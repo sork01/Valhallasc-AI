@@ -209,7 +209,7 @@ impl World {
             let levels: Vec<u32> = self.maps[zone]
                 .quests
                 .iter()
-                .filter(|q| q.gauntlet_level().is_none())
+                .filter(|q| q.gauntlet_level().is_none() && !q.id.starts_with("es_"))
                 .map(|q| q.level)
                 .collect();
             [
@@ -366,7 +366,8 @@ impl World {
             .quests
             .iter()
             .filter(|q| {
-                q.gauntlet_level().is_none()
+                !q.id.starts_with("es_")
+                    && q.gauntlet_level().is_none()
                     && q.level <= level + 2
                     && q.objectives.len() == 1
                     && q.objectives[0].kind == "kill"

@@ -61,7 +61,7 @@
           // Anchor a hunt to a real spawn near its centre, rather than to empty space between packs.
           const x = spawns.reduce((n, e) => n + e.x, 0) / spawns.length, y = spawns.reduce((n, e) => n + e.y, 0) / spawns.length;
           add(spawns.reduce((best, e) => Math.hypot(e.x - x, e.y - y) < Math.hypot(best.x - x, best.y - y) ? e : best), o.label);
-        } else if (['visit', 'hold', 'chime'].includes(o.kind)) {
+        } else if (['visit', 'hold', 'chime', 'memory', 'echo'].includes(o.kind)) {
           for (const p of area.places || []) if (o.kind === 'chime' ? p.chain === o.target : p.id === o.target) add(p, o.label);
         } else if (o.kind === 'talk' || o.kind === 'escort') add((area.npcs || []).find(n => n.id === o.target), o.label);
         else if (o.kind === 'reach') {
@@ -89,6 +89,21 @@
   }
   // A `hold` objective counts seconds of channelling in a ward; a `chime` objective counts the bells of its chain that ring right now.
   const unit = o => o.kind === 'hold' ? ' s' : o.kind === 'chime' ? ' ringing' : '';
+  function storyRecap(quest, node) {
+    if (!quest.story) return;
+    const p = state(quest); if (!p) return;
+    const ready = p.claimed || quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count);
+    const memories = (window.EMPTY_SEAT_SCENES || []).filter(s => s.quest === quest.id && !s.enemy);
+    const texts = ready ? quest.story.recap : memories.filter(s => {
+      const i = quest.objectives.findIndex(o => o.target === s.id);
+      return i >= 0 && (p.counts[i] || 0) >= quest.objectives[i].count;
+    }).map(s => s.description);
+    if (!texts?.length) return;
+    const folded = document.createElement('details'); folded.className = 'quest-memories';
+    folded.append(element('summary', 'Recovered memories'));
+    for (const text of texts) folded.append(element('p', text));
+    node.append(folded);
+  }
   function rewardIcon(id, claim) {
     const item = Inventory.definition(id); if (!item) return null;
     const b = element('button', '', 'item-tile quest-reward-icon'); b.type = 'button';
@@ -140,12 +155,15 @@
     const s = status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
     node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+    if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
     if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${hubName(quest) || 'Quest giver'}`, 'quest-location quest-history'));
     const gap = quest.level - (heroLevel);
     const rec = element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'); rec.dataset.level = String(quest.level);
     if (gap >= 5) rec.style.color = '#ff6b6b'; else if (gap >= 3) rec.style.color = '#ffa65a'; else if (gap <= -5) rec.style.color = '#9fb0a0';
     node.append(rec);
     node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
+    storyRecap(quest, node);
+    if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
     const party = mates(quest);
     if (party.length) {
       const line = element('p', `Party on this quest: ${party.map(m => `${m.name} (${m.done ? 'ready' : m.text})`).join(', ')}`, 'quest-party');
@@ -226,7 +244,15 @@
       const folded = document.createElement('details'); folded.className = 'quest-completed'; folded.open = completedOpen;
       folded.addEventListener('toggle', () => { completedOpen = folded.open; });
       folded.append(element('summary', `Completed (${done.length})`));
-      for (const q of done) { const row = element('p', `${q.title} · ${here(q)}`, 'quest-done'); row.dataset.quest = q.id; folded.append(row); }
+      for (const q of done) {
+        if (q.story) {
+          const row = document.createElement('details'); row.className = 'quest-done'; row.dataset.quest = q.id;
+          row.append(element('summary', q.title), element('p', q.description));
+          for (const text of q.story.recap || []) row.append(element('p', text));
+          if (q.story.next) row.append(element('p', q.story.next, 'quest-next'));
+          folded.append(row);
+        } else { const row = element('p', `${q.title} · ${here(q)}`, 'quest-done'); row.dataset.quest = q.id; folded.append(row); }
+      }
       nodes.push(folded);
     }
     $('quest-list').replaceChildren(...nodes);
@@ -320,7 +346,10 @@
       const s = status(quest);
       const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
       node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+      if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
       node.append(element('p', quest.description));
+      storyRecap(quest, node);
+      if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
       if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
       node.append(element('h5', 'Objectives'), element('p', objectives(quest).join('\n'), 'quest-objectives'));
       node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));

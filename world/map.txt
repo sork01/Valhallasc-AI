@@ -3739,6 +3739,112 @@
         ]
       },
       "minLevel": 99
+    },
+    {
+      "id": "es_01",
+      "title": "Ash in the Bread",
+      "npc": "smith",
+      "description": "Bram found warm ash inside a loaf baked in a cold oven. Follow the ember print north of Alderhaven. Stand still in its circle and listen. Something beneath the meadow is remembering a name.",
+      "objectives": [
+        {
+          "kind": "memory",
+          "target": "es_01_m",
+          "label": "Ash in the Bread",
+          "count": 1
+        }
+      ],
+      "level": 2,
+      "minLevel": 2,
+      "rewardXp": 20,
+      "rewardGold": 24,
+      "requires": null,
+      "repeatable": false,
+      "story": {
+        "title": "The Empty Seat",
+        "chapter": 1,
+        "recap": [
+          "A giant hand cups a tiny flame against a blizzard. A voice says: Not the children. Take my winter instead. The ash spells ELDMARR, then cools."
+        ],
+        "next": "Next chapter: The Cinder That Followed You. Speak to Scout Kael in Emberfall Crags at level 7."
+      },
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_royal",
+          "warrior_armor_azure"
+        ],
+        "mage": [
+          "mage_weapon_crystal",
+          "mage_armor_runic"
+        ],
+        "assassin": [
+          "assassin_weapon_moonfang",
+          "assassin_armor_moon"
+        ],
+        "priest": [
+          "priest_weapon_sunmace",
+          "priest_armor_dawn"
+        ],
+        "hunter": [
+          "hunter_weapon_wardenbow",
+          "hunter_armor_warden"
+        ]
+      }
+    },
+    {
+      "id": "es_28",
+      "title": "Leave One Chair Empty",
+      "npc": "smith",
+      "description": "Return to Bram Emberforge in Alderhaven. Tell him the true name of the one who warmed the first hearth. Then listen at the meadow memorial. The world needs a story that remembers both his gift and his last terrible choice.",
+      "objectives": [
+        {
+          "kind": "talk",
+          "target": "smith",
+          "label": "Tell Bram the keeper's true name",
+          "count": 1
+        },
+        {
+          "kind": "memory",
+          "target": "es_28_m",
+          "label": "Leave One Chair Empty",
+          "count": 1
+        }
+      ],
+      "level": 99,
+      "minLevel": 99,
+      "rewardXp": 12060,
+      "rewardGold": 1188,
+      "requires": "es_27",
+      "repeatable": false,
+      "story": {
+        "title": "The Empty Seat",
+        "chapter": 28,
+        "recap": [
+          "Bram leaves one chair empty beside the village hearth. No crown. No chains. Just a name: Eldmarr, who kept the first fire. Outside, the children plant a tree. The ground is warm enough for spring."
+        ],
+        "next": ""
+      },
+      "rewardChoices": {
+        "warrior": [
+          "warrior_headgear_azure_l95_green",
+          "warrior_shoulders_azure_l95_green"
+        ],
+        "mage": [
+          "mage_headgear_runic_l95_green",
+          "mage_shoulders_runic_l95_green"
+        ],
+        "assassin": [
+          "assassin_headgear_moon_l95_green",
+          "assassin_shoulders_moon_l95_green"
+        ],
+        "priest": [
+          "priest_headgear_dawn_l95_green",
+          "priest_shoulders_dawn_l95_green"
+        ],
+        "hunter": [
+          "hunter_headgear_warden_l95_green",
+          "hunter_shoulders_warden_l95_green"
+        ]
+      }
     }
   ],
   "name": "Greenmeadow",
@@ -6830,6 +6936,12 @@
           "x": 21.5,
           "y": 73,
           "ambush": "raid_key:1"
+        },
+        {
+          "kind": "es_foe_02",
+          "x": 37,
+          "y": 73,
+          "ambush": "empty-seat:es_02_m"
         }
       ],
       "npcs": [
@@ -7392,6 +7504,54 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 5
+        },
+        {
+          "id": "es_02",
+          "title": "The Cinder That Followed You",
+          "npc": "crags_scout",
+          "description": "The ash has crawled into a discarded forge mould. Step into the ember circle to draw out the Cinder Without a Hearth and defeat it. Kael thinks it is tracking old hammer marks, not people.",
+          "objectives": [
+            {
+              "kind": "echo",
+              "target": "es_02_m",
+              "label": "Cinder Without a Hearth",
+              "count": 1
+            }
+          ],
+          "level": 7,
+          "minLevel": 7,
+          "rewardXp": 130,
+          "rewardGold": 84,
+          "requires": "es_01",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 2,
+            "recap": [],
+            "next": "Next chapter: A Warmth Older Than Spring. Speak to Loremaster Ylva in Rimeveil Glacier at level 12."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_armor_azure_l5_green",
+              "warrior_headgear_azure_l5_green"
+            ],
+            "mage": [
+              "mage_armor_runic_l5_green",
+              "mage_headgear_runic_l5_green"
+            ],
+            "assassin": [
+              "assassin_armor_moon_l5_green",
+              "assassin_headgear_moon_l5_green"
+            ],
+            "priest": [
+              "priest_armor_dawn_l5_green",
+              "priest_headgear_dawn_l5_green"
+            ],
+            "hunter": [
+              "hunter_armor_warden_l5_green",
+              "hunter_headgear_warden_l5_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -7438,6 +7598,15 @@
           "shard": "ember_shard_1",
           "bossName": "Cinderthane of Emberfall",
           "color": "#ef6d3d"
+        }
+      ],
+      "places": [
+        {
+          "id": "es_02_m",
+          "name": "The Cinder That Followed You",
+          "x": 35,
+          "y": 73,
+          "r": 2.1
         }
       ]
     },
@@ -13588,6 +13757,56 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 10
+        },
+        {
+          "id": "es_03",
+          "title": "A Warmth Older Than Spring",
+          "npc": "rime_loremaster",
+          "description": "Ylva knows a lullaby about a winter that never ended. Listen at the thaw mark without moving or fighting. The gods are named in every verse except the one that explains who lit the fire.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_03_m",
+              "label": "A Warmth Older Than Spring",
+              "count": 1
+            }
+          ],
+          "level": 12,
+          "minLevel": 12,
+          "rewardXp": 280,
+          "rewardGold": 144,
+          "requires": "es_02",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 3,
+            "recap": [
+              "The ice remembers roots wrapped in a giant's burning hands. Above him, the first houses rise. A child asks his name. The singer has been taught to leave that part silent."
+            ],
+            "next": "Next chapter: The Name in the Drowned Ledger. Speak to Lamplighter Wren in Gloamfen at level 17."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_headgear_azure_l10_green",
+              "warrior_shoulders_azure_l10_green"
+            ],
+            "mage": [
+              "mage_headgear_runic_l10_green",
+              "mage_shoulders_runic_l10_green"
+            ],
+            "assassin": [
+              "assassin_headgear_moon_l10_green",
+              "assassin_shoulders_moon_l10_green"
+            ],
+            "priest": [
+              "priest_headgear_dawn_l10_green",
+              "priest_shoulders_dawn_l10_green"
+            ],
+            "hunter": [
+              "hunter_headgear_warden_l10_green",
+              "hunter_shoulders_warden_l10_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -13644,6 +13863,15 @@
           "shard": "ember_shard_2",
           "bossName": "Frostflame of Rimeveil",
           "color": "#88d7ea"
+        }
+      ],
+      "places": [
+        {
+          "id": "es_03_m",
+          "name": "A Warmth Older Than Spring",
+          "x": 64,
+          "y": 102,
+          "r": 2.1
         }
       ]
     },
@@ -18875,6 +19103,12 @@
           "x": 16.5,
           "y": 37,
           "ambush": "raid_key:3"
+        },
+        {
+          "kind": "es_foe_04",
+          "x": 24,
+          "y": 45,
+          "ambush": "empty-seat:es_04_m"
         }
       ],
       "npcs": [
@@ -19581,6 +19815,54 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 15
+        },
+        {
+          "id": "es_04",
+          "title": "The Name in the Drowned Ledger",
+          "npc": "fen_lamplighter",
+          "description": "A drowned ledger lists nine captains receiving seats in a distant hall. Black water eats the name beneath theirs. Call the Oath-Eater from the circle and recover what it is swallowing.",
+          "objectives": [
+            {
+              "kind": "echo",
+              "target": "es_04_m",
+              "label": "Oath-Eater",
+              "count": 1
+            }
+          ],
+          "level": 17,
+          "minLevel": 17,
+          "rewardXp": 500,
+          "rewardGold": 204,
+          "requires": "es_03",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 4,
+            "recap": [],
+            "next": "Next chapter: The Tenth Place Setting. Speak to Herald Bran Oakenshield in Skaldholm at level 20."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_shoulders_azure_l15_green",
+              "warrior_gloves_azure_l15_green"
+            ],
+            "mage": [
+              "mage_shoulders_runic_l15_green",
+              "mage_gloves_runic_l15_green"
+            ],
+            "assassin": [
+              "assassin_shoulders_moon_l15_green",
+              "assassin_gloves_moon_l15_green"
+            ],
+            "priest": [
+              "priest_shoulders_dawn_l15_green",
+              "priest_gloves_dawn_l15_green"
+            ],
+            "hunter": [
+              "hunter_shoulders_warden_l15_green",
+              "hunter_gloves_warden_l15_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -19617,6 +19899,15 @@
           "shard": "ember_shard_3",
           "bossName": "Bogflame of Gloamfen",
           "color": "#a6b96c"
+        }
+      ],
+      "places": [
+        {
+          "id": "es_04_m",
+          "name": "The Name in the Drowned Ledger",
+          "x": 22,
+          "y": 45,
+          "r": 2.1
         }
       ]
     },
@@ -28872,6 +29163,56 @@
             ]
           },
           "minLevel": 99
+        },
+        {
+          "id": "es_05",
+          "title": "The Tenth Place Setting",
+          "npc": "city_herald",
+          "description": "Bran found a banquet inventory: ten cups, nine chairs. Visit the old setting and listen to the missing toast. The captains were paid before their master ever reached the door.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_05_m",
+              "label": "The Tenth Place Setting",
+              "count": 1
+            }
+          ],
+          "level": 20,
+          "minLevel": 20,
+          "rewardXp": 650,
+          "rewardGold": 240,
+          "requires": "es_04",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 5,
+            "recap": [
+              "Nine cups ring. The tenth is turned upside down. A herald rehearses: The forge has gone out. Behind the wall, a hammer answers once."
+            ],
+            "next": "Next chapter: Keep One Root Alive. Speak to Ash-wright Hallveig in Wyrdwood at level 25."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_gloves_crimson_l20_blue",
+              "warrior_weapon_sword_l20_blue"
+            ],
+            "mage": [
+              "mage_gloves_apprentice_l20_blue",
+              "mage_weapon_ash_l20_blue"
+            ],
+            "assassin": [
+              "assassin_gloves_shadow_l20_blue",
+              "assassin_weapon_daggers_l20_blue"
+            ],
+            "priest": [
+              "priest_gloves_pilgrim_l20_blue",
+              "priest_weapon_mace_l20_blue"
+            ],
+            "hunter": [
+              "hunter_gloves_scout_l20_blue",
+              "hunter_weapon_shortbow_l20_blue"
+            ]
+          }
         }
       ],
       "city": {
@@ -28921,6 +29262,15 @@
           "to": 6,
           "tx": 9.5,
           "ty": 150.0
+        }
+      ],
+      "places": [
+        {
+          "id": "es_05_m",
+          "name": "The Tenth Place Setting",
+          "x": 80,
+          "y": 28,
+          "r": 2.1
         }
       ]
     },
@@ -33622,7 +33972,8 @@
             }
           ]
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "Wyrdwood",
@@ -33917,6 +34268,19 @@
           "x": 88,
           "y": 71,
           "r": 1.8
+        },
+        {
+          "id": "es_06_m",
+          "name": "Keep One Root Alive",
+          "x": 44,
+          "y": 184,
+          "r": 2.1,
+          "waves": [
+            {
+              "at": 1,
+              "tag": "empty-seat:es_06_m"
+            }
+          ]
         }
       ],
       "objects": [
@@ -44434,6 +44798,18 @@
           "x": 66.5,
           "y": 158,
           "ambush": "raid_key:6"
+        },
+        {
+          "kind": "es_foe_06",
+          "x": 46,
+          "y": 184,
+          "ambush": "empty-seat:es_06_m"
+        },
+        {
+          "kind": "es_foe_06",
+          "x": 46,
+          "y": 184,
+          "ambush": "empty-seat:es_06_m"
         }
       ],
       "npcs": [
@@ -45987,6 +46363,54 @@
               "count": 1
             }
           ]
+        },
+        {
+          "id": "es_06",
+          "title": "Keep One Root Alive",
+          "npc": "wyrd_wright",
+          "description": "Hallveig has found a root hot enough to blister bark. Hold the marked circle for twenty seconds while the sootlings attack. The root carries the same warmth as Bram's ash. This time you must use it to save something.",
+          "objectives": [
+            {
+              "kind": "hold",
+              "target": "es_06_m",
+              "label": "Keep the root circle alive",
+              "count": 20
+            }
+          ],
+          "level": 25,
+          "minLevel": 25,
+          "rewardXp": 960,
+          "rewardGold": 300,
+          "requires": "es_05",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 6,
+            "recap": [],
+            "next": "Next chapter: An Invitation With No Door. Speak to Stormseer Veleda in Bifrost Reach at level 32."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_royal_l25_green",
+              "warrior_armor_azure_l25_green"
+            ],
+            "mage": [
+              "mage_weapon_crystal_l25_green",
+              "mage_armor_runic_l25_green"
+            ],
+            "assassin": [
+              "assassin_weapon_moonfang_l25_green",
+              "assassin_armor_moon_l25_green"
+            ],
+            "priest": [
+              "priest_weapon_sunmace_l25_green",
+              "priest_armor_dawn_l25_green"
+            ],
+            "hunter": [
+              "hunter_weapon_wardenbow_l25_green",
+              "hunter_armor_warden_l25_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -46362,6 +46786,33 @@
               "tag": "sky_ward_last#c"
             }
           ]
+        },
+        {
+          "id": "es_07_0",
+          "name": "Oath Bell 1",
+          "x": 50,
+          "y": 133,
+          "r": 2.1,
+          "chain": "es_07_bells",
+          "burn": 30
+        },
+        {
+          "id": "es_07_1",
+          "name": "Oath Bell 2",
+          "x": 66,
+          "y": 133,
+          "r": 2.1,
+          "chain": "es_07_bells",
+          "burn": 30
+        },
+        {
+          "id": "es_07_2",
+          "name": "Oath Bell 3",
+          "x": 75,
+          "y": 130,
+          "r": 2.1,
+          "chain": "es_07_bells",
+          "burn": 30
         }
       ],
       "objects": [
@@ -53973,6 +54424,56 @@
           "rewardCount": 1,
           "repeatable": false,
           "requires": null
+        },
+        {
+          "id": "es_07",
+          "title": "An Invitation With No Door",
+          "npc": "sky_veleda",
+          "description": "Veleda hears three notes trapped in the wind. Ring all three oath bells within thirty seconds to unfold an invitation addressed to the First Keeper of the Forge. Nobody delivered it.",
+          "objectives": [
+            {
+              "kind": "chime",
+              "target": "es_07_bells",
+              "label": "Ring the three oath bells together",
+              "count": 3
+            }
+          ],
+          "level": 32,
+          "minLevel": 32,
+          "rewardXp": 1480,
+          "rewardGold": 384,
+          "requires": "es_06",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 7,
+            "recap": [
+              "The invitation bears Eldmarr's name. Its seal says: A seat beside the fire you gave us. On the back, a later hand has written: Do not admit."
+            ],
+            "next": "Next chapter: The First Shadow. Speak to Halla Deepdiver in Rán's Deep at level 37."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_armor_azure_l30_green",
+              "warrior_headgear_azure_l30_green"
+            ],
+            "mage": [
+              "mage_armor_runic_l30_green",
+              "mage_headgear_runic_l30_green"
+            ],
+            "assassin": [
+              "assassin_armor_moon_l30_green",
+              "assassin_headgear_moon_l30_green"
+            ],
+            "priest": [
+              "priest_armor_dawn_l30_green",
+              "priest_headgear_dawn_l30_green"
+            ],
+            "hunter": [
+              "hunter_armor_warden_l30_green",
+              "hunter_headgear_warden_l30_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -54342,6 +54843,13 @@
           "r": 2.6,
           "chain": "deep_rans",
           "burn": 50
+        },
+        {
+          "id": "es_08_m",
+          "name": "The First Shadow",
+          "x": 25,
+          "y": 141,
+          "r": 2.1
         }
       ],
       "objects": [
@@ -63225,6 +63733,12 @@
           "x": 77.5,
           "y": 131,
           "ambush": "raid_key:8"
+        },
+        {
+          "kind": "es_foe_08",
+          "x": 27,
+          "y": 141,
+          "ambush": "empty-seat:es_08_m"
         }
       ],
       "npcs": [
@@ -64369,6 +64883,54 @@
           "rewardXp": 1740,
           "repeatable": false,
           "requires": null
+        },
+        {
+          "id": "es_08",
+          "title": "The First Shadow",
+          "npc": "deep_halla",
+          "description": "Halla hauled up a chain link that casts a shadow against the current. Enter its circle and defeat the Shade of Eldmarr. It is a memory wearing anger, a fraction of the giant far beneath Asterion.",
+          "objectives": [
+            {
+              "kind": "echo",
+              "target": "es_08_m",
+              "label": "Shade of Eldmarr",
+              "count": 1
+            }
+          ],
+          "level": 37,
+          "minLevel": 37,
+          "rewardXp": 1920,
+          "rewardGold": 444,
+          "requires": "es_07",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 8,
+            "recap": [],
+            "next": "Next chapter: What the Archive Was Paid to Forget. Speak to Vaela Inkfin in Nacrehold at level 40."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_headgear_azure_l35_green",
+              "warrior_shoulders_azure_l35_green"
+            ],
+            "mage": [
+              "mage_headgear_runic_l35_green",
+              "mage_shoulders_runic_l35_green"
+            ],
+            "assassin": [
+              "assassin_headgear_moon_l35_green",
+              "assassin_shoulders_moon_l35_green"
+            ],
+            "priest": [
+              "priest_headgear_dawn_l35_green",
+              "priest_shoulders_dawn_l35_green"
+            ],
+            "hunter": [
+              "hunter_headgear_warden_l35_green",
+              "hunter_shoulders_warden_l35_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -67976,6 +68538,13 @@
           "x": 144,
           "y": 168,
           "r": 3
+        },
+        {
+          "id": "es_09_m",
+          "name": "What the Archive Was Paid to Forget",
+          "x": 144,
+          "y": 72,
+          "r": 2.1
         }
       ],
       "quests": [
@@ -68729,6 +69298,56 @@
             ]
           },
           "minLevel": 99
+        },
+        {
+          "id": "es_09",
+          "title": "What the Archive Was Paid to Forget",
+          "npc": "nacre_archivist",
+          "description": "Vaela found a receipt for scraping a name from the Pearl Archive. Hold still beside the erased inscription. Read the empty space: the lie was purchased, copied and taught to children.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_09_m",
+              "label": "What the Archive Was Paid to Forget",
+              "count": 1
+            }
+          ],
+          "level": 40,
+          "minLevel": 40,
+          "rewardXp": 2210,
+          "rewardGold": 480,
+          "requires": "es_08",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 9,
+            "recap": [
+              "The receipt pays nine shares for one silence. The erased line returns: Eldmarr kept the roots alive through the Long Winter. The hall was built upon his gift."
+            ],
+            "next": "Next chapter: A Constellation With One Star Missing. Speak to Vey Orison in Astralhollow at level 43."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_shoulders_azure_l40_green",
+              "warrior_gloves_azure_l40_green"
+            ],
+            "mage": [
+              "mage_shoulders_runic_l40_green",
+              "mage_gloves_runic_l40_green"
+            ],
+            "assassin": [
+              "assassin_shoulders_moon_l40_green",
+              "assassin_gloves_moon_l40_green"
+            ],
+            "priest": [
+              "priest_shoulders_dawn_l40_green",
+              "priest_gloves_dawn_l40_green"
+            ],
+            "hunter": [
+              "hunter_shoulders_warden_l40_green",
+              "hunter_gloves_warden_l40_green"
+            ]
+          }
         }
       ],
       "futureInstance": {
@@ -75721,7 +76340,8 @@
             }
           ]
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Drowned Cathedral — Coral Reliquary",
@@ -81937,7 +82557,8 @@
             }
           ]
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Drowned Cathedral — Grand Nave",
@@ -89953,7 +90574,8 @@
             }
           ]
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "Astralhollow",
@@ -93636,7 +94258,15 @@
           "buys": false
         }
       ],
-      "places": [],
+      "places": [
+        {
+          "id": "es_10_m",
+          "name": "A Constellation With One Star Missing",
+          "x": 79,
+          "y": 111,
+          "r": 2.1
+        }
+      ],
       "quests": [
         {
           "id": "astral_welcome",
@@ -94729,6 +95359,56 @@
             ]
           },
           "minLevel": 99
+        },
+        {
+          "id": "es_10",
+          "title": "A Constellation With One Star Missing",
+          "npc": "astral_scholar",
+          "description": "Vey charted nine bright stars around a dark tenth. Listen at the fallen star. Its light left the sky on the night the captains accepted their new titles: Wardens.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_10_m",
+              "label": "A Constellation With One Star Missing",
+              "count": 1
+            }
+          ],
+          "level": 43,
+          "minLevel": 43,
+          "rewardXp": 2520,
+          "rewardGold": 516,
+          "requires": "es_09",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 10,
+            "recap": [
+              "Nine shadows bow to a shining hall. Below them, the tenth star is hammered into a ring. Each Warden is given one end of a chain and told never to listen."
+            ],
+            "next": "Next chapter: Break the Beautiful Lie. Speak to Asha of the Lens in The Prismwaste at level 48."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_gloves_crimson_l40_blue",
+              "warrior_weapon_sword_l40_blue"
+            ],
+            "mage": [
+              "mage_gloves_apprentice_l40_blue",
+              "mage_weapon_ash_l40_blue"
+            ],
+            "assassin": [
+              "assassin_gloves_shadow_l40_blue",
+              "assassin_weapon_daggers_l40_blue"
+            ],
+            "priest": [
+              "priest_gloves_pilgrim_l40_blue",
+              "priest_weapon_mace_l40_blue"
+            ],
+            "hunter": [
+              "hunter_gloves_scout_l40_blue",
+              "hunter_weapon_shortbow_l40_blue"
+            ]
+          }
         }
       ],
       "city": {
@@ -97525,6 +98205,12 @@
           "x": 29.5,
           "y": 75,
           "ambush": "raid_key:14"
+        },
+        {
+          "kind": "es_foe_11",
+          "x": 72,
+          "y": 80,
+          "ambush": "empty-seat:es_11_m"
         }
       ],
       "npcs": [
@@ -97844,7 +98530,15 @@
           "buys": false
         }
       ],
-      "places": [],
+      "places": [
+        {
+          "id": "es_11_m",
+          "name": "Break the Beautiful Lie",
+          "x": 70,
+          "y": 80,
+          "r": 2.1
+        }
+      ],
       "quests": [
         {
           "id": "prism_welcome",
@@ -98478,6 +99172,54 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 45
+        },
+        {
+          "id": "es_11",
+          "title": "Break the Beautiful Lie",
+          "npc": "prism_scholar",
+          "description": "Asha's lens shows Eldmarr as a monster before the first chain touched him. Call out the Gilded Witness and break the false reflection. Someone made the betrayal look like a rescue.",
+          "objectives": [
+            {
+              "kind": "echo",
+              "target": "es_11_m",
+              "label": "Gilded Witness",
+              "count": 1
+            }
+          ],
+          "level": 48,
+          "minLevel": 48,
+          "rewardXp": 3090,
+          "rewardGold": 576,
+          "requires": "es_10",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 11,
+            "recap": [],
+            "next": "Next chapter: The Clock That Counts Downward. Speak to Edda Pendulum in The Obsidian Orrery at level 53."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_royal_l45_green",
+              "warrior_armor_azure_l45_green"
+            ],
+            "mage": [
+              "mage_weapon_crystal_l45_green",
+              "mage_armor_runic_l45_green"
+            ],
+            "assassin": [
+              "assassin_weapon_moonfang_l45_green",
+              "assassin_armor_moon_l45_green"
+            ],
+            "priest": [
+              "priest_weapon_sunmace_l45_green",
+              "priest_armor_dawn_l45_green"
+            ],
+            "hunter": [
+              "hunter_weapon_wardenbow_l45_green",
+              "hunter_armor_warden_l45_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -101697,7 +102439,15 @@
           "buys": false
         }
       ],
-      "places": [],
+      "places": [
+        {
+          "id": "es_12_m",
+          "name": "The Clock That Counts Downward",
+          "x": 73,
+          "y": 52,
+          "r": 2.1
+        }
+      ],
       "quests": [
         {
           "id": "orrery_welcome",
@@ -102331,6 +103081,56 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 50
+        },
+        {
+          "id": "es_12",
+          "title": "The Clock That Counts Downward",
+          "npc": "orrery_scholar",
+          "description": "Edda's buried clock has never measured hours. Stand in its measuring circle and hear what it counts. Every turn belongs to the fire trapped beneath the world.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_12_m",
+              "label": "The Clock That Counts Downward",
+              "count": 1
+            }
+          ],
+          "level": 53,
+          "minLevel": 53,
+          "rewardXp": 3710,
+          "rewardGold": 636,
+          "requires": "es_11",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 12,
+            "recap": [
+              "The hands count chain fractures. A hundred years of heat press against nine failing links. The roots have begun carrying the pressure outward. This is not a future war. It has already started under your feet."
+            ],
+            "next": "Next chapter: Borrow a Dream That Is Not Yours. Speak to Odo Sporeglass in The Moonspore Canopy at level 58."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_armor_azure_l50_green",
+              "warrior_headgear_azure_l50_green"
+            ],
+            "mage": [
+              "mage_armor_runic_l50_green",
+              "mage_headgear_runic_l50_green"
+            ],
+            "assassin": [
+              "assassin_armor_moon_l50_green",
+              "assassin_headgear_moon_l50_green"
+            ],
+            "priest": [
+              "priest_armor_dawn_l50_green",
+              "priest_headgear_dawn_l50_green"
+            ],
+            "hunter": [
+              "hunter_armor_warden_l50_green",
+              "hunter_headgear_warden_l50_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -106049,7 +106849,15 @@
           "buys": false
         }
       ],
-      "places": [],
+      "places": [
+        {
+          "id": "es_13_m",
+          "name": "Borrow a Dream That Is Not Yours",
+          "x": 71,
+          "y": 68,
+          "r": 2.1
+        }
+      ],
       "quests": [
         {
           "id": "moonspore_welcome",
@@ -106808,6 +107616,56 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 55
+        },
+        {
+          "id": "es_13",
+          "title": "Borrow a Dream That Is Not Yours",
+          "npc": "moonspore_scholar",
+          "description": "Odo has grown a memory in a lantern cap. Keep still in the spore circle until it opens. It remembers a much younger Eldmarr, and it knows a way to let you walk through his last free night in Asterion.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_13_m",
+              "label": "Borrow a Dream That Is Not Yours",
+              "count": 1
+            }
+          ],
+          "level": 58,
+          "minLevel": 58,
+          "rewardXp": 4380,
+          "rewardGold": 696,
+          "requires": "es_12",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 13,
+            "recap": [
+              "A giant kneels to warm a seedling. The dream asks you to bring three things to Asterion: the hand that gave, the promise that was made, and the hand that closed the chain. You carry them as memories."
+            ],
+            "next": "Next chapter: Before the Nine Chains. Speak to Archon Seraphine Vey in Asterion at level 60."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_headgear_azure_l55_green",
+              "warrior_shoulders_azure_l55_green"
+            ],
+            "mage": [
+              "mage_headgear_runic_l55_green",
+              "mage_shoulders_runic_l55_green"
+            ],
+            "assassin": [
+              "assassin_headgear_moon_l55_green",
+              "assassin_shoulders_moon_l55_green"
+            ],
+            "priest": [
+              "priest_headgear_dawn_l55_green",
+              "priest_shoulders_dawn_l55_green"
+            ],
+            "hunter": [
+              "hunter_headgear_warden_l55_green",
+              "hunter_shoulders_warden_l55_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -112722,6 +113580,70 @@
               "count": 3
             }
           ]
+        },
+        {
+          "id": "es_14",
+          "title": "Before the Nine Chains",
+          "npc": "asterion_archon",
+          "description": "Seraphine will open the city's buried memory. Walk through its three circles in order: the First Hearth, the Promised Table and the Closing Chain. Stand still at each to witness the Long Winter, the bargain and the betrayal. You remain yourself inside the vision; you can leave and return.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_14_0",
+              "label": "The First Hearth",
+              "count": 1
+            },
+            {
+              "kind": "memory",
+              "target": "es_14_1",
+              "label": "The Promised Table",
+              "count": 1
+            },
+            {
+              "kind": "memory",
+              "target": "es_14_2",
+              "label": "The Closing Chain",
+              "count": 1
+            }
+          ],
+          "level": 60,
+          "minLevel": 60,
+          "rewardXp": 4670,
+          "rewardGold": 720,
+          "requires": "es_13",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 14,
+            "recap": [
+              "Long before the chains. Snow buries the last village. Eldmarr tears open his own furnace ribs and lays his fire beneath the roots. A small voice asks if it hurts. He says: Only until spring.",
+              "The hall rises on the rescued roots. A messenger promises Eldmarr a seat beside its fire. He forges ten cups, one for each captain and one for himself. For the first time, the keeper lets his hammer rest.",
+              "Nine captains enter wearing new gold. They lower chains instead of a chair. Eldmarr asks: Did you leave no place for me? One captain looks away. A hundred winters later, that question is still burning."
+            ],
+            "next": "Next chapter: The Sea Cannot Swallow This Fire. Speak to Orrin Glass in The Stormglass Shore at level 63."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_shoulders_azure_l60_green",
+              "warrior_gloves_azure_l60_green"
+            ],
+            "mage": [
+              "mage_shoulders_runic_l60_green",
+              "mage_gloves_runic_l60_green"
+            ],
+            "assassin": [
+              "assassin_shoulders_moon_l60_green",
+              "assassin_gloves_moon_l60_green"
+            ],
+            "priest": [
+              "priest_shoulders_dawn_l60_green",
+              "priest_gloves_dawn_l60_green"
+            ],
+            "hunter": [
+              "hunter_shoulders_warden_l60_green",
+              "hunter_gloves_warden_l60_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -112814,6 +113736,27 @@
           "r": 1.8,
           "chain": "admit_moon",
           "burn": 25
+        },
+        {
+          "id": "es_14_0",
+          "name": "The First Hearth",
+          "x": 76,
+          "y": 93,
+          "r": 2.1
+        },
+        {
+          "id": "es_14_1",
+          "name": "The Promised Table",
+          "x": 85,
+          "y": 93,
+          "r": 2.1
+        },
+        {
+          "id": "es_14_2",
+          "name": "The Closing Chain",
+          "x": 94,
+          "y": 93,
+          "r": 2.1
         }
       ]
     },
@@ -119583,7 +120526,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Stormglass Shore",
@@ -122616,6 +123560,18 @@
           "kind": "breakersentinel",
           "x": 27.75,
           "y": 23.8
+        },
+        {
+          "kind": "es_foe_15",
+          "x": 81,
+          "y": 58,
+          "ambush": "empty-seat:es_15_m"
+        },
+        {
+          "kind": "es_foe_15",
+          "x": 81,
+          "y": 58,
+          "ambush": "empty-seat:es_15_m"
         }
       ],
       "npcs": [
@@ -123001,6 +123957,19 @@
           "x": 92,
           "y": 36,
           "r": 3
+        },
+        {
+          "id": "es_15_m",
+          "name": "The Sea Cannot Swallow This Fire",
+          "x": 79,
+          "y": 58,
+          "r": 2.1,
+          "waves": [
+            {
+              "at": 1,
+              "tag": "empty-seat:es_15_m"
+            }
+          ]
         }
       ],
       "quests": [
@@ -123650,6 +124619,54 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 60
+        },
+        {
+          "id": "es_15",
+          "title": "The Sea Cannot Swallow This Fire",
+          "npc": "stormglass_scholar",
+          "description": "Orrin found salt boiling on a cold shore. Hold the cooling circle for twenty seconds against escaped furnace sparks. The sea is not putting out Eldmarr's fire; his heat is travelling through the world's roots beneath it.",
+          "objectives": [
+            {
+              "kind": "hold",
+              "target": "es_15_m",
+              "label": "Keep the root circle alive",
+              "count": 20
+            }
+          ],
+          "level": 63,
+          "minLevel": 63,
+          "rewardXp": 5120,
+          "rewardGold": 756,
+          "requires": "es_14",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 15,
+            "recap": [],
+            "next": "Next chapter: The Harvest of Tomorrow. Speak to Ada Bell in Sunward Vale at level 68."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_gloves_crimson_l60_blue",
+              "warrior_weapon_sword_l60_blue"
+            ],
+            "mage": [
+              "mage_gloves_apprentice_l60_blue",
+              "mage_weapon_ash_l60_blue"
+            ],
+            "assassin": [
+              "assassin_gloves_shadow_l60_blue",
+              "assassin_weapon_daggers_l60_blue"
+            ],
+            "priest": [
+              "priest_gloves_pilgrim_l60_blue",
+              "priest_weapon_mace_l60_blue"
+            ],
+            "hunter": [
+              "hunter_gloves_scout_l60_blue",
+              "hunter_weapon_shortbow_l60_blue"
+            ]
+          }
         }
       ],
       "city": {
@@ -127292,6 +128309,13 @@
           "x": 108,
           "y": 41,
           "r": 4
+        },
+        {
+          "id": "es_16_m",
+          "name": "The Harvest of Tomorrow",
+          "x": 36,
+          "y": 43,
+          "r": 2.1
         }
       ],
       "quests": [
@@ -128004,6 +129028,56 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 65
+        },
+        {
+          "id": "es_16",
+          "title": "The Harvest of Tomorrow",
+          "npc": "sun_miller",
+          "description": "Ada planted tomorrow's seed and harvested yesterday's ash. Read the ember furrow. Eldmarr is no longer sending memories by accident. He is offering you a warning, and a choice.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_16_m",
+              "label": "The Harvest of Tomorrow",
+              "count": 1
+            }
+          ],
+          "level": 68,
+          "minLevel": 68,
+          "rewardXp": 5900,
+          "rewardGold": 816,
+          "requires": "es_15",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 16,
+            "recap": [
+              "Eldmarr speaks through the grain: I warmed their cradle. They built a throne on my back. Stand aside when I rise. Beside the voice, a real wheat stalk turns to ash. His road upward runs through living homes."
+            ],
+            "next": "Next chapter: A Mask for the Man He Was. Speak to Mira Vell in The Ribbonwild at level 73."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_royal_l65_green",
+              "warrior_armor_azure_l65_green"
+            ],
+            "mage": [
+              "mage_weapon_crystal_l65_green",
+              "mage_armor_runic_l65_green"
+            ],
+            "assassin": [
+              "assassin_weapon_moonfang_l65_green",
+              "assassin_armor_moon_l65_green"
+            ],
+            "priest": [
+              "priest_weapon_sunmace_l65_green",
+              "priest_armor_dawn_l65_green"
+            ],
+            "hunter": [
+              "hunter_weapon_wardenbow_l65_green",
+              "hunter_armor_warden_l65_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -130927,6 +132001,12 @@
           "kind": "jesterling",
           "x": 57.03,
           "y": 109.08
+        },
+        {
+          "kind": "es_foe_17",
+          "x": 85,
+          "y": 25,
+          "ambush": "empty-seat:es_17_m"
         }
       ],
       "npcs": [
@@ -131322,6 +132402,13 @@
           "x": 111,
           "y": 91,
           "r": 5
+        },
+        {
+          "id": "es_17_m",
+          "name": "A Mask for the Man He Was",
+          "x": 83,
+          "y": 25,
+          "r": 2.1
         }
       ],
       "quests": [
@@ -132035,6 +133122,54 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 70
+        },
+        {
+          "id": "es_17",
+          "title": "A Mask for the Man He Was",
+          "npc": "ribbon_host",
+          "description": "Mira's dancers remember the forge keeper as a gentle festival giant. An angry memory has stolen their masks. Enter the circle and defeat the Uninvited Guest before its borrowed face becomes the only version anyone remembers.",
+          "objectives": [
+            {
+              "kind": "echo",
+              "target": "es_17_m",
+              "label": "The Uninvited Guest",
+              "count": 1
+            }
+          ],
+          "level": 73,
+          "minLevel": 73,
+          "rewardXp": 6750,
+          "rewardGold": 876,
+          "requires": "es_16",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 17,
+            "recap": [],
+            "next": "Next chapter: The Root That Refused the Order. Speak to Tavi Moss in The Tanglecrown at level 78."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_armor_azure_l70_green",
+              "warrior_headgear_azure_l70_green"
+            ],
+            "mage": [
+              "mage_armor_runic_l70_green",
+              "mage_headgear_runic_l70_green"
+            ],
+            "assassin": [
+              "assassin_armor_moon_l70_green",
+              "assassin_headgear_moon_l70_green"
+            ],
+            "priest": [
+              "priest_armor_dawn_l70_green",
+              "priest_headgear_dawn_l70_green"
+            ],
+            "hunter": [
+              "hunter_armor_warden_l70_green",
+              "hunter_headgear_warden_l70_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -135802,6 +136937,18 @@
           "kind": "drumgorilla",
           "x": 133.72,
           "y": 56.73
+        },
+        {
+          "kind": "es_foe_18",
+          "x": 79,
+          "y": 77,
+          "ambush": "empty-seat:es_18_m"
+        },
+        {
+          "kind": "es_foe_18",
+          "x": 79,
+          "y": 77,
+          "ambush": "empty-seat:es_18_m"
         }
       ],
       "npcs": [
@@ -136239,6 +137386,19 @@
           "x": 111,
           "y": 76,
           "r": 5
+        },
+        {
+          "id": "es_18_m",
+          "name": "The Root That Refused the Order",
+          "x": 77,
+          "y": 77,
+          "r": 2.1,
+          "waves": [
+            {
+              "at": 1,
+              "tag": "empty-seat:es_18_m"
+            }
+          ]
         }
       ],
       "quests": [
@@ -137066,6 +138226,54 @@
           "requires": "tangle_banyan_3",
           "repeatable": false,
           "rewardMount": "raptor"
+        },
+        {
+          "id": "es_18",
+          "title": "The Root That Refused the Order",
+          "npc": "tangle_botanist",
+          "description": "Tavi found one root growing against the others. Hold its circle for twenty seconds while chain thorns try to turn it back. Eldmarr has begun ordering the roots toward the pillars of the gods' hall. Help this one keep feeding the forest.",
+          "objectives": [
+            {
+              "kind": "hold",
+              "target": "es_18_m",
+              "label": "Keep the root circle alive",
+              "count": 20
+            }
+          ],
+          "level": 78,
+          "minLevel": 78,
+          "rewardXp": 7650,
+          "rewardGold": 936,
+          "requires": "es_17",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 18,
+            "recap": [],
+            "next": "Next chapter: Count the Windows, Not the Thrones. Speak to Iria Sunbark in Veyrroot Canopy at level 80."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_headgear_azure_l75_green",
+              "warrior_shoulders_azure_l75_green"
+            ],
+            "mage": [
+              "mage_headgear_runic_l75_green",
+              "mage_shoulders_runic_l75_green"
+            ],
+            "assassin": [
+              "assassin_headgear_moon_l75_green",
+              "assassin_shoulders_moon_l75_green"
+            ],
+            "priest": [
+              "priest_headgear_dawn_l75_green",
+              "priest_shoulders_dawn_l75_green"
+            ],
+            "hunter": [
+              "hunter_headgear_warden_l75_green",
+              "hunter_shoulders_warden_l75_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -139154,6 +140362,13 @@
           "x": 36,
           "y": 87,
           "r": 4
+        },
+        {
+          "id": "es_19_m",
+          "name": "Count the Windows, Not the Thrones",
+          "x": 76,
+          "y": 87,
+          "r": 2.1
         }
       ],
       "quests": [
@@ -139340,6 +140555,56 @@
           "rewardGold": 7200,
           "requires": "heart_welcome",
           "repeatable": true
+        },
+        {
+          "id": "es_19",
+          "title": "Count the Windows, Not the Thrones",
+          "npc": "heart_matriarch",
+          "description": "Iria asks you to listen where the canopy homes meet the great root. You have learned why Eldmarr hates the hall. Now listen to the people who will fall with it.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_19_m",
+              "label": "Count the Windows, Not the Thrones",
+              "count": 1
+            }
+          ],
+          "level": 80,
+          "minLevel": 80,
+          "rewardXp": 8030,
+          "rewardGold": 960,
+          "requires": "es_18",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 19,
+            "recap": [
+              "Supper bowls. A child practising a song. A carpenter promising to mend a window tomorrow. The root holds every voice at once. Eldmarr's revenge cannot choose only the guilty."
+            ],
+            "next": "Next chapter: A Third Answer. Speak to Veya of the Pith in Veyrroot Heartwood at level 80."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_shoulders_azure_l80_green",
+              "warrior_gloves_azure_l80_green"
+            ],
+            "mage": [
+              "mage_shoulders_runic_l80_green",
+              "mage_gloves_runic_l80_green"
+            ],
+            "assassin": [
+              "assassin_shoulders_moon_l80_green",
+              "assassin_gloves_moon_l80_green"
+            ],
+            "priest": [
+              "priest_shoulders_dawn_l80_green",
+              "priest_gloves_dawn_l80_green"
+            ],
+            "hunter": [
+              "hunter_shoulders_warden_l80_green",
+              "hunter_gloves_warden_l80_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -140223,6 +141488,13 @@
           "x": 48,
           "y": 20,
           "r": 4
+        },
+        {
+          "id": "es_20_m",
+          "name": "A Third Answer",
+          "x": 48,
+          "y": 53,
+          "r": 2.1
         }
       ],
       "quests": [
@@ -140330,6 +141602,56 @@
           "group": true,
           "recommendedPlayers": 5,
           "rewardItem": "accessory_amber_l80_blue"
+        },
+        {
+          "id": "es_20",
+          "title": "A Third Answer",
+          "npc": "heart_oracle",
+          "description": "Veya has heard two endings: leave the giant chained until the roots burn, or let him rise and melt them. Listen at the Living Pith for a third. Saving the world must not require calling the betrayal just.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_20_m",
+              "label": "A Third Answer",
+              "count": 1
+            }
+          ],
+          "level": 80,
+          "minLevel": 80,
+          "rewardXp": 8030,
+          "rewardGold": 960,
+          "requires": "es_19",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 20,
+            "recap": [
+              "The pith answers: Break the jailers. End the hand that would burn us. Keep the name they buried. We can carry the old warmth without carrying his wrath. One small green shoot opens in your palm."
+            ],
+            "next": "Next chapter: The Route Beneath Every Map. Speak to Ivo Starfold in The Lapis Erg at level 83."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_gloves_crimson_l80_blue",
+              "warrior_weapon_sword_l80_blue"
+            ],
+            "mage": [
+              "mage_gloves_apprentice_l80_blue",
+              "mage_weapon_ash_l80_blue"
+            ],
+            "assassin": [
+              "assassin_gloves_shadow_l80_blue",
+              "assassin_weapon_daggers_l80_blue"
+            ],
+            "priest": [
+              "priest_gloves_pilgrim_l80_blue",
+              "priest_weapon_mace_l80_blue"
+            ],
+            "hunter": [
+              "hunter_gloves_scout_l80_blue",
+              "hunter_weapon_shortbow_l80_blue"
+            ]
+          }
         }
       ],
       "city": {
@@ -143939,6 +145261,33 @@
           "x": 112,
           "y": 92,
           "r": 5
+        },
+        {
+          "id": "es_21_0",
+          "name": "Oath Bell 1",
+          "x": 57,
+          "y": 60,
+          "r": 2.1,
+          "chain": "es_21_bells",
+          "burn": 30
+        },
+        {
+          "id": "es_21_1",
+          "name": "Oath Bell 2",
+          "x": 65,
+          "y": 54,
+          "r": 2.1,
+          "chain": "es_21_bells",
+          "burn": 30
+        },
+        {
+          "id": "es_21_2",
+          "name": "Oath Bell 3",
+          "x": 77,
+          "y": 57,
+          "r": 2.1,
+          "chain": "es_21_bells",
+          "burn": 30
         }
       ],
       "quests": [
@@ -144671,6 +146020,56 @@
               "count": 1
             }
           ]
+        },
+        {
+          "id": "es_21",
+          "title": "The Route Beneath Every Map",
+          "npc": "lapis_cartographer",
+          "description": "Ivo sees the old forge roads reflected under the sand. Tune all three survey bells within thirty seconds. Their joined note will show where the failing chains are sending their heat.",
+          "objectives": [
+            {
+              "kind": "chime",
+              "target": "es_21_bells",
+              "label": "Ring the three oath bells together",
+              "count": 3
+            }
+          ],
+          "level": 83,
+          "minLevel": 83,
+          "rewardXp": 8610,
+          "rewardGold": 996,
+          "requires": "es_20",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 21,
+            "recap": [
+              "Every buried road points toward Asterion. The heat does not spread at random: Eldmarr is testing which root will carry him closest to the hall."
+            ],
+            "next": "Next chapter: An Apology Made of Ice. Speak to Ylva Bellward in Frostwake Shelf at level 88."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_royal_l80_green",
+              "warrior_armor_azure_l80_green"
+            ],
+            "mage": [
+              "mage_weapon_crystal_l80_green",
+              "mage_armor_runic_l80_green"
+            ],
+            "assassin": [
+              "assassin_weapon_moonfang_l80_green",
+              "assassin_armor_moon_l80_green"
+            ],
+            "priest": [
+              "priest_weapon_sunmace_l80_green",
+              "priest_armor_dawn_l80_green"
+            ],
+            "hunter": [
+              "hunter_weapon_wardenbow_l80_green",
+              "hunter_armor_warden_l80_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -147833,6 +149232,12 @@
           "kind": "glaciercrab",
           "x": 87.67,
           "y": 106.46
+        },
+        {
+          "kind": "es_foe_22",
+          "x": 88,
+          "y": 77,
+          "ambush": "empty-seat:es_22_m"
         }
       ],
       "npcs": [
@@ -148378,6 +149783,13 @@
           "x": 96,
           "y": 37,
           "r": 5
+        },
+        {
+          "id": "es_22_m",
+          "name": "An Apology Made of Ice",
+          "x": 86,
+          "y": 77,
+          "r": 2.1
         }
       ],
       "quests": [
@@ -149003,6 +150415,54 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 85
+        },
+        {
+          "id": "es_22",
+          "title": "An Apology Made of Ice",
+          "npc": "frostwake_bellkeeper",
+          "description": "Ylva caught a Warden's abandoned apology inside an ice bell. Call out the Penitent Chain and break it. The Wardens were offered places at the table. Each told himself that one more winter of silence would hurt nobody.",
+          "objectives": [
+            {
+              "kind": "echo",
+              "target": "es_22_m",
+              "label": "Penitent Chain",
+              "count": 1
+            }
+          ],
+          "level": 88,
+          "minLevel": 88,
+          "rewardXp": 9630,
+          "rewardGold": 1056,
+          "requires": "es_21",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 22,
+            "recap": [],
+            "next": "Next chapter: Teach the Mountain His Name. Speak to Edda Flintvoice in The Cairnspine at level 93."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_armor_azure_l85_green",
+              "warrior_headgear_azure_l85_green"
+            ],
+            "mage": [
+              "mage_armor_runic_l85_green",
+              "mage_headgear_runic_l85_green"
+            ],
+            "assassin": [
+              "assassin_armor_moon_l85_green",
+              "assassin_headgear_moon_l85_green"
+            ],
+            "priest": [
+              "priest_armor_dawn_l85_green",
+              "priest_headgear_dawn_l85_green"
+            ],
+            "hunter": [
+              "hunter_armor_warden_l85_green",
+              "hunter_headgear_warden_l85_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -152568,6 +154028,33 @@
           "x": 106,
           "y": 78,
           "r": 5
+        },
+        {
+          "id": "es_23_0",
+          "name": "Oath Bell 1",
+          "x": 52,
+          "y": 62,
+          "r": 2.1,
+          "chain": "es_23_bells",
+          "burn": 30
+        },
+        {
+          "id": "es_23_1",
+          "name": "Oath Bell 2",
+          "x": 59,
+          "y": 62,
+          "r": 2.1,
+          "chain": "es_23_bells",
+          "burn": 30
+        },
+        {
+          "id": "es_23_2",
+          "name": "Oath Bell 3",
+          "x": 66,
+          "y": 62,
+          "r": 2.1,
+          "chain": "es_23_bells",
+          "burn": 30
         }
       ],
       "quests": [
@@ -153332,6 +154819,56 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 90
+        },
+        {
+          "id": "es_23",
+          "title": "Teach the Mountain His Name",
+          "npc": "cairn_stonesinger",
+          "description": "Edda has carved the keeper's true name into three singing stones. Ring them together within thirty seconds. The mountain must remember who held it up before you ask it to survive his fall.",
+          "objectives": [
+            {
+              "kind": "chime",
+              "target": "es_23_bells",
+              "label": "Ring the three oath bells together",
+              "count": 3
+            }
+          ],
+          "level": 93,
+          "minLevel": 93,
+          "rewardXp": 10700,
+          "rewardGold": 1116,
+          "requires": "es_22",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 23,
+            "recap": [
+              "The stones answer: Eldmarr, First Keeper. Not the gods' furnace. Not the world's enemy from the beginning. A rescuer who now chooses to become its destroyer."
+            ],
+            "next": "Next chapter: One Year the Fire Cannot Have. Speak to Ysra Snowglass in The Yearwheel at level 97."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_headgear_azure_l90_green",
+              "warrior_shoulders_azure_l90_green"
+            ],
+            "mage": [
+              "mage_headgear_runic_l90_green",
+              "mage_shoulders_runic_l90_green"
+            ],
+            "assassin": [
+              "assassin_headgear_moon_l90_green",
+              "assassin_shoulders_moon_l90_green"
+            ],
+            "priest": [
+              "priest_headgear_dawn_l90_green",
+              "priest_shoulders_dawn_l90_green"
+            ],
+            "hunter": [
+              "hunter_headgear_warden_l90_green",
+              "hunter_shoulders_warden_l90_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -166163,6 +167700,77 @@
               "count": 12
             }
           ]
+        },
+        {
+          "id": "es_24",
+          "title": "One Year the Fire Cannot Have",
+          "npc": "yr_wi_lead",
+          "description": "Ysra asks you to gather four promises from the Yearwheel: a spring that grows, a summer that feeds, an autumn that shares and a winter that shelters. Listen in each circle. These are the futures you carry into the Forge.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_24_0",
+              "label": "A Spring That Grows",
+              "count": 1
+            },
+            {
+              "kind": "memory",
+              "target": "es_24_1",
+              "label": "A Summer That Feeds",
+              "count": 1
+            },
+            {
+              "kind": "memory",
+              "target": "es_24_2",
+              "label": "An Autumn That Shares",
+              "count": 1
+            },
+            {
+              "kind": "memory",
+              "target": "es_24_3",
+              "label": "A Winter That Shelters",
+              "count": 1
+            }
+          ],
+          "level": 97,
+          "minLevel": 97,
+          "rewardXp": 11600,
+          "rewardGold": 1164,
+          "requires": "es_23",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 24,
+            "recap": [
+              "A seed breaks its shell. The world does not owe the old hall another year, but the seed has done nothing to deserve a fire.",
+              "Hands pass bread across a crowded table. There is room because someone brings another chair.",
+              "An old farmer leaves the last apples for strangers. A gift can outlive the person who gave it.",
+              "A child closes a door against the snow, then opens it again for a traveller. This is the winter Eldmarr once wanted to save."
+            ],
+            "next": "Next chapter: The Guest at the Last Door. Speak to Svala Ashroad in Emberwake Caldera at level 99."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_shoulders_azure_l95_green",
+              "warrior_gloves_azure_l95_green"
+            ],
+            "mage": [
+              "mage_shoulders_runic_l95_green",
+              "mage_gloves_runic_l95_green"
+            ],
+            "assassin": [
+              "assassin_shoulders_moon_l95_green",
+              "assassin_gloves_moon_l95_green"
+            ],
+            "priest": [
+              "priest_shoulders_dawn_l95_green",
+              "priest_gloves_dawn_l95_green"
+            ],
+            "hunter": [
+              "hunter_shoulders_warden_l95_green",
+              "hunter_gloves_warden_l95_green"
+            ]
+          }
         }
       ],
       "city": {
@@ -166266,6 +167874,34 @@
           "x": 57,
           "y": 153,
           "r": 1.8
+        },
+        {
+          "id": "es_24_0",
+          "name": "A Spring That Grows",
+          "x": 72,
+          "y": 319,
+          "r": 2.1
+        },
+        {
+          "id": "es_24_1",
+          "name": "A Summer That Feeds",
+          "x": 316,
+          "y": 311,
+          "r": 2.1
+        },
+        {
+          "id": "es_24_2",
+          "name": "An Autumn That Shares",
+          "x": 319,
+          "y": 100,
+          "r": 2.1
+        },
+        {
+          "id": "es_24_3",
+          "name": "A Winter That Shelters",
+          "x": 71,
+          "y": 97,
+          "r": 2.1
         }
       ],
       "futureInstances": [
@@ -169320,7 +170956,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Elder Hollow",
@@ -172625,7 +174262,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Thousandfold Pavilion",
@@ -175765,7 +177403,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "Temple of the Rain Crown",
@@ -178512,7 +180151,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Seed Vault",
@@ -181430,7 +183070,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Sunken Astrolabe",
@@ -184659,7 +186300,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Thunderheart Gate",
@@ -187667,7 +189309,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Blooming Labyrinth",
@@ -191119,7 +192762,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Solar Crucible",
@@ -194313,7 +195957,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Amber Archive",
@@ -197888,7 +199533,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Silent Solstice",
@@ -201289,7 +202935,8 @@
           "after_clear": true,
           "look": "exit"
         }
-      ]
+      ],
+      "places": []
     },
     {
       "name": "The Arena",
@@ -226970,6 +228617,12 @@
           "kind": "ew_cinderhorn",
           "x": 117,
           "y": 24
+        },
+        {
+          "kind": "es_foe_25",
+          "x": 117,
+          "y": 49,
+          "ambush": "empty-seat:es_25_m"
         }
       ],
       "npcs": [
@@ -227400,6 +229053,152 @@
           "rewardItem": "ember_key",
           "requires": null,
           "repeatable": false
+        },
+        {
+          "id": "es_25",
+          "title": "The Guest at the Last Door",
+          "npc": "ew_guide",
+          "description": "Svala says your memories have reached the Nine-Chain Door ahead of you. Eldmarr wants to hear your answer himself. Enter the marked circle and defeat the Shade of the Unbound King. Its power is only an echo; the giant beyond the door is still waiting.",
+          "objectives": [
+            {
+              "kind": "echo",
+              "target": "es_25_m",
+              "label": "Shade of the Unbound King",
+              "count": 1
+            }
+          ],
+          "level": 99,
+          "minLevel": 99,
+          "rewardXp": 12060,
+          "rewardGold": 1188,
+          "requires": "es_24",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 25,
+            "recap": [],
+            "next": "Next chapter: A Place for the Living. Speak to Hedda Linkkeeper in Emberwake Caldera at level 99."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_gloves_crimson_l95_blue",
+              "warrior_weapon_sword_l95_blue"
+            ],
+            "mage": [
+              "mage_gloves_apprentice_l95_blue",
+              "mage_weapon_ash_l95_blue"
+            ],
+            "assassin": [
+              "assassin_gloves_shadow_l95_blue",
+              "assassin_weapon_daggers_l95_blue"
+            ],
+            "priest": [
+              "priest_gloves_pilgrim_l95_blue",
+              "priest_weapon_mace_l95_blue"
+            ],
+            "hunter": [
+              "hunter_gloves_scout_l95_blue",
+              "hunter_weapon_shortbow_l95_blue"
+            ]
+          }
+        },
+        {
+          "id": "es_26",
+          "title": "A Place for the Living",
+          "npc": "ew_keeper",
+          "description": "Hedda will carry your answer to the sealed court. Stand at the offered seat and refuse the bargain: you will break the Wardens, but you will not give Eldmarr the roots to burn. Afterwards, prepare your Ember Key and ten fighters for the Chained Forge.",
+          "objectives": [
+            {
+              "kind": "memory",
+              "target": "es_26_m",
+              "label": "A Place for the Living",
+              "count": 1
+            }
+          ],
+          "level": 99,
+          "minLevel": 99,
+          "rewardXp": 12060,
+          "rewardGold": 1188,
+          "requires": "es_25",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 26,
+            "recap": [
+              "You set a green shoot on the empty seat. Eldmarr answers: They promised me a place. You answer: And you promised the roots another spring. The door shakes. For a moment, the fire sounds like grief."
+            ],
+            "next": "Next chapter: The Table He Was Promised. Speak to Svala Ashroad in Emberwake Caldera at level 99."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "null_warrior_weapon",
+              "null_warrior_armor"
+            ],
+            "mage": [
+              "null_mage_weapon",
+              "null_mage_armor"
+            ],
+            "assassin": [
+              "null_assassin_weapon",
+              "null_assassin_armor"
+            ],
+            "priest": [
+              "null_priest_weapon",
+              "null_priest_armor"
+            ],
+            "hunter": [
+              "null_hunter_weapon",
+              "null_hunter_armor"
+            ]
+          }
+        },
+        {
+          "id": "es_27",
+          "title": "The Table He Was Promised",
+          "npc": "ew_guide",
+          "description": "Enter the Chained Forge with your Ember Key and ten fighters. Defeat Eldmarr, the Ember-Lord. This is the real giant, not a summoned shade. The captains' betrayal was real; so are the homes above his furnace. Stop him before he melts the roots that hold them.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "cf_eldmarr",
+              "label": "Defeat Eldmarr in the Chained Forge",
+              "count": 1
+            }
+          ],
+          "level": 99,
+          "minLevel": 99,
+          "rewardXp": 12060,
+          "rewardGold": 1188,
+          "requires": "es_26",
+          "repeatable": false,
+          "story": {
+            "title": "The Empty Seat",
+            "chapter": 27,
+            "recap": [],
+            "next": "Next chapter: Leave One Chair Empty. Speak to Bram Emberforge in Greenmeadow at level 99."
+          },
+          "rewardChoices": {
+            "warrior": [
+              "warrior_armor_azure_l95_green",
+              "warrior_headgear_azure_l95_green"
+            ],
+            "mage": [
+              "mage_armor_runic_l95_green",
+              "mage_headgear_runic_l95_green"
+            ],
+            "assassin": [
+              "assassin_armor_moon_l95_green",
+              "assassin_headgear_moon_l95_green"
+            ],
+            "priest": [
+              "priest_armor_dawn_l95_green",
+              "priest_headgear_dawn_l95_green"
+            ],
+            "hunter": [
+              "hunter_armor_warden_l95_green",
+              "hunter_headgear_warden_l95_green"
+            ]
+          }
         }
       ],
       "city": null,
@@ -227460,6 +229259,20 @@
           "x": 133,
           "y": 26,
           "r": 4
+        },
+        {
+          "id": "es_25_m",
+          "name": "The Guest at the Last Door",
+          "x": 115,
+          "y": 49,
+          "r": 2.1
+        },
+        {
+          "id": "es_26_m",
+          "name": "A Place for the Living",
+          "x": 126,
+          "y": 33,
+          "r": 2.1
         }
       ],
       "portals": [
@@ -235298,6 +237111,22 @@
       "shard": "ember_shard_0",
       "bossName": "Ashwarden of Greenmeadow",
       "color": "#d48b4b"
+    }
+  ],
+  "places": [
+    {
+      "id": "es_01_m",
+      "name": "Ash in the Bread",
+      "x": 40,
+      "y": 53,
+      "r": 2.1
+    },
+    {
+      "id": "es_28_m",
+      "name": "Leave One Chair Empty",
+      "x": 38,
+      "y": 62,
+      "r": 2.1
     }
   ]
 }

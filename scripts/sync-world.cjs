@@ -14,6 +14,8 @@ execFileSync('python3', [path.join(__dirname, 'dungeon_admission.py')], { cwd: r
 execFileSync('python3', [path.join(__dirname, 'add_repair_offers.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'vendor_weapons.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'hierloom_catalog.py')], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'empty_seat.py')], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'boss_add_art_aliases.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 fs.writeFileSync(path.join(root, 'client/world.js'), "'use strict';\nwindow.WORLD_MAP = " + JSON.stringify(map) + ';\n');
@@ -26,6 +28,7 @@ const zones = map.zones || [];
 console.log(`Synced ${map.objects.length} obstacles and ${map.slimes.length} spawns` + zones.map(z => `, plus zone "${z.name}": ${z.objects.length} obstacles and ${z.slimes.length} spawns`).join('') + '. Rebuild Rust after changing the map.');
 
 const cathedral = [
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/empty-seat-enemies.txt"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(root, "world/raid_key.txt"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(root, "world/chained_forge.txt"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(root, "world/emberwake.txt"), "utf8")),
@@ -47,3 +50,5 @@ const cathedral = [
   ...JSON.parse(fs.readFileSync(path.join(root, "world/thunderheart_gate.txt"), "utf8"))
 ];
 fs.writeFileSync(path.join(root, "client/cathedral.js"), "'use strict';\nwindow.CATHEDRAL_ENEMIES = " + JSON.stringify(cathedral) + ";\n");
+
+fs.writeFileSync(path.join(root, "client/empty-seat-data.js"), "'use strict';\nwindow.EMPTY_SEAT_SCENES = " + fs.readFileSync(path.join(root, "world/empty-seat-scenes.txt"), "utf8").trim() + ";\n");

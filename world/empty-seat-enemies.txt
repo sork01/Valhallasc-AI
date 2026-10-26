@@ -1,0 +1,292 @@
+[
+  {
+    "kind": "es_foe_02",
+    "name": "Cinder Without a Hearth",
+    "level": 7,
+    "stats": [
+      194,
+      29,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_04",
+    "name": "Oath-Eater",
+    "level": 17,
+    "stats": [
+      554,
+      59,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_06",
+    "name": "Root-Sootling",
+    "level": 25,
+    "stats": [
+      1058,
+      83,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_08",
+    "name": "Shade of Eldmarr",
+    "level": 37,
+    "stats": [
+      2174,
+      119,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_eldmarr"
+  },
+  {
+    "kind": "es_foe_11",
+    "name": "Gilded Witness",
+    "level": 48,
+    "stats": [
+      3576,
+      152,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_15",
+    "name": "Furnace Spark",
+    "level": 63,
+    "stats": [
+      6074,
+      197,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_17",
+    "name": "The Uninvited Guest",
+    "level": 73,
+    "stats": [
+      8114,
+      227,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_18",
+    "name": "Chain Thorn",
+    "level": 78,
+    "stats": [
+      9246,
+      242,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_22",
+    "name": "Penitent Chain",
+    "level": 88,
+    "stats": [
+      11736,
+      272,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_kettil"
+  },
+  {
+    "kind": "es_foe_25",
+    "name": "Shade of the Unbound King",
+    "level": 99,
+    "stats": [
+      14822,
+      305,
+      2.6,
+      1.4
+    ],
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "add": true,
+    "gold": 0,
+    "material": "slime_gel",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#a5cddd",
+    "artFrom": "cf_eldmarr"
+  }
+]

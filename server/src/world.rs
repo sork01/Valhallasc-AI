@@ -62,6 +62,9 @@ mod dungeon_solo_tests;
 mod elder_hollow_tests;
 #[cfg(test)]
 mod emberwake_tests;
+mod empty_seat;
+#[cfg(test)]
+mod empty_seat_tests;
 #[cfg(test)]
 mod epic_drop_tests;
 mod escort;
@@ -1506,6 +1509,7 @@ pub struct World {
     set_pending: Vec<sets::Pending>,
     signature: signature::State,
     raid_key: raid_key::State,
+    empty_seat: empty_seat::State,
     /// Counter for mercenary sessions.
     merc_seq: u64,
     /// Live arena gauntlet runs (world/gauntlet.rs), in memory only.
@@ -1622,6 +1626,7 @@ impl World {
             set_pending: vec![],
             signature: signature::State::default(),
             raid_key: raid_key::State::default(),
+            empty_seat: empty_seat::State::default(),
             merc_seq: 0,
             gauntlets: vec![],
             ambient_targets: BTreeMap::new(),
@@ -1895,6 +1900,7 @@ impl World {
             if p.character.gm { view["session"] = json!(session); }
             // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
             // each snapshot over the last, so a flag that vanished would stay set.
+            view["storyMemory"] = self.empty_seat_view(*session);
             view["hired"] = json!(p.merc.is_some());
             view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
             view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
@@ -2883,6 +2889,7 @@ impl World {
         self.update_bolts();
         self.update_enemy_bolts();
         self.update_raid_key();
+        self.update_empty_seat();
         self.update_damage_meter();
         self.audit_progress();
         self.update_drops();
@@ -4219,6 +4226,10 @@ impl World {
             crit,
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
+        if killed && kind.starts_with("es_foe_") {
+            self.empty_seat_killed(id);
+            return dealt;
+        }
         if killed && kind == raid_key::KIND {
             self.raid_key_drops(id, zone, point);
             return dealt; // Shards only: never ordinary XP, gold, gear or elite loot.
@@ -4808,7 +4819,8 @@ impl World {
                             | "rimesaber"
                             | "snowgiant"
                             | "longnightwyrm"
-                    ) || is_boss(&s.kind)
+                    ) || s.kind.starts_with("es_foe_")
+                        || is_boss(&s.kind)
                         || (s.kind.starts_with("ew_") || s.kind.starts_with("cf_"))
                             && is_elite(&s.kind)
                     {
@@ -7034,7 +7046,9 @@ mod tests {
                         ),
                         "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
                         "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
-                        "visit" | "hold" => assert!(area.places.iter().any(|p| p.id == o.target)),
+                        "visit" | "hold" | "memory" | "echo" => {
+                            assert!(area.places.iter().any(|p| p.id == o.target))
+                        }
                         "chime" => assert!(area.places.iter().any(|p| p.chain == o.target)),
                         "escort" => assert!(
                             area.npcs

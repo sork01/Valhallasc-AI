@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.26.0",
+    "date": "2026-10-27",
+    "new": [
+      "The Empty Seat follows Eldmarr from Greenmeadow to the Chained Forge through 28 story quests, summoned shades, ward defenses and a walk through his lost past.",
+      "Campaign quests reward green gear, every fifth quest rewards blue gear, and the final chapter before the raid rewards purple gear. Choose a piece suited to your class.",
+      "Recovered campaign memories can be reread in the completed section of your quest journal."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.25.0",
     "date": "2026-10-26",
     "new": [

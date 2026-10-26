@@ -143,7 +143,17 @@
     "cf_orm",
     "cf_hildr",
     "cf_eldmarr",
-    "ember_firelord"
+    "ember_firelord",
+    "es_foe_02",
+    "es_foe_04",
+    "es_foe_06",
+    "es_foe_08",
+    "es_foe_11",
+    "es_foe_15",
+    "es_foe_17",
+    "es_foe_18",
+    "es_foe_22",
+    "es_foe_25"
   ],
   "clips": {
     "idle": {
@@ -313,7 +323,17 @@
     "cf_orm": "4fc1695f6a54fcd3",
     "cf_hildr": "73339fa7bca515c0",
     "cf_eldmarr": "5a4edb5546051b4e",
-    "ember_firelord": "5a4edb5546051b4e"
+    "ember_firelord": "5a4edb5546051b4e",
+    "es_foe_02": "9c84ec5e867830e6",
+    "es_foe_04": "9c84ec5e867830e6",
+    "es_foe_06": "9c84ec5e867830e6",
+    "es_foe_08": "5a4edb5546051b4e",
+    "es_foe_11": "9c84ec5e867830e6",
+    "es_foe_15": "9c84ec5e867830e6",
+    "es_foe_17": "9c84ec5e867830e6",
+    "es_foe_18": "9c84ec5e867830e6",
+    "es_foe_22": "9c84ec5e867830e6",
+    "es_foe_25": "5a4edb5546051b4e"
   },
   "tops": {
     "tidetemplar": 84,
@@ -451,6 +471,16 @@
     "cf_orm": 60,
     "cf_hildr": 72,
     "cf_eldmarr": 57,
-    "ember_firelord": 57
+    "ember_firelord": 57,
+    "es_foe_02": 57,
+    "es_foe_04": 57,
+    "es_foe_06": 57,
+    "es_foe_08": 57,
+    "es_foe_11": 57,
+    "es_foe_15": 57,
+    "es_foe_17": 57,
+    "es_foe_18": 57,
+    "es_foe_22": 57,
+    "es_foe_25": 57
   }
 }

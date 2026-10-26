@@ -106,6 +106,10 @@ pub static ENEMIES: LazyLock<Vec<Enemy>> = LazyLock::new(|| {
         serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/raid_key.txt"))
             .expect("valid raid key catalog"),
     );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/empty-seat-enemies.txt"))
+            .expect("valid Empty Seat enemies"),
+    );
     enemies
 });
 pub fn enemy(kind: &str) -> Option<&'static Enemy> {

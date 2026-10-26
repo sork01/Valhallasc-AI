@@ -892,6 +892,7 @@
   const FROSTWAKE_KINDS = ['snowhare','iceotter','frostheron','glaciercrab','bellmammoth','auroramanta','crevasseleviathan'];
   const MOONWELL_KINDS = ['dew_moth','lumen_eel','rootbell','tideglass_heron','hourpetal_stag','moonskein_weaver'];
   if(SLIME.ember_firelord) SLIME.ember_firelord.scale=1.5;
+  for (const e of CATHEDRAL_ENEMIES.filter(e => e.kind.startsWith('es_foe_'))) SLIME[e.kind].scale = e.artFrom === 'cf_eldmarr' ? 1.65 : 1.1;
   const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = [...VAULT_KINDS.slice(3), 'tideglass_heron','hourpetal_stag','moonskein_weaver','moonwell_echo', ...CATHEDRAL_ENEMIES.filter(e => e.boss).map(e => e.kind)];
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
@@ -1169,6 +1170,7 @@
     window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
     window.RaidKey?.sync(packet, own, zone);
+    window.EmptySeat?.sync(own, zone);
     window.Attributes?.update(own);
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
@@ -3029,6 +3031,7 @@
     if (s.dead) g.globalAlpha = clamp((DIE_SHOW - s.dieT) / .5, 0, 1);
     g.imageSmoothingEnabled = false; g.scale(s.dir < 0 ? -K : K, K);
     const sheet = s.kind === 'ember_firelord' ? window.RaidKey.tint(src.img[s.kind], zdef.crosses?.[0]?.color || '#ed9152') : src.img[s.kind];
+    if (s.kind.startsWith('es_foe_')) { g.globalAlpha *= .7; g.filter = 'hue-rotate(155deg) saturate(.6)'; }
     g.drawImage(sheet, n * fw, c.row * fh, fw, fh, -ax, -ay, fw, fh);
     g.restore();
   }
@@ -3759,6 +3762,7 @@
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);
     if (zdef.theme === 'deep') drawChimeRings(g, t);
+    window.EmptySeat?.drawFloor(g, w2s);
     window.BossMech?.drawFloor(g, t, bossMechView());
     // ground decals: splats, target marker, slash, shadows
     for (const who of [hero, ...remotePlayers.values()]) drawBuffRings(g, who, t);
@@ -3891,6 +3895,7 @@
     // Light is applied after the world and before attacks, loot labels and other combat feedback.
     window.DayNight?.draw(g, VW, VH, nightLights, w2s);
     window.Weather?.draw(g, VW, VH, t);
+    window.EmptySeat?.drawVision(g, w2s, VW, VH);
     // slash arc on the ground plane (over everything: it is the axe's motion)
     for (const e of effects) if ((e.kind === 'slash' || e.kind === 'dualSlash') && (heroSpr || e.t < 0)) continue; else if (e.kind === 'slash') {
       const p = e.t / .32, a0 = e.a - 1.25, a1 = a0 + 2.5 * Math.min(1, p * 1.8);

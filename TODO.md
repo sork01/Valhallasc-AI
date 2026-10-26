@@ -8,6 +8,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `STORY-EMPTY-SEAT` — **Built and privately checked, Beta 1.26.0 (2026-10-27): nine focused server tests and 17 bounded real-art browser checks pass.** A 28-chapter Eldmarr campaign from Greenmeadow to the Chained Forge: summoned shades, root defenses, bell puzzles, a playable betrayal flashback and a homecoming. Owner reward rule: green gear, every fifth chapter blue, final chapter before the raid purple; two own-class choices per turn-in. Source and checks: `docs/empty-seat.md`.
+
 - [x] `RAID-HIERLOOMS` — **Beta 1.25.0 (2026-10-26).** Four golden Hierloom raid drops (two rings, necklace, cloak), 10% base chance per raid boss, wearer-level stats, +100% XP per equipped piece and no durability loss. Rules and focused checks: `docs/hierlooms.md`.
 
 
