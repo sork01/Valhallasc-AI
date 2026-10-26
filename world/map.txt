@@ -33896,6 +33896,27 @@
           "x": 96.0,
           "y": 57.0,
           "r": 6.0
+        },
+        {
+          "id": "admit_cradle",
+          "name": "The Cradle Stone",
+          "x": 96,
+          "y": 58,
+          "r": 1.8
+        },
+        {
+          "id": "admit_oath",
+          "name": "The Oath Stone",
+          "x": 96,
+          "y": 65,
+          "r": 1.8
+        },
+        {
+          "id": "admit_farewell",
+          "name": "The Farewell Stone",
+          "x": 88,
+          "y": 71,
+          "r": 1.8
         }
       ],
       "objects": [
@@ -44038,6 +44059,33 @@
           "r": 0.55,
           "v": 2,
           "rift": 1
+        },
+        {
+          "kind": "spire",
+          "x": 96,
+          "y": 58,
+          "r": 0,
+          "v": 0,
+          "place": "admit_cradle",
+          "label": "The Cradle Stone"
+        },
+        {
+          "kind": "spire",
+          "x": 96,
+          "y": 65,
+          "r": 0,
+          "v": 0,
+          "place": "admit_oath",
+          "label": "The Oath Stone"
+        },
+        {
+          "kind": "spire",
+          "x": 88,
+          "y": 71,
+          "r": 0,
+          "v": 0,
+          "place": "admit_farewell",
+          "label": "The Farewell Stone"
         }
       ],
       "slimes": [
@@ -45218,7 +45266,7 @@
           "x": 92,
           "y": 68,
           "color": "#bfa368",
-          "dialogue": "Vessa has tied the dead to their old promises. Break her spell. Beyond her waits a king whose story was never written.",
+          "dialogue": "Vessa has tied the dead to their old promises. Break her spell. Beyond her waits a king whose story was never written. The forgotten names are Alva, who tended the cradle; Tor, who kept his oath; and Sif, who stayed for the farewell. Tell Runa: remembered, released, returned.",
           "offers": [],
           "look": {
             "skin": "#e0b48e",
@@ -45901,6 +45949,44 @@
           "rewardCount": 1,
           "repeatable": false,
           "requires": null
+        },
+        {
+          "id": "entry_norn",
+          "title": "Three Names for the Dead",
+          "description": "Nornroot admits mourners, not treasure hunters. Visit the Cradle Stone, the Oath Stone and the Farewell Stone along the Norn Stones approach to remember a life, a promise and a parting. Ask Egil Spindlekeeper for the missing names, then return to Runa Threadreader. She will weave your funeral verse into the door. This opens Nornroot Barrow permanently for you.",
+          "npc": "barrow_guide",
+          "level": 25,
+          "minLevel": 25,
+          "requires": null,
+          "repeatable": false,
+          "rewardXp": 960,
+          "rewardGold": 0,
+          "objectives": [
+            {
+              "kind": "visit",
+              "target": "admit_cradle",
+              "label": "Remember a life at the Cradle Stone",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "admit_oath",
+              "label": "Remember a promise at the Oath Stone",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "admit_farewell",
+              "label": "Remember a parting at the Farewell Stone",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "barrow_scribe",
+              "label": "Ask Egil for the forgotten names",
+              "count": 1
+            }
+          ]
         }
       ],
       "city": {
@@ -45957,7 +46043,8 @@
           "to": 41,
           "tx": 56,
           "ty": 99,
-          "look": "nornroot"
+          "look": "nornroot",
+          "needs_quest": "entry_norn"
         },
         {
           "id": "sky_gate",
@@ -108812,6 +108899,33 @@
           "y": 29,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "tidebell",
+          "x": 92,
+          "y": 68,
+          "r": 0,
+          "v": 0,
+          "place": "admit_waking",
+          "label": "The Waking Bell"
+        },
+        {
+          "kind": "tidebell",
+          "x": 100,
+          "y": 88,
+          "r": 0,
+          "v": 0,
+          "place": "admit_dreaming",
+          "label": "The Dreaming Bell"
+        },
+        {
+          "kind": "tidebell",
+          "x": 116,
+          "y": 88,
+          "r": 0,
+          "v": 0,
+          "place": "admit_returning",
+          "label": "The Returning Bell"
         }
       ],
       "slimes": [],
@@ -112588,6 +112702,26 @@
             ]
           },
           "minLevel": 99
+        },
+        {
+          "id": "entry_moon",
+          "title": "A Bell for Your Reflection",
+          "description": "Your reflection reached the Moonwell before you, and Voss will not let another stranger follow it. Walk into the circles of the Waking Bell, the Dreaming Bell and the Returning Bell in Asterion. Each rings for 25 seconds: get all three ringing together, in any order, so your echo learns the way home. Return to Mora Thirteenbells to have your true name entered in the descent ledger. This opens the Moonwell permanently for you.",
+          "npc": "asterion_bellkeeper",
+          "level": 60,
+          "minLevel": 60,
+          "requires": null,
+          "repeatable": false,
+          "rewardXp": 4670,
+          "rewardGold": 0,
+          "objectives": [
+            {
+              "kind": "chime",
+              "target": "admit_moon",
+              "label": "Ring all three reflection bells together",
+              "count": 3
+            }
+          ]
         }
       ],
       "city": {
@@ -112627,7 +112761,8 @@
           "to": 18,
           "tx": 21,
           "ty": 64,
-          "look": "stairs_down"
+          "look": "stairs_down",
+          "needs_quest": "entry_moon"
         },
         {
           "id": "asterion_stormglass_gate",
@@ -112650,6 +112785,35 @@
           "tx": 22,
           "ty": 137,
           "look": "emberwake"
+        }
+      ],
+      "places": [
+        {
+          "id": "admit_waking",
+          "name": "The Waking Bell",
+          "x": 92,
+          "y": 68,
+          "r": 1.8,
+          "chain": "admit_moon",
+          "burn": 25
+        },
+        {
+          "id": "admit_dreaming",
+          "name": "The Dreaming Bell",
+          "x": 100,
+          "y": 88,
+          "r": 1.8,
+          "chain": "admit_moon",
+          "burn": 25
+        },
+        {
+          "id": "admit_returning",
+          "name": "The Returning Bell",
+          "x": 116,
+          "y": 88,
+          "r": 1.8,
+          "chain": "admit_moon",
+          "burn": 25
         }
       ]
     },
@@ -143359,7 +143523,7 @@
           "x": 40,
           "y": 122,
           "color": "#b7e5dc",
-          "dialogue": "The buried astrolabe charts the sky below us. Its iris now opens for prepared parties.",
+          "dialogue": "The buried astrolabe charts the sky below us. Its iris now opens for prepared parties. For Laleh's horizon lens, use the lowest star in the Mirrored Oasis's reflection as your bearing. The Astrolabe must be shown the sky below, not the sky above.",
           "offers": [],
           "buys": false,
           "look": {
@@ -144475,6 +144639,38 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 80
+        },
+        {
+          "id": "entry_astro",
+          "title": "The Sky Beneath the Sand",
+          "description": "The Sunken Astrolabe has forgotten which way is up. Bring three Glass Scorpion Shards for a new horizon lens, ask Ivo Starfold at Azure Wells for the lost star bearing, and visit the Mirrored Oasis to catch the sky beneath your feet. Return to Laleh of the Lens; she will set the bearing and teach the door to recognise you. The shards are used to make the lens. This opens the Sunken Astrolabe permanently for you.",
+          "npc": "lapis_seer",
+          "level": 85,
+          "minLevel": 85,
+          "requires": null,
+          "repeatable": false,
+          "rewardXp": 9010,
+          "rewardGold": 0,
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "scorpion_glass",
+              "label": "Bring Glass Scorpion Shards for the horizon lens",
+              "count": 3
+            },
+            {
+              "kind": "talk",
+              "target": "lapis_cartographer",
+              "label": "Ask Ivo for the lost star bearing",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "lapis_mirror",
+              "label": "Catch the reflected sky at the Mirrored Oasis",
+              "count": 1
+            }
+          ]
         }
       ],
       "city": {
@@ -144523,7 +144719,8 @@
           "to": 34,
           "tx": 48,
           "ty": 82,
-          "look": "sunken_astrolabe"
+          "look": "sunken_astrolabe",
+          "needs_quest": "entry_astro"
         },
         {
           "id": "lapis_frostwake_gate",
@@ -162168,6 +162365,15 @@
           "y": 90,
           "r": 0.3,
           "v": 3
+        },
+        {
+          "kind": "wardstone",
+          "x": 57,
+          "y": 153,
+          "r": 0,
+          "v": 0,
+          "place": "admit_dawn",
+          "label": "The Dawn Vigil"
         }
       ],
       "slimes": [
@@ -164221,7 +164427,7 @@
           "x": 69,
           "y": 84,
           "color": "#9dbbd0",
-          "dialogue": "Rest here and let this season put you right.",
+          "dialogue": "Rest here and let this season put you right. If Ysra is smuggling a sunrise, take a spark from my hearth. Shelter it in your shadow at the Dawn Vigil. Even the longest winter cannot forbid a borrowed flame.",
           "offers": [
             {
               "id": "blessing",
@@ -165925,6 +166131,38 @@
           "rewardXp": 12060,
           "repeatable": false,
           "requires": null
+        },
+        {
+          "id": "entry_solstice",
+          "title": "Smuggle a Little Sunrise",
+          "description": "The Silent Solstice has outlawed dawn. Defeat three Snow Stoats that steal the village kindling, and ask Tilda Warmmitt in Rimehold for a spark from her hearth. Stand for 12 seconds inside the Dawn Vigil circle beside the Solstice entrance to shelter that spark with your shadow. Leaving the circle pauses the vigil; falling resets unfinished progress. Return to Ysra Snowglass and she will hide the sunrise in your name. This opens the Silent Solstice permanently for you.",
+          "npc": "yr_wi_lead",
+          "level": 99,
+          "minLevel": 99,
+          "requires": null,
+          "repeatable": false,
+          "rewardXp": 12060,
+          "rewardGold": 0,
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "snowstoat",
+              "label": "Drive away the kindling thieves",
+              "count": 3
+            },
+            {
+              "kind": "talk",
+              "target": "yr_wi_heal",
+              "label": "Ask Tilda for a hearth spark",
+              "count": 1
+            },
+            {
+              "kind": "hold",
+              "target": "admit_dawn",
+              "label": "Shelter the sunrise at the Dawn Vigil",
+              "count": 12
+            }
+          ]
         }
       ],
       "city": {
@@ -166021,6 +166259,13 @@
           "x": 58,
           "y": 159,
           "r": 8
+        },
+        {
+          "id": "admit_dawn",
+          "name": "The Dawn Vigil",
+          "x": 57,
+          "y": 153,
+          "r": 1.8
         }
       ],
       "futureInstances": [
@@ -166115,7 +166360,8 @@
           "to": 39,
           "tx": 48,
           "ty": 82,
-          "look": "silent_solstice"
+          "look": "silent_solstice",
+          "needs_quest": "entry_solstice"
         },
         {
           "id": "year_blackhour",

@@ -55,6 +55,8 @@ mod dps_tests;
 #[cfg(test)]
 mod duel_tests;
 #[cfg(test)]
+mod dungeon_admission_tests;
+#[cfg(test)]
 mod dungeon_solo_tests;
 #[cfg(test)]
 mod elder_hollow_tests;

@@ -6,6 +6,16 @@ const BARROW: usize = 41;
 const WYRD: usize = 6;
 
 fn enter(w: &mut World, session: u64) {
+    // These original checks exercise level limits, copies and loot after admission.
+    let c = &mut w.players.get_mut(&session).unwrap().character;
+    if !c.quests.iter().any(|q| q.id == "entry_norn") {
+        c.quests.push(QuestProgress {
+            id: "entry_norn".into(),
+            counts: vec![1; 4],
+            claimed: true,
+            completions: 1,
+        });
+    }
     place(w, session, WYRD, at(84., 66.));
     w.time += 2.;
     w.use_portal(session);
@@ -184,6 +194,7 @@ fn nornroot_bosses_drop_exclusive_gear_and_only_clear_their_copy() {
             .character
             .quests
             .iter()
+            .filter(|q| q.id != "entry_norn")
             .all(|q| q.counts == vec![1])
     );
     let living_other = w

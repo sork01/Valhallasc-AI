@@ -152,10 +152,14 @@ impl World {
                     self.hold_notice(
                         session,
                         true,
-                        format!(
-                            "The ward at {} holds! The storm-spawn dissolve. Return to the quest giver.",
-                            job.place.name
-                        ),
+                        if job.place.waves.is_empty() {
+                            format!("The ward at {} holds! Return to the quest giver.", job.place.name)
+                        } else {
+                            format!(
+                                "The ward at {} holds! The storm-spawn dissolve. Return to the quest giver.",
+                                job.place.name
+                            )
+                        },
                     );
                     self.save();
                 }

@@ -431,5 +431,6 @@
   "Trade refused: {0}": "Byte avvisat: {0}",
   "Traded with {0}. Gave {1}. Received {2}.": "Bytte med {0}. Gav {1}. Fick {2}.",
   "Travelled from {0} to {1}.": "Reste från {0} till {1}.",
-  "Unauthorized GM command attempt: {0}.": "Obehörigt försök till GM-kommando: {0}."
+  "Unauthorized GM command attempt: {0}.": "Obehörigt försök till GM-kommando: {0}.",
+  "The ward at {0} holds! Return to the quest giver.": "Värnet vid {0} håller! Återvänd till uppdragsgivaren."
 }

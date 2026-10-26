@@ -10,6 +10,7 @@ execFileSync('python3', [path.join(__dirname, 'arena_quests.py')], { cwd: root, 
 execFileSync('python3', [path.join(__dirname, 'set_bonuses.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'cloak_catalog.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'raid_key.py')], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'dungeon_admission.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'add_repair_offers.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'vendor_weapons.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));

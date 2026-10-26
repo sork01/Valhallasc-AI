@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.24.0",
+    "date": "2026-10-26",
+    "new": [
+      "Nornroot Barrow now requires Three Names for the Dead: remember three funeral stones and recover the forgotten names with Runa and Egil.",
+      "The Moonwell now requires A Bell for Your Reflection: make three bells in Asterion ring together before their echoes fade.",
+      "The Sunken Astrolabe now requires The Sky Beneath the Sand: build a horizon lens and recover a lost star bearing.",
+      "The Silent Solstice now requires Smuggle a Little Sunrise: recover kindling, find a hearth spark and shelter it in a vigil. Each new admission quest permanently unlocks its dungeon for that character."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.23.0",
     "date": "2026-10-26",
     "new": [

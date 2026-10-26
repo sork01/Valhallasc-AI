@@ -12,7 +12,7 @@ fn lapis_gates_oases_hub_and_astrolabe_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Lapis Erg", Some([80, 85]), 160)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 12));
+    assert_eq!((m.slimes.len(), m.quests.len()), (42, 13));
     assert!(m.in_city(m.spawn));
     assert_eq!(
         w.maps[23].slimes.len(),

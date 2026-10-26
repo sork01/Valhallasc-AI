@@ -33,7 +33,7 @@ fn four_seasons_hubs_travel_and_spring_dungeon() {
     assert!(m.size * m.size > 4 * 192 * 192);
     assert_eq!(
         (m.npcs.len(), m.quests.len(), m.slimes.len()),
-        (30, 36, 156)
+        (30, 38, 156)
     );
     for q in &m.quests {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);

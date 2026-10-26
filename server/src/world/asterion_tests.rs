@@ -25,7 +25,7 @@ fn asterion_is_a_reachable_city_of_distinct_homes_people_and_services() {
         .collect();
     assert_eq!(labels.len(), houses.len());
     assert_eq!(city.npcs.iter().filter(|n| n.route.len() > 1).count(), 10);
-    assert_eq!(city.quests.len(), 6);
+    assert_eq!(city.quests.len(), 16);
     let seen = flood(city, &blocked(city, &[]), city.spawn);
     for n in &city.npcs {
         for t in [0., 10., 60., 140.] {
@@ -204,6 +204,17 @@ fn moonwell_stairs_enter_a_private_copy_and_return_to_asterion() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
     w.players.get_mut(&1).unwrap().character.level = 60;
+    w.players
+        .get_mut(&1)
+        .unwrap()
+        .character
+        .quests
+        .push(QuestProgress {
+            id: "entry_moon".into(),
+            counts: vec![3],
+            claimed: true,
+            completions: 1,
+        });
     place(&mut w, 1, CITY, at(125., 93.));
     w.time = 10.;
     w.use_portal(1);
