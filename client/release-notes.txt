@@ -3,7 +3,7 @@
     "version": "Beta 1.23.0",
     "date": "2026-10-26",
     "new": [
-      "Every buff skill now covers your whole party within 10 metres, not just you: Battle Cry, Shield Wall, Berserk, Arcane Ward, Evasion, Shadow Veil, Deadly Focus, Hunter's Mark, Rapid Fire and Eagle Sight."
+      "Battle Cry, Hunter's Mark, Deadly Focus and Eagle Sight now also cover your party members within 10 metres. Defensive and speed buffs stay on you alone, except the priest's Ward of Light."
     ],
     "changed": [
       "Two buffs of the same kind no longer add up. The stronger one stays, and an equal or stronger recast refreshes it.",

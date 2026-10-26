@@ -2101,7 +2101,7 @@ mod tests {
     }
 
     #[test]
-    fn every_buff_skill_covers_the_party_in_range_and_never_stacks_with_the_same_kind() {
+    fn offensive_buffs_cover_the_party_in_range_defensive_ones_stay_and_a_kind_never_stacks() {
         let mut w = world();
         let war = add(&mut w, 1, "Wil");
         let pia = priest(&mut w, 2, "Pia", 24);
@@ -2154,13 +2154,14 @@ mod tests {
             (1, cry),
             "the stronger replaces"
         );
-        // A different kind is a separate buff: Shield Wall alongside the damage buff.
+        // Defensive and speed buffs stay on the caster, alongside the damage buff: Shield Wall.
         w.players.get_mut(&1).unwrap().character.level = 12;
         w.players.get_mut(&1).unwrap().skill_cd.clear();
         w.players.get_mut(&1).unwrap().character.resource =
             Some(w.players[&1].character.max_resource());
         w.use_skill(1, "shieldwall", Point::default());
-        assert!(w.players[&3].buff(BuffKind::Shield) > 0.);
+        assert!(w.players[&1].buff(BuffKind::Shield) > 0.);
+        assert_eq!(w.players[&3].buff(BuffKind::Shield), 0.);
         assert_eq!((held(&w, 3), damage(&w, 3)), (1, cry));
         assert_eq!(w.players[&5].buffs.len(), 0);
     }
