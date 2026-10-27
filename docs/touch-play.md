@@ -1,9 +1,9 @@
 # Phone and tablet play
 
 Status: owner approved the control layout on 2026-10-24 in this session.
-Implementation is built and the indexed combined check passed 198 assertions at both target sizes. The owner has
-not yet tested the Safari zoom fix or played this release on real devices.
-Keep `BUG-IOS-SAFARI-ZOOM` and `TOUCH-CHECK` open until that happens.
+Implementation is built and the indexed combined check passed 198 assertions at both target sizes. On 2026-10-27 the owner confirmed that play works well on an iPhone 16
+(iOS version unknown) and on a tablet. Safari zoom and real-device phone/tablet
+acceptance are complete; `BUG-IOS-SAFARI-ZOOM` and `TOUCH-CHECK` are closed.
 
 Browser checks on this shared host must use `bash scripts/test-touch-bounded.sh`:
 1.5 GiB RAM for the complete process tree, no swap, one CPU and a ten-minute

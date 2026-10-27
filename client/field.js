@@ -929,6 +929,10 @@
   function s2w(sx, sy) { const [cx, cy] = camS(), rx = sx - VW / 2 + cx, ry = sy - VH / 2 + cy; return [rx / TW + ry / TH, ry / TH - rx / TW]; }
   let shakeX = 0, shakeY = 0;
   function pointerWorld(e) { const r = cv.getBoundingClientRect(); return s2w((e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH); }
+  function rememberPointer(e) {
+    pointer.clientX = e.clientX; pointer.clientY = e.clientY;
+    [pointer.x, pointer.y] = pointerWorld(e);
+  }
 
   // ---------- input ----------
   // Held keys are kept as codes; a code's direction is looked up in the key map each tick, so a rebind takes effect at once.
@@ -971,7 +975,7 @@
     const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27 && my>=y-37 && my<=y+7; });
     if (chest) { openChest(chest); return; }
     pointer.down = true; if (Number.isInteger(e.pointerId)) cv.setPointerCapture?.(e.pointerId);
-    const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
+    rememberPointer(e); const { x: wx, y: wy } = pointer;
     const s = pickSlime(mx, my, wx, wy);
     const rival = !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
     if (s) { hero.pvpTargetId = null; hero.target = s; hero.goal = null; Online.send({ type: 'target', id: s.id }); }
@@ -1066,7 +1070,7 @@
     }
     return out;
   }
-  function onPointerMove(e) { if (pointer.down) { const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy; } }
+  function onPointerMove(e) { if (pointer.down) rememberPointer(e); }
   function onPointerUp() { pointer.down = false; }
 
   // ---------- combat ----------
@@ -2554,9 +2558,14 @@
       inputT -= dt;
       if (inputT <= 0) {
         const [dx, dy] = paused || hero.sparkTravel ? [0, 0] : keyboardDirection();
-        inputT = dx || dy ? .05 : .25;
+        const heldMouse = !paused && !hero.dead && !hero.sparkTravel && pointer.down && !hero.target && !hero.pvpTargetId;
+        inputT = dx || dy || heldMouse ? .05 : .25;
         Online.send({ type: 'input', dx, dy });
-        if (!paused && !hero.sparkTravel && pointer.down && !hero.target) Online.send({ type: 'move', x: pointer.x, y: pointer.y });
+        if (heldMouse) {
+          // Reproject the stationary screen cursor through the current camera, even without a pointermove event.
+          [pointer.x, pointer.y] = pointerWorld(pointer);
+          Online.send({ type: 'move', x: pointer.x, y: pointer.y });
+        }
       }
       if (!paused && pendingNpc) {
         const {npc,until}=pendingNpc;
@@ -4248,6 +4257,7 @@
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize); addEventListener('prefs-change', resize);
         cv.addEventListener('pointerdown', onPointerDown); cv.addEventListener('pointermove', onPointerMove); addEventListener('pointerup', onPointerUp);
+        cv.addEventListener('pointercancel', onPointerUp); cv.addEventListener('lostpointercapture', onPointerUp);
         cv.addEventListener('contextmenu', e => e.preventDefault());
       }
       Online.start({ look: hero.look,

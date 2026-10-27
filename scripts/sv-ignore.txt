@@ -149,5 +149,6 @@
   "KeyG",
   "Retry-After",
   "(pointer: coarse)",
-  "button:not(:disabled), summary"
+  "button:not(:disabled), summary",
+  "wm-connection-{0}"
 ]

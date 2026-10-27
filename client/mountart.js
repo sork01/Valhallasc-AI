@@ -57,6 +57,9 @@
   function compose(rider, id, clip, dir, i, tint) {
     const m = meta.mounts[id], a = atlases.get(id), C = m.clips[clip];
     i = ((i % C.n) + C.n) % C.n;
+    // The saved horse run was authored with planted hooves travelling forwards. Play it backwards so they
+    // push back against the ground; use the same source frame for colour, depth and the rider's saddle bob.
+    if (id === 'horse' && clip === 'run') i = (C.n - i) % C.n;
     const out = new ImageData(FW, CH), z = new Uint16Array(FW * CH).fill(65535);
     const bx = i * FW, by = (C.row0 + dir) * FH, table = tintTable(id, tint);
     for (let y = 0; y < FH; y++) for (let x = 0; x < FW; x++) {

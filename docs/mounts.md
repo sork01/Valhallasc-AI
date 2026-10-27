@@ -55,3 +55,15 @@ All five mounts share one pipeline, `scripts/make_mount_sprites.py` (`preview | 
 - **Rebirth tints** recolour the coat ramp (`coat` in the atlas metadata) by tone. The canvas horse of `field.js` is only the fallback while the art loads and in stub-sprite test mode.
 - **The horse was redesigned** with the others: a stout chestnut with a blaze, a thick mane and tail, a bridle and a gold-trimmed saddle on a red blanket.
 - Checks: `node tests/mount-art-ui.cjs` (needs `REAL_SPRITES=1`), `node tests/mount-ui.cjs`, `cargo test mount`.
+
+## Forward horse run playback (Beta 1.28.0)
+
+The saved horse run frames lift each hoof while it travels backwards in model
+space (+y is forward), then move it forwards while planted. `MountArt.compose`
+plays only the horse's run in reverse source-frame order, `0,7,6,5,4,3,2,1`,
+so planted feet push back and lifted feet recover forwards. The remapped index
+selects color, depth and saddle bob together. Idle clips and other mounts keep
+their existing playback. PixelFlow IDs, source artwork and atlas exports are
+preserved; do not also reverse the authoring source without removing this
+playback correction. `tests/travel-fixes-ui.cjs` checks every frame in all
+eight facings against the actual atlas and verifies the rider's matching bob.

@@ -7304,5 +7304,10 @@
   "Restore quest": "Återställ uppdrag",
   "Only abandoned automatic quests can be restored here.": "Här kan du bara återställa övergivna automatiska uppdrag.",
   "Reach the required level before restoring this quest.": "Nå rätt nivå innan du återställer det här uppdraget.",
-  "The next chapter has already been started.": "Nästa kapitel har redan påbörjats."
+  "The next chapter has already been started.": "Nästa kapitel har redan påbörjats.",
+  "Scroll to explore · Gold: paths · Blue: portals · Purple: dungeons": "Rulla för att utforska · Guld: vägar · Blått: portaler · Lila: instanser",
+  "Emberwake": "Glödvaket",
+  "Chained Forge": "Fjättrade smedjan",
+  "Longship": "Långskeppet",
+  "Black Hour": "Svarta timmen"
 }
