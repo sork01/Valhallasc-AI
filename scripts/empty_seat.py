@@ -117,6 +117,7 @@ def install():
     zones = [world]+world['zones']
     levels = json.loads((ROOT/'world/levels.txt').read_text())
     while len(levels)<99: levels.append(levels[-1]+2300)
+    swedish_names = json.loads((ROOT/'scripts/sv-translations.txt').read_text())
     chapters = content()
     items = json.loads((ROOT/'world/items.txt').read_text())
     for z in zones:
@@ -225,6 +226,15 @@ def install():
                 rewards.append(min((it for it in pool if it.get('requiredLevel',1)==tier), key=lambda it:(len(it['id']),it['id']))['id'])
             q['rewardChoices'][cls] = rewards
         z['quests'].append(q)
+        if i > 1:
+            sv_giver = swedish_names.get(giver['name'], giver['name'])
+            handoff_title = tr(f'Seek {giver["name"]}', f'Sök upp {sv_giver}')
+            handoff_desc = tr(f'Speak to {giver["name"]} in {z["name"]} at level {level} to continue The Empty Seat: {title}. This direction stays in your journal until you accept that chapter.', f'Tala med {sv_giver} i {z["name"]} på nivå {level} för att fortsätta Den tomma stolen: {TEXT[title]}. Vägvisningen finns kvar i din dagbok tills du tar emot det kapitlet.')
+            z['quests'].append(dict(id=f'es_go_{i:02}', title=handoff_title, npc=npc,
+                description=handoff_desc, objectives=[dict(kind='handoff', target=npc, count=1,
+                    label=tr(f'Speak to {giver["name"]} at level {level}', f'Tala med {sv_giver} på nivå {level}'))],
+                level=level, minLevel=1, rewardXp=0, rewardGold=0, requires=f'es_{i-1:02}',
+                autoLevel=1, repeatable=False, handoffTo=qid))
     dump(ROOT/'world/map.txt',world)
     dump(ROOT/'world/empty-seat-scenes.txt',scenes)
     dump(ROOT/'world/empty-seat-enemies.txt',enemies)

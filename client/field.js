@@ -1176,7 +1176,7 @@
     window.Rebirth?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
     window.Quests?.setBells(own.bells || []);
-    window.Quests?.update(own.quests || []);
+    window.Quests?.update(own.quests || [], own.abandonedQuests || []);
     if (wasDead !== hero.dead) { say(hero.dead ? 'death' : 'respawn'); if (!hero.dead) window.BossMech?.setCause(''); }
     if (wasFallen !== !!hero.fallen) say(hero.fallen ? 'fallen' : 'rallied');
     if (initial || moved) { cam.x = hero.x; cam.y = hero.y; }

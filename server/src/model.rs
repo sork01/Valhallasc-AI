@@ -322,6 +322,9 @@ pub struct Character {
     pub kills: u32,
     #[serde(default)]
     pub quests: Vec<QuestProgress>,
+    /// Automatic quests explicitly abandoned by the player stay dismissed until retaken.
+    #[serde(default)]
+    pub abandoned_quests: Vec<String>,
     #[serde(default)]
     pub inventory: Vec<crate::items::ItemStack>,
     #[serde(default)]
@@ -481,6 +484,7 @@ impl Character {
             gold: 0,
             kills: 0,
             quests: vec![],
+            abandoned_quests: vec![],
             inventory: vec![],
             equipment: Default::default(),
             gear_instances: vec![],
@@ -950,6 +954,9 @@ pub struct Quest {
     /// The lowest character level that may take the quest; 0 lets anyone.
     #[serde(default)]
     pub min_level: u32,
+    /// A rewardless direction to the next story giver, resolved when that chapter is accepted.
+    #[serde(default)]
+    pub handoff_to: Option<String>,
 }
 #[derive(Clone, Deserialize)]
 pub struct QuestObjective {
@@ -1069,7 +1076,13 @@ pub fn sync_progression(character: &mut Character, maps: &[Map]) -> Vec<String> 
         if quest
             .auto_level
             .is_some_and(|level| character.level >= level)
+            && quest.unlocked(character)
+            && !character.abandoned_quests.contains(&quest.id)
             && !character.quests.iter().any(|q| q.id == quest.id)
+            && !quest
+                .handoff_to
+                .as_ref()
+                .is_some_and(|id| character.quests.iter().any(|p| &p.id == id))
         {
             character.quests.push(QuestProgress {
                 id: quest.id.clone(),
@@ -1078,6 +1091,24 @@ pub fn sync_progression(character: &mut Character, maps: &[Map]) -> Vec<String> 
                 completions: 0,
             });
             arrived.push(quest.title.clone());
+        }
+    }
+    // Keep a handoff until the next chapter is actually accepted, including below its level gate.
+    let resolved: Vec<_> = maps
+        .iter()
+        .flat_map(|m| &m.quests)
+        .filter(|q| {
+            q.handoff_to
+                .as_ref()
+                .is_some_and(|id| character.quests.iter().any(|p| &p.id == id))
+        })
+        .map(|q| q.id.as_str())
+        .collect();
+    for p in &mut character.quests {
+        if !p.claimed && resolved.contains(&p.id.as_str()) {
+            p.claimed = true;
+            p.completions = 1;
+            p.counts.fill(1);
         }
     }
     let here = character.zone;
@@ -1205,6 +1236,9 @@ pub enum ClientMessage {
         stat: String,
     },
     AllocateRecommended,
+    QuestAbandon {
+        id: String,
+    },
     Interact {
         npc: String,
         offer: Option<String>,

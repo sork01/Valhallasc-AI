@@ -40,7 +40,8 @@ async function call(name, args = {}) {
   }
   async function track(id) {
     await page.evaluate(() => { WorldMap.close(); Quests.close(); Quests.show(); });
-    await page.locator(`#quest-list .quest-card[data-quest="${id}"] button`).filter({ hasText: /^Track quest$|^Tracking$/ }).click();
+    await page.locator(`#quest-list .quest-entry[data-quest="${id}"] > summary`).click();
+    await page.locator(`#quest-list .quest-entry[data-quest="${id}"] button`).filter({ hasText: /^Track quest$|^Tracking$/ }).click();
     await page.evaluate(() => Quests.close());
   }
   // Capture two real frames synchronously with the guidance layer on/off. No shared files or server state are changed.

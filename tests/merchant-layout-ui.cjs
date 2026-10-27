@@ -7,15 +7,15 @@ const suite={name:'merchant-layout',async test({player,check,sleep,width,height,
   await page.evaluate(scale=>{Prefs.set({uiScale:scale});Settings.applyScale();},scale);await sleep(150);
   const r=await page.evaluate(()=>{
    const b=s=>{const r=document.querySelector(s).getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right};};
-   const footer=document.querySelector('#npc-close').getBoundingClientRect();
-   return {tabs:b('.merchant-tabs'),frame:b('#npc-dialogue > .gossip-window'),bags:b('#merchant-bags .bag-window'),footer:b('#npc-close'),hit:document.elementFromPoint(footer.x+footer.width/2,footer.y+footer.height/2)?.id};
+   const footer=document.querySelector('#npc-x').getBoundingClientRect();
+   return {tabs:b('.merchant-tabs'),frame:b('#npc-dialogue > .gossip-window'),bags:b('#merchant-bags .bag-window'),footer:b('.gossip-footer'),hit:document.elementFromPoint(footer.x+footer.width/2,footer.y+footer.height/2)?.id};
   });
   check(r.tabs.top>=r.footer.bottom-2&&r.tabs.bottom<=r.frame.bottom+1,`scale ${scale}: folder tabs sit at the bottom edge below footer actions: ${JSON.stringify(r)}`);
-  check(r.hit==='npc-close',`scale ${scale}: resize grip leaves Goodbye reachable`);
+  check(r.hit==='npc-x',`scale ${scale}: header X remains reachable`);
   check(r.frame.left>=0&&r.frame.right<=r.bags.left&&r.bags.right<=width&&r.frame.top>=0&&r.bags.top>=0&&r.frame.bottom<=height&&r.bags.bottom<=height,`scale ${scale}: separate windows fit`);
  }
  await page.evaluate(()=>{Prefs.set({uiScale:.8});Settings.applyScale();});await page.screenshot({path:`${out}/merchant-final-${width}x${height}.png`});
- await page.locator('#npc-close').tap();check(await page.locator('#npc-dialogue').isHidden(),'Goodbye closes both merchant panes');
+ await page.locator('#npc-x').tap();check(await page.locator('#npc-dialogue').isHidden(),'X closes both merchant panes');
  await page.locator('#inventory-open').tap();
  check(await page.locator('#equipment .bag-window').evaluate(n=>getComputedStyle(n).scale==='none'),'restored bags inherit workspace scale once');
  check(await page.locator('.win-grip[data-window="merchant-bags"]').count()===0,'temporary merchant bag grip is removed');

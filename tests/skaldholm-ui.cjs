@@ -222,6 +222,8 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   }
   await page.getByRole('button', { name: 'Expand quest tracker' }).click();
   await page.keyboard.press('q');
+  await page.locator('#quest-list [data-quest="city_welcome"] > summary').click();
+  await page.locator('#quest-list [data-quest="city_welcome"] .quest-state').waitFor({state:'visible'});
   check((await page.locator('#quest-list [data-quest="city_welcome"]').textContent()).includes('Ready to turn in'), 'Five conversations complete the introduction');
   await page.keyboard.press('Escape');
   await talkByClick('city_captain');

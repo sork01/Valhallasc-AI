@@ -43,6 +43,7 @@ const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('skill'), id: z.string().regex(/^[a-z]{3,20}$/), fx: number, fy: number }).strict(),
   z.object({ type: z.literal('equip'), armor: z.string().max(32).optional(), weapon: z.string().max(32).optional(), slots: z.partialRecord(z.enum(['headgear', 'shoulders', 'chest', 'pants', 'gloves', 'hands', 'necklace', 'cloak', 'accessory1', 'accessory2']), z.string().max(64)).optional() }).strict(),
   z.object({ type: z.literal('use_item'), item: z.string().regex(/^[a-z0-9_]{1,40}$/) }).strict(),
+  z.object({ type: z.literal('quest_abandon'), id: z.string().min(1).max(64) }).strict(),
   z.object({ type: z.literal('interact'), npc: z.string().max(32), offer: z.string().max(128).optional() }).strict(),
   z.object({ type: z.literal('chat'), text: z.string().min(1).max(240) }).strict(),
   z.object({ type: z.literal('social'), command: socialSchema }).strict(),

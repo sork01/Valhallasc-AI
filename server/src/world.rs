@@ -103,6 +103,9 @@ mod partyxp;
 mod perks_tests;
 mod pursuit;
 mod pvp;
+mod quest_journal;
+#[cfg(test)]
+mod quest_journal_tests;
 mod raid;
 mod raid_key;
 #[cfg(test)]
@@ -427,7 +430,7 @@ impl Player {
     }
     fn snapshot(&self) -> Value {
         let c = &self.character;
-        json!({"id":c.id,"look":c.look,"zone":c.zone,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
+        let mut view = json!({"id":c.id,"look":c.look,"zone":c.zone,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"gearInstances":c.gear_instances,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
             "attributes":c.attributes,"gearAttributes":c.gear_attributes(),"passiveAttributes":skills::passive_bonus(c.look.class, c.level),"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
@@ -435,7 +438,9 @@ impl Player {
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
             "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
-            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet})
+            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
+        view["abandonedQuests"] = json!(c.abandoned_quests);
+        view
     }
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
@@ -2359,6 +2364,7 @@ impl World {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 }
             },
+            ClientMessage::QuestAbandon { id } => self.abandon_quest(session, &id),
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
             }
@@ -2789,9 +2795,12 @@ impl World {
                 }
             }
         }
+        if quest_changed {
+            sync_progression(&mut p.character, &self.maps);
+        }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"abandonedQuests":p.character.abandoned_quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -5352,7 +5361,10 @@ fn quest_action_with_choice(
     if !quest.unlocked(character) {
         return refused("Finish the earlier quest first.");
     }
-    if action == "accept" && quest.auto_level.is_some() {
+    if action == "accept"
+        && quest.auto_level.is_some()
+        && !character.abandoned_quests.contains(&quest.id)
+    {
         return refused("This quest finds you by itself when you are ready for it.");
     }
     if action == "accept" && character.level < quest.min_level {
@@ -5382,6 +5394,7 @@ fn quest_action_with_choice(
             } else {
                 character.quests.push(progress);
             }
+            character.abandoned_quests.retain(|id| id != &quest.id);
             quest.sync_bring(character);
             (
                 format!(
@@ -5393,6 +5406,9 @@ fn quest_action_with_choice(
             )
         }
         "claim" => {
+            if quest.handoff_to.is_some() {
+                return refused("Accept the next chapter from this questgiver to continue.");
+            }
             let Some(i) = prior else {
                 return refused("Accept this quest before collecting its reward.");
             };

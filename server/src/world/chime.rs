@@ -24,6 +24,18 @@ struct Job {
 }
 
 impl Chimes {
+    pub(super) fn cancel_quest(&mut self, session: u64, quest: &Quest, maps: &[Map]) {
+        for o in quest.objectives.iter().filter(|o| o.kind == "chime") {
+            self.last.remove(&(session, o.target.clone()));
+            for p in maps
+                .iter()
+                .flat_map(|m| &m.places)
+                .filter(|p| p.chain == o.target)
+            {
+                self.lit.remove(&(session, p.id.clone()));
+            }
+        }
+    }
     /// The bells one hero has ringing, for their snapshot: (place id, seconds left), in place order.
     pub(super) fn view(&self, session: u64) -> Vec<(String, f64)> {
         self.lit

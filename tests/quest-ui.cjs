@@ -70,6 +70,8 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => document.getElementById('quest-tracker').textContent.includes('Speak to Sister Elara: 0/1'));
   check(await page.locator('.tracker-quest[data-quest="welcome"] .tracker-objective').count() === 3, 'Tracker gives each objective its own indented line');
   await page.keyboard.press('q');
+  await page.locator('#quest-list [data-quest="welcome"] > summary').click();
+  await page.locator('#quest-list [data-quest="welcome"] .quest-level').waitFor({state:'visible'});
   check(await page.locator('#quest-list .quest-card').count() === 1 && await page.locator('#quest-list [data-quest="welcome"] .quest-level').textContent() === 'Recommended level 1', 'The journal now shows just the accepted quest, with its recommended level');
   await page.keyboard.press('Escape');
   const trackerBounds = await page.locator('#quest-tracker').boundingBox();
@@ -81,12 +83,14 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => Quests.marker('healer') === '◆'), 'NPC quest objective marker is active');
   await page.keyboard.press('q');
   const welcome = page.locator('#quest-list [data-quest="welcome"]');
+  await welcome.locator(':scope > summary').click();
   await welcome.locator('button').filter({ hasText: 'Track quest', exact: true }).click();
   check(await welcome.locator('button').filter({ hasText: 'Tracking', exact: true }).isVisible(), 'Track button shows the selection');
   await page.keyboard.press('Escape');
   await page.evaluate(() => Field.visitNpc('healer'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   await page.keyboard.press('Escape'); await page.keyboard.press('q');
+  await welcome.locator(':scope > summary').click();
   await page.waitForFunction(() => document.querySelector('#quest-list [data-quest="welcome"]').textContent.includes('Speak to Sister Elara: 1/1'));
   check(await welcome.textContent().then(t => t.includes('Speak to Bram: 0/1')), 'Journal displays authoritative partial progress');
   await page.screenshot({ path: path.join(world.artifacts, 'quest-progress.png') });
@@ -108,12 +112,14 @@ async function call(name, args = {}) {
   check(await fixture.locator('.tracker-quest').count() === 3, 'Tracker displays all active quests together');
   // The journal holds only what you have taken, plus a folded list of finished quests.
   await fixture.evaluate(() => { Quests.update([{ id: 'welcome', counts: [1, 0, 0], claimed: false, completions: 0 }, { id: 'slime_patrol', counts: [2], claimed: false, completions: 0 }, { id: 'meadow_bounty', counts: [8], claimed: false, completions: 0 }, { id: 'ironhide_hunt', counts: [2], claimed: true, completions: 1 }]); Quests.show(); });
-  check(await fixture.locator('#quest-list .quest-card').count() === 3 && await fixture.locator('#quest-list [data-quest="king_challenge"]').count() === 0, 'Journal cards: the three quests in progress, nothing untaken or locked');
-  check(await fixture.locator('#quest-list details.quest-completed summary').textContent() === 'Completed (1)' && await fixture.locator('#quest-list details.quest-completed .quest-done[data-quest="ironhide_hunt"]').count() === 1 && await fixture.locator('#quest-list details.quest-completed').evaluate(n => !n.open), 'Finished quests sit in a folded Completed list');
-  check(await fixture.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'meadow_bounty', 'A quest ready to hand in comes first');
+  check(await fixture.locator('#quest-list > .quest-entry').count() === 3 && await fixture.locator('#quest-list [data-quest="king_challenge"]').count() === 0, 'Journal cards: the three quests in progress, nothing untaken or locked');
+  check(await fixture.locator('#quest-list details.quest-completed > summary').textContent() === 'Completed (1)' && await fixture.locator('#quest-list details.quest-completed .quest-entry[data-quest="ironhide_hunt"]').count() === 1 && await fixture.locator('#quest-list details.quest-completed').evaluate(n => !n.open), 'Finished quests sit in a folded Completed list');
+  check(await fixture.locator('#quest-list > .quest-entry').first().getAttribute('data-quest') === 'meadow_bounty', 'A quest ready to hand in comes first');
   // Party mates on the same quest.
   check(await fixture.locator('[data-party-quest]').count() === 0, 'No party line without a party');
   await fixture.evaluate(() => { window.Social = { questMates: id => id === 'slime_patrol' ? [{ id: 'a', name: 'Bob', counts: [1] }, { id: 'b', name: 'Cat', counts: [6] }] : id === 'welcome' ? [{ id: 'a', name: 'Bob', counts: [1, 1, 0] }] : [] }; Quests.refresh(); });
+  await fixture.locator('#quest-list [data-quest="slime_patrol"] > summary').click();
+  await fixture.locator('#quest-list [data-quest="slime_patrol"] .quest-party').waitFor({state:'visible'});
   check(await fixture.locator('#quest-list [data-quest="slime_patrol"] .quest-party').textContent().then(t => t.includes('Bob (1/') && t.includes('Cat (ready)')), 'The journal names party mates on the same quest and how far each is');
   check(await fixture.locator('.tracker-quest[data-quest="slime_patrol"] .tracker-party').textContent() === 'Party: Bob, Cat' && await fixture.locator('.tracker-quest[data-quest="meadow_bounty"] .tracker-party').count() === 0, 'The tracker lists the party mates on each quest, and only there');
   check(await fixture.evaluate(() => Quests.sharedWith({ quests: [{ id: 'slime_patrol' }, { id: 'ironhide_hunt' }, { id: 'king_challenge' }] }).join('|')) === 'Trouble at the Gate', 'sharedWith lists only quests you also have in progress');

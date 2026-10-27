@@ -37,7 +37,7 @@ const suite={
   check(!shifted.length,`sale and refresh never move stock, tools, tabs or message area (${samples.length} frames): ${JSON.stringify(shifted.slice(0,2))}`);
   check(await page.locator('.merchant-workspace .sell-notice').count()===0,'receipt never inserts a row above the catalog');
   await page.screenshot({path:`${out}/merchant-notice-${width}x${height}.png`});
-  await page.locator('#npc-close').tap();await page.evaluate(()=>Field.visitNpc('smith'));
+  await page.locator('#npc-x').tap();await page.evaluate(()=>Field.visitNpc('smith'));
   await page.waitForFunction(()=>Shop.open&&document.querySelector('.merchant-workspace[aria-busy="false"]'));
   check(await page.locator('#npc-notice').textContent()==='','a new merchant visit clears the previous receipt');
   await page.context().close();

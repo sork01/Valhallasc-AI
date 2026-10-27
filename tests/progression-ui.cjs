@@ -30,7 +30,7 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', ref: 1, command }), command);
   const tracker = () => page.locator('#quest-tracker').textContent();
-  const journal = async () => { await page.keyboard.press('q'); await page.locator('#quest-journal').waitFor({ state: 'visible' }); };
+  const journal = async () => { await page.keyboard.press('q'); await page.locator('#quest-journal').waitFor({ state: 'visible' }); for (const row of await page.locator('#quest-list > .quest-entry').all()) { await row.locator(':scope > summary').click(); await row.locator('.quest-state').waitFor({state:'visible'}); } };
   const card = id => page.locator(`#quest-list [data-quest="${id}"]`);
   const closeJournal = async () => { await page.keyboard.press('Escape'); await page.locator('#quest-journal').waitFor({ state: 'hidden' }); };
   const ids = ['crags_onward', 'rime_onward', 'fen_onward', 'city_onward'], levels = [5, 10, 15, 20];
@@ -71,7 +71,7 @@ async function call(name, args = {}) {
   await done.click();
   await page.locator('#npc-quests [data-action="claim"]').click();
   await page.waitForFunction(() => document.getElementById('npc-notice').textContent.includes('Quest complete: Onward to the Crags'), null, { timeout: 10000 });
-  await page.locator('#npc-close').click();
+  await page.locator('#npc-x').click();
   await journal();
   check(await card('crags_onward').count() === 1 && await card('crags_onward').evaluate(n => n.matches('details.quest-completed *')), 'The journal moves it to the completed list');
   await closeJournal();

@@ -76,7 +76,7 @@ fn empty_seat_campaign_rewards_cover_all_classes_and_real_raid_without_changing_
         .iter()
         .filter(|m| m.template.is_none())
         .flat_map(|m| &m.quests)
-        .filter(|q| q.id.starts_with("es_"))
+        .filter(|q| q.id.starts_with("es_") && q.handoff_to.is_none())
         .collect();
     assert_eq!(campaign.len(), 28);
     for i in 1..=28 {

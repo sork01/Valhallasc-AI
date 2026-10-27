@@ -443,7 +443,7 @@
   // are restored just as they are by each window's own Close button.
   const outsideClose = {
     'whats-new': 'news-close', pause: 'p-resume', 'settings-panel': 'set-back', 'keys-panel': 'keys-back',
-    'quest-journal': 'quest-close', 'npc-dialogue': 'npc-close', worldmap: 'wm-close',
+    'quest-journal': 'quest-close', 'npc-dialogue': 'npc-x', worldmap: 'wm-close',
     'social-panel': 'social-close', 'inspect-panel': 'inspect-close', 'rebirth-dialog': 'rebirth-cancel',
     'bank-panel': 'bank-close', 'skills-panel': 'skills-close', equipment: 'equipment-close',
     'activity-panel': 'activity-close',

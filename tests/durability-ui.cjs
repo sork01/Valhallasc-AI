@@ -90,7 +90,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.locator('#npc-inventory [data-action="repair_all"]').click();
   await page.getByText(/Repaired one piece for 60 gold/).waitFor({timeout:10000});
   await page.waitForFunction(()=>Field.hero.gold===940,null,{timeout:15000});
-  await page.locator('#npc-close').click();
+  await page.locator('#npc-x').click();
   await page.keyboard.press('e');
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='new',null,{timeout:15000});
   assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'ok','repairing clears the warning');

@@ -156,6 +156,7 @@ impl Store {
             gold: 0,
             kills: 0,
             quests: vec![],
+            abandoned_quests: vec![],
             inventory: vec![],
             equipment: Default::default(),
             gear_instances: vec![],

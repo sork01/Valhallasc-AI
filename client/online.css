@@ -40,7 +40,7 @@
 #npc-gold { color: #f1d493; }
 #npc-notice { min-height: 1.6em; color: #b9dfb6; }
 .npc-panel :focus-visible, .city-travel:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
-@media (pointer: coarse) { .city-travel { min-height: 44px; } .npc-offers .btn, #npc-close { min-height: 44px; } }
+@media (pointer: coarse) { .city-travel { min-height: 44px; } .npc-offers .btn, #npc-x { min-height: 44px; } }
 #npc-dialogue { z-index: 45; }
 /* NPC conversation: a parchment window like World of Warcraft's gossip frame. Quests first, then services. */
 .gossip-window { position: static; display: flex; flex-direction: column; width: min(max(31cqw, 320px), 96cqw); max-height: min(46cqw, 94cqh); padding: 0; overflow: hidden; border: .3cqw solid #5a4a30; border-radius: .7cqw; background: #261e15; color: #2b1b08; box-shadow: 0 .6cqw 2cqw #000a, inset 0 0 0 1px #b99d5c55; }
@@ -114,6 +114,13 @@
 #quest-journal { z-index: 46; }
 .quest-panel { width: 46cqw; max-height: 44cqw; }
 #quest-list { max-height: 28cqw; overflow: auto; }
+.quest-entry { margin: .6cqw 0; border: 1px solid #d9c49255; border-radius: .6cqw; background: #142820bb; }
+.quest-entry > summary { cursor: pointer; list-style: none; padding: 1cqw; color: #f1d493; font: 1.3cqw 'Jua', sans-serif; }
+.quest-entry > summary::-webkit-details-marker { display: none; }
+.quest-entry > summary:focus-visible { outline: 2px solid #f1d493; outline-offset: -2px; }
+.quest-entry > .quest-card { margin: 0; border: 0; }
+@media (pointer: coarse) { .quest-entry > summary { min-height: 44px; display: flex; align-items: center; } }
+.quest-abandon-warning { color: #ffb6a6; }
 .quest-card { padding: 1cqw; margin: .8cqw 0; border: 1px solid #d9c49255; border-radius: .6cqw; background: #142820bb; }
 .quest-card h4 { margin: 0 0 .25cqw; color: #f1d493; font: 1.3cqw 'Jua', sans-serif; }
 .quest-card p { margin: .4cqw 0; font-size: .95cqw; }

@@ -4,6 +4,9 @@
   const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
   const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
   let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false, completedOpen = false;
+  let abandoned = [];
+  const expanded = new Set();
+  let abandonConfirm = null;
   const state = quest => progress.find(p => p.id === quest.id);
   const giver = quest => areas[quest.zone].npcs.find(n => n.id === quest.npc);
   // The hub a quest's giver belongs to: a zone may have several (the Wyrdwood's Hollowmoot and Skuldwatch).
@@ -17,7 +20,7 @@
     const p = state(quest);
     if (p && !p.claimed) return quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count) ? 'ready' : 'active';
     if (p?.claimed && !quest.repeatable) return 'completed';
-    if (quest.autoLevel) return 'upcoming'; // a progression quest is accepted by the server, never offered
+    if (quest.autoLevel && !abandoned.includes(quest.id)) return 'upcoming'; // a progression quest is accepted by the server, never offered
     if (quest.requires && !(state({ id: quest.requires })?.completions > 0)) return 'locked';
     if (quest.minLevel && heroLevel < quest.minLevel) return 'locked';
     return 'available';
@@ -63,7 +66,7 @@
           add(spawns.reduce((best, e) => Math.hypot(e.x - x, e.y - y) < Math.hypot(best.x - x, best.y - y) ? e : best), o.label);
         } else if (['visit', 'hold', 'chime', 'memory', 'echo'].includes(o.kind)) {
           for (const p of area.places || []) if (o.kind === 'chime' ? p.chain === o.target : p.id === o.target) add(p, o.label);
-        } else if (o.kind === 'talk' || o.kind === 'escort') add((area.npcs || []).find(n => n.id === o.target), o.label);
+        } else if (o.kind === 'talk' || o.kind === 'escort' || o.kind === 'handoff') add((area.npcs || []).find(n => n.id === o.target), o.label);
         else if (o.kind === 'reach') {
           const name = window.Locale?.translate(o.target) || o.target;
           if (area.name === name) add(area.spawn, o.label);
@@ -150,7 +153,6 @@
       return { name: m.name, done, text };
     });
   }
-  const here = quest => areas[quest.zone].name;
   function card(quest, atNpc) {
     const s = status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
@@ -169,7 +171,7 @@
       const line = element('p', `Party on this quest: ${party.map(m => `${m.name} (${m.done ? 'ready' : m.text})`).join(', ')}`, 'quest-party');
       line.dataset.partyQuest = String(party.length); node.append(line);
     }
-    node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
+    if (!quest.handoffTo) node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
     const choices = rewards(quest, node, s === 'ready' && atNpc);
     if (s === 'upcoming') {
       node.append(element('p', `This quest finds you by itself at level ${quest.autoLevel}.`, 'quest-history'));
@@ -193,6 +195,17 @@
     if (!atNpc && ['active', 'ready'].includes(s)) node.append(button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
       tracked = quest.id; mapCache.clear(); render(); $('quest-close').focus();
     }));
+    if (!atNpc && ['active', 'ready'].includes(s)) {
+      const asking = abandonConfirm === quest.id;
+      if (asking) node.append(element('p', 'Abandon this quest? Current progress will be lost. You can take it again from its questgiver.', 'quest-abandon-warning'));
+      const b = button(asking ? 'Confirm abandon' : 'Abandon quest', () => {
+        expanded.add(quest.id);
+        if (!asking) { abandonConfirm = quest.id; render(); $('quest-list').querySelector(`[data-quest="${quest.id}"] [data-action="abandon"]`).focus(); }
+        else if (Online.send({ type: 'quest_abandon', id: quest.id })) { b.disabled = true; }
+      });
+      b.dataset.action = 'abandon'; node.append(b);
+      if (asking) node.append(button('Cancel', () => { abandonConfirm = null; render(); }));
+    }
     if (state(quest)?.completions) node.append(element('p', `Completed ${state(quest).completions} time${state(quest).completions === 1 ? '' : 's'}.`, 'quest-history'));
     return node;
   }
@@ -233,34 +246,45 @@
   function renderJournal(active) {
     const zone = window.Field?.zone || 0;
     const mine = [...active].sort((a, b) => Number(b.id === tracked) - Number(a.id === tracked) || Number(status(b) === 'ready') - Number(status(a) === 'ready') || Number(b.zone === zone) - Number(a.zone === zone));
-    const nodes = mine.map(q => card(q, false));
+    const nodes = mine.map(q => foldedCard(q));
     if (!mine.length) {
       nodes.push(element('p', 'You have no quests in progress. Speak to anyone with a ! over their head to take one.', 'quest-empty'));
       const next = definitions.find(q => q.zone === zone && status(q) === 'available') || definitions.find(q => status(q) === 'available');
       if (next) nodes.push(element('p', `Next: “${next.title}”. Speak to ${giver(next).name} in ${hubName(next) || areas[next.zone].name}.`, 'quest-empty quest-next'));
     }
-    const done = definitions.filter(q => status(q) === 'completed');
+    const done = definitions.filter(q => !q.handoffTo && status(q) === 'completed');
     if (done.length) {
       const folded = document.createElement('details'); folded.className = 'quest-completed'; folded.open = completedOpen;
-      folded.addEventListener('toggle', () => { completedOpen = folded.open; });
+      folded.addEventListener('toggle', () => { if (folded.isConnected) completedOpen = folded.open; });
       folded.append(element('summary', `Completed (${done.length})`));
-      for (const q of done) {
-        if (q.story) {
-          const row = document.createElement('details'); row.className = 'quest-done'; row.dataset.quest = q.id;
-          row.append(element('summary', q.title), element('p', q.description));
-          for (const text of q.story.recap || []) row.append(element('p', text));
-          if (q.story.next) row.append(element('p', q.story.next, 'quest-next'));
-          folded.append(row);
-        } else { const row = element('p', `${q.title} · ${here(q)}`, 'quest-done'); row.dataset.quest = q.id; folded.append(row); }
-      }
+      for (const q of done) folded.append(foldedCard(q));
       nodes.push(folded);
     }
     $('quest-list').replaceChildren(...nodes);
   }
+  function foldedCard(quest) {
+    const node = document.createElement('details'); node.className = 'quest-entry'; node.dataset.quest = quest.id;
+    node.open = expanded.has(quest.id);
+    const summary = element('summary', `! ${quest.title}`);
+    node.append(summary);
+    // Completed histories can be long: render rewards/details only for entries being read.
+    const fill = () => {
+      if (node.querySelector(':scope > article')) return;
+      const body = card(quest, false); delete body.dataset.quest;
+      body.querySelector('h4')?.remove(); node.append(body);
+    };
+    if (node.open) fill();
+    node.addEventListener('toggle', () => {
+      if (!node.isConnected) return;
+      if (node.open) { expanded.add(quest.id); fill(); }
+      else { expanded.delete(quest.id); node.querySelector(':scope > article')?.remove(); }
+    });
+    return node;
+  }
   function open() { return !$('quest-journal').hidden; }
   function show() {
     if (window.Skillbar?.open || !Online.connected || Field.hero.dead || City.open || !$('pause').hidden || !$('equipment').hidden) return;
-    previousFocus = document.activeElement;
+    previousFocus = document.activeElement; expanded.clear(); completedOpen = false; abandonConfirm = null;
     Field.setPaused(true); $('quest-journal').hidden = false; render(); $('quest-close').focus();
   }
   function close(resume = true) {
@@ -272,7 +296,7 @@
   $('quest-close').addEventListener('click', () => close());
   $('quest-journal').addEventListener('keydown', event => {
     if (event.key !== 'Tab') return;
-    const buttons = [...$('quest-journal').querySelectorAll('button:not(:disabled)')];
+    const buttons = [...$('quest-journal').querySelectorAll('button:not(:disabled), summary')].filter(b => b.getClientRects().length);
     const first = buttons[0], last = buttons.at(-1);
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
@@ -318,8 +342,8 @@
       if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
       return done ? { state: 'done', burn: place.burn } : { state: 'none' };
     },
-    reset() { progress = []; signature = ''; tracked = null; bells = []; mapCache.clear(); close(false); render(); },
-    update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; mapCache.clear(); render(); },
+    reset() { progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; signature = ''; tracked = null; bells = []; mapCache.clear(); close(false); render(); },
+    update(next, dismissed = abandoned) { const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return; progress = next; abandoned = dismissed || []; signature = key; if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null; if (abandonConfirm && !progress.some(p => p.id === abandonConfirm && !p.claimed)) abandonConfirm = null; mapCache.clear(); render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
     // Locked and finished quests are hidden, as they are there.
     offered(id) {
@@ -352,7 +376,7 @@
       if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
       if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
       node.append(element('h5', 'Objectives'), element('p', objectives(quest).join('\n'), 'quest-objectives'));
-      node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
+      if (!quest.handoffTo) node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
       const choices = rewards(quest, node, s === 'ready');
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
@@ -374,7 +398,7 @@
           || definitions.find(q => q.npc === id && status(q) === s);
         if (quest) return { symbol: s === 'ready' ? '?' : '!', color: quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
       }
-      if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => (o.kind === 'talk' || o.kind === 'escort') && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };
+      if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => (o.kind === 'talk' || o.kind === 'escort' || o.kind === 'handoff') && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };
       return { symbol: '', color: '#ffdf88' };
     },
   };

@@ -30,6 +30,8 @@ const suite = {
     await page.locator('#npc-dialogue').waitFor({state:'hidden'});
     await page.evaluate(()=>Quests.show());
     check(await page.locator('#quest-list [data-quest="slime_patrol"]').count()===1,'accepted quest appears in journal without another click');
+    await page.locator('#quest-list [data-quest="slime_patrol"] > summary').tap();
+    await page.locator('#quest-list [data-quest="slime_patrol"] .quest-reward-icon').waitFor({state:'visible'});
     check(await page.locator('#quest-list [data-quest="slime_patrol"] .quest-reward-icon').count()===1,'journal uses the same reward icon');
     await page.keyboard.press('Escape');
     await visit(0,'guide'); await page.locator('#npc-quests [data-quest="arena_alder_40"]').tap();

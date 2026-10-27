@@ -3845,6 +3845,28 @@
           "hunter_shoulders_warden_l95_green"
         ]
       }
+    },
+    {
+      "id": "es_go_28",
+      "title": "Seek Bram Emberforge",
+      "npc": "smith",
+      "description": "Speak to Bram Emberforge in Greenmeadow at level 99 to continue The Empty Seat: Leave One Chair Empty. This direction stays in your journal until you accept that chapter.",
+      "objectives": [
+        {
+          "kind": "handoff",
+          "target": "smith",
+          "count": 1,
+          "label": "Speak to Bram Emberforge at level 99"
+        }
+      ],
+      "level": 99,
+      "minLevel": 1,
+      "rewardXp": 0,
+      "rewardGold": 0,
+      "requires": "es_27",
+      "autoLevel": 1,
+      "repeatable": false,
+      "handoffTo": "es_28"
     }
   ],
   "name": "Greenmeadow",
@@ -7552,6 +7574,28 @@
               "hunter_headgear_warden_l5_green"
             ]
           }
+        },
+        {
+          "id": "es_go_02",
+          "title": "Seek Scout Kael",
+          "npc": "crags_scout",
+          "description": "Speak to Scout Kael in Emberfall Crags at level 7 to continue The Empty Seat: The Cinder That Followed You. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "crags_scout",
+              "count": 1,
+              "label": "Speak to Scout Kael at level 7"
+            }
+          ],
+          "level": 7,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_01",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_02"
         }
       ],
       "city": {
@@ -13807,6 +13851,28 @@
               "hunter_shoulders_warden_l10_green"
             ]
           }
+        },
+        {
+          "id": "es_go_03",
+          "title": "Seek Loremaster Ylva",
+          "npc": "rime_loremaster",
+          "description": "Speak to Loremaster Ylva in Rimeveil Glacier at level 12 to continue The Empty Seat: A Warmth Older Than Spring. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "rime_loremaster",
+              "count": 1,
+              "label": "Speak to Loremaster Ylva at level 12"
+            }
+          ],
+          "level": 12,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_02",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_03"
         }
       ],
       "city": {
@@ -19863,6 +19929,28 @@
               "hunter_gloves_warden_l15_green"
             ]
           }
+        },
+        {
+          "id": "es_go_04",
+          "title": "Seek Lamplighter Wren",
+          "npc": "fen_lamplighter",
+          "description": "Speak to Lamplighter Wren in Gloamfen at level 17 to continue The Empty Seat: The Name in the Drowned Ledger. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "fen_lamplighter",
+              "count": 1,
+              "label": "Speak to Lamplighter Wren at level 17"
+            }
+          ],
+          "level": 17,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_03",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_04"
         }
       ],
       "city": {
@@ -29213,6 +29301,28 @@
               "hunter_weapon_shortbow_l20_blue"
             ]
           }
+        },
+        {
+          "id": "es_go_05",
+          "title": "Seek Herald Bran Oakenshield",
+          "npc": "city_herald",
+          "description": "Speak to Herald Bran Oakenshield in Skaldholm at level 20 to continue The Empty Seat: The Tenth Place Setting. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "city_herald",
+              "count": 1,
+              "label": "Speak to Herald Bran Oakenshield at level 20"
+            }
+          ],
+          "level": 20,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_04",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_05"
         }
       ],
       "city": {
@@ -46411,6 +46521,28 @@
               "hunter_armor_warden_l25_green"
             ]
           }
+        },
+        {
+          "id": "es_go_06",
+          "title": "Seek Ash-wright Hallveig",
+          "npc": "wyrd_wright",
+          "description": "Speak to Ash-wright Hallveig in Wyrdwood at level 25 to continue The Empty Seat: Keep One Root Alive. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "wyrd_wright",
+              "count": 1,
+              "label": "Speak to Ash-wright Hallveig at level 25"
+            }
+          ],
+          "level": 25,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_05",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_06"
         }
       ],
       "city": {
@@ -54474,6 +54606,28 @@
               "hunter_headgear_warden_l30_green"
             ]
           }
+        },
+        {
+          "id": "es_go_07",
+          "title": "Seek Stormseer Veleda",
+          "npc": "sky_veleda",
+          "description": "Speak to Stormseer Veleda in Bifrost Reach at level 32 to continue The Empty Seat: An Invitation With No Door. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "sky_veleda",
+              "count": 1,
+              "label": "Speak to Stormseer Veleda at level 32"
+            }
+          ],
+          "level": 32,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_06",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_07"
         }
       ],
       "city": {
@@ -64931,6 +65085,28 @@
               "hunter_shoulders_warden_l35_green"
             ]
           }
+        },
+        {
+          "id": "es_go_08",
+          "title": "Seek Halla Deepdiver",
+          "npc": "deep_halla",
+          "description": "Speak to Halla Deepdiver in Rán's Deep at level 37 to continue The Empty Seat: The First Shadow. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "deep_halla",
+              "count": 1,
+              "label": "Speak to Halla Deepdiver at level 37"
+            }
+          ],
+          "level": 37,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_07",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_08"
         }
       ],
       "city": {
@@ -69348,6 +69524,28 @@
               "hunter_gloves_warden_l40_green"
             ]
           }
+        },
+        {
+          "id": "es_go_09",
+          "title": "Seek Vaela Inkfin",
+          "npc": "nacre_archivist",
+          "description": "Speak to Vaela Inkfin in Nacrehold at level 40 to continue The Empty Seat: What the Archive Was Paid to Forget. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "nacre_archivist",
+              "count": 1,
+              "label": "Speak to Vaela Inkfin at level 40"
+            }
+          ],
+          "level": 40,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_08",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_09"
         }
       ],
       "futureInstance": {
@@ -95409,6 +95607,28 @@
               "hunter_weapon_shortbow_l40_blue"
             ]
           }
+        },
+        {
+          "id": "es_go_10",
+          "title": "Seek Vey Orison",
+          "npc": "astral_scholar",
+          "description": "Speak to Vey Orison in Astralhollow at level 43 to continue The Empty Seat: A Constellation With One Star Missing. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "astral_scholar",
+              "count": 1,
+              "label": "Speak to Vey Orison at level 43"
+            }
+          ],
+          "level": 43,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_09",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_10"
         }
       ],
       "city": {
@@ -99220,6 +99440,28 @@
               "hunter_armor_warden_l45_green"
             ]
           }
+        },
+        {
+          "id": "es_go_11",
+          "title": "Seek Asha of the Lens",
+          "npc": "prism_scholar",
+          "description": "Speak to Asha of the Lens in The Prismwaste at level 48 to continue The Empty Seat: Break the Beautiful Lie. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "prism_scholar",
+              "count": 1,
+              "label": "Speak to Asha of the Lens at level 48"
+            }
+          ],
+          "level": 48,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_10",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_11"
         }
       ],
       "city": {
@@ -103131,6 +103373,28 @@
               "hunter_headgear_warden_l50_green"
             ]
           }
+        },
+        {
+          "id": "es_go_12",
+          "title": "Seek Edda Pendulum",
+          "npc": "orrery_scholar",
+          "description": "Speak to Edda Pendulum in The Obsidian Orrery at level 53 to continue The Empty Seat: The Clock That Counts Downward. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "orrery_scholar",
+              "count": 1,
+              "label": "Speak to Edda Pendulum at level 53"
+            }
+          ],
+          "level": 53,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_11",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_12"
         }
       ],
       "city": {
@@ -107666,6 +107930,28 @@
               "hunter_shoulders_warden_l55_green"
             ]
           }
+        },
+        {
+          "id": "es_go_13",
+          "title": "Seek Odo Sporeglass",
+          "npc": "moonspore_scholar",
+          "description": "Speak to Odo Sporeglass in The Moonspore Canopy at level 58 to continue The Empty Seat: Borrow a Dream That Is Not Yours. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "moonspore_scholar",
+              "count": 1,
+              "label": "Speak to Odo Sporeglass at level 58"
+            }
+          ],
+          "level": 58,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_12",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_13"
         }
       ],
       "city": {
@@ -113644,6 +113930,28 @@
               "hunter_gloves_warden_l60_green"
             ]
           }
+        },
+        {
+          "id": "es_go_14",
+          "title": "Seek Archon Seraphine Vey",
+          "npc": "asterion_archon",
+          "description": "Speak to Archon Seraphine Vey in Asterion at level 60 to continue The Empty Seat: Before the Nine Chains. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "asterion_archon",
+              "count": 1,
+              "label": "Speak to Archon Seraphine Vey at level 60"
+            }
+          ],
+          "level": 60,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_13",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_14"
         }
       ],
       "city": {
@@ -124667,6 +124975,28 @@
               "hunter_weapon_shortbow_l60_blue"
             ]
           }
+        },
+        {
+          "id": "es_go_15",
+          "title": "Seek Orrin Glass",
+          "npc": "stormglass_scholar",
+          "description": "Speak to Orrin Glass in The Stormglass Shore at level 63 to continue The Empty Seat: The Sea Cannot Swallow This Fire. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "stormglass_scholar",
+              "count": 1,
+              "label": "Speak to Orrin Glass at level 63"
+            }
+          ],
+          "level": 63,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_14",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_15"
         }
       ],
       "city": {
@@ -129078,6 +129408,28 @@
               "hunter_armor_warden_l65_green"
             ]
           }
+        },
+        {
+          "id": "es_go_16",
+          "title": "Seek Ada Bell",
+          "npc": "sun_miller",
+          "description": "Speak to Ada Bell in Sunward Vale at level 68 to continue The Empty Seat: The Harvest of Tomorrow. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "sun_miller",
+              "count": 1,
+              "label": "Speak to Ada Bell at level 68"
+            }
+          ],
+          "level": 68,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_15",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_16"
         }
       ],
       "city": {
@@ -133170,6 +133522,28 @@
               "hunter_headgear_warden_l70_green"
             ]
           }
+        },
+        {
+          "id": "es_go_17",
+          "title": "Seek Mira Vell",
+          "npc": "ribbon_host",
+          "description": "Speak to Mira Vell in The Ribbonwild at level 73 to continue The Empty Seat: A Mask for the Man He Was. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "ribbon_host",
+              "count": 1,
+              "label": "Speak to Mira Vell at level 73"
+            }
+          ],
+          "level": 73,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_16",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_17"
         }
       ],
       "city": {
@@ -138274,6 +138648,28 @@
               "hunter_shoulders_warden_l75_green"
             ]
           }
+        },
+        {
+          "id": "es_go_18",
+          "title": "Seek Tavi Moss",
+          "npc": "tangle_botanist",
+          "description": "Speak to Tavi Moss in The Tanglecrown at level 78 to continue The Empty Seat: The Root That Refused the Order. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "tangle_botanist",
+              "count": 1,
+              "label": "Speak to Tavi Moss at level 78"
+            }
+          ],
+          "level": 78,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_17",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_18"
         }
       ],
       "city": {
@@ -140605,6 +141001,28 @@
               "hunter_gloves_warden_l80_green"
             ]
           }
+        },
+        {
+          "id": "es_go_19",
+          "title": "Seek Iria Sunbark",
+          "npc": "heart_matriarch",
+          "description": "Speak to Iria Sunbark in Veyrroot Canopy at level 80 to continue The Empty Seat: Count the Windows, Not the Thrones. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "heart_matriarch",
+              "count": 1,
+              "label": "Speak to Iria Sunbark at level 80"
+            }
+          ],
+          "level": 80,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_18",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_19"
         }
       ],
       "city": {
@@ -141652,6 +142070,28 @@
               "hunter_weapon_shortbow_l80_blue"
             ]
           }
+        },
+        {
+          "id": "es_go_20",
+          "title": "Seek Veya of the Pith",
+          "npc": "heart_oracle",
+          "description": "Speak to Veya of the Pith in Veyrroot Heartwood at level 80 to continue The Empty Seat: A Third Answer. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "heart_oracle",
+              "count": 1,
+              "label": "Speak to Veya of the Pith at level 80"
+            }
+          ],
+          "level": 80,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_19",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_20"
         }
       ],
       "city": {
@@ -146070,6 +146510,28 @@
               "hunter_armor_warden_l80_green"
             ]
           }
+        },
+        {
+          "id": "es_go_21",
+          "title": "Seek Ivo Starfold",
+          "npc": "lapis_cartographer",
+          "description": "Speak to Ivo Starfold in The Lapis Erg at level 83 to continue The Empty Seat: The Route Beneath Every Map. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "lapis_cartographer",
+              "count": 1,
+              "label": "Speak to Ivo Starfold at level 83"
+            }
+          ],
+          "level": 83,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_20",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_21"
         }
       ],
       "city": {
@@ -150463,6 +150925,28 @@
               "hunter_headgear_warden_l85_green"
             ]
           }
+        },
+        {
+          "id": "es_go_22",
+          "title": "Seek Ylva Bellward",
+          "npc": "frostwake_bellkeeper",
+          "description": "Speak to Ylva Bellward in Frostwake Shelf at level 88 to continue The Empty Seat: An Apology Made of Ice. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "frostwake_bellkeeper",
+              "count": 1,
+              "label": "Speak to Ylva Bellward at level 88"
+            }
+          ],
+          "level": 88,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_21",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_22"
         }
       ],
       "city": {
@@ -154869,6 +155353,28 @@
               "hunter_shoulders_warden_l90_green"
             ]
           }
+        },
+        {
+          "id": "es_go_23",
+          "title": "Seek Edda Flintvoice",
+          "npc": "cairn_stonesinger",
+          "description": "Speak to Edda Flintvoice in The Cairnspine at level 93 to continue The Empty Seat: Teach the Mountain His Name. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "cairn_stonesinger",
+              "count": 1,
+              "label": "Speak to Edda Flintvoice at level 93"
+            }
+          ],
+          "level": 93,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_22",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_23"
         }
       ],
       "city": {
@@ -167771,6 +168277,28 @@
               "hunter_gloves_warden_l95_green"
             ]
           }
+        },
+        {
+          "id": "es_go_24",
+          "title": "Seek Ysra Snowglass",
+          "npc": "yr_wi_lead",
+          "description": "Speak to Ysra Snowglass in The Yearwheel at level 97 to continue The Empty Seat: One Year the Fire Cannot Have. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "yr_wi_lead",
+              "count": 1,
+              "label": "Speak to Ysra Snowglass at level 97"
+            }
+          ],
+          "level": 97,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_23",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_24"
         }
       ],
       "city": {
@@ -229103,6 +229631,28 @@
           }
         },
         {
+          "id": "es_go_25",
+          "title": "Seek Svala Ashroad",
+          "npc": "ew_guide",
+          "description": "Speak to Svala Ashroad in Emberwake Caldera at level 99 to continue The Empty Seat: The Guest at the Last Door. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "ew_guide",
+              "count": 1,
+              "label": "Speak to Svala Ashroad at level 99"
+            }
+          ],
+          "level": 99,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_24",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_25"
+        },
+        {
           "id": "es_26",
           "title": "A Place for the Living",
           "npc": "ew_keeper",
@@ -229153,6 +229703,28 @@
           }
         },
         {
+          "id": "es_go_26",
+          "title": "Seek Hedda Linkkeeper",
+          "npc": "ew_keeper",
+          "description": "Speak to Hedda Linkkeeper in Emberwake Caldera at level 99 to continue The Empty Seat: A Place for the Living. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "ew_keeper",
+              "count": 1,
+              "label": "Speak to Hedda Linkkeeper at level 99"
+            }
+          ],
+          "level": 99,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_25",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_26"
+        },
+        {
           "id": "es_27",
           "title": "The Table He Was Promised",
           "npc": "ew_guide",
@@ -229199,6 +229771,28 @@
               "hunter_headgear_warden_l95_green"
             ]
           }
+        },
+        {
+          "id": "es_go_27",
+          "title": "Seek Svala Ashroad",
+          "npc": "ew_guide",
+          "description": "Speak to Svala Ashroad in Emberwake Caldera at level 99 to continue The Empty Seat: The Table He Was Promised. This direction stays in your journal until you accept that chapter.",
+          "objectives": [
+            {
+              "kind": "handoff",
+              "target": "ew_guide",
+              "count": 1,
+              "label": "Speak to Svala Ashroad at level 99"
+            }
+          ],
+          "level": 99,
+          "minLevel": 1,
+          "rewardXp": 0,
+          "rewardGold": 0,
+          "requires": "es_26",
+          "autoLevel": 1,
+          "repeatable": false,
+          "handoffTo": "es_27"
         }
       ],
       "city": null,

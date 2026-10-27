@@ -8,6 +8,14 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `ELDMARR-QUEST-HANDOFFS` — **Done, Beta 1.27.0 (2026-10-27).** All 27 chapter transitions immediately grant a direction quest to the next giver, even below the next chapter's level. Accepting that chapter resolves the handoff; existing saves receive missing directions. All 27 transitions pass the focused server check; bounded phone/tablet checks pass. After completing each quest in the Eldmarr quest chain, immediately receive a follow-up quest directing the player to the next questgiver. Keep the chain continuous with no gaps between quests (owner's request, 2026-10-27).
+
+- [x] `QUEST-JOURNAL-COLLAPSE` — **Done, Beta 1.27.0 (2026-10-27).** Active and completed quests start folded with only `!` and the title. Press or keyboard activation expands details; live updates retain open entries until the journal is reopened. Details/reward icons load only when expanded. Bounded phone/tablet checks pass. Start with all quests collapsed in the quest journal, showing only `!` followed by the quest title. Clicking a quest expands its details (owner's request, 2026-10-27).
+
+- [x] `QUEST-ABANDON` — **Done, Beta 1.27.0 (2026-10-27).** Expanded journal entries offer Abandon quest with inline confirmation. The server resets current progress, keeps earlier repeatable completions, saves dismissal of automatic quests and allows retaking at the giver. Five focused server tests and bounded phone/tablet checks pass. Make it possible to abandon accepted quests (owner's request, 2026-10-27).
+
+- [x] `DIALOGUE-REMOVE-GOODBYE` — **Done, Beta 1.27.0 (2026-10-27).** Removed Goodbye; the header X handles focus and outside dismissal, with Escape preserved. Bounded phone/tablet checks pass. Remove the Goodbye button from the NPC talking window (owner's request, 2026-10-27).
+
 - [x] `STORY-EMPTY-SEAT` — **Built and privately checked, Beta 1.26.0 (2026-10-27): nine focused server tests and 17 bounded real-art browser checks pass.** A 28-chapter Eldmarr campaign from Greenmeadow to the Chained Forge: summoned shades, root defenses, bell puzzles, a playable betrayal flashback and a homecoming. Owner reward rule: green gear, every fifth chapter blue, final chapter before the raid purple; two own-class choices per turn-in. Source and checks: `docs/empty-seat.md`.
 
 - [x] `RAID-HIERLOOMS` — **Beta 1.25.0 (2026-10-26).** Four golden Hierloom raid drops (two rings, necklace, cloak), 10% base chance per raid boss, wearer-level stats, +100% XP per equipped piece and no durability loss. Rules and focused checks: `docs/hierlooms.md`.

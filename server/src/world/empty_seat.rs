@@ -43,6 +43,17 @@ fn pending(c: &Character, quest: &Quest, target: &str) -> Option<(usize, usize)>
         .0;
     (quest.objectives[oi].target == target).then_some((qi, oi))
 }
+impl State {
+    pub(super) fn cancel(&mut self, session: u64, quest: &str) {
+        if self
+            .memories
+            .get(&session)
+            .is_some_and(|m| SCENES.iter().any(|s| s.id == m.id && s.quest == quest))
+        {
+            self.memories.remove(&session);
+        }
+    }
+}
 impl World {
     pub(super) fn empty_seat_view(&self, session: u64) -> Value {
         self.empty_seat

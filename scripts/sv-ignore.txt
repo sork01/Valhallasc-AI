@@ -148,5 +148,6 @@
   "쌍검과 치명타를 사용하는 민첩한 암살자. ‹dash› 키로 위험을 뚫고 질주하세요.",
   "KeyG",
   "Retry-After",
-  "(pointer: coarse)"
+  "(pointer: coarse)",
+  "button:not(:disabled), summary"
 ]

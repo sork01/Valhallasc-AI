@@ -154,6 +154,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   }
   await page.keyboard.press('q');
   const introduction = page.locator('#quest-list [data-quest="rime_welcome"]');
+  await introduction.locator(':scope > summary').click(); await introduction.locator('.quest-state').waitFor({state:'visible'});
   check((await introduction.textContent()).includes('Ready to turn in'), 'All four camp conversations complete the introduction');
   await introduction.locator('button').filter({ hasText: 'Return to Warden Halvard' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });

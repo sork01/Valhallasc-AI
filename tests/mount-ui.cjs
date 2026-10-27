@@ -20,7 +20,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await page.waitForFunction(() => Field.zone === 4 && Field.hero.level === 50 && Field.hero.gold === 500000 && Math.hypot(Field.hero.x - 126, Field.hero.y - 124.7) < 2.8, null, { timeout: 10000 });
     await page.evaluate(() => Online.send({ type: 'interact', npc: 'city_stable', offer: 'buy_mount' }));
     await page.waitForFunction(() => Field.hero.mountOwned && Field.hero.gold === 0, null, { timeout: 10000 });
-    if (await page.locator('#npc-dialogue').isVisible()) await page.locator('#npc-close').click();
+    if (await page.locator('#npc-dialogue').isVisible()) await page.locator('#npc-x').click();
     assert.equal(await page.locator('#mount-toggle').isEnabled(), true, 'the bought horse enables the control');
     await page.locator('#mount-toggle').click();
     await page.waitForFunction(() => Field.hero.mounted, null, { timeout: 10000 });

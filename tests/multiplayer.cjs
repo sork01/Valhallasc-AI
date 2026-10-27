@@ -200,7 +200,7 @@ async function stageAt(page, point) {
     await warrior.locator('[data-offer="blessing"]').click();
     await warrior.waitForFunction(()=>document.getElementById('npc-notice').textContent.includes('full health'));
     check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Sanctuary blessing is free and does not charge full-health players');
-    await warrior.locator('#npc-close').click();
+    await warrior.locator('#npc-x').click();
     await walkTo(warrior,{x:33,y:88});await delay(400);
     await warrior.evaluate(()=>Online.send({type:'equip',armor:'none',weapon:'none'}));
     await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='none');
@@ -208,10 +208,10 @@ async function stageAt(page, point) {
     await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='sword'&&Field.hero.look.warriorArmor==='crimson');
     await mage.waitForFunction(id=>Field.remotePlayers.find(p=>p.id===id)?.look.warriorWeapon==='sword',warriorId);passed++;
     check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Armorer service equips server-owned class gear without charging');
-    await warrior.screenshot({path:path.join(root,'test-results/city-armorer.png')});await warrior.locator('#npc-close').click();
+    await warrior.screenshot({path:path.join(root,'test-results/city-armorer.png')});await warrior.locator('#npc-x').click();
     await walkTo(warrior,{x:40,y:79});await delay(400);await clickNpc(warrior,'apothecary');
     check(await warrior.locator('[data-offer="tonic"]').isDisabled(),'Shop shows an unaffordable item without allowing a purchase');
-    await warrior.locator('#npc-close').click();
+    await warrior.locator('#npc-x').click();
   };
   const city = cityBlock(); city.catch(() => {});   // an early failure is reported where it is awaited
   // The fighter starts at level 20 (a shortcut for staging only: every rule, reward and save still runs), as a veteran would.
@@ -234,7 +234,7 @@ async function stageAt(page, point) {
   await mage.evaluate(() => Online.send({ type: 'interact', npc: 'healer', offer: 'blessing' }));
   await mage.waitForFunction(() => Field.hero.hp === Field.hero.maxHp);
   await mage.locator('#npc-dialogue').waitFor({ state: 'visible' });
-  await mage.locator('#npc-close').click();
+  await mage.locator('#npc-x').click();
   await stageAt(mage,{x:7,y:64});
   const spawned=await shortcut(mage,{op:'spawn_enemy',kind:'beetle',x:13,y:64,level:1});
   await mage.waitForFunction(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&s.kind==='beetle'&&Math.abs(s.x-13)<2;},spawned.id,{timeout:10000});

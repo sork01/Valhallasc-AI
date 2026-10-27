@@ -476,7 +476,7 @@
         b.append(detail);b.title=destination.stops.join(' → ');
         b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:`spark:${destination.id}`}))b.disabled=true;});offers.push(b);
       }
-      if(npc.buys){const b=row('vendor','Sell');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'merchant'},'#npc-close'));offers.push(b);}
+      if(npc.buys){const b=row('vendor','Sell');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'merchant'},'#npc-x'));offers.push(b);}
       if(npc.offers.some(offer=>offer.bag)){
         const bagOffers=npc.offers.filter(offer=>offer.bag).map(offer=>WORLD_ITEMS.find(i=>i.id===offer.bag)).filter(Boolean).sort((a,b)=>a.requiredLevel-b.requiredLevel);
         const next=bagOffers.find(i=>i.requiredLevel>(packet.level||1));
@@ -559,7 +559,7 @@
     else { window.Shop?.close(); $('npc-inventory').className=''; }
     if(view.kind==='merge'||view.kind==='refine'||view.kind==='repair')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
     const target=focus&&$('npc-dialogue').querySelector(focus);
-    (target&&!target.hidden?target:$('npc-close')).focus({preventScroll:true});
+    (target&&!target.hidden?target:$('npc-x')).focus({preventScroll:true});
   }
   function acceptQuest(quest, button) {
     if (pendingAccept || current?.id !== quest.npc) return false;
@@ -572,7 +572,7 @@
     const accepting=current?.id===packet.npc.id && pendingAccept;
     if(accepting){clearTimeout(acceptTimer);pendingAccept=null;}
     if(accepting && packet.quests?.some(q=>q.id===accepting&&!q.claimed)){
-      window.Quests?.update(packet.quests); close(); return;
+      window.Quests?.update(packet.quests, packet.abandonedQuests); close(); return;
     }
     window.Inventory?.hideTooltip();
     window.Skillbar?.close(false);
@@ -586,12 +586,11 @@
     else if(!['merchant','sell','merge','refine','repair','bags','stat_reset'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
     window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
-    window.Quests?.update(packet.quests || []);
+    window.Quests?.update(packet.quests || [], packet.abandonedQuests);
     if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }
   function close(resume=true) {clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
-  $('npc-close').addEventListener('click',()=>close());
   $('npc-x').addEventListener('click',()=>close());
   $('npc-back').addEventListener('click',()=>{const previous=view.kind;show({kind:'gossip'},`[data-view="${previous}"]`);});
   $('npc-dialogue').addEventListener('keydown',event=>{

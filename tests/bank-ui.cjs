@@ -193,7 +193,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     await page.waitForFunction(() => /Dismount first\./.test(document.getElementById('npc-notice').textContent));
     assert.equal(await page.locator('#bank-panel').isHidden(), true, 'a refused bank stays shut');
     assert.equal(await page.locator('#npc-dialogue [data-offer="bank"]').isEnabled(), true, 'the banker can be asked again');
-    await page.locator('#npc-close').click();
+    await page.locator('#npc-x').click();
     await page.evaluate(() => Field.toggleMount());
     await page.waitForFunction(() => !Field.hero.mounted, null, { timeout: 10000 });
 

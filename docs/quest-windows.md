@@ -36,3 +36,34 @@ Indexed verification: 26 assertions across the two touch target sizes, with
 688 MiB peak under the unchanged cap. Both reward-text and accept-close
 mutations fail as intended. Proof: `test-results/touch/quest-window-index.log`,
 `quest-window-mutation-{icons,accept}.log` and the indexed export screenshots.
+
+## Journal and conversations (Beta 1.27.0)
+
+Every journal quest starts folded when the journal opens. Its native `details` /
+`summary` row shows only `!` and the title; pressing it (or Enter/Space while
+focused) opens the description, objectives, rewards and actions. Live progress
+updates preserve open entries until the journal is closed. Completed quests use
+the same rows inside the completed section, including recovered story memories.
+
+**Abandon quest** asks for confirmation inside the expanded journal entry.
+`quest_abandon` sends only the quest ID; the server drops only the sender's
+unclaimed progress, gives no rewards, and saves immediately. Retaking at the
+original giver starts objectives again (bring objectives still reflect owned
+items). Previously claimed rewards cannot be abandoned. Repeatable completion
+counts are retained, so dropping a new bounty never revokes an earlier unlock.
+`Character.abandoned_quests` defaults to empty for older saves and prevents
+automatic quests from returning each tick or after reconnecting. A dismissed
+automatic quest becomes available at its giver and acceptance clears that flag.
+Current escorts and gauntlets end on abandonment; quest-bound hires leave via
+the usual contract update. Partial memory/hold/bell state is cleared.
+
+Conversations no longer include a Goodbye button. The header X (`npc-x`) is
+the default focus and outside-dismiss target; Escape and grouped merchant/bag
+closing still use the normal City close action.
+
+Focused checks: `cargo test quest_journal_` and the bounded
+`tests/quest-journal-ui.cjs` at the phone and tablet sizes. No encounter tests.
+
+Validation: five focused quest-journal server tests, nine existing Eldmarr story checks, and 44 bounded browser checks at 844×390 and 1024×768 pass. Peak browser-scope memory: 664 MiB. Release build, Clippy with warnings denied, formatting, source syntax, generator byte stability, release notes and locale runtime checks pass. The Swedish catalog checker retains the same three pre-existing proper-name failures as the unchanged main checkout.
+
+Beta 1.27.0 deployed 2026-10-27 with nobody online. Rollback backup: `deploy/backups/quest-journal-20261027T081549Z`. Public/bridge health, the running binary hash, all nine changed client asset hashes, SQLite `quick_check`, unchanged character/guest counts, test-flag exclusion and a warning-free service journal pass. No zone IDs changed or saved characters needed migration. Release binary SHA-256: `a342981a132870a2925f85ee486541788571093259e3a0ac1eb4ebb5f4fe1dfb`.

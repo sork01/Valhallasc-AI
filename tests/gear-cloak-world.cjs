@@ -38,7 +38,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results/cloaks'
   await debug({op:'teleport',zone:0,x:smith.x,y:smith.y-1});await page.waitForTimeout(300);
   await page.evaluate(()=>Online.send({type:'interact',npc:'smith'}));await page.locator('[data-offer="buy_cloak_uncommon"]').click();
   await page.waitForFunction(()=>Inventory.quantity('cloak_l50_uncommon')===1);assert.ok(await page.evaluate(()=>Field.hero.gold<100000),'vendor charges for the level-appropriate cloak');
-  await page.locator('#npc-close').click();await page.screenshot({path:path.join(out,'private-equipped-world.png')});
+  await page.locator('#npc-x').click();await page.screenshot({path:path.join(out,'private-equipped-world.png')});
   assert.deepEqual(errors,[]);console.log('PASS: female Mage, real worn art, equipment, movement, tiered vendor and mobile window in a private world');
  }finally{await browser?.close();await world.stop();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

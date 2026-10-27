@@ -93,7 +93,7 @@ const suite = {
     check(await page.locator('#merchant-stock .merchant-slot').count()>0&&await page.locator('#merchant-stock .merchant-slot').count()<10,'remaining stock appears on the next page');
     await page.locator('.merchant-tabs [data-tab="back"]').tap();
     check(await page.locator('#sell-buyback .merchant-slot').count()===0,'buyback remains separate per merchant');
-    await page.locator('#npc-close').tap(); await page.context().close();
+    await page.locator('#npc-x').tap(); await page.context().close();
     if(width===844) {
       const sv=await player('MerchantSvenska',{lang:'sv'}); const n=await sv.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='smith'));
       await debug(sv,{op:'teleport',zone:0,x:n.x,y:n.y+1});await sv.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);await sv.evaluate(()=>Field.visitNpc('smith'));

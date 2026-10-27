@@ -184,6 +184,7 @@ const look = page => page.evaluate(() => {
   await page.keyboard.press('Escape');
   await page.keyboard.press('q');
   const introduction = page.locator('#quest-list [data-quest="crags_welcome"]');
+  await introduction.locator(':scope > summary').click(); await introduction.locator('.quest-state').waitFor({state:'visible'});
   check((await introduction.textContent()).includes('Ready to turn in'), 'All three camp conversations complete the introduction');
   await introduction.locator('button').filter({ hasText: 'Return to Captain Sera' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
