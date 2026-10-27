@@ -6,7 +6,7 @@
   let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false, completedOpen = false;
   let abandoned = [];
   const expanded = new Set();
-  let abandonConfirm = null;
+  let abandonConfirm = null, abandonedOpen = false;
   const state = quest => progress.find(p => p.id === quest.id);
   const giver = quest => areas[quest.zone].npcs.find(n => n.id === quest.npc);
   // The hub a quest's giver belongs to: a zone may have several (the Wyrdwood's Hollowmoot and Skuldwatch).
@@ -184,6 +184,11 @@
         questAction(quest, action, b);
       });
       b.dataset.action = action; node.append(b);
+    } else if (!atNpc && quest.autoLevel && abandoned.includes(quest.id) && s === 'available') {
+      const b = button('Restore quest', () => {
+        if (Online.send({ type: 'quest_restore', id: quest.id })) b.disabled = true;
+      });
+      b.dataset.action = 'restore'; node.append(b);
     } else if (!atNpc && !['completed', 'upcoming'].includes(s)) {
       if (Field.zone !== quest.zone) node.append(element('p', quest.zone === 0
         ? `${npc.name} is back in Greenmeadow. Return through the gate first.`
@@ -252,6 +257,15 @@
       const next = definitions.find(q => q.zone === zone && status(q) === 'available') || definitions.find(q => status(q) === 'available');
       if (next) nodes.push(element('p', `Next: “${next.title}”. Speak to ${giver(next).name} in ${hubName(next) || areas[next.zone].name}.`, 'quest-empty quest-next'));
     }
+    const recoverable = definitions.filter(q => q.autoLevel && heroLevel >= q.autoLevel && abandoned.includes(q.id)
+      && status(q) === 'available' && (!q.handoffTo || !state({id: q.handoffTo})));
+    if (recoverable.length) {
+      const folded = document.createElement('details'); folded.className = 'quest-abandoned'; folded.open = abandonedOpen;
+      folded.addEventListener('toggle', () => { if (folded.isConnected) abandonedOpen = folded.open; });
+      folded.append(element('summary', `Abandoned automatic quests (${recoverable.length})`));
+      for (const q of recoverable) folded.append(foldedCard(q));
+      nodes.unshift(folded);
+    }
     const done = definitions.filter(q => !q.handoffTo && status(q) === 'completed');
     if (done.length) {
       const folded = document.createElement('details'); folded.className = 'quest-completed'; folded.open = completedOpen;
@@ -284,7 +298,7 @@
   function open() { return !$('quest-journal').hidden; }
   function show() {
     if (window.Skillbar?.open || !Online.connected || Field.hero.dead || City.open || !$('pause').hidden || !$('equipment').hidden) return;
-    previousFocus = document.activeElement; expanded.clear(); completedOpen = false; abandonConfirm = null;
+    previousFocus = document.activeElement; expanded.clear(); completedOpen = false; abandonedOpen = false; abandonConfirm = null;
     Field.setPaused(true); $('quest-journal').hidden = false; render(); $('quest-close').focus();
   }
   function close(resume = true) {
@@ -342,7 +356,7 @@
       if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
       return done ? { state: 'done', burn: place.burn } : { state: 'none' };
     },
-    reset() { progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; signature = ''; tracked = null; bells = []; mapCache.clear(); close(false); render(); },
+    reset() { progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; abandonedOpen = false; signature = ''; tracked = null; bells = []; mapCache.clear(); close(false); render(); },
     update(next, dismissed = abandoned) { const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return; progress = next; abandoned = dismissed || []; signature = key; if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null; if (abandonConfirm && !progress.some(p => p.id === abandonConfirm && !p.claimed)) abandonConfirm = null; mapCache.clear(); render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
     // Locked and finished quests are hidden, as they are there.

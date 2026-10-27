@@ -277,3 +277,136 @@ fn quest_journal_handoffs_backfill_old_progress_once_and_do_not_skip_started_cha
             .any(|p| p.id == "es_go_02")
     );
 }
+
+#[test]
+fn quest_restore_automatic_routes_and_eldmarr_handoffs_from_journal_after_reload() {
+    let mut w = world();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.level = 99;
+    c.zone = 4;
+    c.quests.push(QuestProgress {
+        id: "es_01".into(),
+        claimed: true,
+        completions: 1,
+        counts: vec![1],
+    });
+    sync_progression(c, &w.maps);
+    for id in ["crags_onward", "es_go_02"] {
+        abandon(&mut w, id);
+        let c = &w.players[&1].character;
+        let restored: Character = serde_json::from_value(serde_json::to_value(c).unwrap()).unwrap();
+        w.players.get_mut(&1).unwrap().character = restored;
+        let before = w.players[&1].character.clone();
+        let message: ClientMessage =
+            serde_json::from_value(json!({"type":"quest_restore","id":id})).unwrap();
+        w.message(1, message);
+        let c = &w.players[&1].character;
+        assert!(c.quests.iter().any(|q| q.id == id && !q.claimed));
+        assert!(!c.abandoned_quests.iter().any(|q| q == id));
+        assert_eq!(
+            (c.zone, c.x, c.y, c.gold, c.xp, c.inventory.clone()),
+            (
+                before.zone,
+                before.x,
+                before.y,
+                before.gold,
+                before.xp,
+                before.inventory
+            )
+        );
+        assert!(!w.players[&2].character.quests.iter().any(|q| q.id == id));
+        w.message(1, ClientMessage::QuestRestore { id: id.into() });
+        assert_eq!(
+            w.players[&1]
+                .character
+                .quests
+                .iter()
+                .filter(|q| q.id == id)
+                .count(),
+            1
+        );
+    }
+}
+
+#[test]
+fn quest_restore_rejects_ineligible_quests_and_cannot_bypass_progression() {
+    let mut w = world();
+    let restore =
+        |w: &mut World, id: &str| w.message(1, ClientMessage::QuestRestore { id: id.into() });
+    restore(&mut w, "missing");
+    restore(&mut w, "crags_onward");
+    assert!(
+        !w.players[&1]
+            .character
+            .quests
+            .iter()
+            .any(|q| q.id == "crags_onward")
+    );
+    let q = quest(&w, "slime_patrol");
+    assert!(quest_action(&mut w.players.get_mut(&1).unwrap().character, &q, "accept").2);
+    abandon(&mut w, &q.id);
+    restore(&mut w, &q.id);
+    assert!(
+        !w.players[&1]
+            .character
+            .quests
+            .iter()
+            .any(|q| q.id == "slime_patrol")
+    );
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.level = 1;
+    c.abandoned_quests
+        .extend(["crags_onward".into(), "es_go_02".into()]);
+    restore(&mut w, "crags_onward");
+    restore(&mut w, "es_go_02");
+    assert!(
+        !w.players[&1]
+            .character
+            .quests
+            .iter()
+            .any(|q| ["crags_onward", "es_go_02"].contains(&q.id.as_str()))
+    );
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.level = 99;
+    c.quests.push(QuestProgress {
+        id: "es_01".into(),
+        claimed: true,
+        completions: 1,
+        counts: vec![1],
+    });
+    c.quests.push(QuestProgress {
+        id: "es_02".into(),
+        claimed: false,
+        completions: 0,
+        counts: vec![0],
+    });
+    restore(&mut w, "es_go_02");
+    assert!(
+        !w.players[&1]
+            .character
+            .quests
+            .iter()
+            .any(|q| q.id == "es_go_02")
+    );
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.quests.push(QuestProgress {
+        id: "crags_onward".into(),
+        claimed: true,
+        completions: 1,
+        counts: vec![1],
+    });
+    let before = c.clone();
+    restore(&mut w, "crags_onward");
+    let c = &w.players[&1].character;
+    assert!(
+        c.quests
+            .iter()
+            .find(|q| q.id == "crags_onward")
+            .unwrap()
+            .claimed
+    );
+    assert_eq!(
+        (c.gold, c.xp, c.quests.len()),
+        (before.gold, before.xp, before.quests.len())
+    );
+}

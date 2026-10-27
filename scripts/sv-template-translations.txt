@@ -434,5 +434,7 @@
   "Unauthorized GM command attempt: {0}.": "Obehörigt försök till GM-kommando: {0}.",
   "The ward at {0} holds! Return to the quest giver.": "Värnet vid {0} håller! Återvänd till uppdragsgivaren.",
   "! {0}": "! {0:t}",
-  "Quest abandoned: {0}. You can take it again from its questgiver.": "Uppdrag övergivet: {0:t}. Du kan ta det igen hos uppdragsgivaren."
+  "Quest abandoned: {0}. You can take it again from its questgiver.": "Uppdrag övergivet: {0:t}. Du kan ta det igen hos uppdragsgivaren.",
+  "Abandoned automatic quests ({0})": "Övergivna automatiska uppdrag ({0})",
+  "Quest abandoned: {0}. You can restore it from your quest journal.": "Uppdrag övergivet: {0:t}. Du kan återställa det i din uppdragsdagbok."
 }

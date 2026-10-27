@@ -133,8 +133,8 @@
 .quest-card .quest-party { color: #9dffb2; font-size: .9cqw; }
 .tracker-objective.tracker-party { color: #9dffb2; }
 .quest-empty { margin: .8cqw 0; color: #cfd8cf; font-size: .95cqw; }
-.quest-completed { margin: 1cqw 0 .4cqw; padding-top: .6cqw; border-top: 1px solid #d9c49244; }
-.quest-completed summary { cursor: pointer; color: #b7d5b8; font: .95cqw 'Jua', sans-serif; }
+.quest-abandoned, .quest-completed { margin: 1cqw 0 .4cqw; padding-top: .6cqw; border-top: 1px solid #d9c49244; }
+.quest-abandoned summary, .quest-completed summary { cursor: pointer; color: #b7d5b8; font: .95cqw 'Jua', sans-serif; }
 .quest-done { margin: .3cqw 0 .3cqw 1cqw; color: #9fb0a0; font-size: .9cqw; }
 .social-who .member-quests { display: block; color: #9dffb2; }
 .quest-card[data-repeatable="true"] { border-color: #64b5ff80; }

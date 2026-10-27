@@ -1239,6 +1239,9 @@ pub enum ClientMessage {
     QuestAbandon {
         id: String,
     },
+    QuestRestore {
+        id: String,
+    },
     Interact {
         npc: String,
         offer: Option<String>,

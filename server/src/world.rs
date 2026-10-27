@@ -2365,6 +2365,7 @@ impl World {
                 }
             },
             ClientMessage::QuestAbandon { id } => self.abandon_quest(session, &id),
+            ClientMessage::QuestRestore { id } => self.restore_quest(session, &id),
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
             }

@@ -7300,5 +7300,9 @@
   "Speak to Svala Ashroad in Emberwake Caldera at level 99 to continue The Empty Seat: The Table He Was Promised. This direction stays in your journal until you accept that chapter.": "Tala med Svala Askväg i Emberwake Caldera på nivå 99 för att fortsätta Den tomma stolen: Bordet han blev lovad. Vägvisningen finns kvar i din dagbok tills du tar emot det kapitlet.",
   "Seek Bram Emberforge": "Sök upp Bram Emberforge",
   "Speak to Bram Emberforge in Greenmeadow at level 99 to continue The Empty Seat: Leave One Chair Empty. This direction stays in your journal until you accept that chapter.": "Tala med Bram Emberforge i Greenmeadow på nivå 99 för att fortsätta Den tomma stolen: Lämna en stol tom. Vägvisningen finns kvar i din dagbok tills du tar emot det kapitlet.",
-  "Speak to Bram Emberforge at level 99": "Tala med Bram Emberforge på nivå 99"
+  "Speak to Bram Emberforge at level 99": "Tala med Bram Emberforge på nivå 99",
+  "Restore quest": "Återställ uppdrag",
+  "Only abandoned automatic quests can be restored here.": "Här kan du bara återställa övergivna automatiska uppdrag.",
+  "Reach the required level before restoring this quest.": "Nå rätt nivå innan du återställer det här uppdraget.",
+  "The next chapter has already been started.": "Nästa kapitel har redan påbörjats."
 }
