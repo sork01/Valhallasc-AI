@@ -428,18 +428,155 @@
   const atlasArt = new Image();
   atlasArt.src = ATLAS.background;
   atlasArt.addEventListener('load', () => { if ($('wm-world')?.querySelector('.wm-sea')) bakeAtlas(); });
-  function bakeAtlas() {
-    const cv=$('wm-world').querySelector('.wm-sea');if(!cv)return;
-    if(!atlasArt.complete||!atlasArt.naturalWidth){cv.hidden=true;return;}
-    const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);
-    g.drawImage(atlasArt,0,0,STAGE.w,STAGE.h);
-    for(const r of ATLAS.regions) {
-      const a=zones[r.zone].place;g.save();g.beginPath();polygonPath(g,r.polygon);g.clip();
-      if(!visited(r.zone)){g.fillStyle='#c2d3dfef';g.fillRect(a.x,a.y,a.w,a.h);}
-      else {const fog=document.createElement('canvas');fog.width=fog.height=220;window.Field.fog.paint(fog.getContext('2d'),220,220,r.zone);g.drawImage(fog,a.x,a.y,a.w,a.h);fog.width=fog.height=0;}
-      g.restore();
+  // A continuous cloud bank is masked to the island coastline, leaving the ocean
+  // and compass visible. Explored ground cuts holes through the cloud layer.
+  function islandMask(width, height, padding) {
+    // Trace the painted shoreline independently of the inset gameplay provinces.
+    // Coordinates are in the original 1758 x 895 artwork; this single silhouette
+    // includes all the land between provinces and the northern floating islands.
+    const shore = [[710,0],[700,41],[550,42],[535,30],[515,21],[490,16],
+      [445,27],[420,34],[371,45],[341,66],[304,90],[278,119],[247,128],
+      [236,151],[226,174],[220,203],[204,239],[185,272],[159,306],
+      [145,336],[134,365],[134,407],[134,451],[124,492],[126,535],
+      [131,573],[145,622],[169,671],[188,696],[199,727],[222,754],
+      [252,772],[296,782],[353,787],[400,797],[438,810],[479,830],
+      [521,837],[553,833],[588,835],[610,848],[656,854],[686,864],
+      [710,871],[748,861],[791,848],[837,829],[880,823],[919,798],
+      [947,782],[994,775],[1056,777],[1103,788],[1158,795],[1238,785],
+      [1337,785],[1397,779],[1458,744],[1514,710],[1557,673],[1590,631],
+      [1612,589],[1630,547],[1633,503],[1628,457],[1623,417],[1617,386],
+      [1608,346],[1593,313],[1566,291],[1546,263],[1528,254],[1513,250],
+      [1505,231],[1504,202],[1493,171],[1488,131],[1484,104],[1464,84],
+      [1424,70],[1377,58],[1341,48],[1337,22],[1310,19],[1252,24],
+      [1189,26],[1152,28],[1128,16],[1112,28],[1092,42],[1050,54],
+      [1010,67],[975,62],[935,55],[893,45],[855,36],[815,18],[780,0]];
+    const mask = document.createElement('canvas');
+    mask.width = width + padding * 2; mask.height = height + padding * 2;
+    const g = mask.getContext('2d'); g.translate(padding, padding);
+    g.scale(width / 1758, height / 895); g.fillStyle = g.strokeStyle = '#fff';
+    // Expand well beyond the coast so the blur fades entirely over water.
+    g.lineJoin = 'round'; g.lineWidth = 144;
+    g.beginPath(); polygonPath(g, shore); g.fill(); g.stroke();
+    return mask;
+  }
+  let atlasClouds = null;
+  function cloudBank() {
+    if (atlasClouds) return atlasClouds;
+    const c = document.createElement('canvas');
+    c.width = Math.ceil(STAGE.w / 2); c.height = Math.ceil(STAGE.h / 2);
+    const g = c.getContext('2d'), img = g.createImageData(c.width, c.height);
+    const hash = (x, y) => {
+      let n = Math.imul(x, 374761393) + Math.imul(y, 668265263);
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+    };
+    const noise = (x, y) => {
+      const ix = Math.floor(x), iy = Math.floor(y);
+      let u = x - ix, v = y - iy;
+      u = u * u * (3 - 2 * u); v = v * v * (3 - 2 * v);
+      const a = hash(ix, iy), b = hash(ix + 1, iy), d = hash(ix, iy + 1), e = hash(ix + 1, iy + 1);
+      return a + (b - a) * u + (d - a) * v + (a - b - d + e) * u * v;
+    };
+    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) {
+      // Warped broad billows, overlapping smaller wisps and a light-facing rim.
+      const wx = x + 65 * noise(x / 150 + 17, y / 150 + 31);
+      const wy = y + 55 * noise(x / 150 + 71, y / 150 + 13);
+      let body = 0, amplitude = .55;
+      for (let scale = 110; scale >= 3; scale /= 2, amplitude *= .5)
+        body += amplitude * noise(wx / scale, wy / scale);
+      const puff = Math.min(1, Math.max(0, (body - .22) * 1.8));
+      const light = (noise(wx / 40, wy / 40) - noise((wx + 9) / 40, (wy + 13) / 40)) * 32;
+      const i = (y * c.width + x) * 4;
+      img.data[i] = 61 + puff * 111 + light;
+      img.data[i + 1] = 79 + puff * 108 + light;
+      img.data[i + 2] = 99 + puff * 99 + light;
+      img.data[i + 3] = 255;
     }
-    cv.hidden=false;
+    g.putImageData(img, 0, 0);
+    // Padding keeps land at the image boundary opaque during the coastal blur.
+    const padding = 48, mask = islandMask(c.width, c.height, padding);
+    // Feather only the coastal alpha, preserving the cloud texture's detail.
+    g.globalCompositeOperation = 'destination-in'; g.filter = 'blur(12px)';
+    g.drawImage(mask, -padding, -padding); g.filter = 'none';
+    mask.width = mask.height = 0;
+    atlasClouds = c; return c;
+  }
+  let coastalLookup = null;
+  function extendCoastalClear(clear) {
+    if (!coastalLookup) {
+      // Assign the offshore cloud apron to the nearest authored land point.
+      // Keep province interiors as their own sources, so neighbouring unknown
+      // land never clears just because a nearby stretch of coast was explored.
+      const w = Math.ceil(STAGE.w / 2), h = Math.ceil(STAGE.h / 2);
+      const land = document.createElement('canvas'); land.width = w; land.height = h;
+      const g = land.getContext('2d'); g.scale(w / STAGE.w, h / STAGE.h);
+      g.fillStyle = '#fff'; g.beginPath();
+      for (const r of ATLAS.regions) polygonPath(g, r.polygon);
+      g.fill();
+      const pixels = g.getImageData(0, 0, w, h).data;
+      const nearest = new Int32Array(w * h).fill(-1), queue = new Int32Array(w * h);
+      let head = 0, tail = 0;
+      for (let i = 0; i < nearest.length; i++) if (pixels[i * 4 + 3] === 255) {
+        nearest[i] = i; queue[tail++] = i;
+      }
+      const add = (from, to) => {
+        if (nearest[to] !== -1) return;
+        nearest[to] = nearest[from]; queue[tail++] = to;
+      };
+      while (head < tail) {
+        const i = queue[head++], x = i % w;
+        if (x > 0) add(i, i - 1);
+        if (x + 1 < w) add(i, i + 1);
+        if (i >= w) add(i, i - w);
+        if (i + w < nearest.length) add(i, i + w);
+      }
+      land.width = land.height = 0;
+      coastalLookup = { w, h, nearest };
+    }
+    const { w, h, nearest } = coastalLookup;
+    const water = document.createElement('canvas'); water.width = w; water.height = h;
+    const g = water.getContext('2d'); g.drawImage(clear, 0, 0, w, h);
+    const source = g.getImageData(0, 0, w, h).data, extended = g.createImageData(w, h);
+    for (let i = 0; i < nearest.length; i++) {
+      if (nearest[i] === i || nearest[i] < 0) continue;
+      const p = i * 4;
+      extended.data[p] = extended.data[p + 1] = extended.data[p + 2] = 255;
+      extended.data[p + 3] = source[nearest[i] * 4 + 3];
+    }
+    g.putImageData(extended, 0, 0);
+    clear.getContext('2d').drawImage(water, 0, 0, STAGE.w, STAGE.h);
+    water.width = water.height = 0;
+  }
+  function bakeAtlas() {
+    const cv = $('wm-world').querySelector('.wm-sea'); if (!cv) return;
+    if (!atlasArt.complete || !atlasArt.naturalWidth) { cv.hidden = true; return; }
+    const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height);
+    g.drawImage(atlasArt, 0, 0, STAGE.w, STAGE.h);
+    if (ATLAS.regions.some(r => charted(r.zone) < CELLS)) {
+      const fog = document.createElement('canvas'), clear = document.createElement('canvas');
+      fog.width = clear.width = STAGE.w; fog.height = clear.height = STAGE.h;
+      const fg = fog.getContext('2d'), cg = clear.getContext('2d');
+      fg.drawImage(cloudBank(), 0, 0, STAGE.w, STAGE.h);
+      for (const r of ATLAS.regions) {
+        if (!visited(r.zone)) continue;
+        const a = zones[r.zone].place, local = document.createElement('canvas');
+        local.width = local.height = 220;
+        const lg = local.getContext('2d');
+        lg.fillStyle = '#fff'; lg.fillRect(0, 0, 220, 220);
+        lg.globalCompositeOperation = 'destination-out';
+        window.Field.fog.paint(lg, 220, 220, r.zone);
+        cg.save(); cg.beginPath(); polygonPath(cg, r.polygon); cg.clip();
+        cg.drawImage(local, a.x, a.y, a.w, a.h); cg.restore();
+        local.width = local.height = 0;
+      }
+      extendCoastalClear(clear);
+      fg.globalCompositeOperation = 'destination-out';
+      fg.filter = 'blur(9px)'; fg.drawImage(clear, 0, 0);
+      fg.filter = 'none'; fg.drawImage(clear, 0, 0);
+      g.drawImage(fog, 0, 0);
+      fog.width = fog.height = clear.width = clear.height = 0;
+    }
+    cv.hidden = false;
   }
   let worldScroll=[0,0], worldZoom=1;
   function sizeWorld() {
@@ -555,8 +692,8 @@
     for(const r of ATLAS.regions) {
       const i=r.zone,z=zones[i],unseen=!visited(i),tile=tiles[i],name=nameNodes[i];
       tile.disabled=unseen;tile.dataset.fog=unseen?'full':'partial';tile.setAttribute('aria-label',unseen?'Unexplored zone':`${r.name}. Open its map`);
-      tile.querySelector('b').textContent=unseen?'Unexplored':r.name;
-      name.disabled=unseen;name.dataset.fog=unseen?'full':'partial';name.querySelector('b').textContent=unseen?'Unexplored':r.name.replace(/^The /,'');name.querySelector('small').textContent=unseen?'Not yet visited':rangeText(z);
+      tile.querySelector('b').textContent=unseen?'':r.name;
+      name.hidden=unseen;name.disabled=unseen;name.dataset.fog=unseen?'full':'partial';name.querySelector('b').textContent=unseen?'':r.name.replace(/^The /,'');name.querySelector('small').textContent=unseen?'':rangeText(z);
     }
     for(const city of $('wm-world').querySelectorAll('.wm-city')) {
       const index=+city.dataset.zone;city.hidden=!visited(+city.dataset.parent)&&!visited(index);

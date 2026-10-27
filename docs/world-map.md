@@ -21,8 +21,11 @@ are traced along its painted borders in a 2048×1041 coordinate frame; they are
 not generated Voronoi cells. Labels sit in their matching terrain. City buttons
 outline the existing painted star city and giant tree rather than covering them
 with thumbnails. Entrance buttons remain independently accessible. Exploration
-fog clips to those same province polygons. Detailed zone maps still render the
-real terrain, actors, quests, services and routes from `world/map.txt`.
+fog is masked to the painted island shoreline, including land between provinces.
+The ocean, compass and map grid stay visible. Unknown regions have no visible
+labels; discovered regions show their names. Explored ground clears through the
+province polygons with soft edges. Detailed zone maps still render the real
+terrain, actors, quests, services and routes from `world/map.txt`.
 
 The overview redraws only when the background loads or exploration changes. It
 keeps the supplied landscape proportions and fits the entire atlas inside its
@@ -163,3 +166,72 @@ online at shutdown. Client and server were installed together.
 
 The source commit contains the implementation; the later documentation-only
 receipt commit records the deployment without changing runtime assets.
+
+Beta 1.29.2 replaces flat pale province fills with one continuous, cached
+grey-blue cloud bank. Warped noise at several scales gives the clouds shaded
+billows and wisps. The overview starts fully covered and subtracts only explored
+terrain, using the existing per-zone exploration masks; the clearing combines a
+soft outer edge with the original clear core. This closes gaps outside province
+outlines without leaving fog over already explored ground. Once all overview
+regions are fully charted, the original artwork is shown across the whole map.
+
+Focused private browser validation checked 14,707 samples outside province
+outlines with no uncovered gaps, shaded cloud variation, clear explored ground,
+disabled unknown zones, desktop and landscape phone screenshots, full discovery
+restoring the original artwork and absence of browser errors. Reproduction and
+pre-change source are in `test-results/worldmap-fog-1.29.2/`. This is a client-only
+change and needs no server restart.
+
+
+Beta 1.29.3 narrows the continuous clouds to a separate island silhouette and
+hides unknown region labels and subtitles. `islandMask` in `client/worldmap.js`
+traces the actual shoreline in the artwork's 1758×895 frame, independently of
+the inset gameplay provinces; the cloud texture receives it once using
+`destination-in`. Province geometry alone left exposed strips of coastal land.
+The opaque interior covers those strips and province gaps, while the exterior
+retains the original ocean, compass and coordinate grid. Known names reappear
+through the existing discovery refresh. This supersedes the full-artwork
+coverage described for Beta 1.29.2 above.
+
+The focused private check passed ocean/margin pixel equality, five coastal
+probes beyond the province boundaries, all 22 unknown regions clouded, 43
+province seams covered, no visible unknown labels, clear explored ground,
+unknown-zone access restrictions, all 23 names reappearing after discovery,
+full discovery restoring the original artwork, and no browser errors. Desktop
+and landscape-phone previews and the reproduction script are preserved under
+`test-results/worldmap-fog-1.29.3/`.
+
+
+Beta 1.29.4 feathers the coastline mask with a 12-pixel blur at the cached
+cloud texture's half-atlas resolution. Only the mask alpha is softened, so
+cloud details stay sharp while the shoreline blends into the nearby ocean.
+The private browser check confirmed a partially transparent coastal transition,
+clear open ocean and compass pixels, and no browser errors. Desktop and
+landscape-phone previews and reproduction are preserved in
+`test-results/worldmap-fog-1.29.4/`.
+
+
+Beta 1.29.5 expands the shoreline mask 72 artwork pixels into the water
+(144-pixel round stroke) before the existing blur. A 48-texture-pixel padding
+keeps the blur from exposing land where the island meets the image boundary.
+The fade now lies offshore and unexplored coastal land remains opaque.
+The focused private browser check compared eight coast/boundary probes with
+the unmasked cloud texture: all matched exactly, showing no background land
+leakage. Offshore fog, clear outer-ocean and compass pixels, desktop/landscape
+phone previews and no browser errors were also verified. Reproduction and
+previews: `test-results/worldmap-fog-1.29.5/`.
+
+
+Beta 1.29.6 extends exploration clearing to the offshore cloud apron. A cached
+half-atlas-resolution nearest-land lookup assigns pixels outside the province
+polygons to an opaque interior source pixel. Multi-source flood fill builds
+this lookup once; each discovery redraw copies the nearest source's explored
+alpha into the offshore clearing mask. Province interiors remain independent,
+so the change does not uncover neighbouring unexplored terrain. The resulting
+clearing retains the existing soft edge. No exploration data or saves change.
+
+The focused private browser check explored Veyrroot's eastern middle cell
+through a normal private debug teleport. Three offshore probes and the coastal
+probe changed from clouded to exact original-art pixels; a separate unknown
+coast stayed covered. Desktop/landscape-phone previews and no browser errors
+were checked. Reproduction: `test-results/worldmap-fog-1.29.6/`.

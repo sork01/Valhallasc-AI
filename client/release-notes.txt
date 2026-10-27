@@ -1,5 +1,52 @@
 [
   {
+    "version": "Beta 1.29.6",
+    "date": "2026-10-27",
+    "new": [],
+    "changed": [
+      "Exploring the coastline also clears the nearby fog over the water."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.29.5",
+    "date": "2026-10-27",
+    "new": [],
+    "changed": [
+      "World map fog extends farther out over the water, keeping unexplored coastal land fully hidden beneath the clouds."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.29.4",
+    "date": "2026-10-27",
+    "new": [],
+    "changed": [
+      "World map fog fades softly along the coastline into the ocean."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.29.3",
+    "date": "2026-10-27",
+    "new": [],
+    "changed": [
+      "World map fog follows the island shoreline, leaving the ocean, compass and map grid visible."
+    ],
+    "removed": [
+      "Repeated Unexplored labels are removed so undiscovered land shows only clouds. Region names appear when discovered."
+    ]
+  },
+  {
+    "version": "Beta 1.29.2",
+    "date": "2026-10-27",
+    "new": [],
+    "changed": [
+      "Unexplored areas of the world map are covered by shaded clouds with soft edges. Fog now covers the whole map, including gaps between regions."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.29.1",
     "date": "2026-10-27",
     "new": [],
