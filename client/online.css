@@ -596,7 +596,7 @@
 .wm-world { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, #2f7f93, #1b536b 62%, #0f3048); }
 .wm-connection-key { display: block; }
 .wm-body[data-view="world"] { overflow: auto; }
-.wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: max(100%, calc(1200px / var(--window-k, .8))); height: auto; aspect-ratio: 2048 / 1041; }
+.wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 2048 / 1041; }
 .wm-atlas, .wm-sea { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .wm-sea[hidden] { display: none; }
 .wm-island[data-fog="full"] { fill: #7f9a82; }

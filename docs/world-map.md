@@ -25,7 +25,11 @@ fog clips to those same province polygons. Detailed zone maps still render the
 real terrain, actors, quests, services and routes from `world/map.txt`.
 
 The overview redraws only when the background loads or exploration changes. It
-keeps the supplied landscape proportions and scrolls on smaller windows.
+keeps the supplied landscape proportions and fits the entire atlas inside its
+window each time it opens (Beta 1.29.1). Scrolling over the overview zooms around
+the pointer, from the fitted view up to four times that size. The fitted view
+adapts to window resizing; zoomed views can be panned with the scrollbars or
+touch scrolling. Detail maps retain their normal scrolling.
 
 ## Sources and regeneration
 
@@ -87,7 +91,7 @@ Opening a map never travels or unlocks a door. The server still checks minimum
 level, completed admission quests, party size, raid muster and private copies.
 All six keyed entrances, dungeon entrance coordinates, returns and cleared
 exits remain unchanged. Keyboard Enter activates city/entrance buttons; Escape
-returns to the atlas and preserves its scroll position.
+returns to the atlas and preserves its zoom and scroll position.
 
 ## Focused validation
 

@@ -441,7 +441,31 @@
     }
     cv.hidden=false;
   }
-  let worldScroll=[0,0];
+  let worldScroll=[0,0], worldZoom=1;
+  function sizeWorld() {
+    const body=$('wm-body'),stage=$('wm-world');
+    if (!open() || view !== 'world') return;
+    // Use the full inner box so scrollbars appearing during zoom do not change the fit scale.
+    const width=body.offsetWidth-2*body.clientLeft,height=body.offsetHeight-2*body.clientTop;
+    const w=Math.floor(Math.min(width,height*STAGE.w/STAGE.h))*worldZoom,h=w*STAGE.h/STAGE.w;
+    Object.assign(stage.style,{width:`${w}px`,height:`${h}px`,marginLeft:`${Math.max(0,(width-w)/2)}px`,marginTop:`${Math.max(0,(height-h)/2)}px`});
+    layoutEntrances(stage);
+  }
+  $('wm-body').addEventListener('wheel',event=>{
+    if (!open() || view !== 'world' || !event.deltaY) return;
+    event.preventDefault();
+    const body=$('wm-body'),stage=$('wm-world'),frame=body.getBoundingClientRect();
+    // Window resizing uses CSS scale; wheel coordinates arrive in screen pixels.
+    const k=frame.width/body.offsetWidth,x=(event.clientX-frame.left)/k-body.clientLeft,y=(event.clientY-frame.top)/k-body.clientTop;
+    const px=(body.scrollLeft+x-stage.offsetLeft)/stage.offsetWidth,py=(body.scrollTop+y-stage.offsetTop)/stage.offsetHeight;
+    const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?body.clientHeight:1);
+    worldZoom=Math.max(1,Math.min(4,worldZoom*Math.exp(-delta*.002)));
+    sizeWorld();
+    body.scrollLeft=stage.offsetLeft+px*stage.offsetWidth-x;
+    body.scrollTop=stage.offsetTop+py*stage.offsetHeight-y;
+    worldScroll=[body.scrollLeft,body.scrollTop];
+  },{passive:false});
+  new ResizeObserver(()=>sizeWorld()).observe($('wm-body'),{box:'border-box'});
   function buildWorld() {
     const stage=$('wm-world');stage.replaceChildren();tiles=Array(zones.length).fill(null);nameNodes=Array(zones.length).fill(null);roadRefs=[];tileY=1;
     const sea=el('canvas','','wm-sea');sea.width=STAGE.w;sea.height=STAGE.h;sea.setAttribute('aria-hidden','true');stage.append(sea);
@@ -757,6 +781,7 @@
     $('wm-back').hidden = next === 'world';
     $('wm-title-zone').textContent = next === 'zone' ? ` › ${zones[current].name}` : '';
     if (next === 'zone') { const zv = $('wm-zone'); zv.classList.remove('wm-fade'); void zv.offsetWidth; zv.classList.add('wm-fade'); }
+    if (next === 'world') sizeWorld();
     [body.scrollLeft, body.scrollTop] = next === 'world' ? worldScroll : [0, 0];
     tick();
   }
@@ -778,12 +803,9 @@
     load(); previousFocus = document.activeElement;
     window.Field.setPaused(true); $('worldmap').hidden = false;
     if (!tiles.length) buildWorld(); else if (JSON.stringify(window.Field.explored) !== fogSignature) refreshFog();
-    setView('world');
-    const here = window.Field.zone || 0, tile = tiles[parentOf(here)] || tiles[0], body = $('wm-body');
+    worldZoom=1; worldScroll=[0,0]; setView('world');
+    const here = window.Field.zone || 0, tile = tiles[parentOf(here)] || tiles[0];
     tile.focus({ preventScroll: true });
-    body.scrollLeft = Math.max(0, tile.offsetLeft + tile.offsetWidth / 2 - body.clientWidth / 2);
-    body.scrollTop = Math.max(0, tile.offsetTop + tile.offsetHeight / 2 - body.clientHeight / 2);
-    worldScroll = [body.scrollLeft, body.scrollTop];
     clearInterval(tickTimer); tickTimer = setInterval(tick, 250);
     return true;
   }

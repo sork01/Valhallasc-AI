@@ -121,7 +121,7 @@ html, body { overscroll-behavior: none; }
   .equipment-workspace .equipped-slot select { top: 0; right: 0; bottom: auto; width: var(--touch-target); height: var(--touch-target); }
   .equipment-workspace .equipped-slot .gear-label { font-size: 14px; margin: 0; position: absolute; bottom: 0; width: 100%; }
   .wm-body[data-view="world"] { overflow: auto; }
-  .wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: calc(1200px / var(--window-k, .8)); height: auto; aspect-ratio: 2048 / 1041; }
+  .wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 2048 / 1041; }
 
   .inspect-doll { height: calc((var(--touch-target) + 12px) * 5 + 16px); }
   .inspect-slots { grid-template-columns: var(--touch-target) minmax(0, 1fr) var(--touch-target); grid-template-rows: repeat(5, calc(var(--touch-target) + 12px)); }
