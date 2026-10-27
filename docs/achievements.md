@@ -221,3 +221,10 @@ maximum and Swedish rewards. Clippy, formatting, syntax, Swedish generation
 and release-note checks pass.
 The incorrect-maximum mutation fails at the intended 2,200-point total assertion
 (553 MiB peak).
+
+Beta 1.30.1 is deployed from source `7d1bb73`. Public/bridge health, the exact
+running release binary, all three changed public client files, SQLite
+`quick_check`, unchanged 31 characters / 18 existing guests, absence of test
+flags and a clean warning/error journal were verified. Nobody was online during
+installation; no zone migration, character backfill or public test guest.
+Rollback and verification artifacts: `deploy/backups/achievement-expansion-1.30.1-20261027T175310Z/`.
