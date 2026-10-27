@@ -110,9 +110,10 @@ returns to the atlas and preserves its scroll position.
   Held mouse and horse gait checks remain separate in the travel-fixes suite.
 
 No file zones or copy IDs are added or reordered, and saved positions remain
-valid. The candidate lives on `feat/compact-worldmap` at
-`/media/raid/valhallasc-data/compact-worldmap-review`. Deploy the rebuilt server and synchronized client together;
-the owner authorized merge and deployment on 2026-10-27. Client files in the
+valid. The release was prepared on `feat/compact-worldmap` at
+`/media/raid/valhallasc-data/compact-worldmap-review` and merged to main.
+The owner authorized merge and deployment on 2026-10-27. Deploy future embedded
+server and synchronized client changes together. Client files in the
 main checkout are served immediately, so prepare and validate in isolation.
 
 
@@ -133,5 +134,28 @@ The full-map screenshot is uploaded to FileDrop as
 `valhallasc-painted-worldmap.png` (SHA-256 `26efdc7d98ffb8b5891e2dfe08c1c5b00386dcc748ca92a6ec112dfb53214af7`). The original owner upload remains untouched.
 The owner authorized merge and deployment on 2026-10-27. Release preparation
 backs up the running binary, client files and a consistent SQLite copy. All 47
-file-zone IDs are unchanged; saved characters need no migration. The deployment
-receipt is recorded after public verification.
+file-zone IDs are unchanged; saved characters need no migration. Public verification passed; the deployment receipt follows.
+
+
+## Deployment receipt — 2026-10-27
+
+Beta 1.29.0 is merged and live at https://gunning.se/Valhallasc/.
+Runtime source: `04d47531f5e0fb1bdaa8e70dd0a506622d0ad049`. The optimized
+release was built in the isolated RAID checkout with one CPU and a 3-GiB cap;
+its private startup check passed before the public switch. No players were
+online at shutdown. Client and server were installed together.
+
+* Running executable matches both the installed and isolated build binaries:
+  SHA-256 `5c90957619a5ec6d8ebe6384343c7f5dabde34e3a72dd5de6e11ad3a0e66d9fb`.
+* Public and bridge health both returned `ok`.
+* All nine changed public client files match the checkout byte for byte,
+  including the new atlas PNG, world data, renderer, styles and version label.
+* SQLite `quick_check` returned `ok`; all 31 saved characters remain. All 47 file
+  zones retain their IDs, so no saved-zone migration was required.
+* No test flags, journal errors or public test guests were introduced.
+* Rollback backup: `deploy/backups/painted-atlas-1.29.0-20261027T142200Z/` — previous running
+  executable, client ZIP, consistent pre-build database, stopped DB/WAL/shm
+  copies where present, and complete before/after receipts with file hashes.
+
+The source commit contains the implementation; the later documentation-only
+receipt commit records the deployment without changing runtime assets.
