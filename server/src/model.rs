@@ -360,6 +360,9 @@ pub struct Character {
     /// character has stood in, bit `row * FOG_GRID + column`. The maps show only these cells.
     #[serde(default)]
     pub explored: Vec<u16>,
+    /// Permanent achievement evidence, completions and selected title (docs/achievements.md).
+    #[serde(default)]
+    pub achievements: crate::achievements::Progress,
     /// The administrator character of a GM account (see `Account::is_gm`): may use the debug commands and wears the
     /// golden GM gear. Set only by the server when that character is created; a client's look can never carry it.
     #[serde(default)]
@@ -498,6 +501,7 @@ impl Character {
             potion_ready: 0,
             meal_ready: 0,
             explored: vec![],
+            achievements: Default::default(),
             gm: false,
             party_points: 0,
             travel_stops: vec![],
@@ -1213,6 +1217,11 @@ pub enum ClientMessage {
     /// Chooses the mount coat tint earned by a rebirth tier (2 to 5), or 0 for the plain coat.
     SelectMountTint {
         tier: u32,
+    },
+    /// Reads the authoritative achievement catalog and this character's progress.
+    Achievements,
+    SelectTitle {
+        achievement: String,
     },
     /// Asks whether a rebirth is possible now and what it would do; the answer carries the nonce `Rebirth` needs.
     RebirthPreview,

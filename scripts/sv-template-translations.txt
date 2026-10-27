@@ -439,5 +439,6 @@
   "Quest abandoned: {0}. You can restore it from your quest journal.": "Uppdrag övergivet: {0:t}. Du kan återställa det i din uppdragsdagbok.",
   "{0}. Open its map": "{0}. Öppna kartan",
   "You enter {0}.": "Du går in i {0:t}.",
-  "You enter {0}. Recommended levels {1}–{2}.": "Du går in i {0:t}. Rekommenderade nivåer {1}–{2}."
+  "You enter {0}. Recommended levels {1}–{2}.": "Du går in i {0:t}. Rekommenderade nivåer {1}–{2}.",
+  "Achievement earned: {0} (+{1} points).": "Prestation uppnådd: {0:t} (+{1} poäng)."
 }

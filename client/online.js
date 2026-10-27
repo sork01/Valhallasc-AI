@@ -105,6 +105,7 @@
         case 'shop': window.Shop?.onPacket(packet); break;
         case 'bank': window.Bank?.onPacket(packet); break;
         case 'sign': window.BossSign?.onPacket(packet); break;
+        case 'achievements': window.Achievements?.receive(packet); break;
         case 'rebirthPreview': window.Rebirth?.onPreview(packet); break;
         case 'pvp': window.Pvp?.onPacket(packet); break;
         case 'roll': window.Rolls?.onPacket(packet); break;
@@ -122,7 +123,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');
@@ -135,7 +136,7 @@
       $('chat').hidden = false; connect();
     },
     stop() {
-      window.DpsMeter?.reset();
+      window.DpsMeter?.reset(); window.Achievements?.reset();
       active = false; generation++; connected = false; id = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;

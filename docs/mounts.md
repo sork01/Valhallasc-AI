@@ -67,3 +67,10 @@ their existing playback. PixelFlow IDs, source artwork and atlas exports are
 preserved; do not also reverse the authoring source without removing this
 playback correction. `tests/travel-fixes-ui.cjs` checks every frame in all
 eight facings against the actual atlas and verifies the rider's matching bob.
+
+## Achievement route (Beta 1.30.0)
+
+Defeating all ten different Chained Forge bosses also awards the Gryphon directly,
+without an egg or hatching fee. This is the same mount and speed; the existing
+egg/hatching route remains available. It never adds a duplicate or replaces an
+existing mount selection. See [achievements.md](achievements.md).

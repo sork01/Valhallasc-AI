@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="touch.css">
 <link rel="stylesheet" href="dpsmeter.css">
 <link rel="stylesheet" href="activity.css">
+<link rel="stylesheet" href="achievements.css">
 <script src="compat.js"></script>
 </head>
 <body>
@@ -36,7 +37,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.29.6</p>
+    <p class="version">Beta 1.30.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -427,6 +428,7 @@
         <p class="world-menu-note">The world keeps running while this menu is open.</p>
         <button class="btn primary" id="p-resume" type="button" data-i18n="resume">Resume</button>
         <button class="btn ghost" id="p-equipment" type="button" hidden>Equipment &amp; Inventory (E)</button>
+        <button class="btn ghost" id="p-achievements" type="button">Achievements</button>
         <button class="btn ghost" id="p-settings" type="button">Settings</button>
         <button class="btn ghost" id="dps-toggle" type="button" aria-pressed="true">DPS meter</button>
         <button class="btn ghost" id="p-characters" type="button">Your Characters</button>
@@ -434,6 +436,17 @@
         <button class="btn ghost" id="p-new" type="button" data-i18n="newChar">New Character</button>
         <button class="btn ghost" id="p-title" type="button" data-i18n="toTitle">Back to Title</button>
       </div>
+    </div>
+    <div class="pause" id="achievements-panel" hidden>
+      <section class="panel rpg-window achievements-window" role="dialog" aria-modal="true" aria-labelledby="achievements-heading">
+        <header class="rpg-titlebar"><h3 id="achievements-heading">Achievements</h3><button id="achievements-close" class="window-close" type="button" aria-label="Close achievements">×</button></header>
+        <div class="achievement-summary">
+          <div><span>Achievement points</span> <b id="achievement-total" role="status">…</b></div>
+          <label for="achievement-title-select">Title <select id="achievement-title-select"><option value="">No title</option></select></label>
+          <label for="achievements-filter">Show <select id="achievements-filter"><option value="">All achievements</option><option value="complete">Completed</option><option value="incomplete">In progress</option></select></label>
+        </div>
+        <div id="achievement-list" tabindex="0"></div>
+      </section>
     </div>
     <div class="pause" id="activity-panel" hidden>
       <section class="panel rpg-window activity-window" role="dialog" aria-modal="true" aria-labelledby="activity-title">
@@ -528,6 +541,7 @@
           <p id="equipment-stats" class="character-stats"></p>
           <section id="character-attributes" class="character-attributes" aria-label="Train character stats"></section>
           <section id="character-sets" class="character-sets" aria-label="Dungeon set bonuses"></section>
+          <button id="character-achievements-open" class="btn ghost" type="button">Achievements</button>
           <section id="character-mounts" class="character-mounts" aria-label="Mounts"></section>
           <section id="character-rebirth" class="character-rebirth" aria-label="Rebirth"></section>
         </section>
@@ -683,6 +697,7 @@
 <script src="attributes.js"></script>
 <script src="mounts.js"></script>
 <script src="rebirth.js"></script>
+<script src="achievements.js"></script>
 <script src="syslog.js"></script>
 <script src="announce.js"></script>
 <script src="dpsmeter.js"></script>

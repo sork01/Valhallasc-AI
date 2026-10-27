@@ -114,6 +114,7 @@ impl Character {
         })?;
         next.rebirth_tiers[tier as usize - 1] =
             next.rebirth_tiers[tier as usize - 1].saturating_add(1);
+        next.sync_achievements();
         next.level = 1;
         next.xp = 0;
         next.attributes = Default::default();

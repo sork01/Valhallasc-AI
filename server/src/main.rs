@@ -1,4 +1,5 @@
 #![recursion_limit = "256"]
+mod achievements;
 mod auth;
 mod bank;
 mod bossmech;

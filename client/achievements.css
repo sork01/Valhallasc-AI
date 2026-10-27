@@ -1,0 +1,16 @@
+#achievements-panel { z-index: 50; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.achievements-window { position: static; width: min(880px, 90cqw); height: min(660px, 49cqw); box-sizing: border-box; padding: 18px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.achievements-window .rpg-titlebar { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.achievements-window h3, .achievements-window h4, .achievements-window p { margin: 0; }
+.achievement-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; flex-shrink: 0; }
+.achievement-summary label { display: flex; align-items: center; gap: 8px; }
+#achievement-total { color: #ffd878; font-size: 24px; }
+#achievement-list { flex: 1; align-content: start; grid-auto-rows: max-content; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; gap: 10px; padding: 2px 6px 8px 2px; }
+.achievement-card { border: 1px solid #7283a7; border-radius: 8px; padding: 12px; background: #142341; display: flex; flex-direction: column; gap: 6px; }
+.achievement-card[data-complete=true] { border-color: #cfb466; background: #263a3b; }
+.achievement-card header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.achievement-card h4 { color: #ffe6ab; font-size: 18px; }
+.achievement-card header b { white-space: nowrap; color: #ffdc7d; }
+.achievement-card progress { width: 100%; height: 12px; accent-color: #eac45d; }
+.achievements-window select { color: #fff2d1; background: #13213a; border: 1px solid #8b9ab9; padding: 5px; max-width: 100%; }
+@media (pointer: coarse) { #stage #achievements-panel > .achievements-window { height: min(900px, calc(var(--touch-stage-h, 94dvh) / var(--window-k, .6))); max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .6)); overflow: hidden; } .achievement-summary { gap: 5px 14px; } .achievement-summary label { font-size: 16px; } }

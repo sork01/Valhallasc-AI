@@ -8,7 +8,7 @@
     { id: 'raptor', name: 'Raptor', level: 75, route: 'Quest chain The Banyan Run, from Mara Vines in the Tanglecrown', cost: 'no gold fee' },
     { id: 'lizard', name: 'Lizard', level: 80, route: 'Buy from the Dune-wrangler in the Lapis Erg hub', cost: '160,000 gold' },
     { id: 'sabertooth', name: 'Sabertooth', level: 95, route: 'Rare drop: Sabertooth Whistle from the Rimesaber in the Yearwheel', cost: '4% per kill' },
-    { id: 'gryphon', name: 'Gryphon', level: 95, route: 'Dungeon reward: Gryphon Egg from the Thunderheart Gate\'s final boss, hatched by Oren Highwind in the Cairnspine', cost: '3% per kill and 250,000 gold to hatch' },
+    { id: 'gryphon', name: 'Gryphon', level: 95, route: 'Dungeon reward: Gryphon Egg from the Thunderheart Gate\'s final boss, hatched by Oren Highwind in the Cairnspine', cost: '3% per kill and 250,000 gold to hatch; also earned by defeating all ten Chained Forge bosses' },
   ];
   const byId = Object.fromEntries(MOUNTS.map(m => [m.id, m]));
   let hero = null, signature = '';

@@ -11,6 +11,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod achievements;
 mod activity;
 #[cfg(test)]
 mod activity_tests;
@@ -442,6 +443,8 @@ impl Player {
             "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["abandonedQuests"] = json!(c.abandoned_quests);
+        view["achievementTitle"] = json!(c.achievement_title());
+        view["achievementPoints"] = json!(c.achievement_points());
         view
     }
     fn is_hidden(&self) -> bool {
@@ -2074,6 +2077,7 @@ impl World {
         c.y = point.y;
         let id = c.id.clone();
         let name = c.look.name.clone();
+        c.sync_achievements();
         let place = self.zone_name(c.zone).to_owned();
         let notice =
             crate::notify::eligible(&c, self.test_commands, self.god_mode, self.start_level).then(
@@ -2190,6 +2194,8 @@ impl World {
                     | ClientMessage::Trade { .. }
                     | ClientMessage::Pvp { .. }
                     | ClientMessage::Inspect { .. }
+                    | ClientMessage::Achievements
+                    | ClientMessage::SelectTitle { .. }
                     | ClientMessage::Roll { .. }
                     | ClientMessage::Ping { .. }
             )
@@ -2289,6 +2295,12 @@ impl World {
             }
             ClientMessage::SignRead { sign } => {
                 self.sign_read(session, &sign);
+            }
+            ClientMessage::Achievements => {
+                self.achievements(session, None);
+            }
+            ClientMessage::SelectTitle { achievement } => {
+                self.achievements(session, Some(&achievement));
             }
             ClientMessage::RebirthPreview => {
                 self.rebirth_preview(session);
@@ -2904,6 +2916,9 @@ impl World {
         self.update_empty_seat();
         self.update_damage_meter();
         self.audit_progress();
+        if self.tick.is_multiple_of(20) {
+            self.update_achievements();
+        }
         self.update_drops();
         self.update_rolls();
         let stale: Vec<_> = self
@@ -4352,6 +4367,7 @@ impl World {
             if kind == "big" {
                 self.next_king_spawn = self.time + self.king_spawn_delay();
             }
+            self.achievement_boss_credit(credit, zone, &kind, &party);
             let p = self.players.get_mut(&credit).unwrap();
             p.character.kills += 1;
             quest_progress(&mut p.character, &kill_quests, "kill", &kind);
