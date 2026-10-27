@@ -35,7 +35,7 @@
   {
     "id": "kills_1",
     "name": "First Victory",
-    "description": "Defeat 1 monsters.",
+    "description": "Defeat 1 monster.",
     "category": "Combat",
     "metric": "kills",
     "target": 1,
@@ -68,7 +68,7 @@
   {
     "id": "quests_1",
     "name": "Helping Hand",
-    "description": "Complete 1 different quests.",
+    "description": "Complete 1 quest.",
     "category": "Quests",
     "metric": "quests",
     "target": 1,
@@ -410,7 +410,7 @@
   {
     "id": "rebirth_1",
     "name": "A New Beginning",
-    "description": "Be reborn 1 times.",
+    "description": "Be reborn once.",
     "category": "Adventure",
     "metric": "rebirth",
     "target": 1,
@@ -472,5 +472,893 @@
     "points": 20,
     "title": "",
     "mount": ""
+  },
+  {
+    "id": "level_5",
+    "name": "A Small Adventure",
+    "description": "Reach level 5.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 5,
+    "points": 5,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "level_20",
+    "name": "Ready for the Depths",
+    "description": "Reach level 20.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 20,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "level_30",
+    "name": "Under a Wider Sky",
+    "description": "Reach level 30.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 30,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "level_40",
+    "name": "Through Storm and Shadow",
+    "description": "Reach level 40.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 40,
+    "points": 15,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "level_60",
+    "name": "Among the Stars",
+    "description": "Reach level 60.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 60,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "level_70",
+    "name": "Sunlit Veteran",
+    "description": "Reach level 70.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 70,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "level_80",
+    "name": "Roots of Greatness",
+    "description": "Reach level 80.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 80,
+    "points": 25,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "level_90",
+    "name": "Winter Cannot Stop Me",
+    "description": "Reach level 90.",
+    "category": "Adventure",
+    "metric": "level",
+    "target": 90,
+    "points": 25,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "kills_10",
+    "name": "Ten Victories",
+    "description": "Defeat 10 monsters.",
+    "category": "Combat",
+    "metric": "kills",
+    "target": 10,
+    "points": 5,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "kills_25",
+    "name": "Making the Roads Safer",
+    "description": "Defeat 25 monsters.",
+    "category": "Combat",
+    "metric": "kills",
+    "target": 25,
+    "points": 5,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "kills_250",
+    "name": "A Formidable Foe",
+    "description": "Defeat 250 monsters.",
+    "category": "Combat",
+    "metric": "kills",
+    "target": 250,
+    "points": 15,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "kills_500",
+    "name": "Protector of the Roads",
+    "description": "Defeat 500 monsters.",
+    "category": "Combat",
+    "metric": "kills",
+    "target": 500,
+    "points": 15,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "quests_5",
+    "name": "A Familiar Face",
+    "description": "Complete 5 different quests.",
+    "category": "Quests",
+    "metric": "quests",
+    "target": 5,
+    "points": 5,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "quests_10",
+    "name": "Always Happy to Help",
+    "description": "Complete 10 different quests.",
+    "category": "Quests",
+    "metric": "quests",
+    "target": 10,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "quests_50",
+    "name": "A Friend in Every Town",
+    "description": "Complete 50 different quests.",
+    "category": "Quests",
+    "metric": "quests",
+    "target": 50,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "quests_150",
+    "name": "No Plea Unanswered",
+    "description": "Complete 150 different quests.",
+    "category": "Quests",
+    "metric": "quests",
+    "target": 150,
+    "points": 40,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "regions_10",
+    "name": "Far from Home",
+    "description": "Visit 10 atlas regions.",
+    "category": "Exploration",
+    "metric": "regions",
+    "target": 10,
+    "points": 15,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "regions_15",
+    "name": "Many Roads Travelled",
+    "description": "Visit 15 atlas regions.",
+    "category": "Exploration",
+    "metric": "regions",
+    "target": 15,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "regions_20",
+    "name": "Nearly Everywhere",
+    "description": "Visit 20 atlas regions.",
+    "category": "Exploration",
+    "metric": "regions",
+    "target": 20,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "rebirth_2",
+    "name": "Twice Renewed",
+    "description": "Be reborn 2 times.",
+    "category": "Adventure",
+    "metric": "rebirth",
+    "target": 2,
+    "points": 25,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "rebirth_3",
+    "name": "Another Dawn",
+    "description": "Be reborn 3 times.",
+    "category": "Adventure",
+    "metric": "rebirth",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "charted_52",
+    "name": "Filling the Blank Spaces",
+    "description": "Uncover 52 of the 207 atlas map cells.",
+    "category": "Exploration",
+    "metric": "exploration",
+    "target": 52,
+    "points": 10,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "charted_104",
+    "name": "Half a World of Memories",
+    "description": "Uncover 104 of the 207 atlas map cells.",
+    "category": "Exploration",
+    "metric": "exploration",
+    "target": 104,
+    "points": 20,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "charted_156",
+    "name": "The Last Few Blank Spaces",
+    "description": "Uncover 156 of the 207 atlas map cells.",
+    "category": "Exploration",
+    "metric": "exploration",
+    "target": 156,
+    "points": 30,
+    "title": "",
+    "mount": ""
+  },
+  {
+    "id": "mounts_5",
+    "name": "Master of the Stables",
+    "description": "Own all 5 different mounts.",
+    "category": "Adventure",
+    "metric": "mounts",
+    "target": 5,
+    "points": 50,
+    "title": "The Stablemaster",
+    "mount": ""
+  },
+  {
+    "id": "story_5",
+    "name": "The Story Takes Root",
+    "description": "Complete chapter 5 of The Empty Seat.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 1,
+    "points": 10,
+    "title": "",
+    "mount": "",
+    "members": [
+      "es_05"
+    ]
+  },
+  {
+    "id": "story_10",
+    "name": "Following the Empty Chair",
+    "description": "Complete chapter 10 of The Empty Seat.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 1,
+    "points": 15,
+    "title": "",
+    "mount": "",
+    "members": [
+      "es_10"
+    ]
+  },
+  {
+    "id": "story_15",
+    "name": "Remembering the Forgotten",
+    "description": "Complete chapter 15 of The Empty Seat.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 1,
+    "points": 20,
+    "title": "",
+    "mount": "",
+    "members": [
+      "es_15"
+    ]
+  },
+  {
+    "id": "story_20",
+    "name": "Witness to the Truth",
+    "description": "Complete chapter 20 of The Empty Seat.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 1,
+    "points": 25,
+    "title": "The Witness",
+    "mount": "",
+    "members": [
+      "es_20"
+    ]
+  },
+  {
+    "id": "story_25",
+    "name": "Before the Last Door",
+    "description": "Complete chapter 25 of The Empty Seat.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 1,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "es_25"
+    ]
+  },
+  {
+    "id": "boss_cf_kettil",
+    "name": "Break the Chain: Kettil Linkbearer",
+    "description": "Defeat Kettil Linkbearer in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_kettil"
+    ]
+  },
+  {
+    "id": "boss_cf_ysolt",
+    "name": "Break the Chain: Ysolt Bellowsmaid",
+    "description": "Defeat Ysolt Bellowsmaid in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_ysolt"
+    ]
+  },
+  {
+    "id": "boss_cf_hallgrim",
+    "name": "Break the Chain: Hallgrim Anvilhand",
+    "description": "Defeat Hallgrim Anvilhand in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_hallgrim"
+    ]
+  },
+  {
+    "id": "boss_cf_sigrun",
+    "name": "Break the Chain: Sigrun Slagmother",
+    "description": "Defeat Sigrun Slagmother in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_sigrun"
+    ]
+  },
+  {
+    "id": "boss_cf_dagfinn",
+    "name": "Break the Chain: Dagfinn Tongsbearer",
+    "description": "Defeat Dagfinn Tongsbearer in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_dagfinn"
+    ]
+  },
+  {
+    "id": "boss_cf_thorbjorg",
+    "name": "Break the Chain: Thorbjörg Quenchwife",
+    "description": "Defeat Thorbjörg Quenchwife in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_thorbjorg"
+    ]
+  },
+  {
+    "id": "boss_cf_ragnhild",
+    "name": "Break the Chain: Ragnhild Cinderfoot",
+    "description": "Defeat Ragnhild Cinderfoot in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_ragnhild"
+    ]
+  },
+  {
+    "id": "boss_cf_orm",
+    "name": "Break the Chain: Orm Ashwalker",
+    "description": "Defeat Orm Ashwalker in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_orm"
+    ]
+  },
+  {
+    "id": "boss_cf_hildr",
+    "name": "Break the Chain: Hildr Lastlink",
+    "description": "Defeat Hildr Lastlink in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_hildr"
+    ]
+  },
+  {
+    "id": "boss_cf_eldmarr",
+    "name": "Break the Chain: Eldmarr, the Ember-Lord",
+    "description": "Defeat Eldmarr, the Ember-Lord in The Chained Forge.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "members": [
+      "cf_eldmarr"
+    ]
+  },
+  {
+    "id": "dungeon_hollowking",
+    "name": "Conquer The Undervault",
+    "description": "Defeat every boss in The Undervault.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 4,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "choir",
+      "colossus",
+      "gatewarden",
+      "hollowking"
+    ]
+  },
+  {
+    "id": "dungeon_choirmother",
+    "name": "Conquer The Drowned Cathedral — Flooded Cloister",
+    "description": "Defeat every boss in The Drowned Cathedral — Flooded Cloister.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 4,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "bellkeeper",
+      "choirmother",
+      "mournsister",
+      "rootabbot"
+    ]
+  },
+  {
+    "id": "dungeon_coralregent",
+    "name": "Conquer The Drowned Cathedral — Coral Reliquary",
+    "description": "Defeat every boss in The Drowned Cathedral — Coral Reliquary.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 4,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "coralregent",
+      "glasscantor",
+      "pearlwidow",
+      "relicwarden"
+    ]
+  },
+  {
+    "id": "dungeon_hierophant",
+    "name": "Conquer The Drowned Cathedral — Grand Nave",
+    "description": "Defeat every boss in The Drowned Cathedral — Grand Nave.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 4,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "chainmarshal",
+      "hierophant",
+      "starseraph",
+      "tidejudicator"
+    ]
+  },
+  {
+    "id": "dungeon_moonwell_echo",
+    "name": "Conquer The Moonwell",
+    "description": "Defeat every boss in The Moonwell.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 4,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "hourpetal_stag",
+      "moonskein_weaver",
+      "moonwell_echo",
+      "tideglass_heron"
+    ]
+  },
+  {
+    "id": "dungeon_eye_unblinking",
+    "name": "Conquer The Eye Below",
+    "description": "Defeat every boss in The Eye Below.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "eye_lenswarden",
+      "eye_unblinking",
+      "eye_undertide"
+    ]
+  },
+  {
+    "id": "dungeon_elder_heart",
+    "name": "Conquer The Elder Hollow",
+    "description": "Defeat every boss in The Elder Hollow.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "elder_gatekeeper",
+      "elder_heart",
+      "elder_matron"
+    ]
+  },
+  {
+    "id": "dungeon_pavilion_sovereign",
+    "name": "Conquer The Thousandfold Pavilion",
+    "description": "Defeat every boss in The Thousandfold Pavilion.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "pavilion_mirror",
+      "pavilion_sovereign",
+      "pavilion_weaver"
+    ]
+  },
+  {
+    "id": "dungeon_rain_crown_sovereign",
+    "name": "Conquer Temple of the Rain Crown",
+    "description": "Defeat every boss in Temple of the Rain Crown.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "rain_crown_gatekeeper",
+      "rain_crown_sibyl",
+      "rain_crown_sovereign"
+    ]
+  },
+  {
+    "id": "dungeon_seed_worldseed",
+    "name": "Conquer The Seed Vault",
+    "description": "Defeat every boss in The Seed Vault.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "seed_germinator",
+      "seed_warden",
+      "seed_worldseed"
+    ]
+  },
+  {
+    "id": "dungeon_astro_axis",
+    "name": "Conquer The Sunken Astrolabe",
+    "description": "Defeat every boss in The Sunken Astrolabe.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "astro_axis",
+      "astro_navigator",
+      "astro_warden"
+    ]
+  },
+  {
+    "id": "dungeon_thunder_heart",
+    "name": "Conquer The Thunderheart Gate",
+    "description": "Defeat every boss in The Thunderheart Gate.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "thunder_bastion",
+      "thunder_conductor",
+      "thunder_heart"
+    ]
+  },
+  {
+    "id": "dungeon_bloom_heart",
+    "name": "Conquer The Blooming Labyrinth",
+    "description": "Defeat every boss in The Blooming Labyrinth.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "bloom_heart",
+      "bloom_mirror",
+      "bloom_thornkeeper"
+    ]
+  },
+  {
+    "id": "dungeon_solar_heart",
+    "name": "Conquer The Solar Crucible",
+    "description": "Defeat every boss in The Solar Crucible.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "solar_ashwarden",
+      "solar_heart",
+      "solar_heliomancer"
+    ]
+  },
+  {
+    "id": "dungeon_amber_memory",
+    "name": "Conquer The Amber Archive",
+    "description": "Defeat every boss in The Amber Archive.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "amber_chronicle",
+      "amber_curator",
+      "amber_memory"
+    ]
+  },
+  {
+    "id": "dungeon_solstice_heart",
+    "name": "Conquer The Silent Solstice",
+    "description": "Defeat every boss in The Silent Solstice.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "solstice_harbinger",
+      "solstice_heart",
+      "solstice_watcher"
+    ]
+  },
+  {
+    "id": "dungeon_barrow_fatebound",
+    "name": "Conquer Nornroot Barrow",
+    "description": "Defeat every boss in Nornroot Barrow.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "barrow_doorward",
+      "barrow_fatebound",
+      "barrow_threadkeeper"
+    ]
+  },
+  {
+    "id": "dungeon_span_archon",
+    "name": "Conquer The Shattered Span",
+    "description": "Defeat every boss in The Shattered Span.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "span_archon",
+      "span_warden",
+      "span_weaver"
+    ]
+  },
+  {
+    "id": "dungeon_keel_captain",
+    "name": "Conquer The Drowned Longship",
+    "description": "Defeat every boss in The Drowned Longship.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "keel_bosun",
+      "keel_captain",
+      "keel_cargomaw"
+    ]
+  },
+  {
+    "id": "dungeon_null_hour",
+    "name": "Conquer The Black Hour Foundry",
+    "description": "Defeat every boss in The Black Hour Foundry.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 3,
+    "points": 30,
+    "title": "",
+    "mount": "",
+    "members": [
+      "null_bell",
+      "null_conductor",
+      "null_hour"
+    ]
+  },
+  {
+    "id": "dungeon_master",
+    "name": "Master of the Depths",
+    "description": "Defeat every boss across all 20 non-raid dungeons.",
+    "category": "Combat",
+    "metric": "boss_set",
+    "target": 65,
+    "points": 100,
+    "title": "The Delver",
+    "mount": "",
+    "members": [
+      "amber_chronicle",
+      "amber_curator",
+      "amber_memory",
+      "astro_axis",
+      "astro_navigator",
+      "astro_warden",
+      "barrow_doorward",
+      "barrow_fatebound",
+      "barrow_threadkeeper",
+      "bellkeeper",
+      "bloom_heart",
+      "bloom_mirror",
+      "bloom_thornkeeper",
+      "chainmarshal",
+      "choir",
+      "choirmother",
+      "colossus",
+      "coralregent",
+      "elder_gatekeeper",
+      "elder_heart",
+      "elder_matron",
+      "eye_lenswarden",
+      "eye_unblinking",
+      "eye_undertide",
+      "gatewarden",
+      "glasscantor",
+      "hierophant",
+      "hollowking",
+      "hourpetal_stag",
+      "keel_bosun",
+      "keel_captain",
+      "keel_cargomaw",
+      "moonskein_weaver",
+      "moonwell_echo",
+      "mournsister",
+      "null_bell",
+      "null_conductor",
+      "null_hour",
+      "pavilion_mirror",
+      "pavilion_sovereign",
+      "pavilion_weaver",
+      "pearlwidow",
+      "rain_crown_gatekeeper",
+      "rain_crown_sibyl",
+      "rain_crown_sovereign",
+      "relicwarden",
+      "rootabbot",
+      "seed_germinator",
+      "seed_warden",
+      "seed_worldseed",
+      "solar_ashwarden",
+      "solar_heart",
+      "solar_heliomancer",
+      "solstice_harbinger",
+      "solstice_heart",
+      "solstice_watcher",
+      "span_archon",
+      "span_warden",
+      "span_weaver",
+      "starseraph",
+      "thunder_bastion",
+      "thunder_conductor",
+      "thunder_heart",
+      "tideglass_heron",
+      "tidejudicator"
+    ]
   }
 ]

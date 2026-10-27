@@ -717,5 +717,6 @@
   "Beta 1.29.6",
   "Nornroot",
   "Shattered Span",
-  "Beta 1.30.0"
+  "Beta 1.30.0",
+  "Beta 1.30.1"
 ]

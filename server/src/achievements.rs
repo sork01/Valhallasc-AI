@@ -26,6 +26,9 @@ pub struct Achievement {
     pub title: String,
     pub mount: String,
     pub zone: Option<usize>,
+    /// Exact distinct boss or quest IDs required by a catalog set.
+    #[serde(default)]
+    pub members: Vec<String>,
 }
 pub const FORGE_BOSSES: [&str; 10] = [
     "cf_kettil",
@@ -61,7 +64,19 @@ pub fn catalog() -> &'static [Achievement] {
                     | "bosses"
                     | "forge"
                     | "mounts"
+                    | "boss_set"
+                    | "quest_set"
             ));
+            if matches!(a.metric.as_str(), "boss_set" | "quest_set") {
+                assert_eq!(a.target as usize, a.members.len());
+                assert_eq!(
+                    a.members.iter().collect::<BTreeSet<_>>().len(),
+                    a.members.len()
+                );
+                if a.metric == "boss_set" {
+                    assert!(a.members.iter().all(|kind| crate::items::is_boss(kind)));
+                }
+            }
             assert!(a.mount.is_empty() || crate::model::mount_speed(&a.mount).is_some());
         }
         rows
@@ -97,6 +112,8 @@ impl Character {
             "rebirth" => self.rebirth_count(),
             "story" => u32::from(p.quests.contains("es_28")),
             "bosses" => p.bosses.len() as u32,
+            "boss_set" => a.members.iter().filter(|id| p.bosses.contains(*id)).count() as u32,
+            "quest_set" => a.members.iter().filter(|id| p.quests.contains(*id)).count() as u32,
             "forge" => FORGE_BOSSES
                 .iter()
                 .filter(|&&id| p.bosses.contains(id))
@@ -187,21 +204,21 @@ mod tests {
     }
     #[test]
     fn achievements_catalog_has_positive_points_and_correct_atlas_and_rewards() {
-        assert_eq!(catalog().len(), 41);
+        assert_eq!(catalog().len(), 102);
         assert_eq!(regions().len(), 23);
         assert_eq!(regions().iter().collect::<BTreeSet<_>>().len(), 23);
         let c = hero();
         let view = c.achievement_view();
-        assert_eq!(view["maximum"], 685);
+        assert_eq!(view["maximum"], 2200);
         for a in catalog() {
             if a.metric == "fog" {
                 assert!(regions().contains(&a.zone.unwrap()));
             }
-            if a.metric == "exploration" {
+            if a.id == "explorer" {
                 assert_eq!(a.target, (regions().len() * FOG_GRID * FOG_GRID) as u32);
             }
         }
-        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 3);
+        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 6);
         assert_eq!(catalog().iter().filter(|a| !a.mount.is_empty()).count(), 1);
     }
     #[test]
@@ -216,7 +233,7 @@ mod tests {
         assert!(earned.contains(&"quests_100".into()));
         assert_eq!(c.achievements.quests.len(), 100);
         let points = c.achievement_points();
-        assert_eq!(points, 145);
+        assert_eq!(points, 350);
         assert!(c.sync_achievements().is_empty());
         assert_eq!(c.achievement_points(), points);
         c.achievements.completed.insert("fake_achievement".into());
@@ -334,5 +351,94 @@ mod tests {
         c.achievements.title = "unknown".into();
         c.sync_achievements();
         assert!(c.achievements.title.is_empty());
+    }
+    #[test]
+    fn achievements_expansion_preserves_all_original_points_and_selected_rewards() {
+        let mut c = hero();
+        let original = [
+            "level_10",
+            "level_50",
+            "level_99",
+            "kills_1",
+            "kills_100",
+            "kills_1000",
+            "quests_1",
+            "quests_25",
+            "quests_100",
+            "regions_5",
+            "regions_23",
+            "explorer",
+            "rebirth_1",
+            "rebirth_5",
+            "empty_seat",
+            "first_boss",
+            "forge",
+            "mounts_3",
+        ];
+        c.achievements
+            .completed
+            .extend(original.iter().map(|s| (*s).to_owned()));
+        for zone in regions() {
+            c.achievements.completed.insert(format!("explore_{zone}"));
+        }
+        assert_eq!(c.achievements.completed.len(), 41);
+        c.grant_mount("gryphon");
+        c.select_achievement_title("explorer").unwrap();
+        assert_eq!(c.achievement_points(), 685);
+        assert!(c.sync_achievements().is_empty());
+        assert_eq!(c.achievement_points(), 685);
+        assert_eq!(c.achievement_view()["maximum"], 2200);
+        assert_eq!(c.achievement_title(), "The Explorer");
+        assert_eq!(c.mounts, ["gryphon"]);
+    }
+    #[test]
+    fn achievements_expansion_named_boss_sets_need_each_distinct_member() {
+        let mut c = hero();
+        c.achievements
+            .bosses
+            .extend(["gatewarden", "choir", "colossus", "cf_kettil"].map(str::to_owned));
+        c.sync_achievements();
+        assert!(c.achievements.completed.contains("boss_cf_kettil"));
+        assert!(!c.achievements.completed.contains("dungeon_hollowking"));
+        let before = c.achievement_points();
+        c.achievements.bosses.insert("gatewarden".into());
+        assert!(c.sync_achievements().is_empty());
+        assert_eq!(c.achievement_points(), before);
+        c.achievements.bosses.insert("hollowking".into());
+        c.sync_achievements();
+        assert!(c.achievements.completed.contains("dungeon_hollowking"));
+        assert!(!c.achievements.completed.contains("dungeon_master"));
+        let all = catalog().iter().find(|a| a.id == "dungeon_master").unwrap();
+        assert_eq!(all.members.len(), 65);
+        c.achievements.bosses.extend(all.members.iter().cloned());
+        c.sync_achievements();
+        c.select_achievement_title("dungeon_master").unwrap();
+        assert_eq!(c.achievement_title(), "The Delver");
+        assert_eq!(catalog().iter().filter(|a| a.id.starts_with("dungeon_") && c.achievements.completed.contains(&a.id)).count(),21);
+        let restored: Character =
+            serde_json::from_str(&serde_json::to_string(&c).unwrap()).unwrap();
+        assert_eq!(restored.achievement_title(), "The Delver");
+        assert_eq!(restored.achievement_points(), c.achievement_points());
+    }
+    #[test]
+    fn achievements_expansion_chapters_and_mount_collection_unlock_their_own_titles() {
+        let mut c = hero();
+        c.quests.push(quest("es_20"));
+        c.sync_achievements();
+        assert!(c.achievements.completed.contains("story_20"));
+        assert!(!c.achievements.completed.contains("story_15"));
+        assert!(!c.achievements.completed.contains("empty_seat"));
+        c.select_achievement_title("story_20").unwrap();
+        assert_eq!(c.achievement_title(), "The Witness");
+        for mount in ["horse", "raptor", "lizard", "sabertooth"] {
+            c.grant_mount(mount);
+        }
+        c.sync_achievements();
+        assert!(!c.achievements.completed.contains("mounts_5"));
+        c.grant_mount("gryphon");
+        c.sync_achievements();
+        c.select_achievement_title("mounts_5").unwrap();
+        assert_eq!(c.achievement_title(), "The Stablemaster");
+        assert_eq!(c.mount, "horse");
     }
 }

@@ -7,8 +7,12 @@ const suite = {
     await page.evaluate(() => { window.__nameplates = []; const fill = CanvasRenderingContext2D.prototype.fillText; CanvasRenderingContext2D.prototype.fillText = function(s,...args) { if (String(s).includes('Pathfinder')) window.__nameplates.push(String(s)); return fill.call(this,s,...args); }; });
     await page.keyboard.press('Escape'); await page.locator('#p-achievements').click();
     await page.waitForSelector('.achievement-card');
-    check(await page.locator('.achievement-card').count() === 41, 'all 41 achievements shown');
-    check(/\d+ \/ 685/.test(await page.locator('#achievement-total').textContent()), 'earned / maximum uses the full 685-point catalog');
+    check(await page.locator('.achievement-card').count() === 102, 'all 102 achievements shown');
+    check(await page.locator('[data-achievement^="dungeon_"]').count() === 21, 'all 20 dungeon goals and their overall achievement are shown');
+    for (const [id,title] of [['dungeon_master','The Delver'],['mounts_5','The Stablemaster'],['story_20','The Witness']]) {
+      check((await page.locator(`[data-achievement="${id}"]`).textContent()).includes(title), `${title} reward is visible before it is earned`);
+    }
+    check(/\d+ \/ 2200/.test(await page.locator('#achievement-total').textContent()), 'earned / maximum uses the full 2200-point catalog');
     check(await page.locator('#achievement-title-select option').count() === 1, 'no unearned titles selectable');
     await page.keyboard.press('e'); check(await page.locator('#equipment').isHidden(), 'game shortcuts do not open another window behind achievements');
     await page.locator('#achievements-close').focus(); await page.keyboard.press('Shift+Tab');
@@ -48,7 +52,7 @@ const suite = {
     await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.waitForFunction(() => Online.connected && Field.hero.achievementTitle === 'The Explorer');
     await page.keyboard.press('e'); await page.locator('#character-achievements-open').click();
-    await page.waitForFunction(() => document.querySelector('#achievement-total').textContent.includes('/ 685'));
+    await page.waitForFunction(() => document.querySelector('#achievement-total').textContent.includes('/ 2200'));
     check(await page.locator('#achievement-total').textContent() === total, 'points and title survive reconnect with no duplicate awards');
     check(await page.locator('#achievement-title-select').inputValue() === 'explorer', 'title selection persists');
     await page.locator('#achievement-title-select').selectOption(''); await page.waitForFunction(() => !Field.hero.achievementTitle);
@@ -57,9 +61,11 @@ const suite = {
     await page.evaluate(() => { const key='valhallasc.save.v1'; const s=JSON.parse(localStorage.getItem(key)); s.lang='sv'; localStorage.setItem(key,JSON.stringify(s)); });
     await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.waitForFunction(() => Online.connected && Field.hero.id); await page.keyboard.press('Escape'); await page.locator('#p-achievements').click();
+    await page.locator('#achievements-filter').selectOption('');
     await page.waitForSelector('[data-achievement="explorer"]');
     check(await page.locator('#achievements-heading').textContent() === 'Prestationer', 'Swedish panel heading');
     check(await page.locator('[data-achievement="explorer"] h4').textContent() === 'Utforskaren', 'Swedish catalog achievement');
+    check((await page.locator('[data-achievement="story_20"]').textContent()).includes('Vittnet') && (await page.locator('[data-achievement="mounts_5"]').textContent()).includes('Stallmästaren') && (await page.locator('[data-achievement="dungeon_master"]').textContent()).includes('Djupvandraren'), 'all three added title rewards have Swedish text');
     check(await page.locator('#achievement-title-select option[value="explorer"]').textContent() === 'Utforskaren', 'Swedish title selector');
     await page.locator('#achievement-title-select').selectOption('explorer');
     await page.waitForFunction(() => document.getElementById('hud-name').textContent === 'Pathfinder Utforskaren');
