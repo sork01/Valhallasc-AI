@@ -127,3 +127,16 @@ Swedish coverage and release-note validation pass. Screenshots are in the privat
 worktree under `test-results/touch/achievements-{844x390,1024x768}.png`.
 The incorrect-maximum browser mutation fails at the intended total-points
 assertion (562 MiB peak). No encounter timing or balance suites were run.
+
+## Deployment
+
+Beta 1.30.0 is live from source `0e5083b` (2026-10-27). The release was built
+in the isolated RAID checkout, privately checked and installed with nobody online.
+Both bridge/public health, all nine changed public client hashes, the exact
+running binary, SQLite `quick_check`, unchanged 31 characters / 18 existing guests,
+absence of test flags and a clean warning/error journal were verified. No zone
+IDs changed or character backfill was needed; no public test guests were created.
+
+Rollback and proof: `deploy/backups/achievements-1.30.0-20261027T173235Z/`, including the previous
+running binary, consistent live/stopped database snapshots, `verified.txt`,
+focused check logs and phone/tablet screenshots under `verification/`.
