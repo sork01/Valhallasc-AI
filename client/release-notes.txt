@@ -1,5 +1,21 @@
 [
   {
+    "version": "Beta 1.29.0",
+    "date": "2026-10-27",
+    "new": [
+      "Outdoor neighbours are connected by walking paths. Hold a direction to keep moving into the next region."
+    ],
+    "changed": [
+      "The world atlas uses the illustrated world map with readable region names, correct level ranges, and interactive cities and entrances.",
+      "Asterion is marked inside Stormglass and the Canopy inside Veyrroot. Skaldholm and Nacrehold keep their own regions.",
+      "Dungeon and interior entrance markers open their maps directly, including before your first visit."
+    ],
+    "removed": [
+      "Outdoor glowing gates are replaced by paths and roadside waymarks so travel feels like walking between neighbouring regions.",
+      "Dungeon interiors no longer occupy separate regions on the world overview, so they do not imply outdoor neighbours."
+    ]
+  },
+  {
     "version": "Beta 1.28.0",
     "date": "2026-10-27",
     "new": [],

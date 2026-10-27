@@ -1,3 +1,6 @@
+if (process.env.CHECK_ONLY === 'atlas') {
+  require('./organic-atlas-ui.cjs');
+} else {
 // Focused checks for held mouse travel, forward horse playback and portal-aligned geography.
 // Run with scripts/test-touch-bounded.sh. MUTATE=mouse|horse|atlas must fail the corresponding assertion.
 const assert = require('node:assert/strict');
@@ -27,7 +30,7 @@ const root = path.resolve(__dirname, '..');
       let source = fs.readFileSync(path.join(root, 'client', file), 'utf8');
       if (process.env.MUTATE === 'mouse') source = source.replace('[pointer.x, pointer.y] = pointerWorld(pointer);', '/* stale world destination */');
       if (process.env.MUTATE === 'horse') source = source.replace("if (id === 'horse' && clip === 'run') i = (C.n - i) % C.n;", '/* backwards hooves */');
-      if (process.env.MUTATE === 'atlas') source = source.replace(/const LAYOUT = .*?;/, line => line + ' LAYOUT[1].y = LAYOUT[0].y + 10;');
+      if (process.env.MUTATE === 'atlas') source = source.replace('  const GROUND =', '  LAYOUT[1].y = LAYOUT[0].y + 10;\n  const GROUND =');
       await page.route(`**/${file}`, r => r.fulfill({ contentType: 'text/javascript', body: source }));
     }
     await page.goto(world.url);
@@ -116,69 +119,7 @@ const root = path.resolve(__dirname, '..');
       check(gait.bob.every(Boolean), 'The rider follows the same remapped saddle frame');
       fs.writeFileSync(path.join(world.runDir, 'horse-forward-cycle.png'), Buffer.from(gait.sheet.split(',')[1], 'base64'));
     }
-    if (!process.env.CHECK_ONLY || process.env.CHECK_ONLY === 'atlas') {
-      await debug({ op: 'explore_all' });
-      await page.waitForFunction(() => Field.explored?.[28] === 511);
-      await page.evaluate(() => { document.activeElement?.blur?.(); WorldMap.show(); });
-      const atlas = await page.evaluate(() => {
-        const zones = Field._debug.zones, layout = WorldMap._layout;
-        const shown = zones.map((z, i) => ({ z, i })).filter(({z}) => !z.sealedTemplate && z.theme !== 'arena');
-        const errors = [], pairs = new Set();
-        const side = (z, p) => { const dx = p.x-z.size/2, dy = p.y-z.size/2; return Math.abs(dx)>=Math.abs(dy) ? [Math.sign(dx),0] : [0,Math.sign(dy)]; };
-        const center = i => { const p=layout[i]; return [p.x+p.s/2,p.y+p.s/2]; };
-        for (const { z, i } of shown) {
-          if (!layout[i] || layout[i].x < 0 || layout[i].y < 0 || layout[i].x+layout[i].s > 160 || layout[i].y+layout[i].s > 99) errors.push(`bounds ${i}`);
-          for (const p of z.portals) {
-            if (p.to===i || !shown.some(n=>n.i===p.to)) continue;
-            const pair=[i,p.to].sort((a,b)=>a-b).join('-'); pairs.add(pair);
-            const other=zones[p.to], back=other.portals.filter(q=>q.to===i).sort((a,b)=>Math.hypot(a.x-p.tx,a.y-p.ty)-Math.hypot(b.x-p.tx,b.y-p.ty))[0];
-            if (!back) { errors.push(`return ${pair}`); continue; }
-            const road=document.querySelector(`[data-road="${pair}"]`);
-            if (!road) { errors.push(`road ${pair}`); continue; }
-            const land=document.querySelector(`[data-link="${pair}"]`);
-            if ((road.dataset.kind==='path')!==!!land) errors.push(`land ${pair}`);
-            if (road.dataset.kind==='path') {
-              const a=center(i),b=center(p.to),delta=[b[0]-a[0],b[1]-a[1]],out=side(z,p),incoming=side(other,back);
-              if (delta[0]*out[0]+delta[1]*out[1] <= 0 || delta[0]*incoming[0]+delta[1]*incoming[1] >= 0) errors.push(`direction ${i}->${p.to}`);
-            }
-            // Roads terminate at the actual gate's side of each tile, including the return entrance nearest the arrival.
-            if (i<p.to) {
-              const nums=road.querySelector('.wm-road').getAttribute('d').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/g).map(Number);
-              const a=center(i), b=center(p.to);
-              if ((nums[0]-a[0])*side(z,p)[0]+(nums[1]-a[1])*side(z,p)[1] <= 0 || (nums.at(-2)-b[0])*side(other,back)[0]+(nums.at(-1)-b[1])*side(other,back)[1] <= 0) errors.push(`endpoint ${pair}`);
-            }
-          }
-        }
-        for (const a of shown) for (const b of shown) if(a.i<b.i) {
-          const ac=center(a.i),bc=center(b.i);
-          if(Math.hypot(ac[0]-bc[0],ac[1]-bc[1]) < (layout[a.i].s+layout[b.i].s)/2) errors.push(`overlap ${a.i},${b.i}`);
-        }
-        const graph=WorldMap._graph, seen=new Set([0]),queue=[0];
-        for(const i of queue) for(const e of graph[i]) if(!seen.has(e.to)) {seen.add(e.to);queue.push(e.to);}
-        const body=document.querySelector('#wm-body'),tile=document.querySelector(`.wm-tile[data-zone="${Field.zone}"]`);
-        const br=body.getBoundingClientRect(),tr=tile.getBoundingClientRect();
-        return { errors, roads:document.querySelectorAll('[data-road]').length, pairs:pairs.size, reachable:shown.every(n=>seen.has(n.i)), centered:tr.left>=br.left&&tr.right<=br.right&&tr.top>=br.top&&tr.bottom<=br.bottom };
-      });
-      check(atlas.errors.length === 0, `Atlas geography matches every authoritative portal: ${atlas.errors.join('; ')}`);
-      check(atlas.roads === atlas.pairs && atlas.reachable, 'Every open zone is connected by exactly the real links; internal raid lifts are omitted');
-      check(atlas.centered, 'The scrollable atlas opens centered on the current zone');
-      await page.locator('.wm-tile[data-zone="4"]').click();
-      check(await page.evaluate(() => WorldMap.view === 'zone' && document.querySelector('#wm-body').scrollTop === 0), 'Opening a zone resets the atlas scroll');
-      await page.locator('#wm-back').click();
-      check(await page.evaluate(() => WorldMap.view === 'world' && document.querySelector('#wm-body').scrollTop > 0), 'Returning restores the atlas scroll');
-      await page.locator('#wm-body').screenshot({ path:path.join(world.runDir,'geographic-atlas.png'), timeout:30000 });
-      await page.locator('#wm-close').click();
-      // Real gate travel in both directions: north/south, east/west and a causeway whose return faces south.
-      for (const [from, to] of [[0,1],[1,0],[4,6],[6,4],[16,17],[17,16]]) {
-        const p=await page.evaluate(([from,to])=>Field._debug.zones[from].portals.find(p=>p.to===to),[from,to]);
-        const size=await page.evaluate(from=>Field._debug.zones[from].size,from);
-        const dx=size/2-p.x,dy=size/2-p.y,n=Math.hypot(dx,dy);
-        await stand(from,p.x+dx/n*5,p.y+dy/n*5);
-        await page.evaluate(p=>Online.send({type:'move',x:p.x,y:p.y}),p);
-        await page.waitForFunction(to=>Field.zone===to,to,{timeout:15000});
-        check(await page.evaluate(p=>Math.hypot(Field.hero.x-p.tx,Field.hero.y-p.ty)<3,p),`Actual gate ${from}->${to} reaches its documented arrival`);
-      }
-    }
+    // Organic atlas coverage lives in organic-atlas-ui.cjs.
     await browser.close(); browser = null;
     if (!process.env.CHECK_ONLY || process.env.CHECK_ONLY === 'touch') {
       for (const [width, height] of [[844,390],[1024,768]]) {
@@ -213,3 +154,5 @@ const root = path.resolve(__dirname, '..');
     console.log(`travel-fixes-ui: ${checks} focused checks passed; artifacts: ${world.runDir}`);
   } finally { await browser?.close(); await world.stop(); }
 })().catch(e=>{console.error(e);process.exitCode=1;});
+
+}

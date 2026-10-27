@@ -596,7 +596,7 @@
 .wm-world { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, #2f7f93, #1b536b 62%, #0f3048); }
 .wm-connection-key { display: block; }
 .wm-body[data-view="world"] { overflow: auto; }
-.wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: max(100%, calc(2200px / var(--window-k, .8))); height: auto; aspect-ratio: 160 / 99; }
+.wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: max(100%, calc(1200px / var(--window-k, .8))); height: auto; aspect-ratio: 2048 / 1041; }
 .wm-atlas, .wm-sea { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .wm-sea[hidden] { display: none; }
 .wm-island[data-fog="full"] { fill: #7f9a82; }
@@ -1047,3 +1047,31 @@
 .bank-copy[data-rarity="hierloom"] > span { color: #ffd24a; }
 
 .quest-reward-icon[data-rarity="hierloom"] { border-color: #ffd24a; }
+
+/* Separate buttons avoid nested controls and keep interior maps out of atlas geography. */
+.wm-entrance { position: absolute; z-index: 4; transform: translate(-50%, -50%); width: calc(32px / var(--window-k, .8)); height: calc(32px / var(--window-k, .8)); padding: 0; border: 2px solid #c99df4; border-radius: 50%; background: #271b39; color: #f3dbff; font-size: calc(17px / var(--window-k, .8)); line-height: 1; box-shadow: 0 1px 4px #0009; cursor: pointer; }
+.wm-entrance[hidden] { display: none; }
+.wm-entrance:hover, .wm-entrance:focus-visible { outline: 3px solid #ffe099; background: #50365f; }
+.wm-entrance[data-here="true"] { border-color: #ffe27a; box-shadow: 0 0 10px #ffe27a; }
+
+.wm-name { border: 0; background: transparent; cursor: pointer; pointer-events: auto; }
+.wm-name:focus-visible { outline: 2px solid #ffe099; border-radius: 4px; }
+
+.wm-name { transform: translate(-50%, -50%); justify-content: center; }
+.wm-name b { font-size: max(1.04cqw, calc(12px / var(--window-k, .8))); }
+.wm-name small { font-size: max(.7cqw, calc(10px / var(--window-k, .8))); }
+
+/* Organic world overview: one coast, full irregular provinces and cities within them. */
+.wm-tile { aspect-ratio:auto; }
+.wm-tile:hover,.wm-tile:focus-visible { transform:none; }
+.wm-tile[data-here="true"]::after { display:none; }
+.wm-name { z-index:6; }
+.wm-name b { font-size:max(1.1cqw,calc(13px / var(--window-k,.8))); }
+.wm-city { position:absolute;z-index:5;transform:translate(-50%,-50%);width:calc(52px / var(--window-k,.8));height:calc(52px / var(--window-k,.8));padding:0;border:2px solid #efd7a3;border-radius:50%;background:transparent;cursor:pointer;box-shadow:0 0 6px #efd7a399; }
+.wm-city-ring { display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,transparent 65%,#efd7a344); }
+.wm-city b { position:absolute;top:100%;left:50%;transform:translateX(-50%);font:calc(12px / var(--window-k,.8)) 'Jua',sans-serif;white-space:nowrap;color:#ffe7a7;text-shadow:0 1px 3px #000,0 0 3px #000; }
+.wm-city[hidden] { display:none; }
+.wm-city[data-here="true"] { outline:3px solid #ffe27a; }
+.wm-connection-path .wm-road-under {stroke-width:4;stroke:#31413b;stroke-opacity:.5}
+.wm-connection-path .wm-road {stroke-width:2;stroke:#e0c797;stroke-dasharray:3 2}
+.wm-path-gate {border-color:#e0c797!important;background:#695c3f!important;box-shadow:none!important;border-radius:3px!important}

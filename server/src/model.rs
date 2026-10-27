@@ -1770,6 +1770,9 @@ pub struct Portal {
     pub to: usize,
     pub tx: f64,
     pub ty: f64,
+    /// Ordinary outdoor path: authoritative outward walking direction, no portal effects.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub walk: Option<[i8; 2]>,
     /// An entrance into a raid's isolated muster chamber; the inner gate still needs ten fighters.
     #[serde(default)]
     pub muster: bool,

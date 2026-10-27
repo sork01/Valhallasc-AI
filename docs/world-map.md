@@ -1,41 +1,137 @@
-# World map geography
+# Organic world atlas and walking paths
 
-The atlas in `client/worldmap.js` is north-up, matching the coordinates in each
-zone detail map. The former force layout kept connected regions near each
-other but ignored the sides of their gates. Beta 1.28.0 replaces its positions
-with a layout constrained by the authoritative portals in `world/map.txt`.
+The Beta 1.29.0 world atlas uses the owner's FileDrop
+`newworldmap.png` as its painted overview. It supersedes the earlier sketch and
+procedural terrain previews. The supplied artwork was cleaned of misspelled
+baked labels with the built-in imagegen tool; geography and terrain are retained.
+Correct game names and level ranges are accessible HTML overlays. The original
+FileDrop upload is preserved. Asset provenance and the editing prompt are in
+`docs/world-atlas-art.txt`.
 
-For ordinary connections, the destination lies on the source gate's dominant
-side (nearest edge of the square zone). The source also lies on the reciprocal
-entrance's side of the destination. An east exit therefore leads east, with
-an entrance on the west; an east exit into a south entrance bends northeast.
-Terrain tiles never overlap. Terrain sizes indicate regions, not travel scale.
+The overview has 23 irregular regions. Asterion is a city landmark inside
+Stormglass. Veyrroot is the regional name for zone 23, with its Canopy city
+landmark inside it. Skaldholm and Nacrehold retain separate regions. The bay
+contains Rán's Deep and Nacrehold, and Bifrost's floating islands sit above
+Wyrdwood. The overview uses existing zone IDs and existing local maps; Asterion
+keeps its detailed city map, and Veyrroot's region/city open the Canopy map.
+Heartwood and the Seed Vault remain nested interior maps.
 
-Gold links are ordinary paths and join the land silhouette. Blue dashed links
-are transport portals or entrances into an interior; purple dashed links lead
-to private dungeons or the raid. The Stormrift, Maelstrom, Tideway and Starway
-retain their transport meaning. The Summit/Gloamfen gates both face north,
-and the Tideway gates both face south, so they cannot describe physical
-adjacency: these are explicit portals. Veyrroot Heartwood is an interior.
-No gameplay gates, coordinates, arrival positions, collision or access rules
-are changed to draw the atlas.
+The background is `client/assets/world-atlas-painted.png`. Province hit areas
+are traced along its painted borders in a 2048×1041 coordinate frame; they are
+not generated Voronoi cells. Labels sit in their matching terrain. City buttons
+outline the existing painted star city and giant tree rather than covering them
+with thumbnails. Entrance buttons remain independently accessible. Exploration
+fog clips to those same province polygons. Detailed zone maps still render the
+real terrain, actors, quests, services and routes from `world/map.txt`.
 
-Roads attach to their actual gate's side of each tile. A reciprocal portal is
-chosen by proximity to the authoritative arrival (`tx`, `ty`), so a dungeon's
-boss exit is not mistaken for its entrance. Each inter-zone pair appears once;
-internal raid lifts and other same-zone portals are omitted. Routes and fog
-still follow the real directed graph and discovered gates. The atlas scrolls
-on mouse and touch devices, centers on the current region when opened, and
-restores its scroll after returning from a zone detail.
+The overview redraws only when the background loads or exploration changes. It
+keeps the supplied landscape proportions and scrolls on smaller windows.
 
-When adding a zone, update `LAYOUT`, then check both gate sides and all nearby
-regions. Do not generate a new unconstrained force layout. Special transport
-IDs live in `TRANSPORT_GATES`; same-facing gate pairs and interior/dungeon
-links are classified from their data. Artwork remains the existing renderer.
-The filtered SVG is still baked once to canvas, never redrawn every frame.
+## Sources and regeneration
 
-Focused check: `REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/travel-fixes-ui.cjs`.
-It audits every atlas pair, direction, endpoint, overlap and reachability,
-checks actual travel in both directions, held mouse movement on foot and
-mounted, and all eight frames/facings of the corrected horse run. It also
-checks the rider's saddle bob. `MUTATE=mouse|horse|atlas` must fail.
+* `world/atlas-geography.txt`: traced shared polygon chains, region names,
+  label sites, nested city positions and background asset path.
+* `scripts/atlas_geography.py`: deterministic bounds and shared-edge detection.
+  Borders stay aligned to the art; corner contacts shorter than 24 atlas units
+  do not create walking routes. NumPy/Pillow provide the ownership mask.
+* `scripts/compact_atlas.py`: final authoritative route overlay. It runs after
+  admission/story/repair overlays inside `scripts/sync-world.cjs`. It replaces
+  obsolete outdoor links, places the new paths and exports the same atlas data
+  for the client. Ordinary terrain and encounter content remain owned by their
+  zone generators.
+
+Run the owning content generator, then `node scripts/sync-world.cjs`, then
+rebuild Rust. Never hand-edit generated `world/map.txt` or `client/world.js`.
+Two complete sync runs produce identical world and client bytes. A small
+Bifrost bridge landing keeps traffic from being forced through another exit;
+its sky floor and void collision are updated together.
+
+## Authoritative walking crossings
+
+There are 47 shared-region walking connections and one street into Asterion:
+48 two-way routes, or 96 directed crossings. Sunward and Emberwake touch only
+at a corner in this artwork, so their former crossing is removed. Region neighbours receive paths
+in both directions. Connections from obsolete atlas arrangements are removed
+when the regions no longer touch. The travel-master network is rebuilt from
+the real crossings, preserving same-zone links and reciprocal flights.
+
+The shared route model retains the existing server-authoritative zone handling.
+An optional `Portal.walk` outward direction identifies an ordinary walking path.
+A crossing requires actual movement toward the neighbouring region; idle or
+inward-facing fighters stay put. On crossing, the server preserves held input
+and the remaining local offset of a click destination, clears obsolete targets,
+and sends a normal arrival message. Outdoor crossings emit no teleport flare.
+The client draws trails and low roadside waymarks instead of glowing gates,
+removes their portal night lights, and uses path marks on the minimap/detail map.
+
+Arrivals stand six tiles inward from the return crossing. Both ends are clear
+of collision and at least eight tiles from monster spawns. Each generated
+approach is actually walkable under Rust collision and avoids all other trigger
+areas, including dungeon doors. Players, enemies and scenery retain their data;
+the Bifrost landing changes only the local bridge floor and void rectangles.
+
+## Cities, interiors and exploration
+
+City buttons show Asterion inside Stormglass and the Canopy inside Veyrroot.
+The current city and its parent region are highlighted together. A known city
+can open its detail map before the first visit; its detailed map retains fog until explored.
+
+The 21 dungeon/raid entrances and Heartwood remain purple map buttons in their
+parent regions. Heartwood and its nested Seed Vault resolve outward to Veyrroot;
+the Moonwell resolves outward through Asterion to Stormglass. Dungeon interiors
+occupy no separate overview territory. A discovered entrance can preview an
+unvisited map without revealing terrain, enemies or the unknown directory.
+Names, routes and doors retain the existing exploration visibility rules.
+
+Opening a map never travels or unlocks a door. The server still checks minimum
+level, completed admission quests, party size, raid muster and private copies.
+All six keyed entrances, dungeon entrance coordinates, returns and cleared
+exits remain unchanged. Keyboard Enter activates city/entrance buttons; Escape
+returns to the atlas and preserves its scroll position.
+
+## Focused validation
+
+* `bash scripts/cargo.sh test compact_atlas -- --nocapture`: organic province
+  structure and city containment; safe crossings and collision along every
+  approach; all 96 real walking transitions with continued held movement; idle
+  and inward refusal, continued click movement, preserved keys and travel links.
+* The four existing `dungeon_admission` tests verify the protected quest doors.
+* `VALHALLA_BINARY=<candidate> bash scripts/test-touch-bounded.sh tests/organic-atlas-ui.cjs`:
+  desktop, phone and tablet; province terrain/labels, city containment, all 22
+  interior buttons, fog previews, 44-pixel touch controls, current-city highlight,
+  keyboard navigation, detail paths and actual held movement through eight paths.
+  `MUTATE=layout` and `MUTATE=entrance` must fail.
+* `VALHALLA_BINARY=<candidate> bash scripts/test-touch-bounded.sh tests/organic-atlas-position-ui.cjs`: four actual edge-position markers remain inside their irregular provinces.
+* `VALHALLA_BINARY=<candidate> node scripts/test-via-mcp.cjs run walkways`: actual
+  MCP handshake, normal click movement both ways, no teleport effects, separate
+  zone observations and destination persistence through a private server restart.
+* `tests/compact-atlas-ui.cjs`, `tests/worldmap-atlas-ui.cjs` and
+  `CHECK_ONLY=atlas tests/travel-fixes-ui.cjs` delegate to the organic atlas suite.
+  Held mouse and horse gait checks remain separate in the travel-fixes suite.
+
+No file zones or copy IDs are added or reordered, and saved positions remain
+valid. The candidate lives on `feat/compact-worldmap` at
+`/media/raid/valhallasc-data/compact-worldmap-review`. Deploy the rebuilt server and synchronized client together;
+the owner authorized merge and deployment on 2026-10-27. Client files in the
+main checkout are served immediately, so prepare and validate in isolation.
+
+
+The painted revision passed four revised `compact_atlas` Rust checks and 116
+bounded browser assertions at desktop, phone and tablet sizes. The browser audit
+checks pixels against the supplied background as well as province names, city
+containment, all 22 entrances, fog previews, touch spacing, keyboard access and
+actual held-movement crossings. The first phone run exposed entrance/label
+crowding; placement now uses rendered bounds after fonts load and a finer search,
+including city captions. The final passing run is `test-results/driver-C6bYjN`.
+Four actual edge-position marker checks also pass with the traced borders.
+The complete sync is byte-stable. Changed JS/Python syntax, formatting, Swedish
+coverage and release notes pass. All-target Clippy with warnings denied passes
+under a one-CPU, 1.5-GiB scope (the first uncapped invocation was interrupted). Earlier admission/MCP and mutation results refer
+to the preceding candidate; no combat or full-suite tests were repeated.
+
+The full-map screenshot is uploaded to FileDrop as
+`valhallasc-painted-worldmap.png` (SHA-256 `26efdc7d98ffb8b5891e2dfe08c1c5b00386dcc748ca92a6ec112dfb53214af7`). The original owner upload remains untouched.
+The owner authorized merge and deployment on 2026-10-27. Release preparation
+backs up the running binary, client files and a consistent SQLite copy. All 47
+file-zone IDs are unchanged; saved characters need no migration. The deployment
+receipt is recorded after public verification.

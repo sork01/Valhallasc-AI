@@ -1,0 +1,14 @@
+Painted world atlas, 2026-10-27
+
+Owner source: FileDrop newworldmap.png (preserved, 2635x1340)
+Source SHA-256: ab89bbf10709e996d81cf8431c4202341e96af17cbd10f8c539dbba1f38d7325
+Project asset: client/assets/world-atlas-painted.png (1758x895)
+Asset SHA-256: d82f224ad7c1bd0ff20319fb35bce150a52464aaf39acf1d20ddfff28ed99b4e
+Mode: built-in image_gen tool, precise-object-edit; no CLI/API fallback.
+
+The edit removes baked misspellings/incorrect level labels. Interactive labels,
+city hotspots, entrances and fog are rendered by client/worldmap.js. Traced
+polygon geometry uses a 2048x1041 frame matching the supplied proportions.
+
+Final prompt (verbatim):
+Use case: precise-object-edit. Edit target: the provided fantasy world map newworldmap.png. Remove ALL baked region names, city names, and ALL 'Lv.' level annotations inside the island, replacing ONLY the letter/number pixels with a seamless continuation of the original terrain beneath. Leave no zone-name text anywhere inside the island. Preserve exactly the painted coastline, every province border, roads, islands, clouds, trees, mushrooms, mountains, lava, crystals, city drawings (including the star-shaped city in the blue central-right region and giant tree city on the far right), colour palette, texture, and composition. Preserve the exterior ocean, compass, graticule lines and coordinate labels in the outer margins. Do not redraw, relocate, add, remove, or crop terrain. Keep the same wide aspect ratio and composition, using the largest available size. This is the game atlas background; correct interactive zone labels will be added separately in code. Output just the cleaned map art without new typography.

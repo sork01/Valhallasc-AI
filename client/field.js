@@ -3650,6 +3650,18 @@
   }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
+    if (p.walk) {
+      // A low roadside waymark replaces the glowing gate on ordinary outdoor routes.
+      const dest = ZONES[p.to], dx = p.walk[0], dy = p.walk[1];
+      const [ax, ay] = w2s(p.x-dx*2, p.y-dy*2), [bx, by] = w2s(p.x+dx*3, p.y+dy*3);
+      g.save(); g.strokeStyle = '#c7ae79'; g.lineWidth = 7; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke();
+      g.strokeStyle = '#6e5c43'; g.lineWidth = 3; g.beginPath();g.moveTo(sx-29,sy-3);g.lineTo(sx-29,sy-29);g.stroke();
+      g.fillStyle = '#e0cd9e';g.strokeStyle='#453b31';g.lineWidth=2;
+      g.beginPath();g.moveTo(sx-46,sy-36);g.lineTo(sx-14,sy-36);g.lineTo(sx-7,sy-29);g.lineTo(sx-14,sy-22);g.lineTo(sx-46,sy-22);g.closePath();g.fill();g.stroke();
+      g.font='13px "Jua",sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#192b28';g.fillStyle='#fff2d2';
+      g.strokeText(dest?.name || p.name,sx,sy-48);g.fillText(dest?.name || p.name,sx,sy-48);g.restore();return;
+    }
     if (p.look === 'skybridge') return SkybridgeArt.portal(g,p,sx,sy,t);
     if (p.look === 'emberwake') return EmberwakeArt.portal(g,p,sx,sy,t);
     if (p.look === 'chained_forge') return ChainedForgeArt.portal(g,p,sx,sy,t);
@@ -4069,7 +4081,7 @@
       const [sx, sy] = w2s(o.x, o.y), fl = .9 + .1 * Math.sin(t * 7 + o.x * 3);
       pool(sx, sy - 56, (o.kind === 'brazier' ? 320 : 230) * fl, .9);
     }
-    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(p.x, p.y); pool(sx, sy - 30, p.look === 'exit' ? 340 : 300, .95); }
+    for (const p of zdef.portals) { if (p.walk || p.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(p.x, p.y); pool(sx, sy - 30, p.look === 'exit' ? 340 : 300, .95); }
     for (const s of slimes) { if (s.dead) continue; const [sx, sy] = w2s(s.x, s.y); pool(sx, sy - 40, s.d?.boss ? 330 : 170, s.d?.boss ? .92 : .8); }   // enemies are always seen, wherever they stand
     for (const b of ebolts) { const [sx, sy] = w2s(b.x, b.y, 38); pool(sx, sy, 120 + b.size * 60, .75); }
     for (const b of bolts) { const [sx, sy] = w2s(b.x, b.y, 42); pool(sx, sy, 110, .6); }
@@ -4181,7 +4193,7 @@
       g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (zone === 0 ? '#4fa9c8' : wyrd ? '#2f6f9a' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
-    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
+    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c;
   }
   function drawMini() {

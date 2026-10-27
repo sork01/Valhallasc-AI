@@ -436,5 +436,8 @@
   "! {0}": "! {0:t}",
   "Quest abandoned: {0}. You can take it again from its questgiver.": "Uppdrag övergivet: {0:t}. Du kan ta det igen hos uppdragsgivaren.",
   "Abandoned automatic quests ({0})": "Övergivna automatiska uppdrag ({0})",
-  "Quest abandoned: {0}. You can restore it from your quest journal.": "Uppdrag övergivet: {0:t}. Du kan återställa det i din uppdragsdagbok."
+  "Quest abandoned: {0}. You can restore it from your quest journal.": "Uppdrag övergivet: {0:t}. Du kan återställa det i din uppdragsdagbok.",
+  "{0}. Open its map": "{0}. Öppna kartan",
+  "You enter {0}.": "Du går in i {0:t}.",
+  "You enter {0}. Recommended levels {1}–{2}.": "Du går in i {0:t}. Rekommenderade nivåer {1}–{2}."
 }

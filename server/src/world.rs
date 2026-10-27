@@ -16,6 +16,8 @@ mod activity;
 mod activity_tests;
 mod ambient;
 mod bank;
+#[cfg(test)]
+mod compact_atlas_tests;
 mod inspect;
 #[cfg(test)]
 mod raid_reward_tests;
@@ -3230,7 +3232,17 @@ impl World {
             .portals
             .iter()
             .find(|portal| {
-                (!portal.after_clear || cleared)
+                let walking_out = portal.walk.is_none_or(|side| {
+                    let direction = if p.input.x != 0. || p.input.y != 0. {
+                        p.input
+                    } else {
+                        p.goal.map_or(p.face, |goal| here.direction(goal))
+                    };
+                    p.moving
+                        && direction.x * f64::from(side[0]) + direction.y * f64::from(side[1]) > 0.
+                });
+                walking_out
+                    && (!portal.after_clear || cleared)
                     && here.distance(Point {
                         x: portal.x,
                         y: portal.y,
@@ -3382,7 +3394,9 @@ impl World {
         }
         let p = &self.players[&session];
         let actor = p.character.id.clone();
-        self.event("portal", &actor, here, 0., false);
+        if portal.walk.is_none() {
+            self.event("portal", &actor, here, 0., false);
+        }
         let mut arrival = Point {
             x: portal.tx,
             y: portal.ty,
@@ -3397,26 +3411,44 @@ impl World {
         p.character.x = arrival.x;
         p.character.y = arrival.y;
         p.portal_at = time;
-        p.stop();
+        if portal.walk.is_some() {
+            // Held movement continues across a road. A click goal keeps its remaining
+            // local offset; no position or destination zone is accepted from the client.
+            let limit = self.maps[portal.to].size as f64 - 0.7;
+            p.goal = p.goal.map(|goal| Point {
+                x: (arrival.x + goal.x - here.x).clamp(0.7, limit),
+                y: (arrival.y + goal.y - here.y).clamp(0.7, limit),
+            });
+            p.target = None;
+        } else {
+            p.stop();
+        }
         p.attack = 0.;
         p.dash = 0.;
         let name = self.maps[portal.to].name.clone();
         let party = self.maps[portal.to].players;
-        let text = match self.maps[portal.to].levels {
-            Some([low, high]) if party > 0 => format!(
-                "You step through {} into {name}, a dungeon of your own. Recommended level {}, {party} players.",
-                portal.name,
-                if low == high {
-                    low.to_string()
-                } else {
-                    format!("{low}–{high}")
-                }
-            ),
-            Some([low, high]) => format!(
-                "You step through {} into {name}. Recommended levels {low}–{high}.",
-                portal.name
-            ),
-            None => format!("You step through {} into {name}.", portal.name),
+        let text = if portal.walk.is_some() {
+            match self.maps[portal.to].levels {
+                Some([low, high]) => format!("You enter {name}. Recommended levels {low}–{high}."),
+                None => format!("You enter {name}."),
+            }
+        } else {
+            match self.maps[portal.to].levels {
+                Some([low, high]) if party > 0 => format!(
+                    "You step through {} into {name}, a dungeon of your own. Recommended level {}, {party} players.",
+                    portal.name,
+                    if low == high {
+                        low.to_string()
+                    } else {
+                        format!("{low}–{high}")
+                    }
+                ),
+                Some([low, high]) => format!(
+                    "You step through {} into {name}. Recommended levels {low}–{high}.",
+                    portal.name
+                ),
+                None => format!("You step through {} into {name}.", portal.name),
+            }
         };
         let _ = p.peer.try_send(json!({"type":"system","text":text}));
         // Gathered humans and hired fighters cross together, so nobody is stranded behind the gate.
@@ -3433,7 +3465,9 @@ impl World {
             let _ = p.peer.try_send(json!({"type":"system","text":text}));
         }
         self.separate_enemies();
-        self.event("portal", &actor, arrival, 0., false);
+        if portal.walk.is_none() {
+            self.event("portal", &actor, arrival, 0., false);
+        }
         self.save();
     }
     /// One attack roll: the server alone decides misses, crits and damage (buffs included).
@@ -10895,6 +10929,7 @@ mod tests {
         w.time = 2.;
         let here = w.players[&1].character.point();
         w.maps[0].portals.push(Portal {
+            walk: None,
             id: "accidental_sealed_gate".into(),
             name: "Accidental Sealed Gate".into(),
             x: here.x,

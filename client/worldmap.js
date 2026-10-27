@@ -1,17 +1,21 @@
 'use strict';
 // World map (M, or the button under the minimap). Everything is drawn from window.WORLD_MAP, so a zone added to
 // world/map.txt appears with its real ground, obstacles, camp, gates and spawn points; the only hand-made part is
-// LAYOUT, where each public zone sits on the world sheet. Sealed dungeon floor plans are hidden until opened.
-// The world sheet is a connected geographic atlas: each island uses its actual zone ground,
-// and land bridges follow the authoritative portal graph. Press a region to zoom into its map.
+// the painted overview geometry owned by world/atlas-geography.txt. Interiors open through entrance markers.
+// The overview uses the owner’s supplied artwork; detailed maps use authoritative zone terrain.
+// Walking crossings follow shared painted borders. Press a region to open its detailed map.
 (() => {
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
-  const STAGE = { w: 160, h: 99 };
-  // North-up geography follows the dominant side of each ordinary gate and its reciprocal entrance.
-  // Interior/dungeon doors and the two gates whose ends face the same way use explicit transport links.
-  // See docs/world-map.md; do not replace this with a force layout that discards gate directions.
-  const LAYOUT = [{"x":12.29,"y":82.79,"s":4.79},{"x":12.29,"y":74.99,"s":4.79},{"x":11.97,"y":66.5,"s":5.42},{"x":3.49,"y":64.9,"s":5.42},{"x":11.05,"y":56.48,"s":6.06},{"x":9.65,"y":63.27,"s":2.99},{"x":20.36,"y":56.19,"s":6.64},{"x":19.79,"y":45.36,"s":6.06},{"x":20.44,"y":33.62,"s":6.36},{"x":27.53,"y":42.92,"s":6.64},{"x":27.14,"y":38.86,"s":2.99},{"x":31.61,"y":38.85,"s":2.99},{"x":34.65,"y":35.58,"s":2.99},{"x":28.1,"y":32.42,"s":5.42},{"x":28.1,"y":23.89,"s":5.42},{"x":36.63,"y":23.89,"s":5.42},{"x":45.16,"y":23.89,"s":5.42},{"x":51.1,"y":16.94,"s":6.43},{"x":58.73,"y":16.92,"s":2.99},{"x":62.48,"y":18.41,"s":5.42},{"x":71.78,"y":19.03,"s":5.42},{"x":81.1,"y":19.55,"s":5.59},{"x":90.62,"y":20.08,"s":5.75},{"x":99.5,"y":20.24,"s":5.42},{"x":98.91,"y":31.15,"s":4.79},{"x":108.08,"y":19.92,"s":6.06},{"x":118.16,"y":20.52,"s":6.06},{"x":127.44,"y":20.44,"s":6.21},{"x":138.83,"y":19.06,"s":8.98},{"x":68.57,"y":16.67,"s":2.99},{"x":77.86,"y":17.29,"s":2.99},{"x":87.36,"y":17.9,"s":2.99},{"x":92.0,"y":14.13,"s":2.99},{"x":98.72,"y":26.78,"s":2.99},{"x":114.86,"y":18.5,"s":2.99},{"x":129.04,"y":14.46,"s":2.99},{"x":134.69,"y":19.81,"s":2.99},{"x":150.3,"y":24.54,"s":2.99},{"x":153.51,"y":21.42,"s":2.99},{"x":134.69,"y":24.3,"s":2.99},null,{"x":24.33,"y":52.08,"s":2.99},{"x":19.16,"y":52.5,"s":2.99},{"x":23.4,"y":41.3,"s":2.99},{"x":149.2,"y":20.2,"s":2.99},{"x":58.14,"y":9.46,"s":6.06},{"x":59.67,"y":3.49,"s":2.99}];
+  // Traced painted borders and interactive labels share the world-data overlay.
+  const ATLAS = window.WORLD_MAP.atlas;
+  const STAGE = { w: ATLAS.width, h: ATLAS.height };
+  const PROVINCES = new Map(ATLAS.regions.map(r => [r.zone, r]));
+  const LAYOUT = Array(1 + (window.WORLD_MAP.zones || []).length).fill(null);
+  for (const r of ATLAS.regions) {
+    const [x,y,w,h] = r.box; LAYOUT[r.zone] = { x,y,w,h,s:Math.max(w,h),polygon:r.polygon };
+  }
+  for (const city of ATLAS.cities) if (!LAYOUT[city.zone]) LAYOUT[city.zone] = { x:city.at[0]-45,y:city.at[1]-45,w:90,h:90,s:90 };
   const GROUND = { chained_forge:'#63332e', emberwake:'#49414d', blackhour:'#211b2e', longship:'#123b46', skybridge:'#222e4d', nornroot:'#44374f', meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', ribbonwild:'#d98db2', tanglecrown:'#287a5b', worldtree:'#2f9369', lapiserg:'#d3a468', frostwake:'#c8e6f1', cairnspine:'#6b7378', yearwheel:'#a6cf9b', heartwood:'#806244', vault: '#07080e', eye_below: '#102b3d', elder_hollow: '#31492f', thousandfold: '#40264d', rain_crown: '#1c5251', seed_vault: '#415532', sunken_astrolabe: '#254e59', thunderheart_gate: '#273f60', blooming_labyrinth:'#36553f', solar_crucible:'#754530', amber_archive:'#735238', silent_solstice:'#3b5872', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
   const DIRT = { chained_forge:'#b4a09c', emberwake:"#b39170", blackhour:'#8d7ca3', longship:'#bf9c71', skybridge:'#8fd8f2', nornroot:'#c4a77f', meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', ribbonwild:'#ffe3a0', tanglecrown:'#b99a62', worldtree:'#bd9662', lapiserg:'#efd59e', frostwake:'#8abfd3', cairnspine:'#b7a07b', yearwheel:'#f0d6a7', heartwood:'#b18a5f', vault: '#3a3f55', eye_below: '#386c78', elder_hollow: '#819965', thousandfold: '#ae779d', rain_crown: '#6aa895', seed_vault: '#b6a676', sunken_astrolabe: '#c0ac79', thunderheart_gate: '#a9cde3', blooming_labyrinth:'#deb4cd', solar_crucible:'#e9bb79', amber_archive:'#eac286', silent_solstice:'#b8d5e8', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
   const PORTAL = { chained_forge:'#77e5df', emberwake:"#ffbc70", blackhour:'#8aece1', longship:'#79dcc4', skybridge:'#7fe5ff', nornroot:'#edd293', meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', ribbonwild:'#ff86b9', tanglecrown:'#a6e5ae', worldtree:'#c8f7a7', lapiserg:'#79d5d3', frostwake:'#9af0da', cairnspine:'#f2cb89', yearwheel:'#ffe7a4', heartwood:'#ffe0a1', vault: '#59d9ff', eye_below: '#a3eee5', elder_hollow: '#d7ecaa', thousandfold: '#ffdcb4', rain_crown: '#c2f5db', seed_vault: '#f3df9a', sunken_astrolabe: '#a3e9ed', thunderheart_gate: '#d1eaff', blooming_labyrinth:'#f7c3df', solar_crucible:'#ffe0a0', amber_archive:'#f6d99d', silent_solstice:'#e6f3ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
@@ -124,7 +128,8 @@
   for (const e of CATHEDRAL_ENEMIES) KINDS[e.kind]=[e.name+(e.boss?' (Boss)':''),e.level,e.color];
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
   const travelMasters = z => (z.npcs || []).filter(n => n.travelStop);
-  const onWorldSheet = z => z && !z.sealedTemplate && z.theme !== 'arena';
+  const isInterior = z => z && (z.players > 0 || z.interior || z.theme === 'heartwood');
+  const onWorldSheet = z => z && !!z.place?.polygon && !z.sealedTemplate && z.theme !== 'arena';
   const SEALED = { year_bloom_gate: 'Blooming Labyrinth', year_solar_gate: 'Solar Crucible', year_amber_gate: 'Amber Archive', year_solstice_gate: 'Silent Solstice' };
   // Fog of war: the server saves which of a zone's 3x3 cells the character has stood in (Field.explored, one bitmask per
   // zone). Nothing from an unvisited cell is shown: not its ground, gates, camp, enemies or people.
@@ -146,13 +151,13 @@
   function load() {
     if (zones) return zones;
     const W = window.WORLD_MAP;
-    zones = [{ ...W, theme: 'meadow', name: W.name || 'Greenmeadow', paths: window.Field?.meadowPaths || [] },
+    zones = [{ ...W, theme: 'meadow', name: W.name || 'Greenmeadow', levels: W.levels || [1,5], paths: W.paths || window.Field?.meadowPaths || [] },
       ...(W.zones || []).map(z => ({ theme: 'ember', paths: [], ...z }))];
     zones.forEach((z, i) => {
       z.portals ||= [];
       const levels = z.levels || (() => { const l = z.slimes.filter(s => s.kind !== 'big').map(s => kindInfo(s.kind)[1]); return l.length ? [Math.min(...l), Math.max(...l)] : null; })();
       z.range = levels;
-      z.place = LAYOUT[i] || { x: 4 + ((i - LAYOUT.length) % 4) * 24, y: 58, s: 16 };   // unplaced zones queue along the bottom edge
+      z.place = LAYOUT[i];
     });
     // Each directed edge is a real gate. The graph also keeps the city and private dungeon branches.
     graph = zones.map((z, i) => z.portals.filter(p => Number.isInteger(p.to) && zones[p.to] && p.to !== i).map(p => ({ to: p.to, id: p.id, x: p.x, y: p.y })));
@@ -370,8 +375,6 @@
     'The Eye Below': 'Eye Below', 'The Elder Hollow': 'Elder Hollow', 'The Thousandfold Pavilion': 'Pavilion', 'Temple of the Rain Crown': 'Rain Crown', 'The Seed Vault': 'Seed Vault', 'The Sunken Astrolabe': 'Astrolabe', 'The Thunderheart Gate': 'Thunderheart',
     'The Blooming Labyrinth': 'Blooming', 'The Solar Crucible': 'Crucible', 'The Amber Archive': 'Amber Archive', 'The Silent Solstice': 'Solstice' };
   const labelName = z => NAMES[z.name] || shortName(z.name);
-  // Names of the regions, set in the sea or across a continent (stage units).
-  const REGIONS = [{ text: 'HEARTHLANDS', area: [1, 50, 36, 98], near: [24, 78] }, { text: 'THE STORMRIFT', area: [14, 27, 44, 60], near: [35, 49] }, { text: 'STARFALL REACHES', area: [38, 1, 159, 42], near: [94, 9] }];
   const DECOR = { ember: 'peak', cairnspine: 'peak', frost: 'snow', frostwake: 'snow', wyrd: 'pine', fen: 'reed', meadow: 'tree', sunward: 'tree', tanglecrown: 'palm', worldtree: 'palm', heartwood: 'palm', moonspore: 'shroom',
     lapiserg: 'dune', prismwaste: 'crystal', astral: 'crystal', ribbonwild: 'flag', yearwheel: 'tree', sky: 'cloud', deep: 'coral', nacre: 'coral', asterion: 'spire', orrery: 'spire', city: 'tree' };
   // One small scenery picture at (x, y), `u` stage units across, drawn into `g`.
@@ -396,215 +399,148 @@
       case 'spire': add('path', { d: `M ${x - u * .18} ${y + u * .45} L ${x - u * .1} ${y - u * .5} L ${x} ${y - u * .8} L ${x + u * .1} ${y - u * .5} L ${x + u * .18} ${y + u * .45} Z`, fill: '#d9e8ff' }); break;
     }
   }
-  function buildWorld() {
-    const stage = $('wm-world'); stage.replaceChildren(); tiles = Array(zones.length).fill(null); roadRefs = []; nameNodes = [];
-    tileY = stage.clientWidth / stage.clientHeight * STAGE.h / STAGE.w;
-    const atlas = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-atlas', 'aria-hidden': 'true' });
-    const defs = svgNode('defs', {});
-    const sea = svgNode('pattern', { id: 'wm-sea-lines', width: 8, height: 5, patternUnits: 'userSpaceOnUse' });
-    sea.append(svgNode('path', { d: 'M .5 3 Q 2 1.5 3.5 3 T 6.5 3', stroke: '#b5dfdf', 'stroke-opacity': '.13', 'stroke-width': '.16', fill: 'none' }));
-    const region = { filterUnits: 'userSpaceOnUse', x: 0, y: 0, width: STAGE.w, height: STAGE.h };
-    // Ragged, fractal coastlines: a turbulence field pushes the edge of the land about; the beach is the same shape grown a little.
-    const rough = (id, extra = []) => {
-      const f = svgNode('filter', { id, ...region, 'color-interpolation-filters': 'sRGB' });
-      f.append(svgNode('feTurbulence', { type: 'fractalNoise', baseFrequency: '.07 .09', numOctaves: 3, seed: 11, result: 'n' }),
-        svgNode('feDisplacementMap', { in: 'SourceGraphic', in2: 'n', scale: 1.1, xChannelSelector: 'R', yChannelSelector: 'G', result: 'd' }), ...extra);
-      return f;
-    };
-    defs.append(sea, rough('wm-rough'),
-      rough('wm-beach', [svgNode('feMorphology', { in: 'd', operator: 'dilate', radius: .35 })]),
-      rough('wm-shallow', [svgNode('feMorphology', { in: 'd', operator: 'dilate', radius: .8, result: 'm' }), svgNode('feGaussianBlur', { in: 'm', stdDeviation: .7 })]));
-    const soft = svgNode('filter', { id: 'wm-soft', ...region }); soft.append(svgNode('feGaussianBlur', { stdDeviation: .6 })); defs.append(soft);
-    // The silhouette of all land: a blob under every zone, a rock under every dungeon, and an isthmus along every land link.
-    const silhouette = svgNode('g', { id: 'wm-sil' }), landLinks = svgNode('g', { class: 'wm-land-links' });
-    const seen = new Set(), roadList = [];
-    zones.forEach((z, i) => {
-      if (!onWorldSheet(z)) return;
-      const c = [z.place.x + z.place.s / 2, z.place.y + z.place.s * tileY / 2];
-      silhouette.append(z.players ? svgNode('circle', { cx: c[0], cy: c[1], r: z.place.s / 2 + .35 }) : svgNode('path', { d: pointPath(islandPoints(z.place, i, z.place.s * .08)) }));
-    });
-    zones.forEach((z, i) => z.portals.forEach(p => {
-      const pair = [i, p.to].sort((a, b) => a - b).join('-'); if (p.to === i || !onWorldSheet(z) || seen.has(pair) || !onWorldSheet(zones[p.to])) return; seen.add(pair);
-      const a = z.place, b = zones[p.to].place, back = returnGate(i, p), kind = connectionKind(i, p, back);
-      const link = svgNode('g', { 'data-link': pair });
-      if (kind === 'path') {
-        const w = z.players || zones[p.to].players ? 2.2 : Math.min(a.s, b.s) * .5;
-        link.append(svgNode('path', { d: `M ${a.x + a.s / 2} ${a.y + a.s * tileY / 2} L ${b.x + b.s / 2} ${b.y + b.s * tileY / 2}`, fill: 'none', 'stroke-width': w, 'stroke-linecap': 'round' }));
-        landLinks.append(link);
-      }
-      roadList.push({ z, i, p, back, pair, kind });
-    }));
-    silhouette.append(landLinks); defs.append(silhouette);
-    const mask = svgNode('mask', { id: 'wm-landmask', maskUnits: 'userSpaceOnUse', ...{ x: 0, y: 0, width: STAGE.w, height: STAGE.h } });
-    mask.append(svgNode('use', { href: '#wm-sil', fill: '#fff', stroke: '#fff', 'stroke-width': 0, filter: 'url(#wm-rough)' })); defs.append(mask);
-    atlas.append(defs, svgNode('rect', { x: 0, y: 0, width: STAGE.w, height: STAGE.h, fill: 'url(#wm-sea-lines)' }));
-    const layer = (fill, filter, cls) => svgNode('use', { href: '#wm-sil', fill, stroke: fill, 'stroke-width': 0, filter: `url(#${filter})`, class: cls });
-    atlas.append(layer('#7fd0cf', 'wm-shallow', 'wm-shallows'), layer('#ecdcaa', 'wm-beach', 'wm-beach'), layer('#78a85e', 'wm-rough', 'wm-land-base'));
-    // Each zone's biome colour is a soft blob over the land, so one terrain melts into the next.
-    const land = svgNode('g', { class: 'wm-land-shapes', mask: 'url(#wm-landmask)' }), biomes = svgNode('g', { filter: 'url(#wm-soft)' }), scenery = svgNode('g', { class: 'wm-scenery', mask: 'url(#wm-landmask)' });
-    land.append(biomes);
-    zones.forEach((z, i) => {
-      if (!onWorldSheet(z) || z.players) return;
-      biomes.append(svgNode('path', { d: pointPath(islandPoints(z.place, i, z.place.s * .15)), class: 'wm-island', fill: GROUND[z.theme] || '#6f8e73', 'data-zone': i }));
-      const kind = DECOR[z.theme]; if (!kind) return;
-      const g = svgNode('g', { class: 'wm-decor', 'data-zone': i }), c = [z.place.x + z.place.s / 2, z.place.y + z.place.s * tileY / 2], R = z.place.s / 2;
-      let seed = 31 + i * 17; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
-      const toward = z.portals.filter(p => onWorldSheet(zones[p.to])).map(p => { const b = zones[p.to].place; return Math.atan2(b.y + b.s * tileY / 2 - c[1], b.x + b.s / 2 - c[0]); });
-      const count = Math.round(R * .75 + 2), size = Math.max(1.5, Math.min(2.6, R * .2));
-      for (let k = 0, tries = 0; k < count && tries < 60; tries++) {
-        const ang = rnd() * 6.2832; if (toward.some(t => Math.abs(Math.atan2(Math.sin(ang - t), Math.cos(ang - t))) < .5)) continue;
-        const rad = R * (1.02 + rnd() * .2); sceneryIcon(g, kind, c[0] + Math.cos(ang) * rad, c[1] + Math.sin(ang) * rad * tileY, size * (.8 + rnd() * .5), rnd); k++;
-      }
-      scenery.append(g);
-    });
-    atlas.append(land, scenery);
-    const labels = svgNode('g', { class: 'wm-regions' });
-    for (const r of REGIONS) { const t = svgNode('text', { x: -50, y: -50, 'text-anchor': 'middle', 'data-region': r.text }); t.textContent = r.text; labels.append(t); }
-    atlas.append(labels);
-    const compass = svgNode('g', { class: 'wm-compass', transform: 'translate(10 10)' });
-    compass.append(svgNode('circle', { r: 4.6 }), svgNode('circle', { r: 3.3 }),
-      svgNode('path', { d: 'M 0 -5.7 L 1.1 -1.1 L 5.7 0 L 1.1 1.1 L 0 5.7 L -1.1 1.1 L -5.7 0 L -1.1 -1.1 Z' }),
-      svgNode('path', { d: 'M 0 -4.7 L -1.1 -1.1 L 0 0 Z M 4.7 0 L 1.1 -1.1 L 0 0 Z M 0 4.7 L 1.1 1.1 L 0 0 Z M -4.7 0 L -1.1 1.1 L 0 0 Z', class: 'wm-compass-shadow' }));
-    const north = svgNode('text', { x: 0, y: -6.6, 'text-anchor': 'middle' }); north.textContent = 'N'; compass.append(north);
-    atlas.append(compass);
-    const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-roads', 'aria-hidden': 'true' });
-    for (const { z, i, p, back, pair, kind } of roadList) {
-      const other = zones[p.to], [x1, y1] = portalPoint(z, p);
-      const [x2, y2] = back ? portalPoint(other, back) : [other.place.x + other.place.s / 2, other.place.y + other.place.s * tileY / 2];
-      const road = svgNode('g', { 'data-road': pair, 'data-kind': kind, class: `wm-connection-${kind}` });
-      const a = portalSide(z, p), b = back ? portalSide(other, back) : [-a[0], -a[1]];
-      const reach = Math.min(6, Math.hypot(x2 - x1, y2 - y1) * .45);
-      const d = `M ${x1} ${y1} C ${x1 + a[0] * reach} ${y1 + a[1] * reach * tileY} ${x2 + b[0] * reach} ${y2 + b[1] * reach * tileY} ${x2} ${y2}`;
-      roadRefs.push({ node: road, pair, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
-      road.append(svgNode('title', {}), svgNode('path', { d, class: 'wm-road-under', fill: 'none' }), svgNode('path', { d, class: 'wm-road', fill: 'none' }),
-        svgNode('circle', { cx: x1, cy: y1, r: .35, class: 'wm-gate-dot' }), svgNode('circle', { cx: x2, cy: y2, r: .35, class: 'wm-gate-dot' }));
-      road.firstChild.textContent = `${p.name[0].toUpperCase()}${p.name.slice(1)} joins ${z.name} and ${other.name}`;
-      roads.append(road);
-    }
-    const baked = el('canvas', '', 'wm-sea'); baked.width = STAGE.w * 10; baked.height = STAGE.h * 10; baked.hidden = true; baked.setAttribute('aria-hidden', 'true'); atlas.style.display = 'none';
-    stage.append(baked, atlas, roads);
-    zones.forEach((z, i) => {
-      if (!onWorldSheet(z)) return;
-      const { x, y, s } = z.place, tile = el('button', '', 'wm-tile'); tile.type = 'button'; tile.dataset.zone = String(i); tile.dataset.theme = z.theme;
-      tile.dataset.size = String(s);
-      Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, aspectRatio: '1' });
-      tile.setAttribute('aria-label', `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}. Open its map`);
-      tile.dataset.branch = z.players ? 'dungeon' : ['city','nacre','asterion','worldtree','heartwood'].includes(z.theme) ? 'city' : 'wild';
-      if (!z.players) tile.style.clipPath = islandClip(i); else tile.title = z.name;
-      const canvas = el('canvas'); canvas.width = canvas.height = 220; copy(canvas, paint(i, 220));
-      const fog = el('canvas', '', 'wm-tile-fog'); fog.width = fog.height = 220; fog.setAttribute('aria-hidden', 'true');
-      const label = el('span', '', 'wm-tile-label'); label.append(el('b', z.name), el('small', rangeText(z)));
-      label.querySelector('b').dataset.short = s < 8 ? String(i) : shortName(z.name);
-      const you = el('i', '', 'wm-you'); you.hidden = true; you.title = 'You are here';
-      tile.append(canvas, fog, label, you);
-      if (travelMasters(z).length) {
-        const badge = el('span', '✦', 'wm-travel-badge'); badge.setAttribute('aria-hidden', 'true');
-        badge.title = travelMasters(z).map(n => n.name).join(', ');
-        tile.append(badge);
-      }
-      tile.addEventListener('click', () => zoomTo(i));
-      stage.append(tile); tiles[i] = tile;
-    });
-    // Names hang beside their zone, on whichever side is free (measured, so they never sit on another zone or each other).
-    const names = zones.map((z, i) => {
-      if (!onWorldSheet(z)) return null;
-      const n = el('span', '', 'wm-name'); n.dataset.zone = String(i); n.dataset.kind = z.players ? 'dungeon' : 'zone'; n.setAttribute('aria-hidden', 'true');
-      n.append(el('b', labelName(z)), el('small', ''));
-      stage.append(n); return n;
-    });
-    stage.append(el('div', 'Valhalla', 'wm-sheet-title'));
-    nameNodes = names; refreshFog();
+  function polygonPath(g, points) {
+    g.moveTo(points[0][0],points[0][1]);
+    for (const [x,y] of points.slice(1)) g.lineTo(x,y);
+    g.closePath();
   }
-  // The atlas is live SVG (ragged coasts come from filters), but filters are costly to redraw, so the sheet is baked once into a
-  // canvas and the SVG stays in the DOM, undrawn, as the structure the tests and tools read. It is baked again when the fog changes.
-  const ATLAS_CSS = '.wm-regions text{fill:#fff3cf;fill-opacity:.42;stroke:#0b2a3a;stroke-opacity:.35;stroke-width:.15;font-weight:700;font-family:Georgia,serif;letter-spacing:.5px}' +
-    '.wm-compass{fill:#eedbad;stroke:#0f3447;stroke-width:.3;opacity:.78}.wm-compass circle{fill:none;stroke:#eedbad;stroke-width:.25}.wm-compass .wm-compass-shadow{fill:#51828d}.wm-compass text{stroke:none;fill:#f6e7bd;font:bold 2.3px Georgia,serif}';
-  let bakeToken = 0, worldScroll = [0, 0];
+  function insidePolygon(points,x,y) {
+    let inside=false;
+    for(let i=0,j=points.length-1;i<points.length;j=i++) {
+      const a=points[i],b=points[j];
+      if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]) inside=!inside;
+    }
+    return inside;
+  }
+  function atlasPosition(index,x,y) {
+    const city=ATLAS.cities.find(c=>c.zone===index&&c.parent!==index);
+    if(city) return [city.at[0]+(x/zones[index].size-.5)*100,city.at[1]+(y/zones[index].size-.5)*100];
+    const a=LAYOUT[index];
+    if(a?.polygon) {
+      const r=PROVINCES.get(index),center=r.label||r.seed;
+      let p=[a.x+x/zones[index].size*a.w,a.y+y/zones[index].size*a.h];
+      for(let k=0;k<20&&!insidePolygon(r.polygon,...p);k++) p=[p[0]*.8+center[0]*.2,p[1]*.8+center[1]*.2];
+      return p;
+    }
+    const parent=parentOf(index),gate=zones[parent]?.portals.find(p=>p.to===index);
+    return gate ? atlasPosition(parent,gate.x,gate.y) : PROVINCES.get(parent).seed;
+  }
+  const atlasArt = new Image();
+  atlasArt.src = ATLAS.background;
+  atlasArt.addEventListener('load', () => { if ($('wm-world')?.querySelector('.wm-sea')) bakeAtlas(); });
   function bakeAtlas() {
-    const stage = $('wm-world'), svg = stage.querySelector('.wm-atlas'), canvas = stage.querySelector('.wm-sea'); if (!svg || !canvas) return;
-    const token = ++bakeToken, clone = svg.cloneNode(true);
-    clone.removeAttribute('class'); clone.removeAttribute('style'); clone.setAttribute('xmlns', NS); clone.setAttribute('width', canvas.width); clone.setAttribute('height', canvas.height);
-    clone.querySelectorAll('.wm-island[data-fog="full"]').forEach(n => n.setAttribute('fill', '#7f9a82'));
-    const style = document.createElementNS(NS, 'style'); style.textContent = ATLAS_CSS; clone.prepend(style);
-    const img = new Image();
-    img.onload = () => { if (token !== bakeToken) return; const g = canvas.getContext('2d'); g.clearRect(0, 0, canvas.width, canvas.height); g.drawImage(img, 0, 0, canvas.width, canvas.height); canvas.hidden = false; svg.style.display = 'none'; };
-    img.onerror = () => { if (token === bakeToken) { canvas.hidden = true; svg.style.display = ''; } };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
-  }
-  function placeNames(stage, names) {
-    const px = stage.clientWidth / STAGE.w, boxes = [], circles = zones.map((z, i) => onWorldSheet(z) ? { x: z.place.x + z.place.s / 2, y: z.place.y + z.place.s * tileY / 2, r: z.place.s / 2 } : null);
-    const hits = (b, c) => { const nx = Math.max(b.x, Math.min(c.x, b.x + b.w)), ny = Math.max(b.y, Math.min(c.y, b.y + b.h)); return Math.hypot(nx - c.x, ny - c.y) < c.r * .94; };
-    const clash = (b, q, pad = .3) => b.x < q.x + q.w + pad && q.x < b.x + b.w + pad && b.y < q.y + q.h && q.y < b.y + b.h;
-    const order = zones.map((z, i) => i).filter(i => names[i] && names[i].dataset.mute !== 'yes').sort((a, b) => (zones[a].players ? 1 : 0) - (zones[b].players ? 1 : 0));   // zones choose first
-    const keep = [{ x: 0, y: 0, w: 17, h: 19 }];                                    // the compass
-    for (const i of order) {
-      const n = names[i], c = circles[i], w = n.offsetWidth / px, h = n.offsetHeight / px, g = .35;
-      const options = [];
-      for (const k of [1, 2.6]) options.push({ x: c.x - w / 2, y: c.y + c.r + g * k }, { x: c.x - w / 2, y: c.y - c.r - g * k - h }, { x: c.x + c.r + g * k, y: c.y - h / 2 }, { x: c.x - c.r - g * k - w, y: c.y - h / 2 },
-        { x: c.x + c.r * .6 * k, y: c.y + c.r * .75 }, { x: c.x - c.r * .6 * k - w, y: c.y + c.r * .75 }, { x: c.x + c.r * .6 * k, y: c.y - c.r * .75 - h }, { x: c.x - c.r * .6 * k - w, y: c.y - c.r * .75 - h });
-      if (!zones[i].players) options.push({ x: c.x - w / 2, y: c.y + c.r * .42 }, { x: c.x - w / 2, y: c.y - h / 2 });   // last resorts: on the zone's own ground
-      let best = null;
-      options.forEach((o, rank) => {
-        const b = { x: o.x, y: o.y, w, h };
-        let cost = rank * .15 + (rank >= options.length - 2 && !zones[i].players ? 4 : 0);
-        if (b.x < .6 || b.y < .4 || b.x + w > STAGE.w - .6 || b.y + h > STAGE.h - .4) cost += 50;
-        circles.forEach((other, j) => { if (other && j !== i && hits(b, other)) cost += 10; });
-        for (const q of boxes) if (clash(b, q)) cost += 12;
-        for (const q of keep) if (clash(b, q, 0)) cost += 6;
-        if (!best || cost < best.cost) best = { cost, b };
-      });
-      n.hidden = zones[i].players && best.cost >= 10;            // a dungeon name with no room appears when its tile is hovered or focused
-      if (!n.hidden) boxes.push(best.b);
-      Object.assign(n.style, { left: `${best.b.x / STAGE.w * 100}%`, top: `${best.b.y / STAGE.h * 100}%` });
+    const cv=$('wm-world').querySelector('.wm-sea');if(!cv)return;
+    if(!atlasArt.complete||!atlasArt.naturalWidth){cv.hidden=true;return;}
+    const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);
+    g.drawImage(atlasArt,0,0,STAGE.w,STAGE.h);
+    for(const r of ATLAS.regions) {
+      const a=zones[r.zone].place;g.save();g.beginPath();polygonPath(g,r.polygon);g.clip();
+      if(!visited(r.zone)){g.fillStyle='#c2d3dfef';g.fillRect(a.x,a.y,a.w,a.h);}
+      else {const fog=document.createElement('canvas');fog.width=fog.height=220;window.Field.fog.paint(fog.getContext('2d'),220,220,r.zone);g.drawImage(fog,a.x,a.y,a.w,a.h);fog.width=fog.height=0;}
+      g.restore();
     }
-    // Region names sit in the roomiest sea near where each belongs; a name that finds no clear water is shortened, then left off.
-    const regions = [];
-    for (const r of REGIONS) {
-      let best = null, scale = 1;
-      for (const k of [1, .78]) {
-        const w = r.text.length * 2.2 * k, h = 2.8 * k; best = null;
-        for (let y = r.area[1] + 1; y < r.area[3] - 1 - h; y += 1) for (let x = r.area[0] + w / 2 + 1; x < r.area[2] - w / 2 - 1; x += 1) {
-          const b = { x: x - w / 2, y, w, h };
-          let clear = 99;
-          circles.forEach(c => { if (!c) return; const nx = Math.max(b.x, Math.min(c.x, b.x + w)), ny = Math.max(b.y, Math.min(c.y, b.y + h)); clear = Math.min(clear, Math.hypot(nx - c.x, ny - c.y) - c.r); });
-          for (const q of [...boxes, ...regions, ...keep]) { const dx = Math.max(q.x - (b.x + w), b.x - (q.x + q.w), 0), dy = Math.max(q.y - (b.y + h), b.y - (q.y + q.h), 0); clear = Math.min(clear, Math.hypot(dx, dy)); }
-          const score = Math.min(clear, 2.5) * 10 - Math.hypot(x - r.near[0], y - r.near[1]) * .12;
-          if (clear >= 1 && (!best || score > best.score)) best = { score, b };
-        }
-        scale = k; if (best) break;
+    cv.hidden=false;
+  }
+  let worldScroll=[0,0];
+  function buildWorld() {
+    const stage=$('wm-world');stage.replaceChildren();tiles=Array(zones.length).fill(null);nameNodes=Array(zones.length).fill(null);roadRefs=[];tileY=1;
+    const sea=el('canvas','','wm-sea');sea.width=STAGE.w;sea.height=STAGE.h;sea.setAttribute('aria-hidden','true');stage.append(sea);
+    const roads=svgNode('svg',{viewBox:`0 0 ${STAGE.w} ${STAGE.h}`,preserveAspectRatio:'none',class:'wm-roads','aria-hidden':'true'});
+    for(const link of ATLAS.links) {
+      const pair=[link.a,link.b].sort((a,b)=>a-b).join('-'),a=PROVINCES.get(link.a).seed,b=PROVINCES.get(link.b).seed;
+      const p=zones[link.a].portals.find(p=>p.to===link.b),back=zones[link.b].portals.find(p=>p.to===link.a);if(!p||!back)continue;
+      const road=svgNode('g',{'data-road':pair,'data-kind':'path',class:'wm-connection-path'});
+      // Paths meet at their shared province border rather than joining separate island tiles.
+      const dx=b[0]-a[0],dy=b[1]-a[1],n=Math.hypot(dx,dy),reach=26;
+      const bend=7;
+      const d=`M ${link.at[0]-dx/n*reach} ${link.at[1]-dy/n*reach} C ${link.at[0]-dy/n*bend} ${link.at[1]+dx/n*bend} ${link.at[0]+dy/n*bend} ${link.at[1]-dx/n*bend} ${link.at[0]+dx/n*reach} ${link.at[1]+dy/n*reach}`;
+      road.append(svgNode('path',{d,class:'wm-road-under',fill:'none'}),svgNode('path',{d,class:'wm-road',fill:'none'}));roads.append(road);
+      roadRefs.push({node:road,pair,shown:()=>known(link.a,p.x,p.y)||known(link.b,back.x,back.y)});
+    }
+    stage.append(roads);
+    for(const r of ATLAS.regions) {
+      const i=r.zone,z=zones[i],{x,y,w,h}=z.place,tile=el('button','','wm-tile');tile.type='button';tile.dataset.zone=String(i);tile.dataset.theme=z.theme;tile.dataset.branch=z.players?'dungeon':z.city&&!z.slimes.length?'city':'wild';
+      Object.assign(tile.style,{left:`${x/STAGE.w*100}%`,top:`${y/STAGE.h*100}%`,width:`${w/STAGE.w*100}%`,height:`${h/STAGE.h*100}%`,clipPath:'polygon('+r.polygon.map(p=>`${(p[0]-x)/w*100}% ${(p[1]-y)/h*100}%`).join(',')+')'});
+      tile.setAttribute('aria-label',`${r.name}. Open its map`);
+      const hidden=el('span','','wm-tile-label');hidden.append(el('b',r.name),el('small',rangeText(z)));tile.append(hidden);
+      const you=el('i','','wm-you');you.hidden=true;tile.append(you);tile.addEventListener('click',()=>zoomTo(i));stage.append(tile);tiles[i]=tile;
+      const name=el('button','','wm-name');name.type='button';name.dataset.zone=String(i);name.dataset.kind='zone';
+      name.append(el('b',r.name.replace(/^The /,'')),el('small',rangeText(z)));name.addEventListener('click',()=>zoomTo(i));
+      const point=r.label||r.seed;Object.assign(name.style,{left:`${point[0]/STAGE.w*100}%`,top:`${point[1]/STAGE.h*100}%`});stage.append(name);nameNodes[i]=name;
+    }
+    for(const city of ATLAS.cities) {
+      const b=el('button','','wm-city');b.type='button';b.dataset.zone=String(city.zone);b.dataset.parent=String(city.parent);b.setAttribute('aria-label',`${city.label}. Open its map`);
+      b.append(el('span','', 'wm-city-ring'),el('b',city.label));
+      Object.assign(b.style,{left:`${city.at[0]/STAGE.w*100}%`,top:`${city.at[1]/STAGE.h*100}%`});
+      b.addEventListener('click',()=>{renderZone(city.zone);setView('zone');$('wm-back').focus();});stage.append(b);
+    }
+    buildEntrances(stage);refreshFog();
+  }
+  function parentOf(index) {
+    // Interiors may be nested (the Seed Vault is inside Heartwood).
+    const seen = new Set();
+    while (!PROVINCES.has(index) && !seen.has(index)) {
+      seen.add(index);
+      const city=ATLAS.cities.find(c=>c.zone===index&&c.parent!==index);
+      if(city){index=city.parent;continue;}
+      const parent = zones.findIndex((z, i) => i !== index && !z.players && z.portals.some(p => p.to === index));
+      if (parent < 0) break;
+      index = parent;
+    }
+    return index;
+  }
+  function buildEntrances(stage) {
+    const entries=[];
+    zones.forEach((z,source)=>{
+      if(z.players||z.theme==='arena')return;
+      for(const p of z.portals)if(isInterior(zones[p.to])&&!zones[p.to].sealedTemplate) entries.push({source,p,parent:parentOf(source)});
+    });
+    for(const {source,p,parent} of entries) {
+      if(!PROVINCES.has(parent))continue;
+      const marker=el('button','◆','wm-entrance');marker.type='button';marker.dataset.parent=String(parent);marker.dataset.source=String(source);marker.dataset.portal=p.id;marker.dataset.to=String(p.to);
+      marker.title=zones[p.to].name;marker.setAttribute('aria-label',`${zones[p.to].name}. Open its map`);
+      marker.addEventListener('click',()=>{renderZone(p.to);setView('zone');$('wm-back').focus();});stage.append(marker);
+    }
+    layoutEntrances(stage);
+    document.fonts.ready.then(()=>{if(stage.isConnected)layoutEntrances(stage);});
+  }
+  function layoutEntrances(stage) {
+    const frame=stage.getBoundingClientRect(),scale=frame.width/STAGE.w;if(!scale)return;
+    const occupied=[...stage.querySelectorAll('.wm-name,.wm-city,.wm-city b')].map(n=>{
+      const b=n.getBoundingClientRect();return{x:(b.left-frame.left)/scale,y:(b.top-frame.top)/scale,w:b.width/scale,h:b.height/scale};
+    }).filter(b=>b.w&&b.h);
+    for(const marker of stage.querySelectorAll('.wm-entrance')) {
+      const source=+marker.dataset.source,p=zones[source].portals.find(p=>p.id===marker.dataset.portal),region=PROVINCES.get(+marker.dataset.parent);
+      const hidden=marker.hidden;marker.hidden=false;const size=marker.getBoundingClientRect().width/scale;marker.hidden=hidden;
+      const target=atlasPosition(source,p.x,p.y),pad=size/2+2;
+      const [x,y,w,h]=region.box,candidates=[];
+      for(let py=y;py<=y+h;py+=6)for(let px=x;px<=x+w;px+=6) {
+        if(!insidePolygon(region.polygon,px,py))continue;
+        if(occupied.some(b=>px+pad>b.x&&px-pad<b.x+b.w&&py+pad>b.y&&py-pad<b.y+b.h))continue;
+        candidates.push([px,py]);
       }
-      const t = stage.querySelector(`[data-region="${r.text}"]`);
-      if (best) regions.push(best.b);
-      if (t) { t.setAttribute('visibility', best ? 'visible' : 'hidden'); t.style.fontSize = `${2.4 * scale}px`; if (best) { t.setAttribute('x', best.b.x + best.b.w / 2); t.setAttribute('y', best.b.y + best.b.h * .8); } }
+      candidates.sort((a,b)=>Math.hypot(a[0]-target[0],a[1]-target[1])-Math.hypot(b[0]-target[0],b[1]-target[1]));
+      const at=candidates[0]||target;Object.assign(marker.style,{left:`${at[0]/STAGE.w*100}%`,top:`${at[1]/STAGE.h*100}%`});
+      occupied.push({x:at[0]-size/2,y:at[1]-size/2,w:size,h:size});
     }
-    bakeAtlas();
   }
-  // Repaint everything the fog touches on the world sheet. Cheap, and only runs when the saved masks change.
+
   function refreshFog() {
-    fogSignature = JSON.stringify(window.Field.explored);
-    roadRefs.forEach(r => r.node.setAttribute('visibility', r.shown() ? 'visible' : 'hidden'));
-    zones.forEach((z, i) => {
-      const island = $('wm-world').querySelector(`.wm-island[data-zone="${i}"]`);
-      if (island) island.dataset.fog = visited(i) ? 'partial' : 'full';
-    });
-    zones.forEach((z, i) => {
-      if (!onWorldSheet(z)) return;
-      const tile = tiles[i], g = tile.querySelector('.wm-tile-fog').getContext('2d'), unseen = !visited(i);
-      g.clearRect(0, 0, 220, 220); window.Field.fog.paint(g, 220, 220, i);
-      tile.disabled = unseen; tile.dataset.fog = unseen ? 'full' : 'partial';
-      tile.querySelector('b').textContent = unseen ? 'Unexplored' : z.name;
-      tile.querySelector('b').dataset.short = unseen ? '?' : z.place.s < 8 ? String(i) : shortName(z.name);
-      tile.querySelector('small').textContent = unseen ? 'Not yet visited' : `${rangeText(z)} · ${charted(i)}/${CELLS} charted`;
-      tile.setAttribute('aria-label', unseen ? 'Unexplored zone' : `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}, ${charted(i)} of ${CELLS} places charted${travelMasters(z).length ? `, ${travelMasters(z).length} travel master${travelMasters(z).length === 1 ? '' : 's'}` : ''}. Open its map`);
-      const name = nameNodes[i];
-      if (name) {
-        name.dataset.fog = unseen ? 'full' : 'partial'; name.dataset.mute = unseen && z.players ? 'yes' : 'no';     // an unvisited dungeon has no name to give yet
-        name.querySelector('b').textContent = unseen ? 'Unexplored' : labelName(z);
-        name.querySelector('small').textContent = unseen || z.players ? '' : rangeText(z);
-      }
-      for (const decor of $('wm-world').querySelectorAll(`.wm-decor[data-zone="${i}"]`)) decor.setAttribute('visibility', unseen ? 'hidden' : 'visible');
-    });
-    if (nameNodes.length) placeNames($('wm-world'), nameNodes);
+    fogSignature=JSON.stringify(window.Field.explored);
+    for(const r of roadRefs)r.node.setAttribute('visibility',r.shown()?'visible':'hidden');
+    for(const r of ATLAS.regions) {
+      const i=r.zone,z=zones[i],unseen=!visited(i),tile=tiles[i],name=nameNodes[i];
+      tile.disabled=unseen;tile.dataset.fog=unseen?'full':'partial';tile.setAttribute('aria-label',unseen?'Unexplored zone':`${r.name}. Open its map`);
+      tile.querySelector('b').textContent=unseen?'Unexplored':r.name;
+      name.disabled=unseen;name.dataset.fog=unseen?'full':'partial';name.querySelector('b').textContent=unseen?'Unexplored':r.name.replace(/^The /,'');name.querySelector('small').textContent=unseen?'Not yet visited':rangeText(z);
+    }
+    for(const city of $('wm-world').querySelectorAll('.wm-city')) {
+      const index=+city.dataset.zone;city.hidden=!visited(+city.dataset.parent)&&!visited(index);
+    }
+    for(const marker of $('wm-world').querySelectorAll('.wm-entrance')) {
+      const source=+marker.dataset.source,p=zones[source].portals.find(p=>p.id===marker.dataset.portal);marker.hidden=!known(source,p.x,p.y);
+    }
+    bakeAtlas();layoutEntrances($('wm-world'));
   }
 
   // ---------- zone view ----------
@@ -620,11 +556,10 @@
     g.globalAlpha = 1;
   }
   const pos = (z, x, y) => ({ left: `${x / z.size * 100}%`, top: `${y / z.size * 100}%` });
-  // On the world sheet a zone is a round tile, so a hero standing in a corner of a square zone is drawn at the rim, not beyond it.
-  const youPos = (z, x, y) => {
-    let dx = x / z.size - .5, dy = y / z.size - .5; const d = Math.hypot(dx, dy);
-    if (d > .44) { dx *= .44 / d; dy *= .44 / d; }
-    return { left: `${(.5 + dx) * 100}%`, top: `${(.5 + dy) * 100}%` };
+  // Overview coordinates stay inside the province's organic border; detail maps remain exact.
+  const youPos = (z,x,y) => {
+    const [wx,wy]=atlasPosition(zones.indexOf(z),x,y),a=z.place;
+    return {left:`${(wx-a.x)/a.w*100}%`,top:`${(wy-a.y)/a.h*100}%`};
   };
   function renderZone(index) {
     if (current !== index) selectedPerson = null;
@@ -635,12 +570,12 @@
     const markers = $('wm-markers'); markers.replaceChildren();
     for (const p of z.portals) {
       const dest = zones[p.to]; if (!dest || !known(index, p.x, p.y)) continue;
-      const gate = el('button', '', 'wm-gate'); gate.type = 'button'; gate.dataset.portal = p.id; gate.dataset.to = String(p.to); gate.style.setProperty('--glow', PORTAL[dest.theme]);
+      const gate = el('button', '', 'wm-gate'); gate.type = 'button'; gate.classList.toggle('wm-path-gate',!!p.walk); gate.dataset.portal = p.id; gate.dataset.to = String(p.to); gate.style.setProperty('--glow', PORTAL[dest.theme]);
       Object.assign(gate.style, pos(z, p.x, p.y));
       gate.classList.toggle('low', p.y / z.size > .85); gate.classList.toggle('right', p.x / z.size > .72); gate.classList.toggle('high', p.y / z.size < .08);
       const near = z.portals.find(o => o !== p && known(index, o.x, o.y) && Math.hypot(o.x - p.x, o.y - p.y) < z.size * .14);   // close gates put their labels on opposite sides
       if (near) gate.classList.add(p.x < near.x ? 'west' : 'east');
-      const away = visited(p.to);
+      const away = visited(p.to) || isInterior(dest);
       gate.append(el('span', away ? `to ${dest.name}` : 'to unexplored lands', 'wm-gate-label'));
       gate.setAttribute('aria-label', away ? `${p.name}, leads to ${dest.name}. Open its map` : `${p.name}, leads to unexplored lands`);
       if (!away) { gate.disabled = true; gate.dataset.unexplored = 'true'; }
@@ -726,12 +661,12 @@
   function side(z) {
     const box = $('wm-side'); box.replaceChildren();
     box.append(el('h4', z.name, 'wm-side-name'), el('p', z.tagline || BLURB[z.theme] || '', 'wm-side-blurb'));
-    directory(z, box);
+    if (visited(current)) directory(z, box);
     const facts = el('ul', '', 'wm-facts');
     facts.append(el('li', z.range ? (z.players ? `Dungeon for ${z.players} players of level ${z.range[0]}` : `Recommended levels ${z.range[0]}–${z.range[1]}`) : 'No enemies inside the walls'));
     facts.append(el('li', `Charted ${charted(current)} of ${CELLS} places`, 'wm-charted'));
     const path = route(window.Field.zone || 0, current);
-    facts.append(el('li', path.length === 1 ? 'You are here' : path.length ? `Route: ${path.map(i => zones[i].name).join(' → ')}` : 'No charted portal route yet', 'wm-route-text'));
+    facts.append(el('li', path.length === 1 ? 'You are here' : path.length ? `Route: ${path.map(i => zones[i].name).join(' → ')}` : 'No charted route yet', 'wm-route-text'));
     for (const c of [z.city, ...(z.camps || [])].filter(Boolean)) if (known(current, c.plaza.x, c.plaza.y)) facts.append(el('li', `${c.name}: sanctuary${z.camps?.length ? '' : `, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`}`));
     if (z.camps?.length) facts.append(el('li', `${(z.quests || []).length} quests across ${1 + z.camps.length} hubs`));
     box.append(facts);
@@ -763,7 +698,7 @@
     }
     const seenGates = z.portals.filter(p => zones[p.to] && known(current, p.x, p.y));
     if (seenGates.length) {
-      box.append(el('h5', 'Gates', 'wm-side-title'));
+      box.append(el('h5', 'Routes & entrances', 'wm-side-title'));
       const list = el('ul', '', 'wm-gates');
       seenGates.forEach(p => {
         const row = el('li'), b = el('button', `${p.name[0].toUpperCase()}${p.name.slice(1)} → ${visited(p.to) ? zones[p.to].name : 'unexplored lands'}`, 'window-tool'); b.type = 'button'; b.dataset.to = String(p.to); b.disabled = !visited(p.to);
@@ -797,12 +732,13 @@
     if (!open()) return;
     if (window.Field?.hero?.dead || !window.Online?.connected) { close(); return; }
     if (JSON.stringify(window.Field.explored) !== fogSignature) { refreshFog(); if (view === 'zone') renderZone(current); }
-    const hero = window.Field.hero, here = window.Field.zone || 0;
+    const hero = window.Field.hero, here = window.Field.zone || 0, parent = parentOf(here);
     zones.forEach((z, i) => {
       const you = tiles[i]?.querySelector('.wm-you'); if (!you) return;
       you.hidden = i !== here; if (i === here) Object.assign(you.style, youPos(z, hero.x, hero.y));
-      tiles[i].dataset.here = String(i === here); if (nameNodes[i]) nameNodes[i].dataset.here = String(i === here);
+      tiles[i].dataset.here = String(i === parent); if (nameNodes[i]) nameNodes[i].dataset.here = String(i === parent);
     });
+    for (const marker of $('wm-world').querySelectorAll('.wm-entrance,.wm-city')) marker.dataset.here = String(Number(marker.dataset.to ?? marker.dataset.zone) === here);
     if (view !== 'zone') return;
     updateQuestMarkers();
     const z = zones[current], me = $('wm-markers').querySelector('.wm-me');
@@ -830,7 +766,7 @@
     setView('zone'); $('wm-back').focus();
   }
   function toWorld() {
-    setView('world'); tiles[current]?.focus({ preventScroll: true });
+    setView('world'); (document.querySelector(`.wm-city[data-zone="${current}"]`) || document.querySelector(`.wm-entrance[data-to="${current}"]`) || tiles[current])?.focus({ preventScroll: true });
   }
   const open = () => !$('worldmap').hidden;
   function canShow() {
@@ -843,7 +779,7 @@
     window.Field.setPaused(true); $('worldmap').hidden = false;
     if (!tiles.length) buildWorld(); else if (JSON.stringify(window.Field.explored) !== fogSignature) refreshFog();
     setView('world');
-    const here = window.Field.zone || 0, tile = tiles[here] || tiles[0], body = $('wm-body');
+    const here = window.Field.zone || 0, tile = tiles[parentOf(here)] || tiles[0], body = $('wm-body');
     tile.focus({ preventScroll: true });
     body.scrollLeft = Math.max(0, tile.offsetLeft + tile.offsetWidth / 2 - body.clientWidth / 2);
     body.scrollTop = Math.max(0, tile.offsetTop + tile.offsetHeight / 2 - body.clientHeight / 2);
@@ -894,6 +830,6 @@
     show, close, get open() { return open(); }, get view() { return view; }, get zone() { return current; },
     reset() { close(false); },
     // For the tests: the layout and kind table the map was written against.
-    _layout: LAYOUT, _kinds: KINDS, get _graph() { load(); return graph; }, _route: route,
+    _layout: LAYOUT, _parent: parentOf, _kinds: KINDS, get _graph() { load(); return graph; }, _route: route,
   };
 })();

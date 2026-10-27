@@ -150,5 +150,6 @@
   "Retry-After",
   "(pointer: coarse)",
   "button:not(:disabled), summary",
-  "wm-connection-{0}"
+  "wm-connection-{0}",
+  "bold 25px Georgia"
 ]

@@ -7309,5 +7309,9 @@
   "Emberwake": "Glödvaket",
   "Chained Forge": "Fjättrade smedjan",
   "Longship": "Långskeppet",
-  "Black Hour": "Svarta timmen"
+  "Black Hour": "Svarta timmen",
+  "Scroll to explore · Gold: paths · Blue: portals · Purple: entrance maps": "Rulla för att utforska · Guld: stigar · Blått: portaler · Lila: kartor över ingångar",
+  "Scroll to explore · Gold: walking paths · Purple: entrance maps": "Rulla för att utforska · Guld: gångvägar · Lila: kartor över ingångar",
+  "No charted route yet": "Ingen kartlagd rutt ännu",
+  "Routes & entrances": "Vägar och ingångar"
 }

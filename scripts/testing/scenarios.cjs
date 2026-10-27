@@ -4552,3 +4552,5 @@ scenarios.raid_packs = require('./raid-packs-scenario.cjs')(kit,map);
 scenarios.raid_release = require('./raid-release-scenario.cjs')(kit, map);
 
 scenarios.raid_key = require('./raid-key-scenario.cjs')(kit,map);
+
+scenarios.walkways = require('./walkways-scenario.cjs')(kit,map);
