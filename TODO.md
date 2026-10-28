@@ -8,6 +8,14 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Elite target frame (owner's request, 2026-10-28)
+
+- [ ] `ELITE-DRAGON-FRAME` — Give selected elite enemies an ornate golden dragon frame around their target portrait. Make the elite status visually striking while keeping the enemy name, level and health readable. Scale with the existing HUD and check elite/non-elite selection changes at desktop and touch sizes when implemented.
+
+### Real combat and enemy sounds (owner's request, 2026-10-28)
+
+- [ ] `REAL-COMBAT-SOUNDS` — Source and integrate real/recorded combat sound effects and enemy sounds, including attacks, impacts, hurt and death. Add a Settings toggle between the new sounds and the existing synthesized sounds; keep the synthesized set fully available. Save the player's choice and respect the existing sound volume and mute controls. Add Swedish labels and focused private checks for both sound modes and saved preferences when implemented.
+
 ### Rested (owner's request, 2026-10-28)
 
 - [x] `RESTED-RULES` — `docs/rested.md`: 5% per offline hour, capped at 200% after 40 hours; +200% base XP. Owner confirmed all XP including quests, and a reserve of bonus XP where 100% equals one level and only bonus XP consumes it. Per-character reserve, additive with existing bonuses; new characters start empty; legacy characters accrue from the persistent feature-installation timestamp, without invented earlier offline history.
