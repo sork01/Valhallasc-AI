@@ -64,6 +64,10 @@ Decisions were made in two rounds on 2026-10-22 (recorded in TODO.md under `DEAT
   a healthy equipped copy stays clear even if a spare is broken. The overlay
   does not intercept clicks, drag actions or tooltips and disappears on repair.
 - The Inspect window is not changed (the whitelist packet carries no wear).
+- Beta 1.31.2 gear tooltip comparisons use the displayed copy's rolls and rank
+  against the copy worn in the destination slot; broken copies contribute zero.
+  Each positive change is green, each negative change red, and zero stays neutral.
+  The destination follows the equip action, including an empty second ring slot.
 - The GM test menu hands out the gauntlet gear sets (`gear_set`: ordinary rarities, not rarity `gm`), so deaths during GM dungeon tests wear and can break that gear; repair it at a smith or hand the set out again.
 
 ## Checks

@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.31.2",
+    "date": "2026-10-28",
+    "new": [],
+    "changed": [
+      "Enemy names fade from grey at five or more levels below you to green at your level, then through yellow and orange to red more than five levels above you. The selected enemy uses the same colors.",
+      "Gear comparisons show each stat gain in green and each loss in red, including rolls, upgrade ranks and broken gear. Empty slots and both ring slots are taken into account.",
+      "Merchants with available quests, turn-ins or quests in progress open their quest and service options before the shop."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.31.1",
     "date": "2026-10-28",
     "new": [

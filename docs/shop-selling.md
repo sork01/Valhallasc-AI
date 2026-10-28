@@ -14,6 +14,11 @@ slots, with ten items per page, bag artwork, names, gold prices and tooltips.
 The header uses the NPC renderer to crop a circular portrait, not new artwork.
 **Quests / services** returns to the NPC's ordinary gossip/services.
 
+Beta 1.31.2: opening a merchant with an available quest, a ready turn-in or a
+quest in progress starts at quests/services. The shop remains reachable from
+that greeting. Merchants with only locked or completed quests still open their
+shop directly. Purchases and sales keep an already-open shop in place.
+
 Click a loose bag item or drag it onto the merchant to sell its stack/copy.
 The server's available list selects the exact next loose copy, excluding worn
 copies, starter/GM gear, quest items and bound licences. The bag tooltip shows

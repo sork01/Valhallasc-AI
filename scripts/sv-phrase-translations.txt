@@ -1,4 +1,10 @@
 {
+  "{0} strength": "{0} styrka",
+  "{0} agility": "{0} smidighet",
+  "{0} intellect": "{0} intelligens",
+  "{0} stamina": "{0} uthållighet",
+  "{0} dexterity": "{0} fingerfärdighet",
+  "{0} accuracy": "{0} precision",
   "+{0} attack, +{1} defense": "+{0} attack, +{1} försvar",
   "+{0}% crit ({1}% cap)": "+{0} % kritisk ({1} % tak)",
   ", +{0} maximum mana": ", +{0} maximal mana",

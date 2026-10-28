@@ -580,13 +580,14 @@
     window.Quests?.close(false);
     const same=current?.id===packet.npc.id;
     previousFocus=current?previousFocus:document.activeElement;current=packet.npc;
+    window.Quests?.update(packet.quests || [], packet.abandonedQuests);
+    const hasQuests=!!window.Quests?.offered(packet.npc.id).length;
     // Selling keeps its list open between sales; every other reply (accepting, a purchase) returns to the greeting.
     if(accepting)view={kind:'quest',id:accepting};
-    else if(!same)view={kind:packet.npc.buys||packet.npc.offers?.some(o=>o.item||o.bag)?'merchant':'gossip'};
+    else if(!same)view={kind:!hasQuests&&(packet.npc.buys||packet.npc.offers?.some(o=>o.item||o.bag))?'merchant':'gossip'};
     else if(!['merchant','sell','merge','refine','repair','bags','stat_reset'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
     window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
-    window.Quests?.update(packet.quests || [], packet.abandonedQuests);
     if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }

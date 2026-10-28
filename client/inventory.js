@@ -55,6 +55,10 @@
   const wornCopy = (slot, i) => copiesOf(i)[slots.filter(([s]) => s !== slot && itemAtSlot(s)?.id === i?.id && slots.findIndex(([key]) => key === s) < slots.findIndex(([key]) => key === slot)).length];
   const displayCopy = (i, slot) => slot ? wornCopy(slot, i) : looseCopy(i);
   const displayRarity = (i, slot) => displayCopy(i, slot)?.rarity || i?.rarity || 'common';
+  const equipTarget = i => {
+    const targets = slots.filter(([s]) => slotKind(s) === i.kind).map(([s]) => s);
+    return targets.find(s => !itemAtSlot(s)) || targets.find(s => itemAtSlot(s)?.id !== i.id) || targets[0];
+  };
   // The colour of a cell holding `copies` of `i` (an epic copy shows first, as in the bags).
   const bestRarity = (i, copies) => (copies.find(g => g.rarity === 'epic') || copies[0])?.rarity || i?.rarity || 'common';
   // What the bank window needs of the bags: the loose units (worn ones stay on the hero) and the loose gear copies.
@@ -68,6 +72,7 @@
   const wearNote = g => !indestructible(g) && g?.wear ? ` · ${durabilityOf(g)}% durability` : '';
   const conditionText = g => durabilityOf(g) <= 0 ? 'Broken · no stats until repaired' : `Durability ${durabilityOf(g)}%`;
   const copyStats = copy => { const g = indestructible(copy) ? { ...copy, ...levelStats(definition(copy.item)), rank: 0 } : copy; return ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) }); };
+  const comparisonStats = (i, copy) => conditionState(copy) === 'broken' ? {} : copy ? copyStats(copy) : levelStats(i) || {};
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
   const setEntry = i => i?.kind !== 'cloak' && i?.source && window.WORLD_SET_BONUSES?.entries.find(row => row.source === i.source && row.class === look?.class);
@@ -155,12 +160,24 @@
     const weaponFeature = window.RaidRewards?.tooltip(i);
     if (weaponFeature) t.append(node('p', weaponFeature, 'weapon-feature'));
     if (compatible(i) && !slot) {
-      const target = slots.find(([s]) => slotKind(s) === i.kind)?.[0], current = target && itemAtSlot(target);
-      if (current && current.id !== i.id) {
-        const candidate = levelStats(i), worn = levelStats(current);
-        const attack = num((candidate.attack || 0) - (worn.attack || 0)), defense = num((candidate.defense || 0) - (worn.defense || 0));
-        const bonus = statNames.map(stat => ({ stat, delta: (candidate.bonusStats?.[stat] || 0) - (worn.bonusStats?.[stat] || 0) })).filter(v => v.delta).map(v => `${v.delta > 0 ? '+' : ''}${v.delta} ${v.stat}`).join(' · ');
-        t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense${bonus ? ` · ${bonus}` : ''}`, 'item-comparison'));
+      const target = equipTarget(i), current = target && itemAtSlot(target);
+      if (target && current?.id !== i.id) {
+        const candidate = comparisonStats(i, copy), worn = comparisonStats(current, current && wornCopy(target, current));
+        const changes = ['attack', 'defense', ...statNames].map(stat => ({ stat, delta: num(
+          statNames.includes(stat) ? (candidate.bonusStats?.[stat] || 0) - (worn.bonusStats?.[stat] || 0) : (candidate[stat] || 0) - (worn[stat] || 0)
+        ) })).filter(({ stat, delta }) => delta || stat === 'attack' || stat === 'defense');
+        const line = node('p', '', 'item-comparison');
+        line.append(node('span', `Compared with ${current?.name || 'Empty slot'}:`), ' ');
+        changes.forEach(({ stat, delta }, index) => {
+          if (index) line.append(' · ');
+          const signed = `${delta >= 0 ? '+' : ''}${delta}`;
+          const text = { attack: `${signed} attack`, defense: `${signed} defense`, strength: `${signed} strength`, agility: `${signed} agility`,
+            intellect: `${signed} intellect`, stamina: `${signed} stamina`, dexterity: `${signed} dexterity`, accuracy: `${signed} accuracy` }[stat];
+          const change = node('span', text, delta > 0 ? 'stat-gain' : delta < 0 ? 'stat-loss' : 'stat-unchanged');
+          change.dataset.stat = stat;
+          line.append(change);
+        });
+        t.append(line);
       }
     }
     if (classGear(i)) {
@@ -196,8 +213,7 @@
   }
   function equip(i, slot) {
     if (!compatible(i) || !canEquip() || bagQuantity(i.id) < 1 || tooLow(i)) return false;
-    const targets = slots.filter(([s]) => slotKind(s) === i.kind).map(([s]) => s);
-    slot ||= targets.find(s => !itemAtSlot(s)) || targets.find(s => itemAtSlot(s)?.id !== i.id) || targets[0];
+    slot ||= equipTarget(i);
     if (!slot || slotKind(slot) !== i.kind) return false;
     return Field.equipSlot(slot, i.id);
   }

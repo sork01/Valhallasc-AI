@@ -1,4 +1,10 @@
 {
+  "{0} strength": "{0} styrka",
+  "{0} agility": "{0} smidighet",
+  "{0} intellect": "{0} intelligens",
+  "{0} stamina": "{0} uthållighet",
+  "{0} dexterity": "{0} fingerfärdighet",
+  "{0} accuracy": "{0} precision",
   " Received {0}.": " Fick {0}.",
   " You earned the {0}! Press ‹mount› to mount.": " Du har förtjänat {0}! Tryck på ‹mount› för att sitta upp.",
   " · Equipped ×{0}": " · Utrustad ×{0}",
@@ -21,6 +27,7 @@
   "Cap {0}": "Tak {0}",
   "Capstone: {0}": "Slutsten: {0}",
   "Charted {0} of {1} places": "{0} av {1} platser kartlagda",
+  "Compared with {0}:": "Jämfört med {0:t}:",
   "Completed ({0})": "Slutförda ({0})",
   "Copy #{0} · {1}": "Exemplar #{0} · {1}",
   "Cost: {0} gold and {1} {2} (owned: {3}).": "Kostnad: {0} guld och {1} {2} (du har: {3}).",

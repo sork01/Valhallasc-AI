@@ -894,8 +894,15 @@
   if(SLIME.ember_firelord) SLIME.ember_firelord.scale=1.5;
   for (const e of CATHEDRAL_ENEMIES.filter(e => e.kind.startsWith('es_foe_'))) SLIME[e.kind].scale = e.artFrom === 'cf_eldmarr' ? 1.65 : 1.1;
   const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = [...VAULT_KINDS.slice(3), 'tideglass_heron','hourpetal_stag','moonskein_weaver','moonwell_echo', ...CATHEDRAL_ENEMIES.filter(e => e.boss).map(e => e.kind)];
-  // Colour a level label by how it compares with the hero: grey, normal, orange, red.
-  const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
+  // Grey at five levels below, green at equal level, yellow in between green and red (six above).
+  const levelColor = (level, playerLevel = hero?.level || 1) => {
+    const d = Math.max(-5, Math.min(6, (level ?? playerLevel) - playerLevel));
+    const stops = [[-5, [160, 160, 160]], [0, [74, 214, 109]], [3, [255, 224, 102]], [6, [255, 107, 107]]];
+    const end = stops.findIndex(([at]) => at >= d);
+    if (!end) return '#a0a0a0';
+    const [from, a] = stops[end - 1], [to, b] = stops[end], t = (d - from) / (to - from);
+    return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  };
   function newHero() {
     return { x: SPAWN.x, y: SPAWN.y, r: .3, hp: 120, maxHp: 120, level: 1, xp: 0, gold: 0, kills: 0, fx: 1, fy: 1, moving: false, walk: 0, atkT: 0, atkCd: 0, atkHit: false, hurtT: 0, lastHurt: -99, dead: false, deadT: 0, target: null, goal: null, vx: 0, vy: 0, roar: 0, dashT: 0, dashCd: 0, dashX: 0, dashY: 0, dashTrail: 0 };
   }
@@ -4372,6 +4379,7 @@
     bubbleBox(id) { return bubbles.get(id)?.box || null; },
     bubbleDrawn() { return bubblesLast; },
     enemyName(kind) { return SLIME[kind]?.name || null; },
+    enemyLevelColor: levelColor,
     drawTargetPortrait,
     // The class sprite for any look, loaded like a remote player's (the inspect window draws it).
     loadSprite: look => classSprite(look).load(look, { background: true }),

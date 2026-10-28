@@ -645,6 +645,9 @@
     if (target) {
       $('hud-target-name').textContent = target.name;
       $('hud-target-level').textContent = ` Lv ${target.level}`;
+      const targetColor = target.player ? '' : Field.enemyLevelColor(target.level, s.level);
+      $('hud-target-name').style.color = targetColor;
+      $('hud-target-level').style.color = targetColor;
       $('hud-target-fill').style.width = `${Math.max(0, Math.min(100, target.hp / target.maxHp * 100))}%`;
       $('hud-target-text').textContent = `${Math.min(wholeHp(target.hp), wholeMax(target.maxHp))} / ${wholeMax(target.maxHp)}`;
       $('hud-target-hp').setAttribute('aria-valuenow', wholeHp(target.hp));
