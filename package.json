@@ -28,6 +28,7 @@
     "test:nightmusic": "node tests/night-music-ui.cjs",
     "test:weather": "node tests/weather-ui.cjs",
     "test:sound": "node tests/levelup-sound.cjs && node tests/combat-sound.cjs",
+    "test:combat-feedback": "bash scripts/test-touch-bounded.sh tests/combat-feedback-ui.cjs",
     "test:damage-numbers": "node tests/damage-numbers.cjs && node tests/damage-numbers-ui.cjs",
     "test:arrow-aim": "node tests/hunter-arrow-aim-ui.cjs",
     "test:swedish": "python3 scripts/build_swedish.py --check && python3 tests/swedish-catalog.py && node tests/swedish-locale.cjs && node tests/swedish-ui.cjs && node tests/swedish-layout-ui.cjs",

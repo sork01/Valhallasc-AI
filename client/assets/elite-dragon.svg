@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="gold" x1="20" y1="8" x2="104" y2="118" gradientUnits="userSpaceOnUse"><stop stop-color="#fff2ac"/><stop offset=".3" stop-color="#d99c28"/><stop offset=".55" stop-color="#ffe899"/><stop offset=".8" stop-color="#a76413"/><stop offset="1" stop-color="#f7ca61"/></linearGradient>
+  </defs>
+  <!-- A single winged dragon coils around the portrait, with its head above the right shoulder. -->
+  <circle cx="62" cy="65" r="45" stroke="#3d260f" stroke-width="12"/>
+  <circle cx="62" cy="65" r="45" stroke="url(#gold)" stroke-width="8"/>
+  <circle cx="62" cy="65" r="40" stroke="#fff2b6" stroke-width="1.2" opacity=".8"/>
+  <path d="M34 29 14 13 18 29 5 25 14 40 4 42 20 53 27 43Z" fill="url(#gold)" stroke="#4d2e0c" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="m17 23 12 15-12-4m-5 9 12 3" stroke="#895014" stroke-width="1.8"/>
+  <path d="M25 41C4 65 10 94 35 109c24 15 54 5 62-3-24 13-48 5-53-3" stroke="#4d2e0c" stroke-width="11" stroke-linecap="round"/>
+  <path d="M25 41C4 65 10 94 35 109c24 15 54 5 62-3-24 13-48 5-53-3" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+  <path d="m17 62 5 3m-6 10 6 1m-3 12 6-2m1 13 4-4m6 12 3-5m9 10 1-6m11 7-1-6" stroke="#865017" stroke-width="2"/>
+  <!-- Brow, swept horns, hooked snout, jaw and tiny ivory fangs. -->
+  <path d="m76 25 3-16 8 13 9-17 1 19 12-9-4 17 12 6-2 11-10 3-3 13-8-4 2-13-13-4-10-11Z" fill="url(#gold)" stroke="#4d2e0c" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="m84 27 10 3 4 8 12 2-7 4-11-3-3-6-9-2" stroke="#fff0ae" stroke-width="2.3" stroke-linecap="round"/>
+  <path d="m104 50-1 6-4-5m14-4-2 5-3-3" fill="#fff4cf" stroke="#87541b" stroke-width=".8"/>
+  <path d="m88 32 9 3-6 5Z" fill="#391e0c"/><path d="m91 34 4 1-3 2Z" fill="#ff7236"/>
+  <path d="m112 39 2 2" stroke="#4d2e0c" stroke-width="2" stroke-linecap="round"/>
+  <path d="M83 43c4 8 9 12 15 14l-4 8-8-5 2-7-9-4" fill="url(#gold)" stroke="#4d2e0c" stroke-width="2"/>
+  <path d="m83 74 9-1 2 8-5 5m-6-8 6 3m-56 9-4 9 7 3 6-3" stroke="url(#gold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

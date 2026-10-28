@@ -7560,5 +7560,8 @@
   "Rotate character": "Vrid karaktären",
   "Turn left": "Vrid åt vänster",
   "Turn right": "Vrid åt höger",
-  "Starter gear stays in your bag.": "Startutrustningen ligger kvar i din väska."
+  "Starter gear stays in your bag.": "Startutrustningen ligger kvar i din väska.",
+  "Combat sounds": "Stridsljud",
+  "Recorded": "Inspelade",
+  "Synthesized": "Syntetiska"
 }

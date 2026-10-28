@@ -14,14 +14,14 @@ async function call(name, args = {}) {
   return result.structuredContent;
 }
 (async () => {
-  const env = { ...getDefaultEnvironment(), ...(process.env.VALHALLA_BINARY ? { VALHALLA_BINARY:process.env.VALHALLA_BINARY } : {}) };
+  const env = { ...process.env, ...getDefaultEnvironment(), ...(process.env.VALHALLA_BINARY ? { VALHALLA_BINARY:process.env.VALHALLA_BINARY } : {}) };
   await client.connect(new StdioClientTransport({ command:process.execPath, args:[path.join(root,'scripts/test-mcp.cjs')], cwd:root, stderr:'pipe', env }));
   const world = await call('start_world'); started = true;
   browser = await chromium.launch({ headless:true, args:['--autoplay-policy=no-user-gesture-required'] });
   const page = await browser.newPage({ viewport:{width:1440,height:900} });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => {
-    localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang:'en',sound:true,musicVol:0,sfxVol:1,weatherAudio:0,char:null,draft:null }));
+    localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang:'en',sound:true,combatSounds:'synthesized',musicVol:0,sfxVol:1,weatherAudio:0,char:null,draft:null }));
     const tap = window.__tap = { peak:0, voices:[] }, create = AudioContext.prototype.createOscillator;
     AudioContext.prototype.createOscillator = function () { const o = create.call(this); tap.voices.push(o); return o; };
   });

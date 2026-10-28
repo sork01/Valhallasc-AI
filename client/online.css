@@ -509,7 +509,7 @@
 }
 
 /* ---------- settings panel and Edit UI ---------- */
-#settings-panel { z-index: 40; }
+#settings-panel { z-index: 40; grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
 .world-clock { margin: .15cqw 0 .2cqw; color: #fff0ba; font: bold max(12px, .9cqw) 'Jua', sans-serif; text-align: center; text-shadow: 0 1px 4px #07152c; }
 .world-weather { margin: 0 0 .2cqw; color: #d9edff; font: bold max(11px, .8cqw) 'Jua', sans-serif; text-align: center; text-shadow: 0 1px 4px #07152c; }
 .settings-panel { text-align: left; min-width: 34cqw; }

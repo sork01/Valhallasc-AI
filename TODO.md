@@ -10,11 +10,11 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ### Elite target frame (owner's request, 2026-10-28)
 
-- [ ] `ELITE-DRAGON-FRAME` — Give selected elite enemies an ornate golden dragon frame around their target portrait. Make the elite status visually striking while keeping the enemy name, level and health readable. Scale with the existing HUD and check elite/non-elite selection changes at desktop and touch sizes when implemented.
+- [x] `ELITE-DRAGON-FRAME` — **Done, Beta 1.32.0 (2026-10-28), client-only and live.** Golden coiled dragon surrounds selected elite/boss portraits, including King Slime; ordinary targets keep their normal frame. Name, level and health stay clear, and the frame follows HUD scaling. Desktop, phone and tablet selection/scaling checks pass in the focused 146-check suite. Rules and proof: `docs/combat-feedback.md`.
 
 ### Real combat and enemy sounds (owner's request, 2026-10-28)
 
-- [ ] `REAL-COMBAT-SOUNDS` — Source and integrate real/recorded combat sound effects and enemy sounds, including attacks, impacts, hurt and death. Add a Settings toggle between the new sounds and the existing synthesized sounds; keep the synthesized set fully available. Save the player's choice and respect the existing sound volume and mute controls. Add Swedish labels and focused private checks for both sound modes and saved preferences when implemented.
+- [x] `REAL-COMBAT-SOUNDS` — **Done, Beta 1.32.0 (2026-10-28), client-only and live.** 29 CC0 recorded weapon/impact, creature and human hurt/death clips (191 KB) with bundled credits/checksums and a reproducible builder. Settings saves Recorded/Synthesized per device, preserves the original synth set, and shares effects volume, immediate mute, hearing range and crowd limits. Swedish labels, actual-hit routing, both modes/preferences and download fallback pass in the indexed 146-check suite (1148 MiB peak under the 1536 MiB cap); 25 original synth checks and both intended mutation failures also verified. Sources, behavior and validation: `docs/combat-feedback.md`.
 
 ### Rested (owner's request, 2026-10-28)
 

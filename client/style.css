@@ -212,6 +212,12 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .hud-bars { width: 19cqw; }
 .hud-target { display: flex; align-items: center; gap: .8cqw; padding-left: 1cqw; border-left: .15cqw solid rgba(245, 197, 66, .45); }
 .hud-target[hidden] { display: none; }
+.hud-target-portrait { position: relative; flex: none; width: 6.9cqw; height: 6.9cqw; }
+.hud-target-portrait .hud-target-face { display: block; }
+.hud-elite-dragon { display: none; position: absolute; width: 132%; height: 132%; left: -17%; top: -16%; pointer-events: none; }
+.hud-target.is-elite .hud-elite-dragon { display: block; }
+.hud-target.is-elite .hud-target-face { border-color: #f5c542; }
+.hud-target.is-elite { column-gap: 1.2cqw; }
 .hud-target-face { width: 6.4cqw; height: 6.4cqw; flex: none; border-radius: 50%; border: .25cqw solid #eb6971; background: radial-gradient(circle at 50% 80%, #60404b, #182348 70%); image-rendering: pixelated; }
 .hud-target-bars { width: 15cqw; }
 .hud-target .hud-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

@@ -1,0 +1,267 @@
+{
+  "license": "CC0-1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "clips": {
+    "sword": {
+      "file": "sword.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/knifeSlice.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "3fb677e4e4d1ca7dfbad8e3779b7523264061c843eb8002e038cd7e4ffd6fc18",
+      "duration": 0.3568
+    },
+    "dagger": {
+      "file": "dagger.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/knifeSlice2.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "031fa19c2b09b4d50897b5076aed59afa868633d964d07939f5b5fb117bad3f7",
+      "duration": 0.4298
+    },
+    "mace": {
+      "file": "mace.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/cloth1.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "b47bb2d6ee3ccf261276222ff09d5022428fb8e2a0e555882a92feab01eff930",
+      "duration": 0.5386
+    },
+    "staff": {
+      "file": "staff.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/drawKnife1.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "4662a94b341222560fe84c4755589da31d36f0412d028c4a50d63c24fe44bb2d",
+      "duration": 0.3409
+    },
+    "bow": {
+      "file": "bow.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/creak1.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "7d786f3c75ad5e66d50cbdd3f26b593e8f2e2898278799fc626bd284710102a9",
+      "duration": 0.5805
+    },
+    "arrow": {
+      "file": "arrow.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/cloth2.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "d7994d8e419f91cc8609d1769b8905a8d53f7935af24ff8c244a1107f2e28c42",
+      "duration": 0.3322
+    },
+    "impact": {
+      "file": "impact.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/chop.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "ff539c619448b8db099ceafff77146574d0545f560f338857b0ee728723ce821",
+      "duration": 0.2291
+    },
+    "metal": {
+      "file": "metal.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/metalPot1.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "5a453bdfa9b348efca03347eed2de15fd6f4168a360f66abb571b815707b666c",
+      "duration": 1.2805
+    },
+    "wood": {
+      "file": "wood.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/creak2.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "e09122c579897a54bf00efbf367d08b8b095774c3b62cffb3e93b9be2013ad81",
+      "duration": 0.7416
+    },
+    "beast-attack": {
+      "file": "beast-attack.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "roar_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "02f10687d14c7249ebde298e84e8f0b8fa0ba5c604f0e5d0fe263c49d2b13a90",
+      "duration": 0.3166
+    },
+    "beast-hurt": {
+      "file": "beast-hurt.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "hurt_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "6961df187d406357225d0a7e91760b1528f3b55065d4095026663a69f6557631",
+      "duration": 0.3708
+    },
+    "beast-death": {
+      "file": "beast-death.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "monster_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "7f09fc49739e4c181835f299189f5cf3641e67278c7b380def2f9be6da44319e",
+      "duration": 0.6635
+    },
+    "insect-attack": {
+      "file": "insect-attack.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "bug_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "f429b57d72e61ae602b4828370dfc4bc368d267bfaf68d4bf6bb09ccfab2f8d5",
+      "duration": 0.2005
+    },
+    "insect-hurt": {
+      "file": "insect-hurt.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "bug_03.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "de9e7589941b7c640215765fe7a30e34ebbe63fbb2e2c960eb27f194ddae20a0",
+      "duration": 0.3151
+    },
+    "insect-death": {
+      "file": "insect-death.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "bug_02.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "c12364afb96e790776a7234646b03f4d9b15e25e84b01cc84cadca217e71472d",
+      "duration": 0.3129
+    },
+    "undead-attack": {
+      "file": "undead-attack.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "monster_03.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "0759dc93fbd45c68b11e5ce9262817237c1485d47342b9cdbe61dae58982ef13",
+      "duration": 0.3984
+    },
+    "undead-hurt": {
+      "file": "undead-hurt.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "hurt_03.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "d8f2054769098e9bcc816ada86749b44eeb91f0348c31fde08283fec06715577",
+      "duration": 0.3223
+    },
+    "undead-death": {
+      "file": "undead-death.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "scream_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "35f58b595482a48ce345b7c8972473c616dce4e22ee67c9b78d0b798fb0271c0",
+      "duration": 0.8427
+    },
+    "plant-attack": {
+      "file": "plant-attack.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "grunt_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "950d00579d853c790c89ea0161a109af0fb2b79e91660aab6bbcb2b300392c28",
+      "duration": 0.6849
+    },
+    "plant-hurt": {
+      "file": "plant-hurt.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "hurt_02.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "21246d11c373e3a9e7e362b18d2794d013b038e7ad8803449b998672590a300c",
+      "duration": 0.3675
+    },
+    "plant-death": {
+      "file": "plant-death.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "monster_05.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "20f98ea6fefac66c94c78517edf8d12c0b4f7972843b4aad038d972938d86c1c",
+      "duration": 0.2502
+    },
+    "water-attack": {
+      "file": "water-attack.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "burble_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "84f0f435fd8712b2d8d5e23150961da6fbde405e0b9a5013f370dec0936ae6f3",
+      "duration": 0.9376
+    },
+    "water-hurt": {
+      "file": "water-hurt.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "spit_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "2aedb753f70aa90fce0fbe09834050d3d95d2408f4559f82391cf1ddde5861d3",
+      "duration": 0.3177
+    },
+    "water-death": {
+      "file": "water-death.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "burble_02.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "38bcbc93ab773cd1d85d1691ae61039e6d20e99004a651d82758922ac3c9d275",
+      "duration": 0.7118
+    },
+    "ranged-attack": {
+      "file": "ranged-attack.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "alien_01.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "13a60f1dfdf09f121a34d458f73f46d90cb2b1e6b7be32b43aaafb89175c8e0f",
+      "duration": 0.4974
+    },
+    "ranged-hurt": {
+      "file": "ranged-hurt.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "hurt_04.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "d511e5d1cdfaa75ecce1c6a69800295e5c87d6291cbcf6648cfb6793d7f50d7c",
+      "duration": 0.2749
+    },
+    "ranged-death": {
+      "file": "ranged-death.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-creature-sfx",
+      "member": "alien_02.ogg",
+      "archiveSha256": "5d4002eea42f278e76543bb36e8ddd2cb978588a13271984191d8228f5d26768",
+      "sha256": "dccfc9482450f6fd43db93bb2697e1056dc1967b3d6440757186842e67502786",
+      "duration": 0.5359
+    },
+    "player-hurt": {
+      "file": "player-hurt.mp3",
+      "author": "HaelDB",
+      "source": "https://opengameart.org/content/male-gruntyelling-sounds",
+      "member": "yelling sounds/3grunt4.wav",
+      "archiveSha256": "e9100a4e3b9dcd146993089970dc6097dcf9935fa4683b196040012bad65d67a",
+      "sha256": "a7270d6c4f4fbeb09215ea456c1006799f7a68fb37ca71c3f5531712f8cc7060",
+      "duration": 0.2432
+    },
+    "player-death": {
+      "file": "player-death.mp3",
+      "author": "HaelDB",
+      "source": "https://opengameart.org/content/male-gruntyelling-sounds",
+      "member": "yelling sounds/2yell1.wav",
+      "archiveSha256": "e9100a4e3b9dcd146993089970dc6097dcf9935fa4683b196040012bad65d67a",
+      "sha256": "90f7ef2545a9463b38bbfb620846ca48db9fa5fa7d98d4ad4ab03db82b78e8be",
+      "duration": 0.4444
+    }
+  }
+}

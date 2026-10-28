@@ -1,0 +1,25 @@
+Recorded combat effects — CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Kenney: RPG Sounds (weapon and impact foley).
+rubberduck: 80 CC0 creature SFX (recorded mouth performances with filters).
+HaelDB: Male Grunt/Yelling sounds (recorded human vocals; CC0 option).
+
+See sources.txt for each source URL, original filename and checksum.
+Edits: mono 44.1 kHz, silence trimming, maximum 1.4 seconds, peak normalization, edge fades and MP3 encoding.
+
+Original Kenney license notice:
+
+###############################################################################
+
+	RPG sounds by Kenney Vleugels (www.kenney.nl)
+
+			------------------------------
+
+			        License (CC0)
+	       http://creativecommons.org/publicdomain/zero/1.0/
+
+	You may use these graphics in personal and commercial projects.
+	Credit (Kenney or www.kenney.nl) would be nice but is not mandatory.
+
+###############################################################################

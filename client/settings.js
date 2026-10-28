@@ -281,6 +281,7 @@
     language.value = window.Prefs.lang;
     $('set-low-graphics').checked = window.Prefs.lowGraphics;
     music.value = Math.round(window.Prefs.music * 100); sfx.value = Math.round(window.Prefs.sfx * 100); sound.checked = window.Prefs.sound;
+    $('set-combat-sounds').value = window.Prefs.combatSounds;
     night.value = Math.round(window.Prefs.night * 100); $('set-night-out').textContent = night.value + '%';
     weather.value = Math.round(window.Prefs.weather * 100); $('set-weather-out').textContent = weather.value + '%';
     weatherAudio.value = Math.round(window.Prefs.weatherAudio * 100); $('set-weather-audio-out').textContent = weatherAudio.value + '%';
@@ -293,6 +294,7 @@
   sfx.addEventListener('input', () => window.Prefs.set({ sfxVol: sfx.value / 100 }));
   sfx.addEventListener('change', () => window.Prefs.preview());     // a sample when the slider is released
   sound.addEventListener('change', () => window.Prefs.set({ sound: sound.checked }));
+  $('set-combat-sounds').addEventListener('change', () => { window.Prefs.set({ combatSounds: $('set-combat-sounds').value }); window.Prefs.preview(); });
   night.addEventListener('input', () => { $('set-night-out').textContent = night.value + '%'; window.Prefs.set({ night: night.value / 100 }); });
   weather.addEventListener('input', () => { $('set-weather-out').textContent = weather.value + '%'; window.Prefs.set({ weather: weather.value / 100 }); });
   weatherAudio.addEventListener('input', () => { $('set-weather-audio-out').textContent = weatherAudio.value + '%'; window.Prefs.set({ weatherAudio: weatherAudio.value / 100 }); });

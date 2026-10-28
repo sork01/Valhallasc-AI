@@ -38,7 +38,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.31.2</p>
+    <p class="version">Beta 1.32.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -164,7 +164,10 @@
         </div>
       </div>
       <div class="hud-target" id="hud-target" hidden>
-        <canvas class="hud-target-face" id="hud-target-face" width="96" height="96" aria-hidden="true"></canvas>
+        <div class="hud-target-portrait">
+          <canvas class="hud-target-face" id="hud-target-face" width="96" height="96" aria-hidden="true"></canvas>
+          <img class="hud-elite-dragon" src="assets/elite-dragon.svg" alt="" aria-hidden="true">
+        </div>
         <div class="hud-target-bars">
           <p class="hud-name"><b id="hud-target-name" aria-live="polite"></b><span id="hud-target-level"></span></p>
           <div class="bar hp" role="progressbar" aria-label="Target health" aria-valuemin="0" id="hud-target-hp"><i id="hud-target-fill"></i><span id="hud-target-text"></span></div>
@@ -478,6 +481,7 @@
         <label class="setting-row" for="set-uiscale"><span>UI size</span><input id="set-uiscale" type="range" min="60" max="150" step="5"><output id="set-uiscale-out" for="set-uiscale"></output></label>
         <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
         <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
+        <label class="setting-row" for="set-combat-sounds"><span>Combat sounds</span><select id="set-combat-sounds"><option value="recorded">Recorded</option><option value="synthesized">Synthesized</option></select></label>
         <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
         <label class="setting-row" for="set-weather"><span>Weather effects</span><input id="set-weather" type="range" min="0" max="100" step="1"><output id="set-weather-out" for="set-weather"></output></label>
         <label class="setting-row" for="set-weather-audio"><span>Weather sound</span><input id="set-weather-audio" type="range" min="0" max="100" step="1"><output id="set-weather-audio-out" for="set-weather-audio"></output></label>
@@ -786,6 +790,7 @@
 <script src="skillbar.js"></script>
 <script src="quickuse.js"></script>
 <script src="rested.js"></script>
+<script src="combat-audio.js"></script>
 <script src="game.js"></script>
 <script src="touch.js"></script>
 <script src="settings.js"></script>

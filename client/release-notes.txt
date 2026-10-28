@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.32.0",
+    "date": "2026-10-28",
+    "new": [
+      "Elite enemy target portraits have an ornate golden dragon frame.",
+      "Recorded weapon, impact, creature and hurt/death sounds. Choose Recorded or Synthesized combat sounds in Settings; your choice is saved."
+    ],
+    "changed": [
+      "The sound switch immediately mutes effects that are already playing."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.31.2",
     "date": "2026-10-28",
     "new": [],

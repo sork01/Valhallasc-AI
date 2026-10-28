@@ -5,6 +5,7 @@
   const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
+  save.combatSounds = save.combatSounds === 'synthesized' ? 'synthesized' : 'recorded';
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
   save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
   // Sork's own arrangement (2026-10-21) is what a player gets until they move something (uiSet / panelSizeSet): offsets in cqw from the stylesheet positions, sizes in cqw.
@@ -108,7 +109,7 @@
     syncMusic();
   }
 
-  // ---------- audio (synthesised, so there are no files to load) ----------
+  // ---------- audio (recorded combat and the original synthesized effects) ----------
   let ac = null;
   function audio() {
     if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (A) ac = new A(); }
@@ -122,7 +123,7 @@
   let sfxGain = null;
   function sfxOut(c) {
     if (!sfxGain || sfxGain.context !== c) { sfxGain = c.createGain(); sfxGain.connect(c.destination); }
-    sfxGain.gain.value = taper(save.sfxVol);
+    sfxGain.gain.value = save.sound ? taper(save.sfxVol) : 0;
     return sfxGain;
   }
 
@@ -299,7 +300,7 @@
     if (!Keys.is(e, 'sound')) return;
     if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
     if (Keys.is(e, 'map') && scene === 'game' && !window.Settings?.active) return;   // in the field the map key opens the world map; the other sound key always mutes
-    save.sound = !save.sound; persist(); applyMusicLevel(.6); dispatchEvent(new Event('prefs-change')); showToast(t(save.sound ? 'soundOn' : 'soundOff').replace('(N)', `(${Keys.label('sound', false)})`));
+    window.Prefs.set({ sound: !save.sound }); showToast(t(save.sound ? 'soundOn' : 'soundOff').replace('(N)', `(${Keys.label('sound', false)})`));
   });
   function blip(freq = 660, dur = .08, vol = .05) {
     if (!save.sound) return;
@@ -642,6 +643,7 @@
     hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.min(wholeHp(s.hp), wholeMax(s.maxHp))} / ${wholeMax(s.maxHp)}`;
     const target = s.target, targetBadge = $('hud-target');
     targetBadge.hidden = !target;
+    targetBadge.classList.toggle('is-elite', !!target && !target.player && !!target.elite);
     if (target) {
       $('hud-target-name').textContent = target.name;
       $('hud-target-level').textContent = ` Lv ${target.level}`;
@@ -779,8 +781,14 @@
     sword:[920,370,'triangle'], mace:[185,70,'sawtooth'], dagger:[1450,540,'triangle'],
     staff:[510,160,'sine'], bow:[340,610,'sawtooth'], arrow:[1180,240,'triangle'], spell:[690,1350,'sine'],
   };
+  function recordedVoice(family, stage, level, enemy = false, finalBoss = false, heavy = false) {
+    if (save.combatSounds !== 'recorded' || !save.sound || level <= 0) return false;
+    const c = audio();
+    return !!c && !!window.RecordedCombat?.play(c, sfxOut(c), family, stage, level, enemy ? enemyVoices : null, finalBoss, heavy);
+  }
   function combatVoice(family, stage, level, enemy = false, finalBoss = false, heavy = false) {
     if (!save.sound || level <= 0) return;
+    if (recordedVoice(family, stage, level, enemy, finalBoss, heavy)) return;
     const c = audio(); if (!c) return;
     if (enemy && enemyVoices.size >= 4) return;
     const [base, low, shape] = voiceSpec[family] || voiceSpec.beast;
@@ -845,11 +853,12 @@
     cast: () => { sweep(330, 990, .25, .065, 'triangle'); tone([1175], .2, .025); },
     combatSwing,
     enemyAttack: ev => combatVoice(familySound(ev.kind), 'attack', audibleLevel(ev) * (ev.boss ? 1.6 : ev.elite ? 1.25 : 1), true),
+    enemyHurt: ev => combatVoice(familySound(ev.kind), 'hurt', audibleLevel(ev) * .65, true),
     enemyDeath: ev => combatVoice(familySound(ev.kind), 'death', audibleLevel(ev) * (ev.finalBoss ? 2 : ev.boss ? 1.6 : ev.elite ? 1.25 : 1), true, !!ev.finalBoss, !!(ev.boss || ev.elite)),
-    miss: () => combatVoice('ranged', 'miss', .55),
-    hit: () => { sweep(190, 70, .13, .22); noiseBurst(.07, 1800, 900, .08); sweep(420, 180, .16, .08, 'triangle'); },
-    crit: () => { SFX.hit(); tone([1320, 1980], .3, .07); },
-    hurt: () => voice(115, .32, .32, false),
+    miss: () => { if (!recordedVoice('sword', 'miss', .4)) combatVoice('ranged', 'miss', .55); },
+    hit: () => { if (recordedVoice('impact', 'hit', .8)) return; sweep(190, 70, .13, .22); noiseBurst(.07, 1800, 900, .08); sweep(420, 180, .16, .08, 'triangle'); },
+    crit: () => { if (recordedVoice('impact', 'hit', 1.1, false, false, true)) return; SFX.hit(); tone([1320, 1980], .3, .07); },
+    hurt: () => { if (!recordedVoice('player', 'hurt', .8)) voice(115, .32, .32, false); },
     pickup: () => tone([1568], .12, .05),
     // A potion is a quick gulp that rises; a meal is two soft low notes.
     consume: ev => { if (ev?.value > 0) { sweep(240, 620, .16, .08, 'triangle'); tone([1175, 1568], .25, .04); } else { tone([330, 440], .18, .05, 'triangle'); } },
@@ -880,7 +889,7 @@
       else if (kind === 'heal' || kind === 'mend') { tone([659, 880, 1319], .8, .05, 'sine'); tone([1760, 2637], .5, .03); }
     },
     healed: () => { tone([880, 1319, 1760], .5, .04, 'sine'); },
-    death: () => voice(78, .95, .38),
+    death: () => { if (!recordedVoice('player', 'death', 1)) voice(78, .95, .38); },
     respawn: () => tone([392, 587], .5, .06),
     portal: () => { sweep(180, 720, .5, .09, 'sine'); tone([523, 784, 1047], .5, .05); },
   };
@@ -932,6 +941,7 @@
     rarePickupTimer = setTimeout(() => { rarePickupBox.hidden = true; rarePickupBox.classList.remove('show'); }, rarity === 'legendary' ? 4800 : 3200);
   }
   function enterGame() {
+    if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
     const c = save.char || cfg, p = $('hud-portrait');
     if (modular(c)) {
       p.style.backgroundImage = ''; p.style.backgroundSize = 'cover'; p.style.backgroundPosition = 'center';
@@ -1222,6 +1232,7 @@
   window.Prefs = {
     get lang() { return save.lang; },
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
+    get combatSounds() { return save.combatSounds; },
     get touchSkills() { return save.touchSkills && typeof save.touchSkills === 'object' ? save.touchSkills : {}; },
     get lowGraphics() { return save.lowGraphics === true; },
     get dpsMeter() { return save.dpsMeter !== false; },
@@ -1243,6 +1254,9 @@
       if ('musicVol' in patch) save.musicVol = vol(patch.musicVol);
       if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);
       if ('sound' in patch) save.sound = !!patch.sound;
+      if ('combatSounds' in patch && ['recorded', 'synthesized'].includes(patch.combatSounds)) { save.combatSounds = patch.combatSounds; window.RecordedCombat?.stop(); }
+      if (!save.sound) window.RecordedCombat?.stop();
+      if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
       if ('touchSkills' in patch) save.touchSkills = patch.touchSkills && typeof patch.touchSkills === 'object' ? patch.touchSkills : {};
       if ('lowGraphics' in patch) save.lowGraphics = !!patch.lowGraphics;
       if ('dpsMeter' in patch) save.dpsMeter = !!patch.dpsMeter;
@@ -1256,7 +1270,7 @@
       if ('keys' in patch) save.keys = patch.keys && typeof patch.keys === 'object' ? patch.keys : {};
       if ('panelSize' in patch) { save.panelSize = patch.panelSize || {}; save.panelSizeSet = !!patch.panelSize; }
       persist(); applyMusicLevel(.4);
-      if (sfxGain) sfxGain.gain.value = taper(save.sfxVol);
+      if (sfxGain) sfxGain.gain.value = save.sound ? taper(save.sfxVol) : 0;
       dispatchEvent(new Event('prefs-change'));
     },
     preview() { SFX.hit(); },
