@@ -25,6 +25,22 @@ the rate, cap and bonus explanation; it supports touch, keyboard and Swedish.
 The readout is part of the existing Character frame and follows its UI scaling.
 It stays hidden when connected to an older server without Rested support.
 
+The XP bar paints earned XP blue and the Rested bonus reserve light green after
+it, clipped at the end of the current level. Hovering or keyboard focus shows
+`current/needed (percent% rested bonusXPxp)`, including the full reserve up to
+200%. Bonus XP is the reserve percentage times the current level requirement,
+rounded down to whole XP. The readout updates after rewards and level changes
+and supports Swedish. Against an older server it shows only current/needed XP.
+
+The bar update is client-only **Beta 1.31.1** (2026-10-28).
+`tests/rested-xp-ui.cjs` passes 40 bounded checks at 844 × 390 English and
+1024 × 768 Swedish (645 MiB peak). It covers actual earned XP, hover and keyboard
+focus, segment alignment, fractional/full/empty reserves, level changes and
+older-server fallback. Screenshots: `test-results/touch/rested-xp-844x390.png`
+and `rested-xp-1024x768.png`. JS syntax, Swedish coverage, release-note validation
+and diff checks pass. Public hashes match all five changed client files;
+the existing server needs no restart.
+
 `Character.rested` is server-owned saved state with serde defaults. The reserve
 uses fixed-point level units (72,000,000 per level, 1,000 per offline second),
 avoiding float drift across reconnects. Bonus XP rounds down to whole XP and its

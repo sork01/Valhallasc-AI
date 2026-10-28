@@ -23,6 +23,7 @@ import numpy as np
 
 import cel_common as cc
 import generic_gear as gg
+import turning_hair
 from cel_common import V, unit, rig, FW, FH
 
 SLOTS = {'armor': ('scout', 'warden'), 'shoulders': ('scout', 'warden', 'ironhide'), 'gloves': ('scout', 'warden', 'duelist'),
@@ -147,6 +148,7 @@ def render_frame(clip, facing, k):
     # The Hunter's own head: upswept green eyes, two cheek stripes, a swept fringe with an anime ring highlight and
     # a high ponytail. The head turns only a third as far as the body, so an archer keeps their eyes on the target.
     head = cc.head_frame(body, xf, psi, p)
+    scalp = turning_hair.replace(body, head, 'hunter', cc.FEMALE)
     H, hd, front, side = head['H'], head['hd'], head['front'], head['side']
     if not cc.face(body, head, p, paint=('feather', 1)):
         body.poly([H(*q) for q in [(-9.5, 8), (-10.5, 0), (-8.5, -8), (-4, -10.5), (5, -9.5), (9.5, -5), (10.5, 4), (6.5, 13), (-3, 14)]], COLOR['hair'][2], hd - 5)
@@ -345,6 +347,7 @@ def render_frame(clip, facing, k):
             ink.plate([top, top + R @ V(1.8, 0, -1.4), top + R @ V(1.5, 0, -5.2), top + R @ V(0, 0, -4)], c, 2)
         ink.plate([xf(q) for q in [(7.4, -5.0, 68.5), (4, -5.0, 68.5), (-8, -5.0, 42), (-4.4, -5.0, 42)]], 'umber', 1)
     gg.draw(inks, R, xf, joints, head)
+    scalp.finish()
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
@@ -356,7 +359,7 @@ GENERIC = {'armor': 'scout', 'shoulders': 'ironhide', 'gloves': 'duelist', 'head
            'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'shortbow'}
 SHEET = cc.Sheet(
     'hunter', files='hunter', pixel='hunter_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read(), open(turning_hair.__file__).read()]),
     default_equip={'armor': 'scout', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'shortbow'},
     meta={'attack': {'duration': .4, 'impact': .2}, 'portrait': [57, 15, 46, 46]},
     combos=[('naked', NAKED), ('scout', SCOUT), ('warden', WARDEN), ('generic', GENERIC)])

@@ -1,4 +1,10 @@
 #rested { position: relative; margin-top: .25cqw; pointer-events: auto; }
+#xp-meter { position: relative; pointer-events: auto; }
+#xp-meter:focus-visible { outline: .2cqw solid #b8ffd1; outline-offset: .2cqw; border-radius: 999px; }
+.bar.xp #xp-rested { background: linear-gradient(#d3ffcf, #88dba2); transition: none; }
+#xp-tooltip { display: none; position: absolute; top: 100%; left: 0; width: max-content; max-width: max(32cqw, calc(260px / var(--ui, .8))); padding: .5cqw .8cqw; border: .15cqw solid #88dba2; border-radius: .5cqw; background: #121c36; color: #f5fff7; box-shadow: 0 .4cqw 1cqw #0008; font-size: max(1.2cqw, calc(12px / var(--ui, .8))); pointer-events: none; z-index: 10; }
+#xp-meter:hover #xp-tooltip, #xp-meter:focus-visible #xp-tooltip { display: block; }
+.hud-tl:has(#xp-meter:hover, #xp-meter:focus-visible) { z-index: 25; }
 .hud-tl.rested-open { z-index: 25; }
 #rested[hidden], #rested-details[hidden] { display: none; }
 #rested-status { display: block; width: 100%; min-height: calc(28px / var(--ui, .8)); border: 0; border-radius: .4cqw; padding: .3cqw .5cqw; background: rgba(7, 18, 40, .65); color: #c3ccd9; font: inherit; font-size: max(1.05cqw, calc(11px / var(--ui, .8))); text-align: left; cursor: pointer; touch-action: manipulation; }

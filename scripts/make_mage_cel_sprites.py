@@ -13,6 +13,7 @@ import math
 
 import cel_common as cc
 import generic_gear as gg
+import turning_hair
 from cel_common import V, unit, rig
 
 SLOTS = {'armor': ('apprentice', 'runic'), 'shoulders': ('apprentice', 'runic', 'ironhide'), 'gloves': ('apprentice', 'runic', 'duelist'),
@@ -117,6 +118,7 @@ def render_frame(clip, facing, k):
     torso = lambda ink, mat, *a: cc.torso(ink, xf, mat, *a)
     cc.base_body(body, xf, joints, R)
     head = cc.head_frame(body, xf, psi, p, turn=.6)
+    scalp = turning_hair.replace(body, head, 'mage', cc.FEMALE)
     H, hd, front, side = head['H'], head['hd'], head['front'], head['side']
     sw = p['sway']
     if cc.FEMALE:
@@ -302,6 +304,7 @@ def render_frame(clip, facing, k):
             d, n = across * math.cos(ang) + u * math.sin(ang), -across * math.sin(ang) + u * math.cos(ang)
             ink.plate([c + d * size * 1.9, c + n * .9, c - d * size * 1.9, c - n * .9], glow, 3, True)
     gg.draw(inks, R, xf, joints, head)
+    scalp.finish()
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
@@ -313,7 +316,7 @@ GENERIC = {'armor': 'apprentice', 'shoulders': 'ironhide', 'gloves': 'duelist', 
            'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'ash'}
 SHEET = cc.Sheet(
     'mage', files='mage', pixel='mage_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read(), open(turning_hair.__file__).read()]),
     default_equip={'armor': 'apprentice', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'ash'},
     meta={'attack': {'duration': .56, 'impact': .28}, 'portrait': [57, 15, 46, 46]},
     combos=[('naked', NAKED), ('apprentice', APPRENTICE), ('runic', RUNIC), ('generic', GENERIC)])

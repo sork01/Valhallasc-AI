@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.31.1",
+    "date": "2026-10-28",
+    "new": [
+      "Hover over the XP bar to see your current XP, XP needed to level up, and remaining Rested percentage and bonus XP. Keyboard focus also shows these details.",
+      "Turn the character creation preview to see all eight directions. Choose No gear to preview and start unequipped, with starter items kept in your bag."
+    ],
+    "changed": [
+      "The XP bar shows earned XP in blue and the Rested reserve ahead of it in light green.",
+      "The priest's starting Pilgrim's Hood now turns with the character, including its opening, gold trim and crimson cords.",
+      "Hair crowns, fringes and partings now turn with every character across all five classes and both bodies. Female priest hair also keeps its volume in side views."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.31.0",
     "date": "2026-10-28",
     "new": [

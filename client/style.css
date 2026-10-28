@@ -141,6 +141,14 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 #wcv, .wfallback { display: block; width: 100%; aspect-ratio: 900 / 1180; height: auto; touch-action: manipulation; filter: drop-shadow(0 .5cqw .8cqw rgba(0, 0, 0, .5)); }
 #magecv { display: block; width: 100%; aspect-ratio: 900 / 1180; image-rendering: pixelated; cursor: pointer; touch-action: manipulation; filter: drop-shadow(0 .5cqw .8cqw rgba(0,0,0,.5)); }
 .mage-status { position: absolute; inset: 40% 0 auto; text-align: center; color: #fff3c4; }
+.cc-turn { position: absolute; bottom: .4cqw; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: .7cqw; color: #fff3c4; font-size: 1.1cqw; }
+.cc-turn .arrow { min-width: 3.3cqw; height: 3.3cqw; font-size: 2cqw; touch-action: manipulation; }
+#create-facing { min-width: 6cqw; text-align: center; white-space: nowrap; }
+.cc-no-gear { width: 100%; margin-top: .5cqw; }
+@media (pointer: coarse) {
+  .cc-turn .arrow, .cc-no-gear { min-width: 44px; min-height: 44px; }
+  .cc-turn { font-size: max(12px, 1.1cqw); }
+}
 .runeglow { animation: pulse 2.4s ease-in-out infinite; }
 .tip { margin: .9cqw 0 0; font-size: 1cqw; text-align: center; opacity: .8; color: #fff3c4; }
 

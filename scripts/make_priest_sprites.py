@@ -32,6 +32,7 @@ sys.path.insert(0, os.environ.get('VALHALLA_TOOLS', str(ROOT.parent / 'Valhalla'
 import make_warrior_sprites as rig  # noqa: E402
 import cel_common as cc  # noqa: E402  (the `--female` switch, the torso outline and the Sheet pipeline)
 import generic_gear as gg  # noqa: E402
+import turning_hair
 
 V, unit = rig.V, rig.unit
 FW = FH = 160
@@ -203,22 +204,88 @@ class Ink:
         return idx, z
 
 
-def priest_pieces(inks, R, joints, H, hd, front, side):
-    """Head, shoulder and glove pieces of both sets. Pilgrim: cream cloth, crimson and rope. Dawn: gold and white."""
+def hair_surface(ink, points, tone, bias=0., outline=True):
+    """Keep long hair at its actual depth along the head, shoulders and back."""
+    bias += 2.5      # the locks rest outside the robe and its raised collar
+    projected = [ink.project(q) for q in points]
+    xy = np.array([q[0] for q in projected])
+    depths = np.array([q[1] for q in projected])
+    plane = np.linalg.lstsq(np.c_[np.ones(len(xy)), xy], depths, rcond=None)[0]
+    slope = plane[1:]
+    length = np.linalg.norm(slope)
+    if length < 1e-6:
+        ink.poly(xy, COLOR['hair'][tone], depths.mean() - bias, outline)
+        return
+    axis = slope / length
+    along = xy @ axis
+    a = xy.mean(0) + axis * (along.min() - xy.mean(0) @ axis)
+    b = xy.mean(0) + axis * (along.max() - xy.mean(0) @ axis)
+    ink.poly(xy, COLOR['hair'][tone], -bias, outline,
+             gradient=(a, b, plane[0] + a @ slope, plane[0] + b @ slope))
+
+
+def female_back_hair(ink, xf, sway):
+    """A curved curtain with back and side surfaces, rather than an edge-on card."""
+    rings = [(86, 7.5, -9.5, -3, 0), (74, 9, -10.5, -4, .2),
+             (58, 10, -11, -5.5, .55), (43, 10.3, -11.7, -7.2, 1),
+             (32, 8.3, -12, -9, 1.3)]
+    columns = [-1, -.45, .45, 1]
+
+    def point(row, fraction, front=False):
+        z, width, back, near, swing = rings[row]
+        if row == len(rings) - 1:
+            z += 2.5 * abs(fraction) + math.sin(fraction * math.pi * 2) * 1.5
+        y = near if front else back - 2 * (1 - fraction * fraction)
+        return xf((width * fraction + sway * swing, y, z))
+
+    outline = [point(row, -1) for row in range(len(rings))]
+    outline += [point(row, 1) for row in reversed(range(len(rings)))]
+    hair_surface(ink, outline, 1)
+    for side in (-1, 1):
+        curtain = [point(row, side) for row in range(len(rings))]
+        curtain += [point(row, side, True) for row in reversed(range(len(rings)))]
+        hair_surface(ink, curtain, 2 if side < 0 else 1)
+    for row in range(len(rings) - 1):
+        for col, (a, b) in enumerate(zip(columns, columns[1:])):
+            hair_surface(ink, [point(row, a), point(row, b), point(row + 1, b), point(row + 1, a)],
+                         2 if col < 2 else 1, .05, False)
+        # Narrow highlights follow the rounded back instead of making a flat patch.
+        hair_surface(ink, [point(row, -.44), point(row, -.25), point(row + 1, -.25), point(row + 1, -.44)], 3, .12, False)
+        for side in (-1, 1):
+            hair_surface(ink, [point(row, side), point(row, side, True),
+                              point(row + 1, side, True), point(row + 1, side)], 2 if side < 0 else 1, .05, False)
+
+
+def pilgrim_hood(ink, H, hd, front, side):
+    """A turned cloth hood: the face opening follows the same yaw as the eyes."""
     backview = front < -.4
-    ink = inks['head_pilgrim']
+    # Keep the crown around the head while its opening narrows and moves toward
+    # the visible cheek. A screen-facing opening makes profile views look stuck.
+    shell = lambda x, y: H(x * (1 - .12 * abs(side)) - side * max(0, y) / 23.2 * 2, y)
+    opening = lambda x, y: H(side * 5.2 + x * (.35 + .65 * max(0, front)), y)
     # A cloth hood round the face (closed over the back of the head from behind) with a gold-trimmed opening and a crimson cord.
     outer = [(-12.8, -9), (-13.6, 6), (-10.6, 16.4), (-4, 22), (0, 23.2), (4, 22), (10.6, 16.4), (13.6, 6), (12.8, -9)]
     inner = [(9.9, -6), (9.7, 4.6), (6.9, 9.8), (0, 11), (-6.9, 9.8), (-9.7, 4.6), (-9.9, -6)]
     back = [(-12.4, -3), (-13.6, 6), (-10.6, 16.4), (-4, 22), (0, 23.2), (4, 22), (10.6, 16.4), (13.6, 6), (12.4, -3), (9, -11.5), (0, -13.4), (-9, -11.5)]
-    ink.poly([H(*q) for q in (back if backview else outer + inner)], COLOR['robe'][2], hd - (11 if backview else 7))
-    ink.poly([H(*q) for q in [(13.6, 6), (10.6, 16.4), (4, 22), (0, 23.2), (2, 17), (7.5, 12.6), (11.4, 4), (12.4, -3 if backview else -9)]], COLOR['robe'][1], hd - 7.05 - (4 if backview else 0), False)
-    ink.poly([H(*q) for q in [(-13.6, 6), (-10.6, 16.4), (-4, 22), (0, 23.2), (-2, 19), (-8, 14), (-11, 6)]], COLOR['robe'][3], hd - 7.04 - (4 if backview else 0), False)
+    outline = [shell(*q) for q in (back if backview else outer)]
     if not backview:
-        ink.poly([H(*q) for q in [(-10.3, -6), (-10.2, 4.6), (-7.2, 10.2), (0, 11.5), (7.2, 10.2), (10.2, 4.6), (10.3, -6),
+        outline += [opening(*q) for q in inner]
+    ink.poly(outline, COLOR['robe'][2], hd - (11 if backview else 7))
+    ink.poly([shell(*q) for q in [(13.6, 6), (10.6, 16.4), (4, 22), (0, 23.2), (2, 17), (7.5, 12.6), (11.4, 4), (12.4, -3 if backview else -9)]], COLOR['robe'][1], hd - 7.05 - (4 if backview else 0), False)
+    ink.poly([shell(*q) for q in [(-13.6, 6), (-10.6, 16.4), (-4, 22), (0, 23.2), (-2, 19), (-8, 14), (-11, 6)]], COLOR['robe'][3], hd - 7.04 - (4 if backview else 0), False)
+    if not backview:
+        ink.poly([opening(*q) for q in [(-10.3, -6), (-10.2, 4.6), (-7.2, 10.2), (0, 11.5), (7.2, 10.2), (10.2, 4.6), (10.3, -6),
                                   (9.7, -6), (9.7, 4.6), (6.9, 9.8), (0, 11), (-6.9, 9.8), (-9.7, 4.6), (-9.7, -6)]], COLOR['gold'][2], hd - 7.3, False)
         for sx in (-1, 1):
-            ink.poly([H(sx * 11.6, -6), H(sx * 12.8, -9), H(sx * 13.4, -14), H(sx * 12, -15.4), H(sx * 10.6, -13)], COLOR['stole'][2 if sx > 0 else 1], hd - 7.4)
+            if abs(side) > .85 and sx * side < 0:
+                continue
+            ink.poly([opening(sx * 11.6, -6), opening(sx * 12.8, -9), opening(sx * 13.4, -14), opening(sx * 12, -15.4), opening(sx * 10.6, -13)], COLOR['stole'][2 if sx > 0 else 1], hd - 7.4)
+
+
+def priest_pieces(inks, R, joints, H, hd, front, side):
+    """Head, shoulder and glove pieces of both sets. Pilgrim: cream cloth, crimson and rope. Dawn: gold and white."""
+    backview = front < -.4
+    pilgrim_hood(inks['head_pilgrim'], H, hd, front, side)
     ink = inks['head_dawn']
     # A gold diadem above the circlet: seven pointed rays of rising height round a sun gem.
     xs = [-10.4, -7, -3.5, 0, 3.5, 7, 10.4]
@@ -325,16 +392,21 @@ def render_frame(clip, facing, k):
     H = lambda x, y: hc + right * x + up * y
     front = -math.cos(psi + rig.rad(p['twist']))
     side = -math.sin(psi + rig.rad(p['twist']))
+    scalp = turning_hair.replace(body, dict(H=H, hd=hd, front=front, side=side), 'priest', cc.FEMALE)
+    # The part and cheek locks turn with the face instead of staying a frontal
+    # cutout. Rear strands sit around the back of the same head volume.
+    fringe_at = (lambda x, y: H(x * (.35 + .65 * max(0, front)) + side * 4.8, y)) if cc.FEMALE else H
+    back_at = (lambda x, y: H(x * (.8 + .2 * abs(front)) - side * 2, y)) if cc.FEMALE else H
     skin_shape = [(-8.4, 7), (-9.8, 0), (-8.6, -6), (-4.8, -10.2), (0, -11), (4.8, -10.2), (8.6, -6), (9.8, 0), (8.4, 7), (0, 10)]
     if cc.FEMALE:      # a slightly narrower jaw and a softer chin
         skin_shape = [(-8.2, 7), (-9.3, 0), (-8, -6), (-4, -10), (0, -11.6), (4, -10), (8, -6), (9.3, 0), (8.2, 7), (0, 10)]
     body.poly([H(*q) for q in skin_shape], COLOR['skin'][2], hd - 4)
     body.poly([H(*q) for q in [(4.5, 6), (8.4, 6), (9.7, 0), (7.6, -6), (0, -10.8), (3.5, -4)]], COLOR['skin'][1], hd - 4.05, False)
     if front < -.4:
-        body.poly([H(*q) for q in [(-10, 9), (-11.4, 0), (-10, -9), (-5, -13), (5, -13), (10, -9), (11.4, 0), (10, 9), (5, 14), (-5, 14)]], COLOR['hair'][2], hd - 5)
-        body.poly([H(*q) for q in [(0, 1), (5, 4), (10, 4), (11.4, 0), (10, -9), (5, -13), (0, -12), (1, -5)]], COLOR['hair'][1], hd - 5.05, False)
-        body.poly([H(*q) for q in [(-8, 11), (-3, 13.6), (4, 13.2), (7.5, 10.5), (2, 11.6), (-4, 11)]], COLOR['hair'][3], hd - 5.1, False)
-        body.poly([H(*q) for q in [(-5, 3), (-2, 5), (-3, -6), (-6, -9)]], COLOR['hair'][3], hd - 5.12, False)
+        body.poly([back_at(*q) for q in [(-10, 9), (-11.4, 0), (-10, -9), (-5, -13), (5, -13), (10, -9), (11.4, 0), (10, 9), (5, 14), (-5, 14)]], COLOR['hair'][2], hd - 5)
+        body.poly([back_at(*q) for q in [(0, 1), (5, 4), (10, 4), (11.4, 0), (10, -9), (5, -13), (0, -12), (1, -5)]], COLOR['hair'][1], hd - 5.05, False)
+        body.poly([back_at(*q) for q in [(-8, 11), (-3, 13.6), (4, 13.2), (7.5, 10.5), (2, 11.6), (-4, 11)]], COLOR['hair'][3], hd - 5.1, False)
+        body.poly([back_at(*q) for q in [(-5, 3), (-2, 5), (-3, -6), (-6, -9)]], COLOR['hair'][3], hd - 5.12, False)
     else:
         for sx in (-1, 1):
             if abs(side) > .85 and sx * side < 0:
@@ -364,18 +436,20 @@ def render_frame(clip, facing, k):
         # Fringe parted in the middle, with long locks framing the cheeks.
         fringe = [(-10.8, -1), (-11.4, 7), (-8.8, 13), (0, 15.4), (8.8, 13), (11.4, 7), (10.8, -1), (9.2, 2.6), (6.6, 4.4),
                   (3.2, 6.4), (.4, 9.6), (-.8, 7.4), (-4, 4.8), (-7, 4), (-9.2, 1.8)]
-        body.poly([H(*q) for q in fringe], COLOR['hair'][2], hd - 6)
-        body.poly([H(*q) for q in [(1, 9.6), (3.2, 6.4), (6.6, 4.4), (9.2, 2.6), (10.8, -1), (11.4, 7), (8.8, 13), (4, 14.6)]], COLOR['hair'][1], hd - 6.05, False)
+        # Keep a rounded crown over the skull; only the hairline below it turns.
+        body.poly([H(*q) if i < 7 else fringe_at(*q) for i, q in enumerate(fringe)], COLOR['hair'][2], hd - 6)
+        shade = [(1, 9.6), (3.2, 6.4), (6.6, 4.4), (9.2, 2.6), (10.8, -1), (11.4, 7), (8.8, 13), (4, 14.6)]
+        body.poly([fringe_at(*q) if i < 4 else H(*q) for i, q in enumerate(shade)], COLOR['hair'][1], hd - 6.05, False)
         body.poly([H(*q) for q in [(-8.4, 11), (-3, 13.8), (3, 13.9), (7, 12), (2, 12.2), (-3, 12)]], COLOR['hair'][3], hd - 6.1, False)
         for sx in (-1, 1):
             if abs(side) > .85 and sx * side < 0:
                 continue
             if cc.FEMALE:
-                body.poly([H(sx * q[0], q[1]) for q in [(11, 6), (12, -4), (11.4, -13), (8.4, -16), (8, -8), (8.6, 0), (9.6, 4)]], COLOR['hair'][2], hd - 6.2)
-                body.poly([H(sx * q[0], q[1]) for q in [(11.6, 2), (12, -4), (11.4, -13), (10, -14), (10.4, -5)]], COLOR['hair'][1], hd - 6.25, False)
+                body.poly([fringe_at(sx * q[0], q[1]) for q in [(11, 6), (12, -4), (11.4, -13), (8.4, -16), (8, -8), (8.6, 0), (9.6, 4)]], COLOR['hair'][2], hd - 6.2)
+                body.poly([fringe_at(sx * q[0], q[1]) for q in [(11.6, 2), (12, -4), (11.4, -13), (10, -14), (10.4, -5)]], COLOR['hair'][1], hd - 6.25, False)
             else:      # sideburns
                 body.poly([H(sx * q[0], q[1]) for q in [(10.6, 5), (11.4, -3.6), (9.6, -5.6), (9, 0)]], COLOR['hair'][2], hd - 6.2)
-        if front >= -.4:      # a short pale-gold goatee
+        if not cc.FEMALE and front >= -.4:      # the man's short pale-gold goatee
             body.poly([H(*q) for q in [(-2.8, -9), (2.8, -9), (1.6, -12.4), (0, -13.4), (-1.6, -12.4)]], COLOR['hair'][1], hd - 5.65, False)
     if front >= -.4:
         body.poly([H(*q) for q in [(-10.8, 5.6), (-6, 8.4), (0, 9.4), (6, 8.4), (10.8, 5.6), (10.8, 4.2), (6, 7), (0, 8), (-6, 7), (-10.8, 4.2)]], COLOR['gold'][2], hd - 6.4)
@@ -385,16 +459,11 @@ def render_frame(clip, facing, k):
     # Long hair falls behind the shoulders (seen from the back and sides) tied with a crimson ribbon.
     sw = p['sway']
     if cc.FEMALE:      # to the hips, with a wavy flared end
-        body.plate([xf(q) for q in [(-7, -5.6, 83), (7, -5.6, 83), (9.6, -7, 66), (10.4 + sw, -8.6, 44), (8 + sw * 1.3, -9.8, 32), (4 + sw * 1.4, -9.2, 36),
-                                   (.4 + sw * 1.5, -9.8, 30), (-3.6 + sw * 1.4, -9.2, 36), (-8.2 + sw * 1.3, -9.8, 31), (-9.4 + sw, -8.6, 44), (-9.6, -7, 66)]], 'hair', 1)
+        female_back_hair(body, xf, sw)
     else:      # a man: hair to the nape, no fall of hair down the back
         body.plate([xf(q) for q in [(-6.4, -5.6, 83), (6.4, -5.6, 83), (7.6, -7, 76), (4 + sw * .5, -8, 72), (-4 + sw * .5, -8, 72), (-7.6, -7, 76)]], 'hair', 1)
-    if cc.FEMALE:
-        body.plate([xf(q) for q in [(-5, -6.1, 80), (5, -6.1, 80), (6.6, -7.2, 64), (5 + sw, -8.2, 49), (1 + sw * 1.3, -8.4, 45),
-                                   (-4 + sw, -8.2, 48), (-6.6, -7.2, 64)]], 'hair', 2)
-        for sx in (-1, 1):
-            body.plate([xf(q) for q in [(sx * 9.2, -5.4, 80), (sx * 9.8, -8.4, 70), (sx * 9, -8.8 + sw, 52), (sx * 9.4, -5.6, 58)]], 'hair', 2 if sx > 0 else 1, True)
-    body.plate([xf(q) for q in [(-8.4, -6.6, 62), (8.4, -6.6, 62), (8.4, -6.7, 59.2), (-8.4, -6.7, 59.2)]], 'stole', 2)
+    ribbon_y = -13.2 if cc.FEMALE else -6.6
+    body.plate([xf(q) for q in [(-8.4, ribbon_y, 62), (8.4, ribbon_y, 62), (8.4, ribbon_y - .1, 59.2), (-8.4, ribbon_y - .1, 59.2)]], 'stole', 2)
 
     for key, mat in [('armor_pilgrim', 'robe'), ('armor_dawn', 'dawn')]:
         ink = inks[key]
@@ -497,6 +566,7 @@ def render_frame(clip, facing, k):
                 d = across * math.cos(ang) + u * math.sin(ang)
                 n = across * -math.sin(ang) + u * math.cos(ang)
                 ink.plate([c + d * rr * .9 + n * 1.3, c + d * (rr + 3.2), c + d * rr * .9 - n * 1.3], 'glow', 2)
+    scalp.finish()
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
@@ -509,7 +579,7 @@ GENERIC = {'armor': 'pilgrim', 'shoulders': 'ironhide', 'gloves': 'duelist', 'he
            'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'mace'}
 SHEET = cc.Sheet(
     'priest', files='priest', pixel='priest_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read(), open(turning_hair.__file__).read()]),
     default_equip={'armor': 'pilgrim', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'mace'},
     meta={'attack': {'duration': .4, 'impact': .2}, 'portrait': [57, 19, 46, 46]},
     combos=[('naked', NAKED), ('pilgrim', PILGRIM), ('dawn', DAWN), ('generic', GENERIC)])

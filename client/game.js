@@ -42,6 +42,7 @@
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
       defeated: 'Defeated!', defeatedSub: 'You wake up back at the start…', defeatedWait: 'You have fallen. Wait for the fight to end.', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
+      noGear: 'No gear', facingNames: ['Front', 'Front left', 'Left side', 'Back left', 'Back view', 'Back right', 'Right side', 'Front right'],
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
       tip: 'Tip: click the Warrior’s axe, mug, head, beard or fish!',
       health: 'Health', attack: 'Attack', defense: 'Defense', speed: 'Speed',
@@ -73,6 +74,7 @@
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
       defeated: '쓰러졌다!', defeatedSub: '시작 지점에서 깨어납니다…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
+      noGear: '장비 없음', facingNames: ['정면', '왼쪽 앞', '왼쪽', '왼쪽 뒤', '뒷면', '오른쪽 뒤', '오른쪽', '오른쪽 앞'],
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
       tip: '팁: 워리어의 도끼, 맥주잔, 머리, 수염, 물고기를 눌러 보세요!',
       health: '체력', attack: '공격', defense: '방어', speed: '속도',
@@ -449,7 +451,7 @@
 
   // One sprite per class and body type: spriteViews.mage is the male Mage, spriteViews.mageF the female one.
   const spriteViews = { warrior: null, mage: null, assassin: null, priest: null, hunter: null, warriorF: null, mageF: null, assassinF: null, priestF: null, hunterF: null }, spritePromises = {};
-  let mageRaf = 0, castStart = -10;
+  let mageRaf = 0, castStart = -10, previewFacing = 0;
   const viewKey = c => c.class + (c.gender === 'female' ? 'F' : '');
   const currentSprite = c => spriteViews[viewKey(c)];
   const magecv = $('magecv'); magecv.width = 300; magecv.height = 394;
@@ -480,7 +482,8 @@
     g.strokeStyle = '#8acfff'; g.lineWidth = 2; g.globalAlpha = .65;
     g.beginPath(); g.ellipse(0, 0, 88, 25, 0, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1;
     const age = (now - castStart) / 1000;
-    const h = { fx: 1, fy: 1, atkT: age >= 0 && age < mage.meta.attack.duration ? age : 0, walk: 0 };
+    const angle = previewFacing * Math.PI / 4;
+    const h = { fx: Math.cos(angle) - Math.sin(angle), fy: Math.cos(angle) + Math.sin(angle), atkT: age >= 0 && age < mage.meta.attack.duration ? age : 0, walk: 0 };
     mage.draw(g, h, reduced ? 0 : now / 1000, 2.7);
     if (cfg.class === 'mage' && h.atkT > .24 && h.atkT < .5) {
       g.fillStyle = '#e6f8ff'; g.shadowColor = '#59d9ff'; g.shadowBlur = 15;
@@ -494,6 +497,11 @@
   }
   function castPreview() { castStart = performance.now(); if (cfg.class !== 'mage') noiseBurst(.14, 1400, 2800, .08); else tone([587, 880, 1175], .4, .035); paintMage(castStart + (reduced ? 200 : 0)); }
   magecv.addEventListener('click', castPreview);
+  for (const [id, step] of [['create-turn-left', 1], ['create-turn-right', -1]]) $(id).addEventListener('click', () => {
+    previewFacing = (previewFacing + step + 8) % 8;
+    $('create-facing').textContent = t('facingNames')[previewFacing];
+    castStart = -10; paintMage(performance.now()); blip(760);
+  });
   Object.defineProperty(window.valhalla, 'warrior', { get: () => spriteViews.warrior });
   Object.defineProperty(window.valhalla, 'mage', { get: () => spriteViews.mage });
   Object.defineProperty(window.valhalla, 'assassin', { get: () => spriteViews.assassin });
@@ -530,7 +538,7 @@
     const select = el('select', { class: 'gear-pick', 'aria-label': label, id: (inField ? 'field-' : 'create-') + key });
     values.forEach((v, i) => {
       const item = WORLD_ITEMS.find(item => item.class === type && item.kind === (armor ? 'armor' : 'weapon') && item.variant === v);
-      if (inField ? v === 'none' || Inventory.quantity(item?.id) > 0 : item?.starter) select.append(el('option', { value: v, text: names[i] }));
+      if (v === 'none' || (inField ? Inventory.quantity(item?.id) > 0 : item?.starter)) select.append(el('option', { value: v, text: names[i] }));
     });
     if (![...select.options].some(o => o.value === selected)) { selected = [...select.options].find(o => o.value !== 'none')?.value || 'none'; change(selected); }
     select.value = selected; select.addEventListener('change', () => change(select.value));
@@ -559,6 +567,12 @@
     custom.append(row(t('skin'), sw('skin', isModular ? C.SKIN : OPT.skinSwatch, 'skin')));
     if (isModular) {
       for (const key of equipmentKeys(cfg)) custom.append(gearSelect(key, cfg[key], value => { cfg[key] = value; refresh(); blip(760); }));
+      const clear = el('button', { class: 'btn ghost cc-no-gear', id: 'create-no-gear', type: 'button', text: t('noGear'), title: 'Starter gear stays in your bag.' });
+      clear.addEventListener('click', () => {
+        for (const key of [...equipmentKeys(cfg), 'head', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory', 'cloak']) cfg[key] = 'none';
+        buildControls(); refresh(); $('create-no-gear').focus({ preventScroll: true }); blip(760);
+      });
+      custom.append(clear);
       custom.append(el('p', { class: 'tip', text: t(cfg.class + 'Tip') })); return;
     }
     const tiles = el('div', { class: 'tiles' });
@@ -579,6 +593,7 @@
   }
   function updateClass() {
     const isModular = modular(cfg), name = cfg.class[0].toUpperCase() + cfg.class.slice(1);
+    $('create-facing').textContent = t('facingNames')[previewFacing];
     $('class-name').textContent = { warrior: 'WARRIOR (워리어)', mage: 'MAGE (마법사)', assassin: 'ASSASSIN (암살자)', priest: 'PRIEST (사제)', hunter: 'HUNTER (사냥꾼)' }[cfg.class];
     $('class-desc').dataset.i18n = cfg.class + 'Desc'; $('class-desc').textContent = t($('class-desc').dataset.i18n);
     $('custom-title').textContent = `[Customize ${name}]`; $('custom-panel').setAttribute('aria-label', 'Customize ' + name);
@@ -612,7 +627,9 @@
     const nm = $('name'); const name = nm.value.trim();
     if (name.length < 2) { nm.classList.add('bad'); nm.focus(); blip(200, .15, .08); return; }
     cfg.name = name.slice(0, 16);
-    Online.newCharacter(); save.char = { ...cfg }; save.draft = null; persist();
+    let emptySlots = equipmentKeys(cfg).filter(key => cfg[key] === 'none').map(key => key.endsWith('Armor') ? 'chest' : 'hands');
+    if (emptySlots.length === 2) emptySlots = ['headgear', 'shoulders', 'chest', 'pants', 'gloves', 'hands', 'necklace', 'cloak', 'accessory1', 'accessory2'];
+    Online.newCharacter({ emptySlots }); save.char = { ...cfg }; save.draft = null; persist();
     clang(); horn(); show('game');
   });
 

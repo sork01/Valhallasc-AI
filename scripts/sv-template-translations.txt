@@ -441,5 +441,6 @@
   "You enter {0}.": "Du går in i {0:t}.",
   "You enter {0}. Recommended levels {1}–{2}.": "Du går in i {0:t}. Rekommenderade nivåer {1}–{2}.",
   "Achievement earned: {0} (+{1} points).": "Prestation uppnådd: {0:t} (+{1} poäng).",
-  "Rested: {0}% / 200%": "Utvilad: {0}% / 200%"
+  "Rested: {0}% / 200%": "Utvilad: {0}% / 200%",
+  "{0}/{1} ({2}% rested {3}xp)": "{0}/{1} ({2}% utvilad {3}xp)"
 }

@@ -38,7 +38,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.31.0</p>
+    <p class="version">Beta 1.31.1</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -119,6 +119,11 @@
       <canvas id="wcv" aria-label="Warrior preview. Click the axe, mug, head, beard or fish to interact."></canvas>
       <canvas id="magecv" aria-label="Mage preview. Click to cast a spell." hidden></canvas>
       <p id="mage-status" class="mage-status" role="status" hidden></p>
+      <div class="cc-turn" role="group" aria-label="Rotate character">
+        <button class="arrow" id="create-turn-left" type="button" aria-label="Turn left">↶</button>
+        <span id="create-facing" aria-live="polite">Front</span>
+        <button class="arrow" id="create-turn-right" type="button" aria-label="Turn right">↷</button>
+      </div>
     </div>
 
     <div class="panel cc-desc">
@@ -153,7 +158,10 @@
         <p class="hud-name"><b id="hud-name"></b><span id="hud-lv"></span><span id="hud-reborn" class="hud-reborn" hidden></span><span id="gm-visibility" hidden></span><button id="gmtest-open" class="gmtest-open" type="button" hidden>Test</button><button id="activity-open" class="gmtest-open" type="button" hidden>Activity</button></p>
         <div class="bar hp"><i id="hp-fill"></i><span id="hp-text"></span></div>
         <div class="bar resource" id="resource-bar" role="progressbar" aria-label="Class resource" aria-valuemin="0"><i id="resource-fill"></i><span id="resource-text"></span></div>
-        <div class="bar xp"><i id="xp-fill"></i></div>
+        <div id="xp-meter" tabindex="0" role="progressbar" aria-label="Experience" aria-valuemin="0" aria-describedby="xp-tooltip">
+          <div class="bar xp"><i id="xp-fill"></i><i id="xp-rested"></i></div>
+          <div id="xp-tooltip" role="tooltip"></div>
+        </div>
       </div>
       <div class="hud-target" id="hud-target" hidden>
         <canvas class="hud-target-face" id="hud-target-face" width="96" height="96" aria-hidden="true"></canvas>

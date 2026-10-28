@@ -16,6 +16,7 @@ import numpy as np
 
 import cel_common as cc
 import generic_gear as gg
+import turning_hair
 from cel_common import V, unit, rig
 
 SLOTS = {'armor': ('crimson', 'azure', 'gm'), 'shoulders': ('crimson', 'azure', 'ironhide', 'gm'), 'gloves': ('crimson', 'azure', 'duelist', 'gm'),
@@ -149,6 +150,7 @@ def render_frame(clip, facing, k):
     torso = lambda ink, mat, *a: cc.torso(ink, xf, mat, *a)
     cc.base_body(body, xf, joints, R, w=1.05 if cc.FEMALE else BULK, torso_width=8.8, torso_depth=4)
     head = cc.head_frame(body, xf, psi, p, turn=.5)
+    scalp = turning_hair.replace(body, head, 'warrior', cc.FEMALE)
     H, hd, front, side = head['H'], head['hd'], head['front'], head['side']
     sw = p['sway']
     # Short spiky hair: a swept fringe of three sharp locks, bristling crown, a short tail at the nape.
@@ -519,6 +521,7 @@ def render_frame(clip, facing, k):
     ink.bone(hand + up * .8, hand + up * 1.6, 2.9, 2.8, 'gilt', -1.4, 2)
     ink.bone(hand + up * 1.5, hand + up * 2.3, 2.1, 1.7, 'ruby', -1.6, 3)
     gg.draw(inks, R, xf, joints, head)
+    scalp.finish()
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
@@ -535,7 +538,7 @@ GENERIC = {'armor': 'crimson', 'shoulders': 'ironhide', 'gloves': 'duelist', 'he
            'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'sword'}
 SHEET = cc.Sheet(
     'warrior', files='warrior_layered', pixel='warrior_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read(), open(turning_hair.__file__).read()]),
     # The auto grouping would put the three gm layers into the generic and trinkets sprites and change them; this is the
     # same grouping the five older sprites already have, plus one `gm` sprite per clip and facing.
     groups={'crimson': ['body', 'armor_crimson', 'shoulders_crimson', 'gloves_crimson', 'head_crimson'],

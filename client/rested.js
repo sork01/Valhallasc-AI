@@ -1,6 +1,9 @@
 'use strict';
 // The server owns the reserve. Opening this readout never changes or requests XP.
 window.Rested = (() => {
+  const meter = document.getElementById('xp-meter');
+  const reserve = document.getElementById('xp-rested');
+  const tooltip = document.getElementById('xp-tooltip');
   const holder = document.createElement('div');
   holder.id = 'rested'; holder.hidden = true;
   const button = document.createElement('button');
@@ -28,11 +31,24 @@ window.Rested = (() => {
   }, true);
   return {
     update(s) {
+      const need = Math.max(1, Number(s.xpNeed) || 1);
+      const xp = Math.max(0, Number(s.xp) || 0);
+      const progress = Math.min(100, xp / need * 100);
+      const percent = Math.max(0, Math.min(200, Number(s.rested?.percent) || 0));
+      // Reserve is bonus XP in level units; only the part fitting this level is painted.
+      reserve.style.left = `${progress}%`;
+      reserve.style.width = `${Math.min(percent, 100 - progress)}%`;
+      const amount = Math.floor(percent * 10) / 10;
+      const bonus = Math.floor(percent * need / 100);
+      const detail = s.rested ? `${xp}/${need} (${amount}% rested ${bonus}xp)` : `${xp}/${need}`;
+      const description = window.Locale?.translate(detail) || detail;
+      if (tooltip.textContent !== description) tooltip.textContent = description;
+      meter.setAttribute('aria-valuenow', Math.min(xp, need));
+      meter.setAttribute('aria-valuemax', need);
+      meter.setAttribute('aria-valuetext', description);
       holder.hidden = !s.rested;
       if (holder.hidden) { close(); return; }
-      const percent = Math.max(0, Math.min(200, Number(s.rested.percent) || 0));
       // Round down so a nearly full reserve is never advertised as full.
-      const amount = Math.floor(percent * 10) / 10;
       const text = `Rested: ${amount}% / 200%`;
       const translated = window.Locale?.translate(text) || text;
       if (button.textContent !== translated) button.textContent = translated;

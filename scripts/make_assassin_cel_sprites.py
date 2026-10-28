@@ -15,6 +15,7 @@ import math
 
 import cel_common as cc
 import generic_gear as gg
+import turning_hair
 from cel_common import V, unit, rig
 import make_assassin_sprites as old   # ../Valhalla/tools, read-only: the existing artwork's poses and palette
 
@@ -48,6 +49,7 @@ def female_layers(inks, p, psi, R, xf, joints):
     body = inks['body']
     cc.base_body(body, xf, joints, R)
     head = cc.head_frame(body, xf, psi, p, turn=1.0)
+    scalp = turning_hair.replace(body, head, 'assassin', True)
     H, hd, front = head['H'], head['hd'], head['front']
     sw = p['sway']
     # Long straight hair to the hips (the back sheet), then the legacy angular crown and fringe wedges.
@@ -64,6 +66,7 @@ def female_layers(inks, p, psi, R, xf, joints):
     for sx_ in (-1, 1):
         body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11.2, -1.2, 80), (sx_ * 11, .8, 64), (sx_ * 9.2, .6, 62), (sx_ * 8.6, -.4, 74)]], 'hair', 2 if sx_ > 0 else 1, True)
 
+    scalp.finish()
     for key, mat, scarf in [('armor_shadow', 'night', 'scarf'), ('armor_moon', 'moon', 'ribbon')]:
         ink = inks[key]
         torso(ink, mat, 8.6, 4.3, 36, 69)
@@ -174,6 +177,35 @@ def render_frame(clip, facing, k):
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
 
+def render_body_frame(clip, facing, k):
+    """Refresh the legacy male body without changing the original project."""
+    if cc.FEMALE:
+        return render_frame(clip, facing, k)['body']
+    p = {**DEFAULT, **CLIPS[clip][2](k)}
+    _, xf, _ = cc.skeleton(p)
+    original = old.Ink
+    created = 0
+
+    class HairInk(original):
+        def __init__(self, psi):
+            nonlocal created
+            super().__init__(psi)
+            self.color = old.COLOR
+            self.scalp = turning_hair.replace(self, cc.head_frame(self, xf, psi, p, turn=1.), 'assassin') if created == 0 else None
+            created += 1
+
+        def resolve(self, flash=False):
+            if self.scalp:
+                self.scalp.finish()
+            return super().resolve(flash)
+
+    old.Ink = HairInk
+    try:
+        return old.render_frame(clip, facing, k)['body']
+    finally:
+        old.Ink = original
+
+
 NAKED = {slot: 'none' for slot in SLOTS}
 SHADOW = {'armor': 'shadow', 'shoulders': 'shadow', 'gloves': 'shadow', 'head': 'shadow', 'weapon': 'daggers'}
 MOON = {'armor': 'moon', 'shoulders': 'moon', 'gloves': 'moon', 'head': 'moon', 'weapon': 'moonfang'}
@@ -181,7 +213,7 @@ GENERIC = {'armor': 'shadow', 'shoulders': 'ironhide', 'gloves': 'duelist', 'hea
            'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'daggers'}
 SHEET = cc.Sheet(
     'assassin', files='assassin', pixel='assassin_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]), legacy=LEGACY, legacy_files='assassin',
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read(), open(turning_hair.__file__).read()]), legacy=LEGACY, legacy_files='assassin',
     # Explicit groups, so the class-independent layers are listed here (Sheet only adds them when it picks the groups itself).
     groups=({'shadow': ['body', 'armor_shadow', 'shoulders_shadow', 'gloves_shadow', 'head_shadow'],
              'moon': ['ref_body', 'armor_moon', 'shoulders_moon', 'gloves_moon', 'head_moon'],

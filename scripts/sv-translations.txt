@@ -7547,5 +7547,18 @@
   "more achievements": "fler prestationer",
   "Rested grants 200% more XP from monsters and quests while your reserve lasts.": "Utvilad ger 200% mer XP från monster och uppdrag så länge din reserv räcker.",
   "Earn 5% Rested per hour offline, up to 200% after 40 hours.": "Få 5% vila per timme offline, upp till 200% efter 40 timmar.",
-  "100% Rested stores bonus XP equal to one level. Extra XP uses this reserve.": "100% vila lagrar bonus-XP motsvarande en nivå. Extra XP förbrukar denna reserv."
+  "100% Rested stores bonus XP equal to one level. Extra XP uses this reserve.": "100% vila lagrar bonus-XP motsvarande en nivå. Extra XP förbrukar denna reserv.",
+  "Front": "Framifrån",
+  "Front left": "Snett framifrån vänster",
+  "Left side": "Vänster sida",
+  "Back left": "Snett bakifrån vänster",
+  "Back view": "Bakifrån",
+  "Back right": "Snett bakifrån höger",
+  "Right side": "Höger sida",
+  "Front right": "Snett framifrån höger",
+  "No gear": "Ingen utrustning",
+  "Rotate character": "Vrid karaktären",
+  "Turn left": "Vrid åt vänster",
+  "Turn right": "Vrid åt höger",
+  "Starter gear stays in your bag.": "Startutrustningen ligger kvar i din väska."
 }

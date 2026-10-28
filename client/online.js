@@ -18,7 +18,7 @@
   const layoutSlot = () => mode === 'account' ? (acct.current ? (acct.slots[acct.current] ||= {}) : null) : saved.characters.find(c => c.token === saved.current);
   const persistSlot = () => mode === 'account' ? persistAccount() : persist();
   let socket = null, generation = 0, active = false, callbacks = {}, look = null, retryTimer = 0, heartbeat = 0, failures = 0;
-  let connected = false, id = null;
+  let connected = false, id = null, initialEmptySlots = [];
   const $ = name => document.getElementById(name);
   function status(text, ready) {
     $('network-status').textContent = text;
@@ -69,6 +69,13 @@
             saved.current = packet.token;
             saved.characters.push({ token: packet.token, look: character.look }); persist();
           }
+          // Creation choices use the ordinary authoritative equip action. Keep
+          // the intent until a snapshot confirms it, including across reconnects.
+          const initialSlot = layoutSlot();
+          if (initialEmptySlots.length && initialSlot) {
+            initialSlot.initialEmptySlots = initialEmptySlots; initialEmptySlots = []; persistSlot();
+          }
+          if (initialSlot?.initialEmptySlots?.length) send({ type: 'equip', slots: Object.fromEntries(initialSlot.initialEmptySlots.map(slot => [slot, 'none'])) });
           characterGm = character?.gm === true; window.GM?.onSelf(character);
           callbacks.onWelcome?.(packet);
           window.DpsMeter?.update(packet.snapshot.damageMeter);
@@ -83,6 +90,13 @@
         case 'snapshot': {
           if (!connected) break;
           const character = packet.players.find(p => p.id === id);
+          const initialSlot = layoutSlot();
+          if (character?.equipment && initialSlot?.initialEmptySlots?.every(slot => {
+            if (slot === 'chest' || slot === 'hands') return character.look?.[character.look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === 'none';
+            return !character.equipment[slot] || character.equipment[slot] === 'none';
+          })) {
+            delete initialSlot.initialEmptySlots; persistSlot();
+          }
           const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
           status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
           const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
@@ -143,7 +157,7 @@
       $('chat').hidden = true; $('connection-overlay').hidden = true;
       $('network-status').textContent = 'Valhalla · Shared world';
     },
-    newCharacter() { if (mode === 'account') { acct.current = null; persistAccount(); } else { saved.current = null; persist(); } },
+    newCharacter({ emptySlots = [] } = {}) { initialEmptySlots = [...emptySlots]; if (mode === 'account') { acct.current = null; persistAccount(); } else { saved.current = null; persist(); } },
     // Characters in the current mode as {key, look, level?}: a guest's key is its server key, an account's is the character id.
     select(key) {
       if (mode === 'account') {
