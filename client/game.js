@@ -645,6 +645,7 @@
     $('resource-fill').style.width = (current / max * 100).toFixed(1) + '%';
     $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.min(wholeRes(current), max)} / ${max}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`; window.Quests?.setLevel(s.level);
+    window.Rested?.update(s);
     $('bag-gold').textContent = `${s.gold} gold`;
     const mount = $('mount-toggle');
     mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
@@ -863,6 +864,22 @@
     respawn: () => tone([392, 587], .5, .06),
     portal: () => { sweep(180, 720, .5, .09, 'sine'); tone([523, 784, 1047], .5, .05); },
   };
+  // A struck bell cadence, with quiet metallic overtones; independent of the level-up fanfare.
+  function achievementSound() {
+    if (!save.sound) return;
+    const c = audio(); if (!c) return;
+    const now = c.currentTime, bus = sfxOut(c);
+    for (const [frequency, delay] of [[1174.66, 0], [880, .18], [987.77, .46], [493.88, .46]]) {
+      for (const [ratio, volume, decay] of [[1, .14, 1.2], [2.756, .035, .65], [5.404, .012, .28]]) {
+        const oscillator = c.createOscillator(), gain = c.createGain(), start = now + delay;
+        oscillator.type = 'sine'; oscillator.frequency.value = frequency * ratio;
+        gain.gain.setValueAtTime(0, start); gain.gain.linearRampToValueAtTime(volume, start + .006);
+        gain.gain.exponentialRampToValueAtTime(.0001, start + decay);
+        oscillator.connect(gain).connect(bus); oscillator.start(start); oscillator.stop(start + decay + .02);
+      }
+    }
+  }
+  window.AchievementAudio = { play: achievementSound };
   function onField(name, data) {
     if (SFX[name]) SFX[name](data);
     if (name === 'setTier') showToast(`${data.name}: ${data.tier}-piece bonus ${data.active ? 'active' : 'lost'}`);

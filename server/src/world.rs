@@ -125,6 +125,8 @@ mod rebirth;
 mod resource_tests;
 mod resources;
 #[cfg(test)]
+mod rested_tests;
+#[cfg(test)]
 mod ribbonwild_tests;
 mod rolls;
 #[cfg(test)]
@@ -443,6 +445,7 @@ impl Player {
             "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["abandonedQuests"] = json!(c.abandoned_quests);
+        view["rested"] = json!({"percent":c.rested.percent()});
         view["achievementTitle"] = json!(c.achievement_title());
         view["achievementPoints"] = json!(c.achievement_points());
         view
@@ -2054,6 +2057,13 @@ impl World {
         if let Some(saved) = self.pending_saves.iter().rev().find(|p| p.id == c.id) {
             c = saved.clone();
         }
+        if c.rested.last_seen == 0 {
+            c.rested.last_seen = self
+                .store
+                .rested_epoch()
+                .map_err(|e| storage(Box::new(e)))?;
+        }
+        c.rested.join(crate::store::unix_now().max(0) as u64);
         if c.zone >= self.maps.len() || self.is_arena_zone(c.zone) {
             // A zone that no longer exists sends the character back to the start.
             c.zone = 0;
@@ -2153,7 +2163,7 @@ impl World {
         if let Some(id) = self.players.get(&session).map(|p| p.character.id.clone()) {
             self.pvp_left(&id);
         }
-        if let Some(p) = self.players.remove(&session) {
+        if let Some(mut p) = self.players.remove(&session) {
             let name = p.character.look.name.clone();
             let place = self.zone_name(p.character.zone).to_owned();
             self.trade_left(&p.character.id);
@@ -2161,6 +2171,7 @@ impl World {
                 self.social_left(&p.character.id, &name, &p.character.friends);
             }
             let was_hidden = p.is_hidden();
+            p.character.rested.last_seen = crate::store::unix_now().max(0) as u64;
             self.pending_saves.push(p.character);
             self.save();
             if !was_hidden {
@@ -2169,6 +2180,14 @@ impl World {
         }
     }
     fn save(&mut self) {
+        let now = crate::store::unix_now().max(0) as u64;
+        for p in self
+            .players
+            .values_mut()
+            .filter(|p| p.merc.is_none() && p.ambient.is_none())
+        {
+            p.character.rested.last_seen = now;
+        }
         // Pending versions precede live versions; an online character always wins.
         match self.store.save_many(
             self.pending_saves.iter().chain(
@@ -5504,12 +5523,9 @@ fn quest_action_with_choice(
             *character = next;
             character.quests[i].claimed = true;
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
-            let (xp, gold) = (
-                character.boosted_xp(quest.reward_xp),
-                character.boosted_gold(quest.reward_gold),
-            );
+            let gold = character.boosted_gold(quest.reward_gold);
             character.gold = character.gold.saturating_add(gold);
-            let levels = character.grant_xp(xp);
+            let (xp, levels) = character.reward_xp(quest.reward_xp);
             (
                 format!(
                     "Quest complete: {}! +{} XP and +{} gold.{}",

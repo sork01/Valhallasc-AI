@@ -7538,5 +7538,14 @@
   "The Delver": "Djupvandraren",
   "Defeat 1 monster.": "Besegra 1 monster.",
   "Complete 1 quest.": "Slutför 1 uppdrag.",
-  "Be reborn once.": "Pånyttföds en gång."
+  "Be reborn once.": "Pånyttföds en gång.",
+  "Achievement categories": "Prestationskategorier",
+  "Adventure": "Äventyr",
+  "Exploration": "Utforskning",
+  "Achievement unlocked": "Prestation upplåst",
+  "Achievements unlocked": "Prestationer upplåsta",
+  "more achievements": "fler prestationer",
+  "Rested grants 200% more XP from monsters and quests while your reserve lasts.": "Utvilad ger 200% mer XP från monster och uppdrag så länge din reserv räcker.",
+  "Earn 5% Rested per hour offline, up to 200% after 40 hours.": "Få 5% vila per timme offline, upp till 200% efter 40 timmar.",
+  "100% Rested stores bonus XP equal to one level. Extra XP uses this reserve.": "100% vila lagrar bonus-XP motsvarande en nivå. Extra XP förbrukar denna reserv."
 }

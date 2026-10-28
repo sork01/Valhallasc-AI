@@ -10,6 +10,7 @@ mod model;
 mod notify;
 mod perks;
 mod rebirth;
+mod rested;
 mod sets;
 mod skills;
 mod store;

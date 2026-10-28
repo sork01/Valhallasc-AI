@@ -8,6 +8,13 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Rested (owner's request, 2026-10-28)
+
+- [x] `RESTED-RULES` — `docs/rested.md`: 5% per offline hour, capped at 200% after 40 hours; +200% base XP. Owner confirmed all XP including quests, and a reserve of bonus XP where 100% equals one level and only bonus XP consumes it. Per-character reserve, additive with existing bonuses; new characters start empty; legacy characters accrue from the persistent feature-installation timestamp, without invented earlier offline history.
+- [x] `RESTED-SERVER` — Persistent fixed-point reserve and online checkpoints, offline accrual on join, common kill/party/quest payouts, partial depletion, save/reload and rebirth preservation. No client-supplied time or reserve.
+- [x] `RESTED-CLIENT` — Purple reserve readout below XP, touch/keyboard explanation, hand-written Swedish; follows Character frame scaling and hides on older servers.
+- [x] `RESTED-CHECK` — Done and deployed, Beta 1.31.0 (2026-10-28): ten focused Rust tests, 28 bounded English/Swedish phone/tablet checks (742 MiB final peak), all-target clippy/fmt, changed JS syntax, Swedish coverage and release notes pass. Public/bridge health, running binary, all seven public file hashes, SQLite quick_check, unchanged 30 characters/18 guests, no test flags and no journal warnings verified. Results and backup: `docs/rested.md`.
+
 ### Achievements, points and rewards (owner's request, 2026-10-27)
 
 - [x] `ACHIEVEMENTS-RULES` — **Done: docs/achievements.md records the character scope, 41-achievement catalog, points/rewards, 23-region exploration and old-save/rebirth rules.** Plan an achievement system and document its catalog, completion conditions, point values and rewards in `docs/achievements.md`. **Every achievement awards achievement points.** The achievement panel must show the player's earned points and the maximum obtainable points. Some achievements also unlock titles: removing all exploration fog awards the title **`<Name> The Explorer`**. Hard achievements may additionally award a mount or another special reward; choose the concrete achievements and rewards during design. Settle character/account scope, title selection/display, what counts toward full exploration, and credit for existing progress before implementation.

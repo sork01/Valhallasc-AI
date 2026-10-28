@@ -1,5 +1,37 @@
 [
   {
+    "version": "Beta 1.31.0",
+    "date": "2026-10-28",
+    "new": [
+      "Rested earns 5% per hour offline, up to 200% after 40 hours. Spend the reserve for 200% more XP from monsters and quests.",
+      "See your remaining Rested reserve below the XP bar. Press it to learn how Rested works."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.30.3",
+    "date": "2026-10-27",
+    "new": [
+      "Earning an achievement now reveals an emerald-and-gold trophy ribbon with drifting diamond sparks, a gleaming seal and its own bell chime."
+    ],
+    "changed": [
+      "Achievements earned together share a celebration with their combined points. Celebrations wait for level-up banners and respect reduced motion and sound settings."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.30.2",
+    "date": "2026-10-27",
+    "new": [
+      "Browse achievements by Adventure, Combat, Quests and Exploration, with completion counts for each category."
+    ],
+    "changed": [
+      "Achievement cards now have ornate gold frames, curling corner decorations and golden point medallions. The full list is grouped by category."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.30.1",
     "date": "2026-10-27",
     "new": [

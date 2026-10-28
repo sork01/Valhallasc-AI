@@ -1,0 +1,11 @@
+#rested { position: relative; margin-top: .25cqw; pointer-events: auto; }
+.hud-tl.rested-open { z-index: 25; }
+#rested[hidden], #rested-details[hidden] { display: none; }
+#rested-status { display: block; width: 100%; min-height: calc(28px / var(--ui, .8)); border: 0; border-radius: .4cqw; padding: .3cqw .5cqw; background: rgba(7, 18, 40, .65); color: #c3ccd9; font: inherit; font-size: max(1.05cqw, calc(11px / var(--ui, .8))); text-align: left; cursor: pointer; touch-action: manipulation; }
+.rested-active #rested-status { color: #d7b8ff; background: rgba(84, 44, 124, .45); }
+#rested-status:focus-visible { outline: .2cqw solid #e0c5ff; }
+#rested-details { position: absolute; top: 100%; left: 0; width: max(28cqw, calc(230px / var(--ui, .8))); padding: .6cqw 1cqw; border: .15cqw solid #b691db; border-radius: .6cqw; background: #121c36; color: #f5edff; box-shadow: 0 .4cqw 1cqw #0008; font-size: max(1.25cqw, calc(12px / var(--ui, .8))); z-index: 10; }
+#rested-details p { margin: .5cqw 0; }
+@media (pointer: coarse) {
+  #rested-status { min-height: calc(44px / var(--ui, .8)); }
+}

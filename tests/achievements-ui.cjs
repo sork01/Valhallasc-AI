@@ -1,13 +1,44 @@
 const { run, replace, debug, safeSpot } = require('./lib/touch.cjs');
 const suite = {
   name: 'achievements',
-  mutate: page => replace(page, 'achievements.js', '`${data.points} / ${data.maximum}`', '`${data.points} / ${data.points}`'),
+  mutate: page => process.env.MUTATE === 'category'
+    ? replace(page, 'achievements.js', '!category || category === value', 'true')
+    : replace(page, 'achievements.js', '`${data.points} / ${data.maximum}`', '`${data.points} / ${data.points}`'),
   async test({ player, check, width, height, out }) {
     const page = await player('Pathfinder'); await safeSpot(page);
     await page.evaluate(() => { window.__nameplates = []; const fill = CanvasRenderingContext2D.prototype.fillText; CanvasRenderingContext2D.prototype.fillText = function(s,...args) { if (String(s).includes('Pathfinder')) window.__nameplates.push(String(s)); return fill.call(this,s,...args); }; });
     await page.keyboard.press('Escape'); await page.locator('#p-achievements').click();
     await page.waitForSelector('.achievement-card');
     check(await page.locator('.achievement-card').count() === 102, 'all 102 achievements shown');
+    check(await page.locator('.achievement-group-heading').allTextContents().then(a => a.join(',') === 'Adventure,Combat,Quests,Exploration'), 'all achievements are grouped under their catalog categories');
+    check(await page.locator('#achievement-categories').evaluate(n => {
+      const rows = [...n.children].map(button => button.getBoundingClientRect().top);
+      return Math.max(...rows) - Math.min(...rows) < 1;
+    }), 'category buttons fit on one row to leave space for the cards');
+    for (const [category, count] of [['Adventure',17],['Combat',40],['Quests',13],['Exploration',32]]) {
+      const button = page.locator(`#achievement-categories button[data-category="${category}"]`);
+      await button.click();
+      check(await button.getAttribute('aria-pressed') === 'true', `${category} selection is exposed to assistive technology`);
+      check(await page.locator('.achievement-card').count() === count && await page.locator('.achievement-group-heading').textContent() === category, `${category} shows only its ${count} achievements`);
+      check((await button.locator('small').textContent()).endsWith(`/ ${count}`), `${category} completion count uses its own total`);
+      const r = await button.boundingBox(); check(r.width >= 43.5 && r.height >= 43.5, `${category} has a 44 px touch target`);
+    }
+    await page.locator('#achievement-categories button[data-category="Combat"]').click();
+    await page.locator('[data-achievement="dungeon_choirmother"]').scrollIntoViewIfNeeded();
+    await page.screenshot({ path:`${out}/achievement-frames-${width}x${height}.png` });
+    check(await page.locator('[data-achievement="dungeon_choirmother"]').evaluate(n => {
+      const card = n.getBoundingClientRect();
+      return [...n.querySelectorAll('header, h4, p, progress, small')].every(child => {
+        const r = child.getBoundingClientRect(); return r.left >= card.left && r.right <= card.right;
+      });
+    }), 'long dungeon titles fit inside the ornate frame');
+    check(await page.locator('#achievement-list').evaluate(n => n.scrollWidth <= n.clientWidth + 1), 'gold decorations do not cause horizontal list overflow');
+    check(await page.locator('.achievement-card').first().locator('.achievement-corner[aria-hidden=true]').count() === 4, 'all four decorative corner flourishes are present');
+    check(await page.locator('.achievement-corner').first().evaluate(async n => {
+      const image = new Image(); image.src = getComputedStyle(n).backgroundImage.slice(5, -2);
+      try { await image.decode(); return image.naturalWidth > 0; } catch (_) { return false; }
+    }), 'gold corner artwork loads');
+    await page.locator('#achievement-categories button[data-category=""]').click();
     check(await page.locator('[data-achievement^="dungeon_"]').count() === 21, 'all 20 dungeon goals and their overall achievement are shown');
     for (const [id,title] of [['dungeon_master','The Delver'],['mounts_5','The Stablemaster'],['story_20','The Witness']]) {
       check((await page.locator(`[data-achievement="${id}"]`).textContent()).includes(title), `${title} reward is visible before it is earned`);
@@ -42,6 +73,12 @@ const suite = {
     check(await page.locator('#achievement-total').textContent() === total, 'a refusal awards no points');
     await page.locator('#achievements-filter').selectOption('complete');
     check(await page.locator('.achievement-card[data-complete="false"]').count() === 0, 'completed filter shows only earned achievements');
+    await page.locator('#achievement-categories button[data-category="Exploration"]').click();
+    check(await page.locator('.achievement-card').count() === 32, 'category and completed filters work together');
+    check(await page.locator('#achievement-categories button[data-category="Exploration"] small').textContent() === '32 / 32', 'category counts update after authoritative progress');
+    await page.locator('#achievement-categories button[data-category="Quests"]').click();
+    check(await page.locator('.achievement-card').count() === 0 && (await page.locator('#achievement-list').textContent()).includes('No achievements in this view.'), 'an empty category with a completion filter explains the empty view');
+    await page.locator('#achievement-categories button[data-category=""]').click();
     await page.screenshot({ path:`${out}/achievements-${width}x${height}.png` });
     await page.keyboard.press('Escape'); check(await page.locator('#achievements-panel').isHidden(), 'Escape closes the panel');
     const other = await player('Observer'); await safeSpot(other);
@@ -64,6 +101,7 @@ const suite = {
     await page.locator('#achievements-filter').selectOption('');
     await page.waitForSelector('[data-achievement="explorer"]');
     check(await page.locator('#achievements-heading').textContent() === 'Prestationer', 'Swedish panel heading');
+    check(await page.locator('#achievement-categories button > span').allTextContents().then(a => a.join(',') === 'Alla prestationer,Äventyr,Strid,Uppdrag,Utforskning'), 'all category controls have Swedish labels');
     check(await page.locator('[data-achievement="explorer"] h4').textContent() === 'Utforskaren', 'Swedish catalog achievement');
     check((await page.locator('[data-achievement="story_20"]').textContent()).includes('Vittnet') && (await page.locator('[data-achievement="mounts_5"]').textContent()).includes('Stallmästaren') && (await page.locator('[data-achievement="dungeon_master"]').textContent()).includes('Djupvandraren'), 'all three added title rewards have Swedish text');
     check(await page.locator('#achievement-title-select option[value="explorer"]').textContent() === 'Utforskaren', 'Swedish title selector');

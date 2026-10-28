@@ -318,6 +318,9 @@ pub struct Character {
     pub resource: Option<f64>,
     pub level: u32,
     pub xp: u32,
+    /// Offline-earned bonus XP and the last authoritative online checkpoint.
+    #[serde(default)]
+    pub rested: crate::rested::Rested,
     pub gold: u32,
     pub kills: u32,
     #[serde(default)]
@@ -484,6 +487,7 @@ impl Character {
             y: 0.,
             level,
             xp: 0,
+            rested: Default::default(),
             gold: 0,
             kills: 0,
             quests: vec![],

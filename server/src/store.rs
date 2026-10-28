@@ -44,12 +44,24 @@ impl Store {
             id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, character TEXT NOT NULL,
             actor TEXT NOT NULL, category TEXT NOT NULL, details TEXT NOT NULL, warning INTEGER NOT NULL);
             CREATE INDEX IF NOT EXISTS activity_category ON activity_log(category,id);")?;
+        db.execute(
+            "INSERT OR IGNORE INTO world_meta(key,value) VALUES ('rested_epoch',?1)",
+            [unix_now()],
+        )?;
         Ok(Self {
             db: Arc::new(Mutex::new(db)),
         })
     }
     pub(crate) fn conn(&self) -> MutexGuard<'_, Connection> {
         self.db.lock().unwrap_or_else(|e| e.into_inner())
+    }
+    /// Old offline characters start accruing when Rested first becomes available.
+    pub fn rested_epoch(&self) -> rusqlite::Result<u64> {
+        self.conn().query_row(
+            "SELECT value FROM world_meta WHERE key='rested_epoch'",
+            [],
+            |r| r.get::<_, i64>(0).map(|n| n.max(0) as u64),
+        )
     }
     pub fn world_clock_epoch_ms(&self, now_ms: i64) -> rusqlite::Result<i64> {
         self.conn().execute(
@@ -153,6 +165,10 @@ impl Store {
             y: spawn.y,
             level: 1,
             xp: 0,
+            rested: crate::rested::Rested {
+                last_seen: unix_now().max(0) as u64,
+                ..Default::default()
+            },
             gold: 0,
             kills: 0,
             quests: vec![],

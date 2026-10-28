@@ -6,6 +6,40 @@ Character window open the panel. It shows earned points / maximum points, each
 requirement, progress, completion state, points and rewards, with all/completed/in
 progress filters. The title selector offers earned titles and No title.
 
+Beta 1.30.2 exposes the catalog's Adventure (17), Combat (40), Quests (13) and
+Exploration (32) categories as filter buttons with completed / total counts.
+All achievements groups cards under category headings. Category selection combines
+with the completion filter; counts always describe the whole category. Refreshes
+preserve the selected category, focused button and scroll position. Switching a
+filter starts at the top. Category labels and headings support Swedish.
+Cards have layered gold borders, four decorative SVG corner flourishes, point
+medallions and a brighter completed finish. This is a client-only release.
+The category buttons share one row, with counts beneath their labels.
+Validation: 120 bounded browser checks pass at 844×390 and 1024×768 (923 MiB
+peak). Disabling the category predicate with `MUTATE=category` fails at the
+Adventure-only assertion as intended. JavaScript syntax, Swedish generation,
+release-note checks and all six changed public client file hashes pass.
+
+Beta 1.30.3 adds a 4.8-second emerald trophy ribbon with a stamping gold seal,
+one gleam and six drifting diamond motes. Its short struck-bell cadence uses the
+shared effects bus, Sound toggle and squared volume taper. Reduced motion shows
+a still ribbon. The overlay captures no input and does not pause play.
+The client consumes the original successful `Achievement earned: NAME (+N points).`
+notice from `world/achievements.rs`, before localization; ordinary chat cannot
+trigger it. A 200 ms collection window batches simultaneous awards, shows the
+first two names and remaining count, and sums their points. Awards wait for an
+active level-up banner or hidden document before showing. Names are deduplicated
+within the connection; disconnect/character reset clears the timers, queue and
+visible ribbon. Opening the panel and login reconciliation do not replay awards.
+This presentation needs no server rebuild. If the server notice format changes,
+update the parser and its focused integration check together.
+`tests/achievement-effects-ui.cjs` passes 48 bounded phone/tablet checks (617 MiB
+peak), including real server awards, level-up sequencing, batching, duplicate and
+reset handling, Swedish text and native offline rendering of the production bell
+and effects-bus functions for audible level, no clipping, volume taper and mute.
+Removing notice dispatch with `MUTATE=1` fails waiting for the ribbon, as intended.
+Syntax, Swedish generation, release notes and seven public client hashes pass.
+
 The server owns completion and unlocks. Points are the sum of completed catalog
 entries, and the maximum is the sum of all catalog points, including completed
 ones. Points are a score, not currency. The panel requests the catalog on opening

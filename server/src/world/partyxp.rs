@@ -185,10 +185,7 @@ impl World {
         self.players
             .values_mut()
             .find(|p| p.merc.is_none() && p.character.id == id)
-            .map(|p| {
-                let got = p.character.boosted_xp(xp);
-                (got, p.character.grant_xp(got))
-            })
+            .map(|p| p.character.reward_xp(xp))
     }
 }
 

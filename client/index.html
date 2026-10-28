@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="dpsmeter.css">
 <link rel="stylesheet" href="activity.css">
 <link rel="stylesheet" href="achievements.css">
+<link rel="stylesheet" href="rested.css">
 <script src="compat.js"></script>
 </head>
 <body>
@@ -37,7 +38,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.30.1</p>
+    <p class="version">Beta 1.31.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -445,6 +446,7 @@
           <label for="achievement-title-select">Title <select id="achievement-title-select"><option value="">No title</option></select></label>
           <label for="achievements-filter">Show <select id="achievements-filter"><option value="">All achievements</option><option value="complete">Completed</option><option value="incomplete">In progress</option></select></label>
         </div>
+        <nav id="achievement-categories" aria-label="Achievement categories"></nav>
         <div id="achievement-list" tabindex="0"></div>
       </section>
     </div>
@@ -493,6 +495,13 @@
         <button class="btn ghost" id="keys-reset-all" type="button">Reset all keys</button>
         <button class="btn primary" id="keys-back" type="button">Back to settings</button>
       </section>
+    </div>
+    <div id="achievement-toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+      <div class="achievement-burst" aria-hidden="true"><i>◆</i><i>✦</i><i>◆</i><i>✦</i><i>◆</i><i>✦</i></div>
+      <div class="achievement-emblem" aria-hidden="true">
+        <svg viewBox="0 0 80 80" fill="none"><path d="m40 2 11 9 14 2 2 14 11 13-11 13-2 14-14 2-11 9-11-9-14-2-2-14L2 40l11-13 2-14 14-2Z" fill="#bd9346" stroke="#ffe7a0" stroke-width="2"/><circle cx="40" cy="40" r="28" fill="#123c36" stroke="#f3cf7c" stroke-width="2"/><path d="M29 23h22v14c0 16-22 16-22 0ZM29 27H19v7q0 10 13 10m19-17h10v7q0 10-13 10M40 49v11m-11 0h22" stroke="#ffe49a" stroke-width="3" stroke-linejoin="round"/><path d="m40 28 2 5 5 1-4 4 1 5-4-2-4 2 1-5-4-4 5-1Z" fill="#ffe49a"/></svg>
+      </div>
+      <div class="achievement-ribbon"><small id="achievement-toast-heading"></small><b id="achievement-toast-name"></b><small id="achievement-toast-extra"></small><strong id="achievement-toast-points"></strong></div>
     </div>
     <div id="levelup-flash" class="levelup-flash" aria-hidden="true"></div>
     <div id="levelup-banner" class="levelup" role="status" aria-live="assertive" hidden>
@@ -768,6 +777,7 @@
 <script src="worldmap.js"></script>
 <script src="skillbar.js"></script>
 <script src="quickuse.js"></script>
+<script src="rested.js"></script>
 <script src="game.js"></script>
 <script src="touch.js"></script>
 <script src="settings.js"></script>
