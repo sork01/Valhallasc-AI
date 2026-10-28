@@ -9,7 +9,8 @@
     "changed": [
       "The XP bar shows earned XP in blue and the Rested reserve ahead of it in light green.",
       "The priest's starting Pilgrim's Hood now turns with the character, including its opening, gold trim and crimson cords.",
-      "Hair crowns, fringes and partings now turn with every character across all five classes and both bodies. Female priest hair also keeps its volume in side views."
+      "Hair crowns, fringes and partings now turn with every character across all five classes and both bodies. Female priest hair also keeps its volume in side views.",
+      "Cinderlord now has 60% less health."
     ],
     "removed": []
   },
