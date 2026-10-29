@@ -6,7 +6,7 @@ const http = require('node:http');
 const { chromium } = require('playwright');
 require('./lib/touch.cjs').requireMemoryLimit();
 const root = path.resolve(__dirname, '../client');
-const out = path.resolve(__dirname, '../test-results/female-torso');
+const out = process.env.TORSO_ART_DIR ? path.resolve(process.env.TORSO_ART_DIR) : path.resolve(__dirname, '../test-results/female-torso');
 const candidates = path.join(out, 'assets'), before = path.join(out, 'before');
 const classes = ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
 const server = http.createServer((req, res) => {

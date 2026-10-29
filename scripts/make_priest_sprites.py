@@ -362,6 +362,9 @@ def render_frame(clip, facing, k):
     body = inks['body']
 
     def torso(ink, mat, halfwidth, y, bottom=38, top=67, push=0):
+        if cc.FEMALE:
+            cc.torso(ink, xf, mat, halfwidth, y, bottom, top, push=push)
+            return
         for points, tone in cc.torso_panels(halfwidth, y, bottom, top):
             ink.plate([xf(q) for q in points], mat, tone, push=push)
 

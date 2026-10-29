@@ -190,7 +190,8 @@ def torso_panels(halfwidth, y, bottom=38, top=67):
             (halfwidth * 1.0, at(.1), 1.06), (halfwidth * 1.0, bottom, 1.06)]
     # Additional volume belongs to the front of the chest, tapering above the
     # waist. Keep the back depth and the neck/shoulder/hip attachment unchanged.
-    front = [1., 1.85, 1.55, .88, 1.06, 1.06]
+    # Owner follow-up: double the previous chest/under-chest projection.
+    front = [1., 3.70, 3.10, .88, 1.06, 1.06]
     for sy in (-1, 1):
         face = [(w, sy * y * (front[i] if sy == 1 else d), z) for i, (w, z, d) in enumerate(prof)]
         panels.append((face + [(-x, yy, z) for x, yy, z in reversed(face)], 2 if sy == 1 else 1))
@@ -200,9 +201,35 @@ def torso_panels(halfwidth, y, bottom=38, top=67):
     return panels
 
 
-def torso(ink, xf, mat, halfwidth, y, bottom=38, top=67):
-    for points, tone in torso_panels(halfwidth, y, bottom, top):
-        ink.plate([xf(q) for q in points], mat, tone)
+def torso(ink, xf, mat, halfwidth, y, bottom=38, top=67, push=0):
+    panels = torso_panels(halfwidth, y, bottom, top)
+    if not FEMALE:
+        for points, tone in panels:
+            ink.plate([xf(q) for q in points], mat, tone)
+        return
+    # A fuller profile is not one flat polygon. Render each height band at
+    # its actual depth, then outline only the silhouette, avoiding crossing
+    # seams and false occlusion between the front and side surfaces.
+    previous = ink.z.copy()
+    for points, tone in panels:
+        n = len(points) // 2
+        for i in range(n - 1):
+            corners = [points[i], points[i+1], points[-i-2], points[-i-1]]
+            projected = [ink.project(xf(q)) for q in corners]
+            xy = np.array([p[0] for p in projected])
+            depths = np.array([p[1] for p in projected])
+            plane = np.linalg.lstsq(np.c_[np.ones(4), xy], depths, rcond=None)[0]
+            slope = plane[1:]; length = np.linalg.norm(slope)
+            if length < 1e-6:
+                ink.poly(xy, ink.color[mat][tone], depths.mean() + push - .01, False)
+            else:
+                axis = slope / length; along = xy @ axis; center = xy.mean(0)
+                a = center + axis * (along.min() - center @ axis)
+                b = center + axis * (along.max() - center @ axis)
+                ink.poly(xy, ink.color[mat][tone], push - .01, False,
+                         gradient=(a, b, plane[0] + a @ slope, plane[0] + b @ slope))
+    mask = ink.z < previous
+    ink.index[mask & ~ndi.binary_erosion(mask, iterations=SS)] = 1
 
 
 def base_body(ink, xf, joints, R, w=1., cloth='cloth', pants='pants', torso_width=7.8, torso_depth=3.5):
