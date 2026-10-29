@@ -22,6 +22,74 @@ fn routes(data: &Value) -> Vec<(usize, usize)> {
 }
 
 #[test]
+fn compact_atlas_bifrost_arrivals_and_approaches_stay_on_visible_floor() {
+    let data = bundled();
+    let sky = &data["zones"][6];
+    let floor = |p: Point| {
+        for (dx, dy) in [(0., 0.), (0.38, 0.), (-0.38, 0.), (0., 0.38), (0., -0.38)] {
+            let x = (p.x + dx).floor() as usize;
+            let y = (p.y + dy).floor() as usize;
+            assert_ne!(
+                sky["sky"][y].as_str().unwrap().as_bytes()[x],
+                b' ',
+                "Bifrost route has no visible floor at {p:?}"
+            );
+        }
+    };
+    let mut w = world();
+    calm(&mut w);
+    let _rx = join(&mut w, 1, Class::Warrior);
+    w.players.get_mut(&1).unwrap().character.level = 99;
+    for from in [1, 6, 8, 9] {
+        let gate = w.maps[from]
+            .portals
+            .iter()
+            .find(|p| p.to == 7)
+            .unwrap()
+            .clone();
+        floor(at(gate.tx, gate.ty));
+        let side = gate.walk.unwrap();
+        let dir = at(f64::from(side[0]), f64::from(side[1]));
+        w.players.get_mut(&1).unwrap().stop();
+        place(
+            &mut w,
+            1,
+            from,
+            at(gate.x - dir.x * 4., gate.y - dir.y * 4.),
+        );
+        w.time += PORTAL_DELAY + 1.;
+        for _ in 0..40 {
+            w.time += TICK;
+            let hero = w.players.get_mut(&1).unwrap();
+            hero.input = dir;
+            hero.input_at = w.time;
+            w.update_player(1);
+            if w.players[&1].character.zone == 7 {
+                break;
+            }
+        }
+        assert_eq!(w.players[&1].character.zone, 7, "crossing from {from}");
+        for _ in 0..20 {
+            floor(w.players[&1].character.point());
+            w.time += TICK;
+            w.update_player(1);
+        }
+    }
+    for path in sky["atlasPaths"].as_array().unwrap() {
+        for segment in path.as_array().unwrap().windows(2) {
+            let point = |v: &Value| at(v[0].as_f64().unwrap(), v[1].as_f64().unwrap());
+            let a = point(&segment[0]);
+            let b = point(&segment[1]);
+            let steps = (a.distance(b) * 4.).ceil().max(1.) as usize;
+            for i in 0..=steps {
+                let f = i as f64 / steps as f64;
+                floor(at(a.x + (b.x - a.x) * f, a.y + (b.y - a.y) * f));
+            }
+        }
+    }
+}
+
+#[test]
 fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
     let w = world();
     let data = bundled();

@@ -1,5 +1,23 @@
 [
   {
+    "version": "Beta 1.32.6",
+    "date": "2026-10-29",
+    "new": [],
+    "changed": [
+      "Travel stairs are now solid stone staircases with raised treads, vertical risers, supporting sides and continuous handrails, making climbs and descents easier to see."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.32.5",
+    "date": "2026-10-29",
+    "new": [],
+    "changed": [
+      "Arriving in Bifrost Reach from Wyrdwood or Nacrehold places you on a visible island or bridge. Walking routes stay on solid floor and leave room to pass the exits."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.32.4",
     "date": "2026-10-29",
     "new": [],

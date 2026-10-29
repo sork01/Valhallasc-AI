@@ -45,6 +45,11 @@ def blocked(z, radius=.38):
     """Rasterize exactly the server's round/rectangular collision footprints."""
     n = z['size']
     grid = bytearray(n * n)
+    # Void collision rectangles only guard island edges; unpainted sky farther
+    # away is not another walkable region. Route searches must require floor too.
+    for y, row in enumerate(z.get('sky', [])):
+        for x, tile in enumerate(row):
+            if tile == ' ': grid[y*n+x] = 1
     for o in z['objects']:
         x, y = o['x'], o['y']
         rect = o.get('width', 0) > 0 and o.get('depth', 0) > 0
@@ -82,6 +87,14 @@ def connected(z, avoid=()):
 def clear(z, a, b, radius=.8):
     """Continuous segment test using the same inflated shapes as Map::line_clear."""
     dx, dy = b[0]-a[0], b[1]-a[1]; length = dx*dx+dy*dy
+    if z.get('sky'):
+        n = z['size']; steps = max(1, math.ceil(math.sqrt(length)*4))
+        for i in range(steps+1):
+            x, y = a[0]+dx*i/steps, a[1]+dy*i/steps
+            for ox, oy in [(0,0),(radius,0),(-radius,0),(0,radius),(0,-radius)]:
+                ix, iy = math.floor(x+ox), math.floor(y+oy)
+                if not (0 <= ix < n and 0 <= iy < n and z['sky'][iy][ix] != ' '):
+                    return False
     for o in z['objects']:
         if o.get('width', 0) > 0 and o.get('depth', 0) > 0:
             lo, hi = 0., 1.
@@ -119,6 +132,9 @@ def endpoint(z, side, prev, fixed, preferred=.5):
     for _, p, a in sorted(candidates):
         # Sky bridges are narrow: put their trigger on a broad landing so
         # other travellers can pass it without being forced through the gate.
+        if z.get('sky') and not clear(z, (p[0]-sy*3.5, p[1]+sx*3.5),
+                                     (p[0]+sy*3.5, p[1]-sx*3.5)):
+            continue
         if clear(z, p, a):
             return p, a
     raise AssertionError(f"{z['name']}: no safe reachable gate on {side}")

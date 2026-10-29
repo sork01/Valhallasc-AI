@@ -77,6 +77,14 @@ approach is actually walkable under Rust collision and avoids all other trigger
 areas, including dungeon doors. Players, enemies and scenery retain their data;
 the Bifrost landing changes only the local bridge floor and void rectangles.
 
+Beta 1.32.5 also requires Bifrost routes to remain on the visible sky floor.
+Void collision objects protect island edges but do not fill all distant sky;
+collision-only flood searches previously selected empty-sky arrivals from
+Wyrdwood and Nacrehold. The route raster now excludes empty floor tiles, endpoint
+segments check the player footprint, and sky exits require a lateral passing
+area. See `docs/zone-travel.md` and the focused
+`compact_atlas_bifrost_arrivals_and_approaches_stay_on_visible_floor` regression.
+
 ## Cities, interiors and exploration
 
 City buttons show Asterion inside Stormglass and the Canopy inside Veyrroot.

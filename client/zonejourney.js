@@ -95,22 +95,77 @@
   function approach(g, p, from, to, project, t, still) {
     const trip = route(from, to); if (!trip || trip.up === null) return false;
     const [dx, dy] = p.walk, [sx, sy] = project(p.x, p.y), up = trip.up;
-    g.save(); g.lineJoin = 'round';
-    for (let i = 0; i < 7; i++) {
-      const f = i / 6, [x, y] = project(p.x + dx * (f * 5 - 2), p.y + dy * (f * 5 - 2));
-      const lift = (up ? f : 1 - f) * 50;
-      g.strokeStyle = trip.kind === 'sky' ? '#8276ab' : '#28788d'; g.lineWidth = 10;
-      g.beginPath(); g.moveTo(x - 32, y - lift + 9); g.lineTo(x + 32, y - lift + 9); g.stroke();
-      g.strokeStyle = trip.kind === 'sky' ? '#e9e2ff' : '#8ce0e9'; g.lineWidth = 5;
-      g.beginPath(); g.moveTo(x - 32, y - lift); g.lineTo(x + 32, y - lift); g.stroke();
+    const skyStone = trip.kind === 'sky', steps = 8, run = .7, rise = 26, width = 1.05;
+    const ax = dx * (up ? 1 : -1), ay = dy * (up ? 1 : -1);
+    // Turn the flight at its foot landing when necessary, keeping its risers
+    // facing the camera rather than hiding them behind the tall end wall.
+    const ux = ax + ay > 0 ? -ay : ax, uy = ax + ay > 0 ? -ax : ay, vx = -uy, vy = ux;
+    // All surfaces share actual isometric corners. The 208 px climb is taller
+    // than the ground-plane projection, so the upper end visibly rises.
+    const point = (u, v, z) => {
+      const ox = -dx * 1.6 - (up ? 0 : ux * steps * run), oy = -dy * 1.6 - (up ? 0 : uy * steps * run);
+      const [x,y] = project(p.x + ox + ux * u + vx * v, p.y + oy + uy * u + vy * v);
+      return [x, y - z];
+    };
+    const face = (points, color, stroke = true) => {
+      g.beginPath(); points.forEach(([x,y],i) => i ? g.lineTo(x,y) : g.moveTo(x,y)); g.closePath();
+      g.fillStyle = color; g.fill(); if (stroke) g.stroke();
+    };
+    const rail = (side) => {
+      const low = point(0,side * width, rise + 40), high = point(steps * run,side * width,steps * rise + 40);
+      g.lineCap = 'round';
+      for (let i = 0; i <= steps; i += 2) {
+        const z = Math.max(1,i) * rise, railZ = rise + 40 + (steps-1) * rise * i / steps;
+        const a = point(i*run,side*width,z), b = point(i*run,side*width,railZ);
+        g.strokeStyle = '#30364d'; g.lineWidth = 7; g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke();
+        g.strokeStyle = skyStone ? '#e4c678' : '#85d3d6'; g.lineWidth = 4; g.stroke();
+        g.fillStyle = skyStone ? '#fff1b5' : '#c4ffff'; g.beginPath(); g.arc(b[0],b[1],4.5,0,Math.PI*2); g.fill();
+      }
+      g.strokeStyle = '#30364d'; g.lineWidth = 9; g.beginPath(); g.moveTo(...low); g.lineTo(...high); g.stroke();
+      g.strokeStyle = skyStone ? '#e4c678' : '#85d3d6'; g.lineWidth = 5; g.stroke();
+      g.strokeStyle = skyStone ? '#fff0b4' : '#d2ffff'; g.lineWidth = 1.5; g.stroke();
+    };
+    g.save(); g.lineJoin = 'round'; g.lineWidth = 1.8; g.strokeStyle = '#30364d';
+    face([point(-.65,-width,0),point(-.65,width,0),point(0,width,0),point(0,-width,0)], skyStone ? '#cbd8ef' : '#80bec8');
+    // Solid stepped side walls carry the entire flight down to its foundation.
+    const nearSide = vx + vy > 0 ? 1 : -1;
+    rail(-nearSide);
+    g.strokeStyle = '#30364d'; g.lineWidth = 1.8;
+    for (const side of [-nearSide, nearSide]) {
+      const profile = [point(0,side*width,0)];
+      for (let i = 0; i < steps; i++) profile.push(point(i*run,side*width,(i+1)*rise),point((i+1)*run,side*width,(i+1)*rise));
+      profile.push(point(steps*run,side*width,0));
+      face(profile, skyStone ? (side === nearSide ? '#75829f' : '#96a3c0') : (side === nearSide ? '#286977' : '#408b96'));
+      // Masonry joints make the side read as a load-bearing wall.
+      g.strokeStyle = skyStone ? '#aab6ce' : '#69a4ab'; g.lineWidth = 1;
+      for (let i = 2; i < steps; i += 2) {
+        const a = point(i*run,side*width,0), b = point(i*run,side*width,i*rise);
+        g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke();
+      }
+      g.strokeStyle = '#30364d'; g.lineWidth = 1.8;
     }
+    // Paint the farther blocks first for all four map directions.
+    const order = Array.from({length:steps},(_,i)=>i);
+    if (ux + uy > 0) order.reverse();
+    for (const i of order) {
+      const u = i*run, h = (i+1)*rise;
+      face([point(u,-width,h-rise),point(u,width,h-rise),point(u,width,h),point(u,-width,h)], skyStone ? '#a1adc6' : '#4f9ba5');
+      face([point(u,-width,h),point(u,width,h),point(u+run,width,h),point(u+run,-width,h)], skyStone ? (i%2 ? '#edf2ff' : '#dae5fa') : (i%2 ? '#b6eaeb' : '#8fcdd4'));
+      const a = point(u,-width,h), b = point(u,width,h);
+      g.strokeStyle = skyStone ? '#ffffff' : '#e3ffff'; g.lineWidth = 2.5;
+      g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke();
+      g.strokeStyle = '#30364d'; g.lineWidth = 1.8;
+    }
+    rail(nearSide);
+    const upper = point(steps*run,0,steps*rise), lower = point(0,0,0);
+    const labelX = (upper[0] + lower[0]) / 2, labelY = Math.min(upper[1], lower[1]) - 92;
     g.font = '22px "Jua",sans-serif'; g.textAlign = 'center'; g.lineWidth = 5;
     g.strokeStyle = '#102d46'; g.fillStyle = '#ecfaff';
     const label = (up ? '↑  ' : '↓  ') + tr(trip.text);
-    g.strokeText(label, sx, sy - 108); g.fillText(label, sx, sy - 108);
-    g.font = '17px "Jua",sans-serif'; g.strokeText(to.name, sx, sy - 82); g.fillText(to.name, sx, sy - 82);
+    g.strokeText(label, labelX, labelY); g.fillText(label, labelX, labelY);
+    g.font = '17px "Jua",sans-serif'; g.strokeText(to.name, labelX, labelY + 26); g.fillText(to.name, labelX, labelY + 26);
     if (trip.kind === 'sky') {
-      g.fillStyle = 'rgba(224,242,255,.5)'; cloud(g, sx, sy + 25, 85);
+      g.fillStyle = 'rgba(224,242,255,.3)'; cloud(g, upper[0], upper[1] + 12, 65);
     } else {
       g.strokeStyle = 'rgba(171,238,255,.75)'; g.lineWidth = 2;
       for (let i = 0; i < 8; i++) {
