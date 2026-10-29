@@ -1085,3 +1085,11 @@
 .tracker-track { flex: none; border: 1px solid #8bd9b080; border-radius: 3px; padding: .25cqw .4cqw; background: #152b26bb; color: #a6ffcf; font: inherit; font-size: .8cqw; cursor: pointer; }
 .tracker-track[aria-pressed="true"] { background: #285c40dd; color: #e1ffeb; }
 @media (pointer: coarse) { .tracker-track { min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); } }
+
+/* Vertical crossings: readable direction without interrupting movement or hiding danger. */
+.zone-journey { position:absolute; z-index:3; top:31%; left:50%; transform:translateX(-50%); width:max-content; max-width:78%; padding:.65cqw 1.5cqw; border:1px solid #b8e6ff99; border-radius:.8cqw; background:#112b49de; color:#f1faff; text-align:center; pointer-events:none; box-shadow:0 .3cqw 1.4cqw #03162666; }
+.zone-journey[data-kind="sea"] { background:#073947eb; border-color:#7de2e9aa; }
+.zone-journey b { display:block; font:400 clamp(15px,2.2cqw,36px) var(--display); }
+.zone-journey span { display:block; margin-top:.25cqw; font:clamp(11px,1.2cqw,20px) 'Jua',sans-serif; color:#d7f0ff; }
+.zone-altitude { width:12cqw; white-space:normal; margin:.25cqw 0; color:#c4f2ff; font:clamp(10px,.9cqw,15px) 'Jua',sans-serif; text-align:center; text-shadow:0 1px 3px #041626; }
+.zone-journey[hidden], .zone-altitude[hidden] { display:none; }

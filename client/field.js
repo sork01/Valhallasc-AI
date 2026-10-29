@@ -1167,6 +1167,7 @@
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
     const moved = (own.zone || 0) !== zone;
+    if (moved || initial) window.ZoneJourney?.enter(zdef, ZONES[own.zone || 0], initial);
     if (moved) setZone(own.zone || 0);
     const inZone = a => (a.zone || 0) === zone;
     if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
@@ -3392,6 +3393,7 @@
       g.fillStyle = 'rgba(150,170,215,.55)'; g.beginPath(); g.ellipse(px, py, 70 * s, 12 * s, 0, 0, 6.283); g.fill();
       g.beginPath(); g.moveTo(px - 60 * s, py + 4 * s); g.lineTo(px + 60 * s, py + 4 * s); g.lineTo(px + 8 * s, py + 46 * s); g.lineTo(px - 14 * s, py + 30 * s); g.closePath(); g.fill();
     }
+    window.ZoneJourney?.belowClouds(g, VW, VH, t, cx, cy, reducedMotion());
     // high, bright cloud
     g.fillStyle = 'rgba(255,255,255,.6)';
     for (let i = 0; i < 8; i++) {
@@ -3741,6 +3743,7 @@
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
     if (p.walk) {
+      if (window.ZoneJourney?.approach(g, p, zdef, ZONES[p.to], w2s, t, reducedMotion())) return;
       // A low roadside waymark replaces the glowing gate on ordinary outdoor routes.
       const dest = ZONES[p.to], dx = p.walk[0], dy = p.walk[1];
       const [ax, ay] = w2s(p.x-dx*2, p.y-dy*2), [bx, by] = w2s(p.x+dx*3, p.y+dy*3);
@@ -4160,6 +4163,7 @@
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
+    window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
     drawQuestArrow(g);
     drawMini();
   }
@@ -4368,6 +4372,7 @@
     start(o) {
       cv = o.canvas; ctx = cv.getContext('2d'); mini = o.mini; mctx = mini ? mini.getContext('2d') : null; opts = o.opts; onHud = o.onHud || onHud; onEvent = o.onEvent || onEvent;
       if (!sprites.tree.length) buildSprites();
+      window.ZoneJourney?.clear();
       setZone(0); reset(); slimes = []; remotePlayers.clear(); lastLook = ''; onCharacter = o.onCharacter || (() => {}); hero.look = { ...(o.char || {}) }; resize();
       ++spriteGeneration; mageSpr = null; warSpr = null; heroSpr = null;
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
@@ -4388,7 +4393,7 @@
       });
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
-    stop() { window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
+    stop() { window.ZoneJourney?.clear(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
     setTouchDirection(x, y) {
       if (!Field.canAct || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {

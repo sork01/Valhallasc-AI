@@ -7569,5 +7569,17 @@
   "Synthesized": "Syntetiska",
   "Dazed": "Omtöcknad",
   "Movement speed is reduced by 50%.": "Rörelsehastigheten är sänkt med 50%.",
-  "You can dance when you are alive, out of combat and free to move.": "Du kan dansa när du är vid liv, utanför strid och kan röra dig fritt."
+  "You can dance when you are alive, out of combat and free to move.": "Du kan dansa när du är vid liv, utanför strid och kan röra dig fritt.",
+  "Ascending into the sky": "Stiger upp mot himlen",
+  "The clouds fall away beneath you.": "Molnen försvinner ner under dig.",
+  "Descending to the ocean floor": "Sjunker ner till havsbotten",
+  "The surface fades far above you.": "Ytan försvinner högt ovanför dig.",
+  "Along the ocean floor": "Längs havsbotten",
+  "Beneath the waves, the seabed continues.": "Under vågorna fortsätter havsbotten.",
+  "Descending from the sky": "Sjunker ner från himlen",
+  "Leaving the clouds for the land below.": "Du lämnar molnen för landet nedanför.",
+  "Rising to the surface": "Stiger upp till ytan",
+  "Leaving the ocean floor behind.": "Du lämnar havsbotten bakom dig.",
+  "High in the sky · above the clouds": "Högt på himlen · ovanför molnen",
+  "Ocean floor · deep beneath the surface": "Havsbotten · djupt under ytan"
 }

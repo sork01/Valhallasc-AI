@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.32.4",
+    "date": "2026-10-29",
+    "new": [],
+    "changed": [
+      "Entering Bifrost Reach clearly climbs into the sky, with cloud steps, passing clouds and an ascent message. Routes into Rán’s Deep and Nacrehold descend to the ocean floor with rising bubbles and receding surface light. Sky and seabed labels remain beside the minimap. Reduced motion keeps the direction messages without the moving travel effects."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.32.3",
     "date": "2026-10-29",
     "new": [
