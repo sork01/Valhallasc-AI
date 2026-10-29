@@ -7568,5 +7568,6 @@
   "Recorded": "Inspelade",
   "Synthesized": "Syntetiska",
   "Dazed": "Omtöcknad",
-  "Movement speed is reduced by 50%.": "Rörelsehastigheten är sänkt med 50%."
+  "Movement speed is reduced by 50%.": "Rörelsehastigheten är sänkt med 50%.",
+  "You can dance when you are alive, out of combat and free to move.": "Du kan dansa när du är vid liv, utanför strid och kan röra dig fritt."
 }

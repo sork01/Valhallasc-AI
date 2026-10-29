@@ -1170,7 +1170,8 @@
     if (moved) setZone(own.zone || 0);
     const inZone = a => (a.zone || 0) === zone;
     if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
-    const selectedTarget = hero.target?.id;
+    const selectedTarget = own.danceT != null ? null : hero.target?.id;
+    if (own.danceT != null && hero.danceT == null) { Field.clearInput(); hero.goal = null; hero.pvpTargetId = null; }
     const wasDead = hero.dead, wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
     hero.raidSupport = own.raidSupport || null;
@@ -2556,6 +2557,7 @@
     }
   }
   function interpolate(actor, dt) {
+    if (Number.isFinite(actor.danceT)) actor.danceT += dt;
     if (Number.isFinite(actor.nx)) { const k = Math.min(1, dt * 14); actor.x += (actor.nx - actor.x) * k; actor.y += (actor.ny - actor.y) * k; }
     if (actor.moving) actor.walk += dt * 11;
     if (actor.atkT > 0) actor.atkT += dt;

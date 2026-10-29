@@ -47,6 +47,7 @@ mod consumables;
 mod damage_meter;
 #[cfg(test)]
 mod damage_meter_tests;
+mod dance;
 mod daynight;
 #[cfg(test)]
 mod daze_tests;
@@ -240,6 +241,8 @@ struct Player {
     face: Point,
     moving: bool,
     walk: f64,
+    /// Elapsed dance time, shared with observers; never saved with the character.
+    dance: Option<f64>,
     attack: f64,
     cooldown: f64,
     hit: bool,
@@ -331,6 +334,7 @@ impl Player {
     // Called once when hp reaches 0: a death wears the worn gear down (docs/durability.md) and costs no XP. Mercenaries
     // and ambient adventurers have no durability. The notice says what happened to the gear.
     fn apply_death_penalty(&mut self) {
+        self.dance = None;
         self.daze = 0.;
         let wear = if self.merc.is_some() || self.ambient.is_some() {
             DeathWear::default()
@@ -379,6 +383,7 @@ impl Player {
             face: normalize(1., 1.),
             moving: false,
             walk: 0.,
+            dance: None,
             attack: 0.,
             cooldown: 0.,
             hit: false,
@@ -452,6 +457,7 @@ impl Player {
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["abandonedQuests"] = json!(c.abandoned_quests);
         view["daze"] = json!(self.daze);
+        view["danceT"] = json!(self.dance);
         view["rested"] = json!({"percent":c.rested.percent()});
         view["achievementTitle"] = json!(c.achievement_title());
         view["achievementPoints"] = json!(c.achievement_points());
@@ -2228,6 +2234,20 @@ impl World {
         {
             return;
         }
+        // Intent to fight or travel ends an emote, even if the action is on cooldown.
+        // Idle input and Stop are deliberately exempt: focusing chat sends Stop.
+        if matches!(
+            &message,
+            ClientMessage::Attack { .. }
+                | ClientMessage::Skill { .. }
+                | ClientMessage::Dash { .. }
+                | ClientMessage::Mount { .. }
+                | ClientMessage::Interact { .. }
+                | ClientMessage::RaidCross { .. }
+                | ClientMessage::Pvp { .. }
+        ) {
+            p.dance = None;
+        }
         match message {
             ClientMessage::Input { dx, dy }
                 if dx.is_finite() && dy.is_finite() && dx.abs() <= 1. && dy.abs() <= 1. =>
@@ -2235,6 +2255,7 @@ impl World {
                 p.input = normalize(dx, dy);
                 p.input_at = self.time;
                 if dx != 0. || dy != 0. {
+                    p.dance = None;
                     p.goal = None;
                     p.target = None;
                 }
@@ -2248,6 +2269,7 @@ impl World {
             }
             ClientMessage::Stop => p.stop(),
             ClientMessage::Move { x, y } if x.is_finite() && y.is_finite() => {
+                p.dance = None;
                 let size = self.maps[p.character.zone].size as f64;
                 p.goal = Some(Point {
                     x: x.clamp(0.7, size - 0.7),
@@ -2262,6 +2284,7 @@ impl World {
                     .get(id)
                     .is_some_and(|s| !s.dead && s.zone == p.character.zone) =>
             {
+                p.dance = None;
                 p.target = Some(id);
                 p.goal = None;
                 p.input = Point::default();
@@ -2464,6 +2487,10 @@ impl World {
                     return;
                 }
                 p.chat_at = self.time;
+                if text.eq_ignore_ascii_case("/dance") {
+                    self.toggle_dance(session);
+                    return;
+                }
                 let name = p.character.look.name.clone();
                 let id = (!p.is_hidden()).then(|| p.character.id.clone());
                 self.emit(json!({"type":"chat","name":name,"id":id,"text":text}));
@@ -2940,6 +2967,7 @@ impl World {
         self.update_enemy_bolts();
         self.update_raid_key();
         self.update_empty_seat();
+        self.update_dances();
         self.update_damage_meter();
         self.audit_progress();
         if self.tick.is_multiple_of(20) {

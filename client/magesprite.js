@@ -594,12 +594,17 @@
       else if (h.hurtT > 0) { clip = 'hurt'; i = Math.floor((1 - h.hurtT / .25) * C.hurt.n); }
       else if (h.atkT > 0) { clip = 'attack'; i = Math.floor(h.atkT / this.meta.attack.duration * C.attack.n); }
       else if (h.moving) { clip = 'walk'; i = Math.floor(h.walk) % C.walk.n; }
-      const dir = MageSprite.direction(h.fx, h.fy), [ax, ay] = this.meta.anchor;
+      let dir = MageSprite.direction(h.fx, h.fy);
+      const dance = MageSprite.dancePose(h, this.look.gender);
+      if (dance) { clip = 'walk'; i = dance.frame % C.walk.n; dir = (dir + dance.turn + 8) % 8; }
+      const [ax, ay] = this.meta.anchor;
       g.save(); g.imageSmoothingEnabled = false;
       if (h.dead && !h.fallen) g.globalAlpha *= Math.max(0, Math.min(1, (3.2 - h.deadT) / .6));
       g.scale(scale, scale);
       const mark = !h.dead && dungeonMark(this.equipment);
       if (mark) dungeonAura(g, mark, t);
+      // Move the dressed figure as one unit; equipment stays fitted at every step/turn.
+      if (dance) { g.translate(dance.x, dance.y); g.rotate(dance.lean); g.scale(1, dance.stretch); }
       if (h.mounted && !h.dead && window.MountArt?.ready(h.mount)) {   // seated on the saddle: the rider's idle frame laid into the mount's frame
         const art = window.MountArt, moving = !!h.moving, mclip = art.clipFor(h.mount, moving), M = art.meta(h.mount), MC = M.clips[mclip];
         const mi = moving ? Math.floor(h.walk) % MC.n : Math.floor(t * MC.fps) % MC.n, ri = moving && this.equipment.cloak !== 'none' ? Math.floor(h.walk) % C.idle.n : moving ? 0 : Math.floor(t * C.idle.fps) % C.idle.n;
@@ -624,6 +629,25 @@
       const c = document.createElement('canvas'); c.width = c.height = 128;
       const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
       g.drawImage(this.frame(), ...(this.meta.portrait || [56, 18, 48, 48]), 0, 0, 128, 128); return c.toDataURL();
+    }
+    static dancePose(h, gender = h.look?.gender) {
+      if (!Number.isFinite(h.danceT) || h.dead || h.hurtT > 0 || h.atkT > 0 || h.moving || h.mounted) return null;
+      // Four beats per phrase, at 120 BPM. Reversible footwork keeps the dancer in place.
+      const beat = h.danceT * 2, phrase = beat % 4, pulse = Math.sin(beat * Math.PI * 2);
+      if (gender === 'female') {
+        // Step-touch left/right, a hip sway, then an eight-way twirl on the last beat.
+        const sway = Math.sin(beat * Math.PI);
+        return { frame: [0, 1, 2, 1, 4, 5, 6, 5][Math.floor(beat * 4) % 8],
+          turn: phrase >= 3 ? Math.floor((phrase - 3) * 8) : 0,
+          x: sway * 5, y: -Math.abs(pulse) * 1.6, lean: sway * .09,
+          stretch: 1 + pulse * .018 };
+      }
+      // A heel-toe shuffle with alternating shoulder rocks and a spring on each beat.
+      const rock = Math.sin(beat * Math.PI);
+      return { frame: [0, 2, 4, 2, 4, 6, 0, 6][Math.floor(beat * 4) % 8],
+        turn: phrase < 1 ? 1 : phrase >= 2 && phrase < 3 ? -1 : 0,
+        x: rock * 3, y: -Math.max(0, pulse) * 5, lean: -rock * .12,
+        stretch: 1 - Math.max(0, -pulse) * .055 };
     }
     static direction(fx, fy) { return ((Math.round(-Math.atan2(fx - fy, fx + fy) / (Math.PI / 4)) % 8) + 8) % 8; }
     // `background` is for other players' sprites: they load one at a time, after your own, without blocking the page.

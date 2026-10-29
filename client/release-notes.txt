@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.32.3",
+    "date": "2026-10-29",
+    "new": [
+      "Type /dance in chat to dance. Female characters sway and twirl; male characters perform a bouncing shuffle. Nearby players can see your dance. Type /dance again to stop, or move or fight."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.32.2",
     "date": "2026-10-29",
     "new": [
