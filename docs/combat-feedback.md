@@ -1,6 +1,6 @@
 # Combat sounds and elite portraits
 
-Beta 1.32.1, updated 2026-10-29 (same version by owner request). Client-only: the live server serves these files directly;
+Beta 1.32.2, updated 2026-10-29 (follow-ups keep the same version by owner request). Client-only: the live server serves these files directly;
 no Rust changes, world generation, database migration or service restart.
 
 The selected enemy's portrait has a golden coiled dragon when its existing
@@ -21,7 +21,7 @@ physical 44 px minimum and scroll within the window.
 
 Recorded mode covers weapon attacks, hit/critical impacts, misses, enemy attacks/hurt/death, player hurt/death, all 50 learned skills, achievements and level-ups. Five weapon families and seven enemy families keep their identities. Constructs use wood/metal foley; bosses stay deeper and longer. Skills use explicit per-skill material/pitch profiles (blade, rush, earth, fire, arcane, shadow, ice/lightning, healing, holy, shield, focus and bow). Level-up and achievement cues use separate complete authored sound files. Music and boss-mechanic warnings retain their existing cues. Synthesized mode retains the original effects.
 
-Female hurt and death each use three original AuraVoice performances, selected from the character's authoritative `Field.hero.look.gender` across all five classes. Male characters keep their male recordings, now with three takes per stage. Missing female recordings fall back to a higher-pitched synthesized voice, never a male recording. The synthesized female hurt/death pitch also follows the character body.
+Female hurt and death each use three original AuraVoice performances, selected from the character's authoritative `Field.hero.look.gender` across all five classes. Male characters keep their male recordings, now with three takes per stage. Missing female recordings fall back to a higher-pitched synthesized voice, never a male recording. Synthesized female vocals now use their own pitch, vowel resonances (900/1550/3100 Hz), 6.2 Hz vibrato and lighter breath shaping. Hurt, death, shout, grunt, laugh and thoughtful vocal effects select the character body; creation previews use the selected body. Male synthesis retains its existing sound. This is a same-version Beta 1.32.2 owner follow-up.
 
 `combat-audio.js` decodes 68 short mono MP3s, 569,157 bytes altogether. Since
 Beta 1.32.2, background priming loads one recording at a time, yields to browser
@@ -120,3 +120,7 @@ For reproduction, also download these pinned inputs beside the original three ZI
 Validation: `AUDIO_CANDIDATE=CANDIDATE node tests/recorded-audio.cjs` checks all cue names against the manifest, modulation limits, female routes, repeat prevention and voice ceilings; `MUTATE=repeat` must fail the repeat assertion. `AUDIO_CANDIDATE=CANDIDATE bash scripts/test-touch-bounded.sh tests/recorded-audio-variation-ui.cjs` checks a real female priest death, both voice bodies, all 50 skill routes, separate celebration audio, audible signal, volume/mute and Synthesized mode. The bounded browser passed 136 checks with candidate scripts/assets, artifact `test-results/driver-DGwu3a/recorded-audio-checks.json`. No Rust build, production test guest, balance sweep or restart is needed.
 
 Same-version client release verified: all 76 public client/asset files match local SHA-256, public and bridge health are OK, and Beta 1.32.1 is unchanged. Receipt: `test-results/recorded-audio-1.32.1-public.json`. The generated Swedish catalog, release-note gate, changed JavaScript/Python syntax and whitespace checks pass. The existing audio suite now opts into Recorded explicitly, blocks the entire impact family for fallback checks, and measures the exact bus taper rather than comparing randomized take peaks.
+
+## Selection rings and female synthesis follow-up
+
+Beta 1.32.2 is unchanged by owner request. Enemy selection rings render in the floor pass before depth-sorted bodies and scenery, rather than over the selected sprite. `tests/client-followups-ui.cjs` passes 34 focused checks including crab/toad drawing order, distinct female hurt/death synthesis across all five classes and audible non-clipping female hurt. `MUTATE=ring` restores the old drawing order and must fail. The same bounded private-world check validates the unified Buy flow documented in `docs/shop-selling.md`.

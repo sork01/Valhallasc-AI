@@ -23,6 +23,8 @@ const is = (english, swedish) => { assert.equal(t(english), swedish, english); c
 
 // exact text and the old machine mistakes
 is('Invite to party', 'Bjud in till grupp');
+is('Buy', 'Köp');
+is('+6 slots · Lv 1', '+6 platser · nivå 1');
 is('Ash Staff', 'Askstav');
 is('Tempered Apprentice\'s Gloves', 'Härdade lärlingshandskar');
 is('Defeat the Floodgate Keeper', 'Besegra Slussvaktaren');

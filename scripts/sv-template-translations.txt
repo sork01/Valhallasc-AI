@@ -307,6 +307,7 @@
   "{0} worn pieces go into your bags.": "{0} burna delar hamnar i dina väskor.",
   "{0} · +{1} slots": "{0} · +{1} platser",
   "{0} · +{1} slots · Lv {2}": "{0} · +{1} platser · nivå {2}",
+  "+{0} slots · Lv {1}": "+{0} platser · nivå {1}",
   "{0} · H · 2× speed": "{0} · H · 2× hastighet",
   "{0} · Level {1} {2}": "{0} · Nivå {1} {2:t}",
   "{0} · Lv {1}": "{0} · nivå {1}",

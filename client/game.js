@@ -349,25 +349,36 @@
   }
 
   // ---------- voices and effects (synthesised) ----------
-  function voice(f0, dur = .85, vol = .5, breath = true) {
+  function voice(f0, dur = .85, vol = .5, breath = true, female = false) {
     if (!save.sound) return;
     const c = audio(); if (!c) return;
     const now = c.currentTime, o = c.createOscillator(), g = c.createGain();
     o.type = 'sawtooth';
     o.frequency.setValueAtTime(f0, now); o.frequency.linearRampToValueAtTime(f0 * 1.5, now + dur * .14); o.frequency.exponentialRampToValueAtTime(f0 * .85, now + dur);
     g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(vol, now + Math.min(.05, dur * .2)); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
-    for (const fr of [700, 1150, 2600]) { const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fr; bp.Q.value = 5; o.connect(bp); bp.connect(g); }
+    // Female vowels have their own resonances and a lighter, gently moving tone.
+    for (const fr of female ? [900, 1550, 3100] : [700, 1150, 2600]) { const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fr; bp.Q.value = female ? 3.5 : 5; o.connect(bp); bp.connect(g); }
+    if (female) {
+      const vibrato = c.createOscillator(), depth = c.createGain();
+      vibrato.frequency.value = 6.2; depth.gain.value = f0 * .018;
+      vibrato.connect(depth).connect(o.frequency); vibrato.start(now); vibrato.stop(now + dur + .05);
+      vibrato.onended = () => { vibrato.disconnect(); depth.disconnect(); };
+    }
     g.connect(sfxOut(c)); o.start(now); o.stop(now + dur + .05);
     if (!breath) return;
     const buf = c.createBuffer(1, Math.floor(c.sampleRate * .3), c.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
     const n = c.createBufferSource(), hp = c.createBiquadFilter(), ng = c.createGain();
-    n.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 1500; ng.gain.value = .18 * vol;
+    n.buffer = buf; hp.type = 'highpass'; hp.frequency.value = female ? 2200 : 1500; ng.gain.value = (female ? .12 : .18) * vol;
     n.connect(hp).connect(ng).connect(sfxOut(c)); n.start(now);
   }
-  const shout = () => voice(140, .85, .55);
-  const grunt = () => voice(105, .3, .4, false);
-  const laughSound = () => { for (let i = 0; i < 5; i++) setTimeout(() => voice(150 + (i % 2) * 30, .17, .34, false), i * 180); };
+  function characterVoice(f0, dur, vol, breath = true) {
+    const female = (scene === 'game' ? window.Field?.hero?.look : cfg)?.gender === 'female';
+    voice(f0 * (female ? 1.8 : 1), dur, vol, breath, female);
+  }
+  const shout = () => characterVoice(140, .85, .55);
+  const grunt = () => characterVoice(105, .3, .4, false);
+  const laughSound = () => { for (let i = 0; i < 5; i++) setTimeout(() => characterVoice(150 + (i % 2) * 30, .17, .34, false), i * 180); };
   function tone(freqs, dur, vol, type = 'sine') {
     if (!save.sound) return;
     const c = audio(); if (!c) return;
@@ -517,7 +528,7 @@
       case 'attack:strike': clang(); burstSparks(70, 'blade', '#ffc857', 1.5); slashT = performance.now() / 1000; stage.classList.add('shake'); setTimeout(() => stage.classList.remove('shake'), 520); break;
       case 'cheers:clink': clink(); burstSparks(26, 'mug', '#fff6d6', .45); break;
       case 'cheers:laugh': case 'laugh:laugh': laughSound(); break;
-      case 'beard:hmm': voice(90, .4, .35, false); break;
+      case 'beard:hmm': characterVoice(90, .4, .35, false); break;
       case 'fish:splash': blip(900, .08, .06); burstSparks(14, 'fish', '#bfe8ff', .5); break;
       case 'flex:grunt': grunt(); break;
     }
@@ -859,7 +870,7 @@
     miss: () => { if (!recordedVoice('sword', 'miss', .4)) combatVoice('ranged', 'miss', .55); },
     hit: () => { if (recordedVoice('impact', 'hit', .8)) return; sweep(190, 70, .13, .22); noiseBurst(.07, 1800, 900, .08); sweep(420, 180, .16, .08, 'triangle'); },
     crit: () => { if (recordedVoice('impact', 'hit', 1.1, false, false, true)) return; SFX.hit(); tone([1320, 1980], .3, .07); },
-    hurt: () => { const female = Field.hero?.look?.gender === 'female'; if (!recordedVoice(female ? 'player-female' : 'player', 'hurt', .8)) voice(female ? 190 : 115, .32, .32, false); },
+    hurt: () => { const female = Field.hero?.look?.gender === 'female'; if (!recordedVoice(female ? 'player-female' : 'player', 'hurt', .8)) characterVoice(115, .32, .32, false); },
     pickup: () => tone([1568], .12, .05),
     // A potion is a quick gulp that rises; a meal is two soft low notes.
     consume: ev => { if (ev?.value > 0) { sweep(240, 620, .16, .08, 'triangle'); tone([1175, 1568], .25, .04); } else { tone([330, 440], .18, .05, 'triangle'); } },
@@ -892,7 +903,7 @@
       else if (kind === 'heal' || kind === 'mend') { tone([659, 880, 1319], .8, .05, 'sine'); tone([1760, 2637], .5, .03); }
     },
     healed: () => { tone([880, 1319, 1760], .5, .04, 'sine'); },
-    death: () => { const female = Field.hero?.look?.gender === 'female'; if (!recordedVoice(female ? 'player-female' : 'player', 'death', 1)) voice(female ? 145 : 78, .95, .38); },
+    death: () => { const female = Field.hero?.look?.gender === 'female'; if (!recordedVoice(female ? 'player-female' : 'player', 'death', 1)) characterVoice(78, .95, .38); },
     respawn: () => tone([392, 587], .5, .06),
     portal: () => { sweep(180, 720, .5, .09, 'sine'); tone([523, 784, 1047], .5, .05); },
   };

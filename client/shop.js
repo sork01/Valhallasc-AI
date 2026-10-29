@@ -62,9 +62,11 @@
     window.Settings?.registerWindow('sell-warning', null, 'Sell valuable items?', false);
     (precious.some(row => ['legendary', 'hierloom'].includes(row.rarity)) ? cancel : yes).focus();
   }
+  const isStockOffer = offer => !!(offer.item || offer.bag || offer.mount);
   function stock() {
-    return (npc?.offers || []).filter(o => o.item || o.bag).map(offer => {
-      let item = Inventory.definition(offer.item || offer.bag);
+    return (npc?.offers || []).filter(isStockOffer).map(offer => {
+      const mount = offer.mount && window.Mounts?.MOUNTS.find(m => m.id === offer.mount);
+      let item = mount ? { id: `mount:${mount.id}`, name: mount.name, kind: 'mount_licence', mount: mount.id, requiredLevel: mount.level, rarity: 'common', sell: 0 } : Inventory.definition(offer.item || offer.bag);
       if (offer.tiered && item?.family) item = WORLD_ITEMS.filter(i => i.family === item.family && (i.requiredLevel || 1) <= (packet?.level || 1)).sort((a,b) => b.requiredLevel-a.requiredLevel)[0] || item;
       return {offer,item,cost:offer.tiered ? item?.price : offer.cost};
     }).filter(({item}) => item && (item.kind !== 'weapon' || !item.class || item.class === Field.hero.look.class));
@@ -96,7 +98,11 @@
         if (offer) b.dataset.offer = offer.id;
         const glyph = make('span','','merchant-item-icon'); glyph.innerHTML = Inventory.icon(item, undefined, row?.gear?.find(g => Inventory.conditionState(g) === 'broken'));
         const detail = make('span','','merchant-item-detail'); detail.append(make('b',item.name),make('small',`${cost} gold${row?.quantity > 1 ? ` ×${row.quantity}` : ''}`));
-        b.append(glyph, detail); b.disabled = pending || (data?.gold ?? packet.gold) < cost || (!row && (packet.level || 1) < (item.requiredLevel || 1));
+        if (offer?.bag) detail.append(make('small', `+${item.bagSlots} slots · Lv ${item.requiredLevel}`));
+        if (offer?.mount) detail.append(make('small', offer.label));
+        const fitted = packet.bags || [], growsBag = !offer?.bag || fitted.length < 4 || fitted.some(id => (Inventory.definition(id)?.bagSlots || 0) < item.bagSlots);
+        const ownsMount = offer?.mount && Field.hero.mounts?.includes(offer.mount);
+        b.append(glyph, detail); b.disabled = pending || (data?.gold ?? packet.gold) < cost || (!row && ((packet.level || 1) < (item.requiredLevel || 1) || !growsBag || ownsMount || (offer?.needs && !Inventory.quantity(offer.needs))));
         Inventory.attachTooltip(b, () => item, undefined, row ? () => ({copies:row.gear || [],count:row.quantity,in:'Buyback',hint:`${row.paid} gold`}) : undefined);
         grid.append(b);
       }
@@ -146,7 +152,7 @@
       const opening = npc?.id !== merchant.id || container !== target;
       if (opening) { close(); npc=merchant; zone=Field.zone||0; container=target; tab='merchant'; page=0; packet=dialogue; lastNotice=dialogue.notice || ''; mount(); draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} }
       else { const answered=packet!==dialogue&&pendingKind==='interact'; packet=dialogue; if(dialogue.notice)lastNotice=dialogue.notice; if(answered){settle();if(npc.buys)request();else data={available:[],buyBack:[],gold:packet.gold};} draw(); }
-    }, close,
+    }, close, isStockOffer,
     bagTooltip(id) { const row=data?.available?.find(row=>row.item===id); return npc&&row?{copies:row.gear?[row.gear]:[],count:row.quantity,in:Locale.translate('Your bags'),hint:Locale.translate(`Sell for ${price(row)} gold`)}:undefined; },
     get open() { return !!npc; },
     onPacket(packet) {

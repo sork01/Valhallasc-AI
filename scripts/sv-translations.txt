@@ -6939,6 +6939,7 @@
   "No items to buy back.": "Inga föremål att köpa tillbaka.",
   "No items to show.": "Inga föremål att visa.",
   "Sell": "Sälj",
+  "Buy": "Köp",
   "Sell all junk": "Sälj allt skräp",
   "Sell valuable items?": "Sälj värdefulla föremål?",
   "Starter gear cannot be sold.": "Startutrustning kan inte säljas.",

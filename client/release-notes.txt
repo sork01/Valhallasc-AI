@@ -5,7 +5,10 @@
     "new": [],
     "changed": [
       "Monster artwork loads for the zone you are visiting instead of downloading the whole world when you start playing.",
-      "Recorded combat sounds load in the background one at a time to reduce startup stuttering."
+      "Recorded combat sounds load in the background one at a time to reduce startup stuttering.",
+      "Enemy selection circles stay on the ground beneath enemies and scenery.",
+      "Female synthesized voices have their own tone for hurt, death, shouts and other vocal effects.",
+      "Every vendor opens with a Buy option containing their goods, including bags and mounts. Individual purchases no longer clutter the greeting."
     ],
     "removed": []
   },

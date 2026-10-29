@@ -3881,6 +3881,12 @@
       else if (groundSkillFx(e)) drawSkillFx(g, e, 'floor');
     }
     if (marker) { const [sx, sy] = w2s(marker.x, marker.y), p = (marker.t * 2) % 1; g.strokeStyle = `rgba(255,236,150,${1 - p * .6})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, 10 + p * 12, 5 + p * 6, 0, 0, 6.283); g.stroke(); }
+    // Selection belongs to the floor, below every body and foreground object.
+    if (hero.target && !hero.target.dead) {
+      const target = hero.target, [sx, sy] = w2s(target.x, target.y);
+      g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath();
+      g.ellipse(sx, sy + 2, 32 * target.d.scale, 13 * target.d.scale, 0, 0, 6.283); g.stroke();
+    }
     // build the depth-sorted list of everything standing on the ground
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
     const set = spriteSet();
@@ -3936,7 +3942,6 @@
           g.font = '16px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = levelColor(s.level);
           g.strokeText(label, 0, barY - 8); g.fillText(label, 0, barY - 8);
         }
-        if (!s.dead && hero.target === s) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 32 * s.d.scale, 13 * s.d.scale, 0, 0, 6.283); g.stroke(); }
         g.restore();
       } else if (it.drop) {
         const d = it.drop, item = WORLD_ITEMS.find(i => i.id === d.item);

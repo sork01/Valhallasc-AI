@@ -7,17 +7,22 @@ says **This person does not buy items. Sell to a merchant or smith.** The
 detailed map's people directory labels buying merchants explicitly.
 The server's buying rules and item protections are unchanged.
 
-Merchants now open a **Merchant** frame on the left and the existing inventory
+Choosing **Buy** opens a **Merchant** frame on the left and the existing inventory
 bags on the right. Both windows have independent scale/corner-grip entries;
 phone/tablet targets retain their 44 px floors. Stock uses two columns of five
 slots, with ten items per page, bag artwork, names, gold prices and tooltips.
 The header uses the NPC renderer to crop a circular portrait, not new artwork.
 **Quests / services** returns to the NPC's ordinary gossip/services.
 
-Beta 1.31.2: opening a merchant with an available quest, a ready turn-in or a
-quest in progress starts at quests/services. The shop remains reachable from
-that greeting. Merchants with only locked or completed quests still open their
-shop directly. Purchases and sales keep an already-open shop in place.
+Beta 1.32.2 (same-version owner follow-up): every vendor opens at quests/services
+with a **Buy** option. All stock is inside that shop: items, every bag tier and
+mount purchases. Individual goods and the separate bag category are removed
+from the greeting. Healing, repairs, crafting and other services stay beside
+Buy. This supersedes the earlier automatic-shop behavior for NPCs without
+quests. Purchases and sales keep an already-open shop in place. Own-class weapon
+filtering, usable consumable tiers, bag-size restrictions and authoritative
+purchase actions remain. Mounts use the existing catalog levels, ownership and
+required-item checks.
 
 Click a loose bag item or drag it onto the merchant to sell its stack/copy.
 The server's available list selects the exact next loose copy, excluding worn
@@ -188,3 +193,5 @@ sale. Peak 589 MiB under the unchanged cap. Receipt mutations fail on shifting
 geometry and lost text; the junk mutation restores green inclusion and fails
 preservation. Proof: `test-results/touch/merchant-junk-index.log`,
 `merchant-junk-mutation.log` and `merchant-notice-mutation-{1,clear}.log`.
+
+Focused follow-up validation: `bash scripts/test-touch-bounded.sh tests/client-followups-ui.cjs` checks Buy on potion, bag, crystal and mount vendors, complete paginated stock, actual potion/mount purchases, service access and no individual stock buttons on the greeting.
