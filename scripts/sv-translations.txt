@@ -7563,5 +7563,7 @@
   "Starter gear stays in your bag.": "Startutrustningen ligger kvar i din väska.",
   "Combat sounds": "Stridsljud",
   "Recorded": "Inspelade",
-  "Synthesized": "Syntetiska"
+  "Synthesized": "Syntetiska",
+  "Dazed": "Omtöcknad",
+  "Movement speed is reduced by 50%.": "Rörelsehastigheten är sänkt med 50%."
 }

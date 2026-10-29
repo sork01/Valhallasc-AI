@@ -1,12 +1,15 @@
-Recorded combat effects — CC0 1.0 Universal
+Bundled game effects — CC0 1.0 Universal
 https://creativecommons.org/publicdomain/zero/1.0/
 
 Kenney: RPG Sounds (weapon and impact foley).
-rubberduck: 80 CC0 creature SFX (recorded mouth performances with filters).
-HaelDB: Male Grunt/Yelling sounds (recorded human vocals; CC0 option).
+rubberduck: 80 CC0 creature SFX (mouth performances with filters) and 80 CC0 RPG SFX (weapons, stones and spells).
+HaelDB: Male Grunt/Yelling sounds (human vocals; CC0 option).
+AuraVoice / Nocturnal_Vanguard: Female Hurt Grunts & Groans (original female voice performances).
+JaggedStone: Magic Spell SFX (authored spell and celebration sounds).
 
-See sources.txt for each source URL, original filename and checksum.
-Edits: mono 44.1 kHz, silence trimming, maximum 1.4 seconds, peak normalization, edge fades and MP3 encoding.
+See sources.txt for each source URL, original filename, checksum and voice-take offsets.
+Edits: mono 44.1 kHz, take selection, silence trimming, up to 2.5 seconds, peak normalization, edge fades and MP3 encoding.
+Playback applies subtle random pitch, volume and low-pass variation; alternate takes avoid immediate repeats.
 
 Original Kenney license notice:
 

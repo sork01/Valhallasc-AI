@@ -921,7 +921,7 @@
     // Server fight state selects the raid finale; proximity and a selected target do not.
     const raidFinalFight = !!zdef.raid && (window.BossMech?.fights || []).some(f =>
       slimes.some(s => s.id === f.boss && s.kind === zdef.final_boss && !s.dead));
-    const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
+    const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -1131,7 +1131,8 @@
       const wardBefore = mageWardActive(actor), wardAfter = mageWardActive(packet);
       if (snap) actor.stunHitAt = actor.wardHitAt = actor.wardBreakAt = -99;
       else {
-        if (packet.stun > 0 && (!(actor.stun > 0) || packet.stun > actor.stun + .15)) actor.stunHitAt = tAll;
+        if ((packet.stun > 0 && (!(actor.stun > 0) || packet.stun > actor.stun + .15)) ||
+          (packet.daze > 0 && (!(actor.daze > 0) || packet.daze > actor.daze + .15))) actor.stunHitAt = tAll;
         if (!packet.dead && wardBefore && (packet.hp < actor.hp ||
           (packet.absorb < actor.absorb && packet.absorbLeft > 0))) actor.wardHitAt = tAll;
         if (!packet.dead && ((wardBefore && !wardAfter) ||
@@ -2490,7 +2491,7 @@
     g.strokeText(label,0,y+24);g.fillText(label,0,y+24);
   }
   function drawPlayerStun(g, who, t) {
-    if (who.dead || !(who.stun > 0)) return;
+    if (who.dead || !(who.stun > 0 || who.daze > 0)) return;
     const calm = reducedMotion(), turn = calm ? 0 : t * 2.8;
     g.save(); g.strokeStyle = '#ffe9a2'; g.lineWidth = 2; g.fillStyle = '#ffe181';
     g.globalAlpha = .8; g.beginPath(); g.ellipse(0, -154, 34, 10, 0, 0, Math.PI * 2); g.stroke();

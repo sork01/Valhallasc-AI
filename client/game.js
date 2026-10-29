@@ -5,7 +5,7 @@
   const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
-  save.combatSounds = save.combatSounds === 'synthesized' ? 'synthesized' : 'recorded';
+  save.combatSounds = save.combatSounds === 'recorded' ? 'recorded' : 'synthesized';
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
   save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
   // Sork's own arrangement (2026-10-21) is what a player gets until they move something (uiSet / panelSizeSet): offsets in cqw from the stylesheet positions, sizes in cqw.
@@ -679,6 +679,7 @@
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
     title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
     const statuses = [
+      { id: 'daze', left: s.daze, time: 4, name: 'Dazed', icon: 'starfall', description: 'Movement speed is reduced by 50%.' },
       { id: 'stun', left: s.stun, time: 3, name: 'Stunned', icon: 'starfall', description: 'Cannot move, attack or cast.' },
       { id: 'root', left: s.root, time: 3, name: 'Rooted', icon: 'storm', description: 'Cannot move or dash.' },
       { id: 'wound', left: s.woundLeft, time: 10, name: 'Wounded', icon: 'cuts', description: 'Healing received is reduced by 50%.' },
@@ -858,7 +859,7 @@
     miss: () => { if (!recordedVoice('sword', 'miss', .4)) combatVoice('ranged', 'miss', .55); },
     hit: () => { if (recordedVoice('impact', 'hit', .8)) return; sweep(190, 70, .13, .22); noiseBurst(.07, 1800, 900, .08); sweep(420, 180, .16, .08, 'triangle'); },
     crit: () => { if (recordedVoice('impact', 'hit', 1.1, false, false, true)) return; SFX.hit(); tone([1320, 1980], .3, .07); },
-    hurt: () => { if (!recordedVoice('player', 'hurt', .8)) voice(115, .32, .32, false); },
+    hurt: () => { const female = Field.hero?.look?.gender === 'female'; if (!recordedVoice(female ? 'player-female' : 'player', 'hurt', .8)) voice(female ? 190 : 115, .32, .32, false); },
     pickup: () => tone([1568], .12, .05),
     // A potion is a quick gulp that rises; a meal is two soft low notes.
     consume: ev => { if (ev?.value > 0) { sweep(240, 620, .16, .08, 'triangle'); tone([1175, 1568], .25, .04); } else { tone([330, 440], .18, .05, 'triangle'); } },
@@ -872,6 +873,7 @@
     },
     levelup: () => {
       duckMusic(3.2);
+      if (recordedVoice('levelup', 'celebrate', 1)) return;
       sweep(180, 1900, .7, .14, 'sawtooth'); noiseBurst(.8, 300, 7000, .13, .8);
       [523, 659, 784, 1047, 1319, 1568, 2093].forEach((f, i) => setTimeout(() => tone([f, f * 2], .55, .1, 'triangle'), 120 + i * 85));
       setTimeout(() => { tone([523, 659, 784, 1047, 1319], 2.2, .08, 'triangle'); tone([262, 392], 2.2, .09, 'sine'); }, 780);
@@ -879,6 +881,7 @@
     },
     skill: ev => {
       const def = WORLD_SKILLS.find(k => k.id === ev?.skill), kind = def?.effect.effect;
+      if (def && recordedVoice('skill', def.id, .85)) return;
       if (kind === 'nova') { sweep(220, 55, .45, .26, 'sawtooth'); noiseBurst(.4, 1200, 200, .18); }
       else if (kind === 'cone' || kind === 'strike') { noiseBurst(.22, 700, 3200, .16, 1.4); sweep(900, 300, .15, .06, 'triangle'); }
       else if (kind === 'volley') SFX.cast();
@@ -889,13 +892,14 @@
       else if (kind === 'heal' || kind === 'mend') { tone([659, 880, 1319], .8, .05, 'sine'); tone([1760, 2637], .5, .03); }
     },
     healed: () => { tone([880, 1319, 1760], .5, .04, 'sine'); },
-    death: () => { if (!recordedVoice('player', 'death', 1)) voice(78, .95, .38); },
+    death: () => { const female = Field.hero?.look?.gender === 'female'; if (!recordedVoice(female ? 'player-female' : 'player', 'death', 1)) voice(female ? 145 : 78, .95, .38); },
     respawn: () => tone([392, 587], .5, .06),
     portal: () => { sweep(180, 720, .5, .09, 'sine'); tone([523, 784, 1047], .5, .05); },
   };
   // A struck bell cadence, with quiet metallic overtones; independent of the level-up fanfare.
   function achievementSound() {
     if (!save.sound) return;
+    if (recordedVoice('achievement', 'celebrate', .9)) return;
     const c = audio(); if (!c) return;
     const now = c.currentTime, bus = sfxOut(c);
     for (const [frequency, delay] of [[1174.66, 0], [880, .18], [987.77, .46], [493.88, .46]]) {

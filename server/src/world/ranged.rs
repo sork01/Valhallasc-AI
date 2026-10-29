@@ -97,7 +97,13 @@ impl World {
                 .filter(|(d, _)| *d < PLAYER_RADIUS + BOLT_RADIUS * b.size.max(1.))
                 .min_by(|a, c| a.0.total_cmp(&c.0));
             if let Some((_, session)) = victim {
-                hits.push((session, b.damage, end, b.kind.clone(), b.level));
+                // Use the incoming direction, even when this tick carries the missile past the victim.
+                let point = self.players[&session].character.point();
+                let from = Point {
+                    x: point.x - b.fx,
+                    y: point.y - b.fy,
+                };
+                hits.push((session, b.damage, from, b.kind.clone(), b.level));
                 return false;
             }
             true
@@ -105,6 +111,52 @@ impl World {
         self.enemy_bolts = bolts;
         for (session, damage, at, kind, level) in hits {
             self.hurt_player_by(session, damage, at, &kind, level);
+        }
+    }
+}
+
+#[cfg(test)]
+mod daze_tests {
+    use super::super::wyrd_tests::{at, calm, join, place, world};
+    use super::*;
+
+    #[test]
+    fn daze_projectile_crossing_victim_uses_incoming_direction() {
+        let mut w = world();
+        calm(&mut w);
+        let _rx = join(&mut w, 1, Class::Warrior);
+        place(&mut w, 1, 0, at(25., 25.));
+        w.time = 10.;
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .attributes
+            .dexterity = 20;
+        for (fx, expected) in [(1., 4.), (-1., 0.)] {
+            let p = w.players.get_mut(&1).unwrap();
+            p.face = at(1., 0.);
+            p.daze = 0.;
+            p.last_hurt = 0.;
+            w.rng = 2;
+            w.enemy_bolts.push(EnemyBolt {
+                id: 1,
+                zone: 0,
+                x: 25. - fx * 0.6,
+                y: 25.,
+                fx,
+                fy: 0.,
+                color: "red",
+                size: 1.,
+                kind: "archer".into(),
+                speed: 24.,
+                life: 1.,
+                damage: 1.,
+                level: 1,
+            });
+            w.update_enemy_bolts();
+            assert!(w.enemy_bolts.is_empty());
+            assert_eq!(w.players[&1].daze, expected, "incoming x direction {fx}");
         }
     }
 }

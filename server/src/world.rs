@@ -48,6 +48,8 @@ mod damage_meter;
 #[cfg(test)]
 mod damage_meter_tests;
 mod daynight;
+#[cfg(test)]
+mod daze_tests;
 mod debug;
 #[cfg(test)]
 mod deep_tests;
@@ -258,6 +260,8 @@ struct Player {
     dash_foe_hits: Vec<u64>,
     /// Seconds left of a stun from a skill in a PvP fight (`pvp_hit`): no moving, attacking or casting.
     stun: f64,
+    /// Seconds left of a rear enemy hit's daze: walking speed is halved; actions remain available.
+    daze: f64,
     /// Seconds left of a root from a skill in a PvP fight: no moving, but attacks and casts (dashes excepted) work.
     root: f64,
     /// Share of healing received that is lost while `wound_left` runs (see `Skill::wound`).
@@ -327,6 +331,7 @@ impl Player {
     // Called once when hp reaches 0: a death wears the worn gear down (docs/durability.md) and costs no XP. Mercenaries
     // and ambient adventurers have no durability. The notice says what happened to the gear.
     fn apply_death_penalty(&mut self) {
+        self.daze = 0.;
         let wear = if self.merc.is_some() || self.ambient.is_some() {
             DeathWear::default()
         } else {
@@ -391,6 +396,7 @@ impl Player {
             dash_hits: vec![],
             dash_foe_hits: vec![],
             stun: 0.,
+            daze: 0.,
             root: 0.,
             wound: 0.,
             wound_left: 0.,
@@ -445,6 +451,7 @@ impl Player {
             "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["abandonedQuests"] = json!(c.abandoned_quests);
+        view["daze"] = json!(self.daze);
         view["rested"] = json!({"percent":c.rested.percent()});
         view["achievementTitle"] = json!(c.achievement_title());
         view["achievementPoints"] = json!(c.achievement_points());
@@ -2970,6 +2977,7 @@ impl World {
         p.hurt = (p.hurt - TICK).max(0.);
         for timer in [
             &mut p.stun,
+            &mut p.daze,
             &mut p.root,
             &mut p.wound_left,
             &mut p.pvp_fight,
@@ -3208,6 +3216,7 @@ impl World {
                 },
             |e| e.speed(),
         ) * (1. + p.buff(BuffKind::Haste))
+            * if p.daze > 0. { 0.5 } else { 1. }
             * TICK
             * if p.attack > 0. { 0.25 } else { 1. })
         .min(travel);
@@ -4974,7 +4983,7 @@ impl World {
         self.hurt_player_by(session, damage, from, "", 0);
     }
     /// `enemy` is the attacker's kind and `level` its level, shown in the system log.
-    fn hurt_player_by(&mut self, session: u64, damage: f64, _from: Point, enemy: &str, level: u32) {
+    fn hurt_player_by(&mut self, session: u64, damage: f64, from: Point, enemy: &str, level: u32) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
@@ -5014,6 +5023,10 @@ impl World {
             );
             return;
         }
+        // Rear half of the facing plane, tested only after a hit gets through the dodge check.
+        let p = &self.players[&session];
+        let behind = (from.x - point.x) * p.face.x + (from.y - point.y) * p.face.y < -1e-9;
+        let dazed = !enemy.is_empty() && behind && self.random() < 0.4;
         let raid_taken = self.raid_support(session).taken_multiplier();
         let p = self.players.get_mut(&session).unwrap();
         let shield = p.buff(BuffKind::Shield).min(0.8);
@@ -5038,6 +5051,9 @@ impl World {
         p.set_shield -= absorbed;
         value -= absorbed;
         let taken = value.min(p.character.hp);
+        if taken > 0. && dazed {
+            p.daze = 4.;
+        }
         if p.character.look.class == Class::Warrior {
             p.character.change_resource(taken);
         }

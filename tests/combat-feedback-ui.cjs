@@ -72,8 +72,9 @@ async function frameChecks(page, label) {
   check(await page.locator('.hud-elite-dragon').isHidden(), `${label}: clearing the target hides the frame`);
 }
 async function audioChecks(page) {
+  check(await page.evaluate(() => Prefs.combatSounds) === 'synthesized', 'Legacy preferences without a mode default to synthesized sounds');
+  await page.evaluate(() => Prefs.set({ combatSounds: 'recorded' }));
   await page.waitForFunction(() => RecordedCombat.ready, null, { timeout: 30000 });
-  check(await page.evaluate(() => Prefs.combatSounds) === 'recorded', 'Legacy preferences without a mode default to recorded sounds');
   if (process.env.MUTATE !== 'audio') {
   // One actual server attack verifies the new enemy-hurt path, without grinding an encounter.
   await page.evaluate(() => {
@@ -129,10 +130,11 @@ async function audioChecks(page) {
   await page.evaluate(() => Prefs.set({sfxVol:0}));
   check((await play('hit')).peak < .001, 'Effects volume zero mutes recorded effects');
   await page.evaluate(() => Prefs.set({sfxVol:.5}));
-  const low = await play('hit');
+  const low = await play('hit'), lowGain = await page.evaluate(() => __combatAudioTest.bus().gain.value);
   await page.evaluate(() => Prefs.set({sfxVol:1}));
-  const full = await play('hit');
-  check(low.peak > .001 && low.peak / full.peak > .18 && low.peak / full.peak < .32, 'Recorded effects use the existing squared volume taper');
+  const full = await play('hit'), fullGain = await page.evaluate(() => __combatAudioTest.bus().gain.value);
+  // Random takes/modulation can change peaks; the shared bus still has an exact squared taper.
+  check(low.peak > .001 && full.peak > .001 && Math.abs(lowGain / fullGain - .25) < .001, 'Recorded effects use the existing squared volume taper');
   await page.evaluate(() => { __combatAudioTest.play('death'); Prefs.set({sound:false}); });
   await page.waitForTimeout(100); await page.evaluate(() => { __peak=0; }); await page.waitForTimeout(200);
   check(await page.evaluate(() => __peak) < .001, 'Muting stops an already-playing recording');
@@ -151,7 +153,7 @@ async function audioChecks(page) {
   await page.reload(); await page.waitForFunction(() => !!window.Prefs);
   check(await page.evaluate(() => Prefs.combatSounds) === 'recorded', 'Recorded preference survives reload');
   // An unavailable file must not silence combat or trigger delayed effects.
-  await page.route('**/assets/combat/impact.mp3', r => r.abort());
+  await page.route('**/assets/combat/impact*.mp3', r => r.abort());
   await page.reload(); await page.waitForFunction(() => !!window.Prefs);
   await resume(page);
   await page.evaluate(() => { Settings.show(); Prefs.set({sound:true}); });

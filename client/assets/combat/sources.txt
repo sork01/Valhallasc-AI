@@ -262,6 +262,379 @@
       "archiveSha256": "e9100a4e3b9dcd146993089970dc6097dcf9935fa4683b196040012bad65d67a",
       "sha256": "90f7ef2545a9463b38bbfb620846ca48db9fa5fa7d98d4ad4ab03db82b78e8be",
       "duration": 0.4444
+    },
+    "sword-2": {
+      "file": "sword-2.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "blade_01.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "713dd001e482cdf6c5eb127773b6527179524da281daa8797adaad5da2a0b9a0",
+      "duration": 0.2268
+    },
+    "sword-3": {
+      "file": "sword-3.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "blade_02.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "88d167d6ee0dac19f39d4aa5033ddeda37d7c465cf05eceaa298e1dd1037b6a5",
+      "duration": 0.2661
+    },
+    "dagger-2": {
+      "file": "dagger-2.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "blade_03.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "3a509d706496a1952dee211e87dff26d7b647ca6da7db69741b28402ba6652d2",
+      "duration": 0.2661
+    },
+    "dagger-3": {
+      "file": "dagger-3.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/drawKnife2.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "2bb9b346a86de82d0ad20415a249ce01fd891b618409f07f3e1e6ac18d23f977",
+      "duration": 0.3602
+    },
+    "mace-2": {
+      "file": "mace-2.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/cloth3.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "26f5fbcec108bd1c0a10eb1d5efe52b68e8a7c4dd1fe1f377af6127560fdbf89",
+      "duration": 0.469
+    },
+    "mace-3": {
+      "file": "mace-3.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/cloth4.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "aa148f4d706087afe9ba4fe8760e9bb49e2964cb755d94085d4aa1ede41b5d4b",
+      "duration": 0.3844
+    },
+    "staff-2": {
+      "file": "staff-2.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/drawKnife3.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "fc7e22e5e697f46d86a2c8aa7260f98aa0a7f7b9a9b40ff59983a24ce718918c",
+      "duration": 0.2917
+    },
+    "bow-2": {
+      "file": "bow-2.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/creak3.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "501e7afe2782a4d355b5dff926d8cb4b0a1c015ba8ee929bc93ffc4b240da2b2",
+      "duration": 0.2792
+    },
+    "arrow-2": {
+      "file": "arrow-2.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/clothBelt.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "9e78f9d73d98f2c74c67c620a2afb25410ab79c3d6af397a3f138c94edd2cdc3",
+      "duration": 0.6863
+    },
+    "impact-2": {
+      "file": "impact-2.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "metal_01.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "7e82ff5992c19611ab493af97d6b195d98e1a7ae79da8f6af39896cb75bc773a",
+      "duration": 0.4224
+    },
+    "impact-3": {
+      "file": "impact-3.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "item_wood_01.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "f90d279d254436cd330081faa05051ea3d9840f51c94f002a32893cd847f358e",
+      "duration": 0.3838
+    },
+    "metal-2": {
+      "file": "metal-2.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/metalPot2.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "acfcf438f789fbfac0e90dd70f32896220301caeb533e9b4fc7f94e7d2f14fe0",
+      "duration": 0.6513
+    },
+    "wood-2": {
+      "file": "wood-2.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "wood_01.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "9ecf35b410cb04f1d6196e404a706737a35c4aa9d28aaa639b8100f3210a2bd6",
+      "duration": 0.1814
+    },
+    "player-hurt-2": {
+      "file": "player-hurt-2.mp3",
+      "author": "HaelDB",
+      "source": "https://opengameart.org/content/male-gruntyelling-sounds",
+      "member": "yelling sounds/3grunt3.wav",
+      "archiveSha256": "e9100a4e3b9dcd146993089970dc6097dcf9935fa4683b196040012bad65d67a",
+      "sha256": "0328d9591cb7d43cd68473cd8ed9c696e3b6d8380383a3bb2a7cbc1430d08d09",
+      "duration": 0.4898
+    },
+    "player-hurt-3": {
+      "file": "player-hurt-3.mp3",
+      "author": "HaelDB",
+      "source": "https://opengameart.org/content/male-gruntyelling-sounds",
+      "member": "yelling sounds/3grunt5.wav",
+      "archiveSha256": "e9100a4e3b9dcd146993089970dc6097dcf9935fa4683b196040012bad65d67a",
+      "sha256": "7076c8cd982ec2b4d14200ba95da8d091265ffdc1d207a3b4f2aea18776f58d9",
+      "duration": 0.3575
+    },
+    "player-death-2": {
+      "file": "player-death-2.mp3",
+      "author": "HaelDB",
+      "source": "https://opengameart.org/content/male-gruntyelling-sounds",
+      "member": "yelling sounds/2yell2.wav",
+      "archiveSha256": "e9100a4e3b9dcd146993089970dc6097dcf9935fa4683b196040012bad65d67a",
+      "sha256": "29a96b60e70a2ff86e4f500c7337fff44cb5313094bf07498f6a35a8bb1cf068",
+      "duration": 0.7914
+    },
+    "player-death-3": {
+      "file": "player-death-3.mp3",
+      "author": "HaelDB",
+      "source": "https://opengameart.org/content/male-gruntyelling-sounds",
+      "member": "yelling sounds/2yell3.wav",
+      "archiveSha256": "e9100a4e3b9dcd146993089970dc6097dcf9935fa4683b196040012bad65d67a",
+      "sha256": "ae8e8263a513cf7ea029884d676a331da5423eeb697742af91e62fed46838afe",
+      "duration": 0.9829
+    },
+    "player-female-hurt": {
+      "file": "player-female-hurt.mp3",
+      "author": "AuraVoice (Nocturnal_Vanguard)",
+      "source": "https://opengameart.org/content/female-hurt-grunts-groans",
+      "member": "female_hurt_grunts_groans_1.ogg",
+      "sourceSha256": "80a9fb09203bb8feb065ba15197609b118cbe167c9a2264670a31ee22c384adb",
+      "sha256": "f5b258093066f8a52d6f2d97a06076c94ba20d8ac06afe76afb7faa2fe995d75",
+      "duration": 0.8397,
+      "sourceOffset": 0.3,
+      "sourceWindow": 0.9
+    },
+    "player-female-hurt-2": {
+      "file": "player-female-hurt-2.mp3",
+      "author": "AuraVoice (Nocturnal_Vanguard)",
+      "source": "https://opengameart.org/content/female-hurt-grunts-groans",
+      "member": "female_hurt_grunts_groans_1.ogg",
+      "sourceSha256": "80a9fb09203bb8feb065ba15197609b118cbe167c9a2264670a31ee22c384adb",
+      "sha256": "a9172776f7cc9c3f0d7fd7bc63ef2c4ad7651fac330996cbbf726aafe26cdc78",
+      "duration": 0.6391,
+      "sourceOffset": 2.06,
+      "sourceWindow": 0.75
+    },
+    "player-female-hurt-3": {
+      "file": "player-female-hurt-3.mp3",
+      "author": "AuraVoice (Nocturnal_Vanguard)",
+      "source": "https://opengameart.org/content/female-hurt-grunts-groans",
+      "member": "female_hurt_grunts_groans_1.ogg",
+      "sourceSha256": "80a9fb09203bb8feb065ba15197609b118cbe167c9a2264670a31ee22c384adb",
+      "sha256": "0fbbfa56d520fc2627c8b23f4e142229ae8546686351a484a9a473c1901aa0e4",
+      "duration": 0.8016,
+      "sourceOffset": 7.3,
+      "sourceWindow": 0.95
+    },
+    "player-female-death": {
+      "file": "player-female-death.mp3",
+      "author": "AuraVoice (Nocturnal_Vanguard)",
+      "source": "https://opengameart.org/content/female-hurt-grunts-groans",
+      "member": "female_hurt_grunts_groans_1.ogg",
+      "sourceSha256": "80a9fb09203bb8feb065ba15197609b118cbe167c9a2264670a31ee22c384adb",
+      "sha256": "1d9975f51952c31d079a69204c21c7c8ca7d80e07e0ace29e709db7b06e11bae",
+      "duration": 1.2111,
+      "sourceOffset": 4.88,
+      "sourceWindow": 1.3
+    },
+    "player-female-death-2": {
+      "file": "player-female-death-2.mp3",
+      "author": "AuraVoice (Nocturnal_Vanguard)",
+      "source": "https://opengameart.org/content/female-hurt-grunts-groans",
+      "member": "female_hurt_grunts_groans_1.ogg",
+      "sourceSha256": "80a9fb09203bb8feb065ba15197609b118cbe167c9a2264670a31ee22c384adb",
+      "sha256": "fbdfe7ee7944a9b5b8d1d0308b3d13ce200779ea5ac373bd1d576fab0f916bea",
+      "duration": 0.9937,
+      "sourceOffset": 9.28,
+      "sourceWindow": 1.15
+    },
+    "player-female-death-3": {
+      "file": "player-female-death-3.mp3",
+      "author": "AuraVoice (Nocturnal_Vanguard)",
+      "source": "https://opengameart.org/content/female-hurt-grunts-groans",
+      "member": "female_hurt_grunts_groans_1.ogg",
+      "sourceSha256": "80a9fb09203bb8feb065ba15197609b118cbe167c9a2264670a31ee22c384adb",
+      "sha256": "3d1c6f62038294c4f7a7599871ae7c86ab2b1858443ced74bbf8c1a63aaa9ca2",
+      "duration": 0.8992,
+      "sourceOffset": 11.65,
+      "sourceWindow": 1.1
+    },
+    "skill-fire": {
+      "file": "skill-fire.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "spell_fire_01.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "18cb474fcf4ea4fd740d492a5f46cc4c3fc50d2899b3135f73a49b79bf716425",
+      "duration": 0.8498
+    },
+    "skill-fire-2": {
+      "file": "skill-fire-2.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "spell_fire_02.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "b4ee5452785d21dcf251e8c66b108c11e5648cc6a45496c438cd50496ad96de4",
+      "duration": 0.7051
+    },
+    "skill-blast": {
+      "file": "skill-blast.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "spell_fire_05.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "a999c67e76dddd249995ce5a4edf36944d03dcab255eaaf16621ad65711dfe65",
+      "duration": 1.138
+    },
+    "skill-earth": {
+      "file": "skill-earth.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "stones_01.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "41a92d1a016c4d1f6df2a5782fedc30c005e18f317926696930dbf8d4781f02e",
+      "duration": 0.4428
+    },
+    "skill-shadow": {
+      "file": "skill-shadow.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "spell_02.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "484d752a34db239d3447f8e1f3ff61d4064853467b169334508079c93e86a0b4",
+      "duration": 0.4142
+    },
+    "skill-arcane": {
+      "file": "skill-arcane.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "spell_01.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "c13bd74d809918f7bf3b6cab8eeb3ef453754dc51ec719a03ff0d84b5ce551b2",
+      "duration": 0.5202
+    },
+    "skill-lightning": {
+      "file": "skill-lightning.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "spell_fire_07.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "1a3771d1dbbf6c204b40e86b804cbd82a9b31cdfb2ec740a097173367654759b",
+      "duration": 0.5128
+    },
+    "skill-ice": {
+      "file": "skill-ice.mp3",
+      "author": "JaggedStone",
+      "source": "https://opengameart.org/content/magic-spell-sfx",
+      "member": "magical_2.ogg",
+      "sourceSha256": "84a70f63f3f21e5ba4a48285b760a663d422ad3feddba2f3cbadd94b76cdc52e",
+      "sha256": "b84cef7d0d625443fd820b0ad634ba2395020c7289643240b64b03c45515619e",
+      "duration": 1.38
+    },
+    "skill-heal": {
+      "file": "skill-heal.mp3",
+      "author": "JaggedStone",
+      "source": "https://opengameart.org/content/magic-spell-sfx",
+      "member": "magical_1_0.ogg",
+      "sourceSha256": "119f9061a566c72c1c58444b03f8685b833079ef268dda02fe742eb34d3bc68f",
+      "sha256": "c1589a829492ce66806299eb3ed3339d261521bd098ecde4f4cbc378276cca2f",
+      "duration": 1.5938,
+      "sourceOffset": 0,
+      "sourceWindow": 1.7
+    },
+    "skill-holy": {
+      "file": "skill-holy.mp3",
+      "author": "JaggedStone",
+      "source": "https://opengameart.org/content/magic-spell-sfx",
+      "member": "magical_3.ogg",
+      "sourceSha256": "9fac648a1de869cf9ca2f4b3f1cd47f1766a3ee9d2fdec45831234401d7b2392",
+      "sha256": "539d997a69d1941fbd6df51018680412adf2c060329445470bb4bb7773107317",
+      "duration": 1.8161,
+      "sourceOffset": 0,
+      "sourceWindow": 1.9
+    },
+    "skill-shield": {
+      "file": "skill-shield.mp3",
+      "author": "JaggedStone",
+      "source": "https://opengameart.org/content/magic-spell-sfx",
+      "member": "magical_5.ogg",
+      "sourceSha256": "69aaaaed729cacb518005a5d24074196db3c5fffc0ed2cd01ad864fbed4a62be",
+      "sha256": "404c986012878a253e75425ad9606fde7c4e4ab7007c9693369f6656c68e10c5",
+      "duration": 1.4383,
+      "sourceOffset": 0,
+      "sourceWindow": 1.5
+    },
+    "skill-focus": {
+      "file": "skill-focus.mp3",
+      "author": "JaggedStone",
+      "source": "https://opengameart.org/content/magic-spell-sfx",
+      "member": "magical_6_0.ogg",
+      "sourceSha256": "0a18ee3460cf3fd79c3771bbf94c20c26d34b65ab60d0b0e15694ffcad815955",
+      "sha256": "07e97c6d660d915e9df5296702201dde370a8dfe79489612ce961b965d2adca6",
+      "duration": 1.1104
+    },
+    "skill-rush": {
+      "file": "skill-rush.mp3",
+      "author": "Kenney",
+      "source": "https://opengameart.org/content/50-rpg-sound-effects",
+      "member": "OGG/clothBelt2.ogg",
+      "archiveSha256": "3ae398ad63e293f9c450bda22d5d81c3af69c74df66fc1400f33c012c0bbc231",
+      "sha256": "08bf76722961daddc285dee434f47aa33c9356aa0790a47a0574bc74d685501d",
+      "duration": 0.5384
+    },
+    "skill-whirl": {
+      "file": "skill-whirl.mp3",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/80-cc0-rpg-sfx",
+      "member": "blade_03.ogg",
+      "archiveSha256": "1c2f06ff4e8563b5b8b745b23cf213c1474142a69bb82bd8f5e10d9b3f7a7bbd",
+      "sha256": "3a509d706496a1952dee211e87dff26d7b647ca6da7db69741b28402ba6652d2",
+      "duration": 0.2661
+    },
+    "achievement": {
+      "file": "achievement.mp3",
+      "author": "JaggedStone",
+      "source": "https://opengameart.org/content/magic-spell-sfx",
+      "member": "magical_7_0.ogg",
+      "sourceSha256": "2817da4f5df69ff993baffd6594a2f2a069f85ee2a02019f97db2246e350a76b",
+      "sha256": "4809a1d16afa19f49f2ee1da2d779e863f4bcfbda5ed00406666aaa3644aa23e",
+      "duration": 1.5405,
+      "sourceOffset": 0,
+      "sourceWindow": 1.6
+    },
+    "levelup": {
+      "file": "levelup.mp3",
+      "author": "JaggedStone",
+      "source": "https://opengameart.org/content/magic-spell-sfx",
+      "member": "magical_4.ogg",
+      "sourceSha256": "b7862d109b4013dfb2a389a10f8917203beb0efc458444bc5a1b8ada605cc118",
+      "sha256": "54f5a5702ce553ec0a6c8736ec1d3d68abc1cfdd9a497cfbda6e1d7583766549",
+      "duration": 1.7116,
+      "sourceOffset": 0,
+      "sourceWindow": 2.5
     }
   }
 }

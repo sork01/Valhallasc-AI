@@ -1,5 +1,18 @@
 [
   {
+    "version": "Beta 1.32.1",
+    "date": "2026-10-29",
+    "new": [
+      "Enemy attacks from behind have a 40% chance to daze you for 4 seconds, reducing movement speed by 50%. The hit dismounts you. Dazed characters show stars overhead and a status countdown.",
+      "Female characters have their own hurt and death voices. Recorded mode now includes sounds for all skills, achievements and level-ups."
+    ],
+    "changed": [
+      "Synthesized combat sounds are now the default. Your saved sound choice is kept.",
+      "Recorded sounds vary their pitch, volume and tone, with alternate weapon, impact and character voice takes to reduce repetition."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.32.0",
     "date": "2026-10-28",
     "new": [
