@@ -18,7 +18,7 @@
   const layoutSlot = () => mode === 'account' ? (acct.current ? (acct.slots[acct.current] ||= {}) : null) : saved.characters.find(c => c.token === saved.current);
   const persistSlot = () => mode === 'account' ? persistAccount() : persist();
   let socket = null, generation = 0, active = false, callbacks = {}, look = null, retryTimer = 0, heartbeat = 0, failures = 0;
-  let connected = false, id = null, initialEmptySlots = [];
+  let connected = false, id = null, initialEmptySlots = [], busySince = null;
   const $ = name => document.getElementById(name);
   function status(text, ready) {
     $('network-status').textContent = text;
@@ -43,26 +43,60 @@
     if (!connected || socket?.readyState !== WebSocket.OPEN) return false;
     socket.send(JSON.stringify(message)); return true;
   }
+  // While rendering is busy, only the newest complete snapshot needs applying.
+  // Flush before other packet kinds so transaction/event order is preserved.
+  let pendingSnapshot = null, snapshotFrame = 0;
+  function clearSnapshot() {
+    if (snapshotFrame) cancelAnimationFrame(snapshotFrame);
+    snapshotFrame = 0; pendingSnapshot = null;
+  }
+  function flushSnapshot() {
+    const packet = pendingSnapshot; clearSnapshot();
+    if (packet) applySnapshot(packet);
+  }
+  function applySnapshot(packet) {
+    if (!connected) return;
+    const character = packet.players.find(p => p.id === id);
+    const initialSlot = layoutSlot();
+    if (character?.equipment && initialSlot?.initialEmptySlots?.every(slot => {
+      if (slot === 'chest' || slot === 'hands') return character.look?.[character.look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === 'none';
+      return !character.equipment[slot] || character.equipment[slot] === 'none';
+    })) {
+      delete initialSlot.initialEmptySlots; persistSlot();
+    }
+    const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
+    status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
+    const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
+    if (character) window.GM?.onSelf(character);
+    if (character) window.Trade?.onSnapshot(character);
+    if (character) window.Shop?.onSnapshot(character);
+    if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
+    callbacks.onSnapshot?.(packet); window.DpsMeter?.update(packet.damageMeter);
+  }
   function connect() {
     clearTimeout(retryTimer); clearInterval(heartbeat);
-    const currentGeneration = generation;
+    if (!active) return;
+    const currentGeneration = ++generation; clearSnapshot();
+    const old = socket; socket = null; old?.close();
     connected = false;
     status('Connecting to Greenmeadow…', false); overlay('Connecting to the world…');
     const ws = new WebSocket(endpoint); socket = ws;
-    let fatal = false;
-    const joinTimeout = setTimeout(() => { if (!connected) ws.close(); }, 10000);
+    let fatal = false, waitingForRelease = false, joinTimeout = 0;
+    const current = () => active && currentGeneration === generation && socket === ws;
     ws.onopen = () => {
-      if (!active || currentGeneration !== generation) { ws.close(); return; }
+      if (!current()) { ws.close(); return; }
       ws.send(JSON.stringify(mode === 'account'
         ? { type: 'join', version: 1, session: acct.session, character: acct.current, look: acct.current ? null : look }
         : { type: 'join', version: 1, token: saved.current, look: saved.current ? null : look }));
+      joinTimeout = setTimeout(() => { if (current() && !connected) ws.close(); }, 15000);
     };
     ws.onmessage = event => {
-      if (!active || currentGeneration !== generation) return;
+      if (!current()) return;
       let packet; try { packet = JSON.parse(event.data); } catch (_) { return; }
+      if (packet.type !== 'snapshot') flushSnapshot();
       switch (packet.type) {
         case 'welcome': {
-          clearTimeout(joinTimeout); connected = true; failures = 0; id = packet.id;
+          clearTimeout(joinTimeout); connected = true; failures = 0; busySince = null; id = packet.id;
           const character = packet.snapshot.players.find(p => p.id === id);
           if (mode === 'account') { acct.current = packet.id; persistAccount(); }
           else if (packet.token) {
@@ -89,22 +123,9 @@
         }
         case 'snapshot': {
           if (!connected) break;
-          const character = packet.players.find(p => p.id === id);
-          const initialSlot = layoutSlot();
-          if (character?.equipment && initialSlot?.initialEmptySlots?.every(slot => {
-            if (slot === 'chest' || slot === 'hands') return character.look?.[character.look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === 'none';
-            return !character.equipment[slot] || character.equipment[slot] === 'none';
-          })) {
-            delete initialSlot.initialEmptySlots; persistSlot();
-          }
-          const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
-          status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
-          const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
-          if (character) window.GM?.onSelf(character);
-          if (character) window.Trade?.onSnapshot(character);
-          if (character) window.Shop?.onSnapshot(character);
-          if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
-          callbacks.onSnapshot?.(packet); window.DpsMeter?.update(packet.damageMeter); break;
+          pendingSnapshot = packet;
+          if (!snapshotFrame) snapshotFrame = requestAnimationFrame(() => { if (current()) flushSnapshot(); });
+          break;
         }
         case 'event': window.SystemLog?.event(packet, id); callbacks.onEvent?.(packet); break;
         case 'dialogue': window.City?.dialogue(packet); break;
@@ -126,21 +147,27 @@
         case 'party': window.Social?.onParty(packet.party); break;
         case 'who': window.Social?.onWho(packet.players); break;
         case 'error':
+          // An interrupted socket can remain on the server until its heartbeat
+          // expires. Wait for that slot without discarding the saved identity.
+          if (packet.fatal && packet.code !== 'auth' && packet.text === 'This character is already online in another window.') {
+            busySince ??= Date.now();
+            if (Date.now() - busySince < 90000) { waitingForRelease = true; ws.close(); break; }
+          }
           log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text); window.Rebirth?.onError(packet.text);
           if (packet.code === 'auth') { acct.session = null; accountList = []; persistAccount(); }
-          if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, true); status('Unable to enter world', false); ws.close(); }
+          if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, packet.text !== 'This character is already online in another window.'); status('Unable to enter world', false); ws.close(); }
           break;
       }
     };
     ws.onerror = () => {};
     ws.onclose = () => {
       clearTimeout(joinTimeout);
-      if (!active || currentGeneration !== generation) return;
-      clearInterval(heartbeat);
+      if (!current()) return;
+      clearSnapshot(); clearInterval(heartbeat);
       connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
-      overlay('Connection lost. Reconnecting to your character…');
+      overlay(waitingForRelease ? 'Waiting for your previous connection to close…' : 'Connection lost. Reconnecting to your character…');
       retryTimer = setTimeout(connect, Math.min(5000, 500 * 2 ** Math.min(failures++, 4)));
     };
   }
@@ -151,7 +178,7 @@
     },
     stop() {
       window.DpsMeter?.reset(); window.Achievements?.reset();
-      active = false; generation++; connected = false; id = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
+      active = false; generation++; clearSnapshot(); connected = false; id = null; busySince = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;
       $('chat').hidden = true; $('connection-overlay').hidden = true;
@@ -265,7 +292,7 @@
   });
   addEventListener('blur', () => { window.Field?.clearInput(); send({ type: 'stop' }); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { window.Field?.clearInput(); send({ type: 'stop' }); } });
-  $('connection-retry').addEventListener('click', () => { generation++; socket?.close(); connect(); });
+  $('connection-retry').addEventListener('click', () => { busySince = null; connect(); });
   $('connection-title').addEventListener('click', () => $('p-title').click());
   $('connection-new').addEventListener('click', () => $('p-new').click());
 })();

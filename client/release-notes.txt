@@ -9,7 +9,10 @@
       "Enemy selection circles stay on the ground beneath enemies and scenery.",
       "Female synthesized voices have their own tone for hurt, death, shouts and other vocal effects.",
       "Every vendor opens with a Buy option containing their goods, including bags and mounts. Individual purchases no longer clutter the greeting.",
-      "Rain streaks now follow the direction the drops are falling, with splashes at their tips."
+      "Rain streaks now follow the direction the drops are falling, with splashes at their tips.",
+      "Interrupted connections wait for the previous connection to close and reconnect automatically instead of getting stuck at the already-online message.",
+      "After a freeze, the game catches up to the current world instead of replaying outdated updates.",
+      "Walking into rain makes it pass faster; walking with it makes it pass slower. Rain and thunderstorm streaks follow the camera-relative motion."
     ],
     "removed": []
   },

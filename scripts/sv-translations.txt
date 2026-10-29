@@ -6940,6 +6940,7 @@
   "No items to show.": "Inga föremål att visa.",
   "Sell": "Sälj",
   "Buy": "Köp",
+  "Waiting for your previous connection to close…": "Väntar på att din förra anslutning ska stängas…",
   "Sell all junk": "Sälj allt skräp",
   "Sell valuable items?": "Sälj värdefulla föremål?",
   "Starter gear cannot be sold.": "Startutrustning kan inte säljas.",

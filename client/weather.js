@@ -7,6 +7,7 @@
   let zone = null, packet = null, own = {x:0,y:0,inside:false};
   let shown = {type:'clear',intensity:'none',inside:true}, previous = shown, fade = 1, fadeTime = 1;
   let packetAt = performance.now(), lastLabel = '';
+  let eye = { x: 0, y: 0, at: null, vx: 0, vy: 0 };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const season = (x,y) => x < 200 ? (y >= 200 ? 'spring' : 'winter') : (y >= 200 ? 'summer' : 'autumn');
   const choice = () => {
@@ -23,7 +24,7 @@
     packet = value || {type:'clear',intensity:'none',inside:true}; packetAt = performance.now();
     own = {x,y,inside}; choose();
   }
-  function setZone(value) { zone = value; choose(); }
+  function setZone(value) { zone = value; eye.at = null; choose(); }
   function choose() {
     const next = choice();
     if (next.type === shown.type && next.intensity === shown.intensity && !!next.inside === !!shown.inside && next.variant === shown.variant) {
@@ -47,7 +48,7 @@
   }
   // Fixed hashes keep particle positions stable across frames without allocations or randomness.
   const hash = n => { const v = Math.sin(n * 127.1 + 53.7) * 43758.5453; return v - Math.floor(v); };
-  function paint(g, width, height, state, opacity, time) {
+  function paint(g, width, height, state, opacity, time, view) {
     const a = strength(state) * opacity;
     if (a < .002) return;
     const moving = !reduced(), type = state.type;
@@ -60,10 +61,12 @@
       const wind = 115;
       for (let i=0;i<count;i++) {
         const speed = 260+i%7*18, length = 14+a*11, trail = length/speed;
-        const x = (hash(i+7)*width + (moving ? time*wind : 0)) % width;
-        const y = (hash(i+871)*height + (moving ? time*speed : 0)) % height;
-        // The tip falls downwind; its streak trails behind along the same velocity.
-        g.beginPath(); g.moveTo(x-wind*trail,y-length); g.lineTo(x,y); g.stroke();
+        const x = ((hash(i+7)*width + (moving ? time*wind-view.x : 0)) % width + width) % width;
+        const y = ((hash(i+871)*height + (moving ? time*speed-view.y : 0)) % height + height) % height;
+        // Motion and streaks are relative to the camera: walking into rain
+        // makes it pass faster, while walking with it makes it pass slower.
+        const vx = wind-(moving ? view.vx : 0), vy = speed-(moving ? view.vy : 0);
+        g.beginPath(); g.moveTo(x-vx*trail,y-vy*trail); g.lineTo(x,y); g.stroke();
         if (i%9===0 && y>height*.6) { g.beginPath(); g.ellipse(x,y,4+a*4,1.3,0,0,Math.PI*2); g.stroke(); }
       }
     } else if (type === 'snow') {
@@ -111,9 +114,13 @@
     }
     g.restore();
   }
-  function draw(g,width,height,time) {
-    paint(g,width,height,previous,1-fade,time);
-    paint(g,width,height,shown,fade,time);
+  function draw(g,width,height,time,camera) {
+    const x = camera?.x || 0, y = camera?.y || 0, dt = time-eye.at;
+    // A gate, resize or long stall must not produce a giant motion-blur streak.
+    const continuous = eye.at != null && dt > 0 && dt < .5 && Math.abs(x-eye.x) < width/2 && Math.abs(y-eye.y) < height/2;
+    eye = { x, y, at: time, vx: continuous ? (x-eye.x)/dt : 0, vy: continuous ? (y-eye.y)/dt : 0 };
+    paint(g,width,height,previous,1-fade,time,eye);
+    paint(g,width,height,shown,fade,time,eye);
   }
   window.Weather = {sync,setZone,tick,draw,get state(){return shown;},get blend(){return fade;},season};
 })();

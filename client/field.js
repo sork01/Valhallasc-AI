@@ -4008,7 +4008,7 @@
     }
     // Light is applied after the world and before attacks, loot labels and other combat feedback.
     window.DayNight?.draw(g, VW, VH, nightLights, w2s);
-    window.Weather?.draw(g, VW, VH, t);
+    window.Weather?.draw(g, VW, VH, t, { x: cx, y: cy });
     window.EmptySeat?.drawVision(g, w2s, VW, VH);
     // slash arc on the ground plane (over everything: it is the axe's motion)
     for (const e of effects) if ((e.kind === 'slash' || e.kind === 'dualSlash') && (heroSpr || e.t < 0)) continue; else if (e.kind === 'slash') {

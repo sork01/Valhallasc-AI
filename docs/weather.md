@@ -68,3 +68,13 @@ all intensities and both graphics settings, comparing stroke direction with
 particle motion between frames and checking splash alignment, reduced motion
 and the off setting. `MUTATE=direction` restores the old streak and fails the
 measured-velocity assertion.
+
+## Camera-relative rain (same-version Beta 1.32.2 follow-up)
+
+The field passes its projected camera to `Weather.draw`. Drops are anchored to
+the world, and their streaks use rain velocity minus camera velocity: walking
+into rain speeds it up; walking with it slows it down. Camera jumps and long
+stalls reset motion blur, and reduced-motion precipitation remains stationary.
+The focused direction test now passes 48 checks, including both walking
+directions, relative streak alignment and teleport protection. `MUTATE=camera`
+removes the camera offset and fails the relative-motion assertion.
