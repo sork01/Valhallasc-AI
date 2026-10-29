@@ -1202,6 +1202,7 @@
         if (generation === spriteGeneration && lastLook === signature) mageSpr = sprite;
       }).catch(() => say('spriteError'));
     }
+    loadSceneEnemyArt(packet.slimes.filter(inZone));
     const existing = new Map(slimes.map(s => [s.id, s]));
     slimes = packet.slimes.filter(inZone).map(data => {
       const previous = existing.get(data.id);
@@ -2768,7 +2769,71 @@
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
   let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
-  const enemySource = s => CATHEDRAL_KINDS.includes(s.kind) ? cathedralSrc : YEAR_KINDS.includes(s.kind) ? yearSrc : CAIRN_KINDS.includes(s.kind) ? cairnSrc : FROSTWAKE_KINDS.includes(s.kind) ? frostwakeSrc : LAPIS_KINDS.includes(s.kind) ? lapisSrc : WORLDHEART_KINDS.includes(s.kind) ? worldheartSrc : TANGLECROWN_KINDS.includes(s.kind) ? tanglecrownSrc : RIBBONWILD_KINDS.includes(s.kind) ? ribbonwildSrc : SUNWARD_KINDS.includes(s.kind) ? sunwardSrc : STORMGLASS_KINDS.includes(s.kind) ? stormglassSrc : s.kind === 'moonwell_echo' ? moonwellSrc : MOONWELL_KINDS.includes(s.kind) ? moonwellGardenSrc : s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : DEEP_KINDS.includes(s.kind) ? deepSrc : ASTRAL_KINDS.includes(s.kind) ? astralSrc : PRISM_KINDS.includes(s.kind) ? prismSrc : ORRERY_KINDS.includes(s.kind) ? orrerySrc : MOONSPORE_KINDS.includes(s.kind) ? moonsporeSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
+  // Share the renderer's bank selection with loading, including borrowed boss/add art.
+  // Loading every zone here used to start hundreds of image requests at login.
+  let slimeSpriteConfig = null;
+  const enemyArt = new Map();
+  const slimeArt = { source: () => slimeSrc, load: () => slimeSpriteConfig && loadSlimeSprites(slimeSpriteConfig) };
+  for (const [kinds, source, load] of [
+    [CATHEDRAL_KINDS, () => cathedralSrc, loadCathedralSprites],
+    [YEAR_KINDS, () => yearSrc, loadYearSprites],
+    [CAIRN_KINDS, () => cairnSrc, loadCairnSprites],
+    [FROSTWAKE_KINDS, () => frostwakeSrc, loadFrostwakeSprites],
+    [LAPIS_KINDS, () => lapisSrc, loadLapisSprites],
+    [WORLDHEART_KINDS, () => worldheartSrc, loadWorldheartSprites],
+    [TANGLECROWN_KINDS, () => tanglecrownSrc, loadTanglecrownSprites],
+    [RIBBONWILD_KINDS, () => ribbonwildSrc, loadRibbonwildSprites],
+    [SUNWARD_KINDS, () => sunwardSrc, loadSunwardSprites],
+    [STORMGLASS_KINDS, () => stormglassSrc, loadStormglassSprites],
+    [['moonwell_echo'], () => moonwellSrc, loadMoonwellSprites],
+    [MOONWELL_KINDS, () => moonwellGardenSrc, loadMoonwellGardenSprites],
+    [['beetle'], () => beetleSrc, loadBeetleSprites],
+    [CRAG_KINDS, () => cragSrc, loadCragSprites],
+    [RIME_KINDS, () => rimeSrc, loadRimeSprites],
+    [FEN_KINDS, () => fenSrc, loadFenSprites],
+    [WYRD_KINDS, () => wyrdSrc, loadWyrdSprites],
+    [SKY_KINDS, () => skySrc, loadSkySprites],
+    [DEEP_KINDS, () => deepSrc, loadDeepSprites],
+    [ASTRAL_KINDS, () => astralSrc, loadAstralSprites],
+    [PRISM_KINDS, () => prismSrc, loadPrismSprites],
+    [ORRERY_KINDS, () => orrerySrc, loadOrrerySprites],
+    [MOONSPORE_KINDS, () => moonsporeSrc, loadMoonsporeSprites],
+    [VAULT_KINDS, () => vaultSrc, loadVaultSprites],
+  ]) {
+    const bank = { source, load };
+    for (const kind of kinds) if (!enemyArt.has(kind)) enemyArt.set(kind, bank);
+  }
+  const enemySource = s => {
+    const source = (enemyArt.get(s.kind) || slimeArt).source();
+    return source?.img[s.kind] ? source : null;
+  };
+  const enemyArtPending = new Set(), enemyArtRetry = new Map();
+  function loadSceneEnemyArt(enemies) {
+    const banks = new Map();
+    const add = kind => {
+      const bank = enemyArt.get(kind) || slimeArt;
+      if (!banks.has(bank)) banks.set(bank, new Set());
+      banks.get(bank).add(kind);
+    };
+    // Dormant story and raid helpers are present in snapshots but never drawn.
+    for (const enemy of enemies) if (enemy.state !== 'waiting') add(enemy.kind);
+    // These older NPC drawings remain fallbacks while the dedicated NPC art loads.
+    for (const npc of City.npcs) {
+      const prefix = npc.art?.split('_')[0];
+      const kind = { sun: SUNWARD_KINDS[0], ribbon: RIBBONWILD_KINDS[0], tangle: TANGLECROWN_KINDS[0],
+        heart: WORLDHEART_KINDS[0], lapis: LAPIS_KINDS[0], frostwake: FROSTWAKE_KINDS[0],
+        cairn: CAIRN_KINDS[0], year: YEAR_KINDS[0] }[prefix];
+      if (kind) add(kind);
+    }
+    for (const [bank, kinds] of banks) {
+      if ([...kinds].every(kind => bank.source()?.img[kind]) || enemyArtPending.has(bank) || performance.now() < (enemyArtRetry.get(bank) || 0)) continue;
+      enemyArtPending.add(bank);
+      Promise.resolve().then(() => bank.load([...kinds])).finally(() => {
+        enemyArtPending.delete(bank);
+        if ([...kinds].some(kind => !bank.source()?.img[kind])) enemyArtRetry.set(bank, performance.now() + 5000);
+      });
+    }
+  }
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   const enemyBounds = new WeakMap();
   function enemyHitbox(s) {
@@ -2829,13 +2894,13 @@
   function loadSlimeSprites(cfg) {
     if (slimeSrc) return;
     if (stubOn()) { slimeSrc = stubEnemies(['green', 'blue', 'pink', 'yellow', 'big'], { green: '#4c4', blue: '#48f', pink: '#f6a', yellow: '#ee3', big: '#a5f' }); return; }
-    fetch(cfg.json).then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = cfg.png.replace('%k', k); })))
+    return fetch(cfg.json).then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = cfg.png.replace('%k', k); })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); slimeSrc = { meta, img }; })).catch(() => { slimeSrc = null; });
   }
   function loadBeetleSprites() {
     if (beetleSrc) return;
     if (stubOn()) { beetleSrc = stubEnemies(['beetle'], { beetle: '#963' }); return; }
-    fetch('assets/ironhide.txt').then(r => r.json()).then(meta => new Promise((resolve, reject) => {
+    return fetch('assets/ironhide.txt').then(r => r.json()).then(meta => new Promise((resolve, reject) => {
       const img = new Image(); img.onload = () => resolve({ meta, img: { beetle: img } });
       img.onerror = reject; img.src = 'assets/ironhide.png';
     })).then(src => { beetleSrc = src; }).catch(() => { beetleSrc = null; });
@@ -2845,14 +2910,14 @@
   function loadCragSprites() {
     if (cragSrc) return;
     if (stubOn()) { cragSrc = stubEnemies(CRAG_KINDS, { wisp: '#6ef', spider: '#555', wraith: '#a6f', golem: '#e83', cinderlord: '#fa4' }); return; }
-    fetch('assets/crags.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/crags_${k}.png`; })))
+    return fetch('assets/crags.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/crags_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); cragSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { cragSrc = null; });
   }
   // Gloamfen monsters: assets/fen_<kind>.png (scripts/make_fen_sprites.py), the same clips again.
   function loadFenSprites() {
     if (fenSrc) return;
     if (stubOn()) { fenSrc = stubEnemies(FEN_KINDS, { toad: '#7c4', croc: '#5a3', knight: '#8ca', hydra: '#a6c', gloomroot: '#4fa' }); return; }
-    fetch('assets/fen.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/fen_${k}.png`; })))
+    return fetch('assets/fen.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/fen_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); fenSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { fenSrc = null; });
   }
   // Undervault monsters: assets/vault_<kind>.png (scripts/make_vault_sprites.py), the same clips again. Until an atlas loads
@@ -2860,58 +2925,58 @@
   function loadVaultSprites() {
     if (vaultSrc) return;
     if (stubOn()) { vaultSrc = stubEnemies(VAULT_KINDS, { thrall: '#cba', archer: '#dc8', acolyte: '#a7f', gatewarden: '#fd8', choir: '#8df', colossus: '#9cf', hollowking: '#9f8' }); return; }
-    fetch('assets/vault.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/vault_${k}.png`; })))
+    return fetch('assets/vault.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/vault_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); vaultSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { vaultSrc = null; });
   }
   // Wyrdwood monsters: assets/wyrd_<kind>.png (scripts/make_wyrd_sprites.py), the same clips again.
   function loadWyrdSprites() {
     if (wyrdSrc) return;
     if (stubOn()) { wyrdSrc = stubEnemies(WYRD_KINDS, { boar: '#a64', crow: '#446', troll: '#6a5', weaver: '#a6e', ram: '#9cf', oakhorn: '#e83', hrungnir: '#8af' }); return; }
-    fetch('assets/wyrd.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/wyrd_${k}.png`; })))
+    return fetch('assets/wyrd.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/wyrd_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); wyrdSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { wyrdSrc = null; });
   }
   // Bifrost Reach monsters: assets/sky_<kind>.png (scripts/make_sky_sprites.py), the same clips again.
   function loadSkySprites() {
     if (skySrc) return;
     if (stubOn()) { skySrc = stubEnemies(SKY_KINDS, { galehound: '#9bd', prismgolem: '#a9f', skyray: '#58c', einherjar: '#8cd', thunderroc: '#fc6' }); return; }
-    fetch('assets/sky.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/sky_${k}.png`; })))
+    return fetch('assets/sky.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/sky_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); skySrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { skySrc = null; });
   }
   // Ran's Deep monsters: assets/deep_<kind>.png (scripts/make_deep_sprites.py), the same clips again.
   function loadDeepSprites() {
     if (deepSrc) return;
     if (stubOn()) { deepSrc = stubEnemies(DEEP_KINDS, { draugr: '#6aa', angler: '#7fe', moray: '#bd5', siren: '#e8d', shellback: '#7a8', kraken: '#a7e', hvitserk: '#cb4', ghostmaw: '#dff' }); return; }
-    fetch('assets/deep.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/deep_${k}.png`; })))
+    return fetch('assets/deep.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/deep_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); deepSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { deepSrc = null; });
   }
   function loadAstralSprites() {
     if (astralSrc) return;
     if (stubOn()) { astralSrc = stubEnemies(ASTRAL_KINDS, { voidmoth: '#a8f', crystalwyrm: '#6ef', orbitbeetle: '#fa4', eclipsedryad: '#8d6', meteorgolem: '#b9f' }); return; }
-    fetch('assets/astral.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/astral_${k}.png`; })))
+    return fetch('assets/astral.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/astral_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); astralSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { astralSrc = null; });
   }
   function loadPrismSprites() {
     if (prismSrc) return;
     if (stubOn()) { prismSrc = stubEnemies(PRISM_KINDS, {miragejackal:'#c9a',shardscarab:'#7dc',glassharrier:'#a9e',prismsentinel:'#ace',mirrorqueen:'#d8f',sunshard:'#fc9'}); return; }
-    fetch('assets/prism.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/prism_${k}.png`; })))
+    return fetch('assets/prism.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/prism_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); prismSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { prismSrc = null; });
   }
   function loadOrrerySprites() {
     if (orrerySrc) return;
     if (stubOn()) { orrerySrc = stubEnemies(ORRERY_KINDS, {bronzemantis:'#ca6',gearling:'#9cb',orbitseer:'#ade',chronoguard:'#bac',pendulummatron:'#eaa',epochengine:'#db8'}); return; }
-    fetch('assets/orrery.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/orrery_${k}.png`; })))
+    return fetch('assets/orrery.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/orrery_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); orrerySrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { orrerySrc = null; });
   }
   function loadMoonsporeSprites() {
     if (moonsporeSrc) return;
     if (stubOn()) { moonsporeSrc = stubEnemies(MOONSPORE_KINDS, {glowcapgrazer:'#bfa',silkwing:'#cfe',rootlurker:'#ca8',lanternwraith:'#bfa',mireheart:'#eba',silverwidow:'#ebf',nightbloom:'#efa'}); return; }
-    fetch('assets/moonspore.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonspore_${k}.png`; })))
+    return fetch('assets/moonspore.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonspore_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); moonsporeSrc = { meta, img }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { moonsporeSrc = null; });
   }
   function loadStormglassSprites() {
     if (stormglassSrc) return;
     if (stubOn()) { stormglassSrc=stubEnemies(STORMGLASS_KINDS,{saltclaw:'#9dc',stormgull:'#eff',glassray:'#8ef',breakersentinel:'#cca',maelstromheart:'#c9f'}); return; }
-    fetch('assets/stormglass.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/stormglass.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/stormglass_${k}.png`;
     }))).then(imgs=>{stormglassSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{stormglassSrc=null;});
   }
@@ -2919,7 +2984,7 @@
     if (sunwardSrc) return;
     const kinds=[...SUNWARD_KINDS,'sun_miller','sun_keeper','sun_travel'];
     if (stubOn()) { sunwardSrc=stubEnemies(kinds,{meadowhare:'#ca9',sunbacksnail:'#ac9',brushfox:'#d85',spadebadger:'#aab',honeyjaw:'#b86',wickerwarden:'#db9',sun_miller:'#8ab',sun_keeper:'#8a8',sun_travel:'#acb'}); return; }
-    fetch('assets/sunward.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/sunward.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/sunward_${k}.png`;
     }))).then(imgs=>{sunwardSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{sunwardSrc=null;});
   }
@@ -2927,7 +2992,7 @@
     if (ribbonwildSrc) return;
     const kinds=[...RIBBONWILD_KINDS,'ribbon_host','ribbon_keeper','ribbon_travel'];
     if (stubOn()) { ribbonwildSrc=stubEnemies(kinds,{ribbongecko:'#3cc',balloonbeetle:'#b7d',paintedmacaw:'#5bd',jesterling:'#e8a',paradegryphon:'#d9b',maskcolossus:'#ad9',ribbon_host:'#e8a',ribbon_keeper:'#a9d',ribbon_travel:'#7dc'}); return; }
-    fetch('assets/ribbonwild.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/ribbonwild.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/ribbonwild_${k}.png`;
     }))).then(imgs=>{ribbonwildSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{ribbonwildSrc=null;});
   }
@@ -2935,7 +3000,7 @@
     if (tanglecrownSrc) return;
     const kinds=[...TANGLECROWN_KINDS,'tangle_warden','tangle_scholar','tangle_travel'];
     if (stubOn()) { tanglecrownSrc=stubEnemies(kinds,{orchidmantis:'#ae8',canopyglider:'#7cb',poolcaiman:'#7a9',drumgorilla:'#a87',jadeanaconda:'#4b9',crownjaguar:'#da7',tangle_warden:'#5a8',tangle_scholar:'#8aa',tangle_travel:'#8ca'}); return; }
-    fetch('assets/tanglecrown.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/tanglecrown.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/tanglecrown_${k}.png`;
     }))).then(imgs=>{tanglecrownSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{tanglecrownSrc=null;});
   }
@@ -2943,7 +3008,7 @@
     if (worldheartSrc) return;
     const kinds=[...WORLDHEART_KINDS,'heart_matriarch','heart_archivist','heart_oracle','heart_travel'];
     if (stubOn()) { worldheartSrc=stubEnemies(kinds,{sapbeetle:'#da9',lanternhornet:'#dd9',mosslemur:'#ad9',barkmimic:'#b98',heart_matriarch:'#9c8',heart_archivist:'#9cc',heart_oracle:'#9dc',heart_travel:'#cda'}); return; }
-    fetch('assets/worldheart.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/worldheart.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/worldheart_${k}.png`;
     }))).then(imgs=>{worldheartSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{worldheartSrc=null;});
   }
@@ -2951,7 +3016,7 @@
     if (lapisSrc) return;
     const kinds=[...LAPIS_KINDS,'lapis_keeper','lapis_cartographer','lapis_warden','lapis_seer','lapis_travel'];
     if (stubOn()) { lapisSrc=stubEnemies(kinds,{sandhopper:'#db9',dunefennec:'#eaa',glassscorpion:'#7bc',sunvulture:'#ca9',dunecolossus:'#da9',mirageroc:'#8bd',lapis_keeper:'#8bd',lapis_cartographer:'#bab',lapis_warden:'#da9',lapis_seer:'#9bd',lapis_travel:'#8cb'}); return; }
-    fetch('assets/lapis.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/lapis.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/lapis_${k}.png`;
     }))).then(imgs=>{lapisSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{lapisSrc=null;});
   }
@@ -2959,7 +3024,7 @@
     if (frostwakeSrc) return;
     const kinds=[...FROSTWAKE_KINDS,'frostwake_captain','frostwake_surveyor','frostwake_bellkeeper','frostwake_skywatcher','frostwake_ribkeeper','frostwake_travel'];
     if (stubOn()) { frostwakeSrc=stubEnemies(kinds,{snowhare:'#eef',iceotter:'#9ce',frostheron:'#def',glaciercrab:'#7bd',bellmammoth:'#cdf',auroramanta:'#8dc',crevasseleviathan:'#7ae'}); return; }
-    fetch('assets/frostwake.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/frostwake.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/frostwake_${k}.png`;
     }))).then(imgs=>{frostwakeSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{frostwakeSrc=null;});
   }
@@ -2967,7 +3032,7 @@
     if (cairnSrc) return;
     const kinds=[...CAIRN_KINDS,'cairn_warden','cairn_surveyor','cairn_stonesinger','cairn_grovekeeper','cairn_windseer','cairn_travel'];
     if (stubOn()) { cairnSrc=stubEnemies(kinds,{screeferret:'#cba',stoneibex:'#ba9',slateraven:'#789',ridgeadder:'#9a8',cairnbehemoth:'#b9a',whitebarktitan:'#edc',stormcondor:'#8bb'}); return; }
-    fetch('assets/cairn.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/cairn.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cairn_${k}.png`;
     }))).then(imgs=>{cairnSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{cairnSrc=null;});
   }
@@ -2976,7 +3041,7 @@
   let chestSrc = null;
   function loadChestSprites() {
     if (chestSrc) return;
-    fetch('assets/chest.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => new Promise((res, rej) => {
+    return fetch('assets/chest.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => new Promise((res, rej) => {
       const i = new Image(); i.onload = () => res({ meta, img: i }); i.onerror = rej; i.src = 'assets/chest.png';
     })).then(src => { chestSrc = src; }).catch(() => { chestSrc = null; });
   }
@@ -2989,7 +3054,7 @@
   function loadBankSprites() {
     if (bankSrc) return;
     if (stubOn()) { bankSrc=stubEnemies(BANK_KINDS,{}); return; }
-    fetch('assets/bank.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/bank.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/${k}.png`;
     }))).then(imgs=>{bankSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{bankSrc=null;});
   }
@@ -2997,20 +3062,20 @@
     if (yearSrc) return;
     const kinds=[...YEAR_KINDS,...['sp','su','au','wi'].flatMap(k=>['year_'+k+'_keeper','year_'+k+'_travel'])];
     if(stubOn()){yearSrc=stubEnemies(kinds,{});return;}
-    fetch('assets/yearwheel.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/yearwheel.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/yearwheel_${k}.png?v=cel1`;
     }))).then(imgs=>{yearSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{yearSrc=null;});
   }
   function loadMoonwellSprites() {
     if (moonwellSrc) return;
     if (stubOn()) { moonwellSrc = stubEnemies(['moonwell_echo'], {moonwell_echo:'#9fe'}); return; }
-    fetch('assets/moonwell.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonwell_echo.png`; })))
+    return fetch('assets/moonwell.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonwell_echo.png`; })))
       .then(imgs => { moonwellSrc = { meta, img: {moonwell_echo: imgs[0]} }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { moonwellSrc = null; });
   }
   function loadMoonwellGardenSprites() {
     if (moonwellGardenSrc) return;
     if (stubOn()) { moonwellGardenSrc = stubEnemies(MOONWELL_KINDS,{dew_moth:'#bde',lumen_eel:'#9ed',rootbell:'#fda',tideglass_heron:'#ade',hourpetal_stag:'#fdb',moonskein_weaver:'#eac'}); return; }
-    fetch('assets/moonwell_garden.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+    return fetch('assets/moonwell_garden.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/moonwell_${k}.png`;
     }))).then(imgs=>{const img={};meta.kinds.forEach((k,n)=>img[k]=imgs[n]);moonwellGardenSrc={meta,img}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{moonwellGardenSrc=null;});
   }
@@ -3018,19 +3083,32 @@
   function loadRimeSprites() {
     if (rimeSrc) return;
     if (stubOn()) { rimeSrc = stubEnemies(RIME_KINDS, { crab: '#6bd', wolf: '#cde', yeti: '#fff', wyrm: '#4ae' }); return; }
-    fetch('assets/rime.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/rime_${k}.png`; })))
+    return fetch('assets/rime.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/rime_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); rimeSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { rimeSrc = null; });
   }
-  function loadCathedralSprites() {
-    if (cathedralSrc) return;
-    if (stubOn()) { cathedralSrc = stubEnemies(CATHEDRAL_KINDS,Object.fromEntries(CATHEDRAL_ENEMIES.map(e => [e.kind,e.color]))); return; }
-    fetch('assets/cathedral.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res,rej) => {
-      const artKind=CATHEDRAL_ENEMIES.find(e=>e.kind===k)?.artFrom || k;
-      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cathedral_${artKind}.png`;
-    }))).then(imgs => {
-      cathedralSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};
-      for (const kind of meta.kinds) if (meta.tops?.[kind]) SLIME[kind].top=meta.tops[kind];
-    })).catch(()=>{cathedralSrc=null;});
+  let cathedralMeta = null;
+  function loadCathedralSprites(kinds) {
+    if (stubOn()) {
+      cathedralSrc ||= stubEnemies(CATHEDRAL_KINDS, Object.fromEntries(CATHEDRAL_ENEMIES.map(e => [e.kind, e.color])));
+      return;
+    }
+    // This shared bank also contains story foes and raid helpers: one such actor
+    // must not download all the unrelated dungeon and raid monsters.
+    cathedralMeta ||= fetch('assets/cathedral.txt').then(r => r.ok ? r.json() : Promise.reject()).catch(() => { cathedralMeta = null; return null; });
+    return cathedralMeta.then(meta => {
+      if (!meta) return;
+      cathedralSrc ||= { meta, img: {} };
+      return Promise.all(kinds.filter(kind => meta.kinds.includes(kind) && !cathedralSrc.img[kind]).map(kind => new Promise((resolve, reject) => {
+        const artKind = CATHEDRAL_ENEMIES.find(e => e.kind === kind)?.artFrom || kind;
+        const image = new Image();
+        image.onload = () => {
+          cathedralSrc.img[kind] = image;
+          if (meta.tops?.[kind]) SLIME[kind].top = meta.tops[kind];
+          resolve();
+        };
+        image.onerror = reject; image.src = `assets/cathedral_${artKind}.png`;
+      })));
+    }).catch(() => {});
   }
   function slimeFrame(s, t) {                               // -> [clip, frame index]; priority: dying, hurt, attack, airborne/landing, idle
     const C = enemySource(s).meta.clips;
@@ -4273,8 +4351,8 @@
       ++spriteGeneration; mageSpr = null; warSpr = null; heroSpr = null;
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
-      if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadRibbonwildSprites(); loadTanglecrownSprites(); loadWorldheartSprites(); loadLapisSprites(); loadFrostwakeSprites(); loadCairnSprites(); loadBankSprites(); loadChestSprites(); loadYearSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
+      slimeSpriteConfig = o.slimeSprites || null;
+      loadBankSprites(); loadChestSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize); addEventListener('prefs-change', resize);

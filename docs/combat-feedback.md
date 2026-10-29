@@ -23,8 +23,11 @@ Recorded mode covers weapon attacks, hit/critical impacts, misses, enemy attacks
 
 Female hurt and death each use three original AuraVoice performances, selected from the character's authoritative `Field.hero.look.gender` across all five classes. Male characters keep their male recordings, now with three takes per stage. Missing female recordings fall back to a higher-pitched synthesized voice, never a male recording. The synthesized female hurt/death pitch also follows the character body.
 
-`combat-audio.js` decodes 68 short mono MP3s, 569,157 bytes altogether, with four
-concurrent loads. The game primes them on entering play or enabling Recorded.
+`combat-audio.js` decodes 68 short mono MP3s, 569,157 bytes altogether. Since
+Beta 1.32.2, background priming loads one recording at a time, yields to browser
+idle time before each load and uses low network priority. The game primes them
+on entering play or enabling Recorded. See `docs/client-loading.md` for the
+related zone-art startup fix and focused validation.
 A missing/not-yet-decoded recording uses the original synth immediately; it
 does not replay an old hit after a download finishes. Synthesized mode does not
 request these files. Combat uses the existing hearing range and quieter remote

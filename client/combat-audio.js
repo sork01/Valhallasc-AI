@@ -39,7 +39,7 @@ window.RecordedCombat = (() => {
   let context = null, priming = null;
   function load(c, cue) {
     if (pending.has(cue)) return pending.get(cue);
-    const request = fetch(`assets/combat/${cue}.mp3`).then(r => {
+    const request = fetch(`assets/combat/${cue}.mp3`, { priority: 'low' }).then(r => {
       if (!r.ok) throw Error('Combat recording unavailable');
       return r.arrayBuffer();
     }).then(data => c.decodeAudioData(data)).then(buffer => { if (context === c) buffers.set(cue, buffer); return buffer; }).catch(() => null);
@@ -50,8 +50,17 @@ window.RecordedCombat = (() => {
     if (context !== c) { stop(); context = c; buffers.clear(); pending.clear(); priming = null; }
     if (priming) return priming;
     let next = 0;
-    const worker = async () => { while (next < cues.length) await load(c, cues[next++]); };
-    priming = Promise.all(Array.from({ length: 4 }, worker));
+    // Leave room for character art, input and painting during the first seconds of play.
+    const yieldLoad = () => new Promise(resolve => {
+      if (window.requestIdleCallback) window.requestIdleCallback(resolve, { timeout: 250 });
+      else window.setTimeout(resolve, 16);
+    });
+    priming = (async () => {
+      while (context === c && next < cues.length) {
+        await yieldLoad();
+        if (context === c) await load(c, cues[next++]);
+      }
+    })();
     return priming;
   }
   function stop() { for (const source of voices) source.stop(); voices.clear(); celebrations.clear(); }

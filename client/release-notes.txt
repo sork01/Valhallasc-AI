@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.32.2",
+    "date": "2026-10-29",
+    "new": [],
+    "changed": [
+      "Monster artwork loads for the zone you are visiting instead of downloading the whole world when you start playing.",
+      "Recorded combat sounds load in the background one at a time to reduce startup stuttering."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.32.1",
     "date": "2026-10-29",
     "new": [
