@@ -59,3 +59,16 @@ All 37 public art hashes match the checked candidates; public health is OK.
 The updated FileDrop comparison is
 `female-characters-double-before-after-20261029.png`. Version and release notes
 remain unchanged.
+
+The final same-day size adjustment reduces the doubled chest/under-chest
+projection by 30%, from 3.70/3.10 to 2.59/2.17 (70% of that version). It retains
+the corrected band/depth rendering. Candidates, before images and verification
+receipts live separately in `test-results/female-torso-smaller`. This remains a
+silent Beta 1.32.2 artwork update.
+
+The 30% reduction passes all 58 focused compositor checks; all 4,352 generated
+body/outfit frames are nonempty and unclipped. Geometry checks confirm 70% of
+the previous forward projection across three torso fits. All 37 public asset
+hashes match the checked candidates, health is OK, and the version/release
+notes are unchanged. FileDrop comparison:
+`female-characters-30pct-smaller-before-after-20261029.png`.

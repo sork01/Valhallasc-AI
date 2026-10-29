@@ -190,8 +190,8 @@ def torso_panels(halfwidth, y, bottom=38, top=67):
             (halfwidth * 1.0, at(.1), 1.06), (halfwidth * 1.0, bottom, 1.06)]
     # Additional volume belongs to the front of the chest, tapering above the
     # waist. Keep the back depth and the neck/shoulder/hip attachment unchanged.
-    # Owner follow-up: double the previous chest/under-chest projection.
-    front = [1., 3.70, 3.10, .88, 1.06, 1.06]
+    # Owner follow-up: reduce the doubled chest/under-chest projection by 30%.
+    front = [1., 2.59, 2.17, .88, 1.06, 1.06]
     for sy in (-1, 1):
         face = [(w, sy * y * (front[i] if sy == 1 else d), z) for i, (w, z, d) in enumerate(prof)]
         panels.append((face + [(-x, yy, z) for x, yy, z in reversed(face)], 2 if sy == 1 else 1))
