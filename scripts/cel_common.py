@@ -185,12 +185,18 @@ def torso_panels(halfwidth, y, bottom=38, top=67):
                             (sx * halfwidth * .84, y, bottom), (sx * halfwidth * .84, -y, bottom)], 1))
         return panels
     at = lambda f: bottom + (top - bottom) * f
-    prof = [(halfwidth * .84, top, 1.), (halfwidth * .9, at(.78), 1.1), (halfwidth * .56, at(.42), .88),
+    prof = [(halfwidth * .84, top, 1.), (halfwidth * 1.08, at(.78), 1.1),
+            (halfwidth * .78, at(.60), 1.02), (halfwidth * .56, at(.42), .88),
             (halfwidth * 1.0, at(.1), 1.06), (halfwidth * 1.0, bottom, 1.06)]
+    # Additional volume belongs to the front of the chest, tapering above the
+    # waist. Keep the back depth and the neck/shoulder/hip attachment unchanged.
+    front = [1., 1.85, 1.55, .88, 1.06, 1.06]
     for sy in (-1, 1):
-        panels.append(([(w, sy * y * d, z) for w, z, d in prof] + [(-w, sy * y * d, z) for w, z, d in reversed(prof)], 2 if sy == 1 else 1))
+        face = [(w, sy * y * (front[i] if sy == 1 else d), z) for i, (w, z, d) in enumerate(prof)]
+        panels.append((face + [(-x, yy, z) for x, yy, z in reversed(face)], 2 if sy == 1 else 1))
     for sx in (-1, 1):
-        panels.append(([(sx * w, -y * d, z) for w, z, d in prof] + [(sx * w, y * d, z) for w, z, d in reversed(prof)], 1))
+        panels.append(([(sx * w, -y * d, z) for w, z, d in prof] +
+                       [(sx * w, y * front[i], z) for i, (w, z, d) in reversed(list(enumerate(prof)))], 1))
     return panels
 
 
