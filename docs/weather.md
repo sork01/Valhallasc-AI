@@ -54,3 +54,17 @@ Weather changes **nothing** that the server simulates: movement speed, view dist
 - The same seed gives the same weather after a restart and for every hero in a zone.
 - Spell lengths and the clear/weather ratio stay within the stated ranges over a long window.
 - Combat, movement and drop outcomes with weather forced on are identical to clear.
+
+## Rain direction correction (Beta 1.32.2, same-version follow-up)
+
+Rain and thunderstorm drops move down and to the right. Their streaks now trail
+behind along that same velocity, rather than leaning down-left against the
+rightward motion. The tip is the moving particle position and splash center;
+streak length determines the trail time for each drop's fall speed. This is a
+client-only change with no schedule, sound or server changes.
+
+`node tests/rain-direction.cjs` passes 38 focused checks across both rain types,
+all intensities and both graphics settings, comparing stroke direction with
+particle motion between frames and checking splash alignment, reduced motion
+and the off setting. `MUTATE=direction` restores the old streak and fails the
+measured-velocity assertion.

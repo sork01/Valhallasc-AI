@@ -57,11 +57,14 @@
       g.fillStyle = `rgba(55,96,135,${.07*a})`; g.fillRect(0,height*.72,width,height*.28);
       const count = window.Prefs?.lowGraphics ? 16 : moving ? Math.round(45 + a*105) : 40;
       g.lineWidth = a > .7 ? 1.8 : 1.2; g.strokeStyle = `rgba(183,220,255,${.36*a})`;
+      const wind = 115;
       for (let i=0;i<count;i++) {
-        const x = (hash(i+7)*width + (moving ? time*115 : 0)) % width;
-        const y = (hash(i+871)*height + (moving ? time*(260+i%7*18) : 0)) % height;
-        g.beginPath(); g.moveTo(x,y); g.lineTo(x-5-a*3,y+14+a*11); g.stroke();
-        if (i%9===0 && y>height*.6) { g.beginPath(); g.ellipse(x,y+14,4+a*4,1.3,0,0,Math.PI*2); g.stroke(); }
+        const speed = 260+i%7*18, length = 14+a*11, trail = length/speed;
+        const x = (hash(i+7)*width + (moving ? time*wind : 0)) % width;
+        const y = (hash(i+871)*height + (moving ? time*speed : 0)) % height;
+        // The tip falls downwind; its streak trails behind along the same velocity.
+        g.beginPath(); g.moveTo(x-wind*trail,y-length); g.lineTo(x,y); g.stroke();
+        if (i%9===0 && y>height*.6) { g.beginPath(); g.ellipse(x,y,4+a*4,1.3,0,0,Math.PI*2); g.stroke(); }
       }
     } else if (type === 'snow') {
       g.fillStyle = `rgba(202,228,248,${.055*a})`; g.fillRect(0,0,width,height);

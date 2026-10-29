@@ -8,7 +8,8 @@
       "Recorded combat sounds load in the background one at a time to reduce startup stuttering.",
       "Enemy selection circles stay on the ground beneath enemies and scenery.",
       "Female synthesized voices have their own tone for hurt, death, shouts and other vocal effects.",
-      "Every vendor opens with a Buy option containing their goods, including bags and mounts. Individual purchases no longer clutter the greeting."
+      "Every vendor opens with a Buy option containing their goods, including bags and mounts. Individual purchases no longer clutter the greeting.",
+      "Rain streaks now follow the direction the drops are falling, with splashes at their tips."
     ],
     "removed": []
   },
