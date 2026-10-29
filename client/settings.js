@@ -280,6 +280,7 @@
   function syncPanel() {
     language.value = window.Prefs.lang;
     $('set-low-graphics').checked = window.Prefs.lowGraphics;
+    $('set-quest-arrow').checked = window.Prefs.questArrow;
     music.value = Math.round(window.Prefs.music * 100); sfx.value = Math.round(window.Prefs.sfx * 100); sound.checked = window.Prefs.sound;
     $('set-combat-sounds').value = window.Prefs.combatSounds;
     night.value = Math.round(window.Prefs.night * 100); $('set-night-out').textContent = night.value + '%';
@@ -288,6 +289,7 @@
     size.value = Math.round(uiScale() * 100); $('set-uiscale-out').textContent = size.value + '%';
     $('set-music-out').textContent = music.value + '%'; $('set-sfx-out').textContent = sfx.value + '%';
   }
+  $('set-quest-arrow').addEventListener('change', () => window.Prefs.set({ questArrow: $('set-quest-arrow').checked }));
   $('set-low-graphics').addEventListener('change', () => window.Prefs.set({ lowGraphics: $('set-low-graphics').checked }));
   music.addEventListener('input', () => window.Prefs.set({ musicVol: music.value / 100 }));
   language.addEventListener('change', () => window.Prefs.set({ lang: language.value }));

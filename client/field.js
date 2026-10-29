@@ -3839,6 +3839,19 @@
     }
     g.restore();
   }
+  function drawQuestArrow(g) {
+    if (!window.Prefs?.questArrow || hero.dead || hero.sparkTravel) return;
+    const target = window.Quests?.navigationTarget(zone, hero.x, hero.y);
+    if (!target || Math.hypot(target.x-hero.x, target.y-hero.y) < 1.75) return;
+    const [sx, sy] = w2s(hero.x, hero.y), [tx, ty] = w2s(target.x, target.y);
+    const angle = Math.atan2(ty-sy, tx-sx), ux = Math.cos(angle), uy = Math.sin(angle);
+    // Keep an uphill pointer clear of the character's head as well as their feet.
+    const distance = 80 + Math.max(0, -uy)*90;
+    g.save(); g.translate(sx+ux*distance, sy+uy*distance); g.rotate(angle);
+    g.fillStyle = '#a6ffcf'; g.strokeStyle = '#173e2b'; g.lineWidth = 3; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(22, 0); g.lineTo(-2, -15); g.lineTo(-2, -6); g.lineTo(-20, -6);
+    g.lineTo(-20, 6); g.lineTo(-2, 6); g.lineTo(-2, 15); g.closePath(); g.fill(); g.stroke(); g.restore();
+  }
   function draw(t) {
     const g = ctx, k = dpr * zoom; g.setTransform(k, 0, 0, k, 0, 0);
     drawSky(g, t);
@@ -4145,6 +4158,7 @@
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
+    drawQuestArrow(g);
     drawMini();
   }
   // What the boss-mechanics drawing needs from the field: the projection, the room a point is in, and where a character or boss stands.
@@ -4477,6 +4491,7 @@
     get hero() { return hero; }, get signs() { return signs; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
+    get instanceCleared() { return instanceCleared; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };

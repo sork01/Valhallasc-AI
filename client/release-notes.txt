@@ -2,7 +2,9 @@
   {
     "version": "Beta 1.32.2",
     "date": "2026-10-29",
-    "new": [],
+    "new": [
+      "Track quests directly from the quest tracker. Enable Arrow in Settings for a pointer toward the tracked objective, the next exit toward it, or the quest giver when ready to turn in."
+    ],
     "changed": [
       "Monster artwork loads for the zone you are visiting instead of downloading the whole world when you start playing.",
       "Recorded combat sounds load in the background one at a time to reduce startup stuttering.",

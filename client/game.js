@@ -1249,6 +1249,7 @@
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
     get combatSounds() { return save.combatSounds; },
     get touchSkills() { return save.touchSkills && typeof save.touchSkills === 'object' ? save.touchSkills : {}; },
+    get questArrow() { return save.questArrow === true; },
     get lowGraphics() { return save.lowGraphics === true; },
     get dpsMeter() { return save.dpsMeter !== false; },
     get touchGraphicsSuggested() { return save.touchGraphicsSuggested === true; },
@@ -1273,6 +1274,7 @@
       if (!save.sound) window.RecordedCombat?.stop();
       if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
       if ('touchSkills' in patch) save.touchSkills = patch.touchSkills && typeof patch.touchSkills === 'object' ? patch.touchSkills : {};
+      if ('questArrow' in patch) save.questArrow = !!patch.questArrow;
       if ('lowGraphics' in patch) save.lowGraphics = !!patch.lowGraphics;
       if ('dpsMeter' in patch) save.dpsMeter = !!patch.dpsMeter;
       if ('touchGraphicsSuggested' in patch) save.touchGraphicsSuggested = !!patch.touchGraphicsSuggested;

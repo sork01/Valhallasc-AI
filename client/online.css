@@ -1076,3 +1076,12 @@
 .wm-connection-path .wm-road-under {stroke-width:4;stroke:#31413b;stroke-opacity:.5}
 .wm-connection-path .wm-road {stroke-width:2;stroke:#e0c797;stroke-dasharray:3 2}
 .wm-path-gate {border-color:#e0c797!important;background:#695c3f!important;box-shadow:none!important;border-radius:3px!important}
+
+/* Direct tracker selection remains separate from opening the journal. */
+.tracker-quest { border-left: 2px solid transparent; }
+.tracker-quest[data-tracked="true"] { border-left-color: #a6ffcf; }
+.tracker-quest-heading { display: flex; align-items: center; gap: .3cqw; }
+.tracker-quest-heading .tracker-title { flex: 1; min-width: 0; }
+.tracker-track { flex: none; border: 1px solid #8bd9b080; border-radius: 3px; padding: .25cqw .4cqw; background: #152b26bb; color: #a6ffcf; font: inherit; font-size: .8cqw; cursor: pointer; }
+.tracker-track[aria-pressed="true"] { background: #285c40dd; color: #e1ffeb; }
+@media (pointer: coarse) { .tracker-track { min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); } }

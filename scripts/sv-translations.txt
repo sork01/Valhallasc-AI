@@ -381,6 +381,7 @@
   "Arn, the Amber Doorward": "Arn, bärnstensväktaren",
   "Arn, the Amber Doorward Relic": "Bärnstensväktarens relik",
   "Arrow": "Pil",
+  "Point toward the tracked quest objective.": "Peka mot det spårade uppdragets mål.",
   "Arrow Shot": "Pilskott",
   "Arrow Storm": "Pilstorm",
   "Arrow Storm also bounces once for 20% of one basic blow.": "Pilstorm studsar också en gång med 20 % av ett vanligt slag.",

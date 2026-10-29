@@ -27,7 +27,14 @@
   }
   const words = { ready: 'Ready to turn in', active: 'In progress', completed: 'Completed', locked: 'Locked', upcoming: 'Comes at a later level', available: 'Available' };
   // Both maps share the journal's eligibility rules. Cache presentation by zone, never in the ground/fog canvas.
-  const mapCache = new Map();
+  const mapCache = new Map(), navigationCache = new Map();
+  const byId = new Map(definitions.map(q => [q.id, q]));
+  const clearGuidance = () => { mapCache.clear(); navigationCache.clear(); };
+  function track(id) {
+    const quest = byId.get(id);
+    if (id != null && (!quest || !['active', 'ready'].includes(status(quest)))) return false;
+    tracked = id; clearGuidance(); render(); return true;
+  }
   const questsByNpc = new Map();
   for (const q of definitions) {
     if (!questsByNpc.has(q.npc)) questsByNpc.set(q.npc, []);
@@ -76,6 +83,41 @@
     }
     mapCache.set(zone, out);
     return out;
+  }
+  // Build zone routes only when tracking/progress changes; drawing only picks
+  // the nearest cached destination. This never runs walking pathfinding per frame.
+  function navigationTarget(zone, x, y) {
+    if (!tracked || !areas[zone]) return null;
+    const cacheKey = `${zone}:${!!(window.Field?.instanceCleared)}`;
+    if (!navigationCache.has(cacheKey)) {
+      const goals = new Map();
+      for (let i = 0; i < areas.length; i++) {
+        const markers = mapMarkers(i).filter(m => m.state === 'tracked' && m.quest === tracked);
+        if (markers.length) goals.set(i, markers);
+      }
+      let targets = goals.get(zone) || [];
+      if (!targets.length) {
+        let best = Infinity; targets = [];
+        const usable = (from, portal) => areas[portal.to] && !areas[portal.to].sealedTemplate &&
+          (!portal.after_clear || (from === zone && window.Field?.instanceCleared));
+        for (const exit of areas[zone].portals || []) {
+          if (!usable(zone, exit)) continue;
+          const queue = [[exit.to, 1]], seen = new Set([zone]); let destination = null, hops = Infinity;
+          for (let i = 0; i < queue.length; i++) {
+            const [here, depth] = queue[i];
+            if (seen.has(here) || depth > best) continue;
+            seen.add(here);
+            if (goals.has(here)) { destination = here; hops = depth; break; }
+            for (const portal of areas[here].portals || []) if (usable(here, portal) && !seen.has(portal.to)) queue.push([portal.to, depth+1]);
+          }
+          if (hops < best) { best = hops; targets = []; }
+          if (destination != null && hops === best) targets.push({ x: exit.x, y: exit.y, quest: tracked, viaPortal: true, destinationZone: destination });
+        }
+      }
+      navigationCache.set(cacheKey, targets);
+    }
+    const targets = navigationCache.get(cacheKey);
+    return targets.reduce((best, target) => !best || Math.hypot(target.x-x, target.y-y) < Math.hypot(best.x-x, best.y-y) ? target : best, null);
   }
   function element(tag, text, className) {
     const node = document.createElement(tag); node.textContent = text;
@@ -198,7 +240,7 @@
       }));
     }
     if (!atNpc && ['active', 'ready'].includes(s)) node.append(button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
-      tracked = quest.id; mapCache.clear(); render(); $('quest-close').focus();
+      track(quest.id); $('quest-close').focus();
     }));
     if (!atNpc && ['active', 'ready'].includes(s)) {
       const asking = abandonConfirm === quest.id;
@@ -226,8 +268,15 @@
     const list = element('div', '', 'tracker-list'); list.hidden = collapsed;
     for (const quest of active) {
       const row = element('div', '', 'tracker-quest'); row.dataset.quest = quest.id;
-      const title = button(quest.title, () => { tracked = quest.id; mapCache.clear(); show(); }); title.className = 'tracker-title';
-      row.append(title);
+      row.dataset.tracked = String(tracked === quest.id); row.setAttribute('role', 'group'); row.setAttribute('aria-label', quest.title);
+      const heading = element('div', '', 'tracker-quest-heading');
+      const title = button(quest.title, () => { track(quest.id); show(); }); title.className = 'tracker-title';
+      const tracking = button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
+        track(tracked === quest.id ? null : quest.id);
+        $('quest-tracker').querySelector(`[data-quest="${quest.id}"] .tracker-track`)?.focus({ preventScroll: true });
+      });
+      tracking.className = 'tracker-track'; tracking.dataset.action = 'track'; tracking.setAttribute('aria-pressed', String(tracked === quest.id));
+      heading.append(title, tracking); row.append(heading);
       if (status(quest) === 'ready') row.append(element('small', `✓ ${quest.autoLevel ? 'Report to' : 'Return to'} ${giver(quest).name} for your reward`, 'tracker-objective complete'));
       else if(quest.id==='raid_key') { const n=quest.objectives.filter((o,i)=>(state(quest)?.counts[i]||0)>=o.count).length; row.append(element('small', `Pieces: ${n}/10`, 'tracker-objective')); }
       else quest.objectives.forEach((o, i) => {
@@ -317,8 +366,8 @@
   });
   window.Quests = {
     show, close, get open() { return open(); },
-    setLevel(level) { if (heroLevel !== level) { heroLevel = level; mapCache.clear(); render(); } },
-    mapMarkers,
+    setLevel(level) { if (heroLevel !== level) { heroLevel = level; clearGuidance(); render(); } },
+    mapMarkers, navigationTarget, track, get tracked() { return tracked; },
     refresh() { render(); },
     // Titles of the quests you and this party member both have in progress.
     sharedWith(member) {
@@ -356,8 +405,8 @@
       if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
       return done ? { state: 'done', burn: place.burn } : { state: 'none' };
     },
-    reset() { progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; abandonedOpen = false; signature = ''; tracked = null; bells = []; mapCache.clear(); close(false); render(); },
-    update(next, dismissed = abandoned) { const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return; progress = next; abandoned = dismissed || []; signature = key; if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null; if (abandonConfirm && !progress.some(p => p.id === abandonConfirm && !p.claimed)) abandonConfirm = null; mapCache.clear(); render(); },
+    reset() { progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; abandonedOpen = false; signature = ''; tracked = null; bells = []; clearGuidance(); close(false); render(); },
+    update(next, dismissed = abandoned) { const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return; progress = next; abandoned = dismissed || []; signature = key; if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null; if (abandonConfirm && !progress.some(p => p.id === abandonConfirm && !p.claimed)) abandonConfirm = null; clearGuidance(); render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
     // Locked and finished quests are hidden, as they are there.
     offered(id) {
