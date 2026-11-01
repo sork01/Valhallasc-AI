@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Quest items can't be sold (owner's report, 2026-11-01)
+
+- [ ] `QUEST-ITEM-SELLING` — Owner: "you can't sell quest items." Today this is the intended rule: quest items (`sell: 0`, `items::is_quest_item`) are unsellable and untradeable, so they sit in the bags. Settle what the owner wants before building (ask via `AskUserQuestion` when picked up): sell for a gold price, or only a way to drop/discard them, and whether it applies to every quest item or only leftovers from finished or abandoned quests. Never allow selling an item an active quest still needs, and keep `hour_shard_*`, Ember Key/Shards and other gate keys protected. Then change the server rule (`world/shop.rs`, `items.rs`) and the Sell/Sell-all UI (`shop.js`, `isJunk`) together, with a tooltip and Swedish text. Test only this: one focused Rust check on the sell refusal/acceptance and one bounded browser check on the shop.
+
 ### Quest complete state and hand-in tracking (owner's report, 2026-11-01)
 
 - [ ] `QUEST-READY-TRACKING` — When every objective of a quest is done, the whole quest must show as **complete** (ready to turn in) in the tracker and journal, and tracking must point to where it is handed in: the hand-in NPC on the map/minimap/world map and the quest Arrow, including when that NPC is in another zone. `docs/quest-markers.md` already says finishing all objectives replaces tracked destinations with the hand-in NPC, so first reproduce what the owner saw (which quest, which objective kinds, same zone or cross-zone, multi-objective quests, group/escort/bring quests) and find where the ready state or the hand-in target is missed (`client/quests.js` `status()`/`mapMarkers`, the tracker rows, the Arrow). The tracker row should read as finished (not a list of ticked objectives) and offer the hand-in destination. Test only this: a bounded browser check on the tracker state and the marker/Arrow target for a quest whose last objective just completed, with a mutation that must fail.
