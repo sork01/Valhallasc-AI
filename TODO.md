@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Quest complete state and hand-in tracking (owner's report, 2026-11-01)
+
+- [ ] `QUEST-READY-TRACKING` — When every objective of a quest is done, the whole quest must show as **complete** (ready to turn in) in the tracker and journal, and tracking must point to where it is handed in: the hand-in NPC on the map/minimap/world map and the quest Arrow, including when that NPC is in another zone. `docs/quest-markers.md` already says finishing all objectives replaces tracked destinations with the hand-in NPC, so first reproduce what the owner saw (which quest, which objective kinds, same zone or cross-zone, multi-objective quests, group/escort/bring quests) and find where the ready state or the hand-in target is missed (`client/quests.js` `status()`/`mapMarkers`, the tracker rows, the Arrow). The tracker row should read as finished (not a list of ticked objectives) and offer the hand-in destination. Test only this: a bounded browser check on the tracker state and the marker/Arrow target for a quest whose last objective just completed, with a mutation that must fail.
+
 ### Bag stuck to the player (owner's report, 2026-11-01)
 
 - [ ] `BAG-PICKUP-STUCK` — Sometimes when a bag drop is picked up while all four bag slots are already full, the bag sticks to the player's foot and is carried around with them instead of staying on the ground. Reproduce first (full fitted bag slots, then pick up a dropped bag, also with a full 16-cell grid and in a party with shared loot), then find why the ground pile follows the player: check the server drop/pickup path (`items.rs` `can_fit_bag`/`fit_bag`, `world/rolls.rs` bag drops, `pile_for`) and the client pile drawing/pickup target. A refused pickup must leave the bag where it lies, at a fixed position, with a clear "bags full" notice and no repeated pickup attempts. Test only this case: a focused Rust check for the refused pickup plus a bounded browser check that the pile's position does not move with the hero.
