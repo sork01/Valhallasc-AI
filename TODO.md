@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Bag stuck to the player (owner's report, 2026-11-01)
+
+- [ ] `BAG-PICKUP-STUCK` — Sometimes when a bag drop is picked up while all four bag slots are already full, the bag sticks to the player's foot and is carried around with them instead of staying on the ground. Reproduce first (full fitted bag slots, then pick up a dropped bag, also with a full 16-cell grid and in a party with shared loot), then find why the ground pile follows the player: check the server drop/pickup path (`items.rs` `can_fit_bag`/`fit_bag`, `world/rolls.rs` bag drops, `pile_for`) and the client pile drawing/pickup target. A refused pickup must leave the bag where it lies, at a fixed position, with a clear "bags full" notice and no repeated pickup attempts. Test only this case: a focused Rust check for the refused pickup plus a bounded browser check that the pile's position does not move with the hero.
+
 ### Elite target frame (owner's request, 2026-10-28)
 
 - [x] `ELITE-DRAGON-FRAME` — **Done, Beta 1.32.0 (2026-10-28), client-only and live.** Golden coiled dragon surrounds selected elite/boss portraits, including King Slime; ordinary targets keep their normal frame. Name, level and health stay clear, and the frame follows HUD scaling. Desktop, phone and tablet selection/scaling checks pass in the focused 146-check suite. Rules and proof: `docs/combat-feedback.md`.
