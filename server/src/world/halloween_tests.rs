@@ -50,29 +50,29 @@ fn fixture() -> World {
 #[test]
 fn halloween_summon_requires_five_and_freezes_average_level_and_membership() {
     let mut w = fixture();
-    w.summon_halloween(1).unwrap();
-    let enemy = w.halloween.as_ref().unwrap().enemy;
+    w.summon_festival(1, seasonal_hunt::HALLOWEEN).unwrap();
+    let enemy = w.seasonal_hunt.as_ref().unwrap().enemy;
     assert_eq!(w.slimes[enemy].level, 16);
     let hp = w.slimes[enemy].max_hp;
     w.players.get_mut(&5).unwrap().character.level = 99;
     assert_eq!(w.slimes[enemy].max_hp, hp);
-    assert!(w.summon_halloween(1).is_err());
+    assert!(w.summon_festival(1, seasonal_hunt::HALLOWEEN).is_err());
     let _rx = join(&mut w, 6, Class::Mage);
     place(&mut w, 6, 3, at(105., 25.));
     let before = w.slimes[enemy].hp;
     assert_eq!(w.hit_slime(enemy, 6, 1e9, false), 0.);
     assert_eq!(w.slimes[enemy].hp, before);
     w.time += 901.;
-    w.update_halloween();
-    assert!(w.halloween.is_none());
+    w.update_festival_hunt();
+    assert!(w.seasonal_hunt.is_none());
     w.leave_party(&w.players[&5].character.id.clone());
-    assert!(w.summon_halloween(1).is_err());
+    assert!(w.summon_festival(1, seasonal_hunt::HALLOWEEN).is_err());
 }
 #[test]
 fn halloween_kill_rolls_once_and_daily_claim_is_shared_across_all_cities() {
     let mut w = fixture();
-    w.summon_halloween(1).unwrap();
-    let enemy = w.halloween.as_ref().unwrap().enemy;
+    w.summon_festival(1, seasonal_hunt::HALLOWEEN).unwrap();
+    let enemy = w.seasonal_hunt.as_ref().unwrap().enemy;
     w.rng = 0;
     w.hit_slime(enemy, 1, 1e12, false);
     for s in 1..=5 {
@@ -135,17 +135,17 @@ fn halloween_kill_rolls_once_and_daily_claim_is_shared_across_all_cities() {
 #[test]
 fn halloween_november_tenth_retires_quest_summon_and_boss_but_keeps_mount() {
     let mut w = fixture();
-    w.summon_halloween(1).unwrap();
+    w.summon_festival(1, seasonal_hunt::HALLOWEEN).unwrap();
     w.players
         .get_mut(&1)
         .unwrap()
         .character
         .grant_mount("nightmare");
     festival(&mut w, 1794265200);
-    w.update_halloween();
-    assert!(w.halloween.is_none());
-    assert!(w.summon_halloween(1).is_err());
-    assert!(w.halloween_view().is_null());
+    w.update_festival_hunt();
+    assert!(w.seasonal_hunt.is_none());
+    assert!(w.summon_festival(1, seasonal_hunt::HALLOWEEN).is_err());
+    assert!(w.festival_view(seasonal_hunt::HALLOWEEN).is_null());
     assert!(w.players[&1].character.owns_mount("nightmare"));
     assert!(
         !w.players[&1]
@@ -157,13 +157,13 @@ fn halloween_november_tenth_retires_quest_summon_and_boss_but_keeps_mount() {
 }
 #[test]
 fn halloween_mount_roll_exact_threshold_and_completed_ledger_survive_save() {
-    assert!(halloween::wins_mount(0.));
-    assert!(halloween::wins_mount(0.009999));
-    assert!(!halloween::wins_mount(0.01));
-    assert!(!halloween::wins_mount(0.999));
+    assert!(seasonal_hunt::wins_mount(0., 0.01));
+    assert!(seasonal_hunt::wins_mount(0.009999, 0.01));
+    assert!(!seasonal_hunt::wins_mount(0.01, 0.01));
+    assert!(!seasonal_hunt::wins_mount(0.999, 0.01));
     let mut w = fixture();
-    w.summon_halloween(1).unwrap();
-    let e = w.halloween.as_ref().unwrap().enemy;
+    w.summon_festival(1, seasonal_hunt::HALLOWEEN).unwrap();
+    let e = w.seasonal_hunt.as_ref().unwrap().enemy;
     w.rng = 0;
     w.hit_slime(e, 1, 1e12, false);
     let c = &w.players[&1].character;
@@ -183,8 +183,8 @@ fn halloween_mount_roll_exact_threshold_and_completed_ledger_survive_save() {
             },
         );
     }
-    w.summon_halloween(1).unwrap();
-    let e = w.halloween.as_ref().unwrap().enemy;
+    w.summon_festival(1, seasonal_hunt::HALLOWEEN).unwrap();
+    let e = w.seasonal_hunt.as_ref().unwrap().enemy;
     let old = w.players[&1].character.mounts.clone();
     w.rng = 0;
     w.hit_slime(e, 1, 1e12, false);
@@ -197,8 +197,8 @@ fn halloween_wipe_reset_hired_eligibility_and_bystander_safety() {
     for s in 2..=5 {
         w.players.get_mut(&s).unwrap().merc = Some(owner.clone());
     }
-    w.summon_halloween(1).unwrap();
-    let enemy = w.halloween.as_ref().unwrap().enemy;
+    w.summon_festival(1, seasonal_hunt::HALLOWEEN).unwrap();
+    let enemy = w.seasonal_hunt.as_ref().unwrap().enemy;
     let _rx = join(&mut w, 6, Class::Warrior);
     place(&mut w, 6, 3, at(105., 23.));
     let hp = w.players[&6].character.hp;
@@ -210,9 +210,9 @@ fn halloween_wipe_reset_hired_eligibility_and_bystander_safety() {
         w.players.get_mut(&s).unwrap().character.hp = 0.;
     }
     for _ in 0..170 {
-        w.update_halloween();
+        w.update_festival_hunt();
     }
-    assert!(w.halloween.is_none());
+    assert!(w.seasonal_hunt.is_none());
     assert_eq!(w.slimes[enemy].state, "waiting");
 }
 #[test]

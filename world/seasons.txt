@@ -27,5 +27,34 @@
         "asterion_singer"
       ]
     }
+  },
+  {
+    "id": "christmas",
+    "start": [
+      12,
+      15
+    ],
+    "endExclusive": [
+      12,
+      29
+    ],
+    "quests": [
+      "christmas_alder",
+      "christmas_skald",
+      "christmas_nacre",
+      "christmas_aster",
+      "christmas_hunt"
+    ],
+    "dailyQuests": [
+      "christmas_hunt"
+    ],
+    "givers": {
+      "christmas_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
   }
 ]

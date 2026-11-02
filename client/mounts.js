@@ -4,6 +4,7 @@
 // (docs/mounts.md); this only shows them and sends `select_mount`.
 (() => {
   const MOUNTS = [
+    {id:'reindeer',name:'Red-nosed Reindeer',level:1,route:'Christmas: summon the Grinch with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'nightmare',name:'Nightmare Steed',level:1,route:'Halloween: summon the Hollow Rider with five fighters in Gloamfen',cost:'One independent 1% chance per eligible hero per day'},
     { id: 'horse', name: 'Riding horse', level: 50, route: 'Buy from Stable-hand Greta in Skaldholm', cost: '500,000 gold' },
     { id: 'raptor', name: 'Raptor', level: 75, route: 'Quest chain The Banyan Run, from Mara Vines in the Tanglecrown', cost: 'no gold fee' },
@@ -21,7 +22,7 @@
     if (key === signature && host.childElementCount) return;
     signature = key;
     host.replaceChildren(node('h4', 'Mounts'));
-    host.append(node('small', owned.length ? `${Keys.label('mount', false)} and the Mount button summon the selected mount. All mounts ride at 2× speed.` : `Own a mount to ride at 2× speed (${Keys.label('mount', false)}).`, 'mount-help'));
+    host.append(node('small', owned.length ? `${Keys.label('mount', false)} and the Mount button summon the selected mount. All mounts ride at 160% of walking speed.` : `Own a mount to ride at 160% of walking speed (${Keys.label('mount', false)}).`, 'mount-help'));
     for (const m of MOUNTS) {
       const has = owned.includes(m.id), card = node('article', '', 'mount-card');
       card.dataset.mount = m.id; card.dataset.owned = has; card.dataset.selected = has && m.id === selected;

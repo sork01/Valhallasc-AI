@@ -42,6 +42,8 @@ mod chained_forge_tests;
 mod chests;
 mod chime;
 #[cfg(test)]
+mod christmas_tests;
+#[cfg(test)]
 mod consumable_audit;
 mod consumables;
 mod damage_meter;
@@ -85,7 +87,6 @@ mod gm_test;
 #[cfg(test)]
 mod gm_test_tests;
 mod gm_visibility;
-mod halloween;
 #[cfg(test)]
 mod halloween_tests;
 #[cfg(test)]
@@ -100,6 +101,8 @@ mod longship_tests;
 mod mercs;
 #[cfg(test)]
 mod mount_sources_tests;
+#[cfg(test)]
+mod mount_speed_tests;
 #[cfg(test)]
 mod nacre_tests;
 #[cfg(test)]
@@ -142,6 +145,7 @@ mod rotation_tests;
 mod seasonal_cities;
 #[cfg(test)]
 mod seasonal_cities_tests;
+mod seasonal_hunt;
 #[cfg(test)]
 mod seed_vault_tests;
 mod sets;
@@ -650,6 +654,7 @@ impl Slime {
             "hydra" => (5200., 150., 2.2, 1.8),
             // Five level-20 heroes with a healer who must triage: two hits fell a non-tank, so no party without a healer gets through.
             "hollow_rider" => (5000., 90., 3.1, 1.6),
+            "grinch" => (5000., 90., 3.1, 1.7),
             "gloomroot" => (90000., 1500., 2.3, 2.1),
             // The Undervault, tuned for five level-20 heroes with a healer. Trash packs of three or four; the
             // bosses are fights of one to two minutes each (see the vault_* simulations in the tests).
@@ -818,7 +823,7 @@ impl Slime {
             "croc" => 17,
             "knight" => 18,
             "hydra" => 20,
-            "hollow_rider" => 1,
+            "hollow_rider" | "grinch" => 1,
             "gloomroot" => 20,
             "thrall" | "archer" => 19,
             "acolyte" | "gatewarden" | "choir" => 20,
@@ -950,7 +955,7 @@ impl Slime {
             "croc" => 205,
             "knight" => 245,
             "hydra" => 360,
-            "hollow_rider" => 0,
+            "hollow_rider" | "grinch" => 0,
             "gloomroot" => 1200,
             "thrall" => 280,
             "archer" => 290,
@@ -1099,6 +1104,7 @@ impl Slime {
             "knight" => (0.6, 1.4, 6.5, 7.5),
             "hydra" => (0.55, 1.3, 7.5, 9.),
             "hollow_rider" => (1.4, 2.2, 0., 16.),
+            "grinch" => (1.7, 2.5, 0., 16.),
             "gloomroot" => (0.85, 1.5, 7.5, 8.5),
             "thrall" => (0.45, 1.2, 7.5, 8.),
             "archer" => (0.6, 1.8, 0., 11.),
@@ -1298,7 +1304,7 @@ impl Slime {
     /// Radius of the ground-pound a kind does instead of a single blow (0: an ordinary strike). It lands when the
     /// windup ends, on everyone inside, so the wind-up is the warning.
     fn slam_radius(kind: &str) -> f64 {
-        if kind == halloween::KIND {
+        if seasonal_hunt::for_kind(kind).is_some() {
             return 3.2;
         }
         if let Some(e) = crate::cathedral::enemy(kind) {
@@ -1533,7 +1539,7 @@ pub struct World {
     pending_saves: Vec<Character>,
     world_clock: daynight::WorldClock,
     seasonal: crate::seasonal::Calendar,
-    halloween: Option<halloween::Run>,
+    seasonal_hunt: Option<seasonal_hunt::Run>,
     weather: weather::Weather,
     time: f64,
     tick: u64,
@@ -1656,7 +1662,7 @@ impl World {
             pending_saves: vec![],
             world_clock: daynight::WorldClock::new(epoch),
             seasonal: crate::seasonal::Calendar::default(),
-            halloween: None,
+            seasonal_hunt: None,
             weather: weather::Weather::new(epoch),
             time: 0.,
             tick: 0,
@@ -1941,7 +1947,7 @@ impl World {
                 .view(zone, self.maps[zone].template, daynight::unix_ms())
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
-        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.halloween_view(),
+        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
@@ -2555,10 +2561,18 @@ impl World {
         }
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
-        if npc_id == halloween::RITUAL && offer_id == Some("halloween:summon") {
-            let result = self.summon_halloween(session);
+        if seasonal_hunt::for_landmark(npc_id)
+            .is_some_and(|s| crate::seasonal::period(s.quest, &self.seasonal.active()).is_none())
+        {
             if let Some(p) = self.players.get(&session) {
-                let _=p.peer.try_send(json!({"type":"notice","ok":result.is_ok(),"text":result.err().unwrap_or_else(||"The Hollow Rider answers the haunted lantern.".into())}));
+                let _=p.peer.try_send(json!({"type":"notice","ok":false,"text":"This seasonal landmark is not available now."}));
+            }
+            return;
+        }
+        if let Some(spec) = seasonal_hunt::for_ritual(npc_id, offer_id) {
+            let result = self.summon_festival(session, spec);
+            if let Some(p) = self.players.get(&session) {
+                let _=p.peer.try_send(json!({"type":"notice","ok":result.is_ok(),"text":result.err().unwrap_or_else(||format!("{} answers the summons.",spec.name))}));
             }
             return;
         }
@@ -3011,7 +3025,7 @@ impl World {
         self.time += TICK;
         self.tick += 1;
         self.update_seasonal();
-        self.update_halloween();
+        self.update_festival_hunt();
         self.hide_gms_after_zone_change();
         self.update_king_spawn();
         self.update_instances();
@@ -4323,7 +4337,9 @@ impl World {
     }
     /// Returns the health the enemy actually lost.
     fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) -> f64 {
-        if self.slimes[id].kind == halloween::KIND && !self.halloween_member(session) {
+        if seasonal_hunt::for_kind(&self.slimes[id].kind).is_some()
+            && !self.festival_member(&self.slimes[id].kind, session)
+        {
             return 0.;
         }
         if let Some(i) = self
@@ -4443,8 +4459,8 @@ impl World {
             crit,
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
-        if killed && kind == halloween::KIND {
-            self.halloween_killed(id);
+        if killed && seasonal_hunt::for_kind(&kind).is_some() {
+            self.festival_killed(id);
             return dealt;
         }
         if killed && kind.starts_with("es_foe_") {
@@ -4720,10 +4736,11 @@ impl World {
         } else {
             self.actor_bodies(zone, None, Some(id))
         };
-        let event_members = if self.slimes[id].kind == halloween::KIND {
+        let event_members = if seasonal_hunt::for_kind(&self.slimes[id].kind).is_some() {
             Some(
-                self.halloween
+                self.seasonal_hunt
                     .as_ref()
+                    .filter(|r| r.spec.kind == self.slimes[id].kind)
                     .map(|r| r.members.clone())
                     .unwrap_or_default(),
             )
@@ -5025,6 +5042,7 @@ impl World {
                             | "cinderlord"
                             | "gloomroot"
                             | "hollow_rider"
+                            | "grinch"
                             | "oakhorn"
                             | "hrungnir"
                             | "kraken"
@@ -5906,7 +5924,7 @@ mod tests {
     }
 
     #[test]
-    fn riding_horse_requires_level_and_gold_and_doubles_outdoor_speed() {
+    fn riding_horse_requires_level_and_gold_and_uses_160_percent_speed() {
         let mut w = world();
         let (tx, _rx) = mpsc::channel(256);
         let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
@@ -5947,7 +5965,7 @@ mod tests {
         w.update_player(1);
         let normal = w.players[&1].character.x - start.x;
         assert!(
-            normal > 0. && (fast / normal - 2.).abs() < 1e-6,
+            normal > 0. && (fast / normal - 1.6).abs() < 1e-6,
             "{fast} versus {normal}"
         );
         w.message(1, ClientMessage::Mount { mounted: true });
@@ -5963,6 +5981,14 @@ mod tests {
         p.character.zone = 2;
         p.character.x = glacier_gate.x;
         p.character.y = glacier_gate.y;
+        // Walkway gates require outward intent, even when placed on their centre.
+        let side = glacier_gate.walk.unwrap();
+        p.input = Point {
+            x: f64::from(side[0]),
+            y: f64::from(side[1]),
+        };
+        p.moving = true;
+        p.portal_at = -99.;
         p.combat_left = 0.;
         w.message(1, ClientMessage::Mount { mounted: true });
         w.use_portal(1);

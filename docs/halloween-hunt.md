@@ -38,7 +38,7 @@ acceptance/claims stop, unfinished seasonal quests retire, and city props/NPC
 costumes disappear in the next snapshot. Owned mounts and completion history
 remain permanently. The next October 26 reopens the event automatically.
 
-The Nightmare Steed uses the same 2× travel speed and dismount/collision rules
+The Nightmare Steed uses the same 1.6× travel speed and dismount/collision rules
 as existing mounts. Original dark horse geometry, burning mane/tail, glowing
 hooves and gothic tack are saved through PixelFlow with depth atlases; the
 headless revenant knight and jack-o'-lantern are a separate elite atlas.

@@ -59,7 +59,7 @@ deployment and saved-instance migration; development does not restart the servic
 
 - Click ground to walk; click an enemy to chase and keep attacking.
 - **Spark Travel:** speak to the travel master in Alderhaven, Cinderwatch Camp, Rimeward Camp, Lanternmere, Skaldholm, Hollowmoot, Skuldwatch and Heimdall's Perch to discover that stop for your character. Choose a destination in the master's dialogue. Every intermediate master must also be discovered. Each leg costs 20 gold: Alderhaven → Cinderwatch → Rimeward costs 40 gold. The glacier network branches toward Lanternmere and Skaldholm; Skaldholm continues to Hollowmoot and on to Skuldwatch (a flight inside the Wyrdwood is a straight line over the river). You become an animated spark, fly over terrain at three times your class's walking speed, pass every intermediate master, and land at the destination without attracting enemies. The full fare is charged at departure; disconnects and server restarts resume the paid flight.
-- **Riding horse:** Stable-hand Greta in Skaldholm sells a permanent horse at level 50 for 500,000 gold. Press **H** or the HUD button to mount or dismount. Riding doubles normal outdoor travel speed, including in cities. Attacking, casting, Shadowstep, taking enemy aggro, starting Spark Travel, dying or entering a private dungeon dismounts you. Outdoor gates keep you mounted; ownership survives reconnects and restarts.
+- **Riding horse:** Stable-hand Greta in Skaldholm sells a permanent horse at level 50 for 500,000 gold. Press **H** or the HUD button to mount or dismount. Riding increases normal outdoor walking speed by 60%, including in cities. Attacking, casting, Shadowstep, taking enemy aggro, starting Spark Travel, dying or entering a private dungeon dismounts you. Outdoor gates keep you mounted; ownership survives reconnects and restarts.
 - **World map:** press **M** for the painted world atlas based on the owner's `newworldmap.png`. Correct names, level ranges and interactive regions follow the supplied artwork; detailed maps use real zone data. Asterion is a city landmark inside Stormglass and the Canopy inside Veyrroot; Skaldholm and Nacrehold keep separate regions. Walk across outdoor paths while keeping movement held; purple entrance markers open dungeon/interior maps. Exploration fog is preserved. `world/atlas-geography.txt` and `scripts/atlas_geography.py` own the geography; `scripts/compact_atlas.py` applies the final crossings through `node scripts/sync-world.cjs`. Rebuild Rust and release it with the synchronized client. Existing zone IDs and saves stay valid. See `docs/world-map.md`.
 - Players can walk and Shadowstep through other players, NPCs, and enemies. Enemies stop at least one cell away from living players and move aside when a player enters that space; enemies also avoid stacking with each other.
 - **Ironhide Beetles** roam the outer meadow: 240 HP, 22 base damage, fast horn charges, and 10 gold (XP follows its level, see Enemy levels). Their steel shells and bronze horns distinguish them from slimes.
@@ -673,3 +673,13 @@ City entrance alignment (Beta 1.34.2): `scripts/city_walkways.py`, called by the
 final atlas overlay, aligns the four major cities’ approaches, wall apertures
 and reciprocal arrivals with their existing streets. Run sync-world and rebuild
 Rust; no zone/copy IDs shift. Rules and focused checks: [city walkways](docs/city-walkways.md).
+
+Christmas and permanent seasonal rewards (Beta 1.35.0): December 15–28 brings
+festive scenery and NPC outfits to the four major cities, four annual errands,
+and a shared daily five-fighter Grinch summon at Rimeveil’s great Christmas tree.
+The elite scales to the highest party level; each eligible player has one
+independent daily 5% Red-nosed Reindeer roll. Completing each festival’s five
+distinct quests unlocks **the Merry** or **the Hallowed**. All seven mounts travel
+at **160% of walking speed**. Quests/scenery retire automatically; earned mounts
+and titles stay. See [Christmas](docs/christmas-event.md), [mounts](docs/mounts.md)
+and [achievements](docs/achievements.md).

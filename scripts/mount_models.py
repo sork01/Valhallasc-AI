@@ -1,4 +1,4 @@
-"""The five mounts as primitive lists (make_mount_sprites.py renders them).
+"""The seven mounts as primitive lists (make_mount_sprites.py renders them).
 
 Every builder takes (clip, k, n) and returns (prims, bob): the body parts for frame k of n and how far the saddle
 rises (world units) in that frame, which the client adds to the rider. Model space is documented in mount_toon.py:
@@ -437,9 +437,34 @@ def nightmare(clip,k,n):
                   Ell((side*10.7,9,34+bob),(1.5,8,7),'armor')]
     return prims,bob
 
+# Christmas: compact antlers, winter chest/tail, festive tack and a luminous red nose.
+REINDEER={**HORSE,'coat':['#402719','#745136','#a27b51','#c9a477'],
+ 'coat2':['#2c211a','#4d3b2b','#715a42','#a58c68'],
+ 'blaze':['#c5b99d','#e0d4b9','#f1e8cf','#fff7df'],
+ 'nose':['#9f1830','#d52a35','#f84c46','#ff8670'],
+ 'horn':['#65503b','#a08864','#ccb68d','#eee0bc'],
+ 'blanket':['#163e32','#28664b','#43956a','#76bf86']}
+
+def reindeer(clip,k,n):
+    prims,bob=horse(clip,(-k)%n if clip=='run' else k,n)
+    # Deer have a small white tail and no flowing horse mane.
+    prims=[p for p in prims if p.c[1]>=-21.5 and not(p.mat=='coat2' and (p.c[1]<-20 and p.c[2]>24 or p.c[1]>7 and p.c[2]>44))]
+    prims += [Ell((0,-21,36+bob),(3.8,4.5,4.5),'blaze'),Ell((0,16,31+bob),(7.5,3.5,8),'blaze')]
+    ph=CYCLE(k,n);nod=S_(ph*2+1)*1.4 if clip=='run' else S_(ph)*.6
+    for side in [-1,1]:
+        base=V(side*3.5,24,58+bob+nod)
+        mid=base+V(side*5,-3,10);tip=mid+V(side*3,-4,11)
+        prims += [limb(base,mid,1.7,'horn'),limb(mid,tip,1.2,'horn')]
+        for i in range(3):
+            at=base+(tip-base)*(.35+i*.22)
+            prims += [cone(at,at+V(side*(5-i),4,6),1.1,'horn')]
+        prims += [Ell((side*8.5,14,39+bob),(2,2,2.3),'gold')]
+    return prims,bob
+
 # name -> (builder, materials, flat materials, seat). seat: `raise` lifts the rider so the pelvis sits on the saddle,
 # `cut` hides the rider below that world height (the legs vanish into the barrel), `shadow` is the ground shadow (rx, ry).
 REGISTRY = {
+    'reindeer': (reindeer, REINDEER, {**FLAT,'nose':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'nightmare': (nightmare, NIGHTMARE, {**FLAT,'flame':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'horse': (horse, HORSE, FLAT, {'scale': 1.3, 'raise': 25, 'cut': 34, 'shadow': (34, 9), 'coat': 'coat'}),
     'raptor': (raptor, RAPTOR, FLAT, {'scale': 1.12, 'raise': 30, 'cut': 44, 'shadow': (22, 8), 'coat': 'skin'}),

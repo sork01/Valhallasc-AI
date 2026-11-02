@@ -1,6 +1,6 @@
 """Mount sprites: preview | build [--replace] | export [--local] (docs/mounts.md, TODO MOUNT-*).
 
-Six mounts (horse, raptor, lizard, sabertooth, gryphon, nightmare), eight facings, two clips (idle, run), drawn with the 3D toon
+Seven mounts (horse, raptor, lizard, sabertooth, gryphon, nightmare, reindeer), eight facings, two clips (idle, run), drawn with the 3D toon
 renderer in mount_toon.py from the models in mount_models.py. The mount is a separate layer under and over the rider: the
 client composites the rider's class frame into the mount's frame pixel by pixel on depth (client/mountart.js), so one
 sheet serves every class and both bodies. Frames are 160x160 with the class anchor (80,119) and the class depth encoding.
@@ -187,7 +187,7 @@ def font(size):
     return ImageFont.load_default()
 
 
-TITLES = {'horse': 'Riding horse', 'raptor': 'Raptor', 'lizard': 'Lizard', 'sabertooth': 'Sabertooth', 'gryphon': 'Gryphon', 'nightmare': 'Nightmare Steed'}
+TITLES = {'horse': 'Riding horse', 'raptor': 'Raptor', 'lizard': 'Lizard', 'sabertooth': 'Sabertooth', 'gryphon': 'Gryphon', 'nightmare': 'Nightmare Steed', 'reindeer': 'Red-nosed Reindeer'}
 
 
 def sheet(names, out):

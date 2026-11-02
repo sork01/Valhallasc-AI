@@ -413,7 +413,7 @@ pub struct Character {
     #[serde(default)]
     pub bank: crate::bank::Bank,
 }
-/// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every speed is 2.0.
+/// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every mount uses the same 1.6× walking-speed multiplier.
 pub struct MountDef {
     pub id: &'static str,
     pub name: &'static str,
@@ -421,42 +421,49 @@ pub struct MountDef {
     pub level: u32,
     pub speed: f64,
 }
-pub const MOUNTS: [MountDef; 6] = [
+pub const MOUNT_SPEED: f64 = 1.6;
+pub const MOUNTS: [MountDef; 7] = [
+    MountDef {
+        id: "reindeer",
+        name: "red-nosed reindeer",
+        level: 1,
+        speed: MOUNT_SPEED,
+    },
     MountDef {
         id: "nightmare",
         name: "nightmare steed",
         level: 1,
-        speed: 2.,
+        speed: MOUNT_SPEED,
     },
     MountDef {
         id: "horse",
         name: "riding horse",
         level: 50,
-        speed: 2.,
+        speed: MOUNT_SPEED,
     },
     MountDef {
         id: "raptor",
         name: "raptor",
         level: 75,
-        speed: 2.,
+        speed: MOUNT_SPEED,
     },
     MountDef {
         id: "lizard",
         name: "lizard",
         level: 80,
-        speed: 2.,
+        speed: MOUNT_SPEED,
     },
     MountDef {
         id: "sabertooth",
         name: "sabertooth",
         level: 95,
-        speed: 2.,
+        speed: MOUNT_SPEED,
     },
     MountDef {
         id: "gryphon",
         name: "gryphon",
         level: 95,
-        speed: 2.,
+        speed: MOUNT_SPEED,
     },
 ];
 pub fn mount_def(id: &str) -> Option<&'static MountDef> {

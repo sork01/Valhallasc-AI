@@ -76,7 +76,7 @@ def apply(world):
         description='Gather five fighters and light the haunted lantern in Gloamfen. Defeat the Hollow Rider, then return to any city festival host. The Rider matches the average party level, rounded up. Each eligible hero has one independent 1% Nightmare Steed roll per day. Hired fighters can help.',
         objectives=[dict(kind='kill',target='hollow_rider',count=1,label='Defeat the summoned Hollow Rider')],
         level=1,minLevel=1,rewardXp=levels[0]//10,rewardGold=250,requires=None,repeatable=True,group=True,
-        recommendedPlayers=5,season='halloween',seasonCadence='daily'))
+        recommendedPlayers=5,season='halloween',seasonCadence='daily',summonNpc='halloween_lantern',summonZone=3))
     fen=areas[3];centre=(105.,23.);lantern=(105.,32.)
     # A dedicated circle on dry, reachable ground; preserve water, brambles and all ordinary spawns.
     fen['slimes']=[s for s in fen['slimes'] if s['kind']!='hollow_rider']
@@ -97,6 +97,8 @@ def apply(world):
 
 if __name__=='__main__':
     path=ROOT/'world/map.txt';world=apply(json.loads(path.read_text()))
+    import christmas_cities
+    world=christmas_cities.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
     path.write_text(json.dumps(world,ensure_ascii=False,indent=2)+'\n')
-    (ROOT/'world/seasons.txt').write_text(json.dumps([dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer']})],ensure_ascii=False,indent=2)+'\n')
+    (ROOT/'world/seasons.txt').write_text(json.dumps([dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer']}),christmas_cities.event()],ensure_ascii=False,indent=2)+'\n')
     print('Halloween: city dressing and four annual quests; October 26–November 9, Europe/Stockholm.')

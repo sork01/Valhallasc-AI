@@ -81,7 +81,7 @@
         if ((state(q)?.counts[i] || 0) >= o.count) return;
         if (o.kind === 'kill') {
           // A hub can send you into a neighbouring dungeon. Ordinary "any"/"slime" hunts stay in their own zone.
-          if(q.id==='halloween_hunt'){if(zone===3)add((area.npcs||[]).find(n=>n.id==='halloween_lantern'),o.label);return;}
+          if(q.summonNpc){if(zone===q.summonZone)add((area.npcs||[]).find(n=>n.id===q.summonNpc),o.label);return;}
           const home = areas[q.zone], local = (home.slimes || []).some(e => matchesEnemy(o.target, e.kind));
           if (zone !== q.zone && (local || !home.portals?.some(p => p.to === zone))) return;
           const spawns = (area.slimes || []).filter(e => matchesEnemy(o.target, e.kind) && !e.ambush);
@@ -245,7 +245,7 @@
       node.append(element('p', early ? `Complete “${definitions.find(q => q.id === quest.requires)?.title}” first.` : `This quest is for heroes of level ${quest.minLevel} and above.`));
     } else if (atNpc && ['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
       const action = s === 'ready' ? 'claim' : 'accept';
-      const b = button(s === 'ready' ? 'Collect reward' : state(quest)?.completions ? (quest.season ? 'Take this year’s quest' : 'Take bounty again') : 'Accept quest', () => {
+      const b = button(s === 'ready' ? 'Collect reward' : state(quest)?.completions ? (quest.season ? (quest.seasonCadence==='daily'?'Take today’s quest':'Take this year’s quest') : 'Take bounty again') : 'Accept quest', () => {
         questAction(quest, action, b);
       });
       b.dataset.action = action; node.append(b);
@@ -483,7 +483,7 @@
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
         const action = s === 'ready' ? 'claim' : 'accept';
-        const b = element('button', s === 'ready' ? 'Complete Quest' : state(quest)?.completions ? (quest.season ? 'Take this year’s quest' : 'Take bounty again') : 'Accept', 'gossip-button primary'); b.type = 'button';
+        const b = element('button', s === 'ready' ? 'Complete Quest' : state(quest)?.completions ? (quest.season ? (quest.seasonCadence==='daily'?'Take today’s quest':'Take this year’s quest') : 'Take bounty again') : 'Accept', 'gossip-button primary'); b.type = 'button';
         b.dataset.action = action;
         b.addEventListener('click', () => { questAction(quest, action, b, npcId); });
         actions.append(b);

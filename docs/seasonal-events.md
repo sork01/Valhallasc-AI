@@ -74,3 +74,19 @@ The Hollow Rider, ritual lantern, hires and unfinished quest retire at event
 end; owned mounts remain. See [halloween-hunt.md](halloween-hunt.md) for the
 1% personal reward rule, party scaling and focused validation. No file zones
 or private-copy IDs change.
+
+## Christmas and permanent seasonal titles (Beta 1.35.0)
+
+Christmas uses the same registry and Stockholm calendar: December 15–28,
+ending December 29 midnight. The four cities receive Christmas trees, lights,
+wreaths, garlands, gifts, snowmen and NPC hats/scarves instead of Halloween
+art. All seasonal NPCs/offers are filtered by their own event ID; Christmas
+must never expose the haunted lantern merely because another event is active.
+
+Four annual city errands plus the shared daily Grinch hunt award the Merry
+quest-set achievement/title; Halloween’s five distinct claimed quests award
+the Hallowed. Permanent claimed evidence counts across years and reconciles
+old seasonal claim ledgers on login. Titles never alter saved character names.
+The shared encounter engine preserves Halloween’s average-level/1% rules while
+Christmas uses highest-level/5% rules. Full rules, generator and cleanup:
+[christmas-event.md](christmas-event.md).

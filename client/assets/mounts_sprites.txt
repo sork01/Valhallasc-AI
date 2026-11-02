@@ -854,6 +854,144 @@
         "mount_nightmare_run_e": "9c7f00cd65e4a809",
         "mount_nightmare_run_se": "44f15447bfdc1e26"
       }
+    },
+    "reindeer": {
+      "png": "mount_reindeer.png",
+      "depth": "mount_reindeer_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          -0.65,
+          1.005,
+          1.69,
+          1.005,
+          -0.65,
+          1.005,
+          1.69,
+          1.005
+        ]
+      },
+      "raise": 25,
+      "cut": 34,
+      "shadow": [
+        34,
+        9
+      ],
+      "coat": [
+        "#402719",
+        "#745136",
+        "#a27b51",
+        "#c9a477"
+      ],
+      "ramps": {
+        "coat": [
+          "#402719",
+          "#745136",
+          "#a27b51",
+          "#c9a477"
+        ],
+        "coat2": [
+          "#2c211a",
+          "#4d3b2b",
+          "#715a42",
+          "#a58c68"
+        ],
+        "blaze": [
+          "#c5b99d",
+          "#e0d4b9",
+          "#f1e8cf",
+          "#fff7df"
+        ],
+        "hoof": [
+          "#17110f",
+          "#2a2019",
+          "#40342b",
+          "#5b4b3d"
+        ],
+        "nose": [
+          "#9f1830",
+          "#d52a35",
+          "#f84c46",
+          "#ff8670"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#163e32",
+          "#28664b",
+          "#43956a",
+          "#76bf86"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#3a2208",
+          "#6b3d10",
+          "#b9741f",
+          "#f0b14a"
+        ],
+        "horn": [
+          "#65503b",
+          "#a08864",
+          "#ccb68d",
+          "#eee0bc"
+        ]
+      },
+      "sprites": {
+        "mount_reindeer_idle_s": "eb5aec25daf83a7e",
+        "mount_reindeer_idle_sw": "594ed74ecc9091ae",
+        "mount_reindeer_idle_w": "6bb076e135981811",
+        "mount_reindeer_idle_nw": "a4192b62e89a3e2e",
+        "mount_reindeer_idle_n": "1add904356995de3",
+        "mount_reindeer_idle_ne": "0a0bc8f1bd1fe369",
+        "mount_reindeer_idle_e": "d33ecaf009b5bf74",
+        "mount_reindeer_idle_se": "b985cee5f99b85ee",
+        "mount_reindeer_run_s": "2444a59bfd9b1a35",
+        "mount_reindeer_run_sw": "f5b942249c31e900",
+        "mount_reindeer_run_w": "88a990a0601c5b99",
+        "mount_reindeer_run_nw": "058165e075511e89",
+        "mount_reindeer_run_n": "472b174999c4a921",
+        "mount_reindeer_run_ne": "01a73ea865f76947",
+        "mount_reindeer_run_e": "a36b62a4dacc188e",
+        "mount_reindeer_run_se": "aaab1e31363c2813"
+      }
     }
   }
 }

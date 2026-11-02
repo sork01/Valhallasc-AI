@@ -1360,5 +1360,43 @@
       "tideglass_heron",
       "tidejudicator"
     ]
+  },
+  {
+    "id": "hallowed",
+    "name": "Hallowed Hearts",
+    "description": "Complete all five different Halloween quests.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 5,
+    "points": 25,
+    "title": "the Hallowed",
+    "mount": "",
+    "zone": null,
+    "members": [
+      "halloween_alder",
+      "halloween_skald",
+      "halloween_nacre",
+      "halloween_aster",
+      "halloween_hunt"
+    ]
+  },
+  {
+    "id": "merry",
+    "name": "Merry in Every City",
+    "description": "Complete all five different Christmas quests.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 5,
+    "points": 25,
+    "title": "the Merry",
+    "mount": "",
+    "zone": null,
+    "members": [
+      "christmas_alder",
+      "christmas_skald",
+      "christmas_nacre",
+      "christmas_aster",
+      "christmas_hunt"
+    ]
   }
 ]

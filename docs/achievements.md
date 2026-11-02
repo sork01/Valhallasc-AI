@@ -83,7 +83,7 @@ players, strangers, players in another copy, hires and ambient adventurers recei
 no ledger credit. Repeated boss kills count once. Boss mechanic helpers do not
 count. Forge completion needs all ten named bosses; merely entering or completing
 The Ember Key is insufficient. Its reward is The Chainbreaker and the existing
-Gryphon mount, with the normal 2× speed, riding, selection and collision rules.
+Gryphon mount, with the normal 1.6× speed, riding, selection and collision rules.
 Titles are cosmetic suffixes shown in the HUD and remote world nameplates (and
 player target badge); they coexist with the separate rebirth tier badge/aura.
 Unknown or unearned title selections are refused without changing the selection.
@@ -97,7 +97,7 @@ change. When expanding the atlas, add the new region achievement and update the
 Explorer threshold, translations, documented maximum and focused catalog checks
 together. See the table below for the current catalog.
 
-102 achievements; maximum **2,200 points** (Beta 1.30.1).
+104 achievements; maximum **2,250 points** (Beta 1.35.0).
 
 | Achievement | Requirement | Points | Extra reward |
 | --- | --- | ---: | --- |
@@ -262,3 +262,16 @@ running release binary, all three changed public client files, SQLite
 flags and a clean warning/error journal were verified. Nobody was online during
 installation; no zone migration, character backfill or public test guest.
 Rollback and verification artifacts: `deploy/backups/achievement-expansion-1.30.1-20261027T175310Z/`.
+
+## Seasonal quest sets (Beta 1.35.0)
+
+Hallowed Hearts and Merry in Every City each award 25 points and the suffix
+titles `the Hallowed` and `the Merry`. Each requires the four distinct annual
+city errands plus one claimed daily hunt for its festival. Completions across
+years count, following the permanent achievement evidence model. Claimed
+seasonal ledgers reconcile old completions even after a pending quest has
+replaced an earlier run. Accepted or ready-but-unclaimed quests do not count.
+Earned titles survive expiry, reconnect and rebirth; names and name reservation
+keys are untouched. The catalog now has 104 achievements / 2,250 points and
+eight title rewards. Existing suffix rendering and selection/celebration are
+reused.

@@ -455,5 +455,17 @@
   "Hand in: {0} · {1}": "Lämna in: {0} · {1}",
   "{0} ×{1} · Discard": "{0} ×{1} · Kasta",
   "The Hollow Rider rises at level {0}: the average of five fighters, rounded up.": "Den huvudlösa ryttaren stiger fram på nivå {0}: genomsnittet av fem kämpar, avrundat uppåt.",
-  "The Hollow Rider · Level {0}": "Den huvudlösa ryttaren · Nivå {0}"
+  "The Hollow Rider · Level {0}": "Den huvudlösa ryttaren · Nivå {0}",
+  "Accept {0} daily quest in a city first.": "Ta först dagsuppdraget {0} i en stad.",
+  "Own a mount to ride at 160% of walking speed ({0}).": "Skaffa ett riddjur för att rida i 160% av gånghastigheten ({0}).",
+  "Ride the selected mount at 160% of normal walking speed ({0}). Change it in the Character window.": "Rid på det valda riddjuret i 160% av normal gånghastighet ({0}). Byt i karaktärsfönstret.",
+  "The Grinch rises at level {0}: the highest level among the five fighters.": "Grinchen stiger fram på nivå {0}: den högsta nivån bland de fem kämparna.",
+  "The Grinch · Level {0}": "Grinchen · Nivå {0}",
+  "{0} and the Mount button summon the selected mount. All mounts ride at 160% of walking speed.": "{0} och riddjursknappen kallar fram det valda riddjuret. Alla riddjur går i 160% av gånghastigheten.",
+  "{0} fades. The summoning place falls silent.": "{0} försvinner. Kallelseplatsen tystnar.",
+  "{0} is already summoned. Wait for that encounter to finish.": "{0} är redan framkallad. Vänta tills den striden är slut.",
+  "{0} · {1} · 160% walking speed": "{0} · {1} · 160% gånghastighet",
+  "{0} dropped a {1}! It is permanently added to your mounts.": "{0} gav dig {1}! Det har lagts till permanent bland dina riddjur.",
+  "Your daily {0}% {1} roll is complete. Return to any city festival host.": "Ditt dagliga slag på {0}% för {1} är klart. Återvänd till en högtidsvärd i valfri stad.",
+  "{0} answers the summons.": "{0} svarar på kallelsen."
 }

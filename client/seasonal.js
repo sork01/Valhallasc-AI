@@ -5,7 +5,8 @@
   const areas=[WORLD_MAP,...WORLD_MAP.zones];
   const hosts=new Set(['baker','city_bard','nacre_gardener','asterion_singer']);
   const halloween=()=>events.some(e=>e.id==='halloween');
-  const eligible=n=>halloween() && [0,4,9,17].includes(window.Field?.zone||0) && [areas[window.Field?.zone||0]?.city].some(h=>h&&n.x>=h.x0&&n.x<=h.x1&&n.y>=h.y0&&n.y<=h.y1) && !n.travelStop && !['stone','scenery'].includes(n.art) && n.id.indexOf('meetingstone')<0 && n.art!=='stone';
+  const christmas=()=>events.some(e=>e.id==='christmas');
+  const eligible=n=>(halloween()||christmas()) && [0,4,9,17].includes(window.Field?.zone||0) && [areas[window.Field?.zone||0]?.city].some(h=>h&&n.x>=h.x0&&n.x<=h.x1&&n.y>=h.y0&&n.y<=h.y1) && !n.travelStop && !['stone','scenery'].includes(n.art) && n.id.indexOf('meetingstone')<0 && n.art!=='stone';
   const line=(g,points,color,width=2)=>{g.strokeStyle=color;g.lineWidth=width;g.beginPath();points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();};
   const ellipse=(g,x,y,rx,ry,color)=>{g.fillStyle=color;g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fill();};
   City.art.festivalPumpkins={box:[132,110,66,96],draw(g,o){
@@ -61,12 +62,14 @@
   window.Seasonal={
     update(next,nextClaims){const signature=JSON.stringify([next||[],nextClaims||{}]);if(signature===key)return;
       key=signature;events=next||[];claims=nextClaims||{};window.Quests?.seasonChanged();window.WorldMap?.seasonChanged();return true;},
-    get active(){return halloween();},
+    get active(){return events.length>0;},
+    isActive(id){return events.some(e=>e.id===id);},
     questState(q){if(!q.season)return null;const event=events.find(e=>e.id===q.season);return !event?'inactive':claims[q.id]===(q.seasonCadence==='daily'?event.day:event.year)?'completed':'open';},
-    decor(zone){return halloween()&&[0,4,9,17].includes(zone)?areas[zone]?.seasonDecor||[]:[];},
+    decor(zone){return ![0,4,9,17].includes(zone)?[]:halloween()?areas[zone]?.seasonDecor||[]:christmas()?areas[zone]?.christmasDecor||[]:[];},
     hat(n){return eligible(n)&&hosts.has(n.id);},
     drawNpc(g,n,t,top){
       if(!eligible(n))return;
+      if(christmas()){window.Christmas?.drawNpc(g,n,t,top);return;}
       const scale=n.look?.scale||1,pose=window.NpcArt?.frame(n,t),bob=pose?.clip==='walk'?Math.abs(Math.sin(pose.step*Math.PI/4))*1.4:0;
       g.save();g.lineJoin='round';const y=-top*.58;
       g.fillStyle='#3a244a';g.strokeStyle='#1f1b32';g.lineWidth=2;
@@ -79,7 +82,7 @@
       }
       g.restore();
     },
-    glow(g,zone,w2s){if(!halloween())return;g.save();g.globalCompositeOperation='screen';
-      for(const o of this.decor(zone)){if(!['festivalPumpkins','festivalLantern','festivalCandles'].includes(o.kind))continue;const [x,y]=w2s(o.x,o.y,o.kind==='festivalLantern'?88:20);g.globalAlpha=.13;ellipse(g,x,y,46,24,'#ffbf6c');}g.restore();}
+    glow(g,zone,w2s){if(!this.active)return;g.save();g.globalCompositeOperation='screen';
+      for(const o of this.decor(zone)){if(!['festivalPumpkins','festivalLantern','festivalCandles','christmasTree','christmasGrandTree','christmasLantern','christmasCandles','christmasLights'].includes(o.kind))continue;const [x,y]=w2s(o.x,o.y,o.kind==='festivalLantern'?88:20);g.globalAlpha=.13;ellipse(g,x,y,46,24,'#ffbf6c');}g.restore();}
   };
 })();

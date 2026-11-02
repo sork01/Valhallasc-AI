@@ -125,6 +125,13 @@ impl Character {
     /// Reconcile saved facts and return newly earned achievements. No point balance can be spent or duplicated.
     pub fn sync_achievements(&mut self) -> Vec<String> {
         self.achievements.highest_level = self.achievements.highest_level.max(self.level);
+        // Claimed seasonal ledgers survive daily/yearly replacement and expiry.
+        // Reconcile legacy claims as permanent, distinct quest evidence.
+        for (id, period) in &self.seasonal_claims {
+            if *period > 0 && crate::seasonal::quest_event(id).is_some() {
+                self.achievements.quests.insert(id.clone());
+            }
+        }
         for q in &self.quests {
             if q.completions > 0 && !q.id.starts_with("es_go_") {
                 self.achievements.quests.insert(q.id.clone());
@@ -203,13 +210,52 @@ mod tests {
         }
     }
     #[test]
+    fn seasonal_achievements_require_each_claim_and_survive_history_and_save() {
+        let mut c = hero();
+        for (event, achievement, title) in [
+            ("halloween", "hallowed", "the Hallowed"),
+            ("christmas", "merry", "the Merry"),
+        ] {
+            for (index, suffix) in ["alder", "skald", "nacre", "aster"].iter().enumerate() {
+                c.seasonal_claims
+                    .insert(format!("{event}_{suffix}"), 2023 + index as u32);
+            }
+            c.sync_achievements();
+            assert!(!c.achievements.completed.contains(achievement));
+            // Accepted/ready objectives do not count; only a claimed daily hunt.
+            c.quests.push(crate::model::QuestProgress {
+                id: format!("{event}_hunt"),
+                counts: vec![1],
+                claimed: false,
+                completions: 0,
+            });
+            c.sync_achievements();
+            assert!(!c.achievements.completed.contains(achievement));
+            c.seasonal_claims.insert(format!("{event}_hunt"), 20261215);
+            assert!(c.sync_achievements().contains(&achievement.to_string()));
+            c.select_achievement_title(achievement).unwrap();
+            assert_eq!(c.achievement_title(), title);
+            assert!(c.sync_achievements().is_empty());
+        }
+        let saved = serde_json::to_string(&c).unwrap();
+        let mut loaded: Character = serde_json::from_str(&saved).unwrap();
+        loaded.quests.clear();
+        loaded.seasonal_claims.clear();
+        assert!(loaded.sync_achievements().is_empty());
+        assert!(
+            loaded.achievements.completed.contains("hallowed")
+                && loaded.achievements.completed.contains("merry")
+        );
+        assert_eq!(loaded.achievement_title(), "the Merry");
+    }
+    #[test]
     fn achievements_catalog_has_positive_points_and_correct_atlas_and_rewards() {
-        assert_eq!(catalog().len(), 102);
+        assert_eq!(catalog().len(), 104);
         assert_eq!(regions().len(), 23);
         assert_eq!(regions().iter().collect::<BTreeSet<_>>().len(), 23);
         let c = hero();
         let view = c.achievement_view();
-        assert_eq!(view["maximum"], 2200);
+        assert_eq!(view["maximum"], 2250);
         for a in catalog() {
             if a.metric == "fog" {
                 assert!(regions().contains(&a.zone.unwrap()));
@@ -218,7 +264,7 @@ mod tests {
                 assert_eq!(a.target, (regions().len() * FOG_GRID * FOG_GRID) as u32);
             }
         }
-        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 6);
+        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 8);
         assert_eq!(catalog().iter().filter(|a| !a.mount.is_empty()).count(), 1);
     }
     #[test]
@@ -306,7 +352,7 @@ mod tests {
         first.sync_achievements();
         assert_eq!(first.mount, "gryphon");
         assert!(first.mount_owned);
-        assert_eq!(crate::model::mount_speed("gryphon"), Some(2.));
+        assert_eq!(crate::model::mount_speed("gryphon"), Some(1.6));
     }
     #[test]
     fn achievements_survive_rebirth_with_progress_and_reconcile_before_reset() {
@@ -387,7 +433,7 @@ mod tests {
         assert_eq!(c.achievement_points(), 685);
         assert!(c.sync_achievements().is_empty());
         assert_eq!(c.achievement_points(), 685);
-        assert_eq!(c.achievement_view()["maximum"], 2200);
+        assert_eq!(c.achievement_view()["maximum"], 2250);
         assert_eq!(c.achievement_title(), "The Explorer");
         assert_eq!(c.mounts, ["gryphon"]);
     }
