@@ -8,7 +8,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
-One open owner-reported task: player-name uniqueness. The four city/travel tasks are implemented and verified for Beta 1.33.0 (2026-11-02). The seven earlier reports below are implemented, verified and deployed in Beta 1.32.8 (2026-11-02).
+One open owner-reported task: player-name uniqueness. The four city/travel tasks are implemented, verified and deployed in Beta 1.33.0 (2026-11-02). The seven earlier reports below are implemented, verified and deployed in Beta 1.32.8 (2026-11-02).
 
 ### Unique player names (owner’s request, 2026-11-02)
 

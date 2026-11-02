@@ -22,5 +22,18 @@ Rules and regeneration: `docs/seasonal-events.md`, `docs/zone-travel.md`.
 No new zones or changed private-copy IDs; old saves use default empty annual
 maps. The release needs no database migration or backfill.
 
-Release state: final checks/preparation. Backup and verification receipt:
-`test-results/cities-halloween-release.json` in the main checkout.
+Release state: **deployed and verified 2026-11-02** with nobody online.
+Source `d4cb7f1` is byte-identical to the privately reviewed
+candidate `9e6e03e`. The optimized release passed a separate
+private calendar/quest-expiry/descent/return probe before publication.
+
+Backup: `cities-halloween-1.33.0-20261102T100447Z` under `deploy/backups/` (previous executable,
+changed client files, consistent online SQLite and stopped DB/WAL/shm).
+Public and bridge health pass; all ten changed public client hashes match;
+`cmp` and SHA-256 prove the running executable matches the reviewed binary.
+SQLite quick_check is OK; **36 characters / 22 guests** are unchanged. No test
+flags, public test guests or post-restart journal warnings were introduced.
+No copy-ID migration or backfill was needed.
+
+Release and public-hash receipts: `test-results/cities-halloween-release.json`
+and `test-results/cities-halloween-public-hashes.json` in the main checkout.
