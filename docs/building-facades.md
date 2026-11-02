@@ -60,3 +60,12 @@ house’s sprite. Named stalls already place their names above their awnings.
 A focused private render inspection confirms zero residential address text or
 boards and all 43 named signs/boards retained. Native city views were inspected;
 no full suite or new permanent test was needed for this presentation change.
+
+
+Client Beta 1.35.4 is deployed from source `3e69b54` (private `d412304`). Four
+changed public client hashes and bridge/public health pass; server/PID unchanged.
+Receipt: `test-results/house-signs-release-20261102T202045Z.json`.
+Render audit: 344 addresses / zero drawn texts / zero boards; 43 named signs /
+43 drawn texts / 43 boards. Private artifact `test-results/driver-GshpfG`.
+The four city, wall-detail and both building-gallery pictures in FileDrop were
+refreshed and SHA-256 verified; final captures `test-results/driver-h5Ja8i`.
