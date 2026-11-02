@@ -668,3 +668,8 @@ southern opening with Raven Row and clears its approach while preserving the
 outdoor crossing. `client/exitpaths.js` draws continuous stone surfaces in both
 wall orientations. Run the focused archway Rust check and bounded
 `tests/skaldholm-arches-ui.cjs`; see [city archways](docs/city-archways.md).
+
+City entrance alignment (Beta 1.34.2): `scripts/city_walkways.py`, called by the
+final atlas overlay, aligns the four major cities’ approaches, wall apertures
+and reciprocal arrivals with their existing streets. Run sync-world and rebuild
+Rust; no zone/copy IDs shift. Rules and focused checks: [city walkways](docs/city-walkways.md).

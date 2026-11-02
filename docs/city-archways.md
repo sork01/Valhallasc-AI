@@ -44,3 +44,10 @@ hashes, exact running executable, SQLite quick_check, unchanged 36 characters /
 warnings/errors or public test guest. No zone/copy-ID or save migration.
 Release receipt: `test-results/skaldholm-arches-release-20261102T141829Z.json`
 and the backup's `verification.json`.
+
+## Full city audit (Beta 1.34.2)
+
+The later owner request aligns all major-city entrances with their streets.
+It supersedes the Raven Row/retained-portal layout above: Skaldholm’s southern
+entry now follows Grand Avenue (x80) and both side entries follow Trade Road
+(y76). See [city-walkways.md](city-walkways.md) for all four cities.

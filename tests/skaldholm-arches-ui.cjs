@@ -20,14 +20,14 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   return {vertical,samples};
  }));
  check(faces.every(f=>f.samples.every(c=>c[0]>180&&c[1]>170&&c[2]>145&&c[3]===255)),'Both arch orientations have a continuous light stone face without dark overlapping roof triangles');
- const south=await p.evaluate(()=>{const z=WORLD_MAP.zones[3],a=z.exitArches.find(a=>a.portal==='path_4_0');return {x:a.x,y:a.y,street:z.roads.find(r=>r.x0===110&&r.x1===114),route:z.exitRoutes.find(r=>r.portal===a.portal).points};});
- check(south.x===(south.street.x0+south.street.x1)/2&&south.y===140,'The southern arch is centred on the actual Raven Row paving');
- check(south.route.some(([x,y])=>x===112&&y<140)&&south.route.some(([x,y])=>x===112&&y>140),'The highlighted approach runs through the arch into the street');
- for(const [name,x,y]of[['left',20,89.5],['bottom',112,144]]){
+ const south=await p.evaluate(()=>{const z=WORLD_MAP.zones[3],a=z.exitArches.find(a=>a.portal==='path_4_0');return {x:a.x,y:a.y,street:z.roads.find(r=>r.x0===76.5&&r.x1===83.5),route:z.exitRoutes.find(r=>r.portal===a.portal).points};});
+ check(south.x===(south.street.x0+south.street.x1)/2&&south.y===140,'The southern arch is centred on the actual Grand Avenue paving');
+ check(south.route.some(([x,y])=>x===80&&y<140)&&south.route.some(([x,y])=>x===80&&y>140),'The highlighted approach runs through the arch into the street');
+ for(const [name,x,y]of[['left',20,76],['bottom',80,144]]){
   await at(x,y);await p.waitForTimeout(300);await p.screenshot({path:path.join(w.runDir,name+'-desktop.png')});
   await p.setViewportSize({width:844,height:390});await p.waitForTimeout(300);await p.screenshot({path:path.join(w.runDir,name+'-phone.png')});await p.setViewportSize({width:1280,height:900});
  }
- for(const [name,x,y,tx,ty]of[['left',21,89.5,11,89.5],['bottom',112,134,112,146]]){
+ for(const [name,x,y,tx,ty]of[['left',21,76,11,76],['bottom',80,134,80,146]]){
   await at(x,y);await p.evaluate(([x,y])=>Online.send({type:'move',x,y}),[tx,ty]);await p.waitForFunction(([x,y])=>Field.zone===4&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<.6,[tx,ty],{timeout:15000});
   await p.evaluate(()=>Online.send({type:'stop'}));check(true,`${name}: normal server-authoritative walking crosses the visible opening`);
  }

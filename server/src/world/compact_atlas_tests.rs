@@ -5,6 +5,107 @@ use super::*;
 fn bundled() -> Value {
     serde_json::from_str(include_str!("../../../world/map.txt")).unwrap()
 }
+
+#[test]
+fn compact_atlas_city_walkways_align_with_streets_and_real_wall_openings() {
+    let w = world();
+    let data = bundled();
+    let mut checked = 0;
+    for zone in [0, 4, 9, 17] {
+        let z = if zone == 0 {
+            &data
+        } else {
+            &data["zones"][zone - 1]
+        };
+        let entrances = z["cityEntrances"].as_array().unwrap();
+        assert_eq!(
+            entrances.len(),
+            match zone {
+                0 => 2,
+                4 => 4,
+                9 => 5,
+                _ => 1,
+            }
+        );
+        for e in entrances {
+            let points = e["points"].as_array().unwrap();
+            let point = |p: &Value| at(p[0].as_f64().unwrap(), p[1].as_f64().unwrap());
+            for pair in points.windows(2) {
+                assert!(
+                    w.maps[zone].line_clear(point(&pair[0]), point(&pair[1]), 1.2),
+                    "blocked city entry {zone}:{}",
+                    e["id"]
+                );
+            }
+            let vertical = e["axis"] == "y";
+            let street = e["street"].as_f64().unwrap();
+            if zone == 0 {
+                assert_eq!(street, z["city"]["plaza"]["x"].as_f64().unwrap());
+            } else {
+                // Match original streets, excluding paving created by this overlay.
+                assert!(
+                    z["roads"].as_array().unwrap().iter().any(|r| {
+                        if r.get("cityEntry").is_some() {
+                            return false;
+                        }
+                        let Some(x0) = r["x0"].as_f64() else {
+                            return false;
+                        };
+                        let (x1, y0, y1) = (
+                            r["x1"].as_f64().unwrap(),
+                            r["y0"].as_f64().unwrap(),
+                            r["y1"].as_f64().unwrap(),
+                        );
+                        let (across, along, centre) = if vertical {
+                            (x1 - x0, y1 - y0, (x0 + x1) / 2.)
+                        } else {
+                            (y1 - y0, x1 - x0, (y0 + y1) / 2.)
+                        };
+                        along > 30. && across >= 4. && (centre - street).abs() < 0.001
+                    }),
+                    "entry misses a real city street: {zone}:{}",
+                    e["id"]
+                );
+            }
+            if let Some(id) = e["portal"].as_str() {
+                let portal = w.maps[zone].portals.iter().find(|p| p.id == id).unwrap();
+                assert_eq!(point(&points[0]), at(portal.x, portal.y));
+                assert_eq!(if vertical { portal.x } else { portal.y }, street);
+                let back = w.maps[portal.to]
+                    .portals
+                    .iter()
+                    .find(|p| p.to == zone)
+                    .unwrap();
+                assert!(at(back.tx, back.ty).distance(at(portal.x, portal.y)) >= 5.9);
+                assert!(w.maps[zone].line_clear(at(back.tx, back.ty), point(&points[1]), 1.2));
+            }
+            if let Some(opening) = e.get("opening") {
+                let (x, y) = (
+                    opening["x"].as_f64().unwrap(),
+                    opening["y"].as_f64().unwrap(),
+                );
+                let side = opening["vertical"].as_bool().unwrap();
+                let half = opening["halfWidth"].as_f64().unwrap();
+                assert_eq!(if side { y } else { x }, street);
+                let n = if side { at(1., 0.) } else { at(0., 1.) };
+                let outer = if zone == 0 && y == 94. { 1. } else { 3. };
+                assert!(w.maps[zone].line_clear(
+                    at(x - n.x * 3., y - n.y * 3.),
+                    at(x + n.x * outer, y + n.y * outer),
+                    1.2
+                ));
+                let beside = at(x + n.y * (half + 1.), y + n.x * (half + 1.));
+                assert!(!w.maps[zone].line_clear(
+                    at(beside.x - n.x * 3., beside.y - n.y * 3.),
+                    at(beside.x + n.x * 3., beside.y + n.y * 3.),
+                    PLAYER_RADIUS
+                ));
+            }
+            checked += 1;
+        }
+    }
+    assert_eq!(checked, 12);
+}
 fn routes(data: &Value) -> Vec<(usize, usize)> {
     let mut pairs: Vec<_> = data["atlas"]["links"]
         .as_array()
@@ -281,7 +382,24 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
                 m.walk(&mut actual, direction, distance, PLAYER_RADIUS);
                 assert!(actual.distance(next) < 0.01, "walking approach {i}");
             }
-            assert!(actual.distance(m.spawn) < 1.5);
+            if z["cityEntrances"]
+                .as_array()
+                .is_some_and(|entries| entries.iter().any(|e| e["points"] == *path))
+            {
+                // City approaches join the existing street network rather than
+                // following the perimeter back to the old default spawn.
+                let city = &z["city"];
+                assert!(
+                    actual.x > city["x0"].as_f64().unwrap()
+                        && actual.x < city["x1"].as_f64().unwrap()
+                );
+                assert!(
+                    actual.y > city["y0"].as_f64().unwrap()
+                        && actual.y < city["y1"].as_f64().unwrap()
+                );
+            } else {
+                assert!(actual.distance(m.spawn) < 1.5);
+            }
         }
     }
 }
@@ -462,11 +580,11 @@ fn compact_atlas_city_archways_and_nacre_alcove_are_walkable() {
             PLAYER_RADIUS
         ));
     }
-    // The south opening follows Raven Row, not the off-centre atlas portal.
+    // The south opening and crossing follow the Grand Avenue.
     let south = arches.iter().find(|a| a["portal"] == "path_4_0").unwrap();
-    assert_eq!(south["x"].as_f64().unwrap(), 112.);
-    assert!(city.line_clear(at(112., 136.), at(112., 147.), 1.2));
-    assert!(city.line_clear(at(112., 147.), at(107.5, 154.5), 1.2));
+    assert_eq!(south["x"].as_f64().unwrap(), 80.);
+    assert!(city.line_clear(at(80., 130.), at(80., 154.5), 1.2));
+    assert!(!city.line_clear(at(112., 137.), at(112., 143.), PLAYER_RADIUS));
     assert!(!city.line_clear(at(104., 137.), at(104., 143.), PLAYER_RADIUS));
     let gate = w.maps[7]
         .portals

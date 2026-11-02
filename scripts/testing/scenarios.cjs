@@ -4556,3 +4556,5 @@ scenarios.raid_key = require('./raid-key-scenario.cjs')(kit,map);
 scenarios.walkways = require('./walkways-scenario.cjs')(kit,map);
 
 scenarios.halloween_hunt = require('./halloween-scenario.cjs')(kit);
+
+scenarios.city_entries = require('./city-entries-scenario.cjs')(kit);

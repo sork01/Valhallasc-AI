@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MAP = ROOT / 'world/map.txt'
 from atlas_geography import generate
+import city_walkways
 
 ATLAS, _OWNERSHIP = generate()
 REGIONS = {r['zone']: r for r in ATLAS['regions']}
@@ -169,57 +170,6 @@ def sync_travel_links(zones):
             if a['id'] not in b['travelLinks']:b['travelLinks'].append(a['id'])
 
 
-def city_archways(z):
-    """Open genuine wall apertures at Skaldholm's current outdoor exits."""
-    previous={a['portal']:a for a in z.get('exitArches',[])}
-    for path in z.pop('archPaths',[]):
-        if path in z.get('paths',[]):z['paths'].remove(path)
-    z['archPaths']=[]
-    z['exitArches']=[]
-    for p in z['portals']:
-        if not p.get('walk'): continue
-        dx,dy=p['walk'];vertical=bool(dx)
-        wall=(144 if dx>0 else 16) if vertical else (140 if dy>0 else 12)
-        along=p['y'] if vertical else p['x']; half=4.5
-        if dy>0:
-            # Raven Row, rather than the atlas portal's off-street x coordinate.
-            streets=[(r['x0']+r['x1'])/2 for r in z['roads'] if r.get('t')==1 and
-                     'x0' in r and r['y1']-r['y0']>30 and r['x1']-r['x0']<10 and
-                     r['y1']>=z['city']['y1']]
-            along=min(streets,key=lambda x:abs(x-along))
-        old=previous.get(p['id'])
-        if old and abs((old['y'] if vertical else old['x'])-along)>.01:
-            # Repair the retired opening before cutting the new one. Fresh
-            # Skaldholm generators have intact ramparts and need no repair.
-            template=next(o for o in z['objects'] if o['kind']=='rampart' and abs((o['x'] if vertical else o['y'])-wall)<1)
-            patch=dict(template,x=old['x'],y=old['y'],width=1.8 if vertical else 9.,depth=9. if vertical else 1.8)
-            z['objects'].append(patch)
-        out=[]
-        for o in z['objects']:
-            cross=o['x'] if vertical else o['y']; length=o.get('depth' if vertical else 'width',0)
-            middle=o['y'] if vertical else o['x']
-            if o['kind']!='rampart' or abs(cross-wall)>1 or not length or middle+length/2<=along-half or middle-length/2>=along+half:
-                out.append(o);continue
-            for lo,hi in [(middle-length/2,min(middle+length/2,along-half)),(max(middle-length/2,along+half),middle+length/2)]:
-                if hi-lo<=.05: continue
-                part=dict(o);part['y' if vertical else 'x']=(lo+hi)/2;part['depth' if vertical else 'width']=hi-lo;out.append(part)
-        z['objects']=out
-        arch=dict(x=wall if vertical else along,y=along if vertical else wall,vertical=vertical,name=p['name'],portal=p['id'])
-        if dy>0:
-            path=[[p['x'],p['y']],[along,147.],[along,136.]]
-            # Clear only foliage on the connector; houses, services and all
-            # other wall apertures keep their existing positions.
-            def in_approach(o):
-                for a,b in zip(path,path[1:]):
-                    dx,dy=b[0]-a[0],b[1]-a[1];t=max(0,min(1,((o['x']-a[0])*dx+(o['y']-a[1])*dy)/(dx*dx+dy*dy)))
-                    if math.hypot(o['x']-a[0]-dx*t,o['y']-a[1]-dy*t)<o.get('r',0)+2.5:return True
-                return False
-            z['objects']=[o for o in z['objects'] if o['kind'] not in ['tree','bush','rock','flowers'] or not in_approach(o)]
-            assert all(clear(z,a,b,1.2) for a,b in zip(path,path[1:])), 'South arch approach must stay clear'
-            z.setdefault('paths',[]).append(path);z['archPaths'].append(path);arch['approach']=path
-        z['exitArches'].append(arch)
-
-
 def nacre_alcove(z):
     p=(122.5,113.5);a=(116.5,113.5)
     def near_segment(o,u,v):
@@ -254,8 +204,8 @@ def exit_routes(z):
     for p in z['portals']:
         if not p.get('walk'):continue
         prev=connected(z,[q for q in z['portals'] if q is not p])
-        arch=next((a for a in z.get('exitArches',[]) if a['portal']==p['id'] and a.get('approach')),None)
-        path=arch['approach'] if arch else approach(z,prev,(p['x'],p['y']))
+        entrance=next((e for e in z.get('cityEntrances',[]) if e.get('portal')==p['id']),None)
+        path=entrance['points'] if entrance else approach(z,prev,(p['x'],p['y']))
         short=[path[0]];length=0
         for point in path[1:]:
             a=short[-1];d=math.hypot(point[0]-a[0],point[1]-a[1])
@@ -267,7 +217,7 @@ def exit_routes(z):
 
 
 def apply(world):
-    zones=[world]+world['zones']; sky_landing(zones[7]);nacre_alcove(zones[7]);city_archways(zones[4])
+    zones=[world]+world['zones']; sky_landing(zones[7]);nacre_alcove(zones[7]);city_walkways.prepare(zones,clear)
     pairs=[(p['a'],p['b']) for p in ATLAS['links']]+[(17,19)]
     linked={tuple(sorted(pair)) for pair in pairs}
     # Geographic neighbours replace obsolete crossings from earlier layouts. Dungeon
@@ -290,12 +240,12 @@ def apply(world):
                 a,b=REGIONS[i]['seed'],REGIONS[j]['seed'];side=direction(a,b)
                 dx,dy=b[0]-a[0],b[1]-a[1]
                 preferred=max(.16,min(.84,.5+.3*(dy/abs(dx) if side[0] else dx/abs(dy))))
-            if (i,j)==(4,0):
-                # Align the wall opening/approach without moving the established
-                # outdoor crossing or the reciprocal safe arrival.
-                point,arrival=(107.5,154.5),(107.5,148.5)
-                assert all(int(q[1])*z['size']+int(q[0]) in prev for q in [point,arrival])
-                assert clear(z,point,arrival)
+            city_entry=city_walkways.entry(i,j)
+            if city_entry:
+                assert tuple(side)==city_entry[2], f"{i}: city entrance faces the wrong neighbour"
+                point,arrival=city_walkways.landing(city_entry)
+                assert all(int(q[1])*z['size']+int(q[0]) in prev for q in [point,arrival]), f"{i}: unreachable city landing"
+                assert clear(z,point,arrival), f"{i}: blocked city landing"
             else:
                 point,arrival=nacre_side_landing(z,prev,fixed) if (i,j)==(7,9) else endpoint(z,side,prev,fixed,preferred)
             endpoints[i,j]=(point,arrival);sides[i,j]=side
@@ -304,7 +254,8 @@ def apply(world):
         for a,b in [(i,j),(j,i)]:
             z=zones[a];p=next((p for p in z['portals'] if p['to']==b),None)
             if p is None:
-                p=dict(id=f'path_{a}_{b}',name=zones[b]['name'],r=2.,to=b);z['portals'].append(p)
+                city_entry=city_walkways.entry(a,b)
+                p=dict(id=city_entry[0] if city_entry else f'path_{a}_{b}',name=zones[b]['name'],r=2.,to=b);z['portals'].append(p)
             point,_=endpoints[a,b];_,arrival=endpoints[b,a]
             p.update(name=zones[b]['name'],x=point[0],y=point[1],tx=arrival[0],ty=arrival[1],walk=list(sides[a,b]))
             p.pop('look',None)
@@ -314,7 +265,8 @@ def apply(world):
             if p['to'] not in OUTDOORS:continue
             prev=connected(z,[q for q in z['portals'] if q is not p])
             assert int(p['y'])*z['size']+int(p['x']) in prev,f"{i}: {p['id']} cut off by another crossing"
-            path=approach(z,prev,(p['x'],p['y']))
+            entrance=next((e for e in z.get('cityEntrances',[]) if e.get('portal')==p['id']),None)
+            path=entrance['points'] if entrance else approach(z,prev,(p['x'],p['y']))
             if path not in z.setdefault('paths',[]):z['paths'].append(path);z['atlasPaths'].append(path)
     for i in sorted(OUTDOORS):exit_routes(zones[i])
     world['atlas']=ATLAS

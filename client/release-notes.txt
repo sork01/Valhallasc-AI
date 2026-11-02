@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.34.2",
+    "date": "2026-11-02",
+    "new": [],
+    "changed": [
+      "Walking entrances to the four main cities now join their streets, with matching wall openings and clear paved approaches."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.34.1",
     "date": "2026-11-02",
     "new": [],

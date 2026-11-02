@@ -17,8 +17,9 @@
     g.save();g.lineJoin='round';
     // Each pier is a complete prism in world axes, so both wall orientations
     // show the correct front face rather than an exposed rear face.
-    for(const side of [-1,1]){const [x,y]=P(side*5.1,0);g.save();g.translate(x,y);City.kit.prism(g,a.vertical?1.8:1.2,a.vertical?1.2:1.8,108,'#eee8d4','#d4ccb2','#a9a38c');g.restore();}
-    const point=(angle,outer,v)=>P(Math.cos(angle)*(outer?5.7:4.5),v,108+Math.sin(angle)*(outer?192:148));
+    const inner=a.halfWidth||4.5,outer=inner+1.2;
+    if(!a.towers)for(const side of [-1,1]){const [x,y]=P(side*(inner+.6),0);g.save();g.translate(x,y);City.kit.prism(g,a.vertical?1.8:1.2,a.vertical?1.2:1.8,108,'#eee8d4','#d4ccb2','#a9a38c');g.restore();}
+    const point=(angle,outside,v)=>P(Math.cos(angle)*(outside?outer:inner),v,108+Math.sin(angle)*(outside?192:148));
     // Finish each continuous surface before the next. Painting one complete
     // wedge at a time let later roof faces slice triangles out of its neighbour.
     for(const surface of ['inner','roof','front'])for(let i=0;i<13;i++){
