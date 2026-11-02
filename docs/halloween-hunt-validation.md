@@ -1,8 +1,8 @@
 # Halloween hunt and unique-name validation — Beta 1.34.0
 
-Candidate: `feat/halloween-hunt`, private RAID checkout
+Implemented on `feat/halloween-hunt` (`b936594`), merged as `6a12586`; private RAID checkout
 `/media/raid/valhallasc-data/halloween-hunt-work`; no new file zones or shifted
-private-copy IDs. Deployment is tracked below after public verification.
+private-copy IDs. Beta 1.34.0 is deployed and verified.
 
 - Six focused Rust `halloween` tests: five-fighter admission, rounded-up mixed
   levels (5/10/15/20/26 -> 16), frozen membership, outsiders, hired fighters,
@@ -47,6 +47,28 @@ and is not part of this release.
 
 ## Deployment
 
-Pending optimized release build, zero-player restart, automatic name migration
-and public verification. Live executable and consistent SQLite backup already
-saved at `deploy/backups/halloween-hunt-1.34.0-20261102T134217Z`.
+Deployed 2026-11-02 at 13:47 UTC with nobody online. The optimized release
+passed the same ten-check private MCP scenario before installation
+(`test-results/driver-lPDg94/report.json`). A private startup rehearsal on a
+copy of the production save also passed: 36 characters, exactly 14 required
+renames, all stored character JSON unchanged, unique reservations and SQLite
+quick_check (`test-results/name-migration-efvqdqxl/report.json` in the worktree).
+
+Backup: `deploy/backups/halloween-hunt-1.34.0-20261102T134217Z`, including the
+previous live executable saved before building, consistent online SQLite,
+stopped SQLite/WAL/shm where present, previous changed client files, and state
+hashes. No saved-zone migration was necessary.
+
+Public/bridge health pass. `/proc/<MainPID>/exe` exactly matches the installed
+release, SHA-256
+`d75dbea0338f12e2be1e2e5dd8df3d53f21188480e1bcc4266fcecb1fd376547`.
+All **18 changed public client files/assets** match their local hashes. SQLite
+quick_check is `ok`; **36 characters / 22 guests** remain unchanged, no public
+test guest was created, and every character JSON hash matches the backup.
+The automatic migration reserves each oldest name and flags exactly **14**
+later duplicates. The unique index exists; test flags are absent and the
+restarted service has no journal warnings/errors.
+
+Receipt: `test-results/halloween-release-20261102T134816Z.json` and the backup's
+`verification.json`. Source `6a12586`; release notes and all original six TODO
+checkboxes are complete, with the newly requested achievement/title left open.
