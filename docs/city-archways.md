@@ -31,6 +31,16 @@ Inspected desktop and phone views are in the private checkout at
 in `test-results/driver-9RQNJ8`. Generated map SHA-256:
 `8de60e802139e841a92c29c9eca5ee32440b1adb8f29dcd98162e583badc8588`.
 
-Release build/verification pending. Previous live executable, consistent SQLite
+Deployed and verified 2026-11-02, source `aa09f59` (private source `fad42b6`).
+The optimized release also crossed both openings via normal movement in a
+private probe (`test-results/driver-hqXZUw/report.json` in the worktree).
+Previous live executable, consistent SQLite
 and changed client files are backed up before the release build at
 `deploy/backups/skaldholm-arches-1.34.1-20261102T140954Z`.
+
+Zero-player restart; public/bridge health, all four changed public client
+hashes, exact running executable, SQLite quick_check, unchanged 36 characters /
+22 guests and every saved character JSON hash verified. No test flags, journal
+warnings/errors or public test guest. No zone/copy-ID or save migration.
+Release receipt: `test-results/skaldholm-arches-release-20261102T141829Z.json`
+and the backup's `verification.json`.
