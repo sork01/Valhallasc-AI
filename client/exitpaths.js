@@ -13,20 +13,21 @@
   }
   function arch(g,a,w2s){
     const P=(u,v,h=0)=>w2s(a.x+(a.vertical?v:u),a.y+(a.vertical?u:v),h);
-    const poly=(pts,color)=>{g.fillStyle=color;g.strokeStyle='#493e39';g.lineWidth=2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();g.stroke();};
-    for(const side of [-1,1]){
-      const x=side*5.1;
-      poly([P(x-.65,-.8),P(x+.65,-.8),P(x+.65,-.8,119),P(x-.65,-.8,119)],'#9a927c');
-      poly([P(x+.65,-.8),P(x+.65,.8),P(x+.65,.8,119),P(x+.65,-.8,119)],'#746c5c');
+    const poly=(pts,color)=>{g.fillStyle=color;g.strokeStyle='#6e6756';g.lineWidth=1.5;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();g.stroke();};
+    g.save();g.lineJoin='round';
+    // Each pier is a complete prism in world axes, so both wall orientations
+    // show the correct front face rather than an exposed rear face.
+    for(const side of [-1,1]){const [x,y]=P(side*5.1,0);g.save();g.translate(x,y);City.kit.prism(g,a.vertical?1.8:1.2,a.vertical?1.2:1.8,108,'#eee8d4','#d4ccb2','#a9a38c');g.restore();}
+    const point=(angle,outer,v)=>P(Math.cos(angle)*(outer?5.7:4.5),v,108+Math.sin(angle)*(outer?192:148));
+    // Finish each continuous surface before the next. Painting one complete
+    // wedge at a time let later roof faces slice triangles out of its neighbour.
+    for(const surface of ['inner','roof','front'])for(let i=0;i<13;i++){
+      const a0=Math.PI*i/13,a1=Math.PI*(i+1)/13;
+      if(surface==='inner')poly([point(a0,false,-.9),point(a1,false,-.9),point(a1,false,.9),point(a0,false,.9)],'#aaa18b');
+      if(surface==='roof')poly([point(a0,true,-.9),point(a1,true,-.9),point(a1,true,.9),point(a0,true,.9)],'#eee8d4');
+      if(surface==='front')poly([point(a0,true,.9),point(a1,true,.9),point(a1,false,.9),point(a0,false,.9)],i%2?'#e6dfc9':'#dcd3b9');
     }
-    // A broad vaulted opening has no painted wall or collider across its passage.
-    for(let i=0;i<11;i++){
-      const a0=Math.PI*i/11,a1=Math.PI*(i+1)/11;
-      const point=(angle,r,v)=>P(Math.cos(angle)*r,v,100+Math.sin(angle)*(r===5.6?200:156));
-      poly([point(a0,5.6,-.8),point(a1,5.6,-.8),point(a1,5.6,.8),point(a0,5.6,.8)],'#9d9179');
-      poly([point(a0,5.6,.8),point(a1,5.6,.8),point(a1,4.3,.8),point(a0,4.3,.8)],i%2?'#e3d9bd':'#cfc2a3');
-      poly([point(a0,4.3,-.8),point(a1,4.3,-.8),point(a1,4.3,.8),point(a0,4.3,.8)],'#857a65');
-    }
+    g.restore();
   }
   function gate(g,p,z,dest,w2s,t,still){
     window.ZoneJourney?.approach(g,p,z,dest,w2s,t,still);

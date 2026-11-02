@@ -662,3 +662,9 @@ others to rename before entering, preserving IDs and progress. See
 [unique names](docs/unique-character-names.md). Focused checks: Rust
 `halloween`, `unique_name`, `seasonal`; MCP `halloween_hunt`; bounded browser
 `tests/halloween-hunt-ui.cjs` and `tests/nightmare-art-ui.cjs`.
+
+Skaldholm wall archways (Beta 1.34.1): `scripts/compact_atlas.py` aligns the
+southern opening with Raven Row and clears its approach while preserving the
+outdoor crossing. `client/exitpaths.js` draws continuous stone surfaces in both
+wall orientations. Run the focused archway Rust check and bounded
+`tests/skaldholm-arches-ui.cjs`; see [city archways](docs/city-archways.md).

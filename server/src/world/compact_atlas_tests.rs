@@ -462,6 +462,12 @@ fn compact_atlas_city_archways_and_nacre_alcove_are_walkable() {
             PLAYER_RADIUS
         ));
     }
+    // The south opening follows Raven Row, not the off-centre atlas portal.
+    let south = arches.iter().find(|a| a["portal"] == "path_4_0").unwrap();
+    assert_eq!(south["x"].as_f64().unwrap(), 112.);
+    assert!(city.line_clear(at(112., 136.), at(112., 147.), 1.2));
+    assert!(city.line_clear(at(112., 147.), at(107.5, 154.5), 1.2));
+    assert!(!city.line_clear(at(104., 137.), at(104., 143.), PLAYER_RADIUS));
     let gate = w.maps[7]
         .portals
         .iter()

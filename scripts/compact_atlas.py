@@ -171,12 +171,29 @@ def sync_travel_links(zones):
 
 def city_archways(z):
     """Open genuine wall apertures at Skaldholm's current outdoor exits."""
+    previous={a['portal']:a for a in z.get('exitArches',[])}
+    for path in z.pop('archPaths',[]):
+        if path in z.get('paths',[]):z['paths'].remove(path)
+    z['archPaths']=[]
     z['exitArches']=[]
     for p in z['portals']:
         if not p.get('walk'): continue
         dx,dy=p['walk'];vertical=bool(dx)
         wall=(144 if dx>0 else 16) if vertical else (140 if dy>0 else 12)
         along=p['y'] if vertical else p['x']; half=4.5
+        if dy>0:
+            # Raven Row, rather than the atlas portal's off-street x coordinate.
+            streets=[(r['x0']+r['x1'])/2 for r in z['roads'] if r.get('t')==1 and
+                     'x0' in r and r['y1']-r['y0']>30 and r['x1']-r['x0']<10 and
+                     r['y1']>=z['city']['y1']]
+            along=min(streets,key=lambda x:abs(x-along))
+        old=previous.get(p['id'])
+        if old and abs((old['y'] if vertical else old['x'])-along)>.01:
+            # Repair the retired opening before cutting the new one. Fresh
+            # Skaldholm generators have intact ramparts and need no repair.
+            template=next(o for o in z['objects'] if o['kind']=='rampart' and abs((o['x'] if vertical else o['y'])-wall)<1)
+            patch=dict(template,x=old['x'],y=old['y'],width=1.8 if vertical else 9.,depth=9. if vertical else 1.8)
+            z['objects'].append(patch)
         out=[]
         for o in z['objects']:
             cross=o['x'] if vertical else o['y']; length=o.get('depth' if vertical else 'width',0)
@@ -187,7 +204,20 @@ def city_archways(z):
                 if hi-lo<=.05: continue
                 part=dict(o);part['y' if vertical else 'x']=(lo+hi)/2;part['depth' if vertical else 'width']=hi-lo;out.append(part)
         z['objects']=out
-        z['exitArches'].append(dict(x=wall if vertical else along,y=along if vertical else wall,vertical=vertical,name=p['name'],portal=p['id']))
+        arch=dict(x=wall if vertical else along,y=along if vertical else wall,vertical=vertical,name=p['name'],portal=p['id'])
+        if dy>0:
+            path=[[p['x'],p['y']],[along,147.],[along,136.]]
+            # Clear only foliage on the connector; houses, services and all
+            # other wall apertures keep their existing positions.
+            def in_approach(o):
+                for a,b in zip(path,path[1:]):
+                    dx,dy=b[0]-a[0],b[1]-a[1];t=max(0,min(1,((o['x']-a[0])*dx+(o['y']-a[1])*dy)/(dx*dx+dy*dy)))
+                    if math.hypot(o['x']-a[0]-dx*t,o['y']-a[1]-dy*t)<o.get('r',0)+2.5:return True
+                return False
+            z['objects']=[o for o in z['objects'] if o['kind'] not in ['tree','bush','rock','flowers'] or not in_approach(o)]
+            assert all(clear(z,a,b,1.2) for a,b in zip(path,path[1:])), 'South arch approach must stay clear'
+            z.setdefault('paths',[]).append(path);z['archPaths'].append(path);arch['approach']=path
+        z['exitArches'].append(arch)
 
 
 def nacre_alcove(z):
@@ -224,7 +254,8 @@ def exit_routes(z):
     for p in z['portals']:
         if not p.get('walk'):continue
         prev=connected(z,[q for q in z['portals'] if q is not p])
-        path=approach(z,prev,(p['x'],p['y']))
+        arch=next((a for a in z.get('exitArches',[]) if a['portal']==p['id'] and a.get('approach')),None)
+        path=arch['approach'] if arch else approach(z,prev,(p['x'],p['y']))
         short=[path[0]];length=0
         for point in path[1:]:
             a=short[-1];d=math.hypot(point[0]-a[0],point[1]-a[1])
@@ -259,7 +290,14 @@ def apply(world):
                 a,b=REGIONS[i]['seed'],REGIONS[j]['seed'];side=direction(a,b)
                 dx,dy=b[0]-a[0],b[1]-a[1]
                 preferred=max(.16,min(.84,.5+.3*(dy/abs(dx) if side[0] else dx/abs(dy))))
-            point,arrival=nacre_side_landing(z,prev,fixed) if (i,j)==(7,9) else endpoint(z,side,prev,fixed,preferred)
+            if (i,j)==(4,0):
+                # Align the wall opening/approach without moving the established
+                # outdoor crossing or the reciprocal safe arrival.
+                point,arrival=(107.5,154.5),(107.5,148.5)
+                assert all(int(q[1])*z['size']+int(q[0]) in prev for q in [point,arrival])
+                assert clear(z,point,arrival)
+            else:
+                point,arrival=nacre_side_landing(z,prev,fixed) if (i,j)==(7,9) else endpoint(z,side,prev,fixed,preferred)
             endpoints[i,j]=(point,arrival);sides[i,j]=side
             fixed.extend([dict(x=point[0],y=point[1]),dict(x=arrival[0],y=arrival[1])])
     for i,j in pairs:
