@@ -49,7 +49,54 @@
     g.save(); g.imageSmoothingEnabled = false; if (pose.mirrored) g.scale(-1, 1);
     g.drawImage(sheet, pose.step * w, pose.row * h, w, h, -ax * scale, -ay * scale, w * scale, h * scale); g.restore(); return true;
   }
-  window.NpcArt = { ready, draw, frame, top(n) { const who = assignment(n); return who && meta.tops?.[who.art] ? (meta.tops[who.art] * meta.scale + 3) * (n.look?.scale || 1) : null; },
+  // Costume sockets come from the exported frame, never the tallest held prop.
+  // Inspect each source frame once; tinting does not change its silhouette/material mask.
+  const heads = new Map();
+  let headCanvas = null;
+  function head(n, t, talk = false) {
+    const pose = frame(n, t, talk); if (!pose) return null;
+    const img = source(pose.key); if (!img) return null;
+    const key = `${pose.key}|${pose.row}|${pose.step}`;
+    if (!heads.has(key)) {
+      const [w, h] = meta.frame, [ax, ay] = meta.anchor;
+      headCanvas ||= document.createElement('canvas'); headCanvas.width = w; headCanvas.height = h;
+      const g = headCanvas.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, pose.step * w, pose.row * h, w, h, 0, 0, w, h);
+      const px = g.getImageData(0, 0, w, h).data, materials = meta.designs[pose.key].materials;
+      const skin = new Set(Object.entries(materials).filter(([k]) => k.startsWith('skin')).map(([, c]) => parseInt(c.slice(1), 16)));
+      const mask = new Uint8Array(w * h);
+      for (let y = 0; y < ay; y++) for (let x = Math.max(0, ax - 20); x < Math.min(w, ax + 21); x++) {
+        const i = (y * w + x) * 4;
+        if (px[i + 3] && skin.has((px[i] << 16) | (px[i + 1] << 8) | px[i + 2])) mask[y * w + x] = 1;
+      }
+      let face = [];
+      for (let i = 0; i < mask.length; i++) if (mask[i]) {
+        const component = [i]; mask[i] = 0;
+        for (let j = 0; j < component.length; j++) {
+          const at = component[j], x = at % w;
+          for (const k of [x ? at - 1 : -1, x + 1 < w ? at + 1 : -1, at - w, at + w]) if (k >= 0 && k < mask.length && mask[k]) { mask[k] = 0; component.push(k); }
+        }
+        if (component.length > face.length) face = component;
+      }
+      if (face.length < 12) { heads.set(key, null); }
+      else {
+        const xs = face.map(i => i % w), ys = face.map(i => Math.floor(i / w));
+        const left = Math.min(...xs), right = Math.max(...xs), cx = (left + right) / 2;
+        const half = Math.max(5, (right - left) * .3); let crown = Math.min(...ys);
+        // Follow the connected cap/hair above the face; ignore detached overhead props.
+        for (let y = crown - 1; y >= 0; y--) {
+          let visible = false;
+          for (let x = Math.ceil(cx - half); x <= Math.floor(cx + half); x++) if (px[(y * w + x) * 4 + 3]) { visible = true; break; }
+          if (!visible) break; crown = y;
+        }
+        heads.set(key, { x: cx - ax, y: crown + 1 - ay, width: Math.max(10, (right - left + 1) / 2 + 1), collar: Math.max(...ys) + 2 - ay });
+      }
+    }
+    const socket = heads.get(key); if (!socket) return null;
+    const scale = meta.scale * (n.look?.scale || 1);
+    return { x: socket.x * scale * (pose.mirrored ? -1 : 1), y: socket.y * scale, width: socket.width * scale, collar: socket.collar * scale };
+  }
+  window.NpcArt = { ready, draw, frame, head, top(n) { const who = assignment(n); return who && meta.tops?.[who.art] ? (meta.tops[who.art] * meta.scale + 3) * (n.look?.scale || 1) : null; },
     readyFor(npcs) { return !!meta && npcs.every(n => { const who = assignment(n); return !who || !!source(who.art); }); },
     get manifest() { return meta; }, get cacheSize() { return tinted.size; }, get cacheLimit() { return cacheLimit(); } };
 })();

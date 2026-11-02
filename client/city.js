@@ -248,7 +248,7 @@
   const kit={iso,poly,line,ellipse,prism,text};
   function drawObject(g,o,sx,sy,fade=1) {
     const def=art[o.kind], live=o.sign==='live'&&!!o.label;
-    const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0);let sprite=cache.get(key);
+    const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0)+'|'+(def?.wallMounted&&o.z>0?1:0);let sprite=cache.get(key);
     const [bw,bh,ox,oy]=def?.box||spriteBox(o);
     if(!sprite){const c=document.createElement('canvas');c.width=bw*2;c.height=bh*2;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(ox,oy);if(def)def.draw(cg,o,kit);else objectArt(cg,o,live);sprite=c;cache.set(key,c);}
     g.save();g.globalAlpha=fade;g.drawImage(sprite,sx-ox,sy-oy,bw,bh);
@@ -293,7 +293,7 @@
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
   const baseHeadTop=n=>window.NpcArt?.top(n) || (n.art==='stone'?330:n.art==='scenery'?90:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101);
-  const headTop=n=>baseHeadTop(n)+(window.Seasonal?.hat(n)?28:0);
+  const headTop=n=>window.Seasonal?.headTop?.(n,baseHeadTop(n))??baseHeadTop(n);
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
     g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
@@ -416,7 +416,7 @@
     if(n.id==='baker'){ellipse(g,-9,-103,10,9,'#f6ecd2');ellipse(g,8,-103,12,10,'#f6ecd2');g.fillStyle='#f6ecd2';g.fillRect(-17,-103,34,12);}
     }
     g.restore();
-    window.Seasonal?.drawNpc(g,n,t,baseHeadTop(n));
+    window.Seasonal?.drawNpc(g,n,t,baseHeadTop(n),current?.id===n.id);
     if(portrait){g.restore();return;}
     // Everyone with work or wares always shows a nameplate; a passer-by in the city shows one only when you are close.
     const hero=window.Field?.hero,close=!hero||Math.hypot(hero.x-n.x,hero.y-n.y)<9;

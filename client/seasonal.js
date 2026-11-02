@@ -67,9 +67,10 @@
     questState(q){if(!q.season)return null;const event=events.find(e=>e.id===q.season);return !event?'inactive':claims[q.id]===(q.seasonCadence==='daily'?event.day:event.year)?'completed':'open';},
     decor(zone){return ![0,4,9,17].includes(zone)?[]:halloween()?areas[zone]?.seasonDecor||[]:christmas()?areas[zone]?.christmasDecor||[]:[];},
     hat(n){return eligible(n)&&hosts.has(n.id);},
-    drawNpc(g,n,t,top){
+    headTop(n,base){return eligible(n)&&christmas()?Math.max(base,window.Christmas?.headTop?.(n)||base):base+(this.hat(n)?28:0);},
+    drawNpc(g,n,t,top,talk=false){
       if(!eligible(n))return;
-      if(christmas()){window.Christmas?.drawNpc(g,n,t,top);return;}
+      if(christmas()){window.Christmas?.drawNpc(g,n,t,top,talk);return;}
       const scale=n.look?.scale||1,pose=window.NpcArt?.frame(n,t),bob=pose?.clip==='walk'?Math.abs(Math.sin(pose.step*Math.PI/4))*1.4:0;
       g.save();g.lineJoin='round';const y=-top*.58;
       g.fillStyle='#3a244a';g.strokeStyle='#1f1b32';g.lineWidth=2;

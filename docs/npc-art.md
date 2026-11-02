@@ -27,3 +27,19 @@ The 21 entrance repair smiths reuse the general smith artwork, bringing the
 identity inventory to 319 without adding saved designs. After adding identities,
 run `npc_art_catalog.py`, then `make_npc_sprites.py assign` to refresh assignments
 while preserving every saved frame, id and measured bound.
+
+## Seasonal head attachments (Beta 1.35.1)
+
+Nameplate bounds include occupational props and must never position a costume.
+`NpcArt.head(n,t,talk)` reads the real exported frame, finds the principal skin
+component near the head, then follows its connected central hair/headwear upward.
+It returns the head centre, crown, width and collar, applying the actual sprite
+scale, individual NPC scale and mirrored walking pose. Each design/clip/frame
+is scanned once and cached; existing saved art and PixelFlow IDs stay untouched.
+Christmas hats/scarves use these sockets, and names clear the resulting hat.
+Idle, walk and talk must use the same pose on the body and its accessory.
+
+Focused bounded check: `tests/christmas-attachments-ui.cjs`, real NPC exports,
+103 NPCs / 2,884 poses, plus pixel contact checks and per-city contact sheets.
+The former nameplate-based brim is detached in 108 sampled poses, so the check
+exercises the reported failure rather than merely confirming accessory pixels.

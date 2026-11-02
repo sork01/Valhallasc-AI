@@ -91,3 +91,23 @@ Receipt: `test-results/christmas-release-20261102T184323Z.json`.
 Christmas activates automatically on December 15 and retires at December 29
 midnight (Stockholm). Today’s Halloween remains active through November 9;
 permanent Hallowed/Merry rewards and the 160% mount speed are installed now.
+
+## Attachment correction — Beta 1.35.1
+
+Owner reported floating NPC hats and incorrectly oriented house ornaments.
+The former crown height used `NpcArt.top`, the full silhouette including flags,
+lanterns, staffs and other props. Christmas now uses a cached, frame-specific
+head socket derived from the actual exported skin/headwear pixels. It follows
+individual scale and mirrored walking/talking poses; scarves attach below the
+face, and nameplates clear the hat. No art or gameplay data was regenerated.
+
+Elevated wreaths/garlands now use the +Y house-front wall projection (1:2 slope),
+with separate cache variants for mounted/free-standing drawings. Ground props
+stay upright. Authoritative world geometry, quests and calendar remain intact.
+
+Bounded `tests/christmas-attachments-ui.cjs`: **14 checks**, **103 NPCs / 2,884
+poses**, actual brim/body pixel contact, idle/talk/both walking directions, all
+four cities, wall foliage slope and warmed cache separation. The old placement
+floats in **108** sampled poses. Contact sheets and in-game views inspected; no
+browser errors. Artifact `test-results/driver-nf21rF`. Focused client-only fix;
+no server restart, database work or encounter tests needed.

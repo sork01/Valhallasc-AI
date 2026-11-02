@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.35.1",
+    "date": "2026-11-02",
+    "new": [],
+    "changed": [
+      "Christmas hats stay attached to NPC heads during movement and conversation. House wreaths and garlands follow the angle of their wall."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.35.0",
     "date": "2026-11-02",
     "new": [

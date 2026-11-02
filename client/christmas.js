@@ -2,6 +2,7 @@
 // Native festive scenery; encounter availability and rewards come from the server.
 (() => {
  const {ellipse,line,prism,poly}=City.kit;
+ // House-front placements are on the +Y façade: horizontal trim projects at slope +1/2.
  const star=(g,x,y,r)=>{const p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,k=i%2?r*.45:r;p.push([x+Math.cos(a)*k,y+Math.sin(a)*k]);}poly(g,p,'#ffe49a','#856334',2);};
  City.art.christmasTree={box:[220,320,110,280],occludes:true,draw(g,o){
   ellipse(g,0,3,76,22,'#203e3844');prism(g,.55,.55,38,'#b78858','#886043','#634737');
@@ -20,15 +21,17 @@
  City.art.christmasGifts={box:[145,120,72,98],draw(g){
   for(const [x,y,h,color]of[[-23,-8,29,'#be4352'],[20,4,38,'#389674'],[-8,17,23,'#d0a34f']]){g.save();g.translate(x,y);prism(g,.72,.65,h,color,color,'#79536a');line(g,[[0,0],[0,-h]],'#ffe4a0',5);line(g,[[-12,-h+1],[0,-h-7],[12,-h+1]],'#fbe4b6',3);g.restore();}
  }};
- City.art.christmasWreath={box:[110,120,55,80],draw(g,o){
+ City.art.christmasWreath={box:[110,120,55,80],wallMounted:true,draw(g,o){
+  g.save();if(o.z>0)g.transform(Math.sqrt(.8),Math.sqrt(.2),0,1,0,0);
   g.strokeStyle='#244d3c';g.lineWidth=16;g.beginPath();g.ellipse(0,-12,27,28,0,0,Math.PI*2);g.stroke();
   for(let i=0;i<14;i++){const a=i*Math.PI/7;ellipse(g,Math.cos(a)*27,-12+Math.sin(a)*28,8,6,i%2?'#42815a':'#619d69');if(i%3===0)ellipse(g,Math.cos(a)*26,-12+Math.sin(a)*27,4,4,'#e85555');}
-  poly(g,[[-2,12],[-20,5],[-17,25],[0,18],[17,25],[20,5]],'#d84f58','#72374b',2);ellipse(g,0,16,6,6,'#f1d88e');
+  poly(g,[[-2,12],[-20,5],[-17,25],[0,18],[17,25],[20,5]],'#d84f58','#72374b',2);ellipse(g,0,16,6,6,'#f1d88e');g.restore();
  }};
- City.art.christmasGarland={box:[166,115,83,80],draw(g,o){
+ City.art.christmasGarland={box:[166,115,83,80],wallMounted:true,draw(g,o){
+  g.save();if(o.z>0)g.transform(Math.sqrt(.8),Math.sqrt(.2),0,1,0,0);
   line(g,[[-67,-22],[-35,-9],[0,-4],[35,-9],[67,-22]],'#2e6247',14);
   for(let i=0;i<15;i++){const x=-65+i*9.3,y=-22+18*(1-(x/70)**2);line(g,[[x-7,y-6],[x,y+3],[x+6,y-4]],i%2?'#518e60':'#75a371',4);if(i%3===0)ellipse(g,x,y+5,4,5,o.color||'#d95352');}
-  poly(g,[[-2,-4],[-18,-15],[-16,7],[0,0],[16,7],[18,-15]],'#dd535d','#793b49',2);
+  poly(g,[[-2,-4],[-18,-15],[-16,7],[0,0],[16,7],[18,-15]],'#dd535d','#793b49',2);g.restore();
  }};
  City.art.christmasLights={box:[200,175,100,150],draw(g,o){
   for(const x of [-72,72]){line(g,[[x,0],[x,-133]],'#426454',7);star(g,x,-135,8);}
@@ -58,8 +61,12 @@
    const lines=[state.active?`The Grinch · Level ${state.level}`:'Five fighters · highest party level',rolls.christmas_hunt===day?'Daily mount roll used · resets at Stockholm midnight':'Daily Red-nosed Reindeer chance: 5% per hero'];
    for(const[i,t]of lines.entries()){const text=window.Locale?.translate(t)||t;g.strokeText(text,x,y+i*25);g.fillText(text,x,y+i*25);}g.restore();
   },
-  drawNpc(g,n,t,top){const scale=n.look?.scale||1,pose=window.NpcArt?.frame(n,t),bob=pose?.clip==='walk'?Math.abs(Math.sin(pose.step*Math.PI/4))*1.4:0;g.save();
-   const hy=-top+7-bob,y=-top*.58;line(g,[[-11*scale,y],[12*scale,y],[8*scale,y+22*scale]],'#cc4c58',7*scale);ellipse(g,0,y,4*scale,4*scale,'#edcf87');
+  head(n,t,talk=false){return window.NpcArt?.head?.(n,t,talk)||{x:0,y:-98*(n.look?.scale||1),width:17*(n.look?.scale||1),collar:-58*(n.look?.scale||1)};},
+  headTop(n,t=0){const head=this.head(n,t);return -head.y+31*head.width/17;},
+  drawNpc(g,n,t,top,talk=false){
+   const head=this.head(n,t,talk),scale=head.width/17;g.save();g.translate(head.x,0);
+   line(g,[[-11*scale,head.collar],[12*scale,head.collar],[8*scale,head.collar+22*scale]],'#cc4c58',7*scale);ellipse(g,0,head.collar,4*scale,4*scale,'#edcf87');
+   const hy=head.y;
    poly(g,[[-17*scale,hy],[-12*scale,hy-29*scale],[8*scale,hy-23*scale],[19*scale,hy-10*scale],[5*scale,hy-17*scale],[16*scale,hy]],'#d85761','#783c4b',1.5);line(g,[[-17*scale,hy],[16*scale,hy]],'#f1f1da',7*scale);ellipse(g,19*scale,hy-10*scale,5*scale,5*scale,'#faf2d8');g.restore();
   }
  };
