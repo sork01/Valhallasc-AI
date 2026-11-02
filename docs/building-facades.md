@@ -31,3 +31,14 @@ with one reused canvas cropped to each path's bounds, keeping the 1536 MiB cap.
 This is a client-only native artwork correction. No map, collision, gate,
 interaction, save, PixelFlow sprite or server changes are required. JavaScript
 syntax, Swedish freshness and release-note checks accompany publication.
+
+
+Deployed client **Beta 1.35.2**, main source `0a627d5` (private `433b861`).
+All six public client hashes and public/bridge health pass; the existing server
+remains Beta 1.35.0/PID 1089769, with no restart or database writes. Receipt:
+`test-results/building-openings-release-20261102T191209Z.json`.
+
+The four existing city pictures and the wall-detail picture in FileDrop were
+refreshed, and `valhallasc-building-openings-fixed.png` shows the corrected
+building styles. All six uploads have matching SHA-256. Native captures:
+`test-results/driver-B1OIB3`; building gallery: `test-results/driver-f9T55I`.
