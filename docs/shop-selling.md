@@ -195,3 +195,31 @@ preservation. Proof: `test-results/touch/merchant-junk-index.log`,
 `merchant-junk-mutation.log` and `merchant-notice-mutation-{1,clear}.log`.
 
 Focused follow-up validation: `bash scripts/test-touch-bounded.sh tests/client-followups-ui.cjs` checks Buy on potion, bag, crystal and mount vendors, complete paginated stock, actual potion/mount purchases, service access and no individual stock buttons on the greeting.
+
+## Quest leftovers (owner decision, 2026-11-02; Beta 1.32.8)
+
+The merchant has a **Quest leftovers** tab. It lists material stacks associated
+with a completed or abandoned bring quest, provided no active quest still needs
+that material. Each stack requires a confirmation naming it and its quantity;
+Cancel receives initial focus. Discard pays no gold, creates no buyback row and
+permanently removes only that stack. Ordinary sales remain available for eligible
+priced materials. **Sell all junk** uses only the server's sale list and does
+not include protected active quest materials.
+
+The server excludes every material required by an unclaimed bring quest from
+both sale and discard, even if the objective's counts are already complete.
+The same protection applies to legacy sales. Zero-sale quest materials, Hour
+Shards, Ember Shards/Key, key-named materials and items required by authored
+service offers remain protected regardless of completion history. Materials
+with no finished/abandoned quest evidence cannot be discarded through this tab.
+The current zero-sale materials are all progression keys, so public ordinary
+bring materials are the eligible leftovers in the current catalog.
+
+`discard_quest_item {npc,item,quantity}` uses the merchant's existing range,
+health, travel, cooldown, staged-character and transactional-save checks. The
+server revalidates the quantity, evidence and active quests at confirmation;
+failed or stale requests remove nothing. `shop` replies expose `discardable`
+separately from sellable `available`. Older servers omit the tab automatically.
+Focused Rust check: `owner_fixes_quest_leftovers_discard_and_active_sale_protection`.
+The bounded owner-fixes browser check covers refusal while active, abandonment,
+confirmation and stack removal, with no quest grind.

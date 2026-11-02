@@ -102,6 +102,8 @@ mod nacre_tests;
 #[cfg(test)]
 mod nornroot_tests;
 #[cfg(test)]
+mod owner_fixes_tests;
+#[cfg(test)]
 mod pack_recovery_tests;
 mod packs;
 mod partyxp;
@@ -2436,6 +2438,11 @@ impl World {
             ClientMessage::SellBatch { npc, items } => {
                 self.shop(session, &npc, shop::Request::Sell(items))
             }
+            ClientMessage::DiscardQuestItem {
+                npc,
+                item,
+                quantity,
+            } => self.shop(session, &npc, shop::Request::Discard(item, quantity)),
             ClientMessage::BuyBack { npc, id } => {
                 self.shop(session, &npc, shop::Request::BuyBack(id))
             }
@@ -2683,10 +2690,13 @@ impl World {
                     if let Some((action, id)) = action.split_once(':')
                         && let (quest_id, choice) =
                             id.split_once(':').map_or((id, None), |(q, c)| (q, Some(c)))
-                        && let Some(quest) = map
-                            .quests
-                            .iter()
-                            .find(|q| q.id == quest_id && q.npc == npc_id)
+                        && let Some(quest) = self.maps.iter().flat_map(|m| &m.quests).find(|q| {
+                            q.id == quest_id
+                                && (q.npc == npc_id
+                                    || (action == "claim"
+                                        && q.gauntlet_level().is_some()
+                                        && npc.offers.iter().any(|o| o.id == "gauntlet")))
+                        })
                     {
                         // One arena trial per level, whichever giver offers it.
                         let taken_elsewhere = action == "accept"
@@ -2709,7 +2719,13 @@ impl World {
                     if !npc.buys {
                         notice = "This townsperson does not buy items.".into();
                     } else {
-                        match shop::legacy_sell(&mut p.character, &mut p.shop, npc_id, sale) {
+                        match shop::legacy_sell(
+                            &mut p.character,
+                            &mut p.shop,
+                            npc_id,
+                            sale,
+                            &self.maps,
+                        ) {
                             Ok(value) => {
                                 quest_changed = true;
                                 notice = format!("Items sold for {value} gold.");
@@ -3312,12 +3328,24 @@ impl World {
                     p.moving
                         && direction.x * f64::from(side[0]) + direction.y * f64::from(side[1]) > 0.
                 });
-                walking_out
-                    && (!portal.after_clear || cleared)
-                    && here.distance(Point {
-                        x: portal.x,
-                        y: portal.y,
-                    }) < portal.r
+                let centre = Point {
+                    x: portal.x,
+                    y: portal.y,
+                };
+                let distance = here.distance(centre);
+                // Keep authored arrival discs intact. The wider approach is intentional
+                // movement toward a visible opening, never a passive arrival trigger.
+                let toward = here.direction(centre);
+                let direction = if p.input.x != 0. || p.input.y != 0. {
+                    p.input
+                } else {
+                    p.goal.map_or(p.face, |goal| here.direction(goal))
+                };
+                let approach = p.moving
+                    && distance < portal.r.max(2.8)
+                    && direction.x * toward.x + direction.y * toward.y > 0.25
+                    && self.maps[p.character.zone].line_clear(here, centre, PLAYER_RADIUS);
+                walking_out && (!portal.after_clear || cleared) && (distance < portal.r || approach)
             })
             .cloned()
         else {
@@ -5292,6 +5320,12 @@ impl World {
             };
             let distance = point.distance(at);
             if distance < 3. {
+                // Refused loot must stay at its world position, before the magnet
+                // can attach it to a fighter's feet. Recheck room without taking a turn.
+                if !self.drop_has_room(i, session) {
+                    self.refused_drop_notice(i, session);
+                    continue;
+                }
                 let dir = point.direction(at);
                 let travel = (9. * TICK).min(distance);
                 let d = &mut self.drops[i];

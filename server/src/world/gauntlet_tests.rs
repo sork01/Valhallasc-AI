@@ -8,6 +8,66 @@ use super::*;
 const SKALD: usize = 4;
 const NACRE: usize = 9;
 
+#[test]
+fn owner_fixes_arena_entry_and_reward_at_another_giver() {
+    let mut w = world();
+    let mut rx = hero(&mut w, 1, Class::Warrior, 20, SKALD, "city_steward");
+    offer(&mut w, 1, "city_steward", "quest:accept:arena_skald_20");
+    let n = w.maps[NACRE]
+        .npcs
+        .iter()
+        .find(|n| n.id == "nacre_archivist")
+        .unwrap()
+        .clone();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    (c.zone, c.x, c.y) = (NACRE, n.x, n.y);
+    offer(&mut w, 1, &n.id, "quest:accept:arena_nacre_20");
+    assert!(counts(&w, 1, "arena_nacre_20").is_empty());
+    offer(&mut w, 1, &n.id, "gauntlet");
+    assert_eq!(w.gauntlets.len(), 1);
+    assert_eq!(w.gauntlets[0].quest, "arena_skald_20");
+    assert_eq!(w.gauntlets[0].returns, (NACRE, n.x, n.y));
+    w.gauntlet_abort(1, "Test exit.");
+    assert_eq!(w.players[&1].character.zone, NACRE);
+    w.players
+        .get_mut(&1)
+        .unwrap()
+        .character
+        .quests
+        .iter_mut()
+        .find(|g| g.id == "arena_skald_20")
+        .unwrap()
+        .counts = vec![5];
+    let before = w.players[&1]
+        .character
+        .quantity("warrior_weapon_sword_l20_blue");
+    offer(
+        &mut w,
+        1,
+        &n.id,
+        "quest:claim:arena_skald_20:warrior_weapon_sword_l20_blue",
+    );
+    assert_eq!(
+        w.players[&1]
+            .character
+            .quantity("warrior_weapon_sword_l20_blue"),
+        before + 1
+    );
+    offer(
+        &mut w,
+        1,
+        &n.id,
+        "quest:claim:arena_skald_20:warrior_weapon_sword_l20_blue",
+    );
+    assert_eq!(
+        w.players[&1]
+            .character
+            .quantity("warrior_weapon_sword_l20_blue"),
+        before + 1
+    );
+    drain(&mut rx);
+}
+
 /// A level-`level` hero standing at `npc` in `zone`, in plain green gear.
 fn hero(
     w: &mut World,

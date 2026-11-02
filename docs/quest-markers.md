@@ -4,7 +4,7 @@ Beta 1.16.0 adds quest guidance to the minimap and the detailed zone view of the
 
 Every NPC whose gossip offers an available quest gets a gold `!`. A ready quest gets a blue `?`, taking priority when that giver also offers another quest. Repeatable quests use the same colors. Active, completed, locked and upcoming quests do not produce giver markers. This uses the existing journal `status()` rules, including prerequisites and minimum level.
 
-Choose **Track quest** in the journal or beside a quest in the tracker to add green outline diamonds at its unfinished destinations. The tracker button toggles tracking without opening the journal; its pressed state and a green border identify the selected quest. Clicking a tracker title still selects that quest and opens its journal entry. Talk and escort objectives use NPC positions; visit and hold objectives use their places; chime objectives mark their bells. A hunt marks an actual matching spawn near the center of that enemy's authored area, including ordinary-slime aliases. A hub quest naming enemies in an adjacent dungeon marks those enemies inside that dungeon. Reach objectives mark the relevant gate and destination spawn. Bring and Arena quests point to their giver. Finishing all objectives replaces the tracked destinations with the hand-in NPC; claiming the reward removes them. Completed individual objectives disappear as progress arrives. Material quests do not expose hidden Firelord crosses.
+Choose **Track quest** in the journal or beside a quest in the tracker to add green outline diamonds at its unfinished destinations. The tracker button toggles tracking without opening the journal; its pressed state and a green border identify the selected quest. Clicking a tracker title still selects that quest and opens its journal entry. Talk and escort objectives use NPC positions; visit and hold objectives use their places; chime objectives mark their bells. A hunt marks an actual matching spawn near the center of that enemy's authored area, including ordinary-slime aliases. A hub quest naming enemies in an adjacent dungeon marks those enemies inside that dungeon. Reach objectives mark the relevant gate and destination spawn. Bring objectives mark public material sources until finished; secret/gate materials retain giver guidance. Arena quests can use any of the five arena givers. Finishing all objectives replaces tracked destinations with the hand-in NPC (any arena giver for an arena trial); claiming the reward removes them. Completed individual objectives disappear as progress arrives. Material quests do not expose hidden Firelord crosses.
 
 Beta 1.32.2 (same version at the owner's request) adds **Arrow** in Settings. It starts off and saves its choice in `Prefs.questArrow`. With a quest selected, a green pointer ahead of the character faces the nearest unfinished destination using the field's isometric projection. In another zone it points to the nearest exit among routes with the fewest zone crossings. Sealed templates and uncleared completion exits are excluded. At the destination, while dead or during Spark Travel, the pointer is hidden. It reuses quest-marker coordinates and does not move the character. `Quests.navigationTarget` caches route candidates until quest progress, level, tracking, zone or instance-clear state changes; each frame only selects the nearest cached candidate.
 
@@ -38,3 +38,35 @@ All 40 real-sprite browser checks pass in private world `driver-sxKZkn`; `MUTATE
 Beta 1.32.2: 16 English desktop checks pass against privately routed candidates (`driver-xs97vp`), and 15 Swedish short-screen touch checks pass against the installed files (`driver-xRE0k3`). The latter verifies the translated control/help, physical 44 px tracking target, actual arrow pixels/orientation, saved choice and no browser errors. Remote routing and quest lifecycle transitions run on desktop. Disabling the arrow draw through a private route fails the visible-arrow assertion. Screenshots are in those private driver directories. Chrome requires a loopback-network permission for a fulfilled candidate HTML document; the candidate test grants it only to its private origin.
 
 JavaScript syntax, whitespace, release notes, Swedish generation freshness and 23 Locale checks pass. The broader Swedish catalog guard still flags three existing NPC names containing English words; those exact entries also fail at HEAD and are unchanged by this work. All eight changed public client files match local SHA-256 hashes; public and bridge health report OK. Client-only installation, no restart or database change; version held at the owner's request.
+
+## Gathering and hand-in follow-up (Beta 1.32.8)
+
+An unfinished bring objective now points to public authored spawns whose ordinary
+material drop matches its target, or a vendor that sells the material. A finished
+objective loses its gather markers immediately. Once every objective is finished,
+all guidance switches to the hand-in NPC; the Arrow chooses a local source first,
+then the closest route in zone crossings. The tracker replaces the counters with
+“Complete · Ready to turn in” and a named hand-in destination. The folded journal
+summary exposes the same state, before expanding the quest. Guidance still uses
+the existing progress-invalidated caches; it never pathfinds each animation frame.
+
+`scripts/quest_sources.py`, called by `scripts/sync-world.cjs`, exports
+`client/quest-sources.js` from the Rust material table, enemy catalogs and map
+spawns/offers. The current audit covers all 63 bring materials: 49 have public
+sources. The ten Ember Shards and four Hour Shards intentionally retain giver
+markers, preserving secret-cross and gate-key rules. Ambushes, mechanic helpers
+and hidden Firelord sources are excluded. Each enemy kind/zone is anchored to a
+real spawn nearest its spawn group's centre. No materials lack an identified
+public source apart from those 14 intentional secret/gate materials.
+
+Arena entry and reward claims work at any of the five givers. Active arena
+objectives and ready arena quests mark those givers; the original giver remains
+named in the quest details. All offer lists and giver markers hide a trial level
+already taken at another giver. Other quests retain their original hand-in NPC.
+
+Focused browser proof: `tests/owner-fixes-ui.cjs`; `MUTATE=ready` removes the ready
+hand-in markers and must fail. It checks the real city_gel material transition,
+cross-zone guidance, folded ready state, final-count presentation for kill, talk,
+bring, escort, visit, hold, chime, memory and echo, and arena entry/return/reward at
+a different giver. It uses private worlds and presentation fixtures, without
+farming monsters or running fights.

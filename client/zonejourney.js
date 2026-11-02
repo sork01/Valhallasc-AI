@@ -91,88 +91,61 @@
     }
     g.restore();
   }
-  // Authored route coordinates and collision stay intact; show the height change at the approach.
+  // Wind and water passages stay anchored to the crossing, without raised fake floor.
   function approach(g, p, from, to, project, t, still) {
     const trip = route(from, to); if (!trip || trip.up === null) return false;
-    const [dx, dy] = p.walk, [sx, sy] = project(p.x, p.y), up = trip.up;
-    const skyStone = trip.kind === 'sky', steps = 8, run = .7, rise = 26, width = 1.05;
-    const ax = dx * (up ? 1 : -1), ay = dy * (up ? 1 : -1);
-    // Turn the flight at its foot landing when necessary, keeping its risers
-    // facing the camera rather than hiding them behind the tall end wall.
-    const ux = ax + ay > 0 ? -ay : ax, uy = ax + ay > 0 ? -ax : ay, vx = -uy, vy = ux;
-    // All surfaces share actual isometric corners. The 208 px climb is taller
-    // than the ground-plane projection, so the upper end visibly rises.
-    const point = (u, v, z) => {
-      const ox = -dx * 1.6 - (up ? 0 : ux * steps * run), oy = -dy * 1.6 - (up ? 0 : uy * steps * run);
-      const [x,y] = project(p.x + ox + ux * u + vx * v, p.y + oy + uy * u + vy * v);
-      return [x, y - z];
-    };
-    const face = (points, color, stroke = true) => {
-      g.beginPath(); points.forEach(([x,y],i) => i ? g.lineTo(x,y) : g.moveTo(x,y)); g.closePath();
-      g.fillStyle = color; g.fill(); if (stroke) g.stroke();
-    };
-    const rail = (side) => {
-      const low = point(0,side * width, rise + 40), high = point(steps * run,side * width,steps * rise + 40);
-      g.lineCap = 'round';
-      for (let i = 0; i <= steps; i += 2) {
-        const z = Math.max(1,i) * rise, railZ = rise + 40 + (steps-1) * rise * i / steps;
-        const a = point(i*run,side*width,z), b = point(i*run,side*width,railZ);
-        g.strokeStyle = '#30364d'; g.lineWidth = 7; g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke();
-        g.strokeStyle = skyStone ? '#e4c678' : '#85d3d6'; g.lineWidth = 4; g.stroke();
-        g.fillStyle = skyStone ? '#fff1b5' : '#c4ffff'; g.beginPath(); g.arc(b[0],b[1],4.5,0,Math.PI*2); g.fill();
+    const [sx, sy] = project(p.x, p.y), up = trip.up, water = trip.kind === 'sea' || sea(from);
+    const time = still ? 0 : t, height = 200;
+    g.save(); g.translate(sx, sy); g.lineCap = 'round'; g.lineJoin = 'round';
+    // A grounded ring marks the actual server crossing in both directions.
+    g.fillStyle = water ? 'rgba(2,28,48,.78)' : 'rgba(22,35,65,.65)';
+    g.beginPath(); g.ellipse(0, 0, 72, 33, 0, 0, Math.PI*2); g.fill();
+    g.strokeStyle = water ? '#93e7ef' : '#d0eaff'; g.lineWidth = 3;
+    g.beginPath(); g.ellipse(0, 0, 72, 33, 0, 0, Math.PI*2); g.stroke();
+    if (up) {
+      // Only the LOWER end has a tall rising column.
+      const glow = g.createLinearGradient(0, 0, 0, -height);
+      glow.addColorStop(0, water ? 'rgba(68,202,222,.27)' : 'rgba(177,224,255,.24)');
+      glow.addColorStop(1, 'rgba(177,224,255,0)');
+      g.fillStyle = glow; g.beginPath(); g.moveTo(-58,0); g.lineTo(-80,-height); g.lineTo(80,-height); g.lineTo(58,0); g.closePath(); g.fill();
+      for (let i = 0; i < 15; i++) {
+        const f = (time*.32 + i/15)%1, y = -f*height, r = 40 + f*27, angle = time*2 + i*1.6;
+        g.strokeStyle = water ? 'rgba(181,250,255,.7)' : 'rgba(233,248,255,.8)'; g.lineWidth = 2 + i%2;
+        g.beginPath(); g.ellipse(0,y,r,r*.35,0,angle,angle+1.6); g.stroke();
+        if (water) { g.beginPath(); g.arc(Math.sin(angle)*r,y,3+i%3,0,Math.PI*2); g.stroke(); }
       }
-      g.strokeStyle = '#30364d'; g.lineWidth = 9; g.beginPath(); g.moveTo(...low); g.lineTo(...high); g.stroke();
-      g.strokeStyle = skyStone ? '#e4c678' : '#85d3d6'; g.lineWidth = 5; g.stroke();
-      g.strokeStyle = skyStone ? '#fff0b4' : '#d2ffff'; g.lineWidth = 1.5; g.stroke();
-    };
-    g.save(); g.lineJoin = 'round'; g.lineWidth = 1.8; g.strokeStyle = '#30364d';
-    face([point(-.65,-width,0),point(-.65,width,0),point(0,width,0),point(0,-width,0)], skyStone ? '#cbd8ef' : '#80bec8');
-    // Solid stepped side walls carry the entire flight down to its foundation.
-    const nearSide = vx + vy > 0 ? 1 : -1;
-    rail(-nearSide);
-    g.strokeStyle = '#30364d'; g.lineWidth = 1.8;
-    for (const side of [-nearSide, nearSide]) {
-      const profile = [point(0,side*width,0)];
-      for (let i = 0; i < steps; i++) profile.push(point(i*run,side*width,(i+1)*rise),point((i+1)*run,side*width,(i+1)*rise));
-      profile.push(point(steps*run,side*width,0));
-      face(profile, skyStone ? (side === nearSide ? '#75829f' : '#96a3c0') : (side === nearSide ? '#286977' : '#408b96'));
-      // Masonry joints make the side read as a load-bearing wall.
-      g.strokeStyle = skyStone ? '#aab6ce' : '#69a4ab'; g.lineWidth = 1;
-      for (let i = 2; i < steps; i += 2) {
-        const a = point(i*run,side*width,0), b = point(i*run,side*width,i*rise);
-        g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke();
-      }
-      g.strokeStyle = '#30364d'; g.lineWidth = 1.8;
-    }
-    // Paint the farther blocks first for all four map directions.
-    const order = Array.from({length:steps},(_,i)=>i);
-    if (ux + uy > 0) order.reverse();
-    for (const i of order) {
-      const u = i*run, h = (i+1)*rise;
-      face([point(u,-width,h-rise),point(u,width,h-rise),point(u,width,h),point(u,-width,h)], skyStone ? '#a1adc6' : '#4f9ba5');
-      face([point(u,-width,h),point(u,width,h),point(u+run,width,h),point(u+run,-width,h)], skyStone ? (i%2 ? '#edf2ff' : '#dae5fa') : (i%2 ? '#b6eaeb' : '#8fcdd4'));
-      const a = point(u,-width,h), b = point(u,width,h);
-      g.strokeStyle = skyStone ? '#ffffff' : '#e3ffff'; g.lineWidth = 2.5;
-      g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke();
-      g.strokeStyle = '#30364d'; g.lineWidth = 1.8;
-    }
-    rail(nearSide);
-    const upper = point(steps*run,0,steps*rise), lower = point(0,0,0);
-    const labelX = (upper[0] + lower[0]) / 2, labelY = Math.min(upper[1], lower[1]) - 92;
-    g.font = '22px "Jua",sans-serif'; g.textAlign = 'center'; g.lineWidth = 5;
-    g.strokeStyle = '#102d46'; g.fillStyle = '#ecfaff';
-    const label = (up ? '↑  ' : '↓  ') + tr(trip.text);
-    g.strokeText(label, labelX, labelY); g.fillText(label, labelX, labelY);
-    g.font = '17px "Jua",sans-serif'; g.strokeText(to.name, labelX, labelY + 26); g.fillText(to.name, labelX, labelY + 26);
-    if (trip.kind === 'sky') {
-      g.fillStyle = 'rgba(224,242,255,.3)'; cloud(g, upper[0], upper[1] + 12, 65);
     } else {
-      g.strokeStyle = 'rgba(171,238,255,.75)'; g.lineWidth = 2;
+      // At the UPPER end the passage sinks into the floor; no upward flight.
       for (let i = 0; i < 8; i++) {
-        const phase = still ? i / 8 : (t * .35 + i / 8) % 1;
-        g.beginPath(); g.arc(sx + (i % 3 - 1) * 24, sy + 15 - phase * 100, 3 + i % 3, 0, Math.PI * 2); g.stroke();
+        const f = i/7, r = 66-f*48, y = f*17;
+        g.fillStyle = water ? `rgba(12,${74-i*6},${100-i*8},.7)` : `rgba(${43-i*4},${57-i*5},${89-i*7},.8)`;
+        g.beginPath(); g.ellipse(0,y,r,r*.42,0,0,Math.PI*2); g.fill();
+      }
+      for (let i = 0; i < 12; i++) {
+        const f = (time*.38+i/12)%1, r = 69*(1-f)+8, angle = time*2+i*2.4;
+        const x = Math.cos(angle)*r, y = Math.sin(angle)*r*.42+f*17;
+        g.strokeStyle = water ? 'rgba(181,250,255,.8)' : 'rgba(233,248,255,.85)'; g.lineWidth = 2;
+        g.beginPath(); g.ellipse(0,f*17,r,r*.42,0,angle,angle+.8); g.stroke();
+        if (water) { g.beginPath(); g.arc(x,y,2.5,0,Math.PI*2); g.stroke(); }
       }
     }
+    // Animated chevrons make the vertical direction explicit even without text.
+    g.strokeStyle = water ? '#c5ffff' : '#f0f8ff'; g.lineWidth = 3.5;
+    for (let i = 0; i < (up ? 3 : 2); i++) {
+      const f = (time*.5+i/(up?3:2))%1, y = up ? -35-f*135 : -10+f*25;
+      g.globalAlpha = still ? .9 : .35+.6*Math.sin(f*Math.PI);
+      g.beginPath(); g.moveTo(-8,y+(up?5:-5)); g.lineTo(0,y+(up?-4:4)); g.lineTo(8,y+(up?5:-5)); g.stroke();
+    }
+    g.globalAlpha = 1;
+    g.fillStyle = water ? 'rgba(157,238,250,.12)' : 'rgba(236,248,255,.2)';
+    cloud(g,0,up?4:-5,77);
+    g.restore();
+    const heading = water ? (up ? 'Rising current' : 'Dive into the depths') : (up ? 'Ride the updraft' : 'Descend through the clouds');
+    const label = (up ? '↑  ' : '↓  ') + tr(heading), labelY = sy - (up ? height+32 : 69);
+    g.save(); g.font = '22px "Jua",sans-serif'; g.textAlign = 'center'; g.lineWidth = 5;
+    g.strokeStyle = '#102d46'; g.fillStyle = '#ecfaff';
+    g.strokeText(label,sx,labelY); g.fillText(label,sx,labelY);
+    g.font = '17px "Jua",sans-serif'; g.strokeText(to.name,sx,labelY+26); g.fillText(to.name,sx,labelY+26);
     g.restore(); return true;
   }
   window.ZoneJourney = { route, location, enter, clear, draw, approach, belowClouds };

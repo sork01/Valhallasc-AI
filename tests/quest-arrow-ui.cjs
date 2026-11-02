@@ -45,7 +45,8 @@ const check = (ok, label) => { assert.ok(ok, label); console.log(`${++checks}: $
   if (touch) {
     check(await trackButton('welcome').textContent() === 'Spåra uppdrag', 'Direct tracking control is translated to Swedish');
     const size = await trackButton('welcome').boundingBox();
-    check(size.width >= 43.9 && size.height >= 43.9, 'Tracking button remains a physical 44 px touch target');
+    check(size.height >= 29.9 && size.height <= 36, 'Tracking button looks compact (about 30 px tall): ' + size.height);
+    check(await page.evaluate(({ x, y, width, height }) => [[x + width / 2, y + height + 6], [x - 6, y + height / 2]].every(([px, py]) => document.elementFromPoint(px, py)?.closest('.tracker-track')), size), 'Tracking button keeps a 44 px touch target through its invisible margin');
   }
   await trackButton('welcome').click();
   check(await page.evaluate(() => Quests.tracked === 'welcome' && document.getElementById('quest-journal').hidden), 'Tracker starts tracking without opening the journal');

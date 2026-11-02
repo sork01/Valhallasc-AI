@@ -116,3 +116,74 @@ Bifrost→Deep and Astralhollow→Nacrehold) rendered without browser errors, an
 the before/after contact sheet was inspected after the rail connection fix.
 Artifacts and verified public hashes: `test-results/solid-stairs-20261029/`.
 Changed JavaScript syntax, Swedish generation, release-note and diff checks pass.
+
+## Wind passages and complete sky collision (Beta 1.32.7)
+
+The owner preferred an updraft or teleport after finding the stair model still
+looked like an ascent on the Bifrost side. Both ends of that decorative model
+were above local ground, even when its label described descent. Travel now uses
+wind: a tall rising column on the lower side and a low, inward-swirling cloud
+opening with downward chevrons on Bifrost. Ocean routes use swirling water and
+rising currents. The existing authoritative crossings and arrival atmosphere
+remain; the decorative raised stair geometry is removed. New passage labels
+are translated into Swedish, and reduced motion freezes the swirl animation.
+
+The reported platform escape was a separate collision defect. The atlas
+landing overlay removed pieces of the old void rim when it extended the bridge,
+but did not rebuild barriers along the new platform edges. Fixing valid arrival
+positions alone did not close those exits. `generate_bifrost.void_pieces` now
+covers all empty-sky cells, and `compact_atlas.sky_landing` regenerates that
+collision from the final sky rows after extending the platform. The floor plan,
+portals and safe arrival coordinates stay unchanged.
+
+Collision pieces split at exact tile boundaries. Dividing long runs into equal
+fractions and rounding their widths/centres introduced tiny seams; an exhaustive
+empty-sky check caught one at (146.5, 14.5). Integer splits remove those gaps.
+The focused `compact_atlas_bifrost_platform_edges_and_void_are_solid` regression
+checks empty-sky coverage, walking and dashing toward exposed floor edges, and
+real held movement at all four sides of the added platform. Existing incoming
+crossings remain covered by the earlier focused regression.
+
+`tests/bifrost-wind-ui.cjs` exercises held movement at the four platform edges,
+updraft versus downward-opening artwork, reduced motion and the actual crossing
+in both directions. It uses `BIFROST_CANDIDATE` for private map/art/HTML routes and
+an explicit `VALHALLA_BINARY` for the matching embedded map. The normal bounded
+browser helper remains required. Deploy the regenerated world and client with
+the matching rebuilt server; inspect saved Bifrost positions before restart.
+
+Released 2026-10-29 with zero humans online. Both focused Bifrost Rust tests,
+Clippy all-targets with warnings denied, formatting, Python/JavaScript syntax,
+Swedish/release guards and 17 bounded browser assertions pass. The previous
+binary fails the browser edge check: eastward movement reaches blank sky at
+x=49.02 and beyond; the corrected server stops at x=48.7 for a 0.3-radius player.
+Normal screenshots (both directions) are in `test-results/driver-16Erbz/` and
+were visually inspected. Final map/client generation is byte-stable.
+
+Backup and release receipts:
+`deploy/backups/bifrost-wind-1.32.7-20261029T201834Z/`. Previous executable,
+consistent online/stopped SQLite, previous five client files, next executable
+and `verification.json` are retained. No saved Bifrost characters needed rescue;
+31 characters / 18 guests remained unchanged. Public/bridge health, SQLite
+quick_check, no test flags, warning journal and all five public file hashes pass.
+Running/installed/candidate binary SHA-256:
+`bd2ce8194e6e7a00f361ad5d690d2bc78fa3fbbd395c0078d1b6f82f9e07579c`.
+
+## Forgiving gate approaches (Beta 1.32.8)
+
+The authored portal discs and arrival coordinates remain the source of passive
+entry and safe arrival checks. An additional approach within at least 2.8 tiles
+can cross when the hero is moving toward the centre and the authoritative
+collision map has a clear body-width line to the opening. Walking exits still
+require outward movement. The existing cooldown, instance, quest, boss, level,
+sealed-template and party admission checks run after this reach check.
+
+Mouse and touch use the same larger projected opening hit area. Selecting it
+routes to a clear approach, then through the opening in its outward direction;
+this sends ordinary movement actions, with the server choosing the crossing.
+Hover shows a pointer cursor, and a steady/pulsing floor outline identifies the
+opening. Arrival movement faces away from the return opening, avoiding passive
+bounce after the cooldown without enlarging authored arrival discs.
+
+Focused checks: `owner_fixes_wider_gate_approach_keeps_arrivals_and_access_rules`,
+the existing compact-atlas arrival/crossing checks, and bounded mouse/short-screen
+touch crossings in `tests/owner-fixes-ui.cjs`.

@@ -20,25 +20,19 @@ OUTDOORS = set(REGIONS) | {17}
 
 def sky_landing(z):
     """A small passing place on the western bridge; keep the rest of the void solid."""
+    import numpy as np
+    from generate_bifrost import void_pieces
+
     x0, y0, x1, y1 = 30, 70, 49, 83
     for y in range(y0, y1):
         row = list(z['sky'][y])
         for x in range(x0, x1):
             if row[x] == ' ': row[x] = '='
         z['sky'][y] = ''.join(row)
-    objects = []
-    for o in z['objects']:
-        if o['kind'] != 'void':
-            objects.append(o); continue
-        a, b, c, d = o['x']-o['width']/2, o['y']-o['depth']/2, o['x']+o['width']/2, o['y']+o['depth']/2
-        if a >= x1 or c <= x0 or b >= y1 or d <= y0:
-            objects.append(o); continue
-        # Subtract only the landing rectangle; do not open surrounding empty sky.
-        left, right = max(a, x0), min(c, x1)
-        for ax, ay, bx, by in [(a,b,left,d),(right,b,c,d),(left,b,right,max(b,y0)),(left,min(d,y1),right,d)]:
-            if bx > ax and by > ay:
-                objects.append(dict(o, x=(ax+bx)/2, y=(ay+by)/2, width=bx-ax, depth=by-ay, r=(bx-ax)/2))
-    z['objects'] = objects
+    # Rebuild collision from the FINAL floor. Subtracting old void rectangles
+    # opened the landing but left its newly exposed edges without a barrier.
+    floor = np.array([[tile != ' ' for tile in row] for row in z['sky']], dtype=bool)
+    z['objects'] = void_pieces(floor) + [o for o in z['objects'] if o['kind'] != 'void']
 
 
 def blocked(z, radius=.38):

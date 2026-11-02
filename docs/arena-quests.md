@@ -11,8 +11,8 @@ pays a blue weapon of the hero's class for that level, experience and gold.
   These are the stewards that already keep the stat reset. Ids are `arena_<alder|skald|nacre|astral|aster>_<level>`
   (`quest:accept:` + id stays within 32 characters). A quest is offered from its level upward (`minLevel`) and never expires.
 - **Once per level per character**, whichever giver it came from: accepting another giver's quest of a level the hero already
-  took is refused (`Quest::gauntlet_level`, checked in `interact`). The reward is a one-time reward and is handed in where the
-  quest was taken.
+  took is refused (`Quest::gauntlet_level`, checked in `interact`) and hidden from other givers. The one-time reward can be
+  handed in at any of the five arena givers (owner decision, 2026-11-02).
 - **Entering:** the quest's objective is `gauntlet` with the target `L<level>` and the count 5. The giver's `gauntlet` offer
   ("Enter the Arena") starts a run for the lowest accepted arena quest that is neither won nor handed in. The hero must stand at
   the giver, be alive, not hidden, not in a duel, queue or match, and not in another run. The hero is solo: nobody else can enter
@@ -108,3 +108,20 @@ gear (PvP balancing stays closed).
   and `PLAYWRIGHT_BROWSERS_PATH` with chromium-headless-shell.
 - MCP: `node scripts/test-via-mcp.cjs run gauntlet` (24 checks, ~35 s, mutation-checked). Two heroes, levels 20 and 99, in separate runs at once: accept at the Skaldholm steward, the same level refused from a second giver, the offer, the countdown, the opponent named and marked at the quest's level in a separate ring, a landed basic blow (the driver's new `pvp` action: `attack`, `arena_leave`, `refresh`), leaving (back at the giver, full health, 0 of 5), the weapon turn-in (level 99 pays the level-95 blue piece) and a restart. It does not win fights (starter-gear heroes lose at level 99, and grinding is not wanted): winning a whole run is covered by the Rust tests.
 - Swedish: `python3 scripts/build_swedish.py --check`.
+
+## Any giver entry and hand-in (owner decision, 2026-11-02)
+
+Beta 1.32.8 supersedes the original giver-only restriction: any of the five arena
+givers can start the lowest accepted trial that has not been won or claimed,
+regardless of its original giver. A completed trial can also be handed in at any
+of them, including its class reward choice. The return point stays the giver
+that actually started the run. Only NPCs with the authored `gauntlet` offer can
+start or claim another giver's trial; range, level, once-per-level acceptance,
+reward capacity and all run rules remain authoritative.
+
+Other givers hide a level already in the character's quest ledger, both before
+and after its reward is claimed. Abandoning a never-completed trial releases that
+level, as in the existing server rule. The journal names the original giver and
+explains that entry and hand-in work anywhere. Ready markers and tracking include
+all five givers. Focused checks: Rust `owner_fixes_arena_entry_and_reward_at_another_giver`
+and bounded `tests/owner-fixes-ui.cjs`; no balance or win-rate testing.

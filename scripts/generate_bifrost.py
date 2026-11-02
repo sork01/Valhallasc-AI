@@ -4,7 +4,7 @@
 A sky zone: eight floating islands joined by rainbow-shard bridges over open void, one hub (Heimdall's Perch), five new
 monster kinds and three wards for the new `hold` quest objective. The layout is in sky_layout.py, the people and quests in
 sky_content.py. The zone lists its floor as 160 strings (`sky`: ' ' void, '#' island, '=' bridge) for the client, and the
-void next to the floor as rectangles (`void` objects, up to two tiles thick) that the server collides with.
+all empty sky as rectangles (`void` objects) that the server collides with.
 
 The zone is appended after the Wyrdwood, so no older enemy id moves; the dungeon copies, which the world appends after every
 file zone, move from zones 7-9 to 8-10. Its return gate leads to the Wyrdwood's Stormrift, which generate_wyrdwood.py writes
@@ -55,14 +55,12 @@ def sky_rows(floor, bridges):
 
 
 def void_pieces(floor):
-    """Cells within two tiles (any direction) of the floor that are not floor become void; runs are merged into rectangles
-    cut to VOID_PIECE long. Beyond that nothing is reachable, so nothing more is needed."""
-    pad = np.pad(floor, 2)
-    near = np.zeros_like(floor)
-    for dj in range(-2, 3):
-        for di in range(-2, 3):
-            near |= pad[2 + dj:2 + dj + SIZE, 2 + di:2 + di + SIZE]
-    wall = near & ~floor
+    """Cover every non-floor cell, merging runs into bounded collision rectangles.
+
+    A partial rim becomes unsafe when later overlays extend an island or bridge.
+    Complete coverage also prevents an old out-of-bounds save from roaming sky.
+    """
+    wall = ~floor
     used = np.zeros_like(wall)
     rects = []
     for j in range(SIZE):
@@ -84,14 +82,12 @@ def void_pieces(floor):
     for x0, y0, x1, y1 in rects:
         w, d = x1 - x0, y1 - y0
         if w >= d:
-            n = max(1, math.ceil(w / VOID_PIECE))
-            for k in range(n):
-                a, b = x0 + w * k / n, x0 + w * (k + 1) / n
+            for a in range(x0, x1, VOID_PIECE):
+                b = min(a + VOID_PIECE, x1)
                 out.append(((a + b) / 2, (y0 + y1) / 2, b - a, d))
         else:
-            n = max(1, math.ceil(d / VOID_PIECE))
-            for k in range(n):
-                a, b = y0 + d * k / n, y0 + d * (k + 1) / n
+            for a in range(y0, y1, VOID_PIECE):
+                b = min(a + VOID_PIECE, y1)
                 out.append(((x0 + x1) / 2, (a + b) / 2, w, b - a))
     return [{'kind': 'void', 'x': round(x, 2), 'y': round(y, 2), 'r': round(max(w, d) / 2, 2), 'width': round(w, 2), 'depth': round(d, 2)}
             for x, y, w, d in out]

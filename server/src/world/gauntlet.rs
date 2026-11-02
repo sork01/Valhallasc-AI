@@ -243,7 +243,7 @@ impl World {
         let npc = self.maps[zone]
             .npcs
             .iter()
-            .find(|n| n.id == npc_id)
+            .find(|n| n.id == npc_id && n.offers.iter().any(|o| o.id == "gauntlet"))
             .ok_or("Nobody here offers that.")?;
         if c.hp <= 0. || c.point().distance(npc.position_at(self.time)) > 2.8 {
             return Err("Walk closer to speak with this townsperson.".into());
@@ -257,10 +257,8 @@ impl World {
             return Err("Finish what you are doing first.".into());
         }
         // The lowest arena quest taken and not yet won or handed in.
-        let (level, quest_id) = self.maps[zone]
-            .quests
-            .iter()
-            .filter(|q| q.npc == npc_id)
+        let (level, quest_id) = self.maps.iter()
+            .flat_map(|m| &m.quests)
             .filter_map(|q| Some((q.gauntlet_level()?, q)))
             .filter(|(_, q)| {
                 c.quests
@@ -269,7 +267,7 @@ impl World {
             })
             .min_by_key(|(level, _)| *level)
             .map(|(level, q)| (level, q.id.clone()))
-            .ok_or("Take one of my arena quests first. A quest you have already won is handed in here.")?;
+            .ok_or("Take an arena quest from any arena giver first. A trial you have won can be handed in at any arena giver.")?;
         let arena = self
             .instances
             .iter()

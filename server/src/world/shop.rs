@@ -20,7 +20,47 @@ struct Sold {
 pub(super) enum Request {
     Open,
     Sell(Vec<SaleLine>),
+    Discard(String, u32),
     BuyBack(u64),
+}
+
+fn needed(c: &Character, maps: &[Map], id: &str) -> bool {
+    maps.iter().flat_map(|m| &m.quests).any(|q| {
+        q.objectives
+            .iter()
+            .any(|o| o.kind == "bring" && o.target == id)
+            && c.quests.iter().any(|g| g.id == q.id && !g.claimed)
+    })
+}
+
+/// Only known bring materials with finished/abandoned evidence qualify. Keys
+/// remain protected even after their quests finish, including future gate keys.
+fn discardable(c: &Character, maps: &[Map], id: &str) -> bool {
+    let Some(i) = item(id).filter(|i| i.kind == "material") else {
+        return false;
+    };
+    if is_quest_item(i)
+        || id.contains("key")
+        || id.starts_with("hour_shard_")
+        || id.starts_with("ember_shard_")
+        || needed(c, maps, id)
+        || maps
+            .iter()
+            .flat_map(|m| &m.npcs)
+            .flat_map(|n| &n.offers)
+            .any(|o| o.needs.as_deref() == Some(id))
+    {
+        return false;
+    }
+    maps.iter().flat_map(|m| &m.quests).any(|q| {
+        q.objectives
+            .iter()
+            .any(|o| o.kind == "bring" && o.target == id)
+            && (c.abandoned_quests.contains(&q.id)
+                || c.quests
+                    .iter()
+                    .any(|g| g.id == q.id && (g.claimed || g.completions > 0)))
+    })
 }
 
 fn sellable(i: &Item) -> bool {
@@ -28,7 +68,11 @@ fn sellable(i: &Item) -> bool {
 }
 
 /// Operates only on the caller's staged character. A failure discards all preceding lines.
-fn sell_lines(c: &mut Character, lines: &[SaleLine]) -> Result<(u32, Vec<Sold>), &'static str> {
+fn sell_lines(
+    c: &mut Character,
+    lines: &[SaleLine],
+    maps: &[Map],
+) -> Result<(u32, Vec<Sold>), &'static str> {
     if lines.is_empty() || lines.len() > 256 {
         return Err("Choose between 1 and 256 sale entries.");
     }
@@ -43,6 +87,11 @@ fn sell_lines(c: &mut Character, lines: &[SaleLine]) -> Result<(u32, Vec<Sold>),
         let catalog = item(&line.item).ok_or("Unknown item.")?;
         if !sellable(catalog) {
             return Err("That item cannot be sold.");
+        }
+        if needed(c, maps, &line.item) {
+            return Err(
+                "An active quest still needs this item. Hand it in or abandon the quest first.",
+            );
         }
         if let Some(id) = line.copy {
             if !is_gear(catalog) || line.quantity != 1 || c.gear_instance_equipped(id) {
@@ -123,11 +172,15 @@ pub(super) fn legacy_sell(
     shop: &mut Session,
     npc: &str,
     sale: &str,
+    maps: &[Map],
 ) -> Result<u32, &'static str> {
     let lines = if sale == "materials" {
         c.inventory
             .iter()
-            .filter(|s| item(&s.item).is_some_and(|i| i.kind == "material" && !is_quest_item(i)))
+            .filter(|s| {
+                item(&s.item).is_some_and(|i| i.kind == "material" && !is_quest_item(i))
+                    && !needed(c, maps, &s.item)
+            })
             .map(|s| SaleLine {
                 item: s.item.clone(),
                 quantity: s.quantity,
@@ -146,7 +199,7 @@ pub(super) fn legacy_sell(
         return Ok(0);
     }
     let mut next = c.clone();
-    let (paid, sold) = sell_lines(&mut next, &lines)?;
+    let (paid, sold) = sell_lines(&mut next, &lines, maps)?;
     *c = next;
     remember(shop, npc, sold);
     Ok(paid)
@@ -179,6 +232,7 @@ impl World {
         let mut paid = 0;
         let mut spent = 0;
         let mut changed = false;
+        let discarding = matches!(request, Request::Discard(..));
         let result: Result<(), &'static str> = (|| {
             if !matches!(request, Request::Open) {
                 if self.time - p.service_at < 0.5 {
@@ -189,9 +243,26 @@ impl World {
             match request {
                 Request::Open => {}
                 Request::Sell(lines) => {
-                    let (gold, sold) = sell_lines(&mut next, &lines)?;
+                    let (gold, sold) = sell_lines(&mut next, &lines, &self.maps)?;
                     remember(&mut shop, npc, sold);
                     paid = gold;
+                    changed = true;
+                }
+                Request::Discard(id, quantity) => {
+                    if quantity == 0
+                        || quantity > next.quantity(&id)
+                        || !discardable(&next, &self.maps, &id)
+                    {
+                        return Err(
+                            "Only leftovers from completed or abandoned quests can be discarded. Active quest items and keys are protected.",
+                        );
+                    }
+                    next.consume_item(&id, quantity);
+                    for map in &self.maps {
+                        for quest in &map.quests {
+                            quest.sync_bring(&mut next);
+                        }
+                    }
                     changed = true;
                 }
                 Request::BuyBack(id) => {
@@ -242,7 +313,9 @@ impl World {
             Ok(()) => {
                 p.character = next;
                 p.shop = shop;
-                if changed && spent > 0 {
+                if changed && discarding {
+                    "Quest leftovers discarded. No gold was paid.".into()
+                } else if changed && spent > 0 {
                     format!("Bought back for {spent} gold.")
                 } else if changed {
                     format!("Items sold for {paid} gold.")
@@ -255,7 +328,9 @@ impl World {
         let c = &p.character;
         let mut available = vec![];
         for stack in &c.inventory {
-            let Some(i) = item(&stack.item).filter(|i| sellable(i)) else {
+            let Some(i) =
+                item(&stack.item).filter(|i| sellable(i) && !needed(c, &self.maps, &i.id))
+            else {
                 continue;
             };
             let quantity = stack.quantity.saturating_sub(c.equipped_count(i));
@@ -282,11 +357,17 @@ impl World {
                     .push(json!({"item":i.id,"quantity":quantity,"base":i.sell,"rarity":i.rarity}));
             }
         }
+        let discardable: Vec<_> = c
+            .inventory
+            .iter()
+            .filter(|s| s.quantity > 0 && discardable(c, &self.maps, &s.item))
+            .map(|s| json!({"item":s.item,"quantity":s.quantity}))
+            .collect();
         let _ = p
             .peer
             .try_send(json!({"type":"shop","npc":npc,"ok":ok,"notice":notice,
             "paid":if ok {paid} else {0},"spent":if ok {spent} else {0},"changed":ok && changed,
-            "available":available,"buyBack":p.shop.merchants.get(npc).cloned().unwrap_or_default(),
+            "available":available,"discardable":discardable,"buyBack":p.shop.merchants.get(npc).cloned().unwrap_or_default(),
             "goldPercent":c.rebirth_gold_percent(),"gold":c.gold,"inventory":c.inventory,
             "gearInstances":c.gear_instances,"equipment":c.equipment,"bags":c.bags}));
     }
@@ -295,6 +376,80 @@ impl World {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn owner_fixes_quest_leftovers_discard_and_active_sale_protection() {
+        let (mut w, mut rx, token) = fixture();
+        let q = w.maps[4]
+            .quests
+            .iter()
+            .find(|q| q.id == "city_gel")
+            .unwrap()
+            .clone();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.level = 99;
+        c.quests.push(QuestProgress {
+            id: q.id.clone(),
+            counts: vec![0; q.objectives.len()],
+            ..Default::default()
+        });
+        assert!(c.quests.iter().any(|g| g.id == q.id && !g.claimed));
+        let before = state(&w);
+        let response = message(&mut w, &mut rx, Request::Discard("slime_gel".into(), 1));
+        assert_eq!(response["ok"], false);
+        assert_eq!(state(&w), before);
+        assert_eq!(
+            message(
+                &mut w,
+                &mut rx,
+                Request::Sell(vec![line("slime_gel", 1, None)])
+            )["ok"],
+            false
+        );
+        w.abandon_quest(1, &q.id);
+        let gold = w.players[&1].character.gold;
+        let quantity = w.players[&1].character.quantity("slime_gel");
+        let response = message(&mut w, &mut rx, Request::Open);
+        assert!(
+            response["discardable"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|r| r["item"] == "slime_gel")
+        );
+        assert_eq!(
+            message(&mut w, &mut rx, Request::Discard("slime_gel".into(), 2))["ok"],
+            true
+        );
+        assert_eq!(w.players[&1].character.gold, gold);
+        assert_eq!(w.players[&1].character.quantity("slime_gel"), quantity - 2);
+        assert_eq!(
+            w.store.load(&token).unwrap().unwrap().quantity("slime_gel"),
+            quantity - 2
+        );
+        assert!(w.players[&1].shop.merchants.values().all(Vec::is_empty));
+        for key in [
+            "hour_shard_bloom",
+            "ember_shard_0",
+            "ember_key",
+            "ironhide_shell",
+        ] {
+            w.players.get_mut(&1).unwrap().character.add_item(key, 1);
+            assert_eq!(
+                message(&mut w, &mut rx, Request::Discard(key.into(), 1))["ok"],
+                false,
+                "{key}"
+            );
+            assert_eq!(w.players[&1].character.quantity(key), 1);
+        }
+        assert_eq!(
+            message(
+                &mut w,
+                &mut rx,
+                Request::Discard("slime_gel".into(), u32::MAX)
+            )["ok"],
+            false
+        );
+    }
     const PIECE: &str = "warrior_weapon_sword_l5_gray";
     fn fixture() -> (World, mpsc::Receiver<Value>, String) {
         let mut w = super::super::wyrd_tests::world();

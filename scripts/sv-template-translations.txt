@@ -450,5 +450,8 @@
   "You enter {0}. Recommended levels {1}–{2}.": "Du går in i {0:t}. Rekommenderade nivåer {1}–{2}.",
   "Achievement earned: {0} (+{1} points).": "Prestation uppnådd: {0:t} (+{1} poäng).",
   "Rested: {0}% / 200%": "Utvilad: {0}% / 200%",
-  "{0}/{1} ({2}% rested {3}xp)": "{0}/{1} ({2}% utvilad {3}xp)"
+  "{0}/{1} ({2}% rested {3}xp)": "{0}/{1} ({2}% utvilad {3}xp)",
+  "Accepted from {0}. Enter and hand in at any arena giver.": "Togs emot från {0}. Gå in och lämna in hos valfri arenauppdragsgivare.",
+  "Hand in: {0} · {1}": "Lämna in: {0} · {1}",
+  "{0} ×{1} · Discard": "{0} ×{1} · Kasta"
 }

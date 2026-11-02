@@ -18,6 +18,7 @@ execFileSync('python3', [path.join(__dirname, 'empty_seat.py')], { cwd: root, st
 execFileSync('python3', [path.join(__dirname, 'boss_add_art_aliases.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'compact_atlas.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
+execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 fs.writeFileSync(path.join(root, 'client/world.js'), "'use strict';\nwindow.WORLD_MAP = " + JSON.stringify(map) + ';\n');
 fs.writeFileSync(path.join(root, 'client/items.js'), "'use strict';\nwindow.WORLD_ITEMS = " + JSON.stringify(items) + ';\n');

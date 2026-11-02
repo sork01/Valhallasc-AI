@@ -1266,6 +1266,11 @@ pub enum ClientMessage {
         npc: String,
         items: Vec<SaleLine>,
     },
+    DiscardQuestItem {
+        npc: String,
+        item: String,
+        quantity: u32,
+    },
     BuyBack {
         npc: String,
         id: u64,

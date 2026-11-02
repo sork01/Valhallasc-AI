@@ -1,5 +1,34 @@
 [
   {
+    "version": "Beta 1.32.8",
+    "date": "2026-11-02",
+    "new": [
+      "Merchants can discard leftover materials from completed or abandoned quests, with confirmation and no gold payment."
+    ],
+    "changed": [
+      "Swing, Cleave and other melee streaks pass behind the character on the far side; nearby fighters use the same depth rules.",
+      "Zone gates have wider movement approaches, visible opening markers and forgiving mouse and touch routing.",
+      "Arena trials can be entered and handed in at any of the five arena givers. Other givers hide a trial level already taken.",
+      "Bring quests show public gathering locations until the materials are ready, then guide you to the hand-in NPC.",
+      "Completed objectives show a clear ready-to-turn-in state in the tracker and journal, with hand-in guidance across zones.",
+      "Refused bag pickups stay on the ground when nobody nearby can fit them.",
+      "Active quest materials and gate keys stay protected during merchant cleanup."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.32.7",
+    "date": "2026-10-29",
+    "new": [],
+    "changed": [
+      "Wind passages carry you up to Bifrost, and the return passage descends through the clouds. Ocean crossings use swirling water.",
+      "Bifrost’s platform and island edges block walking and dashing into empty sky."
+    ],
+    "removed": [
+      "Travel staircases have been replaced with wind and water passages because stairs above the arrival platform made the direction confusing."
+    ]
+  },
+  {
     "version": "Beta 1.32.6",
     "date": "2026-10-29",
     "new": [],

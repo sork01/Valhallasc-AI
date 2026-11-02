@@ -16,10 +16,24 @@
     if (!g || hubs.length === 1) return hubs[0].name;
     return hubs.reduce((best, c) => Math.hypot(g.x - c.plaza.x, g.y - c.plaza.y) < Math.hypot(g.x - best.plaza.x, g.y - best.plaza.y) ? c : best).name;
   };
+  const arenaLevel = q => q.objectives.find(o => o.kind === 'gauntlet')?.target;
+  const arenaGivers = areas.flatMap((area, zone) => (area.npcs || [])
+    .filter(n => n.offers?.some(o => o.id === 'gauntlet')).map(n => ({ ...n, zone })));
+  const arenaQuests = definitions.filter(arenaLevel), arenaGiverIds = new Set(arenaGivers.map(n => n.id));
+  const handInAt = (q, id) => q.npc === id || (arenaLevel(q) && arenaGivers.some(n => n.id === id));
+  const turnIns = q => arenaLevel(q) ? arenaGivers : [{ ...giver(q), zone: q.zone }];
+  const handIn = q => {
+    const local = turnIns(q).filter(n => n.zone === (window.Field?.zone || 0));
+    const hero = window.Field?.hero;
+    if (local.length) return local.reduce((a, b) => hero && Math.hypot(b.x-hero.x,b.y-hero.y) < Math.hypot(a.x-hero.x,a.y-hero.y) ? b : a);
+    const target = tracked === q.id && hero && navigationTarget(window.Field?.zone || 0, hero.x, hero.y);
+    return turnIns(q).find(n => n.zone === target?.destinationZone) || turnIns(q)[0];
+  };
   function status(quest) {
     const p = state(quest);
     if (p && !p.claimed) return quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count) ? 'ready' : 'active';
     if (p?.claimed && !quest.repeatable) return 'completed';
+    if (arenaLevel(quest) && arenaQuests.some(q => q.id !== quest.id && arenaLevel(q) === arenaLevel(quest) && state(q))) return 'unavailable';
     if (quest.autoLevel && !abandoned.includes(quest.id)) return 'upcoming'; // a progression quest is accepted by the server, never offered
     if (quest.requires && !(state({ id: quest.requires })?.completions > 0)) return 'locked';
     if (quest.minLevel && heroLevel < quest.minLevel) return 'locked';
@@ -48,6 +62,7 @@
     if (!area) return out;
     for (const n of area.npcs || []) {
       const states = (questsByNpc.get(n.id) || []).map(status);
+      if (arenaGiverIds.has(n.id) && arenaQuests.some(q => status(q) === 'ready')) states.push('ready');
       const s = states.includes('ready') ? 'ready' : states.includes('available') ? 'available' : null;
       if (s) out.push({ x: n.x, y: n.y, npc: n.id, state: s, symbol: s === 'ready' ? '?' : '!',
         color: s === 'ready' ? '#64b5ff' : '#ffdf88', label: `${n.name} · ${words[s]}` });
@@ -59,7 +74,7 @@
         out.push({ x: p.x, y: p.y, quest: q.id, state: 'tracked', symbol: '◆', color: '#a6ffcf',
           label: `Tracked quest · ${q.title} · ${label}` });
       };
-      if (s === 'ready') add((area.npcs || []).find(n => n.id === q.npc), words.ready);
+      if (s === 'ready') for (const n of turnIns(q)) { if (n.zone === zone) add(n, words.ready); }
       else q.objectives.forEach((o, i) => {
         if ((state(q)?.counts[i] || 0) >= o.count) return;
         if (o.kind === 'kill') {
@@ -78,7 +93,11 @@
           const name = window.Locale?.translate(o.target) || o.target;
           if (area.name === name) add(area.spawn, o.label);
           for (const p of area.portals || []) if (areas[p.to]?.name === name) add(p, o.label);
-        } else if (o.kind === 'bring' || o.kind === 'gauntlet') add((area.npcs || []).find(n => n.id === q.npc), o.label);
+        } else if (o.kind === 'bring') {
+          const sources = window.QUEST_SOURCES?.[o.target] || [];
+          if (sources.length) for (const source of sources) { if (source.zone === zone) add(source, o.label); }
+          else add((area.npcs || []).find(n => n.id === q.npc), o.label);
+        } else if (o.kind === 'gauntlet') for (const n of arenaGivers) { if (n.zone === zone) add(n, o.label); }
       });
     }
     mapCache.set(zone, out);
@@ -166,23 +185,23 @@
     if (claim) b.dataset.action = 'claim';
     return b;
   }
-  function rewards(quest, container, claimable) {
+  function rewards(quest, container, claimable, npcId = quest.npc) {
     const icons = element('div', '', 'quest-reward-icons');
     if (quest.rewardItem) { const n = rewardIcon(quest.rewardItem); if (n) icons.append(n); }
     const choices = classChoices(quest);
     if (choices.length) container.append(element('p', 'Choose one class reward:', 'quest-reward'));
     for (const id of choices) {
       const n = rewardIcon(id, claimable ? b => {
-        if (Online.send({ type: 'interact', npc: quest.npc, offer: `quest:claim:${quest.id}:${id}` })) b.disabled = true;
+        if (Online.send({ type: 'interact', npc: npcId, offer: `quest:claim:${quest.id}:${id}` })) b.disabled = true;
       } : null);
       if (n) icons.append(n);
     }
     if (icons.childElementCount) container.append(icons);
     return choices;
   }
-  function questAction(quest, action, b) {
+  function questAction(quest, action, b, npcId = quest.npc) {
     if (action === 'accept') return City.acceptQuest(quest, b);
-    if (Online.send({ type: 'interact', npc: quest.npc, offer: `quest:${action}:${quest.id}` })) b.disabled = true;
+    if (Online.send({ type: 'interact', npc: npcId, offer: `quest:${action}:${quest.id}` })) b.disabled = true;
   }
   function classChoices(quest) {
     return (quest.rewardChoices || {})[Field.hero?.look?.class] || [];
@@ -205,7 +224,8 @@
     const rec = element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'); rec.dataset.level = String(quest.level);
     if (gap >= 5) rec.style.color = '#ff6b6b'; else if (gap >= 3) rec.style.color = '#ffa65a'; else if (gap <= -5) rec.style.color = '#9fb0a0';
     node.append(rec);
-    node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
+    node.append(element('p', quest.description), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join(' · '), 'quest-objectives'));
+    if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
     storyRecap(quest, node);
     if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
     const party = mates(quest);
@@ -268,6 +288,7 @@
     const list = element('div', '', 'tracker-list'); list.hidden = collapsed;
     for (const quest of active) {
       const row = element('div', '', 'tracker-quest'); row.dataset.quest = quest.id;
+      row.dataset.status = status(quest);
       row.dataset.tracked = String(tracked === quest.id); row.setAttribute('role', 'group'); row.setAttribute('aria-label', quest.title);
       const heading = element('div', '', 'tracker-quest-heading');
       const title = button(quest.title, () => { track(quest.id); show(); }); title.className = 'tracker-title';
@@ -277,7 +298,16 @@
       });
       tracking.className = 'tracker-track'; tracking.dataset.action = 'track'; tracking.setAttribute('aria-pressed', String(tracked === quest.id));
       heading.append(title, tracking); row.append(heading);
-      if (status(quest) === 'ready') row.append(element('small', `✓ ${quest.autoLevel ? 'Report to' : 'Return to'} ${giver(quest).name} for your reward`, 'tracker-objective complete'));
+      if (status(quest) === 'ready') {
+        const npc = handIn(quest);
+        row.append(element('small', '✓ Complete · Ready to turn in', 'tracker-objective complete'));
+        const destination = button(`Hand in: ${npc.name} · ${areas[npc.zone].name}`, () => {
+          track(quest.id);
+          if (npc.zone === Field.zone) Field.visitNpc(npc.id);
+          else window.WorldMap?.show();
+        });
+        destination.className = 'tracker-destination'; row.append(destination);
+      }
       else if(quest.id==='raid_key') { const n=quest.objectives.filter((o,i)=>(state(quest)?.counts[i]||0)>=o.count).length; row.append(element('small', `Pieces: ${n}/10`, 'tracker-objective')); }
       else quest.objectives.forEach((o, i) => {
         const count = Math.min(state(quest)?.counts[i] || 0, o.count), done = count >= o.count;
@@ -328,7 +358,8 @@
   function foldedCard(quest) {
     const node = document.createElement('details'); node.className = 'quest-entry'; node.dataset.quest = quest.id;
     node.open = expanded.has(quest.id);
-    const summary = element('summary', `! ${quest.title}`);
+    const summary = element('summary', `${status(quest) === 'ready' ? '✓' : '!'} ${quest.title}${status(quest) === 'ready' ? ' · Complete · Ready to turn in' : ''}`);
+    node.dataset.status = status(quest);
     node.append(summary);
     // Completed histories can be long: render rewards/details only for entries being read.
     const fill = () => {
@@ -369,6 +400,8 @@
     setLevel(level) { if (heroLevel !== level) { heroLevel = level; clearGuidance(); render(); } },
     mapMarkers, navigationTarget, track, get tracked() { return tracked; },
     refresh() { render(); },
+    // The merchant protects every material until its active quest is handed in or abandoned.
+    needsMaterial(id) { return definitions.some(q => state(q) && !state(q).claimed && q.objectives.some(o => o.kind === 'bring' && o.target === id)); },
     // Titles of the quests you and this party member both have in progress.
     sharedWith(member) {
       return (member.quests || []).map(q => definitions.find(d => d.id === q.id)).filter(q => q && ['ready', 'active'].includes(status(q))).map(q => q.title);
@@ -411,7 +444,7 @@
     // Locked and finished quests are hidden, as they are there.
     offered(id) {
       const rank = { ready: 0, available: 1, active: 2 };
-      return definitions.filter(q => q.npc === id && status(q) in rank)
+      return definitions.filter(q => (q.npc === id || (status(q) === 'ready' && handInAt(q, id))) && status(q) in rank)
         .sort((a, b) => rank[status(a)] - rank[status(b)] || Number(a.repeatable) - Number(b.repeatable));
     },
     npc(id, container, pick) {
@@ -429,7 +462,7 @@
       }));
     },
     // The quest page of a conversation: story, objectives, reward, then the accept / complete button.
-    detail(quest, container, back) {
+    detail(quest, container, back, npcId = quest.npc) {
       const s = status(quest);
       const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
       node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
@@ -438,15 +471,16 @@
       storyRecap(quest, node);
       if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
       if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
-      node.append(element('h5', 'Objectives'), element('p', objectives(quest).join('\n'), 'quest-objectives'));
+      node.append(element('h5', 'Objectives'), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join('\n'), 'quest-objectives'));
+      if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
       if (!quest.handoffTo) node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
-      const choices = rewards(quest, node, s === 'ready');
+      const choices = rewards(quest, node, s === 'ready', npcId);
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
         const action = s === 'ready' ? 'claim' : 'accept';
         const b = element('button', s === 'ready' ? 'Complete Quest' : state(quest)?.completions ? 'Take bounty again' : 'Accept', 'gossip-button primary'); b.type = 'button';
         b.dataset.action = action;
-        b.addEventListener('click', () => { questAction(quest, action, b); });
+        b.addEventListener('click', () => { questAction(quest, action, b, npcId); });
         actions.append(b);
       }
       const decline = element('button', s === 'available' ? 'Decline' : 'Back', 'gossip-button'); decline.type = 'button'; decline.dataset.action = 'decline';
@@ -457,8 +491,8 @@
     marker(id) { return this.markerInfo(id).symbol; },
     markerInfo(id) {
       for (const s of ['ready', 'available']) {
-        const quest = definitions.find(q => q.npc === id && status(q) === s && !q.repeatable)
-          || definitions.find(q => q.npc === id && status(q) === s);
+        const quest = definitions.find(q => (q.npc === id || (s === 'ready' && handInAt(q, id))) && status(q) === s && !q.repeatable)
+          || definitions.find(q => (q.npc === id || (s === 'ready' && handInAt(q, id))) && status(q) === s);
         if (quest) return { symbol: s === 'ready' ? '?' : '!', color: quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
       }
       if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => (o.kind === 'talk' || o.kind === 'escort' || o.kind === 'handoff') && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };

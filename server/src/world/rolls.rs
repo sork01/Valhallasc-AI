@@ -59,6 +59,47 @@ pub fn can_need(c: &Character, i: &Item) -> bool {
 }
 
 impl World {
+    /// A read-only preflight for the loot magnet, with the same eligibility as collection.
+    pub(super) fn drop_has_room(&self, index: usize, session: u64) -> bool {
+        let d = &self.drops[index];
+        let Some(id) = &d.item else {
+            return true;
+        };
+        let picker = &self.players[&session].character.id;
+        let group = if d.group.is_empty() {
+            vec![picker.clone()]
+        } else {
+            self.loot_group(picker, d.zone, d.point())
+        };
+        group.iter().any(|who| {
+            self.players.values().any(|p| {
+                p.character.id == *who
+                    && (p.merc.is_none() || !self.maps[d.zone].raid)
+                    && (p.merc.is_some() || p.character.can_collect(id))
+            })
+        })
+    }
+
+    pub(super) fn refused_drop_notice(&mut self, index: usize, session: u64) {
+        let d = &self.drops[index];
+        let bag = d
+            .item
+            .as_deref()
+            .and_then(item)
+            .is_some_and(|i| i.kind == "bag");
+        let text = if bag {
+            "Your bag slots are full or this bag needs a higher level. Nobody nearby can fit it. It stays on the ground."
+        } else {
+            "Nobody nearby has bag room for this item. It stays on the ground."
+        };
+        if let Some(p) = self.players.get_mut(&session)
+            && self.time - p.bag_notice_at >= 5.
+        {
+            p.bag_notice_at = self.time;
+            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        }
+    }
+
     /// The party members (hired fighters included) who share a drop of `owner` at `point` in `zone`, sorted by character id. Just `owner` when
     /// there is nobody to share with.
     fn loot_group(&self, owner: &str, zone: usize, point: Point) -> Vec<String> {
@@ -326,20 +367,7 @@ impl World {
             group
         };
         let Some(who) = self.next_taker(&group, id) else {
-            let now = self.time;
-            if let Some(p) = self.players.get_mut(&session)
-                && now - p.bag_notice_at >= 5.
-            {
-                p.bag_notice_at = now;
-                let text = if item(id).is_some_and(|i| i.kind == "bag") {
-                    "Nobody here can fit this bag yet. It stays on the ground until it expires."
-                } else if group.len() < 2 {
-                    "Your bags are full. Sell loot or fit an extra six-slot bag from Linden. This item stays on the ground until it expires."
-                } else {
-                    "Nobody in your party has bag room for this. It stays on the ground until it expires."
-                };
-                let _ = p.peer.try_send(json!({"type":"system","text":text}));
-            }
+            self.refused_drop_notice(index, session);
             return false;
         };
         if self.merc_id(&who) {

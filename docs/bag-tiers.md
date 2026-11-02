@@ -62,3 +62,19 @@ four-slot limit and smallest-smaller replacement rule apply. If nobody can fit
 it, it stays on the ground until its normal expiry. Fitted bags are bound to
 their recipient and cannot be traded or sold as loose items. This avoids a
 separate bag-inventory state while preserving the existing save format.
+
+## Refused ground pickups (Beta 1.32.8)
+
+The loot magnet now checks the actual party's pickup eligibility before moving
+an item. If nobody nearby can fit a dropped bag, its world coordinates remain
+fixed, including when the picker walks away. A throttled notice explains that
+bag slots or level prevent fitting. Collection is not attempted while nobody
+can take it, and this read-only preflight consumes no round-robin turn. Room is
+rechecked so a party member who becomes eligible can still pick it up. Existing
+larger-bag replacement, level, raid-human-only and mercenary-forfeit rules stay
+in the shared collection path.
+
+The regression check covers solo and real party piles with four fitted bags
+and a full inventory, fixed coordinates across movement, unchanged loot turns,
+and recovery when a second party member has a free bag slot. The private browser
+check also observes a real refused pile while the hero walks away.

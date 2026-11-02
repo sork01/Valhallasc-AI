@@ -461,7 +461,7 @@
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
       const quest=window.Quests.offered(npc.id).find(q=>q.id===view.id);
-      if(quest)window.Quests.detail(quest,$('npc-quests'),()=>show({kind:'gossip'},`[data-quest="${view.id}"]`));
+      if(quest)window.Quests.detail(quest,$('npc-quests'),()=>show({kind:'gossip'},`[data-quest="${view.id}"]`),npc.id);
       else {view={kind:'gossip'};}
     }
     if(view.kind==='gossip')window.Quests?.npc(npc.id,$('npc-quests'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'));

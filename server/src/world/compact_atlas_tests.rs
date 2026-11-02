@@ -22,6 +22,90 @@ fn routes(data: &Value) -> Vec<(usize, usize)> {
 }
 
 #[test]
+fn compact_atlas_bifrost_platform_edges_and_void_are_solid() {
+    let data = bundled();
+    let sky = &data["zones"][6];
+    let rows: Vec<_> = sky["sky"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|r| r.as_str().unwrap().as_bytes())
+        .collect();
+    let floor = |p: Point| {
+        rows.get(p.y.floor() as usize)
+            .and_then(|r| r.get(p.x.floor() as usize))
+            .is_some_and(|c| *c != b' ')
+    };
+    let mut w = world();
+    calm(&mut w);
+    let map = &w.maps[7];
+    let mut edges = 0;
+    for y in 1..map.size as usize - 1 {
+        for x in 1..map.size as usize - 1 {
+            let start = at(x as f64 + 0.5, y as f64 + 0.5);
+            if !floor(start) {
+                assert!(
+                    !map.line_clear(start, start, 0.),
+                    "unblocked empty sky {start:?}"
+                );
+                continue;
+            }
+            let mut clear_start = start;
+            map.collide(&mut clear_start, PLAYER_RADIUS);
+            if clear_start.distance(start) > 1e-8 {
+                continue;
+            }
+            for dir in [at(-1., 0.), at(1., 0.), at(0., -1.), at(0., 1.)] {
+                if floor(at(start.x + dir.x, start.y + dir.y)) {
+                    continue;
+                }
+                let mut foot = start;
+                for _ in 0..10 {
+                    map.walk(&mut foot, dir, 0.2, PLAYER_RADIUS);
+                    assert!(
+                        floor(foot),
+                        "walk off island {start:?} toward {dir:?}: {foot:?}"
+                    );
+                }
+                let mut dash = start;
+                map.walk(&mut dash, dir, 12., PLAYER_RADIUS);
+                assert!(
+                    floor(dash),
+                    "dash off island {start:?} toward {dir:?}: {dash:?}"
+                );
+                edges += 1;
+            }
+        }
+    }
+    assert!(
+        edges > 400,
+        "checked exposed island and bridge edges: {edges}"
+    );
+    let _rx = join(&mut w, 1, Class::Warrior);
+    // All four edges of the added landing, outside the return gate trigger.
+    for (start, dir) in [
+        (at(30.5, 73.5), at(-1., 0.)),
+        (at(48.5, 71.5), at(1., 0.)),
+        (at(40.5, 70.5), at(0., -1.)),
+        (at(40.5, 82.5), at(0., 1.)),
+    ] {
+        place(&mut w, 1, 7, start);
+        for _ in 0..40 {
+            w.time += TICK;
+            let hero = w.players.get_mut(&1).unwrap();
+            hero.input = dir;
+            hero.input_at = w.time;
+            w.update_player(1);
+            assert_eq!(w.players[&1].character.zone, 7);
+            assert!(
+                floor(w.players[&1].character.point()),
+                "held movement leaves platform from {start:?}"
+            );
+        }
+    }
+}
+
+#[test]
 fn compact_atlas_bifrost_arrivals_and_approaches_stay_on_visible_floor() {
     let data = bundled();
     let sky = &data["zones"][6];

@@ -7,7 +7,7 @@
   const key = row => `${row.item}:${row.copy || 0}`;
   const price = row => Math.min(4294967295, Math.floor((row.base * row.quantity * (100 + (data?.goldPercent || 0)) + 50) / 100));
   const rarity = row => row.rarity || row.gear?.[0]?.rarity || Inventory.definition(row.item)?.rarity;
-  const isJunk = row => row.rarity === 'common' && (!!row.gear || Inventory.definition(row.item)?.kind === 'material');
+  const isJunk = row => !window.Quests?.needsMaterial(row.item) && row.rarity === 'common' && (!!row.gear || Inventory.definition(row.item)?.kind === 'material');
   let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null, lastNotice = '';
   const bag = document.querySelector('.bag-window'), bagHome = bag.parentElement, bagNext = bag.nextSibling;
   const dock = make('div'); dock.id = 'merchant-bags'; dock.hidden = true; $('npc-dialogue').append(dock);
@@ -77,6 +77,24 @@
   }
   const anvil = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 13h34v8l-12 6v7h9v6H10v-6h9v-7L7 22z" fill="#b3b4ad" stroke="#493e29" stroke-width="2"/></svg>';
   const pouch = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="m15 5 9 4 9-4-4 12c20 18 14 27-5 27S-1 35 19 17z" fill="#bb8b34" stroke="#543c1d" stroke-width="2"/><circle cx="24" cy="29" r="7" fill="#f6d45f"/></svg>';
+  function discard(row) {
+    if (pending) return;
+    closeWarning();
+    warning = make('dialog', '', 'sell-warning panel'); warning.id = 'sell-warning';
+    warning.setAttribute('aria-labelledby', 'discard-warning-title');
+    const title = make('h3', 'Discard quest leftovers?'); title.id = 'discard-warning-title';
+    warning.append(title, make('p', `${Inventory.definition(row.item)?.name || row.item} ×${row.quantity}`),
+      make('p', 'This permanently removes these leftovers. No gold or buyback. Active quest items and keys are protected.'));
+    const cancel = button('Cancel', closeWarning);
+    const yes = button('Discard leftovers', () => {
+      closeWarning();
+      if (send({ type: 'discard_quest_item', item: row.item, quantity: row.quantity })) draw();
+    }); yes.dataset.action = 'discard';
+    warning.append(cancel, yes); warning.addEventListener('cancel', event => { event.preventDefault(); closeWarning(); });
+    warning.addEventListener('keydown', event => event.stopPropagation());
+    $('stage').append(warning); warning.showModal();
+    window.Settings?.registerWindow('sell-warning', null, 'Discard quest leftovers?', false); cancel.focus();
+  }
   function draw() {
     if (!container || !npc) return;
     $('merchant-service')?.remove();
@@ -85,7 +103,17 @@
     closeWarning(); $('npc-dialogue').querySelector('.merchant-tabs')?.remove(); container.replaceChildren(); container.className = 'merchant-workspace'; container.setAttribute('aria-busy', String(pending));
     const status = $('npc-notice');
     if (status.textContent !== lastNotice) status.textContent = lastNotice;
-    if (tab === 'repair') {
+    if (tab === 'leftovers') {
+      const list = make('div', '', 'merchant-catalog');
+      list.append(make('p', 'Discard only leftovers from completed or abandoned quests. No gold is paid.'));
+      for (const row of data?.discardable || []) {
+        const b = button(`${Inventory.definition(row.item)?.name || row.item} ×${row.quantity} · Discard`, () => discard(row));
+        b.dataset.item = row.item; b.dataset.action = 'discard-leftovers'; b.disabled = pending;
+        b.title = 'Leftover quest material · discard for no gold'; list.append(b);
+      }
+      if (!data?.discardable?.length) list.append(make('p', 'No quest leftovers to discard.'));
+      container.append(list);
+    } else if (tab === 'repair') {
       const repair = make('div','','merchant-catalog'); GearServices.render('repair', npc, packet, repair); container.append(repair);
     } else {
       const grid = make('div','','merchant-grid'); grid.id = tab === 'back' ? 'sell-buyback' : 'merchant-stock';
@@ -124,14 +152,14 @@
     const last=(data?.buyBack || []).at(-1), back=utility('Buyback',last?Inventory.icon(Inventory.definition(last.item)):'',()=>{tab='back';page=0;draw();});
     back.id='merchant-last-buyback'; if(last) {back.dataset.item=last.item;Inventory.attachTooltip(back,()=>Inventory.definition(last.item));} tools.append(back);container.append(tools);
     const tabs=make('div','','merchant-tabs');
-    for(const [id,label] of [['merchant','Merchant'],['back','Buyback']]){const b=button(label,()=>{tab=id;page=0;draw();});b.dataset.tab=id;b.setAttribute('aria-pressed',String(tab===id));tabs.append(b);}$('npc-dialogue').querySelector('.gossip-footer').append(tabs);
+    for(const [id,label] of [['merchant','Merchant'],['back','Buyback'],...(data?.discardable ? [['leftovers','Quest leftovers']] : [])]){const b=button(label,()=>{tab=id;page=0;draw();});b.dataset.tab=id;b.setAttribute('aria-pressed',String(tab===id));tabs.append(b);}$('npc-dialogue').querySelector('.gossip-footer').append(tabs);
     Inventory.render($('inventory-list'));
   }
   function selectItem(id) {
     if (!npc.buys) { lastNotice='This person does not buy items. Sell to a merchant or smith.'; draw(); return; }
     if (pending || !data) return;
     const row = data.available.find(row=>row.item===id);
-    if (!row) { lastNotice='This item cannot be sold.'; draw(); return; }
+    if (!row) { lastNotice=window.Quests?.needsMaterial(id) ? 'An active quest still needs this item. Hand it in or abandon the quest first.' : 'This item cannot be sold.'; draw(); return; }
     basket.clear(); basket.set(key(row),{...row}); confirm();
   }
   function mount() {
@@ -153,7 +181,7 @@
       if (opening) { close(); npc=merchant; zone=Field.zone||0; container=target; tab='merchant'; page=0; packet=dialogue; lastNotice=dialogue.notice || ''; mount(); draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} }
       else { const answered=packet!==dialogue&&pendingKind==='interact'; packet=dialogue; if(dialogue.notice)lastNotice=dialogue.notice; if(answered){settle();if(npc.buys)request();else data={available:[],buyBack:[],gold:packet.gold};} draw(); }
     }, close, isStockOffer,
-    bagTooltip(id) { const row=data?.available?.find(row=>row.item===id); return npc&&row?{copies:row.gear?[row.gear]:[],count:row.quantity,in:Locale.translate('Your bags'),hint:Locale.translate(`Sell for ${price(row)} gold`)}:undefined; },
+    bagTooltip(id) { if (window.Quests?.needsMaterial(id)) return {copies:[],count:1,in:Locale.translate('Your bags'),hint:Locale.translate('Needed for an active quest · cannot sell or discard')}; if (data?.discardable?.some(row => row.item === id)) return {copies:[],count:data.discardable.find(row=>row.item===id).quantity,in:Locale.translate('Your bags'),hint:Locale.translate('Sell this material or open Quest leftovers to discard it for no gold.')}; const row=data?.available?.find(row=>row.item===id); return npc&&row?{copies:row.gear?[row.gear]:[],count:row.quantity,in:Locale.translate('Your bags'),hint:Locale.translate(`Sell for ${price(row)} gold`)}:undefined; },
     get open() { return !!npc; },
     onPacket(packet) {
       if (!npc || packet.npc !== npc.id) return;
@@ -170,7 +198,7 @@
       if (!npc) return;
       const merchant = City.npcs.find(n => n.id === npc.id);
       if (!c || c.dead || c.sparkTravel || (c.zone || 0) !== zone || !merchant || Math.hypot(c.x - merchant.x, c.y - merchant.y) > 3.2) { close(); City.close(); return; }
-      const nextKey = JSON.stringify([c.inventory, c.gearInstances, c.equipment, c.gold, c.rebirthTiers]);
+      const nextKey = JSON.stringify([c.inventory, c.gearInstances, c.equipment, c.gold, c.rebirthTiers, c.quests, c.abandonedQuests]);
       if (npc.buys && nextKey !== snapshotKey && !pending && !warning) { snapshotKey = nextKey; request(); }
     },
   };

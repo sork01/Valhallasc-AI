@@ -969,6 +969,23 @@
     for (const s of slimes) { if (s.dead) continue; const d = Math.hypot(s.x - wx, s.y - wy) - s.r * .6; if (d < distance) { distance = d; best = s; } }
     return best;
   }
+  function pickPortal(mx, my) {
+    return zdef.portals.filter(p => !p.after_clear || instanceCleared)
+      .map(p => { const [x,y] = w2s(p.x,p.y); return { p, x, y }; })
+      .filter(({p,x,y}) => ((mx-x) / (62.2*Math.max(2.8,p.r)))**2 + ((my-y) / (31.1*Math.max(2.8,p.r)))**2 <= 1
+        || (Math.abs(mx-x) < 55 && my > y-100 && my < y))
+      .sort((a,b) => Math.hypot(mx-a.x,my-a.y)-Math.hypot(mx-b.x,my-b.y))[0]?.p;
+  }
+  function visitPortal(portal) {
+    Field.clearInput(); hero.target = null; hero.pvpTargetId = null; hero.goal = null;
+    cityRoute = routeTo(portal, true, hero, 1.65);
+    const side = portal.walk || [0,0];
+    const end = { x: clamp(portal.x + side[0]*.8, .7, MAP-.7), y: clamp(portal.y + side[1]*.8, .7, MAP-.7) };
+    const last = cityRoute.at(-1) || hero;
+    if (segmentFree(last, end, .3)) cityRoute.push(end);
+    if (cityRoute.length) { routeTime = tAll; Online.send({type:'move', ...cityRoute[0]}); }
+    marker = {x:portal.x,y:portal.y,t:0}; emitHud();
+  }
   const SIGN_W = 28, SIGN_TOP = 70;   // the clickable body of a boss sign, in screen pixels
   function onPointerDown(e) {
     if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel) return;
@@ -981,6 +998,7 @@
     if (sign) { talkTo(sign); return; }
     const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27 && my>=y-37 && my<=y+7; });
     if (chest) { openChest(chest); return; }
+    const portal = pickPortal(mx, my); if (portal) { visitPortal(portal); return; }
     pointer.down = true; if (Number.isInteger(e.pointerId)) cv.setPointerCapture?.(e.pointerId);
     rememberPointer(e); const { x: wx, y: wy } = pointer;
     const s = pickSlime(mx, my, wx, wy);
@@ -1077,7 +1095,7 @@
     }
     return out;
   }
-  function onPointerMove(e) { if (pointer.down) rememberPointer(e); }
+  function onPointerMove(e) { if (pointer.down) rememberPointer(e); else if (cv && running && !paused) { const r=cv.getBoundingClientRect(); cv.style.cursor = pickPortal((e.clientX-r.left)/r.width*VW,(e.clientY-r.top)/r.height*VH) ? 'pointer' : ''; } }
   function onPointerUp() { pointer.down = false; }
 
   // ---------- combat ----------
@@ -1325,7 +1343,7 @@
     if (event.kind === 'regen') { floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', false, 'heal'); spark(event.x, event.y, 4, ['#9dffb4', '#d8ffe0'], 6, .6, .6); }
     if (event.kind === 'swing') {
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
-      if (actor) effects.push({ kind: actor.look.class === 'assassin' ? 'dualSlash' : 'slash', x: event.x, y: event.y, a: Math.atan2(actor.fy, actor.fx), t: -.12 });
+      if (actor) effects.push({ actor: event.actor, kind: actor.look.class === 'assassin' ? 'dualSlash' : 'slash', x: event.x, y: event.y, a: Math.atan2(actor.fy, actor.fx), t: -.12 });
     }
   }
   // ---------- skill effects and the level-up spectacle ----------
@@ -1364,7 +1382,7 @@
   function skillFx(ev) {
     const def = SKILL_BY_ID[ev.skill]; if (!def) return;
     const [core, glow] = SKILL_COL[ev.skill] || ['#ffffff', '#9fd0ff'], kind = def.effect.effect, own = ev.actor === Online.id, a = Math.atan2(ev.fy, ev.fx);
-    const base = { x: ev.x, y: ev.y, core, glow, a, t: 0 }, pts = (ev.points || []).map(([x, y]) => ({ x, y }));
+    const base = { actor: ev.actor, x: ev.x, y: ev.y, core, glow, a, t: 0 }, pts = (ev.points || []).map(([x, y]) => ({ x, y }));
     if (kind === 'cone') {
       effects.push({ ...base, kind: ev.skill === 'cleave' ? 'skCleave' : ev.skill === 'earthshatter' ? 'skWarFissure' : ev.skill === 'thousandcuts' ? 'skAssassinFan' : 'skCone', r: def.effect.reach,
         arc: 2 * Math.acos(def.effect.dot), life: ev.skill === 'earthshatter' ? .95 : ev.skill === 'cleave' ? .7 : ev.skill === 'thousandcuts' ? .82 : .42 });
@@ -1460,7 +1478,7 @@
     }
     // Whoever else the skill reached (healed or blessed party members) gets their own glow and sparks.
     if (kind === 'mend' || kind === 'buff' || def.pulse) for (const p of pts) {
-      if (def.class !== 'priest') effects.push({ ...base, kind: 'skAura', x: p.x, y: p.y, col: BUFF_COL[def.effect.kind] || glow, life: 1 });
+      if (def.class !== 'priest') effects.push({ ...base, actor: null, kind: 'skAura', x: p.x, y: p.y, col: BUFF_COL[def.effect.kind] || glow, life: 1 });
       spark(p.x, p.y, 12, [core, glow], 8, .8, .8);
     }
     if (ev.heal > 0) { floater(ev.x, ev.y, '+' + DamageNumbers.format(ev.heal), '#7dff9a', true, 'heal'); if (kind !== 'heal') spark(ev.x, ev.y, 12, ['#9dffb4', '#d8ffe0'], 10, 1, .9); }
@@ -1603,6 +1621,43 @@
       g.moveTo(x - ux * 19 * scale, y - uy * 19 * scale);
       g.lineTo(x - ux * 32 * scale + px * side * 10 * scale, y - uy * 32 * scale + py * side * 10 * scale);
       g.lineTo(x - ux * 31 * scale, y - uy * 31 * scale); g.closePath(); g.fill(); }
+    g.restore();
+  }
+  // Clip at the elevated attack plane, so ground depth decides which half
+  // passes behind the body. No extra canvases or ground-cache invalidations.
+  function clipFxHalf(g, y, back) {
+    g.beginPath(); g.rect(-10000, back ? -10000 : y, 20000, back ? y + 10000 : 20000); g.clip();
+  }
+  const MELEE_HEIGHT = { slash: 26, dualSlash: 53, skCleave: 35, skCone: 26,
+    skAssassinFan: 38, skAssassinCast: 48, skAssassinLunge: 24, skMageVolley: 48,
+    skAura: 60, skMageWard: 72, skAssassinBuff: 56, skHunterBuff: 83 };
+  const meleeHeight = e => MELEE_HEIGHT[e.kind];
+  const fxOrigin = e => e.actor === Online.id ? hero : remotePlayers.get(e.actor) || e;
+  function drawMeleeFx(g, e, back) {
+    if (e.t < 0) return;
+    // The old fixed hero atlas contains its own painted rune slash. Modular
+    // weapons and remote actors need the separate cue; heroSpr is not global eligibility.
+    if ((e.kind === 'slash' || e.kind === 'dualSlash') && e.actor === Online.id && !isModular() && !warSpr && heroSpr) return;
+    const origin = fxOrigin(e), [, sy] = w2s(origin.x, origin.y, meleeHeight(e));
+    g.save(); clipFxHalf(g, sy, back);
+    if (e.kind === 'slash') {
+      const p = e.t / .32, a0 = e.a - 1.25, a1 = a0 + 2.5 * Math.min(1, p * 1.8);
+      g.save(); g.lineCap = 'round';
+      for (const [w, col, al] of [[16, '#59d9ff', .3], [8, '#bff6ff', .7], [3, '#ffffff', 1]]) {
+        g.globalAlpha = al * (1 - p); g.strokeStyle = col; g.lineWidth = w * (1 - p * .5); g.beginPath();
+        for (let i = 0; i <= 14; i++) { const a = lerp(a0, a1, i / 14), [sx, sy] = w2s(e.x + Math.cos(a) * 1.5, e.y + Math.sin(a) * 1.5, 26); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); }
+        g.stroke();
+      }
+      g.restore();
+    } else if (e.kind === 'dualSlash') {
+      const fade = Math.max(0, 1 - e.t / .3);
+      for (const side of [-1, 1]) {
+        const [ax, ay] = w2s(e.x + Math.cos(e.a - side * .5) * .5, e.y + Math.sin(e.a - side * .5) * .5, side < 0 ? 45 : 62);
+        const [bx, by] = w2s(e.x + Math.cos(e.a + side * .6) * 1.4, e.y + Math.sin(e.a + side * .6) * 1.4, side < 0 ? 62 : 45);
+        g.save(); g.globalAlpha = fade; g.strokeStyle = '#cfb5fa'; g.lineWidth = 6 * fade; g.lineCap = 'round'; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke();
+        g.strokeStyle = '#fff1ff'; g.lineWidth = 2; g.stroke(); g.restore();
+      }
+    } else drawSkillFx(g, e, 'air');
     g.restore();
   }
   function drawSkillFx(g, e, layer = 'air') {
@@ -2447,7 +2502,7 @@
     wardIceArt = { ice: crystal(false), flash: crystal(true), mist };
     return wardIceArt;
   }
-  function drawMageWardShell(g, who, t) {
+  function drawMageWardShell(g, who, t, back = false) {
     if (who.dead || who.look?.class !== 'mage') return;
     const active = mageWardActive(who), broken = tAll - (who.wardBreakAt ?? -99);
     if (!active && broken >= .55) return;
@@ -2456,9 +2511,10 @@
     const art = mageWardArt(), turn = calm ? 0 : t * .12;
     g.save();
     if (active) {
-      g.globalAlpha = .75 + hit * .25; g.drawImage(art.mist, -112, -220, 224, 320);
+      if (back) { g.globalAlpha = .75 + hit * .25; g.drawImage(art.mist, -112, -220, 224, 320); }
       for (const [angle, size, tilt] of WARD_ICE) {
         const phase = angle + turn, x = Math.cos(phase) * 72, y = -75 + Math.sin(phase) * 83;
+        if ((Math.sin(phase) < 0) !== back) continue;
         const bob = calm ? 0 : Math.sin(t * 1.6 + angle * 3) * 2;
         g.save(); g.translate(x, y + bob); g.rotate(tilt + (calm ? 0 : Math.sin(t + angle) * .06));
         g.scale(size, size); g.globalAlpha = .74 + soak * .22;
@@ -2472,6 +2528,7 @@
       g.globalAlpha = 1 - broken / .55;
       for (const [angle, size, tilt] of WARD_ICE) {
         const phase = angle + turn;
+        if ((Math.sin(phase) < 0) !== back) continue;
         g.save(); g.translate(Math.cos(phase) * (80 + p * 38), -75 + Math.sin(phase) * (92 + p * 38));
         g.rotate(tilt + p * Math.sin(angle) * 1.5); g.scale(size * .55, size * .55);
         g.drawImage(art.ice, -48, -32, 96, 128); g.restore();
@@ -2513,8 +2570,9 @@
     }
     g.restore();
   }
-  function drawPriestBuffShell(g, who, t) {
+  function drawPriestBuffShell(g, who, t, back = false) {
     if (who.dead || !who.buffs?.length) return;
+    g.save(); clipFxHalf(g, -72, back);
     const ending = id => who.buffs.find(b => b.id === id)?.left < 1.5 && Math.floor(t * 8) % 2;
     if (who.buffs.some(b => b.id === 'wardoflight')) {
       const pulse = .5 + .13 * Math.sin(t * 4);
@@ -2533,9 +2591,11 @@
       }
       g.restore();
     }
+    g.restore();
   }
-  function drawHunterBuffShell(g, who, t) {
+  function drawHunterBuffShell(g, who, t, back = false) {
     if (who.look?.class !== 'hunter' || who.dead || !who.buffs?.length) return;
+    g.save(); clipFxHalf(g, -83, back);
     for (const b of who.buffs) {
       if (!['huntersmark', 'rapidfire', 'eaglesight'].includes(b.id)) continue;
       const pulse = .45 + .14 * Math.sin(t * 4), ending = b.left < 1.5 && Math.floor(t * 8) % 2;
@@ -2556,6 +2616,7 @@
       }
       g.restore();
     }
+    g.restore();
   }
   function interpolate(actor, dt) {
     if (Number.isFinite(actor.danceT)) actor.danceT += dt;
@@ -3742,6 +3803,9 @@
   }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
+    g.save(); g.strokeStyle = '#d9f6be'; g.lineWidth = 2.5;
+    g.globalAlpha = reducedMotion() ? .7 : .55 + .18*Math.sin(t*2);
+    g.beginPath(); g.ellipse(sx, sy, 62.2*Math.max(p.r,2.8), 31.1*Math.max(p.r,2.8), 0, 0, Math.PI*2); g.stroke(); g.restore();
     if (p.walk) {
       if (window.ZoneJourney?.approach(g, p, zdef, ZONES[p.to], w2s, t, reducedMotion())) return;
       // A low roadside waymark replaces the glowing gate on ordinary outdoor routes.
@@ -3927,9 +3991,14 @@
       const [sx, sy] = w2s(remote.x, remote.y);
       if (onScreen(sx, sy, 160)) { shadow(g, remote.x, remote.y, 30, 12, .28); list.push({ d: remote.sparkTravel ? Infinity : remote.x + remote.y + .001, remote, sx, sy }); }
     }
+    for (const e of effects) if (meleeHeight(e) != null && e.t >= 0) {
+      const origin = fxOrigin(e), [sx, sy] = w2s(origin.x, origin.y); if (!onScreen(sx, sy, 450)) continue;
+      list.push({ d: origin.x + origin.y - .002, fx: e, back: true }, { d: origin.x + origin.y + .002, fx: e, back: false });
+    }
     list.sort((a, b) => a.d - b.d);
     const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y;
     for (const it of list) {
+      if (it.fx) { drawMeleeFx(g, it.fx, it.back); continue; }
       if (it.o) {
         const o = it.o;
         if (!set[o.kind]) {
@@ -3988,6 +4057,7 @@
         g.restore();
       } else if (it.remote) {
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);
+        drawMageWardShell(g, remote, t, true); drawPriestBuffShell(g, remote, t, true); drawHunterBuffShell(g, remote, t, true);
         if (!remote.sparkTravel && !remote.dead) window.Rebirth?.drawAura(g, remote.reborn?.tier, remote.mounted ? 1.25 : 1);
         if (remote.sparkTravel) Spark.draw(g,remote,t);
         else if (remote.sprite) { const seated = seatedInArt(remote, remote.sprite); if(!seated)drawMount(g,remote); if(remote.mounted&&!seated)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted&&!seated)g.translate(0,23); }
@@ -4000,7 +4070,7 @@
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
-      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); const seated = isModular() && seatedInArt(hero, mageSpr); if(!seated)drawMount(g,hero); if(hero.mounted&&!seated)g.translate(0,-23); if (isModular()) {
+      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); drawMageWardShell(g, hero, t, true); drawPriestBuffShell(g, hero, t, true); drawHunterBuffShell(g, hero, t, true); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); const seated = isModular() && seatedInArt(hero, mageSpr); if(!seated)drawMount(g,hero); if(hero.mounted&&!seated)g.translate(0,-23); if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
       } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
@@ -4028,25 +4098,7 @@
     window.DayNight?.draw(g, VW, VH, nightLights, w2s);
     window.Weather?.draw(g, VW, VH, t, { x: cx, y: cy });
     window.EmptySeat?.drawVision(g, w2s, VW, VH);
-    // slash arc on the ground plane (over everything: it is the axe's motion)
-    for (const e of effects) if ((e.kind === 'slash' || e.kind === 'dualSlash') && (heroSpr || e.t < 0)) continue; else if (e.kind === 'slash') {
-      const p = e.t / .32, a0 = e.a - 1.25, a1 = a0 + 2.5 * Math.min(1, p * 1.8);
-      g.save(); g.lineCap = 'round';
-      for (const [w, col, al] of [[16, '#59d9ff', .3], [8, '#bff6ff', .7], [3, '#ffffff', 1]]) {
-        g.globalAlpha = al * (1 - p); g.strokeStyle = col; g.lineWidth = w * (1 - p * .5); g.beginPath();
-        for (let i = 0; i <= 14; i++) { const a = lerp(a0, a1, i / 14), [sx, sy] = w2s(e.x + Math.cos(a) * 1.5, e.y + Math.sin(a) * 1.5, 26); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); }
-        g.stroke();
-      }
-      g.restore();
-    } else if (e.kind === 'dualSlash') {
-      const fade = Math.max(0, 1 - e.t / .3);
-      for (const side of [-1, 1]) {
-        const [ax, ay] = w2s(e.x + Math.cos(e.a - side * .5) * .5, e.y + Math.sin(e.a - side * .5) * .5, side < 0 ? 45 : 62);
-        const [bx, by] = w2s(e.x + Math.cos(e.a + side * .6) * 1.4, e.y + Math.sin(e.a + side * .6) * 1.4, side < 0 ? 62 : 45);
-        g.save(); g.globalAlpha = fade; g.strokeStyle = '#cfb5fa'; g.lineWidth = 6 * fade; g.lineCap = 'round'; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke();
-        g.strokeStyle = '#fff1ff'; g.lineWidth = 2; g.stroke(); g.restore();
-      }
-    } else if (e.kind === 'shadow' && mageSpr && isAssassin()) {
+    for (const e of effects) if (e.kind === 'slash' || e.kind === 'dualSlash') continue; else if (e.kind === 'shadow' && mageSpr && isAssassin()) {
       const [sx, sy] = w2s(e.x, e.y), [ax, ay] = mageSpr.meta.anchor;
       g.save(); g.globalAlpha = Math.max(0, .35 * (1 - e.t / .32)); g.imageSmoothingEnabled = false;
       g.drawImage(mageSpr.frame('walk', e.dir, e.frame), sx - ax * 1.3, sy - ay * 1.3, 160 * 1.3, 160 * 1.3); g.restore();
@@ -4075,7 +4127,7 @@
       if (e.col) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 1 - p; g.strokeStyle = e.col; } else g.strokeStyle = `rgba(255,224,102,${1 - p})`;
       g.lineWidth = 6 * (1 - p) + 1; g.beginPath(); g.ellipse(sx, sy, 30 + p * 120 * m, 14 + p * 56 * m, 0, 0, 6.283); g.stroke(); if (e.col) g.restore();
     }
-    for (const e of effects) if (e.kind === 'luPillar' || e.kind === 'luRays' || e.kind === 'rbPillar') drawLevelFx(g, e); else if (e.kind.startsWith('sk')) drawSkillFx(g, e);
+    for (const e of effects) if (e.kind === 'luPillar' || e.kind === 'luRays' || e.kind === 'rbPillar') drawLevelFx(g, e); else if (e.kind.startsWith('sk') && meleeHeight(e) == null) drawSkillFx(g, e);
     for (const b of bolts) {
       const [sx, sy] = w2s(b.x, b.y, 42), [tx, ty] = w2s(b.x - b.fx * .45, b.y - b.fy * .45, 42), [ux, uy] = projDir(b.fx, b.fy);
       const w = b.size || 9;
@@ -4500,7 +4552,7 @@
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
+    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };
   window.Field = Field;
 })();

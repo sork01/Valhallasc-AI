@@ -124,3 +124,35 @@ Same-version client release verified: all 76 public client/asset files match loc
 ## Selection rings and female synthesis follow-up
 
 Beta 1.32.2 is unchanged by owner request. Enemy selection rings render in the floor pass before depth-sorted bodies and scenery, rather than over the selected sprite. `tests/client-followups-ui.cjs` passes 34 focused checks including crab/toad drawing order, distinct female hurt/death synthesis across all five classes and audible non-clipping female hurt. `MUTATE=ring` restores the old drawing order and must fail. The same bounded private-world check validates the unified Buy flow documented in `docs/shop-selling.md`.
+
+## Melee and shell depth (Beta 1.32.8)
+
+Basic slash/Assassin dualSlash, Cleave, cone cuts and the Assassin fan now enter
+the standing-actor depth list as two clipped halves. The far half is drawn before
+the actor and the near half after it. The split is at the actor's projected y at
+the effect's attack height (26/35/38/53 pixels), rather than drawing every streak
+over every body. Sorting uses the current interpolated owner position, which
+also handles remote fighters and moving attackers. The same treatment covers
+Assassin launch/lunge, Mage volley/ward, rising auras and Assassin/Hunter buff
+casts. Floor sectors remain in their existing floor pass. Clipping reuses the
+main context; no additional canvases or ground-cache invalidations are needed.
+
+The fallback fixed hero atlas already paints its rune slash and skips the extra
+basic cue only for that actor. It no longer suppresses remote/modular cues merely
+because a local fallback atlas was loaded. The ordinary modular weapon poses
+carry weapon pixels without this blue canvas streak. Monsters use their own
+attack atlas clips, without the player-only `swing` event's separate arc.
+
+Persistent Mage Ward draws its mist and far orbiting ice behind the body and near
+ice in front, including the break animation. Priest and Hunter shells use the
+same before/after-body contract. Other `sk*` families were audited: floor-only
+reach/warnings/rings stay beneath actors; targeted hit flashes, projectiles,
+beams and healing/party-link glyphs retain their intentional impact/foreground
+placement. Priest shield/blessing cast glyphs are screen-facing symbols, not
+melee blades or orbiting shells. Ground Nova steel/daggers stay in the floor pass.
+
+`tests/melee-depth-ui.cjs` compares real opaque body pixels with/without each
+streak, proves that upward Swing/Cleave actually overlap the body without
+occlusion, and checks visible near-side pixels and draw order on downward Swing/Cleave,
+for both local and remote fighters. Setting
+`MUTATE=1` restores a single foreground pass and must fail the body-pixel check.
