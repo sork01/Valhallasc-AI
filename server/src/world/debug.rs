@@ -59,6 +59,15 @@ impl World {
     ) -> Result<Value, String> {
         // A teleport to a dungeon lands in a copy of it (the party's own, else a free one) and wakes that copy.
         let command = match command {
+            DebugCommand::SeasonTime { unix } => {
+                if !self.test_commands {
+                    return Err("Seasonal calendar overrides are private-test only.".into());
+                }
+                self.seasonal.override_unix = unix;
+                self.seasonal.next_check = 0.;
+                self.update_seasonal();
+                return Ok(json!(self.seasonal.cached));
+            }
             DebugCommand::Visibility { mode } => return self.set_visibility(session, &mode),
             DebugCommand::SetWeather { kind, intensity } => {
                 let zone = self
@@ -461,7 +470,8 @@ impl World {
             DebugCommand::Visibility { .. } => unreachable!("handled before borrowing the player"),
             DebugCommand::SetWeather { .. } => unreachable!("handled before borrowing the player"),
             DebugCommand::SpawnChest { .. } => unreachable!("handled before borrowing the player"),
-            DebugCommand::GmTestInfo
+            DebugCommand::SeasonTime { .. }
+            | DebugCommand::GmTestInfo
             | DebugCommand::GmActivity { .. }
             | DebugCommand::GmDungeonEnter { .. }
             | DebugCommand::GmDungeonReset

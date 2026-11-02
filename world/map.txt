@@ -3870,6 +3870,39 @@
       "autoLevel": 1,
       "repeatable": false,
       "handoffTo": "es_28"
+    },
+    {
+      "id": "halloween_alder",
+      "title": "A Light for Every Door",
+      "npc": "baker",
+      "description": "Pip wants every doorstep to glow for Halloween. Ask Linden for ribbons, Mira for lantern oil, and Tessa for warm cider, then bring Pip their good wishes.",
+      "objectives": [
+        {
+          "kind": "talk",
+          "target": "merchant",
+          "label": "Ask Linden for ribbons",
+          "count": 1
+        },
+        {
+          "kind": "talk",
+          "target": "apothecary",
+          "label": "Ask Mira about lantern oil",
+          "count": 1
+        },
+        {
+          "kind": "talk",
+          "target": "innkeeper",
+          "label": "Arrange warm cider with Tessa",
+          "count": 1
+        }
+      ],
+      "level": 1,
+      "minLevel": 1,
+      "rewardXp": 10,
+      "rewardGold": 75,
+      "requires": null,
+      "repeatable": true,
+      "season": "halloween"
     }
   ],
   "name": "Greenmeadow",
@@ -8728,6 +8761,188 @@
           "r": 2.1
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "meadow_gate",
+          "points": [
+            [
+              35.5,
+              90.5
+            ],
+            [
+              45.5,
+              90.5
+            ],
+            [
+              45.5,
+              89.5
+            ],
+            [
+              48.5,
+              89.5
+            ],
+            [
+              48.5,
+              86.5
+            ]
+          ]
+        },
+        {
+          "portal": "rimeveil_gate",
+          "points": [
+            [
+              5.5,
+              39.5
+            ],
+            [
+              5.5,
+              43.5
+            ],
+            [
+              19.5,
+              43.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_1_4",
+          "points": [
+            [
+              5.5,
+              74.5
+            ],
+            [
+              5.5,
+              81.5
+            ],
+            [
+              12.5,
+              81.5
+            ],
+            [
+              12.5,
+              82.5
+            ],
+            [
+              15.5,
+              82.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_1_6",
+          "points": [
+            [
+              21.5,
+              5.5
+            ],
+            [
+              21.5,
+              13.5
+            ],
+            [
+              31.5,
+              13.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_1_7",
+          "points": [
+            [
+              55.5,
+              6.5
+            ],
+            [
+              55.5,
+              15.5
+            ],
+            [
+              64.5,
+              15.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_1_9",
+          "points": [
+            [
+              75.5,
+              6.5
+            ],
+            [
+              75.5,
+              15.5
+            ],
+            [
+              78.5,
+              15.5
+            ],
+            [
+              78.5,
+              16.5
+            ],
+            [
+              79.5,
+              16.5
+            ],
+            [
+              79.5,
+              20.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_1_15",
+          "points": [
+            [
+              90.5,
+              72.5
+            ],
+            [
+              90.5,
+              78.5
+            ],
+            [
+              89.5,
+              78.5
+            ],
+            [
+              89.5,
+              81.5
+            ],
+            [
+              88.5,
+              81.5
+            ],
+            [
+              88.5,
+              82.5
+            ],
+            [
+              82.5,
+              82.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_1_16",
+          "points": [
+            [
+              75.5,
+              90.5
+            ],
+            [
+              75.5,
+              88.5
+            ],
+            [
+              59.5,
+              88.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -9513,6 +9728,72 @@
             86.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 56.0,
+          "y": 82.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Cinderwatch Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 54.13,
+          "y": 87.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Cinderwatch Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 50.5,
+          "y": 86.33,
+          "r": 0,
+          "v": 2,
+          "hub": "Cinderwatch Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 47.13,
+          "y": 86.92,
+          "r": 0,
+          "v": 0,
+          "hub": "Cinderwatch Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 40.48,
+          "y": 84.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Cinderwatch Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 44.17,
+          "y": 78.79,
+          "r": 0,
+          "v": 2,
+          "hub": "Cinderwatch Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 47.13,
+          "y": 77.08,
+          "r": 0,
+          "v": 0,
+          "hub": "Cinderwatch Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 58.34,
+          "y": 78.24,
+          "r": 0,
+          "v": 1,
+          "hub": "Cinderwatch Camp"
+        }
       ]
     },
     {
@@ -16254,7 +16535,7 @@
           "r": 1.1,
           "to": 4,
           "tx": 49.5,
-          "ty": 20.5,
+          "ty": 11.5,
           "walk": [
             0,
             1
@@ -16294,6 +16575,112 @@
           "x": 64,
           "y": 102,
           "r": 2.1
+        }
+      ],
+      "exitRoutes": [
+        {
+          "portal": "crags_gate",
+          "points": [
+            [
+              122.5,
+              75.5
+            ],
+            [
+              122.5,
+              77.5
+            ],
+            [
+              121.5,
+              77.5
+            ],
+            [
+              121.5,
+              92.5
+            ]
+          ]
+        },
+        {
+          "portal": "fen_gate",
+          "points": [
+            [
+              52.5,
+              122.5
+            ],
+            [
+              61.5,
+              122.5
+            ],
+            [
+              61.5,
+              121.5
+            ],
+            [
+              64.5,
+              121.5
+            ],
+            [
+              64.5,
+              118.5
+            ]
+          ]
+        },
+        {
+          "portal": "city_gate",
+          "points": [
+            [
+              85.5,
+              122.5
+            ],
+            [
+              81.5,
+              122.5
+            ],
+            [
+              81.5,
+              121.5
+            ],
+            [
+              78.5,
+              121.5
+            ],
+            [
+              78.5,
+              120.5
+            ],
+            [
+              72.5,
+              120.5
+            ],
+            [
+              72.5,
+              118.5
+            ],
+            [
+              71.5,
+              118.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_2_6",
+          "points": [
+            [
+              63.5,
+              5.5
+            ],
+            [
+              63.5,
+              13.5
+            ],
+            [
+              73.5,
+              13.5
+            ],
+            [
+              73.5,
+              13.5
+            ]
+          ]
         }
       ],
       "atlasPaths": [
@@ -16765,6 +17152,72 @@
             118.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 72.0,
+          "y": 114.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimeward Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 70.13,
+          "y": 119.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimeward Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 66.5,
+          "y": 118.33,
+          "r": 0,
+          "v": 2,
+          "hub": "Rimeward Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 63.13,
+          "y": 118.92,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimeward Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 56.48,
+          "y": 116.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimeward Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 60.17,
+          "y": 110.79,
+          "r": 0,
+          "v": 2,
+          "hub": "Rimeward Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 63.13,
+          "y": 109.08,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimeward Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 74.34,
+          "y": 110.24,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimeward Camp"
+        }
       ]
     },
     {
@@ -23188,6 +23641,67 @@
           "r": 2.1
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "summit_gate",
+          "points": [
+            [
+              69.5,
+              5.5
+            ],
+            [
+              69.5,
+              9.5
+            ],
+            [
+              64.5,
+              9.5
+            ]
+          ]
+        },
+        {
+          "portal": "atlas_3_0",
+          "points": [
+            [
+              122.5,
+              92.5
+            ],
+            [
+              122.5,
+              106.5
+            ],
+            [
+              120.5,
+              106.5
+            ],
+            [
+              120.5,
+              108.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_3_4",
+          "points": [
+            [
+              122.5,
+              56.5
+            ],
+            [
+              122.5,
+              63.5
+            ],
+            [
+              121.5,
+              63.5
+            ],
+            [
+              121.5,
+              73.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -23519,6 +24033,120 @@
             9.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 75.0,
+          "y": 19.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 79.0,
+          "y": 19.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 84.0,
+          "y": 19.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 68.7,
+          "y": 20.71,
+          "r": 0,
+          "v": 0,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 82.79,
+          "y": 25.84,
+          "r": 0,
+          "v": 1,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 72.43,
+          "y": 26.07,
+          "r": 0,
+          "v": 2,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 75.49,
+          "y": 28.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 65.39,
+          "y": 26.88,
+          "r": 0,
+          "v": 1,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 65.91,
+          "y": 29.83,
+          "r": 0,
+          "v": 2,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 62.61,
+          "y": 26.88,
+          "r": 0,
+          "v": 0,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 62.09,
+          "y": 29.83,
+          "r": 0,
+          "v": 1,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 55.57,
+          "y": 26.07,
+          "r": 0,
+          "v": 2,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 52.51,
+          "y": 28.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Lanternmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 59.3,
+          "y": 20.71,
+          "r": 0,
+          "v": 1,
+          "hub": "Lanternmere"
+        }
       ]
     },
     {
@@ -23534,7 +24162,7 @@
         [
           [
             49.5,
-            14.5
+            5.5
           ],
           [
             49.5,
@@ -24117,33 +24745,22 @@
         },
         {
           "kind": "rampart",
-          "x": 42.49,
+          "x": 42.33022727272727,
           "y": 12.0,
           "r": 0,
           "v": 0,
-          "width": 5.659090909090909,
+          "width": 5.339545454545451,
           "depth": 1.8,
           "color": "#d7d3bc",
           "label": ""
         },
         {
           "kind": "rampart",
-          "x": 48.0,
+          "x": 55.16977272727273,
           "y": 12.0,
           "r": 0,
           "v": 0,
-          "width": 5.659090909090909,
-          "depth": 1.8,
-          "color": "#d7d3bc",
-          "label": ""
-        },
-        {
-          "kind": "rampart",
-          "x": 53.51,
-          "y": 12.0,
-          "r": 0,
-          "v": 0,
-          "width": 5.659090909090909,
+          "width": 2.3395454545454513,
           "depth": 1.8,
           "color": "#d7d3bc",
           "label": ""
@@ -24436,22 +25053,22 @@
         },
         {
           "kind": "rampart",
-          "x": 104.02,
+          "x": 102.00027777777777,
           "y": 140.0,
           "r": 0,
           "v": 0,
-          "width": 6.038888888888889,
+          "width": 1.9994444444444497,
           "depth": 1.8,
           "color": "#d7d3bc",
           "label": ""
         },
         {
           "kind": "rampart",
-          "x": 109.91,
+          "x": 112.46472222222222,
           "y": 140.0,
           "r": 0,
           "v": 0,
-          "width": 6.038888888888889,
+          "width": 0.9294444444444423,
           "depth": 1.8,
           "color": "#d7d3bc",
           "label": ""
@@ -24646,22 +25263,22 @@
         {
           "kind": "rampart",
           "x": 16.0,
-          "y": 85.96,
+          "y": 84.06522727272727,
           "r": 0,
           "v": 0,
           "width": 1.8,
-          "depth": 5.659090909090909,
+          "depth": 1.8695454545454595,
           "color": "#d7d3bc",
           "label": ""
         },
         {
           "kind": "rampart",
           "x": 16.0,
-          "y": 91.47,
+          "y": 94.14977272727273,
           "r": 0,
           "v": 0,
           "width": 1.8,
-          "depth": 5.659090909090909,
+          "depth": 0.2995454545454521,
           "color": "#d7d3bc",
           "label": ""
         },
@@ -30319,33 +30936,22 @@
         {
           "kind": "rampart",
           "x": 144.0,
-          "y": 46.09,
+          "y": 45.53527777777778,
           "r": 0,
           "v": 0,
           "width": 1.8,
-          "depth": 6.038888888888889,
+          "depth": 4.929444444444442,
           "color": "#d7d3bc",
           "label": ""
         },
         {
           "kind": "rampart",
           "x": 144.0,
-          "y": 51.98,
+          "y": 58.944722222222225,
           "r": 0,
           "v": 0,
           "width": 1.8,
-          "depth": 6.038888888888889,
-          "color": "#d7d3bc",
-          "label": ""
-        },
-        {
-          "kind": "rampart",
-          "x": 144.0,
-          "y": 57.87,
-          "r": 0,
-          "v": 0,
-          "width": 1.8,
-          "depth": 6.038888888888889,
+          "depth": 3.889444444444443,
           "color": "#d7d3bc",
           "label": ""
         },
@@ -33144,6 +33750,39 @@
           "autoLevel": 1,
           "repeatable": false,
           "handoffTo": "es_05"
+        },
+        {
+          "id": "halloween_skald",
+          "title": "The Kindly Ghost Parade",
+          "npc": "city_bard",
+          "description": "Eira is planning a friendly ghost parade. Find a story with Fenwick, ask Brunhild for a little bell, and invite Captain Ingrid to lead the procession.",
+          "objectives": [
+            {
+              "kind": "talk",
+              "target": "city_librarian",
+              "label": "Find a friendly ghost story",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "city_smith",
+              "label": "Ask Brunhild for a parade bell",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "city_captain",
+              "label": "Invite Captain Ingrid to the parade",
+              "count": 1
+            }
+          ],
+          "level": 20,
+          "minLevel": 20,
+          "rewardXp": 650,
+          "rewardGold": 450,
+          "requires": null,
+          "repeatable": true,
+          "season": "halloween"
         }
       ],
       "city": {
@@ -33167,7 +33806,7 @@
           "id": "glacier_gate",
           "name": "Rimeveil Glacier",
           "x": 49.5,
-          "y": 14.5,
+          "y": 5.5,
           "r": 1.1,
           "to": 2,
           "tx": 85.5,
@@ -33240,11 +33879,131 @@
           "r": 2.1
         }
       ],
+      "exitArches": [
+        {
+          "x": 49.5,
+          "y": 12,
+          "vertical": false,
+          "name": "Rimeveil Glacier",
+          "portal": "glacier_gate"
+        },
+        {
+          "x": 107.5,
+          "y": 140,
+          "vertical": false,
+          "name": "Greenmeadow",
+          "portal": "path_4_0"
+        },
+        {
+          "x": 144,
+          "y": 52.5,
+          "vertical": true,
+          "name": "Emberfall Crags",
+          "portal": "path_4_1"
+        },
+        {
+          "x": 16,
+          "y": 89.5,
+          "vertical": true,
+          "name": "Gloamfen",
+          "portal": "path_4_3"
+        }
+      ],
+      "exitRoutes": [
+        {
+          "portal": "glacier_gate",
+          "points": [
+            [
+              49.5,
+              5.5
+            ],
+            [
+              49.5,
+              23.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_4_0",
+          "points": [
+            [
+              107.5,
+              154.5
+            ],
+            [
+              107.5,
+              152.5
+            ],
+            [
+              97.5,
+              152.5
+            ],
+            [
+              97.5,
+              151.5
+            ],
+            [
+              92.5,
+              151.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_4_1",
+          "points": [
+            [
+              154.5,
+              52.5
+            ],
+            [
+              154.5,
+              55.5
+            ],
+            [
+              153.5,
+              55.5
+            ],
+            [
+              153.5,
+              58.5
+            ],
+            [
+              152.5,
+              58.5
+            ],
+            [
+              152.5,
+              68.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_4_3",
+          "points": [
+            [
+              5.5,
+              89.5
+            ],
+            [
+              5.5,
+              104.5
+            ],
+            [
+              6.5,
+              104.5
+            ],
+            [
+              6.5,
+              106.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
             49.5,
-            14.5
+            5.5
           ],
           [
             49.5,
@@ -33537,6 +34296,120 @@
             150.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 100.0,
+          "y": 76.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 94.1,
+          "y": 81.13,
+          "r": 0,
+          "v": 1,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 86.13,
+          "y": 81.14,
+          "r": 0,
+          "v": 2,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 88.43,
+          "y": 83.07,
+          "r": 0,
+          "v": 0,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 95.32,
+          "y": 88.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 84.0,
+          "y": 82.93,
+          "r": 0,
+          "v": 2,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 85.5,
+          "y": 85.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 87.5,
+          "y": 88.99,
+          "r": 0,
+          "v": 1,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 90.0,
+          "y": 93.32,
+          "r": 0,
+          "v": 2,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 81.91,
+          "y": 86.83,
+          "r": 0,
+          "v": 0,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 82.6,
+          "y": 90.77,
+          "r": 0,
+          "v": 1,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 83.47,
+          "y": 95.7,
+          "r": 0,
+          "v": 2,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 78.09,
+          "y": 86.83,
+          "r": 0,
+          "v": 0,
+          "hub": "Skaldholm"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 77.4,
+          "y": 90.77,
+          "r": 0,
+          "v": 1,
+          "hub": "Skaldholm"
+        }
       ]
     },
     {
@@ -51153,6 +52026,63 @@
           "color": "#bda473"
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "sky_gate",
+          "points": [
+            [
+              186.5,
+              40.5
+            ],
+            [
+              168.5,
+              40.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_6_1",
+          "points": [
+            [
+              155.5,
+              186.5
+            ],
+            [
+              155.5,
+              180.5
+            ],
+            [
+              152.5,
+              180.5
+            ],
+            [
+              152.5,
+              171.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_6_2",
+          "points": [
+            [
+              95.5,
+              186.5
+            ],
+            [
+              95.5,
+              173.5
+            ],
+            [
+              94.5,
+              173.5
+            ],
+            [
+              94.5,
+              169.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -51504,6 +52434,232 @@
             150.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 38.0,
+          "y": 150.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 44.0,
+          "y": 150.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 48.0,
+          "y": 150.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 53.0,
+          "y": 150.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 40.52,
+          "y": 152.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 43.34,
+          "y": 153.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 47.1,
+          "y": 155.13,
+          "r": 0,
+          "v": 0,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 51.79,
+          "y": 156.84,
+          "r": 0,
+          "v": 1,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 41.43,
+          "y": 157.07,
+          "r": 0,
+          "v": 2,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 44.49,
+          "y": 159.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 35.5,
+          "y": 154.33,
+          "r": 0,
+          "v": 1,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 37.0,
+          "y": 156.93,
+          "r": 0,
+          "v": 2,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 38.5,
+          "y": 159.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 40.5,
+          "y": 162.99,
+          "r": 0,
+          "v": 1,
+          "hub": "Hollowmoot"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 101.0,
+          "y": 86.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 107.0,
+          "y": 86.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 116.0,
+          "y": 86.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 103.52,
+          "y": 88.74,
+          "r": 0,
+          "v": 2,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 114.79,
+          "y": 92.84,
+          "r": 0,
+          "v": 0,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 102.13,
+          "y": 91.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 104.43,
+          "y": 93.07,
+          "r": 0,
+          "v": 2,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 107.49,
+          "y": 95.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 98.5,
+          "y": 90.33,
+          "r": 0,
+          "v": 1,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 100.0,
+          "y": 92.93,
+          "r": 0,
+          "v": 2,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 97.39,
+          "y": 93.88,
+          "r": 0,
+          "v": 0,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 95.13,
+          "y": 90.92,
+          "r": 0,
+          "v": 1,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 94.61,
+          "y": 93.88,
+          "r": 0,
+          "v": 2,
+          "hub": "Skuldwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 92.0,
+          "y": 92.93,
+          "r": 0,
+          "v": 0,
+          "hub": "Skuldwatch"
+        }
       ]
     },
     {
@@ -51916,51 +53072,11 @@
         ],
         [
           [
-            113.5,
-            106.5
+            122.5,
+            113.5
           ],
           [
-            113.5,
-            111.5
-          ],
-          [
-            114.5,
-            111.5
-          ],
-          [
-            114.5,
-            114.5
-          ],
-          [
-            115.5,
-            114.5
-          ],
-          [
-            115.5,
-            115.5
-          ],
-          [
-            116.5,
-            115.5
-          ],
-          [
-            116.5,
-            116.5
-          ],
-          [
-            117.5,
-            116.5
-          ],
-          [
-            117.5,
-            117.5
-          ],
-          [
-            118.5,
-            117.5
-          ],
-          [
-            118.5,
+            122.5,
             118.5
           ],
           [
@@ -61930,13 +63046,6 @@
         },
         {
           "kind": "cloudpuff",
-          "x": 123.14,
-          "y": 117.39,
-          "r": 0.3,
-          "v": 2
-        },
-        {
-          "kind": "cloudpuff",
           "x": 154.19,
           "y": 74.99,
           "r": 0.3,
@@ -62448,13 +63557,6 @@
         },
         {
           "kind": "cloudpuff",
-          "x": 123.61,
-          "y": 111.12,
-          "r": 0.3,
-          "v": 2
-        },
-        {
-          "kind": "cloudpuff",
           "x": 123.79,
           "y": 108.85,
           "r": 0.3,
@@ -62690,8 +63792,8 @@
           "kind": "prismgolem"
         },
         {
-          "x": 119.7,
-          "y": 115.73,
+          "x": 127.5,
+          "y": 121.5,
           "kind": "prismgolem"
         },
         {
@@ -64071,8 +65173,8 @@
           "name": "Nacrehold",
           "r": 2.0,
           "to": 9,
-          "x": 113.5,
-          "y": 106.5,
+          "x": 122.5,
+          "y": 113.5,
           "tx": 11.5,
           "ty": 53.5,
           "walk": [
@@ -64091,6 +65193,112 @@
           "shard": "ember_shard_7",
           "bossName": "Skybrand of Bifrost",
           "color": "#b7b3f3"
+        }
+      ],
+      "exitRoutes": [
+        {
+          "portal": "stormrift_down",
+          "points": [
+            [
+              31.5,
+              78.5
+            ],
+            [
+              47.5,
+              78.5
+            ],
+            [
+              47.5,
+              76.5
+            ],
+            [
+              47.5,
+              76.5
+            ]
+          ]
+        },
+        {
+          "portal": "maelstrom_down",
+          "points": [
+            [
+              152.5,
+              73.5
+            ],
+            [
+              152.5,
+              77.5
+            ],
+            [
+              148.5,
+              77.5
+            ],
+            [
+              148.5,
+              87.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_7_1",
+          "points": [
+            [
+              83.5,
+              154.5
+            ],
+            [
+              83.5,
+              146.5
+            ],
+            [
+              80.5,
+              146.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_7_9",
+          "points": [
+            [
+              122.5,
+              113.5
+            ],
+            [
+              122.5,
+              118.5
+            ],
+            [
+              123.5,
+              118.5
+            ],
+            [
+              123.5,
+              120.5
+            ],
+            [
+              125.5,
+              120.5
+            ],
+            [
+              125.5,
+              121.5
+            ],
+            [
+              128.5,
+              121.5
+            ],
+            [
+              128.5,
+              122.5
+            ],
+            [
+              129.5,
+              122.5
+            ],
+            [
+              129.5,
+              124.5
+            ]
+          ]
         }
       ],
       "atlasPaths": [
@@ -64462,51 +65670,11 @@
         ],
         [
           [
-            113.5,
-            106.5
+            122.5,
+            113.5
           ],
           [
-            113.5,
-            111.5
-          ],
-          [
-            114.5,
-            111.5
-          ],
-          [
-            114.5,
-            114.5
-          ],
-          [
-            115.5,
-            114.5
-          ],
-          [
-            115.5,
-            115.5
-          ],
-          [
-            116.5,
-            115.5
-          ],
-          [
-            116.5,
-            116.5
-          ],
-          [
-            117.5,
-            116.5
-          ],
-          [
-            117.5,
-            117.5
-          ],
-          [
-            118.5,
-            117.5
-          ],
-          [
-            118.5,
+            122.5,
             118.5
           ],
           [
@@ -64610,6 +65778,120 @@
             146.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 88.0,
+          "y": 136.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 87.52,
+          "y": 138.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 90.34,
+          "y": 139.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 86.13,
+          "y": 141.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 95.32,
+          "y": 148.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 82.5,
+          "y": 140.33,
+          "r": 0,
+          "v": 2,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 85.5,
+          "y": 145.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 81.39,
+          "y": 143.88,
+          "r": 0,
+          "v": 1,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 81.91,
+          "y": 146.83,
+          "r": 0,
+          "v": 2,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 79.13,
+          "y": 140.92,
+          "r": 0,
+          "v": 0,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 78.61,
+          "y": 143.88,
+          "r": 0,
+          "v": 1,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 78.09,
+          "y": 146.83,
+          "r": 0,
+          "v": 2,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 74.5,
+          "y": 145.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Heimdall's Perch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 73.87,
+          "y": 141.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Heimdall's Perch"
+        }
       ]
     },
     {
@@ -75298,6 +76580,75 @@
           "color": "#6fcbd1"
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "maelstrom_up",
+          "points": [
+            [
+              10.5,
+              102.5
+            ],
+            [
+              10.5,
+              104.5
+            ],
+            [
+              14.5,
+              104.5
+            ],
+            [
+              14.5,
+              106.5
+            ],
+            [
+              24.5,
+              106.5
+            ]
+          ]
+        },
+        {
+          "portal": "nacre_gate",
+          "points": [
+            [
+              92.5,
+              170.5
+            ],
+            [
+              92.5,
+              168.5
+            ],
+            [
+              86.5,
+              168.5
+            ],
+            [
+              86.5,
+              165.5
+            ],
+            [
+              80.5,
+              165.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_8_13",
+          "points": [
+            [
+              165.5,
+              94.5
+            ],
+            [
+              165.5,
+              106.5
+            ],
+            [
+              159.5,
+              106.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -75485,6 +76836,120 @@
             165.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 88.0,
+          "y": 155.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 87.52,
+          "y": 157.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 90.34,
+          "y": 158.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 86.13,
+          "y": 160.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 82.5,
+          "y": 159.33,
+          "r": 0,
+          "v": 1,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 85.5,
+          "y": 164.53,
+          "r": 0,
+          "v": 2,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 81.39,
+          "y": 162.88,
+          "r": 0,
+          "v": 0,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 81.91,
+          "y": 165.83,
+          "r": 0,
+          "v": 1,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 79.13,
+          "y": 159.92,
+          "r": 0,
+          "v": 2,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 78.61,
+          "y": 162.88,
+          "r": 0,
+          "v": 0,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 78.09,
+          "y": 165.83,
+          "r": 0,
+          "v": 1,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 74.5,
+          "y": 164.53,
+          "r": 0,
+          "v": 2,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 73.87,
+          "y": 160.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Keelhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 64.68,
+          "y": 167.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Keelhaven"
+        }
       ]
     },
     {
@@ -79967,6 +81432,39 @@
           "autoLevel": 1,
           "repeatable": false,
           "handoffTo": "es_09"
+        },
+        {
+          "id": "halloween_nacre",
+          "title": "Lanterns for the Lost",
+          "npc": "nacre_gardener",
+          "description": "Pelar tends a gentle Halloween remembrance. Visit the Memorial of the Lost Choir, ask Syllene for a song, and help Ilo plan the lantern lighting.",
+          "objectives": [
+            {
+              "kind": "visit",
+              "target": "nacre_memorial",
+              "label": "Visit the Memorial of the Lost Choir",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_singer",
+              "label": "Ask Syllene for a remembrance song",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_lamplighter",
+              "label": "Plan the lantern lighting with Ilo",
+              "count": 1
+            }
+          ],
+          "level": 40,
+          "minLevel": 40,
+          "rewardXp": 2210,
+          "rewardGold": 1400,
+          "requires": null,
+          "repeatable": true,
+          "season": "halloween"
         }
       ],
       "futureInstance": {
@@ -80081,8 +81579,8 @@
           "to": 7,
           "x": 5.5,
           "y": 53.5,
-          "tx": 107.5,
-          "ty": 106.5,
+          "tx": 116.5,
+          "ty": 113.5,
           "walk": [
             -1,
             0
@@ -80100,6 +81598,81 @@
           "walk": [
             1,
             0
+          ]
+        }
+      ],
+      "exitRoutes": [
+        {
+          "portal": "nacre_deep_gate",
+          "points": [
+            [
+              94.5,
+              5.5
+            ],
+            [
+              94.5,
+              19.5
+            ],
+            [
+              91.5,
+              19.5
+            ],
+            [
+              91.5,
+              20.5
+            ]
+          ]
+        },
+        {
+          "portal": "nacre_astral_gate",
+          "points": [
+            [
+              186.5,
+              52.5
+            ],
+            [
+              186.5,
+              70.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_9_1",
+          "points": [
+            [
+              71.5,
+              186.5
+            ],
+            [
+              89.5,
+              186.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_9_7",
+          "points": [
+            [
+              5.5,
+              53.5
+            ],
+            [
+              5.5,
+              71.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_9_15",
+          "points": [
+            [
+              186.5,
+              125.5
+            ],
+            [
+              186.5,
+              143.5
+            ]
           ]
         }
       ],
@@ -80206,6 +81779,120 @@
             171.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 101.0,
+          "y": 96.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 104.0,
+          "y": 96.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 107.0,
+          "y": 96.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 111.0,
+          "y": 96.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 116.0,
+          "y": 96.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 103.52,
+          "y": 98.74,
+          "r": 0,
+          "v": 2,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 106.34,
+          "y": 99.76,
+          "r": 0,
+          "v": 0,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 110.1,
+          "y": 101.13,
+          "r": 0,
+          "v": 1,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 114.79,
+          "y": 102.84,
+          "r": 0,
+          "v": 2,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 99.83,
+          "y": 99.21,
+          "r": 0,
+          "v": 0,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 102.13,
+          "y": 101.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 104.43,
+          "y": 103.07,
+          "r": 0,
+          "v": 2,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 107.49,
+          "y": 105.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Nacrehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 111.32,
+          "y": 108.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Nacrehold"
+        }
       ]
     },
     {
@@ -106525,6 +108212,88 @@
           "color": "#b59aef"
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "astral_nacre_gate",
+          "points": [
+            [
+              5.5,
+              88.5
+            ],
+            [
+              5.5,
+              97.5
+            ],
+            [
+              9.5,
+              97.5
+            ],
+            [
+              9.5,
+              102.5
+            ]
+          ]
+        },
+        {
+          "portal": "astral_prism_gate",
+          "points": [
+            [
+              122.5,
+              57.5
+            ],
+            [
+              120.5,
+              57.5
+            ],
+            [
+              120.5,
+              58.5
+            ],
+            [
+              119.5,
+              58.5
+            ],
+            [
+              119.5,
+              70.5
+            ],
+            [
+              117.5,
+              70.5
+            ],
+            [
+              117.5,
+              70.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_13_8",
+          "points": [
+            [
+              5.5,
+              58.5
+            ],
+            [
+              5.5,
+              76.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_13_15",
+          "points": [
+            [
+              64.5,
+              122.5
+            ],
+            [
+              64.5,
+              116.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -106758,6 +108527,120 @@
             116.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 69.0,
+          "y": 116.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 72.0,
+          "y": 116.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 79.0,
+          "y": 116.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 71.52,
+          "y": 118.74,
+          "r": 0,
+          "v": 0,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 78.1,
+          "y": 121.13,
+          "r": 0,
+          "v": 1,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 57.87,
+          "y": 121.14,
+          "r": 0,
+          "v": 2,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 59.3,
+          "y": 117.71,
+          "r": 0,
+          "v": 0,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 56.48,
+          "y": 118.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 49.9,
+          "y": 121.13,
+          "r": 0,
+          "v": 2,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 56.0,
+          "y": 116.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 49.0,
+          "y": 116.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 59.3,
+          "y": 114.29,
+          "r": 0,
+          "v": 2,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 56.48,
+          "y": 113.26,
+          "r": 0,
+          "v": 0,
+          "hub": "Astralhollow"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 49.9,
+          "y": 110.87,
+          "r": 0,
+          "v": 1,
+          "hub": "Astralhollow"
+        }
       ]
     },
     {
@@ -110772,6 +112655,88 @@
           "color": "#efa6bc"
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "prism_astral_gate",
+          "points": [
+            [
+              5.5,
+              58.5
+            ],
+            [
+              5.5,
+              60.5
+            ],
+            [
+              3.5,
+              60.5
+            ],
+            [
+              3.5,
+              61.5
+            ],
+            [
+              2.5,
+              61.5
+            ],
+            [
+              2.5,
+              73.5
+            ]
+          ]
+        },
+        {
+          "portal": "prism_orrery_gate",
+          "points": [
+            [
+              34.5,
+              122.5
+            ],
+            [
+              52.5,
+              122.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_14_19",
+          "points": [
+            [
+              69.5,
+              122.5
+            ],
+            [
+              69.5,
+              116.5
+            ],
+            [
+              64.5,
+              116.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_14_27",
+          "points": [
+            [
+              122.5,
+              49.5
+            ],
+            [
+              122.5,
+              59.5
+            ],
+            [
+              123.5,
+              59.5
+            ],
+            [
+              123.5,
+              66.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -110917,6 +112882,120 @@
             116.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 69.0,
+          "y": 114.0,
+          "r": 0,
+          "v": 0,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 79.0,
+          "y": 114.0,
+          "r": 0,
+          "v": 1,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 71.52,
+          "y": 116.74,
+          "r": 0,
+          "v": 2,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 63.13,
+          "y": 118.92,
+          "r": 0,
+          "v": 0,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 62.61,
+          "y": 121.88,
+          "r": 0,
+          "v": 1,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 60.17,
+          "y": 117.21,
+          "r": 0,
+          "v": 2,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 57.87,
+          "y": 119.14,
+          "r": 0,
+          "v": 0,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 56.48,
+          "y": 116.74,
+          "r": 0,
+          "v": 1,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 53.66,
+          "y": 117.76,
+          "r": 0,
+          "v": 2,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 49.9,
+          "y": 119.13,
+          "r": 0,
+          "v": 0,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 59.0,
+          "y": 114.0,
+          "r": 0,
+          "v": 1,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 49.0,
+          "y": 114.0,
+          "r": 0,
+          "v": 2,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 56.48,
+          "y": 111.26,
+          "r": 0,
+          "v": 0,
+          "hub": "The Last Shade"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 53.66,
+          "y": 110.24,
+          "r": 0,
+          "v": 1,
+          "hub": "The Last Shade"
+        }
       ]
     },
     {
@@ -115357,6 +117436,147 @@
           "color": "#e3b660"
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "orrery_prism_gate",
+          "points": [
+            [
+              93.5,
+              5.5
+            ],
+            [
+              93.5,
+              12.5
+            ],
+            [
+              90.5,
+              12.5
+            ],
+            [
+              90.5,
+              13.5
+            ],
+            [
+              89.5,
+              13.5
+            ],
+            [
+              89.5,
+              15.5
+            ],
+            [
+              88.5,
+              15.5
+            ],
+            [
+              88.5,
+              18.5
+            ],
+            [
+              88.5,
+              18.5
+            ]
+          ]
+        },
+        {
+          "portal": "orrery_moonspore_gate",
+          "points": [
+            [
+              54.5,
+              122.5
+            ],
+            [
+              54.5,
+              116.5
+            ],
+            [
+              48.5,
+              116.5
+            ],
+            [
+              48.5,
+              113.5
+            ],
+            [
+              45.5,
+              113.5
+            ]
+          ]
+        },
+        {
+          "portal": "atlas_15_45",
+          "points": [
+            [
+              89.5,
+              122.5
+            ],
+            [
+              89.5,
+              116.5
+            ],
+            [
+              77.5,
+              116.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_15_1",
+          "points": [
+            [
+              5.5,
+              72.5
+            ],
+            [
+              5.5,
+              90.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_15_9",
+          "points": [
+            [
+              5.5,
+              51.5
+            ],
+            [
+              5.5,
+              68.5
+            ],
+            [
+              6.5,
+              68.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_15_13",
+          "points": [
+            [
+              66.5,
+              5.5
+            ],
+            [
+              66.5,
+              23.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_15_19",
+          "points": [
+            [
+              122.5,
+              63.5
+            ],
+            [
+              122.5,
+              81.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -115784,6 +118004,120 @@
             112.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 34.0,
+          "y": 112.0,
+          "r": 0,
+          "v": 0,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.0,
+          "y": 112.0,
+          "r": 0,
+          "v": 1,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 40.0,
+          "y": 112.0,
+          "r": 0,
+          "v": 2,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 44.0,
+          "y": 112.0,
+          "r": 0,
+          "v": 0,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 35.13,
+          "y": 117.14,
+          "r": 0,
+          "v": 1,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 37.43,
+          "y": 119.07,
+          "r": 0,
+          "v": 2,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 40.49,
+          "y": 121.64,
+          "r": 0,
+          "v": 0,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 33.0,
+          "y": 118.93,
+          "r": 0,
+          "v": 1,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 34.5,
+          "y": 121.53,
+          "r": 0,
+          "v": 2,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 29.87,
+          "y": 116.92,
+          "r": 0,
+          "v": 0,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 30.39,
+          "y": 119.88,
+          "r": 0,
+          "v": 1,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 30.91,
+          "y": 122.83,
+          "r": 0,
+          "v": 2,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 26.5,
+          "y": 116.33,
+          "r": 0,
+          "v": 0,
+          "hub": "The Stillpoint"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 25.0,
+          "y": 118.93,
+          "r": 0,
+          "v": 1,
+          "hub": "The Stillpoint"
+        }
       ]
     },
     {
@@ -120621,6 +122955,84 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "moonspore_orrery_gate",
+          "points": [
+            [
+              72.5,
+              5.5
+            ],
+            [
+              72.5,
+              12.5
+            ],
+            [
+              71.5,
+              12.5
+            ],
+            [
+              71.5,
+              22.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_16_0",
+          "points": [
+            [
+              5.5,
+              74.5
+            ],
+            [
+              5.5,
+              92.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_16_1",
+          "points": [
+            [
+              27.5,
+              5.5
+            ],
+            [
+              27.5,
+              16.5
+            ],
+            [
+              29.5,
+              16.5
+            ],
+            [
+              29.5,
+              17.5
+            ],
+            [
+              30.5,
+              17.5
+            ],
+            [
+              30.5,
+              20.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_16_45",
+          "points": [
+            [
+              122.5,
+              51.5
+            ],
+            [
+              122.5,
+              69.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -120878,6 +123290,120 @@
             112.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 34.0,
+          "y": 112.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 40.0,
+          "y": 112.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 35.13,
+          "y": 117.14,
+          "r": 0,
+          "v": 2,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 37.43,
+          "y": 119.07,
+          "r": 0,
+          "v": 0,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 40.49,
+          "y": 121.64,
+          "r": 0,
+          "v": 1,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 33.0,
+          "y": 118.93,
+          "r": 0,
+          "v": 2,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 34.5,
+          "y": 121.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 29.87,
+          "y": 116.92,
+          "r": 0,
+          "v": 1,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 30.39,
+          "y": 119.88,
+          "r": 0,
+          "v": 2,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 30.91,
+          "y": 122.83,
+          "r": 0,
+          "v": 0,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 26.5,
+          "y": 116.33,
+          "r": 0,
+          "v": 1,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 25.0,
+          "y": 118.93,
+          "r": 0,
+          "v": 2,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 23.5,
+          "y": 121.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Lamplight Refuge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 22.87,
+          "y": 117.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Lamplight Refuge"
+        }
       ]
     },
     {
@@ -126882,6 +129408,39 @@
           "autoLevel": 1,
           "repeatable": false,
           "handoffTo": "es_14"
+        },
+        {
+          "id": "halloween_aster",
+          "title": "The Midnight Masquerade",
+          "npc": "asterion_singer",
+          "description": "Vela is arranging a Halloween masquerade beneath the stars. Ask Mora to ring the opening bell, Umi to dress the balconies, and Nim to welcome the masked guests.",
+          "objectives": [
+            {
+              "kind": "talk",
+              "target": "asterion_bellkeeper",
+              "label": "Arrange the opening bell with Mora",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "asterion_gardener",
+              "label": "Plan the balcony garlands with Umi",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "asterion_merchant",
+              "label": "Ask Nim to welcome the guests",
+              "count": 1
+            }
+          ],
+          "level": 60,
+          "minLevel": 60,
+          "rewardXp": 4670,
+          "rewardGold": 2600,
+          "requires": null,
+          "repeatable": true,
+          "season": "halloween"
         }
       ],
       "city": {
@@ -126978,6 +129537,25 @@
           "r": 2.1
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "asterion_stormglass_gate",
+          "points": [
+            [
+              116.5,
+              5.5
+            ],
+            [
+              116.5,
+              14.5
+            ],
+            [
+              107.5,
+              14.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -127025,6 +129603,120 @@
             162.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 95.0,
+          "y": 88.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 98.0,
+          "y": 88.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 97.52,
+          "y": 90.74,
+          "r": 0,
+          "v": 2,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 100.34,
+          "y": 91.76,
+          "r": 0,
+          "v": 0,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 104.1,
+          "y": 93.13,
+          "r": 0,
+          "v": 1,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 108.79,
+          "y": 94.84,
+          "r": 0,
+          "v": 2,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 93.83,
+          "y": 91.21,
+          "r": 0,
+          "v": 0,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 96.13,
+          "y": 93.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 98.43,
+          "y": 95.07,
+          "r": 0,
+          "v": 2,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 101.49,
+          "y": 97.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 105.32,
+          "y": 100.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 94.0,
+          "y": 94.93,
+          "r": 0,
+          "v": 2,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 95.5,
+          "y": 97.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Asterion"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 97.5,
+          "y": 100.99,
+          "r": 0,
+          "v": 1,
+          "hub": "Asterion"
+        }
       ]
     },
     {
@@ -138375,6 +141067,110 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "stormglass_asterion_gate",
+          "points": [
+            [
+              83.5,
+              122.5
+            ],
+            [
+              83.5,
+              106.5
+            ],
+            [
+              81.5,
+              106.5
+            ]
+          ]
+        },
+        {
+          "portal": "stormglass_sun_gate",
+          "points": [
+            [
+              122.5,
+              67.5
+            ],
+            [
+              122.5,
+              85.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_19_14",
+          "points": [
+            [
+              57.5,
+              5.5
+            ],
+            [
+              57.5,
+              15.5
+            ],
+            [
+              55.5,
+              15.5
+            ],
+            [
+              55.5,
+              21.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_19_15",
+          "points": [
+            [
+              5.5,
+              62.5
+            ],
+            [
+              5.5,
+              80.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_19_26",
+          "points": [
+            [
+              90.5,
+              5.5
+            ],
+            [
+              90.5,
+              22.5
+            ],
+            [
+              89.5,
+              22.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_19_45",
+          "points": [
+            [
+              54.5,
+              122.5
+            ],
+            [
+              54.5,
+              111.5
+            ],
+            [
+              52.5,
+              111.5
+            ],
+            [
+              52.5,
+              106.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -138668,6 +141464,120 @@
             105.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 35.0,
+          "y": 108.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 45.0,
+          "y": 108.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 37.52,
+          "y": 110.74,
+          "r": 0,
+          "v": 2,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 40.34,
+          "y": 111.76,
+          "r": 0,
+          "v": 0,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 44.1,
+          "y": 113.13,
+          "r": 0,
+          "v": 1,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 33.83,
+          "y": 111.21,
+          "r": 0,
+          "v": 2,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 38.43,
+          "y": 115.07,
+          "r": 0,
+          "v": 0,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 45.32,
+          "y": 120.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 35.5,
+          "y": 117.53,
+          "r": 0,
+          "v": 2,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 37.5,
+          "y": 120.99,
+          "r": 0,
+          "v": 0,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 30.87,
+          "y": 112.92,
+          "r": 0,
+          "v": 1,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 31.39,
+          "y": 115.88,
+          "r": 0,
+          "v": 2,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 31.91,
+          "y": 118.83,
+          "r": 0,
+          "v": 0,
+          "hub": "Breakwater Camp"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 32.6,
+          "y": 122.77,
+          "r": 0,
+          "v": 1,
+          "hub": "Breakwater Camp"
+        }
       ]
     },
     {
@@ -143657,6 +146567,179 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "sun_stormglass_gate",
+          "points": [
+            [
+              5.5,
+              52.5
+            ],
+            [
+              5.5,
+              70.5
+            ]
+          ]
+        },
+        {
+          "portal": "sun_ribbon_gate",
+          "points": [
+            [
+              62.5,
+              122.5
+            ],
+            [
+              62.5,
+              114.5
+            ],
+            [
+              61.5,
+              114.5
+            ],
+            [
+              61.5,
+              109.5
+            ],
+            [
+              58.5,
+              109.5
+            ],
+            [
+              58.5,
+              108.5
+            ],
+            [
+              58.5,
+              108.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_20_22",
+          "points": [
+            [
+              94.5,
+              122.5
+            ],
+            [
+              94.5,
+              120.5
+            ],
+            [
+              84.5,
+              120.5
+            ],
+            [
+              84.5,
+              118.5
+            ],
+            [
+              83.5,
+              118.5
+            ],
+            [
+              83.5,
+              115.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_20_23",
+          "points": [
+            [
+              122.5,
+              71.5
+            ],
+            [
+              122.5,
+              89.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_20_25",
+          "points": [
+            [
+              122.5,
+              56.5
+            ],
+            [
+              122.5,
+              58.5
+            ],
+            [
+              114.5,
+              58.5
+            ],
+            [
+              114.5,
+              60.5
+            ],
+            [
+              113.5,
+              60.5
+            ],
+            [
+              113.5,
+              62.5
+            ],
+            [
+              110.5,
+              62.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_20_26",
+          "points": [
+            [
+              62.5,
+              5.5
+            ],
+            [
+              62.5,
+              10.5
+            ],
+            [
+              59.5,
+              10.5
+            ],
+            [
+              59.5,
+              11.5
+            ],
+            [
+              58.5,
+              11.5
+            ],
+            [
+              58.5,
+              16.5
+            ],
+            [
+              57.5,
+              16.5
+            ],
+            [
+              57.5,
+              18.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_20_28",
+          "points": [
+            [
+              87.5,
+              5.5
+            ],
+            [
+              87.5,
+              23.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -144132,6 +147215,120 @@
             106.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 36.0,
+          "y": 106.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 39.0,
+          "y": 106.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 42.0,
+          "y": 106.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 46.0,
+          "y": 106.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 38.52,
+          "y": 108.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 45.1,
+          "y": 111.13,
+          "r": 0,
+          "v": 2,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 49.79,
+          "y": 112.84,
+          "r": 0,
+          "v": 0,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 34.83,
+          "y": 109.21,
+          "r": 0,
+          "v": 1,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 37.13,
+          "y": 111.14,
+          "r": 0,
+          "v": 2,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 42.49,
+          "y": 115.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 35.0,
+          "y": 112.93,
+          "r": 0,
+          "v": 1,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 36.5,
+          "y": 115.53,
+          "r": 0,
+          "v": 2,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 38.5,
+          "y": 118.99,
+          "r": 0,
+          "v": 0,
+          "hub": "Millbridge"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 41.0,
+          "y": 123.32,
+          "r": 0,
+          "v": 1,
+          "hub": "Millbridge"
+        }
       ]
     },
     {
@@ -148325,6 +151522,55 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "ribbon_sun_gate",
+          "points": [
+            [
+              72.5,
+              5.5
+            ],
+            [
+              72.5,
+              23.5
+            ]
+          ]
+        },
+        {
+          "portal": "ribbon_tangle_gate",
+          "points": [
+            [
+              130.5,
+              72.5
+            ],
+            [
+              130.5,
+              69.5
+            ],
+            [
+              115.5,
+              69.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_21_45",
+          "points": [
+            [
+              5.5,
+              56.5
+            ],
+            [
+              5.5,
+              70.5
+            ],
+            [
+              9.5,
+              70.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -148384,6 +151630,120 @@
             70.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 35.0,
+          "y": 70.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 38.0,
+          "y": 70.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 41.0,
+          "y": 70.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 45.0,
+          "y": 70.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.52,
+          "y": 72.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 40.34,
+          "y": 73.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 44.1,
+          "y": 75.13,
+          "r": 0,
+          "v": 0,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 33.83,
+          "y": 73.21,
+          "r": 0,
+          "v": 1,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 36.13,
+          "y": 75.14,
+          "r": 0,
+          "v": 2,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 41.49,
+          "y": 79.64,
+          "r": 0,
+          "v": 0,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 45.32,
+          "y": 82.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 34.0,
+          "y": 76.93,
+          "r": 0,
+          "v": 2,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 35.5,
+          "y": 79.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Jubilee Crossroads"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.5,
+          "y": 82.99,
+          "r": 0,
+          "v": 1,
+          "hub": "Jubilee Crossroads"
+        }
       ]
     },
     {
@@ -153742,6 +157102,83 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "tangle_ribbon_gate",
+          "points": [
+            [
+              5.5,
+              50.5
+            ],
+            [
+              5.5,
+              68.5
+            ]
+          ]
+        },
+        {
+          "portal": "tangle_worldheart_gate",
+          "points": [
+            [
+              88.5,
+              5.5
+            ],
+            [
+              88.5,
+              11.5
+            ],
+            [
+              87.5,
+              11.5
+            ],
+            [
+              87.5,
+              16.5
+            ],
+            [
+              85.5,
+              16.5
+            ],
+            [
+              85.5,
+              18.5
+            ],
+            [
+              84.5,
+              18.5
+            ],
+            [
+              84.5,
+              19.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_22_20",
+          "points": [
+            [
+              42.5,
+              5.5
+            ],
+            [
+              42.5,
+              13.5
+            ],
+            [
+              41.5,
+              13.5
+            ],
+            [
+              41.5,
+              18.5
+            ],
+            [
+              37.5,
+              18.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -153953,6 +157390,120 @@
             111.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 34.0,
+          "y": 110.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.0,
+          "y": 110.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 40.0,
+          "y": 110.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 44.0,
+          "y": 110.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 36.52,
+          "y": 112.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 39.34,
+          "y": 113.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 43.1,
+          "y": 115.13,
+          "r": 0,
+          "v": 0,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 47.79,
+          "y": 116.84,
+          "r": 0,
+          "v": 1,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 32.83,
+          "y": 113.21,
+          "r": 0,
+          "v": 2,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 35.13,
+          "y": 115.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.43,
+          "y": 117.07,
+          "r": 0,
+          "v": 1,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 40.49,
+          "y": 119.64,
+          "r": 0,
+          "v": 2,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 33.0,
+          "y": 116.93,
+          "r": 0,
+          "v": 0,
+          "hub": "Banyan Landing"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 34.5,
+          "y": 119.53,
+          "r": 0,
+          "v": 1,
+          "hub": "Banyan Landing"
+        }
       ]
     },
     {
@@ -156449,6 +160000,63 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "canopy_jungle_gate",
+          "points": [
+            [
+              49.5,
+              122.5
+            ],
+            [
+              49.5,
+              110.5
+            ],
+            [
+              48.5,
+              110.5
+            ],
+            [
+              48.5,
+              105.5
+            ]
+          ]
+        },
+        {
+          "portal": "canopy_lapis_gate",
+          "points": [
+            [
+              62.5,
+              5.5
+            ],
+            [
+              62.5,
+              15.5
+            ],
+            [
+              61.5,
+              15.5
+            ],
+            [
+              61.5,
+              22.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_23_20",
+          "points": [
+            [
+              5.5,
+              55.5
+            ],
+            [
+              5.5,
+              73.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -156580,6 +160188,120 @@
             95.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 61.0,
+          "y": 88.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 64.0,
+          "y": 88.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 67.0,
+          "y": 88.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 71.0,
+          "y": 88.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 76.0,
+          "y": 88.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 63.52,
+          "y": 90.74,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 66.34,
+          "y": 91.76,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 70.1,
+          "y": 93.13,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 59.83,
+          "y": 91.21,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 62.13,
+          "y": 93.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 64.43,
+          "y": 95.07,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 67.49,
+          "y": 97.64,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 71.32,
+          "y": 100.86,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Canopy"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 60.0,
+          "y": 94.93,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Canopy"
+        }
       ]
     },
     {
@@ -157646,6 +161368,120 @@
           "tx": 48,
           "ty": 82,
           "look": "seed_vault"
+        }
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 53.0,
+          "y": 48.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 59.0,
+          "y": 48.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 63.0,
+          "y": 48.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 68.0,
+          "y": 48.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 55.52,
+          "y": 50.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 58.34,
+          "y": 51.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 62.1,
+          "y": 53.13,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 66.79,
+          "y": 54.84,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 51.83,
+          "y": 51.21,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 54.13,
+          "y": 53.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 56.43,
+          "y": 55.07,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 59.49,
+          "y": 57.64,
+          "r": 0,
+          "v": 2,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 63.32,
+          "y": 60.86,
+          "r": 0,
+          "v": 0,
+          "hub": "Veyrroot Heartwood"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 52.0,
+          "y": 54.93,
+          "r": 0,
+          "v": 1,
+          "hub": "Veyrroot Heartwood"
         }
       ]
     },
@@ -162251,6 +166087,51 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "lapis_canopy_gate",
+          "points": [
+            [
+              81.5,
+              154.5
+            ],
+            [
+              81.5,
+              138.5
+            ],
+            [
+              79.5,
+              138.5
+            ]
+          ]
+        },
+        {
+          "portal": "atlas_25_28",
+          "points": [
+            [
+              54.5,
+              5.5
+            ],
+            [
+              54.5,
+              23.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_25_20",
+          "points": [
+            [
+              5.5,
+              89.5
+            ],
+            [
+              5.5,
+              107.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -162382,6 +166263,120 @@
             128.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 34.0,
+          "y": 128.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.0,
+          "y": 128.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 36.52,
+          "y": 130.74,
+          "r": 0,
+          "v": 2,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 39.34,
+          "y": 131.76,
+          "r": 0,
+          "v": 0,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 47.79,
+          "y": 134.84,
+          "r": 0,
+          "v": 1,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 32.83,
+          "y": 131.21,
+          "r": 0,
+          "v": 2,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 35.13,
+          "y": 133.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 40.49,
+          "y": 137.64,
+          "r": 0,
+          "v": 1,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 44.32,
+          "y": 140.86,
+          "r": 0,
+          "v": 2,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 36.5,
+          "y": 140.99,
+          "r": 0,
+          "v": 0,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 39.0,
+          "y": 145.32,
+          "r": 0,
+          "v": 1,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 29.87,
+          "y": 132.92,
+          "r": 0,
+          "v": 2,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 31.6,
+          "y": 142.77,
+          "r": 0,
+          "v": 0,
+          "hub": "Azure Wells"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 27.61,
+          "y": 135.88,
+          "r": 0,
+          "v": 1,
+          "hub": "Azure Wells"
+        }
       ]
     },
     {
@@ -166949,6 +170944,76 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "frostwake_cairn_gate",
+          "points": [
+            [
+              5.5,
+              73.5
+            ],
+            [
+              5.5,
+              91.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_26_19",
+          "points": [
+            [
+              38.5,
+              154.5
+            ],
+            [
+              38.5,
+              137.5
+            ],
+            [
+              37.5,
+              137.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_26_20",
+          "points": [
+            [
+              78.5,
+              154.5
+            ],
+            [
+              78.5,
+              147.5
+            ],
+            [
+              77.5,
+              147.5
+            ],
+            [
+              77.5,
+              141.5
+            ],
+            [
+              73.5,
+              141.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_26_28",
+          "points": [
+            [
+              154.5,
+              99.5
+            ],
+            [
+              154.5,
+              117.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -167086,6 +171151,120 @@
             137.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 34.0,
+          "y": 136.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.0,
+          "y": 136.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 40.0,
+          "y": 136.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 49.0,
+          "y": 136.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 43.1,
+          "y": 141.13,
+          "r": 0,
+          "v": 1,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 40.49,
+          "y": 145.64,
+          "r": 0,
+          "v": 2,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 44.32,
+          "y": 148.86,
+          "r": 0,
+          "v": 0,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 31.5,
+          "y": 140.33,
+          "r": 0,
+          "v": 1,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 34.5,
+          "y": 145.53,
+          "r": 0,
+          "v": 2,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 30.39,
+          "y": 143.88,
+          "r": 0,
+          "v": 0,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 30.91,
+          "y": 146.83,
+          "r": 0,
+          "v": 1,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 28.13,
+          "y": 140.92,
+          "r": 0,
+          "v": 2,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 27.61,
+          "y": 143.88,
+          "r": 0,
+          "v": 0,
+          "hub": "Frostwake Station"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 27.09,
+          "y": 146.83,
+          "r": 0,
+          "v": 1,
+          "hub": "Frostwake Station"
+        }
       ]
     },
     {
@@ -171665,6 +175844,34 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "cairn_frostwake_gate",
+          "points": [
+            [
+              162.5,
+              101.5
+            ],
+            [
+              162.5,
+              119.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_27_14",
+          "points": [
+            [
+              5.5,
+              104.5
+            ],
+            [
+              5.5,
+              122.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -171790,6 +175997,120 @@
             145.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 35.0,
+          "y": 145.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 38.0,
+          "y": 145.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 41.0,
+          "y": 145.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 50.0,
+          "y": 145.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 37.52,
+          "y": 147.74,
+          "r": 0,
+          "v": 1,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 40.34,
+          "y": 148.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 44.1,
+          "y": 150.13,
+          "r": 0,
+          "v": 0,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 33.83,
+          "y": 148.21,
+          "r": 0,
+          "v": 1,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 41.49,
+          "y": 154.64,
+          "r": 0,
+          "v": 2,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 45.32,
+          "y": 157.86,
+          "r": 0,
+          "v": 0,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 35.5,
+          "y": 154.53,
+          "r": 0,
+          "v": 1,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 37.5,
+          "y": 157.99,
+          "r": 0,
+          "v": 2,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 30.87,
+          "y": 149.92,
+          "r": 0,
+          "v": 0,
+          "hub": "Boulderwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 31.39,
+          "y": 152.88,
+          "r": 0,
+          "v": 1,
+          "hub": "Boulderwatch"
+        }
       ]
     },
     {
@@ -185049,6 +189370,51 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "atlas_28_25",
+          "points": [
+            [
+              267.5,
+              394.5
+            ],
+            [
+              267.5,
+              376.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_28_20",
+          "points": [
+            [
+              125.5,
+              394.5
+            ],
+            [
+              125.5,
+              376.5
+            ],
+            [
+              125.5,
+              376.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_28_26",
+          "points": [
+            [
+              5.5,
+              187.5
+            ],
+            [
+              5.5,
+              205.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -185172,6 +189538,456 @@
             359.5
           ]
         ]
+      ],
+      "seasonDecor": [
+        {
+          "kind": "festivalPumpkins",
+          "x": 81.0,
+          "y": 324.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 87.0,
+          "y": 324.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 91.0,
+          "y": 324.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 86.34,
+          "y": 327.76,
+          "r": 0,
+          "v": 0,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 94.79,
+          "y": 330.84,
+          "r": 0,
+          "v": 1,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 79.83,
+          "y": 327.21,
+          "r": 0,
+          "v": 2,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 82.13,
+          "y": 329.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 91.32,
+          "y": 336.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 81.5,
+          "y": 333.53,
+          "r": 0,
+          "v": 2,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 83.5,
+          "y": 336.99,
+          "r": 0,
+          "v": 0,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 86.0,
+          "y": 341.32,
+          "r": 0,
+          "v": 1,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 76.87,
+          "y": 328.92,
+          "r": 0,
+          "v": 2,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 77.91,
+          "y": 334.83,
+          "r": 0,
+          "v": 0,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 78.6,
+          "y": 338.77,
+          "r": 0,
+          "v": 1,
+          "hub": "Springmere"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 325.0,
+          "y": 316.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 331.0,
+          "y": 316.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 335.0,
+          "y": 316.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 330.34,
+          "y": 319.76,
+          "r": 0,
+          "v": 2,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 338.79,
+          "y": 322.84,
+          "r": 0,
+          "v": 0,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 323.83,
+          "y": 319.21,
+          "r": 0,
+          "v": 1,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 326.13,
+          "y": 321.14,
+          "r": 0,
+          "v": 2,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 335.32,
+          "y": 328.86,
+          "r": 0,
+          "v": 0,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 325.5,
+          "y": 325.53,
+          "r": 0,
+          "v": 1,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 327.5,
+          "y": 328.99,
+          "r": 0,
+          "v": 2,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 320.87,
+          "y": 320.92,
+          "r": 0,
+          "v": 0,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 321.91,
+          "y": 326.83,
+          "r": 0,
+          "v": 1,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 322.6,
+          "y": 330.77,
+          "r": 0,
+          "v": 2,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 318.61,
+          "y": 323.88,
+          "r": 0,
+          "v": 0,
+          "hub": "Solhaven"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 326.0,
+          "y": 78.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 332.0,
+          "y": 78.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 336.0,
+          "y": 78.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 331.34,
+          "y": 81.76,
+          "r": 0,
+          "v": 1,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 339.79,
+          "y": 84.84,
+          "r": 0,
+          "v": 2,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 324.83,
+          "y": 81.21,
+          "r": 0,
+          "v": 0,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 327.13,
+          "y": 83.14,
+          "r": 0,
+          "v": 1,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 336.32,
+          "y": 90.86,
+          "r": 0,
+          "v": 2,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 326.5,
+          "y": 87.53,
+          "r": 0,
+          "v": 0,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 328.5,
+          "y": 90.99,
+          "r": 0,
+          "v": 1,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 331.0,
+          "y": 95.32,
+          "r": 0,
+          "v": 2,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 321.87,
+          "y": 82.92,
+          "r": 0,
+          "v": 0,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 322.91,
+          "y": 88.83,
+          "r": 0,
+          "v": 1,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 323.6,
+          "y": 92.77,
+          "r": 0,
+          "v": 2,
+          "hub": "Harvestwatch"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 83.0,
+          "y": 78.0,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 89.0,
+          "y": 78.0,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 93.0,
+          "y": 78.0,
+          "r": 0,
+          "v": 2,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 88.34,
+          "y": 81.76,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 96.79,
+          "y": 84.84,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 81.83,
+          "y": 81.21,
+          "r": 0,
+          "v": 2,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 84.13,
+          "y": 83.14,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 93.32,
+          "y": 90.86,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 83.5,
+          "y": 87.53,
+          "r": 0,
+          "v": 2,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 85.5,
+          "y": 90.99,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 88.0,
+          "y": 95.32,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalBunting",
+          "x": 78.87,
+          "y": 82.92,
+          "r": 0,
+          "v": 2,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalPumpkins",
+          "x": 79.91,
+          "y": 88.83,
+          "r": 0,
+          "v": 0,
+          "hub": "Rimehold"
+        },
+        {
+          "kind": "festivalLantern",
+          "x": 80.6,
+          "y": 92.77,
+          "r": 0,
+          "v": 1,
+          "hub": "Rimehold"
+        }
       ]
     },
     {
@@ -246773,6 +251589,68 @@
           ]
         }
       ],
+      "exitRoutes": [
+        {
+          "portal": "atlas_45_15",
+          "points": [
+            [
+              47.5,
+              5.5
+            ],
+            [
+              47.5,
+              23.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_45_16",
+          "points": [
+            [
+              5.5,
+              99.5
+            ],
+            [
+              5.5,
+              117.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_45_19",
+          "points": [
+            [
+              91.5,
+              5.5
+            ],
+            [
+              91.5,
+              14.5
+            ],
+            [
+              90.5,
+              14.5
+            ],
+            [
+              90.5,
+              22.5
+            ]
+          ]
+        },
+        {
+          "portal": "path_45_21",
+          "points": [
+            [
+              154.5,
+              94.5
+            ],
+            [
+              154.5,
+              112.5
+            ]
+          ]
+        }
+      ],
       "atlasPaths": [
         [
           [
@@ -258660,6 +263538,100 @@
       }
     ]
   },
+  "exitRoutes": [
+    {
+      "portal": "emberfall_gate",
+      "points": [
+        [
+          50.5,
+          5.5
+        ],
+        [
+          50.5,
+          12.5
+        ],
+        [
+          48.5,
+          12.5
+        ],
+        [
+          48.5,
+          13.5
+        ],
+        [
+          45.5,
+          13.5
+        ],
+        [
+          45.5,
+          18.5
+        ]
+      ]
+    },
+    {
+      "portal": "atlas_0_3",
+      "points": [
+        [
+          5.5,
+          47.5
+        ],
+        [
+          5.5,
+          60.5
+        ],
+        [
+          10.5,
+          60.5
+        ]
+      ]
+    },
+    {
+      "portal": "path_0_4",
+      "points": [
+        [
+          22.5,
+          5.5
+        ],
+        [
+          22.5,
+          23.5
+        ]
+      ]
+    },
+    {
+      "portal": "path_0_16",
+      "points": [
+        [
+          90.5,
+          76.5
+        ],
+        [
+          90.5,
+          72.5
+        ],
+        [
+          89.5,
+          72.5
+        ],
+        [
+          89.5,
+          69.5
+        ],
+        [
+          88.5,
+          69.5
+        ],
+        [
+          88.5,
+          63.5
+        ],
+        [
+          85.5,
+          63.5
+        ]
+      ]
+    }
+  ],
   "atlasPaths": [
     [
       [
@@ -258805,5 +263777,79 @@
         60.5
       ]
     ]
+  ],
+  "seasonDecor": [
+    {
+      "kind": "festivalPumpkins",
+      "x": 36.87,
+      "y": 87.92,
+      "r": 0,
+      "v": 0,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalLantern",
+      "x": 31.0,
+      "y": 83.0,
+      "r": 0,
+      "v": 1,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalBunting",
+      "x": 28.48,
+      "y": 80.26,
+      "r": 0,
+      "v": 2,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalPumpkins",
+      "x": 33.5,
+      "y": 78.67,
+      "r": 0,
+      "v": 0,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalLantern",
+      "x": 32.0,
+      "y": 76.07,
+      "r": 0,
+      "v": 1,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalBunting",
+      "x": 36.87,
+      "y": 78.08,
+      "r": 0,
+      "v": 2,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalPumpkins",
+      "x": 37.39,
+      "y": 75.12,
+      "r": 0,
+      "v": 0,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalLantern",
+      "x": 40.0,
+      "y": 76.07,
+      "r": 0,
+      "v": 1,
+      "hub": "Alderhaven"
+    },
+    {
+      "kind": "festivalBunting",
+      "x": 43.52,
+      "y": 80.26,
+      "r": 0,
+      "v": 2,
+      "hub": "Alderhaven"
+    }
   ]
 }

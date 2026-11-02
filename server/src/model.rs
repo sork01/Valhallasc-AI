@@ -329,6 +329,10 @@ pub struct Character {
     #[serde(default)]
     pub abandoned_quests: Vec<String>,
     #[serde(default)]
+    pub seasonal_claims: std::collections::BTreeMap<String, u32>,
+    #[serde(default)]
+    pub seasonal_started: std::collections::BTreeMap<String, u32>,
+    #[serde(default)]
     pub inventory: Vec<crate::items::ItemStack>,
     #[serde(default)]
     pub equipment: std::collections::BTreeMap<String, String>,
@@ -492,6 +496,8 @@ impl Character {
             kills: 0,
             quests: vec![],
             abandoned_quests: vec![],
+            seasonal_claims: Default::default(),
+            seasonal_started: Default::default(),
             inventory: vec![],
             equipment: Default::default(),
             gear_instances: vec![],
@@ -1441,6 +1447,9 @@ pub enum PvpCommand {
 #[derive(Debug, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum DebugCommand {
+    SeasonTime {
+        unix: Option<u64>,
+    },
     SetLevel {
         level: u32,
     },

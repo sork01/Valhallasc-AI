@@ -11,6 +11,7 @@ mod notify;
 mod perks;
 mod rebirth;
 mod rested;
+mod seasonal;
 mod sets;
 mod skills;
 mod store;

@@ -58,7 +58,7 @@ def blocked(z, radius=.38):
     return grid
 
 
-def connected(z, avoid=()):
+def connected(z, avoid=(), origin=None):
     n = z['size']; walls = blocked(z, .6)
     for portal in avoid:
         x, y, r = portal['x'], portal['y'], portal['r']+.65
@@ -66,7 +66,7 @@ def connected(z, avoid=()):
             for ix in range(max(1, math.floor(x-r)), min(n-1, math.ceil(x+r))):
                 if math.hypot(ix+.5-x, iy+.5-y) < r:
                     walls[iy*n+ix] = 1
-    start = int(z['spawn']['y'])*n + int(z['spawn']['x'])
+    start = int((origin or z['spawn'])['y'])*n + int((origin or z['spawn'])['x'])
     assert not walls[start], f"{z['name']}: blocked spawn"
     prev = {start: None}; queue = deque([start])
     while queue:
@@ -169,8 +169,74 @@ def sync_travel_links(zones):
             if a['id'] not in b['travelLinks']:b['travelLinks'].append(a['id'])
 
 
+def city_archways(z):
+    """Open genuine wall apertures at Skaldholm's current outdoor exits."""
+    z['exitArches']=[]
+    for p in z['portals']:
+        if not p.get('walk'): continue
+        dx,dy=p['walk'];vertical=bool(dx)
+        wall=(144 if dx>0 else 16) if vertical else (140 if dy>0 else 12)
+        along=p['y'] if vertical else p['x']; half=4.5
+        out=[]
+        for o in z['objects']:
+            cross=o['x'] if vertical else o['y']; length=o.get('depth' if vertical else 'width',0)
+            middle=o['y'] if vertical else o['x']
+            if o['kind']!='rampart' or abs(cross-wall)>1 or not length or middle+length/2<=along-half or middle-length/2>=along+half:
+                out.append(o);continue
+            for lo,hi in [(middle-length/2,min(middle+length/2,along-half)),(max(middle-length/2,along+half),middle+length/2)]:
+                if hi-lo<=.05: continue
+                part=dict(o);part['y' if vertical else 'x']=(lo+hi)/2;part['depth' if vertical else 'width']=hi-lo;out.append(part)
+        z['objects']=out
+        z['exitArches'].append(dict(x=wall if vertical else along,y=along if vertical else wall,vertical=vertical,name=p['name'],portal=p['id']))
+
+
+def nacre_alcove(z):
+    p=(122.5,113.5);a=(116.5,113.5)
+    def near_segment(o,u,v):
+        dx,dy=v[0]-u[0],v[1]-u[1];length=dx*dx+dy*dy
+        f=max(0,min(1,((o['x']-u[0])*dx+(o['y']-u[1])*dy)/length))
+        return math.hypot(o['x']-u[0]-dx*f,o['y']-u[1]-dy*f)<o.get('r',0)+1.25
+    z['objects']=[o for o in z['objects'] if o['kind'] not in ['prism','skyrock','cloudpuff'] or
+        not (near_segment(o,p,a) or near_segment(o,(p[0],p[1]-3.5),(p[0],p[1]+3.5)))]
+    walls=blocked(z,.8);n=z['size']
+    safe=[(x+.5,y+.5) for y in range(80,141) for x in range(115,145) if not walls[y*n+x]
+        and all(math.hypot(x+.5-q[0],y+.5-q[1])>=9 for q in [p,a])
+        and all(math.hypot(x+.5-q['x'],y+.5-q['y'])>=9 for q in z['portals'])]
+    for spawn in z['slimes']:
+        if all(math.hypot(spawn['x']-q[0],spawn['y']-q[1])>=8.5 for q in [p,a]):continue
+        choices=[q for q in safe if all(e is spawn or math.hypot(q[0]-e['x'],q[1]-e['y'])>=2 for e in z['slimes'])]
+        assert choices,'No safe replacement for an alcove spawn'
+        x,y=min(choices,key=lambda q:(math.hypot(q[0]-spawn['x'],q[1]-spawn['y']),q))
+        spawn['x']=x;spawn['y']=y
+
+
+def nacre_side_landing(z,prev,fixed):
+    p=(122.5,113.5);a=(116.5,113.5);n=z['size']
+    assert all(int(q[1])*n+int(q[0]) in prev for q in [p,a])
+    assert clear(z,p,a) and clear(z,(p[0],p[1]-3.5),(p[0],p[1]+3.5))
+    assert all(math.hypot(q[0]-e['x'],q[1]-e['y'])>=8.5 for q in [p,a] for e in z['slimes'])
+    return p,a
+
+
+def exit_routes(z):
+    """Serialize short, clear approach segments for conspicuous client paving."""
+    z['exitRoutes']=[]
+    for p in z['portals']:
+        if not p.get('walk'):continue
+        prev=connected(z,[q for q in z['portals'] if q is not p])
+        path=approach(z,prev,(p['x'],p['y']))
+        short=[path[0]];length=0
+        for point in path[1:]:
+            a=short[-1];d=math.hypot(point[0]-a[0],point[1]-a[1])
+            if length+d>18:
+                f=(18-length)/d
+                short.append([a[0]+(point[0]-a[0])*f,a[1]+(point[1]-a[1])*f]);break
+            short.append(point);length+=d
+        z['exitRoutes'].append(dict(portal=p['id'],points=short))
+
+
 def apply(world):
-    zones=[world]+world['zones']; sky_landing(zones[7])
+    zones=[world]+world['zones']; sky_landing(zones[7]);nacre_alcove(zones[7]);city_archways(zones[4])
     pairs=[(p['a'],p['b']) for p in ATLAS['links']]+[(17,19)]
     linked={tuple(sorted(pair)) for pair in pairs}
     # Geographic neighbours replace obsolete crossings from earlier layouts. Dungeon
@@ -193,7 +259,7 @@ def apply(world):
                 a,b=REGIONS[i]['seed'],REGIONS[j]['seed'];side=direction(a,b)
                 dx,dy=b[0]-a[0],b[1]-a[1]
                 preferred=max(.16,min(.84,.5+.3*(dy/abs(dx) if side[0] else dx/abs(dy))))
-            point,arrival=endpoint(z,side,prev,fixed,preferred)
+            point,arrival=nacre_side_landing(z,prev,fixed) if (i,j)==(7,9) else endpoint(z,side,prev,fixed,preferred)
             endpoints[i,j]=(point,arrival);sides[i,j]=side
             fixed.extend([dict(x=point[0],y=point[1]),dict(x=arrival[0],y=arrival[1])])
     for i,j in pairs:
@@ -212,6 +278,7 @@ def apply(world):
             assert int(p['y'])*z['size']+int(p['x']) in prev,f"{i}: {p['id']} cut off by another crossing"
             path=approach(z,prev,(p['x'],p['y']))
             if path not in z.setdefault('paths',[]):z['paths'].append(path);z['atlasPaths'].append(path)
+    for i in sorted(OUTDOORS):exit_routes(zones[i])
     world['atlas']=ATLAS
     sync_travel_links(zones)
     return len(pairs),sum(1 for i in OUTDOORS for p in zones[i]['portals'] if p['to'] in OUTDOORS)

@@ -254,6 +254,10 @@
     face([P(-2.25, -2.6), P(2.25, -2.6), P(2.25, 1.75), P(-2.25, 1.75)], '#a39b88', '#4a4234');
     // the dark pit, the far wall going down into a tunnel mouth, and the west wall's inner face
     face([P(X0, Y0), P(X1, Y0), P(X1, Y1), P(X0, Y1)], '#05060a');
+    // Below-ground faces must never escape the visible stairwell aperture.
+    g.save(); g.beginPath();
+    [P(X0,Y0),P(X1,Y0),P(X1,Y1),P(X0,Y1)].forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));
+    g.closePath();g.clip();
     const wall = g.createLinearGradient(0, P(0, Y0, 0)[1], 0, P(0, Y0, -60)[1]); wall.addColorStop(0, '#62697c'); wall.addColorStop(1, '#10131c');
     face([P(X0, Y0, 0), P(X1, Y0, 0), P(X1, Y0, -64), P(X0, Y0, -64)], wall, null);
     face([P(X0, Y0, 0), P(X0, Y1, 0), P(X0, Y1, -52), P(X0, Y0, -52)], '#2b3042', null);
@@ -268,6 +272,9 @@
       face([P(X0, y1, z), P(X1, y1, z), P(X1, y1, z - 6), P(X0, y1, z - 6)], rgb(riser));
       face([P(X0, y0, z), P(X1, y0, z), P(X1, y1, z), P(X0, y1, z)], rgb(tread), 'rgba(8,8,14,.5)');
     }
+    g.restore();
+    // Dressed stone border and lit inset treads make the opening read as a descent.
+    for (let k=0;k<7;k++) { const y=Y0+(Y1-Y0)*k/7; const a=P(-1.92,y,18),b=P(-1.92,y+.28,18);line(g,[a,b],'#e8dfc9',2); }
     // parapets: north (behind), west and east, and short stubs either side of the way in
     const parapet = (cx, cy, w, d, h = 17) => { g.save(); g.translate(...P(cx, cy)); prism(g, w, d, h, '#bdb5a4', '#948c7a', '#726a5a'); g.restore(); };
     parapet(0, -2.3, 4.9, .6); parapet(-1.98, -.4, .5, 3.4); parapet(1.98, -.4, .5, 3.4);

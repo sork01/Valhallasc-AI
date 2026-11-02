@@ -61,6 +61,7 @@ const actionSchema = z.discriminatedUnion('type', [
 // the public service never does, and it refuses these messages.
 const questAction = z.enum(['accept', 'complete', 'claim', 'finish', 'reset']);
 const debugSchema = z.discriminatedUnion('op', [
+  z.object({op:z.literal('season_time'),unix:z.number().int().nonnegative().max(253402214399).nullable()}).strict(),
   z.object({ op: z.literal('set_level'), level: z.number().int().min(1).max(100) }).strict(),
   z.object({ op: z.literal('give_xp'), amount: z.number().int().min(0).max(4294967295) }).strict(),
   z.object({ op: z.literal('set_gold'), gold: z.number().int().min(0).max(4294967295) }).strict(),

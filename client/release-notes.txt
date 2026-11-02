@@ -1,5 +1,20 @@
 [
   {
+    "version": "Beta 1.33.0",
+    "date": "2026-11-02",
+    "new": [
+      "Halloween city decorations and NPC accessories run every year from October 26 through November 9, using Stockholm time.",
+      "Four city festival quests can be completed once per character each year. Unfinished festival quests retire when Halloween ends."
+    ],
+    "changed": [
+      "Walking exits have bright paving, direction flags and destination signs that stay readable at night and on phones.",
+      "Four vaulted openings connect Skaldholm’s streets through its outer walls.",
+      "The Nacrehold descent in Bifrost sits on a wider island landing with room to walk past.",
+      "Undervault’s entrance has clipped descending stairs and dressed stonework inside its opening."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.32.8",
     "date": "2026-11-02",
     "new": [

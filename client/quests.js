@@ -30,7 +30,9 @@
     return turnIns(q).find(n => n.zone === target?.destinationZone) || turnIns(q)[0];
   };
   function status(quest) {
-    const p = state(quest);
+    const p = state(quest), festival=window.Seasonal?.questState(quest);
+    if (festival==='inactive') return p?.claimed?'completed':'unavailable';
+    if (festival==='completed') return 'completed';
     if (p && !p.claimed) return quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count) ? 'ready' : 'active';
     if (p?.claimed && !quest.repeatable) return 'completed';
     if (arenaLevel(quest) && arenaQuests.some(q => q.id !== quest.id && arenaLevel(q) === arenaLevel(quest) && state(q))) return 'unavailable';
@@ -217,7 +219,7 @@
   function card(quest, atNpc) {
     const s = status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
-    node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+    node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? ' · Annual festival quest' : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
     if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
     if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${hubName(quest) || 'Quest giver'}`, 'quest-location quest-history'));
     const gap = quest.level - (heroLevel);
@@ -242,7 +244,7 @@
       node.append(element('p', early ? `Complete “${definitions.find(q => q.id === quest.requires)?.title}” first.` : `This quest is for heroes of level ${quest.minLevel} and above.`));
     } else if (atNpc && ['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
       const action = s === 'ready' ? 'claim' : 'accept';
-      const b = button(s === 'ready' ? 'Collect reward' : state(quest)?.completions ? 'Take bounty again' : 'Accept quest', () => {
+      const b = button(s === 'ready' ? 'Collect reward' : state(quest)?.completions ? (quest.season ? 'Take this year’s quest' : 'Take bounty again') : 'Accept quest', () => {
         questAction(quest, action, b);
       });
       b.dataset.action = action; node.append(b);
@@ -400,6 +402,7 @@
     setLevel(level) { if (heroLevel !== level) { heroLevel = level; clearGuidance(); render(); } },
     mapMarkers, navigationTarget, track, get tracked() { return tracked; },
     refresh() { render(); },
+    seasonChanged() { clearGuidance(); render(); },
     // The merchant protects every material until its active quest is handed in or abandoned.
     needsMaterial(id) { return definitions.some(q => state(q) && !state(q).claimed && q.objectives.some(o => o.kind === 'bring' && o.target === id)); },
     // Titles of the quests you and this party member both have in progress.
@@ -465,7 +468,7 @@
     detail(quest, container, back, npcId = quest.npc) {
       const s = status(quest);
       const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
-      node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+      node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? ' · Annual festival quest' : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
       if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
       node.append(element('p', quest.description));
       storyRecap(quest, node);
@@ -478,7 +481,7 @@
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
         const action = s === 'ready' ? 'claim' : 'accept';
-        const b = element('button', s === 'ready' ? 'Complete Quest' : state(quest)?.completions ? 'Take bounty again' : 'Accept', 'gossip-button primary'); b.type = 'button';
+        const b = element('button', s === 'ready' ? 'Complete Quest' : state(quest)?.completions ? (quest.season ? 'Take this year’s quest' : 'Take bounty again') : 'Accept', 'gossip-button primary'); b.type = 'button';
         b.dataset.action = action;
         b.addEventListener('click', () => { questAction(quest, action, b, npcId); });
         actions.append(b);

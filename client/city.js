@@ -292,7 +292,8 @@
     }
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
-  const headTop=n=>window.NpcArt?.top(n) || (n.art==='stone'?330:n.art==='scenery'?90:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101);
+  const baseHeadTop=n=>window.NpcArt?.top(n) || (n.art==='stone'?330:n.art==='scenery'?90:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101);
+  const headTop=n=>baseHeadTop(n)+(window.Seasonal?.hat(n)?28:0);
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
     g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
@@ -415,6 +416,7 @@
     if(n.id==='baker'){ellipse(g,-9,-103,10,9,'#f6ecd2');ellipse(g,8,-103,12,10,'#f6ecd2');g.fillStyle='#f6ecd2';g.fillRect(-17,-103,34,12);}
     }
     g.restore();
+    window.Seasonal?.drawNpc(g,n,t,baseHeadTop(n));
     if(portrait){g.restore();return;}
     // Everyone with work or wares always shows a nameplate; a passer-by in the city shows one only when you are close.
     const hero=window.Field?.hero,close=!hero||Math.hypot(hero.x-n.x,hero.y-n.y)<9;
@@ -560,5 +562,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();

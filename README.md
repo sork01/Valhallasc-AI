@@ -44,6 +44,11 @@ Players open `http://<server-LAN-address>:8080/`. Allow that port in the server'
 
 ## Play
 
+Seasonal city dressing and four annual Halloween quests use the server’s Stockholm
+calendar, October 26–November 9 inclusive. Rules, expiry, regeneration and focused
+checks: [docs/seasonal-events.md](docs/seasonal-events.md). Walking exits and the
+Skaldholm wall passages are documented in [docs/zone-travel.md](docs/zone-travel.md).
+
 The level-99 **Black Hour Foundry** is a five-player challenge beneath Yearwheel's
 Equinox Crossing, with giant clockwork enemies, exclusive purple Nullforged
 equipment and a dark industrial techno score. Content, balance checks,

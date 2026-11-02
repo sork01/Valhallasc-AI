@@ -173,6 +173,8 @@ impl Store {
             kills: 0,
             quests: vec![],
             abandoned_quests: vec![],
+            seasonal_claims: Default::default(),
+            seasonal_started: Default::default(),
             inventory: vec![],
             equipment: Default::default(),
             gear_instances: vec![],

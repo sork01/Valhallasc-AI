@@ -13,7 +13,7 @@
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
   // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
-  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null },
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null, exitRoutes:WORLD_MAP.exitRoutes||[] },
     ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
   let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
@@ -972,7 +972,7 @@
   function pickPortal(mx, my) {
     return zdef.portals.filter(p => !p.after_clear || instanceCleared)
       .map(p => { const [x,y] = w2s(p.x,p.y); return { p, x, y }; })
-      .filter(({p,x,y}) => ((mx-x) / (62.2*Math.max(2.8,p.r)))**2 + ((my-y) / (31.1*Math.max(2.8,p.r)))**2 <= 1
+      .filter(({p,x,y}) => window.ExitPaths?.hit(ctx,p,ZONES,w2s,mx,my,zoom) || ((mx-x) / (62.2*Math.max(2.8,p.r)))**2 + ((my-y) / (31.1*Math.max(2.8,p.r)))**2 <= 1
         || (Math.abs(mx-x) < 55 && my > y-100 && my < y))
       .sort((a,b) => Math.hypot(mx-a.x,my-a.y)-Math.hypot(mx-b.x,my-b.y))[0]?.p;
   }
@@ -1181,6 +1181,7 @@
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
     window.DayNight?.sync(packet.worldTime);
+    const seasonChanged=window.Seasonal?.update(packet.seasons,own.seasonalClaims);
     explored = Array.isArray(own.explored) ? own.explored : null;
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
@@ -1210,6 +1211,7 @@
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || [], own.abandonedQuests || []);
+    if(seasonChanged)window.City?.refresh();
     if (wasDead !== hero.dead) { say(hero.dead ? 'death' : 'respawn'); if (!hero.dead) window.BossMech?.setCause(''); }
     if (wasFallen !== !!hero.fallen) say(hero.fallen ? 'fallen' : 'rallied');
     if (initial || moved) { cam.x = hero.x; cam.y = hero.y; }
@@ -3803,22 +3805,10 @@
   }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
-    g.save(); g.strokeStyle = '#d9f6be'; g.lineWidth = 2.5;
+    if (!['stairs_down','stairs_up'].includes(p.look)) { g.save(); g.strokeStyle = '#d9f6be'; g.lineWidth = 2.5;
     g.globalAlpha = reducedMotion() ? .7 : .55 + .18*Math.sin(t*2);
-    g.beginPath(); g.ellipse(sx, sy, 62.2*Math.max(p.r,2.8), 31.1*Math.max(p.r,2.8), 0, 0, Math.PI*2); g.stroke(); g.restore();
-    if (p.walk) {
-      if (window.ZoneJourney?.approach(g, p, zdef, ZONES[p.to], w2s, t, reducedMotion())) return;
-      // A low roadside waymark replaces the glowing gate on ordinary outdoor routes.
-      const dest = ZONES[p.to], dx = p.walk[0], dy = p.walk[1];
-      const [ax, ay] = w2s(p.x-dx*2, p.y-dy*2), [bx, by] = w2s(p.x+dx*3, p.y+dy*3);
-      g.save(); g.strokeStyle = '#c7ae79'; g.lineWidth = 7; g.lineCap = 'round';
-      g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke();
-      g.strokeStyle = '#6e5c43'; g.lineWidth = 3; g.beginPath();g.moveTo(sx-29,sy-3);g.lineTo(sx-29,sy-29);g.stroke();
-      g.fillStyle = '#e0cd9e';g.strokeStyle='#453b31';g.lineWidth=2;
-      g.beginPath();g.moveTo(sx-46,sy-36);g.lineTo(sx-14,sy-36);g.lineTo(sx-7,sy-29);g.lineTo(sx-14,sy-22);g.lineTo(sx-46,sy-22);g.closePath();g.fill();g.stroke();
-      g.font='13px "Jua",sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#192b28';g.fillStyle='#fff2d2';
-      g.strokeText(dest?.name || p.name,sx,sy-48);g.fillText(dest?.name || p.name,sx,sy-48);g.restore();return;
-    }
+    g.beginPath(); g.ellipse(sx, sy, 62.2*Math.max(p.r,2.8), 31.1*Math.max(p.r,2.8), 0, 0, Math.PI*2); g.stroke(); g.restore(); }
+    if (p.walk) { ExitPaths.gate(g,p,zdef,ZONES[p.to],w2s,t,reducedMotion()); return; }
     if (p.look === 'skybridge') return SkybridgeArt.portal(g,p,sx,sy,t);
     if (p.look === 'emberwake') return EmberwakeArt.portal(g,p,sx,sy,t);
     if (p.look === 'chained_forge') return ChainedForgeArt.portal(g,p,sx,sy,t);
@@ -3942,6 +3932,7 @@
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
     }
     City.drawPlaza(g, w2s);
+    window.ExitPaths?.floor(g,zdef,w2s,hero);
     // Flat authored terrain belongs below actors, irrespective of its anchor depth.
     for (const o of objects) if (City.art[o.kind]?.ground) {
       const [sx, sy] = w2s(o.x, o.y), box = City.art[o.kind].box;
@@ -3972,7 +3963,7 @@
     // build the depth-sorted list of everything standing on the ground
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
     const set = spriteSet();
-    for (const o of objects) {
+    for (const source of [objects,window.Seasonal?.decor(zone)||[]]) for (const o of source) {
       if (o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
       if (City.art[o.kind]?.ground) continue;
       const [sx, sy] = w2s(o.x, o.y);
@@ -3995,9 +3986,11 @@
       const origin = fxOrigin(e), [sx, sy] = w2s(origin.x, origin.y); if (!onScreen(sx, sy, 450)) continue;
       list.push({ d: origin.x + origin.y - .002, fx: e, back: true }, { d: origin.x + origin.y + .002, fx: e, back: false });
     }
+    for (const arch of zdef.exitArches || []) { const [sx,sy]=w2s(arch.x,arch.y); if(onScreen(sx,sy,480))list.push({d:arch.x+arch.y,arch,sx,sy}); }
     list.sort((a, b) => a.d - b.d);
     const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y;
     for (const it of list) {
+      if (it.arch) { ExitPaths.arch(g,it.arch,w2s); continue; }
       if (it.fx) { drawMeleeFx(g, it.fx, it.back); continue; }
       if (it.o) {
         const o = it.o;
@@ -4098,6 +4091,7 @@
     window.DayNight?.draw(g, VW, VH, nightLights, w2s);
     window.Weather?.draw(g, VW, VH, t, { x: cx, y: cy });
     window.EmptySeat?.drawVision(g, w2s, VW, VH);
+    window.Seasonal?.glow(g,zone,w2s);
     for (const e of effects) if (e.kind === 'slash' || e.kind === 'dualSlash') continue; else if (e.kind === 'shadow' && mageSpr && isAssassin()) {
       const [sx, sy] = w2s(e.x, e.y), [ax, ay] = mageSpr.meta.anchor;
       g.save(); g.globalAlpha = Math.max(0, .35 * (1 - e.t / .32)); g.imageSmoothingEnabled = false;
@@ -4215,6 +4209,7 @@
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
+    window.ExitPaths?.labels(g,zdef,ZONES,w2s,hero,zoom);
     window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
     drawQuestArrow(g);
     drawMini();

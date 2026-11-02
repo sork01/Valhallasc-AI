@@ -1,0 +1,19 @@
+[
+  {
+    "id": "halloween",
+    "start": [
+      10,
+      26
+    ],
+    "endExclusive": [
+      11,
+      10
+    ],
+    "quests": [
+      "halloween_alder",
+      "halloween_skald",
+      "halloween_nacre",
+      "halloween_aster"
+    ]
+  }
+]

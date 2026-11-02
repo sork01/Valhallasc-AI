@@ -435,3 +435,76 @@ fn compact_atlas_keeps_all_keys_private_doors_and_spark_links_match_crossings() 
         }
     }
 }
+
+#[test]
+fn compact_atlas_city_archways_and_nacre_alcove_are_walkable() {
+    let data = bundled();
+    let mut w = world();
+    calm(&mut w);
+    let city = &w.maps[4];
+    let arches = data["zones"][3]["exitArches"].as_array().unwrap();
+    assert_eq!(arches.len(), 4);
+    for arch in arches {
+        let x = arch["x"].as_f64().unwrap();
+        let y = arch["y"].as_f64().unwrap();
+        let vertical = arch["vertical"].as_bool().unwrap();
+        let normal = if vertical { at(1., 0.) } else { at(0., 1.) };
+        assert!(city.line_clear(
+            at(x - normal.x * 3., y - normal.y * 3.),
+            at(x + normal.x * 3., y + normal.y * 3.),
+            PLAYER_RADIUS
+        ));
+        // The wall remains solid beside the new opening.
+        let beside = at(x + normal.y * 7., y + normal.x * 7.);
+        assert!(!city.line_clear(
+            at(beside.x - normal.x * 3., beside.y - normal.y * 3.),
+            at(beside.x + normal.x * 3., beside.y + normal.y * 3.),
+            PLAYER_RADIUS
+        ));
+    }
+    let gate = w.maps[7]
+        .portals
+        .iter()
+        .find(|p| p.to == 9)
+        .unwrap()
+        .clone();
+    assert_eq!((gate.x, gate.y), (122.5, 113.5));
+    let back = w.maps[9].portals.iter().find(|p| p.to == 7).unwrap();
+    assert_eq!((back.tx, back.ty), (116.5, 113.5));
+    assert!(w.maps[7].line_clear(at(107.5, 106.5), at(119.5, 106.5), PLAYER_RADIUS));
+    assert!(w.maps[7].line_clear(
+        at(gate.x, gate.y - 3.5),
+        at(gate.x, gate.y + 3.5),
+        PLAYER_RADIUS
+    ));
+    let _rx = join(&mut w, 1, Class::Warrior);
+    place(&mut w, 1, 7, at(107.5, 106.5));
+    for _ in 0..40 {
+        w.time += TICK;
+        let p = w.players.get_mut(&1).unwrap();
+        p.input = at(1., 0.);
+        p.input_at = w.time;
+        w.update_player(1);
+        assert_eq!(
+            w.players[&1].character.zone, 7,
+            "passing along the old bridge must not travel"
+        );
+    }
+    assert!(w.players[&1].character.x > 114.);
+    for (zone, map) in std::iter::once(&data)
+        .chain(data["zones"].as_array().unwrap())
+        .enumerate()
+    {
+        for route in map["exitRoutes"].as_array().into_iter().flatten() {
+            let points = route["points"].as_array().unwrap();
+            assert!(points.len() >= 2);
+            for pair in points.windows(2) {
+                let p = |v: &Value| at(v[0].as_f64().unwrap(), v[1].as_f64().unwrap());
+                assert!(
+                    w.maps[zone].line_clear(p(&pair[0]), p(&pair[1]), PLAYER_RADIUS),
+                    "exit paving must follow clear floor in zone {zone}"
+                );
+            }
+        }
+    }
+}

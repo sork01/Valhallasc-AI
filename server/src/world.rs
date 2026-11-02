@@ -136,6 +136,9 @@ mod ribbonwild_tests;
 mod rolls;
 #[cfg(test)]
 mod rotation_tests;
+mod seasonal_cities;
+#[cfg(test)]
+mod seasonal_cities_tests;
 #[cfg(test)]
 mod seed_vault_tests;
 mod sets;
@@ -458,6 +461,7 @@ impl Player {
             "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["abandonedQuests"] = json!(c.abandoned_quests);
+        view["seasonalClaims"] = json!(c.seasonal_claims);
         view["daze"] = json!(self.daze);
         view["danceT"] = json!(self.dance);
         view["rested"] = json!({"percent":c.rested.percent()});
@@ -1517,6 +1521,7 @@ pub struct World {
     // Failed disconnect writes are retried by the next periodic transaction.
     pending_saves: Vec<Character>,
     world_clock: daynight::WorldClock,
+    seasonal: crate::seasonal::Calendar,
     weather: weather::Weather,
     time: f64,
     tick: u64,
@@ -1638,6 +1643,7 @@ impl World {
             loot_turns: BTreeMap::new(),
             pending_saves: vec![],
             world_clock: daynight::WorldClock::new(epoch),
+            seasonal: crate::seasonal::Calendar::default(),
             weather: weather::Weather::new(epoch),
             time: 0.,
             tick: 0,
@@ -1922,7 +1928,7 @@ impl World {
                 .view(zone, self.maps[zone].template, daynight::unix_ms())
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
-        "weather":zone_weather,
+        "weather":zone_weather,"seasons":self.seasonal.cached,
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
@@ -2102,6 +2108,7 @@ impl World {
         c.y = point.y;
         let id = c.id.clone();
         let name = c.look.name.clone();
+        crate::seasonal::sync_character(&mut c, &self.seasonal.active());
         c.sync_achievements();
         let place = self.zone_name(c.zone).to_owned();
         let notice =
@@ -2536,6 +2543,7 @@ impl World {
         } else {
             1
         };
+        let seasons = self.seasonal.active();
         let p = self.players.get_mut(&session).unwrap();
         let map = &self.maps[p.character.zone];
         let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
@@ -2707,12 +2715,35 @@ impl World {
                                         && p.character.quests.iter().any(|g| g.id == q.id)
                                 })
                             });
-                        if taken_elsewhere {
+                        let event = crate::seasonal::quest_event(&quest.id);
+                        let year = event
+                            .and_then(|id| seasons.iter().find(|a| a.id == id))
+                            .map(|a| a.year);
+                        crate::seasonal::sync_character(&mut p.character, &seasons);
+                        if event.is_some() && year.is_none() {
+                            notice =
+                                "This seasonal quest is only available during its festival.".into();
+                        } else if event.is_some()
+                            && action == "accept"
+                            && p.character.seasonal_claims.get(&quest.id).copied() == year
+                        {
+                            notice =
+                                "You have already completed this quest for this year's festival."
+                                    .into();
+                        } else if taken_elsewhere {
                             notice =
                                 "You have already taken the arena trial for this level.".into();
                         } else {
                             (notice, levels, quest_changed) =
                                 quest_action_with_choice(&mut p.character, quest, action, choice);
+                            if quest_changed && let Some(year) = year {
+                                if action == "accept" {
+                                    p.character.seasonal_started.insert(quest.id.clone(), year);
+                                }
+                                if action == "claim" {
+                                    p.character.seasonal_claims.insert(quest.id.clone(), year);
+                                }
+                            }
                         }
                     }
                 } else if let Some(sale) = id.strip_prefix("sell:") {
@@ -2941,6 +2972,7 @@ impl World {
     pub fn step(&mut self) {
         self.time += TICK;
         self.tick += 1;
+        self.update_seasonal();
         self.hide_gms_after_zone_change();
         self.update_king_spawn();
         self.update_instances();

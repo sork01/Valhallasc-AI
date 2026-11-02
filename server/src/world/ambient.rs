@@ -209,7 +209,11 @@ impl World {
             let levels: Vec<u32> = self.maps[zone]
                 .quests
                 .iter()
-                .filter(|q| q.gauntlet_level().is_none() && !q.id.starts_with("es_"))
+                .filter(|q| {
+                    q.gauntlet_level().is_none()
+                        && !q.id.starts_with("es_")
+                        && crate::seasonal::quest_event(&q.id).is_none()
+                })
                 .map(|q| q.level)
                 .collect();
             [
@@ -367,6 +371,7 @@ impl World {
             .iter()
             .filter(|q| {
                 !q.id.starts_with("es_")
+                    && crate::seasonal::quest_event(&q.id).is_none()
                     && q.gauntlet_level().is_none()
                     && q.level <= level + 2
                     && q.objectives.len() == 1

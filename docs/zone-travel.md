@@ -187,3 +187,35 @@ bounce after the cooldown without enlarging authored arrival discs.
 Focused checks: `owner_fixes_wider_gate_approach_keeps_arrivals_and_access_rules`,
 the existing compact-atlas arrival/crossing checks, and bounded mouse/short-screen
 touch crossings in `tests/owner-fixes-ui.cjs`.
+
+## City passages and prominent exits (Beta 1.33.0)
+
+Every ordinary walking crossing now has a short strip of contrasting paving,
+static ground chevrons, a direction flag and a high-contrast destination plaque.
+The plaque draws after darkness and keeps at least 13 CSS-pixel text at phone
+zoom. `exitRoutes` metadata follows collision-clear path segments computed by
+`compact_atlas.py`; it adds no collision or motion. Existing sky/ocean descent
+art remains underneath these markers.
+
+Four Skaldholm rampart openings align with its northern, southern, eastern and
+western walking routes. The generator splits only the matching rampart pieces,
+retains the wall beside each opening and exports `exitArches` for the native
+stone arch drawing. Aperture width is nine world units; arch supports sit
+outside it. Other doors, services and dungeon access rules stay intact.
+
+Bifrost’s Nacrehold crossing moves from (113.5,106.5) on the bridge neck to
+(122.5,113.5) on the adjacent broad island. Its reciprocal arrival is now
+(116.5,113.5). Small obstructing scenery is cleared from this approach and
+nearby enemies move to the nearest clear safe floor without changing their
+IDs, types or counts. The old bridge remains walkable without triggering the
+crossing; a seven-unit lateral passing lane surrounds the new gate.
+
+The Skaldholm Undervault entrance keeps its coordinates and safe return.
+Below-ground walls, tunnel mouth, glow and descending stairs are clipped to
+the visible opening; the raised stone parapets and lantern pillars draw above
+that clip. The generic portal halo no longer paints outside either stairwell.
+
+Regenerate with `node scripts/sync-world.cjs`, then rebuild Rust for the map.
+No zone insertion or saved-copy migration is needed. Focused server checks
+cover all 96 crossings, visible Bifrost floor, new arch apertures and the
+solid wall beside them. See `tests/cities-seasonal-ui.cjs` for bounded views.
