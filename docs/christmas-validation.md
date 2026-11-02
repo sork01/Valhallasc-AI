@@ -1,5 +1,6 @@
 # Christmas, seasonal titles and mount speed validation — Beta 1.35.0
 
+Implemented as private commit `2a5e52e`, merged/deployed on main as `04e8ecd`.
 Private source branch `feat/christmas-and-seasonal-rewards`, based on `bb7ba78`,
 at `/media/raid/valhallasc-data/skaldholm-archways-work`. No new zones,
 private-copy IDs, save fields or database schema/migration are needed.
@@ -68,3 +69,25 @@ without HUD overlays; portraits use the saved exported game artwork.
 | `valhallasc-christmas-asterion.png` | `f6eb798d9f84d816` |
 | `valhallasc-christmas-grinch.png` | `4fd20d3dc42f30ad` |
 | `valhallasc-christmas-reindeer.png` | `1fe3920aa936f4ee` |
+
+## Deployment
+
+**Beta 1.35.0 is deployed and verified**, 2026-11-02 at 18:43 UTC, with nobody
+online. Source `04e8ecd`; backup
+`deploy/backups/christmas-1.35.0-20261102T183014Z`, containing the previous live
+executable saved before building, consistent online/stopped SQLite snapshots,
+previous changed client files and saved JSON hashes. No migration was needed.
+
+Public and bridge health pass. The running executable exactly matches the
+optimized release, SHA-256
+`d8dadaf95b2a1dfec874928e1b93fe2ac1aa02323df2ddbb70fa0327785e15e9`.
+All **17 changed public client files/assets** match local hashes. SQLite
+quick_check is `ok`; **37 characters / 23 guests** and every saved character JSON
+hash are unchanged. Test flags and journal warnings/errors are absent; no
+public test guest was created. The additional legitimate guest since the
+previous release was included in this release’s pre-build backup/audit.
+Receipt: `test-results/christmas-release-20261102T184323Z.json`.
+
+Christmas activates automatically on December 15 and retires at December 29
+midnight (Stockholm). Today’s Halloween remains active through November 9;
+permanent Hallowed/Merry rewards and the 160% mount speed are installed now.

@@ -8,7 +8,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
-No open tasks. The Halloween quest achievement/title, Christmas season (six chained deliverables), and all mounts at 160% of walking speed are implemented and verified in Beta 1.35.0; rules, focused checks, FileDrop pictures and release evidence are in `docs/christmas-event.md` / `docs/christmas-validation.md`. Richer four-city dressing, unique character names and the Halloween daily elite/mount hunt are implemented, verified and deployed in Beta 1.34.0; release verification is recorded in `docs/halloween-hunt-validation.md`. The four city/travel tasks are implemented, verified and deployed in Beta 1.33.0 (2026-11-02). The seven earlier reports below are implemented, verified and deployed in Beta 1.32.8 (2026-11-02).
+No open tasks. The Halloween quest achievement/title, Christmas season (six chained deliverables), and all mounts at 160% of walking speed are implemented, verified and deployed in Beta 1.35.0; rules, focused checks, FileDrop pictures and release evidence are in `docs/christmas-event.md` / `docs/christmas-validation.md`. Richer four-city dressing, unique character names and the Halloween daily elite/mount hunt are implemented, verified and deployed in Beta 1.34.0; release verification is recorded in `docs/halloween-hunt-validation.md`. The four city/travel tasks are implemented, verified and deployed in Beta 1.33.0 (2026-11-02). The seven earlier reports below are implemented, verified and deployed in Beta 1.32.8 (2026-11-02).
 
 ### Christmas season, city quests, Grinch daily hunt and rewards (owner’s request, 2026-11-02)
 
