@@ -1,7 +1,7 @@
 'use strict';
 // Asterion's glass-roof homes, lunar obelisks and central astrolabe. Drawn into the normal City.art cache.
 (() => {
-  const {iso,poly,line,ellipse,prism}=City.kit;
+  const {iso,poly,line,ellipse,prism,wallPlane}=City.kit;
   const rx=62.225,ry=31.112;
   const tint=(hex,n)=>{
     const x=parseInt(hex.slice(1),16), target=n<0?0:255, f=Math.abs(n);
@@ -20,14 +20,16 @@
       poly(g,[se,sw,peak],tint(c,-.22),'#4b536d',3);poly(g,[sw,nw,peak],tint(c,.12),'#4b536d',3);
       for(const a of [nw,ne,se,sw])line(g,[a,peak],'rgba(255,247,218,.7)',3);
       for(let row=0;row<2;row++)for(let col=0;col<3;col++){
+        if(row===0&&col===1)continue; // The doorway occupies this part of the lower row.
         const z=42+row*37,x=-w*.28+col*w*.28,p=iso(x,d/2+.02,z);
-        poly(g,[[p[0]-12,p[1]-13],[p[0]+12,p[1]-13],[p[0]+12,p[1]+10],[p[0]-12,p[1]+10]],
-             '#6c9da8','#e9d9ad',2);line(g,[[p[0],p[1]-13],[p[0],p[1]+10]],'#e9d9ad',1);
+        g.save();wallPlane(g,...p);
+        poly(g,[[-12,-13],[12,-13],[12,10],[-12,10]],'#6c9da8','#e9d9ad',2);
+        line(g,[[0,-13],[0,10]],'#e9d9ad',1);g.restore();
       }
       const door=iso(0,d/2+.04,0);
-      poly(g,[[door[0]-14,door[1]],[door[0]-14,door[1]-45],[door[0]+14,door[1]-45],[door[0]+14,door[1]]],
-           '#433e5f','#ecc998',2);
-      g.fillStyle='#f9edc2';g.beginPath();g.arc(door[0]+8,door[1]-20,2,0,Math.PI*2);g.fill();
+      g.save();wallPlane(g,...door);
+      poly(g,[[-14,0],[-14,-45],[14,-45],[14,0]],'#433e5f','#ecc998',2);
+      g.fillStyle='#f9edc2';g.beginPath();g.arc(8,-20,2,0,Math.PI*2);g.fill();g.restore();
       for(const side of [-1,1]){
         const p=iso(side*w*.42,d*.38,103);line(g,[[p[0],p[1]],[p[0],p[1]+27]],'#665679',2);
         ellipse(g,p[0],p[1]+33,6,9,'#fff0ae','#aa7e54',1.5);

@@ -245,7 +245,10 @@
     const span=(o.width||0)+(o.depth||0), hw=Math.max(180,Math.ceil((span+1.3)*22)+16), below=Math.max(70,Math.ceil(span*11)+36);
     return [hw*2,400+below,hw,400];
   }
-  const kit={iso,poly,line,ellipse,prism,text};
+  // Local horizontal pixels follow a vertical wall; its vertical axis stays upright.
+  // +Y/front runs down-right, +X/right runs up-right in this camera.
+  function wallPlane(g,x,y,side='y') { g.transform(1,side==='x'?-.5:.5,0,1,x,y); }
+  const kit={iso,poly,line,ellipse,prism,text,wallPlane};
   function drawObject(g,o,sx,sy,fade=1) {
     const def=art[o.kind], live=o.sign==='live'&&!!o.label;
     const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0)+'|'+(def?.wallMounted&&o.z>0?1:0);let sprite=cache.get(key);

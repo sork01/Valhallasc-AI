@@ -87,7 +87,7 @@
     ellipse(g,0,10,(w+d)*26,(w+d)*9,'rgba(3,15,31,.35)',null);
     prism(g,w+.4,d+.4,12,'#8fa1a7','#64788b','#40566e');
     prism(g,w,d,h,'#c4d8d5','#71889b','#4f6481',12);
-    for(let i=-1;i<=1;i++){const p=iso(i*w/3,d/2+.02,h*.45);poly(g,[[p[0]-9,p[1]-20],[p[0]+9,p[1]-20],[p[0]+9,p[1]+18],[p[0]-9,p[1]+18]],'#fae4af','#20354a',3);line(g,[[p[0],p[1]-18],[p[0],p[1]+18]],'#658b9b',2);}
+    for(let i=-1;i<=1;i++){const p=iso(i*w/3,d/2+.02,h*.45);g.save();City.kit.wallPlane(g,...p);poly(g,[[-9,-20],[9,-20],[9,18],[-9,18]],'#fae4af','#20354a',3);line(g,[[0,-18],[0,18]],'#658b9b',2);g.restore();}
     const a=iso(-w/2,-d/2,h+12),b=iso(w/2,-d/2,h+12),c=iso(w/2,d/2,h+12),e=iso(-w/2,d/2,h+12);
     const peak=iso(0,0,h+(high?116:70));
     poly(g,[a,b,peak],'#a8ccd0',OL,3);poly(g,[b,c,peak],'#5c85aa',OL,3);poly(g,[c,e,peak],'#354d78',OL,3);poly(g,[e,a,peak],'#7597b2',OL,3);

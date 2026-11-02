@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Building opening angles (owner report, 2026-11-02)
+
+- [x] `BUILDING-OPENING-ANGLES` — **Done, Beta 1.35.2:** Project doors, windows, frames, crossbars and matching doorway effects onto their actual wall planes in Asterion, Nacrehold and Astralhollow. Check both visible wall directions and all authored variants; preserve correct common-house/tower openings. 551 opening masks / 116 variants / 413 placed buildings pass the focused bounded renderer check. Details: `docs/building-facades.md`.
+
 ### Christmas visual attachments (owner report, 2026-11-02)
 
 - [x] `CHRISTMAS-NPC-HAT-FIT` — **Done, Beta 1.35.1:** Anchor Christmas hats/scarves to the real head in each exported NPC frame, with correct individual scale, idle/talk animation and mirrored walking. Raised props must not lift the hat. All 103 NPCs / 2,884 poses pass contact checks; names clear the fitted hat.

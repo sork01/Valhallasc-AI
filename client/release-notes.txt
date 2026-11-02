@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.35.2",
+    "date": "2026-11-02",
+    "new": [],
+    "changed": [
+      "Doors and windows in Nacrehold, Asterion and Astralhollow now follow their wall angle, including window frames and the Cathedral doorway glow."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.35.1",
     "date": "2026-11-02",
     "new": [],

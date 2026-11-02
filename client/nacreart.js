@@ -1,7 +1,7 @@
 'use strict';
 // Nacrehold's original canvas art: shell homes, nautilus inn, tide palace and the sealed Cathedral.
 (() => {
-  const { iso, prism, poly } = City.kit;
+  const { iso, prism, poly, wallPlane } = City.kit;
   const OUT = '#133d55';
   const ellipse = (g, x, y, rx, ry, c, stroke = OUT) => {
     g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); g.fillStyle = c; g.fill();
@@ -27,11 +27,12 @@
       line(g, pts, 'rgba(255,255,255,.6)', 2);
     }
   }
-  function windowAt(g, x, y, r = 13) {
-    ellipse(g, x, y, r, r * 1.15, '#256781');
-    ellipse(g, x - 1, y - 1, r * .74, r * .9, '#b6f4dd', '#6999a0');
-    line(g, [[x, y - r], [x, y + r]], '#ebeee0');
-    line(g, [[x - r, y], [x + r, y]], '#ebeee0');
+  function windowAt(g, x, y, r = 13, side = 'y') {
+    g.save();wallPlane(g,x,y,side);
+    ellipse(g, 0, 0, r, r * 1.15, '#256781');
+    ellipse(g, -1, -1, r * .74, r * .9, '#b6f4dd', '#6999a0');
+    line(g, [[0, -r], [0, r]], '#ebeee0');
+    line(g, [[-r, 0], [r, 0]], '#ebeee0');g.restore();
   }
   function home(g, o, grand = false) {
     const w = o.width, d = o.depth, h = grand ? 150 : 90, color = o.color || '#9bd5df';
@@ -42,12 +43,13 @@
     shell(g, 0, cy - h - 8, rx, grand ? 132 : 80 + o.v * 8, color, o.v);
     for (const side of [0, 1]) {
       const pt = side ? iso(w / 2 + .01, -.55, 65) : iso(-.8, d / 2 + .01, 65);
-      windowAt(g, ...pt, grand ? 19 : 13);
+      windowAt(g, ...pt, grand ? 19 : 13, side ? 'x' : 'y');
     }
     const p = iso(.35, d / 2 + .03, 24);
-    ellipse(g, p[0], p[1] - 11, 17, 29, '#194958', '#ecedd2');
-    ellipse(g, p[0] + 7, p[1] - 8, 2.5, 2.5, '#f8daa1', null);
-    line(g, [[p[0] - 12, p[1] + 19], [p[0] + 13, p[1] + 19]], '#f0eee0', 4);
+    g.save();wallPlane(g,...p);
+    ellipse(g, 0, -11, 17, 29, '#194958', '#ecedd2');
+    ellipse(g, 7, -8, 2.5, 2.5, '#f8daa1', null);
+    line(g, [[-12, 19], [13, 19]], '#f0eee0', 4);g.restore();
     // Coral growing from the house's far corner; three shapes share cached sprites.
     const c = iso(-w / 2, d / 2, 13);
     for (let i = 0; i < 3; i++) {
@@ -83,7 +85,7 @@
   } };
   City.art.nacrearchive = { box: [880, 700, 440, 540], draw(g, o) {
     home(g, { ...o, color: '#b0b4ed', v: 2 }, true);
-    for (let i = 0; i < 3; i++) { const x = 25 + i * 28; prism(g, .35, .55, 9, '#eee1c0', '#b5b4ba', '#839cab'); windowAt(g, x, -160, 6); }
+    for (let i = 0; i < 3; i++) windowAt(g, ...iso(o.width / 2 + .02, -.8 + i * .65, 125), 6, 'x');
   } };
   City.art.nacregarden = { box: [640, 470, 320, 360], draw(g) {
     ellipse(g, 0, -12, 170, 64, '#397e7b', '#b1dacc');
@@ -118,17 +120,18 @@
     spire(g, -215, -40, 320, '#9a92b8'); spire(g, 215, -40, 320, '#9a92b8');
     // Huge locked arch. The seal is visible, and the NPC states that the instance is forthcoming.
     const p = iso(0, d / 2 + .02, 0);
-    ellipse(g, p[0], p[1] - 93, 64, 105, '#09192f', '#b0c5ce');
-    for (let i = -2; i <= 2; i++) line(g, [[p[0] + i * 22, p[1] - 173], [p[0] + i * 22, p[1] - 10]], '#6aa7b5', 4);
-    ellipse(g, p[0], p[1] - 80, 37, 37, '#1a465e', '#8eefe2');
-    poly(g, [[p[0], p[1] - 111], [p[0] + 21, p[1] - 80], [p[0], p[1] - 49], [p[0] - 21, p[1] - 80]], '#8fe7dc', OUT, 2);
+    g.save();wallPlane(g,...p);
+    ellipse(g, 0, -93, 64, 105, '#09192f', '#b0c5ce');
+    for (let i = -2; i <= 2; i++) line(g, [[i * 22, -173], [i * 22, -10]], '#6aa7b5', 4);
+    ellipse(g, 0, -80, 37, 37, '#1a465e', '#8eefe2');
+    poly(g, [[0, -111], [21, -80], [0, -49], [-21, -80]], '#8fe7dc', OUT, 2);g.restore();
     // Silent bell in the rose window.
     ellipse(g, 0, -363, 34, 34, '#21446b', '#bdd0d9');
     line(g, [[0, -392], [0, -334]], '#8dbbc7', 3); line(g, [[-29, -363], [29, -363]], '#8dbbc7', 3);
   }, animate(g, o, sx, sy, t) {
-    const p = iso(0, o.depth / 2, 0);
-    g.save(); g.globalAlpha = .6 + Math.sin(t * .8) * .15; g.strokeStyle = '#a0fff1'; g.lineWidth = 2;
-    g.beginPath(); g.arc(sx + p[0], sy + p[1] - 80, 42, 0, Math.PI * 2); g.stroke(); g.restore();
+    const p = iso(0, o.depth / 2 + .02, 0);
+    g.save();wallPlane(g,sx + p[0],sy + p[1]); g.globalAlpha = .6 + Math.sin(t * .8) * .15; g.strokeStyle = '#a0fff1'; g.lineWidth = 2;
+    g.beginPath(); g.arc(0, -80, 42, 0, Math.PI * 2); g.stroke(); g.restore();
     g.font = '17px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = '#071a30';
     const text = 'The Drowned Cathedral · Sealed'; g.strokeText(text, sx, sy + 100); g.fillStyle = '#bdeee8'; g.fillText(text, sx, sy + 100);
   } };
