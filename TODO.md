@@ -8,6 +8,11 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Nacrehold shells/pillars and Alderhaven ledges (owner reports, 2026-11-02)
+
+- [x] `NACRE-SHELL-PILLAR-AXES` — **Done, Beta 1.35.3:** Replace camera-facing, detached shell roofs and pillars with native geometry using the buildings’ world axes, wall-top heights and floor anchors. Cover houses, major landmarks, stalls and related shell sculptures; align the rose window/pearl with the new surfaces. All 33 variants / 129 Nacrehold objects checked, without clipped roof/pillar art. Details: `docs/nacre-roof-geometry.md`.
+- [x] `ALDER-WINDOW-LEDGE` — **Done, Beta 1.35.3:** The reported ledge on the wall came from a doorstep painted at the house centre. Anchor it to the doorway/front wall, preserving the correctly projected window frames. All four Alderhaven buildings pass the placement check.
+
 ### Building opening angles (owner report, 2026-11-02)
 
 - [x] `BUILDING-OPENING-ANGLES` — **Done, Beta 1.35.2:** Project doors, windows, frames, crossbars and matching doorway effects onto their actual wall planes in Asterion, Nacrehold and Astralhollow. Check both visible wall directions and all authored variants; preserve correct common-house/tower openings. 551 opening masks / 116 variants / 413 placed buildings pass the focused bounded renderer check. Details: `docs/building-facades.md`.

@@ -27,6 +27,35 @@
       line(g, pts, 'rgba(255,255,255,.6)', 2);
     }
   }
+  const tone=(hex,k)=>'#'+[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*k).toString(16).padStart(2,'0')).join('');
+  // A ribbed barrel-shell roof: every point uses the same world axes as the walls.
+  function shellRoof(g,w,d,z,rise,color,variant=0){
+    const n=24,front=d/2,back=-d/2,point=(i,y)=>{const a=Math.PI*i/n;return iso(-w/2*Math.cos(a),y,z+rise*Math.sin(a));};
+    // The curved surface is extruded through the actual building depth.
+    for(let i=0;i<n;i++)poly(g,[point(i,back),point(i+1,back),point(i+1,front),point(i,front)],tone(color,.68+.27*Math.sin(Math.PI*(i+.5)/n)),OUT,1);
+    const hinge=iso(0,front,z);
+    for(let i=0;i<n;i++)poly(g,[hinge,point(i,front),point(i+1,front)],tone(color,.81+(i%3)*.075),OUT,1);
+    for(let i=0;i<=n;i+=2)line(g,[hinge,point(i,front)],i%4?'#f5f2df':'#6b8e9c',1.6);
+    line(g,Array.from({length:n+1},(_,i)=>point(i,front)),'#e5eee1',3);
+    // The front lip overlaps the wall top, rather than hovering above its ceiling.
+    poly(g,[iso(-w/2,front,z),iso(w/2,front,z),iso(w/2,front,z-5),iso(-w/2,front,z-5)],'#a3bfc0',OUT,1.5);
+    if(variant===3){
+      g.save();wallPlane(g,...iso(0,front,z+rise*.43));const pts=[];
+      for(let a=0;a<14;a+=.15){const r=1+a*1.5;pts.push([Math.cos(a)*r,Math.sin(a)*r*.8]);}line(g,pts,'#f4e8cf',2);g.restore();
+    }
+  }
+  function column(g,x,y,z,h,color,cap=true){
+    const sides=12,ring=(r,height)=>Array.from({length:sides},(_,i)=>iso(x+Math.cos(i*Math.PI*2/sides)*r,y+Math.sin(i*Math.PI*2/sides)*r,height));
+    const drum=(r0,r1,low,high)=>{
+      const a=ring(r0,low),b=ring(r1,high),faces=[];
+      for(let i=0;i<sides;i++){const j=(i+1)%sides,angle=(i+.5)*Math.PI*2/sides;if(Math.cos(angle)+Math.sin(angle)>0)faces.push({i,j,depth:Math.cos(angle)+Math.sin(angle)});}
+      faces.sort((a,b)=>a.depth-b.depth);for(const {i,j}of faces)poly(g,[a[i],a[j],b[j],b[i]],tone(color,.68+.22*Math.sin((i+.5)*Math.PI*2/sides)),OUT,1.4);
+      poly(g,b,'#e0eee4',OUT,1.5);
+    };
+    drum(.43,.43,z,z+9);drum(.27,.19,z+9,z+h-9);drum(.38,.38,z+h-9,z+h);
+    for(const angle of [0,Math.PI/4,Math.PI/2])line(g,[iso(x+Math.cos(angle)*.27,y+Math.sin(angle)*.27,z+12),iso(x+Math.cos(angle)*.19,y+Math.sin(angle)*.19,z+h-12)],'#eef8e7',1.5);
+    if(cap){g.save();g.translate(...iso(x,y));shellRoof(g,.9,.72,z+h,37,color,1);g.restore();}
+  }
   function windowAt(g, x, y, r = 13, side = 'y') {
     g.save();wallPlane(g,x,y,side);
     ellipse(g, 0, 0, r, r * 1.15, '#256781');
@@ -36,11 +65,11 @@
   }
   function home(g, o, grand = false) {
     const w = o.width, d = o.depth, h = grand ? 150 : 90, color = o.color || '#9bd5df';
-    const rx = (w + d) * 22 + 8, cy = -(w + d) * 9;
+    const rx = (w + d) * 22 + 8;
     ellipse(g, 5, 10, rx, rx * .3, 'rgba(4,29,50,.25)', null);
     prism(g, w + .2, d + .2, 10, '#dcebe2', '#82aaa9', '#54818e');
     prism(g, w, d, h, '#d0e4e1', '#c1ddd6', '#80b4bd', 10);
-    shell(g, 0, cy - h - 8, rx, grand ? 132 : 80 + o.v * 8, color, o.v);
+    shellRoof(g,w+.28,d+.28,h+10,grand?132:80+o.v*8,color,o.v);
     for (const side of [0, 1]) {
       const pt = side ? iso(w / 2 + .01, -.55, 65) : iso(-.8, d / 2 + .01, 65);
       windowAt(g, ...pt, grand ? 19 : 13, side ? 'x' : 'y');
@@ -67,21 +96,14 @@
   } };
   City.art.nacrestall = { box: [420, 420, 210, 320], draw(g, o) {
     prism(g, o.width, o.depth, 50, '#e4e8d6', '#b8cacc', '#719da9');
-    for (const s of [-1, 1]) line(g, [[s * 60, -32], [s * 60, -130]], '#bdd8d1', 5);
-    shell(g, 0, -132, 110, 55, o.color, 1);
+    for(const x of [-o.width/2,o.width/2]){g.save();g.translate(...iso(x,o.depth/2));prism(g,.14,.14,130,'#e1f0e6','#b8d4d1','#78a5b0');g.restore();}
+    shellRoof(g,o.width+.45,o.depth+.45,130,55,o.color,1);
     for (let i = 0; i < 5; i++) ellipse(g, -48 + i * 23, -49 - Math.abs(i - 2) * 4, 9, 6, ['#eee6c9', '#cb9aba', '#96dfbe'][i % 3]);
   } };
-  function spire(g, x, y, h, color) {
-    ellipse(g, x, y, 27, 10, '#668e9b');
-    g.fillStyle = '#b3d9d5'; g.strokeStyle = OUT; g.lineWidth = 3;
-    g.beginPath(); g.moveTo(x - 17, y); g.lineTo(x - 12, y - h); g.quadraticCurveTo(x, y - h - 15, x + 12, y - h); g.lineTo(x + 17, y); g.closePath(); g.fill(); g.stroke();
-    shell(g, x, y - h - 5, 30, 55, color, 1);
-    line(g, [[x - 5, y - 18], [x - 5, y - h + 6]], '#eef8e7', 3);
-  }
   City.art.nacrepalace = { box: [1180, 1040, 590, 850], draw(g, o) {
     home(g, { ...o, color: '#afd9e5', v: 1 }, true);
-    spire(g, -130, -80, 190, '#d6c3ef'); spire(g, 155, -55, 230, '#c9dce9');
-    ellipse(g, 0, -365, 24, 24, '#e3fff4', '#96babc');
+    for(const x of [-o.width/2+.15,o.width/2-.15])column(g,x,o.depth/2+.12,10,210,'#b9d9df');
+    ellipse(g, ...iso(0,0,316), 24, 24, '#e3fff4', '#96babc');
   } };
   City.art.nacrearchive = { box: [880, 700, 440, 540], draw(g, o) {
     home(g, { ...o, color: '#b0b4ed', v: 2 }, true);
@@ -89,7 +111,8 @@
   } };
   City.art.nacregarden = { box: [640, 470, 320, 360], draw(g) {
     ellipse(g, 0, -12, 170, 64, '#397e7b', '#b1dacc');
-    for (let i = 0; i < 9; i++) { const x = Math.cos(i * 2.4) * 128, y = Math.sin(i * 2.4) * 37; spire(g, x, y - 5, 30 + i % 3 * 12, ['#e5a5ca', '#95d9cd', '#beb8e5'][i % 3]); }
+    const posts=Array.from({length:9},(_,i)=>({x:Math.cos(i*2.4)*2,y:Math.sin(i*2.4)*2,i})).sort((a,b)=>a.x+a.y-b.x-b.y);
+    for(const {x,y,i}of posts)column(g,x,y,12,30+i%3*12,['#e5a5ca','#95d9cd','#beb8e5'][i%3]);
   }, animate(g, o, sx, sy, t) {
     g.save(); g.globalCompositeOperation = 'lighter';
     for (let i = 0; i < 12; i++) { const x = sx + Math.cos(t * .25 + i * 2.3) * 122, y = sy - 45 + Math.sin(t * .38 + i) * 42; ellipse(g, x, y, 3, 2, '#aaffdd', null); }
@@ -97,13 +120,13 @@
   } };
   City.art.nacrememorial = { box: [420, 480, 210, 370], draw(g) {
     prism(g, 2.3, 1.7, 16, '#e0dfd3', '#98b7b5', '#668c9c');
-    shell(g, 0, -60, 65, 160, '#c5bde2', 2);
-    for (let i = 0; i < 4; i++) line(g, [[-20, -90 - i * 14], [22, -90 - i * 14]], '#e7f1e1', 2);
+    g.save();wallPlane(g,...iso(0,.65,16));shell(g,0,-20,65,160,'#c5bde2',2);
+    for(let i=0;i<4;i++)line(g,[[-20,-90-i*14],[22,-90-i*14]],'#e7f1e1',2);g.restore();
   } };
   City.art.nacrefountain = { box: [780, 900, 390, 720], draw(g) {
     ellipse(g, 0, -12, 174, 67, '#d7ede0'); ellipse(g, 0, -18, 151, 52, '#41959e');
-    spire(g, 0, -10, 165, '#e5bacf');
-    shell(g, 0, -190, 96, 99, '#a4dbd6', 1);
+    column(g,0,0,10,165,'#c5dce0',false);
+    shellRoof(g,2.4,1.8,175,84,'#a4dbd6',1);
     ellipse(g, 0, -282, 23, 23, '#dffff0', '#9dbbb8');
   }, animate(g, o, sx, sy, t) {
     g.save(); g.globalCompositeOperation = 'lighter';
@@ -116,8 +139,8 @@
     ellipse(g, 0, 6, 264, 84, 'rgba(2,15,38,.5)', null);
     prism(g, w + .3, d + .3, 18, '#adb7c5', '#668493', '#3e5d78');
     prism(g, w, d, 175, '#647a9b', '#69869c', '#405779', 18);
-    shell(g, 0, -290, 247, 165, '#7670a0', 2);
-    spire(g, -215, -40, 320, '#9a92b8'); spire(g, 215, -40, 320, '#9a92b8');
+    shellRoof(g,w+.3,d+.3,193,165,'#9996be',2);
+    for(const x of [-w/2+.15,w/2-.15])column(g,x,d/2+.12,18,280,'#a6bbd0');
     // Huge locked arch. The seal is visible, and the NPC states that the instance is forthcoming.
     const p = iso(0, d / 2 + .02, 0);
     g.save();wallPlane(g,...p);
@@ -126,8 +149,9 @@
     ellipse(g, 0, -80, 37, 37, '#1a465e', '#8eefe2');
     poly(g, [[0, -111], [21, -80], [0, -49], [-21, -80]], '#8fe7dc', OUT, 2);g.restore();
     // Silent bell in the rose window.
-    ellipse(g, 0, -363, 34, 34, '#21446b', '#bdd0d9');
-    line(g, [[0, -392], [0, -334]], '#8dbbc7', 3); line(g, [[-29, -363], [29, -363]], '#8dbbc7', 3);
+    g.save();wallPlane(g,...iso(0,(d+.3)/2,193+165*.58));
+    ellipse(g,0,0,34,34,'#21446b','#bdd0d9');
+    line(g,[[0,-29],[0,29]],'#8dbbc7',3);line(g,[[-29,0],[29,0]],'#8dbbc7',3);g.restore();
   }, animate(g, o, sx, sy, t) {
     const p = iso(0, o.depth / 2 + .02, 0);
     g.save();wallPlane(g,sx + p[0],sy + p[1]); g.globalAlpha = .6 + Math.sin(t * .8) * .15; g.strokeStyle = '#a0fff1'; g.lineWidth = 2;

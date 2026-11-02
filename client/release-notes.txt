@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.35.3",
+    "date": "2026-11-02",
+    "new": [],
+    "changed": [
+      "Nacrehold shell roofs and pillars follow their buildings and sit on their supports. Misplaced ledges in Alderhaven are back at the doorways."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.35.2",
     "date": "2026-11-02",
     "new": [],

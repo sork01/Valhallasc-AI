@@ -155,7 +155,7 @@
     poly(g,[door(-.4),door(.4),iso(.4,d/2+.02,62),iso(-.4,d/2+.02,62)],'#77513b','#4f3c30',3);
     line(g,[iso(-.3,d/2+.04,8),iso(-.3,d/2+.04,53)],'#a77b4d',2);
     const knob=iso(.24,d/2+.05,29);ellipse(g,...knob,3,3,'#eacb75');
-    prism(g,1.25,.5,8,'#e2d4ba','#bcac93','#a59b89');
+    g.save();g.translate(...iso(0,d/2+.25));prism(g,1.25,.5,8,'#e2d4ba','#bcac93','#a59b89');g.restore();
     // Tall gabled roof. The ridge runs in the x direction.
     const rw=w+.65,rd=d+.65,rise=o.kind==='chapel'?90:o.big?88:69;
     const a=iso(-rw/2,-rd/2,h+12),b=iso(rw/2,-rd/2,h+12),c=iso(rw/2,rd/2,h+12),e=iso(-rw/2,rd/2,h+12);
