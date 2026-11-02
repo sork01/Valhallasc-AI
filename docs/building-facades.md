@@ -42,3 +42,7 @@ The four existing city pictures and the wall-detail picture in FileDrop were
 refreshed, and `valhallasc-building-openings-fixed.png` shows the corrected
 building styles. All six uploads have matching SHA-256. Native captures:
 `test-results/driver-B1OIB3`; building gallery: `test-results/driver-f9T55I`.
+
+Beta 1.35.3 also replaces the detached/front-facing Nacrehold shell roofs and
+pillars with projected geometry, and places the common-house doorstep at its
+door instead of on the wall: [nacre-roof-geometry.md](nacre-roof-geometry.md).

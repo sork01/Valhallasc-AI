@@ -31,3 +31,13 @@ only: `test-results/driver-bRkQIm`. Both native contact sheets inspected.
 Client-only artwork/placement fix. No map, collisions, interactions, saved data,
 server, new sprites or PixelFlow IDs change. JavaScript syntax, Swedish
 freshness and the matching release-note guard accompany publication.
+
+
+Deployed and verified client **Beta 1.35.3**, main source `e14fa6f` (private
+`dc20136`). All four changed public client hashes and public/bridge health
+pass; the server remains Beta 1.35.0/PID1089769, with no restart or database
+writes. Receipt: `test-results/nacre-roofs-release-20261102T195237Z.json`.
+
+City pictures and the wall-detail preview were refreshed in FileDrop, plus
+`valhallasc-nacre-shells-pillars-fixed.png`; all six uploads SHA-256 verified.
+Final city captures: `test-results/driver-T05nu3`; gallery: `driver-bRkQIm`.

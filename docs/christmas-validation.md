@@ -63,9 +63,9 @@ without HUD overlays; portraits use the saved exported game artwork.
 
 | Stored filename | SHA-256 prefix |
 | --- | --- |
-| `valhallasc-christmas-alderhaven.png` | `7506a927fec5bb66` |
-| `valhallasc-christmas-skaldholm.png` | `4ab31860855fdfeb` |
-| `valhallasc-christmas-nacrehold.png` | `658e45bedb95b9b9` |
+| `valhallasc-christmas-alderhaven.png` | `dec7573943907804` |
+| `valhallasc-christmas-skaldholm.png` | `a1b803d045b94718` |
+| `valhallasc-christmas-nacrehold.png` | `300afacbc95a24f4` |
 | `valhallasc-christmas-asterion.png` | `22be7f2a74104a02` |
 | `valhallasc-christmas-grinch.png` | `4fd20d3dc42f30ad` |
 | `valhallasc-christmas-reindeer.png` | `1fe3920aa936f4ee` |
@@ -125,7 +125,7 @@ Two additional close-ups were uploaded and SHA-256 verified:
 | Stored filename | SHA-256 prefix |
 | --- | --- |
 | `valhallasc-christmas-npc-hats-fixed.png` | `dbb31b46cf677a2b` |
-| `valhallasc-christmas-wall-ornaments-fixed.png` | `7a00ae3951f49f9c` |
+| `valhallasc-christmas-wall-ornaments-fixed.png` | `e653fb890ee7ed77` |
 
 Fresh city/house captures: private `test-results/driver-HvNieR`; NPC contact
 sheet: `test-results/driver-nf21rF`. Grinch and reindeer art is unchanged.
@@ -134,3 +134,7 @@ Beta 1.35.2 projects building doors/windows onto their actual walls. The four
 city and wall-detail FileDrop pictures were refreshed again (current hashes
 above); the original Grinch/reindeer and hat sheet stay unchanged.
 See [building-facades.md](building-facades.md) for the complete rendering audit.
+
+Beta 1.35.3 refreshes the city/wall pictures with corrected Nacrehold shell
+roofs/pillars and Alderhaven ledges; current hashes are above. Additional gallery
+`valhallasc-nacre-shells-pillars-fixed.png`; see [nacre-roof-geometry.md](nacre-roof-geometry.md).
