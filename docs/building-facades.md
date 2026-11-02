@@ -46,3 +46,17 @@ building styles. All six uploads have matching SHA-256. Native captures:
 Beta 1.35.3 also replaces the detached/front-facing Nacrehold shell roofs and
 pillars with projected geometry, and places the common-house doorstep at its
 door instead of on the wall: [nacre-roof-geometry.md](nacre-roof-geometry.md).
+
+
+## House sign clutter — Beta 1.35.4
+
+Residential street-and-number labels are catalog metadata and no longer draw
+plaques on the houses. All 344 address texts and backing boards are suppressed.
+The 43 named shop/service signs remain, floating above roof, chimney and chapel
+tower bounds with a gap. Field culling accounts for that height. Shop signs
+are drawn outside the shared building cache, so names cannot bake into another
+house’s sprite. Named stalls already place their names above their awnings.
+
+A focused private render inspection confirms zero residential address text or
+boards and all 43 named signs/boards retained. Native city views were inspected;
+no full suite or new permanent test was needed for this presentation change.

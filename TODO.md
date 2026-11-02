@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### House sign clutter (owner request, 2026-11-02)
+
+- [x] `HOUSE-SIGN-CLUTTER` — **Done, Beta 1.35.4:** Remove all 344 residential street-and-number plaques, including the backing boards. Keep the 43 named shop/service signs and float them above roof/chimney/tower bounds, clear of wall decorations. Update drawing bounds and keep signs outside shared cached building art. Render inspection confirms zero address text/boards and all 43 named signs retained; city previews inspected.
+
 ### Nacrehold shells/pillars and Alderhaven ledges (owner reports, 2026-11-02)
 
 - [x] `NACRE-SHELL-PILLAR-AXES` — **Done, Beta 1.35.3:** Replace camera-facing, detached shell roofs and pillars with native geometry using the buildings’ world axes, wall-top heights and floor anchors. Cover houses, major landmarks, stalls and related shell sculptures; align the rose window/pearl with the new surfaces. All 33 variants / 129 Nacrehold objects checked, without clipped roof/pillar art. Details: `docs/nacre-roof-geometry.md`.

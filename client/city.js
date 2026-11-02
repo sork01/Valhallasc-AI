@@ -184,9 +184,19 @@
     // Pots of flowers on the doorstep.
     for(const side of [-1,1]) {const [x,y]=iso(side*1.3,d/2+.15);poly(g,[[x-8,y-3],[x+8,y-3],[x+5,y+12],[x-5,y+12]],'#ad7054');ellipse(g,x,y-7,15,9,'#5b8850');for(let k=0;k<4;k++)ellipse(g,x-9+k*6,y-11-(k%2)*4,3,3,['#edb6c0','#f1d57e'][k%2]);}
   }
-  // The sign over a door. A city of a hundred houses draws it live (not baked), so houses of one size and colour share a sprite.
+  // Residential addresses are catalog metadata, not decoration on the houses.
+  const residentialAddress=o=>o.sign==='live'&&/^(?:\d+\s|.*\s\d+$)/.test(o.label||'');
+  function signHeight(o){
+    if(!o.label||residentialAddress(o)||!['house','chapel'].includes(o.kind))return 0;
+    const h=o.kind==='chapel'?150:o.big?140:117,rise=o.kind==='chapel'?90:o.big?88:69;
+    const ridge=h+12+rise+(o.width+.65)*11,chimney=h+108+1.4*22;
+    return Math.max(ridge,chimney,o.kind==='chapel'?h+rise+12-.6*22+142:0)+18;
+  }
   function signBoard(g,o,ox,oy) {
-    const sign=iso(0,o.depth/2+.13,79);g.fillStyle='#594739';g.fillRect(ox+sign[0]-90,oy+sign[1]-11,180,25);text(g,o.label,ox+sign[0],oy+sign[1]+7,15,'#ffe7ad');
+    const top=signHeight(o);if(!top)return;
+    g.font='15px "Jua",sans-serif';const width=Math.max(130,g.measureText(o.label).width+24);
+    g.fillStyle='#594739';g.fillRect(ox-width/2,oy-top-25,width,25);
+    text(g,o.label,ox,oy-top-7,15,'#ffe7ad');
   }
   function fountain(g) {
     ellipse(g,10,12,95,39,'#3b493430');
@@ -250,7 +260,7 @@
   function wallPlane(g,x,y,side='y') { g.transform(1,side==='x'?-.5:.5,0,1,x,y); }
   const kit={iso,poly,line,ellipse,prism,text,wallPlane};
   function drawObject(g,o,sx,sy,fade=1) {
-    const def=art[o.kind], live=o.sign==='live'&&!!o.label;
+    const def=art[o.kind], live=!!o.label&&(o.sign==='live'||['house','chapel'].includes(o.kind));
     const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0)+'|'+(def?.wallMounted&&o.z>0?1:0);let sprite=cache.get(key);
     const [bw,bh,ox,oy]=def?.box||spriteBox(o);
     if(!sprite){const c=document.createElement('canvas');c.width=bw*2;c.height=bh*2;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(ox,oy);if(def)def.draw(cg,o,kit);else objectArt(cg,o,live);sprite=c;cache.set(key,c);}
@@ -567,5 +577,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();
