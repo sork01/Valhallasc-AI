@@ -69,6 +69,16 @@ client world SHA-256
 All NPCs, quests, monster spawns and file zone IDs are preserved. Outside the
 four city zones, only reciprocal portal arrival coordinates change.
 
-Release verification pending. Previous executable, consistent SQLite and prior
-client files saved before building at
+Deployed and verified 2026-11-02, source `f538d6b` (private source `99ab872`).
+The optimized-release MCP probe passed **14** checks, physically walking all
+12 approaches (`test-results/driver-w8I7H0/report.json` in the worktree).
+Previous executable, consistent SQLite and prior client files saved before building at
 `deploy/backups/city-walkways-1.34.2-20261102T145210Z`.
+
+Zero-player restart; public/bridge health, all four changed public client
+hashes, exact running executable, SQLite quick_check, unchanged 36 characters /
+22 guests and every saved character JSON hash verified. No test flags, journal
+warnings/errors or public test guest. No save or zone migration. Release receipt:
+`test-results/city-walkways-release-20261102T150556Z.json` plus the backup's
+`verification.json`. Executable SHA-256:
+`bca62765e59221601c46ad6b771b794d31af6da84a0e234ecbda8ebbd89ea3ef`.
