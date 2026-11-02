@@ -8,7 +8,11 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
-Two open owner requests: player-name uniqueness and a Halloween summoned elite (four chained deliverables). The four city/travel tasks are implemented, verified and deployed in Beta 1.33.0 (2026-11-02). The seven earlier reports below are implemented, verified and deployed in Beta 1.32.8 (2026-11-02).
+Three open owner requests: richer seasonal dressing in the four main cities only, player-name uniqueness, and a Halloween summoned elite (four chained deliverables). The four city/travel tasks are implemented, verified and deployed in Beta 1.33.0 (2026-11-02). The seven earlier reports below are implemented, verified and deployed in Beta 1.32.8 (2026-11-02).
+
+### Seasonal decorations: four main cities only, with richer dressing (owner’s request, 2026-11-02)
+
+- [ ] `CITY-SEASONAL-DECOR-REVISION` — Restrict the reusable seasonal city decoration and NPC dressing system to **Alderhaven, Skaldholm, Nacrehold and Asterion**, inside their actual city bounds. Remove ambient seasonal props and costume/accessory dressing from smaller camps, minor settlements and other outdoor hubs. Make the four main cities **substantially more decorated** than Beta 1.33.0’s small plaza clusters: richer, varied arrangements throughout streets, gates, markets, service areas, landmarks and residential districts, with pumpkins/jack-o’-lanterns, warm lanterns, bunting/banners, cobwebs, candles and suitable doorway/balcony details. Give each city coordinated festive NPC touches and preserve its own architectural/material identity. Keep routes, entrances, NPC names and quest/service markers readable; respect depth ordering, animation, reduced motion and rendering performance. Apply placements through `scripts/seasonal_cities.py` and sync-world, retaining the October 26–November 9 Stockholm schedule and automatic seasonal cleanup. Focused checks: dressing present across all four cities, absent in smaller camps and beyond city bounds, readable desktop/phone day/night views, clear routes and correct event-boundary removal. This revises the scope and density of the completed `CITY-SEASONAL-DECORATIONS` release.
 
 ### Unique player names (owner’s request, 2026-11-02)
 
