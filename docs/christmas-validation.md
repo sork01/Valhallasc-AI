@@ -63,10 +63,10 @@ without HUD overlays; portraits use the saved exported game artwork.
 
 | Stored filename | SHA-256 prefix |
 | --- | --- |
-| `valhallasc-christmas-alderhaven.png` | `8300db7547db632e` |
-| `valhallasc-christmas-skaldholm.png` | `f4b9a63182619adc` |
-| `valhallasc-christmas-nacrehold.png` | `cfd412642408d27a` |
-| `valhallasc-christmas-asterion.png` | `f6eb798d9f84d816` |
+| `valhallasc-christmas-alderhaven.png` | `7506a927fec5bb66` |
+| `valhallasc-christmas-skaldholm.png` | `6ea20a210955b557` |
+| `valhallasc-christmas-nacrehold.png` | `6e9ef0b5a368f1eb` |
+| `valhallasc-christmas-asterion.png` | `79358c1b06868a68` |
 | `valhallasc-christmas-grinch.png` | `4fd20d3dc42f30ad` |
 | `valhallasc-christmas-reindeer.png` | `1fe3920aa936f4ee` |
 
@@ -111,3 +111,21 @@ four cities, wall foliage slope and warmed cache separation. The old placement
 floats in **108** sampled poses. Contact sheets and in-game views inspected; no
 browser errors. Artifact `test-results/driver-nf21rF`. Focused client-only fix;
 no server restart, database work or encounter tests needed.
+
+
+Beta 1.35.1 is live from source `b6a138e` (private `b7663a0`). All **six changed
+public client hashes** match; public/bridge health pass, with the existing
+Beta 1.35.0 server/PID untouched. Receipt:
+`test-results/christmas-attachments-release-20261102T185833Z.json`.
+
+At the owner’s request, the four city pictures in FileDrop were refreshed to
+show the corrected hats and wall ornaments (current hashes in the table above).
+Two additional close-ups were uploaded and SHA-256 verified:
+
+| Stored filename | SHA-256 prefix |
+| --- | --- |
+| `valhallasc-christmas-npc-hats-fixed.png` | `dbb31b46cf677a2b` |
+| `valhallasc-christmas-wall-ornaments-fixed.png` | `3dd44d5f4133bd70` |
+
+Fresh city/house captures: private `test-results/driver-HvNieR`; NPC contact
+sheet: `test-results/driver-nf21rF`. Grinch and reindeer art is unchanged.
