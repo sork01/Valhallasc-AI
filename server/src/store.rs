@@ -16,12 +16,37 @@ pub struct Summary {
     pub class: Class,
     pub level: u32,
 }
+fn name_error(e: rusqlite::Error) -> Box<dyn std::error::Error> {
+    if matches!(&e,rusqlite::Error::SqliteFailure(_,Some(text)) if text.contains("characters.name_key"))
+    {
+        Box::new(NameTaken)
+    } else {
+        Box::new(e)
+    }
+}
+pub const NAME_TAKEN: &str = "That character name is already taken. Choose another name.";
+pub const NAME_REQUIRED: &str =
+    "This character needs a new name because another older character already uses it.";
+#[derive(Debug)]
+pub struct NameTaken;
+impl std::fmt::Display for NameTaken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(NAME_TAKEN)
+    }
+}
+impl std::error::Error for NameTaken {}
+pub fn name_key(name: &str) -> String {
+    name.trim()
+        .to_lowercase()
+        .replace('ß', "ss")
+        .replace('ς', "σ")
+}
 impl Store {
     pub fn open(path: &std::path::Path) -> Result<Self, Box<dyn std::error::Error>> {
         if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
             std::fs::create_dir_all(parent)?;
         }
-        let db = Connection::open(path)?;
+        let mut db = Connection::open(path)?;
         db.busy_timeout(std::time::Duration::from_secs(2))?;
         db.execute_batch("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;
             CREATE TABLE IF NOT EXISTS characters (id TEXT PRIMARY KEY, token_hash TEXT UNIQUE NOT NULL, state TEXT NOT NULL);")?;
@@ -48,6 +73,33 @@ impl Store {
             "INSERT OR IGNORE INTO world_meta(key,value) VALUES ('rested_epoch',?1)",
             [unix_now()],
         )?;
+        let columns: Vec<String> = db
+            .prepare("PRAGMA table_info(characters)")?
+            .query_map([], |r| r.get(1))?
+            .collect::<Result<_, _>>()?;
+        if !columns.iter().any(|n| n == "name_key") {
+            let tx = db.transaction()?;
+            tx.execute_batch("ALTER TABLE characters ADD COLUMN name_key TEXT; ALTER TABLE characters ADD COLUMN rename_required INTEGER NOT NULL DEFAULT 0;")?;
+            let rows: Vec<(String, String)> = tx
+                .prepare("SELECT id,state FROM characters ORDER BY rowid")?
+                .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+                .collect::<Result<_, _>>()?;
+            let mut used = std::collections::BTreeSet::new();
+            for (id, state) in rows {
+                let value: serde_json::Value = serde_json::from_str(&state)?;
+                let key = name_key(value["look"]["name"].as_str().unwrap_or(""));
+                if used.insert(key.clone()) {
+                    tx.execute(
+                        "UPDATE characters SET name_key=?1 WHERE id=?2",
+                        params![key, id],
+                    )?;
+                } else {
+                    tx.execute("UPDATE characters SET rename_required=1 WHERE id=?1", [id])?;
+                }
+            }
+            tx.execute_batch("CREATE UNIQUE INDEX character_unique_name ON characters(name_key) WHERE name_key IS NOT NULL;")?;
+            tx.commit()?;
+        }
         Ok(Self {
             db: Arc::new(Mutex::new(db)),
         })
@@ -175,6 +227,7 @@ impl Store {
             abandoned_quests: vec![],
             seasonal_claims: Default::default(),
             seasonal_started: Default::default(),
+            seasonal_rolls: Default::default(),
             inventory: vec![],
             equipment: Default::default(),
             gear_instances: vec![],
@@ -207,10 +260,34 @@ impl Store {
             c.become_gm();
         }
         self.conn().execute(
-            "INSERT INTO characters(id,token_hash,state,account_id) VALUES(?1,?2,?3,?4)",
-            params![c.id, hash(&token), serde_json::to_string(&c)?, account],
-        )?;
+            "INSERT INTO characters(id,token_hash,state,account_id,name_key) VALUES(?1,?2,?3,?4,?5)",
+            params![c.id, hash(&token), serde_json::to_string(&c)?, account, name_key(&c.look.name)],
+        ).map_err(name_error)?;
         Ok((c, token))
+    }
+    pub fn needs_rename(&self, id: &str) -> rusqlite::Result<bool> {
+        self.conn().query_row(
+            "SELECT rename_required FROM characters WHERE id=?1",
+            [id],
+            |r| r.get(0),
+        )
+    }
+    pub fn rename(&self, c: &mut Character, name: &str) -> Result<(), Box<dyn std::error::Error>> {
+        let mut next = c.clone();
+        next.look.name = name.trim().into();
+        next.look.validate()?;
+        if next.look.name_is_reserved() {
+            return Err("That name is reserved.".into());
+        }
+        let mut db = self.conn();
+        let tx = db.transaction()?;
+        let changed=tx.execute("UPDATE characters SET state=?1,name_key=?2,rename_required=0 WHERE id=?3 AND rename_required=1",params![serde_json::to_string(&next)?,name_key(&next.look.name),next.id]).map_err(name_error)?;
+        if changed != 1 {
+            return Err("This character does not need renaming.".into());
+        }
+        tx.commit()?;
+        *c = next;
+        Ok(())
     }
     pub fn summary(&self, id: &str) -> Option<Summary> {
         let state: String = self
@@ -772,5 +849,97 @@ mod tests {
             s.load(&token).unwrap().unwrap().explored,
             [0b101, 0, 1 << 8]
         );
+    }
+}
+
+#[cfg(test)]
+mod unique_name_tests {
+    use super::*;
+    fn named(name: &str) -> Look {
+        Look {
+            name: name.into(),
+            ..Look::default()
+        }
+    }
+    #[test]
+    fn unique_name_reservations_span_guests_accounts_offline_and_case() {
+        let store = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (a, _) = store.create(named("Åsa"), Point::default()).unwrap();
+        assert!(
+            store
+                .create_for(Some("other"), named(" åSA "), Point::default())
+                .is_err()
+        );
+        assert_eq!(store.summary(&a.id).unwrap().name, "Åsa");
+        assert!(
+            store
+                .create_for(Some("other"), named("Astrid"), Point::default())
+                .is_ok()
+        );
+    }
+    #[test]
+    fn unique_name_concurrent_creation_has_exactly_one_winner() {
+        let store = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(8));
+        let threads: Vec<_> = (0..8)
+            .map(|i| {
+                let store = store.clone();
+                let barrier = barrier.clone();
+                std::thread::spawn(move || {
+                    barrier.wait();
+                    store
+                        .create(
+                            named(if i % 2 == 0 { "Gunnar" } else { "gUNNAR" }),
+                            Point::default(),
+                        )
+                        .is_ok()
+                })
+            })
+            .collect();
+        assert_eq!(
+            threads
+                .into_iter()
+                .filter_map(|t| t.join().ok())
+                .filter(|v| *v)
+                .count(),
+            1
+        );
+    }
+    #[test]
+    fn unique_name_migration_keeps_oldest_and_rename_preserves_all_progress() {
+        let file = std::env::temp_dir().join(format!("valhallasc-names-{}.sqlite", Uuid::new_v4()));
+        let mut first = Character::mercenary(Class::Warrior, 30, "Thora");
+        first.gold = 1234;
+        first.friends = vec!["friend-id".into()];
+        let mut second = first.clone();
+        second.id = Uuid::new_v4().to_string();
+        second.gold = 5678;
+        let tokens = ["1".repeat(64), "2".repeat(64)];
+        {
+            let db = Connection::open(&file).unwrap();
+            db.execute_batch("CREATE TABLE characters(id TEXT PRIMARY KEY,token_hash TEXT UNIQUE NOT NULL,state TEXT NOT NULL)").unwrap();
+            for (c, t) in [(&first, &tokens[0]), (&second, &tokens[1])] {
+                db.execute(
+                    "INSERT INTO characters VALUES(?1,?2,?3)",
+                    params![c.id, hash(t), serde_json::to_string(c).unwrap()],
+                )
+                .unwrap();
+            }
+        }
+        let store = Store::open(&file).unwrap();
+        assert!(!store.needs_rename(&first.id).unwrap());
+        assert!(store.needs_rename(&second.id).unwrap());
+        let mut c = store.load(&tokens[1]).unwrap().unwrap();
+        assert!(store.rename(&mut c, "THORA").is_err());
+        assert!(store.needs_rename(&second.id).unwrap());
+        let before = serde_json::to_value(&c).unwrap();
+        store.rename(&mut c, "Thora Moon").unwrap();
+        let loaded = store.load(&tokens[1]).unwrap().unwrap();
+        let mut expected = before;
+        expected["look"]["name"] = serde_json::json!("Thora Moon");
+        assert_eq!(serde_json::to_value(loaded).unwrap(), expected);
+        assert!(!store.needs_rename(&second.id).unwrap());
+        drop(store);
+        let _ = std::fs::remove_file(file);
     }
 }

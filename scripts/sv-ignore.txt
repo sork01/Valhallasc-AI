@@ -153,5 +153,8 @@
   "wm-connection-{0}",
   "bold 25px Georgia",
   "blur(9px)",
-  "blur(12px)"
+  "blur(12px)",
+  "Rider base",
+  "Rider scale",
+  "Halloween daily quest"
 ]

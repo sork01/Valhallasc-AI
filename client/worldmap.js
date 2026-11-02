@@ -316,7 +316,7 @@
       g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (o.kind === 'water' || o.kind === 'ew_lava' ? o.r : RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();
     }
     if (z.city && z.theme !== 'city' && z.theme !== 'nacre' && z.theme !== 'asterion') for (const t of [z.city, ...(z.camps || [])]) { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(t.plaza.x * k, t.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
-    for (const n of z.npcs || []) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }
+    for (const n of (z.npcs||[]).filter(n=>!n.season||window.Seasonal?.active)) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }
     cache.set(key, c); return c;
   }
   function copy(canvas, source) { canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height); }
@@ -769,7 +769,7 @@
       questPeople.add(q.npc);
       for (const o of q.objectives || []) if (o.kind === 'talk') questPeople.add(o.target);
     }
-    return (z.npcs || []).filter(n => n.travelStop || n.buys || n.offers?.length || questPeople.has(n.id))
+    return (z.npcs || []).filter(n=>!n.season||window.Seasonal?.active).filter(n => n.travelStop || n.buys || n.offers?.length || questPeople.has(n.id))
       .sort((a, b) => a.name.localeCompare(b.name));
   }
   function services(n) {
@@ -987,6 +987,7 @@
 
   window.WorldMap = {
     show, close, get open() { return open(); }, get view() { return view; }, get zone() { return current; },
+    seasonChanged(){if(open()&&view==='zone')renderZone(current);},
     reset() { close(false); },
     // For the tests: the layout and kind table the map was written against.
     _layout: LAYOUT, _parent: parentOf, _kinds: KINDS, get _graph() { load(); return graph; }, _route: route,

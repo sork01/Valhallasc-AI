@@ -325,7 +325,7 @@ async fn connection(mut socket: WebSocket, mut app: App) {
         Ok(Err(text)) => {
             send(
                 &mut socket,
-                &json!({"type":"error","fatal":true,"text":text}),
+                &json!({"type":"error","fatal":true,"code":if text==store::NAME_REQUIRED||text==store::NAME_TAKEN {"name"}else{"join"},"text":text}),
             )
             .await;
             return;

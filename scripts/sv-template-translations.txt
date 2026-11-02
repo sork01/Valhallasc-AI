@@ -453,5 +453,7 @@
   "{0}/{1} ({2}% rested {3}xp)": "{0}/{1} ({2}% utvilad {3}xp)",
   "Accepted from {0}. Enter and hand in at any arena giver.": "Togs emot från {0}. Gå in och lämna in hos valfri arenauppdragsgivare.",
   "Hand in: {0} · {1}": "Lämna in: {0} · {1}",
-  "{0} ×{1} · Discard": "{0} ×{1} · Kasta"
+  "{0} ×{1} · Discard": "{0} ×{1} · Kasta",
+  "The Hollow Rider rises at level {0}: the average of five fighters, rounded up.": "Den huvudlösa ryttaren stiger fram på nivå {0}: genomsnittet av fem kämpar, avrundat uppåt.",
+  "The Hollow Rider · Level {0}": "Den huvudlösa ryttaren · Nivå {0}"
 }

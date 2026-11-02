@@ -710,6 +710,150 @@
         "mount_gryphon_run_e": "7da3021473eb5cd2",
         "mount_gryphon_run_se": "7f1a9ae91242beda"
       }
+    },
+    "nightmare": {
+      "png": "mount_nightmare.png",
+      "depth": "mount_nightmare_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          -0.65,
+          1.005,
+          1.69,
+          1.005,
+          -0.65,
+          1.005,
+          1.69,
+          1.005
+        ]
+      },
+      "raise": 25,
+      "cut": 34,
+      "shadow": [
+        34,
+        9
+      ],
+      "coat": [
+        "#111422",
+        "#22283a",
+        "#373d51",
+        "#535b73"
+      ],
+      "ramps": {
+        "coat": [
+          "#111422",
+          "#22283a",
+          "#373d51",
+          "#535b73"
+        ],
+        "coat2": [
+          "#0e0f19",
+          "#1a1b2b",
+          "#2d2c41",
+          "#45405b"
+        ],
+        "blaze": [
+          "#29263b",
+          "#494159",
+          "#68576c",
+          "#96738a"
+        ],
+        "hoof": [
+          "#462039",
+          "#984127",
+          "#e9802d",
+          "#ffd16c"
+        ],
+        "nose": [
+          "#4b2b2a",
+          "#7a4a47",
+          "#a8706a",
+          "#d29a92"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#493326",
+          "#7a5740",
+          "#b18453",
+          "#e7b674"
+        ],
+        "blanket": [
+          "#22142f",
+          "#3e244a",
+          "#68375c",
+          "#a85265"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#8e3323",
+          "#df6625",
+          "#ffa340",
+          "#ffe596"
+        ],
+        "flame": [
+          "#b74525",
+          "#f17829",
+          "#ffbf57",
+          "#fff0b6"
+        ],
+        "armor": [
+          "#202338",
+          "#3c4057",
+          "#626984",
+          "#a1a7bd"
+        ]
+      },
+      "sprites": {
+        "mount_nightmare_idle_s": "715ef8d74b82a193",
+        "mount_nightmare_idle_sw": "6366a6ff49dde0c0",
+        "mount_nightmare_idle_w": "b3549badb0c003ae",
+        "mount_nightmare_idle_nw": "81e577fd4406a960",
+        "mount_nightmare_idle_n": "029a7134148b19f4",
+        "mount_nightmare_idle_ne": "e9fedaf6816389fe",
+        "mount_nightmare_idle_e": "c738072a3823e3bf",
+        "mount_nightmare_idle_se": "95b5f85067adeebc",
+        "mount_nightmare_run_s": "689f64bf9a6d6b41",
+        "mount_nightmare_run_sw": "a0a06d49f72d9748",
+        "mount_nightmare_run_w": "38dda2999ca9d043",
+        "mount_nightmare_run_nw": "e3fe8d85c26b63d4",
+        "mount_nightmare_run_n": "15fcbd7ae3dcb651",
+        "mount_nightmare_run_ne": "05a5e8814cfead9e",
+        "mount_nightmare_run_e": "9c7f00cd65e4a809",
+        "mount_nightmare_run_se": "44f15447bfdc1e26"
+      }
     }
   }
 }

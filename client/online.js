@@ -18,6 +18,7 @@
   const layoutSlot = () => mode === 'account' ? (acct.current ? (acct.slots[acct.current] ||= {}) : null) : saved.characters.find(c => c.token === saved.current);
   const persistSlot = () => mode === 'account' ? persistAccount() : persist();
   let socket = null, generation = 0, active = false, callbacks = {}, look = null, retryTimer = 0, heartbeat = 0, failures = 0;
+  let renamePending=false;
   let connected = false, id = null, initialEmptySlots = [], busySince = null;
   const $ = name => document.getElementById(name);
   function status(text, ready) {
@@ -86,8 +87,8 @@
     ws.onopen = () => {
       if (!current()) { ws.close(); return; }
       ws.send(JSON.stringify(mode === 'account'
-        ? { type: 'join', version: 1, session: acct.session, character: acct.current, look: acct.current ? null : look }
-        : { type: 'join', version: 1, token: saved.current, look: saved.current ? null : look }));
+        ? { type: 'join', version: 1, session: acct.session, character: acct.current, look: acct.current && !renamePending ? null : look }
+        : { type: 'join', version: 1, token: saved.current, look: saved.current && !renamePending ? null : look }));
       joinTimeout = setTimeout(() => { if (current() && !connected) ws.close(); }, 15000);
     };
     ws.onmessage = event => {
@@ -96,7 +97,7 @@
       if (packet.type !== 'snapshot') flushSnapshot();
       switch (packet.type) {
         case 'welcome': {
-          clearTimeout(joinTimeout); connected = true; failures = 0; busySince = null; id = packet.id;
+          clearTimeout(joinTimeout); renamePending=false; $('name-change-form').hidden=true; connected = true; failures = 0; busySince = null; id = packet.id;
           const character = packet.snapshot.players.find(p => p.id === id);
           if (mode === 'account') { acct.current = packet.id; persistAccount(); }
           else if (packet.token) {
@@ -153,6 +154,7 @@
             busySince ??= Date.now();
             if (Date.now() - busySince < 90000) { waitingForRelease = true; ws.close(); break; }
           }
+          if(packet.code==='name'){$('name-change-form').hidden=false;$('new-character-name').focus();}
           log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text); window.Rebirth?.onError(packet.text);
           if (packet.code === 'auth') { acct.session = null; accountList = []; persistAccount(); }
           if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, packet.text !== 'This character is already online in another window.'); status('Unable to enter world', false); ws.close(); }
@@ -292,6 +294,10 @@
   });
   addEventListener('blur', () => { window.Field?.clearInput(); send({ type: 'stop' }); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { window.Field?.clearInput(); send({ type: 'stop' }); } });
+  $('name-change-form').addEventListener('submit',event=>{
+    event.preventDefault();const name=$('new-character-name').value.trim();if(!name)return;
+    look={...(look||{}),name};renamePending=true;connect();
+  });
   $('connection-retry').addEventListener('click', () => { busySince = null; connect(); });
   $('connection-title').addEventListener('click', () => $('p-title').click());
   $('connection-new').addEventListener('click', () => $('p-new').click());

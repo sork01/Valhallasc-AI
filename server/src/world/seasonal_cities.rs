@@ -13,7 +13,7 @@ impl World {
             if crate::seasonal::sync_character(&mut p.character, &active) {
                 changed = true;
                 if p.merc.is_none() && p.ambient.is_none() {
-                    let _=p.peer.try_send(json!({"type":"system","text":"The festival has ended. Unfinished seasonal quests have been retired; completed rewards are kept."}));
+                    let _=p.peer.try_send(json!({"type":"system","text":if active.is_empty(){"The festival has ended. Unfinished seasonal quests have been retired; completed rewards are kept."}else{"A new festival day has begun. Unfinished daily quests have been retired; completed rewards are kept."}}));
                 }
             }
         }

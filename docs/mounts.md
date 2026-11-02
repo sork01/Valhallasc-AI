@@ -4,7 +4,7 @@ These settle `MOUNT-RULES` in [TODO.md](../TODO.md). `MOUNT-SERVER` stores the o
 
 ## One cosmetic choice at one speed
 
-All five mounts are the **same ability with a different look**: 2× the class's walking speed in the open world, as today (`speed() * 2` in `world.rs`). No mount crosses water, void, cliffs or any collision, and none flies, jumps or changes combat. The gryphon is a ground-runner that spreads its wings in the animation; this avoids new collision, zone-edge and exploit rules (Bifrost Reach's void rings, sealed gates, instance walls) and keeps travel balance identical to the horse. A mount's rank is its price of effort, not its power.
+All six mounts are the **same ability with a different look**: 2× the class's walking speed in the open world, as today (`speed() * 2` in `world.rs`). No mount crosses water, void, cliffs or any collision, and none flies, jumps or changes combat. The gryphon is a ground-runner that spreads its wings in the animation; this avoids new collision, zone-edge and exploit rules (Bifrost Reach's void rings, sealed gates, instance walls) and keeps travel balance identical to the horse. A mount's rank is its price of effort, not its power.
 
 ## How each mount is obtained
 
@@ -12,6 +12,7 @@ Each uses a different route, and the later the mount the harder it is. A charact
 
 | Mount | Route | Level | Cost and effort |
 | --- | --- | ---: | --- |
+| Nightmare Steed | Halloween Hollow Rider daily hunt in Gloamfen | 1 | One independent 1% roll per eligible real player per Stockholm day; five fighters, average level rounded up. |
 | Horse | Shop: Stable-hand Greta, Skaldholm (unchanged) | 50 | 500,000 gold |
 | Raptor | Quest chain in the Tanglecrown: *The Banyan Run*, four steps given by Mara Vines (Canopy tracker) | 75 | No gold fee. Kill 25 canopy monsters, bring 10 of the zone's materials, win one elite fight and escort a hatchling back. One-time, class-neutral. |
 | Lizard | Shop: a new Dune-wrangler NPC in the Lapis Erg hub (beside Basma Silk) | 80 | 160,000 gold (the price of a level-80 Hero Pack, the same wealth tier as the horse at its level) |
@@ -74,3 +75,14 @@ Defeating all ten different Chained Forge bosses also awards the Gryphon directl
 without an egg or hatching fee. This is the same mount and speed; the existing
 egg/hatching route remains available. It never adds a duplicate or replaces an
 existing mount selection. See [achievements.md](achievements.md).
+
+## Nightmare Steed (Beta 1.34.0)
+
+The seasonal mount grants ownership directly on the eligible kill; no bag
+slot or licence is required. Ownership survives event end. It uses the same
+riding rules and speed as the other mounts. Its original PixelFlow source
+IDs and depth atlas are in `client/assets/mounts_sprites.txt`.
+`make_mount_sprites.py build nightmare` and `export` use the existing pipeline;
+its authored run gait already plays forwards (do not apply the horse-only
+runtime reversal). The focused real-art check is `tests/nightmare-art-ui.cjs`.
+See [halloween-hunt.md](halloween-hunt.md).

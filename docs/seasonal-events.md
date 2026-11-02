@@ -1,9 +1,10 @@
 # Seasonal city events
 
-Beta 1.33.0 introduces Halloween in Alderhaven, Skaldholm, Nacrehold and
-Asterion, with dressing in the other town camps too. Pumpkins, warm lanterns,
-orange/purple bunting, bat bow ties and the four hosts’ witch hats layer onto
-existing scenery and NPC artwork. These cosmetic objects have no collision.
+Beta 1.34.0 dresses only Alderhaven, Skaldholm, Nacrehold and Asterion,
+inside their city bounds. Smaller camps have no seasonal dressing. Pumpkins,
+lanterns, bunting, candles, scarecrows, doorway wreaths and elevated cobwebs
+are distributed through the four cities. Bat bow ties and the four hosts’
+witch hats layer onto existing NPC artwork. These cosmetic objects have no collision.
 They are placed away from people, obstacles and gates; walking routes and
 service/quest names remain visible. Native Canvas artwork uses the existing
 City cache and depth list; NPCs retain their original sprite atlases.
@@ -16,7 +17,7 @@ Stockholm’s CET/CEST offsets and the last-Sunday EU daylight-saving rule.
 A reusable registry in `world/seasons.txt` defines event IDs, month/day
 boundaries (including intervals spanning New Year) and quest IDs.
 
-Every character may complete each festival quest **once each calendar year**.
+Every character may complete each of the four city errands **once each calendar year**.
 The four quests use existing talk/visit objectives and normal level, distance,
 progress, XP and gold validation:
 
@@ -27,9 +28,9 @@ progress, XP and gold validation:
 | Nacrehold | Lanterns for the Lost | Pelar | 40 | 1,400 |
 | Asterion | The Midnight Masquerade | Vela | 60 | 2,600 |
 
-XP follows `levels[level-1] / 10`. No quest items or combat grinds are added.
+XP follows `levels[level-1] / 10`. These four errands add no quest items or combat grinds.
 Two defaulted save maps, `seasonalClaims` and `seasonalStarted`, record the
-claim/accept year. Completed rewards and completion history are retained.
+claim/accept period (year for the errands, YYYYMMDD for the daily hunt). Completed rewards and completion history are retained.
 At event end, unfinished quests retire automatically with a system notice;
 a previous completed run stays in history. No pending objectives carry into
 the next year. Abandoning and retaking during the same event is allowed until
@@ -63,3 +64,13 @@ messages and guidance. The browser check measures actual bright glyph pixels
 and physical font size in both viewport sizes, rather than merely observing a
 `fillText` call. The native stone arch needs a real rise above the projected
 wall slope: a shallow screen-space curve reads like a plank in this camera.
+
+## Shared daily hunt (Beta 1.34.0)
+
+The four hosts also offer `halloween_hunt`, one shared daily five-fighter
+summon in Gloamfen. Daily eligibility uses the same authoritative Stockholm
+calendar; claim and personal mount-roll ledgers are independent and persistent.
+The Hollow Rider, ritual lantern, hires and unfinished quest retire at event
+end; owned mounts remain. See [halloween-hunt.md](halloween-hunt.md) for the
+1% personal reward rule, party scaling and focused validation. No file zones
+or private-copy IDs change.

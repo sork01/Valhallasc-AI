@@ -1,5 +1,22 @@
 [
   {
+    "version": "Beta 1.34.0",
+    "date": "2026-11-02",
+    "new": [
+      "The Hollow Rider can be summoned in Gloamfen during Halloween by five fighters, including hired fighters. Its level is the party average rounded up.",
+      "All four city festival hosts offer the same daily Hollow Rider quest. Each eligible hero has one independent 1% Nightmare Steed chance per day.",
+      "The Nightmare Steed has a burning mane and tail, glowing hooves and the same riding speed as other mounts.",
+      "Character names are unique across accounts and guests. The oldest duplicate keeps its name; other existing duplicates choose a new name before entering."
+    ],
+    "changed": [
+      "Seasonal decorations and NPC costumes appear only inside Alderhaven, Skaldholm, Nacrehold and Asterion, with richer street, doorway and district dressing.",
+      "At the end of Halloween, the Rider, ritual and unfinished festival quests retire automatically. Earned mounts remain owned."
+    ],
+    "removed": [
+      "Seasonal city dressing in smaller camps and settlements, so the festival is concentrated in the four main cities."
+    ]
+  },
+  {
     "version": "Beta 1.33.0",
     "date": "2026-11-02",
     "new": [

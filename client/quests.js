@@ -8,10 +8,11 @@
   const expanded = new Set();
   let abandonConfirm = null, abandonedOpen = false;
   const state = quest => progress.find(p => p.id === quest.id);
-  const giver = quest => areas[quest.zone].npcs.find(n => n.id === quest.npc);
+  const allGivers=q=>q.givers?areas.flatMap((a,zone)=>a.npcs.filter(n=>q.givers.includes(n.id)).map(n=>({...n,zone}))):[{...areas[q.zone].npcs.find(n=>n.id===q.npc),zone:q.zone}];
+  const giver = quest => allGivers(quest).find(n=>n.zone===(window.Field?.zone||0))||allGivers(quest)[0];
   // The hub a quest's giver belongs to: a zone may have several (the Wyrdwood's Hollowmoot and Skuldwatch).
   const hubName = quest => {
-    const a = areas[quest.zone], hubs = [a.city, ...(a.camps || [])].filter(Boolean), g = giver(quest);
+    const a = areas[giver(quest)?.zone??quest.zone], hubs = [a.city, ...(a.camps || [])].filter(Boolean), g = giver(quest);
     if (!hubs.length) return undefined;
     if (!g || hubs.length === 1) return hubs[0].name;
     return hubs.reduce((best, c) => Math.hypot(g.x - c.plaza.x, g.y - c.plaza.y) < Math.hypot(g.x - best.plaza.x, g.y - best.plaza.y) ? c : best).name;
@@ -20,8 +21,8 @@
   const arenaGivers = areas.flatMap((area, zone) => (area.npcs || [])
     .filter(n => n.offers?.some(o => o.id === 'gauntlet')).map(n => ({ ...n, zone })));
   const arenaQuests = definitions.filter(arenaLevel), arenaGiverIds = new Set(arenaGivers.map(n => n.id));
-  const handInAt = (q, id) => q.npc === id || (arenaLevel(q) && arenaGivers.some(n => n.id === id));
-  const turnIns = q => arenaLevel(q) ? arenaGivers : [{ ...giver(q), zone: q.zone }];
+  const handInAt = (q, id) => q.npc === id || q.givers?.includes(id) || (arenaLevel(q) && arenaGivers.some(n => n.id === id));
+  const turnIns = q => arenaLevel(q) ? arenaGivers : allGivers(q);
   const handIn = q => {
     const local = turnIns(q).filter(n => n.zone === (window.Field?.zone || 0));
     const hero = window.Field?.hero;
@@ -53,8 +54,7 @@
   }
   const questsByNpc = new Map();
   for (const q of definitions) {
-    if (!questsByNpc.has(q.npc)) questsByNpc.set(q.npc, []);
-    questsByNpc.get(q.npc).push(q);
+    for(const id of q.givers||[q.npc]){if(!questsByNpc.has(id))questsByNpc.set(id,[]);questsByNpc.get(id).push(q);}
   }
   const matchesEnemy = (target, kind) => target === kind || target === 'any'
     || (target === 'slime' && ['green', 'blue', 'pink', 'yellow'].includes(kind));
@@ -81,6 +81,7 @@
         if ((state(q)?.counts[i] || 0) >= o.count) return;
         if (o.kind === 'kill') {
           // A hub can send you into a neighbouring dungeon. Ordinary "any"/"slime" hunts stay in their own zone.
+          if(q.id==='halloween_hunt'){if(zone===3)add((area.npcs||[]).find(n=>n.id==='halloween_lantern'),o.label);return;}
           const home = areas[q.zone], local = (home.slimes || []).some(e => matchesEnemy(o.target, e.kind));
           if (zone !== q.zone && (local || !home.portals?.some(p => p.to === zone))) return;
           const spawns = (area.slimes || []).filter(e => matchesEnemy(o.target, e.kind) && !e.ambush);
@@ -219,9 +220,9 @@
   function card(quest, atNpc) {
     const s = status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
-    node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? ' · Annual festival quest' : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+    node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
     if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
-    if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${hubName(quest) || 'Quest giver'}`, 'quest-location quest-history'));
+    if (!atNpc) node.append(element('small', `${areas[npc.zone??quest.zone].name} · ${hubName(quest) || 'Quest giver'}`, 'quest-location quest-history'));
     const gap = quest.level - (heroLevel);
     const rec = element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'); rec.dataset.level = String(quest.level);
     if (gap >= 5) rec.style.color = '#ff6b6b'; else if (gap >= 3) rec.style.color = '#ffa65a'; else if (gap <= -5) rec.style.color = '#9fb0a0';
@@ -445,9 +446,10 @@
     update(next, dismissed = abandoned) { const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return; progress = next; abandoned = dismissed || []; signature = key; if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null; if (abandonConfirm && !progress.some(p => p.id === abandonConfirm && !p.claimed)) abandonConfirm = null; clearGuidance(); render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
     // Locked and finished quests are hidden, as they are there.
+    active(id){const q=definitions.find(q=>q.id===id);return !!q&&status(q)==='active';},
     offered(id) {
       const rank = { ready: 0, available: 1, active: 2 };
-      return definitions.filter(q => (q.npc === id || (status(q) === 'ready' && handInAt(q, id))) && status(q) in rank)
+      return definitions.filter(q => (q.npc===id||q.givers?.includes(id)||(status(q)==='ready'&&handInAt(q,id))) && status(q) in rank)
         .sort((a, b) => rank[status(a)] - rank[status(b)] || Number(a.repeatable) - Number(b.repeatable));
     },
     npc(id, container, pick) {
@@ -468,7 +470,7 @@
     detail(quest, container, back, npcId = quest.npc) {
       const s = status(quest);
       const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
-      node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? ' · Annual festival quest' : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+      node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
       if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
       node.append(element('p', quest.description));
       storyRecap(quest, node);
@@ -494,8 +496,8 @@
     marker(id) { return this.markerInfo(id).symbol; },
     markerInfo(id) {
       for (const s of ['ready', 'available']) {
-        const quest = definitions.find(q => (q.npc === id || (s === 'ready' && handInAt(q, id))) && status(q) === s && !q.repeatable)
-          || definitions.find(q => (q.npc === id || (s === 'ready' && handInAt(q, id))) && status(q) === s);
+        const quest = definitions.find(q => (q.npc===id||q.givers?.includes(id)||(s==='ready'&&handInAt(q,id))) && status(q) === s && !q.repeatable)
+          || definitions.find(q => (q.npc===id||q.givers?.includes(id)||(s==='ready'&&handInAt(q,id))) && status(q) === s);
         if (quest) return { symbol: s === 'ready' ? '?' : '!', color: quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
       }
       if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => (o.kind === 'talk' || o.kind === 'escort' || o.kind === 'handoff') && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };

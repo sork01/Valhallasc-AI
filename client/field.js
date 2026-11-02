@@ -761,6 +761,7 @@
     croc: { name: 'Mire Crocodile', scale: 1.25, top: 32, col: ['#b3c76a', '#5b7433', '#26331f'] },
     knight: { name: 'Drowned Knight', scale: 1.15, top: 87, col: ['#cde8d4', '#6a8d7a', '#2d403c'] },
     hydra: { name: 'Mire Hydra', scale: 1.3, top: 70, col: ['#b0d6a0', '#4b7a74', '#233040'] },
+    hollow_rider:{name:'The Hollow Rider',elite:true,scale:1.8,top:88,col:['#ffbd62','#40354f','#151421']},
     gloomroot: { name: 'Gloomroot Colossus', elite: true, scale: 1.8, top: 85, col: ['#8affd8', '#57412a', '#12100c'] },
     thrall: { elite: true, name: 'Vault Thrall', scale: .95, top: 72, col: ['#d8d2bc', '#8a8470', '#2c2a34'] },
     archer: { elite: true, name: 'Bone Archer', scale: .95, top: 76, col: ['#e6dfc4', '#9a9278', '#35303c'] },
@@ -1182,6 +1183,7 @@
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
     window.DayNight?.sync(packet.worldTime);
     const seasonChanged=window.Seasonal?.update(packet.seasons,own.seasonalClaims);
+    window.Halloween?.sync(packet.halloween,own.seasonalRolls,packet.seasons);
     explored = Array.isArray(own.explored) ? own.explored : null;
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
@@ -2841,6 +2843,7 @@
   const enemyArt = new Map();
   const slimeArt = { source: () => slimeSrc, load: () => slimeSpriteConfig && loadSlimeSprites(slimeSpriteConfig) };
   for (const [kinds, source, load] of [
+    [['hollow_rider'],()=>window.Halloween?.source,()=>window.Halloween?.load()],
     [CATHEDRAL_KINDS, () => cathedralSrc, loadCathedralSprites],
     [YEAR_KINDS, () => yearSrc, loadYearSprites],
     [CAIRN_KINDS, () => cairnSrc, loadCairnSprites],
@@ -3933,6 +3936,7 @@
     }
     City.drawPlaza(g, w2s);
     window.ExitPaths?.floor(g,zdef,w2s,hero);
+    window.Halloween?.drawFloor(g,zone,w2s);
     // Flat authored terrain belongs below actors, irrespective of its anchor depth.
     for (const o of objects) if (City.art[o.kind]?.ground) {
       const [sx, sy] = w2s(o.x, o.y), box = City.art[o.kind].box;
@@ -3963,10 +3967,10 @@
     // build the depth-sorted list of everything standing on the ground
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
     const set = spriteSet();
-    for (const source of [objects,window.Seasonal?.decor(zone)||[]]) for (const o of source) {
+    for (const source of [objects,window.Seasonal?.decor(zone)||[],window.Halloween?.objects(zone)||[]]) for (const o of source) {
       if (o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
       if (City.art[o.kind]?.ground) continue;
-      const [sx, sy] = w2s(o.x, o.y);
+      const [sx, sy] = w2s(o.x, o.y,o.z||0);
       if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0))) { list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const portal of zdef.portals) { if (portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
@@ -4209,6 +4213,7 @@
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
+    window.Halloween?.drawLabel(g,zone,w2s);
     window.ExitPaths?.labels(g,zdef,ZONES,w2s,hero,zoom);
     window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
     drawQuestArrow(g);

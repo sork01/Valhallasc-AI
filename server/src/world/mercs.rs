@@ -289,11 +289,18 @@ impl World {
         let p = self.players.get(&session).ok_or("Unknown session.")?;
         let c = &p.character;
         // A group-quest giver rents fighters for that quest; the Meeting Stone rents them to anyone, for any party of up to five.
-        let quest = self.maps[c.zone]
-            .quests
+        let seasons = self.seasonal.active();
+        let quest = self
+            .maps
             .iter()
+            .flat_map(|m| &m.quests)
             .find(|q| {
-                q.group && q.npc == npc_id && c.quests.iter().any(|g| g.id == q.id && !g.claimed)
+                q.group
+                    && (q.npc == npc_id || crate::seasonal::giver(&q.id, npc_id))
+                    && c.quests.iter().any(|g| g.id == q.id && !g.claimed)
+                    && (crate::seasonal::quest_event(&q.id).is_none()
+                        || crate::seasonal::period(&q.id, &seasons)
+                            == c.seasonal_started.get(&q.id).copied())
             })
             .map(|q| {
                 (

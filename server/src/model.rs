@@ -333,6 +333,8 @@ pub struct Character {
     #[serde(default)]
     pub seasonal_started: std::collections::BTreeMap<String, u32>,
     #[serde(default)]
+    pub seasonal_rolls: std::collections::BTreeMap<String, u32>,
+    #[serde(default)]
     pub inventory: Vec<crate::items::ItemStack>,
     #[serde(default)]
     pub equipment: std::collections::BTreeMap<String, String>,
@@ -419,7 +421,13 @@ pub struct MountDef {
     pub level: u32,
     pub speed: f64,
 }
-pub const MOUNTS: [MountDef; 5] = [
+pub const MOUNTS: [MountDef; 6] = [
+    MountDef {
+        id: "nightmare",
+        name: "nightmare steed",
+        level: 1,
+        speed: 2.,
+    },
     MountDef {
         id: "horse",
         name: "riding horse",
@@ -498,6 +506,7 @@ impl Character {
             abandoned_quests: vec![],
             seasonal_claims: Default::default(),
             seasonal_started: Default::default(),
+            seasonal_rolls: Default::default(),
             inventory: vec![],
             equipment: Default::default(),
             gear_instances: vec![],

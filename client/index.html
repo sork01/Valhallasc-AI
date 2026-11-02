@@ -38,7 +38,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.33.0</p>
+    <p class="version">Beta 1.34.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -611,6 +611,11 @@
     <section class="panel connection-panel" role="dialog" aria-modal="true" aria-label="World connection">
       <h3>Greenmeadow awaits</h3><p id="connection-text"></p>
       <button id="connection-retry" class="btn primary" type="button">Retry now</button>
+      <form id="name-change-form" hidden>
+        <label for="new-character-name">Choose a unique character name</label>
+        <input id="new-character-name" minlength="2" maxlength="16" required autocomplete="off" aria-label="New character name">
+        <button class="btn" type="submit">Use this name</button>
+      </form>
       <button id="connection-new" class="btn ghost" type="button">New Character</button>
       <button id="connection-title" class="btn ghost" type="button">Back to Title</button>
     </section>
@@ -781,6 +786,7 @@
 <script src="seasonDungeonArt.js"></script>
 <script src="quest-sources.js"></script>
 <script src="seasonal.js"></script>
+<script src="halloween.js"></script>
 <script src="exitpaths.js"></script>
 <script src="quests.js"></script>
 <script src="cathedral.js"></script>

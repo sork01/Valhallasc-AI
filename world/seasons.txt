@@ -13,7 +13,19 @@
       "halloween_alder",
       "halloween_skald",
       "halloween_nacre",
-      "halloween_aster"
-    ]
+      "halloween_aster",
+      "halloween_hunt"
+    ],
+    "dailyQuests": [
+      "halloween_hunt"
+    ],
+    "givers": {
+      "halloween_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
   }
 ]

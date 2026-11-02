@@ -1097,3 +1097,6 @@
 
 .tracker-destination { display:block; max-width:100%; border:0; background:transparent; color:#a6ffcf; text-align:left; font:inherit; font-size:11px; padding:5px 0; cursor:pointer; }
 @media (pointer: coarse) { .tracker-destination { min-height: calc(44px / var(--ui, .8)); } }
+
+#name-change-form:not([hidden]) { display: flex; flex-direction: column; gap: .6rem; margin-block: 1rem; }
+#name-change-form input { min-height: 44px; padding: .5rem .7rem; font-size: 18px; color: #fff0c9; background: #172139; border: 1px solid #c9a566; border-radius: 6px; }

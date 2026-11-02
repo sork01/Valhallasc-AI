@@ -4,6 +4,7 @@
 // (docs/mounts.md); this only shows them and sends `select_mount`.
 (() => {
   const MOUNTS = [
+    {id:'nightmare',name:'Nightmare Steed',level:1,route:'Halloween: summon the Hollow Rider with five fighters in Gloamfen',cost:'One independent 1% chance per eligible hero per day'},
     { id: 'horse', name: 'Riding horse', level: 50, route: 'Buy from Stable-hand Greta in Skaldholm', cost: '500,000 gold' },
     { id: 'raptor', name: 'Raptor', level: 75, route: 'Quest chain The Banyan Run, from Mara Vines in the Tanglecrown', cost: 'no gold fee' },
     { id: 'lizard', name: 'Lizard', level: 80, route: 'Buy from the Dune-wrangler in the Lapis Erg hub', cost: '160,000 gold' },

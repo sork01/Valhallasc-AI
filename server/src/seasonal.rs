@@ -10,6 +10,10 @@ struct Event {
     start: [u32; 2],
     end_exclusive: [u32; 2],
     quests: Vec<String>,
+    #[serde(default)]
+    daily_quests: Vec<String>,
+    #[serde(default)]
+    givers: std::collections::BTreeMap<String, Vec<String>>,
 }
 static EVENTS: LazyLock<Vec<Event>> = LazyLock::new(|| {
     serde_json::from_str(include_str!("../../world/seasons.txt")).expect("valid seasonal calendar")
@@ -18,6 +22,7 @@ static EVENTS: LazyLock<Vec<Event>> = LazyLock::new(|| {
 pub struct Active {
     pub id: String,
     pub year: u32,
+    pub day: u32,
     pub until: u64,
 }
 
@@ -85,13 +90,14 @@ fn midnight(year: u32, month: u32, day: u32) -> u64 {
     utc - if summer(utc - 7200, year) { 7200 } else { 3600 }
 }
 pub fn active_at(unix: u64) -> Vec<Active> {
-    let (year, _, _) = date(
+    let (year, month, day) = date(
         unix + if summer(unix, date(unix).0) {
             7200
         } else {
             3600
         },
     );
+    let calendar_day = year * 10000 + month * 100 + day;
     EVENTS
         .iter()
         .filter_map(|e| {
@@ -104,6 +110,7 @@ pub fn active_at(unix: u64) -> Vec<Active> {
                     (unix >= start && unix < end).then(|| Active {
                         id: e.id.clone(),
                         year,
+                        day: calendar_day,
                         until: end,
                     })
                 })
@@ -116,6 +123,23 @@ pub fn quest_event(id: &str) -> Option<&'static str> {
         .find(|e| e.quests.iter().any(|q| q == id))
         .map(|e| e.id.as_str())
 }
+pub fn daily(id: &str) -> bool {
+    EVENTS
+        .iter()
+        .any(|e| e.daily_quests.iter().any(|q| q == id))
+}
+pub fn period(id: &str, active: &[Active]) -> Option<u32> {
+    let event = quest_event(id)?;
+    active
+        .iter()
+        .find(|a| a.id == event)
+        .map(|a| if daily(id) { a.day } else { a.year })
+}
+pub fn giver(id: &str, npc: &str) -> bool {
+    EVENTS
+        .iter()
+        .any(|e| e.givers.get(id).is_some_and(|v| v.iter().any(|n| n == npc)))
+}
 pub fn sync_character(c: &mut Character, active: &[Active]) -> bool {
     let mut changed = false;
     c.quests.retain_mut(|q| {
@@ -125,7 +149,8 @@ pub fn sync_character(c: &mut Character, active: &[Active]) -> bool {
         if q.claimed {
             return true;
         }
-        let current = active.iter().find(|a| a.id == event).map(|a| a.year);
+        let _ = event;
+        let current = period(&q.id, active);
         if current.is_some() && current == c.seasonal_started.get(&q.id).copied() {
             return true;
         }

@@ -409,9 +409,38 @@ def gryphon(clip, k, n):
     return prims, z0
 
 
+# Halloween: original gothic tack and animated flame geometry on the common riding rig.
+NIGHTMARE={**HORSE,'coat':['#111422','#22283a','#373d51','#535b73'],
+ 'coat2':['#0e0f19','#1a1b2b','#2d2c41','#45405b'],
+ 'blaze':['#29263b','#494159','#68576c','#96738a'],
+ 'hoof':['#462039','#984127','#e9802d','#ffd16c'],
+ 'blanket':['#22142f','#3e244a','#68375c','#a85265'],
+ 'gold':['#493326','#7a5740','#b18453','#e7b674'],
+ 'iris':['#8e3323','#df6625','#ffa340','#ffe596'],
+ 'flame':['#b74525','#f17829','#ffbf57','#fff0b6'],
+ 'armor':['#202338','#3c4057','#626984','#a1a7bd']}
+
+def nightmare(clip,k,n):
+    # Reverse the source trot: planted feet push back, matching the production horse playback correction.
+    step=(-k)%n if clip=='run' else k
+    prims,bob=horse(clip,step,n);ph=CYCLE(k,n)
+    for part in prims:
+        if part.mat=='coat2' and part.c[2]>34 and (part.c[1]>7 or part.c[1]<-20):part.mat='flame'
+    for i in range(7):
+        y=11+i*2.6;z=44+i*1.8+bob;lift=9+3*S_(ph*2+i*1.7)
+        prims += [cone((0,y,z),(S_(ph+i)*1.2,y-3,z+lift),3.4,'flame')]
+    for i in range(4):
+        y=-24-i*3;z=33-i*1.4+bob;lift=8+2*S_(ph+i)
+        prims += [cone((S_(ph)*3,y,z),(S_(ph+i)*3,y-5,z+lift),3.1,'flame')]
+    for side in [-1,1]:
+        prims += [cone((side*4,24,58+bob),(side*6,19,70+bob),2.2,'armor'),
+                  Ell((side*10.7,9,34+bob),(1.5,8,7),'armor')]
+    return prims,bob
+
 # name -> (builder, materials, flat materials, seat). seat: `raise` lifts the rider so the pelvis sits on the saddle,
 # `cut` hides the rider below that world height (the legs vanish into the barrel), `shadow` is the ground shadow (rx, ry).
 REGISTRY = {
+    'nightmare': (nightmare, NIGHTMARE, {**FLAT,'flame':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'horse': (horse, HORSE, FLAT, {'scale': 1.3, 'raise': 25, 'cut': 34, 'shadow': (34, 9), 'coat': 'coat'}),
     'raptor': (raptor, RAPTOR, FLAT, {'scale': 1.12, 'raise': 30, 'cut': 44, 'shadow': (22, 8), 'coat': 'skin'}),
     'lizard': (lizard, LIZARD, FLAT, {'scale': 1.25, 'raise': 15, 'cut': 28, 'shadow': (38, 10), 'coat': 'hide'}),

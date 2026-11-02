@@ -278,7 +278,7 @@
       const quests=(area().quests||[]);
       folk.set(zone,(area().npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||!!n.travelStop||quests.some(q=>q.npc===n.id)})));
     }
-    return folk.get(zone);
+    const people=folk.get(zone);return people.some(n=>n.season)?people.filter(n=>!n.season||window.Seasonal?.active):people;
   }
   let clockAt=0;
   // Called every frame with the server's world time (seconds); walkers are placed, and face the way they go.
@@ -484,6 +484,8 @@
         b.addEventListener('click',()=>show({kind:'merchant'},'#npc-x'));offers.push(b);
       }
       for(const offer of npc.offers){
+        const meta=(area().npcs||[]).find(n=>n.id===npc.id)?.offers?.find(o=>o.id===offer.id)||offer;
+        if(meta.season&&!window.Seasonal?.active||meta.quest&&!window.Quests?.active(meta.quest))continue;
         if(window.Shop?.isStockOffer(offer))continue;
         if(offer.id==='bank') {
           const b=row('coin',offer.label||'Open the bank','');

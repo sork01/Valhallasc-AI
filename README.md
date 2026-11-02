@@ -645,3 +645,20 @@ quiet cross sites. The affected zone generators reapply it, and
 `scripts/sync-world.cjs` exports it. No zone IDs or saved copies shift. Focused
 checks: Rust `raid_key`, MCP `raid_key`, real-sprite `tests/raid-key-ui.cjs`
 (`MUTATE=1` must fail). Rules and coordinates: [docs/raid-key.md](docs/raid-key.md).
+
+### Halloween daily hunt and unique names (Beta 1.34.0)
+
+The Hollow Rider is a five-fighter Halloween summon in Gloamfen, with one
+shared city daily quest and an independent 1% Nightmare Steed roll per eligible
+player per day. Only the four main cities receive seasonal dressing. The
+Stockholm calendar automatically retires quests, summons and decorations after
+November 9; owned rewards stay. See [the hunt rules](docs/halloween-hunt.md)
+and [seasonal events](docs/seasonal-events.md). Regenerate the authored ritual
+and city dressing through `scripts/sync-world.cjs`; no zone IDs shift.
+
+Character names are reserved across guests/accounts and offline characters.
+A transactional startup migration keeps the oldest duplicate and requires the
+others to rename before entering, preserving IDs and progress. See
+[unique names](docs/unique-character-names.md). Focused checks: Rust
+`halloween`, `unique_name`, `seasonal`; MCP `halloween_hunt`; bounded browser
+`tests/halloween-hunt-ui.cjs` and `tests/nightmare-art-ui.cjs`.

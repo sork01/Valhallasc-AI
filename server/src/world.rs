@@ -85,6 +85,9 @@ mod gm_test;
 #[cfg(test)]
 mod gm_test_tests;
 mod gm_visibility;
+mod halloween;
+#[cfg(test)]
+mod halloween_tests;
 #[cfg(test)]
 mod hierloom_tests;
 mod hold;
@@ -462,6 +465,7 @@ impl Player {
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["abandonedQuests"] = json!(c.abandoned_quests);
         view["seasonalClaims"] = json!(c.seasonal_claims);
+        view["seasonalRolls"] = json!(c.seasonal_rolls);
         view["daze"] = json!(self.daze);
         view["danceT"] = json!(self.dance);
         view["rested"] = json!({"percent":c.rested.percent()});
@@ -645,6 +649,7 @@ impl Slime {
             "knight" => (3400., 130., 2.4, 1.4),
             "hydra" => (5200., 150., 2.2, 1.8),
             // Five level-20 heroes with a healer who must triage: two hits fell a non-tank, so no party without a healer gets through.
+            "hollow_rider" => (5000., 90., 3.1, 1.6),
             "gloomroot" => (90000., 1500., 2.3, 2.1),
             // The Undervault, tuned for five level-20 heroes with a healer. Trash packs of three or four; the
             // bosses are fights of one to two minutes each (see the vault_* simulations in the tests).
@@ -813,6 +818,7 @@ impl Slime {
             "croc" => 17,
             "knight" => 18,
             "hydra" => 20,
+            "hollow_rider" => 1,
             "gloomroot" => 20,
             "thrall" | "archer" => 19,
             "acolyte" | "gatewarden" | "choir" => 20,
@@ -944,6 +950,7 @@ impl Slime {
             "croc" => 205,
             "knight" => 245,
             "hydra" => 360,
+            "hollow_rider" => 0,
             "gloomroot" => 1200,
             "thrall" => 280,
             "archer" => 290,
@@ -1091,6 +1098,7 @@ impl Slime {
             "croc" => (0.35, 1.1, 10., 8.5),
             "knight" => (0.6, 1.4, 6.5, 7.5),
             "hydra" => (0.55, 1.3, 7.5, 9.),
+            "hollow_rider" => (1.4, 2.2, 0., 16.),
             "gloomroot" => (0.85, 1.5, 7.5, 8.5),
             "thrall" => (0.45, 1.2, 7.5, 8.),
             "archer" => (0.6, 1.8, 0., 11.),
@@ -1290,6 +1298,9 @@ impl Slime {
     /// Radius of the ground-pound a kind does instead of a single blow (0: an ordinary strike). It lands when the
     /// windup ends, on everyone inside, so the wind-up is the warning.
     fn slam_radius(kind: &str) -> f64 {
+        if kind == halloween::KIND {
+            return 3.2;
+        }
         if let Some(e) = crate::cathedral::enemy(kind) {
             return e.slam;
         }
@@ -1522,6 +1533,7 @@ pub struct World {
     pending_saves: Vec<Character>,
     world_clock: daynight::WorldClock,
     seasonal: crate::seasonal::Calendar,
+    halloween: Option<halloween::Run>,
     weather: weather::Weather,
     time: f64,
     tick: u64,
@@ -1644,6 +1656,7 @@ impl World {
             pending_saves: vec![],
             world_clock: daynight::WorldClock::new(epoch),
             seasonal: crate::seasonal::Calendar::default(),
+            halloween: None,
             weather: weather::Weather::new(epoch),
             time: 0.,
             tick: 0,
@@ -1928,7 +1941,7 @@ impl World {
                 .view(zone, self.maps[zone].template, daynight::unix_ms())
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
-        "weather":zone_weather,"seasons":self.seasonal.cached,
+        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.halloween_view(),
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
@@ -1995,7 +2008,15 @@ impl World {
         if self.humans_online() >= MAX_PLAYERS {
             return Err("This world is full. Try again later.".into());
         }
+        let proposed_name = match &identity {
+            Identity::Guest { look, .. } | Identity::Account { look, .. } => {
+                look.as_ref().map(|l| l.name.clone())
+            }
+        };
         let storage = |e: Box<dyn std::error::Error>| {
+            if e.downcast_ref::<crate::store::NameTaken>().is_some() {
+                return crate::store::NAME_TAKEN.to_owned();
+            }
             tracing::error!(%e,"character storage failed");
             "Character storage is unavailable.".to_owned()
         };
@@ -2077,6 +2098,14 @@ impl World {
         }
         if let Some(saved) = self.pending_saves.iter().rev().find(|p| p.id == c.id) {
             c = saved.clone();
+        }
+        if self
+            .store
+            .needs_rename(&c.id)
+            .map_err(|e| storage(Box::new(e)))?
+        {
+            let name = proposed_name.ok_or(crate::store::NAME_REQUIRED)?;
+            self.store.rename(&mut c, &name).map_err(storage)?;
         }
         if c.rested.last_seen == 0 {
             c.rested.last_seen = self
@@ -2526,6 +2555,13 @@ impl World {
         }
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
+        if npc_id == halloween::RITUAL && offer_id == Some("halloween:summon") {
+            let result = self.summon_halloween(session);
+            if let Some(p) = self.players.get(&session) {
+                let _=p.peer.try_send(json!({"type":"notice","ok":result.is_ok(),"text":result.err().unwrap_or_else(||"The Hollow Rider answers the haunted lantern.".into())}));
+            }
+            return;
+        }
         if self.travel_master(npc_id).is_some() {
             return self.spark_interact(session, npc_id, offer_id);
         }
@@ -2701,6 +2737,7 @@ impl World {
                         && let Some(quest) = self.maps.iter().flat_map(|m| &m.quests).find(|q| {
                             q.id == quest_id
                                 && (q.npc == npc_id
+                                    || crate::seasonal::giver(&q.id, npc_id)
                                     || (action == "claim"
                                         && q.gauntlet_level().is_some()
                                         && npc.offers.iter().any(|o| o.id == "gauntlet")))
@@ -2716,9 +2753,7 @@ impl World {
                                 })
                             });
                         let event = crate::seasonal::quest_event(&quest.id);
-                        let year = event
-                            .and_then(|id| seasons.iter().find(|a| a.id == id))
-                            .map(|a| a.year);
+                        let year = crate::seasonal::period(&quest.id, &seasons);
                         crate::seasonal::sync_character(&mut p.character, &seasons);
                         if event.is_some() && year.is_none() {
                             notice =
@@ -2727,9 +2762,12 @@ impl World {
                             && action == "accept"
                             && p.character.seasonal_claims.get(&quest.id).copied() == year
                         {
-                            notice =
+                            notice = if crate::seasonal::daily(&quest.id) {
+                                "You have already completed this festival quest today.".into()
+                            } else {
                                 "You have already completed this quest for this year's festival."
-                                    .into();
+                                    .into()
+                            };
                         } else if taken_elsewhere {
                             notice =
                                 "You have already taken the arena trial for this level.".into();
@@ -2973,6 +3011,7 @@ impl World {
         self.time += TICK;
         self.tick += 1;
         self.update_seasonal();
+        self.update_halloween();
         self.hide_gms_after_zone_change();
         self.update_king_spawn();
         self.update_instances();
@@ -4284,6 +4323,9 @@ impl World {
     }
     /// Returns the health the enemy actually lost.
     fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) -> f64 {
+        if self.slimes[id].kind == halloween::KIND && !self.halloween_member(session) {
+            return 0.;
+        }
         if let Some(i) = self
             .instances
             .iter_mut()
@@ -4401,6 +4443,10 @@ impl World {
             crit,
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
+        if killed && kind == halloween::KIND {
+            self.halloween_killed(id);
+            return dealt;
+        }
         if killed && kind.starts_with("es_foe_") {
             self.empty_seat_killed(id);
             return dealt;
@@ -4674,12 +4720,25 @@ impl World {
         } else {
             self.actor_bodies(zone, None, Some(id))
         };
+        let event_members = if self.slimes[id].kind == halloween::KIND {
+            Some(
+                self.halloween
+                    .as_ref()
+                    .map(|r| r.members.clone())
+                    .unwrap_or_default(),
+            )
+        } else {
+            None
+        };
         let map = &self.maps[zone];
         let s = &mut self.slimes[id];
         let downed = self.pack_fights.get(&zone).map(|f| &f.downed);
         if s.target.is_some_and(|session| {
             self.players.get(&session).is_none_or(|p| {
                 p.character.hp <= 0.
+                    || event_members
+                        .as_ref()
+                        .is_some_and(|m| !m.contains(&p.character.id))
                     || p.character.zone != zone
                     || p.character.spark_travel.is_some()
                     || p.is_hidden()
@@ -4737,6 +4796,9 @@ impl World {
             .iter()
             .filter(|(session, p)| {
                 p.character.hp > 0.
+                    && event_members
+                        .as_ref()
+                        .is_none_or(|m| m.contains(&p.character.id))
                     && p.character.zone == zone
                     && p.character.spark_travel.is_none()
                     && !p.is_hidden()
@@ -4757,6 +4819,9 @@ impl World {
                 .get(&id)
                 .filter(|p| {
                     p.character.hp > 0.
+                        && event_members
+                            .as_ref()
+                            .is_none_or(|m| m.contains(&p.character.id))
                         && p.character.zone == zone
                         && p.character.spark_travel.is_none()
                         && !p.is_hidden()
@@ -4916,6 +4981,9 @@ impl World {
                         .iter()
                         .filter(|(_, p)| {
                             p.character.hp > 0.
+                                && event_members
+                                    .as_ref()
+                                    .is_none_or(|m| m.contains(&p.character.id))
                                 && p.character.zone == zone
                                 && !p.is_hidden()
                                 && p.character.point().distance(centre) <= slam + PLAYER_RADIUS
@@ -4956,6 +5024,7 @@ impl World {
                         "ember_firelord"
                             | "cinderlord"
                             | "gloomroot"
+                            | "hollow_rider"
                             | "oakhorn"
                             | "hrungnir"
                             | "kraken"

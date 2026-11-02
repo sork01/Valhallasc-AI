@@ -12,6 +12,7 @@ pub(super) fn world() -> World {
 pub(super) fn join(w: &mut World, id: u64, class: Class) -> mpsc::Receiver<Value> {
     let (tx, rx) = mpsc::channel(4096);
     let look = Look {
+        name: format!("Hero{id}"),
         class,
         ..Look::default()
     };
