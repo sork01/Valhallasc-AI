@@ -1,9 +1,12 @@
-# Gloamfen: slime-style artwork candidate
+# Gloamfen: slime-style artwork release
 
-The owner approved deployment and the finish skill on 2026-11-03 after reviewing
-the corrected tails. The tested **Beta 1.39.4** release is prepared in
-`/media/raid/valhallasc-data/fen-slime-work`, branch `feat/fen-slime-art`, based on
-main `3c9394e`. Publication and public hash verification are the next steps.
+Released as **Beta 1.39.4** on 2026-11-03 after the owner approved the corrected
+tails and requested deployment and the finish skill. Source **ceef9d2** from
+`feat/fen-slime-art`, prepared in `/media/raid/valhallasc-data/fen-slime-work`,
+is merged into main and live. Eight public release hashes and both health
+endpoints pass; 13 existing Crags/Rimeveil/Greenmeadow art hashes are preserved.
+Server PID/executable stayed unchanged: no restart, build or database work.
+Receipt: `test-results/fen-release-20261103T182754Z.json`.
 
 Five new native PixelFlow sprites share Greenmeadow's glossy shading, large
 white eyes, highlights, blush and chunky proportions. Fen colours and creature
@@ -80,7 +83,8 @@ Omit `--apply` for dry run. All six source hashes and target paths are checked
 before writing. Files are replaced atomically and verified after restoration.
 Version labels/notes are separate from art rollback. Actual restore on disposable
 candidate copies passed; a corrupt backup was refused without changing targets.
-All six live art files still match original backup hashes.
+The six original live art files matched backup hashes before deployment;
+public Gloamfen files now match the approved replacement sources.
 
 ## Focused verification
 
@@ -126,8 +130,8 @@ frame; GIFs run the original clip rates and hold the final death pose briefly.
 `fen_slime_review.py upload` is a separate explicit action.
 
 [Before/after comparison](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-fen-before-after.png).
-Next unfinished zone: **The Undervault**. Live remains Beta 1.39.2; reconcile
-candidate numbering against the live label when deployment is approved.
+Next unfinished zone: **The Undervault**. Live is **Beta 1.39.4**; the separate
+Greenmeadow Ironhide candidate remains private and needs its own approval.
 
 ## Tail correction after owner review
 
@@ -156,5 +160,5 @@ refusal and syntax/Swedish/release-note/diff gates pass. No Rimeveil changes.
 The original 18 FileDrop reviews have been refreshed. A 19th close-up compares
 the previous blunt tails directly to their corrections:
 [Corrected tails](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-fen-tails-corrected.png).
-Current private label **Beta 1.39.4** supersedes the initial 1.39.3 candidate.
-Public art remains unchanged pending owner approval.
+Released **Beta 1.39.4** supersedes the initial private 1.39.3 candidate.
+The owner approved these corrections, and the public files are verified.
