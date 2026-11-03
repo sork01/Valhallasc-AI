@@ -1,10 +1,13 @@
-# Undervault slime-style artwork candidate
+# Undervault slime-style artwork release
 
-All four UNDERVAULT-SLIME deliverables are complete as **Beta 1.39.5** in
-`/media/raid/valhallasc-data/vault-slime-work`, branch `feat/vault-slime-art`,
-based on `acfca19`. The owner approved deployment and the finish skill on
-2026-11-03 after picture review. The tested source is ready for a client-only
-release; public verification and Git receipts follow after deployment.
+Released as **Beta 1.39.5** on 2026-11-03 after the owner approved the
+pictures and requested deployment and the finish skill. Source **95ab27d**
+from `feat/vault-slime-art`, prepared in
+`/media/raid/valhallasc-data/vault-slime-work`, is merged into main and live.
+All 10 public release hashes and both health endpoints pass; 19 existing
+Crags/Rimeveil/Gloamfen/Greenmeadow art hashes are preserved. Server PID and
+executable stayed unchanged: no build, restart or database action.
+Receipt: `test-results/vault-release-20261103T184312Z.json`.
 
 Seven new native PixelFlow sources use Greenmeadow's glossy shading, large
 white eyes, highlights, blush and chunky proportions. Skeletons keep bone
@@ -70,9 +73,9 @@ The existing production loader consumes those tops without renderer changes.
 
 Same 96×96 frame, anchor (48,90), 768×480 atlas and 34 frames per kind:
 6 idle at 6fps, 8 walk at 10fps, 8 attack at 12fps, 4 hurt at 10fps,
-8 die at 8fps. Only seven existing PNG paths plus `vault.txt` replace old art
-inside the private candidate; no duplicate old atlases remain under assets.
-No map, stats, timings, rewards, zone IDs, server, database or music changes;
+8 die at 8fps. Seven existing PNG paths plus `vault.txt` replace the old live art;
+no duplicate old atlases remain under assets.
+No map, stats, combat timings, rewards, zone IDs, server, database or music changes;
 no build, restart, migration, grinding or fight/balance/timing sweeps.
 
 ## Rollback
@@ -126,4 +129,4 @@ CLI's `verify` for saved-editor equality.
 - `valhallasc-vault-{kind}-death-before-after.gif` (equal-scale death comparisons)
 
 [Before/after comparison](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-vault-before-after.png).
-Next unfinished zone: **Wyrdwood**. Owner picture approval is recorded above.
+Next unfinished zone: **Wyrdwood**. Owner picture approval and release verification are recorded above.
