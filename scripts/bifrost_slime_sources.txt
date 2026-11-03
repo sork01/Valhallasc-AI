@@ -1,0 +1,7 @@
+{
+  "galehound": "eb5eadd388c59b4b",
+  "prismgolem": "49c6de45376a59e7",
+  "skyray": "bc4e43f2eeae58ed",
+  "einherjar": "b264885a2869eeb3",
+  "thunderroc": "e55dd3cfa101cf61"
+}

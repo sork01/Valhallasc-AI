@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.39.8",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Bifrost Reach's five enemies share Greenmeadow's glossy shading, large eyes and chunky proportions, with movement suited to their anatomy.",
+      "Bifrost deaths fold legs and wings, fracture crystal, settle manta fins or release the spirit from fallen armour."
+    ],
+    "removed": [
+      "Replaced Bifrost Reach's previous enemy artwork to give the zone the shared slime style; the originals remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.7",
     "date": "2026-11-03",
     "new": [],
