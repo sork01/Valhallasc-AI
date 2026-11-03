@@ -737,11 +737,12 @@ rollback, 102 initial and 49 leg-correction checks, and 26 FileDrop previews are
 [Wyrdwood enemy artwork](docs/wyrd-slime-art.md). Released after owner picture
 approval; client-only, with no server restart or database migration.
 
-## Bifrost Reach enemy artwork candidate (private Beta 1.39.8)
+## Bifrost Reach enemy artwork (Beta 1.39.8)
 
 Five new editable PixelFlow enemies use Greenmeadow's glossy style with fitting
 anatomy, movement and deaths. All 170 editor/export frames match; 75 bounded
 real-art checks, a rejected frozen-death mutation, six-file rollback and 18
 verified FileDrop reviews are documented in
-[Bifrost Reach enemy artwork](docs/bifrost-slime-art.md). Built privately;
-owner picture approval is required before deployment.
+[Bifrost Reach enemy artwork](docs/bifrost-slime-art.md). Released after owner
+picture approval; eight public release hashes and 35 preserved art hashes match,
+with healthy endpoints and no server restart or database migration.

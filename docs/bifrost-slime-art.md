@@ -1,10 +1,15 @@
-# Bifrost Reach enemy artwork candidate
+# Bifrost Reach enemy artwork release
 
-All four BIFROST-SLIME deliverables are privately complete as **Beta 1.39.8**
-in `/media/raid/valhallasc-data/bifrost-slime-work`, branch
-`feat/bifrost-slime-art`, based on `09d7446`. The owner approved deployment and invoked the `finish` skill. The tested
-client-only release is being merged over live Beta 1.39.7; public verification
-will be recorded below. No server build, restart or database change is needed.
+Released as **Beta 1.39.8** on 2026-11-03 after the owner requested
+"deploy and finish skill". Source **5f6e9d4** from `feat/bifrost-slime-art`,
+prepared in `/media/raid/valhallasc-data/bifrost-slime-work`, is merged into
+main and live. All four BIFROST-SLIME deliverables are complete.
+
+All **eight public release hashes** and both health endpoints pass; **35 public
+artwork hashes** from other zones are preserved. Server PID and executable
+stayed unchanged, with no test flags, new journal errors or public test guests.
+No build, restart or database action. Receipt:
+`test-results/bifrost-release-20261103T192930Z.json`.
 
 Five original editable PixelFlow sprites use Greenmeadow's glossy shading,
 large white eyes with highlights, blush and chunky shapes. Bodies retain
@@ -46,14 +51,13 @@ Same 96×96 frame, anchor (48,90), 768×480 atlas and five-clip contract:
 6 idle at 6fps, 8 walk at 10fps, 8 attack at 12fps, 4 hurt at 10fps,
 8 die at 8fps. Export derives health tops **68/89/71/86/83**, consumed by the
 existing production loader. The five existing `sky_<kind>.png` paths and
-`sky.txt` replace the old art only in the candidate; no duplicate old atlases
+`sky.txt` replace the old art in the release; no duplicate old atlases
 are left under assets.
 
 No map, stats, combat timings, rewards, zone IDs, renderer, server, database or
 music changes. No rebuild, restart, migration, grinding or encounter sweeps.
-Version label, release notes and Swedish keep list carry the candidate version;
-Swedish data is regenerated and byte-identical. Re-read the live label before
-an approved deployment in case another release has advanced it.
+Version label, release notes and Swedish keep list carry the release version;
+Swedish data is regenerated and byte-identical. Future releases must read the live label before choosing their version.
 
 ## Rollback
 
@@ -82,7 +86,7 @@ presence and no browser errors. Artifacts: `test-results/driver-9wqZvo`.
 
 A deliberate frozen Galehound death atlas is rejected by the browser check's
 `die preserves timing and animates distinctly` assertion. Mutation is served
-only through a private Playwright route; neither live nor candidate art is
+only through a private Playwright route; neither live nor candidate art was
 changed. Evidence: `test-results/bifrost-slime/mutation-proof.json` and
 `mutation.log`. No full suites or fight tests run.
 
@@ -124,4 +128,5 @@ filename and MIME metadata verified. Receipt:
 Each kind also has `valhallasc-bifrost-<kind>-frames.png` (all 34 poses) and
 `valhallasc-bifrost-<kind>-animations.gif` (all five clips at original rates).
 Next unfinished zone: **Rán's Deep**. Greenmeadow remains a separate private
-candidate; no existing candidate or deployed art from other zones changed.
+candidate. The owner approved Bifrost's pictures and deployment; public release
+verification is recorded above.
