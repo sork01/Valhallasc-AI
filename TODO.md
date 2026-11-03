@@ -1,5 +1,9 @@
 # Valhalla game TODO
 
+> Archived candidate snapshot: main's TODO is authoritative. Crags was approved
+> and deployed as Beta 1.39.2 through source bae6ec2 (finish 3c9394e). Preserve
+> this original snapshot for provenance; do not merge its old queue/version over main.
+
 Pick any task by its **ID** (for example, `I65-MAP` or `A70-MAGE`). Each checkbox is one deliverable, and its ID stays stable if the list is reordered. Use focused private checks for the chosen change. An instance entrance stays sealed until its `OPEN` task is complete.
 
 Rules for every TODO: use the `createmap` skill for all zone work; create all sprites through the PixelFlow API; create all music through the dybase2 MCP. Read `docs/musical-style.md` before making or changing any song.
@@ -14,10 +18,14 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 **Defaults (not owner answers):** Artwork only: no stats, timings, map, rewards or zone IDs change. Same 96x96 frame, anchor (48,90), 34-frame/five-clip contract and kind IDs, so no server rebuild. Build in a private worktree under `/media/raid/valhallasc-data`, new PixelFlow sprites under a new name prefix (old PixelFlow IDs stay saved), old atlases and manifest kept outside the live tree for rollback. **Not deployed until the owner has seen the pictures and approved.**
 
-- [ ] `CRAGS-SLIME-ART` — Redraw the five Crags kinds as slime-style PixelFlow sprites (round glossy shading, big eyes with highlight, blush, squash/stretch, chunky details, slime-like collapse) while keeping each kind's colours/identity readable. Export atlases and manifest with health-bar `tops`; retire the old art from the live assets.
-- [ ] `CRAGS-SLIME-ROLLBACK` — Keep the previous five atlases, `crags.txt` and old PixelFlow IDs; provide a one-command rollback script and document it.
-- [ ] `CRAGS-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, nonempty frames clear of the border, production portraits; no full suites.
-- [ ] `CRAGS-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures to FileDrop and verify hashes. Deployment only after the owner approves.
+**Owner correction (2026-11-03):** Do not use squash/collapse where it does not make sense. Keep the slime's shading, eyes and proportions, with movement appropriate to each material: deforming/extinguishing fire, drifting/dissipating ghost, rigid spider shell with jointed/buckling legs, and rigid stone/armour components that step, strike and slump. This supersedes the original universal squash/stretch/slime-collapse wording.
+
+**Private completion (2026-11-03):** All four deliverables are implemented and verified as **Beta 1.39.1** in `/media/raid/valhallasc-data/crags-slime-work`, branch `feat/crags-slime-art`, based on main `9dea2cc`. Local/uncommitted; not pushed, merged or deployed. Five new native PixelFlow sources; all 170 saved-editor/export frames match; 58 bounded real-art browser checks pass. Original five PNGs, manifest, hashes and PixelFlow IDs are preserved outside the worktree at `/media/raid/valhallasc-data/crags-slime-original-20261103`. Tested one-command rollback, including corrupt-backup refusal. All 13 FileDrop before/after, complete frame sheets and animation previews are uploaded/hash/metadata verified. Rules/evidence and rollback command: candidate `docs/crags-slime-art.md`; wiki `10_projects:valhallasc_crags_slime_style_20261103`. **Old art is replaced in the private candidate only; live replacement remains gated on the owner's picture review and approval.**
+
+- [x] `CRAGS-SLIME-ART` — Privately complete: redraw the five Crags kinds as slime-style PixelFlow sprites (round glossy shading, big eyes with highlight, blush and chunky details), using material-appropriate motion per the owner's correction. Keep each kind's colours/identity readable. Export atlases and manifest with health-bar `tops`; stage replacement of the old asset files for approval.
+- [x] `CRAGS-SLIME-ROLLBACK` — Keep the previous five atlases, `crags.txt` and old PixelFlow IDs; provide a one-command rollback script and document it.
+- [x] `CRAGS-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, nonempty frames clear of the border, production portraits; no full suites.
+- [x] `CRAGS-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures to FileDrop and verify hashes. Deployment only after the owner approves.
 
 
 ### Seasonal NPC hair accessories and two-hour festival buff (owner request, 2026-11-03)

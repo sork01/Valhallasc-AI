@@ -1,0 +1,7 @@
+{
+  "wisp": "c62b50368813e7d4",
+  "spider": "10a626fa62ff0e11",
+  "wraith": "f46a745bc9b8ee57",
+  "golem": "39ba48e3c3cf86d1",
+  "cinderlord": "dc4053a775a9b79a"
+}

@@ -732,5 +732,6 @@
   "Beta 1.35.4",
   "Beta 1.38.1",
   "Beta 1.39.0",
-  "Lovefool"
+  "Lovefool",
+  "Beta 1.39.1"
 ]
