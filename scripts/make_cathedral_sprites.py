@@ -24,6 +24,16 @@ ASSETS = ROOT / 'client/assets'
 RAW = ROOT / 'scripts'
 PREFIX = 'valhallasc_cathedral_'
 KINDS = [e['kind'] for e in C.ENEMIES]
+# Flooded Cloister kinds are drawn by scripts/cloister_slime_redraw.py (native PixelFlow sources). The old drawers below must
+# never rebuild or re-export them (that would overwrite the slime-style atlases); their verify delegates to the new pipeline.
+SLIME = frozenset(['tidetemplar', 'tidecantor', 'tideleech', 'bellkeeper', 'mournsister', 'rootabbot', 'choirmother', 'choirsinger'])
+
+
+def skip_slime(kinds, what):
+    kept = [k for k in kinds if k not in SLIME]
+    if len(kept) != len(kinds):
+        print(f'{what}: Flooded Cloister kinds are drawn by cloister_slime_redraw.py; skipped {sorted(set(kinds) - set(kept))}')
+    return kept
 
 def palette(e):
     if e['kind'] in HC.KINDS:
@@ -234,6 +244,7 @@ def ids():
 
 
 def build(kinds, replace=False, preserve_existing=False):
+    kinds = skip_slime(kinds, 'build')
     meta_path = ASSETS / 'cathedral.txt'
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
     known = meta.get('sprites', {})
@@ -274,6 +285,7 @@ def build(kinds, replace=False, preserve_existing=False):
 
 
 def export(kinds):
+    kinds = skip_slime(kinds, 'export')
     meta_path = ASSETS / 'cathedral.txt'
     meta = json.loads(meta_path.read_text())
     saved = meta['sprites']
@@ -313,6 +325,10 @@ def export(kinds):
 
 def verify(kinds):
     """The exported atlas must equal the freshly rendered frames pixel for pixel."""
+    if any(k in SLIME for k in kinds):
+        import cloister_slime_redraw
+        cloister_slime_redraw.verify()
+    kinds = skip_slime(kinds, 'verify')
     for kind in kinds:
         frames = render(kind)
         palette = build_drawers()[kind][1].hex
@@ -331,6 +347,8 @@ if __name__ == '__main__':
         assert len(_pair[1].hex) <= 255
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
     names = [a for a in sys.argv[2:] if a in drawers] or list(drawers)
+    if command in ('build', 'export') and any(a in SLIME for a in sys.argv[2:]):
+        raise SystemExit('--replace is refused for the Flooded Cloister kinds; edit the saved sources and run cloister_slime_redraw.py export.')
     if command == 'build':
         build(names, '--replace' in sys.argv, '--preserve-existing' in sys.argv)
     elif command == 'export':

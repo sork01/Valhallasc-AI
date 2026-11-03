@@ -1,5 +1,18 @@
 [
   {
+    "version": "Beta 1.39.10",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "The Flooded Cloister's eight enemies share Greenmeadow's glossy shading, large eyes and chunky proportions, with movement suited to what each one is. The Tide Templar and Tide Cantor look the same in the Coral Reliquary.",
+      "Deaths fit each creature: the Templar's armour buckles, the Cantor's robe crumples empty, the Leech goes limp, the Bellkeeper's bell cracks and slumps, the Mourning Sister dissolves, the Root Abbot splits into logs, the Choirmother swoons while her singers pop and the Bound Singer drifts away.",
+      "Every enemy in the Cloister now stands exactly on the ground instead of hovering above it."
+    ],
+    "removed": [
+      "Replaced the Flooded Cloister's previous enemy artwork to give the zone the shared slime style; the originals remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.9",
     "date": "2026-11-03",
     "new": [],

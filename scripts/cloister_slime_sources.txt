@@ -1,0 +1,10 @@
+{
+  "tidetemplar": "cd7ff4924a779cb8",
+  "tidecantor": "fde8ff9cf98da578",
+  "tideleech": "356b42219ae7365c",
+  "bellkeeper": "0f27f6d32c7515a4",
+  "mournsister": "725ae0933228f6eb",
+  "rootabbot": "0f7f02bac6eebc84",
+  "choirmother": "c82b6ea277a531f7",
+  "choirsinger": "1180a4e2e4c0584c"
+}
