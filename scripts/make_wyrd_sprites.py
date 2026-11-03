@@ -1,23 +1,12 @@
 #!/usr/bin/env python3
-"""makesprites workflow for the Wyrdwood monsters: preview | build [--replace] | export | verify.
+"""Wyrdwood PixelFlow art: preview | build | legs | export | verify.
 
-Seven kinds share the Emberfall Crags contract (scripts/make_crag_sprites.py): one 96x96 frame, a foot anchor at
-(48, 90), right-facing art (the game mirrors it) and five clips (idle 6, walk 8, attack 8, hurt 4, die 8) so client/field.js
-drives them with the Ironhide's state machine: walk frames 2-4 are the hop, 5-7 the landing, attack 0-2 the windup,
-3-5 the lunge, 6-7 the recovery.
-
-  boar      Rotfang Boar     (L21)  a bristled, blight-veined boar that charges
-  crow      Gallowcrow       (L23)  a big raven that hovers and shoots feathers
-  troll     Mosshide Troll   (L25)  a hunched, mossy brute with a tree growing out of its shoulder; ground-pounds
-  weaver    Wyrdweaver       (L27)  a hooded spinner of fate, golden threads between her hands
-  ram       Stormram         (L29)  a storm-charged ram with crackling horns
-  oakhorn   Oakhorn (elite)  (L25)  the grove's guardian stag, antlers like an oak in autumn, a golden thread through its chest
-  hrungnir  Hrungnir (elite) (L30)  a granite storm giant with a lightning beard
-
-The drawing toolkit (shaded ellipsoids and capsules lit from the upper left, a dithered ramp per material, an outline
-around every part) is imported from make_crag_sprites.py. `build` saves ONE new 34-frame PixelFlow sprite per kind
-(valhallasc_wyrd_<kind>_all) and refuses existing names unless --replace is given (it discards editor edits).
-`export` reads the editor frames back, so edits survive, and writes client/assets/wyrd_<kind>.png plus wyrd.txt.
+The CLI delegates to wyrd_slime_redraw.py: seven Greenmeadow-style enemies,
+material-appropriate motion/deaths, preserved saved editor frames and no
+--replace. Sources use valhallasc_wyrd_slime_style_<kind>_all; prior source IDs
+and atlases are retained in the external rollback backup. Contract: 96x96,
+anchor (48,90), 6 idle / 8 walk / 8 attack / 4 hurt / 8 die frames.
+Historical rig helpers below remain available to other zone generators.
 """
 import json
 import math
@@ -1338,18 +1327,14 @@ def view(kind, picks, out, scale=4):
 
 
 if __name__ == '__main__':
+    # Current slime-style sources replace the historical drawer. Saved editor
+    # frames survive export; old IDs and arrays remain available for rollback.
+    import wyrd_slime_redraw as current
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
-    names = [a for a in sys.argv[2:] if a in DRAWERS] or list(DRAWERS)
-    if command == 'build':
-        build(names, '--replace' in sys.argv)
-    elif command == 'export':
-        export(names)
-    elif command == 'verify':
-        verify(names)
-    elif command == 'view':
-        view(names[0], [a for a in sys.argv[3:] if ':' in a and not a.startswith('/')], next(a for a in sys.argv[2:] if a.endswith('.png')))
-    elif command == 'preview':
-        directory = next((a for a in sys.argv[2:] if a not in DRAWERS and not a.startswith('--')), ROOT / 'test-results/wyrd-preview')
-        preview(names, directory)
-    else:
-        raise SystemExit('Usage: make_wyrd_sprites.py preview [kind...] [directory] | build [kind...] [--replace] | export [kind...] | verify [kind...] | view kind out.png clip:n ...')
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; edit the saved sources and export.')
+    commands = dict(preview=current.preview, build=current.build,
+                    legs=current.repair_legs, export=current.export, verify=current.verify)
+    if command not in commands:
+        raise SystemExit('Usage: make_wyrd_sprites.py preview | build | legs | export | verify')
+    commands[command]()

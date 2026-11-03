@@ -1,0 +1,9 @@
+{
+  "boar": "7ef72fb866da5857",
+  "crow": "6c08b122e9081a38",
+  "troll": "8235202bf15c25f8",
+  "weaver": "f572033866c9eaa8",
+  "ram": "62bd6cef83ff8251",
+  "oakhorn": "1e9c8a7dff65fc61",
+  "hrungnir": "a2f64de2fa2f750d"
+}

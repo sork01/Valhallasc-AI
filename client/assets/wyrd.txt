@@ -49,21 +49,22 @@
     }
   },
   "sprites": {
-    "boar": "ea4b8b54549af551",
-    "crow": "be9b4f3aeae92b67",
-    "troll": "0c06e3a6c26a6b0a",
-    "weaver": "48f4308891f285da",
-    "ram": "f90f6997816a8ef7",
-    "oakhorn": "b1150a62ee7151d0",
-    "hrungnir": "b52981453374ab5f"
+    "boar": "7ef72fb866da5857",
+    "crow": "6c08b122e9081a38",
+    "troll": "8235202bf15c25f8",
+    "weaver": "f572033866c9eaa8",
+    "ram": "62bd6cef83ff8251",
+    "oakhorn": "1e9c8a7dff65fc61",
+    "hrungnir": "a2f64de2fa2f750d"
   },
   "tops": {
-    "boar": 47,
-    "crow": 74,
-    "troll": 84,
-    "weaver": 82,
-    "ram": 44,
-    "oakhorn": 71,
-    "hrungnir": 85
-  }
+    "boar": 57,
+    "crow": 71,
+    "troll": 86,
+    "weaver": 86,
+    "ram": 58,
+    "oakhorn": 86,
+    "hrungnir": 87
+  },
+  "artStyle": "greenmeadow-slime"
 }

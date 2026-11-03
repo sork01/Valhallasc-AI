@@ -1,5 +1,26 @@
 [
   {
+    "version": "Beta 1.39.7",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Corrected the shoulder and haunch attachments, rear-leg bends and four-foot spacing for Rotfang Boars, Stormrams and Oakhorn."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.39.6",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "All seven Wyrdwood enemies share Greenmeadow's glossy slime-style shading, large eyes and chunky proportions, with movement suited to each creature.",
+      "Wyrdwood beasts fall with folding legs, the crow folds its wings, the weaver's cloth and threads settle, and Hrungnir fractures in distinct death animations."
+    ],
+    "removed": [
+      "The previous Wyrdwood enemy artwork is replaced to match Greenmeadow's style and give each creature a fitting death."
+    ]
+  },
+  {
     "version": "Beta 1.39.5",
     "date": "2026-11-03",
     "new": [],

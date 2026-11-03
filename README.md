@@ -728,3 +728,11 @@ eyes, with movement and deaths suited to fire, ghosts, spiders, stone and armour
 Editable PixelFlow sources, preserved originals, one-command rollback and focused
 checks: [Crags enemy artwork](docs/crags-slime-art.md). Client-only release;
 no server restart or database migration.
+
+## Wyrdwood enemy artwork candidate (private Beta 1.39.7)
+
+Seven new editable PixelFlow enemies use Greenmeadow's glossy style with
+creature-specific motion and deaths. Original art, source IDs, one-command
+rollback, 102 initial and 49 leg-correction checks, and 26 FileDrop previews are retained in
+[Wyrdwood enemy artwork](docs/wyrd-slime-art.md). Prepared privately; owner
+picture approval is required before deployment.
