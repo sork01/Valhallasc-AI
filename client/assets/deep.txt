@@ -50,23 +50,24 @@
     }
   },
   "sprites": {
-    "draugr": "dcb96423502b2fdb",
-    "angler": "4b232709b55021ab",
-    "moray": "4d4baf4ecd280218",
-    "siren": "883c943f806553c2",
-    "shellback": "69b4c8ea8a971fb8",
-    "kraken": "1c2ba4fe984d117e",
-    "hvitserk": "2f1a0a41ed5b1e9c",
-    "ghostmaw": "167b214f07044242"
+    "draugr": "178ced3fea57e381",
+    "angler": "0d3232de9bd69eba",
+    "moray": "4c9139ad14331b6b",
+    "siren": "4f81dc6d7b02754c",
+    "shellback": "99412db02a27b9f1",
+    "kraken": "375e2e2f8ffb2414",
+    "hvitserk": "7a7ce19f2c2df638",
+    "ghostmaw": "1fc321846ddef17d"
   },
   "tops": {
-    "draugr": 80,
-    "angler": 70,
-    "moray": 45,
-    "siren": 81,
-    "shellback": 50,
-    "kraken": 64,
-    "hvitserk": 80,
-    "ghostmaw": 45
-  }
+    "draugr": 70,
+    "angler": 72,
+    "moray": 36,
+    "siren": 82,
+    "shellback": 61,
+    "kraken": 68,
+    "hvitserk": 69,
+    "ghostmaw": 42
+  },
+  "artStyle": "greenmeadow-slime"
 }

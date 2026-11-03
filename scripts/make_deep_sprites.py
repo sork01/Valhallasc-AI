@@ -977,18 +977,8 @@ def view(kind, picks, out, scale=4):
 
 
 if __name__ == '__main__':
+    import deep_slime_redraw as slime
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
-    names = [a for a in sys.argv[2:] if a in DRAWERS] or list(DRAWERS)
-    if command == 'build':
-        build(names, '--replace' in sys.argv)
-    elif command == 'export':
-        export(names)
-    elif command == 'verify':
-        verify(names)
-    elif command == 'view':
-        view(names[0], [a for a in sys.argv[3:] if ':' in a and not a.startswith('/')], next(a for a in sys.argv[2:] if a.endswith('.png')))
-    elif command == 'preview':
-        directory = next((a for a in sys.argv[2:] if a not in DRAWERS and not a.startswith('--')), ROOT / 'test-results/deep-preview')
-        preview(names, directory)
-    else:
-        raise SystemExit('Usage: make_deep_sprites.py preview [kind...] [directory] | build [kind...] [--replace] | export [kind...] | verify [kind...] | view kind out.png clip:n ...')
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; edit the saved sources and export.')
+    {'preview': slime.preview, 'build': slime.build, 'export': slime.export, 'verify': slime.verify}[command]()

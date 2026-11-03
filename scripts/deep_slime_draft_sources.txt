@@ -1,0 +1,10 @@
+{
+  "draugr": "6ffe49e571e881b4",
+  "angler": "22b15edcdb0e951c",
+  "moray": "bc622290e41adbb2",
+  "siren": "f6b0209357ea8356",
+  "shellback": "c0a121688624a456",
+  "kraken": "0861cc5e9223f386",
+  "hvitserk": "6883fb13a00bcb4e",
+  "ghostmaw": "974ac425826ff97e"
+}
