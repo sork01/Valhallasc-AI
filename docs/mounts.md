@@ -4,7 +4,7 @@ These settle `MOUNT-RULES` in [TODO.md](../TODO.md). `MOUNT-SERVER` stores the o
 
 ## One cosmetic choice at one speed
 
-All seven mounts are the **same ability with a different look**: 1.6× the class's walking speed in the open world, as today (`speed() * 1.6` in `world.rs`). No mount crosses water, void, cliffs or any collision, and none flies, jumps or changes combat. The gryphon is a ground-runner that spreads its wings in the animation; this avoids new collision, zone-edge and exploit rules (Bifrost Reach's void rings, sealed gates, instance walls) and keeps travel balance identical to the horse. A mount's rank is its price of effort, not its power.
+All eight mounts are the **same ability with a different look**: 1.6× the class's walking speed in the open world, as today (`speed() * 1.6` in `world.rs`). No mount crosses water, void, cliffs or any collision, and none flies, jumps or changes combat. The gryphon is a ground-runner that spreads its wings in the animation; this avoids new collision, zone-edge and exploit rules (Bifrost Reach's void rings, sealed gates, instance walls) and keeps travel balance identical to the horse. A mount's rank is its price of effort, not its power.
 
 ## How each mount is obtained
 
@@ -12,6 +12,7 @@ Each uses a different route, and the later the mount the harder it is. A charact
 
 | Mount | Route | Level | Cost and effort |
 | --- | --- | ---: | --- |
+| Roseheart Unicorn | Valentine Briarheart daily quest in Rimeveil Glacier | 1 | Guaranteed ownership on claim by each eligible real player; five fighters, highest party level. |
 | Red-nosed Reindeer | Christmas Grinch daily hunt in Rimeveil Glacier | 1 | One independent 5% roll per eligible real player per Stockholm day; five fighters, highest party level. |
 | Nightmare Steed | Halloween Hollow Rider daily hunt in Gloamfen | 1 | One independent 1% roll per eligible real player per Stockholm day; five fighters, average level rounded up. |
 | Horse | Shop: Stable-hand Greta, Skaldholm (unchanged) | 50 | 500,000 gold |
@@ -50,7 +51,7 @@ Mounts are not items and cannot be traded, given or sold; ownership is a flag on
 
 ## Sprites (2026-10-18)
 
-All seven mounts share one pipeline, `scripts/make_mount_sprites.py` (`preview | sheet | build [--replace] | export [--local]`): the models in `scripts/mount_models.py` are drawn by the 3D toon renderer in `scripts/mount_toon.py` in the class sprites' camera and depth encoding, eight facings by two clips (`idle` 4 frames, `run` 8, which is the gait of a mounted traveller), 160x160 with anchor (80,119). PixelFlow holds one sprite per mount, clip and facing (`mount_<id>_<clip>_<facing>`, 16 per mount; `build --replace` discards editor edits, `export` keeps them); `client/assets/mount_<id>.png` + `_depth.png` and `mounts_sprites.txt` are the export.
+All eight mounts share one pipeline, `scripts/make_mount_sprites.py` (`preview | sheet | build [--replace] | export [--local]`): the models in `scripts/mount_models.py` are drawn by the 3D toon renderer in `scripts/mount_toon.py` in the class sprites' camera and depth encoding, eight facings by two clips (`idle` 4 frames, `run` 8, which is the gait of a mounted traveller), 160x160 with anchor (80,119). PixelFlow holds one sprite per mount, clip and facing (`mount_<id>_<clip>_<facing>`, 16 per mount; `build --replace` discards editor edits, `export` keeps them); `client/assets/mount_<id>.png` + `_depth.png` and `mounts_sprites.txt` are the export.
 
 - **One sheet for every class and both bodies.** `client/mountart.js` lays the rider's `idle` frame (class sprite, depth kept by `MageSprite.frame`) into the mount's frame pixel by pixel on depth. Each mount lists `raise` (world units the rider is lifted onto the saddle), `bob` per frame (the saddle's bounce), `cut` (the rider is hidden below that world height: the legs vanish into the barrel) and `shadow`. A pixel's world height is `cos30 * (AY - y) / PX - depth / 2`.
 - **Size and seat per mount:** the models are drawn at the class's scale and multiplied (`scale`: horse 1.3, raptor 1.12, lizard 1.25, sabertooth 1.25, gryphon 1.25) so the rider fits. Gaits: quadrupeds trot on diagonal pairs, the raptor runs on two legs with its tail as a balance, the gryphon beats its wings.
@@ -90,7 +91,7 @@ See [halloween-hunt.md](halloween-hunt.md).
 
 ## Seasonal reindeer and speed (Beta 1.35.0)
 
-All seven mounts use one authoritative 1.6× multiplier (160% of walking speed,
+All eight mounts use one authoritative 1.6× multiplier (160% of walking speed,
 60% faster). Haste, class-relative speed, dismounts and collision retain their
 existing order. The mounted gait cadence is 80% of the former 2× travel gait.
 The Christmas reindeer grants permanent ownership directly, with no bag slot

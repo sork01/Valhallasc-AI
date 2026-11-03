@@ -461,9 +461,36 @@ def reindeer(clip,k,n):
         prims += [Ell((side*8.5,14,39+bob),(2,2,2.3),'gold')]
     return prims,bob
 
+# Valentine: pearl coat, rose mane, spiral gold horn, sculpted heart breastplate.
+ROSEHEART={**HORSE,'coat':['#ba819d','#dda7bd','#f5cddd','#fff0f3'],
+ 'coat2':['#621d42','#9c2c57','#d3476d','#f67d98'],
+ 'hoof':['#665439','#a38450','#d9b66a','#ffdf95'],
+ 'blanket':['#611e47','#9b2d5f','#d95182','#ff9bb6'],
+ 'nose':['#a16381','#c889a2','#eeb5c7','#ffe0e8'],
+ 'iris':['#2c5961','#43828b','#73b9ba','#b8f3e2']}
+
+def roseheart(clip,k,n):
+    step=(-k)%n if clip=='run' else k
+    prims,bob=horse(clip,step,n);ph=CYCLE(step,n)
+    nod=S_(ph*2+1)*1.4 if clip=='run' else S_(ph)*.6
+    base=V(0,30.5,59+bob+nod);tip=base+V(0,3,15)
+    prims += [cone(base,tip,2.6,'gold')]
+    for i in range(5):
+        f=i/6;c=base+(tip-base)*f
+        prims += [Ell(c,(2.8*(1-f),2.8*(1-f),.55),'blaze')]
+    # Heart lies in the front breastplate plane, keeping the saddle clear for all riders.
+    z=33+bob
+    prims += [Ell((-3.2,20.5,z+2),(3.7,1.8,3.8),'gold'),Ell((3.2,20.5,z+2),(3.7,1.8,3.8),'gold'),
+              cone((-4,20.5,z+1),(0,21,z-7),3.2,'gold'),cone((4,20.5,z+1),(0,21,z-7),3.2,'gold')]
+    for side in [-1,1]:
+        for i in range(3):
+            prims += [Ell((side*(8.8+i*.4),5-i*2,36+bob-i),(1.8,2,2),'blanket')]
+    return prims,bob
+
 # name -> (builder, materials, flat materials, seat). seat: `raise` lifts the rider so the pelvis sits on the saddle,
 # `cut` hides the rider below that world height (the legs vanish into the barrel), `shadow` is the ground shadow (rx, ry).
 REGISTRY = {
+    'roseheart': (roseheart, ROSEHEART, FLAT, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'reindeer': (reindeer, REINDEER, {**FLAT,'nose':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'nightmare': (nightmare, NIGHTMARE, {**FLAT,'flame':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'horse': (horse, HORSE, FLAT, {'scale': 1.3, 'raise': 25, 'cut': 34, 'shadow': (34, 9), 'coat': 'coat'}),

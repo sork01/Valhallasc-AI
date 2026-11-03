@@ -1398,5 +1398,25 @@
       "christmas_aster",
       "christmas_hunt"
     ]
+  },
+  {
+    "id": "lovefool",
+    "name": "Lovefool",
+    "description": "Claim all five different Valentine's quests.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 5,
+    "points": 25,
+    "title": "Lovefool",
+    "title_prefix": true,
+    "mount": "",
+    "zone": null,
+    "members": [
+      "valentine_alder",
+      "valentine_skald",
+      "valentine_nacre",
+      "valentine_aster",
+      "valentine_hunt"
+    ]
   }
 ]

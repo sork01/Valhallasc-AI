@@ -119,10 +119,9 @@
     receive(packet) { if (packet.character !== window.Online?.id) return; data = packet; render(); },
     update(own) {
       if (hero && hero.id !== own.id) this.reset(); hero = own;
-      const suffix = tr(own.achievementTitle || '');
-      const label = $('hud-name'), name = own.look.name + (suffix ? ' ' + suffix : '');
+      const label = $('hud-name'), name = this.displayName(own);
       if (label.textContent !== name) label.textContent = name; label.setAttribute('translate', 'no');
     },
-    displayName(actor) { return (actor.look?.name || '') + (actor.achievementTitle ? ' ' + tr(actor.achievementTitle) : ''); },
+    displayName(actor) { const name=actor.look?.name||'', title=tr(actor.achievementTitle||''); return !title?name:actor.achievementTitlePosition==='prefix'?title+' '+name:name+' '+title; },
   };
 })();

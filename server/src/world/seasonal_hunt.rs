@@ -49,14 +49,34 @@ pub(super) const CHRISTMAS: Spec = Spec {
     average: false,
     chance: 0.05,
 };
+pub(super) const VALENTINE: Spec = Spec {
+    season: "valentine",
+    kind: "briarheart",
+    quest: "valentine_hunt",
+    ritual: "valentine_shrine",
+    summon: "valentine:summon",
+    mount: "roseheart",
+    name: "The Briarheart",
+    mount_name: "Roseheart Unicorn",
+    zone: 2,
+    centre: Point { x: 103., y: 100. },
+    lantern: Point { x: 112., y: 100. },
+    tag: "valentine:briarheart",
+    average: false,
+    chance: 0.,
+};
 pub(super) fn for_landmark(id: &str) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS].into_iter().find(|s| s.ritual == id)
+    [HALLOWEEN, CHRISTMAS, VALENTINE]
+        .into_iter()
+        .find(|s| s.ritual == id)
 }
 pub(super) fn for_kind(kind: &str) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS].into_iter().find(|s| s.kind == kind)
+    [HALLOWEEN, CHRISTMAS, VALENTINE]
+        .into_iter()
+        .find(|s| s.kind == kind)
 }
 pub(super) fn for_ritual(id: &str, offer: Option<&str>) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS]
+    [HALLOWEEN, CHRISTMAS, VALENTINE]
         .into_iter()
         .find(|s| s.ritual == id && offer == Some(s.summon))
 }
@@ -109,7 +129,7 @@ impl World {
             return Err(if spec.average {
                 "Walk closer to the haunted lantern."
             } else {
-                "Walk closer to the Christmas tree."
+                "Walk closer to the summoning landmark."
             }
             .into());
         }
@@ -189,7 +209,7 @@ impl World {
             started: self.time,
             away: 0.,
         });
-        self.emit_zone(spec.zone,json!({"type":"system","text":if spec.average {format!("The Hollow Rider rises at level {level}: the average of five fighters, rounded up.")}else{format!("The Grinch rises at level {level}: the highest level among the five fighters.")}}));
+        self.emit_zone(spec.zone,json!({"type":"system","text":if spec.average {format!("The Hollow Rider rises at level {level}: the average of five fighters, rounded up.")}else{format!("{} rises at level {level}: the highest level among the five fighters.",spec.name)}}));
         Ok(())
     }
     pub(super) fn update_festival_hunt(&mut self) {
@@ -263,7 +283,7 @@ impl World {
             .map(|(id, _)| *id)
             .collect();
         for session in sessions {
-            let roll = self.random();
+            let roll = if spec.chance > 0. { self.random() } else { 1. };
             let p = self.players.get_mut(&session).unwrap();
             quest_progress(
                 &mut p.character,
@@ -271,7 +291,7 @@ impl World {
                 "kill",
                 spec.kind,
             );
-            if p.character.seasonal_rolls.get(spec.quest) != Some(&day) {
+            if spec.chance > 0. && p.character.seasonal_rolls.get(spec.quest) != Some(&day) {
                 p.character.seasonal_rolls.insert(spec.quest.into(), day);
                 if wins_mount(roll, spec.chance) && p.character.grant_mount(spec.mount) {
                     let _=p.peer.try_send(json!({"type":"notice","ok":true,"text":format!("{} dropped a {}! It is permanently added to your mounts.",spec.name,spec.mount_name)}));

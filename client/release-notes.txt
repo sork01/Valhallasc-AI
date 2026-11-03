@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.36.0",
+    "date": "2026-11-03",
+    "new": [
+      "Valentine's season runs February 10–18, with hearts, roses, ribbons and warm lights in all four main cities.",
+      "Four annual city errands and a daily five-player Briarheart hunt. Claim the hunt for a guaranteed Roseheart Unicorn mount.",
+      "Claim all five Valentine's quests to earn the 25-point Lovefool achievement and the permanent Lovefool prefix title."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.35.4",
     "date": "2026-11-02",
     "new": [],
@@ -7,7 +18,7 @@
       "Named shop and service signs float above their rooftops, clear of house decorations."
     ],
     "removed": [
-      "Removed street-and-number plaques from residential houses to keep the architecture visible."
+      "Removed street-and-number plaques from residential houses so the architecture stays visible."
     ]
   },
   {

@@ -97,7 +97,7 @@ change. When expanding the atlas, add the new region achievement and update the
 Explorer threshold, translations, documented maximum and focused catalog checks
 together. See the table below for the current catalog.
 
-104 achievements; maximum **2,250 points** (Beta 1.35.0).
+105 achievements; maximum **2,275 points** (Valentine candidate Beta 1.36.0).
 
 | Achievement | Requirement | Points | Extra reward |
 | --- | --- | ---: | --- |
@@ -275,3 +275,17 @@ Earned titles survive expiry, reconnect and rebirth; names and name reservation
 keys are untouched. The catalog now has 104 achievements / 2,250 points and
 eight title rewards. Existing suffix rendering and selection/celebration are
 reused.
+
+## Valentine's prefix title (candidate Beta 1.36.0)
+
+Lovefool awards 25 points for claiming all five distinct Valentine quests (the four
+annual city errands plus one daily hunt). Permanent claim history across years
+counts; accepted/ready quests do not. The catalog now has 105 achievements, 2,275
+points and nine titles. The catalog's default-false `title_prefix` marks this title
+as a prefix; snapshots and achievement replies expose its placement explicitly.
+The shared name formatter paints `Lovefool Sork` in HUD, remote nameplates and
+player targets, with one separating space. Existing titles remain suffixes. Saved
+names and reservations never change. Expiry, reconnect and actual rebirth preserve
+evidence, points, eligibility and selection. Rewards use the usual award notice,
+celebration and selector, with English/Swedish presentation. This feature is a
+private candidate; see valentines-event.md and valentines-validation.md.

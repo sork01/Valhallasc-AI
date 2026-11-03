@@ -171,6 +171,8 @@ mod travel;
 #[cfg(test)]
 mod ttk;
 #[cfg(test)]
+mod valentines_tests;
+#[cfg(test)]
 mod vault_tests;
 #[cfg(test)]
 mod vendor_weapon_tests;
@@ -474,6 +476,7 @@ impl Player {
         view["danceT"] = json!(self.dance);
         view["rested"] = json!({"percent":c.rested.percent()});
         view["achievementTitle"] = json!(c.achievement_title());
+        view["achievementTitlePosition"] = json!(c.achievement_title_position());
         view["achievementPoints"] = json!(c.achievement_points());
         view
     }
@@ -655,6 +658,7 @@ impl Slime {
             // Five level-20 heroes with a healer who must triage: two hits fell a non-tank, so no party without a healer gets through.
             "hollow_rider" => (5000., 90., 3.1, 1.6),
             "grinch" => (5000., 90., 3.1, 1.7),
+            "briarheart" => (5000., 90., 3.1, 1.7),
             "gloomroot" => (90000., 1500., 2.3, 2.1),
             // The Undervault, tuned for five level-20 heroes with a healer. Trash packs of three or four; the
             // bosses are fights of one to two minutes each (see the vault_* simulations in the tests).
@@ -823,7 +827,7 @@ impl Slime {
             "croc" => 17,
             "knight" => 18,
             "hydra" => 20,
-            "hollow_rider" | "grinch" => 1,
+            "hollow_rider" | "grinch" | "briarheart" => 1,
             "gloomroot" => 20,
             "thrall" | "archer" => 19,
             "acolyte" | "gatewarden" | "choir" => 20,
@@ -955,7 +959,7 @@ impl Slime {
             "croc" => 205,
             "knight" => 245,
             "hydra" => 360,
-            "hollow_rider" | "grinch" => 0,
+            "hollow_rider" | "grinch" | "briarheart" => 0,
             "gloomroot" => 1200,
             "thrall" => 280,
             "archer" => 290,
@@ -1105,6 +1109,7 @@ impl Slime {
             "hydra" => (0.55, 1.3, 7.5, 9.),
             "hollow_rider" => (1.4, 2.2, 0., 16.),
             "grinch" => (1.7, 2.5, 0., 16.),
+            "briarheart" => (1.7, 2.5, 0., 16.),
             "gloomroot" => (0.85, 1.5, 7.5, 8.5),
             "thrall" => (0.45, 1.2, 7.5, 8.),
             "archer" => (0.6, 1.8, 0., 11.),
@@ -1947,7 +1952,7 @@ impl World {
                 .view(zone, self.maps[zone].template, daynight::unix_ms())
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
-        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),
+        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"valentine":self.festival_view(seasonal_hunt::VALENTINE),
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
@@ -5043,6 +5048,7 @@ impl World {
                             | "gloomroot"
                             | "hollow_rider"
                             | "grinch"
+                            | "briarheart"
                             | "oakhorn"
                             | "hrungnir"
                             | "kraken"

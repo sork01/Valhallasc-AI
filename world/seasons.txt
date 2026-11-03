@@ -56,5 +56,34 @@
         "asterion_singer"
       ]
     }
+  },
+  {
+    "id": "valentine",
+    "start": [
+      2,
+      10
+    ],
+    "endExclusive": [
+      2,
+      19
+    ],
+    "quests": [
+      "valentine_alder",
+      "valentine_skald",
+      "valentine_nacre",
+      "valentine_aster",
+      "valentine_hunt"
+    ],
+    "dailyQuests": [
+      "valentine_hunt"
+    ],
+    "givers": {
+      "valentine_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
   }
 ]
