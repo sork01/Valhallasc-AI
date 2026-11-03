@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""makesprites workflow for the Rimeveil Glacier monsters: preview | build [--replace] | export.
+"""Historical Rimeveil drawers; CLI delegates to rime_slime_redraw.py.
+
+Current workflow: preview | build | export | verify, with --replace refused.
+The routines below preserve historical source/provenance, not the current CLI.
 
 Four kinds (crab, wolf, yeti, wyrm) share the Emberfall Crags contract (scripts/make_crag_sprites.py): one 96x96 frame,
 a foot anchor at (48, 90), right-facing art (the game mirrors it) and five clips (idle 6, walk 8, attack 8, hurt 4,
@@ -913,16 +916,13 @@ def verify(kinds):
 
 
 if __name__ == '__main__':
+    # Keep the established CLI on the non-destructive slime-style pipeline.
+    import rime_slime_redraw
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
-    names = [a for a in sys.argv[2:] if a in DRAWERS] or list(DRAWERS)
-    if command == 'build':
-        build(names, '--replace' in sys.argv)
-    elif command == 'export':
-        export(names)
-    elif command == 'verify':
-        verify(names)
-    elif command == 'preview':
-        directory = next((a for a in sys.argv[2:] if a not in DRAWERS and not a.startswith('--')), ROOT / 'test-results/rime-preview')
-        preview(names, directory)
-    else:
-        raise SystemExit('Usage: make_rime_sprites.py preview [kind...] [directory] | build [kind...] [--replace] | export [kind...] | verify [kind...]')
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused. Edit the new saved sprites and export.')
+    commands = dict(preview=rime_slime_redraw.preview, build=rime_slime_redraw.build,
+                    export=rime_slime_redraw.export, verify=rime_slime_redraw.verify)
+    if command not in commands:
+        raise SystemExit('Usage: make_rime_sprites.py preview | build | export | verify')
+    commands[command]()

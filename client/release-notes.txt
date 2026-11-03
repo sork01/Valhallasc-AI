@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.39.1",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Rimeveil enemies now share the slimes’ glossy shading and expressive eyes, with jointed crab steps, wolf strides, heavy yeti steps and a slithering wyrm.",
+      "Each Rimeveil enemy has its own fitting death animation: curling crab legs, a fallen wolf, a toppling yeti and an uncoiling wyrm."
+    ],
+    "removed": [
+      "Replaced the previous Rimeveil enemy artwork because its movement and deaths did not match the new slime-style art rules."
+    ]
+  },
+  {
     "version": "Beta 1.39.0",
     "date": "2026-11-03",
     "new": [

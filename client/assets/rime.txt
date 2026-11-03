@@ -46,15 +46,16 @@
     }
   },
   "sprites": {
-    "crab": "ba38273ce296d517",
-    "wolf": "5bad6f5a073b88f7",
-    "yeti": "b813182e8e4bd2d2",
-    "wyrm": "6e6118b24d23d38e"
+    "crab": "8193e3569a659d6e",
+    "wolf": "55742e3f517a9bc8",
+    "yeti": "c07c42df83c3f7ae",
+    "wyrm": "0282230513c5c7c0"
   },
   "tops": {
-    "crab": 46,
-    "wolf": 62,
-    "yeti": 82,
-    "wyrm": 88
-  }
+    "crab": 53,
+    "wolf": 67,
+    "yeti": 84,
+    "wyrm": 87
+  },
+  "artStyle": "greenmeadow-slime"
 }
