@@ -43,6 +43,10 @@
     }
   },
   "sprites": {
-    "valhallasc_ironhide_slime_style_all": "399849edffa3ab6f"
-  }
+    "valhallasc_meadow_ironhide_rigid_all": "d1ab641330d34105"
+  },
+  "tops": {
+    "beetle": 36
+  },
+  "artStyle": "greenmeadow-slime-rigid-shell"
 }

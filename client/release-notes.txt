@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.39.1",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Ironhide Beetles keep their glossy slime-style look with rigid shells, jointed legs and a cracking, tipping death animation."
+    ],
+    "removed": [
+      "Removed the elastic Ironhide movement and puddle-like death because they did not fit its steel shell."
+    ]
+  },
+  {
     "version": "Beta 1.39.0",
     "date": "2026-11-03",
     "new": [

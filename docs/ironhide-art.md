@@ -1,45 +1,95 @@
-# Ironhide Beetle — slime-style redraw, private Beta 1.38.1
+# Greenmeadow Ironhide: rigid-shell artwork candidate
 
-Owner request: redo the Ironhide Beetle in the style of the slime. The editable
-PixelFlow redraw keeps its steel-blue carapace, bronze horn and six legs, with
-the slimes' round glossy pixel shading, large white eyes, blink, chunky feet,
-squash/stretch hop, charge anticipation/lunge and collapsing death frames.
-No enemy statistics, combat timings, map data, rewards or other sprites changed.
+All four MEADOW-SLIME TODO deliverables are privately complete as **Beta 1.39.1**
+in `/media/raid/valhallasc-data/meadow-slime-work`, branch `feat/meadow-slime-art`,
+based on main `9dea2cc`. Local/uncommitted; not pushed, merged or deployed.
+TODO.md requires picture review and owner approval before public replacement.
 
-Generator: `scripts/make_ironhide_sprites.py preview | build | export`.
-New saved PixelFlow source: **399849edffa3ab6f**,
-`valhallasc_ironhide_slime_style_all`. Original **a3f8837048d1098c** remains
-in PixelFlow; the new prefix avoids destroying its editable frames.
-`build --replace` affects the new variant only and discards its editor changes;
-use export to retain them. Indexed source: `scripts/ironhide_raw.npz`.
+Ironhide keeps the slimes' round glossy shading, large white eyes, highlights,
+blush and chunky proportions, together with its steel-blue shell, bronze horn
+and six legs. Shell movement uses translation and rigid rotation: idle weight
+shifts, jointed walking, horn lunge and recoil. Death shows angular shell cracks,
+buckling knees, crossed eyes, a forward tip and small metal chips. The shell
+stays solid, with no squash/stretch or puddle death. Eight distinct death frames.
+The five Greenmeadow slime kinds and other zones' art remain unchanged.
 
-The renderer contract is unchanged:72×64, foot anchor(36,60),576×320atlas,
-34frames:6idle/8walk/8attack/4hurt/8die at6/10/12/10/8fps. Every exported frame
-is pixel-for-pixel identical to the saved editor source, nonempty and has clear
-outer edges. Proof: `test-results/ironhide-slime-proof.json`.
-New PNG SHA256: `a91ecac9df2dbc96700f9ae2c95ec90b2248a6bbebbebdc5b22039bbb7921d8f`.
-Previous PNG SHA256: `0dfe5aaa5a08370d935f6706dc1150f82ad6668fbdd297d2dd65d5e0590e0cb1`.
+## Sources and contract
 
-`tests/ironhide-slime-art.cjs`:11 focused real-browser checks pass: frame/anchor/
-atlas contract, all34frames, saved sourceID, five clips animate distinctly,
-readable whites/gloss, production target portrait and no browser errors.
-Desktop and phone gameplay, clip gallery, portrait and slime/reference comparison:
-`test-results/driver-T4GLas`. The first fixture attempted an unexposed slimeSrc
-getter; corrected to load the actual reference PNG, then the focused test passed.
-No full suite, gameplay grinding or combat balance/timing tests.
+New native PixelFlow source **d1ab641330d34105**,
+`valhallasc_meadow_ironhide_rigid_all`. Previous **399849edffa3ab6f** and earlier
+original **a3f8837048d1098c** remain saved. IDs: `scripts/meadow_slime_sources.txt`.
+New raw indexed frames: `scripts/meadow_slime_raw.npz`; historical
+`scripts/ironhide_raw.npz` remains unchanged.
 
-Python/JS syntax, Swedish generation, release-note guard and diff checks pass.
-Boss-add art aliases were reapplied and the unrelated cathedral atlas is
-byte-identical. Display/notes/Swedish keep label all use Beta1.38.1.
+`python3 scripts/make_ironhide_sprites.py preview | build | export`.
+Build uses a separate name prefix, retains existing sources and refuses
+`--replace`. Export reads saved editor frames, preserving edits, and derives
+health-bar `tops.beetle` (currently 36); the beetle loader now uses it.
 
-Implemented in the existing private `/media/raid/valhallasc-data/solstice-work`,
-branch `feat/summer-solstice`, after the combined seasonal candidate. Local and
-uncommitted, not deployed; no public assets or production database changes.
-No server rebuild is required for this client artwork. The previous optimized
-private server is reused only for the bounded browser check.
+Same kind ID/file paths,72×64 frame,anchor(36,60),576×320atlas,34frames:
+6idle@6fps,8walk@10,8attack@12,4hurt@10,8die@8.
+New atlas SHA256: `49c897b97ab646b3dc0a63de4cc156a12062715d942837395b36ba6c5cda881b`.
+Old atlas replaced only in the candidate, without duplicate old live assets.
+No stats/timings/maps/rewards/zone IDs/server/DB changes; no rebuild or restart.
 
-Owner-requested FileDrop follow-up: uploaded `valhallasc-ironhide-before.png`,
-`valhallasc-ironhide-after.png` and `valhallasc-ironhide-before-after.png` to Sork's
-FileDrop. The comparison uses the exact old and new idle atlas frames at equal
-nearest-neighbor scale. All three destination hashes, PNG dimensions and metadata
-were verified; receipt: `test-results/ironhide-filedrop.json`.
+## Rollback
+
+External backup `/media/raid/valhallasc-data/meadow-slime-original-20261103`
+contains exact previous `client/assets/ironhide.png` and `ironhide.txt`, plus
+hashes and previous source IDs in `manifest.txt`. Old atlas SHA256:
+`a91ecac9df2dbc96700f9ae2c95ec90b2248a6bbebbebdc5b22039bbb7921d8f`.
+
+One command to restore old art when wanted:
+
+```sh
+python3 /media/raid/valhallasc-data/meadow-slime-work/scripts/rollback_meadow_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+```
+
+Omit `--apply` for dry run. Validates both backups before writing, atomically
+replaces each art file and verifies both restored hashes. It leaves release
+labels/notes alone; a production rollback needs matching notes and a new version.
+Restoration on disposable copies and corrupt-backup refusal without changes pass.
+
+## Focused verification
+
+**16 distinct bounded real-art browser checks pass**: dimensions/anchor,
+34 nonempty unclipped frames, saved source ID, five animating clips, eye whites/
+gloss, production portrait, eight distinct death poses, retained body height/area
+and steel-shell pixels during death, derived health top, authoritative Greenmeadow
+beetle top and no browser errors. Final artifacts: `test-results/driver-OwqsCG`
+(gallery, portrait, slime reference, desktop/landscape-phone gameplay and numerical
+report). Test uses a tracked source registry, with no ignored-proof dependency.
+
+All **34 saved-editor/export frames match**. Evidence:
+`test-results/meadow-slime/editor-export-proof.json` and `validation.json`.
+Python/JS syntax, Swedish generation/check, release-note guard and diff checks
+pass. No full suites, combat grinding, fight tests or balance sweeps.
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/ironhide-slime-art.cjs
+python3 scripts/meadow_slime_review.py review
+python3 scripts/meadow_slime_review.py verify
+```
+
+## Owner review
+
+Seven FileDrop outputs uploaded; destination SHA256,size,dimensions,original
+filename and MIME metadata verified. Receipt:
+`test-results/meadow-slime/filedrop-receipt.json`.
+
+- `valhallasc-meadow-before.png`
+- `valhallasc-meadow-after.png`
+- `valhallasc-meadow-before-after.png`
+- `valhallasc-meadow-frames.png`
+- `valhallasc-meadow-death-frames.png`
+- `valhallasc-meadow-animations.gif`
+- `valhallasc-meadow-death-before-after.gif`
+
+Before/after uses equal scales. Animations use original clip rates and hold the
+final death pose briefly. `meadow_slime_review.py upload` is separate from
+review/verify and uploads this set only when requested.
+
+Live art hashes remain identical to the backup. Both this and the separate Crags
+candidate label themselves1.39.1: reconcile current version/notes/Swedish keep label
+when combining approved candidates. Main TODO is maintained in the shared checkout;
+do not overwrite it with this worktree's older snapshot. Next zone is Rimeveil.
