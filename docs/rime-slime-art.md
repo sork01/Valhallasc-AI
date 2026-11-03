@@ -121,8 +121,8 @@ Pictures compare both idle and final death poses at equal 2× scale. Frame sheet
 show every pose; GIFs show original animation rates and briefly hold the final
 death pose. Upload is a separate explicit `rime_slime_review.py upload` action.
 
-The main TODO queue records the release; next zone is Gloamfen. Greenmeadow and
-Crags remain separate private candidates, still labelled 1.39.1. Rebase their
-release labels/notes/Swedish keep entries against the current live version before
-any later approved deployment. The Greenmeadow work is preserved separately as
-`5d4a3ee` on `feat/meadow-slime-art`; it was not included in this release.
+The main TODO queue records the release; next zone is Gloamfen. Crags was
+subsequently approved and deployed as Beta 1.39.2 (source `bae6ec2`), with all
+five public Rimeveil art hashes preserved. Greenmeadow remains a separate
+private candidate, preserved as `5d4a3ee` on `feat/meadow-slime-art`; it needs a
+fresh release label/notes/Swedish keep entry if later approved for deployment.

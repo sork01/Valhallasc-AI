@@ -1,10 +1,15 @@
 # Emberfall Crags: slime-style artwork candidate
 
-Approved for **Beta 1.39.2** on 2026-11-03 when the owner requested "deploy crags".
-Originally prepared in `/media/raid/valhallasc-data/crags-slime-work` on
-`feat/crags-slime-art`, based on main `9dea2cc`. The release is assembled on top
-of live Rimeveil 1.39.1 in `/media/raid/valhallasc-data/crags-slime-release-20261103`,
-branch `release/crags-slime-20261103`, preserving the Rimeveil release and notes.
+Released as **Beta 1.39.2** on 2026-11-03 after the owner's explicit "deploy crags"
+approval. Source **bae6ec2**, assembled on top of Rimeveil/main `5c18db3` in
+`/media/raid/valhallasc-data/crags-slime-release-20261103` on
+`release/crags-slime-20261103`, is merged into main and live. Eight public release
+hashes and both health endpoints pass; five public Rimeveil art hashes are
+unchanged. Server PID/executable unchanged, with no restart, build or DB work.
+Receipt: `test-results/crags-release-20261103T173612Z.json`.
+The original candidate remains archived in
+`/media/raid/valhallasc-data/crags-slime-work`, based on `9dea2cc`; its stale
+TODO/version must not overwrite current main.
 
 The five existing Crags kinds now share Greenmeadow's glossy pixel shading,
 large white eyes, highlights, blush and chunky proportions. Existing kind IDs,
