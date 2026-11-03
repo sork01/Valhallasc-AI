@@ -422,7 +422,13 @@ pub struct MountDef {
     pub speed: f64,
 }
 pub const MOUNT_SPEED: f64 = 1.6;
-pub const MOUNTS: [MountDef; 7] = [
+pub const MOUNTS: [MountDef; 8] = [
+    MountDef {
+        id: "springtide",
+        name: "Springtide Bunny",
+        level: 1,
+        speed: MOUNT_SPEED,
+    },
     MountDef {
         id: "reindeer",
         name: "red-nosed reindeer",

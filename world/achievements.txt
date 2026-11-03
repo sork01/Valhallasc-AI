@@ -1398,5 +1398,24 @@
       "christmas_aster",
       "christmas_hunt"
     ]
+  },
+  {
+    "id": "eggstraordinary",
+    "name": "Eggstraordinary Easter",
+    "description": "Claim all five different Easter quests.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 5,
+    "points": 25,
+    "title": "the Springbringer",
+    "mount": "",
+    "zone": null,
+    "members": [
+      "easter_alder",
+      "easter_skald",
+      "easter_nacre",
+      "easter_aster",
+      "easter_hunt"
+    ]
   }
 ]

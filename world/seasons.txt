@@ -56,5 +56,29 @@
         "asterion_singer"
       ]
     }
+  },
+  {
+    "id": "easter",
+    "calendar": "gregorianEaster",
+    "startOffset": -2,
+    "endOffsetExclusive": 9,
+    "quests": [
+      "easter_alder",
+      "easter_skald",
+      "easter_nacre",
+      "easter_aster",
+      "easter_hunt"
+    ],
+    "dailyQuests": [
+      "easter_hunt"
+    ],
+    "givers": {
+      "easter_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
   }
 ]

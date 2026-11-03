@@ -1,4 +1,4 @@
-"""The seven mounts as primitive lists (make_mount_sprites.py renders them).
+"""The eight mounts as primitive lists (make_mount_sprites.py renders them).
 
 Every builder takes (clip, k, n) and returns (prims, bob): the body parts for frame k of n and how far the saddle
 rises (world units) in that frame, which the client adds to the rider. Model space is documented in mount_toon.py:
@@ -461,9 +461,65 @@ def reindeer(clip,k,n):
         prims += [Ell((side*8.5,14,39+bob),(2,2,2.3),'gold')]
     return prims,bob
 
+# Springtide Bunny: original rabbit, hopping gait, floral saddle and egg basket.
+SPRINGTIDE={**HORSE,
+ 'coat':['#a6aebc','#c9ced8','#e4e8ef','#fff9f4'],
+ 'coat2':['#c893ac','#e5adc3','#f8ccdb','#ffe5eb'],
+ 'hoof':['#a58d9f','#c9acbd','#e2c8d6','#f7e0e7'],
+ 'nose':['#a35c82','#cf83a4','#edafc8','#ffd7e2'],
+ 'blanket':['#436557','#6e9677','#a0c79b','#d4e5af'],
+ 'egg':['#8668a4','#ac8dc8','#ceb6e6','#efdcfb'],
+ 'flower':['#c07597','#df99b3','#f2c7ce','#fff0d9'],
+ 'basket':['#80603e','#ae8656','#d0aa75','#f0d1a0']}
+
+def springtide(clip,k,n):
+    ph=CYCLE((-k)%n if clip=='run' else k,n);run=clip=='run'
+    bob=(max(0,S_(ph))*4-.4) if run else S_(ph)*.35
+    prims=[Ell((0,-2,30+bob),(13,19,13),'coat'),
+           Ell((0,-14,27+bob),(14,11,15),'coat'),
+           Ell((0,13,31+bob),(11,10,11),'coat'),
+           Ell((0,-24,30+bob),(6.5,6.5,6.5),'coat')]
+    for side in [-1,1]:
+        # Powerful folded haunches, round feet and paired forward-hopping paws.
+        front=V(side*7,15+(C_(ph)*6 if run else 0),3+(max(0,S_(ph))*8 if run else 0))
+        rear=V(side*9,-15+(C_(ph+.7)*7 if run else 0),3+(max(0,S_(ph+.7))*7 if run else 0))
+        prims += [limb((side*8,10,30+bob),front,3.8,'coat'),Ell(front+V(0,3,0),(4.5,8,3.3),'coat'),
+                  Ell((side*10,-12,24+bob),(7,9,11),'coat'),limb((side*10,-15,17+bob),rear,4.2,'coat'),
+                  Ell(rear+V(0,4,0),(6,10,3.5),'coat')]
+        for i in [-1,1]:prims += [Ell(front+V(i*1.5,7,1),(0.7,1.6,.6),'hoof')]
+    head=V(0,26,43+bob+(S_(ph)*1.1 if run else 0))
+    prims += [Ell(head,(10,10,10),'coat'),Ell(head+V(0,7,-3),(7,5,5.5),'coat'),
+              Ell(head+V(0,11,-1),(2.4,1.8,1.7),'nose')]
+    for side in [-1,1]:
+        base=head+V(side*5,-2,7);tip=base+V(side*4,-5+(S_(ph+.4)*2 if run else 0),19)
+        prims += [limb(base,tip,4,'coat',ext=2),limb(base+V(0,.8,1),tip+V(0,.8,-1),2.3,'coat2')]
+        for i in range(3):prims += [limb(head+V(side*5,9,-3-i),head+V(side*(13+i),10,-2-i*2),.25,'hoof')]
+    prims += eyes(head+V(0,0,1.5),8.5,4.2,3.3)
+    prims += saddle(-2,42+bob,11,10)
+    # Blossoms and leaves around the saddle rim, never over the rider seat.
+    for side in [-1,1]:
+        for i in range(4):
+            c=V(side*11,-9+i*5,42+bob)
+            prims += [Ell(c,(2.8,2.5,1.2),'blanket')]
+            for j in range(5):
+                a=TAU*j/5
+                prims += [Ell(c+V(C_(a)*1.7,S_(a)*1.7,.8),(1.5,1.5,.8),'flower')]
+            prims += [Ell(c+V(0,0,1.5),(1,1,1),'gold')]
+    # Small woven basket on the rabbit's rear quarter, with pastel striped eggs.
+    centre=V(-14,-13,31+bob)
+    prims += [Ell(centre,(5.5,6,5),'basket')]
+    for z in [30,33,35]:prims += [Ell((-14,-13,z+bob),(5.7,6.2,.6),'gold')]
+    for i in range(5):
+        a=TAU*i/5;c=centre+V(C_(a)*3,S_(a)*3,5)
+        prims += [Ell(c,(2.1,2.1,3),'egg' if i%2 else 'flower'),Ell(c+V(0,0,.5),(2.2,2.2,.6),'gold')]
+    for side in [-1,1]:prims += [limb(centre+V(side*5,0,0),centre+V(side*4,0,11),.7,'basket')]
+    prims += [limb(centre+V(-4,0,11),centre+V(4,0,11),.7,'basket')]
+    return prims,bob
+
 # name -> (builder, materials, flat materials, seat). seat: `raise` lifts the rider so the pelvis sits on the saddle,
 # `cut` hides the rider below that world height (the legs vanish into the barrel), `shadow` is the ground shadow (rx, ry).
 REGISTRY = {
+    'springtide': (springtide, SPRINGTIDE, FLAT, {'scale':1.3,'raise':25,'cut':34,'shadow':(35,10),'coat':'coat'}),
     'reindeer': (reindeer, REINDEER, {**FLAT,'nose':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'nightmare': (nightmare, NIGHTMARE, {**FLAT,'flame':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'horse': (horse, HORSE, FLAT, {'scale': 1.3, 'raise': 25, 'cut': 34, 'shadow': (34, 9), 'coat': 'coat'}),

@@ -1,0 +1,29 @@
+US Naval Observatory, Selected Christian Observances
+https://aa.usno.navy.mil/data/christian_observances
+Retrieved 2026-11-03 with urllib.request from the official GET form:
+https://aa.usno.navy.mil/calculated/observances/christian?year=YEAR&submit=Get+Data
+The browser extraction tool could read the service page but not its computed URL;
+the official computed HTML was fetched directly. These are independently retrieved
+fixtures, not output from this repository's computus.
+
+Year  Easter Sunday
+1818  March 22
+1943  April 25
+1954  April 18
+1981  April 19
+2000  April 23
+2024  March 31
+2026  April 5
+2027  March 28
+2038  April 25
+2049  April 18
+2076  April 19
+2100  March 28
+
+1818/1943 are the Gregorian earliest/latest bounds. 1954/1981/2049/2076 exercise
+the correction term; 2000/2100 cover leap-century rules. 2024 and 2027 include
+Stockholm's March DST transition in the festival window. Boundary Unix fixtures
+were calculated independently with Python datetime + zoneinfo(Europe/Stockholm):
+2024-03-29 1711666800; 2024-04-09 1712613600
+2027-03-26 1806015600; 2027-04-06 1806962400
+2038-04-23 2155586400; 2038-05-04 2156536800

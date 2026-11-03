@@ -90,3 +90,13 @@ old seasonal claim ledgers on login. Titles never alter saved character names.
 The shared encounter engine preserves Halloween’s average-level/1% rules while
 Christmas uses highest-level/5% rules. Full rules, generator and cleanup:
 [christmas-event.md](christmas-event.md).
+
+## Computed Easter candidate
+
+Registry `calendar: gregorianEaster` uses Meeus/Jones/Butcher each year, then
+`startOffset: -2` and `endOffsetExclusive: 9`. Local calendar dates are shifted
+before CET/CEST midnight conversion: E−2 through E+8 inclusive. Existing fixed
+and cross-year windows keep their semantics. The four cities receive native
+painted eggs, baskets, spring flowers, ribbons and socket-fitted NPC accessories.
+Four annual errands and the shared daily Bloomwarden quest use the same saved
+claims/attempt/expiry engine. Details: easter-event.md.

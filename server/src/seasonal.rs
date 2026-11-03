@@ -7,8 +7,14 @@ use std::sync::LazyLock;
 #[serde(rename_all = "camelCase")]
 struct Event {
     id: String,
-    start: [u32; 2],
-    end_exclusive: [u32; 2],
+    start: Option<[u32; 2]>,
+    end_exclusive: Option<[u32; 2]>,
+    #[serde(default)]
+    calendar: Option<String>,
+    #[serde(default)]
+    start_offset: i32,
+    #[serde(default)]
+    end_offset_exclusive: i32,
     quests: Vec<String>,
     #[serde(default)]
     daily_quests: Vec<String>,
@@ -89,6 +95,45 @@ fn midnight(year: u32, month: u32, day: u32) -> u64 {
     // Both candidate offsets are unambiguous at midnight on event boundaries.
     utc - if summer(utc - 7200, year) { 7200 } else { 3600 }
 }
+/// Gregorian Meeus/Jones/Butcher computus, including its century corrections.
+fn easter_sunday(year: u32) -> (u32, u32) {
+    let a = year % 19;
+    let b = year / 100;
+    let c = year % 100;
+    let d = b / 4;
+    let e = b % 4;
+    let f = (b + 8) / 25;
+    let g = (b - f + 1) / 3;
+    let h = (19 * a + b - d - g + 15) % 30;
+    let i = c / 4;
+    let k = c % 4;
+    let l = (32 + 2 * e + 2 * i - h - k) % 7;
+    let m = (a + 11 * h + 22 * l) / 451;
+    let n = h + l - 7 * m + 114;
+    (n / 31, n % 31 + 1)
+}
+fn interval(event: &Event, year: u32) -> (u64, u64) {
+    if event.calendar.as_deref() == Some("gregorianEaster") {
+        let (month, day) = easter_sunday(year);
+        let ordinal = day_number(year, month, day) as i64;
+        // Shift LOCAL calendar dates first. Each midnight has its own CET/CEST offset.
+        let boundary = |offset: i32| {
+            let (y, m, d) = date(((ordinal + i64::from(offset)) * 86400) as u64);
+            midnight(y, m, d)
+        };
+        (
+            boundary(event.start_offset),
+            boundary(event.end_offset_exclusive),
+        )
+    } else {
+        let start = event.start.expect("fixed season start");
+        let end = event.end_exclusive.expect("fixed season end");
+        (
+            midnight(year, start[0], start[1]),
+            midnight(year + u32::from(end <= start), end[0], end[1]),
+        )
+    }
+}
 pub fn active_at(unix: u64) -> Vec<Active> {
     let (year, month, day) = date(
         unix + if summer(unix, date(unix).0) {
@@ -104,9 +149,7 @@ pub fn active_at(unix: u64) -> Vec<Active> {
             [year.saturating_sub(1).max(1970), year]
                 .into_iter()
                 .find_map(|year| {
-                    let start = midnight(year, e.start[0], e.start[1]);
-                    let end_year = year + u32::from(e.end_exclusive <= e.start);
-                    let end = midnight(end_year, e.end_exclusive[0], e.end_exclusive[1]);
+                    let (start, end) = interval(e, year);
                     (unix >= start && unix < end).then(|| Active {
                         id: e.id.clone(),
                         year,
@@ -184,6 +227,71 @@ impl Calendar {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn easter_computus_matches_independent_usno_dates() {
+        // USNO /calculated/observances/christian?year=YEAR, fetched 2026-11-03.
+        // Includes earliest/latest dates and the 1954/1981/2049/2076 corrections.
+        for (year, month, day) in [
+            (1818, 3, 22),
+            (1943, 4, 25),
+            (1954, 4, 18),
+            (1981, 4, 19),
+            (2000, 4, 23),
+            (2024, 3, 31),
+            (2026, 4, 5),
+            (2027, 3, 28),
+            (2038, 4, 25),
+            (2049, 4, 18),
+            (2076, 4, 19),
+            (2100, 3, 28),
+        ] {
+            assert_eq!(easter_sunday(year), (month, day), "year {year}");
+        }
+    }
+    #[test]
+    fn easter_local_dates_boundaries_rollover_and_dst() {
+        let event = EVENTS.iter().find(|e| e.id == "easter").unwrap();
+        for (year, start_date, end_date, start_unix, end_unix) in [
+            (2024, [3, 29], [4, 9], 1711666800, 1712613600),
+            (2027, [3, 26], [4, 6], 1806015600, 1806962400),
+            (2038, [4, 23], [5, 4], 2155586400, 2156536800),
+        ] {
+            let (start, end) = interval(event, year);
+            assert_eq!(start, midnight(year, start_date[0], start_date[1]));
+            assert_eq!(end, midnight(year, end_date[0], end_date[1]));
+            assert_eq!((start, end), (start_unix, end_unix));
+            let active = |unix| active_at(unix).into_iter().find(|e| e.id == "easter");
+            assert!(active(start - 1).is_none());
+            assert_eq!(active(start).unwrap().year, year);
+            assert!(active(end - 1).is_some());
+            assert!(active(end).is_none());
+            assert_eq!((end - start) / 3600, if year == 2038 { 264 } else { 263 });
+        }
+        // The March DST transition advances the daily key by a local date, not 24h.
+        let before = midnight(2027, 3, 28);
+        let after = midnight(2027, 3, 29);
+        assert_eq!(after - before, 23 * 3600);
+        assert_eq!(period("easter_hunt", &active_at(after - 1)), Some(20270328));
+        assert_eq!(period("easter_hunt", &active_at(after)), Some(20270329));
+    }
+    #[test]
+    fn easter_registry_preserves_fixed_and_cross_year_windows() {
+        let e: Event = serde_json::from_value(serde_json::json!({
+            "id":"cross","start":[12,29],"endExclusive":[1,3],"quests":[]
+        }))
+        .unwrap();
+        assert_eq!(
+            interval(&e, 2026),
+            (midnight(2026, 12, 29), midnight(2027, 1, 3))
+        );
+        let christmas = EVENTS.iter().find(|e| e.id == "christmas").unwrap();
+        assert_eq!(
+            interval(christmas, 2026),
+            (midnight(2026, 12, 15), midnight(2026, 12, 29))
+        );
+        assert_eq!(date(midnight(2000, 3, 1) + 3600), (2000, 3, 1));
+        assert!(!leap(2100));
+    }
     #[test]
     fn seasonal_stockholm_boundaries_and_dst_are_inclusive() {
         for year in [2025, 2026, 2027, 2028, 2030] {

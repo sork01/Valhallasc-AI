@@ -95,3 +95,13 @@ All seven mounts use one authoritative 1.6× multiplier (160% of walking speed,
 existing order. The mounted gait cadence is 80% of the former 2× travel gait.
 The Christmas reindeer grants permanent ownership directly, with no bag slot
 and no duplicate or forced selection change. See [christmas-event.md](christmas-event.md).
+
+## Easter candidate: Springtide Bunny
+
+Large original white rabbit, pastel-pink ears, floral saddle and decorated egg
+basket. One independent exact 5% roll per eligible real player per Stockholm day
+on the summoned Bloomwarden kill. The persisted roll ledger is separate from
+quest claims. Grant ownership directly outside inventory; no duplicate or selected
+mount replacement. Same 160% walking speed. Sixteen saved PixelFlow sources cover
+eight directions and idle/run; colour/depth exports serve all ten class/body rigs.
+See easter-event.md and easter-validation.md.

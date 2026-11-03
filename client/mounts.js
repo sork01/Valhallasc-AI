@@ -4,6 +4,7 @@
 // (docs/mounts.md); this only shows them and sends `select_mount`.
 (() => {
   const MOUNTS = [
+    {id:'springtide',name:'Springtide Bunny',level:1,route:'Easter: defeat the Bloomwarden with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'reindeer',name:'Red-nosed Reindeer',level:1,route:'Christmas: summon the Grinch with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'nightmare',name:'Nightmare Steed',level:1,route:'Halloween: summon the Hollow Rider with five fighters in Gloamfen',cost:'One independent 1% chance per eligible hero per day'},
     { id: 'horse', name: 'Riding horse', level: 50, route: 'Buy from Stable-hand Greta in Skaldholm', cost: '500,000 gold' },

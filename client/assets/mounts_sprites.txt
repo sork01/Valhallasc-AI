@@ -992,6 +992,156 @@
         "mount_reindeer_run_e": "a36b62a4dacc188e",
         "mount_reindeer_run_se": "aaab1e31363c2813"
       }
+    },
+    "springtide": {
+      "png": "mount_springtide.png",
+      "depth": "mount_springtide_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          -0.52,
+          -0.52,
+          -0.52,
+          -0.52,
+          -0.52,
+          3.157,
+          4.68,
+          3.157
+        ]
+      },
+      "raise": 25,
+      "cut": 34,
+      "shadow": [
+        35,
+        10
+      ],
+      "coat": [
+        "#a6aebc",
+        "#c9ced8",
+        "#e4e8ef",
+        "#fff9f4"
+      ],
+      "ramps": {
+        "coat": [
+          "#a6aebc",
+          "#c9ced8",
+          "#e4e8ef",
+          "#fff9f4"
+        ],
+        "coat2": [
+          "#c893ac",
+          "#e5adc3",
+          "#f8ccdb",
+          "#ffe5eb"
+        ],
+        "blaze": [
+          "#bda48e",
+          "#dccab6",
+          "#f1e4d4",
+          "#fff7ea"
+        ],
+        "hoof": [
+          "#a58d9f",
+          "#c9acbd",
+          "#e2c8d6",
+          "#f7e0e7"
+        ],
+        "nose": [
+          "#a35c82",
+          "#cf83a4",
+          "#edafc8",
+          "#ffd7e2"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#436557",
+          "#6e9677",
+          "#a0c79b",
+          "#d4e5af"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#3a2208",
+          "#6b3d10",
+          "#b9741f",
+          "#f0b14a"
+        ],
+        "egg": [
+          "#8668a4",
+          "#ac8dc8",
+          "#ceb6e6",
+          "#efdcfb"
+        ],
+        "flower": [
+          "#c07597",
+          "#df99b3",
+          "#f2c7ce",
+          "#fff0d9"
+        ],
+        "basket": [
+          "#80603e",
+          "#ae8656",
+          "#d0aa75",
+          "#f0d1a0"
+        ]
+      },
+      "sprites": {
+        "mount_springtide_idle_s": "50ba5538da8fee1c",
+        "mount_springtide_idle_sw": "49bab6a6b30034ad",
+        "mount_springtide_idle_w": "c76a45b040367ed3",
+        "mount_springtide_idle_nw": "434d8ea06ad698db",
+        "mount_springtide_idle_n": "dd464c5223dc154d",
+        "mount_springtide_idle_ne": "48d3206dbec7e3de",
+        "mount_springtide_idle_e": "63ad65e68433e3c0",
+        "mount_springtide_idle_se": "23a18cfa460a2c57",
+        "mount_springtide_run_s": "23115ccd83d98058",
+        "mount_springtide_run_sw": "22c97d1b64b414c0",
+        "mount_springtide_run_w": "887fe2ec7069235c",
+        "mount_springtide_run_nw": "bfc536188a765304",
+        "mount_springtide_run_n": "254c1fd40b755d58",
+        "mount_springtide_run_ne": "03dddbe6fd5138a1",
+        "mount_springtide_run_e": "444f29ef4e6f1f23",
+        "mount_springtide_run_se": "f7727a23f3e8e6e7"
+      }
     }
   }
 }

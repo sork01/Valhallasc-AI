@@ -275,3 +275,13 @@ Earned titles survive expiry, reconnect and rebirth; names and name reservation
 keys are untouched. The catalog now has 104 achievements / 2,250 points and
 eight title rewards. Existing suffix rendering and selection/celebration are
 reused.
+
+## Easter candidate
+
+Eggstraordinary Easter awards 25 points and selectable suffix `the Springbringer`
+for all five distinct claimed Easter quests. Permanent claimed history across
+years counts; accepted/ready quests never do. One daily hunt claim counts once.
+The existing celebration, name display and selector are reused, with no saved
+name/reservation changes. Reconnect, expiry and rebirth retain rewards. This
+independent candidate has 105 achievements / 2,275 maximum points / nine titles;
+New Year and Valentine remain separate branches. See easter-event.md.

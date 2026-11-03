@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.36.0",
+    "date": "2026-11-03",
+    "new": [
+      "Easter returns each year from two days before Easter Sunday through eight days after, with spring decorations and annual quests in all four cities.",
+      "Gather five fighters to summon the Bloomwarden in Rimeveil. Each eligible hero has one independent 5% Springtide Bunny mount chance per Stockholm day.",
+      "Claim all five different Easter quests to earn Eggstraordinary Easter, 25 achievement points and the permanent Springbringer title."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.35.4",
     "date": "2026-11-02",
     "new": [],
@@ -7,7 +18,7 @@
       "Named shop and service signs float above their rooftops, clear of house decorations."
     ],
     "removed": [
-      "Removed street-and-number plaques from residential houses to keep the architecture visible."
+      "Removed street-and-number plaques from residential houses so the architecture stays visible."
     ]
   },
   {
