@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Remade four-legged animal monsters float above the ground (owner report, 2026-11-03)
+
+- [ ] `QUADRUPED-GROUNDING` — All remade four-legged animal monsters look like they are floating above the ground. Review every affected remade kind and correct its sprite placement/ground contact so planted feet sit naturally on the terrain. Verify the result in-game across idle, walking and combat animations with focused real-art checks; apply the same grounding requirement to upcoming remakes.
+
 ### Emberfall Crags enemies in the Greenmeadow slime style (owner request, 2026-11-03)
 
 **Owner requirements:** Remake the **Emberfall Crags enemies** (Fire Wisp, Lava Spider, Ash Wraith, Cinder Golem and the Cinderlord elite) in the **same style as the Greenmeadow slime**, and **remove the old enemy art**. The owner may not like the result, so **a rollback must stay possible**. Redo the enemies, then upload **before vs after pictures to FileDrop**.
@@ -106,10 +110,12 @@ Kinds: `galehound`, `prismgolem`, `skyray`, `einherjar`, `thunderroc`.
 
 Kinds: `kraken`, `hvitserk`, `ghostmaw`, `draugr`, `angler`, `moray`, `siren`, `shellback`.
 
-- [ ] `DEEP-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
-- [ ] `DEEP-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
-- [ ] `DEEP-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
-- [ ] `DEEP-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+- [x] `DEEP-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [x] `DEEP-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [x] `DEEP-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [x] `DEEP-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+**Deployed (2026-11-03), Beta 1.39.9:** The owner requested "deploy and /finish". Source `d2a1136` from `feat/deep-slime-art` (prepared in `/media/raid/valhallasc-data/deep-slime-work`) is merged into main and live; 11 public release hashes and 39 preserved other-zone art hashes match, both health endpoints healthy, PID/binary unchanged, no restart/build/DB action (receipt `test-results/deep-release-20261103T211020Z.json`). All four DEEP deliverables are complete: Eight native PixelFlow sources (`scripts/deep_slime_sources.txt`) with Greenmeadow shading/eyes and fitting deaths: sailors fall apart, angler's light dies as it rolls over, moray goes limp, Siren dissolves to foam, Ghostmaw fades to a skeleton, Shellback pulls in and tips onto its side, Kraken deflates, Hvitserk's coat collapses and hat tumbles. **Grounding (`QUADRUPED-GROUNDING` rule applied):** every resting foot/belly is on anchor row 90, asserted for every living frame and mutation-checked. 272 saved-editor/export frames match; 125 bounded real-art browser checks pass (`driver-ReGEDB`); `make_deep_sprites.py` refuses `--replace`. Nine original files/hashes/old IDs are at `/media/raid/valhallasc-data/deep-slime-original-20261103`; one-command `scripts/rollback_deep_art.py` and corrupt-backup refusal tested. All 27 `valhallasc-deep-*` FileDrop pictures/GIFs are hash/metadata verified (`test-results/deep-slime/filedrop-receipt.json`). Docs `docs/deep-slime-art.md`, wiki `10_projects:valhallasc_deep_slime_style_20261103`. No server/map/stats/zone/DB change, build or restart. `QUADRUPED-GROUNDING` stays open for the earlier remakes (Deep already complies). **Next unfinished zone: Flooded Cloister.**
 
 #### Zone 10: The Drowned Cathedral — Flooded Cloister
 

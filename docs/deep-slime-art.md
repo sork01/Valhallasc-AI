@@ -1,7 +1,7 @@
-# Rán's Deep enemy artwork (private candidate)
+# Rán's Deep enemy artwork release
 
-**Candidate Beta 1.39.9**, 2026-11-03, built in `/media/raid/valhallasc-data/deep-slime-work` on `feat/deep-slime-art` (base `d8cde11`).
-Not deployed: the owner must see the FileDrop pictures and approve first. All four DEEP-SLIME deliverables are complete.
+**Released as Beta 1.39.9** on 2026-11-03 after the owner asked to "deploy and /finish". Source `d2a1136` (from `feat/deep-slime-art`, built in `/media/raid/valhallasc-data/deep-slime-work`) is fast-forwarded into main and live. All four DEEP-SLIME deliverables are complete.
+Client-only: 11 release hashes (nine art files, index.html, release-notes.txt) and 39 preserved other-zone art hashes match the public site; both health endpoints healthy; server PID 1654327 and executable unchanged; no test flags or journal warnings; no build, restart or DB action. Receipt `test-results/deep-release-20261103T211020Z.json` (local).
 
 Eight original editable PixelFlow sprites use Greenmeadow's glossy shading, large eyes with highlights and blush. Each has material-appropriate
 motion and its own death clip (no generic squash). Only this zone uses these atlases (`Field.deepSprites`); nothing is borrowed.
