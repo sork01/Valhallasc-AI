@@ -1,0 +1,9 @@
+{
+  "thrall": "7dee3916397e745c",
+  "archer": "9303b719d8401202",
+  "acolyte": "7a9851aa0becadae",
+  "gatewarden": "fc18588356e1c7e3",
+  "choir": "6d002bf680604a12",
+  "colossus": "787787128faf3195",
+  "hollowking": "b582240b1e315395"
+}

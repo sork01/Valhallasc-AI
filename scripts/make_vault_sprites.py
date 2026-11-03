@@ -1,24 +1,10 @@
 #!/usr/bin/env python3
-"""makesprites workflow for the Undervault monsters: preview | build [--replace] | export | verify.
+"""Undervault native PixelFlow sprites: preview | build | export | verify.
 
-Seven kinds share the Emberfall Crags contract (scripts/make_crag_sprites.py): one 96x96 frame, a foot anchor at (48, 90),
-right-facing art (the game mirrors it) and five clips (idle 6, walk 8, attack 8, hurt 4, die 8) so client/field.js drives
-them with the Ironhide's state machine: walk frames 2-4 are the hop, 5-7 the landing, attack 0-2 the windup, 3-5 the
-lunge (a ranged kind releases its missile on frame 3), 6-7 the recovery.
-
-  thrall      Vault Thrall: a skeleton in rotted rags with a cracked shield and a rusty sword (melee trash)
-  archer      Bone Archer: a hooded skeleton with a quiver and a bow (ranged trash)
-  acolyte     Hollow Acolyte: a skull in a violet hood and robe, a staff with a glowing orb (ranged trash)
-  gatewarden  Hrolf Bonegate: an armoured skeleton jarl with horned helm, round shield and battle-axe (boss 1)
-  choir       Valka, the Hollow Choir: a floating veiled lich in a teal robe who sings (boss 2)
-  colossus    Ironwake: a granite construct with glowing runes (boss 3)
-  hollowking  Haldor, the Hollow King: a crowned skeleton king in a ragged cape with a greatsword (boss 4)
-
-The skeletons share one rig (two-bone IK legs and arms, a ribcage, a skull) lit from the upper left like every other kind;
-the toolkit (shaded ellipsoids and capsules, a dithered ramp per material, an outline per part) comes from
-make_crag_sprites.py. `build` saves ONE new 34-frame PixelFlow sprite per kind (valhallasc_vault_<kind>_all) and refuses
-existing names unless --replace is given (--replace discards hand edits made in the editor). `export` reads the editor frames
-back, so edits survive, and writes client/assets/vault_<kind>.png plus vault.txt. `verify` proves the atlas equals the render.
+The CLI delegates to vault_slime_redraw.py: glossy Greenmeadow-style art,
+material-specific motion/deaths, saved-editor export, no destructive --replace.
+The historical rig/drawers below remain importable for older dependent scripts;
+previous sources and raw arrays are preserved. See docs/vault-slime-art.md.
 """
 import json
 import math
@@ -1454,19 +1440,14 @@ def verify(kinds):
 
 
 if __name__ == '__main__':
-    drawers = build_drawers()
-    for _kind, _pair in drawers.items():
-        assert len(_pair[1].hex) <= 255
+    # Current slime-style sources replace the historical drawer. Saved editor
+    # frames survive export; old IDs and arrays remain available for rollback.
+    import vault_slime_redraw as current
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
-    names = [a for a in sys.argv[2:] if a in drawers] or list(drawers)
-    if command == 'build':
-        build(names, '--replace' in sys.argv)
-    elif command == 'export':
-        export(names)
-    elif command == 'verify':
-        verify(names)
-    elif command == 'preview':
-        directory = next((a for a in sys.argv[2:] if a not in drawers and not a.startswith('--')), ROOT / 'test-results/vault-preview')
-        preview(names, directory)
-    else:
-        raise SystemExit('Usage: make_vault_sprites.py preview [kind...] [directory] | build [kind...] [--replace] | export [kind...] | verify [kind...]')
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; edit the saved sources and export.')
+    commands = dict(preview=current.preview, build=current.build,
+                    export=current.export, verify=current.verify)
+    if command not in commands:
+        raise SystemExit('Usage: make_vault_sprites.py preview | build | export | verify')
+    commands[command]()

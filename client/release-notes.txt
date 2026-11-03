@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.39.5",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "All seven Undervault enemies share Greenmeadow's glossy slime-style shading, large eyes and chunky proportions, with movement suited to bones, armour, cloth and stone.",
+      "Undervault skeletons fall apart, Valka dissipates, Ironwake fractures and the Hollow King drops his crown in distinct death animations."
+    ],
+    "removed": [
+      "The previous Undervault enemy artwork is replaced to match Greenmeadow's style and give each creature a fitting death."
+    ]
+  },
+  {
     "version": "Beta 1.39.4",
     "date": "2026-11-03",
     "new": [],

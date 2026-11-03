@@ -49,21 +49,22 @@
     }
   },
   "sprites": {
-    "thrall": "e635e2c7bae16ec1",
-    "archer": "39c33957abc7b8a7",
-    "acolyte": "a6c0354646530d2c",
-    "gatewarden": "78ed7f80073fb351",
-    "choir": "71caf73e7d1b1b51",
-    "colossus": "105f0d600bec805b",
-    "hollowking": "2811c940c413fed9"
+    "thrall": "7dee3916397e745c",
+    "archer": "9303b719d8401202",
+    "acolyte": "7a9851aa0becadae",
+    "gatewarden": "fc18588356e1c7e3",
+    "choir": "6d002bf680604a12",
+    "colossus": "787787128faf3195",
+    "hollowking": "b582240b1e315395"
   },
   "tops": {
-    "thrall": 69,
-    "archer": 71,
-    "acolyte": 79,
-    "gatewarden": 83,
-    "choir": 85,
-    "colossus": 79,
-    "hollowking": 82
-  }
+    "thrall": 73,
+    "archer": 79,
+    "acolyte": 80,
+    "gatewarden": 86,
+    "choir": 87,
+    "colossus": 86,
+    "hollowking": 84
+  },
+  "artStyle": "greenmeadow-slime"
 }
