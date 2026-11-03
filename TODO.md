@@ -8,6 +8,18 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Emberfall Crags enemies in the Greenmeadow slime style (owner request, 2026-11-03)
+
+**Owner requirements:** Remake the **Emberfall Crags enemies** (Fire Wisp, Lava Spider, Ash Wraith, Cinder Golem and the Cinderlord elite) in the **same style as the Greenmeadow slime**, and **remove the old enemy art**. The owner may not like the result, so **a rollback must stay possible**. Redo the enemies, then upload **before vs after pictures to FileDrop**.
+
+**Defaults (not owner answers):** Artwork only: no stats, timings, map, rewards or zone IDs change. Same 96x96 frame, anchor (48,90), 34-frame/five-clip contract and kind IDs, so no server rebuild. Build in a private worktree under `/media/raid/valhallasc-data`, new PixelFlow sprites under a new name prefix (old PixelFlow IDs stay saved), old atlases and manifest kept outside the live tree for rollback. **Not deployed until the owner has seen the pictures and approved.**
+
+- [ ] `CRAGS-SLIME-ART` — Redraw the five Crags kinds as slime-style PixelFlow sprites (round glossy shading, big eyes with highlight, blush, squash/stretch, chunky details, slime-like collapse) while keeping each kind's colours/identity readable. Export atlases and manifest with health-bar `tops`; retire the old art from the live assets.
+- [ ] `CRAGS-SLIME-ROLLBACK` — Keep the previous five atlases, `crags.txt` and old PixelFlow IDs; provide a one-command rollback script and document it.
+- [ ] `CRAGS-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `CRAGS-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures to FileDrop and verify hashes. Deployment only after the owner approves.
+
+
 ### Seasonal NPC hair accessories and two-hour festival buff (owner request, 2026-11-03)
 
 **Owner requirements:** Summer Solstice NPCs should have **flowers in their hair**; Valentine's NPCs should have **hearts**, and Easter NPCs should have **Easter eggs** as their seasonal hair/head accessories. **Every season** must offer a **two-hour buff granting +10% attack and +50% experience**. This applies to Halloween, Christmas, New Year, Valentine's, Easter and Summer Solstice, and must use the shared seasonal system so future seasons are covered too.
