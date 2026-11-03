@@ -1,10 +1,14 @@
-# Wyrdwood slime-style artwork candidate
+# Wyrdwood slime-style artwork release
 
-Privately complete as **Beta 1.39.7** in
-`/media/raid/valhallasc-data/wyrd-slime-work`, branch `feat/wyrd-slime-art`,
-based on main `82219a1`. Uncommitted, unpushed and undeployed. TODO requires
-owner picture review and approval before deployment. Live remains Beta 1.39.5;
-all eight original Wyrdwood art hashes are unchanged.
+Released as **Beta 1.39.7** on 2026-11-03 after the owner approved the corrected
+boar, ram and Oakhorn legs and requested "deploy and finish skill". Source
+**d99b36e** from `feat/wyrd-slime-art`, prepared in
+`/media/raid/valhallasc-data/wyrd-slime-work`, is merged into main and live.
+All **10 public release hashes** and both health endpoints pass; **27 public
+art hashes** from Crags, Rimeveil, Gloamfen, Undervault and Greenmeadow are
+preserved. Server PID and executable stayed unchanged; no build, restart or
+database action. No test flags, new journal errors or public test guest.
+Receipt: `test-results/wyrd-release-20261103T190716Z.json`.
 
 Seven new native PixelFlow sources use Greenmeadow's glossy shading, large
 white eyes with highlights, blush and chunky proportions. Each retains its
@@ -70,7 +74,7 @@ directly against atlas pixels. Health tops are derived from those exports:
 Same 96×96 frame, anchor (48,90), 768×480 atlas and 34 frames per kind:
 6 idle at 6fps, 8 walk at 10fps, 8 attack at 12fps, 4 hurt at 10fps,
 8 die at 8fps. Seven existing PNG paths plus `wyrd.txt` replace the old art
-in the private candidate; no duplicate old atlases remain under assets.
+in the release; no duplicate old atlases remain under assets.
 No map, stats, combat timings, rewards, zone IDs, renderer, server, database or
 music changes. No build, restart, migration, grinding or fight/balance sweeps.
 
@@ -92,7 +96,7 @@ are separate from artwork rollback.
 
 ## Focused verification and pictures
 
-**102 bounded real-art browser checks pass**, using the existing production
+**102 initial bounded real-art browser checks passed**, using the existing production
 binary with a private server/database. Coverage: all 238 nonempty/unclipped
 frames, original counts/rates, distinct motion in all five clips, readable
 eyes, source IDs, target portraits, derived and consumed health tops, eight
@@ -125,8 +129,8 @@ maker CLI's `verify` for saved-editor equality.
 - `valhallasc-wyrd-{kind}-death-before-after.gif` (equal-scale deaths)
 
 [Before/after comparison](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-wyrd-before-after.png).
-Next unfinished zone: **Bifrost Reach**. Wyrdwood awaits owner picture approval.
-Re-read the live version before approved deployment.
+Next unfinished zone: **Bifrost Reach**. Owner approval and public release
+verification are recorded above.
 
 ## Owner leg-placement correction (private Beta 1.39.7)
 
@@ -151,8 +155,8 @@ to preserve/reuse the corrected sources; no destructive source replacement.
 separate tracks in all six idle poses for each animal. All 18 earlier candidate
 poses read only two tracks and fail that condition; proof:
 `test-results/wyrd-slime/leg-placement-proof.json`. All 238 saved-editor/export
-frames still match, rollback/corrupt-backup checks pass, and all eight live art
-hashes remain unchanged. The first correction browser attempt was blocked before
+frames still match and rollback/corrupt-backup checks pass. Before deployment,
+all eight live art hashes were confirmed unchanged. The first correction browser attempt was blocked before
 art assertions by the release-notes popup; the fixture now seeds its current
 version in `valhallasc.whats-new.v1`. No application flow change was needed.
 The 102 initial checks remain historical evidence for the other four creatures.
@@ -164,4 +168,5 @@ all **26** destinations have verified hashes and metadata. Updated receipt is
 - [Previous candidate versus corrected legs](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-wyrd-legs-corrected.png)
 - [Walking comparison at the original rate](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-wyrd-legs-walk-before-after.gif)
 
-Private candidate only; picture approval is still required before deployment.
+Owner approved these corrected legs and deployment. The tested source and
+public release verification are recorded above.
