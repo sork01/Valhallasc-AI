@@ -14,10 +14,400 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 **Defaults (not owner answers):** Artwork only: no stats, timings, map, rewards or zone IDs change. Same 96x96 frame, anchor (48,90), 34-frame/five-clip contract and kind IDs, so no server rebuild. Build in a private worktree under `/media/raid/valhallasc-data`, new PixelFlow sprites under a new name prefix (old PixelFlow IDs stay saved), old atlases and manifest kept outside the live tree for rollback. **Not deployed until the owner has seen the pictures and approved.**
 
-- [ ] `CRAGS-SLIME-ART` — Redraw the five Crags kinds as slime-style PixelFlow sprites (round glossy shading, big eyes with highlight, blush, squash/stretch, chunky details, slime-like collapse) while keeping each kind's colours/identity readable. Export atlases and manifest with health-bar `tops`; retire the old art from the live assets.
-- [ ] `CRAGS-SLIME-ROLLBACK` — Keep the previous five atlases, `crags.txt` and old PixelFlow IDs; provide a one-command rollback script and document it.
-- [ ] `CRAGS-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, nonempty frames clear of the border, production portraits; no full suites.
-- [ ] `CRAGS-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures to FileDrop and verify hashes. Deployment only after the owner approves.
+**Owner correction (2026-11-03):** Do not use squash/collapse where it does not make sense. Keep the slime's shading, eyes and proportions, with movement appropriate to each material: deforming/extinguishing fire, drifting/dissipating ghost, rigid spider shell with jointed/buckling legs, and rigid stone/armour components that step, strike and slump. This supersedes the original universal squash/stretch/slime-collapse wording.
+
+**Private completion (2026-11-03):** All four deliverables are implemented and verified as **Beta 1.39.1** in `/media/raid/valhallasc-data/crags-slime-work`, branch `feat/crags-slime-art`, based on main `9dea2cc`. Local/uncommitted; not pushed, merged or deployed. Five new native PixelFlow sources; all 170 saved-editor/export frames match; 58 bounded real-art browser checks pass. Original five PNGs, manifest, hashes and PixelFlow IDs are preserved outside the worktree at `/media/raid/valhallasc-data/crags-slime-original-20261103`. Tested one-command rollback, including corrupt-backup refusal. All 13 FileDrop before/after, complete frame sheets and animation previews are uploaded/hash/metadata verified. Rules/evidence and rollback command: candidate `docs/crags-slime-art.md`; wiki `10_projects:valhallasc_crags_slime_style_20261103`. **Old art is replaced in the private candidate only; live replacement remains gated on the owner's picture review and approval.**
+
+**Owner addition (2026-11-03): fitting death animations.** Every enemy must have a death animation that fits what it is (fire gutters out, ghost dissipates, stone and shell crack and slump, and so on). The Crags candidate already does this for its five kinds; re-confirm it in `CRAGS-SLIME-CHECK` when reviewing. The same remake, with this rule, is queued for every other zone and dungeon in the next section.
+
+- [x] `CRAGS-SLIME-ART` — Privately complete: redraw the five Crags kinds as slime-style PixelFlow sprites (round glossy shading, big eyes with highlight, blush and chunky details), using material-appropriate motion per the owner's correction. Keep each kind's colours/identity readable. Export atlases and manifest with health-bar `tops`; stage replacement of the old asset files for approval.
+- [x] `CRAGS-SLIME-ROLLBACK` — Keep the previous five atlases, `crags.txt` and old PixelFlow IDs; provide a one-command rollback script and document it.
+- [x] `CRAGS-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, nonempty frames clear of the border, production portraits; no full suites.
+- [x] `CRAGS-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures to FileDrop and verify hashes. Deployment only after the owner approves.
+
+
+### Slime-style enemy remake and fitting death animations: every other zone and dungeon, in order (owner request, 2026-11-03)
+
+**Owner requirements:** Do for **every zone and every dungeon** what was written for the Emberfall Crags above: remake each zone's enemies (ordinary kinds, elites and bosses) in the **same style as the Greenmeadow slime**, **remove the old enemy art**, keep a **rollback** possible because the owner may not like the result, and upload **before vs after pictures to FileDrop**. Work **in zone order** (the order below; the Crags come first and are already privately complete). **New (owner):** every enemy must also have a **fitting death animation for what it is**.
+
+**Death animation rule:** The death clip must suit the creature's material and anatomy, not a generic collapse. Examples: slimes and jellies collapse or burst; fire gutters out or flares and dies down; ghosts and spirits dissipate or fade upward; undead and skeletons fall apart; stone, metal and armour crack and slump in pieces; insects and arthropods curl up or flip over; animals and beasts fall over; plants wither, wilt or splinter; machines seize, spark and stop; sea creatures sink or deflate; bosses get a longer, more dramatic version of their own kind. Judge each kind individually; never reuse one death for unlike creatures. The **Crags** candidate follows this already (fire extinguishes, ghost dissipates, spider and golem buckle or slump): its CHECK must also confirm that its five death clips are distinct and fit. The **Greenmeadow slimes** keep their collapse.
+
+**Same corrections as the Crags:** Do not use squash/collapse where it does not make sense. Keep the slime's shading, eyes and proportions with movement appropriate to each material (rigid shells, stone and armour step, strike and slump; fire deforms and extinguishes; ghosts drift and dissipate).
+
+**Defaults (not owner answers):** Artwork only: no stats, timings, map, rewards or zone IDs change. Same frame size, anchor and 34-frame/five-clip contract and kind IDs per kind, so no server rebuild. Build in a private worktree under `/media/raid/valhallasc-data` (never `.tools/`), new PixelFlow sprites under a new name prefix (old PixelFlow IDs stay saved), old atlases and manifests kept outside the live tree for rollback, with one pipeline per zone like `scripts/crags_slime_redraw.py preview|build|export` (no destructive `--replace`, export preserves editor frames). Respect the existing per-zone art contracts (zone atlas files, the shared `cathedral.txt`, `yearwheel`, dungeon cel redraws, boss-helper `add` kinds with borrowed art: never `build --replace` a borrowed kind). Empty Seat shades (`es_foe_*`) borrow Forge art (`cf_kettil`, `cf_eldmarr`) and follow those kinds; the Ember Firelord and the seasonal event guardians are covered at the end. Test only the new art (bounded browser checks, no full suites); the owner handles fight testing. **Not deployed until the owner has seen the pictures and approved**, one zone at a time. No-enemy places (Skaldholm, Nacrehold, Asterion, Veyrroot Canopy, Veyrroot Heartwood, the Arena) have no tasks.
+
+#### Zone 0: Greenmeadow
+
+Kinds: `beetle` (Ironhide, already redrawn slime-style in private Beta 1.38.1). The Greenmeadow slimes (`green`, `blue`, `pink`, `big`, `yellow`) are the style reference and stay as they are: their collapse death already fits. The Ironhide is a steel-shelled beetle, so its slime-like squash/charge/death clip does not fit the owner's rules.
+
+- [x] `MEADOW-SLIME-ART` — Keep the Ironhide's slime-style look but redo its movement and death for its material: rigid shell, jointed legs, no squash/stretch; death is the shell cracking, the legs buckling and the body tipping over. Re-export the atlas and manifest with health-bar `tops` (same kind ID, same ids otherwise) and stage the replacement for approval.
+- [x] `MEADOW-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [x] `MEADOW-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [x] `MEADOW-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+**Private completion (2026-11-03):** All four MEADOW deliverables implemented and verified as **Beta 1.39.1** in `/media/raid/valhallasc-data/meadow-slime-work`, branch `feat/meadow-slime-art`, based on `9dea2cc`. Source `5d4a3ee` is committed and pushed on `feat/meadow-slime-art`; not merged or deployed. Native PixelFlow `d1ab641330d34105` preserves the glossy look, rigid shell and jointed legs; death cracks the shell, buckles the legs and tips the body (no squash/puddle). All 34 saved-editor/export frames match; 16 bounded real-art browser checks pass, including shell retention, eight distinct death poses, portraits and health-bar tops. Previous PNG/manifest/hashes and IDs are outside the worktree in `/media/raid/valhallasc-data/meadow-slime-original-20261103`; one-command rollback and corrupt-backup refusal tested. Seven `valhallasc-meadow-*` FileDrop PNG/GIF previews, including before/after death clips, uploaded/hash/metadata verified. Candidate `docs/ironhide-art.md`; wiki `10_projects:valhallasc_meadow_rigid_ironhide_20261103`. Live assets unchanged pending owner picture review and approval. This and the separate Crags candidate both use 1.39.1; reconcile on combination. Rimeveil is now deployed below; the next unfinished zone is Gloamfen.
+
+#### Zone 2: Rimeveil Glacier
+
+Kinds: `crab`, `wolf`, `yeti`, `wyrm`.
+
+- [x] `RIME-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [x] `RIME-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [x] `RIME-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [x] `RIME-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+**Deployed (2026-11-03), Beta 1.39.1:** The owner approved Rimeveil deployment and finish. Source `2d1d2da` on `feat/rime-slime-art` is merged into main and live. Four new native PixelFlow sources preserve frost identities with glossy slime-style shading and eyes. Crab curls/tips its rigid shell; wolf folds its legs and falls onto its side; yeti buckles and topples; wyrm uncoils and drops its head. All 136 saved-editor/export frames match; 56 bounded real-art browser checks pass, including eight distinct death poses per kind, portraits and derived/consumed health tops. Five old art files, hashes and previous source IDs are backed up at `/media/raid/valhallasc-data/rime-slime-original-20261103`; rollback/corrupt-backup refusal tested. Both build entry points refuse destructive `--replace`. All 15 `valhallasc-rime-*` FileDrop PNG/GIF previews are uploaded/hash/metadata verified. Public seven hashes and both health endpoints pass; server PID/binary unchanged, no restart or DB changes. Receipt `test-results/rime-release-20261103T173005Z.json`; `docs/rime-slime-art.md`, wiki `10_projects:valhallasc_rime_slime_style_20261103`. Greenmeadow is preserved separately as `5d4a3ee`; Crags/Greenmeadow are not included in this release and must be relabelled against live 1.39.1 on any later approved deployment. **Next zone: Gloamfen.**
+
+#### Zone 3: Gloamfen
+
+Kinds: `toad`, `croc`, `knight`, `hydra`, `gloomroot`.
+
+- [ ] `FEN-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `FEN-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `FEN-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `FEN-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 5: The Undervault
+
+Kinds: `thrall`, `archer`, `acolyte`, `gatewarden`, `choir`, `colossus`, `hollowking`.
+
+- [ ] `UNDERVAULT-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `UNDERVAULT-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `UNDERVAULT-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `UNDERVAULT-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 6: Wyrdwood
+
+Kinds: `boar`, `crow`, `troll`, `weaver`, `ram`, `oakhorn`, `hrungnir`.
+
+- [ ] `WYRD-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `WYRD-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `WYRD-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `WYRD-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 7: Bifrost Reach
+
+Kinds: `galehound`, `prismgolem`, `skyray`, `einherjar`, `thunderroc`.
+
+- [ ] `BIFROST-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `BIFROST-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `BIFROST-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `BIFROST-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 8: Rán's Deep
+
+Kinds: `kraken`, `hvitserk`, `ghostmaw`, `draugr`, `angler`, `moray`, `siren`, `shellback`.
+
+- [ ] `DEEP-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `DEEP-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `DEEP-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `DEEP-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 10: The Drowned Cathedral — Flooded Cloister
+
+Kinds: `tidetemplar`, `tidecantor`, `tideleech`, `bellkeeper`, `mournsister`, `rootabbot`, `choirmother`, `choirsinger`.
+
+- [ ] `CLOISTER-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `CLOISTER-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `CLOISTER-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `CLOISTER-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 11: The Drowned Cathedral — Coral Reliquary
+
+Kinds: `tidetemplar`, `tidecantor`, `reliccrab`, `pearlwidow`, `glasscantor`, `relicwarden`, `coralregent`, `reliquarypearl`.
+
+- [ ] `RELIQUARY-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `RELIQUARY-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `RELIQUARY-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `RELIQUARY-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 12: The Drowned Cathedral — Grand Nave
+
+Kinds: `tidetemplar`, `tidecantor`, `abysszealot`, `chainmarshal`, `starseraph`, `tidejudicator`, `hierophant`.
+
+- [ ] `NAVE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `NAVE-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `NAVE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `NAVE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 13: Astralhollow
+
+Kinds: `voidmoth`, `crystalwyrm`, `orbitbeetle`, `eclipsedryad`, `meteorgolem`.
+
+- [ ] `ASTRAL-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `ASTRAL-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `ASTRAL-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `ASTRAL-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 14: The Prismwaste
+
+Kinds: `mirrorqueen`, `sunshard`, `miragejackal`, `shardscarab`, `glassharrier`, `prismsentinel`.
+
+- [ ] `PRISM-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `PRISM-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `PRISM-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `PRISM-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 15: The Obsidian Orrery
+
+Kinds: `pendulummatron`, `epochengine`, `bronzemantis`, `gearling`, `orbitseer`, `chronoguard`.
+
+- [ ] `ORRERY-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `ORRERY-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `ORRERY-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `ORRERY-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 16: The Moonspore Canopy
+
+Kinds: `mireheart`, `silverwidow`, `nightbloom`, `glowcapgrazer`, `silkwing`, `rootlurker`, `lanternwraith`.
+
+- [ ] `MOONSPORE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `MOONSPORE-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `MOONSPORE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `MOONSPORE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 18: The Moonwell
+
+Kinds: `dew_moth`, `lumen_eel`, `rootbell`, `tideglass_heron`, `hourpetal_stag`, `moonskein_weaver`, `moonwell_echo`.
+
+- [ ] `MOONWELL-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `MOONWELL-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `MOONWELL-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `MOONWELL-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 19: The Stormglass Shore
+
+Kinds: `maelstromheart`, `saltclaw`, `stormgull`, `glassray`, `breakersentinel`.
+
+- [ ] `STORMGLASS-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `STORMGLASS-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `STORMGLASS-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `STORMGLASS-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 20: Sunward Vale
+
+Kinds: `honeyjaw`, `wickerwarden`, `meadowhare`, `sunbacksnail`, `brushfox`, `spadebadger`.
+
+- [ ] `SUNWARD-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `SUNWARD-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `SUNWARD-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `SUNWARD-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 21: The Ribbonwild
+
+Kinds: `paradegryphon`, `maskcolossus`, `ribbongecko`, `balloonbeetle`, `paintedmacaw`, `jesterling`.
+
+- [ ] `RIBBONWILD-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `RIBBONWILD-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `RIBBONWILD-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `RIBBONWILD-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 22: The Tanglecrown
+
+Kinds: `jadeanaconda`, `crownjaguar`, `orchidmantis`, `canopyglider`, `poolcaiman`, `drumgorilla`.
+
+- [ ] `TANGLECROWN-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `TANGLECROWN-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `TANGLECROWN-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `TANGLECROWN-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 25: The Lapis Erg
+
+Kinds: `dunecolossus`, `mirageroc`, `sandhopper`, `dunefennec`, `glassscorpion`, `sunvulture`.
+
+- [ ] `LAPIS-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `LAPIS-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `LAPIS-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `LAPIS-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 26: Frostwake Shelf
+
+Kinds: `bellmammoth`, `auroramanta`, `crevasseleviathan`, `snowhare`, `iceotter`, `frostheron`, `glaciercrab`.
+
+- [ ] `FROSTWAKE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `FROSTWAKE-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `FROSTWAKE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `FROSTWAKE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 27: The Cairnspine
+
+Kinds: `cairnbehemoth`, `whitebarktitan`, `stormcondor`, `screeferret`, `stoneibex`, `slateraven`, `ridgeadder`.
+
+- [ ] `CAIRN-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `CAIRN-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `CAIRN-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `CAIRN-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 28: The Yearwheel
+
+Kinds: `bloomtortoise`, `petalchimera`, `rainseraph`, `brooknewt`, `glasslion`, `sunwheel`, `firephoenix`, `sundarter`, `lanternowl`, `harvestreaper`, `ambermantis`, `acornmimic`, `rimesaber`, `snowgiant`, `longnightwyrm`, `snowstoat`.
+
+- [ ] `YEARWHEEL-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `YEARWHEEL-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `YEARWHEEL-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `YEARWHEEL-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 29: The Eye Below
+
+Kinds: `eye_drifter`, `eye_adept`, `eye_lurker`, `eye_lenswarden`, `eye_undertide`, `eye_unblinking`.
+
+- [ ] `EYE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `EYE-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `EYE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `EYE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 30: The Elder Hollow
+
+Kinds: `elder_thornling`, `elder_moth`, `elder_barkguard`, `elder_gatekeeper`, `elder_matron`, `elder_heart`.
+
+- [ ] `ELDER-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `ELDER-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `ELDER-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `ELDER-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 31: The Thousandfold Pavilion
+
+Kinds: `pavilion_foldling`, `pavilion_inkmoth`, `pavilion_silkguard`, `pavilion_mirror`, `pavilion_weaver`, `pavilion_sovereign`.
+
+- [ ] `PAVILION-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `PAVILION-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `PAVILION-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `PAVILION-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 32: Temple of the Rain Crown
+
+Kinds: `rain_crown_droplet`, `rain_crown_oracle`, `rain_crown_guard`, `rain_crown_gatekeeper`, `rain_crown_sibyl`, `rain_crown_sovereign`.
+
+- [ ] `RAINCROWN-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `RAINCROWN-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `RAINCROWN-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `RAINCROWN-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 33: The Seed Vault
+
+Kinds: `seed_mote`, `seed_amberwing`, `seed_rootguard`, `seed_warden`, `seed_germinator`, `seed_worldseed`, `seed_sprout`, `seed_treant`.
+
+- [ ] `SEEDVAULT-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `SEEDVAULT-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `SEEDVAULT-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `SEEDVAULT-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 34: The Sunken Astrolabe
+
+Kinds: `astro_gearling`, `astro_starling`, `astro_sentinel`, `astro_warden`, `astro_navigator`, `astro_axis`.
+
+- [ ] `ASTROLABE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `ASTROLABE-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `ASTROLABE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `ASTROLABE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 35: The Thunderheart Gate
+
+Kinds: `thunder_spark`, `thunder_ray`, `thunder_guard`, `thunder_conductor`, `thunder_bastion`, `thunder_heart`.
+
+- [ ] `THUNDERHEART-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `THUNDERHEART-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `THUNDERHEART-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `THUNDERHEART-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 36: The Blooming Labyrinth
+
+Kinds: `bloom_spore`, `bloom_moth`, `bloom_guard`, `bloom_thornkeeper`, `bloom_mirror`, `bloom_heart`.
+
+- [ ] `BLOOMING-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `BLOOMING-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `BLOOMING-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `BLOOMING-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 37: The Solar Crucible
+
+Kinds: `solar_emberling`, `solar_sunmoth`, `solar_crucible_guard`, `solar_ashwarden`, `solar_heliomancer`, `solar_heart`, `solar_cinder`.
+
+- [ ] `CRUCIBLE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `CRUCIBLE-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `CRUCIBLE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `CRUCIBLE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 38: The Amber Archive
+
+Kinds: `amber_page`, `amber_moth`, `amber_sentinel`, `amber_curator`, `amber_chronicle`, `amber_memory`, `amber_cocoon`.
+
+- [ ] `AMBER-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `AMBER-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `AMBER-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `AMBER-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 39: The Silent Solstice
+
+Kinds: `solstice_flurry`, `solstice_owl`, `solstice_guard`, `solstice_watcher`, `solstice_harbinger`, `solstice_heart`.
+
+- [ ] `SOLSTICE-DUNGEON-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `SOLSTICE-DUNGEON-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `SOLSTICE-DUNGEON-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `SOLSTICE-DUNGEON-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 41: Nornroot Barrow
+
+Kinds: `barrow_hound`, `barrow_scarab`, `barrow_spinner`, `barrow_doorward`, `barrow_threadkeeper`, `barrow_fatebound`.
+
+- [ ] `NORNROOT-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `NORNROOT-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `NORNROOT-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `NORNROOT-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 42: The Shattered Span
+
+Kinds: `span_lynx`, `span_sentinel`, `span_caster`, `span_warden`, `span_weaver`, `span_archon`.
+
+- [ ] `SPAN-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `SPAN-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `SPAN-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `SPAN-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 43: The Drowned Longship
+
+Kinds: `keel_crab`, `keel_deckhand`, `keel_lantern`, `keel_cargomaw`, `keel_bosun`, `keel_captain`.
+
+- [ ] `LONGSHIP-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `LONGSHIP-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `LONGSHIP-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `LONGSHIP-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 44: The Black Hour Foundry
+
+Kinds: `null_hauler`, `null_breaker`, `null_coil`, `null_bell`, `null_conductor`, `null_hour`.
+
+- [ ] `FOUNDRY-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the dungeon's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `FOUNDRY-SLIME-ROLLBACK` — Before replacing anything, keep this dungeon's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `FOUNDRY-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `FOUNDRY-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 45: Emberwake Caldera
+
+Kinds: `ew_chainmaw`, `ew_bellows`, `ew_crown`, `ew_ashback`, `ew_glasswing`, `ew_slagjaw`, `ew_cinderhorn`.
+
+- [ ] `EMBERWAKE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the zone's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `EMBERWAKE-SLIME-ROLLBACK` — Before replacing anything, keep this zone's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `EMBERWAKE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `EMBERWAKE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Zone 46: The Chained Forge
+
+Kinds: `cf_brute`, `cf_sentry`, `cf_crawler`, `cf_caster`, `cf_kettil`, `cf_ysolt`, `cf_hallgrim`, `cf_sigrun`, `cf_dagfinn`, `cf_thorbjorg`, `cf_ragnhild`, `cf_orm`, `cf_hildr`, `cf_eldmarr`, `cf_ingot`.
+
+- [ ] `FORGE-SLIME-ART` — Redraw every kind above as a slime-style PixelFlow sprite (round glossy shading, big eyes with highlight, blush, chunky details), keeping each kind's colours/identity readable, with material-appropriate movement and a **fitting death animation** for what each enemy is (see the death rule above). Export the raid's atlases and manifest with health-bar `tops`; stage the replacement of the old asset files for approval.
+- [ ] `FORGE-SLIME-ROLLBACK` — Before replacing anything, keep this raid's previous atlases, manifest and old PixelFlow IDs outside the live tree; provide a one-command rollback script (the Crags `scripts/rollback_crags_art.py` pattern) and document it.
+- [ ] `FORGE-SLIME-CHECK` — Bounded real-art check: contract/anchor/34 frames, each clip animates, **each death clip is distinct and matches the enemy's material**, nonempty frames clear of the border, production portraits; no full suites.
+- [ ] `FORGE-SLIME-FILEDROP` — Upload before, after and before/after comparison pictures (plus the death clips) to FileDrop and verify hashes. Deployment only after the owner approves.
+
+#### Shared and event kinds (last)
+
+Kinds: `ember_firelord` (the cross guardian in ten zones, one shared art), and the seasonal event guardians `hollow_rider`, `grinch`, `bloomwarden`, `birchcrown`, `briarheart`, `starrocketeer` (recently made native PixelFlow art).
+
+- [ ] `SHARED-SLIME-ART` — Redraw `ember_firelord` slime-style once, with a fitting fire-giant death; audit the six event guardians against the slime style and the death rule, and redo only those that do not fit (keep their IDs and event rules). Stage for approval.
+- [ ] `SHARED-SLIME-ROLLBACK` — Keep the previous art, manifests and PixelFlow IDs for these kinds and provide a one-command rollback.
+- [ ] `SHARED-SLIME-CHECK` — Bounded real-art check including distinct, fitting death clips; no full suites.
+- [ ] `SHARED-SLIME-FILEDROP` — Upload before/after and death-clip pictures and verify hashes. Deployment only after the owner approves.
 
 
 ### Seasonal NPC hair accessories and two-hour festival buff (owner request, 2026-11-03)

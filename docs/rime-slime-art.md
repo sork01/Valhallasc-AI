@@ -1,9 +1,12 @@
 # Rimeveil Glacier: slime-style artwork candidate
 
-All four `RIME-SLIME` TODO deliverables are privately complete as **Beta 1.39.1**
-in `/media/raid/valhallasc-data/rime-slime-work`, branch `feat/rime-slime-art`,
-based on main `9dea2cc`. Local/uncommitted; not pushed, merged or deployed.
-TODO.md requires the owner's picture review and approval before public replacement.
+Released as **Beta 1.39.1** on 2026-11-03 after the owner requested deployment.
+Source **2d1d2da**, initially prepared in
+`/media/raid/valhallasc-data/rime-slime-work` on `feat/rime-slime-art`, based on
+main `9dea2cc`, is merged into main. All seven public art/version/notes hashes
+match the tested source; public and bridge health are healthy. The server PID
+and executable hash stayed unchanged: this release required no restart or DB work.
+Release receipt: `test-results/rime-release-20261103T173005Z.json`.
 
 The four kinds now share Greenmeadow's glossy pixel shading, large white eyes,
 highlights, blush and chunky proportions, retaining their frost colours and
@@ -75,7 +78,7 @@ Omit `--apply` for dry run. It validates all five sources before writing,
 atomically replaces each art file, then verifies the restored hashes. Version
 labels and notes are separate from art rollback. Tested on disposable candidate
 copies: all five hashes restored; a corrupt backup was refused without changes.
-Live art remains byte-identical to this backup.
+The backup retains the prior live art; the public assets now match the tested new source.
 
 ## Focused verification
 
@@ -97,8 +100,11 @@ checks pass. No full suites, grinding, encounter tests or balance/timing sweeps.
 ```sh
 PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/rime-slime-art.cjs
 python3 scripts/rime_slime_review.py review
-python3 scripts/rime_slime_review.py verify
 ```
+
+`rime_slime_review.py verify` records pre-deployment rollback/original-live-art
+proof and expects the original public art. After release, use
+`python3 scripts/make_rime_sprites.py verify` for editor/export equality instead.
 
 ## Owner pictures
 
@@ -115,7 +121,8 @@ Pictures compare both idle and final death poses at equal 2× scale. Frame sheet
 show every pose; GIFs show original animation rates and briefly hold the final
 death pose. Upload is a separate explicit `rime_slime_review.py upload` action.
 
-The main TODO queue is current; this worktree's TODO snapshot is older and must
-not overwrite it. Rimeveil, Crags and Greenmeadow private candidates each label
-themselves Beta 1.39.1: reconcile current release/notes/Swedish keep entries when
-combining approved candidates. Next queued zone: Gloamfen.
+The main TODO queue records the release; next zone is Gloamfen. Greenmeadow and
+Crags remain separate private candidates, still labelled 1.39.1. Rebase their
+release labels/notes/Swedish keep entries against the current live version before
+any later approved deployment. The Greenmeadow work is preserved separately as
+`5d4a3ee` on `feat/meadow-slime-art`; it was not included in this release.
