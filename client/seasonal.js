@@ -6,7 +6,7 @@
   const hosts=new Set(['baker','city_bard','nacre_gardener','asterion_singer']);
   const halloween=()=>events.some(e=>e.id==='halloween');
   const christmas=()=>events.some(e=>e.id==='christmas');
-  const eligible=n=>(halloween()||christmas()) && [0,4,9,17].includes(window.Field?.zone||0) && [areas[window.Field?.zone||0]?.city].some(h=>h&&n.x>=h.x0&&n.x<=h.x1&&n.y>=h.y0&&n.y<=h.y1) && !n.travelStop && !['stone','scenery'].includes(n.art) && n.id.indexOf('meetingstone')<0 && n.art!=='stone';
+  const eligible=n=>(halloween()||christmas()) && [0,4,9,17].includes(window.Field?.zone||0) && [areas[window.Field?.zone||0]?.city].some(h=>h&&n.x>=h.x0&&n.x<=h.x1&&n.y>=h.y0&&n.y<=h.y1) && !n.travelStop && !['stone','scenery','mailbox'].includes(n.art) && n.id.indexOf('meetingstone')<0 && n.art!=='stone';
   const line=(g,points,color,width=2)=>{g.strokeStyle=color;g.lineWidth=width;g.beginPath();points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();};
   const ellipse=(g,x,y,rx,ry,color)=>{g.fillStyle=color;g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fill();};
   City.art.festivalPumpkins={box:[132,110,66,96],draw(g,o){

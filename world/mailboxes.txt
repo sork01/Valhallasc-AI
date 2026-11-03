@@ -1,0 +1,310 @@
+[
+  {
+    "id": "mailbox_0_alderhaven",
+    "zone": 0,
+    "hub": "Alderhaven",
+    "x": 38.17,
+    "y": 87.99,
+    "anchor": {
+      "x": 36.5,
+      "y": 85.5
+    }
+  },
+  {
+    "id": "mailbox_1_cinderwatch_camp",
+    "zone": 1,
+    "hub": "Cinderwatch Camp",
+    "x": 50.62,
+    "y": 85.62,
+    "anchor": {
+      "x": 48.5,
+      "y": 83.5
+    }
+  },
+  {
+    "id": "mailbox_2_rimeward_camp",
+    "zone": 2,
+    "hub": "Rimeward Camp",
+    "x": 66.62,
+    "y": 117.62,
+    "anchor": {
+      "x": 64.5,
+      "y": 115.5
+    }
+  },
+  {
+    "id": "mailbox_3_lanternmere",
+    "zone": 3,
+    "hub": "Lanternmere",
+    "x": 66.17,
+    "y": 23.99,
+    "anchor": {
+      "x": 64.5,
+      "y": 21.5
+    }
+  },
+  {
+    "id": "mailbox_4_skaldholm",
+    "zone": 4,
+    "hub": "Skaldholm",
+    "x": 83.27,
+    "y": 129.65,
+    "anchor": {
+      "x": 80.5,
+      "y": 128.5
+    }
+  },
+  {
+    "id": "mailbox_6_hollowmoot",
+    "zone": 6,
+    "hub": "Hollowmoot",
+    "x": 25.62,
+    "y": 155.62,
+    "anchor": {
+      "x": 23.5,
+      "y": 153.5
+    }
+  },
+  {
+    "id": "mailbox_6_skuldwatch",
+    "zone": 6,
+    "hub": "Skuldwatch",
+    "x": 91.5,
+    "y": 89.5,
+    "anchor": {
+      "x": 88.5,
+      "y": 89.5
+    }
+  },
+  {
+    "id": "mailbox_7_heimdall_s_perch",
+    "zone": 7,
+    "hub": "Heimdall's Perch",
+    "x": 89.27,
+    "y": 136.65,
+    "anchor": {
+      "x": 86.5,
+      "y": 135.5
+    }
+  },
+  {
+    "id": "mailbox_8_keelhaven",
+    "zone": 8,
+    "hub": "Keelhaven",
+    "x": 89.27,
+    "y": 155.65,
+    "anchor": {
+      "x": 86.5,
+      "y": 154.5
+    }
+  },
+  {
+    "id": "mailbox_9_nacrehold",
+    "zone": 9,
+    "hub": "Nacrehold",
+    "x": 103.5,
+    "y": 164.5,
+    "anchor": {
+      "x": 100.5,
+      "y": 164.5
+    }
+  },
+  {
+    "id": "mailbox_13_astralhollow",
+    "zone": 13,
+    "hub": "Astralhollow",
+    "x": 79.5,
+    "y": 119.5,
+    "anchor": {
+      "x": 76.5,
+      "y": 119.5
+    }
+  },
+  {
+    "id": "mailbox_14_the_last_shade",
+    "zone": 14,
+    "hub": "The Last Shade",
+    "x": 79.5,
+    "y": 119.5,
+    "anchor": {
+      "x": 76.5,
+      "y": 119.5
+    }
+  },
+  {
+    "id": "mailbox_15_the_stillpoint",
+    "zone": 15,
+    "hub": "The Stillpoint",
+    "x": 46.99,
+    "y": 121.17,
+    "anchor": {
+      "x": 44.5,
+      "y": 119.5
+    }
+  },
+  {
+    "id": "mailbox_16_lamplight_refuge",
+    "zone": 16,
+    "hub": "Lamplight Refuge",
+    "x": 46.99,
+    "y": 121.17,
+    "anchor": {
+      "x": 44.5,
+      "y": 119.5
+    }
+  },
+  {
+    "id": "mailbox_17_asterion",
+    "zone": 17,
+    "hub": "Asterion",
+    "x": 93.5,
+    "y": 114.5,
+    "anchor": {
+      "x": 90.5,
+      "y": 114.5
+    }
+  },
+  {
+    "id": "mailbox_19_breakwater_camp",
+    "zone": 19,
+    "hub": "Breakwater Camp",
+    "x": 45.5,
+    "y": 119.5,
+    "anchor": {
+      "x": 42.5,
+      "y": 119.5
+    }
+  },
+  {
+    "id": "mailbox_20_millbridge",
+    "zone": 20,
+    "hub": "Millbridge",
+    "x": 49.5,
+    "y": 118.5,
+    "anchor": {
+      "x": 46.5,
+      "y": 118.5
+    }
+  },
+  {
+    "id": "mailbox_21_jubilee_crossroads",
+    "zone": 21,
+    "hub": "Jubilee Crossroads",
+    "x": 39.56,
+    "y": 83.91,
+    "anchor": {
+      "x": 42.5,
+      "y": 84.5
+    }
+  },
+  {
+    "id": "mailbox_22_banyan_landing",
+    "zone": 22,
+    "hub": "Banyan Landing",
+    "x": 37.65,
+    "y": 127.27,
+    "anchor": {
+      "x": 36.5,
+      "y": 124.5
+    }
+  },
+  {
+    "id": "mailbox_23_veyrroot_canopy",
+    "zone": 23,
+    "hub": "Veyrroot Canopy",
+    "x": 85.5,
+    "y": 96.5,
+    "anchor": {
+      "x": 82.5,
+      "y": 96.5
+    }
+  },
+  {
+    "id": "mailbox_24_veyrroot_heartwood",
+    "zone": 24,
+    "hub": "Veyrroot Heartwood",
+    "x": 51.5,
+    "y": 49.5,
+    "anchor": {
+      "x": 48.5,
+      "y": 49.5
+    }
+  },
+  {
+    "id": "mailbox_25_azure_wells",
+    "zone": 25,
+    "hub": "Azure Wells",
+    "x": 47.5,
+    "y": 135.5,
+    "anchor": {
+      "x": 44.5,
+      "y": 135.5
+    }
+  },
+  {
+    "id": "mailbox_26_frostwake_station",
+    "zone": 26,
+    "hub": "Frostwake Station",
+    "x": 49.5,
+    "y": 143.5,
+    "anchor": {
+      "x": 46.5,
+      "y": 143.5
+    }
+  },
+  {
+    "id": "mailbox_27_boulderwatch",
+    "zone": 27,
+    "hub": "Boulderwatch",
+    "x": 50.5,
+    "y": 153.5,
+    "anchor": {
+      "x": 47.5,
+      "y": 153.5
+    }
+  },
+  {
+    "id": "mailbox_28_springmere",
+    "zone": 28,
+    "hub": "Springmere",
+    "x": 87.5,
+    "y": 326.5,
+    "anchor": {
+      "x": 84.5,
+      "y": 326.5
+    }
+  },
+  {
+    "id": "mailbox_28_solhaven",
+    "zone": 28,
+    "hub": "Solhaven",
+    "x": 331.5,
+    "y": 318.5,
+    "anchor": {
+      "x": 328.5,
+      "y": 318.5
+    }
+  },
+  {
+    "id": "mailbox_28_harvestwatch",
+    "zone": 28,
+    "hub": "Harvestwatch",
+    "x": 332.5,
+    "y": 80.5,
+    "anchor": {
+      "x": 329.5,
+      "y": 80.5
+    }
+  },
+  {
+    "id": "mailbox_28_rimehold",
+    "zone": 28,
+    "hub": "Rimehold",
+    "x": 89.5,
+    "y": 80.5,
+    "anchor": {
+      "x": 86.5,
+      "y": 80.5
+    }
+  }
+]

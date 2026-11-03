@@ -1298,6 +1298,10 @@ pub enum ClientMessage {
         id: u64,
     },
     /// The bank (docs/bank.md, server/src/world/bank.rs). Each names the banker the window was opened with.
+    Mail {
+        npc: String,
+        request: crate::mail::Request,
+    },
     BankOpen {
         npc: String,
     },

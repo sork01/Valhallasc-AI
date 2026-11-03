@@ -26,6 +26,9 @@ pub fn filter_view(view: &mut Value, viewer: &str) {
         for player in players {
             if let Some(object) = player.as_object_mut() {
                 object.remove("session");
+                if object.get("id").and_then(Value::as_str) != Some(viewer) {
+                    object.remove("mailUnread");
+                }
             }
         }
     }

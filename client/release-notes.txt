@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.36.0",
+    "date": "2026-11-03",
+    "new": [
+      "Mailboxes in every city and hub let you send letters, gold and unbound items to other characters, even while they are offline.",
+      "Read and collect your mail, return unwanted attachments, and see when new letters arrive."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.35.4",
     "date": "2026-11-02",
     "new": [],
@@ -7,7 +17,7 @@
       "Named shop and service signs float above their rooftops, clear of house decorations."
     ],
     "removed": [
-      "Removed street-and-number plaques from residential houses to keep the architecture visible."
+      "Removed street-and-number plaques from residential houses so the architecture stays visible."
     ]
   },
   {

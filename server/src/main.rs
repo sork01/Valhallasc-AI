@@ -6,6 +6,7 @@ mod bossmech;
 mod bosssign;
 mod cathedral;
 mod items;
+mod mail;
 mod model;
 mod notify;
 mod perks;
