@@ -683,3 +683,40 @@ distinct quests unlocks **the Merry** or **the Hallowed**. All seven mounts trav
 at **160% of walking speed**. Quests/scenery retire automatically; earned mounts
 and titles stay. See [Christmas](docs/christmas-event.md), [mounts](docs/mounts.md)
 and [achievements](docs/achievements.md).
+
+### Summer Solstice candidate
+
+Private Beta 1.37.0 adds the annual astronomical June-solstice season (Stockholm
+date S−4 through S+4), Swedish Midsummer city dressing, four annual errands and
+the daily five-fighter Birchcrown Guardian with a personal 5% Sunwoven Stag
+mount chance. Owning overlay `scripts/solstice_event.py` follows Easter through
+`node scripts/sync-world.cjs`; rebuild Rust afterwards. Art is saved in
+PixelFlow via `make_solstice_sprites.py` and `make_mount_sprites.py build/export
+sunwoven`. Rules, supported calendar years, integration notes and validation:
+[summer-solstice-event.md](docs/summer-solstice-event.md),
+[summer-solstice-validation.md](docs/summer-solstice-validation.md). No new
+zones, schema or private-copy ID migration; not deployed.
+### New Year (Beta 1.36.0)
+
+December 29–January 2 uses the authoritative Stockholm calendar, including the
+January year rollover. Fireworks appear worldwide, densely inside the four
+main city boundaries and sparsely elsewhere. Reduced motion uses a still display.
+One shared daily quest summons the five-fighter Starfire Rocketeer at the
+Festival Launchpad in Rimeveil. Each eligible real participant has one personal
+5% Starflight Rocket chance per day; claiming the quest grants Ring in the New
+Year (25 points), regardless of the mount roll. Permanent rewards survive expiry.
+
+Rules and focused evidence: [New Year](docs/new-year-event.md),
+[validation](docs/new-year-validation.md). `scripts/newyear_event.py` runs from
+`seasonal_cities.py` during `node scripts/sync-world.cjs`; rebuild Rust after
+sync. No geography or zone/copy IDs change. Original PixelFlow sources are
+preserved in `assets/newyear.txt` and `assets/mounts_sprites.txt`.
+
+### Shared seasonal dances and accessories (private Beta 1.38.0)
+
+All six seasons now share four-city dance landmarks and Festival Spirit. Press
+the centerpiece and complete two guided circuits for two hours of +10% attack
+and +50% XP. Solstice flowers, Valentine hearts and Easter eggs follow animated
+NPC hair/head sockets. Generator: `scripts/season_dance.py` via sync-world; no
+new zones/copy-ID migration. Rules: docs/seasonal-events.md; focused checks and
+requested FileDrop pictures: docs/festival-spirit-validation.md. Not deployed.

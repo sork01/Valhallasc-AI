@@ -92,3 +92,8 @@ absence of test flags and absence of journal warnings/errors are verified.
 The feature installation epoch is 1793169798 (2026-10-28 06:43:18 UTC).
 No public test character or per-character backfill was used. Rested begins
 accruing for existing offline characters from that installation time.
+
+Festival Spirit (private Beta1.38.0) adds50% base XP alongside rebirth/Hierloom
+in `boosted_xp`. Rested still adds200% base and spends only its own bonus. A
+base100 reward with only Festival Spirit+Rested pays350, not450. See
+seasonal-events.md for the two-hour saved expiry and validation.

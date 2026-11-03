@@ -758,5 +758,13 @@
   "grinch": [
     1.0,
     1.0
+  ],
+  "birchcrown": [
+    1,
+    1
+  ],
+  "starrocketeer": [
+    1.0,
+    1.0
   ]
 }

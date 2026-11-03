@@ -762,6 +762,9 @@
     knight: { name: 'Drowned Knight', scale: 1.15, top: 87, col: ['#cde8d4', '#6a8d7a', '#2d403c'] },
     hydra: { name: 'Mire Hydra', scale: 1.3, top: 70, col: ['#b0d6a0', '#4b7a74', '#233040'] },
     bloomwarden:{name:'The Bloomwarden',elite:true,scale:1.7,top:88,col:['#ef829d','#509274','#513448']},
+    briarheart:{name:'The Briarheart',elite:true,scale:1.7,top:88,col:['#e8c967','#60904e','#65425d']},
+    starrocketeer:{name:'The Starfire Rocketeer',elite:true,scale:1.7,top:88,col:['#e8c967','#60904e','#65425d']},
+    birchcrown:{name:'The Birchcrown Guardian',elite:true,scale:1.7,top:88,col:['#ef829d','#509274','#513448']},
     grinch:{name:'The Grinch',elite:true,scale:1.7,top:88,col:['#badb73','#cf5d5b','#234937']},
     hollow_rider:{name:'The Hollow Rider',elite:true,scale:1.8,top:88,col:['#ffbd62','#40354f','#151421']},
     gloomroot: { name: 'Gloomroot Colossus', elite: true, scale: 1.8, top: 85, col: ['#8affd8', '#57412a', '#12100c'] },
@@ -924,7 +927,7 @@
     // Server fight state selects the raid finale; proximity and a selected target do not.
     const raidFinalFight = !!zdef.raid && (window.BossMech?.fights || []).some(f =>
       slimes.some(s => s.id === f.boss && s.kind === zdef.final_boss && !s.dead));
-    const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
+    const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, festivalBuff:hero.festivalBuff, festivalDance:hero.festivalDance, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -1188,6 +1191,10 @@
     window.Halloween?.sync(packet.halloween,own.seasonalRolls,packet.seasons);
     window.Christmas?.sync(packet.christmas,own.seasonalRolls,packet.seasons);
     window.Easter?.sync(packet.easter,own.seasonalRolls,packet.seasons);
+    window.Valentines?.sync(packet.valentine,own.seasonalClaims,packet.seasons);
+    window.NewYear?.sync(packet.newyear,own.seasonalRolls,packet.seasons);
+    window.Solstice?.sync(packet.solstice,own.seasonalRolls,packet.seasons);
+    window.Festival?.sync(own.festivalDance,own.festivalBuff,packet.seasons);
     explored = Array.isArray(own.explored) ? own.explored : null;
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
@@ -2850,6 +2857,9 @@
   for (const [kinds, source, load] of [
     [['hollow_rider'],()=>window.Halloween?.source,()=>window.Halloween?.load()],
     [['bloomwarden'],()=>window.Easter?.source,()=>window.Easter?.load()],
+    [['briarheart'],()=>window.Valentines?.source,()=>window.Valentines?.load()],
+    [['starrocketeer'],()=>window.NewYear?.source,()=>window.NewYear?.load()],
+    [['birchcrown'],()=>window.Solstice?.source,()=>window.Solstice?.load()],
     [['grinch'],()=>window.Christmas?.source,()=>window.Christmas?.load()],
     [CATHEDRAL_KINDS, () => cathedralSrc, loadCathedralSprites],
     [YEAR_KINDS, () => yearSrc, loadYearSprites],
@@ -3946,6 +3956,9 @@
     window.Halloween?.drawFloor(g,zone,w2s);
     window.Christmas?.drawFloor(g,zone,w2s);
     window.Easter?.drawFloor(g,zone,w2s);
+    window.Valentines?.drawFloor(g,zone,w2s);
+    window.NewYear?.drawFloor(g,zone,w2s);
+    window.Solstice?.drawFloor(g,zone,w2s);
     // Flat authored terrain belongs below actors, irrespective of its anchor depth.
     for (const o of objects) if (City.art[o.kind]?.ground) {
       const [sx, sy] = w2s(o.x, o.y), box = City.art[o.kind].box;
@@ -3976,7 +3989,7 @@
     // build the depth-sorted list of everything standing on the ground
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
     const set = spriteSet();
-    for (const source of [objects,window.Seasonal?.decor(zone)||[],window.Halloween?.objects(zone)||[],window.Christmas?.objects(zone)||[],window.Easter?.objects(zone)||[]]) for (const o of source) {
+    for (const source of [objects,window.Seasonal?.decor(zone)||[],window.Halloween?.objects(zone)||[],window.Christmas?.objects(zone)||[],window.Easter?.objects(zone)||[],window.Solstice?.objects(zone)||[],window.Valentines?.objects(zone)||[]]) for (const o of source) {
       if (o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
       if (City.art[o.kind]?.ground) continue;
       const [sx, sy] = w2s(o.x, o.y,o.z||0);
@@ -4220,11 +4233,15 @@
     if (CathedralArt.isTheme(zdef.theme)) CathedralArt.weather(g,zdef.theme,t,VW,VH);
     if (zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme)) { drawDarkness(g, t); drawBossBar(g); }
     if (zdef.theme === 'moonwell') drawBossBar(g);
+    window.NewYear?.drawFireworks(g,zone,hero,t,VW,VH,reducedMotion());
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     window.Halloween?.drawLabel(g,zone,w2s);
     window.Christmas?.drawLabel(g,zone,w2s);
     window.Easter?.drawLabel(g,zone,w2s);
+    window.Valentines?.drawLabel(g,zone,w2s);
+    window.NewYear?.drawLabel(g,zone,w2s);
+    window.Solstice?.drawLabel(g,zone,w2s);
     window.ExitPaths?.labels(g,zdef,ZONES,w2s,hero,zoom);
     window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
     drawQuestArrow(g);

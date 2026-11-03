@@ -25,7 +25,7 @@
   drawFloor(g,zone,w2s){if(!state||zone!==2)return;const[x,y]=w2s(state.x,state.y);g.save();g.strokeStyle=state.active?'#f1c3d2':'#abd3ac';g.fillStyle='#c6e6d329';g.lineWidth=4;g.beginPath();g.ellipse(x,y,state.radius*62.225,state.radius*31.112,0,0,Math.PI*2);g.fill();g.stroke();g.restore();},
   drawLabel(g,zone,w2s){if(!state||zone!==2)return;const[x,y]=w2s(state.x,state.y,130);g.save();g.font='20px "Jua",sans-serif';g.textAlign='center';g.strokeStyle='#263d38';g.lineWidth=5;g.fillStyle='#fff0cf';const lines=[state.active?`The Bloomwarden · Level ${state.level}`:'Five fighters · highest party level',rolls.easter_hunt===day?'Daily mount roll used · resets at Stockholm midnight':'Daily Springtide Bunny chance: 5% per hero'];for(const[i,t]of lines.entries()){const text=window.Locale?.translate(t)||t;g.strokeText(text,x,y+i*25);g.fillText(text,x,y+i*25);}g.restore();},
   head(n,t,talk=false){return window.Christmas.head(n,t,talk);},
-  headTop(n,t=0){const h=this.head(n,t);return -h.y+25*h.width/17;},
-  drawNpc(g,n,t,top,talk=false){const h=this.head(n,t,talk),s=h.width/17;g.save();g.translate(h.x,0);ribbon(g,0,h.collar+2,0.65*s);line(g,[[-10*s,h.y+2*s],[0,h.y-2*s],[10*s,h.y+2*s]],'#8fb18c',3*s);for(const side of [-1,1]){ellipse(g,side*6*s,h.y-10*s,3*s,12*s,'#f8f1e8');ellipse(g,side*6*s,h.y-11*s,1.4*s,8*s,'#edbed2');flower(g,side*10*s,h.y+2*s,4*s);}g.restore();}
+  headTop(n,t=0){const h=this.head(n,t);return -h.y+8*h.width/17;},
+  drawNpc(g,n,t,top,talk=false){const h=this.head(n,t,talk),s=h.width/17;g.save();g.translate(h.x,0);ribbon(g,0,h.collar+2,.45*s);for(const[x,y,r,c]of[[-6,3,4.3,'#f0bad3'],[5,3,4.6,'#badbc2']]){ellipse(g,x*s,h.y+5*s,5*s,2*s,'#82985b');egg(g,x*s,h.y+y*s,r*s,c);line(g,[[(x-r*.55)*s,h.y+(y+1)*s],[(x+r*.55)*s,h.y+(y+1)*s]],'#e5b94c',1.3*s);}g.restore();}
  };
 })();

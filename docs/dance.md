@@ -26,3 +26,11 @@ consistent online/stopped SQLite backups and previous client files). Its
 Public/bridge health, exact running binary, SQLite quick_check, unchanged 30 saved
 characters, absence of test flags and absence of journal errors were verified.
 No public guest was created. Reload the game to load the dance renderer.
+
+## Guided festival circuits (private Beta 1.38.0)
+
+The original stationary chat emote retains its behavior. Seasonal centerpiece
+interactions reuse its choreography while server-owned legal movement completes
+two full circles. No client lap claims are accepted. See seasonal-events.md and
+festival-spirit-validation.md for interruptions, persistent two-hour rewards and
+focused validation.

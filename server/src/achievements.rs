@@ -24,6 +24,8 @@ pub struct Achievement {
     pub target: u32,
     pub points: u32,
     pub title: String,
+    #[serde(default)]
+    pub title_prefix: bool,
     pub mount: String,
     pub zone: Option<usize>,
     /// Exact distinct boss or quest IDs required by a catalog set.
@@ -167,6 +169,17 @@ impl Character {
             })
             .map_or("", |a| a.title.as_str())
     }
+    pub fn achievement_title_position(&self) -> &str {
+        if catalog().iter().any(|a| {
+            a.id == self.achievements.title
+                && a.title_prefix
+                && self.achievements.completed.contains(&a.id)
+        }) {
+            "prefix"
+        } else {
+            "suffix"
+        }
+    }
     pub fn select_achievement_title(&mut self, id: &str) -> Result<(), &'static str> {
         if !id.is_empty()
             && !catalog().iter().any(|a| {
@@ -190,7 +203,7 @@ impl Character {
             "maximum":catalog().iter().map(|a| a.points).sum::<u32>(), "selected":self.achievements.title,
             "entries":catalog().iter().map(|a| json!({"id":a.id,"name":a.name,"description":a.description,
                 "category":a.category,"points":a.points,"target":a.target,"progress":self.achievement_progress(a),
-                "complete":self.achievements.completed.contains(&a.id),"title":a.title,"mount":a.mount})).collect::<Vec<_>>()})
+                "complete":self.achievements.completed.contains(&a.id),"title":a.title,"titlePosition":if a.title_prefix {"prefix"} else {"suffix"},"mount":a.mount})).collect::<Vec<_>>()})
     }
 }
 
@@ -250,12 +263,12 @@ mod tests {
     }
     #[test]
     fn achievements_catalog_has_positive_points_and_correct_atlas_and_rewards() {
-        assert_eq!(catalog().len(), 105);
+        assert_eq!(catalog().len(), 107);
         assert_eq!(regions().len(), 23);
         assert_eq!(regions().iter().collect::<BTreeSet<_>>().len(), 23);
         let c = hero();
         let view = c.achievement_view();
-        assert_eq!(view["maximum"], 2275);
+        assert_eq!(view["maximum"], 2325);
         for a in catalog() {
             if a.metric == "fog" {
                 assert!(regions().contains(&a.zone.unwrap()));
@@ -264,7 +277,7 @@ mod tests {
                 assert_eq!(a.target, (regions().len() * FOG_GRID * FOG_GRID) as u32);
             }
         }
-        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 9);
+        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 10);
         assert_eq!(catalog().iter().filter(|a| !a.mount.is_empty()).count(), 1);
     }
     #[test]
@@ -433,7 +446,7 @@ mod tests {
         assert_eq!(c.achievement_points(), 685);
         assert!(c.sync_achievements().is_empty());
         assert_eq!(c.achievement_points(), 685);
-        assert_eq!(c.achievement_view()["maximum"], 2275);
+        assert_eq!(c.achievement_view()["maximum"], 2325);
         assert_eq!(c.achievement_title(), "The Explorer");
         assert_eq!(c.mounts, ["gryphon"]);
     }

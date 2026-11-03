@@ -112,9 +112,87 @@ fn easter_sunday(year: u32) -> (u32, u32) {
     let n = h + l - 7 * m + 114;
     (n / 31, n % 31 + 1)
 }
+/// Meeus (2nd ed.), ch. 27, June solstice with all Table 27.C periodic terms.
+/// TT -> UT: Espenak/Meeus delta-T polynomials (NASA). See independent fixtures.
+/// Deliberately bounded to 2000..=2099; fail closed outside the validated range.
+fn june_solstice(year: u32) -> Option<u64> {
+    if !(2000..=2099).contains(&year) {
+        return None;
+    }
+    let y = (f64::from(year) - 2000.) / 1000.;
+    let jde0 = 2451716.56767 + 365241.62603 * y + 0.00325 * y * y + 0.00888 * y.powi(3)
+        - 0.00030 * y.powi(4);
+    let t = (jde0 - 2451545.) / 36525.;
+    let w = (35999.373 * t - 2.47).to_radians();
+    let dl = 1. + 0.0334 * w.cos() + 0.0007 * (2. * w).cos();
+    let terms: [(f64, f64, f64); 24] = [
+        (485., 324.96, 1934.136),
+        (203., 337.23, 32964.467),
+        (199., 342.08, 20.186),
+        (182., 27.85, 445267.112),
+        (156., 73.14, 45036.886),
+        (136., 171.52, 22518.443),
+        (77., 222.54, 65928.934),
+        (74., 296.72, 3034.906),
+        (70., 243.58, 9037.513),
+        (58., 119.81, 33718.147),
+        (52., 297.17, 150.678),
+        (50., 21.02, 2281.226),
+        (45., 247.54, 29929.562),
+        (44., 325.15, 31555.956),
+        (29., 60.93, 4443.417),
+        (18., 155.12, 67555.328),
+        (17., 288.79, 4562.452),
+        (16., 198.04, 62894.029),
+        (14., 199.76, 31436.921),
+        (12., 95.39, 14577.848),
+        (12., 287.11, 31931.756),
+        (12., 320.81, 34777.259),
+        (9., 227.73, 1222.114),
+        (8., 15.45, 16859.074),
+    ];
+    let correction = terms
+        .iter()
+        .map(|(a, b, c)| a * (b + c * t).to_radians().cos())
+        .sum::<f64>();
+    let decimal_year = f64::from(year) + 5.5 / 12.;
+    let delta_t = if decimal_year < 2005. {
+        let u = decimal_year - 2000.;
+        63.86 + 0.3345 * u - 0.060374 * u.powi(2)
+            + 0.0017275 * u.powi(3)
+            + 0.000651814 * u.powi(4)
+            + 0.00002373599 * u.powi(5)
+    } else if decimal_year < 2050. {
+        let u = decimal_year - 2000.;
+        62.92 + 0.32217 * u + 0.005589 * u * u
+    } else {
+        -20. + 32. * ((decimal_year - 1820.) / 100.).powi(2) - 0.5628 * (2150. - decimal_year)
+    };
+    Some(((jde0 + 0.00001 * correction / dl - 2440587.5) * 86400. - delta_t).round() as u64)
+}
+fn stockholm_date(unix: u64) -> (u32, u32, u32) {
+    date(
+        unix + if summer(unix, date(unix).0) {
+            7200
+        } else {
+            3600
+        },
+    )
+}
 fn interval(event: &Event, year: u32) -> (u64, u64) {
-    if event.calendar.as_deref() == Some("gregorianEaster") {
-        let (month, day) = easter_sunday(year);
+    if matches!(
+        event.calendar.as_deref(),
+        Some("gregorianEaster" | "juneSolstice")
+    ) {
+        let (month, day) = if event.calendar.as_deref() == Some("juneSolstice") {
+            let Some(unix) = june_solstice(year) else {
+                return (0, 0);
+            };
+            let (_, month, day) = stockholm_date(unix);
+            (month, day)
+        } else {
+            easter_sunday(year)
+        };
         let ordinal = day_number(year, month, day) as i64;
         // Shift LOCAL calendar dates first. Each midnight has its own CET/CEST offset.
         let boundary = |offset: i32| {
@@ -135,13 +213,7 @@ fn interval(event: &Event, year: u32) -> (u64, u64) {
     }
 }
 pub fn active_at(unix: u64) -> Vec<Active> {
-    let (year, month, day) = date(
-        unix + if summer(unix, date(unix).0) {
-            7200
-        } else {
-            3600
-        },
-    );
+    let (year, month, day) = stockholm_date(unix);
     let calendar_day = year * 10000 + month * 100 + day;
     EVENTS
         .iter()
@@ -227,6 +299,56 @@ impl Calendar {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn solstice_matches_independent_usno_instants_and_stockholm_dates() {
+        let data: serde_json::Value =
+            serde_json::from_str(include_str!("../../docs/solstice-calendar-reference.txt"))
+                .unwrap();
+        for row in data["samples"].as_array().unwrap() {
+            let year = row["year"].as_u64().unwrap() as u32;
+            let unix = june_solstice(year).unwrap();
+            let reference = row["unix"].as_u64().unwrap();
+            assert!(
+                unix.abs_diff(reference) <= 180,
+                "{year}: {} seconds",
+                unix.abs_diff(reference)
+            );
+            let (y, m, d) = stockholm_date(unix);
+            assert_eq!(
+                format!("{y:04}-{m:02}-{d:02}"),
+                row["stockholmDate"].as_str().unwrap()
+            );
+        }
+        assert!(june_solstice(1999).is_none());
+        assert!(june_solstice(2100).is_none());
+    }
+    #[test]
+    fn solstice_nine_local_dates_start_last_day_expiry_and_leap_years() {
+        let event = EVENTS.iter().find(|e| e.id == "solstice").unwrap();
+        for year in [
+            2000, 2008, 2012, 2016, 2024, 2026, 2027, 2048, 2050, 2096, 2099,
+        ] {
+            let (_, m, d) = stockholm_date(june_solstice(year).unwrap());
+            let (start, end) = interval(event, year);
+            assert_eq!(start, midnight(year, m, d - 4));
+            assert_eq!(end, midnight(year, m, d + 5));
+            assert_eq!(end - start, 9 * 86400);
+            for (at, expected) in [
+                (start - 1, false),
+                (start, true),
+                (midnight(year, m, d + 4), true),
+                (end - 1, true),
+                (end, false),
+            ] {
+                assert_eq!(
+                    active_at(at).iter().any(|e| e.id == "solstice"),
+                    expected,
+                    "{year}, {at}"
+                );
+            }
+        }
+        assert_eq!(interval(event, 2100), (0, 0));
+    }
     #[test]
     fn easter_computus_matches_independent_usno_dates() {
         // USNO /calculated/observances/christian?year=YEAR, fetched 2026-11-03.

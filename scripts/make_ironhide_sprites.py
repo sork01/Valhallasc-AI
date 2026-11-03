@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """makesprites workflow: preview | build [--replace] | export.
 
-Build saves one NEW valhallasc_ironhide_all sprite in PixelFlow (34 frames). It refuses
+Build saves a NEW valhallasc_ironhide_slime_style_all sprite in PixelFlow (34 frames),
+preserving the original a3f8837048d1098c. It refuses
 existing names unless --replace is given; --replace discards their hand edits.
 Export reads editor frames back so edits survive. No original Valhalla art is touched.
 Needs numpy/Pillow; build/export also need PixelFlow and its local agent key.
@@ -22,87 +23,88 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
 W, H, AX, AY = 72, 64, 36, 60
-PREFIX = 'valhallasc_ironhide_'
-PALETTE = ['#00000000', '#171e2b', '#324658', '#58758a', '#8aafbf',
-           '#d8e9e6', '#79472b', '#bf8548', '#f4cb78', '#e7523e', '#fff0bc']
+PREFIX = 'valhallasc_ironhide_slime_style_'
+PALETTE = ['#00000000','#25364c','#3b5571','#6084a4','#8bb4cb','#bfdee2','#e8f5e9',
+           '#5b4031','#8a5e3c','#bd8b50','#ebc879','#fff1bd','#edf5e8','#ffffff','#d9a177']
 CLIPS = {'idle': (6, 6), 'walk': (10, 8), 'attack': (12, 8),
          'hurt': (10, 4), 'die': (8, 8)}
 
 
 def frame(clip, n):
-    """Fixed foot anchor, right facing; a steel shell, six legs and a bronze horn."""
-    im = Image.new('P', (W, H), 0)
-    d = ImageDraw.Draw(im)
-    lean, lift, squash = 0, 0, 1
-    if clip == 'idle':
-        lift = [0, 1, 2, 1, 0, 0][n]
-    elif clip == 'walk':
-        lift = [0, 0, 2, 5, 3, 0, 0, 0][n]
-    elif clip == 'attack':
-        lean = [-1, -3, -4, 2, 5, 6, 2, 0][n]
-        lift = [0, 0, 0, 3, 5, 0, 0, 0][n]
-        squash = [.95, .9, .85, 1.05, 1, .9, .95, 1][n]
-    elif clip == 'hurt':
-        lean = [-4, -2, -1, 0][n]
-    elif clip == 'die':
-        lean = -min(n, 4)
-        squash = max(.28, 1 - max(0, n - 1) * .14)
-    cx, cy = AX - 3 + lean, AY - 19 - lift
-    ry = round(13 * squash)
-    dead = clip == 'die' and n >= 2
-    if dead:
-        cy = AY - ry - 4
-    # Far legs, then body, then near legs: the silhouette stays articulated.
-    stride = math.sin(n * math.pi / 2) * 3 if clip == 'walk' else 0
-    for side in (-1, 1):
-        for k in range(3):
-            lx = cx - 12 + k * 10
-            phase = stride * (-1 if k == 1 else 1)
-            ly = cy + (3 if side == 1 else -5)
-            tip = (round(lx + phase - 4), AY - (2 if side == 1 else 10))
-            knee = (round(lx - 7), ly + 7)
-            if dead:
-                knee, tip = (lx - 3, min(AY - 1, cy + 6)), (lx + 2, min(AY - 1, cy + 7))
-            d.line([(lx, ly), knee, tip], fill=1, width=4)
-            d.line([(lx, ly), knee, tip], fill=7 if side == 1 else 6, width=2)
-    d.ellipse((cx - 19, cy - ry, cx + 15, cy + ry), fill=1)
-    d.ellipse((cx - 17, cy - ry + 2, cx + 13, cy + ry - 2), fill=2)
-    d.ellipse((cx - 16, cy - ry + 2, cx + 11, cy + ry - 5), fill=3)
-    d.ellipse((cx - 13, cy - ry + 3, cx + 7, cy + 1), fill=4)
-    d.arc((cx - 14, cy - ry + 3, cx + 8, cy + ry - 4), 195, 290, fill=5, width=2)
-    # Split wing plates and a bronze band make a readable armored beetle.
-    d.line([(cx - 15, cy + 2), (cx + 11, cy - 3)], fill=1, width=2)
-    d.arc((cx - 7, cy - ry, cx + 2, cy + ry), 260, 95, fill=7, width=2)
-    for x, y in ((cx - 10, cy + 6), (cx + 5, cy + 5), (cx - 6, cy - 8)):
-        d.rectangle((x, y, x + 1, y + 1), fill=8)
-    hx, hy = cx + 16, min(cy + 4, AY - 8) if dead else cy + 4
-    d.ellipse((hx - 7, hy - 8, hx + 7, hy + 8), fill=1)
-    d.ellipse((hx - 5, hy - 6, hx + 5, hy + 6), fill=6)
-    d.ellipse((hx - 5, hy - 6, hx + 3, hy + 2), fill=7)
-    # Long forward horn lifts during anticipation and drives the lunge.
-    horn_y = hy - (10 if clip == 'attack' and n < 3 else 4)
-    d.polygon([(hx + 1, hy - 5), (hx + 7, horn_y), (hx + 11, horn_y - 9),
-               (hx + 11, horn_y + 1), (hx + 6, hy + 1)], fill=1)
-    d.polygon([(hx + 3, hy - 4), (hx + 8, horn_y), (hx + 10, horn_y - 5),
-               (hx + 9, horn_y + 1), (hx + 5, hy - 1)], fill=8)
-    if dead:
-        d.line([(hx - 1, hy - 1), (hx + 3, hy + 3)], fill=1, width=1)
-        d.line([(hx + 3, hy - 1), (hx - 1, hy + 3)], fill=1, width=1)
-    elif clip == 'idle' and n == 3:
-        d.line([(hx - 1, hy), (hx + 3, hy)], fill=9, width=1)
-    else:
-        d.rectangle((hx - 1, hy - 1, hx + 3, hy + 1), fill=1)
-        d.rectangle((hx, hy - 1, hx + 2, hy), fill=9)
-        d.point((hx + 1, hy - 1), fill=10)
-    # A brief impact spark and white hurt/death flash.
-    if clip == 'attack' and n == 5:
-        d.line([(W - 6, hy - 11), (W - 6, hy - 3)], fill=10)
-        d.line([(W - 10, hy - 7), (W - 2, hy - 7)], fill=10)
-    arr = np.array(im)
-    if (clip in ('hurt', 'die')) and n == 0:
-        arr[arr > 1] = 10
-    if clip == 'hurt' and n == 1:
-        arr[(arr == 2) | (arr == 3)] = 4
+    """Chunky chibi beetle: the slimes' soft glossy pixels, eyes and squash/stretch."""
+    im=Image.new('P',(W,H),0);d=ImageDraw.Draw(im)
+    lean,lift,sx,sy=0,0,1.,1.
+    if clip=='idle':lift=[0,1,2,1,0,0][n];sx=[1,1,.98,1.04,1,1][n]
+    elif clip=='walk':
+        lift=[0,0,3,6,4,0,0,0][n];sx=[1.04,1.1,.94,.9,.96,1.12,1.06,1.][n];sy=[.97,.87,1.08,1.12,1.04,.83,.94,1.][n]
+    elif clip=='attack':
+        lean=[-1,-3,-4,1,4,4,2,0][n];lift=[0,0,0,3,5,0,0,0][n];sx=[1.04,1.1,1.14,.92,.94,1.06,1.04,1][n];sy=[.97,.88,.82,1.12,1.08,.86,.95,1][n]
+    elif clip=='hurt':lean=[-3,-2,-1,0][n];sx=[1.12,1.06,.97,1][n];sy=[.83,.93,1.04,1][n]
+    elif clip=='die':sx=1+min(n,4)*.035;sy=max(.25,1-max(0,n-1)*.21);lift=-max(0,n-1)*1.1
+    cx,cy=31+lean,AY-18-lift
+    def pos(x,y):return (round(cx+(x-31)*sx),round(cy+(y-42)*sy))
+    def ellipse(x,y,rx,ry,index):
+        px,py=pos(x,y);rx=max(1,round(rx*sx));ry=max(1,round(ry*sy));d.ellipse((px-rx,py-ry,px+rx,py+ry),fill=index)
+    def line(points,index,width=1):d.line([pos(x,y) for x,y in points],fill=index,width=width)
+    def ball(x,y,rx,ry,ramp):
+        px,py=pos(x,y);rx*=sx;ry*=sy
+        for yy in range(max(1,math.floor(py-ry)),min(H-1,math.ceil(py+ry)+1)):
+            for xx in range(max(1,math.floor(px-rx)),min(W-1,math.ceil(px+rx)+1)):
+                u,v=(xx-px)/rx,(yy-py)/ry;rr=u*u+v*v
+                if rr>1:continue
+                z=math.sqrt(max(0,1-rr));light=max(0,min(.999,.24+.70*(-.40*u-.54*v+.74*z)))
+                value=light*(len(ramp)-1);lo=int(value);fraction=value-lo
+                threshold=((xx%4)*5+(yy%4)*3)%16/16
+                shade=min(len(ramp)-1,lo+int(fraction>threshold))
+                if rr>.91 and (u+v)>.2:shade=0
+                im.putpixel((xx,yy),ramp[shade])
+    dead=clip=='die' and n>=2
+    # Three far and three near feet: short, chunky limbs tuck beneath the shell.
+    stride=math.sin(n*math.pi/2)*2.5 if clip=='walk' else 0
+    for k in range(3):
+        x=20+k*11;phase=stride*(-1 if k==1 else 1)
+        line([(x,45),(x-5,49),(x-7+phase,53)],1,4);ellipse(x-7+phase,53,3,2,8)
+    ball(30,40,21,16,[1,2,3,4,5,6])
+    # Soft underside and wing-plate crease retain the iron shell without thin mechanical detail.
+    line([(17,48),(23,53),(32,55),(41,51)],2,3)
+    line([(30,25),(34,30),(37,37),(37,45),(34,51)],2,2)
+    line([(28,26),(32,31),(35,37)],5,1)
+    for x,y in [(21,30),(18,33),(24,28)]:ellipse(x,y,2,1,6)
+    for k in range(3):
+        x=19+k*10;phase=stride*(-1 if k==1 else 1)
+        if dead:line([(x,48),(x+2,51),(x+6,49)],8,3)
+        else:
+            line([(x,47),(x-3,53),(x-1+phase,57)],1,5)
+            line([(x,47),(x-3,53),(x-1+phase,56)],9,3);ellipse(x-1+phase,57,3,2,8)
+    ball(47,44,11,11,[1,7,8,9,10])
+    # A blunt gold horn, leaning forward during the same charge impact frames.
+    horn=[(53,38),(58,32),(63,26),(64,33),(60,41),(55,43)]
+    if clip=='attack' and n<3:horn=[(x-1,y-3) for x,y in horn]
+    d.polygon([pos(x,y) for x,y in horn],fill=7)
+    d.polygon([pos(x,y) for x,y in [(55,38),(60,32),(62,29),(62,34),(58,40)]],fill=10)
+    line([(57,36),(61,30)],11,1)
+    # Large white eye ovals and off-centre dark pupils echo the green slime.
+    for x,y in [(43,40),(52,42)]:
+        if dead:
+            line([(x-2,y-2),(x+2,y+2)],1,1);line([(x+2,y-2),(x-2,y+2)],1,1)
+        elif clip=='idle' and n==3:line([(x-3,y+1),(x+3,y)],1,2)
+        else:
+            ellipse(x,y,4,6,1);ellipse(x,y-1,3,5,12)
+            ellipse(x+1,y,1.5,3.5,1);ellipse(x+1,y-2,1,1,13)
+            if clip=='attack' and n<3:line([(x-3,y-5),(x+3,y-2)],7,2)
+    line([(46,50),(49,52),(52,50)],7,1)
+    ellipse(41,48,2,1,14)
+    if clip=='die' and n>=4:
+        # Collapse into a low shell with a few bouncing pixels, like the slime's breakup.
+        arr=np.array(im);arr[:AY-10]=0;im=Image.fromarray(arr,'P');d=ImageDraw.Draw(im)
+        for k in range(5):
+            x=20+k*8+(n-4)*(k-2);y=AY-12-(n-4)*(5-abs(k-2))
+            if 1<x<W-2 and 1<y<H-2:d.rectangle((x,y,x+1,y+1),fill=5 if k%2 else 10)
+        if n>=6:
+            arr=np.array(im);arr[AY-8:]=0;im=Image.fromarray(arr,'P');d=ImageDraw.Draw(im);d.ellipse((16,AY-3,56,AY-1),fill=3);d.line([(54,AY-2),(61,AY-4)],fill=9,width=2)
+    arr=np.array(im)
+    if clip in ('hurt','die') and n==0:arr[arr>0]=12
+    assert arr.any() and not (arr[0].any() or arr[-1].any() or arr[:,0].any() or arr[:,-1].any()),(clip,n)
     return arr
 
 

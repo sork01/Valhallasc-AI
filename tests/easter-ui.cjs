@@ -48,7 +48,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   await npc(host);await interact(host,'quest:accept:'+qid);await wait(id=>__self().quests.some(q=>q.id===id&&!q.claimed),qid);await debug({op:'quest',id:qid,action:'complete'});await interact(host,'quest:claim:'+qid);await wait(id=>__self().seasonalClaims[id]===2027,qid);
  }
  await p.evaluate(()=>Achievements.open());await wait(()=>window.__ach?.entries);
- check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='eggstraordinary').complete===false&&__ach.maximum===2275),'Four city errands alone do not grant Eggstraordinary Easter');
+ check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='eggstraordinary').complete===false&&__ach.maximum===2325),'Four city errands alone do not grant Eggstraordinary Easter');
  if(process.env.CHECK_ONLY==='titles'){
   await npc('baker');await interact('baker','quest:accept:easter_hunt');await wait(()=>__self().quests.some(q=>q.id==='easter_hunt'&&!q.claimed));await debug({op:'quest',id:'easter_hunt',action:'complete'});await interact('baker','quest:claim:easter_hunt');await wait(()=>__self().seasonalClaims.easter_hunt===20270326);
   await wait(()=>document.querySelector('#achievement-toast-name').textContent.includes('Eggstraordinary Easter'));check(true,'The normal achievement celebration receives the Eggstraordinary Easter award');

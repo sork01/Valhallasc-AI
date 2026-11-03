@@ -2,7 +2,7 @@
 use super::*;
 
 impl Player {
-    fn can_dance(&self) -> bool {
+    pub(super) fn can_dance(&self) -> bool {
         self.character.hp > 0.
             && self.combat_left <= 0.
             && self.pvp_fight <= 0.

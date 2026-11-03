@@ -516,9 +516,121 @@ def springtide(clip,k,n):
     prims += [limb(centre+V(-4,0,11),centre+V(4,0,11),.7,'basket')]
     return prims,bob
 
+# Sunwoven Stag: birch-white coat, golden branching antlers and wildflower tack.
+SUNWOVEN={**REINDEER,
+ 'coat':['#aaa88a','#ccc5a0','#e8e0bd','#fff4d9'],
+ 'coat2':['#817c56','#aba477','#d0c597','#ede1b3'],
+ 'blaze':['#c6c8ab','#e2e1c5','#f2f0d9','#fff9e8'],
+ 'nose':['#534c3d','#77694d','#99845c','#bfaa7c'],
+ 'horn':['#94703a','#c0994b','#e4c36a','#ffe8a3'],
+ 'blanket':['#235278','#397fa7','#65a8c8','#a0d1df'],
+ 'flower':['#c6bc9b','#e5dec2','#f6f0d8','#fff9ed'],
+ 'leaf':['#345736','#527c3d','#85a957','#bad27b']}
+
+def sunwoven(clip,k,n):
+    prims,bob=reindeer(clip,k,n)
+    ph=CYCLE(k,n);nod=S_(ph*2+1)*1.4 if clip=='run' else S_(ph)*.6
+    # Wreath sits around the brow; the saddle stays clear of the rider's body.
+    for i in range(9):
+        a=TAU*i/9;c=V(C_(a)*6,24+S_(a)*4,58+bob+nod)
+        prims += [Ell(c,(3.4,2.5,1.4),'leaf')]
+        if i%2==0:
+            for j in range(5):
+                b=TAU*j/5;prims += [Ell(c+V(C_(b)*1.9,S_(b)*1.9,1),(1.6,1.6,1),'flower')]
+            prims += [Ell(c+V(0,0,1.6),(1,1,1),'gold')]
+    for side in [-1,1]:
+        for i in range(3):
+            c=V(side*11,-9+i*7,39+bob)
+            prims += [Ell(c,(2,3,1.6),'leaf'),Ell(c+V(side,0,1),(2.3,2,1.2),'flower'),Ell(c+V(side*2,0,1.4),(1,1,1),'gold')]
+        prims += [limb((side*9,13,40+bob),(side*12,12,28+bob),1.2,'blanket'),limb((side*11,13,40+bob),(side*14,12,28+bob),1,'gold')]
+    return prims,bob
+
+
+# Valentine: pearl coat, rose mane, spiral gold horn, sculpted heart breastplate.
+ROSEHEART={**HORSE,'coat':['#ba819d','#dda7bd','#f5cddd','#fff0f3'],
+ 'coat2':['#621d42','#9c2c57','#d3476d','#f67d98'],
+ 'hoof':['#665439','#a38450','#d9b66a','#ffdf95'],
+ 'blanket':['#611e47','#9b2d5f','#d95182','#ff9bb6'],
+ 'nose':['#a16381','#c889a2','#eeb5c7','#ffe0e8'],
+ 'iris':['#2c5961','#43828b','#73b9ba','#b8f3e2']}
+
+def roseheart(clip,k,n):
+    step=(-k)%n if clip=='run' else k
+    prims,bob=horse(clip,step,n);ph=CYCLE(step,n)
+    nod=S_(ph*2+1)*1.4 if clip=='run' else S_(ph)*.6
+    base=V(0,30.5,59+bob+nod);tip=base+V(0,3,15)
+    prims += [cone(base,tip,2.6,'gold')]
+    for i in range(5):
+        f=i/6;c=base+(tip-base)*f
+        prims += [Ell(c,(2.8*(1-f),2.8*(1-f),.55),'blaze')]
+    # Heart lies in the front breastplate plane, keeping the saddle clear for all riders.
+    z=33+bob
+    prims += [Ell((-3.2,20.5,z+2),(3.7,1.8,3.8),'gold'),Ell((3.2,20.5,z+2),(3.7,1.8,3.8),'gold'),
+              cone((-4,20.5,z+1),(0,21,z-7),3.2,'gold'),cone((4,20.5,z+1),(0,21,z-7),3.2,'gold')]
+    for side in [-1,1]:
+        for i in range(3):
+            prims += [Ell((side*(8.8+i*.4),5-i*2,36+bob-i),(1.8,2,2),'blanket')]
+    return prims,bob
+
+
+
+# Christmas: compact antlers, winter chest/tail, festive tack and a luminous red nose.
+REINDEER={**HORSE,'coat':['#402719','#745136','#a27b51','#c9a477'],
+ 'coat2':['#2c211a','#4d3b2b','#715a42','#a58c68'],
+ 'blaze':['#c5b99d','#e0d4b9','#f1e8cf','#fff7df'],
+ 'nose':['#9f1830','#d52a35','#f84c46','#ff8670'],
+ 'horn':['#65503b','#a08864','#ccb68d','#eee0bc'],
+ 'blanket':['#163e32','#28664b','#43956a','#76bf86']}
+
+def reindeer(clip,k,n):
+    prims,bob=horse(clip,(-k)%n if clip=='run' else k,n)
+    # Deer have a small white tail and no flowing horse mane.
+    prims=[p for p in prims if p.c[1]>=-21.5 and not(p.mat=='coat2' and (p.c[1]<-20 and p.c[2]>24 or p.c[1]>7 and p.c[2]>44))]
+    prims += [Ell((0,-21,36+bob),(3.8,4.5,4.5),'blaze'),Ell((0,16,31+bob),(7.5,3.5,8),'blaze')]
+    ph=CYCLE(k,n);nod=S_(ph*2+1)*1.4 if clip=='run' else S_(ph)*.6
+    for side in [-1,1]:
+        base=V(side*3.5,24,58+bob+nod)
+        mid=base+V(side*5,-3,10);tip=mid+V(side*3,-4,11)
+        prims += [limb(base,mid,1.7,'horn'),limb(mid,tip,1.2,'horn')]
+        for i in range(3):
+            at=base+(tip-base)*(.35+i*.22)
+            prims += [cone(at,at+V(side*(5-i),4,6),1.1,'horn')]
+        prims += [Ell((side*8.5,14,39+bob),(2,2,2.3),'gold')]
+    return prims,bob
+
+ROCKET = {
+ 'hull':['#332650','#594875','#8f7db2','#c3b4df'],
+ 'red':['#692739','#aa3e55','#de6470','#ff9a91'],
+ 'gold':GOLD,'leather':LEATHER,'blanket':BLANKET,
+ 'flame':['#c34b31','#ee8b3d','#ffd978','#fff2bc'],
+ 'window':['#183c62','#276e91','#57b7d1','#b3f5ed'],
+}
+def rocket(clip,k,n):
+    ph=CYCLE(k,n);bob=S_(ph)*(.8 if clip=='run' else .35)
+    z=31+bob
+    # A broad astride saddle on a horizontal, finned festival rocket. +Y is forward.
+    prims=[Ell((0,-1,z),(10,23,9),'hull'),
+           cone((0,18,z),(0,34,z),9,'red'),
+           Ell((0,-23,z),(8,3.5,8),'gold'),
+           Ell((0,12,z+7),(5,6,2),'window')]
+    for side in [-1,1]:
+        prims += [Ell((side*10,-15,z-2),(7,10,2),'red'),
+                  Ell((side*8,0,z),(2,4,4),'gold'),
+                  limb((side*6,12,z+5),(side*8,15,z+10),1.2,'gold')]
+    prims += [Ell((0,-17,z+8),(2,8,7),'red')]
+    length=(15+S_(ph*2)*2) if clip=='run' else (7+S_(ph)*1.2)
+    prims += [cone((0,-25,z),(0,-25-length,z),6,'flame'),
+              cone((0,-26,z+.5),(0,-28-length*.65,z+.5),3.4,'gold')]
+    prims += saddle(-2,40+bob,9.5,8)
+    return prims,bob
+
+
 # name -> (builder, materials, flat materials, seat). seat: `raise` lifts the rider so the pelvis sits on the saddle,
 # `cut` hides the rider below that world height (the legs vanish into the barrel), `shadow` is the ground shadow (rx, ry).
 REGISTRY = {
+    'rocket': (rocket, ROCKET, {'flame':3}, {'scale':1.3,'raise':25,'cut':31,'shadow':(35,10),'coat':'hull'}),
+    'roseheart': (roseheart, ROSEHEART, FLAT, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
+    'sunwoven': (sunwoven, SUNWOVEN, FLAT, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'springtide': (springtide, SPRINGTIDE, FLAT, {'scale':1.3,'raise':25,'cut':34,'shadow':(35,10),'coat':'coat'}),
     'reindeer': (reindeer, REINDEER, {**FLAT,'nose':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'nightmare': (nightmare, NIGHTMARE, {**FLAT,'flame':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),

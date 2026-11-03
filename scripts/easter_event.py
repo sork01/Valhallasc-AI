@@ -64,7 +64,7 @@ def apply(world,levels):
  rime['objects']=[o for o in rime['objects'] if o['kind'] not in foliage or math.hypot(o['x']-centre[0],o['y']-centre[1])>o.get('r',0)+10.5]
  assert clear(rime,centre,centre,9.5),'Easter clearing must be clear'
  reachable=connected(rime);assert int(tree[1])*rime['size']+int(tree[0]) in reachable,'Easter tree must be reachable'
- assert all(math.hypot(s['x']-centre[0],s['y']-centre[1])>=16 for s in rime['slimes'] if s['kind']!='grinch')
+ assert all(math.hypot(s['x']-centre[0],s['y']-centre[1])>=16 for s in rime['slimes'] if s['kind'] not in {'grinch','bloomwarden','birchcrown','briarheart','starrocketeer'})
  assert all(math.hypot(p['x']-centre[0],p['y']-centre[1])>=18 for p in rime['portals'])
  rime['slimes'].append(dict(kind='bloomwarden',x=centre[0],y=centre[1],ambush='easter:bloomwarden'))
  rime['npcs'].append(dict(id='easter_shrine',name='Springtide Egg Basket',role='Easter summon',art='scenery',x=tree[0],y=tree[1],r=.4,color='#e1bc63',season='easter',

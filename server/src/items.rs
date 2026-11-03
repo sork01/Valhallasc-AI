@@ -514,7 +514,10 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    if matches!(kind, "hollow_rider" | "grinch" | "bloomwarden") {
+    if matches!(
+        kind,
+        "hollow_rider" | "grinch" | "bloomwarden" | "birchcrown" | "briarheart" | "starrocketeer"
+    ) {
         return true;
     }
     if let Some(e) = crate::cathedral::enemy(kind) {
@@ -1527,7 +1530,8 @@ impl Character {
         (
             attack
                 * player_attack_scale(self.look.class, self.level)
-                * (1. + self.set_stat_bonus("attack")),
+                * (1. + self.set_stat_bonus("attack"))
+                * self.festival_attack_at(crate::festival::now()),
             defense * (1. + self.set_stat_bonus("defense")),
         )
     }

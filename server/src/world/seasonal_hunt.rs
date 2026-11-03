@@ -49,6 +49,22 @@ pub(super) const CHRISTMAS: Spec = Spec {
     average: false,
     chance: 0.05,
 };
+pub(super) const VALENTINE: Spec = Spec {
+    season: "valentine",
+    kind: "briarheart",
+    quest: "valentine_hunt",
+    ritual: "valentine_shrine",
+    summon: "valentine:summon",
+    mount: "roseheart",
+    name: "The Briarheart",
+    mount_name: "Roseheart Unicorn",
+    zone: 2,
+    centre: Point { x: 103., y: 100. },
+    lantern: Point { x: 112., y: 100. },
+    tag: "valentine:briarheart",
+    average: false,
+    chance: 0.,
+};
 pub(super) const EASTER: Spec = Spec {
     season: "easter",
     kind: "bloomwarden",
@@ -65,18 +81,50 @@ pub(super) const EASTER: Spec = Spec {
     average: false,
     chance: 0.05,
 };
+pub(super) const SOLSTICE: Spec = Spec {
+    season: "solstice",
+    kind: "birchcrown",
+    quest: "solstice_hunt",
+    ritual: "solstice_pole",
+    summon: "solstice:summon",
+    mount: "sunwoven",
+    name: "The Birchcrown Guardian",
+    mount_name: "Sunwoven Stag",
+    zone: 2,
+    centre: Point { x: 103., y: 100. },
+    lantern: Point { x: 112., y: 100. },
+    tag: "solstice:birchcrown",
+    average: false,
+    chance: 0.05,
+};
+pub(super) const NEWYEAR: Spec = Spec {
+    season: "newyear",
+    kind: "starrocketeer",
+    quest: "newyear_hunt",
+    ritual: "newyear_launchpad",
+    summon: "newyear:summon",
+    mount: "rocket",
+    name: "The Starfire Rocketeer",
+    mount_name: "Starflight Rocket",
+    zone: 2,
+    centre: Point { x: 103., y: 100. },
+    lantern: Point { x: 112., y: 100. },
+    tag: "newyear:rocketeer",
+    average: false,
+    chance: 0.05,
+};
 pub(super) fn for_landmark(id: &str) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS, EASTER]
+    [HALLOWEEN, CHRISTMAS, VALENTINE, EASTER, SOLSTICE, NEWYEAR]
         .into_iter()
         .find(|s| s.ritual == id)
 }
 pub(super) fn for_kind(kind: &str) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS, EASTER]
+    [HALLOWEEN, CHRISTMAS, VALENTINE, EASTER, SOLSTICE, NEWYEAR]
         .into_iter()
         .find(|s| s.kind == kind)
 }
 pub(super) fn for_ritual(id: &str, offer: Option<&str>) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS, EASTER]
+    [HALLOWEEN, CHRISTMAS, VALENTINE, EASTER, SOLSTICE, NEWYEAR]
         .into_iter()
         .find(|s| s.ritual == id && offer == Some(s.summon))
 }
@@ -283,7 +331,7 @@ impl World {
             .map(|(id, _)| *id)
             .collect();
         for session in sessions {
-            let roll = self.random();
+            let roll = if spec.chance > 0. { self.random() } else { 1. };
             let p = self.players.get_mut(&session).unwrap();
             quest_progress(
                 &mut p.character,
@@ -291,7 +339,7 @@ impl World {
                 "kill",
                 spec.kind,
             );
-            if p.character.seasonal_rolls.get(spec.quest) != Some(&day) {
+            if spec.chance > 0. && p.character.seasonal_rolls.get(spec.quest) != Some(&day) {
                 p.character.seasonal_rolls.insert(spec.quest.into(), day);
                 if wins_mount(roll, spec.chance) && p.character.grant_mount(spec.mount) {
                     let _=p.peer.try_send(json!({"type":"notice","ok":true,"text":format!("{} dropped a {}! It is permanently added to your mounts.",spec.name,spec.mount_name)}));

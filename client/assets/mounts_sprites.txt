@@ -1142,6 +1142,396 @@
         "mount_springtide_run_e": "444f29ef4e6f1f23",
         "mount_springtide_run_se": "f7727a23f3e8e6e7"
       }
+    },
+    "sunwoven": {
+      "png": "mount_sunwoven.png",
+      "depth": "mount_sunwoven_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          -0.65,
+          1.005,
+          1.69,
+          1.005,
+          -0.65,
+          1.005,
+          1.69,
+          1.005
+        ]
+      },
+      "raise": 25,
+      "cut": 34,
+      "shadow": [
+        34,
+        9
+      ],
+      "coat": [
+        "#aaa88a",
+        "#ccc5a0",
+        "#e8e0bd",
+        "#fff4d9"
+      ],
+      "ramps": {
+        "coat": [
+          "#aaa88a",
+          "#ccc5a0",
+          "#e8e0bd",
+          "#fff4d9"
+        ],
+        "coat2": [
+          "#817c56",
+          "#aba477",
+          "#d0c597",
+          "#ede1b3"
+        ],
+        "blaze": [
+          "#c6c8ab",
+          "#e2e1c5",
+          "#f2f0d9",
+          "#fff9e8"
+        ],
+        "hoof": [
+          "#17110f",
+          "#2a2019",
+          "#40342b",
+          "#5b4b3d"
+        ],
+        "nose": [
+          "#534c3d",
+          "#77694d",
+          "#99845c",
+          "#bfaa7c"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#235278",
+          "#397fa7",
+          "#65a8c8",
+          "#a0d1df"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#3a2208",
+          "#6b3d10",
+          "#b9741f",
+          "#f0b14a"
+        ],
+        "horn": [
+          "#94703a",
+          "#c0994b",
+          "#e4c36a",
+          "#ffe8a3"
+        ],
+        "flower": [
+          "#c6bc9b",
+          "#e5dec2",
+          "#f6f0d8",
+          "#fff9ed"
+        ],
+        "leaf": [
+          "#345736",
+          "#527c3d",
+          "#85a957",
+          "#bad27b"
+        ]
+      },
+      "sprites": {
+        "mount_sunwoven_idle_s": "056a2aa1387289ef",
+        "mount_sunwoven_idle_sw": "d211f9c08d042060",
+        "mount_sunwoven_idle_w": "6afdfc03ca950a38",
+        "mount_sunwoven_idle_nw": "b205b18ba662a5b0",
+        "mount_sunwoven_idle_n": "e970e5ede35a3f97",
+        "mount_sunwoven_idle_ne": "8d8176f61f20e45b",
+        "mount_sunwoven_idle_e": "90e890f88da78a11",
+        "mount_sunwoven_idle_se": "10cf7b56353da02d",
+        "mount_sunwoven_run_s": "02b451ee1968caf9",
+        "mount_sunwoven_run_sw": "ce25a3305e148131",
+        "mount_sunwoven_run_w": "af50aeaef4b0f72a",
+        "mount_sunwoven_run_nw": "9e684f41c924548c",
+        "mount_sunwoven_run_n": "a0b1feb2e55e363e",
+        "mount_sunwoven_run_ne": "7e47349848934eae",
+        "mount_sunwoven_run_e": "7b8151f921bc88e7",
+        "mount_sunwoven_run_se": "428e98e6f997a456"
+      }
+    },
+    "roseheart": {
+      "png": "mount_roseheart.png",
+      "depth": "mount_roseheart_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          -0.65,
+          1.005,
+          1.69,
+          1.005,
+          -0.65,
+          1.005,
+          1.69,
+          1.005
+        ]
+      },
+      "raise": 25,
+      "cut": 34,
+      "shadow": [
+        34,
+        9
+      ],
+      "coat": [
+        "#ba819d",
+        "#dda7bd",
+        "#f5cddd",
+        "#fff0f3"
+      ],
+      "ramps": {
+        "coat": [
+          "#ba819d",
+          "#dda7bd",
+          "#f5cddd",
+          "#fff0f3"
+        ],
+        "coat2": [
+          "#621d42",
+          "#9c2c57",
+          "#d3476d",
+          "#f67d98"
+        ],
+        "blaze": [
+          "#bda48e",
+          "#dccab6",
+          "#f1e4d4",
+          "#fff7ea"
+        ],
+        "hoof": [
+          "#665439",
+          "#a38450",
+          "#d9b66a",
+          "#ffdf95"
+        ],
+        "nose": [
+          "#a16381",
+          "#c889a2",
+          "#eeb5c7",
+          "#ffe0e8"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#611e47",
+          "#9b2d5f",
+          "#d95182",
+          "#ff9bb6"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#2c5961",
+          "#43828b",
+          "#73b9ba",
+          "#b8f3e2"
+        ]
+      },
+      "sprites": {
+        "mount_roseheart_idle_s": "ab0785498108f5ac",
+        "mount_roseheart_idle_sw": "425e6796abe0af95",
+        "mount_roseheart_idle_w": "a43dd4f2df46e64f",
+        "mount_roseheart_idle_nw": "d2dbc7fd5d730e7b",
+        "mount_roseheart_idle_n": "9706effe82453e3b",
+        "mount_roseheart_idle_ne": "3cdd0eee8323f6de",
+        "mount_roseheart_idle_e": "8bd230e3863820d5",
+        "mount_roseheart_idle_se": "1b69b3e918a8a14e",
+        "mount_roseheart_run_s": "2429f504377263b3",
+        "mount_roseheart_run_sw": "ea18f46ac1403161",
+        "mount_roseheart_run_w": "21a4babff23f1d47",
+        "mount_roseheart_run_nw": "6ff5bca4c3ca59e2",
+        "mount_roseheart_run_n": "f68c9f9577e9a91d",
+        "mount_roseheart_run_ne": "5aeb5d1eea3f13d2",
+        "mount_roseheart_run_e": "599d7fbdb52a427b",
+        "mount_roseheart_run_se": "24d205c4c8665575"
+      }
+    },
+    "rocket": {
+      "png": "mount_rocket.png",
+      "depth": "mount_rocket_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          0.0,
+          0.735,
+          1.04,
+          0.735,
+          0.0,
+          -0.735,
+          -1.04,
+          -0.735
+        ]
+      },
+      "raise": 25,
+      "cut": 31,
+      "shadow": [
+        35,
+        10
+      ],
+      "coat": [
+        "#332650",
+        "#594875",
+        "#8f7db2",
+        "#c3b4df"
+      ],
+      "ramps": {
+        "hull": [
+          "#332650",
+          "#594875",
+          "#8f7db2",
+          "#c3b4df"
+        ],
+        "red": [
+          "#692739",
+          "#aa3e55",
+          "#de6470",
+          "#ff9a91"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "blanket": [
+          "#4a0f1d",
+          "#82182b",
+          "#b92a3c",
+          "#e8586a"
+        ],
+        "flame": [
+          "#c34b31",
+          "#ee8b3d",
+          "#ffd978",
+          "#fff2bc"
+        ],
+        "window": [
+          "#183c62",
+          "#276e91",
+          "#57b7d1",
+          "#b3f5ed"
+        ]
+      },
+      "sprites": {
+        "mount_rocket_idle_s": "9721fcfd26c5be20",
+        "mount_rocket_idle_sw": "5e30944615598f95",
+        "mount_rocket_idle_w": "c528715eabd64004",
+        "mount_rocket_idle_nw": "31a43baaf560c927",
+        "mount_rocket_idle_n": "5b20c629dcf5a718",
+        "mount_rocket_idle_ne": "90e518ab82a7ac22",
+        "mount_rocket_idle_e": "daa37b67564f5906",
+        "mount_rocket_idle_se": "a6ace0dd53597de7",
+        "mount_rocket_run_s": "dba12a98a6f0c57a",
+        "mount_rocket_run_sw": "66973c301d9ba952",
+        "mount_rocket_run_w": "c9fc287b62106e2c",
+        "mount_rocket_run_nw": "a535790f7000cb1d",
+        "mount_rocket_run_n": "61cf871aa6e9f197",
+        "mount_rocket_run_ne": "cfb86a3ab11d9a8d",
+        "mount_rocket_run_e": "c9bb9c4fbe245ea5",
+        "mount_rocket_run_se": "f601ea412993f71b"
+      }
     }
   }
 }

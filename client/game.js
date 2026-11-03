@@ -695,6 +695,7 @@
       { id: 'root', left: s.root, time: 3, name: 'Rooted', icon: 'storm', description: 'Cannot move or dash.' },
       { id: 'wound', left: s.woundLeft, time: 10, name: 'Wounded', icon: 'cuts', description: 'Healing received is reduced by 50%.' },
     ].filter(b => b.left > 0 && s.hp > 0).map(b => ({ ...b, kind: 'status' }));
+    if(s.festivalBuff?.left>0)statuses.push({id:'festivalspirit',kind:'status',left:s.festivalBuff.left,time:7200,name:'Festival Spirit',icon:'blessing',description:'+10% attack and +50% experience. Lasts two hours; time continues offline. Another completed dance refreshes it.'});
     renderBuffs([...(s.buffs || []), ...statuses]);
     const nextRaidFinalFight = !!s.raidFinalFight;
     if ((s.zone || 0) !== musicZone || nextRaidFinalFight !== raidFinalFight) {
@@ -747,12 +748,19 @@
         const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${name}: ${description}` }), glyph = el('span', { class: 'skill-icon' });
         glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph);
         if (b.kind === 'status') chip.append(el('b', { text: b.name }));
-        chip.append(el('i')); return chip;
+        chip.append(el('i'));
+        if(b.id==='festivalspirit'){
+          chip.tabIndex=0;chip.setAttribute('role','button');chip.setAttribute('aria-expanded','false');
+          const detail=el('span',{class:'festival-buff-detail',text:`${name}: ${description}`});detail.hidden=true;chip.append(detail);
+          const toggle=()=>{detail.hidden=!detail.hidden;chip.setAttribute('aria-expanded',String(!detail.hidden));};
+          chip.addEventListener('click',toggle);chip.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}else if(e.key==='Escape'){detail.hidden=true;chip.setAttribute('aria-expanded','false');}});
+        }
+        return chip;
       }));
     }
     for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) {
       const seconds = Math.ceil(b.left), label = b.kind === 'status' ? `${b.name} · ${seconds}s` : '';
-      chip.querySelector('i').textContent = b.kind === 'status' ? `${seconds}s` : seconds;
+      chip.querySelector('i').textContent = b.id==='festivalspirit'?`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`:b.kind === 'status' ? `${seconds}s` : seconds;
       if (label) chip.setAttribute('aria-label', label);
       chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time)));
     } }

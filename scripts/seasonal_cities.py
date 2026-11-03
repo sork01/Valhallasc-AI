@@ -96,11 +96,19 @@ def apply(world):
 
 
 if __name__=='__main__':
-    path=ROOT/'world/map.txt';world=apply(json.loads(path.read_text()))
-    world['zones'][1]['slimes']=[s for s in world['zones'][1]['slimes'] if s['kind']!='bloomwarden']
-    import christmas_cities, easter_event
+    path=ROOT/'world/map.txt';world=json.loads(path.read_text())
+    for area in [world,*world['zones']]:area['npcs']=[n for n in area['npcs'] if not n['id'].startswith('festival_dance_')]
+    world=apply(world)
+    world['zones'][1]['slimes']=[s for s in world['zones'][1]['slimes'] if s['kind'] not in {'bloomwarden','birchcrown','starrocketeer','briarheart'}]
+    import christmas_cities, easter_event, solstice_event, valentines_event, newyear_event
     world=christmas_cities.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
     world=easter_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
+    world=solstice_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
+    world=valentines_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
+    world=newyear_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
+    events=[dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer']}),christmas_cities.event(),easter_event.event(),solstice_event.event(),valentines_event.event(),newyear_event.event()]
+    import season_dance
+    world=season_dance.apply(world,events)
     path.write_text(json.dumps(world,ensure_ascii=False,indent=2)+'\n')
-    (ROOT/'world/seasons.txt').write_text(json.dumps([dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer']}),christmas_cities.event(),easter_event.event()],ensure_ascii=False,indent=2)+'\n')
+    (ROOT/'world/seasons.txt').write_text(json.dumps(events,ensure_ascii=False,indent=2)+'\n')
     print('Halloween: city dressing and four annual quests; October 26–November 9, Europe/Stockholm.')

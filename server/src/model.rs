@@ -321,6 +321,8 @@ pub struct Character {
     /// Offline-earned bonus XP and the last authoritative online checkpoint.
     #[serde(default)]
     pub rested: crate::rested::Rested,
+    #[serde(default)]
+    pub festival_spirit: crate::festival::Spirit,
     pub gold: u32,
     pub kills: u32,
     #[serde(default)]
@@ -422,7 +424,25 @@ pub struct MountDef {
     pub speed: f64,
 }
 pub const MOUNT_SPEED: f64 = 1.6;
-pub const MOUNTS: [MountDef; 8] = [
+pub const MOUNTS: [MountDef; 11] = [
+    MountDef {
+        id: "rocket",
+        name: "Starflight Rocket",
+        level: 1,
+        speed: MOUNT_SPEED,
+    },
+    MountDef {
+        id: "roseheart",
+        name: "Roseheart Unicorn",
+        level: 1,
+        speed: MOUNT_SPEED,
+    },
+    MountDef {
+        id: "sunwoven",
+        name: "Sunwoven Stag",
+        level: 1,
+        speed: MOUNT_SPEED,
+    },
     MountDef {
         id: "springtide",
         name: "Springtide Bunny",
@@ -513,6 +533,7 @@ impl Character {
             level,
             xp: 0,
             rested: Default::default(),
+            festival_spirit: Default::default(),
             gold: 0,
             kills: 0,
             quests: vec![],

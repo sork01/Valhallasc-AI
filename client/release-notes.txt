@@ -1,5 +1,38 @@
 [
   {
+    "version": "Beta 1.38.1",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Ironhide Beetles have a rounder glossy shell, expressive eyes and lively animations matching the slimes."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.38.0",
+    "date": "2026-11-03",
+    "new": [
+      "Press a seasonal centerpiece and dance two full laps to earn Festival Spirit: 10% more attack and 50% more experience for two hours.",
+      "Every season has a dance centerpiece in all four cities, with lap progress, cancellation and a remaining-time buff readout."
+    ],
+    "changed": [
+      "Summer Solstice townspeople wear flowers in their hair, Valentine townspeople wear hearts and Easter townspeople wear decorated eggs.",
+      "New Year, Valentine, Easter and Summer Solstice festivities work together with Halloween and Christmas."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.37.0",
+    "date": "2026-11-03",
+    "new": [
+      "Summer Solstice returns from four days before the June solstice through four days after, with Swedish Midsummer poles, wildflowers, birch branches and blue and yellow ribbons in all four cities.",
+      "Help each city prepare its summer festivities, then gather five fighters at the Sunwoven Midsummer Pole in Rimeveil to summon the Birchcrown Guardian.",
+      "Each eligible hero has one independent 5% chance per Stockholm day to earn the permanent Sunwoven Stag mount."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.36.0",
     "date": "2026-11-03",
     "new": [

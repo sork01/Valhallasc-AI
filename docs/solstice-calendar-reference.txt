@@ -1,0 +1,105 @@
+{
+  "source": "US Naval Observatory seasons API v4.0.1; UTC, DST false",
+  "retrieved": "2026-11-03",
+  "toleranceSeconds": 180,
+  "samples": [
+    {
+      "year": 2000,
+      "utc": "2000-06-21T01:48:00+00:00",
+      "unix": 961552080,
+      "stockholmDate": "2000-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2000&tz=0&dst=false"
+    },
+    {
+      "year": 2004,
+      "utc": "2004-06-21T00:57:00+00:00",
+      "unix": 1087779420,
+      "stockholmDate": "2004-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2004&tz=0&dst=false"
+    },
+    {
+      "year": 2008,
+      "utc": "2008-06-20T23:59:00+00:00",
+      "unix": 1214006340,
+      "stockholmDate": "2008-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2008&tz=0&dst=false"
+    },
+    {
+      "year": 2012,
+      "utc": "2012-06-20T23:09:00+00:00",
+      "unix": 1340233740,
+      "stockholmDate": "2012-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2012&tz=0&dst=false"
+    },
+    {
+      "year": 2016,
+      "utc": "2016-06-20T22:34:00+00:00",
+      "unix": 1466462040,
+      "stockholmDate": "2016-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2016&tz=0&dst=false"
+    },
+    {
+      "year": 2024,
+      "utc": "2024-06-20T20:51:00+00:00",
+      "unix": 1718916660,
+      "stockholmDate": "2024-06-20",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2024&tz=0&dst=false"
+    },
+    {
+      "year": 2026,
+      "utc": "2026-06-21T08:24:00+00:00",
+      "unix": 1782030240,
+      "stockholmDate": "2026-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2026&tz=0&dst=false"
+    },
+    {
+      "year": 2027,
+      "utc": "2027-06-21T14:11:00+00:00",
+      "unix": 1813587060,
+      "stockholmDate": "2027-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2027&tz=0&dst=false"
+    },
+    {
+      "year": 2030,
+      "utc": "2030-06-21T07:31:00+00:00",
+      "unix": 1908257460,
+      "stockholmDate": "2030-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2030&tz=0&dst=false"
+    },
+    {
+      "year": 2048,
+      "utc": "2048-06-20T15:54:00+00:00",
+      "unix": 2476281240,
+      "stockholmDate": "2048-06-20",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2048&tz=0&dst=false"
+    },
+    {
+      "year": 2050,
+      "utc": "2050-06-21T03:33:00+00:00",
+      "unix": 2539395180,
+      "stockholmDate": "2050-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2050&tz=0&dst=false"
+    },
+    {
+      "year": 2072,
+      "utc": "2072-06-20T11:14:00+00:00",
+      "unix": 3233646840,
+      "stockholmDate": "2072-06-20",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2072&tz=0&dst=false"
+    },
+    {
+      "year": 2096,
+      "utc": "2096-06-20T06:32:00+00:00",
+      "unix": 3991012320,
+      "stockholmDate": "2096-06-20",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2096&tz=0&dst=false"
+    },
+    {
+      "year": 2099,
+      "utc": "2099-06-20T23:43:00+00:00",
+      "unix": 4085682180,
+      "stockholmDate": "2099-06-21",
+      "source": "https://aa.usno.navy.mil/api/seasons?year=2099&tz=0&dst=false"
+    }
+  ]
+}

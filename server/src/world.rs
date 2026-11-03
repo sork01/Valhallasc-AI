@@ -80,6 +80,7 @@ mod epic_drop_tests;
 mod escort;
 #[cfg(test)]
 mod eye_below_tests;
+mod festival_dance;
 #[cfg(test)]
 mod frostwake_tests;
 mod gauntlet;
@@ -107,6 +108,8 @@ mod mount_sources_tests;
 mod mount_speed_tests;
 #[cfg(test)]
 mod nacre_tests;
+#[cfg(test)]
+mod newyear_tests;
 #[cfg(test)]
 mod nornroot_tests;
 #[cfg(test)]
@@ -159,6 +162,8 @@ mod social;
 #[cfg(test)]
 mod solo_elite_tests;
 #[cfg(test)]
+mod solstice_tests;
+#[cfg(test)]
 mod stormglass_tests;
 #[cfg(test)]
 mod sunken_astrolabe_tests;
@@ -172,6 +177,8 @@ mod trade;
 mod travel;
 #[cfg(test)]
 mod ttk;
+#[cfg(test)]
+mod valentines_tests;
 #[cfg(test)]
 mod vault_tests;
 #[cfg(test)]
@@ -257,6 +264,7 @@ struct Player {
     walk: f64,
     /// Elapsed dance time, shared with observers; never saved with the character.
     dance: Option<f64>,
+    festival_dance: Option<festival_dance::Circuit>,
     attack: f64,
     cooldown: f64,
     hit: bool,
@@ -398,6 +406,7 @@ impl Player {
             moving: false,
             walk: 0.,
             dance: None,
+            festival_dance: None,
             attack: 0.,
             cooldown: 0.,
             hit: false,
@@ -474,8 +483,14 @@ impl Player {
         view["seasonalRolls"] = json!(c.seasonal_rolls);
         view["daze"] = json!(self.daze);
         view["danceT"] = json!(self.dance);
+        view["festivalDance"] = self
+            .festival_dance
+            .as_ref()
+            .map_or(Value::Null, |r| r.view());
+        view["festivalBuff"] = json!({"left":c.festival_spirit.left(crate::festival::now()),"until":c.festival_spirit.until,"season":c.festival_spirit.season});
         view["rested"] = json!({"percent":c.rested.percent()});
         view["achievementTitle"] = json!(c.achievement_title());
+        view["achievementTitlePosition"] = json!(c.achievement_title_position());
         view["achievementPoints"] = json!(c.achievement_points());
         view
     }
@@ -658,6 +673,9 @@ impl Slime {
             "hollow_rider" => (5000., 90., 3.1, 1.6),
             "grinch" => (5000., 90., 3.1, 1.7),
             "bloomwarden" => (5000., 90., 3.1, 1.7),
+            "briarheart" => (5000., 90., 3.1, 1.7),
+            "starrocketeer" => (5000., 90., 3.1, 1.7),
+            "birchcrown" => (5000., 90., 3.1, 1.7),
             "gloomroot" => (90000., 1500., 2.3, 2.1),
             // The Undervault, tuned for five level-20 heroes with a healer. Trash packs of three or four; the
             // bosses are fights of one to two minutes each (see the vault_* simulations in the tests).
@@ -826,7 +844,8 @@ impl Slime {
             "croc" => 17,
             "knight" => 18,
             "hydra" => 20,
-            "hollow_rider" | "grinch" | "bloomwarden" => 1,
+            "hollow_rider" | "grinch" | "bloomwarden" | "birchcrown" | "briarheart"
+            | "starrocketeer" => 1,
             "gloomroot" => 20,
             "thrall" | "archer" => 19,
             "acolyte" | "gatewarden" | "choir" => 20,
@@ -958,7 +977,8 @@ impl Slime {
             "croc" => 205,
             "knight" => 245,
             "hydra" => 360,
-            "hollow_rider" | "grinch" | "bloomwarden" => 0,
+            "hollow_rider" | "grinch" | "bloomwarden" | "birchcrown" | "briarheart"
+            | "starrocketeer" => 0,
             "gloomroot" => 1200,
             "thrall" => 280,
             "archer" => 290,
@@ -1109,6 +1129,9 @@ impl Slime {
             "hollow_rider" => (1.4, 2.2, 0., 16.),
             "grinch" => (1.7, 2.5, 0., 16.),
             "bloomwarden" => (1.7, 2.5, 0., 16.),
+            "briarheart" => (1.7, 2.5, 0., 16.),
+            "starrocketeer" => (1.7, 2.5, 0., 16.),
+            "birchcrown" => (1.7, 2.5, 0., 16.),
             "gloomroot" => (0.85, 1.5, 7.5, 8.5),
             "thrall" => (0.45, 1.2, 7.5, 8.),
             "archer" => (0.6, 1.8, 0., 11.),
@@ -1951,7 +1974,7 @@ impl World {
                 .view(zone, self.maps[zone].template, daynight::unix_ms())
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
-        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"easter":self.festival_view(seasonal_hunt::EASTER),
+        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"easter":self.festival_view(seasonal_hunt::EASTER),"solstice":self.festival_view(seasonal_hunt::SOLSTICE),"valentine":self.festival_view(seasonal_hunt::VALENTINE),"newyear":self.festival_view(seasonal_hunt::NEWYEAR),
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
@@ -2565,6 +2588,15 @@ impl World {
         }
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
+        if offer_id == Some("festival:dance") {
+            if let Err(text) = self.start_festival_dance(session, npc_id) {
+                let _ = self.players[&session]
+                    .peer
+                    .try_send(json!({"type":"notice","ok":false,"text":text}));
+            }
+            return;
+        }
+
         if seasonal_hunt::for_landmark(npc_id)
             .is_some_and(|s| crate::seasonal::period(s.quest, &self.seasonal.active()).is_none())
         {
@@ -3072,6 +3104,7 @@ impl World {
         self.update_enemy_bolts();
         self.update_raid_key();
         self.update_empty_seat();
+        self.update_festival_dances();
         self.update_dances();
         self.update_damage_meter();
         self.audit_progress();
@@ -5048,6 +5081,9 @@ impl World {
                             | "hollow_rider"
                             | "grinch"
                             | "bloomwarden"
+                            | "birchcrown"
+                            | "starrocketeer"
+                            | "briarheart"
                             | "oakhorn"
                             | "hrungnir"
                             | "kraken"

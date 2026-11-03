@@ -5,6 +5,7 @@ mod bank;
 mod bossmech;
 mod bosssign;
 mod cathedral;
+mod festival;
 mod items;
 mod model;
 mod notify;

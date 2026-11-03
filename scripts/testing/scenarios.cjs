@@ -4561,4 +4561,10 @@ scenarios.city_entries = require('./city-entries-scenario.cjs')(kit);
 
 scenarios.christmas = require('./christmas-scenario.cjs')(kit);
 
+scenarios.solstice = require('./solstice-scenario.cjs')(kit);
 scenarios.easter = require('./easter-scenario.cjs')(kit);
+
+scenarios.valentines = require('./valentines-scenario.cjs')(kit);
+scenarios.newyear = require('./newyear-scenario.cjs')(kit);
+
+scenarios.festival = require('./festival-scenario.cjs')(kit);

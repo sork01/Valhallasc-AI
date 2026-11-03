@@ -4,6 +4,9 @@
 // (docs/mounts.md); this only shows them and sends `select_mount`.
 (() => {
   const MOUNTS = [
+    {id:'roseheart',name:'Roseheart Unicorn',level:1,route:'Valentine: defeat the Briarheart with five fighters in Rimeveil Glacier',cost:'Guaranteed when you claim the daily quest'},
+    {id:'rocket',name:'Starflight Rocket',level:1,route:'New Year: summon the Starfire Rocketeer with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
+    {id:'sunwoven',name:'Sunwoven Stag',level:1,route:'Summer Solstice: defeat the Birchcrown Guardian with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'springtide',name:'Springtide Bunny',level:1,route:'Easter: defeat the Bloomwarden with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'reindeer',name:'Red-nosed Reindeer',level:1,route:'Christmas: summon the Grinch with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'nightmare',name:'Nightmare Steed',level:1,route:'Halloween: summon the Hollow Rider with five fighters in Gloamfen',cost:'One independent 1% chance per eligible hero per day'},

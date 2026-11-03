@@ -80,5 +80,83 @@
         "asterion_singer"
       ]
     }
+  },
+  {
+    "id": "solstice",
+    "calendar": "juneSolstice",
+    "startOffset": -4,
+    "endOffsetExclusive": 5,
+    "quests": [
+      "solstice_alder",
+      "solstice_skald",
+      "solstice_nacre",
+      "solstice_aster",
+      "solstice_hunt"
+    ],
+    "dailyQuests": [
+      "solstice_hunt"
+    ],
+    "givers": {
+      "solstice_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
+  },
+  {
+    "id": "valentine",
+    "start": [
+      2,
+      10
+    ],
+    "endExclusive": [
+      2,
+      19
+    ],
+    "quests": [
+      "valentine_alder",
+      "valentine_skald",
+      "valentine_nacre",
+      "valentine_aster",
+      "valentine_hunt"
+    ],
+    "dailyQuests": [
+      "valentine_hunt"
+    ],
+    "givers": {
+      "valentine_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
+  },
+  {
+    "id": "newyear",
+    "start": [
+      12,
+      29
+    ],
+    "endExclusive": [
+      1,
+      3
+    ],
+    "quests": [
+      "newyear_hunt"
+    ],
+    "dailyQuests": [
+      "newyear_hunt"
+    ],
+    "givers": {
+      "newyear_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
   }
 ]

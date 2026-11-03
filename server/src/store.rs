@@ -217,6 +217,7 @@ impl Store {
             y: spawn.y,
             level: 1,
             xp: 0,
+            festival_spirit: Default::default(),
             rested: crate::rested::Rested {
                 last_seen: unix_now().max(0) as u64,
                 ..Default::default()

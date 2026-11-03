@@ -43,6 +43,6 @@
     }
   },
   "sprites": {
-    "valhallasc_ironhide_all": "a3f8837048d1098c"
+    "valhallasc_ironhide_slime_style_all": "399849edffa3ab6f"
   }
 }

@@ -100,3 +100,67 @@ and cross-year windows keep their semantics. The four cities receive native
 painted eggs, baskets, spring flowers, ribbons and socket-fitted NPC accessories.
 Four annual errands and the shared daily Bloomwarden quest use the same saved
 claims/attempt/expiry engine. Details: easter-event.md.
+
+## Summer Solstice (private Beta 1.37.0)
+
+`calendar: juneSolstice` computes the June-solstice instant using Meeus and
+NASA delta-T, then derives its Stockholm date before local offsets −4/+5
+exclusive. Supported years are 2000–2099. Five authored quests and the shared
+five-fighter hunt use the existing annual/daily save maps; only four cities
+receive Midsummer poles, birch, wildflowers and blue/yellow dressing.
+See [summer-solstice-event.md](summer-solstice-event.md) for the exact 5%
+Sunwoven Stag rules, independent astronomical references and candidate
+integration decision. Other candidate seasons remain separate.
+## New Year (Beta 1.36.0)
+
+December 29–January 2 uses the existing cross-year calendar registry. One
+shared daily five-fighter Starfire Rocketeer quest, no city errands, a personal
+5% Starflight Rocket roll/day, and Ring in the New Year (25 points) on claim.
+Worldwide fireworks are dense inside the four actual city bounds and sparse
+everywhere else, including instances, with a still reduced-motion display.
+See [new-year-event.md](new-year-event.md) and [new-year-validation.md](new-year-validation.md).
+
+## Festival Spirit and guided dances (private Beta 1.38.0)
+
+Owner requirements: flowers in Summer Solstice NPC hair, hearts for Valentine,
+decorated eggs for Easter; every season offers two hours of +10% attack and
++50% experience, earned by pressing its centerpiece and dancing two full laps.
+
+Recorded implementation defaults: automatic guided counterclockwise dance,
+radius1.8 tiles, ten seconds per lap, plus a short normal-speed approach to
+the nearest point of the ring. Each of the four cities has a reachable clear
+centerpiece: pole/tree/heart/egg/pumpkin/rocket for Solstice/Christmas/Valentine/
+Easter/Halloween/New Year. Every registered future season gets the same flow
+with a flower centerpiece unless its generator assigns a specific theme. The
+elite-summon landmarks and actions remain distinct. No quest or group required.
+
+The server owns route movement, accumulated angle and completion; no client
+coordinates, timer or completed-lap claim is accepted. Manual movement, combat
+actions, damage/death, control-impairing status, mounting, travel, zone change,
+disconnect or event expiry cancel unfinished dances with no partial credit.
+Idle input/Stop preserve the dance. Hires/ambient fighters cannot earn it.
+The visible existing body-specific dance choreography follows the guided route.
+The path is checked for collision and tiny legal per-tick steps; outside actors
+do not block players. Two laps are 4π accumulated angle, not stationary spins,
+back-and-forth motion or a timer standing still.
+
+Completion grants one non-stacking Festival Spirit. The saved authoritative
+Unix expiry is now+7200 seconds; another completed dance refreshes it to now+7200,
+never adds durations or bonuses. No cooldown. Timer runs offline; death,
+rebirth and season end retain the earned buff until that expiry. Unfinished
+dance progress is transient and never resumes after disconnect. Old saves
+default to no buff; no DB migration or backfill.
+
+Attack is the normal calculated attack stat multiplied by1.10 after gear/set
+bonuses, used by the existing combat/skill paths; defense and PvP tuning constants
+are unchanged. XP adds50% of the base reward alongside rebirth/Hierloom and
+Rested bonuses, for monster/party/quest rewards through the existing common XP
+path. It does not multiply other XP bonuses or spend the Rested reserve.
+UI uses authoritative seconds remaining, a tap/keyboard tooltip, progress and
+cancellation notices, with hand-written Swedish and desktop/phone controls.
+
+Integration: this private checkout contains all six seasonal registries,
+generator/render/hunt/mount hooks and achievement/title catalogs. Valentine's
+guaranteed mount ON CLAIM remains distinct from rare kill rolls. Mailboxes is
+not a dependency. No publication, production DB/client/server change, new zones,
+copy-ID migration, grinding or timing/balance sweep is part of this task.

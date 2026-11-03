@@ -187,7 +187,7 @@ def font(size):
     return ImageFont.load_default()
 
 
-TITLES = {'springtide':'Springtide Bunny','horse': 'Riding horse', 'raptor': 'Raptor', 'lizard': 'Lizard', 'sabertooth': 'Sabertooth', 'gryphon': 'Gryphon', 'nightmare': 'Nightmare Steed', 'reindeer': 'Red-nosed Reindeer'}
+TITLES = {'roseheart':'Roseheart Unicorn','rocket':'Starflight Rocket','sunwoven':'Sunwoven Stag','springtide':'Springtide Bunny','horse': 'Riding horse', 'raptor': 'Raptor', 'lizard': 'Lizard', 'sabertooth': 'Sabertooth', 'gryphon': 'Gryphon', 'nightmare': 'Nightmare Steed', 'reindeer': 'Red-nosed Reindeer'}
 
 
 def sheet(names, out):
