@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""makesprites workflow for the Emberfall Crags monsters: preview | build [--replace] | export.
+"""Crags sprite plumbing and legacy reference shapes. CLI delegates to crags_slime_redraw.
+
+Historical workflow for the Emberfall Crags monsters: preview | build [--replace] | export.
 
 Five kinds (wisp, spider, wraith, golem, cinderlord) share one 96x96 frame, a foot anchor at (48, 90),
 right-facing art (the game mirrors it) and the same five clips as the Ironhide Beetle
@@ -945,11 +947,6 @@ DRAWERS = {'wisp': (wisp, WISP), 'spider': (spider, SPIDER), 'wraith': (wraith, 
 for _kind, _pair in list(DRAWERS.items()):
     assert len(_pair[1].hex) <= 255
 
-if __name__ == '__main__':
-    # Cel-shaded redraw (2026-10-18): the drawers above are the old art; the script's own commands use the new one.
-    # Only in __main__, because crags_cel_redraw imports this module's toolkit back.
-    import crags_cel_redraw
-    DRAWERS = crags_cel_redraw.DRAWERS
 
 
 def render(kind):
@@ -1071,14 +1068,8 @@ def export(kinds):
 
 
 if __name__ == '__main__':
+    import crags_slime_redraw as redraw
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
-    names = [a for a in sys.argv[2:] if a in DRAWERS] or list(DRAWERS)
-    if command == 'build':
-        build(names, '--replace' in sys.argv)
-    elif command == 'export':
-        export(names)
-    elif command == 'preview':
-        directory = next((a for a in sys.argv[2:] if a not in DRAWERS and not a.startswith('--')), ROOT / 'test-results/crag-preview')
-        preview(names, directory)
-    else:
-        raise SystemExit('Usage: make_crag_sprites.py preview [kind...] [directory] | build [kind...] [--replace] | export [kind...]')
+    if '--replace' in sys.argv:
+        raise SystemExit('Saved sources are preserved. Edit them in PixelFlow and export.')
+    {'preview': redraw.preview, 'build': redraw.build, 'export': redraw.export}[command]()

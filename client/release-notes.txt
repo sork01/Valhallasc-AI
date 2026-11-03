@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.39.2",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Emberfall Crags enemies share the slimes' glossy shading and expressive eyes, with movement suited to fire, ghosts, spiders, stone and armour."
+    ],
+    "removed": [
+      "The previous Crags enemy artwork is replaced so the creatures match Greenmeadow's visual style."
+    ]
+  },
+  {
     "version": "Beta 1.39.1",
     "date": "2026-11-03",
     "new": [],

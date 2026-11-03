@@ -47,17 +47,18 @@
     }
   },
   "sprites": {
-    "wisp": "fd0afdfe7b3ee253",
-    "spider": "9819492cb5c33f19",
-    "wraith": "9a502a20b669e176",
-    "golem": "f4e022ffcfb5b24f",
-    "cinderlord": "58433dbc7f28eee8"
+    "wisp": "c62b50368813e7d4",
+    "spider": "10a626fa62ff0e11",
+    "wraith": "f46a745bc9b8ee57",
+    "golem": "39ba48e3c3cf86d1",
+    "cinderlord": "dc4053a775a9b79a"
   },
   "tops": {
-    "wisp": 74,
-    "spider": 59,
-    "wraith": 87,
-    "golem": 76,
-    "cinderlord": 87
-  }
+    "wisp": 69,
+    "spider": 47,
+    "wraith": 71,
+    "golem": 71,
+    "cinderlord": 79
+  },
+  "artStyle": "greenmeadow-slime"
 }

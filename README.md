@@ -720,3 +720,11 @@ and +50% XP. Solstice flowers, Valentine hearts and Easter eggs follow animated
 NPC hair/head sockets. Generator: `scripts/season_dance.py` via sync-world; no
 new zones/copy-ID migration. Rules: docs/seasonal-events.md; focused checks and
 requested FileDrop pictures: docs/festival-spirit-validation.md. Not deployed.
+
+## Crags enemy artwork (Beta 1.39.2)
+
+The five Emberfall Crags enemies share Greenmeadow's glossy shading and expressive
+eyes, with movement and deaths suited to fire, ghosts, spiders, stone and armour.
+Editable PixelFlow sources, preserved originals, one-command rollback and focused
+checks: [Crags enemy artwork](docs/crags-slime-art.md). Client-only release;
+no server restart or database migration.
