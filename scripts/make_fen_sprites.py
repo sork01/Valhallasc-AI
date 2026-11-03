@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
-"""makesprites workflow for the Gloamfen monsters: preview | build [--replace] | export | verify.
+"""Gloamfen artwork: preview | build | export | verify.
 
-Five kinds (toad, croc, knight, hydra and the elite gloomroot) share the Emberfall Crags contract (scripts/make_crag_sprites.py): one 96x96 frame,
-a foot anchor at (48, 90), right-facing art (the game mirrors it) and five clips (idle 6, walk 8, attack 8, hurt 4,
-die 8) so client/field.js drives them with the Ironhide's state machine: walk frames 2-4 are the hop, 5-7 the landing,
-attack 0-2 the windup, 3-5 the lunge, 6-7 the recovery.
-
-The drawing toolkit (shaded ellipsoids and capsules lit from the upper left, a dithered ramp per material, an outline
-around every part) is imported from make_crag_sprites.py. `build` saves ONE new 34-frame PixelFlow sprite per kind
-(valhallasc_fen_<kind>_all) and refuses existing names unless --replace is given. `export` reads the editor frames
-back, so edits survive, and writes client/assets/fen_<kind>.png plus fen.txt.
+The CLI delegates to fen_slime_redraw.py, preserving saved editor frames and
+refusing destructive --replace. Historical drawers below remain as references;
+the new slime-style sources have separate names, registry and raw arrays.
 """
 import json
 import math
@@ -1213,16 +1207,10 @@ def verify(kinds):
 
 
 if __name__ == '__main__':
+    # The saved slime-style sources supersede the historical cel drawers.
+    import fen_slime_redraw as slime
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; edit saved PixelFlow sources and export.')
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
-    names = [a for a in sys.argv[2:] if a in DRAWERS] or list(DRAWERS)
-    if command == 'build':
-        build(names, '--replace' in sys.argv)
-    elif command == 'export':
-        export(names)
-    elif command == 'verify':
-        verify(names)
-    elif command == 'preview':
-        directory = next((a for a in sys.argv[2:] if a not in DRAWERS and not a.startswith('--')), ROOT / 'test-results/fen-preview')
-        preview(names, directory)
-    else:
-        raise SystemExit('Usage: make_fen_sprites.py preview [kind...] [directory] | build [kind...] [--replace] | export [kind...] | verify [kind...]')
+    {'preview': slime.preview, 'build': slime.build,
+     'export': slime.export, 'verify': slime.verify, 'tails': slime.repair_tails}[command]()

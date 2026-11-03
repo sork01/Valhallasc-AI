@@ -1,5 +1,26 @@
 [
   {
+    "version": "Beta 1.39.4",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Gloamfen crocodiles and hydras have complete curved tails that taper to a point in every animation."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.39.3",
+    "date": "2026-11-03",
+    "new": [],
+    "changed": [
+      "Gloamfen enemies share the slimes' glossy shading and expressive eyes, with hopping toads, striding crocodiles, rigid armour, swaying hydra necks and heavy root steps.",
+      "Each Gloamfen enemy has a fitting death: a tipped toad, a fallen crocodile, separating armour, drooping hydra necks and a splintering, wilting Gloomroot."
+    ],
+    "removed": [
+      "The previous Gloamfen enemy artwork is replaced to match Greenmeadow's style and the new movement and death rules."
+    ]
+  },
+  {
     "version": "Beta 1.39.2",
     "date": "2026-11-03",
     "new": [],

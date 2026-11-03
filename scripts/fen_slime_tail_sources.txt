@@ -1,0 +1,10 @@
+{
+  "previous": {
+    "croc": "2aff30697015da30",
+    "hydra": "2567adb11318d3b6"
+  },
+  "corrected": {
+    "croc": "1fc8953f0a948cc9",
+    "hydra": "db998fee96b02ee8"
+  }
+}
