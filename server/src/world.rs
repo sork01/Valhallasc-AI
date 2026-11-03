@@ -20,6 +20,7 @@ mod bank;
 #[cfg(test)]
 mod compact_atlas_tests;
 mod inspect;
+mod mail;
 #[cfg(test)]
 mod raid_reward_tests;
 mod shop;
@@ -1545,6 +1546,7 @@ pub struct World {
     // Every zone's enemy spawns in one list, so enemy ids stay stable and global.
     spawns: Vec<SlimeSpawn>,
     store: Store,
+    mail_unread: BTreeMap<String, u32>,
     players: BTreeMap<u64, Player>,
     slimes: Vec<Slime>,
     bolts: Vec<Bolt>,
@@ -1673,6 +1675,7 @@ impl World {
             maps,
             spawns,
             store,
+            mail_unread: BTreeMap::new(),
             players: BTreeMap::new(),
             slimes: vec![],
             bolts: vec![],
@@ -1981,6 +1984,7 @@ impl World {
             // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
             // each snapshot over the last, so a flag that vanished would stay set.
             view["storyMemory"] = self.empty_seat_view(*session);
+            view["mailUnread"] = json!(self.mail_unread.get(&p.character.id).copied().unwrap_or(0));
             view["hired"] = json!(p.merc.is_some());
             view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
             view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
@@ -2184,6 +2188,12 @@ impl World {
                 },
             );
         let friends = c.friends.clone();
+        self.mail_unread.insert(
+            id.clone(),
+            self.store
+                .mail_unread(&id)
+                .map_err(|e| storage(Box::new(e)))?,
+        );
         self.players.insert(session, Player::new(c, peer));
         self.audit_player(
             session,
@@ -2248,6 +2258,7 @@ impl World {
             self.pvp_left(&id);
         }
         if let Some(mut p) = self.players.remove(&session) {
+            self.mail_unread.remove(&p.character.id);
             let name = p.character.look.name.clone();
             let place = self.zone_name(p.character.zone).to_owned();
             self.trade_left(&p.character.id);
@@ -2293,6 +2304,7 @@ impl World {
             && !matches!(
                 message,
                 ClientMessage::Chat { .. }
+                    | ClientMessage::Mail { .. }
                     | ClientMessage::Social { .. }
                     | ClientMessage::Trade { .. }
                     | ClientMessage::Pvp { .. }
@@ -2515,6 +2527,7 @@ impl World {
             ClientMessage::BuyBack { npc, id } => {
                 self.shop(session, &npc, shop::Request::BuyBack(id))
             }
+            ClientMessage::Mail { npc, request } => self.mail(session, &npc, request),
             ClientMessage::BankOpen { npc } => self.bank(session, &npc, BankRequest::Open),
             ClientMessage::BankDeposit {
                 npc,

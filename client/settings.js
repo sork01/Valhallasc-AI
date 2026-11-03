@@ -31,6 +31,7 @@
     ['achievements-panel', '.achievements-window', 'Achievements', '50% 50%', true],
     ['activity-panel', '.activity-window', 'Activity log', '50% 50%', true],
     ['trade-panel', '.trade-panel', 'Trade', '50% 50%', true], ['inspect-panel', '.inspect-window', 'Inspect', '50% 50%', true], ['rebirth-dialog', '.rebirth-dialog', 'Rebirth', '50% 50%', true],
+    ['mail-panel', '.mail-window', 'Mailbox', '50% 50%', true],
     ['bank-panel', '.bank-panel', 'Bank', '50% 50%', true], ['skills-panel', '.skills-panel', 'Skills', '50% 50%', true],
     ['equipment', '.equipment-workspace', 'Character and bags', '50% 50%', true], ['sign-panel', null, 'Sign', '0 0', true],
   ];
@@ -451,7 +452,7 @@
     'quest-journal': 'quest-close', 'npc-dialogue': 'npc-x', worldmap: 'wm-close',
     'achievements-panel': 'achievements-close',
     'social-panel': 'social-close', 'inspect-panel': 'inspect-close', 'rebirth-dialog': 'rebirth-cancel',
-    'bank-panel': 'bank-close', 'skills-panel': 'skills-close', equipment: 'equipment-close',
+    'mail-panel': 'mail-close', 'bank-panel': 'bank-close', 'skills-panel': 'skills-close', equipment: 'equipment-close',
     'activity-panel': 'activity-close',
   };
   addEventListener('pointerdown', event => {

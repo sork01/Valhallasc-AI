@@ -435,7 +435,14 @@ async fn delete_character(
             Ok(characters) => account_json(&account, &characters, None),
             Err(e) => broken(e),
         },
-        Ok(false) => fail(StatusCode::NOT_FOUND, "No such character on your account."),
+        Ok(false) => match auth.store.load_for_account(&account.id, &body.id) {
+            Ok(Some(_)) => fail(
+                StatusCode::CONFLICT,
+                "Collect or return pending mail attachments before deleting this character.",
+            ),
+            Ok(None) => fail(StatusCode::NOT_FOUND, "No such character on your account."),
+            Err(e) => broken(e),
+        },
         Err(e) => broken(e),
     }
 }

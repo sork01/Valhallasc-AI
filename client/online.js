@@ -68,7 +68,7 @@
     const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
     status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
     const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
-    if (character) window.GM?.onSelf(character);
+    if (character) { window.GM?.onSelf(character); window.Mail?.onUnread(character.mailUnread || 0); }
     if (character) window.Trade?.onSnapshot(character);
     if (character) window.Shop?.onSnapshot(character);
     if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
@@ -114,7 +114,8 @@
           characterGm = character?.gm === true; window.GM?.onSelf(character);
           callbacks.onWelcome?.(packet);
           window.DpsMeter?.update(packet.snapshot.damageMeter);
-          window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
+          window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
+          window.Mail?.onUnread(character?.mailUnread || 0);
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
           const L = (a, all) => Keys.label(a, all), T = window.Locale?.translate || (x => x), word = text => T(text).toLowerCase();
@@ -139,6 +140,8 @@
         case 'trade': window.Trade?.onPacket(packet); break;
         case 'inspect': window.Inspect?.onPacket(packet); break;
         case 'shop': window.Shop?.onPacket(packet); break;
+        case 'mail': window.Mail?.onPacket(packet); break;
+        case 'mail_unread': window.Mail?.onUnread(packet.count); break;
         case 'bank': window.Bank?.onPacket(packet); break;
         case 'sign': window.BossSign?.onPacket(packet); break;
         case 'achievements': window.Achievements?.receive(packet); break;
@@ -166,7 +169,7 @@
       clearTimeout(joinTimeout);
       if (!current()) return;
       clearSnapshot(); clearInterval(heartbeat);
-      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay(waitingForRelease ? 'Waiting for your previous connection to close…' : 'Connection lost. Reconnecting to your character…');
@@ -180,7 +183,7 @@
     },
     stop() {
       window.DpsMeter?.reset(); window.Achievements?.reset();
-      active = false; generation++; clearSnapshot(); connected = false; id = null; busySince = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
+      active = false; generation++; clearSnapshot(); connected = false; id = null; busySince = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;
       $('chat').hidden = true; $('connection-overlay').hidden = true;

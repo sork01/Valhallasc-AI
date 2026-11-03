@@ -100,6 +100,18 @@ impl Store {
             tx.execute_batch("CREATE UNIQUE INDEX character_unique_name ON characters(name_key) WHERE name_key IS NOT NULL;")?;
             tx.commit()?;
         }
+        db.execute_batch(
+            "CREATE TABLE IF NOT EXISTS mail (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender TEXT NOT NULL, recipient TEXT NOT NULL,
+            sender_name TEXT NOT NULL, recipient_name TEXT NOT NULL,
+            request TEXT NOT NULL, subject TEXT NOT NULL, body TEXT NOT NULL,
+            contents TEXT NOT NULL, created INTEGER NOT NULL,
+            is_read INTEGER NOT NULL DEFAULT 0, returned INTEGER NOT NULL DEFAULT 0,
+            deleted INTEGER NOT NULL DEFAULT 0, UNIQUE(sender,request));
+            CREATE INDEX IF NOT EXISTS mail_inbox ON mail(recipient,deleted,is_read);
+            CREATE INDEX IF NOT EXISTS mail_sender_time ON mail(sender,created);",
+        )?;
         Ok(Self {
             db: Arc::new(Mutex::new(db)),
         })
@@ -509,7 +521,9 @@ impl Store {
         character: &str,
     ) -> Result<bool, Box<dyn std::error::Error>> {
         Ok(self.conn().execute(
-            "DELETE FROM characters WHERE id=?1 AND account_id=?2",
+            "DELETE FROM characters WHERE id=?1 AND account_id=?2
+             AND NOT EXISTS(SELECT 1 FROM mail WHERE (sender=?1 OR recipient=?1)
+             AND (json_extract(contents,'$.gold')>0 OR json_array_length(contents,'$.items')>0))",
             [character, account],
         )? == 1)
     }

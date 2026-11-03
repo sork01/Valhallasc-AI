@@ -156,5 +156,7 @@
   "blur(12px)",
   "Rider base",
   "Rider scale",
-  "Halloween daily quest"
+  "Halloween daily quest",
+  "button:not(:disabled),input,textarea,select",
+  "button[data-mail-busy]"
 ]

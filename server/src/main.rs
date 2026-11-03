@@ -7,6 +7,7 @@ mod bosssign;
 mod cathedral;
 mod festival;
 mod items;
+mod mail;
 mod model;
 mod notify;
 mod perks;

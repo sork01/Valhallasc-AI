@@ -12,6 +12,8 @@
     "test:target": "REAL_SPRITES=1 node tests/target-ui.cjs",
     "test:trade": "node tests/trade-ui.cjs",
     "test:bank": "node tests/bank-ui.cjs",
+    "test:mail": "bash scripts/test-touch-bounded.sh tests/mail-ui.cjs",
+    "test:mail-check": "node tests/mail-check.cjs",
     "test:bank-check": "node tests/bank-check.cjs",
     "test:rebirth": "node tests/rebirth-ui.cjs && python3 tests/rebirth-ui-strings.py",
     "test:rebirth-check": "node tests/rebirth-check.cjs && bash scripts/cargo.sh test perks",

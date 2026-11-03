@@ -3612,6 +3612,24 @@
       ],
       "buys": false,
       "festivalArt": "newyearLaunchpad"
+    },
+    {
+      "id": "mailbox_0_alderhaven",
+      "name": "Mailbox",
+      "role": "Player mail",
+      "x": 38.17,
+      "y": 87.99,
+      "color": "#cda75e",
+      "art": "mailbox",
+      "buys": false,
+      "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+      "offers": [
+        {
+          "id": "mail",
+          "label": "Open mailbox",
+          "cost": 0
+        }
+      ]
     }
   ],
   "quests": [
@@ -8916,6 +8934,24 @@
           "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
           "offers": [],
           "buys": false
+        },
+        {
+          "id": "mailbox_1_cinderwatch_camp",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 50.62,
+          "y": 85.62,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -16770,6 +16806,24 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "mailbox_2_rimeward_camp",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 66.62,
+          "y": 117.62,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -23611,6 +23665,24 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "mailbox_3_lanternmere",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 66.17,
+          "y": 23.99,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -33394,6 +33466,24 @@
           ],
           "buys": false,
           "festivalArt": "newyearLaunchpad"
+        },
+        {
+          "id": "mailbox_4_skaldholm",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 83.27,
+          "y": 129.65,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -78855,6 +78945,42 @@
             "style": "short",
             "beard": "#806653"
           }
+        },
+        {
+          "id": "mailbox_6_hollowmoot",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 25.62,
+          "y": 155.62,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "mailbox_6_skuldwatch",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 91.5,
+          "y": 89.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -91931,6 +92057,24 @@
             "hat": "hood",
             "hatColor": "#725898"
           }
+        },
+        {
+          "id": "mailbox_7_heimdall_s_perch",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 89.27,
+          "y": 136.65,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -103148,6 +103292,24 @@
             "style": "short",
             "beard": "#5e7d77"
           }
+        },
+        {
+          "id": "mailbox_8_keelhaven",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 89.27,
+          "y": 155.65,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -108159,6 +108321,24 @@
           ],
           "buys": false,
           "festivalArt": "newyearLaunchpad"
+        },
+        {
+          "id": "mailbox_9_nacrehold",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 103.5,
+          "y": 164.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -175758,6 +175938,24 @@
           "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
           "offers": [],
           "buys": false
+        },
+        {
+          "id": "mailbox_13_astralhollow",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 79.5,
+          "y": 119.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -180548,6 +180746,24 @@
           "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
           "offers": [],
           "buys": false
+        },
+        {
+          "id": "mailbox_14_the_last_shade",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 79.5,
+          "y": 119.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -185171,6 +185387,24 @@
           "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
           "offers": [],
           "buys": false
+        },
+        {
+          "id": "mailbox_15_the_stillpoint",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 46.99,
+          "y": 121.17,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -190505,6 +190739,24 @@
           "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
           "offers": [],
           "buys": false
+        },
+        {
+          "id": "mailbox_16_lamplight_refuge",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 46.99,
+          "y": 121.17,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -197434,6 +197686,24 @@
           ],
           "buys": false,
           "festivalArt": "newyearLaunchpad"
+        },
+        {
+          "id": "mailbox_17_asterion",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 93.5,
+          "y": 114.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -246618,6 +246888,24 @@
           "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
           "offers": [],
           "buys": false
+        },
+        {
+          "id": "mailbox_19_breakwater_camp",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 45.5,
+          "y": 119.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -251924,6 +252212,24 @@
           "offers": [],
           "buys": false,
           "art": "sun_travel"
+        },
+        {
+          "id": "mailbox_20_millbridge",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 49.5,
+          "y": 118.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -256822,6 +257128,24 @@
           "offers": [],
           "buys": false,
           "art": "ribbon_travel"
+        },
+        {
+          "id": "mailbox_21_jubilee_crossroads",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 39.56,
+          "y": 83.91,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -262168,6 +262492,24 @@
             ],
             "ambush": []
           }
+        },
+        {
+          "id": "mailbox_22_banyan_landing",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 37.65,
+          "y": 127.27,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -265592,6 +265934,24 @@
           "offers": [],
           "buys": false,
           "art": "heart_travel"
+        },
+        {
+          "id": "mailbox_23_veyrroot_canopy",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 85.5,
+          "y": 96.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -266970,6 +267330,24 @@
             "hat": "hood",
             "hatColor": "#569e66"
           }
+        },
+        {
+          "id": "mailbox_24_veyrroot_heartwood",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 51.5,
+          "y": 49.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -270889,6 +271267,24 @@
             "hat": "hood",
             "hatColor": "#c9a35a"
           }
+        },
+        {
+          "id": "mailbox_25_azure_wells",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 47.5,
+          "y": 135.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -275768,6 +276164,24 @@
           "offers": [],
           "buys": false,
           "art": "frostwake_travel"
+        },
+        {
+          "id": "mailbox_26_frostwake_station",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 49.5,
+          "y": 143.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -280401,6 +280815,24 @@
           "offers": [],
           "buys": false,
           "art": "cairn_travel"
+        },
+        {
+          "id": "mailbox_27_boulderwatch",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 50.5,
+          "y": 153.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -293169,6 +293601,78 @@
             "style": "short",
             "beard": "#293f4a"
           }
+        },
+        {
+          "id": "mailbox_28_springmere",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 87.5,
+          "y": 326.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "mailbox_28_solhaven",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 331.5,
+          "y": 318.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "mailbox_28_harvestwatch",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 332.5,
+          "y": 80.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "mailbox_28_rimehold",
+          "name": "Mailbox",
+          "role": "Player mail",
+          "x": 89.5,
+          "y": 80.5,
+          "color": "#cda75e",
+          "art": "mailbox",
+          "buys": false,
+          "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+          "offers": [
+            {
+              "id": "mail",
+              "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [

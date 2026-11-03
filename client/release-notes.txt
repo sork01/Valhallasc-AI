@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.39.0",
+    "date": "2026-11-03",
+    "new": [
+      "Mailboxes in every city and hub let you send letters, gold and unbound items to other characters, even while they are offline.",
+      "Read and collect your mail, return unwanted attachments, and see when new letters arrive."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.38.1",
     "date": "2026-11-03",
     "new": [],

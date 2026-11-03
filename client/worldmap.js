@@ -777,6 +777,7 @@
     if (n.buys) labels.push('Buys items');
     if (n.offers?.some(o => o.mount)) labels.push('Mounts');
     if (n.offers?.some(o => o.id === 'repair')) labels.push('Repairs');
+    if (n.offers?.some(o => o.id === 'mail')) labels.push('Mailbox');
     if (n.offers?.some(o => o.id === 'bank')) labels.push('Bank');
     if (n.offers?.some(o => o.merc)) labels.push('Mercenaries');
     if (n.travelStop) labels.push('Spark Travel');
