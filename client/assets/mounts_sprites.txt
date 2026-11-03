@@ -992,6 +992,114 @@
         "mount_reindeer_run_e": "a36b62a4dacc188e",
         "mount_reindeer_run_se": "aaab1e31363c2813"
       }
+    },
+    "rocket": {
+      "png": "mount_rocket.png",
+      "depth": "mount_rocket_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          0.0,
+          0.735,
+          1.04,
+          0.735,
+          0.0,
+          -0.735,
+          -1.04,
+          -0.735
+        ]
+      },
+      "raise": 25,
+      "cut": 31,
+      "shadow": [
+        35,
+        10
+      ],
+      "coat": [
+        "#332650",
+        "#594875",
+        "#8f7db2",
+        "#c3b4df"
+      ],
+      "ramps": {
+        "hull": [
+          "#332650",
+          "#594875",
+          "#8f7db2",
+          "#c3b4df"
+        ],
+        "red": [
+          "#692739",
+          "#aa3e55",
+          "#de6470",
+          "#ff9a91"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "blanket": [
+          "#4a0f1d",
+          "#82182b",
+          "#b92a3c",
+          "#e8586a"
+        ],
+        "flame": [
+          "#c34b31",
+          "#ee8b3d",
+          "#ffd978",
+          "#fff2bc"
+        ],
+        "window": [
+          "#183c62",
+          "#276e91",
+          "#57b7d1",
+          "#b3f5ed"
+        ]
+      },
+      "sprites": {
+        "mount_rocket_idle_s": "9721fcfd26c5be20",
+        "mount_rocket_idle_sw": "5e30944615598f95",
+        "mount_rocket_idle_w": "c528715eabd64004",
+        "mount_rocket_idle_nw": "31a43baaf560c927",
+        "mount_rocket_idle_n": "5b20c629dcf5a718",
+        "mount_rocket_idle_ne": "90e518ab82a7ac22",
+        "mount_rocket_idle_e": "daa37b67564f5906",
+        "mount_rocket_idle_se": "a6ace0dd53597de7",
+        "mount_rocket_run_s": "dba12a98a6f0c57a",
+        "mount_rocket_run_sw": "66973c301d9ba952",
+        "mount_rocket_run_w": "c9fc287b62106e2c",
+        "mount_rocket_run_nw": "a535790f7000cb1d",
+        "mount_rocket_run_n": "61cf871aa6e9f197",
+        "mount_rocket_run_ne": "cfb86a3ab11d9a8d",
+        "mount_rocket_run_e": "c9bb9c4fbe245ea5",
+        "mount_rocket_run_se": "f601ea412993f71b"
+      }
     }
   }
 }

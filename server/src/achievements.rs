@@ -250,12 +250,12 @@ mod tests {
     }
     #[test]
     fn achievements_catalog_has_positive_points_and_correct_atlas_and_rewards() {
-        assert_eq!(catalog().len(), 104);
+        assert_eq!(catalog().len(), 105);
         assert_eq!(regions().len(), 23);
         assert_eq!(regions().iter().collect::<BTreeSet<_>>().len(), 23);
         let c = hero();
         let view = c.achievement_view();
-        assert_eq!(view["maximum"], 2250);
+        assert_eq!(view["maximum"], 2275);
         for a in catalog() {
             if a.metric == "fog" {
                 assert!(regions().contains(&a.zone.unwrap()));
@@ -433,7 +433,7 @@ mod tests {
         assert_eq!(c.achievement_points(), 685);
         assert!(c.sync_achievements().is_empty());
         assert_eq!(c.achievement_points(), 685);
-        assert_eq!(c.achievement_view()["maximum"], 2250);
+        assert_eq!(c.achievement_view()["maximum"], 2275);
         assert_eq!(c.achievement_title(), "The Explorer");
         assert_eq!(c.mounts, ["gryphon"]);
     }

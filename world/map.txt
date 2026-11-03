@@ -3072,6 +3072,46 @@
           "cost": 0,
           "season": "christmas",
           "quest": "christmas_hunt"
+        },
+        {
+          "id": "newyear:hire:warrior",
+          "label": "Hire a Warrior",
+          "merc": "warrior",
+          "cost": 0,
+          "season": "newyear",
+          "quest": "newyear_hunt"
+        },
+        {
+          "id": "newyear:hire:mage",
+          "label": "Hire a Mage",
+          "merc": "mage",
+          "cost": 0,
+          "season": "newyear",
+          "quest": "newyear_hunt"
+        },
+        {
+          "id": "newyear:hire:assassin",
+          "label": "Hire an Assassin",
+          "merc": "assassin",
+          "cost": 0,
+          "season": "newyear",
+          "quest": "newyear_hunt"
+        },
+        {
+          "id": "newyear:hire:priest",
+          "label": "Hire a Priest",
+          "merc": "priest",
+          "cost": 0,
+          "season": "newyear",
+          "quest": "newyear_hunt"
+        },
+        {
+          "id": "newyear:hire:hunter",
+          "label": "Hire a Hunter",
+          "merc": "hunter",
+          "cost": 0,
+          "season": "newyear",
+          "quest": "newyear_hunt"
         }
       ]
     },
@@ -4079,6 +4119,38 @@
       "season": "christmas",
       "seasonCadence": "daily",
       "summonNpc": "christmas_tree",
+      "summonZone": 2
+    },
+    {
+      "id": "newyear_hunt",
+      "title": "The Starfire Rocketeer",
+      "npc": "baker",
+      "givers": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ],
+      "description": "Gather five fighters at the Festival Launchpad in Rimeveil Glacier. Press it to summon the Starfire Rocketeer at the highest level in your party. Hired fighters can help. Each eligible hero has one independent 5% Starflight Rocket roll per Stockholm day. Return to any city festival host to claim the quest and the Ring in the New Year achievement.",
+      "objectives": [
+        {
+          "kind": "kill",
+          "target": "starrocketeer",
+          "count": 1,
+          "label": "Defeat the summoned Starfire Rocketeer"
+        }
+      ],
+      "level": 1,
+      "minLevel": 1,
+      "rewardXp": 10,
+      "rewardGold": 300,
+      "requires": null,
+      "repeatable": true,
+      "group": true,
+      "recommendedPlayers": 5,
+      "season": "newyear",
+      "seasonCadence": "daily",
+      "summonNpc": "newyear_launchpad",
       "summonZone": 2
     }
   ],
@@ -15911,6 +15983,12 @@
           "x": 103.0,
           "y": 100.0,
           "ambush": "christmas:grinch"
+        },
+        {
+          "kind": "starrocketeer",
+          "x": 103.0,
+          "y": 100.0,
+          "ambush": "newyear:rocketeer"
         }
       ],
       "npcs": [
@@ -16154,6 +16232,26 @@
             {
               "id": "christmas:summon",
               "label": "Summon the Grinch",
+              "cost": 0
+            }
+          ],
+          "buys": false
+        },
+        {
+          "id": "newyear_launchpad",
+          "name": "Festival Launchpad",
+          "role": "New Year summon",
+          "art": "scenery",
+          "x": 112.0,
+          "y": 100.0,
+          "r": 0.4,
+          "color": "#e7bc64",
+          "season": "newyear",
+          "dialogue": "Press the launchpad while on The Starfire Rocketeer daily quest. Gather five living fighters, including hires, nearby. The Rocketeer matches the highest party level. Each eligible hero has one independent 5% Starflight Rocket chance per Stockholm day. Claim the quest in any city to earn Ring in the New Year.",
+          "offers": [
+            {
+              "id": "newyear:summon",
+              "label": "Summon the Starfire Rocketeer",
               "cost": 0
             }
           ],
@@ -31060,6 +31158,46 @@
               "cost": 0,
               "season": "christmas",
               "quest": "christmas_hunt"
+            },
+            {
+              "id": "newyear:hire:warrior",
+              "label": "Hire a Warrior",
+              "merc": "warrior",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:mage",
+              "label": "Hire a Mage",
+              "merc": "mage",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:assassin",
+              "label": "Hire an Assassin",
+              "merc": "assassin",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:priest",
+              "label": "Hire a Priest",
+              "merc": "priest",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:hunter",
+              "label": "Hire a Hunter",
+              "merc": "hunter",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
             }
           ],
           "buys": false,
@@ -89661,6 +89799,46 @@
               "cost": 0,
               "season": "christmas",
               "quest": "christmas_hunt"
+            },
+            {
+              "id": "newyear:hire:warrior",
+              "label": "Hire a Warrior",
+              "merc": "warrior",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:mage",
+              "label": "Hire a Mage",
+              "merc": "mage",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:assassin",
+              "label": "Hire an Assassin",
+              "merc": "assassin",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:priest",
+              "label": "Hire a Priest",
+              "merc": "priest",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:hunter",
+              "label": "Hire a Hunter",
+              "merc": "hunter",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
             }
           ],
           "buys": false,
@@ -152804,6 +152982,46 @@
               "cost": 0,
               "season": "christmas",
               "quest": "christmas_hunt"
+            },
+            {
+              "id": "newyear:hire:warrior",
+              "label": "Hire a Warrior",
+              "merc": "warrior",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:mage",
+              "label": "Hire a Mage",
+              "merc": "mage",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:assassin",
+              "label": "Hire an Assassin",
+              "merc": "assassin",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:priest",
+              "label": "Hire a Priest",
+              "merc": "priest",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
+            },
+            {
+              "id": "newyear:hire:hunter",
+              "label": "Hire a Hunter",
+              "merc": "hunter",
+              "cost": 0,
+              "season": "newyear",
+              "quest": "newyear_hunt"
             }
           ],
           "buys": false

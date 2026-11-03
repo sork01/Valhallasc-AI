@@ -106,6 +106,8 @@ mod mount_speed_tests;
 #[cfg(test)]
 mod nacre_tests;
 #[cfg(test)]
+mod newyear_tests;
+#[cfg(test)]
 mod nornroot_tests;
 #[cfg(test)]
 mod owner_fixes_tests;
@@ -655,6 +657,7 @@ impl Slime {
             // Five level-20 heroes with a healer who must triage: two hits fell a non-tank, so no party without a healer gets through.
             "hollow_rider" => (5000., 90., 3.1, 1.6),
             "grinch" => (5000., 90., 3.1, 1.7),
+            "starrocketeer" => (5000., 90., 3.1, 1.7),
             "gloomroot" => (90000., 1500., 2.3, 2.1),
             // The Undervault, tuned for five level-20 heroes with a healer. Trash packs of three or four; the
             // bosses are fights of one to two minutes each (see the vault_* simulations in the tests).
@@ -823,7 +826,7 @@ impl Slime {
             "croc" => 17,
             "knight" => 18,
             "hydra" => 20,
-            "hollow_rider" | "grinch" => 1,
+            "hollow_rider" | "grinch" | "starrocketeer" => 1,
             "gloomroot" => 20,
             "thrall" | "archer" => 19,
             "acolyte" | "gatewarden" | "choir" => 20,
@@ -955,7 +958,7 @@ impl Slime {
             "croc" => 205,
             "knight" => 245,
             "hydra" => 360,
-            "hollow_rider" | "grinch" => 0,
+            "hollow_rider" | "grinch" | "starrocketeer" => 0,
             "gloomroot" => 1200,
             "thrall" => 280,
             "archer" => 290,
@@ -1104,7 +1107,7 @@ impl Slime {
             "knight" => (0.6, 1.4, 6.5, 7.5),
             "hydra" => (0.55, 1.3, 7.5, 9.),
             "hollow_rider" => (1.4, 2.2, 0., 16.),
-            "grinch" => (1.7, 2.5, 0., 16.),
+            "grinch" | "starrocketeer" => (1.7, 2.5, 0., 16.),
             "gloomroot" => (0.85, 1.5, 7.5, 8.5),
             "thrall" => (0.45, 1.2, 7.5, 8.),
             "archer" => (0.6, 1.8, 0., 11.),
@@ -1947,7 +1950,7 @@ impl World {
                 .view(zone, self.maps[zone].template, daynight::unix_ms())
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
-        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),
+        "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"newyear":self.festival_view(seasonal_hunt::NEWYEAR),
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
@@ -5043,6 +5046,7 @@ impl World {
                             | "gloomroot"
                             | "hollow_rider"
                             | "grinch"
+                            | "starrocketeer"
                             | "oakhorn"
                             | "hrungnir"
                             | "kraken"

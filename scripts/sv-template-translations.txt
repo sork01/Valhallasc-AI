@@ -467,5 +467,7 @@
   "{0} · {1} · 160% walking speed": "{0} · {1} · 160% gånghastighet",
   "{0} dropped a {1}! It is permanently added to your mounts.": "{0} gav dig {1}! Det har lagts till permanent bland dina riddjur.",
   "Your daily {0}% {1} roll is complete. Return to any city festival host.": "Ditt dagliga slag på {0}% för {1} är klart. Återvänd till en högtidsvärd i valfri stad.",
-  "{0} answers the summons.": "{0} svarar på kallelsen."
+  "{0} answers the summons.": "{0} svarar på kallelsen.",
+  "The Starfire Rocketeer · Level {0}": "Stjärneldsraketören · Nivå {0}",
+  "{0} rises at level {1}: the highest level among the five fighters.": "{0} framträder på nivå {1}: den högsta nivån bland de fem kämparna."
 }

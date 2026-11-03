@@ -1398,5 +1398,20 @@
       "christmas_aster",
       "christmas_hunt"
     ]
+  },
+  {
+    "id": "newyear",
+    "name": "Ring in the New Year",
+    "description": "Complete the New Year elite quest.",
+    "category": "Quests",
+    "metric": "quest_set",
+    "target": 1,
+    "points": 25,
+    "title": "",
+    "mount": "",
+    "zone": null,
+    "members": [
+      "newyear_hunt"
+    ]
   }
 ]

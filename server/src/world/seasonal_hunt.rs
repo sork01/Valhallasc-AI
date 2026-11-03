@@ -49,14 +49,34 @@ pub(super) const CHRISTMAS: Spec = Spec {
     average: false,
     chance: 0.05,
 };
+pub(super) const NEWYEAR: Spec = Spec {
+    season: "newyear",
+    kind: "starrocketeer",
+    quest: "newyear_hunt",
+    ritual: "newyear_launchpad",
+    summon: "newyear:summon",
+    mount: "rocket",
+    name: "The Starfire Rocketeer",
+    mount_name: "Starflight Rocket",
+    zone: 2,
+    centre: Point { x: 103., y: 100. },
+    lantern: Point { x: 112., y: 100. },
+    tag: "newyear:rocketeer",
+    average: false,
+    chance: 0.05,
+};
 pub(super) fn for_landmark(id: &str) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS].into_iter().find(|s| s.ritual == id)
+    [HALLOWEEN, CHRISTMAS, NEWYEAR]
+        .into_iter()
+        .find(|s| s.ritual == id)
 }
 pub(super) fn for_kind(kind: &str) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS].into_iter().find(|s| s.kind == kind)
+    [HALLOWEEN, CHRISTMAS, NEWYEAR]
+        .into_iter()
+        .find(|s| s.kind == kind)
 }
 pub(super) fn for_ritual(id: &str, offer: Option<&str>) -> Option<Spec> {
-    [HALLOWEEN, CHRISTMAS]
+    [HALLOWEEN, CHRISTMAS, NEWYEAR]
         .into_iter()
         .find(|s| s.ritual == id && offer == Some(s.summon))
 }
@@ -106,10 +126,10 @@ impl World {
             || p.character.point().distance(spec.lantern) > 2.8
             || p.character.hp <= 0.
         {
-            return Err(if spec.average {
-                "Walk closer to the haunted lantern."
-            } else {
-                "Walk closer to the Christmas tree."
+            return Err(match spec.season {
+                "halloween" => "Walk closer to the haunted lantern.",
+                "christmas" => "Walk closer to the Christmas tree.",
+                _ => "Walk closer to the festival launchpad.",
             }
             .into());
         }
@@ -189,7 +209,7 @@ impl World {
             started: self.time,
             away: 0.,
         });
-        self.emit_zone(spec.zone,json!({"type":"system","text":if spec.average {format!("The Hollow Rider rises at level {level}: the average of five fighters, rounded up.")}else{format!("The Grinch rises at level {level}: the highest level among the five fighters.")}}));
+        self.emit_zone(spec.zone,json!({"type":"system","text":if spec.average {format!("The Hollow Rider rises at level {level}: the average of five fighters, rounded up.")}else{format!("{} rises at level {level}: the highest level among the five fighters.", spec.name)}}));
         Ok(())
     }
     pub(super) fn update_festival_hunt(&mut self) {

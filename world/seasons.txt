@@ -56,5 +56,30 @@
         "asterion_singer"
       ]
     }
+  },
+  {
+    "id": "newyear",
+    "start": [
+      12,
+      29
+    ],
+    "endExclusive": [
+      1,
+      3
+    ],
+    "quests": [
+      "newyear_hunt"
+    ],
+    "dailyQuests": [
+      "newyear_hunt"
+    ],
+    "givers": {
+      "newyear_hunt": [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer"
+      ]
+    }
   }
 ]

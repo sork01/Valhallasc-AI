@@ -7716,5 +7716,18 @@
   "Christmas": "Jul",
   "Grinch": "Grinchen",
   "the Hallowed": "den helgade",
-  "the Merry": "den julglade"
+  "the Merry": "den julglade",
+  "Complete the New Year elite quest.": "Slutför nyårets elituppdrag.",
+  "Daily Starflight Rocket chance: 5% per hero": "Daglig chans till Stjärnflyktsraket: 5% per hjälte",
+  "Defeat the summoned Starfire Rocketeer": "Besegra den frammanade Stjärneldsraketören",
+  "Festival Launchpad": "Festavfyrningsrampen",
+  "Gather five fighters at the Festival Launchpad in Rimeveil Glacier. Press it to summon the Starfire Rocketeer at the highest level in your party. Hired fighters can help. Each eligible hero has one independent 5% Starflight Rocket roll per Stockholm day. Return to any city festival host to claim the quest and the Ring in the New Year achievement.": "Samla fem kämpar vid Festavfyrningsrampen i Rimslöjans glaciär. Tryck på rampen för att frammana Stjärneldsraketören på gruppens högsta nivå. Inhyrda kämpar kan hjälpa till. Varje berättigad hjälte har en egen chans på 5% till en Stjärnflyktsraket per Stockholmsdygn. Återvänd till valfri stads festvärd för att lämna in uppdraget och få prestationen Ring in det nya året.",
+  "New Year summon": "Nyårsframmaning",
+  "New Year: summon the Starfire Rocketeer with five fighters in Rimeveil Glacier": "Nyår: frammana Stjärneldsraketören med fem kämpar i Rimslöjans glaciär",
+  "Press the launchpad while on The Starfire Rocketeer daily quest. Gather five living fighters, including hires, nearby. The Rocketeer matches the highest party level. Each eligible hero has one independent 5% Starflight Rocket chance per Stockholm day. Claim the quest in any city to earn Ring in the New Year.": "Tryck på avfyrningsrampen när du har det dagliga uppdraget Stjärneldsraketören. Samla fem levande kämpar, inklusive inhyrda, i närheten. Raketören får gruppens högsta nivå. Varje berättigad hjälte har en egen chans på 5% till en Stjärnflyktsraket per Stockholmsdygn. Lämna in uppdraget i valfri stad för att få Ring in det nya året.",
+  "Ring in the New Year": "Ring in det nya året",
+  "Starflight Rocket": "Stjärnflyktsraket",
+  "Summon the Starfire Rocketeer": "Frammana Stjärneldsraketören",
+  "The Starfire Rocketeer": "Stjärneldsraketören",
+  "Walk closer to the festival launchpad.": "Gå närmare festavfyrningsrampen."
 }

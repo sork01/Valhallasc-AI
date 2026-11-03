@@ -90,3 +90,12 @@ old seasonal claim ledgers on login. Titles never alter saved character names.
 The shared encounter engine preserves Halloween’s average-level/1% rules while
 Christmas uses highest-level/5% rules. Full rules, generator and cleanup:
 [christmas-event.md](christmas-event.md).
+
+## New Year (Beta 1.36.0)
+
+December 29–January 2 uses the existing cross-year calendar registry. One
+shared daily five-fighter Starfire Rocketeer quest, no city errands, a personal
+5% Starflight Rocket roll/day, and Ring in the New Year (25 points) on claim.
+Worldwide fireworks are dense inside the four actual city bounds and sparse
+everywhere else, including instances, with a still reduced-motion display.
+See [new-year-event.md](new-year-event.md) and [new-year-validation.md](new-year-validation.md).

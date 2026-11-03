@@ -95,3 +95,13 @@ All seven mounts use one authoritative 1.6× multiplier (160% of walking speed,
 existing order. The mounted gait cadence is 80% of the former 2× travel gait.
 The Christmas reindeer grants permanent ownership directly, with no bag slot
 and no duplicate or forced selection change. See [christmas-event.md](christmas-event.md).
+
+## Starflight Rocket (Beta 1.36.0)
+
+`rocket` is a permanent New Year reward: one independent personal 5% chance
+per eligible real participant per Stockholm day from the five-fighter
+Starfire Rocketeer in Rimeveil. Hires do not roll. Full bags and duplicate
+ownership are safe. It follows ordinary collision/movement at the same
+160% walking speed as every mount; hovering is cosmetic. Original PixelFlow
+idle/run sources cover eight directions and the shared ten-rig depth
+compositor. Rules: [new-year-event.md](new-year-event.md).

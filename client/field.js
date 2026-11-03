@@ -761,6 +761,7 @@
     croc: { name: 'Mire Crocodile', scale: 1.25, top: 32, col: ['#b3c76a', '#5b7433', '#26331f'] },
     knight: { name: 'Drowned Knight', scale: 1.15, top: 87, col: ['#cde8d4', '#6a8d7a', '#2d403c'] },
     hydra: { name: 'Mire Hydra', scale: 1.3, top: 70, col: ['#b0d6a0', '#4b7a74', '#233040'] },
+    starrocketeer:{name:'The Starfire Rocketeer',elite:true,scale:1.7,top:88,col:['#d4b1df','#e59a7b','#3e365e']},
     grinch:{name:'The Grinch',elite:true,scale:1.7,top:88,col:['#badb73','#cf5d5b','#234937']},
     hollow_rider:{name:'The Hollow Rider',elite:true,scale:1.8,top:88,col:['#ffbd62','#40354f','#151421']},
     gloomroot: { name: 'Gloomroot Colossus', elite: true, scale: 1.8, top: 85, col: ['#8affd8', '#57412a', '#12100c'] },
@@ -1186,6 +1187,7 @@
     const seasonChanged=window.Seasonal?.update(packet.seasons,own.seasonalClaims);
     window.Halloween?.sync(packet.halloween,own.seasonalRolls,packet.seasons);
     window.Christmas?.sync(packet.christmas,own.seasonalRolls,packet.seasons);
+    window.NewYear?.sync(packet.newyear,own.seasonalRolls,packet.seasons);
     explored = Array.isArray(own.explored) ? own.explored : null;
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
@@ -2848,6 +2850,7 @@
   for (const [kinds, source, load] of [
     [['hollow_rider'],()=>window.Halloween?.source,()=>window.Halloween?.load()],
     [['grinch'],()=>window.Christmas?.source,()=>window.Christmas?.load()],
+    [['starrocketeer'],()=>window.NewYear?.source,()=>window.NewYear?.load()],
     [CATHEDRAL_KINDS, () => cathedralSrc, loadCathedralSprites],
     [YEAR_KINDS, () => yearSrc, loadYearSprites],
     [CAIRN_KINDS, () => cairnSrc, loadCairnSprites],
@@ -3942,6 +3945,7 @@
     window.ExitPaths?.floor(g,zdef,w2s,hero);
     window.Halloween?.drawFloor(g,zone,w2s);
     window.Christmas?.drawFloor(g,zone,w2s);
+    window.NewYear?.drawFloor(g,zone,w2s);
     // Flat authored terrain belongs below actors, irrespective of its anchor depth.
     for (const o of objects) if (City.art[o.kind]?.ground) {
       const [sx, sy] = w2s(o.x, o.y), box = City.art[o.kind].box;
@@ -3972,7 +3976,7 @@
     // build the depth-sorted list of everything standing on the ground
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
     const set = spriteSet();
-    for (const source of [objects,window.Seasonal?.decor(zone)||[],window.Halloween?.objects(zone)||[],window.Christmas?.objects(zone)||[]]) for (const o of source) {
+    for (const source of [objects,window.Seasonal?.decor(zone)||[],window.Halloween?.objects(zone)||[],window.Christmas?.objects(zone)||[],window.NewYear?.objects(zone)||[]]) for (const o of source) {
       if (o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
       if (City.art[o.kind]?.ground) continue;
       const [sx, sy] = w2s(o.x, o.y,o.z||0);
@@ -4216,10 +4220,12 @@
     if (CathedralArt.isTheme(zdef.theme)) CathedralArt.weather(g,zdef.theme,t,VW,VH);
     if (zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme)) { drawDarkness(g, t); drawBossBar(g); }
     if (zdef.theme === 'moonwell') drawBossBar(g);
+    window.NewYear?.drawFireworks(g,zone,hero,t,VW,VH,reducedMotion());
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     window.Halloween?.drawLabel(g,zone,w2s);
     window.Christmas?.drawLabel(g,zone,w2s);
+    window.NewYear?.drawLabel(g,zone,w2s);
     window.ExitPaths?.labels(g,zdef,ZONES,w2s,hero,zoom);
     window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
     drawQuestArrow(g);

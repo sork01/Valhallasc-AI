@@ -275,3 +275,11 @@ Earned titles survive expiry, reconnect and rebirth; names and name reservation
 keys are untouched. The catalog now has 104 achievements / 2,250 points and
 eight title rewards. Existing suffix rendering and selection/celebration are
 reused.
+
+## New Year (Beta 1.36.0)
+
+Ring in the New Year requires one claimed `newyear_hunt`, grants 25 points
+and no title. It uses permanent quest/seasonal claim reconciliation across
+years, independently of the rare mount roll. Accepted/ready quests do not
+count; repeats never add points. Catalog: 105 achievements / 2,275 points,
+with the existing eight titles and mount rewards preserved.

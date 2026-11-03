@@ -46,7 +46,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   await npc(host);await interact(host,'quest:accept:'+qid);await wait(id=>__self().quests.some(q=>q.id===id&&!q.claimed),qid);await debug({op:'quest',id:qid,action:'complete'});await interact(host,'quest:claim:'+qid);await wait(id=>__self().seasonalClaims[id]===2026,qid);
  }
  await p.evaluate(()=>Achievements.open());await wait(()=>window.__ach?.entries);
- check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='merry').complete===false&&__ach.maximum===2250),'Four city errands alone do not grant the Merry title');
+ check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='merry').complete===false&&__ach.maximum===2275),'Four city errands alone do not grant the Merry title');
  if(process.env.CHECK_ONLY==='titles'){
   await npc('baker');await interact('baker','quest:accept:christmas_hunt');await wait(()=>__self().quests.some(q=>q.id==='christmas_hunt'&&!q.claimed));await debug({op:'quest',id:'christmas_hunt',action:'complete'});await interact('baker','quest:claim:christmas_hunt');await wait(()=>__self().seasonalClaims.christmas_hunt===20261215);
   await send({type:'select_title',achievement:'merry'});await wait(()=>document.querySelector('#hud-name').textContent==='Christmas Check the Merry');await debug({op:'give_mount',mount:'reindeer'});await wait(()=>__self().mounts.includes('reindeer'));

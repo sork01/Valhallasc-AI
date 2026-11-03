@@ -4560,3 +4560,5 @@ scenarios.halloween_hunt = require('./halloween-scenario.cjs')(kit);
 scenarios.city_entries = require('./city-entries-scenario.cjs')(kit);
 
 scenarios.christmas = require('./christmas-scenario.cjs')(kit);
+
+scenarios.newyear = require('./newyear-scenario.cjs')(kit);

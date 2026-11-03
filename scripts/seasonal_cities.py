@@ -98,7 +98,10 @@ def apply(world):
 if __name__=='__main__':
     path=ROOT/'world/map.txt';world=apply(json.loads(path.read_text()))
     import christmas_cities
+    import newyear_event
+    newyear_event.remove_encounter(world)
     world=christmas_cities.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
+    world=newyear_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
     path.write_text(json.dumps(world,ensure_ascii=False,indent=2)+'\n')
-    (ROOT/'world/seasons.txt').write_text(json.dumps([dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer']}),christmas_cities.event()],ensure_ascii=False,indent=2)+'\n')
+    (ROOT/'world/seasons.txt').write_text(json.dumps([dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer']}),christmas_cities.event(),newyear_event.event()],ensure_ascii=False,indent=2)+'\n')
     print('Halloween: city dressing and four annual quests; October 26–November 9, Europe/Stockholm.')

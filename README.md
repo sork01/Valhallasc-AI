@@ -683,3 +683,19 @@ distinct quests unlocks **the Merry** or **the Hallowed**. All seven mounts trav
 at **160% of walking speed**. Quests/scenery retire automatically; earned mounts
 and titles stay. See [Christmas](docs/christmas-event.md), [mounts](docs/mounts.md)
 and [achievements](docs/achievements.md).
+
+### New Year (Beta 1.36.0)
+
+December 29–January 2 uses the authoritative Stockholm calendar, including the
+January year rollover. Fireworks appear worldwide, densely inside the four
+main city boundaries and sparsely elsewhere. Reduced motion uses a still display.
+One shared daily quest summons the five-fighter Starfire Rocketeer at the
+Festival Launchpad in Rimeveil. Each eligible real participant has one personal
+5% Starflight Rocket chance per day; claiming the quest grants Ring in the New
+Year (25 points), regardless of the mount roll. Permanent rewards survive expiry.
+
+Rules and focused evidence: [New Year](docs/new-year-event.md),
+[validation](docs/new-year-validation.md). `scripts/newyear_event.py` runs from
+`seasonal_cities.py` during `node scripts/sync-world.cjs`; rebuild Rust after
+sync. No geography or zone/copy IDs change. Original PixelFlow sources are
+preserved in `assets/newyear.txt` and `assets/mounts_sprites.txt`.

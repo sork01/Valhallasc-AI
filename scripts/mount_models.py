@@ -461,9 +461,36 @@ def reindeer(clip,k,n):
         prims += [Ell((side*8.5,14,39+bob),(2,2,2.3),'gold')]
     return prims,bob
 
+ROCKET = {
+ 'hull':['#332650','#594875','#8f7db2','#c3b4df'],
+ 'red':['#692739','#aa3e55','#de6470','#ff9a91'],
+ 'gold':GOLD,'leather':LEATHER,'blanket':BLANKET,
+ 'flame':['#c34b31','#ee8b3d','#ffd978','#fff2bc'],
+ 'window':['#183c62','#276e91','#57b7d1','#b3f5ed'],
+}
+def rocket(clip,k,n):
+    ph=CYCLE(k,n);bob=S_(ph)*(.8 if clip=='run' else .35)
+    z=31+bob
+    # A broad astride saddle on a horizontal, finned festival rocket. +Y is forward.
+    prims=[Ell((0,-1,z),(10,23,9),'hull'),
+           cone((0,18,z),(0,34,z),9,'red'),
+           Ell((0,-23,z),(8,3.5,8),'gold'),
+           Ell((0,12,z+7),(5,6,2),'window')]
+    for side in [-1,1]:
+        prims += [Ell((side*10,-15,z-2),(7,10,2),'red'),
+                  Ell((side*8,0,z),(2,4,4),'gold'),
+                  limb((side*6,12,z+5),(side*8,15,z+10),1.2,'gold')]
+    prims += [Ell((0,-17,z+8),(2,8,7),'red')]
+    length=(15+S_(ph*2)*2) if clip=='run' else (7+S_(ph)*1.2)
+    prims += [cone((0,-25,z),(0,-25-length,z),6,'flame'),
+              cone((0,-26,z+.5),(0,-28-length*.65,z+.5),3.4,'gold')]
+    prims += saddle(-2,40+bob,9.5,8)
+    return prims,bob
+
 # name -> (builder, materials, flat materials, seat). seat: `raise` lifts the rider so the pelvis sits on the saddle,
 # `cut` hides the rider below that world height (the legs vanish into the barrel), `shadow` is the ground shadow (rx, ry).
 REGISTRY = {
+    'rocket': (rocket, ROCKET, {'flame':3}, {'scale':1.3,'raise':25,'cut':31,'shadow':(35,10),'coat':'hull'}),
     'reindeer': (reindeer, REINDEER, {**FLAT,'nose':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'nightmare': (nightmare, NIGHTMARE, {**FLAT,'flame':2}, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'horse': (horse, HORSE, FLAT, {'scale': 1.3, 'raise': 25, 'cut': 34, 'shadow': (34, 9), 'coat': 'coat'}),
