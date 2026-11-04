@@ -5,7 +5,7 @@ The shell, head and horn never squash or stretch: they translate and tilt as sol
 Planted feet rest exactly on the anchor row (Painter y=0, row 90).  The attack is a rear-up (wind-up), a horn
 slam forward (strike) and a recovery, eight distinct frames.  The death cracks the shell, buckles the legs and
 rolls the beetle onto its back with its legs in the air.  Frame size is free per zone (owner, 2026-11-04): the
-Painter draws on 96x96 and every frame is cropped to FW x FH (96x70, anchor 40,64).
+Painter draws on 96x96 and every frame is cropped to FW x FH (96x78, anchor 40,72).
 
 --replace is refused.  Old sources stay saved; export preserves saved editor frames.
 """
@@ -23,25 +23,26 @@ import urllib.request
 import numpy as np
 from PIL import Image, ImageDraw
 from wyrd_slime_redraw import Painter, mix
-from deep_slime_redraw import sm
+from deep_slime_redraw import sm, bez, taper
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT/'client/assets'
 OUT = ROOT/'test-results/meadow-slime'
 REGISTRY = ROOT/'scripts/meadow_slime_sources.txt'
-PREFIX = 'valhallasc_meadow_ironhide_redo_'
+PREFIX = 'valhallasc_meadow_ironhide_redo_b_'
 KIND = 'beetle'
 CLIPS = {'idle': (6, 6), 'walk': (10, 8), 'attack': (12, 8), 'hurt': (10, 4), 'die': (8, 8)}
-FW, FH = 96, 70                    # exported frame
-X0, Y0 = 0, 26                     # crop origin inside the 96x96 Painter canvas
+FW, FH = 96, 78                    # exported frame
+X0, Y0 = 0, 18                     # crop origin inside the 96x96 Painter canvas
 CX = 40                            # Painter x origin (the beetle's local x = 0)
-AX, AY = CX-X0, 90-Y0              # anchor inside the exported frame: (40, 64)
+AX, AY = CX-X0, 90-Y0              # anchor inside the exported frame: (40, 72)
 PALETTE = ['#00000000', '#282131', '#ffffff', '#edf6e9', '#e6a0a5',
            '#25364c', '#3b5571', '#6084a4', '#8bb4cb', '#bfdee2',
            '#5b4031', '#8a5e3c', '#bd8b50', '#ebc879', '#fff1bd']
 assert len(set(PALETTE)) == len(PALETTE), 'duplicate palette hex'
 STEEL = [5, 6, 7, 8, 9]
 GOLD = [10, 11, 12, 13, 14]
+HORN = [10, 10, 12, 13, 14]                           # dark outline, bronze body, bright edge
 
 # Attack: rear up on the hind legs (wind-up), slam the horn forward and down (strike), then recover.
 ATK_OX = [0, -1, -1, 0, 3, 4, 2, 1]
@@ -148,24 +149,25 @@ def beetle(clip, n):
             if n >= 3:
                 a.line([T(*p) for p in [(14, 36), (9, 30), (13, 24), (7, 18)][:n-1]], 1, 2)
     legs(False)
-    # head, blush, mouth and a blunt gold horn
+    # head, blush, mouth and a tapered bronze horn
     if dead:
         hx, hy = mix(17, 19, sr)+ox, mix(24-sag, 10, sr)+3*math.sin(math.pi*r)
     else:
         hx, hy = T(17, 24)
     a.ball(hx, hy, 11, 10, GOLD)
-    horn_a = [(21, 31), (37, 36), (27, 19)]
-    horn_b = [(30, 14), (46, 11), (31, 5)]
-    if dead:
-        shift = (hx-mix(17, 19, sr), hy-mix(24, 10, sr))
-        hp = [(p[0]+shift[0], p[1]+shift[1]) for p in lerp_pts(horn_a, horn_b, sr)]
-    else:
-        hp = [T(*p) for p in horn_a]
-    a.poly(hp, 10)
-    cxm = sum(p[0] for p in hp)/3
-    cym = sum(p[1] for p in hp)/3
-    a.poly([(cxm+(p[0]-cxm)*.55, cym+(p[1]-cym)*.55) for p in hp], 13)
-    a.line([hp[0], hp[1]], 14, 1)
+    # Rhinoceros-beetle horn: rooted on top of the head, rising and sweeping forward with an upturned tip and a short
+    # second tine.  Drawn as a tapered, outlined curve so it reads as a horn, not a cone.
+    horn_parts = [(bez((17, 30), (19, 44), (34, 43), 10), bez((27, 15), (36, 20), (47, 14), 10), 9, 2.5),
+                  (bez((27, 42), (31, 46), (33, 48), 4), bez((38, 18), (41, 20), (43, 20), 4), 4.5, 1.5)]
+    tip = None
+    for rest_pts, back_pts, w0, w1 in horn_parts:
+        if dead:
+            shift = (hx-mix(17, 19, sr), hy-mix(24, 10, sr))
+            pts = [(p[0]+shift[0], p[1]+shift[1]) for p in lerp_pts(rest_pts, back_pts, sr)]
+        else:
+            pts = [T(*p) for p in rest_pts]
+        taper(a, pts, HORN, w0, w1)
+        tip = tip or pts[-1]
     ey = hy+1
     for dx, dy in ((-4, 1), (5, -1)):
         a.eye(hx+dx, ey+dy, clip, n, .72)
@@ -173,7 +175,7 @@ def beetle(clip, n):
         a.ellipse(hx-7, hy-5, 2.5, 1.3, 4)
     a.line([(hx-3, hy-6), (hx, hy-7.5), (hx+3, hy-6)], 1)
     if clip == 'attack' and n in (4, 5):                  # impact sparks and dust
-        tx, ty = hp[1]
+        tx, ty = tip
         for k in range(3):
             a.ellipse(tx+.5+k*1.2, ty+3.5-k*3.8, 2.2-k*.4, 2.2-k*.4, 14 if k % 2 == 0 else 13)
         for k in range(3):

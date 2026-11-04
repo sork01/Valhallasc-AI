@@ -6,13 +6,16 @@ Greenmeadow slime style: shell, head and horn only translate and tilt as solid p
 
 - **Pipeline:** `scripts/meadow_slime_redraw.py preview | build | refresh | export | verify` (the
   `make_ironhide_sprites.py` CLI delegates; `--replace` is refused). One native PixelFlow source,
-  `valhallasc_meadow_ironhide_redo_all` = **d80cccfe6dfc9e32** (`scripts/meadow_slime_sources.txt`). The earlier
-  rigid candidate (`d1ab641330d34105`, never live) is kept in `meadow_slime_v1_sources.txt` / `meadow_slime_v1_raw.npz`;
+  `valhallasc_meadow_ironhide_redo_b_all` = **dfe4da1671317338** (`scripts/meadow_slime_sources.txt`). The earlier
+  rigid candidate (`d1ab641330d34105`, never live) and the first redo draft (`d80cccfe6dfc9e32`, 96x70, cone horn; `meadow_slime_draft_sources.txt`) are kept in `meadow_slime_v1_sources.txt` / `meadow_slime_v1_raw.npz`;
   the live slime-style source `399849edffa3ab6f` and the original `a3f8837048d1098c` stay in PixelFlow.
   `refresh` rewrites the saved source from the drawer (overwrites editor edits); `export` keeps editor edits.
-- **Frame:** 96x70, anchor (40,64), atlas 768x350 (frame size is free per zone; the old frame was 72x64). The
+- **Frame:** 96x78, anchor (40,72), atlas 768x390 (frame size is free per zone; the old frame was 72x64). The
   Painter draws on 96x96 and each frame is cropped. Same art pixel scale as before, so the beetle keeps its size.
   `client/field.js` now applies `meta.tops.beetle` to `SLIME.beetle.top` (the old manifest had no `tops`).
+- **Horn:** a rhinoceros-beetle horn rooted on top of the head, a tapered outlined bronze curve (`bez` + `taper`) that
+  rises and sweeps forward with a short tine; the first draft's flat cone read as a beak, so it was replaced and the
+  frame grew 8 px taller for the rearing attack. On defeat it lies forward along the ground.
 - **Grounding:** every living frame's lowest pixel is exactly the anchor row (feet are Painter balls with integer
   radius, centre y = radius + lift); death frames never sink below it.
 - **Attack (eight distinct frames):** rear up on the hind legs (1-3, pitch up to 20 degrees, front feet lifted),
@@ -22,7 +25,7 @@ Greenmeadow slime style: shell, head and horn only translate and tilt as solid p
 - **Check:** `bash scripts/test-touch-bounded.sh tests/ironhide-slime-art.cjs` (needs `NODE_PATH` with the main
   `node_modules` and `VALHALLA_BINARY` = the main `target/release/valhalla-server` when run from a worktree): 22
   checks incl. 8 distinct attack and death frames, wind-up/strike/recovery extents, constant steel area (rigid),
-  grounding on row 64, health-bar top and portrait. `MUTATE_PNG=<atlas shifted one row up>` must fail the grounding check.
+  grounding on row 72, health-bar top and portrait. `MUTATE_PNG=<atlas shifted one row up>` must fail the grounding check.
 - **Rollback:** `python3 scripts/rollback_meadow_art.py --target <checkout> --apply` restores the live slime-style
   `ironhide.png`/`ironhide.txt` from `/media/raid/valhallasc-data/meadow-slime-original-20261103` (hash-verified,
   dry run by default, corrupt-backup refusal tested). The change is client-only: no server rebuild or restart.

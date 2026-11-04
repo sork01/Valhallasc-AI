@@ -1,11 +1,11 @@
 {
   "frame": [
     96,
-    70
+    78
   ],
   "anchor": [
     40,
-    64
+    72
   ],
   "kinds": [
     "beetle"
@@ -43,10 +43,10 @@
     }
   },
   "sprites": {
-    "beetle": "d80cccfe6dfc9e32"
+    "beetle": "dfe4da1671317338"
   },
   "tops": {
-    "beetle": 44
+    "beetle": 52
   },
   "artStyle": "greenmeadow-slime-rigid-shell"
 }

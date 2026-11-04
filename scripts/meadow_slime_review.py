@@ -21,8 +21,8 @@ OUT = ROOT/'test-results/meadow-slime'
 FONT = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 20)
 SMALL = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 15)
 BG = '#283c32'
-NEW = (96, 70)
-W, H = 100, 72                    # common padded canvas for before/after pictures
+NEW = (96, 78)
+W, H = 100, 80                    # common padded canvas for before/after pictures
 OLD = (72, 64)                    # the live (slime-style, squashing) Ironhide frame
 
 
@@ -35,7 +35,7 @@ def pose(atlas, row, n, scale=3):
     bottom-aligned on the feet so before and after sit on the same ground line at the same pixel scale."""
     fw, fh = (OLD if atlas.width == 8*OLD[0] else NEW)
     cell = atlas.crop((n*fw, row*fh, (n+1)*fw, (row+1)*fh))
-    ground = 60 if fw == OLD[0] else 64           # anchor row of each atlas
+    ground = 60 if fw == OLD[0] else 72           # anchor row of each atlas
     canvas = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     ox, oy = (W-fw)//2, (H-8)-ground
     canvas.alpha_composite(cell, (ox, oy))
@@ -69,7 +69,7 @@ def review():
 
     gallery = Image.new('RGB', (8*W*3, 5*(H*3+26)+36), BG)
     d = ImageDraw.Draw(gallery)
-    d.text((12, 6), 'Ironhide / every saved PixelFlow frame (96x70, anchor 40,64)', font=FONT, fill='white')
+    d.text((12, 6), 'Ironhide / every saved PixelFlow frame (96x78, anchor 40,72)', font=FONT, fill='white')
     for clip, spec in meta['clips'].items():
         for n in range(spec['n']):
             x, y = n*W*3, 36+spec['row']*(H*3+26)

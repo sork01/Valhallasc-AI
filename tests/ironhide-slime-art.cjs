@@ -23,7 +23,7 @@ const w=new TestWorld();let browser,checks=0;const errors=[];const check=(v,s)=>
   return{frame:meta.frame,anchor:meta.anchor,size:[im.width,im.height],rows,clips:meta.clips,sprites:meta.sprites,tops:meta.tops,gallery:gallery.toDataURL(),portraitReady:ready,portraitPixels:Array.from(bytes).filter((v,i)=>i%4===3&&v>0).length,portrait:portrait.toDataURL()};
  });
  const [FW,FH]=result.frame,AY=result.anchor[1];
- check(result.frame.join()==='96,70'&&result.anchor.join()==='40,64'&&result.size.join()==='768,350','Declared 96x70 frame, anchor (40,64) and 768x350 atlas');
+ check(result.frame.join()==='96,78'&&result.anchor.join()==='40,72'&&result.size.join()==='768,390','Declared 96x78 frame, anchor (40,72) and 768x390 atlas');
  check(result.rows.length===34&&result.rows.every(r=>r.opaque>10&&r.edge===0),'All 34 exported editor frames are nonempty and clear of every border');
  check(result.sprites.beetle===source,'The client loads the new saved PixelFlow source');
  const expected={idle:[6,6],walk:[10,8],attack:[12,8],hurt:[10,4],die:[8,8]};
