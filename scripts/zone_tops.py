@@ -12,6 +12,9 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import kindframe
+
 ASSETS = Path(__file__).resolve().parents[1] / 'client/assets'
 
 
@@ -19,11 +22,10 @@ def main(names):
     for name in names:
         path = ASSETS / f'{name}.txt'
         meta = json.loads(path.read_text())
-        w, h = meta['frame']
-        ay = meta['anchor'][1]
         count = meta['clips']['idle']['n']
         tops = {}
         for kind in meta['kinds']:
+            w, h, _, ay = kindframe.frame_of(meta, kind)      # a kind may have its own frame (docs/kind-frames.md)
             # moonwell_garden atlases are moonwell_<kind>.png and the Echo's is moonwell_echo.png
             path_ = next(p for p in (ASSETS / f'{name}_{kind}.png', ASSETS / f'{name.split("_")[0]}_{kind}.png',
                                      ASSETS / f'{kind}.png') if p.exists())

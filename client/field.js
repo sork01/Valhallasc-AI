@@ -2922,12 +2922,38 @@
   }
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   const enemyBounds = new WeakMap();
+  // Per-kind frame size (docs/kind-frames.md). A manifest may carry kindFrames {kind: {frame: [w, h], anchor: [x, y]}};
+  // every other kind keeps the zone-wide meta.frame/meta.anchor. Cached per manifest and kind: nothing allocates per frame.
+  const KIND_FRAME_MIN = 32, KIND_FRAME_MAX = 192, kindFrameCache = new WeakMap();
+  const ART_FROM = new Map(CATHEDRAL_ENEMIES.filter(e => e.artFrom).map(e => [e.kind, e.artFrom]));   // a kind that borrows another kind's atlas also borrows its frame
+  function frameOf(src, kind) {
+    let cache = kindFrameCache.get(src.meta);
+    if (!cache) kindFrameCache.set(src.meta, cache = new Map());
+    let f = cache.get(kind);
+    if (f) return f;
+    const m = src.meta, own = m.kindFrames?.[kind] || m.kindFrames?.[ART_FROM.get(kind)];
+    let [w, h] = m.frame, [ax, ay] = m.anchor, owned = false;
+    if (own) {
+      const [ow, oh] = own.frame || [], [oax, oay] = own.anchor || [], img = src.img?.[kind];
+      const sane = Number.isInteger(ow) && Number.isInteger(oh) && ow >= KIND_FRAME_MIN && oh >= KIND_FRAME_MIN && ow <= KIND_FRAME_MAX && oh <= KIND_FRAME_MAX
+        && Number.isInteger(oax) && Number.isInteger(oay) && oax >= 0 && oax < ow && oay >= 0 && oay < oh;
+      const sized = !img || !img.naturalWidth || (img.naturalWidth === 8 * ow && img.naturalHeight === 5 * oh);
+      if (sane && sized) { [w, h, ax, ay, owned] = [ow, oh, oax, oay, true]; }
+      else console.warn('kindFrames rejected', kind, own, 'using the zone-wide frame');
+    }
+    f = { w, h, ax, ay, own: owned, shadow: owned ? w / m.frame[0] : 1 };     // a kind drawn k times wider than the zone's frame gets k times the shadow
+    if (!own || src.img?.[kind]?.naturalWidth) cache.set(kind, f);     // an unloaded atlas cannot be size-checked yet: ask again next time
+    return f;
+  }
+  // Cull margin and shadow follow a kind's OWN frame; every other kind keeps the old fixed values exactly.
+  const enemyCullMargin = s => { const src = enemySource(s), f = src && frameOf(src, s.kind); return f?.own ? Math.max(100, Math.ceil(f.h * SLIME_K * s.d.scale)) : 100; };
+  const enemyShadowK = s => { const src = enemySource(s); return src ? frameOf(src, s.kind).shadow : 1; };
   function enemyHitbox(s) {
     const src = enemySource(s), img = src?.img[s.kind];
     if (!img) return { x0: -16, x1: 16, y0: -(s.d.top || 28), y1: 5 };
     let b = enemyBounds.get(img);
     if (b) return b;
-    const [fw, fh] = src.meta.frame, [ax, ay] = src.meta.anchor, row = src.meta.clips.idle.row;
+    const { w: fw, h: fh, ax, ay } = frameOf(src, s.kind), row = src.meta.clips.idle.row;
     const c = document.createElement('canvas'); c.width = fw; c.height = fh;
     const g = c.getContext('2d', { willReadFrequently: true });
     g.drawImage(img, 0, row * fh, fw, fh, 0, 0, fw, fh);
@@ -2953,7 +2979,7 @@
       g.beginPath(); g.arc(48, 50, 28, 0, Math.PI * 2); g.fill();
       return false;
     }
-    const b = enemyHitbox(s), [fw, fh] = src.meta.frame, [ax, ay] = src.meta.anchor;
+    const b = enemyHitbox(s), { w: fw, h: fh, ax, ay } = frameOf(src, target.kind);
     const x = Math.max(0, Math.floor(b.x0 + ax)), y = Math.max(0, Math.floor(b.y0 + ay));
     const w = Math.min(fw - x, Math.ceil(b.x1 - b.x0)), h = Math.min(fh - y, Math.ceil(b.y1 - b.y0));
     if (w > 0 && h > 0) {
@@ -3209,7 +3235,7 @@
     return ['idle', [0, 1, 2, 1, 0, 5][Math.floor(t * C.idle.fps + s.seed) % 6]];
   }
   function drawSlimeSprite(g, s, t) {
-    const src = enemySource(s), m = src.meta, [fw, fh] = m.frame, [ax, ay] = m.anchor, [clip, n] = slimeFrame(s, t), c = m.clips[clip], K = SLIME_K * s.d.scale;
+    const src = enemySource(s), m = src.meta, { w: fw, h: fh, ax, ay } = frameOf(src, s.kind), [clip, n] = slimeFrame(s, t), c = m.clips[clip], K = SLIME_K * s.d.scale;
     g.save();
     if (s.dead) g.globalAlpha = clamp((DIE_SHOW - s.dieT) / .5, 0, 1);
     g.imageSmoothingEnabled = false; g.scale(s.dir < 0 ? -K : K, K);
@@ -3999,7 +4025,7 @@
     for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
     for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
-    for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
+    for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, enemyCullMargin(s))) { const sk = enemyShadowK(s); shadow(g, s.x, s.y, 28 * sk * s.d.scale * (1 - s.hop * .12), 11 * sk * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, 70)) { shadow(g,chest.x,chest.y,27,9,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
     for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
@@ -4565,6 +4591,7 @@
     bubbleBox(id) { return bubbles.get(id)?.box || null; },
     bubbleDrawn() { return bubblesLast; },
     enemyName(kind) { return SLIME[kind]?.name || null; },
+    frameOf,
     enemyLevelColor: levelColor,
     drawTargetPortrait,
     // The class sprite for any look, loaded like a remote player's (the inspect window draws it).
@@ -4580,7 +4607,7 @@
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
+    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox, drawSlimeSprite, enemyCullMargin, enemyShadowK, enemySource },
   };
   window.Field = Field;
 })();

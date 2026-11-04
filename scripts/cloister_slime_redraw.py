@@ -19,6 +19,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw
 import make_crag_sprites as old
+import kindframe
 from wyrd_slime_redraw import Painter, motion, mix
 from deep_slime_redraw import (PALETTE as DEEP, sm, bez, taper, erase, rot, BAYER,
                                TEAL, BLUE, BROWN, GOLD, BONE, GREEN, PLATE, FUR, PURPLE, OLIVE, RAG, BONE as BN)
@@ -34,6 +35,13 @@ NAMES = dict(tidetemplar='Tide Templar', tidecantor='Tide Cantor', tideleech='Ti
              mournsister='Mourning Sister', rootabbot='Root Abbot', choirmother='Choirmother', choirsinger='Bound Singer')
 W = H = 96
 AX, AY = 48, 90
+KIND_FRAMES = {}   # kind -> (w, h, ax, ay); empty = every kind on the zone-wide frame (docs/kind-frames.md, scripts/kindframe.py)
+
+
+def kind_frame(kind):
+    return kindframe.check_frame(*KIND_FRAMES.get(kind, (W, H, AX, AY)))
+
+
 CLIPS = old.CLIPS
 PALETTE = DEEP[:] + ['#5a1f38', '#a8456e', '#e07a9a', '#f6b0c4', '#ffe4ec',      # 95-99 rose hair
                      '#2e0f1c', '#6a2038', '#a63a56', '#d8708a', '#ffb0be']      # 100-104 maroon
@@ -706,10 +714,10 @@ def refresh():
         print('Refreshed', kind, saved[kind], offset, 'frames', flush=True)
 
 
-def cel_grid(cel):
+def cel_grid(cel, w=W, h=H):
     if 'rle' in cel:
         runs = cel['rle']
-        return np.repeat(np.array(runs[1::2], dtype=np.uint8), runs[0::2]).reshape(H, W)
+        return np.repeat(np.array(runs[1::2], dtype=np.uint8), runs[0::2]).reshape(h, w)
     return np.array(cel['grid'], dtype=np.uint8)
 
 
@@ -721,31 +729,30 @@ def export():
     before = json.loads(MANIFEST.read_text())
     proof, atlases, tops = {}, {}, {}
     for kind in KINDS:       # read and validate every saved editor source before replacing any installed file
+        kw, kh, kax, kay = kind_frame(kind)
         sp = old.api('get?sprite_id='+saved[kind])['sprite']
-        assert (sp['width'], sp['height'], len(sp['frames'])) == (W, H, 34)
-        atlas = Image.new('RGBA', (8*W, 5*H))
+        assert (sp['width'], sp['height'], len(sp['frames'])) == (kw, kh, 34)
+        atlas = Image.new('RGBA', kindframe.atlas_size(kw, kh))
         offset = 0
         rows = []
         for row, (clip, (fps, count)) in enumerate(CLIPS.items()):
             assert meta['clips'][clip] == dict(fps=fps, n=count, row=row, editorStart=offset), 'clip layout changed'
             for n in range(count):
-                im = rgba(cel_grid(sp['frames'][offset+n]['cels'][0]), sp['palette'])
+                im = rgba(cel_grid(sp['frames'][offset+n]['cels'][0], kw, kh), sp['palette'])
                 bounds = im.getbbox()
-                assert bounds and min(bounds[:2]) > 0 and max(bounds[2:]) < 96
-                atlas.alpha_composite(im, (n*W, row*H))
+                kindframe.check_bounds(bounds, kw, kh)
+                atlas.alpha_composite(im, (n*kw, row*kh))
                 rows.append(dict(clip=clip, n=n, sha256=hashlib.sha256(im.tobytes()).hexdigest(), bounds=bounds))
             offset += count
-        tops[kind] = int(AY-min(r['bounds'][1] for r in rows if r['clip'] == 'idle'))
+        tops[kind] = kindframe.top_of([r['bounds'] for r in rows if r['clip'] == 'idle'], kay)
         atlases[kind] = atlas
         proof[kind] = dict(source=saved[kind], frames=rows)
-    for kind in KINDS:
-        meta['sprites'][kind] = saved[kind]
-        meta['tops'][kind] = tops[kind]
+    meta = kindframe.merge_kind_entries(meta, KINDS, saved, tops, {k: kind_frame(k) for k in KINDS if k in KIND_FRAMES})
     # shared manifest: everything except these eight entries must be untouched
     for key in meta:
-        if key in ('sprites', 'tops'):
-            assert {k: v for k, v in meta[key].items() if k not in KINDS} == {k: v for k, v in before[key].items() if k not in KINDS}
-            assert list(meta[key]) == list(before[key]), 'key order changed'
+        if key in ('sprites', 'tops', 'kindFrames'):
+            assert {k: v for k, v in (meta.get(key) or {}).items() if k not in KINDS} == {k: v for k, v in (before.get(key) or {}).items() if k not in KINDS}
+            if key != 'kindFrames': assert list(meta[key]) == list(before[key]), 'key order changed'
         else:
             assert meta[key] == before[key], key
     for kind, atlas in atlases.items():
@@ -765,12 +772,14 @@ def verify():
     for kind in KINDS:
         assert meta['sprites'][kind] == saved[kind]
         sp = old.api('get?sprite_id='+saved[kind])['sprite']
+        kw, kh, _, _ = kindframe.frame_of(meta, kind)
         atlas = Image.open(ASSETS/f'cathedral_{kind}.png').convert('RGBA')
+        assert atlas.size == kindframe.atlas_size(kw, kh), (kind, atlas.size)
         offset = 0
         for row, (clip, (_, count)) in enumerate(CLIPS.items()):
             for n in range(count):
-                cell = atlas.crop((n*W, row*H, (n+1)*W, (row+1)*H))
-                assert cell.tobytes() == rgba(cel_grid(sp['frames'][offset+n]['cels'][0]), sp['palette']).tobytes(), (kind, clip, n, 'editor mismatch')
+                cell = atlas.crop((n*kw, row*kh, (n+1)*kw, (row+1)*kh))
+                assert cell.tobytes() == rgba(cel_grid(sp['frames'][offset+n]['cels'][0], kw, kh), sp['palette']).tobytes(), (kind, clip, n, 'editor mismatch')
             offset += count
         print(kind, '34 saved editor frames equal exported atlas', flush=True)
 

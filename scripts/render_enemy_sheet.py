@@ -7,6 +7,10 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+import json
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import kindframe
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'test-results/enemy-sheets'
 FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
@@ -124,9 +128,12 @@ def font(size, bold=False):
     return ImageFont.truetype(BOLD if bold else FONT, size)
 
 
-def frame(atlas, row, col, scale):
-    tile = atlas.crop((col * 96, row * 96, (col + 1) * 96, (row + 1) * 96))
-    return tile.resize((96 * scale, 96 * scale), Image.Resampling.NEAREST)
+def frame(atlas, row, col, scale, cell=(96, 96)):
+    # `cell` is the kind's own frame (docs/kind-frames.md); the tile is fitted into the 96*scale slot, keeping its aspect
+    w, h = cell
+    tile = atlas.crop((col * w, row * h, (col + 1) * w, (row + 1) * h))
+    k = 96 * scale / max(w, h)
+    return tile.resize((round(w * k), round(h * k)), Image.Resampling.NEAREST)
 
 
 def sheet(zone):
@@ -149,13 +156,15 @@ def sheet(zone):
         d.text((x + 19, top + 46), 'BOSS / ELITE' if boss else 'ORDINARY', font=font(15, True),
                fill=accent if boss else '#a9a6c4')
         atlas = Image.open(ROOT / f'client/assets/{tag}_{kind}.png').convert('RGBA')
-        big = frame(atlas, 0, 0, 3)
-        canvas.paste(big, (x + (CARD_W - 288) // 2, top + 68), big)
+        manifest = ROOT / f'client/assets/{tag}.txt'
+        cell = kindframe.frame_of(json.loads(manifest.read_text()), kind)[:2] if manifest.exists() else (96, 96)
+        big = frame(atlas, 0, 0, 3, cell)
+        canvas.paste(big, (x + (CARD_W - big.width) // 2, top + 68 + 288 - big.height), big)
         d.line((x + 18, top + 366, x + CARD_W - 18, top + 366), fill=accent, width=2)
         for j, (label, clip, col) in enumerate((('WALK', 1, 2), ('ATTACK', 2, 4), ('HURT', 3, 1), ('DIE', 4, 3))):
             px = x + 12 + j * 96
-            pose = frame(atlas, clip, col, 1)
-            canvas.paste(pose, (px, top + 376), pose)
+            pose = frame(atlas, clip, col, 1, cell)
+            canvas.paste(pose, (px + (96 - pose.width) // 2, top + 376 + 96 - pose.height), pose)
             d.text((px + 6, top + 476), label, font=font(13, True), fill='#c9c6e2')
     d.text((GAP * 2, height - 34), '96 × 96 source frames · shared foot anchor · 34 frames per enemy',
            font=font(16), fill='#8c88a8')

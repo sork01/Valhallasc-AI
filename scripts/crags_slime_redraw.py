@@ -15,6 +15,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw
 import make_crag_sprites as old
+import kindframe
 from wyrd_slime_redraw import Painter, motion, mix
 from deep_slime_redraw import sm, bez, taper, erase
 from cloister_slime_redraw import Rig, erase_rising
@@ -28,6 +29,11 @@ KINDS = old.KINDS
 CLIPS = old.CLIPS
 W = H = 96
 AX, AY = 48, 90
+KIND_FRAMES = {}   # kind -> (w, h, ax, ay); empty = every kind on the zone-wide frame (docs/kind-frames.md, scripts/kindframe.py)
+
+
+def kind_frame(kind):
+    return kindframe.check_frame(*KIND_FRAMES.get(kind, (W, H, AX, AY)))
 # Same colours as v1; index zero alone is transparent.
 PALETTE = ['#00000000', '#282131', '#ffffff', '#edf6e9', '#e6a0a5',
            '#90291b', '#d7471e', '#f87d28', '#ffb840', '#fff39c',
@@ -372,7 +378,7 @@ def build():
         name = PREFIX+kind+'_all'
         assert name not in existing, 'Unregistered source already exists: '+name
         np.savez_compressed(ROOT/f'scripts/crags_slime_{kind}_raw.npz', **data[kind])
-        sid = old.api('create', dict(name=name, width=W, height=H, frames=34, layers=1, fps=10,
+        sid = old.api('create', dict(name=name, width=kind_frame(kind)[0], height=kind_frame(kind)[1], frames=34, layers=1, fps=10,
                                      palette=PALETTE, persist=True, ops=[dict(op='set_layer', layer=0, name=kind)]))['sprite_id']
         saved[kind] = sid
         REGISTRY.write_text(json.dumps(saved, indent=2)+'\n')
@@ -401,10 +407,10 @@ def refresh():
         print('Refreshed', kind, saved[kind], offset, 'frames', flush=True)
 
 
-def cel_grid(cel):
+def cel_grid(cel, w=W, h=H):
     if 'rle' in cel:
         runs = cel['rle']
-        return np.repeat(np.array(runs[1::2], dtype=np.uint8), runs[0::2]).reshape(H, W)
+        return np.repeat(np.array(runs[1::2], dtype=np.uint8), runs[0::2]).reshape(h, w)
     return np.array(cel['grid'], dtype=np.uint8)
 
 
@@ -414,20 +420,22 @@ def export():
     meta = dict(frame=[W, H], anchor=[AX, AY], kinds=KINDS, clips={}, sprites=saved, tops={}, artStyle='greenmeadow-slime')
     proof, atlases = {}, {}
     for kind in KINDS:       # read and validate every saved editor source before replacing any installed file
+        kw, kh, kax, kay = kind_frame(kind)
         sp = old.api('get?sprite_id='+saved[kind])['sprite']
-        assert (sp['width'], sp['height'], len(sp['frames'])) == (W, H, 34)
-        atlas = Image.new('RGBA', (8*W, 5*H))
+        assert (sp['width'], sp['height'], len(sp['frames'])) == (kw, kh, 34)
+        atlas = Image.new('RGBA', kindframe.atlas_size(kw, kh))
         offset, rows = 0, []
         for row, (clip, (fps, count)) in enumerate(CLIPS.items()):
             meta['clips'][clip] = dict(fps=fps, n=count, row=row, editorStart=offset)
             for n in range(count):
-                im = rgba(cel_grid(sp['frames'][offset+n]['cels'][0]), sp['palette'])
+                im = rgba(cel_grid(sp['frames'][offset+n]['cels'][0], kw, kh), sp['palette'])
                 bounds = im.getbbox()
-                assert bounds and min(bounds[:2]) > 0 and max(bounds[2:]) < 96
-                atlas.alpha_composite(im, (n*W, row*H))
+                kindframe.check_bounds(bounds, kw, kh)
+                atlas.alpha_composite(im, (n*kw, row*kh))
                 rows.append(dict(clip=clip, n=n, sha256=hashlib.sha256(im.tobytes()).hexdigest(), bounds=bounds))
             offset += count
-        meta['tops'][kind] = int(AY-min(r['bounds'][1] for r in rows if r['clip'] == 'idle'))
+        meta['tops'][kind] = kindframe.top_of([r['bounds'] for r in rows if r['clip'] == 'idle'], kay)
+        kindframe.set_kind_frame(meta, kind, kw, kh, kax, kay)
         atlases[kind] = atlas
         proof[kind] = dict(source=saved[kind], frames=rows)
     for kind, atlas in atlases.items():
@@ -447,12 +455,14 @@ def verify():
     for kind in KINDS:
         assert meta['sprites'][kind] == saved[kind]
         sp = old.api('get?sprite_id='+saved[kind])['sprite']
+        kw, kh, _, _ = kindframe.frame_of(meta, kind)
         atlas = Image.open(ASSETS/f'crags_{kind}.png').convert('RGBA')
+        assert atlas.size == kindframe.atlas_size(kw, kh), (kind, atlas.size)
         offset = 0
         for row, (clip, (_, count)) in enumerate(CLIPS.items()):
             for n in range(count):
-                cell = atlas.crop((n*W, row*H, (n+1)*W, (row+1)*H))
-                assert cell.tobytes() == rgba(cel_grid(sp['frames'][offset+n]['cels'][0]), sp['palette']).tobytes(), (kind, clip, n, 'editor mismatch')
+                cell = atlas.crop((n*kw, row*kh, (n+1)*kw, (row+1)*kh))
+                assert cell.tobytes() == rgba(cel_grid(sp['frames'][offset+n]['cels'][0], kw, kh), sp['palette']).tobytes(), (kind, clip, n, 'editor mismatch')
             offset += count
         print(kind, '34 saved editor frames equal exported atlas', flush=True)
 

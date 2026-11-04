@@ -10,7 +10,11 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import sys
 import tempfile
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import kindframe
 
 DEFAULT_BACKUP = '/media/raid/valhallasc-data/cloister-slime-original-20261103'
 MANIFEST = 'client/assets/cathedral.txt'
@@ -49,10 +53,8 @@ def restore(target, backup, apply=False):
     for k in kinds:
         assert k in live['sprites'] and k in live['tops'], 'Target manifest lacks '+k
         assert k in info['oldSprites'] and k in info['oldTops'], 'Backup lacks old entries for '+k
-    merged = json.loads(json.dumps(live))
-    for k in kinds:
-        merged['sprites'][k] = info['oldSprites'][k]
-        merged['tops'][k] = info['oldTops'][k]
+    # kindFrames (docs/kind-frames.md): a backup made before that existed has no oldFrames, so every kind returns to the zone-wide frame
+    merged = kindframe.restore_kind_entries(live, kinds, info['oldSprites'], info['oldTops'], kindframe.frames_from_manifest(info.get('oldFrames')))
     for dest, data, digest in staged:
         print(('Restore ' if apply else 'Would restore ')+str(dest))
     print(('Merge ' if apply else 'Would merge ')+f'{len(kinds)} sprites/tops entries into {live_path} (all other entries kept)')
@@ -63,6 +65,7 @@ def restore(target, backup, apply=False):
         atomic_write(live_path, (json.dumps(merged, indent=2)+'\n').encode())
         check = json.loads(live_path.read_text())
         assert all(check['sprites'][k] == info['oldSprites'][k] and check['tops'][k] == info['oldTops'][k] for k in kinds)
+        assert all((check.get('kindFrames') or {}).get(k) == (info.get('oldFrames') or {}).get(k) for k in kinds), 'kindFrames not restored'
     print('Restored and verified eight atlases plus their manifest entries.' if apply else 'Backup verified. Add --apply to restore.')
 
 

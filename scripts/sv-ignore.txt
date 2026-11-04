@@ -158,5 +158,6 @@
   "Rider scale",
   "Halloween daily quest",
   "button:not(:disabled),input,textarea,select",
-  "button[data-mail-busy]"
+  "button[data-mail-busy]",
+  "kindFrames rejected"
 ]

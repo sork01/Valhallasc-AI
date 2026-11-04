@@ -8,6 +8,10 @@ with `add: true` and `artFrom: <kind>`. Until they get PixelFlow sprites of thei
 """
 import json
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import kindframe
 
 ROOT = Path(__file__).resolve().parents[1]
 ATLAS = ROOT / 'client/assets/cathedral.txt'
@@ -27,6 +31,7 @@ def main():
                 atlas['kinds'].append(enemy['kind'])
             atlas['sprites'][enemy['kind']] = atlas['sprites'][source]
             atlas['tops'][enemy['kind']] = atlas['tops'][source]
+            kindframe.set_kind_frame(atlas, enemy['kind'], *kindframe.frame_of(atlas, source))      # the alias draws the borrowed atlas, so it needs the borrowed frame size
             borrowed += 1
     ATLAS.write_text(json.dumps(atlas, indent=2) + '\n')
     print(f'{borrowed} helpers borrow art')

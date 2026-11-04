@@ -37,7 +37,7 @@ window.EmptySeat = (() => {
     const src = window.Field?.cathedralSprites, img = src?.img.cf_eldmarr;
     g.save(); g.translate(x, y); g.globalAlpha = .5;
     if (img?.complete && img.naturalWidth) {
-      const [w, h] = src.meta.frame, [ax, ay] = src.meta.anchor;
+      const { w, h, ax, ay } = window.Field.frameOf(src, 'cf_eldmarr');
       g.drawImage(img, 0, src.meta.clips.idle.row*h, w, h, -ax*2.6, -ay*2.6, w*2.6, h*2.6);
     } else {
       g.fillStyle = '#f2bd80'; g.beginPath(); g.ellipse(0,-90,43,70,0,0,Math.PI*2);g.fill();
