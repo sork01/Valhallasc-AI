@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.16",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The seven Wyrdwood enemies are redrawn from scratch in the shared slime style: the Rotfang Boar, Gallowcrow, Mosshide Troll, Wyrdweaver, Stormram, Oakhorn and Hrungnir keep their colours, with glossier shading, large eyes and chunkier shapes.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the boar lowers its head, charges and tosses its tusks, the crow flares its wings and stabs its beak at the ground, the troll heaves its club overhead and smashes it down, the weaver draws back and lashes its spindle out on a golden thread, the ram rears back and headbutts with a flash of lightning, Oakhorn rakes with its lowered antlers, and Hrungnir raises both fists and slams them down as lightning crawls along the ground.",
+      "Deaths fit each enemy: the boar tips onto its back, the ram lies flat, Oakhorn kneels and lowers its head as its leaves fall, the troll wilts and slumps forward, the weaver's robe settles into folds, Hrungnir cracks and falls apart into stone blocks, and the crow tips forward with loose feathers drifting down.",
+      "All seven now stand exactly on the ground instead of floating above it: every hoof, talon and boot touches the floor and the weaver's robe reaches it. The boar, ram and Oakhorn show four separate legs. Each enemy gets its own picture frame so raised clubs, wings, antlers and fists fit; the enemies themselves are drawn at the same size."
+    ],
+    "removed": [
+      "Replaced the Wyrdwood enemies' previous artwork; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.15",
     "date": "2026-11-04",
     "new": [],
