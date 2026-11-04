@@ -3015,7 +3015,7 @@
     return fetch('assets/ironhide.txt').then(r => r.json()).then(meta => new Promise((resolve, reject) => {
       const img = new Image(); img.onload = () => resolve({ meta, img: { beetle: img } });
       img.onerror = reject; img.src = 'assets/ironhide.png';
-    })).then(src => { beetleSrc = src; }).catch(() => { beetleSrc = null; });
+    })).then(src => { beetleSrc = src; if (src.meta.tops?.beetle) SLIME.beetle.top = src.meta.tops.beetle; }).catch(() => { beetleSrc = null; });
   }
   // Emberfall Crags monsters: one atlas per kind (assets/crags_<kind>.png, scripts/make_crag_sprites.py), the
   // same five clips and frame meanings as the Ironhide Beetle.
