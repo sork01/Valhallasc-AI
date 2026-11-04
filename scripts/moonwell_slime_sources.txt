@@ -1,0 +1,9 @@
+{
+  "dew_moth": "e7398d89791d45c1",
+  "lumen_eel": "98476b90e0aa779a",
+  "rootbell": "dfb31e19bf6b2c75",
+  "tideglass_heron": "ec54d26e3542dbb8",
+  "hourpetal_stag": "ca46ce18eb3e8c3b",
+  "moonskein_weaver": "17c46d9a130f0958",
+  "moonwell_echo": "f961f9c017e35657"
+}

@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.25",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The seven Moonwell enemies are redrawn to look unique and mean, each with its own face and shape instead of one shared round-eyed look: the Dew Moth is a mosquito-like moth with faceted eyes and a needle snout, the Lumen Eel a blind anglerfish with a glowing lure and a jaw full of needles, and the Rootbell a bronze bell on gnarled roots with a dark visor and a toothed mouth.",
+      "The Tideglass Heron is a gaunt glass-feathered bird with a dagger beak, the Hourpetal Stag a skull-faced stag with petal-tipped antlers and an hourglass on its flank, the Moonskein Weaver a tall stilt-legged puppeteer with four needle arms and a stitched mouth, and the Moonwell Echo a cracked mirror wraith with orbiting shards.",
+      "Attacks are easier to read: the moth rears back and dives with its needle, the eel coils and darts, the Rootbell rears up and slams down in a ringing shockwave, the heron spears forward in a spray of glass, the stag lowers its antlers and gores, the Weaver thrusts all four needles, and the Echo draws in its shards and hurls them.",
+      "Deaths match each creature: the moth bursts into dew and drops, the eel goes dark and sinks, the Rootbell cracks and topples, the heron shatters, the stag falls as the sand runs out of its hourglass, the Weaver unravels into a heap of thread, and the Echo splits apart and falls in pieces."
+    ],
+    "removed": [
+      "Replaced the previous Moonwell artwork; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.24",
     "date": "2026-11-04",
     "new": [],

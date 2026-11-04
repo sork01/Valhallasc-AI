@@ -136,7 +136,13 @@ def atlas(kind):
 
 
 def main():
+    # The six garden kinds' art is now the slime-style redo (scripts/moonwell_slime_redraw.py); the helpers above stay importable.
+    if '--replace' in sys.argv:raise SystemExit('--replace is refused; edit the saved sources and export.')
+    import moonwell_slime_redraw as slime
+    cmds={'preview':slime.preview,'extents':slime.extents,'build':slime.build,'refresh':slime.refresh,'export':slime.export,'verify':slime.verify}
     cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
+    if cmd not in cmds:raise SystemExit('preview | extents | build | refresh <kinds> | export | verify')
+    return cmds[cmd]()
     if cmd not in ('preview','export','verify'):raise SystemExit('preview | export | verify')
     for kind in KINDS:
         out=atlas(kind);path=ASSETS/f'moonwell_{kind}.png'

@@ -43,9 +43,22 @@
     }
   },
   "sprites": {
-    "moonwell_echo": "38fdfdff9a8a8bcc"
+    "moonwell_echo": "f961f9c017e35657"
   },
   "tops": {
-    "moonwell_echo": 79
+    "moonwell_echo": 105
+  },
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "moonwell_echo": {
+      "frame": [
+        168,
+        115
+      ],
+      "anchor": [
+        74,
+        109
+      ]
+    }
   }
 }

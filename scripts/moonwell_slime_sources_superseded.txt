@@ -1,0 +1,12 @@
+{
+  "rootbell_v1_larger": "85f25a345780ad2c",
+  "tideglass_heron_v1_larger": "fd49dc9238b36bc8",
+  "hourpetal_stag_v1_larger": "320878a31607e1ef",
+  "moonskein_weaver_v1_larger": "95dbc3f837f80f2d",
+  "moonwell_echo_v1_larger": "d3905c94cba4a044",
+  "tideglass_heron_v2_larger": "b667c3333b827dd4",
+  "moonskein_weaver_v2_larger": "f4099ed20425f9fd",
+  "rootbell_v2_larger": "8f47ad19ff07b36b",
+  "tideglass_heron_v3_duplicate_build": "ad1b4b6ff040fd3b",
+  "moonskein_weaver_v3_duplicate_build": "eae8d022ab80bd20"
+}
