@@ -163,11 +163,12 @@ def spider(clip, n):
                 a.line([(-14, by-12), (-9, by-6), (-13, by-1)], 1, 1)
     hx, hy = 15+st*5-w, by+1+w*6-st*3
     a.ball(hx, hy, 13, 12, ROCK)                    # head
-    spread = 1+st*4+w*1.5                            # fangs hang from the jaw and part when it bites
-    for off, sg in ((6, -1), (13, 1)):
-        bx = hx+off
-        a.poly([(bx-2.2, hy-9), (bx+2.2, hy-9), (bx+sg*spread*.5, hy-15-st*3)], 24)
-        a.poly([(bx-1, hy-9), (bx+1, hy-9), (bx+sg*spread*.5, hy-14-st*3)], 3)
+    spread = .6+st*2.5+w                               # fangs hang from the mouth corners and part when it bites
+    for sg in (-1, 1):
+        bx = hx+2+sg*3.4                               # the face's mouth line is at (hx+2, hy-4)
+        tip = (bx+sg*spread*.5, hy-4.5-4-st*3)
+        a.poly([(bx-1.6, hy-4.2), (bx+1.6, hy-4.2), tip], 24)
+        a.poly([(bx-.6, hy-4.2), (bx+.6, hy-4.2), (tip[0], tip[1]+1)], 3)
     a.face(hx+2, hy+4, clip, n, .75)
     for x in (9, 15, 21):
         a.ellipse(x+hx-15, by+15-t*3+(hy-by-1), 1, 1, 8 if t < .6 else 13)
