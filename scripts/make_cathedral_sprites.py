@@ -24,18 +24,19 @@ ASSETS = ROOT / 'client/assets'
 RAW = ROOT / 'scripts'
 PREFIX = 'valhallasc_cathedral_'
 KINDS = [e['kind'] for e in C.ENEMIES]
-# Flooded Cloister and Coral Reliquary kinds are drawn by scripts/cloister_slime_redraw.py and scripts/reliquary_slime_redraw.py
-# (native PixelFlow sources). The old drawers below must never rebuild or re-export them (that would overwrite the slime-style
-# atlases); their verify delegates to the new pipelines.
+# Flooded Cloister, Coral Reliquary and Grand Nave kinds are drawn by scripts/cloister_slime_redraw.py,
+# scripts/reliquary_slime_redraw.py and scripts/nave_slime_redraw.py (native PixelFlow sources). The old drawers below
+# must never rebuild or re-export them (that would overwrite the slime-style atlases); their verify delegates to the new pipelines.
 CLOISTER_SLIME = frozenset(['tidetemplar', 'tidecantor', 'tideleech', 'bellkeeper', 'mournsister', 'rootabbot', 'choirmother', 'choirsinger'])
 RELIQUARY_SLIME = frozenset(['reliccrab', 'pearlwidow', 'glasscantor', 'relicwarden', 'coralregent', 'reliquarypearl'])
-SLIME = CLOISTER_SLIME | RELIQUARY_SLIME
+NAVE_SLIME = frozenset(['abysszealot', 'chainmarshal', 'starseraph', 'tidejudicator', 'hierophant'])
+SLIME = CLOISTER_SLIME | RELIQUARY_SLIME | NAVE_SLIME
 
 
 def skip_slime(kinds, what):
     kept = [k for k in kinds if k not in SLIME]
     if len(kept) != len(kinds):
-        print(f'{what}: Flooded Cloister / Coral Reliquary kinds are drawn by *_slime_redraw.py; skipped {sorted(set(kinds) - set(kept))}')
+        print(f'{what}: Cathedral slime kinds are drawn by *_slime_redraw.py; skipped {sorted(set(kinds) - set(kept))}')
     return kept
 
 def palette(e):
@@ -335,6 +336,9 @@ def verify(kinds):
     if any(k in RELIQUARY_SLIME for k in kinds):
         import reliquary_slime_redraw
         reliquary_slime_redraw.verify()
+    if any(k in NAVE_SLIME for k in kinds):
+        import nave_slime_redraw
+        nave_slime_redraw.verify()
     kinds = skip_slime(kinds, 'verify')
     for kind in kinds:
         frames = render(kind)

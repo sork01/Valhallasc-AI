@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.19",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The five Grand Nave enemies are redrawn in the shared slime style: the Abyssal Zealot, Chain Marshal, Star Seraph, Tide Judicator and Hierophant Vael keep their colours, with glossier shading, large eyes and chunkier shapes, joining the Tide Templar and Tide Cantor already in the wing.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the Abyssal Zealot hoists its burning chain censer high overhead and whips it far forward in a burst of abyssal flame, the Chain Marshal heaves its iron ship anchor overhead and slams it down with shockwave sparks, the Star Seraph spreads all four feathered wings high to charge a starlight orb and looses a shooting-star volley, the Tide Judicator raises its gavel high as its balance scales flare and brings it crashing down, and Hierophant Vael lifts his Tide-Orb crosier above his mitre and sweeps a torrent of tide orbs forward.",
+      "Deaths fit each enemy: the Abyssal Zealot's censer clatters flat as its flame gutters out and the empty cowl crumples, the Chain Marshal's armoured legs buckle as its anchor and chains crash flat, the Star Seraph's broken halo shatters to the floor as her four wings fold over her gown, the Tide Judicator's balance scales spill onto the floor as his gavel and crown drop, and Hierophant Vael's chest Tide-Heart cracks and dims as his crosier and mitre tumble.",
+      "All five enemies rest cleanly on the ground instead of floating above it, with both armoured boots touching the floor for the Chain Marshal, and each enemy gets its own wider and taller picture frame so raised censers, anchors, wings, gavels and crosiers fit cleanly."
+    ],
+    "removed": [
+      "Replaced the Grand Nave enemies' previous artwork so the wing matches the shared slime style; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.18",
     "date": "2026-11-04",
     "new": [],

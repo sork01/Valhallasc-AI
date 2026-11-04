@@ -192,7 +192,7 @@
     "tidecantor": "fde8ff9cf98da578",
     "tideleech": "356b42219ae7365c",
     "reliccrab": "db58a0a5484721e6",
-    "abysszealot": "c2cab87fa5cc4344",
+    "abysszealot": "7fda970e0aa760ae",
     "bellkeeper": "0f27f6d32c7515a4",
     "mournsister": "725ae0933228f6eb",
     "rootabbot": "0f7f02bac6eebc84",
@@ -201,10 +201,10 @@
     "glasscantor": "c11accd2c6e89fea",
     "relicwarden": "73a994d9b3f767d4",
     "coralregent": "0a8dc9a954c22fe9",
-    "chainmarshal": "462e65b0ea4e3b1a",
-    "starseraph": "fefc71ed55fcb00a",
-    "tidejudicator": "4d95fb5d35541056",
-    "hierophant": "e84af5fba462af60",
+    "chainmarshal": "be78cd79be2e14fe",
+    "starseraph": "82a0f6b1f2b069b8",
+    "tidejudicator": "bd9501ef46e5dd9d",
+    "hierophant": "5db94628883ff5dc",
     "eye_drifter": "96752b085e453e0b",
     "eye_lurker": "b26920ddd3956cf3",
     "eye_adept": "18a4a912b620f968",
@@ -340,7 +340,7 @@
     "tidecantor": 59,
     "tideleech": 29,
     "reliccrab": 61,
-    "abysszealot": 84,
+    "abysszealot": 76,
     "bellkeeper": 51,
     "mournsister": 61,
     "rootabbot": 65,
@@ -349,10 +349,10 @@
     "glasscantor": 72,
     "relicwarden": 70,
     "coralregent": 80,
-    "chainmarshal": 79,
-    "starseraph": 85,
-    "tidejudicator": 82,
-    "hierophant": 80,
+    "chainmarshal": 74,
+    "starseraph": 76,
+    "tidejudicator": 78,
+    "hierophant": 84,
     "eye_drifter": 61,
     "eye_lurker": 40,
     "eye_adept": 56,
@@ -542,6 +542,56 @@
       "anchor": [
         50,
         90
+      ]
+    },
+    "abysszealot": {
+      "frame": [
+        128,
+        104
+      ],
+      "anchor": [
+        52,
+        98
+      ]
+    },
+    "chainmarshal": {
+      "frame": [
+        136,
+        112
+      ],
+      "anchor": [
+        54,
+        106
+      ]
+    },
+    "starseraph": {
+      "frame": [
+        136,
+        114
+      ],
+      "anchor": [
+        56,
+        108
+      ]
+    },
+    "tidejudicator": {
+      "frame": [
+        136,
+        112
+      ],
+      "anchor": [
+        56,
+        106
+      ]
+    },
+    "hierophant": {
+      "frame": [
+        136,
+        116
+      ],
+      "anchor": [
+        54,
+        110
       ]
     }
   }
