@@ -191,16 +191,16 @@
     "tidetemplar": "cd7ff4924a779cb8",
     "tidecantor": "fde8ff9cf98da578",
     "tideleech": "356b42219ae7365c",
-    "reliccrab": "eeeb1e106f92880e",
+    "reliccrab": "db58a0a5484721e6",
     "abysszealot": "c2cab87fa5cc4344",
     "bellkeeper": "0f27f6d32c7515a4",
     "mournsister": "725ae0933228f6eb",
     "rootabbot": "0f7f02bac6eebc84",
     "choirmother": "c82b6ea277a531f7",
-    "pearlwidow": "3152300002a5d9ec",
-    "glasscantor": "c8be0e992c3ee0ef",
-    "relicwarden": "f3a58210139b7518",
-    "coralregent": "f7913eb200e2952c",
+    "pearlwidow": "63b072c8369ef6f5",
+    "glasscantor": "c11accd2c6e89fea",
+    "relicwarden": "73a994d9b3f767d4",
+    "coralregent": "0a8dc9a954c22fe9",
     "chainmarshal": "462e65b0ea4e3b1a",
     "starseraph": "fefc71ed55fcb00a",
     "tidejudicator": "4d95fb5d35541056",
@@ -272,7 +272,7 @@
     "solstice_harbinger": "92d77572e732046a",
     "solstice_heart": "2036902ed7471f75",
     "choirsinger": "1180a4e2e4c0584c",
-    "reliquarypearl": "4568b6329ef8c316",
+    "reliquarypearl": "4680314b634eddd9",
     "seed_sprout": "39768c572c917404",
     "seed_treant": "215216cb71475ec0",
     "solar_cinder": "270d38184ebc19fa",
@@ -339,16 +339,16 @@
     "tidetemplar": 64,
     "tidecantor": 59,
     "tideleech": 29,
-    "reliccrab": 56,
+    "reliccrab": 61,
     "abysszealot": 84,
     "bellkeeper": 51,
     "mournsister": 61,
     "rootabbot": 65,
     "choirmother": 70,
-    "pearlwidow": 52,
-    "glasscantor": 84,
-    "relicwarden": 84,
-    "coralregent": 85,
+    "pearlwidow": 50,
+    "glasscantor": 72,
+    "relicwarden": 70,
+    "coralregent": 80,
     "chainmarshal": 79,
     "starseraph": 85,
     "tidejudicator": 82,
@@ -420,7 +420,7 @@
     "solstice_harbinger": 55,
     "solstice_heart": 66,
     "choirsinger": 42,
-    "reliquarypearl": 69,
+    "reliquarypearl": 56,
     "seed_sprout": 59,
     "seed_treant": 57,
     "solar_cinder": 59,
@@ -482,5 +482,67 @@
     "es_foe_18": 57,
     "es_foe_22": 57,
     "es_foe_25": 57
+  },
+  "kindFrames": {
+    "reliccrab": {
+      "frame": [
+        128,
+        96
+      ],
+      "anchor": [
+        54,
+        90
+      ]
+    },
+    "pearlwidow": {
+      "frame": [
+        136,
+        100
+      ],
+      "anchor": [
+        58,
+        94
+      ]
+    },
+    "glasscantor": {
+      "frame": [
+        124,
+        108
+      ],
+      "anchor": [
+        52,
+        102
+      ]
+    },
+    "relicwarden": {
+      "frame": [
+        136,
+        112
+      ],
+      "anchor": [
+        56,
+        106
+      ]
+    },
+    "coralregent": {
+      "frame": [
+        136,
+        114
+      ],
+      "anchor": [
+        54,
+        108
+      ]
+    },
+    "reliquarypearl": {
+      "frame": [
+        116,
+        96
+      ],
+      "anchor": [
+        50,
+        90
+      ]
+    }
   }
 }

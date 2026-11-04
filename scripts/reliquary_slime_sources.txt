@@ -1,0 +1,8 @@
+{
+  "reliccrab": "db58a0a5484721e6",
+  "pearlwidow": "63b072c8369ef6f5",
+  "glasscantor": "c11accd2c6e89fea",
+  "relicwarden": "73a994d9b3f767d4",
+  "coralregent": "0a8dc9a954c22fe9",
+  "reliquarypearl": "4680314b634eddd9"
+}

@@ -24,15 +24,18 @@ ASSETS = ROOT / 'client/assets'
 RAW = ROOT / 'scripts'
 PREFIX = 'valhallasc_cathedral_'
 KINDS = [e['kind'] for e in C.ENEMIES]
-# Flooded Cloister kinds are drawn by scripts/cloister_slime_redraw.py (native PixelFlow sources). The old drawers below must
-# never rebuild or re-export them (that would overwrite the slime-style atlases); their verify delegates to the new pipeline.
-SLIME = frozenset(['tidetemplar', 'tidecantor', 'tideleech', 'bellkeeper', 'mournsister', 'rootabbot', 'choirmother', 'choirsinger'])
+# Flooded Cloister and Coral Reliquary kinds are drawn by scripts/cloister_slime_redraw.py and scripts/reliquary_slime_redraw.py
+# (native PixelFlow sources). The old drawers below must never rebuild or re-export them (that would overwrite the slime-style
+# atlases); their verify delegates to the new pipelines.
+CLOISTER_SLIME = frozenset(['tidetemplar', 'tidecantor', 'tideleech', 'bellkeeper', 'mournsister', 'rootabbot', 'choirmother', 'choirsinger'])
+RELIQUARY_SLIME = frozenset(['reliccrab', 'pearlwidow', 'glasscantor', 'relicwarden', 'coralregent', 'reliquarypearl'])
+SLIME = CLOISTER_SLIME | RELIQUARY_SLIME
 
 
 def skip_slime(kinds, what):
     kept = [k for k in kinds if k not in SLIME]
     if len(kept) != len(kinds):
-        print(f'{what}: Flooded Cloister kinds are drawn by cloister_slime_redraw.py; skipped {sorted(set(kinds) - set(kept))}')
+        print(f'{what}: Flooded Cloister / Coral Reliquary kinds are drawn by *_slime_redraw.py; skipped {sorted(set(kinds) - set(kept))}')
     return kept
 
 def palette(e):
@@ -316,18 +319,22 @@ def export(kinds):
             sheet.resize((sheet.width * 3 // 2, H * 3 // 2), Image.Resampling.NEAREST).save(dest / f'{kind}_{clip}.png')
         atlas.save(ASSETS / f'cathedral_{kind}.png', optimize=True)
         tops[kind] = AY - atlas.crop((0, 0, 6 * W, H)).getbbox()[1]
-    # Other dungeon sprite generators share this manifest; keep every saved kind.
+    # Other dungeon sprite generators share this manifest; keep every saved kind and any per-kind frames.
     meta = {'frame': [W, H], 'anchor': [AX, AY], 'kinds': list(saved),
-            'clips': clips, 'sprites': saved, 'tops': tops}
+            'clips': clips, 'sprites': saved, 'tops': tops,
+            **({'kindFrames': meta['kindFrames']} if meta.get('kindFrames') else {})}
     meta_path.write_text(json.dumps(meta, indent=2) + '\n')
     print('Exported', ', '.join(kinds), 'to client/assets/cathedral_<kind>.png and cathedral.txt')
 
 
 def verify(kinds):
     """The exported atlas must equal the freshly rendered frames pixel for pixel."""
-    if any(k in SLIME for k in kinds):
+    if any(k in CLOISTER_SLIME for k in kinds):
         import cloister_slime_redraw
         cloister_slime_redraw.verify()
+    if any(k in RELIQUARY_SLIME for k in kinds):
+        import reliquary_slime_redraw
+        reliquary_slime_redraw.verify()
     kinds = skip_slime(kinds, 'verify')
     for kind in kinds:
         frames = render(kind)

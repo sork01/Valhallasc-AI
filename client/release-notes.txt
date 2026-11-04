@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.18",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Coral Reliquary enemies and boss helper are redrawn in the shared slime style: the Relic Crab, Pearl Widow, Glass Cantor, Relic Warden, Coral Regent and Reliquary Pearl keep their colours, with glossier shading, large eyes and chunkier shapes, joining the Tide Templar and Tide Cantor already in the wing.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the Relic Crab raises both claws and lunges with a wide snap, the Pearl Widow rears up and lashes out with venomous silk and pearls, the Glass Cantor lifts its chime rod and sweeps a glowing prism beam forward, the Relic Warden hoists its crusher claw overhead and slams it down with a golden shockwave, the Coral Regent raises its scepter and unleashes a surging coral wave, and the Reliquary Pearl hinges its clam shell wide open to fire a pearl beam.",
+      "Deaths fit each enemy: the Relic Crab's legs splay flat as the cathedral shrine tips off its shell, the Pearl Widow curls its eight legs inward, the Glass Cantor cracks and shatters into glowing stained-glass shards, the Relic Warden's carapace splits open as its reliquary arch topples, the Coral Regent drops its scepter and crown as its royal mantle pools on the floor, and the Reliquary Pearl's top shell cracks and slides off while the pearl dims on its pedestal.",
+      "All six enemies rest cleanly on the ground instead of floating above it, with four distinct leg groups touching the floor for the Relic Crab, Pearl Widow and Relic Warden, and each enemy gets its own wider and taller picture frame so raised claws, scepters, arches and waves fit cleanly."
+    ],
+    "removed": [
+      "Replaced the Coral Reliquary enemies' previous artwork so the wing matches the shared slime style; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.17",
     "date": "2026-11-04",
     "new": [],
