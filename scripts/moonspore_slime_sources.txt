@@ -1,0 +1,9 @@
+{
+  "glowcapgrazer": "15950f32d655bbdd",
+  "silkwing": "ded9cc79f4bd454f",
+  "rootlurker": "58847ba9630e32f8",
+  "lanternwraith": "c4156f7d6c781e02",
+  "mireheart": "0f44e83198435013",
+  "silverwidow": "e6af029d8dccea81",
+  "nightbloom": "c8bd1b84f8a1f941"
+}
