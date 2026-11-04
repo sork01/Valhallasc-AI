@@ -58,24 +58,87 @@
     "lapis_warden": "c9fe3d1af68fed67",
     "lapis_seer": "1c9dc5d148fef101",
     "lapis_travel": "a92127d3650b2884",
-    "sandhopper": "61c320cb61e72028",
-    "dunefennec": "37b781ea63ee9fcb",
-    "glassscorpion": "aaed33b57cc95510",
-    "sunvulture": "9932fbe90a9ae1ae",
-    "dunecolossus": "e4a4370c99875e3d",
-    "mirageroc": "a47fcd9d7bbe379c"
+    "sandhopper": "b3326dd314443057",
+    "dunefennec": "f755ebd9c24b5859",
+    "glassscorpion": "68df6d7bc7e92163",
+    "sunvulture": "0addc31949bc9bc1",
+    "dunecolossus": "7ec69756ab55998c",
+    "mirageroc": "e886af6943869891"
   },
   "tops": {
-    "sandhopper": 63,
-    "dunefennec": 63,
-    "glassscorpion": 53,
-    "sunvulture": 63,
-    "dunecolossus": 75,
-    "mirageroc": 72,
+    "sandhopper": 49,
+    "dunefennec": 56,
+    "glassscorpion": 48,
+    "sunvulture": 57,
+    "dunecolossus": 112,
+    "mirageroc": 141,
     "lapis_keeper": 82,
     "lapis_cartographer": 83,
     "lapis_warden": 83,
     "lapis_seer": 83,
     "lapis_travel": 82
+  },
+  "artStyle": "lapis-slime",
+  "kindFrames": {
+    "sandhopper": {
+      "frame": [
+        103,
+        60
+      ],
+      "anchor": [
+        56,
+        54
+      ]
+    },
+    "dunefennec": {
+      "frame": [
+        95,
+        64
+      ],
+      "anchor": [
+        48,
+        58
+      ]
+    },
+    "glassscorpion": {
+      "frame": [
+        127,
+        65
+      ],
+      "anchor": [
+        58,
+        59
+      ]
+    },
+    "sunvulture": {
+      "frame": [
+        97,
+        70
+      ],
+      "anchor": [
+        42,
+        64
+      ]
+    },
+    "dunecolossus": {
+      "frame": [
+        137,
+        120
+      ],
+      "anchor": [
+        59,
+        114
+      ]
+    },
+    "mirageroc": {
+      "frame": [
+        143,
+        153
+      ],
+      "anchor": [
+        69,
+        147
+      ]
+    }
   }
 }

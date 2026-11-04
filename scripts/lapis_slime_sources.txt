@@ -1,0 +1,8 @@
+{
+  "sandhopper": "b3326dd314443057",
+  "dunefennec": "f755ebd9c24b5859",
+  "glassscorpion": "68df6d7bc7e92163",
+  "sunvulture": "0addc31949bc9bc1",
+  "dunecolossus": "7ec69756ab55998c",
+  "mirageroc": "e886af6943869891"
+}
