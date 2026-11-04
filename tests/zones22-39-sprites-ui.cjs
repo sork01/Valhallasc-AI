@@ -65,10 +65,11 @@ const call = async(name,args={}) => {
         width:Field[src].img[kind].naturalWidth,
         height:Field[src].img[kind].naturalHeight,
         tops:Field[src].meta.tops?.[kind],
+        frame:Field.frameOf(Field[src],kind),
         clip:Field._debug.enemyFrame(Field.slimes.find(s=>s.kind===kind))
       }),{src:z.src,kind});
-      assert.equal(art.width,768,`${kind} atlas width`);
-      assert.equal(art.height,480,`${kind} atlas height`);
+      assert.equal(art.width,art.frame.w*8,`${kind} atlas width`);
+      assert.equal(art.height,art.frame.h*5,`${kind} atlas height`);
       assert.ok(art.tops>20&&art.clip[0],`${kind} has a fitted health-bar height and draws a frame`);
       await page.screenshot({path:path.join(world.artifacts,`${z.tag}-${kind}.png`)});
       count++;

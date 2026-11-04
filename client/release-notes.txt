@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.29",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Tanglecrown enemies are redrawn to look unique and mean, each with its own face and shape: the Jade Anaconda rears from jade coils with a scowling slit eye, fangs and a forked tongue, and the Crown Jaguar is a black-spotted gold cat with a snarling muzzle, tear-marked eyes and a crown of jade thorns.",
+      "The Orchid Mantis has slanted glossy eyes under angry ridges and spined forelegs, the Canopy Glider is a masked, needle-toothed glider with tan membranes, the Blackwater Caiman keeps its teeth showing even with its jaw shut and glares from under a bony brow, and the Drum Gorilla is a charcoal silverback with red eyes, tusks and a war drum.",
+      "Attacks are easier to read: the anaconda pulls back in an S and strikes, the jaguar crouches and pounces, the mantis cocks its forelegs and snaps them down, the glider climbs and dives claws first, the caiman rears and snaps, and the gorilla hauls both clubs overhead and slams them onto its drum.",
+      "Deaths match each creature: the anaconda uncoils flat, the jaguar collapses, the mantis tips over stiffly, the glider tumbles to the ground, the caiman rolls belly-up, and the gorilla topples backwards as its drum rolls away."
+    ],
+    "removed": [
+      "Replaced the previous Tanglecrown enemy artwork; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.28",
     "date": "2026-11-04",
     "new": [],
