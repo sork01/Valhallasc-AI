@@ -1,0 +1,8 @@
+{
+  "ribbongecko": "34dddc1baab0761b",
+  "balloonbeetle": "bdad37a853357e8d",
+  "paintedmacaw": "cce66e3246600b01",
+  "jesterling": "2fa9c4920f43be8e",
+  "paradegryphon": "b6039b7b2b193ac7",
+  "maskcolossus": "e5fb7e1d82a96e2d"
+}

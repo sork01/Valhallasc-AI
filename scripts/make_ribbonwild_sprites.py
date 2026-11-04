@@ -225,9 +225,11 @@ def export(verify=False):
 
 
 if __name__=='__main__':
+ # The six enemies are now the slime-style redo (scripts/ribbonwild_slime_redraw.py); the helpers above stay importable.
+ # The three NPCs (ribbon_host, ribbon_keeper, ribbon_travel) keep their old sources and are never rebuilt here.
+ if '--replace' in sys.argv:raise SystemExit('--replace is refused; edit the saved sources and export.')
+ import ribbonwild_slime_redraw as slime
+ cmds={'preview':slime.preview,'extents':slime.extents,'build':slime.build,'refresh':slime.refresh,'export':slime.export,'verify':slime.verify}
  cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
- if cmd=='preview':preview()
- elif cmd=='build':build('--replace' in sys.argv[2:])
- elif cmd=='export':export()
- elif cmd=='verify':export(True)
- else:raise SystemExit('preview | build [--replace] | export | verify')
+ if cmd not in cmds:raise SystemExit('preview | extents | build | refresh <kinds> | export | verify')
+ cmds[cmd]()
