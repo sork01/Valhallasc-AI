@@ -1,6 +1,6 @@
-# Astralhollow enemy artwork (Beta 1.39.20 candidate)
+# Astralhollow enemy artwork (Beta 1.39.20)
 
-**Candidate prepared 2026-11-04 as Beta 1.39.20** in `/media/raid/valhallasc-data/astral-slime-work` on `feat/astral-slime-art` (base `62d26dc`, awaiting owner review of FileDrop pictures). Client-only: no server, map, stats, timings, rewards, zone, DB or music change; no rebuild or restart.
+**Deployed 2026-11-04 as Beta 1.39.20** (owner approved FileDrop pictures: "deploy and finish"; source `6ceb9b6` from `/media/raid/valhallasc-data/astral-slime-work` on `feat/astral-slime-art`, base `62d26dc`). Client-only: no server, map, stats, timings, rewards, zone, DB or music change; no rebuild or restart.
 
 Five new editable PixelFlow sprites for Zone 13 (Astralhollow) use the shared slime style: glossy multi-stop shading, large eyes with `#fffbea` eye whites and highlights, warm blush and chunky readable silhouettes. Each kind has its own wider/taller frame in `client/assets/astral.txt` (`kindFrames`) so raised nebula wings, crystal jaws,scarab horns, thorny vines and meteorite fists never clip, plus 8 distinct attack frames (wind-up, strike, recovery) and 8 distinct material-appropriate death frames.
 
