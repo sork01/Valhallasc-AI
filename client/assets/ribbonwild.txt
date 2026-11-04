@@ -54,22 +54,85 @@
     "ribbon_host": "3413a27c6453acd0",
     "ribbon_keeper": "aa742e2a645055ca",
     "ribbon_travel": "f626ddf4f43862a3",
-    "ribbongecko": "673693aa0991c114",
-    "balloonbeetle": "36102f9060e70688",
-    "paintedmacaw": "c124a1849eabf71b",
-    "jesterling": "20ce2f22717c22b5",
-    "paradegryphon": "6c9a26b1ab6314bd",
-    "maskcolossus": "369387eec5b6aeb0"
+    "ribbongecko": "34dddc1baab0761b",
+    "balloonbeetle": "bdad37a853357e8d",
+    "paintedmacaw": "cce66e3246600b01",
+    "jesterling": "2fa9c4920f43be8e",
+    "paradegryphon": "b6039b7b2b193ac7",
+    "maskcolossus": "e5fb7e1d82a96e2d"
   },
   "tops": {
-    "ribbongecko": 53,
-    "balloonbeetle": 75,
-    "paintedmacaw": 79,
-    "jesterling": 77,
-    "paradegryphon": 69,
-    "maskcolossus": 83,
+    "ribbongecko": 31,
+    "balloonbeetle": 90,
+    "paintedmacaw": 68,
+    "jesterling": 76,
+    "paradegryphon": 73,
+    "maskcolossus": 88,
     "ribbon_host": 80,
     "ribbon_keeper": 83,
     "ribbon_travel": 81
+  },
+  "artStyle": "ribbonwild-slime",
+  "kindFrames": {
+    "ribbongecko": {
+      "frame": [
+        128,
+        40
+      ],
+      "anchor": [
+        59,
+        34
+      ]
+    },
+    "balloonbeetle": {
+      "frame": [
+        92,
+        99
+      ],
+      "anchor": [
+        40,
+        93
+      ]
+    },
+    "paintedmacaw": {
+      "frame": [
+        100,
+        80
+      ],
+      "anchor": [
+        46,
+        74
+      ]
+    },
+    "jesterling": {
+      "frame": [
+        88,
+        86
+      ],
+      "anchor": [
+        26,
+        80
+      ]
+    },
+    "paradegryphon": {
+      "frame": [
+        129,
+        88
+      ],
+      "anchor": [
+        63,
+        82
+      ]
+    },
+    "maskcolossus": {
+      "frame": [
+        120,
+        96
+      ],
+      "anchor": [
+        41,
+        90
+      ]
+    }
   }
 }
