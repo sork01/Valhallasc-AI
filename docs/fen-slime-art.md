@@ -1,4 +1,74 @@
-# Gloamfen: slime-style artwork release
+# Gloamfen: slime-style artwork, second pass (v2, Beta 1.39.14 candidate)
+
+**Status (2026-11-04): candidate, not deployed.** The four FEN-SLIME tasks were redone under the 2026-11-04 rules (distinct
+attacks, free per-kind frame size, feet exactly on the ground row). Branch `feat/fen-slime-redo`, private worktree
+`/media/raid/valhallasc-data/fen-slime-redo-work`, based on main `a6dd9bb`. Live art is still the v1 art (Beta 1.39.4, below)
+until the owner approves.
+
+| Kind | Frame (anchor) | Attack (8 distinct frames) | Death (8 distinct frames) |
+| --- | --- | --- | --- |
+| Fen Toad | 112x96 (44,90) | Crouches, throat sac puffs, long sticky tongue lashes out, snaps back | Legs go limp, tips over backwards onto its back |
+| Mire Crocodile | 120x96 (56,90) | Rears back with jaws open wide, lunges, snaps shut (spray), tail whips the other way | Body sinks, legs splay flat, jaw drops slack, tail slumps |
+| Drowned Knight | 120x108 (56,102) | Sword raised up and back (behind the head), cuts down in an arc with a light trail, recovers | Knees buckle, suit slumps forward, helmet rolls clear, sword and shield clatter down |
+| Mire Hydra | 128x108 (50,102) | Side heads draw back, central head rears up then strikes forward/down with fangs, right head snaps a beat later | Three necks drop at different times, heads lie across the body |
+| Gloomroot Colossus | 112x116 (52,110) | Both fists overhead, hammered into the ground (roots burst up), recover | Knees buckle, trunk splits and slumps, branches drop, heart goes out |
+
+- **Grounding (`QUADRUPED-GROUNDING`):** every living frame's lowest pixel is the anchor row (feet use `foot()`: integer radius,
+  centre y = radius); every death frame is snapped to the ground. The v1 feet sat on rows 87-89. The toad walk is a waddle (a
+  forefoot and a hind foot always planted), no airborne hop.
+- **Owner rules carried over:** crocodile and hydra tails taper to a point (`Painter.tail`; the tail-profile check is ported to
+  the test); croc/hydra legs have roots under the barrel, a bent rear joint, planted feet and a diagonal gait; hydra necks are a
+  chain of shaded balls (a round tube); fangs and teeth are drawn over the jaw with an outline; no whole-image rotation (the toad
+  death turns every part from points).
+- **Frame sizes:** the zone-wide manifest frame stays 96x96 (48,90) as fallback; each kind carries a `kindFrames` entry. The
+  creatures keep the same art pixel scale; the click hitbox comes from the idle art, the shadow widens with frame width
+  (toad and Gloomroot 1.17x, croc and knight 1.25x, hydra 1.33x). Server collision is untouched.
+- **Open for the owner's eye:** the toad death (belly-up, legs in the air) is the one pose that rotates; the knight's wind-up
+  sword is drawn behind the head.
+
+## Pipeline
+
+```sh
+python3 scripts/fen_slime_redraw.py preview [kind...]  # sheets in test-results/fen-slime; lists border/grounding problems
+python3 scripts/fen_slime_redraw.py build              # NEW PixelFlow sources (prefix valhallasc_fen_slime_style_b_); skips registered kinds
+python3 scripts/fen_slime_redraw.py refresh <kinds>    # rewrite a kind's EXISTING source from the drawer (same size only; overwrites editor edits)
+python3 scripts/fen_slime_redraw.py export             # reads the SAVED editor frames, writes atlases + fen.txt (tops, kindFrames)
+python3 scripts/fen_slime_redraw.py verify             # installed atlases == saved editor frames
+```
+
+`make_fen_sprites.py` delegates to it; `--replace` is refused. Sources (`scripts/fen_slime_sources.txt`): toad `c9f2500768e0086c`,
+croc `b45c848cc65ed92d`, knight `9fe2f23b14e9b9dc`, hydra `74f7f2e45ef00f4f`, gloomroot `ed49cdd88e2c5ff2`. The v1 sources and
+arrays are kept as `fen_slime_v1_*` (`fen_slime_tail_sources.txt` untouched); pre-slime IDs are in the backup manifests.
+
+## Rollback (two levels)
+
+```sh
+# to the live v1 slime art (Beta 1.39.4)
+python3 scripts/rollback_fen_art.py --target <checkout> --backup /media/raid/valhallasc-data/fen-slime-v1-20261104 --apply
+# to the pre-slime originals
+python3 scripts/rollback_fen_art.py --target <checkout> --apply
+```
+
+Dry run without `--apply`; every backup hash is verified first. `fen_slime_review.py verify` exercises both on a disposable copy
+plus the corrupt-backup refusal; it is a PRE-deployment check (asserts the live files are still v1). After release use
+`make_fen_sprites.py verify`.
+
+## Checks
+
+`tests/fen-slime-art.cjs` (110 checks, bounded: `bash scripts/test-touch-bounded.sh tests/fen-slime-art.cjs`, with
+`PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright`, `VALHALLA_BINARY` = main's `target/release/valhalla-server` and
+`NODE_PATH` including main's `node_modules` when run from a worktree): declared frames via `Field.frameOf`, eight distinct attack
+frames with measured wind-up and strike (hydra: central head comes down), recovery returns to idle, eight distinct death frames,
+every living and death frame on the anchor row, exact eye white `#f7fff0`, `tops`, portraits, tail-profile check, rigid mass
+kept in death, production health-bar tops. Mutation controls (`MUTATE_KIND=croc MUTATE_PNG=<png> FEN_ART_KINDS=croc`): an atlas
+shifted up one row fails grounding; an attack row replaced by shifted idle fails the wind-up measure.
+
+`fen_slime_review.py review|verify|upload` makes the 23 `valhallasc-fen-redo-*` pictures (before = live v1) and uploads them
+(separate explicit step).
+
+---
+
+# Gloamfen: slime-style artwork release (v1)
 
 Released as **Beta 1.39.4** on 2026-11-03 after the owner approved the corrected
 tails and requested deployment and the finish skill. Source **ceef9d2** from

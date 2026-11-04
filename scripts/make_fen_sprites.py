@@ -1213,4 +1213,4 @@ if __name__ == '__main__':
         raise SystemExit('--replace is refused; edit saved PixelFlow sources and export.')
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
     {'preview': slime.preview, 'build': slime.build,
-     'export': slime.export, 'verify': slime.verify, 'tails': slime.repair_tails}[command]()
+     'export': slime.export, 'verify': slime.verify, 'refresh': slime.refresh}[command]()
