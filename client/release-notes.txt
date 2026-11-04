@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.30",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Lapis Erg enemies are redrawn to look unique and mean, each with its own face and shape: the Sandhopper is a hunched sand jerboa with narrow glaring eyes and two bared front teeth, the Dune Fennec is a lean cream fox with a deep chest, huge ears, a dark mask and long fangs, and the Glass Scorpion is a rigid blue glass shell with six amber eyes and a glowing sting.",
+      "The Sun Vulture is a hunched plum bird with a bald pink head, a white ruff, a gold sun mark and a hooked beak, the Dune Colossus is a giant of sand-coloured stone blocks with lapis inlay and hollow cyan eyes, and the Mirage Roc is a vast blue-feathered bird with a gold breast, an orange crest and shimmering wing tips.",
+      "Attacks are easier to read: the Sandhopper coils and springs, the Fennec stalks low and lunges, the scorpion cocks its tail and stabs forward, the vulture throws its wings wide and rips down, the Colossus lifts both fists overhead and hammers them down, and the Roc beats its wings back and dives with its talons forward.",
+      "Deaths match each creature: the Sandhopper and Fennec stretch out flat, the scorpion flips onto its back with its tail lying behind it, the vulture buckles and drops its head to the ground, the Colossus breaks apart into a heap of blocks, and the Mirage Roc breaks into drifting heat-haze and fades away."
+    ],
+    "removed": [
+      "Replaced the previous Lapis Erg enemy artwork; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.29",
     "date": "2026-11-04",
     "new": [],
