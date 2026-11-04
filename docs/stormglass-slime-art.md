@@ -33,6 +33,8 @@ python3 scripts/stormglass_slime_redraw.py verify
 ```
 `make_stormglass_sprites.py` keeps its helpers but its CLI delegates here and refuses `--replace`. `stormglass_cel_redraw.py` is untouched (the old art, imported by the old maker).
 
+**Borrowed art:** none. No kind in `CATHEDRAL_ENEMIES` has `artFrom` pointing at a Stormglass kind, and the zone's `es_foe_15` has its own data, so `frameOf` needs no alias handling here. `tests/stormglass-ui.cjs` compared atlases to a fixed 768x480; it now compares to `Field.frameOf` (syntax checked only: the MCP driver needs a `target/debug` binary that this worktree does not have).
+
 ## Rollback
 ```sh
 python3 scripts/rollback_stormglass_art.py --target /path/to/checkout            # dry run
