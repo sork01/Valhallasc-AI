@@ -26,7 +26,7 @@ delegates). Seven new native PixelFlow sources (prefix `valhallasc_vault_slime_s
 - **Check:** `tests/vault-slime-art.cjs` (159 checks, bounded): declared frames, eight distinct attack and death frames,
   wind-up/strike measured against idle (rises / leans / reach plus pixel difference), recovery returns to idle, grounding
   of every frame, Valka's upward dissolve, exact `#fffbea` eye whites, derived tops, portraits. Mutation controls
-  (`MUTATE_KIND` + `MUTATE_PNG`): an atlas shifted up a row fails grounding; an attack row replaced by idle fails.
+  (`MUTATE_KIND` + `MUTATE_PNG`): an atlas shifted up a row fails the grounding check; an attack row of identical idle copies fails the distinct-frames check, and idle plus one recoloured pixel per frame (thrall and Haldor, the weakest threshold) fails the wind-up `rises` measure.
   Run from a worktree with `PLAYWRIGHT_BROWSERS_PATH`, `NODE_PATH` (main + dybase2 `node_modules`) and `VALHALLA_BINARY`
   in the SAME command through `scripts/test-touch-bounded.sh`.
 - **Rollback:** `python3 scripts/rollback_vault_art.py --backup /media/raid/valhallasc-data/vault-slime-v1-20261104 --apply`
