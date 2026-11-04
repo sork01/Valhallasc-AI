@@ -1,6 +1,6 @@
 # Per-kind enemy frame sizes (client, exporter, check)
 
-Status: implemented 2026-11-04 (client `frameOf`, `scripts/kindframe.py`, checks), staged and **not committed**: the owner has not yet approved. `client/field.js` and `client/emptyseat.js` are served from disk, so the (behaviour-neutral) client change is already live; no version bump or release note has been made. Live art is unchanged: no manifest or atlas carries a per-kind frame yet; the six reopened remakes are the first users.
+Status: implemented 2026-11-04 (client `frameOf`, `scripts/kindframe.py`, checks), committed and pushed as `bc7f470` at /finish; the owner has not chosen whether to bump the version. `client/field.js` and `client/emptyseat.js` are served from disk, so the (behaviour-neutral) client change is already live; no version bump or release note has been made. Live art is unchanged: no manifest or atlas carries a per-kind frame yet; the six reopened remakes are the first users.
 
 ## Contract
 
