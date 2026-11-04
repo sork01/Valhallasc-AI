@@ -545,7 +545,7 @@ def orbitbeetle(clip, n):
     if is_atk:
         lean, wlift, hlift = BEETLE_A['lean'][n], BEETLE_A['wing'][n], BEETLE_A['horn'][n]
         reach, flip = BEETLE_A['reach'][n], 0.
-        by = 26 - (2 if n in (4, 5) else 0)
+        by = 26 + (3 if n == 1 else 6 if n == 2 else -2 if n in (4, 5) else 0)
     elif is_die:
         by, flip = BEETLE_D['by'][n], BEETLE_D['flip'][n]
         lean, wlift, hlift, reach = -flip * 3, 0., 0., 0.
@@ -611,12 +611,6 @@ def orbitbeetle(clip, n):
     for k, (fx0, hx0, far) in enumerate(leg_specs):
         if far:
             draw_beetle_leg(k, fx0, hx0, True)
-
-    # Violet under-wings and lifted bronze wing-case (elytra) during attack wind-up
-    if wlift > 1:
-        a.poly([(lean - 18, by + 6), (lean - 24, by + 18 + wlift), (lean + 4, by + 20 + wlift * .9), (lean + 8, by + 8)],
-               VIOLET[3], outline=VIOLET[0])
-        a.ball(lean - 8, by + 15 + wlift * .8, 16, 7.5, AMBER, ang=.35)
 
     # Rigid bronze-and-amber domed scarab shell (rests directly on the ground when flipped on death)
     shell_y = mix(by, 15., flip)
