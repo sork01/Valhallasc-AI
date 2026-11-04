@@ -1,6 +1,6 @@
-# Grand Nave enemy artwork (Beta 1.39.19 candidate)
+# Grand Nave enemy artwork (Beta 1.39.19)
 
-**Candidate ready for review (2026-11-04), Beta 1.39.19** (staged in `/media/raid/valhallasc-data/nave-slime-work` on `feat/nave-slime-art`, base `e515f2f`; not deployed until the owner has reviewed the FileDrop pictures and approved). Client-only: no server, map, stats, timings, rewards, zone, DB or music change; no rebuild or restart.
+**Deployed 2026-11-04 as Beta 1.39.19** (owner approved FileDrop pictures: "deploy and /finish"; source `61864f5` from `/media/raid/valhallasc-data/nave-slime-work` on `feat/nave-slime-art`, base `e515f2f`). Client-only: no server, map, stats, timings, rewards, zone, DB or music change; no rebuild or restart.
 
 Five new editable PixelFlow sprites for Zone 12 (The Drowned Cathedral — Grand Nave) use the shared slime style: glossy multi-stop shading, large eyes with `#fffbea` eye whites and highlights, warm blush and chunky readable silhouettes. Each kind has its own wider/taller frame in `client/assets/cathedral.txt` (`kindFrames`) so raised censers, ship anchors, seraph wings, judicial gavels and papal crosiers never clip, plus 8 distinct attack frames (wind-up, strike, recovery) and 8 distinct material-appropriate death frames.
 
