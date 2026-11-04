@@ -1,6 +1,6 @@
 # Obsidian Orrery enemy artwork
 
-Owner-approved candidate, Beta 1.39.22. Deployment verification pending. This is art only: enemy kinds, mechanics, world data and the server are unchanged.
+Deployed as Beta 1.39.22 on 2026-11-04 after owner approval. Source `c621b4e`; all nine changed public client files match the checkout, both health endpoints pass and server PID 1654327 is unchanged. Receipt `test-results/orrery-release-20261104.json`. This is art only: enemy kinds, mechanics, world data and the server are unchanged.
 
 Six new editable PixelFlow sources are listed in `scripts/orrery_slime_sources.txt`. Each uses a 192×154 frame and (70,148) anchor, with the existing 34-frame, five-clip layout and 10 fps timing. The production loader derives health-bar tops from the idle art. The Bronze Mantis has six jointed legs and swinging scythes; the Gearling charges; the Orbit Seer hovers and fires an eye beam; the Chronoguard thrusts its spear; the Pendulum Matron swings her pendulum; and the Epoch Engine winds up its gear fists. Their deaths crack and settle the clockwork, lower the armour or gown, or drop the hovering eye to the ground.
 
