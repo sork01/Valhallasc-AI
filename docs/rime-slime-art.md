@@ -1,4 +1,77 @@
-# Rimeveil Glacier: slime-style artwork candidate
+# Rimeveil Glacier: slime-style artwork, second pass (v2, Beta 1.39.13 candidate)
+
+**Status (2026-11-04): candidate, not deployed.** The four RIME-SLIME tasks were redone under the 2026-11-04 rules
+(distinct attacks, free frame size, feet exactly on the ground row). Branch `feat/rime-slime-redo`, private worktree
+`/media/raid/valhallasc-data/rime-slime-redo-work`, based on main `faac43c`. Live art is still the v1 art below until the
+owner approves.
+
+## What changed from v1
+
+| Kind | Frame (anchor) | Attack (8 distinct frames) | Death (8 distinct frames) |
+| --- | --- | --- | --- |
+| Rime Crab | 112x96 (52,90) | Both claws rear up open, then slam down and pinch shut; frost bursts on impact | Legs curl in, the rigid shell rolls over backwards onto its back, claws go slack, crystals chip off |
+| Frostfang Wolf | 112x96 (52,90) | Crouch with the head back, pounce forward with open jaws and fangs, recover | Legs fold, the body sinks and ends on its side with stiff legs |
+| Glacier Yeti | 112x112 (56,106) | Leans back and throws both fists overhead, then pounds the ice (ice erupts either side) | Knees buckle, the body tips over sideways like a felled tree, head lolls, arms go slack |
+| Rime Wyrm | 144x96 (56,90) | Draws back, lunges forward and down with open jaws and a frost-breath cone | The three coils slide apart across the ice, the head drops beside them |
+
+- **Grounding (`QUADRUPED-GROUNDING`):** every living frame's lowest pixel is exactly the anchor row; every death frame
+  is snapped to the ground (never sunk, never floating). v1 had crab feet around row 87 and wolf paws near 88.
+- **Frame sizes (`docs/kind-frames.md`):** the zone-wide manifest frame stays 96x96 (48,90) as the fallback; the four
+  kinds each carry a `kindFrames` entry (the first zone to use it). A larger frame makes the click hitbox larger (it is
+  frame-sized): the wyrm's is 144x96 against 96x96 before. The creatures keep the same art pixel scale; the extra room is
+  for raised fists, a pounce and the lunge. Server collision, aggro and ranges are untouched.
+- **Fixes carried over from owner corrections elsewhere:** the wolf has four separate legs with roots hidden under the
+  barrel, a bent hind hock and a diagonal gait (Wyrdwood lesson); the wolf and wyrm tails taper to points, not blunt caps
+  (Gloamfen lesson); the wyrm's neck is a chain of shaded balls (a round tube), not a flat ribbon.
+- **No whole-image rotation:** v1 rotated whole frames with nearest-neighbour; v2 draws every part from points, and the
+  crab shell is a rotated shaded ellipse (`Painter.ball(..., ang=)`), so edges stay clean.
+
+## Pipeline
+
+```sh
+python3 scripts/rime_slime_redraw.py preview [kind...]   # sheets in test-results/rime-slime, lists border overruns
+python3 scripts/rime_slime_redraw.py build               # NEW PixelFlow sources (prefix valhallasc_rime_slime_style_b_); skips registered kinds
+python3 scripts/rime_slime_redraw.py refresh <kinds>     # rewrite a kind's EXISTING source from the drawer (same size only; overwrites editor edits)
+python3 scripts/rime_slime_redraw.py export              # reads the SAVED editor frames, writes atlases + rime.txt (tops, kindFrames)
+python3 scripts/rime_slime_redraw.py verify              # installed atlases == saved editor frames
+```
+
+`make_rime_sprites.py` delegates to it; `--replace` is refused. A frame-size change needs a new source (build skips
+registered kinds), so keep the frame table `KIND_FRAMES` stable once built. Sources (registry
+`scripts/rime_slime_sources.txt`): crab `02bc13f91cc5aa2a`, wolf `9d1075e53372ade6`, yeti `b8f3b5f515ed7d1a`,
+wyrm `04ce35e47b927205`. The v1 sources and raw arrays are kept as `rime_slime_v1_*`; the pre-slime IDs are in the
+backup manifests. Health-bar `tops` are derived from the tallest idle pose of each kind's own frame.
+
+## Rollback (two levels)
+
+```sh
+# to the live v1 slime art (Beta 1.39.1)
+python3 scripts/rollback_rime_art.py --target <checkout> --backup /media/raid/valhallasc-data/rime-slime-v1-20261104 --apply
+# to the pre-slime originals
+python3 scripts/rollback_rime_art.py --target <checkout> --apply
+```
+
+Dry run without `--apply`; both verify every backup hash first. `rime_slime_review.py verify` exercises both on a disposable
+copy, plus the corrupt-backup refusal. It is a PRE-deployment check (it asserts the live files are still v1); after a
+release use `make_rime_sprites.py verify`.
+
+## Checks
+
+`tests/rime-slime-art.cjs` (88 checks, bounded: `bash scripts/test-touch-bounded.sh tests/rime-slime-art.cjs`, with
+`VALHALLA_BINARY` = main's release binary and `NODE_PATH` including main's `node_modules`, run from the worktree):
+declared frame via the production `Field.frameOf`, 34 frames clear of every border at each kind's own size, eight distinct
+attack and death frames, wind-up / strike / recovery measured against the idle silhouette, grounding on the anchor row for
+every living and death frame, colour-exact eye whites (`#edf6f7`; the frost ramps are also near-white, so an RGB>220 test
+would pass vacuously), shell and coil material checks, portraits, health-bar tops. Mutations: `MUTATE_KIND=wolf
+MUTATE_PNG=<atlas shifted up one row>` fails grounding; a wolf attack row replaced by idle plus one unique pixel per
+frame keeps the hashes distinct but fails the wind-up measure.
+
+Pictures: `rime_slime_review.py review | upload` write and upload 19 `valhallasc-rime-redo-*` PNG/GIFs (before = live v1);
+the 15 v1 uploads and their receipt are untouched.
+
+---
+
+# v1 (Beta 1.39.1, currently live)
 
 Released as **Beta 1.39.1** on 2026-11-03 after the owner requested deployment.
 Source **2d1d2da**, initially prepared in

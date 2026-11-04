@@ -1,6 +1,6 @@
 {
-  "crab": "8193e3569a659d6e",
-  "wolf": "55742e3f517a9bc8",
-  "yeti": "c07c42df83c3f7ae",
-  "wyrm": "0282230513c5c7c0"
+  "crab": "02bc13f91cc5aa2a",
+  "wolf": "9d1075e53372ade6",
+  "yeti": "b8f3b5f515ed7d1a",
+  "wyrm": "04ce35e47b927205"
 }

@@ -1,5 +1,20 @@
 [
   {
+    "version": "Beta 1.39.13",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The four Rimeveil Glacier enemies are redrawn from scratch in the shared slime style: the Rime Crab, Frost Wolf, Yeti and Rime Wyrm keep their frosty colours, with glossier shading, large eyes and chunkier shapes.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the crab rears both claws up and slams them down, the wolf crouches and pounces with open jaws, the yeti throws both fists overhead and pounds the ice, and the wyrm draws back, lunges forward and breathes frost.",
+      "Deaths fit each enemy: the crab rolls onto its back with its legs curled up, the wolf sinks onto its side with stiff legs, the yeti buckles and tips over like a felled tree, and the wyrm's coils slide apart across the ice.",
+      "The wolf now has four separate legs with a bent back knee, and the wyrm's tail tapers to a point.",
+      "All four now stand exactly on the ground instead of floating slightly above it. The crab, wolf, yeti and wyrm each get a bigger picture frame so claws, pounces, raised fists and the lunge fit, which makes their click area a little larger."
+    ],
+    "removed": [
+      "Replaced the Rimeveil enemies' previous artwork; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.12",
     "date": "2026-11-04",
     "new": [],
