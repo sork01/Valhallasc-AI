@@ -1,0 +1,7 @@
+{
+  "voidmoth": "580586199f4e6879",
+  "crystalwyrm": "af24bb7845f50e67",
+  "orbitbeetle": "dcb7647f8ef1658c",
+  "eclipsedryad": "f042853483dd824a",
+  "meteorgolem": "20f02bb4828b9527"
+}

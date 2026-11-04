@@ -45,14 +45,19 @@ const call = async(name,args={}) => {
       await page.waitForFunction(src=>!!Field[src],z.src,{timeout:30000});
       await page.waitForFunction(({src,kind})=>Field[src].img[kind]?.complete,{src:z.src,kind},{timeout:30000});
       await page.waitForTimeout(350);
-      const art=await page.evaluate(({src,kind})=>({
-        width:Field[src].img[kind].naturalWidth,
-        height:Field[src].img[kind].naturalHeight,
-        tops:Field[src].meta.tops?.[kind],
-        clip:Field._debug.enemyFrame(Field.slimes.find(s=>s.kind===kind))
-      }),{src:z.src,kind});
-      assert.equal(art.width,768,`${kind} atlas width`);
-      assert.equal(art.height,480,`${kind} atlas height`);
+      const art=await page.evaluate(({src,kind})=>{
+        const fr=Field.frameOf(Field[src],kind);
+        return {
+          width:Field[src].img[kind].naturalWidth,
+          height:Field[src].img[kind].naturalHeight,
+          expectedWidth:fr.w*8,
+          expectedHeight:fr.h*5,
+          tops:Field[src].meta.tops?.[kind],
+          clip:Field._debug.enemyFrame(Field.slimes.find(s=>s.kind===kind))
+        };
+      },{src:z.src,kind});
+      assert.equal(art.width,art.expectedWidth,`${kind} atlas width`);
+      assert.equal(art.height,art.expectedHeight,`${kind} atlas height`);
       assert.ok(art.tops>20&&art.clip[0],`${kind} has a fitted health-bar height and draws a frame`);
       await page.screenshot({path:path.join(world.artifacts,`${z.tag}-${kind}.png`)});
       count++;

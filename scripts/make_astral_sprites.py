@@ -147,4 +147,14 @@ def main_contact():
                 sheet.paste(pose,(10+col*205,28+row*220),pose)
                 d.text((10+col*205,8+row*220),f'{kind} {clip}',fill='#f9d99d')
         out=ROOT/'test-results/astralhollow-enemies.png';out.parent.mkdir(exist_ok=True);sheet.save(out);print(out)
-if __name__=='__main__':main()
+if __name__=='__main__':
+    import astral_slime_redraw as slime
+    command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; edit the saved sources and export.')
+    commands = {'extents': slime.extents, 'preview': slime.preview, 'build': slime.build,
+                'refresh': slime.refresh, 'export': slime.export, 'verify': slime.verify,
+                'contact': main_contact}
+    if command not in commands:
+        raise SystemExit('Usage: make_astral_sprites.py extents | preview | build | refresh | export | verify | contact')
+    commands[command]()

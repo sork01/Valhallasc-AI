@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.20",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The five Astralhollow enemies are redrawn in the shared slime style: the Void Moth, Crystal Wyrm, Orbit Beetle, Eclipse Dryad and Meteor Golem keep their colours, with glossier shading, large eyes and chunkier shapes.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the Void Moth banks back with its four nebula wings swept high to charge a starlight orb and swoops forward firing a volley of starlight bolts, the Crystal Wyrm rears up with flaring dorsal prisms and lunges forward snapping its jaws with a crystal frost breath, the Orbit Beetle rears its golden carapace and swings its forked horn in a wide uppercut as its orbiting moonlet streaks forward, the Eclipse Dryad raises her solar halo crown high and lashes a thorny vine whip forward with bursting star-leaves, and the Meteor Golem hoists both meteorite fists high overhead and slams them into the ground with an impact shockwave.",
+      "Deaths fit each enemy: the Void Moth tumbles from mid-air and folds its wings flat on the ground as its lantern dims, the Crystal Wyrm collapses flat onto its belly as its dorsal prisms crack, the Orbit Beetle flips onto its back with its six legs curled up as its moonlet drops beside it, the Eclipse Dryad wilts into a mossy mound of leaves as her eclipse halo dims, and the Meteor Golem's core goes dark as its meteorite boulders crack apart into a rubble pile.",
+      "All four grounded enemies rest cleanly on the ground instead of floating above it, with four separate paws and claws touching the floor for the Crystal Wyrm and Orbit Beetle, while the Void Moth hovers in mid-air and falls to the ground on death. Each enemy gets its own wider and taller picture frame so raised wings, horns, vines and fists fit cleanly."
+    ],
+    "removed": [
+      "Replaced the Astralhollow enemies' previous artwork; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.19",
     "date": "2026-11-04",
     "new": [],

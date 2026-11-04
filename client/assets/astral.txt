@@ -47,17 +47,70 @@
     }
   },
   "sprites": {
-    "voidmoth": "16f1579889ca68a9",
-    "crystalwyrm": "c4dbc00ed0a20cc4",
-    "orbitbeetle": "c779c03de017e0e6",
-    "eclipsedryad": "2d35cbaf0e90a3a6",
-    "meteorgolem": "3b03b821e34145c5"
+    "voidmoth": "580586199f4e6879",
+    "crystalwyrm": "af24bb7845f50e67",
+    "orbitbeetle": "dcb7647f8ef1658c",
+    "eclipsedryad": "f042853483dd824a",
+    "meteorgolem": "20f02bb4828b9527"
   },
   "tops": {
-    "voidmoth": 88,
-    "crystalwyrm": 60,
-    "orbitbeetle": 70,
-    "eclipsedryad": 89,
-    "meteorgolem": 79
+    "voidmoth": 76,
+    "crystalwyrm": 67,
+    "orbitbeetle": 68,
+    "eclipsedryad": 87,
+    "meteorgolem": 74
+  },
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "voidmoth": {
+      "frame": [
+        132,
+        98
+      ],
+      "anchor": [
+        54,
+        92
+      ]
+    },
+    "crystalwyrm": {
+      "frame": [
+        148,
+        100
+      ],
+      "anchor": [
+        60,
+        94
+      ]
+    },
+    "orbitbeetle": {
+      "frame": [
+        140,
+        100
+      ],
+      "anchor": [
+        54,
+        94
+      ]
+    },
+    "eclipsedryad": {
+      "frame": [
+        132,
+        114
+      ],
+      "anchor": [
+        52,
+        108
+      ]
+    },
+    "meteorgolem": {
+      "frame": [
+        136,
+        112
+      ],
+      "anchor": [
+        56,
+        106
+      ]
+    }
   }
 }
