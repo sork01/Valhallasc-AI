@@ -53,18 +53,20 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
         for (const [clip, spec] of Object.entries(meta.clips)) for (let n = 0; n < spec.n; n++) {
           const pixels = g.getImageData(n*kw, spec.row*kh, kw, kh).data;
           const mask = new Uint8Array(kw*kh);
-          let opaque = 0, edge = 0, white = 0, hash = 7, low = -1, top = kh, left = kw, right = -1;
+          let opaque = 0, edge = 0, white = 0, hash = 7, low = -1, top = kh, left = kw, right = -1, redHigh = 0;
+          const rowCount = Array(kh).fill(0);
           for (let y = 0; y < kh; y++) for (let x = 0; x < kw; x++) {
             const i = (y*kw+x)*4;
             hash = (Math.imul(hash, 31)+pixels[i]+pixels[i+1]*3+pixels[i+2]*7+pixels[i+3]) >>> 0;
             if (!pixels[i+3]) continue;
-            mask[y*kw+x] = 1; opaque++; if (y > low) low = y; if (y < top) top = y; if (x < left) left = x; if (x > right) right = x;
+            mask[y*kw+x] = 1; rowCount[y]++; opaque++; if (y > low) low = y; if (y < top) top = y; if (x < left) left = x; if (x > right) right = x;
             if (x === 0 || x === kw-1 || y === 0 || y === kh-1) edge++;
             if (pixels[i] === 255 && pixels[i+1] === 251 && pixels[i+2] === 234) white++;   // colour-exact eye white #fffbea
+            if (pixels[i] === 185 && pixels[i+1] === 81 && pixels[i+2] === 84 && y < fr.ay-24) redHigh++;   // red arrow fletching/tips well above the ground
           }
           if (clip === 'idle' && n === 0) idle0 = mask;
           let diff = 0; for (let k = 0; k < mask.length; k++) if (mask[k] !== idle0[k]) diff++;
-          rows.push({ clip, n, opaque, edge, white, hash, low, top, left, right, diff });
+          rows.push({ clip, n, opaque, edge, white, hash, low, top, left, right, diff, redHigh, topWidth: rowCount[top], maxWidth: Math.max(...rowCount) });
         }
         const portrait = document.createElement('canvas'); portrait.width = portrait.height = 128;
         const ready = Field.drawTargetPortrait({ kind }, portrait);
@@ -120,6 +122,8 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
       check(die.every(r => r.low === kay), `${kind}: every death frame rests exactly on the ground (row ${kay}), never sunk or floating`);
       if (kind === 'choir') check(die[7].opaque < idle0.opaque*.5 && die[7].opaque > 60 && die[7].top > idleTop+30 && die.every((r, i) => !i || r.opaque <= die[i-1].opaque+30), `${kind}: the spirit dissipates upward and only the settled gown and diadem remain (${die[7].opaque} px)`);
       else check(die.every(r => r.opaque > idle0.opaque*.45), `${kind}: death keeps solid bones, armour or stone, with no puddle or dissolving corpse`);
+      if (kind === 'archer') check(die.slice(4).every(r => r.redHigh === 0), `${kind}: the spilled quiver lies on the ground: no red arrow tips float above the fallen body in death frames 5-8`);
+      if (kind === 'choir') check(die.slice(5).every(r => r.topWidth <= r.maxWidth*.75), `${kind}: the fallen gown is a rounded heap, not a flat-cut slab (top row ≤75% of the widest row)`);
       check(idle0.white > 12, `${kind}: large eye whites remain readable (${idle0.white} exact #fffbea pixels)`);
       check(result.meta.tops[kind] === kay-idleTop, `${kind}: health-bar top is derived from its tallest idle pose`);
       check(d.ready && d.portraitPixels > 80, `${kind}: production target portrait renders`);

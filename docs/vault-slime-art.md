@@ -18,7 +18,10 @@ delegates). Seven new native PixelFlow sources (prefix `valhallasc_vault_slime_s
   acolyte's robe hem and Valka's gown hem touch the ground row (only the spirit above bobs). `frame()` asserts every living
   frame rests on the anchor row and rolls death frames onto it.
 - **Deaths:** unchanged concepts from v1 (bones scatter, robe settles, armour drops, Valka dissolves upward leaving gown
-  and diadem, stone fractures, crown tumbles first).
+  and diadem, stone fractures, crown tumbles first). Owner review fixes: Valka's gown is drawn first and protected from
+  the dissolve (only face, veil and arms dissolve) and sags into a rounded heap, because dissolving everything above a
+  fixed height left a flat-cut slab; the archer's quiver arrows tip over and lie on the ground, because their red tips
+  hung in the air above the fallen body. Both are asserted (`redHigh`, `topWidth <= 75% of maxWidth`) and fail on the earlier art.
 - **Frames (w x h, anchor):** thrall 114x92 (43,86), archer 114x88 (42,82), acolyte 116x104 (37,98), Hrolf 124x102
   (47,96), Valka 104x96 (48,90), Ironwake 126x114 (52,108), Haldor 114x98 (39,92); measured with `extents`. The art pixel
   scale is unchanged; the ground shadow scales with frame width (1.08x-1.31x). The click hitbox comes from the idle

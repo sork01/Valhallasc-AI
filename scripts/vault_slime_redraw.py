@@ -354,10 +354,19 @@ def archer(clip, n):
     y = 33+bob*.8-fall*21-hurt*.5
     a.limb([(-12, y-4), (-18, y+16)], GOLD, 6)
     for k in range(3):
-        xx = -20+k*4-fall*8
-        yy = y+19+fall*3
-        a.line([(xx, yy-13), (xx+fall*8, yy+3)], 8, 1)
-        a.poly([(xx-2, yy+3), (xx+1, yy+8), (xx+3, yy+3)], 37)
+        xx = -20+k*4
+        yy = y+19
+        if not fall:
+            a.line([(xx, yy-13), (xx, yy+3)], 8, 1)
+            a.poly([(xx-2, yy+3), (xx+1, yy+8), (xx+3, yy+3)], 37)
+            continue
+        t = sm(fall)                                          # the quiver spills: each arrow tips over and lies on the ground
+        mid = mixp((xx, yy-5), (-26+k*9, 3+k % 2*2), t)
+        ang = mix(math.pi/2, .12*(k-1), t)
+        dx, dy = math.cos(ang)*8, math.sin(ang)*8
+        a.line([(mid[0]-dx, mid[1]-dy), (mid[0]+dx, mid[1]+dy)], 8, 1)
+        tx, ty = mid[0]+dx, mid[1]+dy
+        a.poly([(tx, ty+2.5), (tx+3.5, ty), (tx, ty-2.5)] if t > .6 else [(tx-2, ty), (tx+1, ty+5), (tx+3, ty)], 37)
     a.poly([(-10, y-8), (10, y-8), (13, 11), (-14, 13)], 26)
     ribs(a, y, fall, spread=.8)
     hx = -fall*12-(draw-1)*.3
@@ -558,11 +567,16 @@ def choir(clip, n):
     # Veil and gown remain cloth; the lowest hem point rests on the ground row, only the spirit above it floats.
     scal = [3, 0, 4, 1, 4, 0, 3, 1]
     hem = [scal[(k+int(floaty > 0)) % 8] for k in range(8)]
-    wide = 1+fall*.35
-    a.poly([(-12, y+14), (12, y+14), ((20+sway)*wide, hem[0]+4), (13*wide, hem[1]), (6*wide, hem[2]+3), (-3*wide, 0),
+    wide = 1+fall*.5
+    gy = y+14-fall*10                                            # on defeat the gown sags into a rounded heap
+    a.poly([(-12, gy), (12, gy), ((20+sway)*wide, hem[0]+4), (13*wide, hem[1]), (6*wide, hem[2]+3), (-3*wide, 0),
             (-12*wide, hem[4]+3), ((-21+sway)*wide, hem[5])], 20)
-    a.poly([(-9, y+11), (7, y+13), (13*wide, hem[3]+5), (-12*wide, hem[6]+4)], 22)
-    a.poly([(-8, y+10), (-3, y+10), (-7*wide, hem[7]+6), (-14*wide, hem[6]+4)], 23)
+    a.poly([(-9, gy-3), (7, gy-1), (13*wide, hem[3]+5), (-12*wide, hem[6]+4)], 22)
+    a.poly([(-8, gy-4), (-3, gy-4), (-7*wide, hem[7]+6), (-14*wide, hem[6]+4)], 23)
+    if fall:
+        a.ellipse(0, gy-1, 11*wide, 3+fall*2, 20)                  # a round crown of folds, so the heap has no flat cut edge
+        a.ellipse(-3, gy, 7*wide, 2+fall, 22)
+    base = np.array(a.im)                                         # the gown is solid cloth: only the spirit dissolves
     for sign in (-1, 1):                                          # arms: resting, spread up for the song, slack on defeat
         rest = (sign*25, y+5)
         up = (sign*(31+wu*3), y+19+wu*8)
@@ -590,14 +604,18 @@ def choir(clip, n):
             ring_arc(a, mx, my, r, TEAL[4] if k > .6 else TEAL[3], width=2 if k > .6 else 1)
             ring_arc(a, mx, my, r-3, TEAL[2], width=1)
     if clip == 'die':
-        # Progressive gaps dissolve the spirit upward, not the solid gown below it.
-        dissolve(a, fall, 82, 14)
+        # Progressive gaps dissolve the spirit (face, veil, arms) upward; the gown beneath stays and settles.
+        dissolve(a, fall, 84, 8)
+        arr = np.array(a.im)
+        arr[(arr == 0) & (base > 0)] = base[(arr == 0) & (base > 0)]
+        a.im = Image.fromarray(arr, 'P')
+        a.d = ImageDraw.Draw(a.im)
         for j in range(max(0, 7-n)):
             x = -24+j*8
             y2 = 55+n*3+(j % 2)*7
             a.line([(x, y2), (x+3, y2+4)], 23, 2)
         if n >= 5:                                                # the diadem lies on the ground at the end
-            a.line([(-9, 3), (-3, 4), (3, 3), (9, 4)], 14, 3)
+            a.line([(-9, 2), (-3, 3), (3, 2), (9, 3)], 14, 3)
     else:
         for j in range(2 if clip != 'attack' else 3):
             x = -30+j*28
