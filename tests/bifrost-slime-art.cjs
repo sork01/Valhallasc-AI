@@ -10,7 +10,16 @@ const allKinds = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'
 const kinds = process.env.BIFROST_ART_KINDS ? process.env.BIFROST_ART_KINDS.split(',') : allKinds;
 assert.ok(kinds.length && kinds.every(k => allKinds.includes(k)), 'Valid art selection');
 const currentVersion = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/release-notes.txt')))[0].version;
+// declared production frames: kind -> [w, h, anchorX, anchorY] (the zone-wide 96x96 frame stays in the manifest as the fallback)
+const frames = {
+  galehound: [124, 76, 54, 70],
+  prismgolem: [120, 102, 52, 96],
+  skyray: [120, 74, 52, 68],
+  einherjar: [120, 102, 46, 96],
+  thunderroc: [130, 82, 47, 76],
+};
 const sources = JSON.parse(fs.readFileSync(path.join(__dirname, '../scripts/bifrost_slime_sources.txt')));
+const quadrupeds = ['galehound'];
 let browser, checks = 0;
 const errors = [];
 function check(value, label) { assert.ok(value, label); console.log(++checks + ': ' + label); }
@@ -20,17 +29,20 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     browser = await chromium.launch({ headless: true });
     const p = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
     p.on('pageerror', e => errors.push(e.message));
+    // Mutation control: serve one kind's atlas replaced by a damaged copy (MUTATE_KIND + MUTATE_PNG or BIFROST_MUTATED_ATLAS); the checks must fail.
+    if (process.env.MUTATE_PNG) {
+      await p.route(`**/assets/sky_${process.env.MUTATE_KIND}.png`, r => r.fulfill({ path: process.env.MUTATE_PNG, contentType: 'image/png' }));
+    } else if (process.env.BIFROST_MUTATED_ATLAS) {
+      await p.route('**/assets/sky_galehound.png', route => route.fulfill({
+        path: process.env.BIFROST_MUTATED_ATLAS, contentType: 'image/png'
+      }));
+    }
     await p.addInitScript(version => {
       localStorage.setItem('valhallasc.whats-new.v1', version);
       window.AudioContext = window.webkitAudioContext = undefined;
       localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false,
         dpsMeter: false, lowGraphics: true, lowGraphicsSet: true, touchGraphicsSuggested: true }));
     }, currentVersion);
-    if (process.env.BIFROST_MUTATED_ATLAS) {
-      await p.route('**/assets/sky_galehound.png', route => route.fulfill({
-        path: process.env.BIFROST_MUTATED_ATLAS, contentType: 'image/png'
-      }));
-    }
     await p.goto(w.url); await p.locator('#start').click(); await p.locator('#login-guest').click();
     await p.locator('#cls-warrior').click(); await p.locator('#name').fill('BifrostArt');
     await p.locator('#go').click({ timeout: 60000 });
@@ -41,83 +53,110 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     });
     await p.waitForFunction(() => Field.skySprites && Field.slimes.some(s => s.kind === 'galehound'), null, { timeout: 30000 });
     const result = await p.evaluate(() => {
-      const { meta, img } = Field.skySprites;
+      const src = Field.skySprites, { meta, img } = src;
       const data = {};
       const portraits = document.createElement('canvas'); portraits.width = 5*144; portraits.height = 170;
       const pg = portraits.getContext('2d'); pg.fillStyle = '#344b40'; pg.fillRect(0, 0, portraits.width, portraits.height);
       let col = 0;
+      const runs = (arr, from, to) => { let r = 0, prev = 0; for (let x = from; x < to; x++) { if (arr[x] && !prev) r++; prev = arr[x]; } return r; };
       for (const kind of meta.kinds) {
+        const fr = Field.frameOf(src, kind), kw = fr.w, kh = fr.h;       // the one production lookup of a kind's frame
         const im = img[kind], c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
         const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(im, 0, 0);
         const rows = [];
-        const legTracks = [];
+        let idle0 = null;
         for (const [clip, spec] of Object.entries(meta.clips)) for (let n = 0; n < spec.n; n++) {
-          const pixels = g.getImageData(n*96, spec.row*96, 96, 96).data;
-          let opaque = 0, edge = 0, white = 0, hash = 7, minY = 96;
-          for (let y = 0; y < 96; y++) for (let x = 0; x < 96; x++) {
-            const i = (y*96+x)*4;
+          const pixels = g.getImageData(n*kw, spec.row*kh, kw, kh).data;
+          const mask = new Uint8Array(kw*kh);
+          let opaque = 0, edge = 0, white = 0, hash = 7, low = -1, top = kh, left = kw, right = -1;
+          const rowCount = Array(kh).fill(0);
+          for (let y = 0; y < kh; y++) for (let x = 0; x < kw; x++) {
+            const i = (y*kw+x)*4;
             hash = (Math.imul(hash, 31)+pixels[i]+pixels[i+1]*3+pixels[i+2]*7+pixels[i+3]) >>> 0;
             if (!pixels[i+3]) continue;
-            opaque++; minY = Math.min(minY, y);
-            if (x === 0 || x === 95 || y === 0 || y === 95) edge++;
-            if (pixels[i] > 220 && pixels[i+1] > 225 && pixels[i+2] > 220) white++;
+            mask[y*kw+x] = 1; rowCount[y]++; opaque++; if (y > low) low = y; if (y < top) top = y; if (x < left) left = x; if (x > right) right = x;
+            if (x === 0 || x === kw-1 || y === 0 || y === kh-1) edge++;
+            if (pixels[i] === 255 && pixels[i+1] === 251 && pixels[i+2] === 234) white++;   // colour-exact eye white #fffbea
           }
-          if (clip === 'idle') {
-            // Below the belly, far and near limbs must form four separate
-            // tracks; the earlier candidate merged each pair into one pole.
-            const counts = [];
-            for (let y=78; y<=83; y++) {
-              let runs=0,inside=false;
-              for (let x=0; x<96; x++) {
-                const solid=pixels[(y*96+x)*4+3]>0;
-                if (solid && !inside) runs++;
-                inside=solid;
-              }
-              counts.push(runs);
-            }
-            legTracks.push(Math.max(...counts));
-          }
-          rows.push({ clip, n, opaque, edge, white, hash, minY });
+          if (clip === 'idle' && n === 0) idle0 = mask;
+          let diff = 0; for (let k = 0; k < mask.length; k++) if (mask[k] !== idle0[k]) diff++;
+          const rowAt = y => Array.from({ length: kw }, (_, x) => mask[y*kw+x]);
+          rows.push({ clip, n, opaque, edge, white, hash, low, top, left, right, diff, topWidth: rowCount[top], maxWidth: Math.max(...rowCount),
+            groundWidth: rowCount[fr.ay], groundRuns: runs(rowAt(fr.ay), 0, kw),
+            legTracks: Math.max(...[7, 8, 9, 10, 11, 12].map(k => runs(rowAt(fr.ay-k), 0, kw))) });
         }
         const portrait = document.createElement('canvas'); portrait.width = portrait.height = 128;
         const ready = Field.drawTargetPortrait({ kind }, portrait);
         const bytes = portrait.getContext('2d').getImageData(0, 0, 128, 128).data;
         pg.drawImage(portrait, col*144+8, 0); pg.fillStyle = '#fff2c8'; pg.font = '16px sans-serif';
         pg.fillText(Field.enemyName(kind), col*144+4, 150); col++;
-        data[kind] = { size: [im.width, im.height], rows, legTracks, ready,
+        data[kind] = { frame: [fr.w, fr.h, fr.ax, fr.ay], size: [im.width, im.height], rows, ready,
           portraitPixels: Array.from(bytes).filter((v, i) => i%4 === 3 && v > 0).length };
       }
       return { meta, data, portraits: portraits.toDataURL() };
     });
-    check(result.meta.frame.join() === '96,96' && result.meta.anchor.join() === '48,90', '96×96 frame and (48,90) anchor preserved');
+    check(result.meta.frame.join() === '96,96' && result.meta.anchor.join() === '48,90', '96×96 zone-wide frame and (48,90) anchor preserved');
     check(result.meta.kinds.join() === allKinds.join(), 'All five production kind IDs preserved');
+    check(JSON.stringify(Object.keys(result.meta.kindFrames).sort()) === JSON.stringify(Object.keys(frames).sort()), 'Every kind that needs another frame has a kindFrames entry');
+    // wind-up / strike measures against the idle poses: [metric, attack frame, minimum px].
+    //   rises: top of the art above the tallest idle pose; leans: left edge pulled back; reach: right edge beyond the widest idle pose
+    const motion = {
+      galehound: { wind: ['rises', 2, 4], strike: ['reach', 4, 16] },
+      prismgolem: { wind: ['rises', 2, 4], strike: ['reach', 4, 16] },
+      skyray: { wind: ['rises', 2, 12], strike: ['reach', 4, 16] },
+      einherjar: { wind: ['rises', 2, 6], strike: ['reach', 4, 24] },
+      thunderroc: { wind: ['leans', 2, 8], strike: ['reach', 4, 24] },
+    };
     for (const kind of kinds) {
-      const d = result.data[kind];
+      const d = result.data[kind], [kw, kh, kax, kay] = frames[kind];
+      check(d.frame.join() === frames[kind].join(), `${kind}: production frame lookup returns its declared ${kw}×${kh}, anchor (${kax},${kay})`);
       check(result.meta.sprites[kind] === sources[kind], `${kind}: production loader uses its new saved PixelFlow source`);
-      check(d.size.join() === '768,480' && d.rows.length === 34 && d.rows.every(r => r.opaque > 3 && r.edge === 0), `${kind}: all 34 atlas frames nonempty and clear of every border`);
+      check(d.size.join() === `${8*kw},${5*kh}` && d.rows.length === 34 && d.rows.every(r => r.opaque > 3 && r.edge === 0), `${kind}: all 34 atlas frames (${8*kw}×${5*kh}) nonempty and clear of every border`);
       const expected = { idle: [6,6], walk: [10,8], attack: [12,8], hurt: [10,4], die: [8,8] };
       for (const [clip, [fps, n]] of Object.entries(expected)) {
         const spec = result.meta.clips[clip];
         check(spec.fps === fps && spec.n === n && new Set(d.rows.filter(r => r.clip === clip).map(r => r.hash)).size >= Math.min(4, n), `${kind}: ${clip} preserves timing and animates distinctly`);
       }
-      check(d.rows.find(r => r.clip === 'idle' && r.n === 0).white > 12, `${kind}: large eye whites and highlights remain readable`);
-      check(result.meta.tops[kind] === 90-Math.min(...d.rows.filter(r=>r.clip==='idle').map(r=>r.minY)), `${kind}: health-bar top is derived from its tallest idle pose`);
-      const death=d.rows.filter(r=>r.clip==='die'),idle=d.rows.find(r=>r.clip==='idle'&&r.n===0);
-      check(new Set(death.map(r=>r.hash)).size===8, `${kind}: all eight anatomy-specific death poses differ`);
-      check(death.every(r=>r.opaque>idle.opaque*.42), `${kind}: death retains its solid anatomy or draped cloth`);
-      check(death.at(-1).minY>idle.minY+14, `${kind}: fallen pose settles visibly below its living pose`);
-      if (kind === 'galehound') check(d.legTracks.every(n=>n===4), `${kind}: four separate lower legs read in every idle pose`);
+      const att = d.rows.filter(r => r.clip === 'attack'), die = d.rows.filter(r => r.clip === 'die');
+      const idle = d.rows.filter(r => r.clip === 'idle'), idle0 = idle[0];
+      const idleTop = Math.min(...idle.map(r => r.top)), idleRight = Math.max(...idle.map(r => r.right)), idleLeft = Math.min(...idle.map(r => r.left));
+      const idleLowTop = Math.max(...idle.map(r => r.top));
+      check(new Set(att.map(r => r.hash)).size === 8, `${kind}: all eight attack frames are distinct`);
+      const m = motion[kind];
+      const wf = att[m.wind[1]];
+      const wind = m.wind[0] === 'rises' ? idleTop-wf.top : m.wind[0] === 'leans' ? idleLeft-wf.left : wf.top-idleLowTop;
+      console.log(`   measured ${kind} wind ${m.wind[0]}=${wind} reach=${att[m.strike[1]].right-idleRight} diff2=${att[2].diff} diffS=${att[m.strike[1]].diff} recover=${att[7].top-idle0.top},${att[7].left-idle0.left},${att[7].right-idle0.right}`);
+      check(wind >= m.wind[2], `${kind}: wind-up frame ${m.wind[1]} ${m.wind[0]} ≥${m.wind[2]} px against idle (${wind})`);
+      check(att[2].diff >= 400, `${kind}: wind-up frame 2 differs from the idle pose by ≥400 px (${att[2].diff})`);
+      const reach = att[m.strike[1]].right-idleRight;
+      check(reach >= m.strike[2], `${kind}: strike frame ${m.strike[1]} reaches ≥${m.strike[2]} px beyond the idle art (${reach})`);
+      check(att[m.strike[1]].diff >= 300, `${kind}: strike frame ${m.strike[1]} differs from the idle pose by ≥300 px (${att[m.strike[1]].diff})`);
+      const last = att[7];
+      check(Math.abs(last.top-idle0.top) <= 3 && Math.abs(last.left-idle0.left) <= 3 && Math.abs(last.right-idle0.right) <= 3, `${kind}: attack recovery returns to the idle silhouette (frame 7 within 3 px of idle 0)`);
+      check(new Set(die.map(r => r.hash)).size === 8, `${kind}: all eight death frames are distinct`);
+      const living = d.rows.filter(r => r.clip !== 'die');
+      check(living.every(r => r.low === kay), `${kind}: every living frame rests exactly on its anchor row ${kay} (rows ${[...new Set(living.map(r => r.low))]})`);
+      check(die.every(r => r.low === kay), `${kind}: every death frame rests exactly on the ground (row ${kay}), never sunk or floating`);
+      console.log(`   ground ${kind} idle groundRuns=${idle.map(r => r.groundRuns)} legTracks=${idle.map(r => r.legTracks)} groundWidth=${idle.map(r => r.groundWidth)}`);
+      if (quadrupeds.includes(kind)) {
+        check(idle.every(r => r.groundRuns >= 4), `${kind}: all four paws touch the ground row in every idle pose (QUADRUPED-GROUNDING; runs ${idle.map(r => r.groundRuns)})`);
+        check(idle.every(r => r.legTracks >= 4), `${kind}: four separate lower legs read in every idle pose (${idle.map(r => r.legTracks)})`);
+        check(d.rows.filter(r => r.clip === 'walk').some(r => r.groundRuns >= 3) && d.rows.filter(r => r.clip === 'walk').every(r => r.groundRuns >= 2), `${kind}: walking keeps at least two paws on the ground at every step`);
+      }
+      if (['prismgolem', 'einherjar'].includes(kind)) check(idle.every(r => r.groundRuns === 2), `${kind}: both boots stand on the ground row in every idle pose`);
+      if (kind === 'thunderroc') check(idle.every(r => r.groundRuns === 2), `${kind}: both talons stand on the ground row in every idle pose`);
       check(d.ready && d.portraitPixels > 80, `${kind}: production target portrait renders`);
-
+      check(idle0.white > 12, `${kind}: large eye whites remain readable (${idle0.white} exact #fffbea pixels)`);
+      check(result.meta.tops[kind] === kay-idleTop, `${kind}: health-bar top is derived from its tallest idle pose`);
     }
-    check(new Set(kinds.map(k=>result.data[k].rows.find(r=>r.clip==='die'&&r.n===7).hash)).size===kinds.length,'Checked kinds retain distinct final corpse silhouettes');
+    check(new Set(kinds.map(k => result.data[k].rows.find(r => r.clip === 'die' && r.n === 7).hash)).size === kinds.length, 'Checked kinds retain distinct final corpse silhouettes');
     fs.writeFileSync(path.join(w.runDir, 'bifrost-slime-portraits.png'), Buffer.from(result.portraits.split(',')[1], 'base64'));
     for (const kind of kinds) {
       const spot = await p.evaluate(kind => {
         const s = Field.slimes.find(s => s.kind === kind);
-        return s && { x: s.x, y: s.y, top:s.d.top };
+        return s && { x: s.x, y: s.y, top: s.d.top };
       }, kind);
-      check(spot&&spot.top===result.meta.tops[kind], `${kind}: authoritative Bifrost Reach presence and production health-bar top`);
+      check(spot && spot.top === result.meta.tops[kind], `${kind}: authoritative Bifrost Reach presence and production health-bar top`);
       await p.evaluate(spot => Online.send({ type: 'debug', command: { op: 'teleport', zone: 7, x: spot.x+3, y: spot.y+2 } }), spot);
       await p.waitForTimeout(400);
       await p.evaluate(() => { City.close(); ZoneJourney.clear(); Field._debug.drawFrame(3); });

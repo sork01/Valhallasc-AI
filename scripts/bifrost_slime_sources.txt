@@ -1,7 +1,7 @@
 {
-  "galehound": "eb5eadd388c59b4b",
-  "prismgolem": "49c6de45376a59e7",
-  "skyray": "bc4e43f2eeae58ed",
-  "einherjar": "b264885a2869eeb3",
-  "thunderroc": "e55dd3cfa101cf61"
+  "galehound": "7450f8bb136a9936",
+  "prismgolem": "f352194463eb9ae2",
+  "skyray": "2837ad79482c989d",
+  "einherjar": "a78dbd54dc6acfa6",
+  "thunderroc": "0689197b87d81900"
 }

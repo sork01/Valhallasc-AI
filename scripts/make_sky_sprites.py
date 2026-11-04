@@ -809,4 +809,8 @@ if __name__ == '__main__':
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
     if '--replace' in sys.argv:
         raise SystemExit('--replace is refused; edit the saved sources and export.')
-    {'preview':slime.preview, 'build':slime.build, 'export':slime.export, 'verify':slime.verify}[command]()
+    commands = {'extents': slime.extents, 'preview': slime.preview, 'build': slime.build,
+                'refresh': slime.refresh, 'export': slime.export, 'verify': slime.verify}
+    if command not in commands:
+        raise SystemExit('Usage: make_sky_sprites.py extents | preview | build | refresh | export | verify')
+    commands[command]()
