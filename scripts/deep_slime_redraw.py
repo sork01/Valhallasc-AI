@@ -15,7 +15,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw
 import make_crag_sprites as old
-from wyrd_slime_redraw import Painter, motion, mix
+from wyrd_slime_v1_redraw import Painter, motion, mix
 from bifrost_slime_redraw import PALETTE as P0, BLUE, BROWN, FUR, PLATE, PURPLE, TEAL, GOLD, BONE
 GREEN = list(range(30, 35))
 

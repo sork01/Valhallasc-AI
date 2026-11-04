@@ -20,7 +20,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 import make_crag_sprites as old
 import kindframe
-from wyrd_slime_redraw import Painter, motion, mix
+from wyrd_slime_v1_redraw import Painter, motion, mix
 from deep_slime_redraw import (PALETTE as DEEP, sm, bez, taper, erase, rot, BAYER,
                                TEAL, BLUE, BROWN, GOLD, BONE, GREEN, PLATE, FUR, PURPLE, OLIVE, RAG, BONE as BN)
 

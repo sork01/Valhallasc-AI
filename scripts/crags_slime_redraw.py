@@ -16,7 +16,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 import make_crag_sprites as old
 import kindframe
-from wyrd_slime_redraw import Painter, motion, mix
+from wyrd_slime_v1_redraw import Painter, motion, mix
 from deep_slime_redraw import sm, bez, taper, erase
 from cloister_slime_redraw import Rig, erase_rising
 

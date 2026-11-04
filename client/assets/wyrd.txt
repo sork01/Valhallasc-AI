@@ -49,22 +49,94 @@
     }
   },
   "sprites": {
-    "boar": "7ef72fb866da5857",
-    "crow": "6c08b122e9081a38",
-    "troll": "8235202bf15c25f8",
-    "weaver": "f572033866c9eaa8",
-    "ram": "62bd6cef83ff8251",
-    "oakhorn": "1e9c8a7dff65fc61",
-    "hrungnir": "a2f64de2fa2f750d"
+    "boar": "d82bad6ae8b7f887",
+    "crow": "b9156ac2e00a9a3d",
+    "troll": "ec88e62f48a1eca7",
+    "weaver": "97c81f7640fccbe7",
+    "ram": "ad14fa2219832640",
+    "oakhorn": "ffe12492a250b0ea",
+    "hrungnir": "55251b01e8c5d994"
   },
   "tops": {
     "boar": 57,
-    "crow": 71,
+    "crow": 59,
     "troll": 86,
     "weaver": 86,
     "ram": 58,
     "oakhorn": 86,
-    "hrungnir": 87
+    "hrungnir": 86
   },
-  "artStyle": "greenmeadow-slime"
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "boar": {
+      "frame": [
+        110,
+        74
+      ],
+      "anchor": [
+        47,
+        68
+      ]
+    },
+    "crow": {
+      "frame": [
+        124,
+        76
+      ],
+      "anchor": [
+        50,
+        70
+      ]
+    },
+    "troll": {
+      "frame": [
+        144,
+        112
+      ],
+      "anchor": [
+        52,
+        106
+      ]
+    },
+    "weaver": {
+      "frame": [
+        144,
+        98
+      ],
+      "anchor": [
+        45,
+        92
+      ]
+    },
+    "ram": {
+      "frame": [
+        130,
+        74
+      ],
+      "anchor": [
+        56,
+        68
+      ]
+    },
+    "oakhorn": {
+      "frame": [
+        124,
+        104
+      ],
+      "anchor": [
+        45,
+        98
+      ]
+    },
+    "hrungnir": {
+      "frame": [
+        132,
+        108
+      ],
+      "anchor": [
+        58,
+        102
+      ]
+    }
+  }
 }

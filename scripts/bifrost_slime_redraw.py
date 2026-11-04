@@ -12,7 +12,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw
 import make_crag_sprites as old
-from wyrd_slime_redraw import Painter, motion, mix, PALETTE as BASE_PALETTE
+from wyrd_slime_v1_redraw import Painter, motion, mix, PALETTE as BASE_PALETTE
 
 ROOT=Path(__file__).resolve().parents[1]
 ASSETS=ROOT/'client/assets'

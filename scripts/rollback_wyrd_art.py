@@ -10,7 +10,7 @@ from pathlib import Path
 import os
 import tempfile
 
-DEFAULT_BACKUP = '/media/raid/valhallasc-data/wyrd-slime-original-20261103'
+DEFAULT_BACKUP = '/media/raid/valhallasc-data/wyrd-slime-v1-20261104'     # the live Beta 1.39.7 art; wyrd-slime-original-20261103 holds the pre-slime originals
 
 
 def restore(target, backup, apply=False):

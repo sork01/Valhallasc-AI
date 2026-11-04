@@ -22,7 +22,7 @@ import urllib.request
 
 import numpy as np
 from PIL import Image, ImageDraw
-from wyrd_slime_redraw import Painter, mix
+from wyrd_slime_v1_redraw import Painter, mix
 from deep_slime_redraw import sm, bez, taper
 
 ROOT = Path(__file__).resolve().parents[1]
