@@ -30,14 +30,14 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   const data=await page.evaluate(()=>{
     const zones=Field._debug.zones,z=zones[19],source=Field.stormglassSprites;
     return {count:zones.length,name:z.name,theme:z.theme,levels:z.levels,quests:z.quests.length,npcs:z.npcs.length,
-      spawns:z.slimes.length,objects:z.objects.length,kinds:source.meta.kinds,sizes:source.meta.kinds.map(k=>[source.img[k].naturalWidth,source.img[k].naturalHeight]),
+      spawns:z.slimes.length,objects:z.objects.length,kinds:source.meta.kinds,sizes:source.meta.kinds.map(k=>{const f=Field.frameOf(source,k);return [source.img[k].naturalWidth,source.img[k].naturalHeight,f.w*8,f.h*5];}),
       art:['saltpillar','blackpebble','seafoam','stormreed','stormglass_spire','stormlamp','breakwater_hut','tide_bell','eye_arch'].every(k=>!!City.art[k]),
       map:WorldMap._layout.length,legend:source.meta.kinds.every(k=>WorldMap._kinds[k]?.[1]>=60),
       seal:z.futureInstance,gate:zones[17].portals.find(p=>p.id==='asterion_stormglass_gate'),
       travel:z.npcs.find(n=>n.id==='travel_breakwater')};
   });
   check(data.count===27&&data.name==='The Stormglass Shore'&&data.theme==='stormglass'&&data.levels.join(',')==='60,65','The shore and level range load');
-  check(data.kinds.length===5&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Five complete monster atlases load');
+  check(data.kinds.length===5&&(STUB||data.sizes.every(([w,h,ew,eh])=>w===ew&&h===eh)),'Five complete monster atlases load');
   check(data.art&&data.map===21&&data.legend,'Original scenery and world-map legend load');
   check(data.npcs===8&&data.quests===8&&data.spawns===41&&data.objects>=380,'Camp, quests and enemy fields load');
   check(data.seal?.status==='sealed'&&data.seal?.name==='The Eye Below'&&data.gate?.to===19,'The Eye is sealed and the Asterion causeway exists');

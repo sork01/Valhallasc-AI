@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.26",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The five Stormglass Shore enemies are redrawn to look unique and mean, each with its own face and shape: the Saltclaw is a brine crab with salt-crusted shell, pale stalked eyes and serrated mandibles, the Stormgull a storm-dark gull with lightning running along its wings and a hooked beak, and the Glassray a manta of storm-glass with angular glowing eyes and a toothed maw.",
+      "The Breakersentinel is a barnacled stone guardian carrying a rusted anchor like a halberd, and the Maelstromheart is a drowned heart wrapped in thorned water rings with one huge eye stitched shut.",
+      "Attacks are easier to read: the crab rears up and slams its big claw, the gull dives talons-first, the Glassray whips its stinger and spreads its wings, the Sentinel hauls the anchor overhead and slams it down, and the Heart snaps its stitches open and bursts its rings outward.",
+      "Deaths match each creature: the crab's shell splits and crumbles into salt, the gull tumbles from the sky, the Glassray shatters into a heap of glass, the Sentinel collapses into barnacled rubble, and the Heart stops beating as its rings unwind into ripples."
+    ],
+    "removed": [
+      "Replaced the previous Stormglass Shore artwork; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.25",
     "date": "2026-11-04",
     "new": [],

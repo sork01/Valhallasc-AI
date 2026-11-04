@@ -1,0 +1,7 @@
+{
+  "stormgull": "793128c99438e6e2",
+  "glassray": "fb4494d6d181b64d",
+  "breakersentinel": "22e635b74ca3ec6a",
+  "saltclaw": "556f7e4e2e5afd7e",
+  "maelstromheart": "a7a1dc3ea471a80b"
+}
