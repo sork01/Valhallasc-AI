@@ -19,35 +19,111 @@
     "idle": {
       "fps": 10,
       "n": 6,
-      "row": 0
+      "row": 0,
+      "editorStart": 0
     },
     "walk": {
       "fps": 10,
       "n": 8,
-      "row": 1
+      "row": 1,
+      "editorStart": 6
     },
     "attack": {
       "fps": 10,
       "n": 8,
-      "row": 2
+      "row": 2,
+      "editorStart": 14
     },
     "hurt": {
       "fps": 10,
       "n": 4,
-      "row": 3
+      "row": 3,
+      "editorStart": 22
     },
     "die": {
       "fps": 10,
       "n": 8,
-      "row": 4
+      "row": 4,
+      "editorStart": 26
     }
   },
+  "sprites": {
+    "dew_moth": "e7398d89791d45c1",
+    "lumen_eel": "98476b90e0aa779a",
+    "rootbell": "dfb31e19bf6b2c75",
+    "tideglass_heron": "ec54d26e3542dbb8",
+    "hourpetal_stag": "ca46ce18eb3e8c3b",
+    "moonskein_weaver": "17c46d9a130f0958"
+  },
   "tops": {
-    "dew_moth": 81,
-    "lumen_eel": 64,
-    "rootbell": 76,
-    "tideglass_heron": 82,
-    "hourpetal_stag": 83,
-    "moonskein_weaver": 75
+    "dew_moth": 78,
+    "lumen_eel": 67,
+    "rootbell": 50,
+    "tideglass_heron": 74,
+    "hourpetal_stag": 89,
+    "moonskein_weaver": 73
+  },
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "dew_moth": {
+      "frame": [
+        100,
+        90
+      ],
+      "anchor": [
+        39,
+        84
+      ]
+    },
+    "lumen_eel": {
+      "frame": [
+        128,
+        77
+      ],
+      "anchor": [
+        55,
+        71
+      ]
+    },
+    "rootbell": {
+      "frame": [
+        103,
+        63
+      ],
+      "anchor": [
+        41,
+        57
+      ]
+    },
+    "tideglass_heron": {
+      "frame": [
+        138,
+        83
+      ],
+      "anchor": [
+        48,
+        77
+      ]
+    },
+    "hourpetal_stag": {
+      "frame": [
+        147,
+        100
+      ],
+      "anchor": [
+        43,
+        94
+      ]
+    },
+    "moonskein_weaver": {
+      "frame": [
+        87,
+        83
+      ],
+      "anchor": [
+        35,
+        77
+      ]
+    }
   }
 }
