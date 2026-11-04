@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.28",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Ribbonwild enemies are redrawn to look unique and mean, each with its own face and shape: the Ribbon Gecko is a low teal lizard with a bulging slit-pupil eye, a toothed mouth and a lashing tongue, the Balloon Beetle is an armoured violet beetle with faceted red eyes and hooked mandibles that floats on two tied balloons, the Painted Macaw has a pinprick eye in a white face patch and a tall hooked beak, and the Jesterling is a pale jester with hollow dark eyes, a needle-tooth grin and a curved knife.",
+      "The Parade Gryphon is now a lion-bodied gryphon with a violet eagle head, a hard yellow glare, a crest of long plumes and banded wings, and the Masquerade Colossus is a robed giant behind a cracked porcelain mask with ember eyes and a gold crown.",
+      "Attacks are easier to read: the gecko crouches and lunges with its tongue, the beetle tilts back and dives, the macaw draws its head back and strikes, the jester cocks its knife and slashes, the gryphon rears up and rakes with both talons, and the colossus raises both fists overhead and slams them down.",
+      "Deaths match each creature: the gecko goes slack and flat, the beetle's balloons pop and it lands on its back, the macaw topples forward, the jester folds into a heap of cloth and bells, the gryphon collapses with its wings spread, and the colossus's mask splits in two as its crown rolls off and its body slumps."
+    ],
+    "removed": [
+      "Replaced the previous Ribbonwild enemy artwork; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.27",
     "date": "2026-11-04",
     "new": [],
