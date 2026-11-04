@@ -10,7 +10,7 @@ import tempfile
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
-BACKUP = Path('/media/raid/valhallasc-data/orrery-slime-original-20261104')
+BACKUP = Path('/media/raid/valhallasc-data/orrery-slime-v1-20261104')  # the live Beta 1.39.22 art this redo replaces
 LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
 OUT = ROOT / 'test-results/orrery-slime'
 KINDS = ['bronzemantis', 'gearling', 'orbitseer', 'chronoguard', 'pendulummatron', 'epochengine']
@@ -66,7 +66,7 @@ def review():
     def board(art, label):
         sheet = Image.new('RGB', (len(KINDS) * CELL[0], 36 + len(picks) * (CELL[1] + 24)), BG)
         d = ImageDraw.Draw(sheet)
-        d.text((14, 8), f'The Obsidian Orrery — {label} (same 2× scale, same ground line)', font=font, fill='#fff0cb')
+        d.text((14, 8), f'The Obsidian Orrery redo — {label} (same 2× scale, same ground line)', font=font, fill='#fff0cb')
         for c, kind in enumerate(KINDS):
             for r, (title, clip, n) in enumerate(picks):
                 im = placed(art, kind, clip, n)
@@ -76,14 +76,14 @@ def review():
                 d.text((x + 10, y + CELL[1] + 2), f'{NAMES[kind]} / {title}', font=small, fill='white')
         return sheet
 
-    b = board(before, 'Before')
-    a = board(after, 'After')
-    b.save(OUT / 'valhallasc-orrery-before.png')
-    a.save(OUT / 'valhallasc-orrery-after.png')
+    b = board(before, 'Before (live 1.39.22)')
+    a = board(after, 'After (redo)')
+    b.save(OUT / 'valhallasc-orrery-redo-before.png')
+    a.save(OUT / 'valhallasc-orrery-redo-after.png')
     both = Image.new('RGB', (a.width, a.height * 2), BG)
     both.paste(b, (0, 0))
     both.paste(a, (0, a.height))
-    both.save(OUT / 'valhallasc-orrery-before-after.png')
+    both.save(OUT / 'valhallasc-orrery-redo-before-after.png')
 
     half = (CELL[0] // 2, CELL[1] // 2)
     strip = Image.new('RGB', (8 * half[0], 36 + len(KINDS) * 2 * (half[1] + 20)), BG)
@@ -97,7 +97,7 @@ def review():
                 strip.paste(im, (n * half[0], y), im)
             d.text((6, y + half[1]), f'{NAMES[kind]} — {label}', font=small, fill='white')
             y += half[1] + 20
-    strip.save(OUT / 'valhallasc-orrery-attacks-before-after.png')
+    strip.save(OUT / 'valhallasc-orrery-redo-attacks-before-after.png')
 
     for kind in KINDS:
         w, h, _, ay = after.frame(kind)
@@ -112,7 +112,7 @@ def review():
                 gallery.paste(im, (x, y), im)
                 gd.text((x + 8, y + h * 2), f'{clip} {n + 1}', font=small, fill='white')
                 gd.line([(x, y + ay * 2 + 2), (x + w * 2, y + ay * 2 + 2)], fill='#5c4e8e')
-        gallery.save(OUT / f'valhallasc-orrery-{kind}-frames.png')
+        gallery.save(OUT / f'valhallasc-orrery-redo-{kind}-frames.png')
 
         frames = []
         for tick in range(120):
@@ -126,7 +126,7 @@ def review():
                 im.paste(c, (col * half[0], 0), c)
                 dd.text((col * half[0] + 8, half[1] + 2), clip, font=small, fill='white')
             frames.append(im)
-        frames[0].save(OUT / f'valhallasc-orrery-{kind}-animations.gif', save_all=True,
+        frames[0].save(OUT / f'valhallasc-orrery-redo-{kind}-animations.gif', save_all=True,
                        append_images=frames[1:], duration=50, loop=0)
 
         for clip, suffix in (('die', 'death'), ('attack', 'attack')):
@@ -140,7 +140,7 @@ def review():
                     im.paste(c, (col * (half[0] + 16), 0), c)
                     dd.text((col * (half[0] + 16) + 8, half[1] + 4), f'{label} / {clip}', font=small, fill='white')
                 seq.append(im)
-            seq[0].save(OUT / f'valhallasc-orrery-{kind}-{suffix}-before-after.gif', save_all=True,
+            seq[0].save(OUT / f'valhallasc-orrery-redo-{kind}-{suffix}-before-after.gif', save_all=True,
                         append_images=seq[1:], duration=50, loop=0)
     # All six death comparisons together, at the manifest's 10 fps with a pause on the final pose.
     combined = []
@@ -157,7 +157,7 @@ def review():
                 canvas.paste(cell, (x + col * half[0], y), cell)
             cd.text((x + 8, y + half[1] + 3), f'{NAMES[kind]} / Before     |     After', font=small, fill='white')
         combined.append(canvas)
-    combined[0].save(OUT / 'valhallasc-orrery-deaths-before-after.gif', save_all=True,
+    combined[0].save(OUT / 'valhallasc-orrery-redo-deaths-before-after.gif', save_all=True,
                      append_images=combined[1:], duration=50, loop=0)
     print('29 before/after pictures, complete frame sheets and original-rate animations written.')
 
@@ -191,7 +191,7 @@ def verify():
         restored = json.loads((target / 'client/assets/orrery.txt').read_text())
         assert restored.get('sprites') == backup_meta['oldSprites']
         assert restored.get('tops') == backup_meta['oldTops']
-        assert 'kindFrames' not in restored
+        assert restored.get('kindFrames') == backup_meta['oldKindFrames']
 
     for entry in ('make_orrery_sprites.py', 'orrery_slime_redraw.py'):
         refused = subprocess.run(['python3', str(ROOT / 'scripts' / entry), 'build', '--replace'], capture_output=True)
@@ -211,7 +211,7 @@ def verify():
 
 def upload():
     receipt = []
-    paths = sorted(OUT.glob('valhallasc-orrery-*.png')) + sorted(OUT.glob('valhallasc-orrery-*.gif'))
+    paths = sorted(OUT.glob('valhallasc-orrery-redo-*.png')) + sorted(OUT.glob('valhallasc-orrery-redo-*.gif'))
     expected = 5 + len(KINDS) * 4
     assert len(paths) == expected, f'Generate the complete review set first (found {len(paths)}, expected {expected})'
     for source in paths:

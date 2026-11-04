@@ -48,81 +48,81 @@
     }
   },
   "sprites": {
-    "bronzemantis": "29ef1c9669274ef7",
-    "gearling": "186c134000b26912",
-    "orbitseer": "80892358ea63b0ea",
-    "chronoguard": "a799846fa2c8322e",
-    "pendulummatron": "6231a26eeca7b79c",
-    "epochengine": "ffa805e511f707e6"
+    "bronzemantis": "d8deff7f20671018",
+    "gearling": "f45a47573ca3f3c4",
+    "orbitseer": "57eabc8f2048b018",
+    "epochengine": "ce87725153993436",
+    "chronoguard": "8479fa9767684a4d",
+    "pendulummatron": "e678e2477460fd3d"
   },
   "tops": {
-    "bronzemantis": 81,
-    "gearling": 72,
-    "orbitseer": 83,
-    "chronoguard": 92,
-    "pendulummatron": 87,
-    "epochengine": 105
+    "bronzemantis": 101,
+    "gearling": 74,
+    "orbitseer": 78,
+    "chronoguard": 104,
+    "pendulummatron": 95,
+    "epochengine": 113
   },
   "artStyle": "greenmeadow-slime",
   "kindFrames": {
     "bronzemantis": {
       "frame": [
-        192,
-        154
+        140,
+        118
       ],
       "anchor": [
-        70,
-        148
+        72,
+        112
       ]
     },
     "gearling": {
       "frame": [
-        192,
-        154
+        146,
+        88
       ],
       "anchor": [
-        70,
-        148
+        63,
+        82
       ]
     },
     "orbitseer": {
       "frame": [
-        192,
-        154
+        164,
+        92
       ],
       "anchor": [
-        70,
-        148
+        66,
+        86
       ]
     },
     "chronoguard": {
       "frame": [
-        192,
-        154
+        158,
+        118
       ],
       "anchor": [
-        70,
-        148
+        50,
+        112
       ]
     },
     "pendulummatron": {
       "frame": [
-        192,
-        154
+        145,
+        141
       ],
       "anchor": [
-        70,
-        148
+        71,
+        135
       ]
     },
     "epochengine": {
       "frame": [
-        192,
-        154
+        149,
+        130
       ],
       "anchor": [
-        70,
-        148
+        69,
+        124
       ]
     }
   }

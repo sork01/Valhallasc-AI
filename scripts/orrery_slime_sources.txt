@@ -1,8 +1,8 @@
 {
-  "bronzemantis": "29ef1c9669274ef7",
-  "gearling": "186c134000b26912",
-  "orbitseer": "80892358ea63b0ea",
-  "chronoguard": "a799846fa2c8322e",
-  "pendulummatron": "6231a26eeca7b79c",
-  "epochengine": "ffa805e511f707e6"
+  "bronzemantis": "d8deff7f20671018",
+  "gearling": "f45a47573ca3f3c4",
+  "orbitseer": "57eabc8f2048b018",
+  "epochengine": "ce87725153993436",
+  "chronoguard": "8479fa9767684a4d",
+  "pendulummatron": "e678e2477460fd3d"
 }

@@ -1,0 +1,15 @@
+{
+  "chronoguard_134px_frame": "4fc44a78b0268fb5",
+  "full_size_first_pass": {
+    "bronzemantis": "65551207ed9f23b5",
+    "gearling": "16dc200bcd546ece",
+    "orbitseer": "69238f79968c8b73",
+    "pendulummatron": "e265dd6ad9ddee78",
+    "epochengine": "916e624538601822",
+    "chronoguard": "12788b5ba5a9576a"
+  },
+  "scaled_first_pass": {
+    "chronoguard": "6de25281d4fcfaa3",
+    "pendulummatron": "f0202fa2ca1388af"
+  }
+}

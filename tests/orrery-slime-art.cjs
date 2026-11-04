@@ -10,7 +10,10 @@ const allKinds = ['bronzemantis', 'gearling', 'orbitseer', 'chronoguard', 'pendu
 const kinds = process.env.ORRERY_ART_KINDS ? process.env.ORRERY_ART_KINDS.split(',') : allKinds;
 assert.ok(kinds.length && kinds.every(k => allKinds.includes(k)), 'Valid art selection');
 const currentVersion = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/release-notes.txt')))[0].version;
-const frames = Object.fromEntries(allKinds.map(k => [k, [192, 154, 70, 148]]));
+const frames = {
+  bronzemantis: [140, 118, 72, 112], gearling: [146, 88, 63, 82], orbitseer: [164, 92, 66, 86],
+  chronoguard: [158, 118, 50, 112], pendulummatron: [145, 141, 71, 135], epochengine: [149, 130, 69, 124],
+};
 const sources = JSON.parse(fs.readFileSync(path.join(__dirname, '../scripts/orrery_slime_sources.txt')));
 let browser, checks = 0;
 const errors = [];

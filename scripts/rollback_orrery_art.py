@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Restore the seven Obsidian Orrery art files from an external hash-verified backup.
+"""Restore the seven Obsidian Orrery art files from an external hash-verified backup (default: v1, the live Beta 1.39.22 art).
 
 Dry run by default. --apply makes the requested restore; no server/DB action.
 """
@@ -10,7 +10,7 @@ from pathlib import Path
 import os
 import tempfile
 
-DEFAULT_BACKUP = '/media/raid/valhallasc-data/orrery-slime-original-20261104'
+DEFAULT_BACKUP = '/media/raid/valhallasc-data/orrery-slime-v1-20261104'  # live Beta 1.39.22; the pre-slime originals are in ...-original-20261104 (pass --backup)
 
 
 def restore(target, backup, apply=False):
