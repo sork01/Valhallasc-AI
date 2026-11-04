@@ -1,8 +1,8 @@
 {
-  "sandhopper": "b3326dd314443057",
-  "dunefennec": "f755ebd9c24b5859",
-  "glassscorpion": "68df6d7bc7e92163",
-  "sunvulture": "0addc31949bc9bc1",
-  "dunecolossus": "7ec69756ab55998c",
-  "mirageroc": "e886af6943869891"
+  "sandhopper": "535fef92c3c75bf7",
+  "dunefennec": "ddbbe969d30b6d27",
+  "glassscorpion": "36760931f219d573",
+  "sunvulture": "ebe3414bf120c529",
+  "mirageroc": "3442d18f81495d7e",
+  "dunecolossus": "b952429dcb6f6070"
 }

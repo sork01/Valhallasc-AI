@@ -45,12 +45,12 @@ W = H = 96
 AX, AY = 48, 90
 # (frame w, frame h, anchor x, anchor y): tuned with `extents` so each kind's art fills its own frame.
 KIND_FRAMES = dict(
-    sandhopper=(103, 60, 56, 54),
-    dunefennec=(95, 64, 48, 58),
-    glassscorpion=(127, 65, 58, 59),
-    sunvulture=(97, 70, 42, 64),
-    dunecolossus=(137, 120, 59, 114),
-    mirageroc=(143, 153, 69, 147),
+    sandhopper=(102, 60, 55, 53),
+    dunefennec=(98, 62, 47, 55),
+    glassscorpion=(121, 79, 52, 72),
+    sunvulture=(103, 77, 42, 64),
+    dunecolossus=(110, 106, 50, 100),
+    mirageroc=(116, 124, 56, 118),
 )
 CLIPS = {'idle': (10, 6), 'walk': (10, 8), 'attack': (10, 8), 'hurt': (10, 4), 'die': (10, 8)}
 FLYING = ('mirageroc',)
@@ -81,7 +81,7 @@ def kind_frame(kind):
 
 
 # Art scale per kind (1.0 = the coordinates written in the draw functions); judged on an in-game screenshot.
-SCALE = dict(sandhopper=1.0, dunefennec=1.0, glassscorpion=1.05, sunvulture=1.15, dunecolossus=1.4, mirageroc=1.25)
+SCALE = dict(sandhopper=1.0, dunefennec=1.0, glassscorpion=1.05, sunvulture=1.15, dunecolossus=1.05, mirageroc=1.0)
 
 
 class Painter(BasePainter):
@@ -107,6 +107,19 @@ class Painter(BasePainter):
 
 def clamp01(t):
     return 0. if t < 0 else (1. if t > 1 else t)
+
+
+def settle(r, pts, k, sign, curl=0.):
+    """World points of a chain (tail) that follows the Rig rigidly at k=0 and lies along the ground, away from the body
+    towards `sign` (+1 right, -1 left), at k=1. Segment lengths are kept; `curl` lifts the tip."""
+    w = [r.t(*p) for p in pts]
+    out = [w[0]]
+    for i in range(1, len(pts)):
+        vx, vy = w[i][0] - w[i - 1][0], w[i][1] - w[i - 1][1]
+        ln = math.hypot(vx, vy)
+        fx, fy = sign * ln * math.cos(curl * i / len(pts)), ln * math.sin(curl * i / len(pts))
+        out.append((out[-1][0] + mix(vx, fx, k), out[-1][1] + mix(vy, fy, k)))
+    return out
 
 
 def polar(x, y, ang, r):
@@ -202,29 +215,34 @@ class HeadRig(Rig):
 def sandhopper(clip, n):
     """Sandhopper: a hunched sand-coloured jerboa on huge hind legs with a long tufted tail. Mean: tall notched ears pinned
     back, narrow glaring beads under a dark brow slab, two chisel incisors bared. It coils, then springs claws-first with
-    the jaws open; when it dies it is thrown over backwards onto its back with the hind legs kicking up."""
+    the jaws open; when it dies the hind legs give way and it stretches out flat on the ground, head down, ears laid back
+    and the tail limp behind it."""
     w, st, dn, ph, bob, recoil = curves(clip, n)
     fall = sm(dn * 1.08)
+    lie = sm(clamp01((dn - .25) * 1.4))                        # 0 standing .. 1 stretched out flat
+    lay = max(w, lie)                                           # ears: pinned back in the wind-up, flat in death
     gait = math.sin(ph) if clip == 'walk' else 0.
     a = Painter('sandhopper', st * 9 - w * 3 + recoil * .6)
-    base = 21 - w * 6 + bob * .7 + (abs(gait) * 2 if clip == 'walk' else 0) - (3 if clip == 'hurt' and n == 1 else 0)
-    r = Rig(a, -5, 5, fall * 1.75 - st * .22 + w * .14, 0)
+    base = 21 - w * 6 + bob * .7 + (abs(gait) * 2 if clip == 'walk' else 0) - (3 if clip == 'hurt' and n == 1 else 0) - fall * 3 - lie * 8
+    r = Rig(a, -5, 5, fall * .22 - st * .22 + w * .14, 0)
     fur, belly = SAND, CREAM
     dark = [SAND[0], SAND[0], SAND[1], SAND[2], SAND[2]]
     # tail: long and thin, ending in a dark tuft; it whips with the spring and goes slack in death
     sw = math.sin(ph * 1.2) * 2.5 * (1 - fall) + st * 5
     tail = bez((-9, base - 2), (-26, base - 6 + sw - fall * 6), (-38 - st * 6, base + 6 + sw * 1.6 - fall * 16), 10)
-    r.taper(tail, dark, 3.4, 1.4)
-    tx, ty = tail[-1]
-    r.ball(tx - 1, ty, 4.4, 3, [STONE[0], STONE[1], STONE[2], STONE[3], STONE[3]], -.3)
+    wt = settle(r, tail, lie, -1, .1)
+    taper(a, wt, dark, 3.4, 1.4)
+    tx, ty = wt[-1]
+    a.ball(tx - 1, ty, 4.4, 3, [STONE[0], STONE[1], STONE[2], STONE[3], STONE[3]], -.3)
     # far legs
     ext = st * 1. + (.4 if clip == 'walk' and gait > 0 else 0.) * (1 - st)
-    kick = fall * (1 + math.sin(n * 2.4) * .3)
+    kick = 0
     def hind(sd, ramp):
         hip = (-4 + sd, base - 3)
         knee = (mix(-12, -9, ext) + sd, mix(base - 9, base - 5, ext))
         foot = (mix(-4 + sd * 2 - gait * 3 * sd, -22, ext), mix(1.5, base - 1, ext))
-        foot = mixp(foot, (-15 + sd * 3, base + 12 + math.sin(n * 2.6 + sd) * 3), kick)
+        knee = mixp(knee, (-13 + sd * 2, 5 + sd * .8), lie)
+        foot = mixp(foot, (-26 + sd * 2, 2.4), lie)
         r.limb([hip, knee, foot], ramp, 4.6 if sd > 0 else 4)
         r.ball(foot[0] + 3, foot[1], 5, 1.9, ramp, -.15 - kick)
         for c in (0, 1, 2):
@@ -238,16 +256,16 @@ def sandhopper(clip, n):
     hind(1, fur)
     # near forearm: small clawed arm that reaches on the strike
     sh = (6, base + 1.5)
-    paw = (11 + st * 11 - w * 2, base - 4 + st * 3 - w * 3 + fall * 8)
+    paw = mixp((11 + st * 11 - w * 2, base - 4 + st * 3 - w * 3), (21, 3.2), lie)
     r.limb([sh, mixp(sh, paw, .55), paw], fur, 3.2)
     for c in (-1, 0, 1):
         r.line([paw, (paw[0] + 3.4 + st * 1.6, paw[1] - 1 + c * 1.5)], BONE[4], 1)
     # head
-    hx, hy = 11.5 + st * 3, base + 9.5 - w * 1.2
+    hx, hy = 11.5 + st * 3 + lie * 8, mix(base + 9.5 - w * 1.2, 7.6, lie)
     ang = -.1 - st * .12
     for sd in (-1, 1):                                          # tall ears swept back, notched rims, dark linings
         e0 = (hx - 2 + sd * 1.6, hy + 4)
-        ear = [(e0[0], e0[1]), (e0[0] - 9 - w * 2 - sd * 1.2, e0[1] + 12 - w * 3), (e0[0] - 3.2, e0[1] + 13.6 - w * 3), (e0[0] + 3, e0[1] + 2)]
+        ear = [(e0[0], e0[1]), (e0[0] - 9 - lay * 5 - sd * 1.2, e0[1] + 12 - lay * 10), (e0[0] - 3.2 - lay * 4, e0[1] + 13.6 - lay * 11), (e0[0] + 3, e0[1] + 2)]
         r.poly(ear, (fur[2] if sd > 0 else fur[1]), outline=fur[0])
         r.poly([mixp(ear[0], ear[1], .3), mixp(ear[1], ear[2], .55), mixp(ear[3], ear[2], .45)], PINK[1] if sd > 0 else PINK[0])
         r.line([ear[2], mixp(ear[2], ear[1], .3)], fur[0], 1)  # a notch bitten out of the rim
@@ -271,70 +289,107 @@ def sandhopper(clip, n):
 
 # --- dunefennec
 def dunefennec(clip, n):
-    """Dune fennec: a lean cream desert fox with enormous ears and a brush tail. Mean: ears flat back, a dark mask with
-    narrow amber slits under hard brows, the lip drawn up off long fangs. It drops into a stalking crouch, then lunges with
-    the jaws wide; when it dies it slumps forward onto its chest, then rolls onto its side with the ears limp."""
+    """Dune fennec: a lean cream desert fox with a deep chest, a tucked waist, jointed legs, a narrow pointed muzzle,
+    enormous ears and a bushy dark-tipped tail. Mean: ears laid flat back, a dark mask running from a narrow amber slit
+    eye down the muzzle, the lip drawn up off long fangs. It sinks into a stalking crouch, then lunges with the forepaws
+    reaching and the jaws wide; when it dies the legs buckle, it sinks onto its belly, stretches out flat with the head
+    down, the ears flopped and the tail limp on the ground."""
     w, st, dn, ph, bob, recoil = curves(clip, n)
     fall = dn
     gait = math.sin(ph) if clip == 'walk' else 0.
-    a = Painter('dunefennec', st * 10 - w * 5 + recoil * .6)
-    low = w * 5 + fall * 8
-    base = 24 - low + bob * .6
-    roll = sm((dn - .45) * 2) * 1.35                           # rolls onto its side late in the fall
-    r = Rig(a, 0, 4, -fall * .5 + st * .12 + roll * .6 - w * .1, 0)
-    fur, belly = CREAM, [CREAM[2], CREAM[3], CREAM[4], BONE[3], BONE[4]]
+    a = Painter('dunefennec', st * 9 - w * 3 + recoil * .6)
+    lie = sm(clamp01((fall - .3) * 1.5))                    # 0 standing .. 1 stretched out flat
+    sag = sm(clamp01(fall * 1.5))                           # the legs buckle first
+    hurt = 1 if clip == 'hurt' and n == 1 else 0
+    by = 21 + bob * .5 - w * 6 - sag * 5 - lie * 8 - hurt * 2 + st * 1.5
+    fur = CREAM
     far = [CREAM[0], CREAM[0], CREAM[1], CREAM[2], CREAM[2]]
+    belly = [CREAM[2], CREAM[3], CREAM[4], BONE[3], BONE[4]]
     mask = [SAND[0], SAND[0], SAND[1], SAND[2], SAND[2]]
-    # brush tail
-    sw = math.sin(ph * 1.1) * 2.5 * (1 - fall)
-    tail = bez((-12, base + 1), (-26, base + 6 + sw - fall * 7), (-34 - st * 3, base - 2 + sw * 1.5 - fall * 12), 9)
-    r.taper(tail, fur, 5.4, 3.2)
-    r.ball(tail[-1][0] - 1, tail[-1][1], 4.2, 3.2, mask, .3)       # dark tip
-    # legs: four long thin legs; diagonal gait, folded and splayed in death
-    def leg(x, sd, ramp, front):
-        s = gait * sd * (1 if front else -1)
-        hip = (x, base - 5)
-        reach = st * (12 if front else -8) + (w * (-4 if front else 3))
-        knee = (x + s * 4 + reach * .5, base - 12 + fall * 3)
-        foot = (x + s * 7 + reach + fall * sd * 4, 1.4 + max(0, s) * 3 * (clip == 'walk') + fall * 4 * (1 + sd * .3))
-        r.limb([hip, knee, foot], ramp, 3.5)
-        r.ball(foot[0] + 1.6, foot[1], 2.8, 1.6, ramp, 0)
-    leg(-8, -1, far, False); leg(7, -1, far, True)
-    # body: long lean barrel
-    r.ball(-1, base, 12.6, 8.6, fur, -.06)
-    r.ball(1.4, base - 3, 9, 5, belly, -.04)
-    r.ball(-4, base + 5, 7, 3, [CREAM[1], CREAM[2], CREAM[3], CREAM[4], CREAM[4]], -.1)   # lit back
-    leg(-6, 1, fur, False); leg(9, 1, fur, True)
-    # head, low and forward in a stalk
-    hx, hy = 13 + st * 5 - w * 3 + fall * 2, base + 7 - w * 2 - fall * 6
-    open_ = (clip == 'attack' and 3 <= n <= 5) or (clip == 'hurt' and n == 1) or fall > .45
-    # enormous ears: broad triangles, upright at rest, laid flat back in the stalk and the strike, limp in death
-    for sd in (-1, 1):
-        e0 = (hx - 2.4 + sd * 2.4, hy + 5)
-        lay = clamp01(w * .9 + st * 1. + fall * .6)
-        tip = (e0[0] - 4 - lay * 15, e0[1] + 19 - lay * 12 - fall * 6)
-        ear = [(e0[0] - 5, e0[1] - .5), (e0[0] + 5, e0[1] - .5), tip]
-        r.poly(ear, (fur[2] if sd > 0 else far[2]), outline=fur[0])
-        r.poly([(e0[0] - 2.4, e0[1] + .8), (e0[0] + 2.6, e0[1] + .8), mixp((e0[0], e0[1]), tip, .72)], PINK[2] if sd > 0 else PINK[1])
-    r.ball(hx, hy, 9.4, 7.4, fur, -.08)
-    r.ball(hx + 7.6, hy - 2.6, 6.4, 3.8, belly, -.06)                # muzzle
-    r.ball(hx - 1, hy + 1, 8.4, 3.2, mask, -.2) if not dying(clip, n) else None
-    r.ellipse(hx + 13.6, hy - 1.2, 1.7, 1.4, STONE[0])               # nose
-    gape = 4 if open_ else .7
-    r.poly([(hx + 3, hy - 4), (hx + 14, hy - 3.2), (hx + 12.2, hy - 6.6 - gape), (hx + 3.6, hy - 7.2 - gape)], CRIMSON[0])
-    r.poly([(hx + 7.6, hy - 6.2 - gape), (hx + 12, hy - 6 - gape), (hx + 11, hy - 8.2 - gape)], CRIMSON[2])      # tongue
-    for x, l in ((hx + 13, 3.4), (hx + 10.2, 2.4), (hx + 7.4, 2)):    # upper fangs bared by the snarl
-        r.poly([(x - 1, hy - 3.4), (x + 1, hy - 3.4), (x + .2, hy - 3.4 - l - gape * .5)], BONE[4], outline=BONE[0])
-    for x in (hx + 12.2, hx + 8.6):                                     # lower fangs
-        r.poly([(x - 1, hy - 6.2 - gape), (x + 1, hy - 6.2 - gape), (x + .4, hy - 3.8 - gape * .2)], BONE[3], outline=BONE[0])
-    ex, ey = hx + 5.2, hy + 1.8
+    thin = 1 - .3 * lie
+    # ---- legs: shoulder/hip, elbow/knee from two-bone IK, then the paw
+    def foreleg(sd, ramp):
+        S = (6.4 + sd * .9 + st * 2 - lie * 2, by - 3)
+        P = (9.4 + sd * 1.6 + gait * sd * 5, 1.6 + max(0., gait * sd) * 4)
+        P = mixp(P, (14.5 + sd * 2, 1.6), w * .85)
+        P = mixp(P, (21 + sd * 3, by + 1.5 - sd * 1.4), st)
+        P = mixp(P, (22 + sd * 3, 2.8), lie)
+        elbow, hand = arm_ik(S, P, 9.5, 9.5, -1)
+        a.limb([S, elbow], ramp, 4.4)
+        a.limb([elbow, hand], ramp, 2.8)
+        a.ball(hand[0] + 1.4, hand[1] + .4, 3.2, 1.7, ramp, 0)
+        if st > .5 or hurt:
+            for c in (-1, 0, 1):
+                a.line([(hand[0] + 3, hand[1] + .4), (hand[0] + 5.4, hand[1] + .4 + c * 1.5)], BONE[4], 1)
+    def hindleg(sd, ramp):
+        H = (-8.6 + sd * .9 - st * 1.5, by - 2)
+        K = (-12.4 + sd * 1.2 - gait * sd * 4, 6.4 + max(0., -gait * sd) * 3.5)
+        K = mixp(K, (-14.5 + sd, 3.4), w * .8)
+        K = mixp(K, (-25 - sd * 2, by - 2.5 + sd * 1.4), st)
+        K = mixp(K, (-19 - sd * 2, 3.4), lie)
+        knee, hock = arm_ik(H, K, 9.5, 9.5, 1)
+        a.ball(mix(H[0], knee[0], .45), mix(H[1], knee[1], .45), 4.8, 5.2, ramp, .2)     # thigh mass
+        a.limb([H, knee], ramp, 5)
+        a.limb([knee, hock], ramp, 3)
+        foot = (hock[0] + mix(4.6, -3.5, st), max(1.6, hock[1] - 4.4))
+        a.limb([hock, foot], ramp, 2.4)
+        a.ball(foot[0] + 1.6, foot[1], 3.2, 1.6, ramp, 0)
+    foreleg(-1, far)
+    hindleg(-1, far)
+    # ---- the bushy tail, dark-tipped
+    sw = math.sin(ph * 1.1) * 2.4 * (1 - fall)
+    t0 = (-14, by + 2)
+    t1 = (-25 - w * 2, mix(by + 3 + sw - w * 3 - sag * 3, 3, lie))
+    t2 = (-34 - st * 4 + lie * 3, mix(by - 6 + sw * 1.3 - w * 3, 2.6, lie))
+    tail = bez(t0, t1, t2, 9)
+    taper(a, tail, fur, 6.4, 3.2)
+    a.ball(tail[-1][0] - .5, tail[-1][1], 3.6, 2.8, mask, .3)
+    # ---- body: deep chest, tucked waist, round rump
+    a.ball(6.4 + st * 1.5, by, 9.2, 8.6 * thin, fur, -.06)
+    a.ball(-8.6 - st, by, 7.8, 7.2 * thin, fur, .05)
+    a.ball(-1.4, by + .8, 8.2, 6.4 * thin, fur, 0)
+    a.ball(5, by - 4 * thin, 7.2, 4.2 * thin, belly, 0)
+    a.ball(-3, by + 4.6 * thin, 8.4, 2.8, [CREAM[1], CREAM[2], CREAM[3], CREAM[4], CREAM[4]], -.1)     # lit back
+    foreleg(1, fur)
+    hindleg(1, fur)
+    # ---- neck and head
+    hx = mix(17 + st * 6 - w * 1.5, 23, lie) + hurt * -2
+    hy = mix(by + 9.5 - st * 3.4 - w * 1.5, 6.6, lie)
+    taper(a, [(9, by + 3), mixp((9, by + 3), (hx - 2, hy - 1), .5), (hx - 2, hy - 1)], fur, 7.4, 6)
+    open_ = (clip == 'attack' and 3 <= n <= 5) or hurt or lie > .35
+    lay = max(clamp01(w * .9 + st * .85), lie)
+    for sd in (-1, 1):                                      # far ear first, near ear after the skull
+        if sd < 0:
+            continue
+    def ear(sd):
+        e0 = (hx - 2 + sd * 1.4, hy + 4.4)
+        tip = (e0[0] - 3 + sd * 1.6 - lay * 14, e0[1] + 17 - lay * 13 - lie * 9)
+        base = [(e0[0] - 4.4, e0[1] - .6), (e0[0] + 3.4, e0[1] - .6)]
+        a.poly(base + [tip], (fur[2] if sd > 0 else far[2]), outline=fur[0])
+        a.poly([(base[0][0] + 1.8, base[0][1] + .6), (base[1][0] - 1.2, base[1][1] + .6), mixp((e0[0], e0[1]), tip, .74)], PINK[2] if sd > 0 else PINK[1])
+    ear(-1)
+    a.ball(hx, hy, 6.4, 5.6, fur, -.05)                      # skull
+    a.ball(hx + 5.8, hy - 1.7, 5.2, 2.7, belly, -.05)         # narrow pointed muzzle
+    a.ball(hx + 1.6, hy + .4, 5.6, 2.6, mask, -.18) if not dying(clip, n) else None    # the dark mask
+    a.ellipse(hx + 10.4, hy - .6, 1.6, 1.3, STONE[0])         # nose
+    gape = 4.4 if open_ else .6
+    a.poly([(hx + 2.4, hy - 3.2), (hx + 10.2, hy - 2.8), (hx + 8.8, hy - 5.6 - gape), (hx + 3, hy - 5.8 - gape)], CRIMSON[0])     # mouth
+    a.ball(hx + 5.4, hy - 4.4 - gape, 4.4, 1.4, belly, 0)     # lower jaw
+    if open_:
+        a.ellipse(hx + 7, hy - 4.2 - gape * .5, 2.4, 1.2, CRIMSON[2])    # tongue
+    for fx, fl in ((hx + 9.4, 3.4), (hx + 7.4, 2.6), (hx + 5.4, 2)):     # upper fangs bared by the snarl
+        a.poly([(fx - .9, hy - 2.8), (fx + .9, hy - 2.8), (fx + .1, hy - 2.8 - fl - gape * .3)], BONE[4], outline=BONE[0])
+    for fx in (hx + 9, hx + 6.4):                              # lower fangs
+        a.poly([(fx - .9, hy - 4.6 - gape), (fx + .9, hy - 4.6 - gape), (fx + .3, hy - 3.2 - gape * .3)], BONE[3], outline=BONE[0])
+    ex, ey = hx + 3.4, hy + 1.4
     if dying(clip, n):
-        r.line([(ex - 2, ey - 1.6), (ex + 2, ey + 1.6)], OUTLINE, 2)
-        r.line([(ex - 2, ey + 1.6), (ex + 2, ey - 1.6)], OUTLINE, 2)
+        a.line([(ex - 1.8, ey - 1.8), (ex + 1.8, ey + 1.8)], OUTLINE, 2)
+        a.line([(ex - 1.8, ey + 1.8), (ex + 1.8, ey - 1.8)], OUTLINE, 2)
     else:
-        r.poly([(ex - 3.8, ey - .6), (ex, ey + 1.6), (ex + 3.8, ey + .2), (ex + 3, ey - 1.8), (ex - 1.6, ey - 1.9)], AMBER[3])
-        r.ellipse(ex + .6, ey - .1, .6, 1.4, OUTLINE)                  # a slit pupil
-        r.poly([(ex - 4.6, ey + 3.4), (ex + 4.6, ey + .6), (ex + 4.6, ey + 2.6), (ex - 3.4, ey + 5)], SAND[0])   # hard brow
+        a.poly([(ex - 3.2, ey - .6), (ex, ey + 1.4), (ex + 3.4, ey + .2), (ex + 2.6, ey - 1.5), (ex - 1.4, ey - 1.6)], AMBER[3])
+        a.ellipse(ex + .6, ey - .1, .5, 1.2, OUTLINE)         # slit pupil
+        a.poly([(ex - 4.2, ey + 3.2), (ex + 4.2, ey + .4), (ex + 4.2, ey + 2.2), (ex - 3.2, ey + 4.8)], SAND[0])      # hard brow
+    ear(1)
     return a
 
 
@@ -350,7 +405,7 @@ def glassscorpion(clip, n):
     a = Painter('glassscorpion', st * 6 - w * 4 + recoil * .6)
     base = 11 + bob * .4 - w * 1.2
     flip = sm((dn - .1) * 1.25)                                  # tips over backwards onto its back (0..1)
-    r = Rig(a, -2, 2, flip * 3.05 + recoil * -.02, 0)
+    r = Rig(a, 0, base, flip * 3.05 + recoil * -.02, 8 * math.sin(math.pi * flip))
     shell = AZURE
     deep = [AZURE[0], AZURE[0], AZURE[1], AZURE[2], AZURE[2]]
     glass = [TEAL[0], TEAL[1], TEAL[2], TEAL[3], TEAL[4]]
@@ -374,13 +429,14 @@ def glassscorpion(clip, n):
         px = base_pt[0] + sum(math.cos(mix(1.0, 2.35, j / 5) - fall * (.9 + j / 5 * .5) + cock * (.7 * j / 5) - st * (1.6 * j / 5)) * -5.2 for j in range(i))
         py = base_pt[1] + sum(math.sin(mix(1.0, 2.35, j / 5) - fall * (.9 + j / 5 * .5) + cock * (.7 * j / 5) - st * (1.6 * j / 5)) * 5.2 for j in range(i))
         tail.append((px, py))
-    for i, p in enumerate(tail):
+    wt = settle(r, tail, flip, 1, .14)                            # the tail follows the body, then lies flat behind it, sting up
+    for i, p in enumerate(wt):
         rad = 4.6 - i * .45
-        r.ball(p[0], p[1], rad, rad, shell if i % 2 else glass, -.2)
-    sx, sy = tail[-1]
-    dir_ = math.atan2(tail[-1][1] - tail[-2][1], tail[-1][0] - tail[-2][0])
-    r.poly([polar(sx, sy, dir_ + 1.5, 2.6), polar(sx, sy, dir_, 8.5), polar(sx, sy, dir_ - 1.5, 2.6)], GOLD[3], outline=AMBER[0])   # glowing sting
-    r.ball(sx, sy, 3.6, 3.6, [AMBER[0], AMBER[1], GOLD[2], GOLD[3], GOLD[4]], 0)
+        a.ball(p[0], p[1], rad, rad, shell if i % 2 else glass, -.2)
+    sx, sy = wt[-1]
+    dir_ = math.atan2(wt[-1][1] - wt[-2][1], wt[-1][0] - wt[-2][0])
+    a.poly([polar(sx, sy, dir_ + 1.5, 2.6), polar(sx, sy, dir_, 8.5), polar(sx, sy, dir_ - 1.5, 2.6)], GOLD[3], outline=AMBER[0])   # glowing sting
+    a.ball(sx, sy, 3.6, 3.6, [AMBER[0], AMBER[1], GOLD[2], GOLD[3], GOLD[4]], 0)
     # body
     r.ball(0, base, 14, 7.4, shell, -.04)
     r.ball(-2, base + 2.4, 9.4, 3.8, glass, -.05)               # lit dorsal plates
@@ -425,9 +481,11 @@ def sunvulture(clip, n):
     fall = dn
     gait = math.sin(ph) if clip == 'walk' else 0.
     a = Painter('sunvulture', st * 7 - w * 4 + recoil * .6)
-    spread = clamp01(w * .65 + st * 1. + fall * .75 + (.35 if clip == 'hurt' and n == 1 else 0))
-    base = 29 - w * 2 + bob * .5 - fall * 5
-    r = Rig(a, 3, 8, -fall * 1.25 + st * .12 - w * .06, 0)
+    spread = clamp01(w * .65 + st * 1. + (.35 if clip == 'hurt' and n == 1 else 0))
+    late = clamp01((n - 5) / 2) if clip == 'die' else 0.
+    slump = sm(fall * 1.1)                                  # in death the knees buckle, the breast drops and the wings slump
+    base = 29 - w * 2 + bob * .5 - slump * 17
+    r = Rig(a, 3, 8, -slump * .18 + st * .12 - w * .06, 0)
     feather = [PLUM[0], PLUM[1], PLUM[2], PLUM[3], PLUM[3]]
     dark = [PLUM[0], PLUM[0], PLUM[1], PLUM[2], PLUM[2]]
     skin = CORAL
@@ -440,8 +498,8 @@ def sunvulture(clip, n):
     for sd, ramp in ((-1, dark), (1, [GOLD[0], AMBER[1], AMBER[2], GOLD[2], GOLD[3]])):
         s = gait * sd
         hip = (-1 + sd * 2, base - 9)
-        knee = (2 + sd * 3 + s * 5, base - 16)
-        foot = (1 + sd * 3 + s * 9, 2 + max(0, s) * 4 + fall * 3)
+        knee = (2 + sd * 3 + s * 5 + slump * (5 + sd * 2), mix(base - 16, 7, slump))
+        foot = (1 + sd * 3 + s * 9 + slump * (4 - sd * 2), 2 + max(0, s) * 4 * (1 - slump))
         r.limb([hip, knee, foot], ramp, 3.4)
         for t in (-1, 0, 1):
             r.line([(foot[0], foot[1]), (foot[0] + 6 + (st * 2), foot[1] - 1 + t * 1.6)], BONE[4], 1)
@@ -455,18 +513,24 @@ def sunvulture(clip, n):
         r.line([(5.2 + math.cos(ra) * 3.8, base - 1.2 + math.sin(ra) * 3.8), (5.2 + math.cos(ra) * 5.4, base - 1.2 + math.sin(ra) * 5.4)], GOLD[3], 1)
     # the wing: folded along the body at rest, a fan of long feathers when spread
     sh = (-1, base + 6)
+    wing_tips = []
     for k in range(6):
-        ang = mix(-2.5 + k * .1, 1.5 - k * .32, spread)
-        ln = mix(14 + k * 1.1, 17 + k * 3.2, spread)
+        wa = mix(mix(-2.5 + k * .1, 1.5 - k * .32, spread), -2.95 + k * .06, slump)
+        wl = mix(14 + k * 1.1, 17 + k * 3.2, spread) * (1 + slump * .45)
+        wing_tips.append(polar(sh[0], sh[1], wa, wl * .94))
+    r.poly([sh] + wing_tips, feather[1], outline=feather[0])                   # the web between the feathers
+    for k in range(6):
+        ang = mix(mix(-2.5 + k * .1, 1.5 - k * .32, spread), -2.95 + k * .06, slump) - late * .1 * (k - 2.5)
+        ln = mix(14 + k * 1.1, 17 + k * 3.2, spread) * (1 + slump * .45 + late * .05)
         tip = polar(sh[0], sh[1], ang, ln)
         mid = polar(sh[0], sh[1], ang + .14, ln * .55)
-        r.poly([sh, polar(sh[0], sh[1], ang + .24, ln * .55), tip, polar(sh[0], sh[1], ang - .24, ln * .55)], feather[1 + (k % 2)], outline=feather[0])
+        r.poly([sh, polar(sh[0], sh[1], ang + .34, ln * .68), tip, polar(sh[0], sh[1], ang - .34, ln * .68)], feather[1 + (k % 2)], outline=feather[0])
         r.line([polar(sh[0], sh[1], ang, ln * .3), tip], feather[3], 1)
     r.ball(-.5, base + 3.4, 8.4, 6.4, feather, -.6)                      # the wing's upper arm
     # neck and head
-    hx, hy = 14.5 + st * 11 - w * 4 + fall * 3, base + 13 - st * 10 + w * 3 - fall * 12
+    hx, hy = 14.5 + st * 11 - w * 4 + slump * 13 + late * 1.2, mix(base + 13 - st * 10 + w * 3, 8, slump) - late * .8
     ruffx, ruffy = 7.6, base + 9
-    neck = bez((ruffx, ruffy), (ruffx + 4 + st * 4, ruffy + 7 - st * 5 + w * 2), (hx - 1.6, hy - 2.8), 8)
+    neck = bez((ruffx, ruffy), (ruffx + 4 + st * 4 + slump * 6, ruffy + (7 - st * 5 + w * 2) * (1 - slump) - slump * 2), (hx - 1.6, hy - 2.8), 8)
     r.taper(neck, skin, 5.4, 4.2)
     for k, (px, py) in enumerate(neck[1:6]):                              # throat wrinkles
         r.line([(px - 1.4, py - .6), (px + 1.4, py + .6)], skin[0], 1)
@@ -503,7 +567,7 @@ def dunecolossus(clip, n):
     w, st, dn, ph, bob, recoil = curves(clip, n)
     fall = dn
     gait = math.sin(ph) if clip == 'walk' else 0.
-    a = Painter('dunecolossus', recoil * .6)
+    a = Painter('dunecolossus', st * 8 - w * 3 + recoil * .6)
     sand = SAND
     stone = STONE
     inlay = AZURE
@@ -527,12 +591,17 @@ def dunecolossus(clip, n):
     for k in range(3):                                                                    # lapis belt studs
         a.ellipse(cx - 7 + k * 7, cy + .4, 1.6, 1.6, inlay[3])
     d = drop(3)
-    tx, ty = mixp((0, 46 + bob * .6 - w * 3 + st * -2), (4, 22), d)
-    tl = d * .5 - st * .05 + w * .04
+    tx, ty = mixp((0, 46 + bob * .6 - w * 3 + st * -2), (2, 15), d)
+    tl = d * 1.3 - st * .05 + w * .04
     cs, sn = math.cos(tl), math.sin(tl)
     tv = 1 - d * .32
     tpts = [(-20, 11 * tv), (20, 11 * tv), (16, 2), (12, -13 * tv), (-12, -13 * tv), (-16, 2)]
-    plate(a, [(tx + x * cs - y * sn, ty + x * sn + y * cs) for x, y in tpts], [sand[0], sand[1], sand[2], sand[3], sand[3]])
+    if d < .55:
+        plate(a, [(tx + x * cs - y * sn, ty + x * sn + y * cs) for x, y in tpts], [sand[0], sand[1], sand[2], sand[3], sand[3]])
+    else:                                                                                # the torso has split into slabs on the ground
+        blk(a, tx - 7, ty - 1, 12, 6.4, [sand[0], sand[1], sand[2], sand[3], sand[3]], .18)
+        blk(a, tx + 9, ty + 3.4, 9, 5, [sand[0], sand[1], sand[2], sand[3], sand[3]], -.32)
+        a.poly([(tx - 3, ty + 7), (tx + 3, ty + 9), (tx + 1, ty + 4)], inlay[2], outline=inlay[0])    # a shard of the lapis breastplate
     if d < .6:
         a.poly([(tx - 11, ty + 9), (tx + 11, ty + 9), (tx + 7, ty - 4), (tx, ty - 8), (tx - 7, ty - 4)], inlay[2], outline=inlay[0])    # a lapis breastplate
         a.poly([(tx - 7, ty + 8), (tx + 4, ty + 8), (tx, ty), (tx - 5, ty - 2)], inlay[3])
@@ -543,14 +612,14 @@ def dunecolossus(clip, n):
     # arms: shoulder -> elbow -> fist; hanging at rest, overhead on the wind-up, hammering down on the strike
     for sd, i in ((-1, 4), (1, 5)):
         d = drop(i, 1.9)
-        sh = (sd * 19, tx and ty + 8)
+        sh = (sd * 19, ty + 8)
         hang = (sd * 24 + gait * sd * 3, 13 + (3 if sd < 0 else 0))
-        up = (sd * 15, 92)
+        up = (sd * 15, 84)
         slam = (sd * 8 + 20, 7)
         tgt = mixp(mixp(hang, up, w), slam, st)
         e = arm_ik(sh, tgt, 17, 17, 1 if sd > 0 else -1)
         elbow, hand = e
-        hand = mixp(hand, (sd * 33 + 7, 4), d)
+        hand = mixp(hand, (sd * 33 + 7, 11), d)
         elbow = mixp(elbow, (sd * 27, 12), d)
         if d < .5:
             a.limb([sh, elbow, hand], [sand[0], sand[1], sand[2], sand[3], sand[3]], 11)
@@ -699,11 +768,15 @@ def mirageroc(clip, n):
 DRAW = {k: globals()[k] for k in KINDS if k in globals()}
 STRICT = True
 BAD = []
+LOWEST = {}
 
 
 def frame(kind, clip, n):
     kw, kh, kax, kay = kind_frame(kind)
     grid = np.array(DRAW[kind](clip, n).im)
+    clipped = bool(grid.any() and (grid[0].any() or grid[-1].any() or grid[:, 0].any() or grid[:, -1].any()))   # BEFORE the roll hides it
+    if grid.any():
+        LOWEST[kind] = max(LOWEST.get(kind, -999), int(np.nonzero(grid.any(axis=1))[0].max()) - kay)
     if kind in FLYING:
         # Flyers hover well above the ground while alive and settle onto kay at the end of death.
         rows = np.nonzero(grid.any(axis=1))[0]
@@ -711,12 +784,14 @@ def frame(kind, clip, n):
             grid = np.roll(grid, kay - int(rows.max()), axis=0)
     else:
         # Grounded kinds rest their lowest pixel exactly on the anchor row in every living and death frame.
+        while grid.any() and int((grid[int(np.nonzero(grid.any(axis=1))[0].max())] != 0).sum()) <= 2:
+            grid[int(np.nonzero(grid.any(axis=1))[0].max())] = 0          # a 1-2 pixel sliver below the feet is a rasteriser stray
         rows = np.nonzero(grid.any(axis=1))[0]
         if rows.size and (clip == 'die' or int(rows.max()) != kay):
             grid = np.roll(grid, kay - int(rows.max()), axis=0)
     if clip == 'hurt' and n == 0:
         grid[grid > 0] = EYE_WHITE
-    problem = None
+    problem = 'drawn past the canvas edge before the ground roll (clipped)' if clipped else None
     low = int(np.nonzero(grid.any(axis=1))[0].max()) if grid.any() else -1
     if not grid.any() or grid[0].any() or grid[-1].any() or grid[:, 0].any() or grid[:, -1].any():
         problem = 'empty or touches the border'
@@ -862,21 +937,24 @@ def extents():
     STRICT = False
     for kind in [k for k in KINDS if k in DRAW and (len(sys.argv) < 3 or k in sys.argv[2:])]:
         old_kf = KIND_FRAMES.get(kind)
-        left = right = up = 0
+        left = right = up = down = 0
+        LOWEST.pop(kind, None)
         for axs in (100, 92):
-            KIND_FRAMES[kind] = (192, 192, axs, 186)
-            for clip, grids in frames(kind).items():
-                for grid in grids:
+            KIND_FRAMES[kind] = (192, 192, axs, 150)
+            for clip, (_, count) in CLIPS.items():
+                for grid in (np.array(DRAW[kind](clip, n).im) for n in range(count)):   # RAW drawing: the ground roll would hide height
                     ys, xs = np.nonzero(grid)
                     if not xs.size:
                         continue
                     assert (xs.min() > 0 if axs == 100 else xs.max() < 191) and ys.min() > 0, (kind, clip, 'scratch canvas clipped', axs)
+                    down = max(down, int(ys.max()) - 150)
                     if axs == 100:
                         left = max(left, axs - 2 - int(xs.min()) + 2)
-                        up = max(up, 184 - int(ys.min()))
+                        up = max(up, 148 - int(ys.min()))
                     else:
                         right = max(right, int(xs.max()) - (axs - 2) + 2)
-        print(f'{kind}: left {left} right {right} up {up}  ->  suggested ax {left+4}, w {left+4+right+5}, ay {up+4}, h {up+4+6}')
+        print(f'{kind}: raw drawing reaches {down} rows below the anchor row (must be <= 4)')
+        print(f'{kind}: left {left} right {right} up {up}  ->  suggested ax {left+4}, w {left+4+right+5}, ay {up+4}, h {up+4+max(6, down + 2)}')
         if old_kf:
             KIND_FRAMES[kind] = old_kf
         else:

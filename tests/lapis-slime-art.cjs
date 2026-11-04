@@ -11,7 +11,7 @@ const kinds = process.env.LAPIS_ART_KINDS ? process.env.LAPIS_ART_KINDS.split(',
 assert.ok(kinds.length && kinds.every(k => allKinds.includes(k)), 'Valid art selection');
 const currentVersion = JSON.parse(fs.readFileSync(path.join(__dirname, '../client/release-notes.txt')))[0].version;
 const frames = {
-  sandhopper: [103, 60, 56, 54], dunefennec: [95, 64, 48, 58], glassscorpion: [127, 65, 58, 59], sunvulture: [97, 70, 42, 64], dunecolossus: [137, 120, 59, 114], mirageroc: [143, 153, 69, 147],
+  sandhopper: [102, 60, 55, 53], dunefennec: [98, 62, 47, 55], glassscorpion: [121, 79, 52, 72], sunvulture: [103, 77, 42, 64], dunecolossus: [110, 106, 50, 100], mirageroc: [116, 124, 56, 118],
 };
 const sources = JSON.parse(fs.readFileSync(path.join(__dirname, '../scripts/lapis_slime_sources.txt')));
 let browser, checks = 0;

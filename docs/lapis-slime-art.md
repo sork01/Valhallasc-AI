@@ -6,10 +6,10 @@
 
 | kind | look | attack | death |
 |---|---|---|---|
-| sandhopper | hunched sand jerboa on huge hind legs, long tail with a dark tuft | coils low, then springs claws-first with the jaws open | thrown over backwards onto its back, hind legs kicking up |
-| dunefennec | lean cream fox, enormous ears, brush tail | drops into a stalk with the ears laid flat, then lunges with the jaws wide | slumps forward onto its chest, then rolls onto its side, ears limp |
+| sandhopper | hunched sand jerboa on huge hind legs, long tail with a dark tuft | coils low, then springs claws-first with the jaws open | the hind legs give way and it stretches out flat, head down, ears back, tail limp |
+| dunefennec | lean cream fox with a deep chest, tucked waist, jointed legs, pointed muzzle, enormous ears and a dark-tipped bush tail | sinks into a stalk with the ears laid flat, then lunges with the forepaws reaching and the jaws wide | the legs buckle, it sinks onto its belly and stretches out flat, head down, ears flopped |
 | glassscorpion | rigid blue glass shell, two claws, segmented tail with a glowing amber sting | tail cocks over the back, then stabs forward over the head, claws spread | the shell cracks, the tail drops, it tips over onto its back with the legs curling in (rigid: no squash) |
-| sunvulture | hunched plum bird, bald pink head, white ruff, gold sun mark on the breast | wings half open, then thrown wide as the neck rips down | wings crumple out to the sides and it pitches forward onto its breast |
+| sunvulture | hunched plum bird, bald pink head, white ruff, gold sun mark on the breast | wings half open, then thrown wide as the neck rips down | the knees buckle, the breast drops, the neck flops forward along the ground and the wings slump back and down |
 | dunecolossus (elite) | giant of sand-coloured stone blocks, lapis breastplate, gold stud | both fists overhead, then hammered down in front with sand thrown up | head drops first, arms break off, torso and legs slump into a heap of blocks (stone breaks, it does not collapse like a slime) |
 | mirageroc (elite, hovers) | vast blue-feathered bird, gold breast, orange crest, magenta-shimmer wing fringes | wings beat up and back, then a dive with talons forward and the beak wide | a mirage does not fall like a bird: heat-haze bands slide sideways and an ordered dither eats the body as it sinks; a few feathers and gold sparks reach the ground |
 
@@ -18,14 +18,14 @@ The six enemies share `client/assets/lapis.txt` with five **NPCs** (`lapis_keepe
 
 | kind | frame | anchor | PixelFlow source | top |
 |---|---|---|---|---|
-| sandhopper | 103x60 | (56,54) | `b3326dd314443057` | 49 |
-| dunefennec | 95x64 | (48,58) | `f755ebd9c24b5859` | 56 |
-| glassscorpion | 127x65 | (58,59) | `68df6d7bc7e92163` | 48 |
-| sunvulture | 97x70 | (42,64) | `0addc31949bc9bc1` | 57 |
-| dunecolossus | 137x120 | (59,114) | `7ec69756ab55998c` | 112 |
-| mirageroc | 143x153 | (69,147) | `e886af6943869891` | 141 |
+| sandhopper | 102x60 | (55,53) | `535fef92c3c75bf7` | 50 |
+| dunefennec | 98x62 | (47,55) | `ddbbe969d30b6d27` | 51 |
+| glassscorpion | 121x79 | (52,72) | `36760931f219d573` | 47 |
+| sunvulture | 103x77 | (42,64) | `ebe3414bf120c529` | 57 |
+| dunecolossus | 110x106 | (50,100) | `b952429dcb6f6070` | 80 |
+| mirageroc | 116x124 | (56,118) | `3442d18f81495d7e` | 113 |
 
-Art scale (`SCALE`) was set by comparing each kind's idle size with the old art's, not from an in-game screenshot: elites are deliberately the biggest (colossus 1.4x, roc 1.25x). Only the Mirage Roc hovers (lowest living pixel at least 12 px above the anchor row, settles on the ground row on death). The other five are grounded; `frame()` rests the lowest pixel on the anchor row.
+Art scale (`SCALE`) matches each kind's idle size to the old art's and was checked on in-game screenshots: the first pass drew the colossus at 1.4x and it towered over the hero, because the engine already draws elites larger, so the colossus is now 1.05x and the roc 1.0x. Only the Mirage Roc hovers (lowest living pixel at least 12 px above the anchor row, settles on the ground row on death). The other five are grounded; `frame()` rests the lowest pixel on the anchor row.
 
 ```sh
 python3 scripts/lapis_slime_redraw.py preview|montage [kinds]   # contact sheets
@@ -44,8 +44,11 @@ python3 scripts/rollback_lapis_art.py --target /path/to/checkout --apply
 ```
 Backup `/media/raid/valhallasc-data/lapis-slime-original-20261104` (seven files, hashes and the old PixelFlow ids in `manifest.txt`). Every hash is checked before any write, a corrupt backup is refused, and the restore stops if an NPC entry in the live manifest differs from the backup's.
 
+## Clipping guard (added after the first review)
+`frame()` rolls every grounded frame so its lowest pixel sits on the anchor row, and the border check ran AFTER that roll, so art drawn below the canvas was cut off silently and then looked fine to every check. `frame()` now tests the RAW Painter canvas for any non-empty edge row or column BEFORE the roll (`drawn past the canvas edge before the ground roll (clipped)`), and `build` (STRICT) refuses it; `preview` and `montage` list the offenders. `extents` measures the raw drawing on a scratch canvas with 150 rows of headroom and 42 below the ground, and reports how far the raw drawing goes below the anchor row. A 1-2 pixel sliver below the real feet is trimmed before grounding (it had lifted the fennec's paws one row off the ground). The first review also found a real bug: the colossus shoulders were placed with `tx and ty + 8`, which is 0 whenever `tx` is 0.0, so its shoulders sat on the ground and its fists hung at its feet. Rigid rotation of a whole creature through the ground was the cause of the clipped scorpion, sandhopper, fennec and vulture deaths: tails now use `settle()` (rigid with the body at the start, lying flat behind it at the end) and deaths buckle and lie down instead of tumbling.
+
 ## Checks
-`tests/lapis-slime-art.cjs` (126 checks, passing): production loading, the five untouched NPCs, portraits, timings, borders, eight distinct attacks and deaths with a reaching strike, anchor-row grounding (the roc hovers, then settles), planted feet, health-bar tops, no browser errors. Run it with `scripts/test-touch-bounded.sh` and, in the SAME command, `PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright`, `NODE_PATH=<main>/node_modules:~/webserver/www/dybase2/node_modules`, `VALHALLA_BINARY=<main>/target/release/valhalla-server`; `SOFT_CHECKS=1` lists every failure. Mutation: `MUTATE_KIND=sunvulture MUTATE_PNG=<original atlas> LAPIS_ART_KINDS=sunvulture` fails as required. `tests/lapis-ui.cjs` now reads each kind's expected atlas size from `Field.frameOf` (it asserted 768x480 for all eleven); it has not been run. `python3 scripts/lapis_slime_review.py review|verify|upload` (pictures `valhallasc-lapis-*`; upload is a separate, explicit step and has NOT been done).
+`tests/lapis-slime-art.cjs` (126 checks, passing; they did NOT catch the problems above, so judge the `-frames.png` sheets and the in-game screenshots it writes (`lapis-slime-<kind>-game.png` in `test-results/driver-*`), not the count): production loading, the five untouched NPCs, portraits, timings, borders, eight distinct attacks and deaths with a reaching strike, anchor-row grounding (the roc hovers, then settles), planted feet, health-bar tops, no browser errors. Run it with `scripts/test-touch-bounded.sh` and, in the SAME command, `PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright`, `NODE_PATH=<main>/node_modules:~/webserver/www/dybase2/node_modules`, `VALHALLA_BINARY=<main>/target/release/valhalla-server`; `SOFT_CHECKS=1` lists every failure. Mutation: `MUTATE_KIND=sunvulture MUTATE_PNG=<original atlas> LAPIS_ART_KINDS=sunvulture` fails as required. `tests/lapis-ui.cjs` now reads each kind's expected atlas size from `Field.frameOf` (it asserted 768x480 for all eleven); it has not been run. `python3 scripts/lapis_slime_review.py review|verify|upload` (pictures `valhallasc-lapis-*`; upload is a separate, explicit step and has NOT been done).
 
 ## Likely veto points
-The roc's wings read like a fanned peacock tail; the sandhopper and vulture are smaller than the old art; the roc's last two death frames are nearly empty by design; the scorpion's claws are plain.
+The roc's wings read like a fanned peacock tail; the roc's last two death frames are nearly empty by design; the scorpion's claws are plain; the colossus heap is a pile of blocks with the skull on top.

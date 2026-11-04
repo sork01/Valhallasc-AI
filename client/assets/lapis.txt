@@ -58,20 +58,20 @@
     "lapis_warden": "c9fe3d1af68fed67",
     "lapis_seer": "1c9dc5d148fef101",
     "lapis_travel": "a92127d3650b2884",
-    "sandhopper": "b3326dd314443057",
-    "dunefennec": "f755ebd9c24b5859",
-    "glassscorpion": "68df6d7bc7e92163",
-    "sunvulture": "0addc31949bc9bc1",
-    "dunecolossus": "7ec69756ab55998c",
-    "mirageroc": "e886af6943869891"
+    "sandhopper": "535fef92c3c75bf7",
+    "dunefennec": "ddbbe969d30b6d27",
+    "glassscorpion": "36760931f219d573",
+    "sunvulture": "ebe3414bf120c529",
+    "dunecolossus": "b952429dcb6f6070",
+    "mirageroc": "3442d18f81495d7e"
   },
   "tops": {
-    "sandhopper": 49,
-    "dunefennec": 56,
-    "glassscorpion": 48,
+    "sandhopper": 50,
+    "dunefennec": 51,
+    "glassscorpion": 47,
     "sunvulture": 57,
-    "dunecolossus": 112,
-    "mirageroc": 141,
+    "dunecolossus": 80,
+    "mirageroc": 113,
     "lapis_keeper": 82,
     "lapis_cartographer": 83,
     "lapis_warden": 83,
@@ -82,38 +82,38 @@
   "kindFrames": {
     "sandhopper": {
       "frame": [
-        103,
+        102,
         60
       ],
       "anchor": [
-        56,
-        54
+        55,
+        53
       ]
     },
     "dunefennec": {
       "frame": [
-        95,
-        64
+        98,
+        62
       ],
       "anchor": [
-        48,
-        58
+        47,
+        55
       ]
     },
     "glassscorpion": {
       "frame": [
-        127,
-        65
+        121,
+        79
       ],
       "anchor": [
-        58,
-        59
+        52,
+        72
       ]
     },
     "sunvulture": {
       "frame": [
-        97,
-        70
+        103,
+        77
       ],
       "anchor": [
         42,
@@ -122,22 +122,22 @@
     },
     "dunecolossus": {
       "frame": [
-        137,
-        120
+        110,
+        106
       ],
       "anchor": [
-        59,
-        114
+        50,
+        100
       ]
     },
     "mirageroc": {
       "frame": [
-        143,
-        153
+        116,
+        124
       ],
       "anchor": [
-        69,
-        147
+        56,
+        118
       ]
     }
   }
