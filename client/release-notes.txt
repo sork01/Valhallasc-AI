@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.24",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The seven Moonspore Canopy enemies are redrawn to look unique and mean, each with its own face and shape instead of one shared round-eyed look: the Glowcap Grazer is a tusked mossy beast with glowing caps, the Silkwing a death's-head moth with razor wings, the Rootlurker a hunched bark creature with splinter teeth, and the Lantern Wraith a hooded ghost with a hooked lantern.",
+      "The Mireheart is a bog-toad with an exposed beating heart and a barbed tongue, the Silver Widow a black spider with a silver crescent and six burning eyes, and the Nightbloom a toothed carnivorous flower with thorny vines.",
+      "Attacks are easier to read: the Grazer gores forward in a spore cloud, the Silkwing slashes down with its wings, the Rootlurker rakes its claws as bark spikes burst from the ground, the Wraith hurls a green fire orb, the Mireheart lashes out its tongue, the Widow lunges and sprays silk, and the Nightbloom snaps down with its vines.",
+      "Deaths match each creature: the Grazer rolls over as its caps wilt, the Silkwing folds its wings and falls, the Rootlurker splinters into logs, the Wraith unravels upward into wisps and drops its lantern, the Mireheart deflates as its heart goes dark, the Widow curls its legs and flips over, and the Nightbloom wilts and bows."
+    ],
+    "removed": [
+      "Replaced the previous Moonspore Canopy artwork; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.23",
     "date": "2026-11-04",
     "new": [],
