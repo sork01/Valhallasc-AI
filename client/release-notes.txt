@@ -1,5 +1,18 @@
 [
   {
+    "version": "Beta 1.39.22",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Obsidian Orrery enemies have glossy slime-style artwork, with expressive eyes and their own animated clockwork details.",
+      "Their attacks have distinct wind-ups, strikes and recoveries: the Bronze Mantis swings its scythes, the Gearling charges, the Orbit Seer fires a beam, the Chronoguard thrusts its spear, the Pendulum Matron swings her pendulum and the Epoch Engine strikes with its gears.",
+      "Their deaths follow their forms: mechanisms crack and settle, the Orbit Seer falls, the Chronoguard slumps in its armour and the Pendulum Matron sinks with her pendulum."
+    ],
+    "removed": [
+      "Replaced the Orrery enemies' earlier artwork; the previous versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.21",
     "date": "2026-11-04",
     "new": [],
