@@ -135,8 +135,13 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
       check(Math.abs(last.top-idle0.top) <= 3 && Math.abs(last.left-idle0.left) <= 3 && Math.abs(last.right-idle0.right) <= 3, `${kind}: attack recovery returns to the idle silhouette (frame 7 within 3 px of idle 0)`);
       check(new Set(die.map(r => r.hash)).size === 8, `${kind}: all eight death frames are distinct`);
       const living = d.rows.filter(r => r.clip !== 'die');
-      check(living.every(r => r.low === kay), `${kind}: every living frame rests exactly on its anchor row ${kay} (rows ${[...new Set(living.map(r => r.low))]})`);
-      check(die.every(r => r.low === kay), `${kind}: every death frame rests exactly on the ground (row ${kay}), never sunk or floating`);
+      if (kind === 'skyray') {
+        check(living.every(r => r.low <= kay-12 && r.groundRuns === 0), `${kind}: flying manta hovers well above anchor row ${kay} with nothing touching the ground (rows ${[...new Set(living.map(r => r.low))]})`);
+        check(die[0].low <= kay-12 && die.every(r => r.low <= kay) && die[7].low === kay, `${kind}: death falls from mid-air and settles on ground row ${kay}`);
+      } else {
+        check(living.every(r => r.low === kay), `${kind}: every living frame rests exactly on its anchor row ${kay} (rows ${[...new Set(living.map(r => r.low))]})`);
+        check(die.every(r => r.low === kay), `${kind}: every death frame rests exactly on the ground (row ${kay}), never sunk or floating`);
+      }
       console.log(`   ground ${kind} idle groundRuns=${idle.map(r => r.groundRuns)} legTracks=${idle.map(r => r.legTracks)} groundWidth=${idle.map(r => r.groundWidth)}`);
       if (quadrupeds.includes(kind)) {
         check(idle.every(r => r.groundRuns >= 4), `${kind}: all four paws touch the ground row in every idle pose (QUADRUPED-GROUNDING; runs ${idle.map(r => r.groundRuns)})`);

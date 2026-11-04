@@ -147,7 +147,7 @@ recovery to the idle silhouette), and satisfies `QUADRUPED-GROUNDING`:
 | --- | --- | --- | --- | --- |
 | Galehound | `124×76`, `(54,70)` | 60 | `7450f8bb136a9936` | `eb5eadd388c59b4b` |
 | Prism Golem | `120×102`, `(52,96)` | 85 | `f352194463eb9ae2` | `49c6de45376a59e7` |
-| Skyray | `120×74`, `(52,68)` | 45 | `2837ad79482c989d` | `bc4e43f2eeae58ed` |
+| Skyray | `120×74`, `(52,68)` | 49 | `2837ad79482c989d` | `bc4e43f2eeae58ed` |
 | Hollow Einherjar | `120×102`, `(46,96)` | 81 | `a78dbd54dc6acfa6` | `b264885a2869eeb3` |
 | Thunderroc | `130×82`, `(47,76)` | 66 | `0689197b87d81900` | `e55dd3cfa101cf61` |
 

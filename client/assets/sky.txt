@@ -56,7 +56,7 @@
   "tops": {
     "galehound": 62,
     "prismgolem": 87,
-    "skyray": 46,
+    "skyray": 50,
     "einherjar": 83,
     "thunderroc": 68
   },

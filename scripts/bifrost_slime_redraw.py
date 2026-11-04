@@ -477,22 +477,22 @@ def prismgolem(clip, n):
 
 
 # ----------------------------------------------------------------------------------------------
-# 3. Skyray: a storm-blue manta ray with smooth triangular pectoral fins and a long whipping tail whose tip trails along
-#    the ground row so the creature never floats disconnected from its anchor.
-#    Attack: banks back with both fins thrown high and a lightning orb charging between its horns, then surges forward and
-#    lashes a jagged lightning bolt ahead.
-#    Death: descends onto the ground, pectoral fins curl inward and drape flat, tail settles and lightning expires.
+# 3. Skyray: a flying storm-blue manta ray with smooth triangular pectoral fins (no ground-dragging tail).
+#    Hovers well above the ground in idle, walk, attack and hurt.
+#    Attack: banks back high in the air with both fins swept up and a lightning orb charging between its horns,
+#    then swoops forward and lashes a jagged lightning bolt ahead.
+#    Death: falls from mid-air onto the ground as its pectoral fins curl inward and lightning expires.
 # ----------------------------------------------------------------------------------------------
 RAY_A = dict(
     lean=[-2, -6, -10, 4, 11, 7, 2, 0],
-    by=[28, 32, 36, 26, 22, 24, 26, 28],
-    flap=[4, 14, 22, -4, -12, -8, -2, 0],
+    by=[32, 35, 38, 30, 26, 28, 30, 32],
+    flap=[4, 12, 18, -4, -10, -6, -2, 0],
     orb=[0, 3, 6, 2, 0, 0, 0, 0],
-    reach=[0, 0, 0, 10, 26, 20, 6, 0],
+    reach=[0, 0, 0, 12, 26, 20, 6, 0],
 )
 RAY_D = dict(
-    by=[28, 26, 23, 19, 16, 14, 13, 12],
-    curl=[0, .1, .3, .55, .78, .92, .98, 1],
+    by=[32, 29, 25, 20, 15, 11, 9, 8],
+    curl=[0, .12, .3, .55, .78, .92, .98, 1],
 )
 
 
@@ -509,44 +509,38 @@ def skyray(clip, n):
         lean, by, flap, orb, reach, curl = -fall*3, RAY_D['by'][n], (1-RAY_D['curl'][n])*4, 0, 0, RAY_D['curl'][n]
     else:
         lean = recoil
-        by = 28+bob*.8-hurt*.5
-        flap = math.sin(n*math.pi/4)*9 if clip == 'walk' else bob*1.5
+        by = 32+bob*1.2-hurt*.5
+        flap = math.sin(n*math.pi/4)*9 if clip == 'walk' else bob*1.8
         orb, reach, curl = 0, 0, 0.
 
-    # Smooth triangular pectoral fins
+    # Smooth triangular pectoral fins flapping together in flight
     for far in (True, False):
         sg = 1 if far else -1
         tipx = lean+sg*(36-curl*14)
-        tipy = max(4, by+8+(flap if far else -flap*.7)*(1-curl)-curl*12)
-        a.poly([(lean+sg*6, by+11), (lean+sg*20, by+14), (tipx, tipy), (tipx-sg*4, max(3, tipy-4)),
-                (lean+sg*22, max(4, by-10+curl*5)), (lean+sg*5, max(4, by-8))], 55 if far else 56)
-        a.poly([(lean+sg*7, by+8), (lean+sg*21, by+10), (tipx-sg*4, max(4, tipy-1)),
-                (lean+sg*20, max(5, by-5)), (lean+sg*7, max(5, by-6))], 56 if far else 57)
-        a.line([(lean+sg*10, by+5), (lean+sg*20, by+2), (tipx-sg*5, max(4, tipy-2))], 58, 1)
+        tipy = max(2, by+8+flap*(1-curl)-curl*10)
+        a.poly([(lean+sg*6, by+11), (lean+sg*20, by+14), (tipx, tipy), (tipx-sg*4, max(1, tipy-4)),
+                (lean+sg*22, max(2, by-10+curl*4)), (lean+sg*5, max(2, by-8))], 55 if far else 56)
+        a.poly([(lean+sg*7, by+8), (lean+sg*21, by+10), (tipx-sg*4, max(2, tipy-1)),
+                (lean+sg*20, max(3, by-5)), (lean+sg*7, max(3, by-6))], 56 if far else 57)
+        a.line([(lean+sg*10, by+5), (lean+sg*20, by+2), (tipx-sg*5, max(2, tipy-2))], 58, 1)
 
-    # Long whipping tail tapers down to graze the ground row (y=0 via foot(ry=2)), grounding every living frame.
-    sway = math.sin(n*math.pi/4)*3 if clip == 'walk' else bob
-    tx_tip = -32+lean*.4+sway*.5-curl*5
-    taper(a, bez((lean-10, by-5), (lean-24, max(6, by-14)), (tx_tip, 2)), BLUE, 5, 2)
-    foot(a, tx_tip, 0, 3, 2, BLUE)
-
-    a.poly([(lean-12, by+7), (lean, by+17), (lean+15, by+8), (lean+12, max(4, by-9)),
-            (lean, max(3, by-14)), (lean-12, max(4, by-8))], 55)
+    a.poly([(lean-12, by+7), (lean, by+17), (lean+15, by+8), (lean+12, max(2, by-9)),
+            (lean, max(1, by-12)), (lean-12, max(2, by-8))], 55)
     a.ball(lean, by+2, 14, 12, BLUE)
     a.ball(lean-4, by+8, 6, 3, BLUE[1:])
     a.face(lean+2, by+3, clip, n, .78)
     # Cephalic horn-fins
     for sg in (-1, 1):
-        a.poly([(lean+sg*6, by+8), (lean+14+sg*4, by+16-curl*6), (lean+18+sg*3, by+11-curl*6), (lean+11+sg*3, by+5)], 57)
+        a.poly([(lean+sg*6, by+8), (lean+14+sg*4, by+15-curl*5), (lean+18+sg*3, by+10-curl*5), (lean+11+sg*3, by+5)], 57)
     for x, dy in [(-5, 11), (5, 12), (0, -6)]:
-        a.ellipse(lean+x, max(3, by+dy), 1.4, 1, 59)
+        a.ellipse(lean+x, max(2, by+dy), 1.4, 1, 59)
     if clip != 'die' or n < 4:
-        bolt(a, lean-2, max(9, by-4), .45)
+        bolt(a, lean-2, max(7, by-4), .45)
     if orb > 0:
-        a.ball(lean+20, by+10, orb, orb, GOLD)
-        spark(a, lean+20, by+10, 29, 4)
+        a.ball(lean+19, by+6, orb, orb, GOLD)
+        spark(a, lean+19, by+6, 29, 4)
     if reach > 0:
-        bx0, by0 = lean+18, by+8
+        bx0, by0 = lean+18, by+5
         pts = [(bx0, by0), (bx0+reach*.35, by0+5), (bx0+reach*.65, by0-4), (bx0+reach, by0+2)]
         a.line(pts, 28, 3)
         a.line(pts, 29, 1)
@@ -772,15 +766,21 @@ def frame(kind, clip, n):
     grid = np.array(DRAW[kind](clip, n).im)
     if clip == 'die':                                       # a fallen body rests on the ground: never sunk, never floating
         rows = np.nonzero(grid.any(axis=1))[0]
-        if rows.size:
+        if rows.size and (kind != 'skyray' or n == 7 or int(rows.max()) > kay):
             grid = np.roll(grid, kay-int(rows.max()), axis=0)
     if clip == 'hurt' and n == 0:
         grid[grid > 0] = 3
     problem = None
+    low = int(np.nonzero(grid.any(axis=1))[0].max()) if grid.any() else -1
     if not grid.any() or grid[0].any() or grid[-1].any() or grid[:, 0].any() or grid[:, -1].any():
         problem = 'empty or touches the border'
-    elif clip != 'die' and int(np.nonzero(grid.any(axis=1))[0].max()) != kay:
-        problem = f'lowest row {int(np.nonzero(grid.any(axis=1))[0].max())} != anchor row {kay}'
+    elif kind == 'skyray':
+        if clip != 'die' and low > kay-12:
+            problem = f'skyray should fly well above anchor row {kay} (lowest row {low})'
+        elif clip == 'die' and low > kay:
+            problem = f'skyray death frame {n} sinks below anchor row {kay} (lowest row {low})'
+    elif clip != 'die' and low != kay:
+        problem = f'lowest row {low} != anchor row {kay}'
     if problem:
         BAD.append((kind, clip, n, problem))
         assert not STRICT, (kind, clip, n, problem)
