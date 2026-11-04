@@ -746,3 +746,7 @@ verified FileDrop reviews are documented in
 [Bifrost Reach enemy artwork](docs/bifrost-slime-art.md). Released after owner
 picture approval; eight public release hashes and 35 preserved art hashes match,
 with healthy endpoints and no server restart or database migration.
+
+## Prismwaste enemy artwork (Beta 1.39.21)
+
+The six Prismwaste enemies have a slime-style remake with per-kind frames, eight readable attack poses and fitting material-specific deaths. `python3 scripts/make_prism_sprites.py preview | build | export | verify` uses saved native PixelFlow sources and refuses destructive `--replace`. Grounding, rollback, focused checks and FileDrop review: [Prismwaste enemy artwork](docs/prism-slime-art.md). Owner approved the pictures and corrected rigid Mirage Jackal tail for the Beta 1.39.21 release.

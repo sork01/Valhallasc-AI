@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.21",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Prismwaste enemies share the glossy slime style, with large highlighted eyes, blush and their own wider or taller frames.",
+      "Each attack has a clear wind-up, strike and recovery: the Mirage Jackal lunges with snapping jaws, the Shard Scarab rears its crystal fan and fires shards, the Glass Harrier banks high and rakes forward, the Prism Sentinel draws back and thrusts its spear, the Mirror Queen raises her hand mirror and casts a reflected beam, and Sunshard winds up its crystal fists for a solar punch.",
+      "Deaths follow each creature: the jackal folds onto its side, the scarab curls its legs beneath a cracked shell, the harrier falls and folds its glass wings, the sentinel slumps with its spear and shield, the queen sinks into her pooled gown as her mirror crown falls, and Sunshard dims and breaks into grounded fragments.",
+      "The jackal has four separate planted paws, the scarab has six grounded feet, and the sentinel keeps its boots planted. The harrier and Sunshard hover until they fall on death."
+    ],
+    "removed": [
+      "Replaced the Prismwaste enemies' previous artwork; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.20",
     "date": "2026-11-04",
     "new": [],

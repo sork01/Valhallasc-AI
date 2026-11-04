@@ -26,11 +26,12 @@ async function call(name,args={}){const result=await client.callTool({name,argum
     const z=Field._debug.zones[14],kinds=Field.prismSprites.meta.kinds;
     return {count:Field._debug.zones.length,name:z.name,theme:z.theme,level:z.levels,npcs:z.npcs.length,quests:z.quests.length,
       spawns:z.slimes.length,objects:z.objects.length,kinds,art:['mirrorwall','sunspire','glassstone','saltbrush','lens_pillar','shade_tent','broken_crown'].every(k=>!!City.art[k]),
+      expectedSizes:kinds.map(k=>{const fr=Field.frameOf(Field.prismSprites,k);return [fr.w*8,fr.h*5]}),
       sizes:kinds.map(k=>[Field.prismSprites.img[k].naturalWidth,Field.prismSprites.img[k].naturalHeight]),
       map:WorldMap._layout.length,legend:kinds.every(k=>WorldMap._kinds[k]?.[1]>=45),gate:Field._debug.zones[13].portals.find(p=>p.id==='astral_prism_gate')};
   });
   check(catalog.count===16 && catalog.name==='The Prismwaste' && catalog.theme==='prismwaste' && catalog.level.join(',')==='45,50','The new zone and level range load');
-  check((STUB || catalog.sizes.every(([w,h])=>w===768 && h===480)) && catalog.kinds.length===6,'Six 34-frame enemy atlases load');
+  check((STUB || catalog.sizes.every(([w,h],i)=>w===catalog.expectedSizes[i][0] && h===catalog.expectedSizes[i][1])) && catalog.kinds.length===6,'Six 34-frame enemy atlases load');
   check(catalog.art && catalog.map===16 && catalog.legend,'Scenery art and world-map legend are complete');
   check(catalog.npcs===6 && catalog.quests===10 && catalog.spawns===42 && catalog.objects>=300,'The refuge, quests and monster bands load');
   check(catalog.gate?.to===14,'Astralhollow exposes the outbound Starbreak');

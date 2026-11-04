@@ -1,0 +1,8 @@
+{
+  "miragejackal": "a7a7d194727e8f71",
+  "shardscarab": "a320707216edfeb6",
+  "glassharrier": "96ca59774a9b433c",
+  "prismsentinel": "9d2105e426ee6c70",
+  "mirrorqueen": "ccac96cfa50e7469",
+  "sunshard": "fc641927dad58174"
+}

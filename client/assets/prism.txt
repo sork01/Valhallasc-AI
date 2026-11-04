@@ -48,19 +48,82 @@
     }
   },
   "sprites": {
-    "miragejackal": "ab495b6f6c94cfd8",
-    "shardscarab": "c05b3daeb5b65907",
-    "glassharrier": "c2ebb6c77c341029",
-    "prismsentinel": "5bbb3705addd934f",
-    "mirrorqueen": "69aa988de5edb6ea",
-    "sunshard": "ccd6ace7e306eda5"
+    "miragejackal": "a7a7d194727e8f71",
+    "shardscarab": "a320707216edfeb6",
+    "glassharrier": "96ca59774a9b433c",
+    "prismsentinel": "9d2105e426ee6c70",
+    "mirrorqueen": "ccac96cfa50e7469",
+    "sunshard": "fc641927dad58174"
   },
   "tops": {
-    "miragejackal": 63,
-    "shardscarab": 54,
-    "glassharrier": 84,
-    "prismsentinel": 83,
-    "mirrorqueen": 86,
-    "sunshard": 80
+    "miragejackal": 69,
+    "shardscarab": 58,
+    "glassharrier": 99,
+    "prismsentinel": 92,
+    "mirrorqueen": 94,
+    "sunshard": 93
+  },
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "miragejackal": {
+      "frame": [
+        152,
+        104
+      ],
+      "anchor": [
+        60,
+        98
+      ]
+    },
+    "shardscarab": {
+      "frame": [
+        148,
+        108
+      ],
+      "anchor": [
+        62,
+        102
+      ]
+    },
+    "glassharrier": {
+      "frame": [
+        160,
+        124
+      ],
+      "anchor": [
+        66,
+        118
+      ]
+    },
+    "prismsentinel": {
+      "frame": [
+        168,
+        136
+      ],
+      "anchor": [
+        62,
+        130
+      ]
+    },
+    "mirrorqueen": {
+      "frame": [
+        164,
+        140
+      ],
+      "anchor": [
+        62,
+        134
+      ]
+    },
+    "sunshard": {
+      "frame": [
+        160,
+        140
+      ],
+      "anchor": [
+        64,
+        134
+      ]
+    }
   }
 }
