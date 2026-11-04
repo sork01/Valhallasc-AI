@@ -10,7 +10,7 @@ let browser,started=false,checks=0;
 const check=(value,message)=>{assert.ok(value,message);checks++;};
 async function call(name,args={}){const result=await client.callTool({name,arguments:args});assert.ok(!result.isError,`${name}: ${JSON.stringify(result.content)}`);return result.structuredContent;}
 (async()=>{
-  const transport=new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe'});
+  const transport=new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,env:{...process.env},stderr:'pipe'});
   await client.connect(transport);
   const world=await call('start_world',{startLevel:60,levelSpread:0});started=true;
   browser=await chromium.launch({headless:true});
@@ -28,12 +28,13 @@ async function call(name,args={}){const result=await client.callTool({name,argum
       spawns:z.slimes.length,npcs:z.npcs.length,objects:z.objects.length,kinds,
       art:['mooncaps','gloomstalk','moonstone','sporefern','glowmoss','sporelamp','lamphouse','moonwell','moonaltar'].every(k=>!!City.art[k]),
       sizes:kinds.map(k=>[Field.moonsporeSprites.img[k].naturalWidth,Field.moonsporeSprites.img[k].naturalHeight]),
+      frames:kinds.map(k=>Field.frameOf(Field.moonsporeSprites,k)),
       map:WorldMap._layout.length,legend:kinds.every(k=>WorldMap._kinds[k]?.[1]>=55),
       gate:Field._debug.zones[15].portals.find(p=>p.id==='orrery_moonspore_gate'),
       travel:z.npcs.find(n=>n.id==='travel_lamplight')};
   });
   check(data.count===27 && data.name==='The Moonspore Canopy' && data.theme==='moonspore' && data.levels.join(',')==='55,60','Zone and level range load');
-  check(data.kinds.length===7 && (STUB || data.sizes.every(([w,h])=>w===768 && h===480)),'Seven complete enemy atlases load');
+  check(data.kinds.length===7 && (STUB || data.sizes.every(([w,h],i)=>w===data.frames[i].w*8 && h===data.frames[i].h*5)),'Seven complete enemy atlases load');
   check(data.art && data.map===20 && data.legend,'Scenery and world-map legend load');
   check(data.npcs===7 && data.quests===12 && data.spawns===43 && data.objects>=400,'Refuge, twelve quests and three elite courts load');
   check(data.gate?.to===16 && data.travel?.travelLinks.includes('travel_stillpoint'),'Orrery gate and reciprocal Travel Master load');

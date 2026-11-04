@@ -49,21 +49,94 @@
     }
   },
   "sprites": {
-    "glowcapgrazer": "e3ddc504b3a14a32",
-    "silkwing": "87e7c6c2f6ac5df2",
-    "rootlurker": "27a88db6858bcaba",
-    "lanternwraith": "41395b9e312803c6",
-    "mireheart": "f79370e4f257af10",
-    "silverwidow": "eef33a20cc1bf8f3",
-    "nightbloom": "89b7d47c080037ae"
+    "glowcapgrazer": "15950f32d655bbdd",
+    "silkwing": "ded9cc79f4bd454f",
+    "rootlurker": "58847ba9630e32f8",
+    "lanternwraith": "c4156f7d6c781e02",
+    "mireheart": "0f44e83198435013",
+    "silverwidow": "e6af029d8dccea81",
+    "nightbloom": "c8bd1b84f8a1f941"
   },
   "tops": {
-    "glowcapgrazer": 82,
-    "silkwing": 89,
-    "rootlurker": 89,
-    "lanternwraith": 81,
-    "mireheart": 87,
-    "silverwidow": 58,
-    "nightbloom": 82
+    "glowcapgrazer": 65,
+    "silkwing": 99,
+    "rootlurker": 85,
+    "lanternwraith": 84,
+    "mireheart": 73,
+    "silverwidow": 63,
+    "nightbloom": 96
+  },
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "glowcapgrazer": {
+      "frame": [
+        154,
+        75
+      ],
+      "anchor": [
+        52,
+        69
+      ]
+    },
+    "silkwing": {
+      "frame": [
+        117,
+        114
+      ],
+      "anchor": [
+        52,
+        108
+      ]
+    },
+    "rootlurker": {
+      "frame": [
+        122,
+        103
+      ],
+      "anchor": [
+        46,
+        97
+      ]
+    },
+    "lanternwraith": {
+      "frame": [
+        125,
+        112
+      ],
+      "anchor": [
+        37,
+        106
+      ]
+    },
+    "mireheart": {
+      "frame": [
+        185,
+        82
+      ],
+      "anchor": [
+        49,
+        76
+      ]
+    },
+    "silverwidow": {
+      "frame": [
+        179,
+        100
+      ],
+      "anchor": [
+        60,
+        94
+      ]
+    },
+    "nightbloom": {
+      "frame": [
+        98,
+        105
+      ],
+      "anchor": [
+        36,
+        99
+      ]
+    }
   }
 }
