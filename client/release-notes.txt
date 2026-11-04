@@ -1,5 +1,20 @@
 [
   {
+    "version": "Beta 1.39.23",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Obsidian Orrery enemies are redrawn with fully shaded, glossy parts and bigger, clearer shapes. The Bronze Mantis now looks like a real mantis, with folded spined blades and four jointed legs.",
+      "The Chronoguard has a visible face under its helm, a rimmed gear-badge shield and a thick spear. The Pendulum Matron has a pleated gown and a chained brass pendulum, and the Epoch Engine stands on piston legs with gear fists.",
+      "Attacks are easier to read: the mantis rears its blades overhead and cuts down, the Gearling rears back and charges with a spinning gear and dust, the Orbit Seer charges its eye and fires a glowing beam, the Chronoguard draws back and thrusts, the Matron swings her pendulum overhead and slams it forward, and the Epoch Engine raises both fists and slams them down.",
+      "Deaths match each creature: the mantis folds its legs, the Gearling's big gear breaks away and rolls off, the Orbit Seer drops to the ground with its rings settling around it, the Chronoguard kneels as its spear and shield fall, the Matron sinks into a heap of gown, and the Epoch Engine's pistons buckle and its rim breaks apart."
+    ],
+    "removed": [
+      "Removed the floating plus-sign marks in attack and death frames and the Chronoguard's black visor, because they looked like debug marks instead of part of the creatures.",
+      "Replaced the previous Orrery artwork from Beta 1.39.22; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.22",
     "date": "2026-11-04",
     "new": [],
