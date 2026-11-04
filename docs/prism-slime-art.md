@@ -1,6 +1,6 @@
 # Prismwaste enemy artwork (Beta 1.39.21)
 
-Owner approved the corrected artwork on 2026-11-04 with “ok deploy and finish skill”. Prepared from `/media/raid/valhallasc-data/prism-slime-work`, branch `feat/prism-slime-art`, base `a0bf0d7`, as Beta 1.39.21. Client-only release; the original art is retained in the external rollback backup. Public verification and deployment details are recorded below after release.
+**Deployed 2026-11-04 as Beta 1.39.21**, source `7041676` fast-forwarded from `feat/prism-slime-art` after the owner approved the corrected Mirage Jackal tail and requested “ok deploy and finish skill”. All nine changed public client hashes match, all 7,819 other local asset hashes are unchanged, both health endpoints are healthy, PID 1654327 and its executable are unchanged, and no test flags or new journal errors were found. Client-only release, with no build/restart or DB changes. Receipt `test-results/prism-release-20261104.json`.
 
 Six new editable native PixelFlow sources use Greenmeadow's glossy shading, large highlighted eyes (`#fffbea`), blush and chunky details. Each kind gets its own frame and anchor in `client/assets/prism.txt`; the 96×96, (48,90) fallback, 34-frame/five-clip layout, original 10 fps timing, kind IDs and game draw scales are preserved. The idle opaque pixels determine click bounds; planted feet, health-bar tops, shadows and portraits use the existing per-kind client path.
 
@@ -85,3 +85,10 @@ The owner reported that the Mirage Jackal’s tail crystal looked weird and flop
 
 - [Tail before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-miragejackal-tail-before-after.png)
 - [Tail animation before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-miragejackal-tail-before-after.gif)
+
+
+## Deployment
+
+**Deployed 2026-11-04 as Beta 1.39.21**, source `7041676` fast-forwarded from `feat/prism-slime-art` after the owner approved the corrected Mirage Jackal tail and requested “ok deploy and finish skill”. All nine changed public client hashes match, all 7,819 other local asset hashes are unchanged, both health endpoints are healthy, PID 1654327 and its executable are unchanged, and no test flags or new journal errors were found. Client-only release, with no build/restart or DB changes. Receipt `test-results/prism-release-20261104.json`.
+
+The 145 focused assertions, 30-check tail follow-up, 204 editor/export frame proofs, two mutation controls and 31 verified FileDrop reviews remain in the private worktree. Original rollback and prior-tail candidate archives remain on the RAID. After deployment use `make_prism_sprites.py verify`; `prism_slime_review.py verify` intentionally expects pre-deployment live art. Next unfinished zone: The Obsidian Orrery (Zone 15).

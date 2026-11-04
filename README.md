@@ -749,4 +749,4 @@ with healthy endpoints and no server restart or database migration.
 
 ## Prismwaste enemy artwork (Beta 1.39.21)
 
-The six Prismwaste enemies have a slime-style remake with per-kind frames, eight readable attack poses and fitting material-specific deaths. `python3 scripts/make_prism_sprites.py preview | build | export | verify` uses saved native PixelFlow sources and refuses destructive `--replace`. Grounding, rollback, focused checks and FileDrop review: [Prismwaste enemy artwork](docs/prism-slime-art.md). Owner approved the pictures and corrected rigid Mirage Jackal tail for the Beta 1.39.21 release.
+The six Prismwaste enemies have a slime-style remake with per-kind frames, eight readable attack poses and fitting material-specific deaths. `python3 scripts/make_prism_sprites.py preview | build | export | verify` uses saved native PixelFlow sources and refuses destructive `--replace`. Grounding, rollback, focused checks and FileDrop review: [Prismwaste enemy artwork](docs/prism-slime-art.md). Released as Beta 1.39.21 after owner approval of the pictures and corrected rigid Mirage Jackal tail. All nine public client hashes and health checks pass.
