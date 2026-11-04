@@ -17,6 +17,8 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     browser = await chromium.launch({ headless: true });
     const p = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
     p.on('pageerror', e => errors.push(e.message));
+    // Mutation control: serve a spider atlas with one foot moved up 1 px (grounding check must fail).
+    if (process.env.MUTATE_SPIDER_PNG) await p.route('**/assets/crags_spider.png', r => r.fulfill({ path: process.env.MUTATE_SPIDER_PNG, contentType: 'image/png' }));
     await p.addInitScript(() => {
       window.AudioContext = window.webkitAudioContext = undefined;
       localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false,
@@ -43,16 +45,16 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
         const rows = [];
         for (const [clip, spec] of Object.entries(meta.clips)) for (let n = 0; n < spec.n; n++) {
           const pixels = g.getImageData(n*96, spec.row*96, 96, 96).data;
-          let opaque = 0, edge = 0, white = 0, hash = 7;
+          let opaque = 0, edge = 0, white = 0, hash = 7, low = -1;
           for (let y = 0; y < 96; y++) for (let x = 0; x < 96; x++) {
             const i = (y*96+x)*4;
             hash = (Math.imul(hash, 31)+pixels[i]+pixels[i+1]*3+pixels[i+2]*7+pixels[i+3]) >>> 0;
             if (!pixels[i+3]) continue;
-            opaque++;
+            opaque++; if (y > low) low = y;
             if (x === 0 || x === 95 || y === 0 || y === 95) edge++;
             if (pixels[i] > 220 && pixels[i+1] > 225 && pixels[i+2] > 220) white++;
           }
-          rows.push({ clip, n, opaque, edge, white, hash });
+          rows.push({ clip, n, opaque, edge, white, hash, low });
         }
         const portrait = document.createElement('canvas'); portrait.width = portrait.height = 128;
         const ready = Field.drawTargetPortrait({ kind }, portrait);
@@ -74,6 +76,15 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
       for (const [clip, [fps, n]] of Object.entries(expected)) {
         const spec = result.meta.clips[clip];
         check(spec.fps === fps && spec.n === n && new Set(d.rows.filter(r => r.clip === clip).map(r => r.hash)).size >= Math.min(4, n), `${kind}: ${clip} preserves timing and animates distinctly`);
+      }
+      const die = d.rows.filter(r => r.clip === 'die');
+      check(new Set(die.map(r => r.hash)).size === 8, `${kind}: all eight death frames are distinct`);
+      if (['spider', 'golem', 'cinderlord'].includes(kind)) {   // QUADRUPED-GROUNDING: planted feet rest exactly on the anchor row
+        const living = d.rows.filter(r => r.clip !== 'die');
+        check(living.every(r => r.low === 90), `${kind}: every living frame rests exactly on row 90 (lowest rows ${[...new Set(living.map(r => r.low))]})`);
+        check(die.every(r => r.low <= 90), `${kind}: no death frame sinks below the floor row`);
+      } else {
+        check(d.rows.every(r => r.low <= 91), `${kind}: hovering kind never sinks into the floor`);
       }
       check(d.rows.find(r => r.clip === 'idle' && r.n === 0).white > 12, `${kind}: large eye whites and highlights remain readable`);
       check(result.meta.tops[kind] > 20 && result.meta.tops[kind] < 90, `${kind}: health-bar top follows new art`);

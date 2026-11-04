@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Crags art in the Greenmeadow slime style, with material-specific movement.
+"""Emberfall Crags art, second pass (v2): Greenmeadow slime style, redrawn from scratch.
 
-Soft fire/ghosts deform; spiders articulate; stone and armour stay rigid.
-Native editable PixelFlow sources use a separate prefix; old sources survive.
+preview | build | export | verify.  Soft fire and ghosts deform; the spider shell, the basalt golem and the
+Cinderlord's armour stay rigid (jointed, buckling, toppling).  Every planted foot rests exactly on the anchor
+row (Painter y=0, row 90) so nothing floats; the wisp and wraith hover by nature.  The v1 sources (Beta
+1.39.2) stay registered in crags_slime_v1_sources.txt.  Export preserves saved editor edits.
 """
 import hashlib
 import json
@@ -11,23 +13,28 @@ from pathlib import Path
 import sys
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 import make_crag_sprites as old
+from wyrd_slime_redraw import Painter, motion, mix
+from deep_slime_redraw import sm, bez, taper, erase
+from cloister_slime_redraw import Rig, erase_rising
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSETS = ROOT / 'client/assets'
-REGISTRY = ROOT / 'scripts/crags_slime_sources.txt'
-PREFIX = 'valhallasc_crags_slime_style_'
+ASSETS = ROOT/'client/assets'
+OUT = ROOT/'test-results/crags-slime'
+REGISTRY = ROOT/'scripts/crags_slime_sources.txt'
+PREFIX = 'valhallasc_crags_slime_style_b_'
 KINDS = old.KINDS
 CLIPS = old.CLIPS
 W = H = 96
 AX, AY = 48, 90
-# All colours are opaque RGB in PixelFlow; index zero alone is transparent.
+# Same colours as v1; index zero alone is transparent.
 PALETTE = ['#00000000', '#282131', '#ffffff', '#edf6e9', '#e6a0a5',
            '#90291b', '#d7471e', '#f87d28', '#ffb840', '#fff39c',
            '#252333', '#454257', '#6b6880', '#9893aa', '#cec8d6',
            '#211a3d', '#403366', '#68528f', '#9780b7', '#c2acd7',
            '#5f3e24', '#a16b32', '#dca249', '#ffe18a', '#eee3cd']
+assert len(set(PALETTE)) == len(PALETTE), 'duplicate palette hex'
 FIRE = [5, 6, 7, 8, 9]
 ROCK = [10, 11, 12, 13, 14]
 GHOST = [15, 16, 17, 18, 19]
@@ -36,224 +43,261 @@ NAMES = dict(wisp='Fire Wisp', spider='Lava Spider', wraith='Ash Wraith',
              golem='Cinder Golem', cinderlord='Cinderlord')
 
 
-class Painter:
-    def __init__(self, cx=48, lift=0, sx=1, sy=1):
-        self.im = Image.new('P', (W, H), 0)
-        self.d = ImageDraw.Draw(self.im)
-        self.cx, self.lift, self.sx, self.sy = cx, lift, sx, sy
+def foot(a, x, lift, rx, ry, ramp):
+    """A planted foot: integer ry and centre y = ry, so its lowest pixel is row 90 when lift is 0."""
+    a.ball(x, ry+lift, rx, ry, ramp)
 
-    def pos(self, x, y):
-        return round(self.cx + x*self.sx), round(AY-y*self.sy-self.lift)
 
-    def ellipse(self, x, y, rx, ry, col):
-        px, py = self.pos(x, y)
-        rx, ry = max(1, round(rx*self.sx)), max(1, round(ry*self.sy))
-        self.d.ellipse((px-rx, py-ry, px+rx, py+ry), fill=col)
+def specks(a, n, count, base_x, spread, top, ramp):
+    """Drifting embers/ash; positions depend on n so consecutive frames always differ."""
+    for k in range(count):
+        x = base_x+((k*37+n*11) % spread)-spread/2
+        y = 6+((n*5+k*13) % top)
+        a.ellipse(x, y, 1, 1, ramp[(k+n) % len(ramp)])
 
-    def line(self, pts, col, width=1):
-        self.d.line([self.pos(*p) for p in pts], fill=col, width=width)
 
-    def poly(self, pts, col):
-        self.d.polygon([self.pos(*p) for p in pts], fill=col)
+# ----------------------------------------------------------------------------------------------
+# Fire Wisp: a teardrop of living fire that hovers.  Tongues lick and lean, the body gutters out, falls
+# as a charred ember and dies down to a glowing ash heap.
+# ----------------------------------------------------------------------------------------------
+def wisp(clip, n):
+    stride, bob, lunge, recoil, fall = motion(clip, n)
+    t = sm(fall)
+    a = Painter(cx=46+recoil+lunge*.6)
+    hover = 34+bob*.9+(math.sin(n*math.pi/4)*2.5 if clip == 'walk' else 0)
+    cy = mix(hover, 6, t)
+    r = mix(17.5, 5, t)
+    body = FIRE if t < .55 else ROCK
+    lean = -lunge*.7+recoil*.4
+    for k, (dx, ln, w) in enumerate(((-11, 20, 8), (0, 30, 10), (11, 17, 7))):
+        if fall > .85:
+            break
+        sway = math.sin(n*1.3+k*2.1)*3.2+lean
+        ln *= (1-t)*(1.25 if clip == 'attack' and lunge > 1 else 1)
+        base = (dx*.8, cy+r*.35)
+        tip = (dx*1.2+sway*1.4, cy+r*.85+ln)
+        mid = (dx*1.5+sway*.4, cy+r*.9+ln*.45)
+        taper(a, bez(base, mid, tip), body, w*(1-t*.6), 1)
+    a.ball(0, cy, r, r*.94, body)
+    if t < .8:
+        a.ellipse(-r*.45, cy+r*.35, max(1, 4*(1-t)), max(1, 2.2*(1-t)), 9 if t < .55 else 14)
+    if fall < .7:
+        a.face(1, cy+1, clip, n, .95)
+    if t > .45:
+        a.ball(1, 4.5, 3, 2.4, FIRE)
+    if clip == 'die':
+        for k in range(3):
+            sx_, sy_ = 6+n*.6*k, 10+n*3.2+k*5
+            if sy_ < 58:
+                a.ellipse(sx_+math.sin(n+k)*2, sy_, 2.6-k*.5, 2.6-k*.5, ROCK[2-k % 2])
+        specks(a, n, 4, 0, 40, 18, ROCK[2:])
+    else:
+        specks(a, n, 4, 0, 46, 38, [8, 9, 8, 7])
+    return a
 
-    def ball(self, x, y, rx, ry, ramp):
-        px, py = self.pos(x, y)
-        rx, ry = rx*self.sx, ry*self.sy
-        for yy in range(max(1, math.floor(py-ry)), min(H-1, math.ceil(py+ry)+1)):
-            for xx in range(max(1, math.floor(px-rx)), min(W-1, math.ceil(px+rx)+1)):
-                u, v = (xx-px)/rx, (yy-py)/ry
-                rr = u*u+v*v
-                if rr > 1:
-                    continue
-                z = math.sqrt(max(0, 1-rr))
-                light = max(0, min(.999, .23+.71*(-.40*u-.54*v+.74*z)))
-                value = light*(len(ramp)-1)
-                lo = int(value)
-                threshold = ((xx % 4)*5+(yy % 4)*3) % 16/16
-                shade = min(len(ramp)-1, lo+int(value-lo > threshold))
-                if rr > .93 and u+v > .2:
-                    shade = 0
-                self.im.putpixel((xx, yy), ramp[shade])
 
-    def face(self, x, y, clip, n, size=1, blush=True):
-        dead = clip == 'die' and n >= 2
-        for dx in (-6, 6):
-            ex = x+dx*size
-            if dead:
-                self.line([(ex-2, y-2), (ex+2, y+2)], 1)
-                self.line([(ex-2, y+2), (ex+2, y-2)], 1)
-            elif clip == 'idle' and n == 3:
-                self.line([(ex-3*size, y), (ex+3*size, y+.5)], 1, 2)
-            else:
-                self.ellipse(ex, y, 4.3*size, 6.5*size, 1)
-                self.ellipse(ex, y+.6, 3.3*size, 5.5*size, 3)
-                self.ellipse(ex+1.2, y-.3, 1.7*size, 3.5*size, 1)
-                self.ellipse(ex+.5, y+2.2, .8, 1, 2)
-                if clip == 'attack' and n < 3:
-                    self.line([(ex-4, y+6), (ex+3, y+3)], 1, 2)
-        if blush and not dead:
-            self.ellipse(x-12*size, y-5, 2.5, 1.3, 4)
-            self.ellipse(x+12*size, y-5, 2.5, 1.3, 4)
-        self.line([(x-3, y-8), (x, y-9), (x+3, y-8)], 1)
+# ----------------------------------------------------------------------------------------------
+# Lava Spider: round basalt shell on eight jointed legs (tetrapod gait).  On defeat the legs fold under,
+# the shell drops to the floor and cracks; the glow dies.  No squash anywhere.
+# ----------------------------------------------------------------------------------------------
+def spider(clip, n):
+    stride, bob, lunge, recoil, fall = motion(clip, n)
+    t = sm(fall)
+    ph = n*math.pi/4
+    a = Painter(cx=45+recoil+(lunge*.5 if clip == 'attack' else 0))
+    by = mix(26+bob*.6, 16, t)                      # carapace centre; bottom reaches the floor when dead
+    hips = (-22, -11, 0, 10)
+    feet = (-26, -17, 17, 27)
+    for far in (True, False):
+        for k in range(4):
+            hx = hips[k]+(3 if not far else -2)
+            fx = feet[k]+(4 if not far else -3)
+            lift, push = 0, 0
+            if clip == 'walk':
+                s = ph+(k % 2)*math.pi+(0 if far else math.pi)
+                lift, push = max(0, math.sin(s))*5, math.cos(s)*3
+            if clip == 'attack' and k >= 2 and not far:
+                lift = max(0, -lunge)*3.4
+                push = max(0, lunge)*2.2
+            hip = (hx, by-1)
+            knee = (fx+(1 if fx > hx else -1)*7, by+13+lift*.6+bob*.3)
+            ft = (fx+push, 3+lift)
+            if fall:
+                knee = (mix(knee[0], fx*.95, t), mix(knee[1], by+7, t))
+                ft = (mix(ft[0], hx*1.05+(8 if fx > 0 else -8), t), 3)
+            ramp = ROCK[:4]+[ROCK[3]] if far else ROCK
+            a.limb([hip, knee, (ft[0], ft[1]+2)], ramp, 4)
+            foot(a, ft[0], ft[1]-3, 3.5, 3, ramp)
+        if far:
+            a.ball(-6, by, 23, 16, ROCK)             # shell
+            for ex, ey, er in ((-14, 7, 3), (-3, 10, 3.4), (-20, 2, 2.4)):
+                a.ball(ex, by+ey, er, er, FIRE if t < .6 else ROCK)
+            a.line([(-24, by+4), (-17, by+9), (-19, by+13), (-12, by+15)], 7 if t < .6 else 11, 2)
+            if t > .25:
+                a.line([(-4, by+15), (-1, by+8), (-6, by+2), (-3, by-6)], 1, 2)
+                a.line([(-14, by-12), (-9, by-6), (-13, by-1)], 1, 1)
+    a.ball(15, by+1, 13, 12, ROCK)                  # head
+    mouth = 3+max(0, lunge)*1.5 if clip == 'attack' else 0
+    for sg in (-1, 1):
+        a.poly([(24, by-3+sg*mouth*.4), (31+max(0, lunge)*.6, by-9+sg*mouth), (26, by-9+sg*mouth*.5)], GOLD[2])
+    a.face(17, by+5, clip, n, .75)
+    for x in (9, 15, 21):
+        a.ellipse(x, by+15-t*3, 1, 1, 8 if t < .6 else 13)
+    if clip == 'die':
+        specks(a, n, 3, 0, 36, 30, ROCK[2:])
+    return a
+
+
+# ----------------------------------------------------------------------------------------------
+# Ash Wraith: a hooded ghost on a ragged hem with a bone-grey scythe.  It drifts, and on defeat it
+# rises and dissolves from the hood downwards into a few settling ash flecks.
+# ----------------------------------------------------------------------------------------------
+def wraith(clip, n):
+    stride, bob, lunge, recoil, fall = motion(clip, n)
+    t = sm(fall)
+    ph = n*math.pi/4
+    a = Painter(cx=38+recoil+lunge*.3)
+    cy = 31+bob*.9+(math.sin(ph)*1.8 if clip == 'walk' else 0)+t*10
+    for k, (dx, ln) in enumerate(((-17, 12), (-8, 19), (1, 24), (10, 17), (18, 11))):   # ragged hem tails
+        sw = math.sin(ph*(1 if clip == 'walk' else .5)+k*1.4)*2.2
+        taper(a, bez((dx*.8, cy-8), (dx+sw*.4, cy-ln*.55), (dx*1.08+sw, cy-ln-6)), GHOST, 9, 2)
+    a.ball(0, cy+3, 19.5, 23, GHOST)               # robe
+    a.ball(-1, cy+22, 15, 13, GHOST)               # hood
+    a.ball(1, cy+20, 11, 9, [15, 16, 17])           # hood shadow
+    a.face(2, cy+19, clip, n, .85)
+    a.ball(-18, cy+2-(2 if clip == 'attack' and lunge > 1 else 0), 6, 9, GHOST)           # far sleeve
+    hand = (21+lunge*.7, cy-1)
+    ang = (.8 if lunge > 1 else .45) if clip == 'attack' else .22
+    base = (hand[0]-math.sin(ang)*5, hand[1]-math.cos(ang)*5)
+    top = (hand[0]+math.sin(ang)*34, hand[1]+math.cos(ang)*34-6)
+    a.line([base, top], 20, 4)
+    a.line([base, top], 22, 2)
+    blade = [(top[0]+3, top[1]+4), (top[0]-14, top[1]+9), (top[0]-24, top[1]+4), (top[0]-29, top[1]-6),
+             (top[0]-18, top[1]-1), (top[0]-3, top[1]-3)]
+    a.poly(blade, ROCK[3])
+    a.line([blade[1], blade[2], blade[3]], 2, 1)
+    a.ball(hand[0], hand[1], 4.5, 4.5, GHOST)
+    if clip == 'die':
+        erase_rising(a, max(0, min(1, fall*.93)))
+        for k in range(5):                           # ash flecks settle on the floor
+            y = max(1.5, mix(20+k*6, 1.5, min(1, t*1.2)))
+            a.ellipse(-16+k*8+(n % 3)*2, y, 1.6, 1.6, ROCK[1+k % 3])
+    else:
+        specks(a, n, 4, 0, 46, 50, GHOST[2:])
+    return a
+
+
+# ----------------------------------------------------------------------------------------------
+# Cinder Golem: basalt blocks with a molten core.  Heavy steps (one foot is always planted), a raised fist
+# slam; on defeat it kneels, the head rolls off, shoulders and fists drop and the core goes dark.
+# ----------------------------------------------------------------------------------------------
+def golem(clip, n):
+    stride, bob, lunge, recoil, fall = motion(clip, n)
+    t = sm(fall)
+    ph = n*math.pi/4
+    a = Painter(cx=46+recoil+(lunge*.5 if clip == 'attack' else 0)-(1.5 if clip == 'die' and n == 0 else 0))
+    ty = mix(34+bob*.5, 21, t)
+    swing = math.cos(ph)*3 if clip == 'walk' else 0                          # opposing fist swing
+    for sg in (-1, 1):
+        sw = math.sin(ph+(0 if sg > 0 else math.pi)) if clip == 'walk' else 0
+        lift, push = max(0, sw)*3, sw*2.5
+        foot(a, sg*(11+t*9)+push, lift*(1-t), 10, 6, ROCK)
+        a.ball(sg*(10+t*8)+push*.5, mix(18+lift, 8, t), 8, 10 if t < .5 else 8, ROCK)
+    a.ball(0, ty, 22, 20, ROCK)
+    a.ellipse(-8, ty+10, 5, 2, 14)
+    a.line([(-16, ty+3), (-9, ty-1), (-14, ty-8)], 7 if t < .7 else 11, 2)      # molten seams
+    a.line([(15, ty+5), (10, ty-1), (14, ty-9)], 6 if t < .7 else 11, 2)
+    a.ball(1, ty-3, 6, 7, FIRE if t < .7 else ROCK)                              # chest core
+    a.ellipse(-1, ty-1, 2, 2, 9 if t < .7 else 13)
+    for sg in (-1, 1):
+        a.ball(sg*(21+t*(9 if sg < 0 else 6)), mix(ty+8, 9, t**1.2), 9, 9, ROCK)  # shoulder boulders drop
+    fist_up = max(0, -lunge)*6-max(0, lunge)*2
+    a.ball(-27-t*7, mix(23+swing, 11, t), 9, 11, ROCK)
+    a.ball(27+t*6, mix(23+fist_up-swing, 11, t), 9, 11, ROCK)
+    a.line([(26+t*6, mix(26+fist_up-swing, 11, t)), (30+t*6, mix(20+fist_up-swing, 11, t))], 7 if t < .7 else 11, 2)
+    hx, hy = t*14, mix(57+bob*.5, 13, t**1.4)
+    a.ball(hx, hy, 17, 13 if t < .7 else 12, ROCK)
+    a.ellipse(hx-7, hy+7, 4, 2, 14)
+    a.line([(hx-14, hy+9), (hx-5, hy+11)], 11, 2)                                # heavy brow
+    a.face(hx, hy-1, clip, n, 1.)
+    if fall > .35:
+        for k in range(4):
+            r = 3+k % 2
+            a.ball(-30+k*21+((n*3) % 5), r, r, r, ROCK)                          # fallen rubble on the floor
+    if clip == 'die' and n >= 4:
+        specks(a, n, 4, 0, 60, 26, ROCK[2:])                                     # settling dust
+    return a
+
+
+# ----------------------------------------------------------------------------------------------
+# Cinderlord: the golem's lord in dark armour, horned helm, ember cape and warhammer.  On defeat the
+# armour buckles and topples backwards, the hammer clattering down in front.
+# ----------------------------------------------------------------------------------------------
+def cinderlord(clip, n):
+    stride, bob, lunge, recoil, fall = motion(clip, n)
+    t = sm(fall)
+    R = Rig(fall, pivot=(-12, 0), sign=1, angle=.55, lift=3, buckle=.42, start=.3)
+    P = R.P
+    ph = n*math.pi/4
+    a = Painter(cx=46+recoil+(lunge*.4 if clip == 'attack' else 0))
+    ty = 34+bob*.5
+    swing = math.cos(ph)*3 if clip == 'walk' else 0                          # opposing fist swing
+    a.poly(R.pts([(-13, ty+16), (12, ty+16), (22, 6), (-25, 6)]), FIRE[0])       # ember cape
+    a.poly(R.pts([(-10, ty+14), (9, ty+14), (16, 10), (-17, 10)]), FIRE[1])
+    a.line(R.pts([(-16, 15), (0, 20), (16, 13)]), 7, 2)
+    for sg in (-1, 1):
+        sw = math.sin(ph+(0 if sg > 0 else math.pi)) if clip == 'walk' else 0
+        lift = max(0, sw)*3
+        fx, fy = P(sg*11+sw*2.5, 6+lift)
+        foot(a, fx, fy-6, 10, 6, ROCK)
+        a.ball(*P(sg*10+sw*1.2, 18+lift), 8, 10, ROCK)
+    a.ball(*P(0, ty), 21, 21, ROCK)
+    a.line(R.pts([(-16, ty-12), (16, ty-12)]), 22, 3)                           # belt
+    a.ball(*P(1, ty-3), 5.5, 6.5, FIRE if fall < .7 else ROCK)
+    a.ellipse(*P(0, ty-1), 2, 2, 9 if fall < .7 else 13)
+    for sg in (-1, 1):
+        px, py = P(sg*20, ty+8)
+        a.ball(px, py, 9, 9, ROCK)
+        a.poly([(px-sg*4, py+3), (px+sg*5, py+12), (px+sg*8, py+2)], GOLD[1])      # pauldron spike
+    a.ball(*P(-27, 23+swing), 8.5, 10.5, ROCK)
+    hand = P(27+max(0, lunge)*1.5, 23+max(0, -lunge)*6-swing)
+    a.ball(hand[0], hand[1], 8.5, 10.5, ROCK)
+    if fall:                                      # warhammer: one rigid prop; it falls forward to lie on the floor
+        tx, tyh = mix(33, 34, t), mix(61, 6, t**.7)
+        hb = (mix(hand[0], 20, t), mix(hand[1], 3, t))
+    else:
+        tx, tyh = (33, 61) if lunge < 1 else (32, 33)
+        hb = hand
+    a.line([hb, (tx, tyh)], 20, 4)
+    a.line([hb, (tx, tyh)], 22, 2)
+    a.ball(tx, tyh, 9, 6, ROCK)
+    a.line([(tx-2, tyh-4), (tx-2, tyh+4)], 23, 3)
+    hx, hy = P(0, 56+bob*.5)
+    a.ball(hx, hy, 16, 14, ROCK)
+    for sg in (-1, 1):                                                              # curved horns
+        taper(a, [(hx+sg*x, hy+y) for x, y in bez((10, 9), (24, 11), (20, 27))], GOLD, 6, 1)
+    a.line([(hx-14, hy+10), (hx+14, hy+10)], 22, 3)                                # crown band
+    a.poly([(hx-3, hy+12), (hx, hy+18), (hx+4, hy+12)], GOLD[3])
+    a.face(hx, hy-1, clip, n, 1.)
+    if clip == 'die' and n >= 5:
+        specks(a, n, 3, 0, 40, 26, ROCK[2:])
+    return a
+
+
+DRAW = dict(wisp=wisp, spider=spider, wraith=wraith, golem=golem, cinderlord=cinderlord)
 
 
 def frame(kind, clip, n):
-    walk = clip == 'walk'
-    phase = n*math.pi/4
-    bob = [0, 1, 2, 1, 0, -1][n] if clip == 'idle' else 0
-    stride = math.sin(phase)*4 if walk else 0
-    lunge = [-1, -3, -4, 2, 5, 4, 2, 0][n] if clip == 'attack' else 0
-    hurt = [-3, -2, 1, 0][n] if clip == 'hurt' else 0
-    death = max(0, n-1)/6 if clip == 'die' else 0
-    soft = kind in ('wisp', 'wraith')
-    sx, sy = 1., 1.
-    if soft:
-        sx = 1 + (math.sin(phase)*.035 if walk else bob*.012)
-        sy = 1 - (math.sin(phase)*.04 if walk else bob*.012)
-    # The stone, armour and spider shell have no whole-body squash or stretch.
-    a = Painter(cx=45+lunge+hurt, lift=bob if soft else 0, sx=sx, sy=sy)
-
-    if kind == 'wisp':
-        cy = 32+ (math.sin(phase)*3 if walk else 0)-death*13
-        r = 20*(1-death*.8)
-        # Flickering fire tongues disappear as the ember goes out.
-        for dx, dy, rad in [(-12, 19, 8), (0, 29, 9), (12, 17, 6)]:
-            flick = math.sin(n*1.6+dx)*3
-            a.poly([(dx-9, cy), (dx-4, cy+dy*(1-death)+flick),
-                    (dx+2, cy+dy*(1-death)+8), (dx+rad, cy+5)], 7)
-            a.poly([(dx-4, cy+8), (dx, cy+dy*(1-death)+2), (dx+3, cy+4)], 8)
-        a.ball(0, cy, r+2, r*.88, FIRE)
-        a.ellipse(-9, cy+9, max(1, 5*(1-death)), 2, 9)
-        if death < .6:
-            a.face(2, cy+1, clip, n)
-        for k in range(3 if not death else 5):
-            a.ellipse(-23+k*10, 13+(n*3+k*7) % 15, 1, 1, 8 if not death else 13)
-        if death > .8:
-            a = Painter()
-            a.ball(0, 3, 9, 2, [10, 11, 12])
-            for k in range(4):
-                a.ellipse(-12+k*8, 12+((n+k)*5) % 15, 1.5, 1.5, 13)
-
-    elif kind == 'spider':
-        # Eight short jointed legs tuck under the intact shell on defeat.
-        by = 22-death*9+bob*.5
-        for far in (True, False):
-            for k, fx in enumerate((-35, -25, 21, 32)):
-                up = max(0, math.sin(phase*2+k*1.5+(1 if far else 0)))*5 if walk else 0
-                hip = (-10+k*6, by)
-                foot = (fx*(1-death*.5), 4+up+death*(10+k*2))
-                knee = (fx*.72, by+7-death*8)
-                if clip == 'attack' and k >= 2:
-                    foot = (foot[0]+lunge, foot[1]+max(0, -lunge)*2)
-                col = 11 if far else 12
-                a.line([hip, knee, foot], 10, 6)
-                a.line([hip, knee, foot], col, 4)
-                a.ball(*knee, 3.5, 3.5, ROCK)
-            if far:
-                a.ball(-11, by+7, 21, 17, ROCK)
-                a.line([(-23, by+13), (-16, by+8), (-19, by+2), (-10, by-4)], 7, 2)
-                a.ellipse(-20, by+16, 4, 2, 14)
-        a.ball(13, by+2, 15, 12, ROCK)
-        a.face(15, by+5, clip, n, .8)
-        for x in (9, 15, 21):
-            a.ellipse(x, by+15, 1, 1, 8)
-        for x in (11, 20):
-            a.poly([(x-2, by-6), (x+2, by-6), (x+1, by-11)], 24)
-
-    elif kind == 'wraith':
-        # Hood and scythe identify the ghost; it dissipates upwards into ash.
-        rise = death*18
-        cy = 29+rise
-        if death < .85:
-            a.ball(-1, cy, 20*(1-death*.55), 21*(1-death*.4), GHOST)
-            for k in range(5):
-                a.ball(-16+k*8, cy-15+math.sin(n+k)*2, 6*(1-death*.7), 5, GHOST)
-            a.ball(1, cy+18, 17*(1-death*.5), 16, GHOST)
-            a.ball(3, cy+17, 13*(1-death*.6), 11, [15, 16, 17])
-            if death < .5:
-                a.face(3, cy+19, clip, n, .9)
-                a.ellipse(-8, cy+29, 3, 1, 19)
-            # Short scythe swings as a rigid prop and drops during dissipation.
-            topx, topy = (28, 63) if lunge < 1 else (34, 44)
-            if death:
-                topx, topy = 29, 63-death*53
-            a.line([(23, 9), (topx, topy)], 1, 4)
-            a.line([(23, 9), (topx, topy)], 21, 2)
-            a.poly([(topx-3, topy+3), (topx-15, topy+8),
-                    (topx-23, topy+4), (topx-28, topy-5),
-                    (topx-18, topy), (topx-3, topy-2)], 14)
-            a.line([(topx-23, topy+3), (topx-15, topy+6), (topx-3, topy+1)], 3)
-            a.ball(23, 30+rise*.3, 4, 4, GHOST)
-        if death:
-            arr = np.array(a.im)
-            # Dissolution mask, increasingly sparse; no ghost puddle.
-            yy, xx = np.indices(arr.shape)
-            arr[((xx*7+yy*3) % 17) < int(death*13)] = 0
-            a.im = Image.fromarray(arr, 'P')
-            a.d = ImageDraw.Draw(a.im)
-        for k in range(5):
-            a.ellipse(-20+k*9, 14+((n*3+k*11) % 45), 1, 1, 18)
-
-    elif kind in ('golem', 'cinderlord'):
-        lord = kind == 'cinderlord'
-        # Fixed-size rigid components slump/dislocate rather than flattening.
-        drop = death*31
-        torso_y = 33-drop*.65+bob*.5
-        head_y = 56-drop+bob*.5
-        sway = stride*.35
-        if lord:
-            a.poly([(-13, 51-drop), (12, 51-drop), (21, 7), (-24, 7)], 6)
-            a.line([(-17, 14), (0, 19), (17, 12)], 8, 2)
-        for side in (-1, 1):
-            footx = side*(11+death*8)
-            lift = max(0, side*stride) if walk else 0
-            a.ball(footx, 7+lift, 10, 6, ROCK)
-            a.ball(side*10, 18+lift-death*8, 8, 10, ROCK)
-        a.ball(sway, torso_y, 23 if not lord else 21, 21, ROCK)
-        a.ellipse(-8+sway, torso_y+11, 5, 2, 14)
-        # Molten seam and chest core survive the chibi proportions.
-        a.line([(-15, torso_y+4), (-9, torso_y), (-13, torso_y-6)], 7, 2)
-        a.ball(1+sway, torso_y-3, 6, 7, FIRE if death < .7 else ROCK)
-        a.ellipse(-1+sway, torso_y, 2, 2, 9 if death < .7 else 13)
-        for side in (-1, 1):
-            a.ball(side*20, torso_y+7, 9, 9, ROCK)
-            if lord:
-                a.poly([(side*20-4, torso_y+12), (side*25, torso_y+21),
-                        (side*20+5, torso_y+11)], 22)
-        # Stone fist lifts for attack, armour keeps its shape through the swing.
-        fist_y = 23+max(0, -lunge)*6-death*9
-        a.ball(-27-death*4, 23-death*9, 9, 11, ROCK)
-        a.ball(27, fist_y, 9, 11, ROCK)
-        a.line([(25, fist_y+3), (29, fist_y-4)], 7, 2)
-        a.ball(-death*6, head_y, 16 if lord else 17, 14, ROCK)
-        a.ellipse(-7-death*6, head_y+8, 4, 2, 14)
-        if lord:
-            hx = -death*6
-            for side in (-1, 1):
-                a.poly([(hx+side*11, head_y+8), (hx+side*22, head_y+22),
-                        (hx+side*17, head_y+7)], 21)
-                a.line([(hx+side*15, head_y+11), (hx+side*20, head_y+20)], 23, 2)
-            a.line([(hx-14, head_y+10), (hx+14, head_y+10)], 22, 3)
-            a.poly([(hx-3, head_y+12), (hx, head_y+18), (hx+4, head_y+12)], 23)
-            # Compact warhammer moves as one rigid object with the hand.
-            tx, ty = (31, 62) if lunge < 1 else (34, 31)
-            if death:
-                tx, ty = 33, 62-death*53
-            a.line([(26, max(8, fist_y-7)), (tx, ty)], 20, 4)
-            a.line([(26, max(8, fist_y-7)), (tx, ty)], 22, 2)
-            a.ball(tx, ty, 9, 6, ROCK)
-            a.line([(tx-2, ty-4), (tx-2, ty+4)], 23, 3)
-            a.line([(-16, torso_y-12), (16, torso_y-12)], 22, 3)
-        a.face(-death*6, head_y, clip, n, 1., blush=not death)
-        if death > .4:
-            for k in range(4):
-                a.ball(-24+k*15, 3+(k % 2)*2, 3, 3, ROCK)
-    arr = np.array(a.im)
+    grid = np.array(DRAW[kind](clip, n).im)
+    if kind in ('spider', 'golem', 'cinderlord'):      # rigid bodies never sink below the floor row
+        low = int(np.nonzero(grid.any(axis=1))[0].max())
+        if low > AY:
+            grid = np.roll(grid, AY-low, axis=0)
     if clip == 'hurt' and n == 0:
-        arr[arr > 0] = 3
-    assert arr.any(), (kind, clip, n, 'empty')
-    assert not (arr[0].any() or arr[-1].any() or arr[:, 0].any() or arr[:, -1].any()), (kind, clip, n, 'border')
-    return arr
+        grid[grid > 0] = 3
+    assert grid.any(), (kind, clip, n, 'empty')
+    assert not (grid[0].any() or grid[-1].any() or grid[:, 0].any() or grid[:, -1].any()), (kind, clip, n, 'border')
+    return grid
 
 
 def rgba(grid, palette=PALETTE):
@@ -261,8 +305,7 @@ def rgba(grid, palette=PALETTE):
 
 
 def frames(kind):
-    return {clip: np.array([frame(kind, clip, n) for n in range(count)])
-            for clip, (_, count) in CLIPS.items()}
+    return {clip: np.array([frame(kind, clip, n) for n in range(count)]) for clip, (_, count) in CLIPS.items()}
 
 
 def registry():
@@ -270,38 +313,43 @@ def registry():
 
 
 def build():
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; edit the saved sources and export.')
     saved = registry()
     existing = {s['name']: s['sprite_id'] for s in old.api('list')['sprites']}
+    data = {kind: frames(kind) for kind in KINDS}      # validate every kind before saving any source
     for kind in KINDS:
         if kind in saved:
             print('Preserving saved source', kind, saved[kind], flush=True)
             continue
         name = PREFIX+kind+'_all'
         assert name not in existing, 'Unregistered source already exists: '+name
-        data = frames(kind)  # Validate everything before creating any sprite.
-        np.savez_compressed(ROOT/f'scripts/crags_slime_{kind}_raw.npz', **data)
-        sid = old.api('create', {'name': name, 'width': W, 'height': H,
-                 'frames': 34, 'layers': 1, 'fps': 10, 'palette': PALETTE,
-                 'persist': True, 'ops': [{'op': 'set_layer', 'layer': 0, 'name': kind}]})['sprite_id']
-        # Persist immediately; a failed build is recoverable without deleting sources.
+        np.savez_compressed(ROOT/f'scripts/crags_slime_{kind}_raw.npz', **data[kind])
+        sid = old.api('create', dict(name=name, width=W, height=H, frames=34, layers=1, fps=10,
+                                     palette=PALETTE, persist=True, ops=[dict(op='set_layer', layer=0, name=kind)]))['sprite_id']
         saved[kind] = sid
         REGISTRY.write_text(json.dumps(saved, indent=2)+'\n')
         offset = 0
-        for clip, grids in data.items():
+        for clip, grids in data[kind].items():
             for n, grid in enumerate(grids):
-                old.api('draw', {'sprite_id': sid, 'frame': offset+n,
-                    'ops': [{'op': 'grid', 'rows': grid.tolist(), 'x': 0, 'y': 0, 'layer': 0}]})
+                old.api('draw', dict(sprite_id=sid, frame=offset+n, ops=[dict(op='grid', rows=grid.tolist(), x=0, y=0, layer=0)]))
             offset += len(grids)
         print(kind, sid, offset, 'frames saved', flush=True)
+
+
+def cel_grid(cel):
+    if 'rle' in cel:
+        runs = cel['rle']
+        return np.repeat(np.array(runs[1::2], dtype=np.uint8), runs[0::2]).reshape(H, W)
+    return np.array(cel['grid'], dtype=np.uint8)
 
 
 def export():
     saved = registry()
     assert set(saved) == set(KINDS)
-    meta = {'frame': [W, H], 'anchor': [AX, AY], 'kinds': KINDS,
-            'clips': {}, 'sprites': saved, 'tops': {}, 'artStyle': 'greenmeadow-slime'}
-    proof = {}
-    for kind in KINDS:
+    meta = dict(frame=[W, H], anchor=[AX, AY], kinds=KINDS, clips={}, sprites=saved, tops={}, artStyle='greenmeadow-slime')
+    proof, atlases = {}, {}
+    for kind in KINDS:       # read and validate every saved editor source before replacing any installed file
         sp = old.api('get?sprite_id='+saved[kind])['sprite']
         assert (sp['width'], sp['height'], len(sp['frames'])) == (W, H, 34)
         atlas = Image.new('RGBA', (8*W, 5*H))
@@ -309,45 +357,64 @@ def export():
         for row, (clip, (fps, count)) in enumerate(CLIPS.items()):
             meta['clips'][clip] = dict(fps=fps, n=count, row=row, editorStart=offset)
             for n in range(count):
-                cel = sp['frames'][offset+n]['cels'][0]
-                if 'rle' in cel:
-                    runs = cel['rle']
-                    grid = np.repeat(np.array(runs[1::2], dtype=np.uint8), runs[0::2]).reshape(H, W)
-                else:
-                    grid = np.array(cel['grid'], dtype=np.uint8)
-                im = rgba(grid, sp['palette'])
-                assert im.getbbox() and min(im.getbbox()[:2]) > 0 and max(im.getbbox()[2:]) < 96
+                im = rgba(cel_grid(sp['frames'][offset+n]['cels'][0]), sp['palette'])
+                bounds = im.getbbox()
+                assert bounds and min(bounds[:2]) > 0 and max(bounds[2:]) < 96
                 atlas.alpha_composite(im, (n*W, row*H))
-                rows.append({'clip': clip, 'n': n, 'sha256': hashlib.sha256(im.tobytes()).hexdigest(),
-                             'bounds': im.getbbox()})
+                rows.append(dict(clip=clip, n=n, sha256=hashlib.sha256(im.tobytes()).hexdigest(), bounds=bounds))
             offset += count
-        idle = np.array(atlas)[:H, :6*W, 3]
-        meta['tops'][kind] = int(AY-np.nonzero(idle.any(axis=1))[0].min())
-        atlas.save(ASSETS/f'crags_{kind}.png', optimize=True)
-        proof[kind] = dict(source=saved[kind], frames=rows,
-            atlasSha256=hashlib.sha256((ASSETS/f'crags_{kind}.png').read_bytes()).hexdigest())
+        meta['tops'][kind] = int(AY-min(r['bounds'][1] for r in rows if r['clip'] == 'idle'))
+        atlases[kind] = atlas
+        proof[kind] = dict(source=saved[kind], frames=rows)
+    for kind, atlas in atlases.items():
+        dest = ASSETS/f'crags_{kind}.png'
+        atlas.save(dest, optimize=True)
+        proof[kind]['atlasSha256'] = hashlib.sha256(dest.read_bytes()).hexdigest()
     (ASSETS/'crags.txt').write_text(json.dumps(meta, indent=2)+'\n')
-    out = ROOT/'test-results/crags-slime'
-    out.mkdir(parents=True, exist_ok=True)
-    (out/'editor-export-proof.json').write_text(json.dumps(proof, indent=2)+'\n')
-    print('Exported five saved PixelFlow sources and health-bar tops', flush=True)
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT/'editor-export-proof.json').write_text(json.dumps(proof, indent=2)+'\n')
+    print('Exported 170 saved PixelFlow frames and derived health-bar tops.', flush=True)
+
+
+def verify():
+    """Compare the installed atlases directly to the saved editor frames, not to the drawers."""
+    meta = json.loads((ASSETS/'crags.txt').read_text())
+    saved = registry()
+    for kind in KINDS:
+        assert meta['sprites'][kind] == saved[kind]
+        sp = old.api('get?sprite_id='+saved[kind])['sprite']
+        atlas = Image.open(ASSETS/f'crags_{kind}.png').convert('RGBA')
+        offset = 0
+        for row, (clip, (_, count)) in enumerate(CLIPS.items()):
+            for n in range(count):
+                cell = atlas.crop((n*W, row*H, (n+1)*W, (row+1)*H))
+                assert cell.tobytes() == rgba(cel_grid(sp['frames'][offset+n]['cels'][0]), sp['palette']).tobytes(), (kind, clip, n, 'editor mismatch')
+            offset += count
+        print(kind, '34 saved editor frames equal exported atlas', flush=True)
 
 
 def preview():
-    out = ROOT/'test-results/crags-slime'
-    out.mkdir(parents=True, exist_ok=True)
-    sheet = Image.new('RGBA', (5*240, 5*230), '#344b40')
-    d = ImageDraw.Draw(sheet)
-    for col, kind in enumerate(KINDS):
+    OUT.mkdir(parents=True, exist_ok=True)
+    only = [k for k in sys.argv[2:] if k in KINDS] or KINDS
+    overview = Image.new('RGB', (len(only)*240, 5*218), '#344b40')
+    d = ImageDraw.Draw(overview)
+    for col, kind in enumerate(only):
         data = frames(kind)
-        for row, clip in enumerate(CLIPS):
-            im = rgba(data[clip][min(4, len(data[clip])-1)])
-            sheet.alpha_composite(im.resize((192,192), Image.Resampling.NEAREST), (col*240+24, row*230))
-            d.text((col*240+24, row*230+196), f'{NAMES[kind]} / {clip}', fill='white')
-    sheet.convert('RGB').save(out/'preview.png')
-    print(out/'preview.png')
+        sheet = Image.new('RGB', (8*192, 5*218), '#344b40')
+        sd = ImageDraw.Draw(sheet)
+        for row, (clip, grids) in enumerate(data.items()):
+            for n, grid in enumerate(grids):
+                im = rgba(grid).resize((192, 192), Image.Resampling.NEAREST)
+                sheet.paste(im, (n*192, row*218), im)
+                sd.text((n*192+8, row*218+194), f'{clip} {n}', fill='white')
+                sd.line([(n*192, row*218+180), (n*192+192, row*218+180)], fill='#5a7a68')
+            im = rgba(grids[0 if clip != 'die' else 7]).resize((192, 192), Image.Resampling.NEAREST)
+            overview.paste(im, (col*240+20, row*218), im)
+            d.text((col*240+20, row*218+194), f'{NAMES[kind]} / {clip}', fill='white')
+        sheet.save(OUT/f'preview-{kind}.png')
+    overview.save(OUT/'preview.png')
+    print(OUT/'preview.png')
 
 
 if __name__ == '__main__':
-    command = sys.argv[1] if len(sys.argv)>1 else 'preview'
-    {'preview': preview, 'build': build, 'export': export}[command]()
+    {'preview': preview, 'build': build, 'export': export, 'verify': verify}[sys.argv[1] if len(sys.argv) > 1 else 'preview']()

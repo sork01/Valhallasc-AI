@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.11",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The Emberfall Crags' five enemies are redrawn from scratch in the shared slime style: the Fire Wisp, Lava Spider, Ash Wraith, Cinder Golem and Cinderlord keep their colours and silhouettes, with glossier shading, large eyes and chunkier shapes.",
+      "Soft creatures move softly and hard ones stay hard: the wisp flickers, the wraith drifts, while the spider's shell, the golem's stone and the Cinderlord's armour keep their shape and move on joints.",
+      "Deaths fit each enemy: the wisp gutters out into an ember, the spider's legs fold and its shell cracks, the wraith dissolves into ash, the golem kneels and its head rolls off, and the Cinderlord buckles and topples with its hammer on the floor.",
+      "The spider, golem and Cinderlord now stand exactly on the ground instead of floating slightly above it."
+    ],
+    "removed": [
+      "Replaced the Crags' previous enemy artwork; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.10",
     "date": "2026-11-03",
     "new": [],

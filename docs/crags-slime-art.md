@@ -131,3 +131,47 @@ death holds its final frame briefly before replaying. Frame sheets show all
 The owner approved Crags deployment after Rimeveil. The private 1.39.1 label
 is reconciled to 1.39.2 in this release. No release restart or migration is
 required. Greenmeadow remains a separate feature candidate; Gloamfen is next.
+
+## v2 redo (Beta 1.39.11, 2026-11-04, candidate, not live)
+
+The owner reopened the Crags remake and asked for it redone from scratch in the
+same direction. `scripts/crags_slime_redraw.py` was rewritten with the lessons of
+the later zones; the v1 sources and raw arrays are kept as
+`scripts/crags_slime_v1_*` (v1 PixelFlow IDs in `crags_slime_v1_sources.txt`).
+
+- Five new native PixelFlow sources (prefix `valhallasc_crags_slime_style_b_`, IDs
+  in `crags_slime_sources.txt`); `build` refuses `--replace` and registered kinds,
+  `export` preserves saved editor frames and derives the health-bar tops
+  (81/43/68/71/85).
+- **Grounding rule (`QUADRUPED-GROUNDING`):** every living frame of the spider,
+  golem and Cinderlord has its lowest pixel exactly on row 90 (planted feet are
+  `Painter` balls with integer radius and centre y = radius). Death frames of the
+  rigid kinds are clamped so they never sink below row 90. The wisp and wraith
+  hover by nature.
+- Deaths (eight distinct frames each, all checked): wisp gutters and falls as an
+  ember with drifting smoke; spider folds its legs and its shell drops and cracks;
+  wraith dissolves from the hood down (`erase_rising`) into settling ash; golem
+  kneels, head rolls off, core goes dark; Cinderlord buckles and topples on a
+  `Rig` with the hammer lying on the floor.
+- Walk cycles of the golem and Cinderlord swing the fists opposite each other
+  (`cos` phase) so no two walk frames are identical.
+
+### Checks
+
+`tests/crags-slime-art.cjs` (71 bounded real-art checks) now also asserts eight
+distinct death frames per kind and the row-90 grounding of the three rigid kinds.
+Mutation control: `MUTATE_SPIDER_PNG=<png>` serves a spider atlas with the idle
+frame moved up 1 px and the grounding check fails (`lowest rows 89,90`). 170
+saved-editor/export frames match (`crags_slime_redraw.py verify`).
+
+### Rollback (two levels)
+
+- To v1 (live art since Beta 1.39.2): `python3 scripts/rollback_crags_art.py
+  --target <checkout> --backup /media/raid/valhallasc-data/crags-slime-v1-20261104 --apply`
+  (dry run without `--apply`).
+- To the pre-slime originals: the same command with the default backup
+  (`crags-slime-original-20261103`).
+
+Not deployed: wait for the owner to approve the pictures. Release recipe: commit
+all but `TODO.md` in this worktree, merge `--ff-only` into main, verify the
+public hashes of the six art files and `index.html`.
