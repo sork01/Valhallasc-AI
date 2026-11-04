@@ -1,4 +1,42 @@
-# Undervault slime-style artwork release
+# Undervault slime-style artwork
+
+## v2 redo (Beta 1.39.15, candidate 2026-11-04, not yet deployed)
+
+The owner's 2026-11-04 rules reopened the zone: a distinct attack animation (wind-up, strike, recovery, eight distinct
+frames per kind), exact ground contact, and per-kind frame sizes. The art was redrawn from the v1 identities
+(`scripts/vault_slime_redraw.py`, `preview | extents | build | refresh <kinds> | export | verify`; `make_vault_sprites.py`
+delegates). Seven new native PixelFlow sources (prefix `valhallasc_vault_slime_style_b_`, ids in
+`scripts/vault_slime_sources.txt`); the v1 ids/arrays stay in `vault_slime_v1_*`. A frame-size change needs a NEW source
+(`refresh` only rewrites same-size frames and overwrites editor edits).
+
+- **Attacks:** thrall sword chop (raised right of the skull, swings down with a trail), archer draw/release (string
+  pulled 16 px, arrow flies out, bow kicks), acolyte staff raise then thrust with an orb bolt, Hrolf axe chop, Valka head
+  back + arms spread then rings of sound from the open mouth, Ironwake both fists overhead then a double hammer with
+  rock and dust, Haldor sword chop with a green trail. Swung props use the shared `SW` keyframes so frame 3 continues the
+  swing instead of snapping back to rest.
+- **Grounding:** feet use `foot()` (integer radius, centre y = radius, lowest pixel exactly on the anchor row); the
+  acolyte's robe hem and Valka's gown hem touch the ground row (only the spirit above bobs). `frame()` asserts every living
+  frame rests on the anchor row and rolls death frames onto it.
+- **Deaths:** unchanged concepts from v1 (bones scatter, robe settles, armour drops, Valka dissolves upward leaving gown
+  and diadem, stone fractures, crown tumbles first).
+- **Frames (w x h, anchor):** thrall 114x92 (43,86), archer 114x88 (42,82), acolyte 116x104 (37,98), Hrolf 124x102
+  (47,96), Valka 104x96 (48,90), Ironwake 126x114 (52,108), Haldor 114x98 (39,92); measured with `extents`. The art pixel
+  scale is unchanged; the ground shadow scales with frame width (1.08x-1.31x). The click hitbox comes from the idle
+  pixels, not the frame.
+- **Check:** `tests/vault-slime-art.cjs` (159 checks, bounded): declared frames, eight distinct attack and death frames,
+  wind-up/strike measured against idle (rises / leans / reach plus pixel difference), recovery returns to idle, grounding
+  of every frame, Valka's upward dissolve, exact `#fffbea` eye whites, derived tops, portraits. Mutation controls
+  (`MUTATE_KIND` + `MUTATE_PNG`): an atlas shifted up a row fails grounding; an attack row replaced by idle fails.
+  Run from a worktree with `PLAYWRIGHT_BROWSERS_PATH`, `NODE_PATH` (main + dybase2 `node_modules`) and `VALHALLA_BINARY`
+  in the SAME command through `scripts/test-touch-bounded.sh`.
+- **Rollback:** `python3 scripts/rollback_vault_art.py --backup /media/raid/valhallasc-data/vault-slime-v1-20261104 --apply`
+  (live Beta 1.39.5 art; default) or `--backup /media/raid/valhallasc-data/vault-slime-original-20261103` (pre-slime
+  originals). Both tested with a corrupt-backup refusal by `vault_slime_review.py verify` (pre-deployment only; afterwards
+  use `make_vault_sprites.py verify`).
+- **Pictures:** `vault_slime_review.py review` writes 31 `valhallasc-vault-redo-*` PNG/GIFs (before = live v1);
+  `upload` is a separate explicit action, receipt `filedrop-receipt-redo.json`.
+
+## v1 (Beta 1.39.5, live until the redo is approved)
 
 Released as **Beta 1.39.5** on 2026-11-03 after the owner approved the
 pictures and requested deployment and the finish skill. Source **95ab27d**

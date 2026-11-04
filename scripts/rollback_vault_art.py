@@ -10,7 +10,7 @@ from pathlib import Path
 import os
 import tempfile
 
-DEFAULT_BACKUP = '/media/raid/valhallasc-data/vault-slime-original-20261103'
+DEFAULT_BACKUP = '/media/raid/valhallasc-data/vault-slime-v1-20261104'     # the live Beta 1.39.5 art; vault-slime-original-20261103 holds the pre-slime originals
 
 
 def restore(target, backup, apply=False):

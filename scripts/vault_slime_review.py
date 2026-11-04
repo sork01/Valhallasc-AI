@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Undervault review | verify | upload. Upload is a separate explicit operation."""
+"""Undervault redo (v2) review | verify | upload.  Upload is a separate explicit operation.
+
+"Before" is the live v1 art (Beta 1.39.5) kept at /media/raid/valhallasc-data/vault-slime-v1-20261104; the pictures are
+named valhallasc-vault-redo-* so the 24 verified v1 uploads and their receipt stay intact.
+"""
 from pathlib import Path
 import hashlib
 import json
@@ -10,145 +14,186 @@ import tempfile
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
-BACKUP = Path('/media/raid/valhallasc-data/vault-slime-original-20261103')
+V1 = Path('/media/raid/valhallasc-data/vault-slime-v1-20261104')
+ORIGINAL = Path('/media/raid/valhallasc-data/vault-slime-original-20261103')
+LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
 OUT = ROOT/'test-results/vault-slime'
-KINDS = ['thrall','archer','acolyte','gatewarden','choir','colossus','hollowking']
-NAMES = ['Vault Thrall','Bone Archer','Hollow Acolyte','Hrolf Bonegate','Valka','Ironwake','Haldor']
+KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking']
+NAMES = dict(thrall='Vault Thrall', archer='Bone Archer', acolyte='Hollow Acolyte', gatewarden='Hrolf Bonegate', choir='Valka, the Hollow Choir', colossus='Ironwake', hollowking='Haldor, the Hollow King')
 FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 font = ImageFont.truetype(FONT, 20)
 small = ImageFont.truetype(FONT, 15)
+BG = '#283c32'
+CLIPS = ['idle', 'walk', 'attack', 'hurt', 'die']
 
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+class Art:
+    """One version of the zone's art: a root directory with client/assets/vault.txt and the seven atlases."""
+    def __init__(self, root):
+        self.root = Path(root)
+        self.meta = json.loads((self.root/'client/assets/vault.txt').read_text())
+        self.atlas = {k: Image.open(self.root/f'client/assets/vault_{k}.png').convert('RGBA') for k in KINDS}
+
+    def frame(self, kind):
+        own = (self.meta.get('kindFrames') or {}).get(kind)
+        (w, h), (ax, ay) = (own['frame'], own['anchor']) if own else (self.meta['frame'], self.meta['anchor'])
+        return w, h, ax, ay
+
+    def cell(self, kind, clip, n):
+        w, h, _, _ = self.frame(kind)
+        row = self.meta['clips'][clip]['row']
+        return self.atlas[kind].crop((n*w, row*h, (n+1)*w, (row+1)*h))
+
+
+CELL = (320, 256)       # a common 2x cell: the widest frame is 128 px (256 at 2x) with its anchor off-centre
+
+
+def placed(art, kind, clip, n, scale=2, size=CELL):
+    """The frame drawn at 2x on a common canvas with the anchor on one ground line and the anchor column centred, so before
+    and after are compared at the same scale and on the same ground."""
+    w, h, ax, ay = art.frame(kind)
+    im = art.cell(kind, clip, n).resize((w*scale, h*scale), Image.Resampling.NEAREST)
+    canvas = Image.new('RGBA', size, (0, 0, 0, 0))
+    canvas.alpha_composite(im, (size[0]//2-ax*scale, size[1]-14-ay*scale-scale))
+    return canvas
+
+
 def review():
-    # Equal frame crop/scale: preserve the actual silhouette size of each version.
-    meta = json.loads((ROOT/'client/assets/vault.txt').read_text())
-    before = Image.new('RGB', (1848, 540), '#283c32')
-    after = before.copy()
-    for label, sheet, source in [('Before', before, BACKUP), ('After', after, ROOT)]:
+    OUT.mkdir(parents=True, exist_ok=True)
+    before, after = Art(V1), Art(ROOT)
+    picks = [('Idle', 'idle', 0), ('Wind-up', 'attack', 2), ('Strike', 'attack', 4), ('Death', 'die', 7)]
+
+    def board(art, label):
+        sheet = Image.new('RGB', (len(KINDS)*CELL[0], 36+len(picks)*(CELL[1]+24)), BG)
         d = ImageDraw.Draw(sheet)
-        d.text((22, 12), 'Undervault — '+label+' (same 2× scale)', font=font, fill='#fff0cb')
-        for col, (kind, name) in enumerate(zip(KINDS, NAMES)):
-            atlas = Image.open(source/f'client/assets/vault_{kind}.png').convert('RGBA')
-            corpse=atlas.crop((7*96,4*96,8*96,5*96)).resize((192,192),Image.Resampling.NEAREST)
-            sheet.paste(corpse,(col*264+36,310),corpse)
-            d.text((col*264+36,505),'Final death pose',font=small,fill='white')
-            im = atlas.crop((0, 0, 96, 96)).resize((192,192), Image.Resampling.NEAREST)
-            sheet.paste(im, (col*264+36, 60), im)
-            d.text((col*264+36, 266), name, font=font, fill='white')
-    before.save(OUT/'valhallasc-vault-before.png')
-    after.save(OUT/'valhallasc-vault-after.png')
-    compare = Image.new('RGB', (1848, 1150), '#283c32')
-    compare.paste(before, (0,0)); compare.paste(after, (0,540))
-    d = ImageDraw.Draw(compare)
-    d.text((22,1092), 'Skeletons break apart; the acolyte drops its staff; Hrolf loses his armour;', font=font, fill='white')
-    d.text((22,1120), 'Valka dissipates; Ironwake fractures; Haldor loses his crown, sword and bones.', font=font, fill='white')
-    compare.save(OUT/'valhallasc-vault-before-after.png')
-    for kind, name in zip(KINDS,NAMES):
-        atlas = Image.open(ROOT/f'client/assets/vault_{kind}.png').convert('RGBA')
-        gallery = Image.new('RGB',(8*192,5*218+36),'#283c32')
+        d.text((14, 8), f'Undervault — {label} (same 2× scale, same ground line)', font=font, fill='#fff0cb')
+        for c, kind in enumerate(KINDS):
+            for r, (title, clip, n) in enumerate(picks):
+                im = placed(art, kind, clip, n)
+                x, y = c*CELL[0], 36+r*(CELL[1]+24)
+                sheet.paste(im, (x, y), im)
+                d.line([(x+8, y+CELL[1]-13), (x+CELL[0]-8, y+CELL[1]-13)], fill='#4c6a58')
+                d.text((x+10, y+CELL[1]+2), f'{NAMES[kind]} / {title}', font=small, fill='white')
+        return sheet
+    a, b = board(after, 'after (v2)'), board(before, 'before (live v1)')
+    a.save(OUT/'valhallasc-vault-redo-after.png')
+    both = Image.new('RGB', (a.width, a.height*2), BG)
+    both.paste(b, (0, 0))
+    both.paste(a, (0, a.height))
+    both.save(OUT/'valhallasc-vault-redo-before-after.png')
+    # every attack frame, before above after, per kind
+    half = (CELL[0]//2, CELL[1]//2)
+    strip = Image.new('RGB', (8*half[0], 36+len(KINDS)*2*(half[1]+20)), BG)
+    d = ImageDraw.Draw(strip)
+    d.text((14, 8), 'Attack frames 1–8: before (live v1) above, after (v2) below', font=font, fill='#fff0cb')
+    y = 36
+    for kind in KINDS:
+        for label, art in (('before', before), ('after', after)):
+            for n in range(8):
+                im = placed(art, kind, 'attack', n).resize(half, Image.Resampling.NEAREST)
+                strip.paste(im, (n*half[0], y), im)
+            d.text((6, y+half[1]), f'{NAMES[kind]} — {label}', font=small, fill='white')
+            y += half[1]+20
+    strip.save(OUT/'valhallasc-vault-redo-attacks-before-after.png')
+    for kind in KINDS:
+        w, h, _, ay = after.frame(kind)
+        gallery = Image.new('RGB', (8*w*2, 36+5*(h*2+24)), BG)
         gd = ImageDraw.Draw(gallery)
-        gd.text((12,8), name+' — every exported PixelFlow frame',font=font,fill='white')
-        for clip,spec in meta['clips'].items():
+        gd.text((12, 8), f'{NAMES[kind]} — every exported PixelFlow frame ({w}×{h})', font=font, fill='white')
+        for clip in CLIPS:
+            spec = after.meta['clips'][clip]
             for n in range(spec['n']):
-                x,y = n*192,36+spec['row']*218
-                im=atlas.crop((n*96,spec['row']*96,(n+1)*96,(spec['row']+1)*96)).resize((192,192),Image.Resampling.NEAREST)
-                gallery.paste(im,(x,y),im)
-                gd.text((x+8,y+192),f'{clip} {n+1}',font=small,fill='white')
-        gallery.save(OUT/f'valhallasc-vault-{kind}-frames.png')
-        # Each row runs at its original fps; all five clips visible together.
-        sequence=[]
-        for tick in range(120):
-            image=Image.new('RGB',(5*208,250),'#283c32')
-            d=ImageDraw.Draw(image)
-            for col,(clip,spec) in enumerate(meta['clips'].items()):
-                # Repeat live loops, hold the final die frame for a moment.
-                count=spec['n']; time=tick/20
-                n=int(time*spec['fps']) % count if clip!='die' else min(count-1,int((time%2)*spec['fps']))
-                crop=atlas.crop((n*96,spec['row']*96,(n+1)*96,(spec['row']+1)*96)).resize((192,192),Image.Resampling.NEAREST)
-                image.paste(crop,(col*208+8,22),crop)
-                d.text((col*208+8,218),clip,font=font,fill='white')
-            sequence.append(image)
-        sequence[0].save(OUT/f'valhallasc-vault-{kind}-animations.gif',save_all=True,
-                         append_images=sequence[1:],duration=50,loop=0,optimize=False)
-        deaths=[]
-        previous=Image.open(BACKUP/f'client/assets/vault_{kind}.png').convert('RGBA')
-        for tick in range(80):
-            n=min(7,int(((tick/20)%2)*8))
-            im=Image.new('RGB',(480,260),'#283c32');d=ImageDraw.Draw(im)
-            for col,(label,source) in enumerate([('Before',previous),('After',atlas)]):
-                crop=source.crop((n*96,4*96,(n+1)*96,5*96)).resize((192,192),Image.Resampling.NEAREST)
-                im.paste(crop,(col*240+24,16),crop)
-                d.text((col*240+24,220),label+' / die',font=font,fill='white')
-            deaths.append(im)
-        deaths[0].save(OUT/f'valhallasc-vault-{kind}-death-before-after.gif',save_all=True,
-                      append_images=deaths[1:],duration=50,loop=0,optimize=False)
-    print('24 before/after pictures, complete frame sheets and animation previews written.')
+                x, y = n*w*2, 36+spec['row']*(h*2+24)
+                im = after.cell(kind, clip, n).resize((w*2, h*2), Image.Resampling.NEAREST)
+                gallery.paste(im, (x, y), im)
+                gd.text((x+8, y+h*2), f'{clip} {n+1}', font=small, fill='white')
+                gd.line([(x, y+ay*2+2), (x+w*2, y+ay*2+2)], fill='#4c6a58')
+        gallery.save(OUT/f'valhallasc-vault-redo-{kind}-frames.png')
+        frames = []
+        for tick in range(120):          # all five clips side by side, each at its own fps; die holds its last frame
+            im = Image.new('RGB', (5*half[0], half[1]+22), BG)
+            dd = ImageDraw.Draw(im)
+            for col, clip in enumerate(CLIPS):
+                spec = after.meta['clips'][clip]
+                time = tick/20
+                n = int(time*spec['fps']) % spec['n'] if clip != 'die' else min(spec['n']-1, int((time % 2)*spec['fps']))
+                c = placed(after, kind, clip, n).resize(half, Image.Resampling.NEAREST)
+                im.paste(c, (col*half[0], 0), c)
+                dd.text((col*half[0]+8, half[1]+2), clip, font=small, fill='white')
+            frames.append(im)
+        frames[0].save(OUT/f'valhallasc-vault-redo-{kind}-animations.gif', save_all=True, append_images=frames[1:], duration=50, loop=0)
+        for clip in ('die', 'attack'):
+            seq = []
+            for tick in range(80):
+                n = min(7, int(((tick/20) % 2)*8))
+                im = Image.new('RGB', (2*half[0]+16, half[1]+24), BG)
+                dd = ImageDraw.Draw(im)
+                for col, (label, art) in enumerate((('Before', before), ('After', after))):
+                    c = placed(art, kind, clip, n).resize(half, Image.Resampling.NEAREST)
+                    im.paste(c, (col*(half[0]+16), 0), c)
+                    dd.text((col*(half[0]+16)+8, half[1]+4), f'{label} / {clip}', font=small, fill='white')
+                seq.append(im)
+            seq[0].save(OUT/f'valhallasc-vault-redo-{kind}-{clip}-before-after.gif', save_all=True, append_images=seq[1:], duration=50, loop=0)
+    print('31 before/after pictures, frame sheets and animation previews written.')
 
 
 def verify():
-    proof=json.loads((OUT/'editor-export-proof.json').read_text())
-    count=0
+    """PRE-deployment check: the candidate matches its saved editor frames; both rollbacks work on a disposable copy; the
+    live art is still the v1 art.  After deployment use `make_vault_sprites.py verify`."""
+    proof = json.loads((OUT/'editor-export-proof.json').read_text())
+    art, count = Art(ROOT), 0
     for kind, packet in proof.items():
-        atlas=Image.open(ROOT/f'client/assets/vault_{kind}.png').convert('RGBA')
-        meta=json.loads((ROOT/'client/assets/vault.txt').read_text())
-        assert sha(ROOT/f'client/assets/vault_{kind}.png')==packet['atlasSha256']
+        assert sha(ROOT/f'client/assets/vault_{kind}.png') == packet['atlasSha256']
         for entry in packet['frames']:
-            row=meta['clips'][entry['clip']]['row'];n=entry['n']
-            im=atlas.crop((n*96,row*96,(n+1)*96,(row+1)*96))
-            assert hashlib.sha256(im.tobytes()).hexdigest()==entry['sha256']
-            count+=1
-    assert count==238
-    # Exercise the actual rollback command on an isolated copy, then corrupt a
-    # backup to prove preflight refuses it without partially changing the target.
-    with tempfile.TemporaryDirectory(prefix='rollback-',dir=OUT) as temp:
-        scratch=Path(temp)
-        target=scratch/'target'; damaged=scratch/'damaged'
-        backup_meta=json.loads((BACKUP/'manifest.txt').read_text())
-        for name in backup_meta['files']:
-            (target/name).parent.mkdir(parents=True,exist_ok=True)
-            shutil.copy2(ROOT/name,target/name)
-        command=['python3',str(ROOT/'scripts/rollback_vault_art.py'),'--target',str(target),'--apply']
-        subprocess.run(command,check=True,capture_output=True)
-        assert all(sha(target/name)==digest for name,digest in backup_meta['files'].items())
-        shutil.copytree(BACKUP,damaged)
-        (damaged/'client/assets/vault_gatewarden.png').write_bytes(b'corrupt')
-        before={name:sha(target/name) for name in backup_meta['files']}
-        failed=subprocess.run(command+['--backup',str(damaged)],capture_output=True)
-        assert failed.returncode!=0 and all(sha(target/name)==digest for name,digest in before.items())
-    for entry in ('make_vault_sprites.py', 'vault_slime_redraw.py'):
-        refused=subprocess.run(['python3',str(ROOT/'scripts'/entry),'build','--replace'],capture_output=True)
-        assert refused.returncode != 0 and b'--replace is refused' in refused.stderr
-    live=Path('/home/serveperry/webserver/www/Valhallasc')
-    assert all(sha(live/name)==digest for name,digest in backup_meta['files'].items())
-    (OUT/'validation.json').write_text(json.dumps({'editorFramesMatch':count, 'liveArtUnchanged':True,
-        'rollbackEightFilesVerified':True,'corruptBackupRefusedWithoutChanges':True,'destructiveBuildRefused':True,
-        'originalFiles':json.loads((BACKUP/'manifest.txt').read_text())},indent=2)+'\n')
-    print('238 saved-editor/export frame matches; eight-file rollback and corrupt-backup refusal pass.')
+            assert hashlib.sha256(art.cell(kind, entry['clip'], entry['n']).tobytes()).hexdigest() == entry['sha256']
+            count += 1
+    assert count == 238
+    results = {}
+    for label, backup in (('v1', V1), ('original', ORIGINAL)):
+        manifest = json.loads((backup/'manifest.txt').read_text())
+        with tempfile.TemporaryDirectory(prefix='vault-rollback-') as temp:
+            scratch = Path(temp)
+            target, damaged = scratch/'target', scratch/'damaged'
+            for name in manifest['files']:
+                (target/name).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT/name, target/name)
+            command = ['python3', str(ROOT/'scripts/rollback_vault_art.py'), '--target', str(target), '--backup']
+            subprocess.run(command+[str(backup), '--apply'], check=True, capture_output=True)
+            assert all(sha(target/name) == digest for name, digest in manifest['files'].items()), label
+            shutil.copytree(backup, damaged)
+            (damaged/'client/assets/vault_gatewarden.png').write_bytes(b'corrupt')
+            held = {name: sha(target/name) for name in manifest['files']}
+            failed = subprocess.run(command+[str(damaged), '--apply'], capture_output=True)
+            assert failed.returncode != 0 and all(sha(target/name) == digest for name, digest in held.items()), label
+        results[label] = 'restored eight files; corrupt backup refused without changes'
+    v1 = json.loads((V1/'manifest.txt').read_text())
+    assert all(sha(LIVE/name) == digest for name, digest in v1['files'].items()), 'live art is no longer the v1 art'
+    (OUT/'validation.json').write_text(json.dumps(dict(editorFramesMatch=count, liveArtStillV1=True, rollback=results,
+                                                       v1Files=v1['files']), indent=2)+'\n')
+    print('238 saved-editor/export frame matches; v1 and original rollbacks and corrupt-backup refusal pass; live art is still v1.')
 
 
 def upload():
-    receipt=[]
-    paths=sorted(OUT.glob('valhallasc-vault-*.png'))+sorted(OUT.glob('valhallasc-vault-*.gif'))
-    expected=3+len(KINDS)*3
-    assert len(paths)==expected, 'Generate the complete review set first'
+    receipt = []
+    paths = sorted(OUT.glob('valhallasc-vault-redo-*.png'))+sorted(OUT.glob('valhallasc-vault-redo-*.gif'))
+    assert len(paths) == 31, 'Generate the complete review set first'
     for source in paths:
-        mime='image/gif' if source.suffix=='.gif' else 'image/png'
-        subprocess.run(['bash',str(ROOT/'scripts/filedrop_put.sh'),str(source),source.name,mime],check=True)
-        dest=Path('/home/serveperry/webserver/www/filedrop/data/Sork/files')/source.name
-        metadata=json.loads(Path(str(dest)+'.meta.json').read_text())
-        assert sha(source)==sha(dest)
-        assert metadata['original_name']==source.name and metadata['type']==mime
-        assert metadata['size']==source.stat().st_size==dest.stat().st_size
-        assert Image.open(source).size==Image.open(dest).size
-        receipt.append({'name':source.name,'sha256':sha(source),'bytes':source.stat().st_size,
-                        'dimensions':Image.open(source).size,'mime':mime})
-    (OUT/'filedrop-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
-    print(len(receipt),'FileDrop pictures/animations verified')
+        mime = 'image/gif' if source.suffix == '.gif' else 'image/png'
+        subprocess.run(['bash', str(ROOT/'scripts/filedrop_put.sh'), str(source), source.name, mime], check=True)
+        dest = Path('/home/serveperry/webserver/www/filedrop/data/Sork/files')/source.name
+        metadata = json.loads(Path(str(dest)+'.meta.json').read_text())
+        assert sha(source) == sha(dest)
+        assert metadata['original_name'] == source.name and metadata['type'] == mime
+        assert metadata['size'] == source.stat().st_size == dest.stat().st_size
+        assert Image.open(source).size == Image.open(dest).size
+        receipt.append(dict(name=source.name, sha256=sha(source), bytes=source.stat().st_size, dimensions=Image.open(source).size, mime=mime))
+    (OUT/'filedrop-receipt-redo.json').write_text(json.dumps(receipt, indent=2)+'\n')
+    print(len(receipt), 'FileDrop pictures/animations verified')
 
 
-if __name__=='__main__':
-    {'review':review,'verify':verify,'upload':upload}[sys.argv[1]]()
+if __name__ == '__main__':
+    {'review': review, 'verify': verify, 'upload': upload}[sys.argv[1]]()

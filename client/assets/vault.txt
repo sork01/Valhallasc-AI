@@ -49,22 +49,94 @@
     }
   },
   "sprites": {
-    "thrall": "7dee3916397e745c",
-    "archer": "9303b719d8401202",
-    "acolyte": "7a9851aa0becadae",
-    "gatewarden": "fc18588356e1c7e3",
-    "choir": "6d002bf680604a12",
-    "colossus": "787787128faf3195",
-    "hollowking": "b582240b1e315395"
+    "thrall": "4073280c9ba0d192",
+    "archer": "fb7634836d417787",
+    "acolyte": "c0051be6fe0e6dd7",
+    "gatewarden": "70dab6be632a6e04",
+    "choir": "e48f5d62c668806c",
+    "colossus": "686de128f06bb5ee",
+    "hollowking": "a09229aeca7e27a6"
   },
   "tops": {
-    "thrall": 73,
+    "thrall": 72,
     "archer": 79,
     "acolyte": 80,
     "gatewarden": 86,
-    "choir": 87,
+    "choir": 86,
     "colossus": 86,
     "hollowking": 84
   },
-  "artStyle": "greenmeadow-slime"
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "thrall": {
+      "frame": [
+        114,
+        92
+      ],
+      "anchor": [
+        43,
+        86
+      ]
+    },
+    "archer": {
+      "frame": [
+        114,
+        88
+      ],
+      "anchor": [
+        42,
+        82
+      ]
+    },
+    "acolyte": {
+      "frame": [
+        116,
+        104
+      ],
+      "anchor": [
+        37,
+        98
+      ]
+    },
+    "gatewarden": {
+      "frame": [
+        124,
+        102
+      ],
+      "anchor": [
+        47,
+        96
+      ]
+    },
+    "choir": {
+      "frame": [
+        104,
+        96
+      ],
+      "anchor": [
+        48,
+        90
+      ]
+    },
+    "colossus": {
+      "frame": [
+        126,
+        114
+      ],
+      "anchor": [
+        52,
+        108
+      ]
+    },
+    "hollowking": {
+      "frame": [
+        114,
+        98
+      ],
+      "anchor": [
+        39,
+        92
+      ]
+    }
+  }
 }

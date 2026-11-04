@@ -1446,8 +1446,8 @@ if __name__ == '__main__':
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
     if '--replace' in sys.argv:
         raise SystemExit('--replace is refused; edit the saved sources and export.')
-    commands = dict(preview=current.preview, build=current.build,
+    commands = dict(preview=current.preview, build=current.build, refresh=current.refresh,
                     export=current.export, verify=current.verify)
     if command not in commands:
-        raise SystemExit('Usage: make_vault_sprites.py preview | build | export | verify')
+        raise SystemExit('Usage: make_vault_sprites.py preview | build | refresh <kinds> | export | verify')
     commands[command]()
