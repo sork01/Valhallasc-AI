@@ -7,6 +7,7 @@ import make_sunward_sprites as sun
 from make_crag_sprites import rgba
 
 def main():
+ raise SystemExit('Superseded by the slime-style Badger (scripts/sunward_slime_redraw.py); edit the saved source and export instead.')
  api=sun.m._pf();manifest=sun.ASSETS/'sunward.txt';meta=json.loads(manifest.read_text());sid=meta['sprites']['spadebadger'];sp,frames=api.load(sid)
  assert sp['palette']==sun.PALETTES['spadebadger'].hex
  before=[f[0].copy() for f in frames];start=meta['clips']['walk']['editorStart']
