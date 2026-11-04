@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.15",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The seven Undervault enemies are redrawn from scratch in the shared slime style: the Vault Thrall, Bone Archer, Hollow Acolyte, Hrolf Bonegate, Valka the Hollow Choir, Ironwake and Haldor the Hollow King keep their colours, with glossier shading, large eyes and chunkier shapes.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the thrall raises its sword overhead and chops down, the archer draws the string back and looses an arrow, the acolyte gathers its staff orb and fires a bolt, Hrolf lifts his axe high and brings it down, Valka throws her head back and sings rings of sound, Ironwake raises both fists and hammers the ground, and Haldor lifts his green blade and cuts down with a bright trail.",
+      "Deaths fit each enemy: the skeletons collapse into a heap of bones, the acolyte's robe settles, Hrolf's armour drops, Valka dissolves upward and leaves only her gown and diadem, Ironwake's stone cracks and falls apart, and Haldor's crown tumbles away before his bones fall.",
+      "All seven now stand exactly on the ground instead of floating slightly above it, and the acolyte's robe and Valka's gown now reach the floor. Each gets its own picture frame so raised weapons, the arrow, the bolt, the rings of sound and the raised fists fit; the enemies themselves are drawn at the same size."
+    ],
+    "removed": [
+      "Replaced the Undervault enemies' previous artwork; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.14",
     "date": "2026-11-04",
     "new": [],

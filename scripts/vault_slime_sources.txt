@@ -1,9 +1,9 @@
 {
-  "thrall": "7dee3916397e745c",
-  "archer": "9303b719d8401202",
-  "acolyte": "7a9851aa0becadae",
-  "gatewarden": "fc18588356e1c7e3",
-  "choir": "6d002bf680604a12",
-  "colossus": "787787128faf3195",
-  "hollowking": "b582240b1e315395"
+  "thrall": "4073280c9ba0d192",
+  "archer": "fb7634836d417787",
+  "acolyte": "c0051be6fe0e6dd7",
+  "gatewarden": "70dab6be632a6e04",
+  "choir": "e48f5d62c668806c",
+  "colossus": "686de128f06bb5ee",
+  "hollowking": "a09229aeca7e27a6"
 }
