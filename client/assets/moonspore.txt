@@ -64,7 +64,7 @@
     "lanternwraith": 84,
     "mireheart": 73,
     "silverwidow": 63,
-    "nightbloom": 97
+    "nightbloom": 96
   },
   "artStyle": "greenmeadow-slime",
   "kindFrames": {

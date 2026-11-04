@@ -155,7 +155,7 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
         check(d.rows.filter(r => r.clip === 'walk').every(r => r.groundRuns >= 2), `${kind}: walking keeps at least two feet on the ground`);
       }
       if (['rootlurker', 'nightbloom', 'mireheart'].includes(kind)) {
-        check(idle.every(r => r.groundRuns >= 1 && r.groundWidth >= 2), `${kind}: its feet or roots touch the ground in idle`);
+        check(idle.every(r => r.groundRuns >= 1 && r.groundWidth >= 8), `${kind}: its feet or roots touch the ground in idle`);
       }
       check(die.at(-1).diff >= 100, `${kind}: death changes the visible silhouette`);
       check(idle0.opaque > 700 && idle0.white === 0, `${kind}: substantial silhouette with no flat-white debug fills (${idle0.opaque} opaque pixels)`);

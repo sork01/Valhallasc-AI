@@ -708,8 +708,9 @@ def nightbloom(clip, n):
         swing = math.sin(ph + k * math.pi) * 6 if clip == 'walk' else 0
         lift = max(0, math.sin(ph + k * math.pi)) * 4 if clip == 'walk' else 0
         for j in range(3):
-            pts = bez((fx * .4, 22), (fx + swing + (j - 1) * 6, 8 + lift), (fx + swing + (j - 1) * 14, 1 + lift * .3), 5)
+            pts = bez((fx * .4, 22), (fx + swing + (j - 1) * 6, 8 + lift), (fx + swing + (j - 1) * 14, 5 + lift * .3), 5)
             taper(a, pts, BARK, 8 - j, 4)
+        a.poly([(fx + swing - 8, lift), (fx + swing + 10, lift), (fx + swing + 8, lift + 4), (fx + swing - 6, lift + 4)], BARK[2], outline=BARK[0])
     bend = -w * 18 + st * 24 + sway * 3 + wilt * 38
     sag = wilt * 46
     stem = bez((0, 20), (-6 + bend * .2, 54 - sag * .3), (6 + bend, 92 - sag), 8)
