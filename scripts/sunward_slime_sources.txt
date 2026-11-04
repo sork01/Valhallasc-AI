@@ -1,0 +1,8 @@
+{
+  "meadowhare": "eef89dbdde8bfb60",
+  "sunbacksnail": "cbf04647fe1bcdac",
+  "brushfox": "a9f4e0b994c6a159",
+  "spadebadger": "dab9c4728edb6924",
+  "honeyjaw": "2715096a2bd9a48a",
+  "wickerwarden": "5cc997243e029bb6"
+}

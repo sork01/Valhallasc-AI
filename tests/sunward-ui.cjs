@@ -28,14 +28,14 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   const data=await page.evaluate(()=>{
     const zones=Field._debug.zones,z=zones[20],src=Field.sunwardSprites;
     return {count:zones.length,name:z.name,theme:z.theme,levels:z.levels,quests:z.quests.length,npcs:z.npcs.length,
-      spawns:z.slimes.length,kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),
+      spawns:z.slimes.length,kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>{const f=Field.frameOf(src,k);return [src.img[k].naturalWidth,src.img[k].naturalHeight,f.w*8,f.h*5];}),
       art:['oak_tree','birch_tree','apple_tree','willow_tree','vale_cottage','watermill','stone_bridge','elder_hollow_gate'].every(k=>!!City.art[k]),
       layout:WorldMap._layout.length,legend:src.meta.kinds.slice(0,6).every(k=>WorldMap._kinds[k]?.[1]>=65),
       seal:z.futureInstance,gate:zones[19].portals.find(p=>p.id==='stormglass_sun_gate'),
       travel:z.npcs.find(n=>n.id==='travel_millbridge'),miller:z.npcs.find(n=>n.id==='sun_miller'),keeper:z.npcs.find(n=>n.id==='sun_keeper'),trees:z.objects.filter(o=>['oak_tree','birch_tree','apple_tree','willow_tree'].includes(o.kind)).length};
   });
   check(data.count===27&&data.name==='Sunward Vale'&&data.theme==='sunward'&&data.levels.join(',')==='65,70','Zone 20 and levels load');
-  check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Six enemy and three NPC PixelFlow atlases load');
+  check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h,ew,eh])=>w===ew&&h===eh)),'Six enemy and three NPC PixelFlow atlases load');
   check(data.art&&data.layout===29&&data.legend&&data.trees>=170,'Real trees, mill, bridges and world map catalog load');
   check(data.npcs===8&&data.quests===9&&data.spawns===42,'Camp, quest hub and encounters load');
   check(data.seal?.status==='sealed'&&data.seal?.name==='The Elder Hollow'&&data.gate?.to===20,'Instance entrance is sealed and Sunward Cut exists');

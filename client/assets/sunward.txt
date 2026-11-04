@@ -54,22 +54,85 @@
     "sun_miller": "a9eaaeffe06b9e8e",
     "sun_keeper": "c736f2b0a95ac55f",
     "sun_travel": "5bd8d82dbea287e8",
-    "meadowhare": "dbaa2e299850e019",
-    "sunbacksnail": "333d6ab51b41c61e",
-    "brushfox": "94be11d580ca9223",
-    "spadebadger": "e165e19e3142c918",
-    "honeyjaw": "bcd12bdbd289df90",
-    "wickerwarden": "9f1bab7635da1258"
+    "meadowhare": "eef89dbdde8bfb60",
+    "sunbacksnail": "cbf04647fe1bcdac",
+    "brushfox": "a9f4e0b994c6a159",
+    "spadebadger": "dab9c4728edb6924",
+    "honeyjaw": "2715096a2bd9a48a",
+    "wickerwarden": "5cc997243e029bb6"
   },
   "tops": {
-    "meadowhare": 80,
-    "sunbacksnail": 51,
-    "brushfox": 57,
-    "spadebadger": 50,
+    "meadowhare": 70,
+    "sunbacksnail": 47,
+    "brushfox": 53,
+    "spadebadger": 40,
     "honeyjaw": 80,
-    "wickerwarden": 83,
+    "wickerwarden": 91,
     "sun_miller": 83,
     "sun_keeper": 83,
     "sun_travel": 83
+  },
+  "artStyle": "greenmeadow-slime",
+  "kindFrames": {
+    "meadowhare": {
+      "frame": [
+        122,
+        78
+      ],
+      "anchor": [
+        56,
+        72
+      ]
+    },
+    "sunbacksnail": {
+      "frame": [
+        112,
+        65
+      ],
+      "anchor": [
+        39,
+        59
+      ]
+    },
+    "brushfox": {
+      "frame": [
+        124,
+        92
+      ],
+      "anchor": [
+        56,
+        86
+      ]
+    },
+    "spadebadger": {
+      "frame": [
+        122,
+        73
+      ],
+      "anchor": [
+        36,
+        67
+      ]
+    },
+    "honeyjaw": {
+      "frame": [
+        167,
+        113
+      ],
+      "anchor": [
+        89,
+        107
+      ]
+    },
+    "wickerwarden": {
+      "frame": [
+        130,
+        135
+      ],
+      "anchor": [
+        41,
+        129
+      ]
+    }
   }
 }
