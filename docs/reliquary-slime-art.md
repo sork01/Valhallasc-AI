@@ -1,6 +1,6 @@
-# Coral Reliquary enemy artwork (candidate)
+# Coral Reliquary enemy artwork (Beta 1.39.18)
 
-**Candidate Beta 1.39.18, not deployed.** Built in `/media/raid/valhallasc-data/reliquary-slime-work` on `feat/reliquary-slime-art` (base `2c8f7fc`); the owner reviews and approves the FileDrop pictures before anything is merged into the live tree. Client-only: no server, map, stats, timings, rewards, zone, DB or music change; no rebuild or restart.
+**Deployed 2026-11-04 as Beta 1.39.18** (owner approved FileDrop pictures: "deploy and /finish"; source `2a782fd` from `/media/raid/valhallasc-data/reliquary-slime-work` on `feat/reliquary-slime-art`, base `2c8f7fc`). Client-only: no server, map, stats, timings, rewards, zone, DB or music change; no rebuild or restart.
 
 Six new editable PixelFlow sprites for Zone 11 (The Drowned Cathedral — Coral Reliquary) use the shared slime style: glossy multi-stop shading, large eyes with `#fffbea` eye whites and highlights, warm blush and chunky readable silhouettes. Each kind has its own wider/taller frame in `client/assets/cathedral.txt` (`kindFrames`) so raised claws, scepters, hammer-claws, tidal waves and pearl beams never clip, plus 8 distinct attack frames (wind-up, strike, recovery) and 8 distinct material-appropriate death frames.
 
