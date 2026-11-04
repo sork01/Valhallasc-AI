@@ -1,11 +1,11 @@
 {
   "frame": [
-    72,
-    64
+    96,
+    70
   ],
   "anchor": [
-    36,
-    60
+    40,
+    64
   ],
   "kinds": [
     "beetle"
@@ -43,6 +43,10 @@
     }
   },
   "sprites": {
-    "valhallasc_ironhide_slime_style_all": "399849edffa3ab6f"
-  }
+    "beetle": "d80cccfe6dfc9e32"
+  },
+  "tops": {
+    "beetle": 44
+  },
+  "artStyle": "greenmeadow-slime-rigid-shell"
 }
