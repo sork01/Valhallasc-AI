@@ -22,7 +22,7 @@ until the owner approves.
   death turns every part from points).
 - **Frame sizes:** the zone-wide manifest frame stays 96x96 (48,90) as fallback; each kind carries a `kindFrames` entry. The
   creatures keep the same art pixel scale; the click hitbox comes from the idle art, the shadow widens with frame width
-  (toad 1.17x, croc/knight 1.25x, hydra 1.33x). Server collision is untouched.
+  (toad and Gloomroot 1.17x, croc and knight 1.25x, hydra 1.33x). Server collision is untouched.
 - **Open for the owner's eye:** the toad death (belly-up, legs in the air) is the one pose that rotates; the knight's wind-up
   sword is drawn behind the head.
 
