@@ -7,6 +7,7 @@
       "The Emberfall Crags' five enemies are redrawn from scratch in the shared slime style: the Fire Wisp, Lava Spider, Ash Wraith, Cinder Golem and Cinderlord keep their colours and silhouettes, with glossier shading, large eyes and chunkier shapes.",
       "Soft creatures move softly and hard ones stay hard: the wisp flickers, the wraith drifts, while the spider's shell, the golem's stone and the Cinderlord's armour keep their shape and move on joints.",
       "Deaths fit each enemy: the wisp gutters out into an ember, the spider's legs fold and its shell cracks, the wraith dissolves into ash, the golem kneels and its head rolls off, and the Cinderlord buckles and topples with its hammer on the floor.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the spider rears up and bites with small pale fangs, the golem raises both fists and slams them down, the Cinderlord swings its hammer overhead, the wraith sweeps its scythe and the wisp darts forward spitting fire.",
       "The spider, golem and Cinderlord now stand exactly on the ground instead of floating slightly above it."
     ],
     "removed": [

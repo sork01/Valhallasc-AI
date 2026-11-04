@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Emberfall Crags art, second pass (v2): Greenmeadow slime style, redrawn from scratch.
 
-preview | build | export | verify.  Soft fire and ghosts deform; the spider shell, the basalt golem and the
+preview | build | refresh | export | verify.  Soft fire and ghosts deform; the spider shell, the basalt golem and the
 Cinderlord's armour stay rigid (jointed, buckling, toppling).  Every planted foot rests exactly on the anchor
 row (Painter y=0, row 90) so nothing floats; the wisp and wraith hover by nature.  The v1 sources (Beta
 1.39.2) stay registered in crags_slime_v1_sources.txt.  Export preserves saved editor edits.
@@ -43,6 +43,26 @@ NAMES = dict(wisp='Fire Wisp', spider='Lava Spider', wraith='Ash Wraith',
              golem='Cinder Golem', cinderlord='Cinderlord')
 
 
+ATTACK = [-1.5, -3, -4, .5, 4, 3.5, 1.5, 0]     # wind-up (negative), snap, impact, follow-through, recover
+
+
+def atk(clip, n):
+    """(windup, strike) in 0..1 for the attack clip; both zero for every other clip."""
+    if clip != 'attack':
+        return 0., 0.
+    v = ATTACK[n]
+    return max(0., -v)/4, max(0., v)/4
+
+
+ARC = [-.35, -.7, -1, .25, 1, .95, .5, .15]      # swung props: back over the shoulder (-1) to smashed down (+1)
+
+
+def arc(clip, n):
+    if clip != 'attack':
+        return 0., 0.
+    return max(0., -ARC[n]), max(0., ARC[n])
+
+
 def foot(a, x, lift, rx, ry, ramp):
     """A planted foot: integer ry and centre y = ry, so its lowest pixel is row 90 when lift is 0."""
     a.ball(x, ry+lift, rx, ry, ramp)
@@ -63,22 +83,26 @@ def specks(a, n, count, base_x, spread, top, ramp):
 def wisp(clip, n):
     stride, bob, lunge, recoil, fall = motion(clip, n)
     t = sm(fall)
-    a = Painter(cx=46+recoil+lunge*.6)
-    hover = 34+bob*.9+(math.sin(n*math.pi/4)*2.5 if clip == 'walk' else 0)
+    wu, st = atk(clip, n)
+    a = Painter(cx=44+recoil+st*9-wu*3)               # crouches back, then darts forward
+    hover = 34+bob*.9+(math.sin(n*math.pi/4)*2.5 if clip == 'walk' else 0)-wu*4+st*2
     cy = mix(hover, 6, t)
     r = mix(17.5, 5, t)
     body = FIRE if t < .55 else ROCK
-    lean = -lunge*.7+recoil*.4
+    lean = -st*5+wu*2+recoil*.4                         # tongues stream back on the dash
     for k, (dx, ln, w) in enumerate(((-11, 20, 8), (0, 30, 10), (11, 17, 7))):
         if fall > .85:
             break
         sway = math.sin(n*1.3+k*2.1)*3.2+lean
-        ln *= (1-t)*(1.25 if clip == 'attack' and lunge > 1 else 1)
+        ln *= (1-t)*(1-.4*wu+.12*st)
         base = (dx*.8, cy+r*.35)
         tip = (dx*1.2+sway*1.4, cy+r*.85+ln)
         mid = (dx*1.5+sway*.4, cy+r*.9+ln*.45)
         taper(a, bez(base, mid, tip), body, w*(1-t*.6), 1)
-    a.ball(0, cy, r, r*.94, body)
+    a.ball(0, cy, r*(1-.12*wu+.14*st), r*.94*(1+.08*wu-.1*st), body)
+    if st > .5:                                        # fire spat ahead of the dash
+        for k in range(3):
+            a.ellipse(r*1.1+5+k*5, cy+2-k*3+(n % 2)*2, 3-k*.6, 2.4-k*.4, [9, 8, 7][k])
     if t < .8:
         a.ellipse(-r*.45, cy+r*.35, max(1, 4*(1-t)), max(1, 2.2*(1-t)), 9 if t < .55 else 14)
     if fall < .7:
@@ -103,9 +127,10 @@ def wisp(clip, n):
 def spider(clip, n):
     stride, bob, lunge, recoil, fall = motion(clip, n)
     t = sm(fall)
+    w, st = atk(clip, n)
     ph = n*math.pi/4
-    a = Painter(cx=45+recoil+(lunge*.5 if clip == 'attack' else 0))
-    by = mix(26+bob*.6, 16, t)                      # carapace centre; bottom reaches the floor when dead
+    a = Painter(cx=43+recoil+st*6-w*2)
+    by = mix(26+bob*.6+w*3-st*3, 16, t)                      # carapace centre; bottom reaches the floor when dead
     hips = (-22, -11, 0, 10)
     feet = (-26, -17, 17, 27)
     for far in (True, False):
@@ -116,9 +141,9 @@ def spider(clip, n):
             if clip == 'walk':
                 s = ph+(k % 2)*math.pi+(0 if far else math.pi)
                 lift, push = max(0, math.sin(s))*5, math.cos(s)*3
-            if clip == 'attack' and k >= 2 and not far:
-                lift = max(0, -lunge)*3.4
-                push = max(0, lunge)*2.2
+            if clip == 'attack' and k >= 2:               # front legs rear up, then slam down ahead
+                lift = w*11
+                push = -w*5+st*(5 if k == 3 else 3)
             hip = (hx, by-1)
             knee = (fx+(1 if fx > hx else -1)*7, by+13+lift*.6+bob*.3)
             ft = (fx+push, 3+lift)
@@ -136,13 +161,16 @@ def spider(clip, n):
             if t > .25:
                 a.line([(-4, by+15), (-1, by+8), (-6, by+2), (-3, by-6)], 1, 2)
                 a.line([(-14, by-12), (-9, by-6), (-13, by-1)], 1, 1)
-    a.ball(15, by+1, 13, 12, ROCK)                  # head
-    mouth = 3+max(0, lunge)*1.5 if clip == 'attack' else 0
-    for sg in (-1, 1):
-        a.poly([(24, by-3+sg*mouth*.4), (31+max(0, lunge)*.6, by-9+sg*mouth), (26, by-9+sg*mouth*.5)], GOLD[2])
-    a.face(17, by+5, clip, n, .75)
+    hx, hy = 15+st*5-w, by+1+w*6-st*3
+    a.ball(hx, hy, 13, 12, ROCK)                    # head
+    spread = 1+st*4+w*1.5                            # fangs hang from the jaw and part when it bites
+    for off, sg in ((6, -1), (13, 1)):
+        bx = hx+off
+        a.poly([(bx-2.2, hy-9), (bx+2.2, hy-9), (bx+sg*spread*.5, hy-15-st*3)], 24)
+        a.poly([(bx-1, hy-9), (bx+1, hy-9), (bx+sg*spread*.5, hy-14-st*3)], 3)
+    a.face(hx+2, hy+4, clip, n, .75)
     for x in (9, 15, 21):
-        a.ellipse(x, by+15-t*3, 1, 1, 8 if t < .6 else 13)
+        a.ellipse(x+hx-15, by+15-t*3+(hy-by-1), 1, 1, 8 if t < .6 else 13)
     if clip == 'die':
         specks(a, n, 3, 0, 36, 30, ROCK[2:])
     return a
@@ -156,8 +184,9 @@ def wraith(clip, n):
     stride, bob, lunge, recoil, fall = motion(clip, n)
     t = sm(fall)
     ph = n*math.pi/4
-    a = Painter(cx=38+recoil+lunge*.3)
-    cy = 31+bob*.9+(math.sin(ph)*1.8 if clip == 'walk' else 0)+t*10
+    w, st = arc(clip, n)
+    a = Painter(cx=36+recoil+st*2-w*1)                # leans back to raise the scythe, then sweeps forward
+    cy = 31+bob*.9+(math.sin(ph)*1.8 if clip == 'walk' else 0)+t*10-w*2+st*1
     for k, (dx, ln) in enumerate(((-17, 12), (-8, 19), (1, 24), (10, 17), (18, 11))):   # ragged hem tails
         sw = math.sin(ph*(1 if clip == 'walk' else .5)+k*1.4)*2.2
         taper(a, bez((dx*.8, cy-8), (dx+sw*.4, cy-ln*.55), (dx*1.08+sw, cy-ln-6)), GHOST, 9, 2)
@@ -166,10 +195,13 @@ def wraith(clip, n):
     a.ball(1, cy+20, 11, 9, [15, 16, 17])           # hood shadow
     a.face(2, cy+19, clip, n, .85)
     a.ball(-18, cy+2-(2 if clip == 'attack' and lunge > 1 else 0), 6, 9, GHOST)           # far sleeve
-    hand = (21+lunge*.7, cy-1)
-    ang = (.8 if lunge > 1 else .45) if clip == 'attack' else .22
+    hand = (21-w*4+st*1, cy-1+w*13-st*5)
+    ang = .22-w*.6+st*.85 if clip == 'attack' else .22
+    L = 34-st*7
     base = (hand[0]-math.sin(ang)*5, hand[1]-math.cos(ang)*5)
-    top = (hand[0]+math.sin(ang)*34, hand[1]+math.cos(ang)*34-6)
+    top = (hand[0]+math.sin(ang)*L, hand[1]+math.cos(ang)*L-6)
+    if st > .6:                                       # slash arc behind the blade
+        a.line([(hand[0]+math.sin(q)*(L+3), hand[1]+math.cos(q)*(L+3)-6) for q in (ang-1.0, ang-.7, ang-.35, ang)], 19, 2)
     a.line([base, top], 20, 4)
     a.line([base, top], 22, 2)
     blade = [(top[0]+3, top[1]+4), (top[0]-14, top[1]+9), (top[0]-24, top[1]+4), (top[0]-29, top[1]-6),
@@ -195,8 +227,9 @@ def golem(clip, n):
     stride, bob, lunge, recoil, fall = motion(clip, n)
     t = sm(fall)
     ph = n*math.pi/4
-    a = Painter(cx=46+recoil+(lunge*.5 if clip == 'attack' else 0)-(1.5 if clip == 'die' and n == 0 else 0))
-    ty = mix(34+bob*.5, 21, t)
+    w, st = atk(clip, n)
+    a = Painter(cx=46+recoil+st*2-(1.5 if clip == 'die' and n == 0 else 0))
+    ty = mix(34+bob*.5-st*4+w*1, 21, t)
     swing = math.cos(ph)*3 if clip == 'walk' else 0                          # opposing fist swing
     for sg in (-1, 1):
         sw = math.sin(ph+(0 if sg > 0 else math.pi)) if clip == 'walk' else 0
@@ -211,11 +244,18 @@ def golem(clip, n):
     a.ellipse(-1, ty-1, 2, 2, 9 if t < .7 else 13)
     for sg in (-1, 1):
         a.ball(sg*(21+t*(9 if sg < 0 else 6)), mix(ty+8, 9, t**1.2), 9, 9, ROCK)  # shoulder boulders drop
-    fist_up = max(0, -lunge)*6-max(0, lunge)*2
-    a.ball(-27-t*7, mix(23+swing, 11, t), 9, 11, ROCK)
-    a.ball(27+t*6, mix(23+fist_up-swing, 11, t), 9, 11, ROCK)
-    a.line([(26+t*6, mix(26+fist_up-swing, 11, t)), (30+t*6, mix(20+fist_up-swing, 11, t))], 7 if t < .7 else 11, 2)
-    hx, hy = t*14, mix(57+bob*.5, 13, t**1.4)
+    # Both fists rise overhead, then hammer down in front of it.
+    lx, rx_ = -27+w*9+st*6-t*7, 27-w*9+st*6+t*6
+    ly = mix(23+swing+w*23-st*11, 11, t)
+    ry_ = mix(23-swing+w*23-st*11, 11, t)
+    a.ball(lx, ly, 9, 11, ROCK)
+    a.ball(rx_, ry_, 9, 11, ROCK)
+    a.line([(rx_-1, ry_+3), (rx_+3, ry_-3)], 7 if t < .7 else 11, 2)
+    if st > .7:                                                                   # ground shock
+        for sg in (-1, 1):
+            a.ellipse(sg*30+st*sg*4, 2, 4, 2, ROCK[3])
+            a.ellipse(sg*40+st*sg*3, 5, 2, 2, ROCK[2])
+    hx, hy = t*14, mix(57+bob*.5+w*3-st*7, 13, t**1.4)
     a.ball(hx, hy, 17, 13 if t < .7 else 12, ROCK)
     a.ellipse(hx-7, hy+7, 4, 2, 14)
     a.line([(hx-14, hy+9), (hx-5, hy+11)], 11, 2)                                # heavy brow
@@ -239,8 +279,9 @@ def cinderlord(clip, n):
     R = Rig(fall, pivot=(-12, 0), sign=1, angle=.55, lift=3, buckle=.42, start=.3)
     P = R.P
     ph = n*math.pi/4
-    a = Painter(cx=46+recoil+(lunge*.4 if clip == 'attack' else 0))
-    ty = 34+bob*.5
+    w, st = arc(clip, n)
+    a = Painter(cx=46-6*max(w, st)+recoil+st*1-w*1)
+    ty = 34+bob*.5-st*3
     swing = math.cos(ph)*3 if clip == 'walk' else 0                          # opposing fist swing
     a.poly(R.pts([(-13, ty+16), (12, ty+16), (22, 6), (-25, 6)]), FIRE[0])       # ember cape
     a.poly(R.pts([(-10, ty+14), (9, ty+14), (16, 10), (-17, 10)]), FIRE[1])
@@ -260,14 +301,19 @@ def cinderlord(clip, n):
         a.ball(px, py, 9, 9, ROCK)
         a.poly([(px-sg*4, py+3), (px+sg*5, py+12), (px+sg*8, py+2)], GOLD[1])      # pauldron spike
     a.ball(*P(-27, 23+swing), 8.5, 10.5, ROCK)
-    hand = P(27+max(0, lunge)*1.5, 23+max(0, -lunge)*6-swing)
+    hand = P(27-w*9-st*6, 23-swing+w*25+st*12)
     a.ball(hand[0], hand[1], 8.5, 10.5, ROCK)
     if fall:                                      # warhammer: one rigid prop; it falls forward to lie on the floor
         tx, tyh = mix(33, 34, t), mix(61, 6, t**.7)
         hb = (mix(hand[0], 20, t), mix(hand[1], 3, t))
-    else:
-        tx, tyh = (33, 61) if lunge < 1 else (32, 33)
+    else:                                         # hammer: cocked back over the shoulder, then smashed down ahead
+        ha = .16-w*1.5+st**3*2.55
+        Lh = 38-st*13
+        tx, tyh = hand[0]+math.sin(ha)*Lh, hand[1]+math.cos(ha)*Lh
         hb = hand
+        if st > .7:
+            for k in range(3):                    # embers burst from the impact
+                a.ellipse(min(tx+3+k*4, 40), 4+k*4+(n % 2)*2, 2.4-k*.5, 2.4-k*.5, [9, 8, 7][k])
     a.line([hb, (tx, tyh)], 20, 4)
     a.line([hb, (tx, tyh)], 22, 2)
     a.ball(tx, tyh, 9, 6, ROCK)
@@ -335,6 +381,23 @@ def build():
                 old.api('draw', dict(sprite_id=sid, frame=offset+n, ops=[dict(op='grid', rows=grid.tolist(), x=0, y=0, layer=0)]))
             offset += len(grids)
         print(kind, sid, offset, 'frames saved', flush=True)
+
+
+def refresh():
+    """Rewrite the frames of the named kinds' EXISTING v2 sources from the drawers (same IDs). Overwrites editor
+    edits of those kinds: only for a candidate nobody has hand-edited."""
+    names = [k for k in sys.argv[2:] if k in KINDS]
+    assert names, 'name the kinds to refresh'
+    saved = registry()
+    for kind in names:
+        data = frames(kind)
+        np.savez_compressed(ROOT/f'scripts/crags_slime_{kind}_raw.npz', **data)
+        offset = 0
+        for clip, grids in data.items():
+            for n, grid in enumerate(grids):
+                old.api('draw', dict(sprite_id=saved[kind], frame=offset+n, ops=[dict(op='grid', rows=grid.tolist(), x=0, y=0, layer=0)]))
+            offset += len(grids)
+        print('Refreshed', kind, saved[kind], offset, 'frames', flush=True)
 
 
 def cel_grid(cel):
@@ -417,4 +480,4 @@ def preview():
 
 
 if __name__ == '__main__':
-    {'preview': preview, 'build': build, 'export': export, 'verify': verify}[sys.argv[1] if len(sys.argv) > 1 else 'preview']()
+    {'preview': preview, 'build': build, 'refresh': refresh, 'export': export, 'verify': verify}[sys.argv[1] if len(sys.argv) > 1 else 'preview']()

@@ -78,6 +78,7 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
         check(spec.fps === fps && spec.n === n && new Set(d.rows.filter(r => r.clip === clip).map(r => r.hash)).size >= Math.min(4, n), `${kind}: ${clip} preserves timing and animates distinctly`);
       }
       const die = d.rows.filter(r => r.clip === 'die');
+      check(new Set(d.rows.filter(r => r.clip === 'attack').map(r => r.hash)).size === 8, `${kind}: all eight attack frames are distinct (wind-up, strike, recovery)`);
       check(new Set(die.map(r => r.hash)).size === 8, `${kind}: all eight death frames are distinct`);
       if (['spider', 'golem', 'cinderlord'].includes(kind)) {   // QUADRUPED-GROUNDING: planted feet rest exactly on the anchor row
         const living = d.rows.filter(r => r.clip !== 'die');

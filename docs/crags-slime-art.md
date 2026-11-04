@@ -141,7 +141,7 @@ the later zones; the v1 sources and raw arrays are kept as
 
 - Five new native PixelFlow sources (prefix `valhallasc_crags_slime_style_b_`, IDs
   in `crags_slime_sources.txt`); `build` refuses `--replace` and registered kinds,
-  `export` preserves saved editor frames and derives the health-bar tops
+  `refresh <kinds>` rewrites the candidate's own sources (overwrites editor edits), `export` preserves saved editor frames and derives the health-bar tops
   (81/43/68/71/85).
 - **Grounding rule (`QUADRUPED-GROUNDING`):** every living frame of the spider,
   golem and Cinderlord has its lowest pixel exactly on row 90 (planted feet are
@@ -153,13 +153,14 @@ the later zones; the v1 sources and raw arrays are kept as
   wraith dissolves from the hood down (`erase_rising`) into settling ash; golem
   kneels, head rolls off, core goes dark; Cinderlord buckles and topples on a
   `Rig` with the hammer lying on the floor.
+- Attacks (owner request 2026-11-04): every kind has eight distinct frames with a real wind-up, strike and recovery: wisp crouches then darts forward spitting fire, spider rears its front legs then slams down and bites, wraith raises the scythe over its shoulder then sweeps it in an arc, golem raises both fists then hammers them down with a ground shock, Cinderlord cocks the warhammer behind it then smashes it down with an ember burst. Swung props follow the `ARC` curve, the others `ATTACK` (`atk()`/`arc()`); extents are held inside the 96 px frame. The spider's old gold fang triangles (two overlapping squiggles) are replaced by small pale fangs that part on the bite.
 - Walk cycles of the golem and Cinderlord swing the fists opposite each other
   (`cos` phase) so no two walk frames are identical.
 
 ### Checks
 
-`tests/crags-slime-art.cjs` (71 bounded real-art checks) now also asserts eight
-distinct death frames per kind and the row-90 grounding of the three rigid kinds.
+`tests/crags-slime-art.cjs` (76 bounded real-art checks) now also asserts eight
+distinct death and attack frames per kind and the row-90 grounding of the three rigid kinds.
 Mutation control: `MUTATE_SPIDER_PNG=<png>` serves a spider atlas with the idle
 frame moved up 1 px and the grounding check fails (`lowest rows 89,90`). 170
 saved-editor/export frames match (`crags_slime_redraw.py verify`).
