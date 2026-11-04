@@ -131,17 +131,20 @@ Next unfinished zone: **Rán's Deep**. Greenmeadow remains a separate private
 candidate. The owner approved Bifrost's pictures and deployment; public release
 verification is recorded above.
 
-## Redo v2 candidate (2026-11-04, `feat/bifrost-slime-redo`)
+## Redo v2 release (2026-11-04, **Beta 1.39.17**, `feat/bifrost-slime-redo`)
 
 Prepared in `/media/raid/valhallasc-data/bifrost-slime-redo-work` for the four
-reopened `BIFROST-SLIME-*` tasks. Not deployed to live until the owner approves
-the FileDrop pictures.
+reopened `BIFROST-SLIME-*` tasks and deployed as **Beta 1.39.17** after the
+owner approved the flying Skyray with its aerial whip tail and requested
+"deploy and /finish".
 
 Every Bifrost Reach kind now uses its own measured `kindFrames` entry in
-`client/assets/sky.txt` (via `kindframe.set_kind_frame`), rests its lowest pixel
-exactly on its declared anchor row (`kay`) in every living and death frame, has
-eight distinct attack frames (wind-up, strike with weapon/arc/bolt reach, and
-recovery to the idle silhouette), and satisfies `QUADRUPED-GROUNDING`:
+`client/assets/sky.txt` (via `kindframe.set_kind_frame`), has eight distinct
+attack frames (wind-up, strike with weapon/arc/bolt reach, and recovery to the
+idle silhouette), and satisfies `QUADRUPED-GROUNDING` (all four grounded kinds
+rest their lowest pixel on `kay` in every living and death frame; the flying
+Skyray hovers well above `kay` with its tapered whip tail in mid-air and falls
+onto `kay` on death):
 
 | Kind | Frame & anchor (`w×h`, `ax,ay`) | Top | New v2 PixelFlow ID | Preserved v1 ID |
 | --- | --- | --- | --- | --- |
