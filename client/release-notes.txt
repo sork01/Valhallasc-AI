@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.39.27",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The six Sunward Vale enemies are redrawn to look unique and mean, each with its own face and shape: the Meadow Hare is a hunched grey hare with one bloodshot eye and bared chisel teeth, the Sunback Snail carries a thorned golden shell and has hooked-pupil eyestalks over a toothed mouth, the Brush Fox is a russet-orange stalker with a narrow amber slit eye and bared fangs, and the Spade Badger wears a striped black mask and digs with four huge claws on each paw.",
+      "Honeyjaw is now a hulking hive-bear with a honeycomb hive grown over its back and a jaw trailing honey, and the Wicker Warden is a woven-cane giant with burning slots for eyes, a ragged hat and a rusted scythe.",
+      "Attacks are easier to read: the hare coils and lunges, the snail rears up and drives forward, the fox pounces, the badger rakes its claws down, Honeyjaw rears up and hammers both paws down, and the Warden draws its scythe back and swings it in a long arc.",
+      "Deaths match each creature: the hare flops over, the snail pulls into its shell and the shell tips and cracks, the fox rolls onto its back, the badger collapses forward, Honeyjaw falls over as its hive splits and spills honey, and the Warden unravels into a heap of cane and straw."
+    ],
+    "removed": [
+      "Replaced the previous Sunward Vale enemy artwork; it remains backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.26",
     "date": "2026-11-04",
     "new": [],
