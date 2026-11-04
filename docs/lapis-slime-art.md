@@ -1,6 +1,6 @@
-# The Lapis Erg enemy artwork (candidate, not deployed)
+# The Lapis Erg enemy artwork (deployed as Beta 1.39.30)
 
-**Status:** built 2026-11-04 as a client-only candidate on `feat/lapis-slime-art` in `/media/raid/valhallasc-data/lapis-slime-work`. Not merged, no version bump, nothing live. The Lapis Erg is zone 25 in the docs and index 24 in `world/map.txt`; look it up by name in tests.
+**Status:** deployed 2026-11-04 as Beta 1.39.30 (fast-forward merge `d9f588e`, client-only, server PID 1654327 and binary unchanged; receipt `test-results/lapis-release-20261104.json`). Built on `feat/lapis-slime-art` in `/media/raid/valhallasc-data/lapis-slime-work`. The Lapis Erg is zone 25 in the docs and index 24 in `world/map.txt`; look it up by name in tests.
 
 **Owner direction (2026-11-04):** every enemy unique and mean, no shared round-eye-plus-blush face. This overrides the older "big eyes with highlight, blush" wording in `LAPIS-SLIME-ART`. Each kind has its own face routine: narrow glaring beads under a dark brow slab with two bared chisel incisors (sandhopper); ears laid back over amber slits in a dark mask, lip drawn up off long fangs (dunefennec); a ridge of six unequal amber eyes over hooked chelicerae (glassscorpion); a raw red slit eye under a hard brow ridge and a deep-hooked beak on a wrinkled bare head (sunvulture); a carved stone mask with two hollow cyan pits and a cracked mouth dragged down at both corners (dunecolossus); a hard magenta slit under a cruel brow ridge over a long hooked beak (mirageroc). No blush anywhere. No face routine is shared with another zone.
 
