@@ -7,7 +7,7 @@
       "The Ironhide Beetle in Greenmeadow is redrawn in the shared slime style with a solid steel shell: it no longer squashes and stretches, and it walks on six jointed legs.",
       "The beetle's attack is easier to read: it rears up on its hind legs, slams its horn forward, then settles back.",
       "When it is defeated, the shell cracks, the legs buckle and the beetle rolls onto its back with its legs in the air.",
-      "The beetle now stands exactly on the ground, and its health bar sits right above its back."
+      "The beetle now stands exactly on the ground instead of floating slightly above it, and its health bar follows its new height."
     ],
     "removed": [
       "Replaced the Ironhide Beetle's previous artwork; the earlier version remains backed up for rollback."
