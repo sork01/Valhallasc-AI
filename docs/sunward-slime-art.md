@@ -1,6 +1,6 @@
-# The Sunward Vale enemy artwork (candidate, owner approval pending)
+# The Sunward Vale enemy artwork (deployed, Beta 1.39.27)
 
-**Status:** private candidate on `feat/sunward-slime-art` in `/media/raid/valhallasc-data/sunward-slime-work`. Not deployed, no version bump until the owner has seen the FileDrop pictures and approved. Client-only. Sunward Vale is zone 20 in the docs and index 19 in `world/map.txt`; look it up by name in tests.
+**Status:** deployed 2026-11-04 as Beta 1.39.27 (merge `7a7ad39`, client-only, owner said "deploy"). Built on `feat/sunward-slime-art` in `/media/raid/valhallasc-data/sunward-slime-work`. Sunward Vale is zone 20 in the docs and index 19 in `world/map.txt`; look it up by name in tests.
 
 **Owner direction (2026-11-04):** every enemy unique and mean, no shared round-eye-plus-blush face. Each kind has its own face routine: one bloodshot mad eye under a heavy brow over bared chisel teeth (meadowhare), two hooked-pupil eyestalks over a toothed rasp mouth (sunbacksnail), a narrow amber vertical slit under a dark brow over a bared muzzle (brushfox), a tiny hard eye under a white brow stripe in a black mask over a tusked snarl (spadebadger), a dark socket with one ember pinpoint under a scarred brow over a comb-toothed jaw trailing honey (honeyjaw), and two hollow angled ember slots plus a zigzag mouth slot in a woven face under a ragged hat (wickerwarden). No blush anywhere. Drips are strands attached to the jaw or claws, never loose glyphs. Defaults chosen without asking (veto welcome): all six stand on the ground, nothing hovers; Honeyjaw and Wicker Warden are the two elites (as in `items::is_elite`) and are clearly the biggest.
 
