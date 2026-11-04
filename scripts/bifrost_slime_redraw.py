@@ -485,7 +485,7 @@ def prismgolem(clip, n):
 # ----------------------------------------------------------------------------------------------
 RAY_A = dict(
     lean=[-2, -6, -10, 4, 11, 7, 2, 0],
-    by=[32, 35, 38, 30, 26, 28, 30, 32],
+    by=[32, 35, 38, 30, 28, 29, 31, 32],
     flap=[4, 12, 18, -4, -10, -6, -2, 0],
     orb=[0, 3, 6, 2, 0, 0, 0, 0],
     reach=[0, 0, 0, 12, 26, 20, 6, 0],
@@ -523,6 +523,13 @@ def skyray(clip, n):
         a.poly([(lean+sg*7, by+8), (lean+sg*21, by+10), (tipx-sg*4, max(2, tipy-1)),
                 (lean+sg*20, max(3, by-5)), (lean+sg*7, max(3, by-6))], 56 if far else 57)
         a.line([(lean+sg*10, by+5), (lean+sg*20, by+2), (tipx-sg*5, max(2, tipy-2))], 58, 1)
+
+    # Aerial whipping tail trailing behind in flight (staying high above the ground, settling with the body on death)
+    sway = (math.sin(n*math.pi/4)*4 if clip == 'walk' else bob*1.5)*(1-curl)
+    t_root = (lean-9, max(4, by-6))
+    t_mid = (lean-23-curl*2, max(3, by-16+sway*.4+curl*9))
+    t_tip = (lean-38+sway*.5-curl*3, max(2, by-12-sway*1.1+curl*6))
+    taper(a, bez(t_root, t_mid, t_tip), BLUE, 5, 1)
 
     a.poly([(lean-12, by+7), (lean, by+17), (lean+15, by+8), (lean+12, max(2, by-9)),
             (lean, max(1, by-12)), (lean-12, max(2, by-8))], 55)
