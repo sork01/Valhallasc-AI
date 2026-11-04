@@ -27,7 +27,7 @@ OUT = ROOT/'test-results/rime-slime'
 REGISTRY = ROOT/'scripts/rime_slime_sources.txt'
 PREFIX = 'valhallasc_rime_slime_style_b_'
 KINDS = ['crab', 'wolf', 'yeti', 'wyrm']
-NAMES = dict(crab='Rime Crab', wolf='Frost Wolf', yeti='Yeti', wyrm='Rime Wyrm')
+NAMES = dict(crab='Rime Crab', wolf='Frostfang Wolf', yeti='Glacier Yeti', wyrm='Rime Wyrm')
 W = H = 96                       # zone-wide frame
 AX, AY = 48, 90
 # kind -> (w, h, ax, ay); a kind equal to the zone-wide frame gets no kindFrames entry.  The anchor's y is the ground
@@ -85,8 +85,8 @@ class Painter:
     def line(self, pts, col, width=1):
         self.d.line([self.pos(*p) for p in pts], fill=col, width=width)
 
-    def poly(self, pts, col):
-        self.d.polygon([self.pos(*p) for p in pts], fill=col)
+    def poly(self, pts, col, outline=None):
+        self.d.polygon([self.pos(*p) for p in pts], fill=col, outline=outline)
 
     def ball(self, x, y, rx, ry, ramp, ang=0.0):
         """A shaded ellipsoid; `ang` turns the ellipse counter-clockwise on screen, the light stays upper-left."""
@@ -348,9 +348,10 @@ def wolf(clip, n):
     a.ball(hx+9, hy-7-jaw, 10, 4, LIGHT_FUR)
     if jaw > .5:
         a.ball(hx+10, hy-5, 7, 3+jaw*.6, MOUTH)
-        for sx in (hx+6, hx+13):                      # fangs hang from the upper jaw
-            a.poly([(sx-1.4, hy-4), (sx+1.4, hy-4), (sx, hy-7-jaw*.3)], 2)
     a.ball(hx+8, hy-3, 10, 5, FUR)
+    if jaw > .5:
+        for sx in (hx+5, hx+12):                      # fangs hang from the muzzle's lower edge, drawn over it
+            a.poly([(sx-1.8, hy-7), (sx+1.8, hy-7), (sx, hy-9.5-jaw*.35)], 2, 1)
     a.ellipse(hx+16, hy-2, 3, 2, 1)
     a.eye(hx-3, hy+2, clip, n, 1)
     a.eye(hx+7, hy+2, clip, n, .8)
@@ -483,10 +484,11 @@ def wyrm(clip, n):
     a.ball(hx+8, hy-8-jaw, 10, 4, FACE)
     if jaw > 1:
         a.ball(hx+9, hy-5, 8, jaw+1, MOUTH)
-        for sx in (hx+6, hx+13):
-            a.poly([(sx-1.5, hy-5), (sx+1.5, hy-5), (sx, hy-9-jaw*.25)], 2)
     a.ball(hx, hy, 15, 12, SHELL)
     a.ball(hx+9, hy-3, 11, 6, SHELL)
+    if jaw > 1:
+        for sx in (hx+5, hx+13):                      # fangs hang from the snout's lower edge, drawn over it
+            a.poly([(sx-2, hy-8), (sx+2, hy-8), (sx, hy-11-jaw*.3)], 2, 1)
     a.ellipse(hx+17, hy-2, 2, 1, 1)
     a.face(hx+1, hy+2, clip, n, .8)
     if clip == 'attack' and n in (3, 4, 5):

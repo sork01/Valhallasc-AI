@@ -48,16 +48,16 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
         const rows = [];
         for (const [clip, spec] of Object.entries(meta.clips)) for (let n = 0; n < spec.n; n++) {
           const pixels = g.getImageData(n*kw, spec.row*kh, kw, kh).data;
-          let opaque = 0, edge = 0, white = 0, hash = 7, low = -1, top = kh, left = kw, right = -1;
+          let opaque = 0, edge = 0, white = 0, hash = 7, low = -1, top = kh, left = kw, right = -1, upRight = -1;
           for (let y = 0; y < kh; y++) for (let x = 0; x < kw; x++) {
             const i = (y*kw+x)*4;
             hash = (Math.imul(hash, 31)+pixels[i]+pixels[i+1]*3+pixels[i+2]*7+pixels[i+3]) >>> 0;
             if (!pixels[i+3]) continue;
-            opaque++; if (y > low) low = y; if (y < top) top = y; if (x < left) left = x; if (x > right) right = x;
+            opaque++; if (y > low) low = y; if (y < 40 && x > upRight) upRight = x; if (y < top) top = y; if (x < left) left = x; if (x > right) right = x;
             if (x === 0 || x === kw-1 || y === 0 || y === kh-1) edge++;
             if (pixels[i] === 237 && pixels[i+1] === 246 && pixels[i+2] === 247) white++;   // colour-exact eye white #edf6f7
           }
-          rows.push({ clip, n, opaque, edge, white, hash, low, top, left, right });
+          rows.push({ clip, n, opaque, edge, white, hash, low, top, left, right, upRight });
         }
         const portrait = document.createElement('canvas'); portrait.width = portrait.height = 128;
         const ready = Field.drawTargetPortrait({ kind }, portrait);
@@ -99,6 +99,10 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
       const reach = att[m.strike[1]].right-idleRight, sdrop = att[m.strike[1]].top-idleTop;
       check(m.strike[0] === 'reaches' ? reach >= m.strike[2] : sdrop >= m.strike[2], `${kind}: strike frame ${m.strike[1]} ${m.strike[0]} ≥${m.strike[2]} px (${m.strike[0] === 'reaches' ? reach : sdrop})`);
       const last = att[7];
+      if (kind === 'wyrm') {   // the real wind-up: the head and neck (rows above the top coil) pull back to the left
+        const idleUp = Math.min(...idle.map(r => r.upRight)), pull = idleUp-att[2].upRight;
+        check(pull >= 10, `wyrm: wind-up frame 2 pulls the head back ≥10 px against idle (${pull})`);
+      }
       check(Math.abs(last.top-idle0.top) <= 3 && Math.abs(last.left-idle0.left) <= 3 && Math.abs(last.right-idle0.right) <= 3, `${kind}: attack recovery returns to the idle silhouette (frame 7 within 3 px of idle 0)`);
       check(new Set(die.map(r => r.hash)).size === 8, `${kind}: all eight death frames are distinct`);
       const living = d.rows.filter(r => r.clip !== 'die');

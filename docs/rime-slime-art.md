@@ -57,7 +57,7 @@ release use `make_rime_sprites.py verify`.
 
 ## Checks
 
-`tests/rime-slime-art.cjs` (88 checks, bounded: `bash scripts/test-touch-bounded.sh tests/rime-slime-art.cjs`, with
+`tests/rime-slime-art.cjs` (89 checks, bounded: `bash scripts/test-touch-bounded.sh tests/rime-slime-art.cjs`, with
 `VALHALLA_BINARY` = main's release binary and `NODE_PATH` including main's `node_modules`, run from the worktree):
 declared frame via the production `Field.frameOf`, 34 frames clear of every border at each kind's own size, eight distinct
 attack and death frames, wind-up / strike / recovery measured against the idle silhouette, grounding on the anchor row for

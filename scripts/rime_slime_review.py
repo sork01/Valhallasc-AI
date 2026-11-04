@@ -19,7 +19,7 @@ ORIGINAL = Path('/media/raid/valhallasc-data/rime-slime-original-20261103')
 LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
 OUT = ROOT/'test-results/rime-slime'
 KINDS = ['crab', 'wolf', 'yeti', 'wyrm']
-NAMES = dict(crab='Rime Crab', wolf='Frost Wolf', yeti='Yeti', wyrm='Rime Wyrm')
+NAMES = dict(crab='Rime Crab', wolf='Frostfang Wolf', yeti='Glacier Yeti', wyrm='Rime Wyrm')
 FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 font = ImageFont.truetype(FONT, 20)
 small = ImageFont.truetype(FONT, 15)
