@@ -1,5 +1,20 @@
 [
   {
+    "version": "Beta 1.39.14",
+    "date": "2026-11-04",
+    "new": [],
+    "changed": [
+      "The five Gloamfen enemies are redrawn from scratch in the shared slime style: the Fen Toad, Mire Crocodile, Drowned Knight, Mire Hydra and Gloomroot Colossus keep their colours, with glossier shading, large eyes and chunkier shapes.",
+      "Each enemy's attack is easier to read, with a clear wind-up, strike and recovery: the toad crouches, puffs its throat and lashes out its tongue, the crocodile rears back with open jaws, lunges and snaps shut, the knight raises its sword and cuts down in an arc, the hydra's middle head rears up and bites while the others draw back, and the Colossus lifts both fists overhead and hammers them into the ground.",
+      "Deaths fit each enemy: the toad tips onto its back, the crocodile sinks flat with its legs splayed and its jaw slack, the knight's armour slumps while the helmet rolls away and the sword and shield clatter down, the hydra's necks drop one by one, and the Colossus buckles, splits and slumps.",
+      "The crocodile and hydra have four separate legs with a bent back knee, and the hydra's necks are now smooth round tubes.",
+      "All five now stand exactly on the ground instead of floating slightly above it. Each gets its own picture frame so the tongue, lunge, raised sword, rearing head and raised fists fit, which makes their click area a little larger."
+    ],
+    "removed": [
+      "Replaced the Gloamfen enemies' previous artwork; the earlier versions remain backed up for rollback."
+    ]
+  },
+  {
     "version": "Beta 1.39.13",
     "date": "2026-11-04",
     "new": [],
