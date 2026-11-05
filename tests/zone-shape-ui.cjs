@@ -77,10 +77,13 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await debug({ op: 'teleport', zone: from, x: sx, y: sy });
     await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [from, sx, sy], { timeout: 20000 });
     await page.screenshot({ path: path.join(out, `seam-${from}-before.png`) });
+    await page.evaluate(() => { window.__gaps = []; let last = performance.now(); const tick = now => { window.__gaps.push(now - last); last = now; if (window.__gaps.length < 600) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
     for (const k of keys) await page.keyboard.down(k);
     await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
     for (const k of keys) await page.keyboard.up(k);
     await page.waitForTimeout(800);
+    const gaps = await page.evaluate(() => window.__gaps.slice().sort((a, b) => b - a));
+    console.log(`seam ${from} -> ${to}: slowest frames ms`, gaps.slice(0, 4).map(g => g.toFixed(0)).join(', '), 'median', gaps[Math.floor(gaps.length / 2)].toFixed(0));
     const p = await where();
     check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
     check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);

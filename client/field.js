@@ -45,7 +45,7 @@
     [[36, 79], [36, 71], [36, 62], [33, 52], [38, 44], [36, 36], [42, 28], [50, 22], [54, 12]],
     [[36, 36], [26, 32], [16, 26], [10, 16]],
   ];
-  const map = { dirt: new Uint8Array(0), tone: new Float32Array(0) };
+  let map = { dirt: new Uint8Array(0), tone: new Float32Array(0) };
   let objects = [], nightLights = [], SHIFT = [0, 0], seamlessUntil = 0;
   // Enemies and players of a neighbouring zone seen across a seam border (view only), already moved into this zone's frame.
   const ghostSlimes = new Map(), ghostPlayers = new Map();
@@ -195,12 +195,7 @@
     }
     if (c >= 'A' && c <= 'Z') {
       const nb = (zdef.shape?.neighbours || [])[code - 65], theme = ZONES[nb]?.theme || 'ember', seam = map.seamBy?.[nb];
-      if (seam) {   // beyond a border you cross: this zone's own floor under the neighbour's, mixed as the neighbour will mix it
-        const i = y * MAP + x, w = map.blendD[i] ? map.blendW[i] : 1, [sx, sy] = seam.shift, ns = groundSample(ZONES[nb], x + Math.round(sx), y + Math.round(sy));
-        flat(groundOf(zdef.theme, map.tone[i], map.dirt[i], alt));
-        g.globalAlpha = w; flat(groundOf(theme, ns.tone, ns.dirt, ((x + Math.round(sx) + y + Math.round(sy)) & 1) ? 1.4 : -1.4)); g.globalAlpha = 1;
-        return;
-      }
+      if (seam && ctxs.has(nb)) return;   // beyond a border you cross, the neighbour's own ground chunks are drawn (drawNeighbourGround)
       flat(groundOf(theme, tone, h > .93 && d < 4, alt));
       if (!zdef.portals.some(p => p.seam && p.to === nb)) { if (d <= 2) wallBlock(g, px, py, BORDER_LOOK[theme] || [215, 12, 26], d === 1 ? 14 * (.75 + h * .5) : 7, tone, h); }
       else if (d > 9) { g.fillStyle = `rgba(7,16,13,${(d - 9) * .17})`; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill(); }
@@ -217,11 +212,57 @@
   }
   const isVoid = (x, y) => !!map.floor && (x < 0 || y < 0 || x >= MAP || y >= MAP || !map.floor[y * MAP + x]);
   // Switch to another zone: new ground, obstacles and minimap. Everything tied to the old zone's coordinates goes.
+  // ---------- zone contexts ----------
+  // Everything the ground renderer reads about one zone. The hero's zone is current (the module variables); a seam neighbour
+  // keeps its own context so its ground can be drawn beside the border and crossing swaps pointers, not a rebuild.
+  const ctxs = new Map();
+  const snapCtx = () => ({ z: zone, def: zdef, MAP, map, objects, nightLights, SHIFT, SPAWN, chunks });
+  function adoptCtx(c) { zone = c.z; zdef = c.def; MAP = c.MAP; map = c.map; objects = c.objects; nightLights = c.nightLights; SHIFT = c.SHIFT; SPAWN = c.SPAWN; chunks = c.chunks; }
+  function ctxFor(z) {
+    let c = ctxs.get(z); if (c) return c;
+    c = { z, def: ZONES[z], MAP: ZONES[z].size, map: { dirt: new Uint8Array(0), tone: new Float32Array(0) }, objects: [], nightLights: [], SHIFT: [0, 0], SPAWN: ZONES[z].spawn, chunks: new Map(), empty: new Set(), limit: 40 };
+    ctxs.set(z, c);
+    const keep = snapCtx(); adoptCtx(c);
+    try { buildMap(); c.MAP = MAP; c.objects = objects; c.nightLights = nightLights; c.SHIFT = SHIFT; c.SPAWN = SPAWN; }
+    finally { adoptCtx(keep); }
+    return c;
+  }
+  // A ground chunk of a neighbour's context (rendered with that context current), or null when the chunk has no ground to draw.
+  function neighbourChunk(c, cx, cy) {
+    const k = cy * 100 + cx; if (c.empty.has(k)) return null;
+    let ch = c.chunks.get(k);
+    if (!ch) {
+      let any = false; const m = c.map;
+      for (let ty = 0; ty < CH && !any; ty++) for (let tx = 0; tx < CH; tx++) { const x = cx * CH + tx, y = cy * CH + ty; if (x < c.MAP && y < c.MAP && (m.floor ? m.floor[y * c.MAP + x] || m.edge[y * c.MAP + x] : true)) { any = true; break; } }
+      if (!any) { c.empty.add(k); return null; }
+      const keep = snapCtx(); adoptCtx(c);
+      try { ch = renderChunk(cx, cy); } finally { adoptCtx(keep); }
+      if (c.chunks.size >= c.limit) { const oldest = c.chunks.keys().next().value, old = c.chunks.get(oldest); old.c.width = 1; old.c.height = 1; c.chunks.delete(oldest); }
+    } else c.chunks.delete(k);
+    c.chunks.set(k, ch); return ch;
+  }
+  // The neighbour's ground in this zone's frame (its cell = ours + shift), for the part of the screen beyond the border.
+  function drawNeighbourGround(g, c, shift, cx, cy, sxo, syo) {
+    const [shx, shy] = shift, cs = [s2w(0, 0), s2w(VW, 0), s2w(0, VH), s2w(VW, VH)];
+    const x0 = Math.min(...cs.map(q => q[0])) + shx - 2, x1 = Math.max(...cs.map(q => q[0])) + shx + 2, y0 = Math.min(...cs.map(q => q[1])) + shy - 2, y1 = Math.max(...cs.map(q => q[1])) + shy + 2, n = c.MAP / CH, out = [];
+    for (let by = clamp(Math.floor(y0 / CH), 0, n - 1); by <= clamp(Math.floor(y1 / CH), 0, n - 1); by++) for (let bx = clamp(Math.floor(x0 / CH), 0, n - 1); bx <= clamp(Math.floor(x1 / CH), 0, n - 1); bx++) out.push([bx, by]);
+    out.sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
+    for (const [bx, by] of out) {
+      const G = chunkGeom(bx, by), dx = G.ox - (shx - shy) * TW / 2 - cx + VW / 2 + sxo, dy = G.oy - (shx + shy) * TH / 2 - cy + VH / 2 + syo;
+      if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;
+      const ch = neighbourChunk(c, bx, by); if (ch) g.drawImage(ch.c, dx, dy, G.w, G.h);
+    }
+  }
   function setZone(z) {
-    zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
+    zone = ZONES[z] ? z : 0;
+    adoptCtx(ctxFor(zone));
+    // Neighbours across a seam keep a context too, built now so their ground is ready to draw beside the border and to swap
+    // in when you cross; every other zone's ground is released.
+    const keepZones = new Set([zone]);
+    for (const p of zdef.portals || []) if (p.seam) { ctxFor(p.to); keepZones.add(p.to); loadSceneEnemyArt(ZONES[p.to].slimes || []); }
+    for (const [k, cc] of ctxs) if (!keepZones.has(k)) { for (const { c } of cc.chunks.values()) { c.width = 1; c.height = 1; } cc.chunks.clear(); ctxs.delete(k); }
     window.DayNight?.setZone(zdef);
     window.Weather?.setZone(zdef);
-    buildMap(); clearGroundChunks();
     if (mini) buildMini();
     if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
     floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; remotePlayers.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
@@ -542,10 +583,11 @@
   const spriteSet = () => zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'wyrd' || zdef.theme === 'sky' || zdef.theme === 'deep' || zdef.theme === 'nacre' || zdef.theme === 'astral' || zdef.theme === 'prismwaste' || zdef.theme === 'orrery' || zdef.theme === 'moonspore' || zdef.theme === 'stormglass' || zdef.theme === 'sunward' || zdef.theme === 'ribbonwild' || zdef.theme === 'tanglecrown' || zdef.theme === 'worldtree' || zdef.theme === 'heartwood' || zdef.theme === 'lapiserg' || zdef.theme === 'frostwake' || zdef.theme === 'cairnspine' || zdef.theme === 'yearwheel' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme) ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
 
   // ---------- ground chunks ----------
-  const chunks = new Map(); let chunkScale = 1, chunkCacheLimit = 32;
+  let chunks = new Map(); let chunkScale = 1, chunkCacheLimit = 32;
   function clearGroundChunks() {
     for (const { c } of chunks.values()) { c.width = 1; c.height = 1; }
     chunks.clear();
+    for (const cc of ctxs.values()) { for (const { c } of cc.chunks.values()) { c.width = 1; c.height = 1; } cc.chunks.clear(); }
   }
   const CLIFF = 120, PADX = 10, PADTOP = 40;
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
@@ -1331,8 +1373,18 @@
       if (sp && Math.hypot(own.x - (hero.nx + sp.seam.shift[0]), own.y - (hero.ny + sp.seam.shift[1])) < 3) seamShift = sp.seam.shift;
     }
     if ((moved || initial) && !seamShift) window.ZoneJourney?.enter(zdef, ZONES[own.zone || 0], initial);
+    // Across a seam the two sides swap roles: what was drawn as a ghost is now real and the other way round, so nothing
+    // blinks out and back in at the crossing.
+    const carry = seamShift ? { slimes: slimes.slice(), players: [...remotePlayers.values()], gs: [...ghostSlimes.values()], gp: [...ghostPlayers.values()] } : null;
     if (moved) setZone(own.zone || 0);
-    if (seamShift) { hero.x += seamShift[0]; hero.y += seamShift[1]; cam.x += seamShift[0]; cam.y += seamShift[1]; seamlessUntil = performance.now() + 2500; }
+    if (seamShift) {
+      const [cxs, cys] = seamShift, mv = a => { a.x += cxs; a.y += cys; if (Number.isFinite(a.nx)) { a.nx += cxs; a.ny += cys; } return a; };
+      hero.x += cxs; hero.y += cys; cam.x += cxs; cam.y += cys; seamlessUntil = performance.now() + 2500;
+      slimes = carry.gs.map(a => { a.ghost = false; return mv(a); });
+      for (const a of carry.gp) { mv(a); remotePlayers.set(a.id, a); }
+      for (const a of carry.slimes) { a.ghost = true; ghostSlimes.set(a.id, mv(a)); }
+      for (const a of carry.players) ghostPlayers.set(a.id, mv(a));
+    }
     const inZone = a => (a.zone || 0) === zone;
     if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
     const selectedTarget = own.danceT != null ? null : hero.target?.id;
@@ -1403,7 +1455,7 @@
     for (const id of remotePlayers.keys()) if (!present.has(id)) remotePlayers.delete(id);
     // Across a seam: the neighbour's enemies and players near the line, drawn but never targetable.
     const seenSlimes = new Set(), seenPlayers = new Set();
-    for (const a of moved ? [] : packet.across || []) {
+    for (const a of moved && !seamShift ? [] : packet.across || []) {
       const [ax, ay] = a.shift;
       loadSceneEnemyArt(a.slimes);
       for (const data of a.slimes) {
@@ -4134,6 +4186,7 @@
       if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;      // the world box of the screen is much bigger than the screen itself
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
+    for (const p of zdef.portals) if (p.seam) { const nc = ctxs.get(p.to); if (nc) drawNeighbourGround(g, nc, p.seam.shift, cx, cy, sxo, syo); }
     g.imageSmoothingEnabled = true;
     if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge' || zdef.theme === 'ember') {
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
