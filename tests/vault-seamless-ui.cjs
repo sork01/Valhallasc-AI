@@ -71,6 +71,13 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       console.log(`zone ${zone} s ${s}: noise ${noise.mean.toFixed(2)}/${(noise.big * 100).toFixed(1)}%  across the vault ${d.mean.toFixed(2)}/${(d.big * 100).toFixed(1)}% (mean abs diff / % of pixels off by >40)`);
     }
   }
+  // Skaldholm's own square is never touched by a neighbour's region (the borders lean across it: the Crags' region once covered its north-east corner).
+  await debug({ op: 'teleport', zone: 4, x: 120, y: 30 });
+  await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 });
+  await page.waitForTimeout(2500);
+  const intr = await page.evaluate(() => Field.cityIntrusion);
+  check(intr && intr.hidden === 0 && intr.ghosts === 0 && intr.season === 0, `no neighbour region hides or replaces anything inside Skaldholm's walls (${JSON.stringify(intr)})`);
+  await page.screenshot({ path: path.join(out, 'skaldholm-north-east.png') });
   // A real walk through the vault, both ways: sample the canvas while walking; the step at the zone change must be no bigger than the
   // steps of ordinary walking (a pop shows as a spike).
   const isoKeys = (dx, dy) => [dx - dy > .35 ? 'ArrowRight' : dx - dy < -.35 ? 'ArrowLeft' : null, dx + dy > .35 ? 'ArrowDown' : dx + dy < -.35 ? 'ArrowUp' : null].filter(Boolean);

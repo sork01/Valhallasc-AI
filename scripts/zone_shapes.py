@@ -971,6 +971,35 @@ def vault_regions(runs, land_probe, land=None):
     return out
 
 
+def axis_wall(rows, run, axis, c):
+    """The wall line is the straight axis-aligned line `axis` = c (the city's own wall is straight): along the run's extent the floor is
+    cut to it, and the land between it and the old border fills in. Returns (floor, lost)."""
+    n = len(rows)
+    old = np.array([[ch == '#' for ch in row] for row in rows])
+    if axis == 'y':
+        new, lost = axis_wall([''.join('#' if v else ' ' for v in col) for col in old.T], [(q[1], q[0]) for q in run], 'x', c)
+        return new.T, lost.T
+    pts = [tuple(q) for q in run]
+    y0, y1 = min(q[1] for q in pts), max(q[1] for q in pts)
+    band = old[max(0, int(y0)):min(n, int(y1) + 1)]
+    east, west = int(band[:, int(c) + 1:].sum()), int(band[:, :int(c)].sum())
+    inland = 1 if east >= west else -1        # the land is on the side that holds more of it
+    new = old.copy()
+    for y in range(int(math.floor(y0)), int(math.ceil(y1)) + 1):
+        if not 0 <= y < n:
+            continue
+        # where the old border crosses this row
+        xs = [a[0] + (b[0] - a[0]) * ((y + .5) - a[1]) / (b[1] - a[1]) for a, b in zip(pts, pts[1:]) if (a[1] - (y + .5)) * (b[1] - (y + .5)) <= 0 and b[1] != a[1]]
+        xb = xs[0] if xs else c
+        for x in range(n):
+            cx = x + .5
+            if (cx - c) * inland < 0:
+                new[y, x] = False                                   # beyond the wall line
+            elif (cx - xb) * inland < 0:
+                new[y, x] = True                                    # between the line and the old border: land now
+    return new, old & ~new
+
+
 def straighten(rows, runs_orig, runs_simp, tol):
     """Floor mask with the border along `runs_simp` (straight): cells on the city side of the line go, cells between the line and the
     old border fill in. Only the perpendicular band of each run is touched (nothing past a run's two ends). Returns (floor, lost)."""
@@ -1016,7 +1045,7 @@ def straighten(rows, runs_orig, runs_simp, tol):
     return new, old & ~new
 
 
-def build_walls(world, shifted, landmarks, margins):
+def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
     """Skaldholm's wall (docs/zone-shapes-pilot.md): along every border a shaped zone has with a landmark city, ramparts and
     towers (the city's own art, real collision objects) with a vault at the gate you walk through to enter the city.
 
@@ -1033,9 +1062,29 @@ def build_walls(world, shifted, landmarks, margins):
             if not runs or gate is None:
                 continue
             n = z['size']
+            city = zones[lm]
+            back = next(p for p in city['portals'] if p['to'] == i)
+            carch = next(a for a in city['exitArches'] if a['portal'] == back['id'])
+            carch_ = [carch]
             simp = [simplify_run(r, WALL_TOL) for r in runs]
             orig_floor = np.array([[c == '#' for c in row] for row in z['shapeFloor']])
-            floor_now, lost = straighten(z['shapeFloor'], runs, simp, WALL_TOL)
+            axis = (cfg_axes or {}).get(str(i))
+            if axis:       # one straight, axis-aligned wall along the city's own wall (carch is vertical for a vertical wall)
+                assert (axis == 'x') == bool(carch_[0]['vertical']), f"zone {i}: the wall axis {axis} does not match the city arch"
+                longest = max(runs, key=lambda r: sum(math.dist(a, b) for a, b in zip(r, r[1:])))
+                gx_, gy_ = gate['x'], gate['y']
+                feet_ = []
+                for a, b in zip(longest, longest[1:]):
+                    dx, dy = b[0] - a[0], b[1] - a[1]
+                    t = max(0., min(1., ((gx_ - a[0]) * dx + (gy_ - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9)))
+                    feet_.append((a[0] + t * dx, a[1] + t * dy))
+                qf = min(feet_, key=lambda p_: math.dist(p_, (gx_, gy_)))
+                c_ = round(qf[0] if axis == 'x' else qf[1], 2)
+                ys_ = [q[1] if axis == 'x' else q[0] for q in longest]
+                simp = [[(c_, min(ys_)), (c_, max(ys_))] if axis == 'x' else [(min(ys_), c_), (max(ys_), c_)]]
+                floor_now, lost = axis_wall(z['shapeFloor'], longest, axis, c_)
+            else:
+                floor_now, lost = straighten(z['shapeFloor'], runs, simp, WALL_TOL)
             assert not any(lost[int(o['y']), int(o['x'])] for k in ('npcs', 'places', 'crosses') for o in z.get(k, [])), f'zone {i}: a straight wall would cut off an NPC, place or cross'
             assert not lost[int(z['spawn']['y']), int(z['spawn']['x'])], f'zone {i}: a straight wall would cut off the spawn'
             c_ = z['city']
@@ -1043,9 +1092,6 @@ def build_walls(world, shifted, landmarks, margins):
             rows = floor_rows(floor_now)
             runs = simp
             on = lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and rows[int(y)][int(x)] == '#'
-            city = zones[lm]
-            back = next(p for p in city['portals'] if p['to'] == i)
-            carch = next(a for a in city['exitArches'] if a['portal'] == back['id'])
             wx, wy = gate['walk']
             assert [wx, wy] == [-back['walk'][0], -back['walk'][1]], f"zone {i}: the vault and the city's arch face different ways"
             hw = carch['halfWidth']
@@ -1138,7 +1184,7 @@ def build_walls(world, shifted, landmarks, margins):
             assert int(gate['y']) * n + int(gate['x']) in prev, f"zone {i}: the vault gate to {lm} is cut off by the wall (A {A}, gate {gate['x']},{gate['y']}, walk {wx},{wy}, on land {on(gate['x'], gate['y'])}, pocket cells {int(pocket.sum())}, arch hw {hw})"
             ca.exit_routes(z)
             ca.exit_routes(city)
-            regs = vault_regions(runs, lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and orig_floor[int(y), int(x)], floor_now)
+            regs = vault_regions(runs, lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and floor_now[int(y), int(x)], floor_now)
             z['shape'].setdefault('vaultRegions', []).extend(dict(r_, to=lm, portal=gate['id']) for r_ in regs)
             print(f"zone {i}: wall to {zones[lm]['name']}: {len(adds) - len(towers)} ramparts, {len(towers)} towers, vault at {A}, shift {shift}")
 
@@ -1214,7 +1260,7 @@ def apply(world, cfg):
               f"core at ({ox},{oy}), +{added[0]} objects, +{added[1]} spawns, {len(voids)} void pieces")
     shift_incoming(world, shifted, 1)
     place_portals(world, shifted, cfg.get('landmarks', []))
-    build_walls(world, shifted, cfg.get('landmarks', []), margins)
+    build_walls(world, shifted, cfg.get('landmarks', []), margins, cfg.get('wallAxis'))
     return shifted
 
 
