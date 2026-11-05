@@ -110,6 +110,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       if (to === 16) { await page.waitForTimeout(600); const sh = await page.evaluate(() => Field.ghosts.shadowed); check(!sh.some(k => ['gloomstalk', 'mooncaps', 'moonstone', 'sporefern', 'glowmoss', 'sporelamp'].includes(k)), `seam ${from} -> ${to}: no generic shadow under the Canopy's own scenery (shadowed: ${sh.join(', ')})`); }
       const wanted = to === 16 ? ['gloomstalk', 'mooncaps', 'moonstone', 'sporefern'] : own.filter(k => ['tree', 'bush', 'rock'].includes(k));
       check(wanted.every(k => ahead.includes(k)), `seam ${from} -> ${to}: the zone ahead's scenery (${wanted.join(', ')}) is ready beyond the border; ghosts: ${ahead.join(', ')}`);
+      const tilesBefore = await page.evaluate(() => Field.miniTiles);
       const keys = keysFor([-dir[0], -dir[1]]);
       for (const key of keys) await page.keyboard.down(key);
       await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
@@ -119,6 +120,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
       check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);
       await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
+      const tilesAfter = await page.evaluate(() => Field.miniTiles);
+      check(tilesBefore === tilesAfter, `seam crossing ${from} -> ${to}: the minimap keeps its scale (${tilesBefore} tiles across before, ${tilesAfter} after)`);
     }
   }
   // Step 2: what lies across the border shows through. A second hero stands on the Crags side with an enemy beside them;
