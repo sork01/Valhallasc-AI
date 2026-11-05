@@ -157,7 +157,7 @@
         // The neighbour can lie past this zone's own grid (the meadow is south of the Crags' 208 tiles): no grid limit, only the rule that it must not lie on our own land.
         if (gx >= 0 && gy >= 0 && gx < MAP && gy < MAP && map.floor[(gy | 0) * MAP + (gx | 0)]) continue;
         let best = 1e9, cross = 0; for (let k = 0; k < pts.length - 1; k++) { const d = segDist(gx, gy, pts[k][0], pts[k][1], pts[k + 1][0], pts[k + 1][1]); if (d < best) { best = d; cross = (pts[k + 1][0] - pts[k][0]) * (gy - pts[k][1]) - (pts[k + 1][1] - pts[k][1]) * (gx - pts[k][0]); } }
-        if (cross * seam.side > 0) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set || {} });
+        if (cross * seam.side > 0 || WALL_KINDS.has(o.kind) && best < 3) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set || {} });   // a wall piece can stand on the line itself
       }
     }
   }
@@ -5074,7 +5074,7 @@
       for (const o of map.ghosts || []) out.push([o.kind, o.x, o.y]);
       for (const R of map.vregs || []) for (const o of vaultSeason(R)) out.push([o.kind, o.x, o.y]);
       return out.filter(o => Math.hypot(o[1] - x, o[2] - y) < r);
-    }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { walls: (map.ghosts || []).filter(o => WALL_KINDS.has(o.kind)).map(o => [o.x, o.y]), slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };

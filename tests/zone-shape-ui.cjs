@@ -246,8 +246,13 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
         await page.waitForTimeout(600);
         await page.screenshot({ path: path.join(out, `seam-${from}-before-${to}.png`) });
         const ahead = await page.evaluate(() => Field.ghosts.kinds);
-        const want = [...new Set(zoneDef(to).objects.map(o => o.kind))].filter(k => ['tree', 'bush', 'rock', 'rampart'].includes(k));
-        check(want.includes('rampart') && want.every(k => ahead.includes(k)), `seam ${from} -> ${to}: the zone ahead's scenery and wall (${want.join(', ')}) are ready beyond the border; ghosts: ${ahead.join(', ')}`);
+        const want = [...new Set(zoneDef(to).objects.map(o => o.kind))].filter(k => ['tree', 'bush', 'rock'].includes(k));
+        check(want.length > 0 && want.every(k => ahead.includes(k)), `seam ${from} -> ${to}: the zone ahead's scenery (${want.join(', ')}) is ready beyond the border; ghosts: ${ahead.join(', ')}`);
+        // by position, not by kind: the vault's own ghosts are ramparts too, so a kind list passes without the neighbour's wall
+        const fs = zoneDef(from).portals.find(p => p.to === to && p.seam).seam, end = fs.points, [fx, fy] = fs.shift, ghostWalls = await page.evaluate(() => Field.ghosts.walls);
+        const beside = zoneDef(to).objects.filter(o => ['rampart', 'tower'].includes(o.kind)).map(o => [o.x - fx, o.y - fy]).filter(([x, y]) => !onLand(from, x, y) && Math.min(...end.map(q => Math.hypot(q[0] - x, q[1] - y))) < 12);
+        const shown = beside.filter(([x, y]) => ghostWalls.some(q => Math.hypot(q[0] - x, q[1] - y) < .01));
+        check(beside.length > 0 && shown.length === beside.length, `seam ${from} -> ${to}: the neighbour's wall stands beyond the line at the junction (${shown.length} of ${beside.length} pieces)`);
         const tilesBefore = await page.evaluate(() => Field.miniTiles);
         const keys = keysFor([-dir[0], -dir[1]]);
         for (const key of keys) await page.keyboard.down(key);
