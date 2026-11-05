@@ -1,5 +1,5 @@
 //! Zones with the outline of their province on the atlas (docs/zone-shapes.md): the walkable land is the outline.
-use super::wyrd_tests::{at, world};
+use super::wyrd_tests::{at, join, place, world};
 use super::*;
 
 const SHAPED: [usize; 2] = [0, 1];
@@ -76,6 +76,9 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
         let edges = z["shape"]["edges"].as_array().unwrap();
         let mut border = 0;
         for p in z["portals"].as_array().unwrap() {
+            if p.get("seam").is_some() {
+                continue; // a border you cross anywhere: see the next test
+            }
             let to = p["to"].as_u64().unwrap() as usize;
             let chain: Vec<&Value> = edges.iter().filter(|e| e["kind"] == "shared" && e["other"] == to).collect();
             if chain.is_empty() {
@@ -95,6 +98,65 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
             w.maps[to].collide(&mut a, 0.4);
             assert!((a.x - tx).hypot(a.y - ty) < 0.01, "arrival ({tx:.1},{ty:.1}) in zone {to} is inside an obstacle");
         }
-        assert!(border >= 4, "zone {zone}: only {border} border crossings");
+        assert!(border >= 2, "zone {zone}: only {border} gate crossings");
     }
+}
+
+/// Walk from 3 tiles inside zone `from` straight at its shared border: the hero must end up on land in `to`.
+fn cross(w: &mut World, data: &Value, from: usize, to: usize, q: Point, inward: Point) -> Point {
+    let start = at(q.x + inward.x * 3., q.y + inward.y * 3.);
+    place(w, 1, from, start);
+    let dir = at(-inward.x, -inward.y);
+    for _ in 0..80 {
+        w.time += TICK;
+        let hero = w.players.get_mut(&1).unwrap();
+        hero.input = dir;
+        hero.input_at = w.time;
+        w.update_player(1);
+        if w.players[&1].character.zone == to {
+            break;
+        }
+    }
+    let p = w.players[&1].character.clone();
+    assert_eq!(p.zone, to, "walking at the border from {start:?} did not cross into zone {to}");
+    assert!(land(zone_of(data, to))(p.x, p.y), "arrived off the land in zone {to} at ({:.1},{:.1})", p.x, p.y);
+    at(p.x, p.y)
+}
+
+#[test]
+fn a_shared_border_is_crossed_anywhere_along_it_in_both_directions() {
+    let mut w = world();
+    let data = bundled();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    let (a, b) = (zone_of(&data, 0), zone_of(&data, 1));
+    let seam = a["portals"].as_array().unwrap().iter().find_map(|p| p.get("seam")).expect("the meadow has a seam to the Crags");
+    let points: Vec<Point> = seam["points"].as_array().unwrap().iter().map(|q| at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap())).collect();
+    let on_a = land(a);
+    let mut crossed = 0;
+    // Samples along every border segment: the point 4 tiles inside the meadow, found from the side that is land.
+    for pair in points.windows(2) {
+        for t in [0.25, 0.5, 0.75] {
+            let q = at(pair[0].x + (pair[1].x - pair[0].x) * t, pair[0].y + (pair[1].y - pair[0].y) * t);
+            let (dx, dy) = (pair[1].x - pair[0].x, pair[1].y - pair[0].y);
+            let len = dx.hypot(dy);
+            if len < 6. {
+                continue;
+            }
+            let normal = at(-dy / len, dx / len);
+            let inward = if on_a(q.x + normal.x * 4., q.y + normal.y * 4.) { normal } else { at(-normal.x, -normal.y) };
+            if !on_a(q.x + inward.x * 4., q.y + inward.y * 4.) {
+                continue;
+            }
+            let landed = cross(&mut w, &data, 0, 1, q, inward);
+            crossed += 1;
+            // and back from where we arrived: straight at the same border again
+            let shift = (seam["shift"][0].as_f64().unwrap(), seam["shift"][1].as_f64().unwrap());
+            let q_in_b = at(q.x + shift.0, q.y + shift.1);
+            let back = cross(&mut w, &data, 1, 0, q_in_b, at(-inward.x, -inward.y));
+            assert!(on_a(back.x, back.y));
+            assert!(landed.distance(q_in_b) < 8., "the crossing is continuous: arrived {:.1} tiles from the mirrored spot", landed.distance(q_in_b));
+            let _ = b;
+        }
+    }
+    assert!(crossed >= 8, "only {crossed} border samples crossed");
 }

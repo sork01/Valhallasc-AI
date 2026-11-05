@@ -65,21 +65,25 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     const mini = await page.evaluate(() => { const c = document.querySelector('#minimap canvas, canvas#minimap, #mini'); return !!c; });
     check(mini || true, 'minimap present');
   }
-  // Cross the border gate both ways: each crossing lands on land near the other side's arrival point, and back.
-  const keyFor = ([wx, wy]) => (wx ? (wx > 0 ? 'ArrowRight' : 'ArrowLeft') : (wy > 0 ? 'ArrowDown' : 'ArrowUp'));
-  for (const [from, id, to] of [[0, 'emberfall_gate', 1], [1, 'meadow_gate', 0]]) {
-    const portal = zoneDef(from).portals.find(p => p.id === id);
-    check(portal && portal.walk, `zone ${from} has ${id} with a walk direction`);
-    const [wx, wy] = portal.walk, sx = portal.x - wx * 3, sy = portal.y - wy * 3;
+  // Walk across the shared border of the meadow and the Crags (a seam: crossable anywhere along it), both ways.
+  const seam = zoneDef(0).portals.find(p => p.seam).seam, pts = seam.points, [shx, shy] = seam.shift;
+  const onA = (x, y) => onLand(0, x, y);
+  const seg = Math.floor(pts.length / 2), a = pts[seg], b = pts[seg + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const q = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
+  const inward = onA(q[0] + nrm[0] * 4, q[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
+  const keysFor = ([dx, dy]) => [Math.abs(dx) > .35 ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : null, Math.abs(dy) > .35 ? (dy > 0 ? 'ArrowDown' : 'ArrowUp') : null].filter(Boolean);
+  for (const [from, to, origin, dir] of [[0, 1, q, inward], [1, 0, [q[0] + shx, q[1] + shy], [-inward[0], -inward[1]]]]) {
+    const sx = origin[0] + dir[0] * 3, sy = origin[1] + dir[1] * 3, keys = keysFor([-dir[0], -dir[1]]);
     await debug({ op: 'teleport', zone: from, x: sx, y: sy });
     await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [from, sx, sy], { timeout: 20000 });
-    await page.keyboard.down(keyFor(portal.walk));
+    await page.screenshot({ path: path.join(out, `seam-${from}-before.png`) });
+    for (const k of keys) await page.keyboard.down(k);
     await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
-    await page.keyboard.up(keyFor(portal.walk));
+    for (const k of keys) await page.keyboard.up(k);
     await page.waitForTimeout(800);
     const p = await where();
-    check(onLand(to, p.x, p.y) && Math.hypot(p.x - portal.tx, p.y - portal.ty) < 6, `crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)}) near (${portal.tx.toFixed(1)},${portal.ty.toFixed(1)})`);
-    await page.screenshot({ path: path.join(out, `cross-${from}-to-${to}.png`) });
+    check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+    await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
   }
   // The hubs keep their place inside the shifted core: Alderhaven's plaza and Cinderwatch Camp.
   for (const zone of [0, 1]) {

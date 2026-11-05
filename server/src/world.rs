@@ -3456,6 +3456,19 @@ impl World {
             .portals
             .iter()
             .find(|portal| {
+                if let Some(seam) = &portal.seam {
+                    // A shared border: crossing it anywhere along its length, walking toward it.
+                    let (q, d) = seam.nearest(here);
+                    let direction = if p.input.x != 0. || p.input.y != 0. {
+                        p.input
+                    } else {
+                        p.goal.map_or(p.face, |goal| here.direction(goal))
+                    };
+                    let toward = here.direction(q);
+                    return p.moving
+                        && d < Seam::REACH
+                        && direction.x * toward.x + direction.y * toward.y > 0.15;
+                }
                 let walking_out = portal.walk.is_none_or(|side| {
                     let direction = if p.input.x != 0. || p.input.y != 0. {
                         p.input
@@ -3490,6 +3503,11 @@ impl World {
         };
         if portal.to >= self.maps.len() {
             return;
+        }
+        if let Some(seam) = &portal.seam {
+            let arrival = seam.arrival(here);
+            portal.tx = arrival.x;
+            portal.ty = arrival.y;
         }
         if self.maps[portal.to].sealed_template && self.public_zone(p.character.zone) != portal.to {
             return;
@@ -3647,7 +3665,7 @@ impl World {
         p.character.x = arrival.x;
         p.character.y = arrival.y;
         p.portal_at = time;
-        if portal.walk.is_some() {
+        if portal.walk.is_some() || portal.seam.is_some() {
             // Held movement continues across a road. A click goal keeps its remaining
             // local offset; no position or destination zone is accepted from the client.
             let limit = self.maps[portal.to].size as f64 - 0.7;
@@ -3663,7 +3681,7 @@ impl World {
         p.dash = 0.;
         let name = self.maps[portal.to].name.clone();
         let party = self.maps[portal.to].players;
-        let text = if portal.walk.is_some() {
+        let text = if portal.walk.is_some() || portal.seam.is_some() {
             match self.maps[portal.to].levels {
                 Some([low, high]) => format!("You enter {name}. Recommended levels {low}–{high}."),
                 None => format!("You enter {name}."),
@@ -11235,6 +11253,7 @@ mod tests {
             muster: false,
             needs_quest: None,
             needs_boss: None,
+            seam: None,
         });
         w.use_portal(1);
         assert_eq!(w.players[&1].character.zone, 0);

@@ -43,7 +43,7 @@ SIDE = ROOT / 'world/zone-shapes'
 CONFIG = ROOT / 'world/zone-shapes.txt'
 TAG = 'shape_v1'
 VOID_PIECE = 12
-EDGE_BAND = 7
+EDGE_BAND = 14
 STRUCTURAL = {'wall', 'lamp', 'house', 'flowers', 'post', 'void', 'lava', 'water'}
 ELITE_OR_SCRIPTED = ('big', 'cinderlord', 'ember_firelord', 'es_')
 
@@ -239,15 +239,18 @@ class Atlas:
         nx, ny = -(b[1] - a[1]), b[0] - a[0]
         ln = math.hypot(nx, ny) or 1
         poly = self.polys[z]
-        for sgn in (1, -1):
-            q = (mx + sgn * nx / ln * 14, my + sgn * ny / ln * 14)
-            if not inside_pt(q, poly):
-                break
-        q = (max(0, min(self.atlas['width'] - 1, q[0])), max(0, min(self.atlas['height'] - 1, q[1])))
-        if any(o != z and inside_pt(q, p) for o, p in self.polys.items()):
+        sgn = 1 if not inside_pt((mx + nx / ln * 14, my + ny / ln * 14), poly) else -1
+        W, H = self.atlas['width'], self.atlas['height']
+
+        def at(dist):
+            q = (max(0, min(W - 1, mx + sgn * nx / ln * dist)), max(0, min(H - 1, my + sgn * ny / ln * dist)))
+            return q, self.img.getpixel((min(self.img.size[0] - 1, int(q[0] * self.ps)), min(self.img.size[1] - 1, int(q[1] * self.ps))))
+        q14, _ = at(14)
+        if any(o != z and inside_pt(q14, p) for o, p in self.polys.items()):
             return ('gap', None)
-        px = self.img.getpixel((min(self.img.size[0] - 1, int(q[0] * self.ps)), min(self.img.size[1] - 1, int(q[1] * self.ps))))
-        return ('coast', None) if is_water(px) else ('land', None)
+        # A pale beach strip lies between the province and the sea: any open water within 60 px outward makes it coast.
+        water = sum(1 for d in (12, 24, 36, 48, 60) if is_water(at(d)[1]))
+        return ('coast', None) if water >= 2 else ('land', None)
 
     def runs(self, z):
         """Maximal runs of equal edge class around the outline, each from junction to junction (atlas coords)."""
@@ -317,17 +320,19 @@ def shape_geometry(cfg, atlas, z, old):
         runs.append(dict(kind=key[0], other=key[1], points=[[round(a, 2), round(b, 2)] for a, b in sm]))
         outline.extend(sm[:-1])
     floor = inside_mask(outline, n)
-    return dict(scale=s, size=n, frame=[offx, offy], bbox=[W, H], outline=[[round(a, 2), round(b, 2)] for a, b in outline], runs=runs, floor=floor)
+    return dict(scale=s, size=n, frame=[offx, offy], origin=[x0, y0], bbox=[W, H], outline=[[round(a, 2), round(b, 2)] for a, b in outline], runs=runs, floor=floor)
 
 
-def edge_rows(geom):
-    """One char per cell: which kind of edge the outside cell borders (b border, c coast, l land, g gap)."""
+def edge_rows(geom, neighbours):
+    """One char per cell: which kind of edge the outside cell borders (A.. border with shape.neighbours[i], c coast, l land, g gap)."""
     n = geom['size']
     floor = geom['floor']
     band = dilate(floor, EDGE_BAND) & ~floor
     pts = []
     for run in geom['runs']:
-        ch = {'shared': 'b', 'corner': 'b', 'coast': 'c', 'land': 'l', 'gap': 'g'}[run['kind']]
+        ch = {'corner': 'b', 'coast': 'c', 'land': 'l', 'gap': 'g'}.get(run['kind'])
+        if run['kind'] == 'shared':
+            ch = chr(ord('A') + neighbours.index(run['other']))   # border with that neighbour (index into shape.neighbours)
         for a, b in zip(run['points'], run['points'][1:]):
             steps = max(1, int(math.hypot(b[0] - a[0], b[1] - a[1])))
             for i in range(steps + 1):
@@ -581,11 +586,36 @@ def chain_endpoint(ca, z, other, prev, fixed):
     raise SystemExit(f"{z['name']}: no safe reachable gate toward zone {other}")
 
 
+def make_seams(zones, shifted):
+    """Two shaped zones at one tile scale share a border you can cross anywhere: B is A shifted by a constant."""
+    seams = {}
+    for i in shifted:
+        for j in shifted:
+            if i == j:
+                continue
+            a, b = zones[i]['shape'], zones[j]['shape']
+            runs = [e for e in a['edges'] if e['kind'] == 'shared' and e['other'] == j]
+            if not runs or abs(a['k'] - b['k']) > 1e-9:
+                continue
+            run = max(runs, key=lambda e: len(e['points']))
+            shift = [round(b['frame'][0] - a['frame'][0] + (a['origin'][0] - b['origin'][0]) * a['k'], 4),
+                     round(b['frame'][1] - a['frame'][1] + (a['origin'][1] - b['origin'][1]) * a['k'], 4)]
+            # the same border, seen from the other side, must be this line shifted
+            other = [e for e in b['edges'] if e['kind'] == 'shared' and e['other'] == i]
+            mine = np.array(run['points'])
+            theirs = np.array(max(other, key=lambda e: len(e['points']))['points']) - np.array(shift)
+            gap = max(min(np.linalg.norm(theirs - q, axis=1)) for q in mine)
+            assert gap < 0.6, f'zones {i}/{j}: border does not match across the seam ({gap:.2f} tiles)'
+            seams[i, j] = dict(points=[tuple(q) for q in run['points']], shift=shift)
+    return seams
+
+
 def place_portals(world, shifted):
     """Atlas crossings of shaped zones move onto the real shared chains; neighbours' arrivals follow."""
     import compact_atlas as ca
     zones = [world] + world['zones']
     landing = {}
+    seams = make_seams(zones, shifted)
     for i in sorted(shifted):
         z = zones[i]
         for path in z.get('atlasPaths', []):
@@ -593,7 +623,7 @@ def place_portals(world, shifted):
                 z['paths'].remove(path)
         z['atlasPaths'] = []
         prev = ca.connected(z)
-        links = [p for p in z['portals'] if p['to'] in ca.OUTDOORS and p['to'] in zones[i]['shape'].get('neighbours', [])]
+        links = [p for p in z['portals'] if p['to'] in ca.OUTDOORS and p['to'] in zones[i]['shape'].get('neighbours', []) and (i, p['to']) not in seams]
         fixed = [p for p in z['portals'] if p not in links]
         for p in sorted(links, key=lambda p: p['to']):
             point, arrival, side = chain_endpoint(ca, z, p['to'], prev, fixed)
@@ -608,6 +638,17 @@ def place_portals(world, shifted):
         back = next((q for q in zones[j]['portals'] if q['to'] == i), None)
         if back is not None and j not in shifted:
             back.update(tx=arrival[0], ty=arrival[1])
+    for (i, j), seam in seams.items():
+        z = zones[i]
+        old = next((q for q in z['portals'] if q['to'] == j), None)
+        pts = seam['points']
+        mid = pts[len(pts) // 2]
+        portal = dict(id=old['id'] if old else f'seam_{i}_{j}', name=zones[j]['name'], x=mid[0], y=mid[1], r=1.1, to=j, tx=mid[0] + seam['shift'][0],
+                      ty=mid[1] + seam['shift'][1], seam=dict(points=[[round(a, 2), round(b, 2)] for a, b in pts], shift=seam['shift']))
+        if old:
+            z['portals'][z['portals'].index(old)] = portal
+        else:
+            z['portals'].append(portal)
     for i in sorted(shifted):
         z = zones[i]
         for p in z['portals']:
@@ -659,10 +700,10 @@ def apply(world, cfg):
         voids = void_pieces(geom['floor'])
         view['objects'] = [o for o in view['objects'] if o['kind'] != 'void'] + voids
         view['size'] = geom['size']
-        view['shape'] = dict(rule=cfg['rule'], k=round(geom['scale'], 4), offset=[ox, oy], core=S0, bbox=geom['bbox'], frame=geom['frame'],
+        view['shape'] = dict(rule=cfg['rule'], k=round(geom['scale'], 4), offset=[ox, oy], core=S0, bbox=geom['bbox'], frame=geom['frame'], origin=geom['origin'],
                              outline=geom['outline'], edges=geom['runs'], neighbours=sorted(atlas.neighbours[z]))
         view['shapeFloor'] = floor_rows(geom['floor'])
-        view['shapeEdge'] = edge_rows(geom)
+        view['shapeEdge'] = edge_rows(geom, sorted(atlas.neighbours[z]))
         check(z, view, geom)
         set_view(world, z, view)
         shifted[z] = (ox, oy)

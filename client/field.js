@@ -96,22 +96,69 @@
   // A zone with the outline of its province on the world atlas (docs/zone-shapes.md): `shapeFloor` rows mark the land
   // ('#'), `shapeEdge` rows say what the outside cells next to it are (b border, c coast, l outer land, g gap).
   function paintShape(rows, edge) {
-    map.floor = new Uint8Array(MAP * MAP); map.edge = new Uint8Array(MAP * MAP);
+    map.floor = new Uint8Array(MAP * MAP); map.edge = new Uint8Array(MAP * MAP); map.edgeDist = new Uint8Array(MAP * MAP);
     (rows || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) if (row[x] === '#') map.floor[y * MAP + x] = 1; });
     (edge || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) { const c = row[x]; if (c && c !== ' ' && !map.floor[y * MAP + x]) map.edge[y * MAP + x] = c.charCodeAt(0); } });
+    // How many tiles each outside cell lies from the land (breadth first from the land cells, up to 14).
+    let front = [];
+    for (let i = 0; i < MAP * MAP; i++) if (map.floor[i]) front.push(i);
+    for (let d = 1; d <= 14 && front.length; d++) {
+      const next = [];
+      for (const i of front) { const x = i % MAP, y = (i / MAP) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (!map.floor[k] && !map.edgeDist[k]) { map.edgeDist[k] = d; next.push(k); } } }
+      front = next;
+    }
+    // Land near a border: how far the ground has to go to meet the neighbour's, and which neighbour (letter code).
+    map.blendD = new Uint8Array(MAP * MAP); map.blendNb = new Uint8Array(MAP * MAP);
+    front = [];
+    for (let i = 0; i < MAP * MAP; i++) if (!map.floor[i] && map.edge[i] >= 65 && map.edge[i] <= 90) {
+      const x = i % MAP, y = (i / MAP) | 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (map.floor[k] && !map.blendD[k]) { map.blendD[k] = 1; map.blendNb[k] = map.edge[i]; front.push(k); } }
+    }
+    for (let d = 2; d <= BLEND_REACH && front.length; d++) {
+      const next = [];
+      for (const i of front) { const x = i % MAP, y = (i / MAP) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (map.floor[k] && !map.blendD[k]) { map.blendD[k] = d; map.blendNb[k] = map.blendNb[i]; next.push(k); } } }
+      front = next;
+    }
   }
-  // Outside the outline, within a few tiles of it: coast is water, a border with another province is a dark wall of
-  // trees or rock, outer land is a rocky rim. Everything farther out stays the backdrop.
-  function outsideTile(g, px, py, code, x, y, tone, alt, ember) {
+  const BLEND_REACH = 14;
+  // The ground of another zone's theme, to blend toward it where two provinces meet.
+  function groundOf(theme, tone, dirt, alt) {
+    if (theme === 'ember') return dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`;
+    if (theme === 'frost') return dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`;
+    if (theme === 'fen') return dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`;
+    if (theme === 'meadow' || !BORDER_LOOK[theme]) return dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
+    const [h, sa, l] = BORDER_LOOK[theme]; return `hsl(${h + tone * 6}, ${sa}%, ${Math.min(88, l + (dirt ? 10 : 0) + tone * 8 + alt)}%)`;
+  }
+  // What lies past a border: the neighbouring province's own look as a wall (hue, saturation, lightness), so a border reads as
+  // another zone. Keyed by the neighbour theme.
+  const BORDER_LOOK = { ember: [14, 22, 17], frost: [203, 42, 70], fen: [92, 30, 17], city: [28, 12, 38], meadow: [112, 40, 24], wyrd: [32, 40, 30], sky: [255, 30, 70], deep: [190, 45, 26], nacre: [190, 38, 40],
+    moonspore: [172, 30, 22], orrery: [235, 20, 24], astral: [160, 34, 24], prism: [32, 30, 46], stormglass: [212, 26, 24], sunward: [100, 44, 34], ribbonwild: [330, 45, 62], tanglecrown: [133, 45, 24],
+    worldtree: [142, 50, 28], lapiserg: [35, 55, 58], frostwake: [198, 30, 78], cairnspine: [210, 10, 40], yearwheel: [90, 28, 50], emberwake: [350, 20, 22] };
+  function wallBlock(g, px, py, look, lift, tone, h) {
+    const [H, S, L] = look, top = L + tone * 6 + h * 5, e = .7, hw = TW / 2 + e;
+    g.fillStyle = `hsl(${H},${S}%,${Math.max(4, top - 9)}%)`; g.beginPath(); g.moveTo(px - hw, py + TH / 2 - lift); g.lineTo(px, py + TH - lift); g.lineTo(px, py + TH + e); g.lineTo(px - hw, py + TH / 2 + e); g.closePath(); g.fill();
+    g.fillStyle = `hsl(${H},${S}%,${Math.max(3, top - 16)}%)`; g.beginPath(); g.moveTo(px + hw, py + TH / 2 - lift); g.lineTo(px, py + TH - lift); g.lineTo(px, py + TH + e); g.lineTo(px + hw, py + TH / 2 + e); g.closePath(); g.fill();
+    g.fillStyle = `hsl(${H},${S}%,${Math.min(90, top)}%)`; g.beginPath(); g.moveTo(px, py - e - lift); g.lineTo(px + hw, py + TH / 2 - lift); g.lineTo(px, py + TH + e - lift); g.lineTo(px - hw, py + TH / 2 - lift); g.closePath(); g.fill();
+  }
+  // Outside the outline: coast is water; past a border you can cross (a seam) the neighbouring zone's own ground carries on;
+  // past a border with only gates, the neighbour's ground behind a low rim; outer land a rocky rim. Beyond the band the backdrop shows.
+  function outsideTile(g, px, py, code, x, y, tone, alt, ember, d) {
     const c = String.fromCharCode(code), h = hash2(x, y, 9), e = .7;
-    let col;
-    if (c === 'c') col = `hsl(${200 + tone * 12}, ${48 + tone * 8}%, ${24 + tone * 8 + alt * .6}%)`;
-    else if (c === 'b') col = ember ? `hsl(${8 + tone * 10}, 18%, ${9 + h * 6}%)` : `hsl(${128 + tone * 14}, 34%, ${11 + h * 6}%)`;
-    else if (c === 'l') col = ember ? `hsl(${14 + tone * 10}, 14%, ${12 + h * 6}%)` : `hsl(${35 + tone * 10}, 18%, ${15 + h * 7}%)`;
-    else col = '#1a2024';
-    g.fillStyle = col; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
-    if (c === 'c' && h > .72) { g.strokeStyle = 'rgba(190,230,245,.28)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(px - 7, py + TH / 2); g.lineTo(px + 7, py + TH / 2 + 2); g.stroke(); }
-    if (c === 'b' && h > .5) { g.fillStyle = ember ? 'rgba(0,0,0,.35)' : 'rgba(10,40,20,.55)'; g.beginPath(); g.ellipse(px, py + TH / 2 - 3, 9, 7, 0, 0, 6.283); g.fill(); }
+    const flat = col => { g.fillStyle = col; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill(); };
+    if (c === 'c') {
+      flat(`hsl(${200 + tone * 12}, ${48 + tone * 8}%, ${Math.max(8, 26 - d * 1.1) + tone * 8 + alt * .6}%)`);
+      if (h > .72 && d < 8) { g.strokeStyle = `rgba(190,230,245,${.3 - d * .02})`; g.lineWidth = 1.5; g.beginPath(); g.moveTo(px - 7, py + TH / 2); g.lineTo(px + 7, py + TH / 2 + 2); g.stroke(); }
+      return;
+    }
+    if (c >= 'A' && c <= 'Z') {
+      const nb = (zdef.shape?.neighbours || [])[code - 65], theme = ZONES[nb]?.theme || 'ember';
+      flat(groundOf(theme, tone, h > .93 && d < 4, alt));
+      if (!zdef.portals.some(p => p.seam && p.to === nb)) { if (d <= 2) wallBlock(g, px, py, BORDER_LOOK[theme] || [215, 12, 26], d === 1 ? 14 * (.75 + h * .5) : 7, tone, h); }
+      else if (d > 9) { g.fillStyle = `rgba(7,16,13,${(d - 9) * .17})`; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill(); }
+      return;
+    }
+    if (c === 'l') { flat(ember ? `hsl(${14 + tone * 6},14%,${12 + h * 6}%)` : `hsl(${35 + tone * 8},18%,${15 + h * 7}%)`); if (d <= 2) wallBlock(g, px, py, ember ? [14, 14, 18] : [35, 18, 22], d === 1 ? 12 * (.75 + h * .5) : 6, tone, h); return; }
+    flat('#1a2024');
   }
   function paintMoonwell(rows) {
     map.floor = new Uint8Array(MAP * MAP); map.dirt.fill(0);
@@ -462,7 +509,7 @@
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       if ((sky || moonwell) && !map.floor[i]) continue;                              // open water or sky
-      if (zdef.shapeFloor && !map.floor[i]) { if (map.edge[i]) outsideTile(g, px, py, map.edge[i], x, y, tone, ((x + y) & 1) ? 1.4 : -1.4, zdef.theme === 'ember'); continue; }
+      if (zdef.shapeFloor && !map.floor[i]) { if (map.edge[i]) outsideTile(g, px, py, map.edge[i], x, y, tone, ((x + y) & 1) ? 1.4 : -1.4, zdef.theme === 'ember', map.edgeDist[i]); continue; }
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];
       g.fillStyle = zdef.theme === 'emberwake' ? EmberwakeArt.ground(x,y,tone,alt,zdef,dirt) : zdef.theme === 'chained_forge' ? ChainedForgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'blackhour' ? BlackhourArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'longship' ? LongshipArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'arena' ? (x < 3 || y < 3 || x > 28 || y > 28 ? '#423746' : x === 16 || y === 16 ? '#ae8456' : (x + y) % 2 ? '#6e6877' : '#777180') : zdef.theme === 'skybridge' ? SkybridgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'nornroot' ? NornrootArt.ground(x,y,tone,alt,zdef) : moonwell ? MoonwellArt.ground(x,y,tone,dirt,alt,zdef) : zdef.theme === 'eye_below' ? EyeBelowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'elder_hollow' ? ElderHollowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thousandfold' ? PavilionArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'rain_crown' ? RainCrownArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'seed_vault' ? SeedVaultArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'sunken_astrolabe' ? SunkenArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thunderheart_gate' ? ThunderArt.ground(x,y,tone,alt,zdef) : SeasonDungeonArt.isTheme(zdef.theme) ? SeasonDungeonArt.ground(zdef.theme,x,y,tone,alt,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt,zdef) : zdef.theme === 'vault' ? VaultArt.ground(x,y,tone,alt,zdef.rooms,arenas) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
@@ -488,6 +535,10 @@
         : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
         : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
+      if (map.blendD && map.blendD[i]) {   // the ground turns into the neighbour's toward their shared border
+        const nb = (zdef.shape?.neighbours || [])[map.blendNb[i] - 65], t = 1 - (map.blendD[i] - 1) / BLEND_REACH;
+        g.globalAlpha = Math.min(1, t * t * 1.05); g.fillStyle = groundOf(ZONES[nb]?.theme || 'ember', tone, dirt, alt); g.fill(); g.globalAlpha = 1;
+      }
       if (zdef.theme === 'arena') continue;
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
       if (yearwheel) {
@@ -998,7 +1049,7 @@
     return best;
   }
   function pickPortal(mx, my) {
-    return zdef.portals.filter(p => !p.after_clear || instanceCleared)
+    return zdef.portals.filter(p => (!p.after_clear || instanceCleared) && !p.seam)
       .map(p => { const [x,y] = w2s(p.x,p.y); return { p, x, y }; })
       .filter(({p,x,y}) => window.ExitPaths?.hit(ctx,p,ZONES,w2s,mx,my,zoom) || ((mx-x) / (62.2*Math.max(2.8,p.r)))**2 + ((my-y) / (31.1*Math.max(2.8,p.r)))**2 <= 1
         || (Math.abs(mx-x) < 55 && my > y-100 && my < y))
@@ -4044,7 +4095,7 @@
       const [sx, sy] = w2s(o.x, o.y,o.z||0);
       if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0, (City.signHeight?.(o)||0)+25))) { list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
-    for (const portal of zdef.portals) { if (portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
+    for (const portal of zdef.portals) { if (portal.seam || portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
     for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
     for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
@@ -4323,7 +4374,7 @@
       const [sx, sy] = w2s(o.x, o.y), fl = .9 + .1 * Math.sin(t * 7 + o.x * 3);
       pool(sx, sy - 56, (o.kind === 'brazier' ? 320 : 230) * fl, .9);
     }
-    for (const p of zdef.portals) { if (p.walk || p.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(p.x, p.y); pool(sx, sy - 30, p.look === 'exit' ? 340 : 300, .95); }
+    for (const p of zdef.portals) { if (p.walk || p.seam || p.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(p.x, p.y); pool(sx, sy - 30, p.look === 'exit' ? 340 : 300, .95); }
     for (const s of slimes) { if (s.dead) continue; const [sx, sy] = w2s(s.x, s.y); pool(sx, sy - 40, s.d?.boss ? 330 : 170, s.d?.boss ? .92 : .8); }   // enemies are always seen, wherever they stand
     for (const b of ebolts) { const [sx, sy] = w2s(b.x, b.y, 38); pool(sx, sy, 120 + b.size * 60, .75); }
     for (const b of bolts) { const [sx, sy] = w2s(b.x, b.y, 42); pool(sx, sy, 110, .6); }
@@ -4436,7 +4487,7 @@
       g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (zone === 0 ? '#4fa9c8' : wyrd ? '#2f6f9a' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
-    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
+    for (const p of zdef.portals) { if (p.seam || p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c;
   }
   function drawMini() {

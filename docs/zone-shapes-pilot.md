@@ -10,7 +10,9 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 | Emberfall Crags | 96x96 square | 208 grid, outline 203x195 tiles (3.0x area): eight neighbours, the four lava rivers run on past the old edge |
 
 * The **old square is kept as a core**, moved as one block (Greenmeadow by (116, 64), Crags by (43, 59)), so Alderhaven, Cinderwatch Camp, every NPC, quest, spawn and the lava fords are unchanged; new ground around it is filled with scenery, spawns and trail at the old densities (Greenmeadow +319 objects +37 spawns, Crags +463 objects +51 spawns; new spawn kinds follow the old progression: by distance from Alderhaven, by y for the Crags).
-* **Crossings to neighbours sit on the real shared borders** (outline chains): the meadow's Crags gate is on the border the atlas draws, not on a square's side. Arrivals follow in both zones and in unshaped neighbours.
+* **The Greenmeadow/Crags border is a seam: you cross it anywhere along its 87 tiles**, in both directions, by walking at it (held movement carries on, the walker lands on the mirrored spot 3.2 tiles inside the other zone). One `Portal` with a `seam` (polyline + constant shift; both zones share one tile scale, checked at build time) replaces the gate; `use_portal` in `world.rs` handles it. Borders with zones that are not shaped yet keep one gate each, placed on the real shared border; arrivals follow in both zones.
+* **Ground transition:** near a border the ground blends into the neighbour's floor material over 14 tiles (meadow green to Crags ash, and back), past a seam the neighbour's ground carries on outside the outline. Borders with only a gate get a low rim instead.
+* **Coast:** an outline edge is coast when open water lies within 60 atlas px outward (the pale beach strip no longer counts as land), so the whole south of Greenmeadow is shore.
 * Outside the outline: coast is water, a border with another province is a dark wall, outer land a rocky rim; beyond that the backdrop is dark. The minimap and the detailed world map show only the land.
 
 ## How it is built
@@ -18,7 +20,7 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 * `scripts/zone_shapes.py` (`unshape` / `apply`), config `world/zone-shapes.txt` (k = 0.56116 tiles per atlas px, zones `[0, 1]`).
 * `sync-world` runs `unshape` first (every generator and overlay sees the **old square layout and old coordinates**, so `raid_key.py`, `empty_seat.py`, the seasonal overlays, `compact_atlas.py`, `mailboxes.py` need no change) and `apply` last. `apply` saves the old-layout zone to `world/zone-shapes/preshape-<zone>.txt`, then shapes it.
 * **Never run a zone generator on a shaped zone**: run `python3 scripts/zone_shapes.py unshape` first (restores from the sidecar), run the generator, then `node scripts/sync-world.cjs`. Two consecutive `sync-world` runs give identical `map.txt` and `client/world.js`.
-* Collision is the Bifrost mechanism: every non-land cell is covered by `void` rectangles (917 and 714 pieces, comparable to Bifrost's 1,022), so the server, pursuit, chest and route code needed no change. The server's `Map` is untouched.
+* Collision is the Bifrost mechanism (plus the seam portal in `model.rs`/`world.rs`): every non-land cell is covered by `void` rectangles (917 and 714 pieces, comparable to Bifrost's 1,022), so the server, pursuit, chest and route code needed no change. 
 * New zone fields: `size` (multiple of 8), `shape` (rule, k, `offset` of the core, `frame`, `outline`, `edges` runs with kind/other zone), `shapeFloor` rows (`#` land), `shapeEdge` rows (what the outside cell next to the land is: b border, c coast, l land, g gap).
 * Smoothing: each outline run between junctions gets two Chaikin passes, once per shared chain, so neighbours match.
 * Portals: `place_portals` in `zone_shapes.py` reuses `compact_atlas`'s reachability and clearance tests and places each crossing 5-14 tiles inside its chain, with the arrival six tiles further in.
@@ -29,7 +31,7 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 
 * Pilot server: port 8081 on the Docker bridge, own database **copy** (made with sqlite's backup API at 2026-11-05 02:10; the 30 characters in zones 0 and 1 were moved by the migration), no Surv notify variables. Beta progress does not carry back to the live game. Unit file `deploy/valhalla-shapes.service` (install by hand), served client = this branch's `client/` (live the moment a file is saved).
 * Public path: `bash scripts/zone_shapes_beta.sh on|off|status` adds or removes a marked proxy block in the live checkout's `deploy/apache.conf` and reloads Apache gracefully after `configtest`; URL `https://gunning.se/Valhallasc-shapes/`. Log in again there (character storage is per endpoint); SSO and game accounts work.
-* Checks run: Rust `zone_shape` (land content, edge walkers, border crossings), `tests/zone-shape-ui.cjs` (bounded: edge walks, both gate crossings, hub placement, screenshots in `test-results/zone-shapes/`).
+* Checks run: Rust `zone_shape` (3 tests: land content, edge walkers, gate crossings, seam crossing at 24+ points both ways), `tests/zone-shape-ui.cjs` (bounded: edge walks, both gate crossings, hub placement, screenshots in `test-results/zone-shapes/`).
 
 ## Not done / open
 
