@@ -81,17 +81,27 @@
     const old = socket; socket = null; old?.close();
     connected = false;
     status('Connecting to Greenmeadow…', false); overlay('Connecting to the world…');
+    // Offer deflated snapshots only when the inflater loaded.
+    const deflateOffer = () => (window.pako?.inflateRaw ? { compress: true } : {});
     const ws = new WebSocket(endpoint); socket = ws;
     let fatal = false, waitingForRelease = false, joinTimeout = 0;
     const current = () => active && currentGeneration === generation && socket === ws;
     ws.onopen = () => {
       if (!current()) { ws.close(); return; }
       ws.send(JSON.stringify(mode === 'account'
-        ? { type: 'join', version: 1, session: acct.session, character: acct.current, look: acct.current && !renamePending ? null : look }
-        : { type: 'join', version: 1, token: saved.current, look: saved.current && !renamePending ? null : look }));
+        ? { type: 'join', version: 1, session: acct.session, character: acct.current, look: acct.current && !renamePending ? null : look, ...deflateOffer() }
+        : { type: 'join', version: 1, token: saved.current, look: saved.current && !renamePending ? null : look, ...deflateOffer() }));
       joinTimeout = setTimeout(() => { if (current() && !connected) ws.close(); }, 15000);
     };
+    // Snapshots may arrive deflated (raw deflate in a binary frame; the server does it when the join asked for it).
+    // Inflated synchronously (pako): the browser's stream API took seconds per backlog under load, and sync keeps order.
+    ws.binaryType = 'arraybuffer';
     ws.onmessage = event => {
+      if (typeof event.data === 'string') { onFrame(event); return; }
+      let text; try { text = window.pako.inflateRaw(new Uint8Array(event.data), { to: 'string' }); } catch (_) { return; }
+      onFrame({ data: text });
+    };
+    const onFrame = event => {
       if (!current()) return;
       let packet; try { packet = JSON.parse(event.data); } catch (_) { return; }
       if (packet.type !== 'snapshot') flushSnapshot();

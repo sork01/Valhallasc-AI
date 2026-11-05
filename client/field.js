@@ -49,6 +49,7 @@
   let objects = [], nightLights = [], SHIFT = [0, 0], seamlessUntil = 0, lastGhostDrawn = 0;
   // Enemies and players of a neighbouring zone seen across a seam border (view only), already moved into this zone's frame.
   const ghostSlimes = new Map(), ghostPlayers = new Map();
+  let farDots = [];
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
@@ -186,12 +187,16 @@
   }
   // Outside the outline: coast is water; past a border you can cross (a seam) the neighbouring zone's own ground carries on;
   // past a border with only gates, the neighbour's ground behind a low rim; outer land a rocky rim. Beyond the band the backdrop shows.
+  const SEA_S = 46, SEA_L = 16, SEA_COLOR = `hsl(200, ${SEA_S}%, ${SEA_L}%)`;   // open water beyond the shallows of a shaped zone
   function outsideTile(g, px, py, code, x, y, tone, alt, ember, d) {
     const c = String.fromCharCode(code), h = hash2(x, y, 9), e = .7;
     const flat = col => { g.fillStyle = col; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill(); };
     if (c === 'c') {
-      flat(`hsl(${200 + tone * 12}, ${48 + tone * 8}%, ${Math.max(8, 26 - d * 1.1) + tone * 8 + alt * .6}%)`);
-      if (h > .72 && d < 8) { g.strokeStyle = `rgba(190,230,245,${.3 - d * .02})`; g.lineWidth = 1.5; g.beginPath(); g.moveTo(px - 7, py + TH / 2); g.lineTo(px + 7, py + TH / 2 + 2); g.stroke(); }
+      // The shallows fade into the open sea over the 14-tile band and end exactly on SEA_COLOR, which fills everything beyond
+      // (drawSky), so there is no edge of blackness: the water simply goes on.
+      const f = Math.max(0, 1 - d / 14);
+      flat(`hsl(${200 + tone * 12 * f}, ${SEA_S + (48 - SEA_S + tone * 8) * f}%, ${SEA_L + (26 - SEA_L) * f + (tone * 8 + alt * .6) * f}%)`);
+      if (h > .72 && d < 10) { g.strokeStyle = `rgba(190,230,245,${.3 - d * .02})`; g.lineWidth = 1.5; g.beginPath(); g.moveTo(px - 7, py + TH / 2); g.lineTo(px + 7, py + TH / 2 + 2); g.stroke(); }
       return;
     }
     if (c >= 'A' && c <= 'Z') {
@@ -266,7 +271,7 @@
     window.Weather?.setZone(zdef);
     if (mini) buildMini();
     if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
-    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; remotePlayers.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
+    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; farDots = []; remotePlayers.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
 
@@ -1424,6 +1429,7 @@
       }).catch(() => say('spriteError'));
     }
     loadSceneEnemyArt(packet.slimes.filter(inZone));
+    farDots = packet.far || [];   // enemies the server left out as too far to draw: [x, y, big], minimap only
     const existing = new Map(slimes.map(s => [s.id, s]));
     slimes = packet.slimes.filter(inZone).map(data => {
       const previous = existing.get(data.id);
@@ -3956,7 +3962,7 @@
     g.globalAlpha = 1;
   }
   function drawSky(g, t) {
-    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' ? '#0c0605' : '#07100d'; g.fillRect(0, 0, VW, VH); return; }
+    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' ? '#0c0605' : SEA_COLOR; g.fillRect(0, 0, VW, VH); return; }   // beyond the drawn shallows (and the grid) lies open sea
     if (zdef.theme === 'arena') { g.fillStyle = '#191723'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'emberwake') { EmberwakeArt.background(g,VW,VH,t); return; }
     if (zdef.theme === 'chained_forge') { const [cx,cy]=camS(); ChainedForgeArt.background(g,VW,VH,t,zdef,cx,cy,TW,TH); return; }
@@ -4715,6 +4721,7 @@
     for (const remote of remotePlayers.values()) {
       if (!seen(zone, remote.x, remote.y)) continue; mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
+    for (const [fx, fy, big] of farDots) if (seen(zone, fx, fy)) { mctx.fillStyle = big ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(fx * s, fy * s, 2, 0, 6.283); mctx.fill(); }
     // Quest guidance stays above fog and actors, and changes independently of the cached ground.
     mctx.save(); mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';
     for (const q of window.Quests?.mapMarkers(zone) || []) {

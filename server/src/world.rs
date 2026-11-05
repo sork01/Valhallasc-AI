@@ -500,6 +500,18 @@ impl Player {
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
     }
+    /// What a client draws of a player seen across a seam: no inventory, quests or stats.
+    fn across_view(&self) -> Value {
+        let c = &self.character;
+        json!({"id":c.id,"look":c.look,"zone":c.zone,"x":r2(c.x),"y":r2(c.y),"r":PLAYER_RADIUS,"hp":r2(c.hp),"maxHp":r2(c.max_hp()),
+            "level":c.level,"fx":r2(self.face.x),"fy":r2(self.face.y),"moving":self.moving,"walk":r2(self.walk),"atkT":r2(self.attack),
+            "hurtT":r2(self.hurt),"dead":c.hp<=0.,"deadT":r2(self.dead_time),"fallen":c.hp<=0. && self.fallen,"dashT":r2(self.dash),
+            "buffs":self.buffs,"sparkTravel":c.spark_travel,"mount":c.mount,"mounted":c.mounted,"mountTint":c.mount_tint,
+            "reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"pvpFlag":self.pvp_flag,"stun":r2(self.stun),
+            "daze":r2(self.daze),"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":r2(self.absorb_left),
+            "danceT":self.dance,"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet,
+            "hired":self.merc.is_some()})
+    }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
         self.buffs
@@ -638,7 +650,22 @@ struct Slime {
     #[serde(skip)]
     contributors: std::collections::BTreeSet<String>,
 }
+/// Two decimals, for what is only drawn.
+fn r2(v: f64) -> f64 {
+    (v * 100.).round() / 100.
+}
 impl Slime {
+    /// An enemy seen across a seam is drawn only while alive or dying.
+    fn shows_across(&self) -> bool {
+        !self.dead || self.die_t < 2.
+    }
+    /// What a client draws of an enemy seen across a seam (not the home point, respawn or attack timers).
+    fn across_view(&self) -> Value {
+        json!({"id":self.id,"kind":self.kind,"elite":self.elite,"zone":self.zone,"level":self.level,"x":r2(self.x),"y":r2(self.y),
+            "hp":r2(self.hp),"maxHp":r2(self.max_hp),"r":self.r,"state":self.state,"st":r2(self.st),"dir":r2(self.dir),
+            "hop":r2(self.hop),"hopV":r2(self.hop_v),"hurtT":r2(self.hurt_t),"recT":r2(self.rec_t),"landT":r2(self.land_t),
+            "dead":self.dead,"dieT":r2(self.die_t),"blink":r2(self.blink),"seed":self.seed,"windupTime":self.windup_time})
+    }
     // Health, damage, speed and body scale of a default-level enemy.
     /// (health, damage, speed, scale) of `kind` at its default level: the table below times the power in
     /// `world/elite-power.txt` (see `items::elite_power`).
@@ -2006,16 +2033,20 @@ impl World {
                     y: p.y - seam.shift[1],
                 }) < ACROSS_RANGE
             };
+            // Slim copies: only what the client draws of a ghost. A hidden GM is not listed at all.
             let players: Vec<Value> = self
                 .players
                 .iter()
-                .filter(|(_, p)| p.character.zone == portal.to && near(p.character.point()))
-                .map(|(session, p)| self.player_view(*session, p))
+                .filter(|(_, p)| {
+                    p.character.zone == portal.to && near(p.character.point()) && !p.is_hidden()
+                })
+                .map(|(_, p)| p.across_view())
                 .collect();
-            let slimes: Vec<&Slime> = self
+            let slimes: Vec<Value> = self
                 .slimes
                 .iter()
-                .filter(|s| s.zone == portal.to && near(s.point()))
+                .filter(|s| s.zone == portal.to && near(s.point()) && s.shows_across())
+                .map(Slime::across_view)
                 .collect();
             out.push(json!({"to":portal.to,"shift":seam.shift,"players":players,"slimes":slimes}));
         }
@@ -2261,6 +2292,7 @@ impl World {
         let zone = self.players[&session].character.zone;
         let mut snapshot = self.snapshot_for(zone);
         crate::visibility::filter_view(&mut snapshot, &id);
+        crate::visibility::cull_view(&mut snapshot, &id);
         Ok(json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":snapshot}))
     }
     /// Test servers may start new characters above level 1 (VALHALLA_START_LEVEL).

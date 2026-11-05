@@ -329,3 +329,97 @@ fn the_other_side_of_a_seam_is_listed_for_the_view_but_only_near_the_line() {
         "own-zone players are unchanged"
     );
 }
+
+#[test]
+fn what_lies_across_a_seam_is_slim_and_never_a_hidden_gm() {
+    let mut w = world();
+    let data = bundled();
+    let _a = join(&mut w, 1, Class::Warrior);
+    let _b = join(&mut w, 2, Class::Mage);
+    let seam = zone_of(&data, 0)["portals"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find_map(|p| p.get("seam"))
+        .unwrap();
+    let pts = seam["points"].as_array().unwrap();
+    let (shx, shy) = (
+        seam["shift"][0].as_f64().unwrap(),
+        seam["shift"][1].as_f64().unwrap(),
+    );
+    let mid = &pts[pts.len() / 2];
+    let q = at(
+        mid[0].as_f64().unwrap() + shx,
+        mid[1].as_f64().unwrap() + shy,
+    );
+    let inside = (0..200)
+        .map(|i| at(q.x + (i % 20) as f64 - 10., q.y + (i / 20) as f64 - 5.))
+        .find(|p| land(zone_of(&data, 1))(p.x, p.y))
+        .unwrap();
+    place(&mut w, 2, 1, inside);
+    let s0 = w.maps[0].spawn;
+    place(&mut w, 1, 0, at(s0.x, s0.y));
+    let across = w.snapshot_for(0)["across"][0].clone();
+    let player = &across["players"][0];
+    assert_eq!(player["id"], w.players[&2].character.id);
+    for field in [
+        "x", "y", "look", "hp", "maxHp", "fx", "fy", "moving", "walk", "atkT", "dead", "buffs",
+        "mounted",
+    ] {
+        assert!(player.get(field).is_some(), "ghost player lacks {field}");
+    }
+    for leak in [
+        "inventory",
+        "quests",
+        "equipment",
+        "gold",
+        "gearInstances",
+        "bags",
+        "attributes",
+        "mailUnread",
+        "session",
+        "explored",
+        "storyMemory",
+    ] {
+        assert!(player.get(leak).is_none(), "ghost player leaks {leak}");
+    }
+    // A hidden GM in the neighbour zone is not listed at all.
+    w.players.get_mut(&2).unwrap().character.gm = true;
+    w.players.get_mut(&2).unwrap().hidden = true;
+    assert!(
+        w.snapshot_for(0)["across"][0]["players"]
+            .as_array()
+            .unwrap()
+            .is_empty(),
+        "a hidden GM is visible across the seam"
+    );
+    // Enemies: the fields a client draws, none of the server's bookkeeping.
+    let enemy = w
+        .slimes
+        .iter()
+        .find(|s| s.zone == 1)
+        .expect("a Crags enemy")
+        .across_view();
+    for field in [
+        "id",
+        "kind",
+        "x",
+        "y",
+        "state",
+        "dir",
+        "hop",
+        "dead",
+        "dieT",
+        "windupTime",
+        "maxHp",
+        "seed",
+    ] {
+        assert!(enemy.get(field).is_some(), "ghost enemy lacks {field}");
+    }
+    for bookkeeping in ["hx", "hy", "respawn", "atkCd"] {
+        assert!(
+            enemy.get(bookkeeping).is_none(),
+            "ghost enemy sends {bookkeeping}"
+        );
+    }
+}

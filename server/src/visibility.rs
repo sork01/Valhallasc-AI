@@ -48,6 +48,67 @@ pub fn filter_view(view: &mut Value, viewer: &str) {
     }
 }
 
+/// Half-width (tiles) of the square around the viewer that still gets full enemy data. The client draws at most about
+/// 48 tiles from the hero along an axis (portrait phone, 1600 px virtual width), plus a margin for tall sprites.
+pub const CULL_HALF: f64 = 56.;
+
+/// Per-viewer distance culling of a zone view: enemies farther than `CULL_HALF` tiles (either axis) from the viewer's
+/// own hero are dropped, and listed as `far: [[x, y, big]]` dots so the minimap keeps showing them. Elites and bosses
+/// are always kept, dead enemies are not dotted, dungeon copies (`instance`) are never culled, and neither is a view
+/// that does not list the viewer. Things across a seam are culled by their distance to the viewer after undoing the seam
+/// shift.
+pub fn cull_view(view: &mut Value, viewer: &str) {
+    if view.get("instance").is_some() {
+        return;
+    }
+    let Some((vx, vy)) = view["players"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .find(|p| p["id"] == viewer)
+        .and_then(|p| Some((p["x"].as_f64()?, p["y"].as_f64()?)))
+    else {
+        return;
+    };
+    let near = |x: Option<f64>, y: Option<f64>, dx: f64, dy: f64| match (x, y) {
+        (Some(x), Some(y)) => (x - dx - vx).abs() <= CULL_HALF && (y - dy - vy).abs() <= CULL_HALF,
+        _ => true,
+    };
+    let mut far: Vec<Value> = Vec::new();
+    if let Some(slimes) = view["slimes"].as_array_mut() {
+        slimes.retain(|s| {
+            if s["elite"] == true || near(s["x"].as_f64(), s["y"].as_f64(), 0., 0.) {
+                return true;
+            }
+            if s["dead"] != true {
+                let round = |v: f64| (v * 10.).round() / 10.;
+                far.push(json!([
+                    round(s["x"].as_f64().unwrap_or(0.)),
+                    round(s["y"].as_f64().unwrap_or(0.)),
+                    u8::from(s["kind"] == "big")
+                ]));
+            }
+            false
+        });
+    }
+    if !far.is_empty() {
+        view["far"] = Value::Array(far);
+    }
+    if let Some(across) = view["across"].as_array_mut() {
+        for side in across {
+            let (dx, dy) = (
+                side["shift"][0].as_f64().unwrap_or(0.),
+                side["shift"][1].as_f64().unwrap_or(0.),
+            );
+            for key in ["slimes", "players"] {
+                if let Some(list) = side[key].as_array_mut() {
+                    list.retain(|a| near(a["x"].as_f64(), a["y"].as_f64(), dx, dy));
+                }
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -68,5 +129,63 @@ mod tests {
         assert_eq!(gm["players"].as_array().unwrap().len(), 2);
         assert_eq!(gm["online"], 2);
         assert!(!gm.to_string().contains("\"session\""));
+    }
+
+    fn slime(id: u64, x: f64, y: f64, elite: bool, dead: bool, kind: &str) -> Value {
+        json!({"id":id,"x":x,"y":y,"elite":elite,"dead":dead,"kind":kind})
+    }
+    fn cullable() -> Value {
+        json!({"players":[{"id":"me","x":100.,"y":100.},{"id":"pal","x":300.,"y":300.}],
+            "slimes":[slime(1,120.,90.,false,false,"green"), slime(2,100.+CULL_HALF+1.,100.,false,false,"green"),
+                      slime(3,100.,100.-CULL_HALF-1.,false,false,"big"), slime(4,400.,400.,true,false,"king"),
+                      slime(5,300.,300.,false,true,"green")],
+            "across":[{"to":1,"shift":[-50.,0.],"slimes":[slime(10,60.,100.,false,false,"wisp"), slime(11,100.+CULL_HALF+51.,100.,false,false,"wisp")],
+                       "players":[{"id":"far","x":300.,"y":100.},{"id":"near","x":30.,"y":100.}]}]})
+    }
+    fn ids(list: &Value) -> Vec<u64> {
+        list.as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|s| s["id"].as_u64())
+            .collect()
+    }
+
+    #[test]
+    fn enemies_beyond_the_square_around_the_viewer_are_dropped_and_dotted() {
+        let mut v = cullable();
+        cull_view(&mut v, "me");
+        assert_eq!(
+            ids(&v["slimes"]),
+            vec![1, 4],
+            "near and elite stay; far ones go"
+        );
+        // Far living enemies become dots; the far dead one (id 5) is not dotted.
+        assert_eq!(v["far"], json!([[157.0, 100.0, 0], [100.0, 43.0, 1]]));
+    }
+
+    #[test]
+    fn across_entries_are_culled_by_distance_to_the_viewer_after_the_seam_shift() {
+        let mut v = cullable();
+        cull_view(&mut v, "me");
+        assert_eq!(ids(&v["across"][0]["slimes"]), vec![10]);
+        let kept: Vec<&str> = v["across"][0]["players"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|p| p["id"].as_str())
+            .collect();
+        assert_eq!(kept, vec!["near"]);
+    }
+
+    #[test]
+    fn a_view_that_cannot_be_culled_is_left_alone() {
+        let mut stranger = cullable();
+        cull_view(&mut stranger, "nobody");
+        assert_eq!(stranger, cullable(), "viewer not listed");
+        let mut dungeon = cullable();
+        dungeon["instance"] = json!({"cleared":false});
+        let before = dungeon.clone();
+        cull_view(&mut dungeon, "me");
+        assert_eq!(dungeon, before, "instance copies are never culled");
     }
 }

@@ -1232,6 +1232,9 @@ pub enum ClientMessage {
         session: Option<String>,
         #[serde(default)]
         character: Option<String>,
+        /// The client can inflate raw-deflate binary frames: snapshots then arrive compressed (`send_snapshot`).
+        #[serde(default)]
+        compress: bool,
     },
     Input {
         dx: f64,
