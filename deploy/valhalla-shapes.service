@@ -1,0 +1,22 @@
+# Zone-shape pilot (feat/zone-shapes): a private copy of the game next to the live one. NOT the live unit.
+# Install by hand:  cp deploy/valhalla-shapes.service ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user start valhalla-shapes
+# Remove:           systemctl --user stop valhalla-shapes && rm ~/.config/systemd/user/valhalla-shapes.service
+# No Surv notify variables on purpose: beta logins must not push to the owner's phone.
+[Unit]
+Description=Valhalla zone-shape pilot (feat/zone-shapes), a private test copy next to the live game
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/media/raid/valhallasc-data/zone-shapes-work
+ExecStart=/media/raid/valhallasc-data/zone-shapes-target/release/valhalla-server
+Environment=VALHALLA_BIND=172.18.0.1:8081
+Environment=VALHALLA_DB=/media/raid/valhallasc-data/zone-shapes-data/valhalla.sqlite
+Environment=VALHALLA_CLIENT_DIR=/media/raid/valhallasc-data/zone-shapes-work/client
+Environment=VALHALLA_ORIGIN=https://gunning.se
+Environment=VALHALLA_AMBIENT_PLAYERS=1
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+NoNewPrivileges=true
+UMask=0077

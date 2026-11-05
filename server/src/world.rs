@@ -19,6 +19,8 @@ mod ambient;
 mod bank;
 #[cfg(test)]
 mod compact_atlas_tests;
+#[cfg(test)]
+mod zone_shape_tests;
 mod inspect;
 mod mail;
 #[cfg(test)]

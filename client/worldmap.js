@@ -291,7 +291,8 @@
     for (let n = 0; n < 70; n++) { g.fillStyle = rnd() < .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.07)'; g.beginPath(); g.arc(rnd() * px, rnd() * px, (4 + rnd() * 9) * k, 0, 6.283); g.fill(); }
     g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme]; g.lineWidth = 2.8 * k;
     for (const p of z.paths || []) { g.beginPath(); p.forEach(([x, y], i) => i ? g.lineTo(x * k, y * k) : g.moveTo(x * k, y * k)); g.stroke(); }
-    if (z.theme === 'meadow') { g.beginPath(); g.arc(36 * k, 36 * k, 3.5 * k, 0, 6.283); g.fill(); }
+    if (z.theme === 'meadow') { const o = z.shape ? z.shape.offset : [0, 0]; g.beginPath(); g.arc((36 + o[0]) * k, (36 + o[1]) * k, 3.5 * k, 0, 6.283); g.fill(); }
+    if (z.shapeFloor) { g.fillStyle = 'rgba(6,10,9,.9)'; z.shapeFloor.forEach((row, y) => { for (let x = 0; x < z.size; x++) if (row[x] !== '#') g.fillRect(x * k, y * k, k + .6, k + .6); }); }
     (z.sky || []).forEach((row, y) => { for (let x = 0; x < z.size; x++) { const c = row[x]; if (c && c !== ' ') { g.fillStyle = c === '=' ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .6, k + .6); } } });   // floating islands and their bridges
     (z.moonwellFloor || []).forEach((row,y)=>{for(let x=0;x<z.size;x++){const c=row[x];if(c&&c!==' '){g.fillStyle=c==='='?'#f8e8ad':'#a8d5cf';g.fillRect(x*k,y*k,k+.6,k+.6);}}});
     (z.forgeFloor || z.blackhourFloor || z.longshipFloor || []).forEach((row,y)=>{for(let x=0;x<z.size;x++)if(row[x]==='='){g.fillStyle=z.forgeFloor?'#b4a09c':z.blackhourFloor?'#87749b':Math.abs(x+.5-64)<2?'#668c80':'#bf9c71';g.fillRect(x*k,y*k,k+.6,k+.6);}});
@@ -416,6 +417,12 @@
     const city=ATLAS.cities.find(c=>c.zone===index&&c.parent!==index);
     if(city) return [city.at[0]+(x/zones[index].size-.5)*100,city.at[1]+(y/zones[index].size-.5)*100];
     const a=LAYOUT[index];
+    if(a?.polygon && zones[index].shape) {
+      const sh=zones[index].shape; let p=[a.x+(x-sh.frame[0])/sh.k,a.y+(y-sh.frame[1])/sh.k];
+      const r=PROVINCES.get(index),center=r.label||r.seed;
+      for(let q=0;q<20&&!insidePolygon(r.polygon,...p);q++) p=[p[0]*.8+center[0]*.2,p[1]*.8+center[1]*.2];
+      return p;
+    }
     if(a?.polygon) {
       const r=PROVINCES.get(index),center=r.label||r.seed;
       let p=[a.x+x/zones[index].size*a.w,a.y+y/zones[index].size*a.h];

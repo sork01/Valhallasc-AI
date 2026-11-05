@@ -13,7 +13,7 @@
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
   // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
-  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null, exitRoutes:WORLD_MAP.exitRoutes||[] },
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null, exitRoutes:WORLD_MAP.exitRoutes||[], shape: WORLD_MAP.shape, shapeFloor: WORLD_MAP.shapeFloor, shapeEdge: WORLD_MAP.shapeEdge },
     ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
   let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
@@ -46,16 +46,16 @@
     [[36, 36], [26, 32], [16, 26], [10, 16]],
   ];
   const map = { dirt: new Uint8Array(0), tone: new Float32Array(0) };
-  let objects = [], nightLights = [];
+  let objects = [], nightLights = [], SHIFT = [0, 0];
   function buildMap() {
-    MAP = zdef.size; SPAWN = zdef.spawn;
+    MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
     const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
       map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : sky ? 71 : astral ? 91 : prism ? 101 : orrery ? 111 : moonspore ? 121 : zdef.theme === 'stormglass' ? 131 : zdef.theme === 'sunward' ? 141 : zdef.theme === 'ribbonwild' ? 151 : zdef.theme === 'tanglecrown' ? 161 : zdef.theme === 'worldtree' ? 171 : zdef.theme === 'heartwood' ? 181 : zdef.theme === 'lapiserg' ? 191 : zdef.theme === 'frostwake' ? 201 : zdef.theme === 'cairnspine' ? 211 : zdef.theme === 'yearwheel' ? 221 : deep ? 81 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : sky ? 72 : astral ? 92 : prism ? 102 : orrery ? 112 : moonspore ? 122 : zdef.theme === 'stormglass' ? 132 : zdef.theme === 'sunward' ? 142 : zdef.theme === 'ribbonwild' ? 152 : zdef.theme === 'tanglecrown' ? 162 : zdef.theme === 'worldtree' ? 172 : zdef.theme === 'heartwood' ? 182 : zdef.theme === 'lapiserg' ? 192 : zdef.theme === 'frostwake' ? 202 : zdef.theme === 'cairnspine' ? 212 : zdef.theme === 'yearwheel' ? 222 : deep ? 82 : 2) * .35;
       let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
-      if (!ember && !frost && !fen && !city && !vault && !wyrd && !sky && !astral && !prism && !orrery && !moonspore && zdef.theme !== 'stormglass' && zdef.theme !== 'sunward' && zdef.theme !== 'ribbonwild' && zdef.theme !== 'tanglecrown' && zdef.theme !== 'worldtree' && zdef.theme !== 'heartwood' && zdef.theme !== 'lapiserg' && zdef.theme !== 'frostwake' && zdef.theme !== 'cairnspine' && zdef.theme !== 'yearwheel' && zdef.theme !== 'emberwake' && !deep) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
+      if (!ember && !frost && !fen && !city && !vault && !wyrd && !sky && !astral && !prism && !orrery && !moonspore && zdef.theme !== 'stormglass' && zdef.theme !== 'sunward' && zdef.theme !== 'ribbonwild' && zdef.theme !== 'tanglecrown' && zdef.theme !== 'worldtree' && zdef.theme !== 'heartwood' && zdef.theme !== 'lapiserg' && zdef.theme !== 'frostwake' && zdef.theme !== 'cairnspine' && zdef.theme !== 'yearwheel' && zdef.theme !== 'emberwake' && !deep) d = Math.min(d, Math.hypot(cx - 36 - SHIFT[0], cy - 36 - SHIFT[1]) - 2.4);
       map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
     if (city || zdef.theme === 'nacre') paintRoads(zdef.roads);
@@ -66,6 +66,7 @@
     if (zdef.theme === 'blackhour') paintSky(zdef.blackhourFloor);
     if (zdef.theme === 'chained_forge') paintSky(zdef.forgeFloor);
     if (zdef.theme === 'moonwell') paintMoonwell(zdef.moonwellFloor);
+    if (zdef.shapeFloor) paintShape(zdef.shapeFloor, zdef.shapeEdge);
     objects = zdef.objects.map(o => ({ ...o }));
     nightLights = objects.filter(o => ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop'].some(k => o.kind.includes(k)));
   }
@@ -91,6 +92,26 @@
   function paintSky(rows) {
     map.floor = new Uint8Array(MAP * MAP); map.dirt.fill(0);
     (rows || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) { const c = row[x]; if (c && c !== ' ') { map.floor[y * MAP + x] = 1; if (c === '=') map.dirt[y * MAP + x] = 1; } } });
+  }
+  // A zone with the outline of its province on the world atlas (docs/zone-shapes.md): `shapeFloor` rows mark the land
+  // ('#'), `shapeEdge` rows say what the outside cells next to it are (b border, c coast, l outer land, g gap).
+  function paintShape(rows, edge) {
+    map.floor = new Uint8Array(MAP * MAP); map.edge = new Uint8Array(MAP * MAP);
+    (rows || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) if (row[x] === '#') map.floor[y * MAP + x] = 1; });
+    (edge || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) { const c = row[x]; if (c && c !== ' ' && !map.floor[y * MAP + x]) map.edge[y * MAP + x] = c.charCodeAt(0); } });
+  }
+  // Outside the outline, within a few tiles of it: coast is water, a border with another province is a dark wall of
+  // trees or rock, outer land is a rocky rim. Everything farther out stays the backdrop.
+  function outsideTile(g, px, py, code, x, y, tone, alt, ember) {
+    const c = String.fromCharCode(code), h = hash2(x, y, 9), e = .7;
+    let col;
+    if (c === 'c') col = `hsl(${200 + tone * 12}, ${48 + tone * 8}%, ${24 + tone * 8 + alt * .6}%)`;
+    else if (c === 'b') col = ember ? `hsl(${8 + tone * 10}, 18%, ${9 + h * 6}%)` : `hsl(${128 + tone * 14}, 34%, ${11 + h * 6}%)`;
+    else if (c === 'l') col = ember ? `hsl(${14 + tone * 10}, 14%, ${12 + h * 6}%)` : `hsl(${35 + tone * 10}, 18%, ${15 + h * 7}%)`;
+    else col = '#1a2024';
+    g.fillStyle = col; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
+    if (c === 'c' && h > .72) { g.strokeStyle = 'rgba(190,230,245,.28)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(px - 7, py + TH / 2); g.lineTo(px + 7, py + TH / 2 + 2); g.stroke(); }
+    if (c === 'b' && h > .5) { g.fillStyle = ember ? 'rgba(0,0,0,.35)' : 'rgba(10,40,20,.55)'; g.beginPath(); g.ellipse(px, py + TH / 2 - 3, 9, 7, 0, 0, 6.283); g.fill(); }
   }
   function paintMoonwell(rows) {
     map.floor = new Uint8Array(MAP * MAP); map.dirt.fill(0);
@@ -441,6 +462,7 @@
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       if ((sky || moonwell) && !map.floor[i]) continue;                              // open water or sky
+      if (zdef.shapeFloor && !map.floor[i]) { if (map.edge[i]) outsideTile(g, px, py, map.edge[i], x, y, tone, ((x + y) & 1) ? 1.4 : -1.4, zdef.theme === 'ember'); continue; }
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];
       g.fillStyle = zdef.theme === 'emberwake' ? EmberwakeArt.ground(x,y,tone,alt,zdef,dirt) : zdef.theme === 'chained_forge' ? ChainedForgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'blackhour' ? BlackhourArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'longship' ? LongshipArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'arena' ? (x < 3 || y < 3 || x > 28 || y > 28 ? '#423746' : x === 16 || y === 16 ? '#ae8456' : (x + y) % 2 ? '#6e6877' : '#777180') : zdef.theme === 'skybridge' ? SkybridgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'nornroot' ? NornrootArt.ground(x,y,tone,alt,zdef) : moonwell ? MoonwellArt.ground(x,y,tone,dirt,alt,zdef) : zdef.theme === 'eye_below' ? EyeBelowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'elder_hollow' ? ElderHollowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thousandfold' ? PavilionArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'rain_crown' ? RainCrownArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'seed_vault' ? SeedVaultArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'sunken_astrolabe' ? SunkenArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thunderheart_gate' ? ThunderArt.ground(x,y,tone,alt,zdef) : SeasonDungeonArt.isTheme(zdef.theme) ? SeasonDungeonArt.ground(zdef.theme,x,y,tone,alt,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt,zdef) : zdef.theme === 'vault' ? VaultArt.ground(x,y,tone,alt,zdef.rooms,arenas) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
@@ -690,7 +712,7 @@
         g.strokeStyle = OL; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + depth); g.lineTo(bx, by + depth * .9); g.stroke();
       };
       if (sky || moonwell) { if (isVoid(x + 1, y)) face(1); if (isVoid(x, y + 1)) face(-1); }
-      else { if (!vault && x === MAP - 1) face(1); if (!vault && y === MAP - 1) face(-1); }
+      else if (!zdef.shapeFloor) { if (!vault && x === MAP - 1) face(1); if (!vault && y === MAP - 1) face(-1); }
     }
     if(zdef.theme==='emberwake'||zdef.theme==='ember') EmberwakeArt.molten(g,G,CH,TW,TH,zdef);
     return { c, G };
@@ -3742,6 +3764,7 @@
     g.globalAlpha = 1;
   }
   function drawSky(g, t) {
+    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' ? '#0c0605' : '#07100d'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'arena') { g.fillStyle = '#191723'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'emberwake') { EmberwakeArt.background(g,VW,VH,t); return; }
     if (zdef.theme === 'chained_forge') { const [cx,cy]=camS(); ChainedForgeArt.background(g,VW,VH,t,zdef,cx,cy,TW,TH); return; }
@@ -4369,6 +4392,7 @@
   function buildMini() {
     const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    if (zdef.shapeFloor) { g.fillStyle = '#080c0b'; for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (!map.floor[y * MAP + x]) g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? MoonwellArt.minimap(x,y,map.dirt[y*MAP+x],zdef) : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
@@ -4548,7 +4572,7 @@
       if(paused || !Online.connected || hero.dead)return;
       if (!zdef.city) return;
       Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;
-      cityRoute=routeTo(zone === 0 ? {x:36,y:79} : campNear()?.entry || zdef.spawn);routeTime=0;
+      cityRoute=routeTo(zone === 0 ? {x:36+SHIFT[0],y:79+SHIFT[1]} : campNear()?.entry || zdef.spawn);routeTime=0;
     },
     toggleMount() {
       if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel || !hero.mountOwned) return;

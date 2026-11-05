@@ -27,7 +27,7 @@
   function stoneTile(g, px, py, x, y) {
     const city = area().city; if (!city) return false;
     if (Field.zone > 0 && (Field.zoneTheme === 'city' || Field.zoneTheme === 'nacre' || Field.zoneTheme === 'asterion')) return false;     // zone roads are painted by field.js
-    const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
+    const inCity=inside(x+.5,y+.5), sh=(city && area().shape ? area().shape.offset : [0,0]), road=!Field.zone && y>=69+sh[1] && y<city.y0 && Math.abs(x+.5-36-sh[0])<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
       if (Field.zoneTheme === 'worldtree') {
