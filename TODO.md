@@ -8,6 +8,25 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Zone shapes follow the world-map provinces (owner request, 2026-11-05)
+
+**Owner request:** change the zones so they look like the zones on the world map, shape-wise (today every zone is a square grid; the painted atlas gives each province an irregular outline, `world/atlas-geography.txt`, zones 0-28).
+
+**Owner answers (grill, 2026-11-05):**
+- **Scope: everything on the atlas.** All 29 atlas zones, cities included (Skaldholm, Nacrehold, Asterion, Veyrroot Canopy/Heartwood). Dungeons, instances and raids are not provinces and keep their layout.
+- **Method: real relative scale.** Each zone is sized in proportion to its atlas area and takes the atlas outline (not a polygon carved into the current square). Distances, pacing, kill-time and travel balance shift with the new sizes, so expect re-checks of the affected zones only.
+- **Edge: match the neighbour.** Where two provinces share a border on the atlas, that edge is the walking route/portal to the neighbour (portals tied to the shared borders, `Portal.walk` stays authoritative). Only true coastline and outer edges get themed scenery.
+- **Rollout: preview first, then decide.** No map edits until the owner approves overlays. Do not start `SHAPE-DATA` before the owner says go.
+
+**Defaults (not owner answers):** Work in a private worktree under `/media/raid/valhallasc-data`, never `.tools/`. The map is embedded in the server, so a shaped zone needs a rebuild and restart: nobody online, backup first, and saved characters standing in newly blocked cells (and private-copy IDs, `COPY` in `vault_tests.rs`) must be checked and moved. Generators are seeded and byte-stable; later generators in the chain preserve earlier zones, so decide per zone where the shaping step runs (`sync-world` runs last). Bump the version per release and add release notes.
+
+- [ ] `SHAPE-RULES` - Write `docs/zone-shapes.md`: scale rule (atlas area to grid size, min/max), how an outline becomes collision (existing `bounds`/`void`/`sky` mechanics vs a new polygon field), how shared borders map to portals and walking routes, the themed coastline edge per zone, and what happens to cities, camps, NPCs, quests and spawns that fall outside the new outline.
+- [ ] `SHAPE-PREVIEW` - Owner-approved first step: per zone an overlay picture (atlas outline at the proposed size over the current layout, with the spawns, camps, NPCs, portals and city blocks that would move marked) plus a table of old and new sizes. Upload to FileDrop under `valhallasc-shape-*` and wait for the owner to approve or adjust. No map edits.
+- [ ] `SHAPE-DATA` - After approval, apply the outlines zone by zone (outdoor provinces first, cities after), move displaced content inside the outline, tie portals to the shared borders, run `sync-world`, rebuild. Only after `SHAPE-PREVIEW` is approved.
+- [ ] `SHAPE-CLIENT` - Draw the themed edge outside the outline (ground cache, minimap, detailed world map and fog of war must agree with the new bounds; keep the ground-cache working-set invariant in `field.js`).
+- [ ] `SHAPE-MIGRATE` - Server release: move saved characters out of blocked cells, update zone-count and size assertions, backup, restart, verify health and hashes.
+- [ ] `SHAPE-CHECK` - Focused bounded checks for the shaped zones only (collision matches the outline, every portal reachable, no enemy or NPC outside, atlas and minimap agree); no full suites.
+
 ### Remade four-legged animal monsters float above the ground (owner report, 2026-11-03)
 
 - [x] `QUADRUPED-GROUNDING` — All remade four-legged animal monsters look like they are floating above the ground. Review every affected remade kind and correct its sprite placement/ground contact so planted feet sit naturally on the terrain. Verify the result in-game across idle, walking and combat animations with focused real-art checks; apply the same grounding requirement to upcoming remakes. (Completed across all reopened remakes through Beta 1.39.17; enforced in every `*-slime-art.cjs` check.)
