@@ -1,7 +1,7 @@
 // Zone shapes pilot (docs/zone-shapes.md): the real client draws Greenmeadow and the Emberfall Crags with the outline of
 // their province, and a walker cannot leave the land. Starts its own private world (test commands, own database) from
 // VALHALLA_BINARY and writes screenshots to test-results/zone-shapes/. Run it bounded:
-//   bash scripts/test-touch-bounded.sh tests/zone-shape-ui.cjs
+//   PART=seams bash scripts/test-touch-bounded.sh tests/zone-shape-ui.cjs   (then PART=rest)
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -35,6 +35,15 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
   const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
   const where = () => page.evaluate(() => ({ zone: Field.zone, x: Field.hero.nx, y: Field.hero.ny }));
+  // The meadow/Crags border geometry, shared by both parts.
+  const seam = zoneDef(0).portals.find(p => p.seam).seam, pts = seam.points, [shx, shy] = seam.shift;
+  const onA = (x, y) => onLand(0, x, y);
+  const seg = Math.floor(pts.length / 2), a = pts[seg], b = pts[seg + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const q = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
+  const inward = onA(q[0] + nrm[0] * 4, q[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
+  const keysFor = ([dx, dy]) => [Math.abs(dx) > .35 ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : null, Math.abs(dy) > .35 ? (dy > 0 ? 'ArrowDown' : 'ArrowUp') : null].filter(Boolean);
+  // The suite is split in two so each part stays inside the bounded runner's ten minutes: PART=seams (edge walks, the four seam crossings) or PART=rest (minimap, step 2, hubs, world map).
+  if (process.env.PART !== 'rest') {
   for (const zone of [0, 1, 3]) {
     const z = zoneDef(zone), n = z.size;
     check(z.shapeFloor?.length === n && z.size % 8 === 0, `zone ${zone} carries its outline`);
@@ -66,12 +75,6 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     check(mini || true, 'minimap present');
   }
   // Walk across the shared border of the meadow and the Crags (a seam: crossable anywhere along it), both ways.
-  const seam = zoneDef(0).portals.find(p => p.seam).seam, pts = seam.points, [shx, shy] = seam.shift;
-  const onA = (x, y) => onLand(0, x, y);
-  const seg = Math.floor(pts.length / 2), a = pts[seg], b = pts[seg + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-  const q = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
-  const inward = onA(q[0] + nrm[0] * 4, q[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
-  const keysFor = ([dx, dy]) => [Math.abs(dx) > .35 ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : null, Math.abs(dy) > .35 ? (dy > 0 ? 'ArrowDown' : 'ArrowUp') : null].filter(Boolean);
   for (const [from, to, origin, dir] of [[0, 1, q, inward], [1, 0, [q[0] + shx, q[1] + shy], [-inward[0], -inward[1]]]]) {
     const sx = origin[0] + dir[0] * 3, sy = origin[1] + dir[1] * 3, keys = keysFor([-dir[0], -dir[1]]);
     await debug({ op: 'teleport', zone: from, x: sx, y: sy });
@@ -128,6 +131,37 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       check(tilesBefore === tilesAfter, `seam crossing ${from} -> ${to}: the minimap keeps its scale (${tilesBefore} tiles across before, ${tilesAfter} after)`);
     }
   }
+  // Gloamfen (zone 3) shares a seam with the meadow at the one tile scale (1.0): crossed both ways in the real client, nothing pops in.
+  {
+    const gl = zoneDef(0).portals.find(p => p.to === 3 && p.seam).seam, gp = gl.points, [gx, gy] = gl.shift;
+    const k = Math.floor(gp.length / 2), ga = gp[k], gb = gp[k + 1], gln = Math.hypot(gb[0] - ga[0], gb[1] - ga[1]);
+    const gq = [(ga[0] + gb[0]) / 2, (ga[1] + gb[1]) / 2], gn = [-(gb[1] - ga[1]) / gln, (gb[0] - ga[0]) / gln];
+    const gi = onLand(0, gq[0] + gn[0] * 4, gq[1] + gn[1] * 4) ? gn : [-gn[0], -gn[1]];
+    for (const [from, to, origin, dir] of [[0, 3, gq, gi], [3, 0, [gq[0] + gx, gq[1] + gy], [-gi[0], -gi[1]]]]) {
+      const sx = origin[0] + dir[0] * 3, sy = origin[1] + dir[1] * 3;
+      await debug({ op: 'teleport', zone: from, x: sx, y: sy });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [from, sx, sy], { timeout: 20000 });
+      await page.waitForTimeout(600);
+      await page.screenshot({ path: path.join(out, `seam-${from}-before-gloamfen.png`) });
+      const ahead = await page.evaluate(() => Field.ghosts.kinds);
+      const own = [...new Set(zoneDef(to).objects.map(o => o.kind))].filter(k => ['tree', 'bush', 'rock'].includes(k));
+      check(own.length > 0 && own.every(k => ahead.includes(k)), `seam ${from} -> ${to}: the zone ahead's scenery (${own.join(', ')}) is ready beyond the border; ghosts: ${ahead.join(', ')}`);
+      const tilesBefore = await page.evaluate(() => Field.miniTiles);
+      const keys = keysFor([-dir[0], -dir[1]]);
+      for (const key of keys) await page.keyboard.down(key);
+      await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
+      for (const key of keys) await page.keyboard.up(key);
+      await page.waitForTimeout(1300);
+      const p = await where();
+      check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+      check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);
+      check(await page.evaluate(() => !document.getElementById('area-title').classList.contains('show') && !document.body.innerText.includes('You enter')), `seam crossing ${from} -> ${to}: no zone banner and no "You enter" line`);
+      await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}-gloamfen.png`) });
+      check(tilesBefore === await page.evaluate(() => Field.miniTiles), `seam crossing ${from} -> ${to}: the minimap keeps its scale`);
+    }
+  }
+  }
+  if (process.env.PART !== 'seams') {
   // The minimap waves are pinned to the world: the same spot seen from either side of a seam gives the same ripple origin.
   {
     const sm = zoneDef(0).portals.find(p => p.to === 16 && p.seam).seam, k = Math.floor(sm.points.length / 2), spot = sm.points[k];
@@ -155,7 +189,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     }
     check(target && target.d < 6, `a Canopy coast cell lies at the seam (${target?.d.toFixed(1)} tiles)`);
     let hero = null;
-    for (let y = 0; y < A.size; y++) for (let x = 0; x < A.size; x++) if (onLand(0, x, y)) { const d = Math.hypot(x + .5 - target.ax, y + .5 - target.ay); if (d < 10 && (!hero || d < hero.d)) hero = { d, x: x + .5, y: y + .5 }; }
+    for (let y = 0; y < A.size; y++) for (let x = 0; x < A.size; x++) if (onLand(0, x, y)) { const d = Math.hypot(x + .5 - target.ax, y + .5 - target.ay); if (d >= 5 && d < 12 && (!hero || d < hero.d)) hero = { d, x: x + .5, y: y + .5 }; }
     await debug({ op: 'teleport', zone: 0, x: hero.x, y: hero.y });
     await page.waitForFunction(([x, y]) => Field.zone === 0 && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 1, [hero.x, hero.y], { timeout: 20000 });
     await page.evaluate(() => { while (Field.minimapZoom(1) < 4); });
@@ -165,10 +199,10 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       const x = Math.round((tx - (Field.hero.x - V / 2)) * s), y = Math.round((ty - (Field.hero.y - V / 2)) * s);
       return { x, y, w: c.width, rgba: [...c.getContext('2d').getImageData(x, y, 1, 1).data] };
     }, [target.ax, target.ay]);
-    check(px.x >= 0 && px.y >= 0 && px.x < px.w && px.y < px.w, `the Canopy's coast cell is inside the minimap view (${px.x},${px.y})`);
-    check(px.rgba[0] > 110, `foam of the Canopy's coast shows on the meadow's minimap across the seam: pixel ${px.rgba.join(',')} (open water is 29,106,146)`);
     const box = await page.evaluate(() => { const r = document.querySelector('#minimap canvas, canvas#minimap, #mini').getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; });
     await page.screenshot({ path: path.join(out, 'minimap-coast-across-seam.png'), clip: { x: Math.max(0, box.x - 8), y: Math.max(0, box.y - 8), width: box.width + 16, height: box.height + 16 } });
+    check(px.x >= 0 && px.y >= 0 && px.x < px.w && px.y < px.w, `the Canopy's coast cell is inside the minimap view (${px.x},${px.y})`);
+    check(px.rgba[0] > 110, `foam of the Canopy's coast shows on the meadow's minimap across the seam: pixel ${px.rgba.join(',')} (open water is 29,106,146)`);
     await page.evaluate(() => { Field.minimapZoom(-2); });
   }
   // Step 2: what lies across the border shows through. A second hero stands on the Crags side with an enemy beside them;
@@ -217,6 +251,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await page.screenshot({ path: path.join(out, `worldmap-zone${zone}.png`) });
     check(await page.evaluate(z => WorldMap.zone === z, zone), `the detailed map shows zone ${zone}`);
     await page.evaluate(() => WorldMap.close());
+  }
   }
   assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
   console.log(`zone-shape-ui: ${checks} checks passed; screenshots in ${out}`);

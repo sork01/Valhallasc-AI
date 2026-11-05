@@ -271,8 +271,15 @@
     // Neighbours across a seam keep a context too, built now so their ground is ready to draw beside the border and to swap
     // in when you cross; every other zone's ground is released.
     const keepZones = new Set([zone]);
-    for (const p of zdef.portals || []) if (p.seam) { ctxFor(p.to); keepZones.add(p.to); loadSceneEnemyArt(ZONES[p.to].slimes || []); }
-    for (const [k, cc] of ctxs) if (!keepZones.has(k)) { for (const { c } of cc.chunks.values()) { c.width = 1; c.height = 1; } cc.chunks.clear(); ctxs.delete(k); }
+    // At one tile scale the grids are big (up to ~420 tiles): building a neighbour's map arrays is the cost of a frame or more, so the
+    // neighbours are built one per timer tick right after the crossing instead of inside it, and a context is never thrown away
+    // (its arrays are small; only its ground canvases are released), so crossing back and forth rebuilds nothing.
+    let nbi = 0;
+    for (const p of zdef.portals || []) if (p.seam) {
+      keepZones.add(p.to); const to = p.to;
+      setTimeout(() => { if (ZONES[to]) { ctxFor(to); loadSceneEnemyArt(ZONES[to].slimes || []); } }, ctxs.has(to) ? 0 : 150 + 300 * nbi++);
+    }
+    for (const [k, cc] of ctxs) if (!keepZones.has(k)) { for (const { c } of cc.chunks.values()) { c.width = 1; c.height = 1; } cc.chunks.clear(); cc.empty.clear(); }
     window.DayNight?.setZone(zdef);
     window.Weather?.setZone(zdef);
     if (mini) buildMini();
@@ -4607,7 +4614,7 @@
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
   function renderMini() {
-    const [c, g] = canvasOf(144, 144, 4), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
@@ -4667,13 +4674,19 @@
   // Tiles across the minimap at zoom 1. Shaped zones share one tile scale and can be crossed seamlessly, so they share one span too (their grids differ: 240, 208): a span that followed the grid made the map jump on every crossing. Other zones keep showing the whole grid.
   const MINI_SHAPED_SPAN = 240;
   const miniSpan = () => zdef.shapeFloor ? MINI_SHAPED_SPAN : MAP;
+  // The minimap canvas of a shaped zone keeps 2.4 pixels per tile whatever the grid (units are 4 px; 144 units for the old 240 grid).
+  const miniUnits = () => zdef.shapeFloor ? Math.max(144, Math.round(MAP * .6)) : 144;
+  const miniCache = new Map();   // shaped zone -> its rendered land and shallows (a crossing back and forth renders nothing)
   function buildMini() {
-    miniBase = renderMini(); miniNb.clear(); miniWater = renderShallows();
+    const hit = zdef.shapeFloor && miniCache.get(zone);
+    if (hit) { miniBase = hit.base; miniWater = hit.water; return; }
+    miniBase = renderMini(); if (!zdef.shapeFloor) miniNb.clear(); miniWater = renderShallows();
+    if (zdef.shapeFloor) miniCache.set(zone, { base: miniBase, water: miniWater });
   }
   // Shallows and a foam line along the coast of the zone whose state is adopted (null for a zone without an outline).
   function renderShallows() {
     if (!zdef.shapeFloor) return null;
-    const [c, g] = canvasOf(144, 144, 4), k = 144 / MAP;
+    const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP;
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // lighter and greener near the shore, a foam line at the edge
       const i = y * MAP + x, d = map.edgeDist[i];
       if (map.floor[i] || !d || d > 16) continue;

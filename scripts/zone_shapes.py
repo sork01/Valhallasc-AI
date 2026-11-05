@@ -56,7 +56,7 @@ FILL = {
          elites=('mireheart', 'silverwidow', 'nightbloom')),
     # Gloamfen is a chain of lanes: ridges (thicket walls) with one gap each, so the ridges run on to the outline and the
     # filler spawns follow the lane they are in. Hydras live on the island only; Hollow Rider is the Halloween spawn.
-    3: dict(spawn_sep=7.0, spawn_feature='lane', decor=('tree', 'bush', 'rock', 'spire'), ridges=True, lanes=True, warp=True,
+    3: dict(spawn_sep=7.0, spawn_feature='lane', decor=('tree', 'bush', 'rock', 'spire'), ridges=True, lanes=True,
             elites=('gloomroot', 'hollow_rider'), no_fill=('hydra',)),
 }
 

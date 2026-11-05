@@ -154,7 +154,9 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
                 "arrival ({tx:.1},{ty:.1}) in zone {to} is inside an obstacle"
             );
         }
-        assert!(border >= 2, "zone {zone}: only {border} gate crossings");
+        // the meadow's other borders (the Crags, Gloamfen, the Canopy) are seams now: only Skaldholm is a gate
+        let wanted = if zone == 0 { 1 } else { 2 };
+        assert!(border >= wanted, "zone {zone}: only {border} gate crossings");
     }
 }
 
@@ -212,6 +214,11 @@ fn the_meadow_and_the_moonspore_canopy_share_a_seam() {
 }
 
 #[test]
+fn the_meadow_and_gloamfen_share_a_seam() {
+    seam_walks(0, 3);
+}
+
+#[test]
 fn the_crags_and_the_moonspore_canopy_share_a_seam() {
     seam_walks(1, 16);
 }
@@ -222,8 +229,8 @@ fn the_moonspore_canopy_keeps_its_gates_to_the_orrery_and_emberwake() {
 }
 
 #[test]
-fn gloamfen_keeps_gates_to_the_glacier_greenmeadow_and_skaldholm() {
-    gates_stand_on_free_land(3, &[2, 0, 4]);
+fn gloamfen_keeps_gates_to_the_glacier_and_skaldholm() {
+    gates_stand_on_free_land(3, &[2, 4]);
 }
 
 fn gates_stand_on_free_land(zone: usize, targets: &[u64]) {

@@ -17,27 +17,39 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def offsets():
-    world = json.loads((ROOT / 'world/map.txt').read_text())
+def offsets(path=None):
+    world = json.loads((path or ROOT / 'world/map.txt').read_text())
     zones = [world] + world['zones']
     return {i: z['shape']['offset'] for i, z in enumerate(zones) if z.get('shape') and not z['shape'].get('warp')}
 
 
-def warped():
+def warped(path=None):
     """Zones whose old layout was bent into the outline: a saved position has no simple offset, so the character is placed at the zone's spawn."""
-    world = json.loads((ROOT / 'world/map.txt').read_text())
+    world = json.loads((path or ROOT / 'world/map.txt').read_text())
     zones = [world] + world['zones']
     return {i: z['spawn'] for i, z in enumerate(zones) if z.get('shape', {}).get('warp')}
+
+
+def world_spawn(zone):
+    world = json.loads((ROOT / 'world/map.txt').read_text())
+    return ([world] + world['zones'])[zone]['spawn']
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--db', required=True)
     ap.add_argument('--apply', action='store_true')
+    ap.add_argument('--old-map', help='re-migrate a database that already went through an earlier shape layout: map.txt of that layout '
+                    '(a zone moves by new offset minus old offset; one that was warped before is placed at its spawn)')
     ap.add_argument('--zones', help='comma list: only move characters saved in these zones (already-migrated zones must be left out)')
     args = ap.parse_args()
     off = offsets()
     warp = warped()
+    if args.old_map:
+        prev, prev_warp = offsets(Path(args.old_map)), warped(Path(args.old_map))
+        # a zone shaped in both layouts moves by the difference; one that was warped before has no usable offset: spawn
+        off = {k: [v[0] - prev[k][0], v[1] - prev[k][1]] if k in prev else v for k, v in off.items()}
+        warp = {**warp, **{k: world_spawn(k) for k in prev_warp if k not in warp}}
     if args.zones:
         keep = {int(v) for v in args.zones.split(',')}
         off = {k: v for k, v in off.items() if k in keep}
