@@ -47,6 +47,8 @@
   ];
   const map = { dirt: new Uint8Array(0), tone: new Float32Array(0) };
   let objects = [], nightLights = [], SHIFT = [0, 0], seamlessUntil = 0;
+  // Enemies and players of a neighbouring zone seen across a seam border (view only), already moved into this zone's frame.
+  const ghostSlimes = new Map(), ghostPlayers = new Map();
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
@@ -222,7 +224,7 @@
     buildMap(); clearGroundChunks();
     if (mini) buildMini();
     if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
-    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
+    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; remotePlayers.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
 
@@ -1399,6 +1401,32 @@
       }
     }
     for (const id of remotePlayers.keys()) if (!present.has(id)) remotePlayers.delete(id);
+    // Across a seam: the neighbour's enemies and players near the line, drawn but never targetable.
+    const seenSlimes = new Set(), seenPlayers = new Set();
+    for (const a of moved ? [] : packet.across || []) {
+      const [ax, ay] = a.shift;
+      loadSceneEnemyArt(a.slimes);
+      for (const data of a.slimes) {
+        const moved_ = { ...data, x: data.x - ax, y: data.y - ay }; seenSlimes.add(data.id);
+        const prev = ghostSlimes.get(data.id), actor = prev || { ...moved_ };
+        applyActor(actor, moved_, !prev); actor.d = SLIME[data.kind]; actor.ghost = true; ghostSlimes.set(data.id, actor);
+      }
+      for (const data of a.players) {
+        if (data.id === Online.id) continue;
+        const moved_ = { ...data, x: data.x - ax, y: data.y - ay }; seenPlayers.add(data.id);
+        let remote = ghostPlayers.get(data.id);
+        if (!remote) { remote = { ...moved_, sprite: null, signature: '' }; ghostPlayers.set(data.id, remote); }
+        applyActor(remote, moved_, !!remote.sparkTravel !== !!data.sparkTravel);
+        const lookKey = JSON.stringify(data.look);
+        if (remote.signature !== lookKey) {
+          remote.signature = lookKey; const generation = spriteGeneration;
+          if (remote.sprite && remote.sprite.constructor === classSprite(data.look)) remote.sprite.set(data.look);
+          else classSprite(data.look).load(data.look, { background: true }).then(sprite => { if (generation === spriteGeneration && remote.signature === lookKey) remote.sprite = sprite; }).catch(() => say('spriteError'));
+        }
+      }
+    }
+    for (const id of ghostSlimes.keys()) if (!seenSlimes.has(id)) ghostSlimes.delete(id);
+    for (const id of ghostPlayers.keys()) if (!seenPlayers.has(id)) ghostPlayers.delete(id);
     if (hero.pvpTargetId && !remotePlayers.has(hero.pvpTargetId)) hero.pvpTargetId = null;
     bolts = packet.bolts.filter(inZone).map(b => ({ ...b, col: b.color }));
     window.BossMech?.update(packet.bossMech);
@@ -2828,6 +2856,8 @@
       }
       interpolate(hero, dt); for (const remote of remotePlayers.values()) interpolate(remote, dt);
       for (const slime of slimes) { interpolate(slime, dt); if (slime.dead) slime.dieT += dt; }
+      for (const remote of ghostPlayers.values()) interpolate(remote, dt);
+      for (const slime of ghostSlimes.values()) { interpolate(slime, dt); if (slime.dead) slime.dieT += dt; }
       keepActorsSeparated();
     }
     for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vz -= p.g * dt; p.z = Math.max(0, p.z + p.vz * dt * 6); }
@@ -4157,12 +4187,12 @@
     for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
     for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
-    for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, enemyCullMargin(s))) { const sk = enemyShadowK(s); shadow(g, s.x, s.y, 28 * sk * s.d.scale * (1 - s.hop * .12), 11 * sk * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
+    for (const s of ghostSlimes.size ? [...slimes, ...ghostSlimes.values()] : slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, enemyCullMargin(s))) { const sk = enemyShadowK(s); shadow(g, s.x, s.y, 28 * sk * s.d.scale * (1 - s.hop * .12), 11 * sk * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, 70)) { shadow(g,chest.x,chest.y,27,9,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
     for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
-    for (const remote of remotePlayers.values()) {
+    for (const remote of ghostPlayers.size ? [...remotePlayers.values(), ...ghostPlayers.values()] : remotePlayers.values()) {
       const [sx, sy] = w2s(remote.x, remote.y);
       if (onScreen(sx, sy, 160)) { shadow(g, remote.x, remote.y, 30, 12, .28); list.push({ d: remote.sparkTravel ? Infinity : remote.x + remote.y + .001, remote, sx, sy }); }
     }
@@ -4740,7 +4770,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size }; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox, drawSlimeSprite, enemyCullMargin, enemyShadowK, enemySource },
   };
   window.Field = Field;

@@ -19,14 +19,14 @@ mod ambient;
 mod bank;
 #[cfg(test)]
 mod compact_atlas_tests;
-#[cfg(test)]
-mod zone_shape_tests;
 mod inspect;
 mod mail;
 #[cfg(test)]
 mod raid_reward_tests;
 mod shop;
 mod signature;
+#[cfg(test)]
+mod zone_shape_tests;
 use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
@@ -1968,6 +1968,59 @@ impl World {
         }
         self.emit_zone(self.zone_of(actor), v);
     }
+    /// One player as every client in the zone sees them.
+    fn player_view(&self, session: u64, p: &Player) -> Value {
+        let mut view = self.raid_support(session).snapshot(p);
+        if p.character.gm {
+            view["session"] = json!(session);
+        }
+        // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
+        // each snapshot over the last, so a flag that vanished would stay set.
+        view["storyMemory"] = self.empty_seat_view(session);
+        view["mailUnread"] = json!(self.mail_unread.get(&p.character.id).copied().unwrap_or(0));
+        view["hired"] = json!(p.merc.is_some());
+        view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
+        view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
+        // The bells a hero has ringing and how long each has left (only listed while there are any).
+        let bells = self.chime.view(session);
+        if !bells.is_empty() {
+            view["bells"] = json!(
+                bells
+                    .iter()
+                    .map(|(place, left)| json!({"place":place,"left":left}))
+                    .collect::<Vec<_>>()
+            );
+        }
+        view
+    }
+    /// What lies across each seam border of `zone` (view only, shown through the border by the client): the neighbour's
+    /// players and enemies within ACROSS_RANGE tiles of the line, in the neighbour's own coordinates.
+    fn across_view(&self, zone: usize) -> Vec<Value> {
+        const ACROSS_RANGE: f64 = 30.;
+        let mut out = Vec::new();
+        for portal in &self.maps[zone].portals {
+            let Some(seam) = &portal.seam else { continue };
+            let near = |p: Point| {
+                seam.distance(Point {
+                    x: p.x - seam.shift[0],
+                    y: p.y - seam.shift[1],
+                }) < ACROSS_RANGE
+            };
+            let players: Vec<Value> = self
+                .players
+                .iter()
+                .filter(|(_, p)| p.character.zone == portal.to && near(p.character.point()))
+                .map(|(session, p)| self.player_view(*session, p))
+                .collect();
+            let slimes: Vec<&Slime> = self
+                .slimes
+                .iter()
+                .filter(|s| s.zone == portal.to && near(s.point()))
+                .collect();
+            out.push(json!({"to":portal.to,"shift":seam.shift,"players":players,"slimes":slimes}));
+        }
+        out
+    }
     // What one client needs: its own zone's players, enemies, bolts and drops. Zones are separate maps, so
     // nothing about another zone is ever sent to this client.
     pub fn snapshot_for(&self, zone: usize) -> Value {
@@ -1980,23 +2033,7 @@ impl World {
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
         "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"easter":self.festival_view(seasonal_hunt::EASTER),"solstice":self.festival_view(seasonal_hunt::SOLSTICE),"valentine":self.festival_view(seasonal_hunt::VALENTINE),"newyear":self.festival_view(seasonal_hunt::NEWYEAR),
-        "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
-            let mut view = self.raid_support(*session).snapshot(p);
-            if p.character.gm { view["session"] = json!(session); }
-            // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
-            // each snapshot over the last, so a flag that vanished would stay set.
-            view["storyMemory"] = self.empty_seat_view(*session);
-            view["mailUnread"] = json!(self.mail_unread.get(&p.character.id).copied().unwrap_or(0));
-            view["hired"] = json!(p.merc.is_some());
-            view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
-            view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
-            // The bells a hero has ringing and how long each has left (only listed while there are any).
-            let bells = self.chime.view(*session);
-            if !bells.is_empty() {
-                view["bells"] = json!(bells.iter().map(|(place, left)| json!({"place":place,"left":left})).collect::<Vec<_>>());
-            }
-            view
-        }).collect::<Vec<_>>(),
+        "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| self.player_view(*session, p)).collect::<Vec<_>>(),
         "raidCrosses":self.raid_cross_view(zone),
         "slimes":self.slimes.iter().filter(|s| s.zone == zone && !idle).collect::<Vec<_>>(),
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
@@ -2004,6 +2041,10 @@ impl World {
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
         "chests":self.chests.list.iter().filter(|c| c.zone == zone).collect::<Vec<_>>(),
         "online":self.visible_online()});
+        let across = self.across_view(zone);
+        if !across.is_empty() {
+            view["across"] = json!(across);
+        }
         view["damageMeter"] = self.damage_meter_view(zone);
         let boss_mech = self.boss_mech_view(zone);
         if !boss_mech.is_empty() {

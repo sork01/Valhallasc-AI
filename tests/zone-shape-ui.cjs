@@ -87,6 +87,29 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     check(await page.evaluate(() => !document.getElementById('area-title').classList.contains('show') && !document.body.innerText.includes('You enter')), `seam crossing ${from} -> ${to}: no zone banner and no "You enter" line`);
     await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
   }
+  // Step 2: what lies across the border shows through. A second hero stands on the Crags side with an enemy beside them;
+  // the first hero, on the meadow side, sees both (drawn, never targetable) before crossing.
+  {
+    const ctx2 = await browser.newContext({ viewport: { width: 800, height: 600 }, reducedMotion: 'reduce' });
+    const far = await ctx2.newPage();
+    await far.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })));
+    await far.goto(`http://127.0.0.1:${port}/`); await far.locator('#start').click(); await far.locator('#login-guest').click();
+    await far.locator('#name').fill('FarSide'); await far.locator('#go').click({ timeout: 60000 });
+    await far.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
+    const farDebug = command => far.evaluate(c => Online.send({ type: 'debug', command: c }), command);
+    const bx = q[0] + shx - inward[0] * 6, by = q[1] + shy - inward[1] * 6;   // six tiles inside the Crags
+    await farDebug({ op: 'teleport', zone: 1, x: bx, y: by });
+    await far.waitForFunction(([x, y]) => Field.zone === 1 && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [bx, by], { timeout: 20000 });
+    await farDebug({ op: 'spawn_enemy', kind: 'wisp', x: bx - inward[0] * 3, y: by - inward[1] * 3 });
+    const ax = q[0] + inward[0] * 6, ay = q[1] + inward[1] * 6;               // six tiles inside the meadow
+    await debug({ op: 'teleport', zone: 0, x: ax, y: ay });
+    await page.waitForFunction(([x, y]) => Field.zone === 0 && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [ax, ay], { timeout: 20000 });
+    await page.waitForFunction(() => Field.ghosts.players >= 1 && Field.ghosts.slimes >= 1, null, { timeout: 15000 });
+    check(true, 'the meadow hero sees the Crags hero and a wisp across the border');
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: path.join(out, 'across-meadow-sees-crags.png') });
+    await ctx2.close();
+  }
   // The hubs keep their place inside the shifted core: Alderhaven's plaza and Cinderwatch Camp.
   for (const zone of [0, 1]) {
     const c = zoneDef(zone).city;

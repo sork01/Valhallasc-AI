@@ -1876,6 +1876,23 @@ pub struct Seam {
 impl Seam {
     /// Past the line by less than this is a crossing; the margin of land beyond the line is a little deeper.
     pub const REACH: f64 = 3.;
+    /// How far `p` is from the border line.
+    pub fn distance(&self, p: Point) -> f64 {
+        self.points
+            .windows(2)
+            .map(|pair| {
+                let (a, b) = (pair[0], pair[1]);
+                let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+                let len2 = dx * dx + dy * dy;
+                let t = if len2 < 1e-12 {
+                    0.
+                } else {
+                    (((p.x - a[0]) * dx + (p.y - a[1]) * dy) / len2).clamp(0., 1.)
+                };
+                (p.x - a[0] - dx * t).hypot(p.y - a[1] - dy * t)
+            })
+            .fold(f64::MAX, f64::min)
+    }
     /// The walker's new position when it stands beyond the border line, or None while it is still on this side.
     pub fn crossing(&self, p: Point) -> Option<Point> {
         let mut best: Option<(f64, f64)> = None;
