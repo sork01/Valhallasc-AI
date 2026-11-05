@@ -418,7 +418,7 @@
     if(city) return [city.at[0]+(x/zones[index].size-.5)*100,city.at[1]+(y/zones[index].size-.5)*100];
     const a=LAYOUT[index];
     if(a?.polygon && zones[index].shape) {
-      const sh=zones[index].shape; let p=[a.x+(x-sh.frame[0])/sh.k,a.y+(y-sh.frame[1])/sh.k];
+      const sh=zones[index].shape; let p=[(x+sh.T[0])/sh.k,(y+sh.T[1])/sh.k];
       const r=PROVINCES.get(index),center=r.label||r.seed;
       for(let q=0;q<20&&!insidePolygon(r.polygon,...p);q++) p=[p[0]*.8+center[0]*.2,p[1]*.8+center[1]*.2];
       return p;

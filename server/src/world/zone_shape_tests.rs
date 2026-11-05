@@ -39,6 +39,9 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
         assert!(on_land(z["spawn"]["x"].as_f64().unwrap(), z["spawn"]["y"].as_f64().unwrap()));
         for key in ["slimes", "npcs", "places", "crosses", "portals"] {
             for o in z[key].as_array().unwrap() {
+                if o.get("seam").is_some() {
+                    continue; // a border line, not a place on the land
+                }
                 let (x, y) = (o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
                 assert!(on_land(x, y), "zone {zone} {key} {} at ({x},{y}) is off the land", o["id"]);
             }
@@ -46,6 +49,14 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
         // Walk outward from every few land cells that touch the edge: the walker must stay on land.
         let rows: Vec<&[u8]> = z["shapeFloor"].as_array().unwrap().iter().map(|r| r.as_str().unwrap().as_bytes()).collect();
         let mut tested = 0;
+        // Along a seam the land runs a margin past the line on purpose (the server moves a walker who steps over it).
+        let seam: Vec<(f64, f64)> = z["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|p| p.get("seam"))
+            .flat_map(|s| s["points"].as_array().unwrap().iter().map(|q| (q[0].as_f64().unwrap(), q[1].as_f64().unwrap())))
+            .collect();
         for y in 1..n - 1 {
             for x in 1..n - 1 {
                 if rows[y][x] != b'#' {
@@ -55,6 +66,9 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
                     let (nx, ny) = ((x as i32 + dx) as usize, (y as i32 + dy) as usize);
                     if rows[ny][nx] == b'#' || (x * 7 + y * 13) % 11 != 0 {
                         continue;
+                    }
+                    if seam.iter().any(|q| (q.0 - x as f64).hypot(q.1 - y as f64) < 30.) {
+                        continue; // near a seam border (the line's vertices are up to ~30 tiles apart)
                     }
                     let mut p = at(x as f64 + 0.5, y as f64 + 0.5);
                     w.maps[zone].walk(&mut p, at(dx as f64, dy as f64), 4.0, 0.4);
@@ -119,7 +133,14 @@ fn cross(w: &mut World, data: &Value, from: usize, to: usize, q: Point, inward: 
     }
     let p = w.players[&1].character.clone();
     assert_eq!(p.zone, to, "walking at the border from {start:?} did not cross into zone {to}");
-    assert!(land(zone_of(data, to))(p.x, p.y), "arrived off the land in zone {to} at ({:.1},{:.1})", p.x, p.y);
+    // The arrival is just inside the border line, which can fall in a margin cell (the raster is whole cells): within a tile of land.
+    let on_land = land(zone_of(data, to));
+    assert!(
+        [(0., 0.), (1., 0.), (-1., 0.), (0., 1.), (0., -1.), (1., 1.), (-1., -1.), (1., -1.), (-1., 1.)].iter().any(|(dx, dy)| on_land(p.x + dx, p.y + dy)),
+        "arrived far off the land in zone {to} at ({:.1},{:.1})",
+        p.x,
+        p.y
+    );
     at(p.x, p.y)
 }
 
@@ -152,9 +173,8 @@ fn a_shared_border_is_crossed_anywhere_along_it_in_both_directions() {
             // and back from where we arrived: straight at the same border again
             let shift = (seam["shift"][0].as_f64().unwrap(), seam["shift"][1].as_f64().unwrap());
             let q_in_b = at(q.x + shift.0, q.y + shift.1);
-            let back = cross(&mut w, &data, 1, 0, q_in_b, at(-inward.x, -inward.y));
-            assert!(on_a(back.x, back.y));
-            assert!(landed.distance(q_in_b) < 8., "the crossing is continuous: arrived {:.1} tiles from the mirrored spot", landed.distance(q_in_b));
+            let _back = cross(&mut w, &data, 1, 0, q_in_b, at(-inward.x, -inward.y));
+            assert!(landed.distance(q_in_b) < 4., "the crossing is continuous: arrived {:.1} tiles from the mirrored spot", landed.distance(q_in_b));
             let _ = b;
         }
     }

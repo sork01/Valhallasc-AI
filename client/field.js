@@ -46,7 +46,7 @@
     [[36, 36], [26, 32], [16, 26], [10, 16]],
   ];
   const map = { dirt: new Uint8Array(0), tone: new Float32Array(0) };
-  let objects = [], nightLights = [], SHIFT = [0, 0];
+  let objects = [], nightLights = [], SHIFT = [0, 0], seamlessUntil = 0;
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
@@ -108,7 +108,7 @@
       front = next;
     }
     // Land near a border: how far the ground has to go to meet the neighbour's, and which neighbour (letter code).
-    map.blendD = new Uint8Array(MAP * MAP); map.blendNb = new Uint8Array(MAP * MAP);
+    map.blendD = new Uint8Array(MAP * MAP); map.blendNb = new Uint8Array(MAP * MAP); map.blendW = new Float32Array(MAP * MAP);
     front = [];
     for (let i = 0; i < MAP * MAP; i++) if (!map.floor[i] && map.edge[i] >= 65 && map.edge[i] <= 90) {
       const x = i % MAP, y = (i / MAP) | 0;
@@ -119,8 +119,49 @@
       for (const i of front) { const x = i % MAP, y = (i / MAP) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (map.floor[k] && !map.blendD[k]) { map.blendD[k] = d; map.blendNb[k] = map.blendNb[i]; next.push(k); } } }
       front = next;
     }
+    for (let i = 0; i < MAP * MAP; i++) if (map.blendD[i]) map.blendW[i] = .6 * (1 - (map.blendD[i] - 1) / BLEND_REACH);
+    // A border you cross anywhere (a seam): both zones draw the same mix of their two floors around the line, seen from
+    // their own side, so the ground does not change when the server moves you across. s is the signed distance to the
+    // line, positive on this side; this side's weight toward the neighbour is .5 at the line, falling to 0 at BLEND_REACH.
+    map.seamBy = {}; map.ghosts = [];
+    const nbs = zdef.shape?.neighbours || [];
+    for (const portal of zdef.portals || []) if (portal.seam) {
+      const seam = portal.seam, nb = portal.to; map.seamBy[nb] = seam;
+      const letter = 65 + nbs.indexOf(nb), pts = seam.points, R = BLEND_REACH;
+      let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (const [a, b] of pts) { x0 = Math.min(x0, a); x1 = Math.max(x1, a); y0 = Math.min(y0, b); y1 = Math.max(y1, b); }
+      for (let y = Math.max(0, Math.floor(y0 - R - 2)); y <= Math.min(MAP - 1, Math.ceil(y1 + R + 2)); y++) for (let x = Math.max(0, Math.floor(x0 - R - 2)); x <= Math.min(MAP - 1, Math.ceil(x1 + R + 2)); x++) {
+        const i = y * MAP + x, cx = x + .5, cy = y + .5;
+        if (!map.floor[i] && map.edge[i] !== letter) continue;
+        let best = 1e9, cross = 0;
+        for (let k = 0; k < pts.length - 1; k++) { const d = segDist(cx, cy, pts[k][0], pts[k][1], pts[k + 1][0], pts[k + 1][1]); if (d < best) { best = d; cross = (pts[k + 1][0] - pts[k][0]) * (cy - pts[k][1]) - (pts[k + 1][1] - pts[k][1]) * (cx - pts[k][0]); } }
+        const s = cross * seam.side > 0 ? -best : best;
+        if (s > R) continue;
+        const w = s >= 0 ? .5 * (1 - s / R) : s < -R ? 1 : 1 - .5 * (1 + s / R);
+        if (map.blendW[i] <= w || map.blendNb[i] !== letter) { map.blendW[i] = w; map.blendNb[i] = letter; map.blendD[i] = 1; }
+      }
+      // The neighbour's trees and rocks beyond the line (view only: the walker never reaches them, the server moves it first).
+      const nz = ZONES[nb], set = nz && simpleSet(nz.theme); if (!set) continue;
+      const [shx, shy] = seam.shift;
+      for (const o of nz.objects || []) {
+        if (!set[o.kind]) continue;
+        const gx = o.x - shx, gy = o.y - shy;
+        if (gx < 0 || gy < 0 || gx > MAP || gy > MAP || map.floor[(gy | 0) * MAP + (gx | 0)]) continue;
+        let best = 1e9, cross = 0; for (let k = 0; k < pts.length - 1; k++) { const d = segDist(gx, gy, pts[k][0], pts[k][1], pts[k + 1][0], pts[k + 1][1]); if (d < best) { best = d; cross = (pts[k + 1][0] - pts[k][0]) * (gy - pts[k][1]) - (pts[k + 1][1] - pts[k][1]) * (gx - pts[k][0]); } }
+        if (cross * seam.side > 0 && best < 40) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set });
+      }
+    }
   }
   const BLEND_REACH = 14;
+  // Sprites of the zones whose scenery can be drawn from the other side of a seam.
+  const simpleSet = theme => theme === 'ember' ? emberSprites : theme === 'frost' ? frostSprites : theme === 'fen' ? fenSprites : theme === 'meadow' ? sprites : null;
+  // The ground of zone `nz` at its own cell (x, y): the same noise and trail test as buildMap, so a mapped cell looks as it will on arrival.
+  function groundSample(nz, x, y) {
+    const cx = x + .5, cy = y + .5, [a, b] = nz.theme === 'ember' ? [11, 12] : nz.theme === 'frost' ? [21, 22] : nz.theme === 'fen' ? [31, 32] : [1, 2];
+    const tone = vnoise(cx * .16, cy * .16, a) * .65 + vnoise(cx * .55, cy * .55, b) * .35;
+    let d = 99; for (const p of nz.paths || PATHS) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
+    if (nz.theme === 'meadow') { const o = nz.shape ? nz.shape.offset : [0, 0]; d = Math.min(d, Math.hypot(cx - 36 - o[0], cy - 36 - o[1]) - 2.4); }
+    return { tone, dirt: d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0 };
+  }
   // The ground of another zone's theme, to blend toward it where two provinces meet.
   function groundOf(theme, tone, dirt, alt) {
     if (theme === 'ember') return dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`;
@@ -151,7 +192,13 @@
       return;
     }
     if (c >= 'A' && c <= 'Z') {
-      const nb = (zdef.shape?.neighbours || [])[code - 65], theme = ZONES[nb]?.theme || 'ember';
+      const nb = (zdef.shape?.neighbours || [])[code - 65], theme = ZONES[nb]?.theme || 'ember', seam = map.seamBy?.[nb];
+      if (seam) {   // beyond a border you cross: this zone's own floor under the neighbour's, mixed as the neighbour will mix it
+        const i = y * MAP + x, w = map.blendD[i] ? map.blendW[i] : 1, [sx, sy] = seam.shift, ns = groundSample(ZONES[nb], x + Math.round(sx), y + Math.round(sy));
+        flat(groundOf(zdef.theme, map.tone[i], map.dirt[i], alt));
+        g.globalAlpha = w; flat(groundOf(theme, ns.tone, ns.dirt, ((x + Math.round(sx) + y + Math.round(sy)) & 1) ? 1.4 : -1.4)); g.globalAlpha = 1;
+        return;
+      }
       flat(groundOf(theme, tone, h > .93 && d < 4, alt));
       if (!zdef.portals.some(p => p.seam && p.to === nb)) { if (d <= 2) wallBlock(g, px, py, BORDER_LOOK[theme] || [215, 12, 26], d === 1 ? 14 * (.75 + h * .5) : 7, tone, h); }
       else if (d > 9) { g.fillStyle = `rgba(7,16,13,${(d - 9) * .17})`; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill(); }
@@ -535,9 +582,11 @@
         : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
         : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
-      if (map.blendD && map.blendD[i]) {   // the ground turns into the neighbour's toward their shared border
-        const nb = (zdef.shape?.neighbours || [])[map.blendNb[i] - 65], t = 1 - (map.blendD[i] - 1) / BLEND_REACH;
-        g.globalAlpha = Math.min(1, t * t * 1.05); g.fillStyle = groundOf(ZONES[nb]?.theme || 'ember', tone, dirt, alt); g.fill(); g.globalAlpha = 1;
+      if (map.blendD && map.blendD[i] && map.blendW[i] > .01) {   // the ground turns into the neighbour's toward their shared border
+        const nb = (zdef.shape?.neighbours || [])[map.blendNb[i] - 65], seam = map.seamBy?.[nb], nz = ZONES[nb];
+        let nt = tone, nd = dirt, na = alt;
+        if (seam) { const mx = x + Math.round(seam.shift[0]), my = y + Math.round(seam.shift[1]), ns = groundSample(nz, mx, my); nt = ns.tone; nd = ns.dirt; na = ((mx + my) & 1) ? 1.4 : -1.4; }
+        g.globalAlpha = Math.min(1, map.blendW[i]); g.fillStyle = groundOf(nz?.theme || 'ember', nt, nd, na); g.fill(); g.globalAlpha = 1;
       }
       if (zdef.theme === 'arena') continue;
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
@@ -1272,14 +1321,22 @@
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
     const moved = (own.zone || 0) !== zone;
-    if (moved || initial) window.ZoneJourney?.enter(zdef, ZONES[own.zone || 0], initial);
+    // Crossing a shared border (a seam) is not a journey: the server moved us by the border's whole-tile shift, so the
+    // camera moves by the same amount, there is no banner, and held keys carry on.
+    let seamShift = null;
+    if (moved && !initial) {
+      const sp = zdef.portals.find(p => p.seam && p.to === (own.zone || 0));
+      if (sp && Math.hypot(own.x - (hero.nx + sp.seam.shift[0]), own.y - (hero.ny + sp.seam.shift[1])) < 3) seamShift = sp.seam.shift;
+    }
+    if ((moved || initial) && !seamShift) window.ZoneJourney?.enter(zdef, ZONES[own.zone || 0], initial);
     if (moved) setZone(own.zone || 0);
+    if (seamShift) { hero.x += seamShift[0]; hero.y += seamShift[1]; cam.x += seamShift[0]; cam.y += seamShift[1]; seamlessUntil = performance.now() + 2500; }
     const inZone = a => (a.zone || 0) === zone;
     if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
     const selectedTarget = own.danceT != null ? null : hero.target?.id;
     if (own.danceT != null && hero.danceT == null) { Field.clearInput(); hero.goal = null; hero.pvpTargetId = null; }
     const wasDead = hero.dead, wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
-    applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
+    applyActor(hero, own, initial || (moved && !seamShift) || !!hero.sparkTravel !== !!own.sparkTravel);
     hero.raidSupport = own.raidSupport || null;
     if (!initial && !moved) for (const source of new Set([...Object.keys(oldSets), ...Object.keys(own.setCounts || {})])) {
       const before = oldSets[source] || 0, after = own.setCounts?.[source] || 0;
@@ -1300,7 +1357,7 @@
     if(seasonChanged)window.City?.refresh();
     if (wasDead !== hero.dead) { say(hero.dead ? 'death' : 'respawn'); if (!hero.dead) window.BossMech?.setCause(''); }
     if (wasFallen !== !!hero.fallen) say(hero.fallen ? 'fallen' : 'rallied');
-    if (initial || moved) { cam.x = hero.x; cam.y = hero.y; }
+    if (initial || (moved && !seamShift)) { cam.x = hero.x; cam.y = hero.y; }
     const signature = JSON.stringify(own.look);
     if (signature !== lastLook) {
       lastLook = signature; onCharacter(own.look);
@@ -4095,6 +4152,7 @@
       const [sx, sy] = w2s(o.x, o.y,o.z||0);
       if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0, (City.signHeight?.(o)||0)+25))) { list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
+    for (const o of map.ghosts || []) { const [sx, sy] = w2s(o.x, o.y); if (onScreen(sx, sy, 220)) list.push({ d: o.x + o.y, o, sx, sy }); }
     for (const portal of zdef.portals) { if (portal.seam || portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
     for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
@@ -4120,7 +4178,8 @@
       if (it.fx) { drawMeleeFx(g, it.fx, it.back); continue; }
       if (it.o) {
         const o = it.o;
-        if (!set[o.kind]) {
+        const oset = o.ghostSet || set;
+        if (!oset[o.kind]) {
           const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','cathedralwall','cathedralcolumn','tree','pine','elderash','ribcage','gallows','skypine','prism','column','spirelight','pylon','hallgate','wardstone','windcairn','nacrehouse','nacrecathedral','nacrepalace','nacrearchive','nacreinn','nacrefountain','reefwall','tidebell','sunkencolumn','shiprib','coral','vent','clockwall','blackspire','hourpillar','stillpoint','epoch_crown'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           const box=City.art[o.kind]?.box;
           const palmCover=City.art[o.kind]?.occludes && it.d>hd && hsx>it.sx-box[2] && hsx<it.sx+box[0]-box[2] && hsy>it.sy-box[3] && hsy-90<it.sy+box[1]-box[3];
@@ -4129,7 +4188,7 @@
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
           continue;
         }
-        const spr = set[o.kind][o.v % 4];
+        const spr = oset[o.kind][o.v % 4];
         // trees in front of the hero fade so he never disappears behind a canopy
         const cover = o.kind === 'tree' && it.d > hd && Math.abs(it.sx - hsx) < 80 && it.sy - 190 < hsy && it.sy > hsy - 20;
         if (cover) g.globalAlpha = .45;
@@ -4681,7 +4740,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox, drawSlimeSprite, enemyCullMargin, enemyShadowK, enemySource },
   };
   window.Field = Field;

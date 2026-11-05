@@ -44,6 +44,7 @@ CONFIG = ROOT / 'world/zone-shapes.txt'
 TAG = 'shape_v1'
 VOID_PIECE = 12
 EDGE_BAND = 14
+SEAM_MARGIN = 2.4
 STRUCTURAL = {'wall', 'lamp', 'house', 'flowers', 'post', 'void', 'lava', 'water'}
 ELITE_OR_SCRIPTED = ('big', 'cinderlord', 'ember_firelord', 'es_')
 
@@ -307,11 +308,15 @@ def shape_geometry(cfg, atlas, z, old):
     poly = atlas.polys[z]
     x0 = min(q[0] for q in poly)
     y0 = min(q[1] for q in poly)
-    W = math.ceil((max(q[0] for q in poly) - x0) * s)
-    H = math.ceil((max(q[1] for q in poly) - y0) * s)
+    # Tile coordinates are atlas * s - T with an INTEGER T per zone, so two shaped zones differ by a whole-tile shift
+    # (their cell grids, noise and rasterised borders then line up exactly across a seam).
+    fx, fy = x0 * s - math.floor(x0 * s), y0 * s - math.floor(y0 * s)
+    W = math.ceil((max(q[0] for q in poly) - x0) * s + fx)
+    H = math.ceil((max(q[1] for q in poly) - y0) * s + fy)
     n = ceil8(max(W, H))
     offx, offy = (n - W) // 2, (n - H) // 2
-    tx = lambda q: ((q[0] - x0) * s + offx, (q[1] - y0) * s + offy)
+    Tx, Ty = math.floor(x0 * s) - offx, math.floor(y0 * s) - offy
+    tx = lambda q: (q[0] * s - Tx, q[1] * s - Ty)
     runs = []
     outline = []
     for key, pts in atlas.runs(z):
@@ -320,7 +325,7 @@ def shape_geometry(cfg, atlas, z, old):
         runs.append(dict(kind=key[0], other=key[1], points=[[round(a, 2), round(b, 2)] for a, b in sm]))
         outline.extend(sm[:-1])
     floor = inside_mask(outline, n)
-    return dict(scale=s, size=n, frame=[offx, offy], origin=[x0, y0], bbox=[W, H], outline=[[round(a, 2), round(b, 2)] for a, b in outline], runs=runs, floor=floor)
+    return dict(scale=s, size=n, T=[Tx, Ty], bbox=[W, H], outline=[[round(a, 2), round(b, 2)] for a, b in outline], runs=runs, floor=floor)
 
 
 def edge_rows(geom, neighbours):
@@ -598,15 +603,22 @@ def make_seams(zones, shifted):
             if not runs or abs(a['k'] - b['k']) > 1e-9:
                 continue
             run = max(runs, key=lambda e: len(e['points']))
-            shift = [round(b['frame'][0] - a['frame'][0] + (a['origin'][0] - b['origin'][0]) * a['k'], 4),
-                     round(b['frame'][1] - a['frame'][1] + (a['origin'][1] - b['origin'][1]) * a['k'], 4)]
+            shift = [a['T'][0] - b['T'][0], a['T'][1] - b['T'][1]]   # whole tiles: B's cell = A's cell + shift
             # the same border, seen from the other side, must be this line shifted
             other = [e for e in b['edges'] if e['kind'] == 'shared' and e['other'] == i]
             mine = np.array(run['points'])
             theirs = np.array(max(other, key=lambda e: len(e['points']))['points']) - np.array(shift)
             gap = max(min(np.linalg.norm(theirs - q, axis=1)) for q in mine)
             assert gap < 0.6, f'zones {i}/{j}: border does not match across the seam ({gap:.2f} tiles)'
-            seams[i, j] = dict(points=[tuple(q) for q in run['points']], shift=shift)
+            # which side of the polyline the neighbour lies: test a point 2 tiles off the middle of the longest segment
+            k = max(range(len(run['points']) - 1), key=lambda m: math.dist(run['points'][m], run['points'][m + 1]))
+            (x1, y1), (x2, y2) = run['points'][k], run['points'][k + 1]
+            ln = math.hypot(x2 - x1, y2 - y1)
+            nx, ny = -(y2 - y1) / ln, (x2 - x1) / ln
+            rows = zones[i]['shapeFloor']
+            mx, my = (x1 + x2) / 2 + nx * 2, (y1 + y2) / 2 + ny * 2
+            side = 1 if rows[int(my)][int(mx)] != '#' else -1
+            seams[i, j] = dict(points=[tuple(q) for q in run['points']], shift=shift, side=side)
     return seams
 
 
@@ -644,7 +656,7 @@ def place_portals(world, shifted):
         pts = seam['points']
         mid = pts[len(pts) // 2]
         portal = dict(id=old['id'] if old else f'seam_{i}_{j}', name=zones[j]['name'], x=mid[0], y=mid[1], r=1.1, to=j, tx=mid[0] + seam['shift'][0],
-                      ty=mid[1] + seam['shift'][1], seam=dict(points=[[round(a, 2), round(b, 2)] for a, b in pts], shift=seam['shift']))
+                      ty=mid[1] + seam['shift'][1], seam=dict(points=[[round(a, 2), round(b, 2)] for a, b in pts], shift=seam['shift'], side=seam['side']))
         if old:
             z['portals'][z['portals'].index(old)] = portal
         else:
@@ -683,12 +695,14 @@ def apply(world, cfg):
     atlas = Atlas()
     SIDE.mkdir(exist_ok=True)
     shifted = {}
+    olds = {z: get_view(world, z) for z in cfg['zones']}
+    geoms = {z: shape_geometry(cfg, atlas, z, olds[z]) for z in cfg['zones']}
     for z in cfg['zones']:
         zone = zone_of(world, z)
         assert 'shape' not in zone, f'zone {z} is already shaped: run unshape first'
-        old = get_view(world, z)
+        old = olds[z]
         (SIDE / f'preshape-{z:02d}.txt').write_text(json.dumps(old, indent=1, ensure_ascii=False) + '\n')
-        geom = shape_geometry(cfg, atlas, z, old)
+        geom = geoms[z]
         ox, oy = choose_offset(geom, old, z, atlas, world)
         view = copy.deepcopy(old)
         S0 = view['size']
@@ -697,10 +711,23 @@ def apply(world, cfg):
         rng = random.Random(20261105 + z)
         added = fill_zone(z, view, geom, (ox, oy), rng)
         del view['_old_size']
-        voids = void_pieces(geom['floor'])
+        # Land runs SEAM_MARGIN tiles past a seam border so a walker can step across the line (the server then moves it).
+        margin = np.zeros_like(geom['floor'])
+        n = geom['size']
+        ys, xs = np.mgrid[0:n, 0:n]
+        for j in cfg['zones']:
+            if j != z and abs(geoms[j]['scale'] - geom['scale']) < 1e-9:
+                for run in geom['runs']:
+                    if run['kind'] == 'shared' and run['other'] == j:
+                        for a, b in zip(run['points'], run['points'][1:]):
+                            dx, dy = b[0] - a[0], b[1] - a[1]
+                            t = np.clip(((xs + .5 - a[0]) * dx + (ys + .5 - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9), 0, 1)
+                            margin |= np.hypot(xs + .5 - a[0] - t * dx, ys + .5 - a[1] - t * dy) <= SEAM_MARGIN
+        margin &= ~geom['floor']
+        voids = void_pieces(geom['floor'] | margin)
         view['objects'] = [o for o in view['objects'] if o['kind'] != 'void'] + voids
         view['size'] = geom['size']
-        view['shape'] = dict(rule=cfg['rule'], k=round(geom['scale'], 4), offset=[ox, oy], core=S0, bbox=geom['bbox'], frame=geom['frame'], origin=geom['origin'],
+        view['shape'] = dict(rule=cfg['rule'], k=round(geom['scale'], 4), offset=[ox, oy], core=S0, bbox=geom['bbox'], T=geom['T'],
                              outline=geom['outline'], edges=geom['runs'], neighbours=sorted(atlas.neighbours[z]))
         view['shapeFloor'] = floor_rows(geom['floor'])
         view['shapeEdge'] = edge_rows(geom, sorted(atlas.neighbours[z]))

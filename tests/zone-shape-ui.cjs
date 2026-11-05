@@ -83,6 +83,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await page.waitForTimeout(800);
     const p = await where();
     check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+    check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);
+    check(await page.evaluate(() => !document.getElementById('area-title').classList.contains('show') && !document.body.innerText.includes('You enter')), `seam crossing ${from} -> ${to}: no zone banner and no "You enter" line`);
     await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
   }
   // The hubs keep their place inside the shifted core: Alderhaven's plaza and Cinderwatch Camp.

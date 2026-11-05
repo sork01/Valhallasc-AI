@@ -1864,23 +1864,21 @@ pub struct Portal {
     pub seam: Option<Seam>,
 }
 /// The shared border of two shaped zones. Both zones use one tile scale, so the other side is the same line shifted by
-/// `shift`; a walker who reaches the line arrives on the same spot of the other side, `inset` tiles in.
+/// `shift`. The land runs a few tiles past the line (the zone's margin) so a walker can step across it; the moment the
+/// walker is past the line the server moves it by `shift`, to the same spot of the other zone: no hop, no message.
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Seam {
     pub points: Vec<[f64; 2]>,
     pub shift: [f64; 2],
-    #[serde(default = "Seam::default_inset")]
-    pub inset: f64,
+    /// +1 when the other zone lies to the left of the polyline's direction (cross product positive), -1 when to the right.
+    pub side: f64,
 }
 impl Seam {
-    /// Walkers this close to the border line cross it.
-    pub const REACH: f64 = 1.3;
-    fn default_inset() -> f64 {
-        3.2
-    }
-    /// The nearest point of the border to `p`, and how far it is.
-    pub fn nearest(&self, p: Point) -> (Point, f64) {
-        let mut best = (Point { x: 0., y: 0. }, f64::MAX);
+    /// Past the line by less than this is a crossing; the margin of land beyond the line is a little deeper.
+    pub const REACH: f64 = 3.;
+    /// The walker's new position when it stands beyond the border line, or None while it is still on this side.
+    pub fn crossing(&self, p: Point) -> Option<Point> {
+        let mut best: Option<(f64, f64)> = None;
         for pair in self.points.windows(2) {
             let (a, b) = (pair[0], pair[1]);
             let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
@@ -1890,29 +1888,16 @@ impl Seam {
             } else {
                 (((p.x - a[0]) * dx + (p.y - a[1]) * dy) / len2).clamp(0., 1.)
             };
-            let q = Point {
-                x: a[0] + dx * t,
-                y: a[1] + dy * t,
-            };
-            let d = p.distance(q);
-            if d < best.1 {
-                best = (q, d);
+            let d = (p.x - a[0] - dx * t).hypot(p.y - a[1] - dy * t);
+            if best.is_none_or(|(bd, _)| d < bd) {
+                best = Some((d, dx * (p.y - a[1]) - dy * (p.x - a[0])));
             }
         }
-        best
-    }
-    /// Where a walker at `here` lands on the other side: straight across the border, `inset` tiles in.
-    pub fn arrival(&self, here: Point) -> Point {
-        let (q, d) = self.nearest(here);
-        let n = if d < 1e-6 {
-            Point { x: 0., y: 0. }
-        } else {
-            normalize(q.x - here.x, q.y - here.y)
-        };
-        Point {
-            x: q.x + n.x * self.inset + self.shift[0],
-            y: q.y + n.y * self.inset + self.shift[1],
-        }
+        let (d, cross) = best?;
+        (d < Self::REACH && cross * self.side > 0.).then_some(Point {
+            x: p.x + self.shift[0],
+            y: p.y + self.shift[1],
+        })
     }
 }
 #[derive(Clone, Deserialize, Serialize)]

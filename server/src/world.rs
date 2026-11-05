@@ -3457,17 +3457,8 @@ impl World {
             .iter()
             .find(|portal| {
                 if let Some(seam) = &portal.seam {
-                    // A shared border: crossing it anywhere along its length, walking toward it.
-                    let (q, d) = seam.nearest(here);
-                    let direction = if p.input.x != 0. || p.input.y != 0. {
-                        p.input
-                    } else {
-                        p.goal.map_or(p.face, |goal| here.direction(goal))
-                    };
-                    let toward = here.direction(q);
-                    return p.moving
-                        && d < Seam::REACH
-                        && direction.x * toward.x + direction.y * toward.y > 0.15;
+                    // A shared border: the walker is past the line.
+                    return p.moving && seam.crossing(here).is_some();
                 }
                 let walking_out = portal.walk.is_none_or(|side| {
                     let direction = if p.input.x != 0. || p.input.y != 0. {
@@ -3504,8 +3495,9 @@ impl World {
         if portal.to >= self.maps.len() {
             return;
         }
-        if let Some(seam) = &portal.seam {
-            let arrival = seam.arrival(here);
+        if let Some(seam) = &portal.seam
+            && let Some(arrival) = seam.crossing(here)
+        {
             portal.tx = arrival.x;
             portal.ty = arrival.y;
         }
@@ -3704,7 +3696,9 @@ impl World {
                 None => format!("You step through {} into {name}.", portal.name),
             }
         };
-        let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        if portal.seam.is_none() {
+            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        }
         // Gathered humans and hired fighters cross together, so nobody is stranded behind the gate.
         for mate in raid_gate_crew.into_iter().filter(|mate| *mate != session) {
             let p = self.players.get_mut(&mate).unwrap();
@@ -3719,7 +3713,7 @@ impl World {
             let _ = p.peer.try_send(json!({"type":"system","text":text}));
         }
         self.separate_enemies();
-        if portal.walk.is_none() {
+        if portal.walk.is_none() && portal.seam.is_none() {
             self.event("portal", &actor, arrival, 0., false);
         }
         self.save();
