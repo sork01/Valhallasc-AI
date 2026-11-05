@@ -877,7 +877,7 @@
 
   // ---------- state ----------
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
-  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null, miniWater = null, miniTmp = null, miniZoom = 2; const miniNb = new Map();
+  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null, miniWater = null, miniTmp = null, miniRipple = null, miniZoom = 2; const miniNb = new Map();
   let hero, slimes, drops, chests, signs = [], floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   const BAG_COLORS = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
@@ -4651,10 +4651,10 @@
     miniBase = renderMini(); miniNb.clear(); miniWater = null;
     if (zdef.shapeFloor) {
       const [c, g] = canvasOf(144, 144, 4), k = 144 / MAP;
-      for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
+      for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // shallows: lighter and greener near the shore, a foam line at the edge
         const i = y * MAP + x, d = map.edgeDist[i];
-        if (map.floor[i] || map.edge[i] !== 99 || !d || d > 10) continue;
-        g.fillStyle = `rgba(52,150,176,${.55 * (1 - (d - 1) / 10)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
+        if (map.floor[i] || !d || d > 16) continue;
+        g.fillStyle = d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
       }
       miniWater = c;
     }
@@ -4671,7 +4671,13 @@
     if (!miniTmp || miniTmp.width !== W) { miniTmp = document.createElement('canvas'); miniTmp.width = miniTmp.height = W; }
     const tg = miniTmp.getContext('2d');
     mctx.save(); mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
-    mctx.fillStyle = zdef.shapeFloor ? '#12384c' : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    mctx.fillStyle = zdef.shapeFloor ? '#1d6a92' : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    if (zdef.shapeFloor) {                                  // ripples fixed to the world, so they slide past as the hero moves
+      if (!miniRipple) { const [rc, rg] = canvasOf(48, 48, 1); let n = 7; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647; rg.strokeStyle = 'rgba(190,232,246,.55)'; rg.lineWidth = 1; rg.lineCap = 'round';
+        for (let i = 0; i < 11; i++) { const x = rnd() * 48, y = rnd() * 48, w = 4 + rnd() * 6; rg.beginPath(); rg.moveTo(x, y); rg.quadraticCurveTo(x + w / 2, y - 1.5, x + w, y); rg.stroke(); }
+        miniRipple = mctx.createPattern(rc, 'repeat'); }
+      miniRipple.setTransform(new DOMMatrix().translate(-vx * s, -vy * s)); mctx.fillStyle = miniRipple; mctx.fillRect(0, 0, W, W);
+    }
     // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.
     const layer = (canvas, tiles, ox, oy, zi) => {
       const dx = (ox - vx) * s, dy = (oy - vy) * s, dw = tiles * s;
