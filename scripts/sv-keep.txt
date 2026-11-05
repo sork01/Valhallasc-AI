@@ -751,5 +751,7 @@
   "Beta 1.39.17",
   "Beta 1.39.18",
   "Beta 1.39.19",
-  "Beta 1.39.30"
+  "Beta 1.39.30",
+  "BracketLeft",
+  "BracketRight"
 ]

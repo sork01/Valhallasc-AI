@@ -4758,6 +4758,8 @@
   "Sound on": "Ljud på",
   "Sound on (N)": "Ljud på (N)",
   "Sound on or off": "Ljud på eller av",
+  "Minimap zoom in": "Zooma in minikartan",
+  "Minimap zoom out": "Zooma ut minikartan",
   "Sovereign Pack": "Suveränryggsäck",
   "Sovereign Travel Cloak": "Härskarens resemantel",
   "Sovereign of the Last Fold": "Härskaren över det sista vecket",

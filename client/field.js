@@ -877,7 +877,7 @@
 
   // ---------- state ----------
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
-  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null, miniOut = null;
+  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null, miniWater = null, miniTmp = null, miniZoom = 2; const miniNb = new Map();
   let hero, slimes, drops, chests, signs = [], floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   const BAG_COLORS = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
@@ -1122,6 +1122,7 @@
   function onKeyDown(e) {
     if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || Keys.typing(e)) return;
     const code = Keys.codeOf(e);
+    for (const [action, step] of [['minimapIn', 1], ['minimapOut', -1]]) if (Keys.is(e, action)) { e.preventDefault(); if (!e.repeat) Field.minimapZoom(step); return; }
     for (const action of ['interact', 'talk', 'mount']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
     if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; emitHud(); e.preventDefault(); }
     if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.action('attack'); }
@@ -4588,10 +4589,9 @@
     }
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
-  function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+  function renderMini() {
+    const [c, g] = canvasOf(144, 144, 4), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
-    if (zdef.shapeFloor) { g.fillStyle = '#080c0b'; for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (!map.floor[y * MAP + x]) g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? MoonwellArt.minimap(x,y,map.dirt[y*MAP+x],zdef) : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
@@ -4636,49 +4636,63 @@
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
     for (const p of zdef.portals) { if (p.seam || p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
-    miniBase = c; miniOut = zdef.shapeFloor ? buildMiniOutside(k) : null;
-  }
-  // What lies outside the outline of a shaped zone (docs/zone-shapes.md), drawn over the fog so mist never covers it: open
-  // water everywhere, the neighbouring province's own ground where a border lies (fading into the water), and the neighbour's
-  // name at the side it lies on.
-  function buildMiniOutside(k) {
-    const [c, g] = canvasOf(144, 144, 1);
-    const nbs = zdef.shape?.neighbours || [], sum = {};
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
-      const i = y * MAP + x; if (map.floor[i]) continue;
-      const d = map.edgeDist[i], near = d ? Math.max(0, 1 - (d - 1) / 14) : 0;
-      g.fillStyle = `hsl(${203 + near * 4}, ${52 - (1 - near) * 10}%, ${15 + near * 12}%)`; g.fillRect(x * k, y * k, k + .5, k + .5);
-      const code = map.edge[i];
-      if (code >= 65 && code <= 90 && d && d <= 14) {
-        g.globalAlpha = .9 * (1 - (d - 1) / 14); g.fillStyle = groundOf(ZONES[nbs[code - 65]]?.theme || 'meadow', .5, false, 0); g.fillRect(x * k, y * k, k + .5, k + .5); g.globalAlpha = 1;
-        if (d <= 3) { const t = sum[code] || (sum[code] = [0, 0, 0]); t[0] += x + .5; t[1] += y + .5; t[2]++; }
-      }
+    if (zdef.shapeFloor) {                                  // only the land is drawn: outside the outline the minimap shows the water (or a neighbour)
+      g.globalCompositeOperation = 'destination-out';
+      for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (!map.floor[y * MAP + x]) g.fillRect(x * k - .25, y * k - .25, k + .5, k + .5);
+      g.globalCompositeOperation = 'source-over';
     }
-    // Cut the land back out so the overlay only covers what is outside the outline.
-    g.globalCompositeOperation = 'destination-out';
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) g.fillRect(x * k - .25, y * k - .25, k + 1, k + 1);
-    g.globalCompositeOperation = 'source-over';
-    // Each neighbour's name sits on the minimap's rim, in the direction it lies from the middle of the land.
-    let lx = 0, ly = 0, ln = 0; for (let i = 0; i < MAP * MAP; i++) if (map.floor[i]) { lx += i % MAP; ly += (i / MAP) | 0; ln++; }
-    lx = lx / (ln || 1) * k; ly = ly / (ln || 1) * k;
-    g.save(); g.font = 'bold 8px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = 'rgba(8,16,22,.92)'; g.fillStyle = '#f2ead0';
-    const placed = [];
-    for (const code in sum) {
-      const [sx, sy, n] = sum[code], name = (ZONES[nbs[code - 65]]?.name || '').replace(/^The /, ''); if (!name || n < 6) continue;
-      let dx = sx / n * k - lx, dy = sy / n * k - ly; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
-      const hw = g.measureText(name).width / 2 + 2, t = Math.min(dx ? (72 - 7 - Math.min(hw, 40) * Math.abs(dx)) / Math.abs(dx) : 1e9, dy ? (72 - 8) / Math.abs(dy) : 1e9);
-      const x = Math.max(hw, Math.min(144 - hw, 72 + dx * t)); let y = Math.max(8, Math.min(136, 72 + dy * t));
-      for (let tries = 0; tries < 8 && placed.some(q => Math.abs(q.y - y) < 9 && Math.abs(q.x - x) < q.hw + hw); tries++) y = y > 72 ? y - 9 : y + 9;
-      placed.push({ x, y, hw }); g.strokeText(name, x, y); g.fillText(name, x, y);
-    }
-    g.restore();
     return c;
+  }
+  // The minimap is centred on the hero and zoomable (1 = the whole zone, the widest view, up to 4 times closer). Layers, back to
+  // front: water (the coast's shallows), each seam neighbour's land (docs/zone-shapes.md: the Crags show Greenmeadow beyond the
+  // border), then this zone's land. Each layer carries its own fog of war.
+  const MINI_ZOOMS = 4;
+  function buildMini() {
+    miniBase = renderMini(); miniNb.clear(); miniWater = null;
+    if (zdef.shapeFloor) {
+      const [c, g] = canvasOf(144, 144, 4), k = 144 / MAP;
+      for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
+        const i = y * MAP + x, d = map.edgeDist[i];
+        if (map.floor[i] || map.edge[i] !== 99 || !d || d > 10) continue;
+        g.fillStyle = `rgba(52,150,176,${.55 * (1 - (d - 1) / 10)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
+      }
+      miniWater = c;
+    }
+  }
+  function miniNeighbour(nb) {
+    let e = miniNb.get(nb); if (e) return e;
+    const nc = ctxFor(nb), keep = snapCtx(); adoptCtx(nc);
+    try { e = { base: renderMini(), size: nc.MAP }; } finally { adoptCtx(keep); }
+    miniNb.set(nb, e); return e;
   }
   function drawMini() {
     if (!mctx || !miniBase) return;
-    const s = mini.width / MAP; mctx.clearRect(0, 0, mini.width, mini.height); mctx.drawImage(miniBase, 0, 0, mini.width, mini.height);
-    paintFog(mctx, mini.width, mini.height, zone);
-    if (miniOut) mctx.drawImage(miniOut, 0, 0, mini.width, mini.height);
+    const W = mini.width, V = MAP / miniZoom, s = W / V, vx = hero.x - V / 2, vy = hero.y - V / 2;
+    if (!miniTmp || miniTmp.width !== W) { miniTmp = document.createElement('canvas'); miniTmp.width = miniTmp.height = W; }
+    const tg = miniTmp.getContext('2d');
+    mctx.save(); mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
+    mctx.fillStyle = zdef.shapeFloor ? '#12384c' : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.
+    const layer = (canvas, tiles, ox, oy, zi) => {
+      const dx = (ox - vx) * s, dy = (oy - vy) * s, dw = tiles * s;
+      if (dx > W || dy > W || dx + dw < 0 || dy + dw < 0) return;
+      tg.globalCompositeOperation = 'source-over'; tg.clearRect(0, 0, W, W); tg.drawImage(canvas, dx, dy, dw, dw);
+      if (zi !== null) { tg.globalCompositeOperation = 'source-atop'; tg.save(); tg.translate(dx, dy); paintFog(tg, dw, dw, zi); tg.restore(); tg.globalCompositeOperation = 'source-over'; }
+      mctx.drawImage(miniTmp, 0, 0);
+    };
+    if (miniWater) layer(miniWater, MAP, 0, 0, null);
+    const seams = zdef.portals.filter(p => p.seam);
+    for (const p of seams) { const e = miniNeighbour(p.to); layer(e.base, e.size, -p.seam.shift[0], -p.seam.shift[1], p.to); }
+    layer(miniBase, MAP, 0, 0, zone);
+    mctx.restore();
+    mctx.save(); mctx.translate(-vx * s, -vy * s);
+    // What the neighbours across a seam show: their NPCs and the view-only enemies and players already moved into this frame.
+    for (const p of seams) {
+      const [shx, shy] = p.seam.shift;
+      for (const n of ZONES[p.to].npcs || []) if (!n.travelStop && seen(p.to, n.x, n.y)) { mctx.fillStyle = '#f5d477'; mctx.fillRect((n.x - shx) * s - 1, (n.y - shy) * s - 1, 2, 2); }
+      for (const g of ghostPlayers.values()) if (seen(p.to, g.x + shx, g.y + shy)) { mctx.fillStyle = '#b3dfff'; mctx.beginPath(); mctx.arc(g.x * s, g.y * s, 2.5, 0, 6.283); mctx.fill(); }
+      for (const g of ghostSlimes.values()) if (!g.dead && seen(p.to, g.x + shx, g.y + shy)) { mctx.fillStyle = g.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(g.x * s, g.y * s, 2, 0, 6.283); mctx.fill(); }
+    }
     for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
     // Travel masters are navigation landmarks: their spark remains visible even through unexplored mist.
     for (const n of City.npcs) if (n.travelStop) {
@@ -4693,7 +4707,7 @@
     // Quest guidance stays above fog and actors, and changes independently of the cached ground.
     mctx.save(); mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';
     for (const q of window.Quests?.mapMarkers(zone) || []) {
-      const x = Math.max(7, Math.min(mini.width - 7, q.x * s)), y = Math.max(8, Math.min(mini.height - 8, q.y * s));
+      const x = Math.max(vx * s + 7, Math.min(vx * s + W - 7, q.x * s)), y = Math.max(vy * s + 8, Math.min(vy * s + W - 8, q.y * s));
       mctx.strokeStyle = '#101827'; mctx.fillStyle = q.color; mctx.lineWidth = 3;
       if (q.state === 'tracked') {
         // An outer diamond remains distinct when the tracked destination is also a quest giver.
@@ -4705,6 +4719,7 @@
     }
     mctx.restore();
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
+    mctx.restore();
   }
 
   // ---------- lifecycle ----------
@@ -4743,11 +4758,13 @@
       ++spriteGeneration; mageSpr = null; warSpr = null; heroSpr = null;
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
+      miniZoom = Math.max(1, Math.min(MINI_ZOOMS, Math.round(+window.Prefs?.minimapZoom || 2)));
       slimeSpriteConfig = o.slimeSprites || null;
       loadBankSprites(); loadChestSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize); addEventListener('prefs-change', resize);
+        if (mini) mini.addEventListener('wheel', e => { e.preventDefault(); Field.minimapZoom(e.deltaY < 0 ? 1 : -1); }, { passive: false });
         cv.addEventListener('pointerdown', onPointerDown); cv.addEventListener('pointermove', onPointerMove); addEventListener('pointerup', onPointerUp);
         cv.addEventListener('pointercancel', onPointerUp); cv.addEventListener('lostpointercapture', onPointerUp);
         cv.addEventListener('contextmenu', e => e.preventDefault());
@@ -4785,6 +4802,8 @@
       hero.pvpTargetId = null; hero.target = nearest; hero.goal = null; marker = null;
       Online.send({ type: 'target', id: nearest.id }); emitHud(); return true;
     },
+    // Minimap zoom: 1 is the whole zone, 4 is four times closer. Saved in Prefs.
+    minimapZoom(step) { const z = Math.max(1, Math.min(MINI_ZOOMS, miniZoom + (step || 0))); if (z !== miniZoom) { miniZoom = z; window.Prefs?.set({ minimapZoom: z }); } return miniZoom; },
     action(action) {
       if (!Field.canAct || hero.sparkTravel) return false;
       if (action === 'attack') return Field.useSkill('attack');

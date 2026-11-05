@@ -1268,6 +1268,7 @@
     // Keep explicit choices; untouched devices start at 60% on touch and 80% on a mouse.
     get uiScale() { return save.uiScaleSet && Number.isFinite(+save.uiScale) ? Math.max(.6, Math.min(1.5, +save.uiScale)) : matchMedia('(pointer: coarse)').matches ? .6 : .8; },
     // Key bindings the player changed ({action: [code, code]}); keymap.js merges them over the shipped keys.
+    get minimapZoom() { return [1, 2, 3, 4].includes(+save.minimapZoom) ? +save.minimapZoom : 2; },
     get keys() { return save.keys && typeof save.keys === 'object' ? save.keys : {}; },
     get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },
     get panelSize() { return !save.panelSizeSet && !has(save.panelSize) ? DEFAULT_PANEL_SIZE : save.panelSize && typeof save.panelSize === 'object' ? save.panelSize : {}; },
@@ -1292,6 +1293,7 @@
       if ('ui' in patch) { save.ui = patch.ui || {}; save.uiSet = !!patch.ui; } // null = back to the shipped arrangement
       if ('uiScale' in patch && Number.isFinite(+patch.uiScale)) { save.uiScale = Math.max(.6, Math.min(1.5, +patch.uiScale)); save.uiScaleSet = true; }
       if ('winScale' in patch) save.winScale = patch.winScale;
+      if ('minimapZoom' in patch && [1, 2, 3, 4].includes(+patch.minimapZoom)) save.minimapZoom = +patch.minimapZoom;
       if ('keys' in patch) save.keys = patch.keys && typeof patch.keys === 'object' ? patch.keys : {};
       if ('panelSize' in patch) { save.panelSize = patch.panelSize || {}; save.panelSizeSet = !!patch.panelSize; }
       persist(); applyMusicLevel(.4);

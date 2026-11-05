@@ -28,6 +28,8 @@
     ['Windows', 'party', 'Party', ['KeyP']],
     ['Windows', 'map', 'World map', ['KeyM']],
     ['Windows', 'menu', 'Menu', ['Escape']],
+    ['Windows', 'minimapIn', 'Minimap zoom in', ['BracketRight']],
+    ['Windows', 'minimapOut', 'Minimap zoom out', ['BracketLeft']],
     ...Array.from({ length: 4 }, (_, i) => ['Touch controls', 'touchSkill' + (i + 1), `Touch skill ${i + 1}`, []]),
     ['Other', 'chat', 'Chat', ['Enter']],
     ['Other', 'sound', 'Sound on or off', ['KeyN', 'KeyM']],

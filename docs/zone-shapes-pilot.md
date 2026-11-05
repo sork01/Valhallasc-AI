@@ -41,3 +41,9 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 * Existing Rust tests were not run beyond `zone_shape`; assertions on zone 0/1 sizes or old coordinates may need updating.
 * Filler uses the old densities; kind mix and trail layout in the new ground have not been judged in play. The Crags rivers continue past the core with one extra ford about 52 tiles from each core edge.
 * Rolling the pilot out for real needs `SHAPE-MIGRATE` (service stopped, backup, `zone_shapes_migrate.py --apply`) and a server restart.
+
+## Minimap (MINIMAP-CENTRED, 2026-11-05)
+
+- Centred on the hero in every zone. Zoom 1 = the whole zone (the widest view; the part beyond the zone is water, or the void in a non-shaped zone), up to 4x closer; default 2. Mouse wheel over the minimap and the keymap actions `minimapIn`/`minimapOut` (default `]` and `[`; `-` and `=` are skill slots 11/12). Saved in `Prefs.minimapZoom`. Clicking still opens the world map.
+- `renderMini()` draws a zone's land once at 4x (transparent outside the outline); `buildMini()` adds the coast shallows. `drawMini()` layers water, each seam neighbour's land (`miniNeighbour`, built from its `ctxFor` context and shifted by `seam.shift`), then this zone's land; each layer gets its own fog of war (`source-atop`, so mist never covers water). Across a seam the neighbour's NPCs and the view-only ghost enemies/players are drawn too. No zone names on the minimap (owner).
+- Check: `bash scripts/test-touch-bounded.sh tests/minimap-ui.cjs` (11 checks; mutation: dropping the neighbour layer fails the Greenmeadow-from-the-Crags check).
