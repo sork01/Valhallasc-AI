@@ -159,6 +159,25 @@
         if (cross * seam.side > 0) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set || {} });
       }
     }
+    for (const portal of zdef.portals || []) if (portal.vault && zdef.shapeFloor && ZONES[portal.to]) {
+      const win = vaultWindow(portal); if (!win) continue;
+      for (const o of ZONES[portal.to].objects || []) {
+        if (!VAULT_GHOST_KINDS.has(o.kind)) continue;
+        const gx = o.x - portal.vault[0], gy = o.y - portal.vault[1];
+        if (win.inside(gx, gy)) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: {} });
+      }
+    }
+  }
+  // The city beyond a vault (Skaldholm's wall): a window of its street and buildings seen through the opening, in this zone's frame
+  // (the offset `portal.vault` maps ours to the city's), so crossing changes nothing on screen. The window opens from the arch,
+  // `VAULT_VIEW` tiles outward, a little wider than the opening.
+  const VAULT_VIEW = 46, VAULT_GHOST_KINDS = new Set(['house', 'chapel', 'lamp', 'fountain', 'grandfountain', 'stall', 'bench', 'banner', 'statue', 'well', 'barrels', 'noticeboard', 'meetingstone', 'campfire']);
+  function vaultWindow(portal) {
+    const arch = (zdef.exitArches || []).find(a => a.portal === portal.id); if (!arch || !portal.walk) return null;
+    const [wx, wy] = portal.walk, px = -wy, py = wx, hw = arch.halfWidth || 5;
+    const at = (along, across) => [arch.x + wx * along + px * across, arch.y + wy * along + py * across];
+    return { arch, wx, wy, hw, corners: [at(0, -hw), at(0, hw), at(VAULT_VIEW, hw + .4 * VAULT_VIEW), at(VAULT_VIEW, -hw - .4 * VAULT_VIEW)],
+      inside: (x, y) => { const along = (x - arch.x) * wx + (y - arch.y) * wy, across = Math.abs((x - arch.x) * px + (y - arch.y) * py); return along >= 0 && along <= VAULT_VIEW && across <= hw + .4 * along; } };
   }
   const BLEND_REACH = 14;
   // Sprites of the zones whose scenery can be drawn from the other side of a seam.
@@ -275,7 +294,7 @@
     // neighbours are built one per timer tick right after the crossing instead of inside it, and a context is never thrown away
     // (its arrays are small; only its ground canvases are released), so crossing back and forth rebuilds nothing.
     let nbi = 0;
-    for (const p of zdef.portals || []) if (p.seam) {
+    for (const p of zdef.portals || []) if (p.seam || (p.vault && zdef.shapeFloor)) {
       keepZones.add(p.to); const to = p.to;
       setTimeout(() => { if (ZONES[to]) { ctxFor(to); loadSceneEnemyArt(ZONES[to].slimes || []); } }, ctxs.has(to) ? 0 : 150 + 300 * nbi++);
     }
@@ -1389,8 +1408,9 @@
     // camera moves by the same amount, there is no banner, and held keys carry on.
     let seamShift = null;
     if (moved && !initial) {
-      const sp = zdef.portals.find(p => p.seam && p.to === (own.zone || 0));
-      if (sp && Math.hypot(own.x - (hero.nx + sp.seam.shift[0]), own.y - (hero.ny + sp.seam.shift[1])) < 3) seamShift = sp.seam.shift;
+      // A vault in a landmark city's wall (Skaldholm) is crossed like a seam: the camera moves with the hero by the gate's offset.
+      const sp = zdef.portals.find(p => (p.seam || p.vault) && p.to === (own.zone || 0)), sh = sp && (sp.seam ? sp.seam.shift : sp.vault);
+      if (sp && Math.hypot(own.x - (hero.nx + sh[0]), own.y - (hero.ny + sh[1])) < 3) seamShift = sh;
     }
     if ((moved || initial) && !seamShift) window.ZoneJourney?.enter(zdef, ZONES[own.zone || 0], initial);
     // Across a seam the two sides swap roles: what was drawn as a ghost is now real and the other way round, so nothing
@@ -4211,6 +4231,11 @@
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
     for (const p of zdef.portals) if (p.seam) { const nc = ctxs.get(p.to); if (nc) drawNeighbourGround(g, nc, p.seam.shift, cx, cy, sxo, syo); }
+    for (const p of zdef.portals) if (p.vault && zdef.shapeFloor) {     // the city's ground through the vault: a clipped window, never over our own land beyond it
+      const nc = ctxs.get(p.to), win = nc && vaultWindow(p); if (!win) continue;
+      g.save(); g.beginPath(); win.corners.forEach(([x, y], i) => { const [sx, sy] = w2s(x, y); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); }); g.closePath(); g.clip();
+      drawNeighbourGround(g, nc, p.vault, cx, cy, sxo, syo); g.restore();
+    }
     g.imageSmoothingEnabled = true;
     if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge' || zdef.theme === 'ember') {
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
@@ -4958,7 +4983,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get vaultView() { return (map.ghosts || []).filter(o => VAULT_GHOST_KINDS.has(o.kind)).length; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };

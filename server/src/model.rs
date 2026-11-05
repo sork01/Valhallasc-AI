@@ -1865,6 +1865,11 @@ pub struct Portal {
     /// A border you can cross anywhere along its length (docs/zone-shapes.md): the whole shared edge of two shaped zones.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub seam: Option<Seam>,
+    /// A vault in a landmark city's wall (docs/zone-shapes-pilot.md): the gate and the city's own arch are one doorway seen from two
+    /// zones, so the walker keeps its place relative to it: the arrival is `here + vault`, no hop, and the client shows no banner,
+    /// journey notice or chat line (held movement carries on like across a seam).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vault: Option<[f64; 2]>,
 }
 /// The shared border of two shaped zones. Both zones use one tile scale, so the other side is the same line shifted by
 /// `shift`. The land runs a few tiles past the line (the zone's margin) so a walker can step across it; the moment the

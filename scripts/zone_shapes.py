@@ -875,9 +875,13 @@ def place_portals(world, shifted, landmarks=()):
 WALL_STEP, WALL_IN, VAULT_HALF = 2.0, 1.6, 5.9
 
 
-def build_walls(world, shifted, landmarks):
+def build_walls(world, shifted, landmarks, margins):
     """Skaldholm's wall (docs/zone-shapes-pilot.md): along every border a shaped zone has with a landmark city, ramparts and
-    towers (the city's own art, real collision objects) with a vault at the gate you walk through to enter the city."""
+    towers (the city's own art, real collision objects) with a vault at the gate you walk through to enter the city.
+
+    The vault IS the city's own arch seen from this zone: the two share one doorway, so a crossing keeps your place relative to it
+    (`Portal.vault` = the offset between the two frames, the arrival is `here + offset`): you walk under the vault, past the arch's
+    centre, and you are under the city's arch, with the street ahead. A small pocket of land is added just beyond the wall to stand on."""
     import compact_atlas as ca
     zones = [world] + world['zones']
     for i in sorted(shifted):
@@ -888,27 +892,24 @@ def build_walls(world, shifted, landmarks):
             if not runs or gate is None:
                 continue
             n = z['size']
-            floor = z['shapeFloor']
-            on = lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and floor[int(y)][int(x)] == '#'
-            # the vault: the chain point nearest the gate, the wall's local axis, the opening faces the way the gate walks
+            rows = z['shapeFloor']
+            on = lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and rows[int(y)][int(x)] == '#'
+            city = zones[lm]
+            back = next(p for p in city['portals'] if p['to'] == i)
+            carch = next(a for a in city['exitArches'] if a['portal'] == back['id'])
+            wx, wy = gate['walk']
+            assert [wx, wy] == [-back['walk'][0], -back['walk'][1]], f"zone {i}: the vault and the city's arch face different ways"
+            hw = carch['halfWidth']
+            # the arch on the wall line, 1.2 tiles inland of the border point nearest the gate, axis-aligned like the city's arch
             chain = [tuple(q) for r in runs for q in r]
             q = min(chain, key=lambda c: math.dist(c, (gate['x'], gate['y'])))
-            run = next(r for r in runs if any(tuple(c) == q for c in r))
-            k = [tuple(c) for c in run].index(q)
-            a, b = run[max(0, k - 1)], run[min(len(run) - 1, k + 1)]
-            vertical = abs(b[1] - a[1]) > abs(b[0] - a[0])
-            arch = dict(x=round(q[0], 2), y=round(q[1], 2), vertical=vertical, halfWidth=VAULT_HALF, towers=True, portal=gate['id'], name=zones[lm]['name'])
+            A = (round(q[0] - wx * 1.2, 2), round(q[1] - wy * 1.2, 2))
+            arch = dict(x=A[0], y=A[1], vertical=carch['vertical'], halfWidth=hw, towers=carch['towers'], portal=gate['id'], name=zones[lm]['name'])
             adds, towers = [], []
-            # the vault's own towers, as in Skaldholm's wall: one each side, hugging the opening (half width + 1.7)
-            ia, ib = max(0, k - 3), min(len(run) - 1, k + 3)
-            ux, uy = run[ib][0] - run[ia][0], run[ib][1] - run[ia][1]
-            ul = math.hypot(ux, uy) or 1
-            ux, uy = ux / ul, uy / ul
-            inx, iny = -uy, ux
-            if not on(q[0] + inx * 3, q[1] + iny * 3):
-                inx, iny = -inx, -iny
-            for sgn in (-1, 1):
-                towers.append((q[0] + inx * WALL_IN + ux * sgn * (VAULT_HALF + 1.7), q[1] + iny * WALL_IN + uy * sgn * (VAULT_HALF + 1.7)))
+            px, py = -wy, wx                                   # across the opening
+            if carch['towers']:                                # the vault's own towers, as in the city's wall: half width + 1.7 each side
+                for sgn in (-1, 1):
+                    towers.append((A[0] + px * sgn * (hw + 1.7), A[1] + py * sgn * (hw + 1.7)))
             flank = list(towers)
             for r in runs:
                 pts = []
@@ -927,7 +928,7 @@ def build_walls(world, shifted, landmarks):
                         nx, ny = -nx, -ny
                     cx, cy = c[0] + nx * WALL_IN, c[1] + ny * WALL_IN
                     run_len += WALL_STEP
-                    if math.dist(c, q) <= VAULT_HALF + 1.9 or any(math.dist(t, (cx, cy)) < 2.2 for t in flank):
+                    if math.dist((cx, cy), A) <= hw + 1.9 or any(math.dist(t, (cx, cy)) < 2.2 for t in flank):
                         continue                          # the opening and the flank towers
                     if run_len % 28 < WALL_STEP and not any(math.dist(t, (cx, cy)) < 8 for t in towers):
                         towers.append((cx, cy))
@@ -943,14 +944,36 @@ def build_walls(world, shifted, landmarks):
                     if math.hypot(o['x'] - w_['x'], o['y'] - w_['y']) < max(w_['width'], w_['depth']) / 2 + (o.get('r', .5) or .5) + .9:
                         return True
                 return False
-            z['objects'] = [o for o in z['objects'] if o['kind'] in STRUCTURAL or not hit(o)]
+            # a pocket of land just beyond the wall (the border line is the wall's outer face): the strip you stand on under the vault
+            floor = np.array([[c == '#' for c in row] for row in rows])
+            ys, xs = np.mgrid[0:n, 0:n]
+            dx_, dy_ = xs + .5 - A[0], ys + .5 - A[1]
+            along, across = dx_ * wx + dy_ * wy, dx_ * px + dy_ * py
+            pocket = (along >= -1.0) & (along <= 6.2) & (np.abs(across) <= hw + 1.0)
+            floor = floor | pocket
+            z['shapeFloor'] = floor_rows(floor)
+            z['objects'] = [o for o in z['objects'] if o['kind'] != 'void' and (o['kind'] in STRUCTURAL or not hit(o))]
+            z['objects'].extend(void_pieces(floor | margins[i]))
             z['slimes'] = [s for s in z['slimes'] if not hit(dict(s, r=1.5))]
             z['objects'].extend(adds)
             z['exitArches'] = [e for e in z.get('exitArches', []) if e['portal'] != gate['id']] + [arch]
+            # Both gates sit just past the arch's centre (the server also triggers up to 2.8 tiles before its portal) and carry the
+            # one offset between the two frames: this zone's A is the city's own arch.
+            shift = [round(carch['x'] - A[0], 2), round(carch['y'] - A[1], 2)]
+            gate['x'], gate['y'], gate['r'] = round(A[0] + wx * 3.0, 2), round(A[1] + wy * 3.0, 2), 1.2
+            gate['vault'] = shift
+            back['x'], back['y'], back['r'] = round(carch['x'] - wx * 3.0, 2), round(carch['y'] - wy * 3.0, 2), 1.2
+            back['vault'] = [-shift[0], -shift[1]]
+            gate['tx'], gate['ty'] = round(gate['x'] + shift[0], 2), round(gate['y'] + shift[1], 2)
+            back['tx'], back['ty'] = round(back['x'] - shift[0], 2), round(back['y'] - shift[1], 2)
+            for e in city.get('cityEntrances', []):
+                if e.get('portal') == back['id']:
+                    e['points'][0] = [back['x'], back['y']]
             prev = ca.connected(z)
-            assert int(gate['y']) * n + int(gate['x']) in prev, f"zone {i}: the vault gate to {lm} is cut off by the wall"
-            print(f"zone {i}: wall to {zones[lm]['name']}: {len(adds) - len(towers)} ramparts, {len(towers)} towers, vault at ({arch['x']},{arch['y']}) {'vertical' if vertical else 'horizontal'}")
+            assert int(gate['y']) * n + int(gate['x']) in prev, f"zone {i}: the vault gate to {lm} is cut off by the wall (A {A}, gate {gate['x']},{gate['y']}, walk {wx},{wy}, on land {on(gate['x'], gate['y'])}, pocket cells {int(pocket.sum())}, arch hw {hw})"
             ca.exit_routes(z)
+            ca.exit_routes(city)
+            print(f"zone {i}: wall to {zones[lm]['name']}: {len(adds) - len(towers)} ramparts, {len(towers)} towers, vault at {A}, shift {shift}")
 
 # ---- unshape / apply ---------------------------------------------------------------------------------------------------
 def unshape(world, cfg):
@@ -970,6 +993,7 @@ def apply(world, cfg):
     atlas = Atlas()
     SIDE.mkdir(exist_ok=True)
     shifted = {}
+    margins = {}
     olds = {z: get_view(world, z) for z in cfg['zones']}
     geoms = {z: shape_geometry(cfg, atlas, z, olds[z]) for z in cfg['zones']}
     for z in cfg['zones']:
@@ -1006,6 +1030,7 @@ def apply(world, cfg):
                             t = np.clip(((xs + .5 - a[0]) * dx + (ys + .5 - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9), 0, 1)
                             margin |= np.hypot(xs + .5 - a[0] - t * dx, ys + .5 - a[1] - t * dy) <= SEAM_MARGIN
         margin &= ~geom['floor']
+        margins[z] = margin
         voids = void_pieces(geom['floor'] | margin)
         view['objects'] = [o for o in view['objects'] if o['kind'] != 'void'] + voids
         view['size'] = geom['size']
@@ -1022,7 +1047,7 @@ def apply(world, cfg):
               f"core at ({ox},{oy}), +{added[0]} objects, +{added[1]} spawns, {len(voids)} void pieces")
     shift_incoming(world, shifted, 1)
     place_portals(world, shifted, cfg.get('landmarks', []))
-    build_walls(world, shifted, cfg.get('landmarks', []))
+    build_walls(world, shifted, cfg.get('landmarks', []), margins)
     return shifted
 
 

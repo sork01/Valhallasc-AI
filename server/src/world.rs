@@ -3574,6 +3574,10 @@ impl World {
             portal.tx = arrival.x;
             portal.ty = arrival.y;
         }
+        if let Some(shift) = portal.vault {
+            portal.tx = here.x + shift[0];
+            portal.ty = here.y + shift[1];
+        }
         if self.maps[portal.to].sealed_template && self.public_zone(p.character.zone) != portal.to {
             return;
         }
@@ -3769,7 +3773,7 @@ impl World {
                 None => format!("You step through {} into {name}.", portal.name),
             }
         };
-        if portal.seam.is_none() {
+        if portal.seam.is_none() && portal.vault.is_none() {
             let _ = p.peer.try_send(json!({"type":"system","text":text}));
         }
         // Gathered humans and hired fighters cross together, so nobody is stranded behind the gate.
@@ -11321,6 +11325,7 @@ mod tests {
             needs_quest: None,
             needs_boss: None,
             seam: None,
+            vault: None,
         });
         w.use_portal(1);
         assert_eq!(w.players[&1].character.zone, 0);

@@ -261,23 +261,32 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     for (const zone of [3, 0, 1]) {
       const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
       check(z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower').length >= 40, `zone ${zone}: Skaldholm's wall runs along the border`);
-      const bx = gate.x - gate.walk[0] * 9, by = gate.y - gate.walk[1] * 9;
-      await debug({ op: 'teleport', zone, x: bx, y: by });
-      await page.waitForFunction(([zz, x, y]) => Field.zone === zz && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, bx, by], { timeout: 20000 });
-      await page.waitForTimeout(1500);
-      await page.screenshot({ path: path.join(out, `skaldholm-vault-${zone}-wide.png`) });
-      const sx = gate.x - gate.walk[0] * 2.5, sy = gate.y - gate.walk[1] * 2.5;
+      const sx = gate.x - gate.walk[0] * 5.5, sy = gate.y - gate.walk[1] * 5.5;
       await debug({ op: 'teleport', zone, x: sx, y: sy });
       await page.waitForFunction(([zz, x, y]) => Field.zone === zz && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, sx, sy], { timeout: 20000 });
       await page.waitForTimeout(1500);
       check(await page.evaluate(() => Field.exitArches.some(a => a.name === 'Skaldholm')), `zone ${zone}: the client draws the vault (it knows the arch)`);
+      // the city beyond the vault is already there: its ground and buildings are ghosted in the opening, so nothing pops in
+      check(await page.evaluate(() => Field.vaultView), `zone ${zone}: the city's street is drawn through the vault before you cross`);
       await page.screenshot({ path: path.join(out, `skaldholm-vault-${zone}.png`) });
       // the camera is isometric: a world step (dx, dy) is the screen step (dx - dy, (dx + dy) / 2), so +x is Right+Down and -y is Right+Up
-      const [wdx, wdy] = gate.walk, keys = [wdx - wdy > .35 ? 'ArrowRight' : wdx - wdy < -.35 ? 'ArrowLeft' : null, wdx + wdy > .35 ? 'ArrowDown' : wdx + wdy < -.35 ? 'ArrowUp' : null].filter(Boolean);
+      const isoKeys = (dx, dy) => [dx - dy > .35 ? 'ArrowRight' : dx - dy < -.35 ? 'ArrowLeft' : null, dx + dy > .35 ? 'ArrowDown' : dx + dy < -.35 ? 'ArrowUp' : null].filter(Boolean);
+      const [wdx, wdy] = gate.walk;
+      let keys = isoKeys(wdx, wdy);
       for (const k of keys) await page.keyboard.down(k);
       await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 });
+      check(await page.evaluate(() => Field.seamless), `zone ${zone}: the walk into Skaldholm is seamless (no hop, no journey)`);
+      check(await page.evaluate(() => !document.getElementById('area-title').classList.contains('show') && !document.body.innerText.includes('You enter')), `zone ${zone}: no banner and no "You enter" line at the vault`);
+      await page.waitForTimeout(500);
+      await page.screenshot({ path: path.join(out, `skaldholm-vault-${zone}-inside.png`) });
       for (const k of keys) await page.keyboard.up(k);
       check((await where()).zone === 4, `zone ${zone}: walking through the vault leads into Skaldholm`);
+      // and out again through the city's own arch: the same doorway
+      keys = isoKeys(-wdx, -wdy);
+      for (const k of keys) await page.keyboard.down(k);
+      await page.waitForFunction(zz => Field.zone === zz, zone, { timeout: 20000 });
+      check(await page.evaluate(() => Field.seamless), `zone ${zone}: the walk out of Skaldholm is seamless too`);
+      for (const k of keys) await page.keyboard.up(k);
     }
   }
   assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));

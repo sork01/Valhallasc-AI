@@ -328,6 +328,64 @@ fn walking_into_the_vault_enters_skaldholm() {
         }
         let c = &w.players[&1].character;
         assert_eq!(c.zone, 4, "walking through the vault of zone {zone} from 5 tiles did not enter Skaldholm (ended at {:.1},{:.1})", c.x, c.y);
+        // the city's own arch is the other half of the vault: you land just inside it, on free ground, not in a margin outside the wall
+        let city = zone_of(&data, 4);
+        let back = city["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["to"] == zone as u64)
+            .unwrap();
+        let arch = city["exitArches"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|a| a["portal"] == back["id"])
+            .unwrap();
+        let (ax, ay) = (arch["x"].as_f64().unwrap(), arch["y"].as_f64().unwrap());
+        assert!(
+            (c.x - ax).hypot(c.y - ay) < 5.,
+            "zone {zone}: you land {:.1} tiles from the city's arch",
+            (c.x - ax).hypot(c.y - ay)
+        );
+        // one doorway seen from two zones: the two offsets cancel, and the arch of this zone maps onto the city's own
+        for k in 0..2 {
+            assert!(
+                (gate["vault"][k].as_f64().unwrap() + back["vault"][k].as_f64().unwrap()).abs() < 0.011,
+                "zone {zone}: the vault offsets do not cancel"
+            );
+        }
+        let zarch = zone_of(&data, zone)["exitArches"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|a| a["name"] == "Skaldholm")
+            .unwrap();
+        assert!(
+            (zarch["x"].as_f64().unwrap() + gate["vault"][0].as_f64().unwrap() - ax).abs() < 0.011
+                && (zarch["y"].as_f64().unwrap() + gate["vault"][1].as_f64().unwrap() - ay).abs() < 0.011,
+            "zone {zone}: the vault does not line up with the city's arch"
+        );
+        // and back out through the arch: held movement carries on, you stand in front of the vault again
+        let out = back["walk"].as_array().unwrap();
+        let odir = at(out[0].as_f64().unwrap(), out[1].as_f64().unwrap());
+        for _ in 0..160 {
+            w.time += TICK;
+            let hero = w.players.get_mut(&1).unwrap();
+            hero.input = odir;
+            hero.input_at = w.time;
+            w.update_player(1);
+            if w.players[&1].character.zone == zone {
+                break;
+            }
+        }
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, zone, "walking out of Skaldholm's arch did not return to zone {zone} (ended at {:.1},{:.1})", c.x, c.y);
+        assert!(
+            (c.x - gx).hypot(c.y - gy) < 6.,
+            "zone {zone}: you come out {:.1} tiles from the vault",
+            (c.x - gx).hypot(c.y - gy)
+        );
     }
 }
 
