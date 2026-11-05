@@ -1,6 +1,6 @@
 # Zone shapes follow the world-map provinces (SHAPE-RULES)
 
-Status: **proposal, pending owner approval of `SHAPE-PREVIEW`.** Nothing here is applied to `world/map.txt`. Numbers and pictures: `docs/zone-shapes-preview.md`, generator `scripts/zone_shapes_preview.py` (read-only).
+Status: **scale rule `nofloor` and "Asterion stays" approved by the owner (2026-11-05); the rest is still a proposal.** Nothing here is applied to `world/map.txt`. Numbers and pictures: `docs/zone-shapes-preview.md`, generator `scripts/zone_shapes_preview.py` (read-only).
 
 Owner answers (2026-11-05): everything on the atlas; real relative scale; edges match the neighbour; preview first.
 
@@ -16,7 +16,7 @@ The painted atlas (`world/atlas-geography.txt`) has **23 polygon regions**, not 
 
 Zone IDs map to `world/map.txt` as: Greenmeadow is the top-level map, zone N is `zones[N-1]`.
 
-## Scale rule (proposal, owner decides)
+## Scale rule (owner chose `nofloor`, 2026-11-05)
 
 One factor `k` tiles per atlas pixel for every zone: tile area of a zone = polygon area x k^2. The atlas fits painted proportions, not game content, so strict proportion breaks things (numbers in the preview doc):
 
@@ -26,9 +26,9 @@ One factor `k` tiles per atlas pixel for every zone: tile area of a zone = polyg
 
 Three rules are rendered; the preview states the cost of each:
 
-1. **`median` (proposed default):** `k^2` = median of (old tile area / atlas area) = 0.315, k = 0.561. It minimises the median relative size change, so about half the zones grow and half shrink. Strict, no exceptions. The two cities do not fit and the Yearwheel collapses.
+1. **`median` (not chosen):** `k^2` = median of (old tile area / atlas area) = 0.315, k = 0.561. It minimises the median relative size change, so about half the zones grow and half shrink. Strict, no exceptions. The two cities do not fit and the Yearwheel collapses.
 2. **`total`:** `k^2` = 0.452, k = 0.672, conserving total tile area. Every early zone and the Moonspore/Orrery/Sunward group grows 2-4x; cities still do not fit. Not recommended.
-3. **`nofloor` (a deviation from the owner's "real relative scale" answer):** the median `k`, but no zone drops below its current area and a city footprint must fit inside the outline. Skaldholm and Nacrehold are drawn 2.4x and 2.2x bigger than their neighbours; the Yearwheel stays 1.0x (395x568 bbox). The owner decides whether to accept it; it must not be folded into the default silently.
+3. **`nofloor` (CHOSEN; a deviation from strict proportion that the owner accepted):** the median `k`, but no zone drops below its current area and a city footprint must fit inside the outline. Skaldholm and Nacrehold are drawn 2.4x and 2.2x bigger than their neighbours; the Yearwheel stays 1.0x (395x568 bbox). The owner accepted this on 2026-11-05.
 
 The size of a zone is its outline's bounding box (`W x H`, rounded up). The engine map stays square (`size = max(W, H)`, rest outside the outline) unless the owner wants a non-square grid, which is a larger Rust and client change.
 
@@ -63,9 +63,12 @@ The generators lay content out in the old square, so the preview maps old coordi
 - Balance: sizes change travel times and kill-time grids; recheck only the zones that grew or shrank (owner handles balance testing).
 - Worktrees and cargo targets go under `/media/raid/valhallasc-data`, never `.tools/`.
 
-## Open owner questions
+## Owner decisions
 
-1. Scale rule: `median` (strict), `nofloor` (cities and Yearwheel exempt), or `total`?
-2. Asterion and Heartwood: keep their current layout (proposed)?
+1. Scale rule: **`nofloor`** (decided).
+2. Asterion: **keeps its current layout** (decided); Heartwood keeps it too (default).
+
+## Still open (proposed defaults apply)
+
 3. Non-square zones: keep an engine-square grid with the outline masked (proposed) or add a rectangular grid?
 4. Smooth the outlines (proposed, per shared chain) or keep the raw straight-edged polygons?
