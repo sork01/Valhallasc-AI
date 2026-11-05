@@ -877,7 +877,7 @@
 
   // ---------- state ----------
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
-  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null;
+  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null, miniOut = null;
   let hero, slimes, drops, chests, signs = [], floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   const BAG_COLORS = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
@@ -4636,12 +4636,34 @@
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
     for (const p of zdef.portals) { if (p.seam || p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
-    miniBase = c;
+    miniBase = c; miniOut = zdef.shapeFloor ? buildMiniOutside(k) : null;
+  }
+  // What lies outside the outline of a shaped zone (docs/zone-shapes.md), drawn over the fog so mist never covers it: coast is
+  // sea, past a border the neighbour's own ground, outer land dark rock; all fading to the void with distance from the land.
+  function buildMiniOutside(k) {
+    const [c, g] = canvasOf(144, 144, 1);
+    g.fillStyle = '#080c0b'; g.fillRect(0, 0, 144, 144);
+    const nbs = zdef.shape?.neighbours || [];
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
+      const i = y * MAP + x, code = map.edge[i], d = map.edgeDist[i];
+      if (map.floor[i] || !code || !d || d > 10) continue;
+      const ch = String.fromCharCode(code), fade = 1 - (d - 1) / 10;
+      g.globalAlpha = (ch === 'c' ? .85 : .7) * fade;
+      g.fillStyle = ch === 'c' ? '#1f5568' : ch >= 'A' && ch <= 'Z' ? groundOf(ZONES[nbs[code - 65]]?.theme || 'meadow', .5, false, 0) : '#2c2824';
+      g.fillRect(x * k, y * k, k + .5, k + .5);
+    }
+    g.globalAlpha = 1;
+    // Cut the land back out so the overlay only covers what is outside the outline.
+    g.globalCompositeOperation = 'destination-out';
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) g.fillRect(x * k - .25, y * k - .25, k + 1, k + 1);
+    g.globalCompositeOperation = 'source-over';
+    return c;
   }
   function drawMini() {
     if (!mctx || !miniBase) return;
     const s = mini.width / MAP; mctx.clearRect(0, 0, mini.width, mini.height); mctx.drawImage(miniBase, 0, 0, mini.width, mini.height);
     paintFog(mctx, mini.width, mini.height, zone);
+    if (miniOut) mctx.drawImage(miniOut, 0, 0, mini.width, mini.height);
     for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
     // Travel masters are navigation landmarks: their spark remains visible even through unexplored mist.
     for (const n of City.npcs) if (n.travelStop) {
