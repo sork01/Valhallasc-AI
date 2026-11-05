@@ -72,6 +72,27 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   await go(0, q[0] + inward[0] * 3, q[1] + inward[1] * 3); await page.waitForTimeout(400); await shot('meadow-seam-zoom1');
   const mw = await pixels(); check(mw.hero.every(v => v > 200) && mw.green > 400, `Greenmeadow minimap at zoom 1 is centred and green (${mw.green} px)`);
   await page.evaluate(() => { Field.minimapZoom(9); });
+  // Touch: the zoom buttons exist only on a coarse pointer (hidden with a mouse), and tapping them zooms.
+  check(await page.evaluate(() => ['mini-zoom-in', 'mini-zoom-out'].every(id => getComputedStyle(document.getElementById(id)).display === 'none')), 'no zoom buttons with a mouse');
+  const tctx = await browser.newContext({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  const tp = await tctx.newPage(); const terrors = [];
+  tp.on('pageerror', e => terrors.push(e.message));
+  await tp.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {}, minimapZoom: 2 })));
+  await tp.goto(`http://127.0.0.1:${port}/`); await tp.locator('#start').click(); await tp.locator('#login-guest').click();
+  await tp.locator('#name').fill('TouchZoom'); await tp.locator('#go').click({ timeout: 60000 });
+  await tp.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
+  const zoomIn = tp.locator('#mini-zoom-in'), zoomOut = tp.locator('#mini-zoom-out');
+  check(await zoomIn.isVisible() && await zoomOut.isVisible(), 'zoom buttons show on a touch device');
+  const mb = await tp.locator('#minimap').boundingBox(), bi = await zoomIn.boundingBox(), bo = await zoomOut.boundingBox();
+  console.log('touch minimap', JSON.stringify(mb), 'in', JSON.stringify(bi), 'out', JSON.stringify(bo));
+  check(bi.x + bi.width <= mb.x + 1 && bo.x + bo.width <= mb.x + 1 && bo.y >= bi.y + bi.height, 'the buttons sit left of the minimap, stacked, not on top of it');
+  check(Math.min(bi.width, bi.height, bo.width, bo.height) >= 44, `touch targets are at least 44 px on screen (${bi.width.toFixed(0)} x ${bi.height.toFixed(0)})`);
+  check(bi.x >= 0 && bi.y >= 0 && bo.y + bo.height <= 390, 'both buttons are on screen');
+  await zoomIn.tap(); check(await tp.evaluate(() => Field.minimapZoom(0)) === 3, 'tapping + zooms in');
+  await zoomIn.tap(); check(await tp.evaluate(() => Field.minimapZoom(0)) === 4 && await zoomIn.isDisabled(), 'zoom in stops at 4 and + greys out');
+  await zoomOut.tap(); await zoomOut.tap(); await zoomOut.tap(); check(await tp.evaluate(() => Field.minimapZoom(0)) === 1 && await zoomOut.isDisabled(), 'zoom out stops at 1 and \u2212 greys out');
+  await tp.screenshot({ path: path.join(out, 'minimap-touch.png') });
+  assert.deepEqual(terrors, [], 'no touch page errors');
   assert.deepEqual(errors, [], 'no page errors'); console.log(`${checks} minimap checks passed`);
   await browser.close(); server.kill();
 })().catch(e => { console.error(e); try { server.kill(); } catch (_) {} process.exit(1); });

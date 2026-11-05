@@ -4759,6 +4759,8 @@
   "Sound on (N)": "Ljud på (N)",
   "Sound on or off": "Ljud på eller av",
   "Minimap zoom in": "Zooma in minikartan",
+  "Zoom the minimap in": "Zooma in minikartan",
+  "Zoom the minimap out": "Zooma ut minikartan",
   "Minimap zoom out": "Zooma ut minikartan",
   "Sovereign Pack": "Suveränryggsäck",
   "Sovereign Travel Cloak": "Härskarens resemantel",

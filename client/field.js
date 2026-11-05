@@ -4659,6 +4659,11 @@
       miniWater = c;
     }
   }
+  // The touch buttons grey out at the ends of the zoom range.
+  function miniZoomButtons() {
+    const a = document.getElementById('mini-zoom-in'), b = document.getElementById('mini-zoom-out');
+    if (a) a.disabled = miniZoom >= MINI_ZOOMS; if (b) b.disabled = miniZoom <= 1;
+  }
   function miniNeighbour(nb) {
     let e = miniNb.get(nb); if (e) return e;
     const nc = ctxFor(nb), keep = snapCtx(); adoptCtx(nc);
@@ -4765,11 +4770,13 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       miniZoom = Math.max(1, Math.min(MINI_ZOOMS, Math.round(+window.Prefs?.minimapZoom || 2)));
+      miniZoomButtons();
       slimeSpriteConfig = o.slimeSprites || null;
       loadBankSprites(); loadChestSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize); addEventListener('prefs-change', resize);
+        for (const [id, step] of [['mini-zoom-in', 1], ['mini-zoom-out', -1]]) document.getElementById(id)?.addEventListener('click', () => Field.minimapZoom(step));
         if (mini) mini.addEventListener('wheel', e => { e.preventDefault(); Field.minimapZoom(e.deltaY < 0 ? 1 : -1); }, { passive: false });
         cv.addEventListener('pointerdown', onPointerDown); cv.addEventListener('pointermove', onPointerMove); addEventListener('pointerup', onPointerUp);
         cv.addEventListener('pointercancel', onPointerUp); cv.addEventListener('lostpointercapture', onPointerUp);
@@ -4809,7 +4816,11 @@
       Online.send({ type: 'target', id: nearest.id }); emitHud(); return true;
     },
     // Minimap zoom: 1 is the whole zone, 4 is four times closer. Saved in Prefs.
-    minimapZoom(step) { const z = Math.max(1, Math.min(MINI_ZOOMS, miniZoom + (step || 0))); if (z !== miniZoom) { miniZoom = z; window.Prefs?.set({ minimapZoom: z }); } return miniZoom; },
+    minimapZoom(step) {
+      const z = Math.max(1, Math.min(MINI_ZOOMS, miniZoom + (step || 0)));
+      if (z !== miniZoom) { miniZoom = z; window.Prefs?.set({ minimapZoom: z }); }
+      miniZoomButtons(); return miniZoom;
+    },
     action(action) {
       if (!Field.canAct || hero.sparkTravel) return false;
       if (action === 'attack') return Field.useSkill('attack');
