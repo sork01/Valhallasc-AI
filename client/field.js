@@ -4663,16 +4663,18 @@
   const MINI_SHAPED_SPAN = 240;
   const miniSpan = () => zdef.shapeFloor ? MINI_SHAPED_SPAN : MAP;
   function buildMini() {
-    miniBase = renderMini(); miniNb.clear(); miniWater = null;
-    if (zdef.shapeFloor) {
-      const [c, g] = canvasOf(144, 144, 4), k = 144 / MAP;
-      for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // shallows: lighter and greener near the shore, a foam line at the edge
-        const i = y * MAP + x, d = map.edgeDist[i];
-        if (map.floor[i] || !d || d > 16) continue;
-        g.fillStyle = d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
-      }
-      miniWater = c;
+    miniBase = renderMini(); miniNb.clear(); miniWater = renderShallows();
+  }
+  // Shallows and a foam line along the coast of the zone whose state is adopted (null for a zone without an outline).
+  function renderShallows() {
+    if (!zdef.shapeFloor) return null;
+    const [c, g] = canvasOf(144, 144, 4), k = 144 / MAP;
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // lighter and greener near the shore, a foam line at the edge
+      const i = y * MAP + x, d = map.edgeDist[i];
+      if (map.floor[i] || !d || d > 16) continue;
+      g.fillStyle = d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
     }
+    return c;
   }
   // The touch buttons grey out at the ends of the zoom range.
   function miniZoomButtons() {
@@ -4682,7 +4684,7 @@
   function miniNeighbour(nb) {
     let e = miniNb.get(nb); if (e) return e;
     const nc = ctxFor(nb), keep = snapCtx(); adoptCtx(nc);
-    try { e = { base: renderMini(), size: nc.MAP }; } finally { adoptCtx(keep); }
+    try { e = { base: renderMini(), water: renderShallows(), size: nc.MAP }; } finally { adoptCtx(keep); }
     miniNb.set(nb, e); return e;
   }
   function drawMini() {
@@ -4708,8 +4710,10 @@
       if (zi !== null) { tg.globalCompositeOperation = 'source-atop'; tg.save(); tg.translate(dx, dy); paintFog(tg, dw, dw, zi); tg.restore(); tg.globalCompositeOperation = 'source-over'; }
       mctx.drawImage(miniTmp, 0, 0);
     };
-    if (miniWater) layer(miniWater, MAP, 0, 0, null);
+    // All water first (this zone's and every seam neighbour's shallows and foam), then the land layers on top, so a coast carries on across a seam.
     const seams = zdef.portals.filter(p => p.seam);
+    if (miniWater) layer(miniWater, MAP, 0, 0, null);
+    for (const p of seams) { const e = miniNeighbour(p.to); if (e.water) layer(e.water, e.size, -p.seam.shift[0], -p.seam.shift[1], null); }
     for (const p of seams) { const e = miniNeighbour(p.to); layer(e.base, e.size, -p.seam.shift[0], -p.seam.shift[1], p.to); }
     layer(miniBase, MAP, 0, 0, zone);
     mctx.restore();

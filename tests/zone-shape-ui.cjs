@@ -136,6 +136,37 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     }
     check(Math.hypot(origins[0][0] - origins[1][0], origins[0][1] - origins[1][1]) < 1.5, `the minimap waves do not shift across the seam: origins ${origins.map(o => o.map(v => v.toFixed(1)).join(',')).join(' vs ')}`);
   }
+  // The shallows and the foam line of the zone ahead are drawn across the seam on the minimap: find a coast cell of the Canopy
+  // next to the seam, stand on the meadow's land nearby, zoom to the closest view and read the pixel (foam is much lighter than open water).
+  {
+    const sm = zoneDef(0).portals.find(p => p.to === 16 && p.seam).seam, [shx, shy] = sm.shift, B = zoneDef(16), A = zoneDef(0);
+    let target = null;
+    for (let y = 1; y < B.size - 1; y++) for (let x = 1; x < B.size - 1; x++) {
+      if (B.shapeFloor[y][x] === '#' || B.shapeEdge[y][x] !== 'c') continue;
+      if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => B.shapeFloor[y + dy][x + dx] === '#')) continue;
+      const ax = x - shx + .5, ay = y - shy + .5;
+      if (ax < 0 || ay < 0 || ax >= A.size || ay >= A.size || onLand(0, ax, ay)) continue;
+      const d = Math.min(...sm.points.map(q => Math.hypot(ax - q[0], ay - q[1])));
+      if (!target || d < target.d) target = { d, ax, ay };
+    }
+    check(target && target.d < 6, `a Canopy coast cell lies at the seam (${target?.d.toFixed(1)} tiles)`);
+    let hero = null;
+    for (let y = 0; y < A.size; y++) for (let x = 0; x < A.size; x++) if (onLand(0, x, y)) { const d = Math.hypot(x + .5 - target.ax, y + .5 - target.ay); if (d < 10 && (!hero || d < hero.d)) hero = { d, x: x + .5, y: y + .5 }; }
+    await debug({ op: 'teleport', zone: 0, x: hero.x, y: hero.y });
+    await page.waitForFunction(([x, y]) => Field.zone === 0 && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 1, [hero.x, hero.y], { timeout: 20000 });
+    await page.evaluate(() => { while (Field.minimapZoom(1) < 4); });
+    await page.waitForTimeout(900);
+    const px = await page.evaluate(([tx, ty]) => {
+      const c = document.querySelector('#minimap canvas, canvas#minimap, #mini'), V = Field.miniTiles, s = c.width / V;
+      const x = Math.round((tx - (Field.hero.x - V / 2)) * s), y = Math.round((ty - (Field.hero.y - V / 2)) * s);
+      return { x, y, w: c.width, rgba: [...c.getContext('2d').getImageData(x, y, 1, 1).data] };
+    }, [target.ax, target.ay]);
+    check(px.x >= 0 && px.y >= 0 && px.x < px.w && px.y < px.w, `the Canopy's coast cell is inside the minimap view (${px.x},${px.y})`);
+    check(px.rgba[0] > 110, `foam of the Canopy's coast shows on the meadow's minimap across the seam: pixel ${px.rgba.join(',')} (open water is 29,106,146)`);
+    const box = await page.evaluate(() => { const r = document.querySelector('#minimap canvas, canvas#minimap, #mini').getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; });
+    await page.screenshot({ path: path.join(out, 'minimap-coast-across-seam.png'), clip: { x: Math.max(0, box.x - 8), y: Math.max(0, box.y - 8), width: box.width + 16, height: box.height + 16 } });
+    await page.evaluate(() => { Field.minimapZoom(-2); });
+  }
   // Step 2: what lies across the border shows through. A second hero stands on the Crags side with an enemy beside them;
   // the first hero, on the meadow side, sees both (drawn, never targetable) before crossing.
   {
