@@ -149,7 +149,7 @@
         const gx = o.x - shx, gy = o.y - shy;
         if (gx < 0 || gy < 0 || gx > MAP || gy > MAP || map.floor[(gy | 0) * MAP + (gx | 0)]) continue;
         let best = 1e9, cross = 0; for (let k = 0; k < pts.length - 1; k++) { const d = segDist(gx, gy, pts[k][0], pts[k][1], pts[k + 1][0], pts[k + 1][1]); if (d < best) { best = d; cross = (pts[k + 1][0] - pts[k][0]) * (gy - pts[k][1]) - (pts[k + 1][1] - pts[k][1]) * (gx - pts[k][0]); } }
-        if (cross * seam.side > 0 && best < 40) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set });
+        if (cross * seam.side > 0) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set });
       }
     }
   }

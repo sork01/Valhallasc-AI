@@ -290,7 +290,7 @@ fn the_other_side_of_a_seam_is_listed_for_the_view_but_only_near_the_line() {
         .find(|p| land(zone_of(&data, 1))(p.x, p.y))
         .unwrap();
     place(&mut w, 2, 1, inside);
-    let (s0, s1) = (w.maps[0].spawn, w.maps[1].spawn);
+    let s0 = w.maps[0].spawn;
     place(&mut w, 1, 0, at(s0.x, s0.y));
     let view = w.snapshot_for(0);
     let across = view["across"]
@@ -302,8 +302,19 @@ fn the_other_side_of_a_seam_is_listed_for_the_view_but_only_near_the_line() {
         1,
         "the Crags hero near the border is listed"
     );
-    // moved far from the border, hero 2 is no longer listed
-    place(&mut w, 2, 1, at(s1.x, s1.y));
+    // moved far from the border (beyond the view range), hero 2 is no longer listed
+    let seam_line: Seam = serde_json::from_value(seam.clone()).unwrap();
+    let on_b = land(zone_of(&data, 1));
+    let far = (0..w.maps[1].size)
+        .step_by(4)
+        .flat_map(|y| {
+            (0..w.maps[1].size)
+                .step_by(4)
+                .map(move |x| at(x as f64 + 0.5, y as f64 + 0.5))
+        })
+        .find(|p| on_b(p.x, p.y) && seam_line.distance(at(p.x - shx, p.y - shy)) > 80.)
+        .expect("a Crags spot far from the border");
+    place(&mut w, 2, 1, far);
     let view = w.snapshot_for(0);
     assert!(
         view["across"][0]["players"].as_array().unwrap().is_empty(),

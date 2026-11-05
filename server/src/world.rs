@@ -1994,9 +1994,9 @@ impl World {
         view
     }
     /// What lies across each seam border of `zone` (view only, shown through the border by the client): the neighbour's
-    /// players and enemies within ACROSS_RANGE tiles of the line, in the neighbour's own coordinates.
+    /// players and enemies within ACROSS_RANGE (60) tiles of the line, in the neighbour's own coordinates.
     fn across_view(&self, zone: usize) -> Vec<Value> {
-        const ACROSS_RANGE: f64 = 30.;
+        const ACROSS_RANGE: f64 = 60.;
         let mut out = Vec::new();
         for portal in &self.maps[zone].portals {
             let Some(seam) = &portal.seam else { continue };
@@ -3681,7 +3681,7 @@ impl World {
         }
         let p = &self.players[&session];
         let actor = p.character.id.clone();
-        if portal.walk.is_none() {
+        if portal.walk.is_none() && portal.seam.is_none() {
             self.event("portal", &actor, here, 0., false);
         }
         let mut arrival = Point {
