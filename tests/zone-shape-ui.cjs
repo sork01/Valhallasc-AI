@@ -77,6 +77,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await debug({ op: 'teleport', zone: from, x: sx, y: sy });
     await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [from, sx, sy], { timeout: 20000 });
     await page.screenshot({ path: path.join(out, `seam-${from}-before.png`) });
+    const seen = await page.evaluate(() => Field.ghosts.objects);
+    check(seen >= 100, `seam ${from}: ${seen} scenery objects of the other zone are ready beyond the border (no grid cut-off)`);
     await page.evaluate(() => { window.__gaps = []; let last = performance.now(); const tick = now => { window.__gaps.push(now - last); last = now; if (window.__gaps.length < 600) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
     for (const k of keys) await page.keyboard.down(k);
     await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
