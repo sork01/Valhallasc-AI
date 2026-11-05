@@ -49,6 +49,7 @@
   let objects = [], nightLights = [], SHIFT = [0, 0], seamlessUntil = 0, lastGhostDrawn = 0;
   // Enemies and players of a neighbouring zone seen across a seam border (view only), already moved into this zone's frame.
   const ghostSlimes = new Map(), ghostPlayers = new Map();
+  let ghostShadowKinds = new Set();
   let farDots = [];
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
@@ -4246,10 +4247,12 @@
       const [sx, sy] = w2s(o.x, o.y,o.z||0);
       if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0, (City.signHeight?.(o)||0)+25))) { list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
+    ghostShadowKinds = new Set();
     for (const o of map.ghosts || []) {
       const [sx, sy] = w2s(o.x, o.y); if (!onScreen(sx, sy, Math.max(220, City.art[o.kind]?.box?.[3] || 0))) continue;
       list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy });
-      if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else shadow(g, o.x, o.y, 26, 9, .25);   // the same shadows as the zone's own scenery
+      const big = o.kind === 'tree' || o.kind === 'pine', small = o.kind === 'bush', generic = Object.keys(o.ghostSet).length > 0;   // the same shadows as the zone's own scenery: art-drawn kinds (empty ghostSet) paint their own, or none (flowers)
+      if (big || small || generic) { ghostShadowKinds.add(o.kind); if (big) shadow(g, o.x, o.y, 46, 17, .22); else if (small) shadow(g, o.x, o.y, 30, 10, .22); else shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const portal of zdef.portals) { if (portal.seam || portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
     for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
@@ -4912,7 +4915,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };
