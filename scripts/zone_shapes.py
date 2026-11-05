@@ -873,6 +873,66 @@ def place_portals(world, shifted, landmarks=()):
 
 # ---- landmark walls: a neighbour city drawn as a wall along the shared border, with a vault you walk through ---------------
 WALL_STEP, WALL_IN, VAULT_HALF = 2.0, 1.6, 5.9
+WALL_TOL = 2.5      # a city wall is straight: the border run is simplified to segments within this many tiles of it
+
+
+def simplify_run(pts, tol):
+    """Douglas-Peucker: the fewest straight segments that stay within `tol` tiles of the polyline (ends kept)."""
+    pts = [tuple(p) for p in pts]
+    if len(pts) < 3:
+        return pts
+    a, b = pts[0], pts[-1]
+    L = math.dist(a, b) or 1e-9
+    dev = [abs((b[0] - a[0]) * (a[1] - q[1]) - (a[0] - q[0]) * (b[1] - a[1])) / L for q in pts[1:-1]]
+    k = max(range(len(dev)), key=dev.__getitem__)
+    if dev[k] <= tol:
+        return [a, b]
+    return simplify_run(pts[:k + 2], tol)[:-1] + simplify_run(pts[k + 1:], tol)
+
+
+def straighten(rows, runs_orig, runs_simp, tol):
+    """Floor mask with the border along `runs_simp` (straight): cells on the city side of the line go, cells between the line and the
+    old border fill in. Only the perpendicular band of each run is touched (nothing past a run's two ends). Returns (floor, lost)."""
+    n = len(rows)
+    old = np.array([[c == '#' for c in row] for row in rows])
+    new = old.copy()
+    ys, xs = np.mgrid[0:n, 0:n]
+    cx, cy = xs + .5, ys + .5
+    D = tol + 3
+    # distance to the original chain: only cells close to the old border may fill in
+    near_old = np.full((n, n), 1e9)
+    for r in runs_orig:
+        for a, b in zip(r, r[1:]):
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            t = np.clip(((cx - a[0]) * dx + (cy - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9), 0, 1)
+            near_old = np.minimum(near_old, np.hypot(cx - a[0] - t * dx, cy - a[1] - t * dy))
+    for r in runs_simp:
+        segs = list(zip(r, r[1:]))
+        best = np.full((n, n), 1e9)
+        sd = np.zeros((n, n))
+        ok = np.zeros((n, n), dtype=bool)
+        for si, (a, b) in enumerate(segs):
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            ln = math.hypot(dx, dy) or 1e-9
+            nx, ny = -dy / ln, dx / ln
+            mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+            def land(px, py):
+                return 0 <= int(py) < n and 0 <= int(px) < n and old[int(py), int(px)]
+            side = sum((1 if land(mx + nx * d, my + ny * d) else 0) - (1 if land(mx - nx * d, my - ny * d) else 0) for d in (3, 5, 8))
+            if side < 0:
+                nx, ny = -nx, -ny
+            traw = ((cx - a[0]) * dx + (cy - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9)
+            t = np.clip(traw, 0, 1)
+            dist = np.hypot(cx - a[0] - t * dx, cy - a[1] - t * dy)
+            sdist = (cx - a[0]) * nx + (cy - a[1]) * ny
+            beyond = ((si == 0) & (traw < 0)) | ((si == len(segs) - 1) & (traw > 1))   # past a run's end: another border starts there
+            better = (dist < best) & ~beyond & (dist <= D)
+            best = np.where(better, dist, best)
+            sd = np.where(better, sdist, sd)
+            ok |= better
+        inside = ok & (sd >= 0)
+        new = np.where(ok, np.where(inside, old | (inside & (sd <= tol + 1) & (near_old <= tol + 1.5)), False), new)
+    return new, old & ~new
 
 
 def build_walls(world, shifted, landmarks, margins):
@@ -892,7 +952,15 @@ def build_walls(world, shifted, landmarks, margins):
             if not runs or gate is None:
                 continue
             n = z['size']
-            rows = z['shapeFloor']
+            simp = [simplify_run(r, WALL_TOL) for r in runs]
+            orig_floor = np.array([[c == '#' for c in row] for row in z['shapeFloor']])
+            floor_now, lost = straighten(z['shapeFloor'], runs, simp, WALL_TOL)
+            assert not any(lost[int(o['y']), int(o['x'])] for k in ('npcs', 'places', 'crosses') for o in z.get(k, [])), f'zone {i}: a straight wall would cut off an NPC, place or cross'
+            assert not lost[int(z['spawn']['y']), int(z['spawn']['x'])], f'zone {i}: a straight wall would cut off the spawn'
+            c_ = z['city']
+            assert not any(lost[int(y), int(x)] for x in (c_['x0'], c_['x1']) for y in (c_['y0'], c_['y1'])), f'zone {i}: a straight wall would cut the city'
+            rows = floor_rows(floor_now)
+            runs = simp
             on = lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and rows[int(y)][int(x)] == '#'
             city = zones[lm]
             back = next(p for p in city['portals'] if p['to'] == i)
@@ -901,8 +969,12 @@ def build_walls(world, shifted, landmarks, margins):
             assert [wx, wy] == [-back['walk'][0], -back['walk'][1]], f"zone {i}: the vault and the city's arch face different ways"
             hw = carch['halfWidth']
             # the arch on the wall line, 1.2 tiles inland of the border point nearest the gate, axis-aligned like the city's arch
-            chain = [tuple(q) for r in runs for q in r]
-            q = min(chain, key=lambda c: math.dist(c, (gate['x'], gate['y'])))
+            def foot(a, b, g):
+                dx, dy = b[0] - a[0], b[1] - a[1]
+                t = max(0., min(1., ((g[0] - a[0]) * dx + (g[1] - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9)))
+                return (a[0] + t * dx, a[1] + t * dy)
+            feet = [foot(a, b, (gate['x'], gate['y'])) for r in runs for a, b in zip(r, r[1:])]
+            q = min(feet, key=lambda c: math.dist(c, (gate['x'], gate['y'])))
             A = (round(q[0] - wx * 1.2, 2), round(q[1] - wy * 1.2, 2))
             arch = dict(x=A[0], y=A[1], vertical=carch['vertical'], halfWidth=hw, towers=carch['towers'], portal=gate['id'], name=zones[lm]['name'])
             adds, towers = [], []
@@ -952,9 +1024,21 @@ def build_walls(world, shifted, landmarks, margins):
             pocket = (along >= -1.0) & (along <= 6.2) & (np.abs(across) <= hw + 1.0)
             floor = floor | pocket
             z['shapeFloor'] = floor_rows(floor)
-            z['objects'] = [o for o in z['objects'] if o['kind'] != 'void' and (o['kind'] in STRUCTURAL or not hit(o))]
+            z['objects'] = [o for o in z['objects'] if o['kind'] != 'void' and (o['kind'] in STRUCTURAL or not (hit(o) or lost[int(o['y']) % n, int(o['x']) % n]))]
             z['objects'].extend(void_pieces(floor | margins[i]))
-            z['slimes'] = [s for s in z['slimes'] if not hit(dict(s, r=1.5))]
+            z['slimes'] = [s for s in z['slimes'] if not hit(dict(s, r=1.5)) and not lost[int(s['y']), int(s['x'])]]
+            # the ground beyond the straight wall is the neighbour's: edge rows of the changed band say so
+            code = chr(ord('A') + z['shape']['neighbours'].index(lm))
+            er = [list(r_) for r_ in z['shapeEdge']]
+            band = dilate(floor, EDGE_BAND) & ~floor
+            near = dilate(floor != orig_floor, EDGE_BAND)
+            for yy in range(n):
+                for xx in range(n):
+                    if floor[yy, xx]:
+                        er[yy][xx] = ' '
+                    elif near[yy, xx] and band[yy, xx]:
+                        er[yy][xx] = code
+            z['shapeEdge'] = [''.join(r_) for r_ in er]
             z['objects'].extend(adds)
             z['exitArches'] = [e for e in z.get('exitArches', []) if e['portal'] != gate['id']] + [arch]
             # Both gates sit just past the arch's centre (the server also triggers up to 2.8 tiles before its portal) and carry the
