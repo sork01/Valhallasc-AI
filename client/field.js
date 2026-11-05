@@ -143,15 +143,18 @@
         if (map.blendW[i] <= w || map.blendNb[i] !== letter) { map.blendW[i] = w; map.blendNb[i] = letter; map.blendD[i] = 1; }
       }
       // The neighbour's trees and rocks beyond the line (view only: the walker never reaches them, the server moves it first).
-      const nz = ZONES[nb], set = nz && simpleSet(nz.theme); if (!set) continue;
+      // A neighbour with a sprite set (meadow, ember, frost, fen) shows those sprites; any other theme (the Moonspore Canopy and later
+      // shaped zones) shows what its scenery art draws (`City.art`, an empty ghostSet sends it down that path), so nothing pops in on crossing.
+      const nz = ZONES[nb], set = nz && simpleSet(nz.theme); if (!nz || (!set && ['ember', 'frost', 'fen', 'meadow'].includes(nz.theme))) continue;
       const [shx, shy] = seam.shift;
       for (const o of nz.objects || []) {
-        if (!set[o.kind]) continue;
+        const art = City.art[o.kind];
+        if (set ? !set[o.kind] : !art || art.ground || o.kind === 'void') continue;
         const gx = o.x - shx, gy = o.y - shy;
         // The neighbour can lie past this zone's own grid (the meadow is south of the Crags' 208 tiles): no grid limit, only the rule that it must not lie on our own land.
         if (gx >= 0 && gy >= 0 && gx < MAP && gy < MAP && map.floor[(gy | 0) * MAP + (gx | 0)]) continue;
         let best = 1e9, cross = 0; for (let k = 0; k < pts.length - 1; k++) { const d = segDist(gx, gy, pts[k][0], pts[k][1], pts[k + 1][0], pts[k + 1][1]); if (d < best) { best = d; cross = (pts[k + 1][0] - pts[k][0]) * (gy - pts[k][1]) - (pts[k + 1][1] - pts[k][1]) * (gx - pts[k][0]); } }
-        if (cross * seam.side > 0) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set });
+        if (cross * seam.side > 0) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set || {} });
       }
     }
   }
@@ -4244,8 +4247,8 @@
       if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0, (City.signHeight?.(o)||0)+25))) { list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const o of map.ghosts || []) {
-      const [sx, sy] = w2s(o.x, o.y); if (!onScreen(sx, sy, 220)) continue;
-      list.push({ d: o.x + o.y, o, sx, sy });
+      const [sx, sy] = w2s(o.x, o.y); if (!onScreen(sx, sy, Math.max(220, City.art[o.kind]?.box?.[3] || 0))) continue;
+      list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy });
       if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else shadow(g, o.x, o.y, 26, 9, .25);   // the same shadows as the zone's own scenery
     }
     for (const portal of zdef.portals) { if (portal.seam || portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
@@ -4909,7 +4912,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };

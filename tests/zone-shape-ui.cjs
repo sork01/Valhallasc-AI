@@ -103,6 +103,11 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       await debug({ op: 'teleport', zone: from, x: sx, y: sy });
       await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [from, sx, sy], { timeout: 20000 });
       await page.screenshot({ path: path.join(out, `seam-${from}-before-moonspore.png`) });
+      // Scenery of the zone ahead is already drawn beyond the line, so nothing pops in on crossing (the Canopy has no sprite set: its City.art draws).
+      const ahead = await page.evaluate(() => Field.ghosts.kinds);
+      const own = [...new Set(zoneDef(to).objects.map(o => o.kind))].filter(k => !['void', 'lava', 'water'].includes(k));
+      const wanted = to === 16 ? ['gloomstalk', 'mooncaps', 'moonstone', 'sporefern'] : own.filter(k => ['tree', 'bush', 'rock'].includes(k));
+      check(wanted.every(k => ahead.includes(k)), `seam ${from} -> ${to}: the zone ahead's scenery (${wanted.join(', ')}) is ready beyond the border; ghosts: ${ahead.join(', ')}`);
       const keys = keysFor([-dir[0], -dir[1]]);
       for (const key of keys) await page.keyboard.down(key);
       await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });

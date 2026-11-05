@@ -57,3 +57,14 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 - Nothing in the client needed changing: ground, minimap, ghosts and day/night key on the zone theme, not on zone numbers. No saved character was in zone 16, so the pilot DB needed no moves (`zone_shapes_migrate.py --zones 16` is the filter; **without `--zones` the script would shift zones 0 and 1 a second time**).
 - Checks: Rust `zone_shape` (8 tests, three seam pairs 0-1, 0-16, 1-16 walked at 24+ points both ways, Canopy gate reachability), `tests/zone-shape-ui.cjs` (26 checks: edge walk, meadow <-> Canopy crossings in the real client, hub), screenshots `test-results/zone-shapes/seam-0-to-16.png`, `seam-16-to-0.png`.
 - Not judged in play: the new Canopy ground's spawn mix and the look of the Canopy/Crags seam.
+
+## Adding a zone to the pilot: checklist (written down 2026-11-05 so it need not be asked again)
+
+Owner request in short: "do <zone>" means shape it like Greenmeadow/Crags **and** make the crossing invisible: nothing may pop in when you walk in. Steps:
+
+1. `python3 scripts/zone_shapes.py unshape`, add the zone number to `world/zone-shapes.txt`, add a `FILL[<zone>]` entry in `scripts/zone_shapes.py` (decor kinds, `spawn_feature`, and **`elites=` for every elite/boss kind of the zone**: count kinds among `layout == shape_v1` slimes afterwards, the zone must keep exactly one of each), then `node scripts/sync-world.cjs` twice (byte-identical `map.txt`/`world.js`).
+2. Check the content: nothing outside `shapeFloor` (slimes, npcs, places, quest points, paths, portals in and out), zones 0/1 (and any earlier shaped zone) changed only at the new seams.
+3. **Scenery across the seam (the "stuff clips in" bug, found on the Canopy):** `map.ghosts` in `field.js` draws the neighbour's scenery beyond the line. Meadow/ember/frost/fen use their sprite sets (`simpleSet`); **every other theme draws through `City.art`** (empty `ghostSet`), so mushrooms, stones, moss and flowers of the zone ahead are already there before you cross. A theme that gains a sprite set must be added to `simpleSet` *and* to the theme list in the ghost builder. Enemy art for the neighbour is preloaded (`loadSceneEnemyArt` over the seam neighbour's `slimes`); NPCs, lava and drops are not shown across a seam (known).
+4. Rebuild the pilot binary (copy `/proc/<pid>/exe` aside first), run Rust `zone_shape` (add the new seam pairs), `tests/zone-shape-ui.cjs` (bounded; asserts the neighbour's own scenery kinds are ghosted before crossing: mutate by reverting the ghost builder, it must fail), look at `seam-*-before-*.png`.
+5. Stop `valhalla-shapes`, back up its DB copy, `zone_shapes_migrate.py --db ... --zones <new zone only>` (without `--zones` it shifts the earlier zones twice), start it.
+6. Update this doc, the `SHAPE-PILOT` TODO line, the wiki page `10_projects:valhallasc_zone_shapes_pilot_20261105`.
