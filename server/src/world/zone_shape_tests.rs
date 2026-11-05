@@ -655,3 +655,46 @@ fn what_lies_across_a_seam_is_slim_and_never_a_hidden_gm() {
         );
     }
 }
+
+#[test]
+fn a_hero_beside_a_vault_is_listed_across_it_from_both_sides() {
+    let mut w = world();
+    let data = bundled();
+    let _a = join(&mut w, 1, Class::Warrior);
+    let _b = join(&mut w, 2, Class::Mage);
+    for zone in [0usize, 1, 3] {
+        let gate = zone_of(&data, zone)["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["to"] == 4)
+            .unwrap();
+        let (gx, gy) = (gate["x"].as_f64().unwrap(), gate["y"].as_f64().unwrap());
+        let (vx, vy) = (
+            gate["vault"][0].as_f64().unwrap(),
+            gate["vault"][1].as_f64().unwrap(),
+        );
+        // hero 1 stands at the zone's gate, hero 2 in Skaldholm at the same world point (the vault offset)
+        place(&mut w, 1, zone, at(gx - 4., gy));
+        place(&mut w, 2, 4, at(gx - 4. + vx, gy + vy));
+        let list = |view: &Value, to: usize| {
+            view["across"]
+                .as_array()
+                .and_then(|a| a.iter().find(|e| e["to"] == to))
+                .map(|e| (e["players"].as_array().unwrap().len(), e["shift"].clone()))
+        };
+        let (n, shift) = list(&w.snapshot_for(zone), 4)
+            .unwrap_or_else(|| panic!("zone {zone} lists nothing across its vault"));
+        assert_eq!(n, 1, "zone {zone}: the hero in Skaldholm is listed beside the vault");
+        assert_eq!(shift[0].as_f64().unwrap(), vx);
+        let (n, shift) = list(&w.snapshot_for(4), zone)
+            .unwrap_or_else(|| panic!("Skaldholm lists nothing across its vault to zone {zone}"));
+        assert_eq!(n, 1, "Skaldholm lists the hero standing in zone {zone}");
+        assert_eq!(shift[0].as_f64().unwrap(), -vx);
+        // far from the gate (the zone's spawn), nobody is listed
+        let s0 = w.maps[zone].spawn;
+        place(&mut w, 1, zone, at(s0.x, s0.y));
+        let (n, _) = list(&w.snapshot_for(4), zone).unwrap();
+        assert_eq!(n, 0, "zone {zone}: a hero far from the vault is not listed");
+    }
+}

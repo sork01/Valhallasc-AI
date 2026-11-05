@@ -890,6 +890,87 @@ def simplify_run(pts, tol):
     return simplify_run(pts[:k + 2], tol)[:-1] + simplify_run(pts[k + 1:], tol)
 
 
+REGION_DEPTH, STRIP_DEPTH = 90., 4.
+
+
+def _any_inside(mask, quad):
+    """Does the convex-ish polygon `quad` contain a True cell centre of `mask`? (ray casting over the bounding box)"""
+    n = mask.shape[0]
+    xs = [q[0] for q in quad]; ys = [q[1] for q in quad]
+    x0, x1 = max(0, int(min(xs))), min(n - 1, int(max(xs)) + 1)
+    y0, y1 = max(0, int(min(ys))), min(n - 1, int(max(ys)) + 1)
+    if x0 > x1 or y0 > y1:
+        return False
+    sub = mask[y0:y1 + 1, x0:x1 + 1]
+    gy, gx = np.mgrid[y0:y1 + 1, x0:x1 + 1]
+    px, py = gx + .5, gy + .5
+    inside = np.zeros(sub.shape, dtype=bool)
+    m = len(quad)
+    for i in range(m):
+        ax, ay = quad[i]; bx, by = quad[(i + 1) % m]
+        if ay == by:
+            continue
+        cond = ((ay > py) != (by > py)) & (px < (bx - ax) * (py - ay) / (by - ay) + ax)
+        inside ^= cond
+    return bool((inside & sub).any())
+
+
+def vault_regions(runs, land_probe, land=None):
+    """Where each side of a landmark's wall owns the ground (the wall line is the straightened border, in this zone's frame):
+    `city` = beyond the line, `land` = this zone's side, `strip` = the 4 tiles just past the line (the city's own wall stands there, and is
+    replaced by ours). Each is a polygon [x, y, ...]; both frames use the same ones (docs/zone-shapes-pilot.md, "Vault seamlessness")."""
+    out = []
+    for r in runs:
+        r = [tuple(q) for q in r]
+        segn = []
+        for a, b in zip(r, r[1:]):
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            ln = math.hypot(dx, dy) or 1e-9
+            nx, ny = -dy / ln, dx / ln
+            mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+            side = sum((1 if land_probe(mx + nx * d, my + ny * d) else 0) - (1 if land_probe(mx - nx * d, my - ny * d) else 0) for d in (3, 5, 8))
+            segn.append((nx, ny) if side >= 0 else (-nx, -ny))              # inland normal
+        vn = []
+        for k in range(len(r)):
+            ns = [segn[j] for j in (k - 1, k) if 0 <= j < len(segn)]
+            sx, sy = sum(n[0] for n in ns), sum(n[1] for n in ns)
+            ln = math.hypot(sx, sy) or 1e-9
+            k_ = min(1.5, 1 / max(.66, ln / len(ns)))                       # keep the strip's width through a bend
+            vn.append((sx / ln * k_, sy / ln * k_))
+        # Past the two ends of the wall line the ground still has an owner: the city side runs on along the end tangents (as far as it
+        # does not cover this zone's own land), so nothing beyond the run is left unowned (the Crags' arch stands at the end of its run).
+        ext = [0., 0.]
+        for end, (a_, b_) in enumerate(((r[1], r[0]), (r[-2], r[-1]))):
+            tx, ty = b_[0] - a_[0], b_[1] - a_[1]
+            ln = math.hypot(tx, ty) or 1e-9
+            tx, ty = tx / ln, ty / ln
+            for E in (90., 60., 40., 25., 12., 0.):
+                far = (b_[0] + tx * E, b_[1] + ty * E)
+                vn_ = vn[0] if end == 0 else vn[-1]
+                quad = [b_, far, (far[0] - vn_[0] * REGION_DEPTH, far[1] - vn_[1] * REGION_DEPTH), (b_[0] - vn_[0] * REGION_DEPTH, b_[1] - vn_[1] * REGION_DEPTH)]
+                if E == 0 or land is None or not _any_inside(land, quad):
+                    ext[end] = E
+                    break
+        r2 = list(r); vn2 = list(vn)
+        for end, E in enumerate(ext):
+            if not E:
+                continue
+            a_, b_ = (r[1], r[0]) if end == 0 else (r[-2], r[-1])
+            tx, ty = b_[0] - a_[0], b_[1] - a_[1]
+            ln = math.hypot(tx, ty) or 1e-9
+            q = (b_[0] + tx / ln * E, b_[1] + ty / ln * E)
+            if end == 0:
+                r2.insert(0, q); vn2.insert(0, vn[0])
+            else:
+                r2.append(q); vn2.append(vn[-1])
+        r, vn = r2, vn2
+        def band(d0, d1):               # polygon between the line offset by d0 and by d1 (positive = inland)
+            return [round(c, 2) for q, n in zip(r, vn) for c in (q[0] + n[0] * d0, q[1] + n[1] * d0)] + \
+                   [round(c, 2) for q, n in reversed(list(zip(r, vn))) for c in (q[0] + n[0] * d1, q[1] + n[1] * d1)]
+        out.append(dict(city=band(0, -REGION_DEPTH), land=band(0, REGION_DEPTH), strip=band(0, -STRIP_DEPTH)))
+    return out
+
+
 def straighten(rows, runs_orig, runs_simp, tol):
     """Floor mask with the border along `runs_simp` (straight): cells on the city side of the line go, cells between the line and the
     old border fill in. Only the perpendicular band of each run is touched (nothing past a run's two ends). Returns (floor, lost)."""
@@ -1057,6 +1138,8 @@ def build_walls(world, shifted, landmarks, margins):
             assert int(gate['y']) * n + int(gate['x']) in prev, f"zone {i}: the vault gate to {lm} is cut off by the wall (A {A}, gate {gate['x']},{gate['y']}, walk {wx},{wy}, on land {on(gate['x'], gate['y'])}, pocket cells {int(pocket.sum())}, arch hw {hw})"
             ca.exit_routes(z)
             ca.exit_routes(city)
+            regs = vault_regions(runs, lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and orig_floor[int(y), int(x)], floor_now)
+            z['shape'].setdefault('vaultRegions', []).extend(dict(r_, to=lm, portal=gate['id']) for r_ in regs)
             print(f"zone {i}: wall to {zones[lm]['name']}: {len(adds) - len(towers)} ramparts, {len(towers)} towers, vault at {A}, shift {shift}")
 
 # ---- unshape / apply ---------------------------------------------------------------------------------------------------

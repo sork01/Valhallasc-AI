@@ -2026,12 +2026,21 @@ impl World {
         const ACROSS_RANGE: f64 = 60.;
         let mut out = Vec::new();
         for portal in &self.maps[zone].portals {
-            let Some(seam) = &portal.seam else { continue };
+            // A seam is a long line; a vault (a landmark city's wall) is one doorway, so range is measured from its gate.
+            let shift = match (&portal.seam, portal.vault) {
+                (Some(seam), _) => seam.shift,
+                (None, Some(vault)) => vault,
+                (None, None) => continue,
+            };
             let near = |p: Point| {
-                seam.distance(Point {
-                    x: p.x - seam.shift[0],
-                    y: p.y - seam.shift[1],
-                }) < ACROSS_RANGE
+                let here = Point {
+                    x: p.x - shift[0],
+                    y: p.y - shift[1],
+                };
+                match &portal.seam {
+                    Some(seam) => seam.distance(here) < ACROSS_RANGE,
+                    None => (here.x - portal.x).hypot(here.y - portal.y) < ACROSS_RANGE,
+                }
             };
             // Slim copies: only what the client draws of a ghost. A hidden GM is not listed at all.
             let players: Vec<Value> = self
@@ -2048,7 +2057,7 @@ impl World {
                 .filter(|s| s.zone == portal.to && near(s.point()) && s.shows_across())
                 .map(Slime::across_view)
                 .collect();
-            out.push(json!({"to":portal.to,"shift":seam.shift,"players":players,"slimes":slimes}));
+            out.push(json!({"to":portal.to,"shift":shift,"players":players,"slimes":slimes}));
         }
         out
     }

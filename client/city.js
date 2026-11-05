@@ -288,8 +288,8 @@
   const folk=new Map();
   function folkOf(zone) {
     if(!folk.has(zone)){
-      const quests=(area().quests||[]);
-      folk.set(zone,(area().npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||!!n.travelStop||quests.some(q=>q.npc===n.id)})));
+      const A=zone>0?WORLD_MAP.zones[zone-1]:WORLD_MAP,quests=(A.quests||[]);
+      folk.set(zone,(A.npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||!!n.travelStop||quests.some(q=>q.npc===n.id)})));
     }
     const people=folk.get(zone);return people.some(n=>n.season)?people.filter(n=>!n.season||window.Seasonal?.isActive(n.season)):people;
   }
@@ -297,7 +297,7 @@
   // Called every frame with the server's world time (seconds); walkers are placed, and face the way they go.
   function update(time) {
     clockAt=time;
-    for(const n of folkOf(Field.zone||0)){
+    for(const n of [...folkOf(Field.zone||0),...(Field.vaultZones||[]).flatMap(folkOf)]){      // the other side of a vault walks too
       if(!n.route)continue;
       const p=routePoint(n,time),dx=p.x-n.x,dy=p.y-n.y;
       n.moving=Math.hypot(dx,dy)>1e-4;if(n.moving){n.fx=dx;n.fy=dy;}
@@ -581,5 +581,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();

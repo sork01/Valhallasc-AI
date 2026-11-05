@@ -72,6 +72,7 @@
     if (zdef.theme === 'chained_forge') paintSky(zdef.forgeFloor);
     if (zdef.theme === 'moonwell') paintMoonwell(zdef.moonwellFloor);
     if (zdef.shapeFloor) paintShape(zdef.shapeFloor, zdef.shapeEdge);
+    paintVault();
     objects = zdef.objects.map(o => ({ ...o }));
     nightLights = objects.filter(o => ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop'].some(k => o.kind.includes(k)));
   }
@@ -159,25 +160,75 @@
         if (cross * seam.side > 0) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: set || {} });
       }
     }
-    for (const portal of zdef.portals || []) if (portal.vault && zdef.shapeFloor && ZONES[portal.to]) {
-      const win = vaultWindow(portal); if (!win) continue;
-      for (const o of ZONES[portal.to].objects || []) {
-        if (!VAULT_GHOST_KINDS.has(o.kind)) continue;
-        const gx = o.x - portal.vault[0], gy = o.y - portal.vault[1];
-        if (win.inside(gx, gy)) map.ghosts.push({ ...o, x: gx, y: gy, ghostSet: {} });
+  }
+  function paintVault() {
+    map.ghosts = map.ghosts || []; map.vregs = vaultRegions();
+    // The other side of a vault (Skaldholm's wall), drawn as one world: everything the other zone owns on its side of the wall line, in
+    // this zone's frame (its coordinates = ours + shift), so a crossing changes nothing on screen. The ground is drawn in draw() (clipped
+    // to the region), the scenery here as ghosts. The city's own wall stands in `strip` and is replaced by the shaped zone's ramparts.
+    map.vlights = [];
+    for (const R of map.vregs) {
+      const T = ZONES[R.to]; if (!T) continue;
+      map.ghosts.push(...vaultGhosts(R, [T.objects]));
+      for (const o of T.objects || []) {      // the other side's lamps and fires light the night through the opening too
+        if (!['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop'].some(k => o.kind.includes(k))) continue;
+        const gx = o.x - R.shift[0], gy = o.y - R.shift[1]; if (inPoly(R.other, gx, gy)) map.vlights.push({ ...o, x: gx, y: gy });
       }
     }
   }
-  // The city beyond a vault (Skaldholm's wall): a window of its street and buildings seen through the opening, in this zone's frame
-  // (the offset `portal.vault` maps ours to the city's), so crossing changes nothing on screen. The window opens from the arch,
-  // `VAULT_VIEW` tiles outward, a little wider than the opening.
-  const VAULT_VIEW = 46, VAULT_GHOST_KINDS = new Set(['house', 'chapel', 'lamp', 'fountain', 'grandfountain', 'stall', 'bench', 'banner', 'statue', 'well', 'barrels', 'noticeboard', 'meetingstone', 'campfire']);
-  function vaultWindow(portal) {
-    const arch = (zdef.exitArches || []).find(a => a.portal === portal.id); if (!arch || !portal.walk) return null;
-    const [wx, wy] = portal.walk, px = -wy, py = wx, hw = arch.halfWidth || 5;
-    const at = (along, across) => [arch.x + wx * along + px * across, arch.y + wy * along + py * across];
-    return { arch, wx, wy, hw, corners: [at(0, -hw), at(0, hw), at(VAULT_VIEW, hw + .4 * VAULT_VIEW), at(VAULT_VIEW, -hw - .4 * VAULT_VIEW)],
-      inside: (x, y) => { const along = (x - arch.x) * wx + (y - arch.y) * wy, across = Math.abs((x - arch.x) * px + (y - arch.y) * py); return along >= 0 && along <= VAULT_VIEW && across <= hw + .4 * along; } };
+  // The other zone's scenery inside the region, in our frame. Seasonal pieces come and go with the event (the server announces them
+  // after the zone is built), so `vaultSeason` rebuilds those when the set changes.
+  function vaultGhosts(R, sources) {
+    const T = ZONES[R.to], set = ghostSetFor(T.theme), out = [];
+    for (const src of sources) for (const o of src || []) {
+      if (o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void' || City.art[o.kind]?.ground) continue;
+      const gx = o.x - R.shift[0], gy = o.y - R.shift[1];
+      const wallPiece = WALL_KINDS.has(o.kind);
+      // the city's own wall beside the line is replaced by the shaped zone's (tagged) ramparts and towers, which may stand a little past the line
+      if (wallPiece && T.theme === 'city' ? inPoly(R.strip, gx, gy) : !(inPoly(R.other, gx, gy) || (wallPiece && o.layout === 'shape_v1' && R.hide && inPoly(R.strip, gx, gy)))) continue;
+      out.push({ ...o, x: gx, y: gy, ghostSet: set });
+    }
+    return out;
+  }
+  function vaultSeason(R) {
+    const src = [window.Seasonal?.decor(R.to), window.Halloween?.objects(R.to), window.Christmas?.objects(R.to), window.Easter?.objects(R.to), window.Solstice?.objects(R.to), window.Valentines?.objects(R.to)];
+    const key = src.map(a => (a?.length || 0) + ':' + (a?.[0]?.kind || '')).join('|');
+    if (R.seasonKey !== key) { R.seasonKey = key; R.season = vaultGhosts(R, src); }
+    return R.season;
+  }
+  const WALL_KINDS = new Set(['rampart', 'tower', 'wall']);
+  // Our own scenery where the other zone owns the ground (Skaldholm outside its wall), and the city's own wall beside the line, is not drawn.
+  function ownHidden(o) {
+    for (const R of map.vregs) if (R.hide && (inPoly(R.other, o.x, o.y) || (WALL_KINDS.has(o.kind) && inPoly(R.strip, o.x, o.y)))) return true;
+    return false;
+  }
+  // Point in a polygon given as a flat [x, y, ...] array (with its bounding box cached on the array).
+  function inPoly(P, x, y) {
+    if (!P) return false;
+    if (!P.bb) { let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (let i = 0; i < P.length; i += 2) { a = Math.min(a, P[i]); c = Math.max(c, P[i]); b = Math.min(b, P[i + 1]); d = Math.max(d, P[i + 1]); } P.bb = [a, b, c, d]; }
+    const bb = P.bb; if (x < bb[0] || x > bb[2] || y < bb[1] || y > bb[3]) return false;
+    let inside = false;
+    for (let i = 0, j = P.length - 2; i < P.length; j = i, i += 2) {
+      if ((P[i + 1] > y) !== (P[j + 1] > y) && x < (P[j] - P[i]) * (y - P[i + 1]) / (P[j + 1] - P[i + 1]) + P[i]) inside = !inside;
+    }
+    return inside;
+  }
+  const ghostSetFor = theme => simpleSet(theme) || (theme === 'city' ? sprites : {});
+  // The regions of every vault of this zone: `other` = what the other zone owns (in our frame), `strip` = the city's own wall beside the
+  // line, `shift` = the other zone's cell minus ours. A shaped zone stores them for its own frame; the city reads them from each neighbour.
+  function vaultRegions() {
+    const out = [];
+    for (const p of zdef.portals || []) {
+      if (!p.vault || !ZONES[p.to]) continue;
+      if (zdef.shape?.vaultRegions) {
+        for (const r of zdef.shape.vaultRegions) if (r.portal === p.id) out.push({ to: p.to, shift: p.vault, other: r.city, strip: r.strip });
+      } else {
+        const T = ZONES[p.to], q = (T.portals || []).find(x => x.to === zone && x.vault); if (!q || !T.shape?.vaultRegions) continue;
+        const mv = (P) => { const o = P.slice(); for (let i = 0; i < o.length; i += 2) { o[i] += q.vault[0]; o[i + 1] += q.vault[1]; } return o; };
+        for (const r of T.shape.vaultRegions) if (r.to === zone) out.push({ to: p.to, shift: p.vault, other: mv(r.land), strip: mv(r.strip), hide: true });
+      }
+    }
+    return out;
   }
   const BLEND_REACH = 14;
   // Sprites of the zones whose scenery can be drawn from the other side of a seam.
@@ -294,7 +345,7 @@
     // neighbours are built one per timer tick right after the crossing instead of inside it, and a context is never thrown away
     // (its arrays are small; only its ground canvases are released), so crossing back and forth rebuilds nothing.
     let nbi = 0;
-    for (const p of zdef.portals || []) if (p.seam || (p.vault && zdef.shapeFloor)) {
+    for (const p of zdef.portals || []) if (p.seam || p.vault) {
       keepZones.add(p.to); const to = p.to;
       setTimeout(() => { if (ZONES[to]) { ctxFor(to); loadSceneEnemyArt(ZONES[to].slimes || []); } }, ctxs.has(to) ? 0 : 150 + 300 * nbi++);
     }
@@ -4232,10 +4283,11 @@
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
     for (const p of zdef.portals) if (p.seam) { const nc = ctxs.get(p.to); if (nc) drawNeighbourGround(g, nc, p.seam.shift, cx, cy, sxo, syo); }
-    for (const p of zdef.portals) if (p.vault && zdef.shapeFloor) {     // the city's ground through the vault: a clipped window, never over our own land beyond it
-      const nc = ctxs.get(p.to), win = nc && vaultWindow(p); if (!win) continue;
-      g.save(); g.beginPath(); win.corners.forEach(([x, y], i) => { const [sx, sy] = w2s(x, y); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); }); g.closePath(); g.clip();
-      drawNeighbourGround(g, nc, p.vault, cx, cy, sxo, syo); g.restore();
+    for (const R of map.vregs || []) {      // what the other zone owns beyond the wall line: its ground, clipped to that region (never over our own land)
+      const nc = ctxs.get(R.to); if (!nc) continue;
+      g.save(); g.beginPath(); for (let i = 0; i < R.other.length; i += 2) { const [sx, sy] = w2s(R.other[i], R.other[i + 1]); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); } g.closePath(); g.clip();
+      if (R.hide && !zdef.shapeFloor) { g.fillStyle = ZONES[R.to].theme === 'ember' ? '#0c0605' : SEA_COLOR; g.fillRect(0, 0, VW, VH); }   // our own ground there is not theirs: open water where they have none
+      drawNeighbourGround(g, nc, R.shift, cx, cy, sxo, syo); g.restore();
     }
     g.imageSmoothingEnabled = true;
     if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge' || zdef.theme === 'ember') {
@@ -4243,6 +4295,11 @@
     }
     City.drawPlaza(g, w2s);
     window.ExitPaths?.floor(g,zdef,w2s,hero);
+    for (const R of map.vregs || []) {      // the other side's paved roads, inside its region
+      const T = ZONES[R.to]; if (!T.exitRoutes?.length) continue;
+      g.save(); g.beginPath(); for (let i = 0; i < R.other.length; i += 2) { const [sx, sy] = w2s(R.other[i], R.other[i + 1]); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); } g.closePath(); g.clip();
+      window.ExitPaths?.floor(g, T, (x, y, z) => w2s(x - R.shift[0], y - R.shift[1], z), { x: hero.x + R.shift[0], y: hero.y + R.shift[1] }); g.restore();
+    }
     window.Halloween?.drawFloor(g,zone,w2s);
     window.Christmas?.drawFloor(g,zone,w2s);
     window.Easter?.drawFloor(g,zone,w2s);
@@ -4282,6 +4339,7 @@
     for (const source of [objects,window.Seasonal?.decor(zone)||[],window.Halloween?.objects(zone)||[],window.Christmas?.objects(zone)||[],window.Easter?.objects(zone)||[],window.Solstice?.objects(zone)||[],window.Valentines?.objects(zone)||[]]) for (const o of source) {
       if (o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
       if (City.art[o.kind]?.ground) continue;
+      if (ownHidden(o)) continue;
       const [sx, sy] = w2s(o.x, o.y,o.z||0);
       if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0, (City.signHeight?.(o)||0)+25))) { list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
@@ -4310,6 +4368,10 @@
       list.push({ d: origin.x + origin.y - .002, fx: e, back: true }, { d: origin.x + origin.y + .002, fx: e, back: false });
     }
     for (const arch of zdef.exitArches || []) { const [sx,sy]=w2s(arch.x,arch.y); if(onScreen(sx,sy,480))list.push({d:arch.x+arch.y,arch,sx,sy}); }
+    for (const R of map.vregs || []) {
+      for (const o of vaultSeason(R)) { const [sx, sy] = w2s(o.x, o.y); if (onScreen(sx, sy, Math.max(220, City.art[o.kind]?.box?.[3] || 0))) list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); }
+      for (const n of City.npcsOf(R.to)) { const gx = n.x - R.shift[0], gy = n.y - R.shift[1]; if (!inPoly(R.other, gx, gy)) continue; const [sx, sy] = w2s(gx, gy); if (onScreen(sx, sy, 150)) list.push({ d: gx + gy, npc: { ...n, x: gx, y: gy }, sx, sy, ghostNpc: true }); }
+    }
     lastGhostDrawn = 0; for (const it of list) if (it.o && it.o.ghostSet) lastGhostDrawn++;
     list.sort((a, b) => a.d - b.d);
     const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y;
@@ -4334,7 +4396,7 @@
         if (cover) g.globalAlpha = .45;
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
-      } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
+      } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,!it.ghostNpc && Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
       } else if (it.cross) { window.RaidKey?.draw(g,it.cross,it.sx,it.sy);
       } else if (it.chest) { drawChest(g,it.chest,it.sx,it.sy);
       } else if (it.sign) { drawSign(g,it.sign,it.sx,it.sy,Math.hypot(hero.x-it.sign.x,hero.y-it.sign.y)<2.8);
@@ -4413,10 +4475,11 @@
       }
     }
     // Light is applied after the world and before attacks, loot labels and other combat feedback.
-    window.DayNight?.draw(g, VW, VH, nightLights, w2s);
+    window.DayNight?.draw(g, VW, VH, map.vlights?.length ? nightLights.filter(o => !ownHidden(o)).concat(map.vlights) : nightLights, w2s);
     window.Weather?.draw(g, VW, VH, t, { x: cx, y: cy });
     window.EmptySeat?.drawVision(g, w2s, VW, VH);
     window.Seasonal?.glow(g,zone,w2s);
+    for (const R of map.vregs || []) window.Seasonal?.glow(g,R.to,(x,y,z)=>w2s(x-R.shift[0],y-R.shift[1],z));
     for (const e of effects) if (e.kind === 'slash' || e.kind === 'dualSlash') continue; else if (e.kind === 'shadow' && mageSpr && isAssassin()) {
       const [sx, sy] = w2s(e.x, e.y), [ax, ay] = mageSpr.meta.anchor;
       g.save(); g.globalAlpha = Math.max(0, .35 * (1 - e.t / .32)); g.imageSmoothingEnabled = false;
@@ -4984,10 +5047,14 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get vaultView() { return (map.ghosts || []).filter(o => VAULT_GHOST_KINDS.has(o.kind)).length; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get vaultView() { return (map.vregs || []).length ? (map.ghosts || []).length : 0; }, get vaultRegions() { return map.vregs || []; }, get ghostNpcIds() { return (map.vregs || []).flatMap(R => City.npcsOf(R.to).filter(n => inPoly(R.other, n.x - R.shift[0], n.y - R.shift[1])).map(n => n.id)); }, get wallGhosts() { return (map.ghosts || []).filter(o => o.kind === 'rampart' || o.kind === 'tower').map(o => [o.kind, +o.x.toFixed(1), +o.y.toFixed(1)]); }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };
+      }
+      for (const R of map.vregs || []) {      // a vault mixes the two zones' light the same way (the line is the first half of the region polygon)
+        const P = R.other, n = P.length / 4; let d = 1e9; for (let k = 0; k < n - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, P[2 * k], P[2 * k + 1], P[2 * k + 2], P[2 * k + 3]));
+        const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[R.to]?.theme, w };
       }
       return null;
     }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
