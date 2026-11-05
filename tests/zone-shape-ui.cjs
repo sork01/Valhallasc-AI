@@ -1,7 +1,7 @@
 // Zone shapes pilot (docs/zone-shapes.md): the real client draws Greenmeadow and the Emberfall Crags with the outline of
 // their province, and a walker cannot leave the land. Starts its own private world (test commands, own database) from
 // VALHALLA_BINARY and writes screenshots to test-results/zone-shapes/. Run it bounded:
-//   PART=seams bash scripts/test-touch-bounded.sh tests/zone-shape-ui.cjs   (then PART=rest)
+//   PART=seams bash scripts/test-touch-bounded.sh tests/zone-shape-ui.cjs   (then PART=rest, then PART=walls)
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -42,8 +42,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const q = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
   const inward = onA(q[0] + nrm[0] * 4, q[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
   const keysFor = ([dx, dy]) => [Math.abs(dx) > .35 ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : null, Math.abs(dy) > .35 ? (dy > 0 ? 'ArrowDown' : 'ArrowUp') : null].filter(Boolean);
-  // The suite is split in two so each part stays inside the bounded runner's ten minutes: PART=seams (edge walks, the four seam crossings) or PART=rest (minimap, step 2, hubs, world map).
-  if (process.env.PART !== 'rest') {
+  // The suite is split in three so each part stays inside the bounded runner's ten minutes AND its 1.5 GiB memory cap (one long run peaked at 1.44 GiB of anonymous memory): PART=seams (edge walks, the four seam crossings), PART=rest (minimap, step 2), PART=walls (hubs, world map, Skaldholm's wall and vaults).
+  if (!process.env.PART || process.env.PART === 'seams') {
   for (const zone of [0, 1, 3]) {
     const z = zoneDef(zone), n = z.size;
     check(z.shapeFloor?.length === n && z.size % 8 === 0, `zone ${zone} carries its outline`);
@@ -52,6 +52,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     const rows = z.shapeFloor.map(r => [...r]), land = (x, y) => rows[y]?.[x] === '#';
     const edge = [];
     for (let y = 8; y < n - 8; y++) for (let x = 8; x < n - 8; x++) if (land(x, y) && !land(x + dx, y + dy) && land(x - 6 * dx, y - 6 * dy) && !land(x + 4 * dx, y + 4 * dy) ) edge.push([x, y]);
+    // a vault in the border is a way through, not an edge: keep clear of it (and of its wall)
+    for (let i = edge.length - 1; i >= 0; i--) if ((z.exitArches || []).some(a => Math.hypot(edge[i][0] - a.x, edge[i][1] - a.y) < 16)) edge.splice(i, 1);
     check(edge.length > 10, `zone ${zone} has an edge to test`);
     const [ex, ey] = edge[Math.floor(edge.length / 2)], sx = ex - 2 * dx + .5, sy = ey - 2 * dy + .5;
     await debug({ op: 'teleport', zone, x: sx, y: sy });
@@ -161,7 +163,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     }
   }
   }
-  if (process.env.PART !== 'seams') {
+  if (!process.env.PART || process.env.PART === 'rest') {
   // The minimap waves are pinned to the world: the same spot seen from either side of a seam gives the same ripple origin.
   {
     const sm = zoneDef(0).portals.find(p => p.to === 16 && p.seam).seam, k = Math.floor(sm.points.length / 2), spot = sm.points[k];
@@ -228,6 +230,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await page.screenshot({ path: path.join(out, 'across-meadow-sees-crags.png') });
     await ctx2.close();
   }
+  }
+  if (!process.env.PART || process.env.PART === 'walls') {
   // The hubs keep their place inside the shifted core: Alderhaven's plaza and Cinderwatch Camp.
   for (const zone of [0, 1, 3, 16]) {
     const c = zoneDef(zone).city;
@@ -252,6 +256,29 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     check(await page.evaluate(z => WorldMap.zone === z, zone), `the detailed map shows zone ${zone}`);
     await page.evaluate(() => WorldMap.close());
   }
+    // Skaldholm's wall stands along its borders (the city drawn as a landmark, no scale needed) and the vault is the way in:
+    // walked through from Gloamfen, the meadow and the Crags in the real client.
+    for (const zone of [3, 0, 1]) {
+      const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
+      check(z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower').length >= 40, `zone ${zone}: Skaldholm's wall runs along the border`);
+      const bx = gate.x - gate.walk[0] * 9, by = gate.y - gate.walk[1] * 9;
+      await debug({ op: 'teleport', zone, x: bx, y: by });
+      await page.waitForFunction(([zz, x, y]) => Field.zone === zz && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, bx, by], { timeout: 20000 });
+      await page.waitForTimeout(1500);
+      await page.screenshot({ path: path.join(out, `skaldholm-vault-${zone}-wide.png`) });
+      const sx = gate.x - gate.walk[0] * 2.5, sy = gate.y - gate.walk[1] * 2.5;
+      await debug({ op: 'teleport', zone, x: sx, y: sy });
+      await page.waitForFunction(([zz, x, y]) => Field.zone === zz && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, sx, sy], { timeout: 20000 });
+      await page.waitForTimeout(1500);
+      check(await page.evaluate(() => Field.exitArches.some(a => a.name === 'Skaldholm')), `zone ${zone}: the client draws the vault (it knows the arch)`);
+      await page.screenshot({ path: path.join(out, `skaldholm-vault-${zone}.png`) });
+      // the camera is isometric: a world step (dx, dy) is the screen step (dx - dy, (dx + dy) / 2), so +x is Right+Down and -y is Right+Up
+      const [wdx, wdy] = gate.walk, keys = [wdx - wdy > .35 ? 'ArrowRight' : wdx - wdy < -.35 ? 'ArrowLeft' : null, wdx + wdy > .35 ? 'ArrowDown' : wdx + wdy < -.35 ? 'ArrowUp' : null].filter(Boolean);
+      for (const k of keys) await page.keyboard.down(k);
+      await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 });
+      for (const k of keys) await page.keyboard.up(k);
+      check((await where()).zone === 4, `zone ${zone}: walking through the vault leads into Skaldholm`);
+    }
   }
   assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
   console.log(`zone-shape-ui: ${checks} checks passed; screenshots in ${out}`);

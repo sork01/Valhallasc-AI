@@ -78,9 +78,23 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
                     .map(|q| (q[0].as_f64().unwrap(), q[1].as_f64().unwrap()))
             })
             .collect();
+        // Skaldholm's wall stands 1.6 tiles inside its borders: the strip behind it is not a place to walk from.
+        let wall: Vec<(f64, f64)> = z["objects"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|o| o["kind"] == "rampart" || o["kind"] == "tower")
+            .map(|o| (o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap()))
+            .collect();
         for y in 1..n - 1 {
             for x in 1..n - 1 {
                 if rows[y][x] != b'#' {
+                    continue;
+                }
+                if wall
+                    .iter()
+                    .any(|q| (q.0 - x as f64).hypot(q.1 - y as f64) < 4.)
+                {
                     continue;
                 }
                 for (dx, dy) in [(1i32, 0i32), (-1, 0), (0, 1), (0, -1)] {
@@ -231,6 +245,90 @@ fn the_moonspore_canopy_keeps_its_gates_to_the_orrery_and_emberwake() {
 #[test]
 fn gloamfen_keeps_gates_to_the_glacier_and_skaldholm() {
     gates_stand_on_free_land(3, &[2, 4]);
+}
+
+#[test]
+fn skaldholms_wall_runs_along_its_borders_and_the_vault_is_open() {
+    let w = world();
+    let data = bundled();
+    for zone in [0usize, 1, 3] {
+        let z = zone_of(&data, zone);
+        let objects = z["objects"].as_array().unwrap();
+        let pieces: Vec<&Value> = objects
+            .iter()
+            .filter(|o| o["kind"] == "rampart" || o["kind"] == "tower")
+            .collect();
+        assert!(pieces.len() >= 40, "zone {zone}: only {} wall pieces", pieces.len());
+        let arch = z["exitArches"]
+            .as_array()
+            .and_then(|a| a.iter().find(|e| e["name"] == "Skaldholm"))
+            .unwrap_or_else(|| panic!("zone {zone} has no vault"));
+        let gate = z["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["id"] == arch["portal"])
+            .unwrap();
+        let (gx, gy) = (gate["x"].as_f64().unwrap(), gate["y"].as_f64().unwrap());
+        let walk = gate["walk"].as_array().unwrap();
+        let (wx, wy) = (walk[0].as_f64().unwrap(), walk[1].as_f64().unwrap());
+        assert!(gate["to"] == 4, "the vault leads into Skaldholm");
+        // the way in is open: from 5 tiles inland straight at the gate nothing blocks a walker (further out is ordinary scenery)
+        for i in 0..=8 {
+            let t = 5. - i as f64 * 0.5;
+            let (x, y) = (gx - wx * t, gy - wy * t);
+            let mut a = at(x, y);
+            w.maps[zone].collide(&mut a, 0.4);
+            assert!(
+                (a.x - x).hypot(a.y - y) < 0.01,
+                "zone {zone}: the vault approach is blocked at ({x:.1},{y:.1})"
+            );
+        }
+        // and the wall is solid on both sides of the opening, within 25 tiles along it
+        let half = arch["halfWidth"].as_f64().unwrap();
+        let near = pieces
+            .iter()
+            .filter(|o| {
+                let d = (o["x"].as_f64().unwrap() - arch["x"].as_f64().unwrap())
+                    .hypot(o["y"].as_f64().unwrap() - arch["y"].as_f64().unwrap());
+                d > half && d < half + 25.
+            })
+            .count();
+        assert!(near >= 6, "zone {zone}: the wall beside the vault is missing ({near} pieces)");
+    }
+}
+
+#[test]
+fn walking_into_the_vault_enters_skaldholm() {
+    let mut w = world();
+    let data = bundled();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    for zone in [0usize, 1, 3] {
+        let z = zone_of(&data, zone);
+        let gate = z["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["to"] == 4)
+            .unwrap();
+        let (gx, gy) = (gate["x"].as_f64().unwrap(), gate["y"].as_f64().unwrap());
+        let walk = gate["walk"].as_array().unwrap();
+        let (wx, wy) = (walk[0].as_f64().unwrap(), walk[1].as_f64().unwrap());
+        place(&mut w, 1, zone, at(gx - wx * 5., gy - wy * 5.));
+        let dir = at(wx, wy);
+        for _ in 0..160 {
+            w.time += TICK;
+            let hero = w.players.get_mut(&1).unwrap();
+            hero.input = dir;
+            hero.input_at = w.time;
+            w.update_player(1);
+            if w.players[&1].character.zone == 4 {
+                break;
+            }
+        }
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, 4, "walking through the vault of zone {zone} from 5 tiles did not enter Skaldholm (ended at {:.1},{:.1})", c.x, c.y);
+    }
 }
 
 fn gates_stand_on_free_land(zone: usize, targets: &[u64]) {

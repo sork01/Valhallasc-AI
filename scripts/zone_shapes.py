@@ -740,7 +740,7 @@ def fill_zone(z, view, geom, off, rng, core=None, F=None):
 
 
 # ---- portals on the shared chains (reuses compact_atlas's reachability and clearance tests) ---------------------------
-def chain_endpoint(ca, z, other, prev, fixed):
+def chain_endpoint(ca, z, other, prev, fixed, vault=False):
     """The crossing sits just inside the shared border chain: trigger point, arrival six tiles further in, outward axis."""
     n = z['size']
     chains = [e['points'] for e in z['shape']['edges'] if e['kind'] == 'shared' and e['other'] == other]
@@ -757,7 +757,8 @@ def chain_endpoint(ca, z, other, prev, fixed):
     d2 = (xs[:, None] - px[None, :, 0]) ** 2 + (ys[:, None] - px[None, :, 1]) ** 2
     near, dist = d2.argmin(axis=1), np.sqrt(d2.min(axis=1))
     candidates = []
-    for k in np.nonzero((dist >= 5) & (dist <= 14))[0]:
+    lo, hi = (2., 3.5) if vault else (5., 14.)
+    for k in np.nonzero((dist >= lo) & (dist <= hi))[0]:
         p = (float(xs[k]), float(ys[k]))
         q = pts[int(near[k])]
         vx, vy = p[0] - q[0], p[1] - q[1]
@@ -771,7 +772,12 @@ def chain_endpoint(ca, z, other, prev, fixed):
             continue
         if any(math.hypot(c[0] - s['x'], c[1] - s['y']) < 3 for c in (p, a) for s in z.get('npcs', [])):
             continue
-        candidates.append((float(dist[k]) * 2 + math.dist(p, mid) * .12, p, a, (q[0] - p[0], q[1] - p[1])))
+        score = float(dist[k]) * 2 + math.dist(p, mid) * .12
+        if vault:   # the vault is an axis-aligned arch: put it where the wall runs straight along an axis
+            i0, i1 = max(0, int(near[k]) - 8), min(len(pts) - 1, int(near[k]) + 8)
+            tx, ty = abs(pts[i1][0] - pts[i0][0]), abs(pts[i1][1] - pts[i0][1])
+            score += min(tx, ty) / max(tx, ty, 1e-9) * 60
+        candidates.append((score, p, a, (q[0] - p[0], q[1] - p[1])))
     for _, p, a, out in sorted(candidates):
         if ca.clear(z, p, a):
             return p, a, ca.direction((0, 0), out)
@@ -809,7 +815,7 @@ def make_seams(zones, shifted):
     return seams
 
 
-def place_portals(world, shifted):
+def place_portals(world, shifted, landmarks=()):
     """Atlas crossings of shaped zones move onto the real shared chains; neighbours' arrivals follow."""
     import compact_atlas as ca
     zones = [world] + world['zones']
@@ -825,7 +831,7 @@ def place_portals(world, shifted):
         links = [p for p in z['portals'] if p['to'] in ca.OUTDOORS and p['to'] in zones[i]['shape'].get('neighbours', []) and (i, p['to']) not in seams]
         fixed = [p for p in z['portals'] if p not in links]
         for p in sorted(links, key=lambda p: p['to']):
-            point, arrival, side = chain_endpoint(ca, z, p['to'], prev, fixed)
+            point, arrival, side = chain_endpoint(ca, z, p['to'], prev, fixed, vault=p['to'] in landmarks)
             landing[i, p['to']] = (point, arrival, side)
             fixed.append(dict(x=point[0], y=point[1]))
             fixed.append(dict(x=arrival[0], y=arrival[1]))
@@ -863,6 +869,88 @@ def place_portals(world, shifted):
         ca.exit_routes(z)
     ca.sync_travel_links(zones)
 
+
+
+# ---- landmark walls: a neighbour city drawn as a wall along the shared border, with a vault you walk through ---------------
+WALL_STEP, WALL_IN, VAULT_HALF = 2.0, 1.6, 5.9
+
+
+def build_walls(world, shifted, landmarks):
+    """Skaldholm's wall (docs/zone-shapes-pilot.md): along every border a shaped zone has with a landmark city, ramparts and
+    towers (the city's own art, real collision objects) with a vault at the gate you walk through to enter the city."""
+    import compact_atlas as ca
+    zones = [world] + world['zones']
+    for i in sorted(shifted):
+        z = zones[i]
+        for lm in landmarks:
+            runs = [e['points'] for e in z['shape']['edges'] if e['kind'] == 'shared' and e['other'] == lm]
+            gate = next((p for p in z['portals'] if p['to'] == lm and 'seam' not in p), None)
+            if not runs or gate is None:
+                continue
+            n = z['size']
+            floor = z['shapeFloor']
+            on = lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and floor[int(y)][int(x)] == '#'
+            # the vault: the chain point nearest the gate, the wall's local axis, the opening faces the way the gate walks
+            chain = [tuple(q) for r in runs for q in r]
+            q = min(chain, key=lambda c: math.dist(c, (gate['x'], gate['y'])))
+            run = next(r for r in runs if any(tuple(c) == q for c in r))
+            k = [tuple(c) for c in run].index(q)
+            a, b = run[max(0, k - 1)], run[min(len(run) - 1, k + 1)]
+            vertical = abs(b[1] - a[1]) > abs(b[0] - a[0])
+            arch = dict(x=round(q[0], 2), y=round(q[1], 2), vertical=vertical, halfWidth=VAULT_HALF, towers=True, portal=gate['id'], name=zones[lm]['name'])
+            adds, towers = [], []
+            # the vault's own towers, as in Skaldholm's wall: one each side, hugging the opening (half width + 1.7)
+            ia, ib = max(0, k - 3), min(len(run) - 1, k + 3)
+            ux, uy = run[ib][0] - run[ia][0], run[ib][1] - run[ia][1]
+            ul = math.hypot(ux, uy) or 1
+            ux, uy = ux / ul, uy / ul
+            inx, iny = -uy, ux
+            if not on(q[0] + inx * 3, q[1] + iny * 3):
+                inx, iny = -inx, -iny
+            for sgn in (-1, 1):
+                towers.append((q[0] + inx * WALL_IN + ux * sgn * (VAULT_HALF + 1.7), q[1] + iny * WALL_IN + uy * sgn * (VAULT_HALF + 1.7)))
+            flank = list(towers)
+            for r in runs:
+                pts = []
+                for u, v in zip(r, r[1:]):
+                    steps = max(1, int(math.dist(u, v) / WALL_STEP))
+                    pts += [(u[0] + (v[0] - u[0]) * j / steps, u[1] + (v[1] - u[1]) * j / steps) for j in range(steps)]
+                pts.append(tuple(r[-1]))
+                run_len = 0.
+                for j in range(2, len(pts) - 2):        # leave the ends free: a seam or another border starts there
+                    p0, p1 = pts[j - 2], pts[j + 2]
+                    tx, ty = p1[0] - p0[0], p1[1] - p0[1]
+                    ln = math.hypot(tx, ty) or 1
+                    nx, ny = -ty / ln, tx / ln
+                    c = pts[j]
+                    if not on(c[0] + nx * 3, c[1] + ny * 3):
+                        nx, ny = -nx, -ny
+                    cx, cy = c[0] + nx * WALL_IN, c[1] + ny * WALL_IN
+                    run_len += WALL_STEP
+                    if math.dist(c, q) <= VAULT_HALF + 1.9 or any(math.dist(t, (cx, cy)) < 2.2 for t in flank):
+                        continue                          # the opening and the flank towers
+                    if run_len % 28 < WALL_STEP and not any(math.dist(t, (cx, cy)) < 8 for t in towers):
+                        towers.append((cx, cy))
+                        continue
+                    ax, ay = abs(tx), abs(ty)
+                    w, d = (2.8, 1.8) if ax >= 2 * ay else (1.8, 2.8) if ay >= 2 * ax else (2.3, 2.3)
+                    adds.append(dict(kind='rampart', x=round(cx, 2), y=round(cy, 2), r=0, v=0, width=w, depth=d, color='#d7d3bc', label='', layout=TAG))
+            for tx_, ty_ in towers:
+                adds.append(dict(kind='tower', x=round(tx_, 2), y=round(ty_, 2), r=0, v=0, width=3.4, depth=3.4, color='#4a7a9a', label='', layout=TAG))
+            # scenery under the wall goes; a spawn too close would be walled in
+            def hit(o):
+                for w_ in adds:
+                    if math.hypot(o['x'] - w_['x'], o['y'] - w_['y']) < max(w_['width'], w_['depth']) / 2 + (o.get('r', .5) or .5) + .9:
+                        return True
+                return False
+            z['objects'] = [o for o in z['objects'] if o['kind'] in STRUCTURAL or not hit(o)]
+            z['slimes'] = [s for s in z['slimes'] if not hit(dict(s, r=1.5))]
+            z['objects'].extend(adds)
+            z['exitArches'] = [e for e in z.get('exitArches', []) if e['portal'] != gate['id']] + [arch]
+            prev = ca.connected(z)
+            assert int(gate['y']) * n + int(gate['x']) in prev, f"zone {i}: the vault gate to {lm} is cut off by the wall"
+            print(f"zone {i}: wall to {zones[lm]['name']}: {len(adds) - len(towers)} ramparts, {len(towers)} towers, vault at ({arch['x']},{arch['y']}) {'vertical' if vertical else 'horizontal'}")
+            ca.exit_routes(z)
 
 # ---- unshape / apply ---------------------------------------------------------------------------------------------------
 def unshape(world, cfg):
@@ -933,7 +1021,8 @@ def apply(world, cfg):
         print(f"zone {z}: {'warped ' if warp else ''}{S0}x{S0} -> {geom['size']}x{geom['size']} (bbox {geom['bbox'][0]}x{geom['bbox'][1]}, k {geom['scale']:.3f}), "
               f"core at ({ox},{oy}), +{added[0]} objects, +{added[1]} spawns, {len(voids)} void pieces")
     shift_incoming(world, shifted, 1)
-    place_portals(world, shifted)
+    place_portals(world, shifted, cfg.get('landmarks', []))
+    build_walls(world, shifted, cfg.get('landmarks', []))
     return shifted
 
 

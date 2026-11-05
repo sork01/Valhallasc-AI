@@ -7674,14 +7674,6 @@
     },
     {
       "kind": "bush",
-      "x": 192.76,
-      "y": 119.73,
-      "r": 0.3,
-      "v": 2,
-      "layout": "shape_v1"
-    },
-    {
-      "kind": "bush",
       "x": 210.52,
       "y": 115.12,
       "r": 0.3,
@@ -9882,14 +9874,6 @@
     },
     {
       "kind": "bush",
-      "x": 223.54,
-      "y": 101.62,
-      "r": 0.3,
-      "v": 1,
-      "layout": "shape_v1"
-    },
-    {
-      "kind": "bush",
       "x": 83.06,
       "y": 259.66,
       "r": 0.3,
@@ -10660,14 +10644,6 @@
       "kind": "bush",
       "x": 396.59,
       "y": 173.26,
-      "r": 0.3,
-      "v": 0,
-      "layout": "shape_v1"
-    },
-    {
-      "kind": "bush",
-      "x": 107.43,
-      "y": 132.98,
       "r": 0.3,
       "v": 0,
       "layout": "shape_v1"
@@ -11494,14 +11470,6 @@
       "y": 143.3,
       "r": 0.3,
       "v": 1,
-      "layout": "shape_v1"
-    },
-    {
-      "kind": "bush",
-      "x": 151.98,
-      "y": 126.21,
-      "r": 0.3,
-      "v": 0,
       "layout": "shape_v1"
     },
     {
@@ -39342,6 +39310,702 @@
       "width": 4,
       "depth": 7,
       "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 97.27,
+      "y": 132.07,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 99.31,
+      "y": 131.86,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 101.35,
+      "y": 131.65,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 103.65,
+      "y": 131.42,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 105.95,
+      "y": 131.18,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 108.24,
+      "y": 130.95,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 110.54,
+      "y": 130.71,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 112.58,
+      "y": 130.51,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 114.62,
+      "y": 130.3,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 116.66,
+      "y": 130.09,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 118.7,
+      "y": 129.89,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 120.75,
+      "y": 129.68,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 122.8,
+      "y": 129.47,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 127.09,
+      "y": 128.94,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 129.22,
+      "y": 128.68,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 131.36,
+      "y": 128.42,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 133.5,
+      "y": 128.16,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 135.65,
+      "y": 127.9,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 137.88,
+      "y": 127.58,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 140.12,
+      "y": 127.27,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 142.35,
+      "y": 126.96,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 144.57,
+      "y": 126.65,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 146.81,
+      "y": 126.34,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 149.04,
+      "y": 126.02,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 151.04,
+      "y": 125.71,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 153.04,
+      "y": 125.39,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 173.38,
+      "y": 122.04,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 175.48,
+      "y": 121.68,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 177.59,
+      "y": 121.31,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 179.8,
+      "y": 120.75,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 182.0,
+      "y": 120.18,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 186.36,
+      "y": 119.05,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 188.57,
+      "y": 118.48,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 190.78,
+      "y": 117.91,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 192.76,
+      "y": 117.19,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 194.74,
+      "y": 116.46,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 196.68,
+      "y": 115.75,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 198.61,
+      "y": 115.04,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 200.6,
+      "y": 114.31,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 202.58,
+      "y": 113.59,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 204.66,
+      "y": 112.54,
+      "r": 0,
+      "v": 0,
+      "width": 2.8,
+      "depth": 1.8,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 206.73,
+      "y": 111.5,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 208.77,
+      "y": 110.48,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 210.85,
+      "y": 109.43,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 214.73,
+      "y": 107.15,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 216.53,
+      "y": 105.92,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 218.28,
+      "y": 104.72,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 220.03,
+      "y": 103.52,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 221.78,
+      "y": 102.32,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 223.97,
+      "y": 100.82,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 226.16,
+      "y": 99.32,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 228.35,
+      "y": 97.82,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "rampart",
+      "x": 230.53,
+      "y": 96.32,
+      "r": 0,
+      "v": 0,
+      "width": 2.3,
+      "depth": 2.3,
+      "color": "#d7d3bc",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "tower",
+      "x": 155.61,
+      "y": 125.3,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.4,
+      "color": "#4a7a9a",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "tower",
+      "x": 170.52,
+      "y": 122.34,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.4,
+      "color": "#4a7a9a",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "tower",
+      "x": 124.94,
+      "y": 129.21,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.4,
+      "color": "#4a7a9a",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "tower",
+      "x": 184.18,
+      "y": 119.61,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.4,
+      "color": "#4a7a9a",
+      "label": "",
+      "layout": "shape_v1"
+    },
+    {
+      "kind": "tower",
+      "x": 212.93,
+      "y": 108.38,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.4,
+      "color": "#4a7a9a",
+      "label": "",
+      "layout": "shape_v1"
     }
   ],
   "slimes": [
@@ -42614,8 +43278,8 @@
       "name": "Skaldholm",
       "r": 2.0,
       "to": 4,
-      "x": 162.5,
-      "y": 127.5,
+      "x": 161.5,
+      "y": 124.5,
       "tx": 80.0,
       "ty": 148.5,
       "walk": [
@@ -42868,11 +43532,11 @@
     ],
     [
       [
-        162.5,
-        127.5
+        161.5,
+        124.5
       ],
       [
-        162.5,
+        161.5,
         134.5
       ],
       [
@@ -43129,68 +43793,32 @@
         ],
         [
           [
-            47.5,
-            298.5
+            6.5,
+            212.5
           ],
           [
-            85.5,
-            298.5
+            6.5,
+            213.5
           ],
           [
-            85.5,
-            296.5
+            33.5,
+            213.5
           ],
           [
-            103.5,
-            296.5
+            33.5,
+            212.5
           ],
           [
-            103.5,
-            290.5
+            80.5,
+            212.5
           ],
           [
-            119.5,
-            290.5
-          ],
-          [
-            119.5,
-            289.5
-          ],
-          [
-            139.5,
-            289.5
-          ],
-          [
-            139.5,
-            288.5
-          ],
-          [
-            153.5,
-            288.5
-          ],
-          [
-            153.5,
-            264.5
-          ],
-          [
-            154.5,
-            264.5
-          ],
-          [
-            154.5,
-            242.5
-          ],
-          [
-            155.5,
-            242.5
-          ],
-          [
-            155.5,
-            218.5
+            80.5,
+            211.5
           ],
           [
             156.5,
-            218.5
+            211.5
           ],
           [
             156.5,
@@ -53605,14 +54233,6 @@
           "y": 253.87,
           "r": 0.4,
           "v": 1,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "rock",
-          "x": 14.26,
-          "y": 234.45,
-          "r": 0.4,
-          "v": 2,
           "layout": "shape_v1"
         },
         {
@@ -76125,6 +76745,714 @@
           "width": 3,
           "depth": 7,
           "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 61.2,
+          "y": 334.45,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 60.08,
+          "y": 332.01,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 58.95,
+          "y": 329.58,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 57.95,
+          "y": 327.41,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 56.95,
+          "y": 325.24,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 55.94,
+          "y": 323.06,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 54.99,
+          "y": 321.13,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 54.03,
+          "y": 319.19,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 53.07,
+          "y": 317.27,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 52.12,
+          "y": 315.34,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 51.19,
+          "y": 313.55,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 50.26,
+          "y": 311.77,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 49.33,
+          "y": 310.0,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 47.47,
+          "y": 306.44,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 46.38,
+          "y": 304.42,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 45.29,
+          "y": 302.4,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 44.2,
+          "y": 300.39,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 43.11,
+          "y": 298.37,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 42.02,
+          "y": 296.35,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 40.98,
+          "y": 294.47,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 39.94,
+          "y": 292.6,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 38.9,
+          "y": 290.72,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 37.86,
+          "y": 288.85,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 36.83,
+          "y": 286.99,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 35.8,
+          "y": 285.13,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 34.81,
+          "y": 283.17,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 32.84,
+          "y": 279.22,
+          "r": 0,
+          "v": 0,
+          "width": 2.3,
+          "depth": 2.3,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 31.85,
+          "y": 277.24,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 30.87,
+          "y": 275.28,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 29.89,
+          "y": 273.31,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 28.95,
+          "y": 271.25,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 28.02,
+          "y": 269.18,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 27.08,
+          "y": 267.09,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 26.15,
+          "y": 265.01,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 25.21,
+          "y": 262.94,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 24.28,
+          "y": 260.87,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 23.53,
+          "y": 259.01,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 22.78,
+          "y": 257.15,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 22.02,
+          "y": 255.28,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 20.5,
+          "y": 251.53,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 19.75,
+          "y": 249.67,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 18.99,
+          "y": 247.81,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 18.28,
+          "y": 245.85,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 17.58,
+          "y": 243.9,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 16.86,
+          "y": 241.94,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 16.15,
+          "y": 239.97,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 15.43,
+          "y": 238.0,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 14.72,
+          "y": 236.04,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 14.0,
+          "y": 234.07,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 13.25,
+          "y": 232.01,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 12.5,
+          "y": 229.95,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 11.75,
+          "y": 227.89,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 11.0,
+          "y": 225.83,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 10.25,
+          "y": 223.76,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 9.1,
+          "y": 220.6,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 3.91,
+          "y": 206.31,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 48.4,
+          "y": 308.22,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 33.83,
+          "y": 281.2,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 21.26,
+          "y": 253.4,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
         }
       ],
       "slimes": [
@@ -77124,12 +78452,6 @@
         {
           "x": 96.66,
           "y": 203.68,
-          "kind": "wisp",
-          "layout": "shape_v1"
-        },
-        {
-          "x": 26.44,
-          "y": 259.4,
           "kind": "wisp",
           "layout": "shape_v1"
         },
@@ -78375,8 +79697,8 @@
           "name": "Skaldholm",
           "r": 2.0,
           "to": 4,
-          "x": 47.5,
-          "y": 298.5,
+          "x": 6.5,
+          "y": 212.5,
           "tx": 148.5,
           "ty": 76.0,
           "walk": [
@@ -78575,12 +79897,16 @@
           "portal": "path_1_4",
           "points": [
             [
-              47.5,
-              298.5
+              6.5,
+              212.5
             ],
             [
-              65.5,
-              298.5
+              6.5,
+              213.5
+            ],
+            [
+              23.5,
+              213.5
             ]
           ]
         },
@@ -78782,68 +80108,32 @@
         ],
         [
           [
-            47.5,
-            298.5
+            6.5,
+            212.5
           ],
           [
-            85.5,
-            298.5
+            6.5,
+            213.5
           ],
           [
-            85.5,
-            296.5
+            33.5,
+            213.5
           ],
           [
-            103.5,
-            296.5
+            33.5,
+            212.5
           ],
           [
-            103.5,
-            290.5
+            80.5,
+            212.5
           ],
           [
-            119.5,
-            290.5
-          ],
-          [
-            119.5,
-            289.5
-          ],
-          [
-            139.5,
-            289.5
-          ],
-          [
-            139.5,
-            288.5
-          ],
-          [
-            153.5,
-            288.5
-          ],
-          [
-            153.5,
-            264.5
-          ],
-          [
-            154.5,
-            264.5
-          ],
-          [
-            154.5,
-            242.5
-          ],
-          [
-            155.5,
-            242.5
-          ],
-          [
-            155.5,
-            218.5
+            80.5,
+            211.5
           ],
           [
             156.5,
-            218.5
+            211.5
           ],
           [
             156.5,
@@ -81057,6 +82347,17 @@
         "                                                                               AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHHHH                                                                                                                                           ",
         "                                                                                    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHHH                                                                                                                                             ",
         "                                                                                         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHH                                                                                                                                              "
+      ],
+      "exitArches": [
+        {
+          "x": 5.0,
+          "y": 214.0,
+          "vertical": true,
+          "halfWidth": 5.9,
+          "towers": true,
+          "portal": "path_1_4",
+          "name": "Skaldholm"
+        }
       ]
     },
     {
@@ -88678,15 +89979,11 @@
         ],
         [
           [
-            242.5,
-            119.5
+            244.5,
+            141.5
           ],
           [
-            241.5,
-            119.5
-          ],
-          [
-            241.5,
+            244.5,
             172.5
           ],
           [
@@ -94001,30 +95298,6 @@
         },
         {
           "kind": "thicket",
-          "x": 245.08,
-          "y": 99.79,
-          "r": 1.3,
-          "v": 0,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 246.45,
-          "y": 99.94,
-          "r": 1.3,
-          "v": 3,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 248.22,
-          "y": 100.11,
-          "r": 1.3,
-          "v": 1,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "thicket",
           "x": 113.75,
           "y": 155.77,
           "r": 1.3,
@@ -94493,14 +95766,6 @@
           "y": 218.91,
           "r": 0.42,
           "v": 0,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 244.31,
-          "y": 118.61,
-          "r": 0.42,
-          "v": 2,
           "layout": "shape_v1"
         },
         {
@@ -95029,14 +96294,6 @@
           "y": 55.94,
           "r": 0.42,
           "v": 1,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 248.61,
-          "y": 84.23,
-          "r": 0.42,
-          "v": 2,
           "layout": "shape_v1"
         },
         {
@@ -95685,14 +96942,6 @@
           "y": 116.63,
           "r": 0.42,
           "v": 3,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 252.18,
-          "y": 68.42,
-          "r": 0.42,
-          "v": 0,
           "layout": "shape_v1"
         },
         {
@@ -97089,14 +98338,6 @@
         },
         {
           "kind": "rock",
-          "x": 251.33,
-          "y": 77.1,
-          "r": 0.4,
-          "v": 2,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "rock",
           "x": 97.44,
           "y": 65.29,
           "r": 0.4,
@@ -97281,14 +98522,6 @@
         },
         {
           "kind": "spire",
-          "x": 247.83,
-          "y": 91.95,
-          "r": 0.55,
-          "v": 2,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "spire",
           "x": 145.32,
           "y": 205.61,
           "r": 0.55,
@@ -97437,14 +98670,6 @@
           "y": 121.52,
           "r": 0.55,
           "v": 2,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "spire",
-          "x": 244.3,
-          "y": 127.43,
-          "r": 0.55,
-          "v": 0,
           "layout": "shape_v1"
         },
         {
@@ -121693,6 +122918,582 @@
           "width": 4,
           "depth": 1,
           "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 254.28,
+          "y": 68.63,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 253.83,
+          "y": 71.01,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 253.37,
+          "y": 73.39,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 252.96,
+          "y": 75.53,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 252.54,
+          "y": 77.66,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 252.13,
+          "y": 79.8,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 251.72,
+          "y": 81.94,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 251.31,
+          "y": 84.08,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 250.91,
+          "y": 86.11,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 250.52,
+          "y": 88.14,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 250.13,
+          "y": 90.18,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 249.73,
+          "y": 92.21,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 249.34,
+          "y": 94.25,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 248.54,
+          "y": 98.36,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 248.25,
+          "y": 100.52,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 247.96,
+          "y": 102.68,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 247.68,
+          "y": 104.81,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 247.39,
+          "y": 106.94,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 247.11,
+          "y": 109.08,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 246.82,
+          "y": 111.24,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 246.53,
+          "y": 113.39,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 246.35,
+          "y": 115.65,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 246.17,
+          "y": 117.9,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.99,
+          "y": 120.13,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.82,
+          "y": 122.36,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.64,
+          "y": 124.6,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.28,
+          "y": 129.1,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.22,
+          "y": 131.16,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.16,
+          "y": 133.22,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.09,
+          "y": 135.26,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 244.93,
+          "y": 156.15,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 244.96,
+          "y": 158.27,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 244.99,
+          "y": 160.4,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.02,
+          "y": 162.52,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.05,
+          "y": 164.65,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.08,
+          "y": 166.77,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.12,
+          "y": 168.9,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.15,
+          "y": 171.02,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.18,
+          "y": 173.15,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.21,
+          "y": 175.27,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.24,
+          "y": 177.4,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.28,
+          "y": 179.52,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.31,
+          "y": 181.65,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "rampart",
+          "x": 245.34,
+          "y": 183.77,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 2.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 245.06,
+          "y": 137.85,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 244.5,
+          "y": 153.03,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 248.94,
+          "y": 96.3,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "tower",
+          "x": 245.46,
+          "y": 126.85,
+          "r": 0,
+          "v": 0,
+          "width": 3.4,
+          "depth": 3.4,
+          "color": "#4a7a9a",
+          "label": "",
+          "layout": "shape_v1"
         }
       ],
       "slimes": [
@@ -122958,8 +124759,8 @@
           "name": "Skaldholm",
           "r": 2.0,
           "to": 4,
-          "x": 242.5,
-          "y": 119.5,
+          "x": 244.5,
+          "y": 141.5,
           "tx": 11.5,
           "ty": 76.0,
           "walk": [
@@ -123019,16 +124820,20 @@
           "portal": "path_3_4",
           "points": [
             [
-              242.5,
-              119.5
+              244.5,
+              141.5
+            ],
+            [
+              244.5,
+              150.5
             ],
             [
               241.5,
-              119.5
+              150.5
             ],
             [
               241.5,
-              136.5
+              156.5
             ]
           ]
         }
@@ -123083,15 +124888,11 @@
         ],
         [
           [
-            242.5,
-            119.5
+            244.5,
+            141.5
           ],
           [
-            241.5,
-            119.5
-          ],
-          [
-            241.5,
+            244.5,
             172.5
           ],
           [
@@ -124365,6 +126166,17 @@
         "                                                                                                                                             cccccccccccccccAAAAAAAAAAAAAA                                                                                                              ",
         "                                                                                                                                               ccccccccccccAAAAAAAAAAAAAA                                                                                                               ",
         "                                                                                                                                                ccccccccccAAAAAAAAAAAAAA                                                                                                                "
+      ],
+      "exitArches": [
+        {
+          "x": 246.38,
+          "y": 145.5,
+          "vertical": true,
+          "halfWidth": 5.9,
+          "towers": true,
+          "portal": "path_3_4",
+          "name": "Skaldholm"
+        }
       ]
     },
     {
@@ -134281,8 +136093,8 @@
           "to": 0,
           "x": 80.0,
           "y": 154.5,
-          "tx": 163.3691529132527,
-          "ty": 133.43671400805061,
+          "tx": 163.64473339013483,
+          "ty": 130.10358088058348,
           "walk": [
             0,
             1
@@ -134295,8 +136107,8 @@
           "to": 1,
           "x": 154.5,
           "y": 76.0,
-          "tx": 52.93951898523293,
-          "ty": 295.9678797008652,
+          "tx": 10.742640687119286,
+          "ty": 208.2573593128807,
           "walk": [
             1,
             0
@@ -134309,8 +136121,8 @@
           "to": 3,
           "x": 5.5,
           "y": 76.0,
-          "tx": 236.51109191698725,
-          "ty": 119.13533580759173,
+          "tx": 238.50447723185275,
+          "ty": 141.7317471394171,
           "walk": [
             -1,
             0
@@ -506343,11 +508155,11 @@
       "portal": "path_0_4",
       "points": [
         [
-          162.5,
-          127.5
+          161.5,
+          124.5
         ],
         [
-          162.5,
+          161.5,
           134.5
         ],
         [
@@ -506356,7 +508168,7 @@
         ],
         [
           165.5,
-          142.5
+          138.5
         ]
       ]
     }
@@ -506411,11 +508223,11 @@
   "atlasPaths": [
     [
       [
-        162.5,
-        127.5
+        161.5,
+        124.5
       ],
       [
-        162.5,
+        161.5,
         134.5
       ],
       [
@@ -509112,5 +510924,16 @@
     "                                                                                                                                                                                                                                                                                                                                                                                                                                        ",
     "                                                                                                                                                                                                                                                                                                                                                                                                                                        ",
     "                                                                                                                                                                                                                                                                                                                                                                                                                                        "
+  ],
+  "exitArches": [
+    {
+      "x": 162.75,
+      "y": 122.25,
+      "vertical": false,
+      "halfWidth": 5.9,
+      "towers": true,
+      "portal": "path_0_4",
+      "name": "Skaldholm"
+    }
   ]
 }
