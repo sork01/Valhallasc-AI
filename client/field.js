@@ -183,7 +183,7 @@
     for (let k = 0; k < n - 1; k++) d = Math.min(d, segDist(x, y, P[2 * k], P[2 * k + 1], P[2 * k + 2], P[2 * k + 3]));
     return d;
   }
-  const ownWallNear = (x, y) => (zdef.objects || []).some(o => o.layout === 'shape_v1' && WALL_KINDS.has(o.kind) && Math.hypot(o.x - x, o.y - y) < 6);
+  const ownWallNear = (x, y) => (zdef.objects || []).some(o => o.layout === 'shape_v1' && WALL_KINDS.has(o.kind) && Math.hypot(o.x - x, o.y - y) < 2.5);
   function vaultGhosts(R, sources) {
     const T = ZONES[R.to], set = ghostSetFor(T.theme), out = [];
     for (const src of sources) for (const o of src || []) {
@@ -191,7 +191,8 @@
       const gx = o.x - R.shift[0], gy = o.y - R.shift[1];
       // Skaldholm's own wall is the wall: the shaped zone's ramparts stand exactly on it, so the city's wall is drawn from the other side only where
       // this zone has none of its own (past the ends of its run); and the shaped zone's ramparts are drawn in the city only beyond the city's square.
-      if (WALL_KINDS.has(o.kind) && T.theme === 'city' ? !(distToLine(R, gx, gy) <= 5 && !ownWallNear(gx, gy)) && !(inRegion(R, gx, gy) && distToLine(R, gx, gy) > 5) : !inRegion(R, gx, gy)) continue;
+      const wall = WALL_KINDS.has(o.kind);
+      if (wall && T.theme === 'city' ? !(distToLine(R, gx, gy) <= 5 && !ownWallNear(gx, gy)) && !(inRegion(R, gx, gy) && distToLine(R, gx, gy) > 5) : wall && R.hide ? !inPoly(R.other, gx, gy) || inSquare(gx, gy) : !inRegion(R, gx, gy)) continue;
       out.push({ ...o, x: gx, y: gy, ghostSet: set });
     }
     return out;
@@ -204,8 +205,9 @@
   }
   const WALL_KINDS = new Set(['rampart', 'tower', 'wall']);
   // A region never reaches into the city's own walls: the neighbours' borders lean across the city's square, but inside Skaldholm the city is the city.
-  const inCityWalls = (R, x, y) => !!R.hide && !!zdef.city && x >= zdef.city.x0 - 1.5 && x <= zdef.city.x1 + 1.5 && y >= zdef.city.y0 - 1.5 && y <= zdef.city.y1 + 1.5;   // (the city's own wall stands 1 tile outside its square)
-  const inRegion = (R, x, y) => inPoly(R.other, x, y) && !inCityWalls(R, x, y);
+  const inSquare = (x, y) => !!zdef.city && x >= zdef.city.x0 - 1.5 && x <= zdef.city.x1 + 1.5 && y >= zdef.city.y0 - 1.5 && y <= zdef.city.y1 + 1.5;   // (the city's own wall stands 1 tile outside its square)
+  const pastWall = (R, x, y) => (x - R.arch.x) * R.walk[0] + (y - R.arch.y) * R.walk[1] >= 1.5;      // beyond the straight wall this vault stands in
+  const inRegion = (R, x, y) => inPoly(R.other, x, y) && (!R.hide || (!inSquare(x, y) && pastWall(R, x, y)));
   // Our own scenery where the other zone owns the ground (Skaldholm outside its wall), and the city's own wall beside the line, is not drawn.
   function ownHidden(o) {
     for (const R of map.vregs) if (R.hide && inRegion(R, o.x, o.y)) return true;
@@ -234,7 +236,7 @@
       } else {
         const T = ZONES[p.to], q = (T.portals || []).find(x => x.to === zone && x.vault); if (!q || !T.shape?.vaultRegions) continue;
         const mv = (P) => { const o = P.slice(); for (let i = 0; i < o.length; i += 2) { o[i] += q.vault[0]; o[i + 1] += q.vault[1]; } return o; };
-        for (const r of T.shape.vaultRegions) if (r.to === zone) out.push({ to: p.to, shift: p.vault, other: mv(r.land), strip: mv(r.strip), hide: true });
+        for (const r of T.shape.vaultRegions) if (r.to === zone) out.push({ to: p.to, shift: p.vault, other: mv(r.land), strip: mv(r.strip), hide: true, walk: p.walk, arch: (zdef.exitArches || []).find(a => a.portal === p.id) });
       }
     }
     return out;
@@ -332,7 +334,7 @@
     c.chunks.set(k, ch); return ch;
   }
   // The neighbour's ground in this zone's frame (its cell = ours + shift), for the part of the screen beyond the border.
-  function drawNeighbourGround(g, c, shift, cx, cy, sxo, syo) {
+  function drawNeighbourGround(g, c, shift, cx, cy, sxo, syo, wanted) {
     const [shx, shy] = shift, cs = [s2w(0, 0), s2w(VW, 0), s2w(0, VH), s2w(VW, VH)];
     const x0 = Math.min(...cs.map(q => q[0])) + shx - 2, x1 = Math.max(...cs.map(q => q[0])) + shx + 2, y0 = Math.min(...cs.map(q => q[1])) + shy - 2, y1 = Math.max(...cs.map(q => q[1])) + shy + 2, n = c.MAP / CH, out = [];
     for (let by = clamp(Math.floor(y0 / CH), 0, n - 1); by <= clamp(Math.floor(y1 / CH), 0, n - 1); by++) for (let bx = clamp(Math.floor(x0 / CH), 0, n - 1); bx <= clamp(Math.floor(x1 / CH), 0, n - 1); bx++) out.push([bx, by]);
@@ -340,11 +342,13 @@
     for (const [bx, by] of out) {
       const G = chunkGeom(bx, by), dx = G.ox - (shx - shy) * TW / 2 - cx + VW / 2 + sxo, dy = G.oy - (shx + shy) * TH / 2 - cy + VH / 2 + syo;
       if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;
-      const ch = neighbourChunk(c, bx, by); if (ch) g.drawImage(ch.c, dx, dy, G.w, G.h);
+      if (wanted && !wanted(bx, by)) continue;      // a clipped region: never render a chunk nothing of it will show
+      const ch = neighbourChunk(c, bx, by); if (ch) { g.drawImage(ch.c, dx, dy, G.w, G.h); c.usedAt = performance.now(); }
     }
   }
   function setZone(z) {
     miniFade = null;
+    { const left = ctxs.get(zone); if (left) left.usedAt = performance.now(); }     // the zone you leave is still on screen: keep its ground
     zone = ZONES[z] ? z : 0;
     adoptCtx(ctxFor(zone));
     // Neighbours across a seam keep a context too, built now so their ground is ready to draw beside the border and to swap
@@ -4295,14 +4299,20 @@
     for (const R of map.vregs || []) {      // what the other zone owns beyond the wall line: its ground, clipped to that region (never over our own land)
       const nc = ctxs.get(R.to); if (!nc) continue;
       g.save();
-      if (R.hide && zdef.city) {      // never over the city's own square: clip to everything outside it first
-        const c = zdef.city; g.beginPath(); g.rect(0, 0, VW, VH);
-        [[c.x0, c.y0], [c.x1, c.y0], [c.x1, c.y1], [c.x0, c.y1]].forEach(([x, y], i) => { const [sx, sy] = w2s(x, y); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); }); g.closePath(); g.clip('evenodd');
+      if (R.hide && R.arch) {      // only beyond the straight wall this vault stands in, never over the city
+        const [wx, wy] = R.walk, ax = R.arch.x, ay = R.arch.y, far = 2000; g.beginPath();
+        [[-wy * far, wx * far], [wy * far, -wx * far], [wy * far + wx * far, -wx * far + wy * far], [-wy * far + wx * far, wx * far + wy * far]].forEach(([dx, dy], i) => { const [sx, sy] = w2s(ax + dx, ay + dy); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); }); g.closePath(); g.clip();
       }
       g.beginPath(); for (let i = 0; i < R.other.length; i += 2) { const [sx, sy] = w2s(R.other[i], R.other[i + 1]); i ? g.lineTo(sx, sy) : g.moveTo(sx, sy); } g.closePath(); g.clip();
       if (R.hide && !zdef.shapeFloor) { g.fillStyle = ZONES[R.to].theme === 'ember' ? '#0c0605' : SEA_COLOR; g.fillRect(0, 0, VW, VH); }   // our own ground there is not theirs: open water where they have none
-      drawNeighbourGround(g, nc, R.shift, cx, cy, sxo, syo); g.restore();
+      drawNeighbourGround(g, nc, R.shift, cx, cy, sxo, syo, (bx, by) => {
+        const x0 = bx * CH - R.shift[0], y0 = by * CH - R.shift[1];
+        return [[0, 0], [CH, 0], [0, CH], [CH, CH], [CH / 2, CH / 2]].some(([a, b]) => inPoly(R.other, x0 + a, y0 + b) && (!R.hide || !R.arch || (x0 + a - R.arch.x) * R.walk[0] + (y0 + b - R.arch.y) * R.walk[1] >= -CH));
+      }); g.restore();
     }
+    // A neighbour's ground canvases are released a few seconds after the last one was drawn (walked away from that border): they are the
+    // biggest thing the client holds, and they come back chunk by chunk as they reach the screen.
+    { const now = performance.now(); for (const [k, cc] of ctxs) if (k !== zone && cc.chunks.size && now - (cc.usedAt || 0) > 4000) { for (const { c } of cc.chunks.values()) { c.width = 1; c.height = 1; } cc.chunks.clear(); } }
     g.imageSmoothingEnabled = true;
     if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge' || zdef.theme === 'ember') {
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());

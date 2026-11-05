@@ -971,16 +971,18 @@ def vault_regions(runs, land_probe, land=None):
     return out
 
 
-def axis_wall(rows, run, axis, c):
+def axis_wall(rows, run, axis, c, lim=None):
     """The wall line is the straight axis-aligned line `axis` = c (the city's own wall is straight): along the run's extent the floor is
     cut to it, and the land between it and the old border fills in. Returns (floor, lost)."""
     n = len(rows)
     old = np.array([[ch == '#' for ch in row] for row in rows])
     if axis == 'y':
-        new, lost = axis_wall([''.join('#' if v else ' ' for v in col) for col in old.T], [(q[1], q[0]) for q in run], 'x', c)
+        new, lost = axis_wall([''.join('#' if v else ' ' for v in col) for col in old.T], [(q[1], q[0]) for q in run], 'x', c, lim)
         return new.T, lost.T
     pts = [tuple(q) for q in run]
     y0, y1 = min(q[1] for q in pts), max(q[1] for q in pts)
+    if lim:
+        y0, y1 = max(y0, lim[0]), min(y1, lim[1])
     band = old[max(0, int(y0)):min(n, int(y1) + 1)]
     east, west = int(band[:, int(c) + 1:].sum()), int(band[:, :int(c)].sum())
     inland = 1 if east >= west else -1        # the land is on the side that holds more of it
@@ -1079,10 +1081,36 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
                     t = max(0., min(1., ((gx_ - a[0]) * dx + (gy_ - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9)))
                     feet_.append((a[0] + t * dx, a[1] + t * dy))
                 qf = min(feet_, key=lambda p_: math.dist(p_, (gx_, gy_)))
-                c_ = round(qf[0] if axis == 'x' else qf[1], 2)
-                ys_ = [q[1] if axis == 'x' else q[0] for q in longest]
-                simp = [[(c_, min(ys_)), (c_, max(ys_))] if axis == 'x' else [(min(ys_), c_), (max(ys_), c_)]]
-                floor_now, lost = axis_wall(z['shapeFloor'], longest, axis, c_)
+                ai = 0 if axis == 'x' else 1            # the coordinate that is constant along the wall
+                bi = 1 - ai
+                c_ = round(qf[ai], 2)
+                band_ = orig_floor if axis == 'x' else orig_floor.T
+                rows_ = band_[max(0, int(min(q[bi] for q in longest))):int(max(q[bi] for q in longest)) + 1]
+                inland = 1 if rows_[:, int(c_) + 1:].sum() >= rows_[:, :int(c_)].sum() else -1
+                # the city's own corners in this frame: where its wall turns away, ours turns with it (and the land past the corner stays)
+                cb = city['city']
+                off = (carch['x'], carch['y'])[bi] - qf[bi]
+                lo_c, hi_c = ((cb['y0'] - 1, cb['y1'] + 1) if axis == 'x' else (cb['x0'] - 1, cb['x1'] + 1))
+                lo_c, hi_c = lo_c - off, hi_c - off
+                def across_at(v):
+                    for a_, b_ in zip(longest, longest[1:]):
+                        if (a_[bi] - v) * (b_[bi] - v) <= 0 and a_[bi] != b_[bi]:
+                            return a_[ai] + (b_[ai] - a_[ai]) * (v - a_[bi]) / (b_[bi] - a_[bi])
+                    return None
+                ends = sorted(longest, key=lambda q: q[bi])
+                e_lo, e_hi = min(longest, key=lambda q: q[bi]), max(longest, key=lambda q: q[bi])
+                pt = lambda across, along: (across, along) if axis == 'x' else (along, across)
+                lo, hi = e_lo[bi], e_hi[bi]
+                head, tail = [], []
+                if inland * (e_lo[ai] - c_) < -3 and lo < lo_c + 1.2:
+                    lo = lo_c + 1.2
+                    head = [pt(across_at(lo), lo)]
+                if inland * (e_hi[ai] - c_) < -3 and hi > hi_c - 1.2:
+                    hi = hi_c - 1.2
+                    tail = [pt(across_at(hi), hi)]
+                lo, hi = round(lo, 2), round(hi, 2)
+                simp = [head + [pt(c_, lo), pt(c_, hi)] + tail]
+                floor_now, lost = axis_wall(z['shapeFloor'], longest, axis, c_, (lo, hi))
             else:
                 floor_now, lost = straighten(z['shapeFloor'], runs, simp, WALL_TOL)
             assert not any(lost[int(o['y']), int(o['x'])] for k in ('npcs', 'places', 'crosses') for o in z.get(k, [])), f'zone {i}: a straight wall would cut off an NPC, place or cross'
@@ -1111,7 +1139,41 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
                 for sgn in (-1, 1):
                     towers.append((A[0] + px * sgn * (hw + 1.7), A[1] + py * sgn * (hw + 1.7)))
             flank = list(towers)
-            for r in runs:
+            if axis:
+                # The wall IS the city's wall: its own pieces, copied into this frame (same art, same place, real collision), and generated
+                # ramparts only where the city has no wall (past its corners).
+                sx_, sy_ = carch['x'] - A[0], carch['y'] - A[1]
+                def line_dist(x, y):
+                    best = 1e9
+                    for r in runs:
+                        for a_, b_ in zip(r, r[1:]):
+                            dx, dy = b_[0] - a_[0], b_[1] - a_[1]
+                            t = max(0., min(1., ((x - a_[0]) * dx + (y - a_[1]) * dy) / max(dx * dx + dy * dy, 1e-9)))
+                            best = min(best, math.hypot(x - a_[0] - t * dx, y - a_[1] - t * dy))
+                    return best
+                copies = [dict(o, x=round(o['x'] - sx_, 2), y=round(o['y'] - sy_, 2), layout=TAG) for o in city['objects']
+                          if o['kind'] in ('rampart', 'tower') and line_dist(o['x'] - sx_, o['y'] - sy_) <= 2.2]
+                adds.extend(o for o in copies if o['kind'] == 'rampart')
+                ctow = [(o['x'], o['y']) for o in copies if o['kind'] == 'tower']
+                towers = ctow + [t for t in towers if not any(math.dist(t, q_) < 2 for q_ in ctow)]
+                covered = lambda x, y: any(abs(x - o['x']) <= o['width'] / 2 + .9 and abs(y - o['y']) <= o['depth'] / 2 + .9 for o in copies)
+                for r in runs:
+                    for a_, b_ in zip(r, r[1:]):
+                        ln = math.dist(a_, b_) or 1e-9
+                        tx, ty = (b_[0] - a_[0]) / ln, (b_[1] - a_[1]) / ln
+                        mx, my = (a_[0] + b_[0]) / 2, (a_[1] + b_[1]) / 2
+                        nx, ny = -ty, tx
+                        if not on(mx + nx * 4, my + ny * 4):
+                            nx, ny = -nx, -ny
+                        run_len = 0.
+                        for k in range(1, int(ln / WALL_STEP)):
+                            cx, cy = a_[0] + tx * k * WALL_STEP + nx * wall_in, a_[1] + ty * k * WALL_STEP + ny * wall_in
+                            run_len += WALL_STEP
+                            if math.dist((cx, cy), A) <= hw + 1.9 or any(math.dist(t, (cx, cy)) < 2.2 for t in towers) or covered(cx, cy):
+                                continue
+                            w, d = (2.8, 1.8) if abs(tx) >= abs(ty) else (1.8, 2.8)
+                            adds.append(dict(kind='rampart', x=round(cx, 2), y=round(cy, 2), r=0, v=0, width=w, depth=d, color='#d7d3bc', label='', layout=TAG))
+            for r in ([] if axis else runs):
                 pts = []
                 for u, v in zip(r, r[1:]):
                     steps = max(1, int(math.dist(u, v) / WALL_STEP))

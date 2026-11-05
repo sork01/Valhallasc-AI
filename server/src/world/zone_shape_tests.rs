@@ -258,7 +258,12 @@ fn skaldholms_wall_runs_along_its_borders_and_the_vault_is_open() {
             .iter()
             .filter(|o| o["kind"] == "rampart" || o["kind"] == "tower")
             .collect();
-        assert!(pieces.len() >= 40, "zone {zone}: only {} wall pieces", pieces.len());
+        // (measured in tiles: the wall is Skaldholm's own long pieces, copied, so a piece count says little)
+        let length: f64 = pieces
+            .iter()
+            .map(|o| o["width"].as_f64().unwrap().max(o["depth"].as_f64().unwrap()))
+            .sum();
+        assert!(length >= 80., "zone {zone}: only {length:.0} tiles of wall");
         let arch = z["exitArches"]
             .as_array()
             .and_then(|a| a.iter().find(|e| e["name"] == "Skaldholm"))

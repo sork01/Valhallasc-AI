@@ -38,6 +38,17 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const where = () => page.evaluate(() => ({ zone: Field.zone, x: Field.hero.nx, y: Field.hero.ny }));
   // The meadow/Crags border geometry, shared by both parts.
 
+  // SHOTS=zone:x:y,... only takes screenshots at those places (for looking at walls), then stops.
+  if (process.env.SHOTS) {
+    for (const [zone, x, y] of process.env.SHOTS.split(',').map(v => v.split(':').map(Number))) {
+      await debug({ op: 'teleport', zone, x, y });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, x, y], { timeout: 20000 }).catch(() => console.log('no arrival', zone, x, y));
+      await page.waitForTimeout(2500);
+      await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+      await page.screenshot({ path: path.join(out, `shot-${zone}-${x}-${y}.png`) });
+    }
+    return;
+  }
   const snap = async (zone, x, y) => {
     await debug({ op: 'teleport', zone, x, y });
     await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 1.5, [zone, x, y], { timeout: 20000 });
@@ -56,13 +67,11 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const diff = (a, b) => { let sum = 0, big = 0, n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
   const save = (name, im) => fs.writeFileSync(path.join(out, name), Buffer.from(im.png.split(',')[1], 'base64'));
   const rows = [];
-  const straightWalls = Object.keys(JSON.parse(fs.readFileSync(path.join(root, 'world/zone-shapes.txt'), 'utf8')).wallAxis || {}).map(Number);
   for (const zone of (process.env.ZONES || '3,0,1').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
     const [wx, wy] = gate.walk, [vx, vy] = gate.vault;
     for (const [s, t] of (process.env.SS || '0:0,-4:14').split(',').map(x => x.split(':').map(Number))) {
       const px = arch.x + wx * s - wy * t, py = arch.y + wy * s + wx * t;       // one world point (t = along the wall), in the zone's frame...
-      if (t !== 0 && !straightWalls.includes(zone)) continue;   // the meadow's wall still leans against Skaldholm's straight one (known gap)
       if (!onLand(zone, px, py)) continue;                      // (the Crags' wall ends at the arch: nothing to stand on beyond it)
       const a = await snap(zone, px, py);                      // ...drawn from this zone,
       const a2 = await snap(zone, px, py);                     // again (the noise floor: animation, timers)

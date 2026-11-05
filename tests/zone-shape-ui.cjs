@@ -267,7 +267,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     });
     for (const zone of [3, 0, 1]) {
       const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
-      check(z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower').length >= 40, `zone ${zone}: Skaldholm's wall runs along the border`);
+      check(z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower').reduce((n, o) => n + Math.max(o.width, o.depth), 0) >= 80, `zone ${zone}: Skaldholm's wall runs along the border`);
       const sx = gate.x - gate.walk[0] * 5.5, sy = gate.y - gate.walk[1] * 5.5;
       await debug({ op: 'teleport', zone, x: sx, y: sy });
       await page.waitForFunction(([zz, x, y]) => Field.zone === zz && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, sx, sy], { timeout: 20000 });
