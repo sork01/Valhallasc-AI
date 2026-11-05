@@ -92,6 +92,28 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     check(await page.evaluate(() => !document.getElementById('area-title').classList.contains('show') && !document.body.innerText.includes('You enter')), `seam crossing ${from} -> ${to}: no zone banner and no "You enter" line`);
     await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
   }
+  // The Moonspore Canopy (zone 16) is shaped too: it shares a seam with the meadow (checked in the real client both ways).
+  {
+    const moon = zoneDef(0).portals.find(p => p.to === 16 && p.seam).seam, mp = moon.points, [mx, my] = moon.shift;
+    const k = Math.floor(mp.length / 2), ma = mp[k], mb = mp[k + 1], ml = Math.hypot(mb[0] - ma[0], mb[1] - ma[1]);
+    const mq = [(ma[0] + mb[0]) / 2, (ma[1] + mb[1]) / 2], mn = [-(mb[1] - ma[1]) / ml, (mb[0] - ma[0]) / ml];
+    const mi = onLand(0, mq[0] + mn[0] * 4, mq[1] + mn[1] * 4) ? mn : [-mn[0], -mn[1]];
+    for (const [from, to, origin, dir] of [[0, 16, mq, mi], [16, 0, [mq[0] + mx, mq[1] + my], [-mi[0], -mi[1]]]]) {
+      const sx = origin[0] + dir[0] * 3, sy = origin[1] + dir[1] * 3;
+      await debug({ op: 'teleport', zone: from, x: sx, y: sy });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [from, sx, sy], { timeout: 20000 });
+      await page.screenshot({ path: path.join(out, `seam-${from}-before-moonspore.png`) });
+      const keys = keysFor([-dir[0], -dir[1]]);
+      for (const key of keys) await page.keyboard.down(key);
+      await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
+      for (const key of keys) await page.keyboard.up(key);
+      await page.waitForTimeout(800);
+      const p = await where();
+      check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+      check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);
+      await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
+    }
+  }
   // Step 2: what lies across the border shows through. A second hero stands on the Crags side with an enemy beside them;
   // the first hero, on the meadow side, sees both (drawn, never targetable) before crossing.
   {
@@ -116,7 +138,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await ctx2.close();
   }
   // The hubs keep their place inside the shifted core: Alderhaven's plaza and Cinderwatch Camp.
-  for (const zone of [0, 1]) {
+  for (const zone of [0, 1, 16]) {
     const c = zoneDef(zone).city;
     await debug({ op: 'teleport', zone, x: c.plaza.x, y: c.plaza.y + 3 });
     await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, c.plaza.x, c.plaza.y + 3], { timeout: 20000 });

@@ -3,7 +3,8 @@
  "k": 0.56116,
  "zones": [
   0,
-  1
+  1,
+  16
  ],
- "note": "Owner-approved 2026-11-05. k = tiles per atlas pixel (median old-area/atlas-area over the 23 provinces). Pilot: zones 0 and 1."
+ "note": "Owner-approved 2026-11-05. k = tiles per atlas pixel (median old-area/atlas-area over the 23 provinces). Pilot: zones 0, 1 and 16 (Moonspore Canopy)."
 }

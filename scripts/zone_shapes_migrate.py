@@ -27,8 +27,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--db', required=True)
     ap.add_argument('--apply', action='store_true')
+    ap.add_argument('--zones', help='comma list: only move characters saved in these zones (already-migrated zones must be left out)')
     args = ap.parse_args()
     off = offsets()
+    if args.zones:
+        keep = {int(v) for v in args.zones.split(',')}
+        off = {k: v for k, v in off.items() if k in keep}
     c = sqlite3.connect(args.db)
     moved = 0
     for id_, state in c.execute('select id, state from characters').fetchall():

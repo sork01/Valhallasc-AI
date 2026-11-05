@@ -52,6 +52,8 @@ ELITE_OR_SCRIPTED = ('big', 'cinderlord', 'ember_firelord', 'es_')
 FILL = {
     0: dict(spawn_sep=5.0, spawn_feature='city_distance', decor=('tree', 'bush', 'rock')),
     1: dict(spawn_sep=7.0, spawn_feature='y', decor=('rock', 'tree', 'bush', 'spire'), rivers=True),
+    16: dict(spawn_sep=5.0, spawn_feature='city_distance', decor=('gloomstalk', 'sporefern', 'moonstone', 'glowmoss', 'mooncaps'),
+         elites=('mireheart', 'silverwidow', 'nightbloom')),
 }
 
 
@@ -502,7 +504,7 @@ def fill_zone(z, view, geom, off, rng):
                 adds.append({'kind': 'lava', 'x': round(float(x), 2), 'y': round(float(yy), 2), 'r': round(rng.uniform(1.25, 1.5), 2),
                              'v': rng.randrange(4), 'layout': TAG})
         existing = existing + adds
-    spawns_old = [s for s in view['slimes'] if not s['kind'].startswith(ELITE_OR_SCRIPTED)]
+    spawns_old = [s for s in view['slimes'] if not s['kind'].startswith(ELITE_OR_SCRIPTED) and s['kind'] not in style.get('elites', ())]
     plaza = city['plaza']
     for k in kinds:
         want = round(count[k] * cell_area / old_free)

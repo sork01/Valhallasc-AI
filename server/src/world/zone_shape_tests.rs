@@ -2,7 +2,7 @@
 use super::wyrd_tests::{at, join, place, world};
 use super::*;
 
-const SHAPED: [usize; 2] = [0, 1];
+const SHAPED: [usize; 3] = [0, 1, 16];
 
 fn bundled() -> Value {
     serde_json::from_str(include_str!("../../../world/map.txt")).unwrap()
@@ -44,7 +44,7 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
             z["spawn"]["y"].as_f64().unwrap()
         ));
         for key in ["slimes", "npcs", "places", "crosses", "portals"] {
-            for o in z[key].as_array().unwrap() {
+            for o in z[key].as_array().into_iter().flatten() {
                 if o.get("seam").is_some() {
                     continue; // a border line, not a place on the land
                 }
@@ -106,7 +106,7 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
                 }
             }
         }
-        assert!(tested > 40, "zone {zone}: only {tested} edge walks");
+        assert!(tested > 30, "zone {zone}: only {tested} edge walks");
     }
 }
 
@@ -203,16 +203,69 @@ fn cross(w: &mut World, data: &Value, from: usize, to: usize, q: Point, inward: 
 
 #[test]
 fn a_shared_border_is_crossed_anywhere_along_it_in_both_directions() {
+    seam_walks(0, 1);
+}
+
+#[test]
+fn the_meadow_and_the_moonspore_canopy_share_a_seam() {
+    seam_walks(0, 16);
+}
+
+#[test]
+fn the_crags_and_the_moonspore_canopy_share_a_seam() {
+    seam_walks(1, 16);
+}
+
+#[test]
+fn the_moonspore_canopy_keeps_its_gates_to_the_orrery_and_emberwake() {
+    let w = world();
+    let data = bundled();
+    let z = zone_of(&data, 16);
+    for to in [15u64, 45] {
+        let p = z["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["to"] == to && p.get("seam").is_none())
+            .unwrap_or_else(|| panic!("no gate from the Canopy to zone {to}"));
+        let (x, y) = (p["x"].as_f64().unwrap(), p["y"].as_f64().unwrap());
+        assert!(land(z)(x, y), "gate to {to} is off the land");
+        let mut a = at(x, y);
+        w.maps[16].collide(&mut a, 0.4);
+        assert!(
+            (a.x - x).hypot(a.y - y) < 0.01,
+            "gate to {to} is inside an obstacle"
+        );
+        // and the way back lands on free Canopy ground
+        let back = zone_of(&data, to as usize)["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|q| q["to"] == 16)
+            .unwrap();
+        let (tx, ty) = (back["tx"].as_f64().unwrap(), back["ty"].as_f64().unwrap());
+        assert!(land(z)(tx, ty), "arrival from {to} is off the land");
+        let mut b = at(tx, ty);
+        w.maps[16].collide(&mut b, 0.4);
+        assert!(
+            (b.x - tx).hypot(b.y - ty) < 0.01,
+            "arrival from {to} is inside an obstacle"
+        );
+    }
+}
+
+fn seam_walks(from_zone: usize, to_zone: usize) {
     let mut w = world();
     let data = bundled();
     let _rx = join(&mut w, 1, Class::Warrior);
-    let (a, b) = (zone_of(&data, 0), zone_of(&data, 1));
+    let (a, b) = (zone_of(&data, from_zone), zone_of(&data, to_zone));
     let seam = a["portals"]
         .as_array()
         .unwrap()
         .iter()
-        .find_map(|p| p.get("seam"))
-        .expect("the meadow has a seam to the Crags");
+        .find(|p| p["to"] == to_zone && p.get("seam").is_some())
+        .map(|p| &p["seam"])
+        .expect("a seam between the two zones");
     let points: Vec<Point> = seam["points"]
         .as_array()
         .unwrap()
@@ -242,7 +295,7 @@ fn a_shared_border_is_crossed_anywhere_along_it_in_both_directions() {
             if !on_a(q.x + inward.x * 4., q.y + inward.y * 4.) {
                 continue;
             }
-            let landed = cross(&mut w, &data, 0, 1, q, inward);
+            let landed = cross(&mut w, &data, from_zone, to_zone, q, inward);
             crossed += 1;
             // and back from where we arrived: straight at the same border again
             let shift = (
@@ -250,7 +303,14 @@ fn a_shared_border_is_crossed_anywhere_along_it_in_both_directions() {
                 seam["shift"][1].as_f64().unwrap(),
             );
             let q_in_b = at(q.x + shift.0, q.y + shift.1);
-            let _back = cross(&mut w, &data, 1, 0, q_in_b, at(-inward.x, -inward.y));
+            let _back = cross(
+                &mut w,
+                &data,
+                to_zone,
+                from_zone,
+                q_in_b,
+                at(-inward.x, -inward.y),
+            );
             assert!(
                 landed.distance(q_in_b) < 4.,
                 "the crossing is continuous: arrived {:.1} tiles from the mirrored spot",

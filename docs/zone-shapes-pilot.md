@@ -1,6 +1,6 @@
-# Zone shapes pilot: Greenmeadow and the Emberfall Crags (branch `feat/zone-shapes`)
+# Zone shapes pilot: Greenmeadow, the Emberfall Crags and the Moonspore Canopy (branch `feat/zone-shapes`)
 
-Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** Owner decisions: `nofloor` scale rule, Asterion unchanged, everything on the atlas eventually (`docs/zone-shapes.md`). This pilot shapes zones 0 and 1 only.
+Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** Owner decisions: `nofloor` scale rule, Asterion unchanged, everything on the atlas eventually (`docs/zone-shapes.md`). This pilot shapes zones 0, 1 and (added 2026-11-05) 16.
 
 ## What changed for the player
 
@@ -8,6 +8,7 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 |---|---|---|
 | Greenmeadow | 96x96 square | 240 grid, outline 236x135 tiles (2.28x area): Gloamfen to the west, Skaldholm north-west, Crags north-east, Moonspore east, coast in the south |
 | Emberfall Crags | 96x96 square | 208 grid, outline 203x195 tiles (3.0x area): eight neighbours, the four lava rivers run on past the old edge |
+| The Moonspore Canopy | 128x128 square | 208 grid, outline 200x205 tiles (2.4x area): west of the Orrery, south-east of the Crags, east of Greenmeadow, Emberwake to the east |
 
 * The **old square is kept as a core**, moved as one block (Greenmeadow by (116, 64), Crags by (43, 59)), so Alderhaven, Cinderwatch Camp, every NPC, quest, spawn and the lava fords are unchanged; new ground around it is filled with scenery, spawns and trail at the old densities (Greenmeadow +319 objects +37 spawns, Crags +463 objects +51 spawns; new spawn kinds follow the old progression: by distance from Alderhaven, by y for the Crags).
 * **The Greenmeadow/Crags border is a seamless seam**: you walk over the line anywhere along its 87 tiles and the server moves you by the border's whole-tile shift to the very same spot of the other zone, with no hop, no banner and no chat line; held keys and the camera carry on. One `Portal` with a `seam` (polyline, shift, side) replaces the gate (`Seam::crossing` in `model.rs`, `use_portal` in `world.rs`); the land runs a 2.4 tile margin past the line so a walker can step over it. Both zones use one tile scale and **integer tile origins** (`shape.T`), so the shift is whole tiles and cells, noise and rasterised borders line up exactly. Borders with zones that are not shaped yet keep one gate each.
@@ -48,3 +49,11 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 - `renderMini()` draws a zone's land once at 4x (transparent outside the outline); `buildMini()` adds the coast shallows. `drawMini()` layers water, each seam neighbour's land (`miniNeighbour`, built from its `ctxFor` context and shifted by `seam.shift`), then this zone's land; each layer gets its own fog of war (`source-atop`, so mist never covers water). Across a seam the neighbour's NPCs and the view-only ghost enemies/players are drawn too. No zone names on the minimap (owner).
 - Check: `bash scripts/test-touch-bounded.sh tests/minimap-ui.cjs` (11 checks; mutation: dropping the neighbour layer fails the Greenmeadow-from-the-Crags check).
 - Touch: `+`/`-` buttons (`#mini-zoom-in/out`, 46 px on screen via `/ var(--ui)`) stacked left of the minimap on a coarse pointer only; they grey out at zoom 4 and 1. Tests cover mouse (hidden), touch (visible, 44 px floor, taps zoom, disabled at the ends).
+
+## The Moonspore Canopy (zone 16, 2026-11-05)
+
+- `world/zone-shapes.txt` zones `[0, 1, 16]`; fill style `FILL[16]` in `scripts/zone_shapes.py` (decor gloomstalk, sporefern, moonstone, glowmoss, mooncaps; spawns by distance from the Lamplight Refuge plaza; **the three elites `mireheart`, `silverwidow`, `nightbloom` are excluded from the spawn pool and the density count**: the first build cloned them into the new ground, caught by counting kinds among `layout == shape_v1` slimes). Core offset (43, 29); +396 objects, +41 spawns, 646 void pieces.
+- **Two new seams:** Greenmeadow <-> Canopy and Crags <-> Canopy replace the `path_0_16` and `path_1_16` gates (cross anywhere, no banner). The Orrery (15) and Emberwake (45) borders stay gates (those zones are not shaped yet). Zones 0 and 1 changed only in those two portals, the exit routes/paths that went with them and the void margin along the new seams.
+- Nothing in the client needed changing: ground, minimap, ghosts and day/night key on the zone theme, not on zone numbers. No saved character was in zone 16, so the pilot DB needed no moves (`zone_shapes_migrate.py --zones 16` is the filter; **without `--zones` the script would shift zones 0 and 1 a second time**).
+- Checks: Rust `zone_shape` (8 tests, three seam pairs 0-1, 0-16, 1-16 walked at 24+ points both ways, Canopy gate reachability), `tests/zone-shape-ui.cjs` (26 checks: edge walk, meadow <-> Canopy crossings in the real client, hub), screenshots `test-results/zone-shapes/seam-0-to-16.png`, `seam-16-to-0.png`.
+- Not judged in play: the new Canopy ground's spawn mix and the look of the Canopy/Crags seam.
