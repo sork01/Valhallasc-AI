@@ -4638,25 +4638,40 @@
     for (const p of zdef.portals) { if (p.seam || p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c; miniOut = zdef.shapeFloor ? buildMiniOutside(k) : null;
   }
-  // What lies outside the outline of a shaped zone (docs/zone-shapes.md), drawn over the fog so mist never covers it: coast is
-  // sea, past a border the neighbour's own ground, outer land dark rock; all fading to the void with distance from the land.
+  // What lies outside the outline of a shaped zone (docs/zone-shapes.md), drawn over the fog so mist never covers it: open
+  // water everywhere, the neighbouring province's own ground where a border lies (fading into the water), and the neighbour's
+  // name at the side it lies on.
   function buildMiniOutside(k) {
     const [c, g] = canvasOf(144, 144, 1);
-    g.fillStyle = '#080c0b'; g.fillRect(0, 0, 144, 144);
-    const nbs = zdef.shape?.neighbours || [];
+    const nbs = zdef.shape?.neighbours || [], sum = {};
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
-      const i = y * MAP + x, code = map.edge[i], d = map.edgeDist[i];
-      if (map.floor[i] || !code || !d || d > 10) continue;
-      const ch = String.fromCharCode(code), fade = 1 - (d - 1) / 10;
-      g.globalAlpha = (ch === 'c' ? .85 : .7) * fade;
-      g.fillStyle = ch === 'c' ? '#1f5568' : ch >= 'A' && ch <= 'Z' ? groundOf(ZONES[nbs[code - 65]]?.theme || 'meadow', .5, false, 0) : '#2c2824';
-      g.fillRect(x * k, y * k, k + .5, k + .5);
+      const i = y * MAP + x; if (map.floor[i]) continue;
+      const d = map.edgeDist[i], near = d ? Math.max(0, 1 - (d - 1) / 14) : 0;
+      g.fillStyle = `hsl(${203 + near * 4}, ${52 - (1 - near) * 10}%, ${15 + near * 12}%)`; g.fillRect(x * k, y * k, k + .5, k + .5);
+      const code = map.edge[i];
+      if (code >= 65 && code <= 90 && d && d <= 14) {
+        g.globalAlpha = .9 * (1 - (d - 1) / 14); g.fillStyle = groundOf(ZONES[nbs[code - 65]]?.theme || 'meadow', .5, false, 0); g.fillRect(x * k, y * k, k + .5, k + .5); g.globalAlpha = 1;
+        if (d <= 3) { const t = sum[code] || (sum[code] = [0, 0, 0]); t[0] += x + .5; t[1] += y + .5; t[2]++; }
+      }
     }
-    g.globalAlpha = 1;
     // Cut the land back out so the overlay only covers what is outside the outline.
     g.globalCompositeOperation = 'destination-out';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) g.fillRect(x * k - .25, y * k - .25, k + 1, k + 1);
     g.globalCompositeOperation = 'source-over';
+    // Each neighbour's name sits on the minimap's rim, in the direction it lies from the middle of the land.
+    let lx = 0, ly = 0, ln = 0; for (let i = 0; i < MAP * MAP; i++) if (map.floor[i]) { lx += i % MAP; ly += (i / MAP) | 0; ln++; }
+    lx = lx / (ln || 1) * k; ly = ly / (ln || 1) * k;
+    g.save(); g.font = 'bold 8px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = 'rgba(8,16,22,.92)'; g.fillStyle = '#f2ead0';
+    const placed = [];
+    for (const code in sum) {
+      const [sx, sy, n] = sum[code], name = (ZONES[nbs[code - 65]]?.name || '').replace(/^The /, ''); if (!name || n < 6) continue;
+      let dx = sx / n * k - lx, dy = sy / n * k - ly; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+      const hw = g.measureText(name).width / 2 + 2, t = Math.min(dx ? (72 - 7 - Math.min(hw, 40) * Math.abs(dx)) / Math.abs(dx) : 1e9, dy ? (72 - 8) / Math.abs(dy) : 1e9);
+      const x = Math.max(hw, Math.min(144 - hw, 72 + dx * t)); let y = Math.max(8, Math.min(136, 72 + dy * t));
+      for (let tries = 0; tries < 8 && placed.some(q => Math.abs(q.y - y) < 9 && Math.abs(q.x - x) < q.hw + hw); tries++) y = y > 72 ? y - 9 : y + 9;
+      placed.push({ x, y, hw }); g.strokeText(name, x, y); g.fillText(name, x, y);
+    }
+    g.restore();
     return c;
   }
   function drawMini() {
