@@ -54,6 +54,10 @@ FILL = {
     1: dict(spawn_sep=7.0, spawn_feature='y', decor=('rock', 'tree', 'bush', 'spire'), rivers=True),
     16: dict(spawn_sep=5.0, spawn_feature='city_distance', decor=('gloomstalk', 'sporefern', 'moonstone', 'glowmoss', 'mooncaps'),
          elites=('mireheart', 'silverwidow', 'nightbloom')),
+    # Gloamfen is a chain of lanes: ridges (thicket walls) with one gap each, so the ridges run on to the outline and the
+    # filler spawns follow the lane they are in. Hydras live on the island only; Hollow Rider is the Halloween spawn.
+    3: dict(spawn_sep=7.0, spawn_feature='lane', decor=('tree', 'bush', 'rock', 'spire'), ridges=True, lanes=True, warp=True,
+            elites=('gloomroot', 'hollow_rider'), no_fill=('hydra',)),
 }
 
 
@@ -428,6 +432,10 @@ def shift_view(view, dx, dy):
         if 'street' in e:
             e['street'] += dx if e.get('axis') == 'y' else dy
         shift_xy(e, dx, dy)
+    ritual = view.get('halloweenRitual')
+    if ritual:
+        shift_xy(ritual, dx, dy)
+        ritual['lantern'] = [ritual['lantern'][0] + dx, ritual['lantern'][1] + dy]
     for key in ('seasonDecor', 'christmasDecor', 'easterDecor', 'solsticeDecor', 'valentineDecor'):
         for o in view.get(key, []):
             shift_xy(o, dx, dy)
@@ -444,6 +452,99 @@ def shift_incoming(world, targets, sign):
             if to in targets and 'tx' in p and zi not in targets:
                 p['tx'] += sign * targets[to][0]
                 p['ty'] += sign * targets[to][1]
+
+
+
+# ---- warp: the whole old layout is bent into the outline (zones whose old square cannot sit inside it) -----------------
+WARP_MIN_TOP, WARP_MIN_BOTTOM = 90, 56
+
+
+class Warp:
+    """Row-wise area-preserving map of the old square [0,S0]^2 onto the outline rows where it is wide enough.
+
+    A row keeps its order and its ridges stay ridges (a ridge along a row stays along a row), so lanes, gaps, the lake and
+    the town keep their topology; only distances stretch. Rows narrower than WARP_MIN_BOTTOM (the tip) and the spike
+    above the wide part are left to the filler."""
+    def __init__(self, geom, S0):
+        n = geom['size']
+        inner = erode(geom['floor'], 1)
+        L = np.full(n, np.nan)
+        R = np.full(n, np.nan)
+        for y in range(n):
+            xs = np.nonzero(inner[y])[0]
+            if len(xs):
+                L[y], R[y] = xs[0], xs[-1] + 1
+        W = 5
+        Ls = np.full(n, np.nan)
+        Rs = np.full(n, np.nan)
+        for y in range(n):
+            lo, hi = max(0, y - W), min(n, y + W + 1)
+            if not np.isnan(L[lo:hi]).any():
+                Ls[y], Rs[y] = L[lo:hi].max(), R[lo:hi].min()
+        w = Rs - Ls
+        y0 = next(y for y in range(n) if w[y] >= WARP_MIN_TOP)
+        y1 = y0
+        while y1 + 1 < n and w[y1 + 1] >= WARP_MIN_BOTTOM:
+            y1 += 1
+        self.S0, self.y0, self.y1 = S0, y0, y1 + 1
+        self.rows = np.arange(y0, y1 + 1)
+        cum = np.concatenate([[0], np.cumsum(w[y0:y1 + 1])])
+        self.v_edges = cum / cum[-1] * S0
+        self.y_edges = np.arange(y0, y1 + 2, dtype=float)
+        self.Ls, self.Rs = Ls, Rs
+        centres = np.arange(y0, y1 + 1) + .5
+        self.centres = centres
+        self.Lc, self.Rc = Ls[y0:y1 + 1], Rs[y0:y1 + 1]
+        self.n = n
+
+    def __call__(self, x, y):
+        Y = float(np.interp(min(max(y, 0), self.S0), self.v_edges, self.y_edges))
+        lo = float(np.interp(Y, self.centres, self.Lc)) + .5
+        hi = float(np.interp(Y, self.centres, self.Rc)) - .5
+        return round(lo + min(max(x, 0), self.S0) / self.S0 * (hi - lo), 2), round(Y, 2)
+
+    def region(self):
+        m = np.zeros((self.n, self.n), dtype=bool)
+        for y in range(self.y0, self.y1):
+            m[y, int(math.ceil(self.Ls[y])):int(self.Rs[y])] = True
+        return m
+
+
+def dense(path, step=3.0):
+    out = [path[0]]
+    for a, b in zip(path, path[1:]):
+        k = max(1, int(math.dist(a, b) / step))
+        out += [[a[0] + (b[0] - a[0]) * i / k, a[1] + (b[1] - a[1]) * i / k] for i in range(1, k + 1)]
+    return out
+
+
+def warp_view(view, F):
+    """Same job as shift_view, with the warp as the map."""
+    def mv(d, kx='x', ky='y'):
+        if kx in d and ky in d:
+            d[kx], d[ky] = F(d[kx], d[ky])
+    mv(view['spawn'])
+    for key in ('objects', 'slimes', 'npcs', 'places', 'crosses'):
+        for o in view.get(key, []):
+            mv(o)
+    for c in ([view['city']] if view.get('city') else []) + list(view.get('camps', [])):
+        corners = [F(x, y) for x in (c['x0'], c['x1']) for y in (c['y0'], c['y1'])]
+        c['x0'], c['x1'] = min(q[0] for q in corners), max(q[0] for q in corners)
+        c['y0'], c['y1'] = min(q[1] for q in corners), max(q[1] for q in corners)
+        for k in ('plaza', 'entry'):
+            if k in c:
+                mv(c[k])
+    for p in view.get('portals', []):
+        mv(p)
+    for key in ('paths', 'atlasPaths'):
+        view[key] = [[list(F(a, b)) for a, b in dense(path)] for path in view.get(key, [])]
+    for e in view.get('exitRoutes', []):
+        e['points'] = [list(F(a, b)) for a, b in dense(e['points'])]
+    ritual = view.get('halloweenRitual')
+    if ritual:
+        mv(ritual)
+        ritual['lantern'] = list(F(*ritual['lantern']))
+    assert not view.get('cityEntrances') and not view.get('roads'), 'warp: cityEntrances/roads are not mapped'
 
 
 # ---- fill ---------------------------------------------------------------------------------------------------------------
@@ -467,14 +568,44 @@ def separated(x, y, r, objects, margin):
     return True
 
 
-def fill_zone(z, view, geom, off, rng):
+def gloam_gaps():
+    import generate_gloamfen as gg
+    return [(gx, gy, gg.GAP_HALF + 1.2) for gx, gy in gg.GAPS]
+
+
+def lane_labels(objects, floor, n, gaps):
+    """Component label (0 = blocked) of every cell with the ridge gaps plugged: the lanes of a ridge-and-gap zone."""
+    from scipy import ndimage
+    blocked = ~floor
+    ys, xs = np.mgrid[0:n, 0:n]
+    cx, cy = xs + .5, ys + .5
+    for o in objects:
+        if o['kind'] not in ('thicket', 'water', 'void'):
+            continue
+        if o['kind'] == 'void':
+            x0, x1 = o['x'] - o['width'] / 2, o['x'] + o['width'] / 2
+            y0, y1 = o['y'] - o['depth'] / 2, o['y'] + o['depth'] / 2
+            blocked[max(0, int(y0)):min(n, int(math.ceil(y1))), max(0, int(x0)):min(n, int(math.ceil(x1)))] = True
+            continue
+        r = o['r'] + .5
+        j0, j1 = max(0, int(o['y'] - r)), min(n, int(o['y'] + r) + 1)
+        i0, i1 = max(0, int(o['x'] - r)), min(n, int(o['x'] + r) + 1)
+        blocked[j0:j1, i0:i1] |= (cx[j0:j1, i0:i1] - o['x']) ** 2 + (cy[j0:j1, i0:i1] - o['y']) ** 2 <= r * r
+    for gx, gy, gr in gaps:
+        blocked |= (cx - gx) ** 2 + (cy - gy) ** 2 <= gr * gr
+    labels, _ = ndimage.label(~blocked)
+    return labels
+
+
+def fill_zone(z, view, geom, off, rng, core=None, F=None):
     """Scenery, lava rivers and spawns for the part of the outline the old square does not cover."""
     style = FILL[z]
     n, S0 = geom['size'], view['_old_size']
     floor = geom['floor']
     ox, oy = off
-    core = np.zeros((n, n), dtype=bool)
-    core[oy:oy + S0, ox:ox + S0] = True
+    if core is None:
+        core = np.zeros((n, n), dtype=bool)
+        core[oy:oy + S0, ox:ox + S0] = True
     free = erode(floor, 2) & ~dilate(core, 0)
     city = view['city']
     cell_area = int(free.sum())
@@ -504,6 +635,32 @@ def fill_zone(z, view, geom, off, rng):
                 adds.append({'kind': 'lava', 'x': round(float(x), 2), 'y': round(float(yy), 2), 'r': round(rng.uniform(1.25, 1.5), 2),
                              'v': rng.randrange(4), 'layout': TAG})
         existing = existing + adds
+    if style.get('ridges'):
+        import generate_gloamfen as gg
+        inner = erode(floor, 1)
+        if F is None:
+            runs = [[(0.0, gg.R1_Y), (-float(n), gg.R1_Y)], [(float(S0), gg.R1_Y), (S0 + float(n), gg.R1_Y)],
+                    [(0.0, gg.R2_Y), (-float(n), gg.R2_Y)], [(92.0, float(S0)), (92.0, S0 + float(n))]]
+            runs = [[(x + ox, y + oy) for x, y in run] for run in runs]
+        else:
+            # a warped ridge ends at the conservative outline row extent: run each end on, straight, to the void
+            runs = []
+            for end, inward in (((0.0, gg.R1_Y), (8.0, gg.R1_Y)), ((float(S0), gg.R1_Y), (S0 - 8.0, gg.R1_Y)),
+                                ((0.0, gg.R2_Y), (8.0, gg.R2_Y)), ((92.0, float(S0)), (92.0, S0 - 8.0))):
+                P, Q = F(*end), F(*inward)
+                d = (P[0] - Q[0], P[1] - Q[1])
+                ln = math.hypot(*d)
+                runs.append([P, (P[0] + d[0] / ln * n, P[1] + d[1] / ln * n)])
+        thickets = [o for o in view['objects'] if o['kind'] == 'thicket']
+        for run in runs:
+            for o in gg.ridge(run, rng):
+                i, j = int(o['x']), int(o['y'])
+                if 0 <= i < n and 0 <= j < n and inner[j, i] and not (F is None and core[j, i]):
+                    if any(math.hypot(o['x'] - t['x'], o['y'] - t['y']) < 1.0 for t in thickets):
+                        continue
+                    o['layout'] = TAG
+                    adds.append(o)
+        existing = existing + adds
     spawns_old = [s for s in view['slimes'] if not s['kind'].startswith(ELITE_OR_SCRIPTED) and s['kind'] not in style.get('elites', ())]
     plaza = city['plaza']
     for k in kinds:
@@ -530,8 +687,22 @@ def fill_zone(z, view, geom, off, rng):
         if style['spawn_feature'] == 'y':
             return min(max(y - oy, 0), S0)
         return math.hypot(x - plaza['x'], y - plaza['y'])
-    ranked = sorted((feature(s['x'], s['y']), s['kind']) for s in spawns_old)
-    want = round(len(spawns_old) * cell_area / old_free)
+    lane_of = None
+    if style.get('lanes'):
+        spawns_old = [s for s in spawns_old if s['kind'] not in style.get('no_fill', ())]
+        lane_of = lane_labels(view['objects'] + adds, floor, n, [(*(F(g[0], g[1]) if F else (g[0] + ox, g[1] + oy)), g[2]) for g in gloam_gaps()])
+        lane_spawns = defaultdict(list)
+        for s in spawns_old:
+            lane_spawns[lane_of[int(s['y']), int(s['x'])]].append(s)
+        lane_spawns.pop(0, None)
+        laned = np.isin(lane_of, list(lane_spawns))
+        old_cells = int((laned & core).sum())
+        new_cells = int((laned & ~core & erode(floor, 4)).sum())
+        want = round(len(spawns_old) * new_cells / max(old_cells, 1))
+        ranked = []
+    else:
+        ranked = sorted((feature(s['x'], s['y']), s['kind']) for s in spawns_old)
+        want = round(len(spawns_old) * cell_area / old_free)
     sp = []
     pts = np.argwhere(erode(floor, 4) & ~core)
     solid = view['objects'] + adds
@@ -546,11 +717,25 @@ def fill_zone(z, view, geom, off, rng):
             continue
         if not separated(x, y, .8, solid, 1.3):
             continue
+        if lane_of is not None:
+            here = lane_spawns.get(lane_of[int(y), int(x)])
+            if not here:
+                continue   # the town strip and any pocket without an old spawn stay empty
+            near = sorted(here, key=lambda t: math.hypot(t['x'] - x, t['y'] - y))[:6]
+            sp.append({'x': x, 'y': y, 'kind': near[rng.randrange(len(near))]['kind'], 'layout': TAG})
+            continue
         f = feature(x, y)
         near = sorted(ranked, key=lambda t: abs(t[0] - f))[:6]
         sp.append({'x': x, 'y': y, 'kind': near[rng.randrange(len(near))][1], 'layout': TAG})
     view['objects'].extend(adds)
     view['slimes'].extend(sp)
+    if lane_of is not None:
+        seen = {}
+        for k in ('toad', 'croc', 'knight'):
+            ids = {int(lane_of[int(t['y']), int(t['x'])]) for t in view['slimes'] if t['kind'] == k} - {0}
+            assert len(ids) == 1, f'zone {z}: the {k} lane is split or lost across components {ids}'
+            seen[k] = ids.pop()
+        assert len(set(seen.values())) == 3, f'zone {z}: lanes are connected around the ridges: {seen}'
     return len(adds), len(sp)
 
 
@@ -705,13 +890,20 @@ def apply(world, cfg):
         old = olds[z]
         (SIDE / f'preshape-{z:02d}.txt').write_text(json.dumps(old, indent=1, ensure_ascii=False) + '\n')
         geom = geoms[z]
-        ox, oy = choose_offset(geom, old, z, atlas, world)
         view = copy.deepcopy(old)
         S0 = view['size']
         view['_old_size'] = S0
-        shift_view(view, ox, oy)
         rng = random.Random(20261105 + z)
-        added = fill_zone(z, view, geom, (ox, oy), rng)
+        warp = None
+        if FILL.get(z, {}).get('warp'):
+            ox = oy = 0
+            warp = Warp(geom, S0)
+            warp_view(view, warp)
+            added = fill_zone(z, view, geom, (0, 0), rng, core=warp.region(), F=warp)
+        else:
+            ox, oy = choose_offset(geom, old, z, atlas, world)
+            shift_view(view, ox, oy)
+            added = fill_zone(z, view, geom, (ox, oy), rng)
         del view['_old_size']
         # Land runs SEAM_MARGIN tiles past a seam border so a walker can step across the line (the server then moves it).
         margin = np.zeros_like(geom['floor'])
@@ -731,12 +923,14 @@ def apply(world, cfg):
         view['size'] = geom['size']
         view['shape'] = dict(rule=cfg['rule'], k=round(geom['scale'], 4), offset=[ox, oy], core=S0, bbox=geom['bbox'], T=geom['T'],
                              outline=geom['outline'], edges=geom['runs'], neighbours=sorted(atlas.neighbours[z]))
+        if warp:
+            view['shape']['warp'] = [warp.y0, warp.y1]
         view['shapeFloor'] = floor_rows(geom['floor'])
         view['shapeEdge'] = edge_rows(geom, sorted(atlas.neighbours[z]))
         check(z, view, geom)
         set_view(world, z, view)
         shifted[z] = (ox, oy)
-        print(f"zone {z}: {S0}x{S0} -> {geom['size']}x{geom['size']} (bbox {geom['bbox'][0]}x{geom['bbox'][1]}, k {geom['scale']:.3f}), "
+        print(f"zone {z}: {'warped ' if warp else ''}{S0}x{S0} -> {geom['size']}x{geom['size']} (bbox {geom['bbox'][0]}x{geom['bbox'][1]}, k {geom['scale']:.3f}), "
               f"core at ({ox},{oy}), +{added[0]} objects, +{added[1]} spawns, {len(voids)} void pieces")
     shift_incoming(world, shifted, 1)
     place_portals(world, shifted)

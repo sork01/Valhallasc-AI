@@ -20,7 +20,14 @@ ROOT = Path(__file__).resolve().parents[1]
 def offsets():
     world = json.loads((ROOT / 'world/map.txt').read_text())
     zones = [world] + world['zones']
-    return {i: z['shape']['offset'] for i, z in enumerate(zones) if z.get('shape')}
+    return {i: z['shape']['offset'] for i, z in enumerate(zones) if z.get('shape') and not z['shape'].get('warp')}
+
+
+def warped():
+    """Zones whose old layout was bent into the outline: a saved position has no simple offset, so the character is placed at the zone's spawn."""
+    world = json.loads((ROOT / 'world/map.txt').read_text())
+    zones = [world] + world['zones']
+    return {i: z['spawn'] for i, z in enumerate(zones) if z.get('shape', {}).get('warp')}
 
 
 def main():
@@ -30,21 +37,26 @@ def main():
     ap.add_argument('--zones', help='comma list: only move characters saved in these zones (already-migrated zones must be left out)')
     args = ap.parse_args()
     off = offsets()
+    warp = warped()
     if args.zones:
         keep = {int(v) for v in args.zones.split(',')}
         off = {k: v for k, v in off.items() if k in keep}
+        warp = {k: v for k, v in warp.items() if k in keep}
     c = sqlite3.connect(args.db)
     moved = 0
     for id_, state in c.execute('select id, state from characters').fetchall():
         d = json.loads(state)
         z = d.get('zone', 0)
-        if z not in off:
+        if z not in off and z not in warp:
             continue
-        d['x'] += off[z][0]
-        d['y'] += off[z][1]
+        if z in warp:
+            d['x'], d['y'] = warp[z]['x'], warp[z]['y']
+        else:
+            d['x'] += off[z][0]
+            d['y'] += off[z][1]
         ex = d.get('explored')
         if isinstance(ex, list):
-            for k in off:
+            for k in list(off) + list(warp):
                 if k < len(ex):
                     ex[k] = 0
         moved += 1
@@ -52,7 +64,7 @@ def main():
             c.execute('update characters set state=? where id=?', (json.dumps(d, separators=(',', ':')), id_))
     if args.apply:
         c.commit()
-    print(f"{'moved' if args.apply else 'would move'} {moved} characters in zones {sorted(off)} by {off}")
+    print(f"{'moved' if args.apply else 'would move'} {moved} characters in zones {sorted(off)} by {off}, warped zones {sorted(warp)} to their spawn")
 
 
 if __name__ == '__main__':

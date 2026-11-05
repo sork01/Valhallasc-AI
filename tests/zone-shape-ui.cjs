@@ -35,7 +35,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
   const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
   const where = () => page.evaluate(() => ({ zone: Field.zone, x: Field.hero.nx, y: Field.hero.ny }));
-  for (const zone of [0, 1]) {
+  for (const zone of [0, 1, 3]) {
     const z = zoneDef(zone), n = z.size;
     check(z.shapeFloor?.length === n && z.size % 8 === 0, `zone ${zone} carries its outline`);
     // Stand on a land cell two tiles inside an edge (south-facing in zone 0, east-facing in zone 1) and walk off the land.
@@ -56,7 +56,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     const p = await where();
     check(p.zone === zone && onLand(zone, p.x, p.y), `zone ${zone}: held ${key} for 3.5 s from (${ex},${ey}), stopped on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
     // Centre of the core: normal ground, objects and trees draw (the old square is intact).
-    const cx = z.shape.offset[0] + 48.5, cy = z.shape.offset[1] + 48.5;
+    const cx = z.shape.warp ? z.city.plaza.x + .5 : z.shape.offset[0] + 48.5, cy = z.shape.warp ? z.city.plaza.y + 3.5 : z.shape.offset[1] + 48.5;
     await debug({ op: 'teleport', zone, x: cx, y: cy });
     await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, cx, cy], { timeout: 20000 });
     await page.waitForTimeout(1500);
@@ -195,7 +195,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await ctx2.close();
   }
   // The hubs keep their place inside the shifted core: Alderhaven's plaza and Cinderwatch Camp.
-  for (const zone of [0, 1, 16]) {
+  for (const zone of [0, 1, 3, 16]) {
     const c = zoneDef(zone).city;
     await debug({ op: 'teleport', zone, x: c.plaza.x, y: c.plaza.y + 3 });
     await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [zone, c.plaza.x, c.plaza.y + 3], { timeout: 20000 });

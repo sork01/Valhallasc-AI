@@ -2,7 +2,7 @@
 use super::wyrd_tests::{at, join, place, world};
 use super::*;
 
-const SHAPED: [usize; 3] = [0, 1, 16];
+const SHAPED: [usize; 4] = [0, 1, 3, 16];
 
 fn bundled() -> Value {
     serde_json::from_str(include_str!("../../../world/map.txt")).unwrap()
@@ -218,20 +218,29 @@ fn the_crags_and_the_moonspore_canopy_share_a_seam() {
 
 #[test]
 fn the_moonspore_canopy_keeps_its_gates_to_the_orrery_and_emberwake() {
+    gates_stand_on_free_land(16, &[15, 45]);
+}
+
+#[test]
+fn gloamfen_keeps_gates_to_the_glacier_greenmeadow_and_skaldholm() {
+    gates_stand_on_free_land(3, &[2, 0, 4]);
+}
+
+fn gates_stand_on_free_land(zone: usize, targets: &[u64]) {
     let w = world();
     let data = bundled();
-    let z = zone_of(&data, 16);
-    for to in [15u64, 45] {
+    let z = zone_of(&data, zone);
+    for &to in targets {
         let p = z["portals"]
             .as_array()
             .unwrap()
             .iter()
             .find(|p| p["to"] == to && p.get("seam").is_none())
-            .unwrap_or_else(|| panic!("no gate from the Canopy to zone {to}"));
+            .unwrap_or_else(|| panic!("no gate from zone {zone} to zone {to}"));
         let (x, y) = (p["x"].as_f64().unwrap(), p["y"].as_f64().unwrap());
         assert!(land(z)(x, y), "gate to {to} is off the land");
         let mut a = at(x, y);
-        w.maps[16].collide(&mut a, 0.4);
+        w.maps[zone].collide(&mut a, 0.4);
         assert!(
             (a.x - x).hypot(a.y - y) < 0.01,
             "gate to {to} is inside an obstacle"
@@ -241,12 +250,12 @@ fn the_moonspore_canopy_keeps_its_gates_to_the_orrery_and_emberwake() {
             .as_array()
             .unwrap()
             .iter()
-            .find(|q| q["to"] == 16)
+            .find(|q| q["to"] == zone as u64)
             .unwrap();
         let (tx, ty) = (back["tx"].as_f64().unwrap(), back["ty"].as_f64().unwrap());
         assert!(land(z)(tx, ty), "arrival from {to} is off the land");
         let mut b = at(tx, ty);
-        w.maps[16].collide(&mut b, 0.4);
+        w.maps[zone].collide(&mut b, 0.4);
         assert!(
             (b.x - tx).hypot(b.y - ty) < 0.01,
             "arrival from {to} is inside an obstacle"

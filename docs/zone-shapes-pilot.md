@@ -1,6 +1,6 @@
 # Zone shapes pilot: Greenmeadow, the Emberfall Crags and the Moonspore Canopy (branch `feat/zone-shapes`)
 
-Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** Owner decisions: `nofloor` scale rule, Asterion unchanged, everything on the atlas eventually (`docs/zone-shapes.md`). This pilot shapes zones 0, 1 and (added 2026-11-05) 16.
+Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** Owner decisions: `nofloor` scale rule, Asterion unchanged, everything on the atlas eventually (`docs/zone-shapes.md`). This pilot shapes zones 0, 1, 3 (Gloamfen, 2026-11-05, warped) and 16.
 
 ## What changed for the player
 
@@ -68,3 +68,17 @@ Owner request in short: "do <zone>" means shape it like Greenmeadow/Crags **and*
 4. Rebuild the pilot binary (copy `/proc/<pid>/exe` aside first), run Rust `zone_shape` (add the new seam pairs), `tests/zone-shape-ui.cjs` (bounded; asserts the neighbour's own scenery kinds are ghosted before crossing: mutate by reverting the ghost builder, it must fail), look at `seam-*-before-*.png`.
 5. Stop `valhalla-shapes`, back up its DB copy, `zone_shapes_migrate.py --db ... --zones <new zone only>` (without `--zones` it shifts the earlier zones twice), start it.
 6. Update this doc, the `SHAPE-PILOT` TODO line, the wiki page `10_projects:valhallasc_zone_shapes_pilot_20261105`.
+
+
+## Gloamfen (zone 3, 2026-11-05): the first WARPED zone
+
+Why a different method: the core-and-fill method needs the old 128x128 square to sit inside the outline. At the map scale (k 0.675 by the nofloor area rule, area ratio 1.0 in `zone-shapes-preview.md`) it does not (it needs about 0.95, a 264 grid, 1.7x Greenmeadow's scale). Owner: "remake the zone so it fits": the zone takes the real outline at the map scale and **the old layout is bent into it**.
+
+- `FILL[3]` has `warp=True`. `Warp` (`scripts/zone_shapes.py`) maps the old square row by row onto the outline rows where the floor is wide enough (width 90 at the top, 56 at the bottom: rows 41-153 of the 192 grid); x is linear between the row's conservative left/right extents, y follows the cumulative row width, so **area (and so object and spawn density) is preserved** while a row stays a row: ridges stay ridges, gaps stay gaps, the lake, island and causeway keep their order, the town keeps its place at the top. Distances stretch (sx 0.45-1.17).
+- `warp_view` is `shift_view` with the map (objects, slimes, NPCs, places, crosses, paths densified to 3 tiles, city rect as the bounding box of its mapped corners, plaza, portals, halloweenRitual). Sprites and houses keep their size, only their centres move. `shape.offset` is `[0,0]`, `shape.warp = [y0, y1]`.
+- The spike above the wide part and the tip below it are ordinary filler ground (`fill_zone` with the warp region as the core). The four ridge ends are run on straight to the void (`ridges=True`: R1 both ends, R2 west, R3 south into the tip), otherwise the conservative row extents leave a corridor round a ridge.
+- **Lane check (assertion in `fill_zone`)**: with the three ridge gaps plugged, toads, crocodiles and knights must each sit in ONE component of the walkable floor, all different (the lanes, so no bypass of a ridge). Filler spawns take the kind of the nearest old spawn in their own lane (`lane_labels`); no filler spawns in a pocket without an old spawn (the town strip); hydras (island only) and the elites (`gloomroot`, `hollow_rider`) are never cloned.
+- **The Greenmeadow border is a GATE, not a seam**: a seam needs both zones at one tile scale (0.675 vs 0.561 here). The Gloamfen gates (Rimeveil, Greenmeadow, Skaldholm) are placed on the shared chains by `place_portals`. Zones 0, 1, 16 changed only in the portal arrival coordinates.
+- `scripts/zone_shapes_migrate.py --zones 3` puts characters saved in Gloamfen at its spawn (a warp has no offset); the pilot DB had 2.
+- Checks: Rust `zone_shape` (SHAPED now `[0,1,3,16]`, `gloamfen_keeps_gates_to_the_glacier_greenmeadow_and_skaldholm`), UI `zone-shape-ui.cjs` (edge walk and hub for zone 3). Picture of the layout: `test-results/zone-shapes/gloamfen-layout.png`.
+- Not judged in play: the town is flatter (25 -> 17 tiles tall, 48 -> 60 wide), the south shore narrows toward the tip, spawn spacing in the narrow rows.
