@@ -52,7 +52,7 @@
   }
   function labels(g,z,zones,w2s,hero,zoom){
     const size=Math.max(19,13/Math.max(.35,zoom));g.save();g.font=`${size}px "Jua",sans-serif`;g.textAlign='center';g.textBaseline='middle';
-    for(const p of z.portals){if(!p.walk||Math.hypot(p.x-hero.x,p.y-hero.y)>28)continue;
+    for(const p of z.portals){if(!p.walk||p.vault||Math.hypot(p.x-hero.x,p.y-hero.y)>28)continue;
       const {x,y,size,label,width}=plaque(g,p,zones,w2s,zoom);g.fillStyle='#18232ef0';g.strokeStyle='#f3d595';g.lineWidth=2;
       g.beginPath();g.roundRect(x-width/2,y-size,width,size*2,7);g.fill();g.stroke();g.fillStyle='#fff0c9';g.fillText(label,x,y);
     }g.restore();

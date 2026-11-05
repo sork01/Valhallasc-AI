@@ -258,6 +258,13 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   }
     // Skaldholm's wall stands along its borders (the city drawn as a landmark, no scale needed) and the vault is the way in:
     // walked through from Gloamfen, the meadow and the Crags in the real client.
+    // A vault is a doorway, not a portal: nothing portal-like is drawn at it, from either side (no gate flag/ring, no "Skaldholm" plaque).
+    await page.evaluate(() => {
+      window.__marks = { gate: 0, plaque: 0 };
+      const gate = ExitPaths.gate; ExitPaths.gate = (g, p, ...r) => { if (p.vault) window.__marks.gate++; return gate(g, p, ...r); };
+      const ft = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (t, ...r) { if (typeof t === 'string' && t.startsWith('Skaldholm')) window.__marks.plaque++; return ft.call(this, t, ...r); };
+    });
     for (const zone of [3, 0, 1]) {
       const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
       check(z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower').length >= 40, `zone ${zone}: Skaldholm's wall runs along the border`);
@@ -287,6 +294,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       await page.waitForFunction(zz => Field.zone === zz, zone, { timeout: 20000 });
       check(await page.evaluate(() => Field.seamless), `zone ${zone}: the walk out of Skaldholm is seamless too`);
       for (const k of keys) await page.keyboard.up(k);
+      await page.waitForTimeout(800);
+      check(await page.evaluate(() => window.__marks.gate === 0 && window.__marks.plaque === 0), `zone ${zone}: no portal marker or plaque was drawn at the vault, from either side (${await page.evaluate(() => JSON.stringify(window.__marks))})`);
     }
   }
   assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
