@@ -49,7 +49,8 @@
   let objects = [], nightLights = [], SHIFT = [0, 0], seamlessUntil = 0, lastGhostDrawn = 0;
   // Enemies and players of a neighbouring zone seen across a seam border (view only), already moved into this zone's frame.
   const ghostSlimes = new Map(), ghostPlayers = new Map();
-  let ghostShadowKinds = new Set(), miniRippleOrigin = [0, 0];
+  let ghostShadowKinds = new Set(), miniRippleOrigin = [0, 0], miniFade = null;
+  const MINI_FADE_MS = 1000;
   let farDots = [];
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
@@ -264,6 +265,7 @@
     }
   }
   function setZone(z) {
+    miniFade = null;
     zone = ZONES[z] ? z : 0;
     adoptCtx(ctxFor(zone));
     // Neighbours across a seam keep a context too, built now so their ground is ready to draw beside the border and to swap
@@ -1387,7 +1389,10 @@
     // Across a seam the two sides swap roles: what was drawn as a ghost is now real and the other way round, so nothing
     // blinks out and back in at the crossing.
     const carry = seamShift ? { slimes: slimes.slice(), players: [...remotePlayers.values()], gs: [...ghostSlimes.values()], gp: [...ghostPlayers.values()] } : null;
+    // The minimap markers that only the hero's own zone has (quest guidance, far enemy dots, travel sparks) fade out with the zone left and in with the zone entered.
+    const fadeOut = seamShift ? { zone, shift: seamShift.slice(), quests: (window.Quests?.mapMarkers(zone) || []).map(q => ({ ...q })), far: farDots.slice(), sparks: (ZONES[zone]?.npcs || []).filter(n => n.travelStop).map(n => ({ x: n.x, y: n.y })) } : null;
     if (moved) setZone(own.zone || 0);
+    if (fadeOut) miniFade = { ...fadeOut, start: performance.now() };
     if (seamShift) {
       const [cxs, cys] = seamShift, mv = a => { a.x += cxs; a.y += cys; if (Number.isFinite(a.nx)) { a.nx += cxs; a.ny += cys; } return a; };
       hero.x += cxs; hero.y += cys; cam.x += cxs; cam.y += cys; seamlessUntil = performance.now() + 2500;
@@ -4725,32 +4730,47 @@
       for (const g of ghostPlayers.values()) if (seen(p.to, g.x + shx, g.y + shy)) { mctx.fillStyle = '#b3dfff'; mctx.beginPath(); mctx.arc(g.x * s, g.y * s, 2.5, 0, 6.283); mctx.fill(); }
       for (const g of ghostSlimes.values()) if (!g.dead && seen(p.to, g.x + shx, g.y + shy)) { mctx.fillStyle = g.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(g.x * s, g.y * s, 2, 0, 6.283); mctx.fill(); }
     }
-    for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    // After a seam crossing, what belongs to one zone only fades: the left zone's markers out, the entered zone's in (MINI_FADE_MS).
+    let inA = 1, outA = 0;
+    if (miniFade) { const t = (performance.now() - miniFade.start) / MINI_FADE_MS; if (t >= 1) miniFade = null; else { inA = Math.max(0, t); outA = 1 - inA; } }
+    const farLayer = (dots, zi, dx, dy, a) => { mctx.globalAlpha = a; for (const [fx, fy, big] of dots) if (seen(zi, fx, fy)) { mctx.fillStyle = big ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc((fx + dx) * s, (fy + dy) * s, 2, 0, 6.283); mctx.fill(); } mctx.globalAlpha = 1; };
     // Travel masters are navigation landmarks: their spark remains visible even through unexplored mist.
-    for (const n of City.npcs) if (n.travelStop) {
-      const x = n.x * s, y = n.y * s;
-      mctx.fillStyle = '#bdffec'; mctx.strokeStyle = '#10242e'; mctx.lineWidth = 1.5;
-      mctx.beginPath(); mctx.moveTo(x, y - 5); mctx.lineTo(x + 1.5, y - 1.5); mctx.lineTo(x + 5, y); mctx.lineTo(x + 1.5, y + 1.5);
-      mctx.lineTo(x, y + 5); mctx.lineTo(x - 1.5, y + 1.5); mctx.lineTo(x - 5, y); mctx.lineTo(x - 1.5, y - 1.5); mctx.closePath(); mctx.fill(); mctx.stroke();
-    }
+    const sparkLayer = (list, dx, dy, a) => {
+      mctx.globalAlpha = a;
+      for (const n of list) {
+        const x = (n.x + dx) * s, y = (n.y + dy) * s;
+        mctx.fillStyle = '#bdffec'; mctx.strokeStyle = '#10242e'; mctx.lineWidth = 1.5;
+        mctx.beginPath(); mctx.moveTo(x, y - 5); mctx.lineTo(x + 1.5, y - 1.5); mctx.lineTo(x + 5, y); mctx.lineTo(x + 1.5, y + 1.5);
+        mctx.lineTo(x, y + 5); mctx.lineTo(x - 1.5, y + 1.5); mctx.lineTo(x - 5, y); mctx.lineTo(x - 1.5, y - 1.5); mctx.closePath(); mctx.fill(); mctx.stroke();
+      }
+      mctx.globalAlpha = 1;
+    };
+    for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    sparkLayer(City.npcs.filter(n => n.travelStop), 0, 0, inA);
     for (const remote of remotePlayers.values()) {
       if (!seen(zone, remote.x, remote.y)) continue; mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
-    for (const [fx, fy, big] of farDots) if (seen(zone, fx, fy)) { mctx.fillStyle = big ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(fx * s, fy * s, 2, 0, 6.283); mctx.fill(); }
+    farLayer(farDots, zone, 0, 0, inA);
+    if (miniFade) { const [fx, fy] = miniFade.shift; farLayer(miniFade.far, miniFade.zone, fx, fy, outA); sparkLayer(miniFade.sparks, fx, fy, outA); }
     // Quest guidance stays above fog and actors, and changes independently of the cached ground.
-    mctx.save(); mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';
-    for (const q of window.Quests?.mapMarkers(zone) || []) {
-      const x = Math.max(vx * s + 7, Math.min(vx * s + W - 7, q.x * s)), y = Math.max(vy * s + 8, Math.min(vy * s + W - 8, q.y * s));
-      mctx.strokeStyle = '#101827'; mctx.fillStyle = q.color; mctx.lineWidth = 3;
-      if (q.state === 'tracked') {
-        // An outer diamond remains distinct when the tracked destination is also a quest giver.
-        mctx.beginPath(); mctx.moveTo(x, y - 8); mctx.lineTo(x + 7, y); mctx.lineTo(x, y + 8); mctx.lineTo(x - 7, y); mctx.closePath(); mctx.stroke();
-        mctx.strokeStyle = q.color; mctx.lineWidth = 1.5; mctx.stroke();
-      } else {
-        mctx.font = 'bold 15px sans-serif'; mctx.strokeText(q.symbol, x, y); mctx.fillText(q.symbol, x, y);
+    const questLayer = (list, dx, dy, a) => {
+      mctx.save(); mctx.globalAlpha = a; mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';
+      for (const q of list) {
+        const qx = q.x + dx, qy = q.y + dy;
+        const x = Math.max(vx * s + 7, Math.min(vx * s + W - 7, qx * s)), y = Math.max(vy * s + 8, Math.min(vy * s + W - 8, qy * s));
+        mctx.strokeStyle = '#101827'; mctx.fillStyle = q.color; mctx.lineWidth = 3;
+        if (q.state === 'tracked') {
+          // An outer diamond remains distinct when the tracked destination is also a quest giver.
+          mctx.beginPath(); mctx.moveTo(x, y - 8); mctx.lineTo(x + 7, y); mctx.lineTo(x, y + 8); mctx.lineTo(x - 7, y); mctx.closePath(); mctx.stroke();
+          mctx.strokeStyle = q.color; mctx.lineWidth = 1.5; mctx.stroke();
+        } else {
+          mctx.font = 'bold 15px sans-serif'; mctx.strokeText(q.symbol, x, y); mctx.fillText(q.symbol, x, y);
+        }
       }
-    }
-    mctx.restore();
+      mctx.restore();
+    };
+    questLayer(window.Quests?.mapMarkers(zone) || [], 0, 0, inA);
+    if (miniFade) questLayer(miniFade.quests, miniFade.shift[0], miniFade.shift[1], outA);
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
     mctx.restore();
   }
@@ -4924,7 +4944,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };

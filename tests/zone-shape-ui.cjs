@@ -114,8 +114,12 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       const keys = keysFor([-dir[0], -dir[1]]);
       for (const key of keys) await page.keyboard.down(key);
       await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
+      const fade = await page.evaluate(() => Field.miniFade);
       for (const key of keys) await page.keyboard.up(key);
-      await page.waitForTimeout(800);
+      if (from === 0) check(fade && fade.left === 0 && fade.quests >= 1 && fade.t < .9, `seam crossing ${from} -> ${to}: the left zone's quest guidance fades out on the minimap instead of vanishing (${JSON.stringify(fade)})`);
+      else check(fade && fade.left === 16 && fade.t < .9, `seam crossing ${from} -> ${to}: the minimap fade is running (${JSON.stringify(fade)})`);
+      await page.waitForTimeout(1300);
+      check(await page.evaluate(() => Field.miniFade === null), `seam crossing ${from} -> ${to}: the minimap fade is over after a second`);
       const p = await where();
       check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
       check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);
