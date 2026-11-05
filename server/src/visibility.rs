@@ -3,6 +3,56 @@
 use serde_json::{Value, json};
 use std::collections::BTreeSet;
 
+/// Player fields sent only to their owner (see `filter_view`). Everything else stays for other clients: what is drawn
+/// (look, position, health, buffs, mount, `signatureWeapon`), PvP/trade/party flags and the nameplate title.
+const OWN_ONLY: &[&str] = &[
+    "quests",
+    "inventory",
+    "equipment",
+    "gearInstances",
+    "bags",
+    "bagCapacity",
+    "bagUsed",
+    "attributes",
+    "gearAttributes",
+    "passiveAttributes",
+    "statPoints",
+    "attack",
+    "defense",
+    "critChance",
+    "attackCooldown",
+    "cooldownReduction",
+    "dodgeChance",
+    "hitChance",
+    "xp",
+    "xpNeed",
+    "gold",
+    "kills",
+    "explored",
+    "travelStops",
+    "mountOwned",
+    "mounts",
+    "rebirthTiers",
+    "rebirthPerks",
+    "setCounts",
+    "setCd",
+    "skillCd",
+    "potionCd",
+    "mealCd",
+    "atkCd",
+    "dashCd",
+    "resource",
+    "maxResource",
+    "resourceType",
+    "abandonedQuests",
+    "seasonalClaims",
+    "seasonalRolls",
+    "festivalBuff",
+    "rested",
+    "achievementPoints",
+    "storyMemory",
+];
+
 pub fn filter_view(view: &mut Value, viewer: &str) {
     let hidden: Vec<(String, u64)> = view["players"]
         .as_array()
@@ -28,6 +78,11 @@ pub fn filter_view(view: &mut Value, viewer: &str) {
                 object.remove("session");
                 if object.get("id").and_then(Value::as_str) != Some(viewer) {
                     object.remove("mailUnread");
+                    // What only the owner's own client reads: nobody else needs your bags, quests or gold, and it is
+                    // most of a player's ~2.7 KB. Inspect has its own whitelisted packet (`world/inspect.rs`).
+                    for key in OWN_ONLY {
+                        object.remove(*key);
+                    }
                 }
             }
         }
@@ -187,5 +242,31 @@ mod tests {
         let before = dungeon.clone();
         cull_view(&mut dungeon, "me");
         assert_eq!(dungeon, before, "instance copies are never culled");
+    }
+
+    #[test]
+    fn other_players_lose_their_private_fields_but_the_owner_keeps_them() {
+        let mut raw = json!({"players":[
+            {"id":"me","x":1,"inventory":[1],"quests":[2],"gold":9,"xp":5,"skillCd":{},"signatureWeapon":"w"},
+            {"id":"pal","x":2,"inventory":[1],"quests":[2],"gold":9,"xp":5,"skillCd":{},"signatureWeapon":"w","look":{"name":"Pal"},"hp":3,"buffs":[]}]});
+        filter_view(&mut raw, "me");
+        let me = &raw["players"][0];
+        assert!(
+            me["inventory"].is_array() && me["gold"] == 9 && me["quests"].is_array(),
+            "owner keeps their own"
+        );
+        let pal = &raw["players"][1];
+        for key in ["inventory", "quests", "gold", "xp", "skillCd"] {
+            assert!(
+                pal.get(key).is_none(),
+                "another player's {key} reaches the viewer"
+            );
+        }
+        for key in ["look", "hp", "buffs", "signatureWeapon", "x"] {
+            assert!(
+                pal.get(key).is_some(),
+                "{key} is drawn for other players and must stay"
+            );
+        }
     }
 }
