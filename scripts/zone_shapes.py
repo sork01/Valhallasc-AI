@@ -1235,6 +1235,10 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
             # one offset between the two frames: this zone's A is the city's own arch.
             shift = [round(carch['x'] - A[0], 2), round(carch['y'] - A[1], 2)]
             gate['x'], gate['y'], gate['r'] = round(A[0] + wx * 3.0, 2), round(A[1] + wy * 3.0, 2), 1.2
+            # the doorway is clear: scenery of the city standing in its own opening would block it and show from one side only
+            city['objects'] = [o for o in city['objects'] if not (o['kind'] in ('tree', 'bush', 'rock', 'flowers')
+                               and abs((o['x'] - carch['x']) * wx + (o['y'] - carch['y']) * wy) <= 3
+                               and abs((o['x'] - carch['x']) * -wy + (o['y'] - carch['y']) * wx) <= hw + 1)]
             gate['vault'] = shift
             gate['vault_half'] = back['vault_half'] = hw
             back['x'], back['y'], back['r'] = round(carch['x'] - wx * 3.0, 2), round(carch['y'] - wy * 3.0, 2), 1.2

@@ -83,6 +83,37 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       console.log(`zone ${zone} s ${s} t ${t}: noise ${noise.mean.toFixed(2)}/${(noise.big * 100).toFixed(1)}%  across the vault ${d.mean.toFixed(2)}/${(d.big * 100).toFixed(1)}% (mean abs diff / % of pixels off by >40)`);
     }
   }
+  // Nothing pops in: around each arch both frames draw the same scenery (kind and place), checked object by object.
+  for (const zone of (process.env.ZONES || '3,0,1').split(',').map(Number)) {
+    const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal), [vx, vy] = gate.vault;
+    await debug({ op: 'teleport', zone, x: arch.x - gate.walk[0] * 2, y: arch.y - gate.walk[1] * 2 });
+    await page.waitForFunction(z => Field.zone === z, zone, { timeout: 20000 }); await page.waitForTimeout(1500);
+    const A = await page.evaluate(([x, y]) => Field.sceneAround(x, y, 34), [arch.x, arch.y]);
+    await debug({ op: 'teleport', zone: 4, x: arch.x + vx + gate.walk[0] * 2, y: arch.y + vy + gate.walk[1] * 2 });
+    await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 }); await page.waitForTimeout(1500);
+    const B = await page.evaluate(([x, y]) => Field.sceneAround(x, y, 34), [arch.x + vx, arch.y + vy]);
+    const near = (o, L, dx, dy) => L.some(q => q[0] === o[0] && Math.hypot(q[1] - o[1] - dx, q[2] - o[2] - dy) < .6);
+    const onlyZone = A.filter(o => !near(o, B, vx, vy)), onlyCity = B.filter(o => !near(o, A, -vx, -vy));
+    const fmt = (L, dx, dy) => L.map(o => `${o[0]}@${(o[1] + dx).toFixed(1)},${(o[2] + dy).toFixed(1)}`).join(' ');
+    console.log(`zone ${zone}: ${A.length} / ${B.length} objects near the arch; only in the zone frame: ${fmt(onlyZone, 0, 0) || '-'}; only in Skaldholm (zone coords): ${fmt(onlyCity, -vx, -vy) || '-'}`);
+    check(onlyZone.length + onlyCity.length === 0, `zone ${zone}: the same scenery around the arch from both sides`);
+  }
+  // The last row of the zone's land, in the opening, is the same ground from both sides (it once vanished on crossing: the clip stood at the arch, not the line).
+  const ground = async (zone, x, y, pts) => {
+    await debug({ op: 'teleport', zone, x, y });
+    await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 1.5, [zone, x, y], { timeout: 20000 });
+    await page.waitForTimeout(2500);
+    return page.evaluate(pts => { const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'); return pts.map(([x, y]) => { const [fx, fy] = Field.screenOf(x, y); return [...g.getImageData(Math.round(fx * cv.width), Math.round(fy * cv.height), 1, 1).data].slice(0, 3); }); }, pts);
+  };
+  for (const zone of (process.env.ZONES || '3,0,1').split(',').map(Number)) {
+    const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal), [wx, wy] = gate.walk, [vx, vy] = gate.vault;
+    const row = [-3.5, -1.5, 1.5, 3.5].map(t => [arch.x + wx * .6 - wy * t, arch.y + wy * .6 + wx * t]);
+    const hx = arch.x - wx * 4, hy = arch.y - wy * 4;
+    const a = await ground(zone, hx, hy, row), b = await ground(4, hx + vx, hy + vy, row.map(([x, y]) => [x + vx, y + vy]));
+    const dist = a.map((p, i) => Math.hypot(p[0] - b[i][0], p[1] - b[i][1], p[2] - b[i][2])).sort((p, q) => p - q), med = dist[2];
+    console.log(`zone ${zone}: last row of land in the opening, colour distance ${dist.map(d => d.toFixed(0)).join(' ')}`);
+    check(med < 40, `zone ${zone}: the last row of land is the same from both sides (${med.toFixed(0)})`);
+  }
   // Skaldholm's own square is never touched by a neighbour's region (the borders lean across it: the Crags' region once covered its north-east corner).
   await debug({ op: 'teleport', zone: 4, x: 120, y: 30 });
   await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 });
