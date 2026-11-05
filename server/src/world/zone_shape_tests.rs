@@ -698,3 +698,39 @@ fn a_hero_beside_a_vault_is_listed_across_it_from_both_sides() {
         assert_eq!(n, 0, "zone {zone}: a hero far from the vault is not listed");
     }
 }
+
+#[test]
+fn the_whole_opening_of_a_vault_crosses_not_only_its_middle() {
+    let mut w = world();
+    let data = bundled();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    for zone in [0usize, 1, 3] {
+        let gate = zone_of(&data, zone)["portals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["to"] == 4)
+            .unwrap();
+        let (gx, gy) = (gate["x"].as_f64().unwrap(), gate["y"].as_f64().unwrap());
+        let walk = gate["walk"].as_array().unwrap();
+        let (wx, wy) = (walk[0].as_f64().unwrap(), walk[1].as_f64().unwrap());
+        let half = gate["vault_half"].as_f64().expect("a vault knows its opening");
+        for across in [-(half - 0.6), -half / 2., half / 2., half - 0.6] {
+            // start 6 tiles before the gate, off to the side of the opening, and walk straight through
+            place(&mut w, 1, zone, at(gx - wx * 6. + -wy * across, gy - wy * 6. + wx * across));
+            let dir = at(wx, wy);
+            for _ in 0..200 {
+                w.time += TICK;
+                let hero = w.players.get_mut(&1).unwrap();
+                hero.input = dir;
+                hero.input_at = w.time;
+                w.update_player(1);
+                if w.players[&1].character.zone == 4 {
+                    break;
+                }
+            }
+            let c = &w.players[&1].character;
+            assert_eq!(c.zone, 4, "zone {zone}: walking through the opening {across:+.1} tiles off its middle did not enter Skaldholm (at {:.1},{:.1})", c.x, c.y);
+        }
+    }
+}

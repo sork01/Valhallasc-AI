@@ -3556,6 +3556,13 @@ impl World {
                     y: portal.y,
                 };
                 let distance = here.distance(centre);
+                // A vault is crossed anywhere across its opening, from the arch's centre on (the gate stands 3 tiles past it).
+                if let (Some(_), Some(half), Some(side)) = (portal.vault, portal.vault_half, portal.walk) {
+                    let (wx, wy) = (f64::from(side[0]), f64::from(side[1]));
+                    let along = (here.x - centre.x) * wx + (here.y - centre.y) * wy;
+                    let across = ((here.x - centre.x) * -wy + (here.y - centre.y) * wx).abs();
+                    return walking_out && along >= -3. && across <= half;
+                }
                 // Keep authored arrival discs intact. The wider approach is intentional
                 // movement toward a visible opening, never a passive arrival trigger.
                 let toward = here.direction(centre);
@@ -11335,6 +11342,7 @@ mod tests {
             needs_boss: None,
             seam: None,
             vault: None,
+            vault_half: None,
         });
         w.use_portal(1);
         assert_eq!(w.players[&1].character.zone, 0);

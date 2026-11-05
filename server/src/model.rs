@@ -1870,6 +1870,10 @@ pub struct Portal {
     /// journey notice or chat line (held movement carries on like across a seam).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vault: Option<[f64; 2]>,
+    /// Half the width of the vault's opening: the crossing happens anywhere across the opening (past the arch's centre), not only at
+    /// the gate point, so there is no way round it inside the arch.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vault_half: Option<f64>,
 }
 /// The shared border of two shaped zones. Both zones use one tile scale, so the other side is the same line shifted by
 /// `shift`. The land runs a few tiles past the line (the zone's margin) so a walker can step across it; the moment the

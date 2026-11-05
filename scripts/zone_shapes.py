@@ -1105,6 +1105,7 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
             A = (round(q[0] - wx * 1.2, 2), round(q[1] - wy * 1.2, 2))
             arch = dict(x=A[0], y=A[1], vertical=carch['vertical'], halfWidth=hw, towers=carch['towers'], portal=gate['id'], name=zones[lm]['name'])
             adds, towers = [], []
+            wall_in = 1.2 if axis else WALL_IN      # an axis wall stands exactly on the city's own wall (the arch is 1.2 inland of the line)
             px, py = -wy, wx                                   # across the opening
             if carch['towers']:                                # the vault's own towers, as in the city's wall: half width + 1.7 each side
                 for sgn in (-1, 1):
@@ -1125,7 +1126,7 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
                     c = pts[j]
                     if not on(c[0] + nx * 3, c[1] + ny * 3):
                         nx, ny = -nx, -ny
-                    cx, cy = c[0] + nx * WALL_IN, c[1] + ny * WALL_IN
+                    cx, cy = c[0] + nx * wall_in, c[1] + ny * wall_in
                     run_len += WALL_STEP
                     if math.dist((cx, cy), A) <= hw + 1.9 or any(math.dist(t, (cx, cy)) < 2.2 for t in flank):
                         continue                          # the opening and the flank towers
@@ -1173,6 +1174,7 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
             shift = [round(carch['x'] - A[0], 2), round(carch['y'] - A[1], 2)]
             gate['x'], gate['y'], gate['r'] = round(A[0] + wx * 3.0, 2), round(A[1] + wy * 3.0, 2), 1.2
             gate['vault'] = shift
+            gate['vault_half'] = back['vault_half'] = hw
             back['x'], back['y'], back['r'] = round(carch['x'] - wx * 3.0, 2), round(carch['y'] - wy * 3.0, 2), 1.2
             back['vault'] = [-shift[0], -shift[1]]
             gate['tx'], gate['ty'] = round(gate['x'] + shift[0], 2), round(gate['y'] + shift[1], 2)
