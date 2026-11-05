@@ -49,7 +49,7 @@
   let objects = [], nightLights = [], SHIFT = [0, 0], seamlessUntil = 0, lastGhostDrawn = 0;
   // Enemies and players of a neighbouring zone seen across a seam border (view only), already moved into this zone's frame.
   const ghostSlimes = new Map(), ghostPlayers = new Map();
-  let ghostShadowKinds = new Set();
+  let ghostShadowKinds = new Set(), miniRippleOrigin = [0, 0];
   let farDots = [];
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
@@ -4696,7 +4696,9 @@
       if (!miniRipple) { const [rc, rg] = canvasOf(48, 48, 1); let n = 7; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647; rg.strokeStyle = 'rgba(190,232,246,.55)'; rg.lineWidth = 1; rg.lineCap = 'round';
         for (let i = 0; i < 11; i++) { const x = rnd() * 48, y = rnd() * 48, w = 4 + rnd() * 6; rg.beginPath(); rg.moveTo(x, y); rg.quadraticCurveTo(x + w / 2, y - 1.5, x + w, y); rg.stroke(); }
         miniRipple = mctx.createPattern(rc, 'repeat'); }
-      miniRipple.setTransform(new DOMMatrix().translate(-vx * s, -vy * s)); mctx.fillStyle = miniRipple; mctx.fillRect(0, 0, W, W);
+      // The ripples are pinned to the world, and a seam crossing moves the hero into another zone's frame: add the zone's tile origin (shape.T, the same for both sides of a border) so the waves do not shift.
+      const wx = vx + (zdef.shape?.T?.[0] || 0), wy = vy + (zdef.shape?.T?.[1] || 0); miniRippleOrigin = [wx, wy];
+      miniRipple.setTransform(new DOMMatrix().translate(-wx * s, -wy * s)); mctx.fillStyle = miniRipple; mctx.fillRect(0, 0, W, W);
     }
     // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.
     const layer = (canvas, tiles, ox, oy, zi) => {
@@ -4918,7 +4920,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };

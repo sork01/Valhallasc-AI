@@ -124,6 +124,18 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       check(tilesBefore === tilesAfter, `seam crossing ${from} -> ${to}: the minimap keeps its scale (${tilesBefore} tiles across before, ${tilesAfter} after)`);
     }
   }
+  // The minimap waves are pinned to the world: the same spot seen from either side of a seam gives the same ripple origin.
+  {
+    const sm = zoneDef(0).portals.find(p => p.to === 16 && p.seam).seam, k = Math.floor(sm.points.length / 2), spot = sm.points[k];
+    const origins = [];
+    for (const [zone, x, y] of [[0, spot[0] - 3, spot[1]], [16, spot[0] - 3 + sm.shift[0], spot[1] + sm.shift[1]]]) {
+      await debug({ op: 'teleport', zone, x, y });
+      await page.waitForFunction(([z, a, b]) => Field.zone === z && Math.hypot(Field.hero.nx - a, Field.hero.ny - b) < 1, [zone, x, y], { timeout: 20000 });
+      await page.waitForTimeout(500);
+      origins.push(await page.evaluate(() => Field.miniRippleOrigin));
+    }
+    check(Math.hypot(origins[0][0] - origins[1][0], origins[0][1] - origins[1][1]) < 1.5, `the minimap waves do not shift across the seam: origins ${origins.map(o => o.map(v => v.toFixed(1)).join(',')).join(' vs ')}`);
+  }
   // Step 2: what lies across the border shows through. A second hero stands on the Crags side with an enemy beside them;
   // the first hero, on the meadow side, sees both (drawn, never targetable) before crossing.
   {
