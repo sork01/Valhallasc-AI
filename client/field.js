@@ -152,7 +152,7 @@
       const [shx, shy] = seam.shift;
       for (const o of nz.objects || []) {
         const art = City.art[o.kind];
-        if (set ? !set[o.kind] : !art || art.ground || o.kind === 'void') continue;
+        if (set && !WALL_KINDS.has(o.kind) ? !set[o.kind] : !art || art.ground || o.kind === 'void') continue;   // a landmark wall carries on across a seam, whatever the theme
         const gx = o.x - shx, gy = o.y - shy;
         // The neighbour can lie past this zone's own grid (the meadow is south of the Crags' 208 tiles): no grid limit, only the rule that it must not lie on our own land.
         if (gx >= 0 && gy >= 0 && gx < MAP && gy < MAP && map.floor[(gy | 0) * MAP + (gx | 0)]) continue;

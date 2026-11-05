@@ -1,6 +1,6 @@
 # Zone shapes pilot: Greenmeadow, the Emberfall Crags and the Moonspore Canopy (branch `feat/zone-shapes`)
 
-Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** Owner decisions: `nofloor` scale rule, Asterion unchanged, everything on the atlas eventually (`docs/zone-shapes.md`). This pilot shapes zones 0, 1, 3 (Gloamfen, 2026-11-05, warped) and 16.
+Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** Owner decisions: `nofloor` scale rule, Asterion unchanged, everything on the atlas eventually (`docs/zone-shapes.md`). This pilot shapes zones 0, 1, 2 (Rimeveil), 3 (Gloamfen) and 16.
 
 ## What changed for the player
 
@@ -95,3 +95,15 @@ Owner request in short: "do <zone>" means shape it like Greenmeadow/Crags **and*
 A vault is one doorway seen from two frames. Ownership: `shape.vaultRegions` (polygons `city`/`land`/`strip` in the shaped zone's frame, extended past the run ends) say which zone owns the ground on each side of the straightened wall line. Each frame draws the other zone's ground, scenery, seasonal decor, NPCs, roads, lamp light and glow inside its region and hides its own there; the server lists players/enemies across a vault. Judge with `tests/vault-seamless-ui.cjs` (same point from both frames + real walks), never with "no banner" alone. A vault draws no portal marker. Walls are straight (`WALL_TOL` 2.5). Not handled: music/weather at the crossing.
 
 Later the same day (`1fe2d9b`..`bb150a4`): Skaldholm's own wall is the wall. `wallAxis` zones copy its pieces into their frame, generate ramparts only past the city's corners, and turn the corner where the old border leaves the city. A vault crosses across its whole opening (`vault_half`). In the city a region applies only past that vault's wall; zone ground is clipped at the wall line (arch - 1.2). City scenery is cleared from the doorway. Neighbour ground renders only chunks a region shows and is released after 4 s unused.
+
+## Rimeveil (zone 2) and the wall's fit (2026-11-05)
+
+- Core offset (181, 125) in a 336 grid (bbox 330x250), +781 objects, +79 spawns (`FILL[2]`). The spiral, camp, quests and cross are unchanged. Difficulty runs by ring, so the fill uses `spawn_feature='summit'` (distance from the summit): the new land takes the outer ring's crabs and wolves, never yetis or wyrms. The five seasonal bosses are `elites`. `shift_view` now moves the four `*Ritual` blocks.
+- Seams 1-2 and 2-3 replace the `rimeveil_gate`/`crags_gate` and `fen_gate`/`summit_gate` pairs. The Wyrdwood border stays a gate. The Skaldholm gate is a vault with the same rules as the others.
+- **`wallFit` (world/zone-shapes.txt, `fitted_vault`):** Skaldholm now has shaped zones all round, so a wall's ends meet seams. The Crags' arch stood exactly on the end of its run, which became the end of the Rimeveil seam (a walker at the opening would have been on two crossings). `wallFit` puts the city's corner on the run's `corner` end, which fixes where along the wall the vault stands, and `line` (optional) makes the wall line pass through that end of the run. Zones 1, 2, 3 use it; zone 0 does not. **This moved two vaults:** the Crags' 63 tiles south (arch now in the middle of the wall, both real corners line up), Gloamfen's 15 tiles north (same lane, between the ridges at y 100 and 156).
+- Result in the atlas frame: the wall closes from the Crags seam, along Skaldholm's north wall, round its real north-west corner to the Gloamfen seam, where Gloamfen's stub meets it.
+- The vault's road: `place_portals` lays it to land that exists before the wall fill, `build_walls` adds the arch as its last point.
+- Region ends now stop at seam neighbours' land too (`taken` in `build_walls`): overlaps fell from about 15,000 cells to about 1,800, all well behind a wall.
+- Seam ghosts now include `rampart`/`tower` whatever the neighbour's sprite set (`WALL_KINDS` in `field.js`): the neighbour's wall stands beyond the line at both junctions.
+- `no_vault_stands_on_a_seam` (Rust) guards the junction. `PART=rime` in `tests/zone-shape-ui.cjs` crosses both seams both ways and writes `rime-*.png` pictures of the junctions. `ZONES=2` narrows `PART=walls` and `tests/vault-seamless-ui.cjs`.
+- Older suites still teleport to Rimeveil's old coordinates (`christmas-art-ui`, `easter-*`, `music-*`, `rime-slime-art`, `rimeveil-ui`): same state as the other pilot zones, to update before any merge.

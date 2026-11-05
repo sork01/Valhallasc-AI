@@ -2,7 +2,7 @@
 use super::wyrd_tests::{at, join, place, world};
 use super::*;
 
-const SHAPED: [usize; 4] = [0, 1, 3, 16];
+const SHAPED: [usize; 5] = [0, 1, 2, 3, 16];
 
 fn bundled() -> Value {
     serde_json::from_str(include_str!("../../../world/map.txt")).unwrap()
@@ -120,7 +120,8 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
                 }
             }
         }
-        assert!(tested > 30, "zone {zone}: only {tested} edge walks");
+        // (Gloamfen has seams on two sides and a wall on a third: little plain edge is left)
+        assert!(tested > 20, "zone {zone}: only {tested} edge walks");
     }
 }
 
@@ -145,6 +146,9 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
                 continue;
             }
             border += 1;
+            if p.get("vault").is_some() {
+                continue; // stands on the straight wall line, not the leaning border: the vault tests cover it
+            }
             let (x, y) = (p["x"].as_f64().unwrap(), p["y"].as_f64().unwrap());
             let d = chain
                 .iter()
@@ -168,8 +172,8 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
                 "arrival ({tx:.1},{ty:.1}) in zone {to} is inside an obstacle"
             );
         }
-        // the meadow's other borders (the Crags, Gloamfen, the Canopy) are seams now: only Skaldholm is a gate
-        let wanted = if zone == 0 { 1 } else { 2 };
+        // the meadow's and Gloamfen's other borders are seams now: only Skaldholm is a gate
+        let wanted = if zone == 0 || zone == 3 { 1 } else { 2 };
         assert!(border >= wanted, "zone {zone}: only {border} gate crossings");
     }
 }
@@ -243,15 +247,52 @@ fn the_moonspore_canopy_keeps_its_gates_to_the_orrery_and_emberwake() {
 }
 
 #[test]
-fn gloamfen_keeps_gates_to_the_glacier_and_skaldholm() {
-    gates_stand_on_free_land(3, &[2, 4]);
+fn gloamfen_keeps_its_gate_to_skaldholm() {
+    gates_stand_on_free_land(3, &[4]);
+}
+
+#[test]
+fn the_glacier_keeps_gates_to_wyrdwood_and_skaldholm() {
+    gates_stand_on_free_land(2, &[4, 6]);
+}
+
+#[test]
+fn the_crags_and_the_glacier_share_a_seam() {
+    seam_walks(1, 2);
+}
+
+#[test]
+fn the_glacier_and_gloamfen_share_a_seam() {
+    seam_walks(2, 3);
+}
+
+// Skaldholm has shaped zones on every side, so a wall's ends meet those zones' seams: a vault must stand clear of them, or a walker at the
+// opening is on two crossings at once (the Crags' arch once stood on the end of its run, right where the glacier's seam now ends).
+#[test]
+fn no_vault_stands_on_a_seam() {
+    let data = bundled();
+    for zone in [0usize, 1, 2, 3] {
+        let z = zone_of(&data, zone);
+        let portals = z["portals"].as_array().unwrap();
+        let arch = z["exitArches"]
+            .as_array()
+            .and_then(|a| a.iter().find(|e| e["name"] == "Skaldholm"))
+            .unwrap();
+        let (ax, ay) = (arch["x"].as_f64().unwrap(), arch["y"].as_f64().unwrap());
+        for seam in portals.iter().filter_map(|p| p.get("seam")) {
+            for q in seam["points"].as_array().unwrap() {
+                let d = (q[0].as_f64().unwrap() - ax).hypot(q[1].as_f64().unwrap() - ay);
+                assert!(d > 25., "zone {zone}: the vault stands {d:.1} tiles from a seam");
+            }
+        }
+    }
 }
 
 #[test]
 fn skaldholms_wall_runs_along_its_borders_and_the_vault_is_open() {
     let w = world();
     let data = bundled();
-    for zone in [0usize, 1, 3] {
+    for zone in [0usize, 1, 2, 3] {
         let z = zone_of(&data, zone);
         let objects = z["objects"].as_array().unwrap();
         let pieces: Vec<&Value> = objects
@@ -308,7 +349,7 @@ fn walking_into_the_vault_enters_skaldholm() {
     let mut w = world();
     let data = bundled();
     let _rx = join(&mut w, 1, Class::Warrior);
-    for zone in [0usize, 1, 3] {
+    for zone in [0usize, 1, 2, 3] {
         let z = zone_of(&data, zone);
         let gate = z["portals"]
             .as_array()
@@ -451,6 +492,18 @@ fn seam_walks(from_zone: usize, to_zone: usize) {
         .collect();
     let on_a = land(a);
     let mut crossed = 0;
+    // Skaldholm's wall meets a seam at its end: the last tiles of such a seam are the wall, on either side of the line.
+    let (sx, sy) = (
+        seam["shift"][0].as_f64().unwrap(),
+        seam["shift"][1].as_f64().unwrap(),
+    );
+    let walled = |z: &Value, x: f64, y: f64| {
+        z["objects"].as_array().unwrap().iter().any(|o| {
+            (o["kind"] == "rampart" || o["kind"] == "tower")
+                && (o["x"].as_f64().unwrap() - x).hypot(o["y"].as_f64().unwrap() - y) < 8.
+        })
+    };
+    let mut at_wall = 0;
     // Samples along every border segment: the point 4 tiles inside the meadow, found from the side that is land.
     for pair in points.windows(2) {
         for t in [0.25, 0.5, 0.75] {
@@ -470,6 +523,10 @@ fn seam_walks(from_zone: usize, to_zone: usize) {
                 at(-normal.x, -normal.y)
             };
             if !on_a(q.x + inward.x * 4., q.y + inward.y * 4.) {
+                continue;
+            }
+            if walled(a, q.x, q.y) || walled(b, q.x + sx, q.y + sy) {
+                at_wall += 1;
                 continue;
             }
             let landed = cross(&mut w, &data, from_zone, to_zone, q, inward);
@@ -497,6 +554,7 @@ fn seam_walks(from_zone: usize, to_zone: usize) {
         }
     }
     assert!(crossed >= 8, "only {crossed} border samples crossed");
+    assert!(at_wall <= 6, "{at_wall} border samples stand at a wall: the wall runs along the seam");
 }
 
 #[test]
@@ -667,7 +725,7 @@ fn a_hero_beside_a_vault_is_listed_across_it_from_both_sides() {
     let data = bundled();
     let _a = join(&mut w, 1, Class::Warrior);
     let _b = join(&mut w, 2, Class::Mage);
-    for zone in [0usize, 1, 3] {
+    for zone in [0usize, 1, 2, 3] {
         let gate = zone_of(&data, zone)["portals"]
             .as_array()
             .unwrap()
@@ -697,7 +755,8 @@ fn a_hero_beside_a_vault_is_listed_across_it_from_both_sides() {
         assert_eq!(n, 1, "Skaldholm lists the hero standing in zone {zone}");
         assert_eq!(shift[0].as_f64().unwrap(), -vx);
         // far from the gate (the zone's spawn), nobody is listed
-        let s0 = w.maps[zone].spawn;
+        // (Rimeward Camp stands right behind its vault: the far end of the zone is the Wyrdwood gate)
+        let s0 = if zone == 2 { at(167.5, 67.5) } else { w.maps[zone].spawn };
         place(&mut w, 1, zone, at(s0.x, s0.y));
         let (n, _) = list(&w.snapshot_for(4), zone).unwrap();
         assert_eq!(n, 0, "zone {zone}: a hero far from the vault is not listed");
@@ -709,7 +768,7 @@ fn the_whole_opening_of_a_vault_crosses_not_only_its_middle() {
     let mut w = world();
     let data = bundled();
     let _rx = join(&mut w, 1, Class::Warrior);
-    for zone in [0usize, 1, 3] {
+    for zone in [0usize, 1, 2, 3] {
         let gate = zone_of(&data, zone)["portals"]
             .as_array()
             .unwrap()

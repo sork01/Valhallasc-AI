@@ -4,16 +4,31 @@
   "zones": [
     0,
     1,
+    2,
     3,
     16
   ],
-  "note": "Owner-approved 2026-11-05: ONE scale for every zone, k = 1.0 tiles per atlas px (was 0.56116, the median, with a per-zone area floor that gave Gloamfen 0.675 and made seams between zones of different scale impossible). Pilot: zones 0, 1, 3 (Gloamfen) and 16 (Moonspore Canopy). wallAxis: the Skaldholm wall of zones 0, 1 and 3 follows the city's own straight wall (copied piece by piece) and turns its real corner (owner, 2026-11-05: the walls must be straight); the land between it and the old leaning border fills in.",
+  "note": "Owner-approved 2026-11-05: ONE scale for every zone, k = 1.0 tiles per atlas px (was 0.56116, the median, with a per-zone area floor that gave Gloamfen 0.675 and made seams between zones of different scale impossible). Pilot: zones 0, 1, 2 (Rimeveil), 3 (Gloamfen) and 16 (Moonspore Canopy). wallAxis: the Skaldholm wall of zones 0, 1 and 3 follows the city's own straight wall (copied piece by piece) and turns its real corner (owner, 2026-11-05: the walls must be straight); the land between it and the old leaning border fills in. wallFit: the wall meets its run ends, the city corner on the Rimeveil junctions, so no seam runs through a wall or vault.",
   "landmarks": [
     4
   ],
   "wallAxis": {
     "0": "y",
     "1": "x",
+    "2": "y",
     "3": "x"
+  },
+  "wallFit": {
+    "1": {
+      "corner": "lo",
+      "line": "lo"
+    },
+    "2": {
+      "corner": "lo",
+      "line": "hi"
+    },
+    "3": {
+      "corner": "lo"
+    }
   }
 }

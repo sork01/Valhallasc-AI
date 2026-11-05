@@ -231,6 +231,47 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await ctx2.close();
   }
   }
+  // Rimeveil (zone 2): its seams with the Crags and Gloamfen, crossed both ways in the real client. Skaldholm's wall meets both seams at their ends, so the
+  // neighbour's wall must already stand beyond the line (ramparts have no sprite set: they were left out of the ghosts, and popped in at the corner).
+  if (!process.env.PART || process.env.PART === 'rime') {
+    for (const [za, zb] of [[1, 2], [2, 3]]) {
+      const seam = zoneDef(za).portals.find(p => p.to === zb && p.seam).seam, sp = seam.points, [ax, ay] = seam.shift;
+      const k = Math.floor(sp.length / 2), a = sp[k], b = sp[k + 1], ln = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / ln, (b[0] - a[0]) / ln];
+      const inl = onLand(za, mid[0] + nrm[0] * 4, mid[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
+      for (const [from, to, origin, dir] of [[za, zb, mid, inl], [zb, za, [mid[0] + ax, mid[1] + ay], [-inl[0], -inl[1]]]]) {
+        const sx = origin[0] + dir[0] * 3, sy = origin[1] + dir[1] * 3;
+        await debug({ op: 'teleport', zone: from, x: sx, y: sy });
+        await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 2, [from, sx, sy], { timeout: 20000 });
+        await page.waitForTimeout(600);
+        await page.screenshot({ path: path.join(out, `seam-${from}-before-${to}.png`) });
+        const ahead = await page.evaluate(() => Field.ghosts.kinds);
+        const want = [...new Set(zoneDef(to).objects.map(o => o.kind))].filter(k => ['tree', 'bush', 'rock', 'rampart'].includes(k));
+        check(want.includes('rampart') && want.every(k => ahead.includes(k)), `seam ${from} -> ${to}: the zone ahead's scenery and wall (${want.join(', ')}) are ready beyond the border; ghosts: ${ahead.join(', ')}`);
+        const tilesBefore = await page.evaluate(() => Field.miniTiles);
+        const keys = keysFor([-dir[0], -dir[1]]);
+        for (const key of keys) await page.keyboard.down(key);
+        await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
+        for (const key of keys) await page.keyboard.up(key);
+        await page.waitForTimeout(1300);
+        const p = await where();
+        check(onLand(to, p.x, p.y), `seam crossing ${from} -> ${to} arrived on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+        check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);
+        check(await page.evaluate(() => !document.getElementById('area-title').classList.contains('show') && !document.body.innerText.includes('You enter')), `seam crossing ${from} -> ${to}: no zone banner and no "You enter" line`);
+        check(tilesBefore === await page.evaluate(() => Field.miniTiles), `seam crossing ${from} -> ${to}: the minimap keeps its scale`);
+        await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
+      }
+    }
+    // Pictures for the eye: where the wall meets each seam, from both sides, and the vault from the camp road.
+    const T = z => zoneDef(z).shape.T, arch2 = zoneDef(2).exitArches.find(a => a.name === 'Skaldholm');
+    const ne = zoneDef(2).shape.edges.find(e => e.other === 1).points.at(-1), nw = zoneDef(2).shape.edges.find(e => e.other === 3).points[0];
+    for (const [name, zone, x, y] of [['ne-rime', 2, ne[0] - 7, ne[1] - 8], ['ne-crags', 1, ne[0] + T(2)[0] - T(1)[0] + 7, ne[1] + T(2)[1] - T(1)[1] - 6], ['nw-rime', 2, nw[0] - 8, nw[1] - 12], ['nw-fen', 3, nw[0] + T(2)[0] - T(3)[0] - 12, nw[1] + T(2)[1] - T(3)[1] + 8], ['vault-road', 2, arch2.x, arch2.y - 12]]) {
+      await debug({ op: 'teleport', zone, x, y });
+      await page.waitForFunction(([z, xx, yy]) => Field.zone === z && Math.hypot(Field.hero.nx - xx, Field.hero.ny - yy) < 6, [zone, x, y], { timeout: 20000 }).catch(() => console.log(`picture ${name}: no teleport to ${zone} ${x},${y}`));
+      await page.waitForTimeout(1800);
+      await page.screenshot({ path: path.join(out, `rime-${name}.png`) });
+    }
+  }
   if (!process.env.PART || process.env.PART === 'walls') {
   // The hubs keep their place inside the shifted core: Alderhaven's plaza and Cinderwatch Camp.
   for (const zone of [0, 1, 3, 16]) {
@@ -265,7 +306,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       const ft = CanvasRenderingContext2D.prototype.fillText;
       CanvasRenderingContext2D.prototype.fillText = function (t, ...r) { if (typeof t === 'string' && t.startsWith('Skaldholm')) window.__marks.plaque++; return ft.call(this, t, ...r); };
     });
-    for (const zone of [3, 0, 1]) {
+    for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
       const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
       check(z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower').reduce((n, o) => n + Math.max(o.width, o.depth), 0) >= 80, `zone ${zone}: Skaldholm's wall runs along the border`);
       const sx = gate.x - gate.walk[0] * 5.5, sy = gate.y - gate.walk[1] * 5.5;

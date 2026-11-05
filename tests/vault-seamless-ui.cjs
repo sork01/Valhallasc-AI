@@ -67,7 +67,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const diff = (a, b) => { let sum = 0, big = 0, n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
   const save = (name, im) => fs.writeFileSync(path.join(out, name), Buffer.from(im.png.split(',')[1], 'base64'));
   const rows = [];
-  for (const zone of (process.env.ZONES || '3,0,1').split(',').map(Number)) {
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
     const [wx, wy] = gate.walk, [vx, vy] = gate.vault;
     for (const [s, t] of (process.env.SS || '0:0,-4:14').split(',').map(x => x.split(':').map(Number))) {
@@ -84,7 +84,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     }
   }
   // Nothing pops in: around each arch both frames draw the same scenery (kind and place), checked object by object.
-  for (const zone of (process.env.ZONES || '3,0,1').split(',').map(Number)) {
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal), [vx, vy] = gate.vault;
     await debug({ op: 'teleport', zone, x: arch.x - gate.walk[0] * 2, y: arch.y - gate.walk[1] * 2 });
     await page.waitForFunction(z => Field.zone === z, zone, { timeout: 20000 }); await page.waitForTimeout(1500);
@@ -105,7 +105,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await page.waitForTimeout(2500);
     return page.evaluate(pts => { const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'); return pts.map(([x, y]) => { const [fx, fy] = Field.screenOf(x, y); return [...g.getImageData(Math.round(fx * cv.width), Math.round(fy * cv.height), 1, 1).data].slice(0, 3); }); }, pts);
   };
-  for (const zone of (process.env.ZONES || '3,0,1').split(',').map(Number)) {
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal), [wx, wy] = gate.walk, [vx, vy] = gate.vault;
     const row = [-3.5, -1.5, 1.5, 3.5].map(t => [arch.x + wx * .6 - wy * t, arch.y + wy * .6 + wx * t]);
     const hx = arch.x - wx * 4, hy = arch.y - wy * 4;
@@ -130,7 +130,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     return { zone: Field.zone, px: Array.from(g.getImageData(0, 0, W, H).data) };
   });
   const walkSpikes = [];
-  for (const zone of (process.env.ZONES || '3,0,1').split(',').map(Number)) {
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
     const [wx, wy] = gate.walk;
     for (const dir of [1, -1]) {                         // 1 = into Skaldholm, -1 = back out

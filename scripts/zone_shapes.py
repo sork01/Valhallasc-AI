@@ -58,6 +58,10 @@ FILL = {
     # filler spawns follow the lane they are in. Hydras live on the island only; Hollow Rider is the Halloween spawn.
     3: dict(spawn_sep=7.0, spawn_feature='lane', decor=('tree', 'bush', 'rock', 'spire'), ridges=True, lanes=True,
             elites=('gloomroot', 'hollow_rider'), no_fill=('hydra',)),
+    # Rimeveil is a spiral of ice rings around the summit: difficulty runs by ring, so the land outside the rings takes the outermost
+    # ring's kinds (feature = distance from the summit, not from the camp). The seasonal bosses sleep at the ritual clearing.
+    2: dict(spawn_sep=7.0, spawn_feature='summit', summit=(64, 64), decor=('tree', 'rock', 'bush', 'spire'),
+            elites=('grinch', 'bloomwarden', 'birchcrown', 'briarheart', 'starrocketeer')),
 }
 
 
@@ -436,6 +440,10 @@ def shift_view(view, dx, dy):
     if ritual:
         shift_xy(ritual, dx, dy)
         ritual['lantern'] = [ritual['lantern'][0] + dx, ritual['lantern'][1] + dy]
+    for key in ('christmasRitual', 'easterRitual', 'solsticeRitual', 'valentineRitual'):
+        if key in view:
+            shift_xy(view[key], dx, dy)
+            view[key]['tree'] = [view[key]['tree'][0] + dx, view[key]['tree'][1] + dy]
     for key in ('seasonDecor', 'christmasDecor', 'easterDecor', 'solsticeDecor', 'valentineDecor'):
         for o in view.get(key, []):
             shift_xy(o, dx, dy)
@@ -686,6 +694,8 @@ def fill_zone(z, view, geom, off, rng, core=None, F=None):
     def feature(x, y):
         if style['spawn_feature'] == 'y':
             return min(max(y - oy, 0), S0)
+        if style['spawn_feature'] == 'summit':
+            return math.hypot(x - style['summit'][0] - ox, y - style['summit'][1] - oy)
         return math.hypot(x - plaza['x'], y - plaza['y'])
     lane_of = None
     if style.get('lanes'):
@@ -815,7 +825,29 @@ def make_seams(zones, shifted):
     return seams
 
 
-def place_portals(world, shifted, landmarks=()):
+def fitted_vault(zones, i, lm, fit, axis):
+    """`wallFit` (world/zone-shapes.txt): the wall's ends sit on the ends of its border run, so a shaped neighbour's seam meets the wall and
+    never runs through it. `corner` is the end of the run that takes the city's own corner, which fixes where along the wall the vault
+    stands; `line` (optional) is the end the straight wall line passes through. Returns (along, across of the wall line, across of the old border) at the vault."""
+    z, city = zones[i], zones[lm]
+    run = max((e['points'] for e in z['shape']['edges'] if e['kind'] == 'shared' and e['other'] == lm),
+              key=lambda r: sum(math.dist(a, b) for a, b in zip(r, r[1:])))
+    ai = 0 if axis == 'x' else 1
+    bi = 1 - ai
+    ends = {'lo': min(run, key=lambda q: q[bi]), 'hi': max(run, key=lambda q: q[bi])}
+    assert fit['corner'] == 'lo', 'wallFit: only the low corner is used so far'
+    back = next(p for p in city['portals'] if p['to'] == i)
+    carch = next(a for a in city['exitArches'] if a['portal'] == back['id'])
+    cb = city['city']
+    along = ends['lo'][bi] + (carch['x'], carch['y'])[bi] - (cb['x0'], cb['y0'])[bi]
+    for a, b in zip(run, run[1:]):
+        if (a[bi] - along) * (b[bi] - along) <= 0 and a[bi] != b[bi]:
+            border = a[ai] + (b[ai] - a[ai]) * (along - a[bi]) / (b[bi] - a[bi])
+            return along, ends[fit['line']][ai] if 'line' in fit else border, border
+    raise SystemExit(f'zone {i}: the fitted vault lies past the end of its wall')
+
+
+def place_portals(world, shifted, landmarks=(), axes=None, fits=None):
     """Atlas crossings of shaped zones move onto the real shared chains; neighbours' arrivals follow."""
     import compact_atlas as ca
     zones = [world] + world['zones']
@@ -831,7 +863,23 @@ def place_portals(world, shifted, landmarks=()):
         links = [p for p in z['portals'] if p['to'] in ca.OUTDOORS and p['to'] in zones[i]['shape'].get('neighbours', []) and (i, p['to']) not in seams]
         fixed = [p for p in z['portals'] if p not in links]
         for p in sorted(links, key=lambda p: p['to']):
-            point, arrival, side = chain_endpoint(ca, z, p['to'], prev, fixed, vault=p['to'] in landmarks)
+            if p['to'] in landmarks and str(i) in (fits or {}):
+                axis = axes[str(i)]
+                along, across, border = fitted_vault(zones, i, p['to'], fits[str(i)], axis)
+                back = next(q for q in zones[p['to']]['portals'] if q['to'] == i)
+                wx, wy = -back['walk'][0], -back['walk'][1]                     # outward: into the city
+                out = wx if axis == 'x' else wy
+                inner = min((across, border), key=lambda v: v * out)            # land today: the wall's fill does not exist yet
+                line = (inner, along) if axis == 'x' else (along, inner)
+                point = (line[0] - wx * 3, line[1] - wy * 3)
+                arrival = (point[0] - wx * 6, point[1] - wy * 6)
+                side = [wx, wy]
+                near = lambda o, r: seg_dist((o['x'], o['y']), point, arrival) < r
+                z['slimes'] = [s for s in z['slimes'] if s.get('layout') != TAG or not near(s, 8.5)]
+                z['objects'] = [o for o in z['objects'] if o['kind'] not in ('tree', 'bush', 'rock', 'spire') or not near(o, 2.5 + o.get('r', 0))]
+                assert ca.clear(z, point, arrival), f"zone {i}: the fitted vault at {point} is blocked"
+            else:
+                point, arrival, side = chain_endpoint(ca, z, p['to'], prev, fixed, vault=p['to'] in landmarks)
             landing[i, p['to']] = (point, arrival, side)
             fixed.append(dict(x=point[0], y=point[1]))
             fixed.append(dict(x=arrival[0], y=arrival[1]))
@@ -1047,7 +1095,7 @@ def straighten(rows, runs_orig, runs_simp, tol):
     return new, old & ~new
 
 
-def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
+def build_walls(world, shifted, landmarks, margins, cfg_axes=None, fits=None):
     """Skaldholm's wall (docs/zone-shapes-pilot.md): along every border a shaped zone has with a landmark city, ramparts and
     towers (the city's own art, real collision objects) with a vault at the gate you walk through to enter the city.
 
@@ -1083,6 +1131,9 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
                 qf = min(feet_, key=lambda p_: math.dist(p_, (gx_, gy_)))
                 ai = 0 if axis == 'x' else 1            # the coordinate that is constant along the wall
                 bi = 1 - ai
+                if str(i) in (fits or {}):
+                    along_, across_, _ = fitted_vault(zones, i, lm, fits[str(i)], axis)
+                    qf = (across_, along_) if axis == 'x' else (along_, across_)
                 c_ = round(qf[ai], 2)
                 band_ = orig_floor if axis == 'x' else orig_floor.T
                 rows_ = band_[max(0, int(min(q[bi] for q in longest))):int(max(q[bi] for q in longest)) + 1]
@@ -1169,7 +1220,8 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
                         for k in range(1, int(ln / WALL_STEP)):
                             cx, cy = a_[0] + tx * k * WALL_STEP + nx * wall_in, a_[1] + ty * k * WALL_STEP + ny * wall_in
                             run_len += WALL_STEP
-                            if math.dist((cx, cy), A) <= hw + 1.9 or any(math.dist(t, (cx, cy)) < 2.2 for t in towers) or covered(cx, cy):
+                            lx, ly = a_[0] + tx * k * WALL_STEP, a_[1] + ty * k * WALL_STEP    # on the line itself: a leg along a seam has land on neither side
+                            if math.dist((cx, cy), A) <= hw + 1.9 or any(math.dist(t, (cx, cy)) < 2.2 for t in towers) or covered(cx, cy) or covered(lx, ly):
                                 continue
                             w, d = (2.8, 1.8) if abs(tx) >= abs(ty) else (1.8, 2.8)
                             adds.append(dict(kind='rampart', x=round(cx, 2), y=round(cy, 2), r=0, v=0, width=w, depth=d, color='#d7d3bc', label='', layout=TAG))
@@ -1222,11 +1274,12 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
             er = [list(r_) for r_ in z['shapeEdge']]
             band = dilate(floor, EDGE_BAND) & ~floor
             near = dilate(floor != orig_floor, EDGE_BAND)
+            seamed = {chr(ord('A') + z['shape']['neighbours'].index(p_['to'])) for p_ in z['portals'] if 'seam' in p_}
             for yy in range(n):
                 for xx in range(n):
                     if floor[yy, xx]:
                         er[yy][xx] = ' '
-                    elif near[yy, xx] and band[yy, xx]:
+                    elif near[yy, xx] and band[yy, xx] and er[yy][xx] not in seamed:    # beside a seam the ground stays the seam neighbour's
                         er[yy][xx] = code
             z['shapeEdge'] = [''.join(r_) for r_ in er]
             z['objects'].extend(adds)
@@ -1234,6 +1287,10 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
             # Both gates sit just past the arch's centre (the server also triggers up to 2.8 tiles before its portal) and carry the
             # one offset between the two frames: this zone's A is the city's own arch.
             shift = [round(carch['x'] - A[0], 2), round(carch['y'] - A[1], 2)]
+            if str(i) in (fits or {}):                         # the road was laid to the old border: carry it on to the arch
+                for path in z['paths']:
+                    if math.dist(path[0], (gate['x'], gate['y'])) < 1.5:    # ca.approach runs from the gate back to the road
+                        path.insert(0, [A[0], A[1]])
             gate['x'], gate['y'], gate['r'] = round(A[0] + wx * 3.0, 2), round(A[1] + wy * 3.0, 2), 1.2
             # the doorway is clear: scenery of the city standing in its own opening would block it and show from one side only
             city['objects'] = [o for o in city['objects'] if not (o['kind'] in ('tree', 'bush', 'rock', 'flowers')
@@ -1252,7 +1309,17 @@ def build_walls(world, shifted, landmarks, margins, cfg_axes=None):
             assert int(gate['y']) * n + int(gate['x']) in prev, f"zone {i}: the vault gate to {lm} is cut off by the wall (A {A}, gate {gate['x']},{gate['y']}, walk {wx},{wy}, on land {on(gate['x'], gate['y'])}, pocket cells {int(pocket.sum())}, arch hw {hw})"
             ca.exit_routes(z)
             ca.exit_routes(city)
-            regs = vault_regions(runs, lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and floor_now[int(y), int(x)], floor_now)
+            # a region's ends stop at land, this zone's or a seam neighbour's (Skaldholm has shaped zones on every side)
+            taken = floor_now.copy()
+            for p_ in z['portals']:
+                if 'seam' in p_:
+                    other = np.array([[c == '#' for c in row] for row in zones[p_['to']]['shapeFloor']])
+                    sx_, sy_ = p_['seam']['shift']
+                    js, is_ = np.nonzero(other)
+                    js, is_ = js - sy_, is_ - sx_
+                    keep = (js >= 0) & (js < n) & (is_ >= 0) & (is_ < n)
+                    taken[js[keep], is_[keep]] = True
+            regs = vault_regions(runs, lambda x, y: 0 <= int(y) < n and 0 <= int(x) < n and floor_now[int(y), int(x)], taken)
             z['shape'].setdefault('vaultRegions', []).extend(dict(r_, to=lm, portal=gate['id']) for r_ in regs)
             print(f"zone {i}: wall to {zones[lm]['name']}: {len(adds) - len(towers)} ramparts, {len(towers)} towers, vault at {A}, shift {shift}")
 
@@ -1327,8 +1394,8 @@ def apply(world, cfg):
         print(f"zone {z}: {'warped ' if warp else ''}{S0}x{S0} -> {geom['size']}x{geom['size']} (bbox {geom['bbox'][0]}x{geom['bbox'][1]}, k {geom['scale']:.3f}), "
               f"core at ({ox},{oy}), +{added[0]} objects, +{added[1]} spawns, {len(voids)} void pieces")
     shift_incoming(world, shifted, 1)
-    place_portals(world, shifted, cfg.get('landmarks', []))
-    build_walls(world, shifted, cfg.get('landmarks', []), margins, cfg.get('wallAxis'))
+    place_portals(world, shifted, cfg.get('landmarks', []), cfg.get('wallAxis'), cfg.get('wallFit'))
+    build_walls(world, shifted, cfg.get('landmarks', []), margins, cfg.get('wallAxis'), cfg.get('wallFit'))
     return shifted
 
 
