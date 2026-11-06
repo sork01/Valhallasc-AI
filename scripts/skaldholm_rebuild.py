@@ -777,7 +777,7 @@ def east_wall(world, city):
     y0, y1 = round(tc[0]['y'] + zc['shape']['T'][1] - TC[1], 2), round(gy - TC[1], 2)
     y = y0 + 4.6
     n = 0
-    while y < y1 - 3.4:
+    while y < y1 - 1.7:          # up to the corner tower's north face: the last piece ends inside the tower (it used to stop at y1 - 3.4 and leave a 3.8-tile hole)
         city['objects'].append(dict(kind='rampart', x=x, y=round(y, 2), r=0, v=0, width=1.8, depth=5.8, color='#d7d3bc', label='', layout='skaldholm_east_wall'))
         y += 5.9
         n += 1

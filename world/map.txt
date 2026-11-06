@@ -316469,6 +316469,18 @@
           "layout": "skaldholm_east_wall"
         },
         {
+          "kind": "rampart",
+          "x": 104.2,
+          "y": 171.2,
+          "r": 0,
+          "v": 0,
+          "width": 1.8,
+          "depth": 5.8,
+          "color": "#d7d3bc",
+          "label": "",
+          "layout": "skaldholm_east_wall"
+        },
+        {
           "kind": "tower",
           "x": 104.2,
           "y": 173.7,
