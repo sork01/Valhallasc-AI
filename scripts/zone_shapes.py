@@ -1334,12 +1334,18 @@ def unshape(world, cfg):
         offsets[z] = zone['shape']['offset']
         set_view(world, z, json.loads(side.read_text()))
     shift_incoming(world, {z: o for z, o in offsets.items()}, -1)
+    if cfg.get('cityRebuild'):      # AFTER the neighbours' shift_incoming(-1), which also rewrote the city's back portals
+        import skaldholm_rebuild
+        skaldholm_rebuild.restore(world)
     return offsets
 
 
 def apply(world, cfg):
     atlas = Atlas()
     SIDE.mkdir(exist_ok=True)
+    if cfg.get('cityRebuild'):      # the old city, before build_walls edits its back portals
+        import skaldholm_rebuild
+        skaldholm_rebuild.save_sidecar(world)
     shifted = {}
     margins = {}
     olds = {z: get_view(world, z) for z in cfg['zones']}
@@ -1412,6 +1418,9 @@ def apply(world, cfg):
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)
+    if cfg.get('cityRebuild'):      # last: the neighbours' walls are final, the city is made in the middle of them
+        import skaldholm_rebuild
+        skaldholm_rebuild.rebuild(world)
     return shifted
 
 
