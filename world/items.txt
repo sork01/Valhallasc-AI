@@ -77,6 +77,27 @@
     "sell": 60
   },
   {
+    "id": "hoarhorn_tusk",
+    "name": "Hoarhorn Tusk",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 120
+  },
+  {
+    "id": "whitewail_shroud",
+    "name": "Whitewail Shroud",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 120
+  },
+  {
+    "id": "shardback_carapace",
+    "name": "Shardback Carapace",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 120
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",

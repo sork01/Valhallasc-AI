@@ -1403,6 +1403,9 @@ def apply(world, cfg):
     if 1 in cfg['zones']:
         import crags_design
         print('crags', crags_design.design(world, write=True)[1])
+    if 2 in cfg['zones']:
+        import rimeveil_design
+        print('rimeveil', rimeveil_design.design(world, write=True)[1])
     return shifted
 
 

@@ -115,3 +115,7 @@ Later the same day (`1fe2d9b`..`bb150a4`): Skaldholm's own wall is the wall. `wa
 ## Greenmeadow redesign (2026-11-06)
 
 Zone 0 is now an authored map on the same outline: `docs/greenmeadow-design.md`. Its filler (`FILL[0]`) still runs so portals and walls are placed exactly as before, then `greenmeadow_design.py` replaces the scenery, spawns, trails and adds hamlets and quests.
+
+## Rimeveil redesign (2026-11-06)
+
+Zone 2 is now an authored map on the same outline: `docs/rimeveil-design.md`. Same method as Greenmeadow and the Crags: the filler still runs so seams, the vault and the wall are placed as before, then `rimeveil_design.py` (after `crags_design.py` in `apply`) replaces scenery, spawns and trails and adds three outposts, 17 quests and three elites. New client pieces: frost ground classes, a frost `drawWater` look, `client/rimeveilart.js` (`rime_peak`), the elite loader for `rimeelites.txt`. Water stays out of the vault's land region and 17 tiles from every seam, because neither the vault nor the seam ghosts draw `water`.

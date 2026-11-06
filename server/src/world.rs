@@ -698,6 +698,10 @@ impl Slime {
             // The Crags' two new elites, beside the Cinderlord: a party of level-10 fighters, or one hero well past the zone.
             "slagmaw" => (2600., 150., 2.2, 1.9),
             "ashwing" => (1900., 170., 3.4, 1.5),
+            // Rimeveil's three elites, beside the wyrms: a party of level-15 fighters, or one hero well past the zone.
+            "hoarhorn" => (5400., 230., 2.4, 2.0),
+            "whitewail" => (3800., 260., 3.4, 1.6),
+            "shardback" => (4800., 210., 2.2, 1.7),
             "crab" => (900., 60., 2.8, 1.1),
             "wolf" => (1000., 72., 3.6, 1.2),
             "yeti" => (1900., 88., 2.2, 1.6),
@@ -875,6 +879,7 @@ impl Slime {
             "cinderlord" => 10,
             "oldtusker" | "tidecrusher" | "orchardqueen" => 7,
             "slagmaw" | "ashwing" => 10,
+            "hoarhorn" | "whitewail" | "shardback" => 15,
             "crab" => 10,
             "wolf" => 12,
             "yeti" => 13,
@@ -1010,6 +1015,7 @@ impl Slime {
             "cinderlord" => 100,
             "oldtusker" | "tidecrusher" | "orchardqueen" => 70,
             "slagmaw" | "ashwing" => 110,
+            "hoarhorn" | "whitewail" | "shardback" => 260,
             "crab" => 60,
             "wolf" => 78,
             "yeti" => 105,
@@ -1158,9 +1164,8 @@ impl Slime {
             "spider" => (0.4, 1.1, 8., 7.5),
             "wraith" => (0.5, 1.2, 7.5, 8.),
             "golem" => (0.6, 1.5, 6., 6.5),
-            "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw" | "ashwing" => {
-                (0.65, 1.25, 7., 7.)
-            }
+            "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw" | "ashwing"
+            | "hoarhorn" | "whitewail" | "shardback" => (0.65, 1.25, 7., 7.),
             "crab" => (0.4, 1., 8., 7.),
             "wolf" => (0.3, 0.9, 9.5, 9.),
             "yeti" => (0.7, 1.6, 6.5, 7.),
@@ -4607,7 +4612,7 @@ impl World {
                 "big" => 0.,
                 "ember_firelord" => 1e9,
                 "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw"
-                | "ashwing" => 180.,
+                | "ashwing" | "hoarhorn" | "whitewail" | "shardback" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
@@ -5218,6 +5223,9 @@ impl World {
                             | "orchardqueen"
                             | "slagmaw"
                             | "ashwing"
+                            | "hoarhorn"
+                            | "whitewail"
+                            | "shardback"
                             | "gloomroot"
                             | "hollow_rider"
                             | "grinch"

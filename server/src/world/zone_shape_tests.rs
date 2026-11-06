@@ -1298,3 +1298,316 @@ fn ulf_walks_the_cart_over_the_ford_and_up_the_highfire_road() {
         "Ulf reached the end of the road"
     );
 }
+
+// ---- Rimeveil Glacier, authored (scripts/rimeveil_design.py) ----------------------------------------------------------
+
+#[test]
+fn the_glacier_outposts_are_sanctuaries_with_their_people() {
+    let w = world();
+    let map = &w.maps[2];
+    assert_eq!(
+        map.camps.len(),
+        3,
+        "Driftwatch, Shearwind Post and Peakrest"
+    );
+    for id in [
+        "rime_dw_hild",
+        "rime_dw_nils",
+        "rime_dw_trader",
+        "travel_driftwatch",
+        "rime_sw_runa",
+        "rime_sw_arne",
+        "rime_sw_trader",
+        "travel_shearwind",
+        "rime_pk_gunnar",
+        "rime_pk_sif",
+        "rime_pk_trader",
+        "travel_peakrest",
+    ] {
+        let npc = map.npcs.iter().find(|n| n.id == id).unwrap();
+        let spot = Point { x: npc.x, y: npc.y };
+        assert!(map.in_city(spot), "{id} stands in a sanctuary");
+        let mut q = spot;
+        map.collide(&mut q, PLAYER_RADIUS);
+        assert!(q.distance(spot) < 1e-6, "{id} stands on free ground");
+        assert!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 2 && s.state != "waiting")
+                .all(|s| s.point().distance(spot) > 8.),
+            "no enemy within eight units of {id}"
+        );
+    }
+    // mail_all stops at the camp's old entry, so the outposts' mailboxes are checked here
+    for hub in ["driftwatch", "shearwind", "peakrest"] {
+        let find = |id: String| map.npcs.iter().find(|n| n.id == id).unwrap();
+        let (b, m) = (
+            find(format!("mailbox_2_{hub}")),
+            find(format!("travel_{hub}")),
+        );
+        let (spot, anchor) = (at(b.x, b.y), at(m.x, m.y));
+        let mut q = spot;
+        map.collide(&mut q, 0.6);
+        assert!(q.distance(spot) < 0.01, "{hub}: mailbox blocked");
+        assert!(map.line_clear(anchor, spot, 0.4), "{hub}: mailbox approach");
+    }
+    let master = map.npcs.iter().find(|n| n.id == "travel_rimeward").unwrap();
+    for hub in ["driftwatch", "shearwind", "peakrest"] {
+        assert!(
+            master
+                .travel_links
+                .iter()
+                .any(|l| l == &format!("travel_{hub}")),
+            "Rimeward's Travel Master links to {hub}"
+        );
+    }
+}
+
+#[test]
+fn every_glacier_quest_can_be_done_on_the_map() {
+    let w = world();
+    let map = &w.maps[2];
+    let mut played = 0;
+    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_")) {
+        assert!((10..=15).contains(&q.level), "{}: level {}", q.id, q.level);
+        assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
+        for o in &q.objectives {
+            match o.kind.as_str() {
+                "visit" | "hold" => assert!(
+                    map.places.iter().any(|p| p.id == o.target),
+                    "{}: place {}",
+                    q.id,
+                    o.target
+                ),
+                "talk" | "escort" => assert!(
+                    map.npcs.iter().any(|n| n.id == o.target),
+                    "{}: npc {}",
+                    q.id,
+                    o.target
+                ),
+                "kill" if o.target != "any" => assert!(
+                    w.slimes.iter().any(|s| s.zone == 2 && s.kind == o.target),
+                    "{}: enemy {}",
+                    q.id,
+                    o.target
+                ),
+                "bring" => assert!(
+                    w.slimes
+                        .iter()
+                        .any(|s| s.zone == 2 && crate::items::material(&s.kind) == o.target),
+                    "{}: some enemy of the glacier drops {}",
+                    q.id,
+                    o.target
+                ),
+                _ => {}
+            }
+            played += 1;
+        }
+        assert!(
+            map.npcs.iter().any(|n| n.id == q.npc),
+            "{}: giver {} is on the glacier",
+            q.id,
+            q.npc
+        );
+        if let Some(id) = &q.requires {
+            let pre = map.quests.iter().find(|p| &p.id == id).unwrap();
+            assert!(pre.level <= q.level, "{} unlocks upward", q.id);
+        }
+    }
+    assert!(played > 35, "the walk covers the whole chain: {played}");
+}
+
+#[test]
+fn the_glacier_has_three_elites_two_with_a_quest() {
+    let w = world();
+    let quests = &w.maps[2].quests;
+    for (kind, quest) in [
+        ("hoarhorn", true),
+        ("whitewail", true),
+        ("shardback", false),
+    ] {
+        assert_eq!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 2 && s.kind == kind)
+                .count(),
+            1,
+            "one {kind}"
+        );
+        assert!(crate::items::is_elite(kind), "{kind} is an elite");
+        assert_eq!(
+            quests
+                .iter()
+                .any(|q| q.objectives.iter().any(|o| o.target == kind)),
+            quest,
+            "{kind} quest"
+        );
+    }
+}
+
+#[test]
+fn a_glacier_road_reaches_every_gate_and_the_ice_rings_are_solid() {
+    let w = world();
+    let map = &w.maps[2];
+    let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
+    let paths = data["zones"][1]["paths"].as_array().unwrap();
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+        let near = paths.iter().flat_map(|r| r.as_array().unwrap()).any(|q| {
+            at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.
+        });
+        assert!(near, "a road reaches {}", p.id);
+    }
+    // a ring of ice is terrain: nobody walks through its middle, and every road still gets across at a ford
+    let rings: Vec<&Value> = data["zones"][1]["objects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|o| o["kind"] == "water")
+        .collect();
+    assert!(rings.len() > 500, "{} water circles", rings.len());
+    let o = rings[rings.len() / 2];
+    let spot = at(o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
+    let mut q = spot;
+    map.collide(&mut q, PLAYER_RADIUS);
+    assert!(q.distance(spot) > 0.1, "the ice is solid");
+    for road in paths {
+        let pts = road.as_array().unwrap();
+        for leg in pts.windows(2) {
+            let (a, b) = (
+                at(leg[0][0].as_f64().unwrap(), leg[0][1].as_f64().unwrap()),
+                at(leg[1][0].as_f64().unwrap(), leg[1][1].as_f64().unwrap()),
+            );
+            for k in 0..=24 {
+                let t = k as f64 / 24.;
+                let spot = at(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+                if map.in_city(spot) {
+                    continue;
+                }
+                let mut q = spot;
+                map.collide(&mut q, PLAYER_RADIUS);
+                assert!(q.distance(spot) < 1e-6, "the road is clear at {spot:?}");
+            }
+        }
+    }
+}
+
+fn glacier_hero(w: &mut World, x: f64, y: f64, level: u32, quest: &str) -> mpsc::Receiver<Value> {
+    let rx = meadow_hero(w, x, y, level, quest);
+    w.players.get_mut(&1).unwrap().character.zone = 2;
+    rx
+}
+
+fn hold_wakes_its_waves_and_counts_twenty_seconds(
+    spot: (f64, f64),
+    level: u32,
+    quest: &str,
+    prefix: &str,
+) {
+    let mut w = world();
+    let _rx = glacier_hero(&mut w, spot.0, spot.1, level, quest);
+    let sleepers = |w: &World| {
+        w.spawns
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| s.ambush.as_deref().is_some_and(|t| t.starts_with(prefix)))
+            .filter(|(id, _)| w.slimes[*id].dead)
+            .count()
+    };
+    assert_eq!(
+        sleepers(&w),
+        4,
+        "four enemies sleep until the waves call them"
+    );
+    for tick in 0..(24. / TICK) as usize {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.hp = c.max_hp();
+        w.step();
+        if tick == (5. / TICK) as usize {
+            assert_eq!(sleepers(&w), 2, "the first wave came");
+        }
+        if tick == (15. / TICK) as usize {
+            assert_eq!(sleepers(&w), 0, "the second wave came");
+        }
+    }
+    let c = &w.players[&1].character;
+    assert!(
+        c.quests.iter().find(|q| q.id == quest).unwrap().counts[0] >= 20,
+        "the hold is complete"
+    );
+}
+
+#[test]
+fn the_signal_fire_wakes_the_fells_and_counts_twenty_seconds() {
+    hold_wakes_its_waves_and_counts_twenty_seconds(
+        (30., 128.),
+        14,
+        "rime_sw_signal",
+        "rime_signal_m",
+    );
+}
+
+#[test]
+fn the_stranded_sledge_wakes_the_drifts_and_counts_twenty_seconds() {
+    hold_wakes_its_waves_and_counts_twenty_seconds(
+        (96., 259.),
+        12,
+        "rime_dw_sledge",
+        "rime_sledge_m",
+    );
+}
+
+#[test]
+fn sif_walks_the_charts_from_peakrest_down_through_the_rings_to_the_heart() {
+    let mut w = world();
+    let sif = w.maps[2]
+        .npcs
+        .iter()
+        .find(|n| n.id == "rime_pk_sif")
+        .unwrap()
+        .clone();
+    let route = &sif.escort.as_ref().unwrap().route;
+    for leg in route.windows(2) {
+        let (from, to) = (at(leg[0][0], leg[0][1]), at(leg[1][0], leg[1][1]));
+        for k in 0..=20 {
+            let t = k as f64 / 20.;
+            let spot = at(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
+            let mut q = spot;
+            w.maps[2].collide(&mut q, PLAYER_RADIUS);
+            assert!(q.distance(spot) < 1e-6, "the road is clear at {spot:?}");
+        }
+    }
+    let _rx = glacier_hero(&mut w, sif.x, sif.y + 1., 14, "rime_pk_chart");
+    w.time += 1.;
+    w.interact(1, "rime_pk_sif", None);
+    let owner = w.players[&1].character.id.clone();
+    let escort = w.escort_of(&owner).expect("Sif joins");
+    for _ in 0..(150. / TICK) as usize {
+        let Some(e) = w.players.get(&escort) else {
+            break;
+        };
+        let there = e.character.point();
+        let e = &mut w.players.get_mut(&escort).unwrap().character;
+        e.hp = e.max_hp();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = there.x + 1.;
+        c.y = there.y + 1.;
+        c.hp = c.max_hp();
+        for s in w.slimes.iter_mut().filter(|s| s.zone == 2 && !s.dead) {
+            if s.point().distance(there) < 12. {
+                s.dead = true;
+                s.respawn = 1e9;
+            }
+        }
+        w.step();
+    }
+    let c = &w.players[&1].character;
+    assert_eq!(
+        c.quests
+            .iter()
+            .find(|q| q.id == "rime_pk_chart")
+            .unwrap()
+            .counts[0],
+        1,
+        "Sif reached the Heart"
+    );
+}
