@@ -1429,6 +1429,7 @@ def apply(world, cfg):
         skaldholm_rebuild.rebuild(world)
         skaldholm_rebuild.even_flank_wall(world)
         skaldholm_rebuild.wing_gate(world, margins)
+        skaldholm_rebuild.seam_tower(world)
     return shifted
 
 

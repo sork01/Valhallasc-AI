@@ -736,6 +736,24 @@ def wing_gate(world, margins):
     return filled
 
 
+def seam_tower(world):
+    """The tower where the city's east wall leaves the Crags (owner, 2026-11-06: "where meadow meets crags on the Skaldholm wall, from the meadow side the wall is
+    missing a tower, from the Crags side the tower is there"). The Crags' wall ends in a tower at atlas (456.2, 727), right on the 0-1 border. `wing_gate`
+    made the ground around it Greenmeadow's, and a seam neighbour's piece is never drawn over our own land, so Greenmeadow lost the tower its wall starts
+    from. Like the south-west corner: the tower is a piece of BOTH neighbours (same collision and art from either side). Runs after `wing_gate`."""
+    g, c = zs.zone_of(world, 0), zs.zone_of(world, 1)
+    Tg, Tc = g['shape']['T'], c['shape']['T']
+    tc = [o for o in c['objects'] if o['kind'] == 'tower' and o.get('layout') == TAG and abs(o['x'] + Tc[0] - 456.2) < .3 and 720 < o['y'] + Tc[1] < 733]
+    assert len(tc) == 1, "the Crags' wall no longer ends in one tower at (456.2, 727)"
+    t = tc[0]
+    x, y = round(t['x'] + Tc[0] - Tg[0], 2), round(t['y'] + Tc[1] - Tg[1], 2)
+    if any(o['kind'] == 'tower' and abs(o['x'] - x) < .1 and abs(o['y'] - y) < .1 for o in g['objects']):
+        return 0
+    g['objects'].append(dict(t, x=x, y=y))
+    print(f"seam tower: the Crags' end tower stands in Greenmeadow too, at ({x}, {y})")
+    return 1
+
+
 def trim_greenmeadow_flank(world):
     """Greenmeadow's wall used to run on past the city's east wall and turn north in a leg (the right-hand wing of the old L). It stops at the
     corner now: everything east of x 457 goes."""

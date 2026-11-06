@@ -60875,6 +60875,18 @@
       "width": 4,
       "depth": 7,
       "layout": "shape_v1"
+    },
+    {
+      "kind": "tower",
+      "x": 178.2,
+      "y": 93.0,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.4,
+      "color": "#4a7a9a",
+      "label": "",
+      "layout": "shape_v1"
     }
   ],
   "slimes": [

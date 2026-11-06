@@ -128,6 +128,33 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     console.log(`vault-seamless-ui corner: ${checks} checks passed; screenshots in ${out}`);
     return;
   }
+  // PART=eastcorner: the city's south-east corner where Greenmeadow, the Crags and Skaldholm meet (atlas 456.2, 757.7; owner, 2026-11-06: "from the meadow side the wall
+  // is missing a tower, from the Crags side the tower is there"). Every frame must draw the SAME wall pieces around it (own plus ghosts, atlas coordinates).
+  if (process.env.PART === 'eastcorner') {
+    const C = (process.env.EC || '456.2,757.7').split(',').map(Number), R = 11, key = (o, T) => `${o[0]}@${(o[1] + T[0]).toFixed(1)},${(o[2] + T[1]).toFixed(1)}`;
+    const sets = {};
+    for (const [zone, dx, dy] of (process.env.EV || '0:9:8,1:9:-22,4:-12:-6').split(',').map(v => v.split(':').map(Number))) {
+      const T = zoneDef(zone).shape.T, hx = C[0] - T[0] + dx, hy = C[1] - T[1] + dy;
+      check(onLand(zone, hx, hy), `zone ${zone}: the viewing spot is on land`);
+      await debug({ op: 'teleport', zone, x: hx, y: hy });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, hx, hy], { timeout: 20000 });
+      await page.waitForTimeout(3500);
+      const near = o => Math.hypot(o[1] + T[0] - C[0], o[2] + T[1] - C[1]) < R;
+      const own = zoneDef(zone).objects.filter(o => (o.kind === 'rampart' || o.kind === 'tower') && near([o.kind, o.x, o.y])).map(o => [o.kind, o.x, o.y]);
+      const ghost = (await page.evaluate(() => Field.wallGhosts)).filter(near);
+      sets[zone] = new Set([...own, ...ghost].map(o => key(o, T)));
+      console.log(`zone ${zone}: ${own.length} own + ${ghost.length} ghost wall pieces within ${R} tiles of the corner: ${[...sets[zone]].sort().join(' ')}`);
+      await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+      await page.screenshot({ path: path.join(out, `eastcorner-zone${zone}.png`) });
+    }
+    for (const a of [0, 1, 4]) for (const b of [0, 1, 4]) if (a < b) {
+      const only = [...sets[a]].filter(k => !sets[b].has(k)).concat([...sets[b]].filter(k => !sets[a].has(k)).map(k => '~' + k));
+      check(only.length === 0, `the east corner's wall pieces are the same from zone ${a} and zone ${b} (differ: ${only.join(' ')})`);
+    }
+    assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
+    console.log(`vault-seamless-ui eastcorner: ${checks} checks passed`);
+    return;
+  }
   const rows = [];
   for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
