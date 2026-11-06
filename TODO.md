@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Melee range a bit longer, players and enemies (owner request, 2026-11-06)
+
+- [ ] `MELEE-REACH` — Lengthen the melee attack range a little, for **both players and enemies** (owner: "melee range can be a bit longer"). Starting points: player reach is `Class::reach()` in `server/src/model.rs` (Warrior 1.35, Assassin 1.1, Priest 1.5; ranged classes unchanged); enemy melee range is wherever `world.rs` decides a monster can strike (look near the `distance - s.r <= ...reach()` checks around lines 3332/3351/3729 and the enemy attack code; `Slime::melee_inside` is only the ranged-kind threshold). Ask the owner (`AskUserQuestion`) how much if not obvious (suggest about +0.4 to +0.5 tiles, or ~25%); keep the client swing arcs/hit feedback (`client/field.js`), mercenary and `boss_play` approach distances, duel/gauntlet helpers (`duel_tests.rs`, `gauntlet.rs` use `reach()` too), pursuit stop distances and the `Ranged`/`melee_inside` boundaries consistent so nothing stops short or oscillates. Check which existing tuning depends on reach (TTK grid, dungeon calibration, boss mechanics safety times, DPS dummy start 1 tile away): a longer reach changes who can hit whom, so re-run only the checks that name reach, do not recalibrate encounters unless asked (PvP balancing is closed). Release as a server change (binary restart, nobody online, back up first). Test only this: a Rust test that a melee player and a melee enemy now hit from the new distance and not beyond it.
+
 ### Zone shapes follow the world-map provinces (owner request, 2026-11-05)
 
 **Owner request:** change the zones so they look like the zones on the world map, shape-wise (today every zone is a square grid; the painted atlas gives each province an irregular outline, `world/atlas-geography.txt`, 23 regions).
