@@ -55,28 +55,6 @@
     }
   },
   {
-    "id": "mailbox_6_hollowmoot",
-    "zone": 6,
-    "hub": "Hollowmoot",
-    "x": 25.62,
-    "y": 155.62,
-    "anchor": {
-      "x": 23.5,
-      "y": 153.5
-    }
-  },
-  {
-    "id": "mailbox_6_skuldwatch",
-    "zone": 6,
-    "hub": "Skuldwatch",
-    "x": 91.5,
-    "y": 89.5,
-    "anchor": {
-      "x": 88.5,
-      "y": 89.5
-    }
-  },
-  {
     "id": "mailbox_7_heimdall_s_perch",
     "zone": 7,
     "hub": "Heimdall's Perch",
@@ -437,6 +415,61 @@
     "anchor": {
       "x": 215,
       "y": 154
+    }
+  },
+  {
+    "id": "mailbox_6_hollowmoot",
+    "zone": 6,
+    "hub": "Hollowmoot",
+    "x": 70.62,
+    "y": 282.62,
+    "anchor": {
+      "x": 68,
+      "y": 280
+    }
+  },
+  {
+    "id": "mailbox_6_skuldwatch",
+    "zone": 6,
+    "hub": "Skuldwatch",
+    "x": 161.5,
+    "y": 207.0,
+    "anchor": {
+      "x": 158,
+      "y": 206.5
+    }
+  },
+  {
+    "id": "mailbox_6_gallowsfoot",
+    "zone": 6,
+    "hub": "Gallowsfoot",
+    "x": 258,
+    "y": 298,
+    "anchor": {
+      "x": 254,
+      "y": 299
+    }
+  },
+  {
+    "id": "mailbox_6_ridgewatch",
+    "zone": 6,
+    "hub": "Ridgewatch",
+    "x": 182,
+    "y": 144,
+    "anchor": {
+      "x": 179,
+      "y": 146.5
+    }
+  },
+  {
+    "id": "mailbox_6_highmoor",
+    "zone": 6,
+    "hub": "Highmoor Hold",
+    "x": 148,
+    "y": 115,
+    "anchor": {
+      "x": 149,
+      "y": 115.5
     }
   }
 ]

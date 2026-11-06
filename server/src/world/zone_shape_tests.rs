@@ -2,7 +2,7 @@
 use super::wyrd_tests::{at, join, place, world};
 use super::*;
 
-const SHAPED: [usize; 5] = [0, 1, 2, 3, 16];
+const SHAPED: [usize; 6] = [0, 1, 2, 3, 6, 16];
 
 fn bundled() -> Value {
     serde_json::from_str(include_str!("../../../world/map.txt")).unwrap()
@@ -109,6 +109,12 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
                         continue; // near a seam border (the line's vertices are up to ~30 tiles apart)
                     }
                     let mut p = at(x as f64 + 0.5, y as f64 + 0.5);
+                    // a walker can only start where he can stand (the Wyrdwood's river runs right out to the edge: its water is solid there)
+                    let mut free = p;
+                    w.maps[zone].collide(&mut free, 0.4);
+                    if free.distance(p) > 0.01 {
+                        continue;
+                    }
                     w.maps[zone].walk(&mut p, at(dx as f64, dy as f64), 4.0, 0.4);
                     assert!(
                         on_land(p.x, p.y),
@@ -120,8 +126,9 @@ fn shaped_zones_keep_all_content_on_land_and_the_edge_stops_walkers() {
                 }
             }
         }
-        // (Gloamfen has seams on two sides and a wall on a third: little plain edge is left)
-        assert!(tested > 20, "zone {zone}: only {tested} edge walks");
+        // (Gloamfen has seams on two sides and a wall on a third, the glacier seams on three: little plain edge is left)
+        let floor = if zone == 2 { 10 } else { 20 };
+        assert!(tested > floor, "zone {zone}: only {tested} edge walks");
     }
 }
 
@@ -173,7 +180,8 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
             );
         }
         // the meadow's and Gloamfen's other borders are seams now: only Skaldholm is a gate
-        let wanted = if zone == 0 || zone == 3 { 1 } else { 2 };
+        // (the glacier's Wyrdwood border and the Wyrdwood's glacier and Crags borders are seams too: each keeps one gate)
+        let wanted = if matches!(zone, 0 | 2 | 3 | 6) { 1 } else { 2 };
         assert!(
             border >= wanted,
             "zone {zone}: only {border} gate crossings"
@@ -255,8 +263,93 @@ fn gloamfen_keeps_its_gate_to_skaldholm() {
 }
 
 #[test]
-fn the_glacier_keeps_gates_to_wyrdwood_and_skaldholm() {
-    gates_stand_on_free_land(2, &[4, 6]);
+fn the_glacier_keeps_its_gate_to_skaldholm() {
+    gates_stand_on_free_land(2, &[4]);
+}
+
+#[test]
+fn the_wyrdwood_keeps_its_gate_to_bifrost() {
+    gates_stand_on_free_land(6, &[7]);
+}
+
+#[test]
+fn the_wyrdwood_and_the_glacier_share_a_seam() {
+    seam_walks(6, 2);
+}
+
+#[test]
+fn the_wyrdwood_and_the_crags_share_a_seam() {
+    seam_walks(6, 1);
+}
+
+#[test]
+fn the_wyrdwood_seams_meet_the_crags_and_glacier_seam_at_a_corner_nobody_stands_on_two_crossings_at() {
+    let data = bundled();
+    let z = zone_of(&data, 6);
+    let seams: Vec<&Value> = z["portals"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|p| p.get("seam"))
+        .collect();
+    assert_eq!(seams.len(), 2, "the Wyrdwood has a seam to the Crags and one to the glacier");
+    // the junction: the end point the two seams share
+    let ends: Vec<Vec<(f64, f64)>> = seams
+        .iter()
+        .map(|s| {
+            let p = s["points"].as_array().unwrap();
+            [&p[0], &p[p.len() - 1]]
+                .iter()
+                .map(|q| (q[0].as_f64().unwrap(), q[1].as_f64().unwrap()))
+                .collect()
+        })
+        .collect();
+    let junction = ends[0]
+        .iter()
+        .flat_map(|a| ends[1].iter().map(move |b| (*a, *b)))
+        .min_by(|x, y| {
+            ((x.0 .0 - x.1 .0).hypot(x.0 .1 - x.1 .1))
+                .partial_cmp(&((y.0 .0 - y.1 .0).hypot(y.0 .1 - y.1 .1)))
+                .unwrap()
+        })
+        .unwrap();
+    assert!(
+        (junction.0 .0 - junction.1 .0).hypot(junction.0 .1 - junction.1 .1) < 0.5,
+        "the two seams meet at one corner"
+    );
+    // a hero walking toward the corner from inside the Wyrdwood is never on land of one zone while a neighbour's seam also claims him:
+    // stand on the Wyrdwood's land 3, 6 and 12 tiles from the corner along the bisector and check every crossing claims at most one seam
+    let on_land = land(z);
+    let (cx, cy) = junction.0;
+    let mut checked = 0;
+    for dist in [3., 6., 12.] {
+        for k in 0..16 {
+            let a = k as f64 / 16. * std::f64::consts::TAU;
+            let (x, y) = (cx + a.cos() * dist, cy + a.sin() * dist);
+            if !on_land(x, y) {
+                continue;
+            }
+            checked += 1;
+            let claims = seams
+                .iter()
+                .filter(|s| {
+                    s["points"]
+                        .as_array()
+                        .unwrap()
+                        .windows(2)
+                        .any(|w| {
+                            let (ax, ay) = (w[0][0].as_f64().unwrap(), w[0][1].as_f64().unwrap());
+                            let (bx, by) = (w[1][0].as_f64().unwrap(), w[1][1].as_f64().unwrap());
+                            let (dx, dy) = (bx - ax, by - ay);
+                            let t = (((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)).clamp(0., 1.);
+                            (x - ax - t * dx).hypot(y - ay - t * dy) < 0.5
+                        })
+                })
+                .count();
+            assert!(claims <= 1, "a point on the land at ({x:.1}, {y:.1}) lies on both seams");
+        }
+    }
+    assert!(checked > 0, "no land samples near the corner");
 }
 
 #[test]
@@ -1952,4 +2045,315 @@ fn walking_down_rimeveils_wall_into_the_last_wedge_never_shuts_a_hero_in() {
             assert!(c.x < 246.5, "arrived inside Skaldholm's wall at ({:.1},{:.1})", c.x, c.y);
         }
     }
+}
+
+// ---- the Wyrdwood as an authored map (scripts/wyrdwood_design.py) ---------------------------------------------------------
+const WYRD_HUBS: [&str; 3] = ["gallowsfoot", "ridgewatch", "highmoor"];
+
+#[test]
+fn the_wyrdwood_outposts_are_sanctuaries_with_their_people() {
+    let w = world();
+    let map = &w.maps[6];
+    assert_eq!(map.camps.len(), 4, "Skuldwatch, Gallowsfoot, Ridgewatch and Highmoor Hold");
+    for id in [
+        "wyrd_gf_hild",
+        "wyrd_gf_orm",
+        "wyrd_gf_trader",
+        "travel_gallowsfoot",
+        "wyrd_rw_dagny",
+        "wyrd_rw_fenn",
+        "wyrd_rw_trader",
+        "travel_ridgewatch",
+        "wyrd_hm_sunniva",
+        "wyrd_hm_loom",
+        "wyrd_hm_trader",
+        "travel_highmoor",
+    ] {
+        let npc = map.npcs.iter().find(|n| n.id == id).unwrap();
+        let spot = Point { x: npc.x, y: npc.y };
+        assert!(map.in_city(spot), "{id} stands in a sanctuary");
+        let mut q = spot;
+        map.collide(&mut q, PLAYER_RADIUS);
+        assert!(q.distance(spot) < 1e-6, "{id} stands on free ground");
+        assert!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 6 && s.state != "waiting")
+                .all(|s| s.point().distance(spot) > 8.),
+            "no enemy within eight units of {id}"
+        );
+    }
+    for hub in ["hollowmoot", "skuldwatch", "gallowsfoot", "ridgewatch", "highmoor"] {
+        let find = |id: String| map.npcs.iter().find(|n| n.id == id).unwrap();
+        let (b, m) = (
+            find(format!("mailbox_6_{hub}")),
+            find(format!("travel_{hub}")),
+        );
+        let (spot, anchor) = (at(b.x, b.y), at(m.x, m.y));
+        let mut q = spot;
+        map.collide(&mut q, 0.6);
+        assert!(q.distance(spot) < 0.01, "{hub}: mailbox blocked");
+        assert!(map.line_clear(anchor, spot, 0.4), "{hub}: mailbox approach");
+    }
+    // the mail directory is in the shaped frame too
+    let dir: Vec<Value> = serde_json::from_str(include_str!("../../../world/mailboxes.txt")).unwrap();
+    for hub in ["hollowmoot", "skuldwatch", "gallowsfoot", "ridgewatch", "highmoor"] {
+        let entry = dir
+            .iter()
+            .find(|d| d["id"] == format!("mailbox_6_{hub}"))
+            .unwrap_or_else(|| panic!("{hub} is in the mail directory"));
+        let b = map
+            .npcs
+            .iter()
+            .find(|n| n.id == format!("mailbox_6_{hub}"))
+            .unwrap();
+        assert!(
+            (entry["x"].as_f64().unwrap() - b.x).abs() < 0.01
+                && (entry["y"].as_f64().unwrap() - b.y).abs() < 0.01,
+            "{hub}: the directory holds the mailbox where it stands"
+        );
+    }
+    let skuld = map.npcs.iter().find(|n| n.id == "travel_skuldwatch").unwrap();
+    for hub in WYRD_HUBS {
+        assert!(
+            skuld.travel_links.iter().any(|l| l == &format!("travel_{hub}")),
+            "Skuldwatch's Travel Master links to {hub}"
+        );
+    }
+}
+
+#[test]
+fn every_wyrdwood_quest_can_be_done_on_the_map() {
+    let w = world();
+    let map = &w.maps[6];
+    let mut played = 0;
+    for q in map.quests.iter().filter(|q| q.id.starts_with("wyrd_")) {
+        assert!((20..=30).contains(&q.level), "{}: level {}", q.id, q.level);
+        assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
+        for o in &q.objectives {
+            match o.kind.as_str() {
+                "visit" | "hold" => assert!(
+                    map.places.iter().any(|p| p.id == o.target),
+                    "{}: place {}",
+                    q.id,
+                    o.target
+                ),
+                "talk" | "escort" => assert!(
+                    map.npcs.iter().any(|n| n.id == o.target),
+                    "{}: npc {}",
+                    q.id,
+                    o.target
+                ),
+                "kill" if o.target != "any" => assert!(
+                    w.slimes.iter().any(|s| s.zone == 6 && s.kind == o.target),
+                    "{}: enemy {}",
+                    q.id,
+                    o.target
+                ),
+                "bring" => assert!(
+                    w.slimes
+                        .iter()
+                        .any(|s| s.zone == 6 && crate::items::material(&s.kind) == o.target),
+                    "{}: some enemy of the Wyrdwood drops {}",
+                    q.id,
+                    o.target
+                ),
+                _ => {}
+            }
+            played += 1;
+        }
+        assert!(
+            map.npcs.iter().any(|n| n.id == q.npc),
+            "{}: giver {} is in the Wyrdwood",
+            q.id,
+            q.npc
+        );
+        if let Some(id) = &q.requires {
+            let pre = map.quests.iter().find(|p| &p.id == id).unwrap();
+            assert!(pre.level <= q.level, "{} unlocks upward", q.id);
+        }
+        assert!(q.id.len() <= 19, "{}: the accept string must fit", q.id);
+    }
+    assert!(played > 55, "the walk covers the whole chain: {played}");
+    // the fourteen new quests
+    for id in [
+        "wyrd_h_wood",
+        "wyrd_s_bridge",
+        "wyrd_gf_quills",
+        "wyrd_gf_hush",
+        "wyrd_gf_vigil",
+        "wyrd_gf_mill",
+        "wyrd_rw_orders",
+        "wyrd_rw_horns",
+        "wyrd_rw_gap",
+        "wyrd_rw_fire",
+        "wyrd_hm_rams",
+        "wyrd_hm_threads",
+        "wyrd_hm_ring",
+        "wyrd_hm_gale",
+    ] {
+        assert!(map.quests.iter().any(|q| q.id == id), "{id}");
+    }
+}
+
+#[test]
+fn the_wyrdwood_has_three_elites_two_with_a_quest() {
+    let w = world();
+    let quests = &w.maps[6].quests;
+    for (kind, quest) in [("oakhorn", true), ("hrungnir", true), ("hangedking", false)] {
+        assert_eq!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 6 && s.kind == kind)
+                .count(),
+            1,
+            "one {kind}"
+        );
+        assert!(crate::items::is_elite(kind), "{kind} is an elite");
+        assert_eq!(
+            quests
+                .iter()
+                .any(|q| q.objectives.iter().any(|o| o.target == kind)),
+            quest,
+            "{kind} quest"
+        );
+    }
+}
+
+#[test]
+fn a_wyrdwood_road_reaches_every_gate_and_the_river_is_solid() {
+    let w = world();
+    let map = &w.maps[6];
+    let data = bundled();
+    let z = zone_of(&data, 6);
+    let paths = z["paths"].as_array().unwrap();
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+        let near = paths.iter().flat_map(|r| r.as_array().unwrap()).any(|q| {
+            at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.
+        });
+        assert!(near, "a road reaches {}", p.id);
+    }
+    let water: Vec<&Value> = z["objects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|o| o["kind"] == "water")
+        .collect();
+    assert!(water.len() > 300, "{} water circles", water.len());
+    let o = water[water.len() / 2];
+    let spot = at(o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
+    let mut q = spot;
+    map.collide(&mut q, PLAYER_RADIUS);
+    assert!(q.distance(spot) > 0.1, "the water is solid");
+    // neither neighbour with a seam draws water: none stands within 16 tiles of one
+    let seams: Vec<(f64, f64)> = z["portals"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|p| p.get("seam"))
+        .flat_map(|s| s["points"].as_array().unwrap().iter().map(|q| (q[0].as_f64().unwrap(), q[1].as_f64().unwrap())))
+        .collect();
+    for o in &water {
+        let (x, y) = (o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
+        assert!(seams.iter().all(|q| (q.0 - x).hypot(q.1 - y) > 16.), "water at ({x},{y}) is near a seam");
+    }
+    for road in paths {
+        let pts = road.as_array().unwrap();
+        for leg in pts.windows(2) {
+            let (a, b) = (
+                at(leg[0][0].as_f64().unwrap(), leg[0][1].as_f64().unwrap()),
+                at(leg[1][0].as_f64().unwrap(), leg[1][1].as_f64().unwrap()),
+            );
+            for k in 0..=24 {
+                let t = k as f64 / 24.;
+                let spot = at(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+                if map.in_city(spot) {
+                    continue;
+                }
+                let mut q = spot;
+                map.collide(&mut q, PLAYER_RADIUS);
+                assert!(q.distance(spot) < 1e-6, "the road is clear at {spot:?}");
+            }
+        }
+    }
+    // no art-less building stands within the camera's reach of a seam: the other side draws none of them
+    for o in z["objects"].as_array().unwrap() {
+        let kind = o["kind"].as_str().unwrap();
+        if ["house", "tent", "stall", "noticeboard", "campfire", "brazier", "bench", "lamp", "chapel", "post"].contains(&kind) {
+            let (x, y) = (o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
+            for pair in z["portals"].as_array().unwrap().iter().filter_map(|p| p.get("seam")).flat_map(|s| {
+                let pts = s["points"].as_array().unwrap();
+                (0..pts.len() - 1).map(|i| (pts[i].clone(), pts[i + 1].clone())).collect::<Vec<_>>()
+            }) {
+                let (ax, ay, bx, by) = (pair.0[0].as_f64().unwrap(), pair.0[1].as_f64().unwrap(), pair.1[0].as_f64().unwrap(), pair.1[1].as_f64().unwrap());
+                let (dx, dy) = (bx - ax, by - ay);
+                let t = (((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)).clamp(0., 1.);
+                assert!((x - ax - t * dx).hypot(y - ay - t * dy) >= 20., "{kind} at ({x},{y}) is within 20 tiles of a seam");
+            }
+        }
+    }
+}
+
+fn wyrd_hero(w: &mut World, x: f64, y: f64, level: u32, quest: &str) -> mpsc::Receiver<Value> {
+    let rx = meadow_hero(w, x, y, level, quest);
+    w.players.get_mut(&1).unwrap().character.zone = 6;
+    rx
+}
+
+fn wyrd_hold(place: &str, level: u32, quest: &str, prefix: &str) {
+    let mut w = world();
+    let spot = {
+        let p = w.maps[6].places.iter().find(|p| p.id == place).unwrap();
+        (p.x, p.y)
+    };
+    let _rx = wyrd_hero(&mut w, spot.0, spot.1, level, quest);
+    let sleepers = |w: &World| {
+        w.spawns
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| s.ambush.as_deref().is_some_and(|t| t.starts_with(prefix)))
+            .filter(|(id, _)| w.slimes[*id].dead)
+            .count()
+    };
+    assert_eq!(
+        sleepers(&w),
+        4,
+        "four enemies sleep until the waves call them"
+    );
+    for tick in 0..(24. / TICK) as usize {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.hp = c.max_hp();
+        w.step();
+        if tick == (5. / TICK) as usize {
+            assert_eq!(sleepers(&w), 2, "the first wave came");
+        }
+        if tick == (15. / TICK) as usize {
+            assert_eq!(sleepers(&w), 0, "the second wave came");
+        }
+    }
+    let c = &w.players[&1].character;
+    assert!(
+        c.quests.iter().find(|q| q.id == quest).unwrap().counts[0] >= 20,
+        "the hold is complete"
+    );
+}
+
+#[test]
+fn the_hanged_vigil_wakes_the_hill_and_counts_twenty_seconds() {
+    wyrd_hold("wyrd_vigil_m", 25, "wyrd_gf_vigil", "wyrd_vigil_m");
+}
+
+#[test]
+fn the_ridge_fire_wakes_the_terrace_and_counts_twenty_seconds() {
+    wyrd_hold("wyrd_fire_m", 29, "wyrd_rw_fire", "wyrd_fire_m");
+}
+
+#[test]
+fn the_gale_stones_wake_the_highmoor_and_count_twenty_seconds() {
+    wyrd_hold("wyrd_gale_m", 30, "wyrd_hm_gale", "wyrd_gale_m");
+}
+
+#[test]
+fn the_bridgehead_wakes_the_bank_and_counts_twenty_seconds() {
+    wyrd_hold("wyrd_bridge_m", 26, "wyrd_s_bridge", "wyrd_bridge_m");
 }

@@ -845,5 +845,19 @@
   "The Mere Mouth",
   "The Old Quarter",
   "The Plank Ford",
-  "The Reed Ford"
+  "The Reed Ford",
+  "Gallowsfoot",
+  "Ridgewatch",
+  "Highmoor Hold",
+  "Eirik Loomwatch",
+  "Fenn Ramsong",
+  "Orm Crowfriend",
+  "Ragna Hornbuyer",
+  "Sigrun Stitchwife",
+  "Thorgrim Tindertrader",
+  "The Bridgehead",
+  "The East Gap",
+  "The Gale Stones",
+  "The Rotfang Wood",
+  "The Ruined Mill"
 ]

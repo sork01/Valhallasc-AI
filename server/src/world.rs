@@ -703,6 +703,8 @@ impl Slime {
             // Gloamfen's two new elites, beside the Gloomroot Colossus: a party of level-20 fighters, or one hero well past the zone.
             "bellowmaw" => (8200., 280., 2.4, 2.0),
             "rustmarshal" => (9400., 300., 2.2, 1.7),
+            // The Wyrdwood's new elite, beside the Oakhorn and Hrungnir: a party of level-26 fighters, or one hero well past the zone.
+            "hangedking" => (12600., 360., 2.6, 1.9),
             "whitewail" => (3800., 260., 3.4, 1.6),
             "shardback" => (4800., 210., 2.2, 1.7),
             "crab" => (900., 60., 2.8, 1.1),
@@ -884,6 +886,7 @@ impl Slime {
             "slagmaw" | "ashwing" => 10,
             "hoarhorn" | "whitewail" | "shardback" => 15,
             "bellowmaw" | "rustmarshal" => 20,
+            "hangedking" => 26,
             "crab" => 10,
             "wolf" => 12,
             "yeti" => 13,
@@ -1021,6 +1024,7 @@ impl Slime {
             "slagmaw" | "ashwing" => 110,
             "hoarhorn" | "whitewail" | "shardback" => 260,
             "bellowmaw" | "rustmarshal" => 900,
+            "hangedking" => 1400,
             "crab" => 60,
             "wolf" => 78,
             "yeti" => 105,
@@ -1173,6 +1177,8 @@ impl Slime {
             | "hoarhorn" | "whitewail" | "shardback" | "bellowmaw" | "rustmarshal" => {
                 (0.65, 1.25, 7., 7.)
             }
+            // The Hanged King swings his rope-wrapped beam: a long wind-up, a long reach.
+            "hangedking" => (0.85, 1.6, 7.5, 9.),
             "crab" => (0.4, 1., 8., 7.),
             "wolf" => (0.3, 0.9, 9.5, 9.),
             "yeti" => (0.7, 1.6, 6.5, 7.),
@@ -4620,7 +4626,7 @@ impl World {
                 "ember_firelord" => 1e9,
                 "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw"
                 | "ashwing" | "hoarhorn" | "whitewail" | "shardback" | "bellowmaw"
-                | "rustmarshal" => 180.,
+                | "rustmarshal" | "hangedking" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
@@ -5234,6 +5240,7 @@ impl World {
                             | "hoarhorn"
                             | "bellowmaw"
                             | "rustmarshal"
+                            | "hangedking"
                             | "whitewail"
                             | "shardback"
                             | "gloomroot"

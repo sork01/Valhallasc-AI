@@ -151,9 +151,16 @@ class Grid:
         return True
 
 
+# A design is seeded scatter: one more seam in the masks shifts every random draw, so the whole approved zone would reshuffle. A seam that
+# was added later (the Wyrdwood's, 2026-11-06) is therefore left out of the masks and applied afterwards, locally, by late_trim().
+LATE_SEAMS = {6}
+ARTLESS = ('house', 'tent', 'stall', 'noticeboard', 'campfire', 'brazier', 'bench', 'lamp', 'chapel', 'post')
+
+
 class Designer:
     # A subclass (scripts/crags_design.py) brings its own plan; the helpers below only read these.
     TAG, SEED = TAG, SEED
+    LATE_SEAMS = LATE_SEAMS
 
     def __init__(self, world):
         self.REGIONS, self.ROADS, self.R = self.plan()
@@ -172,9 +179,14 @@ class Designer:
         from zone_shapes import erode
         self.inner = erode(self.floor, 3)
         self.seam = np.full((self.n, self.n), 1e9)
+        self.seam_late = np.full((self.n, self.n), 1e9)     # seams that appeared after this zone's design was approved: see late_trim()
         for p in world['portals']:
             if p.get('seam'):
-                self.seam = np.minimum(self.seam, seg_field(p['seam']['points'], self.xs, self.ys))
+                f = seg_field(p['seam']['points'], self.xs, self.ys)
+                if p['to'] in self.LATE_SEAMS:
+                    self.seam_late = np.minimum(self.seam_late, f)
+                else:
+                    self.seam = np.minimum(self.seam, f)
         self.blocked = np.zeros((self.n, self.n), bool)   # no loose scenery or spawn here
         self.region = self.make_regions()
         self.zone_ids = list(self.REGIONS)
@@ -558,6 +570,64 @@ def ground_spans(g, floor):
                 out.append([y, x, e, k])
             x = e + 1
     return out
+
+
+def late_trim(zone, d):
+    """Apply a late seam's rules to a finished design, touching only what stands near that seam: loose scenery within 2.5 tiles, water and lava
+    within 17 (the other side draws neither), spawns within 7, and ground classes within 16-30 (the other side blends toward its plain ground)."""
+    late = d.seam_late
+    gone = {}
+    if late.min() > 1e8:
+        return gone
+    def at(o):
+        return late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)]
+    keep, near = [], []
+    for o in zone['objects']:
+        if o.get('layout') != d.TAG or o['kind'] in ('void', 'rampart', 'tower'):
+            keep.append(o)
+            continue
+        dist = at(o)
+        if o['kind'] in ('water', 'lava'):
+            bad = dist - o['r'] <= 17
+        elif o['kind'] in ARTLESS:
+            if dist < 20:       # a building cannot be ghosted across the seam: stand it on the nearest clear ground that is 20.5+ tiles away
+                spot = None
+                r = max(o.get('r', 0), (o.get('width', 0) + o.get('depth', 0)) / 4)
+                for dy in range(-14, 15):
+                    for dx in range(-14, 15):
+                        x, y = o['x'] + dx, o['y'] + dy
+                        i, j = int(x), int(y)
+                        if not (0 <= i < d.n and 0 <= j < d.n) or not d.inner[j, i] or late[j, i] < 20.5 or d.road[j, i] < 2.4 or any(math.hypot(n['x'] - x, n['y'] - y) < 3 for n in zone['npcs']):
+                            continue
+                        if spot is None or math.hypot(dx, dy) < spot[0]:
+                            if d.grid.free(x, y, r, 1.0):
+                                spot = (math.hypot(dx, dy), x, y)
+                if spot is None:
+                    near.append((o['kind'], o['x'], o['y'], round(float(dist), 1)))
+                else:
+                    gone['moved ' + o['kind']] = gone.get('moved ' + o['kind'], 0) + 1
+                    o['x'], o['y'] = round(spot[1], 2), round(spot[2], 2)
+                    d.grid.add(o['x'], o['y'], r)
+            bad = False
+        else:
+            bad = dist < 2.5
+        if bad:
+            gone[o['kind']] = gone.get(o['kind'], 0) + 1
+        else:
+            keep.append(o)
+    assert not near, f'art-less objects within 20 tiles of a late seam (the other side draws none of them): {near}'
+    zone['objects'] = keep
+    slimes = []
+    for t in zone['slimes']:
+        if t.get('layout') == d.TAG and at(t) <= 7:
+            gone['spawn'] = gone.get('spawn', 0) + 1
+        else:
+            slimes.append(t)
+    zone['slimes'] = slimes
+    far = late > 16 + fbm(d.noise, d.xs, d.ys, .09) * 14
+    d.ground[~far] = 0
+    zone['groundSpans'] = ground_spans(d.ground, d.floor)
+    return gone
 
 
 def design(world, write=False):

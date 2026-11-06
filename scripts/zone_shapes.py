@@ -60,6 +60,8 @@ FILL = {
             elites=('gloomroot', 'hollow_rider'), no_fill=('hydra',)),
     # Rimeveil is a spiral of ice rings around the summit: difficulty runs by ring, so the land outside the rings takes the outermost
     # ring's kinds (feature = distance from the summit, not from the camp). The seasonal bosses sleep at the ritual clearing.
+    # Wyrdwood is a triangle (apex north) that the old square cannot sit inside at k = 1.0: the old layout is warped into it, then the authored design replaces it.
+    6: dict(spawn_sep=7.0, spawn_feature='city_distance', decor=('tree', 'bush', 'crag', 'pine', 'rock'), warp=True, elites=('oakhorn', 'hrungnir', 'ember_firelord')),
     2: dict(spawn_sep=7.0, spawn_feature='summit', summit=(64, 64), decor=('tree', 'rock', 'bush', 'spire'),
             elites=('grinch', 'bloomwarden', 'birchcrown', 'briarheart', 'starrocketeer')),
 }
@@ -1342,6 +1344,21 @@ def unshape(world, cfg):
     return offsets
 
 
+def phantom_gate(world, z, design):
+    """Run a finished zone's design as if the Wyrdwood border were still a gate. The Crags' and Rimeveil's designs were approved before the
+    Wyrdwood was shaped; a gate blocks a disc of scenery and spawns round it, and without that disc every seeded scatter draws different
+    points, so the whole zone would reshuffle. The gate's old record is in world/zone-shapes/late-gates.txt; the real crossing is the seam."""
+    zone = zone_of(world, z)
+    late = json.loads((SIDE / 'late-gates.txt').read_text()).get(str(z)) if 6 in config()['zones'] else None
+    if not late:
+        return design(world, write=True)
+    zone['portals'].append(dict(copy.deepcopy(late['portal']), id='phantom_wyrd_gate'))
+    try:
+        return design(world, write=True)
+    finally:
+        zone['portals'] = [p for p in zone['portals'] if p['id'] != 'phantom_wyrd_gate']
+
+
 def apply(world, cfg):
     atlas = Atlas()
     SIDE.mkdir(exist_ok=True)
@@ -1413,13 +1430,22 @@ def apply(world, cfg):
         print('greenmeadow', greenmeadow_design.design(world, write=True)[1])
     if 1 in cfg['zones']:
         import crags_design
-        print('crags', crags_design.design(world, write=True)[1])
+        d, stats = phantom_gate(world, 1, crags_design.design)
+        print('crags', stats)
+        if 6 in cfg['zones']:
+            print('crags late seam trim', greenmeadow_design.late_trim(world['zones'][0], d))
     if 2 in cfg['zones']:
         import rimeveil_design
-        print('rimeveil', rimeveil_design.design(world, write=True)[1])
+        d, stats = phantom_gate(world, 2, rimeveil_design.design)
+        print('rimeveil', stats)
+        if 6 in cfg['zones']:
+            print('rimeveil late seam trim', greenmeadow_design.late_trim(world['zones'][1], d))
     if 3 in cfg['zones']:
         import gloamfen_design
         print('gloamfen', gloamfen_design.design(world, write=True)[1])
+    if 6 in cfg['zones']:
+        import wyrdwood_design
+        print('wyrdwood', wyrdwood_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

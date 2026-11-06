@@ -123,3 +123,7 @@ Zone 2 is now an authored map on the same outline: `docs/rimeveil-design.md`. Sa
 ## Gloamfen redesign (2026-11-06)
 
 Zone 3 is now an authored map on the same outline: `docs/gloamfen-design.md`. Same method as the other three: the filler still runs so seams, the vault and the wall are placed as before, then `gloamfen_design.py` (after `rimeveil_design.py` in `apply`) replaces scenery, spawns and trails and adds three outposts, 16 new quests and two new elites beside the Gloomroot Colossus. New client pieces: fen ground classes and minimap colours, the elite loader for `fenelites.txt`, `'fen'` in the seam-ghost art list. Water stays 17 tiles from every seam and west of x = 222, because neither the seam ghosts nor the vault view draw `water`; the stream's old bed east of that is the dry Culvert (ground only).
+
+## Wyrdwood (zone 6) shaped and redesigned (2026-11-07)
+
+Zone 6 is the sixth pilot zone (`world/zone-shapes.txt` zones `[0, 1, 2, 3, 6, 16]`): a triangle with its apex north, 424 grid, warped in only to be valid and then replaced by an authored map with three outposts, 14 new quests and a third elite, the Hanged King. Seams 6-1 (Crags) and 6-2 (Rimeveil) replace the `path_1_6`/`path_2_6` gates; the Bifrost border stays a gate. **A seam added after a design was approved must not reshuffle it**: `LATE_SEAMS`, `phantom_gate` and `late_trim` (see `docs/wyrdwood-design.md`). Zone `Rimeveil` loses the ends of two ice-ring arcs and the Crags 19 lava circles next to the new borders; nothing else of theirs changes.

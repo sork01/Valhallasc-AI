@@ -161,14 +161,14 @@ fn walkable(map: &Map, a: Point, b: Point) -> bool {
 
 // ---- data -------------------------------------------------------------------------------------------------------------------
 #[test]
-fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_gate_pair() {
+fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_three_elites_five_hubs_and_its_gates() {
     let w = world();
     let map = &w.maps[WYRD];
     assert_eq!(map.name, "Wyrdwood");
-    assert_eq!((map.size, map.levels), (192, Some([20, 30])));
+    assert_eq!((map.size, map.levels), (424, Some([20, 30])));
     assert_eq!(map.size % 8, 0, "the ground is cut in chunks of eight");
     assert_eq!(map.copies, 0);
-    // enemies: every kind at its default level, in the bands the design lists (sleeping ambushers apart)
+    // enemies: every kind at its default level (sleeping ambushers apart)
     let mut live = std::collections::BTreeMap::<&str, usize>::new();
     let mut asleep = std::collections::BTreeMap::<&str, usize>::new();
     for (id, spawn) in w.spawns.iter().enumerate().filter(|(_, s)| s.zone == WYRD) {
@@ -185,21 +185,23 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
         }
         assert!(!map.in_city(at(spawn.x, spawn.y)));
     }
-    assert_eq!(
-        live.into_iter().collect::<Vec<_>>(),
-        [
-            ("boar", 14),
-            ("crow", 12),
-            ("hrungnir", 1),
-            ("oakhorn", 1),
-            ("ram", 10),
-            ("troll", 12),
-            ("weaver", 12)
-        ]
-    );
+    // every hunting ground has its kind in numbers; the three elites stand alone
+    for (kind, floor) in [("boar", 55), ("crow", 55), ("troll", 50), ("weaver", 45), ("ram", 55)] {
+        assert!(live[kind] >= floor, "{kind}: {}", live[kind]);
+    }
+    for kind in ["hrungnir", "oakhorn", "hangedking"] {
+        assert_eq!(live[kind], 1, "{kind}");
+    }
+    assert_eq!(live.len(), 8, "{live:?}");
     assert_eq!(
         asleep.into_iter().collect::<Vec<_>>(),
-        [("crow", 3), ("troll", 2)]
+        [
+            ("crow", 6),
+            ("ember_firelord", 1),
+            ("es_foe_06", 2),
+            ("ram", 8),
+            ("troll", 7)
+        ]
     );
     for (kind, level) in [
         ("boar", 21),
@@ -208,29 +210,37 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
         ("weaver", 27),
         ("ram", 29),
         ("oakhorn", 25),
+        ("hangedking", 26),
         ("hrungnir", 30),
     ] {
         assert_eq!(Slime::default_level(kind), level, "{kind}");
     }
-    assert!(is_elite("oakhorn") && is_elite("hrungnir") && !is_elite("boar"));
+    assert!(
+        is_elite("oakhorn") && is_elite("hrungnir") && is_elite("hangedking") && !is_elite("boar")
+    );
     // the first spawns of the old zones keep their ids: the new zone comes last of the file's zones
     assert!(w.spawns.iter().take_while(|s| s.zone < WYRD).count() > 0);
     assert_eq!(
         w.spawns.iter().position(|s| s.zone == WYRD),
         Some(w.spawns.iter().filter(|s| s.zone < WYRD).count())
     );
-    // two hubs, both safe ground, each with a travel master; the first is the zone's `city`, the other a camp
-    assert_eq!(
-        map.city.as_ref().map(|c| (c.x0, c.x1, c.y0, c.y1)),
-        Some((9., 57., 131., 172.))
-    );
-    assert_eq!(map.camps.len(), 1);
-    assert!(
-        map.in_city(at(33., 150.)) && map.in_city(at(96., 86.)),
-        "both plazas are sanctuary"
-    );
-    assert!(!map.in_city(at(96., 120.)) && !map.in_city(at(60., 150.)));
-    for id in ["travel_hollowmoot", "travel_skuldwatch"] {
+    // five hubs, all safe ground, each with a travel master: Hollowmoot is the zone's `city`, the other four are camps
+    let c = map.city.as_ref().unwrap();
+    assert_eq!((c.x1 - c.x0, c.y1 - c.y0), (48., 41.));
+    assert_eq!(map.camps.len(), 4);
+    for camp in &map.camps {
+        let plaza = at((camp.x0 + camp.x1) / 2., (camp.y0 + camp.y1) / 2.);
+        assert!(map.in_city(plaza), "a camp at {} is sanctuary", camp.x0);
+    }
+    assert!(map.in_city(at((c.x0 + c.x1) / 2., (c.y0 + c.y1) / 2.)));
+    assert!(!map.in_city(at(c.x1 + 12., (c.y0 + c.y1) / 2.)));
+    for id in [
+        "travel_hollowmoot",
+        "travel_skuldwatch",
+        "travel_gallowsfoot",
+        "travel_ridgewatch",
+        "travel_highmoor",
+    ] {
         assert!(
             map.npcs
                 .iter()
@@ -238,32 +248,24 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
             "{id}"
         );
     }
-    // the gate pair: Skaldholm's East Gate and the Wyrdwood's way back, each arrival clear of both gates and of enemies
-    let east = w.maps[SKALD]
+    // the gates: the way to Bifrost Reach and its way back; the Crags and the glacier are seams, Skaldholm is not a neighbour
+    let up = map.portals.iter().find(|p| p.id == "sky_gate").unwrap();
+    let down = w.maps[7]
         .portals
         .iter()
-        .find(|p| p.id == "wyrd_gate")
+        .find(|p| p.to == WYRD)
         .unwrap();
-    let back = map
-        .portals
-        .iter()
-        .find(|p| p.id == "skaldholm_gate")
-        .unwrap();
-    assert_eq!((east.to, back.to), (WYRD, SKALD));
-    assert_eq!((east.tx, east.ty), (map.spawn.x, map.spawn.y));
-    assert_eq!((back.tx, back.ty), (147.6, 76.));
-    for (arrival, gates) in [
-        (at(east.tx, east.ty), &map.portals),
-        (at(back.tx, back.ty), &w.maps[SKALD].portals),
-    ] {
-        for gate in gates {
-            assert!(
-                arrival.distance(at(gate.x, gate.y)) > gate.r + 0.5,
-                "{} is clear of {}",
-                arrival.x,
-                gate.id
-            );
-        }
+    assert_eq!(up.to, 7);
+    assert!(
+        at(down.tx, down.ty).distance(at(up.x, up.y)) > up.r + 0.5 && at(down.tx, down.ty).distance(at(up.x, up.y)) < 8.,
+        "the arrival stands clear of the gate, beside it"
+    );
+    assert_eq!(map.portals.iter().filter(|p| p.seam.is_some()).count(), 2);
+    for barrow in ["barrow_return", "barrow_clear"] {
+        let door = w.maps[41].portals.iter().find(|p| p.id == barrow).unwrap();
+        let mut a = at(door.tx, door.ty);
+        map.collide(&mut a, PLAYER_RADIUS);
+        assert!(a.distance(at(door.tx, door.ty)) < 1e-6, "{barrow} lands on free ground");
     }
     let mut spawn_clear = map.spawn;
     map.collide(&mut spawn_clear, PLAYER_RADIUS);
@@ -271,6 +273,7 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
         spawn_clear.distance(map.spawn) < 1e-6,
         "the arrival is free ground"
     );
+    assert!(map.in_city(map.spawn), "a new hero starts in Hollowmoot");
     for s in w.slimes.iter().filter(|s| s.zone == WYRD) {
         assert!(
             s.point().distance(map.spawn) > 8.,
@@ -279,26 +282,27 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
         );
     }
     // a map that is saved with `places`, `bridges` and `camps` stays loadable: the places are what visit objectives name
-    assert_eq!(map.places.len(), 6);
+    assert_eq!(map.places.len(), 18);
     assert!(map.places.iter().all(|p| p.r > 0. && p.x > 0. && p.y > 0.));
 }
-
 #[test]
 fn the_river_has_one_bridge_and_each_ridge_one_gap_so_the_bands_come_in_order() {
     let w = world();
     let map = &w.maps[WYRD];
     let arrival = map.spawn;
-    let bridge_y = 108. + 2.6 * (96f64 / 19.).sin() + 1.6 * (96f64 / 7.3 + 1.).sin();
     let seal = |extra: &[(f64, f64, f64)]| flood(map, &blocked(map, extra), arrival);
     let open = seal(&[]);
     // every person, every live enemy, every place and both gates can be walked to
     // (a cell beside the spot counts: people stand close to walls, and the grid is coarse)
     let near = |seen: &[bool], p: Point| {
-        [(0., 0.), (1., 0.), (-1., 0.), (0., 1.), (0., -1.)]
+        [(0., 0.), (1., 0.), (-1., 0.), (0., 1.), (0., -1.), (2., 0.), (0., 2.)]
             .iter()
             .any(|(dx, dy)| reached(map, seen, at(p.x + dx, p.y + dy)))
     };
     for n in &map.npcs {
+        if n.id.starts_with("barrow") {
+            continue; // they stand inside the Norn ring's walls
+        }
         assert!(near(&open, at(n.x, n.y)), "{}", n.id);
     }
     for s in w.slimes.iter().filter(|s| s.zone == WYRD && !s.dead) {
@@ -306,60 +310,65 @@ fn the_river_has_one_bridge_and_each_ridge_one_gap_so_the_bands_come_in_order() 
             reached(map, &open, s.point()),
             "{} at {:?} is unreachable",
             s.kind,
-            s.point().x
+            (s.point().x, s.point().y)
         );
     }
     for p in &map.places {
         let below = if p.id.contains("beacon") { 2.4 } else { 0. };
-        assert!(reached(map, &open, at(p.x, p.y + below)), "{}", p.id);
+        assert!(near(&open, at(p.x, p.y + below)), "{}", p.id);
     }
-    // closing the bridge cuts the map in two: Skuldwatch, the heights and every north-bank enemy are cut off
-    let no_bridge = seal(&[(96., bridge_y, 3.6)]);
-    assert!(
-        !reached(map, &no_bridge, at(96., 86.)),
-        "Skuldwatch lies beyond the bridge"
+    // the bridge stands at x 166 over the river (y 226): closing it cuts the map in two
+    let skuldwatch = &map.camps[0]; // Skuldwatch comes first
+    let fort = at(
+        (skuldwatch.x0 + skuldwatch.x1) / 2.,
+        skuldwatch.y1 - 3.,
     );
-    assert!(!reached(map, &no_bridge, at(96., 30.)));
+    let no_bridge = seal(&[(166., 226., 5.6)]);
+    assert!(!reached(map, &no_bridge, fort), "Skuldwatch lies beyond the bridge");
+    assert!(!reached(map, &no_bridge, at(152., 100.)), "and so does the whole north");
     for s in w.slimes.iter().filter(|s| s.zone == WYRD && !s.dead) {
         assert_eq!(
             reached(map, &no_bridge, s.point()),
-            s.y > bridge_y,
+            s.y > 226.,
             "{} at y {}",
             s.kind,
             s.y
         );
     }
     assert!(
-        near(&no_bridge, at(58., 150.)) && near(&no_bridge, at(140., 170.)),
+        near(&no_bridge, at(255., 292.)) && near(&no_bridge, at(103., 277.)),
         "the whole south is still open"
     );
-    // the first ridge (y 44) has its gap in the east: rams only above it, weavers only below
-    let no_gap_a = seal(&[(150., 44., 5.4)]);
+    // the first ridge (y 160) has its gap in the east (x 222): rams only above it, weavers only below
+    let no_gap_a = seal(&[(222.5, 160., 6.5)]);
     for s in w.slimes.iter().filter(|s| s.zone == WYRD && !s.dead) {
         match s.kind.as_str() {
-            "ram" => assert!(
+            "ram" if s.y < 158. => assert!(
                 !reached(map, &no_gap_a, s.point()),
                 "ram at {:?}",
-                s.point().x
+                (s.point().x, s.point().y)
             ),
-            "weaver" => assert!(reached(map, &no_gap_a, s.point())),
+            "weaver" if s.y > 163. => assert!(reached(map, &no_gap_a, s.point())),
             _ => {}
         }
     }
-    // the second ridge (y 22) has its gap in the west: Hrungnir's court only above it
-    let no_gap_b = seal(&[(42., 22., 5.4)]);
+    // the second ridge (y 128) has its gap in the west (x 112): Hrungnir's court only above it
+    let no_gap_b = seal(&[(112.5, 128., 6.5)]);
     let king = w.slimes.iter().find(|s| s.kind == "hrungnir").unwrap();
     assert!(!reached(map, &no_gap_b, king.point()) && reached(map, &open, king.point()));
     assert!(
-        reached(map, &no_gap_b, at(46., 33.4)),
-        "the Storm Beacon is on the rams' terrace"
+        reached(map, &no_gap_b, at(206., 150.)),
+        "the Ridge Beacon is on the rams' terrace"
     );
     assert!(
-        !reached(map, &no_gap_a, at(46., 33.4)),
+        !reached(map, &no_gap_a, at(206., 150.)),
         "and the terrace needs the first gap"
     );
+    assert!(
+        !reached(map, &no_gap_b, at(120., 108.)),
+        "the Storm Beacon is on the Highmoor, past the second gap"
+    );
 }
-
 #[test]
 fn every_wyrdwood_monster_has_its_own_stats_attacks_materials_and_rewards() {
     // (kind, hp, damage, gold) at the default level
@@ -406,9 +415,10 @@ fn every_wyrdwood_monster_has_its_own_stats_attacks_materials_and_rewards() {
         let c = &w.players[&1].character;
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
         assert_eq!(paid, xp, "{kind} xp");
+        // enemy gold drops are halved at the kill (MOB_GOLD_SCALE)
         assert_eq!(
             w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
-            gold
+            ((gold as f64 * 0.5).round() as u32).max(1)
         );
         assert!(
             w.drops
@@ -445,6 +455,20 @@ fn every_wyrdwood_monster_has_its_own_stats_attacks_materials_and_rewards() {
     );
     assert_eq!(material("oakhorn"), "oakhorn_crown");
     assert_eq!(material("hrungnir"), "stormheart_shard");
+    assert_eq!(material("hangedking"), "hangedking_noose");
+    let hk = Slime::with_level(
+        0,
+        &SlimeSpawn {
+            ambush: None,
+            x: 5.,
+            y: 5.,
+            kind: "hangedking".into(),
+            zone: WYRD,
+        },
+        26,
+    );
+    assert_eq!(hk.max_hp, 12600.);
+    assert!(hk.elite, "the Hanged King is an elite with no quest");
 }
 
 // ---- the two hubs and their quests ------------------------------------------------------------------------------------------
@@ -455,19 +479,18 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
     let map = &w.maps[WYRD];
     assert_eq!(
         map.npcs.len(),
-        17,
-        "7 + 7 people, the stranded Eydis and two travel masters"
+        36,
+        "7 + 7 people, the stranded Eydis, the barrow's two, nine at the outposts, five travel masters, five mailboxes"
     );
-    assert!(map.quests.len() >= 24, "{} quests", map.quests.len());
+    assert!(map.quests.len() >= 40, "{} quests", map.quests.len());
     let mut kinds = std::collections::BTreeSet::new();
     let mut levels = std::collections::BTreeSet::new();
     let mut roots = vec![];
     for q in &map.quests {
-        assert!(
-            q.id.starts_with("wyrd_") && q.npc.starts_with("wyrd_"),
-            "{}",
-            q.id
-        );
+        if !q.id.starts_with("wyrd_") {
+            continue; // the barrow's and the Empty Seat's quests have their own tests
+        }
+        assert!(q.npc.starts_with("wyrd_"), "{}", q.id);
         assert!((20..=30).contains(&q.level), "{} level {}", q.id, q.level);
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
         assert!(q.reward_gold >= 400, "{}", q.id);
@@ -519,6 +542,14 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
                 ),
                 "escort" => assert!(npc(&w, &o.target).escort.is_some(), "{}", q.id),
                 "reach" => assert_eq!(o.target, "Wyrdwood"),
+                "hold" => assert!(
+                    map.places
+                        .iter()
+                        .any(|p| p.id == o.target && !p.waves.is_empty()),
+                    "{} holds {}",
+                    q.id,
+                    o.target
+                ),
                 other => panic!("{} has an unknown objective {other}", q.id),
             }
         }
@@ -530,7 +561,7 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
     );
     assert_eq!(
         kinds.into_iter().collect::<Vec<_>>(),
-        ["bring", "escort", "kill", "reach", "talk", "visit"]
+        ["bring", "escort", "hold", "kill", "reach", "talk", "visit"]
     );
     assert_eq!((levels.first(), levels.last()), (Some(&20), Some(&30)));
     assert!(
@@ -650,35 +681,35 @@ fn visit_objectives_complete_only_inside_the_named_place_for_an_accepted_quest()
 }
 
 #[test]
-fn skaldholm_flies_to_both_wyrdwood_hubs_through_the_east_gate_for_twenty_gold_a_leg() {
+fn the_five_wyrdwood_travel_masters_are_linked_and_a_flight_costs_twenty_gold_a_leg() {
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
-    let skald = w.maps[SKALD]
-        .npcs
-        .iter()
-        .find(|n| n.id == "travel_skaldholm")
-        .unwrap()
-        .clone();
-    assert!(skald.travel_links.iter().any(|l| l == "travel_hollowmoot"));
-    assert_eq!(
-        npc(&w, "travel_hollowmoot").travel_links,
-        ["travel_skaldholm", "travel_skuldwatch"]
-    );
-    assert_eq!(
-        npc(&w, "travel_skuldwatch").travel_links,
-        ["travel_hollowmoot", "travel_perch"]
-    );
+    // the old hubs keep their masters; the three outposts are linked to both
+    let hollow = npc(&w, "travel_hollowmoot");
+    for id in ["travel_skuldwatch", "travel_gallowsfoot", "travel_ridgewatch", "travel_highmoor"] {
+        assert!(hollow.travel_links.iter().any(|l| l == id), "Hollowmoot links to {id}");
+    }
+    let skuld = npc(&w, "travel_skuldwatch");
+    assert!(skuld.travel_links.iter().any(|l| l == "travel_perch"), "the Bifrost link stays");
+    for id in ["travel_gallowsfoot", "travel_ridgewatch", "travel_highmoor"] {
+        assert_eq!(
+            npc(&w, id).travel_links,
+            ["travel_hollowmoot", "travel_skuldwatch"],
+            "{id}"
+        );
+    }
+    let stop = npc(&w, "travel_highmoor");
     {
         let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.zone = SKALD;
-        c.x = skald.x;
-        c.y = skald.y + 1.;
+        c.zone = WYRD;
+        c.x = hollow.x;
+        c.y = hollow.y + 1.;
         c.gold = 100;
-        c.travel_stops = vec!["travel_skaldholm".into(), "travel_hollowmoot".into()];
+        c.travel_stops = vec!["travel_hollowmoot".into()];
     }
-    // the second stop is not discovered: the whole trip is refused and costs nothing
+    // the second stop is not discovered: the trip is refused and costs nothing
     w.time += 1.;
-    w.interact(1, "travel_skaldholm", Some("spark:travel_skuldwatch"));
+    w.interact(1, "travel_hollowmoot", Some("spark:travel_highmoor"));
     assert_eq!(w.players[&1].character.gold, 100);
     assert!(w.players[&1].character.spark_travel.is_none());
     w.players
@@ -686,43 +717,17 @@ fn skaldholm_flies_to_both_wyrdwood_hubs_through_the_east_gate_for_twenty_gold_a
         .unwrap()
         .character
         .travel_stops
-        .push("travel_skuldwatch".into());
+        .push("travel_highmoor".into());
     w.time += 1.;
     drain(&mut rx);
-    w.interact(1, "travel_skaldholm", Some("spark:travel_skuldwatch"));
+    w.interact(1, "travel_hollowmoot", Some("spark:travel_highmoor"));
     let flight = w.players[&1]
         .character
         .spark_travel
         .clone()
         .expect("the flight starts");
-    assert_eq!(
-        w.players[&1].character.gold, 60,
-        "two legs: Skaldholm - Hollowmoot - Skuldwatch"
-    );
-    assert_eq!(
-        flight.stops,
-        ["travel_skaldholm", "travel_hollowmoot", "travel_skuldwatch"]
-    );
-    let east = w.maps[SKALD]
-        .portals
-        .iter()
-        .find(|p| p.id == "wyrd_gate")
-        .unwrap()
-        .clone();
-    assert!(
-        flight
-            .points
-            .iter()
-            .any(|p| p.zone == SKALD && (p.x, p.y) == (east.x, east.y)),
-        "it leaves through the East Gate"
-    );
-    assert!(
-        flight
-            .points
-            .iter()
-            .any(|p| p.zone == WYRD && (p.x, p.y) == (east.tx, east.ty)),
-        "and lands at the Wyrdwood arrival"
-    );
+    assert_eq!(w.players[&1].character.gold, 80, "one leg: Hollowmoot - Highmoor Hold");
+    assert_eq!(flight.stops, ["travel_hollowmoot", "travel_highmoor"]);
     for _ in 0..(400. / TICK) as usize {
         w.step();
         if w.players[&1].character.spark_travel.is_none() {
@@ -731,19 +736,25 @@ fn skaldholm_flies_to_both_wyrdwood_hubs_through_the_east_gate_for_twenty_gold_a
     }
     let c = &w.players[&1].character;
     assert!(c.spark_travel.is_none());
-    let stop = npc(&w, "travel_skuldwatch");
     assert_eq!(c.zone, WYRD);
     assert!(
         c.point().distance(at(stop.x, stop.y)) < 0.5,
-        "landed at Skuldwatch's master"
+        "landed at Highmoor Hold's master"
     );
 }
-
 #[test]
-fn skuldwatch_is_a_sanctuary_like_hollowmoot() {
+fn every_hub_of_the_wyrdwood_is_a_sanctuary() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
-    for (x, y) in [(96., 86.), (33., 150.)] {
+    let plazas: Vec<(f64, f64)> = {
+        let map = &w.maps[WYRD];
+        let c = map.city.as_ref().unwrap();
+        std::iter::once(((c.x0 + c.x1) / 2., (c.y0 + c.y1) / 2.))
+            .chain(map.camps.iter().map(|k| ((k.x0 + k.x1) / 2., (k.y0 + k.y1) / 2.)))
+            .collect()
+    };
+    assert_eq!(plazas.len(), 5);
+    for (x, y) in plazas {
         place(&mut w, 1, WYRD, at(x, y));
         w.time += 10.;
         let before = w.players[&1].character.hp;
@@ -753,13 +764,13 @@ fn skuldwatch_is_a_sanctuary_like_hollowmoot() {
             "no damage inside the hub at {x}"
         );
     }
-    place(&mut w, 1, WYRD, at(96., 130.));
+    // the open country between is not: halfway down the Troll Bank road
+    place(&mut w, 1, WYRD, at(132., 262.));
     w.time += 10.;
     let before = w.players[&1].character.hp;
-    w.hurt_player(1, 5000., at(96., 130.));
+    w.hurt_player(1, 5000., at(132., 262.));
     assert!(w.players[&1].character.hp < before);
 }
-
 #[test]
 fn a_hirer_rents_two_fighters_for_the_oakhorn_and_four_for_hrungnir() {
     let mut w = world();
@@ -770,7 +781,7 @@ fn a_hirer_rents_two_fighters_for_the_oakhorn_and_four_for_hrungnir() {
     {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = 25;
-        c.gold = 2000;
+        c.gold = 20_000;
         for id in ["wyrd_crows", "wyrd_boars"] {
             c.quests.push(QuestProgress {
                 id: id.into(),
@@ -780,7 +791,8 @@ fn a_hirer_rents_two_fighters_for_the_oakhorn_and_four_for_hrungnir() {
             });
         }
     }
-    place(&mut w, 1, WYRD, at(33., 141.5));
+    let warden = npc(&w, "wyrd_warden");
+    place(&mut w, 1, WYRD, at(warden.x, warden.y + 1.5));
     w.time += 1.;
     w.interact(1, "wyrd_warden", Some("merc_warrior"));
     assert_eq!(mercs(&w), 0, "the quest must be taken first");
@@ -791,7 +803,7 @@ fn a_hirer_rents_two_fighters_for_the_oakhorn_and_four_for_hrungnir() {
         w.interact(1, "wyrd_warden", Some(&format!("merc_{class}")));
     }
     assert_eq!(mercs(&w), 2, "a party of three: the hero and two fighters");
-    assert_eq!(w.players[&1].character.gold, 2000 - 2 * 250);
+    assert_eq!(w.players[&1].character.gold, 20_000 - 2 * super::mercs::merc_price(25));
 }
 
 #[test]
@@ -978,9 +990,14 @@ fn the_escort_route_is_clear_ground_from_the_mill_to_skuldwatch_and_the_ambusher
         );
     }
     let end = route.last().unwrap();
+    let fort = &map.camps[0];
     assert!(
-        end.x > 67. && end.x < 125. && end.y > 75. && end.y < 97.,
+        end.x > fort.x0 && end.x < fort.x1 && end.y > fort.y0 && end.y < fort.y1,
         "the walk ends inside Skuldwatch"
+    );
+    assert!(
+        route.windows(2).all(|p| p[0].distance(p[1]) <= 18.5),
+        "waypoints are split for the stuck recovery"
     );
     // two ambushes: crows near the foot of the gallows hill, trolls at the bridge
     assert_eq!(
@@ -1406,7 +1423,7 @@ fn fight(
         let points = (level - 1) * 3;
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = level;
-        c.gold = 9000;
+        c.gold = 500_000;       // a hire costs merc_price(level) now: four of them at level 30 are several thousand
         c.attributes.stamina = points / 5;
         c.attributes.accuracy = 7;
         c.attributes.strength = points - points / 5 - 7;

@@ -112,6 +112,13 @@
     "sell": 180
   },
   {
+    "id": "hangedking_noose",
+    "name": "Hanged King's Noose",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 330
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",
