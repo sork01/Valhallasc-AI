@@ -1427,6 +1427,7 @@ def apply(world, cfg):
         import skaldholm_rebuild
         skaldholm_rebuild.south_west_corner(world, margins)
         skaldholm_rebuild.rebuild(world)
+        skaldholm_rebuild.even_flank_wall(world)
     return shifted
 
 

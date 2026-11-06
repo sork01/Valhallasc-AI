@@ -632,6 +632,35 @@ def sw_corner_tower(world, city):
     city['objects'].append(dict(kind='tower', x=round(wall_x - TC[0], 2), y=round(wall_y - TC[1], 2), r=0, v=0, width=3.4, depth=3.4, color='#4a7a9a', label='', layout='skaldholm_east_wall'))
 
 
+def even_flank_wall(world):
+    """Greenmeadow's wall east of the vault is one regular run (owner, 2026-11-06: "the wall to the right of the arch looks weird in places").
+    Where the vault used to stand (before it moved to the Grand Avenue's axis) the old pieces were filler of 2.0, 4.5, 9.0 and 2.3 tiles; every piece
+    draws floor(width / 1.2) merlons and restarts its ashlar joints and shadow, so the run showed uneven merlons, one-merlon stubs and steps.
+    The stretch is re-cut into equal pieces over exactly the same footprint (same y, same left and right edge, the same overlap the generator uses),
+    so nothing about collision changes. Runs after the designs and `rebuild` (neither reads it), so no random draw moves."""
+    z = zs.zone_of(world, 0)
+    arch = next(a for a in z['exitArches'] if a['portal'] == 'path_0_4')
+    tower_r = arch['x'] + arch['halfWidth'] + 1.7 + 1.7               # right face of the vault's right-hand tower
+    wall_y = next(o['y'] for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG)
+    run = sorted((o for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG and o['y'] == wall_y and o['x'] > tower_r), key=lambda o: o['x'])
+    std = max(set(o['width'] for o in run), key=[o['width'] for o in run].count)     # the generator's own piece (6.0389): the commonest width
+    odd = [o for o in run if abs(o['width'] - std) > .01]
+    if not odd:
+        return 0
+    lo, hi = min(o['x'] - o['width'] / 2 for o in odd), max(o['x'] + o['width'] / 2 for o in odd)
+    overlap = .15
+    n = max(1, round((hi - lo + overlap) / (std - overlap) - .0001)) if (hi - lo) > std - .5 else 1
+    w = (hi - lo + (n - 1) * overlap) / n
+    assert abs(w - std) < .3, f'the stretch {lo:.2f}-{hi:.2f} does not re-cut into regular pieces ({n} x {w:.2f})'
+    proto = odd[0]
+    pieces = [dict(proto, x=round(lo + w / 2 + k * (w - overlap), 2), width=round(w, 4)) for k in range(n)]
+    new_lo, new_hi = min(p['x'] - p['width'] / 2 for p in pieces), max(p['x'] + p['width'] / 2 for p in pieces)
+    assert abs(new_lo - lo) < .02 and abs(new_hi - hi) < .02, 'the re-cut changed the footprint'
+    z['objects'] = [o for o in z['objects'] if not any(o is q for q in odd)] + pieces
+    print(f'greenmeadow flank wall: {len(odd)} uneven pieces ({lo:.2f}-{hi:.2f}) re-cut into {n} of {w:.3f}')
+    return n
+
+
 def trim_greenmeadow_flank(world):
     """Greenmeadow's wall used to run on past the city's east wall and turn north in a leg (the right-hand wing of the old L). It stops at the
     corner now: everything east of x 457 goes."""
