@@ -1409,7 +1409,35 @@ def apply(world, cfg):
     if 3 in cfg['zones']:
         import gloamfen_design
         print('gloamfen', gloamfen_design.design(world, write=True)[1])
+    if 2 in cfg['zones'] and 3 in cfg['zones']:
+        trim_corner_seam(world)
     return shifted
+
+
+CORNER_CUT_X = 241.0
+
+
+def trim_corner_seam(world):
+    """Rimeveil's and Gloamfen's shared border ends at Skaldholm's north-west wall corner, past the point where Gloamfen's land stops (x ~ 246, Gloamfen's frame):
+    a hero walking down Rimeveil's side of the wall into the last wedge used to cross there and arrive inside the wall, shut in (owner, 2026-11-06). The seam portals
+    stop at x = CORNER_CUT_X (Gloamfen's frame); the wedge is a dead end against the wall."""
+    rime, fen = world['zones'][1], world['zones'][2]
+    for z, to, to_fen in ((fen, 2, True), (rime, 3, False)):
+        portal = next(p for p in z['portals'] if p.get('seam') and p['to'] == to)
+        seam = portal['seam']
+        dx, dy = (0., 0.) if to_fen else (float(seam['shift'][0]), float(seam['shift'][1]))      # this zone's frame -> Gloamfen's
+        pts = [[x + dx, y + dy] for x, y in seam['points']]
+        out = []
+        for k, a in enumerate(pts):
+            if a[0] <= CORNER_CUT_X:
+                out.append(a)
+            if k + 1 < len(pts) and (a[0] <= CORNER_CUT_X) != (pts[k + 1][0] <= CORNER_CUT_X):
+                b = pts[k + 1]
+                t = (CORNER_CUT_X - a[0]) / (b[0] - a[0])
+                out.append([CORNER_CUT_X, a[1] + (b[1] - a[1]) * t])
+        out = [[round(x - dx, 2), round(y - dy, 2)] for x, y in out]
+        assert len(out) >= 2, 'the corner trim emptied a seam'
+        seam['points'] = out
 
 
 def check(z, view, geom):

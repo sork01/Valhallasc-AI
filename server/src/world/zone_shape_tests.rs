@@ -1922,3 +1922,34 @@ fn per_walks_the_survey_from_the_rest_over_the_causeway_to_hydra_isle() {
         "Per reached Hydra Isle"
     );
 }
+
+#[test]
+fn walking_down_rimeveils_wall_into_the_last_wedge_never_shuts_a_hero_in() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    for (sx, sy, dx, dy) in [(236.2, 270., 0., 1.), (236.2, 270., -0.3, 1.), (230., 285., 0.7, 0.7), (236.2, 286., 0., 1.), (236.2, 286., 1., 1.)] {
+        place(&mut w, 1, 2, at(sx, sy));
+        for _ in 0..600 {
+            w.time += TICK;
+            let hero = w.players.get_mut(&1).unwrap();
+            hero.input = at(dx, dy);
+            hero.input_at = w.time;
+            w.update_player(1);
+        }
+        let c = w.players[&1].character.clone();
+        let spot = at(c.x, c.y);
+        // wherever the hero ends, in the wedge or across the border, it can walk away again
+        let zone = c.zone;
+        let mut moved = 0.;
+        for k in 0..8 {
+            let a = k as f64 * std::f64::consts::FRAC_PI_4;
+            let mut p = spot;
+            w.maps[zone].walk(&mut p, at(a.cos(), a.sin()), 6., PLAYER_RADIUS);
+            moved += p.distance(spot);
+        }
+        assert!(moved > 20., "shut in at zone {zone} ({:.1},{:.1}) after walking from ({sx},{sy}): {moved}", c.x, c.y);
+        if zone == 3 {
+            assert!(c.x < 246.5, "arrived inside Skaldholm's wall at ({:.1},{:.1})", c.x, c.y);
+        }
+    }
+}
