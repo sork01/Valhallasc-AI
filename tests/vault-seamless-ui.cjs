@@ -18,6 +18,7 @@ let server, browser, checks = 0;
 const check = (value, label) => { assert.ok(value, label); checks++; };
 const world = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const zoneDef = z => (z === 0 ? world : world.zones[z - 1]);
+const cityFree = (x, y) => onLand(4, x, y) && !zoneDef(4).objects.some(o => o.kind !== 'void' && (o.width ? Math.abs(x - o.x) < o.width / 2 + 1 && Math.abs(y - o.y) < o.depth / 2 + 1 : Math.hypot(x - o.x, y - o.y) < o.r + 1));
 const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)] === '#';
 (async () => {
   server = spawn(process.env.VALHALLA_BINARY, [], {
@@ -73,6 +74,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     for (const [s, t] of (process.env.SS || '0:0,-4:14').split(',').map(x => x.split(':').map(Number))) {
       const px = arch.x + wx * s - wy * t, py = arch.y + wy * s + wx * t;       // one world point (t = along the wall), in the zone's frame...
       if (!onLand(zone, px, py)) continue;                      // (the Crags' wall ends at the arch: nothing to stand on beyond it)
+      if (!cityFree(px + vx, py + vy)) continue;                // (nor in the city: the point must be ground with nothing standing on it)
       const a = await snap(zone, px, py);                      // ...drawn from this zone,
       const a2 = await snap(zone, px, py);                     // again (the noise floor: animation, timers)
       const b = await snap(4, px + vx, py + vy);               // ...and from Skaldholm (arrival = here + vault)
@@ -115,7 +117,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     check(med < 40, `zone ${zone}: the last row of land is the same from both sides (${med.toFixed(0)})`);
   }
   // Skaldholm's own square is never touched by a neighbour's region (the borders lean across it: the Crags' region once covered its north-east corner).
-  await debug({ op: 'teleport', zone: 4, x: 120, y: 30 });
+  await debug({ op: 'teleport', zone: 4, x: 75, y: 24 });      // (the rebuilt city: its north-east, beside the Archive)
   await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 });
   await page.waitForTimeout(2500);
   const intr = await page.evaluate(() => Field.cityIntrusion);
@@ -133,8 +135,9 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
     const [wx, wy] = gate.walk;
+    const inward = zone === 2 ? 2.5 : 9;                  // (the north door lands in the lane behind the Steward's Hall: the hall stands 5 tiles in)
     for (const dir of [1, -1]) {                         // 1 = into Skaldholm, -1 = back out
-      const from = dir === 1 ? [zone, arch.x - wx * 9, arch.y - wy * 9] : [4, arch.x - wx * 9 * -1 * 0 + gate.vault[0] + wx * 9, arch.y + gate.vault[1] + wy * 9];
+      const from = dir === 1 ? [zone, arch.x - wx * 9, arch.y - wy * 9] : [4, arch.x + gate.vault[0] + wx * inward, arch.y + gate.vault[1] + wy * inward];
       await snap(from[0], from[1], from[2]);
       const keys = isoKeys(wx * dir, wy * dir);
       for (const k of keys) await page.keyboard.down(k);

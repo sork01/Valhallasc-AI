@@ -87,7 +87,7 @@ def pocket_cells(zone, gate, arch):
     dx, dy = xs + .5 - arch['x'], ys + .5 - arch['y']
     along, across = dx * wx + dy * wy, dx * px + dy * py
     # from 3.5 tiles beyond the arch (an alcove through the wall opening: you arrive at the arch line and must be able to turn round) to the pocket's end
-    return (along >= -3.5) & (along <= 6.2) & (np.abs(across) <= hw + 1.0)
+    return ((along >= 0.5) & (along <= 6.2) & (np.abs(across) <= hw + 1.0)) | ((along >= -3.5) & (along < 0.5) & (np.abs(across) <= hw - 1.0))
 
 
 def city_floor(world):
@@ -183,6 +183,7 @@ def rebuild(world):
                 p['tx'], p['ty'] = mv(p['tx'], p['ty'])
     open_hall_lane(city)
     place_band(city, old, floor)
+    wall_the_notch(world, city, floor)
     city['objects'].extend(zs.void_pieces(floor))
     city['shapeFloor'] = zs.floor_rows(floor)
     city['shapeEdge'] = edge_rows(world, floor)
@@ -470,6 +471,8 @@ def place_band(city, old, floor):
             near = min(moved, key=lambda m: math.hypot(m[0] - o['x'], m[1] - o['y']), default=None)
             if near and math.hypot(near[0] - o['x'], near[1] - o['y']) <= 6:
                 city[key].append(dict(o, x=round(o['x'] + near[2], 2), y=round(o['y'] + near[3], 2)))
+    for key in ('seasonDecor', 'christmasDecor', 'easterDecor', 'solsticeDecor', 'valentineDecor'):      # decor stands on the city's ground, never beyond it
+        city[key] = [o for o in city[key] if 0 <= int(o['y']) < SIZE and 0 <= int(o['x']) < SIZE and floor[int(o['y']), int(o['x'])]]
     missing = {n['id'] for n in old['npcs']} - {n['id'] for n in city['npcs']}
     assert not missing, f'NPCs without a place: {sorted(missing)}'
 
@@ -489,6 +492,39 @@ def settle_npcs(city):
                     best = (math.hypot(x - npc['x'], y - npc['y']), x, y)
         assert best, f"{npc['id']} has no reachable ground within 5 tiles"
         npc['x'], npc['y'] = round(best[1], 2), round(best[2], 2)
+
+
+def wall_the_notch(world, city, floor):
+    """Where the Crags and Greenmeadow meet there is no neighbour wall (their walls stop at the corners): along the L's top edge between them
+    the city stands a short run of its own ramparts, so the view from inside does not end in bare ground. Only that stretch; the doors and
+    every stretch a neighbour walls stay as they are."""
+    theirs = []
+    for i in NEIGHBOURS:
+        z = zs.zone_of(world, i)
+        T = z['shape']['T']
+        theirs += [(o['x'] + T[0] - TC[0], o['y'] + T[1] - TC[1]) for o in z['objects'] if o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG]
+    arches = [(a['x'], a['y'], a['halfWidth']) for a in city['exitArches']]
+    n = SIZE
+    cells = []
+    for y in range(n):
+        for x in range(n):
+            if not floor[y, x]:
+                continue
+            out = [(dx, dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if not (0 <= y + dy < n and 0 <= x + dx < n and floor[y + dy, x + dx])]
+            if not out or x < 104 or not 138 <= y <= 152:
+                continue
+            if min(math.hypot(x + .5 - px, y + .5 - py) for px, py in theirs) <= 3.5 or any(math.hypot(x + .5 - a[0], y + .5 - a[1]) <= a[2] + 4 for a in arches):
+                continue
+            cells.append((x, y, out[0]))
+    placed = []
+    for x, y, (dx, dy) in sorted(cells):
+        cx, cy = x + .5 - dx * .9, y + .5 - dy * .9
+        if any(math.hypot(cx - q['x'], cy - q['y']) < 2.6 for q in placed):
+            continue
+        w, d = (2.8, 1.8) if dy else (1.8, 2.8)
+        placed.append(dict(kind='rampart', x=round(cx, 2), y=round(cy, 2), r=0, v=0, width=w, depth=d, color='#d7d3bc', label='', layout='skaldholm_notch'))
+    city['objects'].extend(placed)
+    return len(placed)
 
 
 def check_city(city, floor):
