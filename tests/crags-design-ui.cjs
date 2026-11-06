@@ -19,7 +19,7 @@ const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const SPOTS = [
   ['shelf', 186, 218, 'The Cinderwatch Shelf'], ['flats', 150, 268, 'The Sunpit Flats'], ['quarry', 112, 316, 'The Anvil Quarries'], ['wallfoot', 44, 262, 'The Wallfoot'],
   ['slopes', 262, 300, 'The Red Slopes'], ['reach', 322, 170, 'The Hearth Reach'], ['horned', 238, 176, 'The Horned Terrace'], ['steps', 140, 160, 'The Long Steps'],
-  ['highfire', 138, 108, 'Highfire Ridge'], ['crown', 130, 44, 'The Ashen Crown'], ['spurs', 34, 128, 'The Steaming Spurs'], ['glass', 300, 116, 'The Glass Shore'],
+  ['highfire', 138, 108, 'Highfire Ridge'], ['crown', 130, 44, 'The Ashen Crown'], ['spurs', 34, 128, 'The Steaming Spurs'], ['glass', 300, 116, 'The Glass Barrens'],
 ];
 const OUTPOSTS = [['anvilrest', 118, 293, 'Anvilrest'], ['ashford', 197, 155, 'Ashford'], ['lasthearth', 305, 207, 'Lasthearth']];
 const ELITES = [['slagmaw', 214, 326], ['ashwing', 112, 32], ['cinderlord', 246, 160]];

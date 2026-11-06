@@ -55,7 +55,22 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   await go(1, 335, 170); await page.waitForTimeout(600);
   const beyond = await east([335, 170, [346.5, 347.5, 349, 352, 358, 380, 420]]); await shot('crags-east-landlocked');
   check(beyond.slice(2).every(([r, g, b]) => b <= r + 12 && g < 90), `past the Crags' east border there is no water: ${JSON.stringify(beyond)}`);
-  await go(1, q[0] + shx - inward[0] * 3, q[1] + shy - inward[1] * 3); await page.waitForTimeout(400);
+  // A crossing changes nothing: the same world points on the minimap, from each side of the Crags-meadow border (owner: blue from the meadow, black from the Crags).
+  const grid = []; for (let i = -5; i <= 5; i++) for (let j = -5; j <= 5; j++) grid.push([i * 20, j * 20]);
+  const world = ([cx, cy]) => page.evaluate(([hx, hy, px, py, g2]) => { const c = document.getElementById('minimap'), g = c.getContext('2d'), s = c.width / 240; return g2.map(([i, j]) => { const d = g.getImageData(Math.round(c.width / 2 + (px + i - hx) * s) - 3, Math.round(c.height / 2 + (py + j - hy) * s) - 3, 7, 7).data, m = [0, 0, 0]; for (let k = 0; k < d.length; k += 4) for (let q = 0; q < 3; q++) m[q] += d[k + q] / 49; return m; }); }, [cx[0], cx[1], cy[0], cy[1], grid]);
+  await go(0, q[0] + inward[0] * 3, q[1] + inward[1] * 3); await page.waitForTimeout(600);
+  const fromMeadow = await world([[q[0] + inward[0] * 3, q[1] + inward[1] * 3], [q[0], q[1]]]); await shot('seam-from-meadow');
+  await go(1, q[0] + shx - inward[0] * 3, q[1] + shy - inward[1] * 3); await page.waitForTimeout(600);
+  const fromCrags = await world([[q[0] + shx - inward[0] * 3, q[1] + shy - inward[1] * 3], [q[0] + shx, q[1] + shy]]); await shot('seam-from-crags');
+  await go(0, q[0] + inward[0] * 3, q[1] + inward[1] * 3); await page.waitForTimeout(600);
+  const again = await world([[q[0] + inward[0] * 3, q[1] + inward[1] * 3], [q[0], q[1]]]);
+  // Markers still belong to the zone you stand in (MINIMAP-WORLD): a pink, red or gold dot on either side is not the ground.
+  const marker = ([r, g, b]) => r > 170 && g < 170 && b > 60 || r > 200 && g > 150 && b < 130;
+  const apart = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) > 30;
+  const differ = grid.map((p, i) => [p, again[i], fromCrags[i]]).filter(([, a, b]) => !marker(a) && !marker(b) && apart(a, b));
+  console.log('minimap diff', JSON.stringify(differ.map(([p, a, c]) => [p, a.map(Math.round), c.map(Math.round)])));
+  // What is left is the enemy dots of the zone you stand in, blurred into the 7 px mean, and speckled fog edges; the client before the shared background gives 26.
+  check(differ.length <= 10, `the ground on the minimap is the same from both sides of the border: ${differ.length} of ${grid.length} points differ`);
   check(wide.hero.every(v => v > 200), `the hero is drawn in the centre (${wide.hero})`);
   const box = await page.locator('#minimap').boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

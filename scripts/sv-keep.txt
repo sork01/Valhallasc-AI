@@ -791,7 +791,7 @@
   "The Ashen Crown",
   "The Deep Cut",
   "The Giants' Forge",
-  "The Glass Shore",
+  "The Glass Barrens",
   "The Highfire Beacon",
   "The Horn Gate",
   "The Pit Props",

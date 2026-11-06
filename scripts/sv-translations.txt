@@ -8036,7 +8036,6 @@
   "Elof grinds magma fangs into sighting needles for his brass tubes. Nothing else keeps its edge in this heat. Bring four.": "Elof slipar magmatänder till siktnålar för sina mässingsrör. Inget annat håller eggen i den här hettan. Hämta fyra.",
   "Faces in the Ash": "Ansikten i askan",
   "Find the Giants' Forge": "Hitta The Giants' Forge",
-  "Find the Glass Shore": "Hitta The Glass Shore",
   "Find the Highfire Beacon": "Hitta The Highfire Beacon",
   "Fire draws the things of the ridge. Stand at the beacon for twenty seconds while it catches, and let nothing put it out.": "Eld lockar till sig det som lever på åsen. Stå vid vårdkasen i tjugo sekunder medan den tar sig, och låt inget släcka den.",
   "Ford Inn": "Vadvärdshuset",
@@ -8051,7 +8050,6 @@
   "Magma spiders nest on the Red Slopes, across the fourth river. Take the ford east of the Terrace road and defeat four before they spin over it.": "Magmaspindlar bygger bo på The Red Slopes, bortom fjärde floden. Ta vadstället öster om terrassvägen och besegra fyra innan de spinner igen det.",
   "Needles for the Stars": "Nålar till stjärnorna",
   "Nobody has set stones north of the last river since Tora was a girl. Cross it, climb to the Ashen Crown and defeat three golems, so the road can go on to the Wyrdwood.": "Ingen har satt sten norr om sista floden sedan Tora var liten. Gå över den, klättra upp på The Ashen Crown och besegra tre golemer, så att vägen kan fortsätta till Wyrdwood.",
-  "North of the second river the lava once met the sea and turned the beach to black glass. Elof wants to know if it still shines at night. Cross the ford and find the Glass Shore.": "Norr om andra floden mötte lavan en gång havet och gjorde stranden till svart glas. Elof vill veta om den fortfarande lyser om natten. Gå över vadstället och hitta The Glass Shore.",
   "Ore carter": "Malmforkarl",
   "Outpost trader": "Utpostens handlare",
   "Pay the toll or do not, the lava does not mind. Tonics are extra.": "Betala tullen eller låt bli, lavan bryr sig inte. Tonikum kostar extra.",
@@ -8100,5 +8098,7 @@
   "Where the Heat Comes From": "Varifrån hettan kommer",
   "Wisps follow the ore carts into the Anvil Quarries and set the scaffolds alight. Clear eight of them from the workings.": "Irrbloss följer malmvagnarna in i The Anvil Quarries och sätter eld på ställningarna. Rensa bort åtta från brottet.",
   "Wraiths walk the Horned Terrace at dusk, and they have come to within sight of the Hearth. Go up to the Horn Gate between the peaks and defeat five of them.": "Askandar vandrar på The Horned Terrace i skymningen, och nu syns de från härden. Gå upp till The Horn Gate mellan topparna och besegra fem.",
-  "Cinder wisps have drifted off the Sunpit Flats and up to the south gate. Go down the camp road and defeat four of them before they reach the tents.": "Glödirrbloss har drivit från The Sunpit Flats upp till södra porten. Gå nedför lägervägen och besegra fyra innan de når tälten."
+  "Cinder wisps have drifted off the Sunpit Flats and up to the south gate. Go down the camp road and defeat four of them before they reach the tents.": "Glödirrbloss har drivit från The Sunpit Flats upp till södra porten. Gå nedför lägervägen och besegra fyra innan de når tälten.",
+  "North of the second river a great flow once ran out over the black sand and cooled to glass. Elof wants to know if it still shines at night. Cross the ford and find the Glass Barrens.": "Norr om andra floden rann en gång ett stort lavaflöde ut över den svarta sanden och stelnade till glas. Elof vill veta om det fortfarande lyser om natten. Gå över vadstället och hitta The Glass Barrens.",
+  "Find the Glass Barrens": "Hitta The Glass Barrens"
 }

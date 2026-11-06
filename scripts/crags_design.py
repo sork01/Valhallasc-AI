@@ -37,7 +37,7 @@ REGIONS = {
     'highfire': dict(name='Highfire Ridge', seeds=[(70, 92), (115, 95), (165, 100), (140, 110)]),
     'crown':    dict(name='The Ashen Crown', seeds=[(90, 40), (140, 35), (60, 62), (160, 55)]),
     'spurs':    dict(name='The Steaming Spurs', seeds=[(30, 110), (30, 150), (22, 180)]),
-    'glass':    dict(name='The Glass Shore', seeds=[(245, 110), (300, 112), (328, 125)]),
+    'glass':    dict(name='The Glass Barrens', seeds=[(245, 110), (300, 112), (328, 125)]),
 }
 
 ROADS = [
@@ -60,7 +60,7 @@ ROADS = [
     [(197, 152), (197, 132), (192, 102)],
     # north again to the Bifrost gate, over the first river
     [(150, 100), (150, 72), (153, 50), (156.5, 29.5), (156.5, 20.5), (154.5, 20.5), (154.5, 13.5)],
-    # the Glass Shore road: Nacrehold's gate east along the sea, and down over the ford to Lasthearth
+    # the Glass Barrens road: Nacrehold's gate east along the border, and down over the ford to Lasthearth
     [(207.5, 104), (207.5, 111.5)],
     [(207.5, 104), (240, 110), (276, 110), (304, 112), (320, 111)],
     [(276, 110), (276, 150), (285, 190)],
@@ -346,7 +346,7 @@ class Crags(Designer):
         self.scatter(['ew_vent'], 26, m('spurs'), gap=7)
         self.scatter(['rock', 'rock', 'cairn_boulder', 'bush'], 430, m('spurs'), gap=1.2)
 
-        # The Glass Shore: black glass, sharp spires, a beach where the lava met the sea.
+        # The Glass Barrens: black glass and sharp spires, where an old lava flow cooled on the sand.
         self.scatter(['spire', 'spire', 'ew_basalt'], 130, m('glass'), gap=2.2)
         self.scatter(['rock', 'cairn_pebble', 'bones'], 300, m('glass'), gap=1)
 

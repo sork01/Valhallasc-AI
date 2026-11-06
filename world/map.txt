@@ -133101,14 +133101,14 @@
         },
         {
           "id": "hearth_glass",
-          "title": "The Glass Shore",
+          "title": "The Glass Barrens",
           "npc": "hearth_elof",
-          "description": "North of the second river the lava once met the sea and turned the beach to black glass. Elof wants to know if it still shines at night. Cross the ford and find the Glass Shore.",
+          "description": "North of the second river a great flow once ran out over the black sand and cooled to glass. Elof wants to know if it still shines at night. Cross the ford and find the Glass Barrens.",
           "objectives": [
             {
               "kind": "visit",
               "target": "hearth_glass",
-              "label": "Find the Glass Shore",
+              "label": "Find the Glass Barrens",
               "count": 1
             }
           ],
@@ -133615,7 +133615,7 @@
         },
         {
           "id": "hearth_glass",
-          "name": "The Glass Shore",
+          "name": "The Glass Barrens",
           "x": 304,
           "y": 113,
           "r": 7
@@ -147100,7 +147100,7 @@
           "Highfire Ridge",
           "The Ashen Crown",
           "The Steaming Spurs",
-          "The Glass Shore"
+          "The Glass Barrens"
         ],
         "spans": [
           [

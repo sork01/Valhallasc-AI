@@ -1014,7 +1014,7 @@
 
   // ---------- state ----------
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
-  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null, miniWater = null, miniTmp = null, miniRipple = null, miniZoom = 2; const miniNb = new Map();
+  let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null, miniWater = null, miniTmp = null, miniZoom = 2; const miniNb = new Map();
   let hero, slimes, drops, chests, signs = [], floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   const BAG_COLORS = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
@@ -4885,18 +4885,9 @@
     if (!miniTmp || miniTmp.width !== W) { miniTmp = document.createElement('canvas'); miniTmp.width = miniTmp.height = W; }
     const tg = miniTmp.getContext('2d');
     mctx.save(); mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
-    // A zone with no coast is landlocked: nothing around it is sea.
-    const sea = zdef.shapeFloor && zdef.shape.edges.some(e => e.kind === 'coast');
-    mctx.fillStyle = sea ? '#1d6a92' : zdef.shapeFloor ? '#2b2421' : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    // Stopgap until MINIMAP-WORLD (TODO.md): every shaped zone shares one plain background, so a crossing changes nothing; real coast still shows its shallows and foam.
+    mctx.fillStyle = zdef.shapeFloor ? '#2b2421' : '#080c0b'; mctx.fillRect(0, 0, W, W);
     if (zdef.shapeFloor) miniRippleOrigin = [vx + (zdef.shape?.T?.[0] || 0), vy + (zdef.shape?.T?.[1] || 0)];
-    if (sea) {                                  // ripples fixed to the world, so they slide past as the hero moves
-      if (!miniRipple) { const [rc, rg] = canvasOf(48, 48, 1); let n = 7; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647; rg.strokeStyle = 'rgba(190,232,246,.55)'; rg.lineWidth = 1; rg.lineCap = 'round';
-        for (let i = 0; i < 11; i++) { const x = rnd() * 48, y = rnd() * 48, w = 4 + rnd() * 6; rg.beginPath(); rg.moveTo(x, y); rg.quadraticCurveTo(x + w / 2, y - 1.5, x + w, y); rg.stroke(); }
-        miniRipple = mctx.createPattern(rc, 'repeat'); }
-      // The ripples are pinned to the world, and a seam crossing moves the hero into another zone's frame: add the zone's tile origin (shape.T, the same for both sides of a border) so the waves do not shift.
-      const [wx, wy] = miniRippleOrigin;
-      miniRipple.setTransform(new DOMMatrix().translate(-wx * s, -wy * s)); mctx.fillStyle = miniRipple; mctx.fillRect(0, 0, W, W);
-    }
     // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.
     const layer = (canvas, tiles, ox, oy, zi) => {
       const dx = (ox - vx) * s, dy = (oy - vy) * s, dw = tiles * s;
