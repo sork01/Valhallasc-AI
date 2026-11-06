@@ -103,15 +103,15 @@
   // A zone with the outline of its province on the world atlas (docs/zone-shapes.md): `shapeFloor` rows mark the land
   // ('#'), `shapeEdge` rows say what the outside cells next to it are (b border, c coast, l outer land, g gap).
   function paintShape(rows, edge) {
-    map.floor = new Uint8Array(MAP * MAP); map.edge = new Uint8Array(MAP * MAP); map.edgeDist = new Uint8Array(MAP * MAP);
+    map.floor = new Uint8Array(MAP * MAP); map.edge = new Uint8Array(MAP * MAP); map.edgeDist = new Uint8Array(MAP * MAP); map.edgeCoast = new Uint8Array(MAP * MAP);
     (rows || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) if (row[x] === '#') map.floor[y * MAP + x] = 1; });
     (edge || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) { const c = row[x]; if (c && c !== ' ' && !map.floor[y * MAP + x]) map.edge[y * MAP + x] = c.charCodeAt(0); } });
-    // How many tiles each outside cell lies from the land (breadth first from the land cells, up to 14).
+    // How many tiles each outside cell lies from the land (breadth first from the land cells, up to 14), and whether the shore it faces is coast ('c').
     let front = [];
     for (let i = 0; i < MAP * MAP; i++) if (map.floor[i]) front.push(i);
     for (let d = 1; d <= 14 && front.length; d++) {
       const next = [];
-      for (const i of front) { const x = i % MAP, y = (i / MAP) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (!map.floor[k] && !map.edgeDist[k]) { map.edgeDist[k] = d; next.push(k); } } }
+      for (const i of front) { const x = i % MAP, y = (i / MAP) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (!map.floor[k] && !map.edgeDist[k]) { map.edgeDist[k] = d; map.edgeCoast[k] = d === 1 ? +(map.edge[k] === 99) : map.edgeCoast[i]; next.push(k); } } }
       front = next;
     }
     // Land near a border: how far the ground has to go to meet the neighbour's, and which neighbour (letter code).
@@ -4857,14 +4857,14 @@
     miniBase = renderMini(); if (!zdef.shapeFloor) miniNb.clear(); miniWater = renderShallows();
     if (zdef.shapeFloor) miniCache.set(zone, { base: miniBase, water: miniWater });
   }
-  // Shallows and a foam line along the coast of the zone whose state is adopted (null for a zone without an outline).
+  // Shallows and a foam line along the COAST of the zone whose state is adopted (null for a zone without an outline). Past any other edge lies land: another province, drawn plain.
   function renderShallows() {
     if (!zdef.shapeFloor) return null;
     const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP;
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // lighter and greener near the shore, a foam line at the edge
       const i = y * MAP + x, d = map.edgeDist[i];
       if (map.floor[i] || !d || d > 16) continue;
-      g.fillStyle = d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
+      g.fillStyle = !map.edgeCoast[i] ? `rgba(43,36,33,${Math.min(1, (15 - d) / 4)})` : d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
     }
     return c;
   }
@@ -4885,13 +4885,16 @@
     if (!miniTmp || miniTmp.width !== W) { miniTmp = document.createElement('canvas'); miniTmp.width = miniTmp.height = W; }
     const tg = miniTmp.getContext('2d');
     mctx.save(); mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
-    mctx.fillStyle = zdef.shapeFloor ? '#1d6a92' : '#080c0b'; mctx.fillRect(0, 0, W, W);
-    if (zdef.shapeFloor) {                                  // ripples fixed to the world, so they slide past as the hero moves
+    // A zone with no coast is landlocked: nothing around it is sea.
+    const sea = zdef.shapeFloor && zdef.shape.edges.some(e => e.kind === 'coast');
+    mctx.fillStyle = sea ? '#1d6a92' : zdef.shapeFloor ? '#2b2421' : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    if (zdef.shapeFloor) miniRippleOrigin = [vx + (zdef.shape?.T?.[0] || 0), vy + (zdef.shape?.T?.[1] || 0)];
+    if (sea) {                                  // ripples fixed to the world, so they slide past as the hero moves
       if (!miniRipple) { const [rc, rg] = canvasOf(48, 48, 1); let n = 7; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647; rg.strokeStyle = 'rgba(190,232,246,.55)'; rg.lineWidth = 1; rg.lineCap = 'round';
         for (let i = 0; i < 11; i++) { const x = rnd() * 48, y = rnd() * 48, w = 4 + rnd() * 6; rg.beginPath(); rg.moveTo(x, y); rg.quadraticCurveTo(x + w / 2, y - 1.5, x + w, y); rg.stroke(); }
         miniRipple = mctx.createPattern(rc, 'repeat'); }
       // The ripples are pinned to the world, and a seam crossing moves the hero into another zone's frame: add the zone's tile origin (shape.T, the same for both sides of a border) so the waves do not shift.
-      const wx = vx + (zdef.shape?.T?.[0] || 0), wy = vy + (zdef.shape?.T?.[1] || 0); miniRippleOrigin = [wx, wy];
+      const [wx, wy] = miniRippleOrigin;
       miniRipple.setTransform(new DOMMatrix().translate(-wx * s, -wy * s)); mctx.fillStyle = miniRipple; mctx.fillRect(0, 0, W, W);
     }
     // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.

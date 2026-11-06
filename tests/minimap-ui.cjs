@@ -50,7 +50,12 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   check(await page.evaluate(() => Field.minimapZoom(0)) === 1, 'zoom clamps at 1 (the widest view)');
   await page.waitForTimeout(400); const wide = await pixels(); await shot('crags-seam-zoom1');
   check(wide.green > 400, `Crags minimap at zoom 1 shows Greenmeadow's green land beyond the border (${wide.green} green px)`);
-  check(wide.water > 300, `and open water around the land (${wide.water} px)`);
+  // The Crags are landlocked: past their east border (the Orrery, a gate, no seam) the minimap shows plain land, no foam line, no shallows, no sea, on and past the grid.
+  const east = q2 => page.evaluate(([hx, hy, xs]) => { const c = document.getElementById('minimap'), g = c.getContext('2d'), s = c.width / 240; return xs.map(x => [...g.getImageData(Math.round(c.width / 2 + (x - hx) * s), Math.round(c.height / 2), 1, 1).data].slice(0, 3)); }, q2);
+  await go(1, 335, 170); await page.waitForTimeout(600);
+  const beyond = await east([335, 170, [346.5, 347.5, 349, 352, 358, 380, 420]]); await shot('crags-east-landlocked');
+  check(beyond.slice(2).every(([r, g, b]) => b <= r + 12 && g < 90), `past the Crags' east border there is no water: ${JSON.stringify(beyond)}`);
+  await go(1, q[0] + shx - inward[0] * 3, q[1] + shy - inward[1] * 3); await page.waitForTimeout(400);
   check(wide.hero.every(v => v > 200), `the hero is drawn in the centre (${wide.hero})`);
   const box = await page.locator('#minimap').boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
