@@ -339,5 +339,38 @@
       "x": 341,
       "y": 225.5
     }
+  },
+  {
+    "id": "mailbox_1_anvilrest",
+    "zone": 1,
+    "hub": "Anvilrest",
+    "x": 121,
+    "y": 291,
+    "anchor": {
+      "x": 117,
+      "y": 292
+    }
+  },
+  {
+    "id": "mailbox_1_ashford",
+    "zone": 1,
+    "hub": "Ashford",
+    "x": 199,
+    "y": 153,
+    "anchor": {
+      "x": 196,
+      "y": 157
+    }
+  },
+  {
+    "id": "mailbox_1_lasthearth",
+    "zone": 1,
+    "hub": "Lasthearth",
+    "x": 303,
+    "y": 207,
+    "anchor": {
+      "x": 306,
+      "y": 202
+    }
   }
 ]

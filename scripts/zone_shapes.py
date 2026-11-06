@@ -1400,6 +1400,9 @@ def apply(world, cfg):
     if 0 in cfg['zones']:
         import greenmeadow_design
         print('greenmeadow', greenmeadow_design.design(world, write=True)[1])
+    if 1 in cfg['zones']:
+        import crags_design
+        print('crags', crags_design.design(world, write=True)[1])
     return shifted
 
 

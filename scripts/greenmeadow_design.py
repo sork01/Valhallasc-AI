@@ -152,17 +152,21 @@ class Grid:
 
 
 class Designer:
+    # A subclass (scripts/crags_design.py) brings its own plan; the helpers below only read these.
+    TAG, SEED = TAG, SEED
+
     def __init__(self, world):
+        self.REGIONS, self.ROADS, self.R = self.plan()
         self.w = world
         self.n = world['size']
         self.floor = np.array([[c == '#' for c in row] for row in world['shapeFloor']])
         self.ys, self.xs = np.mgrid[0:self.n, 0:self.n] + .5
-        self.rng = random.Random(SEED)
-        self.noise = Noise(SEED)
+        self.rng = random.Random(self.SEED)
+        self.noise = Noise(self.SEED)
         self.grid = Grid()
         self.objects = []
         self.road = np.full((self.n, self.n), 1e9)
-        for road in ROADS:
+        for road in self.ROADS:
             self.road = np.minimum(self.road, seg_field(road, self.xs, self.ys))
         # one cell-wide ring of shore keeps a walker's edge clear of scenery
         from zone_shapes import erode
@@ -173,14 +177,17 @@ class Designer:
                 self.seam = np.minimum(self.seam, seg_field(p['seam']['points'], self.xs, self.ys))
         self.blocked = np.zeros((self.n, self.n), bool)   # no loose scenery or spawn here
         self.region = self.make_regions()
-        self.zone_ids = list(REGIONS)
+        self.zone_ids = list(self.REGIONS)
+
+    def plan(self):
+        return REGIONS, ROADS, R
 
     def make_regions(self):
         wx = self.xs + (fbm(self.noise, self.xs, self.ys, .035) - .5) * 44
         wy = self.ys + (fbm(self.noise, self.xs + 90, self.ys + 40, .035) - .5) * 44
         best = np.full((self.n, self.n), 1e9)
         out = np.zeros((self.n, self.n), int)
-        for i, r in enumerate(REGIONS.values()):
+        for i, r in enumerate(self.REGIONS.values()):
             for sx, sy in r['seeds']:
                 d = np.hypot(wx - sx, wy - sy)
                 out[d < best] = i
@@ -188,11 +195,11 @@ class Designer:
         return out
 
     def mask(self, name):
-        return (self.region == list(REGIONS).index(name)) & self.floor
+        return (self.region == list(self.REGIONS).index(name)) & self.floor
 
     def add(self, kind, x, y, r=None, solid=True, **extra):
-        r = R.get(kind, 0) if r is None else r
-        o = {'kind': kind, 'x': round(float(x), 2), 'y': round(float(y), 2), 'r': r, 'v': extra.pop('v', self.rng.randrange(4)), **extra, 'layout': TAG}
+        r = self.R.get(kind, 0) if r is None else r
+        o = {'kind': kind, 'x': round(float(x), 2), 'y': round(float(y), 2), 'r': r, 'v': extra.pop('v', self.rng.randrange(4)), **extra, 'layout': self.TAG}
         self.objects.append(o)
         if solid:
             self.grid.add(o['x'], o['y'], max(r, (extra.get('width', 0) + extra.get('depth', 0)) / 4))
@@ -216,7 +223,7 @@ class Designer:
             j, i = pts[self.rng.randrange(len(pts))]
             x, y = i + self.rng.random(), j + self.rng.random()
             k = self.rng.choice(kinds)
-            if self.grid.free(x, y, R[k], gap):
+            if self.grid.free(x, y, self.R[k], gap):
                 self.add(k, x, y)
                 placed += 1
         return placed

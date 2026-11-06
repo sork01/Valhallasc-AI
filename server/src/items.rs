@@ -316,6 +316,8 @@ pub fn material(kind: &str) -> &'static str {
         "oldtusker" => "tusker_bristle",
         "tidecrusher" => "tidecrusher_shard",
         "orchardqueen" => "queen_stinger",
+        "slagmaw" => "slagmaw_gullet",
+        "ashwing" => "ashwing_plume",
         "crab" => "rime_shell",
         "wolf" => "frost_pelt",
         "yeti" => "yeti_horn",
@@ -533,6 +535,8 @@ pub fn is_elite(kind: &str) -> bool {
             | "oldtusker"
             | "tidecrusher"
             | "orchardqueen"
+            | "slagmaw"
+            | "ashwing"
             | "gloomroot"
             | "oakhorn"
             | "hrungnir"

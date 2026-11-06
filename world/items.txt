@@ -63,6 +63,20 @@
     "sell": 40
   },
   {
+    "id": "slagmaw_gullet",
+    "name": "Slagmaw Gullet Stone",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 60
+  },
+  {
+    "id": "ashwing_plume",
+    "name": "Ashwing Plume",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 60
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",

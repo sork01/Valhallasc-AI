@@ -982,3 +982,197 @@ fn lotta_walks_the_lane_from_applewick_to_the_watermill() {
         "Lotta reached the watermill"
     );
 }
+
+// The Emberfall Crags are an authored map (scripts/crags_design.py): outposts, elites and quests on real ground.
+#[test]
+fn the_crags_outposts_are_sanctuaries_with_their_people() {
+    let w = world();
+    let map = &w.maps[1];
+    assert_eq!(map.camps.len(), 3, "Anvilrest, Ashford and Lasthearth");
+    for id in [
+        "anvil_ingrid",
+        "anvil_bror",
+        "anvil_trader",
+        "travel_anvilrest",
+        "ford_tora",
+        "ford_olaf",
+        "ford_ulf",
+        "ford_trader",
+        "travel_ashford",
+        "hearth_sigrid",
+        "hearth_elof",
+        "hearth_trader",
+        "travel_lasthearth",
+    ] {
+        let npc = map.npcs.iter().find(|n| n.id == id).unwrap();
+        let spot = Point { x: npc.x, y: npc.y };
+        assert!(map.in_city(spot), "{id} stands in a sanctuary");
+        let mut q = spot;
+        map.collide(&mut q, PLAYER_RADIUS);
+        assert!(q.distance(spot) < 1e-6, "{id} stands on free ground");
+        assert!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 1 && s.state != "waiting")
+                .all(|s| s.point().distance(spot) > 8.),
+            "no enemy within eight units of {id}"
+        );
+    }
+}
+
+#[test]
+fn every_crags_quest_can_be_done_on_the_map() {
+    let w = world();
+    let map = &w.maps[1];
+    let mut played = 0;
+    for q in map.quests.iter().filter(|q| !q.id.starts_with("es_")) {
+        assert!((5..=10).contains(&q.level), "{}: level {}", q.id, q.level);
+        for o in &q.objectives {
+            match o.kind.as_str() {
+                "visit" | "hold" => assert!(
+                    map.places.iter().any(|p| p.id == o.target),
+                    "{}: place {}",
+                    q.id,
+                    o.target
+                ),
+                "talk" | "escort" => assert!(
+                    map.npcs.iter().any(|n| n.id == o.target),
+                    "{}: npc {}",
+                    q.id,
+                    o.target
+                ),
+                "kill" if o.target != "any" => assert!(
+                    w.slimes.iter().any(|s| s.zone == 1 && s.kind == o.target),
+                    "{}: enemy {}",
+                    q.id,
+                    o.target
+                ),
+                _ => {}
+            }
+            played += 1;
+        }
+        assert!(
+            map.npcs.iter().any(|n| n.id == q.npc),
+            "{}: giver {} is in the Crags",
+            q.id,
+            q.npc
+        );
+    }
+    assert!(played > 30, "the walk covers the whole chain: {played}");
+}
+
+#[test]
+fn the_crags_have_three_elites_two_with_a_quest() {
+    let w = world();
+    let quests = &w.maps[1].quests;
+    for (kind, quest) in [("cinderlord", true), ("slagmaw", true), ("ashwing", false)] {
+        assert_eq!(
+            w.slimes.iter().filter(|s| s.zone == 1 && s.kind == kind).count(),
+            1,
+            "one {kind}"
+        );
+        assert!(crate::items::is_elite(kind), "{kind} is an elite");
+        assert_eq!(
+            quests.iter().any(|q| q.objectives.iter().any(|o| o.target == kind)),
+            quest,
+            "{kind} quest"
+        );
+    }
+}
+
+#[test]
+fn a_crags_road_reaches_every_gate() {
+    let w = world();
+    let map = &w.maps[1];
+    // the road network reaches every crossing: each gate has a road end within a step of it
+    let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
+    let paths = data["zones"][0]["paths"].as_array().unwrap();
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+        let near = paths.iter().flat_map(|r| r.as_array().unwrap()).any(|q| {
+            at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.
+        });
+        assert!(near, "a road reaches {}", p.id);
+    }
+}
+
+fn crags_hero(w: &mut World, x: f64, y: f64, level: u32, quest: &str) -> mpsc::Receiver<Value> {
+    let rx = meadow_hero(w, x, y, level, quest);
+    w.players.get_mut(&1).unwrap().character.zone = 1;
+    rx
+}
+
+#[test]
+fn the_beacon_wakes_the_ridge_and_counts_twenty_seconds() {
+    let mut w = world();
+    let _rx = crags_hero(&mut w, 122., 92., 9, "ford_lit");
+    let sleepers = |w: &World| {
+        w.spawns
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| s.ambush.as_deref().is_some_and(|t| t.starts_with("ford_lit_m")))
+            .filter(|(id, _)| w.slimes[*id].dead)
+            .count()
+    };
+    assert_eq!(sleepers(&w), 4, "four enemies sleep until the waves call them");
+    for tick in 0..(24. / TICK) as usize {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.hp = c.max_hp();
+        w.step();
+        if tick == (5. / TICK) as usize {
+            assert_eq!(sleepers(&w), 2, "the first wave came");
+        }
+        if tick == (15. / TICK) as usize {
+            assert_eq!(sleepers(&w), 0, "the second wave came");
+        }
+    }
+    let c = &w.players[&1].character;
+    assert!(
+        c.quests.iter().find(|q| q.id == "ford_lit").unwrap().counts[0] >= 20,
+        "the hold is complete"
+    );
+}
+
+#[test]
+fn ulf_walks_the_cart_over_the_ford_and_up_the_highfire_road() {
+    let mut w = world();
+    let ulf = w.maps[1].npcs.iter().find(|n| n.id == "ford_ulf").unwrap().clone();
+    let route = &ulf.escort.as_ref().unwrap().route;
+    for leg in route.windows(2) {
+        let (from, to) = (at(leg[0][0], leg[0][1]), at(leg[1][0], leg[1][1]));
+        for k in 0..=20 {
+            let t = k as f64 / 20.;
+            let spot = at(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
+            let mut q = spot;
+            w.maps[1].collide(&mut q, PLAYER_RADIUS);
+            assert!(q.distance(spot) < 1e-6, "the road is clear at {spot:?}");
+        }
+    }
+    let _rx = crags_hero(&mut w, ulf.x, ulf.y + 1., 8, "ford_cart");
+    w.time += 1.;
+    w.interact(1, "ford_ulf", None);
+    let owner = w.players[&1].character.id.clone();
+    let escort = w.escort_of(&owner).expect("Ulf joins");
+    for _ in 0..(120. / TICK) as usize {
+        let Some(e) = w.players.get(&escort) else { break };
+        let there = e.character.point();
+        let e = &mut w.players.get_mut(&escort).unwrap().character;
+        e.hp = e.max_hp();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = there.x + 1.;
+        c.y = there.y + 1.;
+        c.hp = c.max_hp();
+        for s in w.slimes.iter_mut().filter(|s| s.zone == 1 && !s.dead) {
+            if s.point().distance(there) < 12. {
+                s.dead = true;
+                s.respawn = 1e9;
+            }
+        }
+        w.step();
+    }
+    let c = &w.players[&1].character;
+    assert_eq!(
+        c.quests.iter().find(|q| q.id == "ford_cart").unwrap().counts[0],
+        1,
+        "Ulf reached the end of the road"
+    );
+}

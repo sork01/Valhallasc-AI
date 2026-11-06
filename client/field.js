@@ -155,7 +155,7 @@
         const art = City.art[o.kind];
         // Water is drawn by drawWater, not as an object: a meadow pond near a seam must already be there before you cross.
         if (o.kind === 'water' && nz.theme === 'meadow') { const wx = o.x - shx, wy = o.y - shy; if (!(wx >= 0 && wy >= 0 && wx < MAP && wy < MAP && map.floor[(wy | 0) * MAP + (wx | 0)])) (map.ghostWater ||= []).push({ ...o, x: wx, y: wy }); continue; }
-        if (set && !WALL_KINDS.has(o.kind) && !(nz.theme === 'meadow' && art && !art.ground) ? !set[o.kind] : !art || art.ground || o.kind === 'void') continue;   // a landmark wall carries on across a seam, whatever the theme
+        if (set && !WALL_KINDS.has(o.kind) && !((nz.theme === 'meadow' || nz.theme === 'ember') && art && !art.ground) ? !set[o.kind] : !art || art.ground || o.kind === 'void') continue;   // a landmark wall carries on across a seam, whatever the theme
         const gx = o.x - shx, gy = o.y - shy;
         // The neighbour can lie past this zone's own grid (the meadow is south of the Crags' 208 tiles): no grid limit, only the rule that it must not lie on our own land.
         if (gx >= 0 && gy >= 0 && gx < MAP && gy < MAP && map.floor[(gy | 0) * MAP + (gx | 0)]) continue;
@@ -265,12 +265,25 @@
     return `hsl(${34 + tone * 10}, ${14 + tone * 8}%, ${39 + tone * 9 + alt}%)`;
   }
   const MEADOW_MINI = ['', '#e2cf9a', '#8a6a48', '#98a460', '#3e6c3e', '#80aa58', '#827868'];
-  // The name of the part of Greenmeadow at a point (`regions`: names and [y, x0, x1, region + 1] runs).
-  let regionCells = null;
+  // The Crags' ground classes (scripts/crags_design.py): pale ash, red scree, ochre terrace, black sand, quarry stone, the cooled crust beside the lava, wet steam rock.
+  function emberGround(k, tone, alt) {
+    if (k === 1) return `hsl(${28 + tone * 8}, ${10 + tone * 6}%, ${42 + tone * 9 + alt}%)`;
+    if (k === 2) return `hsl(${14 + tone * 8}, ${44 + tone * 8}%, ${27 + tone * 8 + alt}%)`;
+    if (k === 3) return `hsl(${24 + tone * 7}, ${44 + tone * 8}%, ${33 + tone * 9 + alt}%)`;
+    if (k === 4) return `hsl(${255 + tone * 20}, ${7 + tone * 5}%, ${14 + tone * 7 + alt}%)`;
+    if (k === 5) return `hsl(${32 + tone * 6}, ${20 + tone * 6}%, ${47 + tone * 9 + alt}%)`;
+    if (k === 6) return `hsl(${10 + tone * 8}, ${26 + tone * 8}%, ${19 + tone * 6 + alt}%)`;
+    return `hsl(${200 + tone * 12}, ${10 + tone * 6}%, ${36 + tone * 9 + alt}%)`;
+  }
+  const EMBER_MINI = ['', '#90877c', '#8f4a2a', '#a9703c', '#2a2730', '#a8967a', '#3a2820', '#68727a'];
+  const MINI_QUIET = new Set(['rock', 'bush', 'bones', 'cairn_pebble', 'ew_warmstone', 'tree', 'spire', 'ew_basalt', 'cairn_boulder']);   // authored Crags: the ground tells the story, dots of every stone only noise
+  // The name of the part of an authored zone at a point (`regions`: names and [y, x0, x1, region + 1] runs).
+  const regionCells = new WeakMap();
   function regionAt(x, y) {
-    const R = ZONES[0].regions; if (!R) return null;
-    if (!regionCells) { regionCells = new Uint8Array(ZONES[0].size ** 2); for (const [ry, a, b, k] of R.spans) regionCells.fill(k, ry * ZONES[0].size + a, ry * ZONES[0].size + b + 1); }
-    return R.names[regionCells[(y | 0) * ZONES[0].size + (x | 0)] - 1] || null;
+    const R = zdef.regions, n = zdef.size; if (!R) return null;
+    let cells = regionCells.get(R);
+    if (!cells) { cells = new Uint8Array(n * n); for (const [ry, a, b, k] of R.spans) cells.fill(k, ry * n + a, ry * n + b + 1); regionCells.set(R, cells); }
+    return R.names[cells[(y | 0) * n + (x | 0)] - 1] || null;
   }
   // The ground of another zone's theme, to blend toward it where two provinces meet.
   function groundOf(theme, tone, dirt, alt) {
@@ -745,7 +758,7 @@
         : wyrd ? wyrdGround(x, y, tone, dirt, alt)
         : fen ? (dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`)
         : frost ? (dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`)
-        : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
+        : ember ? (dirt ? (map.gk?.[i] ? `hsl(${30 + tone * 8}, ${30 + tone * 8}%, ${46 + tone * 8 + alt}%)` : `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)`) : map.gk?.[i] ? emberGround(map.gk[i], tone, alt) : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
         : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : map.gk?.[i] ? meadowGround(map.gk[i], tone, alt, y) : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
       if (map.blendD && map.blendD[i] && map.blendW[i] > .01) {   // the ground turns into the neighbour's toward their shared border
@@ -1047,6 +1060,8 @@
     oldtusker: { name: 'Old Tusker', elite: true, scale: 1.55, top: 90, col: ['#8a6548', '#44291e', '#120a08'] },
     tidecrusher: { name: 'Tidecrusher', elite: true, scale: 1.55, top: 90, col: ['#5cae94', '#e08a3a', '#0c2422'] },
     orchardqueen: { name: 'The Orchard Queen', elite: true, scale: 1.55, top: 90, col: ['#f8d040', '#322c40', '#0c0a12'] },
+    slagmaw: { name: 'Slagmaw', elite: true, scale: 1.6, top: 90, col: ['#e0702a', '#3a2a2a', '#120a0a'] },
+    ashwing: { name: 'Ashwing', elite: true, scale: 1.6, top: 90, col: ['#8a8078', '#3a2c2c', '#0c0a0a'] },
     crab: { name: 'Rime Crab', scale: 1.1, top: 53, col: ['#d8f2ff', '#6fb3dc', '#2d5f8a'] },
     wolf: { name: 'Frostfang Wolf', scale: 1.1, top: 67, col: ['#f2f6fa', '#9fb4c8', '#4a5d74'] },
     yeti: { name: 'Glacier Yeti', scale: 1.2, top: 85, col: ['#f4f8fc', '#b9cbdc', '#5e7690'] },
@@ -1179,6 +1194,7 @@
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:e.elite !== false, boss:e.boss, scale:e.kind.startsWith('cf_') ? (e.add ? 1.25 : e.raidPack ? 1.95 : e.kind === 'cf_eldmarr' ? 3.2 : 2.6) : e.kind.startsWith('null_') ? (e.boss ? 2.6 : 1.9) : e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   if (window.Locale?.language === 'sv') for (const d of Object.values(SLIME)) d.name = Locale.translate(d.name); // nameplates, log lines and the boss bar read these
   const MEADOW_ELITES = ['oldtusker', 'tidecrusher', 'orchardqueen'];
+  const CRAGS_ELITES = ['slagmaw', 'ashwing'];
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
@@ -1218,7 +1234,7 @@
   const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
   const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
   const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
-  const areaName = () => zone > 0 ? zdef.name : hubAt(hero.x, hero.y)?.name ?? regionAt(hero.x, hero.y) ?? 'Greenmeadow';
+  const areaName = () => zone > 0 && !zdef.regions ? zdef.name : hubAt(hero.x, hero.y)?.name ?? regionAt(hero.x, hero.y) ?? zdef.name;
   function emitHud(force) {
     // Server fight state selects the raid finale; proximity and a selected target do not.
     const raidFinalFight = !!zdef.raid && (window.BossMech?.fights || []).some(f =>
@@ -3196,7 +3212,7 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let meadowEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  let meadowEliteSrc = null, cragsEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   // Share the renderer's bank selection with loading, including borrowed boss/add art.
   // Loading every zone here used to start hundreds of image requests at login.
   let slimeSpriteConfig = null;
@@ -3215,6 +3231,7 @@
     [FROSTWAKE_KINDS, () => frostwakeSrc, loadFrostwakeSprites],
     [LAPIS_KINDS, () => lapisSrc, loadLapisSprites],
     [MEADOW_ELITES, () => meadowEliteSrc, loadMeadowElites],
+    [CRAGS_ELITES, () => cragsEliteSrc, loadCragsElites],
     [WORLDHEART_KINDS, () => worldheartSrc, loadWorldheartSprites],
     [TANGLECROWN_KINDS, () => tanglecrownSrc, loadTanglecrownSprites],
     [RIBBONWILD_KINDS, () => ribbonwildSrc, loadRibbonwildSprites],
@@ -3472,6 +3489,13 @@
     return fetch('assets/worldheart.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/worldheart_${k}.png`;
     }))).then(imgs=>{worldheartSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{worldheartSrc=null;});
+  }
+  function loadCragsElites() {
+    if (cragsEliteSrc) return;
+    if (stubOn()) { cragsEliteSrc = stubEnemies(CRAGS_ELITES, { slagmaw: '#e72', ashwing: '#887' }); return; }
+    return fetch('assets/cragselites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/cragselites_${k}.png`;
+    }))).then(imgs => { cragsEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { cragsEliteSrc = null; });
   }
   function loadMeadowElites() {
     if (meadowEliteSrc) return;
@@ -4764,7 +4788,7 @@
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
-    if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = MEADOW_MINI[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
+    if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = (ember ? EMBER_MINI : MEADOW_MINI)[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? MoonwellArt.minimap(x,y,map.dirt[y*MAP+x],zdef) : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = zdef.theme === 'emberwake' ? '#ae8a6e' : zdef.theme === 'chained_forge' ? '#bca69e' : zdef.theme === 'blackhour' ? '#82758d' : zdef.theme === 'longship' ? '#c5a475' : zdef.theme === 'skybridge' ? '#8dd8f2' : zdef.theme === 'nornroot' ? '#c29b59' : DungeonVisual.styles[zdef.theme] ? DungeonVisual.minimap(zdef.theme,x,y,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : yearwheel ? ['#e8c498','#e9bd7d','#bf8c6b','#b8d9e9'][yearSeason(x,y)] : deep ? '#c8c29a' : zdef.theme === 'elder_hollow' ? '#597251' : zdef.theme === 'thousandfold' ? '#ae779d' : zdef.theme === 'rain_crown' ? '#6aa895' : zdef.theme === 'seed_vault' ? '#b6a676' : zdef.theme === 'sunken_astrolabe' ? '#c0ac79' : zdef.theme === 'thunderheart_gate' ? '#b6d4e6' : zdef.theme === 'blooming_labyrinth' ? '#e2b7cf' : zdef.theme === 'solar_crucible' ? '#e8ba77' : zdef.theme === 'amber_archive' ? '#eac286' : zdef.theme === 'silent_solstice' ? '#b8d5e8' : zdef.theme === 'vault' ? VaultArt.minimap(x,y,zdef.rooms) : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : worldtree ? '#c19a60' : heartwood ? '#b58a5b' : frostwake ? '#8fc6d8' : cairn ? '#b49a75' : lapis ? '#efd49b' : tanglecrown ? '#b99a62' : ribbonwild ? '#ffe2a2' : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (wyrd) { const gr = g.createLinearGradient(0, 0, 0, 144); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(.42, 'rgba(120,128,92,.9)'); gr.addColorStop(.56, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, 144, 144); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * .5) g.fillRect(x * k, y * k, k + .5, k + .5); } }
@@ -4804,6 +4828,8 @@
         g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue;
       }
       if ((city || zdef.theme === 'nacre') && (o.kind === 'grandfountain' || o.kind === 'nacrefountain' || o.kind === 'meetingstone' || o.kind === 'fountain')) { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, o.r * k), 0, 6.283); g.fill(); continue; }
+      if (ember && map.gk && MINI_QUIET.has(o.kind)) continue;
+      if (o.kind === 'crag_peak') { g.fillStyle = '#d8d2cc'; g.beginPath(); g.moveTo(o.x * k, (o.y - o.r * 1.5) * k); g.lineTo((o.x + o.r) * k, o.y * k); g.lineTo((o.x - o.r) * k, o.y * k); g.fill(); continue; }
       g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (zone === 0 ? '#4fa9c8' : wyrd ? '#2f6f9a' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }

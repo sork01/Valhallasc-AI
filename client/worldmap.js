@@ -237,6 +237,7 @@
       case 'thicket': return '#6a2f58';
       case 'tree': return wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a';
       case 'spire': return wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e';
+      case 'crag_peak': return '#d8d2cc';
       case 'rock': return wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8';
       case 'rampart': return '#6f7078';
       case 'eye_wall': return '#527c8e';

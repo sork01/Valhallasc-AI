@@ -17,6 +17,22 @@
   }};
   // Lava is painted once as continuous terrain, never as repeated object stamps.
   City.art.ew_lava={box:[1,1,0,0],draw(){}};
+  // A mountain of the painted atlas: three sizes (`v`), its foot the collision circle. Ochre rock, a dark lee side, snow on top.
+  const PEAK=[4.6,5.2,6.1];
+  City.art.crag_peak={box:[820,840,410,630],occludes:true,draw(g,o){
+    const size=PEAK[Math.min(o.v||0,2)],W=size*62.2,D=size*31.1,H=size*96,ax=((o.v||0)-1)*10,top=[ax,-H];
+    const edge=[];for(let i=0;i<=10;i++){const a=Math.PI*i/10;edge.push([Math.cos(a)*W,Math.sin(a)*D]);}
+    const left=[-W,0],right=[W,0],foot=[W*.16,D];
+    poly(g,[top,left,...edge.slice(5).reverse(),foot],'#a2653a',C.ink,3);
+    poly(g,[top,foot,...edge.slice(0,4).reverse(),right],'#5e3a2c',C.ink,3);
+    // strata and gullies follow the two faces down
+    for(const [t,k] of [[.22,.5],[.4,-.34],[.55,.18],[.7,-.62],[.34,.72]]){
+      const y=-H*(1-t*.9),x=ax*(1-t)+W*t*k;
+      line(g,[[x,y],[x+W*.06*Math.sign(k||1),y+H*.12],[x+W*.02,y+H*.2],[x+W*.1*Math.sign(k||1),y+H*.32]],k<0?'#6e4630':'#3c2622',3);
+    }
+    poly(g,[top,[ax-W*.24,-H*.72],[ax-W*.14,-H*.76],[ax-W*.08,-H*.66],[ax+W*.02,-H*.75],[ax+W*.1,-H*.68],[ax+W*.22,-H*.74]],'#efeae2',C.ink,2.5);
+    poly(g,[top,[ax+W*.02,-H*.75],[ax+W*.1,-H*.68],[ax+W*.22,-H*.74]],'#b7c0cc','#b7c0cc',1);
+  }};
   const lavaPieces=z=>z.objects.filter(o=>o.kind==='ew_lava'||(z.theme==='ember'&&o.kind==='lava'));
   const moltenCache=new WeakMap();
   const hash=(x,y)=>{let n=Math.imul(x|0,374761393)^Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295;};
@@ -61,32 +77,33 @@
     return [mix(r,29+grain*19,bank),mix(g,27+grain*15,bank),mix(b,30+grain*13,bank),
       Math.round(255*smooth(Math.max(0,Math.min(1,edge*2.4))))];
   }
-  function moltenTexture(z){
-    if(moltenCache.has(z))return moltenCache.get(z);
-    const pieces=lavaPieces(z),resolution=12;
-    const ymin=Math.floor(Math.min(...pieces.map(o=>o.y-o.r)))-1;
-    const ymax=Math.ceil(Math.max(...pieces.map(o=>o.y+o.r)))+1;
-    const c=document.createElement('canvas');c.width=z.size*resolution;c.height=(ymax-ymin)*resolution;
+  // One ground chunk at a time, straight from the collision circles: a whole-zone texture was 4320 x 2800 px once the Crags' rivers spread over the map.
+  const MOLTEN_RES=12;
+  function moltenPatch(z,X0,Y0,N){
+    let pieces=moltenCache.get(z);if(!pieces){pieces=lavaPieces(z);moltenCache.set(z,pieces);}
+    const near=pieces.filter(o=>o.x+o.r>X0&&o.x-o.r<X0+N&&o.y+o.r>Y0&&o.y-o.r<Y0+N);if(!near.length)return null;
+    const c=document.createElement('canvas');c.width=c.height=N*MOLTEN_RES;
     const ctx=c.getContext('2d'),pixels=ctx.createImageData(c.width,c.height);
     // Raster columns sample the actual collision footprint. The wide causeway
     // remains clear; the cooled broken banks belong to the impassable channel.
-    const columns=Array.from({length:c.width},(_,px)=>pieces.filter(o=>Math.abs((px+.5)/resolution-o.x)<=o.r));
+    const columns=Array.from({length:c.width},(_,px)=>near.filter(o=>Math.abs(X0+(px+.5)/MOLTEN_RES-o.x)<=o.r));
     for(let py=0;py<c.height;py++)for(let px=0;px<c.width;px++){
       const nearby=columns[px];if(!nearby.length)continue;
-      const x=(px+.5)/resolution,y=ymin+(py+.5)/resolution;
+      const x=X0+(px+.5)/MOLTEN_RES,y=Y0+(py+.5)/MOLTEN_RES;
       let edge=-Infinity;
       for(const o of nearby)edge=Math.max(edge,o.r-Math.hypot(x-o.x,y-o.y));
       if(edge<=0)continue;
       pixels.data.set(moltenColor(x,y,edge,z.theme==='ember'),(py*c.width+px)*4);
     }
-    ctx.putImageData(pixels,0,0);const result={canvas:c,ymin,height:ymax-ymin};moltenCache.set(z,result);return result;
+    ctx.putImageData(pixels,0,0);return c;
   }
   function molten(g,G,CH,TW,TH,z){
-    const texture=moltenTexture(z),point=(x,y)=>[(x-y)*TW/2-G.ox,(x+y)*TH/2-G.oy];
+    const X0=Math.floor(G.x0)-1,Y0=Math.floor(G.y0)-1,N=CH+3,patch=moltenPatch(z,X0,Y0,N);if(!patch)return;
+    const point=(x,y)=>[(x-y)*TW/2-G.ox,(x+y)*TH/2-G.oy];
     const corners=[point(G.x0-.06,G.y0-.06),point(G.x0+CH+.06,G.y0-.06),point(G.x0+CH+.06,G.y0+CH+.06),point(G.x0-.06,G.y0+CH+.06)];
     g.save();g.beginPath();corners.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.clip();
     g.transform(TW/2,TH/2,-TW/2,TH/2,-G.ox,-G.oy);g.imageSmoothingEnabled=true;
-    g.drawImage(texture.canvas,0,texture.ymin,z.size,texture.height);g.restore();
+    g.drawImage(patch,X0,Y0,N,N);g.restore();
   }
   // Sparse motion above the cached terrain. Cache world anchors, never animated
   // textures; both zones use the same clock, fissures and collision footprint.
