@@ -1406,6 +1406,9 @@ def apply(world, cfg):
     if 2 in cfg['zones']:
         import rimeveil_design
         print('rimeveil', rimeveil_design.design(world, write=True)[1])
+    if 3 in cfg['zones']:
+        import gloamfen_design
+        print('gloamfen', gloamfen_design.design(world, write=True)[1])
     return shifted
 
 

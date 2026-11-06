@@ -98,6 +98,20 @@
     "sell": 120
   },
   {
+    "id": "bellowmaw_gullet",
+    "name": "Bellowmaw Gullet",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "rustmarshal_plate",
+    "name": "Rustmarshal Plate",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",

@@ -405,5 +405,38 @@
       "x": 286,
       "y": 96
     }
+  },
+  {
+    "id": "mailbox_3_reedhallow",
+    "zone": 3,
+    "hub": "Reedhallow",
+    "x": 73,
+    "y": 101,
+    "anchor": {
+      "x": 69,
+      "y": 102
+    }
+  },
+  {
+    "id": "mailbox_3_dikewatch",
+    "zone": 3,
+    "hub": "Dikewatch",
+    "x": 144,
+    "y": 241,
+    "anchor": {
+      "x": 141,
+      "y": 245
+    }
+  },
+  {
+    "id": "mailbox_3_lastlight",
+    "zone": 3,
+    "hub": "Garrison's Rest",
+    "x": 212,
+    "y": 159,
+    "anchor": {
+      "x": 215,
+      "y": 154
+    }
   }
 ]

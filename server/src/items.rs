@@ -319,6 +319,8 @@ pub fn material(kind: &str) -> &'static str {
         "slagmaw" => "slagmaw_gullet",
         "ashwing" => "ashwing_plume",
         "hoarhorn" => "hoarhorn_tusk",
+        "bellowmaw" => "bellowmaw_gullet",
+        "rustmarshal" => "rustmarshal_plate",
         "whitewail" => "whitewail_shroud",
         "shardback" => "shardback_carapace",
         "crab" => "rime_shell",
@@ -541,6 +543,8 @@ pub fn is_elite(kind: &str) -> bool {
             | "slagmaw"
             | "ashwing"
             | "hoarhorn"
+            | "bellowmaw"
+            | "rustmarshal"
             | "whitewail"
             | "shardback"
             | "gloomroot"

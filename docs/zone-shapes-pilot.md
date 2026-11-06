@@ -119,3 +119,7 @@ Zone 0 is now an authored map on the same outline: `docs/greenmeadow-design.md`.
 ## Rimeveil redesign (2026-11-06)
 
 Zone 2 is now an authored map on the same outline: `docs/rimeveil-design.md`. Same method as Greenmeadow and the Crags: the filler still runs so seams, the vault and the wall are placed as before, then `rimeveil_design.py` (after `crags_design.py` in `apply`) replaces scenery, spawns and trails and adds three outposts, 17 quests and three elites. New client pieces: frost ground classes, a frost `drawWater` look, `client/rimeveilart.js` (`rime_peak`), the elite loader for `rimeelites.txt`. Water stays out of the vault's land region and 17 tiles from every seam, because neither the vault nor the seam ghosts draw `water`.
+
+## Gloamfen redesign (2026-11-06)
+
+Zone 3 is now an authored map on the same outline: `docs/gloamfen-design.md`. Same method as the other three: the filler still runs so seams, the vault and the wall are placed as before, then `gloamfen_design.py` (after `rimeveil_design.py` in `apply`) replaces scenery, spawns and trails and adds three outposts, 16 new quests and two new elites beside the Gloomroot Colossus. New client pieces: fen ground classes and minimap colours, the elite loader for `fenelites.txt`, `'fen'` in the seam-ghost art list. Water stays 17 tiles from every seam and west of x = 222, because neither the seam ghosts nor the vault view draw `water`; the stream's old bed east of that is the dry Culvert (ground only).
