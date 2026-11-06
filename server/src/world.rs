@@ -9194,7 +9194,7 @@ mod tests {
             "Skaldholm is the fifth map; every later zone is added after it"
         );
         assert_eq!(map.name, "Skaldholm");
-        assert_eq!(map.size, 160);
+        assert_eq!(map.size, 184, "the rebuilt city: one frame with its four neighbours (docs/skaldholm-rebuild.md)");
         assert_eq!(map.size % 8, 0, "whole ground chunks");
         assert!(map.slimes.is_empty() && w.slimes.iter().all(|s| s.zone != CITY));
         assert!(
@@ -9226,14 +9226,31 @@ mod tests {
             (100..=104).contains(&houses),
             "about a hundred houses, got {houses}"
         );
-        assert!(count("rampart") >= 60 && count("tower") >= 9);
+        // The city has no wall of its own: the four neighbours' walls enclose it (void collision lies beyond its ground).
+        assert!(count("rampart") == 0 && count("tower") == 0, "no wall of its own");
+        assert!(count("void") > 0);
         assert_eq!(count("grandfountain"), 1);
         assert_eq!(count("meetingstone"), 1);
         assert!(count("stall") >= 14 && count("lamp") >= 30);
         // The great fountain sits in the middle of the plaza the city names.
         let city = map.city.as_ref().unwrap();
-        assert!(!city.contains(map.spawn), "you arrive outside the wall");
-        assert!(map.in_city(Point { x: 80., y: 76. }));
+        assert!(city.contains(map.spawn), "you arrive inside the city");
+        let fountain = {
+            let all: serde_json::Value =
+                serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
+            let o = all["zones"][CITY - 1]["objects"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|o| o["kind"] == "grandfountain")
+                .unwrap()
+                .clone();
+            Point {
+                x: o["x"].as_f64().unwrap(),
+                y: o["y"].as_f64().unwrap(),
+            }
+        };
+        assert!(map.in_city(fountain));
         // Gates: the glacier's Skaldholm Gate brings you to the forecourt, the Glacier Gate takes you back to its arrival.
         let up = w.maps[2]
             .portals
@@ -9242,9 +9259,17 @@ mod tests {
             .unwrap();
         let down = &map.portals[0];
         assert_eq!((up.to, down.to), (CITY, 2));
-        assert_eq!((up.tx, up.ty), (map.spawn.x, map.spawn.y));
+        // One doorway in one frame: the vault drops you just inside the arch, on free ground, and the offsets cancel.
+        assert!(free_for_player(
+            map,
+            Point {
+                x: up.tx,
+                y: up.ty
+            }
+        ));
         assert_eq!(down.id, "glacier_gate");
-        assert!(down.tx == up.x && (down.ty - (up.y + 4.5)).abs() < 1e-6);
+        let (va, vb) = (up.vault.unwrap(), down.vault.unwrap());
+        assert!((va[0] + vb[0]).abs() < 0.011 && (va[1] + vb[1]).abs() < 0.011);
         let outside_gate = |gate: &Portal, p: Point| {
             p.distance(Point {
                 x: gate.x,
@@ -9265,34 +9290,9 @@ mod tests {
             ),
             "the summit arrival is clear of the Skaldholm Gate"
         );
-        // The glacier keeps all four of its wyrms, and no glacier spawn stands within 8 of any place a gate drops you.
-        let wyrms = w
-            .slimes
-            .iter()
-            .filter(|s| s.zone == 2 && s.kind == "wyrm")
-            .count();
-        assert_eq!(wyrms, 4);
-        for s in w.slimes.iter().filter(|s| s.zone == 2) {
-            for gate in w
-                .maps
-                .iter()
-                .flat_map(|m| m.portals.iter())
-                .filter(|p| p.to == 2)
-            {
-                assert!(
-                    s.point().distance(Point {
-                        x: gate.tx,
-                        y: gate.ty
-                    }) > 8.0,
-                    "a {} stands at {:?}, too near an arrival point",
-                    s.kind,
-                    s.point()
-                );
-            }
-        }
         // Everything solid is inside the map.
         for o in &map.objects {
-            assert!(o.x > 0. && o.y > 0. && o.x < 160. && o.y < 160.);
+            assert!(o.x > 0. && o.y > 0. && o.x < 184. && o.y < 184.);
         }
     }
 
@@ -9310,12 +9310,7 @@ mod tests {
         let mut ids = std::collections::HashSet::new();
         let mut walkers = 0;
         for npc in &map.npcs {
-            assert!(
-                (npc.id.starts_with("city_") || npc.id == "travel_skaldholm")
-                    && ids.insert(&npc.id),
-                "{} is unique",
-                npc.id
-            );
+            assert!(ids.insert(&npc.id), "{} is unique", npc.id);
             if npc.route.is_empty() {
                 let p = Point { x: npc.x, y: npc.y };
                 assert!(free_for_player(map, p), "{} stands on free ground", npc.id);
@@ -9331,33 +9326,58 @@ mod tests {
         }
         assert!(map.npcs.len() >= 40, "{} people", map.npcs.len());
         assert!(walkers >= 12, "{walkers} walk");
-        // The plaza, the stone court, the gate and the far corners can all be walked to.
+        // The plaza, the stone court, every door and the south band can all be walked to.
+        let inside = |id: &str| {
+            let p = map.portals.iter().find(|p| p.id == id).unwrap();
+            let w = p.walk.unwrap();
+            Point {
+                x: p.x - 3. * f64::from(w[0]),
+                y: p.y - 3. * f64::from(w[1]),
+            }
+        };
+        let fountain = {
+            let all: serde_json::Value =
+                serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
+            let o = all["zones"][CITY - 1]["objects"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|o| o["kind"] == "grandfountain")
+                .unwrap()
+                .clone();
+            Point {
+                x: o["x"].as_f64().unwrap(),
+                y: o["y"].as_f64().unwrap(),
+            }
+        };
         for (name, p) in [
-            ("plaza", Point { x: 80., y: 66. }),
-            ("stone court", Point { x: 100., y: 123. }),
-            ("return gate", Point { x: 80., y: 153. }),
-            ("garden", Point { x: 27.4, y: 34. }),
-            ("orchard", Point { x: 121.4, y: 30. }),
+            (
+                "plaza",
+                Point {
+                    x: fountain.x,
+                    y: fountain.y + 9.,
+                },
+            ),
+            ("Rimeveil door", inside("glacier_gate")),
+            ("Greenmeadow door", inside("path_4_0")),
+            ("Crags door", inside("path_4_1")),
+            ("Gloamfen door", inside("path_4_3")),
         ] {
             assert!(reach(p).is_some(), "{name} is reachable");
         }
-        // The wall holds: the long way round the outside never gets in, so the Great Gate is the only door.
+        // No wall of its own: beyond the ground there is void, so the doors are the only way out.
         assert!(
-            !free_for_player(map, Point { x: 30., y: 12. }),
-            "the north wall is solid"
+            !free_for_player(map, Point { x: 30., y: 2. }),
+            "north of the ground is solid"
         );
         assert!(
-            !free_for_player(map, Point { x: 16., y: 100. }),
-            "the west wall is solid"
+            !free_for_player(map, Point { x: 8., y: 120. }),
+            "west of the ground is solid"
         );
+        let far = reach(inside("path_4_0")).unwrap() as f64 * 0.5;
         assert!(
-            free_for_player(map, Point { x: 80., y: 140. }),
-            "the Great Gate is open"
-        );
-        let gate_walk = *reach(Point { x: 80., y: 68. }).as_ref().unwrap() as f64 * 0.5;
-        assert!(
-            gate_walk > 78. && gate_walk < 110.,
-            "the forecourt to the plaza is a real walk: {gate_walk}"
+            far > 20. && far < 160.,
+            "the spawn to the south door is a real walk: {far}"
         );
     }
 

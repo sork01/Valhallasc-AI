@@ -23,11 +23,12 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import zone_shapes as zs  # noqa: E402
 
-TC = (352, 590)                 # city tile = atlas tile - TC
-SIZE = 168
+TC = (352, 584)                 # city tile = atlas tile - TC (the portals stand 3 tiles outside the arches: all inside the grid)
+SIZE = 184
 STRIP = (38.5, 123.5)           # old x range that stays rigid (85 wide: the north part of the L)
 OLD_Y = (13.0, 139.5)
 ODX, ODY = 331.5 - TC[0], 587.0 - TC[1]     # old city frame -> city frame for the strip
+DB = 590 - TC[1]                # the band's hand-placed rows were laid out for TC y 590
 NEIGHBOURS = (0, 1, 2, 3)       # Greenmeadow, Crags, Rimeveil, Gloamfen
 CITY = 4
 SIDE = zs.SIDE / 'preshape-04.txt'
@@ -85,7 +86,8 @@ def pocket_cells(zone, gate, arch):
     ys, xs = np.mgrid[0:n, 0:n]
     dx, dy = xs + .5 - arch['x'], ys + .5 - arch['y']
     along, across = dx * wx + dy * wy, dx * px + dy * py
-    return (along >= 0.5) & (along <= 6.2) & (np.abs(across) <= hw + 1.0)
+    # from 3.5 tiles beyond the arch (an alcove through the wall opening: you arrive at the arch line and must be able to turn round) to the pocket's end
+    return (along >= -3.5) & (along <= 6.2) & (np.abs(across) <= hw + 1.0)
 
 
 def city_floor(world):
@@ -162,7 +164,7 @@ def rebuild(world):
         gate['tx'], gate['ty'] = round(gate['x'] + shift[0], 2), round(gate['y'] + shift[1], 2)
         carch = dict(carch_old, x=round(arch['x'] + shift[0], 2), y=round(arch['y'] + shift[1], 2))
         city['exitArches'] = [a for a in city['exitArches'] if a['portal'] != back['id']] + [carch]
-        back['x'], back['y'] = round(carch['x'] - wx * 3.0, 2), round(carch['y'] - wy * 3.0, 2)
+        back['x'], back['y'] = round(carch['x'] - wx * 1.0, 2), round(carch['y'] - wy * 1.0, 2)     # beyond the arch is the neighbour's ground and the walker stops at the arch line: a vault crosses from 3 tiles before its portal
         back['vault'] = [-shift[0], -shift[1]]
         back['tx'], back['ty'] = round(back['x'] - shift[0], 2), round(back['y'] - shift[1], 2)
 
@@ -262,10 +264,15 @@ def entrances(city):
         back = next(p for p in city['portals'] if p['id'] == a['portal'])
         wx, wy = -back['walk'][0], -back['walk'][1]
         p0 = [back['x'], back['y']]
-        p1 = [round(a['x'] + wx * 18, 2), round(a['y'] + wy * 18, 2)]
-        ents.append(dict(id=back['id'], portal=back['id'], points=[p0, p1], axis='y' if wy else 'x', street=a['x'] if wy else a['y'],
+        reach = 11 if back['to'] == 3 else 18     # West Street ends at Lark Lane
+        p1 = [round(a['x'] + wx * reach, 2), round(a['y'] + wy * reach, 2)]
+        pts = [p0, p1]
+        if back['to'] == 2:      # the north door lands behind the Steward's Hall: the way in follows the lane round its west side
+            ly, lx = mv(0, 14.6)[1], mv(72.7, 0)[0]
+            pts = [p0, [a['x'], ly], [lx, ly], [lx, round(ly + 8.0, 2)]]
+        ents.append(dict(id=back['id'], portal=back['id'], points=pts, axis='y' if wy else 'x', street=a['x'] if wy else a['y'],
                          width=7.0 if a['halfWidth'] > 5 else 4.0, opening={k: a[k] for k in ('x', 'y', 'vertical', 'halfWidth', 'towers', 'portal', 'name')}))
-        paths.append([[round(a['x'] - wx * 5.5, 2), round(a['y'] - wy * 5.5, 2)], p1])
+        paths.append([[round(a['x'] - wx * 5.5, 2), round(a['y'] - wy * 5.5, 2)]] + pts[1:])
     city['cityEntrances'] = ents
     city['paths'] = paths
     city['atlasPaths'] = copy.deepcopy(paths)
@@ -327,9 +334,9 @@ class Lots:
 
 
 # where the strip leftovers go: (old x range, old y range) -> new origin of that group's old top-left corner (city frame)
-SMITHY = dict(old=(17.0, 38.5, 93.0, 108.0), to=(21.0, 153.0))      # campfire, forge props, smith and apprentice
-STABLE = dict(old=(123.5, 143.0, 114.0, 131.0), to=(121.0, 152.0))  # the stables, its wall pieces and barrels
-GARDEN = dict(old=(17.0, 38.5, 13.0, 30.0), to=(40.0, 152.0))       # the NW garden: fountain, benches, flowers, gardener, painter
+SMITHY = dict(old=(17.0, 38.5, 93.0, 108.0), to=(21.0, 153.0 + DB))      # campfire, forge props, smith and apprentice
+STABLE = dict(old=(123.5, 143.0, 114.0, 131.0), to=(121.0, 152.0 + DB))  # the stables, its wall pieces and barrels
+GARDEN = dict(old=(17.0, 38.5, 13.0, 30.0), to=(40.0, 152.0 + DB))       # the NW garden: fountain, benches, flowers, gardener, painter
 MARKET = dict(old=(17.0, 143.0, 70.0, 75.0), to=None)               # the Trade Road's stall rows: only the stalls and barrels move
 
 
@@ -341,7 +348,7 @@ def in_box(o, g):
 def place_band(city, old, floor):
     lots = Lots(city, floor)
     moved = []              # (old x, old y, dx, dy): decor follows the piece it belongs to
-    street_y = 148.0
+    street_y = 148.0 + DB
     city['roads'].append(dict(t=1, x0=18.0, y0=street_y - 2.0, x1=151.0, y1=street_y + 2.0))       # Southgate Street
     lots.streets.append((18.0, street_y - 2.0, 151.0, street_y + 2.0))
     for p in city['portals']:
@@ -397,8 +404,8 @@ def place_band(city, old, floor):
                 if q.get('route'):
                     q['route'] = [[round(a + dx, 2), round(b + dy, 2)] for a, b in npc['route']]
                     if npc['id'] == 'city_gardener':        # the garden is shorter here: a walk along its path
-                        q['route'] = [[q['x'], 155.0], [q['x'], 162.5]]
-                        q['y'] = 155.0
+                        q['route'] = [[q['x'], 155.0 + DB], [q['x'], 162.5 + DB]]
+                        q['y'] = 155.0 + DB
                 city['npcs'].append(q)
                 placed_npcs.append(q['id'])
         x0, x1, y0, y1 = g['old']
@@ -409,7 +416,7 @@ def place_band(city, old, floor):
     mx = 60.0
     for o in old['objects']:
         if o['kind'] in ('stall', 'barrels') and 70 < o['y'] < 73 and not in_strip(o['x'], o['y']):
-            q = dict(o, x=round(mx + (0.7 if o['kind'] == 'barrels' else 0.0), 2), y=round(155.5 if o['kind'] == 'stall' else 156.8, 2))
+            q = dict(o, x=round(mx + (0.7 if o['kind'] == 'barrels' else 0.0), 2), y=round((155.5 if o['kind'] == 'stall' else 156.8) + DB, 2))
             if lots.free(q, margin=0.2, streets=False):
                 city['objects'].append(q)
                 lots.solid.append(footprint(q))
@@ -418,12 +425,12 @@ def place_band(city, old, floor):
                 mx += 3.6
     for npc in old['npcs']:         # the weaver sold at those stalls
         if npc['id'] == 'city_weaver':
-            city['npcs'].append(dict(npc, x=round(mx - 8, 2), y=157.6))
+            city['npcs'].append(dict(npc, x=round(mx - 8, 2), y=157.6 + DB))
             placed_npcs.append(npc['id'])
     # the houses that stood outside the strip, and any pushed out of a new street, along Southgate Street (doors face south)
     plain = [o for o in old['objects'] if o['kind'] == 'house' and not in_strip(o['x'], o['y']) and 17 <= o['x'] <= 143 and 13 <= o['y'] <= 139 and o['width'] <= 4.5] + pend
     slots = []
-    for row_y in (142.4, 154.4):
+    for row_y in (142.4 + DB, 154.4 + DB):
         x = 20.5
         while x < 150:
             slots.append((round(x, 2), row_y))
@@ -432,7 +439,7 @@ def place_band(city, old, floor):
     for h in plain:
         for sx, sy in slots:
             q = dict(h, x=sx, y=sy)
-            if sy > 150 and not (92 <= sx <= 118 or 62 <= sx <= 82):
+            if sy > 150 + DB and not (92 <= sx <= 118 or 62 <= sx <= 82):
                 continue
             if lots.add(q, margin=0.9):
                 city['objects'].append(q)
@@ -444,14 +451,15 @@ def place_band(city, old, floor):
     # NPCs that patrolled the old outer walls
     for npc in old['npcs']:
         if npc['id'] == 'city_watch_trade':
-            q = dict(npc, x=21.0, y=71.2)
-            q['route'] = [[21.0, 71.2], [45.5, 71.2], [45.5, 74.8], [21.0, 74.8]]
+            y0, y1 = mv(0, 74.2)[1], mv(0, 77.8)[1]
+            q = dict(npc, x=21.0, y=y0)
+            q['route'] = [[21.0, y0], [45.5, y0], [45.5, y1], [21.0, y1]]
             city['npcs'].append(q)
             placed_npcs.append(npc['id'])
         if npc['id'] == 'city_watch_wall':
-            q = dict(npc, x=22.0, y=146.5)
-            q['route'] = [[22.0, 138.0], [70.0, 138.0], [70.0, 140.2], [22.0, 140.2]]
-            q['x'], q['y'] = 22.0, 138.0
+            q = dict(npc)
+            q['route'] = [[22.0, 138.0 + DB], [70.0, 138.0 + DB], [70.0, 140.2 + DB], [22.0, 140.2 + DB]]
+            q['x'], q['y'] = 22.0, 138.0 + DB
             city['npcs'].append(q)
             placed_npcs.append(npc['id'])
     # seasonal decor follows the piece it belonged to (within 6 tiles of one that moved), the rest of the outside is dropped
@@ -498,9 +506,9 @@ def check_city(city, floor):
     for kind, items in (('portal', city['portals']), ('npc', city['npcs']), ('place', city['places'])):
         for o in items:
             x, y = o['x'], o['y']
-            if o.get('id') in doors:        # a door's portal stands outside the arch: its inward side is the ground
+            if o.get('id') in doors:        # a door's portal stands at the arch line: three tiles inward is the street
                 a = doors[o['id']]
-                x, y = a['x'] - (o['x'] - a['x']), a['y'] - (o['y'] - a['y'])
+                x, y = a['x'] - o['walk'][0] * 3.0, a['y'] - o['walk'][1] * 3.0
             if int(y) * SIZE + int(x) not in prev:
                 unreachable.append((kind, o.get('id'), x, y))
     assert not unreachable, f'not reachable on foot from the spawn: {unreachable}'
