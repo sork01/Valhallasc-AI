@@ -34,11 +34,36 @@ def solid(world, x, y):
     return False
 
 
+def settle(a):
+    full = json.loads((ROOT / 'world/map.txt').read_text())
+    zones = {0: full, CITY: full['zones'][CITY - 1]}
+    db = sqlite3.connect(a.db)
+    moved = seen = 0
+    for rid, state in db.execute('select rowid, state from characters').fetchall():
+        c = json.loads(state)
+        z = zones.get(c.get('zone', 0))
+        if z is None:
+            continue
+        seen += 1
+        if solid(z, c['x'], c['y']):
+            print('to the spawn:', c.get('name'), c.get('zone', 0), round(c['x'], 1), round(c['y'], 1))
+            c['x'], c['y'] = z['spawn']['x'], z['spawn']['y']
+            moved += 1
+            if a.apply:
+                db.execute('update characters set state=? where rowid=?', (json.dumps(c), rid))
+    if a.apply:
+        db.commit()
+    print(f'{seen} characters in Greenmeadow or Skaldholm, {moved} {"moved" if a.apply else "would move"}')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--db', required=True)
     ap.add_argument('--apply', action='store_true')
+    ap.add_argument('--settle', action='store_true', help='only move characters of Skaldholm and Greenmeadow who stand inside scenery or off the ground to the spawn (a later layout change)')
     a = ap.parse_args()
+    if a.settle:
+        return settle(a)
     world = json.loads((ROOT / 'world/map.txt').read_text())['zones'][CITY - 1]
     assert world['name'] == 'Skaldholm' and 'shape' in world, 'the map is not rebuilt'
     db = sqlite3.connect(a.db)
