@@ -9228,8 +9228,8 @@ mod tests {
         );
         // The city has no wall of its own: the four neighbours' walls enclose it (void collision lies beyond its ground).
         assert!(
-            count("tower") == 0 && (1..=40).contains(&count("rampart")),
-            "no wall of its own but a short run of ramparts at the Crags/Greenmeadow corner"
+            count("tower") <= 1 && (1..=40).contains(&count("rampart")),
+            "no wall of its own but the east wall's run from the Crags' wall down to Greenmeadow's"
         );
         assert!(count("void") > 0);
         assert_eq!(count("grandfountain"), 1);

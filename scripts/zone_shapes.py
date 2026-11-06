@@ -840,10 +840,12 @@ def fitted_vault(zones, i, lm, fit, axis):
     carch = next(a for a in city['exitArches'] if a['portal'] == back['id'])
     cb = city['city']
     along = ends['lo'][bi] + (carch['x'], carch['y'])[bi] - (cb['x0'], cb['y0'])[bi]
+    if 'at' in fit:         # Skaldholm rebuild: the vault stands where the city's main street meets the wall (an atlas coordinate along the wall)
+        along = fit['at'] - z['shape']['T'][bi]
     for a, b in zip(run, run[1:]):
         if (a[bi] - along) * (b[bi] - along) <= 0 and a[bi] != b[bi]:
             border = a[ai] + (b[ai] - a[ai]) * (along - a[bi]) / (b[bi] - a[bi])
-            return along, ends[fit['line']][ai] if 'line' in fit else border, border
+            return along, fit['c'] if 'c' in fit else ends[fit['line']][ai] if 'line' in fit else border, border
     raise SystemExit(f'zone {i}: the fitted vault lies past the end of its wall')
 
 

@@ -61,7 +61,7 @@ ROADS = [
     [(160, 192), (136, 202), (135, 243)],
     [(136, 202), (134, 170), (126, 156)],
     # the Skaldholm road: from the vault down through the pasture to the fork
-    [(161.5, 124.5), (163, 138), (172, 150), (178, 168), (192, 186)],
+    [(133.5, 124.5), (134.5, 136), (146, 146), (162, 156), (172, 162), (178, 168), (192, 186)],     # (the vault stands on the Grand Avenue's axis since the Skaldholm rebuild)
     # the Downs way and the shore path
     [(92, 224), (66, 218), (40, 222)],
     [(112, 238), (102, 252), (94, 260)],

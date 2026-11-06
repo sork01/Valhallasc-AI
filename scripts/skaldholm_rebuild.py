@@ -33,6 +33,8 @@ NEIGHBOURS = (0, 1, 2, 3)       # Greenmeadow, Crags, Rimeveil, Gloamfen
 CITY = 4
 SIDE = zs.SIDE / 'preshape-04.txt'
 TAG = zs.TAG
+EAST_WALL_X = 456            # atlas: the Crags' east wall (x 456.2, y 599-727) carries on straight down to Greenmeadow's wall
+EAST_WALL_Y0 = 720          # (the Crags' door alcove at y ~663 reaches past x 456: only the wing below it is cut)
 
 
 def mv(x, y):
@@ -122,6 +124,7 @@ def city_floor(world):
                 seen[v, u] = True
                 stack.append((u, v))
     land = seen | pocket
+    land[EAST_WALL_Y0 - Y0:, EAST_WALL_X - X0:] = False        # the right wing is not the city: its wall runs straight down from the Crags' to Greenmeadow's
     floor = np.zeros((SIZE, SIZE), bool)
     ys, xs = np.nonzero(land)
     for y, x in zip(ys + Y0 - TC[1], xs + X0 - TC[0]):
@@ -135,7 +138,7 @@ def neighbour_fingerprint(world):
     out = {}
     for i in NEIGHBOURS:
         z = zs.zone_of(world, i)
-        walls = [o for o in z['objects'] if o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG]
+        walls = [o for o in z['objects'] if o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG] if i != 0 else []     # (Greenmeadow's wall is trimmed below, on purpose)
         out[i] = hashlib.sha256(json.dumps([walls, z['shapeFloor'], z['shape'].get('vaultRegions')], sort_keys=True).encode()).hexdigest()
     return out
 
@@ -144,6 +147,7 @@ def neighbour_fingerprint(world):
 def rebuild(world):
     city = zs.zone_of(world, CITY)
     assert city['name'] == 'Skaldholm' and 'shape' not in city
+    trim_greenmeadow_flank(world)
     before = neighbour_fingerprint(world)
     old = copy.deepcopy(city)
     floor = city_floor(world)
@@ -183,7 +187,8 @@ def rebuild(world):
                 p['tx'], p['ty'] = mv(p['tx'], p['ty'])
     open_hall_lane(city)
     place_band(city, old, floor)
-    wall_the_notch(world, city, floor)
+    east_wall(world, city)
+    quiet_lobe(world)
     city['objects'].extend(zs.void_pieces(floor))
     city['shapeFloor'] = zs.floor_rows(floor)
     city['shapeEdge'] = edge_rows(world, floor)
@@ -268,9 +273,6 @@ def entrances(city):
         reach = 11 if back['to'] == 3 else 18     # West Street ends at Lark Lane
         p1 = [round(a['x'] + wx * reach, 2), round(a['y'] + wy * reach, 2)]
         pts = [p0, p1]
-        if back['to'] == 2:      # the north door lands behind the Steward's Hall: the way in follows the lane round its west side
-            ly, lx = mv(0, 14.6)[1], mv(72.7, 0)[0]
-            pts = [p0, [a['x'], ly], [lx, ly], [lx, round(ly + 8.0, 2)]]
         ents.append(dict(id=back['id'], portal=back['id'], points=pts, axis='y' if wy else 'x', street=a['x'] if wy else a['y'],
                          width=7.0 if a['halfWidth'] > 5 else 4.0, opening={k: a[k] for k in ('x', 'y', 'vertical', 'halfWidth', 'towers', 'portal', 'name')}))
         paths.append([[round(a['x'] - wx * 5.5, 2), round(a['y'] - wy * 5.5, 2)]] + pts[1:])
@@ -281,14 +283,20 @@ def entrances(city):
 
 # ---- the Steward's Hall and the north door -----------------------------------------------------------------------------------
 def open_hall_lane(city):
-    """The Rimeveil door lands behind the Steward's Hall: its two flank towers go and a lane runs behind the hall and down its west side."""
+    """The Rimeveil door lands on the Grand Avenue, and the Steward's Hall used to close the avenue there: its two flank towers go and the hall
+    steps aside to the east (the free ground where the east tower stood), so the main road runs from the door straight down."""
     gone = [o for o in city['objects'] if o['kind'] == 'tower' and any(abs(o['x'] - mv(tx, 19)[0]) < .1 and abs(o['y'] - mv(tx, 19)[1]) < .1 for tx in (71.6, 88.4))]
     assert len(gone) == 2, 'the hall towers moved'
     city['objects'] = [o for o in city['objects'] if o not in gone]
-    for (x0, y0, x1, y1) in ((70.0, 13.0, 90.0, 16.2), (70.0, 13.0, 75.4, 22.0)):
-        a, b = mv(x0, y0)
-        c, d = mv(x1, y1)
-        city['roads'].append(dict(t=1, x0=a, y0=b, x1=c, y1=d))
+    hall = next(o for o in city['objects'] if o['kind'] == 'house' and o.get('label') == "Steward's Hall")
+    others = [footprint(o) for o in city['objects'] if o is not hall and o['kind'] != 'void']
+    for nx in (68.4, 69.4, 70.4, 71.4, 72.4):
+        q = dict(hall, x=nx)
+        b = footprint(q)
+        if not any(b[0] - .4 < c[2] and b[2] + .4 > c[0] and b[1] - .4 < c[3] and b[3] + .4 > c[1] for c in others):
+            hall['x'] = nx
+            return
+    raise AssertionError("the Steward's Hall found no place beside the avenue")
 
 
 # ---- the south band ------------------------------------------------------------------------------------------------------
@@ -335,9 +343,9 @@ class Lots:
 
 
 # where the strip leftovers go: (old x range, old y range) -> new origin of that group's old top-left corner (city frame)
-SMITHY = dict(old=(17.0, 38.5, 93.0, 108.0), to=(21.0, 153.0 + DB))      # campfire, forge props, smith and apprentice
-STABLE = dict(old=(123.5, 143.0, 114.0, 131.0), to=(121.0, 152.0 + DB))  # the stables, its wall pieces and barrels
-GARDEN = dict(old=(17.0, 38.5, 13.0, 30.0), to=(40.0, 152.0 + DB))       # the NW garden: fountain, benches, flowers, gardener, painter
+SMITHY = dict(old=(17.0, 38.5, 93.0, 108.0), to=(19.5, 153.0 + DB))      # campfire, forge props, smith and apprentice
+STABLE = dict(old=(123.5, 143.0, 114.0, 131.0), to=(84.0, 152.0 + DB))  # the stables, its wall pieces and barrels
+GARDEN = dict(old=(17.0, 38.5, 13.0, 30.0), to=(63.0, 152.0 + DB))       # (east of the main street's road to the south door)       # the NW garden: fountain, benches, flowers, gardener, painter
 MARKET = dict(old=(17.0, 143.0, 70.0, 75.0), to=None)               # the Trade Road's stall rows: only the stalls and barrels move
 
 
@@ -350,25 +358,29 @@ def place_band(city, old, floor):
     lots = Lots(city, floor)
     moved = []              # (old x, old y, dx, dy): decor follows the piece it belongs to
     street_y = 148.0 + DB
-    city['roads'].append(dict(t=1, x0=18.0, y0=street_y - 2.0, x1=151.0, y1=street_y + 2.0))       # Southgate Street
-    lots.streets.append((18.0, street_y - 2.0, 151.0, street_y + 2.0))
+    city['roads'].append(dict(t=1, x0=18.0, y0=street_y - 2.0, x1=104.0, y1=street_y + 2.0))       # Southgate Street
+    new_streets = [(18.0, street_y - 2.0, 104.0, street_y + 2.0)]
+    lots.streets.append(new_streets[0])
     for p in city['portals']:
         if p['to'] == 0:    # the road up from the Greenmeadow door
             city['roads'].append(dict(t=1, x0=p['x'] - 2.0, y0=street_y, x1=p['x'] + 2.0, y1=p['y'] + 2.0))
-            lots.streets.append((p['x'] - 2.0, street_y, p['x'] + 2.0, p['y'] + 2.0))
+            new_streets.append((p['x'] - 2.0, street_y, p['x'] + 2.0, p['y'] + 2.0))
+            lots.streets.append(new_streets[-1])
         if p['to'] == 3:    # West Street: from the Gloamfen door to Lark Lane
             a = next(a for a in city['exitArches'] if a['portal'] == p['id'])
             city['roads'].append(dict(t=1, x0=a['x'], y0=a['y'] - 2.0, x1=29.5, y1=a['y'] + 2.0))
-            lots.streets.append((a['x'], a['y'] - 2.0, 29.5, a['y'] + 2.0))
+            new_streets.append((a['x'], a['y'] - 2.0, 29.5, a['y'] + 2.0))
+            lots.streets.append(new_streets[-1])
     # the avenue and the two minor streets run on down to Southgate Street
     for r in list(city['roads']):
         if 'x0' in r and r['t'] == 1 and abs(r['y1'] - mv(0, 139)[1]) < .6 and r['y0'] < 40:
             r['y1'] = street_y - 2.0
+    # the streets as they are now (the avenue and the two lanes reach Southgate Street): no house may stand on any of them
+    lots.streets = [(r['x0'], r['y0'], r['x1'], r['y1']) for r in city['roads'] if 'x0' in r and r['t'] == 1]
     # strip houses that stand in the new West Street or the hall lane go to the band like the rest
     pend = []
     stay = []
-    fresh = lots.streets[len(lots.streets) - 3:]            # Southgate Street, the road from the south door, West Street
-    fresh += [(a_, b_, c_, d_) for a_, b_, c_, d_ in (mv(70.0, 13.0) + mv(90.0, 16.2), mv(70.0, 13.0) + mv(75.4, 22.0))]
+    fresh = list(new_streets)                               # Southgate Street, the road from the south door, West Street
     for o in city['objects']:
         if o['kind'] == 'house' and o['width'] <= 4.5 and o not in pend:
             sq = footprint(o)
@@ -414,7 +426,7 @@ def place_band(city, old, floor):
             if 'x0' in r and r['t'] in (2, 3) and x0 - 1 <= r['x0'] and r['x1'] <= x1 + 6 and y0 <= r['y0'] and r['y1'] <= y1 + 1:
                 city['roads'].append(dict(r, x0=round(r['x0'] + dx, 2), x1=round(r['x1'] + dx, 2), y0=round(r['y0'] + dy, 2), y1=round(r['y1'] + dy, 2)))
     # market stalls and barrels of the Trade Road's outer ends: along the new Market Row beside Southgate Street
-    mx = 60.0
+    mx = 42.0
     for o in old['objects']:
         if o['kind'] in ('stall', 'barrels') and 70 < o['y'] < 73 and not in_strip(o['x'], o['y']):
             q = dict(o, x=round(mx + (0.7 if o['kind'] == 'barrels' else 0.0), 2), y=round((155.5 if o['kind'] == 'stall' else 156.8) + DB, 2))
@@ -423,25 +435,23 @@ def place_band(city, old, floor):
                 lots.solid.append(footprint(q))
                 moved.append((o['x'], o['y'], q['x'] - o['x'], q['y'] - o['y']))
             if o['kind'] == 'stall':
-                mx += 3.6
+                mx += 3.0
     for npc in old['npcs']:         # the weaver sold at those stalls
         if npc['id'] == 'city_weaver':
-            city['npcs'].append(dict(npc, x=round(mx - 8, 2), y=157.6 + DB))
+            city['npcs'].append(dict(npc, x=round(mx - 5.0, 2), y=157.6 + DB))
             placed_npcs.append(npc['id'])
     # the houses that stood outside the strip, and any pushed out of a new street, along Southgate Street (doors face south)
     plain = [o for o in old['objects'] if o['kind'] == 'house' and not in_strip(o['x'], o['y']) and 17 <= o['x'] <= 143 and 13 <= o['y'] <= 139 and o['width'] <= 4.5] + pend
     slots = []
-    for row_y in (142.4 + DB, 154.4 + DB):
+    for row_y in (142.4 + DB, 152.6 + DB, 157.4 + DB, 162.2 + DB, 166.6 + DB):
         x = 20.5
-        while x < 150:
+        while x < 103:
             slots.append((round(x, 2), row_y))
-            x += 5.2
+            x += 4.8
     left = []
     for h in plain:
         for sx, sy in slots:
             q = dict(h, x=sx, y=sy)
-            if sy > 150 + DB and not (92 <= sx <= 118 or 62 <= sx <= 82):
-                continue
             if lots.add(q, margin=0.9):
                 city['objects'].append(q)
                 moved.append((h['x'], h['y'], q['x'] - h['x'], q['y'] - h['y']))
@@ -494,37 +504,49 @@ def settle_npcs(city):
         npc['x'], npc['y'] = round(best[1], 2), round(best[2], 2)
 
 
-def wall_the_notch(world, city, floor):
-    """Where the Crags and Greenmeadow meet there is no neighbour wall (their walls stop at the corners): along the L's top edge between them
-    the city stands a short run of its own ramparts, so the view from inside does not end in bare ground. Only that stretch; the doors and
-    every stretch a neighbour walls stay as they are."""
-    theirs = []
-    for i in NEIGHBOURS:
+def trim_greenmeadow_flank(world):
+    """Greenmeadow's wall used to run on past the city's east wall and turn north in a leg (the right-hand wing of the old L). It stops at the
+    corner now: everything east of x 457 goes."""
+    z = zs.zone_of(world, 0)
+    T = z['shape']['T']
+    gone = [o for o in z['objects'] if o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG and o['x'] + T[0] > EAST_WALL_X + 1.0]
+    z['objects'] = [o for o in z['objects'] if o not in gone]
+    print(f'greenmeadow flank trimmed: {len(gone)} wall pieces east of the corner')
+    return len(gone)
+
+
+def east_wall(world, city):
+    """The city's east wall: the Crags' (x 456.2, ends in a tower at y 727) straight on down to Greenmeadow's wall (y 757.7), in the city's own pieces,
+    with a corner tower; the wing east of it is void. Nothing else of the city is walled by the city."""
+    zc = zs.zone_of(world, 1)
+    zg = zs.zone_of(world, 0)
+    tc = [o for o in zc['objects'] if o['kind'] == 'tower' and o.get('layout') == TAG and abs(o['x'] + zc['shape']['T'][0] - 456.2) < .3 and o['y'] + zc['shape']['T'][1] > 720]
+    assert tc, "the Crags' wall no longer ends in a tower at (456.2, 727)"
+    gy = next(o['y'] + zg['shape']['T'][1] for o in zg['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG)
+    x = round(456.2 - TC[0], 2)
+    y0, y1 = round(tc[0]['y'] + zc['shape']['T'][1] - TC[1], 2), round(gy - TC[1], 2)
+    y = y0 + 4.6
+    n = 0
+    while y < y1 - 3.4:
+        city['objects'].append(dict(kind='rampart', x=x, y=round(y, 2), r=0, v=0, width=1.8, depth=5.8, color='#d7d3bc', label='', layout='skaldholm_east_wall'))
+        y += 5.9
+        n += 1
+    city['objects'].append(dict(kind='tower', x=x, y=y1, r=0, v=0, width=3.4, depth=3.4, color='#4a7a9a', label='', layout='skaldholm_east_wall'))
+    return n + 1
+
+
+def quiet_lobe(world):
+    """The wing is nobody's ground: the neighbours must not draw it as Skaldholm's cobbles; their edge band there is plain outer land."""
+    for i in (0, 1):
         z = zs.zone_of(world, i)
         T = z['shape']['T']
-        theirs += [(o['x'] + T[0] - TC[0], o['y'] + T[1] - TC[1]) for o in z['objects'] if o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG]
-    arches = [(a['x'], a['y'], a['halfWidth']) for a in city['exitArches']]
-    n = SIZE
-    cells = []
-    for y in range(n):
-        for x in range(n):
-            if not floor[y, x]:
-                continue
-            out = [(dx, dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if not (0 <= y + dy < n and 0 <= x + dx < n and floor[y + dy, x + dx])]
-            if not out or x < 104 or not 138 <= y <= 152:
-                continue
-            if min(math.hypot(x + .5 - px, y + .5 - py) for px, py in theirs) <= 3.5 or any(math.hypot(x + .5 - a[0], y + .5 - a[1]) <= a[2] + 4 for a in arches):
-                continue
-            cells.append((x, y, out[0]))
-    placed = []
-    for x, y, (dx, dy) in sorted(cells):
-        cx, cy = x + .5 - dx * .9, y + .5 - dy * .9
-        if any(math.hypot(cx - q['x'], cy - q['y']) < 2.6 for q in placed):
-            continue
-        w, d = (2.8, 1.8) if dy else (1.8, 2.8)
-        placed.append(dict(kind='rampart', x=round(cx, 2), y=round(cy, 2), r=0, v=0, width=w, depth=d, color='#d7d3bc', label='', layout='skaldholm_notch'))
-    city['objects'].extend(placed)
-    return len(placed)
+        letter = chr(ord('A') + z['shape']['neighbours'].index(CITY))
+        rows = [list(r) for r in z['shapeEdge']]
+        for yy, row in enumerate(rows):
+            for xx, ch in enumerate(row):
+                if ch == letter and xx + T[0] >= EAST_WALL_X and EAST_WALL_Y0 - 2 <= yy + T[1] <= 760:
+                    row[xx] = 'l'
+        z['shapeEdge'] = [''.join(r) for r in rows]
 
 
 def check_city(city, floor):

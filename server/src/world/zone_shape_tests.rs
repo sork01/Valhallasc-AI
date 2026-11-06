@@ -315,7 +315,7 @@ fn skaldholms_wall_runs_along_its_borders_and_the_vault_is_open() {
                     .max(o["depth"].as_f64().unwrap())
             })
             .sum();
-        assert!(length >= 80., "zone {zone}: only {length:.0} tiles of wall");
+        assert!(length >= 70., "zone {zone}: only {length:.0} tiles of wall"); // (Greenmeadow's wall stops at the city's east wall since the rebuild)
         let arch = z["exitArches"]
             .as_array()
             .and_then(|a| a.iter().find(|e| e["name"] == "Skaldholm"))
