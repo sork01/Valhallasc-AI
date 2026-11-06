@@ -179,6 +179,8 @@ def rebuild(world):
         for p in zs.zone_of(world, zi).get('portals', []):
             if p['to'] == CITY and 'tx' in p:
                 p['tx'], p['ty'] = mv(p['tx'], p['ty'])
+    open_hall_lane(city)
+    place_band(city, old, floor)
     city['objects'].extend(zs.void_pieces(floor))
     city['shapeFloor'] = zs.floor_rows(floor)
     city['shapeEdge'] = edge_rows(world, floor)
@@ -190,6 +192,14 @@ def rebuild(world):
     c['plaza'] = dict(zip('xy', mv(old['city']['plaza']['x'], old['city']['plaza']['y'])))
     # -- the city's own streets from each door
     entrances(city)
+    south = next(p for p in city['portals'] if p['to'] == 0)
+    north = next(p for p in city['portals'] if p['to'] == 2)
+    c['entry'] = dict(x=round(south['x'], 2), y=round(south['y'] - 6, 2))
+    city['spawn'] = dict(x=round(c['plaza']['x'], 2), y=round(c['plaza']['y'] + 25.0, 2))
+    settle_npcs(city)
+    import compact_atlas as ca
+    ca.exit_routes(city)
+    check_city(city, floor)
 
     after = neighbour_fingerprint(world)
     assert before == after, f'the neighbours changed: {[i for i in NEIGHBOURS if before[i] != after[i]]}'
@@ -237,7 +247,7 @@ def move_content(city, old):
             q = dict(npc)
             q['x'], q['y'] = mv(npc['x'], npc['y'])
             if q.get('route'):
-                q['route'] = [list(mv(*p)) for p in npc['route']]
+                q['route'] = [list(mv(min(max(p[0], STRIP[0] + 1.0), STRIP[1] - 1.0), p[1])) for p in npc['route']]
             npcs.append(q)
     city['npcs'] = npcs
     city['places'] = [dict(p, **dict(zip('xy', mv(p['x'], p['y'])))) for p in old['places'] if in_strip(p['x'], p['y'])]
@@ -259,6 +269,245 @@ def entrances(city):
     city['cityEntrances'] = ents
     city['paths'] = paths
     city['atlasPaths'] = copy.deepcopy(paths)
+
+
+# ---- the Steward's Hall and the north door -----------------------------------------------------------------------------------
+def open_hall_lane(city):
+    """The Rimeveil door lands behind the Steward's Hall: its two flank towers go and a lane runs behind the hall and down its west side."""
+    gone = [o for o in city['objects'] if o['kind'] == 'tower' and any(abs(o['x'] - mv(tx, 19)[0]) < .1 and abs(o['y'] - mv(tx, 19)[1]) < .1 for tx in (71.6, 88.4))]
+    assert len(gone) == 2, 'the hall towers moved'
+    city['objects'] = [o for o in city['objects'] if o not in gone]
+    for (x0, y0, x1, y1) in ((70.0, 13.0, 90.0, 16.2), (70.0, 13.0, 75.4, 22.0)):
+        a, b = mv(x0, y0)
+        c, d = mv(x1, y1)
+        city['roads'].append(dict(t=1, x0=a, y0=b, x1=c, y1=d))
+
+
+# ---- the south band ------------------------------------------------------------------------------------------------------
+def footprint(o):
+    if o.get('width'):
+        return o['x'] - o['width'] / 2, o['y'] - o['depth'] / 2, o['x'] + o['width'] / 2, o['y'] + o['depth'] / 2
+    r = max(o.get('r', 0.5) or 0.5, 0.4)
+    return o['x'] - r, o['y'] - r, o['x'] + r, o['y'] + r
+
+
+class Lots:
+    """Free-ground test for placing things: on the floor, off every object, off every street (yards are placed on purpose)."""
+
+    def __init__(self, city, floor):
+        self.floor = floor
+        self.solid = [footprint(o) for o in city['objects'] if o['kind'] != 'void']
+        self.streets = [(r['x0'], r['y0'], r['x1'], r['y1']) for r in city['roads'] if 'x0' in r and r['t'] == 1]
+        self.discs = [(r['x'], r['y'], r['r1']) for r in city['roads'] if 'x0' not in r and r['t'] == 1]
+
+    def on_floor(self, b):
+        x0, y0, x1, y1 = b
+        return all(0 <= int(y) < SIZE and 0 <= int(x) < SIZE and self.floor[int(y), int(x)]
+                   for x in (x0, (x0 + x1) / 2, x1) for y in (y0, (y0 + y1) / 2, y1))
+
+    def free(self, o, margin=0.5, streets=True):
+        x0, y0, x1, y1 = footprint(o)
+        b = (x0 - margin, y0 - margin, x1 + margin, y1 + margin)
+        if not self.on_floor((x0, y0, x1, y1)):
+            return False
+        if any(b[0] < q[2] and b[2] > q[0] and b[1] < q[3] and b[3] > q[1] for q in self.solid):
+            return False
+        if streets:
+            if any(b[0] < q[2] and b[2] > q[0] and b[1] < q[3] and b[3] > q[1] for q in self.streets):
+                return False
+            if any(math.hypot(max(abs(o['x'] - d[0]) - (x1 - x0) / 2, 0), max(abs(o['y'] - d[1]) - (y1 - y0) / 2, 0)) < d[2] for d in self.discs):
+                return False
+        return True
+
+    def add(self, o, **kw):
+        if not self.free(o, **kw):
+            return False
+        self.solid.append(footprint(o))
+        return True
+
+
+# where the strip leftovers go: (old x range, old y range) -> new origin of that group's old top-left corner (city frame)
+SMITHY = dict(old=(17.0, 38.5, 93.0, 108.0), to=(21.0, 153.0))      # campfire, forge props, smith and apprentice
+STABLE = dict(old=(123.5, 143.0, 114.0, 131.0), to=(121.0, 152.0))  # the stables, its wall pieces and barrels
+GARDEN = dict(old=(17.0, 38.5, 13.0, 30.0), to=(40.0, 152.0))       # the NW garden: fountain, benches, flowers, gardener, painter
+MARKET = dict(old=(17.0, 143.0, 70.0, 75.0), to=None)               # the Trade Road's stall rows: only the stalls and barrels move
+
+
+def in_box(o, g):
+    x0, x1, y0, y1 = g['old']
+    return x0 <= o['x'] < x1 and y0 <= o['y'] < y1
+
+
+def place_band(city, old, floor):
+    lots = Lots(city, floor)
+    moved = []              # (old x, old y, dx, dy): decor follows the piece it belongs to
+    street_y = 148.0
+    city['roads'].append(dict(t=1, x0=18.0, y0=street_y - 2.0, x1=151.0, y1=street_y + 2.0))       # Southgate Street
+    lots.streets.append((18.0, street_y - 2.0, 151.0, street_y + 2.0))
+    for p in city['portals']:
+        if p['to'] == 0:    # the road up from the Greenmeadow door
+            city['roads'].append(dict(t=1, x0=p['x'] - 2.0, y0=street_y, x1=p['x'] + 2.0, y1=p['y'] + 2.0))
+            lots.streets.append((p['x'] - 2.0, street_y, p['x'] + 2.0, p['y'] + 2.0))
+        if p['to'] == 3:    # West Street: from the Gloamfen door to Lark Lane
+            a = next(a for a in city['exitArches'] if a['portal'] == p['id'])
+            city['roads'].append(dict(t=1, x0=a['x'], y0=a['y'] - 2.0, x1=29.5, y1=a['y'] + 2.0))
+            lots.streets.append((a['x'], a['y'] - 2.0, 29.5, a['y'] + 2.0))
+    # the avenue and the two minor streets run on down to Southgate Street
+    for r in list(city['roads']):
+        if 'x0' in r and r['t'] == 1 and abs(r['y1'] - mv(0, 139)[1]) < .6 and r['y0'] < 40:
+            r['y1'] = street_y - 2.0
+    # strip houses that stand in the new West Street or the hall lane go to the band like the rest
+    pend = []
+    stay = []
+    fresh = lots.streets[len(lots.streets) - 3:]            # Southgate Street, the road from the south door, West Street
+    fresh += [(a_, b_, c_, d_) for a_, b_, c_, d_ in (mv(70.0, 13.0) + mv(90.0, 16.2), mv(70.0, 13.0) + mv(75.4, 22.0))]
+    for o in city['objects']:
+        if o['kind'] == 'house' and o['width'] <= 4.5 and o not in pend:
+            sq = footprint(o)
+            if any(sq[0] < q[2] and sq[2] > q[0] and sq[1] < q[3] and sq[3] > q[1] for q in fresh):
+                pend.append(o)
+                continue
+        stay.append(o)
+    city['objects'] = stay
+    lots.solid = [footprint(o) for o in city['objects'] if o['kind'] != 'void']
+
+    def shift_group(g):
+        return g['to'][0] - g['old'][0], g['to'][1] - g['old'][2]
+
+    groups = {'smithy': SMITHY, 'stable': STABLE, 'garden': GARDEN}
+    placed_npcs = []
+    for name, g in groups.items():
+        dx, dy = shift_group(g)
+        for o in old['objects']:
+            if in_box(o, g) and o['kind'] not in ('tree', 'bush', 'rampart', 'tower', 'house'):
+                q = dict(o, x=round(o['x'] + dx, 2), y=round(o['y'] + dy, 2))
+                if lots.free(q, margin=0.2, streets=False):
+                    city['objects'].append(q)
+                    lots.solid.append(footprint(q))
+                    moved.append((o['x'], o['y'], dx, dy))
+        for o in old['objects']:
+            if in_box(o, g) and o['kind'] == 'house' and o['width'] > 4.5:       # the smith's house and the stables
+                q = dict(o, x=round(o['x'] + dx, 2), y=round(o['y'] + dy, 2))
+                assert lots.add(q, margin=0.2, streets=False), f"{o.get('label')} does not fit its yard"
+                city['objects'].append(q)
+                moved.append((o['x'], o['y'], dx, dy))
+        for npc in old['npcs']:
+            if in_box(npc, g) and npc['id'] != 'city_watch_wall':      # the wall watch gets its own beat below
+                q = dict(npc, x=round(npc['x'] + dx, 2), y=round(npc['y'] + dy, 2))
+                if q.get('route'):
+                    q['route'] = [[round(a + dx, 2), round(b + dy, 2)] for a, b in npc['route']]
+                    if npc['id'] == 'city_gardener':        # the garden is shorter here: a walk along its path
+                        q['route'] = [[q['x'], 155.0], [q['x'], 162.5]]
+                        q['y'] = 155.0
+                city['npcs'].append(q)
+                placed_npcs.append(q['id'])
+        x0, x1, y0, y1 = g['old']
+        for r in old['roads']:      # yard paving and garden paths that lie in the group
+            if 'x0' in r and r['t'] in (2, 3) and x0 - 1 <= r['x0'] and r['x1'] <= x1 + 6 and y0 <= r['y0'] and r['y1'] <= y1 + 1:
+                city['roads'].append(dict(r, x0=round(r['x0'] + dx, 2), x1=round(r['x1'] + dx, 2), y0=round(r['y0'] + dy, 2), y1=round(r['y1'] + dy, 2)))
+    # market stalls and barrels of the Trade Road's outer ends: along the new Market Row beside Southgate Street
+    mx = 60.0
+    for o in old['objects']:
+        if o['kind'] in ('stall', 'barrels') and 70 < o['y'] < 73 and not in_strip(o['x'], o['y']):
+            q = dict(o, x=round(mx + (0.7 if o['kind'] == 'barrels' else 0.0), 2), y=round(155.5 if o['kind'] == 'stall' else 156.8, 2))
+            if lots.free(q, margin=0.2, streets=False):
+                city['objects'].append(q)
+                lots.solid.append(footprint(q))
+                moved.append((o['x'], o['y'], q['x'] - o['x'], q['y'] - o['y']))
+            if o['kind'] == 'stall':
+                mx += 3.6
+    for npc in old['npcs']:         # the weaver sold at those stalls
+        if npc['id'] == 'city_weaver':
+            city['npcs'].append(dict(npc, x=round(mx - 8, 2), y=157.6))
+            placed_npcs.append(npc['id'])
+    # the houses that stood outside the strip, and any pushed out of a new street, along Southgate Street (doors face south)
+    plain = [o for o in old['objects'] if o['kind'] == 'house' and not in_strip(o['x'], o['y']) and 17 <= o['x'] <= 143 and 13 <= o['y'] <= 139 and o['width'] <= 4.5] + pend
+    slots = []
+    for row_y in (142.4, 154.4):
+        x = 20.5
+        while x < 150:
+            slots.append((round(x, 2), row_y))
+            x += 5.2
+    left = []
+    for h in plain:
+        for sx, sy in slots:
+            q = dict(h, x=sx, y=sy)
+            if sy > 150 and not (92 <= sx <= 118 or 62 <= sx <= 82):
+                continue
+            if lots.add(q, margin=0.9):
+                city['objects'].append(q)
+                moved.append((h['x'], h['y'], q['x'] - h['x'], q['y'] - h['y']))
+                break
+        else:
+            left.append(h)
+    assert not left, f'{len(left)} houses found no lot in the band'
+    # NPCs that patrolled the old outer walls
+    for npc in old['npcs']:
+        if npc['id'] == 'city_watch_trade':
+            q = dict(npc, x=21.0, y=71.2)
+            q['route'] = [[21.0, 71.2], [45.5, 71.2], [45.5, 74.8], [21.0, 74.8]]
+            city['npcs'].append(q)
+            placed_npcs.append(npc['id'])
+        if npc['id'] == 'city_watch_wall':
+            q = dict(npc, x=22.0, y=146.5)
+            q['route'] = [[22.0, 138.0], [70.0, 138.0], [70.0, 140.2], [22.0, 140.2]]
+            q['x'], q['y'] = 22.0, 138.0
+            city['npcs'].append(q)
+            placed_npcs.append(npc['id'])
+    # seasonal decor follows the piece it belonged to (within 6 tiles of one that moved), the rest of the outside is dropped
+    for key in ('seasonDecor', 'christmasDecor', 'easterDecor', 'solsticeDecor', 'valentineDecor'):
+        for o in old.get(key, []):
+            if in_strip(o['x'], o['y']):
+                continue
+            near = min(moved, key=lambda m: math.hypot(m[0] - o['x'], m[1] - o['y']), default=None)
+            if near and math.hypot(near[0] - o['x'], near[1] - o['y']) <= 6:
+                city[key].append(dict(o, x=round(o['x'] + near[2], 2), y=round(o['y'] + near[3], 2)))
+    missing = {n['id'] for n in old['npcs']} - {n['id'] for n in city['npcs']}
+    assert not missing, f'NPCs without a place: {sorted(missing)}'
+
+
+def settle_npcs(city):
+    """A person who stands in a wall's margin or inside a house after the move steps to the nearest ground a walker can reach."""
+    import compact_atlas as ca
+    prev = ca.connected(city)
+    for npc in city['npcs']:
+        if npc.get('route') or int(npc['y']) * SIZE + int(npc['x']) in prev:
+            continue
+        best = None
+        for dy in range(-5, 6):
+            for dx in range(-5, 6):
+                x, y = int(npc['x']) + dx + .5, int(npc['y']) + dy + .5
+                if int(y) * SIZE + int(x) in prev and (best is None or math.hypot(x - npc['x'], y - npc['y']) < best[0]):
+                    best = (math.hypot(x - npc['x'], y - npc['y']), x, y)
+        assert best, f"{npc['id']} has no reachable ground within 5 tiles"
+        npc['x'], npc['y'] = round(best[1], 2), round(best[2], 2)
+
+
+def check_city(city, floor):
+    """Everything stands on ground, and a flood fill over the collision reaches the doors, the stairs, the spawn, every NPC and the place."""
+    import compact_atlas as ca
+    on = lambda x, y: 0 <= int(y) < SIZE and 0 <= int(x) < SIZE and floor[int(y), int(x)]
+    for key in ('npcs', 'places'):
+        bad = [(o['id'], o['x'], o['y']) for o in city[key] if not on(o['x'], o['y'])]
+        assert not bad, f'{key} off the ground: {bad}'
+    assert on(city['spawn']['x'], city['spawn']['y'])
+    assert on(city['city']['entry']['x'], city['city']['entry']['y'])
+    prev = ca.connected(city)
+    unreachable = []
+    doors = {a['portal']: a for a in city['exitArches']}
+    for kind, items in (('portal', city['portals']), ('npc', city['npcs']), ('place', city['places'])):
+        for o in items:
+            x, y = o['x'], o['y']
+            if o.get('id') in doors:        # a door's portal stands outside the arch: its inward side is the ground
+                a = doors[o['id']]
+                x, y = a['x'] - (o['x'] - a['x']), a['y'] - (o['y'] - a['y'])
+            if int(y) * SIZE + int(x) not in prev:
+                unreachable.append((kind, o.get('id'), x, y))
+    assert not unreachable, f'not reachable on foot from the spawn: {unreachable}'
+    for o in city['npcs']:
+        for a, b in zip(o.get('route', []), o.get('route', [])[1:]):
+            assert on(*a) and on(*b), f"{o['id']}: route leaves the ground: {a} {on(*a)} {b} {on(*b)}"
+            assert ca.clear(city, a, b, .3), f"{o['id']}: route {a}->{b} is blocked"
 
 
 # ---- plan picture (read-only): python3 scripts/skaldholm_rebuild.py plan OUT.png ------------------------------------------
