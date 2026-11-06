@@ -9,6 +9,7 @@ mod festival;
 mod items;
 mod mail;
 mod model;
+mod object_grid;
 mod notify;
 mod perks;
 mod rebirth;

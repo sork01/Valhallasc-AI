@@ -10706,6 +10706,7 @@ mod tests {
     #[test]
     fn enemies_block_each_other_but_players_can_walk_and_dash_through_actors() {
         let map = Map {
+            grid: Default::default(),
             crosses: vec![],
             name: String::new(),
             size: 96,
