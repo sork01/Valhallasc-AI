@@ -661,6 +661,85 @@ def even_flank_wall(world):
     return n
 
 
+CLIFF_WINDOW = (440, 536, 700, 765)     # atlas x0, x1, y0, y1: the wing and the strip of void between it and the Crags
+
+
+def wing_cliff(world):
+    """The wing's north edge is a cliff you can see (owner, 2026-11-06: "going alongside the right Skaldholm wall in meadow there is this black ground and
+    then you get stopped by an invisible wall").
+    Two things were wrong, both in the edge letters (`shapeEdge`), neither in the collision (the stop is by design: the wing is cut off from the Crags by void):
+      * the Crags' outer-land cells (`l`) lay over the wing, and the client draws a seam neighbour's outside tiles after our own ground, so hundreds of tiles
+        of the wing's land were painted as dark Crags rock;
+      * Greenmeadow had no letters at all on the void between the wing and the Crags west of x 201, so the land simply ended in flat dark with no cliff.
+    The void gap now belongs to whichever land is nearer (ties to Greenmeadow): Greenmeadow gets `l` letters on its half (the client draws a cliff block
+    on the first two rows), the Crags lose theirs there, and a Greenmeadow `l` that lies on Crags land goes too. Only `l` cells and blank cells change.
+    Runs last (the designs and the walls do not read it), so no random draw moves and nothing but `shapeEdge` rows is different."""
+    g, c = zs.zone_of(world, 0), zs.zone_of(world, 1)
+    x0, x1, y0, y1 = CLIFF_WINDOW
+    band = zs.EDGE_BAND
+
+    def land(z):
+        T, n = z['shape']['T'], z['size']
+        out = np.zeros((y1 - y0, x1 - x0), bool)
+        for ay in range(y0, y1):
+            yy = ay - T[1]
+            if 0 <= yy < n:
+                row = z['shapeFloor'][yy]
+                for ax in range(x0, x1):
+                    xx = ax - T[0]
+                    if 0 <= xx < n and row[xx] == '#':
+                        out[ay - y0, ax - x0] = True
+        return out
+
+    def dist(mask):
+        d = np.full(mask.shape, band + 1, int)
+        d[mask] = 0
+        m = mask.copy()
+        for k in range(1, band + 1):
+            m2 = zs.dilate(m, 1)
+            d[m2 & ~m] = k
+            m = m2
+        return d
+
+    LG, LC = land(g), land(c)
+    dG, dC = dist(LG), dist(LC)
+    mine = dG <= dC                                   # Greenmeadow's side of the gap (its own land included)
+
+    def edit(z, fn):
+        T, n = z['shape']['T'], z['size']
+        rows = [list(r) for r in z['shapeEdge']]
+        count = 0
+        for ay in range(y0, y1):
+            yy = ay - T[1]
+            if not 0 <= yy < n:
+                continue
+            for ax in range(x0, x1):
+                xx = ax - T[0]
+                if 0 <= xx < n:
+                    new = fn(rows[yy][xx], ay - y0, ax - x0, ax)
+                    if new != rows[yy][xx]:
+                        rows[yy][xx] = new
+                        count += 1
+        z['shapeEdge'] = [''.join(r) for r in rows]
+        return count
+
+    def ours(ch, ay, ax, x):        # letters on the gap's near half (east of the city's wall), none on Crags land
+        if LG[ay, ax]:
+            return ch
+        if ch == 'l' and LC[ay, ax]:
+            return ' '
+        if ch == ' ' and x >= EAST_WALL_X and not LC[ay, ax] and mine[ay, ax] and dG[ay, ax] <= band:
+            return 'l'
+        return ch
+
+    def theirs(ch, ay, ax, x):      # no outer-land cell on Greenmeadow's land or on its half of the gap
+        return ' ' if ch == 'l' and not LC[ay, ax] and mine[ay, ax] and dG[ay, ax] <= band else ch
+    added = edit(g, ours)
+    gone = edit(c, theirs)
+    print(f"wing cliff: {added} Greenmeadow edge cells changed, {gone} Crags outer-land cells no longer drawn over it")
+    return added, gone
+
+
 def trim_greenmeadow_flank(world):
     """Greenmeadow's wall used to run on past the city's east wall and turn north in a leg (the right-hand wing of the old L). It stops at the
     corner now: everything east of x 457 goes."""
