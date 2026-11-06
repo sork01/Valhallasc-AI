@@ -43,6 +43,10 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 * Filler uses the old densities; kind mix and trail layout in the new ground have not been judged in play. The Crags rivers continue past the core with one extra ford about 52 tiles from each core edge.
 * Rolling the pilot out for real needs `SHAPE-MIGRATE` (service stopped, backup, `zone_shapes_migrate.py --apply`) and a server restart.
 
+## Authored zones
+
+Greenmeadow and the Crags are authored maps on their outlines: `docs/greenmeadow-design.md`, `docs/crags-design.md`.
+
 ## Minimap (MINIMAP-CENTRED, 2026-11-05)
 
 - Centred on the hero in every zone. Zoom 1 = the whole zone (the widest view; **in shaped zones the span is a fixed 240 tiles (`MINI_SHAPED_SPAN`), not the grid size, so crossing a seam never rescales the map: the grids are 240 and 208 and the scale used to jump by 15%; `Field.miniTiles` is asserted equal before and after each crossing**; **after a seam crossing the markers that only one zone has fade over one second (`MINI_FADE_MS`): the zone left fades out (its quest guidance, far enemy dots, travel sparks, shifted into the new frame), the zone entered fades in; `Field.miniFade` exposes the state, the UI test asserts it runs and ends; markers both sides already show (NPC dots, ghost enemies and players) are continuous and not faded**; each seam neighbour's shallows and foam are drawn too (`renderShallows()`, all water layers first, then the land layers; asserted by reading the foam pixel of a Canopy coast cell from the meadow's minimap, picture `test-results/zone-shapes/minimap-coast-across-seam.png`); the water ripples are pinned to the shared world frame (`zone.shape.T` added to the view origin, `Field.miniRippleOrigin` asserted equal for the same spot seen from both sides of a seam); the part beyond the zone is water, or the void in a non-shaped zone), up to 4x closer; default 2. Mouse wheel over the minimap and the keymap actions `minimapIn`/`minimapOut` (default `]` and `[`; `-` and `=` are skill slots 11/12). Saved in `Prefs.minimapZoom`. Clicking still opens the world map.
