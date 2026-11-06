@@ -2095,7 +2095,14 @@ impl Map {
             // File order, as the scan: a push moves `p`, so what is near is asked again for the obstacles still to come.
             let mut from = 0;
             'pass: loop {
-                grid.in_box(p.x - radius, p.y - radius, p.x + radius, p.y + radius, from, &mut near);
+                grid.in_box(
+                    p.x - radius,
+                    p.y - radius,
+                    p.x + radius,
+                    p.y + radius,
+                    from,
+                    &mut near,
+                );
                 for &id in &near {
                     let before = (p.x, p.y);
                     Self::push_out(&self.objects[id as usize], p, radius);
@@ -2182,7 +2189,10 @@ mod tests {
                 let (x, y) = match (k % 2 == 0, map.objects.len()) {
                     (true, n) if n > 0 => {
                         let o = &map.objects[(roll() * n as f64) as usize];
-                        (o.x + (roll() - 0.5) * (o.width + 3.), o.y + (roll() - 0.5) * (o.depth + 3.))
+                        (
+                            o.x + (roll() - 0.5) * (o.width + 3.),
+                            o.y + (roll() - 0.5) * (o.depth + 3.),
+                        )
                     }
                     _ => (roll() * (size + 8.) - 4., roll() * (size + 8.) - 4.),
                 };
@@ -2190,7 +2200,12 @@ mod tests {
                 let (mut a, mut b) = (Point { x, y }, Point { x, y });
                 map.collide(&mut a, radius);
                 map.collide_scan(&mut b, radius);
-                assert_eq!((a.x, a.y), (b.x, b.y), "{} collide at {x},{y} r {radius}", map.name);
+                assert_eq!(
+                    (a.x, a.y),
+                    (b.x, b.y),
+                    "{} collide at {x},{y} r {radius}",
+                    map.name
+                );
                 pushed += usize::from((a.x, a.y) != (x, y));
                 let reach = [1., 6., 25., 120., size][k % 5];
                 let end = Point {
@@ -2215,18 +2230,33 @@ mod tests {
                 }
             }
         }
-        assert!(pushed > 10000 && blocked > 10000 && clear > 10000, "{pushed} {blocked} {clear}");
+        assert!(
+            pushed > 10000 && blocked > 10000 && clear > 10000,
+            "{pushed} {blocked} {clear}"
+        );
     }
 
     #[test]
     fn a_map_whose_obstacles_were_replaced_uses_the_scan() {
         let mut map = Map {
-            objects: vec![Obstacle { x: 5., y: 5., r: 1., width: 0., depth: 0. }],
+            objects: vec![Obstacle {
+                x: 5.,
+                y: 5.,
+                r: 1.,
+                width: 0.,
+                depth: 0.,
+            }],
             size: 16,
             ..Map::default()
         };
         assert!(!map.line_clear(Point { x: 1., y: 5. }, Point { x: 9., y: 5. }, 0.));
-        map.objects = vec![Obstacle { x: 5., y: 9., r: 1., width: 0., depth: 0. }];
+        map.objects = vec![Obstacle {
+            x: 5.,
+            y: 9.,
+            r: 1.,
+            width: 0.,
+            depth: 0.,
+        }];
         assert!(map.line_clear(Point { x: 1., y: 5. }, Point { x: 9., y: 5. }, 0.));
         let mut clone_source = map.clone();
         clone_source.objects[0].y = 5.;

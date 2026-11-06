@@ -3570,7 +3570,9 @@ impl World {
                 };
                 let distance = here.distance(centre);
                 // A vault is crossed anywhere across its opening, from the arch's centre on (the gate stands 3 tiles past it).
-                if let (Some(_), Some(half), Some(side)) = (portal.vault, portal.vault_half, portal.walk) {
+                if let (Some(_), Some(half), Some(side)) =
+                    (portal.vault, portal.vault_half, portal.walk)
+                {
                     let (wx, wy) = (f64::from(side[0]), f64::from(side[1]));
                     let along = (here.x - centre.x) * wx + (here.y - centre.y) * wy;
                     let across = ((here.x - centre.x) * -wy + (here.y - centre.y) * wx).abs();

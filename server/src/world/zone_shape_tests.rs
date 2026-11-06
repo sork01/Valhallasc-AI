@@ -174,7 +174,10 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
         }
         // the meadow's and Gloamfen's other borders are seams now: only Skaldholm is a gate
         let wanted = if zone == 0 || zone == 3 { 1 } else { 2 };
-        assert!(border >= wanted, "zone {zone}: only {border} gate crossings");
+        assert!(
+            border >= wanted,
+            "zone {zone}: only {border} gate crossings"
+        );
     }
 }
 
@@ -282,7 +285,10 @@ fn no_vault_stands_on_a_seam() {
         for seam in portals.iter().filter_map(|p| p.get("seam")) {
             for q in seam["points"].as_array().unwrap() {
                 let d = (q[0].as_f64().unwrap() - ax).hypot(q[1].as_f64().unwrap() - ay);
-                assert!(d > 25., "zone {zone}: the vault stands {d:.1} tiles from a seam");
+                assert!(
+                    d > 25.,
+                    "zone {zone}: the vault stands {d:.1} tiles from a seam"
+                );
             }
         }
     }
@@ -302,7 +308,12 @@ fn skaldholms_wall_runs_along_its_borders_and_the_vault_is_open() {
         // (measured in tiles: the wall is Skaldholm's own long pieces, copied, so a piece count says little)
         let length: f64 = pieces
             .iter()
-            .map(|o| o["width"].as_f64().unwrap().max(o["depth"].as_f64().unwrap()))
+            .map(|o| {
+                o["width"]
+                    .as_f64()
+                    .unwrap()
+                    .max(o["depth"].as_f64().unwrap())
+            })
             .sum();
         assert!(length >= 80., "zone {zone}: only {length:.0} tiles of wall");
         let arch = z["exitArches"]
@@ -340,7 +351,10 @@ fn skaldholms_wall_runs_along_its_borders_and_the_vault_is_open() {
                 d > half && d < half + 25.
             })
             .count();
-        assert!(near >= 6, "zone {zone}: the wall beside the vault is missing ({near} pieces)");
+        assert!(
+            near >= 6,
+            "zone {zone}: the wall beside the vault is missing ({near} pieces)"
+        );
     }
 }
 
@@ -373,7 +387,11 @@ fn walking_into_the_vault_enters_skaldholm() {
             }
         }
         let c = &w.players[&1].character;
-        assert_eq!(c.zone, 4, "walking through the vault of zone {zone} from 5 tiles did not enter Skaldholm (ended at {:.1},{:.1})", c.x, c.y);
+        assert_eq!(
+            c.zone, 4,
+            "walking through the vault of zone {zone} from 5 tiles did not enter Skaldholm (ended at {:.1},{:.1})",
+            c.x, c.y
+        );
         // the city's own arch is the other half of the vault: you land just inside it, on free ground, not in a margin outside the wall
         let city = zone_of(&data, 4);
         let back = city["portals"]
@@ -397,7 +415,8 @@ fn walking_into_the_vault_enters_skaldholm() {
         // one doorway seen from two zones: the two offsets cancel, and the arch of this zone maps onto the city's own
         for k in 0..2 {
             assert!(
-                (gate["vault"][k].as_f64().unwrap() + back["vault"][k].as_f64().unwrap()).abs() < 0.011,
+                (gate["vault"][k].as_f64().unwrap() + back["vault"][k].as_f64().unwrap()).abs()
+                    < 0.011,
                 "zone {zone}: the vault offsets do not cancel"
             );
         }
@@ -409,7 +428,8 @@ fn walking_into_the_vault_enters_skaldholm() {
             .unwrap();
         assert!(
             (zarch["x"].as_f64().unwrap() + gate["vault"][0].as_f64().unwrap() - ax).abs() < 0.011
-                && (zarch["y"].as_f64().unwrap() + gate["vault"][1].as_f64().unwrap() - ay).abs() < 0.011,
+                && (zarch["y"].as_f64().unwrap() + gate["vault"][1].as_f64().unwrap() - ay).abs()
+                    < 0.011,
             "zone {zone}: the vault does not line up with the city's arch"
         );
         // and back out through the arch: held movement carries on, you stand in front of the vault again
@@ -426,7 +446,11 @@ fn walking_into_the_vault_enters_skaldholm() {
             }
         }
         let c = &w.players[&1].character;
-        assert_eq!(c.zone, zone, "walking out of Skaldholm's arch did not return to zone {zone} (ended at {:.1},{:.1})", c.x, c.y);
+        assert_eq!(
+            c.zone, zone,
+            "walking out of Skaldholm's arch did not return to zone {zone} (ended at {:.1},{:.1})",
+            c.x, c.y
+        );
         assert!(
             (c.x - gx).hypot(c.y - gy) < 6.,
             "zone {zone}: you come out {:.1} tiles from the vault",
@@ -554,7 +578,10 @@ fn seam_walks(from_zone: usize, to_zone: usize) {
         }
     }
     assert!(crossed >= 8, "only {crossed} border samples crossed");
-    assert!(at_wall <= 6, "{at_wall} border samples stand at a wall: the wall runs along the seam");
+    assert!(
+        at_wall <= 6,
+        "{at_wall} border samples stand at a wall: the wall runs along the seam"
+    );
 }
 
 #[test]
@@ -748,7 +775,10 @@ fn a_hero_beside_a_vault_is_listed_across_it_from_both_sides() {
         };
         let (n, shift) = list(&w.snapshot_for(zone), 4)
             .unwrap_or_else(|| panic!("zone {zone} lists nothing across its vault"));
-        assert_eq!(n, 1, "zone {zone}: the hero in Skaldholm is listed beside the vault");
+        assert_eq!(
+            n, 1,
+            "zone {zone}: the hero in Skaldholm is listed beside the vault"
+        );
         assert_eq!(shift[0].as_f64().unwrap(), vx);
         let (n, shift) = list(&w.snapshot_for(4), zone)
             .unwrap_or_else(|| panic!("Skaldholm lists nothing across its vault to zone {zone}"));
@@ -756,7 +786,11 @@ fn a_hero_beside_a_vault_is_listed_across_it_from_both_sides() {
         assert_eq!(shift[0].as_f64().unwrap(), -vx);
         // far from the gate (the zone's spawn), nobody is listed
         // (Rimeward Camp stands right behind its vault: the far end of the zone is the Wyrdwood gate)
-        let s0 = if zone == 2 { at(167.5, 67.5) } else { w.maps[zone].spawn };
+        let s0 = if zone == 2 {
+            at(167.5, 67.5)
+        } else {
+            w.maps[zone].spawn
+        };
         place(&mut w, 1, zone, at(s0.x, s0.y));
         let (n, _) = list(&w.snapshot_for(4), zone).unwrap();
         assert_eq!(n, 0, "zone {zone}: a hero far from the vault is not listed");
@@ -778,10 +812,17 @@ fn the_whole_opening_of_a_vault_crosses_not_only_its_middle() {
         let (gx, gy) = (gate["x"].as_f64().unwrap(), gate["y"].as_f64().unwrap());
         let walk = gate["walk"].as_array().unwrap();
         let (wx, wy) = (walk[0].as_f64().unwrap(), walk[1].as_f64().unwrap());
-        let half = gate["vault_half"].as_f64().expect("a vault knows its opening");
+        let half = gate["vault_half"]
+            .as_f64()
+            .expect("a vault knows its opening");
         for across in [-(half - 0.6), -half / 2., half / 2., half - 0.6] {
             // start 6 tiles before the gate, off to the side of the opening, and walk straight through
-            place(&mut w, 1, zone, at(gx - wx * 6. + -wy * across, gy - wy * 6. + wx * across));
+            place(
+                &mut w,
+                1,
+                zone,
+                at(gx - wx * 6. + -wy * across, gy - wy * 6. + wx * across),
+            );
             let dir = at(wx, wy);
             for _ in 0..200 {
                 w.time += TICK;
@@ -794,7 +835,11 @@ fn the_whole_opening_of_a_vault_crosses_not_only_its_middle() {
                 }
             }
             let c = &w.players[&1].character;
-            assert_eq!(c.zone, 4, "zone {zone}: walking through the opening {across:+.1} tiles off its middle did not enter Skaldholm (at {:.1},{:.1})", c.x, c.y);
+            assert_eq!(
+                c.zone, 4,
+                "zone {zone}: walking through the opening {across:+.1} tiles off its middle did not enter Skaldholm (at {:.1},{:.1})",
+                c.x, c.y
+            );
         }
     }
 }
@@ -841,7 +886,14 @@ fn every_greenmeadow_quest_can_be_done_on_the_map() {
     let w = world();
     let map = &w.maps[0];
     for q in map.quests.iter().filter(|q| q.level <= 5) {
-        let seasonal = ["halloween", "christmas", "easter", "solstice", "valentine", "newyear"];
+        let seasonal = [
+            "halloween",
+            "christmas",
+            "easter",
+            "solstice",
+            "valentine",
+            "newyear",
+        ];
         if q.id.starts_with("es_") || seasonal.iter().any(|s| q.id.starts_with(s)) {
             continue;
         }
@@ -875,15 +927,24 @@ fn every_greenmeadow_quest_can_be_done_on_the_map() {
 fn greenmeadow_has_three_elites_two_with_a_quest() {
     let w = world();
     let quests = &w.maps[0].quests;
-    for (kind, quest) in [("oldtusker", true), ("tidecrusher", true), ("orchardqueen", false)] {
+    for (kind, quest) in [
+        ("oldtusker", true),
+        ("tidecrusher", true),
+        ("orchardqueen", false),
+    ] {
         assert_eq!(
-            w.slimes.iter().filter(|s| s.zone == 0 && s.kind == kind).count(),
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 0 && s.kind == kind)
+                .count(),
             1,
             "one {kind}"
         );
         assert!(crate::items::is_elite(kind), "{kind} is an elite");
         assert_eq!(
-            quests.iter().any(|q| q.objectives.iter().any(|o| o.target == kind)),
+            quests
+                .iter()
+                .any(|q| q.objectives.iter().any(|o| o.target == kind)),
             quest,
             "{kind} quest"
         );
@@ -914,11 +975,19 @@ fn the_ring_at_dusk_wakes_its_slimes_and_counts_twenty_seconds() {
         w.spawns
             .iter()
             .enumerate()
-            .filter(|(_, s)| s.ambush.as_deref().is_some_and(|t| t.starts_with("fold_watch_m")))
+            .filter(|(_, s)| {
+                s.ambush
+                    .as_deref()
+                    .is_some_and(|t| t.starts_with("fold_watch_m"))
+            })
             .filter(|(id, _)| w.slimes[*id].dead)
             .count()
     };
-    assert_eq!(sleepers(&w), 4, "four slimes sleep until the waves call them");
+    assert_eq!(
+        sleepers(&w),
+        4,
+        "four slimes sleep until the waves call them"
+    );
     for tick in 0..(24. / TICK) as usize {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.hp = c.max_hp();
@@ -932,7 +1001,12 @@ fn the_ring_at_dusk_wakes_its_slimes_and_counts_twenty_seconds() {
     }
     let c = &w.players[&1].character;
     assert!(
-        c.quests.iter().find(|q| q.id == "fold_watch").unwrap().counts[0] >= 20,
+        c.quests
+            .iter()
+            .find(|q| q.id == "fold_watch")
+            .unwrap()
+            .counts[0]
+            >= 20,
         "the hold is complete"
     );
 }
@@ -940,7 +1014,12 @@ fn the_ring_at_dusk_wakes_its_slimes_and_counts_twenty_seconds() {
 #[test]
 fn lotta_walks_the_lane_from_applewick_to_the_watermill() {
     let mut w = world();
-    let lotta = w.maps[0].npcs.iter().find(|n| n.id == "apple_lotta").unwrap().clone();
+    let lotta = w.maps[0]
+        .npcs
+        .iter()
+        .find(|n| n.id == "apple_lotta")
+        .unwrap()
+        .clone();
     let route = &lotta.escort.as_ref().unwrap().route;
     for leg in route.windows(2) {
         let (from, to) = (at(leg[0][0], leg[0][1]), at(leg[1][0], leg[1][1]));
@@ -958,7 +1037,9 @@ fn lotta_walks_the_lane_from_applewick_to_the_watermill() {
     let owner = w.players[&1].character.id.clone();
     let escort = w.escort_of(&owner).expect("Lotta joins");
     for _ in 0..(90. / TICK) as usize {
-        let Some(e) = w.players.get(&escort) else { break };
+        let Some(e) = w.players.get(&escort) else {
+            break;
+        };
         let there = e.character.point();
         let e = &mut w.players.get_mut(&escort).unwrap().character;
         e.hp = e.max_hp();
@@ -977,7 +1058,11 @@ fn lotta_walks_the_lane_from_applewick_to_the_watermill() {
     }
     let c = &w.players[&1].character;
     assert_eq!(
-        c.quests.iter().find(|q| q.id == "apple_mill").unwrap().counts[0],
+        c.quests
+            .iter()
+            .find(|q| q.id == "apple_mill")
+            .unwrap()
+            .counts[0],
         1,
         "Lotta reached the watermill"
     );
@@ -1017,6 +1102,19 @@ fn the_crags_outposts_are_sanctuaries_with_their_people() {
                 .all(|s| s.point().distance(spot) > 8.),
             "no enemy within eight units of {id}"
         );
+    }
+    // mail_all stops at Alderhaven's old entry, so the outposts' mailboxes are checked here
+    for hub in ["anvilrest", "ashford", "lasthearth"] {
+        let find = |id: String| map.npcs.iter().find(|n| n.id == id).unwrap();
+        let (b, m) = (
+            find(format!("mailbox_1_{hub}")),
+            find(format!("travel_{hub}")),
+        );
+        let (spot, anchor) = (at(b.x, b.y), at(m.x, m.y));
+        let mut q = spot;
+        map.collide(&mut q, 0.6);
+        assert!(q.distance(spot) < 0.01, "{hub}: mailbox blocked");
+        assert!(map.line_clear(anchor, spot, 0.4), "{hub}: mailbox approach");
     }
 }
 
@@ -1067,13 +1165,18 @@ fn the_crags_have_three_elites_two_with_a_quest() {
     let quests = &w.maps[1].quests;
     for (kind, quest) in [("cinderlord", true), ("slagmaw", true), ("ashwing", false)] {
         assert_eq!(
-            w.slimes.iter().filter(|s| s.zone == 1 && s.kind == kind).count(),
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 1 && s.kind == kind)
+                .count(),
             1,
             "one {kind}"
         );
         assert!(crate::items::is_elite(kind), "{kind} is an elite");
         assert_eq!(
-            quests.iter().any(|q| q.objectives.iter().any(|o| o.target == kind)),
+            quests
+                .iter()
+                .any(|q| q.objectives.iter().any(|o| o.target == kind)),
             quest,
             "{kind} quest"
         );
@@ -1109,11 +1212,19 @@ fn the_beacon_wakes_the_ridge_and_counts_twenty_seconds() {
         w.spawns
             .iter()
             .enumerate()
-            .filter(|(_, s)| s.ambush.as_deref().is_some_and(|t| t.starts_with("ford_lit_m")))
+            .filter(|(_, s)| {
+                s.ambush
+                    .as_deref()
+                    .is_some_and(|t| t.starts_with("ford_lit_m"))
+            })
             .filter(|(id, _)| w.slimes[*id].dead)
             .count()
     };
-    assert_eq!(sleepers(&w), 4, "four enemies sleep until the waves call them");
+    assert_eq!(
+        sleepers(&w),
+        4,
+        "four enemies sleep until the waves call them"
+    );
     for tick in 0..(24. / TICK) as usize {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.hp = c.max_hp();
@@ -1135,7 +1246,12 @@ fn the_beacon_wakes_the_ridge_and_counts_twenty_seconds() {
 #[test]
 fn ulf_walks_the_cart_over_the_ford_and_up_the_highfire_road() {
     let mut w = world();
-    let ulf = w.maps[1].npcs.iter().find(|n| n.id == "ford_ulf").unwrap().clone();
+    let ulf = w.maps[1]
+        .npcs
+        .iter()
+        .find(|n| n.id == "ford_ulf")
+        .unwrap()
+        .clone();
     let route = &ulf.escort.as_ref().unwrap().route;
     for leg in route.windows(2) {
         let (from, to) = (at(leg[0][0], leg[0][1]), at(leg[1][0], leg[1][1]));
@@ -1153,7 +1269,9 @@ fn ulf_walks_the_cart_over_the_ford_and_up_the_highfire_road() {
     let owner = w.players[&1].character.id.clone();
     let escort = w.escort_of(&owner).expect("Ulf joins");
     for _ in 0..(120. / TICK) as usize {
-        let Some(e) = w.players.get(&escort) else { break };
+        let Some(e) = w.players.get(&escort) else {
+            break;
+        };
         let there = e.character.point();
         let e = &mut w.players.get_mut(&escort).unwrap().character;
         e.hp = e.max_hp();
@@ -1171,7 +1289,11 @@ fn ulf_walks_the_cart_over_the_ford_and_up_the_highfire_road() {
     }
     let c = &w.players[&1].character;
     assert_eq!(
-        c.quests.iter().find(|q| q.id == "ford_cart").unwrap().counts[0],
+        c.quests
+            .iter()
+            .find(|q| q.id == "ford_cart")
+            .unwrap()
+            .counts[0],
         1,
         "Ulf reached the end of the road"
     );

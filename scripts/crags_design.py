@@ -3,7 +3,7 @@
 
 Runs in `zone_shapes.py apply` after the seams, the Skaldholm vault and the wall exist, so the outline, the borders and every crossing
 stay exactly as they were. It replaces all loose scenery, every spawn and the trails with the plan below, traced from the owner's
-painted atlas (client/assets/world-atlas-painted.png; tile = atlas px * 2048/1758... see zone_shapes): four lava rivers stepping the land
+painted atlas (client/assets/world-atlas-painted.png; tile = painted px * 2048/1758 - shape.T): four lava rivers stepping the land
 into terraces, the snow-capped peaks, the pale roads along the ledges, the fire pit in the south and the cut quarry block in the south-west.
 
 Fixed, never touched: Cinderwatch Camp and its people, the spawn point, the Ember Grave Cross and its sleeper, the Empty Seat circle,
@@ -61,6 +61,7 @@ ROADS = [
     # north again to the Bifrost gate, over the first river
     [(150, 100), (150, 72), (153, 50), (156.5, 29.5), (156.5, 20.5), (154.5, 20.5), (154.5, 13.5)],
     # the Glass Shore road: Nacrehold's gate east along the sea, and down over the ford to Lasthearth
+    [(207.5, 104), (207.5, 111.5)],
     [(207.5, 104), (240, 110), (276, 110), (304, 112), (320, 111)],
     [(276, 110), (276, 150), (285, 190)],
     # the Skaldholm road and the Quarry way
@@ -422,7 +423,7 @@ def design(world, write=False):
             a = p['x'] - p.get('walk', (0, 0))[0] * 4, p['y'] - p.get('walk', (0, 0))[1] * 4
             assert seen[int(a[1]), int(a[0])], f"gate cut off {p['id']}"
     bad = set()
-    for road in ROADS:
+    for road in ROADS + [r['points'] for r in zone['exitRoutes']]:   # the painted exit markings are roads too
         for a, b in zip(road, road[1:]):
             for k in range(int(math.dist(a, b)) + 1):
                 x = a[0] + (b[0] - a[0]) * k / max(math.dist(a, b), 1)
