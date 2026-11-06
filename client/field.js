@@ -117,7 +117,7 @@
     // Land near a border: how far the ground has to go to meet the neighbour's, and which neighbour (letter code).
     map.blendD = new Uint8Array(MAP * MAP); map.blendNb = new Uint8Array(MAP * MAP); map.blendW = new Float32Array(MAP * MAP);
     front = [];
-    for (let i = 0; i < MAP * MAP; i++) if (!map.floor[i] && map.edge[i] >= 65 && map.edge[i] <= 90) {
+    for (let i = 0; i < MAP * MAP; i++) if (!map.floor[i] && map.edge[i] >= 65 && map.edge[i] <= 90 && ZONES[(zdef.shape?.neighbours || [])[map.edge[i] - 65]]?.theme !== 'city') {   // (a walled city's ground is not blended into: its wall stands between)
       const x = i % MAP, y = (i / MAP) | 0;
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (map.floor[k] && !map.blendD[k]) { map.blendD[k] = 1; map.blendNb[k] = map.edge[i]; front.push(k); } }
     }

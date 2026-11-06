@@ -1404,6 +1404,9 @@ def apply(world, cfg):
     shift_incoming(world, shifted, 1)
     place_portals(world, shifted, cfg.get('landmarks', []), cfg.get('wallAxis'), cfg.get('wallFit'))
     build_walls(world, shifted, cfg.get('landmarks', []), margins, cfg.get('wallAxis'), cfg.get('wallFit'))
+    if cfg.get('cityRebuild'):      # the wing is Greenmeadow's land and the south-west corner is a corner, before any design runs
+        import skaldholm_rebuild
+        skaldholm_rebuild.prepare(world, margins)
     # Greenmeadow is an authored map: scenery, spawns, trails and quests are replaced last, on the finished outline, seams and vault.
     if 0 in cfg['zones']:
         import greenmeadow_design

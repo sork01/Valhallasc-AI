@@ -147,7 +147,6 @@ def neighbour_fingerprint(world):
 def rebuild(world):
     city = zs.zone_of(world, CITY)
     assert city['name'] == 'Skaldholm' and 'shape' not in city
-    trim_greenmeadow_flank(world)
     before = neighbour_fingerprint(world)
     old = copy.deepcopy(city)
     floor = city_floor(world)
@@ -188,6 +187,7 @@ def rebuild(world):
     open_hall_lane(city)
     place_band(city, old, floor)
     east_wall(world, city)
+    sw_corner_tower(world, city)
     quiet_lobe(world)
     city['objects'].extend(zs.void_pieces(floor))
     city['shapeFloor'] = zs.floor_rows(floor)
@@ -502,6 +502,69 @@ def settle_npcs(city):
                     best = (math.hypot(x - npc['x'], y - npc['y']), x, y)
         assert best, f"{npc['id']} has no reachable ground within 5 tiles"
         npc['x'], npc['y'] = round(best[1], 2), round(best[2], 2)
+
+
+WING = (456, 504, 733, 758)    # atlas x0, x1, y0, y1: the old right-hand wing, now Greenmeadow's ground (its top 6 rows toward the Crags stay a cliff)
+
+
+def prepare(world, margins):
+    """Runs after the neighbours' walls are built and BEFORE their designs (so Greenmeadow's design fills what it is given):
+      * Greenmeadow's wall stops at the city's east wall, and the wing east of it becomes Greenmeadow's land;
+      * the south-west corner is a corner: Gloamfen's west wall stops at Greenmeadow's wall line, Greenmeadow's wall starts at it."""
+    import numpy as np
+    trim_greenmeadow_flank(world)
+    z = zs.zone_of(world, 0)
+    T = z['shape']['T']
+    n = z['size']
+    floor = np.array([[c == '#' for c in row] for row in z['shapeFloor']])
+    new = np.zeros_like(floor)
+    for y in range(WING[2], WING[3]):
+        for x in range(WING[0], WING[1]):
+            yy, xx = y - T[1], x - T[0]
+            if 0 <= yy < n and 0 <= xx < n and not floor[yy, xx]:
+                new[yy, xx] = True
+    for i in (1, 2, 3):      # nobody else owns these cells
+        o = zs.zone_of(world, i)
+        To = o['shape']['T']
+        ys, xs = np.nonzero(new)
+        assert not any(0 <= y + T[1] - To[1] < o['size'] and 0 <= x + T[0] - To[0] < o['size'] and o['shapeFloor'][y + T[1] - To[1]][x + T[0] - To[0]] == '#' for y, x in zip(ys, xs)), f'zone {i} owns part of the wing'
+    floor |= new
+    z['shapeFloor'] = zs.floor_rows(floor)
+    z['objects'] = [o for o in z['objects'] if o['kind'] != 'void'] + zs.void_pieces(floor | margins[0])
+    letter = chr(ord('A') + z['shape']['neighbours'].index(CITY))
+    near = zs.dilate(new, zs.EDGE_BAND) & ~floor
+    rows = [list(r) for r in z['shapeEdge']]
+    for yy in range(n):
+        for xx in range(n):
+            if floor[yy, xx]:
+                rows[yy][xx] = ' '
+            elif near[yy, xx] and rows[yy][xx] == letter:
+                rows[yy][xx] = 'l'          # outer land: the cliff between the wing and the Crags
+    z['shapeEdge'] = [''.join(r) for r in rows]
+    cut = EAST_WALL_X - T[0]
+    for reg in z['shape'].get('vaultRegions', []):        # the vault's regions end at the city's east wall
+        for key in ('city', 'land', 'strip'):
+            pts = reg[key]
+            for k in range(0, len(pts), 2):
+                pts[k] = min(pts[k], cut)
+    print(f"greenmeadow wing: {int(new.sum())} tiles of land")
+    # the south-west corner: Gloamfen's wall must not run on past Greenmeadow's wall line, and Greenmeadow's wall must not start inside Gloamfen's
+    fen = zs.zone_of(world, 3)
+    Tf = fen['shape']['T']
+    wall_y = next(o['y'] + T[1] for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG)
+    before = len(fen['objects'])
+    fen['objects'] = [o for o in fen['objects'] if not (o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG and o['y'] + Tf[1] > wall_y + 3.0)]
+    first = min((o for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG), key=lambda o: o['x'])
+    first['x'] = round(first['x'] + 2.7, 2)
+    print(f"south-west corner squared: {before - len(fen['objects'])} Gloamfen wall pieces beyond Greenmeadow's wall line removed")
+
+
+def sw_corner_tower(world, city):
+    zg = zs.zone_of(world, 0)
+    zf = zs.zone_of(world, 3)
+    wall_y = next(o['y'] + zg['shape']['T'][1] for o in zg['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG)
+    wall_x = next(o['x'] + zf['shape']['T'][0] for o in zf['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG)
+    city['objects'].append(dict(kind='tower', x=round(wall_x - TC[0], 2), y=round(wall_y - TC[1], 2), r=0, v=0, width=3.4, depth=3.4, color='#4a7a9a', label='', layout='skaldholm_east_wall'))
 
 
 def trim_greenmeadow_flank(world):
