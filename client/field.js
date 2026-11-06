@@ -299,7 +299,7 @@
   }
   const FEN_MINI = ['', '#4e4a30', '#2a2e22', '#4f7a3c', '#6c7a3a', '#7a6544', '#a89a76', '#1e3030', '#22262c'];
   const FROST_MINI = ['', '#d4e0ec', '#9cc8e4', '#aab0b8', '#60646f', '#eef4fa', '#78aad6', '#8ca0be'];
-  const MINI_QUIET = new Set(['thicket', 'lamp', 'ice', 'rock', 'bush', 'bones', 'cairn_pebble', 'ew_warmstone', 'tree', 'spire', 'ew_basalt', 'cairn_boulder']);   // authored Crags: the ground tells the story, dots of every stone only noise
+  const MINI_QUIET = new Set(['ice', 'rock', 'bush', 'bones', 'cairn_pebble', 'ew_warmstone', 'tree', 'spire', 'ew_basalt', 'cairn_boulder']);   // authored Crags: the ground tells the story, dots of every stone only noise
   // The name of the part of an authored zone at a point (`regions`: names and [y, x0, x1, region + 1] runs).
   const regionCells = new WeakMap();
   function regionAt(x, y) {
@@ -4878,7 +4878,7 @@
         g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue;
       }
       if ((city || zdef.theme === 'nacre') && (o.kind === 'grandfountain' || o.kind === 'nacrefountain' || o.kind === 'meetingstone' || o.kind === 'fountain')) { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, o.r * k), 0, 6.283); g.fill(); continue; }
-      if ((ember || frost || fen) && map.gk && MINI_QUIET.has(o.kind)) continue;
+      if ((ember || frost || fen) && map.gk && (MINI_QUIET.has(o.kind) || fen && (o.kind === 'thicket' || o.kind === 'lamp'))) continue;
       if (o.kind === 'rime_peak') { g.fillStyle = '#f4f8fc'; g.strokeStyle = '#6f8aa8'; g.lineWidth = .6; g.beginPath(); g.moveTo(o.x * k, (o.y - o.r * 1.5) * k); g.lineTo((o.x + o.r) * k, o.y * k); g.lineTo((o.x - o.r) * k, o.y * k); g.closePath(); g.fill(); g.stroke(); continue; }
       if (o.kind === 'crag_peak') { g.fillStyle = '#d8d2cc'; g.beginPath(); g.moveTo(o.x * k, (o.y - o.r * 1.5) * k); g.lineTo((o.x + o.r) * k, o.y * k); g.lineTo((o.x - o.r) * k, o.y * k); g.fill(); continue; }
       g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (zone === 0 ? '#4fa9c8' : wyrd ? '#2f6f9a' : frost ? '#2f77c0' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');

@@ -92,8 +92,9 @@ const WATER = [[104, 172, 116, 172], [160, 241, 160, 226], [173, 150, 165, 150],
   } else {
     await page.evaluate(() => { if (window.DayNight) DayNight.draw = () => {}; if (window.Weather) for (const k of Object.keys(Weather)) if (/^draw/.test(k) && typeof Weather[k] === 'function') Weather[k] = () => {}; });
     const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[2], land = (x, y) => Z.shapeFloor[Math.floor(y)]?.[Math.floor(x)] === '#';
-    // The seam to Rimeveil is checked from Rimeveil's side by `SEAMS=1 tests/rimeveil-design-ui.cjs` (2-3): measured from here, with Rimeveil's heavy frame as the far side, the pixel
-    // comparison failed on the plain pilot too (41 vs 14), while Rimeveil's own run passes at the very same border (129 objects matched).
+    // The seam to Rimeveil is skipped here (ALLSEAMS=1 includes it): measured from Gloamfen's side the pixel comparison fails at the west end of the border (FRACS=.3, near (62,24):
+    // Rimeveil's frame draws no fen blend there), and it fails the same way on the plain pilot before this redesign (41 vs 14). The Rimeveil-side run (`SEAMS=1 tests/rimeveil-design-ui.cjs`,
+    // seam 2-3) passes, but it samples other points of the same border, so the west end is an open finding, not covered.
     for (const portal of Z.portals.filter(p => p.seam && (process.env.ALLSEAMS || p.to !== 2))) {
       const pts = portal.seam.points, [sx, sy] = portal.seam.shift, to = portal.to;
       for (const f of (process.env.FRACS ? process.env.FRACS.split(',').map(Number) : [.3, .5, .7])) {

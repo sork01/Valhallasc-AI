@@ -310,8 +310,13 @@ class Gloamfen(Designer):
         self.lay_regions()
         for x, y in LAMPS:
             self.lamp(x, y)
+        self.clear_glades()
         return kept + self.objects
 
+    def clear_glades(self):
+        """Tall scenery (willows, thickets, columns) standing in front of an elite hides it (the owner's first look at Bellowmaw: half behind willows): a glade of 12 tiles round each."""
+        spots = [(x, y) for _, x, y in content.ELITES]
+        self.objects[:] = [o for o in self.objects if not (o['kind'] in ('tree', 'thicket', 'spire') and any(math.hypot(o['x'] - x, o['y'] - y) < 12 for x, y in spots))]
     def lay_ground(self):
         """Ground classes beside plain fen grass. None within 16-30 tiles of a seam: the other side blends toward plain Gloamfen ground."""
         G, g = GROUND, self.ground
@@ -394,7 +399,7 @@ class Gloamfen(Designer):
 
         # The Gloomroot Mire: black thickets and dead willows round the Colossus, as the painting darkens in the south-east.
         self.block_disc(*GLOOMROOT, 9)
-        self.ring(GLOOMROOT, 11, 14, 'thicket', r=1.3)
+        self.ring(GLOOMROOT, 14, 16, 'thicket', r=1.3)
         sc(['thicket', 'thicket', 'tree', 'bush'], 520, m('mirewood') & (dense > .35), gap=1.0)
         sc(['rock', 'bush', 'spire'], 300, m('mirewood'), gap=1.3)
 

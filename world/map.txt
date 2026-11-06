@@ -268398,14 +268398,6 @@
         },
         {
           "kind": "tree",
-          "x": 190.58,
-          "y": 120.14,
-          "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 195.53,
           "y": 57.26,
           "r": 0.42,
@@ -268632,14 +268624,6 @@
           "kind": "tree",
           "x": 184.35,
           "y": 55.62,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 189.3,
-          "y": 123.37,
           "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
@@ -272309,14 +272293,6 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 45.26,
-          "y": 50.92,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
           "x": 27.71,
           "y": 13.31,
@@ -272330,14 +272306,6 @@
           "y": 40.97,
           "r": 0.42,
           "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 46.99,
-          "y": 73.84,
-          "r": 0.42,
-          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -272525,14 +272493,6 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 49.07,
-          "y": 52.86,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
           "x": 58.14,
           "y": 64.21,
@@ -272568,14 +272528,6 @@
           "kind": "tree",
           "x": 55.89,
           "y": 83.19,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 35.05,
-          "y": 58.66,
           "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
@@ -272645,14 +272597,6 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 45.47,
-          "y": 72.49,
-          "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
           "x": 107.7,
           "y": 73.6,
@@ -272712,14 +272656,6 @@
           "kind": "tree",
           "x": 31.13,
           "y": 47.06,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 56.31,
-          "y": 60.49,
           "r": 0.42,
           "v": 3,
           "layout": "gloamfen_design_v1"
@@ -272910,14 +272846,6 @@
         },
         {
           "kind": "tree",
-          "x": 38.52,
-          "y": 59.59,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 37.2,
           "y": 29.38,
           "r": 0.42,
@@ -272994,14 +272922,6 @@
           "y": 54.46,
           "r": 0.3,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 55.42,
-          "y": 55.04,
-          "r": 0.42,
-          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -273130,14 +273050,6 @@
           "y": 49.56,
           "r": 0.42,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 47.64,
-          "y": 69.1,
-          "r": 0.42,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -273350,14 +273262,6 @@
         },
         {
           "kind": "tree",
-          "x": 56.11,
-          "y": 64.1,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 47.08,
           "y": 38.35,
           "r": 0.42,
@@ -273542,14 +273446,6 @@
         },
         {
           "kind": "tree",
-          "x": 38.17,
-          "y": 61.89,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 52.59,
           "y": 32.66,
           "r": 0.42,
@@ -273602,14 +273498,6 @@
           "y": 40.67,
           "r": 0.3,
           "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 36.46,
-          "y": 67.87,
-          "r": 0.42,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -273800,14 +273688,6 @@
           "kind": "tree",
           "x": 41.68,
           "y": 48.42,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 55.45,
-          "y": 57.04,
           "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
@@ -274045,14 +273925,6 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 37.91,
-          "y": 64.27,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
           "x": 99.12,
           "y": 79.01,
@@ -274230,14 +274102,6 @@
         },
         {
           "kind": "tree",
-          "x": 43.42,
-          "y": 54.48,
-          "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 51.13,
           "y": 94.99,
           "r": 0.42,
@@ -274258,14 +274122,6 @@
           "y": 44.73,
           "r": 0.42,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 49.04,
-          "y": 72.29,
-          "r": 0.42,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -274370,14 +274226,6 @@
           "y": 77.07,
           "r": 0.3,
           "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 45.47,
-          "y": 69.2,
-          "r": 0.42,
-          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -274538,14 +274386,6 @@
           "y": 75.25,
           "r": 0.42,
           "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 40.68,
-          "y": 51.67,
-          "r": 0.42,
-          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -274774,14 +274614,6 @@
         },
         {
           "kind": "tree",
-          "x": 43.43,
-          "y": 70.26,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 65.05,
           "y": 46.71,
           "r": 0.42,
@@ -274848,14 +274680,6 @@
           "kind": "tree",
           "x": 52.08,
           "y": 37.14,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 50.76,
-          "y": 67.27,
           "r": 0.42,
           "v": 3,
           "layout": "gloamfen_design_v1"
@@ -275110,14 +274934,6 @@
         },
         {
           "kind": "tree",
-          "x": 46.9,
-          "y": 71.26,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 53.87,
           "y": 95.06,
           "r": 0.42,
@@ -275190,14 +275006,6 @@
         },
         {
           "kind": "tree",
-          "x": 38.57,
-          "y": 67.6,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
           "x": 44.44,
           "y": 83.49,
           "r": 0.42,
@@ -275210,14 +275018,6 @@
           "y": 30.52,
           "r": 0.3,
           "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 50.1,
-          "y": 50.98,
-          "r": 0.42,
-          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -275242,14 +275042,6 @@
           "y": 23.9,
           "r": 0.3,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 42.22,
-          "y": 68.49,
-          "r": 0.42,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -275281,14 +275073,6 @@
           "x": 35.23,
           "y": 61.87,
           "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 36.92,
-          "y": 58.66,
-          "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
@@ -275362,14 +275146,6 @@
           "y": 43.38,
           "r": 0.42,
           "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 42.17,
-          "y": 55.84,
-          "r": 0.42,
-          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -286317,14 +286093,6 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "spire",
-          "x": 204.13,
-          "y": 118.03,
-          "r": 0.55,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "rock",
           "x": 194.56,
           "y": 145.07,
@@ -286394,14 +286162,6 @@
           "y": 160.39,
           "r": 0.4,
           "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 204.99,
-          "y": 121.22,
-          "r": 1.3,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -286498,14 +286258,6 @@
           "y": 154.53,
           "r": 0.3,
           "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "spire",
-          "x": 207.86,
-          "y": 129.5,
-          "r": 0.55,
-          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -289678,200 +289430,192 @@
         },
         {
           "kind": "thicket",
-          "x": 242.31,
-          "y": 184.05,
+          "x": 245.17,
+          "y": 184.94,
           "r": 1.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 239.86,
-          "y": 188.29,
+          "x": 242.57,
+          "y": 189.74,
           "r": 1.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 235.81,
-          "y": 191.04,
+          "x": 238.33,
+          "y": 193.18,
           "r": 1.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 230.97,
-          "y": 191.77,
+          "x": 233.1,
+          "y": 194.74,
           "r": 1.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 226.29,
-          "y": 190.32,
+          "x": 227.66,
+          "y": 194.17,
           "r": 1.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 222.71,
-          "y": 186.99,
+          "x": 222.86,
+          "y": 191.57,
           "r": 1.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 220.92,
-          "y": 182.43,
+          "x": 219.42,
+          "y": 187.33,
           "r": 1.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 221.29,
-          "y": 177.55,
+          "x": 217.86,
+          "y": 182.1,
           "r": 1.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 227.79,
-          "y": 170.56,
+          "x": 218.43,
+          "y": 176.66,
           "r": 1.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 232.63,
-          "y": 169.83,
+          "x": 221.03,
+          "y": 171.86,
           "r": 1.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 237.31,
-          "y": 171.28,
+          "x": 230.5,
+          "y": 166.86,
           "r": 1.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 240.89,
-          "y": 174.61,
+          "x": 235.94,
+          "y": 167.43,
           "r": 1.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 242.68,
-          "y": 179.17,
+          "x": 240.74,
+          "y": 170.03,
           "r": 1.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 198.88,
-          "y": 201.21,
-          "r": 0.3,
+          "kind": "thicket",
+          "x": 244.18,
+          "y": 174.27,
+          "r": 1.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 245.74,
+          "y": 179.5,
+          "r": 1.3,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 205.45,
-          "y": 190.44,
-          "r": 1.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 205.02,
-          "y": 212.65,
-          "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 215.57,
-          "y": 186.39,
-          "r": 1.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 180.89,
-          "y": 195.27,
-          "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 218.54,
-          "y": 201.38,
-          "r": 1.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 221.26,
-          "y": 172.18,
-          "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 242.43,
-          "y": 162.75,
-          "r": 1.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 201.12,
-          "y": 210.41,
-          "r": 1.3,
-          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 227.32,
-          "y": 195.71,
+          "x": 198.5,
+          "y": 223.2,
           "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 207.44,
+          "y": 196.23,
+          "r": 1.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 193.39,
-          "y": 207.93,
+          "x": 213.63,
+          "y": 199.49,
+          "r": 1.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 236.03,
+          "y": 154.4,
+          "r": 1.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 219.32,
+          "y": 204.16,
+          "r": 1.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 198.72,
+          "y": 216.06,
+          "r": 1.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 241.41,
+          "y": 146.23,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 190.71,
+          "y": 198.32,
           "r": 1.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 239.36,
-          "y": 149.83,
+          "x": 196.02,
+          "y": 193.57,
           "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
@@ -289893,49 +289637,33 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 234.54,
-          "y": 165.44,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 196.29,
-          "y": 214.37,
-          "r": 1.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 198.34,
-          "y": 194.59,
-          "r": 1.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 209.07,
-          "y": 210.76,
-          "r": 1.3,
-          "v": 2,
+          "kind": "tree",
+          "x": 180.1,
+          "y": 196.11,
+          "r": 0.42,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 196.87,
-          "y": 203.0,
+          "x": 192.99,
+          "y": 194.3,
           "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "tree",
+          "x": 201.25,
+          "y": 219.82,
+          "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "thicket",
-          "x": 198.72,
-          "y": 221.77,
+          "x": 175.88,
+          "y": 180.82,
           "r": 1.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
@@ -289949,43 +289677,27 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "thicket",
-          "x": 219.14,
-          "y": 187.57,
-          "r": 1.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
-          "x": 208.75,
-          "y": 207.69,
+          "x": 241.93,
+          "y": 181.75,
           "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "thicket",
-          "x": 235.23,
-          "y": 153.98,
-          "r": 1.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 181.96,
-          "y": 200.07,
-          "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "tree",
-          "x": 170.48,
-          "y": 202.14,
+          "x": 196.64,
+          "y": 202.2,
           "r": 0.42,
           "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 164.15,
+          "y": 200.62,
+          "r": 0.3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -289998,18 +289710,18 @@
         },
         {
           "kind": "bush",
-          "x": 225.19,
-          "y": 187.92,
+          "x": 234.12,
+          "y": 169.56,
           "r": 0.3,
-          "v": 0,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 164.7,
-          "y": 200.75,
+          "x": 210.78,
+          "y": 207.26,
           "r": 0.3,
-          "v": 2,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290018,14 +289730,6 @@
           "y": 208.15,
           "r": 0.42,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 193.38,
-          "y": 194.03,
-          "r": 0.42,
-          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290046,50 +289750,42 @@
         },
         {
           "kind": "bush",
-          "x": 229.27,
-          "y": 195.68,
+          "x": 182.77,
+          "y": 199.05,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 226.23,
+          "y": 197.03,
+          "r": 0.42,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 195.08,
+          "y": 209.44,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 216.74,
+          "y": 197.03,
           "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 201.65,
-          "y": 224.52,
+          "x": 207.13,
+          "y": 220.92,
           "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 205.17,
-          "y": 220.13,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 210.14,
-          "y": 199.56,
-          "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 209.44,
-          "y": 186.54,
-          "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 222.6,
-          "y": 180.09,
-          "r": 0.42,
-          "v": 3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290125,11 +289821,27 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "thicket",
-          "x": 241.31,
-          "y": 147.69,
-          "r": 1.3,
+          "kind": "tree",
+          "x": 210.93,
+          "y": 200.41,
+          "r": 0.42,
           "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 202.18,
+          "y": 204.82,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 170.54,
+          "y": 186.27,
+          "r": 0.3,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290157,11 +289869,11 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 238.41,
-          "y": 153.9,
-          "r": 0.42,
-          "v": 2,
+          "kind": "thicket",
+          "x": 211.0,
+          "y": 212.94,
+          "r": 1.3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290181,67 +289893,51 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 235.38,
-          "y": 167.72,
-          "r": 0.3,
+          "kind": "tree",
+          "x": 207.67,
+          "y": 210.25,
+          "r": 0.42,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 190.55,
-          "y": 197.44,
-          "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 202.38,
-          "y": 191.65,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 211.81,
-          "y": 196.67,
-          "r": 0.42,
+          "kind": "bush",
+          "x": 224.35,
+          "y": 194.96,
+          "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 175.01,
-          "y": 180.33,
+          "x": 206.13,
+          "y": 189.6,
           "r": 1.3,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 215.04,
-          "y": 204.17,
+          "x": 199.78,
+          "y": 199.87,
           "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "thicket",
-          "x": 214.04,
-          "y": 201.57,
-          "r": 1.3,
-          "v": 3,
+          "kind": "bush",
+          "x": 167.3,
+          "y": 180.87,
+          "r": 0.3,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 208.02,
-          "y": 193.42,
+          "x": 199.38,
+          "y": 224.74,
           "r": 0.3,
-          "v": 0,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290253,41 +289949,41 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "thicket",
-          "x": 227.09,
-          "y": 198.56,
-          "r": 1.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 173.22,
-          "y": 204.65,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 206.8,
-          "y": 196.8,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "tree",
-          "x": 202.84,
-          "y": 206.2,
+          "x": 206.22,
+          "y": 213.68,
           "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 242.1,
+          "y": 149.22,
+          "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 205.84,
-          "y": 206.57,
+          "x": 199.87,
+          "y": 221.94,
+          "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 176.72,
+          "y": 201.89,
+          "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 239.73,
+          "y": 147.63,
           "r": 0.42,
           "v": 3,
           "layout": "gloamfen_design_v1"
@@ -290301,26 +289997,26 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "bush",
+          "x": 231.11,
+          "y": 163.32,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "tree",
-          "x": 239.35,
-          "y": 191.39,
+          "x": 212.74,
+          "y": 206.87,
           "r": 0.42,
-          "v": 2,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 211.57,
-          "y": 188.46,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 224.74,
-          "y": 196.76,
-          "r": 0.3,
+          "kind": "thicket",
+          "x": 172.63,
+          "y": 204.61,
+          "r": 1.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
@@ -290333,11 +290029,19 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 210.64,
-          "y": 194.07,
-          "r": 0.3,
+          "kind": "tree",
+          "x": 173.35,
+          "y": 179.76,
+          "r": 0.42,
           "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 240.19,
+          "y": 183.56,
+          "r": 0.3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290366,26 +290070,10 @@
         },
         {
           "kind": "bush",
-          "x": 207.94,
-          "y": 205.79,
+          "x": 230.72,
+          "y": 191.6,
           "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 222.02,
-          "y": 194.05,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 240.89,
-          "y": 167.63,
-          "r": 0.42,
-          "v": 2,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290398,65 +290086,49 @@
         },
         {
           "kind": "thicket",
-          "x": 172.9,
-          "y": 198.85,
+          "x": 202.27,
+          "y": 210.68,
           "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 201.81,
-          "y": 220.1,
-          "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 199.13,
-          "y": 217.33,
+          "x": 198.8,
+          "y": 193.01,
           "r": 1.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 193.42,
-          "y": 195.9,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 232.88,
-          "y": 195.78,
-          "r": 1.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 169.46,
-          "y": 185.01,
-          "r": 0.42,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 172.92,
-          "y": 182.73,
-          "r": 0.42,
-          "v": 2,
+          "kind": "bush",
+          "x": 180.63,
+          "y": 199.28,
+          "r": 0.3,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "thicket",
-          "x": 178.49,
-          "y": 198.17,
+          "x": 212.72,
+          "y": 203.08,
           "r": 1.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 203.27,
+          "y": 224.29,
+          "r": 1.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 196.66,
+          "y": 212.56,
+          "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
@@ -290478,32 +290150,40 @@
         },
         {
           "kind": "tree",
-          "x": 224.3,
-          "y": 193.4,
+          "x": 178.69,
+          "y": 197.51,
           "r": 0.42,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 214.48,
-          "y": 211.62,
+          "x": 201.8,
+          "y": 192.47,
           "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 220.45,
-          "y": 205.91,
-          "r": 0.42,
-          "v": 2,
+          "kind": "bush",
+          "x": 222.02,
+          "y": 187.03,
+          "r": 0.3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 207.54,
-          "y": 219.91,
+          "x": 170.12,
+          "y": 179.12,
+          "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 169.81,
+          "y": 181.28,
           "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
@@ -290525,14 +290205,6 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "thicket",
-          "x": 216.33,
-          "y": 196.5,
-          "r": 1.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
           "x": 197.17,
           "y": 226.56,
@@ -290542,18 +290214,18 @@
         },
         {
           "kind": "bush",
-          "x": 238.14,
-          "y": 168.38,
+          "x": 231.99,
+          "y": 169.74,
           "r": 0.3,
-          "v": 0,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 200.34,
-          "y": 198.44,
-          "r": 0.3,
-          "v": 1,
+          "kind": "tree",
+          "x": 173.6,
+          "y": 198.15,
+          "r": 0.42,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290562,14 +290234,6 @@
           "y": 204.32,
           "r": 0.3,
           "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 172.38,
-          "y": 179.31,
-          "r": 0.42,
-          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290589,19 +290253,27 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 233.66,
-          "y": 193.19,
-          "r": 0.3,
+          "kind": "tree",
+          "x": 218.87,
+          "y": 200.66,
+          "r": 0.42,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 167.74,
-          "y": 203.29,
-          "r": 0.3,
-          "v": 0,
+          "kind": "thicket",
+          "x": 228.61,
+          "y": 200.05,
+          "r": 1.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 210.49,
+          "y": 198.53,
+          "r": 0.42,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290614,24 +290286,40 @@
         },
         {
           "kind": "bush",
-          "x": 200.17,
-          "y": 214.13,
+          "x": 210.58,
+          "y": 193.11,
           "r": 0.3,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 197.24,
-          "y": 211.13,
-          "r": 0.42,
-          "v": 3,
+          "kind": "bush",
+          "x": 189.01,
+          "y": 195.87,
+          "r": 0.3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
           "x": 235.26,
           "y": 148.5,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 207.99,
+          "y": 208.04,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 198.5,
+          "y": 219.35,
           "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
@@ -290645,6 +290333,14 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "thicket",
+          "x": 167.63,
+          "y": 186.01,
+          "r": 1.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "bush",
           "x": 231.97,
           "y": 161.61,
@@ -290653,10 +290349,10 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 235.33,
-          "y": 193.78,
-          "r": 0.3,
+          "kind": "tree",
+          "x": 231.09,
+          "y": 159.02,
+          "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
@@ -290669,27 +290365,11 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 169.92,
-          "y": 180.81,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "tree",
-          "x": 228.83,
-          "y": 193.87,
+          "x": 215.23,
+          "y": 185.35,
           "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 211.01,
-          "y": 181.38,
-          "r": 1.3,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290701,11 +290381,11 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 191.06,
-          "y": 200.74,
-          "r": 0.3,
-          "v": 3,
+          "kind": "tree",
+          "x": 210.51,
+          "y": 183.0,
+          "r": 0.42,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290718,6 +290398,22 @@
         },
         {
           "kind": "tree",
+          "x": 215.74,
+          "y": 203.11,
+          "r": 0.42,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 203.26,
+          "y": 190.82,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
           "x": 233.54,
           "y": 151.44,
           "r": 0.42,
@@ -290726,34 +290422,34 @@
         },
         {
           "kind": "bush",
-          "x": 207.14,
-          "y": 208.53,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 210.28,
-          "y": 189.77,
+          "x": 236.82,
+          "y": 149.88,
           "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 167.97,
-          "y": 199.87,
+          "x": 208.31,
+          "y": 205.47,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 225.1,
+          "y": 192.94,
           "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 217.67,
-          "y": 207.9,
-          "r": 0.42,
-          "v": 3,
+          "kind": "thicket",
+          "x": 239.64,
+          "y": 151.46,
+          "r": 1.3,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290789,19 +290485,43 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 194.83,
-          "y": 210.84,
-          "r": 0.3,
-          "v": 3,
+          "kind": "tree",
+          "x": 217.32,
+          "y": 201.99,
+          "r": 0.42,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 231.02,
-          "y": 163.48,
+          "x": 204.86,
+          "y": 210.94,
           "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 171.99,
+          "y": 200.58,
+          "r": 0.42,
           "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 243.64,
+          "y": 164.89,
+          "r": 0.42,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 212.28,
+          "y": 195.57,
+          "r": 0.42,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290814,66 +290534,66 @@
         },
         {
           "kind": "thicket",
-          "x": 222.05,
-          "y": 190.63,
+          "x": 210.09,
+          "y": 189.11,
           "r": 1.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "thicket",
-          "x": 176.45,
-          "y": 202.01,
-          "r": 1.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 213.38,
-          "y": 205.83,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 172.56,
-          "y": 186.7,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 209.12,
-          "y": 195.47,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 192.35,
-          "y": 198.98,
-          "r": 0.42,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 177.18,
-          "y": 187.53,
+          "x": 201.11,
+          "y": 226.11,
           "r": 0.3,
-          "v": 0,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 217.72,
-          "y": 184.45,
+          "x": 189.64,
+          "y": 219.25,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 242.3,
+          "y": 163.61,
           "r": 0.3,
           "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 171.37,
+          "y": 182.58,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 169.25,
+          "y": 199.19,
+          "r": 0.42,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 215.3,
+          "y": 205.45,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 209.68,
+          "y": 184.52,
+          "r": 0.3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290901,11 +290621,11 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 189.51,
-          "y": 195.12,
-          "r": 0.3,
-          "v": 0,
+          "kind": "tree",
+          "x": 197.71,
+          "y": 196.57,
+          "r": 0.42,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290918,18 +290638,10 @@
         },
         {
           "kind": "bush",
-          "x": 200.31,
-          "y": 191.66,
+          "x": 168.1,
+          "y": 201.81,
           "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 241.68,
-          "y": 171.44,
-          "r": 0.42,
-          "v": 3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290941,11 +290653,19 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "bush",
+          "x": 177.99,
+          "y": 188.71,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "tree",
-          "x": 233.62,
-          "y": 157.5,
+          "x": 205.07,
+          "y": 218.82,
           "r": 0.42,
-          "v": 3,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -290960,14 +290680,6 @@
           "kind": "bush",
           "x": 222.69,
           "y": 206.72,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 243.06,
-          "y": 165.88,
           "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
@@ -291005,11 +290717,75 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "tree",
+          "x": 172.97,
+          "y": 186.98,
+          "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 215.59,
+          "y": 177.62,
+          "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 214.22,
+          "y": 187.37,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "bush",
-          "x": 211.59,
-          "y": 208.49,
+          "x": 223.37,
+          "y": 176.38,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 220.58,
+          "y": 189.94,
+          "r": 0.42,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 242.73,
+          "y": 160.89,
+          "r": 1.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 216.36,
+          "y": 200.29,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 233.05,
+          "y": 191.85,
           "r": 0.3,
           "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 170.48,
+          "y": 202.11,
+          "r": 0.42,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291030,10 +290806,10 @@
         },
         {
           "kind": "tree",
-          "x": 215.68,
-          "y": 177.19,
+          "x": 173.26,
+          "y": 183.26,
           "r": 0.42,
-          "v": 0,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291069,6 +290845,14 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "tree",
+          "x": 240.08,
+          "y": 167.28,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "bush",
           "x": 211.44,
           "y": 174.05,
@@ -291078,17 +290862,17 @@
         },
         {
           "kind": "bush",
-          "x": 170.62,
-          "y": 182.61,
+          "x": 203.81,
+          "y": 213.92,
           "r": 0.3,
-          "v": 3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 174.11,
-          "y": 184.77,
-          "r": 0.42,
+          "kind": "bush",
+          "x": 211.81,
+          "y": 181.16,
+          "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
@@ -291109,22 +290893,6 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 211.67,
-          "y": 211.69,
-          "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 237.01,
-          "y": 151.69,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
           "x": 233.4,
           "y": 149.65,
@@ -291134,33 +290902,9 @@
         },
         {
           "kind": "tree",
-          "x": 217.96,
-          "y": 204.23,
+          "x": 168.03,
+          "y": 178.78,
           "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 243.42,
-          "y": 173.56,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 214.11,
-          "y": 183.42,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 197.64,
-          "y": 197.43,
-          "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
@@ -291174,17 +290918,17 @@
         },
         {
           "kind": "bush",
-          "x": 211.74,
-          "y": 205.76,
+          "x": 215.43,
+          "y": 175.67,
           "r": 0.3,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "thicket",
-          "x": 190.98,
-          "y": 221.4,
-          "r": 1.3,
+          "kind": "bush",
+          "x": 241.44,
+          "y": 173.52,
+          "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
@@ -291197,6 +290941,14 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "bush",
+          "x": 182.47,
+          "y": 200.78,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "thicket",
           "x": 167.83,
           "y": 193.84,
@@ -291206,10 +290958,26 @@
         },
         {
           "kind": "bush",
-          "x": 212.6,
-          "y": 187.1,
+          "x": 193.65,
+          "y": 196.22,
           "r": 0.3,
-          "v": 3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 208.04,
+          "y": 192.25,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 209.18,
+          "y": 201.28,
+          "r": 0.42,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291221,50 +290989,66 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 178.62,
-          "y": 189.89,
-          "r": 0.42,
+          "kind": "bush",
+          "x": 214.91,
+          "y": 196.71,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 209.14,
+          "y": 209.2,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 164.39,
+          "y": 206.64,
+          "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 229.85,
-          "y": 200.76,
+          "x": 222.42,
+          "y": 194.21,
           "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 165.28,
-          "y": 206.39,
+          "x": 199.18,
+          "y": 210.2,
           "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 216.97,
-          "y": 175.78,
-          "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 220.51,
-          "y": 195.44,
-          "r": 0.42,
-          "v": 2,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 204.33,
-          "y": 222.38,
+          "x": 197.47,
+          "y": 221.73,
           "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 172.16,
+          "y": 197.18,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 231.6,
+          "y": 197.17,
+          "r": 0.42,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
@@ -291277,43 +291061,11 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 243.2,
-          "y": 160.12,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
-          "x": 203.39,
-          "y": 220.79,
+          "x": 217.54,
+          "y": 195.03,
           "r": 0.3,
           "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 174.43,
-          "y": 205.78,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 196.09,
-          "y": 209.13,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 170.36,
-          "y": 179.11,
-          "r": 0.3,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291325,131 +291077,155 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 195.11,
-          "y": 192.5,
-          "r": 0.3,
+          "kind": "tree",
+          "x": 210.17,
+          "y": 205.41,
+          "r": 0.42,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 167.01,
-          "y": 185.43,
-          "r": 0.3,
-          "v": 0,
+          "kind": "tree",
+          "x": 166.75,
+          "y": 199.38,
+          "r": 0.42,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 167.43,
-          "y": 180.47,
+          "x": 225.27,
+          "y": 189.43,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 203.58,
+          "y": 206.67,
           "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 227.03,
-          "y": 201.86,
+          "x": 239.87,
+          "y": 172.62,
           "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 171.3,
-          "y": 185.52,
+          "x": 225.88,
+          "y": 191.1,
           "r": 0.3,
-          "v": 2,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 231.82,
+          "y": 155.28,
+          "r": 0.42,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 218.53,
-          "y": 174.14,
+          "x": 240.09,
+          "y": 190.53,
           "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 227.0,
-          "y": 193.18,
+          "x": 195.04,
+          "y": 211.5,
+          "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 210.79,
+          "y": 186.52,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 180.59,
+          "y": 194.17,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 233.63,
+          "y": 157.82,
           "r": 0.42,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 210.2,
-          "y": 206.92,
+          "x": 210.34,
+          "y": 180.43,
           "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 242.26,
-          "y": 169.47,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 210.27,
-          "y": 213.45,
-          "r": 0.42,
-          "v": 2,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 198.21,
-          "y": 191.59,
+          "x": 217.44,
+          "y": 174.15,
           "r": 0.3,
-          "v": 2,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 239.64,
-          "y": 152.68,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 195.33,
-          "y": 196.25,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 236.99,
-          "y": 148.38,
+          "x": 229.16,
+          "y": 197.15,
           "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 240.08,
-          "y": 165.69,
+          "x": 172.59,
+          "y": 181.45,
           "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "thicket",
+          "x": 217.32,
+          "y": 207.18,
+          "r": 1.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 163.28,
-          "y": 199.78,
-          "r": 0.3,
-          "v": 0,
+          "kind": "tree",
+          "x": 243.46,
+          "y": 148.1,
+          "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 208.03,
+          "y": 186.46,
+          "r": 0.42,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291462,98 +291238,122 @@
         },
         {
           "kind": "tree",
-          "x": 212.13,
-          "y": 203.75,
-          "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 214.38,
-          "y": 198.87,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 214.05,
-          "y": 174.55,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 208.74,
-          "y": 191.18,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 221.07,
-          "y": 202.44,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 232.04,
-          "y": 154.98,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 167.32,
-          "y": 198.08,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 220.22,
-          "y": 174.72,
-          "r": 0.42,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 238.68,
-          "y": 146.83,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 171.04,
-          "y": 205.52,
+          "x": 211.8,
+          "y": 208.7,
           "r": 0.42,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 218.48,
-          "y": 171.37,
+          "x": 174.67,
+          "y": 185.65,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 234.77,
+          "y": 192.6,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 206.44,
+          "y": 192.68,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 233.21,
+          "y": 170.88,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 214.51,
+          "y": 211.69,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 194.73,
+          "y": 194.81,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 203.55,
+          "y": 220.89,
+          "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 213.47,
+          "y": 174.51,
+          "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 189.95,
+          "y": 221.4,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 197.03,
+          "y": 218.53,
           "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 202.22,
-          "y": 189.4,
+          "x": 193.91,
+          "y": 207.94,
           "r": 0.42,
           "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 195.04,
+          "y": 213.76,
+          "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 208.07,
+          "y": 212.32,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 237.48,
+          "y": 148.19,
+          "r": 0.42,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291566,18 +291366,18 @@
         },
         {
           "kind": "tree",
-          "x": 198.8,
-          "y": 224.76,
+          "x": 215.02,
+          "y": 183.34,
           "r": 0.42,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 231.26,
-          "y": 166.1,
+          "x": 165.81,
+          "y": 207.84,
           "r": 0.42,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291589,43 +291389,27 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 236.62,
-          "y": 188.37,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 216.12,
-          "y": 209.19,
-          "r": 0.3,
+          "kind": "tree",
+          "x": 220.66,
+          "y": 195.06,
+          "r": 0.42,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 211.7,
-          "y": 215.35,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 216.39,
-          "y": 206.4,
+          "x": 176.52,
+          "y": 187.31,
           "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 240.42,
-          "y": 177.52,
+          "x": 210.66,
+          "y": 194.77,
           "r": 0.3,
-          "v": 1,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291638,8 +291422,16 @@
         },
         {
           "kind": "bush",
-          "x": 223.42,
-          "y": 195.71,
+          "x": 206.3,
+          "y": 206.44,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 242.51,
+          "y": 184.93,
           "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
@@ -291653,27 +291445,11 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 168.17,
-          "y": 178.46,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
-          "x": 243.31,
-          "y": 176.25,
+          "x": 206.15,
+          "y": 209.29,
           "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 239.1,
-          "y": 185.54,
-          "r": 0.42,
-          "v": 2,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291685,27 +291461,27 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 216.93,
-          "y": 199.26,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "tree",
-          "x": 233.14,
-          "y": 190.01,
+          "x": 181.46,
+          "y": 197.37,
           "r": 0.42,
-          "v": 3,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 166.47,
-          "y": 183.85,
+          "x": 242.7,
+          "y": 171.98,
           "r": 0.3,
           "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 233.18,
+          "y": 153.46,
+          "r": 0.3,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291717,18 +291493,26 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 168.43,
-          "y": 201.53,
-          "r": 0.42,
-          "v": 2,
+          "kind": "bush",
+          "x": 222.6,
+          "y": 182.77,
+          "r": 0.3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 231.3,
-          "y": 158.3,
+          "x": 213.75,
+          "y": 181.9,
           "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 174.73,
+          "y": 200.7,
+          "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
@@ -291742,6 +291526,22 @@
         },
         {
           "kind": "bush",
+          "x": 196.94,
+          "y": 210.45,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 199.53,
+          "y": 202.56,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
           "x": 209.74,
           "y": 218.91,
           "r": 0.3,
@@ -291749,9 +291549,41 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "tree",
+          "x": 175.3,
+          "y": 203.07,
+          "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "bush",
-          "x": 237.34,
-          "y": 166.82,
+          "x": 221.07,
+          "y": 206.5,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 166.15,
+          "y": 183.01,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 223.93,
+          "y": 185.92,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 177.59,
+          "y": 204.19,
           "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
@@ -291762,6 +291594,22 @@
           "y": 188.81,
           "r": 0.3,
           "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 176.65,
+          "y": 197.54,
+          "r": 0.42,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 215.07,
+          "y": 209.43,
+          "r": 0.3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291782,49 +291630,17 @@
         },
         {
           "kind": "bush",
-          "x": 223.84,
-          "y": 175.26,
+          "x": 218.32,
+          "y": 171.36,
           "r": 0.3,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 210.92,
-          "y": 202.38,
+          "x": 196.13,
+          "y": 215.39,
           "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 217.92,
-          "y": 177.82,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 165.32,
-          "y": 199.05,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 243.62,
-          "y": 158.45,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 231.49,
-          "y": 198.28,
-          "r": 0.42,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
@@ -291838,42 +291654,10 @@
         },
         {
           "kind": "bush",
-          "x": 190.89,
-          "y": 218.67,
+          "x": 211.04,
+          "y": 196.9,
           "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 168.94,
-          "y": 186.79,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 225.82,
-          "y": 194.86,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 197.12,
-          "y": 224.17,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 208.36,
-          "y": 213.5,
-          "r": 0.3,
-          "v": 0,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291885,35 +291669,43 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 166.03,
-          "y": 186.74,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 218.6,
-          "y": 205.98,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 239.79,
-          "y": 169.68,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "tree",
-          "x": 169.95,
-          "y": 200.33,
+          "x": 169.04,
+          "y": 177.18,
           "r": 0.42,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 219.33,
+          "y": 174.05,
+          "r": 0.3,
           "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 230.68,
+          "y": 193.29,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 238.38,
+          "y": 174.97,
+          "r": 0.3,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 223.01,
+          "y": 188.71,
+          "r": 0.3,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291925,35 +291717,27 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 177.85,
-          "y": 205.39,
-          "r": 0.42,
-          "v": 2,
+          "kind": "bush",
+          "x": 217.31,
+          "y": 185.51,
+          "r": 0.3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 209.8,
-          "y": 192.7,
+          "x": 221.05,
+          "y": 174.63,
           "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 201.49,
-          "y": 221.8,
+          "x": 195.97,
+          "y": 196.07,
           "r": 0.3,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 209.2,
-          "y": 197.07,
-          "r": 0.3,
-          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291966,10 +291750,26 @@
         },
         {
           "kind": "bush",
-          "x": 213.47,
-          "y": 195.84,
+          "x": 214.25,
+          "y": 195.22,
           "r": 0.3,
           "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 219.87,
+          "y": 196.96,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 194.93,
+          "y": 192.28,
+          "r": 0.3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -291982,26 +291782,10 @@
         },
         {
           "kind": "bush",
-          "x": 206.02,
-          "y": 221.65,
+          "x": 165.04,
+          "y": 187.94,
           "r": 0.3,
           "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 229.76,
-          "y": 198.54,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 208.06,
-          "y": 189.13,
-          "r": 0.3,
-          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292014,10 +291798,18 @@
         },
         {
           "kind": "bush",
-          "x": 163.44,
-          "y": 206.28,
+          "x": 199.53,
+          "y": 198.09,
           "r": 0.3,
-          "v": 0,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 216.13,
+          "y": 187.04,
+          "r": 0.3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292030,42 +291822,34 @@
         },
         {
           "kind": "tree",
-          "x": 200.61,
-          "y": 200.44,
+          "x": 203.1,
+          "y": 188.87,
           "r": 0.42,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 240.99,
+          "y": 165.52,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 167.42,
+          "y": 204.29,
+          "r": 0.42,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 167.9,
+          "y": 198.04,
+          "r": 0.3,
           "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 195.23,
-          "y": 201.94,
-          "r": 0.3,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 219.76,
-          "y": 204.17,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 209.6,
-          "y": 205.16,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 206.91,
-          "y": 194.59,
-          "r": 0.3,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292077,35 +291861,35 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "kind": "tree",
+          "x": 188.6,
+          "y": 194.16,
+          "r": 0.42,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "kind": "bush",
-          "x": 231.15,
-          "y": 160.16,
+          "x": 193.01,
+          "y": 199.85,
           "r": 0.3,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 187.75,
-          "y": 194.97,
+          "x": 241.64,
+          "y": 187.04,
           "r": 0.3,
-          "v": 3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "tree",
-          "x": 175.85,
-          "y": 185.74,
+          "x": 194.46,
+          "y": 201.88,
           "r": 0.42,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 243.66,
-          "y": 149.34,
-          "r": 0.3,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292126,14 +291910,6 @@
         },
         {
           "kind": "bush",
-          "x": 230.55,
-          "y": 194.47,
-          "r": 0.3,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
           "x": 243.76,
           "y": 170.74,
           "r": 0.3,
@@ -292141,51 +291917,51 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "tree",
-          "x": 208.8,
-          "y": 183.13,
-          "r": 0.42,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "tree",
-          "x": 189.03,
-          "y": 198.58,
-          "r": 0.42,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
           "kind": "bush",
-          "x": 197.39,
-          "y": 219.31,
+          "x": 178.41,
+          "y": 199.51,
           "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 205.62,
-          "y": 209.79,
+          "x": 197.69,
+          "y": 200.75,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 170.75,
+          "y": 184.13,
           "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 171.7,
-          "y": 203.55,
+          "x": 208.92,
+          "y": 193.82,
           "r": 0.3,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 215.85,
-          "y": 183.69,
+          "x": 212.82,
+          "y": 186.11,
           "r": 0.3,
           "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "tree",
+          "x": 227.87,
+          "y": 202.74,
+          "r": 0.42,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292197,51 +291973,19 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "spire",
-          "x": 237.72,
-          "y": 163.18,
-          "r": 0.55,
-          "v": 1,
+          "kind": "bush",
+          "x": 243.25,
+          "y": 180.69,
+          "r": 0.3,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 241.06,
-          "y": 159.24,
+          "x": 192.1,
+          "y": 201.58,
           "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "spire",
-          "x": 235.21,
-          "y": 162.15,
-          "r": 0.55,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "spire",
-          "x": 238.06,
-          "y": 156.48,
-          "r": 0.55,
           "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "rock",
-          "x": 179.09,
-          "y": 203.54,
-          "r": 0.4,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 180.99,
-          "y": 206.5,
-          "r": 0.3,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292261,19 +292005,67 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 237.3,
-          "y": 159.71,
-          "r": 0.3,
+          "kind": "spire",
+          "x": 239.81,
+          "y": 154.68,
+          "r": 0.55,
           "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "spire",
-          "x": 177.92,
-          "y": 183.17,
+          "x": 234.82,
+          "y": 160.59,
           "r": 0.55,
-          "v": 0,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 182.22,
+          "y": 206.39,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "rock",
+          "x": 241.25,
+          "y": 158.08,
+          "r": 0.4,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "rock",
+          "x": 238.72,
+          "y": 157.31,
+          "r": 0.4,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "rock",
+          "x": 236.55,
+          "y": 162.77,
+          "r": 0.4,
+          "v": 1,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 238.46,
+          "y": 162.12,
+          "r": 0.3,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "rock",
+          "x": 180.84,
+          "y": 203.87,
+          "r": 0.4,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292286,58 +292078,42 @@
         },
         {
           "kind": "bush",
-          "x": 242.21,
-          "y": 152.76,
+          "x": 237.89,
+          "y": 165.0,
+          "r": 0.3,
+          "v": 3,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 237.98,
+          "y": 159.19,
+          "r": 0.3,
+          "v": 0,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "rock",
+          "x": 242.87,
+          "y": 151.32,
+          "r": 0.4,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "bush",
+          "x": 177.79,
+          "y": 183.66,
           "r": 0.3,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "rock",
-          "x": 235.63,
-          "y": 158.44,
+          "x": 180.1,
+          "y": 206.95,
           "r": 0.4,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "spire",
-          "x": 233.77,
-          "y": 160.08,
-          "r": 0.55,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "spire",
-          "x": 239.68,
-          "y": 161.14,
-          "r": 0.55,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 240.86,
-          "y": 157.23,
-          "r": 0.3,
-          "v": 1,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 191.88,
-          "y": 203.37,
-          "r": 0.3,
           "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 193.42,
-          "y": 201.26,
-          "r": 0.3,
-          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292349,57 +292125,25 @@
           "layout": "gloamfen_design_v1"
         },
         {
-          "kind": "bush",
-          "x": 223.56,
-          "y": 184.08,
-          "r": 0.3,
+          "kind": "spire",
+          "x": 243.1,
+          "y": 153.66,
+          "r": 0.55,
+          "v": 2,
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "kind": "rock",
+          "x": 235.98,
+          "y": 157.64,
+          "r": 0.4,
           "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "bush",
-          "x": 181.16,
-          "y": 203.08,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "rock",
-          "x": 243.15,
-          "y": 187.74,
-          "r": 0.4,
-          "v": 3,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "rock",
-          "x": 241.77,
-          "y": 150.81,
-          "r": 0.4,
-          "v": 0,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 238.96,
-          "y": 158.58,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 182.99,
-          "y": 207.54,
-          "r": 0.3,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "bush",
-          "x": 236.49,
-          "y": 164.99,
+          "x": 239.98,
+          "y": 163.71,
           "r": 0.3,
           "v": 0,
           "layout": "gloamfen_design_v1"
@@ -292409,7 +292153,7 @@
           "x": 54.5,
           "y": 61.5,
           "r": 0.18,
-          "v": 2,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292417,7 +292161,7 @@
           "x": 51.5,
           "y": 69.5,
           "r": 0.18,
-          "v": 3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292425,7 +292169,7 @@
           "x": 83.5,
           "y": 78.5,
           "r": 0.18,
-          "v": 0,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292449,7 +292193,7 @@
           "x": 106.5,
           "y": 114.5,
           "r": 0.18,
-          "v": 1,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292457,7 +292201,7 @@
           "x": 75.5,
           "y": 124.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292481,7 +292225,7 @@
           "x": 192.5,
           "y": 113.5,
           "r": 0.18,
-          "v": 3,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292489,7 +292233,7 @@
           "x": 216.5,
           "y": 116.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292497,7 +292241,7 @@
           "x": 224.5,
           "y": 126.5,
           "r": 0.18,
-          "v": 1,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292505,7 +292249,7 @@
           "x": 235.5,
           "y": 118.5,
           "r": 0.18,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292519,14 +292263,14 @@
         {
           "kind": "lamp",
           "x": 231.5,
-          "y": 156.5,
+          "y": 157.5,
           "r": 0.18,
-          "v": 0,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "lamp",
-          "x": 239.5,
+          "x": 238.5,
           "y": 163.5,
           "r": 0.18,
           "v": 1,
@@ -292534,32 +292278,24 @@
         },
         {
           "kind": "lamp",
-          "x": 241.5,
-          "y": 165.5,
+          "x": 238.5,
+          "y": 167.5,
           "r": 0.18,
           "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "lamp",
-          "x": 215.5,
-          "y": 174.5,
-          "r": 0.18,
-          "v": 2,
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "kind": "lamp",
-          "x": 218.5,
-          "y": 176.5,
+          "x": 212.5,
+          "y": 172.5,
           "r": 0.18,
           "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "lamp",
-          "x": 222.5,
-          "y": 174.5,
+          "x": 224.5,
+          "y": 175.5,
           "r": 0.18,
           "v": 0,
           "layout": "gloamfen_design_v1"
@@ -292569,7 +292305,7 @@
           "x": 186.5,
           "y": 181.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292577,7 +292313,7 @@
           "x": 192.5,
           "y": 182.5,
           "r": 0.18,
-          "v": 1,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292585,7 +292321,7 @@
           "x": 138.5,
           "y": 177.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292593,7 +292329,7 @@
           "x": 144.5,
           "y": 192.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292601,15 +292337,15 @@
           "x": 187.5,
           "y": 197.5,
           "r": 0.18,
-          "v": 2,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
           "kind": "lamp",
-          "x": 197.5,
-          "y": 201.5,
+          "x": 194.5,
+          "y": 203.5,
           "r": 0.18,
-          "v": 3,
+          "v": 2,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292617,7 +292353,7 @@
           "x": 96.5,
           "y": 156.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292625,7 +292361,7 @@
           "x": 114.5,
           "y": 99.5,
           "r": 0.18,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292633,7 +292369,7 @@
           "x": 150.5,
           "y": 98.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292649,7 +292385,7 @@
           "x": 236.5,
           "y": 89.5,
           "r": 0.18,
-          "v": 2,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292657,7 +292393,7 @@
           "x": 121.5,
           "y": 69.5,
           "r": 0.18,
-          "v": 2,
+          "v": 1,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292673,7 +292409,7 @@
           "x": 44.5,
           "y": 76.5,
           "r": 0.18,
-          "v": 1,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292681,7 +292417,7 @@
           "x": 46.5,
           "y": 94.5,
           "r": 0.18,
-          "v": 0,
+          "v": 3,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292689,7 +292425,7 @@
           "x": 83.5,
           "y": 149.5,
           "r": 0.18,
-          "v": 2,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         },
         {
@@ -292697,62 +292433,56 @@
           "x": 161.5,
           "y": 239.5,
           "r": 0.18,
-          "v": 3,
+          "v": 0,
           "layout": "gloamfen_design_v1"
         }
       ],
       "slimes": [
         {
-          "x": 187.83,
-          "y": 107.86,
+          "x": 185.19,
+          "y": 107.16,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 211.86,
-          "y": 63.9,
+          "x": 211.16,
+          "y": 63.89,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 139.1,
-          "y": 83.68,
+          "x": 141.62,
+          "y": 80.26,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 152.4,
-          "y": 57.97,
+          "x": 142.77,
+          "y": 53.85,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 191.97,
-          "y": 60.48,
+          "x": 143.95,
+          "y": 92.76,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 166.4,
-          "y": 57.12,
+          "x": 156.33,
+          "y": 55.1,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 187.13,
+          "x": 186.13,
           "y": 120.93,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 133.05,
-          "y": 51.78,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 144.84,
-          "y": 93.46,
+          "x": 168.21,
+          "y": 60.39,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
@@ -292763,1263 +292493,1257 @@
           "layout": "gloamfen_design_v1"
         },
         {
+          "x": 191.63,
+          "y": 60.72,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 145.86,
+          "y": 64.9,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
           "x": 180.16,
           "y": 60.93,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 143.72,
-          "y": 67.81,
+          "x": 131.71,
+          "y": 85.18,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 140.94,
-          "y": 56.82,
+          "x": 194.38,
+          "y": 113.64,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 134.53,
-          "y": 74.95,
+          "x": 97.44,
+          "y": 47.69,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 109.63,
-          "y": 52.88,
+          "x": 76.33,
+          "y": 60.46,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 112.62,
-          "y": 82.74,
+          "x": 116.53,
+          "y": 72.6,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 94.88,
-          "y": 74.48,
+          "x": 112.84,
+          "y": 84.28,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 81.95,
-          "y": 67.67,
+          "x": 91.21,
+          "y": 62.43,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 74.52,
-          "y": 56.89,
+          "x": 118.82,
+          "y": 48.11,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 88.52,
-          "y": 58.5,
+          "x": 100.8,
+          "y": 68.73,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 116.77,
-          "y": 65.78,
+          "x": 107.65,
+          "y": 53.0,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 125.49,
-          "y": 83.59,
+          "x": 127.84,
+          "y": 73.04,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 121.23,
-          "y": 51.23,
+          "x": 83.17,
+          "y": 68.09,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 77.32,
-          "y": 45.39,
+          "x": 90.35,
+          "y": 41.16,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 128.06,
-          "y": 61.9,
+          "x": 104.71,
+          "y": 60.86,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 108.14,
-          "y": 71.83,
+          "x": 47.7,
+          "y": 33.59,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 40.03,
-          "y": 36.5,
+          "x": 47.79,
+          "y": 73.39,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 58.86,
-          "y": 62.8,
+          "x": 66.96,
+          "y": 39.49,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 58.8,
-          "y": 35.68,
+          "x": 61.59,
+          "y": 62.43,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 66.37,
-          "y": 48.68,
+          "x": 44.64,
+          "y": 50.69,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 37.18,
-          "y": 49.73,
+          "x": 59.39,
+          "y": 73.3,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 61.55,
-          "y": 78.67,
+          "x": 111.13,
+          "y": 98.11,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 34.67,
-          "y": 62.86,
+          "x": 29.53,
+          "y": 35.02,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 70.8,
-          "y": 36.33,
+          "x": 100.61,
+          "y": 80.43,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 47.08,
-          "y": 27.26,
+          "x": 36.78,
+          "y": 68.6,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 33.93,
-          "y": 26.86,
+          "x": 33.48,
+          "y": 49.56,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 26.4,
-          "y": 16.22,
+          "x": 58.78,
+          "y": 48.73,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 109.4,
-          "y": 96.44,
+          "x": 43.79,
+          "y": 85.47,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 48.66,
-          "y": 50.82,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 29.13,
-          "y": 41.45,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 76.05,
-          "y": 78.85,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 51.31,
-          "y": 73.19,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 49.28,
-          "y": 39.86,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 102.64,
-          "y": 79.71,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 100.13,
-          "y": 99.81,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 66.62,
-          "y": 59.62,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 58.42,
-          "y": 48.9,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 84.44,
-          "y": 75.71,
+          "x": 75.97,
+          "y": 78.98,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
           "x": 59.22,
-          "y": 70.77,
+          "y": 31.65,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 55.28,
-          "y": 28.25,
+          "x": 101.86,
+          "y": 100.5,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 40.87,
-          "y": 67.78,
+          "x": 37.37,
+          "y": 40.2,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 95.89,
-          "y": 81.21,
+          "x": 35.29,
+          "y": 59.14,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 69.19,
-          "y": 142.47,
+          "x": 96.78,
+          "y": 89.17,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 110.49,
-          "y": 116.77,
+          "x": 37.85,
+          "y": 30.68,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 62.09,
-          "y": 128.5,
+          "x": 108.82,
+          "y": 77.21,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 86.54,
-          "y": 150.84,
+          "x": 51.21,
+          "y": 41.01,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 97.9,
-          "y": 146.93,
+          "x": 39.13,
+          "y": 77.48,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 74.29,
-          "y": 152.66,
+          "x": 75.47,
+          "y": 37.02,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 70.56,
-          "y": 124.05,
+          "x": 56.11,
+          "y": 56.31,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 68.75,
-          "y": 134.24,
+          "x": 26.2,
+          "y": 15.77,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 97.19,
-          "y": 107.3,
+          "x": 75.94,
+          "y": 144.88,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 76.65,
-          "y": 128.1,
+          "x": 103.57,
+          "y": 120.41,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 85.52,
-          "y": 131.34,
+          "x": 86.76,
+          "y": 150.52,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 74.18,
-          "y": 138.26,
+          "x": 61.82,
+          "y": 127.88,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 80.27,
-          "y": 151.09,
+          "x": 114.56,
+          "y": 113.92,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 103.86,
-          "y": 104.21,
+          "x": 70.33,
+          "y": 122.96,
           "kind": "toad",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 121.54,
-          "y": 123.84,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 150.49,
-          "y": 129.81,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 117.66,
-          "y": 98.61,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 157.51,
-          "y": 126.02,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 108.35,
-          "y": 151.37,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 98.87,
-          "y": 190.7,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 91.14,
-          "y": 177.49,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 108.44,
-          "y": 177.42,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 114.75,
-          "y": 199.34,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 98.47,
-          "y": 155.02,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 221.08,
-          "y": 71.82,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 241.54,
-          "y": 76.75,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 241.05,
-          "y": 88.46,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 232.48,
-          "y": 67.77,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 230.67,
-          "y": 77.44,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 242.73,
-          "y": 68.7,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 233.21,
-          "y": 85.41,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 222.34,
-          "y": 104.5,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 214.34,
-          "y": 70.95,
-          "kind": "toad",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 101.37,
-          "y": 63.46,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 97.3,
-          "y": 48.22,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 90.02,
-          "y": 41.26,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 124.69,
-          "y": 72.57,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 43.36,
-          "y": 80.32,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 96.85,
-          "y": 89.16,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 40.22,
-          "y": 20.36,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 99.53,
-          "y": 114.92,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 102.61,
-          "y": 130.93,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 45.12,
-          "y": 93.98,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 86.23,
-          "y": 141.44,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 98.55,
-          "y": 138.82,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 104.26,
-          "y": 122.56,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 77.15,
-          "y": 144.32,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 105.21,
-          "y": 110.25,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 58.95,
-          "y": 122.07,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 97.94,
-          "y": 124.28,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 148.48,
-          "y": 141.81,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 112.72,
-          "y": 138.1,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 135.75,
-          "y": 126.4,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 153.1,
-          "y": 118.33,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 172.78,
-          "y": 119.14,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 119.87,
-          "y": 106.36,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 149.63,
-          "y": 103.47,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 128.36,
-          "y": 115.02,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 159.92,
-          "y": 137.16,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 125.19,
-          "y": 134.89,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 154.83,
-          "y": 148.82,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 140.1,
-          "y": 117.55,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 158.87,
+          "x": 105.13,
           "y": 110.08,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 87.42,
+          "y": 142.53,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 96.26,
+          "y": 146.84,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 74.1,
+          "y": 152.84,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 96.39,
+          "y": 118.28,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 71.63,
+          "y": 140.04,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 77.24,
+          "y": 128.6,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 59.4,
+          "y": 122.03,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 150.24,
+          "y": 103.29,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 130.76,
+          "y": 129.39,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 150.53,
+          "y": 136.89,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 168.42,
+          "y": 126.42,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 107.93,
+          "y": 154.89,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 94.65,
+          "y": 172.31,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 110.76,
+          "y": 176.67,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 85.3,
+          "y": 172.45,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 79.34,
+          "y": 160.05,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 123.48,
+          "y": 220.64,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 117.5,
+          "y": 229.95,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 163.66,
+          "y": 238.54,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 181.45,
+          "y": 229.66,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 227.3,
+          "y": 67.94,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 238.39,
+          "y": 95.66,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 217.32,
+          "y": 71.28,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 230.31,
+          "y": 77.58,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 231.87,
+          "y": 93.86,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 235.07,
+          "y": 70.2,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 219.16,
+          "y": 65.81,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 236.29,
+          "y": 108.45,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 243.95,
+          "y": 93.65,
+          "kind": "toad",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 128.73,
+          "y": 60.59,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 118.75,
-          "y": 114.62,
+          "x": 77.05,
+          "y": 45.21,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 112.38,
-          "y": 191.64,
+          "x": 90.7,
+          "y": 73.64,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 89.91,
-          "y": 166.14,
+          "x": 130.2,
+          "y": 51.08,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 103.96,
-          "y": 166.78,
+          "x": 33.1,
+          "y": 20.81,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 118.84,
-          "y": 207.02,
+          "x": 43.83,
+          "y": 23.37,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 106.26,
-          "y": 205.6,
+          "x": 69.42,
+          "y": 52.86,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 125.19,
-          "y": 219.06,
+          "x": 65.21,
+          "y": 138.63,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 95.67,
+          "y": 111.04,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 102.65,
+          "y": 140.45,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 100.97,
+          "y": 129.5,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 70.93,
+          "y": 131.69,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 45.48,
+          "y": 93.87,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 95.11,
+          "y": 100.13,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 69.18,
+          "y": 145.78,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 108.08,
+          "y": 115.64,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 101.62,
+          "y": 114.65,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 155.69,
+          "y": 113.34,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 120.53,
+          "y": 134.85,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 122.88,
+          "y": 123.04,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 160.6,
+          "y": 135.41,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 154.06,
+          "y": 145.9,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 172.69,
+          "y": 117.06,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 134.76,
+          "y": 119.87,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 149.95,
+          "y": 124.41,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 120.26,
+          "y": 104.45,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 112.88,
+          "y": 141.76,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 128.71,
+          "y": 109.5,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 144.01,
+          "y": 147.83,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 122.13,
+          "y": 87.03,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 157.58,
+          "y": 127.22,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 97.65,
+          "y": 185.9,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 104.49,
+          "y": 166.83,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 105.7,
+          "y": 205.8,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 120.08,
+          "y": 213.11,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 87.63,
+          "y": 162.83,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 109.74,
+          "y": 190.42,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 130.47,
+          "y": 221.55,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 115.97,
+          "y": 201.47,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 110.48,
+          "y": 215.2,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 98.8,
+          "y": 155.65,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 90.86,
+          "y": 179.85,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 103.38,
+          "y": 198.17,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
           "x": 112.35,
-          "y": 215.95,
+          "y": 148.77,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 82.24,
-          "y": 160.27,
+          "x": 105.04,
+          "y": 148.64,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 114.43,
-          "y": 146.16,
-          "kind": "croc",
+          "x": 157.1,
+          "y": 177.62,
+          "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 133.36,
-          "y": 221.73,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 108.27,
-          "y": 159.36,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 103.06,
-          "y": 198.3,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 105.68,
-          "y": 142.43,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 85.97,
-          "y": 172.33,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 161.49,
-          "y": 205.29,
+          "x": 145.34,
+          "y": 168.28,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 142.87,
-          "y": 164.91,
+          "x": 145.72,
+          "y": 191.93,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 154.66,
-          "y": 164.79,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 154.23,
-          "y": 190.53,
+          "x": 160.78,
+          "y": 166.22,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 155.24,
-          "y": 175.78,
+          "x": 160.45,
+          "y": 207.49,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 142.54,
-          "y": 151.11,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 144.21,
-          "y": 195.51,
+          "x": 154.82,
+          "y": 156.92,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 137.03,
-          "y": 175.01,
+          "x": 139.12,
+          "y": 157.77,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 139.37,
-          "y": 185.93,
+          "x": 136.09,
+          "y": 171.72,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 159.81,
-          "y": 156.74,
+          "x": 149.76,
+          "y": 200.96,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 148.44,
-          "y": 159.18,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 145.43,
-          "y": 172.58,
+          "x": 154.94,
+          "y": 188.31,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 162.79,
-          "y": 165.87,
+          "x": 138.35,
+          "y": 182.03,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 145.27,
+          "y": 154.96,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 142.58,
+          "y": 174.48,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 151.67,
-          "y": 197.28,
+          "x": 150.93,
+          "y": 163.3,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 189.55,
-          "y": 226.71,
+          "x": 186.83,
+          "y": 223.38,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 117.59,
-          "y": 228.66,
+          "x": 163.16,
+          "y": 255.74,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 163.39,
-          "y": 255.91,
+          "x": 175.69,
+          "y": 230.01,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 181.22,
-          "y": 227.06,
+          "x": 187.28,
+          "y": 230.21,
           "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 175.95,
-          "y": 232.25,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 164.18,
-          "y": 239.47,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 169.34,
-          "y": 252.16,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 186.55,
-          "y": 231.78,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 164.52,
-          "y": 233.15,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 163.04,
-          "y": 250.09,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 143.22,
-          "y": 260.05,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 157.85,
-          "y": 265.54,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 154.62,
-          "y": 259.04,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 147.63,
-          "y": 263.91,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 171.95,
-          "y": 135.13,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 182.83,
-          "y": 174.15,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 174.22,
-          "y": 155.86,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 229.27,
-          "y": 134.51,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 228.32,
-          "y": 110.38,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 188.92,
-          "y": 186.84,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 241.36,
-          "y": 139.14,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 214.68,
-          "y": 106.19,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 200.49,
-          "y": 184.38,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 221.56,
-          "y": 123.87,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 203.61,
-          "y": 112.28,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 169.11,
-          "y": 176.03,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 217.87,
-          "y": 134.3,
-          "kind": "croc",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 232.69,
-          "y": 121.77,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 188.35,
-          "y": 164.11,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 207.88,
-          "y": 122.82,
-          "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
           "x": 169.26,
-          "y": 146.03,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 206.81,
-          "y": 134.55,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 209.66,
-          "y": 179.4,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 215.14,
-          "y": 116.23,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 174.66,
-          "y": 165.95,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 169.45,
-          "y": 127.54,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 206.28,
-          "y": 103.31,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 195.88,
-          "y": 107.05,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 193.82,
-          "y": 179.07,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 189.24,
-          "y": 128.62,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 182.56,
-          "y": 157.84,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 185.94,
-          "y": 180.68,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 228.75,
-          "y": 127.77,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 224.48,
-          "y": 117.1,
+          "y": 252.33,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 220.24,
-          "y": 111.56,
+          "x": 176.23,
+          "y": 236.32,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 146.31,
+          "y": 260.61,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 195.91,
-          "y": 113.98,
+          "x": 157.67,
+          "y": 265.51,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 154.65,
+          "y": 259.24,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 221.41,
+          "y": 125.86,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 197.7,
+          "y": 179.12,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 184.59,
+          "y": 176.83,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 214.4,
+          "y": 113.09,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 170.79,
+          "y": 142.04,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 186.93,
+          "y": 162.95,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 227.71,
+          "y": 116.09,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 204.37,
+          "y": 107.94,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 172.97,
+          "y": 155.96,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 243.3,
+          "y": 144.44,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 173.17,
+          "y": 176.32,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 205.51,
+          "y": 119.96,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 208.88,
+          "y": 181.38,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 229.02,
+          "y": 133.97,
+          "kind": "croc",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 188.66,
+          "y": 187.63,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 207.09,
+          "y": 134.49,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 221.78,
+          "y": 107.26,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 201.81,
+          "y": 188.85,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 217.18,
+          "y": 134.91,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 243.68,
+          "y": 135.05,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 174.5,
+          "y": 165.48,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 173.79,
+          "y": 133.17,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 189.12,
+          "y": 128.52,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 235.8,
+          "y": 116.95,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 230.61,
+          "y": 124.3,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 189.54,
+          "y": 170.46,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 216.43,
+          "y": 120.54,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 214.13,
+          "y": 105.07,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 170.17,
+          "y": 149.27,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
           "x": 182.14,
-          "y": 148.07,
+          "y": 169.2,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 233.75,
-          "y": 114.49,
+          "x": 196.86,
+          "y": 107.24,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 231.39,
-          "y": 93.84,
+          "x": 182.58,
+          "y": 147.45,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 182.32,
+          "y": 156.21,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 228.68,
+          "y": 108.24,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 238.35,
+          "y": 77.65,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 239.09,
-          "y": 104.79,
+          "x": 242.38,
+          "y": 106.79,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 222.18,
-          "y": 65.0,
+          "x": 242.77,
+          "y": 87.3,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 238.69,
-          "y": 95.63,
+          "x": 242.37,
+          "y": 68.0,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 240.67,
-          "y": 112.85,
+          "x": 233.07,
+          "y": 85.92,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 236.63,
-          "y": 72.55,
+          "x": 224.27,
+          "y": 72.9,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 228.23,
-          "y": 103.45,
+          "x": 242.85,
+          "y": 112.9,
           "kind": "croc",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 168.93,
-          "y": 188.08,
+          "x": 200.03,
+          "y": 219.28,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 242.97,
-          "y": 156.5,
+          "x": 241.61,
+          "y": 166.61,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 228.38,
-          "y": 192.32,
+          "x": 183.31,
+          "y": 202.88,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 228.72,
+          "y": 191.89,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 216.28,
-          "y": 200.52,
+          "x": 201.68,
+          "y": 203.5,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 194.46,
-          "y": 202.7,
+          "x": 164.7,
+          "y": 195.47,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 214.74,
+          "y": 202.48,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 220.91,
+          "y": 183.67,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 242.75,
+          "y": 178.49,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 181.59,
-          "y": 204.29,
+          "x": 176.57,
+          "y": 188.37,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 242.08,
-          "y": 168.02,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 207.68,
-          "y": 207.38,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 201.11,
-          "y": 218.06,
+          "x": 172.36,
+          "y": 207.65,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 215.25,
-          "y": 188.91,
+          "x": 243.5,
+          "y": 155.7,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 209.4,
+          "y": 210.71,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 205.73,
-          "y": 195.48,
+          "x": 192.87,
+          "y": 198.59,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 243.4,
-          "y": 181.7,
+          "x": 174.79,
+          "y": 197.78,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 170.72,
-          "y": 199.07,
+          "x": 167.32,
+          "y": 183.92,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 220.17,
-          "y": 179.28,
+          "x": 219.49,
+          "y": 194.4,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 209.84,
+          "y": 195.86,
+          "kind": "knight",
+          "layout": "gloamfen_design_v1"
+        },
+        {
+          "x": 195.27,
+          "y": 208.27,
           "kind": "hydra",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 176.55,
-          "y": 182.27,
+          "x": 221.57,
+          "y": 201.54,
           "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
-          "x": 188.05,
-          "y": 216.58,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 196.13,
-          "y": 193.01,
+          "x": 201.08,
+          "y": 212.49,
           "kind": "hydra",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 196.06,
-          "y": 211.28,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 163.34,
-          "y": 195.89,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 169.74,
-          "y": 207.22,
-          "kind": "knight",
-          "layout": "gloamfen_design_v1"
-        },
-        {
-          "x": 239.03,
-          "y": 148.28,
-          "kind": "knight",
           "layout": "gloamfen_design_v1"
         },
         {
@@ -295111,12 +294835,6 @@
           "description": "Cross the causeway to Hydra Isle in the middle of the Mere and defeat two Mire Hydras. Pell must know what lives there.",
           "objectives": [
             {
-              "kind": "visit",
-              "target": "fen_isle",
-              "label": "Reach Hydra Isle",
-              "count": 1
-            },
-            {
               "kind": "kill",
               "target": "hydra",
               "label": "Defeat Mire Hydras",
@@ -295444,7 +295162,7 @@
           "rewardGold": 700,
           "requires": "fen_rh_wicks",
           "repeatable": false,
-          "rewardItem": "necklace_moonstone_l15_blue",
+          "rewardItem": "pants_wayfarer_l20_blue",
           "recommendedPlayers": 3
         },
         {
@@ -295594,14 +295312,20 @@
           "rewardGold": 600,
           "requires": "fen_gr_fort",
           "repeatable": false,
-          "rewardItem": "pants_wayfarer_l20_green"
+          "rewardItem": "pants_wayfarer_l15_green"
         },
         {
           "id": "fen_gr_fangs",
           "title": "Fangs for the Surveyor",
           "npc": "fen_gr_per",
-          "description": "A hydra fang holds a drafting pen steady better than anything else Per has tried, which says more about hydras than it does about pens. Bring him three.",
+          "description": "A hydra fang holds a drafting pen steady better than anything else Per has tried, which says more about hydras than it does about pens. Walk out to Hydra Isle and bring him three.",
           "objectives": [
+            {
+              "kind": "visit",
+              "target": "fen_isle",
+              "label": "Reach Hydra Isle",
+              "count": 1
+            },
             {
               "kind": "bring",
               "target": "hydra_fang",
@@ -295722,7 +295446,7 @@
           "rewardGold": 520,
           "requires": "fen_toads",
           "repeatable": false,
-          "rewardItem": "necklace_moonstone_l20_green"
+          "rewardItem": "necklace_moonstone_l15_green"
         }
       ],
       "city": {
