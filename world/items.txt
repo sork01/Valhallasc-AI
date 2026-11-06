@@ -42,6 +42,27 @@
     "sell": 40
   },
   {
+    "id": "tusker_bristle",
+    "name": "Old Tusker Bristle",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 40
+  },
+  {
+    "id": "tidecrusher_shard",
+    "name": "Tidecrusher Shell Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 40
+  },
+  {
+    "id": "queen_stinger",
+    "name": "Orchard Queen's Stinger",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 40
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",

@@ -13,7 +13,7 @@
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
   // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
-  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null, exitRoutes:WORLD_MAP.exitRoutes||[], exitArches: WORLD_MAP.exitArches || [], shape: WORLD_MAP.shape, shapeFloor: WORLD_MAP.shapeFloor, shapeEdge: WORLD_MAP.shapeEdge },
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null, exitRoutes:WORLD_MAP.exitRoutes||[], exitArches: WORLD_MAP.exitArches || [], camps: WORLD_MAP.camps || [], places: WORLD_MAP.places || [], groundSpans: WORLD_MAP.groundSpans, regions: WORLD_MAP.regions, shape: WORLD_MAP.shape, shapeFloor: WORLD_MAP.shapeFloor, shapeEdge: WORLD_MAP.shapeEdge },
     ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
   let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
@@ -55,6 +55,7 @@
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn; SHIFT = zdef.shape ? zdef.shape.offset : [0, 0];
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
+    map.gk = null; if (zdef.groundSpans) { map.gk = new Uint8Array(MAP * MAP); for (const [gy, a, b, k] of zdef.groundSpans) map.gk.fill(k, gy * MAP + a, gy * MAP + b + 1); }
     const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
@@ -129,7 +130,7 @@
     // A border you cross anywhere (a seam): both zones draw the same mix of their two floors around the line, seen from
     // their own side, so the ground does not change when the server moves you across. s is the signed distance to the
     // line, positive on this side; this side's weight toward the neighbour is .5 at the line, falling to 0 at BLEND_REACH.
-    map.seamBy = {}; map.ghosts = [];
+    map.seamBy = {}; map.ghosts = []; map.ghostWater = [];
     const nbs = zdef.shape?.neighbours || [];
     for (const portal of zdef.portals || []) if (portal.seam) {
       const seam = portal.seam, nb = portal.to; map.seamBy[nb] = seam;
@@ -152,7 +153,9 @@
       const [shx, shy] = seam.shift;
       for (const o of nz.objects || []) {
         const art = City.art[o.kind];
-        if (set && !WALL_KINDS.has(o.kind) ? !set[o.kind] : !art || art.ground || o.kind === 'void') continue;   // a landmark wall carries on across a seam, whatever the theme
+        // Water is drawn by drawWater, not as an object: a meadow pond near a seam must already be there before you cross.
+        if (o.kind === 'water' && nz.theme === 'meadow') { const wx = o.x - shx, wy = o.y - shy; if (!(wx >= 0 && wy >= 0 && wx < MAP && wy < MAP && map.floor[(wy | 0) * MAP + (wx | 0)])) (map.ghostWater ||= []).push({ ...o, x: wx, y: wy }); continue; }
+        if (set && !WALL_KINDS.has(o.kind) && !(nz.theme === 'meadow' && art && !art.ground) ? !set[o.kind] : !art || art.ground || o.kind === 'void') continue;   // a landmark wall carries on across a seam, whatever the theme
         const gx = o.x - shx, gy = o.y - shy;
         // The neighbour can lie past this zone's own grid (the meadow is south of the Crags' 208 tiles): no grid limit, only the rule that it must not lie on our own land.
         if (gx >= 0 && gy >= 0 && gx < MAP && gy < MAP && map.floor[(gy | 0) * MAP + (gx | 0)]) continue;
@@ -251,6 +254,23 @@
     let d = 99; for (const p of nz.paths || PATHS) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
     if (nz.theme === 'meadow') { const o = nz.shape ? nz.shape.offset : [0, 0]; d = Math.min(d, Math.hypot(cx - 36 - o[0], cy - 36 - o[1]) - 2.4); }
     return { tone, dirt: d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0 };
+  }
+  // Greenmeadow's ground classes (scripts/greenmeadow_design.py, `groundSpans`): sand, tilled field, downs, forest floor, clover, scarp.
+  function meadowGround(k, tone, alt, y) {
+    if (k === 1) return `hsl(${44 + tone * 6}, ${50 + tone * 8}%, ${70 + tone * 7 + alt}%)`;
+    if (k === 2) return `hsl(${26 + tone * 6}, 36%, ${(y % 3 ? 34 : 28) + tone * 6 + alt}%)`;
+    if (k === 3) return `hsl(${72 + tone * 14}, ${32 + tone * 10}%, ${45 + tone * 10 + alt}%)`;
+    if (k === 4) return `hsl(${112 + tone * 14}, ${38 + tone * 10}%, ${24 + tone * 9 + alt}%)`;
+    if (k === 5) return `hsl(${90 + tone * 14}, ${50 + tone * 10}%, ${41 + tone * 11 + alt}%)`;
+    return `hsl(${34 + tone * 10}, ${14 + tone * 8}%, ${39 + tone * 9 + alt}%)`;
+  }
+  const MEADOW_MINI = ['', '#e2cf9a', '#8a6a48', '#98a460', '#3e6c3e', '#80aa58', '#827868'];
+  // The name of the part of Greenmeadow at a point (`regions`: names and [y, x0, x1, region + 1] runs).
+  let regionCells = null;
+  function regionAt(x, y) {
+    const R = ZONES[0].regions; if (!R) return null;
+    if (!regionCells) { regionCells = new Uint8Array(ZONES[0].size ** 2); for (const [ry, a, b, k] of R.spans) regionCells.fill(k, ry * ZONES[0].size + a, ry * ZONES[0].size + b + 1); }
+    return R.names[regionCells[(y | 0) * ZONES[0].size + (x | 0)] - 1] || null;
   }
   // The ground of another zone's theme, to blend toward it where two provinces meet.
   function groundOf(theme, tone, dirt, alt) {
@@ -726,7 +746,7 @@
         : fen ? (dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`)
         : frost ? (dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`)
         : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
-        : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
+        : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : map.gk?.[i] ? meadowGround(map.gk[i], tone, alt, y) : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
       if (map.blendD && map.blendD[i] && map.blendW[i] > .01) {   // the ground turns into the neighbour's toward their shared border
         const nb = (zdef.shape?.neighbours || [])[map.blendNb[i] - 65], seam = map.seamBy?.[nb], nz = ZONES[nb];
@@ -921,6 +941,9 @@
         } else if (r() < .05) { const [qx, qy] = inTile(); g.fillStyle = '#3a363f'; g.strokeStyle = OL; g.lineWidth = 1.4; g.beginPath(); g.ellipse(qx, qy - 2, 4, 3, 0, 0, 6.283); g.fill(); g.stroke(); }
       } else if (dirt) {
         for (let k = 0; k < 3; k++) { const [qx, qy] = inTile(); g.fillStyle = r() < .5 ? 'rgba(120,80,40,.35)' : 'rgba(255,225,170,.28)'; g.beginPath(); g.ellipse(qx, qy, 2 + r() * 3, 1.2 + r() * 1.5, 0, 0, 6.283); g.fill(); }
+      } else if (map.gk?.[i] === 1 || map.gk?.[i] === 2 || map.gk?.[i] === 6) {         // sand, tilled earth, bare stony ground: grit, no grass
+        const q = map.gk[i], tint = q === 1 ? ['rgba(160,130,80,.3)', 'rgba(255,245,215,.4)'] : q === 2 ? ['rgba(60,40,25,.35)', 'rgba(170,130,90,.3)'] : ['rgba(60,55,50,.35)', 'rgba(190,180,160,.3)'];
+        for (let k = 0; k < 3; k++) { const [qx, qy] = inTile(); g.fillStyle = tint[k & 1]; g.beginPath(); g.ellipse(qx, qy, 1.5 + r() * 3, 1 + r() * 1.3, 0, 0, 6.283); g.fill(); }
       } else {
         g.lineCap = 'round';
         const tufts = Math.floor(r() * 2.4);
@@ -1021,6 +1044,9 @@
     wraith: { name: 'Ash Wraith', scale: 1, top: 88, col: ['#746b8e', '#383250', '#15121d'] },
     golem: { name: 'Basalt Golem', scale: 1.2, top: 86, col: ['#9a939a', '#544f58', '#24212a'] },
     cinderlord: { name: 'Cinderlord', elite: true, scale: 1.55, top: 90, col: ['#ffe095', '#e96d25', '#392c32'] },
+    oldtusker: { name: 'Old Tusker', elite: true, scale: 1.55, top: 90, col: ['#8a6548', '#44291e', '#120a08'] },
+    tidecrusher: { name: 'Tidecrusher', elite: true, scale: 1.55, top: 90, col: ['#5cae94', '#e08a3a', '#0c2422'] },
+    orchardqueen: { name: 'The Orchard Queen', elite: true, scale: 1.55, top: 90, col: ['#f8d040', '#322c40', '#0c0a12'] },
     crab: { name: 'Rime Crab', scale: 1.1, top: 53, col: ['#d8f2ff', '#6fb3dc', '#2d5f8a'] },
     wolf: { name: 'Frostfang Wolf', scale: 1.1, top: 67, col: ['#f2f6fa', '#9fb4c8', '#4a5d74'] },
     yeti: { name: 'Glacier Yeti', scale: 1.2, top: 85, col: ['#f4f8fc', '#b9cbdc', '#5e7690'] },
@@ -1152,6 +1178,7 @@
   const CATHEDRAL_KINDS = CATHEDRAL_ENEMIES.map(e => e.kind);
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:e.elite !== false, boss:e.boss, scale:e.kind.startsWith('cf_') ? (e.add ? 1.25 : e.raidPack ? 1.95 : e.kind === 'cf_eldmarr' ? 3.2 : 2.6) : e.kind.startsWith('null_') ? (e.boss ? 2.6 : 1.9) : e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   if (window.Locale?.language === 'sv') for (const d of Object.values(SLIME)) d.name = Locale.translate(d.name); // nameplates, log lines and the boss bar read these
+  const MEADOW_ELITES = ['oldtusker', 'tidecrusher', 'orchardqueen'];
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
@@ -1191,11 +1218,12 @@
   const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
   const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
   const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
+  const areaName = () => zone > 0 ? zdef.name : hubAt(hero.x, hero.y)?.name ?? regionAt(hero.x, hero.y) ?? 'Greenmeadow';
   function emitHud(force) {
     // Server fight state selects the raid finale; proximity and a selected target do not.
     const raidFinalFight = !!zdef.raid && (window.BossMech?.fights || []).some(f =>
       slimes.some(s => s.id === f.boss && s.kind === zdef.final_boss && !s.dead));
-    const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, festivalBuff:hero.festivalBuff, festivalDance:hero.festivalDance, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
+    const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, festivalBuff:hero.festivalBuff, festivalDance:hero.festivalDance, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: areaName(), zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -3168,7 +3196,7 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  let meadowEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   // Share the renderer's bank selection with loading, including borrowed boss/add art.
   // Loading every zone here used to start hundreds of image requests at login.
   let slimeSpriteConfig = null;
@@ -3186,6 +3214,7 @@
     [CAIRN_KINDS, () => cairnSrc, loadCairnSprites],
     [FROSTWAKE_KINDS, () => frostwakeSrc, loadFrostwakeSprites],
     [LAPIS_KINDS, () => lapisSrc, loadLapisSprites],
+    [MEADOW_ELITES, () => meadowEliteSrc, loadMeadowElites],
     [WORLDHEART_KINDS, () => worldheartSrc, loadWorldheartSprites],
     [TANGLECROWN_KINDS, () => tanglecrownSrc, loadTanglecrownSprites],
     [RIBBONWILD_KINDS, () => ribbonwildSrc, loadRibbonwildSprites],
@@ -3443,6 +3472,13 @@
     return fetch('assets/worldheart.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/worldheart_${k}.png`;
     }))).then(imgs=>{worldheartSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{worldheartSrc=null;});
+  }
+  function loadMeadowElites() {
+    if (meadowEliteSrc) return;
+    if (stubOn()) { meadowEliteSrc = stubEnemies(MEADOW_ELITES, { oldtusker: '#864', tidecrusher: '#5a9', orchardqueen: '#ec3' }); return; }
+    return fetch('assets/greenmeadow.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/greenmeadow_${k}.png`;
+    }))).then(imgs => { meadowEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { meadowEliteSrc = null; });
   }
   function loadLapisSprites() {
     if (lapisSrc) return;
@@ -3746,14 +3782,14 @@
   }
   // The mere: water discs are ground decals (and obstacles, kind 'water'), drawn in whole-lake passes so overlapping
   // discs merge into one lake: muddy rim, algae edge, black-teal depths, then moving ripples, lily pads and glints.
-  function drawWater(g, t) {
+  function drawWater(g, t, ghost) {
     const rows = [];
-    for (const o of objects) if (o.kind === 'water') { const [sx, sy] = w2s(o.x, o.y); if (sx > -140 && sx < VW + 140 && sy > -90 && sy < VH + 90) rows.push([o, sx, sy]); }
+    for (const o of ghost ? map.ghostWater : objects) if (o.kind === 'water') { const [sx, sy] = w2s(o.x, o.y); if (sx > -140 && sx < VW + 140 && sy > -90 && sy < VH + 90) rows.push([o, sx, sy]); }
     if (!rows.length) return;
     const ex = o => o.r * TW * .7071, ey = o => o.r * TH * .7071;
     const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
     const shimmer = o => .5 + .5 * Math.sin(t * .8 + o.x * .45 + o.y * .33);
-    const river = zdef.theme === 'wyrd', meadow = zone === 0 || zdef.theme === 'sunward';
+    const river = !ghost && zdef.theme === 'wyrd', meadow = ghost || zone === 0 || zdef.theme === 'sunward';
     pass(1.36, meadow ? '#a1ad65' : river ? '#3c2c1c' : '#2c2a1c');
     pass(1.2, meadow ? '#74a57b' : river ? '#6a7a3a' : '#3c5a30');
     pass(1.04, o => meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
@@ -4334,6 +4370,7 @@
       City.animateObject(g, o, sx, sy, t);
     }
     if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward') drawWater(g, t);
+    if (map.ghostWater?.length) drawWater(g, t, true);
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);
     if (zdef.theme === 'deep') drawChimeRings(g, t);
@@ -4727,6 +4764,7 @@
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
+    if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = MEADOW_MINI[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? MoonwellArt.minimap(x,y,map.dirt[y*MAP+x],zdef) : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = zdef.theme === 'emberwake' ? '#ae8a6e' : zdef.theme === 'chained_forge' ? '#bca69e' : zdef.theme === 'blackhour' ? '#82758d' : zdef.theme === 'longship' ? '#c5a475' : zdef.theme === 'skybridge' ? '#8dd8f2' : zdef.theme === 'nornroot' ? '#c29b59' : DungeonVisual.styles[zdef.theme] ? DungeonVisual.minimap(zdef.theme,x,y,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : yearwheel ? ['#e8c498','#e9bd7d','#bf8c6b','#b8d9e9'][yearSeason(x,y)] : deep ? '#c8c29a' : zdef.theme === 'elder_hollow' ? '#597251' : zdef.theme === 'thousandfold' ? '#ae779d' : zdef.theme === 'rain_crown' ? '#6aa895' : zdef.theme === 'seed_vault' ? '#b6a676' : zdef.theme === 'sunken_astrolabe' ? '#c0ac79' : zdef.theme === 'thunderheart_gate' ? '#b6d4e6' : zdef.theme === 'blooming_labyrinth' ? '#e2b7cf' : zdef.theme === 'solar_crucible' ? '#e8ba77' : zdef.theme === 'amber_archive' ? '#eac286' : zdef.theme === 'silent_solstice' ? '#b8d5e8' : zdef.theme === 'vault' ? VaultArt.minimap(x,y,zdef.rooms) : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : worldtree ? '#c19a60' : heartwood ? '#b58a5b' : frostwake ? '#8fc6d8' : cairn ? '#b49a75' : lapis ? '#efd49b' : tanglecrown ? '#b99a62' : ribbonwild ? '#ffe2a2' : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (wyrd) { const gr = g.createLinearGradient(0, 0, 0, 144); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(.42, 'rgba(120,128,92,.9)'); gr.addColorStop(.56, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, 144, 144); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * .5) g.fillRect(x * k, y * k, k + .5, k + .5); } }
@@ -5067,14 +5105,14 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get vaultView() { return (map.vregs || []).length ? (map.ghosts || []).length : 0; }, get vaultRegions() { return map.vregs || []; }, get ghostNpcIds() { return (map.vregs || []).flatMap(R => City.npcsOf(R.to).filter(n => inRegion(R, n.x - R.shift[0], n.y - R.shift[1])).map(n => n.id)); }, get wallGhosts() { return (map.ghosts || []).filter(o => o.kind === 'rampart' || o.kind === 'tower').map(o => [o.kind, +o.x.toFixed(1), +o.y.toFixed(1)]); }, get cityIntrusion() { const c = zdef.city; if (!c || !(map.vregs || []).some(r => r.hide)) return null; const inside = o => o.x >= c.x0 - 1.5 && o.x <= c.x1 + 1.5 && o.y >= c.y0 - 1.5 && o.y <= c.y1 + 1.5; return { hidden: objects.filter(o => inside(o) && ownHidden(o)).length, ghosts: (map.ghosts || []).filter(inside).length, season: (map.vregs || []).reduce((n, R) => n + vaultSeason(R).filter(inside).length, 0) }; }, screenOf(x, y) { const [sx, sy] = w2s(x, y); return [sx / VW, sy / VH]; },
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get areaName() { return areaName(); }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get vaultView() { return (map.vregs || []).length ? (map.ghosts || []).length : 0; }, get vaultRegions() { return map.vregs || []; }, get ghostNpcIds() { return (map.vregs || []).flatMap(R => City.npcsOf(R.to).filter(n => inRegion(R, n.x - R.shift[0], n.y - R.shift[1])).map(n => n.id)); }, get wallGhosts() { return (map.ghosts || []).filter(o => o.kind === 'rampart' || o.kind === 'tower').map(o => [o.kind, +o.x.toFixed(1), +o.y.toFixed(1)]); }, get cityIntrusion() { const c = zdef.city; if (!c || !(map.vregs || []).some(r => r.hide)) return null; const inside = o => o.x >= c.x0 - 1.5 && o.x <= c.x1 + 1.5 && o.y >= c.y0 - 1.5 && o.y <= c.y1 + 1.5; return { hidden: objects.filter(o => inside(o) && ownHidden(o)).length, ghosts: (map.ghosts || []).filter(inside).length, season: (map.vregs || []).reduce((n, R) => n + vaultSeason(R).filter(inside).length, 0) }; }, screenOf(x, y) { const [sx, sy] = w2s(x, y); return [sx / VW, sy / VH]; },
     sceneAround(x, y, r) {      // every scenery object this frame draws near a point, in this frame's coordinates (own, ghosts, seasonal): what must match across a vault
       const skip = o => o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void' || City.art[o.kind]?.ground, out = [];
       for (const source of [objects, window.Seasonal?.decor(zone) || [], window.Halloween?.objects(zone) || []]) for (const o of source) if (!skip(o) && !ownHidden(o)) out.push([o.kind, o.x, o.y]);
       for (const o of map.ghosts || []) out.push([o.kind, o.x, o.y]);
       for (const R of map.vregs || []) for (const o of vaultSeason(R)) out.push([o.kind, o.x, o.y]);
       return out.filter(o => Math.hypot(o[1] - x, o[2] - y) < r);
-    }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { walls: (map.ghosts || []).filter(o => WALL_KINDS.has(o.kind)).map(o => [o.x, o.y]), slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostWater() { return (map.ghostWater || []).length; }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { walls: (map.ghosts || []).filter(o => WALL_KINDS.has(o.kind)).map(o => [o.x, o.y]), slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };

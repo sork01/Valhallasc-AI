@@ -687,8 +687,8 @@
     mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : `Ride the selected mount at 160% of normal walking speed (${mountKey}). Change it in the Character window.`) : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 500,000 gold. All mounts are listed in the Character window.';
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); if (!window.Field.seamless) { void title.offsetWidth; title.classList.add('show'); } }
-    title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
-    title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
+    title.querySelector('b').textContent = away ? s.area : inCity ? (s.hub && s.hub !== 'Alderhaven' ? s.hub : 'Alderhaven · Fountain Square') : s.area !== 'Greenmeadow' ? s.area : t('areaName');
+    title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : s.area !== 'Greenmeadow' ? 'Greenmeadow' : '푸른 초원';
     const statuses = [
       { id: 'daze', left: s.daze, time: 4, name: 'Dazed', icon: 'starfall', description: 'Movement speed is reduced by 50%.' },
       { id: 'stun', left: s.stun, time: 3, name: 'Stunned', icon: 'starfall', description: 'Cannot move, attack or cast.' },

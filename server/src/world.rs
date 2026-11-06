@@ -691,6 +691,10 @@ impl Slime {
             "golem" => (1100., 64., 1.9, 1.5),
             // Two level-10 heroes, with skills and healing, rather than an ordinary solo pull.
             "cinderlord" => (2400., 180., 2.5, 1.7),
+            // Greenmeadow's three elites: a party of level-5 fighters, or one hero well past the zone.
+            "oldtusker" => (1500., 70., 3.0, 1.7),
+            "tidecrusher" => (1900., 60., 1.9, 1.8),
+            "orchardqueen" => (1200., 78., 3.2, 1.6),
             "crab" => (900., 60., 2.8, 1.1),
             "wolf" => (1000., 72., 3.6, 1.2),
             "yeti" => (1900., 88., 2.2, 1.6),
@@ -866,6 +870,7 @@ impl Slime {
             "wraith" => 8,
             "golem" => 10,
             "cinderlord" => 10,
+            "oldtusker" | "tidecrusher" | "orchardqueen" => 7,
             "crab" => 10,
             "wolf" => 12,
             "yeti" => 13,
@@ -999,6 +1004,7 @@ impl Slime {
             "wraith" => 36,
             "golem" => 55,
             "cinderlord" => 100,
+            "oldtusker" | "tidecrusher" | "orchardqueen" => 70,
             "crab" => 60,
             "wolf" => 78,
             "yeti" => 105,
@@ -1147,7 +1153,7 @@ impl Slime {
             "spider" => (0.4, 1.1, 8., 7.5),
             "wraith" => (0.5, 1.2, 7.5, 8.),
             "golem" => (0.6, 1.5, 6., 6.5),
-            "cinderlord" => (0.65, 1.25, 7., 7.),
+            "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" => (0.65, 1.25, 7., 7.),
             "crab" => (0.4, 1., 8., 7.),
             "wolf" => (0.3, 0.9, 9.5, 9.),
             "yeti" => (0.7, 1.6, 6.5, 7.),
@@ -4591,7 +4597,7 @@ impl World {
                 _ if self.spawns[id].ambush.is_some() => 1e9,
                 "big" => 0.,
                 "ember_firelord" => 1e9,
-                "cinderlord" => 180.,
+                "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
@@ -5197,6 +5203,9 @@ impl World {
                         s.kind.as_str(),
                         "ember_firelord"
                             | "cinderlord"
+                            | "oldtusker"
+                            | "tidecrusher"
+                            | "orchardqueen"
                             | "gloomroot"
                             | "hollow_rider"
                             | "grinch"

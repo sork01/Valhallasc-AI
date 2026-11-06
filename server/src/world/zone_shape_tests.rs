@@ -798,3 +798,187 @@ fn the_whole_opening_of_a_vault_crosses_not_only_its_middle() {
         }
     }
 }
+
+// Greenmeadow is an authored map (scripts/greenmeadow_design.py): hamlets, elites and quests on real ground.
+#[test]
+fn greenmeadows_hamlets_are_sanctuaries_with_their_people() {
+    let w = world();
+    let map = &w.maps[0];
+    assert_eq!(map.camps.len(), 3, "Stonefold, Saltby and Applewick");
+    for id in [
+        "fold_hild",
+        "fold_torvald",
+        "fold_trader",
+        "travel_stonefold",
+        "salt_ragna",
+        "salt_odd",
+        "salt_trader",
+        "travel_saltby",
+        "apple_maren",
+        "apple_sten",
+        "apple_trader",
+        "travel_applewick",
+        "apple_lotta",
+    ] {
+        let npc = map.npcs.iter().find(|n| n.id == id).unwrap();
+        let spot = Point { x: npc.x, y: npc.y };
+        assert!(map.in_city(spot), "{id} stands in a sanctuary");
+        let mut q = spot;
+        map.collide(&mut q, PLAYER_RADIUS);
+        assert!(q.distance(spot) < 1e-6, "{id} stands on free ground");
+        assert!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 0 && s.state != "waiting")
+                .all(|s| s.point().distance(spot) > 8.),
+            "no enemy within eight units of {id}"
+        );
+    }
+}
+
+#[test]
+fn every_greenmeadow_quest_can_be_done_on_the_map() {
+    let w = world();
+    let map = &w.maps[0];
+    for q in map.quests.iter().filter(|q| q.level <= 5) {
+        let seasonal = ["halloween", "christmas", "easter", "solstice", "valentine", "newyear"];
+        if q.id.starts_with("es_") || seasonal.iter().any(|s| q.id.starts_with(s)) {
+            continue;
+        }
+        for o in &q.objectives {
+            match o.kind.as_str() {
+                "visit" | "hold" => assert!(
+                    map.places.iter().any(|p| p.id == o.target),
+                    "{}: place {}",
+                    q.id,
+                    o.target
+                ),
+                "talk" | "escort" => assert!(
+                    map.npcs.iter().any(|n| n.id == o.target),
+                    "{}: npc {}",
+                    q.id,
+                    o.target
+                ),
+                "kill" if o.target != "any" && o.target != "slime" => assert!(
+                    w.slimes.iter().any(|s| s.zone == 0 && s.kind == o.target),
+                    "{}: enemy {}",
+                    q.id,
+                    o.target
+                ),
+                _ => {}
+            }
+        }
+    }
+}
+
+#[test]
+fn greenmeadow_has_three_elites_two_with_a_quest() {
+    let w = world();
+    let quests = &w.maps[0].quests;
+    for (kind, quest) in [("oldtusker", true), ("tidecrusher", true), ("orchardqueen", false)] {
+        assert_eq!(
+            w.slimes.iter().filter(|s| s.zone == 0 && s.kind == kind).count(),
+            1,
+            "one {kind}"
+        );
+        assert!(crate::items::is_elite(kind), "{kind} is an elite");
+        assert_eq!(
+            quests.iter().any(|q| q.objectives.iter().any(|o| o.target == kind)),
+            quest,
+            "{kind} quest"
+        );
+    }
+}
+
+fn meadow_hero(w: &mut World, x: f64, y: f64, level: u32, quest: &str) -> mpsc::Receiver<Value> {
+    let rx = join(w, 1, Class::Warrior);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.level = level;
+    c.zone = 0;
+    c.x = x;
+    c.y = y;
+    c.hp = c.max_hp();
+    c.quests.push(QuestProgress {
+        id: quest.into(),
+        counts: vec![0],
+        ..Default::default()
+    });
+    rx
+}
+
+#[test]
+fn the_ring_at_dusk_wakes_its_slimes_and_counts_twenty_seconds() {
+    let mut w = world();
+    let _rx = meadow_hero(&mut w, 58., 222., 4, "fold_watch");
+    let sleepers = |w: &World| {
+        w.spawns
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| s.ambush.as_deref().is_some_and(|t| t.starts_with("fold_watch_m")))
+            .filter(|(id, _)| w.slimes[*id].dead)
+            .count()
+    };
+    assert_eq!(sleepers(&w), 4, "four slimes sleep until the waves call them");
+    for tick in 0..(24. / TICK) as usize {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.hp = c.max_hp();
+        w.step();
+        if tick == (5. / TICK) as usize {
+            assert_eq!(sleepers(&w), 2, "the first wave came");
+        }
+        if tick == (15. / TICK) as usize {
+            assert_eq!(sleepers(&w), 0, "the second wave came");
+        }
+    }
+    let c = &w.players[&1].character;
+    assert!(
+        c.quests.iter().find(|q| q.id == "fold_watch").unwrap().counts[0] >= 20,
+        "the hold is complete"
+    );
+}
+
+#[test]
+fn lotta_walks_the_lane_from_applewick_to_the_watermill() {
+    let mut w = world();
+    let lotta = w.maps[0].npcs.iter().find(|n| n.id == "apple_lotta").unwrap().clone();
+    let route = &lotta.escort.as_ref().unwrap().route;
+    for leg in route.windows(2) {
+        let (from, to) = (at(leg[0][0], leg[0][1]), at(leg[1][0], leg[1][1]));
+        for k in 0..=20 {
+            let t = k as f64 / 20.;
+            let spot = at(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
+            let mut q = spot;
+            w.maps[0].collide(&mut q, PLAYER_RADIUS);
+            assert!(q.distance(spot) < 1e-6, "the lane is clear at {spot:?}");
+        }
+    }
+    let _rx = meadow_hero(&mut w, lotta.x, lotta.y + 1., 4, "apple_mill");
+    w.time += 1.;
+    w.interact(1, "apple_lotta", None);
+    let owner = w.players[&1].character.id.clone();
+    let escort = w.escort_of(&owner).expect("Lotta joins");
+    for _ in 0..(90. / TICK) as usize {
+        let Some(e) = w.players.get(&escort) else { break };
+        let there = e.character.point();
+        let e = &mut w.players.get_mut(&escort).unwrap().character;
+        e.hp = e.max_hp();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = there.x + 1.;
+        c.y = there.y + 1.;
+        c.hp = c.max_hp();
+        // The hero fights what comes: an escort stands still while an enemy is on it.
+        for s in w.slimes.iter_mut().filter(|s| s.zone == 0 && !s.dead) {
+            if s.point().distance(there) < 12. {
+                s.dead = true;
+                s.respawn = 1e9;
+            }
+        }
+        w.step();
+    }
+    let c = &w.players[&1].character;
+    assert_eq!(
+        c.quests.iter().find(|q| q.id == "apple_mill").unwrap().counts[0],
+        1,
+        "Lotta reached the watermill"
+    );
+}

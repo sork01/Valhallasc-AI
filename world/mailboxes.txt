@@ -306,5 +306,38 @@
       "x": 86.5,
       "y": 80.5
     }
+  },
+  {
+    "id": "mailbox_0_stonefold",
+    "zone": 0,
+    "hub": "Stonefold",
+    "x": 96,
+    "y": 226.5,
+    "anchor": {
+      "x": 91,
+      "y": 217
+    }
+  },
+  {
+    "id": "mailbox_0_saltby",
+    "zone": 0,
+    "hub": "Saltby",
+    "x": 189,
+    "y": 275,
+    "anchor": {
+      "x": 188,
+      "y": 267
+    }
+  },
+  {
+    "id": "mailbox_0_applewick",
+    "zone": 0,
+    "hub": "Applewick",
+    "x": 343,
+    "y": 238,
+    "anchor": {
+      "x": 341,
+      "y": 225.5
+    }
   }
 ]

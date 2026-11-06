@@ -313,6 +313,9 @@ pub fn material(kind: &str) -> &'static str {
         "spider" => "magma_fang",
         "wraith" => "ash_veil",
         "golem" | "cinderlord" => "basalt_heart",
+        "oldtusker" => "tusker_bristle",
+        "tidecrusher" => "tidecrusher_shard",
+        "orchardqueen" => "queen_stinger",
         "crab" => "rime_shell",
         "wolf" => "frost_pelt",
         "yeti" => "yeti_horn",
@@ -527,6 +530,9 @@ pub fn is_elite(kind: &str) -> bool {
         kind,
         "big"
             | "cinderlord"
+            | "oldtusker"
+            | "tidecrusher"
+            | "orchardqueen"
             | "gloomroot"
             | "oakhorn"
             | "hrungnir"

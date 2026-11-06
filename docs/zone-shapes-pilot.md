@@ -107,3 +107,7 @@ Later the same day (`1fe2d9b`..`bb150a4`): Skaldholm's own wall is the wall. `wa
 - Seam ghosts now include `rampart`/`tower` whatever the neighbour's sprite set (`WALL_KINDS` in `field.js`): the neighbour's wall stands beyond the line at both junctions.
 - `no_vault_stands_on_a_seam` (Rust) guards the junction. `PART=rime` in `tests/zone-shape-ui.cjs` crosses both seams both ways and writes `rime-*.png` pictures of the junctions. `ZONES=2` narrows `PART=walls` and `tests/vault-seamless-ui.cjs`.
 - Older suites still teleport to Rimeveil's old coordinates (`christmas-art-ui`, `easter-*`, `music-*`, `rime-slime-art`, `rimeveil-ui`): same state as the other pilot zones, to update before any merge.
+
+## Greenmeadow redesign (2026-11-06)
+
+Zone 0 is now an authored map on the same outline: `docs/greenmeadow-design.md`. Its filler (`FILL[0]`) still runs so portals and walls are placed exactly as before, then `greenmeadow_design.py` replaces the scenery, spawns, trails and adds hamlets and quests.

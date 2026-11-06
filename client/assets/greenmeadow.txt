@@ -1,0 +1,90 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "oldtusker",
+    "tidecrusher",
+    "orchardqueen"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "oldtusker": "639f96e057a20c8c",
+    "tidecrusher": "e440d202480143d7",
+    "orchardqueen": "536e64854ddf7e37"
+  },
+  "tops": {
+    "oldtusker": 83,
+    "tidecrusher": 82,
+    "orchardqueen": 127
+  },
+  "artStyle": "meadow-elite",
+  "kindFrames": {
+    "oldtusker": {
+      "frame": [
+        176,
+        112
+      ],
+      "anchor": [
+        68,
+        104
+      ]
+    },
+    "tidecrusher": {
+      "frame": [
+        186,
+        134
+      ],
+      "anchor": [
+        76,
+        124
+      ]
+    },
+    "orchardqueen": {
+      "frame": [
+        160,
+        188
+      ],
+      "anchor": [
+        86,
+        178
+      ]
+    }
+  }
+}

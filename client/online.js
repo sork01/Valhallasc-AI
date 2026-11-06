@@ -66,7 +66,7 @@
       delete initialSlot.initialEmptySlots; persistSlot();
     }
     const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
-    status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
+    status(`${away || window.Field?.areaName || 'Greenmeadow'} · ${packet.online} online`, true);
     const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
     if (character) { window.GM?.onSelf(character); window.Mail?.onUnread(character.mailUnread || 0); }
     if (character) window.Trade?.onSnapshot(character);
