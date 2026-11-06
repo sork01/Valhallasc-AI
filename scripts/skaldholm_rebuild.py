@@ -661,83 +661,79 @@ def even_flank_wall(world):
     return n
 
 
-CLIFF_WINDOW = (440, 536, 700, 765)     # atlas x0, x1, y0, y1: the wing and the strip of void between it and the Crags
-
-
-def wing_cliff(world):
-    """The wing's north edge is a cliff you can see (owner, 2026-11-06: "going alongside the right Skaldholm wall in meadow there is this black ground and
-    then you get stopped by an invisible wall").
-    Two things were wrong, both in the edge letters (`shapeEdge`), neither in the collision (the stop is by design: the wing is cut off from the Crags by void):
-      * the Crags' outer-land cells (`l`) lay over the wing, and the client draws a seam neighbour's outside tiles after our own ground, so hundreds of tiles
-        of the wing's land were painted as dark Crags rock;
-      * Greenmeadow had no letters at all on the void between the wing and the Crags west of x 201, so the land simply ended in flat dark with no cliff.
-    The void gap now belongs to whichever land is nearer (ties to Greenmeadow): Greenmeadow gets `l` letters on its half (the client draws a cliff block
-    on the first two rows), the Crags lose theirs there, and a Greenmeadow `l` that lies on Crags land goes too. Only `l` cells and blank cells change.
-    Runs last (the designs and the walls do not read it), so no random draw moves and nothing but `shapeEdge` rows is different."""
+def wing_gate(world, margins):
+    """The wing opens onto the Crags (owner, 2026-11-06: "there is still a row of 7 tiles that is brown and then invisible wall, can't pass through to crags").
+    Between the wing's north edge (y 99 in Greenmeadow's frame) and the Crags' south edge (y 92) lay 7 rows of void, and the wing_cliff edge letters only made it
+    look like a cliff. The 0-1 border is one straight line (y 92) from the city's east wall to where the painted border starts (x 234): this step makes the
+    gap Greenmeadow's land, runs the 0-1 seam along that line (both zones, so a walker steps across anywhere on it like on the rest of the seam), gives both
+    zones the usual SEAM_MARGIN of walkable ground past the line, and sets the edge letters beside it to the neighbour's (the client draws the neighbour's
+    ground there, and blends ours into it). Collision changes, so the pilot binary needs the new map.
+    Runs last (the designs and the walls do not read it): nothing but this strip differs, and no random draw moves."""
     g, c = zs.zone_of(world, 0), zs.zone_of(world, 1)
-    x0, x1, y0, y1 = CLIFF_WINDOW
-    band = zs.EDGE_BAND
-
-    def land(z):
-        T, n = z['shape']['T'], z['size']
-        out = np.zeros((y1 - y0, x1 - x0), bool)
-        for ay in range(y0, y1):
-            yy = ay - T[1]
-            if 0 <= yy < n:
-                row = z['shapeFloor'][yy]
-                for ax in range(x0, x1):
-                    xx = ax - T[0]
-                    if 0 <= xx < n and row[xx] == '#':
-                        out[ay - y0, ax - x0] = True
-        return out
-
-    def dist(mask):
-        d = np.full(mask.shape, band + 1, int)
-        d[mask] = 0
-        m = mask.copy()
-        for k in range(1, band + 1):
-            m2 = zs.dilate(m, 1)
-            d[m2 & ~m] = k
-            m = m2
-        return d
-
-    LG, LC = land(g), land(c)
-    dG, dC = dist(LG), dist(LC)
-    mine = dG <= dC                                   # Greenmeadow's side of the gap (its own land included)
-
-    def edit(z, fn):
-        T, n = z['shape']['T'], z['size']
+    Tg, Tc = g['shape']['T'], c['shape']['T']
+    n, nc = g['size'], c['size']
+    gp = next(p for p in g['portals'] if p['to'] == 1 and p.get('seam'))
+    cp = next(p for p in c['portals'] if p['to'] == 0 and p.get('seam'))
+    ly, lx_end = gp['seam']['points'][0][1], gp['seam']['points'][0][0]
+    lx0 = float(EAST_WALL_X - Tg[0] + 2)                       # the city's east wall stands at 178.2: the line starts just past its tower
+    sx, sy = gp['seam']['shift']
+    assert [sx, sy] == [Tg[0] - Tc[0], Tg[1] - Tc[1]] and lx0 < lx_end
+    floor_g = np.array([[ch == '#' for ch in row] for row in g['shapeFloor']])
+    floor_c = np.array([[ch == '#' for ch in row] for row in c['shapeFloor']])
+    old_g, old_c = floor_g.copy(), floor_c.copy()
+    # the voids are a pure function of floor + margin: rebuilding them wholesale changes nothing outside the strip
+    def voids(z):
+        return sorted((o['x'], o['y'], o['width'], o['depth']) for o in z['objects'] if o['kind'] == 'void')
+    for z, fl, mg in ((g, old_g, margins[0]), (c, old_c, margins[1])):
+        assert voids(z) == sorted((o['x'], o['y'], o['width'], o['depth']) for o in zs.void_pieces(fl | mg)), 'the voids are no longer floor + margin: update wing_gate'
+    # 1. the gap is land: rows from the line down to the wing, from the wall to the first land of each row
+    y0 = int(ly)
+    filled = 0
+    for y in range(y0, WING[2] - Tg[1]):
+        row = floor_g[y]
+        first = int(np.argmax(row[int(lx0) - 2:])) + int(lx0) - 2          # the wing's own land (x >= 178) or the painted border's
+        assert row[first] and first > int(lx0), f'row {y}: no land east of the gap'
+        new = ~row[int(lx0) - 2:first]
+        filled += int(new.sum())
+        floor_g[y, int(lx0) - 2:first] = True
+    # 2. margins: walkable ground within SEAM_MARGIN of the line, on the far side as well as ours
+    ys, xs = np.mgrid[0:n, 0:n]
+    t = np.clip((xs + .5 - lx0) / (lx_end - lx0), 0, 1)
+    mg_g = np.hypot(xs + .5 - lx0 - t * (lx_end - lx0), ys + .5 - ly) <= zs.SEAM_MARGIN
+    yc, xc = np.mgrid[0:nc, 0:nc]
+    tc = np.clip((xc + .5 - (lx0 + sx)) / (lx_end - lx0), 0, 1)
+    mg_c = np.hypot(xc + .5 - (lx0 + sx) - tc * (lx_end - lx0), yc + .5 - (ly + sy)) <= zs.SEAM_MARGIN
+    margins[0] = margins[0] | (mg_g & ~floor_g)
+    margins[1] = margins[1] | (mg_c & ~floor_c)
+    g['shapeFloor'] = zs.floor_rows(floor_g)
+    for z, fl, mg in ((g, floor_g, margins[0]), (c, floor_c, margins[1])):
+        z['objects'] = [o for o in z['objects'] if o['kind'] != 'void'] + zs.void_pieces(fl | mg)
+    # 3. the seam runs along the line in both zones (the Crags' list runs the other way round: its end is our start)
+    mid_g = [[round(lx0, 2), ly], [round((lx0 + lx_end) / 2, 2), ly]]
+    gp['seam']['points'] = mid_g + gp['seam']['points']
+    cp['seam']['points'] = cp['seam']['points'] + [[round(p[0] + sx, 2), round(p[1] + sy, 2)] for p in reversed(mid_g)]
+    for e in g['shape']['edges']:
+        if e['kind'] == 'shared' and e['other'] == 1:
+            e['points'] = mid_g + e['points']
+    for e in c['shape']['edges']:
+        if e['kind'] == 'shared' and e['other'] == 0:
+            e['points'] = e['points'] + [[round(p[0] + sx, 2), round(p[1] + sy, 2)] for p in reversed(mid_g)]
+    # 4. edge letters: the far side of the line is the neighbour's ground (and our land is no outside tile)
+    for z, fl, ox, oy, other in ((g, floor_g, 0, 0, 1), (c, floor_c, sx, sy, 0)):
+        letter = chr(ord('A') + z['shape']['neighbours'].index(other))
         rows = [list(r) for r in z['shapeEdge']]
-        count = 0
-        for ay in range(y0, y1):
-            yy = ay - T[1]
-            if not 0 <= yy < n:
-                continue
-            for ax in range(x0, x1):
-                xx = ax - T[0]
-                if 0 <= xx < n:
-                    new = fn(rows[yy][xx], ay - y0, ax - x0, ax)
-                    if new != rows[yy][xx]:
-                        rows[yy][xx] = new
-                        count += 1
+        band = zs.dilate(fl, zs.EDGE_BAND) & ~fl
+        for yy in range(z['size']):
+            for xx in range(z['size']):
+                if fl[yy, xx]:
+                    rows[yy][xx] = ' '
+                elif band[yy, xx]:
+                    px, py = xx + .5 - ox, yy + .5 - oy                     # the cell in Greenmeadow's frame
+                    if lx0 - 2 <= px < lx_end + zs.EDGE_BAND and (py < ly if z is g else py >= ly):
+                        rows[yy][xx] = letter
         z['shapeEdge'] = [''.join(r) for r in rows]
-        return count
-
-    def ours(ch, ay, ax, x):        # letters on the gap's near half (east of the city's wall), none on Crags land
-        if LG[ay, ax]:
-            return ch
-        if ch == 'l' and LC[ay, ax]:
-            return ' '
-        if ch == ' ' and x >= EAST_WALL_X and not LC[ay, ax] and mine[ay, ax] and dG[ay, ax] <= band:
-            return 'l'
-        return ch
-
-    def theirs(ch, ay, ax, x):      # no outer-land cell on Greenmeadow's land or on its half of the gap
-        return ' ' if ch == 'l' and not LC[ay, ax] and mine[ay, ax] and dG[ay, ax] <= band else ch
-    added = edit(g, ours)
-    gone = edit(c, theirs)
-    print(f"wing cliff: {added} Greenmeadow edge cells changed, {gone} Crags outer-land cells no longer drawn over it")
-    return added, gone
+    print(f"wing gate: {filled} tiles of land between the wing and the Crags, seam from x {lx0:.0f} to {lx_end:.0f} at y {ly}")
+    return filled
 
 
 def trim_greenmeadow_flank(world):
