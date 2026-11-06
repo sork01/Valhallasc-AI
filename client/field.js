@@ -126,6 +126,7 @@
       for (const i of front) { const x = i % MAP, y = (i / MAP) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (map.floor[k] && !map.blendD[k]) { map.blendD[k] = d; map.blendNb[k] = map.blendNb[i]; next.push(k); } } }
       front = next;
     }
+    if (zdef.theme === 'city') map.blendD.fill(0);   // Skaldholm: a wall, not a seam, lies between it and its neighbours
     for (let i = 0; i < MAP * MAP; i++) if (map.blendD[i]) map.blendW[i] = .6 * (1 - (map.blendD[i] - 1) / BLEND_REACH);
     // A border you cross anywhere (a seam): both zones draw the same mix of their two floors around the line, seen from
     // their own side, so the ground does not change when the server moves you across. s is the signed distance to the
@@ -208,7 +209,7 @@
   }
   const WALL_KINDS = new Set(['rampart', 'tower', 'wall']);
   // A region never reaches into the city's own walls: the neighbours' borders lean across the city's square, but inside Skaldholm the city is the city.
-  const inSquare = (x, y) => !!zdef.city && x >= zdef.city.x0 - 1.5 && x <= zdef.city.x1 + 1.5 && y >= zdef.city.y0 - 1.5 && y <= zdef.city.y1 + 1.5;   // (the city's own wall stands 1 tile outside its square)
+  const inSquare = (x, y) => zdef.shapeFloor ? x >= 0 && y >= 0 && x < MAP && y < MAP && !!map.floor[(y | 0) * MAP + (x | 0)] : !!zdef.city && x >= zdef.city.x0 - 1.5 && x <= zdef.city.x1 + 1.5 && y >= zdef.city.y0 - 1.5 && y <= zdef.city.y1 + 1.5;   // (the city's own wall stands 1 tile outside its square)
   const pastWall = (R, x, y) => (x - R.arch.x) * R.walk[0] + (y - R.arch.y) * R.walk[1] >= 1.5;      // beyond the straight wall this vault stands in
   const inRegion = (R, x, y) => inPoly(R.other, x, y) && (!R.hide || (!inSquare(x, y) && pastWall(R, x, y)));
   // Our own scenery where the other zone owns the ground (Skaldholm outside its wall), and the city's own wall beside the line, is not drawn.
@@ -4172,7 +4173,7 @@
     g.globalAlpha = 1;
   }
   function drawSky(g, t) {
-    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' ? '#0c0605' : SEA_COLOR; g.fillRect(0, 0, VW, VH); return; }   // beyond the drawn shallows (and the grid) lies open sea
+    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' || zdef.theme === 'city' ? '#0c0605' : SEA_COLOR; g.fillRect(0, 0, VW, VH); return; }   // beyond the drawn shallows (and the grid) lies open sea
     if (zdef.theme === 'arena') { g.fillStyle = '#191723'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'emberwake') { EmberwakeArt.background(g,VW,VH,t); return; }
     if (zdef.theme === 'chained_forge') { const [cx,cy]=camS(); ChainedForgeArt.background(g,VW,VH,t,zdef,cx,cy,TW,TH); return; }
