@@ -67,6 +67,53 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   };
   const diff = (a, b) => { let sum = 0, big = 0, n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
   const save = (name, im) => fs.writeFileSync(path.join(out, name), Buffer.from(im.png.split(',')[1], 'base64'));
+  // PART=corner: the south-west corner where Greenmeadow, Gloamfen and Skaldholm meet (atlas 368.9, 757.7; owner, 2026-11-06: "the wall is broken").
+  // Every frame must draw the SAME wall pieces around it (its own plus its ghosts, in atlas coordinates), and a hero walks between the two lands below the corner.
+  if (process.env.PART === 'corner') {
+    const C = [368.9, 757.7], R = 11, key = (o, T) => `${o[0]}@${(o[1] + T[0]).toFixed(1)},${(o[2] + T[1]).toFixed(1)}`;
+    const sets = {};
+    for (const [zone, dx, dy] of [[0, 14, 12], [3, -14, 2], [4, 14, -14]]) {
+      const T = zoneDef(zone).shape.T, hx = C[0] - T[0] + dx, hy = C[1] - T[1] + dy;
+      check(onLand(zone, hx, hy), `zone ${zone}: the viewing spot is on land`);
+      await debug({ op: 'teleport', zone, x: hx, y: hy });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, hx, hy], { timeout: 20000 });
+      await page.waitForTimeout(3500);
+      const near = o => Math.hypot(o[1] + T[0] - C[0], o[2] + T[1] - C[1]) < R;
+      const own = zoneDef(zone).objects.filter(o => (o.kind === 'rampart' || o.kind === 'tower') && near([o.kind, o.x, o.y])).map(o => [o.kind, o.x, o.y]);
+      const ghost = (await page.evaluate(() => Field.wallGhosts)).filter(near);
+      sets[zone] = new Set([...own, ...ghost].map(o => key(o, T)));
+      console.log(`zone ${zone}: ${own.length} own + ${ghost.length} ghost wall pieces within ${R} tiles of the corner: ${[...sets[zone]].sort().join(' ')}`);
+      await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+      await page.screenshot({ path: path.join(out, `corner-zone${zone}.png`) });
+    }
+    for (const a of [0, 3, 4]) for (const b of [0, 3, 4]) if (a < b) {
+      const only = [...sets[a]].filter(k => !sets[b].has(k)).concat([...sets[b]].filter(k => !sets[a].has(k)).map(k => '~' + k));
+      check(only.length === 0, `the corner's wall pieces are the same from zone ${a} and zone ${b} (differ: ${only.join(' ')})`);
+    }
+    check(sets[0].size >= 5 && [...sets[0]].some(k => k.startsWith('tower')), `the corner has its tower and at least five pieces (${sets[0].size})`);
+    // a walk below the corner: Gloamfen (x < 370) into Greenmeadow (x >= 370) and back, at y 762
+    const wy = 762 - zoneDef(3).shape.T[1];
+    const walk = async (fromZone, fromX, dirx, toZone) => {
+      await debug({ op: 'teleport', zone: fromZone, x: fromX, y: 762 - zoneDef(fromZone).shape.T[1] });
+      await page.waitForFunction(z => Field.zone === z, fromZone, { timeout: 20000 }); await page.waitForTimeout(1500);
+      const keys = isoKeys(dirx, 0);
+      for (const k of keys) await page.keyboard.down(k);
+      const t0 = Date.now(); let z = fromZone;
+      while (Date.now() - t0 < 9000 && z === fromZone) { await page.waitForTimeout(200); z = await page.evaluate(() => Field.zone); }
+      for (const k of keys) await page.keyboard.up(k);
+      const at = await where();
+      check(z === toZone, `walking ${dirx > 0 ? 'east' : 'west'} at y 762 leads from zone ${fromZone} to zone ${toZone} (ended in zone ${z} at ${at.x.toFixed(1)},${at.y.toFixed(1)})`);
+      return at;
+    };
+    const isoKeys = (dx, dy) => [dx - dy > .35 ? 'ArrowRight' : dx - dy < -.35 ? 'ArrowLeft' : null, dx + dy > .35 ? 'ArrowDown' : dx + dy < -.35 ? 'ArrowUp' : null].filter(Boolean);
+    const e = await walk(3, 366 - zoneDef(3).shape.T[0], 1, 0);
+    check(Math.abs(e.y + zoneDef(0).shape.T[1] - 762) < 2.5, `the crossing keeps the hero at y 762 (${(e.y + zoneDef(0).shape.T[1]).toFixed(1)})`);
+    await walk(0, 374 - zoneDef(0).shape.T[0], -1, 3);
+    // and the wall itself still stops a hero on the corner's north side (y 756-758 is wall)
+    assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
+    console.log(`vault-seamless-ui corner: ${checks} checks passed; screenshots in ${out}`);
+    return;
+  }
   const rows = [];
   for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);

@@ -187,7 +187,6 @@ def rebuild(world):
     open_hall_lane(city)
     place_band(city, old, floor)
     east_wall(world, city)
-    sw_corner_tower(world, city)
     quiet_lobe(world)
     city['objects'].extend(zs.void_pieces(floor))
     city['shapeFloor'] = zs.floor_rows(floor)
@@ -552,11 +551,69 @@ def prepare(world, margins):
     fen = zs.zone_of(world, 3)
     Tf = fen['shape']['T']
     wall_y = next(o['y'] + T[1] for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG)
-    before = len(fen['objects'])
     fen['objects'] = [o for o in fen['objects'] if not (o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG and o['y'] + Tf[1] > wall_y + 3.0)]
     first = min((o for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG), key=lambda o: o['x'])
-    first['x'] = round(first['x'] + 2.7, 2)
-    print(f"south-west corner squared: {before - len(fen['objects'])} Gloamfen wall pieces beyond Greenmeadow's wall line removed")
+    first['x'] = round(first['x'] + 2.7, 2)       # (the designs see this geometry; `south_west_corner` finishes the corner after them, so no design draw changes)
+    print("south-west corner squared: Gloamfen wall pieces beyond Greenmeadow's wall line removed")
+
+
+def south_west_corner(world, margins):
+    """The corner is one structure in all three zones (owner, 2026-11-06: "the wall is broken" where Greenmeadow, Gloamfen and Skaldholm meet).
+    Runs AFTER the designs (their random draws follow the geometry they see: finishing the corner earlier reshuffled 215 spawns).
+    * Gloamfen's last rampart ends at the south face of Greenmeadow's wall (it ran 1.2 tiles past it) and Greenmeadow's first rampart fills exactly
+      from the corner tower to its neighbour (the old +2.7 shift stacked it 2.8 tiles over the next piece);
+    * the corner tower is a piece of BOTH neighbours, so each zone draws it itself (a ghost of the city's copy was suppressed beside the rampart);
+    * below the corner Gloamfen's land (x < 370) and Greenmeadow's (x >= 370) meet along a 6.4-tile straight border that had no wall and no seam
+      (a dead end): the 0-3 seam now starts at the corner, with Gloamfen's edge cells beyond it relabelled as Greenmeadow's."""
+    z, fen = zs.zone_of(world, 0), zs.zone_of(world, 3)
+    T, Tf = z['shape']['T'], fen['shape']['T']
+    wall_y = next(o['y'] + T[1] for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG)
+    face = round(wall_y + 0.9, 2)                          # the south face of Greenmeadow's wall (depth 1.8)
+    walls = [o for o in fen['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG]
+    last = max(walls, key=lambda o: o['y'])
+    wall_x = last['x'] + Tf[0]
+    top = last['y'] + Tf[1] - last['depth'] / 2
+    last['y'] = round((top + face) / 2 - Tf[1], 2)
+    last['depth'] = round(face - top, 2)
+    ramps = sorted((o for o in z['objects'] if o['kind'] == 'rampart' and o.get('layout') == TAG), key=lambda o: o['x'])
+    first, second = ramps[0], ramps[1]
+    left = wall_x + 1.7 - 0.1                              # under the tower (3.4 wide)
+    right = second['x'] + T[0] - second['width'] / 2 + 0.1
+    first['x'], first['width'] = round((left + right) / 2 - T[0], 2), round(right - left, 2)
+    tower = dict(kind='tower', r=0, v=0, width=3.4, depth=3.4, color='#4a7a9a', label='', layout=TAG)
+    z['objects'].append(dict(tower, x=round(wall_x - T[0], 2), y=round(wall_y - T[1], 2)))
+    fen['objects'].append(dict(tower, x=round(wall_x - Tf[0], 2), y=round(wall_y - Tf[1], 2)))
+    # the seam: both frames' border is the straight line x = BORDER_X from the corner down to the old start (370, 765)
+    bx = wall_x + 1.1                                      # 370.0: Gloamfen's floor ends at x 369, Greenmeadow's starts at 370
+    assert abs(bx - 370.0) < 0.05, bx
+    seam_f = next(p for p in fen['portals'] if p.get('seam') and p['to'] == 0)['seam']
+    seam_g = next(p for p in z['portals'] if p.get('seam') and p['to'] == 3)['seam']
+    assert seam_f['points'][0] == [370.0 - Tf[0], 765.0 - Tf[1]] and seam_g['points'][-1] == [370.0 - T[0], 765.0 - T[1]], 'the 0-3 seam no longer starts at (370, 765)'
+    seam_f['points'].insert(0, [round(370.0 - Tf[0], 2), round(face - Tf[1], 2)])
+    seam_g['points'].append([round(370.0 - T[0], 2), round(face - T[1], 2)])
+    gl = [[c == '#' for c in row] for row in z['shapeFloor']]
+    rows = [list(r) for r in fen['shapeEdge']]
+    a, c = chr(ord('A') + fen['shape']['neighbours'].index(0)), chr(ord('A') + fen['shape']['neighbours'].index(CITY))
+    n = 0
+    for yy, row in enumerate(rows):
+        for xx, ch in enumerate(row):
+            ax, ay = xx + Tf[0], yy + Tf[1]
+            if ch == c and ay >= face and 0 <= ay - T[1] < len(gl) and 0 <= ax - T[0] < len(gl[0]) and gl[ay - T[1]][ax - T[0]]:
+                row[xx] = a
+                n += 1
+    fen['shapeEdge'] = [''.join(r) for r in rows]
+    # land runs SEAM_MARGIN past the new stretch of seam (the walker steps over the line and the server moves it): rebuild both zones' voids
+    import numpy as np
+    for zone, zi, T_ in ((z, 0, T), (fen, 3, Tf)):
+        floor = np.array([[c == '#' for c in row] for row in zone['shapeFloor']])
+        n = floor.shape[0]
+        ys, xs = np.mgrid[0:n, 0:n]
+        ax, ay = xs + .5 + T_[0], ys + .5 + T_[1]
+        t = np.clip((ay - face) / (765.0 - face), 0, 1)
+        grown = np.hypot(ax - 370.0, ay - (face + t * (765.0 - face))) <= zs.SEAM_MARGIN
+        margins[zi] = margins[zi] | (grown & ~floor & (ay >= face))      # never north of the corner: there stands the wall
+        zone['objects'] = [o for o in zone['objects'] if o['kind'] != 'void'] + zs.void_pieces(floor | margins[zi])
+    print(f"south-west corner: seam extended to y {face}, {n} Gloamfen edge cells now Greenmeadow's, tower in both neighbours")
 
 
 def sw_corner_tower(world, city):

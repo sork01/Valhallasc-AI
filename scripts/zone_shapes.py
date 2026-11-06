@@ -1425,6 +1425,7 @@ def apply(world, cfg):
         align_corner_wall(world, margins)
     if cfg.get('cityRebuild'):      # last: the neighbours' walls are final, the city is made in the middle of them
         import skaldholm_rebuild
+        skaldholm_rebuild.south_west_corner(world, margins)
         skaldholm_rebuild.rebuild(world)
     return shifted
 
@@ -1495,6 +1496,7 @@ def align_corner_wall(world, margins):
     m_f = margins[3].copy()
     m_f[:75, int(CORNER_CUT_X):] = False
     fen['objects'] = [o for o in fen['objects'] if o['kind'] != 'void'] + void_pieces(ffloor | m_f)
+    margins[3] = m_f
     fcode = chr(ord('A') + fen['shape']['neighbours'].index(4))
     fer = [list(r_) for r_ in fen['shapeEdge']]
     fband = dilate(ffloor, EDGE_BAND) & ~ffloor
