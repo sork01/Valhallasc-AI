@@ -91,6 +91,20 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
       check(only.length === 0, `the corner's wall pieces are the same from zone ${a} and zone ${b} (differ: ${only.join(' ')})`);
     }
     check(sets[0].size >= 5 && [...sets[0]].some(k => k.startsWith('tower')), `the corner has its tower and at least five pieces (${sets[0].size})`);
+    // the ground south of the corner is Greenmeadow's from Gloamfen's frame too (it was painted as the city's flat outer ground: a lime slab)
+    const sample = async (zone, hx, hy, pts) => {
+      const T = zoneDef(zone).shape.T;
+      await debug({ op: 'teleport', zone, x: hx - T[0], y: hy - T[1] });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, hx - T[0], hy - T[1]], { timeout: 20000 });
+      await page.waitForTimeout(3500);
+      return page.evaluate(([pts, T]) => { const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'); return pts.map(([ax, ay]) => { const [fx, fy] = Field.screenOf(ax - T[0], ay - T[1]); const d = g.getImageData(Math.round(fx * cv.width) - 2, Math.round(fy * cv.height) - 2, 5, 5).data; let r = 0, gg = 0, b = 0; for (let i = 0; i < d.length; i += 4) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; } const n = d.length / 4; return [r / n, gg / n, b / n]; }); }, [pts, T]);
+    };
+    const ground = []; for (let gx = 371.5; gx <= 379; gx += 1.5) for (let gy = 759.5; gy <= 765; gy += 1.5) ground.push([gx, gy]);
+    const inFen = await sample(3, 363, 762, ground), inMeadow = await sample(0, 377, 764, ground);
+    const mean = L => [0, 1, 2].map(c => L.reduce((t, p) => t + p[c], 0) / L.length);      // (the average colour of the whole patch: flowers and shadows cancel)
+    const [mf, mm] = [mean(inFen), mean(inMeadow)], dist = Math.hypot(mf[0] - mm[0], mf[1] - mm[1], mf[2] - mm[2]);
+    console.log(`ground south of the corner: average colour from Gloamfen ${mf.map(Math.round)} from Greenmeadow ${mm.map(Math.round)}, distance ${dist.toFixed(1)}`);
+    check(dist < 12, `the ground south of the corner looks the same from Gloamfen and Greenmeadow (${dist.toFixed(1)})`);
     // a walk below the corner: Gloamfen (x < 370) into Greenmeadow (x >= 370) and back, at y 762
     const wy = 762 - zoneDef(3).shape.T[1];
     const walk = async (fromZone, fromX, dirx, toZone) => {

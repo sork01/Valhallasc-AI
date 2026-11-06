@@ -602,6 +602,14 @@ def south_west_corner(world, margins):
                 row[xx] = a
                 n += 1
     fen['shapeEdge'] = [''.join(r) for r in rows]
+    # Gloamfen's view of the city (`city`, `strip`) ends at Greenmeadow's wall face: below it lies Greenmeadow's land (it was painted as the city's plain outer
+    # ground, a flat lime slab without the meadow's flowers). `land` (the city's view of Gloamfen's ground, x < 370) stays.
+    ylim = round(face - Tf[1], 2)
+    for reg in fen['shape'].get('vaultRegions', []):
+        for key in ('city', 'strip'):
+            pts = reg[key]
+            for k in range(1, len(pts), 2):
+                pts[k] = min(pts[k], ylim)
     # land runs SEAM_MARGIN past the new stretch of seam (the walker steps over the line and the server moves it): rebuild both zones' voids
     import numpy as np
     for zone, zi, T_ in ((z, 0, T), (fen, 3, Tf)):
