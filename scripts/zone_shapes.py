@@ -1411,7 +1411,89 @@ def apply(world, cfg):
         print('gloamfen', gloamfen_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
+        align_corner_wall(world, margins)
     return shifted
+
+
+def align_corner_wall(world, margins):
+    """Skaldholm's west wall is one straight line: Gloamfen's wall (x = 245.93 in its frame) carries on straight into Rimeveil (x = 226.93 in Rimeveil's frame,
+    shift [19, -230]). Each zone fits the city's wall to its own border, so the two used to meet 10 tiles apart, joined by a stub along Gloamfen's north wall
+    (owner, 2026-11-06: \"make the straight wall from Gloamfen continue straight in Rimeveil\"). Rimeveil's leg moves 10.07 tiles west, its corner tower and north wall
+    with it; the land east of the new line is the city's; Gloamfen's stub goes."""
+    rime, fen = world['zones'][1], world['zones'][2]
+    old_x, new_x = 237.0, 245.93 - 19.0
+    d = round(new_x - old_x, 2)                                            # -10.07
+    n = rime['size']
+    # --- Rimeveil: the leg and the corner tower move, the north wall grows west to meet it
+    pieces = [o for o in rime['objects'] if o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG]
+    leg = [o for o in pieces if abs(o['x'] - old_x) < .05 and 245 < o['y'] < 296]
+    assert len(leg) == 8, f'the leg of Rimeveil\'s wall changed: {len(leg)} pieces'
+    for o in leg:
+        o['x'] = round(o['x'] + d, 2)
+    north = sorted((o for o in pieces if o['kind'] == 'rampart' and abs(o['y'] - 251.8) < .05), key=lambda o: o['x'])
+    step = north[1]['x'] - north[0]['x']
+    x = north[0]['x'] - step
+    while x > new_x + 1.5:
+        rime['objects'].append(dict(north[0], x=round(x, 2)))
+        x -= step
+    floor = np.array([[c == '#' for c in row] for row in rime['shapeFloor']])
+    cut = np.zeros_like(floor)
+    cut[253:, int(new_x + .9) + 1:250] = True                        # the leg's band only: the vault's pocket at x ~ 269 stays
+    cut &= floor
+    floor &= ~cut
+    ys, xs = np.nonzero(cut)
+    gone = lambda o: new_x + .9 <= o['x'] and o['y'] >= 252.7 and o['kind'] != 'void'
+    rime['objects'] = [o for o in rime['objects'] if o['kind'] in ('rampart', 'tower') and o.get('layout') == TAG or not gone(o)]
+    rime['slimes'] = [t for t in rime['slimes'] if not (new_x + .9 <= t['x'] and t['y'] >= 252.7)]
+    rime['shapeFloor'] = floor_rows(floor)
+    # the stretch of the border that no longer crosses (x > 222 in Rimeveil's frame, 241 in Gloamfen's) is an ordinary edge again: voids right at the land
+    m_r = margins[2].copy()
+    m_r[280:, int(CORNER_CUT_X - 19):] = False
+    rime['objects'] = [o for o in rime['objects'] if o['kind'] != 'void'] + void_pieces(floor | m_r)
+    code = chr(ord('A') + rime['shape']['neighbours'].index(4))
+    er = [list(r_) for r_ in rime['shapeEdge']]
+    band = dilate(floor, EDGE_BAND) & ~floor
+    near = dilate(cut, EDGE_BAND)
+    seamed = {chr(ord('A') + rime['shape']['neighbours'].index(p_['to'])) for p_ in rime['portals'] if 'seam' in p_}
+    for yy in range(n):
+        for xx in range(n):
+            if floor[yy, xx]:
+                er[yy][xx] = ' '
+            elif near[yy, xx] and band[yy, xx] and er[yy][xx] not in seamed:
+                er[yy][xx] = code
+    rime['shapeEdge'] = [''.join(r_) for r_ in er]
+    for reg in rime['shape'].get('vaultRegions', []):
+        for key in ('land', 'strip', 'city'):
+            pts = reg[key]
+            for i in range(0, len(pts), 2):
+                if abs(pts[i] - 238.2) < .05 and 250 < pts[i + 1] < 296:
+                    pts[i] = round(pts[i] + d, 2)
+                elif abs(pts[i] - 242.2) < .05 and 250 < pts[i + 1] < 296:
+                    pts[i] = round(pts[i] + d, 2)
+    # --- Gloamfen: the stub along the north wall east of the corner goes, and the lip of land beside it
+    fen['objects'] = [o for o in fen['objects'] if not (o['kind'] == 'rampart' and o.get('layout') == TAG and abs(o['y'] - 62.0) < .05 and o['x'] > 247)]
+    ffloor = np.array([[c == '#' for c in row] for row in fen['shapeFloor']])
+    fcut = np.zeros_like(ffloor)
+    fcut[:64, 247:] = True
+    fcut &= ffloor
+    ffloor &= ~fcut
+    fen['shapeFloor'] = floor_rows(ffloor)
+    m_f = margins[3].copy()
+    m_f[:75, int(CORNER_CUT_X):] = False
+    fen['objects'] = [o for o in fen['objects'] if o['kind'] != 'void'] + void_pieces(ffloor | m_f)
+    fcode = chr(ord('A') + fen['shape']['neighbours'].index(4))
+    fer = [list(r_) for r_ in fen['shapeEdge']]
+    fband = dilate(ffloor, EDGE_BAND) & ~ffloor
+    fnear = dilate(fcut, EDGE_BAND)
+    fseamed = {chr(ord('A') + fen['shape']['neighbours'].index(p_['to'])) for p_ in fen['portals'] if 'seam' in p_}
+    for yy in range(fen['size']):
+        for xx in range(fen['size']):
+            if ffloor[yy, xx]:
+                fer[yy][xx] = ' '
+            elif fnear[yy, xx] and fband[yy, xx] and fer[yy][xx] not in fseamed:
+                fer[yy][xx] = fcode
+    fen['shapeEdge'] = [''.join(r_) for r_ in fer]
+    print(f'corner wall aligned: Rimeveil leg moved {d}, {int(cut.sum())} Rimeveil and {int(fcut.sum())} Gloamfen cells handed to the city')
 
 
 CORNER_CUT_X = 241.0

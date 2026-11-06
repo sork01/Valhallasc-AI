@@ -88,10 +88,10 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal), [vx, vy] = gate.vault;
     await debug({ op: 'teleport', zone, x: arch.x - gate.walk[0] * 2, y: arch.y - gate.walk[1] * 2 });
     await page.waitForFunction(z => Field.zone === z, zone, { timeout: 20000 }); await page.waitForTimeout(1500);
-    const A = await page.evaluate(([x, y]) => Field.sceneAround(x, y, 34), [arch.x, arch.y]);
+    const A = await page.evaluate(([x, y, R]) => Field.sceneAround(x, y, R), [arch.x, arch.y, +process.env.SCENE_R || 34]);
     await debug({ op: 'teleport', zone: 4, x: arch.x + vx + gate.walk[0] * 2, y: arch.y + vy + gate.walk[1] * 2 });
     await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 }); await page.waitForTimeout(1500);
-    const B = await page.evaluate(([x, y]) => Field.sceneAround(x, y, 34), [arch.x + vx, arch.y + vy]);
+    const B = await page.evaluate(([x, y, R]) => Field.sceneAround(x, y, R), [arch.x + vx, arch.y + vy, +process.env.SCENE_R || 34]);
     const near = (o, L, dx, dy) => L.some(q => q[0] === o[0] && Math.hypot(q[1] - o[1] - dx, q[2] - o[2] - dy) < .6);
     const onlyZone = A.filter(o => !near(o, B, vx, vy)), onlyCity = B.filter(o => !near(o, A, -vx, -vy));
     const fmt = (L, dx, dy) => L.map(o => `${o[0]}@${(o[1] + dx).toFixed(1)},${(o[2] + dy).toFixed(1)}`).join(' ');

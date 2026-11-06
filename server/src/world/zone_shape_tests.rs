@@ -1927,7 +1927,7 @@ fn per_walks_the_survey_from_the_rest_over_the_causeway_to_hydra_isle() {
 fn walking_down_rimeveils_wall_into_the_last_wedge_never_shuts_a_hero_in() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
-    for (sx, sy, dx, dy) in [(236.2, 270., 0., 1.), (236.2, 270., -0.3, 1.), (230., 285., 0.7, 0.7), (236.2, 286., 0., 1.), (236.2, 286., 1., 1.)] {
+    for (sx, sy, dx, dy) in [(224.5, 270., 0., 1.), (224.5, 270., -0.3, 1.), (216., 285., 0.7, 0.7), (224.5, 286., 0., 1.), (224.5, 286., 1., 1.)] {
         place(&mut w, 1, 2, at(sx, sy));
         for _ in 0..600 {
             w.time += TICK;
