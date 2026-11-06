@@ -240,7 +240,7 @@ def shardback(clip, n):
     fall = sm(dn * 1.1)
     lie = sm(clamp01((dn - .3) * 1.5))
     a = Painter('shardback', st * 5 - w * 4 + recoil)
-    base = 25 + bob * .5 - lie * 11 - fall * 2 - st * 2
+    base = 25 + bob * .5 - lie * 9 - fall * 2 - st * 2
     # legs: three a side, jointed up and out, a spiked foot; the far ones darker and behind
     def leg(x, p0, side, far):
         sw = math.sin(ph + p0) * 5 if clip == 'walk' else 0

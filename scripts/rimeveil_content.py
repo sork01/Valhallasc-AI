@@ -16,7 +16,7 @@ LEVELS = json.loads((ROOT / 'world/levels.txt').read_text())
 XP = {lv: LEVELS[lv - 1] // 10 for lv in range(10, 16)}
 GOLD = {10: 200, 11: 250, 12: 300, 13: 380, 14: 450, 15: 550}
 
-ELITES = [('hoarhorn', 46, 102), ('whitewail', 268, 128), ('shardback', 214, 262)]
+ELITES = [('hoarhorn', 46, 102), ('whitewail', 296, 130), ('shardback', 214, 262)]
 
 HUT = dict(r=0, width=3.4, depth=3.2)
 
@@ -87,11 +87,12 @@ PLACES = [
     dict(id='rime_sledge_m', name='The Stranded Sledge', x=96, y=259, r=2.1, waves=[dict(at=1, tag='rime_sledge_m#a'), dict(at=11, tag='rime_sledge_m#b')]),
     dict(id='rime_whalecairn', name='The Whale Cairn', x=14, y=206, r=7),
     dict(id='rime_signal_m', name='The Shearwind Fire', x=30, y=128, r=2.1, waves=[dict(at=1, tag='rime_signal_m#a'), dict(at=11, tag='rime_signal_m#b')]),
-    dict(id='rime_hornspire', name='The Hornspire Ridge', x=254, y=102, r=7),
+    dict(id='rime_hornspire', name='The Hornspire Ridge', x=306, y=101, r=7),
     dict(id='rime_heart', name='The Heart of the Glacier', x=167, y=149, r=8),
-    dict(id='rime_ford_outer', name='The Outer Ford', x=168, y=229, r=6),
-    dict(id='rime_ford_mid', name='The Middle Ford', x=168, y=203, r=6),
-    dict(id='rime_ford_inner', name='The Inner Ford', x=168, y=180, r=6),
+    dict(id='rime_ford_outer', name='The Outer Ford', x=168, y=229, r=4),
+    dict(id='rime_ford_blue', name='The Bluewater Ford', x=168, y=219, r=4),
+    dict(id='rime_ford_mid', name='The Middle Ford', x=168, y=203, r=5),
+    dict(id='rime_ford_inner', name='The Inner Ford', x=168, y=180, r=5),
 ]
 
 # Sleepers woken by a wave or an escort ambush
@@ -156,8 +157,9 @@ QUESTS = [
       [('kill', 'whitewail', 'Defeat Whitewail', 1)], requires='rime_pk_ridge', recommendedPlayers=3),
     # Rimeward Camp: the middle of the glacier
     Q('rime_spiral', 'The Spiral Road', 'rime_loremaster', 13,
-      'The old road crosses each ring of blue ice on a ford. Ylva wants the three southern fords walked in order, outer, middle and inner, to see which of them still holds.',
-      [('visit', 'rime_ford_outer', 'Cross the Outer Ford', 1), ('visit', 'rime_ford_mid', 'Cross the Middle Ford', 1), ('visit', 'rime_ford_inner', 'Cross the Inner Ford', 1)],
+      'The old road crosses each ring of blue ice on a ford. Ylva wants the four southern fords walked in order, from the outermost ring in, to see which of them still holds.',
+      [('visit', 'rime_ford_outer', 'Cross the Outer Ford', 1), ('visit', 'rime_ford_blue', 'Cross the Bluewater Ford', 1), ('visit', 'rime_ford_mid', 'Cross the Middle Ford', 1),
+       ('visit', 'rime_ford_inner', 'Cross the Inner Ford', 1)],
       requires='rime_wolves'),
     Q('rime_ice_salve', 'Salve from Shell', 'rime_healer', 12,
       'Crushed rime shell makes the one salve that works on frostbite. Brother Eirik is out of it and the shelf crabs are not. Bring five shells.',
@@ -174,9 +176,9 @@ QUESTS = [
 # Old ids, new meaning: (fields to replace)
 REWRITES = {
     'rime_welcome': dict(description='Meet Huntress Brynja, Brother Eirik, Trader Skadi and Loremaster Ylva in Rimeward Camp, then report to Warden Halvard. The glacier is bigger than it looks: four rings of blue ice, three outposts and a heart nobody has charted.'),
-    'rime_crabs': dict(description='Rime crabs crowd the shelf south of Rimeward Camp. Defeat five of them and return to Brynja.'),
+    'rime_crabs': dict(description='Rime crabs crowd the shelf round Rimeward Camp. Defeat five of them and return to Brynja.'),
     'rime_crab_sweep': dict(npc='rime_dw_hild', title='Crack the Southern Drifts', description='The crabs breed under the drifts all the way to the fen border. Defeat ten of them so the sledge road to Driftwatch stays open.'),
-    'rime_wolves': dict(description='Frostfang wolves hunt in packs on the Rimewalk, the outermost ring of the glacier. Defeat four and report to Brynja.'),
+    'rime_wolves': dict(description='Frostfang wolves hunt in packs on the Rimewalk, the lane inside the outermost ring of the glacier. Defeat four and report to Brynja.'),
     'rime_wolf_pack': dict(npc='rime_sw_runa', description='The packs on the western strand are the biggest on the glacier. Defeat eight Frostfang Wolves so the Shearwind scouts can cross it alive.'),
     'rime_thaw': dict(description='Lost climbers lie frozen in the Bluewater Walk and along the shelf. Clear six Rime Crabs and four Frostfang Wolves from around them.'),
     'rime_yetis': dict(description='Glacier yetis roam the Bluewater Walk, between the second and third ring. Defeat three and bring Ylva their count.'),
@@ -186,12 +188,12 @@ REWRITES = {
     'rime_vanguard': dict(description='Prove you can hold the whole glacier: defeat two of every monster, from the shelf to the Heart, and report to Halvard.'),
     'rime_bounty': dict(description='Defeat ten enemies of any kind anywhere on Rimeveil Glacier and return to Skadi. This patrol can be repeated.'),
     'rime_supply_route': dict(title='Keep the Sledge Road Open', description='The road to the outposts crosses crab country and wolf country. Clear three Rime Crabs and three Frostfang Wolves for the next sledge. Skadi offers this contract again after each turn-in.'),
-    'rime_onward': dict(description='The Crags have little left to teach you. A walk east of Cinderwatch leads up onto the Rimeveil Glacier: climb it, find Rimeward Camp and report to Warden Halvard.'),
+    'rime_onward': dict(description='The Crags have little left to teach you. A walk west of Cinderwatch leads up onto the Rimeveil Glacier: climb it, find Rimeward Camp and report to Warden Halvard.'),
 }
 
 NPC_UPDATES = {
     'rime_warden': 'Welcome to Rimeward Camp. The glacier winds up in four rings of blue ice with a heart in the middle, and three outposts hold the far edges: Driftwatch on the fen border, Shearwind on the western cliffs, Peakrest among the peaks. Crabs on the shelf, wolves on the outer ring, yetis on the next, wyrms in the Whorl. Report back here.',
-    'rime_tracker': 'The south shelf is crab country and the packed-snow road runs straight through it. I need the crabs thinned and the wolf packs on the outer ring broken before the sledges can climb. Do not stand still on the fords; everything wakes there.',
+    'rime_tracker': 'The shelf round the camp is crab country and the packed-snow road runs straight through it. I need the crabs thinned and the wolf packs on the outer ring broken before the sledges can climb. Do not stand still on the fords; everything wakes there.',
     'rime_loremaster': 'The ice here is older than the Crags and it is not quiet. I chart every footprint I can reach, and every ring has a ford where the old road still holds. Something coils in the Whorl and breathes the cold out through the rings. Help me learn what it is.',
 }
 

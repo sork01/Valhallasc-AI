@@ -38,7 +38,7 @@ RINGS = [
 FORD = 4.2          # half width of a crossing
 
 # ---- the plan -------------------------------------------------------------------------------------------------------
-# The four ring bands are decided by the normalised radius (`band`); everything outside the outer ring by the nearest seed.
+# The four lanes inside the rings are decided by each ring's own ellipse (`make_regions`); everything outside the outer ring by the nearest seed.
 FAR = (-9999, -9999)
 REGIONS = {
     'heart':     dict(name='The Heart of the Glacier', seeds=[FAR]),
@@ -53,7 +53,6 @@ REGIONS = {
     'horn':      dict(name='The Hornspire Ridge', seeds=[(285, 98), (300, 120), (265, 82)]),
     'whitefall': dict(name='The Whitefall', seeds=[(302, 160), (305, 195), (290, 225), (298, 140)]),
 }
-BAND = {'heart': (0, .42), 'whorl': (.42, .70), 'blue': (.70, .87), 'rimewalk': (.87, 1.04)}   # normalised to the outer ring
 
 ROADS = [
     # the spine of the painting: the Wyrdwood gate straight down through every ring (a ford at each) to the south road
@@ -117,19 +116,15 @@ class Rimeveil(Designer):
         # the zone is big: a thinner hand keeps the object list a manageable size; the lane is wide enough for the biggest block (r 1.35)
         return super().scatter(kinds, int(count * .7), where, gap, road)
 
-    # ---- the regions: ring bands round the Heart, nearest seed outside -------------------------------------------------
-    def band(self):
-        """Normalised radius round the Heart, as the outer ring sees it (1.0 = the outer ring's own line)."""
-        rx, ry = RINGS[-1][0], RINGS[-1][1]
-        wob = 1 + (fbm(self.noise, self.xs, self.ys, .05) - .5) * .06
-        return np.hypot((self.xs - CENTRE[0]) / rx, (self.ys - CENTRE[1]) / ry) * wob
-
+    # ---- the regions: the lanes between the rings, nearest seed outside ---------------------------------------------------
     def make_regions(self):
+        """Inside the outer ring is the Rimewalk, inside the third the Bluewater Walk, inside the second the Whorl, inside the first the Heart: each ring's own ellipse
+        decides (they are not concentric scalings of one another), so a lane's name changes exactly where a ring is crossed."""
         out = super().make_regions()
-        u = self.band()
+        wob = 1 + (fbm(self.noise, self.xs, self.ys, .05) - .5) * .06
         names = list(REGIONS)
-        for name, (lo, hi) in BAND.items():
-            out[(u >= lo) & (u < hi)] = names.index(name)
+        for name, (rx, ry, *_rest) in zip(('rimewalk', 'blue', 'whorl', 'heart'), reversed(RINGS)):
+            out[np.hypot((self.xs - CENTRE[0]) / rx, (self.ys - CENTRE[1]) / ry) * wob < 1] = names.index(name)
         return out
 
     # ---- water: the rings, the holes ---------------------------------------------------------------------------------------

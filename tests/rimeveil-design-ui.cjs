@@ -19,10 +19,10 @@ const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const SPOTS = [
   ['heart', 174, 149, 'The Heart of the Glacier'], ['whorl', 194, 120, 'The Inner Whorl'], ['blue', 229, 111, 'The Bluewater Walk'], ['rimewalk', 225, 89, 'The Rimewalk'],
   ['shelf', 260, 230, 'The Rimeward Shelf'], ['drifts', 139, 246, 'The Southern Drifts'], ['strand', 30, 205, 'The Shearwind Strand'], ['fells', 44, 92, 'The Whalebone Fells'],
-  ['wyrdgate', 176, 64, 'The Wyrdgate Reach'], ['horn', 310, 108, 'The Hornspire Ridge'], ['whitefall', 287, 212, 'The Whitefall'],
+  ['wyrdgate', 176, 64, 'The Wyrdgate Reach'], ['horn', 310, 108, 'The Hornspire Ridge'], ['hornspire-place', 306, 101, 'The Hornspire Ridge'], ['lane-west-blue', 90, 149, 'The Bluewater Walk'], ['lane-west-whorl', 118, 149, 'The Inner Whorl'], ['whitefall', 287, 212, 'The Whitefall'],
 ];
 const OUTPOSTS = [['driftwatch', 120, 253, 'Driftwatch'], ['shearwind', 36, 175, 'Shearwind Post'], ['peakrest', 285, 101, 'Peakrest']];
-const ELITES = [['hoarhorn', 46, 102], ['whitewail', 268, 128], ['shardback', 214, 262]];
+const ELITES = [['hoarhorn', 46, 102], ['whitewail', 296, 130], ['shardback', 214, 262]];
 const RINGS = [[46, 149], [77, 149], [232, 149], [288, 149]];   // the four ice rings on the Heart's east-west line
 (async () => {
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',
@@ -44,6 +44,7 @@ const RINGS = [[46, 149], [77, 149], [232, 149], [288, 149]];   // the four ice 
     const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[1];
     const cells = new Uint8Array(Z.size * Z.size); for (const [ry, a, b, k] of Z.regions.spans) cells.fill(k, ry * Z.size + a, ry * Z.size + b + 1);
     check(Z.regions.names.length === 11, 'eleven regions');
+    for (const p of Z.places.filter(p => ['rime_hornspire', 'rime_heart'].includes(p.id))) check(Z.regions.names[cells[Math.floor(p.y) * Z.size + Math.floor(p.x)] - 1] === (p.id === 'rime_heart' ? 'The Heart of the Glacier' : 'The Hornspire Ridge'), `the place ${p.id} lies in the region it is named for`);
     for (const [id, x, y, name] of SPOTS) {
       check(Z.regions.names[cells[y * Z.size + x] - 1] === name, `${id}: the data puts (${x},${y}) in ${name}`);
       await go(x, y);
