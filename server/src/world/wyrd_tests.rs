@@ -2,7 +2,6 @@
 //! and the two elites.
 use super::*;
 
-const SKALD: usize = 4;
 const WYRD: usize = 6;
 const STEP: f64 = 1.;
 
@@ -186,7 +185,13 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_three_elites_five_hubs_and_
         assert!(!map.in_city(at(spawn.x, spawn.y)));
     }
     // every hunting ground has its kind in numbers; the three elites stand alone
-    for (kind, floor) in [("boar", 55), ("crow", 55), ("troll", 50), ("weaver", 45), ("ram", 55)] {
+    for (kind, floor) in [
+        ("boar", 55),
+        ("crow", 55),
+        ("troll", 50),
+        ("weaver", 45),
+        ("ram", 55),
+    ] {
         assert!(live[kind] >= floor, "{kind}: {}", live[kind]);
     }
     for kind in ["hrungnir", "oakhorn", "hangedking"] {
@@ -250,14 +255,11 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_three_elites_five_hubs_and_
     }
     // the gates: the way to Bifrost Reach and its way back; the Crags and the glacier are seams, Skaldholm is not a neighbour
     let up = map.portals.iter().find(|p| p.id == "sky_gate").unwrap();
-    let down = w.maps[7]
-        .portals
-        .iter()
-        .find(|p| p.to == WYRD)
-        .unwrap();
+    let down = w.maps[7].portals.iter().find(|p| p.to == WYRD).unwrap();
     assert_eq!(up.to, 7);
     assert!(
-        at(down.tx, down.ty).distance(at(up.x, up.y)) > up.r + 0.5 && at(down.tx, down.ty).distance(at(up.x, up.y)) < 8.,
+        at(down.tx, down.ty).distance(at(up.x, up.y)) > up.r + 0.5
+            && at(down.tx, down.ty).distance(at(up.x, up.y)) < 8.,
         "the arrival stands clear of the gate, beside it"
     );
     assert_eq!(map.portals.iter().filter(|p| p.seam.is_some()).count(), 2);
@@ -265,7 +267,10 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_three_elites_five_hubs_and_
         let door = w.maps[41].portals.iter().find(|p| p.id == barrow).unwrap();
         let mut a = at(door.tx, door.ty);
         map.collide(&mut a, PLAYER_RADIUS);
-        assert!(a.distance(at(door.tx, door.ty)) < 1e-6, "{barrow} lands on free ground");
+        assert!(
+            a.distance(at(door.tx, door.ty)) < 1e-6,
+            "{barrow} lands on free ground"
+        );
     }
     let mut spawn_clear = map.spawn;
     map.collide(&mut spawn_clear, PLAYER_RADIUS);
@@ -295,9 +300,17 @@ fn the_river_has_one_bridge_and_each_ridge_one_gap_so_the_bands_come_in_order() 
     // every person, every live enemy, every place and both gates can be walked to
     // (a cell beside the spot counts: people stand close to walls, and the grid is coarse)
     let near = |seen: &[bool], p: Point| {
-        [(0., 0.), (1., 0.), (-1., 0.), (0., 1.), (0., -1.), (2., 0.), (0., 2.)]
-            .iter()
-            .any(|(dx, dy)| reached(map, seen, at(p.x + dx, p.y + dy)))
+        [
+            (0., 0.),
+            (1., 0.),
+            (-1., 0.),
+            (0., 1.),
+            (0., -1.),
+            (2., 0.),
+            (0., 2.),
+        ]
+        .iter()
+        .any(|(dx, dy)| reached(map, seen, at(p.x + dx, p.y + dy)))
     };
     for n in &map.npcs {
         if n.id.starts_with("barrow") {
@@ -319,13 +332,16 @@ fn the_river_has_one_bridge_and_each_ridge_one_gap_so_the_bands_come_in_order() 
     }
     // the bridge stands at x 166 over the river (y 226): closing it cuts the map in two
     let skuldwatch = &map.camps[0]; // Skuldwatch comes first
-    let fort = at(
-        (skuldwatch.x0 + skuldwatch.x1) / 2.,
-        skuldwatch.y1 - 3.,
-    );
+    let fort = at((skuldwatch.x0 + skuldwatch.x1) / 2., skuldwatch.y1 - 3.);
     let no_bridge = seal(&[(166., 226., 5.6)]);
-    assert!(!reached(map, &no_bridge, fort), "Skuldwatch lies beyond the bridge");
-    assert!(!reached(map, &no_bridge, at(152., 100.)), "and so does the whole north");
+    assert!(
+        !reached(map, &no_bridge, fort),
+        "Skuldwatch lies beyond the bridge"
+    );
+    assert!(
+        !reached(map, &no_bridge, at(152., 100.)),
+        "and so does the whole north"
+    );
     for s in w.slimes.iter().filter(|s| s.zone == WYRD && !s.dead) {
         assert_eq!(
             reached(map, &no_bridge, s.point()),
@@ -686,11 +702,22 @@ fn the_five_wyrdwood_travel_masters_are_linked_and_a_flight_costs_twenty_gold_a_
     let mut rx = join(&mut w, 1, Class::Warrior);
     // the old hubs keep their masters; the three outposts are linked to both
     let hollow = npc(&w, "travel_hollowmoot");
-    for id in ["travel_skuldwatch", "travel_gallowsfoot", "travel_ridgewatch", "travel_highmoor"] {
-        assert!(hollow.travel_links.iter().any(|l| l == id), "Hollowmoot links to {id}");
+    for id in [
+        "travel_skuldwatch",
+        "travel_gallowsfoot",
+        "travel_ridgewatch",
+        "travel_highmoor",
+    ] {
+        assert!(
+            hollow.travel_links.iter().any(|l| l == id),
+            "Hollowmoot links to {id}"
+        );
     }
     let skuld = npc(&w, "travel_skuldwatch");
-    assert!(skuld.travel_links.iter().any(|l| l == "travel_perch"), "the Bifrost link stays");
+    assert!(
+        skuld.travel_links.iter().any(|l| l == "travel_perch"),
+        "the Bifrost link stays"
+    );
     for id in ["travel_gallowsfoot", "travel_ridgewatch", "travel_highmoor"] {
         assert_eq!(
             npc(&w, id).travel_links,
@@ -726,7 +753,10 @@ fn the_five_wyrdwood_travel_masters_are_linked_and_a_flight_costs_twenty_gold_a_
         .spark_travel
         .clone()
         .expect("the flight starts");
-    assert_eq!(w.players[&1].character.gold, 80, "one leg: Hollowmoot - Highmoor Hold");
+    assert_eq!(
+        w.players[&1].character.gold, 80,
+        "one leg: Hollowmoot - Highmoor Hold"
+    );
     assert_eq!(flight.stops, ["travel_hollowmoot", "travel_highmoor"]);
     for _ in 0..(400. / TICK) as usize {
         w.step();
@@ -750,7 +780,11 @@ fn every_hub_of_the_wyrdwood_is_a_sanctuary() {
         let map = &w.maps[WYRD];
         let c = map.city.as_ref().unwrap();
         std::iter::once(((c.x0 + c.x1) / 2., (c.y0 + c.y1) / 2.))
-            .chain(map.camps.iter().map(|k| ((k.x0 + k.x1) / 2., (k.y0 + k.y1) / 2.)))
+            .chain(
+                map.camps
+                    .iter()
+                    .map(|k| ((k.x0 + k.x1) / 2., (k.y0 + k.y1) / 2.)),
+            )
             .collect()
     };
     assert_eq!(plazas.len(), 5);
@@ -803,7 +837,10 @@ fn a_hirer_rents_two_fighters_for_the_oakhorn_and_four_for_hrungnir() {
         w.interact(1, "wyrd_warden", Some(&format!("merc_{class}")));
     }
     assert_eq!(mercs(&w), 2, "a party of three: the hero and two fighters");
-    assert_eq!(w.players[&1].character.gold, 20_000 - 2 * super::mercs::merc_price(25));
+    assert_eq!(
+        w.players[&1].character.gold,
+        20_000 - 2 * super::mercs::merc_price(25)
+    );
 }
 
 #[test]
@@ -1179,8 +1216,14 @@ fn enemies_pick_the_escort_as_a_target_and_hurt_her() {
         "the nearest hero in sight is Eydis"
     );
     let hp = w.players[&session].character.hp;
-    w.time += 5.;
-    w.hurt_player_by(session, 400., here, "boar", 21);
+    // a blow can be dodged (a random draw): a few blows land at least once
+    for _ in 0..30 {
+        w.time += 5.;
+        w.hurt_player_by(session, 400., here, "boar", 21);
+        if w.players[&session].character.hp < hp {
+            break;
+        }
+    }
     assert!(w.players[&session].character.hp < hp);
 }
 
@@ -1423,7 +1466,7 @@ fn fight(
         let points = (level - 1) * 3;
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = level;
-        c.gold = 500_000;       // a hire costs merc_price(level) now: four of them at level 30 are several thousand
+        c.gold = 500_000; // a hire costs merc_price(level) now: four of them at level 30 are several thousand
         c.attributes.stamina = points / 5;
         c.attributes.accuracy = 7;
         c.attributes.strength = points - points / 5 - 7;

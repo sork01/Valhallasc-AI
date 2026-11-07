@@ -16,7 +16,13 @@ fn enter(w: &mut World, session: u64) {
             completions: 1,
         });
     }
-    place(w, session, WYRD, at(84., 66.));
+    let door = w.maps[WYRD]
+        .portals
+        .iter()
+        .find(|p| p.id == "wyrd_nornroot")
+        .map(|p| at(p.x, p.y))
+        .expect("the barrow door");
+    place(w, session, WYRD, door);
     w.time += 2.;
     w.use_portal(session);
 }

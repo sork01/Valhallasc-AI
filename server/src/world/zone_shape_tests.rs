@@ -283,7 +283,8 @@ fn the_wyrdwood_and_the_crags_share_a_seam() {
 }
 
 #[test]
-fn the_wyrdwood_seams_meet_the_crags_and_glacier_seam_at_a_corner_nobody_stands_on_two_crossings_at() {
+fn the_wyrdwood_seams_meet_the_crags_and_glacier_seam_at_a_corner_nobody_stands_on_two_crossings_at()
+ {
     let data = bundled();
     let z = zone_of(&data, 6);
     let seams: Vec<&Value> = z["portals"]
@@ -292,7 +293,11 @@ fn the_wyrdwood_seams_meet_the_crags_and_glacier_seam_at_a_corner_nobody_stands_
         .iter()
         .filter_map(|p| p.get("seam"))
         .collect();
-    assert_eq!(seams.len(), 2, "the Wyrdwood has a seam to the Crags and one to the glacier");
+    assert_eq!(
+        seams.len(),
+        2,
+        "the Wyrdwood has a seam to the Crags and one to the glacier"
+    );
     // the junction: the end point the two seams share
     let ends: Vec<Vec<(f64, f64)>> = seams
         .iter()
@@ -308,13 +313,13 @@ fn the_wyrdwood_seams_meet_the_crags_and_glacier_seam_at_a_corner_nobody_stands_
         .iter()
         .flat_map(|a| ends[1].iter().map(move |b| (*a, *b)))
         .min_by(|x, y| {
-            ((x.0 .0 - x.1 .0).hypot(x.0 .1 - x.1 .1))
-                .partial_cmp(&((y.0 .0 - y.1 .0).hypot(y.0 .1 - y.1 .1)))
+            ((x.0.0 - x.1.0).hypot(x.0.1 - x.1.1))
+                .partial_cmp(&((y.0.0 - y.1.0).hypot(y.0.1 - y.1.1)))
                 .unwrap()
         })
         .unwrap();
     assert!(
-        (junction.0 .0 - junction.1 .0).hypot(junction.0 .1 - junction.1 .1) < 0.5,
+        (junction.0.0 - junction.1.0).hypot(junction.0.1 - junction.1.1) < 0.5,
         "the two seams meet at one corner"
     );
     // a hero walking toward the corner from inside the Wyrdwood is never on land of one zone while a neighbour's seam also claims him:
@@ -333,20 +338,20 @@ fn the_wyrdwood_seams_meet_the_crags_and_glacier_seam_at_a_corner_nobody_stands_
             let claims = seams
                 .iter()
                 .filter(|s| {
-                    s["points"]
-                        .as_array()
-                        .unwrap()
-                        .windows(2)
-                        .any(|w| {
-                            let (ax, ay) = (w[0][0].as_f64().unwrap(), w[0][1].as_f64().unwrap());
-                            let (bx, by) = (w[1][0].as_f64().unwrap(), w[1][1].as_f64().unwrap());
-                            let (dx, dy) = (bx - ax, by - ay);
-                            let t = (((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)).clamp(0., 1.);
-                            (x - ax - t * dx).hypot(y - ay - t * dy) < 0.5
-                        })
+                    s["points"].as_array().unwrap().windows(2).any(|w| {
+                        let (ax, ay) = (w[0][0].as_f64().unwrap(), w[0][1].as_f64().unwrap());
+                        let (bx, by) = (w[1][0].as_f64().unwrap(), w[1][1].as_f64().unwrap());
+                        let (dx, dy) = (bx - ax, by - ay);
+                        let t =
+                            (((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)).clamp(0., 1.);
+                        (x - ax - t * dx).hypot(y - ay - t * dy) < 0.5
+                    })
                 })
                 .count();
-            assert!(claims <= 1, "a point on the land at ({x:.1}, {y:.1}) lies on both seams");
+            assert!(
+                claims <= 1,
+                "a point on the land at ({x:.1}, {y:.1}) lies on both seams"
+            );
         }
     }
     assert!(checked > 0, "no land samples near the corner");
@@ -2020,7 +2025,13 @@ fn per_walks_the_survey_from_the_rest_over_the_causeway_to_hydra_isle() {
 fn walking_down_rimeveils_wall_into_the_last_wedge_never_shuts_a_hero_in() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
-    for (sx, sy, dx, dy) in [(224.5, 270., 0., 1.), (224.5, 270., -0.3, 1.), (216., 285., 0.7, 0.7), (224.5, 286., 0., 1.), (224.5, 286., 1., 1.)] {
+    for (sx, sy, dx, dy) in [
+        (224.5, 270., 0., 1.),
+        (224.5, 270., -0.3, 1.),
+        (216., 285., 0.7, 0.7),
+        (224.5, 286., 0., 1.),
+        (224.5, 286., 1., 1.),
+    ] {
         place(&mut w, 1, 2, at(sx, sy));
         for _ in 0..600 {
             w.time += TICK;
@@ -2040,9 +2051,19 @@ fn walking_down_rimeveils_wall_into_the_last_wedge_never_shuts_a_hero_in() {
             w.maps[zone].walk(&mut p, at(a.cos(), a.sin()), 6., PLAYER_RADIUS);
             moved += p.distance(spot);
         }
-        assert!(moved > 20., "shut in at zone {zone} ({:.1},{:.1}) after walking from ({sx},{sy}): {moved}", c.x, c.y);
+        assert!(
+            moved > 20.,
+            "shut in at zone {zone} ({:.1},{:.1}) after walking from ({sx},{sy}): {moved}",
+            c.x,
+            c.y
+        );
         if zone == 3 {
-            assert!(c.x < 246.5, "arrived inside Skaldholm's wall at ({:.1},{:.1})", c.x, c.y);
+            assert!(
+                c.x < 246.5,
+                "arrived inside Skaldholm's wall at ({:.1},{:.1})",
+                c.x,
+                c.y
+            );
         }
     }
 }
@@ -2054,7 +2075,11 @@ const WYRD_HUBS: [&str; 3] = ["gallowsfoot", "ridgewatch", "highmoor"];
 fn the_wyrdwood_outposts_are_sanctuaries_with_their_people() {
     let w = world();
     let map = &w.maps[6];
-    assert_eq!(map.camps.len(), 4, "Skuldwatch, Gallowsfoot, Ridgewatch and Highmoor Hold");
+    assert_eq!(
+        map.camps.len(),
+        4,
+        "Skuldwatch, Gallowsfoot, Ridgewatch and Highmoor Hold"
+    );
     for id in [
         "wyrd_gf_hild",
         "wyrd_gf_orm",
@@ -2083,7 +2108,13 @@ fn the_wyrdwood_outposts_are_sanctuaries_with_their_people() {
             "no enemy within eight units of {id}"
         );
     }
-    for hub in ["hollowmoot", "skuldwatch", "gallowsfoot", "ridgewatch", "highmoor"] {
+    for hub in [
+        "hollowmoot",
+        "skuldwatch",
+        "gallowsfoot",
+        "ridgewatch",
+        "highmoor",
+    ] {
         let find = |id: String| map.npcs.iter().find(|n| n.id == id).unwrap();
         let (b, m) = (
             find(format!("mailbox_6_{hub}")),
@@ -2096,8 +2127,15 @@ fn the_wyrdwood_outposts_are_sanctuaries_with_their_people() {
         assert!(map.line_clear(anchor, spot, 0.4), "{hub}: mailbox approach");
     }
     // the mail directory is in the shaped frame too
-    let dir: Vec<Value> = serde_json::from_str(include_str!("../../../world/mailboxes.txt")).unwrap();
-    for hub in ["hollowmoot", "skuldwatch", "gallowsfoot", "ridgewatch", "highmoor"] {
+    let dir: Vec<Value> =
+        serde_json::from_str(include_str!("../../../world/mailboxes.txt")).unwrap();
+    for hub in [
+        "hollowmoot",
+        "skuldwatch",
+        "gallowsfoot",
+        "ridgewatch",
+        "highmoor",
+    ] {
         let entry = dir
             .iter()
             .find(|d| d["id"] == format!("mailbox_6_{hub}"))
@@ -2113,10 +2151,17 @@ fn the_wyrdwood_outposts_are_sanctuaries_with_their_people() {
             "{hub}: the directory holds the mailbox where it stands"
         );
     }
-    let skuld = map.npcs.iter().find(|n| n.id == "travel_skuldwatch").unwrap();
+    let skuld = map
+        .npcs
+        .iter()
+        .find(|n| n.id == "travel_skuldwatch")
+        .unwrap();
     for hub in WYRD_HUBS {
         assert!(
-            skuld.travel_links.iter().any(|l| l == &format!("travel_{hub}")),
+            skuld
+                .travel_links
+                .iter()
+                .any(|l| l == &format!("travel_{hub}")),
             "Skuldwatch's Travel Master links to {hub}"
         );
     }
@@ -2251,11 +2296,20 @@ fn a_wyrdwood_road_reaches_every_gate_and_the_river_is_solid() {
         .unwrap()
         .iter()
         .filter_map(|p| p.get("seam"))
-        .flat_map(|s| s["points"].as_array().unwrap().iter().map(|q| (q[0].as_f64().unwrap(), q[1].as_f64().unwrap())))
+        .flat_map(|s| {
+            s["points"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|q| (q[0].as_f64().unwrap(), q[1].as_f64().unwrap()))
+        })
         .collect();
     for o in &water {
         let (x, y) = (o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
-        assert!(seams.iter().all(|q| (q.0 - x).hypot(q.1 - y) > 16.), "water at ({x},{y}) is near a seam");
+        assert!(
+            seams.iter().all(|q| (q.0 - x).hypot(q.1 - y) > 16.),
+            "water at ({x},{y}) is near a seam"
+        );
     }
     for road in paths {
         let pts = road.as_array().unwrap();
@@ -2279,16 +2333,45 @@ fn a_wyrdwood_road_reaches_every_gate_and_the_river_is_solid() {
     // no art-less building stands within the camera's reach of a seam: the other side draws none of them
     for o in z["objects"].as_array().unwrap() {
         let kind = o["kind"].as_str().unwrap();
-        if ["house", "tent", "stall", "noticeboard", "campfire", "brazier", "bench", "lamp", "chapel", "post"].contains(&kind) {
+        if [
+            "house",
+            "tent",
+            "stall",
+            "noticeboard",
+            "campfire",
+            "brazier",
+            "bench",
+            "lamp",
+            "chapel",
+            "post",
+        ]
+        .contains(&kind)
+        {
             let (x, y) = (o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
-            for pair in z["portals"].as_array().unwrap().iter().filter_map(|p| p.get("seam")).flat_map(|s| {
-                let pts = s["points"].as_array().unwrap();
-                (0..pts.len() - 1).map(|i| (pts[i].clone(), pts[i + 1].clone())).collect::<Vec<_>>()
-            }) {
-                let (ax, ay, bx, by) = (pair.0[0].as_f64().unwrap(), pair.0[1].as_f64().unwrap(), pair.1[0].as_f64().unwrap(), pair.1[1].as_f64().unwrap());
+            for pair in z["portals"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter_map(|p| p.get("seam"))
+                .flat_map(|s| {
+                    let pts = s["points"].as_array().unwrap();
+                    (0..pts.len() - 1)
+                        .map(|i| (pts[i].clone(), pts[i + 1].clone()))
+                        .collect::<Vec<_>>()
+                })
+            {
+                let (ax, ay, bx, by) = (
+                    pair.0[0].as_f64().unwrap(),
+                    pair.0[1].as_f64().unwrap(),
+                    pair.1[0].as_f64().unwrap(),
+                    pair.1[1].as_f64().unwrap(),
+                );
                 let (dx, dy) = (bx - ax, by - ay);
                 let t = (((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)).clamp(0., 1.);
-                assert!((x - ax - t * dx).hypot(y - ay - t * dy) >= 20., "{kind} at ({x},{y}) is within 20 tiles of a seam");
+                assert!(
+                    (x - ax - t * dx).hypot(y - ay - t * dy) >= 20.,
+                    "{kind} at ({x},{y}) is within 20 tiles of a seam"
+                );
             }
         }
     }

@@ -9201,7 +9201,10 @@ mod tests {
             "Skaldholm is the fifth map; every later zone is added after it"
         );
         assert_eq!(map.name, "Skaldholm");
-        assert_eq!(map.size, 184, "the rebuilt city: one frame with its four neighbours (docs/skaldholm-rebuild.md)");
+        assert_eq!(
+            map.size, 184,
+            "the rebuilt city: one frame with its four neighbours (docs/skaldholm-rebuild.md)"
+        );
         assert_eq!(map.size % 8, 0, "whole ground chunks");
         assert!(map.slimes.is_empty() && w.slimes.iter().all(|s| s.zone != CITY));
         assert!(
@@ -9270,13 +9273,7 @@ mod tests {
         let down = &map.portals[0];
         assert_eq!((up.to, down.to), (CITY, 2));
         // One doorway in one frame: the vault drops you just inside the arch, on free ground, and the offsets cancel.
-        assert!(free_for_player(
-            map,
-            Point {
-                x: up.tx,
-                y: up.ty
-            }
-        ));
+        assert!(free_for_player(map, Point { x: up.tx, y: up.ty }));
         assert_eq!(down.id, "glacier_gate");
         let (va, vb) = (up.vault.unwrap(), down.vault.unwrap());
         assert!((va[0] + vb[0]).abs() < 0.011 && (va[1] + vb[1]).abs() < 0.011);

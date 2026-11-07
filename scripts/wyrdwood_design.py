@@ -50,7 +50,7 @@ REGIONS = {
     'glade':     dict(name='The Moonpetal Glade', seeds=[(150, 298), (140, 306)]),
     'wyrdgate':  dict(name='The Wyrdgate Rise', seeds=[(170, 316), (200, 322), (132, 318), (210, 300)]),
     'banks':     dict(name='The Troll Banks', seeds=[(70, 246), (110, 244), (150, 244), (190, 246), (230, 246), (270, 246)]),
-    'oakgrove':  dict(name="The Oakhorn's Grove", seeds=[(248, 262), (228, 272), (262, 270)]),
+    'oakgrove':  dict(name="The Oakhorn's Grove", seeds=[(251, 258), (232, 270), (264, 268)]),
     'gallows':   dict(name='Gallows Hill', seeds=[(302, 316), (288, 306), (314, 308), (284, 328)]),
     'fells':     dict(name='The East Fells', seeds=[(330, 296), (312, 280), (296, 262), (300, 250)]),
     'mill':      dict(name='The Ruined Mill', seeds=[(330, 326), (352, 332), (320, 340)]),
@@ -80,15 +80,15 @@ ROADS = [
     # to Hollowmoot's Rotfang trail
     [(54.5, 277), (46, 290), (42, 306), (40, 316)],
     # the Norn Stones, the West Beacon, the barrow
-    [(166, 190), (150, 187), (126, 182), (110, 178), (96, 176)],
-    [(167.4, 185.5), (154, 185.5), (154, 183.5)],
+    [(167.4, 185.5), (154, 185.5), (140, 184), (126, 183), (110, 178), (96, 176)],
+    [(154, 185.5), (154, 183.5)],
     # up to the ridge: Norn terrace to the east gap, the Ridge Beacon and the Bifrost gate
     [(167.4, 181), (172, 170), (190, 166), (206, 166), (222.5, 165), (222.5, 156), (221.5, 146.5)],
     # the Ridge Beacon, the camp, the terrace and the west gap
     [(206, 150), (204, 145), (194, 143), (180, 143), (150, 138), (128, 136), (113, 133), (112.5, 126), (113, 118)],
     # up to the Storm Beacon and the hold, and on up to the giant's ring
     [(113, 118), (120, 108)],
-    [(120, 108), (136, 110), (150, 112), (152, 102), (152, 92)],
+    [(120, 108), (136, 110), (150, 112), (152, 102), (152, 98)],
     [(122, 100), (120, 108)],
 ]
 
@@ -128,6 +128,14 @@ def thick_mask(d, pts, wob=.18, scale=.08):
         dist = np.hypot(d.xs - ax - t * dx, d.ys - ay - t * dy)
         best = np.minimum(best, dist - (aw + (bw - aw) * t))
     return best < (fbm(d.noise, d.xs, d.ys, scale) - .5) * wob * 14
+
+
+def dense_points(path, step=2.0):
+    out = [tuple(path[0])]
+    for a, b in zip(path, path[1:]):
+        k = max(1, int(math.dist(a, b) / step))
+        out += [(a[0] + (b[0] - a[0]) * i / k, a[1] + (b[1] - a[1]) * i / k) for i in range(1, k + 1)]
+    return out
 
 
 def moved(o, dx, dy):
@@ -344,12 +352,12 @@ class Wyrdwood(Designer):
         # The Troll Banks: boulders and willows along the river's south bank
         sc(['rock', 'rock', 'bush', 'tree'], 520, m('banks'), gap=1.0)
         # The Oakhorn's Grove: the old oaks, close together, and a ring of stones round the thread
-        self.block_disc(248, 262, 10)
-        self.ring((248, 262), 10.5, 10, 'rock')
+        self.block_disc(251, 258, 10)
+        self.ring((251, 258), 10.5, 10, 'rock')
         sc(['tree', 'tree', 'tree', 'bush'], 480, m('oakgrove') & (dense > .3), gap=1.0)
         # Gallows Hill: dead trees, boulders, ribcages round the beam
         sc(['rock', 'rock', 'tree', 'bush'], 300, m('gallows'), gap=1.2)
-        self.ring((308, 318), 12, 6, 'bones', r=1.1)
+        self.ring((318, 298), 12, 6, 'bones', r=1.1)
         # The East Fells: scree, crag outcrops and storm pines up to the cloud wall
         sc(['rock', 'rock', 'pine', 'bush'], 520, m('fells'), gap=1.1)
         sc(['crag'], 90, m('fells'), gap=2.5)
@@ -566,6 +574,19 @@ def design(world, write=False):
             x, y = a[0] + (b[0] - a[0]) * k / 20, a[1] + (b[1] - a[1]) * k / 20
             if not (not solid[int(y), int(x)]):
                 problems.append(f'Eydis would walk into something at {x:.0f},{y:.0f}')
+    # an elite stands clear of everything a player walks to: awareness (the server's attack_profile) plus 3 tiles from every road, the escort's route, every place
+    # and person (the elite's own fight needs no approach), so a quest errand or a road never pulls it
+    awareness = {'oakhorn': 10., 'hrungnir': 14., 'hangedking': 9.}
+    walked = [(p, 'road') for road in ROADS + [route] for p in dense_points(road)]
+    walked += [((q['x'], q['y']), f"place {q['id']}") for q in zone['places']] + [((n['x'], n['y']), f"npc {n['id']}") for n in zone['npcs']]
+    for kind, ex, ey in content.ELITES:
+        near = min(((math.dist((ex, ey), p), what) for p, what in walked), key=lambda t: t[0])
+        if near[0] < awareness[kind] + 3:
+            problems.append(f'{kind} stands {near[0]:.1f} tiles from a {near[1]}: its awareness is {awareness[kind]:.0f}')
+        for c in [zone['city']] + zone['camps']:
+            gap = math.hypot(max(c['x0'] - ex, 0, ex - c['x1']), max(c['y0'] - ey, 0, ey - c['y1']))
+            if gap < awareness[kind] + 3:
+                problems.append(f'{kind} stands {gap:.1f} tiles from a hub')
     artless = ('house', 'tent', 'stall', 'noticeboard', 'campfire', 'brazier', 'bench', 'lamp', 'chapel', 'post')
     popping = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o['kind'] in artless and d.seam[int(o['y']), int(o['x'])] < 20]
     if not (not popping):
@@ -585,7 +606,7 @@ def design(world, write=False):
         s2[int(y0):int(y1) + 1, int(x0):int(x1) + 1] = True
         return d.reachable(s2, (int(SPAWN[0]), int(SPAWN[1])))
     plaza = zone['camps'][0]['entry']
-    ring_south = (152, 92)
+    ring_south = (152, 99)
     east_beacon = (206, 150)
     storm_beacon = (120, 108)
     shut = cut(BRIDGE_X - 5, RIVER_Y - 4, BRIDGE_X + 5, RIVER_Y + 4)

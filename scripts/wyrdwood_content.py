@@ -24,7 +24,7 @@ HAMLETS = {
     'highmoor':    dict(name='Highmoor Hold', x=150, y=112, hw=14, hh=11),
 }
 
-ELITES = [('oakhorn', 248, 262), ('hrungnir', 152, 78), ('hangedking', 308, 318)]
+ELITES = [('oakhorn', 251, 258), ('hrungnir', 152, 78), ('hangedking', 318, 298)]
 
 HUT = dict(r=0, width=3.4, depth=3.2)
 
@@ -89,7 +89,7 @@ NPCS = [
 PLACES = [
     dict(id='wyrd_mill', name='The Ruined Mill', x=318, y=326, r=5),
     dict(id='wyrd_east_gap', name='The East Gap', x=222, y=160, r=5),
-    dict(id='wyrd_hrung_ring', name="Hrungnir's Ring", x=152, y=92, r=5),
+    dict(id='wyrd_hrung_ring', name="Hrungnir's Ring", x=152, y=99, r=4),
     dict(id='wyrd_rotwood', name='The Rotfang Wood', x=40, y=316, r=7),
     dict(id='wyrd_vigil_m', name='The Hanged Vigil', x=276, y=311, r=2.1, waves=[dict(at=1, tag='wyrd_vigil_m#a'), dict(at=11, tag='wyrd_vigil_m#b')]),
     dict(id='wyrd_fire_m', name='The Ridge Fire', x=204, y=145, r=2.1, waves=[dict(at=1, tag='wyrd_fire_m#a'), dict(at=11, tag='wyrd_fire_m#b')]),
@@ -162,7 +162,7 @@ QUESTS = [
       'Eirik can tell how long the weavers\' loom will hold by the knots in what falls off it. Bring him six Frayed Fate Threads.',
       [('bring', 'fate_thread', 'Bring Frayed Fate Threads', 6)], requires='wyrd_fate'),
     Q('wyrd_hm_ring', "Hrungnir's Ring", 'wyrd_hm_sunniva', 30,
-      "Twelve stones stand round the summit where the storm giant sleeps. Sunniva wants to know whether they still hold. Walk up to the edge of Hrungnir's Ring and defeat three Stormrams on the way.",
+      "Twelve stones stand round the summit where the storm giant sleeps. Sunniva wants to know whether they still hold. Walk up the slope until Hrungnir's Ring comes into view, no nearer, and defeat three Stormrams on the way.",
       [('visit', 'wyrd_hrung_ring', "Reach Hrungnir's Ring", 1), ('kill', 'ram', 'Defeat Stormrams on the Highmoor', 3)], requires='wyrd_hm_rams'),
     Q('wyrd_hm_gale', 'Hold Against the Gale', 'wyrd_hm_loom', 30,
       'West of the hold the old rift stones still hum, and when the weavers pull, the storm comes down through them. Stand among the stones for twenty seconds while Eirik reads the threads, and let the rams come to you.',
