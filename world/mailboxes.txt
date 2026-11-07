@@ -55,17 +55,6 @@
     }
   },
   {
-    "id": "mailbox_13_astralhollow",
-    "zone": 13,
-    "hub": "Astralhollow",
-    "x": 79.5,
-    "y": 119.5,
-    "anchor": {
-      "x": 76.5,
-      "y": 119.5
-    }
-  },
-  {
     "id": "mailbox_14_the_last_shade",
     "zone": 14,
     "hub": "The Last Shade",
@@ -536,6 +525,50 @@
     "anchor": {
       "x": 133.3,
       "y": 213.7
+    }
+  },
+  {
+    "id": "mailbox_13_astralhollow",
+    "zone": 13,
+    "hub": "Astralhollow",
+    "x": 187.5,
+    "y": 297.5,
+    "anchor": {
+      "x": 184,
+      "y": 297
+    }
+  },
+  {
+    "id": "mailbox_13_choirrest",
+    "zone": 13,
+    "hub": "Choir Rest",
+    "x": 123,
+    "y": 193,
+    "anchor": {
+      "x": 119,
+      "y": 194
+    }
+  },
+  {
+    "id": "mailbox_13_cometwatch",
+    "zone": 13,
+    "hub": "Cometwatch",
+    "x": 224,
+    "y": 177,
+    "anchor": {
+      "x": 221,
+      "y": 179.5
+    }
+  },
+  {
+    "id": "mailbox_13_fallstone",
+    "zone": 13,
+    "hub": "Fallstone Hold",
+    "x": 170,
+    "y": 51,
+    "anchor": {
+      "x": 171,
+      "y": 51.5
     }
   }
 ]

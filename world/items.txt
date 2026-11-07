@@ -140,6 +140,27 @@
     "sell": 780
   },
   {
+    "id": "cometmaw_tail",
+    "name": "Cometmaw's Burning Tail",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1020
+  },
+  {
+    "id": "eclipsequeen_crown",
+    "name": "Eclipse Queen's Crown",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1180
+  },
+  {
+    "id": "orbitwarden_ring",
+    "name": "Orbit Warden's Ring",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1400
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",

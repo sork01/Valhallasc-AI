@@ -1517,6 +1517,9 @@ def apply(world, cfg):
     if 9 in cfg['zones']:       # after the Deep: the city is rebuilt on its outline, the Tideway is the seam
         import nacre_design
         print('nacrehold', nacre_design.design(world, margins[9], write=True)[1])
+    if 13 in cfg['zones']:      # after the Deep and Nacrehold: it rewrites the arrivals of their crossings into Astralhollow (and the Prismwaste's and the Orrery's)
+        import astral_design
+        print('astralhollow', astral_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

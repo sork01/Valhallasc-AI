@@ -139,3 +139,7 @@ Zone 8 is the eighth pilot zone (`world/zone-shapes.txt` zones `[0, 1, 2, 3, 6, 
 ## Nacrehold (zone 9) shaped and rebuilt, seam to the Deep only (2026-11-07)
 
 Zone 9 is the ninth pilot zone (`designOnly` + `rebuild` + `seamWith {8:[9], 9:[8]}`): a shield-shaped city rebuilt on its outline from `preshape-09.txt`, 120 homes in six districts, the Tideway Promenade along the whole Deep border (the only seam), four rim gates and three cathedral doors as portals, four new quests. Full description, checks and open items in `docs/nacre-design.md`.
+
+## Astralhollow (zone 13) shaped and authored, gates only (2026-11-07)
+
+Zone 13 is the tenth pilot zone (`designOnly: [13]`, `seamWith {13: []}`): a tall shield-shaped impact basin (grid 336, 60,525 land tiles) laid out by `scripts/astral_design.py`: the Starway trunk road and the Impact Ring round the crater, thirteen regions with nine ground classes, the Observatory Court moved whole, three outposts (Choir Rest, Cometwatch, Fallstone Hold), 14 new quests and three new elites (Cometmaw, Eclipse Queen, Orbit Warden). All four crossings stay walk-in gates; the Orrery and Prismwaste borders are reserved for a later seam. See `docs/astral-design.md`.

@@ -34,6 +34,8 @@ use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
 #[cfg(test)]
+mod astral_tests;
+#[cfg(test)]
 mod blackhour_tests;
 mod boss_mechanics;
 mod boss_signs;
@@ -715,6 +717,10 @@ impl Slime {
             "skoll" => (60000., 1100., 3.8, 1.5),
             "shardking" => (110000., 1800., 2.0, 1.9),
             "heimdallr" => (140000., 2300., 2.6, 1.8),
+            // Astralhollow's three elites (the shapes pilot): a party of level-42 to 45 fighters, or one hero well past the zone.
+            "cometmaw" => (150000., 1300., 3.6, 1.8),
+            "eclipsequeen" => (190000., 1500., 2.2, 1.9),
+            "orbitwarden" => (260000., 1900., 2.0, 2.2),
             "whitewail" => (3800., 260., 3.4, 1.6),
             "shardback" => (4800., 210., 2.2, 1.7),
             "crab" => (900., 60., 2.8, 1.1),
@@ -900,6 +906,9 @@ impl Slime {
             "skoll" => 31,
             "shardking" => 33,
             "heimdallr" => 35,
+            "cometmaw" => 42,
+            "eclipsequeen" => 44,
+            "orbitwarden" => 45,
             "crab" => 10,
             "wolf" => 12,
             "yeti" => 13,
@@ -1041,6 +1050,9 @@ impl Slime {
             "skoll" => 3400,
             "shardking" => 4200,
             "heimdallr" => 5200,
+            "cometmaw" => 4800,
+            "eclipsequeen" => 5800,
+            "orbitwarden" => 7000,
             "crab" => 60,
             "wolf" => 78,
             "yeti" => 105,
@@ -1199,6 +1211,10 @@ impl Slime {
             "skoll" => (0.4, 1.1, 10., 10.),
             "shardking" => (0.9, 1.7, 7., 8.),
             "heimdallr" => (0.8, 1.5, 8.5, 10.),
+            // The Cometmaw bounds in a burning rush, the Eclipse Queen sweeps her crown-branches, the Orbit Warden slams his orbiting rings down.
+            "cometmaw" => (0.4, 1.1, 10., 10.),
+            "eclipsequeen" => (0.9, 1.6, 7.5, 9.),
+            "orbitwarden" => (1.0, 1.8, 8., 11.),
             "crab" => (0.4, 1., 8., 7.),
             "wolf" => (0.3, 0.9, 9.5, 9.),
             "yeti" => (0.7, 1.6, 6.5, 7.),
@@ -4676,7 +4692,8 @@ impl World {
                 "ember_firelord" => 1e9,
                 "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw"
                 | "ashwing" | "hoarhorn" | "whitewail" | "shardback" | "bellowmaw"
-                | "rustmarshal" | "hangedking" | "skoll" | "shardking" | "heimdallr" => 180.,
+                | "rustmarshal" | "hangedking" | "skoll" | "shardking" | "heimdallr"
+                | "cometmaw" | "eclipsequeen" | "orbitwarden" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
@@ -5294,6 +5311,9 @@ impl World {
                             | "skoll"
                             | "shardking"
                             | "heimdallr"
+                            | "cometmaw"
+                            | "eclipsequeen"
+                            | "orbitwarden"
                             | "whitewail"
                             | "shardback"
                             | "gloomroot"

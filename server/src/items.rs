@@ -325,6 +325,9 @@ pub fn material(kind: &str) -> &'static str {
         "skoll" => "skoll_fang",
         "shardking" => "shardking_crown",
         "heimdallr" => "heimdallr_horn",
+        "cometmaw" => "cometmaw_tail",
+        "eclipsequeen" => "eclipsequeen_crown",
+        "orbitwarden" => "orbitwarden_ring",
         "whitewail" => "whitewail_shroud",
         "shardback" => "shardback_carapace",
         "crab" => "rime_shell",
@@ -553,6 +556,9 @@ pub fn is_elite(kind: &str) -> bool {
             | "skoll"
             | "shardking"
             | "heimdallr"
+            | "cometmaw"
+            | "eclipsequeen"
+            | "orbitwarden"
             | "whitewail"
             | "shardback"
             | "gloomroot"
