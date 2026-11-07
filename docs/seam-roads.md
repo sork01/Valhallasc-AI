@@ -33,8 +33,11 @@ For each seam pair among the zones that draw trails (`ROAD_ZONES` = 0, 1, 2, 3, 
 4. Only what stands on it goes: loose scenery within 2.6 tiles, spawns within 3.6 (elites within 17 where their zone kept that rule). Everything else of an
    approved design is untouched; a seam that already has a road on both sides at the same point is left alone.
 
-Result on the pilot map: 8 pairs, 16 roads laid (Greenmeadow-Gloamfen: 36 tiles from the shore path to the border, 4 from Gloamfen's road), 83 loose
-objects removed, 7 spawns nudged. Wyrdwood lost nothing.
+Result on the pilot map: 8 pairs, 16 roads laid (Greenmeadow-Gloamfen: about 40 tiles from the shore path to the border, 4 from Gloamfen's road;
+Moonspore-Greenmeadow: 110 tiles across the Canopy), 109 loose objects removed (rocks, trees, bushes, moonstones; no lamps), 7 spawns nudged. Wyrdwood lost nothing.
+The crossing also feels a pull of 0.5 per tile toward each side's own seam portal, because quest arrows and map markers aim at the portal's point: Greenmeadow-Gloamfen
+crosses exactly at Gloamfen's portal, Greenmeadow-Crags and Crags-Moonspore within a few tiles of one of the two. Greenmeadow-Moonspore still crosses ~50 tiles from the
+portals (the Canopy has no road for 110 tiles, so a nearer crossing costs a longer road).
 
 ## Not covered
 - Skaldholm, Bifrost (updrafts only), Rán's Deep and Nacrehold: no dirt trails (the Deep has no road style, Nacrehold draws `roads`, its only seam is

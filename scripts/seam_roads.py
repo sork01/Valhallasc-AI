@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 
 SEAM_MARGIN = 2.4            # land runs this far past a border (zone_shapes.SEAM_MARGIN)
 EXTEND = 2.2                 # a road runs this far past the border
+PORTAL_PULL = 0.5            # cost per tile between the crossing and each side's own seam portal (quest arrows and markers aim at the portal's point)
 END_GAP = 14.0              # a crossing stands this far (along the border) from either end of it: ends are corners, coasts and Skaldholm's wall
 JOIN = 1.2                   # a road within this of the border (both sides, same point) is a crossing already
 CLEAR = 2.6                  # loose scenery stands at least this far from a road's centre line (the designs use 2.6)
@@ -37,7 +38,7 @@ ELITE_CLEAR = 17.0           # awareness (up to 14) + 3: an elite stands this fa
 # Scenery that may be removed from a road's way. Everything else with a footprint is an obstacle the road goes round.
 LOOSE = {'tree', 'bush', 'rock', 'wildflowers', 'hawthorn_bush', 'birch_tree', 'oak_tree', 'apple_tree', 'willow_tree', 'cairn_boulder',
          'cairn_pebble', 'flowers', 'haystack', 'bones', 'spire', 'thicket', 'pine', 'glowmoss', 'sporefern', 'gloomstalk', 'moonstone', 'mooncaps',
-         'ew_basalt', 'crag', 'lamp'}
+         'ew_basalt', 'crag'}          # (lamps light the camps and outposts: obstacles, never scatter)
 # Zones that draw dirt trails from `paths` (not the cities, the sky or the sea). Zone 6 is the Wyrdwood, 16 the Moonspore Canopy.
 ROAD_ZONES = (0, 1, 2, 3, 6, 16)
 
@@ -264,6 +265,9 @@ def plan_pair(world, lands, a, b, sh, pa, pb):
     for z, land in ((a, lands[a]), (b, lands[b])):
         fields[z] = land.dijkstra(land.road_cells(), land.cost())
     best = None
+    # where each zone's own seam portal stands, in a's frame
+    pts = [(p['x'], p['y']) for p in za['portals'] if p.get('seam') and p['to'] == b] + \
+          [(p['x'] - sh[0], p['y'] - sh[1]) for p in zb['portals'] if p.get('seam') and p['to'] == a]
     for (x, y), tang in border_points(pa, end_gap=END_GAP):
         # the border is the line between the two lands: step onto each side's walkable cell nearest to it
         ca = nearest_walk(lands[a], x, y)
@@ -273,6 +277,7 @@ def plan_pair(world, lands, a, b, sh, pa, pb):
         cost = fields[a][0][ca[1], ca[0]] + fields[b][0][cb[1], cb[0]]
         if not math.isfinite(cost):
             continue
+        cost += PORTAL_PULL * sum(math.hypot(x - q[0], y - q[1]) for q in pts)
         # the road is already across if both roads touch the line here
         if best is None or cost < best[0]:
             best = (cost, (x, y), tang, ca, cb)

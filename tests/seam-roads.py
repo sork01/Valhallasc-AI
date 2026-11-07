@@ -4,7 +4,8 @@
 Pure data, no server. For every seam pair among the zones that draw dirt trails:
   1. at one point of the border BOTH sides have a road touching the line (the second side measured after the seam's shift),
   2. the roads that reach a border stand on open land: no building, wall, tower, water or other obstacle under their centre line,
-  3. no loose scenery within 2.5 tiles of such a road and no spawn within 3.4 (the designs' own clearances).
+  3. every point of such a road is at least 0.6 tiles from a void piece (the server's walker has a radius: three Rust road tests failed on this once),
+  4. no loose scenery within 2.5 tiles of such a road and no spawn within 3.4 (the designs' own clearances).
 
 `MAP=<path>` runs it against another map.txt: the map from before the pass must FAIL (mutation check).
 """
@@ -55,12 +56,17 @@ for a, b, sh, pa, pb in pairs:
         touching = [r for r in zone['paths'] if min(S.poly_dist(p[0], p[1], border) for p in r) <= 3.0]
         assert touching, f'seam {a}-{b}: no road of zone {z} touches the border'
         walls = [o for o in zone['objects'] if o['kind'] not in S.LOOSE and o['kind'] != 'void']
+        voids = [o for o in zone['objects'] if o['kind'] == 'void']
         for road in touching:
             for p, q in zip(road, road[1:]):
                 L = math.hypot(q[0] - p[0], q[1] - p[1])
                 for k in range(int(L / .5) + 1):
                     x, y = p[0] + (q[0] - p[0]) * k * .5 / max(L, 1e-9), p[1] + (q[1] - p[1]) * k * .5 / max(L, 1e-9)
                     checks += 1
+                    gap = next((o for o in voids if abs(x - o['x']) < o['width'] / 2 + .6 and abs(y - o['y']) < o['depth'] / 2 + .6), None)
+                    if gap:
+                        fail(f'zone {z}: a road comes within 0.6 tiles of a void piece at {x:.1f},{y:.1f}')
+                        break
                     hit = next((o for o in walls if abs(o['x'] - x) < 8 and abs(o['y'] - y) < 8 and inside(o, x, y)), None)
                     if hit:
                         fail(f'zone {z}: a road crosses a {hit["kind"]} at {hit["x"]:.0f},{hit["y"]:.0f}')
