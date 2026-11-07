@@ -1530,6 +1530,10 @@ def apply(world, cfg):
     if 0 in cfg['zones']:       # last of all: the pier is cut out of zone 0's final voids (scripts/greenmeadow_dock.py)
         import greenmeadow_dock
         print('greenmeadow dock', greenmeadow_dock.build(world, json.loads((ROOT / 'world/levels.txt').read_text())))
+    # really last: a road crosses every seam (owner, 2026-11-07), laid on the finished designs so no seeded scatter moves (scripts/seam_roads.py)
+    import seam_roads
+    for line in seam_roads.build(world, [z for z in seam_roads.ROAD_ZONES if z in cfg['zones']]):
+        print('seam road', line)
     return shifted
 
 
