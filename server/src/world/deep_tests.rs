@@ -1262,13 +1262,29 @@ fn the_maelstrom_stands_on_the_eyrie_and_both_gates_work() {
         let row = floor[y as usize].as_str().unwrap().as_bytes();
         assert_ne!(row[x as usize], b' ', "({x}, {y}) is over the void");
     }
-    // walking into it carries the hero down to Keelhaven, and back up
+    // walking into it carries the hero down to Keelhaven, and back up (the updrafts are walk-in gates: the hero walks the way they face)
     let mut rx = join(&mut w, 1, Class::Warrior);
+    let side = down.walk.expect("a walk-in gate");
     place(&mut w, 1, SKY, at(down.x, down.y));
+    w.message(
+        1,
+        ClientMessage::Move {
+            x: down.x + f64::from(side[0]) * 3.,
+            y: down.y + f64::from(side[1]) * 3.,
+        },
+    );
     run(&mut w, &mut rx, 40);
     assert_eq!(w.players[&1].character.zone, DEEP);
     let up = w.maps[DEEP].portals[0].clone();
+    let side = up.walk.expect("a walk-in gate");
     place(&mut w, 1, DEEP, at(up.x, up.y));
+    w.message(
+        1,
+        ClientMessage::Move {
+            x: up.x + f64::from(side[0]) * 3.,
+            y: up.y + f64::from(side[1]) * 3.,
+        },
+    );
     run(&mut w, &mut rx, 40);
     assert_eq!(w.players[&1].character.zone, SKY);
     assert!(w.maps[SKALD].portals.len() >= 2);

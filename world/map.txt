@@ -487400,7 +487400,8 @@
           "rewardGold": 1150,
           "requires": "sky_shards",
           "repeatable": false,
-          "rewardItem": "accessory_amber_l30_blue"
+          "rewardItem": "accessory_amber_l30_blue",
+          "recommendedPlayers": 3
         },
         {
           "id": "sky_h_ledger",
@@ -487477,7 +487478,8 @@
           "rewardGold": 950,
           "requires": "sky_hounds",
           "repeatable": false,
-          "rewardItem": "necklace_moonstone_l30_green"
+          "rewardItem": "necklace_moonstone_l30_green",
+          "recommendedPlayers": 3
         },
         {
           "id": "sky_wr_beacon",
