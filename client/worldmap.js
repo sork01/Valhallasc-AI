@@ -208,7 +208,8 @@
       case 'birch_tree': return '#538547';
       case 'hawthorn_bush': return '#6a9d51';
       case 'wildflowers': return '#efe49d';
-      case 'vale_cottage': case 'watermill': return '#f2d9ad';
+      case 'vale_cottage': case 'watermill': case 'meadow_cottage': case 'meadow_mill': return '#f2d9ad';
+      case 'chapel_ruin': return '#c4bca8';
       case 'elder_hollow_gate': return '#f8df91';
       case 'stone_bridge': return '#e0d3ac';
       case 'fan_topiary': return '#58c5d0';

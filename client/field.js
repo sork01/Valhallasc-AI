@@ -75,7 +75,7 @@
     if (zdef.shapeFloor) paintShape(zdef.shapeFloor, zdef.shapeEdge);
     paintVault();
     objects = zdef.objects.map(o => ({ ...o }));
-    nightLights = objects.filter(o => ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop'].some(k => o.kind.includes(k)));
+    nightLights = objects.filter(o => ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop', 'meadow_cottage', 'meadow_mill'].some(k => o.kind.includes(k)));
   }
   // Skaldholm's ground: the zone lists its streets (type 1 cobbles), plazas and squares (2 marble, 3 brick) as rectangles, discs and rings.
   function paintRoads(roads) {
@@ -191,7 +191,7 @@
       const T = ZONES[R.to]; if (!T) continue;
       map.ghosts.push(...vaultGhosts(R, [T.objects]));
       for (const o of T.objects || []) {      // the other side's lamps and fires light the night through the opening too
-        if (!['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop'].some(k => o.kind.includes(k))) continue;
+        if (!['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop', 'meadow_cottage', 'meadow_mill'].some(k => o.kind.includes(k))) continue;
         const gx = o.x - R.shift[0], gy = o.y - R.shift[1]; if (inRegion(R, gx, gy)) map.vlights.push({ ...o, x: gx, y: gy });
       }
     }
@@ -4577,7 +4577,7 @@
         const o = it.o;
         const oset = o.ghostSet || set;
         if (!oset[o.kind]) {
-          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','cathedralwall','cathedralcolumn','tree','pine','elderash','ribcage','gallows','skypine','prism','column','spirelight','pylon','hallgate','wardstone','windcairn','nacrehouse','nacrecathedral','nacrepalace','nacrearchive','nacreinn','nacrefountain','reefwall','tidebell','sunkencolumn','shiprib','coral','vent','clockwall','blackspire','hourpillar','stillpoint','epoch_crown'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          const cover=['house','chapel','meadow_cottage','meadow_mill','chapel_ruin','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','cathedralwall','cathedralcolumn','tree','pine','elderash','ribcage','gallows','skypine','prism','column','spirelight','pylon','hallgate','wardstone','windcairn','nacrehouse','nacrecathedral','nacrepalace','nacrearchive','nacreinn','nacrefountain','reefwall','tidebell','sunkencolumn','shiprib','coral','vent','clockwall','blackspire','hourpillar','stillpoint','epoch_crown'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           const box=City.art[o.kind]?.box;
           const palmCover=City.art[o.kind]?.occludes && it.d>hd && hsx>it.sx-box[2] && hsx<it.sx+box[0]-box[2] && hsy>it.sy-box[3] && hsy-90<it.sy+box[1]-box[3];
           City.drawObject(g,o,it.sx,it.sy,cover || palmCover ? .5 : 1);

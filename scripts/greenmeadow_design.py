@@ -431,7 +431,7 @@ class Designer:
         # The Three Meres: willows at the water, reeds of flowers, the old watermill between the two east meres.
         mill = (349, 158)
         self.block_disc(*mill, 7)
-        self.add('watermill', *mill, r=0, width=6, depth=4)
+        self.add('meadow_mill', *mill, r=0, width=6, depth=4)
         meres = self.mask('meres')
         water = np.full((self.n, self.n), 1e9)
         for x, y, rx, ry in PONDS:
@@ -454,7 +454,7 @@ class Designer:
         # Hollowend: the old wood at the end of the land, a roofless chapel in its middle.
         chapel = (352, 308)
         self.block_disc(*chapel, 9)
-        self.add('chapel', *chapel, r=0, width=6, depth=5, label='Hollowend Chapel')
+        self.add('chapel_ruin', *chapel, r=0, width=6, depth=5, label='Hollowend Chapel')
         for dx, dy, wd, dp in ((-8, -6, .6, 4), (8, -6, .6, 3), (-6, 7, 4, .6), (6, 7, 3, .6)):
             self.add('wall', chapel[0] + dx, chapel[1] + dy, r=0, width=wd, depth=dp)
         hollow = self.mask('hollowend')
@@ -691,7 +691,7 @@ def plan_picture(world, d, out, scale=3):
             continue
         r = max(o['r'] * scale, 1)
         c = col.get(o['kind'], (24, 66, 30))
-        if o['kind'] in ('rampart', 'tower', 'wall', 'house', 'chapel', 'vale_cottage', 'watermill'):
+        if o['kind'] in ('rampart', 'tower', 'wall', 'house', 'chapel', 'meadow_cottage', 'meadow_mill', 'chapel_ruin'):
             c = (235, 235, 245)
         g.ellipse([o['x'] * scale - r, o['y'] * scale - r, o['x'] * scale + r, o['y'] * scale + r], fill=c)
     kc = {'green': (120, 240, 90), 'blue': (90, 170, 255), 'pink': (255, 130, 200), 'yellow': (255, 230, 70), 'beetle': (255, 70, 40), 'big': (255, 255, 255)}

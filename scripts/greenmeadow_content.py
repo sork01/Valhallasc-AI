@@ -13,18 +13,21 @@ ELITES = [('oldtusker', 128, 172), ('tidecrusher', 232, 278), ('orchardqueen', 3
 XP = {1: 10, 2: 20, 3: 40, 4: 60, 5: 80}
 
 COTTAGE = dict(r=0, width=5, depth=4)
+# Each hamlet builds its own way (owner, 2026-11-07): Stonefold in fieldstone and slate, Saltby in tarred planks, Applewick in limewash and thatch.
+# `v` picks the variant inside a hamlet (size of the gable, roof colour, door side); passing it does not change the rng order (the default is evaluated anyway).
+STONE, FISHER, THATCH = (dict(COTTAGE, style=s) for s in ('stone', 'fisher', 'thatch'))
 
 # (kind, dx, dy, extra) around each hamlet's plaza
 DRESSING = {
     'stonefold': [
-        ('vale_cottage', -9, -8, COTTAGE), ('vale_cottage', 9, -9, COTTAGE), ('vale_cottage', -10, 8, COTTAGE),
+        ('meadow_cottage', -9, -8, dict(STONE, v=0)), ('meadow_cottage', 9, -9, dict(STONE, v=1)), ('meadow_cottage', -10, 8, dict(STONE, v=2)),
         ('house', -1, 9, dict(r=0, width=3.4, depth=3.2, label='Fold Hall', color='#8a6a4a')),
         ('well', -4, -3, dict(r=.7)), ('noticeboard', 2, -5, dict(r=.4, width=1.3, depth=.4, label='Stonefold')),
         ('stall', 6, -2, dict(r=0, width=1.8, depth=1.2, color='#7a9a5a', label='Fold Stores')),
         ('lamp', -5, 3, dict(r=.18)), ('lamp', 5, 4, dict(r=.18)), ('flowers', -7, 3, dict(r=.55)), ('haystack', 12, 2, dict(r=.58)), ('haystack', 13, -3, dict(r=.58)),
     ],
     'saltby': [
-        ('vale_cottage', -12, -4, COTTAGE), ('vale_cottage', -12, 4, COTTAGE), ('vale_cottage', 12, 3, COTTAGE),
+        ('meadow_cottage', -12, -4, dict(FISHER, v=0)), ('meadow_cottage', -12, 4, dict(FISHER, v=1)), ('meadow_cottage', 12, 3, dict(FISHER, v=2)),
         ('tent', 12, -5, dict(r=1.5, width=3, depth=2.4, color='#5f8aa0', label='Net Loft')),
         ('stall', 5, 6, dict(r=0, width=1.8, depth=1.2, color='#5f8aa0', label='Fresh Catch')),
         ('barrels', 8, 6, dict(r=0, width=.6, depth=.6, color='', label='')), ('barrels', 9, 7, dict(r=0, width=.6, depth=.6, color='', label='')),
@@ -32,7 +35,7 @@ DRESSING = {
         ('lamp', -6, -2, dict(r=.18)), ('lamp', 6, -3, dict(r=.18)), ('bench', -2, 6, dict(r=0, width=1.5, depth=.45)),
     ],
     'applewick': [
-        ('vale_cottage', -8, -7, COTTAGE), ('vale_cottage', 8, -7, COTTAGE), ('vale_cottage', -8, 7, COTTAGE), ('vale_cottage', 8, 7, COTTAGE),
+        ('meadow_cottage', -8, -7, dict(THATCH, v=0)), ('meadow_cottage', 8, -7, dict(THATCH, v=1)), ('meadow_cottage', -8, 7, dict(THATCH, v=2)), ('meadow_cottage', 8, 7, dict(THATCH, v=3)),
         ('well', -4, 0, dict(r=.7)), ('stall', 4, -3, dict(r=0, width=1.8, depth=1.2, color='#b65b4a', label='Cider & Apples')),
         ('noticeboard', -3, -4, dict(r=.4, width=1.3, depth=.4, label='Applewick')),
         ('lamp', 3, 3, dict(r=.18)), ('lamp', -3, 3, dict(r=.18)), ('flowers', 5, 1, dict(r=.55)), ('flowers', -6, 3, dict(r=.55)),

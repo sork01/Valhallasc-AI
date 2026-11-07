@@ -2179,33 +2179,36 @@
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 83.0,
       "y": 216.0,
       "r": 0,
-      "v": 2,
+      "v": 0,
       "width": 5,
       "depth": 4,
+      "style": "stone",
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 101.0,
       "y": 215.0,
       "r": 0,
       "v": 1,
       "width": 5,
       "depth": 4,
+      "style": "stone",
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 82.0,
       "y": 232.0,
       "r": 0,
-      "v": 3,
+      "v": 2,
       "width": 5,
       "depth": 4,
+      "style": "stone",
       "layout": "meadow_design_v1"
     },
     {
@@ -2292,33 +2295,36 @@
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 178.0,
       "y": 268.0,
       "r": 0,
       "v": 0,
       "width": 5,
       "depth": 4,
+      "style": "fisher",
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 178.0,
       "y": 276.0,
-      "r": 0,
-      "v": 0,
-      "width": 5,
-      "depth": 4,
-      "layout": "meadow_design_v1"
-    },
-    {
-      "kind": "vale_cottage",
-      "x": 202.0,
-      "y": 275.0,
       "r": 0,
       "v": 1,
       "width": 5,
       "depth": 4,
+      "style": "fisher",
+      "layout": "meadow_design_v1"
+    },
+    {
+      "kind": "meadow_cottage",
+      "x": 202.0,
+      "y": 275.0,
+      "r": 0,
+      "v": 2,
+      "width": 5,
+      "depth": 4,
+      "style": "fisher",
       "layout": "meadow_design_v1"
     },
     {
@@ -2415,43 +2421,47 @@
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 337.0,
       "y": 225.0,
       "r": 0,
-      "v": 3,
+      "v": 0,
       "width": 5,
       "depth": 4,
+      "style": "thatch",
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 353.0,
       "y": 225.0,
       "r": 0,
       "v": 1,
       "width": 5,
       "depth": 4,
+      "style": "thatch",
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "vale_cottage",
+      "kind": "meadow_cottage",
       "x": 337.0,
-      "y": 239.0,
-      "r": 0,
-      "v": 3,
-      "width": 5,
-      "depth": 4,
-      "layout": "meadow_design_v1"
-    },
-    {
-      "kind": "vale_cottage",
-      "x": 353.0,
       "y": 239.0,
       "r": 0,
       "v": 2,
       "width": 5,
       "depth": 4,
+      "style": "thatch",
+      "layout": "meadow_design_v1"
+    },
+    {
+      "kind": "meadow_cottage",
+      "x": 353.0,
+      "y": 239.0,
+      "r": 0,
+      "v": 3,
+      "width": 5,
+      "depth": 4,
+      "style": "thatch",
       "layout": "meadow_design_v1"
     },
     {
@@ -27526,7 +27536,7 @@
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "watermill",
+      "kind": "meadow_mill",
       "x": 349.0,
       "y": 158.0,
       "r": 0,
@@ -34120,7 +34130,7 @@
       "layout": "meadow_design_v1"
     },
     {
-      "kind": "chapel",
+      "kind": "chapel_ruin",
       "x": 352.0,
       "y": 308.0,
       "r": 0,
