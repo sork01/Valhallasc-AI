@@ -3201,7 +3201,7 @@
     g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, tx + 7, y + h, r);
     g.lineTo(tx + 7, y + h); g.lineTo(tx, y + h + 9); g.lineTo(tx - 7, y + h); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
     g.fillStyle = '#fffdf0'; g.strokeStyle = '#151c35'; g.lineWidth = 2.5; g.fill(); g.stroke();
-    b.box = { l: x, r: x + w, t: y - 0, b: y + h, lines: b.lines.length }; bubblesDrawn++;
+    b.box = { l: x, r: x + w, t: y - 0, b: y + h, lines: b.lines.length, cut: b.lines[b.lines.length - 1].endsWith('…') && !b.text.endsWith('…') }; bubblesDrawn++;
     g.fillStyle = b.party ? '#1d5a8a' : '#1b1b2e';
     b.lines.forEach((l, i) => g.fillText(l, x + pad, y + pad + 14 + i * lh - 2));
     g.restore();
@@ -4666,6 +4666,11 @@
       const now = performance.now();
       for (const [id, b] of bubbles) {
         if (b.until <= now) { bubbles.delete(id); continue; }
+        if (String(id).startsWith('npc:')) {      // a townsperson speaking (the dock's skipper greeting a new arrival)
+          const n = City.npcs.find(n => n.id === id.slice(4)); if (!n) continue;
+          const [bx, by] = w2s(n.x, n.y); if (bx > -200 && bx < VW + 200 && by > -50 && by < VH + 250) drawBubble(g, b, bx, by - City.nameplateTop(n) - 18, (b.until - now) / 1000);
+          continue;
+        }
         const who = id === Online.id ? hero : remotePlayers.get(id); if (!who || who.dead) continue;
         const [bx, by] = w2s(who.x, who.y); if (bx > -200 && bx < VW + 200 && by > -50 && by < VH + 250) drawBubble(g, b, bx, by - (who === hero ? 138 : 152), (b.until - now) / 1000);
       }

@@ -142,6 +142,10 @@
         case 'event': window.SystemLog?.event(packet, id); callbacks.onEvent?.(packet); break;
         case 'dialogue': window.City?.dialogue(packet); break;
         case 'chat': window.Field?.bubble(packet.id, packet.text, packet.channel === 'party'); log(packet.text, packet.channel === 'party' ? `[Party] ${packet.name}` : packet.name, packet.channel); break;
+        case 'npc_say': {      // a townsperson speaks to this hero (the dock's skipper greets a new arrival)
+          const npc = window.City?.npcs?.find(n => n.id === packet.npc), text = window.Locale?.translate(packet.text) || packet.text;
+          window.Field?.bubble('npc:' + packet.npc, text); log(text, npc?.name || packet.npc, 'npc'); break;
+        }
         case 'system': log(packet.text); break;
         case 'announce': log(packet.text); window.Announce?.show(packet.text, packet.kind); break;
         case 'notice': window.Achievements?.onNotice(packet); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;

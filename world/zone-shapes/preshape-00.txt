@@ -4172,6 +4172,29 @@
    }
   },
   {
+   "id": "es_go_01",
+   "title": "Seek Bram Emberforge",
+   "npc": "smith",
+   "description": "Speak to Bram Emberforge in Greenmeadow at level 2 to begin The Empty Seat: Ash in the Bread. This direction stays in your journal until you accept that chapter.",
+   "objectives": [
+    {
+     "kind": "handoff",
+     "target": "smith",
+     "count": 1,
+     "label": "Speak to Bram Emberforge at level 2"
+    }
+   ],
+   "level": 2,
+   "minLevel": 1,
+   "rewardXp": 0,
+   "rewardGold": 0,
+   "requires": null,
+   "autoLevel": 1,
+   "landing": true,
+   "repeatable": false,
+   "handoffTo": "es_01"
+  },
+  {
    "id": "es_28",
    "title": "Leave One Chair Empty",
    "npc": "smith",

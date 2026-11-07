@@ -2,6 +2,7 @@ use super::*;
 
 fn world() -> (World, mpsc::Receiver<Value>) {
     let mut w = World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
+    w.landings = true;
     let (tx, rx) = mpsc::channel(4096);
     let look = Look {
         name: "Newcomer".into(),
@@ -96,7 +97,13 @@ fn landing_quest_never_finds_heroes_made_before_the_dock() {
     c.level = 5;
     walk_to(&mut w, 250., 190.);
     walk_to(&mut w, 200., 270.);
+    w.step();
     assert_eq!(holds(&w, &id), 0);
+    assert_eq!(
+        holds(&w, "es_go_01"),
+        0,
+        "the Empty Seat direction comes only with the landing"
+    );
     let mut v = serde_json::to_value(&w.players[&1].character).unwrap();
     v.as_object_mut().unwrap().remove("landing");
     let old: Character = serde_json::from_value(v).unwrap();
@@ -176,4 +183,48 @@ fn landing_quest_abandoned_and_restored_from_the_journal_is_held_again() {
             .abandoned_quests
             .contains(&dock.quest)
     );
+}
+
+#[test]
+fn landing_the_empty_seat_points_the_new_hero_to_bram_once_ashore() {
+    let (mut w, _rx) = world();
+    let dock = w.maps[0].dock.clone().unwrap();
+    w.step();
+    // Nothing but the voyage while on the pier...
+    assert_eq!(holds(&w, "es_go_01"), 0);
+    walk_to(&mut w, dock.start.x - 4., dock.y0 - 1.);
+    // ...then the landing quest and the direction to the Empty Seat's first chapter.
+    assert_eq!(holds(&w, &dock.quest), 1);
+    assert_eq!(holds(&w, "es_go_01"), 1);
+    let h = w.maps[0]
+        .quests
+        .iter()
+        .find(|q| q.id == "es_go_01")
+        .unwrap();
+    assert_eq!(h.handoff_to.as_deref(), Some("es_01"));
+}
+
+#[test]
+fn landing_the_skipper_greets_a_new_arrival_once() {
+    let (mut w, mut rx) = world();
+    let dock = w.maps[0].dock.clone().unwrap();
+    let greeter = dock.greeter.clone().unwrap();
+    assert!(
+        w.maps[0]
+            .npcs
+            .iter()
+            .any(|n| n.id == greeter && dock.contains(n.position_at(0.)))
+    );
+    for _ in 0..80 {
+        w.step();
+    }
+    let mut said = vec![];
+    while let Ok(m) = rx.try_recv() {
+        if m["type"] == "npc_say" {
+            said.push(m);
+        }
+    }
+    assert_eq!(said.len(), 1, "{said:?}");
+    assert_eq!(said[0]["npc"], greeter.as_str());
+    assert_eq!(said[0]["text"], dock.greeting.as_deref().unwrap());
 }

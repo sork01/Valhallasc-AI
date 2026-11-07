@@ -502,6 +502,7 @@
 .chat-party { color: #9ad9ff; }
 .chat-party b { color: #7fd0ff; }
 .chat-notice { color: #cfe8c8; font-style: italic; }
+.chat-npc { color: #f1dfae; }
 .chat-refused { color: #ffb7a3; font-style: italic; }
 @media (pointer: coarse) {
   .social-open, .social-panel .window-tool, .social-tabs button, .party-head, .invite-card .btn { min-height: 44px; min-width: 44px; }

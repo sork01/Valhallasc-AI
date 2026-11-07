@@ -26,6 +26,12 @@ START = dict(x=200.5, y=293.5)
 SHIP = dict(x=195.4, y0=288.6, y1=299.4, beam=3.5, plank=293.5)
 QUEST_ID = 'meadow_landing'
 TRAIL = [[200.5, 282.6], [196.2, 281.0], [190.5, 276.4]]
+# The ship's skipper stands at the foot of the gangplank and greets every new arrival (world/landing.rs sends the line once).
+SKIPPER = dict(id='dock_skipper', name='Skipper Halvard', role='Master of the Grey Gull', x=199.9, y=292.1, color='#4f6d8a',
+               dialogue=('Mind the gangplank, the Gull bucks like a goat. Saltby is up the beach, and the road north runs straight '
+                         'to Alderhaven. Ask for Wren at the fountain.'),
+               offers=[], buys=False, look=dict(skin='#c08a66', hair='#d8d2c4', style='short', hat='cap', hatColor='#2f4560'))
+GREETING = 'Land ho! Welcome to Greenmeadow, friend. Follow the road north to Alderhaven and ask for Wren.'
 
 
 def quest(levels):
@@ -79,7 +85,10 @@ def build(world, levels):
     else:
         raise AssertionError('no Saltby camp')
     z['paths'] = z['paths'] + [TRAIL]
-    z['dock'] = dict(x0=PIER['x0'], x1=PIER['x1'], y0=PIER['y0'], y1=PIER['y1'], start=START, quest=QUEST_ID, ship=SHIP)
+    z['dock'] = dict(x0=PIER['x0'], x1=PIER['x1'], y0=PIER['y0'], y1=PIER['y1'], start=START, quest=QUEST_ID, ship=SHIP,
+                     greeter=SKIPPER['id'], greeting=GREETING)
+    assert not any(n['id'] == SKIPPER['id'] for n in z['npcs'])
+    z['npcs'].append(dict(SKIPPER))
     assert not any(q['id'] == QUEST_ID for q in z['quests'])
     z['quests'].append(quest(levels))
     # nothing solid on the pier or the trail, no monster near the landing

@@ -328,6 +328,8 @@ struct Player {
     shop: shop::Session,
     bag_notice_at: f64,
     portal_at: f64,
+    /// Seconds until the dock's skipper greets a hero who arrived by ship (once per connection; world/landing.rs).
+    greet_in: f64,
     /// Opt-in status is deliberately cleared on reconnect.
     pvp_flag: bool,
     /// Personal god mode of a game master (the debug command `set_god_mode`): no damage for this player only.
@@ -456,6 +458,7 @@ impl Player {
             service_at: -99.,
             bag_notice_at: -99.,
             portal_at: -99.,
+            greet_in: 1.5,
             pvp_flag: false,
             god: false,
             hidden,
@@ -1681,6 +1684,9 @@ pub struct World {
     pub god_mode: bool,
     // Test servers only (VALHALLA_START_LEVEL): new characters begin at this level; loaded ones are untouched.
     pub start_level: u32,
+    /// New characters arrive by ship on Greenmeadow's dock (world/landing.rs). Off in unit-test worlds, whose heroes
+    /// would otherwise collect the landing quests the moment a test moves them; `landing_tests` switch it on.
+    pub landings: bool,
     // Test servers only (VALHALLA_TEST_COMMANDS=1): players may send `debug` shortcuts. Never set on the public service.
     pub test_commands: bool,
     pub login_notifications: Option<mpsc::Sender<crate::notify::LoginNotice>>,
@@ -1795,6 +1801,7 @@ impl World {
             level_spread,
             god_mode: false,
             start_level: 1,
+            landings: !cfg!(test),
             test_commands: false,
             login_notifications: None,
             social: social::Social::default(),
@@ -2282,6 +2289,8 @@ impl World {
                 .map_err(|e| storage(Box::new(e)))?;
         }
         c.rested.join(crate::store::unix_now().max(0) as u64);
+        // The Empty Seat can no longer be abandoned: directions dropped before that rule come back.
+        c.abandoned_quests.retain(|id| !id.starts_with("es_"));
         if c.zone >= self.maps.len() || self.is_arena_zone(c.zone) {
             // A zone that no longer exists sends the character back to the start.
             c.zone = 0;
@@ -3399,17 +3408,34 @@ impl World {
         if p.ambient.is_none() {
             p.character
                 .explore_in(public, self.maps[p.character.zone].size);
-            for title in sync_progression(&mut p.character, &self.maps) {
+            // A hero still on the landing dock gets nothing yet: the landing quest arrives first, as they step ashore.
+            let arrived = if p.character.landing {
+                vec![]
+            } else {
+                sync_progression(&mut p.character, &self.maps)
+            };
+            for title in arrived {
                 let _ = p.peer.try_send(json!({"type":"system","text":format!(
                     "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
                 )}));
             }
-            if let Some(title) = landing::step_off(&mut p.character, &self.maps) {
+            if let Some((npc, text)) = landing::greeting(p, &self.maps) {
                 let _ = p
                     .peer
-                    .try_send(json!({"type":"announce","kind":"quest","text":format!(
-                        "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
-                    )}));
+                    .try_send(json!({"type":"npc_say","npc":npc,"text":text}));
+            }
+            // The dock's quest is the one announcement; the rest arrive like any automatic quest.
+            for (i, title) in landing::step_off(&mut p.character, &self.maps)
+                .into_iter()
+                .enumerate()
+            {
+                let text = format!(
+                    "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
+                );
+                let kind = if i == 0 { "announce" } else { "system" };
+                let _ = p
+                    .peer
+                    .try_send(json!({"type":kind,"kind":"quest","text":text}));
             }
             for place in sync_visits(&mut p.character, &self.maps) {
                 let _ = p.peer.try_send(

@@ -14,31 +14,59 @@ impl World {
     }
     /// Marks a just-created character as arriving by ship (only when zone 0 has a dock to arrive on).
     pub(super) fn arrive(&self, mut c: Character) -> Character {
-        c.landing = self.maps[0].dock.is_some();
+        c.landing = self.landings && self.maps[0].dock.is_some();
         c
     }
 }
 
-/// Grants the landing quest once the character stands anywhere but on the dock (another zone counts too). Returns the
-/// quest's title when it arrived now. A character who already holds it, or abandoned it, is only un-flagged.
-pub(super) fn step_off(c: &mut Character, maps: &[Map]) -> Option<String> {
+/// Grants the landing quests once the character stands anywhere but on the dock (another zone counts too): the dock's own
+/// quest first, then every other zone-0 quest marked `landing` (the direction to the Empty Seat's first chapter). Returns
+/// the titles that arrived now, the dock's quest first. Quests already held or abandoned are skipped.
+pub(super) fn step_off(c: &mut Character, maps: &[Map]) -> Vec<String> {
+    let mut arrived = vec![];
     if !c.landing {
+        return arrived;
+    }
+    let Some(dock) = maps[0].dock.as_ref() else {
+        return arrived;
+    };
+    if c.zone == 0 && dock.contains(c.point()) {
+        return arrived;
+    }
+    c.landing = false;
+    let first = maps[0].quests.iter().filter(|q| q.id == dock.quest);
+    let rest = maps[0]
+        .quests
+        .iter()
+        .filter(|q| q.landing && q.id != dock.quest);
+    for quest in first.chain(rest) {
+        if c.quests.iter().any(|q| q.id == quest.id) || c.abandoned_quests.contains(&quest.id) {
+            continue;
+        }
+        c.quests.push(QuestProgress {
+            id: quest.id.clone(),
+            counts: vec![0; quest.objectives.len()],
+            claimed: false,
+            completions: 0,
+        });
+        arrived.push(quest.title.clone());
+    }
+    arrived
+}
+
+/// The skipper's welcome: once per connection, a moment after a hero who arrived by ship appears on the dock.
+pub(super) fn greeting(p: &mut Player, maps: &[Map]) -> Option<(String, String)> {
+    let c = &p.character;
+    if !c.landing || p.greet_in <= 0. || c.zone != 0 {
         return None;
     }
     let dock = maps[0].dock.as_ref()?;
-    if c.zone == 0 && dock.contains(c.point()) {
+    if !dock.contains(c.point()) {
         return None;
     }
-    c.landing = false;
-    let quest = maps[0].quests.iter().find(|q| q.id == dock.quest)?;
-    if c.quests.iter().any(|q| q.id == quest.id) || c.abandoned_quests.contains(&quest.id) {
+    p.greet_in -= TICK;
+    if p.greet_in > 0. {
         return None;
     }
-    c.quests.push(QuestProgress {
-        id: quest.id.clone(),
-        counts: vec![0; quest.objectives.len()],
-        claimed: false,
-        completions: 0,
-    });
-    Some(quest.title.clone())
+    Some((dock.greeter.clone()?, dock.greeting.clone()?))
 }

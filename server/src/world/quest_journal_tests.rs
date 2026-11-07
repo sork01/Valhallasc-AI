@@ -4,7 +4,11 @@ fn world() -> World {
     let mut w = World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
     for session in 1..=2 {
         let (tx, _) = mpsc::channel(4096);
-        w.join(session, None, Some(Look::default()), tx).unwrap();
+        let look = Look {
+            name: format!("Journal{session}"),
+            ..Look::default()
+        };
+        w.join(session, None, Some(look), tx).unwrap();
     }
     w
 }
@@ -178,7 +182,7 @@ fn quest_journal_abandoned_automatic_quest_survives_save_and_can_be_retaken() {
     );
 }
 #[test]
-fn quest_journal_all_27_handoffs_are_immediate_level_independent_and_rewardless() {
+fn quest_journal_all_28_handoffs_are_immediate_level_independent_and_rewardless() {
     let mut w = world();
     assert_eq!(
         w.maps
@@ -187,7 +191,7 @@ fn quest_journal_all_27_handoffs_are_immediate_level_independent_and_rewardless(
             .flat_map(|m| &m.quests)
             .filter(|q| q.handoff_to.is_some())
             .count(),
-        27
+        28
     );
     for chapter in 1..=28 {
         let id = format!("es_{chapter:02}");
@@ -261,10 +265,12 @@ fn quest_journal_handoffs_backfill_old_progress_once_and_do_not_skip_started_cha
     sync_progression(c, &w.maps);
     assert_eq!(c.quests.iter().filter(|p| p.id == "es_go_02").count(), 1);
     assert!(!c.quests.iter().any(|p| p.id == "es_go_03"));
+    // The Empty Seat cannot be abandoned: the direction stays.
     abandon(&mut w, "es_go_02");
     let c = &mut w.players.get_mut(&1).unwrap().character;
     sync_progression(c, &w.maps);
-    assert!(!c.quests.iter().any(|p| p.id == "es_go_02"));
+    assert_eq!(c.quests.iter().filter(|p| p.id == "es_go_02").count(), 1);
+    assert!(!c.abandoned_quests.iter().any(|q| q == "es_go_02"));
     c.level = 7;
     let q = quest(&w, "es_02");
     assert!(quest_action(&mut w.players.get_mut(&1).unwrap().character, &q, "accept").2);
@@ -274,7 +280,42 @@ fn quest_journal_handoffs_backfill_old_progress_once_and_do_not_skip_started_cha
             .character
             .quests
             .iter()
-            .any(|p| p.id == "es_go_02")
+            .any(|p| p.id == "es_go_02" && !p.claimed)
+    );
+}
+
+#[test]
+fn quest_journal_empty_seat_cannot_be_abandoned() {
+    let mut w = world();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.level = 2;
+    // A new hero is pointed to the first chapter as they step off the dock (landing_tests); neither the direction
+    // nor the chapter can be dropped.
+    c.quests.push(QuestProgress {
+        id: "es_go_01".into(),
+        counts: vec![0],
+        claimed: false,
+        completions: 0,
+    });
+    abandon(&mut w, "es_go_01");
+    let q = quest(&w, "es_01");
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    assert!(c.quests.iter().any(|p| p.id == "es_go_01" && !p.claimed));
+    assert!(quest_action(c, &q, "accept").2);
+    abandon(&mut w, "es_01");
+    let c = &w.players[&1].character;
+    assert!(c.quests.iter().any(|p| p.id == "es_01" && !p.claimed));
+    assert!(c.abandoned_quests.is_empty());
+    // An ordinary quest still can.
+    let q = quest(&w, "slime_patrol");
+    assert!(quest_action(&mut w.players.get_mut(&1).unwrap().character, &q, "accept").2);
+    abandon(&mut w, "slime_patrol");
+    assert!(
+        !w.players[&1]
+            .character
+            .quests
+            .iter()
+            .any(|p| p.id == "slime_patrol")
     );
 }
 
@@ -291,7 +332,7 @@ fn quest_restore_automatic_routes_and_eldmarr_handoffs_from_journal_after_reload
         counts: vec![1],
     });
     sync_progression(c, &w.maps);
-    for id in ["crags_onward", "es_go_02"] {
+    for id in ["crags_onward"] {
         abandon(&mut w, id);
         let c = &w.players[&1].character;
         let restored: Character = serde_json::from_value(serde_json::to_value(c).unwrap()).unwrap();

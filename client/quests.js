@@ -266,7 +266,7 @@
     if (!atNpc && ['active', 'ready'].includes(s)) node.append(button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
       track(quest.id); $('quest-close').focus();
     }));
-    if (!atNpc && ['active', 'ready'].includes(s)) {
+    if (!atNpc && ['active', 'ready'].includes(s) && !quest.id.startsWith('es_')) {      // the Empty Seat cannot be abandoned (server: Quest::abandonable)
       const asking = abandonConfirm === quest.id;
       if (asking) node.append(element('p', 'Abandon this quest? Current progress will be lost. You can take it again from its questgiver.', 'quest-abandon-warning'));
       const b = button(asking ? 'Confirm abandon' : 'Abandon quest', () => {

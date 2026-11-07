@@ -1072,6 +1072,10 @@ impl Quest {
         }
         character.inventory.retain(|s| s.quantity > 0);
     }
+    /// The Empty Seat (Eldmarr's story: chapters `es_NN` and their `es_go_NN` directions) cannot be abandoned (owner, 2026-11-07).
+    pub fn abandonable(&self) -> bool {
+        !self.id.starts_with("es_")
+    }
     pub fn unlocked(&self, character: &Character) -> bool {
         self.requires.as_ref().is_none_or(|id| {
             character
@@ -1958,6 +1962,11 @@ pub struct Dock {
     pub y1: f64,
     pub start: Point,
     pub quest: String,
+    /// The NPC who greets a new arrival on the pier, and what they say (once, shortly after the hero appears).
+    #[serde(default)]
+    pub greeter: Option<String>,
+    #[serde(default)]
+    pub greeting: Option<String>,
 }
 impl Dock {
     pub fn contains(&self, p: Point) -> bool {
