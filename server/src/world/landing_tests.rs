@@ -142,3 +142,38 @@ fn landing_quest_is_handed_in_to_wren() {
     assert!(p.claimed, "not claimed: {:?}", p.counts);
     assert!(c.gold > gold);
 }
+
+#[test]
+fn landing_quest_abandoned_and_restored_from_the_journal_is_held_again() {
+    let (mut w, _rx) = world();
+    let dock = w.maps[0].dock.clone().unwrap();
+    walk_to(&mut w, dock.start.x - 4., dock.y0 - 1.);
+    assert_eq!(holds(&w, &dock.quest), 1);
+    w.message(
+        1,
+        ClientMessage::QuestAbandon {
+            id: dock.quest.clone(),
+        },
+    );
+    assert_eq!(holds(&w, &dock.quest), 0);
+    w.step();
+    assert_eq!(
+        holds(&w, &dock.quest),
+        0,
+        "an abandoned landing quest came back by itself"
+    );
+    w.message(
+        1,
+        ClientMessage::QuestRestore {
+            id: dock.quest.clone(),
+        },
+    );
+    w.step();
+    assert_eq!(holds(&w, &dock.quest), 1, "restoring did not bring it back");
+    assert!(
+        !w.players[&1]
+            .character
+            .abandoned_quests
+            .contains(&dock.quest)
+    );
+}

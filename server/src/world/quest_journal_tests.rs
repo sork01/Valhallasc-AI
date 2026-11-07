@@ -152,7 +152,7 @@ fn quest_journal_abandoned_automatic_quest_survives_save_and_can_be_retaken() {
         .maps
         .iter()
         .flat_map(|m| &m.quests)
-        .find(|q| q.auto_level.is_some() && q.handoff_to.is_none())
+        .find(|q| q.auto_level.is_some() && q.handoff_to.is_none() && !q.landing)
         .unwrap()
         .clone();
     let c = &mut w.players.get_mut(&1).unwrap().character;
