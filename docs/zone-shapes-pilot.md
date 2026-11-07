@@ -32,7 +32,7 @@ Status 2026-11-05: **candidate on a branch, not on main, live game untouched.** 
 ## Test it (private copy next to the live game)
 
 * Pilot server: port 8081 on the Docker bridge, own database **copy** (made with sqlite's backup API at 2026-11-05 02:10; the 30 characters in zones 0 and 1 were moved by the migration), no Surv notify variables. Beta progress does not carry back to the live game. Unit file `deploy/valhalla-shapes.service` (install by hand), served client = this branch's `client/` (live the moment a file is saved).
-* Public path: `bash scripts/zone_shapes_beta.sh on|off|status` adds or removes a marked proxy block in the live checkout's `deploy/apache.conf` and reloads Apache gracefully after `configtest`; URL `https://gunning.se/Valhallasc-shapes/`. Log in again there (character storage is per endpoint); SSO and game accounts work.
+* Public path: `bash scripts/zone_shapes_beta.sh on|off|status` adds or removes a marked proxy block in the live checkout's `deploy/apache.conf` and reloads Apache gracefully after `configtest`; URL `https://gunning.se/Valhalla/ (until 2026-11-07 `/Valhallasc-shapes/`, which now redirects there; the old single-player Valhalla that lived at `/Valhalla/` was removed, archive `/media/raid/valhallasc-data/old-valhalla-20261107.tar.gz`)`. Log in again there (character storage is per endpoint); SSO and game accounts work.
 * Checks run: Rust `zone_shape` (3 tests: land content, edge walkers, gate crossings, seam crossing at 24+ points both ways), `tests/zone-shape-ui.cjs` (bounded: edge walks, both gate crossings, hub placement, screenshots in `test-results/zone-shapes/`).
 
 ## Not done / open
