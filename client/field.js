@@ -66,7 +66,7 @@
     }
     if (city || zdef.theme === 'nacre') paintRoads(zdef.roads);
     if (vault) paintRooms(zdef.rooms);
-    map.floor = null;
+    map.floor = null; map.nbFloor = null;
     if (sky) paintSky(zdef.sky);
     if (zdef.theme === 'longship') paintSky(zdef.longshipFloor);
     if (zdef.theme === 'blackhour') paintSky(zdef.blackhourFloor);
@@ -89,6 +89,15 @@
         if (inside) map.dirt[y * MAP + x] = r.t;
       }
     }
+  }
+  // paintRoads at one point: the last road that covers it wins (0 = none).
+  function roadAt(roads, cx, cy) {
+    let t = 0;
+    for (const r of roads || []) {
+      const d = r.x0 !== undefined ? 0 : Math.hypot(cx - r.x, cy - r.y);
+      if (r.x0 !== undefined ? cx >= r.x0 && cx <= r.x1 && cy >= r.y0 && cy <= r.y1 : r.r0 !== undefined ? d >= r.r0 && d <= r.r1 : d <= r.r) t = r.t;
+    }
+    return t;
   }
   // The Undervault's floor: the zone lists its rooms and corridors as rectangles; everything else is solid rock, left black.
   function paintRooms(rooms) {
@@ -131,7 +140,7 @@
     // A border you cross anywhere (a seam): both zones draw the same mix of their two floors around the line, seen from
     // their own side, so the ground does not change when the server moves you across. s is the signed distance to the
     // line, positive on this side; this side's weight toward the neighbour is .5 at the line, falling to 0 at BLEND_REACH.
-    map.seamBy = {}; map.ghosts = []; map.ghostWater = [];
+    map.seamBy = {}; map.ghosts = []; map.ghostWater = []; map.nbFloor = null;
     const nbs = zdef.shape?.neighbours || [];
     for (const portal of zdef.portals || []) if (portal.seam) {
       const seam = portal.seam, nb = portal.to; map.seamBy[nb] = seam;
@@ -146,6 +155,13 @@
         if (s > R) continue;
         const w = s >= 0 ? .5 * (1 - s / R) : s < -R ? 1 : 1 - .5 * (1 + s / R);
         if (map.blendW[i] <= w || map.blendNb[i] !== letter) { map.blendW[i] = w; map.blendNb[i] = letter; map.blendD[i] = 1; }
+      }
+      // Beyond the line the neighbour's own chunks paint its floor; the Deep and Nacrehold paint every cell (black water past the
+      // outline), so they leave the neighbour's floor cells empty here, or their chunk would cover the neighbour's ground (and the
+      // neighbour's chunk ours), and the same world point would look different from the two sides.
+      if (zdef.theme === 'deep' || zdef.theme === 'nacre') {
+        const rows = ZONES[nb]?.shapeFloor || [], sx = Math.round(seam.shift[0]), sy = Math.round(seam.shift[1]); map.nbFloor ||= new Uint8Array(MAP * MAP);
+        for (let y = 0; y < MAP; y++) { const row = rows[y + sy]; if (row) for (let x = 0; x < MAP; x++) if (!map.floor[y * MAP + x] && row[x + sx] === '#') map.nbFloor[y * MAP + x] = 1; }
       }
       // The neighbour's trees and rocks beyond the line (view only: the walker never reaches them, the server moves it first).
       // A neighbour with a sprite set (meadow, ember, frost, fen) shows those sprites; any other theme (the Moonspore Canopy and later
@@ -250,8 +266,9 @@
   const simpleSet = theme => theme === 'ember' ? emberSprites : theme === 'frost' ? frostSprites : theme === 'fen' ? fenSprites : theme === 'meadow' ? sprites : null;
   // The ground of zone `nz` at its own cell (x, y): the same noise and trail test as buildMap, so a mapped cell looks as it will on arrival.
   function groundSample(nz, x, y) {
-    const cx = x + .5, cy = y + .5, [a, b] = nz.theme === 'ember' ? [11, 12] : nz.theme === 'frost' ? [21, 22] : nz.theme === 'fen' ? [31, 32] : [1, 2];
+    const cx = x + .5, cy = y + .5, [a, b] = nz.theme === 'ember' ? [11, 12] : nz.theme === 'frost' ? [21, 22] : nz.theme === 'fen' ? [31, 32] : nz.theme === 'deep' || nz.theme === 'nacre' ? [81, 82] : [1, 2];
     const tone = vnoise(cx * .16, cy * .16, a) * .65 + vnoise(cx * .55, cy * .55, b) * .35;
+    if (nz.theme === 'nacre') return { tone, dirt: roadAt(nz.roads, cx, cy) };     // the city's ground is its streets and squares (paintRoads), not trails
     let d = 99; for (const p of nz.paths || PATHS) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
     if (nz.theme === 'meadow') { const o = nz.shape ? nz.shape.offset : [0, 0]; d = Math.min(d, Math.hypot(cx - 36 - o[0], cy - 36 - o[1]) - 2.4); }
     return { tone, dirt: d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0 };
@@ -765,6 +782,7 @@
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       if ((sky || moonwell) && !map.floor[i]) continue;                              // open water or sky
+      if (map.nbFloor?.[i]) continue;                                                // a seam neighbour's floor: its own chunk draws it
       if (zdef.shapeFloor && !map.floor[i] && zdef.theme !== 'deep' && zdef.theme !== 'nacre') { if (map.edge[i]) outsideTile(g, px, py, map.edge[i], x, y, tone, ((x + y) & 1) ? 1.4 : -1.4, zdef.theme === 'ember', map.edgeDist[i]); continue; }
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];
@@ -4042,8 +4060,15 @@
     else if (q < .225) { const [qx, qy] = inTile(); g.strokeStyle = '#d8d0b8'; g.lineWidth = 2; g.beginPath(); g.moveTo(qx - 5, qy); g.lineTo(qx + 5, qy - 2); g.stroke(); g.fillStyle = '#d8d0b8'; g.beginPath(); g.arc(qx - 5, qy, 1.8, 0, 6.283); g.arc(qx + 5, qy - 2, 1.8, 0, 6.283); g.fill(); }   // a bone
   }
   // Beyond the walls there is only deep water: a gradient, shafts of light from the surface and drifting marine snow.
+  // The camera the sea's light and drifting particles move with: Nacrehold uses the Deep's frame (its cells = ours + the seam shift),
+  // so shafts, caustics and snow stand still when you cross the seam and the same point looks the same from both sides.
+  function deepCam() {
+    const [cx, cy] = camS(), p = zdef.theme === 'nacre' && (zdef.portals || []).find(q => q.seam && ZONES[q.to]?.theme === 'deep');
+    if (!p) return [cx, cy];
+    const [sx, sy] = w2sRaw(p.seam.shift[0], p.seam.shift[1]); return [cx + sx, cy + sy];
+  }
   function drawSkyDeep(g, t) {
-    const [cx, cy] = camS();
+    const [cx, cy] = deepCam();
     const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#0a5a78'); gr.addColorStop(.45, '#073a56'); gr.addColorStop(1, '#020c18');
     g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
     g.save(); g.globalCompositeOperation = 'lighter';
@@ -4052,7 +4077,7 @@
   }
   // Marine snow, rising bubbles, slow shafts of light and a few shoals of fish, over everything; a darker rim and a green-blue tint.
   function drawDeepWeather(g, t) {
-    const [cx, cy] = camS();
+    const [cx, cy] = deepCam();
     g.save();
     g.fillStyle = 'rgba(6,74,104,.17)'; g.fillRect(0, 0, VW, VH);
     g.globalCompositeOperation = 'lighter';

@@ -2,6 +2,7 @@
 // anywhere along the Tideway without a banner and with nothing popping in, the four other crossings are rim gates, and beyond the outline lies black water.
 // Pictures in test-results/nacre-design/.
 //   REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/nacre-design-ui.cjs
+//   SEAM_ONLY=1 KS='[7]': only the seam, one point (the bounded runner's memory and time caps).
 //   MUTATE=1 serves the committed field.js (Nacrehold's outline drawn like a land zone's): the black-water check must fail.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -35,7 +36,9 @@ const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] 
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   if (process.env.MUTATE) await page.route('**/field.js', route => route.fulfill({ contentType: 'text/javascript', body: execSync('git show HEAD:client/field.js', { cwd: root, maxBuffer: 1 << 28 }).toString() }));
   const news = fs.readFileSync(path.join(root, 'client/index.html'), 'utf8').match(/class="version">([^<]+)</)[1];
-  await page.addInitScript(news => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', news); }, news);
+  await page.addInitScript(news => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', news);
+    const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = cb => raf(ts => cb(window.__freezeT ?? ts));     // __freezeT: draw every frame at one time (the sea's light drifts with time)
+  }, news);
   await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('NacreWalker'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
@@ -43,6 +46,9 @@ const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] 
   const where = () => page.evaluate(() => ({ zone: Field.zone, x: Field.hero.nx, y: Field.hero.ny }));
   const go = async (zone, x, y, wait = 1800) => { await debug({ op: 'teleport', zone, x, y }); await page.waitForFunction(([z, a, b]) => Field.zone === z && Math.hypot(Field.hero.nx - a, Field.hero.ny - b) < 2, [zone, x, y], { timeout: 20000 }); await page.waitForTimeout(wait); };
   await debug({ op: 'set_time', hour: 12, freeze: true }); await debug({ op: 'set_weather', kind: 'clear' });
+  // the ground is isometric: a world step (dx, dy) is the screen step (dx - dy, (dx + dy) / 2), so +x is Right+Down
+  const keysFor = ([dx, dy]) => [Math.abs(dx - dy) > .35 ? (dx - dy > 0 ? 'ArrowRight' : 'ArrowLeft') : null, Math.abs(dx + dy) > .35 ? (dx + dy > 0 ? 'ArrowDown' : 'ArrowUp') : null].filter(Boolean);
+  if (!process.env.SEAM_ONLY) {     // SEAM_ONLY=1 runs only the seam part (the whole suite can exceed the runner's 1.5 GiB cap)
   // ---- the city names itself and every landmark draws
   await go(9, Z.city.plaza.x, Z.city.plaza.y + 7);
   check(await page.evaluate(() => Field.zoneName === 'Nacrehold' && Field.areaName === 'Nacrehold'), 'the client is in Nacrehold and the area names itself');
@@ -60,8 +66,6 @@ const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] 
   check(beyond.px > 0 && beyond.px < 1280 && beyond.py > 0 && beyond.py < 800, `the probe point is on screen (${beyond.px}, ${beyond.py})`);
   check(beyond.rgba[3] === 255 && beyond.rgba[0] < 40 && beyond.rgba[1] < 50 && beyond.rgba[2] < 60, `black water beyond the outline: pixel ${beyond.rgba.join(',')}`);
   await page.screenshot({ path: path.join(out, 'rim-west.png') });
-  // the ground is isometric: a world step (dx, dy) is the screen step (dx - dy, (dx + dy) / 2), so +x is Right+Down
-  const keysFor = ([dx, dy]) => [Math.abs(dx - dy) > .35 ? (dx - dy > 0 ? 'ArrowRight' : 'ArrowLeft') : null, Math.abs(dx + dy) > .35 ? (dx + dy > 0 ? 'ArrowDown' : 'ArrowUp') : null].filter(Boolean);
   // ---- the four rim gates, each walked through for real: they lead to the neighbour and the neighbour's gate leads back
   for (const p of Z.portals.filter(p => p.walk && !p.seam && p.to !== 10 && p.to !== 11 && p.to !== 12)) {
     await go(9, p.x - p.walk[0] * 5, p.y - p.walk[1] * 5, 1200);
@@ -73,10 +77,13 @@ const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] 
     check(await page.evaluate(() => !Field.seamless), `${p.id}: a gate, not a seam (the usual zone change)`);
     await page.waitForTimeout(600);
   }
+  }
   // ---- the seam: crossed anywhere along the Tideway, both ways, without a banner, and nothing pops in
   const seam = seams[0].seam, pts = seam.points, [shx, shy] = seam.shift;
   const diff = (a, b) => { let sum = 0, big = 0; const n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
-  const snap = async (zone, x, y) => { await go(zone, x, y, 2500); return page.evaluate(() => { const cv = document.getElementById('fieldcv'), W = 256, H = 160, o = document.createElement('canvas'); o.width = W; o.height = H; const g = o.getContext('2d'); g.drawImage(cv, cv.width * .2, cv.height * .12, cv.width * .6, cv.height * .6, 0, 0, W, H); return { px: Array.from(g.getImageData(0, 0, W, H).data), png: o.toDataURL('image/png') }; }); };
+  // A crop centred on world point (wx, wy) of the zone the hero stands in (a hero placed past the line is moved across by the server, so each
+  // side's hero stands on its own floor).
+  const snap = async (zone, x, y, wx, wy) => { await go(zone, x, y, 2500); await page.evaluate(() => { window.__freezeT = 600000; }); await page.waitForTimeout(300); const shot = await page.evaluate(([wx, wy]) => { const cv = document.getElementById('fieldcv'), [fx, fy] = Field.screenOf(wx, wy), W = 256, H = 160, cw = cv.width * .26, chh = cv.height * .26, o = document.createElement('canvas'); o.width = W; o.height = H; const g = o.getContext('2d'); g.drawImage(cv, fx * cv.width - cw / 2, fy * cv.height - chh / 2, cw, chh, 0, 0, W, H); return { px: Array.from(g.getImageData(0, 0, W, H).data), png: o.toDataURL('image/png') }; }, [wx, wy]); await page.evaluate(() => { delete window.__freezeT; }); return shot; };
   const rows = [];
   for (const k of JSON.parse(process.env.KS || '[3, 7, 11]')) {
     const a = pts[k], b = pts[k + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
@@ -106,16 +113,18 @@ const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] 
       check(tilesBefore === await page.evaluate(() => Field.miniTiles), `seam crossing ${from} -> ${to}: the minimap keeps its scale`);
       if (k === 7) await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });
     }
-    // the same world point, drawn from Nacrehold and from the Deep, looks the same (ground, scenery; people and decor are never within 22 tiles)
-    const P = [q[0] + inward[0] * 6, q[1] + inward[1] * 6];
-    const a1 = await snap(9, P[0], P[1]), a2 = await snap(9, P[0], P[1]), b1 = await snap(8, P[0] + shx, P[1] + shy);
+    // the same world point (on the line), drawn from Nacrehold and from the Deep, looks the same (ground, scenery; people and decor are never within 22 tiles)
+    // A hero half a tile from the line on each side (the two cameras nearly agree, so the sea's parallax light does too), the crop a point on the
+    // line 7 tiles along (keeps the hero out of it).
+    const P = [q[0] + inward[0] * .5, q[1] + inward[1] * .5], B = [q[0] - inward[0] * .5 + shx, q[1] - inward[1] * .5 + shy], C = [q[0] + (b[0] - a[0]) / len * 7, q[1] + (b[1] - a[1]) / len * 7];
+    const a1 = await snap(9, P[0], P[1], C[0], C[1]), a2 = await snap(9, P[0], P[1], C[0], C[1]), b1 = await snap(8, B[0], B[1], C[0] + shx, C[1] + shy);
     const noise = diff(a1, a2), d = diff(a1, b1);
     fs.writeFileSync(path.join(out, `seam-same-${k}-nacre.png`), Buffer.from(a1.png.split(',')[1], 'base64')); fs.writeFileSync(path.join(out, `seam-same-${k}-deep.png`), Buffer.from(b1.png.split(',')[1], 'base64'));
     rows.push({ k, noise, d });
     console.log(`seam point ${k}: noise ${noise.mean.toFixed(2)}/${(noise.big * 100).toFixed(1)}%, across ${d.mean.toFixed(2)}/${(d.big * 100).toFixed(1)}%`);
   }
-  // OPEN (2026-11-07): the same world point drawn from the two frames still differs (mean ~30, 17-28% of pixels): reported, not asserted, until it is understood. STRICT=1 asserts it.
-  for (const r of rows) { const same = r.d.mean <= Math.max(10, r.noise.mean * 2 + 2) && r.d.big <= Math.max(.10, r.noise.big * 2 + .02); if (process.env.STRICT) check(same, `seam point ${r.k}: the same point looks the same from both frames`); else console.log(`seam point ${r.k}: same-point look ${same ? 'matches' : 'DIFFERS (open)'}`); }
+  // Each world cell is painted by exactly one zone's chunk (the Deep and Nacrehold leave the other's floor empty), so the two frames agree.
+  for (const r of rows) check(r.d.mean <= Math.max(10, r.noise.mean * 2 + 2) && r.d.big <= Math.max(.10, r.noise.big * 2 + .02), `seam point ${r.k}: the same point looks the same from both frames (${r.d.mean.toFixed(1)}/${(r.d.big * 100).toFixed(1)}%)`);
   check(errors.length === 0, 'no page errors: ' + errors.slice(0, 3).join(' | '));
   console.log(JSON.stringify({ passed: true, checks }));
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => { await browser?.close(); server?.kill(); });
