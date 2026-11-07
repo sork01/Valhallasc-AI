@@ -55,17 +55,6 @@
     }
   },
   {
-    "id": "mailbox_7_heimdall_s_perch",
-    "zone": 7,
-    "hub": "Heimdall's Perch",
-    "x": 89.27,
-    "y": 136.65,
-    "anchor": {
-      "x": 86.5,
-      "y": 135.5
-    }
-  },
-  {
     "id": "mailbox_8_keelhaven",
     "zone": 8,
     "hub": "Keelhaven",
@@ -470,6 +459,50 @@
     "anchor": {
       "x": 149,
       "y": 115.5
+    }
+  },
+  {
+    "id": "mailbox_7_heimdall_s_perch",
+    "zone": 7,
+    "hub": "Heimdall's Perch",
+    "x": 196.27,
+    "y": 194.65,
+    "anchor": {
+      "x": 193,
+      "y": 193
+    }
+  },
+  {
+    "id": "mailbox_7_roost",
+    "zone": 7,
+    "hub": "Windward Roost",
+    "x": 114,
+    "y": 125,
+    "anchor": {
+      "x": 111,
+      "y": 127.5
+    }
+  },
+  {
+    "id": "mailbox_7_station",
+    "zone": 7,
+    "hub": "Stormcrown Station",
+    "x": 299,
+    "y": 255,
+    "anchor": {
+      "x": 295,
+      "y": 257.5
+    }
+  },
+  {
+    "id": "mailbox_7_landing",
+    "zone": 7,
+    "hub": "Eyrie Landing",
+    "x": 254,
+    "y": 103,
+    "anchor": {
+      "x": 255,
+      "y": 103.5
     }
   }
 ]

@@ -71,6 +71,12 @@ def config():
     return json.loads(CONFIG.read_text())
 
 
+def gate_only_zones():
+    """Zones whose every crossing stays a portal (never a seam, never a margin of land past the border): Bifrost Reach floats over the
+    storm and is reached by updrafts only (owner, 2026-11-07: "keep the portals/updrafts since this place should be inaccessible without them")."""
+    return set(config().get('gateOnly', []))
+
+
 # ---- the old layout view of a zone ------------------------------------------------------------------------------------
 def view_keys(world, z):
     zone = world if z == 0 else world['zones'][z - 1]
@@ -799,9 +805,10 @@ def chain_endpoint(ca, z, other, prev, fixed, vault=False):
 def make_seams(zones, shifted):
     """Two shaped zones at one tile scale share a border you can cross anywhere: B is A shifted by a constant."""
     seams = {}
+    gate_only = gate_only_zones()
     for i in shifted:
         for j in shifted:
-            if i == j:
+            if i == j or i in gate_only or j in gate_only:
                 continue
             a, b = zones[i]['shape'], zones[j]['shape']
             runs = [e for e in a['edges'] if e['kind'] == 'shared' and e['other'] == j]
@@ -857,7 +864,10 @@ def place_portals(world, shifted, landmarks=(), axes=None, fits=None):
     zones = [world] + world['zones']
     landing = {}
     seams = make_seams(zones, shifted)
+    gate_only = gate_only_zones()
     for i in sorted(shifted):
+        if i in gate_only:      # a sky zone keeps its own gates: its design (bifrost_design.py) places every updraft
+            continue
         z = zones[i]
         for path in z.get('atlasPaths', []):
             if path in z['paths']:
@@ -893,7 +903,7 @@ def place_portals(world, shifted, landmarks=(), axes=None, fits=None):
         if (j, i) in landing:
             p.update(tx=landing[j, i][1][0], ty=landing[j, i][1][1])
         back = next((q for q in zones[j]['portals'] if q['to'] == i), None)
-        if back is not None and j not in shifted:
+        if back is not None and (j not in shifted or j in gate_only):
             back.update(tx=arrival[0], ty=arrival[1])
     for (i, j), seam in seams.items():
         z = zones[i]
@@ -907,6 +917,8 @@ def place_portals(world, shifted, landmarks=(), axes=None, fits=None):
         else:
             z['portals'].append(portal)
     for i in sorted(shifted):
+        if i in gate_only:
+            continue
         z = zones[i]
         for p in z['portals']:
             if (i, p['to']) not in landing:
@@ -1367,6 +1379,7 @@ def apply(world, cfg):
         skaldholm_rebuild.save_sidecar(world)
     shifted = {}
     margins = {}
+    gate_only = set(cfg.get('gateOnly', []))
     olds = {z: get_view(world, z) for z in cfg['zones']}
     geoms = {z: shape_geometry(cfg, atlas, z, olds[z]) for z in cfg['zones']}
     for z in cfg['zones']:
@@ -1385,6 +1398,10 @@ def apply(world, cfg):
             warp = Warp(geom, S0)
             warp_view(view, warp)
             added = fill_zone(z, view, geom, (0, 0), rng, core=warp.region(), F=warp)
+        elif z in gate_only:       # a sky zone: the old layout is moved as a block and nothing fills the rest (its design replaces it)
+            ox, oy = choose_offset(geom, old, z, atlas, world)
+            shift_view(view, ox, oy)
+            added = (0, 0)
         else:
             ox, oy = choose_offset(geom, old, z, atlas, world)
             shift_view(view, ox, oy)
@@ -1395,7 +1412,7 @@ def apply(world, cfg):
         n = geom['size']
         ys, xs = np.mgrid[0:n, 0:n]
         for j in cfg['zones']:
-            if j != z and abs(geoms[j]['scale'] - geom['scale']) < 1e-9:
+            if j != z and j not in gate_only and z not in gate_only and abs(geoms[j]['scale'] - geom['scale']) < 1e-9:
                 for run in geom['runs']:
                     if run['kind'] == 'shared' and run['other'] == j:
                         for a, b in zip(run['points'], run['points'][1:]):
@@ -1404,15 +1421,25 @@ def apply(world, cfg):
                             margin |= np.hypot(xs + .5 - a[0] - t * dx, ys + .5 - a[1] - t * dy) <= SEAM_MARGIN
         margin &= ~geom['floor']
         margins[z] = margin
-        voids = void_pieces(geom['floor'] | margin)
+        if z in gate_only:         # walkable = the old islands and bridges moved into the new frame; the rest of the grid is sky
+            walk = np.zeros_like(geom['floor'])
+            for y, row in enumerate(view['sky']):
+                for x, c in enumerate(row):
+                    if c != ' ':
+                        walk[y + oy, x + ox] = True
+            view['sky'] = [''.join('#' if v else ' ' for v in r) for r in walk]
+            voids = void_pieces(walk)
+        else:
+            voids = void_pieces(geom['floor'] | margin)
         view['objects'] = [o for o in view['objects'] if o['kind'] != 'void'] + voids
         view['size'] = geom['size']
         view['shape'] = dict(rule=cfg['rule'], k=round(geom['scale'], 4), offset=[ox, oy], core=S0, bbox=geom['bbox'], T=geom['T'],
                              outline=geom['outline'], edges=geom['runs'], neighbours=sorted(atlas.neighbours[z]))
         if warp:
             view['shape']['warp'] = [warp.y0, warp.y1]
-        view['shapeFloor'] = floor_rows(geom['floor'])
-        view['shapeEdge'] = edge_rows(geom, sorted(atlas.neighbours[z]))
+        if z not in gate_only:     # a sky zone is drawn from its `sky` rows; the outline is only the frame for the world map
+            view['shapeFloor'] = floor_rows(geom['floor'])
+            view['shapeEdge'] = edge_rows(geom, sorted(atlas.neighbours[z]))
         check(z, view, geom)
         set_view(world, z, view)
         shifted[z] = (ox, oy)
@@ -1446,6 +1473,9 @@ def apply(world, cfg):
     if 6 in cfg['zones']:
         import wyrdwood_design
         print('wyrdwood', wyrdwood_design.design(world, write=True)[1])
+    if 7 in cfg['zones']:       # after the Wyrdwood: it writes the Stormrift's arrival, and every other updraft here is re-pointed
+        import bifrost_design
+        print('bifrost', bifrost_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

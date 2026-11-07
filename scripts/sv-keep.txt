@@ -859,5 +859,15 @@
   "The East Gap",
   "The Gale Stones",
   "The Rotfang Wood",
-  "The Ruined Mill"
+  "The Ruined Mill",
+  "Asa Fangmonger",
+  "Bjorn Stormtally",
+  "Eyrie Landing",
+  "Hallveig Quillsinger",
+  "Ketil Featherfence",
+  "Leif Windcatcher",
+  "Stormcrown Station",
+  "Windward Roost",
+  "Yrsa Wingmonger",
+  "the Shardfield"
 ]

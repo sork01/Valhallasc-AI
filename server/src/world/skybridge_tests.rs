@@ -5,8 +5,19 @@ use super::*;
 const SPAN: usize = 42;
 const BIFROST: usize = 7;
 
+/// The Span's door in Bifrost Reach: it moved with the Perch (the shapes pilot), so read it from the map.
+fn door(w: &World) -> Point {
+    let d = w.maps[BIFROST]
+        .portals
+        .iter()
+        .find(|p| p.id == "sky_shattered_span")
+        .unwrap();
+    at(d.x, d.y)
+}
+
 fn enter(w: &mut World, session: u64) {
-    place(w, session, BIFROST, at(58., 128.));
+    let door = door(w);
+    place(w, session, BIFROST, door);
     w.time += 2.;
     w.use_portal(session);
 }
@@ -93,7 +104,8 @@ fn skybridge_travel_enters_and_leaves_cleanly() {
     w.use_portal(1);
     let p = &w.players[&1].character;
     assert_eq!(p.zone, BIFROST);
-    assert_eq!(p.point(), at(58., 133.));
+    let door = door(&w);
+    assert_eq!(w.players[&1].character.point(), at(door.x, door.y + 5.));
 }
 
 #[test]

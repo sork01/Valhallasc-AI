@@ -1092,6 +1092,9 @@
     bellowmaw: { name: 'Bellowmaw', elite: true, scale: 1.6, top: 90, col: ['#a8c860', '#4a5a2a', '#10140a'] },
     rustmarshal: { name: 'Rustmarshal', elite: true, scale: 1.6, top: 90, col: ['#b86a3a', '#4a4a52', '#12100e'] },
     hangedking: { name: 'The Hanged King', elite: true, scale: 1.7, top: 96, col: ['#b8a8c8', '#3a3048', '#100c16'] },
+    skoll: { name: 'Sköll, the Gale-Alpha', elite: true, scale: 1.7, top: 90, col: ['#e4f0ff', '#506a98', '#141a2c'] },
+    shardking: { name: 'The Shard-King', elite: true, scale: 1.8, top: 96, col: ['#bfe9ff', '#7a68d8', '#161a38'] },
+    heimdallr: { name: "Heimdall's Shade", elite: true, scale: 1.7, top: 96, col: ['#cfd8f0', '#4a5a88', '#10142a'] },
     crab: { name: 'Rime Crab', scale: 1.1, top: 53, col: ['#d8f2ff', '#6fb3dc', '#2d5f8a'] },
     wolf: { name: 'Frostfang Wolf', scale: 1.1, top: 67, col: ['#f2f6fa', '#9fb4c8', '#4a5d74'] },
     yeti: { name: 'Glacier Yeti', scale: 1.2, top: 85, col: ['#f4f8fc', '#b9cbdc', '#5e7690'] },
@@ -1224,7 +1227,7 @@
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:e.elite !== false, boss:e.boss, scale:e.kind.startsWith('cf_') ? (e.add ? 1.25 : e.raidPack ? 1.95 : e.kind === 'cf_eldmarr' ? 3.2 : 2.6) : e.kind.startsWith('null_') ? (e.boss ? 2.6 : 1.9) : e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   if (window.Locale?.language === 'sv') for (const d of Object.values(SLIME)) d.name = Locale.translate(d.name); // nameplates, log lines and the boss bar read these
   const MEADOW_ELITES = ['oldtusker', 'tidecrusher', 'orchardqueen'];
-  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'];
+  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'], BIFROST_ELITES = ['skoll', 'shardking', 'heimdallr'];
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
@@ -3242,7 +3245,7 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, bifrostEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   // Share the renderer's bank selection with loading, including borrowed boss/add art.
   // Loading every zone here used to start hundreds of image requests at login.
   let slimeSpriteConfig = null;
@@ -3265,6 +3268,7 @@
     [RIME_ELITES, () => rimeEliteSrc, loadRimeElites],
     [FEN_ELITES, () => fenEliteSrc, loadFenElites],
     [WYRD_ELITES, () => wyrdEliteSrc, loadWyrdElites],
+    [BIFROST_ELITES, () => bifrostEliteSrc, loadBifrostElites],
     [WORLDHEART_KINDS, () => worldheartSrc, loadWorldheartSprites],
     [TANGLECROWN_KINDS, () => tanglecrownSrc, loadTanglecrownSprites],
     [RIBBONWILD_KINDS, () => ribbonwildSrc, loadRibbonwildSprites],
@@ -3536,6 +3540,13 @@
     return fetch('assets/fenelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
       const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/fenelites_${k}.png`;
     }))).then(imgs => { fenEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { fenEliteSrc = null; });
+  }
+  function loadBifrostElites() {
+    if (bifrostEliteSrc) return;
+    if (stubOn()) { bifrostEliteSrc = stubEnemies(BIFROST_ELITES, { skoll: '#8ab', shardking: '#a8f', heimdallr: '#9cf' }); return; }
+    return fetch('assets/bifrostelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/bifrostelites_${k}.png`;
+    }))).then(imgs => { bifrostEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { bifrostEliteSrc = null; });
   }
   function loadWyrdElites() {
     if (wyrdEliteSrc) return;
@@ -4920,9 +4931,10 @@
   const MINI_ZOOMS = 4;
   // Tiles across the minimap at zoom 1. Shaped zones share one tile scale and can be crossed seamlessly, so they share one span too (their grids differ: 240, 208): a span that followed the grid made the map jump on every crossing. Other zones keep showing the whole grid.
   const MINI_SHAPED_SPAN = 240;
-  const miniSpan = () => zdef.shapeFloor ? MINI_SHAPED_SPAN : MAP;
+  const bigSky = () => zdef.theme === 'sky' && !!zdef.shape;   // Bifrost Reach on the pilot: a 376 grid of islands, no outline floor
+  const miniSpan = () => zdef.shapeFloor || bigSky() ? MINI_SHAPED_SPAN : MAP;
   // The minimap canvas of a shaped zone keeps 2.4 pixels per tile whatever the grid (units are 4 px; 144 units for the old 240 grid).
-  const miniUnits = () => zdef.shapeFloor ? Math.max(144, Math.round(MAP * .6)) : 144;
+  const miniUnits = () => zdef.shapeFloor || bigSky() ? Math.max(144, Math.round(MAP * .6)) : 144;
   const miniCache = new Map();   // shaped zone -> its rendered land and shallows (a crossing back and forth renders nothing)
   function buildMini() {
     const hit = zdef.shapeFloor && miniCache.get(zone);

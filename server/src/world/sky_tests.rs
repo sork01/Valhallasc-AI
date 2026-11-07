@@ -3,7 +3,6 @@
 use super::wyrd_tests::{at, blocked, calm, drain, flood, join, lines, place, reached, world};
 use super::*;
 
-const SKALD: usize = 4;
 const WYRD: usize = 6;
 const SKY: usize = 7;
 const STEP: f64 = 1.;
@@ -56,11 +55,12 @@ fn near(map: &Map, seen: &[bool], p: Point) -> bool {
 
 // ---- data ----------------------------------------------------------------------------------------------------------------------
 #[test]
-fn bifrost_reach_is_a_sky_zone_with_five_kinds_one_hub_three_wards_and_a_gate_pair() {
+fn bifrost_reach_is_a_sky_zone_with_five_kinds_three_elites_one_hub_three_outposts_and_four_updrafts()
+ {
     let w = world();
     let map = &w.maps[SKY];
     assert_eq!(map.name, "Bifrost Reach");
-    assert_eq!((map.size, map.levels), (160, Some([30, 35])));
+    assert_eq!((map.size, map.levels), (376, Some([30, 35])));
     assert_eq!(map.size % 8, 0, "the ground is cut in chunks of eight");
     assert_eq!(map.copies, 0);
     // enemies: every kind at its default level, in the counts the design lists (sleeping ward waves apart)
@@ -75,9 +75,11 @@ fn bifrost_reach_is_a_sky_zone_with_five_kinds_one_hub_three_wards_and_a_gate_pa
                 "{tag} sleeps"
             );
             assert!(
-                map.places
-                    .iter()
-                    .any(|p| p.waves.iter().any(|wave| &wave.tag == tag)),
+                tag.starts_with("raid_key:")
+                    || map
+                        .places
+                        .iter()
+                        .any(|p| p.waves.iter().any(|wave| &wave.tag == tag)),
                 "{tag} belongs to a ward"
             );
         } else {
@@ -89,22 +91,26 @@ fn bifrost_reach_is_a_sky_zone_with_five_kinds_one_hub_three_wards_and_a_gate_pa
     assert_eq!(
         live.into_iter().collect::<Vec<_>>(),
         [
-            ("einherjar", 10),
-            ("galehound", 8),
-            ("prismgolem", 8),
-            ("skyray", 10),
-            ("thunderroc", 9)
+            ("einherjar", 20),
+            ("galehound", 39),
+            ("heimdallr", 1),
+            ("prismgolem", 16),
+            ("shardking", 1),
+            ("skoll", 1),
+            ("skyray", 31),
+            ("thunderroc", 18)
         ]
     );
-    // the waves: two galehounds, two einherjar and a skyray, then two thunderrocs, two prism golems and two thunderrocs
+    // the waves: six circles, two or three waves each (the old wards keep theirs), and the grave cross's sleeper
     assert_eq!(
         asleep.into_iter().collect::<Vec<_>>(),
         [
             ("einherjar", 2),
-            ("galehound", 2),
+            ("ember_firelord", 1),
+            ("galehound", 6),
             ("prismgolem", 2),
-            ("skyray", 1),
-            ("thunderroc", 4)
+            ("skyray", 5),
+            ("thunderroc", 8)
         ]
     );
     for (kind, level) in [
@@ -122,26 +128,49 @@ fn bifrost_reach_is_a_sky_zone_with_five_kinds_one_hub_three_wards_and_a_gate_pa
         w.spawns.iter().position(|s| s.zone == SKY),
         Some(w.spawns.iter().filter(|s| s.zone < SKY).count())
     );
-    // one hub on the arrival island, safe ground, with a travel master
-    assert!(map.camps.is_empty());
+    // one hub on the central island, safe ground, with a travel master; three outposts on the three big outer islands
     assert_eq!(
         map.city.as_ref().map(|c| (c.x0, c.x1, c.y0, c.y1)),
-        Some((62., 98., 124., 153.))
+        Some((169., 205., 182., 211.))
     );
-    assert!(map.in_city(at(80., 136.)) && !map.in_city(at(30., 106.)));
+    assert!(
+        map.in_city(at(187., 194.)) && !map.in_city(at(60., 134.)),
+        "the hub is safe ground, Windward Meadow is not"
+    );
+    assert_eq!(map.camps.len(), 3);
+    for (name, plaza) in [
+        ("Windward Roost", (112., 124.)),
+        ("Stormcrown Station", (296., 254.)),
+        ("Eyrie Landing", (256., 100.)),
+    ] {
+        let camp = map
+            .camps
+            .iter()
+            .find(|c| ((c.x0 + c.x1) / 2., (c.y0 + c.y1) / 2.) == plaza)
+            .unwrap_or_else(|| panic!("{name}"));
+        assert_eq!((camp.x1 - camp.x0, camp.y1 - camp.y0), (28., 22.), "{name}");
+    }
     let master = map
         .npcs
         .iter()
-        .find(|n| n.travel_stop.is_some())
+        .find(|n| n.travel_stop.as_deref() == Some("Heimdall's Perch"))
         .expect("a travel master");
     assert_eq!(master.id, "travel_perch");
+    let hub = map.city.as_ref().unwrap();
     let perch_npcs: Vec<_> = map
         .npcs
         .iter()
-        .filter(|n| !n.id.starts_with("span_"))
+        .filter(|n| {
+            n.x >= hub.x0
+                && n.x <= hub.x1
+                && n.y >= hub.y0
+                && n.y <= hub.y1
+                && !n.id.starts_with("span_")
+                && !n.id.starts_with("mailbox")
+        })
         .collect();
     assert_eq!(perch_npcs.len(), 8, "seven people and the travel master");
-    // the gate pair: the Wyrdwood's Stormrift up, and the Perch's down, each arrival clear of every gate and of enemies
+    // the four updrafts, each on its own pad, the arrival six tiles in, clear of every gate and of enemies
     let up = w.maps[WYRD]
         .portals
         .iter()
@@ -153,8 +182,16 @@ fn bifrost_reach_is_a_sky_zone_with_five_kinds_one_hub_three_wards_and_a_gate_pa
         .find(|p| p.id == "stormrift_down")
         .unwrap();
     assert_eq!((up.to, down.to), (SKY, WYRD));
-    assert_eq!((up.tx, up.ty), (map.spawn.x, map.spawn.y));
-    assert_eq!((down.tx, down.ty), (24., 14.));
+    assert_eq!(
+        (up.tx, up.ty),
+        (down.x + 6., down.y),
+        "the Stormrift lands on its own pad"
+    );
+    assert_eq!((down.tx, down.ty), (up.x - 5.5, up.y));
+    assert!(
+        !map.in_city(at(up.tx, up.ty)),
+        "you land on the pad, not in the hub"
+    );
     for (arrival, gates) in [
         (at(up.tx, up.ty), &map.portals),
         (at(down.tx, down.ty), &w.maps[WYRD].portals),
@@ -168,26 +205,46 @@ fn bifrost_reach_is_a_sky_zone_with_five_kinds_one_hub_three_wards_and_a_gate_pa
             );
         }
     }
-    for m in [map.spawn, at(down.tx, down.ty)] {
-        let zone = if m.x == map.spawn.x { SKY } else { WYRD };
+    for (m, zone) in [
+        (at(up.tx, up.ty), SKY),
+        (at(down.tx, down.ty), WYRD),
+        (map.spawn, SKY),
+    ] {
         let mut clear = m;
         w.maps[zone].collide(&mut clear, PLAYER_RADIUS);
         assert!(clear.distance(m) < 1e-6, "{m:?} is free ground");
+        // eight tiles of calm round an arrival in Bifrost; the Wyrdwood's own arrival (a design of 2026-11-07) has a ram 7.5 tiles off
+        let calm = if zone == SKY { 8. } else { 7. };
         for s in w.slimes.iter().filter(|s| s.zone == zone) {
             assert!(
-                s.point().distance(m) > 8.,
+                s.point().distance(m) > calm,
                 "{} is clear of the arrival",
                 s.kind
             );
         }
     }
-    assert!(
-        w.maps[WYRD].portals.len() == 2 && w.maps[WYRD].portals[0].id == "skaldholm_gate",
-        "the Wyrdwood's old gate keeps index 0"
+    assert_eq!(
+        w.maps[WYRD].portals.iter().filter(|p| p.to == SKY).count(),
+        1,
+        "the Wyrdwood has one way up"
     );
-    // places: the ward circles carry waves, the rest are plain visit spots; a map without `waves` still loads
-    assert_eq!(map.places.len(), 7);
-    assert_eq!(map.places.iter().filter(|p| !p.waves.is_empty()).count(), 3);
+    for (id, to) in [
+        ("stormrift_down", WYRD),
+        ("maelstrom_down", 8),
+        ("path_7_9", 9),
+        ("path_7_1", 1),
+    ] {
+        let g = map
+            .portals
+            .iter()
+            .find(|p| p.id == id)
+            .unwrap_or_else(|| panic!("{id}"));
+        assert_eq!(g.to, to, "{id}");
+        assert!(g.walk.is_some(), "{id} is a walk-in updraft");
+    }
+    // places: the ward circles and the rods carry waves, the rest are plain visit spots; a map without `waves` still loads
+    assert_eq!(map.places.len(), 20);
+    assert_eq!(map.places.iter().filter(|p| !p.waves.is_empty()).count(), 6);
     let old: Place = serde_json::from_str(r#"{"id":"a","name":"A","x":1,"y":2,"r":3}"#).unwrap();
     assert!(old.waves.is_empty());
 }
@@ -197,16 +254,16 @@ fn the_void_is_sealed_nobody_can_walk_off_an_island_or_a_bridge() {
     let w = world();
     let map = &w.maps[SKY];
     let floor = rows();
-    assert_eq!(floor.len(), 160);
-    assert!(floor.iter().all(|r| r.len() == 160));
+    assert_eq!(floor.len(), 376);
+    assert!(floor.iter().all(|r| r.len() == 376));
     // a ring of void rectangles round every island and bridge
     let rects = map
         .objects
         .iter()
         .filter(|o| o.width > 0. && o.depth > 0.)
         .count();
-    assert!(rects > 300, "a ring of void round every island: {rects}");
-    // every cell a hero can reach from the arrival lies on the floor
+    assert!(rects > 1000, "a ring of void round every island: {rects}");
+    // every cell a hero can reach from the spawn lies on the floor
     let grid = blocked(map, &[]);
     let open = flood(map, &grid, map.spawn);
     let n = (map.size as f64 / STEP) as usize;
@@ -224,10 +281,10 @@ fn the_void_is_sealed_nobody_can_walk_off_an_island_or_a_bridge() {
         }
     }
     assert!(
-        reachable > 5000,
+        reachable > 25000,
         "{reachable} walkable cells: the whole archipelago"
     );
-    // every person, every live enemy, every place, both gates and every ward ambusher can be walked to
+    // every person, every live enemy, every place, every gate and every ward ambusher can be walked to
     for npc in &map.npcs {
         assert!(
             near(map, &open, at(npc.x, npc.y)),
@@ -240,24 +297,44 @@ fn the_void_is_sealed_nobody_can_walk_off_an_island_or_a_bridge() {
         assert!(on_floor(&floor, s.x, s.y), "{} stands on the floor", s.kind);
     }
     for p in &map.places {
-        // a landmark stands in the middle of its place
-        assert!(near(map, &open, at(p.x, p.y + 2.4)), "{}", p.id);
+        // a landmark stands in the middle of its place: some ground inside the circle can be walked to
+        let mut any = false;
+        for (dx, dy) in [(0., 2.4), (0., -2.4), (2.4, 0.), (-2.4, 0.), (0., 0.)] {
+            any |= near(map, &open, at(p.x + dx, p.y + dy));
+        }
+        assert!(any, "{}", p.id);
     }
     for g in &map.portals {
-        assert!(near(map, &open, at(g.x, g.y - 2.)), "{}", g.id);
+        let (dx, dy) = g
+            .walk
+            .map_or((0., 2.), |w| (-f64::from(w[0]) * 2., -f64::from(w[1]) * 2.));
+        assert!(near(map, &open, at(g.x + dx, g.y + dy)), "{}", g.id);
     }
-    // a real walk with the real collision: out through a bridge's end into the void stops at the edge
-    let mut p = at(30., 130.);
-    for _ in 0..40 {
-        map.walk(&mut p, at(0., 1.), 1., PLAYER_RADIUS);
+    // a real walk with the real collision: out through each updraft pad's rim into the void stops at the edge
+    for g in map.portals.iter().filter(|g| g.walk.is_some()) {
+        let walk = g.walk.unwrap();
+        let mut p = at(g.x - f64::from(walk[0]) * 6., g.y - f64::from(walk[1]) * 6.);
+        for _ in 0..40 {
+            map.walk(
+                &mut p,
+                at(f64::from(walk[0]), f64::from(walk[1])),
+                1.,
+                PLAYER_RADIUS,
+            );
+        }
+        assert!(on_floor(&floor, p.x, p.y), "{} stopped at {p:?}", g.id);
+        let mut dash = at(g.x - f64::from(walk[0]) * 2., g.y - f64::from(walk[1]) * 2.);
+        map.walk(
+            &mut dash,
+            at(f64::from(walk[0]), f64::from(walk[1])),
+            12.,
+            PLAYER_RADIUS,
+        );
+        assert!(
+            on_floor(&floor, dash.x, dash.y),
+            "a dash cannot tunnel through the void: {dash:?}"
+        );
     }
-    assert!(on_floor(&floor, p.x, p.y), "stopped at {p:?}");
-    let mut dash = at(80., 150.);
-    map.walk(&mut dash, at(0., 1.), 12., PLAYER_RADIUS);
-    assert!(
-        on_floor(&floor, dash.x, dash.y),
-        "a dash cannot tunnel through the void: {dash:?}"
-    );
 }
 
 #[test]
@@ -268,73 +345,74 @@ fn each_bridge_closes_exactly_the_islands_beyond_it_so_the_bands_come_in_order()
     let seal = |points: &[(f64, f64)]| -> Vec<(f64, f64, f64)> {
         points.iter().map(|&(x, y)| (x, y, 3.4)).collect()
     };
-    let b_west = (43.5, 134.5);
-    let b_east = (117.5, 134.5);
-    let b_wcrown = (56.5, 106.5);
-    let b_scrown = (104.5, 106.5);
-    let b_hall = (49.5, 76.5);
-    let b_eyrie = (85.5, 40.5);
-    // which kinds still have a reachable representative with these bridges closed
+    let b_pad_nw = (96., 163.);
+    let b_pad_hub = (133., 185.);
+    let b_hub_pylon = (205., 136.);
+    let b_pylon_nw = (165., 103.);
+    let b_pylon_north = (179., 86.);
+    let b_north_ne = (192., 65.5);
+    let b_hub_south = (203., 256.);
+    let b_south_se = (274., 308.);
+    let b_se_nacre = (317., 289.);
+    // what stays reachable from the spawn with these bridges closed: a landmark of each part of the archipelago
+    let spots: [(&str, (f64, f64)); 8] = [
+        ("the Roost", (112., 127.)),
+        ("the Station", (296., 257.)),
+        ("the Landing", (256., 103.)),
+        ("the Hall Gate", (156.5, 82.)),
+        ("the Spire", (232.5, 303.)),
+        ("the Cragsfall pad", (227., 334.)),
+        ("the Nacrehold pad", (327., 300.)),
+        ("the Pylon", (195.5, 104.)),
+    ];
     let cut = |closed: &[(f64, f64)]| -> Vec<&'static str> {
         let open = flood(map, &blocked(map, &seal(closed)), map.spawn);
-        let mut gone = vec![];
-        for kind in [
-            "galehound",
-            "prismgolem",
-            "skyray",
-            "einherjar",
-            "thunderroc",
-        ] {
-            let mut live = w
-                .slimes
-                .iter()
-                .filter(|s| s.zone == SKY && s.kind == kind && !s.dead);
-            if !live.any(|s| near(map, &open, s.point())) {
-                gone.push(kind);
-            }
-        }
-        gone
+        spots
+            .iter()
+            .filter(|(_, p)| !near(map, &open, at(p.0, p.1)))
+            .map(|(name, _)| *name)
+            .collect()
     };
-    assert!(cut(&[]).is_empty());
+    assert!(cut(&[]).is_empty(), "everything is reachable");
     assert_eq!(
-        cut(&[b_west, b_east]),
-        [
-            "galehound",
-            "prismgolem",
-            "skyray",
-            "einherjar",
-            "thunderroc"
-        ],
-        "the Perch has two exits"
+        cut(&[b_se_nacre]),
+        ["the Nacrehold pad"],
+        "one short bridge to the south-east pad"
     );
     assert_eq!(
-        cut(&[b_west]),
-        Vec::<&str>::new(),
-        "the ring: the east way still reaches everything"
+        cut(&[b_pad_nw, b_pylon_nw]),
+        ["the Roost"],
+        "Windward Meadow hangs off two bridges"
     );
-    assert_eq!(cut(&[b_west, b_wcrown]), ["galehound"]);
-    assert_eq!(cut(&[b_east, b_scrown]), ["prismgolem"]);
     assert_eq!(
-        cut(&[b_wcrown, b_scrown]),
-        ["skyray", "einherjar", "thunderroc"],
-        "the Stormcrown needs one of its two bridges"
+        cut(&[b_pylon_north, b_north_ne]),
+        ["the Hall Gate"],
+        "the Hall of the Fallen hangs off two bridges"
     );
-    assert_eq!(cut(&[b_hall]), ["einherjar", "thunderroc"]);
-    assert_eq!(cut(&[b_eyrie]), ["thunderroc"]);
-    // the wards: the first lies on its own islet, the vigil in the hall, the last in the Eyrie
+    assert_eq!(
+        cut(&[b_hub_south, b_south_se]),
+        ["the Spire", "the Cragsfall pad"],
+        "the Shardfields hang off two bridges"
+    );
+    assert!(
+        cut(&[b_hub_pylon]).is_empty(),
+        "the ring: the Stormrift pad still leads north"
+    );
+    assert!(
+        cut(&[b_pad_hub]).is_empty(),
+        "the Stormrift pad's second bridge"
+    );
+    // the wards: the first on Windward Meadow, the vigil in the hall, the last in the Eyrie
     let open = |closed: &[(f64, f64)]| flood(map, &blocked(map, &seal(closed)), map.spawn);
     let ward_wind = place_of(&w, "sky_ward_wind");
     let ward_vigil = place_of(&w, "sky_ward_vigil");
     let ward_last = place_of(&w, "sky_ward_last");
     let reach = |seen: &[bool], p: &Place| near(map, seen, at(p.x, p.y + 2.4));
     assert!(reach(&open(&[]), &ward_wind));
-    assert!(
-        !reach(&open(&[(12.5, 87.5)]), &ward_wind),
-        "the islet hangs off one short bridge"
-    );
-    assert!(!reach(&open(&[b_hall]), &ward_vigil));
-    assert!(reach(&open(&[b_eyrie]), &ward_vigil));
-    assert!(!reach(&open(&[b_eyrie]), &ward_last));
+    assert!(reach(&open(&[]), &ward_vigil) && reach(&open(&[]), &ward_last));
+    assert!(!reach(&open(&[b_pad_nw, b_pylon_nw]), &ward_wind));
+    assert!(!reach(&open(&[b_pylon_north, b_north_ne]), &ward_vigil));
+    assert!(reach(&open(&[b_pylon_north, b_north_ne]), &ward_last));
 }
 
 #[test]
@@ -382,9 +460,10 @@ fn every_bifrost_monster_has_its_own_stats_attacks_materials_and_rewards() {
         let c = &w.players[&1].character;
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
         assert_eq!(paid, xp, "{kind} xp");
+        // enemy gold drops are halved at the kill (MOB_GOLD_SCALE)
         assert_eq!(
             w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
-            gold
+            ((f64::from(gold) * 0.5).round() as u32).max(1)
         );
         assert!(
             w.drops
@@ -423,17 +502,229 @@ fn every_bifrost_monster_has_its_own_stats_attacks_materials_and_rewards() {
     }
 }
 
+// ---- the shapes pilot: elites, outposts and updrafts -------------------------------------------------------------------------------------
+#[test]
+fn bifrosts_three_elites_stand_clear_of_every_road_place_and_person_two_with_a_quest_and_one_without()
+ {
+    let w = world();
+    let map = &w.maps[SKY];
+    for (kind, level, hp, damage, material_id, quest_id) in [
+        (
+            "skoll",
+            31,
+            60000.,
+            1100.,
+            "skoll_fang",
+            Some("sky_wr_alpha"),
+        ),
+        (
+            "shardking",
+            33,
+            110000.,
+            1800.,
+            "shardking_crown",
+            Some("sky_h_shardking"),
+        ),
+        ("heimdallr", 35, 140000., 2300., "heimdallr_horn", None),
+    ] {
+        assert!(is_elite(kind), "{kind}");
+        assert_eq!(Slime::default_level(kind), level, "{kind}");
+        let spawn = SlimeSpawn {
+            ambush: None,
+            x: 5.,
+            y: 5.,
+            kind: kind.into(),
+            zone: SKY,
+        };
+        let base = Slime::with_level(0, &spawn, level);
+        assert_eq!((base.max_hp, base.damage), (hp, damage), "{kind}");
+        assert_eq!(material(kind), material_id);
+        assert!(item(material_id).is_some_and(|i| i.kind == "material"));
+        let ours: Vec<_> = w
+            .spawns
+            .iter()
+            .filter(|s| s.zone == SKY && s.kind == kind)
+            .collect();
+        assert_eq!(ours.len(), 1, "one {kind}");
+        let e = at(ours[0].x, ours[0].y);
+        // awareness plus 3 tiles from every person, place and road, so an errand never pulls it
+        let awareness = Slime::attack_profile(kind).3 + 3.;
+        for n in &map.npcs {
+            assert!(
+                e.distance(at(n.x, n.y)) > awareness,
+                "{kind} is {:.1} from {}",
+                e.distance(at(n.x, n.y)),
+                n.id
+            );
+        }
+        for p in &map.places {
+            assert!(
+                e.distance(at(p.x, p.y)) > awareness,
+                "{kind} is too close to {}",
+                p.id
+            );
+        }
+        let quests: Vec<_> = map
+            .quests
+            .iter()
+            .filter(|q| {
+                q.objectives
+                    .iter()
+                    .any(|o| o.kind == "kill" && o.target == kind)
+            })
+            .collect();
+        assert_eq!(
+            quests.len(),
+            usize::from(quest_id.is_some()),
+            "{kind} quests"
+        );
+        if let Some(id) = quest_id {
+            assert_eq!(quests[0].id, id);
+        }
+    }
+}
+
+#[test]
+fn the_three_outposts_each_have_two_givers_a_trader_a_travel_master_and_a_mailbox_inside_their_camp()
+ {
+    let w = world();
+    let map = &w.maps[SKY];
+    for (key, name, plaza, ids) in [
+        (
+            "roost",
+            "Windward Roost",
+            (112., 124.),
+            ["sky_wr_vigdis", "sky_wr_leif", "sky_wr_trader"],
+        ),
+        (
+            "station",
+            "Stormcrown Station",
+            (296., 254.),
+            ["sky_ss_ingrid", "sky_ss_bjorn", "sky_ss_trader"],
+        ),
+        (
+            "landing",
+            "Eyrie Landing",
+            (256., 100.),
+            ["sky_el_gunnar", "sky_el_hallveig", "sky_el_trader"],
+        ),
+    ] {
+        let camp = map
+            .camps
+            .iter()
+            .find(|c| ((c.x0 + c.x1) / 2., (c.y0 + c.y1) / 2.) == plaza)
+            .unwrap_or_else(|| panic!("{name}"));
+        let inside = |n: &Npc| n.x >= camp.x0 && n.x <= camp.x1 && n.y >= camp.y0 && n.y <= camp.y1;
+        for id in ids {
+            assert!(inside(&npc(&w, id)), "{id} stands in {name}");
+        }
+        assert!(npc(&w, ids[2]).buys, "{} trades", ids[2]);
+        assert!(inside(&npc(&w, &format!("travel_{key}"))));
+        assert!(inside(&npc(&w, &format!("mailbox_7_{key}"))));
+        // a quest chain: every giver of the outpost owns at least one quest
+        for id in &ids[..2] {
+            assert!(map.quests.iter().any(|q| &q.npc == id), "{id} has a quest");
+        }
+    }
+}
+
+#[test]
+fn every_updraft_lands_on_walkable_floor_outside_every_gate_with_no_enemy_near_in_both_directions()
+{
+    let w = world();
+    for (zone, id, back) in [
+        (WYRD, "sky_gate", "stormrift_down"),
+        (8, "maelstrom_up", "maelstrom_down"),
+        (9, "path_9_7", "path_7_9"),
+        (1, "path_1_7", "path_7_1"),
+    ] {
+        let there = w.maps[zone]
+            .portals
+            .iter()
+            .find(|p| p.id == id)
+            .unwrap_or_else(|| panic!("{id}"));
+        let here = w.maps[SKY].portals.iter().find(|p| p.id == back).unwrap();
+        assert_eq!((there.to, here.to), (SKY, zone), "{id}");
+        // up: the arrival in Bifrost, then down: the arrival in the neighbour
+        for (dest, tx, ty, label) in [
+            (SKY, there.tx, there.ty, "up"),
+            (zone, here.tx, here.ty, "down"),
+        ] {
+            let m = at(tx, ty);
+            let mut clear = m;
+            w.maps[dest].collide(&mut clear, PLAYER_RADIUS);
+            assert!(
+                clear.distance(m) < 1e-6,
+                "{id} {label}: ({tx}, {ty}) is free ground"
+            );
+            for gate in &w.maps[dest].portals {
+                assert!(
+                    m.distance(at(gate.x, gate.y)) > gate.r + 0.5,
+                    "{id} {label}: clear of {}",
+                    gate.id
+                );
+            }
+            // eight tiles of calm round an arrival in Bifrost; the Wyrdwood's own arrival (a design of 2026-11-07) has a ram 7.5 tiles off
+            let calm = if dest == SKY { 8. } else { 7. };
+            for s in w.slimes.iter().filter(|s| s.zone == dest) {
+                assert!(
+                    s.point().distance(m) > calm,
+                    "{id} {label}: {} is {:.1} away",
+                    s.kind,
+                    s.point().distance(m)
+                );
+            }
+        }
+        // and the arrival in Bifrost is on the floor the client draws
+        assert!(on_floor(&rows(), there.tx, there.ty), "{id}");
+    }
+}
+
+#[test]
+fn bifrost_is_gate_only_no_seam_leads_into_it_and_every_way_in_is_an_updraft_you_walk_into() {
+    let w = world();
+    for (zone, map) in w.maps.iter().enumerate() {
+        for p in map.portals.iter().filter(|p| p.to == SKY || zone == SKY) {
+            assert!(p.seam.is_none(), "zone {zone}: {} is a seam", p.id);
+            if zone != SKY && p.id.starts_with("span_") {
+                continue;
+            }
+            if zone == SKY && p.id == "sky_shattered_span" {
+                continue;
+            }
+            assert!(
+                p.walk.is_some(),
+                "zone {zone}: {} is a walk-in updraft",
+                p.id
+            );
+        }
+    }
+    // the neighbours' land ends at their own border: no margin of land past it, so nobody can step across
+    for neighbour in [1, WYRD] {
+        let own = w.maps[neighbour]
+            .portals
+            .iter()
+            .filter(|p| p.to == SKY)
+            .count();
+        assert_eq!(own, 1, "zone {neighbour} has exactly one way up");
+    }
+}
+
 // ---- the questline -----------------------------------------------------------------------------------------------------------------
 #[test]
-fn the_questline_has_twenty_two_quests_with_three_wards_and_the_old_objective_kinds() {
+fn the_questline_has_forty_one_quests_with_six_holds_and_the_old_objective_kinds() {
     let w = world();
     let map = &w.maps[SKY];
     let quests: Vec<_> = map
         .quests
         .iter()
-        .filter(|q| !q.id.starts_with("span_"))
+        .filter(|q| !q.id.starts_with("span_") && !q.id.starts_with("es_"))
         .collect();
-    assert_eq!(quests.len(), 22);
+    assert_eq!(
+        quests.len(),
+        36,
+        "the old 22 (ids kept) and 14 new; the Span's and the Empty Seat's apart"
+    );
     let mut kinds = std::collections::BTreeSet::new();
     let mut holds = vec![];
     for q in &quests {
@@ -475,7 +766,7 @@ fn the_questline_has_twenty_two_quests_with_three_wards_and_the_old_objective_ki
                 other => panic!("unsupported objective {other}"),
             }
         }
-        if let Some(requires) = &q.requires {
+        if let Some(requires) = q.requires.as_ref().filter(|r| r.starts_with("sky_")) {
             assert!(
                 map.quests.iter().any(|r| &r.id == requires),
                 "{} requires {requires}",
@@ -501,6 +792,9 @@ fn the_questline_has_twenty_two_quests_with_three_wards_and_the_old_objective_ki
                 "sky_ward_last".to_string(),
                 120
             ),
+            ("sky_wr_beacon".to_string(), "sky_beacon_m".to_string(), 20),
+            ("sky_ss_rod".to_string(), "sky_rod_m".to_string(), 20),
+            ("sky_el_rod".to_string(), "sky_nest_m".to_string(), 20),
         ]
     );
     // the last ward is the group quest: three heroes, hired at its giver, and level-appropriate gear
@@ -759,7 +1053,8 @@ fn falling_at_the_ward_loses_the_count_and_puts_the_waves_back_to_sleep() {
     assert!(asleep_all(&w, &ward));
     assert!(told.iter().any(|t| t.contains("collapses")), "{told:?}");
     // a hero who died far from the ward keeps what they had
-    let (mut w, mut rx) = holder("sky_ward_wind", SKY, at(80., 140.));
+    let far = world().maps[SKY].spawn;
+    let (mut w, mut rx) = holder("sky_ward_wind", SKY, far);
     w.god_mode = false;
     set_held(&mut w, 30);
     w.players.get_mut(&1).unwrap().character.hp = 0.;
@@ -775,7 +1070,8 @@ fn enemies_left_awake_by_a_hero_who_walked_away_go_back_to_sleep_after_twelve_se
     run(&mut w, &mut rx, 20);
     assert!(!awake(&w, "sky_ward_wind#a").is_empty());
     // the hero leaves for the Perch, far from the ward: nobody is near it any more
-    place(&mut w, 1, SKY, at(80., 140.));
+    let far = w.maps[SKY].spawn;
+    place(&mut w, 1, SKY, far);
     run(&mut w, &mut rx, 200);
     assert!(
         !awake(&w, "sky_ward_wind#a").is_empty(),
@@ -839,12 +1135,12 @@ fn the_stormrift_carries_a_hero_up_and_the_perch_gate_carries_them_down_without_
         .find(|p| p.id == "sky_gate")
         .unwrap()
         .clone();
-    place(&mut w, 1, WYRD, at(up.x, up.y + 4.));
+    place(&mut w, 1, WYRD, at(up.x - 4., up.y));
     w.message(
         1,
         ClientMessage::Move {
-            x: up.x,
-            y: up.y - 1.,
+            x: up.x + 1.,
+            y: up.y,
         },
     );
     for _ in 0..200 {
@@ -857,7 +1153,10 @@ fn the_stormrift_carries_a_hero_up_and_the_perch_gate_carries_them_down_without_
     let c = &w.players[&1].character;
     assert_eq!(c.zone, SKY);
     assert!(c.point().distance(at(up.tx, up.ty)) < 1e-6);
-    assert!(w.maps[SKY].in_city(c.point()), "you land in the hub");
+    assert!(
+        !w.maps[SKY].in_city(c.point()),
+        "you land on the Stormrift pad, a bridge away from the hub"
+    );
     assert_eq!(w.snapshot_for(SKY)["players"].as_array().unwrap().len(), 1);
     assert!(
         w.snapshot_for(WYRD)["players"]
@@ -866,8 +1165,21 @@ fn the_stormrift_carries_a_hero_up_and_the_perch_gate_carries_them_down_without_
             .is_empty()
     );
     // standing in the way back too soon does nothing; a moment later it carries you down to the summit court
-    let down = w.maps[SKY].portals[0].clone();
+    let down = w.maps[SKY]
+        .portals
+        .iter()
+        .find(|p| p.id == "stormrift_down")
+        .unwrap()
+        .clone();
     place(&mut w, 1, SKY, at(down.x, down.y));
+    let side = down.walk.expect("the updraft is a walk-in gate");
+    w.message(
+        1,
+        ClientMessage::Move {
+            x: down.x + f64::from(side[0]) * 3.,
+            y: down.y + f64::from(side[1]) * 3.,
+        },
+    );
     w.update_player(1);
     assert_eq!(w.players[&1].character.zone, SKY, "no instant bounce");
     w.time += PORTAL_DELAY + 0.1;
@@ -881,10 +1193,27 @@ fn the_stormrift_carries_a_hero_up_and_the_perch_gate_carries_them_down_without_
 #[test]
 fn the_perch_has_its_own_spark_travel_master_linked_to_skuldwatch() {
     let w = world();
-    assert_eq!(
-        npc(&w, "travel_perch").travel_links,
-        ["travel_skuldwatch", "travel_keelhaven"]
-    );
+    let links = npc(&w, "travel_perch").travel_links;
+    for want in [
+        "travel_skuldwatch",
+        "travel_keelhaven",
+        "travel_roost",
+        "travel_station",
+        "travel_landing",
+    ] {
+        assert!(links.iter().any(|l| l == want), "{want} in {links:?}");
+    }
+    // the outposts link inside Bifrost only, and to each other
+    for key in ["roost", "station", "landing"] {
+        let m = npc(&w, &format!("travel_{key}"));
+        assert!(m.travel_links.iter().any(|l| l == "travel_perch"));
+        assert!(
+            m.travel_links
+                .iter()
+                .all(|l| l.starts_with("travel_") && npc_exists(&w.maps[SKY], l)),
+            "{key}"
+        );
+    }
     assert!(
         w.maps[WYRD]
             .npcs
@@ -903,11 +1232,6 @@ fn the_perch_has_its_own_spark_travel_master_linked_to_skuldwatch() {
         "the master stands on free ground"
     );
     assert!(w.maps[SKY].in_city(at(master.x, master.y)));
-    assert_eq!(
-        w.maps[SKALD].portals.len(),
-        3,
-        "Skaldholm's gates are untouched"
-    );
 }
 
 // ---- balance: a hero (and hired fighters) holding each ward against its waves --------------------------------------------------------

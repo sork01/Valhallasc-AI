@@ -20,14 +20,14 @@ ROOT = Path(__file__).resolve().parents[1]
 def offsets(path=None):
     world = json.loads((path or ROOT / 'world/map.txt').read_text())
     zones = [world] + world['zones']
-    return {i: z['shape']['offset'] for i, z in enumerate(zones) if z.get('shape') and not z['shape'].get('warp')}
+    return {i: z['shape']['offset'] for i, z in enumerate(zones) if z.get('shape') and not z['shape'].get('warp') and not z['shape'].get('placeAtSpawn')}
 
 
 def warped(path=None):
-    """Zones whose old layout was bent into the outline: a saved position has no simple offset, so the character is placed at the zone's spawn."""
+    """Zones whose old layout was bent into the outline (or replaced by an authored sky, `placeAtSpawn`: Bifrost Reach): a saved position has no simple offset, so the character is placed at the zone's spawn."""
     world = json.loads((path or ROOT / 'world/map.txt').read_text())
     zones = [world] + world['zones']
-    return {i: z['spawn'] for i, z in enumerate(zones) if z.get('shape', {}).get('warp')}
+    return {i: z['spawn'] for i, z in enumerate(zones) if z.get('shape', {}).get('warp') or z.get('shape', {}).get('placeAtSpawn')}
 
 
 def world_spawn(zone):

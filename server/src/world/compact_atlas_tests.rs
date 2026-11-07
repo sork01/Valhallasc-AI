@@ -187,13 +187,20 @@ fn compact_atlas_bifrost_platform_edges_and_void_are_solid() {
         "checked exposed island and bridge edges: {edges}"
     );
     let _rx = join(&mut w, 1, Class::Warrior);
-    // All four edges of the added landing, outside the return gate trigger.
-    for (start, dir) in [
-        (at(30.5, 73.5), at(-1., 0.)),
-        (at(48.5, 71.5), at(1., 0.)),
-        (at(40.5, 70.5), at(0., -1.)),
-        (at(40.5, 82.5), at(0., 1.)),
-    ] {
+    // Along the rim of every updraft pad (both ways at right angles to its gate), outside the gate's trigger.
+    let mut sweeps = vec![];
+    for g in sky["portals"].as_array().unwrap() {
+        let Some(side) = g["walk"].as_array() else {
+            continue;
+        };
+        let (wx, wy) = (side[0].as_f64().unwrap(), side[1].as_f64().unwrap());
+        let (gx, gy) = (g["x"].as_f64().unwrap(), g["y"].as_f64().unwrap());
+        for sign in [-1., 1.] {
+            sweeps.push((at(gx - wx * 5., gy - wy * 5.), at(-wy * sign, wx * sign)));
+        }
+    }
+    assert_eq!(sweeps.len(), 8);
+    for (start, dir) in sweeps {
         place(&mut w, 1, 7, start);
         for _ in 0..40 {
             w.time += TICK;
@@ -591,29 +598,30 @@ fn compact_atlas_city_archways_and_nacre_alcove_are_walkable() {
         .find(|p| p.to == 9)
         .unwrap()
         .clone();
-    assert_eq!((gate.x, gate.y), (122.5, 113.5));
+    // the Nacrehold updraft stands on its own pad in the south-east (the shapes pilot), six tiles from where Nacrehold sends you
+    assert_eq!((gate.x, gate.y), (330.8, 300.0));
     let back = w.maps[9].portals.iter().find(|p| p.to == 7).unwrap();
-    assert_eq!((back.tx, back.ty), (116.5, 113.5));
-    assert!(w.maps[7].line_clear(at(107.5, 106.5), at(119.5, 106.5), PLAYER_RADIUS));
+    assert_eq!((back.tx, back.ty), (gate.x - 6., gate.y));
     assert!(w.maps[7].line_clear(
-        at(gate.x, gate.y - 3.5),
-        at(gate.x, gate.y + 3.5),
+        at(gate.x - 6., gate.y),
+        at(gate.x - 1., gate.y),
         PLAYER_RADIUS
     ));
     let _rx = join(&mut w, 1, Class::Warrior);
-    place(&mut w, 1, 7, at(107.5, 106.5));
+    // passing along the pad, at right angles to the gate, must not travel
+    place(&mut w, 1, 7, at(gate.x - 5., gate.y - 4.));
     for _ in 0..40 {
         w.time += TICK;
         let p = w.players.get_mut(&1).unwrap();
-        p.input = at(1., 0.);
+        p.input = at(0., 1.);
         p.input_at = w.time;
         w.update_player(1);
         assert_eq!(
             w.players[&1].character.zone, 7,
-            "passing along the old bridge must not travel"
+            "passing along the pad must not travel"
         );
     }
-    assert!(w.players[&1].character.x > 114.);
+    assert!(w.players[&1].character.y > gate.y + 1.);
     for (zone, map) in std::iter::once(&data)
         .chain(data["zones"].as_array().unwrap())
         .enumerate()

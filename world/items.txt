@@ -119,6 +119,27 @@
     "sell": 330
   },
   {
+    "id": "skoll_fang",
+    "name": "Sköll's Fang",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 620
+  },
+  {
+    "id": "shardking_crown",
+    "name": "Shard-King's Crown",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 700
+  },
+  {
+    "id": "heimdallr_horn",
+    "name": "Horn of Heimdall's Shade",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 780
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",
