@@ -19,14 +19,14 @@
   City.art.skypine = {
     box: [300, 420, 150, 380],
     draw(g, o) {
-      const v = (o.v || 0) % 4, rng = rngf(100 + v * 31), pal = PINES[v], lean = (v % 2 ? 1 : -1) * 22;
+      const v = (o.v || 0) % 4, rng = rngf(100 + v * 31), pal = PINES[v], lean = (v % 2 ? 1 : -1) * 5;   // a trunk that stands: the old 22 px lean read as a tree falling over
       g.scale(.78, .78); g.lineJoin = 'round'; g.lineCap = 'round';
       shadow(g, 40, 12);
-      const trunk = [[0, -2], [lean * .25, -50], [lean * .8, -100], [lean, -150]];
+      const trunk = [[0, -2], [lean * .25, -52], [lean * .8, -104], [lean, -156]];
       g.strokeStyle = OL; g.lineWidth = 17; g.beginPath(); g.moveTo(...trunk[0]); g.bezierCurveTo(...trunk[1], ...trunk[2], ...trunk[3]); g.stroke();
       g.strokeStyle = '#8a6a5a'; g.lineWidth = 11; g.stroke(); g.strokeStyle = '#c4a090'; g.lineWidth = 3; g.beginPath(); g.moveTo(-3, -8); g.bezierCurveTo(lean * .2 - 3, -50, lean * .7 - 3, -100, lean - 3, -145); g.stroke();
       for (let i = 0; i < 4; i++) {                                         // layered pads of foliage, each one wider lower down
-        const y = -150 + i * 30, x = lean * (1 - i * .2) + (rng() - .5) * 6, rx = 34 + i * 17, ry = 12 + i * 3.4;
+        const y = -158 + i * 31, x = lean * (1 - i * .2) + (rng() - .5) * 4, rx = 30 + i * 15, ry = 17 + i * 4;
         ell(g, x, y + 5, rx + 4, ry + 4, OL);
         const gr = g.createRadialGradient(x - rx * .3, y - ry * .5, 4, x, y, rx); gr.addColorStop(0, pal[0]); gr.addColorStop(.55, pal[1]); gr.addColorStop(1, pal[2]);
         ell(g, x, y, rx, ry, gr);

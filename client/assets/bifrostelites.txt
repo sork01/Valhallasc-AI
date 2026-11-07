@@ -45,14 +45,14 @@
     }
   },
   "sprites": {
-    "skoll": "c6086716db8673f1",
-    "shardking": "11aea2259a565f01",
-    "heimdallr": "fe42f9e2aa0f6574"
+    "skoll": "da6870a129408fa3",
+    "shardking": "bc0cd4b3030e32cb",
+    "heimdallr": "26e0be263417cad8"
   },
   "tops": {
     "skoll": 80,
-    "shardking": 113,
-    "heimdallr": 120
+    "shardking": 126,
+    "heimdallr": 109
   },
   "artStyle": "bifrost-elite",
   "kindFrames": {
@@ -62,7 +62,7 @@
         124
       ],
       "anchor": [
-        78,
+        74,
         116
       ]
     },
