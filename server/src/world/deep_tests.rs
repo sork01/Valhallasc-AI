@@ -308,8 +308,8 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         w.maps[SKY].portals.len() >= 2 && w.maps[SKY].portals[0].id == "stormrift_down",
         "Bifrost Reach's old gate keeps index 0"
     );
-    // places: 5 landmarks, 6 for the new quests, the Empty Seat circle and 12 bells in three chains; a map without `chain` and `burn` still loads
-    assert_eq!(map.places.len(), 24);
+    // places: 5 landmarks, 7 for the new quests, the Empty Seat circle and 12 bells in three chains; a map without `chain` and `burn` still loads
+    assert_eq!(map.places.len(), 25);
     assert_eq!(
         map.places.iter().filter(|p| !p.chain.is_empty()).count(),
         12
@@ -1638,4 +1638,62 @@ fn the_nacrehold_border_band_is_kept_free_for_the_seam_that_comes_later() {
         .filter(|o| o["rim"] == 1)
         .count();
     assert!(rim > 200, "{rim} rim pieces");
+}
+
+#[test]
+fn the_tideway_and_the_way_to_astralhollow_are_walked_through_both_ways() {
+    let mut w = world();
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    for (gate_id, zone, back_id) in [
+        ("nacre_gate", 9, "nacre_deep_gate"),
+        ("path_8_13", 13, "path_13_8"),
+        ("maelstrom_up", SKY, "maelstrom_down"),
+    ] {
+        let gate = w.maps[DEEP]
+            .portals
+            .iter()
+            .find(|p| p.id == gate_id)
+            .unwrap()
+            .clone();
+        let side = gate.walk.expect("a walk-in gate");
+        place(&mut w, 1, DEEP, at(gate.x, gate.y));
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: gate.x + f64::from(side[0]) * 3.,
+                y: gate.y + f64::from(side[1]) * 3.,
+            },
+        );
+        run(&mut w, &mut rx, 40);
+        assert_eq!(
+            w.players[&1].character.zone, zone,
+            "{gate_id} leads to {zone}"
+        );
+        // and back: the far side's gate carries the hero to the arrival six tiles inside this gate
+        let back = w.maps[zone]
+            .portals
+            .iter()
+            .find(|p| p.id == back_id)
+            .unwrap()
+            .clone();
+        let side = back.walk.expect("a walk-in gate");
+        place(&mut w, 1, zone, at(back.x, back.y));
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: back.x + f64::from(side[0]) * 3.,
+                y: back.y + f64::from(side[1]) * 3.,
+            },
+        );
+        run(&mut w, &mut rx, 40);
+        assert_eq!(
+            w.players[&1].character.zone, DEEP,
+            "{back_id} returns to the Deep"
+        );
+        let c = &w.players[&1].character;
+        assert!(
+            at(c.x, c.y).distance(at(gate.x, gate.y)) < 12.,
+            "{back_id} puts the hero near {gate_id}"
+        );
+    }
 }

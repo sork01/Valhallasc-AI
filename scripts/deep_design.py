@@ -507,6 +507,7 @@ def design(world, write=False):
     longship = shift(next(p for p in old['portals'] if p['id'] == 'deep_longship'))
     d.walked.append((longship['x'], longship['y'], 'gate deep_longship'))
     d.spots.add(longship['x'], longship['y'], 3.0)
+    d.spots.add(longship['x'], longship['y'] + 5, 3.0)       # the Longship's return arrival
 
     # ---- walls: the Net, the reef massif round it and under the dropped cells, the outer reef along the outline
     def reef(x, y, w, dp, tag=None):
@@ -612,7 +613,9 @@ def design(world, write=False):
     # the places the new quests visit
     for spec in content.PLACES:
         kind, where = spec['where']
-        if kind == 'gate':
+        if kind == 'door':                                    # the Longship's door: the pad lies between the door and its return arrival (five tiles below)
+            x, y = longship['x'], longship['y'] + 2.5
+        elif kind == 'gate':
             g = gates[where]
             x, y = (g['gate'][0] + g['arrival'][0]) / 2, (g['gate'][1] + g['arrival'][1]) / 2
         elif kind == 'cell':
@@ -718,7 +721,7 @@ def design(world, write=False):
     keep = [(p['x'], p['y'], p['r'] + (5.0 if p.get('chain') else 6.0)) for p in places]
     keep += [(h['x'], h['y'], max(h['hw'], h['hh']) + 8) for h in hamlets.values()]
     keep += [(g['gate'][0], g['gate'][1], 15.0) for g in gates.values()]
-    keep += [(longship['x'], longship['y'], 9.0), (ex, ey, 9.0), (cxx, cyy, 9.0)]
+    keep += [(longship['x'], longship['y'] + 2.5, 14.0), (ex, ey, 9.0), (cxx, cyy, 9.0)]
     BANDS = [('angler', 16, 9.0, 0), ('moray', 16, 9.0, 1), ('siren', 16, 9.0, 2), ('shellback', 14, 9.5, 3), ('draugr', 26, 9.0, 'wings')]
     for kind, count, spacing, where in BANDS:
         placed, tries = 0, 0
@@ -868,6 +871,7 @@ def design(world, write=False):
         content.record_mailboxes(zone, hamlets, ROOT / 'world/mailboxes.txt')
     d.bells, d.gates, d.hamlets, d.places, d.band, d.hops, d.doors, d.depth = bells, gates, hamlets, places, band, hops, doors, depth
     d.city, d.spawn, d.elites, d.lair, d.garden, d.cdoor, d.court_centre = city, spawn, elites, lair, garden, cdoor, (cx0, cy0)
+    d.longship = longship
     problems = check(d, zone, fen)
     stats = dict(kept=len(kept), dropped=len(d.dropped), walls=len(walls), massif=len(massif), objects=len([o for o in zone['objects'] if o['kind'] != 'void']),
                  voids=len(voids), spawns=len(spawns), quests=len(zone['quests']), maxdepth=max(depth.values()), elites=[(k, round(x), round(y)) for x, y, k in elites])
@@ -907,6 +911,7 @@ def check(d, zone, fen):
         except AssertionError as e:
             problems.append(str(e))
     targets = [(x['id'], x['x'], x['y']) for x in zone['npcs']] + [(s['kind'], s['x'], s['y']) for s in zone['slimes']] + [(pid, x, y) for pid, (x, y) in probes.items()]
+    targets += [('longship arrival', d.longship['x'], d.longship['y'] + 5)]
     for pid, g in d.gates.items():
         targets += [(pid + ' arrival', *g['arrival']), (pid + ' gate', g['gate'][0] - g['walk'][0] * 2, g['gate'][1] - g['walk'][1] * 2)]
     for name, x, y in targets:
@@ -1006,6 +1011,8 @@ def check(d, zone, fen):
         for pid, g in d.gates.items():
             if math.hypot(s['x'] - g['arrival'][0], s['y'] - g['arrival'][1]) < 8:
                 problems.append(f"{s['kind']} is within 8 of the arrival of {pid}")
+        if math.hypot(s['x'] - d.longship['x'], s['y'] - d.longship['y'] - 5) < 8:
+            problems.append(f"{s['kind']} is within 8 of the Longship's return arrival")
         if (d.city['x0'] - 8 <= s['x'] <= d.city['x1'] + 8 and d.city['y0'] - 8 <= s['y'] <= d.city['y1'] + 8):
             problems.append(f"{s['kind']} at ({s['x']}, {s['y']}) is within 8 of Keelhaven")
     for o in zone['objects']:

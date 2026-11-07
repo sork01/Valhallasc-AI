@@ -58,7 +58,7 @@ DRESSING = {
 NPCS = [
     dict(id='deep_lr_solveig', hamlet='lanternrest', dx=-3, dy=-1.5, name='Lamp-Warden Solveig Brasslamp', role='Keeper of Lanternrest', color='#c8a458',
          look=dict(skin='#edc5a1', hair='#a8683a', style='long', hat='none', hatColor='#c8a458'),
-         dialogue='A room of the Net with a roof of coral and a lamp that never goes out: that is Lanternrest, and the anglers hate it. They come to the west wing in shoals to put the light out. I keep it lit, and I pay for every angler that stops coming.'),
+         dialogue='A room of the Net with a roof of coral and a lamp that never goes out: that is Lanternrest, and the morays hate it. They come up the west corridors to put the light out. I keep it lit, and I pay for every moray that stops coming.'),
     dict(id='deep_lr_torvald', hamlet='lanternrest', dx=4, dy=2.5, name='Torvald Netspool', role='Maze-runner', color='#b8945a',
          look=dict(skin='#d9b08c', hair='#6a5a4a', style='short', hat='cap', hatColor='#7a6a4a'),
          dialogue='I have run the west wing of the Net two hundred times and I have never run it the same way twice. The corridors move when you are not looking. The Great Lantern in the next room is the one fixed point, and a hero who has seen it does not get lost.'),
@@ -70,7 +70,7 @@ NPCS = [
          dialogue='Beyond this east wall the water turns to starlight, and the way up to Astralhollow opens here. The shellbacks sit in the corridors outside and think the gate is theirs. I hold the camp so that heroes can rest before they climb.'),
     dict(id='deep_gw_hallbjorn', hamlet='gatewatch', dx=4.5, dy=2.5, name='Hallbjorn Reefsmith', role='Reef-smith', color='#6aa8b8',
          look=dict(skin='#c99b7a', hair='#5a3a2a', style='bald', hat='none', hatColor='#6aa8b8'),
-         dialogue='The reef grows where the vents breathe, and I cut it into plate. The vents east of the camp are the best, and the sirens like them too. Every hero who has cleared the Vent Garden has bought me a week of quiet.'),
+         dialogue='The reef grows where the vents breathe, and I cut it into plate. The vents west of the camp are the best, and the sirens like them too. Every hero who has cleared the Vent Garden has bought me a week of quiet.'),
     dict(id='deep_gw_trader', hamlet='gatewatch', dx=7, dy=-4.8, name='Gunnhild Weedwife', role='Outpost trader', color='#a0b8c8', trader=True,
          look=dict(skin='#edc5a1', hair='#8a4a2a', style='long', hat='none', hatColor='#a0b8c8'),
          dialogue='Plates, pearls, stew and tonics. A shellback plate is the one thing in the Net that is exactly as strong as it looks. I pay for it that way.'),
@@ -94,6 +94,7 @@ PLACES = [
     dict(id='deep_pad_maelstrom', name='the Maelstrom Landing', where=('gate', 'maelstrom_up'), r=3.0),
     dict(id='deep_pad_tideway', name="the Tideway to Nacrehold", where=('gate', 'nacre_gate'), r=3.0),
     dict(id='deep_pad_astral', name='the Way to Astralhollow', where=('gate', 'path_8_13'), r=3.0),
+    dict(id='deep_pad_longship', name='the Longship Door', where=('door', 'deep_longship'), r=3.0),
 ]
 
 
@@ -111,27 +112,27 @@ def Q(id, title, npc, level, desc, objectives, requires=None, repeatable=False, 
 QUESTS = [
     # Keelhaven: the ledger of the four ways in and out of the Deep
     Q('deep_kh_ledger', 'The Harbour Ledger', 'deep_warden', 36,
-      'Four ways lead in and out of the Deep: the Maelstrom that dropped you in the south-west, the Tideway south to Nacrehold, the old longship door beside the camp and the way up to Astralhollow on the east wall of the Net. '
+      'Four ways lead in and out of the Deep: the Maelstrom that dropped you in the south-west, the Tideway south to Nacrehold, the Longship door beside the camp and the way up to Astralhollow on the east wall of the Net. '
       'Skipper Ylva keeps a ledger of every one and wants each walked. Stand at all four.',
       [('visit', 'deep_pad_maelstrom', 'Stand at the Maelstrom Landing', 1), ('visit', 'deep_pad_tideway', 'Stand at the Tideway', 1),
-       ('visit', 'deep_longship', 'Reach the Wreck of Naglfar', 1), ('visit', 'deep_pad_astral', 'Stand at the Way to Astralhollow', 1)], requires='deep_welcome'),
+       ('visit', 'deep_pad_longship', 'Stand at the Longship Door', 1), ('visit', 'deep_pad_astral', 'Stand at the Way to Astralhollow', 1)], requires='deep_welcome'),
     # Lanternrest, a camp inside the west of the Net
     Q('deep_lr_glow', 'Lights Out in the West Wing', 'deep_lr_solveig', 36,
-      'The anglers come to Lanternrest in shoals to put its lamp out. Defeat six lantern anglers in the corridors round the camp, and Solveig will keep the light.',
-      [('kill', 'angler', 'Defeat Lantern Anglers near Lanternrest', 6)], requires='deep_anglers'),
+      'The morays come to Lanternrest to put its lamp out, one dark corridor at a time. Defeat six gnashing morays in the corridors round the camp, and Solveig will keep the light.',
+      [('kill', 'moray', 'Defeat Gnashing Morays', 6)], requires='deep_anglers'),
     Q('deep_lr_teeth', 'Teeth for the Brine Stall', 'deep_lr_trader', 37,
       'Eira grinds moray teeth into needles and sells the needles to every net-mender in Keelhaven. She is short. Bring her five Moray Teeth.',
       [('bring', 'moray_tooth', 'Bring Moray Teeth', 5)], requires='deep_lr_glow'),
     Q('deep_lr_lamp', 'The Great Lantern', 'deep_lr_torvald', 37,
-      'In the room east of Lanternrest hangs the Great Lantern, the one fixed point of the west wing. Walk to it, look at what it shows you, and put three gnashing morays down on the way.',
-      [('visit', 'deep_lr_lamp', 'Reach the Great Lantern', 1), ('kill', 'moray', 'Defeat Gnashing Morays', 3)], requires='deep_lr_glow'),
+      'In the room east of Lanternrest hangs the Great Lantern, the one fixed point of the west wing. Walk to it, look at what it shows you, and put three lantern anglers down on the way: they hang round the light like moths.',
+      [('visit', 'deep_lr_lamp', 'Reach the Great Lantern', 1), ('kill', 'angler', 'Defeat Lantern Anglers', 3)], requires='deep_lr_glow'),
     Q('deep_lr_sirens', 'The Siren Row', 'deep_lr_torvald', 38,
-      'North of the Great Lantern the corridors fill with sirens, and Torvald loses runners there. Defeat four of them and he will run the row again.',
+      'Beyond the Great Lantern the corridors fill with sirens, and Torvald loses runners there. Defeat four of them and he will run the row again.',
       [('kill', 'siren', 'Defeat Sirens', 4)], requires='deep_lr_lamp'),
     # Gatewatch, a camp on the east rim of the Net
     Q('deep_gw_shells', 'Shells at the Gate', 'deep_gw_bergljot', 39,
-      'The shellbacks outside Gatewatch have started to sit on the way up to Astralhollow. Defeat five of them so the gate is clear.',
-      [('kill', 'shellback', 'Defeat Shellbacks near Gatewatch', 5)], requires='deep_shellbacks'),
+      'The shellbacks in the corridors round Gatewatch have started to sit on the way up to Astralhollow. Defeat five of them so the gate is clear.',
+      [('kill', 'shellback', 'Defeat Shellbacks', 5)], requires='deep_shellbacks'),
     Q('deep_gw_plates', 'Plate for the Reef-Smith', 'deep_gw_trader', 39,
       'Hallbjorn cuts shellback plate into bars and Gunnhild sells the bars to the whole Deep. Bring her five Shellback Plates.',
       [('bring', 'shellback_plate', 'Bring Shellback Plates', 5)], requires='deep_gw_shells'),
