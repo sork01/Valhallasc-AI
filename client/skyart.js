@@ -25,7 +25,7 @@
       const trunk = [[0, -2], [lean * .25, -52], [lean * .8, -104], [lean, -156]];
       g.strokeStyle = OL; g.lineWidth = 17; g.beginPath(); g.moveTo(...trunk[0]); g.bezierCurveTo(...trunk[1], ...trunk[2], ...trunk[3]); g.stroke();
       g.strokeStyle = '#8a6a5a'; g.lineWidth = 11; g.stroke(); g.strokeStyle = '#c4a090'; g.lineWidth = 3; g.beginPath(); g.moveTo(-3, -8); g.bezierCurveTo(lean * .2 - 3, -50, lean * .7 - 3, -100, lean - 3, -145); g.stroke();
-      for (let i = 0; i < 4; i++) {                                         // layered pads of foliage, each one wider lower down
+      for (let i = 3; i >= 0; i--) {                                         // layered pads of foliage, each one wider lower down: the lowest first, so every higher tier overlaps the one beneath it
         const y = -158 + i * 31, x = lean * (1 - i * .2) + (rng() - .5) * 4, rx = 30 + i * 15, ry = 17 + i * 4;
         ell(g, x, y + 5, rx + 4, ry + 4, OL);
         const gr = g.createRadialGradient(x - rx * .3, y - ry * .5, 4, x, y, rx); gr.addColorStop(0, pal[0]); gr.addColorStop(.55, pal[1]); gr.addColorStop(1, pal[2]);
