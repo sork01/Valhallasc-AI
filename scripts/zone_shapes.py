@@ -83,6 +83,12 @@ def design_only_zones():
     return set(config().get('designOnly', []))
 
 
+def rebuild_zones():
+    """Zones whose old layout is NOT moved into the new frame (it cannot fit): the view is emptied and the zone's design rebuilds it from
+    world/zone-shapes/preshape-<zone>.txt (Nacrehold, owner 2026-11-07)."""
+    return set(config().get('rebuild', []))
+
+
 def seam_allowed(i, j):
     """`seamWith` {zone: [neighbours]}: a zone listed there may seam ONLY with those neighbours (the Deep: only Nacrehold, owner 2026-11-07)."""
     rule = config().get('seamWith', {})
@@ -320,6 +326,8 @@ def city_fits(poly, s, cw, ch):
 
 def zone_scale(cfg, atlas, z, old):
     s = cfg['k']
+    if z in design_only_zones():        # a design-only zone is authored on its outline at the one scale (a seam needs equal scales): no area floor, no city fit
+        return s
     s = max(s, math.sqrt(old['size'] ** 2 / area(atlas.polys[z])))
     c = old.get('city')
     if c:
@@ -1411,6 +1419,18 @@ def apply(world, cfg):
             warp = Warp(geom, S0)
             warp_view(view, warp)
             added = fill_zone(z, view, geom, (0, 0), rng, core=warp.region(), F=warp)
+        elif z in rebuild_zones():       # the old city cannot sit inside the outline: nothing is moved, the design rebuilds the zone (placeholders keep the outline check honest)
+            ox = oy = 0
+            for key in ('objects', 'slimes', 'npcs', 'places', 'crosses'):
+                if key in view:
+                    view[key] = []
+            c = geom['floor']
+            ys_, xs_ = np.nonzero(erode(c, 12))
+            k_ = len(xs_) // 2
+            view['spawn'] = dict(x=int(xs_[k_]) + .5, y=int(ys_[k_]) + .5)
+            view['npcs'] = [dict(n, x=view['spawn']['x'], y=view['spawn']['y']) for n in old['npcs'] if n.get('travelStop')]     # the Spark Travel master stays, so the neighbours keep their link to it
+            view['city'] = dict(view['city'], x0=int(xs_[k_]) - 2, x1=int(xs_[k_]) + 3, y0=int(ys_[k_]) - 2, y1=int(ys_[k_]) + 3)
+            added = (0, 0)
         elif z in gate_only or z in design_only:       # a sky zone (or a design-only one): the old layout is moved as a block and nothing fills the rest (its design replaces it)
             ox, oy = choose_offset(geom, old, z, atlas, world)
             shift_view(view, ox, oy)
@@ -1492,6 +1512,11 @@ def apply(world, cfg):
     if 8 in cfg['zones']:       # after Bifrost: it wrote the Maelstrom's far end, and the Deep re-points every crossing that arrives here
         import deep_design
         print('deep', deep_design.design(world, write=True)[1])
+        if 9 in cfg['zones']:       # Nacrehold's seam opens the south border: the approved design above ran unchanged
+            print('deep seam', deep_design.late_seam(world, margins[8]))
+    if 9 in cfg['zones']:       # after the Deep: the city is rebuilt on its outline, the Tideway is the seam
+        import nacre_design
+        print('nacrehold', nacre_design.design(world, margins[9], write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

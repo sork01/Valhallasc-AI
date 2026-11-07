@@ -135,3 +135,7 @@ Zone 7 is the seventh pilot zone (`world/zone-shapes.txt` zones `[0, 1, 2, 3, 6,
 ## Rán's Deep (zone 8) shaped and redesigned, keeping its style (2026-11-07)
 
 Zone 8 is the eighth pilot zone (`world/zone-shapes.txt` zones `[0, 1, 2, 3, 6, 7, 8, 16]`) and the first **design-only** one (`"designOnly": [8]`): it keeps its outline floor (`shapeFloor`, 256 grid) but takes no filler, and `place_portals` skips it because its design places its own gates (Maelstrom west rim, Tideway south rim, the way to Astralhollow east rim, the Longship door). `"seamWith": {"8": [9]}` lets it seam only with Nacrehold, later. Full description, checks and open items in `docs/deep-design.md`.
+
+## Nacrehold (zone 9) shaped and rebuilt, seam to the Deep only (2026-11-07)
+
+Zone 9 is the ninth pilot zone (`designOnly` + `rebuild` + `seamWith {8:[9], 9:[8]}`): a shield-shaped city rebuilt on its outline from `preshape-09.txt`, 120 homes in six districts, the Tideway Promenade along the whole Deep border (the only seam), four rim gates and three cathedral doors as portals, four new quests. Full description, checks and open items in `docs/nacre-design.md`.

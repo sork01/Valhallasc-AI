@@ -1381,10 +1381,14 @@ fn every_crossing_of_the_deep_stays_a_portal_on_the_rim_and_keeps_its_far_end() 
     let w = world();
     let raw = raw_deep();
     let map = &w.maps[DEEP];
-    // no seam anywhere in or out: the Nacrehold seam comes after Nacrehold is reshaped, and no other neighbour may ever seam with the Deep
+    // the only seam in or out is the one to Nacrehold (owner, 2026-11-07); every other crossing of the Deep stays a portal
     for (zone, m) in w.maps.iter().enumerate() {
         for p in m.portals.iter().filter(|p| p.to == DEEP || zone == DEEP) {
-            assert!(p.seam.is_none(), "zone {zone}: {} is a seam", p.id);
+            assert!(
+                p.seam.is_none() || (zone == 9 && p.to == DEEP) || (zone == DEEP && p.to == 9),
+                "zone {zone}: {} is a seam",
+                p.id
+            );
         }
     }
     let ids: Vec<&str> = map.portals.iter().map(|p| p.id.as_str()).collect();
@@ -1393,7 +1397,7 @@ fn every_crossing_of_the_deep_stays_a_portal_on_the_rim_and_keeps_its_far_end() 
         ["maelstrom_up", "nacre_gate", "deep_longship", "path_8_13"]
     );
     // each stands on the outline floor, a gate on the rim faces outwards and its arrival lies inside
-    for p in &map.portals {
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
         assert!(on_outline(&raw, p.x, p.y), "{} is on the floor", p.id);
         if let Some(side) = p.walk {
             let beyond = (p.x + f64::from(side[0]) * 6., p.y + f64::from(side[1]) * 6.);
@@ -1412,7 +1416,6 @@ fn every_crossing_of_the_deep_stays_a_portal_on_the_rim_and_keeps_its_far_end() 
     };
     for (zone, id, gate) in [
         (SKY, "maelstrom_down", "maelstrom_up"),
-        (9, "nacre_deep_gate", "nacre_gate"),
         (13, "path_13_8", "path_8_13"),
     ] {
         let p = w.maps[zone].portals.iter().find(|p| p.id == id).unwrap();
@@ -1442,7 +1445,7 @@ fn every_crossing_of_the_deep_stays_a_portal_on_the_rim_and_keeps_its_far_end() 
     }
     // and every one of them can be walked to from the spawn
     let seen = flood(map, &blocked(map, &[]), map.spawn);
-    for p in &map.portals {
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
         let s = p.walk.unwrap_or([0, 0]);
         assert!(
             near(
@@ -1568,7 +1571,7 @@ fn the_three_outposts_are_sanctuaries_with_their_people_a_master_a_mailbox_and_t
 }
 
 #[test]
-fn the_nacrehold_border_band_is_kept_free_for_the_seam_that_comes_later() {
+fn the_nacrehold_border_band_is_kept_free_for_the_seam() {
     let w = world();
     let raw = raw_deep();
     let runs: Vec<Vec<(f64, f64)>> = raw["shape"]["edges"]
@@ -1645,7 +1648,6 @@ fn the_tideway_and_the_way_to_astralhollow_are_walked_through_both_ways() {
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
     for (gate_id, zone, back_id) in [
-        ("nacre_gate", 9, "nacre_deep_gate"),
         ("path_8_13", 13, "path_13_8"),
         ("maelstrom_up", SKY, "maelstrom_down"),
     ] {

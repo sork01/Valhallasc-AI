@@ -248,6 +248,35 @@ fn the_meadow_and_gloamfen_share_a_seam() {
 }
 
 #[test]
+fn the_deep_and_nacrehold_share_a_seam() {
+    seam_walks(8, 9);
+}
+
+#[test]
+fn nacrehold_keeps_its_gates_to_the_crags_bifrost_astralhollow_and_the_orrery() {
+    gates_stand_on_free_land(9, &[1, 7, 13, 15]);
+}
+
+#[test]
+fn nacrehold_is_seamless_against_the_deep_only() {
+    let data = bundled();
+    let mut seams = 0;
+    for zi in 1..=data["zones"].as_array().unwrap().len() {
+        for p in zone_of(&data, zi)["portals"].as_array().unwrap() {
+            if p.get("seam").is_some() && (zi == 9 || p["to"] == 9) {
+                seams += 1;
+                assert!(
+                    (zi == 8 && p["to"] == 9) || (zi == 9 && p["to"] == 8),
+                    "zone {zi} has a seam to {}",
+                    p["to"]
+                );
+            }
+        }
+    }
+    assert_eq!(seams, 2, "one seam, seen from both sides");
+}
+
+#[test]
 fn the_crags_and_the_moonspore_canopy_share_a_seam() {
     seam_walks(1, 16);
 }

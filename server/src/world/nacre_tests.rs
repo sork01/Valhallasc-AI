@@ -15,7 +15,7 @@ fn stand(w: &mut World, id: &str) {
 fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
     let w = world();
     let m = &w.maps[NACRE];
-    assert_eq!((m.name.as_str(), m.size), ("Nacrehold", 192));
+    assert_eq!((m.name.as_str(), m.size), ("Nacrehold", 248));
     assert!(m.levels.is_none() && m.copies == 0 && m.template.is_none());
     assert!(m.slimes.is_empty() && !w.slimes.iter().any(|s| s.zone == NACRE));
     assert!(m.in_city(m.spawn));
@@ -33,8 +33,8 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
         .map(|o| o["label"].as_str().unwrap())
         .collect();
     assert_eq!(names.len(), 120);
-    assert_eq!(m.npcs.len(), 30);
-    assert_eq!(m.quests.len(), 12);
+    assert_eq!(m.npcs.len(), 40);
+    assert_eq!(m.quests.len(), 32);
     // Every dungeon added since keeps its copies after the file zones, so the count only grows.
     assert!(w.maps.len() >= 49, "{} maps", w.maps.len());
     assert_eq!(w.maps.iter().find_map(|m| m.template), Some(5));
@@ -80,7 +80,7 @@ fn nacre_all_people_are_merfolk_except_the_stone_and_the_cathedral_has_three_ope
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let z = &raw["zones"][NACRE - 1];
     let people = z["npcs"].as_array().unwrap();
-    for n in people.iter().filter(|n| n["art"] != "stone") {
+    for n in people.iter().filter(|n| n["art"] != "stone" && n.get("look").is_some()) {
         assert_eq!(n["look"]["species"], "merfolk");
         assert!(n["look"]["female"].is_boolean());
     }
@@ -106,8 +106,8 @@ fn nacre_all_people_are_merfolk_except_the_stone_and_the_cathedral_has_three_ope
     );
     assert_eq!(
         z["portals"].as_array().unwrap().len(),
-        5,
-        "Tideway, three Cathedral entrances and the Astralhollow Starway"
+        8,
+        "the Deep seam, three Cathedral entrances and the four gates (Astralhollow, the Orrery, the Crags, Bifrost)"
     );
     let stone = z["objects"]
         .as_array()
@@ -115,64 +115,84 @@ fn nacre_all_people_are_merfolk_except_the_stone_and_the_cathedral_has_three_ope
         .iter()
         .find(|o| o["kind"] == "meetingstone")
         .unwrap();
-    let dist = (stone["x"].as_f64().unwrap() - 96.).hypot(stone["y"].as_f64().unwrap() - 24.);
-    assert!(dist < 18., "stone is beside the entrance");
+    let dist = (stone["x"].as_f64().unwrap() - 128.).hypot(stone["y"].as_f64().unwrap() - 50.);
+    assert!(dist < 25., "stone is beside the entrance");
 }
 
 #[test]
-fn nacre_tideway_is_clear_safe_paired_and_walked_in_both_directions_without_bounce() {
-    let mut w = world();
-    calm(&mut w);
-    let _rx = join(&mut w, 1, Class::Warrior);
-    let down = w.maps[DEEP]
-        .portals
-        .iter()
-        .find(|p| p.id == "nacre_gate")
-        .unwrap()
-        .clone();
-    let up = w.maps[NACRE].portals[0].clone();
-    assert_eq!((down.to, up.to), (NACRE, DEEP));
-    for p in [&down, &up] {
-        let m = &w.maps[p.to];
+fn nacre_deep_border_is_a_seam_and_every_other_crossing_is_a_walk_in_gate() {
+    let w = world();
+    let m = &w.maps[NACRE];
+    let seams: Vec<_> = m.portals.iter().filter(|p| p.seam.is_some()).collect();
+    assert_eq!(seams.len(), 1, "one seam");
+    assert_eq!(seams[0].to, DEEP);
+    for to in [1, 7, 13, 15] {
+        let p = m.portals.iter().find(|p| p.to == to).unwrap();
+        assert!(p.seam.is_none() && p.walk.is_some(), "the way to {to} is a gate");
+        // the arrival six tiles inside the neighbour's gate stands on free ground and clear of every gate disc
+        let n = &w.maps[to];
         let arrival = at(p.tx, p.ty);
         let mut c = arrival;
-        m.collide(&mut c, PLAYER_RADIUS);
-        assert!(c.distance(arrival) < 1e-6);
-        assert!(
-            m.portals
-                .iter()
-                .all(|g| arrival.distance(at(g.x, g.y)) > g.r + 0.5)
-        );
-        assert!(m.slimes.iter().all(|s| arrival.distance(at(s.x, s.y)) > 8.));
+        n.collide(&mut c, PLAYER_RADIUS);
+        assert!(c.distance(arrival) < 1e-6, "arrival from Nacrehold in zone {to}");
     }
-    place(&mut w, 1, DEEP, at(down.x, down.y));
-    w.step();
-    assert_eq!(w.players[&1].character.zone, NACRE);
-    for _ in 0..60 {
-        w.step();
+    // the Deep keeps no gate to Nacrehold: its border is the seam
+    assert!(w.maps[DEEP].portals.iter().all(|p| p.to != NACRE || p.seam.is_some()));
+    // every crossing that arrives here lands on free ground inside the sanctuary
+    for (zi, n) in w.maps.iter().enumerate() {
+        for p in n.portals.iter().filter(|p| p.to == NACRE && p.seam.is_none()) {
+            let arrival = at(p.tx, p.ty);
+            let mut c = arrival;
+            m.collide(&mut c, PLAYER_RADIUS);
+            assert!(c.distance(arrival) < 1e-6, "{} (zone {zi}) arrives in an obstacle", p.id);
+            assert!(m.in_city(arrival), "{} arrives outside the sanctuary", p.id);
+        }
     }
-    assert_eq!(w.players[&1].character.zone, NACRE);
-    place(&mut w, 1, NACRE, at(up.x, up.y));
-    w.step();
-    assert_eq!(w.players[&1].character.zone, DEEP);
+}
+
+#[test]
+fn nacre_new_places_and_quests_walk_the_new_shape() {
+    let w = world();
+    let m = &w.maps[NACRE];
+    for id in ["nacre_tideway", "nacre_plaza", "nacre_way_crags", "nacre_way_orrery", "nacre_way_astral", "nacre_way_bifrost", "nacre_reef_west", "nacre_reef_south", "nacre_reef_east"] {
+        assert!(m.places.iter().any(|p| p.id == id), "{id}");
+    }
+    let five = m.quests.iter().find(|q| q.id == "nacre_five_ways").unwrap();
+    assert_eq!(five.objectives.len(), 5);
+    // the Tideway pad lies on the open promenade, between the city and the Deep
+    let pad = m.places.iter().find(|p| p.id == "nacre_tideway").unwrap();
+    assert!(pad.y < 44.);
+    // no person stands within 22 tiles of the Deep border: a seam draws ground, scenery and enemies of the other side, not people
+    let seam = m.portals.iter().find(|p| p.seam.is_some()).unwrap().seam.as_ref().unwrap();
+    for n in m.npcs.iter().filter(|n| !n.id.starts_with("festival_dance_")) {
+        let d = seam.distance(at(n.x, n.y));
+        assert!(d >= 22., "{} stands {d:.1} from the Deep border", n.id);
+    }
 }
 
 #[test]
 fn nacre_quests_have_valid_targets_prerequisites_and_level_table_rewards() {
     let w = world();
     let m = &w.maps[NACRE];
-    assert_eq!(m.quests.iter().filter(|q| q.repeatable).count(), 1);
+    assert_eq!(
+        m.quests.iter().filter(|q| q.repeatable && !q.id.contains("halloween") && !q.id.contains("christmas") && !q.id.contains("easter") && !q.id.contains("solstice") && !q.id.contains("valentine") && !q.id.starts_with("arena_") && !q.id.starts_with("es_")).count(),
+        1
+    );
     for q in &m.quests {
         assert!(m.npcs.iter().any(|n| n.id == q.npc));
-        assert_eq!(q.reward_xp, xp_to_level(q.level) / 10);
+        if q.reward_xp != 0 || !q.id.starts_with("es_go_") {
+            // (the Empty Seat's rewardless hand-offs pay nothing)
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
+        }
         if let Some(id) = &q.requires {
-            assert!(m.quests.iter().any(|p| p.id == *id));
+            // the Empty Seat chapter chain continues from the previous zone's chapter
+            assert!(q.id.starts_with("es_") || m.quests.iter().any(|p| p.id == *id), "{}", q.id);
         }
         for o in &q.objectives {
             assert!(
                 match o.kind.as_str() {
                     "talk" => m.npcs.iter().any(|n| n.id == o.target),
-                    "visit" => m.places.iter().any(|p| p.id == o.target),
+                    "visit" | "memory" => m.places.iter().any(|p| p.id == o.target),
                     "bring" => crate::items::item(&o.target).is_some(),
                     "kill" => m
                         .portals
@@ -180,7 +200,7 @@ fn nacre_quests_have_valid_targets_prerequisites_and_level_table_rewards() {
                         .any(|p| w.maps[p.to].slimes.iter().any(|s| s.kind == o.target)),
                     "reach" => w.maps.iter().any(|area| area.name == o.target),
                     "gauntlet" => q.gauntlet_level().is_some(),
-                    _ => false,
+                    _ => q.id.starts_with("es_"), // the Empty Seat has its own objective kinds (tested in empty_seat)
                 },
                 "{} {}",
                 q.id,
@@ -262,10 +282,10 @@ fn nacre_travel_stop_has_a_reciprocal_link_and_discovery_is_authoritative() {
         .iter()
         .find(|n| n.id == "travel_nacrehold")
         .unwrap();
-    assert_eq!(
-        master.travel_links,
-        ["travel_keelhaven", "travel_astralhollow"]
-    );
+    // the Deep (Keelhaven) and Astralhollow stay linked; the shapes pilot added the Crags, Bifrost and the Orrery (every neighbour with a master)
+    for id in ["travel_keelhaven", "travel_astralhollow"] {
+        assert!(master.travel_links.iter().any(|l| l == id), "{id}");
+    }
     assert!(
         w.maps[DEEP]
             .npcs

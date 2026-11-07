@@ -126,7 +126,7 @@
       for (const i of front) { const x = i % MAP, y = (i / MAP) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= MAP || ny >= MAP) continue; const k = ny * MAP + nx; if (map.floor[k] && !map.blendD[k]) { map.blendD[k] = d; map.blendNb[k] = map.blendNb[i]; next.push(k); } } }
       front = next;
     }
-    if (zdef.theme === 'city' || zdef.theme === 'deep') map.blendD.fill(0);   // Skaldholm: a wall, not a seam, lies between it and its neighbours
+    if (zdef.theme === 'city' || zdef.theme === 'deep' || zdef.theme === 'nacre') map.blendD.fill(0);   // Skaldholm: a wall, not a seam, lies between it and its neighbours
     for (let i = 0; i < MAP * MAP; i++) if (map.blendD[i]) map.blendW[i] = .6 * (1 - (map.blendD[i] - 1) / BLEND_REACH);
     // A border you cross anywhere (a seam): both zones draw the same mix of their two floors around the line, seen from
     // their own side, so the ground does not change when the server moves you across. s is the signed distance to the
@@ -310,7 +310,13 @@
     return R.names[cells[(y | 0) * n + (x | 0)] - 1] || null;
   }
   // The ground of another zone's theme, to blend toward it where two provinces meet.
-  function groundOf(theme, tone, dirt, alt) {
+  // The Deep's and Nacrehold's own floors (what deepGround paints), so a seam between them blends the real colours from both sides.
+  function deepLook(theme, tone, dirt, alt, yf) {
+    if (theme === 'nacre') return dirt === 2 ? `hsl(${174 + tone * 8}, 28%, ${72 + tone * 7}%)` : dirt ? `hsl(${184 + tone * 7}, 25%, ${56 + tone * 8}%)` : `hsl(${182 + tone * 12}, 32%, ${31 + tone * 9}%)`;
+    return dirt ? `hsl(${46 + tone * 8}, ${24 + tone * 8}%, ${64 + tone * 8 + alt * .5}%)` : `hsl(${178 + tone * 16}, ${22 + tone * 10}%, ${22 + yf * 16 + tone * 8 + alt * .7}%)`;
+  }
+  function groundOf(theme, tone, dirt, alt, yf = .5) {
+    if (theme === 'deep' || theme === 'nacre') return deepLook(theme, tone, dirt, alt, yf);
     if (theme === 'ember') return dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`;
     if (theme === 'frost') return dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`;
     if (theme === 'fen') return dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`;
@@ -759,7 +765,7 @@
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       if ((sky || moonwell) && !map.floor[i]) continue;                              // open water or sky
-      if (zdef.shapeFloor && !map.floor[i] && zdef.theme !== 'deep') { if (map.edge[i]) outsideTile(g, px, py, map.edge[i], x, y, tone, ((x + y) & 1) ? 1.4 : -1.4, zdef.theme === 'ember', map.edgeDist[i]); continue; }
+      if (zdef.shapeFloor && !map.floor[i] && zdef.theme !== 'deep' && zdef.theme !== 'nacre') { if (map.edge[i]) outsideTile(g, px, py, map.edge[i], x, y, tone, ((x + y) & 1) ? 1.4 : -1.4, zdef.theme === 'ember', map.edgeDist[i]); continue; }
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];
       g.fillStyle = zdef.theme === 'emberwake' ? EmberwakeArt.ground(x,y,tone,alt,zdef,dirt) : zdef.theme === 'chained_forge' ? ChainedForgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'blackhour' ? BlackhourArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'longship' ? LongshipArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'arena' ? (x < 3 || y < 3 || x > 28 || y > 28 ? '#423746' : x === 16 || y === 16 ? '#ae8456' : (x + y) % 2 ? '#6e6877' : '#777180') : zdef.theme === 'skybridge' ? SkybridgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'nornroot' ? NornrootArt.ground(x,y,tone,alt,zdef) : moonwell ? MoonwellArt.ground(x,y,tone,dirt,alt,zdef) : zdef.theme === 'eye_below' ? EyeBelowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'elder_hollow' ? ElderHollowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thousandfold' ? PavilionArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'rain_crown' ? RainCrownArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'seed_vault' ? SeedVaultArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'sunken_astrolabe' ? SunkenArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thunderheart_gate' ? ThunderArt.ground(x,y,tone,alt,zdef) : SeasonDungeonArt.isTheme(zdef.theme) ? SeasonDungeonArt.ground(zdef.theme,x,y,tone,alt,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt,zdef) : zdef.theme === 'vault' ? VaultArt.ground(x,y,tone,alt,zdef.rooms,arenas) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
@@ -789,7 +795,7 @@
         const nb = (zdef.shape?.neighbours || [])[map.blendNb[i] - 65], seam = map.seamBy?.[nb], nz = ZONES[nb];
         let nt = tone, nd = dirt, na = alt;
         if (seam) { const mx = x + Math.round(seam.shift[0]), my = y + Math.round(seam.shift[1]), ns = groundSample(nz, mx, my); nt = ns.tone; nd = ns.dirt; na = ((mx + my) & 1) ? 1.4 : -1.4; }
-        g.globalAlpha = Math.min(1, map.blendW[i]); g.fillStyle = groundOf(nz?.theme || 'ember', nt, nd, na); g.fill(); g.globalAlpha = 1;
+        g.globalAlpha = Math.min(1, map.blendW[i]); g.fillStyle = groundOf(nz?.theme || 'ember', nt, nd, na, seam ? (y + Math.round(seam.shift[1])) / (nz?.size || MAP) : y / MAP); g.fill(); g.globalAlpha = 1;
       }
       if (zdef.theme === 'arena') continue;
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
@@ -4015,8 +4021,8 @@
   // ---------- Ran's Deep: sea-floor sand, a dark sea beyond the outer wall, light shafts, bubbles and the tidebells' ground circles ----------
   const beyondDeepWall = (x, y) => { if (zdef.shapeFloor) return !map.floor[y * MAP + x]; const b = zdef.bounds; return !!b && (x + .5 < b.x0 || x + .5 > b.x1 || y + .5 < b.y0 || y + .5 > b.y1); };
   function deepGround(x, y, tone, dirt, alt) {
+    if (beyondDeepWall(x, y)) return `hsl(208, 55%, ${5 + tone * 3}%)`;                   // black water outside the outer wall (a shaped Nacrehold too: its outline is the edge of the city)
     if (zdef.theme === 'nacre') return dirt === 2 ? `hsl(${174 + tone * 8}, 28%, ${72 + tone * 7}%)` : dirt ? `hsl(${184 + tone * 7}, 25%, ${56 + tone * 8}%)` : `hsl(${182 + tone * 12}, 32%, ${31 + tone * 9}%)`;
-    if (beyondDeepWall(x, y)) return `hsl(208, 55%, ${5 + tone * 3}%)`;                   // black water outside the outer wall
     if (dirt) return `hsl(${46 + tone * 8}, ${24 + tone * 8}%, ${64 + tone * 8 + alt * .5}%)`;   // the trail: pale shell-sand
     return `hsl(${178 + tone * 16}, ${22 + tone * 10}%, ${22 + (y / MAP) * 16 + tone * 8 + alt * .7}%)`;   // teal-grey sand, deeper (darker) towards the north
   }
@@ -4205,7 +4211,7 @@
     g.globalAlpha = 1;
   }
   function drawSky(g, t) {
-    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' || zdef.theme === 'city' ? '#0c0605' : zdef.theme === 'deep' ? '#071018' : SEA_COLOR; g.fillRect(0, 0, VW, VH); return; }   // beyond the drawn shallows (and the grid) lies open sea
+    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' || zdef.theme === 'city' ? '#0c0605' : zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : SEA_COLOR; g.fillRect(0, 0, VW, VH); return; }   // beyond the drawn shallows (and the grid) lies open sea
     if (zdef.theme === 'arena') { g.fillStyle = '#191723'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'emberwake') { EmberwakeArt.background(g,VW,VH,t); return; }
     if (zdef.theme === 'chained_forge') { const [cx,cy]=camS(); ChainedForgeArt.background(g,VW,VH,t,zdef,cx,cy,TW,TH); return; }
@@ -4944,7 +4950,7 @@
   }
   // Shallows and a foam line along the COAST of the zone whose state is adopted (null for a zone without an outline). Past any other edge lies land: another province, drawn plain.
   function renderShallows() {
-    if (!zdef.shapeFloor || zdef.theme === 'deep') return null;   // the Deep lies under the sea: no shallows or foam round it
+    if (!zdef.shapeFloor || zdef.theme === 'deep' || zdef.theme === 'nacre') return null;   // the Deep lies under the sea: no shallows or foam round it
     const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP;
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // lighter and greener near the shore, a foam line at the edge
       const i = y * MAP + x, d = map.edgeDist[i];
@@ -4971,7 +4977,7 @@
     const tg = miniTmp.getContext('2d');
     mctx.save(); mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
     // Stopgap until MINIMAP-WORLD (TODO.md): every shaped zone shares one plain background, so a crossing changes nothing; real coast still shows its shallows and foam.
-    mctx.fillStyle = zdef.shapeFloor ? (zdef.theme === 'deep' ? '#071018' : '#2b2421') : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    mctx.fillStyle = zdef.shapeFloor ? (zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : '#2b2421') : '#080c0b'; mctx.fillRect(0, 0, W, W);
     if (zdef.shapeFloor) miniRippleOrigin = [vx + (zdef.shape?.T?.[0] || 0), vy + (zdef.shape?.T?.[1] || 0)];
     // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.
     const layer = (canvas, tiles, ox, oy, zi) => {

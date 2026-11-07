@@ -55,17 +55,6 @@
     }
   },
   {
-    "id": "mailbox_9_nacrehold",
-    "zone": 9,
-    "hub": "Nacrehold",
-    "x": 103.5,
-    "y": 164.5,
-    "anchor": {
-      "x": 100.5,
-      "y": 164.5
-    }
-  },
-  {
     "id": "mailbox_13_astralhollow",
     "zone": 13,
     "hub": "Astralhollow",
@@ -536,6 +525,17 @@
     "anchor": {
       "x": 183,
       "y": 208.5
+    }
+  },
+  {
+    "id": "mailbox_9_nacrehold",
+    "zone": 9,
+    "hub": "Nacrehold",
+    "x": 137.5,
+    "y": 213.5,
+    "anchor": {
+      "x": 133.3,
+      "y": 213.7
     }
   }
 ]

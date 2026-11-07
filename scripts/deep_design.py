@@ -847,6 +847,8 @@ def design(world, write=False):
     zone['paths'] = [[list(p) for p in path]]
     zone['atlasPaths'] = []
     for p in zone['portals']:
+        if p.get('seam'):           # Nacrehold's seam replaced the Tideway portal (zone_shapes.make_seams): its line is the border, not a gate
+            continue
         if p['id'] == 'deep_longship':
             p.update(x=longship['x'], y=longship['y'])
         else:
@@ -865,7 +867,7 @@ def design(world, write=False):
                 'keel_return': (longship['x'], longship['y'] + 5), 'keel_clear': (longship['x'], longship['y'] + 5)}
     for zi in range(len(world['zones'])):
         for p in world['zones'][zi]['portals']:
-            if p['to'] == ZONE and p['id'] in arrivals:
+            if p['to'] == ZONE and p['id'] in arrivals and not p.get('seam'):
                 p['tx'], p['ty'] = arrivals[p['id']]
     if write:
         content.record_mailboxes(zone, hamlets, ROOT / 'world/mailboxes.txt')
@@ -1081,3 +1083,56 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# ---- the Nacrehold seam (added after this design was approved: the design itself runs unchanged, then this opens the border) ----------------
+SEAM_OPEN = RIM + 3.0         # reef within this many tiles of the border run is removed
+
+
+def late_seam(world, margin):
+    """Rán's Deep and Nacrehold share one border you cross anywhere (owner, 2026-11-07). The approved design reserved the band (no scenery within
+    2.5 tiles, no spawn within 7, no building within 20): this removes the rim reef along the run, the Tideway's gate posts and its exit route,
+    and rebuilds the void so the floor reaches the line and the margin of land past it (`margin`: cells outside the outline within SEAM_MARGIN).
+    Nothing else of the Deep changes (the Tideway pad stays: the ledger quest still has its place)."""
+    from greenmeadow_design import seg_field
+    import zone_shapes as zs
+    zone = world['zones'][ZONE - 1]
+    seam = next((p for p in zone['portals'] if p.get('seam') and p['to'] == 9), None)
+    if seam is None:
+        return None
+    n = zone['size']
+    F = np.array([[c == '#' for c in row] for row in zone['shapeFloor']])
+    ys, xs = np.mgrid[0:n, 0:n] + .5
+    dist = np.full((n, n), 1e9)
+    for e in zone['shape']['edges']:
+        if e['kind'] == 'shared' and e['other'] == 9:
+            dist = np.minimum(dist, seg_field(e['points'], xs, ys))
+    walk = np.zeros((n, n), bool)         # what the void left open before: every cell no void box covers
+    cover = np.zeros((n, n), np.int16)
+    for o in zone['objects']:
+        if o['kind'] == 'void':
+            x0, x1 = int(round(o['x'] - o['width'] / 2)), int(round(o['x'] + o['width'] / 2))
+            y0, y1 = int(round(o['y'] - o['depth'] / 2)), int(round(o['y'] + o['depth'] / 2))
+            cover[y0:y1, x0:x1] += 1
+    walk = cover == 0
+    keep, gone = [], 0
+    opened = np.zeros((n, n), bool)
+    for o in zone['objects']:
+        if o['kind'] == 'reefwall' and o.get('rim') and dist[min(n - 1, int(o['y'])), min(n - 1, int(o['x']))] < SEAM_OPEN + 1.5 * math.sqrt(2):
+            x0, x1 = int(round(o['x'] - o['width'] / 2)), int(round(o['x'] + o['width'] / 2))
+            y0, y1 = int(round(o['y'] - o['depth'] / 2)), int(round(o['y'] + o['depth'] / 2))
+            opened[y0:y1, x0:x1] = True
+            gone += 1
+        elif o['kind'] == 'post' and dist[min(n - 1, int(o['y'])), min(n - 1, int(o['x']))] < 6:
+            gone += 1
+        else:
+            keep.append(o)
+    opened &= F
+    open_all = walk | opened | (F & (dist < SEAM_OPEN)) | margin
+    zone['objects'] = [o for o in keep if o['kind'] != 'void']
+    voids = zs.void_pieces(open_all)
+    for o in voids:
+        o.pop('layout', None)
+    zone['objects'] = voids + zone['objects']
+    zone['exitRoutes'] = [r for r in zone.get('exitRoutes', []) if r.get('portal') != seam['id']]
+    return dict(reef_removed=gone, voids=len(voids), open=int(open_all.sum()))
