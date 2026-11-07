@@ -267,6 +267,7 @@ impl Store {
             mount_tint: 0,
             starters_granted: vec![],
             bank: Default::default(),
+            landing: false,
         };
         c.seed_inventory();
         if gm {

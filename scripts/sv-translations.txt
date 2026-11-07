@@ -8573,5 +8573,8 @@
   "the Road Reef": "Vägreven",
   "the South Reef": "Södra revet",
   "the Tideway": "Tidvattenleden",
-  "the West Reef": "Västra revet"
+  "the West Reef": "Västra revet",
+  "Ashore at Saltby": "I land vid Saltby",
+  "The ship that carried you over the sea has tied up at Saltby. Follow the road north to Alderhaven and find Wren by the fountain. She helps every newcomer find their feet, and she knows who needs a hand.": "Skeppet som bar dig över havet har lagt till vid Saltby. Följ vägen norrut till Alderhaven och leta upp Wren vid fontänen. Hon hjälper varje nykomling att komma till rätta, och hon vet vem som behöver en hjälpande hand.",
+  "Find Wren in Alderhaven": "Leta upp Wren i Alderhaven"
 }

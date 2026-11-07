@@ -20,6 +20,9 @@ mod bank;
 #[cfg(test)]
 mod compact_atlas_tests;
 mod inspect;
+mod landing;
+#[cfg(test)]
+mod landing_tests;
 mod mail;
 #[cfg(test)]
 mod raid_reward_tests;
@@ -2239,9 +2242,9 @@ impl World {
                 }
                 let (c, _) = self
                     .store
-                    .create_character(Some(&id), look, self.maps[0].spawn, wants_gm)
+                    .create_character(Some(&id), look, self.newcomer_start(), wants_gm)
                     .map_err(storage)?;
-                (self.with_start_level(c), None)
+                (self.arrive(self.with_start_level(c)), None)
             }
             Identity::Guest { token: None, look } => {
                 let mut look = look.ok_or("Create a character first.")?;
@@ -2253,9 +2256,9 @@ impl World {
                 look.validate()?;
                 let (c, token) = self
                     .store
-                    .create(look, self.maps[0].spawn)
+                    .create(look, self.newcomer_start())
                     .map_err(storage)?;
-                (self.with_start_level(c), Some(token))
+                (self.arrive(self.with_start_level(c)), Some(token))
             }
         };
         if self.players.values().any(|p| p.character.id == c.id) {
@@ -3400,6 +3403,13 @@ impl World {
                 let _ = p.peer.try_send(json!({"type":"system","text":format!(
                     "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
                 )}));
+            }
+            if let Some(title) = landing::step_off(&mut p.character, &self.maps) {
+                let _ = p
+                    .peer
+                    .try_send(json!({"type":"announce","kind":"quest","text":format!(
+                        "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
+                    )}));
             }
             for place in sync_visits(&mut p.character, &self.maps) {
                 let _ = p.peer.try_send(
@@ -10801,6 +10811,7 @@ mod tests {
             quests: vec![],
             city: None,
             camps: vec![],
+            dock: None,
             places: vec![],
             portals: vec![],
             levels: None,

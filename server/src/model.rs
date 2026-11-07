@@ -330,6 +330,9 @@ pub struct Character {
     /// Automatic quests explicitly abandoned by the player stay dismissed until retaken.
     #[serde(default)]
     pub abandoned_quests: Vec<String>,
+    /// Set only when the character is created on Greenmeadow's dock; cleared when they step off it and its quest finds them.
+    #[serde(default)]
+    pub landing: bool,
     #[serde(default)]
     pub seasonal_claims: std::collections::BTreeMap<String, u32>,
     #[serde(default)]
@@ -567,6 +570,7 @@ impl Character {
             mount_tint: 0,
             starters_granted: vec![],
             bank: Default::default(),
+            landing: false,
         };
         c.seed_inventory();
         if let Some(piece) = crate::items::ITEMS
@@ -1014,6 +1018,10 @@ pub struct Quest {
     /// A rewardless direction to the next story giver, resolved when that chapter is accepted.
     #[serde(default)]
     pub handoff_to: Option<String>,
+    /// Greenmeadow's landing quest: never handed out by level or by a giver, only when a new hero steps off the dock
+    /// (`Map::dock`, world/landing.rs). It also carries `auto_level`, so no giver offers it and no one can accept it.
+    #[serde(default)]
+    pub landing: bool,
 }
 #[derive(Clone, Deserialize)]
 pub struct QuestObjective {
@@ -1133,6 +1141,7 @@ pub fn sync_progression(character: &mut Character, maps: &[Map]) -> Vec<String> 
         if quest
             .auto_level
             .is_some_and(|level| character.level >= level)
+            && !quest.landing
             && quest.unlocked(character)
             && !character.abandoned_quests.contains(&quest.id)
             && !character.quests.iter().any(|q| q.id == quest.id)
@@ -1939,6 +1948,23 @@ pub struct RaidCross {
     pub boss_name: String,
     pub color: String,
 }
+/// The pier new heroes arrive on (scripts/greenmeadow_dock.py): the box of its planks, where a new character
+/// starts, and the quest that finds them when they leave it.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Dock {
+    pub x0: f64,
+    pub x1: f64,
+    pub y0: f64,
+    pub y1: f64,
+    pub start: Point,
+    pub quest: String,
+}
+impl Dock {
+    pub fn contains(&self, p: Point) -> bool {
+        p.x >= self.x0 && p.x <= self.x1 && p.y >= self.y0 && p.y <= self.y1
+    }
+}
+
 #[derive(Clone, Deserialize)]
 pub struct Map {
     #[serde(default)]
@@ -1960,6 +1986,9 @@ pub struct Map {
     /// Further sanctuaries of a zone with more than one hub (the Wyrdwood's Skuldwatch): `city` is the first.
     #[serde(default)]
     pub camps: Vec<City>,
+    /// Greenmeadow's landing pier: new characters start on it and get its quest when they step off.
+    #[serde(default)]
+    pub dock: Option<Dock>,
     #[serde(default)]
     pub portals: Vec<Portal>,
     /// Spots that `visit` quest objectives name: standing inside one marks the objective done.
@@ -2406,6 +2435,7 @@ mod tests {
             quests: vec![],
             city: None,
             camps: vec![],
+            dock: None,
             places: vec![],
             portals: vec![],
             levels: None,

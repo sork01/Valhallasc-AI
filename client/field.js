@@ -13,7 +13,7 @@
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
   // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
-  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null, exitRoutes:WORLD_MAP.exitRoutes||[], exitArches: WORLD_MAP.exitArches || [], camps: WORLD_MAP.camps || [], places: WORLD_MAP.places || [], groundSpans: WORLD_MAP.groundSpans, regions: WORLD_MAP.regions, shape: WORLD_MAP.shape, shapeFloor: WORLD_MAP.shapeFloor, shapeEdge: WORLD_MAP.shapeEdge },
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null, exitRoutes:WORLD_MAP.exitRoutes||[], exitArches: WORLD_MAP.exitArches || [], camps: WORLD_MAP.camps || [], places: WORLD_MAP.places || [], dock: WORLD_MAP.dock, groundSpans: WORLD_MAP.groundSpans, regions: WORLD_MAP.regions, shape: WORLD_MAP.shape, shapeFloor: WORLD_MAP.shapeFloor, shapeEdge: WORLD_MAP.shapeEdge },
     ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
   let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
@@ -4507,6 +4507,7 @@
       City.drawObject(g, o, sx, sy);
       City.animateObject(g, o, sx, sy, t);
     }
+    if (zdef.dock) window.MeadowDock?.draw(g, zdef, w2s, t);      // Greenmeadow's landing pier and its ship (meadowdock.js)
     if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost') drawWater(g, t);
     if (map.ghostWater?.length) drawWater(g, t, true);
     if (zdef.theme === 'wyrd') drawBridges(g, t);

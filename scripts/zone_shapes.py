@@ -1527,6 +1527,9 @@ def apply(world, cfg):
         skaldholm_rebuild.even_flank_wall(world)
         skaldholm_rebuild.wing_gate(world, margins)
         skaldholm_rebuild.seam_tower(world)
+    if 0 in cfg['zones']:       # last of all: the pier is cut out of zone 0's final voids (scripts/greenmeadow_dock.py)
+        import greenmeadow_dock
+        print('greenmeadow dock', greenmeadow_dock.build(world, json.loads((ROOT / 'world/levels.txt').read_text())))
     return shifted
 
 
