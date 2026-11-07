@@ -254,8 +254,11 @@
     const east = [R(-d / 2, 0), R(d / 2, 0), ...eProf.slice().reverse().map(([t, z]) => R(t, z))];
     K.poly(g, east, '#a8a190', null); stone(R, east, d / 2, 'rgba(40,40,60,.12)', 8); cap(R, (t, z) => K.iso(w / 2 - T, t, z), eProf);
     ivy(L, 1.1, w / 2, 4, 40, 13); ivy(R, .5, d / 2, 4, 50, 14);
-    // Fallen blocks outside the doorway.
-    for (const [x, y] of [[.2, d / 2 + .7], [-.6, d / 2 + 1.1], [w / 2 + .6, .6]]) { g.save(); g.translate(...K.iso(x, y)); K.prism(g, .55, .4, 14, '#c4bca8', '#a39c8a', '#8c8576'); g.restore(); }
+    // The doorway is choked with the fallen arch (the ruin is solid: nothing should invite a walk in), more blocks lie outside.
+    for (const [x, y, sw, sd, sh] of [[-.45, d / 2 - .25, .6, .5, 34], [.35, d / 2 - .3, .7, .5, 40], [-.05, d / 2 - .05, .6, .45, 26], [.55, d / 2 + .05, .45, .4, 20], [-.6, d / 2 + .1, .45, .4, 18], [.05, d / 2 - .15, .5, .4, 50]]) {
+      g.save(); g.translate(...K.iso(x, y)); K.prism(g, sw, sd, sh, '#d2cab6', '#aaa390', '#918a7a'); g.restore(); }
+    const [ax, ay] = L(-.1, 52); K.line(g, [[ax - 26, ay + 6], [ax - 12, ay - 10], [ax + 12, ay - 12], [ax + 28, ay + 2]], '#cfc7b2', 9);   // a piece of the arch on top
+    for (const [x, y] of [[.2, d / 2 + .9], [-.8, d / 2 + 1.2], [w / 2 + .6, .6]]) { g.save(); g.translate(...K.iso(x, y)); K.prism(g, .55, .4, 14, '#c4bca8', '#a39c8a', '#8c8576'); g.restore(); }
     if (o.label) K.text(g, o.label, 0, -330, 17);
   }
 

@@ -4577,7 +4577,7 @@
         const o = it.o;
         const oset = o.ghostSet || set;
         if (!oset[o.kind]) {
-          const cover=['house','chapel','meadow_cottage','meadow_mill','chapel_ruin','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','cathedralwall','cathedralcolumn','tree','pine','elderash','ribcage','gallows','skypine','prism','column','spirelight','pylon','hallgate','wardstone','windcairn','nacrehouse','nacrecathedral','nacrepalace','nacrearchive','nacreinn','nacrefountain','reefwall','tidebell','sunkencolumn','shiprib','coral','vent','clockwall','blackspire','hourpillar','stillpoint','epoch_crown'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','cathedralwall','cathedralcolumn','tree','pine','elderash','ribcage','gallows','skypine','prism','column','spirelight','pylon','hallgate','wardstone','windcairn','nacrehouse','nacrecathedral','nacrepalace','nacrearchive','nacreinn','nacrefountain','reefwall','tidebell','sunkencolumn','shiprib','coral','vent','clockwall','blackspire','hourpillar','stillpoint','epoch_crown'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           const box=City.art[o.kind]?.box;
           const palmCover=City.art[o.kind]?.occludes && it.d>hd && hsx>it.sx-box[2] && hsx<it.sx+box[0]-box[2] && hsy>it.sy-box[3] && hsy-90<it.sy+box[1]-box[3];
           City.drawObject(g,o,it.sx,it.sy,cover || palmCover ? .5 : 1);
