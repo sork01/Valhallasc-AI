@@ -869,5 +869,14 @@
   "Stormcrown Station",
   "Windward Roost",
   "Yrsa Wingmonger",
-  "the Shardfield"
+  "the Shardfield",
+  "Drownwatch",
+  "Eira Brinemonger",
+  "Gatewatch",
+  "Gunnhild Weedwife",
+  "Hallbjorn Reefsmith",
+  "Lanternrest",
+  "Rannveig Saltwife",
+  "Skuli Gravedigger",
+  "Torvald Netspool"
 ]

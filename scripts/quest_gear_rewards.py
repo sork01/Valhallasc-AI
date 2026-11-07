@@ -116,6 +116,13 @@ REWARDS = {
     'sky_hounds': green(30, 'necklace'),
     'sky_golems': green(30, 'pants'),
     'sky_vanguard': blue(35, 'necklace'),
+    # Rán's Deep's outposts (pilot): a green or blue at the end of each outpost chain
+    'deep_kh_ledger': green(35, 'accessory'),
+    'deep_lr_lamp': green(35, 'accessory'),
+    'deep_lr_sirens': green(35, 'necklace'),
+    'deep_gw_vents': green(40, 'pants'),
+    'deep_gw_gate': blue(40, 'accessory'),
+    'deep_dw_stones': green(35, 'pants'),
     'deep_draugr': green(35, 'necklace'),
     'deep_anglers': green(35, 'pants'),
     'deep_ghostmaw': blue(40, 'necklace'),

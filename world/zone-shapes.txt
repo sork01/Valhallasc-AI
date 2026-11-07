@@ -8,12 +8,13 @@
     3,
     6,
     7,
+    8,
     16
   ],
   "gateOnly": [
     7
   ],
-  "note": "Owner-approved 2026-11-05: ONE scale for every zone, k = 1.0 tiles per atlas px (was 0.56116, the median, with a per-zone area floor that gave Gloamfen 0.675 and made seams between zones of different scale impossible). Pilot: zones 0, 1, 2 (Rimeveil), 3 (Gloamfen) and 16 (Moonspore Canopy). wallAxis: the Skaldholm wall of zones 0, 1 and 3 follows the city's own straight wall (copied piece by piece) and turns its real corner (owner, 2026-11-05: the walls must be straight); the land between it and the old leaning border fills in. wallFit: the wall meets its run ends, the city corner on the Rimeveil junctions, so no seam runs through a wall or vault. cityRebuild: Skaldholm (zone 4) is made in the middle of the four neighbours' walls (scripts/skaldholm_rebuild.py, docs/skaldholm-rebuild.md). wallFit 0 (Skaldholm rebuild, owner 2026-11-06): Greenmeadow's vault stands at atlas x 411.5, on the Grand Avenue's axis, with the wall line kept at y 122.5.",
+  "note": "Owner-approved 2026-11-05: ONE scale for every zone, k = 1.0 tiles per atlas px (was 0.56116, the median, with a per-zone area floor that gave Gloamfen 0.675 and made seams between zones of different scale impossible). Pilot: zones 0, 1, 2 (Rimeveil), 3 (Gloamfen) and 16 (Moonspore Canopy). wallAxis: the Skaldholm wall of zones 0, 1 and 3 follows the city's own straight wall (copied piece by piece) and turns its real corner (owner, 2026-11-05: the walls must be straight); the land between it and the old leaning border fills in. wallFit: the wall meets its run ends, the city corner on the Rimeveil junctions, so no seam runs through a wall or vault. cityRebuild: Skaldholm (zone 4) is made in the middle of the four neighbours' walls (scripts/skaldholm_rebuild.py, docs/skaldholm-rebuild.md). wallFit 0 (Skaldholm rebuild, owner 2026-11-06): Greenmeadow's vault stands at atlas x 411.5, on the Grand Avenue's axis, with the wall line kept at y 122.5. Rán's Deep (zone 8, owner 2026-11-07: reshape it, remake the zone and quests to fit, no filler, keep the portals): designOnly (outline floor, no filler, the design places its own gates) and seamWith {8: [9]} = the Deep may only ever be seamless with Nacrehold, which comes after Nacrehold is reshaped.",
   "landmarks": [
     4
   ],
@@ -41,5 +42,13 @@
       "corner": "lo"
     }
   },
-  "cityRebuild": 4
+  "cityRebuild": 4,
+  "designOnly": [
+    8
+  ],
+  "seamWith": {
+    "8": [
+      9
+    ]
+  }
 }

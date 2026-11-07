@@ -55,17 +55,6 @@
     }
   },
   {
-    "id": "mailbox_8_keelhaven",
-    "zone": 8,
-    "hub": "Keelhaven",
-    "x": 89.27,
-    "y": 155.65,
-    "anchor": {
-      "x": 86.5,
-      "y": 154.5
-    }
-  },
-  {
     "id": "mailbox_9_nacrehold",
     "zone": 9,
     "hub": "Nacrehold",
@@ -503,6 +492,50 @@
     "anchor": {
       "x": 255,
       "y": 103.5
+    }
+  },
+  {
+    "id": "mailbox_8_keelhaven",
+    "zone": 8,
+    "hub": "Keelhaven",
+    "x": 105.27,
+    "y": 202.65,
+    "anchor": {
+      "x": 102,
+      "y": 201
+    }
+  },
+  {
+    "id": "mailbox_8_lanternrest",
+    "zone": 8,
+    "hub": "Lanternrest",
+    "x": 42.5,
+    "y": 112,
+    "anchor": {
+      "x": 39,
+      "y": 113.5
+    }
+  },
+  {
+    "id": "mailbox_8_gatewatch",
+    "zone": 8,
+    "hub": "Gatewatch",
+    "x": 229.5,
+    "y": 128,
+    "anchor": {
+      "x": 231,
+      "y": 129.5
+    }
+  },
+  {
+    "id": "mailbox_8_drownwatch",
+    "zone": 8,
+    "hub": "Drownwatch",
+    "x": 190.5,
+    "y": 207,
+    "anchor": {
+      "x": 183,
+      "y": 208.5
     }
   }
 ]
