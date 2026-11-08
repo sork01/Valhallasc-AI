@@ -249,12 +249,25 @@ fn cathedral_encounters_have_materials_fixed_levels_distinct_profiles_and_guaran
         assert_eq!(Slime::fixed_level(&e.kind), !e.outdoor);
         assert_eq!(is_elite(&e.kind), e.elite);
         assert_eq!(is_boss(&e.kind), e.boss);
-        assert!(item(material(&e.kind)).is_some());
+        // (Helpers of boss mechanics, `add`, carry no loot.)
+        assert!(
+            e.add || item(material(&e.kind)).is_some(),
+            "{} drops a real material",
+            e.kind
+        );
         // The strength and gold floors are the Cathedral's (level 40 up); the level 25 and 30 dungeons are lighter.
-        assert!(e.add || e.level < 40 || (e.stats[0] > 20000. && e.stats[1] >= 800.));
+        assert!(
+            e.add
+                || overlay_enemy(&e.kind)
+                || e.level < 40
+                || (e.stats[0] > 20000. && e.stats[1] >= 800.),
+            "{} has stats {:?}",
+            e.kind,
+            e.stats
+        );
         for s in w.slimes.iter().filter(|s| s.kind == e.kind) {
             assert_eq!(s.xp, enemy_xp(s.level) * if e.boss { 12 } else { 1 });
-            assert!(e.level < 40 || s.gold >= 850);
+            assert!(e.add || overlay_enemy(&e.kind) || e.level < 40 || s.gold >= 850);
         }
         // Later dungeons share this enemy table with their own sets; only the Cathedral's wings are checked here.
         if e.boss

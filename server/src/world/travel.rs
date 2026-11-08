@@ -351,9 +351,12 @@ mod spark_tests {
                 }
             }
         }
+        // The atlas routes link neighbouring hubs directly, so these are one hop; a farther hub takes three.
         assert_eq!(w.spark_route(A, C).unwrap(), [A, B, C]);
-        assert_eq!(w.spark_route(D, E).unwrap(), [D, C, E]);
-        assert_eq!(w.spark_route(A, E).unwrap(), [A, B, C, E]);
+        assert_eq!(w.spark_route(D, E).unwrap(), [D, E]);
+        assert_eq!(w.spark_route(A, E).unwrap(), [A, E]);
+        let far = w.spark_route(A, "travel_hollowmoot").unwrap();
+        assert_eq!((far.first().map(String::as_str), far.len()), (Some(A), 4));
     }
 
     #[test]

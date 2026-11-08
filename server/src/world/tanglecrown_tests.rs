@@ -12,7 +12,7 @@ fn tanglecrown_gates_hub_loops_and_temple_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Tanglecrown", Some([75, 80]), 144)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 16));
+    assert_eq!(authored_counts(m), (42, 16));
     assert!(m.in_city(m.spawn));
     let back = m
         .portals
@@ -71,7 +71,7 @@ fn tanglecrown_gates_hub_loops_and_temple_are_reachable() {
             >= 20
     );
     let travel = m.npcs.iter().find(|n| n.id == "travel_banyan").unwrap();
-    assert_eq!(travel.travel_links, ["travel_jubilee", "travel_veyrroot"]);
+    assert_links_include(&travel.travel_links, &["travel_jubilee", "travel_veyrroot"]);
     assert!(
         w.maps[21]
             .npcs
@@ -104,7 +104,8 @@ fn tanglecrown_enemies_materials_and_quest_rewards_are_registered() {
     }
     assert!(is_elite("jadeanaconda") && is_elite("crownjaguar"));
     assert!(!is_elite("poolcaiman"));
-    for q in &m.quests {
+    // The Empty Seat handoffs (`es_*`) are rewardless by design.
+    for q in m.quests.iter().filter(|q| !q.id.starts_with("es_")) {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
     }
     for id in [

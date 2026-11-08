@@ -1093,7 +1093,9 @@ mod tests {
         let mut ann = add(&mut w, 1, "Ann");
         let mut bob = add(&mut w, 2, "Bob");
         let twin_a = add(&mut w, 3, "Twin");
-        let twin_b = add(&mut w, 4, "twin");
+        // Stored names are unique, so a second "Twin" cannot join: rename it in memory to reach the defensive branch.
+        let twin_b = add(&mut w, 4, "Twain");
+        w.players.get_mut(&4).unwrap().character.look.name = "twin".into();
         say(&mut w, &ann, by_name("Ann"));
         refused(&mut ann, "yourself");
         say(

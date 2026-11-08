@@ -32,10 +32,14 @@ fn four_seasons_hubs_travel_and_spring_dungeon() {
     );
     assert!(m.size * m.size > 4 * 192 * 192);
     assert_eq!(
-        (m.npcs.len(), m.quests.len(), m.slimes.len()),
+        (
+            authored_npc_count(m),
+            authored_counts(m).1,
+            authored_counts(m).0
+        ),
         (30, 38, 156)
     );
-    for q in &m.quests {
+    for q in m.quests.iter().filter(|q| !overlay_quest(&q.id)) {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
     }
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
@@ -45,7 +49,7 @@ fn four_seasons_hubs_travel_and_spring_dungeon() {
     assert_eq!(future.len(), 4);
     assert_eq!(future[0]["status"], "open");
     assert!(future.iter().all(|door| door["status"] == "open"));
-    assert_eq!(m.portals.len(), 6);
+    assert!(m.portals.len() >= 6, "{} portals", m.portals.len());
     assert!(
         m.portals
             .iter()
@@ -87,27 +91,19 @@ fn four_seasons_hubs_travel_and_spring_dungeon() {
             .find(|n| n.id == "travel_springmere")
             .unwrap()
             .travel_links
-            .contains(&"travel_boulderwatch".to_string())
+            .contains(&"travel_solhaven".to_string())
     );
-    let out = m
+    let out = m.portals.iter().find(|p| p.id == "path_28_26").unwrap();
+    // The atlas joins the Yearwheel to the Frostwake Shelf by a path (the old Cairnspine gate pair is gone).
+    let into = w.maps[26]
         .portals
         .iter()
-        .find(|p| p.id == "year_cairn_gate")
+        .find(|p| p.id == "path_26_28")
         .unwrap();
-    let into = w.maps[27]
-        .portals
-        .iter()
-        .find(|p| p.id == "cairn_year_gate")
-        .unwrap();
-    assert_eq!((out.to, into.to), (27, YEAR));
+    assert_eq!((out.to, into.to), (26, YEAR));
     for portal in [out, into] {
         let mut foot = at(portal.x, portal.y);
-        w.maps[if portal.id == "year_cairn_gate" {
-            YEAR
-        } else {
-            27
-        }]
-        .collide(&mut foot, PLAYER_RADIUS);
+        w.maps[if portal.id == "path_28_26" { YEAR } else { 26 }].collide(&mut foot, PLAYER_RADIUS);
         assert!(foot.distance(at(portal.x, portal.y)) < 1e-6);
         let target = &w.maps[portal.to];
         let arrival = at(portal.tx, portal.ty);
@@ -133,5 +129,11 @@ fn seasonal_enemies_loot_and_elite_courts() {
         assert_eq!(material(kind), drop);
         assert!(item(drop).is_some());
     }
-    assert_eq!(m.slimes.iter().filter(|s| is_elite(&s.kind)).count(), 12);
+    assert_eq!(
+        m.slimes
+            .iter()
+            .filter(|s| is_elite(&s.kind) && !overlay_enemy(&s.kind))
+            .count(),
+        12
+    );
 }

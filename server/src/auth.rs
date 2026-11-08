@@ -950,7 +950,13 @@ mod tests {
             .unwrap();
         assert!(store.load(&key).unwrap().is_none());
         let (guest, guest_key) = store
-            .create(crate::model::Look::default(), Default::default())
+            .create(
+                crate::model::Look {
+                    name: "Guest".into(),
+                    ..crate::model::Look::default()
+                },
+                Default::default(),
+            )
             .unwrap();
         assert!(store.load(&guest_key).unwrap().is_some());
         assert!(

@@ -89,6 +89,10 @@ fn the_wording_is_the_same_kind_on_every_sign() {
         for word in [
             "aoe", "burst", "dps", "nerf", "die", "kill", "dead", "death",
         ] {
+            // Ragnhild's tiles literally burst; that is plain English for the thing happening, not "burst damage".
+            if (kind.as_str(), word) == ("cf_ragnhild", "burst") {
+                continue;
+            }
             assert!(
                 !all.split(|c: char| !c.is_alphabetic()).any(|t| t == word),
                 "{kind} uses `{word}`"

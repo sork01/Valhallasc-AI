@@ -5,7 +5,11 @@ fn world() -> World {
 }
 fn hero(w: &mut World, session: u64) -> mpsc::Receiver<Value> {
     let (tx, rx) = mpsc::channel(4096);
-    w.join(session, None, Some(Look::default()), tx).unwrap();
+    let look = Look {
+        name: format!("Hero{session}"),
+        ..Look::default()
+    };
+    w.join(session, None, Some(look), tx).unwrap();
     rx
 }
 fn quest(w: &World, id: &str) -> Quest {

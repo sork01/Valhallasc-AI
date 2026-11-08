@@ -12,7 +12,7 @@ fn ribbonwild_gates_hub_circuit_and_entrance_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Ribbonwild", Some([70, 75]), 136)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 12));
+    assert_eq!(authored_counts(m), (42, 12));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals
@@ -110,7 +110,8 @@ fn ribbonwild_kinds_gear_and_elite_quests_are_registered() {
     }
     assert!(is_elite("paradegryphon") && is_elite("maskcolossus"));
     assert!(!is_elite("jesterling"));
-    for q in &m.quests {
+    // The Empty Seat handoffs (`es_*`) are rewardless by design.
+    for q in m.quests.iter().filter(|q| !q.id.starts_with("es_")) {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
     }
     for id in [

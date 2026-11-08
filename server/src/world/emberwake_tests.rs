@@ -20,7 +20,8 @@ fn emberwake_map_gates_and_outdoor_catalog() {
     let seen = flood(m, &grid, at(22., 137.));
     for p in &m.portals {
         assert!(reached(m, &seen, at(p.x, p.y)));
-        assert!(p.to == 17 || p.to == 46);
+        // The gate to the Forge and the road to Asterion, plus the atlas paths to the neighbouring provinces.
+        assert!(p.to == 17 || p.to == 46 || p.walk.is_some());
     }
     for n in &m.npcs {
         assert!(reached(m, &seen, at(n.x, n.y)), "{}", n.id);
@@ -31,7 +32,13 @@ fn emberwake_map_gates_and_outdoor_catalog() {
         assert!(!Slime::fixed_level(&s.kind));
         assert!(!is_boss(&s.kind));
     }
-    assert_eq!(m.slimes.iter().filter(|s| is_elite(&s.kind)).count(), 3);
+    assert_eq!(
+        m.slimes
+            .iter()
+            .filter(|s| is_elite(&s.kind) && !overlay_enemy(&s.kind))
+            .count(),
+        3
+    );
     assert_eq!(m.quests.iter().filter(|q| q.group).count(), 2);
     assert!(m.npcs.iter().any(|n| n.id == "ew_seal"));
     assert!(
@@ -54,20 +61,25 @@ fn emberwake_map_gates_and_outdoor_catalog() {
         bridge.distance(at(81., 82.)) < 0.01,
         "the causeway is actual floor"
     );
-    for q in &m.quests {
+    for q in m.quests.iter().filter(|q| !overlay_quest(&q.id)) {
         assert_eq!(q.reward_xp, crate::model::xp_to_level(q.level) / 10);
         assert!(format!("quest:accept:{}", q.id).len() <= 32);
     }
+    // Emberwake is no longer entered from Asterion: the atlas joins it to the Orrery, the Canopy, the Stormglass Shore
+    // and the Ribbonwild by walking paths, which world/compact_atlas_tests.rs crosses in both directions. Here the
+    // road to the Orrery is walked out once.
+    let road = w.maps[ZONE]
+        .portals
+        .iter()
+        .find(|p| p.id == "atlas_45_15")
+        .unwrap()
+        .clone();
     let _rx = join(&mut w, 1, Class::Warrior);
-    place(&mut w, 1, 17, at(90., 18.));
-    w.use_portal(1);
-    assert_eq!(w.players[&1].character.zone, ZONE);
-    assert!(w.players[&1].character.point().distance(at(22., 137.)) < 0.01);
-    place(&mut w, 1, ZONE, at(14., 140.));
+    place(&mut w, 1, ZONE, at(road.x, road.y));
     w.time += PORTAL_DELAY;
+    push_through(&mut w, 1, &road);
     w.use_portal(1);
-    assert_eq!(w.players[&1].character.zone, 17);
-    assert!(w.players[&1].character.point().distance(at(90., 25.)) < 0.01);
+    assert_eq!(w.players[&1].character.zone, 15);
 }
 
 #[test]

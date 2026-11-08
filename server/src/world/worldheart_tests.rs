@@ -46,10 +46,10 @@ fn worldheart_gates_and_both_city_floors_are_reachable() {
     );
     assert_eq!(
         (
-            outer.slimes.len(),
-            outer.quests.len(),
-            inner.slimes.len(),
-            inner.quests.len()
+            authored_counts(outer).0,
+            authored_counts(outer).1,
+            authored_counts(inner).0,
+            authored_counts(inner).1
         ),
         (0, 7, 0, 4)
     );
@@ -119,7 +119,7 @@ fn worldheart_creatures_are_reserved_for_instance_and_city_quests_are_peaceful()
         assert!(hp > 300000. && damage > 5000.);
     }
     for (map, peaceful) in [(&w.maps[23], true), (&w.maps[24], false)] {
-        for q in &map.quests {
+        for q in map.quests.iter().filter(|q| !q.id.starts_with("es_")) {
             assert_eq!(q.reward_xp, xp_to_level(80) / 10, "{}", q.id);
             if peaceful || matches!(q.id.as_str(), "heart_rings" | "heart_seed_vault") {
                 assert!(

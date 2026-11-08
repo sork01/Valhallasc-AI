@@ -159,5 +159,6 @@
   "Halloween daily quest",
   "button:not(:disabled),input,textarea,select",
   "button[data-mail-busy]",
-  "kindFrames rejected"
+  "kindFrames rejected",
+  "link {0} absent, links are {1}"
 ]

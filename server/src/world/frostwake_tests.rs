@@ -12,20 +12,21 @@ fn frostwake_routes_gates_and_hub_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("Frostwake Shelf", Some([85, 90]), 160)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (43, 11));
+    assert_eq!(authored_counts(m), (43, 11));
     assert!(m.in_city(m.spawn));
     let back = m
         .portals
         .iter()
-        .find(|p| p.id == "frostwake_lapis_gate")
+        .find(|p| p.id == "frostwake_cairn_gate")
         .unwrap();
-    let gate = w.maps[25]
+    let gate = w.maps[27]
         .portals
         .iter()
-        .find(|p| p.id == "lapis_frostwake_gate")
+        .find(|p| p.id == "cairn_frostwake_gate")
         .unwrap();
-    assert_eq!((back.to, gate.to), (25, SHELF));
-    for (source, portal) in [(m, back), (&w.maps[25], gate)] {
+    // The atlas joins the Shelf to the Cairnspine (the old Lapis gate pair is gone).
+    assert_eq!((back.to, gate.to), (27, SHELF));
+    for (source, portal) in [(m, back), (&w.maps[27], gate)] {
         let mut foot = at(portal.x, portal.y);
         source.collide(&mut foot, PLAYER_RADIUS);
         assert!(
@@ -74,13 +75,13 @@ fn frostwake_routes_gates_and_hub_are_reachable() {
             .find(|n| n.id == "travel_frostwake")
             .unwrap()
             .travel_links
-            .contains(&"travel_azure_wells".to_string())
+            .contains(&"travel_boulderwatch".to_string())
     );
     assert!(
-        w.maps[25]
+        w.maps[27]
             .npcs
             .iter()
-            .find(|n| n.id == "travel_azure_wells")
+            .find(|n| n.id == "travel_boulderwatch")
             .unwrap()
             .travel_links
             .contains(&"travel_frostwake".to_string())
@@ -107,8 +108,14 @@ fn frostwake_kinds_elites_materials_and_gear_rewards_are_registered() {
         let (hp, damage, _, _) = Slime::stats(kind);
         assert!(hp > 500000. && damage > 7000.);
     }
-    assert_eq!(m.slimes.iter().filter(|s| is_elite(&s.kind)).count(), 3);
-    for q in &m.quests {
+    assert_eq!(
+        m.slimes
+            .iter()
+            .filter(|s| is_elite(&s.kind) && !overlay_enemy(&s.kind))
+            .count(),
+        3
+    );
+    for q in m.quests.iter().filter(|q| !overlay_quest(&q.id)) {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
     }
     for id in [

@@ -33,8 +33,8 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
         .map(|o| o["label"].as_str().unwrap())
         .collect();
     assert_eq!(names.len(), 120);
-    assert_eq!(m.npcs.len(), 30);
-    assert_eq!(m.quests.len(), 12);
+    assert_eq!(authored_npc_count(m), 31);
+    assert_eq!(hosted_counts(m).1, 12);
     // Every dungeon added since keeps its copies after the file zones, so the count only grows.
     assert!(w.maps.len() >= 49, "{} maps", w.maps.len());
     assert_eq!(w.maps.iter().find_map(|m| m.template), Some(5));
@@ -80,7 +80,10 @@ fn nacre_all_people_are_merfolk_except_the_stone_and_the_cathedral_has_three_ope
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let z = &raw["zones"][NACRE - 1];
     let people = z["npcs"].as_array().unwrap();
-    for n in people.iter().filter(|n| n["art"] != "stone") {
+    for n in people
+        .iter()
+        .filter(|n| n["art"] != "stone" && !overlay_npc(n["id"].as_str().unwrap_or("")))
+    {
         assert_eq!(n["look"]["species"], "merfolk");
         assert!(n["look"]["female"].is_boolean());
     }
@@ -104,10 +107,9 @@ fn nacre_all_people_are_merfolk_except_the_stone_and_the_cathedral_has_three_ope
         (plan["level"].as_u64(), plan["players"].as_u64()),
         (None, Some(5))
     );
-    assert_eq!(
-        z["portals"].as_array().unwrap().len(),
-        5,
-        "Tideway, three Cathedral entrances and the Astralhollow Starway"
+    assert!(
+        z["portals"].as_array().unwrap().len() >= 5,
+        "Tideway, three Cathedral entrances and the Astralhollow Starway (plus the atlas paths)"
     );
     let stone = z["objects"]
         .as_array()
@@ -146,6 +148,7 @@ fn nacre_tideway_is_clear_safe_paired_and_walked_in_both_directions_without_boun
         assert!(m.slimes.iter().all(|s| arrival.distance(at(s.x, s.y)) > 8.));
     }
     place(&mut w, 1, DEEP, at(down.x, down.y));
+    push_through(&mut w, 1, &down);
     w.step();
     assert_eq!(w.players[&1].character.zone, NACRE);
     for _ in 0..60 {
@@ -153,6 +156,7 @@ fn nacre_tideway_is_clear_safe_paired_and_walked_in_both_directions_without_boun
     }
     assert_eq!(w.players[&1].character.zone, NACRE);
     place(&mut w, 1, NACRE, at(up.x, up.y));
+    push_through(&mut w, 1, &up);
     w.step();
     assert_eq!(w.players[&1].character.zone, DEEP);
 }
@@ -161,8 +165,14 @@ fn nacre_tideway_is_clear_safe_paired_and_walked_in_both_directions_without_boun
 fn nacre_quests_have_valid_targets_prerequisites_and_level_table_rewards() {
     let w = world();
     let m = &w.maps[NACRE];
-    assert_eq!(m.quests.iter().filter(|q| q.repeatable).count(), 1);
-    for q in &m.quests {
+    assert_eq!(
+        m.quests
+            .iter()
+            .filter(|q| q.repeatable && !overlay_quest(&q.id))
+            .count(),
+        1
+    );
+    for q in m.quests.iter().filter(|q| !overlay_quest(&q.id)) {
         assert!(m.npcs.iter().any(|n| n.id == q.npc));
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10);
         if let Some(id) = &q.requires {
@@ -262,9 +272,9 @@ fn nacre_travel_stop_has_a_reciprocal_link_and_discovery_is_authoritative() {
         .iter()
         .find(|n| n.id == "travel_nacrehold")
         .unwrap();
-    assert_eq!(
-        master.travel_links,
-        ["travel_keelhaven", "travel_astralhollow"]
+    assert_links_include(
+        &master.travel_links,
+        &["travel_keelhaven", "travel_astralhollow"],
     );
     assert!(
         w.maps[DEEP]

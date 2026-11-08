@@ -4,7 +4,11 @@ fn world() -> World {
     let mut w = World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
     for session in 1..=2 {
         let (tx, _) = mpsc::channel(4096);
-        w.join(session, None, Some(Look::default()), tx).unwrap();
+        let look = Look {
+            name: format!("Hero{session}"),
+            ..Look::default()
+        };
+        w.join(session, None, Some(look), tx).unwrap();
     }
     w
 }

@@ -654,7 +654,11 @@ mod tests {
         let loaded = s.load(&token).unwrap().unwrap();
         assert_eq!(loaded.look.gender, crate::model::Gender::Female);
         assert_eq!(loaded.look.class, Class::Hunter);
-        let (plain, _) = s.create(Look::default(), Point::default()).unwrap();
+        let plain_look = Look {
+            name: "Plain".into(),
+            ..Look::default()
+        };
+        let (plain, _) = s.create(plain_look, Point::default()).unwrap();
         assert_eq!(plain.look.gender, crate::model::Gender::Male);
     }
     #[test]

@@ -46,7 +46,11 @@ fn rested_legacy_account_character_accrues_since_installation_not_first_login() 
     w.save();
     let before = w.players[&1].character.rested.reserve;
     let (tx, _rx) = mpsc::channel(256);
-    assert!(w.join(2, None, Some(Look::default()), tx).is_ok());
+    let look = Look {
+        name: "Newcomer".into(),
+        ..Look::default()
+    };
+    assert!(w.join(2, None, Some(look), tx).is_ok());
     assert_eq!(
         w.players[&2].character.rested.reserve, 0,
         "a new hero cannot collect time from before creation"

@@ -268,6 +268,8 @@ fn raid_rewards_ember_ward_is_spent_by_monster_and_player_hits() {
     let hp = p.character.hp;
     // A fixed one-damage floor, entirely absorbed by this weapon's ward.
     for _ in 0..30 {
+        // A dodged blow starts the hurt cooldown, so let it pass between tries (the cloak gives a little dodge).
+        w.time += 2.;
         w.hurt_player(1, 1., at(61., 60.));
         if w.players[&1].forge_ward < 100. {
             break;

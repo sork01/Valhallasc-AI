@@ -13,7 +13,7 @@ fn shore_has_reciprocal_clear_gates_a_hub_and_the_open_eye() {
         ("The Stormglass Shore", Some([60, 65]), 128)
     );
     // Two more quests arrived when the Eye Below behind this zone opened.
-    assert_eq!((m.slimes.len(), m.quests.len()), (41, 11));
+    assert_eq!(authored_counts(m), (41, 11));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals
@@ -73,9 +73,9 @@ fn shore_has_reciprocal_clear_gates_a_hub_and_the_open_eye() {
     );
     assert!(m.npcs.iter().any(|n| n.id == "stormglass_stone"));
     let travel = m.npcs.iter().find(|n| n.id == "travel_breakwater").unwrap();
-    assert_eq!(
-        travel.travel_links,
-        ["travel_asterion", "travel_millbridge"]
+    assert_links_include(
+        &travel.travel_links,
+        &["travel_asterion", "travel_millbridge"],
     );
     assert!(
         w.maps[17]
@@ -108,7 +108,8 @@ fn shore_enemies_have_real_stats_materials_and_quest_rewards() {
     }
     assert!(is_elite("maelstromheart"));
     assert!(!is_elite("breakersentinel"));
-    for q in &m.quests {
+    // The Empty Seat handoffs (`es_*`) are rewardless by design.
+    for q in m.quests.iter().filter(|q| !q.id.starts_with("es_")) {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
     }
     for id in [

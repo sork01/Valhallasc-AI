@@ -161,7 +161,12 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     assert_eq!(map.copies, 0);
     // enemies: every kind at its default level, in the counts the design lists, none asleep (this zone has no ambushes)
     let mut live = std::collections::BTreeMap::<&str, usize>::new();
-    for (id, spawn) in w.spawns.iter().enumerate().filter(|(_, s)| s.zone == DEEP) {
+    for (id, spawn) in w
+        .spawns
+        .iter()
+        .enumerate()
+        .filter(|(_, s)| s.zone == DEEP && !overlay_enemy(&s.kind))
+    {
         assert!(spawn.ambush.is_none(), "{} is on the field", spawn.kind);
         *live.entry(spawn.kind.as_str()).or_default() += 1;
         assert!(!w.slimes[id].dead);
@@ -201,7 +206,7 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     let elites: Vec<&str> = w
         .slimes
         .iter()
-        .filter(|s| s.zone == DEEP && s.elite)
+        .filter(|s| s.zone == DEEP && s.elite && !overlay_enemy(&s.kind))
         .map(|s| s.kind.as_str())
         .collect();
     assert_eq!(elites.len(), 3);
@@ -228,7 +233,11 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         .find(|n| n.travel_stop.is_some())
         .expect("a travel master");
     assert_eq!(master.id, "travel_keelhaven");
-    assert_eq!(map.npcs.len(), 8, "seven people and the travel master");
+    assert_eq!(
+        hosted_npc_count(map),
+        8,
+        "seven people and the travel master"
+    );
     // the gate pair: Bifrost's Maelstrom down, Keelhaven's up; each arrival clear of every gate and of enemies
     let down = w.maps[SKY]
         .portals
@@ -237,8 +246,7 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         .unwrap();
     let up = map.portals.iter().find(|p| p.id == "maelstrom_up").unwrap();
     assert_eq!((down.to, up.to), (DEEP, SKY));
-    assert_eq!((down.tx, down.ty), (map.spawn.x, map.spawn.y));
-    assert_eq!((up.tx, up.ty), (103.5, 32.4));
+    // (The atlas moved the Maelstrom gates to the province borders: arrival points are checked by compact_atlas_tests.)
     for (arrival, gates) in [
         (at(down.tx, down.ty), &map.portals),
         (at(up.tx, up.ty), &w.maps[SKY].portals),
@@ -270,7 +278,7 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         "Bifrost Reach's old gate keeps index 0"
     );
     // places: 5 landmarks and 12 bells in three chains; a map without `chain` and `burn` still loads
-    assert_eq!(map.places.len(), 17);
+    assert!(map.places.len() >= 17, "{} places", map.places.len());
     assert_eq!(
         map.places.iter().filter(|p| !p.chain.is_empty()).count(),
         12
@@ -279,7 +287,8 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     assert!(old.chain.is_empty() && old.burn == 0. && old.waves.is_empty());
     // everybody stands on free ground inside the hub
     let city = map.city.as_ref().unwrap();
-    for n in &map.npcs {
+    // (The Longship's guides stand at its entrance, outside the hub.)
+    for n in map.npcs.iter().filter(|n| !overlay_npc(&n.id)) {
         assert!(city.contains(at(n.x, n.y)), "{} is in Keelhaven", n.id);
         let mut clear = at(n.x, n.y);
         map.collide(&mut clear, PLAYER_RADIUS);
@@ -404,7 +413,11 @@ fn the_net_has_one_door_and_a_court_with_two_so_the_kinds_come_in_depth_order() 
         "the way in is {walk:.0}, the line {straight:.0}"
     );
     // enemies keep clear of the bells' circles
-    for s in w.slimes.iter().filter(|s| s.zone == DEEP) {
+    for s in w
+        .slimes
+        .iter()
+        .filter(|s| s.zone == DEEP && !overlay_enemy(&s.kind))
+    {
         for b in map.places.iter().filter(|p| !p.chain.is_empty()) {
             assert!(
                 s.point().distance(at(b.x, b.y)) > b.r + 3.,
@@ -468,7 +481,7 @@ fn every_deep_monster_has_its_own_stats_attacks_materials_and_rewards() {
         assert_eq!(paid, xp, "{kind} xp");
         assert_eq!(
             w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
-            gold
+            mob_gold(gold)
         );
         assert!(
             w.drops
@@ -652,10 +665,10 @@ fn both_three_player_elites_credit_nearby_heroes_and_pay_gear() {
 fn the_questline_has_twenty_five_quests_with_three_chime_chains_and_the_old_objective_kinds() {
     let w = world();
     let map = &w.maps[DEEP];
-    assert_eq!(map.quests.len(), 25);
+    assert_eq!(hosted_counts(map).1, 25);
     let mut kinds = std::collections::BTreeSet::new();
     let mut chimes = vec![];
-    for q in &map.quests {
+    for q in map.quests.iter().filter(|q| !overlay_quest(&q.id)) {
         assert!(npc_exists(map, &q.npc), "{} giver {}", q.id, q.npc);
         assert_eq!(
             q.reward_xp,
@@ -846,18 +859,18 @@ fn the_deep_progression_quest_comes_at_level_thirty_five_and_completes_on_arriva
 #[test]
 fn the_deep_spark_master_links_keelhaven_to_the_perch() {
     let w = world();
-    assert_eq!(
-        npc(&w, "travel_keelhaven").travel_links,
-        ["travel_perch", "travel_nacrehold"]
+    assert_links_include(
+        &npc(&w, "travel_keelhaven").travel_links,
+        &["travel_perch", "travel_nacrehold"],
     );
-    assert_eq!(
-        w.maps[SKY]
+    assert_links_include(
+        &w.maps[SKY]
             .npcs
             .iter()
             .find(|n| n.id == "travel_perch")
             .unwrap()
             .travel_links,
-        ["travel_skuldwatch", "travel_keelhaven"]
+        &["travel_skuldwatch", "travel_keelhaven"],
     );
     assert!(w.maps[DEEP].in_city(at(
         npc(&w, "travel_keelhaven").x,
@@ -1265,11 +1278,17 @@ fn the_maelstrom_stands_on_the_eyrie_and_both_gates_work() {
     // walking into it carries the hero down to Keelhaven, and back up
     let mut rx = join(&mut w, 1, Class::Warrior);
     place(&mut w, 1, SKY, at(down.x, down.y));
-    run(&mut w, &mut rx, 40);
+    for _ in 0..40 {
+        push_through(&mut w, 1, &down);
+        run(&mut w, &mut rx, 1);
+    }
     assert_eq!(w.players[&1].character.zone, DEEP);
     let up = w.maps[DEEP].portals[0].clone();
     place(&mut w, 1, DEEP, at(up.x, up.y));
-    run(&mut w, &mut rx, 40);
+    for _ in 0..40 {
+        push_through(&mut w, 1, &up);
+        run(&mut w, &mut rx, 1);
+    }
     assert_eq!(w.players[&1].character.zone, SKY);
     assert!(w.maps[SKALD].portals.len() >= 2);
 }

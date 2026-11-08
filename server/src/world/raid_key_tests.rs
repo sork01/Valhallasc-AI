@@ -1,7 +1,11 @@
 use super::*;
 fn hero(w: &mut World, session: u64, active: bool) -> mpsc::Receiver<Value> {
     let (tx, rx) = mpsc::channel(4096);
-    w.join(session, None, Some(Look::default()), tx).unwrap();
+    let look = Look {
+        name: format!("Hero{session}"),
+        ..Look::default()
+    };
+    w.join(session, None, Some(look), tx).unwrap();
     let c = w.maps[0].crosses[0].clone();
     let p = w.players.get_mut(&session).unwrap();
     p.character.level = 99;

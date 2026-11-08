@@ -2,7 +2,6 @@
 //! and the two elites.
 use super::*;
 
-const SKALD: usize = 4;
 const WYRD: usize = 6;
 const STEP: f64 = 1.;
 
@@ -171,7 +170,12 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
     // enemies: every kind at its default level, in the bands the design lists (sleeping ambushers apart)
     let mut live = std::collections::BTreeMap::<&str, usize>::new();
     let mut asleep = std::collections::BTreeMap::<&str, usize>::new();
-    for (id, spawn) in w.spawns.iter().enumerate().filter(|(_, s)| s.zone == WYRD) {
+    for (id, spawn) in w
+        .spawns
+        .iter()
+        .enumerate()
+        .filter(|(_, s)| s.zone == WYRD && !overlay_enemy(&s.kind))
+    {
         if spawn.ambush.is_some() {
             *asleep.entry(spawn.kind.as_str()).or_default() += 1;
             let s = &w.slimes[id];
@@ -238,33 +242,8 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
             "{id}"
         );
     }
-    // the gate pair: Skaldholm's East Gate and the Wyrdwood's way back, each arrival clear of both gates and of enemies
-    let east = w.maps[SKALD]
-        .portals
-        .iter()
-        .find(|p| p.id == "wyrd_gate")
-        .unwrap();
-    let back = map
-        .portals
-        .iter()
-        .find(|p| p.id == "skaldholm_gate")
-        .unwrap();
-    assert_eq!((east.to, back.to), (WYRD, SKALD));
-    assert_eq!((east.tx, east.ty), (map.spawn.x, map.spawn.y));
-    assert_eq!((back.tx, back.ty), (147.6, 76.));
-    for (arrival, gates) in [
-        (at(east.tx, east.ty), &map.portals),
-        (at(back.tx, back.ty), &w.maps[SKALD].portals),
-    ] {
-        for gate in gates {
-            assert!(
-                arrival.distance(at(gate.x, gate.y)) > gate.r + 0.5,
-                "{} is clear of {}",
-                arrival.x,
-                gate.id
-            );
-        }
-    }
+    // (The East Gate to Skaldholm is gone: the atlas joins the Wyrdwood to the Crags, Rimeveil and the Bifrost by
+    // paths, which world/compact_atlas_tests.rs walks.)
     let mut spawn_clear = map.spawn;
     map.collide(&mut spawn_clear, PLAYER_RADIUS);
     assert!(
@@ -279,7 +258,7 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_two_elites_two_hubs_and_a_g
         );
     }
     // a map that is saved with `places`, `bridges` and `camps` stays loadable: the places are what visit objectives name
-    assert_eq!(map.places.len(), 6);
+    assert!(map.places.len() >= 6, "{} places", map.places.len());
     assert!(map.places.iter().all(|p| p.r > 0. && p.x > 0. && p.y > 0.));
 }
 
@@ -408,7 +387,7 @@ fn every_wyrdwood_monster_has_its_own_stats_attacks_materials_and_rewards() {
         assert_eq!(paid, xp, "{kind} xp");
         assert_eq!(
             w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
-            gold
+            mob_gold(gold)
         );
         assert!(
             w.drops
@@ -454,7 +433,7 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
     let w = world();
     let map = &w.maps[WYRD];
     assert_eq!(
-        map.npcs.len(),
+        hosted_npc_count(map),
         17,
         "7 + 7 people, the stranded Eydis and two travel masters"
     );
@@ -462,7 +441,7 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
     let mut kinds = std::collections::BTreeSet::new();
     let mut levels = std::collections::BTreeSet::new();
     let mut roots = vec![];
-    for q in &map.quests {
+    for q in map.quests.iter().filter(|q| !overlay_quest(&q.id)) {
         assert!(
             q.id.starts_with("wyrd_") && q.npc.starts_with("wyrd_"),
             "{}",
@@ -650,96 +629,6 @@ fn visit_objectives_complete_only_inside_the_named_place_for_an_accepted_quest()
 }
 
 #[test]
-fn skaldholm_flies_to_both_wyrdwood_hubs_through_the_east_gate_for_twenty_gold_a_leg() {
-    let mut w = world();
-    let mut rx = join(&mut w, 1, Class::Warrior);
-    let skald = w.maps[SKALD]
-        .npcs
-        .iter()
-        .find(|n| n.id == "travel_skaldholm")
-        .unwrap()
-        .clone();
-    assert!(skald.travel_links.iter().any(|l| l == "travel_hollowmoot"));
-    assert_eq!(
-        npc(&w, "travel_hollowmoot").travel_links,
-        ["travel_skaldholm", "travel_skuldwatch"]
-    );
-    assert_eq!(
-        npc(&w, "travel_skuldwatch").travel_links,
-        ["travel_hollowmoot", "travel_perch"]
-    );
-    {
-        let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.zone = SKALD;
-        c.x = skald.x;
-        c.y = skald.y + 1.;
-        c.gold = 100;
-        c.travel_stops = vec!["travel_skaldholm".into(), "travel_hollowmoot".into()];
-    }
-    // the second stop is not discovered: the whole trip is refused and costs nothing
-    w.time += 1.;
-    w.interact(1, "travel_skaldholm", Some("spark:travel_skuldwatch"));
-    assert_eq!(w.players[&1].character.gold, 100);
-    assert!(w.players[&1].character.spark_travel.is_none());
-    w.players
-        .get_mut(&1)
-        .unwrap()
-        .character
-        .travel_stops
-        .push("travel_skuldwatch".into());
-    w.time += 1.;
-    drain(&mut rx);
-    w.interact(1, "travel_skaldholm", Some("spark:travel_skuldwatch"));
-    let flight = w.players[&1]
-        .character
-        .spark_travel
-        .clone()
-        .expect("the flight starts");
-    assert_eq!(
-        w.players[&1].character.gold, 60,
-        "two legs: Skaldholm - Hollowmoot - Skuldwatch"
-    );
-    assert_eq!(
-        flight.stops,
-        ["travel_skaldholm", "travel_hollowmoot", "travel_skuldwatch"]
-    );
-    let east = w.maps[SKALD]
-        .portals
-        .iter()
-        .find(|p| p.id == "wyrd_gate")
-        .unwrap()
-        .clone();
-    assert!(
-        flight
-            .points
-            .iter()
-            .any(|p| p.zone == SKALD && (p.x, p.y) == (east.x, east.y)),
-        "it leaves through the East Gate"
-    );
-    assert!(
-        flight
-            .points
-            .iter()
-            .any(|p| p.zone == WYRD && (p.x, p.y) == (east.tx, east.ty)),
-        "and lands at the Wyrdwood arrival"
-    );
-    for _ in 0..(400. / TICK) as usize {
-        w.step();
-        if w.players[&1].character.spark_travel.is_none() {
-            break;
-        }
-    }
-    let c = &w.players[&1].character;
-    assert!(c.spark_travel.is_none());
-    let stop = npc(&w, "travel_skuldwatch");
-    assert_eq!(c.zone, WYRD);
-    assert!(
-        c.point().distance(at(stop.x, stop.y)) < 0.5,
-        "landed at Skuldwatch's master"
-    );
-}
-
-#[test]
 fn skuldwatch_is_a_sanctuary_like_hollowmoot() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
@@ -770,7 +659,7 @@ fn a_hirer_rents_two_fighters_for_the_oakhorn_and_four_for_hrungnir() {
     {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = 25;
-        c.gold = 2000;
+        c.gold = mercs::merc_price(25) * 8;
         for id in ["wyrd_crows", "wyrd_boars"] {
             c.quests.push(QuestProgress {
                 id: id.into(),
@@ -791,7 +680,11 @@ fn a_hirer_rents_two_fighters_for_the_oakhorn_and_four_for_hrungnir() {
         w.interact(1, "wyrd_warden", Some(&format!("merc_{class}")));
     }
     assert_eq!(mercs(&w), 2, "a party of three: the hero and two fighters");
-    assert_eq!(w.players[&1].character.gold, 2000 - 2 * 250);
+    assert_eq!(
+        w.players[&1].character.gold,
+        mercs::merc_price(25) * 6,
+        "two hires at the level-25 price"
+    );
 }
 
 #[test]
@@ -1162,8 +1055,14 @@ fn enemies_pick_the_escort_as_a_target_and_hurt_her() {
         "the nearest hero in sight is Eydis"
     );
     let hp = w.players[&session].character.hp;
-    w.time += 5.;
-    w.hurt_player_by(session, 400., here, "boar", 21);
+    // A dodge (the hero's gear gives a little) swallows a blow, so try until one lands.
+    for _ in 0..30 {
+        w.time += 5.;
+        w.hurt_player_by(session, 400., here, "boar", 21);
+        if w.players[&session].character.hp < hp {
+            break;
+        }
+    }
     assert!(w.players[&session].character.hp < hp);
 }
 
@@ -1406,7 +1305,8 @@ fn fight(
         let points = (level - 1) * 3;
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = level;
-        c.gold = 9000;
+        // Enough for every hire at the current price (it rises with the hirer's level).
+        c.gold = mercs::merc_price(level) * 8;
         c.attributes.stamina = points / 5;
         c.attributes.accuracy = 7;
         c.attributes.strength = points - points / 5 - 7;

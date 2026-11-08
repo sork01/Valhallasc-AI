@@ -14,6 +14,7 @@ fn join(w: &mut World, id: u64, class: Class) -> mpsc::Receiver<Value> {
     let (tx, rx) = mpsc::channel(4096);
     let look = Look {
         class,
+        name: format!("Hero{id}"),
         ..Look::default()
     };
     w.join(id, None, Some(look), tx).unwrap();
@@ -425,7 +426,10 @@ fn a_dungeon_copy_resets_when_its_last_hero_leaves_and_a_hero_who_logged_out_ins
     assert!(!w.instances[0].active);
     // A character saved inside a copy comes back at the stairs.
     let (tx, _rx) = mpsc::channel(64);
-    let look = Look::default();
+    let look = Look {
+        name: "Returner".into(),
+        ..Look::default()
+    };
     let welcome = {
         let (tx2, _rx2) = mpsc::channel(64);
         w.leave(1);
@@ -908,7 +912,7 @@ fn a_mercenarys_boss_kill_starts_one_shared_roll_with_the_hirer() {
     {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = 20;
-        c.gold = 1000;
+        c.gold = mercs::merc_price(20) * 2;
     }
     let stone = w.maps[SKALD]
         .npcs

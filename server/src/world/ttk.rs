@@ -1697,7 +1697,10 @@ fn green_gear_warrior_survives_four_plain_hits_from_same_level_elites() {
     let w = world();
     let mut seen = std::collections::BTreeSet::new();
     for spawn in &w.spawns {
-        if !is_elite(&spawn.kind) || !seen.insert(spawn.kind.clone()) {
+        if !is_elite(&spawn.kind)
+            || crate::world::overlay_enemy(&spawn.kind)
+            || !seen.insert(spawn.kind.clone())
+        {
             continue;
         }
         // Dungeon pack mobs are hardened on purpose (a pack must kill a lone player, `world/elite-power.txt`).

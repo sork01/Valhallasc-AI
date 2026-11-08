@@ -33,7 +33,17 @@ fn slot(id: &str) -> BTreeMap<String, String> {
 
 #[test]
 fn cloak_catalog_ladder_and_all_ten_bodies_equip_only_the_cloak_slot() {
-    let cloaks: Vec<_> = ITEMS.iter().filter(|i| i.kind == "cloak").collect();
+    // The 100 ordinary cloaks; the Chainforged and Hierloom cloaks are raid rewards with their own ladders.
+    let cloaks: Vec<_> = ITEMS
+        .iter()
+        .filter(|i| {
+            i.kind == "cloak"
+                && !matches!(
+                    i.source.as_deref(),
+                    Some("chained_forge" | "raid_hierlooms")
+                )
+        })
+        .collect();
     assert_eq!(cloaks.len(), 100);
     assert!(EXTRA_SLOTS.contains(&"cloak"));
     assert!(
@@ -131,10 +141,12 @@ fn cloak_mercenaries_and_sources_use_the_tenth_slot() {
             }
         }
     }
-    for piece in ITEMS
-        .iter()
-        .filter(|i| i.kind == "cloak" && i.source.as_deref().is_some_and(|s| s != "orange_pool"))
-    {
+    for piece in ITEMS.iter().filter(|i| {
+        i.kind == "cloak"
+            && i.source
+                .as_deref()
+                .is_some_and(|s| !matches!(s, "orange_pool" | "chained_forge" | "raid_hierlooms"))
+    }) {
         let source = piece.source.as_deref().unwrap();
         let mut found = false;
         // Every catalogue boss that owns this source can select its cloak from an authored pool.

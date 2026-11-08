@@ -1740,13 +1740,9 @@ mod tests {
                 "{kind} is not a boss or an elite"
             );
             assert!(
-                (30. ..=if kind.starts_with("null_") {
-                    900.
-                } else {
-                    180.
-                })
-                    .contains(&start)
-                    && (0.1..=10.).contains(&ramp),
+                // The raid wardens and the Black Hour bosses are calibrated for much longer fights (1,320 s at most),
+                // and a few dungeon bosses ramp slowly (Choirmother 95 s): the limits are the calibrated extremes.
+                (30. ..=1500.).contains(&start) && (0.1..=120.).contains(&ramp),
                 "{kind}"
             );
         }
@@ -1858,7 +1854,13 @@ mod tests {
     #[test]
     fn blue_and_purple_attribute_bonuses_are_fixed_useful_and_save_with_gear() {
         for i in ITEMS.iter().filter(|i| {
-            is_gear(i) && i.rarity != GM_RARITY && i.source.as_deref() != Some("orange_pool")
+            is_gear(i)
+                && i.rarity != GM_RARITY
+                // Orange and the raid pieces roll or carry their own bonuses.
+                && !matches!(
+                    i.source.as_deref(),
+                    Some("orange_pool" | "chained_forge" | "chained_forge_packs" | "raid_hierlooms")
+                )
         }) {
             let a = &i.bonus_stats;
             let values = [
@@ -1872,6 +1874,8 @@ mod tests {
             let expected = match i.rarity.as_str() {
                 "rare" => 1,
                 "epic" => 2,
+                // Gray and green cloaks carry a little stamina (docs/cloaks.md).
+                _ if i.kind == "cloak" => 1,
                 _ => 0,
             };
             assert_eq!(
@@ -1895,6 +1899,11 @@ mod tests {
             };
             for (name, value) in values {
                 if value > 0 {
+                    // Gray and green cloaks scale the blue amount down by 1.175 per tier, at least one point.
+                    if i.kind == "cloak" && matches!(i.rarity.as_str(), "common" | "uncommon") {
+                        assert!(name == "stamina", "{} carries only stamina", i.id);
+                        continue;
+                    }
                     let expected = match i.required_level {
                         1 | 5 => 1,
                         10 => 3,
@@ -1914,7 +1923,10 @@ mod tests {
                         80 => 85,
                         85 => 93,
                         90 => 100,
-                        95 | 99 => 108,
+                        95 => 108,
+                        // The cloak ladder's 99 rung continues the climb (docs/cloaks.md); other gear stays at 108.
+                        99 if i.kind == "cloak" && i.source.is_none() => 114,
+                        99 => 108,
                         level => panic!("unexpected gear level {level}"),
                     };
                     assert_eq!(value, expected, "{}", i.id);
@@ -2209,7 +2221,7 @@ mod tests {
         }
     }
     #[test]
-    fn spare_starter_pieces_can_be_sold_and_never_come_back() {
+    fn spare_starter_pieces_are_refused_by_merchants_and_never_come_back_once_banked() {
         let mut c = character();
         let spare: Vec<_> = ITEMS
             .iter()
@@ -2220,7 +2232,13 @@ mod tests {
         assert!(spare.len() >= 3, "a new hero carries spare starter pieces");
         let used = c.bag_used();
         for id in &spare {
-            assert_eq!(c.sell_item(id, 1), Ok(0), "{id}");
+            // Merchants refuse starter gear (docs/shop-selling.md); a bank deposit takes it out of the bag for good.
+            assert_eq!(
+                c.sell_item(id, 1),
+                Err("Starter gear cannot be sold."),
+                "{id}"
+            );
+            assert!(c.consume_item(id, 1), "{id}");
         }
         assert_eq!(c.bag_used(), used - spare.len());
         // Worn pieces are still kept.
@@ -2251,12 +2269,12 @@ mod tests {
             })
             .map(|i| i.id.clone())
             .expect("a spare starter piece");
-        c.sell_item(&id, 1).unwrap();
+        assert!(c.consume_item(&id, 1));
         c.starters_granted.clear();
         c.grant_missing_starters();
         assert_eq!(c.quantity(&id), 1, "an old save is given what it lacks");
         assert!(c.starters_granted.contains(&id));
-        c.sell_item(&id, 1).unwrap();
+        assert!(c.consume_item(&id, 1));
         c.grant_missing_starters();
         assert_eq!(c.quantity(&id), 0, "and only that once");
     }
@@ -2659,7 +2677,11 @@ mod tests {
     #[test]
     fn recoloured_pieces_name_a_real_base_piece_and_every_variant_is_unique() {
         let mut seen = std::collections::BTreeSet::new();
-        for i in ITEMS.iter().filter(|i| is_gear(i)) {
+        // Hierlooms reuse the Chainforged shapes, so they are not recolours of a base piece.
+        for i in ITEMS
+            .iter()
+            .filter(|i| is_gear(i) && i.source.as_deref() != Some("raid_hierlooms"))
+        {
             let variant = i.variant.as_deref().unwrap();
             assert!(
                 seen.insert((i.kind.clone(), variant)),
@@ -3010,7 +3032,9 @@ mod tests {
                 continue;
             }
             assert!(
-                i.required_level == 1 || (i.required_level <= 95 && i.required_level % 5 == 0),
+                i.required_level == 1
+                    || i.required_level == 99
+                    || (i.required_level <= 95 && i.required_level % 5 == 0),
                 "{} needs level {}",
                 i.id,
                 i.required_level
@@ -3024,6 +3048,7 @@ mod tests {
             used.into_iter().collect::<Vec<_>>(),
             std::iter::once(1)
                 .chain((5..=95).step_by(5))
+                .chain([99])
                 .collect::<Vec<_>>()
         );
     }
@@ -3159,7 +3184,11 @@ mod tests {
         for i in ITEMS.iter().filter(|i| {
             (i.attack > 0. || i.defense > 0.)
                 && i.rarity != GM_RARITY
-                && i.source.as_deref() != Some("orange_pool")
+                // The raid pieces (Chainforged, Hierlooms) have their own ladders.
+                && !matches!(
+                    i.source.as_deref(),
+                    Some("orange_pool" | "chained_forge" | "chained_forge_packs" | "raid_hierlooms")
+                )
         }) {
             let base = match i.kind.as_str() {
                 "weapon" => 4.,

@@ -25,7 +25,7 @@ fn asterion_is_a_reachable_city_of_distinct_homes_people_and_services() {
         .collect();
     assert_eq!(labels.len(), houses.len());
     assert_eq!(city.npcs.iter().filter(|n| n.route.len() > 1).count(), 10);
-    assert_eq!(city.quests.len(), 16);
+    assert_eq!(authored_counts(city).1, 16);
     let seen = flood(city, &blocked(city, &[]), city.spawn);
     for n in &city.npcs {
         for t in [0., 10., 60., 140.] {
@@ -44,12 +44,11 @@ fn asterion_is_a_reachable_city_of_distinct_homes_people_and_services() {
         .iter()
         .find(|n| n.id == "travel_asterion")
         .unwrap();
-    assert_eq!(
-        master.travel_links,
-        ["travel_lamplight", "travel_breakwater"]
-    );
+    // The atlas nests Asterion in the Canopy (reached from its entrance map, not by Spark), so only the Stormglass
+    // master is linked, and the link is reciprocal.
+    assert_links_include(&master.travel_links, &["travel_breakwater"]);
     assert!(
-        w.maps[16].npcs.iter().any(|n| n.id == "travel_lamplight"
+        w.maps[19].npcs.iter().any(|n| n.id == "travel_breakwater"
             && n.travel_links.contains(&"travel_asterion".to_string()))
     );
 }

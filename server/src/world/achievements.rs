@@ -175,7 +175,7 @@ mod tests {
         assert!(messages.iter().any(|m| m["type"] == "error"));
         assert!(
             messages.iter().any(|m| m["type"] == "achievements"
-                && m["maximum"] == 2275
+                && m["maximum"] == 2325
                 && m["points"] == points)
         );
         w.leave(1);

@@ -174,14 +174,21 @@ fn every_hub_offers_nine_trials_with_a_blue_weapon_for_each_class() {
             assert_eq!(q.objectives[0].count, FIGHTS as u32);
             assert!(format!("quest:accept:{}", q.id).len() <= 32);
             for class in ["warrior", "mage", "assassin", "priest", "hunter"] {
-                let [id] = q.reward_choices[class].as_slice() else {
-                    panic!("one weapon")
+                // A blue own-class weapon and a blue cloak (the tenth slot).
+                let [id, cloak] = q.reward_choices[class].as_slice() else {
+                    panic!("one weapon and one cloak")
                 };
                 let it = item(id).unwrap();
                 assert_eq!(
                     (it.kind.as_str(), it.rarity.as_str()),
                     ("weapon", "rare"),
                     "{id}"
+                );
+                let it = item(cloak).unwrap();
+                assert_eq!(
+                    (it.kind.as_str(), it.rarity.as_str()),
+                    ("cloak", "rare"),
+                    "{cloak}"
                 );
             }
         }
@@ -439,13 +446,21 @@ fn every_opponent_wears_a_full_green_set_of_its_level() {
                 .iter()
                 .filter(|i| {
                     i.rarity == "uncommon"
+                        && i.kind != "cloak"
                         && i.required_level == want
                         && i.class.is_none_or(|k| k == class)
                 })
                 .collect();
+            // The cloak (tenth slot) is green too, and level 99 wears the 99 rung.
+            assert!(
+                worn.iter()
+                    .any(|i| i.kind == "cloak" && i.rarity == "uncommon"),
+                "{class:?} at {level}: a green cloak"
+            );
             assert_eq!(
                 green.len(),
-                8,
+                // Armour, headgear, shoulders, gloves, weapon, pants, necklace and the two rings (the cloak is checked above).
+                9,
                 "{class:?} at {level}: {:?}",
                 worn.iter().map(|i| &i.id).collect::<Vec<_>>()
             );

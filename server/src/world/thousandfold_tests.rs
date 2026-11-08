@@ -39,7 +39,8 @@ fn thousandfold_encounters_are_reachable_through_the_open_entrance() {
         assert!(is_elite(kind));
         assert_eq!(is_boss(kind), e.boss);
         assert_eq!(Slime::default_level(kind), 75);
-        assert_eq!(Slime::stats(kind).0, e.stats[0]);
+        // Health goes through world/elite-power.txt, which scales the catalogue figure (never below it).
+        assert!(Slime::stats(kind).0 >= e.stats[0], "{kind}");
         assert_eq!(material(kind), e.material);
     }
     assert!(Slime::ranged("pavilion_inkmoth").is_some());

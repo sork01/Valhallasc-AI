@@ -146,7 +146,7 @@ fn blackhour_data_and_actual_collision() {
     for (kind, start) in [
         ("null_bell", 224.),
         ("null_conductor", 248.),
-        ("null_hour", 608.),
+        ("null_hour", 760.),
     ] {
         assert_eq!(crate::items::enrage(kind), Some((start, 0.2)));
     }
@@ -489,6 +489,18 @@ fn through(w: &mut World, id: u64, door: &str) {
         .find(|p| p.id == door)
         .unwrap()
         .clone();
+    // The Silent Solstice is a keyed dungeon (`entry_solstice`, docs/dungeon-admission.md): the hero holds its key.
+    // (The Black Hour door's own `null_keys` quest is the thing under test, so it is never granted here.)
+    if let Some(key) = p.needs_quest.as_ref().filter(|k| k.starts_with("entry_")) {
+        let c = &mut w.players.get_mut(&id).unwrap().character;
+        if !c.quests.iter().any(|q| &q.id == key) {
+            c.quests.push(QuestProgress {
+                id: key.clone(),
+                completions: 1,
+                ..Default::default()
+            });
+        }
+    }
     place(w, id, YEARWHEEL, at(p.x, p.y));
     w.time += 2.;
     w.use_portal(id);

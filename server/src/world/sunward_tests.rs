@@ -13,7 +13,7 @@ fn vale_gates_bridges_hub_and_all_encounters_are_reachable() {
         ("Sunward Vale", Some([65, 70]), 128)
     );
     // Two more quests arrived when the Elder Hollow behind this zone opened.
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 12));
+    assert_eq!(authored_counts(m), (42, 12));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals
@@ -79,13 +79,13 @@ fn vale_gates_bridges_hub_and_all_encounters_are_reachable() {
     assert!(trees >= 170, "the vale stays a landscape of real trees");
     assert!(objects.iter().filter(|o| o["kind"] == "water").count() >= 40);
     assert!(m.npcs.iter().any(|n| n.id == "sun_stone"));
-    assert_eq!(
-        m.npcs
+    assert_links_include(
+        &m.npcs
             .iter()
             .find(|n| n.id == "travel_millbridge")
             .unwrap()
             .travel_links,
-        ["travel_breakwater", "travel_jubilee"]
+        &["travel_breakwater", "travel_jubilee"],
     );
     assert!(
         w.maps[19]
@@ -119,7 +119,8 @@ fn vale_kinds_have_distinct_rewards_and_elite_quests() {
     }
     assert!(is_elite("honeyjaw") && is_elite("wickerwarden"));
     assert!(!is_elite("spadebadger"));
-    for q in &m.quests {
+    // The Empty Seat handoffs (`es_*`) are rewardless by design.
+    for q in m.quests.iter().filter(|q| !q.id.starts_with("es_")) {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
     }
     for id in ["sun_hares", "sun_snails", "sun_honeyjaw", "sun_warden"] {

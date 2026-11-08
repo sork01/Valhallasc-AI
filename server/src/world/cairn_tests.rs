@@ -12,7 +12,7 @@ fn cairnspine_routes_hub_and_pass_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Cairnspine", Some([90, 95]), 168)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (43, 13));
+    assert_eq!(authored_counts(m), (43, 13));
     assert!(m.in_city(m.spawn));
     let back = m
         .portals
@@ -109,8 +109,15 @@ fn cairnspine_enemies_rewards_and_elites_are_registered() {
         let (hp, damage, _, _) = Slime::stats(kind);
         assert!(hp > 600000. && damage > 8000.);
     }
-    assert_eq!(m.slimes.iter().filter(|s| is_elite(&s.kind)).count(), 3);
-    for q in &m.quests {
+    assert_eq!(
+        m.slimes
+            .iter()
+            .filter(|s| is_elite(&s.kind) && !overlay_enemy(&s.kind))
+            .count(),
+        3
+    );
+    // The Empty Seat handoffs (`es_*`) are rewardless by design.
+    for q in m.quests.iter().filter(|q| !q.id.starts_with("es_")) {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
     }
     for id in [

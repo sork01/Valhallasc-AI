@@ -171,7 +171,16 @@ fn chained_forge_open_muster_preserves_seal_level_and_ten_fighter_gates() {
         w.players[&1].character.zone, 45,
         "level gate applies to muster too"
     );
-    w.players.get_mut(&1).unwrap().character.level = 99;
+    {
+        // The outer gate also needs the Ember Key quest (`needs_quest: raid_key`).
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.level = 99;
+        c.quests.push(QuestProgress {
+            id: "raid_key".into(),
+            completions: 1,
+            ..Default::default()
+        });
+    }
     w.time += PORTAL_DELAY;
     w.use_portal(1);
     assert_eq!(

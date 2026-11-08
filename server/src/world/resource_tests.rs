@@ -426,7 +426,11 @@ fn mana_survives_resume_while_rage_and_energy_reset_and_death_respawns_correctly
 fn healing_a_fighting_party_member_puts_the_priest_in_combat() {
     let (mut w, _) = setup(Class::Priest);
     let (tx, _rx) = mpsc::channel(256);
-    w.join(2, None, Some(Look::default()), tx).unwrap();
+    let look = Look {
+        name: "Second".into(),
+        ..Look::default()
+    };
+    w.join(2, None, Some(look), tx).unwrap();
     let p = w.players.get_mut(&2).unwrap();
     p.character.hp = 1.;
     p.combat_left = 5.;
