@@ -180,8 +180,8 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
             );
         }
         // the meadow's and Gloamfen's other borders are seams now: only Skaldholm is a gate
-        // (the glacier's Wyrdwood border and the Wyrdwood's glacier and Crags borders are seams too: each keeps one gate)
-        let wanted = if matches!(zone, 0 | 2 | 3 | 6) { 1 } else { 2 };
+        // (the glacier's Wyrdwood border and the Wyrdwood's glacier and Crags borders are seams too: each keeps one gate; the Canopy keeps only Emberwake's since the Orrery border became a seam)
+        let wanted = if matches!(zone, 0 | 2 | 3 | 6 | 16) { 1 } else { 2 };
         assert!(
             border >= wanted,
             "zone {zone}: only {border} gate crossings"
@@ -282,8 +282,8 @@ fn the_crags_and_the_moonspore_canopy_share_a_seam() {
 }
 
 #[test]
-fn the_moonspore_canopy_keeps_its_gates_to_the_orrery_and_emberwake() {
-    gates_stand_on_free_land(16, &[15, 45]);
+fn the_moonspore_canopy_keeps_its_gate_to_emberwake_and_shares_a_seam_with_the_orrery() {
+    gates_stand_on_free_land(16, &[45]);
 }
 
 #[test]
@@ -709,6 +709,37 @@ fn seam_walks(from_zone: usize, to_zone: usize) {
         at_wall <= 6,
         "{at_wall} border samples stand at a wall: the wall runs along the seam"
     );
+}
+
+#[test]
+fn astralhollow_and_the_orrery_share_a_seam() {
+    seam_walks(13, 15);
+}
+
+#[test]
+fn the_orrery_and_the_moonspore_canopy_share_a_seam() {
+    seam_walks(15, 16);
+}
+
+#[test]
+fn the_orrery_keeps_its_gates_to_the_crags_nacrehold_the_prismwaste_stormglass_and_emberwake() {
+    gates_stand_on_free_land(15, &[1, 9, 14, 19, 45]);
+}
+
+#[test]
+fn the_orrery_is_seamless_against_astralhollow_and_the_moonspore_canopy_only() {
+    let data = bundled();
+    let mut pairs = std::collections::BTreeSet::new();
+    for zi in 1..=data["zones"].as_array().unwrap().len() {
+        for p in zone_of(&data, zi)["portals"].as_array().unwrap() {
+            let to = p["to"].as_u64().unwrap() as usize;
+            if p.get("seam").is_some() && (zi == 15 || to == 15) {
+                pairs.insert((zi, to));
+            }
+        }
+    }
+    let want: std::collections::BTreeSet<_> = [(13, 15), (15, 13), (15, 16), (16, 15)].into();
+    assert_eq!(pairs, want, "one seam to Astralhollow and one to the Canopy, seen from both sides");
 }
 
 #[test]

@@ -402,6 +402,8 @@ def shifted_state(zone, old, G):
     for cx in zone['crosses']:
         cx['x'], cx['y'] = CROSS
     for p in zone['portals']:
+        if p.get('seam'):           # the Orrery's seam replaced the south gate (zone_shapes.make_seams): its line is the border, not a gate
+            continue
         gx, gy, walk, arr = G[p['id']]
         p['x'], p['y'], p['walk'] = round(gx, 2), round(gy, 2), list(walk)
 
@@ -422,13 +424,16 @@ def design(world, write=False):
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
-    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items()]
+    seamed = {p['id'] for p in zone['portals'] if p.get('seam')}
+    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(zone, content.HAMLETS)
     # every crossing that arrives here follows the new frame: the Deep's, Nacrehold's, the Prismwaste's and the Orrery's
     inbound = {'path_13_8': ('path_8_13', 8), 'astral_nacre_gate': ('nacre_astral_gate', 9), 'astral_prism_gate': ('prism_astral_gate', 14), 'path_13_15': ('path_15_13', 15)}
     for mine, (theirs, zi) in inbound.items():
+        if mine in seamed:          # a seam arrives where it was crossed (the neighbour's portal carries the shift)
+            continue
         for p in world['zones'][zi - 1]['portals']:
             if p['id'] == theirs:
                 p['tx'], p['ty'] = round(G[mine][3][0], 2), round(G[mine][3][1], 2)

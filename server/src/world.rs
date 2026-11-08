@@ -36,6 +36,8 @@ mod asterion_tests;
 #[cfg(test)]
 mod astral_tests;
 #[cfg(test)]
+mod orrery_tests;
+#[cfg(test)]
 mod blackhour_tests;
 mod boss_mechanics;
 mod boss_signs;
@@ -799,6 +801,8 @@ impl Slime {
             "chronoguard" => (130000., 1950., 1.9, 1.95),
             "pendulummatron" => (750000., 7600., 2.7, 2.15),
             "epochengine" => (1250000., 12000., 1.9, 2.6),
+            // The Mainspring Wyrm (the shapes pilot, no quest): a coil of brass gears round an obsidian spire, a fast serpent between the matron and the engine in strength. First guess.
+            "mainspringwyrm" => (600000., 6400., 3.4, 1.9),
             // Moonspore Canopy: an overgrown moonfall with three distinct group courts.
             "glowcapgrazer" => (145000., 2100., 3.4, 1.45),
             "silkwing" => (150000., 2250., 3.9, 1.35),
@@ -959,6 +963,7 @@ impl Slime {
             "chronoguard" => 53,
             "pendulummatron" => 54,
             "epochengine" => 55,
+            "mainspringwyrm" => 53,
             "glowcapgrazer" => 55,
             "silkwing" => 56,
             "rootlurker" => 57,
@@ -1108,6 +1113,7 @@ impl Slime {
             "chronoguard" => 2750,
             "pendulummatron" => 8000,
             "epochengine" => 12000,
+            "mainspringwyrm" => 7000,
             "glowcapgrazer" => 3000,
             "silkwing" => 3250,
             "rootlurker" => 3500,
@@ -1276,6 +1282,8 @@ impl Slime {
             "chronoguard" => (0.95, 1.9, 6., 8.),
             "pendulummatron" => (0.9, 1.65, 8., 11.),
             "epochengine" => (1.15, 2.1, 6., 13.),
+            // The Wyrm lunges along its coil: a long reach, a fast wind-up.
+            "mainspringwyrm" => (0.8, 1.5, 8., 12.),
             "glowcapgrazer" => (0.35, 1.0, 10., 9.),
             "silkwing" => (0.45, 1.2, 11., 10.),
             "rootlurker" => (0.85, 1.7, 6., 8.),
@@ -4695,7 +4703,7 @@ impl World {
                 | "rustmarshal" | "hangedking" | "skoll" | "shardking" | "heimdallr"
                 | "cometmaw" | "eclipsequeen" | "orbitwarden" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
-                "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
+                "gloomroot" | "hrungnir" | "kraken" | "hvitserk" | "mainspringwyrm" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
                 | "wickerwarden" | "paradegryphon" | "maskcolossus" | "jadeanaconda"
@@ -5332,6 +5340,7 @@ impl World {
                             | "sunshard"
                             | "pendulummatron"
                             | "epochengine"
+                            | "mainspringwyrm"
                             | "mireheart"
                             | "silverwidow"
                             | "nightbloom"
@@ -8661,6 +8670,7 @@ mod tests {
             "sunshard",
             "pendulummatron",
             "epochengine",
+            "mainspringwyrm",
             "mireheart",
             "silverwidow",
             "nightbloom",

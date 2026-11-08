@@ -39,8 +39,8 @@ ELITE_CLEAR = 17.0           # awareness (up to 14) + 3: an elite stands this fa
 LOOSE = {'tree', 'bush', 'rock', 'wildflowers', 'hawthorn_bush', 'birch_tree', 'oak_tree', 'apple_tree', 'willow_tree', 'cairn_boulder',
          'cairn_pebble', 'flowers', 'haystack', 'bones', 'spire', 'thicket', 'pine', 'glowmoss', 'sporefern', 'gloomstalk', 'moonstone', 'mooncaps',
          'ew_basalt', 'crag'}          # (lamps light the camps and outposts: obstacles, never scatter)
-# Zones that draw dirt trails from `paths` (not the cities, the sky or the sea). Zone 6 is the Wyrdwood, 16 the Moonspore Canopy.
-ROAD_ZONES = (0, 1, 2, 3, 6, 16)
+# Zones that draw dirt trails from `paths` (not the cities, the sky or the sea). Zone 6 is the Wyrdwood, 13 Astralhollow, 15 the Obsidian Orrery, 16 the Moonspore Canopy.
+ROAD_ZONES = (0, 1, 2, 3, 6, 13, 15, 16)
 
 
 def zone_of(world, z):

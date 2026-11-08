@@ -25159,6 +25159,13 @@
     "sell": 1200
   },
   {
+    "id": "mainspring_coil",
+    "name": "Mainspring Coil",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1000
+  },
+  {
     "id": "warrior_armor_crimson_l55_gray",
     "name": "Clockworn Crimson Armor",
     "kind": "armor",

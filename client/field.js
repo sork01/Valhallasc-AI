@@ -788,7 +788,7 @@
       const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];
       g.fillStyle = zdef.theme === 'emberwake' ? EmberwakeArt.ground(x,y,tone,alt,zdef,dirt) : zdef.theme === 'chained_forge' ? ChainedForgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'blackhour' ? BlackhourArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'longship' ? LongshipArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'arena' ? (x < 3 || y < 3 || x > 28 || y > 28 ? '#423746' : x === 16 || y === 16 ? '#ae8456' : (x + y) % 2 ? '#6e6877' : '#777180') : zdef.theme === 'skybridge' ? SkybridgeArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'nornroot' ? NornrootArt.ground(x,y,tone,alt,zdef) : moonwell ? MoonwellArt.ground(x,y,tone,dirt,alt,zdef) : zdef.theme === 'eye_below' ? EyeBelowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'elder_hollow' ? ElderHollowArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thousandfold' ? PavilionArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'rain_crown' ? RainCrownArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'seed_vault' ? SeedVaultArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'sunken_astrolabe' ? SunkenArt.ground(x,y,tone,alt,zdef) : zdef.theme === 'thunderheart_gate' ? ThunderArt.ground(x,y,tone,alt,zdef) : SeasonDungeonArt.isTheme(zdef.theme) ? SeasonDungeonArt.ground(zdef.theme,x,y,tone,alt,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt,zdef) : zdef.theme === 'vault' ? VaultArt.ground(x,y,tone,alt,zdef.rooms,arenas) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
         : sky ? skyGround(x, y, tone, dirt, alt)
-        : orrery ? (dirt ? `hsl(${34 + tone * 7}, 19%, ${43 + tone * 8 + alt}%)` : `hsl(${232 + tone * 13}, ${17 + tone * 9}%, ${20 + tone * 10 + alt}%)`)
+        : orrery ? (dirt ? `hsl(${34 + tone * 7}, 19%, ${43 + tone * 8 + alt}%)` : map.gk?.[i] ? orreryClassGround(map.gk[i], tone, alt) : `hsl(${232 + tone * 13}, ${17 + tone * 9}%, ${20 + tone * 10 + alt}%)`)
         : moonspore ? (dirt ? `hsl(${151 + tone * 9}, 18%, ${35 + tone * 9 + alt}%)` : `hsl(${177 + tone * 20}, ${25 + tone * 12}%, ${19 + tone * 10 + alt}%)`)
         : worldtree ? (dirt ? `hsl(${34+tone*8}, 42%, ${46+tone*8+alt}%)` : `hsl(${142+tone*18}, 51%, ${33+tone*10+alt}%)`)
         : heartwood ? (dirt ? `hsl(${35+tone*6}, 35%, ${45+tone*8+alt}%)` : `hsl(${31+tone*6}, 29%, ${34+tone*8+alt}%)`)
@@ -1122,6 +1122,7 @@
     cometmaw: { name: 'Cometmaw', elite: true, scale: 1.8, top: 90, col: ['#bfeaff', '#4a8ab8', '#0c1a30'] },
     eclipsequeen: { name: 'Eclipse Queen', elite: true, scale: 1.4, top: 110, col: ['#d8b8f0', '#5a3a78', '#100a1c'] },
     orbitwarden: { name: 'Orbit Warden', elite: true, scale: 1.5, top: 120, col: ['#ffe2a0', '#8a7a58', '#1a1810'] },
+    mainspringwyrm: { name: 'Mainspring Wyrm', elite: true, scale: 1.6, top: 100, col: ['#e8c98a', '#8a6a3a', '#1c1710'] },
     crab: { name: 'Rime Crab', scale: 1.1, top: 53, col: ['#d8f2ff', '#6fb3dc', '#2d5f8a'] },
     wolf: { name: 'Frostfang Wolf', scale: 1.1, top: 67, col: ['#f2f6fa', '#9fb4c8', '#4a5d74'] },
     yeti: { name: 'Glacier Yeti', scale: 1.2, top: 85, col: ['#f4f8fc', '#b9cbdc', '#5e7690'] },
@@ -1254,7 +1255,7 @@
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:e.elite !== false, boss:e.boss, scale:e.kind.startsWith('cf_') ? (e.add ? 1.25 : e.raidPack ? 1.95 : e.kind === 'cf_eldmarr' ? 3.2 : 2.6) : e.kind.startsWith('null_') ? (e.boss ? 2.6 : 1.9) : e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   if (window.Locale?.language === 'sv') for (const d of Object.values(SLIME)) d.name = Locale.translate(d.name); // nameplates, log lines and the boss bar read these
   const MEADOW_ELITES = ['oldtusker', 'tidecrusher', 'orchardqueen'];
-  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'], BIFROST_ELITES = ['skoll', 'shardking', 'heimdallr'], ASTRAL_ELITES = ['cometmaw', 'eclipsequeen', 'orbitwarden'];
+  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'], BIFROST_ELITES = ['skoll', 'shardking', 'heimdallr'], ASTRAL_ELITES = ['cometmaw', 'eclipsequeen', 'orbitwarden'], ORRERY_ELITES = ['mainspringwyrm'];
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
@@ -3272,7 +3273,7 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, bifrostEliteSrc = null, astralEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, bifrostEliteSrc = null, astralEliteSrc = null, orreryEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   // Share the renderer's bank selection with loading, including borrowed boss/add art.
   // Loading every zone here used to start hundreds of image requests at login.
   let slimeSpriteConfig = null;
@@ -3297,6 +3298,7 @@
     [WYRD_ELITES, () => wyrdEliteSrc, loadWyrdElites],
     [BIFROST_ELITES, () => bifrostEliteSrc, loadBifrostElites],
     [ASTRAL_ELITES, () => astralEliteSrc, loadAstralElites],
+    [ORRERY_ELITES, () => orreryEliteSrc, loadOrreryElites],
     [WORLDHEART_KINDS, () => worldheartSrc, loadWorldheartSprites],
     [TANGLECROWN_KINDS, () => tanglecrownSrc, loadTanglecrownSprites],
     [RIBBONWILD_KINDS, () => ribbonwildSrc, loadRibbonwildSprites],
@@ -3582,6 +3584,13 @@
     return fetch('assets/astralelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
       const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/astralelites_${k}.png`;
     }))).then(imgs => { astralEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { astralEliteSrc = null; });
+  }
+  function loadOrreryElites() {
+    if (orreryEliteSrc) return;
+    if (stubOn()) { orreryEliteSrc = stubEnemies(ORRERY_ELITES, { mainspringwyrm: '#da8' }); return; }
+    return fetch('assets/orreryelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/orreryelites_${k}.png`;
+    }))).then(imgs => { orreryEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { orreryEliteSrc = null; });
   }
   function loadWyrdElites() {
     if (wyrdEliteSrc) return;
@@ -4153,6 +4162,19 @@
     if (k === 7) return `hsl(${275 + tone * 16}, ${24 + tone * 8}%, ${30 + tone * 8 + alt}%)`;
     if (k === 8) return `hsl(${150 + tone * 20}, ${28 + tone * 8}%, ${12 + tone * 6 + alt * .7}%)`;
     return `hsl(${215 + tone * 14}, ${8 + tone * 6}%, ${40 + tone * 8 + alt}%)`;
+  }
+  // The Orrery's ground classes (scripts/orrery_design.py): brass meadow, dust verge, gearyard slate, ring floor, the Axis's brass floor, obsidian glass, valley slate, heath, the burnt ground round the Ember Grave Cross.
+  const ORRERY_MINI = ['', '#6a5d3c', '#5a4a40', '#505a70', '#463c68', '#8f7550', '#1e1432', '#3c5a78', '#503c64', '#50283a'];
+  function orreryClassGround(k, tone, alt) {
+    if (k === 1) return `hsl(${42 + tone * 10}, ${22 + tone * 8}%, ${26 + tone * 9 + alt}%)`;
+    if (k === 2) return `hsl(${18 + tone * 10}, ${15 + tone * 7}%, ${23 + tone * 8 + alt}%)`;
+    if (k === 3) return `hsl(${215 + tone * 12}, ${14 + tone * 6}%, ${30 + tone * 8 + alt}%)`;
+    if (k === 4) return `hsl(${250 + tone * 14}, ${20 + tone * 8}%, ${23 + tone * 8 + alt}%)`;
+    if (k === 5) return `hsl(${38 + tone * 8}, ${26 + tone * 8}%, ${34 + tone * 9 + alt}%)`;
+    if (k === 6) return `hsl(${262 + tone * 14}, ${28 + tone * 8}%, ${11 + tone * 6 + alt * .7}%)`;
+    if (k === 7) return `hsl(${200 + tone * 12}, ${22 + tone * 8}%, ${24 + tone * 8 + alt}%)`;
+    if (k === 8) return `hsl(${275 + tone * 14}, ${15 + tone * 6}%, ${21 + tone * 7 + alt}%)`;
+    return `hsl(${335 + tone * 10}, ${14 + tone * 6}%, ${16 + tone * 6 + alt}%)`;
   }
   // ---------- the Wyrdwood: ground, river bridge, storm sky and weather ----------
   const moorK = y => clamp(((zdef.shape ? 224 : 104) - y) / 10, 0, 1);              // 0 in the south forest, 1 north of the river (the shaped Wyrdwood's river runs at y 226)
@@ -4932,7 +4954,7 @@
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
-    if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = (ember ? EMBER_MINI : frost ? FROST_MINI : fen ? FEN_MINI : wyrd ? WYRD_MINI : astral ? ASTRAL_MINI : MEADOW_MINI)[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
+    if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = (ember ? EMBER_MINI : frost ? FROST_MINI : fen ? FEN_MINI : wyrd ? WYRD_MINI : astral ? ASTRAL_MINI : orrery ? ORRERY_MINI : MEADOW_MINI)[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? MoonwellArt.minimap(x,y,map.dirt[y*MAP+x],zdef) : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = zdef.theme === 'emberwake' ? '#ae8a6e' : zdef.theme === 'chained_forge' ? '#bca69e' : zdef.theme === 'blackhour' ? '#82758d' : zdef.theme === 'longship' ? '#c5a475' : zdef.theme === 'skybridge' ? '#8dd8f2' : zdef.theme === 'nornroot' ? '#c29b59' : DungeonVisual.styles[zdef.theme] ? DungeonVisual.minimap(zdef.theme,x,y,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : yearwheel ? ['#e8c498','#e9bd7d','#bf8c6b','#b8d9e9'][yearSeason(x,y)] : deep ? '#c8c29a' : zdef.theme === 'elder_hollow' ? '#597251' : zdef.theme === 'thousandfold' ? '#ae779d' : zdef.theme === 'rain_crown' ? '#6aa895' : zdef.theme === 'seed_vault' ? '#b6a676' : zdef.theme === 'sunken_astrolabe' ? '#c0ac79' : zdef.theme === 'thunderheart_gate' ? '#b6d4e6' : zdef.theme === 'blooming_labyrinth' ? '#e2b7cf' : zdef.theme === 'solar_crucible' ? '#e8ba77' : zdef.theme === 'amber_archive' ? '#eac286' : zdef.theme === 'silent_solstice' ? '#b8d5e8' : zdef.theme === 'vault' ? VaultArt.minimap(x,y,zdef.rooms) : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : worldtree ? '#c19a60' : heartwood ? '#b58a5b' : frostwake ? '#8fc6d8' : cairn ? '#b49a75' : lapis ? '#efd49b' : tanglecrown ? '#b99a62' : ribbonwild ? '#ffe2a2' : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (wyrd) { const rv = zdef.shape ? 226 / MAP : .5625, gr = g.createLinearGradient(0, 0, 0, U); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(rv - .14, 'rgba(120,128,92,.9)'); gr.addColorStop(rv, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, U, U); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * (zdef.shape ? 226 / MAP : .5)) g.fillRect(x * k, y * k, k + .5, k + .5); } }

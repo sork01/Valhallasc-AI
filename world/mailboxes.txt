@@ -66,17 +66,6 @@
     }
   },
   {
-    "id": "mailbox_15_the_stillpoint",
-    "zone": 15,
-    "hub": "The Stillpoint",
-    "x": 46.99,
-    "y": 121.17,
-    "anchor": {
-      "x": 44.5,
-      "y": 119.5
-    }
-  },
-  {
     "id": "mailbox_16_lamplight_refuge",
     "zone": 16,
     "hub": "Lamplight Refuge",
@@ -569,6 +558,50 @@
     "anchor": {
       "x": 171,
       "y": 51.5
+    }
+  },
+  {
+    "id": "mailbox_15_the_stillpoint",
+    "zone": 15,
+    "hub": "The Stillpoint",
+    "x": 96.99,
+    "y": 310.17,
+    "anchor": {
+      "x": 94,
+      "y": 308
+    }
+  },
+  {
+    "id": "mailbox_15_bellcourt",
+    "zone": 15,
+    "hub": "Bellcourt",
+    "x": 87,
+    "y": 125,
+    "anchor": {
+      "x": 83,
+      "y": 126
+    }
+  },
+  {
+    "id": "mailbox_15_crownwatch",
+    "zone": 15,
+    "hub": "Crownwatch",
+    "x": 192,
+    "y": 83,
+    "anchor": {
+      "x": 189,
+      "y": 85.5
+    }
+  },
+  {
+    "id": "mailbox_15_shardwatch",
+    "zone": 15,
+    "hub": "Shardwatch",
+    "x": 252,
+    "y": 131,
+    "anchor": {
+      "x": 253,
+      "y": 131.5
     }
   }
 ]

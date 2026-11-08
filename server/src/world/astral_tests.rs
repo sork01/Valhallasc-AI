@@ -12,12 +12,11 @@ const KINDS: [&str; 5] = [
     "meteorgolem",
 ];
 const ELITES: [(&str, u32); 3] = [("cometmaw", 42), ("eclipsequeen", 44), ("orbitwarden", 45)];
-/// (gate, the zone it leads to, the far gate that leads back)
-const GATES: [(&str, usize, &str); 4] = [
+/// (gate, the zone it leads to, the far gate that leads back); the border to the Orrery became a seam on 2026-11-08
+const GATES: [(&str, usize, &str); 3] = [
     ("astral_nacre_gate", 9, "nacre_astral_gate"),
     ("path_13_8", 8, "path_8_13"),
     ("astral_prism_gate", 14, "prism_astral_gate"),
-    ("path_13_15", 15, "path_15_13"),
 ];
 const HAMLETS: [(&str, &str); 3] = [
     ("choirrest", "astral_cr_"),
@@ -35,7 +34,7 @@ fn run(w: &mut World, rx: &mut mpsc::Receiver<Value>, ticks: usize) -> Vec<Strin
 }
 
 #[test]
-fn astralhollow_is_a_big_basin_with_five_kinds_by_distance_three_elites_four_hubs_and_four_gates() {
+fn astralhollow_is_a_big_basin_with_five_kinds_by_distance_three_elites_four_hubs_three_gates_and_a_seam() {
     let w = world();
     let map = &w.maps[ASTRAL];
     assert_eq!(map.name, "Astralhollow");
@@ -130,15 +129,19 @@ fn astralhollow_is_a_big_basin_with_five_kinds_by_distance_three_elites_four_hub
             .count(),
         9
     );
+    // three walk-in gates and one seam (to the Orrery)
     assert_eq!(map.portals.len(), 4);
-    assert!(
-        map.portals.iter().all(|p| p.seam.is_none()),
-        "every crossing is a gate"
-    );
+    let seams: Vec<usize> = map
+        .portals
+        .iter()
+        .filter(|p| p.seam.is_some())
+        .map(|p| p.to)
+        .collect();
+    assert_eq!(seams, vec![15], "only the Orrery border is a seam");
 }
 
 #[test]
-fn all_four_gates_are_walked_through_both_ways_and_every_arrival_is_clear_ground() {
+fn all_three_gates_are_walked_through_both_ways_and_every_arrival_is_clear_ground() {
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
     for (gate_id, zone, back_id) in GATES {

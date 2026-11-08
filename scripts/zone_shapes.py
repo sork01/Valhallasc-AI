@@ -1520,6 +1520,9 @@ def apply(world, cfg):
     if 13 in cfg['zones']:      # after the Deep and Nacrehold: it rewrites the arrivals of their crossings into Astralhollow (and the Prismwaste's and the Orrery's)
         import astral_design
         print('astralhollow', astral_design.design(world, write=True)[1])
+    if 15 in cfg['zones']:      # after Astralhollow: it rewrites the arrivals of its crossings (the Crags', Nacrehold's, the Prismwaste's, Stormglass's and Emberwake's) and fills its seams to Astralhollow and the Moonspore Canopy
+        import orrery_design
+        print('orrery', orrery_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)
