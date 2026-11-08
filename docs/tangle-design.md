@@ -2,6 +2,8 @@
 
 Owner request: "for pilot. reshape tanglecrown. and remake the zone and quests to fit the new shape. no fillers." Owner answers: seamless against the **Ribbonwild only** (Sunward Vale, the Veyrroot Canopy and the Temple of the Rain Crown stay gates), **keep all portals**, **keep both elites and add one with no quest**, **three outposts**. Pilot only (branch `feat/zone-shapes-tangle`, off `feat/zone-shapes`, worktree `/media/raid/valhallasc-data/zone-tangle-work`, cargo target `zone-tangle-target`, wrapper `zone-tangle-cargo.sh`). The sixteenth pilot zone: 0, 1, 2, 3, 6, 7, 8, 9, 13, 14, 15, 16, 19, 21, 22, 45.
 
+Swapped onto the pilot server (unit `valhalla-shapes`) on 2026-11-08 23:13 after commits `39e0602` and the merge `8bb8d89` (the Orrery's seams to the Crags and Emberwake arrived on `feat/zone-shapes` while this was built): nobody online, DB backup `zone-shapes-data/backup-before-tanglecrown-20261108.sqlite`, old binary `zone-shapes-target/release/valhalla-server.before-tangle`, no character was saved in zone 22 (`zone_shapes_migrate.py --zones 22` would move 0), served client hashes verified against https://gunning.se/Valhalla/, the running executable `cmp`s with the release build.
+
 ## The shape
 
 At k = 1.0 the atlas outline is grid 304 with 32,708 land tiles (the old square was 144, 20,736 tiles): a wide triangle. Borders: the Ribbonwild on the west (295 tiles, **the seam**), Sunward Vale in the north-west corner (77), the Veyrroot Canopy along the north-east side (246), a 60-tile land edge in the east and a 201-tile coast in the south-east. The painting is a jungle cut by a net of pale trails: a trunk road with a junction, a western branch, an eastern fork.
