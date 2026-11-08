@@ -117,7 +117,8 @@ const GROUND = { 'The Obsidian Reaches': [45, null] };
         const keys = keysFor([-dir[0], -dir[1]]);
         const w0 = await where();
         for (const key of keys) await page.keyboard.down(key);
-        await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
+        try { await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 }); }
+        catch (e) { throw new Error(`seam crossing ${from} -> ${to} at ${k} never changed zone: started ${JSON.stringify(w0)}, now ${JSON.stringify(await where())}, keys ${keys.join('+')}, seam point ${JSON.stringify(origin)}, direction ${JSON.stringify(dir)}`); }
         const seamless = await page.evaluate(() => Field.seamless);       // read at the crossing: the flag lasts 2.5 s and the bounded software renderer is slow
         if (process.env.DEBUG_SEAM) console.log('crossing', from, '->', to, 'start', JSON.stringify(w0), 'keys', keys.join('+'), 'arrived', JSON.stringify(await where()), 'seamless', await page.evaluate(() => Field.seamless), 'shift', shx, shy);
         for (const key of keys) await page.keyboard.up(key);
