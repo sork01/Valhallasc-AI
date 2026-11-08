@@ -1379,16 +1379,25 @@ def unshape(world, cfg):
 def phantom_gate(world, z, design):
     """Run a finished zone's design as if the Wyrdwood border were still a gate. The Crags' and Rimeveil's designs were approved before the
     Wyrdwood was shaped; a gate blocks a disc of scenery and spawns round it, and without that disc every seeded scatter draws different
-    points, so the whole zone would reshuffle. The gate's old record is in world/zone-shapes/late-gates.txt; the real crossing is the seam."""
+    points, so the whole zone would reshuffle. The gate's old record is in world/zone-shapes/late-gates.txt; the real crossing is the seam.
+    A later seam has its own record under the key "<zone>:<other zone>" (the Crags' gate to the Obsidian Orrery, 2026-11-08), kept only while that seam exists."""
     zone = zone_of(world, z)
-    late = json.loads((SIDE / 'late-gates.txt').read_text()).get(str(z)) if 6 in config()['zones'] else None
-    if not late:
+    side = json.loads((SIDE / 'late-gates.txt').read_text())
+    records = []
+    if side.get(str(z)) and 6 in config()['zones']:
+        records.append(('phantom_wyrd_gate', side[str(z)]))
+    for key, rec in side.items():
+        if key.startswith(f'{z}:') and any(p.get('seam') and p['to'] == rec['portal']['to'] for p in zone['portals']):
+            records.append((f"phantom_{rec['portal']['id']}", rec))
+    if not records:
         return design(world, write=True)
-    zone['portals'].append(dict(copy.deepcopy(late['portal']), id='phantom_wyrd_gate'))
+    for pid, rec in records:
+        zone['portals'].append(dict(copy.deepcopy(rec['portal']), id=pid))
     try:
         return design(world, write=True)
     finally:
-        zone['portals'] = [p for p in zone['portals'] if p['id'] != 'phantom_wyrd_gate']
+        gone = {pid for pid, _ in records}
+        zone['portals'] = [p for p in zone['portals'] if p['id'] not in gone]
 
 
 def apply(world, cfg):

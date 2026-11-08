@@ -156,7 +156,7 @@ def roads(G):
 
 class Emberwake(Designer):
     TAG, SEED = 'ember_design_v1', 20261108
-    LATE_SEAMS = {21}       # the Ribbonwild's seam arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate path_45_21 keeps its discs and its road)
+    LATE_SEAMS = {21, 15}   # the Ribbonwild's and the Orrery's seams arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gates path_45_21 and atlas_45_15 keep their discs and their roads)
 
     def __init__(self, world, old):
         self.old = old
@@ -481,8 +481,9 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
-    if any(p.get('seam') and p['to'] == 21 for p in zone['portals']):      # the Ribbonwild's seam (2026-11-08) replaced the east rim gate: only the spawns within 7 tiles of it and the river circles within 17 go
-        d.late_dropped = drop_near_seam(zone, d, 21)
+    late_seams = [t for t in sorted(Emberwake.LATE_SEAMS) if any(p.get('seam') and p['to'] == t for p in zone['portals'])]
+    if late_seams:      # the Ribbonwild's (east) and the Orrery's (north-west) seams (2026-11-08) replaced rim gates: only the spawns within 7 tiles of them and the lava circles within 17 go
+        d.late_dropped = sum(drop_near_seam(zone, d, t) for t in late_seams)
         before = len(objects)
         objects = [o for o in objects if not (o['kind'] == 'ew_lava' and d.lava_dropped(o))]
         d.lava = [o for o in d.lava if not d.lava_dropped(o)]
@@ -571,13 +572,13 @@ def check(zone, d, solid, seen, G):
         if d.reserve[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] - o['r'] < 17:
             problems.append(f"lava within 17 tiles of a seam at {o['x']},{o['y']}")
             break
-    # the Ribbonwild's seam (late): no lava within 17 tiles of it and no art-less object within 20 (a seam neighbour draws neither)
+    # the late seams (the Ribbonwild's, the Orrery's): no lava within 17 tiles of them and no art-less object within 20 (a seam neighbour draws neither)
     at_late = lambda o: d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)]
     if any(at_late(o) - o['r'] < 17 for o in d.lava):
-        problems.append('lava within 17 tiles of the Ribbonwild seam')
+        problems.append('lava within 17 tiles of a late seam')
     near_late = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o['kind'] in ARTLESS and at_late(o) < 20]
     if near_late:
-        problems.append(f'art-less objects within 20 tiles of the Ribbonwild seam: {near_late[:5]}')
+        problems.append(f'art-less objects within 20 tiles of a late seam: {near_late[:5]}')
     # an elite stands clear of everything a player walks to: awareness plus 3 tiles from every road, place and person, and from every hub and gate
     walked = [(q, 'road') for road in d.ROADLIST for q in dense_points(road)]
     walked += [((q['x'], q['y']), f"place {q['id']}") for q in zone['places']] + [((n['x'], n['y']), f"npc {n['id']}") for n in zone['npcs']]

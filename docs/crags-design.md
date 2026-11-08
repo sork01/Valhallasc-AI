@@ -40,3 +40,7 @@ The outline, seams, Skaldholm wall and vault, the four walk gates (Wyrdwood, Bif
 ## Pilot database
 
 `scripts/crags_positions.py --db FILE [--apply]` moves characters who now stand inside scenery to the spawn (service stopped, backup first).
+
+## Update 2026-11-08: the Orrery border is a seam too
+
+`crags_design.LATE_SEAMS = {6, 15}`: `path_1_15` (east, 160 tiles) became a seam portal. `zone_shapes.phantom_gate` re-adds the old gate from `world/zone-shapes/late-gates.txt` (key `1:15`) so the seeded scatter does not move; `late_trim` dropped 14 lava circles (the lava river's east end), 7 spawns and faded the ground classes within 16-30 tiles of the seam. See `docs/orrery-design.md`.

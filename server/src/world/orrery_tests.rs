@@ -11,11 +11,8 @@ const ELITES: [(&str, u32); 3] = [
     ("mainspringwyrm", 53),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); the borders to the Prismwaste and Stormglass became seams on 2026-11-08
-const GATES: [(&str, usize, &str); 3] = [
-    ("path_15_9", 9, "path_9_15"),
-    ("path_15_1", 1, "path_1_15"),
-    ("atlas_15_45", 45, "atlas_45_15"),
-];
+// the Crags' and Emberwake's rim gates became seams (2026-11-08): Nacrehold's is the only walk-in gate left
+const GATES: [(&str, usize, &str); 1] = [("path_15_9", 9, "path_9_15")];
 const HAMLETS: [(&str, &str); 3] = [
     ("bellcourt", "orrery_bc_"),
     ("crownwatch", "orrery_cn_"),
@@ -32,7 +29,7 @@ fn run(w: &mut World, rx: &mut mpsc::Receiver<Value>, ticks: usize) -> Vec<Strin
 }
 
 #[test]
-fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hubs_four_gates_and_three_seams()
+fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hubs_one_gate_and_six_seams()
  {
     let w = world();
     let map = &w.maps[ORRERY];
@@ -126,7 +123,7 @@ fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hu
             .count(),
         9
     );
-    // three gates (the Crags, Nacrehold, Emberwake) and four seams (Astralhollow, the Prismwaste, the Canopy, Stormglass)
+    // one gate (Nacrehold) and six seams (Astralhollow, the Prismwaste, the Canopy, Stormglass, the Crags, Emberwake)
     assert_eq!(map.portals.len(), 7);
     let mut seams: Vec<usize> = map
         .portals
@@ -137,8 +134,8 @@ fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hu
     seams.sort_unstable();
     assert_eq!(
         seams,
-        vec![13, 14, 16, 19],
-        "only Astralhollow, the Prismwaste, the Canopy and Stormglass are seams"
+        vec![1, 13, 14, 16, 19, 45],
+        "only Astralhollow, the Prismwaste, the Canopy, Stormglass, the Crags and Emberwake are seams"
     );
     for (id, to, _) in GATES {
         let g = map.portals.iter().find(|p| p.id == id).expect(id);
@@ -147,7 +144,7 @@ fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hu
 }
 
 #[test]
-fn all_four_gates_are_walked_through_both_ways_and_every_arrival_is_clear_ground() {
+fn the_remaining_gate_is_walked_through_both_ways_and_every_arrival_is_clear_ground() {
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
     for (gate_id, zone, back_id) in GATES {
