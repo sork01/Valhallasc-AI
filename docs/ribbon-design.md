@@ -2,6 +2,8 @@
 
 Owner request: "for pilot. reshape ribbonwild. and remake the zone and quests to fit the new shape. no fillers." Owner answers: seamless against **Emberwake Caldera only** (Sunward Vale, the Tanglecrown and the Thousandfold Pavilion stay gates), **keep both elites and add one with no quest**, **three outposts**. Pilot only (branch `feat/zone-shapes-ribbon`, off `feat/zone-shapes`, worktree `/media/raid/valhallasc-data/zone-ribbon-work`, cargo target `zone-ribbon-target`, wrapper `zone-ribbon-cargo.sh`). The fifteenth pilot zone: 0, 1, 2, 3, 6, 7, 8, 9, 13, 14, 15, 16, 19, 21, 45.
 
+Swapped onto the pilot server (`valhalla-server`'s unit `valhalla-shapes`) on 2026-11-08 19:56 after commits `05d6c51` and `2bba268`: nobody online, DB backup `zone-shapes-data/backup-before-ribbonwild-20261108.sqlite`, old binary `zone-shapes-target/release/valhalla-server.before-ribbon`, no character was saved in zone 21 (`zone_shapes_migrate.py --zones 21` would move 0), served client hashes verified against https://gunning.se/Valhalla/.
+
 ## The shape
 
 At k = 1.0 the atlas outline is grid 368 with 72,902 land tiles (the old square was 136, 18,496 tiles). Borders: Sunward Vale on the north (153 tiles), the Tanglecrown on the east (295), **Emberwake on the west (301, the seam)** and a 365-tile coast on the south. The painting is a pink field with a great golden wheel of roads (a hub, eight spokes, a ring), a swirl in the west, a concentric rosette in the south-west and flower rosettes along the east.
