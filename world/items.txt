@@ -25166,6 +25166,13 @@
     "sell": 1000
   },
   {
+    "id": "horn_prism",
+    "name": "Horn Prism",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1800
+  },
+  {
     "id": "warrior_armor_crimson_l55_gray",
     "name": "Clockworn Crimson Armor",
     "kind": "armor",

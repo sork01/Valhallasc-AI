@@ -55,17 +55,6 @@
     }
   },
   {
-    "id": "mailbox_14_the_last_shade",
-    "zone": 14,
-    "hub": "The Last Shade",
-    "x": 79.5,
-    "y": 119.5,
-    "anchor": {
-      "x": 76.5,
-      "y": 119.5
-    }
-  },
-  {
     "id": "mailbox_16_lamplight_refuge",
     "zone": 16,
     "hub": "Lamplight Refuge",
@@ -602,6 +591,50 @@
     "anchor": {
       "x": 253,
       "y": 131.5
+    }
+  },
+  {
+    "id": "mailbox_14_the_last_shade",
+    "zone": 14,
+    "hub": "The Last Shade",
+    "x": 101.5,
+    "y": 177.5,
+    "anchor": {
+      "x": 98,
+      "y": 177
+    }
+  },
+  {
+    "id": "mailbox_14_mirrorfall",
+    "zone": 14,
+    "hub": "Mirrorfall",
+    "x": 109,
+    "y": 99,
+    "anchor": {
+      "x": 105,
+      "y": 100
+    }
+  },
+  {
+    "id": "mailbox_14_whitesun",
+    "zone": 14,
+    "hub": "Whitesun Post",
+    "x": 152,
+    "y": 71,
+    "anchor": {
+      "x": 149,
+      "y": 73.5
+    }
+  },
+  {
+    "id": "mailbox_14_cairnfoot",
+    "zone": 14,
+    "hub": "Cairnfoot",
+    "x": 196,
+    "y": 165,
+    "anchor": {
+      "x": 197,
+      "y": 165.5
     }
   }
 ]

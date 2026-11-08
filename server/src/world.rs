@@ -123,6 +123,8 @@ mod nornroot_tests;
 #[cfg(test)]
 mod orrery_tests;
 #[cfg(test)]
+mod prism_tests;
+#[cfg(test)]
 mod owner_fixes_tests;
 #[cfg(test)]
 mod pack_recovery_tests;
@@ -803,6 +805,8 @@ impl Slime {
             "epochengine" => (1250000., 12000., 1.9, 2.6),
             // The Mainspring Wyrm (the shapes pilot, no quest): a coil of brass gears round an obsidian spire, a fast serpent between the matron and the engine in strength. First guess.
             "mainspringwyrm" => (600000., 6400., 3.4, 1.9),
+            // The Shatterhorn (the shapes pilot, no quest): a rhinoceros of rose glass among the Sunspire Reaches, a prism for a horn. First guess.
+            "shatterhorn" => (480000., 5200., 3.1, 1.8),
             // Moonspore Canopy: an overgrown moonfall with three distinct group courts.
             "glowcapgrazer" => (145000., 2100., 3.4, 1.45),
             "silkwing" => (150000., 2250., 3.9, 1.35),
@@ -964,6 +968,7 @@ impl Slime {
             "pendulummatron" => 54,
             "epochengine" => 55,
             "mainspringwyrm" => 53,
+            "shatterhorn" => 48,
             "glowcapgrazer" => 55,
             "silkwing" => 56,
             "rootlurker" => 57,
@@ -1114,6 +1119,7 @@ impl Slime {
             "pendulummatron" => 8000,
             "epochengine" => 12000,
             "mainspringwyrm" => 7000,
+            "shatterhorn" => 6000,
             "glowcapgrazer" => 3000,
             "silkwing" => 3250,
             "rootlurker" => 3500,
@@ -1284,6 +1290,8 @@ impl Slime {
             "epochengine" => (1.15, 2.1, 6., 13.),
             // The Wyrm lunges along its coil: a long reach, a fast wind-up.
             "mainspringwyrm" => (0.8, 1.5, 8., 12.),
+            // The Shatterhorn paws the ground and then charges, head down: a short wind-up, a long reach.
+            "shatterhorn" => (0.85, 1.6, 8., 11.),
             "glowcapgrazer" => (0.35, 1.0, 10., 9.),
             "silkwing" => (0.45, 1.2, 11., 10.),
             "rootlurker" => (0.85, 1.7, 6., 8.),
@@ -4701,7 +4709,7 @@ impl World {
                 "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw"
                 | "ashwing" | "hoarhorn" | "whitewail" | "shardback" | "bellowmaw"
                 | "rustmarshal" | "hangedking" | "skoll" | "shardking" | "heimdallr"
-                | "cometmaw" | "eclipsequeen" | "orbitwarden" => 180.,
+                | "cometmaw" | "eclipsequeen" | "orbitwarden" | "shatterhorn" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" | "mainspringwyrm" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
@@ -5341,6 +5349,7 @@ impl World {
                             | "pendulummatron"
                             | "epochengine"
                             | "mainspringwyrm"
+                            | "shatterhorn"
                             | "mireheart"
                             | "silverwidow"
                             | "nightbloom"
@@ -8671,6 +8680,7 @@ mod tests {
             "pendulummatron",
             "epochengine",
             "mainspringwyrm",
+            "shatterhorn",
             "mireheart",
             "silverwidow",
             "nightbloom",

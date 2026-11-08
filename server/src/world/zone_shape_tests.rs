@@ -628,6 +628,11 @@ fn gates_stand_on_free_land(zone: usize, targets: &[u64]) {
 }
 
 fn seam_walks(from_zone: usize, to_zone: usize) {
+    seam_walks_with(from_zone, to_zone, 6., 8);
+}
+
+/// `min_len`: segments shorter than this are skipped; `min_crossed`: how many samples must cross (the Prismwaste-Orrery seam is only 37 tiles long)
+fn seam_walks_with(from_zone: usize, to_zone: usize, min_len: f64, min_crossed: usize) {
     let mut w = world();
     let data = bundled();
     let _rx = join(&mut w, 1, Class::Warrior);
@@ -668,7 +673,7 @@ fn seam_walks(from_zone: usize, to_zone: usize) {
             );
             let (dx, dy) = (pair[1].x - pair[0].x, pair[1].y - pair[0].y);
             let len = dx.hypot(dy);
-            if len < 6. {
+            if len < min_len {
                 continue;
             }
             let normal = at(-dy / len, dx / len);
@@ -708,7 +713,10 @@ fn seam_walks(from_zone: usize, to_zone: usize) {
             let _ = b;
         }
     }
-    assert!(crossed >= 8, "only {crossed} border samples crossed");
+    assert!(
+        crossed >= min_crossed,
+        "only {crossed} border samples crossed"
+    );
     assert!(
         at_wall <= 6,
         "{at_wall} border samples stand at a wall: the wall runs along the seam"
@@ -726,12 +734,12 @@ fn the_orrery_and_the_moonspore_canopy_share_a_seam() {
 }
 
 #[test]
-fn the_orrery_keeps_its_gates_to_the_crags_nacrehold_the_prismwaste_stormglass_and_emberwake() {
-    gates_stand_on_free_land(15, &[1, 9, 14, 19, 45]);
+fn the_orrery_keeps_its_gates_to_the_crags_nacrehold_stormglass_and_emberwake() {
+    gates_stand_on_free_land(15, &[1, 9, 19, 45]);
 }
 
 #[test]
-fn the_orrery_is_seamless_against_astralhollow_and_the_moonspore_canopy_only() {
+fn the_orrery_is_seamless_against_astralhollow_the_prismwaste_and_the_moonspore_canopy_only() {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -742,10 +750,45 @@ fn the_orrery_is_seamless_against_astralhollow_and_the_moonspore_canopy_only() {
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(13, 15), (15, 13), (15, 16), (16, 15)].into();
+    let want: std::collections::BTreeSet<_> =
+        [(13, 15), (15, 13), (14, 15), (15, 14), (15, 16), (16, 15)].into();
     assert_eq!(
         pairs, want,
-        "one seam to Astralhollow and one to the Canopy, seen from both sides"
+        "one seam each to Astralhollow, the Prismwaste and the Canopy, seen from both sides"
+    );
+}
+
+#[test]
+fn astralhollow_and_the_prismwaste_share_a_seam() {
+    seam_walks(13, 14);
+}
+
+#[test]
+fn the_prismwaste_and_the_orrery_share_a_seam() {
+    seam_walks_with(14, 15, 3., 6);
+}
+
+#[test]
+fn the_prismwaste_keeps_its_gates_to_stormglass_and_cairnspine() {
+    gates_stand_on_free_land(14, &[19, 27]);
+}
+
+#[test]
+fn the_prismwaste_is_seamless_against_astralhollow_and_the_orrery_only() {
+    let data = bundled();
+    let mut pairs = std::collections::BTreeSet::new();
+    for zi in 1..=data["zones"].as_array().unwrap().len() {
+        for p in zone_of(&data, zi)["portals"].as_array().unwrap() {
+            let to = p["to"].as_u64().unwrap() as usize;
+            if p.get("seam").is_some() && (zi == 14 || to == 14) {
+                pairs.insert((zi, to));
+            }
+        }
+    }
+    let want: std::collections::BTreeSet<_> = [(13, 14), (14, 13), (14, 15), (15, 14)].into();
+    assert_eq!(
+        pairs, want,
+        "one seam to Astralhollow and one to the Orrery, seen from both sides"
     );
 }
 

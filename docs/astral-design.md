@@ -44,3 +44,7 @@ The impact basin, living starglass groves, crystal spires, the observatory court
 ## Update 2026-11-08: the Orrery border is a seam
 
 The Orrery became a pilot zone with a seam against Astralhollow (`seamWith {13: [15]}`): `path_13_15` is now a seam portal, not a gate (`shifted_state`, the exit routes and the inbound rewrite skip a seam portal), so Astralhollow has three walk-in gates (Nacrehold, the Deep, the Prismwaste) and one seam. Nothing else of this design changed (a map diff shows only the portal, one exit route, the void boxes and the seam road). See `docs/orrery-design.md`.
+
+## Update 2026-11-08: the Prismwaste border is a seam too
+
+`seamWith {13: [15, 14]}`: `astral_prism_gate` is now a seam portal (the Prismwaste design, `docs/prism-design.md`). Astralhollow's design ran unchanged (it had reserved the border); a map diff shows only the portal, one exit route, the void boxes and one new seam road. Astralhollow has two walk-in gates (Nacrehold, the Deep) and two seams (the Prismwaste, the Orrery).

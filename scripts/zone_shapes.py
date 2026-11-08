@@ -1523,6 +1523,9 @@ def apply(world, cfg):
     if 15 in cfg['zones']:      # after Astralhollow: it rewrites the arrivals of its crossings (the Crags', Nacrehold's, the Prismwaste's, Stormglass's and Emberwake's) and fills its seams to Astralhollow and the Moonspore Canopy
         import orrery_design
         print('orrery', orrery_design.design(world, write=True)[1])
+    if 14 in cfg['zones']:      # after Astralhollow and the Orrery: both reserved/left the Prismwaste border (their gates became its seams); it rewrites the arrivals of Stormglass's and Cairnspine's crossings
+        import prism_design
+        print('prismwaste', prism_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

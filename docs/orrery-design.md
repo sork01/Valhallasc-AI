@@ -42,3 +42,7 @@ The starry black plain, the three broken rings of clockwall (now round the Axis,
 - Edge letters of other neighbours over a seam partner's floor (a drawing leak, like the other pilot corners): Nacrehold 7 cells over Astralhollow, the Prismwaste 52 cells over the Orrery's north-east corner, Emberwake 13 over the Canopy, the Crags 2 and Emberwake 31 over the Orrery from the Canopy's side.
 - Older suites that teleport into the Orrery at the old coordinates (`tests/orrery-ui.cjs`, MCP `orrery`) are stale like the other pilot zones'.
 - The minimap and the world map show the plain pilot background.
+
+## Update 2026-11-08: the Prismwaste border is a seam too
+
+`seamWith {15: [13, 16, 14]}`: `orrery_prism_gate` is now a seam portal at the north-east corner (37 tiles). Nothing of the Orrery stood near it, so the design ran unchanged; `design()` now skips a seam portal in its exit routes and inbound rewrite (the same filter Astralhollow has). The Orrery has four rim gates (the Crags, Nacrehold, Stormglass, Emberwake) and three seams (Astralhollow, the Prismwaste, the Canopy). See `docs/prism-design.md`.

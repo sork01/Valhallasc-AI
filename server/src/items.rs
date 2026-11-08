@@ -384,6 +384,7 @@ pub fn material(kind: &str) -> &'static str {
         "pendulummatron" => "matron_pendulum",
         "epochengine" => "epoch_core",
         "mainspringwyrm" => "mainspring_coil",
+        "shatterhorn" => "horn_prism",
         "glowcapgrazer" => "glowcap",
         "silkwing" => "moon_silk",
         "rootlurker" => "root_heart",
@@ -573,6 +574,7 @@ pub fn is_elite(kind: &str) -> bool {
             | "pendulummatron"
             | "epochengine"
             | "mainspringwyrm"
+            | "shatterhorn"
             | "mireheart"
             | "silverwidow"
             | "nightbloom"
