@@ -744028,7 +744028,8 @@
             "travel_breakwater",
             "travel_bellcourt",
             "travel_crownwatch",
-            "travel_shardwatch"
+            "travel_shardwatch",
+            "travel_craterwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -744343,7 +744344,8 @@
           "travelLinks": [
             "travel_stillpoint",
             "travel_bellcourt",
-            "travel_crownwatch"
+            "travel_crownwatch",
+            "travel_craterwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -803529,7 +803531,8 @@
           "travelLinks": [
             "travel_alderhaven",
             "travel_cinderwatch",
-            "travel_stillpoint"
+            "travel_stillpoint",
+            "travel_craterwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -881566,7 +881569,9 @@
             "travel_frostwake",
             "travel_rodstead",
             "travel_fulgur",
-            "travel_bankhold"
+            "travel_bankhold",
+            "travel_chainrest",
+            "travel_door"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -911728,7 +911733,8 @@
           "travelStop": "Jubilee Crossroads",
           "travelLinks": [
             "travel_millbridge",
-            "travel_banyan"
+            "travel_banyan",
+            "travel_door"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1066846,7 +1066852,8 @@
             "travel_door",
             "travel_craterwatch",
             "travel_cinderquay",
-            "travel_glasshold"
+            "travel_glasshold",
+            "travel_breakwater"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1066871,7 +1066878,9 @@
             "travel_chainrest",
             "travel_craterwatch",
             "travel_cinderquay",
-            "travel_glasshold"
+            "travel_glasshold",
+            "travel_jubilee",
+            "travel_breakwater"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1066896,7 +1066905,10 @@
             "travel_chainrest",
             "travel_door",
             "travel_cinderquay",
-            "travel_glasshold"
+            "travel_glasshold",
+            "travel_stillpoint",
+            "travel_lamplight",
+            "travel_shardwatch"
           ],
           "look": {
             "hair": "#e4edf4",

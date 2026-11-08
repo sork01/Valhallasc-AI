@@ -443,6 +443,25 @@ def shifted_state(zone, old, G):
         p['walk'] = list(walk)
 
 
+def link_travel(world):
+    """Add (never strip) the Spark links across every portal into or out of Emberwake, both ways, as compact_atlas.sync_travel_links does."""
+    zones = [world] + world['zones']
+    masters = lambda z: [n for n in z.get('npcs', []) if n.get('travelStop')]
+    for i, z in enumerate(zones):
+        for p in z['portals']:
+            if p['to'] == i or ZONE not in (i, p['to']):
+                continue
+            mine, other = masters(z), masters(zones[p['to']])
+            if not mine or not other:
+                continue
+            a = min(mine, key=lambda n: math.hypot(n['x'] - p['x'], n['y'] - p['y']))
+            b = min(other, key=lambda n: math.hypot(n['x'] - p['tx'], n['y'] - p['ty']))
+            if b['id'] not in a['travelLinks']:
+                a['travelLinks'].append(b['id'])
+            if a['id'] not in b['travelLinks']:
+                b['travelLinks'].append(a['id'])
+
+
 def design(world, write=False):
     zone = world['zones'][ZONE - 1]
     old = json.loads(OLD.read_text())
@@ -469,6 +488,9 @@ def design(world, write=False):
         for p in world['zones'][zi]['portals']:
             if p['to'] == ZONE and p['id'] in arrivals and not p.get('seam'):
                 p['tx'], p['ty'] = round(arrivals[p['id']][0], 2), round(arrivals[p['id']][1], 2)
+    # the five new masters join the Spark network of their neighbours: compact_atlas links the master nearest a portal with the one nearest its arrival, but ran before
+    # the design made them, and a global re-run would rewrite every other pilot zone's links, so only the links across Emberwake's own portals are added
+    link_travel(world)
     if write:
         content.record_mailboxes(zone, content.HAMLETS, ROOT / 'world/mailboxes.txt')
     problems = check(zone, d, solid, seen, G)

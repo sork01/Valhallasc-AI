@@ -156,6 +156,28 @@ fn the_caldera_is_a_big_outdoor_map_with_four_kinds_by_distance_three_elites_fiv
             "a mailbox at {key}"
         );
     }
+    // the Spark network is not an island: a master of the Flats, the Canopy, the Orrery and the Ribbonwild links with one of ours, and back
+    for zone in [15, 16, 19, 21] {
+        let there: Vec<_> = w.maps[zone]
+            .npcs
+            .iter()
+            .filter(|n| n.travel_stop.is_some())
+            .collect();
+        let ours = |id: &str| map.npcs.iter().any(|n| n.id == id && n.travel_stop.is_some());
+        let theirs = |id: &str| there.iter().any(|n| n.id == id);
+        assert!(
+            there
+                .iter()
+                .any(|n| n.travel_links.iter().any(|l| ours(l))),
+            "a master in zone {zone} links to Emberwake"
+        );
+        assert!(
+            map.npcs
+                .iter()
+                .any(|n| n.travel_links.iter().any(|l| theirs(l))),
+            "a master in Emberwake links to zone {zone}"
+        );
+    }
     assert!(map.in_city(map.spawn), "a saved hero is moved to Chainrest");
     let mut free = map.spawn;
     map.collide(&mut free, PLAYER_RADIUS);
