@@ -77,17 +77,6 @@
     }
   },
   {
-    "id": "mailbox_19_breakwater_camp",
-    "zone": 19,
-    "hub": "Breakwater Camp",
-    "x": 45.5,
-    "y": 119.5,
-    "anchor": {
-      "x": 42.5,
-      "y": 119.5
-    }
-  },
-  {
     "id": "mailbox_20_millbridge",
     "zone": 20,
     "hub": "Millbridge",
@@ -635,6 +624,50 @@
     "anchor": {
       "x": 197,
       "y": 165.5
+    }
+  },
+  {
+    "id": "mailbox_19_breakwater_camp",
+    "zone": 19,
+    "hub": "Breakwater Camp",
+    "x": 103.5,
+    "y": 273.5,
+    "anchor": {
+      "x": 100,
+      "y": 273
+    }
+  },
+  {
+    "id": "mailbox_19_rodstead",
+    "zone": 19,
+    "hub": "Rodstead",
+    "x": 103,
+    "y": 153,
+    "anchor": {
+      "x": 99,
+      "y": 154
+    }
+  },
+  {
+    "id": "mailbox_19_fulgur",
+    "zone": 19,
+    "hub": "Fulgur Post",
+    "x": 114,
+    "y": 65,
+    "anchor": {
+      "x": 111,
+      "y": 67.5
+    }
+  },
+  {
+    "id": "mailbox_19_bankhold",
+    "zone": 19,
+    "hub": "Bankhold",
+    "x": 270,
+    "y": 153,
+    "anchor": {
+      "x": 271,
+      "y": 153.5
     }
   }
 ]

@@ -1526,6 +1526,9 @@ def apply(world, cfg):
     if 14 in cfg['zones']:      # after Astralhollow and the Orrery: both reserved/left the Prismwaste border (their gates became its seams); it rewrites the arrivals of Stormglass's and Cairnspine's crossings
         import prism_design
         print('prismwaste', prism_design.design(world, write=True)[1])
+    if 19 in cfg['zones']:      # after the Prismwaste and the Orrery: both left their Stormglass border clear (their gates became its seams); it rewrites the arrivals of Asterion's, Sunward's, Frostwake's and Emberwake's crossings and the Eye's way back
+        import storm_design
+        print('stormglass', storm_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)
@@ -1543,6 +1546,9 @@ def apply(world, cfg):
     import seam_roads
     for line in seam_roads.build(world, [z for z in seam_roads.ROAD_ZONES if z in cfg['zones']]):
         print('seam road', line)
+    if 19 in cfg['zones']:      # the Stormglass Shore is no shore: every text that names it follows (scripts/storm_design.py)
+        import storm_design
+        storm_design.rename(world)
     return shifted
 
 

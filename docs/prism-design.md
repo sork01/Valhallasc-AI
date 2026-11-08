@@ -45,3 +45,7 @@ Standing mirrors, sunspires (the painting's huge crystals become stands of spire
 - `mail_all_authored_hub_mailboxes_...` fails at the Alderhaven hub before it reaches the Prismwaste (same on the previous pilot commit); `the_four_prismwaste_mailboxes_stand_on_free_ground_...` checks the four Prismwaste mailboxes directly.
 - Seam point 15/7 of the browser test was polluted by another player walking through the frame (32% noise); the check passes relative to the noise but proves little at that point (points 13/3, 13/7 and 15/3 are clean).
 - The minimap and the world map show the plain pilot background.
+
+## Update 2026-11-08: the Stormglass border is a seam too
+
+`seamWith {14: [13, 15, 19]}`: `path_14_19` is now a seam portal along the south side. The approved design ran unchanged (`LATE_SEAMS = {19}`); only the 10 spawns within 7 tiles of the seam were dropped (`greenmeadow_design.drop_near_seam`), and `design()` now skips a seam portal in its exit routes and inbound rewrite. The Prismwaste keeps one rim gate (the Cairnspine) and has three seams (Astralhollow, the Orrery, Stormglass). See `docs/storm-design.md`.

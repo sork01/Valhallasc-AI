@@ -46,3 +46,7 @@ The starry black plain, the three broken rings of clockwall (now round the Axis,
 ## Update 2026-11-08: the Prismwaste border is a seam too
 
 `seamWith {15: [13, 16, 14]}`: `orrery_prism_gate` is now a seam portal at the north-east corner (37 tiles). Nothing of the Orrery stood near it, so the design ran unchanged; `design()` now skips a seam portal in its exit routes and inbound rewrite (the same filter Astralhollow has). The Orrery has four rim gates (the Crags, Nacrehold, Stormglass, Emberwake) and three seams (Astralhollow, the Prismwaste, the Canopy). See `docs/prism-design.md`.
+
+## Update 2026-11-08: the Stormglass border is a seam too
+
+`seamWith {15: [13, 16, 14, 19]}`: `path_15_19` is now a seam portal along the east side (250 tiles). The approved design ran unchanged (`LATE_SEAMS = {19}`); only the 5 spawns within 7 tiles of the seam were dropped. The Orrery keeps three rim gates (the Crags, Nacrehold, Emberwake) and has four seams (Astralhollow, the Prismwaste, the Canopy, Stormglass). See `docs/storm-design.md`.

@@ -11,11 +11,8 @@ const KINDS: [&str; 4] = [
     "prismsentinel",
 ];
 const ELITES: [(&str, u32); 3] = [("mirrorqueen", 49), ("sunshard", 50), ("shatterhorn", 48)];
-/// (gate, the zone it leads to, the far gate that leads back); the borders to Astralhollow and the Orrery are seams
-const GATES: [(&str, usize, &str); 2] = [
-    ("path_14_19", 19, "path_19_14"),
-    ("path_14_27", 27, "path_27_14"),
-];
+/// (gate, the zone it leads to, the far gate that leads back); the borders to Astralhollow, the Orrery and Stormglass are seams
+const GATES: [(&str, usize, &str); 1] = [("path_14_27", 27, "path_27_14")];
 const HAMLETS: [(&str, &str); 3] = [
     ("mirrorfall", "prism_mf_"),
     ("whitesun", "prism_ws_"),
@@ -123,7 +120,7 @@ fn the_prismwaste_is_a_big_waste_with_four_families_by_distance_three_elites_fou
             .count(),
         10
     );
-    // two gates (Stormglass, Cairnspine) and two seams (Astralhollow, the Orrery)
+    // one gate (Cairnspine) and three seams (Astralhollow, the Orrery, Stormglass)
     assert_eq!(map.portals.len(), 4);
     let mut seams: Vec<usize> = map
         .portals
@@ -134,8 +131,8 @@ fn the_prismwaste_is_a_big_waste_with_four_families_by_distance_three_elites_fou
     seams.sort_unstable();
     assert_eq!(
         seams,
-        vec![13, 15],
-        "only Astralhollow and the Orrery are seams"
+        vec![13, 15, 19],
+        "only Astralhollow, the Orrery and Stormglass are seams"
     );
     for (id, to, _) in GATES {
         let g = map.portals.iter().find(|p| p.id == id).expect(id);

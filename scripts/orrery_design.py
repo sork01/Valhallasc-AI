@@ -33,7 +33,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import orrery_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-15.txt'
 
@@ -187,7 +187,7 @@ def roads(G):
 
 class Orrery(Designer):
     TAG, SEED = 'orrery_design_v1', 20261108
-    LATE_SEAMS = set()
+    LATE_SEAMS = {19}       # Stormglass's seam arrived after this design was approved: the masks stay as they were
 
     def __init__(self, world, old):
         self.old = old
@@ -427,6 +427,8 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    if any(p.get('seam') and p['to'] == 19 for p in zone['portals']):      # Stormglass's seam (2026-11-08) replaced the east rim gate: only the spawns within 7 tiles of it go
+        d.late_dropped = drop_near_seam(zone, d, 19)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []

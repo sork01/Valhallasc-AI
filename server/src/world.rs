@@ -123,8 +123,6 @@ mod nornroot_tests;
 #[cfg(test)]
 mod orrery_tests;
 #[cfg(test)]
-mod prism_tests;
-#[cfg(test)]
 mod owner_fixes_tests;
 #[cfg(test)]
 mod pack_recovery_tests;
@@ -132,6 +130,8 @@ mod packs;
 mod partyxp;
 #[cfg(test)]
 mod perks_tests;
+#[cfg(test)]
+mod prism_tests;
 mod pursuit;
 mod pvp;
 mod quest_journal;
@@ -829,6 +829,10 @@ impl Slime {
             "glassray" => (205000., 3300., 3.5, 1.5),
             "breakersentinel" => (270000., 3900., 2.0, 1.9),
             "maelstromheart" => (2100000., 17000., 2.0, 2.7),
+            // The Lamphouse Hermit (the shapes pilot, quest): a crab as big as a barn in a wrecked lamphouse, among the Salt Pans. First guess.
+            "lamphermit" => (1150000., 11800., 2.3, 2.1),
+            // The Stormtusk (the shapes pilot, no quest): a stranded narwhal of black glass whose tusk draws the lightning, below the Low Shards. First guess.
+            "stormtusk" => (980000., 10600., 3.4, 1.9),
             // Sunward Vale: four unmistakable animals, a hive bear and a wicker giant.
             "meadowhare" => (225000., 3400., 4.2, 1.45),
             "sunbacksnail" => (280000., 3600., 1.3, 1.35),
@@ -983,6 +987,8 @@ impl Slime {
             "glassray" => 62,
             "breakersentinel" => 64,
             "maelstromheart" => 65,
+            "lamphermit" => 63,
+            "stormtusk" => 62,
             "meadowhare" => 65,
             "sunbacksnail" => 66,
             "brushfox" => 67,
@@ -1139,6 +1145,8 @@ impl Slime {
             "glassray" => 4600,
             "breakersentinel" => 5200,
             "maelstromheart" => 26000,
+            "lamphermit" => 14000,
+            "stormtusk" => 12500,
             "meadowhare" => 4900,
             "sunbacksnail" => 5200,
             "brushfox" => 5650,
@@ -1311,6 +1319,10 @@ impl Slime {
             "glassray" => (0.55, 1.4, 9.5, 10.),
             "breakersentinel" => (0.85, 1.7, 6.5, 9.),
             "maelstromheart" => (1.1, 2.1, 6., 15.),
+            // The Lamphouse Hermit rears and slams its claw: a long wind-up, a wide reach.
+            "lamphermit" => (0.95, 1.8, 6., 12.),
+            // The Stormtusk lowers its head and lunges along the tusk: a short wind-up, a long reach.
+            "stormtusk" => (0.8, 1.5, 9., 12.),
             "meadowhare" => (0.38, 1.15, 11., 9.),
             "sunbacksnail" => (0.7, 1.35, 5., 10.),
             "brushfox" => (0.55, 1.3, 9., 10.),
@@ -4709,7 +4721,8 @@ impl World {
                 "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw"
                 | "ashwing" | "hoarhorn" | "whitewail" | "shardback" | "bellowmaw"
                 | "rustmarshal" | "hangedking" | "skoll" | "shardking" | "heimdallr"
-                | "cometmaw" | "eclipsequeen" | "orbitwarden" | "shatterhorn" => 180.,
+                | "cometmaw" | "eclipsequeen" | "orbitwarden" | "shatterhorn" | "lamphermit"
+                | "stormtusk" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" | "mainspringwyrm" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
@@ -5350,6 +5363,8 @@ impl World {
                             | "epochengine"
                             | "mainspringwyrm"
                             | "shatterhorn"
+                            | "lamphermit"
+                            | "stormtusk"
                             | "mireheart"
                             | "silverwidow"
                             | "nightbloom"
@@ -8681,6 +8696,8 @@ mod tests {
             "epochengine",
             "mainspringwyrm",
             "shatterhorn",
+            "lamphermit",
+            "stormtusk",
             "mireheart",
             "silverwidow",
             "nightbloom",

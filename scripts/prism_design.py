@@ -34,7 +34,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import prism_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-14.txt'
 
@@ -175,7 +175,7 @@ def roads(G):
 
 class Prismwaste(Designer):
     TAG, SEED = 'prism_design_v1', 20261114
-    LATE_SEAMS = set()
+    LATE_SEAMS = {19}       # Stormglass's seam arrived after this design was approved: the masks stay as they were
 
     def __init__(self, world, old):
         self.old = old
@@ -430,16 +430,21 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    if any(p.get('seam') and p['to'] == 19 for p in zone['portals']):      # Stormglass's seam (2026-11-08) replaced the south gate: only the spawns within 7 tiles of it go
+        d.late_dropped = drop_near_seam(zone, d, 19)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
-    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items()]
+    seamed = {p['id'] for p in zone['portals'] if p.get('seam')}      # Stormglass's seam replaced the south rim gate: its line is the border, not a gate
+    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(zone, content.HAMLETS)
     # every crossing that arrives here follows the new frame: Stormglass's and Cairnspine's (the seams carry their own shift)
     inbound = {'path_14_19': ('path_19_14', 19), 'path_14_27': ('path_27_14', 27)}
     for mine, (theirs, zi) in inbound.items():
+        if mine in seamed:          # a seam arrives where it was crossed (the neighbour's portal carries the shift)
+            continue
         for p in world['zones'][zi - 1]['portals']:
             if p['id'] == theirs:
                 p['tx'], p['ty'] = round(G[mine][3][0], 2), round(G[mine][3][1], 2)

@@ -10,11 +10,10 @@ const ELITES: [(&str, u32); 3] = [
     ("epochengine", 55),
     ("mainspringwyrm", 53),
 ];
-/// (gate, the zone it leads to, the far gate that leads back); the border to the Prismwaste became a seam on 2026-11-08
-const GATES: [(&str, usize, &str); 4] = [
+/// (gate, the zone it leads to, the far gate that leads back); the borders to the Prismwaste and Stormglass became seams on 2026-11-08
+const GATES: [(&str, usize, &str); 3] = [
     ("path_15_9", 9, "path_9_15"),
     ("path_15_1", 1, "path_1_15"),
-    ("path_15_19", 19, "path_19_15"),
     ("atlas_15_45", 45, "atlas_45_15"),
 ];
 const HAMLETS: [(&str, &str); 3] = [
@@ -127,7 +126,7 @@ fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hu
             .count(),
         9
     );
-    // four gates (the Crags, Nacrehold, Stormglass, Emberwake) and three seams (Astralhollow, the Prismwaste, the Canopy)
+    // three gates (the Crags, Nacrehold, Emberwake) and four seams (Astralhollow, the Prismwaste, the Canopy, Stormglass)
     assert_eq!(map.portals.len(), 7);
     let mut seams: Vec<usize> = map
         .portals
@@ -138,8 +137,8 @@ fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hu
     seams.sort_unstable();
     assert_eq!(
         seams,
-        vec![13, 14, 16],
-        "only Astralhollow, the Prismwaste and the Canopy are seams"
+        vec![13, 14, 16, 19],
+        "only Astralhollow, the Prismwaste, the Canopy and Stormglass are seams"
     );
     for (id, to, _) in GATES {
         let g = map.portals.iter().find(|p| p.id == id).expect(id);

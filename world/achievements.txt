@@ -278,8 +278,8 @@
   },
   {
     "id": "explore_19",
-    "name": "Explore The Stormglass Shore",
-    "description": "Uncover all 9 map cells in The Stormglass Shore.",
+    "name": "Explore The Stormglass Flats",
+    "description": "Uncover all 9 map cells in The Stormglass Flats.",
     "category": "Exploration",
     "metric": "fog",
     "target": 9,

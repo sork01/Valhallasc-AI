@@ -385,6 +385,8 @@ pub fn material(kind: &str) -> &'static str {
         "epochengine" => "epoch_core",
         "mainspringwyrm" => "mainspring_coil",
         "shatterhorn" => "horn_prism",
+        "lamphermit" => "hermit_lens",
+        "stormtusk" => "tusk_storm",
         "glowcapgrazer" => "glowcap",
         "silkwing" => "moon_silk",
         "rootlurker" => "root_heart",
@@ -575,6 +577,8 @@ pub fn is_elite(kind: &str) -> bool {
             | "epochengine"
             | "mainspringwyrm"
             | "shatterhorn"
+            | "lamphermit"
+            | "stormtusk"
             | "mireheart"
             | "silverwidow"
             | "nightbloom"

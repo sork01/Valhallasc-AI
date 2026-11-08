@@ -4,7 +4,7 @@
   function stroke(g,pts,color,width){g.strokeStyle=color;g.lineWidth=width;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();}
   function floor(g,z,w2s,hero){
     g.save();g.lineCap='round';g.lineJoin='round';
-    for(const r of z.exitRoutes||[]){const p=z.portals.find(p=>p.id===r.portal);if(!p||p.vault||Math.hypot(p.x-hero.x,p.y-hero.y)>32)continue;
+    for(const r of z.exitRoutes||[]){const p=z.portals.find(p=>p.id===r.portal);if(!p||p.vault||!p.walk||Math.hypot(p.x-hero.x,p.y-hero.y)>32)continue;      // a gate in the open (Asterion's, on the compass rose) has no side to mark
       const points=r.points.map(([x,y])=>w2s(x,y));
       stroke(g,points,'#302e35',42);stroke(g,points,z.sky?'#f1dfb9':'#d8c395',34);stroke(g,points,'#a28d69',2);
       const [x,y]=w2s(p.x,p.y),[a,b]=w2s(p.x-p.walk[0],p.y-p.walk[1]),len=Math.hypot(x-a,y-b)||1,ux=(x-a)/len,uy=(y-b)/len;

@@ -25173,6 +25173,20 @@
     "sell": 1800
   },
   {
+    "id": "hermit_lens",
+    "name": "Hermit Lens",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2600
+  },
+  {
+    "id": "tusk_storm",
+    "name": "Storm Tusk",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
     "id": "warrior_armor_crimson_l55_gray",
     "name": "Clockworn Crimson Armor",
     "kind": "armor",

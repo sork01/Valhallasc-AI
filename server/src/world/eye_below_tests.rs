@@ -6,7 +6,13 @@ const SHORE: usize = 19;
 const EYE: usize = 29;
 
 fn enter(w: &mut World, session: u64) {
-    place(w, session, SHORE, at(105., 27.));
+    let eye = w.maps[SHORE]
+        .portals
+        .iter()
+        .find(|p| p.id == "stormglass_eye_descent")
+        .expect("the descent")
+        .clone();
+    place(w, session, SHORE, at(eye.x, eye.y));
     w.time += 1.;
     w.use_portal(session);
 }

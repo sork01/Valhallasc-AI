@@ -13,12 +13,13 @@
     13,
     14,
     15,
-    16
+    16,
+    19
   ],
   "gateOnly": [
     7
   ],
-  "note": "Owner-approved 2026-11-05: ONE scale for every zone, k = 1.0 tiles per atlas px (was 0.56116, the median, with a per-zone area floor that gave Gloamfen 0.675 and made seams between zones of different scale impossible). Pilot: zones 0, 1, 2 (Rimeveil), 3 (Gloamfen) and 16 (Moonspore Canopy). wallAxis: the Skaldholm wall of zones 0, 1 and 3 follows the city's own straight wall (copied piece by piece) and turns its real corner (owner, 2026-11-05: the walls must be straight); the land between it and the old leaning border fills in. wallFit: the wall meets its run ends, the city corner on the Rimeveil junctions, so no seam runs through a wall or vault. cityRebuild: Skaldholm (zone 4) is made in the middle of the four neighbours' walls (scripts/skaldholm_rebuild.py, docs/skaldholm-rebuild.md). wallFit 0 (Skaldholm rebuild, owner 2026-11-06): Greenmeadow's vault stands at atlas x 411.5, on the Grand Avenue's axis, with the wall line kept at y 122.5. Rán's Deep (zone 8, owner 2026-11-07: reshape it, remake the zone and quests to fit, no filler, keep the portals): designOnly (outline floor, no filler, the design places its own gates) and seamWith {8: [9]} = the Deep may only ever be seamless with Nacrehold, which comes after Nacrehold is reshaped. Nacrehold (zone 9, owner 2026-11-07: reshape it, remake the zone and quests to fit, no fillers, keep the portals, the only seam is against Rán's Deep): designOnly + rebuild (the old 176-tile city cannot sit inside the outline, so the design rebuilds it from preshape-09.txt) and seamWith {9: [8]}: the Crags, Bifrost, Astralhollow and Orrery crossings stay portals. Astralhollow (zone 13, owner 2026-11-07: reshape it, remake the zone and quests to fit, no fillers): designOnly with seamWith {13: []}, so every crossing (Deep, Nacrehold, Prismwaste, Orrery) stays a portal; its design (scripts/astral_design.py) keeps the Prismwaste and Orrery borders free of anything a later seam could not draw. The Obsidian Orrery (zone 15, owner 2026-11-08: reshape it, remake the zone and quests to fit, no fillers): designOnly, and the ONLY seams are Astralhollow (13) and the Moonspore Canopy (16); the Crags, Nacrehold, the Prismwaste, Stormglass and Emberwake stay rim gates. Astralhollow's approved design ran unchanged with a phantom south gate and its Orrery gate became the seam (astral_design.shifted_state skips a seam portal). The Prismwaste (zone 14, owner 2026-11-08: reshape it, remake the zone and quests to fit, no fillers): designOnly, and the ONLY seams are Astralhollow (13, its whole west side) and the Obsidian Orrery (15, the short south-west corner); Stormglass and Cairnspine stay rim gates. Astralhollow's and the Orrery's approved designs ran unchanged (Astralhollow had reserved the Prismwaste border; the Orrery has nothing near it): only their Prismwaste gates became the seam portals.",
+  "note": "Owner-approved 2026-11-05: ONE scale for every zone, k = 1.0 tiles per atlas px (was 0.56116, the median, with a per-zone area floor that gave Gloamfen 0.675 and made seams between zones of different scale impossible). Pilot: zones 0, 1, 2 (Rimeveil), 3 (Gloamfen) and 16 (Moonspore Canopy). wallAxis: the Skaldholm wall of zones 0, 1 and 3 follows the city's own straight wall (copied piece by piece) and turns its real corner (owner, 2026-11-05: the walls must be straight); the land between it and the old leaning border fills in. wallFit: the wall meets its run ends, the city corner on the Rimeveil junctions, so no seam runs through a wall or vault. cityRebuild: Skaldholm (zone 4) is made in the middle of the four neighbours' walls (scripts/skaldholm_rebuild.py, docs/skaldholm-rebuild.md). wallFit 0 (Skaldholm rebuild, owner 2026-11-06): Greenmeadow's vault stands at atlas x 411.5, on the Grand Avenue's axis, with the wall line kept at y 122.5. Rán's Deep (zone 8, owner 2026-11-07: reshape it, remake the zone and quests to fit, no filler, keep the portals): designOnly (outline floor, no filler, the design places its own gates) and seamWith {8: [9]} = the Deep may only ever be seamless with Nacrehold, which comes after Nacrehold is reshaped. Nacrehold (zone 9, owner 2026-11-07: reshape it, remake the zone and quests to fit, no fillers, keep the portals, the only seam is against Rán's Deep): designOnly + rebuild (the old 176-tile city cannot sit inside the outline, so the design rebuilds it from preshape-09.txt) and seamWith {9: [8]}: the Crags, Bifrost, Astralhollow and Orrery crossings stay portals. Astralhollow (zone 13, owner 2026-11-07: reshape it, remake the zone and quests to fit, no fillers): designOnly with seamWith {13: []}, so every crossing (Deep, Nacrehold, Prismwaste, Orrery) stays a portal; its design (scripts/astral_design.py) keeps the Prismwaste and Orrery borders free of anything a later seam could not draw. The Obsidian Orrery (zone 15, owner 2026-11-08: reshape it, remake the zone and quests to fit, no fillers): designOnly, and the ONLY seams are Astralhollow (13) and the Moonspore Canopy (16); the Crags, Nacrehold, the Prismwaste, Stormglass and Emberwake stay rim gates. Astralhollow's approved design ran unchanged with a phantom south gate and its Orrery gate became the seam (astral_design.shifted_state skips a seam portal). The Prismwaste (zone 14, owner 2026-11-08: reshape it, remake the zone and quests to fit, no fillers): designOnly, and the ONLY seams are Astralhollow (13, its whole west side) and the Obsidian Orrery (15, the short south-west corner); Stormglass and Cairnspine stay rim gates. Astralhollow's and the Orrery's approved designs ran unchanged (Astralhollow had reserved the Prismwaste border; the Orrery has nothing near it): only their Prismwaste gates became the seam portals. The Stormglass Flats (zone 19, formerly The Stormglass Shore, owner 2026-11-08: reshape it, rename it (it is no shore), remake the zone and quests to fit, no fillers): designOnly, and the ONLY seams are the Prismwaste (14, its north side) and the Obsidian Orrery (15, its west side); Sunward Vale, Frostwake and Emberwake stay rim gates, Asterion's gate stands on the painted compass rose. The Prismwaste's and the Orrery's approved designs ran unchanged: only their Stormglass gates became the seam portals and the few spawns within 7 tiles of the seam went.",
   "landmarks": [
     4
   ],
@@ -52,7 +53,8 @@
     9,
     13,
     14,
-    15
+    15,
+    19
   ],
   "seamWith": {
     "8": [
@@ -67,12 +69,18 @@
     ],
     "14": [
       13,
-      15
+      15,
+      19
     ],
     "15": [
       13,
       16,
-      14
+      14,
+      19
+    ],
+    "19": [
+      14,
+      15
     ]
   },
   "rebuild": [

@@ -995,7 +995,7 @@
     },
     {
       "zone": 19,
-      "name": "The Stormglass Shore",
+      "name": "The Stormglass Flats",
       "seed": [
         1195,
         440

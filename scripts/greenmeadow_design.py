@@ -630,6 +630,20 @@ def late_trim(zone, d):
     return gone
 
 
+def drop_near_seam(zone, d, to, dist=7.0):
+    """A seam that arrived after this zone's design was approved (Stormglass's, 2026-11-08): drop only the zone's own spawns within `dist` tiles of the seam
+    to zone `to` (the other side draws no scenery that close and a hero must not wake a pack while crossing). Nothing else moves, so the seeded scatter of
+    the approved design is untouched. Returns how many went."""
+    late = np.full((d.n, d.n), 1e9)
+    for p in zone['portals']:
+        if p.get('seam') and p['to'] == to:
+            late = np.minimum(late, seg_field(p['seam']['points'], d.xs, d.ys))
+    keep = [t for t in zone['slimes'] if t.get('layout') != d.TAG or late[min(max(int(t['y']), 0), d.n - 1), min(max(int(t['x']), 0), d.n - 1)] > dist]
+    gone = len(zone['slimes']) - len(keep)
+    zone['slimes'] = keep
+    return gone
+
+
 def design(world, write=False):
     d = Designer(world)
     objects = d.build()
