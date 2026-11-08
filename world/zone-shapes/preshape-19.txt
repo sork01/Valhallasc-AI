@@ -4406,7 +4406,7 @@
    "id": "es_15",
    "title": "The Sea Cannot Swallow This Fire",
    "npc": "stormglass_scholar",
-   "description": "Orrin found salt boiling on a cold shore. Hold the cooling circle for twenty seconds against escaped furnace sparks. The sea is not putting out Eldmarr's fire; his heat is travelling through the world's roots beneath it.",
+   "description": "Orrin found salt boiling on the dry sea bed. Hold the cooling circle for twenty seconds against escaped furnace sparks. The sea that might have put out Eldmarr's fire is gone; his heat is travelling through the world's roots beneath the flats.",
    "objectives": [
     {
      "kind": "hold",
