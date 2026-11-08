@@ -367,7 +367,7 @@ class Orrery(Designer):
         for name, kinds in SPAWNS.items():
             pool = [k for k, c in kinds.items() for _ in range(c)]
             rng.shuffle(pool)
-            pts = np.argwhere(self.mask(name) & self.inner & self.reach & ~keep & (self.road > 3.5) & (self.reserve > 7))
+            pts = np.argwhere(self.mask(name) & self.inner & self.reach & ~keep & (self.road > 4.4) & (self.reserve > 7))      # a spawn is placed up to a cell off the cell's centre: 4.4 keeps it 3.4+ tiles from every road (tests/seam-roads.py)
             if not len(pts):
                 self.short[name] = len(pool)
                 continue

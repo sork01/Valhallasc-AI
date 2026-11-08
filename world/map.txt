@@ -702282,116 +702282,110 @@
       ],
       "slimes": [
         {
-          "x": 116.04,
-          "y": 296.0,
+          "x": 147.04,
+          "y": 299.0,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 174.05,
-          "y": 297.06,
+          "x": 207.05,
+          "y": 300.06,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 156.63,
-          "y": 308.58,
+          "x": 143.63,
+          "y": 320.58,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 114.1,
-          "y": 278.36,
+          "x": 219.1,
+          "y": 286.36,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 134.08,
-          "y": 265.34,
+          "x": 154.46,
+          "y": 280.18,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 110.64,
-          "y": 247.2,
+          "x": 182.76,
+          "y": 309.07,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 163.75,
-          "y": 278.47,
+          "x": 185.83,
+          "y": 291.41,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 202.71,
-          "y": 304.5,
+          "x": 154.71,
+          "y": 327.32,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 174.63,
-          "y": 267.98,
+          "x": 119.71,
+          "y": 315.5,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 146.89,
-          "y": 303.45,
+          "x": 156.77,
+          "y": 306.65,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 112.7,
-          "y": 332.98,
+          "x": 148.63,
+          "y": 269.98,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 186.95,
-          "y": 288.02,
+          "x": 105.17,
+          "y": 332.04,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 210.64,
-          "y": 277.98,
+          "x": 134.52,
+          "y": 277.9,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 175.94,
-          "y": 255.82,
+          "x": 207.64,
+          "y": 286.98,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 160.2,
-          "y": 265.44,
+          "x": 170.61,
+          "y": 261.9,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 139.37,
-          "y": 316.58,
+          "x": 133.74,
+          "y": 303.03,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 189.74,
-          "y": 299.03,
+          "x": 121.07,
+          "y": 256.83,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 155.33,
-          "y": 324.86,
-          "kind": "bronzemantis",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 208.49,
-          "y": 293.95,
+          "x": 195.6,
+          "y": 306.41,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
@@ -702402,1898 +702396,1904 @@
           "layout": "orrery_design_v1"
         },
         {
-          "x": 187.56,
-          "y": 273.11,
+          "x": 223.44,
+          "y": 273.66,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 116.6,
-          "y": 265.28,
+          "x": 169.09,
+          "y": 305.5,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 155.57,
-          "y": 290.53,
+          "x": 186.1,
+          "y": 253.83,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 191.96,
-          "y": 251.31,
+          "x": 157.57,
+          "y": 293.53,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 127.14,
-          "y": 318.86,
+          "x": 184.14,
+          "y": 241.89,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 145.47,
-          "y": 245.77,
+          "x": 167.14,
+          "y": 325.86,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 133.15,
-          "y": 304.41,
+          "x": 111.84,
+          "y": 293.07,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 181.92,
-          "y": 238.91,
+          "x": 116.44,
+          "y": 239.18,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 186.34,
-          "y": 261.18,
+          "x": 131.52,
+          "y": 324.3,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 140.26,
-          "y": 294.54,
+          "x": 122.77,
+          "y": 301.5,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 134.32,
-          "y": 332.26,
+          "x": 121.3,
+          "y": 273.56,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 124.4,
-          "y": 256.93,
+          "x": 138.13,
+          "y": 289.53,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 132.87,
-          "y": 248.38,
+          "x": 174.9,
+          "y": 288.38,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 198.2,
-          "y": 287.73,
+          "x": 160.09,
+          "y": 267.04,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 148.64,
-          "y": 261.96,
+          "x": 124.81,
+          "y": 289.32,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 123.13,
-          "y": 329.45,
+          "x": 155.45,
+          "y": 249.79,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 119.13,
-          "y": 306.95,
+          "x": 136.87,
+          "y": 249.38,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 122.49,
-          "y": 242.53,
+          "x": 133.55,
+          "y": 266.12,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 127.84,
-          "y": 293.17,
+          "x": 110.17,
+          "y": 305.65,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 107.25,
-          "y": 289.34,
+          "x": 187.17,
+          "y": 265.22,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 156.96,
-          "y": 250.7,
+          "x": 142.19,
+          "y": 332.43,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 98.96,
-          "y": 249.15,
+          "x": 111.63,
+          "y": 267.77,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 164.33,
-          "y": 331.23,
+          "x": 211.12,
+          "y": 276.54,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 134.2,
-          "y": 279.92,
+          "x": 105.43,
+          "y": 239.1,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 175.51,
-          "y": 279.81,
+          "x": 178.89,
+          "y": 298.85,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 170.7,
-          "y": 307.55,
+          "x": 159.81,
+          "y": 318.51,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 49.61,
-          "y": 280.41,
+          "x": 123.61,
+          "y": 247.05,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 55.73,
-          "y": 144.29,
+          "x": 29.04,
+          "y": 155.15,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 69.98,
-          "y": 269.73,
+          "x": 53.67,
+          "y": 197.78,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 55.83,
-          "y": 200.85,
+          "x": 58.24,
+          "y": 262.8,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 47.25,
-          "y": 215.55,
+          "x": 22.45,
+          "y": 206.26,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 77.82,
-          "y": 166.23,
+          "x": 41.86,
+          "y": 209.85,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 39.44,
-          "y": 182.74,
+          "x": 45.38,
+          "y": 268.79,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 50.92,
-          "y": 157.44,
+          "x": 26.27,
+          "y": 231.28,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 26.22,
-          "y": 171.4,
+          "x": 76.11,
+          "y": 166.47,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 48.22,
-          "y": 172.33,
+          "x": 59.26,
+          "y": 173.4,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 24.13,
-          "y": 185.9,
+          "x": 19.23,
+          "y": 181.78,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 54.43,
-          "y": 186.94,
+          "x": 56.49,
+          "y": 154.55,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 42.11,
-          "y": 133.24,
+          "x": 49.53,
+          "y": 281.44,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 42.46,
-          "y": 146.87,
+          "x": 55.3,
+          "y": 250.44,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 41.17,
-          "y": 230.07,
+          "x": 45.01,
+          "y": 241.06,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 27.14,
-          "y": 239.78,
+          "x": 48.04,
+          "y": 168.06,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 34.28,
-          "y": 293.91,
+          "x": 24.43,
+          "y": 220.1,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 43.52,
-          "y": 254.44,
+          "x": 39.55,
+          "y": 259.46,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 36.17,
-          "y": 219.86,
+          "x": 65.27,
+          "y": 163.89,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 45.71,
-          "y": 194.11,
+          "x": 36.1,
+          "y": 139.27,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 80.43,
-          "y": 215.49,
+          "x": 49.87,
+          "y": 139.43,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 68.84,
-          "y": 243.3,
+          "x": 78.71,
+          "y": 267.96,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 66.46,
-          "y": 255.39,
+          "x": 67.92,
+          "y": 217.87,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 65.21,
-          "y": 192.13,
+          "x": 97.59,
+          "y": 197.56,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 75.47,
-          "y": 207.41,
+          "x": 68.45,
+          "y": 244.44,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 79.33,
-          "y": 267.02,
+          "x": 106.89,
+          "y": 225.4,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 51.32,
-          "y": 231.13,
+          "x": 71.34,
+          "y": 234.42,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 58.56,
-          "y": 221.02,
+          "x": 112.62,
+          "y": 200.29,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 243.89,
-          "y": 229.82,
+          "x": 88.94,
+          "y": 210.01,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 284.98,
-          "y": 252.03,
+          "x": 228.53,
+          "y": 257.75,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 210.0,
-          "y": 252.45,
+          "x": 268.5,
+          "y": 243.91,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 266.58,
-          "y": 228.06,
+          "x": 281.95,
+          "y": 251.46,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 281.68,
-          "y": 264.74,
+          "x": 250.77,
+          "y": 274.11,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 269.73,
-          "y": 261.86,
+          "x": 263.31,
+          "y": 267.63,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 197.13,
-          "y": 266.34,
+          "x": 225.77,
+          "y": 229.87,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 240.03,
-          "y": 244.61,
+          "x": 230.08,
+          "y": 240.81,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 250.05,
-          "y": 220.04,
+          "x": 241.34,
+          "y": 242.97,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 287.91,
-          "y": 239.65,
+          "x": 241.27,
+          "y": 267.12,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 254.84,
-          "y": 230.9,
+          "x": 203.88,
+          "y": 263.46,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 276.01,
-          "y": 234.75,
+          "x": 285.19,
+          "y": 216.78,
           "kind": "bronzemantis",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 146.46,
-          "y": 273.62,
+          "x": 238.75,
+          "y": 252.85,
+          "kind": "bronzemantis",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 183.46,
+          "y": 275.62,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 167.71,
-          "y": 319.32,
+          "x": 107.64,
+          "y": 248.2,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 227.54,
-          "y": 271.89,
+          "x": 116.94,
+          "y": 328.36,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 182.81,
-          "y": 314.94,
+          "x": 175.63,
+          "y": 318.23,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 220.57,
-          "y": 284.47,
+          "x": 169.2,
+          "y": 278.84,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 147.69,
-          "y": 332.84,
+          "x": 197.66,
+          "y": 293.61,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 25.53,
-          "y": 213.85,
+          "x": 41.51,
+          "y": 230.38,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 55.83,
-          "y": 258.42,
+          "x": 42.44,
+          "y": 149.41,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 36.36,
-          "y": 157.69,
+          "x": 55.71,
+          "y": 186.31,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 32.21,
-          "y": 282.31,
+          "x": 30.42,
+          "y": 175.71,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 38.25,
-          "y": 264.33,
+          "x": 53.09,
+          "y": 215.92,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 51.22,
-          "y": 242.75,
+          "x": 36.19,
+          "y": 164.23,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 39.43,
-          "y": 203.32,
+          "x": 40.86,
+          "y": 127.35,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 62.61,
-          "y": 160.72,
+          "x": 42.06,
+          "y": 188.4,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 26.94,
-          "y": 228.52,
+          "x": 67.35,
+          "y": 272.83,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 59.14,
-          "y": 271.78,
+          "x": 37.43,
+          "y": 288.76,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 58.79,
-          "y": 176.45,
+          "x": 27.76,
+          "y": 195.43,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 21.36,
-          "y": 200.56,
+          "x": 24.26,
+          "y": 165.29,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 73.68,
-          "y": 182.51,
+          "x": 95.8,
+          "y": 186.58,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 90.7,
-          "y": 205.94,
+          "x": 105.38,
+          "y": 208.58,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 101.06,
-          "y": 214.84,
+          "x": 82.65,
+          "y": 232.78,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 75.58,
-          "y": 197.6,
+          "x": 96.5,
+          "y": 215.58,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 86.79,
-          "y": 192.49,
+          "x": 70.42,
+          "y": 204.94,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 104.93,
-          "y": 233.45,
+          "x": 80.72,
+          "y": 215.6,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 109.46,
-          "y": 205.81,
+          "x": 76.11,
+          "y": 256.13,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 90.25,
-          "y": 230.23,
+          "x": 74.88,
+          "y": 178.81,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 79.85,
-          "y": 255.63,
+          "x": 75.49,
+          "y": 194.48,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 93.37,
-          "y": 183.43,
+          "x": 88.87,
+          "y": 171.49,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 65.34,
-          "y": 213.97,
+          "x": 120.14,
+          "y": 206.22,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 74.01,
-          "y": 232.89,
+          "x": 88.73,
+          "y": 247.2,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 87.35,
-          "y": 241.67,
+          "x": 93.71,
+          "y": 233.02,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 98.8,
-          "y": 198.03,
+          "x": 86.67,
+          "y": 200.92,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 120.4,
-          "y": 207.94,
+          "x": 84.44,
+          "y": 185.68,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 87.96,
-          "y": 172.89,
+          "x": 64.26,
+          "y": 194.05,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 91.82,
-          "y": 217.57,
+          "x": 59.56,
+          "y": 241.52,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 67.93,
-          "y": 172.94,
+          "x": 78.08,
+          "y": 242.13,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 83.1,
-          "y": 181.06,
+          "x": 67.04,
+          "y": 184.9,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 60.01,
-          "y": 247.01,
+          "x": 65.97,
+          "y": 255.9,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 106.76,
-          "y": 222.78,
+          "x": 88.87,
+          "y": 223.78,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 71.27,
-          "y": 223.64,
+          "x": 52.06,
+          "y": 227.43,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 82.26,
-          "y": 225.36,
+          "x": 61.49,
+          "y": 208.69,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 89.71,
-          "y": 251.83,
+          "x": 75.71,
+          "y": 224.22,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 77.74,
-          "y": 246.45,
+          "x": 98.11,
+          "y": 245.69,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 55.57,
-          "y": 210.41,
+          "x": 96.29,
+          "y": 206.72,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 180.08,
-          "y": 224.12,
+          "x": 177.69,
+          "y": 199.36,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 134.7,
-          "y": 222.11,
+          "x": 120.01,
+          "y": 224.7,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 155.88,
-          "y": 231.83,
+          "x": 148.63,
+          "y": 232.63,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 149.15,
-          "y": 219.73,
+          "x": 161.78,
+          "y": 203.58,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 192.71,
+          "y": 216.07,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 167.66,
+          "y": 213.41,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 195.47,
+          "y": 187.57,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 200.31,
-          "y": 204.04,
+          "x": 215.79,
+          "y": 203.45,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 192.8,
-          "y": 226.48,
+          "x": 188.09,
+          "y": 226.75,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 180.97,
-          "y": 210.92,
+          "x": 193.34,
+          "y": 200.41,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 181.54,
-          "y": 187.32,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 191.22,
-          "y": 196.91,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 167.23,
-          "y": 223.17,
+          "x": 141.31,
+          "y": 221.55,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 167.25,
-          "y": 204.13,
+          "x": 157.82,
+          "y": 225.42,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 214.57,
-          "y": 206.8,
+          "x": 176.79,
+          "y": 222.21,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 221.57,
-          "y": 197.65,
+          "x": 162.16,
+          "y": 191.45,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 207.9,
+          "x": 205.73,
+          "y": 229.37,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 133.62,
+          "y": 211.68,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 181.91,
+          "y": 210.4,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 218.33,
+          "y": 191.36,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 134.15,
+          "y": 233.65,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 181.24,
+          "y": 186.26,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 218.52,
+          "y": 216.49,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 207.43,
+          "y": 215.17,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 146.15,
+          "y": 209.94,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 203.39,
+          "y": 195.24,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 150.07,
+          "y": 199.5,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 194.56,
           "y": 236.65,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 211.08,
-          "y": 192.78,
+          "x": 167.27,
+          "y": 224.93,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 122.39,
-          "y": 218.85,
+          "x": 199.86,
+          "y": 208.59,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 160.66,
-          "y": 189.49,
+          "x": 115.82,
+          "y": 214.91,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 144.81,
-          "y": 208.22,
+          "x": 142.98,
+          "y": 241.94,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 207.39,
-          "y": 221.84,
+          "x": 171.46,
+          "y": 188.41,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 120.89,
-          "y": 231.51,
+          "x": 180.13,
+          "y": 232.27,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 138.17,
-          "y": 235.08,
+          "x": 184.9,
+          "y": 177.28,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 192.91,
-          "y": 239.4,
+          "x": 214.36,
+          "y": 233.61,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 193.06,
-          "y": 213.31,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 132.27,
-          "y": 210.19,
+          "x": 120.34,
+          "y": 176.94,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 175.2,
-          "y": 196.47,
+          "x": 128.25,
+          "y": 139.51,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 218.83,
-          "y": 217.91,
+          "x": 141.56,
+          "y": 141.97,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 153.23,
-          "y": 199.71,
+          "x": 168.63,
+          "y": 166.47,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 107.89,
+          "y": 176.64,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 126.09,
+          "y": 154.95,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 161.13,
+          "y": 136.66,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 149.08,
+          "y": 107.9,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 131.09,
+          "y": 182.85,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 200.56,
-          "y": 189.37,
+          "x": 178.86,
+          "y": 161.52,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 161.09,
-          "y": 213.94,
+          "x": 148.03,
+          "y": 176.17,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 167.25,
+          "y": 146.13,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 164.71,
+          "y": 178.71,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 149.37,
+          "y": 132.97,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 182.32,
-          "y": 177.9,
+          "x": 107.61,
+          "y": 190.19,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 155.61,
+          "y": 155.67,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 122.82,
+          "y": 191.35,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 151.84,
+          "y": 119.74,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 133.11,
+          "y": 169.4,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 146.2,
-          "y": 229.54,
+          "x": 151.62,
+          "y": 187.36,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 170.55,
-          "y": 214.1,
+          "x": 138.3,
+          "y": 200.47,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 116.37,
+          "y": 160.83,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 145.72,
+          "y": 161.79,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 177.32,
+          "y": 141.58,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 157.49,
+          "y": 170.33,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 136.89,
+          "y": 152.33,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 155.81,
+          "y": 145.83,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 112.97,
-          "y": 215.38,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 112.93,
-          "y": 230.13,
+          "x": 174.08,
+          "y": 179.32,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 125.01,
-          "y": 182.64,
+          "x": 118.88,
+          "y": 145.34,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 148.52,
-          "y": 186.2,
+          "x": 54.67,
+          "y": 110.32,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 115.3,
+          "y": 84.37,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 109.14,
+          "y": 121.69,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 121.59,
-          "y": 138.18,
+          "x": 135.41,
+          "y": 126.26,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 141.64,
+          "y": 92.13,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 121.4,
-          "y": 161.9,
+          "x": 120.24,
+          "y": 111.06,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 89.58,
+          "y": 158.46,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 145.64,
-          "y": 155.64,
+          "x": 131.97,
+          "y": 106.62,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 109.62,
+          "y": 107.39,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 92.77,
+          "y": 146.52,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 136.42,
-          "y": 146.9,
+          "x": 107.22,
+          "y": 91.85,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 65.7,
+          "y": 146.7,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 61.17,
+          "y": 101.32,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 145.64,
-          "y": 131.39,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 165.56,
-          "y": 165.09,
+          "x": 53.66,
+          "y": 124.59,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 110.97,
-          "y": 183.44,
+          "x": 78.79,
+          "y": 155.38,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 107.86,
+          "y": 147.76,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 113.41,
-          "y": 170.94,
+          "x": 123.76,
+          "y": 124.48,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 128.73,
-          "y": 196.82,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 148.62,
-          "y": 105.87,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 162.61,
-          "y": 144.52,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 183.23,
-          "y": 165.85,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 133.36,
-          "y": 134.22,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 155.38,
-          "y": 176.79,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 133.67,
-          "y": 168.04,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 171.11,
-          "y": 181.22,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 123.63,
-          "y": 150.04,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 165.37,
-          "y": 133.15,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 175.49,
-          "y": 142.55,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 177.66,
-          "y": 155.98,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 139.9,
-          "y": 193.63,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 152.5,
-          "y": 119.89,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 156.91,
-          "y": 157.49,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 102.24,
-          "y": 173.39,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 114.59,
-          "y": 195.37,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 134.78,
-          "y": 184.42,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 130.45,
+          "x": 130.35,
           "y": 90.04,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 113.66,
-          "y": 113.14,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 107.02,
-          "y": 145.14,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 95.81,
-          "y": 159.36,
+          "x": 96.9,
+          "y": 99.3,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 117.89,
-          "y": 86.41,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 55.1,
-          "y": 103.83,
+          "x": 100.38,
+          "y": 165.79,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 129.74,
-          "y": 103.71,
+          "x": 110.96,
+          "y": 136.44,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 139.69,
+          "y": 115.42,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 107.22,
-          "y": 93.09,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 55.21,
-          "y": 115.7,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 141.09,
-          "y": 96.21,
+          "x": 44.39,
+          "y": 115.15,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 110.97,
-          "y": 129.09,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 72.33,
-          "y": 153.98,
+          "x": 49.92,
+          "y": 102.02,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 54.1,
-          "y": 130.5,
+          "x": 83.92,
+          "y": 80.32,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 83.67,
-          "y": 156.87,
+          "x": 228.28,
+          "y": 116.13,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 217.34,
+          "y": 123.55,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 189.28,
+          "y": 157.53,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 218.23,
+          "y": 142.22,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 153.57,
+          "y": 88.95,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 193.2,
+          "y": 169.65,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 212.7,
+          "y": 111.15,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 220.59,
+          "y": 174.18,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 175.51,
+          "y": 127.45,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 200.35,
+          "y": 148.28,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 164.62,
+          "y": 102.37,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 228.64,
+          "y": 183.39,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 209.91,
+          "y": 132.18,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 211.25,
+          "y": 167.36,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 230.36,
+          "y": 166.6,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 210.04,
+          "y": 181.34,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 211.8,
+          "y": 151.16,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 230.44,
+          "y": 127.79,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 170.01,
+          "y": 114.91,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 196.49,
+          "y": 132.96,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 201.25,
+          "y": 161.03,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 233.22,
+          "y": 106.28,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 160.19,
+          "y": 112.78,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 155.01,
+          "y": 100.55,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 234.24,
+          "y": 175.73,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 189.61,
+          "y": 147.52,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 257.66,
+          "y": 202.12,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 138.81,
-          "y": 118.39,
+          "x": 282.54,
+          "y": 21.79,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 126.31,
-          "y": 121.12,
+          "x": 285.65,
+          "y": 76.38,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 111.29,
-          "y": 155.36,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 98.53,
-          "y": 99.88,
+          "x": 282.03,
+          "y": 199.28,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 94.1,
-          "y": 148.22,
+          "x": 310.74,
+          "y": 63.83,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 43.94,
-          "y": 117.83,
+          "x": 229.95,
+          "y": 91.62,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 124.61,
-          "y": 111.67,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 107.42,
-          "y": 104.09,
+          "x": 283.9,
+          "y": 88.15,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 97.11,
-          "y": 90.34,
+          "x": 244.69,
+          "y": 97.75,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 63.17,
-          "y": 150.93,
+          "x": 253.09,
+          "y": 43.23,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 139.56,
-          "y": 108.81,
+          "x": 251.02,
+          "y": 171.87,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 317.21,
+          "y": 52.06,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 268.13,
+          "y": 167.98,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 83.87,
-          "y": 80.5,
+          "x": 323.56,
+          "y": 28.52,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 257.58,
+          "y": 105.84,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 273.23,
+          "y": 48.85,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 286.75,
+          "y": 133.49,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 227.73,
-          "y": 175.27,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 197.1,
-          "y": 148.59,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 231.12,
-          "y": 118.79,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 201.7,
-          "y": 176.67,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 214.35,
-          "y": 181.46,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 209.02,
-          "y": 129.34,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 212.85,
-          "y": 110.75,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 219.72,
-          "y": 120.54,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 216.56,
-          "y": 144.97,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 223.59,
-          "y": 164.01,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 158.63,
-          "y": 94.47,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 201.07,
-          "y": 163.24,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 173.86,
-          "y": 115.65,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 191.26,
-          "y": 135.87,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 177.49,
-          "y": 130.62,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 162.63,
-          "y": 106.21,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 225.76,
-          "y": 130.62,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 225.96,
-          "y": 187.02,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 211.87,
-          "y": 170.46,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 212.91,
-          "y": 155.87,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 189.23,
-          "y": 156.28,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 231.93,
-          "y": 107.01,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 148.71,
-          "y": 88.11,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 192.09,
-          "y": 180.74,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 209.71,
-          "y": 119.58,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 192.37,
-          "y": 167.93,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 249.11,
-          "y": 69.86,
+          "x": 243.44,
+          "y": 201.85,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 281.94,
-          "y": 49.07,
+          "x": 250.77,
+          "y": 186.8,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 306.03,
-          "y": 71.12,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 243.69,
-          "y": 186.1,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 280.15,
-          "y": 31.29,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 315.04,
-          "y": 44.23,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 228.37,
-          "y": 79.34,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 299.1,
-          "y": 22.89,
+          "x": 303.11,
+          "y": 106.12,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 252.3,
-          "y": 198.81,
+          "x": 305.27,
+          "y": 83.48,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 274.37,
+          "y": 34.93,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 232.52,
+          "y": 45.59,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 292.01,
+          "y": 118.1,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 298.08,
-          "y": 115.39,
+          "x": 248.24,
+          "y": 85.77,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 293.67,
+          "y": 52.29,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 243.63,
-          "y": 97.54,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 242.49,
-          "y": 208.52,
+          "x": 277.75,
+          "y": 189.03,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 251.71,
-          "y": 37.31,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 222.59,
-          "y": 89.6,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 314.34,
-          "y": 60.01,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 268.52,
-          "y": 100.74,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 240.5,
-          "y": 163.29,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 234.74,
-          "y": 150.43,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 233.04,
-          "y": 199.57,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 273.59,
-          "y": 157.81,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 264.0,
-          "y": 31.21,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 289.56,
-          "y": 122.59,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 279.39,
-          "y": 213.43,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 309.13,
-          "y": 91.17,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 298.45,
-          "y": 49.28,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 242.17,
-          "y": 81.04,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 283.75,
-          "y": 173.91,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 255.84,
-          "y": 166.45,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 290.03,
-          "y": 106.35,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 244.6,
-          "y": 54.13,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 297.82,
-          "y": 82.53,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 267.2,
-          "y": 170.35,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 217.74,
-          "y": 32.51,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 167.15,
-          "y": 75.32,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 179.33,
-          "y": 48.53,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 197.45,
-          "y": 45.54,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 172.18,
-          "y": 35.22,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 223.43,
-          "y": 65.46,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 182.3,
-          "y": 60.8,
+          "x": 293.61,
+          "y": 18.58,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
           "x": 225.32,
-          "y": 50.05,
+          "y": 71.48,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 210.75,
-          "y": 57.62,
+          "x": 302.44,
+          "y": 39.12,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 229.04,
-          "y": 37.53,
+          "x": 270.36,
+          "y": 198.93,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 217.08,
-          "y": 77.82,
+          "x": 273.8,
+          "y": 211.57,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 167.17,
-          "y": 50.16,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 204.02,
-          "y": 33.6,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 216.4,
-          "y": 99.51,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 214.09,
-          "y": 45.25,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 198.08,
-          "y": 57.86,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 233.33,
-          "y": 58.63,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 181.54,
-          "y": 31.9,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 188.19,
-          "y": 43.47,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 223.56,
-          "y": 111.25,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 167.69,
-          "y": 66.38,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 205.96,
-          "y": 44.32,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 139.95,
-          "y": 55.64,
+          "x": 231.47,
+          "y": 200.77,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 90.87,
-          "y": 26.1,
+          "x": 218.33,
+          "y": 35.15,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 116.78,
-          "y": 35.31,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 141.73,
-          "y": 40.01,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 158.19,
-          "y": 39.64,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 153.79,
-          "y": 74.68,
+          "x": 178.24,
+          "y": 60.67,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 80.63,
-          "y": 67.26,
+          "x": 205.61,
+          "y": 58.57,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 83.52,
-          "y": 42.53,
+          "x": 202.89,
+          "y": 36.35,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 104.61,
+          "x": 223.98,
+          "y": 60.49,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 171.17,
+          "y": 44.02,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 179.85,
+          "y": 32.23,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 215.08,
+          "y": 93.3,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 218.51,
+          "y": 80.57,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 210.82,
+          "y": 46.9,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 167.44,
+          "y": 68.72,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 186.85,
+          "y": 47.93,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 198.19,
+          "y": 46.33,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 221.9,
+          "y": 105.1,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 167.22,
+          "y": 54.95,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 232.29,
+          "y": 56.08,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 195.51,
+          "y": 55.97,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 224.05,
+          "y": 51.08,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 177.71,
           "y": 51.26,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 97.26,
-          "y": 38.62,
+          "x": 229.25,
+          "y": 36.83,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 105.48,
-          "y": 82.07,
+          "x": 171.66,
+          "y": 35.56,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 94.73,
-          "y": 56.69,
+          "x": 167.42,
+          "y": 77.79,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 132.3,
-          "y": 68.25,
-          "kind": "chronoguard",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 66.8,
-          "y": 71.06,
+          "x": 100.69,
+          "y": 25.64,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 96.44,
-          "y": 70.8,
+          "x": 99.25,
+          "y": 46.54,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 102.36,
+          "y": 66.37,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 149.18,
-          "y": 63.03,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 128.6,
-          "y": 52.42,
-          "kind": "orbitseer",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 114.43,
-          "y": 72.63,
+          "x": 70.62,
+          "y": 75.27,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 79.3,
-          "y": 55.7,
+          "x": 109.45,
+          "y": 33.62,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 64.36,
-          "y": 82.47,
+          "x": 117.84,
+          "y": 22.8,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 152.33,
-          "y": 28.94,
+          "x": 138.96,
+          "y": 75.95,
           "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 115.95,
-          "y": 52.85,
+          "x": 138.44,
+          "y": 39.67,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 274.68,
-          "y": 246.19,
-          "kind": "gearling",
+          "x": 80.49,
+          "y": 59.45,
+          "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 231.01,
-          "y": 230.79,
+          "x": 117.49,
+          "y": 69.88,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 125.18,
+          "y": 35.39,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 208.83,
-          "y": 264.06,
-          "kind": "gearling",
+          "x": 143.81,
+          "y": 60.01,
+          "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 249.38,
-          "y": 250.69,
-          "kind": "gearling",
+          "x": 89.64,
+          "y": 40.4,
+          "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 284.83,
-          "y": 228.12,
-          "kind": "gearling",
-          "layout": "orrery_design_v1"
-        },
-        {
-          "x": 230.14,
-          "y": 257.14,
+          "x": 148.09,
+          "y": 29.2,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 257.07,
-          "y": 242.55,
+          "x": 128.51,
+          "y": 65.81,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 127.97,
+          "y": 48.1,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 223.97,
-          "y": 241.54,
-          "kind": "gearling",
+          "x": 129.84,
+          "y": 23.09,
+          "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 256.68,
-          "y": 271.72,
-          "kind": "gearling",
+          "x": 153.04,
+          "y": 76.62,
+          "kind": "chronoguard",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 243.58,
-          "y": 269.88,
+          "x": 154.57,
+          "y": 38.93,
           "kind": "orbitseer",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 238.22,
-          "y": 220.11,
+          "x": 89.87,
+          "y": 53.13,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 108.95,
+          "y": 53.42,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 70.04,
+          "y": 64.11,
+          "kind": "chronoguard",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 238.2,
+          "y": 232.15,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 261.5,
-          "y": 252.91,
+          "x": 270.89,
+          "y": 259.59,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 255.24,
+          "y": 247.29,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 199.03,
+          "y": 277.86,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 219.43,
-          "y": 260.95,
+          "x": 250.18,
+          "y": 224.61,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 251.21,
-          "y": 261.65,
+          "x": 284.93,
+          "y": 228.49,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 205.64,
+          "y": 250.02,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 222.12,
-          "y": 251.27,
+          "x": 236.3,
+          "y": 215.17,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },
         {
-          "x": 200.78,
-          "y": 255.32,
+          "x": 247.78,
+          "y": 255.38,
+          "kind": "orbitseer",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 251.01,
+          "y": 235.95,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 270.82,
+          "y": 230.07,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 283.95,
+          "y": 262.97,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 216.49,
+          "y": 252.0,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 287.47,
+          "y": 241.55,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 215.35,
+          "y": 265.2,
+          "kind": "gearling",
+          "layout": "orrery_design_v1"
+        },
+        {
+          "x": 260.58,
+          "y": 257.73,
           "kind": "gearling",
           "layout": "orrery_design_v1"
         },

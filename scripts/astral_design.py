@@ -10,6 +10,7 @@ Runs in `zone_shapes.py apply` after Nacrehold's design. The zone is `designOnly
 the Prismwaste and the Orrery are not in the pilot), so all four crossings stay portals. The Orrery is the pilot's next candidate, so the borders to
 the Prismwaste and the Orrery are reserved now exactly as the Deep reserved Nacrehold's: no art-less object or person within 20 tiles, no spawn
 within 7, no loose scenery within 2.5 (`shape.edges` runs, not seam portals, so a later seam cannot change this design's masks or its RNG order).
+The Orrery seam arrived on 2026-11-08 (`seamWith {13: [15]}`): `path_13_15` is then a seam portal and `shifted_state`, the exit routes and the inbound rewrite skip it; the rest of the design ran unchanged.
 
 The painted atlas (tile = painted px * 2048/1758 - shape.T, T = [770, 0]) shows a dark teal land with a pale court at the south end, one golden
 trunk road straight up the middle, an oval ring road around a crater, and big cyan crystals along the ring: the design follows it.

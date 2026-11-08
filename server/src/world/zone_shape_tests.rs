@@ -181,7 +181,11 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
         }
         // the meadow's and Gloamfen's other borders are seams now: only Skaldholm is a gate
         // (the glacier's Wyrdwood border and the Wyrdwood's glacier and Crags borders are seams too: each keeps one gate; the Canopy keeps only Emberwake's since the Orrery border became a seam)
-        let wanted = if matches!(zone, 0 | 2 | 3 | 6 | 16) { 1 } else { 2 };
+        let wanted = if matches!(zone, 0 | 2 | 3 | 6 | 16) {
+            1
+        } else {
+            2
+        };
         assert!(
             border >= wanted,
             "zone {zone}: only {border} gate crossings"
@@ -739,7 +743,10 @@ fn the_orrery_is_seamless_against_astralhollow_and_the_moonspore_canopy_only() {
         }
     }
     let want: std::collections::BTreeSet<_> = [(13, 15), (15, 13), (15, 16), (16, 15)].into();
-    assert_eq!(pairs, want, "one seam to Astralhollow and one to the Canopy, seen from both sides");
+    assert_eq!(
+        pairs, want,
+        "one seam to Astralhollow and one to the Canopy, seen from both sides"
+    );
 }
 
 #[test]

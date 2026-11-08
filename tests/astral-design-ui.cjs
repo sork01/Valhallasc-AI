@@ -77,7 +77,7 @@ const GROUND = { 'The Cometfield': [null, 130] };
     check(await page.evaluate(k => Field.slimes.find(s => s.kind === k)?.d?.name?.length > 3, kind), `${kind} is on the map with a name`);
   }
   check((await fetch(`http://127.0.0.1:${port}/assets/astralelites.txt`)).ok, 'the elites\' art is served');
-  for (const g of Z.portals) { await go(g.x - g.walk[0] * 6, g.y - g.walk[1] * 6); await page.screenshot({ path: path.join(out, `gate-${g.id}.png`) }); }
+  for (const g of Z.portals.filter(p => !p.seam)) { await go(g.x - g.walk[0] * 6, g.y - g.walk[1] * 6); await page.screenshot({ path: path.join(out, `gate-${g.id}.png`) }); }
   check(errors.length === 0, 'no page errors: ' + errors.slice(0, 3).join(' | '));
   console.log(JSON.stringify({ passed: true, checks }));
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => { await browser?.close(); server?.kill(); });

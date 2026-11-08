@@ -34,7 +34,8 @@ fn run(w: &mut World, rx: &mut mpsc::Receiver<Value>, ticks: usize) -> Vec<Strin
 }
 
 #[test]
-fn astralhollow_is_a_big_basin_with_five_kinds_by_distance_three_elites_four_hubs_three_gates_and_a_seam() {
+fn astralhollow_is_a_big_basin_with_five_kinds_by_distance_three_elites_four_hubs_three_gates_and_a_seam()
+ {
     let w = world();
     let map = &w.maps[ASTRAL];
     assert_eq!(map.name, "Astralhollow");

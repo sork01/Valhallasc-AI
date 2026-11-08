@@ -137,7 +137,11 @@ fn the_orrery_is_a_big_plain_with_four_families_by_distance_three_elites_four_hu
         .map(|p| p.to)
         .collect();
     seams.sort_unstable();
-    assert_eq!(seams, vec![13, 16], "only Astralhollow and the Canopy are seams");
+    assert_eq!(
+        seams,
+        vec![13, 16],
+        "only Astralhollow and the Canopy are seams"
+    );
     for (id, to, _) in GATES {
         let g = map.portals.iter().find(|p| p.id == id).expect(id);
         assert!(g.seam.is_none() && g.walk.is_some() && g.to == to, "{id}");
@@ -495,6 +499,12 @@ fn the_three_elites_have_stats_materials_names_and_stand_clear_of_everything_wal
         find("pendulummatron").x < 150. && find("pendulummatron").y < 140.,
         "the Matron keeps the Winding Court in the west"
     );
-    assert!(find("epochengine").y < 60., "the Engine stands under the crown");
-    assert!(find("mainspringwyrm").x > 230., "the Wyrm coils through the Reaches in the east");
+    assert!(
+        find("epochengine").y < 60.,
+        "the Engine stands under the crown"
+    );
+    assert!(
+        find("mainspringwyrm").x > 230.,
+        "the Wyrm coils through the Reaches in the east"
+    );
 }

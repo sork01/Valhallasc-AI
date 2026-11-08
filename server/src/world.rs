@@ -36,8 +36,6 @@ mod asterion_tests;
 #[cfg(test)]
 mod astral_tests;
 #[cfg(test)]
-mod orrery_tests;
-#[cfg(test)]
 mod blackhour_tests;
 mod boss_mechanics;
 mod boss_signs;
@@ -122,6 +120,8 @@ mod nacre_tests;
 mod newyear_tests;
 #[cfg(test)]
 mod nornroot_tests;
+#[cfg(test)]
+mod orrery_tests;
 #[cfg(test)]
 mod owner_fixes_tests;
 #[cfg(test)]

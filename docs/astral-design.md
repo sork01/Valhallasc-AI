@@ -40,3 +40,7 @@ The impact basin, living starglass groves, crystal spires, the observatory court
 - Elite stats and the fights are first guesses; the art is a first pass judged on contact sheets and one in-game screenshot each.
 - Older suites that teleport into Astralhollow at the old coordinates (`tests/astral-ui.cjs`, MCP `astral`) are stale like the other pilot zones'.
 - The minimap and the world map show the plain pilot background.
+
+## Update 2026-11-08: the Orrery border is a seam
+
+The Orrery became a pilot zone with a seam against Astralhollow (`seamWith {13: [15]}`): `path_13_15` is now a seam portal, not a gate (`shifted_state`, the exit routes and the inbound rewrite skip a seam portal), so Astralhollow has three walk-in gates (Nacrehold, the Deep, the Prismwaste) and one seam. Nothing else of this design changed (a map diff shows only the portal, one exit route, the void boxes and the seam road). See `docs/orrery-design.md`.
