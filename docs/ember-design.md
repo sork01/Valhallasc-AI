@@ -2,6 +2,8 @@
 
 Owner request: "for pilot. reshape emberwake caldera. and remake the zone and quests to fit the new shape. no fillers." Owner answers: seamless against **the Stormglass Flats (north) and the Moonspore Canopy (west)**, **keep the three elites**, **three outposts**. Pilot only (branch `feat/zone-shapes-ember`, off `feat/zone-shapes-storm`, worktree `/media/raid/valhallasc-data/zone-ember-work`, cargo target `zone-ember-target`, wrapper `zone-ember-cargo.sh`). The fourteenth pilot zone: 0, 1, 2, 3, 6, 7, 8, 9, 13, 14, 15, 16, 19, 45.
 
+Swapped onto the pilot server (`valhalla-shapes`) on 2026-11-08 16:04 after the commits `5297173` and `cb9a47a`: DB backup `zone-shapes-data/backup-before-emberwake-20261108.sqlite`, old binary `valhalla-server.before-ember`, no character was saved in zone 45.
+
 ## The shape
 
 At k = 1.0 the atlas outline is grid 400 with 90,795 land tiles (the old square was 160, 25,600 tiles). Borders: the Stormglass Flats on the north (269 tiles), the Moonspore Canopy on the west (333), the Obsidian Orrery in the north-west corner (158), the Ribbonwild on the east (301) and a 213-tile **coast** on the south. The painting shows a great crater north-west of the middle, a glowing river across the whole zone from the Canopy border to the Ribbonwild, a cold crater and a hot one in the south, painted chain roads and many peaks.
