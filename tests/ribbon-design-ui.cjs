@@ -28,8 +28,8 @@ const GROUND = ['The Rose Court', 'The Teal Court'], lums = {};
 (async () => {
   check(Z.name === 'The Ribbonwild' && Z.size === 368 && Z.shapeFloor && Z.shape.neighbours.join() === '20,22,45', 'The Ribbonwild is the 368 grid with its outline and three neighbours');
   const seams = Z.portals.filter(p => p.seam);
-  check(seams.map(p => p.to).join() === '45', 'the only seam is the one to Emberwake');
-  for (const to of [20, 22]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
+  check(seams.map(p => p.to).join() === '22,45', 'the seams are the one to the Tanglecrown and the one to Emberwake');
+  for (const to of [20]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
   check(Z.portals.some(p => p.id === 'ribbon_pavilion_gate' && p.to === 31), 'the Pavilion door leads to the Thousandfold Pavilion');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
   check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 28, 'fourteen regions, five hubs and 28 quests');

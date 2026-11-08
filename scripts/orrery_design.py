@@ -187,7 +187,7 @@ def roads(G):
 
 class Orrery(Designer):
     TAG, SEED = 'orrery_design_v1', 20261108
-    LATE_SEAMS = {19}       # Stormglass's seam arrived after this design was approved: the masks stay as they were
+    LATE_SEAMS = {19, 1, 45}       # Stormglass's, the Crags' and Emberwake's seams arrived after this design was approved: the masks stay as they were (their rim gates keep their discs and roads)
 
     def __init__(self, world, old):
         self.old = old
@@ -427,8 +427,10 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
-    if any(p.get('seam') and p['to'] == 19 for p in zone['portals']):      # Stormglass's seam (2026-11-08) replaced the east rim gate: only the spawns within 7 tiles of it go
-        d.late_dropped = drop_near_seam(zone, d, 19)
+    d.late_dropped = 0
+    for late in sorted(Orrery.LATE_SEAMS):      # Stormglass's, the Crags' and Emberwake's seams (2026-11-08) replaced rim gates: only the spawns within 7 tiles of each go
+        if any(p.get('seam') and p['to'] == late for p in zone['portals']):
+            d.late_dropped += drop_near_seam(zone, d, late)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
@@ -524,6 +526,17 @@ def check(zone, d, solid, seen, G):
     loose = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o.get('layout') == d.TAG and o['kind'] != 'void' and d.reserve[int(o['y']), int(o['x'])] < 2.5]
     if loose:
         problems.append(f'loose scenery within 2.5 tiles of a seam: {loose[:5]}')
+    # the late seams (Stormglass, the Crags, Emberwake): a seam neighbour draws no art-less object or person that close either (the masks were made without them, so this only checks)
+    at_late = lambda o: d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)]
+    late_npcs = [n['id'] for n in zone['npcs'] if at_late(n) < 20]
+    if late_npcs:
+        problems.append(f'npcs within 20 tiles of a late seam: {late_npcs}')
+    late_pop = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o['kind'] in ARTLESS and at_late(o) < 20]
+    if late_pop:
+        problems.append(f'art-less objects within the camera reach of a late seam pop in on crossing: {late_pop[:5]}')
+    late_loose = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o.get('layout') == d.TAG and o['kind'] != 'void' and at_late(o) < 2.5]
+    if late_loose:
+        problems.append(f'loose scenery within 2.5 tiles of a late seam: {late_loose[:5]}')
     if sum(d.short.values()) > 12:
         problems.append(f'regions short of spawns: {d.short}')
     names = list(REGIONS)

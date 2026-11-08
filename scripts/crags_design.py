@@ -121,6 +121,7 @@ GROUND = {'ash': 1, 'scree': 2, 'terrace': 3, 'black': 4, 'quarry': 5, 'crust': 
 
 class Crags(Designer):
     TAG, SEED = 'crags_design_v1', 20261107
+    LATE_SEAMS = {6, 15}    # the Wyrdwood's and the Obsidian Orrery's seams arrived after this design was approved: the masks keep their gates' discs (zone_shapes.phantom_gate), late_trim applies the seams' rules
 
     def plan(self):
         return REGIONS, ROADS, R

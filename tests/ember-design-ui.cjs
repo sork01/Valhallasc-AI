@@ -1,5 +1,5 @@
 // Emberwake Caldera as an authored map (scripts/ember_design.py): the real client names each of the fourteen regions, draws its ground classes and the molten river, the
-// five hubs name themselves, the elites draw from their art, the two rim gates and the raid door stand on the floor, and the two seams (the Stormglass Flats on the north,
+// five hubs name themselves, the elites draw from their art, the raid door stands on the floor, and the four seams (the Stormglass Flats on the north,
 // the Moonspore Canopy on the west) are crossed anywhere without a banner, with the neighbour's scenery ready beyond the line and the same world point looking the same.
 // Pictures in test-results/ember-design/.
 //   REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/ember-design-ui.cjs
@@ -30,8 +30,8 @@ const GROUND = ['The Ash Verge', 'The Black Shore'], lums = {};
 (async () => {
   check(Z.name === 'Emberwake Caldera' && Z.size === 400 && Z.shapeFloor && Z.shape.neighbours.join() === '15,16,19,21', 'Emberwake Caldera is the 400 grid with its outline and four neighbours');
   const seams = Z.portals.filter(p => p.seam);
-  check(seams.map(p => p.to).sort().join() === '16,19', 'the only seams are the ones to the Canopy and the Flats');
-  for (const to of [15, 21]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
+  check(seams.map(p => p.to).sort((a, b) => a - b).join() === '15,16,19,21', 'the only seams are the ones to the Orrery, the Canopy, the Flats and the Ribbonwild');
+  check(Z.portals.every(p => p.seam || p.id === 'ew_raid'), 'no rim gate is left: every border is a seam (the Orrery since 2026-11-08), the raid door aside');
   check(Z.portals.some(p => p.id === 'ew_raid' && p.to === 46 && p.needs_quest === 'raid_key'), 'the raid door keeps its key');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
   check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 26, 'fourteen regions, five hubs and 26 quests');

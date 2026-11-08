@@ -40,7 +40,7 @@ const GROUND = ['The Drum Terraces', 'The Blackwater Edge'], lums = {};
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' })).newPage();
   const errors = []; page.on('pageerror', e => errors.push(e.message + ' @ ' + (e.stack || '').split('\n').slice(1, 4).join(' | ')));
   if (process.env.MUTATE) {
-    const old = execSync('git show feat/zone-shapes:client/field.js', { cwd: root, maxBuffer: 1 << 28 });
+    const old = execSync('git show c434787:client/field.js', { cwd: root, maxBuffer: 1 << 28 });
     await page.route('**/field.js*', r => r.fulfill({ status: 200, contentType: 'application/javascript', body: old }));
   }
   await page.addInitScript(v => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', v);

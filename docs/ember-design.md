@@ -47,3 +47,7 @@ At k = 1.0 the atlas outline is grid 400 with 90,795 land tiles (the old square 
 - Older suites that teleport into Emberwake at the old coordinates (`tests/emberwake-ui.cjs`, MCP `emberwake`) are stale like the other pilot zones'. The Asterion road gate described in `docs/emberwake.md` was already replaced by the atlas gates before this work.
 - The minimap and the world map show the plain pilot background. The coast uses the generic shallows and foam.
 - Spawn density (2.5 per 1,000 tiles) and the elites' placement are judged from the data, not in play. The Ribbonwild and the Orrery are not shaped: the triple corners (Orrery/Canopy/Emberwake near (0, 82), Orrery/Flats/Emberwake near (135, 7)) keep their rim-gate letters.
+
+## Update 2026-11-08: the Orrery border is a seam too
+
+`seamWith {45: [16, 19, 21, 15]}`: `atlas_45_15` (north-west, 158 tiles) is a seam portal; Emberwake has no rim gate left (the raid door `ew_raid` is its only other portal). The approved design ran unchanged (`LATE_SEAMS = {21, 15}`; 3 spawns dropped, no lava). See `docs/orrery-design.md`.

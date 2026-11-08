@@ -1,26 +1,16 @@
-//! Emberwake Caldera (zone 45, levels 95-99) as an authored map on the shapes pilot: its data, the rim gate to the Obsidian Orrery, the three seams (the
-//! Stormglass Flats on the north, the Moonspore Canopy on the west, the Ribbonwild on the east), Chainrest and four more hubs, the molten river and its causeway, the Nine-Chain Door and its two ways
+//! Emberwake Caldera (zone 45, levels 95-99) as an authored map on the shapes pilot: its data, the four seams (the
+//! Stormglass Flats on the north, the Obsidian Orrery on the north-west corner, the Moonspore Canopy on the west, the Ribbonwild on the east), Chainrest and four more hubs, the molten river and its causeway, the Nine-Chain Door and its two ways
 //! out, the quests (holds, visits, brings, kills, the two elite quests) and the three elites.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
 use super::*;
 const ZONE: usize = 45;
 const ELITES: [(&str, u32); 3] = [("ew_chainmaw", 97), ("ew_bellows", 99), ("ew_crown", 99)];
-/// (gate, the zone it leads to, the far gate that leads back); the borders to the Flats, the Canopy and the Ribbonwild are seams
-const GATES: [(&str, usize, &str); 1] = [("atlas_45_15", 15, "atlas_15_45")];
+// no rim gate is left: the borders to the Flats, the Canopy, the Ribbonwild and the Orrery (since 2026-11-08) are seams
 const HAMLETS: [(&str, &str); 3] = [
     ("craterwatch", "ew_cw_"),
     ("cinderquay", "ew_cq_"),
     ("glasshold", "ew_gh_"),
 ];
-
-fn run(w: &mut World, rx: &mut mpsc::Receiver<Value>, ticks: usize) -> Vec<String> {
-    let mut told = vec![];
-    for _ in 0..ticks {
-        w.step();
-        told.extend(lines(rx));
-    }
-    told
-}
 
 /// Distance from a point to a polyline.
 fn to_line(p: Point, line: &[Point]) -> f64 {
@@ -35,7 +25,7 @@ fn to_line(p: Point, line: &[Point]) -> f64 {
 }
 
 #[test]
-fn the_caldera_is_a_big_outdoor_map_with_four_kinds_by_distance_three_elites_five_hubs_two_gates_the_raid_door_and_two_seams()
+fn the_caldera_is_a_big_outdoor_map_with_four_kinds_by_distance_three_elites_five_hubs_the_raid_door_and_four_seams()
  {
     let w = world();
     let map = &w.maps[ZONE];
@@ -193,7 +183,7 @@ fn the_caldera_is_a_big_outdoor_map_with_four_kinds_by_distance_three_elites_fiv
         6
     );
     assert_eq!(map.places.iter().filter(|p| p.waves.len() == 2).count(), 4);
-    // the raid door, the two rim gates and two seams (the Flats, the Canopy)
+    // the raid door and four seams (the Flats, the Canopy, the Ribbonwild, the Orrery)
     assert_eq!(map.portals.len(), 5);
     let mut seams: Vec<usize> = map
         .portals
@@ -204,13 +194,15 @@ fn the_caldera_is_a_big_outdoor_map_with_four_kinds_by_distance_three_elites_fiv
     seams.sort_unstable();
     assert_eq!(
         seams,
-        vec![16, 19, 21],
-        "only the Canopy, the Flats and the Ribbonwild are seams"
+        vec![15, 16, 19, 21],
+        "only the Orrery, the Canopy, the Flats and the Ribbonwild are seams"
     );
-    for (id, to, _) in GATES {
-        let g = map.portals.iter().find(|p| p.id == id).expect(id);
-        assert!(g.seam.is_none() && g.walk.is_some() && g.to == to, "{id}");
-    }
+    assert!(
+        map.portals
+            .iter()
+            .all(|p| p.seam.is_some() || p.id == "ew_raid"),
+        "no rim gate is left"
+    );
     let raid = map.portals.iter().find(|p| p.id == "ew_raid").unwrap();
     assert_eq!(
         (raid.to, raid.needs_quest.as_deref()),
@@ -250,12 +242,6 @@ fn everything_is_reachable_from_the_spawn_the_river_blocks_and_its_causeway_is_f
             "{} is cut off",
             p.id
         );
-    }
-    for (gate_id, _, _) in GATES {
-        let g = map.portals.iter().find(|p| p.id == gate_id).unwrap();
-        let side = g.walk.unwrap();
-        let inside = at(g.x - f64::from(side[0]) * 6., g.y - f64::from(side[1]) * 6.);
-        assert!(reached(map, &open, inside), "{gate_id} is cut off");
     }
     // both banks of the river: Glasshold, Cinderquay and the Ember Crater lie south of it, reached over the causeway or round its west end
     for (name, x, y) in [
@@ -309,17 +295,17 @@ fn everything_is_reachable_from_the_spawn_the_river_blocks_and_its_causeway_is_f
 fn no_enemy_or_lava_stands_near_a_seam_and_the_elites_keep_clear_of_everything_a_hero_walks_to() {
     let w = world();
     let map = &w.maps[ZONE];
-    // (zone across, seam line): the Ribbonwild's seam arrived after this design was approved, so only the spawns within 7 tiles of it went
+    // (zone across, seam line): the Ribbonwild's and the Orrery's seams arrived after this design was approved, so only the spawns within 7 tiles of them went
     let seams: Vec<(usize, Vec<Point>)> = map
         .portals
         .iter()
         .filter_map(|p| p.seam.as_ref().map(|s| (p.to, s)))
         .map(|(to, s)| (to, s.points.iter().map(|q| at(q[0], q[1])).collect()))
         .collect();
-    assert_eq!(seams.len(), 3);
+    assert_eq!(seams.len(), 4);
     for (id, spawn) in w.spawns.iter().enumerate().filter(|(_, s)| s.zone == ZONE) {
         for (to, l) in &seams {
-            let calm = if *to == 21 { 7. } else { 20. };
+            let calm = if *to == 21 || *to == 15 { 7. } else { 20. };
             assert!(
                 to_line(at(spawn.x, spawn.y), l) > calm,
                 "{} ({id}) stands within {calm} tiles of a seam",
@@ -377,74 +363,6 @@ fn no_enemy_or_lava_stands_near_a_seam_and_the_elites_keep_clear_of_everything_a
                 .hypot((c.y0 - e.y).max(0.).max(e.y - c.y1));
             assert!(gap > 15., "{kind} stands {gap:.1} tiles from a hub");
         }
-    }
-}
-
-#[test]
-fn the_two_rim_gates_are_walked_through_both_ways_and_every_arrival_is_clear_ground() {
-    let mut w = world();
-    let mut rx = join(&mut w, 1, Class::Warrior);
-    for (gate_id, zone, back_id) in GATES {
-        let gate = w.maps[ZONE]
-            .portals
-            .iter()
-            .find(|p| p.id == gate_id)
-            .unwrap()
-            .clone();
-        let side = gate.walk.expect("a walk-in gate");
-        place(&mut w, 1, ZONE, at(gate.x, gate.y));
-        w.message(
-            1,
-            ClientMessage::Move {
-                x: gate.x + f64::from(side[0]) * 3.,
-                y: gate.y + f64::from(side[1]) * 3.,
-            },
-        );
-        run(&mut w, &mut rx, 40);
-        assert_eq!(
-            w.players[&1].character.zone, zone,
-            "{gate_id} leads to {zone}"
-        );
-        let back = w.maps[zone]
-            .portals
-            .iter()
-            .find(|p| p.id == back_id)
-            .unwrap()
-            .clone();
-        assert_eq!(back.to, ZONE, "{back_id} leads here");
-        let arrival = at(back.tx, back.ty);
-        assert!(
-            arrival.distance(at(gate.x, gate.y)) > gate.r + 0.5
-                && arrival.distance(at(gate.x, gate.y)) < 12.,
-            "{back_id} arrives beside {gate_id}, clear of its disc"
-        );
-        let mut a = arrival;
-        w.maps[ZONE].collide(&mut a, PLAYER_RADIUS);
-        assert!(a.distance(arrival) < 1e-6, "{back_id} lands on free ground");
-        assert!(
-            w.spawns
-                .iter()
-                .filter(|s| s.zone == ZONE)
-                .all(|s| at(s.x, s.y).distance(arrival) > 8.),
-            "an enemy stands near the arrival of {back_id}"
-        );
-        // and back
-        let side = back.walk.expect("a walk-in gate");
-        place(&mut w, 1, zone, at(back.x, back.y));
-        w.message(
-            1,
-            ClientMessage::Move {
-                x: back.x + f64::from(side[0]) * 3.,
-                y: back.y + f64::from(side[1]) * 3.,
-            },
-        );
-        run(&mut w, &mut rx, 40);
-        assert_eq!(w.players[&1].character.zone, ZONE, "{back_id} returns");
-        let c = &w.players[&1].character;
-        assert!(
-            at(c.x, c.y).distance(at(gate.x, gate.y)) < 12.,
-            "{back_id} puts the hero near {gate_id}"
-        );
     }
 }
 
