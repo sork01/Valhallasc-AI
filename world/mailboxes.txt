@@ -88,17 +88,6 @@
     }
   },
   {
-    "id": "mailbox_21_jubilee_crossroads",
-    "zone": 21,
-    "hub": "Jubilee Crossroads",
-    "x": 39.56,
-    "y": 83.91,
-    "anchor": {
-      "x": 42.5,
-      "y": 84.5
-    }
-  },
-  {
     "id": "mailbox_22_banyan_landing",
     "zone": 22,
     "hub": "Banyan Landing",
@@ -723,6 +712,61 @@
     "anchor": {
       "x": 291,
       "y": 229.5
+    }
+  },
+  {
+    "id": "mailbox_21_jubilee_crossroads",
+    "zone": 21,
+    "hub": "Jubilee Crossroads",
+    "x": 183,
+    "y": 202,
+    "anchor": {
+      "x": 209,
+      "y": 200
+    }
+  },
+  {
+    "id": "mailbox_21_pavilion",
+    "zone": 21,
+    "hub": "Pavilion Steps",
+    "x": 297,
+    "y": 183,
+    "anchor": {
+      "x": 299,
+      "y": 201
+    }
+  },
+  {
+    "id": "mailbox_21_bunting",
+    "zone": 21,
+    "hub": "Bunting Post",
+    "x": 198,
+    "y": 83,
+    "anchor": {
+      "x": 195,
+      "y": 85.5
+    }
+  },
+  {
+    "id": "mailbox_21_tassel",
+    "zone": 21,
+    "hub": "Tassel Post",
+    "x": 123,
+    "y": 215,
+    "anchor": {
+      "x": 119,
+      "y": 217.5
+    }
+  },
+  {
+    "id": "mailbox_21_garland",
+    "zone": 21,
+    "hub": "Garland Rest",
+    "x": 303,
+    "y": 293,
+    "anchor": {
+      "x": 304,
+      "y": 293.5
     }
   }
 ]

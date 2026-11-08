@@ -1,15 +1,12 @@
-//! Emberwake Caldera (zone 45, levels 95-99) as an authored map on the shapes pilot: its data, the two rim gates (the Obsidian Orrery, the Ribbonwild), the two seams (the
-//! Stormglass Flats on the north, the Moonspore Canopy on the west), Chainrest and four more hubs, the molten river and its causeway, the Nine-Chain Door and its two ways
+//! Emberwake Caldera (zone 45, levels 95-99) as an authored map on the shapes pilot: its data, the rim gate to the Obsidian Orrery, the three seams (the
+//! Stormglass Flats on the north, the Moonspore Canopy on the west, the Ribbonwild on the east), Chainrest and four more hubs, the molten river and its causeway, the Nine-Chain Door and its two ways
 //! out, the quests (holds, visits, brings, kills, the two elite quests) and the three elites.
 use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
 use super::*;
 const ZONE: usize = 45;
 const ELITES: [(&str, u32); 3] = [("ew_chainmaw", 97), ("ew_bellows", 99), ("ew_crown", 99)];
-/// (gate, the zone it leads to, the far gate that leads back); the borders to the Flats and the Canopy are seams
-const GATES: [(&str, usize, &str); 2] = [
-    ("atlas_45_15", 15, "atlas_15_45"),
-    ("path_45_21", 21, "path_21_45"),
-];
+/// (gate, the zone it leads to, the far gate that leads back); the borders to the Flats, the Canopy and the Ribbonwild are seams
+const GATES: [(&str, usize, &str); 1] = [("atlas_45_15", 15, "atlas_15_45")];
 const HAMLETS: [(&str, &str); 3] = [
     ("craterwatch", "ew_cw_"),
     ("cinderquay", "ew_cq_"),
@@ -163,12 +160,14 @@ fn the_caldera_is_a_big_outdoor_map_with_four_kinds_by_distance_three_elites_fiv
             .iter()
             .filter(|n| n.travel_stop.is_some())
             .collect();
-        let ours = |id: &str| map.npcs.iter().any(|n| n.id == id && n.travel_stop.is_some());
+        let ours = |id: &str| {
+            map.npcs
+                .iter()
+                .any(|n| n.id == id && n.travel_stop.is_some())
+        };
         let theirs = |id: &str| there.iter().any(|n| n.id == id);
         assert!(
-            there
-                .iter()
-                .any(|n| n.travel_links.iter().any(|l| ours(l))),
+            there.iter().any(|n| n.travel_links.iter().any(|l| ours(l))),
             "a master in zone {zone} links to Emberwake"
         );
         assert!(
@@ -205,8 +204,8 @@ fn the_caldera_is_a_big_outdoor_map_with_four_kinds_by_distance_three_elites_fiv
     seams.sort_unstable();
     assert_eq!(
         seams,
-        vec![16, 19],
-        "only the Canopy and the Flats are seams"
+        vec![16, 19, 21],
+        "only the Canopy, the Flats and the Ribbonwild are seams"
     );
     for (id, to, _) in GATES {
         let g = map.portals.iter().find(|p| p.id == id).expect(id);
@@ -310,18 +309,20 @@ fn everything_is_reachable_from_the_spawn_the_river_blocks_and_its_causeway_is_f
 fn no_enemy_or_lava_stands_near_a_seam_and_the_elites_keep_clear_of_everything_a_hero_walks_to() {
     let w = world();
     let map = &w.maps[ZONE];
-    let seams: Vec<Vec<Point>> = map
+    // (zone across, seam line): the Ribbonwild's seam arrived after this design was approved, so only the spawns within 7 tiles of it went
+    let seams: Vec<(usize, Vec<Point>)> = map
         .portals
         .iter()
-        .filter_map(|p| p.seam.as_ref())
-        .map(|s| s.points.iter().map(|q| at(q[0], q[1])).collect())
+        .filter_map(|p| p.seam.as_ref().map(|s| (p.to, s)))
+        .map(|(to, s)| (to, s.points.iter().map(|q| at(q[0], q[1])).collect()))
         .collect();
-    assert_eq!(seams.len(), 2);
+    assert_eq!(seams.len(), 3);
     for (id, spawn) in w.spawns.iter().enumerate().filter(|(_, s)| s.zone == ZONE) {
-        for l in &seams {
+        for (to, l) in &seams {
+            let calm = if *to == 21 { 7. } else { 20. };
             assert!(
-                to_line(at(spawn.x, spawn.y), l) > 20.,
-                "{} ({id}) stands within 20 tiles of a seam",
+                to_line(at(spawn.x, spawn.y), l) > calm,
+                "{} ({id}) stands within {calm} tiles of a seam",
                 spawn.kind
             );
         }
@@ -340,7 +341,7 @@ fn no_enemy_or_lava_stands_near_a_seam_and_the_elites_keep_clear_of_everything_a
             o["r"].as_f64().unwrap(),
         );
         for l in &seams {
-            assert!(to_line(at(x, y), l) - r >= 17., "lava at {x},{y}");
+            assert!(to_line(at(x, y), &l.1) - r >= 17., "lava at {x},{y}");
         }
     }
     let walked: Vec<Point> = map

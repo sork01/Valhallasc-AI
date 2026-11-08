@@ -51,6 +51,14 @@
       line(g,[[s*34,-112],[s*34,-100]],'#f7e4a2',2);
     }
   }};
+  // A parasol tree of the shaped Ribbonwild (scripts/ribbon_design.py): a slim trunk under a three-lobed canopy of blossom in the colour of its court.
+  City.art.rw_blossom_tree={box:[270,310,135,262],draw(g,o){
+    shadow(g,52);poly(g,[[-8,0],[-6,-96],[7,-96],[9,0]],'#9b6c5c','#694a51',2);
+    line(g,[[0,-90],[-34,-122]],'#8a5c52',6);line(g,[[0,-90],[36,-126]],'#8a5c52',6);
+    oval(g,-38,-128,44,38,shade(o.v));oval(g,40,-132,42,36,shade(o.v+1));oval(g,0,-160,56,46,shade(o.v));
+    oval(g,-10,-174,30,20,'rgba(255,248,215,.32)');oval(g,34,-146,13,9,'rgba(255,248,215,.28)');
+    for(let j=0;j<9;j++)oval(g,Math.sin(j*2.3+o.v)*58,-132-Math.cos(j*1.7)*34,5,4,'#fff0c4');
+  }};
   City.art.silk_pavilion={box:[510,450,255,400],draw(g,o){
     shadow(g,128);poly(g,[[-107,0],[-107,-143],[108,-143],[108,0]],'#f7dfaf','#7f596c',3);
     poly(g,[[-146,-141],[-72,-202],[0,-276],[72,-202],[145,-141],[101,-149],[0,-255],[-101,-149]],'#f7d36f','#754d67',4);

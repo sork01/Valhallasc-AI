@@ -31,7 +31,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import ember_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-45.txt'
 
@@ -156,7 +156,7 @@ def roads(G):
 
 class Emberwake(Designer):
     TAG, SEED = 'ember_design_v1', 20261108
-    LATE_SEAMS = set()
+    LATE_SEAMS = {21}       # the Ribbonwild's seam arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate path_45_21 keeps its discs and its road)
 
     def __init__(self, world, old):
         self.old = old
@@ -345,6 +345,8 @@ class Emberwake(Designer):
         g[self.floor & (self.coast < 20)] = GROUND['sand']
         near = np.full((self.n, self.n), 1e9)
         for o in self.lava:
+            if self.lava_dropped(o):
+                continue
             near = np.minimum(near, np.hypot(self.xs - o['x'], self.ys - o['y']) - o['r'])
         rough = (fbm(self.noise, self.xs, self.ys, .14) - .5) * 6
         g[self.floor & (near < 6 + rough * .5)] = GROUND['slag']
@@ -399,6 +401,10 @@ class Emberwake(Designer):
         ordinary = [t for t in out if t.get('layout') == self.TAG]
         ordinary.sort(key=lambda t: t['kind'] != 'ew_ashback')
         return ordinary + [t for t in out if t.get('layout') != self.TAG]
+
+    def lava_dropped(self, o):
+        """The Ribbonwild's seam (late): a seam neighbour draws no lava, so the river's circles within 17 tiles of it are not kept (the masks and the scatter were made with them)."""
+        return self.seam_late[min(max(int(o['y']), 0), self.n - 1), min(max(int(o['x']), 0), self.n - 1)] - o['r'] < 18      # 18: the field is read at the cell centre, the test measures the exact point
 
     def lava_near(self, x, y):
         return min((math.hypot(x - o['x'], y - o['y']) - o['r'] for o in self.lava if abs(o['x'] - x) < 12 and abs(o['y'] - y) < 12), default=1e9)
@@ -475,10 +481,17 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    if any(p.get('seam') and p['to'] == 21 for p in zone['portals']):      # the Ribbonwild's seam (2026-11-08) replaced the east rim gate: only the spawns within 7 tiles of it and the river circles within 17 go
+        d.late_dropped = drop_near_seam(zone, d, 21)
+        before = len(objects)
+        objects = [o for o in objects if not (o['kind'] == 'ew_lava' and d.lava_dropped(o))]
+        d.lava = [o for o in d.lava if not d.lava_dropped(o)]
+        d.late_dropped += before - len(objects)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
-    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items()]
+    seamed = {p['id'] for p in zone['portals'] if p.get('seam')}      # the Ribbonwild's seam replaced the east rim gate: its line is the border, not a gate
+    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(world, zone, content.HAMLETS)
@@ -558,6 +571,13 @@ def check(zone, d, solid, seen, G):
         if d.reserve[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] - o['r'] < 17:
             problems.append(f"lava within 17 tiles of a seam at {o['x']},{o['y']}")
             break
+    # the Ribbonwild's seam (late): no lava within 17 tiles of it and no art-less object within 20 (a seam neighbour draws neither)
+    at_late = lambda o: d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)]
+    if any(at_late(o) - o['r'] < 17 for o in d.lava):
+        problems.append('lava within 17 tiles of the Ribbonwild seam')
+    near_late = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o['kind'] in ARTLESS and at_late(o) < 20]
+    if near_late:
+        problems.append(f'art-less objects within 20 tiles of the Ribbonwild seam: {near_late[:5]}')
     # an elite stands clear of everything a player walks to: awareness plus 3 tiles from every road, place and person, and from every hub and gate
     walked = [(q, 'road') for road in d.ROADLIST for q in dense_points(road)]
     walked += [((q['x'], q['y']), f"place {q['id']}") for q in zone['places']] + [((n['x'], n['y']), f"npc {n['id']}") for n in zone['npcs']]

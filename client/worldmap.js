@@ -106,7 +106,7 @@
     ribbongecko:['Ribbon Gecko',70,'#31c7bd'],balloonbeetle:['Balloon Beetle',71,'#b277db'],
     paintedmacaw:['Painted Macaw',72,'#52bbdf'],jesterling:['Jesterling',73,'#d36ab3'],
     paradegryphon:['Parade Gryphon (Elite · 3 players)',74,'#f7bb72'],
-    maskcolossus:['Masquerade Colossus (Elite · 5 players)',75,'#ae94dc'],
+    maskcolossus:['Masquerade Colossus (Elite · 5 players)',75,'#ae94dc'], whorlshell:['Whorlshell (Elite · 3 players)',73,'#f2b8e8'],
     orchidmantis:['Orchid Mantis',75,'#d5ef83'],canopyglider:['Canopy Glider',76,'#59c0b5'],
     poolcaiman:['Blackwater Caiman',77,'#6ea58c'],drumgorilla:['Drum Gorilla',78,'#c69a70'],
     jadeanaconda:['Jade Anaconda (Elite · 3 players)',79,'#4dc098'],
@@ -224,6 +224,7 @@
       case 'festival_bloom': return '#f4c65e';
       case 'ribbon_pole': case 'pinwheel': case 'confetti_lantern': return '#ef6998';
       case 'silk_pavilion': case 'painted_stall': return '#f7d36f';
+      case 'rw_blossom_tree': return '#f0a0c4';
       case 'parade_standard': case 'mask_dais': case 'grand_pavilion_gate': return '#fff0b5';
       case 'jungle_water': case 'jade_pool': return '#48b4bb';
       case 'kapok_tree': case 'strangler_fig': return '#1d6047';

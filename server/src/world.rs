@@ -846,6 +846,8 @@ impl Slime {
             "jesterling" => (390000., 5400., 3.0, 1.65),
             "paradegryphon" => (1950000., 16900., 2.4, 2.65),
             "maskcolossus" => (3200000., 23900., 1.8, 3.0),
+            // The Whorlshell (the shapes pilot, no quest): a giant snail whose spiral shell is a carousel of bands, slow and heavy, in the middle of the Ribbon Whorl. First guess.
+            "whorlshell" => (2300000., 18500., 1.7, 2.8),
             "orchidmantis" => (430000., 5700., 3.6, 1.45),
             "canopyglider" => (370000., 6100., 4.2, 1.35),
             "poolcaiman" => (510000., 6900., 2.1, 1.8),
@@ -1001,6 +1003,7 @@ impl Slime {
             "jesterling" => 73,
             "paradegryphon" => 74,
             "maskcolossus" => 75,
+            "whorlshell" => 73,
             "orchidmantis" => 75,
             "canopyglider" => 76,
             "poolcaiman" => 77,
@@ -1159,6 +1162,7 @@ impl Slime {
             "jesterling" => 8900,
             "paradegryphon" => 27000,
             "maskcolossus" => 41000,
+            "whorlshell" => 33000,
             "orchidmantis" => 9900,
             "canopyglider" => 10500,
             "poolcaiman" => 11200,
@@ -1335,6 +1339,8 @@ impl Slime {
             "jesterling" => (0.62, 1.5, 8., 11.),
             "paradegryphon" => (1.1, 2.0, 5.5, 14.),
             "maskcolossus" => (1.25, 2.2, 5., 16.),
+            // The Whorlshell rears and slams its shell down: a slow wind-up, a wide reach.
+            "whorlshell" => (1.2, 2.1, 5., 14.),
             "orchidmantis" => (0.54, 1.3, 9., 11.),
             "canopyglider" => (0.46, 1.25, 11., 10.),
             "poolcaiman" => (0.88, 1.55, 7., 12.),
@@ -1484,6 +1490,7 @@ impl Slime {
             "wickerwarden" => 4.8,
             "paradegryphon" => 4.4,
             "maskcolossus" => 5.0,
+            "whorlshell" => 4.6,
             "jadeanaconda" => 4.7,
             "crownjaguar" => 5.3,
             "dunecolossus" => 5.0,
@@ -4727,12 +4734,12 @@ impl World {
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" | "mainspringwyrm" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
-                | "wickerwarden" | "paradegryphon" | "maskcolossus" | "jadeanaconda"
-                | "crownjaguar" | "dunecolossus" | "mirageroc" | "bellmammoth" | "auroramanta"
-                | "crevasseleviathan" | "cairnbehemoth" | "whitebarktitan" | "stormcondor"
-                | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel"
-                | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber"
-                | "snowgiant" | "longnightwyrm" => 600.,
+                | "wickerwarden" | "paradegryphon" | "maskcolossus" | "whorlshell"
+                | "jadeanaconda" | "crownjaguar" | "dunecolossus" | "mirageroc" | "bellmammoth"
+                | "auroramanta" | "crevasseleviathan" | "cairnbehemoth" | "whitebarktitan"
+                | "stormcondor" | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion"
+                | "sunwheel" | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis"
+                | "rimesaber" | "snowgiant" | "longnightwyrm" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -5373,6 +5380,7 @@ impl World {
                             | "wickerwarden"
                             | "paradegryphon"
                             | "maskcolossus"
+                            | "whorlshell"
                             | "jadeanaconda"
                             | "crownjaguar"
                             | "dunecolossus"
@@ -8706,6 +8714,7 @@ mod tests {
             "wickerwarden",
             "paradegryphon",
             "maskcolossus",
+            "whorlshell",
             "jadeanaconda",
             "crownjaguar",
             "dunecolossus",

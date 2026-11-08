@@ -25173,6 +25173,13 @@
     "sell": 1800
   },
   {
+    "id": "whorl_shell",
+    "name": "Whorl Shell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4400
+  },
+  {
     "id": "hermit_lens",
     "name": "Hermit Lens",
     "kind": "material",

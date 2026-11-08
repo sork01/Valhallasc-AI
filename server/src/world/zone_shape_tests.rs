@@ -825,12 +825,18 @@ fn the_stormglass_flats_and_emberwake_share_a_seam() {
 }
 
 #[test]
-fn emberwake_keeps_its_gates_to_the_orrery_and_the_ribbonwild() {
-    gates_stand_on_free_land(45, &[15, 21]);
+fn emberwake_keeps_its_gate_to_the_orrery() {
+    gates_stand_on_free_land(45, &[15]);
 }
 
 #[test]
-fn emberwake_is_seamless_against_the_stormglass_flats_and_the_moonspore_canopy_only() {
+fn emberwake_and_the_ribbonwild_share_a_seam() {
+    seam_walks(21, 45);
+}
+
+#[test]
+fn emberwake_is_seamless_against_the_stormglass_flats_the_moonspore_canopy_and_the_ribbonwild_only()
+{
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -841,7 +847,8 @@ fn emberwake_is_seamless_against_the_stormglass_flats_and_the_moonspore_canopy_o
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(19, 45), (45, 19), (16, 45), (45, 16)].into();
+    let want: std::collections::BTreeSet<_> =
+        [(19, 45), (45, 19), (16, 45), (45, 16), (21, 45), (45, 21)].into();
     assert_eq!(
         pairs, want,
         "one seam to the Flats and one to the Canopy, seen from both sides"

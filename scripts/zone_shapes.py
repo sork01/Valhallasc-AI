@@ -1532,6 +1532,9 @@ def apply(world, cfg):
     if 45 in cfg['zones']:      # after the Stormglass Flats (its south gate became the seam): it rewrites the arrivals of the Orrery's, the Ribbonwild's and the raid's crossings and makes the Nine-Chain Door camp
         import ember_design
         print('emberwake', ember_design.design(world, write=True)[1])
+    if 21 in cfg['zones']:      # after Emberwake (its east gate became the seam; its design dropped the spawns and lava near it): it rewrites the arrivals of Sunward's, the Tanglecrown's and the Pavilion's crossings
+        import ribbon_design
+        print('ribbonwild', ribbon_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)
