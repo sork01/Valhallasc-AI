@@ -44,3 +44,4 @@ The rename is data and display only: ids, the `stormglass` theme and the `stormg
 - Older suites that teleport into the Shore at the old coordinates (`tests/stormglass-ui.cjs`, MCP `stormglass`) are stale like the other pilot zones'.
 - Sunward Vale, Frostwake and Emberwake are not shaped yet; when they are, their borders with the Flats need the same reservation scan (art-less 20, spawns 7, loose scenery 2.5 along `shape.edges`; the Flats' east side is not reserved).
 - The minimap and the world map show the plain pilot background.
+- Emberwake's seam arrived later (2026-11-08): `LATE_SEAMS = {45}`, the south gate `path_19_45` is now the seam, 8 spawns and 1 pebble near it dropped (see `docs/ember-design.md`).

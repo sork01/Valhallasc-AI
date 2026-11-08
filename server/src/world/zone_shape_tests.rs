@@ -181,10 +181,11 @@ fn shaped_zones_cross_into_each_other_on_their_shared_border() {
         }
         // the meadow's and Gloamfen's other borders are seams now: only Skaldholm is a gate
         // (the glacier's Wyrdwood border and the Wyrdwood's glacier and Crags borders are seams too: each keeps one gate; the Canopy keeps only Emberwake's since the Orrery border became a seam)
-        let wanted = if matches!(zone, 0 | 2 | 3 | 6 | 16) {
-            1
-        } else {
-            2
+        // (the Canopy keeps no gate at all: its Orrery and Emberwake borders are seams)
+        let wanted = match zone {
+            16 => 0,
+            0 | 2 | 3 | 6 => 1,
+            _ => 2,
         };
         assert!(
             border >= wanted,
@@ -286,8 +287,8 @@ fn the_crags_and_the_moonspore_canopy_share_a_seam() {
 }
 
 #[test]
-fn the_moonspore_canopy_keeps_its_gate_to_emberwake_and_shares_a_seam_with_the_orrery() {
-    gates_stand_on_free_land(16, &[45]);
+fn the_moonspore_canopy_and_emberwake_share_a_seam() {
+    seam_walks(16, 45);
 }
 
 #[test]
@@ -814,12 +815,41 @@ fn the_orrery_and_the_stormglass_flats_share_a_seam() {
 }
 
 #[test]
-fn the_stormglass_flats_keep_their_gates_to_sunward_frostwake_and_emberwake() {
-    gates_stand_on_free_land(19, &[20, 26, 45]);
+fn the_stormglass_flats_keep_their_gates_to_sunward_and_frostwake() {
+    gates_stand_on_free_land(19, &[20, 26]);
 }
 
 #[test]
-fn the_stormglass_flats_are_seamless_against_the_prismwaste_and_the_orrery_only() {
+fn the_stormglass_flats_and_emberwake_share_a_seam() {
+    seam_walks(19, 45);
+}
+
+#[test]
+fn emberwake_keeps_its_gates_to_the_orrery_and_the_ribbonwild() {
+    gates_stand_on_free_land(45, &[15, 21]);
+}
+
+#[test]
+fn emberwake_is_seamless_against_the_stormglass_flats_and_the_moonspore_canopy_only() {
+    let data = bundled();
+    let mut pairs = std::collections::BTreeSet::new();
+    for zi in 1..=data["zones"].as_array().unwrap().len() {
+        for p in zone_of(&data, zi)["portals"].as_array().unwrap() {
+            let to = p["to"].as_u64().unwrap() as usize;
+            if p.get("seam").is_some() && (zi == 45 || to == 45) {
+                pairs.insert((zi, to));
+            }
+        }
+    }
+    let want: std::collections::BTreeSet<_> = [(19, 45), (45, 19), (16, 45), (45, 16)].into();
+    assert_eq!(
+        pairs, want,
+        "one seam to the Flats and one to the Canopy, seen from both sides"
+    );
+}
+
+#[test]
+fn the_stormglass_flats_are_seamless_against_the_prismwaste_the_orrery_and_emberwake_only() {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -830,10 +860,11 @@ fn the_stormglass_flats_are_seamless_against_the_prismwaste_and_the_orrery_only(
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(14, 19), (19, 14), (15, 19), (19, 15)].into();
+    let want: std::collections::BTreeSet<_> =
+        [(14, 19), (19, 14), (15, 19), (19, 15), (19, 45), (45, 19)].into();
     assert_eq!(
         pairs, want,
-        "one seam to the Prismwaste and one to the Orrery, seen from both sides"
+        "one seam each to the Prismwaste, the Orrery and Emberwake, seen from both sides"
     );
 }
 

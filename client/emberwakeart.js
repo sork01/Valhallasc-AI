@@ -207,7 +207,84 @@
     line(g,[[-5,-62],[4,-39],[-8,-23],[6,4]],C.hot,7);
     oval(g,2,-27,11,15,C.pale,C.hot);
   }};
-  function ground(x,y,tone,alt,z,dirt){return dirt?`hsl(28,17%,${40+tone*5+alt*.08}%)`:`hsl(${22+tone*8},8%,${25+tone*8+alt*.12}%)`;}
+  // The caldera's ground classes (scripts/ember_design.py): ash, cinder, obsidian glass, basalt plates, scorched earth, crater floor, quenched basin, pale ash, black sand, cooled slag.
+  function classGround(k,tone,alt){
+    switch(k){
+      case 2:return `hsl(${10+tone*8},22%,${22+tone*7+alt*.12}%)`;
+      case 3:return `hsl(${232+tone*10},18%,${18+tone*7+alt*.1}%)`;
+      case 4:return `hsl(${250+tone*6},6%,${30+tone*7+alt*.12}%)`;
+      case 5:return `hsl(${24+tone*8},30%,${24+tone*7+alt*.12}%)`;
+      case 6:return `hsl(${8+tone*6},34%,${19+tone*6+alt*.1}%)`;
+      case 7:return `hsl(${205+tone*8},14%,${31+tone*7+alt*.1}%)`;
+      case 8:return `hsl(${28+tone*6},8%,${42+tone*6+alt*.12}%)`;
+      case 9:return `hsl(${240+tone*8},8%,${15+tone*5+alt*.1}%)`;
+      case 10:return `hsl(${14+tone*8},18%,${20+tone*6+alt*.1}%)`;
+    }
+    return `hsl(${22+tone*8},8%,${25+tone*8+alt*.12}%)`;
+  }
+  function ground(x,y,tone,alt,z,dirt,k){return dirt?`hsl(28,17%,${40+tone*5+alt*.08}%)`:k?classGround(k,tone,alt):`hsl(${22+tone*8},8%,${25+tone*8+alt*.12}%)`;}
+  // Scenery of the authored caldera: a lodge of basalt slabs, volcano cones, obsidian shards, cooled slag, burnt trees and half-buried chain links.
+  City.art.ew_hut={box:[340,325,170,287],draw(g){
+    oval(g,0,5,80,17,'rgba(10,6,10,.42)',null);
+    poly(g,[[-75,0],[-75,-69],[75,-69],[75,0]],'#5a5560',C.ink,3);
+    poly(g,[[-75,0],[-75,-69],[-22,-69],[-22,0]],'#4a4650',null,0);
+    poly(g,[[-88,-68],[-37,-108],[31,-108],[88,-68]],'#34323d',C.ink,3);
+    poly(g,[[-88,-68],[0,-104],[88,-68]],'#6d6671',C.ink,2);
+    for(const x of [-54,-27,0,27,54])line(g,[[x,-70],[x*.9,-98]],C.iron,3);
+    line(g,[[-82,-70],[0,-106],[82,-70]],C.hot,2);
+    poly(g,[[-14,0],[-14,-49],[14,-49],[14,0]],'#1d1a25',C.pale,2);
+    oval(g,-46,-43,10,12,'#e59a52',C.ink);oval(g,46,-43,10,12,'#e59a52',C.ink);
+  }};
+  const CONE=[4.6,5.2,6.1];
+  City.art.ew_cone={box:[820,840,410,630],occludes:true,draw(g,o){
+    const size=CONE[Math.min(o.v||0,2)],W=size*62.2,D=size*31.1,H=size*92,ax=((o.v||0)-1)*8,top=[ax,-H];
+    const edge=[];for(let i=0;i<=10;i++){const a=Math.PI*i/10;edge.push([Math.cos(a)*W,Math.sin(a)*D]);}
+    const left=[-W,0],right=[W,0],foot=[W*.16,D];
+    poly(g,[top,left,...edge.slice(5).reverse(),foot],'#4d4756',C.ink,3);
+    poly(g,[top,foot,...edge.slice(0,4).reverse(),right],'#2c2832',C.ink,3);
+    for(const [t,k] of [[.2,.5],[.38,-.34],[.52,.18],[.68,-.62],[.34,.72]]){
+      const y=-H*(1-t*.9),x=ax*(1-t)+W*t*k;
+      line(g,[[x,y],[x+W*.06*Math.sign(k||1),y+H*.12],[x+W*.02,y+H*.2],[x+W*.1*Math.sign(k||1),y+H*.32]],k<0?'#5e5766':'#1f1c25',3);
+    }
+    // the cone's crater: a glowing lip and a lava tongue down the lee face
+    poly(g,[top,[ax-W*.2,-H*.8],[ax-W*.1,-H*.86],[ax,-H*.78],[ax+W*.1,-H*.86],[ax+W*.2,-H*.8]],'#d96a32',C.ink,2);
+    poly(g,[[ax-W*.08,-H*.84],[ax,-H*.9],[ax+W*.08,-H*.84],[ax,-H*.8]],'#ffd68a',null,0);
+    line(g,[[ax+W*.04,-H*.78],[ax+W*.1,-H*.55],[ax+W*.07,-H*.38],[ax+W*.16,-H*.2]],C.hot,4);
+  }};
+  City.art.ew_obsidian={box:[130,170,65,150],draw(g,o){
+    oval(g,0,3,34,9,'rgba(10,8,16,.35)',null);
+    const h=[[-14,70,18],[10,104,22],[26,58,16]];
+    h.forEach(([x,ht,w],i)=>{
+      const j=(o.v+i)%2?1:.8;
+      poly(g,[[x-w,0],[x-w*.6,-ht*j],[x+w*.1,-ht*j-14],[x+w,0]],'#26283c',C.ink,3);
+      poly(g,[[x+w*.1,-ht*j-14],[x+w,0],[x+w*.2,-6]],'#4a5a8a',null,0);
+      line(g,[[x-w*.3,-ht*j*.8],[x-w*.1,-ht*j*.2]],'#9db4e6',2);
+    });
+  }};
+  City.art.ew_slag={box:[130,80,65,60],draw(g,o){
+    oval(g,0,2,36,10,'rgba(10,6,8,.35)',null);
+    poly(g,[[-34,0],[-26,-18],[-6,-30],[18,-22],[34,0]],o.v%2?'#3b3236':'#2f292d',C.ink,3);
+    line(g,[[-20,-14],[-4,-24],[6,-8],[22,-12]],C.hot,2);
+    oval(g,6,-14,3,2,C.pale,null);
+  }};
+  City.art.ew_ashtree={box:[130,250,65,235],draw(g,o){
+    oval(g,0,3,28,8,'rgba(10,8,10,.3)',null);
+    const lean=(o.v%3-1)*8;
+    line(g,[[0,0],[lean*.4,-60],[lean,-120]],'#1d1a1f',9);
+    line(g,[[lean*.4,-60],[lean-22,-98]],'#1d1a1f',5);line(g,[[lean*.7,-90],[lean+24,-128]],'#1d1a1f',5);line(g,[[lean,-120],[lean-10,-160]],'#1d1a1f',4);
+    line(g,[[lean*.4,-60],[lean*.5+6,-110]],'#3a3036',2);
+    oval(g,lean-22,-98,2,2,C.hot,null);oval(g,lean+24,-128,2,2,C.hot,null);
+  }};
+  City.art.ew_link={box:[220,180,110,120],draw(g,o){
+    oval(g,0,2,56,13,'rgba(10,6,8,.38)',null);
+    const flip=o.v%2?-1:1;
+    g.save();g.translate(0,-34);g.rotate(.35*flip);
+    g.beginPath();g.ellipse(0,0,48,30,0,0,TAU);g.strokeStyle=C.ink;g.lineWidth=24;g.stroke();
+    g.beginPath();g.ellipse(0,0,48,30,0,0,TAU);g.strokeStyle=C.iron;g.lineWidth=18;g.stroke();
+    g.beginPath();g.ellipse(0,-3,48,30,0,Math.PI*1.1,Math.PI*1.8);g.strokeStyle=C.light;g.lineWidth=4;g.stroke();
+    g.restore();
+    poly(g,[[-44,0],[-36,-16],[0,-12],[40,-18],[48,0]],'#3b3236',C.ink,3);
+  }};
   function detail(g,px,py,x,y,tw,th){
     const h=Math.abs(Math.sin(x*127.1+y*311.7)*43758.5453)%1;
     if(h<.15){

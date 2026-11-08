@@ -1529,6 +1529,9 @@ def apply(world, cfg):
     if 19 in cfg['zones']:      # after the Prismwaste and the Orrery: both left their Stormglass border clear (their gates became its seams); it rewrites the arrivals of Asterion's, Sunward's, Frostwake's and Emberwake's crossings and the Eye's way back
         import storm_design
         print('stormglass', storm_design.design(world, write=True)[1])
+    if 45 in cfg['zones']:      # after the Stormglass Flats (its south gate became the seam): it rewrites the arrivals of the Orrery's, the Ribbonwild's and the raid's crossings and makes the Nine-Chain Door camp
+        import ember_design
+        print('emberwake', ember_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)
@@ -1542,6 +1545,8 @@ def apply(world, cfg):
     if 0 in cfg['zones']:       # last of all: the pier is cut out of zone 0's final voids (scripts/greenmeadow_dock.py)
         import greenmeadow_dock
         print('greenmeadow dock', greenmeadow_dock.build(world, json.loads((ROOT / 'world/levels.txt').read_text())))
+    if 16 in cfg['zones'] and 45 in cfg['zones']:      # Emberwake's seam arrived after the Canopy's fill: only its spawns within 7 tiles of the seam and the loose scenery within 2.5 go
+        print('canopy seam trim', trim_late_seam(world, 16, 45))
     # really last: a road crosses every seam (owner, 2026-11-07), laid on the finished designs so no seeded scatter moves (scripts/seam_roads.py)
     import seam_roads
     for line in seam_roads.build(world, [z for z in seam_roads.ROAD_ZONES if z in cfg['zones']]):
@@ -1550,6 +1555,30 @@ def apply(world, cfg):
         import storm_design
         storm_design.rename(world)
     return shifted
+
+
+def trim_late_seam(world, z, to, spawn_dist=7.0, loose_dist=2.5):
+    """A seam that arrived after zone `z` was filled or designed (Emberwake's, 2026-11-08, against the Moonspore Canopy): a hero must not wake a pack while
+    crossing and no loose scenery stands on the line. Only the spawns within `spawn_dist` of the seam to `to` and the loose objects within `loose_dist` go;
+    nothing else moves. Returns (spawns, objects) dropped."""
+    zone = zone_of(world, z)
+    n = zone['size']
+    ys, xs = np.mgrid[0:n, 0:n] + .5
+    field = np.full((n, n), 1e9)
+    for p in zone['portals']:
+        if p.get('seam') and p['to'] == to:
+            pts = p['seam']['points']
+            for a, b in zip(pts, pts[1:]):
+                dx, dy = b[0] - a[0], b[1] - a[1]
+                t = np.clip(((xs - a[0]) * dx + (ys - a[1]) * dy) / max(dx * dx + dy * dy, 1e-9), 0, 1)
+                field = np.minimum(field, np.hypot(xs - a[0] - t * dx, ys - a[1] - t * dy))
+    at = lambda o: field[min(max(int(o['y']), 0), n - 1), min(max(int(o['x']), 0), n - 1)]
+    keep = [t for t in zone['slimes'] if at(t) > spawn_dist]
+    gone = len(zone['slimes']) - len(keep)
+    zone['slimes'] = keep
+    loose = [o for o in zone['objects'] if o['kind'] != 'void' and o.get('layout') == TAG and at(o) < loose_dist]
+    zone['objects'] = [o for o in zone['objects'] if o not in loose]
+    return gone, len(loose)
 
 
 def align_corner_wall(world, margins):
@@ -1671,8 +1700,8 @@ def check(z, view, geom):
         bad += [(key, o['x'], o['y']) for o in view.get(key, []) if not ok(o['x'], o['y'])]
     assert ok(view['spawn']['x'], view['spawn']['y']), f'zone {z}: spawn outside the outline'
     assert not bad, f'zone {z}: content outside the outline: {bad[:5]}'
-    c = view['city']
-    assert all(ok(x, y) for x in (c['x0'], c['x1']) for y in (c['y0'], c['y1'])), f'zone {z}: city outside the outline'
+    c = view.get('city')        # an outdoor zone without a hub rectangle (Emberwake) has none until its design makes one
+    assert not c or all(ok(x, y) for x in (c['x0'], c['x1']) for y in (c['y0'], c['y1'])), f'zone {z}: city outside the outline'
 
 
 def main():

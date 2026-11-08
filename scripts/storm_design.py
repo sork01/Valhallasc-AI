@@ -34,7 +34,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import storm_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-19.txt'
 
@@ -178,7 +178,7 @@ def roads(G):
 
 class Stormglass(Designer):
     TAG, SEED = 'storm_design_v1', 20261108
-    LATE_SEAMS = set()
+    LATE_SEAMS = {45}       # Emberwake's seam arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate path_19_45 keeps its discs)
 
     def __init__(self, world, old):
         self.old = old
@@ -438,10 +438,18 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    if any(p.get('seam') and p['to'] == 45 for p in zone['portals']):      # Emberwake's seam (2026-11-08) replaced the south rim gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go
+        d.late_dropped = drop_near_seam(zone, d, 45)
+        loose = ('blackpebble', 'seafoam', 'stormreed')
+        near = lambda o: d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5
+        before = len(objects)
+        objects = [o for o in objects if not (o['kind'] in loose and o.get('layout') == d.TAG and near(o))]
+        d.late_dropped += before - len(objects)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
-    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items()]
+    seamed = {p['id'] for p in zone['portals'] if p.get('seam')}      # Emberwake's seam replaced the south rim gate: its line is the border, not a gate
+    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(zone, content.HAMLETS)

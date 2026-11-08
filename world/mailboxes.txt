@@ -669,5 +669,60 @@
       "x": 271,
       "y": 153.5
     }
+  },
+  {
+    "id": "mailbox_45_chainrest",
+    "zone": 45,
+    "hub": "Chainrest",
+    "x": 235,
+    "y": 90,
+    "anchor": {
+      "x": 227,
+      "y": 89
+    }
+  },
+  {
+    "id": "mailbox_45_door",
+    "zone": 45,
+    "hub": "Nine-Chain Hold",
+    "x": 312,
+    "y": 102,
+    "anchor": {
+      "x": 307,
+      "y": 98
+    }
+  },
+  {
+    "id": "mailbox_45_craterwatch",
+    "zone": 45,
+    "hub": "Craterwatch",
+    "x": 103,
+    "y": 129,
+    "anchor": {
+      "x": 99,
+      "y": 130
+    }
+  },
+  {
+    "id": "mailbox_45_cinderquay",
+    "zone": 45,
+    "hub": "Cinderquay",
+    "x": 188,
+    "y": 313,
+    "anchor": {
+      "x": 185,
+      "y": 315.5
+    }
+  },
+  {
+    "id": "mailbox_45_glasshold",
+    "zone": 45,
+    "hub": "Glasshold",
+    "x": 290,
+    "y": 229,
+    "anchor": {
+      "x": 291,
+      "y": 229.5
+    }
   }
 ]

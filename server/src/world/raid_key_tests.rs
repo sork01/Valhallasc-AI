@@ -295,7 +295,7 @@ fn raid_key_unkeyed_saved_raid_occupant_wakes_outside_without_grandfathering() {
     w.join(2, Some(token), None, tx).unwrap();
     let c = &w.players[&2].character;
     assert_eq!(c.zone, 45);
-    assert!(c.point().distance(Point { x: 127., y: 25. }) < 1.);
+    assert!(c.point().distance(Point { x: 316., y: 81. }) < 1.); // in front of the Nine-Chain Door, which moved whole in the shapes pilot (scripts/ember_design.py)
     assert!(
         !c.quests
             .iter()

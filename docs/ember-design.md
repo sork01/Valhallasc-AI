@@ -1,0 +1,42 @@
+# Emberwake Caldera as a shaped, authored zone (zone shapes pilot, 2026-11-08)
+
+Owner request: "for pilot. reshape emberwake caldera. and remake the zone and quests to fit the new shape. no fillers." Owner answers: seamless against **the Stormglass Flats (north) and the Moonspore Canopy (west)**, **keep the three elites**, **three outposts**. Pilot only (branch `feat/zone-shapes-ember`, off `feat/zone-shapes-storm`, worktree `/media/raid/valhallasc-data/zone-ember-work`, cargo target `zone-ember-target`, wrapper `zone-ember-cargo.sh`). The fourteenth pilot zone: 0, 1, 2, 3, 6, 7, 8, 9, 13, 14, 15, 16, 19, 45.
+
+## The shape
+
+At k = 1.0 the atlas outline is grid 400 with 90,795 land tiles (the old square was 160, 25,600 tiles). Borders: the Stormglass Flats on the north (269 tiles), the Moonspore Canopy on the west (333), the Obsidian Orrery in the north-west corner (158), the Ribbonwild on the east (301) and a 213-tile **coast** on the south. The painting shows a great crater north-west of the middle, a glowing river across the whole zone from the Canopy border to the Ribbonwild, a cold crater and a hot one in the south, painted chain roads and many peaks.
+
+`world/zone-shapes.txt`: `designOnly: [.., 45]`, `seamWith {45: [16, 19], 19: [14, 15, 45]}` (16 has no rule). Seams to the Flats and the Canopy, a road across each (`seam_roads.ROAD_ZONES` + 45). The Orrery (`atlas_45_15`, at (118.5, 14.5)) and the Ribbonwild (`path_45_21`, at (361.5, 130.5)) stay walk-in rim gates. The Chained Forge's door (`ew_raid`) keeps its key.
+
+## What moved and what was proven unchanged
+
+- **A late seam on an approved zone, twice.** The Flats' approved design ran unchanged with its south gate as a phantom (`storm_design.LATE_SEAMS = {45}`: the masks and the seeded scatter are identical): only its 8 spawns within 7 tiles of the new seam and 1 loose pebble within 2.5 went, its exit route for the gate and its inbound rewrite skip the seam portal. The Canopy is a filler zone, so `zone_shapes.trim_late_seam` drops its 5 spawns within 7 tiles of the seam and 3 loose objects (nothing else moves; the seam road clears 22 more).
+- **Cross-zone map diff against HEAD** (voids excluded): zones 0-14, 17, 18, 20, 22-44 identical; the Orrery and the Ribbonwild differ only in an arrival coordinate, the Chained Forge only in its two ways out, the Flats and the Canopy only in the seam portal, the trimmed objects/spawns, the seam road and voids.
+- The Orrery and the Flats borders were scanned first (art-less objects within 20 tiles, spawns within 7, loose scenery within 2.5): the Flats' kinds near the border all have `City.art` (`stormglassart.js`), so they ghost across the seam like the other approved zones'.
+
+## The design (`scripts/ember_design.py`, `ember_content.py`)
+
+- **Moved whole as a rigid block** from `world/zone-shapes/preshape-45.txt`: the Nine-Chain Door, its tablet, the Voice below and the Meeting Stone with Orri, the seal and the echo, by (189, 56): the door stands at (322, 76), the road's end in the north-east, as in the old zone (the door at the end of the road, the causeway halfway). The raid's two ways out (`cf_return`, `cf_clear`) arrive at (316, 81) in front of it.
+- **Hubs.** **Chainrest** (Svala's camp, the zone's `city` and spawn, on the Chain Road at (228, 84) 50 tiles from the Flats seam), the **Nine-Chain Hold** (a camp round the Door, 36 x 36), and three outposts: **Craterwatch** (the western rim, on the road), **Cinderquay** (the black shore) and **Glasshold** (the river's southern bank). Every hub has a Travel Master (all five linked), a mailbox (`world/mailboxes.txt` rewritten) and, at the outposts, two givers and a trader.
+- **The river** is 267 lava circles along the painted path from x 93 (19 tiles from the Canopy seam) to the Ribbonwild, broken at the **causeway** (190, 226) where the Chain Road crosses; the west end is open ground, so there are two crossings. **Two lava lakes** in the great crater and the hot crater; **a lava circle never stands within 17 tiles of a seam** (a seam neighbour draws no lava; asserted in `check()` and in Rust).
+- **Roads** follow the painting: the west road (R1), the straight north road (R2), the diagonal chain road to the Door (R3, over the causeway), the south road (R4), the coast road (R5), the south-bank road to Glasshold (R6), and the gate roads. Chain lamps every 34 tiles on alternate sides.
+- **Landmarks:** rings of basalt columns round the great crater (open south, west, east, north) and the hot crater (open north, south, west, east), a ring of obsidian round the cold crater, 14 volcano cones where the painting has its peaks, two shackles and three half-buried links at the First Shackle, a low ring of slag round every hold circle and elite.
+- **Fourteen regions** (nearest seed, warped): The Ash Verge, The Bellows Crater, The Caldera Rim, The Cinder Slopes, The Broken Links, The Molten Reach, The Glass Steppe, The Door Terraces, Chainrest Flats, The Quenched Basin, The Ember Crater, The Black Shore, The Slag Banks, The Slagfold. Ten ground classes (`EmberwakeArt.classGround`, `EMBERWAKE_MINI`): ash, cinder, obsidian glass, basalt plates, scorched earth, crater floor, quenched basin, pale ash, black sand (the coast), cooled slag (the river banks).
+- **Spawns:** 232 live (229 ordinary + 3 elites) + 17 sleepers (16 hold-wave ambushers and the Empty Seat's shade): the four ordinary kinds banded by region (ashbacks by the Flats seam, rams deep, none beside the Canopy seam), none within 22 tiles of a seam (a calm strip along both: heroes of level 55-65 cross into level 95-99 ground). Elites: **Chainmaw** (97, quest `ew_link`) at the Broken Links, **Yrsa** (99, quest `ew_breath`) on the floor of the great crater, **the Uncrowned Ember** (99, no quest) in the hot crater, each awareness + 3 clear of every road, place, person, hub and gate (a glade of 12 tiles is cleared of tall scenery round each).
+- **Scenery** (`client/emberwakeart.js`): `ew_hut`, `ew_cone`, `ew_obsidian`, `ew_slag`, `ew_ashtree`, `ew_link` are new; `ew_basalt`, `ew_vent`, `ew_lantern`, `ew_shackle`, `ew_warmstone`, `ew_door`, `ew_tablet`, `ew_echo` stay. Every kind has `City.art`, so every one ghosts across a seam.
+
+## Quests (26; the old 12 keep their ids, 14 are new)
+
+- **Old, kept:** `ew_warm`, `ew_road`, `ew_link`, `ew_breath`, `ew_voice`, `raid_key`, `es_25`..`es_27` and the three `es_go_*` handoffs; five descriptions and two people's roles/dialogue were reworded where the geography changed (`ew_road` no longer starts at Asterion).
+- **New:** `ew_h_hold` (hold the Chain Lamps) and `ew_h_rounds` (speak to the three wardens); per outpost four: a walk with kills, a bring, a hold circle, a final walk (`ew_cw_*`, `ew_cq_*`, `ew_gh_*`). Four hold circles wake two waves of two sleepers each. Rewards in `quest_gear_rewards.py` (a green at the end of each chain). Swedish written by hand.
+- Empty Seat: `es_25_m` (the guest at the last door, with its shade) moved to (322, 126), outside the sanctuary; `es_26_m` moved with the Door.
+
+## Checks
+
+`cargo test emberwake_` (7) + `zone_shape` (the 16-45 and 19-45 seams, the gates, the seam set); `python3 tests/seam-roads.py` (2,911 checks, 16 seam pairs); `python3 scripts/ember_design.py plan OUT.png`; `REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/ember-design-ui.cjs` (`SEAM_ONLY=1 KS='[7]'` for the seams alone; `MUTATE=1` serves the previous `emberwakeart.js`: the ground-class check must fail).
+
+## Not done / open
+
+- Older suites that teleport into Emberwake at the old coordinates (`tests/emberwake-ui.cjs`, MCP `emberwake`) are stale like the other pilot zones'. The Asterion road gate described in `docs/emberwake.md` was already replaced by the atlas gates before this work.
+- The minimap and the world map show the plain pilot background. The coast uses the generic shallows and foam.
+- Spawn density (2.5 per 1,000 tiles) and the elites' placement are judged from the data, not in play. The Ribbonwild and the Orrery are not shaped: the triple corners (Orrery/Canopy/Emberwake near (0, 82), Orrery/Flats/Emberwake near (135, 7)) keep their rim-gate letters.
