@@ -115,13 +115,16 @@ const GROUND = { 'The Obsidian Reaches': [45, null] };
         const tilesBefore = await page.evaluate(() => Field.miniTiles);
         const entered0 = await page.evaluate(() => { document.getElementById('area-title').classList.remove('show'); return (document.body.innerText.match(/You enter/g) || []).length; });
         const keys = keysFor([-dir[0], -dir[1]]);
+        const w0 = await where();
         for (const key of keys) await page.keyboard.down(key);
         await page.waitForFunction(z => Field.zone === z, to, { timeout: 15000 });
+        const seamless = await page.evaluate(() => Field.seamless);       // read at the crossing: the flag lasts 2.5 s and the bounded software renderer is slow
+        if (process.env.DEBUG_SEAM) console.log('crossing', from, '->', to, 'start', JSON.stringify(w0), 'keys', keys.join('+'), 'arrived', JSON.stringify(await where()), 'seamless', await page.evaluate(() => Field.seamless), 'shift', shx, shy);
         for (const key of keys) await page.keyboard.up(key);
         await page.waitForTimeout(500);
         const p = await where();
         check(onFloor(zt, p.x, p.y) || [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => onFloor(zt, p.x + dx, p.y + dy)), `seam crossing ${from} -> ${to} arrived on the floor at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
-        check(await page.evaluate(() => Field.seamless), `seam crossing ${from} -> ${to} was recognised as seamless`);
+        check(seamless, `seam crossing ${from} -> ${to} was recognised as seamless`);
         check(await page.evaluate(n => !document.getElementById('area-title').classList.contains('show') && (document.body.innerText.match(/You enter/g) || []).length === n, entered0), `seam crossing ${from} -> ${to}: no zone banner and no new "You enter" line`);
         check(tilesBefore === await page.evaluate(() => Field.miniTiles), `seam crossing ${from} -> ${to}: the minimap keeps its scale`);
         if (k === 7) await page.screenshot({ path: path.join(out, `seam-${from}-to-${to}.png`) });

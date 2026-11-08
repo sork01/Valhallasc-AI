@@ -1122,7 +1122,7 @@
     cometmaw: { name: 'Cometmaw', elite: true, scale: 1.8, top: 90, col: ['#bfeaff', '#4a8ab8', '#0c1a30'] },
     eclipsequeen: { name: 'Eclipse Queen', elite: true, scale: 1.4, top: 110, col: ['#d8b8f0', '#5a3a78', '#100a1c'] },
     orbitwarden: { name: 'Orbit Warden', elite: true, scale: 1.5, top: 120, col: ['#ffe2a0', '#8a7a58', '#1a1810'] },
-    mainspringwyrm: { name: 'Mainspring Wyrm', elite: true, scale: 1.6, top: 100, col: ['#e8c98a', '#8a6a3a', '#1c1710'] },
+    mainspringwyrm: { name: 'Mainspring Wyrm', elite: true, scale: 1.4, top: 100, col: ['#e8c98a', '#8a6a3a', '#1c1710'] },
     crab: { name: 'Rime Crab', scale: 1.1, top: 53, col: ['#d8f2ff', '#6fb3dc', '#2d5f8a'] },
     wolf: { name: 'Frostfang Wolf', scale: 1.1, top: 67, col: ['#f2f6fa', '#9fb4c8', '#4a5d74'] },
     yeti: { name: 'Glacier Yeti', scale: 1.2, top: 85, col: ['#f4f8fc', '#b9cbdc', '#5e7690'] },
