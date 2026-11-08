@@ -40,7 +40,7 @@ The rename is data and display only: ids, the `stormglass` theme and the `stormg
 ## Not done / open
 
 - The elites' stats and fights are first guesses; the art is a first pass.
-- The Empty Seat's text for `es_15` still says "a cold shore" (`scripts/empty_seat.py` owns it): a question for the owner.
+- The Empty Seat's `es_15` text was reworded (owner, 2026-11-08): salt boils on the dry sea bed, in `scripts/empty_seat.py` and its Swedish.
 - Older suites that teleport into the Shore at the old coordinates (`tests/stormglass-ui.cjs`, MCP `stormglass`) are stale like the other pilot zones'.
 - Sunward Vale, Frostwake and Emberwake are not shaped yet; when they are, their borders with the Flats need the same reservation scan (art-less 20, spawns 7, loose scenery 2.5 along `shape.edges`; the Flats' east side is not reserved).
 - The minimap and the world map show the plain pilot background.
