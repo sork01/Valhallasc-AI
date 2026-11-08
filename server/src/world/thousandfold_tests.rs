@@ -63,6 +63,12 @@ fn thousandfold_encounters_are_reachable_through_the_open_entrance() {
 #[test]
 fn thousandfold_level_gate_and_party_copies() {
     let mut w = world();
+    let door = w.maps[21]
+        .portals
+        .iter()
+        .find(|p| p.id == "ribbon_pavilion_gate")
+        .map(|p| (p.x, p.y))
+        .unwrap();
     for (session, class) in [(1, Class::Warrior), (2, Class::Priest), (3, Class::Mage)] {
         let _ = join(&mut w, session, class);
         w.players.get_mut(&session).unwrap().character.level = 75;
@@ -82,13 +88,13 @@ fn thousandfold_level_gate_and_party_copies() {
         },
     );
     w.players.get_mut(&1).unwrap().character.level = 74;
-    place(&mut w, 1, 21, at(119., 65.));
+    place(&mut w, 1, 21, at(door.0, door.1));
     w.time += 1.;
     w.use_portal(1);
     assert_eq!(w.players[&1].character.zone, 21);
     w.players.get_mut(&1).unwrap().character.level = 75;
     for session in [1, 2, 3] {
-        place(&mut w, session, 21, at(119., 65.));
+        place(&mut w, session, 21, at(door.0, door.1));
         w.time += 1.;
         w.use_portal(session);
     }
