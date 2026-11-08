@@ -1,7 +1,7 @@
 //! Emberwake Caldera (zone 45, levels 95-99) as an authored map on the shapes pilot: its data, the four seams (the
 //! Stormglass Flats on the north, the Obsidian Orrery on the north-west corner, the Moonspore Canopy on the west, the Ribbonwild on the east), Chainrest and four more hubs, the molten river and its causeway, the Nine-Chain Door and its two ways
 //! out, the quests (holds, visits, brings, kills, the two elite quests) and the three elites.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
 use super::*;
 const ZONE: usize = 45;
 const ELITES: [(&str, u32); 3] = [("ew_chainmaw", 97), ("ew_bellows", 99), ("ew_crown", 99)];
@@ -11,15 +11,6 @@ const HAMLETS: [(&str, &str); 3] = [
     ("cinderquay", "ew_cq_"),
     ("glasshold", "ew_gh_"),
 ];
-
-fn run(w: &mut World, rx: &mut mpsc::Receiver<Value>, ticks: usize) -> Vec<String> {
-    let mut told = vec![];
-    for _ in 0..ticks {
-        w.step();
-        told.extend(lines(rx));
-    }
-    told
-}
 
 /// Distance from a point to a polyline.
 fn to_line(p: Point, line: &[Point]) -> f64 {
