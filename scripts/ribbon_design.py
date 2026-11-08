@@ -31,7 +31,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import ribbon_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-21.txt'
 
@@ -154,7 +154,7 @@ def roads(G):
 
 class Ribbonwild(Designer):
     TAG, SEED = 'ribbon_design_v1', 20261109
-    LATE_SEAMS = set()
+    LATE_SEAMS = {22}       # the Tanglecrown's seam arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate ribbon_tangle_gate keeps its discs and its road)
 
     def __init__(self, world, old):
         self.old = old
@@ -429,6 +429,8 @@ def link_travel(world):
         for p in z['portals']:
             if p['to'] == i or ZONE not in (i, p['to']):
                 continue
+            if p.get('seam') and 22 in (i, p['to']):      # the Tanglecrown's seam (both its portals) is linked by tangle_design.link_travel once they are aimed at the crossing
+                continue
             mine, other = masters(z), masters(zones[p['to']])
             if not mine or not other:
                 continue
@@ -453,10 +455,17 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    d.late_dropped = 0
+    if any(p.get('seam') and p['to'] == 22 for p in zone['portals']):      # the Tanglecrown's seam (2026-11-08) replaced the south-east rim gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go
+        d.late_dropped = drop_near_seam(zone, d, 22)
+        loose = [o for o in objects if o.get('layout') == d.TAG and o['kind'] != 'void' and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5]
+        objects = [o for o in objects if o not in loose]
+        d.late_dropped += len(loose)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
-    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items()]
+    seamed = {p['id'] for p in zone['portals'] if p.get('seam')}      # the Tanglecrown's seam replaced the south-east rim gate: its line is the border, not a gate
+    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(world, zone, content.HAMLETS, old)
@@ -471,7 +480,7 @@ def design(world, write=False):
     if write:
         content.record_mailboxes(zone, content.HAMLETS, ROOT / 'world/mailboxes.txt')
     problems = check(zone, d, solid, seen, G)
-    stats = dict(short=d.short, objects=len([o for o in objects if o['kind'] != 'void']), spawns=len(zone['slimes']), land=int(d.floor.sum()), reachable=int(seen.sum()),
+    stats = dict(late_dropped=d.late_dropped, short=d.short, objects=len([o for o in objects if o['kind'] != 'void']), spawns=len(zone['slimes']), land=int(d.floor.sum()), reachable=int(seen.sum()),
                  quests=len(zone['quests']), npcs=len(zone['npcs']),
                  kinds={k: sum(1 for o in objects if o['kind'] == k) for k in ('festival_bloom', 'fan_topiary', 'pinwheel', 'ribbon_pole', 'confetti_lantern', 'rw_blossom_tree')})
     if problems:
@@ -549,6 +558,19 @@ def check(zone, d, solid, seen, G):
     loose = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o.get('layout') == d.TAG and o['kind'] != 'void' and d.reserve[int(o['y']), int(o['x'])] < 2.5]
     if loose:
         problems.append(f'loose scenery within 2.5 tiles of the seam: {loose[:5]}')
+    # the Tanglecrown's seam (late): a seam neighbour draws scenery with art but no people and no art-less objects, so none of those stand within 20 tiles of it (the Pavilion's mailbox and Spark master stepped back)
+    at_late = lambda o: d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)]
+    near_late = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o['kind'] in ARTLESS and at_late(o) < 20]
+    if near_late:
+        problems.append(f'art-less objects within 20 tiles of the Tanglecrown seam: {near_late[:5]}')
+    people_late = [(n['id'], round(float(at_late(n)), 1)) for n in zone['npcs'] if at_late(n) < 20]
+    if people_late:
+        problems.append(f'people within 20 tiles of the Tanglecrown seam pop in on crossing: {people_late[:5]}')
+    loose_late = [(o['kind'], o['x'], o['y']) for o in zone['objects'] if o.get('layout') == d.TAG and o['kind'] != 'void' and at_late(o) < 2.5]
+    if loose_late:
+        problems.append(f'loose scenery within 2.5 tiles of the Tanglecrown seam: {loose_late[:5]}')
+    if any(at_late(t) <= 7 for t in zone['slimes'] if t.get('layout') == d.TAG):
+        problems.append('a spawn within 7 tiles of the Tanglecrown seam')
     if sum(d.short.values()) > 12:
         problems.append(f'regions short of spawns: {d.short}')
     for h in content.HAMLETS.values():

@@ -9,11 +9,8 @@ const ELITES: [(&str, u32); 3] = [
     ("maskcolossus", 75),
     ("whorlshell", 73),
 ];
-/// (gate, the zone it leads to, the far gate that leads back); the border to Emberwake is a seam, the Pavilion is a door
-const GATES: [(&str, usize, &str); 2] = [
-    ("ribbon_sun_gate", 20, "sun_ribbon_gate"),
-    ("ribbon_tangle_gate", 22, "tangle_ribbon_gate"),
-];
+/// (gate, the zone it leads to, the far gate that leads back); the borders to Emberwake and the Tanglecrown are seams, the Pavilion is a door
+const GATES: [(&str, usize, &str); 1] = [("ribbon_sun_gate", 20, "sun_ribbon_gate")];
 const HAMLETS: [(&str, &str); 3] = [
     ("bunting", "rw_bp_"),
     ("tassel", "rw_tp_"),
@@ -128,8 +125,8 @@ fn the_ribbonwild_is_a_big_wheel_with_four_families_three_elites_five_hubs_and_t
 }
 
 #[test]
-fn both_gates_are_walked_through_both_ways_the_door_leads_to_the_pavilion_and_the_arrivals_are_clear()
- {
+fn the_gate_is_walked_through_both_ways_the_door_leads_to_the_pavilion_and_the_arrivals_are_clear()
+{
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
     for (gate_id, zone, back_id) in GATES {
@@ -209,7 +206,8 @@ fn both_gates_are_walked_through_both_ways_the_door_leads_to_the_pavilion_and_th
 }
 
 #[test]
-fn the_ribbonwild_border_to_emberwake_is_a_seam_and_the_other_borders_are_gates() {
+fn the_ribbonwild_borders_to_emberwake_and_the_tanglecrown_are_seams_and_the_other_borders_are_gates()
+ {
     let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -220,8 +218,11 @@ fn the_ribbonwild_border_to_emberwake_is_a_seam_and_the_other_borders_are_gates(
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(21, 45), (45, 21)].into();
-    assert_eq!(pairs, want, "one seam to Emberwake, seen from both sides");
+    let want: std::collections::BTreeSet<_> = [(21, 22), (21, 45), (22, 21), (45, 21)].into();
+    assert_eq!(
+        pairs, want,
+        "one seam to Emberwake and one to the Tanglecrown, each seen from both sides"
+    );
 }
 
 #[test]

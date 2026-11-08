@@ -25180,6 +25180,13 @@
     "sell": 4400
   },
   {
+    "id": "hollow_chitin",
+    "name": "Hollowroot Chitin",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4300
+  },
+  {
     "id": "hermit_lens",
     "name": "Hermit Lens",
     "kind": "material",

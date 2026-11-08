@@ -1535,6 +1535,9 @@ def apply(world, cfg):
     if 21 in cfg['zones']:      # after Emberwake (its east gate became the seam; its design dropped the spawns and lava near it): it rewrites the arrivals of Sunward's, the Tanglecrown's and the Pavilion's crossings
         import ribbon_design
         print('ribbonwild', ribbon_design.design(world, write=True)[1])
+    if 22 in cfg['zones']:      # after the Ribbonwild (its south-east gate became the seam; its design dropped the spawns near it): it rewrites the arrivals of Sunward's, the Veyrroot Canopy's and the temple's crossings
+        import tangle_design
+        print('tanglecrown', tangle_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

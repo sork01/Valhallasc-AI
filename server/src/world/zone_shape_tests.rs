@@ -835,6 +835,35 @@ fn emberwake_and_the_ribbonwild_share_a_seam() {
 }
 
 #[test]
+fn the_tanglecrown_and_the_ribbonwild_share_a_seam() {
+    seam_walks(21, 22);
+}
+
+#[test]
+fn the_tanglecrown_keeps_its_gates_to_sunward_the_veyrroot_canopy_and_the_temple() {
+    gates_stand_on_free_land(22, &[20, 23, 32]);
+}
+
+#[test]
+fn the_tanglecrown_is_seamless_against_the_ribbonwild_only() {
+    let data = bundled();
+    let mut pairs = std::collections::BTreeSet::new();
+    for zi in 1..=data["zones"].as_array().unwrap().len() {
+        for p in zone_of(&data, zi)["portals"].as_array().unwrap() {
+            let to = p["to"].as_u64().unwrap() as usize;
+            if p.get("seam").is_some() && (zi == 22 || to == 22) {
+                pairs.insert((zi, to));
+            }
+        }
+    }
+    let want: std::collections::BTreeSet<_> = [(21, 22), (22, 21)].into();
+    assert_eq!(
+        pairs, want,
+        "one seam to the Ribbonwild, seen from both sides"
+    );
+}
+
+#[test]
 fn emberwake_is_seamless_against_the_stormglass_flats_the_moonspore_canopy_and_the_ribbonwild_only()
 {
     let data = bundled();

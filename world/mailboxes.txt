@@ -88,17 +88,6 @@
     }
   },
   {
-    "id": "mailbox_22_banyan_landing",
-    "zone": 22,
-    "hub": "Banyan Landing",
-    "x": 37.65,
-    "y": 127.27,
-    "anchor": {
-      "x": 36.5,
-      "y": 124.5
-    }
-  },
-  {
     "id": "mailbox_23_veyrroot_canopy",
     "zone": 23,
     "hub": "Veyrroot Canopy",
@@ -729,10 +718,10 @@
     "id": "mailbox_21_pavilion",
     "zone": 21,
     "hub": "Pavilion Steps",
-    "x": 297,
+    "x": 287,
     "y": 183,
     "anchor": {
-      "x": 299,
+      "x": 290,
       "y": 201
     }
   },
@@ -767,6 +756,61 @@
     "anchor": {
       "x": 304,
       "y": 293.5
+    }
+  },
+  {
+    "id": "mailbox_22_banyan_landing",
+    "zone": 22,
+    "hub": "Banyan Landing",
+    "x": 130.65,
+    "y": 207.27,
+    "anchor": {
+      "x": 129,
+      "y": 204
+    }
+  },
+  {
+    "id": "mailbox_22_rootgate",
+    "zone": 22,
+    "hub": "Rootgate Post",
+    "x": 172,
+    "y": 121,
+    "anchor": {
+      "x": 169,
+      "y": 123.5
+    }
+  },
+  {
+    "id": "mailbox_22_drumroot",
+    "zone": 22,
+    "hub": "Drumroot Post",
+    "x": 217,
+    "y": 129,
+    "anchor": {
+      "x": 213,
+      "y": 131.5
+    }
+  },
+  {
+    "id": "mailbox_22_stilt",
+    "zone": 22,
+    "hub": "Stilt Post",
+    "x": 158,
+    "y": 221,
+    "anchor": {
+      "x": 159,
+      "y": 221.5
+    }
+  },
+  {
+    "id": "mailbox_22_rainstep",
+    "zone": 22,
+    "hub": "Rainstep Camp",
+    "x": 261,
+    "y": 140,
+    "anchor": {
+      "x": 246,
+      "y": 152
     }
   }
 ]

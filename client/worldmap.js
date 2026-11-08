@@ -109,7 +109,7 @@
     maskcolossus:['Masquerade Colossus (Elite · 5 players)',75,'#ae94dc'], whorlshell:['Whorlshell (Elite · 3 players)',73,'#f2b8e8'],
     orchidmantis:['Orchid Mantis',75,'#d5ef83'],canopyglider:['Canopy Glider',76,'#59c0b5'],
     poolcaiman:['Blackwater Caiman',77,'#6ea58c'],drumgorilla:['Drum Gorilla',78,'#c69a70'],
-    jadeanaconda:['Jade Anaconda (Elite · 3 players)',79,'#4dc098'],
+    jadeanaconda:['Jade Anaconda (Elite · 3 players)',79,'#4dc098'], rootcentipede:['Hollowroot Centipede (Elite · 3 players)',77,'#c8e68a'],
     crownjaguar:['Crown Jaguar (Elite · 5 players)',80,'#f1ce73'],
     sapbeetle:['Sap Beetle',80,'#e3ae59'],lanternhornet:['Lantern Hornet',80,'#d7cf74'],
     mosslemur:['Moss Lemur',80,'#c8d68a'],barkmimic:['Bark Mimic',80,'#c5a479'],

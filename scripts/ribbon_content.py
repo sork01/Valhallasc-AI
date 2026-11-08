@@ -238,13 +238,13 @@ def people(world, zone, hamlets, old):
                  offers=copy.deepcopy(healer + [o for o in supplier if o['id'] == 'stew']) if trader else [], buys=trader, look=s['look'])
         out.append(n)
     keys = list(hamlets)
-    spots = {'bunting': (-1, 3.5), 'tassel': (-1, 3.5), 'garland': (-1, 3.5), 'pavilion': (6, 9)}
+    spots = {'bunting': (-1, 3.5), 'tassel': (-1, 3.5), 'garland': (-1, 3.5), 'pavilion': (-3, 9)}      # the Pavilion's master stands 21+ tiles from the Tanglecrown seam (a seam neighbour draws no people)
     for key, (dx, dy) in spots.items():
         h = hamlets[key]
         t = copy.deepcopy(hub)
         t.update(id=f'travel_{key}', x=h['x'] + dx, y=h['y'] + dy, travelStop=h['name'], travelLinks=[f'travel_{k}' for k in keys if k != key])
         out.append(t)
-    boxes = {'bunting': (2, 1), 'tassel': (3, 1), 'garland': (-2, 3), 'pavilion': (4, -9)}
+    boxes = {'bunting': (2, 1), 'tassel': (3, 1), 'garland': (-2, 3), 'pavilion': (-6, -9)}
     for key, (dx, dy) in boxes.items():
         h = hamlets[key]
         m = copy.deepcopy(box)
