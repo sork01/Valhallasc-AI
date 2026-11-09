@@ -2,6 +2,7 @@
 // fern shade), the five hubs name themselves, the three elites draw from their art, the Sunward gate and the Hollow Arch stand on the floor, and the two borders to the Tanglecrown and the
 // Lapis Erg are seams: a held key walks over each and the hero ends up in the neighbour, and walks back. Pictures in test-results/veyrroot-design/.
 //   REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/veyrroot-design-ui.cjs
+//   MUTATE=seam serves the committed client/field.js (generic seam tint): the Tanglecrown same-point check must fail.
 //   MUTATE=1 serves the pilot's previous client/field.js (before the Veyrroot's ground classes): the ground-class check must fail.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -36,12 +37,14 @@ const GROUND = ['The Sunlit Glade', 'The Fernbreak'], lums = {};
   for (let i = 0; i < 100; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch (_) {} await new Promise(r => setTimeout(r, 200)); }
   browser = await chromium.launch({ headless: true });
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' })).newPage();
-  const errors = []; page.on('pageerror', e => errors.push(e.message + ' @ ' + (e.stack || '').split('\n').slice(1, 4).join(' | ')));
+  const errors = []; page.on('pageerror', e => console.log('PAGEERROR', e.message) || errors.push(e.message + ' @ ' + (e.stack || '').split('\n').slice(1, 4).join(' | ')));
   if (process.env.MUTATE) {
-    const old = execSync('git show b9c59c8:client/field.js', { cwd: root, maxBuffer: 1 << 28 });
+    const old = execSync(`git show ${process.env.MUTATE === 'seam' ? 'HEAD' : 'b9c59c8'}:client/field.js`, { cwd: root, maxBuffer: 1 << 28 });
     await page.route('**/field.js*', r => r.fulfill({ status: 200, contentType: 'application/javascript', body: old }));
   }
-  await page.addInitScript(v => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', v); }, VERSION);
+  await page.addInitScript(v => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', v);
+    const raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = cb => raf(ts => cb(window.__freezeT ?? ts));     // __freezeT: draw every frame at one time
+  }, VERSION);
   await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('VeyrrootWalker'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
@@ -55,6 +58,7 @@ const GROUND = ['The Sunlit Glade', 'The Fernbreak'], lums = {};
   const solids = Z.objects.filter(o => o.kind !== 'void' && (o.r > 0 || o.width > 0));
   const towns = [Z.city, ...Z.camps].map(c => [c.x0 - 6, c.y0 - 6, c.x1 + 6, c.y1 + 6]);
   const clear = (x, y) => Z.shapeFloor[y]?.[x] === '#' && !towns.some(t => x >= t[0] && x <= t[2] && y >= t[1] && y <= t[3]) && solids.every(o => Math.hypot(o.x - x - .5, o.y - y - .5) > Math.max(o.r || 0, (o.width || 0) / 2 + .4) + 4);
+  if (!process.env.SEAM_ONLY) {      // SEAM_ONLY=1: skip straight to the same-point seam check (the bounded runner's time cap)
   for (const [k, name] of Z.regions.names.entries()) {
     const mine = []; for (let y = 0; y < Z.size; y += 2) for (let x = 0; x < Z.size; x += 2) if (cells[y * Z.size + x] === k + 1 && Z.shapeFloor[y]?.[x] === '#') mine.push([x, y]);
     const mx = mine.reduce((s, c) => s + c[0], 0) / mine.length, my = mine.reduce((s, c) => s + c[1], 0) / mine.length;
@@ -105,6 +109,31 @@ const GROUND = ['The Sunlit Glade', 'The Fernbreak'], lums = {};
     for (const key of keys) await page.keyboard.up(key);
     await page.waitForTimeout(400);
     check((await where()).zone === 23, `a held key walks back over the seam from zone ${other}`);
+  }
+  }
+  // ---- the same world point on the line, drawn from the Veyrroot and from the Tanglecrown, looks the same (the ground blend toward a neighbour must be its real ground classes, not a generic tint)
+  const diff = (a, b) => { let sum = 0, big = 0; const n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
+  const snap = async (zone, x, y, wx, wy) => { await go(zone, x, y, 2500); await page.evaluate(() => { window.__freezeT = 600000; }); await page.waitForTimeout(300); const shot = await page.evaluate(([wx, wy]) => { const cv = document.getElementById('fieldcv'), [fx, fy] = Field.screenOf(wx, wy), Wd = 256, H = 160, cw = cv.width * .26, chh = cv.height * .26, o = document.createElement('canvas'); o.width = Wd; o.height = H; const g = o.getContext('2d'); g.drawImage(cv, fx * cv.width - cw / 2, fy * cv.height - chh / 2, cw, chh, 0, 0, Wd, H); return { px: Array.from(g.getImageData(0, 0, Wd, H).data), png: o.toDataURL('image/png') }; }, [wx, wy]); await page.evaluate(() => { delete window.__freezeT; }); return shot; };
+  for (const partner of [22, 25]) {
+    const sp = Z.portals.find(q => q.seam && q.to === partner), pts = sp.seam.points, [shx, shy] = sp.seam.shift, rows = [];
+    for (const k of JSON.parse(process.env.KS || '[4, 9]')) {
+      const a = pts[k], b = pts[k + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]), q = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
+      const inward = onFloor(Z, q[0] + nrm[0] * 4, q[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
+      const Pt = [q[0] + inward[0] * .5, q[1] + inward[1] * .5], B = [q[0] - inward[0] * .5 + shx, q[1] - inward[1] * .5 + shy], C = [q[0] + (b[0] - a[0]) / len * 7, q[1] + (b[1] - a[1]) / len * 7];
+      await go(23, Pt[0], Pt[1], 9000);
+      const a1 = await snap(23, Pt[0], Pt[1], C[0], C[1]), a2 = await snap(23, Pt[0], Pt[1], C[0], C[1]), b1 = await snap(partner, B[0], B[1], C[0] + shx, C[1] + shy);
+      if (process.env.PROFILE) {     // colours along the line's normal, seen from each side (debug)
+        const probe = async (zone, x, y, pts) => { await go(zone, x, y, 2500); await page.evaluate(() => { window.__freezeT = 600000; }); await page.waitForTimeout(300); const r = await page.evaluate(pts => { const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'); return pts.map(([wx, wy]) => { const [fx, fy] = Field.screenOf(wx, wy); return Array.from(g.getImageData(Math.round(fx * cv.width), Math.round(fy * cv.height), 1, 1).data.slice(0, 3)).join(','); }); }, pts); await page.evaluate(() => { delete window.__freezeT; }); return r; };
+        const ts = [-10, -6, -3, -1, 1, 3, 6, 10], inv = ts.map(t => [C[0] + inward[0] * t, C[1] + inward[1] * t]);
+        console.log('PROFILE t:', ts.join(' '));
+        console.log('PROFILE veyrroot view:', (await probe(23, Pt[0], Pt[1], inv)).join(' | '));
+        console.log('PROFILE tangle view  :', (await probe(partner, B[0], B[1], inv.map(([x, y]) => [x + shx, y + shy]))).join(' | '));
+      }
+      const noise = diff(a1, a2), d = diff(a1, b1);
+      fs.writeFileSync(path.join(out, `seam-same-${partner}-${k}-veyrroot.png`), Buffer.from(a1.png.split(',')[1], 'base64')); fs.writeFileSync(path.join(out, `seam-same-${partner}-${k}-other.png`), Buffer.from(b1.png.split(',')[1], 'base64'));
+      rows.push({ k, noise, d }); console.log(`seam ${partner} point ${k}: noise ${noise.mean.toFixed(2)}/${(noise.big * 100).toFixed(1)}%, across ${d.mean.toFixed(2)}/${(d.big * 100).toFixed(1)}%`);
+    }
+    for (const r of rows) check(r.d.mean <= Math.max(10, r.noise.mean * 2 + 2) && r.d.big <= Math.max(.10, r.noise.big * 2 + .02), `seam to zone ${partner}, point ${r.k}: the same point looks the same from both frames (${r.d.mean.toFixed(1)}/${(r.d.big * 100).toFixed(1)}%)`);
   }
   check(errors.length === 0, 'no page errors: ' + errors.slice(0, 3).join(' | '));
   console.log(JSON.stringify({ passed: true, checks }));

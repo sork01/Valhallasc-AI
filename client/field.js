@@ -264,14 +264,30 @@
   const BLEND_REACH = 14;
   // Sprites of the zones whose scenery can be drawn from the other side of a seam.
   const simpleSet = theme => theme === 'ember' ? emberSprites : theme === 'frost' ? frostSprites : theme === 'fen' ? fenSprites : theme === 'meadow' ? sprites : null;
+  // The noise seeds buildMap gives each theme's ground tone (first, second): groundSample must use the same field as the neighbour's own map.
+  const TONE_SEEDS = { ember: [11, 12], frost: [21, 22], fen: [31, 32], city: [41, 42], wyrd: [61, 62], deep: [81, 82], nacre: [81, 82], astral: [91, 92], prismwaste: [101, 102], orrery: [111, 112], moonspore: [121, 122], stormglass: [131, 132], sunward: [141, 142], ribbonwild: [151, 152], tanglecrown: [161, 162], worldtree: [171, 172], heartwood: [181, 182], lapiserg: [191, 192], frostwake: [201, 202], cairnspine: [211, 212], yearwheel: [221, 222] };
+  const nbClassCache = new Map();
+  // The ground class of zone `nz` at its own cell, from the same spans buildMap reads (0 where it has none).
+  function nbClassAt(nz, x, y) {
+    if (!nz.groundSpans) return 0;
+    let a = nbClassCache.get(nz); if (!a) { const n = nz.size; a = new Uint8Array(n * n); for (const [gy, x0, x1, k] of nz.groundSpans) a.fill(k, gy * n + x0, gy * n + x1 + 1); nbClassCache.set(nz, a); }
+    return x >= 0 && y >= 0 && x < nz.size && y < nz.size ? a[y * nz.size + x] : 0;
+  }
   // The ground of zone `nz` at its own cell (x, y): the same noise and trail test as buildMap, so a mapped cell looks as it will on arrival.
   function groundSample(nz, x, y) {
-    const cx = x + .5, cy = y + .5, [a, b] = nz.theme === 'ember' ? [11, 12] : nz.theme === 'frost' ? [21, 22] : nz.theme === 'fen' ? [31, 32] : nz.theme === 'deep' || nz.theme === 'nacre' ? [81, 82] : [1, 2];
+    const cx = x + .5, cy = y + .5, [a, b] = TONE_SEEDS[nz.theme] || [1, 2];
     const tone = vnoise(cx * .16, cy * .16, a) * .65 + vnoise(cx * .55, cy * .55, b) * .35;
     if (nz.theme === 'nacre') return { tone, dirt: roadAt(nz.roads, cx, cy) };     // the city's ground is its streets and squares (paintRoads), not trails
     let d = 99; for (const p of nz.paths || PATHS) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
     if (nz.theme === 'meadow') { const o = nz.shape ? nz.shape.offset : [0, 0]; d = Math.min(d, Math.hypot(cx - 36 - o[0], cy - 36 - o[1]) - 2.4); }
-    return { tone, dirt: d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0 };
+    return { tone, dirt: d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0, k: nbClassAt(nz, x, y) };
+  }
+  // The exact colour a class-painted zone gives a cell (what buildChunk fills), or null for a theme without class ground.
+  function classLook(theme, k, tone, dirt, alt) {
+    if (theme === 'worldtree') return dirt ? `hsl(${34+tone*8}, 42%, ${46+tone*8+alt}%)` : k ? veyrClassGround(k, tone, alt) : `hsl(${142+tone*18}, 51%, ${33+tone*10+alt}%)`;
+    if (theme === 'tanglecrown') return dirt ? `hsl(${34+tone*8}, ${37+tone*7}%, ${44+tone*8+alt}%)` : k ? tangleClassGround(k, tone, alt) : `hsl(${133+tone*19}, ${48+tone*9}%, ${29+tone*11+alt}%)`;
+    if (theme === 'lapiserg') return dirt ? `hsl(${34+tone*7}, 47%, ${63+tone*8+alt}%)` : k ? lapisClassGround(k, tone, alt) : `hsl(${35+tone*11}, ${58+tone*8}%, ${57+tone*12+alt}%)`;
+    return null;
   }
   // Greenmeadow's ground classes (scripts/greenmeadow_design.py, `groundSpans`): sand, tilled field, downs, forest floor, clover, scarp.
   function meadowGround(k, tone, alt, y) {
@@ -370,6 +386,7 @@
     if (c >= 'A' && c <= 'Z') {
       const nb = (zdef.shape?.neighbours || [])[code - 65], theme = ZONES[nb]?.theme || 'ember', seam = map.seamBy?.[nb];
       if (seam && ctxs.has(nb)) return;   // beyond a border you cross, the neighbour's own ground chunks are drawn (drawNeighbourGround)
+      if (seam) stand_in.add(nb);           // this chunk holds a generic stand-in for ground that neighbour has not drawn yet: it is re-rendered once the neighbour's context exists
       flat(groundOf(theme, tone, h > .93 && d < 4, alt));
       if (!zdef.portals.some(p => p.seam && p.to === nb)) { if (d <= 2) wallBlock(g, px, py, BORDER_LOOK[theme] || [215, 12, 26], d === 1 ? 14 * (.75 + h * .5) : 7, tone, h); }
       else if (d > 9) { g.fillStyle = `rgba(7,16,13,${(d - 9) * .17})`; g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill(); }
@@ -405,6 +422,7 @@
   function neighbourChunk(c, cx, cy) {
     const k = cy * 100 + cx; if (c.empty.has(k)) return null;
     let ch = c.chunks.get(k);
+    if (ch && staleChunk(ch)) { ch.c.width = 1; ch.c.height = 1; c.chunks.delete(k); ch = null; }
     if (!ch) {
       let any = false; const m = c.map;
       for (let ty = 0; ty < CH && !any; ty++) for (let tx = 0; tx < CH; tx++) { const x = cx * CH + tx, y = cy * CH + ty; if (x < c.MAP && y < c.MAP && (m.floor ? m.floor[y * c.MAP + x] || m.edge[y * c.MAP + x] : true)) { any = true; break; } }
@@ -428,6 +446,9 @@
       const ch = neighbourChunk(c, bx, by); if (ch) { g.drawImage(ch.c, dx, dy, G.w, G.h); c.usedAt = performance.now(); }
     }
   }
+  // A chunk drawn before a seam neighbour's context existed holds a generic stand-in for the ground beyond the line. Seen as a neighbour from across the line, such a chunk
+  // would paint the stand-in over the real ground, so the ground would change when you cross: a chunk is stale once any zone it stood in for has its context.
+  const staleChunk = ch => ch.standIn && ch.standIn.some(nb => ctxs.has(nb));
   function setZone(z) {
     miniFade = null;
     { const left = ctxs.get(zone); if (left) left.usedAt = performance.now(); }     // the zone you leave is still on screen: keep its ground
@@ -775,8 +796,10 @@
   }
   const CLIFF = 120, PADX = 10, PADTOP = 40;
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
+  let stand_in = new Set();
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
+    stand_in = new Set();
     const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', asterion = zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     const arenas = vault ? (zdef.slimes || []).filter(m => BOSS_KINDS.includes(m.kind)) : [];
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
@@ -813,9 +836,9 @@
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
       if (map.blendD && map.blendD[i] && map.blendW[i] > .01) {   // the ground turns into the neighbour's toward their shared border
         const nb = (zdef.shape?.neighbours || [])[map.blendNb[i] - 65], seam = map.seamBy?.[nb], nz = ZONES[nb];
-        let nt = tone, nd = dirt, na = alt;
-        if (seam) { const mx = x + Math.round(seam.shift[0]), my = y + Math.round(seam.shift[1]), ns = groundSample(nz, mx, my); nt = ns.tone; nd = ns.dirt; na = ((mx + my) & 1) ? 1.4 : -1.4; }
-        g.globalAlpha = Math.min(1, map.blendW[i]); g.fillStyle = groundOf(nz?.theme || 'ember', nt, nd, na, seam ? (y + Math.round(seam.shift[1])) / (nz?.size || MAP) : y / MAP); g.fill(); g.globalAlpha = 1;
+        let nt = tone, nd = dirt, na = alt, nk = 0;
+        if (seam) { const mx = x + Math.round(seam.shift[0]), my = y + Math.round(seam.shift[1]), ns = groundSample(nz, mx, my); nt = ns.tone; nd = ns.dirt; nk = ns.k; na = ((mx + my) & 1) ? 1.4 : -1.4; }
+        g.globalAlpha = Math.min(1, map.blendW[i]); g.fillStyle = (seam && classLook(nz.theme, nk, nt, nd, na)) || groundOf(nz?.theme || 'ember', nt, nd, na, seam ? (y + Math.round(seam.shift[1])) / (nz?.size || MAP) : y / MAP); g.fill(); g.globalAlpha = 1;
       }
       if (zdef.theme === 'arena') continue;
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
@@ -1047,10 +1070,11 @@
       else if (!zdef.shapeFloor) { if (!vault && x === MAP - 1) face(1); if (!vault && y === MAP - 1) face(-1); }
     }
     if(zdef.theme==='emberwake'||zdef.theme==='ember') EmberwakeArt.molten(g,G,CH,TW,TH,zdef);
-    return { c, G };
+    return { c, G, standIn: stand_in.size ? [...stand_in] : null };
   }
   function getChunk(cx, cy) {
     const k = cy * 100 + cx; let ch = chunks.get(k);
+    if (ch && staleChunk(ch)) { ch.c.width = 1; ch.c.height = 1; chunks.delete(k); ch = null; }
     if (!ch) {
       ch = renderChunk(cx, cy);
       if (chunks.size >= chunkCacheLimit) {
