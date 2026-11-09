@@ -175,7 +175,7 @@ def roads(G):
 
 class Prismwaste(Designer):
     TAG, SEED = 'prism_design_v1', 20261114
-    LATE_SEAMS = {19}       # Stormglass's seam arrived after this design was approved: the masks stay as they were
+    LATE_SEAMS = {19, 27}       # Stormglass's seam (2026-11-08) and Cairnspine's (2026-11-09) arrived after this design was approved: the masks stay as they were
 
     def __init__(self, world, old):
         self.old = old
@@ -430,8 +430,10 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
-    if any(p.get('seam') and p['to'] == 19 for p in zone['portals']):      # Stormglass's seam (2026-11-08) replaced the south gate: only the spawns within 7 tiles of it go
-        d.late_dropped = drop_near_seam(zone, d, 19)
+    d.late_dropped = 0
+    for late in (19, 27):      # Stormglass's seam (2026-11-08) replaced the south gate and Cairnspine's (2026-11-09) the east gate: only the spawns within 7 tiles of each go
+        if any(p.get('seam') and p['to'] == late for p in zone['portals']):
+            d.late_dropped += drop_near_seam(zone, d, late)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []

@@ -1,7 +1,7 @@
 'use strict';
 // The Cairnspine: ochre switchbacks cut through blue slate and a leafless alpine forest.
 (() => {
-  const {poly}=City.kit,T=Math.PI*2;
+  const {poly,iso,prism}=City.kit,T=Math.PI*2;
   const oval=(g,x,y,a,b,c)=>{g.fillStyle=c;g.beginPath();g.ellipse(x,y,a,b,0,0,T);g.fill();};
   const line=(g,p,c,w=3)=>{g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.lineJoin='round';g.beginPath();p.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();};
   const shade=(g,r)=>oval(g,0,7,r,r*.27,'rgba(30,37,48,.27)');
@@ -16,5 +16,23 @@
   City.art.cairn_whitegrove={box:[590,570,295,530],draw(g){shade(g,170);for(let i=-2;i<=2;i++){let x=i*70,y=Math.abs(i)*10;line(g,[[x,y],[x+12,-180],[x-6,-310]],'#dedaca',17);for(let s of [-1,1]){line(g,[[x+10,-167],[x+s*56,-241],[x+s*74,-341]],'#ebe7d6',7);line(g,[[x+s*45,-246],[x+s*96,-264]],'#d7d6cb',4);}}}};
   City.art.cairn_eyrie={box:[420,390,210,350],draw(g){shade(g,150);poly(g,[[-169,0],[-124,-202],[-25,-297],[79,-242],[158,-58],[139,8]],'#59616a','#303946',7);poly(g,[[-25,-297],[79,-242],[11,-130],[-69,-132]],'#aba38f');for(let i=0;i<5;i++)line(g,[[-115+i*51,-31],[-61+i*36,-121]],'#c3b594',6);}};
   City.art.cairn_boulder_altar={box:[430,390,215,350],draw(g){shade(g,130);for(let i=-2;i<=2;i++)poly(g,[[i*66-35,0],[i*66-29,-96-i%2*20],[i*66+26,-108],[i*66+36,2]],i%2?'#777a7b':'#929084','#353b44',4);line(g,[[-128,-139],[0,-203],[132,-142]],'#d9be83',9);oval(g,0,-206,22,29,'#e8b663');}};
-  City.art.cairn_thunder_gate={box:[900,920,450,865],draw(g,o){shade(g,365);for(const s of [-1,1]){poly(g,[[s*225,4],[s*240,-506],[s*145,-725],[s*97,-555],[s*114,-2]],'#525762','#242d3c',10);poly(g,[[s*225,-510],[s*145,-725],[s*97,-555],[s*164,-474]],'#a39d8f');line(g,[[s*145,-642],[s*157,-446],[s*132,-259]],'#f4c77f',9);}poly(g,[[-260,-555],[-177,-704],[0,-824],[177,-704],[260,-555],[0,-620]],'#686a6b','#27303c',10);poly(g,[[-105,-610],[0,-728],[105,-610],[0,-649]],'#ddb87b','#5f5650',5);oval(g,0,-307,93,230,'#172937');oval(g,0,-307,58,190,o.open?'#84d4ed':'#2d5360');for(let i=0;i<11;i++){const a=i*T/11;oval(g,Math.cos(a)*126,-309+Math.sin(a)*210,9,13,i%2?'#f4d99a':'#91d6cf');}line(g,[[-175,-126],[175,-126]],'#bba986',10);},animate(g,o,sx,sy,t){g.save();g.globalAlpha=.1+.06*Math.sin(t*1.7);oval(g,sx,sy-307,117,253,'#7bbec0');g.restore();}};
+  // The Thunderheart Gate, drawn isometric (owner rule 2026-11-09: gates are never a flat front elevation): a slate plinth, two square slate pillars with bronze bands on the x axis, a lintel across
+  // them, and the stormlight ring standing in the wall plane between the pillars (the opening runs along the y axis; the ring is sheared like a house door).
+  const ring=(g,rx,ry,cy,c)=>{g.beginPath();g.ellipse(0,cy,rx,ry,0,0,T);g.fillStyle=c;g.fill();};
+  City.art.cairn_thunder_gate={box:[900,920,450,865],draw(g,o){
+    shade(g,365);
+    g.save();g.translate(...iso(0,0));prism(g,7.4,3,16,'#8a8d94','#5c616c','#464b57');g.restore();
+    g.save();g.translate(...iso(0,.6));g.transform(1,.5,0,1,0,0);
+    ring(g,112,172,-258,'#172937');ring(g,76,148,-258,o.open?'#84d4ed':'#2d5360');
+    for(let i=0;i<13;i++){const a=i*T/13;oval(g,Math.cos(a)*134,-258+Math.sin(a)*190,9,13,i%2?'#f4d99a':'#91d6cf');}
+    g.restore();
+    for(const x of [-2.6,2.6]){
+      g.save();g.translate(...iso(x,0));prism(g,1.5,1.5,430,'#8d9199','#5d6370','#474d5a',16);g.restore();
+      for(const z of [150,300]){g.save();g.translate(...iso(x,0));prism(g,1.7,1.7,22,'#e0b87a','#a98450','#8a6a3e',16+z);g.restore();}
+    }
+    g.save();g.translate(...iso(0,0));prism(g,7.4,1.7,80,'#9c9fa5','#676c78','#505663',446);g.restore();
+    const [kx,ky]=iso(0,.85,560);poly(g,[[kx-34,ky+2],[kx,ky-52],[kx+34,ky+2],[kx,ky+26]],'#ddb87b','#5f5650',5);
+  },animate(g,o,sx,sy,t){g.save();g.translate(sx,sy);g.transform(1,.5,0,1,0,0);g.globalAlpha=.1+.06*Math.sin(t*1.7);oval(g,0,-258,136,206,'#7bbec0');g.restore();}};
+  City.art.cairn_stack={box:[130,170,65,150],draw(g,o){shade(g,34);const v=o.v||0;[[0,-2,38,13,'#6f747c'],[1,-22,31,11,'#8a8f93'],[-1,-39,23,9,'#767b80'],[0,-54,15,7,'#9a9a96']].forEach(([x,y,a,b,c],i)=>{oval(g,x+(v%2?2:-2)*(i%2),y,a,b,c);oval(g,x-a*.2,y-b*.35,a*.5,b*.3,'rgba(214,214,205,.28)');});}};
+  City.art.cairn_lichen_rock={box:[180,120,90,100],draw(g,o){shade(g,50);const v=o.v||0;poly(g,[[-54,0],[-48,-36],[-16,-68],[26,-62],[54,-30],[58,0]],v%2?'#667079':'#7a8088','#303946',5);poly(g,[[-48,-36],[-16,-68],[26,-62],[54,-30],[24,-36],[-12,-44]],'#9aa0a2');for(let k=0;k<6;k++)oval(g,-34+k*14+(v%3)*2,-24-(k%3)*12,5+(k%2)*3,3+(k%2),k%2?'#d99a3c':'#e8c15a');}};
 })();

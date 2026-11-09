@@ -175,3 +175,7 @@ Shaped and authored on the pilot with a **wall towards the Yearwheel and no cros
 ## The Veyrroot Canopy (zone 23, 2026-11-09)
 
 Shaped and authored as a **wild zone** on the pilot (owner: "veyroot should be wild with enemies"), **seamless against the Tanglecrown and the Lapis Erg** (Sunward Vale and the Hollow Arch to Heartwood stay gates), three outposts, three new elites, the old quests kept; both approved neighbours ran unchanged (`LATE_SEAMS = {23}`). Heartwood (24) becomes the main city in step two. `docs/veyrroot-design.md` (branch `feat/zone-shapes-veyrroot`).
+
+## Cairnspine (zone 27, 2026-11-09)
+
+Shaped and authored on the pilot (owner: "reshape cairnspine. and remake the zone and quests to fit the new shape. no fillers."), **seamless against the Prismwaste** (its east gate became the seam; the Prismwaste's approved design ran unchanged, `LATE_SEAMS = {19, 27}`), the Frostwake Shelf crossing stays a gate (the day Frostwake is shaped its design must list 27 in `seamWith`), the Thunderheart Gate stays the dungeon door. Three outposts, the three old elites kept and a fourth added with no quest (the Avalanche Bear), 14 new quests. `docs/cairn-design.md` (branch `feat/zone-shapes-cairn`).

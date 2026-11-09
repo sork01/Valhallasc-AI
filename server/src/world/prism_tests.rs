@@ -1,6 +1,6 @@
-//! The Prismwaste (zone 14, levels 45-50) as an authored rose-salt desert on the shapes pilot: its data, the two gates and two seams, the refuge and
+//! The Prismwaste (zone 14, levels 45-50) as an authored rose-salt desert on the shapes pilot: its data, the four seams (Astralhollow, the Orrery, Stormglass, Cairnspine), the refuge and
 //! three outposts, the quests (holds, visits, brings, kills, the two elite quests) and the new elite with no quest.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
 use super::*;
 
 const PRISM: usize = 14;
@@ -11,22 +11,11 @@ const KINDS: [&str; 4] = [
     "prismsentinel",
 ];
 const ELITES: [(&str, u32); 3] = [("mirrorqueen", 49), ("sunshard", 50), ("shatterhorn", 48)];
-/// (gate, the zone it leads to, the far gate that leads back); the borders to Astralhollow, the Orrery and Stormglass are seams
-const GATES: [(&str, usize, &str); 1] = [("path_14_27", 27, "path_27_14")];
 const HAMLETS: [(&str, &str); 3] = [
     ("mirrorfall", "prism_mf_"),
     ("whitesun", "prism_ws_"),
     ("cairnfoot", "prism_cf_"),
 ];
-
-fn run(w: &mut World, rx: &mut mpsc::Receiver<Value>, ticks: usize) -> Vec<String> {
-    let mut told = vec![];
-    for _ in 0..ticks {
-        w.step();
-        told.extend(lines(rx));
-    }
-    told
-}
 
 #[test]
 fn the_prismwaste_is_a_big_waste_with_four_families_by_distance_three_elites_four_hubs_two_gates_and_two_seams()
@@ -60,7 +49,7 @@ fn the_prismwaste_is_a_big_waste_with_four_families_by_distance_three_elites_fou
         ("miragejackal", 40),
         ("shardscarab", 60),
         ("glassharrier", 35),
-        ("prismsentinel", 30),
+        ("prismsentinel", 25),
     ] {
         assert!(live[kind].len() >= floor, "{kind}: {}", live[kind].len());
     }
@@ -120,7 +109,7 @@ fn the_prismwaste_is_a_big_waste_with_four_families_by_distance_three_elites_fou
             .count(),
         10
     );
-    // one gate (Cairnspine) and three seams (Astralhollow, the Orrery, Stormglass)
+    // four seams (Astralhollow, the Orrery, Stormglass, Cairnspine) and no gate left
     assert_eq!(map.portals.len(), 4);
     let mut seams: Vec<usize> = map
         .portals
@@ -131,83 +120,15 @@ fn the_prismwaste_is_a_big_waste_with_four_families_by_distance_three_elites_fou
     seams.sort_unstable();
     assert_eq!(
         seams,
-        vec![13, 15, 19],
-        "only Astralhollow, the Orrery and Stormglass are seams"
+        vec![13, 15, 19, 27],
+        "only Astralhollow, the Orrery, Stormglass and Cairnspine are seams"
     );
-    for (id, to, _) in GATES {
-        let g = map.portals.iter().find(|p| p.id == id).expect(id);
-        assert!(g.seam.is_none() && g.walk.is_some() && g.to == to, "{id}");
-    }
-}
-
-#[test]
-fn both_gates_are_walked_through_both_ways_and_every_arrival_is_clear_ground() {
-    let mut w = world();
-    let mut rx = join(&mut w, 1, Class::Warrior);
-    for (gate_id, zone, back_id) in GATES {
-        let gate = w.maps[PRISM]
-            .portals
+    assert!(
+        map.portals
             .iter()
-            .find(|p| p.id == gate_id)
-            .unwrap()
-            .clone();
-        assert_eq!(gate.to, zone, "{gate_id}");
-        let side = gate.walk.expect("a walk-in gate");
-        place(&mut w, 1, PRISM, at(gate.x, gate.y));
-        w.message(
-            1,
-            ClientMessage::Move {
-                x: gate.x + f64::from(side[0]) * 3.,
-                y: gate.y + f64::from(side[1]) * 3.,
-            },
-        );
-        run(&mut w, &mut rx, 40);
-        assert_eq!(
-            w.players[&1].character.zone, zone,
-            "{gate_id} leads to {zone}"
-        );
-        let back = w.maps[zone]
-            .portals
-            .iter()
-            .find(|p| p.id == back_id)
-            .unwrap()
-            .clone();
-        assert_eq!(back.to, PRISM, "{back_id} leads here");
-        let arrival = at(back.tx, back.ty);
-        assert!(
-            arrival.distance(at(gate.x, gate.y)) > gate.r + 0.5
-                && arrival.distance(at(gate.x, gate.y)) < 8.,
-            "{back_id} arrives beside {gate_id}, clear of its disc"
-        );
-        let mut a = arrival;
-        w.maps[PRISM].collide(&mut a, PLAYER_RADIUS);
-        assert!(a.distance(arrival) < 1e-6, "{back_id} lands on free ground");
-        // no enemy within eight tiles of an arrival
-        assert!(
-            w.spawns
-                .iter()
-                .filter(|s| s.zone == PRISM)
-                .all(|s| at(s.x, s.y).distance(arrival) > 8.),
-            "an enemy stands near the arrival of {back_id}"
-        );
-        // and back
-        let side = back.walk.expect("a walk-in gate");
-        place(&mut w, 1, zone, at(back.x, back.y));
-        w.message(
-            1,
-            ClientMessage::Move {
-                x: back.x + f64::from(side[0]) * 3.,
-                y: back.y + f64::from(side[1]) * 3.,
-            },
-        );
-        run(&mut w, &mut rx, 40);
-        assert_eq!(w.players[&1].character.zone, PRISM, "{back_id} returns");
-        let c = &w.players[&1].character;
-        assert!(
-            at(c.x, c.y).distance(at(gate.x, gate.y)) < 12.,
-            "{back_id} puts the hero near {gate_id}"
-        );
-    }
+            .all(|p| p.seam.is_some() && p.walk.is_none()),
+        "every crossing of the Prismwaste is a seam"
+    );
 }
 
 #[test]
@@ -227,12 +148,6 @@ fn everyone_and_everything_in_the_prismwaste_can_be_walked_to_from_the_refuge() 
             "{} #{id} is cut off",
             s.kind
         );
-    }
-    for (gate_id, _, _) in GATES {
-        let g = map.portals.iter().find(|p| p.id == gate_id).unwrap();
-        let side = g.walk.unwrap();
-        let inside = at(g.x - f64::from(side[0]) * 6., g.y - f64::from(side[1]) * 6.);
-        assert!(reached(map, &open, inside), "{gate_id} is cut off");
     }
 }
 

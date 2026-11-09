@@ -25194,6 +25194,13 @@
     "sell": 8400
   },
   {
+    "id": "avalanche_claw",
+    "name": "Avalanche Bear Claw",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11200
+  },
+  {
     "id": "hermit_lens",
     "name": "Hermit Lens",
     "kind": "material",

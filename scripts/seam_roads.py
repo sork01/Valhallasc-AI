@@ -40,7 +40,7 @@ LOOSE = {'tree', 'bush', 'rock', 'wildflowers', 'hawthorn_bush', 'birch_tree', '
          'cairn_pebble', 'flowers', 'haystack', 'bones', 'spire', 'thicket', 'pine', 'glowmoss', 'sporefern', 'gloomstalk', 'moonstone', 'mooncaps',
          'ew_basalt', 'crag'}          # (lamps light the camps and outposts: obstacles, never scatter)
 # Zones that draw dirt trails from `paths` (not the cities, the sky or the sea). Zone 6 is the Wyrdwood, 13 Astralhollow, 14 the Prismwaste, 15 the Obsidian Orrery, 16 the Moonspore Canopy, 19 the Stormglass Flats, 21 the Ribbonwild, 22 the Tanglecrown, 45 Emberwake Caldera.
-ROAD_ZONES = (0, 1, 2, 3, 6, 13, 14, 15, 16, 19, 21, 22, 23, 25, 45)
+ROAD_ZONES = (0, 1, 2, 3, 6, 13, 14, 15, 16, 19, 21, 22, 23, 25, 27, 45)
 
 
 def zone_of(world, z):

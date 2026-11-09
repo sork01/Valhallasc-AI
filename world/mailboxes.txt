@@ -99,17 +99,6 @@
     }
   },
   {
-    "id": "mailbox_27_boulderwatch",
-    "zone": 27,
-    "hub": "Boulderwatch",
-    "x": 50.5,
-    "y": 153.5,
-    "anchor": {
-      "x": 47.5,
-      "y": 153.5
-    }
-  },
-  {
     "id": "mailbox_28_springmere",
     "zone": 28,
     "hub": "Springmere",
@@ -899,6 +888,50 @@
     "anchor": {
       "x": 117,
       "y": 171
+    }
+  },
+  {
+    "id": "mailbox_27_boulderwatch",
+    "zone": 27,
+    "hub": "Boulderwatch",
+    "x": 173.5,
+    "y": 178.5,
+    "anchor": {
+      "x": 171,
+      "y": 176
+    }
+  },
+  {
+    "id": "mailbox_27_singing",
+    "zone": 27,
+    "hub": "Singing Cairn Post",
+    "x": 98,
+    "y": 93,
+    "anchor": {
+      "x": 95,
+      "y": 95.5
+    }
+  },
+  {
+    "id": "mailbox_27_whitebark",
+    "zone": 27,
+    "hub": "Whitebark Post",
+    "x": 143,
+    "y": 113,
+    "anchor": {
+      "x": 139,
+      "y": 115.5
+    }
+  },
+  {
+    "id": "mailbox_27_stormgate",
+    "zone": 27,
+    "hub": "Stormgate Camp",
+    "x": 174,
+    "y": 61,
+    "anchor": {
+      "x": 175,
+      "y": 61.5
     }
   }
 ]

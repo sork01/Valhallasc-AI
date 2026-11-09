@@ -287,6 +287,7 @@
     if (theme === 'worldtree') return dirt ? `hsl(${34+tone*8}, 42%, ${46+tone*8+alt}%)` : k ? veyrClassGround(k, tone, alt) : `hsl(${142+tone*18}, 51%, ${33+tone*10+alt}%)`;
     if (theme === 'tanglecrown') return dirt ? `hsl(${34+tone*8}, ${37+tone*7}%, ${44+tone*8+alt}%)` : k ? tangleClassGround(k, tone, alt) : `hsl(${133+tone*19}, ${48+tone*9}%, ${29+tone*11+alt}%)`;
     if (theme === 'lapiserg') return dirt ? `hsl(${34+tone*7}, 47%, ${63+tone*8+alt}%)` : k ? lapisClassGround(k, tone, alt) : `hsl(${35+tone*11}, ${58+tone*8}%, ${57+tone*12+alt}%)`;
+    if (theme === 'cairnspine') return dirt ? `hsl(${31+tone*8}, 32%, ${54+tone*7+alt}%)` : k ? cairnClassGround(k, tone, alt) : `hsl(${210+tone*9}, ${9+tone*7}%, ${38+tone*9+alt}%)`;
     return null;
   }
   // Greenmeadow's ground classes (scripts/greenmeadow_design.py, `groundSpans`): sand, tilled field, downs, forest floor, clover, scarp.
@@ -819,7 +820,7 @@
         : heartwood ? (dirt ? `hsl(${35+tone*6}, 35%, ${45+tone*8+alt}%)` : `hsl(${31+tone*6}, 29%, ${34+tone*8+alt}%)`)
         : lapis ? (dirt ? `hsl(${34+tone*7}, 47%, ${63+tone*8+alt}%)` : map.gk?.[i] ? lapisClassGround(map.gk[i], tone, alt) : `hsl(${35+tone*11}, ${58+tone*8}%, ${57+tone*12+alt}%)`)
         : yearwheel ? yearGround(x,y,tone,dirt,alt)
-        : cairn ? (dirt ? `hsl(${31+tone*8}, 32%, ${54+tone*7+alt}%)` : `hsl(${210+tone*9}, ${9+tone*7}%, ${38+tone*9+alt}%)`)
+        : cairn ? (dirt ? `hsl(${31+tone*8}, 32%, ${54+tone*7+alt}%)` : map.gk?.[i] ? cairnClassGround(map.gk[i], tone, alt) : `hsl(${210+tone*9}, ${9+tone*7}%, ${38+tone*9+alt}%)`)
         : frostwake ? (dirt ? `hsl(${197+tone*9}, 43%, ${72+tone*8+alt}%)` : `hsl(${198+tone*14}, ${23+tone*14}%, ${83+tone*10+alt}%)`)
         : tanglecrown ? (dirt ? `hsl(${34+tone*8}, ${37+tone*7}%, ${44+tone*8+alt}%)` : map.gk?.[i] ? tangleClassGround(map.gk[i], tone, alt) : `hsl(${133+tone*19}, ${48+tone*9}%, ${29+tone*11+alt}%)`)
         : ribbonwild ? (dirt ? `hsl(${43+tone*8}, 79%, ${73+tone*5+alt}%)` : map.gk?.[i] ? ribbonClassGround(map.gk[i], tone, alt) : (x<49&&y>44&&y<97 ? `hsl(${103+tone*12}, ${47+tone*8}%, ${44+tone*8+alt}%)` : `hsl(${ribbonHue+tone*6}, ${52+tone*9}%, ${62+tone*9+alt}%)`))
@@ -1152,6 +1153,7 @@
     shatterhorn: { name: 'Shatterhorn', elite: true, scale: 1.5, top: 100, col: ['#f6c8e0', '#b8789c', '#2a1028'] },
     whorlshell: { name: 'Whorlshell', elite: true, scale: 1.5, top: 100, col: ['#f2b8e8', '#a86ac0', '#2a1438'] },
     rootcentipede: { name: 'Hollowroot Centipede', elite: true, scale: 1.5, top: 100, col: ['#c8e68a', '#5a7a2a', '#10200a'] },
+    avalanchebear: { name: 'Avalanche Bear', elite: true, scale: 1.5, top: 100, col: ['#cfe0f2', '#46566e', '#0a0f18'] },
     cobaltbasilisk: { name: 'Cobalt Basilisk', elite: true, scale: 1.5, top: 100, col: ['#9ad0f0', '#2a5a9a', '#0a1830'] },
     lanternqueen: { name: 'Lantern Queen', elite: true, scale: 1.5, top: 100, col: ['#f6e27a', '#c98a2a', '#2a1a08'] },
     barkcolossus: { name: 'Heartbark Colossus', elite: true, scale: 1.5, top: 100, col: ['#b6965f', '#5f4a2e', '#1e1a10'] },
@@ -1290,7 +1292,7 @@
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:e.elite !== false, boss:e.boss, scale:e.kind.startsWith('cf_') ? (e.add ? 1.25 : e.raidPack ? 1.95 : e.kind === 'cf_eldmarr' ? 3.2 : 2.6) : e.kind.startsWith('null_') ? (e.boss ? 2.6 : 1.9) : e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   if (window.Locale?.language === 'sv') for (const d of Object.values(SLIME)) d.name = Locale.translate(d.name); // nameplates, log lines and the boss bar read these
   const MEADOW_ELITES = ['oldtusker', 'tidecrusher', 'orchardqueen'];
-  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'], BIFROST_ELITES = ['skoll', 'shardking', 'heimdallr'], ASTRAL_ELITES = ['cometmaw', 'eclipsequeen', 'orbitwarden'], ORRERY_ELITES = ['mainspringwyrm'], PRISM_ELITES = ['shatterhorn'], STORM_ELITES = ['lamphermit', 'stormtusk'], RIBBON_ELITES = ['whorlshell'], TANGLE_ELITES = ['rootcentipede'], LAPIS_ELITES = ['cobaltbasilisk'], VEYR_ELITES = ['lanternqueen', 'barkcolossus', 'ambergolem'];
+  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'], BIFROST_ELITES = ['skoll', 'shardking', 'heimdallr'], ASTRAL_ELITES = ['cometmaw', 'eclipsequeen', 'orbitwarden'], ORRERY_ELITES = ['mainspringwyrm'], PRISM_ELITES = ['shatterhorn'], STORM_ELITES = ['lamphermit', 'stormtusk'], RIBBON_ELITES = ['whorlshell'], TANGLE_ELITES = ['rootcentipede'], LAPIS_ELITES = ['cobaltbasilisk'], VEYR_ELITES = ['lanternqueen', 'barkcolossus', 'ambergolem'], CAIRN_ELITES = ['avalanchebear'];
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
@@ -3308,7 +3310,7 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, bifrostEliteSrc = null, astralEliteSrc = null, orreryEliteSrc = null, prismEliteSrc = null, stormEliteSrc = null, ribbonEliteSrc = null, tangleEliteSrc = null, lapisEliteSrc = null, veyrEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, bifrostEliteSrc = null, astralEliteSrc = null, orreryEliteSrc = null, prismEliteSrc = null, stormEliteSrc = null, ribbonEliteSrc = null, tangleEliteSrc = null, lapisEliteSrc = null, veyrEliteSrc = null, cairnEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   // Share the renderer's bank selection with loading, including borrowed boss/add art.
   // Loading every zone here used to start hundreds of image requests at login.
   let slimeSpriteConfig = null;
@@ -3339,6 +3341,7 @@
     [TANGLE_ELITES, () => tangleEliteSrc, loadTangleElites],
     [LAPIS_ELITES, () => lapisEliteSrc, loadLapisElites],
     [VEYR_ELITES, () => veyrEliteSrc, loadVeyrElites],
+    [CAIRN_ELITES, () => cairnEliteSrc, loadCairnElites],
     [STORM_ELITES, () => stormEliteSrc, loadStormElites],
     [WORLDHEART_KINDS, () => worldheartSrc, loadWorldheartSprites],
     [TANGLECROWN_KINDS, () => tanglecrownSrc, loadTanglecrownSprites],
@@ -3639,6 +3642,13 @@
     return fetch('assets/veyrelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
       const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/veyrelites_${k}.png`;
     }))).then(imgs => { veyrEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { veyrEliteSrc = null; });
+  }
+  function loadCairnElites() {
+    if (cairnEliteSrc) return;
+    if (stubOn()) { cairnEliteSrc = stubEnemies(CAIRN_ELITES, { avalanchebear: '#9bd' }); return; }
+    return fetch('assets/cairnelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/cairnelites_${k}.png`;
+    }))).then(imgs => { cairnEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { cairnEliteSrc = null; });
   }
   function loadLapisElites() {
     if (lapisEliteSrc) return;
@@ -4299,6 +4309,19 @@
     if (k === 7) return `hsl(${15 + tone * 8}, ${44 + tone * 6}%, ${42 + tone * 8 + alt}%)`;
     if (k === 8) return `hsl(${42 + tone * 6}, ${40 + tone * 6}%, ${76 + tone * 6 + alt}%)`;
     return `hsl(${172 + tone * 8}, ${36 + tone * 6}%, ${30 + tone * 8 + alt}%)`;
+  }
+  // Cairnspine's ground classes (scripts/cairn_design.py): blue slate, ochre terrace dust, grey scree, snow, pale ash floor under the white trees, dark shale, lichen slate, pale stone, black basalt.
+  const CAIRN_MINI = ['', '#6b7788', '#b78a58', '#8e97a4', '#dbe7f2', '#aea78d', '#454e60', '#7b8a6a', '#c5b393', '#2c2e3e'];
+  function cairnClassGround(k, tone, alt) {
+    if (k === 1) return `hsl(${210 + tone * 9}, ${9 + tone * 7}%, ${38 + tone * 9 + alt}%)`;
+    if (k === 2) return `hsl(${31 + tone * 8}, ${34 + tone * 6}%, ${52 + tone * 8 + alt}%)`;
+    if (k === 3) return `hsl(${215 + tone * 6}, ${6 + tone * 5}%, ${52 + tone * 9 + alt}%)`;
+    if (k === 4) return `hsl(${205 + tone * 6}, ${22 + tone * 8}%, ${82 + tone * 7 + alt}%)`;
+    if (k === 5) return `hsl(${48 + tone * 8}, ${12 + tone * 6}%, ${62 + tone * 8 + alt}%)`;
+    if (k === 6) return `hsl(${222 + tone * 7}, ${10 + tone * 6}%, ${28 + tone * 7 + alt}%)`;
+    if (k === 7) return `hsl(${88 + tone * 14}, ${16 + tone * 8}%, ${44 + tone * 8 + alt}%)`;
+    if (k === 8) return `hsl(${38 + tone * 6}, ${24 + tone * 6}%, ${70 + tone * 7 + alt}%)`;
+    return `hsl(${240 + tone * 8}, ${8 + tone * 5}%, ${20 + tone * 6 + alt}%)`;
   }
   // The Tanglecrown's ground classes (scripts/tangle_design.py): deep canopy floor, root loam, bright moss, blackwater mud, jade stone, orchid bloom, leaf litter, coast clay, fern floor.
   const TANGLE_MINI = ['', '#2c6b46', '#8a5b3a', '#74b04a', '#2b5560', '#9fd8c0', '#9a5a8e', '#b99a4a', '#d6bd86', '#3f9a78'];
@@ -5118,7 +5141,7 @@
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild && !map.gk) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
-    if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = (zdef.theme === 'emberwake' ? EMBERWAKE_MINI : ember ? EMBER_MINI : frost ? FROST_MINI : fen ? FEN_MINI : wyrd ? WYRD_MINI : astral ? ASTRAL_MINI : orrery ? ORRERY_MINI : prism ? PRISM_MINI : stormglass ? STORM_MINI : ribbonwild ? RIBBON_MINI : tanglecrown ? TANGLE_MINI : worldtree ? VEYR_MINI : lapis ? LAPIS_MINI : MEADOW_MINI)[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
+    if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = (zdef.theme === 'emberwake' ? EMBERWAKE_MINI : ember ? EMBER_MINI : frost ? FROST_MINI : fen ? FEN_MINI : wyrd ? WYRD_MINI : astral ? ASTRAL_MINI : orrery ? ORRERY_MINI : prism ? PRISM_MINI : stormglass ? STORM_MINI : ribbonwild ? RIBBON_MINI : tanglecrown ? TANGLE_MINI : worldtree ? VEYR_MINI : lapis ? LAPIS_MINI : cairn ? CAIRN_MINI : MEADOW_MINI)[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? MoonwellArt.minimap(x,y,map.dirt[y*MAP+x],zdef) : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = zdef.theme === 'emberwake' ? '#ae8a6e' : zdef.theme === 'chained_forge' ? '#bca69e' : zdef.theme === 'blackhour' ? '#82758d' : zdef.theme === 'longship' ? '#c5a475' : zdef.theme === 'skybridge' ? '#8dd8f2' : zdef.theme === 'nornroot' ? '#c29b59' : DungeonVisual.styles[zdef.theme] ? DungeonVisual.minimap(zdef.theme,x,y,zdef) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : yearwheel ? ['#e8c498','#e9bd7d','#bf8c6b','#b8d9e9'][yearSeason(x,y)] : deep ? '#c8c29a' : zdef.theme === 'elder_hollow' ? '#597251' : zdef.theme === 'thousandfold' ? '#ae779d' : zdef.theme === 'rain_crown' ? '#6aa895' : zdef.theme === 'seed_vault' ? '#b6a676' : zdef.theme === 'sunken_astrolabe' ? '#c0ac79' : zdef.theme === 'thunderheart_gate' ? '#b6d4e6' : zdef.theme === 'blooming_labyrinth' ? '#e2b7cf' : zdef.theme === 'solar_crucible' ? '#e8ba77' : zdef.theme === 'amber_archive' ? '#eac286' : zdef.theme === 'silent_solstice' ? '#b8d5e8' : zdef.theme === 'vault' ? VaultArt.minimap(x,y,zdef.rooms) : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : worldtree ? '#c19a60' : heartwood ? '#b58a5b' : frostwake ? '#8fc6d8' : cairn ? '#b49a75' : lapis ? '#efd49b' : tanglecrown ? '#b99a62' : ribbonwild ? '#ffe2a2' : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (wyrd) { const rv = zdef.shape ? 226 / MAP : .5625, gr = g.createLinearGradient(0, 0, 0, U); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(rv - .14, 'rgba(120,128,92,.9)'); gr.addColorStop(rv, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, U, U); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * (zdef.shape ? 226 / MAP : .5)) g.fillRect(x * k, y * k, k + .5, k + .5); } }

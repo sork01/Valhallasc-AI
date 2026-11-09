@@ -1558,6 +1558,9 @@ def apply(world, cfg):
         print('veyrroot', veyrroot_design.design(world, write=True)[1])
         import heartwood_design      # right after: Heartwood is the Veyrroot's city inside the tree; it rewrites the arrivals of the arch's and the Seed Vault's crossings
         print('heartwood', heartwood_design.design(world, write=True)[1])
+    if 27 in cfg['zones']:      # after the Prismwaste (its east gate became the seam; its design dropped the spawns near it): it rewrites the arrivals of Frostwake's gate and the Thunderheart Gate's two ways home
+        import cairn_design
+        print('cairnspine', cairn_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

@@ -796,12 +796,12 @@ fn the_prismwaste_and_the_orrery_share_a_seam() {
 }
 
 #[test]
-fn the_prismwaste_keeps_its_gate_to_cairnspine() {
-    gates_stand_on_free_land(14, &[27]);
+fn the_prismwaste_and_cairnspine_share_a_seam() {
+    seam_walks(14, 27);
 }
 
 #[test]
-fn the_prismwaste_is_seamless_against_astralhollow_the_orrery_and_stormglass_only() {
+fn the_prismwaste_is_seamless_against_astralhollow_the_orrery_stormglass_and_cairnspine_only() {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -812,11 +812,20 @@ fn the_prismwaste_is_seamless_against_astralhollow_the_orrery_and_stormglass_onl
             }
         }
     }
-    let want: std::collections::BTreeSet<_> =
-        [(13, 14), (14, 13), (14, 15), (15, 14), (14, 19), (19, 14)].into();
+    let want: std::collections::BTreeSet<_> = [
+        (13, 14),
+        (14, 13),
+        (14, 15),
+        (15, 14),
+        (14, 19),
+        (19, 14),
+        (14, 27),
+        (27, 14),
+    ]
+    .into();
     assert_eq!(
         pairs, want,
-        "one seam each to Astralhollow, the Orrery and Stormglass, seen from both sides"
+        "one seam each to Astralhollow, the Orrery, Stormglass and Cairnspine, seen from both sides"
     );
 }
 
