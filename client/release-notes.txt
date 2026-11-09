@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.39.31",
+    "date": "2026-11-09",
+    "new": [],
+    "changed": [
+      "The silk pavilions and painted stalls of the Ribbonwild are redrawn in the same angled view as every other house, so they sit squarely on the ground they stand on: the pavilions now have a tent roof with striped panels, bunting round the eaves, a door and windows, and the stalls have a counter under a sloping striped awning."
+    ],
+    "removed": [
+      "Replaced the flat front-facing pavilion and stall artwork, which did not match the rest of the game."
+    ]
+  },
+  {
     "version": "Beta 1.39.30",
     "date": "2026-11-04",
     "new": [],

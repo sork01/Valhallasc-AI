@@ -1,7 +1,7 @@
 'use strict';
 // The Ribbonwild's silk architecture, painted gardens and colossal sealed big top.
 (() => {
-  const {poly}=City.kit,TAU=Math.PI*2;
+  const {poly,iso,prism}=City.kit,TAU=Math.PI*2;
   const oval=(g,x,y,rx,ry,c)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,TAU);g.fillStyle=c;g.fill();};
   const line=(g,pts,c,w=3)=>{g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.strokeStyle=c;g.lineWidth=w;g.lineJoin='round';g.lineCap='round';g.stroke();};
   const COLORS=['#ef6998','#f4c65e','#58c5d0','#aa7dda'];
@@ -51,21 +51,56 @@
       line(g,[[s*34,-112],[s*34,-100]],'#f7e4a2',2);
     }
   }};
-  City.art.silk_pavilion={box:[510,450,255,400],draw(g,o){
-    shadow(g,128);poly(g,[[-107,0],[-107,-143],[108,-143],[108,0]],'#f7dfaf','#7f596c',3);
-    poly(g,[[-146,-141],[-72,-202],[0,-276],[72,-202],[145,-141],[101,-149],[0,-255],[-101,-149]],'#f7d36f','#754d67',4);
-    for(let j=-3;j<=2;j++)stripe(g,j*39,-147,43,139,o.v+j);
-    poly(g,[[-28,0],[-28,-109],[27,-109],[27,0]],'#665078','#e5c9a4',4);
-    for(const x of [-106,107])line(g,[[x,0],[x,-150]],'#ecd297',8);
-    oval(g,0,-276,15,15,'#fff0ac');
-    for(let j=-3;j<=3;j++)oval(g,j*35,-135,5,6,'#ffefb0');
+  // The pavilion and the stall stand on their w x d footprint in the same 2:1 projection as every house (City.kit.iso), so each sits on the tiles it blocks.
+  const lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
+  City.art.silk_pavilion={box:[520,400,260,270],draw(g,o){
+    const w=o.width||5,d=o.depth||4,v=o.v||0,z0=10,zt=z0+100;
+    oval(g,0,8,(w+d)*30,(w+d)*13,'rgba(40,31,57,.23)');
+    prism(g,w+.35,d+.35,z0,'#ece0c2','#d6c39e','#bba883');
+    prism(g,w,d,zt-z0,'#f7dfaf','#f7dfaf','#dcc18f',z0);
+    const wall={y:(t,z)=>iso(t,d/2+.02,z),x:(t,z)=>iso(w/2+.02,t,z)};
+    // Door and windows on the two walls that face the camera.
+    poly(g,[wall.y(-.55,z0),wall.y(.55,z0),wall.y(.55,z0+72),wall.y(-.55,z0+72)],'#665078','#e5c9a4',3);
+    line(g,[wall.y(-.62,z0+76),wall.y(.62,z0+76)],'#ecd297',5);
+    for(const t of [-1.65,1.65])poly(g,[wall.y(t-.38,z0+36),wall.y(t+.38,z0+36),wall.y(t+.38,z0+76),wall.y(t-.38,z0+76)],'#9ad9e0','#e5c9a4',3);
+    for(const t of [-1,1])poly(g,[wall.x(t-.38,z0+36),wall.x(t+.38,z0+36),wall.x(t+.38,z0+76),wall.x(t-.38,z0+76)],'#7fbfd0','#e5c9a4',3);
+    // Bunting along the eaves of both walls.
+    for(const [side,span] of [['y',w],['x',d]]){
+      const n=Math.round(span*2);
+      for(let i=0;i<n;i++){
+        const t0=-span/2+i*span/n,t1=t0+span/n,c=shade(v+i);
+        poly(g,[wall[side](t0,zt),wall[side](t1,zt),wall[side](t1,zt-20),wall[side]((t0+t1)/2,zt-32),wall[side](t0,zt-20)],c,'#6f496f',1.5);
+      }
+    }
+    for(const [x,y] of [[-1,1],[1,1],[1,-1]])line(g,[iso(x*w/2,y*d/2,z0),iso(x*w/2,y*d/2,zt)],'#ecd297',7);
+    // A four-sided tent roof striped in the court colours, with the +x slope in shade.
+    const rw=w+1,rd=d+1,ze=zt+6,rise=96;
+    const a=iso(rw/2,-rd/2,ze),c=iso(rw/2,rd/2,ze),e=iso(-rw/2,rd/2,ze),top=iso(0,0,ze+rise);
+    const ny=Math.round(rw*1.4),nx=Math.round(rd*1.4);
+    for(let i=0;i<ny;i++)poly(g,[top,lerp(e,c,i/ny),lerp(e,c,(i+1)/ny)],i%2?'#f7d36f':shade(v+(i>>1)),'#754d67',2);
+    for(let i=0;i<nx;i++)poly(g,[top,lerp(c,a,i/nx),lerp(c,a,(i+1)/nx)],i%2?'#e3bd5c':shade(v+(i>>1)+1),'#754d67',2);
+    poly(g,[top,c,a],'rgba(70,35,90,.16)',null);
+    line(g,[e,c,a],'#754d67',4);
+    line(g,[top,[top[0],top[1]-30]],'#f1d69d',5);
+    oval(g,top[0],top[1]-34,10,10,'#fff0ac');
   }};
-  City.art.painted_stall={box:[330,280,165,250],draw(g,o){
-    shadow(g,92);poly(g,[[-80,0],[-80,-92],[80,-92],[80,0]],'#f2dfb5','#78546b',3);
-    poly(g,[[-104,-93],[-82,-143],[83,-143],[104,-93]],shade(o.v),'#694c6e',3);
-    for(let j=-2;j<=2;j++)stripe(g,j*37,-143,35,50,o.v+j);
-    line(g,[[-78,-44],[78,-44]],'#9a6a74',10);
-    for(let j=-2;j<=2;j++)oval(g,j*27,-50,11,6,['#ffe189','#9ad9e0','#f2a0bc'][((j+2)+o.v)%3]);
+  City.art.painted_stall={box:[340,330,170,250],draw(g,o){
+    const w=o.width||3,d=o.depth||2,v=o.v||0,hc=38,zb=122,zf=100;
+    oval(g,0,6,(w+d)*22,(w+d)*10,'rgba(40,31,57,.23)');
+    for(const x of [-1,1])line(g,[iso(x*w/2,-d/2,hc),iso(x*w/2,-d/2,zb)],'#f1d69d',5);
+    prism(g,w,d,hc,'#f2dfb5','#e6cf9d','#c3a97a');
+    line(g,[iso(-w/2+.05,d/2+.02,hc*.5),iso(w/2-.05,d/2+.02,hc*.5)],'#9a6a74',3);
+    for(let j=-2;j<=2;j++){const [x,y]=iso(j*(w-.7)/4,d/2-.45,hc);oval(g,x,y-5,10,6,['#ffe189','#9ad9e0','#f2a0bc'][((j+2)+v)%3]);}
+    for(const x of [-1,1])line(g,[iso(x*w/2,d/2,hc),iso(x*w/2,d/2,zf)],'#f1d69d',5);
+    // The awning slopes down to the front; its stripes run front to back.
+    const ex=w/2+.15,yf=d/2+.35,n=6;
+    const P=(x,front)=>front?iso(x,yf,zf-8):iso(x,-d/2,zb);
+    for(let i=0;i<n;i++){
+      const x0=-ex+i*2*ex/n,x1=x0+2*ex/n,c=i%2?'#fff0c4':shade(v+(i>>1));
+      poly(g,[P(x0,0),P(x1,0),P(x1,1),P(x0,1)],c,'#694c6e',2);
+      const f0=P(x0,1),f1=P(x1,1);
+      poly(g,[f0,f1,[(f0[0]+f1[0])/2,f0[1]+10]],c,'#694c6e',1.5);
+    }
   }};
   City.art.parade_standard={box:[240,390,120,350],draw(g){
     shadow(g,41);line(g,[[0,0],[0,-273]],'#f1d69d',12);
