@@ -18,6 +18,8 @@ SUN = 20
 PARTNERS = (19, 21, 22, 23, 25, 26)
 ARTLESS = ('house', 'tent', 'stall', 'noticeboard', 'campfire', 'brazier', 'bench', 'lamp', 'chapel', 'post')
 LIQUID = ('water', 'ew_lava', 'lava', 'jungle_water', 'jade_pool')
+# walkable ground art (City.art `ground: true`): a neighbour draws none of it across a seam, so it would pop in
+GROUND_ART = ('frostwake_crevasse', 'lapis_oasis', 'year_spring_pool')
 
 
 def seg_dist(p, a, b):
@@ -52,6 +54,8 @@ def audit(world, report=None):
                 hard.append(f"zone {zi}: art-less {o['kind']} at {o['x']},{o['y']} stands {k:.1f} tiles from the Sunward seam")
             if o['kind'] in LIQUID and k < 16 and (o.get('r') or 0) > 0:
                 hard.append(f"zone {zi}: {o['kind']} at {o['x']},{o['y']} stands {k:.1f} tiles from the Sunward seam")
+            if o['kind'] in GROUND_ART and k < 17.5:
+                hard.append(f"zone {zi}: ground art {o['kind']} at {o['x']},{o['y']} stands {k:.1f} tiles from the Sunward seam")
             if o.get('layout') and k < 2.5:
                 hard.append(f"zone {zi}: loose {o['kind']} at {o['x']},{o['y']} stands {k:.1f} tiles from the Sunward seam")
         for s in z['slimes']:

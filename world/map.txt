@@ -1237281,14 +1237281,6 @@
           "layout": "frostwake_design_v1"
         },
         {
-          "kind": "frostwake_crevasse",
-          "x": 67.13,
-          "y": 295.37,
-          "r": 0,
-          "v": 0,
-          "layout": "frostwake_design_v1"
-        },
-        {
           "kind": "frostwake_frozen_pool",
           "x": 48.13,
           "y": 296.71,

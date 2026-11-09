@@ -54,6 +54,7 @@ const PARTNERS = (process.env.PARTNERS || '26').split(',').map(Number);
   await debug({ op: 'set_time', hour: 12, freeze: true }); await debug({ op: 'set_weather', kind: 'clear' });
   // the ground is isometric: a world step (dx, dy) is the screen step (dx - dy, (dx + dy) / 2), so +x is Right+Down
   const keysFor = ([dx, dy]) => [Math.abs(dx - dy) > .35 ? (dx - dy > 0 ? 'ArrowRight' : 'ArrowLeft') : null, Math.abs(dx + dy) > .35 ? (dx + dy > 0 ? 'ArrowDown' : 'ArrowUp') : null].filter(Boolean);
+  if (process.env.GATE_SHOT) { await go(20, 176, 50, 2500); await page.screenshot({ path: path.join(out, 'hollow-door.png') }); await go(20, 262, 20, 2500); await page.screenshot({ path: path.join(out, 'vault-wall.png') }); console.log('shots'); return; }
   const cells = new Uint8Array(Z.size * Z.size); for (const [ry, a, b, k] of Z.regions.spans) cells.fill(k, ry * Z.size + a, ry * Z.size + b + 1);
   const solids = Z.objects.filter(o => o.kind !== 'void' && (o.r > 0 || o.width > 0));
   const towns = [Z.city, ...Z.camps].map(c => [c.x0 - 6, c.y0 - 6, c.x1 + 6, c.y1 + 6]);

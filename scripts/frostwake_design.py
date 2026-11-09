@@ -553,6 +553,10 @@ def design(world, write=False):
         loose = [o for o in objects if o.get('layout') == d.TAG and o['kind'] != 'void' and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5]
         objects = [o for o in objects if o not in loose]
         d.late_dropped += len(loose)
+        # walkable ground art (crevasses, frozen pools) is drawn by no neighbour across a seam: none within 17.5 tiles of Sunward Vale's
+        decals = [o for o in objects if o.get('layout') == d.TAG and o['kind'] in DECALS and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < SEAM_DECAL]
+        objects = [o for o in objects if o not in decals]
+        d.late_dropped += len(decals)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
