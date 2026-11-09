@@ -167,3 +167,7 @@ Zone 22 is the sixteenth pilot zone: the Tanglecrown shaped and an authored map 
 ## The Orrery is seamless against the Crags and Emberwake (2026-11-08)
 
 Owner: "orrey is missing seamless to cragss and emberwake" (branch `feat/zone-shapes-orrery-seams`, worktree `/media/raid/valhallasc-data/zone-seams-work`, wrapper `zone-seams-cargo.sh`). `seamWith {15: [13, 16, 14, 19, 1, 45], 45: [16, 19, 21, 15]}`; the three approved designs ran unchanged with late seams (`LATE_SEAMS`: Orrery {19, 1, 45}, Crags {6, 15}, Emberwake {21, 15}); `phantom_gate` takes several records (`late-gates.txt` key `<zone>:<other>`). Nacrehold is the Orrery's only gate left. See `docs/orrery-design.md`.
+
+## The Lapis Erg (zone 25, 2026-11-09)
+
+Shaped and authored on the pilot with a **wall towards the Yearwheel and no crossing to it at all** (owner: "yearwheel shouldn't have a portal at all from here. just a wall covering it up"); no seams (no neighbour is shaped yet: `seamWith {25: []}`), Sunward Vale, the Veyrroot Canopy and the Sunken Astrolabe stay gates. `docs/lapis-design.md` (branch `feat/zone-shapes-lapis`).

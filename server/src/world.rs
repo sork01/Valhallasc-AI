@@ -850,6 +850,8 @@ impl Slime {
             "whorlshell" => (2300000., 18500., 1.7, 2.8),
             // The Hollowroot Centipede (the shapes pilot, no quest): a giant jungle centipede that rears out of the strangler maze, fast for its size. First guess.
             "rootcentipede" => (2350000., 19000., 2.5, 2.8),
+            // The Cobalt Basilisk (the shapes pilot, no quest): a huge lapis-scaled desert lizard that lies in the Glass Dunes, quick off the mark and heavy. First guess.
+            "cobaltbasilisk" => (3300000., 25500., 2.3, 2.9),
             "orchidmantis" => (430000., 5700., 3.6, 1.45),
             "canopyglider" => (370000., 6100., 4.2, 1.35),
             "poolcaiman" => (510000., 6900., 2.1, 1.8),
@@ -1006,6 +1008,7 @@ impl Slime {
             "paradegryphon" => 74,
             "maskcolossus" => 75,
             "whorlshell" => 73,
+            "cobaltbasilisk" => 83,
             "rootcentipede" => 77,
             "orchidmantis" => 75,
             "canopyglider" => 76,
@@ -1166,6 +1169,7 @@ impl Slime {
             "paradegryphon" => 27000,
             "maskcolossus" => 41000,
             "whorlshell" => 33000,
+            "cobaltbasilisk" => 56000,
             "rootcentipede" => 34000,
             "orchidmantis" => 9900,
             "canopyglider" => 10500,
@@ -1345,6 +1349,8 @@ impl Slime {
             "maskcolossus" => (1.25, 2.2, 5., 16.),
             // The Whorlshell rears and slams its shell down: a slow wind-up, a wide reach.
             "whorlshell" => (1.2, 2.1, 5., 14.),
+            // The basilisk rears on its forelegs and snaps its whole neck forward: a moderate wind-up, a long reach.
+            "cobaltbasilisk" => (1.12, 2.0, 5.2, 15.),
             // The centipede rears up and drops its whole length forward: a quick wind-up, a long reach.
             "rootcentipede" => (1.05, 1.9, 5.5, 15.),
             "orchidmantis" => (0.54, 1.3, 9., 11.),
@@ -1497,6 +1503,7 @@ impl Slime {
             "paradegryphon" => 4.4,
             "maskcolossus" => 5.0,
             "whorlshell" => 4.6,
+            "cobaltbasilisk" => 5.0,
             "rootcentipede" => 4.7,
             "jadeanaconda" => 4.7,
             "crownjaguar" => 5.3,
@@ -4742,12 +4749,12 @@ impl World {
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
                 | "wickerwarden" | "paradegryphon" | "maskcolossus" | "whorlshell"
-                | "rootcentipede" | "jadeanaconda" | "crownjaguar" | "dunecolossus"
-                | "mirageroc" | "bellmammoth" | "auroramanta" | "crevasseleviathan"
-                | "cairnbehemoth" | "whitebarktitan" | "stormcondor" | "bloomtortoise"
-                | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel" | "firephoenix"
-                | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber" | "snowgiant"
-                | "longnightwyrm" => 600.,
+                | "cobaltbasilisk" | "rootcentipede" | "jadeanaconda" | "crownjaguar"
+                | "dunecolossus" | "mirageroc" | "bellmammoth" | "auroramanta"
+                | "crevasseleviathan" | "cairnbehemoth" | "whitebarktitan" | "stormcondor"
+                | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel"
+                | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber"
+                | "snowgiant" | "longnightwyrm" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -5389,6 +5396,7 @@ impl World {
                             | "paradegryphon"
                             | "maskcolossus"
                             | "whorlshell"
+                            | "cobaltbasilisk"
                             | "rootcentipede"
                             | "jadeanaconda"
                             | "crownjaguar"
@@ -8724,6 +8732,7 @@ mod tests {
             "paradegryphon",
             "maskcolossus",
             "whorlshell",
+            "cobaltbasilisk",
             "rootcentipede",
             "jadeanaconda",
             "crownjaguar",

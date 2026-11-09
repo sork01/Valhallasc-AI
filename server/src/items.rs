@@ -420,6 +420,7 @@ pub fn material(kind: &str) -> &'static str {
         "maskcolossus" => "masquerade_mask",
         "whorlshell" => "whorl_shell",
         "rootcentipede" => "hollow_chitin",
+        "cobaltbasilisk" => "basilisk_scale",
         "orchidmantis" => "mantis_petals",
         "canopyglider" => "glider_membrane",
         "poolcaiman" => "caiman_scale",
@@ -595,6 +596,7 @@ pub fn is_elite(kind: &str) -> bool {
             | "maskcolossus"
             | "whorlshell"
             | "rootcentipede"
+            | "cobaltbasilisk"
             | "jadeanaconda"
             | "crownjaguar"
             | "dunecolossus"

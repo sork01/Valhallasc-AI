@@ -322,7 +322,8 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
             .any(|r| r["zone"] == 17)
     );
     let pairs = routes(&data);
-    assert_eq!(pairs.len(), 48);
+    // 48 painted borders, minus the Lapis Erg-Yearwheel one: a wall covers it up (the shapes pilot, owner 2026-11-09)
+    assert_eq!(pairs.len(), 47);
     let mut count = 0;
     for (i, j) in pairs.iter().flat_map(|&(i, j)| [(i, j), (j, i)]) {
         let m = &w.maps[i];
@@ -355,7 +356,7 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
         assert!(w.maps[j].line_clear(at(p.tx, p.ty), at(back.x, back.y), PLAYER_RADIUS));
         count += 1;
     }
-    assert_eq!(count, 96);
+    assert_eq!(count, 94);
     for (i, m) in w.maps.iter().enumerate().take(47) {
         let z = if i == 0 { &data } else { &data["zones"][i - 1] };
         let Some(paths) = z["atlasPaths"].as_array() else {

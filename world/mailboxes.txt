@@ -110,17 +110,6 @@
     }
   },
   {
-    "id": "mailbox_25_azure_wells",
-    "zone": 25,
-    "hub": "Azure Wells",
-    "x": 47.5,
-    "y": 135.5,
-    "anchor": {
-      "x": 44.5,
-      "y": 135.5
-    }
-  },
-  {
     "id": "mailbox_26_frostwake_station",
     "zone": 26,
     "hub": "Frostwake Station",
@@ -811,6 +800,61 @@
     "anchor": {
       "x": 246,
       "y": 152
+    }
+  },
+  {
+    "id": "mailbox_25_azure_wells",
+    "zone": 25,
+    "hub": "Azure Wells",
+    "x": 75.5,
+    "y": 202.5,
+    "anchor": {
+      "x": 74,
+      "y": 200
+    }
+  },
+  {
+    "id": "mailbox_25_wallwatch",
+    "zone": 25,
+    "hub": "Wallwatch Post",
+    "x": 97,
+    "y": 71,
+    "anchor": {
+      "x": 94,
+      "y": 73.5
+    }
+  },
+  {
+    "id": "mailbox_25_eastwell",
+    "zone": 25,
+    "hub": "Eastwell Post",
+    "x": 189,
+    "y": 173,
+    "anchor": {
+      "x": 185,
+      "y": 175.5
+    }
+  },
+  {
+    "id": "mailbox_25_saltpan",
+    "zone": 25,
+    "hub": "Saltpan Post",
+    "x": 148,
+    "y": 208,
+    "anchor": {
+      "x": 149,
+      "y": 208.5
+    }
+  },
+  {
+    "id": "mailbox_25_astro",
+    "zone": 25,
+    "hub": "Astrolabe Rest",
+    "x": 137,
+    "y": 72,
+    "anchor": {
+      "x": 122,
+      "y": 84
     }
   }
 ]

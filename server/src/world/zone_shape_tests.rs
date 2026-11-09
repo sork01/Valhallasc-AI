@@ -875,6 +875,28 @@ fn the_tanglecrown_is_seamless_against_the_ribbonwild_only() {
 }
 
 #[test]
+fn the_lapis_erg_keeps_its_gates_to_sunward_the_veyrroot_canopy_and_the_astrolabe() {
+    gates_stand_on_free_land(25, &[20, 23, 34]);
+}
+
+#[test]
+fn the_lapis_erg_has_no_seam_and_no_crossing_to_the_yearwheel() {
+    let data = bundled();
+    for zi in 1..=data["zones"].as_array().unwrap().len() {
+        for p in zone_of(&data, zi)["portals"].as_array().unwrap() {
+            let to = p["to"].as_u64().unwrap() as usize;
+            if zi == 25 || to == 25 {
+                assert!(p.get("seam").is_none(), "{zi} -> {to} is a seam");
+            }
+            assert!(
+                !((zi == 25 && to == 28) || (zi == 28 && to == 25)),
+                "{zi} -> {to}: the Yearwheel is walled off from the Lapis Erg"
+            );
+        }
+    }
+}
+
+#[test]
 fn emberwake_is_seamless_against_the_flats_the_canopy_the_ribbonwild_and_the_orrery_only() {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();

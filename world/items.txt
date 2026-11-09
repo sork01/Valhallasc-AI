@@ -25187,6 +25187,13 @@
     "sell": 4300
   },
   {
+    "id": "basilisk_scale",
+    "name": "Cobalt Basilisk Scale",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8400
+  },
+  {
     "id": "hermit_lens",
     "name": "Hermit Lens",
     "kind": "material",
