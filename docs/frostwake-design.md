@@ -39,5 +39,6 @@ A solid wall of the game's own isometric `rampart` (140) and `tower` (12) object
 ## Not done / open
 
 - Spawn density, walking times between hubs and the elite pockets were not judged in play. The elites keep their old stats and art.
+- Cairnspine's approved elites were placed before this seam existed: the Cairn Behemoth (160, 244) stands 12.6 tiles from the Frostwake border (awareness 17, so a hero who walks across the south-western stretch of the seam steps inside its aggro range) and the Storm Condor (212, 30) 20.1 tiles (awareness 19); the four ambush sleepers and every person are 28+ tiles away. Cairnspine was left unchanged on purpose (an approved zone must not reshuffle); moving the Behemoth's pocket is the owner's call.
 - The day the Sunward Vale (20) or the Stormglass Flats (19) crossing becomes a seam, the matching `seamWith` rule must list 26 and `frostwake_design` aim that crossing.
 - Older suites that teleport into the old Frostwake coordinates (MCP `frostwake`, `tests/frostwake-*`) are stale.
