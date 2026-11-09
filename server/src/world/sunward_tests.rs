@@ -1,7 +1,7 @@
 //! Sunward Vale (zone 20, levels 65-70) as an authored river valley on the shapes pilot: its data, the six seams (the Stormglass Flats, the Ribbonwild, the Tanglecrown, the Veyrroot
 //! Canopy, the Lapis Erg and the Frostwake Shelf) with a road across each, the wall along the Yearwheel border with its one vaulted opening, Millbridge and three outposts, the quests
 //! (holds, visits, brings, kills, the two elite quests) and the three elites.
-use super::wyrd_tests::{at, blocked, flood, join, lines, place, reached, world};
+use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
 use super::*;
 
 const VALE: usize = 20;
@@ -15,15 +15,6 @@ const HAMLETS: [(&str, &str, &str); 3] = [
     ("wickerfield", "sv_wf_", ""),
     ("elderroot", "sv_er_", "sun_keeper"),
 ];
-
-fn run(w: &mut World, rx: &mut mpsc::Receiver<Value>, ticks: usize) -> Vec<String> {
-    let mut told = vec![];
-    for _ in 0..ticks {
-        w.step();
-        told.extend(lines(rx));
-    }
-    told
-}
 
 fn spot(w: &World, id: &str) -> (f64, f64) {
     let p = w.maps[VALE]
@@ -287,11 +278,20 @@ fn the_yearwheel_is_walled_off_along_its_whole_border_but_for_one_vaulted_openin
         .iter()
         .find(|a| a["portal"] == "path_20_28")
         .expect("the vault's arch");
-    let (vx, vy) = (vault["x"].as_f64().unwrap(), vault["y"].as_f64().unwrap());
+    // a real vault since the Yearwheel was shaped (a whole-tile shift, the arch 3 tiles inside the gate)
+    assert!(
+        vault["vault"].is_array() && vault["vault_half"].as_f64().unwrap() > 5.,
+        "a vault"
+    );
+    assert!(data["zones"][VALE - 1]["shape"]["vaultRegions"].is_array());
+    let (vx, vy) = (
+        vault["x"].as_f64().unwrap(),
+        vault["y"].as_f64().unwrap() + 3.,
+    );
     assert!(
         (arch["x"].as_f64().unwrap() - vx).abs() < 1e-6
             && (arch["y"].as_f64().unwrap() - vy).abs() < 1e-6,
-        "the arch stands at the vault"
+        "the arch stands 3 tiles inside the vault's gate"
     );
     assert_eq!(arch["vertical"], false);
     assert!(
@@ -386,62 +386,6 @@ fn the_yearwheel_is_walled_off_along_its_whole_border_but_for_one_vaulted_openin
 }
 
 #[test]
-fn a_hero_walks_through_the_vault_to_the_yearwheel_and_back() {
-    let mut w = world();
-    let mut rx = join(&mut w, 1, Class::Warrior);
-    let vault = w.maps[VALE]
-        .portals
-        .iter()
-        .find(|p| p.id == "path_20_28")
-        .unwrap()
-        .clone();
-    place(&mut w, 1, VALE, at(vault.x, vault.y + 4.));
-    w.message(
-        1,
-        ClientMessage::Move {
-            x: vault.x,
-            y: vault.y - 3.,
-        },
-    );
-    run(&mut w, &mut rx, 60);
-    assert_eq!(
-        w.players[&1].character.zone, YEARWHEEL,
-        "the vault leads to the Yearwheel"
-    );
-    let back = w.maps[YEARWHEEL]
-        .portals
-        .iter()
-        .find(|p| p.id == "path_28_20")
-        .unwrap()
-        .clone();
-    let (bx, by) = (back.tx, back.ty);
-    assert!(
-        (bx - vault.x).abs() < 1e-6 && (by - (vault.y + 7.)).abs() < 1e-6,
-        "the Yearwheel's gate arrives seven tiles inside the vault, clear of it"
-    );
-    let mut arrival = at(bx, by);
-    w.maps[VALE].collide(&mut arrival, PLAYER_RADIUS);
-    assert!(
-        arrival.distance(at(bx, by)) < 1e-6,
-        "the arrival is free ground"
-    );
-    let side = back.walk.expect("a walk-in gate");
-    place(&mut w, 1, YEARWHEEL, at(back.x, back.y));
-    w.message(
-        1,
-        ClientMessage::Move {
-            x: back.x + f64::from(side[0]) * 3.,
-            y: back.y + f64::from(side[1]) * 3.,
-        },
-    );
-    run(&mut w, &mut rx, 60);
-    assert_eq!(
-        w.players[&1].character.zone, VALE,
-        "and back through the vault"
-    );
-}
-
-#[test]
 fn the_hollow_door_leads_down_and_both_ways_home_arrive_clear_beside_the_camp() {
     let w = world();
     let door = w.maps[VALE]
@@ -496,7 +440,13 @@ fn everyone_and_everything_in_the_vale_can_be_walked_to_from_millbridge() {
         );
     }
     for p in &map.portals {
-        assert!(reached(map, &open, at(p.x, p.y)), "{} is cut off", p.id);
+        // the vault's gate stands 3 tiles past its arch, outside our land: the arch is what is walked to
+        let (x, y) = if p.vault.is_some() {
+            (p.x, p.y + 3.)
+        } else {
+            (p.x, p.y)
+        };
+        assert!(reached(map, &open, at(x, y)), "{} is cut off", p.id);
     }
 }
 

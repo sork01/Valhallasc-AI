@@ -912,6 +912,8 @@ impl Slime {
             "rimesaber" => (5500000., 37000., 3.5, 3.3),
             "snowgiant" => (6900000., 43000., 1.8, 3.7),
             "longnightwyrm" => (8100000., 49000., 2.9, 3.9),
+            // The Equinox Stag (the shapes pilot, no quest): a great stag that carries the turning year in its antlers (blossom, leaf, ember and frost), loping the northern reaches of the wheel. First guess, level with the Snow Giant.
+            "equinoxstag" => (7400000., 46000., 3.2, 3.8),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -1070,6 +1072,7 @@ impl Slime {
             "rimesaber" => 97,
             "snowgiant" => 98,
             "longnightwyrm" => 99,
+            "equinoxstag" => 98,
             _ => 2,
         }
     }
@@ -1241,6 +1244,7 @@ impl Slime {
             "rimesaber" => 120000,
             "snowgiant" => 140000,
             "longnightwyrm" => 160000,
+            "equinoxstag" => 150000,
             _ => 0,
         }
     }
@@ -1433,6 +1437,8 @@ impl Slime {
             "rimesaber" => (1.28, 2.20, 7., 18.),
             "snowgiant" => (1.35, 2.35, 5., 19.),
             "longnightwyrm" => (1.40, 2.45, 8., 21.),
+            // The stag lowers its antlers and the seasons bloom off them in a wide arc: a slow wind-up, a long reach.
+            "equinoxstag" => (1.37, 2.35, 6., 19.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -1566,6 +1572,7 @@ impl Slime {
             "rimesaber" => 6.3,
             "snowgiant" => 6.4,
             "longnightwyrm" => 6.5,
+            "equinoxstag" => 6.4,
             _ => 0.,
         }
     }
@@ -4794,7 +4801,7 @@ impl World {
                 | "whitebarktitan" | "stormcondor" | "avalanchebear" | "harrowox"
                 | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel"
                 | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber"
-                | "snowgiant" | "longnightwyrm" => 600.,
+                | "snowgiant" | "longnightwyrm" | "equinoxstag" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -5465,6 +5472,7 @@ impl World {
                             | "rimesaber"
                             | "snowgiant"
                             | "longnightwyrm"
+                            | "equinoxstag"
                     ) || s.kind.starts_with("es_foe_")
                         || is_boss(&s.kind)
                         || (s.kind.starts_with("ew_") || s.kind.starts_with("cf_"))
@@ -8806,6 +8814,7 @@ mod tests {
             "rimesaber",
             "snowgiant",
             "longnightwyrm",
+            "equinoxstag",
         ] {
             let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
             let zone = w.slimes[id].zone;

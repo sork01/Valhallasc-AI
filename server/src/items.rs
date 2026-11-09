@@ -472,6 +472,7 @@ pub fn material(kind: &str) -> &'static str {
         "rimesaber" => "rimesaber_fang",
         "snowgiant" => "snowgiant_heart",
         "longnightwyrm" => "longnight_scale",
+        "equinoxstag" => "equinox_antler",
         _ => "slime_gel",
     }
 }
@@ -629,6 +630,7 @@ pub fn is_elite(kind: &str) -> bool {
             | "rimesaber"
             | "snowgiant"
             | "longnightwyrm"
+            | "equinoxstag"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.

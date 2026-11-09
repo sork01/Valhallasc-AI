@@ -33376,6 +33376,13 @@
     "sell": 3000
   },
   {
+    "id": "equinox_antler",
+    "name": "Equinox Antler",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 19000
+  },
+  {
     "id": "wicker_heart",
     "name": "Wicker Heart",
     "kind": "material",

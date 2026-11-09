@@ -187,7 +187,13 @@ fn blackhour_data_and_actual_collision() {
 }
 
 fn enter(w: &mut World, id: u64) {
-    place(w, id, 28, at(208., 200.));
+    let door = w.maps[28]
+        .portals
+        .iter()
+        .find(|p| p.id == "year_blackhour")
+        .unwrap()
+        .clone();
+    place(w, id, 28, at(door.x, door.y));
     w.time += 2.;
     w.use_portal(id);
 }

@@ -52,7 +52,7 @@
       }
       if (Field.zoneTheme === 'yearwheel') {
         if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
-        const season=(x<200?(y<200?3:0):(y<200?2:1));
+        const yc=Field.yearCentre||[200,200],season=(x<yc[0]?(y<yc[1]?3:0):(y<yc[1]?2:1));
         const colors=[['#b9ddae','#d6efbd','#f3b5cf'],['#efd89d','#ffe8ae','#edab61'],['#dba070','#efc583','#bd684b'],['#b9dce7','#e5f4f4','#8ec6dc']][season];
         poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],colors[(x+y)%2],colors[2],1.3);
         if((x*5+y*7)%6===0)ellipse(g,px,py+21,2.8,2.8,colors[2]);

@@ -1230,5 +1230,22 @@
   "The Root Springs",
   "The Scarecrow Rows",
   "The Wickerfield Circle",
-  "Thornback Ridge"
+  "Thornback Ridge",
+  "Brage Caskpurse",
+  "Hedda Frostpurse",
+  "Maja Dustpurse",
+  "Lowfall Rest",
+  "Tidehollow Camp",
+  "Wheelmark Post",
+  "The Amber Tidepools",
+  "The Dustwind Flats",
+  "The Equinox Crossing",
+  "The Lowfall Circle",
+  "The Mimic Shore",
+  "The Old Kilns",
+  "The Springmere Weir",
+  "The Stoat Pass",
+  "The Tidehollow Circle",
+  "The Wheelmark Cairn",
+  "The Wheelmark Circle"
 ]

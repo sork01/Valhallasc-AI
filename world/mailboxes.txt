@@ -77,50 +77,6 @@
     }
   },
   {
-    "id": "mailbox_28_springmere",
-    "zone": 28,
-    "hub": "Springmere",
-    "x": 87.5,
-    "y": 326.5,
-    "anchor": {
-      "x": 84.5,
-      "y": 326.5
-    }
-  },
-  {
-    "id": "mailbox_28_solhaven",
-    "zone": 28,
-    "hub": "Solhaven",
-    "x": 331.5,
-    "y": 318.5,
-    "anchor": {
-      "x": 328.5,
-      "y": 318.5
-    }
-  },
-  {
-    "id": "mailbox_28_harvestwatch",
-    "zone": 28,
-    "hub": "Harvestwatch",
-    "x": 332.5,
-    "y": 80.5,
-    "anchor": {
-      "x": 329.5,
-      "y": 80.5
-    }
-  },
-  {
-    "id": "mailbox_28_rimehold",
-    "zone": 28,
-    "hub": "Rimehold",
-    "x": 89.5,
-    "y": 80.5,
-    "anchor": {
-      "x": 86.5,
-      "y": 80.5
-    }
-  },
-  {
     "id": "mailbox_0_stonefold",
     "zone": 0,
     "hub": "Stonefold",
@@ -998,6 +954,83 @@
     "anchor": {
       "x": 175,
       "y": 69.5
+    }
+  },
+  {
+    "id": "mailbox_28_springmere",
+    "zone": 28,
+    "hub": "Springmere",
+    "x": 311.5,
+    "y": 772.5,
+    "anchor": {
+      "x": 308,
+      "y": 772
+    }
+  },
+  {
+    "id": "mailbox_28_solhaven",
+    "zone": 28,
+    "hub": "Solhaven",
+    "x": 631.5,
+    "y": 662.5,
+    "anchor": {
+      "x": 628,
+      "y": 662
+    }
+  },
+  {
+    "id": "mailbox_28_harvestwatch",
+    "zone": 28,
+    "hub": "Harvestwatch",
+    "x": 631.5,
+    "y": 302.5,
+    "anchor": {
+      "x": 628,
+      "y": 302
+    }
+  },
+  {
+    "id": "mailbox_28_rimehold",
+    "zone": 28,
+    "hub": "Rimehold",
+    "x": 331.5,
+    "y": 302.5,
+    "anchor": {
+      "x": 328,
+      "y": 302
+    }
+  },
+  {
+    "id": "mailbox_28_wheelmark",
+    "zone": 28,
+    "hub": "Wheelmark Post",
+    "x": 332.5,
+    "y": 133.2,
+    "anchor": {
+      "x": 335,
+      "y": 131.5
+    }
+  },
+  {
+    "id": "mailbox_28_tidehollow",
+    "zone": 28,
+    "hub": "Tidehollow Camp",
+    "x": 686.5,
+    "y": 475.2,
+    "anchor": {
+      "x": 689,
+      "y": 473.5
+    }
+  },
+  {
+    "id": "mailbox_28_lowfall",
+    "zone": 28,
+    "hub": "Lowfall Rest",
+    "x": 476.5,
+    "y": 655.2,
+    "anchor": {
+      "x": 479,
+      "y": 653.5
     }
   }
 ]

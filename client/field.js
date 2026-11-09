@@ -33,7 +33,7 @@
   const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), t = k < 0 ? 0 : 255, p = Math.abs(k); return '#' + [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v + (t - v) * p).toString(16).padStart(2, '0')).join(''); };
 
   // ---------- the map ----------
-  const yearSeason=(x,y)=>x<200?(y<200?3:0):(y<200?2:1);
+  const yearSeason=(x,y)=>{const c=zdef.yearCentre||[200,200];return x<c[0]?(y<c[1]?3:0):(y<c[1]?2:1);};     // the quarters meet at the zone's own Equinox Crossing (`yearCentre`: the reshaped Yearwheel's is (440, 480))
   function yearGround(x,y,tone,dirt,alt) {
     const s=yearSeason(x,y);
     const grass=[[116,47,42],[89,57,45],[35,54,46],[196,48,85]][s];
@@ -1157,6 +1157,7 @@
     rootcentipede: { name: 'Hollowroot Centipede', elite: true, scale: 1.5, top: 100, col: ['#c8e68a', '#5a7a2a', '#10200a'] },
     avalanchebear: { name: 'Avalanche Bear', elite: true, scale: 1.5, top: 100, col: ['#cfe0f2', '#46566e', '#0a0f18'] },
     harrowox: { name: 'Harrow Ox', elite: true, scale: 1.5, top: 100, col: ['#b8a07a', '#5a4630', '#14100a'] },
+    equinoxstag: { name: 'Equinox Stag', elite: true, scale: 1.5, top: 100, col: ['#d49a52', '#5a3820', '#24140a'] },
     cobaltbasilisk: { name: 'Cobalt Basilisk', elite: true, scale: 1.5, top: 100, col: ['#9ad0f0', '#2a5a9a', '#0a1830'] },
     lanternqueen: { name: 'Lantern Queen', elite: true, scale: 1.5, top: 100, col: ['#f6e27a', '#c98a2a', '#2a1a08'] },
     barkcolossus: { name: 'Heartbark Colossus', elite: true, scale: 1.5, top: 100, col: ['#b6965f', '#5f4a2e', '#1e1a10'] },
@@ -1295,7 +1296,7 @@
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:e.elite !== false, boss:e.boss, scale:e.kind.startsWith('cf_') ? (e.add ? 1.25 : e.raidPack ? 1.95 : e.kind === 'cf_eldmarr' ? 3.2 : 2.6) : e.kind.startsWith('null_') ? (e.boss ? 2.6 : 1.9) : e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   if (window.Locale?.language === 'sv') for (const d of Object.values(SLIME)) d.name = Locale.translate(d.name); // nameplates, log lines and the boss bar read these
   const MEADOW_ELITES = ['oldtusker', 'tidecrusher', 'orchardqueen'];
-  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'], BIFROST_ELITES = ['skoll', 'shardking', 'heimdallr'], ASTRAL_ELITES = ['cometmaw', 'eclipsequeen', 'orbitwarden'], ORRERY_ELITES = ['mainspringwyrm'], PRISM_ELITES = ['shatterhorn'], STORM_ELITES = ['lamphermit', 'stormtusk'], RIBBON_ELITES = ['whorlshell'], TANGLE_ELITES = ['rootcentipede'], LAPIS_ELITES = ['cobaltbasilisk'], VEYR_ELITES = ['lanternqueen', 'barkcolossus', 'ambergolem'], CAIRN_ELITES = ['avalanchebear'], SUNWARD_ELITES = ['harrowox'];
+  const CRAGS_ELITES = ['slagmaw', 'ashwing'], RIME_ELITES = ['hoarhorn', 'whitewail', 'shardback'], FEN_ELITES = ['bellowmaw', 'rustmarshal'], WYRD_ELITES = ['hangedking'], BIFROST_ELITES = ['skoll', 'shardking', 'heimdallr'], ASTRAL_ELITES = ['cometmaw', 'eclipsequeen', 'orbitwarden'], ORRERY_ELITES = ['mainspringwyrm'], PRISM_ELITES = ['shatterhorn'], STORM_ELITES = ['lamphermit', 'stormtusk'], RIBBON_ELITES = ['whorlshell'], TANGLE_ELITES = ['rootcentipede'], LAPIS_ELITES = ['cobaltbasilisk'], VEYR_ELITES = ['lanternqueen', 'barkcolossus', 'ambergolem'], CAIRN_ELITES = ['avalanchebear'], SUNWARD_ELITES = ['harrowox'], YEAR_ELITES = ['equinoxstag'];
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
@@ -3313,7 +3314,7 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, bifrostEliteSrc = null, astralEliteSrc = null, orreryEliteSrc = null, prismEliteSrc = null, stormEliteSrc = null, ribbonEliteSrc = null, tangleEliteSrc = null, lapisEliteSrc = null, veyrEliteSrc = null, cairnEliteSrc = null, sunwardEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  let meadowEliteSrc = null, cragsEliteSrc = null, rimeEliteSrc = null, fenEliteSrc = null, wyrdEliteSrc = null, bifrostEliteSrc = null, astralEliteSrc = null, orreryEliteSrc = null, prismEliteSrc = null, stormEliteSrc = null, ribbonEliteSrc = null, tangleEliteSrc = null, lapisEliteSrc = null, veyrEliteSrc = null, cairnEliteSrc = null, sunwardEliteSrc = null, yearEliteSrc = null, slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   // Share the renderer's bank selection with loading, including borrowed boss/add art.
   // Loading every zone here used to start hundreds of image requests at login.
   let slimeSpriteConfig = null;
@@ -3346,6 +3347,7 @@
     [VEYR_ELITES, () => veyrEliteSrc, loadVeyrElites],
     [CAIRN_ELITES, () => cairnEliteSrc, loadCairnElites],
     [SUNWARD_ELITES, () => sunwardEliteSrc, loadSunwardElites],
+    [YEAR_ELITES, () => yearEliteSrc, loadYearElites],
     [STORM_ELITES, () => stormEliteSrc, loadStormElites],
     [WORLDHEART_KINDS, () => worldheartSrc, loadWorldheartSprites],
     [TANGLECROWN_KINDS, () => tanglecrownSrc, loadTanglecrownSprites],
@@ -3660,6 +3662,13 @@
     return fetch('assets/sunwardelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
       const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/sunwardelites_${k}.png`;
     }))).then(imgs => { sunwardEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { sunwardEliteSrc = null; });
+  }
+  function loadYearElites() {
+    if (yearEliteSrc) return;
+    if (stubOn()) { yearEliteSrc = stubEnemies(YEAR_ELITES, { equinoxstag: '#d94' }); return; }
+    return fetch('assets/yearwheelelites.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/yearwheelelites_${k}.png`;
+    }))).then(imgs => { yearEliteSrc = { meta, img: Object.fromEntries(meta.kinds.map((k, n) => [k, imgs[n]])) }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { yearEliteSrc = null; });
   }
   function loadLapisElites() {
     if (lapisEliteSrc) return;
@@ -5176,7 +5185,7 @@
   function renderMini() {
     const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
-    if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
+    if (yearwheel) { const yc=zdef.yearCentre||[200,200], qx=yc[0]*k, qy=yc[1]*k; for(const [x,y,w,h,col] of [[0,0,qx,qy,'#d7edf5'],[qx,0,U-qx,qy,'#bd7951'],[0,qy,qx,U-qy,'#73bc77'],[qx,qy,U-qx,U-qy,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,w,h);} }
     if (ribbonwild && !map.gk) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
     if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = (zdef.theme === 'emberwake' ? EMBERWAKE_MINI : ember ? EMBER_MINI : frost ? FROST_MINI : fen ? FEN_MINI : wyrd ? WYRD_MINI : astral ? ASTRAL_MINI : orrery ? ORRERY_MINI : prism ? PRISM_MINI : stormglass ? STORM_MINI : sunward ? SUNWARD_MINI : ribbonwild ? RIBBON_MINI : tanglecrown ? TANGLE_MINI : worldtree ? VEYR_MINI : lapis ? LAPIS_MINI : cairn ? CAIRN_MINI : frostwake ? FROSTWAKE_MINI : MEADOW_MINI)[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? MoonwellArt.minimap(x,y,map.dirt[y*MAP+x],zdef) : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
@@ -5534,7 +5543,7 @@
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[R.to]?.theme, w };
       }
       return null;
-    }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
+    }, get zoneTheme() { return zdef.theme; }, get yearCentre() { return zdef.yearCentre || null; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox, drawSlimeSprite, enemyCullMargin, enemyShadowK, enemySource },
   };
   window.Field = Field;

@@ -9,7 +9,7 @@
   let packetAt = performance.now(), lastLabel = '';
   let eye = { x: 0, y: 0, at: null, vx: 0, vy: 0 };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const season = (x,y) => x < 200 ? (y >= 200 ? 'spring' : 'winter') : (y >= 200 ? 'summer' : 'autumn');
+  const season = (x,y) => { const c = zone?.yearCentre || [200,200]; return x < c[0] ? (y >= c[1] ? 'spring' : 'winter') : (y >= c[1] ? 'summer' : 'autumn'); };
   const choice = () => {
     if (own.inside || !packet || packet.inside) return {type:'clear',intensity:'none',inside:true};
     return zone?.theme === 'yearwheel' && packet.seasons ? {...packet.seasons[season(own.x,own.y)],inside:false} : packet;
