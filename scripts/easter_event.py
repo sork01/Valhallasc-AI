@@ -2,7 +2,7 @@
 import math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-GIVERS=['baker','city_bard','nacre_gardener','asterion_singer']
+GIVERS=['baker','city_bard','nacre_gardener','asterion_singer','hw_baker']
 SPECS=[
  (0,'easter_alder','An Egg for Every Hearth','baker',1,100,
   'Pip wants to share painted Easter eggs with every home. Ask Linden for egg baskets, Mira for pastel dyes and Tessa for spring buns, then bring their good wishes back to Pip.',
@@ -16,6 +16,9 @@ SPECS=[
  (17,'easter_aster','A Basket of Starlight','asterion_singer',60,2800,
   'Vela is preparing Easter baskets beneath the stars. Ask Mora for a spring chime, Umi for blossom ribbons and Nim for little star-painted eggs.',
   [('talk','asterion_bellkeeper','Arrange the spring chime with Mora'),('talk','asterion_gardener','Plan blossom ribbons with Umi'),('talk','asterion_merchant','Arrange star-painted eggs with Nim')]),
+ (24,'easter_heart','Seeds of a New Spring','hw_baker',80,4500,
+  'Olle wants a spring basket on every table. Ask Lars for the first glow-caps, Nils for spring seeds, and visit the Living Pith to wake it for the season.',
+  [('talk','hw_gardener','Ask Lars for the first glow-caps'),('talk','hw_sorter','Ask Nils for spring seeds'),('visit','heart_core','Visit the Living Pith')]),
 ]
 def event():return dict(id='easter',calendar='gregorianEaster',startOffset=-2,endOffsetExclusive=9,quests=[s[1] for s in SPECS]+['easter_hunt'],dailyQuests=['easter_hunt'],givers={'easter_hunt':GIVERS})
 def apply(world,levels):
@@ -38,7 +41,7 @@ def apply(world,levels):
    if not o.get('z') and street_centre(o['x'],o['y']):continue
    kind=remap[o['kind']]
    if kind=='easterEgg' and i%3==0:kind='easterBasket'
-   decor.append(dict(o,kind=kind,color={0:'#d74848',4:'#d2aa56',9:'#8bd8d2',17:'#c5a1df'}[zone]))
+   decor.append(dict(o,kind=kind,color={0:'#d74848',4:'#d2aa56',9:'#8bd8d2',17:'#c5a1df',24:'#9fd06a'}[zone]))
   # A district centrepiece where there is room; protect doorways and street centres.
   candidates=[o for o in decor if not o.get('z') and
    hub['x0']+2<o['x']<hub['x1']-2 and hub['y0']+2<o['y']<hub['y1']-2 and

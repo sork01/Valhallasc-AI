@@ -69,6 +69,9 @@ SPOTS = {
     'mailbox': (118.5, 174.5), 'spark': (117, 171),
 }
 MEMORY = (92.0, 118.0)       # the Empty Seat's memory (old es_20_m): beside the Living Pith
+DANCE = (120.0, 124.5)       # the festival dance circle of every season (radius 1.8 orbit, 2.5 clear), between the Pith's lamps and the inner ring
+HOST = 'hw_baker'            # Baker Olle Barkloaf hosts the five city festivals (hires and the annual errand), like the baker of Alderhaven
+HOST_OLD_SPOT = (56.0, 70.0)    # where the host stands in the old 96 square, so the seasonal overlays can address him before the city is built
 
 # the six districts and the Living Pith by the angle of a point from the centre (degrees, y down: 0 east, 90 south)
 REGIONS = ['The Living Pith', 'Seed Court', 'Amberleaf Hollows', 'Sap Market', 'Loomrow', 'Hollowgate', 'Greenrow']
@@ -181,6 +184,7 @@ class City:
             self.rects.append((p['x'] - p.get('r', 4) - .5, p['y'] - p.get('r', 4) - .5, p['x'] + p.get('r', 4) + .5, p['y'] + p.get('r', 4) + .5))
         for sx, sy in spots.values():
             self.rects.append((sx - 1.6, sy - 1.6, sx + 1.6, sy + 1.6))
+        self.rects.append((DANCE[0] - 5, DANCE[1] - 5, DANCE[0] + 5, DANCE[1] + 5))
         for pt in (GATE, GATE_ARRIVAL, DOOR, DOOR_ARRIVAL, SPAWN):
             self.rects.append((pt[0] - 3, pt[1] - 3, pt[0] + 3, pt[1] + 3))
         self.homes_rows()
@@ -317,9 +321,11 @@ def make_people(world, old, spots):
 
 def design(world, write=False):
     zone = world['zones'][ZONE - 1]
+    authored = zone.get('shape', {}).get('rule') == 'authored'
     if not OLD.exists():
-        OLD.write_text(json.dumps(zone, indent=1, ensure_ascii=False) + '\n')           # the old 96 square, saved once: every later run rebuilds from it
-    old = json.loads(OLD.read_text())
+        OLD.write_text(json.dumps(zone, indent=1, ensure_ascii=False) + '\n')           # the old 96 square, saved once (pure: before any seasonal overlay)
+    # the old square WITH this run's overlays (the seasonal quests, the host's hires, the dancers) when the sync-world restored it; the pure sidecar when run on a finished map
+    old = copy.deepcopy(zone) if not authored else json.loads(OLD.read_text())
     places = places_in_frame(old)
     spots = dict(SPOTS)
     for p in places:
@@ -329,15 +335,22 @@ def design(world, write=False):
     city.build(places + [dict(id='es', x=MEMORY[0], y=MEMORY[1], r=3)], spots)
     people = make_people(world, old, spots)
     # the old people keep their ids; their words follow the new city
-    old_npcs = []
+    old_npcs, dancers = [], []
     for n in copy.deepcopy(old['npcs']):
         if n['id'] in content.OLD_PEOPLE:
             n['x'], n['y'] = spots[content.OLD_PEOPLE[n['id']]]
             n.update(copy.deepcopy(content.NPC_UPDATES.get(n['id'], {})))
             old_npcs.append(n)
+        elif n['id'] == HOST:
+            for p in people:
+                if p['id'] == HOST:
+                    p['offers'] = n['offers']                          # the host's seasonal hires (scripts/*_event.py)
+        elif n['id'].startswith('festival_dance_'):
+            n['x'], n['y'] = DANCE
+            dancers.append(n)
         else:
             raise AssertionError(f"unplaced old person {n['id']}")
-    npcs = old_npcs + people
+    npcs = old_npcs + people + dancers
     voids = void_pieces(city.floor)
     objects = [o for o in city.objects] + voids
     # the zone
@@ -363,6 +376,7 @@ def design(world, write=False):
         else:
             raise AssertionError(f"unplaced old portal {p['id']}")
         zone['portals'].append(p)
+    zone.update(season_decor(city, npcs, zone['portals'], old))
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in r] for r in city.roads]
     zone['exitRoutes'] = [dict(portal='hollow_canopy_gate', points=[[GATE[0], GATE[1]], [GATE_ARRIVAL[0], GATE_ARRIVAL[1]]]), dict(portal='heart_seed_gate', points=[[DOOR[0], DOOR[1]], [DOOR_ARRIVAL[0], DOOR_ARRIVAL[1]]])]
     region = np.zeros((N, N), int)
@@ -402,6 +416,86 @@ def design(world, write=False):
     return city, stats
 
 
+SEASONS = {
+    'christmasDecor': ({'festivalPumpkins': 'christmasGifts', 'festivalLantern': 'christmasLantern', 'festivalCandles': 'christmasCandles', 'festivalWreath': 'christmasWreath',
+                        'festivalWeb': 'christmasGarland', 'festivalBunting': 'christmasLights', 'festivalScarecrow': 'christmasTree'}, 'christmasGrandTree', '#9fd06a'),
+    'easterDecor': ({'festivalPumpkins': 'easterFlowers', 'festivalLantern': 'easterLantern', 'festivalCandles': 'easterCandles', 'festivalWreath': 'easterWreath',
+                     'festivalWeb': 'easterGarland', 'festivalBunting': 'easterLights', 'festivalScarecrow': 'easterEgg'}, 'easterGrandEgg', '#9fd06a'),
+    'solsticeDecor': ({'festivalPumpkins': 'solsticeFlowers', 'festivalLantern': 'solsticeLantern', 'festivalCandles': 'solsticeFlowers', 'festivalWreath': 'solsticeWreath',
+                       'festivalWeb': 'solsticeGarland', 'festivalBunting': 'solsticeLights', 'festivalScarecrow': 'solsticeBirch'}, None, '#9fd06a'),
+    'valentineDecor': ({'festivalPumpkins': 'valentineRoses', 'festivalLantern': 'valentineLantern', 'festivalCandles': 'valentineCandles', 'festivalWreath': 'valentineWreath',
+                        'festivalWeb': 'valentineGarland', 'festivalBunting': 'valentineLights', 'festivalScarecrow': 'valentineHeart'}, 'valentineGrandHeart', '#9fd06a'),
+}
+
+
+def season_decor(city, npcs, portals, old):
+    """The five seasons' city dressing on the round city's own streets and buildings (the seasonal generators ran on the old square, before the city was built): Halloween's base dressing,
+    then each season's remap of it, a centrepiece where there is room, and the dance circle kept clear. Same rules as nacre_design.decor."""
+    solid = [o for o in city.objects if o['kind'] != 'void']
+    accent = ((old.get('seasonDecor') or [{}])[0]).get('color', '#8fc860')
+    base = []
+
+    def inside(x, y):
+        return math.hypot(x - C[0], y - C[1]) <= RF - 3.0
+
+    def on_road(x, y):
+        return road_dist((x, y), city.roads) < 1.6
+
+    def safe(x, y):
+        if not inside(x, y) or on_road(x, y):
+            return False
+        if any((abs(x - o['x']) < o['width'] / 2 + .7 and abs(y - o['y']) < o['depth'] / 2 + .7) if o.get('width') else math.hypot(x - o['x'], y - o['y']) < o.get('r', 0) + .7 for o in solid):
+            return False
+        if any(math.hypot(x - n['x'], y - n['y']) < 1.6 for n in npcs):
+            return False
+        if any(math.hypot(x - q['x'], y - q['y']) < 6 for q in portals if not q.get('seam')):
+            return False
+        return not any(math.hypot(x - d['x'], y - d['y']) < 2.5 for d in base)
+
+    def add(kind, x, y, z=0):
+        base.append(dict(kind=kind, x=round(x, 2), y=round(y, 2), z=z, r=0, v=len(base) % 3, hub=content.NAME, color=accent))
+    houses = [o for o in solid if o.get('width') and o.get('depth') and o['kind'] in ('heart_burl', 'heart_burl_tall', 'heart_stall', 'amber_library', 'pith_forge', 'root_loom', 'seed_chapel')]
+    for o in houses:
+        x, y = o['x'], o['y'] + o['depth'] / 2 + .2
+        if inside(x, y) and all(math.hypot(x - q['x'], y - q['y']) > 6 for q in portals if not q.get('seam')):
+            add('festivalWreath' if len(base) % 2 else 'festivalWeb', x, y, 76 if o['kind'] != 'heart_stall' else 52)
+        for side in (-1, 1):
+            x, y = o['x'] + side * (o['width'] / 2 + .95), o['y'] + o['depth'] / 2 + .8
+            if safe(x, y):
+                add('festivalPumpkins' if side < 0 else 'festivalCandles', x, y)
+    step = 6.5
+    for row in range(math.ceil(N / step)):
+        for col in range(math.ceil(N / step)):
+            x, y = 6 + 1.5 + col * step + (row % 2) * 1.2, 6 + 1.5 + row * step
+            if safe(x, y):
+                add(['festivalPumpkins', 'festivalLantern', 'festivalBunting', 'festivalCandles', 'festivalScarecrow'][(row * 3 + col) % 5], x, y)
+    near_dance = lambda o: not o.get('z') and math.hypot(o['x'] - DANCE[0], o['y'] - DANCE[1]) <= 3.2
+    out = {'seasonDecor': [o for o in base if not near_dance(o)]}
+    for key, (remap, grand, fallback) in SEASONS.items():
+        color = ((old.get(key) or [{}])[0]).get('color', fallback)
+        dec = []
+        for i, o in enumerate(base):
+            if near_dance(o):
+                continue
+            kind = remap[o['kind']]
+            if kind == 'christmasTree' and i % 3 == 0:
+                kind = 'christmasSnowman'
+            dec.append(dict(o, kind=kind, color=color))
+        if grand:
+            cand = [o for o in dec if not o.get('z') and all(math.hypot(o['x'] - n['x'], o['y'] - n['y']) > 4 for n in npcs)
+                    and all(math.hypot(o['x'] - q['x'], o['y'] - q['y']) > 10 for q in portals if not q.get('seam'))]
+            if cand:
+                centre = min(cand, key=lambda o: abs(math.hypot(o['x'] - C[0], o['y'] - C[1]) - 24))
+                dec = [o for o in dec if o.get('z') or o is centre or math.hypot(o['x'] - centre['x'], o['y'] - centre['y']) > 4]
+                centre['kind'] = grand
+        if key == 'solsticeDecor' and not any(o['kind'] == 'solsticeTable' for o in dec):
+            table = next((o for o in dec if o['kind'] == 'solsticeFlowers'), None)
+            if table:
+                table['kind'] = 'solsticeTable'
+        out[key] = dec
+    return out
+
+
 OLD_ARRIVALS = {'canopy_hollow_gate': (48, 80), 'seed_vault_return': (48, 22), 'seed_vault_exit': (48, 22)}
 
 
@@ -409,11 +503,26 @@ def unshape(world):
     """Put the old 96 square back (every sync-world starts with it, so the overlays and the Empty Seat see the layout they were written for): the zone from `preshape-24.txt` and the arrivals
     of the crossings that come here. The Veyrroot's own restore (zone_shapes.unshape) already brought back the arch's arrival."""
     zone = world['zones'][ZONE - 1]
-    if not OLD.exists() or zone.get('shape', {}).get('rule') != 'authored':
+    if not OLD.exists():
         return False
-    old = json.loads(OLD.read_text())
-    zone.clear()
-    zone.update(old)
+    if zone.get('shape', {}).get('rule') == 'authored':
+        old = json.loads(OLD.read_text())
+        zone.clear()
+        zone.update(old)
+        restore_arrivals(world)
+    ensure_host(zone)
+    return True
+
+
+def ensure_host(old):
+    """The five city festivals (scripts/seasonal_cities.py, christmas_cities.py, ...) address their host in the old square: a placeholder stands there until the city is built, and the
+    design takes its seasonal offers."""
+    if not any(n['id'] == HOST for n in old['npcs']):
+        old['npcs'].append(dict(id=HOST, name='Baker Olle Barkloaf', role='Bark baker', x=HOST_OLD_SPOT[0], y=HOST_OLD_SPOT[1], color='#e4f7ae', dialogue='.', offers=[], buys=False,
+                                look=copy.deepcopy(content.LOOKS[4])))
+
+
+def restore_arrivals(world):
     for z in world['zones']:
         for p in z['portals']:
             if p['to'] == ZONE and p['id'] in OLD_ARRIVALS:
@@ -421,7 +530,6 @@ def unshape(world):
         for n in z.get('npcs', []):
             if n['id'] == 'travel_veyrroot' and 'travel_heartwood' in n.get('travelLinks', []):
                 n['travelLinks'].remove('travel_heartwood')
-    return True
 
 
 def z23_npcs(world):

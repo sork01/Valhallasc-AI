@@ -1,6 +1,6 @@
 """Annual New Year: exactly one daily hunt, using the retired Rimeveil Christmas clearing."""
 import math
-GIVERS=['baker','city_bard','nacre_gardener','asterion_singer']
+GIVERS=['baker','city_bard','nacre_gardener','asterion_singer','hw_baker']
 def event():
     return dict(id='newyear',start=[12,29],endExclusive=[1,3],quests=['newyear_hunt'],dailyQuests=['newyear_hunt'],givers={'newyear_hunt':GIVERS})
 def remove_encounter(world):

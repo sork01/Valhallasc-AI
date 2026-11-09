@@ -41,10 +41,11 @@ fn worldheart_gates_and_both_city_floors_are_reachable() {
     );
     assert_eq!(
         (inner.name.as_str(), inner.levels, inner.size),
-        ("Veyrroot Heartwood", Some([80, 80]), 96)
+        ("Veyrroot Heartwood", Some([80, 80]), 208)
     );
     assert!(!outer.slimes.is_empty() && outer.quests.len() >= 25);
-    assert_eq!((inner.slimes.len(), inner.quests.len()), (0, 6));
+    assert_eq!(inner.slimes.len(), 0);
+    assert!(inner.quests.len() >= 29, "{} quests", inner.quests.len());
     assert!(outer.in_city(at(210., 241.)) && inner.in_city(inner.spawn));
     for (map, id, to) in [
         (outer, "canopy_hollow_gate", 24),

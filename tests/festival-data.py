@@ -16,7 +16,7 @@ centres=[]
 for zone,a in enumerate(areas):
  for n in a['npcs']:
   if not n['id'].startswith('festival_dance_'):continue
-  assert zone in [0,4,9,17] and n['r']==0 and n['offers'][0]['id']=='festival:dance'
+  assert zone in [0,4,9,17,24] and n['r']==0 and n['offers'][0]['id']=='festival:dance'
   assert clear(a,(n['x'],n['y']),(n['x'],n['y']),2.5)
   assert int(n['y'])*a['size']+int(n['x']) in connected(a)
   assert a['city']['x0']<n['x']<a['city']['x1'] and a['city']['y0']<n['y']<a['city']['y1']

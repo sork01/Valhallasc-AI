@@ -254,7 +254,13 @@ fn newyear_city_scope_catalog_and_calendar_edges() {
             .count(),
         1
     );
-    for npc in ["baker", "city_bard", "nacre_gardener", "asterion_singer"] {
+    for npc in [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer",
+        "hw_baker",
+    ] {
         assert!(crate::seasonal::giver("newyear_hunt", npc));
     }
 }

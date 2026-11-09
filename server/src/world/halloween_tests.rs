@@ -223,7 +223,7 @@ fn halloween_data_only_four_cities_are_dressed_and_ritual_is_clear() {
         .enumerate()
     {
         let decor = z["seasonDecor"].as_array();
-        if [0, 4, 9, 17].contains(&i) {
+        if [0, 4, 9, 17, 24].contains(&i) {
             assert!(decor.unwrap().len() >= 24);
             let city = &z["city"];
             for o in decor.unwrap() {

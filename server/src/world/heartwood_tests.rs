@@ -318,3 +318,114 @@ fn heartwood_is_a_sanctuary() {
     w.hurt_player(1, 5000., at(104., 104.));
     assert_eq!(w.players[&1].character.hp, before, "no damage in Heartwood");
 }
+
+#[test]
+fn heartwood_hosts_all_five_festivals_and_the_six_dances_and_dresses_for_each_season() {
+    let w = world();
+    let map = &w.maps[HEART];
+    let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
+    let zone = &raw["zones"][HEART - 1];
+    // the host: Baker Olle hires fighters for every festival and gives the annual errand
+    let host = map
+        .npcs
+        .iter()
+        .find(|n| n.id == "hw_baker")
+        .expect("the festival host");
+    for season in ["halloween", "christmas", "easter", "solstice", "valentine"] {
+        for class in ["warrior", "mage", "assassin", "priest", "hunter"] {
+            let id = format!("{season}:hire:{class}");
+            assert!(host.offers.iter().any(|o| o.id == id), "{id}");
+        }
+        let quest = map
+            .quests
+            .iter()
+            .find(|q| q.id == format!("{season}_heart"))
+            .unwrap_or_else(|| panic!("{season}_heart"));
+        assert_eq!(quest.npc, "hw_baker");
+        assert!(quest.objectives.len() >= 3);
+        for o in &quest.objectives {
+            match o.kind.as_str() {
+                "talk" => assert!(
+                    map.npcs.iter().any(|n| n.id == o.target),
+                    "{}: {}",
+                    quest.id,
+                    o.target
+                ),
+                "visit" => assert!(
+                    map.places.iter().any(|p| p.id == o.target),
+                    "{}: {}",
+                    quest.id,
+                    o.target
+                ),
+                _ => {}
+            }
+        }
+    }
+    // the dance: one centrepiece per season on clear ground, two laps of radius 1.8 walkable
+    let c = at(120., 124.5);
+    for season in [
+        "halloween",
+        "christmas",
+        "newyear",
+        "valentine",
+        "easter",
+        "solstice",
+    ] {
+        let n = map
+            .npcs
+            .iter()
+            .find(|n| n.id == format!("festival_dance_{season}_24"))
+            .unwrap_or_else(|| panic!("{season} dance"));
+        assert!(at(n.x, n.y).distance(c) < 1e-6);
+        for i in 0..64 {
+            let a = |k: f64| {
+                at(
+                    c.x + 1.8 * (k * std::f64::consts::TAU / 64.).cos(),
+                    c.y + 1.8 * (k * std::f64::consts::TAU / 64.).sin(),
+                )
+            };
+            assert!(
+                map.line_clear(a(i as f64), a(i as f64 + 1.), PLAYER_RADIUS),
+                "{season} orbit step {i}"
+            );
+        }
+    }
+    // the dressing: dense for every season, nothing on the ground near the dance, nothing on a road
+    for key in [
+        "seasonDecor",
+        "christmasDecor",
+        "easterDecor",
+        "solsticeDecor",
+        "valentineDecor",
+    ] {
+        let decor = zone[key].as_array().unwrap_or_else(|| panic!("{key}"));
+        assert!(decor.len() >= 200, "{key}: {}", decor.len());
+        for o in decor {
+            let (x, y) = (o["x"].as_f64().unwrap(), o["y"].as_f64().unwrap());
+            assert!(
+                ((x - 104.).powi(2) + (y - 104.).powi(2)).sqrt() < 98.,
+                "{key} decor off the floor"
+            );
+            if o.get("z").and_then(|z| z.as_f64()).unwrap_or(0.) == 0. {
+                assert!(
+                    ((x - 120.).powi(2) + (y - 124.5).powi(2)).sqrt() > 3.2,
+                    "{key}: ground decor on the dance circle"
+                );
+            }
+        }
+    }
+    assert!(
+        zone["christmasDecor"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|o| o["kind"] == "christmasGrandTree")
+    );
+    assert!(
+        zone["solsticeDecor"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|o| o["kind"] == "solsticeTable")
+    );
+}

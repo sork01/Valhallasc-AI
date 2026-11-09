@@ -1,6 +1,6 @@
 """Shared, byte-stable four-city dance landmarks for every registered season."""
 import math
-POSITIONS={0:(32,83),4:(87,83),9:(93,100),17:(95,91)}
+POSITIONS={0:(32,83),4:(87,83),9:(93,100),17:(95,91),24:(36,60)}
 KINDS={'solstice':('solsticePole','Midsummer Pole'),'christmas':('christmasGrandTree','Christmas Tree'),
  'valentine':('valentineGrandHeart','Valentine Heart'),'easter':('easterGrandEgg','Easter Egg'),
  'halloween':('festivalPumpkins','Halloween Pumpkin'),'newyear':('newyearLaunchpad','New Year Rocket')}

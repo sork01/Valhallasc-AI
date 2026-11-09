@@ -4,7 +4,7 @@
  const areas=[WORLD_MAP,...WORLD_MAP.zones],colors=['#ffd46a','#ff5e99','#42d5ed','#ad81ff','#6adea4'];
  const {ellipse,line,prism,poly}=City.kit;
  let state=null,rolls={},day=0,source=null,loading=null;
- const inCity=(zone,hero)=>{const c=areas[zone]?.city;return [0,4,9,17].includes(zone)&&c&&hero.x>=c.x0&&hero.x<=c.x1&&hero.y>=c.y0&&hero.y<=c.y1;};
+ const inCity=(zone,hero)=>{const c=areas[zone]?.city;return [0,4,9,17,24].includes(zone)&&c&&hero.x>=c.x0&&hero.x<=c.x1&&hero.y>=c.y0&&hero.y<=c.y1;};
  function plan(zone,hero,t,reduced,w,h){
   if(!window.Seasonal?.isActive('newyear'))return [];
   const city=inCity(zone,hero),count=reduced?(city?4:1):(city?10:2);

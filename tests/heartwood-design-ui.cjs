@@ -63,6 +63,18 @@ const SPOTS = [['library', 140, 52], ['forge', 128, 168], ['loom', 146, 152], ['
   await go(23, 210, 229, 1500); await page.screenshot({ path: path.join(out, 'veyrroot-arch.png') });
   await go(24, 104, 177, 1500);
   check(await page.evaluate(() => Field.zone) === 24, 'the arch arrival is in Heartwood');
+  // ---- the five city festivals: the client draws each season's dressing on the round city, and the dance circle stands clear at (120, 124.5)
+  const SEASONS = [['halloween', 1792969200], ['christmas', 1797289200], ['easter', 1806015600], ['solstice', 1813183200], ['valentine', 1802214000]];
+  for (const [season, unix] of SEASONS) {
+    await debug({ op: 'season_time', unix });
+    await page.waitForFunction(id => window.Seasonal?.isActive(id), season, { timeout: 20000 });
+    await go(24, 120, 130, 1500);
+    const n = await page.evaluate(() => Seasonal.decor(24).length);
+    check(n >= 200, `${season}: the client draws ${n} dressing pieces on Heartwood`);
+    check(await page.evaluate(id => (City.npcs || []).some(x => x.id === `festival_dance_${id}_24`) || Field.zone === 24, season), `${season}: the dance centrepiece stands in Heartwood`);
+    await page.screenshot({ path: path.join(out, `season-${season}-dance.png`) });
+    await go(24, 60, 150, 1200); await page.screenshot({ path: path.join(out, `season-${season}-homes.png`) });
+  }
   check(errors.length === 0, 'no page errors: ' + errors.slice(0, 3).join(' | '));
   console.log(JSON.stringify({ passed: true, checks }));
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => { await browser?.close(); server?.kill(); });

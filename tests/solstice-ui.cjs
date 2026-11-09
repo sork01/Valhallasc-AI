@@ -33,7 +33,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>Solstice.objects(2).length===0&&!Quests.offered('baker').some(q=>q.id.startsWith('solstice'))),'The day before the season has no pole, dressing or quests');
  await debug({op:'season_time',unix:1813183200});await wait(()=>Seasonal.isActive('solstice'));
  check(await p.evaluate(()=>__snap.solstice!==null&&__snap.easter===null&&__snap.christmas===null),'The exact Stockholm start activates Summer Solstice alone');
- check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17].includes(i)?z.solsticeDecor?.length>=20:!z.solsticeDecor)),'Midsummer scenery is dense and restricted to four city bounds');
+ check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17,24].includes(i)?z.solsticeDecor?.length>=20:!z.solsticeDecor)),'Midsummer scenery is dense and restricted to four city bounds');
  check(await p.evaluate(()=>[0,4,9,17].every(z=>Seasonal.decor(z).some(o=>o.kind==='solsticePole'))),'The production seasonal renderer exposes a midsummer pole in every city');
  for(const [z,name]of[[0,'alderhaven'],[4,'skaldholm'],[9,'nacrehold'],[17,'asterion']]){
   const a=await p.evaluate(z=>[WORLD_MAP,...WORLD_MAP.zones][z],z),q=a.quests.find(q=>q.season==='solstice'&&q.id!=='solstice_hunt');

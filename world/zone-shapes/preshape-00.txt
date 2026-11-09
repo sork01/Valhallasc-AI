@@ -4313,7 +4313,8 @@
     "baker",
     "city_bard",
     "nacre_gardener",
-    "asterion_singer"
+    "asterion_singer",
+    "hw_baker"
    ],
    "description": "Gather five fighters and light the haunted lantern in Gloamfen. Defeat the Hollow Rider, then return to any city festival host. The Rider matches the average party level, rounded up. Each eligible hero has one independent 1% Nightmare Steed roll per day. Hired fighters can help.",
    "objectives": [
@@ -4378,7 +4379,8 @@
     "baker",
     "city_bard",
     "nacre_gardener",
-    "asterion_singer"
+    "asterion_singer",
+    "hw_baker"
    ],
    "description": "Gather five fighters at the great Christmas tree in Rimeveil Glacier. Press the tree to summon the Grinch and recover the stolen presents. He matches the highest level in your party. Hired fighters can help. Each eligible hero has one independent 5% Red-nosed Reindeer roll per day. Return to any city festival host.",
    "objectives": [
@@ -4443,7 +4445,8 @@
     "baker",
     "city_bard",
     "nacre_gardener",
-    "asterion_singer"
+    "asterion_singer",
+    "hw_baker"
    ],
    "description": "Gather five fighters at the Springtide Egg Basket in Rimeveil Glacier. Press the shrine to summon the Bloomwarden, a moss-and-blossom guardian protecting the painted eggs. It matches the highest party level. Hired fighters can help. Each eligible hero has one independent 5% Springtide Bunny roll per Stockholm day. Return to any city festival host.",
    "objectives": [
@@ -4508,7 +4511,8 @@
     "baker",
     "city_bard",
     "nacre_gardener",
-    "asterion_singer"
+    "asterion_singer",
+    "hw_baker"
    ],
    "description": "Gather five fighters at the Sunwoven Midsummer Pole in Rimeveil Glacier. Press the pole to summon the Birchcrown Guardian, a birch-bark guardian crowned with wildflowers and sunlight. It matches the highest party level. Hired fighters can help. Each eligible hero has one independent 5% Sunwoven Stag roll per Stockholm day. Return to any city festival host.",
    "objectives": [
@@ -4573,7 +4577,8 @@
     "baker",
     "city_bard",
     "nacre_gardener",
-    "asterion_singer"
+    "asterion_singer",
+    "hw_baker"
    ],
    "description": "Gather five fighters at the Roseheart Shrine in Rimeveil Glacier. Press the shrine to summon the Briarheart, a thorn guardian holding the festival roses. It matches the highest party level. Hired fighters can help. Claim this daily quest at any city festival host to earn the Roseheart Unicorn, guaranteed. One claim per Stockholm day.",
    "objectives": [
@@ -4606,7 +4611,8 @@
     "baker",
     "city_bard",
     "nacre_gardener",
-    "asterion_singer"
+    "asterion_singer",
+    "hw_baker"
    ],
    "description": "Gather five fighters at the Festival Launchpad in Rimeveil Glacier. Press it to summon the Starfire Rocketeer at the highest level in your party. Hired fighters can help. Each eligible hero has one independent 5% Starflight Rocket roll per Stockholm day. Return to any city festival host to claim the quest and the Ring in the New Year achievement.",
    "objectives": [

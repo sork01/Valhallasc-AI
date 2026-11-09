@@ -26,7 +26,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>!Seasonal.isActive('easter')&&Easter.objects(2).length===0&&!Quests.offered('baker').some(q=>q.id.startsWith('easter'))),'March 25: Easter dressing, shrine and quests are absent');
  await debug({op:'season_time',unix:1806015600});await wait(()=>Seasonal.isActive('easter'));
  check(await p.evaluate(()=>!Seasonal.isActive('halloween')&&__snap.halloween===null&&__snap.easter!==null),'March 26 activates only Easter, with its own ritual state');
- check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17].includes(i)?z.easterDecor?.length>=20:!z.easterDecor)),'Easter city dressing is dense and restricted to the four major cities');
+ check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17,24].includes(i)?z.easterDecor?.length>=20:!z.easterDecor)),'Easter city dressing is dense and restricted to the four major cities');
  const names={0:'alderhaven',4:'skaldholm',9:'nacrehold',17:'asterion'};
  if(!['hunt','titles'].includes(process.env.CHECK_ONLY))for(const z of [0,4,9,17]){
   const a=await area(z),q=a.quests.find(q=>q.season==='easter'&&q.id!=='easter_hunt');

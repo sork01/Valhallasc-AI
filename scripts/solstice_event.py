@@ -2,7 +2,7 @@
 import math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-GIVERS=['baker','city_bard','nacre_gardener','asterion_singer']
+GIVERS=['baker','city_bard','nacre_gardener','asterion_singer','hw_baker']
 SPECS=[
  (0,'solstice_alder','Flowers for Every Door','baker',1,100,
   'Pip is weaving flower crowns for Summer Solstice. Ask Linden for blue and yellow ribbons, Mira for wildflowers and Tessa for strawberry cakes, then return to Pip.',
@@ -16,6 +16,9 @@ SPECS=[
  (17,'solstice_aster','The Sunlit Garland','asterion_singer',60,2800,
   'Vela is stringing sunlit garlands beneath the stars. Ask Mora for the midsummer chime, Umi for birch branches and Nim for blue and yellow ribbons.',
   [('talk','asterion_bellkeeper','Arrange the midsummer chime with Mora'),('talk','asterion_gardener','Gather birch branches with Umi'),('talk','asterion_merchant','Arrange summer ribbons with Nim')]),
+ (24,'solstice_heart','Midsummer in the Hollow','hw_baker',80,4500,
+  'Olle is weaving a midsummer wreath for the Living Pith. Ask Lars for green moss, Saga for bright ribbon, and Edda for a midsummer song.',
+  [('talk','hw_gardener','Ask Lars for green moss'),('talk','hw_weaver','Ask Saga for bright ribbon'),('talk','hw_storyteller','Ask Edda for a midsummer song')]),
 ]
 def event():return dict(id='solstice',calendar='juneSolstice',startOffset=-4,endOffsetExclusive=5,quests=[s[1] for s in SPECS]+['solstice_hunt'],dailyQuests=['solstice_hunt'],givers={'solstice_hunt':GIVERS})
 def apply(world,levels):
@@ -38,9 +41,9 @@ def apply(world,levels):
    if not o.get('z') and street_centre(o['x'],o['y']):continue
    kind=remap[o['kind']]
    if kind=='solsticeBirch' and i%3==0:kind='solsticeTable'
-   decor.append(dict(o,kind=kind,color={0:'#d74848',4:'#d2aa56',9:'#8bd8d2',17:'#c5a1df'}[zone]))
+   decor.append(dict(o,kind=kind,color={0:'#d74848',4:'#d2aa56',9:'#8bd8d2',17:'#c5a1df',24:'#9fd06a'}[zone]))
   # Authored plaza-side circles: routes/collision stay unchanged, space is cleared only of cosmetics.
-  x,y={0:(32,83),4:(87,83),9:(93,100),17:(95,91)}[zone]
+  x,y={0:(32,83),4:(87,83),9:(93,100),17:(95,91),24:(36,60)}[zone]
   assert hub['x0']+2<x<hub['x1']-2 and hub['y0']+2<y<hub['y1']-2
   assert all(math.hypot(x-n['x'],y-n['y'])>3 for n in area['npcs'])
   assert all(math.hypot(x-p['x'],y-p['y'])>7 for p in area['portals'])

@@ -240,17 +240,23 @@ fn christmas_city_scope_catalog_and_calendar_edges() {
     let mut annual = 0;
     for (i, z) in zones.enumerate() {
         let count = z["christmasDecor"].as_array().map_or(0, Vec::len);
-        assert_eq!(count > 0, [0, 4, 9, 17].contains(&i));
+        assert_eq!(count > 0, [0, 4, 9, 17, 24].contains(&i));
         for q in z["quests"].as_array().unwrap() {
             if q["season"] == "christmas" && q["seasonCadence"] != "daily" {
                 annual += 1;
             }
         }
     }
-    assert_eq!(annual, 4);
+    assert_eq!(annual, 5);
     assert!(w.maps[2].line_clear(at(103., 100.), at(112., 100.), 1.2));
     assert_eq!(w.spawns.iter().filter(|s| s.kind == "grinch").count(), 1);
-    for npc in ["baker", "city_bard", "nacre_gardener", "asterion_singer"] {
+    for npc in [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer",
+        "hw_baker",
+    ] {
         assert!(crate::seasonal::giver("christmas_hunt", npc));
     }
 }

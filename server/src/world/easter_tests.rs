@@ -69,7 +69,7 @@ fn easter_calendar_boundaries_city_scope_and_safe_landmark() {
         let decor = z["easterDecor"].as_array();
         assert_eq!(
             decor.is_some_and(|d| d.len() >= 20),
-            [0, 4, 9, 17].contains(&i)
+            [0, 4, 9, 17, 24].contains(&i)
         );
         if let Some(decor) = decor {
             for o in decor {
@@ -91,13 +91,19 @@ fn easter_calendar_boundaries_city_scope_and_safe_landmark() {
             .filter(|q| q["season"] == "easter" && q["seasonCadence"] != "daily")
             .count();
     }
-    assert_eq!(annual, 4);
+    assert_eq!(annual, 5);
     assert_eq!(
         w.spawns.iter().filter(|s| s.kind == "bloomwarden").count(),
         1
     );
     assert!(w.maps[2].line_clear(at(103., 100.), at(112., 100.), 1.2));
-    for n in ["baker", "city_bard", "nacre_gardener", "asterion_singer"] {
+    for n in [
+        "baker",
+        "city_bard",
+        "nacre_gardener",
+        "asterion_singer",
+        "hw_baker",
+    ] {
         assert!(crate::seasonal::giver("easter_hunt", n));
     }
 }
