@@ -12,10 +12,7 @@ const ELITES: [(&str, u32); 3] = [
     ("cobaltbasilisk", 83),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); the Astrolabe is a door, the Yearwheel has none
-const GATES: [(&str, usize, &str); 2] = [
-    ("path_25_20", 20, "path_20_25"),
-    ("lapis_canopy_gate", 23, "canopy_lapis_gate"),
-];
+const GATES: [(&str, usize, &str); 1] = [("path_25_20", 20, "path_20_25")];
 const HAMLETS: [(&str, &str); 3] = [
     ("wallwatch", "lp_ww_"),
     ("saltpan", "lp_sp_"),
@@ -40,10 +37,9 @@ fn the_lapis_erg_is_a_desert_wedge_with_four_families_three_elites_five_hubs_and
     assert_eq!((map.size, map.levels), (296, Some([80, 85])));
     assert_eq!(map.size % 8, 0, "the ground is cut in chunks of eight");
     assert!(map.in_city(map.spawn), "the spawn is Azure Wells");
-    assert_eq!(
-        w.maps[23].slimes.len(),
-        0,
-        "Veyrroot remains a peaceful city"
+    assert!(
+        !w.maps[23].slimes.is_empty(),
+        "the Veyrroot is wild since 2026-11-09"
     );
     let mut live = std::collections::BTreeMap::<&str, usize>::new();
     for (id, spawn) in w.spawns.iter().enumerate().filter(|(_, s)| s.zone == ERG) {
@@ -142,8 +138,16 @@ fn the_lapis_erg_is_a_desert_wedge_with_four_families_three_elites_five_hubs_and
             .unwrap()
             .travel_links
             .iter()
-            .any(|l| l == "travel_saltpan"),
-        "the Veyrroot Canopy's master links to the nearest master here"
+            .any(|l| l == "travel_saltpan")
+            || w.maps[23]
+                .npcs
+                .iter()
+                .find(|n| n.id == "travel_rootstair")
+                .unwrap()
+                .travel_links
+                .iter()
+                .any(|l| l == "travel_saltpan"),
+        "a Veyrroot master links to the nearest master here (across the seam)"
     );
 }
 
@@ -237,7 +241,10 @@ fn the_yearwheel_has_no_crossing_from_either_side_only_a_solid_wall_along_its_wh
             p["to"], YEARWHEEL,
             "the Lapis Erg has a portal to the Yearwheel"
         );
-        assert!(p.get("seam").is_none(), "no seam anywhere");
+        assert!(
+            p.get("seam").is_none() || p["to"] == 23,
+            "no seam but the Veyrroot's"
+        );
     }
     for p in data["zones"][YEARWHEEL - 1]["portals"].as_array().unwrap() {
         assert_ne!(p["to"], ERG, "the Yearwheel has a portal to the Lapis Erg");

@@ -1550,6 +1550,9 @@ def apply(world, cfg):
     if 25 in cfg['zones']:      # after compact_atlas: it rewrites the arrivals of Sunward's, the Veyrroot Canopy's and the astrolabe's crossings and closes the Yearwheel (a wall, no portal on either side)
         import lapis_design
         print('lapis', lapis_design.design(world, write=True)[1])
+    if 23 in cfg['zones']:      # after the Tanglecrown and the Lapis Erg (their Veyrroot gates became the seams; their designs dropped the spawns near them): it rewrites the arrivals of Sunward's and Heartwood's crossings and stands both seam portals where the roads cross
+        import veyrroot_design
+        print('veyrroot', veyrroot_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

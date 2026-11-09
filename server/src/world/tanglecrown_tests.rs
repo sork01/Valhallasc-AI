@@ -10,10 +10,7 @@ const ELITES: [(&str, u32); 3] = [
     ("rootcentipede", 77),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); the border to the Ribbonwild is a seam, the temple is a door
-const GATES: [(&str, usize, &str); 2] = [
-    ("path_22_20", 20, "path_20_22"),
-    ("tangle_worldheart_gate", 23, "canopy_jungle_gate"),
-];
+const GATES: [(&str, usize, &str); 1] = [("path_22_20", 20, "path_20_22")]; // the Veyrroot border is a seam since 2026-11-09
 const HAMLETS: [(&str, &str); 3] = [
     ("rootgate", "tg_rg_"),
     ("drumroot", "tg_dr_"),
@@ -234,10 +231,10 @@ fn the_tanglecrown_border_to_the_ribbonwild_is_a_seam_with_a_road_across_and_the
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(21, 22), (22, 21)].into();
+    let want: std::collections::BTreeSet<_> = [(21, 22), (22, 21), (22, 23), (23, 22)].into();
     assert_eq!(
         pairs, want,
-        "one seam to the Ribbonwild, seen from both sides"
+        "one seam each to the Ribbonwild and the Veyrroot, seen from both sides"
     );
     // both seam portals stand where the road crosses (the old gate's place, in the south-west), not on the middle of the border
     let w = world();
@@ -246,6 +243,18 @@ fn the_tanglecrown_border_to_the_ribbonwild_is_a_seam_with_a_road_across_and_the
         .iter()
         .find(|p| p.to == 21)
         .expect("the seam portal");
+    // the Veyrroot seam (2026-11-09) stands where the old rim gate stood, on the north-east border
+    let veyrroot = w.maps[JUNGLE]
+        .portals
+        .iter()
+        .find(|p| p.to == 23)
+        .expect("the Veyrroot seam portal");
+    assert!(
+        (veyrroot.x - 184.5).abs() < 1.5 && veyrroot.y > 90. && veyrroot.y < 105.,
+        "{} {}",
+        veyrroot.x,
+        veyrroot.y
+    );
     assert!(
         (mine.x - 94.).abs() < 2. && (mine.y - 253.3).abs() < 2.,
         "{} {}",

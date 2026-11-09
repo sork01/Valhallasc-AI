@@ -114,7 +114,7 @@
     sapbeetle:['Sap Beetle',80,'#e3ae59'],lanternhornet:['Lantern Hornet',80,'#d7cf74'],
     mosslemur:['Moss Lemur',80,'#c8d68a'],barkmimic:['Bark Mimic',80,'#c5a479'],
     sandhopper:['Sandhopper',80,'#ca9958'],dunefennec:['Dune Fennec',81,'#d6a278'],glassscorpion:['Glass Scorpion',82,'#71bed0'],sunvulture:['Sun Vulture',83,'#c69b76'],
-    dunecolossus:['Dune Colossus (Elite · 3 players)',84,'#d2a274'],mirageroc:['Mirage Roc (Elite · 5 players)',85,'#8dc3c6'],
+    lanternqueen:['Lantern Queen (Elite · 3 players)',83,'#f6e27a'],barkcolossus:['Heartbark Colossus (Elite · 5 players)',84,'#b6965f'],dunecolossus:['Dune Colossus (Elite · 3 players)',84,'#d2a274'],mirageroc:['Mirage Roc (Elite · 5 players)',85,'#8dc3c6'],
     snowhare:['Snow Hare',85,'#c8dce4'],iceotter:['Ice Otter',86,'#86b3c5'],frostheron:['Frost Heron',87,'#b4d7e0'],glaciercrab:['Glacier Crab',88,'#66b4d0'],
     bellmammoth:['Bell Mammoth (Elite · 3 players)',88,'#d8ab68'],auroramanta:['Aurora Manta (Elite · 4 players)',89,'#68bcb8'],crevasseleviathan:['Crevasse Leviathan (Elite · 5 players)',90,'#77c9e4'],
     screeferret:['Scree Ferret',90,'#c4a78a'],stoneibex:['Stone Ibex',91,'#baa88c'],slateraven:['Slate Raven',92,'#828fa0'],ridgeadder:['Ridge Adder',93,'#a1ad87'],

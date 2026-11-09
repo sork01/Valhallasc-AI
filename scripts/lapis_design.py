@@ -28,7 +28,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import lapis_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field, step_back_artless  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-25.txt'
 
@@ -139,7 +139,7 @@ def roads(G):
 
 class Lapis(Designer):
     TAG, SEED = 'lapis_design_v1', 20261109
-    LATE_SEAMS = set()
+    LATE_SEAMS = {23}       # the Veyrroot's seam arrived after this design was approved (2026-11-09): the masks stay as they were (the gate lapis_canopy_gate keeps its discs and its road)
 
     def __init__(self, world, old):
         self.old = old
@@ -428,6 +428,9 @@ def restore_and_shift(zone, old, G):
     for p in zone['portals']:
         if p['id'] == 'atlas_25_28':          # the wall covers it up: no crossing to the Yearwheel from here
             continue
+        if p.get('seam'):                     # the Veyrroot's seam (zone_shapes.make_seams, 2026-11-09): its line is the border, not a gate
+            keep.append(p)
+            continue
         if p['id'] == 'lapis_astrolabe_gate':
             p['x'], p['y'] = door[0], door[1] + 3
         else:
@@ -491,23 +494,32 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    d.late_dropped = d.late_moved = 0
+    if any(p.get('seam') and p['to'] == 23 for p in zone['portals']):      # the Veyrroot's seam (2026-11-09) replaced the south rim gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go, and the art-less objects within 20 step back
+        d.late_dropped = drop_near_seam(zone, d, 23)
+        loose = [o for o in objects if o.get('layout') == d.TAG and o['kind'] != 'void' and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5]
+        objects = [o for o in objects if o not in loose]
+        d.late_dropped += len(loose)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
-    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items()]
+    seamed = {p['id'] for p in zone['portals'] if p.get('seam')}      # the Veyrroot's seam replaced the south rim gate: its line is the border, not a gate
+    zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]
     door = content.DOOR
     zone['exitRoutes'].append(dict(portal='lapis_astrolabe_gate', points=[[door[0], door[1] + 3], [door[0], door[1] + 7]]))
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(world, zone, HAM, old)
+    if any(p.get('seam') and p['to'] == 23 for p in zone['portals']):      # after the people stand in their final places: the art-less objects within 20 tiles of the Veyrroot seam step back (see greenmeadow_design.step_back_artless)
+        d.late_moved = step_back_artless(zone, zone['objects'], d, 23)
     for q in zone['quests']:
         q.update(copy.deepcopy(content.REWRITES.get(q['id'], {})))
-    # every crossing that arrives here follows the new frame: Sunward's and the Veyrroot Canopy's gates and the astrolabe's two ways out
-    arrivals = {'path_20_25': G['path_25_20'][3], 'canopy_lapis_gate': G['lapis_canopy_gate'][3], 'sunken_astrolabe_return': (door[0], door[1] + 7), 'sunken_astrolabe_exit': (door[0], door[1] + 7)}
+    # every crossing that arrives here follows the new frame: Sunward's gate and the astrolabe's two ways out (the Veyrroot seam carries its own shift)
+    arrivals = {'path_20_25': G['path_25_20'][3], 'sunken_astrolabe_return': (door[0], door[1] + 7), 'sunken_astrolabe_exit': (door[0], door[1] + 7)}
     found = set()
     for zi in range(len(world['zones'])):
         for p in world['zones'][zi]['portals']:
-            if p['to'] == ZONE and p['id'] in arrivals:
+            if p['to'] == ZONE and p['id'] in arrivals and not p.get('seam'):
                 p['tx'], p['ty'] = round(arrivals[p['id']][0], 2), round(arrivals[p['id']][1], 2)
                 found.add(p['id'])
     close_yearwheel(world, zone)
@@ -569,7 +581,7 @@ def check(world, zone, d, solid, seen, G, found):
         problems.append('Lapis still has a portal to the Yearwheel')
     if any(p['to'] == ZONE for p in world['zones'][YEARWHEEL - 1]['portals']):
         problems.append('the Yearwheel still has a portal to the Lapis Erg')
-    for need in ('path_20_25', 'canopy_lapis_gate', 'sunken_astrolabe_return', 'sunken_astrolabe_exit'):
+    for need in ('path_20_25', 'sunken_astrolabe_return', 'sunken_astrolabe_exit'):      # the Veyrroot crossing is a seam since 2026-11-09: it carries its own shift
         if need not in found:
             problems.append(f'no incoming portal {need} found to re-aim')
     # the wall: continuous (no gap wider than a player between neighbouring pieces), towers at both ends, and nothing reachable between it and the border

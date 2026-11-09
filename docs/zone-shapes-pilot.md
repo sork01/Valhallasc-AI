@@ -171,3 +171,7 @@ Owner: "orrey is missing seamless to cragss and emberwake" (branch `feat/zone-sh
 ## The Lapis Erg (zone 25, 2026-11-09)
 
 Shaped and authored on the pilot with a **wall towards the Yearwheel and no crossing to it at all** (owner: "yearwheel shouldn't have a portal at all from here. just a wall covering it up"); no seams (no neighbour is shaped yet: `seamWith {25: []}`), Sunward Vale, the Veyrroot Canopy and the Sunken Astrolabe stay gates. `docs/lapis-design.md` (branch `feat/zone-shapes-lapis`).
+
+## The Veyrroot Canopy (zone 23, 2026-11-09)
+
+Shaped and authored as a **wild zone** on the pilot (owner: "veyroot should be wild with enemies"), **seamless against the Tanglecrown and the Lapis Erg** (Sunward Vale and the Hollow Arch to Heartwood stay gates), three outposts, three new elites, the old quests kept; both approved neighbours ran unchanged (`LATE_SEAMS = {23}`). Heartwood (24) becomes the main city in step two. `docs/veyrroot-design.md` (branch `feat/zone-shapes-veyrroot`).

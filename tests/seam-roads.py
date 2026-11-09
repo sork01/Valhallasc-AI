@@ -7,6 +7,9 @@ Pure data, no server. For every seam pair among the zones that draw dirt trails:
   3. every point of such a road is at least 0.6 tiles from a void piece (the server's walker has a radius: three Rust road tests failed on this once),
   4. no loose scenery within 2.5 tiles of such a road and no spawn within 3.4 (the designs' own clearances).
 
+A trunk road may run through its own camp or city (the designs' checks exempt those rectangles too, 2026-11-09: the Veyrroot's seams brought the Tanglecrown's and the Lapis Erg's trunk roads
+under this test), and a sleeper woken by a hold circle (`ambush`) may stand beside a road: both are exempt.
+
 `MAP=<path>` runs it against another map.txt: the map from before the pass must FAIL (mutation check).
 """
 import json
@@ -57,6 +60,8 @@ for a, b, sh, pa, pb in pairs:
         assert touching, f'seam {a}-{b}: no road of zone {z} touches the border'
         walls = [o for o in zone['objects'] if o['kind'] not in S.LOOSE and o['kind'] != 'void']
         voids = [o for o in zone['objects'] if o['kind'] == 'void']
+        rects = [zone['city']] + zone.get('camps', [])
+        in_camp = lambda x, y: any(c['x0'] - 1 <= x <= c['x1'] + 1 and c['y0'] - 1 <= y <= c['y1'] + 3 for c in rects)
         for road in touching:
             for p, q in zip(road, road[1:]):
                 L = math.hypot(q[0] - p[0], q[1] - p[1])
@@ -67,7 +72,7 @@ for a, b, sh, pa, pb in pairs:
                     if gap:
                         fail(f'zone {z}: a road comes within 0.6 tiles of a void piece at {x:.1f},{y:.1f}')
                         break
-                    hit = next((o for o in walls if abs(o['x'] - x) < 8 and abs(o['y'] - y) < 8 and inside(o, x, y)), None)
+                    hit = None if in_camp(x, y) else next((o for o in walls if abs(o['x'] - x) < 8 and abs(o['y'] - y) < 8 and inside(o, x, y)), None)
                     if hit:
                         fail(f'zone {z}: a road crosses a {hit["kind"]} at {hit["x"]:.0f},{hit["y"]:.0f}')
                         break
@@ -78,7 +83,7 @@ for a, b, sh, pa, pb in pairs:
         checks += 1
         if loose:
             fail(f'zone {z}: {len(loose)} loose objects stand within 2.5 tiles of a road to the border, first {loose[0]["kind"]} at {loose[0]["x"]:.0f},{loose[0]["y"]:.0f}')
-        close = [s for s in zone['slimes'] if near_road(s['x'], s['y']) < 3.4]
+        close = [s for s in zone['slimes'] if not s.get('ambush') and near_road(s['x'], s['y']) < 3.4]
         checks += 1
         if close:
             fail(f'zone {z}: {len(close)} spawns stand within 3.4 tiles of a road to the border, first {close[0]["kind"]} at {close[0]["x"]:.0f},{close[0]["y"]:.0f}')

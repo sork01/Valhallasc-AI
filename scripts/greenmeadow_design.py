@@ -644,6 +644,47 @@ def drop_near_seam(zone, d, to, dist=7.0):
     return gone
 
 
+STEP_BACK_KINDS = ('house', 'tent', 'stall', 'noticeboard', 'campfire', 'brazier', 'bench', 'lamp', 'chapel', 'post')
+
+
+def step_back_artless(zone, objects, d, to, clear=20.5, reach=12.0):
+    """A plain seam draws the neighbour's scenery with `City.art` but no art-less objects (a notice board, a bench: drawn only on their own side), so none may stand within 20 tiles of a seam
+    that arrived after this zone's design was approved (the Veyrroot's, 2026-11-09, against the Tanglecrown and the Lapis Erg). Each such object of the design steps to the nearest free spot
+    (within `reach`, the same camp or city rectangle, 2 tiles off every road and every other object) at least `clear` tiles from the seam. Nothing else moves. Returns how many moved."""
+    late = np.full((d.n, d.n), 1e9)
+    for p in zone['portals']:
+        if p.get('seam') and p['to'] == to:
+            late = np.minimum(late, seg_field(p['seam']['points'], d.xs, d.ys))
+    at = lambda x, y: late[min(max(int(y), 0), d.n - 1), min(max(int(x), 0), d.n - 1)]
+    rects = [zone['city']] + zone.get('camps', [])
+    moved = 0
+    for o in objects:
+        if o.get('layout') != d.TAG or o['kind'] not in STEP_BACK_KINDS or at(o['x'], o['y']) >= clear:
+            continue
+        home = next((c for c in rects if c['x0'] - 1 <= o['x'] <= c['x1'] + 1 and c['y0'] - 1 <= o['y'] <= c['y1'] + 1), None)
+        best = None
+        for slack in (0., 6.):                # inside the camp or city rectangle first, then a few tiles beyond it
+            for dx in np.arange(-reach, reach + .01, .5):
+                for dy in np.arange(-reach, reach + .01, .5):
+                    x, y = o['x'] + dx, o['y'] + dy
+                    if math.hypot(dx, dy) > reach or at(x, y) < clear + .5 or not (0 <= int(x) < d.n and 0 <= int(y) < d.n) or not d.inner[int(y), int(x)] or d.road[int(y), int(x)] < 2.0:
+                        continue
+                    if home and not (home['x0'] + 1 - slack <= x <= home['x1'] - 1 + slack and home['y0'] + 1 - slack <= y <= home['y1'] - 1 + slack):
+                        continue
+                    if any(q is not o and q['kind'] != 'void' and math.hypot(q['x'] - x, q['y'] - y) < max(q['r'], (q.get('width', 0) + q.get('depth', 0)) / 4, .6) + max(o['r'], .5) + .9 for q in objects):
+                        continue
+                    if any(math.hypot(n['x'] - x, n['y'] - y) < 2.4 for n in zone['npcs']) or any(math.hypot(q['x'] - x, q['y'] - y) < q.get('r', 2) + 2.0 for q in zone['places']):
+                        continue              # a person keeps a clear spot to stand on, and a place its circle
+                    if best is None or math.hypot(dx, dy) < best[0]:
+                        best = (math.hypot(dx, dy), x, y)
+            if best:
+                break
+        assert best, f"no spot for {o['kind']} at {o['x']},{o['y']} 20 tiles from the seam to zone {to}"
+        o['x'], o['y'] = round(best[1], 2), round(best[2], 2)
+        moved += 1
+    return moved
+
+
 def design(world, write=False):
     d = Designer(world)
     objects = d.build()

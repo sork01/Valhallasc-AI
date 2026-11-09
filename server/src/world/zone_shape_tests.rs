@@ -852,11 +852,11 @@ fn the_tanglecrown_and_the_ribbonwild_share_a_seam() {
 
 #[test]
 fn the_tanglecrown_keeps_its_gates_to_sunward_the_veyrroot_canopy_and_the_temple() {
-    gates_stand_on_free_land(22, &[20, 23, 32]);
+    gates_stand_on_free_land(22, &[20, 32]); // the Veyrroot border is a seam since 2026-11-09
 }
 
 #[test]
-fn the_tanglecrown_is_seamless_against_the_ribbonwild_only() {
+fn the_tanglecrown_is_seamless_against_the_ribbonwild_and_the_veyrroot_only() {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -867,26 +867,27 @@ fn the_tanglecrown_is_seamless_against_the_ribbonwild_only() {
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(21, 22), (22, 21)].into();
+    let want: std::collections::BTreeSet<_> = [(21, 22), (22, 21), (22, 23), (23, 22)].into();
     assert_eq!(
         pairs, want,
-        "one seam to the Ribbonwild, seen from both sides"
+        "one seam each to the Ribbonwild and the Veyrroot, seen from both sides"
     );
 }
 
 #[test]
-fn the_lapis_erg_keeps_its_gates_to_sunward_the_veyrroot_canopy_and_the_astrolabe() {
-    gates_stand_on_free_land(25, &[20, 23, 34]);
+fn the_lapis_erg_keeps_its_gates_to_sunward_and_the_astrolabe() {
+    gates_stand_on_free_land(25, &[20, 34]); // the Veyrroot border is a seam since 2026-11-09
 }
 
 #[test]
-fn the_lapis_erg_has_no_seam_and_no_crossing_to_the_yearwheel() {
+fn the_lapis_erg_is_seamless_against_the_veyrroot_only_and_has_no_crossing_to_the_yearwheel() {
     let data = bundled();
+    let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
         for p in zone_of(&data, zi)["portals"].as_array().unwrap() {
             let to = p["to"].as_u64().unwrap() as usize;
-            if zi == 25 || to == 25 {
-                assert!(p.get("seam").is_none(), "{zi} -> {to} is a seam");
+            if (zi == 25 || to == 25) && p.get("seam").is_some() {
+                pairs.insert((zi, to));
             }
             assert!(
                 !((zi == 25 && to == 28) || (zi == 28 && to == 25)),
@@ -894,6 +895,11 @@ fn the_lapis_erg_has_no_seam_and_no_crossing_to_the_yearwheel() {
             );
         }
     }
+    let want: std::collections::BTreeSet<_> = [(23, 25), (25, 23)].into();
+    assert_eq!(
+        pairs, want,
+        "one seam to the Veyrroot, seen from both sides"
+    );
 }
 
 #[test]

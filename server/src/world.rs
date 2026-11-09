@@ -195,6 +195,8 @@ mod valentines_tests;
 mod vault_tests;
 #[cfg(test)]
 mod vendor_weapon_tests;
+#[cfg(test)]
+mod veyrroot_tests;
 mod weather;
 #[cfg(test)]
 mod worldheart_tests;
@@ -852,6 +854,12 @@ impl Slime {
             "rootcentipede" => (2350000., 19000., 2.5, 2.8),
             // The Cobalt Basilisk (the shapes pilot, no quest): a huge lapis-scaled desert lizard that lies in the Glass Dunes, quick off the mark and heavy. First guess.
             "cobaltbasilisk" => (3300000., 25500., 2.3, 2.9),
+            // The Lantern Queen (the shapes pilot, quest): the hornets' queen in a paper hive high in the north-western canopy, quick and fierce. First guess.
+            "lanternqueen" => (3000000., 23500., 3.0, 2.8),
+            // The Heartbark Colossus (the shapes pilot, quest): a walking grove of living bark in the Eastern Roots, slow and heavy. First guess.
+            "barkcolossus" => (4100000., 29500., 1.9, 3.1),
+            // The Amber Sap Golem (the shapes pilot, no quest): a hulk of hardened sap with whole insects trapped in it, on the southern sap flats. First guess.
+            "ambergolem" => (3700000., 27000., 1.7, 3.0),
             "orchidmantis" => (430000., 5700., 3.6, 1.45),
             "canopyglider" => (370000., 6100., 4.2, 1.35),
             "poolcaiman" => (510000., 6900., 2.1, 1.8),
@@ -1009,6 +1017,9 @@ impl Slime {
             "maskcolossus" => 75,
             "whorlshell" => 73,
             "cobaltbasilisk" => 83,
+            "lanternqueen" => 82,
+            "barkcolossus" => 84,
+            "ambergolem" => 83,
             "rootcentipede" => 77,
             "orchidmantis" => 75,
             "canopyglider" => 76,
@@ -1170,6 +1181,9 @@ impl Slime {
             "maskcolossus" => 41000,
             "whorlshell" => 33000,
             "cobaltbasilisk" => 56000,
+            "lanternqueen" => 52000,
+            "barkcolossus" => 64000,
+            "ambergolem" => 58000,
             "rootcentipede" => 34000,
             "orchidmantis" => 9900,
             "canopyglider" => 10500,
@@ -1351,6 +1365,12 @@ impl Slime {
             "whorlshell" => (1.2, 2.1, 5., 14.),
             // The basilisk rears on its forelegs and snaps its whole neck forward: a moderate wind-up, a long reach.
             "cobaltbasilisk" => (1.12, 2.0, 5.2, 15.),
+            // The queen rears and drives her stinger down: a short wind-up, a long reach.
+            "lanternqueen" => (0.9, 1.7, 6.0, 15.),
+            // The colossus raises both root-arms and brings them down together: a slow wind-up, a wide reach.
+            "barkcolossus" => (1.3, 2.2, 5.0, 15.),
+            // The golem draws back its slab of an arm and slams it forward: a slow wind-up.
+            "ambergolem" => (1.25, 2.1, 4.8, 14.),
             // The centipede rears up and drops its whole length forward: a quick wind-up, a long reach.
             "rootcentipede" => (1.05, 1.9, 5.5, 15.),
             "orchidmantis" => (0.54, 1.3, 9., 11.),
@@ -1504,6 +1524,9 @@ impl Slime {
             "maskcolossus" => 5.0,
             "whorlshell" => 4.6,
             "cobaltbasilisk" => 5.0,
+            "lanternqueen" => 5.2,
+            "barkcolossus" => 5.4,
+            "ambergolem" => 4.9,
             "rootcentipede" => 4.7,
             "jadeanaconda" => 4.7,
             "crownjaguar" => 5.3,
@@ -4750,11 +4773,13 @@ impl World {
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
                 | "wickerwarden" | "paradegryphon" | "maskcolossus" | "whorlshell"
                 | "cobaltbasilisk" | "rootcentipede" | "jadeanaconda" | "crownjaguar"
-                | "dunecolossus" | "mirageroc" | "bellmammoth" | "auroramanta"
-                | "crevasseleviathan" | "cairnbehemoth" | "whitebarktitan" | "stormcondor"
-                | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel"
-                | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber"
-                | "snowgiant" | "longnightwyrm" => 600.,
+                | "lanternqueen" | "barkcolossus" | "ambergolem" | "dunecolossus" | "mirageroc"
+                | "bellmammoth" | "auroramanta" | "crevasseleviathan" | "cairnbehemoth"
+                | "whitebarktitan" | "stormcondor" | "bloomtortoise" | "petalchimera"
+                | "rainseraph" | "glasslion" | "sunwheel" | "firephoenix" | "lanternowl"
+                | "harvestreaper" | "ambermantis" | "rimesaber" | "snowgiant" | "longnightwyrm" => {
+                    600.
+                }
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -5397,6 +5422,9 @@ impl World {
                             | "maskcolossus"
                             | "whorlshell"
                             | "cobaltbasilisk"
+                            | "lanternqueen"
+                            | "barkcolossus"
+                            | "ambergolem"
                             | "rootcentipede"
                             | "jadeanaconda"
                             | "crownjaguar"
@@ -8734,6 +8762,9 @@ mod tests {
             "whorlshell",
             "cobaltbasilisk",
             "rootcentipede",
+            "lanternqueen",
+            "barkcolossus",
+            "ambergolem",
             "jadeanaconda",
             "crownjaguar",
             "dunecolossus",

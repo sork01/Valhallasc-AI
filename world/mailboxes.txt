@@ -88,17 +88,6 @@
     }
   },
   {
-    "id": "mailbox_23_veyrroot_canopy",
-    "zone": 23,
-    "hub": "Veyrroot Canopy",
-    "x": 85.5,
-    "y": 96.5,
-    "anchor": {
-      "x": 82.5,
-      "y": 96.5
-    }
-  },
-  {
     "id": "mailbox_24_veyrroot_heartwood",
     "zone": 24,
     "hub": "Veyrroot Heartwood",
@@ -855,6 +844,61 @@
     "anchor": {
       "x": 122,
       "y": 84
+    }
+  },
+  {
+    "id": "mailbox_23_veyrroot_canopy",
+    "zone": 23,
+    "hub": "Rootfoot",
+    "x": 226.5,
+    "y": 255.5,
+    "anchor": {
+      "x": 225,
+      "y": 253
+    }
+  },
+  {
+    "id": "mailbox_23_gladewatch",
+    "zone": 23,
+    "hub": "Gladewatch Post",
+    "x": 102,
+    "y": 193,
+    "anchor": {
+      "x": 99,
+      "y": 195.5
+    }
+  },
+  {
+    "id": "mailbox_23_rootstair",
+    "zone": 23,
+    "hub": "Rootstair Post",
+    "x": 209,
+    "y": 99,
+    "anchor": {
+      "x": 205,
+      "y": 101.5
+    }
+  },
+  {
+    "id": "mailbox_23_eastbark",
+    "zone": 23,
+    "hub": "Eastbark Post",
+    "x": 294,
+    "y": 201,
+    "anchor": {
+      "x": 295,
+      "y": 201.5
+    }
+  },
+  {
+    "id": "mailbox_23_lookout",
+    "zone": 23,
+    "hub": "Sunleaf Lookout",
+    "x": 257,
+    "y": 149,
+    "anchor": {
+      "x": 246,
+      "y": 150
     }
   }
 ]

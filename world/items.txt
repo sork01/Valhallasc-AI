@@ -58121,6 +58121,27 @@
     }
   },
   {
+    "id": "queen_amber",
+    "name": "Lantern Queen Amber",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8000
+  },
+  {
+    "id": "heartbark_slab",
+    "name": "Heartbark Slab",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 9000
+  },
+  {
+    "id": "golem_amber",
+    "name": "Amber Golem Core",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8600
+  },
+  {
     "id": "ember_shard_0",
     "name": "Greenmeadow Ember Shard",
     "kind": "material",

@@ -1,4 +1,4 @@
-//! Veyrroot's open canopy and inhabitable hollow are reachable public maps.
+//! Veyrroot's wild canopy and Heartwood's hollow are reachable public maps (the Veyrroot became a wild jungle on the shapes pilot, 2026-11-09: `veyrroot_tests`).
 use super::wyrd_tests::{at, blocked, flood, reached, world};
 use super::*;
 
@@ -33,30 +33,20 @@ fn canopy_meeting_stone_has_visible_scenery_and_a_clear_hiring_spot() {
 #[test]
 fn worldheart_gates_and_both_city_floors_are_reachable() {
     let w = world();
-    let jungle = &w.maps[22];
     let outer = &w.maps[23];
     let inner = &w.maps[24];
     assert_eq!(
         (outer.name.as_str(), outer.levels, outer.size),
-        ("Veyrroot Canopy", Some([80, 80]), 128)
+        ("Veyrroot Canopy", Some([80, 84]), 352)
     );
     assert_eq!(
         (inner.name.as_str(), inner.levels, inner.size),
         ("Veyrroot Heartwood", Some([80, 80]), 96)
     );
-    assert_eq!(
-        (
-            outer.slimes.len(),
-            outer.quests.len(),
-            inner.slimes.len(),
-            inner.quests.len()
-        ),
-        (0, 7, 0, 4)
-    );
-    assert!(outer.in_city(at(56., 88.)) && inner.in_city(inner.spawn));
+    assert!(!outer.slimes.is_empty() && outer.quests.len() >= 25);
+    assert_eq!((inner.slimes.len(), inner.quests.len()), (0, 6));
+    assert!(outer.in_city(at(210., 241.)) && inner.in_city(inner.spawn));
     for (map, id, to) in [
-        (jungle, "tangle_worldheart_gate", 23),
-        (outer, "canopy_jungle_gate", 22),
         (outer, "canopy_hollow_gate", 24),
         (inner, "hollow_canopy_gate", 23),
         (inner, "heart_seed_gate", 33),
@@ -104,7 +94,7 @@ fn worldheart_gates_and_both_city_floors_are_reachable() {
 }
 
 #[test]
-fn worldheart_creatures_are_reserved_for_instance_and_city_quests_are_peaceful() {
+fn worldheart_creatures_roam_the_wild_veyrroot_and_the_heartwood_city_quests_are_peaceful() {
     let w = world();
     for (kind, drop) in [
         ("sapbeetle", "sapbeetle_resin"),
@@ -118,9 +108,12 @@ fn worldheart_creatures_are_reserved_for_instance_and_city_quests_are_peaceful()
         let (hp, damage, _, _) = Slime::stats(kind);
         assert!(hp > 300000. && damage > 5000.);
     }
-    for (map, peaceful) in [(&w.maps[23], true), (&w.maps[24], false)] {
+    for (map, peaceful) in [(&w.maps[24], false)] {
         for q in &map.quests {
-            assert_eq!(q.reward_xp, xp_to_level(80) / 10, "{}", q.id);
+            if q.id.starts_with("es_go_") {
+                continue; // a hand-off pays nothing
+            }
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
             if peaceful || matches!(q.id.as_str(), "heart_rings" | "heart_seed_vault") {
                 assert!(
                     q.objectives

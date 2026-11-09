@@ -1123,5 +1123,20 @@
   "The Roc Crag",
   "The Eastern Basin",
   "The Salt Coast",
-  "The Wheel Wall Verge"
+  "The Wheel Wall Verge",
+  "Eastbark Post",
+  "Gladewatch Post",
+  "Rootstair Post",
+  "Sunleaf Lookout",
+  "Rootfoot",
+  "The Amber Sap Flats",
+  "The Eastbark Circle",
+  "The Eastern Roots",
+  "The Foot of the Hive Crown",
+  "The Glade Circle",
+  "The Rootfoot Lanterns",
+  "The Rootstair Circle",
+  "The Twin Roots",
+  "Mirra Dewberry",
+  "Pell Honeyfig"
 ]
