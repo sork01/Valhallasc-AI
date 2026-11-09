@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.39.32",
+    "date": "2026-11-09",
+    "new": [],
+    "changed": [
+      "The Thousandfold Pavilion door and the Mask Dais in the Ribbonwild are redrawn in the same angled view as every other building: the door is now a big striped silk hall with a tall arched doorway, steps, a steep tent roof and a flag, and the dais is a stepped stage with the mask on a post.",
+      "The Ribbonwild's silk pavilions have a steeper tent roof so they match the new hall."
+    ],
+    "removed": [
+      "Replaced the flat front-facing door and dais artwork, which did not match the rest of the game."
+    ]
+  },
+  {
     "version": "Beta 1.39.31",
     "date": "2026-11-09",
     "new": [],
