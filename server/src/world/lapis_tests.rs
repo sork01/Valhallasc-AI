@@ -12,7 +12,7 @@ const ELITES: [(&str, u32); 3] = [
     ("cobaltbasilisk", 83),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); the Astrolabe is a door, the Yearwheel has none
-const GATES: [(&str, usize, &str); 1] = [("path_25_20", 20, "path_20_25")];
+const GATES: [(&str, usize, &str); 0] = []; // the Sunward border is a seam since 2026-11-09
 const HAMLETS: [(&str, &str); 3] = [
     ("wallwatch", "lp_ww_"),
     ("saltpan", "lp_sp_"),
@@ -242,8 +242,8 @@ fn the_yearwheel_has_no_crossing_from_either_side_only_a_solid_wall_along_its_wh
             "the Lapis Erg has a portal to the Yearwheel"
         );
         assert!(
-            p.get("seam").is_none() || p["to"] == 23,
-            "no seam but the Veyrroot's"
+            p.get("seam").is_none() || p["to"] == 23 || p["to"] == 20,
+            "no seam but the Veyrroot's and Sunward Vale's"
         );
     }
     for p in data["zones"][YEARWHEEL - 1]["portals"].as_array().unwrap() {

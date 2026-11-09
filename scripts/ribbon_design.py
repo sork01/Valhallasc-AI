@@ -31,7 +31,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import ribbon_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, late_targets, seg_field, step_back_artless  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-21.txt'
 
@@ -154,7 +154,7 @@ def roads(G):
 
 class Ribbonwild(Designer):
     TAG, SEED = 'ribbon_design_v1', 20261109
-    LATE_SEAMS = {22}       # the Tanglecrown's seam arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate ribbon_tangle_gate keeps its discs and its road)
+    LATE_SEAMS = {22, 20}   # the Tanglecrown's seam (and, 2026-11-09, Sunward Vale's) arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate ribbon_tangle_gate keeps its discs and its road)
 
     def __init__(self, world, old):
         self.old = old
@@ -455,9 +455,11 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
-    d.late_dropped = 0
-    if any(p.get('seam') and p['to'] == 22 for p in zone['portals']):      # the Tanglecrown's seam (2026-11-08) replaced the south-east rim gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go
-        d.late_dropped = drop_near_seam(zone, d, 22)
+    d.late_dropped = d.late_moved = 0
+    late = late_targets(zone, 22, 20)
+    if late:      # the Tanglecrown's seam (2026-11-08) and Sunward Vale's (2026-11-09) replaced rim gates: only the spawns within 7 tiles of them and the loose scenery within 2.5 go (the art-less objects within 20 step back below)
+        for t in late:
+            d.late_dropped += drop_near_seam(zone, d, t)
         loose = [o for o in objects if o.get('layout') == d.TAG and o['kind'] != 'void' and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5]
         objects = [o for o in objects if o not in loose]
         d.late_dropped += len(loose)
@@ -469,6 +471,8 @@ def design(world, write=False):
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(world, zone, content.HAMLETS, old)
+    for t in late_targets(zone, 20):      # after the people stand in their final places: the art-less objects within 20 tiles of Sunward Vale's seam step back (see greenmeadow_design.step_back_artless)
+        d.late_moved += step_back_artless(zone, zone['objects'], d, t)
     # every crossing that arrives here follows the new frame: Sunward's and the Tanglecrown's gates, and the Pavilion's two ways out (the Emberwake seam carries its own shift)
     arrivals = {'sun_ribbon_gate': G['ribbon_sun_gate'][3], 'tangle_ribbon_gate': G['ribbon_tangle_gate'][3], 'thousandfold_return': PAV_ARR, 'thousandfold_exit': PAV_ARR}
     for zi in range(len(world['zones'])):

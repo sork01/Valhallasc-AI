@@ -10,7 +10,7 @@ const ELITES: [(&str, u32); 3] = [
     ("whorlshell", 73),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); the borders to Emberwake and the Tanglecrown are seams, the Pavilion is a door
-const GATES: [(&str, usize, &str); 1] = [("ribbon_sun_gate", 20, "sun_ribbon_gate")];
+const GATES: [(&str, usize, &str); 0] = []; // the Sunward border is a seam since 2026-11-09
 const HAMLETS: [(&str, &str); 3] = [
     ("bunting", "rw_bp_"),
     ("tassel", "rw_tp_"),
@@ -218,10 +218,11 @@ fn the_ribbonwild_borders_to_emberwake_and_the_tanglecrown_are_seams_and_the_oth
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(21, 22), (21, 45), (22, 21), (45, 21)].into();
+    let want: std::collections::BTreeSet<_> =
+        [(21, 22), (21, 45), (22, 21), (45, 21), (20, 21), (21, 20)].into();
     assert_eq!(
         pairs, want,
-        "one seam to Emberwake and one to the Tanglecrown, each seen from both sides"
+        "one seam each to Emberwake, the Tanglecrown and Sunward Vale, each seen from both sides"
     );
 }
 

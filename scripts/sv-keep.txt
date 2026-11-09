@@ -1214,5 +1214,21 @@
   "The Rib Fields",
   "The Northern Peaks",
   "The Pool Fields",
-  "The Frozen Coast"
+  "The Frozen Coast",
+  "Brita Sheafwife",
+  "Leif Acornpurse",
+  "Tolle Combwright",
+  "Elderroot Camp",
+  "Honeywood Steading",
+  "Wickerfield Post",
+  "The Elder Orchard",
+  "The Elderroot Circle",
+  "The Hawthorn Hives",
+  "The Honeywood Circle",
+  "The Long Barrow",
+  "The Millbridge Weir",
+  "The Root Springs",
+  "The Scarecrow Rows",
+  "The Wickerfield Circle",
+  "Thornback Ridge"
 ]

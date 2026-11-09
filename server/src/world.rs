@@ -894,6 +894,8 @@ impl Slime {
             "stormcondor" => (5600000., 37000., 3.1, 3.5),
             // The Avalanche Bear (the shapes pilot, no quest): a mountain-sized white bear that sleeps in the Hollow Peaks, slow to start and very heavy. First guess.
             "avalanchebear" => (4100000., 28500., 2.6, 3.3),
+            // The Harrow Ox (the shapes pilot, no quest): a plough-ox that dragged its iron harrow loose and never stopped, lumbering and very heavy. First guess, between Old Honeyjaw and the Wicker Warden.
+            "harrowox" => (2100000., 16800., 2.1, 2.6),
             "brooknewt" => (840000., 10500., 3.2, 1.5),
             "sundarter" => (900000., 11200., 3.8, 1.6),
             "acornmimic" => (970000., 12000., 2.5, 1.7),
@@ -1049,6 +1051,7 @@ impl Slime {
             "slateraven" => 92,
             "ridgeadder" | "cairnbehemoth" => 93,
             "avalanchebear" => 92,
+            "harrowox" => 69,
             "whitebarktitan" => 94,
             "stormcondor" => 95,
             "brooknewt" => 95,
@@ -1221,6 +1224,7 @@ impl Slime {
             "whitebarktitan" => 96000,
             "stormcondor" => 110000,
             "avalanchebear" => 90000,
+            "harrowox" => 24000,
             "brooknewt" => 25000,
             "sundarter" => 26500,
             "acornmimic" => 28500,
@@ -1411,6 +1415,8 @@ impl Slime {
             "stormcondor" => (1.36, 2.35, 7., 19.),
             // The bear rears on its hind legs and brings both paws down: a slow wind-up, a wide reach.
             "avalanchebear" => (1.3, 2.1, 5.5, 17.),
+            // The ox lowers its horns and the harrow swings round behind it: a slow wind-up, a wide sweep.
+            "harrowox" => (1.0, 1.95, 6., 16.),
             "brooknewt" => (0.58, 1.30, 9., 12.),
             "sundarter" => (0.57, 1.40, 10., 12.),
             "acornmimic" => (0.68, 1.55, 8., 13.),
@@ -1547,6 +1553,7 @@ impl Slime {
             "whitebarktitan" => 5.6,
             "stormcondor" => 6.0,
             "avalanchebear" => 5.2,
+            "harrowox" => 4.4,
             "bloomtortoise" => 5.4,
             "petalchimera" => 5.5,
             "rainseraph" => 5.6,
@@ -4784,10 +4791,10 @@ impl World {
                 | "cobaltbasilisk" | "rootcentipede" | "jadeanaconda" | "crownjaguar"
                 | "lanternqueen" | "barkcolossus" | "ambergolem" | "dunecolossus" | "mirageroc"
                 | "bellmammoth" | "auroramanta" | "crevasseleviathan" | "cairnbehemoth"
-                | "whitebarktitan" | "stormcondor" | "avalanchebear" | "bloomtortoise"
-                | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel" | "firephoenix"
-                | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber" | "snowgiant"
-                | "longnightwyrm" => 600.,
+                | "whitebarktitan" | "stormcondor" | "avalanchebear" | "harrowox"
+                | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel"
+                | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber"
+                | "snowgiant" | "longnightwyrm" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -5445,6 +5452,7 @@ impl World {
                             | "whitebarktitan"
                             | "stormcondor"
                             | "avalanchebear"
+                            | "harrowox"
                             | "bloomtortoise"
                             | "petalchimera"
                             | "rainseraph"
@@ -8785,6 +8793,7 @@ mod tests {
             "whitebarktitan",
             "stormcondor",
             "avalanchebear",
+            "harrowox",
             "bloomtortoise",
             "petalchimera",
             "rainseraph",

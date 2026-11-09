@@ -117,7 +117,7 @@ fn the_veyrroot_is_a_wild_wedge_with_four_families_three_elites_five_hubs_and_th
 }
 
 #[test]
-fn the_borders_to_the_tanglecrown_and_the_lapis_erg_are_seams_with_roads_across_and_sunward_is_a_gate()
+fn the_borders_to_the_tanglecrown_and_the_lapis_erg_are_seams_with_roads_across_and_sunward_is_a_seam_too()
  {
     let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let mut pairs = std::collections::BTreeSet::new();
@@ -129,8 +129,9 @@ fn the_borders_to_the_tanglecrown_and_the_lapis_erg_are_seams_with_roads_across_
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(22, 23), (23, 22), (23, 25), (25, 23)].into();
-    assert_eq!(pairs, want, "two seams, seen from both sides");
+    let want: std::collections::BTreeSet<_> =
+        [(22, 23), (23, 22), (23, 25), (25, 23), (20, 23), (23, 20)].into();
+    assert_eq!(pairs, want, "three seams, seen from both sides");
     let w = world();
     let zone = &data["zones"][WOOD - 1];
     // both seam portals stand where the approved neighbours' roads end, and a road of this zone meets each
@@ -163,7 +164,10 @@ fn the_borders_to_the_tanglecrown_and_the_lapis_erg_are_seams_with_roads_across_
         .iter()
         .find(|p| p.id == "path_23_20")
         .unwrap();
-    assert!(sunward.walk.is_some() && sunward.to == 20);
+    assert!(
+        sunward.walk.is_none() && sunward.seam.is_some() && sunward.to == 20,
+        "the Sunward border is a seam since 2026-11-09"
+    );
     assert!(
         w.maps[WOOD]
             .portals
@@ -175,51 +179,9 @@ fn the_borders_to_the_tanglecrown_and_the_lapis_erg_are_seams_with_roads_across_
 const HEARTWOOD: usize = 24;
 
 #[test]
-fn the_sunward_gate_and_the_hollow_arch_work_and_the_arrivals_are_clear() {
+fn the_hollow_arch_works_and_the_arrival_is_clear() {
     let mut w = world();
-    let mut rx = join(&mut w, 1, Class::Warrior);
-    let gate = w.maps[WOOD]
-        .portals
-        .iter()
-        .find(|p| p.id == "path_23_20")
-        .unwrap()
-        .clone();
-    let side = gate.walk.expect("a walk-in gate");
-    place(&mut w, 1, WOOD, at(gate.x, gate.y));
-    w.message(
-        1,
-        ClientMessage::Move {
-            x: gate.x + f64::from(side[0]) * 3.,
-            y: gate.y + f64::from(side[1]) * 3.,
-        },
-    );
-    run(&mut w, &mut rx, 40);
-    assert_eq!(w.players[&1].character.zone, 20, "Sunward is reached");
-    let back = w.maps[20]
-        .portals
-        .iter()
-        .find(|p| p.id == "path_20_23")
-        .unwrap()
-        .clone();
-    assert_eq!(back.to, WOOD);
-    let arrival = at(back.tx, back.ty);
-    assert!(
-        arrival.distance(at(gate.x, gate.y)) > gate.r + 0.5
-            && arrival.distance(at(gate.x, gate.y)) < 8.
-    );
-    let mut a = arrival;
-    w.maps[WOOD].collide(&mut a, PLAYER_RADIUS);
-    assert!(
-        a.distance(arrival) < 1e-6,
-        "the Sunward arrival is on free ground"
-    );
-    assert!(
-        w.spawns
-            .iter()
-            .filter(|s| s.zone == WOOD)
-            .all(|s| at(s.x, s.y).distance(arrival) > 8.),
-        "an enemy stands near the Sunward arrival"
-    );
+    let _rx = join(&mut w, 1, Class::Warrior);
     // the Hollow Arch and Heartwood's way back
     let arch = w.maps[WOOD]
         .portals

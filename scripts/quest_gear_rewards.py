@@ -288,6 +288,15 @@ REWARDS = {
     'yr_au_intro': green(95, 'accessory'),
     'yr_wi_intro': green(95, 'necklace'),
     'cairn_thunder_final': blue(95, 'accessory'),
+    # Sunward Vale's hubs (pilot): a green at the end of each chain (the ladder has levels 65 and 70)
+    'svs_mb_hold': green(65, 'accessory'),
+    'svs_rounds': green(65, 'pants'),
+    'svs_hw_hold': green(65, 'necklace'),
+    'svs_hw_ridge': green(70, 'accessory'),
+    'svs_wf_hold': green(70, 'pants'),
+    'svs_wf_barrow': green(70, 'necklace'),
+    'svs_er_hold': green(70, 'accessory'),
+    'svs_er_springs': green(70, 'pants'),
     # Cairnspine's hubs (pilot): a green at the end of each chain
     'crn_bw_hold': green(90, 'accessory'),
     'crn_rounds': green(90, 'pants'),

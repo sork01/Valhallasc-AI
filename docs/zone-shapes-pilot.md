@@ -183,3 +183,7 @@ Shaped and authored on the pilot (owner: "reshape cairnspine. and remake the zon
 ## The Frostwake Shelf (zone 26, 2026-11-09)
 
 Shaped and authored on the pilot (owner: "reshape frostwake shelf. and remake the zone and quests to fit the new shape. no fillers. a wall towards yearwheel"), **seamless against Cairnspine only** (its east rim gate became the seam; Cairnspine's approved design ran unchanged, `LATE_SEAMS = {26}`), the Stormglass Flats and Sunward Vale stay rim gates, and a **solid wall with no portal towards the Yearwheel** (the portal pair, exit route, atlas link and Spark links are deleted; the Yearwheel stays reachable through Sunward Vale). Frostwake Station and three outposts, the three old elites kept (no new one), 14 new quests. `docs/frostwake-design.md` (branch `feat/zone-shapes-frost`).
+
+## Sunward Vale (zone 20, 2026-11-09)
+
+Shaped and authored on the pilot (owner: "reshape sunward vale. and remake the zone and quests to fit the new shape. no fillers. a wall with a vault opening towards yearwheel"), **seamless against all six shaped neighbours** (Stormglass, Ribbonwild, Tanglecrown, Veyrroot, Lapis, Frostwake) with a wall and a vaulted opening towards the Yearwheel, Millbridge and three outposts, the Harrow Ox as a new elite, Bankhold moved inland. See `docs/sunward-design.md`.

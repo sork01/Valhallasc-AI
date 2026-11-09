@@ -13,6 +13,7 @@ Seat circles, the seam portals, the vault, the wall, the void.
 """
 import json
 import math
+import os
 import random
 import sys
 from collections import deque
@@ -644,6 +645,16 @@ def drop_near_seam(zone, d, to, dist=7.0):
     return gone
 
 
+def late_targets(zone, *cands):
+    """Of the zones `cands`, those the zone has a (late) seam with: the seam portal carries `seam`."""
+    return [t for t in cands if any(p.get('seam') and p['to'] == t for p in zone['portals'])]
+
+
+def is_seam_portal(world, pid):
+    """True when the portal with this id (in any zone) is a seam: a seam keeps the id of the gate it replaced, and carries its own arrival shift."""
+    return any(p['id'] == pid and p.get('seam') for z in [world] + world['zones'] for p in z.get('portals', []))
+
+
 STEP_BACK_KINDS = ('house', 'tent', 'stall', 'noticeboard', 'campfire', 'brazier', 'bench', 'lamp', 'chapel', 'post')
 
 
@@ -679,6 +690,9 @@ def step_back_artless(zone, objects, d, to, clear=20.5, reach=12.0):
                         best = (math.hypot(dx, dy), x, y)
             if best:
                 break
+        if not best and os.environ.get('STEP_BACK_LAX'):       # diagnosis: list what cannot step back instead of stopping
+            print(f"  STEP-BACK-FAIL zone-side seam to {to}: {o['kind']} at {o['x']},{o['y']} ({at(o['x'], o['y']):.1f} tiles from it)")
+            continue
         assert best, f"no spot for {o['kind']} at {o['x']},{o['y']} 20 tiles from the seam to zone {to}"
         o['x'], o['y'] = round(best[1], 2), round(best[2], 2)
         moved += 1

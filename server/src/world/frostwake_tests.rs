@@ -13,10 +13,7 @@ const ELITES: [(&str, u32); 3] = [
     ("crevasseleviathan", 90),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); Cairnspine is a seam and the Yearwheel has no crossing
-const GATES: [(&str, usize, &str); 2] = [
-    ("path_26_20", 20, "path_20_26"),
-    ("path_26_19", 19, "path_19_26"),
-];
+const GATES: [(&str, usize, &str); 1] = [("path_26_19", 19, "path_19_26")]; // the Sunward border is a seam since 2026-11-09
 const HAMLETS: [(&str, &str, &str); 3] = [
     ("bellward", "fw_bw_", "frostwake_bellkeeper"),
     ("aurora", "fw_au_", "frostwake_skywatcher"),
@@ -171,7 +168,8 @@ fn the_shelf_is_a_tall_glacier_with_four_families_three_elites_four_hubs_and_no_
 }
 
 #[test]
-fn the_border_to_cairnspine_is_a_seam_with_a_road_across_and_sunward_and_stormglass_stay_gates() {
+fn the_borders_to_cairnspine_and_sunward_are_seams_with_a_road_across_and_stormglass_stays_a_gate()
+{
     let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -182,8 +180,11 @@ fn the_border_to_cairnspine_is_a_seam_with_a_road_across_and_sunward_and_stormgl
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(26, 27), (27, 26)].into();
-    assert_eq!(pairs, want, "one seam, seen from both sides");
+    let want: std::collections::BTreeSet<_> = [(26, 27), (27, 26), (20, 26), (26, 20)].into();
+    assert_eq!(
+        pairs, want,
+        "one seam each to Cairnspine and Sunward Vale, seen from both sides"
+    );
     let w = world();
     let zone = &data["zones"][SHELF - 1];
     let mine = w.maps[SHELF]

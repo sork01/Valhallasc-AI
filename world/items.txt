@@ -33369,6 +33369,13 @@
     "sell": 2700
   },
   {
+    "id": "harrow_horn",
+    "name": "Harrow Ox Horn",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3000
+  },
+  {
     "id": "wicker_heart",
     "name": "Wicker Heart",
     "kind": "material",

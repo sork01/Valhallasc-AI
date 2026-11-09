@@ -840,8 +840,8 @@ fn the_orrery_and_the_stormglass_flats_share_a_seam() {
 }
 
 #[test]
-fn the_stormglass_flats_keep_their_gates_to_sunward_and_frostwake() {
-    gates_stand_on_free_land(19, &[20, 26]);
+fn the_stormglass_flats_keep_their_gate_to_frostwake() {
+    gates_stand_on_free_land(19, &[26]); // the Sunward border is a seam since 2026-11-09
 }
 
 #[test]
@@ -860,12 +860,42 @@ fn the_tanglecrown_and_the_ribbonwild_share_a_seam() {
 }
 
 #[test]
-fn the_tanglecrown_keeps_its_gates_to_sunward_the_veyrroot_canopy_and_the_temple() {
-    gates_stand_on_free_land(22, &[20, 32]); // the Veyrroot border is a seam since 2026-11-09
+fn sunward_vale_and_the_stormglass_flats_share_a_seam() {
+    seam_walks(20, 19);
 }
 
 #[test]
-fn the_tanglecrown_is_seamless_against_the_ribbonwild_and_the_veyrroot_only() {
+fn sunward_vale_and_the_ribbonwild_share_a_seam() {
+    seam_walks(20, 21);
+}
+
+#[test]
+fn sunward_vale_and_the_tanglecrown_share_a_seam() {
+    seam_walks(20, 22);
+}
+
+#[test]
+fn sunward_vale_and_the_veyrroot_canopy_share_a_seam() {
+    seam_walks(20, 23);
+}
+
+#[test]
+fn sunward_vale_and_the_lapis_erg_share_a_seam() {
+    seam_walks(20, 25);
+}
+
+#[test]
+fn sunward_vale_and_the_frostwake_shelf_share_a_seam() {
+    seam_walks(20, 26);
+}
+
+#[test]
+fn the_tanglecrown_keeps_its_gate_to_the_temple() {
+    gates_stand_on_free_land(22, &[32]); // the Veyrroot and Sunward borders are seams since 2026-11-09
+}
+
+#[test]
+fn the_tanglecrown_is_seamless_against_the_ribbonwild_the_veyrroot_and_sunward_vale_only() {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -876,20 +906,22 @@ fn the_tanglecrown_is_seamless_against_the_ribbonwild_and_the_veyrroot_only() {
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(21, 22), (22, 21), (22, 23), (23, 22)].into();
+    let want: std::collections::BTreeSet<_> =
+        [(21, 22), (22, 21), (22, 23), (23, 22), (20, 22), (22, 20)].into();
     assert_eq!(
         pairs, want,
-        "one seam each to the Ribbonwild and the Veyrroot, seen from both sides"
+        "one seam each to the Ribbonwild, the Veyrroot and Sunward Vale, seen from both sides"
     );
 }
 
 #[test]
-fn the_lapis_erg_keeps_its_gates_to_sunward_and_the_astrolabe() {
-    gates_stand_on_free_land(25, &[20, 34]); // the Veyrroot border is a seam since 2026-11-09
+fn the_lapis_erg_keeps_its_gate_to_the_astrolabe() {
+    gates_stand_on_free_land(25, &[34]); // the Veyrroot and Sunward borders are seams since 2026-11-09
 }
 
 #[test]
-fn the_lapis_erg_is_seamless_against_the_veyrroot_only_and_has_no_crossing_to_the_yearwheel() {
+fn the_lapis_erg_is_seamless_against_the_veyrroot_and_sunward_vale_only_and_has_no_crossing_to_the_yearwheel()
+ {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -904,10 +936,10 @@ fn the_lapis_erg_is_seamless_against_the_veyrroot_only_and_has_no_crossing_to_th
             );
         }
     }
-    let want: std::collections::BTreeSet<_> = [(23, 25), (25, 23)].into();
+    let want: std::collections::BTreeSet<_> = [(23, 25), (25, 23), (20, 25), (25, 20)].into();
     assert_eq!(
         pairs, want,
-        "one seam to the Veyrroot, seen from both sides"
+        "one seam each to the Veyrroot and Sunward Vale, seen from both sides"
     );
 }
 
@@ -941,7 +973,8 @@ fn emberwake_is_seamless_against_the_flats_the_canopy_the_ribbonwild_and_the_orr
 }
 
 #[test]
-fn the_stormglass_flats_are_seamless_against_the_prismwaste_the_orrery_and_emberwake_only() {
+fn the_stormglass_flats_are_seamless_against_the_prismwaste_the_orrery_emberwake_and_sunward_vale_only()
+ {
     let data = bundled();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -952,11 +985,20 @@ fn the_stormglass_flats_are_seamless_against_the_prismwaste_the_orrery_and_ember
             }
         }
     }
-    let want: std::collections::BTreeSet<_> =
-        [(14, 19), (19, 14), (15, 19), (19, 15), (19, 45), (45, 19)].into();
+    let want: std::collections::BTreeSet<_> = [
+        (14, 19),
+        (19, 14),
+        (15, 19),
+        (19, 15),
+        (19, 45),
+        (45, 19),
+        (19, 20),
+        (20, 19),
+    ]
+    .into();
     assert_eq!(
         pairs, want,
-        "one seam each to the Prismwaste, the Orrery and Emberwake, seen from both sides"
+        "one seam each to the Prismwaste, the Orrery, Emberwake and Sunward Vale, seen from both sides"
     );
 }
 

@@ -10,7 +10,7 @@ const ELITES: [(&str, u32); 3] = [
     ("rootcentipede", 77),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); the border to the Ribbonwild is a seam, the temple is a door
-const GATES: [(&str, usize, &str); 1] = [("path_22_20", 20, "path_20_22")]; // the Veyrroot border is a seam since 2026-11-09
+const GATES: [(&str, usize, &str); 0] = []; // the Veyrroot and Sunward borders are seams since 2026-11-09
 const HAMLETS: [(&str, &str); 3] = [
     ("rootgate", "tg_rg_"),
     ("drumroot", "tg_dr_"),
@@ -231,10 +231,11 @@ fn the_tanglecrown_border_to_the_ribbonwild_is_a_seam_with_a_road_across_and_the
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(21, 22), (22, 21), (22, 23), (23, 22)].into();
+    let want: std::collections::BTreeSet<_> =
+        [(21, 22), (22, 21), (22, 23), (23, 22), (20, 22), (22, 20)].into();
     assert_eq!(
         pairs, want,
-        "one seam each to the Ribbonwild and the Veyrroot, seen from both sides"
+        "one seam each to the Ribbonwild, the Veyrroot and Sunward Vale, seen from both sides"
     );
     // both seam portals stand where the road crosses (the old gate's place, in the south-west), not on the middle of the border
     let w = world();

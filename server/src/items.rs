@@ -455,6 +455,7 @@ pub fn material(kind: &str) -> &'static str {
         "whitebarktitan" => "whitebark_core",
         "stormcondor" => "stormcondor_plume",
         "avalanchebear" => "avalanche_claw",
+        "harrowox" => "harrow_horn",
         "brooknewt" => "newt_ribbon",
         "sundarter" => "sundarter_scale",
         "acornmimic" => "amber_acorn",
@@ -615,6 +616,7 @@ pub fn is_elite(kind: &str) -> bool {
             | "whitebarktitan"
             | "stormcondor"
             | "avalanchebear"
+            | "harrowox"
             | "bloomtortoise"
             | "petalchimera"
             | "rainseraph"

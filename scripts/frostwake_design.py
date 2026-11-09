@@ -28,7 +28,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import frostwake_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, is_seam_portal, late_targets, seg_field, step_back_artless  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-26.txt'
 
@@ -186,7 +186,7 @@ def roads(G):
 
 class Frostwake(Designer):
     TAG, SEED = 'frostwake_design_v1', 20261112
-    LATE_SEAMS = set()
+    LATE_SEAMS = {20}       # Sunward Vale's seam arrived after this design was approved (2026-11-09): the masks stay as they were (the rim gate keeps its discs and its road)
 
     def __init__(self, world, old):
         self.old = old
@@ -545,6 +545,14 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    d.late_dropped = d.late_moved = 0
+    late = late_targets(zone, 20)
+    if late:      # Sunward Vale's seam (2026-11-09) replaced a rim gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go, and the art-less objects within 20 step back (below)
+        for t in late:
+            d.late_dropped += drop_near_seam(zone, d, t)
+        loose = [o for o in objects if o.get('layout') == d.TAG and o['kind'] != 'void' and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5]
+        objects = [o for o in objects if o not in loose]
+        d.late_dropped += len(loose)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
@@ -553,6 +561,8 @@ def design(world, write=False):
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(world, zone, HAM, old)
+    for t in late:      # after the people stand in their final places: the art-less objects within 20 tiles of Sunward Vale's seam step back (see greenmeadow_design.step_back_artless)
+        d.late_moved += step_back_artless(zone, zone['objects'], d, t)
     # every crossing that arrives here follows the new frame: Sunward's and the Stormglass gates (the Cairnspine seam carries its own shift)
     arrivals = {'path_19_26': G['path_26_19'][3], 'path_20_26': G['path_26_20'][3]}
     found = set()
@@ -627,7 +637,7 @@ def check(world, zone, d, solid, seen, G, found):
         if walk and not seen[int(gy - walk[1] * 3), int(gx - walk[0] * 3)]:
             problems.append(f'gate {g} is blocked from the inside')
     for need in ('path_19_26', 'path_20_26'):
-        if need not in found:
+        if need not in found and not is_seam_portal(world, need):
             problems.append(f'no incoming portal {need} found to re-aim')
     # no crossing to the Yearwheel from either side
     if any(p['to'] == YEARWHEEL for p in zone['portals']):

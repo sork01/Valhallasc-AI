@@ -77,17 +77,6 @@
     }
   },
   {
-    "id": "mailbox_20_millbridge",
-    "zone": 20,
-    "hub": "Millbridge",
-    "x": 49.5,
-    "y": 118.5,
-    "anchor": {
-      "x": 46.5,
-      "y": 118.5
-    }
-  },
-  {
     "id": "mailbox_28_springmere",
     "zone": 28,
     "hub": "Springmere",
@@ -586,10 +575,10 @@
     "id": "mailbox_19_bankhold",
     "zone": 19,
     "hub": "Bankhold",
-    "x": 270,
-    "y": 153,
+    "x": 214.0,
+    "y": 153.0,
     "anchor": {
-      "x": 271,
+      "x": 215.0,
       "y": 153.5
     }
   },
@@ -965,6 +954,50 @@
     "anchor": {
       "x": 167,
       "y": 43.5
+    }
+  },
+  {
+    "id": "mailbox_20_millbridge",
+    "zone": 20,
+    "hub": "Millbridge",
+    "x": 115.5,
+    "y": 210.5,
+    "anchor": {
+      "x": 118,
+      "y": 208.5
+    }
+  },
+  {
+    "id": "mailbox_20_honeywood",
+    "zone": 20,
+    "hub": "Honeywood Steading",
+    "x": 88.5,
+    "y": 77.2,
+    "anchor": {
+      "x": 91,
+      "y": 75.5
+    }
+  },
+  {
+    "id": "mailbox_20_wickerfield",
+    "zone": 20,
+    "hub": "Wickerfield Post",
+    "x": 232.5,
+    "y": 99.2,
+    "anchor": {
+      "x": 235,
+      "y": 97.5
+    }
+  },
+  {
+    "id": "mailbox_20_elderroot",
+    "zone": 20,
+    "hub": "Elderroot Camp",
+    "x": 172.5,
+    "y": 71.2,
+    "anchor": {
+      "x": 175,
+      "y": 69.5
     }
   }
 ]

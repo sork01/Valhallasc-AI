@@ -34,7 +34,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import storm_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, late_targets, seg_field, step_back_artless  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-19.txt'
 
@@ -134,6 +134,63 @@ SPIRE_STANDS = [(180, 66, 22), (126, 69, 8), (233, 52, 5), (102, 122, 14), (100,
 JUNCTIONS = [(192, 131), (140, 214), (252, 179), (114, 86), (75, 131), (146, 82)]
 
 
+BANKHOLD_SHIFT = (-56.0, 0.0)       # Bankhold (272, 150) -> (216, 150), beside the Eye Basin
+WALL_CIRCLE_SHIFT = (-12.0, 0.0)    # the Wall Circle (276, 112) -> (264, 112)
+
+
+def late_move_bankhold(zone, d):
+    """Sunward Vale became a seam (2026-11-09) and Bankhold stood 3-20 tiles from it: a plain seam draws no people and no art-less objects, so the outpost, its three people, its Travel Master
+    and mailbox move 56 tiles west beside the Eye Basin, and the Wall Circle with its four sleepers 12 tiles west, away from the line. A LATE edit of the finished design (the approved scatter of the
+    zone is not redrawn): the dressing, people, camp rectangle, circle and sleepers are translated; the scenery and ordinary spawns that now stand inside the new hub or round the new circle go;
+    the old four-tile road stub is replaced by one from the new hub's west edge to the Vert road. Returns (objects moved, scenery dropped, spawns dropped)."""
+    h = content.HAMLETS['bankhold']
+    dx, dy = BANKHOLD_SHIFT
+    old = (h['x'] - h['hw'] - 1, h['x'] + h['hw'] + 1, h['y'] - h['hh'] - 1, h['y'] + h['hh'] + 1)
+    kinds = {k for k, *_ in content.DRESSING['bankhold']}
+    moved = 0
+    for o in zone['objects']:
+        if o.get('layout') == d.TAG and o['kind'] in kinds and old[0] <= o['x'] <= old[1] and old[2] <= o['y'] <= old[3]:
+            o['x'], o['y'] = round(o['x'] + dx, 2), round(o['y'] + dy, 2)
+            moved += 1
+    people = ('storm_bh_torvald', 'storm_bh_sigrid', 'storm_bh_trader', 'travel_bankhold', 'mailbox_19_bankhold')
+    for n in zone['npcs']:
+        if n['id'] in people:
+            n['x'], n['y'] = round(n['x'] + dx, 2), round(n['y'] + dy, 2)
+    for c in zone['camps']:
+        if c['name'] == h['name']:
+            c['x0'], c['x1'], c['y0'], c['y1'] = c['x0'] + dx, c['x1'] + dx, c['y0'] + dy, c['y1'] + dy
+            c['plaza'] = dict(x=c['plaza']['x'] + dx, y=c['plaza']['y'] + dy)
+            c['entry'] = dict(x=c['entry']['x'] + dx, y=c['entry']['y'] + dy)
+    cx, cy = h['x'] + dx, h['y'] + dy
+    for p in zone['places']:
+        if p['id'] == 'storm_wall_m':
+            p['x'], p['y'] = p['x'] + WALL_CIRCLE_SHIFT[0], p['y'] + WALL_CIRCLE_SHIFT[1]
+            wall = (p['x'], p['y'])
+    for t in zone['slimes']:
+        if str(t.get('ambush', '')).startswith('storm_wall_m#'):
+            t['x'], t['y'] = round(t['x'] + WALL_CIRCLE_SHIFT[0], 2), round(t['y'] + WALL_CIRCLE_SHIFT[1], 2)
+    # what the move left standing where the outpost and the circle now are
+    new_rect = (cx - h['hw'] - 3, cx + h['hw'] + 3, cy - h['hh'] - 3, cy + h['hh'] + 3)
+    inside = lambda o, r: r[0] <= o['x'] <= r[1] and r[2] <= o['y'] <= r[3]
+    keep, gone = [], 0
+    for o in zone['objects']:
+        stray = (o.get('layout') == d.TAG and o['kind'] not in kinds and o['kind'] != 'void'
+                 and (inside(o, new_rect) or math.hypot(o['x'] - wall[0], o['y'] - wall[1]) < 3.6 + (o['r'] or 0)
+                      or any(math.hypot(o['x'] - t['x'], o['y'] - t['y']) < 3.6 for t in zone['slimes'] if str(t.get('ambush', '')).startswith('storm_wall_m#'))))
+        if stray:
+            gone += 1
+        else:
+            keep.append(o)
+    zone['objects'][:] = keep
+    spawn_rect = (cx - h['hw'] - 10, cx + h['hw'] + 10, cy - h['hh'] - 10, cy + h['hh'] + 10)
+    before = len(zone['slimes'])
+    zone['slimes'] = [t for t in zone['slimes'] if t.get('layout') != d.TAG or not inside(t, spawn_rect)]
+    # the old stub from the hub's west edge to the east road goes; the new outpost joins the Vert road (190.6, 153) from its own west edge
+    stub = [[260, 150], [256, 148]]
+    zone['paths'] = [r for r in zone['paths'] if [[round(a, 2), round(b, 2)] for a, b in r] != stub] + [[[round(cx - h['hw'], 2), round(cy, 2)], [197.0, 151.5], [190.6, 153.0]]]
+    return moved, gone, before - len(zone['slimes'])
+
+
 def dense_points(path, step=2.0):
     out = [tuple(path[0])]
     for a, b in zip(path, path[1:]):
@@ -178,7 +235,7 @@ def roads(G):
 
 class Stormglass(Designer):
     TAG, SEED = 'storm_design_v1', 20261108
-    LATE_SEAMS = {45}       # Emberwake's seam arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate path_19_45 keeps its discs)
+    LATE_SEAMS = {45, 20}   # Emberwake's seam (and, 2026-11-09, Sunward Vale's) arrived after this design was approved (2026-11-08): the masks stay as they were (the phantom gate path_19_45 keeps its discs)
 
     def __init__(self, world, old):
         self.old = old
@@ -438,8 +495,11 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
-    if any(p.get('seam') and p['to'] == 45 for p in zone['portals']):      # Emberwake's seam (2026-11-08) replaced the south rim gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go
-        d.late_dropped = drop_near_seam(zone, d, 45)
+    late = late_targets(zone, 45, 20)
+    d.late_dropped = d.late_moved = 0
+    if late:      # Emberwake's seam (2026-11-08) and Sunward Vale's (2026-11-09) replaced rim gates: only the spawns within 7 tiles of them and the loose scenery within 2.5 go (the art-less objects within 20 step back below)
+        for t in late:
+            d.late_dropped += drop_near_seam(zone, d, t)
         loose = ('blackpebble', 'seafoam', 'stormreed')
         near = lambda o: d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5
         before = len(objects)
@@ -453,6 +513,10 @@ def design(world, write=False):
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(zone, content.HAMLETS)
+    if late_targets(zone, 20):      # Bankhold stood on the Sunward seam: the outpost moves inland before anything steps back (see late_move_bankhold)
+        d.bankhold = late_move_bankhold(zone, d)
+    for t in late_targets(zone, 20):      # after the people stand in their final places: the art-less objects within 20 tiles of Sunward Vale's seam step back (see greenmeadow_design.step_back_artless)
+        d.late_moved += step_back_artless(zone, zone['objects'], d, t)
     # every crossing that arrives here follows the new frame: Asterion's, Sunward's, Frostwake's and Emberwake's gates, and the Eye's two ways back (the seams carry their own shift)
     arrivals = {'asterion_stormglass_gate': G['stormglass_asterion_gate'][3], 'sun_stormglass_gate': G['stormglass_sun_gate'][3],
                 'path_26_19': G['path_19_26'][3], 'path_45_19': G['path_19_45'][3],

@@ -1564,6 +1564,9 @@ def apply(world, cfg):
     if 26 in cfg['zones']:      # after Cairnspine (its east rim gate became the seam and its design stood both seam portals where its road ends): it rewrites the arrivals of Stormglass's and Sunward's crossings and closes the Yearwheel (a wall, no portal on either side)
         import frostwake_design
         print('frostwake', frostwake_design.design(world, write=True)[1])
+    if 20 in cfg['zones']:      # after every neighbour (their gates to Sunward Vale became the seams and their approved designs ran with 20 as a late seam; Bankhold moved inland): it stands both portals of each seam where the neighbour's road ends, builds the Yearwheel wall with its vault and re-aims the Elder Hollow's and the Yearwheel's crossings
+        import sunward_design
+        print('sunward', sunward_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

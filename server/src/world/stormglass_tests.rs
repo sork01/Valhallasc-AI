@@ -11,10 +11,7 @@ const ELITES: [(&str, u32); 3] = [
     ("stormtusk", 62),
 ];
 /// (gate, the zone it leads to, the far gate that leads back); the borders to the Prismwaste and the Orrery are seams
-const GATES: [(&str, usize, &str); 2] = [
-    ("stormglass_sun_gate", 20, "sun_stormglass_gate"),
-    ("path_19_26", 26, "path_26_19"),
-];
+const GATES: [(&str, usize, &str); 1] = [("path_19_26", 26, "path_26_19")]; // the Sunward border is a seam since 2026-11-09
 const HAMLETS: [(&str, &str); 3] = [
     ("rodstead", "storm_rs_"),
     ("fulgur", "storm_fp_"),
@@ -122,7 +119,7 @@ fn the_flats_are_a_big_night_plain_with_four_families_by_distance_three_elites_f
             .count(),
         10
     );
-    // the two rim gates, Asterion's gate, the Eye's descent and three seams (the Prismwaste, the Orrery, Emberwake)
+    // the rim gate to Frostwake, Asterion's gate, the Eye's descent and four seams (the Prismwaste, the Orrery, Sunward Vale, Emberwake)
     assert_eq!(map.portals.len(), 7);
     let mut seams: Vec<usize> = map
         .portals
@@ -133,8 +130,8 @@ fn the_flats_are_a_big_night_plain_with_four_families_by_distance_three_elites_f
     seams.sort_unstable();
     assert_eq!(
         seams,
-        vec![14, 15, 45],
-        "only the Prismwaste, the Orrery and Emberwake are seams"
+        vec![14, 15, 20, 45],
+        "only the Prismwaste, the Orrery, Sunward Vale and Emberwake are seams"
     );
     for (id, to, _) in GATES {
         let g = map.portals.iter().find(|p| p.id == id).expect(id);

@@ -26,7 +26,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import veyrroot_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, is_seam_portal, late_targets, seg_field, step_back_artless  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-23.txt'
 
@@ -147,7 +147,7 @@ def roads(G):
 
 class Veyrroot(Designer):
     TAG, SEED = 'veyrroot_design_v1', 20261110
-    LATE_SEAMS = set()
+    LATE_SEAMS = {20}       # Sunward Vale's seam arrived after this design was approved (2026-11-09): the masks stay as they were (the rim gate keeps its discs and its road)
 
     def __init__(self, world, old):
         self.old = old
@@ -413,6 +413,14 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    d.late_dropped = d.late_moved = 0
+    late = late_targets(zone, 20)
+    if late:      # Sunward Vale's seam (2026-11-09) replaced a rim gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go, and the art-less objects within 20 step back (below)
+        for t in late:
+            d.late_dropped += drop_near_seam(zone, d, t)
+        loose = [o for o in objects if o.get('layout') == d.TAG and o['kind'] != 'void' and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5]
+        objects = [o for o in objects if o not in loose]
+        d.late_dropped += len(loose)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
@@ -425,6 +433,8 @@ def design(world, write=False):
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(world, zone, HAM, old)
     add_elite_choices(zone)
+    for t in late:      # after the people stand in their final places: the art-less objects within 20 tiles of Sunward Vale's seam step back (see greenmeadow_design.step_back_artless)
+        d.late_moved += step_back_artless(zone, zone['objects'], d, t)
     # every crossing that arrives here follows the new frame: Sunward's gate and Heartwood's way back (the two seams carry their own shift)
     arrivals = {'path_20_23': G['path_23_20'][3], 'hollow_canopy_gate': content.ARCH_ARRIVAL}
     found = set()
@@ -494,7 +504,7 @@ def check(world, zone, d, solid, seen, G, found):
     if not seen[int(content.ARCH_ARRIVAL[1]), int(content.ARCH_ARRIVAL[0])]:
         problems.append('the Hollow Arch arrival is cut off')
     for need in ('path_20_23', 'hollow_canopy_gate'):
-        if need not in found:
+        if need not in found and not is_seam_portal(world, need):
             problems.append(f'no incoming portal {need} found to re-aim')
     # an elite stands clear of everything a player walks to: awareness plus 3 tiles from every road, place and person, and from every hub and gate
     walked = [(q, 'road') for road in d.ROADLIST for q in dense_points(road)]
