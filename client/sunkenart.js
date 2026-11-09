@@ -23,10 +23,13 @@
   const detail=(g,px,py,x,y,TW,TH,zone)=>DungeonVisual.detail(g,'sunken_astrolabe',px,py,x,y,TW,TH,zone);
   function weather(g,t,w,h){g.save();for(let i=0;i<26;i++){const x=(i*173+t*(3+i%4))%w,y=(i*127+t*(7+i%3))%h;oval(g,x,y,1.3,1.7,'rgba(249,229,172,.3)');}g.restore();}
   function portal(g,p,sx,sy,t){
-    g.save();g.translate(sx,sy);poly(g,[[-66,0],[-56,-93],[-31,-149],[0,-171],[31,-149],[56,-93],[66,0]],'#725d50','#f0d496',6);
+    g.save();g.translate(sx,sy);
+    g.save();g.transform(1,.5,0,1,0,0);      // the doorway stands in the +y wall plane like every house door (City.kit.wallPlane): isometric, not a front-on billboard
+    poly(g,[[-66,0],[-56,-93],[-31,-149],[0,-171],[31,-149],[56,-93],[66,0]],'#725d50','#f0d496',6);
     const glow=g.createRadialGradient(0,-77,2,0,-77,72);glow.addColorStop(0,'#fff0bb');glow.addColorStop(.5,'#86d5dc');glow.addColorStop(1,'#265c6c');
     oval(g,0,-76,42+Math.sin(t*2)*2,63,glow,'#f2d9a5');
     for(let a=0;a<8;a++){const q=a*Math.PI/4+t*.15;oval(g,Math.cos(q)*29,-76+Math.sin(q)*44,4,5,'#f7e6bd');}
+    g.restore();
     g.font='15px "Jua",sans-serif';g.textAlign='center';g.strokeStyle='#233a43';g.lineWidth=4;g.fillStyle='#f5e6bc';g.strokeText(p.name,0,-182);g.fillText(p.name,0,-182);g.restore();
   }
   window.SunkenArt={ground,detail,weather,portal};

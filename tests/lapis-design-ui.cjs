@@ -88,7 +88,7 @@ const GROUND = ['The Blue Salt Pans', 'The Roc Crag'], lums = {};
     check(await page.evaluate(k => Field.slimes.find(s => s.kind === k)?.d?.name?.length > 3, kind), `${kind} is on the map with a name`);
   }
   check(await page.evaluate(() => Field.slimes.find(s => s.kind === 'cobaltbasilisk')?.d?.name) === 'Cobalt Basilisk', 'the new elite is named the Cobalt Basilisk');
-  for (const [id, x, y] of [['oasis-wells', 61, 188], ['mirrored-oasis', 118, 144], ['eastern-oasis', 209, 158], ['astrolabe', 130, 74]]) { await go(25, x, y); await page.screenshot({ path: path.join(out, `${id}.png`) }); }
+  for (const [id, x, y] of [['oasis-wells', 61, 188], ['mirrored-oasis', 118, 144], ['eastern-oasis', 209, 158], ['astrolabe', 130, 70], ['astrolabe-far', 142, 78], ['salt-arch', 100, 51]]) { await go(25, x, y); await page.screenshot({ path: path.join(out, `${id}.png`) }); }
   for (const g of Z.portals) { const wk = g.walk || [0, 1]; await go(25, g.x - wk[0] * 6, g.y - wk[1] * 6); await page.screenshot({ path: path.join(out, `gate-${g.id}.png`) }); }
   // ---- the Wheel Wall: stand 15 tiles inland of it at three places (past the occlusion fade) for the pictures, then hold the key toward it and stay inside
   const edge = Z.shape.edges.find(e => e.kind === 'shared' && e.other === 28).points;

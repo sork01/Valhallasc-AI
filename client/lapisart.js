@@ -1,30 +1,36 @@
 'use strict';
 // The Lapis Erg: ochre dunes, blue water, date palms, silk caravans and a buried astrolabe.
 (() => {
-  const {poly}=City.kit,TAU=Math.PI*2;
+  const {poly,iso,prism}=City.kit,TAU=Math.PI*2;
   const oval=(g,x,y,rx,ry,c)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,TAU);g.fillStyle=c;g.fill();};
   const line=(g,pts,c,w=3)=>{g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.lineJoin='round';g.stroke();};
   const shadow=(g,r)=>oval(g,0,5,r,r*.27,'rgba(68,45,37,.25)');
+  // Isometric round pieces (2:1 projection, a circle of r tiles is an ellipse r*62 by r*31): a drum is its front side band plus its top, an iso ring is a 3D circle in the ground plane or in a vertical plane.
+  const ring=(g,r,z,col,w,t0=0,t1=TAU,plane='z')=>{g.beginPath();for(let i=0;i<=56;i++){const a=t0+(t1-t0)*i/56,c=Math.cos(a)*r,s=Math.sin(a)*r,[x,y]=plane==='z'?iso(c,s,z):plane==='x'?iso(c,0,z+s*63):iso(0,c,z+s*63);i?g.lineTo(x,y):g.moveTo(x,y);}g.strokeStyle=col;g.lineWidth=w;g.lineCap='round';g.stroke();};
+  const drum=(g,r,h,z,top,side,rim)=>{
+    g.beginPath();for(let i=0;i<=40;i++){const a=Math.PI*i/40,[x,y]=iso(Math.cos(a)*r,Math.sin(a)*r,z);i?g.lineTo(x,y):g.moveTo(x,y);}
+    for(let i=40;i>=0;i--){const a=Math.PI*i/40,[x,y]=iso(Math.cos(a)*r,Math.sin(a)*r,z+h);g.lineTo(x,y);}
+    g.closePath();const gr=g.createLinearGradient(-r*62,0,r*62,0);gr.addColorStop(0,side[0]);gr.addColorStop(.5,side[1]);gr.addColorStop(1,side[2]);g.fillStyle=gr;g.fill();g.strokeStyle=rim;g.lineWidth=5;g.stroke();
+    const [cx,cy]=iso(0,0,z+h);oval(g,cx,cy,r*62.2,r*31.1,rim);oval(g,cx,cy,r*62.2-5,r*31.1-2.5,top);};
   City.art.lapis_astrolabe={box:[1050,1060,525,970],draw(g,o){
-    shadow(g,270);
-    // Half of the bronze star machine remains beneath the dune; its iris opens over the stair.
-    poly(g,[[-359,0],[-302,-333],[-185,-681],[0,-834],[185,-681],[302,-333],[359,0]],'#c99c69','#72544b',11);
-    oval(g,0,-338,264,307,'#705855');oval(g,0,-338,235,282,'#e4bd81');oval(g,0,-338,204,249,'#326a75');
-    for(let i=0;i<12;i++){const a=i*TAU/12;const x=Math.cos(a)*222,y=-338+Math.sin(a)*266;
-      oval(g,x,y,12,12,i%2?'#f9dfa3':'#87cbd0');line(g,[[x,y],[x*.72,-338+(y+338)*.72]],'#d6ae75',4);}
-    oval(g,0,-338,158,195,'#d7bd89');oval(g,0,-338,139,174,'#234e5d');
-    for(let i=0;i<8;i++){const a=i*TAU/8;g.save();g.translate(0,-338);g.rotate(a);
-      poly(g,[[-22,-153],[22,-153],[61,-27],[0,55],[-61,-27]],i%2?'#bd9469':'#e1bd84','#624e4a',5);g.restore();}
-    if(o.open){
-      oval(g,0,-338,103,139,'#162f3b');oval(g,0,-338,82,116,'#071c2c');
-      for(let i=0;i<7;i++)line(g,[[-71+i*7,-260+i*18],[71-i*7,-260+i*18]],i%2?'#bba277':'#e0c78f',5);
-      oval(g,0,-391,22,27,'#87d9da');
-    }else{oval(g,0,-338,50,67,'#f8dda1');oval(g,0,-338,27,39,'#79d5d3');}
-    for(let side of [-1,1]){poly(g,[[side*310,0],[side*265,-475],[side*220,-677],[side*178,-734],[side*221,-412],[side*245,0]],'#bc8a60','#6b554e',7);
-      for(let j=0;j<4;j++)oval(g,side*(253+j*19),-116-j*110,6,10,'#b8e6d4');}
-    poly(g,[[-185,-3],[0,62],[185,-3],[0,-66]],'#a47857','#684d43',7);
-    for(let j=0;j<9;j++)line(g,[[-110+j*27,24],[-98+j*25,-62]],'#ead3a5',3);
-  },animate(g,o,sx,sy,t){g.save();g.globalAlpha=.12+.07*Math.sin(t*1.3);oval(g,sx,sy-334,62,75,'#fff3c2');g.restore();}};
+    shadow(g,330);
+    // An isometric observatory: three stepped sandstone drums with a ring of lens studs, an iris pit with a stair going down, and a brass armillary sphere (a horizontal and two upright rings, one in each wall plane) held up on four struts.
+    drum(g,5.2,34,0,'#d9b480',['#a47857','#c99c69','#8b6850'],'#684d43');
+    for(let i=0;i<12;i++){const a=i*TAU/12,[x,y]=iso(Math.cos(a)*4.8,Math.sin(a)*4.8,34);oval(g,x,y,10,5,i%2?'#f9dfa3':'#87cbd0');}
+    drum(g,4.4,34,34,'#e4bd81',['#a9825c','#d2a972','#8d6a52'],'#684d43');
+    drum(g,3.7,26,68,'#d7bd89',['#b08a5e','#dcb77d','#94724f'],'#624e4a');
+    const [px,py]=iso(0,0,94);
+    oval(g,px,py,2.9*62.2,2.9*31.1,'#705855');oval(g,px,py+2,2.6*62.2,2.6*31.1,o.open?'#162f3b':'#e4bd81');
+    if(o.open){for(let k=0;k<7;k++)oval(g,px,py+8+k*5,(2.4-k*.28)*62.2,(2.4-k*.28)*31.1,k%2?'#2c4a58':'#0a2030');oval(g,px,py+40,34,15,'#87d9da');}
+    else{oval(g,px,py,2.2*62.2,2.2*31.1,'#f8dda1');oval(g,px,py,1.2*62.2,1.2*31.1,'#79d5d3');}
+    const zc=300;
+    for(let k=0;k<4;k++){const a=Math.PI/4+k*Math.PI/2,[x0,y0]=iso(Math.cos(a)*3.3,Math.sin(a)*3.3,94),[x1,y1]=iso(Math.cos(a)*3.3,Math.sin(a)*3.3,zc);line(g,[[x0,y0],[x1,y1]],'#6b554e',15);line(g,[[x0,y0],[x1,y1]],'#c99c69',9);}
+    ring(g,3.3,zc,'#5d4a46',17,Math.PI,TAU);ring(g,3.3,zc,'#d6ae75',10,Math.PI,TAU);
+    for(const plane of ['x','y']){ring(g,3.1,zc,'#5d4a46',17,0,TAU,plane);ring(g,3.1,zc,plane==='x'?'#e4bd81':'#87cbd0',10,0,TAU,plane);}
+    const [ox,oy]=iso(0,0,zc);oval(g,ox,oy,38,38,'#6b554e');oval(g,ox,oy,31,31,'#f3d17e');oval(g,ox-8,oy-9,12,12,'#fff3c2');
+    ring(g,3.3,zc,'#5d4a46',17,0,Math.PI);ring(g,3.3,zc,'#ecc88a',10,0,Math.PI);
+    for(let i=0;i<12;i++){const a=i*TAU/12,[x,y]=iso(Math.cos(a)*3.3,Math.sin(a)*3.3,zc);if(Math.sin(a)>=0)oval(g,x,y,7,7,i%2?'#f9dfa3':'#87cbd0');}
+  },animate(g,o,sx,sy,t){g.save();g.globalAlpha=.12+.07*Math.sin(t*1.3);oval(g,sx,sy-300,70,70,'#fff3c2');g.restore();}};
   City.art.lapis_oasis={box:[880,570,440,470],ground:true,draw(g,o){
     shadow(g,270);
     // A long blue pool with lush banks, floating lilies and patterned stone lip.
@@ -69,9 +75,12 @@
     for(let x of [-50,0,50])oval(g,x,-78,22,32,'#e3c389');
   }};
   City.art.lapis_salt_arch={box:[430,550,215,500],draw(g){
-    shadow(g,132);for(let side of [-1,1])poly(g,[[side*117,0],[side*110,-318],[side*51,-430],[side*81,-277],[side*72,0]],'#d7d4c5','#568e9a',7);
-    poly(g,[[-133,-323],[0,-475],[133,-323],[82,-329],[0,-397],[-82,-329]],'#dce5d9','#5c9ba4',6);
-    oval(g,0,-408,22,15,'#8bd5d2');
+    shadow(g,150);
+    // An isometric gate of salt blocks: two square pillars and a lintel across them (the opening runs along the y axis), a turquoise crystal on the keystone.
+    for(const x of [-1.5,1.5]){g.save();g.translate(...iso(x,0));prism(g,.9,.9,250,'#f1f4ea','#d7d4c5','#b4c1bb');g.restore();}
+    g.save();g.translate(...iso(0,0));prism(g,4.2,.9,54,'#f6f8f0','#dfe3d6','#bccac4',250);g.restore();
+    const [kx,ky]=iso(0,0,330);poly(g,[[kx-16,ky+4],[kx,ky-34],[kx+16,ky+4],[kx,ky+22]],'#8bd5d2','#568e9a',4);
+    for(const x of [-1.5,1.5])for(let k=1;k<4;k++){const [a,b]=iso(x-.45,.45,k*62),[c,d]=iso(x+.45,.45,k*62);line(g,[[a,b],[c,d]],'rgba(86,142,154,.45)',2);}
   }};
   City.art.lapis_sandstone={box:[230,190,115,145],draw(g,o){shadow(g,65);poly(g,[[-69,0],[-45,-92],[14,-130],[72,-64],[63,0]],o.v%2?'#c89366':'#dbad77','#966d57',5);}};
   City.art.lapis_salt_spire={box:[205,295,102,255],draw(g,o){shadow(g,56);poly(g,[[-41,0],[-30,-150],[6,-233],[43,-90],[28,0]],o.v%2?'#b5d4cf':'#d8e1d7','#558b96',5);line(g,[[-26,-28],[13,-146]],'#79c3c5',4);}};

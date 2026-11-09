@@ -228,9 +228,11 @@
       poly(g,[[-9,-9],[0,-34],[10,-9]],'#ffe6a0',null);return;
     }
     if(o.kind==='noticeboard') {
+      g.save();g.transform(1,.5,0,1,0,0);       // the board stands in the +y wall plane (wallPlane), like a house door: isometric, never a front-on elevation
       line(g,[[-34,0],[-34,-100]],'#72543c',7);line(g,[[34,0],[34,-100]],'#72543c',7);
       poly(g,[[-56,-116],[56,-116],[56,-54],[-56,-54]],'#624533','#d4b27b',3);
       for(const x of [-31,0,31])poly(g,[[x-10,-101],[x+11,-99],[x+9,-67],[x-11,-69]],'#e9d3a0',null);
+      g.restore();
       text(g,o.label,0,-137,17,'#ffd58d');return;
     }
     if(o.kind==='house'||o.kind==='chapel')return building(g,o,live);
