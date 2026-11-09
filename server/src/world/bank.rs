@@ -166,12 +166,13 @@ mod tests {
     }
 
     /// The zone of each big city and its banker (docs/bank.md): Alderhaven is the south of Greenmeadow.
-    const BANKERS: [(usize, &str); 5] = [
+    const BANKERS: [(usize, &str); 6] = [
         (0, "banker_alderhaven"),
         (4, "banker_skaldholm"),
         (9, "banker_nacrehold"),
         (13, "banker_astralhollow"),
         (17, "banker_asterion"),
+        (24, "banker_heartwood"), // the sixth city (the shapes pilot, 2026-11-09): Heartwood, the main city inside the world-tree
     ];
     #[test]
     fn exactly_five_bankers_stand_beside_their_plazas_clear_of_everything_and_nowhere_else() {

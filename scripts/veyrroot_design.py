@@ -212,7 +212,7 @@ class Veyrroot(Designer):
             self.block_disc(p['x'], p['y'], 3.5)
         self.block_disc(*content.MEMORY, 3.5)
         self.add('worldheart_trunk', *content.TREE, r=9, v=0)
-        self.add('hollow_arch', content.ARCH[0], content.ARCH[1] - 1.5, r=0, v=0, place='heart_hollow')      # behind the portal: the way in and out runs south of it
+        self.add('hollow_arch', content.ARCH[0], content.ARCH[1] - 1.8, r=0, v=0, width=6, depth=2, place='heart_hollow')      # behind the portal: the way in and out runs south of it
         content.dress(self, HAM)
         self.landmarks()
         self.lay_regions()

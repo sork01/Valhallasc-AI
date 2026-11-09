@@ -264,6 +264,13 @@ REWARDS = {
     'veyr_rs_hive': green(80, 'necklace'),
     'veyr_eb_hold': green(80, 'accessory'),
     'veyr_eb_grove': green(80, 'pants'),
+    # Heartwood's city quests (pilot): a green at the end of each chain
+    'hw_hollows': green(80, 'accessory'),
+    'hw_resin': green(80, 'pants'),
+    'hw_panes': green(80, 'necklace'),
+    'hw_blankets': green(80, 'pants'),
+    'hw_stools': green(80, 'accessory'),
+    'hw_watch': green(80, 'necklace'),
     'lapis_colossus': blue(85, 'accessory'),
     'lapis_roc': blue(85, 'necklace'),
     'frostwake_hares': green(85, 'necklace'),

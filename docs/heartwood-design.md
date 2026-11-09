@@ -1,0 +1,34 @@
+# Heartwood as the main city inside the world-tree (zone shapes pilot, 2026-11-09)
+
+Owner request (step two of the Veyrroot work): **"remake and reshape heartwood. it should be the main city in the big tree. like a main city like skaldholm. people live in there."** and **"the buildings in heartwood should be buildings that could be found inside a big tree. right"** (owner, same day). The Veyrroot itself became a wild zone (`docs/veyrroot-design.md`); Heartwood is where the people live. Branch `feat/zone-shapes-veyrroot` (the Veyrroot step is committed `6c2f34d`; this step is the next commit), worktree `/media/raid/valhallasc-data/zone-veyrroot-work`.
+
+## The shape
+
+Heartwood has **no outline on the atlas** (it is nested inside the Veyrroot), so `zone_shapes` cannot shape it and it stays out of `zones`, `designOnly` and `seamWith`. Its floor is authored: the hollow of the trunk, **a disc of radius 98 on a 208 grid** (30,172 land tiles), black outside (`shapeFloor` rows + `void` pieces for the server's collision, theme `heartwood`, the client paints the outside a dark wood brown). The server only reads the `void` objects; `shape` carries just `rule: authored` and `placeAtSpawn` (saved characters are moved to the spawn).
+
+**Ownership.** `scripts/heartwood_design.py` owns the zone. It saves the old 96 square once in `world/zone-shapes/preshape-24.txt` (the old people, places, quests and the Seed Vault's door keep their ids) and every `zone_shapes apply` rebuilds from it; `zone_shapes.unshape` restores the old square through `heartwood_design.unshape` (and the arrivals of the crossings that come here), so the overlays and the Empty Seat always see the layout they were written for, exactly as for Skaldholm. `generate_worldheart.py` also writes zone 24 but runs only in the old generator chain, never in sync-world.
+
+## The city (`scripts/heartwood_design.py`, `heartwood_content.py`)
+
+- **The Living Pith** at the centre (104, 104): the old `heartwood_core`, ringed by sap-lamps and root benches. Oracle Veya stands beside it.
+- **Roads:** three ring roads (radius 30, 58, 84; the outer one, the **Rim Walk**, is open round the Hollow Arch), seven spokes (every 45 degrees, the south one is the Great Axis to the arch), and the north road to the Seed Vault's door. Every road avoids every building (checked).
+- **Six districts** (the HUD names them, seven regions with the Pith): **Seed Court** (north: the Seed Chapel, the Dew Bell, the custodian, the door of the Seed Vault at (104, 17) with its portal in front), **Amberleaf Hollows** (north-east: the Amber Library, the archivist), **Sap Market** (east: six stalls either side of the east spoke, the Amber Cup inn), **Loomrow** (south-east: the Root Loom, the Pith Forge, the Rootwright's Hollow), **Hollowgate** (south: the Hollow Arch's portal at (104, 184), the Watch House, the Meeting Stone, the Spark master, the mailbox), **Greenrow** (west and the two corners: the Steward's Hollow, the Hollow Vault bank, the Infirmary, the Founders' Burl).
+- **Homes:** about 110 burl-pod homes (`heart_burl`, every fifth `heart_burl_tall`) in seven rows between the rings, none within 5 tiles of a road, 1.3 apart, every place and person kept clear.
+- **People (32):** the four old ones, the services of a main city (the steward with stat reset and the Arena, the vault keeper's bank, the smith with fitting and repair, the healer, the trader with the bag, cloak and weapon stock, the innkeeper, the Meeting Stone with five mercenary offers, a Spark master linked both ways to Rootfoot's, a mailbox) and 20 residents (captain, two gate watch, lamplighter, weaver, logwarden, bellringer, seed sorter, storyteller, baker, sap tapper, gardener, glassblower, courier, pilgrim, four children). Offers are copied from the same NPCs Skaldholm and the Canopy used.
+- **Quests (34):** the old 6 keep their ids (`heart_rings`, `_seed_vault`, `_seed_trials`, `_seed_final`, `es_20`, `es_go_20`), 14 new peaceful errands (`hw_*`: talk, visit, bring) whose bring targets are the four materials of the wild Veyrroot (resin, hornet amber, lemur fur, bark chips), and the nine Arena trials (`arena_heart_20`-`99`). Rewards in `quest_gear_rewards.py`. All Swedish written by hand (145 texts, 26 kept names).
+- **The sixth big city:** `bank_npcs.py` skips it (its banker is made by the design); stat reset, the Arena and repair are copied from the same offer definitions; `seasonal_cities` and the festival dancers are not extended to it.
+
+## Buildings are grown or carved wood (owner rule), all isometric (`client/heartwoodart.js`)
+
+Burl-pod homes (a root plinth, a barrel of bark with burls and grain lines, a living dome roof with a moss cap, an arched door and a round amber window), market stalls under a woven leaf awning, the **Amber Library** (a carved hall with tall amber slits), the **Pith Forge** (a hollow-log chimney over a glowing vent), the **Root Loom** (four root posts, a woven panel of coloured threads), the **Seed Chapel** (curled root petals round an amber rosette), the **Seed Vault's door** (an iris of bark petals set in a bark wall, lit when open) and the **Hollow Arch** (a thick bark wall with an arched way cut through; it also replaces the Veyrroot's old flat arch). All use `City.kit` prisms on the object's `width` x `depth` with the door on the +y wall (`wallPlane`), none is a flat front elevation. A Rust test fails on any object kind that is not wood, sap-light, a living plant or the Meeting Stone.
+
+## Checks
+
+`cargo test heartwood_tests` (7: round floor and homes, every building wooden and on the floor, services, both crossings, reachability, the quests, a sanctuary); `tests/heartwood-design-ui.cjs` (regions named by the real client, pictures of every district and building, a dark outside, no page errors).
+
+## Not done / open
+
+- The seasonal events' Heartwood hooks (festival dancers, seasonal hires) are not built; Heartwood is not in the five-city services overlays (it carries the same services through its own design).
+- The buildings and the district feel were checked only on test pictures; judge them in play (homes' density, the walking time from the arch to the Seed Court).
+- `worldmap.js` draws the interior with the old square rules: check the detailed map for zone 24.
+- Older suites that teleport into the old Heartwood coordinates (`tests/worldheart-ui.cjs`, MCP `worldheart`, `seed_vault_tests` arrivals) are stale.

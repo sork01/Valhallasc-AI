@@ -1373,6 +1373,9 @@ def unshape(world, cfg):
     if cfg.get('cityRebuild'):      # AFTER the neighbours' shift_incoming(-1), which also rewrote the city's back portals
         import skaldholm_rebuild
         skaldholm_rebuild.restore(world)
+    if 23 in cfg['zones']:          # Heartwood has no atlas outline: its old 96 square comes back from its own sidecar (scripts/heartwood_design.py)
+        import heartwood_design
+        heartwood_design.unshape(world)
     return offsets
 
 
@@ -1553,6 +1556,8 @@ def apply(world, cfg):
     if 23 in cfg['zones']:      # after the Tanglecrown and the Lapis Erg (their Veyrroot gates became the seams; their designs dropped the spawns near them): it rewrites the arrivals of Sunward's and Heartwood's crossings and stands both seam portals where the roads cross
         import veyrroot_design
         print('veyrroot', veyrroot_design.design(world, write=True)[1])
+        import heartwood_design      # right after: Heartwood is the Veyrroot's city inside the tree; it rewrites the arrivals of the arch's and the Seed Vault's crossings
+        print('heartwood', heartwood_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

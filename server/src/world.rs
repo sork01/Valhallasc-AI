@@ -101,6 +101,8 @@ mod gm_visibility;
 #[cfg(test)]
 mod halloween_tests;
 #[cfg(test)]
+mod heartwood_tests;
+#[cfg(test)]
 mod hierloom_tests;
 mod hold;
 mod hour_shards;

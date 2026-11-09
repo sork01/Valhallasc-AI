@@ -1306,7 +1306,7 @@
   const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
   const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
   const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
-  const areaName = () => zone > 0 && !zdef.regions ? zdef.name : hubAt(hero.x, hero.y)?.name ?? regionAt(hero.x, hero.y) ?? zdef.name;
+  const areaName = () => zone > 0 && !zdef.regions ? zdef.name : zdef.regionsFirst ? regionAt(hero.x, hero.y) ?? hubAt(hero.x, hero.y)?.name ?? zdef.name : hubAt(hero.x, hero.y)?.name ?? regionAt(hero.x, hero.y) ?? zdef.name;   // `regionsFirst`: a city whose districts are its regions (Heartwood)
   function emitHud(force) {
     // Server fight state selects the raid finale; proximity and a selected target do not.
     const raidFinalFight = !!zdef.raid && (window.BossMech?.fights || []).some(f =>
@@ -4422,7 +4422,7 @@
     g.globalAlpha = 1;
   }
   function drawSky(g, t) {
-    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' || zdef.theme === 'city' ? '#0c0605' : zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : SEA_COLOR; g.fillRect(0, 0, VW, VH); return; }   // beyond the drawn shallows (and the grid) lies open sea
+    if (zdef.shapeFloor) { g.fillStyle = zdef.theme === 'ember' || zdef.theme === 'city' ? '#0c0605' : zdef.theme === 'heartwood' ? '#140d07' : zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : SEA_COLOR; g.fillRect(0, 0, VW, VH); return; }   // beyond the drawn shallows (and the grid) lies open sea
     if (zdef.theme === 'arena') { g.fillStyle = '#191723'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'emberwake') { EmberwakeArt.background(g,VW,VH,t); return; }
     if (zdef.theme === 'chained_forge') { const [cx,cy]=camS(); ChainedForgeArt.background(g,VW,VH,t,zdef,cx,cy,TW,TH); return; }

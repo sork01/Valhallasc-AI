@@ -104,7 +104,7 @@ NPCS = [
 
 # places a quest walks to (r 6) and the hold circles (r 2.1, two waves of sleepers each); the old Canopy places keep their ids
 PLACES = [
-    dict(id='heart_hollow', name='Hollow Arch', x=210, y=219, r=4),
+    dict(id='heart_hollow', name='Hollow Arch', x=210, y=217.6, r=4),
     dict(id='heart_observatory', name='Sunleaf Observatory', x=252, y=141, r=4),
     dict(id='heart_lantern_walk', name='Lantern Walk', x=222, y=112, r=4),
     dict(id='heart_garden_walk', name='Hanging Gardens', x=118, y=150, r=4),

@@ -88,17 +88,6 @@
     }
   },
   {
-    "id": "mailbox_24_veyrroot_heartwood",
-    "zone": 24,
-    "hub": "Veyrroot Heartwood",
-    "x": 51.5,
-    "y": 49.5,
-    "anchor": {
-      "x": 48.5,
-      "y": 49.5
-    }
-  },
-  {
     "id": "mailbox_26_frostwake_station",
     "zone": 26,
     "hub": "Frostwake Station",
@@ -899,6 +888,17 @@
     "anchor": {
       "x": 246,
       "y": 150
+    }
+  },
+  {
+    "id": "mailbox_24_veyrroot_heartwood",
+    "zone": 24,
+    "hub": "Veyrroot Heartwood",
+    "x": 118.5,
+    "y": 174.5,
+    "anchor": {
+      "x": 117,
+      "y": 171
     }
   }
 ]
