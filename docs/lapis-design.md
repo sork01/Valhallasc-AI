@@ -4,6 +4,8 @@ Owner request: "for pilot. reshape lapis erg. and remake the zone and quests to 
 
 Standing owner rule for this zone's building art: **isometric only**, never a flat drawing. The wall is the game's own `rampart` and `tower` prisms (`client/cityart.js`), the hubs use `lapis_caravan_tent`, `lapis_well`, `noticeboard`, `campfire`, `bench`.
 
+Swapped onto the pilot server (unit `valhalla-shapes`) on 2026-11-09 08:06 after commit `2cb9bcb`: nobody online, DB backup `zone-shapes-data/backup-before-lapis-20261109.sqlite`, old binary `zone-shapes-target/release/valhalla-server.before-lapis`, no character was saved in zone 25 (`zone_shapes_migrate.py --zones 25` would move 0), the running executable `cmp`s with the release build, served client hashes verified against https://gunning.se/Valhalla/.
+
 ## The shape
 
 At k = 1.0 the atlas outline is grid 296 with 41,194 land tiles (the old square was 160, 25,600): a wedge. Borders: the Yearwheel on the curved north-west side (131 tiles, **the wall**), the sea along the long north-east diagonal (295, coast), the Veyrroot Canopy's jungle along the south (286) and Sunward Vale along the west (178). None of the three neighbours is on the pilot, so **there is no seam**: `world/zone-shapes.txt` has `designOnly` + `rebuild` (the old square is not moved; `lapis_design.restore_and_shift` brings the old people, places and portals back from `preshape-25.txt`) and `seamWith {25: []}`. **The day Sunward Vale, the Veyrroot Canopy or the Yearwheel is shaped, its design must list 25 in its own `seamWith` and this design must learn the seam** (reserve the border first, see the other pilot docs).
