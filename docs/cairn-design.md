@@ -34,7 +34,7 @@ A native PixelFlow source with its own frame (156 x 120, anchor (60, 112), art s
 
 ## Checks
 
-`cargo test cairn_tests` (12) + `zone_shape` + `prism_tests`; `python3 scripts/cairn_design.py plan OUT.png` (`CAIRN_WORLD=<cached shaped world>`); bounded `REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/cairn-design-ui.cjs` (`MUTATE=1` serves the pilot's previous `field.js`: the ground-class check must fail; `MUTATE=seam` the one from before the seam-blend fix: the same-point check must fail).
+`cargo test cairn_tests` (11) + `zone_shape` + `prism_tests`; `python3 scripts/cairn_design.py plan OUT.png` (`CAIRN_WORLD=<cached shaped world>`); bounded `REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/cairn-design-ui.cjs` (`MUTATE=1` serves the pilot's previous `field.js`: the ground-class check must fail; `MUTATE=seam` the one from before the seam-blend fix: the same-point check must fail).
 
 ## Not done / open
 
