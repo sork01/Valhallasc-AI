@@ -1561,6 +1561,9 @@ def apply(world, cfg):
     if 27 in cfg['zones']:      # after the Prismwaste (its east gate became the seam; its design dropped the spawns near it): it rewrites the arrivals of Frostwake's gate and the Thunderheart Gate's two ways home
         import cairn_design
         print('cairnspine', cairn_design.design(world, write=True)[1])
+    if 26 in cfg['zones']:      # after Cairnspine (its east rim gate became the seam and its design stood both seam portals where its road ends): it rewrites the arrivals of Stormglass's and Sunward's crossings and closes the Yearwheel (a wall, no portal on either side)
+        import frostwake_design
+        print('frostwake', frostwake_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)

@@ -26,7 +26,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import cairn_content as content  # noqa: E402
-from greenmeadow_design import Designer, Grid, fbm, ground_spans, seg_field  # noqa: E402
+from greenmeadow_design import Designer, Grid, drop_near_seam, fbm, ground_spans, seg_field, step_back_artless  # noqa: E402
 MAP = ROOT / 'world/map.txt'
 OLD = ROOT / 'world/zone-shapes/preshape-27.txt'
 
@@ -141,7 +141,7 @@ def roads(G):
 
 class Cairn(Designer):
     TAG, SEED = 'cairn_design_v1', 20261111
-    LATE_SEAMS = set()
+    LATE_SEAMS = {26}       # the Frostwake Shelf's seam (2026-11-09) replaced the east rim gate after this design was approved: the masks stay as they were
 
     def __init__(self, world, old):
         self.old = old
@@ -371,6 +371,27 @@ def aim_seam(world, zone, G):
     return (mine['x'], mine['y'])
 
 
+def aim_frostwake_seam(world, zone, G):
+    """The Frostwake seam (2026-11-09) replaced the east rim gate: both seam portals stand where the east road already ends, on the border at the gate's row. Returns the point (our frame) or None."""
+    mine = next((p for p in zone['portals'] if p.get('seam') and p['to'] == FROSTWAKE), None)
+    if not mine:
+        return None
+    theirs = next(p for p in world['zones'][FROSTWAKE - 1]['portals'] if p.get('seam') and p['to'] == ZONE)
+    y = G['cairn_frostwake_gate'][1]
+    pts = mine['seam']['points']
+    best = None
+    for a, b in zip(pts, pts[1:]):
+        if (a[1] - y) * (b[1] - y) <= 0 and a[1] != b[1]:
+            t = (y - a[1]) / (b[1] - a[1])
+            best = (a[0] + (b[0] - a[0]) * t, y)
+            break
+    assert best, 'the Frostwake border does not cross the east road row'
+    sh = mine['seam']['shift']
+    mine['x'], mine['y'], mine['tx'], mine['ty'] = round(best[0], 2), round(best[1], 2), round(best[0] + sh[0], 2), round(best[1] + sh[1], 2)
+    theirs['x'], theirs['y'], theirs['tx'], theirs['ty'] = mine['tx'], mine['ty'], mine['x'], mine['y']
+    return (mine['x'], mine['y'])
+
+
 def link_travel(world):
     """Add (never strip) the Spark links across every portal into or out of Cairnspine, both ways, as compact_atlas.sync_travel_links does."""
     zones = [world] + world['zones']
@@ -397,6 +418,7 @@ def design(world, write=False):
     G = gates(F)
     restore_and_shift(zone, old, G)
     aim_seam(world, zone, G)
+    aim_frostwake_seam(world, zone, G)
     zone['shape']['placeAtSpawn'] = True            # saved characters are moved to the spawn (zone_shapes_migrate.py): the zone was rebuilt
     d = Cairn(zone, old)
     objects = d.build()
@@ -404,16 +426,23 @@ def design(world, write=False):
     seen = d.reachable(solid, (int(SPAWN[0]), int(SPAWN[1])))
     d.reach = seen
     zone['slimes'] = d.spawns()
+    d.late_dropped = d.late_moved = 0
+    if any(p.get('seam') and p['to'] == FROSTWAKE for p in zone['portals']):      # the Frostwake seam (2026-11-09) replaced the east gate: only the spawns within 7 tiles of it and the loose scenery within 2.5 go, and the art-less objects within 20 step back
+        d.late_dropped = drop_near_seam(zone, d, FROSTWAKE)
+        loose = [o for o in objects if o.get('layout') == d.TAG and o['kind'] != 'void' and d.seam_late[min(max(int(o['y']), 0), d.n - 1), min(max(int(o['x']), 0), d.n - 1)] < 2.5]
+        objects = [o for o in objects if o not in loose]
+        d.late_dropped += len(loose)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []
     zone['levels'] = [90, 95]
     seamed = {p['id'] for p in zone['portals'] if p.get('seam')}
-    zone['exitRoutes'] = [dict(portal='cairn_frostwake_gate', points=[[round(G['cairn_frostwake_gate'][0], 2), round(G['cairn_frostwake_gate'][1], 2)],
-                                                                       [round(G['cairn_frostwake_gate'][3][0], 2), round(G['cairn_frostwake_gate'][3][1], 2)]])]
+    zone['exitRoutes'] = [dict(portal=g, points=[[round(G[g][0], 2), round(G[g][1], 2)], [round(G[g][3][0], 2), round(G[g][3][1], 2)]]) for g in ('cairn_frostwake_gate',) if g not in seamed]
     zone['groundSpans'] = ground_spans(d.ground, d.floor)
     zone['regions'] = dict(names=[r['name'] for r in REGIONS.values()], spans=ground_spans(d.region + 1, d.floor))
     content.install(world, zone, HAM, old)
+    if any(p.get('seam') and p['to'] == FROSTWAKE for p in zone['portals']):      # after the people stand in their final places (see greenmeadow_design.step_back_artless)
+        d.late_moved = step_back_artless(zone, zone['objects'], d, FROSTWAKE)
     # every crossing that arrives here follows the new frame: Frostwake's gate and the Thunderheart Gate's two ways home (the Prismwaste seam carries its own shift)
     arrivals = {'frostwake_cairn_gate': G['cairn_frostwake_gate'][3], 'thunderheart_gate_return': content.THUNDER_ARRIVAL, 'thunderheart_gate_exit': content.THUNDER_ARRIVAL}
     found = set()
@@ -477,9 +506,12 @@ def check(world, zone, d, solid, seen, G, found):
         if not seen[int(arr[1]), int(arr[0])]:
             problems.append(f'gate cut off {g}')
     fw = G['cairn_frostwake_gate']
-    if not seen[int(fw[1] - fw[2][1] * 3), int(fw[0] - fw[2][0] * 3)]:
+    walled = any(p.get('seam') and p['to'] == FROSTWAKE for p in zone['portals'])      # the Frostwake gate became a seam: no gate to check or re-aim
+    if not walled and not seen[int(fw[1] - fw[2][1] * 3), int(fw[0] - fw[2][0] * 3)]:
         problems.append('Frostwake gate is blocked from the inside')
     for need in ('frostwake_cairn_gate', 'thunderheart_gate_return', 'thunderheart_gate_exit'):
+        if need == 'frostwake_cairn_gate' and walled:
+            continue
         if need not in found:
             problems.append(f'no incoming portal {need} found to re-aim')
     # an elite stands clear of everything a player walks to: awareness plus 3 tiles from every road, place and person, and from every hub and gate

@@ -39,5 +39,5 @@ A native PixelFlow source with its own frame (156 x 120, anchor (60, 112), art s
 ## Not done / open
 
 - The bear's stats and look are first passes (judge on an in-game screenshot); walking time between hubs, spawn density and the toe / Hollow Peaks pockets were not judged in play.
-- The day the Frostwake Shelf is shaped its design must list 27 in `seamWith` (the Frostwake gate becomes a seam).
+- The Frostwake Shelf was shaped later the same day (2026-11-09): its design lists 27 in `seamWith` and the rim gate became the second seam (`cairn_design.aim_frostwake_seam`, `LATE_SEAMS = {26}`).
 - Older suites that teleport into the old Cairnspine coordinates (`tests/cairn-ui.cjs`, MCP `cairn`) are stale.

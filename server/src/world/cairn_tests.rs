@@ -122,7 +122,7 @@ fn cairnspine_is_a_mountain_shield_with_four_families_four_elites_four_hubs_and_
 }
 
 #[test]
-fn the_border_to_the_prismwaste_is_a_seam_with_a_road_across_and_frostwake_stays_a_gate() {
+fn the_borders_to_the_prismwaste_and_the_frostwake_shelf_are_seams_with_roads_across() {
     let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let mut pairs = std::collections::BTreeSet::new();
     for zi in 1..=data["zones"].as_array().unwrap().len() {
@@ -133,8 +133,8 @@ fn the_border_to_the_prismwaste_is_a_seam_with_a_road_across_and_frostwake_stays
             }
         }
     }
-    let want: std::collections::BTreeSet<_> = [(14, 27), (27, 14)].into();
-    assert_eq!(pairs, want, "one seam, seen from both sides");
+    let want: std::collections::BTreeSet<_> = [(14, 27), (27, 14), (26, 27), (27, 26)].into();
+    assert_eq!(pairs, want, "two seams, each seen from both sides");
     let w = world();
     let zone = &data["zones"][CAIRN - 1];
     let mine = w.maps[CAIRN]
@@ -164,41 +164,52 @@ fn the_border_to_the_prismwaste_is_a_seam_with_a_road_across_and_frostwake_stays
         })
     });
     assert!(near, "a road of this zone meets the seam");
-    let gate = w.maps[CAIRN]
+    // the old rim gate to the Frostwake Shelf became the second seam (2026-11-09): the same id, no walk-in direction, a road across at the row where the east road ends
+    let east = w.maps[CAIRN]
         .portals
         .iter()
         .find(|p| p.id == "cairn_frostwake_gate")
         .unwrap();
-    assert!(gate.walk.is_some() && gate.to == FROSTWAKE);
+    assert!(east.walk.is_none() && east.to == FROSTWAKE);
+    assert!((east.y - 118.5).abs() < 1.5, "{}", east.y);
+    assert!(
+        zone["paths"].as_array().unwrap().iter().any(|road| {
+            road.as_array().unwrap().iter().any(|q| {
+                let (qx, qy) = (q[0].as_f64().unwrap(), q[1].as_f64().unwrap());
+                ((qx - east.x).powi(2) + (qy - east.y).powi(2)).sqrt() < 2.
+            })
+        }),
+        "a road meets the Frostwake seam"
+    );
     assert!(
         w.maps[CAIRN]
             .portals
             .iter()
             .all(|p| p.to == PRISM || p.to == FROSTWAKE || p.to == THUNDER),
-        "the Prismwaste seam, the Frostwake gate and the Thunderheart door are the only crossings"
+        "the two seams and the Thunderheart door are the only crossings"
     );
 }
 
 #[test]
-fn the_frostwake_gate_and_the_thunderheart_door_work_and_the_arrivals_are_clear() {
+fn the_frostwake_seam_and_the_thunderheart_door_work_and_the_arrivals_are_clear() {
     let mut w = world();
     let mut rx = join(&mut w, 1, Class::Warrior);
-    let gate = w.maps[CAIRN]
+    let seam = w.maps[CAIRN]
         .portals
         .iter()
         .find(|p| p.id == "cairn_frostwake_gate")
         .unwrap()
         .clone();
-    let side = gate.walk.expect("a walk-in gate");
-    place(&mut w, 1, CAIRN, at(gate.x, gate.y));
+    // the Frostwake Shelf lies to the east of the seam
+    place(&mut w, 1, CAIRN, at(seam.x - 3., seam.y));
     w.message(
         1,
         ClientMessage::Move {
-            x: gate.x + f64::from(side[0]) * 3.,
-            y: gate.y + f64::from(side[1]) * 3.,
+            x: seam.x + 4.,
+            y: seam.y,
         },
     );
-    run(&mut w, &mut rx, 40);
+    run(&mut w, &mut rx, 80);
     assert_eq!(
         w.players[&1].character.zone, FROSTWAKE,
         "Frostwake is reached"
@@ -210,24 +221,7 @@ fn the_frostwake_gate_and_the_thunderheart_door_work_and_the_arrivals_are_clear(
         .unwrap()
         .clone();
     assert_eq!(back.to, CAIRN);
-    let arrival = at(back.tx, back.ty);
-    assert!(
-        arrival.distance(at(gate.x, gate.y)) > gate.r + 0.5
-            && arrival.distance(at(gate.x, gate.y)) < 8.
-    );
-    let mut a = arrival;
-    w.maps[CAIRN].collide(&mut a, PLAYER_RADIUS);
-    assert!(
-        a.distance(arrival) < 1e-6,
-        "the Frostwake arrival is on free ground"
-    );
-    assert!(
-        w.spawns
-            .iter()
-            .filter(|s| s.zone == CAIRN)
-            .all(|s| at(s.x, s.y).distance(arrival) > 8.),
-        "an enemy stands near the Frostwake arrival"
-    );
+    assert!((back.tx - seam.x).abs() < 1e-6 && (back.ty - seam.y).abs() < 1e-6);
     // the Thunderheart Gate: the door stands on free ground and both of the dungeon's ways home arrive beside it
     let door = w.maps[CAIRN]
         .portals
