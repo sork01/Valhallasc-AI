@@ -162,10 +162,18 @@
     g.save();for(let j=0;j<4;j++){const k=(t*.16+j*.25)%1;g.globalAlpha=(1-k)*.12;oval(g,sx+Math.sin(j+t*.2)*12,sy-30-k*80,13+k*14,8+k*12,'#d7b7a4',null);}g.restore();
   }};
   City.art.ew_door={box:[640,600,320,438],draw(g,o){
-    // A basalt curtain wall with a tower at each end; the doorway, chains and the glowing seals are on the +y face.
-    const K=City.kit,{iso,poly,prism,wallPlane}=K,w=o.width||10,d=o.depth||3;
+    // A basalt curtain wall between two flush towers. The pieces do not overlap, so they are drawn left to right and nothing stands in front of the doorway.
+    const K=City.kit,{iso,poly,prism,wallPlane}=K,w=o.width||10,d=o.depth||3,tw=1.6;
     oval(g,0,10,250,64,'rgba(0,0,0,.3)',null);
-    prism(g,w,d,170,C.light,C.rock,'#393843');
+    const tower=s=>{
+      g.save();g.translate(...iso(s*(w-tw)/2,0));prism(g,tw,d,290,C.light,C.rock,'#393843');g.restore();
+      g.save();wallPlane(g,...iso(s*(w-tw)/2,d/2+.02,0),'y');
+      line(g,[[-14,-12],[-8,-140],[-16,-250]],C.hot,5);line(g,[[14,-20],[8,-130],[16,-240]],C.hot,4);
+      g.restore();
+      const t=iso(s*(w-tw)/2,0,290);poly(g,[[t[0]-18,t[1]+6],[t[0],t[1]-44],[t[0]+18,t[1]+6]],C.rock,C.ink,3);
+    };
+    tower(-1);
+    prism(g,w-2*tw,d,170,C.light,C.rock,'#393843');
     g.save();wallPlane(g,...iso(0,d/2+.02,0),'y');
     const arch=(k,c)=>{g.beginPath();g.moveTo(-100*k,0);g.lineTo(-100*k,-120*k);g.quadraticCurveTo(-100*k,-160*k,0,-164*k);g.quadraticCurveTo(100*k,-160*k,100*k,-120*k);g.lineTo(100*k,0);g.closePath();g.fillStyle=c;g.fill();};
     arch(.86,'#292731');g.strokeStyle=C.ink;g.lineWidth=6;g.lineJoin='round';g.stroke();
@@ -173,13 +181,7 @@
     for(let n=0;n<8;n++){const x=-70+n*20;chain(g,x,-125+Math.abs(n-3.5)*5,5);}
     oval(g,0,-70,24,30,C.iron);oval(g,0,-71,9,12,C.hot);
     g.restore();
-    for(const s of [-1,1]){
-      g.save();g.translate(...iso(s*(w/2-.8),0));prism(g,1.6,d+.3,290,C.light,C.rock,'#393843');g.restore();
-      g.save();wallPlane(g,...iso(s*(w/2-.8),(d+.3)/2+.02,0),'y');
-      line(g,[[-14,-12],[-8,-140],[-16,-250]],C.hot,5);line(g,[[14,-20],[8,-130],[16,-240]],C.hot,4);
-      g.restore();
-      const t=iso(s*(w/2-.8),0,290);poly(g,[[t[0]-18,t[1]+6],[t[0],t[1]-44],[t[0]+18,t[1]+6]],C.rock,C.ink,3);
-    }
+    tower(1);
   }};
   City.art.ew_well={box:[260,230,130,155],draw(g){
     oval(g,0,0,67,31,C.rock);oval(g,0,-29,64,28,C.light);oval(g,0,-31,41,17,C.ink);

@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.39.34",
+    "date": "2026-11-09",
+    "new": [],
+    "changed": [
+      "The Emberwake gate and the Bifrost Hall Gate are rebuilt so nothing stands in front of the doorway: the gate towers and the stone pilasters now sit beside the opening instead of overlapping it."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.39.33",
     "date": "2026-11-09",
     "new": [],

@@ -188,21 +188,28 @@
   City.art.hallgate = {
     box: [360, 470, 180, 390],
     draw(g, o) {
-      // A stone gate on a 5 x 1.4 footprint: a slab with the arched doorway on its +y face, a pilaster at each end, a lintel and a winged pediment.
-      const K = City.kit, { iso, poly, prism, wallPlane } = K, w = o.width || 5, d = o.depth || 1.4;
+      // A stone gate on a 5 x 1.4 footprint. Two pilasters and the walled doorway between them are separate pieces drawn left to right, so nothing stands in front of the arch; a lintel and a small gabled crest sit on top.
+      const K = City.kit, { iso, poly, prism, wallPlane } = K, w = o.width || 5, d = o.depth || 1.4, pw = .9;
       shadow(g, 150, 26);
-      prism(g, w, d, 250, STONE[0], STONE[1], STONE[2]);
+      const stone = (pw_, d_, h, z) => prism(g, pw_, d_, h, STONE[0], STONE[1], STONE[2], z);
+      g.save(); g.translate(...iso(-(w - pw) / 2, 0)); stone(pw, d, 250); g.restore();
+      stone(w - 2 * pw, d, 250);
       g.save(); wallPlane(g, ...iso(0, d / 2 + .02, 0), 'y');
       g.fillStyle = '#2a2c4c'; g.strokeStyle = OL; g.lineWidth = 4; g.lineJoin = 'round';
       g.beginPath(); g.moveTo(-68, 0); g.lineTo(-68, -150); g.quadraticCurveTo(-68, -208, 0, -212); g.quadraticCurveTo(68, -208, 68, -150); g.lineTo(68, 0); g.closePath(); g.fill(); g.stroke();
       K.line(g, [[0, 0], [0, -208]], '#d8c070', 3);
       g.restore();
-      for (const s of [-1, 1]) { g.save(); g.translate(...iso(s * (w / 2 - .45), 0)); prism(g, .9, d + .4, 250, STONE[0], STONE[1], STONE[2]); g.restore(); }
+      g.save(); g.translate(...iso((w - pw) / 2, 0)); stone(pw, d, 250); g.restore();
       prism(g, w + .5, d + .5, 34, STONE[0], STONE[1], STONE[2], 250);
-      prism(g, w - 1, d, 30, STONE[0], STONE[1], STONE[2], 284);
       g.save(); wallPlane(g, ...iso(0, (d + .5) / 2 + .02, 250), 'y');
-      for (const sgn of [-1, 1]) { const pts = [[sgn * 10, -22]]; for (let i = 1; i <= 5; i++) pts.push([sgn * (10 + i * 16), -22 - i * 4 + (i % 2) * 6]); pts.push([sgn * 20, -8]); poly(g, pts, '#e8d890', OL, 2.4); }
+      poly(g, [[-w * 22 + 14, -8], [w * 22 - 14, -8], [w * 22 - 14, -24], [-w * 22 + 14, -24]], '#e8d890', OL, 2.4);
+      for (let i = -4; i <= 4; i++) poly(g, [[i * 24 - 6, -16], [i * 24, -22], [i * 24 + 6, -16], [i * 24, -10]], '#b89a4a', null);
       g.restore();
+      const zt = 284, rw = w + .3, rd = d + .9, rise = 46;
+      const a = iso(-rw / 2, -rd / 2, zt), b = iso(rw / 2, -rd / 2, zt), c = iso(rw / 2, rd / 2, zt), e = iso(-rw / 2, rd / 2, zt), r0 = iso(-rw / 2, 0, zt + rise), r1 = iso(rw / 2, 0, zt + rise);
+      poly(g, [a, b, r1, r0], STONE[1], OL, 3);
+      poly(g, [b, c, r1], STONE[2], OL, 3);
+      poly(g, [r0, r1, c, e], STONE[0], OL, 3);
     },
     animate(g, o, sx, sy, t) {
       const on = lit(o.place), a = .25 + .2 * Math.sin(t * 1.5);
