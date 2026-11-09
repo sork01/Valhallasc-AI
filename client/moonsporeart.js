@@ -45,13 +45,31 @@
     stroke(g,[[0,-48],[0,-84]],'#7b8c7e',4);
     oval(g,0,-94,14,14,'#c9f5ba');oval(g,0,-94,8,8,'#ecffe0');
   }};
-  City.art.lamphouse={box:[310,360,155,315],draw(g){
-    oval(g,0,5,73,17,'rgba(4,21,20,.4)');
-    poly(g,[[-65,0],[-65,-73],[65,-73],[65,0]],'#566660',INK);
-    poly(g,[[-76,-70],[-34,-118],[32,-118],[78,-70]],'#547469',INK);
-    poly(g,[[-76,-70],[0,-110],[78,-70]],'#9ac3a7',null);
-    poly(g,[[-13,0],[-13,-54],[13,-54],[13,0]],'#243b40','#aac7b1');
-    oval(g,-43,-42,12,15,'#d8f5b8');oval(g,43,-42,12,15,'#d8f5b8');
+  // A hut on its w x d footprint in the game's 2:1 projection: walls, a gabled roof (ridge along x), a door and windows on the +y wall and a window on the +x wall.
+  const hut=(g,o,P)=>{
+    const K=City.kit,{iso,poly,prism,wallPlane}=K,w=o.width||4.5,d=o.depth||3.5,z0=8,zt=z0+P.h;
+    const fill=(x,y,rx,ry,c)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,6.2832);g.fillStyle=c;g.fill();};
+    fill(0,6,(w+d)*25,(w+d)*10,'rgba(5,16,30,.38)');
+    prism(g,w+.3,d+.3,z0,...P.base);
+    prism(g,w,d,P.h,...P.wall,z0);
+    const onWall=(side,fn)=>{g.save();wallPlane(g,...(side==='y'?iso(0,d/2+.02,z0):iso(w/2+.02,0,z0)),side);fn();g.restore();};
+    onWall('y',()=>{
+      poly(g,[[-24,0],[-24,-P.h*.74],[24,-P.h*.74],[24,0]],P.door,P.trim,3);
+      for(const x of [-w*13,w*13]){fill(x,-P.h*.58,12,15,P.glow);}
+    });
+    onWall('x',()=>fill(0,-P.h*.58,12,15,P.glow));
+    const rw=w+.7,rd=d+.7,rise=P.rise;
+    const a=iso(-rw/2,-rd/2,zt),b=iso(rw/2,-rd/2,zt),c=iso(rw/2,rd/2,zt),e=iso(-rw/2,rd/2,zt),r0=iso(-rw/2,0,zt+rise),r1=iso(rw/2,0,zt+rise);
+    poly(g,[a,b,r1,r0],P.roof,P.line,3);
+    poly(g,[b,c,r1],P.gable,P.line,3);
+    poly(g,[r0,r1,c,e],P.roof,P.line,3);
+    for(let row=1;row<6;row++){const t=row/6;K.line(g,[iso(-rw/2,rd/2*t,zt+rise*(1-t)),iso(rw/2,rd/2*t,zt+rise*(1-t))],P.course,1.6);}
+    K.line(g,[r0,r1],P.ridge||P.line,5);
+    return {top:iso(0,0,zt+rise)};
+  };
+  City.art.lamphouse={box:[400,360,200,250],draw(g,o){
+    const t=hut(g,{width:o.width||4,depth:o.depth||3},{h:66,rise:46,base:['#7a8b84','#566660','#3f4d49'],wall:['#6f817a','#566660','#43524d'],door:'#243b40',trim:'#aac7b1',glow:'#d8f5b8',roof:'#547469',gable:'#9ac3a7',line:INK,course:'rgba(154,195,167,.3)'}).top;
+    stroke(g,[t,[t[0],t[1]-34]],'#aac7b1',5);oval(g,t[0],t[1]-44,9,12,'#d8f5b8');oval(g,t[0],t[1]-44,4,6,'#ffffff');
   }};
   City.art.moonwell={box:[150,170,75,145],draw(g){
     oval(g,0,3,33,10,'rgba(4,21,20,.3)');

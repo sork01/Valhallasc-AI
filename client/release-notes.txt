@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.39.33",
+    "date": "2026-11-09",
+    "new": [],
+    "changed": [
+      "Buildings and gates that were drawn flat and front-on are redrawn in the same angled view as every house, so they sit squarely on the ground: the Tanglecrown stilt lodges, boardwalk stalls, rain-crown temple and root bridge, the Stormglass Flats breakwater huts and the Eye Arch, the Moonspore lamphouse, the Bifrost Hall Gate, and the Emberwake gate."
+    ],
+    "removed": [
+      "Replaced the flat front-facing artwork of those buildings, which did not match the rest of the game."
+    ]
+  },
+  {
     "version": "Beta 1.39.32",
     "date": "2026-11-09",
     "new": [],

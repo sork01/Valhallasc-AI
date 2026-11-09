@@ -52,7 +52,7 @@
   }};
   // The pavilion and the stall stand on their w x d footprint in the same 2:1 projection as every house (City.kit.iso), so each sits on the tiles it blocks.
   const lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
-  City.art.silk_pavilion={box:[520,430,260,300],draw(g,o){
+  City.art.silk_pavilion={box:[560,430,280,300],draw(g,o){
     const w=o.width||5,d=o.depth||4,v=o.v||0,z0=10,zt=z0+100;
     oval(g,0,8,(w+d)*30,(w+d)*13,'rgba(40,31,57,.23)');
     prism(g,w+.35,d+.35,z0,'#ece0c2','#d6c39e','#bba883');
@@ -125,7 +125,7 @@
       oval(g,Math.cos(a)*150,Math.sin(a)*66,21,10,shade(j));}
     oval(g,0,0,31,15,'#fff0b9');
   }};
-  City.art.grand_pavilion_gate={box:[700,680,350,520],draw(g,o){
+  City.art.grand_pavilion_gate={box:[720,690,360,520],draw(g,o){
     // A hall of silk on a 8 x 5 footprint; the mask door is on the +y wall like every house door. Wall art is drawn in the wall's own plane (City.kit.wallPlane).
     const w=8,d=5,z0=14,h=230,zt=z0+h,v=o.v||0;
     oval(g,0,10,300,100,'rgba(40,31,57,.25)');

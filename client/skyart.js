@@ -186,16 +186,23 @@
     },
   };
   City.art.hallgate = {
-    box: [480, 420, 240, 360],
+    box: [360, 470, 180, 390],
     draw(g, o) {
-      shadow(g, 110, 18);
-      g.lineJoin = 'round';
-      const pillar = (x) => { g.fillStyle = stoneGrad(g, x - 20, x + 20); g.strokeStyle = OL; g.lineWidth = 4; g.beginPath(); g.rect(x - 20, -270, 40, 270); g.fill(); g.stroke(); g.strokeStyle = 'rgba(70,80,130,.4)'; g.lineWidth = 2; for (let i = -1; i <= 1; i++) { g.beginPath(); g.moveTo(x + i * 10, -4); g.lineTo(x + i * 10, -260); g.stroke(); } };
-      pillar(-100); pillar(100);
-      g.fillStyle = stoneGrad(g, -130, 130); g.strokeStyle = OL; g.lineWidth = 4; g.beginPath(); g.moveTo(-126, -270); g.lineTo(-96, -330); g.lineTo(96, -330); g.lineTo(126, -270); g.closePath(); g.fill(); g.stroke();
-      g.fillStyle = '#2a2c4c'; g.beginPath(); g.moveTo(-80, 0); g.lineTo(-80, -190); g.quadraticCurveTo(0, -270, 80, -190); g.lineTo(80, 0); g.closePath(); g.fill(); g.stroke();
-      g.strokeStyle = '#d8c070'; g.lineWidth = 3; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -230); g.stroke();
-      for (const sgn of [-1, 1]) { g.fillStyle = '#e8d890'; g.strokeStyle = OL; g.lineWidth = 2.4; g.beginPath(); g.moveTo(sgn * 12, -300); for (let i = 1; i <= 5; i++) g.lineTo(sgn * (12 + i * 16), -300 - i * 5 + (i % 2) * 8); g.lineTo(sgn * 22, -284); g.closePath(); g.fill(); g.stroke(); }     // a valkyrie's wings over the door
+      // A stone gate on a 5 x 1.4 footprint: a slab with the arched doorway on its +y face, a pilaster at each end, a lintel and a winged pediment.
+      const K = City.kit, { iso, poly, prism, wallPlane } = K, w = o.width || 5, d = o.depth || 1.4;
+      shadow(g, 150, 26);
+      prism(g, w, d, 250, STONE[0], STONE[1], STONE[2]);
+      g.save(); wallPlane(g, ...iso(0, d / 2 + .02, 0), 'y');
+      g.fillStyle = '#2a2c4c'; g.strokeStyle = OL; g.lineWidth = 4; g.lineJoin = 'round';
+      g.beginPath(); g.moveTo(-68, 0); g.lineTo(-68, -150); g.quadraticCurveTo(-68, -208, 0, -212); g.quadraticCurveTo(68, -208, 68, -150); g.lineTo(68, 0); g.closePath(); g.fill(); g.stroke();
+      K.line(g, [[0, 0], [0, -208]], '#d8c070', 3);
+      g.restore();
+      for (const s of [-1, 1]) { g.save(); g.translate(...iso(s * (w / 2 - .45), 0)); prism(g, .9, d + .4, 250, STONE[0], STONE[1], STONE[2]); g.restore(); }
+      prism(g, w + .5, d + .5, 34, STONE[0], STONE[1], STONE[2], 250);
+      prism(g, w - 1, d, 30, STONE[0], STONE[1], STONE[2], 284);
+      g.save(); wallPlane(g, ...iso(0, (d + .5) / 2 + .02, 250), 'y');
+      for (const sgn of [-1, 1]) { const pts = [[sgn * 10, -22]]; for (let i = 1; i <= 5; i++) pts.push([sgn * (10 + i * 16), -22 - i * 4 + (i % 2) * 6]); pts.push([sgn * 20, -8]); poly(g, pts, '#e8d890', OL, 2.4); }
+      g.restore();
     },
     animate(g, o, sx, sy, t) {
       const on = lit(o.place), a = .25 + .2 * Math.sin(t * 1.5);
