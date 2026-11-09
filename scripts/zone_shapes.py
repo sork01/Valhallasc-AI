@@ -325,6 +325,8 @@ def city_fits(poly, s, cw, ch):
 
 
 def zone_scale(cfg, atlas, z, old):
+    if str(z) in cfg.get('zoneScale', {}):       # a zone at its own scale (the Yearwheel, owner 2026-11-09: 2.8): it has no seam, so its tiles need not match a neighbour's (a vault is one doorway: a whole-tile shift)
+        return float(cfg['zoneScale'][str(z)])
     s = cfg['k']
     if z in design_only_zones():        # a design-only zone is authored on its outline at the one scale (a seam needs equal scales): no area floor, no city fit
         return s
@@ -1567,6 +1569,9 @@ def apply(world, cfg):
     if 20 in cfg['zones']:      # after every neighbour (their gates to Sunward Vale became the seams and their approved designs ran with 20 as a late seam; Bankhold moved inland): it stands both portals of each seam where the neighbour's road ends, builds the Yearwheel wall with its vault and re-aims the Elder Hollow's and the Yearwheel's crossings
         import sunward_design
         print('sunward', sunward_design.design(world, write=True)[1])
+    if 28 in cfg['zones']:      # after Sunward Vale: it makes Sunward's path_20_28 a real vault (the only late edit of that approved design), walls the Lapis and Frostwake borders and re-aims the dungeons' ways home
+        import year_design
+        print('yearwheel', year_design.design(world, write=True)[1])
     if 2 in cfg['zones'] and 3 in cfg['zones']:
         trim_corner_seam(world)
         align_corner_wall(world, margins)
