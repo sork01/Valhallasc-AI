@@ -9753,5 +9753,7 @@
   "in the north-east": "i nordost",
   "in the south-west": "i sydväst",
   "in the south-east": "i sydost",
-  "near the middle": "nära mitten"
+  "near the middle": "nära mitten",
+  "Equipping lead shoes": "Tar på blyskor",
+  "Removing lead shoes": "Tar av blyskor"
 }

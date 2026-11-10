@@ -1980,6 +1980,9 @@ pub struct Map {
     pub crosses: Vec<RaidCross>,
     #[serde(default)]
     pub name: String,
+    /// The zone's look (`deep`, `nacre`, `ember`, ...): the client's theme name, read here only for `underwater`.
+    #[serde(default)]
+    pub theme: String,
     pub size: u32,
     pub spawn: Point,
     pub objects: Vec<Obstacle>,
@@ -2045,7 +2048,21 @@ impl Default for Map {
         serde_json::from_str(include_str!("../../world/map.txt")).expect("valid bundled world map")
     }
 }
+/// Themes that lie under water: Ran's Deep, Nacrehold, the three Drowned Cathedral wings, the Moonwell and the Drowned
+/// Longship. A hero in one of them wears lead shoes (`world/leadshoes.rs`).
+pub const UNDERWATER_THEMES: [&str; 7] = [
+    "deep",
+    "nacre",
+    "cathedral_left",
+    "cathedral_right",
+    "cathedral_main",
+    "moonwell",
+    "longship",
+];
 impl Map {
+    pub fn underwater(&self) -> bool {
+        UNDERWATER_THEMES.contains(&self.theme.as_str())
+    }
     /// True when a straight shot stays clear of the same solid objects that block movement.
     pub fn line_clear(&self, start: Point, end: Point, radius: f64) -> bool {
         if ![start.x, start.y, end.x, end.y, radius]
@@ -2436,6 +2453,7 @@ mod tests {
             grid: Default::default(),
             crosses: vec![],
             name: String::new(),
+            theme: String::new(),
             size: 72,
             rooms: vec![],
             spawn: Point::default(),

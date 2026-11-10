@@ -378,7 +378,7 @@
     g.save();g.scale(sc,sc);if(n.art!=='mailbox'&&!window.NpcArt?.frame(n,t,current?.id===n.id))g.translate(0,-bob);
     if(n.art==='stone'||n.art==='scenery'){}    // a speaking stone or tablet is drawn as an object
     else if(n.art==='mailbox'){window.Mail?.draw(g);}
-    else if(window.NpcArt?.draw(g,n,t,current?.id===n.id)){}
+    else if(window.NpcArt?.draw(g,n,t,current?.id===n.id,portrait)){}
     else if(n.art?.startsWith('sun_') && Field.sunwardSprites?.img[n.art]){
       const src=Field.sunwardSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
       g.imageSmoothingEnabled=false;

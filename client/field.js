@@ -3035,6 +3035,25 @@
     const label=window.Locale?.translate(`Ember ward: ${Math.ceil(who.emberWard)}`)||`Ember ward: ${Math.ceil(who.emberWard)}`;
     g.strokeText(label,0,y+24);g.fillText(label,0,y+24);
   }
+  // Lead shoes (server flag `leadShoes`, LEAD-SHOES): an overlay on the feet of a hero under water, drawn over the rig for every
+  // class and body. They are not an item, so they follow the walk cycle only roughly: each boot lifts a little on its own stride.
+  function drawLeadShoes(g, who, t) {
+    if (!who.leadShoes || who.dead || who.sparkTravel || who.mounted) return;
+    const stride = who.moving ? Math.sin((who.walk || 0) * 2) : 0;
+    g.save(); g.lineJoin = 'round'; g.lineWidth = 2;
+    for (const side of [-1, 1]) {
+      const lift = stride * side > 0 ? stride * side * 3 : 0, x = side * 8 + (who.moving ? stride * side * 3 : 0), y = 3 - lift;
+      const grad = g.createLinearGradient(0, y - 8, 0, y + 3);
+      grad.addColorStop(0, '#9aa6b8'); grad.addColorStop(.55, '#5d6778'); grad.addColorStop(1, '#3a4150');
+      g.fillStyle = grad; g.strokeStyle = '#1f2430';
+      g.beginPath(); g.moveTo(x - 7, y + 3); g.lineTo(x - 7, y - 6); g.quadraticCurveTo(x - 6, y - 9, x - 2, y - 9);
+      g.lineTo(x + 2, y - 9); g.quadraticCurveTo(x + 5, y - 8, x + 8, y - 4); g.quadraticCurveTo(x + 11, y, x + 8, y + 3); g.closePath();
+      g.fill(); g.stroke();
+      g.fillStyle = '#2b313e'; g.fillRect(x - 7, y, 15, 3); // the thick sole
+      g.fillStyle = '#c8d1de'; g.fillRect(x - 5, y - 7, 5, 2); // upper-left glint
+    }
+    g.restore();
+  }
   function drawPlayerStun(g, who, t) {
     if (who.dead || !(who.stun > 0 || who.daze > 0)) return;
     const calm = reducedMotion(), turn = calm ? 0 : t * 2.8;
@@ -4927,7 +4946,7 @@
         if (remote.sparkTravel) Spark.draw(g,remote,t);
         else if (remote.sprite) { const seated = seatedInArt(remote, remote.sprite); if(!seated)drawMount(g,remote); if(remote.mounted&&!seated)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted&&!seated)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-        drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t); drawPlayerStun(g, remote, t);
+        drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t); drawLeadShoes(g, remote, t); drawPlayerStun(g, remote, t);
         g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag || remote.gauntlet ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
         const nameText = remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : (window.Achievements?.displayName(remote) || remote.look.name) + (remote.pvpFlag ? ' · PvP' : '');
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
@@ -4938,7 +4957,7 @@
       } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); drawMageWardShell(g, hero, t, true); drawPriestBuffShell(g, hero, t, true); drawHunterBuffShell(g, hero, t, true); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); const seated = isModular() && seatedInArt(hero, mageSpr); if(!seated)drawMount(g,hero); if(hero.mounted&&!seated)g.translate(0,-23); if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
+      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawLeadShoes(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
     }
     // Keep the soak readout legible even when another actor stands in front of the warded fighter.
     for (const who of [hero, ...remotePlayers.values()]) {
