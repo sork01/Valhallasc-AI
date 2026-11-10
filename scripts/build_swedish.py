@@ -35,7 +35,8 @@ CLIENT_FILES = ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'q
                 'rolls', 'shop', 'gearservices', 'worldmap', 'field', 'zonejourney', 'seasonal', 'halloween', 'christmas', 'easter', 'solstice', 'valentines', 'newyear', 'festival', 'exitpaths', 'spark', 'keymap', 'raidkey', 'emptyseat', 'touch', 'dpsmeter', 'activity', 'achievements', 'rested')
 INTERNAL = ('INSERT ', 'ALTER ', 'PRAGMA ', 'SELECT ', 'CREATE ', 'UPDATE ', 'DELETE ', 'Bearer ', 'HTTP ', 'SIGTERM ', 'VALHALLA_')
 # A template may leave out a placeholder only where Swedish needs no plural ending the English one builds.
-MAY_DROP = {'A treasure chest has appeared! It will vanish in {0} minute{1}.': {'{1}'}}
+MAY_DROP = {'A treasure chest has appeared! It will vanish in {0} minute{1}.': {'{1}'},
+            "A treasure chest has appeared! It's {0}. It will vanish in {1} minute{2}.": {'{2}'}}
 CODE_WORDS = re.compile(r'\b(function|const|undefined|null|addEventListener|querySelector)\b|=>|\|\||&&|\?\.|\);')
 
 

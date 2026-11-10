@@ -40,7 +40,7 @@ const errors = [];
   await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'spawn_chest', distance: 1.2 } }));
   await page.waitForFunction(() => document.querySelectorAll('#announce .announce-line').length === 1, null, { timeout: 5000 });
   const first = (await lines())[0];
-  check(/A treasure chest has appeared! It will vanish in 3 minutes\./.test(first), `The chest spawn is announced (${first})`);
+  check(/A treasure chest has appeared! (It's (on the (west|east|north|south) side|in the (north|south)-(west|east)|near the middle)\. )?It will vanish in 5 minutes\./.test(first), `The chest spawn is announced (${first})`);
   check(await page.locator('#announce .announce-line').getAttribute('data-kind') === 'treasure', 'It carries the treasure kind');
   const chat = await page.locator('#chat-log').innerText();
   check((chat.match(/treasure chest has appeared/g) || []).length === 1, 'The same line is in the chat log once');

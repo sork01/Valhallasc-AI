@@ -165,6 +165,8 @@ pub(crate) fn overlay_quest(id: &str) -> bool {
 }
 #[cfg(test)]
 mod activity_tests;
+#[cfg(test)]
+mod aggro_level_tests;
 mod ambient;
 mod bank;
 #[cfg(test)]
@@ -831,6 +833,22 @@ struct Slime {
 fn r2(v: f64) -> f64 {
     (v * 100.).round() / 100.
 }
+/// Aggro range change per level the monster is above (or below) the hero, and its limits (`docs/aggro-level.md`).
+const AGGRO_PER_LEVEL: f64 = 0.12;
+const AGGRO_MAX_SCALE: f64 = 2.0;
+const AGGRO_MIN_SCALE: f64 = 0.35;
+/// A monster far below the hero still notices one that walks this close (or its whole radius, if that is smaller).
+const AGGRO_FLOOR: f64 = 3.;
+
+/// The distance at which an open-world monster of `monster_level` notices a hero of `hero_level`, from its
+/// kind's base `awareness`: +12% per level above the hero, -12% per level below, within x2.0 and x0.35, never under
+/// 3 tiles.
+fn aggro_radius(awareness: f64, monster_level: u32, hero_level: u32) -> f64 {
+    let gap = monster_level as f64 - hero_level as f64;
+    let scale = (1. + AGGRO_PER_LEVEL * gap).clamp(AGGRO_MIN_SCALE, AGGRO_MAX_SCALE);
+    (awareness * scale).max(awareness.min(AGGRO_FLOOR))
+}
+
 impl Slime {
     /// An enemy seen across a seam is drawn only while alive or dying.
     fn shows_across(&self) -> bool {
@@ -5378,9 +5396,18 @@ impl World {
                     *id,
                     p.character.point(),
                     s.point().distance(p.character.point()),
+                    // Open-world monsters notice a hero by the level gap (AGGRO-LEVEL); dungeons keep the fixed radius.
+                    if dungeon.is_some() {
+                        awareness
+                    } else {
+                        aggro_radius(awareness, s.level, p.character.level)
+                    },
                 )
             })
-            .filter(|(_, _, d)| *d < awareness || (hunting && (was_chasing || s.target.is_some())))
+            .filter(|(_, _, d, reach)| {
+                *d < *reach || (hunting && (was_chasing || s.target.is_some()))
+            })
+            .map(|(id, point, d, _)| (id, point, d))
             .min_by(|a, b| a.2.total_cmp(&b.2));
         let target = s.target.and_then(|id| {
             self.players

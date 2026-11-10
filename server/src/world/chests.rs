@@ -9,8 +9,8 @@ use std::collections::VecDeque;
 pub const CHEST_ROLL_INTERVAL: f64 = 120.;
 /// Chance that a roll creates a chest.
 pub const CHEST_SPAWN_CHANCE: f64 = 0.10;
-/// Seconds before an unopened chest despawns.
-pub const CHEST_LIFETIME: f64 = 180.;
+/// Seconds before an unopened chest despawns (the maps are big, so it stays five minutes).
+pub const CHEST_LIFETIME: f64 = 300.;
 /// A roll while a chest is up does nothing (it is not banked).
 pub const CHEST_MAX_PER_AREA: usize = 1;
 /// Distance from the chest centre to open it, in tiles.
@@ -54,6 +54,9 @@ pub(super) struct Chest {
     pub y: f64,
     /// Seconds until it vanishes.
     pub left: f64,
+    /// Where on the map it lies ("on the west side", "near the middle"), told in the announcement; empty for none.
+    #[serde(skip)]
+    pub hint: String,
     /// Sessions that have been told it exists (everyone present at spawn, and anyone arriving later, once).
     #[serde(skip)]
     pub told: Vec<u64>,
@@ -70,6 +73,8 @@ pub(super) struct Chests {
     grids: BTreeMap<usize, Vec<bool>>,
     /// Cached walking distance in tiles from the arrival point, by template zone (`u16::MAX`: unreachable).
     fields: BTreeMap<usize, Vec<u16>>,
+    /// Cached box round the reachable ground, by template zone: (min x, max x, min y, max y).
+    bounds: BTreeMap<usize, (f64, f64, f64, f64)>,
     /// Chests that are gone: `true` when opened, `false` when they vanished.
     finished: VecDeque<(u64, bool)>,
     /// The roll interval; tests shorten it.
@@ -85,6 +90,7 @@ impl Chests {
             rng: seed | 1,
             grids: BTreeMap::new(),
             fields: BTreeMap::new(),
+            bounds: BTreeMap::new(),
             finished: VecDeque::new(),
             interval: CHEST_ROLL_INTERVAL,
             rolls: 0,
@@ -103,6 +109,46 @@ impl Chests {
             self.finished.pop_front();
         }
     }
+}
+
+/// The spawn line; `hint` is empty for a chest placed by hand.
+fn chest_announcement(hint: &str, minutes: u32) -> String {
+    let plural = if minutes == 1 { "" } else { "s" };
+    if hint.is_empty() {
+        format!("A treasure chest has appeared! It will vanish in {minutes} minute{plural}.")
+    } else {
+        format!(
+            "A treasure chest has appeared! It's {hint}. It will vanish in {minutes} minute{plural}."
+        )
+    }
+}
+
+/// Splits the box `(min x, max x, min y, max y)` into thirds each way: the middle ninth is "near the middle", the
+/// four edge ninths "on the west side" and so on, the four corner ninths "in the north-west" and so on.
+fn chest_hint_words(at: Point, (x0, x1, y0, y1): (f64, f64, f64, f64)) -> String {
+    let third = |v: f64, lo: f64, hi: f64| {
+        let f = if hi > lo { (v - lo) / (hi - lo) } else { 0.5 };
+        if f < 1. / 3. {
+            -1
+        } else if f > 2. / 3. {
+            1
+        } else {
+            0
+        }
+    };
+    let (col, row) = (third(at.x, x0, x1), third(at.y, y0, y1));
+    match (row, col) {
+        (0, 0) => "near the middle",
+        (0, -1) => "on the west side",
+        (0, _) => "on the east side",
+        (-1, 0) => "on the north side",
+        (_, 0) => "on the south side",
+        (-1, -1) => "in the north-west",
+        (-1, _) => "in the north-east",
+        (_, -1) => "in the south-west",
+        (_, _) => "in the south-east",
+    }
+    .into()
 }
 
 /// The ladder rarity for a roll in [0, 1).
@@ -270,10 +316,7 @@ impl World {
                     chest.told.push(session);
                     if let Some(p) = self.players.get(&session) {
                         let minutes = (chest.left / 60.).ceil().max(1.) as u32;
-                        let text = format!(
-                            "A treasure chest has appeared! It will vanish in {minutes} minute{}.",
-                            if minutes == 1 { "" } else { "s" }
-                        );
+                        let text = chest_announcement(&chest.hint, minutes);
                         let _ = p
                             .peer
                             .try_send(json!({"type":"announce","kind":"treasure","text":text}));
@@ -316,15 +359,54 @@ impl World {
             return false;
         };
         let id = self.entity();
+        let hint = self.chest_hint(zone, at);
         self.chests.list.push(Chest {
             id,
             zone,
             x: at.x,
             y: at.y,
             left: CHEST_LIFETIME,
+            hint,
             told: vec![],
         });
         true
+    }
+    /// Builds and caches the walking grid, the distance field and the box round the reachable ground of `template`.
+    fn ensure_chest_grid(&mut self, template: usize) {
+        if self.chests.grids.contains_key(&template) {
+            return;
+        }
+        let grid = blocked_grid(&self.maps[template]);
+        let map = &self.maps[template];
+        let start = map
+            .places
+            .iter()
+            .find(|p| map.raid && p.id == "cf_checkpoint_1")
+            .map_or(map.spawn, |p| Point { x: p.x, y: p.y });
+        let field = distance_field(map, &grid, start);
+        let n = map.size as usize;
+        let mut bounds = (f64::MAX, f64::MIN, f64::MAX, f64::MIN);
+        for (i, &steps) in field.iter().enumerate() {
+            if steps == u16::MAX || grid[i] {
+                continue;
+            }
+            let (x, y) = ((i % n) as f64 + 0.5, (i / n) as f64 + 0.5);
+            bounds = (
+                bounds.0.min(x),
+                bounds.1.max(x),
+                bounds.2.min(y),
+                bounds.3.max(y),
+            );
+        }
+        self.chests.bounds.insert(template, bounds);
+        self.chests.grids.insert(template, grid);
+        self.chests.fields.insert(template, field);
+    }
+    /// Where `at` lies on the reachable ground of `zone`, in words (north is up on the map, so a small y).
+    pub(super) fn chest_hint(&mut self, zone: usize, at: Point) -> String {
+        let template = self.chest_template(zone);
+        self.ensure_chest_grid(template);
+        chest_hint_words(at, self.chests.bounds[&template])
     }
     /// A tile for a new chest in `zone`, or `None` after `CHEST_PLACEMENT_TRIES` failures.
     pub(super) fn chest_spot(&mut self, zone: usize) -> Option<Point> {
@@ -333,18 +415,7 @@ impl World {
         for _ in 0..CHEST_PLACEMENT_TRIES {
             candidates.push((self.chests.random(), self.chests.random()));
         }
-        if !self.chests.grids.contains_key(&template) {
-            let grid = blocked_grid(&self.maps[template]);
-            let map = &self.maps[template];
-            let start = map
-                .places
-                .iter()
-                .find(|p| map.raid && p.id == "cf_checkpoint_1")
-                .map_or(map.spawn, |p| Point { x: p.x, y: p.y });
-            let field = distance_field(map, &grid, start);
-            self.chests.grids.insert(template, grid);
-            self.chests.fields.insert(template, field);
-        }
+        self.ensure_chest_grid(template);
         let map = &self.maps[zone];
         let n = map.size as usize;
         let grid = &self.chests.grids[&template];
@@ -598,12 +669,14 @@ impl World {
                 .ok_or("No free tile for a chest in this zone.")?,
         };
         let id = self.entity();
+        let hint = self.chest_hint(zone, at);
         self.chests.list.push(Chest {
             id,
             zone,
             x: at.x,
             y: at.y,
             left: CHEST_LIFETIME,
+            hint,
             told: vec![],
         });
         Ok(json!({"id": id, "x": at.x, "y": at.y, "left": CHEST_LIFETIME}))
@@ -647,7 +720,7 @@ mod tests {
         for (name, value) in [
             ("CHEST_ROLL_INTERVAL", "120 s"),
             ("CHEST_SPAWN_CHANCE", "0.10"),
-            ("CHEST_LIFETIME", "180 s"),
+            ("CHEST_LIFETIME", "300 s"),
             ("CHEST_MAX_PER_AREA", "1"),
             ("CHEST_OPEN_RANGE", "2.0 tiles"),
             ("CHEST_MIN_ARRIVAL_DISTANCE", "14 tiles"),
@@ -661,7 +734,7 @@ mod tests {
         }
         assert_eq!(CHEST_ROLL_INTERVAL, 120.);
         assert_eq!(CHEST_SPAWN_CHANCE, 0.10);
-        assert_eq!(CHEST_LIFETIME, 180.);
+        assert_eq!(CHEST_LIFETIME, 300.);
         assert_eq!(CHEST_MAX_PER_AREA, 1);
         assert_eq!(CHEST_OPEN_RANGE, 2.0);
         assert_eq!(CHEST_MIN_ARRIVAL_DISTANCE, 14.);
@@ -781,6 +854,48 @@ mod tests {
     }
 
     #[test]
+    fn the_hint_names_the_ninth_of_the_map_the_chest_lies_in() {
+        let b = (10., 110., 20., 220.);
+        let at = |x: f64, y: f64| chest_hint_words(Point { x, y }, b);
+        assert_eq!(at(60., 120.), "near the middle");
+        assert_eq!(at(12., 120.), "on the west side");
+        assert_eq!(at(108., 120.), "on the east side");
+        assert_eq!(at(60., 22.), "on the north side");
+        assert_eq!(at(60., 218.), "on the south side");
+        assert_eq!(at(12., 22.), "in the north-west");
+        assert_eq!(at(108., 22.), "in the north-east");
+        assert_eq!(at(12., 218.), "in the south-west");
+        assert_eq!(at(108., 218.), "in the south-east");
+        assert_eq!(
+            chest_announcement("on the west side", 5),
+            "A treasure chest has appeared! It's on the west side. It will vanish in 5 minutes."
+        );
+        assert_eq!(
+            chest_announcement("", 1),
+            "A treasure chest has appeared! It will vanish in 1 minute."
+        );
+    }
+
+    #[test]
+    fn a_placed_chest_carries_a_hint_that_matches_where_it_lies() {
+        let mut w = world();
+        calm(&mut w);
+        assert!(w.spawn_chest(0));
+        let c = w.chests.list[0].clone();
+        assert!(
+            c.hint.starts_with("on the ")
+                || c.hint.starts_with("in the ")
+                || c.hint == "near the middle"
+        );
+        let (x0, x1, y0, y1) = w.chests.bounds[&0];
+        assert_eq!(
+            c.hint,
+            chest_hint_words(Point { x: c.x, y: c.y }, (x0, x1, y0, y1))
+        );
+        assert!(x0 < x1 && y0 < y1);
+    }
+
+    #[test]
     fn chest_lines_travel_as_announcements_not_system_lines() {
         let mut w = world();
         calm(&mut w);
@@ -813,7 +928,7 @@ mod tests {
     }
 
     #[test]
-    fn a_chest_vanishes_after_three_minutes_and_says_so() {
+    fn a_chest_vanishes_after_five_minutes_and_says_so() {
         let mut w = world();
         calm(&mut w);
         let mut rx = join(&mut w, 1, Class::Warrior);
@@ -827,13 +942,15 @@ mod tests {
             .collect();
         assert!(
             said.iter()
-                .any(|t| t.contains("treasure chest has appeared") && t.contains("3 minutes")),
+                .any(|t| t.contains("treasure chest has appeared")
+                    && t.contains("It's ")
+                    && t.contains("5 minutes")),
             "{said:?}"
         );
         assert_eq!(
             w.chests.list[0].left,
             CHEST_LIFETIME - TICK,
-            "a new chest lives three minutes"
+            "a new chest lives five minutes"
         );
         w.chests.list[0].left = 0.2;
         for _ in 0..8 {
@@ -1037,7 +1154,7 @@ mod tests {
         assert_eq!(told, 1);
         let snapshot = w.snapshot_for(0);
         assert_eq!(snapshot["chests"].as_array().unwrap().len(), 1);
-        assert!(snapshot["chests"][0]["left"].as_f64().unwrap() > 170.);
+        assert!(snapshot["chests"][0]["left"].as_f64().unwrap() > 290.);
         assert!(
             w.snapshot_for(CRAGS)["chests"]
                 .as_array()

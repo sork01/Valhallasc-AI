@@ -18,6 +18,7 @@
   "A party holds {0}. Remove {1} members first.": "En grupp rymmer {0}. Ta först bort {1} medlemmar.",
   "A rebirth now is tier {0}. At level {1} it becomes tier {2}, with more perks.": "En pånyttfödelse nu ger grad {0}. På nivå {1} blir den grad {2}, med fler förmåner.",
   "A treasure chest has appeared! It will vanish in {0} minute{1}.": "En skattkista har dykt upp! Den försvinner om {0} min.",
+  "A treasure chest has appeared! It's {0}. It will vanish in {1} minute{2}.": "En skattkista har dykt upp! Den ligger {0:t}. Den försvinner om {1} min.",
   "All {0} bells ring as one! The sound carries across the deep. Return to the quest giver.": "Alla {0} klockor ringer som en! Ljudet bär över djupet. Gå tillbaka till uppdragsgivaren.",
   "Arena gauntlet · Fight {0} of {1}": "Arenaprövning · Strid {0} av {1}",
   "Bag fitted! You now have {0} bag slots.": "Väska monterad! Du har nu {0} väskplatser.",

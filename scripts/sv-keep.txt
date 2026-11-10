@@ -1254,5 +1254,7 @@
   "The Wheelmark Circle",
   "Beta 1.39.35",
   "Beta 1.40.0",
-  "Beta 1.40.1"
+  "Beta 1.40.1",
+  "Beta 1.40.2",
+  "Beta 1.40.3"
 ]

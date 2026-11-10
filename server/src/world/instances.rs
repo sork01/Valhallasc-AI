@@ -212,6 +212,7 @@ impl World {
                 x: 111.,
                 y: 29.,
                 left: 1800.,
+                hint: String::new(),
                 told: vec![],
             });
         }

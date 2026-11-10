@@ -10,7 +10,7 @@ Defined once in a new `server/src/world/chests.rs` and imported by tests; no oth
 | --- | ---: | --- |
 | `CHEST_ROLL_INTERVAL` | 120 s | One roll per area per interval. |
 | `CHEST_SPAWN_CHANCE` | 0.10 | Chance that a roll creates a chest. |
-| `CHEST_LIFETIME` | 180 s | Time before an unopened chest despawns. |
+| `CHEST_LIFETIME` | 300 s | Time before an unopened chest despawns. |
 | `CHEST_MAX_PER_AREA` | 1 | A roll while a chest is up does nothing (not banked). |
 | `CHEST_OPEN_RANGE` | 2.0 tiles | Distance from the chest centre to open it. |
 | `CHEST_MIN_ARRIVAL_DISTANCE` | 14 tiles | Minimum walking distance from the arrival point and from every portal. |
@@ -55,7 +55,7 @@ A chest holds **one gold pile, one material stack, two equipment rolls and one o
 
 ## Messages
 
-- On spawn, to everyone in the area: "A treasure chest has appeared! It will vanish in 3 minutes." No direction hint, but the chest carries a countdown for anyone who finds it (`CHEST-CLIENT`).
+- On spawn, to everyone in the area: "A treasure chest has appeared! It's on the west side. It will vanish in 5 minutes." The hint (Beta 1.40.2) splits the box round the area's reachable ground into thirds each way: the middle ninth is "near the middle", an edge ninth "on the west/east/north/south side", a corner ninth "in the north-west" etc. North is up on the map (small y), as in the atlas. A late arrival gets the same line with the minutes left. A chest placed by hand (the Forge's Eldmarr chest) has no hint. The chest also carries a countdown for anyone who finds it (`CHEST-CLIENT`).
 - On open: "<name> opened the treasure chest." On despawn with nobody opening it: "The treasure chest has vanished."
 - Players arriving later see the chest in their snapshot with its remaining seconds, and receive the spawn message once.
 

@@ -1,5 +1,25 @@
 [
   {
+    "version": "Beta 1.40.3",
+    "date": "2026-11-10",
+    "new": [],
+    "changed": [
+      "How far a monster notices you now depends on its level compared with yours. A monster above your level spots you from further away (12% per level, up to double), and one below your level only notices you when you get closer (12% less per level, down to about a third). Even a much weaker monster still attacks if you walk right up to it, within about 3 tiles. This applies to everything outdoors, elites included; dungeons and raids work as before."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.40.2",
+    "date": "2026-11-10",
+    "new": [
+      "The treasure chest announcement now tells you roughly where it is, for example \"It's on the west side\", \"It's in the north-east\" or \"It's near the middle\", so you know which way to go on the big maps."
+    ],
+    "changed": [
+      "A treasure chest now stays for 5 minutes instead of 3, because the maps are so much bigger."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.40.1",
     "date": "2026-11-10",
     "new": [],
