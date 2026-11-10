@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.41.2",
+    "date": "2026-11-10",
+    "new": [],
+    "changed": [
+      "Fixed big black areas on the minimap, for example between Rimeveil and Gloamfen and beside Rimeveil's east side: the right and bottom parts of the larger zones were never painted. They now show the real ground."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.41.1",
     "date": "2026-11-10",
     "new": [],
