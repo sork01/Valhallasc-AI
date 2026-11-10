@@ -64,6 +64,23 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const diff = (a, b) => { let sum = 0, big = 0; const n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
   const save = (name, im) => fs.writeFileSync(path.join(out, name), Buffer.from(im.png.split(',')[1], 'base64'));
 
+  // PART=pop: full-size frames of one world point right at the arch from both frames, plus a diff picture (white = differs), to find what pops at the doorway
+  if (process.env.PART === 'pop') {
+    const sv = (process.env.POP || '0.3:0,0.3:5,0.3:-5').split(',').map(v => v.split(':').map(Number));
+    for (const [s, t] of sv) {
+      const px = archV.x + t, py = archV.y + s;
+      const shots = [];
+      for (const [z, x, y] of [[VALE, px, py], [YEAR, px + sx, py + sy]]) {
+        await debug({ op: 'teleport', zone: z, x, y });
+        await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 1.5, [z, x, y], { timeout: 30000 });
+        await page.waitForTimeout(3500);
+        await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+        shots.push(await page.screenshot({ path: path.join(out, `pop-z${z}-s${s}-t${t}.png`) }));
+      }
+      console.log('saved pop', s, t);
+    }
+    return;
+  }
   // PART=stag: the Equinox Stag (and for scale a Snow Giant from the old art) in the real client, one picture each (the art's size is judged from an in-game screenshot)
   if (process.env.PART === 'stag') {
     page.on('response', r => { if (/yearwheelelites|sunwardelites/.test(r.url())) console.log('response', r.status(), r.url()); });

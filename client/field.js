@@ -389,6 +389,7 @@
     if (c >= 'A' && c <= 'Z') {
       const nb = (zdef.shape?.neighbours || [])[code - 65], theme = ZONES[nb]?.theme || 'ember', seam = map.seamBy?.[nb];
       if (seam && ctxs.has(nb)) return;   // beyond a border you cross, the neighbour's own ground chunks are drawn (drawNeighbourGround)
+      if (map.vregs?.some(R => R.to === nb && inPoly(R.other, x + .5, y + .5))) return;   // beyond a vault the other zone's ground is drawn through the opening (its region): our own border tiles and wall blocks would show through as a step that pops when you cross
       if (seam) stand_in.add(nb);           // this chunk holds a generic stand-in for ground that neighbour has not drawn yet: it is re-rendered once the neighbour's context exists
       flat(groundOf(theme, tone, h > .93 && d < 4, alt));
       if (!zdef.portals.some(p => p.seam && p.to === nb)) { if (d <= 2) wallBlock(g, px, py, BORDER_LOOK[theme] || [215, 12, 26], d === 1 ? 14 * (.75 + h * .5) : 7, tone, h); }
