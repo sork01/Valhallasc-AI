@@ -3,7 +3,7 @@
 // for the other direction), waves its tail in an S while swimming, lets bubbles rise while moving, and shows none of the motion (only the lift and
 // lean) under reduced motion; the nameplate sits 25 px higher; the dialogue portrait is lifted back so it frames the same; everybody else on the
 // same street is unchanged. Real pixels of an offscreen canvas, drawn by the page's own `City.drawNpc`.
-// Needs the bounded runner and a `--profile test` server binary. MUTATE=lift|lean|wave|bubbles serves an npc-art.js without that part and must fail.
+// Needs the bounded runner and a `--profile test` server binary. MUTATE=lift|lean|wave|bubbles|style serves an npc-art.js without that part and must fail.
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -20,12 +20,12 @@ async function call(name, args = {}) {
 }
 const errors = [];
 (async () => {
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0' } }));
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0', ...(process.env.VALHALLA_BINARY ? { VALHALLA_BINARY: process.env.VALHALLA_BINARY } : {}) } }));
   const world = await call('start_world'); started = true;
   browser = await chromium.launch({ headless: true, args: ['--disable-gpu'] });
   const page = await browser.newPage({ viewport: { width: 960, height: 600 }, reducedMotion: 'reduce' });
   page.on('pageerror', e => errors.push(e.message));
-  const mutations = { lift: ['const LIFT = 25', 'const LIFT = 0'], lean: ['LEAN = .5', 'LEAN = 0'], wave: ['moving ? 4 : 1.5', 'moving ? 0 : 0'], bubbles: ['if (sw?.moving && !sw.still && !portrait)', 'if (false)'] };
+  const mutations = { lift: ['const LIFT = 25', 'const LIFT = 0'], lean: ['LEAN = .5', 'LEAN = 0'], wave: ['amp: [6, 2.2]', 'amp: [0, 0]'], style: ["new Set(['merfolk'])", 'new Set([])'], bubbles: ['if (sw?.moving && !sw.still && !portrait)', 'if (false)'] };
   if (process.env.MUTATE) {
     const [from, to] = mutations[process.env.MUTATE] || mutations.lift, src = fs.readFileSync(path.join(root, 'client/npc-art.js'), 'utf8');
     assert.ok(src.includes(from), 'the mutation applies');
@@ -50,21 +50,24 @@ const errors = [];
     for (let i = 0; i < 100 && !NpcArt.readyFor([window.__plain]); i++) { NpcArt.frame(window.__plain, 0); await new Promise(r => setTimeout(r, 100)); }
     return { merfolk: merfolk.length, other: NpcArt.frame(window.__plain, 0) ? id : null, first: merfolk[0]?.id };
   });
+  const styles = await page.evaluate(([a, b]) => ({ merfolk: NpcArt.styleOf(City.npcs.find(x => x.id === a)), plain: NpcArt.styleOf(window.__plain) }), [lab.first, lab.other]);
+  check(styles.merfolk === 'player', `The merfolk are drawn from the player-style atlases (${styles.merfolk})`);
+  check(styles.plain === 'saved', `Everybody else keeps the saved art (${styles.plain})`);
   check(lab.merfolk >= 10, `Nacrehold shows many sprite-drawn merfolk (${lab.merfolk})`);
   check(lab.other, 'And a non-merfolk person with art to compare against');
 
-  // The canvas also holds the nameplate (rows above 82), so figure measurements use the sprite rows only; the alpha plane is returned whole.
+  // Plate-free renders (see raw); the alpha plane is returned whole.
   const raw = (id, opts) => page.evaluate(([id, o]) => {
-    const n = [...City.npcs, window.__plain].find(x => x.id === id), keep = { moving: n.moving, fx: n.fx, fy: n.fy };
-    n.moving = !!o.moving; n.fx = o.fx ?? 1; n.fy = o.fy ?? 0;
+    const src = [...City.npcs, window.__plain].find(x => x.id === id);
+    // A copy far from the hero with no work or wares: no nameplate over the figure (the plate would sit in the measured rows).
+    const n = { ...src, x: -999, y: -999, key: false, offers: [], buys: null, moving: !!o.moving, fx: o.fx ?? 1, fy: o.fy ?? 0 };
     const c = document.createElement('canvas'); c.width = 200; c.height = 260; const g = c.getContext('2d', { willReadFrequently: true });
     City.drawNpc(g, n, 100, 220, o.t ?? 0.37, false, !!o.portrait);
-    Object.assign(n, keep);
     const d = g.getImageData(0, 0, 200, 260).data, a = new Array(200 * 260);
     for (let i = 0; i < a.length; i++) a[i] = d[i * 4 + 3];
     return a;
   }, [id, opts]);
-  const SPRITE = 82;
+  const SPRITE = 0;
   const measure = a => {
     let minY = 999, maxY = -1; const rows = [];
     for (let y = 0; y < 260; y++) {
@@ -75,7 +78,7 @@ const errors = [];
     return { minY, maxY, rows, headX: head.reduce((p, q) => p + q, 0) / head.length };
   };
   // Pixels in the plate band (rows 24..82, where bubbles climb past the plate-free sides) that differ between two alpha planes.
-  const bandDiff = (a, b) => { let k = 0; for (let y = 24; y < SPRITE; y++) for (let x = 0; x < 200; x++) if (Math.abs(a[y * 200 + x] - b[y * 200 + x]) > 20) k++; return k; };
+  const bandDiff = (a, b) => { let k = 0; for (let y = 24; y < 130; y++) for (let x = 0; x < 200; x++) if (Math.abs(a[y * 200 + x] - b[y * 200 + x]) > 20) k++; return k; };
   const render = async (id, opts) => measure(await raw(id, opts));
   const key = render;
 
@@ -95,7 +98,7 @@ const errors = [];
 
   // --- the plate and the portrait ---
   const tops = await page.evaluate(([a, b]) => {
-    const m = City.npcs.find(x => x.id === a), who = NpcArt.manifest.npcs[m.id], t = NpcArt.manifest.tops[who.art], s = NpcArt.manifest.scale;
+    const m = City.npcs.find(x => x.id === a), who = NpcArt.manifest.npcs[m.id], man = NpcArt.fresh, t = man.tops[who.art], s = man.scale;
     return { top: NpcArt.top(m), plain: (t * s + 3) * (m.look?.scale || 1), scale: m.look?.scale || 1, other: NpcArt.top(window.__plain) };
   }, [lab.first, lab.other]);
   check(Math.abs(tops.top - tops.plain - 25 * tops.scale) < 1e-6, `The nameplate sits 25 px higher (${tops.top.toFixed(1)} against ${tops.plain.toFixed(1)})`);
@@ -112,7 +115,7 @@ const errors = [];
   // --- tail wave and bubbles: with reduced motion the frame holds still between times, otherwise it moves ---
   const rows = r => r.rows;
   const calmA = await key(lab.first, { moving: true, t: .2 }), calmB = await key(lab.first, { moving: true, t: .55 });
-  const tailRows = (a, b) => { let diff = 0; for (let y = 190; y <= 220; y++) if (rows(a)[y] !== null && rows(b)[y] !== null) diff += Math.abs(rows(a)[y] - rows(b)[y]); return diff; };
+  const tailRows = (a, b) => { let diff = 0; for (let y = 150; y <= 200; y++) if (rows(a)[y] !== null && rows(b)[y] !== null) diff += Math.abs(rows(a)[y] - rows(b)[y]); return diff; };
   // (Both frames of a walk cycle also change the sprite step, so compare the same step: times a whole second apart land on the same frame.)
   const calmC = await key(lab.first, { moving: true, t: .2 + 3 }), calmD = await key(lab.first, { moving: true, t: .2 });
   check(tailRows(calmC, calmD) < 1 && calmC.minY === calmD.minY, 'Under reduced motion the same walk frame is drawn identically at any time (no bob, no wave)');
@@ -128,15 +131,20 @@ const errors = [];
   check(range > .8, `Without it the tail is waved: its sideways offset from the body swings through ${range.toFixed(1)} px`);
   const waveA = await key(lab.first, { moving: true, t: .2 }), waveB = await key(lab.first, { moving: true, t: .2 + 3 });
   check(waveA.minY !== waveB.minY || waveA.headX !== waveB.headX, 'And the figure drifts up and down');
-  // Bubbles: the same moving frame with and without them differs in the band above the sprite (the plate is identical in both).
+  // Bubbles: the same moving frame with and without them, at a time when the bob is exactly zero (so only the wave and the bubbles differ),
+  // compared above the tail (rows before the tail starts), where only the bubbles can differ.
+  const zeroBob = await page.evaluate(id => { const phase = [...id].reduce((q, ch) => q + ch.charCodeAt(0), 0) % 628 / 100; return (Math.PI * 4 - phase) / 1.7; }, lab.first);
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  const noBubbles = await raw(lab.first, { moving: true, t: .2 });
+  const noBubbles = await raw(lab.first, { moving: true, t: zeroBob });
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  const withBubbles = await raw(lab.first, { moving: true, t: .2 });
+  const withBubbles = await raw(lab.first, { moving: true, t: zeroBob });
   const bubbleDiff = bandDiff(noBubbles, withBubbles);
-  check(bubbleDiff > 8, `Bubbles rise past the head of a swimming merfolk (${bubbleDiff} pixels differ above the figure)`);
-  const standingBubbles = bandDiff(await raw(lab.first, { t: .2 }), await raw(lab.first, { t: .2 + 3 }));
-  check(standingBubbles === 0, `A standing merfolk lets none rise (${standingBubbles})`);
+  check(bubbleDiff > 8, `Bubbles rise beside the head of a swimming merfolk (${bubbleDiff} pixels differ above the tail)`);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const standCalm = await raw(lab.first, { t: zeroBob });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const standingBubbles = bandDiff(standCalm, await raw(lab.first, { t: zeroBob }));
+  check(standingBubbles <= 0, `A standing merfolk lets none rise (${standingBubbles})`);
   const idleA = await key(lab.first, { t: .2 }), idleB = await key(lab.first, { t: .2 + 3 });
   check(tailRows(idleA, idleB) >= 0 && idleA.minY !== idleB.minY, 'A standing merfolk still bobs in place');
 

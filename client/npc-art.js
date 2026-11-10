@@ -1,28 +1,39 @@
 'use strict';
 // Saved PixelFlow NPC frames. Names, routes and interactions remain in WORLD_MAP.
 (() => {
-  let meta = null;
+  let meta = null, fresh = null;
   const sources = new Map(), tinted = new Map();
   let tintZone = null;
   // Keep the current zone's working set. Evicting visible people every frame
   // would continuously allocate full atlases in a busy town.
   const cacheLimit = () => Math.max(24, window.City?.npcs.length || 0);
-  const ready = fetch('assets/npc.txt').then(r => { if (!r.ok) throw Error('NPC artwork unavailable'); return r.json(); }).then(value => { meta = value; return value; }).catch(() => null);
+  const loadMeta = url => fetch(url).then(r => { if (!r.ok) throw Error('NPC artwork unavailable'); return r.json(); });
+  // The player-style remake (`assets/npcp.txt`, atlases `npcp_<design>.png`, same frame, anchor, scale and clips) replaces the saved art of the species
+  // listed in NEW_STYLE, design by design; everybody else keeps the saved atlases. Both manifests name a design the same way.
+  const NEW_STYLE = new Set(['merfolk']);
+  const ready = Promise.all([loadMeta('assets/npc.txt').catch(() => null), loadMeta('assets/npcp.txt').catch(() => null)]).then(([a, b]) => { meta = a; fresh = b; return a; });
   const assignment = n => meta?.npcs[n.id];
+  // Which manifest and atlas draw a person: the player-style one when their species is switched over and it has the design.
+  function art(n) {
+    const who = assignment(n); if (!who) return null;
+    const isNew = !!fresh && NEW_STYLE.has(who.identity?.species) && !!fresh.sprites[who.art], m = isNew ? fresh : meta;
+    return { who, m, isNew, art: who.art, key: (isNew ? 'npcp_' : 'npc_') + who.art };
+  }
   function source(key) {
-    if (!sources.has(key)) { const img = new Image(); img.src = `assets/npc_${key}.png`; sources.set(key, img); }
+    if (!sources.has(key)) { const img = new Image(); img.src = `assets/${key}.png`; sources.set(key, img); }
     const img = sources.get(key);
     return img.complete && img.naturalWidth ? img : null;
   }
   const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
   const shade = (color, amount) => rgb(color).map(v => Math.round(amount < 1 ? v * amount : v + (255 - v) * (amount - 1)));
-  function atlas(n, key, img) {
-    if (!meta.designs[key].general) return img;
+  function atlas(n, pose, img) {
+    const key = pose.key;
+    if (!pose.m.designs[pose.art].general) return img;
     const zone = window.Field?.zone ?? 0;
     if (tintZone !== zone) { for (const old of tinted.values()) old.width = old.height = 0; tinted.clear(); tintZone = zone; }
     const who = assignment(n), identity = who.identity, signature = `${key}|${identity.skin}|${identity.hair}|${who.color}`;
     if (tinted.has(signature)) { const canvas = tinted.get(signature); tinted.delete(signature); tinted.set(signature, canvas); return canvas; }
-    const remap = new Map(), materials = meta.designs[key].materials;
+    const remap = new Map(), materials = pose.m.designs[pose.art].materials;
     for (const [group, color, amounts] of [['skin', identity.skin, [.65, 1, 1.5]], ['hair', identity.hair, [.6, 1, 1.4]], ['cloth', who.color, [.45, .7, 1, 1.45]]]) {
       if (!/^#[0-9a-f]{6}$/i.test(color || '')) continue;
       amounts.forEach((amount, i) => { const from = rgb(materials[group + i]); remap.set((from[0] << 16) | (from[1] << 8) | from[2], shade(color, amount)); });
@@ -36,45 +47,48 @@
     return canvas;
   }
   function frame(n, t, talk = false) {
-    const who = assignment(n); if (!who || !meta.sprites[who.art]) return null;
-    const name = n.moving ? 'walk' : talk ? 'talk' : 'idle', clip = meta.clips[name];
+    const a = art(n); if (!a || !a.m.sprites[a.art]) return null;
+    const name = n.moving ? 'walk' : talk ? 'talk' : 'idle', clip = a.m.clips[name];
     // Phase by stable identity, so neighbours do not blink or step together.
     const phase = [...n.id].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    return { key: who.art, clip: name, row: clip.row, step: Math.floor(t * clip.fps + phase) % clip.n, mirrored: !!n.moving && n.fx - n.fy < 0 };
+    return { key: a.key, art: a.art, m: a.m, isNew: a.isNew, clip: name, row: clip.row, step: Math.floor(t * clip.fps + phase) % clip.n, mirrored: !!n.moving && n.fx - n.fy < 0 };
   }
   // Merfolk swim (MERFOLK-SWIM): drawn from the same saved frames, so nothing but the drawing changes (routes, speed, names, dialogue stay).
   // They float LIFT px above the floor (the shadow stays on it), drift up and down, lean along the way they swim, wave the tail in an S
   // (the frame's lowest rows are sheared sideways, more towards the tip) and, while moving, let a few bubbles rise. A reduced-motion player
   // gets the lift and the lean but no bob, wave or bubbles. The nameplate (`top`) and the costume sockets (`head`) follow the lift.
-  const LIFT = 25, TAIL_TOP = 66, WAIST = 62, LEAN = .5;
+  // Where the tail starts (frame row), the waist the body leans about, and how far the tail tip swings (source px: moving, standing). The
+  // player-style merfolk have a longer tail that starts higher than the saved art's little fin.
+  const LIFT = 25, LEAN = .5, GEO = { saved: { tailTop: 66, waist: 62, amp: [4, 1.5], strip: 2 }, fresh: { tailTop: 52, waist: 52, amp: [6, 2.2], strip: 1 } };
   const calm = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const swimmer = n => assignment(n)?.identity?.species === 'merfolk' || n.look?.species === 'merfolk';
   function swimPose(n, t, pose, portrait) {
     if (!swimmer(n)) return null;
     const phase = [...n.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 628 / 100, still = calm(), moving = pose.clip === 'walk';
     const bob = still || portrait ? 0 : Math.sin(t * 1.7 + phase) * (moving ? 2.5 : 3.5);
-    return { lift: LIFT + bob, phase, moving, still, angle: moving && !portrait ? (pose.mirrored ? -LEAN : LEAN) : 0,
-      amp: still || portrait ? 0 : moving ? 4 : 1.5 };
+    const geo = pose.isNew ? GEO.fresh : GEO.saved;
+    return { lift: LIFT + bob, phase, moving, still, geo, angle: moving && !portrait ? (pose.mirrored ? -LEAN : LEAN) : 0,
+      amp: still || portrait ? 0 : geo.amp[moving ? 0 : 1] };
   }
   function draw(g, n, t, talk = false, portrait = false) {
     const pose = frame(n, t, talk); if (!pose) return false;
     const img = source(pose.key); if (!img) return false;
-    const sheet = atlas(n, pose.key, img), [w, h] = meta.frame, [ax, ay] = meta.anchor, scale = meta.scale, sw = swimPose(n, t, pose, portrait);
+    const sheet = atlas(n, pose, img), [w, h] = pose.m.frame, [ax, ay] = pose.m.anchor, scale = pose.m.scale, sw = swimPose(n, t, pose, portrait);
     g.save(); g.imageSmoothingEnabled = false;
     if (sw) {
       g.translate(0, -sw.lift);
-      if (sw.angle) { const py = -(ay - WAIST) * scale; g.translate(0, py); g.rotate(sw.angle); g.translate(0, -py); }
+      if (sw.angle) { const py = -(ay - sw.geo.waist) * scale; g.translate(0, py); g.rotate(sw.angle); g.translate(0, -py); }
     }
     if (pose.mirrored) g.scale(-1, 1);
     const sx = pose.step * w, sy = pose.row * h, dx = -ax * scale, dy = -ay * scale;
     if (!sw || !sw.amp) g.drawImage(sheet, sx, sy, w, h, dx, dy, w * scale, h * scale);
     else {
-      // The body is one piece; the tail is cut into two-row strips, each pushed sideways by a travelling sine wave.
-      g.drawImage(sheet, sx, sy, w, TAIL_TOP, dx, dy, w * scale, Math.round(TAIL_TOP * scale));
-      for (let r = TAIL_TOP; r < h; r += 2) {
-        const off = sw.amp * ((r - TAIL_TOP) / (h - TAIL_TOP)) * Math.sin(t * 7 - r * .3 + sw.phase) * scale;
-        const top = Math.round((r - ay) * scale), bottom = Math.round((r + 2 - ay) * scale);
-        g.drawImage(sheet, sx, sy + r, w, 2, dx + off, top, w * scale, bottom - top);
+      // The body is one piece; the tail is cut into thin strips, each pushed sideways by a travelling sine wave.
+      g.drawImage(sheet, sx, sy, w, sw.geo.tailTop, dx, dy, w * scale, sw.geo.tailTop * scale);
+      for (let r = sw.geo.tailTop; r < h; r += sw.geo.strip) {
+        const off = sw.amp * ((r - sw.geo.tailTop) / (h - sw.geo.tailTop)) * Math.sin(t * 7 - r * .3 + sw.phase) * scale;
+        const top = Math.round((r - ay) * scale), bottom = Math.round((r + sw.geo.strip - ay) * scale);
+        g.drawImage(sheet, sx, sy + r, w, sw.geo.strip, dx + off, top, w * scale, bottom - top);
       }
     }
     g.restore();
@@ -97,11 +111,11 @@
     const img = source(pose.key); if (!img) return null;
     const key = `${pose.key}|${pose.row}|${pose.step}`;
     if (!heads.has(key)) {
-      const [w, h] = meta.frame, [ax, ay] = meta.anchor;
+      const [w, h] = pose.m.frame, [ax, ay] = pose.m.anchor;
       headCanvas ||= document.createElement('canvas'); headCanvas.width = w; headCanvas.height = h;
       const g = headCanvas.getContext('2d', { willReadFrequently: true });
       g.drawImage(img, pose.step * w, pose.row * h, w, h, 0, 0, w, h);
-      const px = g.getImageData(0, 0, w, h).data, materials = meta.designs[pose.key].materials;
+      const px = g.getImageData(0, 0, w, h).data, materials = pose.m.designs[pose.art].materials;
       const skin = new Set(Object.entries(materials).filter(([k]) => k.startsWith('skin')).map(([, c]) => parseInt(c.slice(1), 16)));
       const mask = new Uint8Array(w * h);
       for (let y = 0; y < ay; y++) for (let x = Math.max(0, ax - 20); x < Math.min(w, ax + 21); x++) {
@@ -132,17 +146,18 @@
       }
     }
     const socket = heads.get(key); if (!socket) return null;
-    const scale = meta.scale * (n.look?.scale || 1);
+    const scale = pose.m.scale * (n.look?.scale || 1);
     let x = socket.x * scale * (pose.mirrored ? -1 : 1), y = socket.y * scale, collar = socket.collar * scale;
     const sw = swimPose(n, t, pose, false);
     if (sw) {
-      const py = -(ay - WAIST) * scale, c = Math.cos(sw.angle), s = Math.sin(sw.angle), ry = y - py;
+      const py = -(ay - sw.geo.waist) * scale, c = Math.cos(sw.angle), s = Math.sin(sw.angle), ry = y - py;
       const turnedX = x * c - ry * s, turnedY = py + x * s + ry * c, lift = sw.lift * (n.look?.scale || 1);
       collar += turnedY - y - lift; x = turnedX; y = turnedY - lift;
     }
     return { x, y, width: socket.width * scale, collar };
   }
-  window.NpcArt = { ready, draw, frame, head, top(n) { const who = assignment(n); return who && meta.tops?.[who.art] ? (meta.tops[who.art] * meta.scale + 3 + (swimmer(n) ? LIFT : 0)) * (n.look?.scale || 1) : null; },
-    readyFor(npcs) { return !!meta && npcs.every(n => { const who = assignment(n); return !who || !!source(who.art); }); },
-    get manifest() { return meta; }, get cacheSize() { return tinted.size; }, get cacheLimit() { return cacheLimit(); } };
+  window.NpcArt = { ready, draw, frame, head, top(n) { const a = art(n); return a && a.m.tops?.[a.art] ? (a.m.tops[a.art] * a.m.scale + 3 + (swimmer(n) ? LIFT : 0)) * (n.look?.scale || 1) : null; },
+    readyFor(npcs) { return !!meta && npcs.every(n => { const a = art(n); return !a || !!source(a.key); }); },
+    styleOf(n) { const a = art(n); return a ? (a.isNew ? 'player' : 'saved') : null; },
+    get manifest() { return meta; }, get fresh() { return fresh; }, get cacheSize() { return tinted.size; }, get cacheLimit() { return cacheLimit(); } };
 })();
