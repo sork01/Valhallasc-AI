@@ -84,11 +84,12 @@ for key, spec in META['sprites'].items():
         skin = {hexint('#010203')}
     img = np.array(Image.open(A / f'npcp_{key}.png').convert('RGBA'))
     colours = {(int(p[0]) << 16) | (int(p[1]) << 8) | int(p[2]) for p in img.reshape(-1, 4) if p[3]}
-    for group, need in (('cloth', 2), ('skin', 2), ('hair', 0 if key in ('pilgrim', 'lamplighter') else 1)):
+    general = META['designs'][key]['general']
+    for group, need in (('cloth', 2), ('skin', 2), ('hair', 0 if key in ('pilgrim', 'lamplighter') else 1)) if general else (('skin', 1),):
         present = [n for n in range(4) if hexint(mats[f'{group}{n}']) in colours]
         check(MUTATE or len(present) >= need, f'{key}: only tones {present} of {group} are in the atlas (the per-person remap needs them)')
         designs = META['designs'][key]
-    check(set(designs['amounts']) == {'skin', 'hair', 'cloth'}, f'{key}: amounts missing')
+    check(not general or set(designs['amounts']) == {'skin', 'hair', 'cloth'}, f'{key}: amounts missing')
     sigs = {}
     for clip, n, fr in frames(key):
         a = fr[..., 3] > 0
@@ -96,10 +97,11 @@ for key, spec in META['sprites'].items():
         check(len(xs) > 0 and xs.min() >= 1 and xs.max() <= 94 and ys.min() >= 1 and ys.max() <= 94, f'{key} {clip} {n}: touches the border')
         check(a.any(0)[0] == False and a.any(0)[-1] == False, f'{key} {clip} {n}: opaque edge column')
         sigs.setdefault(clip, set()).add(fr.tobytes())
-        if clip == 'idle' and n == 0:
+        if clip == 'idle' and n == 0 and general:
             idle_masks[key] = a
         # feet: the lowest opaque row must sit near the anchor (walk may lift a foot)
-        check(ys.max() <= 94 and ys.max() >= AY - 6, f'{key} {clip} {n}: feet at row {ys.max()}, anchor {AY}')
+        slack = 10 if designs.get('species') == 'merfolk' else 6      # a merfolk tail flicks up on one walk frame
+        check(ys.max() <= 94 and ys.max() >= AY - slack, f'{key} {clip} {n}: feet at row {ys.max()}, anchor {AY}')
         s = socket(fr, skin)
         check(s is not None, f'{key} {clip} {n}: no head socket (skin face not found)')
         if s:
@@ -121,7 +123,10 @@ for i, k1 in enumerate(keys):
         d = int((idle_masks[k1] ^ idle_masks[k2]).sum())
         if d < worst[0]:
             worst = (d, (k1, k2))
-check(len(keys) == 24, f'{len(keys)} designs, want 24')
+check(len(keys) == 24, f'{len(keys)} general designs, want 24')
+check(len(META['sprites']) == 164, f"{len(META['sprites'])} designs in total, want 164 (24 general + 140 special)")
+for sp, kind in (('special_heart_oracle', 'treefolk'), ('special_sky_warden', 'winged'), ('special_nacre_envoy', 'merfolk')):
+    check(META['designs'].get(sp, {}).get('species') == kind, f'{sp}: species {kind} missing from the manifest')
 check(worst[0] >= 120, f'two designs have near-identical silhouettes: {worst}')
 print(f'designs {len(keys)}, closest silhouette pair {worst}')
 print('FAIL' if fails else 'PASS', len(fails), 'problems')

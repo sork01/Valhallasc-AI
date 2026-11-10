@@ -52,7 +52,147 @@
     "steward": "1d440c214db77505",
     "stablehand": "f3d708dbc13e39f6",
     "lamplighter": "5d711ecaba0a21da",
-    "banker": "7f7dba85ba1f2e57"
+    "banker": "7f7dba85ba1f2e57",
+    "special_banker_alderhaven": "9de60e566de7c76a",
+    "special_banker_skaldholm": "ba0f20a99cd0fea8",
+    "special_sky_warden": "5054996c6536ff2f",
+    "special_sky_healer": "c6f3c679aff3d03a",
+    "special_sky_trader": "ab04a0109c810c23",
+    "special_sky_skadi": "e732f1d50d20905c",
+    "special_sky_brokk": "364eab7f1c2174f8",
+    "special_sky_veleda": "a3e25414027914db",
+    "special_sky_thorgrim": "42aa36c37ea69024",
+    "special_travel_perch": "7a3bfc621fe5fc86",
+    "special_span_guide": "7ac13cf9aece0649",
+    "special_span_chronicler": "3d199ad45b207a02",
+    "special_nacre_envoy": "8458a3b21a16dae5",
+    "special_nacre_healer": "6fde973e392a853b",
+    "special_nacre_trader": "aec9386f68a802dc",
+    "special_nacre_smith": "3e24eb6863e7a2c5",
+    "special_nacre_archivist": "d0126bc3b8f1c680",
+    "special_banker_nacrehold": "d35f5899b69fbdb2",
+    "special_nacre_gardener": "23151b206371d9f1",
+    "special_nacre_singer": "9b43a41ddceef269",
+    "special_nacre_warden": "a1f2c92c73ca3d24",
+    "special_nacre_innkeeper": "118a4ae276378492",
+    "special_nacre_lamplighter": "93d42dff6a156580",
+    "special_nacre_resident_0": "90615e669e453e6c",
+    "special_nacre_resident_1": "c06dbc46dd023489",
+    "special_nacre_resident_2": "8bcee6d756481c2d",
+    "special_nacre_resident_3": "470a0e1b6e96e081",
+    "special_nacre_resident_4": "c1f73f9cc00b5ddf",
+    "special_nacre_resident_5": "6d3139ac247eecbb",
+    "special_nacre_resident_6": "21837d5ea019b4ce",
+    "special_nacre_resident_7": "b4def64599444ec1",
+    "special_nacre_resident_8": "a5d00c591c3460bd",
+    "special_nacre_resident_9": "b4662d7b294a681e",
+    "special_nacre_resident_10": "24a8d02eb6bd0ac5",
+    "special_nacre_resident_11": "4c4620a07a2ac1be",
+    "special_nacre_resident_12": "c6f59003a2c5da08",
+    "special_nacre_resident_13": "867ad7643f7be9bf",
+    "special_nacre_resident_14": "0ce7ee0b46f24b2e",
+    "special_nacre_resident_15": "4ad804ab27455c41",
+    "special_nacre_resident_16": "88490c66de365db7",
+    "special_nacre_resident_17": "896b6a266589fdb7",
+    "special_travel_nacrehold": "dfe52490f7b62fb2",
+    "special_astral_steward": "3805c677875d6836",
+    "special_banker_astralhollow": "1c6d918d18988854",
+    "special_astral_healer": "ce8f287cb8341b0c",
+    "special_astral_scholar": "6024b7c9bfc1b28b",
+    "special_astral_gardener": "2e6e0d5ea071902f",
+    "special_astral_warden": "3691db2e50a9b857",
+    "special_astral_trader": "364d2dfbd9399527",
+    "special_travel_astralhollow": "48807eeb03ff2f5e",
+    "special_prism_keeper": "7ede7d368af04ba4",
+    "special_prism_healer": "968a40ccf02fb165",
+    "special_prism_scout": "1f2f601d4a7f19d9",
+    "special_prism_scholar": "2942122befbcb057",
+    "special_prism_trader": "7614e3d6f3d8ac3d",
+    "special_travel_last_shade": "4a2a5f762de9eaec",
+    "special_orrery_keeper": "99a887da4eb88975",
+    "special_orrery_healer": "65a31e6af51d2127",
+    "special_orrery_scout": "59038030e540ed70",
+    "special_orrery_scholar": "814711ef02501d53",
+    "special_orrery_trader": "45f70f63059af5b4",
+    "special_travel_stillpoint": "d86bd54ac8188ad2",
+    "special_moonspore_warden": "a833f5ca15a64d39",
+    "special_moonspore_healer": "fe2b13cd14ef7cf3",
+    "special_moonspore_ranger": "28738ecbdafe1468",
+    "special_moonspore_scholar": "a164ed4ae0f372c7",
+    "special_moonspore_trader": "82447dbc4c346019",
+    "special_moonspore_seer": "718e03b9c5911d38",
+    "special_travel_lamplight": "08cedcf825c505b8",
+    "special_asterion_archon": "16186685f287597a",
+    "special_banker_asterion": "b06bc4bca4b45702",
+    "special_asterion_cartographer": "74b40f0d24cffa14",
+    "special_asterion_bellkeeper": "687696ad8d92f3bc",
+    "special_asterion_gardener": "b9d59eb65584cb88",
+    "special_asterion_healer": "22dd66a673a4422d",
+    "special_asterion_merchant": "639da4da9720ee82",
+    "special_asterion_stonewarden": "118315b8061bb106",
+    "special_asterion_singer": "b54c81bd10bac85c",
+    "special_asterion_smith": "adc6501d0637cd76",
+    "special_asterion_walker0": "75547e3b2870162b",
+    "special_asterion_walker1": "6f2c01d8489cd761",
+    "special_asterion_walker2": "ffd98ef1e61bd1cf",
+    "special_asterion_walker3": "9f05da91a5d8993e",
+    "special_asterion_walker4": "1d2633e4fe343ce6",
+    "special_asterion_walker5": "5fb3a7af0c3bbb01",
+    "special_asterion_walker6": "b1874b4355e5633b",
+    "special_asterion_walker7": "0210041863e7ce87",
+    "special_asterion_walker8": "43d83180ab98ecfa",
+    "special_asterion_walker9": "87edb5e92a2ed225",
+    "special_travel_asterion": "7b068f81b9fe7479",
+    "special_ew_citysmith": "ca38f11fda819083",
+    "special_sun_miller": "0f72b48f4f04a5ee",
+    "special_sun_keeper": "f319ec4dd81fb489",
+    "special_travel_millbridge": "9633a3146084e7cd",
+    "special_ribbon_host": "4dd83148486fc398",
+    "special_ribbon_keeper": "0708c811135dee3f",
+    "special_travel_jubilee": "07e6e57eb103f96e",
+    "special_tangle_warden": "1c0820218b501acc",
+    "special_tangle_scholar": "fafb6d03b7c0d511",
+    "special_travel_banyan": "725ef70473294bfa",
+    "special_heart_matriarch": "3580fb0358fa0187",
+    "special_travel_veyrroot": "941b2f141c351a5f",
+    "special_heart_archivist": "d6051ef95ab99804",
+    "special_heart_carver": "b6f897fd5befb29b",
+    "special_heart_oracle": "3bd21066af1bcd50",
+    "special_heart_custodian": "e1a900dda46d19bd",
+    "special_lapis_keeper": "64a892a7fc326f62",
+    "special_lapis_cartographer": "eca12e5c0c793e0b",
+    "special_lapis_warden": "18270ffb1ec4de81",
+    "special_lapis_seer": "92c0e4130b14d2b2",
+    "special_travel_azure_wells": "69034fb4d56cf782",
+    "special_frostwake_captain": "1bc2d53e1dd92dcd",
+    "special_frostwake_surveyor": "9ec7e3e43c381ae6",
+    "special_frostwake_bellkeeper": "5d918b5e8e256255",
+    "special_frostwake_skywatcher": "b310afd7a1674028",
+    "special_frostwake_ribkeeper": "a87576756b5017f1",
+    "special_travel_frostwake": "30a2afc363ef6677",
+    "special_cairn_warden": "3855726e4e7e381b",
+    "special_cairn_surveyor": "d204dc11f9785b29",
+    "special_cairn_stonesinger": "02fccf6ebee54965",
+    "special_cairn_grovekeeper": "3584bab7a8488496",
+    "special_cairn_windseer": "3a6cf74eb0a21d8e",
+    "special_travel_boulderwatch": "9d15a652eb7f94d3",
+    "special_yr_sp_lead": "65ae34075bcf80ff",
+    "special_yr_su_lead": "d619d1e3139d1615",
+    "special_yr_au_lead": "db051ba65433d173",
+    "special_yr_wi_lead": "9853e661cfd63304",
+    "special_travel_springmere": "d0634a1f84c08824",
+    "special_travel_solhaven": "5aa8d051d5955c01",
+    "special_travel_harvestwatch": "b103d6b279ca35c6",
+    "special_travel_rimehold": "0ae71571f8fd4852",
+    "special_barrow_witness": "f2cfa8a5a48c9db2",
+    "special_span_witness": "c9529a564112eaca",
+    "special_keel_witness": "a1a9c4ef08f6890f",
+    "special_null_witness": "234e72942cb4f466",
+    "special_ew_guide": "ec16babae721ff2f",
+    "special_ew_keeper": "d2c6d4d65e38ef55",
+    "special_ew_smith": "c5540044c1d06c07",
+    "special_raid_key_keeper": "57e60a11273ea6bc",
+    "special_cf_quartermaster": "8b82b8cff5b5368e"
   },
   "designs": {
     "sentinel": {
@@ -966,6 +1106,2573 @@
           1.45
         ]
       }
+    },
+    "special_banker_alderhaven": {
+      "general": false,
+      "name": "Brenna Coinwright",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#3d2515",
+        "hair1": "#5c3820",
+        "hair2": "#7a4a2a",
+        "hair3": "#a2806a",
+        "cloth0": "#5a4922",
+        "cloth1": "#8d7134",
+        "cloth2": "#c9a24b",
+        "cloth3": "#e1cc9c"
+      }
+    },
+    "special_banker_skaldholm": {
+      "general": false,
+      "name": "Hakon Vaultwarden",
+      "materials": {
+        "skin0": "#8d725c",
+        "skin1": "#ba977a",
+        "skin2": "#e3b895",
+        "skin3": "#e9c6aa",
+        "hair0": "#5c5952",
+        "hair1": "#8b867b",
+        "hair2": "#b9b2a4",
+        "hair3": "#cec9bf",
+        "cloth0": "#313946",
+        "cloth1": "#4c596d",
+        "cloth2": "#6d7f9c",
+        "cloth3": "#afb9c9"
+      }
+    },
+    "special_sky_warden": {
+      "general": false,
+      "name": "Shieldmaiden Sigrun Cloudwatcher",
+      "materials": {
+        "skin0": "#8b7058",
+        "skin1": "#b89474",
+        "skin2": "#e0b48e",
+        "skin3": "#e6c3a5",
+        "hair0": "#6c6038",
+        "hair1": "#a29054",
+        "hair2": "#d8c070",
+        "hair3": "#e4d39b",
+        "cloth0": "#455161",
+        "cloth1": "#6c7e97",
+        "cloth2": "#9ab4d8",
+        "cloth3": "#c7d6ea"
+      },
+      "species": "winged"
+    },
+    "special_sky_healer": {
+      "general": false,
+      "name": "Eira the Windhealer",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#74726e",
+        "hair1": "#aeaba5",
+        "hair2": "#e8e4dc",
+        "hair3": "#efece6",
+        "cloth0": "#3e5e56",
+        "cloth1": "#619286",
+        "cloth2": "#8ad0c0",
+        "cloth3": "#bfe5dc"
+      },
+      "species": "winged"
+    },
+    "special_sky_trader": {
+      "general": false,
+      "name": "Hrafn Skyfarer",
+      "materials": {
+        "skin0": "#7c5f47",
+        "skin1": "#a47e5d",
+        "skin2": "#c89a72",
+        "skin3": "#d3ae8e",
+        "hair0": "#151519",
+        "hair1": "#202026",
+        "hair2": "#2a2a32",
+        "hair3": "#6a6a70",
+        "cloth0": "#58482b",
+        "cloth1": "#897043",
+        "cloth2": "#c4a060",
+        "cloth3": "#dfcba8"
+      },
+      "species": "winged"
+    },
+    "special_sky_skadi": {
+      "general": false,
+      "name": "Gale-Mistress Skadi",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#6c6962",
+        "hair1": "#a29e93",
+        "hair2": "#d8d2c4",
+        "hair3": "#e4e0d6",
+        "cloth0": "#535a65",
+        "cloth1": "#818c9d",
+        "cloth2": "#b8c8e0",
+        "cloth3": "#d8e1ee"
+      },
+      "species": "winged"
+    },
+    "special_sky_brokk": {
+      "general": false,
+      "name": "Prism-smith Brokk",
+      "materials": {
+        "skin0": "#7c5f47",
+        "skin1": "#a47e5d",
+        "skin2": "#c89a72",
+        "skin3": "#d3ae8e",
+        "hair0": "#451d0d",
+        "hair1": "#682c14",
+        "hair2": "#8a3a1a",
+        "hair3": "#ad755f",
+        "cloth0": "#5e3e28",
+        "cloth1": "#92613f",
+        "cloth2": "#d08a5a",
+        "cloth3": "#e5bfa4"
+      },
+      "species": "winged"
+    },
+    "special_sky_veleda": {
+      "general": false,
+      "name": "Stormseer Veleda",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#454545",
+        "hair1": "#686868",
+        "hair2": "#8a8a8a",
+        "hair3": "#adadad",
+        "cloth0": "#4c3e56",
+        "cloth1": "#766186",
+        "cloth2": "#a88ac0",
+        "cloth3": "#cfbfdc"
+      },
+      "species": "winged"
+    },
+    "special_sky_thorgrim": {
+      "general": false,
+      "name": "Thorgrim Hallskald",
+      "materials": {
+        "skin0": "#7c5f47",
+        "skin1": "#a47e5d",
+        "skin2": "#c89a72",
+        "skin3": "#d3ae8e",
+        "hair0": "#6c6962",
+        "hair1": "#a29e93",
+        "hair2": "#d8d2c4",
+        "hair3": "#e4e0d6",
+        "cloth0": "#373e45",
+        "cloth1": "#55616c",
+        "cloth2": "#7a8a9a",
+        "cloth3": "#b6bfc7"
+      },
+      "species": "winged"
+    },
+    "special_travel_perch": {
+      "general": false,
+      "name": "Travel Master",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      },
+      "species": "winged"
+    },
+    "special_span_guide": {
+      "general": false,
+      "name": "Valkyrie Astrid Bridgeward",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#746844",
+        "hair1": "#ae9c66",
+        "hair2": "#e8d088",
+        "hair3": "#efdeac",
+        "cloth0": "#3a5f6d",
+        "cloth1": "#5b94a9",
+        "cloth2": "#82d4f2",
+        "cloth3": "#bae7f8"
+      },
+      "species": "winged"
+    },
+    "special_span_chronicler": {
+      "general": false,
+      "name": "Soren Shardkeeper",
+      "materials": {
+        "skin0": "#7c5f47",
+        "skin1": "#a47e5d",
+        "skin2": "#c89a72",
+        "skin3": "#d3ae8e",
+        "hair0": "#5c6470",
+        "hair1": "#8a96a8",
+        "hair2": "#b8c8e0",
+        "hair3": "#cdd8e9",
+        "cloth0": "#5f466c",
+        "cloth1": "#946da8",
+        "cloth2": "#d49cf0",
+        "cloth3": "#e7c9f7"
+      },
+      "species": "winged"
+    },
+    "special_nacre_envoy": {
+      "general": false,
+      "name": "Lyris Pearlvoice",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#6a5b3e",
+        "cloth1": "#a58e60",
+        "cloth2": "#eccb89",
+        "cloth3": "#f5e2be"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_healer": {
+      "general": false,
+      "name": "Nerissa Stillwater",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#3a605c",
+        "cloth1": "#5a968f",
+        "cloth2": "#81d6cc",
+        "cloth3": "#bae8e3"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_trader": {
+      "general": false,
+      "name": "Orin Shellweaver",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#5c3144",
+        "hair1": "#8b4a67",
+        "hair2": "#b96289",
+        "hair3": "#ce91ac",
+        "cloth0": "#694d5a",
+        "cloth1": "#a3788c",
+        "cloth2": "#e9acc8",
+        "cloth3": "#f3d1e1"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_smith": {
+      "general": false,
+      "name": "Thalos Reefhammer",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#6a5b3e",
+        "cloth1": "#a58e60",
+        "cloth2": "#eccb89",
+        "cloth3": "#f5e2be"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_archivist": {
+      "general": false,
+      "name": "Vaela Inkfin",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#3a605c",
+        "cloth1": "#5a968f",
+        "cloth2": "#81d6cc",
+        "cloth3": "#bae8e3"
+      },
+      "species": "merfolk"
+    },
+    "special_banker_nacrehold": {
+      "general": false,
+      "name": "Perla Tidekeeper",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#30484e",
+        "hair1": "#476b75",
+        "hair2": "#5f8f9c",
+        "hair3": "#8fb1ba",
+        "cloth0": "#665260",
+        "cloth1": "#9e8096",
+        "cloth2": "#e2b7d6",
+        "cloth3": "#efd7e8"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_gardener": {
+      "general": false,
+      "name": "Pelar Kelpbraid",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#121f31",
+        "hair1": "#1b2e4a",
+        "hair2": "#243e62",
+        "hair3": "#667891",
+        "cloth0": "#694d5a",
+        "cloth1": "#a3788c",
+        "cloth2": "#e9acc8",
+        "cloth3": "#f3d1e1"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_singer": {
+      "general": false,
+      "name": "Syllene Softsong",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#121f31",
+        "hair1": "#1b2e4a",
+        "hair2": "#243e62",
+        "hair3": "#667891",
+        "cloth0": "#694d5a",
+        "cloth1": "#a3788c",
+        "cloth2": "#e9acc8",
+        "cloth3": "#f3d1e1"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_warden": {
+      "general": false,
+      "name": "Captain Namar Deepwatch",
+      "materials": {
+        "skin0": "#7f7691",
+        "skin1": "#a89dc0",
+        "skin2": "#cdbfea",
+        "skin3": "#d7ccee",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#6a5143",
+        "cloth1": "#a57d68",
+        "cloth2": "#ecb395",
+        "cloth3": "#f5d5c5"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_innkeeper": {
+      "general": false,
+      "name": "Maera Warmcurrent",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#3a605c",
+        "cloth1": "#5a968f",
+        "cloth2": "#81d6cc",
+        "cloth3": "#bae8e3"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_lamplighter": {
+      "general": false,
+      "name": "Ilo Glowfin",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#3a605c",
+        "cloth1": "#5a968f",
+        "cloth2": "#81d6cc",
+        "cloth3": "#bae8e3"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_0": {
+      "general": false,
+      "name": "Aren",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#6a5b3e",
+        "cloth1": "#a58e60",
+        "cloth2": "#eccb89",
+        "cloth3": "#f5e2be"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_1": {
+      "general": false,
+      "name": "Miriel",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#5c3144",
+        "hair1": "#8b4a67",
+        "hair2": "#b96289",
+        "hair3": "#ce91ac",
+        "cloth0": "#3f5663",
+        "cloth1": "#63859a",
+        "cloth2": "#8dbedc",
+        "cloth3": "#c0dbec"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_2": {
+      "general": false,
+      "name": "Kovar",
+      "materials": {
+        "skin0": "#7f7691",
+        "skin1": "#a89dc0",
+        "skin2": "#cdbfea",
+        "skin3": "#d7ccee",
+        "hair0": "#22413d",
+        "hair1": "#32625c",
+        "hair2": "#43827a",
+        "hair3": "#7ba8a2",
+        "cloth0": "#6a5143",
+        "cloth1": "#a57d68",
+        "cloth2": "#ecb395",
+        "cloth3": "#f5d5c5"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_3": {
+      "general": false,
+      "name": "Oceane",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#121f31",
+        "hair1": "#1b2e4a",
+        "hair2": "#243e62",
+        "hair3": "#667891",
+        "cloth0": "#694d5a",
+        "cloth1": "#a3788c",
+        "cloth2": "#e9acc8",
+        "cloth3": "#f3d1e1"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_4": {
+      "general": false,
+      "name": "Tethis",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#3a605c",
+        "cloth1": "#5a968f",
+        "cloth2": "#81d6cc",
+        "cloth3": "#bae8e3"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_5": {
+      "general": false,
+      "name": "Luma",
+      "materials": {
+        "skin0": "#7f7691",
+        "skin1": "#a89dc0",
+        "skin2": "#cdbfea",
+        "skin3": "#d7ccee",
+        "hair0": "#5c3144",
+        "hair1": "#8b4a67",
+        "hair2": "#b96289",
+        "hair3": "#ce91ac",
+        "cloth0": "#50516c",
+        "cloth1": "#7d7ea7",
+        "cloth2": "#b2b4ef",
+        "cloth3": "#d5d6f6"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_6": {
+      "general": false,
+      "name": "Soren",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#22413d",
+        "hair1": "#32625c",
+        "hair2": "#43827a",
+        "hair3": "#7ba8a2",
+        "cloth0": "#6a5b3e",
+        "cloth1": "#a58e60",
+        "cloth2": "#eccb89",
+        "cloth3": "#f5e2be"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_7": {
+      "general": false,
+      "name": "Elyra",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#121f31",
+        "hair1": "#1b2e4a",
+        "hair2": "#243e62",
+        "hair3": "#667891",
+        "cloth0": "#3f5663",
+        "cloth1": "#63859a",
+        "cloth2": "#8dbedc",
+        "cloth3": "#c0dbec"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_8": {
+      "general": false,
+      "name": "Brin",
+      "materials": {
+        "skin0": "#7f7691",
+        "skin1": "#a89dc0",
+        "skin2": "#cdbfea",
+        "skin3": "#d7ccee",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#6a5143",
+        "cloth1": "#a57d68",
+        "cloth2": "#ecb395",
+        "cloth3": "#f5d5c5"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_9": {
+      "general": false,
+      "name": "Coralie",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#5c3144",
+        "hair1": "#8b4a67",
+        "hair2": "#b96289",
+        "hair3": "#ce91ac",
+        "cloth0": "#694d5a",
+        "cloth1": "#a3788c",
+        "cloth2": "#e9acc8",
+        "cloth3": "#f3d1e1"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_10": {
+      "general": false,
+      "name": "Damar",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#5c3144",
+        "hair1": "#8b4a67",
+        "hair2": "#b96289",
+        "hair3": "#ce91ac",
+        "cloth0": "#3f5663",
+        "cloth1": "#63859a",
+        "cloth2": "#8dbedc",
+        "cloth3": "#c0dbec"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_11": {
+      "general": false,
+      "name": "Iselle",
+      "materials": {
+        "skin0": "#7f7691",
+        "skin1": "#a89dc0",
+        "skin2": "#cdbfea",
+        "skin3": "#d7ccee",
+        "hair0": "#22413d",
+        "hair1": "#32625c",
+        "hair2": "#43827a",
+        "hair3": "#7ba8a2",
+        "cloth0": "#6a5143",
+        "cloth1": "#a57d68",
+        "cloth2": "#ecb395",
+        "cloth3": "#f5d5c5"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_12": {
+      "general": false,
+      "name": "Kelp",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#121f31",
+        "hair1": "#1b2e4a",
+        "hair2": "#243e62",
+        "hair3": "#667891",
+        "cloth0": "#694d5a",
+        "cloth1": "#a3788c",
+        "cloth2": "#e9acc8",
+        "cloth3": "#f3d1e1"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_13": {
+      "general": false,
+      "name": "Pearl",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#3a605c",
+        "cloth1": "#5a968f",
+        "cloth2": "#81d6cc",
+        "cloth3": "#bae8e3"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_14": {
+      "general": false,
+      "name": "Finn",
+      "materials": {
+        "skin0": "#7f7691",
+        "skin1": "#a89dc0",
+        "skin2": "#cdbfea",
+        "skin3": "#d7ccee",
+        "hair0": "#5c3144",
+        "hair1": "#8b4a67",
+        "hair2": "#b96289",
+        "hair3": "#ce91ac",
+        "cloth0": "#50516c",
+        "cloth1": "#7d7ea7",
+        "cloth2": "#b2b4ef",
+        "cloth3": "#d5d6f6"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_15": {
+      "general": false,
+      "name": "Nori",
+      "materials": {
+        "skin0": "#66887d",
+        "skin1": "#86b4a5",
+        "skin2": "#a4dbc9",
+        "skin3": "#b6e2d4",
+        "hair0": "#22413d",
+        "hair1": "#32625c",
+        "hair2": "#43827a",
+        "hair3": "#7ba8a2",
+        "cloth0": "#6a5b3e",
+        "cloth1": "#a58e60",
+        "cloth2": "#eccb89",
+        "cloth3": "#f5e2be"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_16": {
+      "general": false,
+      "name": "Reef",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#121f31",
+        "hair1": "#1b2e4a",
+        "hair2": "#243e62",
+        "hair3": "#667891",
+        "cloth0": "#3f5663",
+        "cloth1": "#63859a",
+        "cloth2": "#8dbedc",
+        "cloth3": "#c0dbec"
+      },
+      "species": "merfolk"
+    },
+    "special_nacre_resident_17": {
+      "general": false,
+      "name": "Mira",
+      "materials": {
+        "skin0": "#7f7691",
+        "skin1": "#a89dc0",
+        "skin2": "#cdbfea",
+        "skin3": "#d7ccee",
+        "hair0": "#766e5e",
+        "hair1": "#b0a48e",
+        "hair2": "#ebdbbd",
+        "hair3": "#f1e6d1",
+        "cloth0": "#6a5143",
+        "cloth1": "#a57d68",
+        "cloth2": "#ecb395",
+        "cloth3": "#f5d5c5"
+      },
+      "species": "merfolk"
+    },
+    "special_travel_nacrehold": {
+      "general": false,
+      "name": "Travel Master Auralis",
+      "materials": {
+        "skin0": "#6a838d",
+        "skin1": "#8caebb",
+        "skin2": "#abd4e4",
+        "skin3": "#bcdde9",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      },
+      "species": "merfolk"
+    },
+    "special_astral_steward": {
+      "general": false,
+      "name": "Seren Starwatcher",
+      "materials": {
+        "skin0": "#8f7c6d",
+        "skin1": "#bda490",
+        "skin2": "#e7c8b0",
+        "skin3": "#ecd3c0",
+        "hair0": "#6c6880",
+        "hair1": "#a39dbf",
+        "hair2": "#d9d1ff",
+        "hair3": "#e4dfff",
+        "cloth0": "#534a73",
+        "cloth1": "#8273b2",
+        "cloth2": "#b9a4ff",
+        "cloth3": "#d8cdff"
+      }
+    },
+    "special_banker_astralhollow": {
+      "general": false,
+      "name": "Ilvane Stargaler",
+      "materials": {
+        "skin0": "#877668",
+        "skin1": "#b29d8a",
+        "skin2": "#d9bfa8",
+        "skin3": "#e1ccb9",
+        "hair0": "#505b74",
+        "hair1": "#7788ae",
+        "hair2": "#9fb6e8",
+        "hair3": "#bcccef",
+        "cloth0": "#405173",
+        "cloth1": "#647eb2",
+        "cloth2": "#8fb4ff",
+        "cloth3": "#c1d6ff"
+      }
+    },
+    "special_astral_healer": {
+      "general": false,
+      "name": "Ilyra Nightbloom",
+      "materials": {
+        "skin0": "#8f7c6d",
+        "skin1": "#bda490",
+        "skin2": "#e7c8b0",
+        "skin3": "#ecd3c0",
+        "hair0": "#6c6880",
+        "hair1": "#a39dbf",
+        "hair2": "#d9d1ff",
+        "hair3": "#e4dfff",
+        "cloth0": "#534a73",
+        "cloth1": "#8273b2",
+        "cloth2": "#b9a4ff",
+        "cloth3": "#d8cdff"
+      }
+    },
+    "special_astral_scholar": {
+      "general": false,
+      "name": "Vey Orison",
+      "materials": {
+        "skin0": "#8f7c6d",
+        "skin1": "#bda490",
+        "skin2": "#e7c8b0",
+        "skin3": "#ecd3c0",
+        "hair0": "#6c6880",
+        "hair1": "#a39dbf",
+        "hair2": "#d9d1ff",
+        "hair3": "#e4dfff",
+        "cloth0": "#534a73",
+        "cloth1": "#8273b2",
+        "cloth2": "#b9a4ff",
+        "cloth3": "#d8cdff"
+      }
+    },
+    "special_astral_gardener": {
+      "general": false,
+      "name": "Thalia Moonroot",
+      "materials": {
+        "skin0": "#8f7c6d",
+        "skin1": "#bda490",
+        "skin2": "#e7c8b0",
+        "skin3": "#ecd3c0",
+        "hair0": "#6c6880",
+        "hair1": "#a39dbf",
+        "hair2": "#d9d1ff",
+        "hair3": "#e4dfff",
+        "cloth0": "#534a73",
+        "cloth1": "#8273b2",
+        "cloth2": "#b9a4ff",
+        "cloth3": "#d8cdff"
+      }
+    },
+    "special_astral_warden": {
+      "general": false,
+      "name": "Orun Nightshield",
+      "materials": {
+        "skin0": "#8f7c6d",
+        "skin1": "#bda490",
+        "skin2": "#e7c8b0",
+        "skin3": "#ecd3c0",
+        "hair0": "#6c6880",
+        "hair1": "#a39dbf",
+        "hair2": "#d9d1ff",
+        "hair3": "#e4dfff",
+        "cloth0": "#534a73",
+        "cloth1": "#8273b2",
+        "cloth2": "#b9a4ff",
+        "cloth3": "#d8cdff"
+      }
+    },
+    "special_astral_trader": {
+      "general": false,
+      "name": "Pell of the Nine Lights",
+      "materials": {
+        "skin0": "#8f7c6d",
+        "skin1": "#bda490",
+        "skin2": "#e7c8b0",
+        "skin3": "#ecd3c0",
+        "hair0": "#6c6880",
+        "hair1": "#a39dbf",
+        "hair2": "#d9d1ff",
+        "hair3": "#e4dfff",
+        "cloth0": "#534a73",
+        "cloth1": "#8273b2",
+        "cloth2": "#b9a4ff",
+        "cloth3": "#d8cdff"
+      }
+    },
+    "special_travel_astralhollow": {
+      "general": false,
+      "name": "Travel Master",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_prism_keeper": {
+      "general": false,
+      "name": "Mara Vey",
+      "materials": {
+        "skin0": "#887463",
+        "skin1": "#b49983",
+        "skin2": "#dcbba0",
+        "skin3": "#e3c9b3",
+        "hair0": "#6b5844",
+        "hair1": "#a08366",
+        "hair2": "#d6af88",
+        "hair3": "#e2c7ac",
+        "cloth0": "#6e583c",
+        "cloth1": "#ab895e",
+        "cloth2": "#f4c486",
+        "cloth3": "#f9dfbc"
+      }
+    },
+    "special_prism_healer": {
+      "general": false,
+      "name": "Sela Dawnglass",
+      "materials": {
+        "skin0": "#887463",
+        "skin1": "#b49983",
+        "skin2": "#dcbba0",
+        "skin3": "#e3c9b3",
+        "hair0": "#6b5844",
+        "hair1": "#a08366",
+        "hair2": "#d6af88",
+        "hair3": "#e2c7ac",
+        "cloth0": "#6e583c",
+        "cloth1": "#ab895e",
+        "cloth2": "#f4c486",
+        "cloth3": "#f9dfbc"
+      }
+    },
+    "special_prism_scout": {
+      "general": false,
+      "name": "Tarin Glassrunner",
+      "materials": {
+        "skin0": "#887463",
+        "skin1": "#b49983",
+        "skin2": "#dcbba0",
+        "skin3": "#e3c9b3",
+        "hair0": "#6b5844",
+        "hair1": "#a08366",
+        "hair2": "#d6af88",
+        "hair3": "#e2c7ac",
+        "cloth0": "#6e583c",
+        "cloth1": "#ab895e",
+        "cloth2": "#f4c486",
+        "cloth3": "#f9dfbc"
+      }
+    },
+    "special_prism_scholar": {
+      "general": false,
+      "name": "Asha of the Lens",
+      "materials": {
+        "skin0": "#887463",
+        "skin1": "#b49983",
+        "skin2": "#dcbba0",
+        "skin3": "#e3c9b3",
+        "hair0": "#6b5844",
+        "hair1": "#a08366",
+        "hair2": "#d6af88",
+        "hair3": "#e2c7ac",
+        "cloth0": "#6e583c",
+        "cloth1": "#ab895e",
+        "cloth2": "#f4c486",
+        "cloth3": "#f9dfbc"
+      }
+    },
+    "special_prism_trader": {
+      "general": false,
+      "name": "Pell Ashcoin",
+      "materials": {
+        "skin0": "#887463",
+        "skin1": "#b49983",
+        "skin2": "#dcbba0",
+        "skin3": "#e3c9b3",
+        "hair0": "#6b5844",
+        "hair1": "#a08366",
+        "hair2": "#d6af88",
+        "hair3": "#e2c7ac",
+        "cloth0": "#6e583c",
+        "cloth1": "#ab895e",
+        "cloth2": "#f4c486",
+        "cloth3": "#f9dfbc"
+      }
+    },
+    "special_travel_last_shade": {
+      "general": false,
+      "name": "Travel Master",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_orrery_keeper": {
+      "general": false,
+      "name": "Ilyra Cogsong",
+      "materials": {
+        "skin0": "#7d5e45",
+        "skin1": "#a57c5c",
+        "skin2": "#c99770",
+        "skin3": "#d4ac8d",
+        "hair0": "#6e5e49",
+        "hair1": "#a68e6e",
+        "hair2": "#ddbd92",
+        "hair3": "#e7d1b3",
+        "cloth0": "#6c5a36",
+        "cloth1": "#a78c55",
+        "cloth2": "#efc879",
+        "cloth3": "#f6e1b5"
+      }
+    },
+    "special_orrery_healer": {
+      "general": false,
+      "name": "Neris Brasshand",
+      "materials": {
+        "skin0": "#7d5e45",
+        "skin1": "#a57c5c",
+        "skin2": "#c99770",
+        "skin3": "#d4ac8d",
+        "hair0": "#6e5e49",
+        "hair1": "#a68e6e",
+        "hair2": "#ddbd92",
+        "hair3": "#e7d1b3",
+        "cloth0": "#6c5a36",
+        "cloth1": "#a78c55",
+        "cloth2": "#efc879",
+        "cloth3": "#f6e1b5"
+      }
+    },
+    "special_orrery_scout": {
+      "general": false,
+      "name": "Rook Vesper",
+      "materials": {
+        "skin0": "#7d5e45",
+        "skin1": "#a57c5c",
+        "skin2": "#c99770",
+        "skin3": "#d4ac8d",
+        "hair0": "#6e5e49",
+        "hair1": "#a68e6e",
+        "hair2": "#ddbd92",
+        "hair3": "#e7d1b3",
+        "cloth0": "#6c5a36",
+        "cloth1": "#a78c55",
+        "cloth2": "#efc879",
+        "cloth3": "#f6e1b5"
+      }
+    },
+    "special_orrery_scholar": {
+      "general": false,
+      "name": "Edda Pendulum",
+      "materials": {
+        "skin0": "#7d5e45",
+        "skin1": "#a57c5c",
+        "skin2": "#c99770",
+        "skin3": "#d4ac8d",
+        "hair0": "#6e5e49",
+        "hair1": "#a68e6e",
+        "hair2": "#ddbd92",
+        "hair3": "#e7d1b3",
+        "cloth0": "#6c5a36",
+        "cloth1": "#a78c55",
+        "cloth2": "#efc879",
+        "cloth3": "#f6e1b5"
+      }
+    },
+    "special_orrery_trader": {
+      "general": false,
+      "name": "Oren Flint",
+      "materials": {
+        "skin0": "#7d5e45",
+        "skin1": "#a57c5c",
+        "skin2": "#c99770",
+        "skin3": "#d4ac8d",
+        "hair0": "#6e5e49",
+        "hair1": "#a68e6e",
+        "hair2": "#ddbd92",
+        "hair3": "#e7d1b3",
+        "cloth0": "#6c5a36",
+        "cloth1": "#a78c55",
+        "cloth2": "#efc879",
+        "cloth3": "#f6e1b5"
+      }
+    },
+    "special_travel_stillpoint": {
+      "general": false,
+      "name": "Travel Master",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_moonspore_warden": {
+      "general": false,
+      "name": "Eira Lanternkeeper",
+      "materials": {
+        "skin0": "#847062",
+        "skin1": "#af9482",
+        "skin2": "#d5b59e",
+        "skin3": "#ddc4b1",
+        "hair0": "#5e776a",
+        "hair1": "#8eb2a0",
+        "hair2": "#bdeed5",
+        "hair3": "#d1f3e2",
+        "cloth0": "#4a675b",
+        "cloth1": "#73a08d",
+        "cloth2": "#a5e5ca",
+        "cloth3": "#cef1e2"
+      }
+    },
+    "special_moonspore_healer": {
+      "general": false,
+      "name": "Solvi Dewmender",
+      "materials": {
+        "skin0": "#847062",
+        "skin1": "#af9482",
+        "skin2": "#d5b59e",
+        "skin3": "#ddc4b1",
+        "hair0": "#5e776a",
+        "hair1": "#8eb2a0",
+        "hair2": "#bdeed5",
+        "hair3": "#d1f3e2",
+        "cloth0": "#4a675b",
+        "cloth1": "#73a08d",
+        "cloth2": "#a5e5ca",
+        "cloth3": "#cef1e2"
+      }
+    },
+    "special_moonspore_ranger": {
+      "general": false,
+      "name": "Tamsin Threadmark",
+      "materials": {
+        "skin0": "#847062",
+        "skin1": "#af9482",
+        "skin2": "#d5b59e",
+        "skin3": "#ddc4b1",
+        "hair0": "#5e776a",
+        "hair1": "#8eb2a0",
+        "hair2": "#bdeed5",
+        "hair3": "#d1f3e2",
+        "cloth0": "#4a675b",
+        "cloth1": "#73a08d",
+        "cloth2": "#a5e5ca",
+        "cloth3": "#cef1e2"
+      }
+    },
+    "special_moonspore_scholar": {
+      "general": false,
+      "name": "Odo Sporeglass",
+      "materials": {
+        "skin0": "#847062",
+        "skin1": "#af9482",
+        "skin2": "#d5b59e",
+        "skin3": "#ddc4b1",
+        "hair0": "#5e776a",
+        "hair1": "#8eb2a0",
+        "hair2": "#bdeed5",
+        "hair3": "#d1f3e2",
+        "cloth0": "#4a675b",
+        "cloth1": "#73a08d",
+        "cloth2": "#a5e5ca",
+        "cloth3": "#cef1e2"
+      }
+    },
+    "special_moonspore_trader": {
+      "general": false,
+      "name": "Pell Mosscoin",
+      "materials": {
+        "skin0": "#847062",
+        "skin1": "#af9482",
+        "skin2": "#d5b59e",
+        "skin3": "#ddc4b1",
+        "hair0": "#5e776a",
+        "hair1": "#8eb2a0",
+        "hair2": "#bdeed5",
+        "hair3": "#d1f3e2",
+        "cloth0": "#4a675b",
+        "cloth1": "#73a08d",
+        "cloth2": "#a5e5ca",
+        "cloth3": "#cef1e2"
+      }
+    },
+    "special_moonspore_seer": {
+      "general": false,
+      "name": "Ysra Palefern",
+      "materials": {
+        "skin0": "#847062",
+        "skin1": "#af9482",
+        "skin2": "#d5b59e",
+        "skin3": "#ddc4b1",
+        "hair0": "#5e776a",
+        "hair1": "#8eb2a0",
+        "hair2": "#bdeed5",
+        "hair3": "#d1f3e2",
+        "cloth0": "#4a675b",
+        "cloth1": "#73a08d",
+        "cloth2": "#a5e5ca",
+        "cloth3": "#cef1e2"
+      }
+    },
+    "special_travel_lamplight": {
+      "general": false,
+      "name": "Travel Master",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_asterion_archon": {
+      "general": false,
+      "name": "Archon Seraphine Vey",
+      "materials": {
+        "skin0": "#7b5844",
+        "skin1": "#a3745a",
+        "skin2": "#c78e6e",
+        "skin3": "#d2a58b",
+        "hair0": "#79746a",
+        "hair1": "#b6ada0",
+        "hair2": "#f2e7d5",
+        "hair3": "#f6eee2",
+        "cloth0": "#524a63",
+        "cloth1": "#80739b",
+        "cloth2": "#b7a5dd",
+        "cloth3": "#d7ceec"
+      }
+    },
+    "special_banker_asterion": {
+      "general": false,
+      "name": "Archon Veyl",
+      "materials": {
+        "skin0": "#7b5844",
+        "skin1": "#a3745a",
+        "skin2": "#c78e6e",
+        "skin3": "#d2a58b",
+        "hair0": "#79746a",
+        "hair1": "#b6ada0",
+        "hair2": "#f2e7d5",
+        "hair3": "#f6eee2",
+        "cloth0": "#5a5268",
+        "cloth1": "#8b7fa2",
+        "cloth2": "#c7b6e8",
+        "cloth3": "#e0d7f2"
+      }
+    },
+    "special_asterion_cartographer": {
+      "general": false,
+      "name": "Ixo the Many-Eyed",
+      "materials": {
+        "skin0": "#5c4542",
+        "skin1": "#795b58",
+        "skin2": "#946f6b",
+        "skin3": "#a98c89",
+        "hair0": "#786432",
+        "hair1": "#b5954c",
+        "hair2": "#f1c765",
+        "hair3": "#f5d893",
+        "cloth0": "#36565f",
+        "cloth1": "#548694",
+        "cloth2": "#78bfd3",
+        "cloth3": "#b5dce7"
+      }
+    },
+    "special_asterion_bellkeeper": {
+      "general": false,
+      "name": "Mora Thirteenbells",
+      "materials": {
+        "skin0": "#8d6953",
+        "skin1": "#bb8b6e",
+        "skin2": "#e4aa86",
+        "skin3": "#e9bb9e",
+        "hair0": "#7e7868",
+        "hair1": "#bcb49c",
+        "hair2": "#fbf0d0",
+        "hair3": "#fcf4de",
+        "cloth0": "#685534",
+        "cloth1": "#a18450",
+        "cloth2": "#e6bd73",
+        "cloth3": "#f1dbb2"
+      }
+    },
+    "special_asterion_gardener": {
+      "general": false,
+      "name": "Umi of the Roofs",
+      "materials": {
+        "skin0": "#442d25",
+        "skin1": "#593c31",
+        "skin2": "#6d493c",
+        "skin3": "#8a6d63",
+        "hair0": "#647869",
+        "hair1": "#96b49e",
+        "hair2": "#c8f0d2",
+        "hair3": "#d8f4e0",
+        "cloth0": "#385849",
+        "cloth1": "#588871",
+        "cloth2": "#7dc3a2",
+        "cloth3": "#b8decc"
+      }
+    },
+    "special_asterion_healer": {
+      "general": false,
+      "name": "Doctor Pell Prism",
+      "materials": {
+        "skin0": "#47342c",
+        "skin1": "#5e453a",
+        "skin2": "#735447",
+        "skin3": "#8f766c",
+        "hair0": "#6c747a",
+        "hair1": "#a1afb6",
+        "hair2": "#d7e9f3",
+        "hair3": "#e3f0f7",
+        "cloth0": "#61676c",
+        "cloth1": "#96a0a8",
+        "cloth2": "#d7e4f0",
+        "cloth3": "#e9f0f7"
+      }
+    },
+    "special_asterion_merchant": {
+      "general": false,
+      "name": "Nim Copperkite",
+      "materials": {
+        "skin0": "#714f35",
+        "skin1": "#966846",
+        "skin2": "#b77f55",
+        "skin3": "#c59977",
+        "hair0": "#241d34",
+        "hair1": "#372c4d",
+        "hair2": "#493a67",
+        "hair3": "#807595",
+        "cloth0": "#684b38",
+        "cloth1": "#a17557",
+        "cloth2": "#e6a77c",
+        "cloth3": "#f1cfb7"
+      }
+    },
+    "special_asterion_stonewarden": {
+      "general": false,
+      "name": "Voss the Unmoored",
+      "materials": {
+        "skin0": "#6c4f44",
+        "skin1": "#8f6959",
+        "skin2": "#ae806d",
+        "skin3": "#be998a",
+        "hair0": "#7e7b72",
+        "hair1": "#bdb8aa",
+        "hair2": "#fcf6e3",
+        "hair3": "#fdf9eb",
+        "cloth0": "#475a63",
+        "cloth1": "#6f8c9b",
+        "cloth2": "#9ec8dd",
+        "cloth3": "#cae1ec"
+      }
+    },
+    "special_asterion_singer": {
+      "general": false,
+      "name": "Vela Glassvoice",
+      "materials": {
+        "skin0": "#704537",
+        "skin1": "#945c49",
+        "skin2": "#b47059",
+        "skin3": "#c38d7a",
+        "hair0": "#161426",
+        "hair1": "#201d3a",
+        "hair2": "#2b274d",
+        "hair3": "#6b6882",
+        "cloth0": "#6c5941",
+        "cloth1": "#a88b65",
+        "cloth2": "#f0c690",
+        "cloth3": "#f7e0c2"
+      }
+    },
+    "special_asterion_smith": {
+      "general": false,
+      "name": "Bramble Gilt",
+      "materials": {
+        "skin0": "#483930",
+        "skin1": "#5f4b40",
+        "skin2": "#745c4e",
+        "skin3": "#907d71",
+        "hair0": "#64482a",
+        "hair1": "#956c40",
+        "hair2": "#c79055",
+        "hair3": "#d8b188",
+        "cloth0": "#55424b",
+        "cloth1": "#846775",
+        "cloth2": "#bd93a7",
+        "cloth3": "#dbc4cf"
+      }
+    },
+    "special_asterion_walker0": {
+      "general": false,
+      "name": "Tavi Kite",
+      "materials": {
+        "skin0": "#694735",
+        "skin1": "#8b5e46",
+        "skin2": "#aa7355",
+        "skin3": "#bb8f77",
+        "hair0": "#746a51",
+        "hair1": "#af9f7a",
+        "hair2": "#e9d4a2",
+        "hair3": "#f0e1be",
+        "cloth0": "#664c56",
+        "cloth1": "#9e7686",
+        "cloth2": "#e2a8c0",
+        "cloth3": "#efcfdc"
+      }
+    },
+    "special_asterion_walker1": {
+      "general": false,
+      "name": "Orro",
+      "materials": {
+        "skin0": "#45312d",
+        "skin1": "#5c413b",
+        "skin2": "#704f48",
+        "skin3": "#8d726d",
+        "hair0": "#716874",
+        "hair1": "#aa9cae",
+        "hair2": "#e2d0e8",
+        "hair3": "#ebdeef",
+        "cloth0": "#415262",
+        "cloth1": "#668098",
+        "cloth2": "#91b7d9",
+        "cloth3": "#c2d7ea"
+      }
+    },
+    "special_asterion_walker2": {
+      "general": false,
+      "name": "Jin Sunthread",
+      "materials": {
+        "skin0": "#724432",
+        "skin1": "#975942",
+        "skin2": "#b86d50",
+        "skin3": "#c68a73",
+        "hair0": "#161824",
+        "hair1": "#212536",
+        "hair2": "#2c3148",
+        "hair3": "#6b6f7f",
+        "cloth0": "#645534",
+        "cloth1": "#9c8450",
+        "cloth2": "#dfbd73",
+        "cloth3": "#eddbb2"
+      }
+    },
+    "special_asterion_walker3": {
+      "general": false,
+      "name": "Dessa of Nine Doors",
+      "materials": {
+        "skin0": "#443027",
+        "skin1": "#5a4034",
+        "skin2": "#6e4e3f",
+        "skin3": "#8b7165",
+        "hair0": "#7c7870",
+        "hair1": "#b9b4a9",
+        "hair2": "#f7f0e1",
+        "hair3": "#f9f4ea",
+        "cloth0": "#524862",
+        "cloth1": "#807198",
+        "cloth2": "#b7a1d9",
+        "cloth3": "#d7cbea"
+      }
+    },
+    "special_asterion_walker4": {
+      "general": false,
+      "name": "Malo Inkhand",
+      "materials": {
+        "skin0": "#7d5e49",
+        "skin1": "#a57d60",
+        "skin2": "#c99875",
+        "skin3": "#d4ad91",
+        "hair0": "#14182a",
+        "hair1": "#1f2340",
+        "hair2": "#292f55",
+        "hair3": "#696d88",
+        "cloth0": "#3a5851",
+        "cloth1": "#5a887e",
+        "cloth2": "#81c3b4",
+        "cloth3": "#baded6"
+      }
+    },
+    "special_asterion_walker5": {
+      "general": false,
+      "name": "Piri Starling",
+      "materials": {
+        "skin0": "#614435",
+        "skin1": "#815947",
+        "skin2": "#9d6d56",
+        "skin3": "#b18a78",
+        "hair0": "#6a6a7a",
+        "hair1": "#a09eb7",
+        "hair2": "#d5d3f4",
+        "hair3": "#e2e0f7",
+        "cloth0": "#6b473b",
+        "cloth1": "#a76e5c",
+        "cloth2": "#ee9d83",
+        "cloth3": "#f6c9bb"
+      }
+    },
+    "special_asterion_walker6": {
+      "general": false,
+      "name": "Rook the Lantern",
+      "materials": {
+        "skin0": "#4b3830",
+        "skin1": "#634a3f",
+        "skin2": "#795a4d",
+        "skin3": "#947b71",
+        "hair0": "#735a36",
+        "hair1": "#ac8651",
+        "hair2": "#e6b36c",
+        "hair3": "#eeca98",
+        "cloth0": "#515d44",
+        "cloth1": "#7d9169",
+        "cloth2": "#b3cf96",
+        "cloth3": "#d5e5c5"
+      }
+    },
+    "special_asterion_walker7": {
+      "general": false,
+      "name": "Ari Copperglass",
+      "materials": {
+        "skin0": "#765444",
+        "skin1": "#9d7059",
+        "skin2": "#bf886d",
+        "skin3": "#cca08a",
+        "hair0": "#161a24",
+        "hair1": "#212837",
+        "hair2": "#2c3549",
+        "hair3": "#6b7280",
+        "cloth0": "#485966",
+        "cloth1": "#6f8b9e",
+        "cloth2": "#9fc6e2",
+        "cloth3": "#cae0ef"
+      }
+    },
+    "special_asterion_walker8": {
+      "general": false,
+      "name": "Yana Two-Moons",
+      "materials": {
+        "skin0": "#523a2b",
+        "skin1": "#6d4d39",
+        "skin2": "#855e45",
+        "skin3": "#9d7e6a",
+        "hair0": "#7a7469",
+        "hair1": "#b8ae9e",
+        "hair2": "#f5e8d2",
+        "hair3": "#f8efe0",
+        "cloth0": "#615162",
+        "cloth1": "#977e98",
+        "cloth2": "#d8b4d9",
+        "cloth3": "#ead6ea"
+      }
+    },
+    "special_asterion_walker9": {
+      "general": false,
+      "name": "Kes of the Steps",
+      "materials": {
+        "skin0": "#403128",
+        "skin1": "#544135",
+        "skin2": "#674f41",
+        "skin3": "#857267",
+        "hair0": "#74604c",
+        "hair1": "#ad8f71",
+        "hair2": "#e7bf97",
+        "hair3": "#eed2b6",
+        "cloth0": "#4f5d51",
+        "cloth1": "#7a917f",
+        "cloth2": "#afcfb5",
+        "cloth3": "#d3e5d6"
+      }
+    },
+    "special_travel_asterion": {
+      "general": false,
+      "name": "Travel Master",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_ew_citysmith": {
+      "general": false,
+      "name": "Runa Coalhand",
+      "materials": {
+        "skin0": "#7b5f4c",
+        "skin1": "#a27e65",
+        "skin2": "#c69a7b",
+        "skin3": "#d1ae95",
+        "hair0": "#2a1e1c",
+        "hair1": "#3e2d2b",
+        "hair2": "#533c39",
+        "hair3": "#877674",
+        "cloth0": "#2f333b",
+        "cloth1": "#4a4f5c",
+        "cloth2": "#697184",
+        "cloth3": "#acb1bb"
+      }
+    },
+    "special_sun_miller": {
+      "general": false,
+      "name": "Ada Bell",
+      "materials": {
+        "skin0": "#6c4938",
+        "skin1": "#8f614b",
+        "skin2": "#ae765b",
+        "skin3": "#be917c",
+        "hair0": "#321e18",
+        "hair1": "#4b2c23",
+        "hair2": "#643b2f",
+        "hair3": "#92766d",
+        "cloth0": "#73684a",
+        "cloth1": "#b2a173",
+        "cloth2": "#ffe6a5",
+        "cloth3": "#fff1ce"
+      }
+    },
+    "special_sun_keeper": {
+      "general": false,
+      "name": "Rowan Alder",
+      "materials": {
+        "skin0": "#513a2e",
+        "skin1": "#6b4d3d",
+        "skin2": "#835e4b",
+        "skin3": "#9c7e6f",
+        "hair0": "#69624e",
+        "hair1": "#9e9274",
+        "hair2": "#d2c39b",
+        "hair3": "#e0d5b9",
+        "cloth0": "#73684a",
+        "cloth1": "#b2a173",
+        "cloth2": "#ffe6a5",
+        "cloth3": "#fff1ce"
+      }
+    },
+    "special_travel_millbridge": {
+      "general": false,
+      "name": "Travel Master Jori",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_ribbon_host": {
+      "general": false,
+      "name": "Mira Vell",
+      "materials": {
+        "skin0": "#75513f",
+        "skin1": "#9b6b53",
+        "skin2": "#bd8365",
+        "skin3": "#ca9c84",
+        "hair0": "#38262a",
+        "hair1": "#553a3f",
+        "hair2": "#714d54",
+        "hair3": "#9c8287",
+        "cloth0": "#736c51",
+        "cloth1": "#b2a87f",
+        "cloth2": "#fff0b5",
+        "cloth3": "#fff7d6"
+      }
+    },
+    "special_ribbon_keeper": {
+      "general": false,
+      "name": "Iona Bell",
+      "materials": {
+        "skin0": "#75513f",
+        "skin1": "#9b6b53",
+        "skin2": "#bd8365",
+        "skin3": "#ca9c84",
+        "hair0": "#38262a",
+        "hair1": "#553a3f",
+        "hair2": "#714d54",
+        "hair3": "#9c8287",
+        "cloth0": "#736c51",
+        "cloth1": "#b2a87f",
+        "cloth2": "#fff0b5",
+        "cloth3": "#fff7d6"
+      }
+    },
+    "special_travel_jubilee": {
+      "general": false,
+      "name": "Travel Master Luma",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_tangle_warden": {
+      "general": false,
+      "name": "Asha Banyan",
+      "materials": {
+        "skin0": "#694330",
+        "skin1": "#8b5940",
+        "skin2": "#a96c4e",
+        "skin3": "#ba8971",
+        "hair0": "#131e18",
+        "hair1": "#1c2e25",
+        "hair2": "#263d31",
+        "hair3": "#67776f",
+        "cloth0": "#606c49",
+        "cloth1": "#96a971",
+        "cloth2": "#d6f1a2",
+        "cloth3": "#e8f7cc"
+      }
+    },
+    "special_tangle_scholar": {
+      "general": false,
+      "name": "Oru Slate",
+      "materials": {
+        "skin0": "#694330",
+        "skin1": "#8b5940",
+        "skin2": "#a96c4e",
+        "skin3": "#ba8971",
+        "hair0": "#131e18",
+        "hair1": "#1c2e25",
+        "hair2": "#263d31",
+        "hair3": "#67776f",
+        "cloth0": "#606c49",
+        "cloth1": "#96a971",
+        "cloth2": "#d6f1a2",
+        "cloth3": "#e8f7cc"
+      }
+    },
+    "special_travel_banyan": {
+      "general": false,
+      "name": "Travel Master Suri",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_heart_matriarch": {
+      "general": false,
+      "name": "Iria Sunbark",
+      "materials": {
+        "skin0": "#5c452e",
+        "skin1": "#795b3d",
+        "skin2": "#946f4a",
+        "skin3": "#a98c6e",
+        "hair0": "#355025",
+        "hair1": "#507838",
+        "hair2": "#6aa04a",
+        "hair3": "#97bc80",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "species": "treefolk"
+    },
+    "special_travel_veyrroot": {
+      "general": false,
+      "name": "Travel Master Lio",
+      "materials": {
+        "skin0": "#634d34",
+        "skin1": "#836645",
+        "skin2": "#a07c54",
+        "skin3": "#b39676",
+        "hair0": "#28451f",
+        "hair1": "#3b682e",
+        "hair2": "#4f8a3e",
+        "hair3": "#84ad78",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      },
+      "species": "treefolk"
+    },
+    "special_heart_archivist": {
+      "general": false,
+      "name": "Oli Amberleaf",
+      "materials": {
+        "skin0": "#6d573d",
+        "skin1": "#907350",
+        "skin2": "#b08c62",
+        "skin3": "#c0a381",
+        "hair0": "#304d25",
+        "hair1": "#477438",
+        "hair2": "#5f9a4a",
+        "hair3": "#8fb880",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "species": "treefolk"
+    },
+    "special_heart_carver": {
+      "general": false,
+      "name": "Ruva Rootsong",
+      "materials": {
+        "skin0": "#634d34",
+        "skin1": "#836645",
+        "skin2": "#a07c54",
+        "skin3": "#b39676",
+        "hair0": "#28451f",
+        "hair1": "#3b682e",
+        "hair2": "#4f8a3e",
+        "hair3": "#84ad78",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "species": "treefolk"
+    },
+    "special_heart_oracle": {
+      "general": false,
+      "name": "Veya of the Pith",
+      "materials": {
+        "skin0": "#6d573d",
+        "skin1": "#907350",
+        "skin2": "#b08c62",
+        "skin3": "#c0a381",
+        "hair0": "#304d25",
+        "hair1": "#477438",
+        "hair2": "#5f9a4a",
+        "hair3": "#8fb880",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "species": "treefolk"
+    },
+    "special_heart_custodian": {
+      "general": false,
+      "name": "Mosslet",
+      "materials": {
+        "skin0": "#755f44",
+        "skin1": "#9b7e5a",
+        "skin2": "#bd9a6e",
+        "skin3": "#caae8b",
+        "hair0": "#3c592d",
+        "hair1": "#5b8644",
+        "hair2": "#79b25a",
+        "hair3": "#a1c98c",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "species": "treefolk"
+    },
+    "special_lapis_keeper": {
+      "general": false,
+      "name": "Sahra Bluewell",
+      "materials": {
+        "skin0": "#684732",
+        "skin1": "#895d42",
+        "skin2": "#a77250",
+        "skin3": "#b98e73",
+        "hair0": "#1e202b",
+        "hair1": "#2c3140",
+        "hair2": "#3b4156",
+        "hair3": "#767a89",
+        "cloth0": "#526763",
+        "cloth1": "#80a09a",
+        "cloth2": "#b7e5dc",
+        "cloth3": "#d7f1ec"
+      }
+    },
+    "special_lapis_cartographer": {
+      "general": false,
+      "name": "Ivo Starfold",
+      "materials": {
+        "skin0": "#684732",
+        "skin1": "#895d42",
+        "skin2": "#a77250",
+        "skin3": "#b98e73",
+        "hair0": "#1e202b",
+        "hair1": "#2c3140",
+        "hair2": "#3b4156",
+        "hair3": "#767a89",
+        "cloth0": "#526763",
+        "cloth1": "#80a09a",
+        "cloth2": "#b7e5dc",
+        "cloth3": "#d7f1ec"
+      }
+    },
+    "special_lapis_warden": {
+      "general": false,
+      "name": "Ruma Sunward",
+      "materials": {
+        "skin0": "#684732",
+        "skin1": "#895d42",
+        "skin2": "#a77250",
+        "skin3": "#b98e73",
+        "hair0": "#1e202b",
+        "hair1": "#2c3140",
+        "hair2": "#3b4156",
+        "hair3": "#767a89",
+        "cloth0": "#526763",
+        "cloth1": "#80a09a",
+        "cloth2": "#b7e5dc",
+        "cloth3": "#d7f1ec"
+      }
+    },
+    "special_lapis_seer": {
+      "general": false,
+      "name": "Laleh of the Lens",
+      "materials": {
+        "skin0": "#684732",
+        "skin1": "#895d42",
+        "skin2": "#a77250",
+        "skin3": "#b98e73",
+        "hair0": "#1e202b",
+        "hair1": "#2c3140",
+        "hair2": "#3b4156",
+        "hair3": "#767a89",
+        "cloth0": "#526763",
+        "cloth1": "#80a09a",
+        "cloth2": "#b7e5dc",
+        "cloth3": "#d7f1ec"
+      }
+    },
+    "special_travel_azure_wells": {
+      "general": false,
+      "name": "Travel Master Nadir",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_frostwake_captain": {
+      "general": false,
+      "name": "Captain Svala Northlight",
+      "materials": {
+        "skin0": "#856c5a",
+        "skin1": "#b08f77",
+        "skin2": "#d7ae91",
+        "skin3": "#dfbea7",
+        "hair0": "#6c7477",
+        "hair1": "#a3afb2",
+        "hair2": "#d9e9ee",
+        "hair3": "#e4f0f3",
+        "cloth0": "#51626c",
+        "cloth1": "#7f99a7",
+        "cloth2": "#b5daef",
+        "cloth3": "#d6ebf6"
+      }
+    },
+    "special_frostwake_surveyor": {
+      "general": false,
+      "name": "Orin Riftline",
+      "materials": {
+        "skin0": "#856c5a",
+        "skin1": "#b08f77",
+        "skin2": "#d7ae91",
+        "skin3": "#dfbea7",
+        "hair0": "#6c7477",
+        "hair1": "#a3afb2",
+        "hair2": "#d9e9ee",
+        "hair3": "#e4f0f3",
+        "cloth0": "#51626c",
+        "cloth1": "#7f99a7",
+        "cloth2": "#b5daef",
+        "cloth3": "#d6ebf6"
+      }
+    },
+    "special_frostwake_bellkeeper": {
+      "general": false,
+      "name": "Ylva Bellward",
+      "materials": {
+        "skin0": "#856c5a",
+        "skin1": "#b08f77",
+        "skin2": "#d7ae91",
+        "skin3": "#dfbea7",
+        "hair0": "#6c7477",
+        "hair1": "#a3afb2",
+        "hair2": "#d9e9ee",
+        "hair3": "#e4f0f3",
+        "cloth0": "#51626c",
+        "cloth1": "#7f99a7",
+        "cloth2": "#b5daef",
+        "cloth3": "#d6ebf6"
+      }
+    },
+    "special_frostwake_skywatcher": {
+      "general": false,
+      "name": "Vessa Aurora",
+      "materials": {
+        "skin0": "#856c5a",
+        "skin1": "#b08f77",
+        "skin2": "#d7ae91",
+        "skin3": "#dfbea7",
+        "hair0": "#6c7477",
+        "hair1": "#a3afb2",
+        "hair2": "#d9e9ee",
+        "hair3": "#e4f0f3",
+        "cloth0": "#51626c",
+        "cloth1": "#7f99a7",
+        "cloth2": "#b5daef",
+        "cloth3": "#d6ebf6"
+      }
+    },
+    "special_frostwake_ribkeeper": {
+      "general": false,
+      "name": "Irik Deepice",
+      "materials": {
+        "skin0": "#856c5a",
+        "skin1": "#b08f77",
+        "skin2": "#d7ae91",
+        "skin3": "#dfbea7",
+        "hair0": "#6c7477",
+        "hair1": "#a3afb2",
+        "hair2": "#d9e9ee",
+        "hair3": "#e4f0f3",
+        "cloth0": "#51626c",
+        "cloth1": "#7f99a7",
+        "cloth2": "#b5daef",
+        "cloth3": "#d6ebf6"
+      }
+    },
+    "special_travel_frostwake": {
+      "general": false,
+      "name": "Travel Master Eira",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_cairn_warden": {
+      "general": false,
+      "name": "Warden Mira Cairn",
+      "materials": {
+        "skin0": "#725649",
+        "skin1": "#977260",
+        "skin2": "#b88b75",
+        "skin3": "#c6a291",
+        "hair0": "#6c6861",
+        "hair1": "#a39c92",
+        "hair2": "#d9d0c2",
+        "hair3": "#e4ded4",
+        "cloth0": "#5f534c",
+        "cloth1": "#948177",
+        "cloth2": "#d4b8aa",
+        "cloth3": "#e7d8d0"
+      }
+    },
+    "special_cairn_surveyor": {
+      "general": false,
+      "name": "Daro Slatehand",
+      "materials": {
+        "skin0": "#725649",
+        "skin1": "#977260",
+        "skin2": "#b88b75",
+        "skin3": "#c6a291",
+        "hair0": "#6c6861",
+        "hair1": "#a39c92",
+        "hair2": "#d9d0c2",
+        "hair3": "#e4ded4",
+        "cloth0": "#5f534c",
+        "cloth1": "#948177",
+        "cloth2": "#d4b8aa",
+        "cloth3": "#e7d8d0"
+      }
+    },
+    "special_cairn_stonesinger": {
+      "general": false,
+      "name": "Edda Flintvoice",
+      "materials": {
+        "skin0": "#725649",
+        "skin1": "#977260",
+        "skin2": "#b88b75",
+        "skin3": "#c6a291",
+        "hair0": "#6c6861",
+        "hair1": "#a39c92",
+        "hair2": "#d9d0c2",
+        "hair3": "#e4ded4",
+        "cloth0": "#5f534c",
+        "cloth1": "#948177",
+        "cloth2": "#d4b8aa",
+        "cloth3": "#e7d8d0"
+      }
+    },
+    "special_cairn_grovekeeper": {
+      "general": false,
+      "name": "Tala Whitebark",
+      "materials": {
+        "skin0": "#725649",
+        "skin1": "#977260",
+        "skin2": "#b88b75",
+        "skin3": "#c6a291",
+        "hair0": "#6c6861",
+        "hair1": "#a39c92",
+        "hair2": "#d9d0c2",
+        "hair3": "#e4ded4",
+        "cloth0": "#5f534c",
+        "cloth1": "#948177",
+        "cloth2": "#d4b8aa",
+        "cloth3": "#e7d8d0"
+      }
+    },
+    "special_cairn_windseer": {
+      "general": false,
+      "name": "Oren Highwind",
+      "materials": {
+        "skin0": "#725649",
+        "skin1": "#977260",
+        "skin2": "#b88b75",
+        "skin3": "#c6a291",
+        "hair0": "#6c6861",
+        "hair1": "#a39c92",
+        "hair2": "#d9d0c2",
+        "hair3": "#e4ded4",
+        "cloth0": "#5f534c",
+        "cloth1": "#948177",
+        "cloth2": "#d4b8aa",
+        "cloth3": "#e7d8d0"
+      }
+    },
+    "special_travel_boulderwatch": {
+      "general": false,
+      "name": "Travel Master Asta",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_yr_sp_lead": {
+      "general": false,
+      "name": "Ilya Greenwake",
+      "materials": {
+        "skin0": "#7d614a",
+        "skin1": "#a58162",
+        "skin2": "#c99d78",
+        "skin3": "#d4b193",
+        "hair0": "#3c5a45",
+        "hair1": "#5a8768",
+        "hair2": "#78b48a",
+        "hair3": "#a0caad",
+        "cloth0": "#36513e",
+        "cloth1": "#547e61",
+        "cloth2": "#78b48b",
+        "cloth3": "#b5d6bf"
+      }
+    },
+    "special_yr_su_lead": {
+      "general": false,
+      "name": "Sera Brightward",
+      "materials": {
+        "skin0": "#7d614a",
+        "skin1": "#a58162",
+        "skin2": "#c99d78",
+        "skin3": "#d4b193",
+        "hair0": "#735a2e",
+        "hair1": "#ac8745",
+        "hair2": "#e6b45c",
+        "hair3": "#eeca8d",
+        "cloth0": "#685129",
+        "cloth1": "#a17e40",
+        "cloth2": "#e6b45d",
+        "cloth3": "#f1d6a5"
+      }
+    },
+    "special_yr_au_lead": {
+      "general": false,
+      "name": "Haldan Coppersong",
+      "materials": {
+        "skin0": "#7d614a",
+        "skin1": "#a58162",
+        "skin2": "#c99d78",
+        "skin3": "#d4b193",
+        "hair0": "#5e422f",
+        "hair1": "#8c6246",
+        "hair2": "#bb835e",
+        "hair3": "#cfa88e",
+        "cloth0": "#543b2a",
+        "cloth1": "#835c42",
+        "cloth2": "#bb835f",
+        "cloth3": "#dabba6"
+      }
+    },
+    "special_yr_wi_lead": {
+      "general": false,
+      "name": "Ysra Snowglass",
+      "materials": {
+        "skin0": "#7d614a",
+        "skin1": "#a58162",
+        "skin2": "#c99d78",
+        "skin3": "#d4b193",
+        "hair0": "#4e5e68",
+        "hair1": "#768c9c",
+        "hair2": "#9dbbd0",
+        "hair3": "#bacfde",
+        "cloth0": "#47545e",
+        "cloth1": "#6e8392",
+        "cloth2": "#9dbbd1",
+        "cloth3": "#c9dae5"
+      }
+    },
+    "special_travel_springmere": {
+      "general": false,
+      "name": "Travel Master Linn",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_travel_solhaven": {
+      "general": false,
+      "name": "Travel Master Taro",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_travel_harvestwatch": {
+      "general": false,
+      "name": "Travel Master Maren",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_travel_rimehold": {
+      "general": false,
+      "name": "Travel Master Eirik",
+      "materials": {
+        "skin0": "#937a64",
+        "skin1": "#c2a284",
+        "skin2": "#edc5a1",
+        "skin3": "#f1d1b4",
+        "hair0": "#72767a",
+        "hair1": "#abb2b7",
+        "hair2": "#e4edf4",
+        "hair3": "#ecf2f7",
+        "cloth0": "#34615e",
+        "cloth1": "#519692",
+        "cloth2": "#74d7d0",
+        "cloth3": "#b3e9e5"
+      }
+    },
+    "special_barrow_witness": {
+      "general": false,
+      "name": "Ida, the Last Witness",
+      "materials": {
+        "skin0": "#857c75",
+        "skin1": "#b0a49a",
+        "skin2": "#d7c8bc",
+        "skin3": "#dfd3c9",
+        "hair0": "#625c6a",
+        "hair1": "#938b9f",
+        "hair2": "#c4b9d4",
+        "hair3": "#d6cee1",
+        "cloth0": "#4a5859",
+        "cloth1": "#73898b",
+        "cloth2": "#a5c4c6",
+        "cloth3": "#cedfe0"
+      }
+    },
+    "special_span_witness": {
+      "general": false,
+      "name": "Torvald, the Last Watcher",
+      "materials": {
+        "skin0": "#8b7058",
+        "skin1": "#b89474",
+        "skin2": "#e0b48e",
+        "skin3": "#e6c3a5",
+        "hair0": "#6b7278",
+        "hair1": "#a0abb4",
+        "hair2": "#d6e4f0",
+        "hair3": "#e2ecf4",
+        "cloth0": "#3c616c",
+        "cloth1": "#5e97a8",
+        "cloth2": "#86d8f0",
+        "cloth3": "#bceaf7"
+      },
+      "species": "winged"
+    },
+    "special_keel_witness": {
+      "general": false,
+      "name": "Edda, the Last Lookout",
+      "materials": {
+        "skin0": "#8f7864",
+        "skin1": "#bd9e84",
+        "skin2": "#e6c1a1",
+        "skin3": "#ebcdb4",
+        "hair0": "#3a4e4a",
+        "hair1": "#58756f",
+        "hair2": "#759c94",
+        "hair3": "#9ebab4",
+        "cloth0": "#3c564c",
+        "cloth1": "#5e8676",
+        "cloth2": "#86bfa9",
+        "cloth3": "#bcdcd0"
+      }
+    },
+    "special_null_witness": {
+      "general": false,
+      "name": "Eydis, the Missing Minute",
+      "materials": {
+        "skin0": "#7c676a",
+        "skin1": "#a4888c",
+        "skin2": "#c8a6ab",
+        "skin3": "#d3b8bc",
+        "hair0": "#3c3447",
+        "hair1": "#594d6a",
+        "hair2": "#77678e",
+        "hair3": "#a095b0",
+        "cloth0": "#524368",
+        "cloth1": "#7f68a2",
+        "cloth2": "#b694e8",
+        "cloth3": "#d7c4f2"
+      }
+    },
+    "special_ew_guide": {
+      "general": false,
+      "name": "Svala Ashroad",
+      "materials": {
+        "skin0": "#7b5f4c",
+        "skin1": "#a27e65",
+        "skin2": "#c69a7b",
+        "skin3": "#d1ae95",
+        "hair0": "#2a1e1c",
+        "hair1": "#3e2d2b",
+        "hair2": "#533c39",
+        "hair3": "#877674",
+        "cloth0": "#2f333b",
+        "cloth1": "#4a4f5c",
+        "cloth2": "#697184",
+        "cloth3": "#acb1bb"
+      }
+    },
+    "special_ew_keeper": {
+      "general": false,
+      "name": "Hedda Linkkeeper",
+      "materials": {
+        "skin0": "#7b5f4c",
+        "skin1": "#a27e65",
+        "skin2": "#c69a7b",
+        "skin3": "#d1ae95",
+        "hair0": "#2a1e1c",
+        "hair1": "#3e2d2b",
+        "hair2": "#533c39",
+        "hair3": "#877674",
+        "cloth0": "#2f333b",
+        "cloth1": "#4a4f5c",
+        "cloth2": "#697184",
+        "cloth3": "#acb1bb"
+      }
+    },
+    "special_ew_smith": {
+      "general": false,
+      "name": "Orri Hearthmender",
+      "materials": {
+        "skin0": "#7b5f4c",
+        "skin1": "#a27e65",
+        "skin2": "#c69a7b",
+        "skin3": "#d1ae95",
+        "hair0": "#2a1e1c",
+        "hair1": "#3e2d2b",
+        "hair2": "#533c39",
+        "hair3": "#877674",
+        "cloth0": "#2f333b",
+        "cloth1": "#4a4f5c",
+        "cloth2": "#697184",
+        "cloth3": "#acb1bb"
+      }
+    },
+    "special_raid_key_keeper": {
+      "general": false,
+      "name": "Iarn Emberkeeper",
+      "materials": {
+        "skin0": "#755745",
+        "skin1": "#9b735b",
+        "skin2": "#bd8c6f",
+        "skin3": "#caa38c",
+        "hair0": "#6c6456",
+        "hair1": "#a39582",
+        "hair2": "#d9c7ad",
+        "hair3": "#e4d8c6",
+        "cloth0": "#6b4b31",
+        "cloth1": "#a6744c",
+        "cloth2": "#eda66c",
+        "cloth3": "#f5ceae"
+      }
+    },
+    "special_cf_quartermaster": {
+      "general": false,
+      "name": "Quartermaster Halla",
+      "materials": {
+        "skin0": "#7d604c",
+        "skin1": "#a57f64",
+        "skin2": "#c99b7a",
+        "skin3": "#d4af95",
+        "hair0": "#2c2026",
+        "hair1": "#423139",
+        "hair2": "#58414c",
+        "hair3": "#8a7a82",
+        "cloth0": "#356160",
+        "cloth1": "#529695",
+        "cloth2": "#75d7d5",
+        "cloth3": "#b3e9e8"
+      }
     }
   },
   "tops": {
@@ -992,7 +3699,147 @@
     "steward": 79,
     "stablehand": 79,
     "lamplighter": 87,
-    "banker": 79
+    "banker": 79,
+    "special_banker_alderhaven": 79,
+    "special_banker_skaldholm": 85,
+    "special_sky_warden": 88,
+    "special_sky_healer": 85,
+    "special_sky_trader": 85,
+    "special_sky_skadi": 82,
+    "special_sky_brokk": 78,
+    "special_sky_veleda": 82,
+    "special_sky_thorgrim": 88,
+    "special_travel_perch": 78,
+    "special_span_guide": 82,
+    "special_span_chronicler": 78,
+    "special_nacre_envoy": 87,
+    "special_nacre_healer": 85,
+    "special_nacre_trader": 85,
+    "special_nacre_smith": 85,
+    "special_nacre_archivist": 85,
+    "special_banker_nacrehold": 85,
+    "special_nacre_gardener": 86,
+    "special_nacre_singer": 87,
+    "special_nacre_warden": 85,
+    "special_nacre_innkeeper": 87,
+    "special_nacre_lamplighter": 87,
+    "special_nacre_resident_0": 86,
+    "special_nacre_resident_1": 85,
+    "special_nacre_resident_2": 85,
+    "special_nacre_resident_3": 86,
+    "special_nacre_resident_4": 87,
+    "special_nacre_resident_5": 85,
+    "special_nacre_resident_6": 85,
+    "special_nacre_resident_7": 87,
+    "special_nacre_resident_8": 86,
+    "special_nacre_resident_9": 85,
+    "special_nacre_resident_10": 85,
+    "special_nacre_resident_11": 86,
+    "special_nacre_resident_12": 87,
+    "special_nacre_resident_13": 85,
+    "special_nacre_resident_14": 85,
+    "special_nacre_resident_15": 87,
+    "special_nacre_resident_16": 86,
+    "special_nacre_resident_17": 85,
+    "special_travel_nacrehold": 85,
+    "special_astral_steward": 85,
+    "special_banker_astralhollow": 87,
+    "special_astral_healer": 83,
+    "special_astral_scholar": 76,
+    "special_astral_gardener": 86,
+    "special_astral_warden": 85,
+    "special_astral_trader": 83,
+    "special_travel_astralhollow": 78,
+    "special_prism_keeper": 83,
+    "special_prism_healer": 83,
+    "special_prism_scout": 87,
+    "special_prism_scholar": 79,
+    "special_prism_trader": 83,
+    "special_travel_last_shade": 83,
+    "special_orrery_keeper": 87,
+    "special_orrery_healer": 83,
+    "special_orrery_scout": 87,
+    "special_orrery_scholar": 78,
+    "special_orrery_trader": 83,
+    "special_travel_stillpoint": 83,
+    "special_moonspore_warden": 85,
+    "special_moonspore_healer": 83,
+    "special_moonspore_ranger": 87,
+    "special_moonspore_scholar": 75,
+    "special_moonspore_trader": 83,
+    "special_moonspore_seer": 79,
+    "special_travel_lamplight": 77,
+    "special_asterion_archon": 81,
+    "special_banker_asterion": 82,
+    "special_asterion_cartographer": 75,
+    "special_asterion_bellkeeper": 86,
+    "special_asterion_gardener": 86,
+    "special_asterion_healer": 83,
+    "special_asterion_merchant": 83,
+    "special_asterion_stonewarden": 85,
+    "special_asterion_singer": 87,
+    "special_asterion_smith": 76,
+    "special_asterion_walker0": 76,
+    "special_asterion_walker1": 82,
+    "special_asterion_walker2": 83,
+    "special_asterion_walker3": 79,
+    "special_asterion_walker4": 82,
+    "special_asterion_walker5": 87,
+    "special_asterion_walker6": 85,
+    "special_asterion_walker7": 76,
+    "special_asterion_walker8": 86,
+    "special_asterion_walker9": 77,
+    "special_travel_asterion": 76,
+    "special_ew_citysmith": 76,
+    "special_sun_miller": 87,
+    "special_sun_keeper": 81,
+    "special_travel_millbridge": 87,
+    "special_ribbon_host": 81,
+    "special_ribbon_keeper": 79,
+    "special_travel_jubilee": 86,
+    "special_tangle_warden": 79,
+    "special_tangle_scholar": 75,
+    "special_travel_banyan": 87,
+    "special_heart_matriarch": 86,
+    "special_travel_veyrroot": 86,
+    "special_heart_archivist": 86,
+    "special_heart_carver": 87,
+    "special_heart_oracle": 86,
+    "special_heart_custodian": 83,
+    "special_lapis_keeper": 83,
+    "special_lapis_cartographer": 83,
+    "special_lapis_warden": 83,
+    "special_lapis_seer": 83,
+    "special_travel_azure_wells": 83,
+    "special_frostwake_captain": 85,
+    "special_frostwake_surveyor": 87,
+    "special_frostwake_bellkeeper": 87,
+    "special_frostwake_skywatcher": 87,
+    "special_frostwake_ribkeeper": 79,
+    "special_travel_frostwake": 79,
+    "special_cairn_warden": 85,
+    "special_cairn_surveyor": 85,
+    "special_cairn_stonesinger": 79,
+    "special_cairn_grovekeeper": 82,
+    "special_cairn_windseer": 87,
+    "special_travel_boulderwatch": 79,
+    "special_yr_sp_lead": 87,
+    "special_yr_su_lead": 87,
+    "special_yr_au_lead": 87,
+    "special_yr_wi_lead": 87,
+    "special_travel_springmere": 87,
+    "special_travel_solhaven": 87,
+    "special_travel_harvestwatch": 87,
+    "special_travel_rimehold": 87,
+    "special_barrow_witness": 83,
+    "special_span_witness": 88,
+    "special_keel_witness": 87,
+    "special_null_witness": 82,
+    "special_ew_guide": 87,
+    "special_ew_keeper": 79,
+    "special_ew_smith": 83,
+    "special_raid_key_keeper": 79,
+    "special_cf_quartermaster": 83
   },
   "bounds": {
     "sentinel": [
@@ -1137,6 +3984,846 @@
       34,
       11,
       73,
+      95
+    ],
+    "special_banker_alderhaven": [
+      34,
+      11,
+      73,
+      95
+    ],
+    "special_banker_skaldholm": [
+      34,
+      5,
+      68,
+      95
+    ],
+    "special_sky_warden": [
+      19,
+      2,
+      76,
+      91
+    ],
+    "special_sky_healer": [
+      19,
+      5,
+      76,
+      91
+    ],
+    "special_sky_trader": [
+      19,
+      5,
+      76,
+      91
+    ],
+    "special_sky_skadi": [
+      19,
+      8,
+      76,
+      91
+    ],
+    "special_sky_brokk": [
+      19,
+      12,
+      76,
+      91
+    ],
+    "special_sky_veleda": [
+      19,
+      8,
+      76,
+      91
+    ],
+    "special_sky_thorgrim": [
+      19,
+      2,
+      76,
+      91
+    ],
+    "special_travel_perch": [
+      19,
+      12,
+      76,
+      91
+    ],
+    "special_span_guide": [
+      19,
+      8,
+      76,
+      91
+    ],
+    "special_span_chronicler": [
+      19,
+      12,
+      76,
+      91
+    ],
+    "special_nacre_envoy": [
+      29,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_healer": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_trader": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_smith": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_archivist": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_banker_nacrehold": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_gardener": [
+      28,
+      4,
+      73,
+      90
+    ],
+    "special_nacre_singer": [
+      29,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_warden": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_innkeeper": [
+      29,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_lamplighter": [
+      28,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_resident_0": [
+      28,
+      4,
+      73,
+      90
+    ],
+    "special_nacre_resident_1": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_resident_2": [
+      28,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_resident_3": [
+      28,
+      4,
+      73,
+      90
+    ],
+    "special_nacre_resident_4": [
+      29,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_resident_5": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_resident_6": [
+      28,
+      5,
+      74,
+      90
+    ],
+    "special_nacre_resident_7": [
+      29,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_resident_8": [
+      28,
+      4,
+      73,
+      90
+    ],
+    "special_nacre_resident_9": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_resident_10": [
+      28,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_resident_11": [
+      28,
+      4,
+      73,
+      90
+    ],
+    "special_nacre_resident_12": [
+      29,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_resident_13": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_nacre_resident_14": [
+      28,
+      5,
+      74,
+      90
+    ],
+    "special_nacre_resident_15": [
+      29,
+      3,
+      73,
+      90
+    ],
+    "special_nacre_resident_16": [
+      28,
+      4,
+      73,
+      90
+    ],
+    "special_nacre_resident_17": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_travel_nacrehold": [
+      29,
+      5,
+      73,
+      90
+    ],
+    "special_astral_steward": [
+      27,
+      5,
+      75,
+      95
+    ],
+    "special_banker_astralhollow": [
+      27,
+      3,
+      75,
+      95
+    ],
+    "special_astral_healer": [
+      27,
+      7,
+      75,
+      95
+    ],
+    "special_astral_scholar": [
+      28,
+      14,
+      81,
+      95
+    ],
+    "special_astral_gardener": [
+      27,
+      4,
+      75,
+      95
+    ],
+    "special_astral_warden": [
+      27,
+      5,
+      75,
+      95
+    ],
+    "special_astral_trader": [
+      27,
+      7,
+      75,
+      95
+    ],
+    "special_travel_astralhollow": [
+      27,
+      12,
+      75,
+      95
+    ],
+    "special_prism_keeper": [
+      29,
+      7,
+      70,
+      95
+    ],
+    "special_prism_healer": [
+      28,
+      7,
+      70,
+      95
+    ],
+    "special_prism_scout": [
+      28,
+      3,
+      71,
+      95
+    ],
+    "special_prism_scholar": [
+      29,
+      11,
+      78,
+      95
+    ],
+    "special_prism_trader": [
+      28,
+      7,
+      74,
+      95
+    ],
+    "special_travel_last_shade": [
+      28,
+      7,
+      70,
+      95
+    ],
+    "special_orrery_keeper": [
+      29,
+      3,
+      73,
+      95
+    ],
+    "special_orrery_healer": [
+      28,
+      7,
+      73,
+      95
+    ],
+    "special_orrery_scout": [
+      28,
+      3,
+      73,
+      95
+    ],
+    "special_orrery_scholar": [
+      29,
+      12,
+      76,
+      95
+    ],
+    "special_orrery_trader": [
+      28,
+      7,
+      74,
+      95
+    ],
+    "special_travel_stillpoint": [
+      28,
+      7,
+      73,
+      95
+    ],
+    "special_moonspore_warden": [
+      29,
+      5,
+      73,
+      95
+    ],
+    "special_moonspore_healer": [
+      28,
+      7,
+      73,
+      95
+    ],
+    "special_moonspore_ranger": [
+      28,
+      3,
+      73,
+      95
+    ],
+    "special_moonspore_scholar": [
+      29,
+      15,
+      78,
+      95
+    ],
+    "special_moonspore_trader": [
+      28,
+      7,
+      74,
+      95
+    ],
+    "special_moonspore_seer": [
+      30,
+      11,
+      73,
+      95
+    ],
+    "special_travel_lamplight": [
+      28,
+      13,
+      73,
+      95
+    ],
+    "special_asterion_archon": [
+      27,
+      9,
+      76,
+      95
+    ],
+    "special_banker_asterion": [
+      26,
+      8,
+      81,
+      95
+    ],
+    "special_asterion_cartographer": [
+      26,
+      15,
+      81,
+      95
+    ],
+    "special_asterion_bellkeeper": [
+      27,
+      4,
+      78,
+      95
+    ],
+    "special_asterion_gardener": [
+      27,
+      4,
+      76,
+      95
+    ],
+    "special_asterion_healer": [
+      27,
+      7,
+      76,
+      95
+    ],
+    "special_asterion_merchant": [
+      27,
+      7,
+      76,
+      95
+    ],
+    "special_asterion_stonewarden": [
+      27,
+      5,
+      76,
+      95
+    ],
+    "special_asterion_singer": [
+      27,
+      3,
+      76,
+      95
+    ],
+    "special_asterion_smith": [
+      27,
+      14,
+      76,
+      95
+    ],
+    "special_asterion_walker0": [
+      27,
+      14,
+      76,
+      95
+    ],
+    "special_asterion_walker1": [
+      26,
+      8,
+      81,
+      95
+    ],
+    "special_asterion_walker2": [
+      27,
+      7,
+      76,
+      95
+    ],
+    "special_asterion_walker3": [
+      27,
+      11,
+      76,
+      95
+    ],
+    "special_asterion_walker4": [
+      26,
+      8,
+      81,
+      95
+    ],
+    "special_asterion_walker5": [
+      27,
+      3,
+      76,
+      95
+    ],
+    "special_asterion_walker6": [
+      27,
+      5,
+      76,
+      95
+    ],
+    "special_asterion_walker7": [
+      27,
+      14,
+      76,
+      95
+    ],
+    "special_asterion_walker8": [
+      27,
+      4,
+      76,
+      95
+    ],
+    "special_asterion_walker9": [
+      26,
+      13,
+      81,
+      95
+    ],
+    "special_travel_asterion": [
+      27,
+      14,
+      76,
+      95
+    ],
+    "special_ew_citysmith": [
+      27,
+      14,
+      76,
+      95
+    ],
+    "special_sun_miller": [
+      29,
+      3,
+      70,
+      95
+    ],
+    "special_sun_keeper": [
+      27,
+      9,
+      80,
+      95
+    ],
+    "special_travel_millbridge": [
+      28,
+      3,
+      70,
+      95
+    ],
+    "special_ribbon_host": [
+      28,
+      9,
+      72,
+      95
+    ],
+    "special_ribbon_keeper": [
+      28,
+      11,
+      68,
+      95
+    ],
+    "special_travel_jubilee": [
+      28,
+      4,
+      91,
+      95
+    ],
+    "special_tangle_warden": [
+      29,
+      11,
+      72,
+      95
+    ],
+    "special_tangle_scholar": [
+      29,
+      15,
+      77,
+      95
+    ],
+    "special_travel_banyan": [
+      28,
+      3,
+      72,
+      95
+    ],
+    "special_heart_matriarch": [
+      28,
+      4,
+      75,
+      95
+    ],
+    "special_travel_veyrroot": [
+      28,
+      4,
+      75,
+      95
+    ],
+    "special_heart_archivist": [
+      28,
+      4,
+      75,
+      95
+    ],
+    "special_heart_carver": [
+      28,
+      3,
+      75,
+      95
+    ],
+    "special_heart_oracle": [
+      28,
+      4,
+      75,
+      95
+    ],
+    "special_heart_custodian": [
+      28,
+      7,
+      82,
+      95
+    ],
+    "special_lapis_keeper": [
+      28,
+      7,
+      69,
+      95
+    ],
+    "special_lapis_cartographer": [
+      28,
+      7,
+      69,
+      95
+    ],
+    "special_lapis_warden": [
+      29,
+      7,
+      68,
+      95
+    ],
+    "special_lapis_seer": [
+      28,
+      7,
+      69,
+      95
+    ],
+    "special_travel_azure_wells": [
+      28,
+      7,
+      68,
+      95
+    ],
+    "special_frostwake_captain": [
+      29,
+      5,
+      68,
+      95
+    ],
+    "special_frostwake_surveyor": [
+      28,
+      3,
+      68,
+      95
+    ],
+    "special_frostwake_bellkeeper": [
+      29,
+      3,
+      68,
+      95
+    ],
+    "special_frostwake_skywatcher": [
+      29,
+      3,
+      74,
+      95
+    ],
+    "special_frostwake_ribkeeper": [
+      29,
+      11,
+      67,
+      95
+    ],
+    "special_travel_frostwake": [
+      28,
+      11,
+      69,
+      95
+    ],
+    "special_cairn_warden": [
+      29,
+      5,
+      71,
+      95
+    ],
+    "special_cairn_surveyor": [
+      28,
+      5,
+      70,
+      95
+    ],
+    "special_cairn_stonesinger": [
+      29,
+      11,
+      68,
+      95
+    ],
+    "special_cairn_grovekeeper": [
+      28,
+      8,
+      76,
+      95
+    ],
+    "special_cairn_windseer": [
+      28,
+      3,
+      70,
+      95
+    ],
+    "special_travel_boulderwatch": [
+      28,
+      11,
+      68,
+      95
+    ],
+    "special_yr_sp_lead": [
+      32,
+      3,
+      72,
+      95
+    ],
+    "special_yr_su_lead": [
+      28,
+      3,
+      72,
+      95
+    ],
+    "special_yr_au_lead": [
+      29,
+      3,
+      72,
+      95
+    ],
+    "special_yr_wi_lead": [
+      28,
+      3,
+      72,
+      95
+    ],
+    "special_travel_springmere": [
+      28,
+      3,
+      75,
+      95
+    ],
+    "special_travel_solhaven": [
+      28,
+      3,
+      72,
+      95
+    ],
+    "special_travel_harvestwatch": [
+      28,
+      3,
+      72,
+      95
+    ],
+    "special_travel_rimehold": [
+      28,
+      3,
+      72,
+      95
+    ],
+    "special_barrow_witness": [
+      28,
+      7,
+      82,
+      95
+    ],
+    "special_span_witness": [
+      19,
+      2,
+      76,
+      91
+    ],
+    "special_keel_witness": [
+      28,
+      3,
+      71,
+      95
+    ],
+    "special_null_witness": [
+      28,
+      8,
+      76,
+      95
+    ],
+    "special_ew_guide": [
+      28,
+      3,
+      71,
+      95
+    ],
+    "special_ew_keeper": [
+      33,
+      11,
+      70,
+      95
+    ],
+    "special_ew_smith": [
+      28,
+      7,
+      69,
+      95
+    ],
+    "special_raid_key_keeper": [
+      33,
+      11,
+      70,
+      95
+    ],
+    "special_cf_quartermaster": [
+      28,
+      7,
+      74,
       95
     ]
   }

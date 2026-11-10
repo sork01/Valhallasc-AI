@@ -15,7 +15,7 @@ import numpy as np
 from PIL import Image
 
 import npcp_general as G
-from npcp_general import core, cc, CLIPS, SPECS
+from npcp_general import core, cc, CLIPS
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / 'client/assets'
@@ -24,7 +24,7 @@ PREFIX = 'valhallasc_npcp_'
 
 
 def selected():
-    return sys.argv[2:] or list(SPECS)
+    return G.pick(sys.argv[2:])
 
 
 def frames(key):
@@ -46,16 +46,24 @@ def validate(key, data):
 
 
 def design_meta(key, palette):
-    """Remap table: the exact exported hex of each recolourable tone, so the client can recolour per person."""
-    spec = SPECS[key]
-    m = G.materials(dict(spec, skin=G.skin_of(spec), hair=G.hair_of(spec), pants=G.PANTS.get(key, '#4a3f5c'),
-                         accent=G.ACCENT.get(key, '#7fb8d0'), trim=G.TRIM.get(key, '#e0b85c')))
+    """Remap table: the exact exported hex of each recolourable tone, so the client can recolour per person (general designs) and find the skin for head sockets (all)."""
+    d = G.DESIGNS[key]
+    m = G.materials(d)
     mats = {}
     for group in ('skin', 'hair', 'cloth'):
         for i, hexc in enumerate(m[group]):
             assert hexc in palette
             mats[f'{group}{i}'] = hexc
-    return dict(general=True, name=spec['name'], materials=mats, amounts={g: list(a) for g, a in G.AMOUNTS.items()})
+    meta = dict(general=d['general'], name=d['name'], materials=mats)
+    if d['general']:
+        meta['amounts'] = {g: list(a) for g, a in G.AMOUNTS.items()}
+    if d.get('tree'):
+        meta['species'] = 'treefolk'
+    if d.get('hover'):
+        meta['species'] = 'winged'
+    if d.get('tail'):
+        meta['species'] = 'merfolk'
+    return meta
 
 
 def metadata(saved, palettes):
