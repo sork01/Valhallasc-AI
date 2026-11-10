@@ -166,6 +166,8 @@ pub(crate) fn overlay_quest(id: &str) -> bool {
 #[cfg(test)]
 mod activity_tests;
 #[cfg(test)]
+mod leadshoes_tests;
+#[cfg(test)]
 mod aggro_level_tests;
 mod ambient;
 mod bank;
@@ -201,6 +203,7 @@ mod cathedral_tests;
 mod chained_forge_tests;
 mod chests;
 mod chime;
+mod leadshoes;
 #[cfg(test)]
 mod christmas_tests;
 #[cfg(test)]
@@ -455,6 +458,8 @@ struct Player {
     dead_time: f64,
     /// Down in a zone where a final boss fight is running: stays down until it ends (`BOSSMECH-DEATH`).
     fallen: bool,
+    /// Wearing the lead shoes of the deep (`world/leadshoes.rs`); derived from the zone each tick, never saved.
+    shoed: bool,
     /// A pack death returns to the entrance, even after an earlier boss rally.
     pack_death: bool,
     dash: f64,
@@ -598,6 +603,7 @@ impl Player {
             combat_left: 0.,
             dead_time: 0.,
             fallen: false,
+            shoed: false,
             pack_death: false,
             dash: 0.,
             dash_cd: 0.,
@@ -2377,6 +2383,7 @@ impl World {
         view["storyMemory"] = self.empty_seat_view(session);
         view["mailUnread"] = json!(self.mail_unread.get(&p.character.id).copied().unwrap_or(0));
         view["hired"] = json!(p.merc.is_some());
+        view["leadShoes"] = json!(p.shoed);
         view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
         view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
         // The bells a hero has ringing and how long each has left (only listed while there are any).
@@ -3558,6 +3565,7 @@ impl World {
         self.update_escorts();
         self.update_holds();
         self.update_chimes();
+        self.update_lead_shoes();
         self.update_chests();
         self.update_set_effects();
         self.update_signatures();
@@ -11293,6 +11301,7 @@ mod tests {
             grid: Default::default(),
             crosses: vec![],
             name: String::new(),
+            theme: String::new(),
             size: 96,
             rooms: vec![],
             spawn: Point::default(),
