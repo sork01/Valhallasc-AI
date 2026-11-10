@@ -43,3 +43,59 @@ Focused bounded check: `tests/christmas-attachments-ui.cjs`, real NPC exports,
 103 NPCs / 2,884 poses, plus pixel contact checks and per-city contact sheets.
 The former nameplate-based brim is detached in 108 sampled poses, so the check
 exercises the reported failure rather than merely confirming accessory pixels.
+
+## Player-style remake (NPC-PLAYER-STYLE, started 2026-11-10)
+
+Owner decision (2026-11-03): every human NPC takes the **player's body and head ratio**; differences come only from clothing, hair, headwear, props, palette and posture. Non-humans keep their anatomy in the player's shading, eyes and animation feel. **Status: sample trio only, awaiting the owner's go/no-go.** Nothing is deployed, no PixelFlow sprite is built, no live file is touched.
+
+### Method: draw with the players' own rig
+
+`scripts/npcp_sample.py` imports `cel_common` read-only (skeleton, `torso`, `head_frame`, `face`, `Ink` cel renderer) and patches its frame constants at run time (`FW=FH=96`, anchor 48,89, `PX`), so the proportions, almond eyes, outline weight and 4-tone ramps are the players' by construction, with no hand-copied numbers. The rig module `make_warrior_sprites.py` was removed from `www/` with the old Valhalla; it is kept in `rig-tools/` (extracted from `/media/raid/valhallasc-data/old-valhalla-20261107.tar.gz`, set `VALHALLA_TOOLS` to move it). No class sprite is re-rendered and `cel_common.py` is untouched.
+
+- **Scale:** players are 97 px tall in a 160 px cell (hair top to foot), drawn at 1.3 = 126 px on screen. NPC atlases draw at 1.4, so an adult at `PX` 0.81 (79 px with hair, about 110 px on screen, 0.88 of a player, the old sentinel was 75 px) fits the 96 frame with the foot at y 90 and room above for props. A child is rendered at 0.68 of that with a 1.28x head (64 px, 0.71 of a player). **True player height does not fit the 96 frame** (it would need 90 px of the 90 above the anchor), so NPCs are slightly shorter than players, as the old ones were. The frame stays 96x96, no `NpcArt`/`City` change.
+- **Facing:** idle and talk face the camera (`S`), walk uses the three-quarter `SE` (the client mirrors it), as before.
+- **Clips unchanged:** idle 6 (blink on frame 4), walk 8 (alternating feet, counter-swinging arms), talk 6 (raised hand, mouth opens on odd frames). Same `npc.txt` contract.
+- **Palette:** per-design `skin`, `hair`, `coat` (cloth), `pants`, `trim`, `extra` ramps built from the NPC's own identity colours (`mats()`), so named people keep their colours.
+
+### Traits that must survive (general designs, from `npc-art-plan.txt`)
+
+| design | build | hair | headwear | prop | notes |
+|---|---|---|---|---|---|
+| sentinel | broad | crop | helm | spear | square shoulders, high greaves and long pennant spear |
+| physician | tall | braid | veil | bottle | long split coat, narrow shoulders and high medicinal flask |
+| smith | stocky | shaved | goggles | hammer | heavy apron, bare forearms and oversized smith hammer |
+| baker | round | curls | toque | bread | round belly, towering soft chef hat and bread tray |
+| innkeeper | curvy | bun | ribbon | mug | full skirt, puff sleeves, apron and welcoming tankard |
+| merchant | round | beard | turban | scales | broad layered silk coat, wrapped hat and brass balance |
+| ranger | lean | ponytail | feather | bow | long bow, fitted tunic and angled feather cap |
+| scholar | stooped | long | cap | book | bent shoulders, long robe, spectacles and open folio |
+| herald | tall | waves | beret | trumpet | angular tabard, jaunty beret and raised brass trumpet |
+| gardener | short | pigtails | straw | flowers | wide straw hat, short overalls and overflowing flower basket |
+| fisher | broad | beard | beanie | fish | oilskin cape, sea beard, creel and a silver fish |
+| weaver | curvy | braid | ribbon | spool | asymmetric shawl, braids and spindle with threaded wool |
+| courier | lean | crop | scarf | satchel | short jacket, long trailing scarf and packed messenger satchel |
+| pilgrim | stooped | shaved | hood | staff | hunched cloak, high walking stick and tied bedroll |
+| bard | lean | waves | feather | lyre | fitted vest, swept hair and large curved lyre |
+| child | child | pigtails | ribbon | kite | small limbs, oversized round face and diamond kite |
+| elder | stooped | beard | beanie | cane | low back, large beard, spectacles and crooked walking cane |
+| painter | short | curls | beret | palette | painted smock, curled hair, broad palette and long brush |
+| carpenter | broad | ponytail | band | saw | rolled sleeves, tool belt and long toothed hand saw |
+| alchemist | short | spikes | goggles | alembic | short triangular coat, wild hair and glass distillation coil |
+| steward | tall | long | circlet | scroll | straight formal mantle, thin crown and ribbon-bound scroll |
+| stablehand | stocky | braid | cap | reins | leather chaps, strong boots, braided hair and looped reins |
+| lamplighter | lean | crop | hood | lantern | long rain cape, pointed hood and hanging amber lantern |
+| banker | round | bun | cap | chest | buttoned waistcoat, large coin chest and folded ledger |
+
+Build words (stocky, round, stooped, child, ...) no longer change the body; they become clothing volume, posture and prop size.
+
+### Special designs by group (count)
+
+asterion 19, astral 6, banker 5, barrow 1, cairn 5, cf 1, ew 4, frostwake 5, heart 5, keel 1, lapis 4, moonspore 6, nacre 28, null 1, orrery 5, prism 5, raid 1, ribbon 2, sky 7, span 3, sun 2, tangle 2, travel 18, yr 4
+
+Each keeps its region material (kelp/coral/fins, star embroidery, brass, spore caps, rings, living branches, veils, glacier fur, slate, forge chains) and its own headwear/prop; merfolk keep tails (see Captain Namar in the sample).
+
+### Sample trio and open points
+
+Smith (general, gripped prop), child (no player equivalent) and Captain Namar Deepwatch (non-human). Sheet: `test-results/npcp-sample/npcp-sample-sheet.png` (old | new idle, walk, talk | player at in-game scale), per-design clip strips beside it.
+- **Not yet checked:** `NpcArt.head` socket detection on the new frames (the head is smaller and hair is drawn differently), hand-on-prop contact (`tests/npc-grips.py` expects the old wrist coordinates and `GRIPS`), `tests/npc-art.py`, portraits, nameplate bounds. All of it belongs to the full run, after the owner's go/no-go.
+- **First-pass flaws to fix in the full run:** smith's hammer reads sideways (head too wide for the handle), the child's kite string is hidden behind the pigtail, scale texture on Namar's tail is flat, arms are thin in the idle pose.
