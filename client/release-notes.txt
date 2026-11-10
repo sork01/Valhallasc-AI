@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.39.35",
+    "date": "2026-11-10",
+    "new": [],
+    "changed": [
+      "Treasure chests are drawn almost twice as big, so they are much easier to spot, and you can click anywhere on the larger chest to open it.",
+      "Melee attacks reach a little further for both heroes and monsters: Warriors, Assassins and Priests hit about 25% farther away, and monsters start their attacks from a slightly longer distance. Duels and arena fights keep their old melee range."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.39.34",
     "date": "2026-11-09",
     "new": [],

@@ -20,7 +20,11 @@ const ZONE: usize = 0;
 
 /// The distance `pvp_attack` allows for a class.
 pub fn duel_range(class: Class) -> f64 {
-    class.reach().max(if class.ranged() { 8. } else { 1.8 })
+    if class.ranged() {
+        class.reach().max(8.)
+    } else {
+        1.8
+    }
 }
 
 /// What one side did in one duel.

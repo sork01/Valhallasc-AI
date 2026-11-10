@@ -505,15 +505,12 @@ impl World {
             return Err("PvP requires a duel, opposing arena teams, or two flagged players outside a sanctuary.".into());
         }
         if point.distance(target_point)
-            > a.character
-                .look
-                .class
-                .reach()
-                .max(if a.character.look.class.ranged() {
-                    8.
-                } else {
-                    1.8
-                })
+            > if a.character.look.class.ranged() {
+                a.character.look.class.reach().max(8.)
+            } else {
+                // Duels keep the old melee range: PvP balancing is closed, so MELEE-REACH does not touch it.
+                1.8
+            }
         {
             return Err("Target is out of range.".into());
         }

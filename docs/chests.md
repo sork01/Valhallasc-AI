@@ -65,6 +65,10 @@ A chest holds **one gold pile, one material stack, two equipment rolls and one o
 
 None. The point is to search, so chests appear neither on the minimap nor on the world map.
 
+## Size (`CHEST-BIGGER`, Beta 1.39.35)
+
+The chest is drawn `CHEST_SCALE` = 1.75x its 64x64 atlas (and the vector fallback), about its feet, in `client/field.js`. The click box (27 px sideways, 37 above, 7 below the feet), the shadow, the countdown label (-40 px) and the cull margin (70 px) all multiply by the same constant, so change them together. Nothing else was added (no beam, no marker). Check `tests/chest-bigger-ui.cjs` (`MUTATE=1` must fail).
+
 ## Verification hooks for `CHEST-CHECK`
 
 - Private Rust worlds shorten `Chests::interval` directly and call `spawn_chest` when a test needs an immediate chest. Neither changes production timing.

@@ -350,6 +350,10 @@ pub(crate) const PLAYER_RADIUS: f64 = 0.3;
 pub const LEVEL_SPREAD: i32 = 2;
 /// How close (tiles) a target must be to count for a boss's soft enrage clock.
 const ENRAGE_RANGE: f64 = 14.;
+/// How close (to its edge) a melee monster must be to start winding up, and how close the lunge must end to land.
+/// Both grew 0.35 with the player melee reach (MELEE-REACH, 2026-11-10).
+const ENEMY_WINDUP_REACH: f64 = 1.5;
+const ENEMY_HIT_REACH: f64 = 1.25;
 /// Health and damage change by this fraction per level from the default; gold changes by 10%. XP does not scale
 /// this way: an enemy pays `enemy_xp(level)`, set by its own level alone.
 const LEVEL_HP_DAMAGE: f64 = 0.12;
@@ -5123,9 +5127,10 @@ impl World {
                 if let Some((_, point, d)) = target
                     .filter(|_| hunting || s.point().distance(Point { x: s.hx, y: s.hy }) < 14.)
                 {
-                    let attack_reach = ranged
-                        .as_ref()
-                        .map_or(1.15 + s.r + if slam > 0. { 0.9 } else { 0. }, |r| r.range);
+                    let attack_reach = ranged.as_ref().map_or(
+                        ENEMY_WINDUP_REACH + s.r + if slam > 0. { 0.9 } else { 0. },
+                        |r| r.range,
+                    );
                     let visible = dungeon.is_none()
                         || d > attack_reach
                         || pursuit::clear_line(map, s.point(), point, s.r);
@@ -5155,7 +5160,7 @@ impl World {
                             movement *= 0.8;
                         }
                     } else if visible
-                        && d < 1.15 + s.r + if slam > 0. { 0.9 } else { 0. }
+                        && d < ENEMY_WINDUP_REACH + s.r + if slam > 0. { 0.9 } else { 0. }
                         && s.atk_cd <= 0.
                     {
                         s.state = "windup".into();
@@ -5226,7 +5231,7 @@ impl World {
                 movement = charge_speed * TICK;
                 if let Some((id, _, d)) = target
                     && !s.hit
-                    && d < 0.9 + s.r
+                    && d < ENEMY_HIT_REACH + s.r
                 {
                     s.hit = true;
                     hit = Some(id);
@@ -12429,6 +12434,63 @@ mod tests {
     }
     fn skill(w: &mut World, id: &str) {
         w.use_skill(1, id, Point { x: 1., y: 0. });
+    }
+    /// MELEE-REACH: a melee player's blow now lands from the longer `Class::reach()` and not one step beyond it.
+    #[test]
+    fn melee_players_hit_from_the_longer_reach_and_not_beyond() {
+        for (class, reach) in [
+            (Class::Warrior, 1.7),
+            (Class::Assassin, 1.4),
+            (Class::Priest, 1.9),
+        ] {
+            assert_eq!(class.reach(), reach);
+            for (extra, lands) in [(-0.05, true), (0.05, false)] {
+                let mut w = world();
+                let _rx = join(&mut w, 1, class);
+                let at = arena(&mut w, 20);
+                w.maps[0].objects.clear();
+                for i in 1..w.slimes.len() {
+                    put(&mut w, i, at, 400., 400.);
+                }
+                let r = w.slimes[0].r;
+                put(&mut w, 0, at, reach + r + extra, 0.);
+                w.strike(1);
+                assert_eq!(hp_lost(&w, 0), lands, "{class:?} at reach {extra:+}");
+            }
+        }
+    }
+    /// MELEE-REACH: a melee monster starts its wind-up from the longer distance, and not from beyond it.
+    #[test]
+    fn melee_monsters_wind_up_from_the_longer_reach_and_not_beyond() {
+        for (extra, state) in [(-0.05, "windup"), (0.1, "chase")] {
+            let mut w = world();
+            let _rx = join(&mut w, 1, Class::Warrior);
+            w.maps[0].objects.clear();
+            let player = w.players[&1].character.point();
+            for i in 1..w.slimes.len() {
+                w.slimes[i].x = player.x + 400.;
+                w.slimes[i].y = player.y + 400.;
+            }
+            w.slimes[0] = Slime::new(
+                0,
+                &SlimeSpawn {
+                    ambush: None,
+                    kind: "beetle".into(),
+                    zone: 0,
+                    x: player.x + 3.,
+                    y: player.y,
+                },
+            );
+            let r = w.slimes[0].r;
+            w.slimes[0].x = player.x + ENEMY_WINDUP_REACH + r + extra;
+            w.slimes[0].hx = w.slimes[0].x;
+            w.slimes[0].hy = w.slimes[0].y;
+            w.slimes[0].state = "chase".into();
+            w.slimes[0].target = Some(1);
+            w.slimes[0].atk_cd = 0.;
+            w.update_slime(0);
+            assert_eq!(w.slimes[0].state, state, "offset {extra:+}");
+        }
     }
     #[test]
     fn autoattack_resumes_after_every_class_skill() {
