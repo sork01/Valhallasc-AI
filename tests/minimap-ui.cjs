@@ -29,6 +29,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
+  // FIELD_JS=<file> serves that file as client/field.js (a candidate or the old version for a mutation check) without touching the live client.
+  if (process.env.FIELD_JS) await page.route('**/field.js*', r => r.fulfill({ path: process.env.FIELD_JS, contentType: 'application/javascript' }));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })));
   await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('ShapeWalker'); await page.locator('#go').click({ timeout: 60000 });
@@ -44,20 +46,36 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const pixels = () => page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let green = 0, water = 0; for (let i = 0; i < d.length; i += 4) { const r = d[i], g = d[i + 1], bl = d[i + 2]; if (g > r + 25 && g > bl + 25) green++; else if (bl > r + 20 && bl > g - 5 && r < 60) water++; } const k = (c.height / 2 | 0) * c.width + (c.width / 2 | 0), h = [d[k * 4], d[k * 4 + 1], d[k * 4 + 2]]; return { green, water, hero: h }; });
   const shot = name => page.locator('#minimap').screenshot({ path: path.join(out, `minimap-${name}.png`) });
   await page.evaluate(() => Prefs.set({ minimapZoom: 2 }));
+  // Fog is its own thing (a fresh guest has explored one meadow cell): explore everything so the ground comparisons below read land, not mist.
+  await debug({ op: 'explore_all' }); await page.waitForTimeout(600);
   // From the Crags, three tiles from the border: Greenmeadow's land shows on the minimap at the widest zoom, not at 4x far away.
   await go(1, q[0] + shx - inward[0] * 3, q[1] + shy - inward[1] * 3);
   await page.evaluate(() => { Field.minimapZoom(-9); });
   check(await page.evaluate(() => Field.minimapZoom(0)) === 1, 'zoom clamps at 1 (the widest view)');
   await page.waitForTimeout(400); const wide = await pixels(); await shot('crags-seam-zoom1');
   check(wide.green > 400, `Crags minimap at zoom 1 shows Greenmeadow's green land beyond the border (${wide.green} green px)`);
-  // The Crags are landlocked: past their east border (the Orrery, a gate, no seam) the minimap shows plain land, no foam line, no shallows, no sea, on and past the grid.
+  // The Crags are landlocked: past their east border (the Orrery, a seam since 2026-11-08) the minimap shows the Orrery's land, no foam line, no shallows, no sea, on and past the grid.
   const east = q2 => page.evaluate(([hx, hy, xs]) => { const c = document.getElementById('minimap'), g = c.getContext('2d'), s = c.width / 240; return xs.map(x => [...g.getImageData(Math.round(c.width / 2 + (x - hx) * s), Math.round(c.height / 2), 1, 1).data].slice(0, 3)); }, q2);
   await go(1, 335, 170); await page.waitForTimeout(600);
   const beyond = await east([335, 170, [346.5, 347.5, 349, 352, 358, 380, 420]]); await shot('crags-east-landlocked');
-  check(beyond.slice(2).every(([r, g, b]) => b <= r + 12 && g < 90), `past the Crags' east border there is no water: ${JSON.stringify(beyond)}`);
+  check(beyond.slice(2).every(([r, g, b]) => b <= r + 60), `past the Crags' east border there is no water (shallows are 70,184,200; the Orrery's own ground is a bluish grey): ${JSON.stringify(beyond)}`);
+  // MINIMAP-WORLD: a border with NO seam shows the neighbour's land too (the Stormglass Flats and Frostwake Shelf are a gate, not a seam).
+  // Pick, from the real outlines, a Frostwake tile as near as possible to a Stormglass tile; from that Stormglass tile the Frostwake tile is on the minimap, past Stormglass' own land.
+  const land = z => { const f = zoneDef(z).shapeFloor, out = []; for (let y = 0; y < f.length; y++) for (let x = 0; x < f[y].length; x++) if (f[y][x] === '#') out.push([x, y]); return out; };
+  const dT = [zoneDef(26).shape.T[0] - zoneDef(19).shape.T[0], zoneDef(26).shape.T[1] - zoneDef(19).shape.T[1]];
+  const inland = (z, x, y) => [[3, 0], [-3, 0], [0, 3], [0, -3], [0, 0]].every(([i, j]) => zoneDef(z).shapeFloor[y + j]?.[x + i] === '#');   // not the cliff line along the border
+  const fw = land(19).filter(([x, y]) => inland(19, x, y)), sv = land(26).filter(([x, y], i) => i % 7 === 0 && inland(26, x, y)).map(([x, y]) => [x + dT[0], y + dT[1]]);
+  let best = null; for (const [fx, fy] of fw.filter((_, i) => i % 5 === 0)) for (const [sx, sy] of sv) { const d = Math.hypot(fx - sx, fy - sy); if (d > 16 && (!best || d < best.d)) best = { d, f: [fx, fy], s: [sx, sy] }; }
+  check(best && best.d < 60, `the Stormglass Flats and Frostwake Shelf lie within sight of each other on the atlas (${best && best.d.toFixed(1)} tiles)`);
+  await go(19, best.f[0] + .5, best.f[1] + .5);
+  await page.waitForFunction(() => (Field.miniZones || []).includes(26), null, { timeout: 15000 }).catch(() => {}); await page.waitForTimeout(500);   // the neighbour's canvas is built one zone per timer tick
+  await shot('stormglass-frostwake-gate');
+  const px = await page.evaluate(([hx, hy, tx, ty]) => { const c = document.getElementById('minimap'), g = c.getContext('2d'), s = c.width / 240; return [...g.getImageData(Math.round(c.width / 2 + (tx - hx) * s), Math.round(c.height / 2 + (ty - hy) * s), 1, 1).data].slice(0, 3); }, [best.f[0] + .5, best.f[1] + .5, best.s[0] + .5, best.s[1] + .5]);
+  check(Math.hypot(px[0] - 43, px[1] - 36, px[2] - 33) > 25, `Frostwake's ground shows from the Stormglass Flats across a gate border with no seam (pixel ${px}; the old client drew the plain sea colour 43,36,33)`);
+  check(((await page.evaluate(() => Field.miniZones)) || []).includes(26), 'Frostwake (zone 26) is in the minimap cache from the Stormglass Flats');
   // A crossing changes nothing: the same world points on the minimap, from each side of the Crags-meadow border (owner: blue from the meadow, black from the Crags).
   const grid = []; for (let i = -5; i <= 5; i++) for (let j = -5; j <= 5; j++) grid.push([i * 20, j * 20]);
-  const world = ([cx, cy]) => page.evaluate(([hx, hy, px, py, g2]) => { const c = document.getElementById('minimap'), g = c.getContext('2d'), s = c.width / 240; return g2.map(([i, j]) => { const d = g.getImageData(Math.round(c.width / 2 + (px + i - hx) * s) - 3, Math.round(c.height / 2 + (py + j - hy) * s) - 3, 7, 7).data, m = [0, 0, 0]; for (let k = 0; k < d.length; k += 4) for (let q = 0; q < 3; q++) m[q] += d[k + q] / 49; return m; }); }, [cx[0], cx[1], cy[0], cy[1], grid]);
+  const world = ([cx, cy]) => page.evaluate(([hx, hy, px, py, g2]) => { const c = document.getElementById('minimap'), g = c.getContext('2d'), s = c.width / 240; return g2.map(([i, j]) => { const d = g.getImageData(Math.round(c.width / 2 + (px + i - hx) * s) - 4, Math.round(c.height / 2 + (py + j - hy) * s) - 4, 9, 9).data, m = [0, 0, 0, 0]; for (let k = 0; k < d.length; k += 4) { for (let q = 0; q < 3; q++) m[q] += d[k + q] / 81; const [r, gg, bb] = [d[k], d[k + 1], d[k + 2]]; if (r >= 235 && gg <= 125 && bb >= 120 && bb <= 160 || bb >= 245 && r >= 190 && gg >= 170 && r <= 215 || r >= 240 && gg >= 200 && bb <= 135 || r >= 170 && gg >= 215 && bb >= 245 || r >= 250 && gg >= 250 && bb >= 250) m[3] = 1; } return m; }); }, [cx[0], cx[1], cy[0], cy[1], grid]);
   await go(0, q[0] + inward[0] * 3, q[1] + inward[1] * 3); await page.waitForTimeout(600);
   const fromMeadow = await world([[q[0] + inward[0] * 3, q[1] + inward[1] * 3], [q[0], q[1]]]); await shot('seam-from-meadow');
   await go(1, q[0] + shx - inward[0] * 3, q[1] + shy - inward[1] * 3); await page.waitForTimeout(600);
@@ -67,7 +85,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   // Markers still belong to the zone you stand in (MINIMAP-WORLD): a pink, red or gold dot on either side is not the ground.
   const marker = ([r, g, b]) => r > 170 && g < 170 && b > 60 || r > 200 && g > 150 && b < 130;
   const apart = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) > 30;
-  const differ = grid.map((p, i) => [p, again[i], fromCrags[i]]).filter(([, a, b]) => !marker(a) && !marker(b) && apart(a, b));
+  // A point whose window holds an enemy, player or travel dot (pink, purple, light blue, gold, white) is skipped: those belong to the zone you stand in and come from the server's view of you.
+  const differ = grid.map((p, i) => [p, again[i], fromCrags[i]]).filter(([, a, b]) => !a[3] && !b[3] && !marker(a) && !marker(b) && apart(a, b));
   console.log('minimap diff', JSON.stringify(differ.map(([p, a, c]) => [p, a.map(Math.round), c.map(Math.round)])));
   // What is left is the enemy dots of the zone you stand in, blurred into the 7 px mean, and speckled fog edges; the client before the shared background gives 26.
   check(differ.length <= 10, `the ground on the minimap is the same from both sides of the border: ${differ.length} of ${grid.length} points differ`);
@@ -94,6 +113,8 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   await page.evaluate(() => { Field.minimapZoom(9); });
   // Touch: the zoom buttons exist only on a coarse pointer (hidden with a mouse), and tapping them zooms.
   check(await page.evaluate(() => ['mini-zoom-in', 'mini-zoom-out'].every(id => getComputedStyle(document.getElementById(id)).display === 'none')), 'no zoom buttons with a mouse');
+  // Two full clients do not fit the 1.5 GiB cap of the bounded runner (the first one died with oom-kill, with the old client too): close the desktop one first.
+  assert.deepEqual(errors, [], 'no page errors'); await context.close();
   const tctx = await browser.newContext({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
   const tp = await tctx.newPage(); const terrors = [];
   tp.on('pageerror', e => terrors.push(e.message));

@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.41.0",
+    "date": "2026-11-10",
+    "new": [
+      "The minimap now shows the whole world. When you walk over a border the map no longer changes: the zones around you are drawn where they lie on the world map, including those you reach through a gate and not a seamless crossing. Quest marks, travel masters and townspeople of every zone you can see on the minimap are shown, and mist still covers the land you have not explored yet."
+    ],
+    "changed": [
+      "The minimap's sea is the same everywhere, so the dark gap and the blue strip you used to see at a border are gone. Places that are not on the world map, like dungeons and the Yearwheel, still show their own map."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.40.3",
     "date": "2026-11-10",
     "new": [],

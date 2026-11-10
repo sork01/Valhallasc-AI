@@ -5244,7 +5244,7 @@
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
     for (const p of zdef.portals) { if (p.seam || p.vault || p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
-    if (zdef.shapeFloor) {                                  // only the land is drawn: outside the outline the minimap shows the water (or a neighbour)
+    if (zdef.shapeFloor || bigSky()) {                      // only the land is drawn: outside the outline the minimap shows the water (or a neighbour)
       g.globalCompositeOperation = 'destination-out';
       for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (!map.floor[y * MAP + x]) g.fillRect(x * k - .25, y * k - .25, k + .5, k + .5);
       g.globalCompositeOperation = 'source-over';
@@ -5261,11 +5261,56 @@
   const miniSpan = () => zdef.shapeFloor || bigSky() ? MINI_SHAPED_SPAN : MAP;
   // The minimap canvas of a shaped zone keeps 2.4 pixels per tile whatever the grid (units are 4 px; 144 units for the old 240 grid).
   const miniUnits = () => zdef.shapeFloor || bigSky() ? Math.max(144, Math.round(MAP * .6)) : 144;
-  const miniCache = new Map();   // shaped zone -> its rendered land and shallows (a crossing back and forth renders nothing)
+  const miniCache = new Map();   // zone -> its rendered land and shallows (a crossing back and forth renders nothing)
+  // MINIMAP-WORLD: the shaped k = 1 zones share one frame, the atlas (a zone's tile (x, y) lies at atlas (x, y) + shape.T), so the minimap draws every
+  // such zone that reaches into its view, whether or not a seam joins it to yours. Nothing is swapped at a crossing: the zones were already there.
+  // Heartwood (no atlas place) and the Yearwheel (2.8 tiles per atlas pixel) do not fit that frame and keep a view of their own.
+  const worldZone = z => { const sh = ZONES[z] && ZONES[z].shape; return !!sh && sh.k === 1 && !!sh.T && sh.rule !== 'authored'; };
+  let worldList = null;
+  const worldZones = () => worldList || (worldList = ZONES.map((_, z) => z).filter(worldZone));
+  const MINI_CACHE_SOFT = 8, MINI_CACHE_HARD = 14;
+  let miniReach = new Set(), miniQueue = [], miniTimer = 0;
+  function releaseMini(e) { for (const c of [e.base, e.water]) if (c) { c.width = 1; c.height = 1; } }
+  function trimMini() {                       // drop the least recently used zones nothing in reach needs; never the hero's own
+    while (miniCache.size > MINI_CACHE_SOFT) {
+      let drop = null;
+      for (const [z, e] of miniCache) if (z !== zone && (!miniReach.has(z) || miniCache.size > MINI_CACHE_HARD) && (!drop || e.at < miniCache.get(drop).at)) drop = z;
+      if (drop === null) break;
+      releaseMini(miniCache.get(drop)); miniCache.delete(drop);
+    }
+  }
+  // A zone's context for drawing its minimap only: kept out of `ctxs`, so it does not count as a seam neighbour (staleChunk, nbFloor and the chunk release read that map).
+  function miniCtx(z) {
+    const had = ctxs.get(z); if (had) return had;
+    const c = { z, def: ZONES[z], MAP: ZONES[z].size, map: { dirt: new Uint8Array(0), tone: new Float32Array(0) }, objects: [], nightLights: [], SHIFT: [0, 0], SPAWN: ZONES[z].spawn, chunks: new Map(), empty: new Set(), limit: 40 };
+    const keep = snapCtx(); adoptCtx(c);
+    try { buildMap(); c.MAP = MAP; c.objects = objects; c.nightLights = nightLights; c.SHIFT = SHIFT; c.SPAWN = SPAWN; } finally { adoptCtx(keep); }
+    return c;
+  }
+  function miniRenderOf(c) {                  // land and shallows of the zone context `c`
+    const keep = snapCtx(); adoptCtx(c);
+    try { return { base: renderMini(), water: renderShallows(), size: c.MAP, at: performance.now() }; } finally { adoptCtx(keep); }
+  }
+  // One zone per timer tick, so building the map arrays and the canvases of a far neighbour never lands inside a single frame.
+  function miniWant(z) {
+    if (miniCache.has(z) || miniQueue.includes(z)) return;
+    miniQueue.push(z); if (!miniTimer) miniTimer = setTimeout(miniPump, 30);
+  }
+  function miniPump() {
+    miniTimer = 0; const z = miniQueue.shift();
+    if (z !== undefined && !miniCache.has(z) && worldZone(z) && worldZone(zone)) { miniCache.set(z, miniRenderOf(miniCtx(z))); trimMini(); }
+    if (miniQueue.length) miniTimer = setTimeout(miniPump, 30);
+  }
   function buildMini() {
+    if (worldZone(zone)) {
+      if (!miniCache.has(zone)) miniCache.set(zone, miniRenderOf(snapCtx()));
+      const e = miniCache.get(zone); e.at = performance.now(); miniBase = e.base; miniWater = e.water; return;
+    }
+    for (const [z, e] of miniCache) if (worldZone(z)) { releaseMini(e); miniCache.delete(z); }   // inside a place that is not on the atlas: free the world's canvases
+    miniQueue = [];
     const hit = zdef.shapeFloor && miniCache.get(zone);
     if (hit) { miniBase = hit.base; miniWater = hit.water; return; }
-    miniBase = renderMini(); if (!zdef.shapeFloor) miniNb.clear(); miniWater = renderShallows();
+    miniBase = renderMini(); miniWater = renderShallows();
     if (zdef.shapeFloor) miniCache.set(zone, { base: miniBase, water: miniWater });
   }
   // Shallows and a foam line along the COAST of the zone whose state is adopted (null for a zone without an outline). Past any other edge lies land: another province, drawn plain.
@@ -5284,11 +5329,19 @@
     const a = document.getElementById('mini-zoom-in'), b = document.getElementById('mini-zoom-out');
     if (a) a.disabled = miniZoom >= MINI_ZOOMS; if (b) b.disabled = miniZoom <= 1;
   }
-  function miniNeighbour(nb) {
-    let e = miniNb.get(nb); if (e) return e;
-    const nc = ctxFor(nb), keep = snapCtx(); adoptCtx(nc);
-    try { e = { base: renderMini(), water: renderShallows(), size: nc.MAP }; } finally { adoptCtx(keep); }
-    miniNb.set(nb, e); return e;
+  // The world zones whose land can reach the view (V tiles across at (vx, vy), in the hero's frame), with the offset of each zone's origin in this frame.
+  // Zones within a margin of the view are queued, nearest first, so their canvases are ready before they scroll in.
+  function miniNear(vx, vy, V) {
+    const T0 = zdef.shape.T, m = V * .6, out = [], want = []; miniReach = new Set([zone]);
+    for (const z of worldZones()) {
+      const T = ZONES[z].shape.T, size = ZONES[z].size, ox = T[0] - T0[0], oy = T[1] - T0[1];
+      if (z !== zone && (ox > vx + V + m || oy > vy + V + m || ox + size < vx - m || oy + size < vy - m)) continue;
+      miniReach.add(z);
+      const e = miniCache.get(z) || null; if (e) e.at = performance.now(); else want.push([Math.hypot(ox + size / 2 - hero.x, oy + size / 2 - hero.y), z]);
+      if (z === zone || !(ox > vx + V || oy > vy + V || ox + size < vx || oy + size < vy)) out.push({ z, ox, oy, size, e });
+    }
+    want.sort((a, b) => a[0] - b[0]); for (const [, z] of want) miniWant(z);
+    return out;
   }
   function drawMini() {
     if (!mctx || !miniBase) return;
@@ -5296,9 +5349,10 @@
     if (!miniTmp || miniTmp.width !== W) { miniTmp = document.createElement('canvas'); miniTmp.width = miniTmp.height = W; }
     const tg = miniTmp.getContext('2d');
     mctx.save(); mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
-    // Stopgap until MINIMAP-WORLD (TODO.md): every shaped zone shares one plain background, so a crossing changes nothing; real coast still shows its shallows and foam.
-    mctx.fillStyle = zdef.shapeFloor ? (zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : '#2b2421') : '#080c0b'; mctx.fillRect(0, 0, W, W);
-    if (zdef.shapeFloor) miniRippleOrigin = [vx + (zdef.shape?.T?.[0] || 0), vy + (zdef.shape?.T?.[1] || 0)];
+    // One plain sea for every zone of the atlas frame, so a crossing changes nothing; a coast still shows its shallows and foam.
+    const wmode = worldZone(zone);
+    mctx.fillStyle = zdef.shapeFloor || wmode ? (zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : '#2b2421') : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    if (zdef.shapeFloor || wmode) miniRippleOrigin = [vx + (zdef.shape?.T?.[0] || 0), vy + (zdef.shape?.T?.[1] || 0)];
     // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.
     const layer = (canvas, tiles, ox, oy, zi) => {
       const dx = (ox - vx) * s, dy = (oy - vy) * s, dw = tiles * s;
@@ -5307,18 +5361,22 @@
       if (zi !== null) { tg.globalCompositeOperation = 'source-atop'; tg.save(); tg.translate(dx, dy); paintFog(tg, dw, dw, zi); tg.restore(); tg.globalCompositeOperation = 'source-over'; }
       mctx.drawImage(miniTmp, 0, 0);
     };
-    // All water first (this zone's and every seam neighbour's shallows and foam), then the land layers on top, so a coast carries on across a seam.
-    const seams = zdef.portals.filter(p => p.seam);
-    if (miniWater) layer(miniWater, MAP, 0, 0, null);
-    for (const p of seams) { const e = miniNeighbour(p.to); if (e.water) layer(e.water, e.size, -p.seam.shift[0], -p.seam.shift[1], null); }
-    for (const p of seams) { const e = miniNeighbour(p.to); layer(e.base, e.size, -p.seam.shift[0], -p.seam.shift[1], p.to); }
+    // All water first (every world zone in view: shallows and foam), then the land layers on top, so a coast carries on across a border.
+    const seams = zdef.portals.filter(p => p.seam), near = wmode ? miniNear(vx, vy, V) : [];
+    if (wmode) {
+      for (const n of near) if (n.e && n.e.water) layer(n.e.water, n.size, n.ox, n.oy, null);
+      for (const n of near) if (n.z !== zone && n.e) layer(n.e.base, n.size, n.ox, n.oy, n.z);
+    } else if (miniWater) layer(miniWater, MAP, 0, 0, null);
     layer(miniBase, MAP, 0, 0, zone);
     mctx.restore();
     mctx.save(); mctx.translate(-vx * s, -vy * s);
-    // What the neighbours across a seam show: their NPCs and the view-only enemies and players already moved into this frame.
+    // The NPCs of every other world zone in view, and what the neighbours across a seam show: the view-only enemies and players already moved into this frame.
+    for (const w of near) {
+      if (w.z === zone) continue;
+      for (const n of ZONES[w.z].npcs || []) if (!n.travelStop && seen(w.z, n.x, n.y)) { mctx.fillStyle = '#f5d477'; mctx.fillRect((n.x + w.ox) * s - 1, (n.y + w.oy) * s - 1, 2, 2); }
+    }
     for (const p of seams) {
       const [shx, shy] = p.seam.shift;
-      for (const n of ZONES[p.to].npcs || []) if (!n.travelStop && seen(p.to, n.x, n.y)) { mctx.fillStyle = '#f5d477'; mctx.fillRect((n.x - shx) * s - 1, (n.y - shy) * s - 1, 2, 2); }
       for (const g of ghostPlayers.values()) if (seen(p.to, g.x + shx, g.y + shy)) { mctx.fillStyle = '#b3dfff'; mctx.beginPath(); mctx.arc(g.x * s, g.y * s, 2.5, 0, 6.283); mctx.fill(); }
       for (const g of ghostSlimes.values()) if (!g.dead && seen(p.to, g.x + shx, g.y + shy)) { mctx.fillStyle = g.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(g.x * s, g.y * s, 2, 0, 6.283); mctx.fill(); }
     }
@@ -5338,17 +5396,20 @@
       mctx.globalAlpha = 1;
     };
     for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
-    sparkLayer(City.npcs.filter(n => n.travelStop), 0, 0, inA);
+    const mA = wmode ? 1 : inA;       // a world zone's sparks and quest marks never fade at a border: every zone in view shows its own
+    sparkLayer(City.npcs.filter(n => n.travelStop), 0, 0, mA);
+    for (const w of near) if (w.z !== zone) sparkLayer((ZONES[w.z].npcs || []).filter(n => n.travelStop), w.ox, w.oy, 1);
     for (const remote of remotePlayers.values()) {
       if (!seen(zone, remote.x, remote.y)) continue; mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
     farLayer(farDots, zone, 0, 0, inA);
-    if (miniFade) { const [fx, fy] = miniFade.shift; farLayer(miniFade.far, miniFade.zone, fx, fy, outA); sparkLayer(miniFade.sparks, fx, fy, outA); }
+    if (miniFade) { const [fx, fy] = miniFade.shift; farLayer(miniFade.far, miniFade.zone, fx, fy, outA); if (!wmode) sparkLayer(miniFade.sparks, fx, fy, outA); }
     // Quest guidance stays above fog and actors, and changes independently of the cached ground.
-    const questLayer = (list, dx, dy, a) => {
+    const questLayer = (list, dx, dy, a, pin = true) => {
       mctx.save(); mctx.globalAlpha = a; mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';
       for (const q of list) {
         const qx = q.x + dx, qy = q.y + dy;
+        if (!pin && (qx < vx || qx > vx + V || qy < vy || qy > vy + V)) continue;     // another zone's marks only where they are in view; the hero's own zone pins to the edge as a guide
         const x = Math.max(vx * s + 7, Math.min(vx * s + W - 7, qx * s)), y = Math.max(vy * s + 8, Math.min(vy * s + W - 8, qy * s));
         mctx.strokeStyle = '#101827'; mctx.fillStyle = q.color; mctx.lineWidth = 3;
         if (q.state === 'tracked') {
@@ -5361,8 +5422,9 @@
       }
       mctx.restore();
     };
-    questLayer(window.Quests?.mapMarkers(zone) || [], 0, 0, inA);
-    if (miniFade) questLayer(miniFade.quests, miniFade.shift[0], miniFade.shift[1], outA);
+    questLayer(window.Quests?.mapMarkers(zone) || [], 0, 0, mA);
+    for (const w of near) if (w.z !== zone) questLayer(window.Quests?.mapMarkers(w.z) || [], w.ox, w.oy, 1, false);
+    if (miniFade && !wmode) questLayer(miniFade.quests, miniFade.shift[0], miniFade.shift[1], outA);
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
     mctx.restore();
   }
@@ -5543,7 +5605,7 @@
       for (const o of map.ghosts || []) out.push([o.kind, o.x, o.y]);
       for (const R of map.vregs || []) for (const o of vaultSeason(R)) out.push([o.kind, o.x, o.y]);
       return out.filter(o => Math.hypot(o[1] - x, o[2] - y) < r);
-    }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostWater() { return (map.ghostWater || []).length; }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { walls: (map.ghosts || []).filter(o => WALL_KINDS.has(o.kind)).map(o => [o.x, o.y]), slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    }, get miniZones() { return [...miniCache.keys()].sort((a, b) => a - b); }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostWater() { return (map.ghostWater || []).length; }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { walls: (map.ghosts || []).filter(o => WALL_KINDS.has(o.kind)).map(o => [o.x, o.y]), slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };
