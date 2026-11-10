@@ -205,11 +205,7 @@ fn the_wyrdwood_is_a_big_forest_zone_with_five_kinds_three_elites_five_hubs_and_
     assert_eq!(live.len(), 8, "{live:?}");
     assert_eq!(
         asleep.into_iter().collect::<Vec<_>>(),
-        [
-            ("crow", 6),
-            ("ram", 8),
-            ("troll", 7)
-        ]
+        [("crow", 6), ("ram", 8), ("troll", 7)]
     );
     for (kind, level) in [
         ("boar", 21),

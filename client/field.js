@@ -1420,7 +1420,7 @@
     if (npc) { talkTo(npc); return; }
     const sign = signs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<=SIGN_W && my>=y-SIGN_TOP && my<=y+10; });
     if (sign) { talkTo(sign); return; }
-    const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27 && my>=y-37 && my<=y+7; });
+    const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27*CHEST_SCALE && my>=y-37*CHEST_SCALE && my<=y+7*CHEST_SCALE; });
     if (chest) { openChest(chest); return; }
     const portal = pickPortal(mx, my); if (portal) { visitPortal(portal); return; }
     pointer.down = true; if (Number.isInteger(e.pointerId)) cv.setPointerCapture?.(e.pointerId);
@@ -3762,10 +3762,13 @@
       const i = new Image(); i.onload = () => res({ meta, img: i }); i.onerror = rej; i.src = 'assets/chest.png';
     })).then(src => { chestSrc = src; }).catch(() => { chestSrc = null; });
   }
+  // CHEST-BIGGER: the chest is drawn this much larger than its 64x64 atlas (and vector fallback), scaled about its feet, so it is
+  // easy to spot. The click box, shadow, countdown label and cull margin below all follow it.
+  const CHEST_SCALE = 1.75;
   // One frame of the chest atlas with its feet on (sx, sy).
   function drawChestFrame(g, row, n, sx, sy) {
-    const [w, h] = chestSrc.meta.frame, [ax, ay] = chestSrc.meta.anchor;
-    g.save(); g.imageSmoothingEnabled = false; g.drawImage(chestSrc.img, n * w, row * h, w, h, Math.round(sx - ax), Math.round(sy - ay), w, h); g.restore();
+    const [w, h] = chestSrc.meta.frame, [ax, ay] = chestSrc.meta.anchor, k = CHEST_SCALE;
+    g.save(); g.imageSmoothingEnabled = false; g.drawImage(chestSrc.img, n * w, row * h, w, h, Math.round(sx - ax * k), Math.round(sy - ay * k), Math.round(w * k), Math.round(h * k)); g.restore();
   }
   const BANK_KINDS=['bank_alderhaven','bank_skaldholm','bank_nacrehold','bank_astralhollow','bank_asterion'];
   function loadBankSprites() {
@@ -4614,17 +4617,17 @@
     if (chestSrc) {
       drawChestFrame(g, 0, reducedMotion() ? 0 : Math.floor(tAll * 6 + chest.x * 7) % 6, sx, sy);
       g.save(); g.translate(sx, sy); g.font = 'bold 13px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = '#281d20'; g.fillStyle = left <= 30 ? '#ff9a83' : '#fff1c8';
-      const text = `${Math.floor(left / 60)}:${String(left % 60).padStart(2,'0')}`; g.strokeText(text,0,-40); g.fillText(text,0,-40); g.restore();
+      const text = `${Math.floor(left / 60)}:${String(left % 60).padStart(2,'0')}`, ty = Math.round(-40 * CHEST_SCALE); g.strokeText(text,0,ty); g.fillText(text,0,ty); g.restore();
       return;
     }
-    g.save(); g.translate(sx, sy); g.lineJoin = 'round'; g.lineWidth = 2.5; g.strokeStyle = '#2d1b17';
+    g.save(); g.translate(sx, sy); g.save(); g.scale(CHEST_SCALE, CHEST_SCALE); g.lineJoin = 'round'; g.lineWidth = 2.5; g.strokeStyle = '#2d1b17';
     g.fillStyle = '#8f5129'; g.beginPath(); g.moveTo(-24,-22); g.lineTo(0,-29); g.lineTo(24,-22); g.lineTo(24,1); g.lineTo(0,8); g.lineTo(-24,1); g.closePath(); g.fill(); g.stroke();
     g.fillStyle = '#b97837'; g.beginPath(); g.moveTo(-24,-22); g.lineTo(0,-29); g.lineTo(24,-22); g.lineTo(0,-15); g.closePath(); g.fill(); g.stroke();
     g.fillStyle = '#704025'; g.beginPath(); g.moveTo(0,-15); g.lineTo(24,-22); g.lineTo(24,1); g.lineTo(0,8); g.closePath(); g.fill(); g.stroke();
     g.strokeStyle = '#e9c56f'; g.lineWidth = 4; g.beginPath(); g.moveTo(-20,-18); g.lineTo(-20,0); g.moveTo(20,-18); g.lineTo(20,1); g.moveTo(0,-15); g.lineTo(0,7); g.stroke();
-    g.fillStyle = '#ffe08b'; g.strokeStyle = '#6b401a'; g.lineWidth = 2; g.fillRect(-5,-13,10,10); g.strokeRect(-5,-13,10,10);
+    g.fillStyle = '#ffe08b'; g.strokeStyle = '#6b401a'; g.lineWidth = 2; g.fillRect(-5,-13,10,10); g.strokeRect(-5,-13,10,10); g.restore();
     g.font = 'bold 13px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = '#281d20'; g.fillStyle = left <= 30 ? '#ff9a83' : '#fff1c8';
-    const label = `${Math.floor(left / 60)}:${String(left % 60).padStart(2,'0')}`; g.strokeText(label,0,-40); g.fillText(label,0,-40); g.restore();
+    const label = `${Math.floor(left / 60)}:${String(left % 60).padStart(2,'0')}`, ly = Math.round(-40 * CHEST_SCALE); g.strokeText(label,0,ly); g.fillText(label,0,ly); g.restore();
   }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
@@ -4833,7 +4836,7 @@
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
     for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of ghostSlimes.size ? [...slimes, ...ghostSlimes.values()] : slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, enemyCullMargin(s))) { const sk = enemyShadowK(s); shadow(g, s.x, s.y, 28 * sk * s.d.scale * (1 - s.hop * .12), 11 * sk * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
-    for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, 70)) { shadow(g,chest.x,chest.y,27,9,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
+    for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, Math.round(70 * CHEST_SCALE))) { shadow(g,chest.x,chest.y,27 * CHEST_SCALE,9 * CHEST_SCALE,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
     for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
@@ -4970,7 +4973,7 @@
     } else if (e.kind === 'chestOpen') {
       if (!chestSrc) continue;
       const [sx, sy] = w2s(e.x, e.y), fade = Math.min(1, (e.life - e.t) / .4);   // the lid swings back, the pile shimmers, then it is gone
-      g.save(); g.globalAlpha = fade; g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(sx, sy, 27, 9, 0, 0, 6.283); g.fill();
+      g.save(); g.globalAlpha = fade; g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(sx, sy, 27 * CHEST_SCALE, 9 * CHEST_SCALE, 0, 0, 6.283); g.fill();
       if (e.t < .5) drawChestFrame(g, 1, Math.min(5, Math.floor(e.t * 12)), sx, sy); else drawChestFrame(g, 2, Math.floor((e.t - .5) * 4) % 2, sx, sy);
       g.restore();
     } else if (e.kind === 'forgeOrb') {

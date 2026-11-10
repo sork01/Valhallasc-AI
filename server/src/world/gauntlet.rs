@@ -156,7 +156,11 @@ pub(super) fn opponent_character(class: Class, level: u32, name: &str) -> Charac
 
 /// The distance `pvp_attack` allows for a class.
 fn attack_range(class: Class) -> f64 {
-    class.reach().max(if class.ranged() { 8. } else { 1.8 })
+    if class.ranged() {
+        class.reach().max(8.)
+    } else {
+        1.8 // same as pvp_attack: melee PvP range is unchanged by MELEE-REACH
+    }
 }
 
 impl World {

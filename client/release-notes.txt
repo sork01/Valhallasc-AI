@@ -1,5 +1,37 @@
 [
   {
+    "version": "Beta 1.40.0",
+    "date": "2026-11-10",
+    "new": [
+      "Almost every outdoor zone now has the shape of its province on the painted world map, instead of a square: Greenmeadow, the Emberfall Crags, Rimeveil, Gloamfen, the Wyrdwood, Bifrost Reach, Ran's Deep, Nacrehold, Astralhollow, the Prismwaste, the Obsidian Orrery, the Stormglass Flats, Emberwake, the Ribbonwild, the Tanglecrown, the Veyrroot Canopy, the Lapis Erg, Frostwake, the Cairnspine, Sunward Vale and the Yearwheel.",
+      "Zones that touch on the world map now join without a loading gate: you walk across the border, see the next zone's ground and scenery before you cross, and a road leads across every border.",
+      "Every reshaped zone is rebuilt by hand with new regions, three outposts, a new elite and 14 to 16 new quests, and no filler land.",
+      "Heartwood is now the main city inside the world-tree, built from grown and carved wood.",
+      "New characters start on a pier in Greenmeadow beside a ship, and a guide quest leads them to the beginner quests when they step off the dock.",
+      "The minimap follows you and can be zoomed with the mouse wheel or the = and - keys."
+    ],
+    "changed": [
+      "The Stormglass Shore is now called the Stormglass Flats, because it is no longer on the coast.",
+      "Quests, enemies and people in the reshaped zones moved to fit the new maps, and characters standing in a zone are placed at its start when the map changes.",
+      "The game sends less data in big zones: enemies far away are not sent, and updates are compressed.",
+      "Greenmeadow's cottages, mill and chapels are redrawn in the same angled view as every house."
+    ],
+    "removed": [
+      "The old square zone layouts and their filler land are gone, because the new shapes replace them.",
+      "The old quests of the reshaped zones are replaced by new ones, because they no longer fit the new maps."
+    ]
+  },
+  {
+    "version": "Beta 1.39.35",
+    "date": "2026-11-10",
+    "new": [],
+    "changed": [
+      "Treasure chests are drawn almost twice as big, so they are much easier to spot, and you can click anywhere on the larger chest to open it.",
+      "Melee attacks reach a little further for both heroes and monsters: Warriors, Assassins and Priests hit about 25% farther away, and monsters start their attacks from a slightly longer distance. Duels and arena fights keep their old melee range."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.39.34",
     "date": "2026-11-09",
     "new": [],

@@ -1251,5 +1251,7 @@
   "The Stoat Pass",
   "The Tidehollow Circle",
   "The Wheelmark Cairn",
-  "The Wheelmark Circle"
+  "The Wheelmark Circle",
+  "Beta 1.39.35",
+  "Beta 1.40.0"
 ]

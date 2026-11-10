@@ -81,10 +81,10 @@ impl Class {
     }
     pub fn reach(self) -> f64 {
         match self {
-            Self::Warrior => 1.35,
+            Self::Warrior => 1.7,
             Self::Mage => 5.5,
-            Self::Assassin => 1.1,
-            Self::Priest => 1.5,
+            Self::Assassin => 1.4,
+            Self::Priest => 1.9,
             Self::Hunter => 7.,
         }
     }
