@@ -1566,8 +1566,9 @@
   }
   function shadowstep() { const [dx, dy] = keyboardDirection(); Online.send({ type: 'dash', dx, dy }); }
   const classSprite = look => (look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : look.class === 'hunter' ? HunterSprite : WarriorSprite).variant(look);
+  let curSnapTime;                                                // the server clock of the snapshot being applied (ActorMotion measures velocity on it)
   function applyActor(actor, packet, snap = false) {
-    const x = actor.x, y = actor.y;
+    const x = actor.x, y = actor.y, prevNx = actor.nx, prevNy = actor.ny;
     // Snapshot transitions drive one short cue per impact, for the victim and every observer.
     if (packet.stun !== undefined) {
       const wardBefore = mageWardActive(actor), wardAfter = mageWardActive(packet);
@@ -1583,6 +1584,7 @@
     }
     Object.assign(actor, packet); actor.nx = packet.x; actor.ny = packet.y;
     if (!snap && Math.hypot(x - packet.x, y - packet.y) < 4) { actor.x = x; actor.y = y; }
+    ActorMotion.track(actor, prevNx, prevNy, packet.x, packet.y, curSnapTime, performance.now() / 1000, snap);
   }
   function keepActorsSeparated() {
     const enemies = new Set(slimes);
@@ -1615,6 +1617,7 @@
     window.Festival?.sync(own.festivalDance,own.festivalBuff,packet.seasons);
     explored = Array.isArray(own.explored) ? own.explored : null;
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
+    curSnapTime = typeof packet.time === 'number' ? packet.time : undefined;
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
     const moved = (own.zone || 0) !== zone;
     // Crossing a shared border (a seam) is not a journey: the server moved us by the border's whole-tile shift, so the
@@ -3102,7 +3105,8 @@
   }
   function interpolate(actor, dt) {
     if (Number.isFinite(actor.danceT)) actor.danceT += dt;
-    if (Number.isFinite(actor.nx)) { const k = Math.min(1, dt * 14); actor.x += (actor.nx - actor.x) * k; actor.y += (actor.ny - actor.y) * k; }
+    // Drawn on the line between the last two snapshots (see actormotion.js), not chasing the newest one: that surged at every 10 Hz snapshot.
+    ActorMotion.step(actor, dt, performance.now() / 1000, actor === hero);
     // Mounted gaits were authored for 2× travel; 160% travel uses 80% of that cadence.
     if (actor.moving) actor.walk += dt * (actor.mounted ? 8.8 : 11);
     if (actor.atkT > 0) actor.atkT += dt;

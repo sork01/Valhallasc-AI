@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.40.1",
+    "date": "2026-11-10",
+    "new": [],
+    "changed": [
+      "Walking is smooth now: your hero, other players and monsters glide between the game's updates instead of jerking forward about ten times a second. The smoothing also copes with an uneven connection.",
+      "The game keeps up with the big new zones again. It was falling behind, which made movement choppy and made time in the world run slow."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.40.0",
     "date": "2026-11-10",
     "new": [

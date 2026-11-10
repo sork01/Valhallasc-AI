@@ -1253,5 +1253,6 @@
   "The Wheelmark Cairn",
   "The Wheelmark Circle",
   "Beta 1.39.35",
-  "Beta 1.40.0"
+  "Beta 1.40.0",
+  "Beta 1.40.1"
 ]
