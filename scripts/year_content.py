@@ -147,7 +147,7 @@ def Q(id, title, npc, level, desc, objectives, requires=None, repeatable=False, 
 QUESTS = [
     # Springmere (spring, south-west)
     Q('yrs_sp_hold', 'Keep the Weir Clear', 'yr_sp_lead', 96,
-      'West of Springmere the old weir holds the spring water back from the meadows, and whenever the newts crowd the sluice the fields flood. Stand in the circle beside the weir for twenty seconds while Ilya clears it, and let nothing reach her.',
+      'North-west of Springmere the old weir holds the spring water back from the meadows, and whenever the newts crowd the sluice the fields flood. Stand in the circle beside the weir for twenty seconds while Ilya clears it, and let nothing reach her.',
       [('hold', 'yrs_sp_m', 'Keep the Springmere Weir Clear', 20)], requires='yr_sp_intro'),
     Q('yrs_rounds', 'The Three Outposts', 'yr_sp_lead', 97,
       'Three outposts keep the far reaches of the wheel: Wheelmark Post in the north, Tidehollow Camp on the east coast and Lowfall Rest on the southern plain. Ilya wants their wardens told that the spring road is open again. Speak with Ingrid, Halvar and Tove, and use the Travel Masters if the road is long.',
@@ -181,16 +181,16 @@ QUESTS = [
       [('visit', 'yw_tidepool', 'Reach the Amber Tidepools', 1), ('kill', 'acornmimic', 'Defeat Acorn Mimics at the pools', 6)], requires='yrs_th_hold'),
     # Lowfall Rest (summer, southern plain)
     Q('yrs_lf_kiln', 'To the Old Kilns', 'yo_lf_tove', 96,
-      'East of the rest the old kilns stand in a ring on the plain, and the sundarters nest in their ash. Walk out to the Old Kilns and defeat five Sundarters on the way.',
+      'South-east of the rest the old kilns stand in a ring on the plain, and the sundarters nest in their ash. Walk out to the Old Kilns and defeat five Sundarters on the way.',
       [('visit', 'yw_kiln', 'Reach the Old Kilns', 1), ('kill', 'sundarter', 'Defeat Sundarters on the way', 5)], requires='yr_su_intro'),
     Q('yrs_lf_scales', 'Scales for the Glaze', 'yo_lf_arvid', 97,
       'Arvid grinds sundarter scale into his glaze, and the pots come out the colour of the plain at noon. Bring him six Sundarter Scales.',
       [('bring', 'sundarter_scale', 'Bring Sundarter Scales', 6)], requires='yrs_lf_kiln'),
     Q('yrs_lf_hold', 'Hold the Lowfall Circle', 'yo_lf_tove', 97,
-      'The heat gong west of the rest rings by itself when the sundarters gather, and then every one on the plain comes to it. Stand in the circle beside it for twenty seconds while Tove stills the gong, and keep them off her.',
+      'The heat gong south-west of the rest rings by itself when the sundarters gather, and then every one on the plain comes to it. Stand in the circle beside it for twenty seconds while Tove stills the gong, and keep them off her.',
       [('hold', 'yrs_lf_m', 'Hold the Lowfall Circle', 20)], requires='yrs_lf_kiln'),
     Q('yrs_lf_dust', 'Across the Dustwind Flats', 'yo_lf_tove', 98,
-      'South-east of the rest the flats lie open to the dust wind, and the sundarters hunt there in packs. Walk out to the Dustwind Flats and defeat six Sundarters there.',
+      'Far to the south-east of the rest, beyond the kilns, the flats lie open to the dust wind, and the sundarters hunt there in packs. Walk out to the Dustwind Flats and defeat six Sundarters there.',
       [('visit', 'yw_dust', 'Reach the Dustwind Flats', 1), ('kill', 'sundarter', 'Defeat Sundarters on the flats', 6)], requires='yrs_lf_hold'),
     # the Equinox Crossing
     Q('yrs_crossing', 'Stand at the Crossing', 'null_guide', 99,

@@ -639,3 +639,154 @@ fn everyone_and_everything_on_the_wheel_can_be_walked_to_from_the_vault() {
         }
     }
 }
+
+#[test]
+fn the_compass_words_in_the_new_texts_match_where_things_stand() {
+    let w = world();
+    let m = &w.maps[YEAR];
+    let data = raw();
+    let z = &data["zones"][YEAR - 1];
+    let hub = |name: &str| -> (f64, f64) {
+        let c = std::iter::once(&z["city"])
+            .chain(z["camps"].as_array().unwrap().iter())
+            .find(|c| c["name"] == name)
+            .unwrap_or_else(|| panic!("no hub {name}"));
+        (
+            c["plaza"]["x"].as_f64().unwrap(),
+            c["plaza"]["y"].as_f64().unwrap(),
+        )
+    };
+    let bearing = |from: (f64, f64), to: (f64, f64)| -> &'static str {
+        let ang = (to.0 - from.0)
+            .atan2(-(to.1 - from.1))
+            .to_degrees()
+            .rem_euclid(360.);
+        [
+            "north",
+            "north-east",
+            "east",
+            "south-east",
+            "south",
+            "south-west",
+            "west",
+            "north-west",
+        ][((ang + 22.5) / 45.) as usize % 8]
+    };
+    // (quest, the hub the giver stands in, the place, the compass word the text uses for it)
+    for (quest, hub_name, place, word) in [
+        (
+            "yrs_sp_hold",
+            "Springmere",
+            "yrs_sp_m",
+            "North-west of Springmere",
+        ),
+        (
+            "yrs_wm_cairn",
+            "Wheelmark Post",
+            "yw_cairn",
+            "North-east of the post",
+        ),
+        (
+            "yrs_wm_hold",
+            "Wheelmark Post",
+            "yrs_wm_m",
+            "south-east of the post",
+        ),
+        (
+            "yrs_wm_pass",
+            "Wheelmark Post",
+            "yw_pass",
+            "South-west of the post",
+        ),
+        (
+            "yrs_th_shore",
+            "Tidehollow Camp",
+            "yw_shore",
+            "North of the camp",
+        ),
+        (
+            "yrs_th_hold",
+            "Tidehollow Camp",
+            "yrs_th_m",
+            "north-west of the camp",
+        ),
+        (
+            "yrs_th_pools",
+            "Tidehollow Camp",
+            "yw_tidepool",
+            "South of the camp",
+        ),
+        (
+            "yrs_lf_kiln",
+            "Lowfall Rest",
+            "yw_kiln",
+            "South-east of the rest",
+        ),
+        (
+            "yrs_lf_hold",
+            "Lowfall Rest",
+            "yrs_lf_m",
+            "south-west of the rest",
+        ),
+        (
+            "yrs_lf_dust",
+            "Lowfall Rest",
+            "yw_dust",
+            "south-east of the rest",
+        ),
+    ] {
+        let q = z["quests"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|q| q["id"] == quest)
+            .unwrap_or_else(|| panic!("no quest {quest}"));
+        let text = q["description"].as_str().unwrap();
+        assert!(
+            text.contains(word),
+            "{quest}: the text should say {word:?}: {text}"
+        );
+        let p = m
+            .places
+            .iter()
+            .find(|p| p.id == place)
+            .unwrap_or_else(|| panic!("no place {place}"));
+        let said = word.split(' ').next().unwrap().to_lowercase();
+        assert_eq!(
+            bearing(hub(hub_name), (p.x, p.y)),
+            said,
+            "{quest}: {place} lies {} of {hub_name}",
+            bearing(hub(hub_name), (p.x, p.y))
+        );
+    }
+}
+
+#[test]
+fn a_hero_pushed_south_along_the_vault_stretch_walks_up_to_sunwards_wall_and_no_further() {
+    let data = raw();
+    let year = &data["zones"][YEAR - 1];
+    let rows = floor_rows(year);
+    let arch = year["exitArches"].as_array().unwrap()[0].clone();
+    let ax = arch["x"].as_f64().unwrap();
+    let w = world();
+    let map = &w.maps[YEAR];
+    for dx in [-30., -15., 15., 30.] {
+        let x = ax + dx;
+        let last = last_land(&rows, x as usize).unwrap() as f64;
+        let mut foot = at(x, last - 6.);
+        for _ in 0..80 {
+            map.walk(&mut foot, at(0., 1.), 0.5, PLAYER_RADIUS);
+        }
+        // one row of ground past our own line, then void: the wall's face stands at about line + 0.8
+        assert!(
+            foot.y > last + 1.0,
+            "x {x:.0}: stopped at {:.2}, a tile short of the wall (last land row {last})",
+            foot.y
+        );
+        assert!(
+            foot.y < last + 2.0,
+            "x {x:.0}: walked on to {:.2}, past the wall",
+            foot.y
+        );
+    }
+}

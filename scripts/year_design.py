@@ -847,6 +847,12 @@ def pocket_cells(zone, fr):
         for v in range(-6, int(POCKET_DEPTH + WALL_IN + 2)):
             x, y = ax + tx * u + nx * (v - WALL_IN - 1.5), ay + ty * u + ny * (v - WALL_IN - 1.5)
             cells.append((int(x), int(y)))
+    # along the whole matched stretch one more row of ground past our own line: Sunward's wall is drawn there (no collision in this frame), so a hero walks up to its face instead of stopping a tile short
+    rows = zone['shapeFloor']
+    bx = int(round(fr['bY'][0]))
+    for x in range(bx - MATCH_EXACT, bx + MATCH_EXACT + 1):
+        last = max(y for y, row in enumerate(rows) if row[x] == '#')
+        cells.append((x, last + 1))
     return cells
 
 

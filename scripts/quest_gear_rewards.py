@@ -319,6 +319,15 @@ REWARDS = {
     'yr_su_solar_final': blue(95, 'accessory'),
     'yr_au_amber_final': blue(95, 'necklace'),
     'yr_wi_sols_final': blue(95, 'accessory'),
+    # the Yearwheel's outposts (pilot): a green at the end of each chain (the ladder has level 95 here)
+    'yrs_sp_hold': green(95, 'accessory'),
+    'yrs_rounds': green(95, 'pants'),
+    'yrs_wm_hold': green(95, 'necklace'),
+    'yrs_wm_pass': green(95, 'accessory'),
+    'yrs_th_hold': green(95, 'pants'),
+    'yrs_th_pools': green(95, 'necklace'),
+    'yrs_lf_hold': green(95, 'accessory'),
+    'yrs_lf_dust': green(95, 'pants'),
 }
 
 

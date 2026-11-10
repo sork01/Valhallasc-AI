@@ -1432755,24 +1432755,6 @@
         },
         {
           "kind": "void",
-          "x": 237.5,
-          "y": 872.0,
-          "r": 6.0,
-          "width": 1,
-          "depth": 12,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "void",
-          "x": 237.5,
-          "y": 883.0,
-          "r": 5.0,
-          "width": 1,
-          "depth": 10,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "void",
           "x": 439.5,
           "y": 872.0,
           "r": 6.0,
@@ -1432791,19 +1432773,19 @@
         },
         {
           "kind": "void",
-          "x": 239.5,
+          "x": 237.5,
           "y": 873.0,
           "r": 6.0,
-          "width": 3,
+          "width": 1,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 239.5,
+          "x": 237.5,
           "y": 883.5,
           "r": 4.5,
-          "width": 3,
+          "width": 1,
           "depth": 9,
           "layout": "shape_v1"
         },
@@ -1432827,19 +1432809,19 @@
         },
         {
           "kind": "void",
-          "x": 243.0,
+          "x": 239.5,
           "y": 874.0,
           "r": 6.0,
-          "width": 4,
+          "width": 3,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 243.0,
+          "x": 239.5,
           "y": 884.0,
           "r": 4.0,
-          "width": 4,
+          "width": 3,
           "depth": 8,
           "layout": "shape_v1"
         },
@@ -1432863,19 +1432845,19 @@
         },
         {
           "kind": "void",
-          "x": 246.5,
+          "x": 243.0,
           "y": 875.0,
           "r": 6.0,
-          "width": 3,
+          "width": 4,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 246.5,
+          "x": 243.0,
           "y": 884.5,
           "r": 3.5,
-          "width": 3,
+          "width": 4,
           "depth": 7,
           "layout": "shape_v1"
         },
@@ -1432899,7 +1432881,7 @@
         },
         {
           "kind": "void",
-          "x": 249.5,
+          "x": 246.5,
           "y": 876.0,
           "r": 6.0,
           "width": 3,
@@ -1432908,7 +1432890,7 @@
         },
         {
           "kind": "void",
-          "x": 249.5,
+          "x": 246.5,
           "y": 885.0,
           "r": 3.0,
           "width": 3,
@@ -1432935,19 +1432917,19 @@
         },
         {
           "kind": "void",
-          "x": 253.0,
+          "x": 249.5,
           "y": 877.0,
           "r": 6.0,
-          "width": 4,
+          "width": 3,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 253.0,
+          "x": 249.5,
           "y": 885.5,
           "r": 2.5,
-          "width": 4,
+          "width": 3,
           "depth": 5,
           "layout": "shape_v1"
         },
@@ -1432971,19 +1432953,19 @@
         },
         {
           "kind": "void",
-          "x": 256.5,
+          "x": 253.0,
           "y": 878.0,
           "r": 6.0,
-          "width": 3,
+          "width": 4,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 256.5,
+          "x": 253.0,
           "y": 886.0,
           "r": 2.0,
-          "width": 3,
+          "width": 4,
           "depth": 4,
           "layout": "shape_v1"
         },
@@ -1433007,19 +1432989,19 @@
         },
         {
           "kind": "void",
-          "x": 260.5,
+          "x": 256.5,
           "y": 879.0,
           "r": 6.0,
-          "width": 5,
+          "width": 3,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 260.5,
+          "x": 256.5,
           "y": 886.5,
-          "r": 2.5,
-          "width": 5,
+          "r": 1.5,
+          "width": 3,
           "depth": 3,
           "layout": "shape_v1"
         },
@@ -1433043,19 +1433025,19 @@
         },
         {
           "kind": "void",
-          "x": 265.0,
+          "x": 260.5,
           "y": 880.0,
           "r": 6.0,
-          "width": 4,
+          "width": 5,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 265.0,
+          "x": 260.5,
           "y": 887.0,
-          "r": 2.0,
-          "width": 4,
+          "r": 2.5,
+          "width": 5,
           "depth": 2,
           "layout": "shape_v1"
         },
@@ -1433079,19 +1433061,19 @@
         },
         {
           "kind": "void",
-          "x": 270.0,
+          "x": 265.0,
           "y": 881.0,
           "r": 6.0,
-          "width": 6,
+          "width": 4,
           "depth": 12,
           "layout": "shape_v1"
         },
         {
           "kind": "void",
-          "x": 270.0,
+          "x": 265.0,
           "y": 887.5,
-          "r": 3.0,
-          "width": 6,
+          "r": 2.0,
+          "width": 4,
           "depth": 1,
           "layout": "shape_v1"
         },
@@ -1433115,11 +1433097,11 @@
         },
         {
           "kind": "void",
-          "x": 274.5,
-          "y": 877.5,
-          "r": 1.5,
-          "width": 3,
-          "depth": 3,
+          "x": 270.0,
+          "y": 882.0,
+          "r": 6.0,
+          "width": 6,
+          "depth": 12,
           "layout": "shape_v1"
         },
         {
@@ -1433133,20 +1433115,20 @@
         },
         {
           "kind": "void",
+          "x": 274.5,
+          "y": 878.0,
+          "r": 1.5,
+          "width": 3,
+          "depth": 2,
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "void",
           "x": 426.5,
           "y": 882.5,
           "r": 5.5,
           "width": 1,
           "depth": 11,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "void",
-          "x": 297.0,
-          "y": 883.0,
-          "r": 6.0,
-          "width": 12,
-          "depth": 10,
           "layout": "shape_v1"
         },
         {
@@ -1433178,19 +1433160,10 @@
         },
         {
           "kind": "void",
-          "x": 309.0,
+          "x": 297.0,
           "y": 883.5,
           "r": 6.0,
           "width": 12,
-          "depth": 9,
-          "layout": "shape_v1"
-        },
-        {
-          "kind": "void",
-          "x": 319.0,
-          "y": 883.5,
-          "r": 4.5,
-          "width": 8,
           "depth": 9,
           "layout": "shape_v1"
         },
@@ -1433214,7 +1433187,7 @@
         },
         {
           "kind": "void",
-          "x": 329.0,
+          "x": 309.0,
           "y": 884.0,
           "r": 6.0,
           "width": 12,
@@ -1433223,10 +1433196,28 @@
         },
         {
           "kind": "void",
-          "x": 341.0,
+          "x": 319.0,
+          "y": 884.0,
+          "r": 4.0,
+          "width": 8,
+          "depth": 8,
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "void",
+          "x": 336.0,
           "y": 884.0,
           "r": 6.0,
           "width": 12,
+          "depth": 8,
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "void",
+          "x": 344.5,
+          "y": 884.0,
+          "r": 4.0,
+          "width": 5,
           "depth": 8,
           "layout": "shape_v1"
         },
@@ -1433245,6 +1433236,15 @@
           "y": 884.5,
           "r": 3.5,
           "width": 1,
+          "depth": 7,
+          "layout": "shape_v1"
+        },
+        {
+          "kind": "void",
+          "x": 326.5,
+          "y": 884.5,
+          "r": 3.5,
+          "width": 7,
           "depth": 7,
           "layout": "shape_v1"
         },
@@ -1439612,7 +1439612,7 @@
           "id": "yrs_sp_hold",
           "title": "Keep the Weir Clear",
           "npc": "yr_sp_lead",
-          "description": "West of Springmere the old weir holds the spring water back from the meadows, and whenever the newts crowd the sluice the fields flood. Stand in the circle beside the weir for twenty seconds while Ilya clears it, and let nothing reach her.",
+          "description": "North-west of Springmere the old weir holds the spring water back from the meadows, and whenever the newts crowd the sluice the fields flood. Stand in the circle beside the weir for twenty seconds while Ilya clears it, and let nothing reach her.",
           "objectives": [
             {
               "kind": "hold",
@@ -1439625,7 +1439625,8 @@
           "rewardXp": 11370,
           "rewardGold": 11500,
           "requires": "yr_sp_intro",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l95_green"
         },
         {
           "id": "yrs_rounds",
@@ -1439656,7 +1439657,8 @@
           "rewardXp": 11600,
           "rewardGold": 12000,
           "requires": "yr_sp_intro",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l95_green"
         },
         {
           "id": "yrs_wm_cairn",
@@ -1439719,7 +1439721,8 @@
           "rewardXp": 11600,
           "rewardGold": 12000,
           "requires": "yrs_wm_cairn",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l95_green"
         },
         {
           "id": "yrs_wm_pass",
@@ -1439744,7 +1439747,8 @@
           "rewardXp": 11830,
           "rewardGold": 12500,
           "requires": "yrs_wm_hold",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l95_green"
         },
         {
           "id": "yrs_th_shore",
@@ -1439807,7 +1439811,8 @@
           "rewardXp": 11830,
           "rewardGold": 12500,
           "requires": "yrs_th_shore",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l95_green"
         },
         {
           "id": "yrs_th_pools",
@@ -1439832,13 +1439837,14 @@
           "rewardXp": 12060,
           "rewardGold": 13000,
           "requires": "yrs_th_hold",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l95_green"
         },
         {
           "id": "yrs_lf_kiln",
           "title": "To the Old Kilns",
           "npc": "yo_lf_tove",
-          "description": "East of the rest the old kilns stand in a ring on the plain, and the sundarters nest in their ash. Walk out to the Old Kilns and defeat five Sundarters on the way.",
+          "description": "South-east of the rest the old kilns stand in a ring on the plain, and the sundarters nest in their ash. Walk out to the Old Kilns and defeat five Sundarters on the way.",
           "objectives": [
             {
               "kind": "visit",
@@ -1439882,7 +1439888,7 @@
           "id": "yrs_lf_hold",
           "title": "Hold the Lowfall Circle",
           "npc": "yo_lf_tove",
-          "description": "The heat gong west of the rest rings by itself when the sundarters gather, and then every one on the plain comes to it. Stand in the circle beside it for twenty seconds while Tove stills the gong, and keep them off her.",
+          "description": "The heat gong south-west of the rest rings by itself when the sundarters gather, and then every one on the plain comes to it. Stand in the circle beside it for twenty seconds while Tove stills the gong, and keep them off her.",
           "objectives": [
             {
               "kind": "hold",
@@ -1439895,13 +1439901,14 @@
           "rewardXp": 11600,
           "rewardGold": 12000,
           "requires": "yrs_lf_kiln",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l95_green"
         },
         {
           "id": "yrs_lf_dust",
           "title": "Across the Dustwind Flats",
           "npc": "yo_lf_tove",
-          "description": "South-east of the rest the flats lie open to the dust wind, and the sundarters hunt there in packs. Walk out to the Dustwind Flats and defeat six Sundarters there.",
+          "description": "Far to the south-east of the rest, beyond the kilns, the flats lie open to the dust wind, and the sundarters hunt there in packs. Walk out to the Dustwind Flats and defeat six Sundarters there.",
           "objectives": [
             {
               "kind": "visit",
@@ -1439920,7 +1439927,8 @@
           "rewardXp": 11830,
           "rewardGold": 12500,
           "requires": "yrs_lf_hold",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l95_green"
         },
         {
           "id": "yrs_crossing",

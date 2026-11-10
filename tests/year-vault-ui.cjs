@@ -33,6 +33,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
+  await page.route(/\.(mp3|ogg|wav)(\?.*)?$/, route => route.abort());      // the pilot client is at the memory cap: decoded music is the biggest thing a test never listens to
   if (process.env.MUTATE) {      // the vault drawing is switched off: both frames then draw only their own side of the arch
     await page.route(/\/field\.js(\?.*)?$/, async route => {
       const src = fs.readFileSync(path.join(root, 'client/field.js'), 'utf8').replace('map.ghosts = map.ghosts || []; map.vregs = vaultRegions();', 'map.ghosts = map.ghosts || []; map.vregs = [];');
@@ -63,6 +64,23 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const diff = (a, b) => { let sum = 0, big = 0; const n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
   const save = (name, im) => fs.writeFileSync(path.join(out, name), Buffer.from(im.png.split(',')[1], 'base64'));
 
+  // PART=stag: the Equinox Stag (and for scale a Snow Giant from the old art) in the real client, one picture each (the art's size is judged from an in-game screenshot)
+  if (process.env.PART === 'stag') {
+    page.on('response', r => { if (/yearwheelelites|sunwardelites/.test(r.url())) console.log('response', r.status(), r.url()); });
+    page.on('requestfailed', r => console.log('requestfailed', r.url()));
+    page.on('console', m => { if (m.type() === 'error') console.log('console error', m.text().slice(0, 200)); });
+    for (const [kind, dx, dy] of (process.env.STAGS || 'equinoxstag:-7:7,snowgiant:-7:7').split(',').map(v => v.split(':')).map(([k, a, b]) => [k, +a, +b])) {
+      const e = zoneDef(YEAR).slimes.find(t => t.kind === kind);
+      await debug({ op: 'teleport', zone: YEAR, x: e.x + dx, y: e.y + dy });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [YEAR, e.x + dx, e.y + dy], { timeout: 30000 });
+      await page.waitForTimeout(5000);
+      await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+      await page.screenshot({ path: path.join(out, `stag-${kind}-${dx}-${dy}.png`) });
+      console.log(kind, 'at', e.x, e.y, 'from', dx, dy);
+    }
+    assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
+    return;
+  }
   // 1. the frames line up and the data is what the design promises
   const yarch = zoneDef(YEAR).exitArches.find(a => a.portal === 'path_28_20');
   check(Math.abs(archV.x + sx - yarch.x) < .02 && Math.abs(archV.y + sy - yarch.y) < .02, 'the two arches are one place in the two frames');
@@ -76,7 +94,7 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   if (!PART || PART === 'pair') for (const [s, t] of (process.env.SS || '0.6:0,1.2:-3,1.2:3,2.4:0').split(',').map(x => x.split(':').map(Number))) {
     const px = archV.x + t, py = archV.y + s;
     check(onLand(VALE, px, py), `Sunward's point ${s}/${t} is land`);
-    const a = await snap(VALE, px, py), a2 = process.env.MUTATE ? a : await snap(VALE, px, py), b = await snap(YEAR, px + sx, py + sy);      // (the mutated run skips the noise snap: it is the memory-hungry one)
+    const a = await snap(VALE, px, py), a2 = process.env.MUTATE || process.env.NONOISE ? a : await snap(VALE, px, py), b = await snap(YEAR, px + sx, py + sy);      // (the mutated run skips the noise snap: it is the memory-hungry one)
     const noise = diff(a, a2), d = diff(a, b);
     save(`vault-vale-s${s}-t${t}.png`, a); save(`vault-year-s${s}-t${t}.png`, b);
     rows.push({ s: `${s}/${t}`, noise, d });
