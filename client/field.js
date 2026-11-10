@@ -5291,15 +5291,15 @@
     const keep = snapCtx(); adoptCtx(c);
     try { return { base: renderMini(), water: renderShallows(), size: c.MAP, at: performance.now() }; } finally { adoptCtx(keep); }
   }
-  // One zone per timer tick, so building the map arrays and the canvases of a far neighbour never lands inside a single frame.
+  // One zone per timer tick (250 ms apart), so building the map arrays and the canvases of a far neighbour never lands inside a single frame or two builds back to back.
   function miniWant(z) {
     if (miniCache.has(z) || miniQueue.includes(z)) return;
-    miniQueue.push(z); if (!miniTimer) miniTimer = setTimeout(miniPump, 30);
+    miniQueue.push(z); if (!miniTimer) miniTimer = setTimeout(miniPump, 60);
   }
   function miniPump() {
     miniTimer = 0; const z = miniQueue.shift();
     if (z !== undefined && !miniCache.has(z) && worldZone(z) && worldZone(zone)) { miniCache.set(z, miniRenderOf(miniCtx(z))); trimMini(); }
-    if (miniQueue.length) miniTimer = setTimeout(miniPump, 30);
+    if (miniQueue.length) miniTimer = setTimeout(miniPump, 250);   // a build is a hitch of its own: leave real frames between two of them
   }
   function buildMini() {
     if (worldZone(zone)) {
@@ -5329,16 +5329,30 @@
     const a = document.getElementById('mini-zoom-in'), b = document.getElementById('mini-zoom-out');
     if (a) a.disabled = miniZoom >= MINI_ZOOMS; if (b) b.disabled = miniZoom <= 1;
   }
+  // The tile box of a zone's real land (its grid is far bigger than its outline): reach tests use it, so a zone whose land is nowhere near the view costs nothing.
+  const landBoxes = new Map();
+  function landBox(z) {
+    let b = landBoxes.get(z); if (b) return b;
+    const f = ZONES[z].shapeFloor;
+    if (Array.isArray(f)) {
+      let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+      for (let y = 0; y < f.length; y++) { const r = f[y]; if (!r) continue; for (let x = 0; x < r.length; x++) if (r[x] && r[x] !== ' ') { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } }
+      b = x1 < 0 ? [0, 0, 0, 0] : [x0, y0, x1 + 1, y1 + 1];
+    } else b = [0, 0, ZONES[z].size, ZONES[z].size];
+    landBoxes.set(z, b); return b;
+  }
+  const travelStopLists = new Map();   // zone -> its Spark masters (a list built once, not every frame)
+  const travelStops = z => { let l = travelStopLists.get(z); if (!l) { l = (ZONES[z].npcs || []).filter(n => n.travelStop); travelStopLists.set(z, l); } return l; };
   // The world zones whose land can reach the view (V tiles across at (vx, vy), in the hero's frame), with the offset of each zone's origin in this frame.
   // Zones within a margin of the view are queued, nearest first, so their canvases are ready before they scroll in.
   function miniNear(vx, vy, V) {
     const T0 = zdef.shape.T, m = V * .6, out = [], want = []; miniReach = new Set([zone]);
     for (const z of worldZones()) {
-      const T = ZONES[z].shape.T, size = ZONES[z].size, ox = T[0] - T0[0], oy = T[1] - T0[1];
-      if (z !== zone && (ox > vx + V + m || oy > vy + V + m || ox + size < vx - m || oy + size < vy - m)) continue;
+      const T = ZONES[z].shape.T, size = ZONES[z].size, ox = T[0] - T0[0], oy = T[1] - T0[1], [bx0, by0, bx1, by1] = landBox(z), x0 = ox + bx0, y0 = oy + by0, x1 = ox + bx1, y1 = oy + by1;
+      if (z !== zone && (x0 > vx + V + m || y0 > vy + V + m || x1 < vx - m || y1 < vy - m)) continue;
       miniReach.add(z);
-      const e = miniCache.get(z) || null; if (e) e.at = performance.now(); else want.push([Math.hypot(ox + size / 2 - hero.x, oy + size / 2 - hero.y), z]);
-      if (z === zone || !(ox > vx + V || oy > vy + V || ox + size < vx || oy + size < vy)) out.push({ z, ox, oy, size, e });
+      const e = miniCache.get(z) || null; if (e) e.at = performance.now(); else want.push([Math.hypot((x0 + x1) / 2 - hero.x, (y0 + y1) / 2 - hero.y), z]);
+      if (z === zone || !(x0 > vx + V || y0 > vy + V || x1 < vx || y1 < vy)) out.push({ z, ox, oy, size, e });
     }
     want.sort((a, b) => a[0] - b[0]); for (const [, z] of want) miniWant(z);
     return out;
@@ -5398,7 +5412,7 @@
     for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
     const mA = wmode ? 1 : inA;       // a world zone's sparks and quest marks never fade at a border: every zone in view shows its own
     sparkLayer(City.npcs.filter(n => n.travelStop), 0, 0, mA);
-    for (const w of near) if (w.z !== zone) sparkLayer((ZONES[w.z].npcs || []).filter(n => n.travelStop), w.ox, w.oy, 1);
+    for (const w of near) if (w.z !== zone) sparkLayer(travelStops(w.z), w.ox, w.oy, 1);
     for (const remote of remotePlayers.values()) {
       if (!seen(zone, remote.x, remote.y)) continue; mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }

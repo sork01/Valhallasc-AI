@@ -36,6 +36,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ### Zone shapes follow the world-map provinces (owner request, 2026-11-05)
 
+- [ ] `MINIMAP-INTERIOR` - Owner answer 2026-11-06 for `MINIMAP-WORLD`: inside places that are not on the atlas (dungeons, raids, Arena, city interiors) show the world map centred on the entrance, with a marker that you are inside. **Not built in Beta 1.41.0 (they keep their own minimap); first confirm with the owner, because this replaces the dungeon layout minimap.** Also open: the Sunward-Yearwheel doorway still changes the minimap (different scale); a zone build costs 0.3-1.4 s of main thread in the throttled test (about 10 per walk across the Stormglass region, one per 250 ms, cached).
+
 **Owner request:** change the zones so they look like the zones on the world map, shape-wise (today every zone is a square grid; the painted atlas gives each province an irregular outline, `world/atlas-geography.txt`, 23 regions).
 
 **Owner answers (grill, 2026-11-05):**
