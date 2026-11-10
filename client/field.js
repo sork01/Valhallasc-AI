@@ -5194,7 +5194,7 @@
   }
   function renderMini() {
     const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
-    g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, U, U);   // the whole canvas: a shaped zone's is bigger than 144 units, and the strip the fill missed was black on the minimap
+    g.fillStyle = zdef.theme === 'emberwake' ? '#49414d' : zdef.theme === 'chained_forge' ? '#6b302b' : zdef.theme === 'blackhour' ? '#181522' : zdef.theme === 'longship' ? '#123b46' : zdef.theme === 'skybridge' ? '#19223b' : zdef.theme === 'nornroot' ? '#273c32' : moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? (bigSky() ? '#4f88dc' : '#1a1838') : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, U, U);   // the whole canvas: a shaped zone's is bigger than 144 units, and the strip the fill missed was black on the minimap
     if (yearwheel) { const yc=zdef.yearCentre||[200,200], qx=yc[0]*k, qy=yc[1]*k; for(const [x,y,w,h,col] of [[0,0,qx,qy,'#d7edf5'],[qx,0,U-qx,qy,'#bd7951'],[0,qy,qx,U-qy,'#73bc77'],[qx,qy,U-qx,U-qy,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,w,h);} }
     if (ribbonwild && !map.gk) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
     if (map.gk) for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const q = map.gk[y * MAP + x]; if (q) { g.fillStyle = (zdef.theme === 'emberwake' ? EMBERWAKE_MINI : ember ? EMBER_MINI : frost ? FROST_MINI : fen ? FEN_MINI : wyrd ? WYRD_MINI : astral ? ASTRAL_MINI : orrery ? ORRERY_MINI : prism ? PRISM_MINI : stormglass ? STORM_MINI : sunward ? SUNWARD_MINI : ribbonwild ? RIBBON_MINI : tanglecrown ? TANGLE_MINI : worldtree ? VEYR_MINI : lapis ? LAPIS_MINI : cairn ? CAIRN_MINI : frostwake ? FROSTWAKE_MINI : MEADOW_MINI)[q]; g.fillRect(x * k, y * k, k + .5, k + .5); } }
@@ -5244,7 +5244,11 @@
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
     for (const p of zdef.portals) { if (p.seam || p.vault || p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
-    if (zdef.shapeFloor || bigSky()) {                      // only the land is drawn: outside the outline the minimap shows the water (or a neighbour)
+    if (bigSky() && zdef.shape.outline) {                   // Bifrost: the sky shows between the islands, inside the outline only; beyond it the sea (or a neighbour) shows
+      g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.rect(0, 0, U, U);
+      zdef.shape.outline.forEach(([ox, oy], n) => { if (n) g.lineTo(ox * k, oy * k); else g.moveTo(ox * k, oy * k); }); g.closePath(); g.fill('evenodd');
+      g.globalCompositeOperation = 'source-over';
+    } else if (zdef.shapeFloor || bigSky()) {                // only the land is drawn: outside the outline the minimap shows the water (or a neighbour)
       g.globalCompositeOperation = 'destination-out';
       // Along a border with another province the cut keeps two tiles of this zone's own ground: the two edges are soft after the downscale, and with nothing under them the dark sea showed through as a black line (no such line exists on the real map).
       const ed = map.edgeDist, ec = map.edgeCoast;
@@ -5316,13 +5320,31 @@
     if (zdef.shapeFloor) miniCache.set(zone, { base: miniBase, water: miniWater });
   }
   // Shallows and a foam line along the COAST of the zone whose state is adopted (null for a zone without an outline). Past any other edge lies land: another province, drawn plain.
+  const MINI_PAD = 16;       // tiles of shallows drawn beyond the grid: a coast that runs along the edge of the grid (the north and east of the atlas) gets the same 14 tiles as one with room to spare
   function renderShallows() {
     if (!zdef.shapeFloor || zdef.theme === 'deep' || zdef.theme === 'nacre') return null;   // the Deep lies under the sea: no shallows or foam round it
-    const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP;
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // lighter and greener near the shore, a foam line at the edge
-      const i = y * MAP + x, d = map.edgeDist[i];
-      if (map.floor[i] || !d || d > 16 || !map.edgeCoast[i]) continue;   // only a coast has shallows; a border with another province is that province's own ground
-      g.fillStyle = d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
+    const PAD = MINI_PAD, P = MAP + 2 * PAD, U = miniUnits(), k = U / MAP, [c, g] = canvasOf(U + 2 * PAD * k, U + 2 * PAD * k, 4);
+    c.pad = PAD; g.translate(PAD * k, PAD * k);
+    // Distance from the land, in a copy of the grid with PAD tiles of margin; a margin cell next to land counts as coast, a grid cell as the shape's edge letter says (99 = sea).
+    const dist = new Uint8Array(P * P), coast = new Uint8Array(P * P), land = new Uint8Array(P * P); let front = [];
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { const i = (y + PAD) * P + x + PAD; land[i] = 1; front.push(i); }
+    for (let d = 1; d <= 14 && front.length; d++) {
+      const next = [];
+      for (const i of front) {
+        const px = i % P, py = (i / P) | 0;
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const nx = px + dx, ny = py + dy; if (nx < 0 || ny < 0 || nx >= P || ny >= P) continue;
+          const j = ny * P + nx; if (land[j] || dist[j]) continue;
+          dist[j] = d; const gx = nx - PAD, gy = ny - PAD;
+          coast[j] = d === 1 ? (gx >= 0 && gy >= 0 && gx < MAP && gy < MAP ? +(map.edge[gy * MAP + gx] === 99) : 1) : coast[i];
+          next.push(j);
+        }
+      }
+      front = next;
+    }
+    for (let py = 0; py < P; py++) for (let px = 0; px < P; px++) {                // lighter and greener near the shore, a foam line at the edge
+      const i = py * P + px, d = dist[i]; if (!d || !coast[i]) continue;           // only a coast has shallows; a border with another province is that province's own ground
+      g.fillStyle = d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect((px - PAD) * k, (py - PAD) * k, k + .5, k + .5);
     }
     return c;
   }
@@ -5365,9 +5387,9 @@
     if (!miniTmp || miniTmp.width !== W) { miniTmp = document.createElement('canvas'); miniTmp.width = miniTmp.height = W; }
     const tg = miniTmp.getContext('2d');
     mctx.save(); mctx.imageSmoothingEnabled = true; mctx.imageSmoothingQuality = 'high';
-    // One plain sea for every zone of the atlas frame, so a crossing changes nothing; a coast still shows its shallows and foam.
+    // One sea for every zone of the atlas frame, the game's own open-water colour, so a crossing changes nothing; a coast still shows its shallows and foam.
     const wmode = worldZone(zone);
-    mctx.fillStyle = zdef.shapeFloor || wmode ? (zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : '#2b2421') : '#080c0b'; mctx.fillRect(0, 0, W, W);
+    mctx.fillStyle = zdef.shapeFloor || wmode ? (zdef.theme === 'deep' || zdef.theme === 'nacre' ? '#071018' : SEA_COLOR) : '#080c0b'; mctx.fillRect(0, 0, W, W);
     if (zdef.shapeFloor || wmode) miniRippleOrigin = [vx + (zdef.shape?.T?.[0] || 0), vy + (zdef.shape?.T?.[1] || 0)];
     // One layer: its canvas covers `tiles` tiles at (ox, oy) in this zone's frame; fog (zone zi) only paints where the layer has land.
     const layer = (canvas, tiles, ox, oy, zi) => {
@@ -5380,9 +5402,9 @@
     // All water first (every world zone in view: shallows and foam), then the land layers on top, so a coast carries on across a border.
     const seams = zdef.portals.filter(p => p.seam), near = wmode ? miniNear(vx, vy, V) : [];
     if (wmode) {
-      for (const n of near) if (n.e && n.e.water) layer(n.e.water, n.size, n.ox, n.oy, null);
+      for (const n of near) if (n.e && n.e.water) { const pd = n.e.water.pad || 0; layer(n.e.water, n.size + 2 * pd, n.ox - pd, n.oy - pd, null); }
       for (const n of near) if (n.z !== zone && n.e) layer(n.e.base, n.size, n.ox, n.oy, n.z);
-    } else if (miniWater) layer(miniWater, MAP, 0, 0, null);
+    } else if (miniWater) { const pd = miniWater.pad || 0; layer(miniWater, MAP + 2 * pd, -pd, -pd, null); }
     layer(miniBase, MAP, 0, 0, zone);
     mctx.restore();
     mctx.save(); mctx.translate(-vx * s, -vy * s);

@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.41.3",
+    "date": "2026-11-10",
+    "new": [],
+    "changed": [
+      "The sea on the minimap is now the same deep blue-green as the sea in the game, not black, and Bifrost Reach shows sky between its islands.",
+      "The shallow water along the coast is now the same width everywhere. Coasts in the north and east of the map used to get a much narrower band than the ones in the south and west."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.41.2",
     "date": "2026-11-10",
     "new": [],
