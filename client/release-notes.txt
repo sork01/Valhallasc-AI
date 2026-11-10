@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.41.5",
+    "date": "2026-11-10",
+    "new": [
+      "Lead shoes: when you go down into the sea (Ran's Deep, Nacrehold, the Drowned Cathedral, the Moonwell and the Drowned Longship) you put on lead shoes. The game says \"Equipping lead shoes\", the shoes show on your feet, and \"Removing lead shoes\" when you come back up. They cannot be taken off under water. Your stats and gear do not change."
+    ],
+    "changed": [
+      "Monsters in Greenmeadow now give half as much experience, so reaching level 5 takes about 48 kills. Quest experience is unchanged."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.41.4",
     "date": "2026-11-10",
     "new": [
