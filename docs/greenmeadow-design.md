@@ -39,7 +39,7 @@ The outline, seams, Skaldholm wall and vault, Alderhaven and its people, the spa
 - Rust at this point: `zone_shape` 23 pass, `perks_tests` 16 pass. Still failing and not from this work: `compact_atlas` (3, listed in AGENTS.md), three Spark link-list tests on other hubs, `mail_all` (Alderhaven's directory entry keeps old-square coordinates, the same in HEAD), `king_spawn_announcement_stays_in_greenmeadow` (join refused: two default names; not compared against HEAD).
 - `tests/quest-rewards.py` has six failures on older rewards (Nornroot, Longship, Black Hour); the Greenmeadow rewards all meet its rules.
 - Not checked: the detailed world map pictures, the touch layout, fights against the elites.
-- Pacing: a kill pays 50-70 XP, so level 5 needs about 24 kills; players outgrow a level 1-5 zone long before finishing this map. Left as it is pending an owner decision.
+- Pacing: a kill pays 50-70 XP, so level 5 needs about 24 kills; players outgrow a level 1-5 zone long before finishing this map. **Decided 2026-11-10 (owner): twice as many kills.** Kills in zone 0 pay half XP (`Slime::kill_xp`, `GREENMEADOW_ZONE`), so level 5 needs about 48 kills. Server change: needs a release. Quest XP is unchanged.
 - `apple_tree` art: its fruit fell on a straight diagonal because x and y used the same linear seed (Sunward too); fixed in `sunwardart.js`.
 
 ## Collision grid (2026-11-06)

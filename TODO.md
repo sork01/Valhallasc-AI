@@ -36,7 +36,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ### Zone shapes follow the world-map provinces (owner request, 2026-11-05)
 
-- [ ] `MINIMAP-INTERIOR` - Owner answer 2026-11-06 for `MINIMAP-WORLD`: inside places that are not on the atlas (dungeons, raids, Arena, city interiors) show the world map centred on the entrance, with a marker that you are inside. **Not built in Beta 1.41.0 (they keep their own minimap); first confirm with the owner, because this replaces the dungeon layout minimap.** Also open: the Sunward-Yearwheel doorway still changes the minimap (different scale); a zone build costs 0.3-1.4 s of main thread in the throttled test (about 10 per walk across the Stormglass region, one per 250 ms, cached).
+- [x] `MINIMAP-INTERIOR` - **Decided 2026-11-10 (owner): inside a dungeon, raid, instance, Arena or city interior the minimap shows that place's own layout, as it does now. The earlier idea (world map centred on the entrance) is dropped; nothing to build.** Still open as a minor note: the Sunward-Yearwheel doorway changes the minimap scale (different tile scale), and a zone build costs 0.3-1.4 s of main thread in the throttled test (about 10 per walk across the Stormglass region, one per 250 ms, cached).
 
 **Owner request:** change the zones so they look like the zones on the world map, shape-wise (today every zone is a square grid; the painted atlas gives each province an irregular outline, `world/atlas-geography.txt`, 23 regions).
 
@@ -87,7 +87,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 **Owner requirements:** "redesign greenmeadow. keep shape and boarders etc. but redesign the rest of the map and the quests. to not have any filler land and to use the entire map" (for the pilot, `feat/zone-shapes`). **Owner decisions:** existing enemy kinds plus three new elites (two with quests, one without); 2-3 hamlets with their own quest givers.
 
 - [x] `MEADOW-DESIGN` - Nine regions, atlas road lattice, ponds, farms, orchards, three hamlets, 16 new quests, three elites: `docs/greenmeadow-design.md`.
-- [ ] `MEADOW-DESIGN-REVIEW` - Owner plays it on the pilot; elite stats are a first guess; decide pacing (level 5 after about 24 kills).
+- [ ] `MEADOW-DESIGN-REVIEW` - Owner plays it; elite stats are a first guess. Pacing decided 2026-11-10: Greenmeadow kills pay half XP (level 5 after about 48 kills); code and test done (`a_greenmeadow_kill_pays_half_xp...`), uncommitted, needs a server release.
 
 ### Emberfall Crags enemies in the Greenmeadow slime style (owner request, 2026-11-03)
 

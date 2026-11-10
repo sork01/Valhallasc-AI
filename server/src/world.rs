@@ -374,6 +374,8 @@ const ENEMY_HIT_REACH: f64 = 1.25;
 /// Health and damage change by this fraction per level from the default; gold changes by 10%. XP does not scale
 /// this way: an enemy pays `enemy_xp(level)`, set by its own level alone.
 const LEVEL_HP_DAMAGE: f64 = 0.12;
+/// Zone 0. Kills here pay half XP (see `Slime::kill_xp`).
+const GREENMEADOW_ZONE: usize = 0;
 /// Fights ran too fast, so every hit a player lands and every hit a player takes is cut to this share.
 const DAMAGE_DEALT_SCALE: f64 = 0.25;
 /// Gold an enemy drops, as a fraction of its `Slime.gold` (owner, 2026-10-21: half). Applied where the kill pays, so the
@@ -1777,6 +1779,12 @@ impl Slime {
     fn xp_multiplier(kind: &str) -> u32 {
         if is_boss(kind) { 12 } else { 1 }
     }
+    /// What a kill pays: `enemy_xp` by level, times the boss multiplier, and halved in Greenmeadow (owner, 2026-11-10:
+    /// level 5 needs about 48 kills instead of 24). The other zones are untouched.
+    fn kill_xp(kind: &str, zone: usize, level: u32) -> u32 {
+        let xp = enemy_xp(level) * Self::xp_multiplier(kind);
+        if zone == GREENMEADOW_ZONE { xp.div_ceil(2) } else { xp }
+    }
     fn level_scale(kind: &str, level: u32, per_level: f64) -> f64 {
         (1. + per_level * (level as f64 - Self::default_level(kind) as f64)).max(0.2)
     }
@@ -1821,7 +1829,7 @@ impl Slime {
             set_slow: 0.,
             damage: (damage * strength).round(),
             fight: 0.,
-            xp: enemy_xp(level) * Self::xp_multiplier(&s.kind),
+            xp: Self::kill_xp(&s.kind, s.zone, level),
             gold: (Self::base_gold(&s.kind) as f64 * Self::level_scale(&s.kind, level, 0.1)).round()
                 as u32,
             target: None,
@@ -8351,6 +8359,15 @@ mod tests {
             assert_eq!(up.gold, (gold as f64 * 1.2).round() as u32);
             assert_eq!(up.xp, enemy_xp(level + 2));
         }
+    }
+
+    #[test]
+    fn a_greenmeadow_kill_pays_half_xp_and_other_zones_pay_in_full() {
+        // Level 5 costs 1300 XP: 24 kills at 50-70 became about 48 (owner, 2026-11-10).
+        assert_eq!(Slime::kill_xp("slime", 0, 1), 25);
+        assert_eq!(Slime::kill_xp("slime", 0, 5), 35);
+        assert_eq!(Slime::kill_xp("slime", 1, 1), enemy_xp(1));
+        assert_eq!(Slime::kill_xp("slime", 2, 5), enemy_xp(5));
     }
 
     #[test]
