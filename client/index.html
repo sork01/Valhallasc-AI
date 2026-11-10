@@ -195,6 +195,8 @@
     <div class="hud hud-tr">
       <div class="minimap-wrap">
         <canvas id="minimap" width="144" height="144" aria-label="Minimap"></canvas>
+        <button id="mini-zoom-in" class="mini-zoom" type="button" title="Zoom the minimap in" aria-label="Zoom the minimap in">+</button>
+        <button id="mini-zoom-out" class="mini-zoom" type="button" title="Zoom the minimap out" aria-label="Zoom the minimap out">&minus;</button>
         <button id="wm-open" class="wm-open" type="button" title="World map (M)" aria-label="Open the world map (M)"><svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="16" cy="16" r="12"/><ellipse cx="16" cy="16" rx="5.2" ry="12"/><path d="M4.5 12h23M4.5 20h23M16 4v24"/></svg></button>
       </div>
       <p id="network-status" class="network-status" role="status">Valhalla · Shared world</p>
@@ -759,6 +761,7 @@
 <script src="syslog.js"></script>
 <script src="announce.js"></script>
 <script src="dpsmeter.js"></script>
+<script src="pako_inflate.min.js"></script>
 <script src="online.js"></script>
 <script src="account.js"></script>
 <script src="social.js"></script>
@@ -790,9 +793,13 @@
 <script src="moonsporeart.js"></script>
 <script src="stormglassart.js"></script>
 <script src="sunwardart.js"></script>
+<script src="meadowart.js"></script>
+<script src="meadowdock.js"></script>
 <script src="ribbonwildart.js"></script>
 <script src="tanglecrownart.js"></script>
 <script src="worldheartart.js"></script>
+<script src="veyrrootart.js"></script>
+<script src="heartwoodart.js"></script>
 <script src="lapisart.js"></script>
 <script src="frostwakeart.js"></script>
 <script src="cairnart.js"></script>
@@ -807,6 +814,7 @@
 <script src="chainedforgeart.js"></script>
 <script src="blackhourart.js"></script>
 <script src="emberwakeart.js"></script>
+<script src="rimeveilart.js"></script>
 <script src="pavilionart.js"></script>
 <script src="raincrownart.js"></script>
 <script src="seedvaultart.js"></script>

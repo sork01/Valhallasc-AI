@@ -89,8 +89,9 @@
     galehound: ['Galehound', 30, '#9fc0ee'], prismgolem: ['Prism Golem', 31, '#a9a0f0'], skyray: ['Skyray (ranged)', 32, '#6a86d0'], einherjar: ['Hollow Einherjar', 33, '#8ad0e8'], thunderroc: ['Thunderroc', 35, '#f0c070'],
     draugr: ['Drowned Draugr', 35, '#8ac4b8'], angler: ['Lantern Angler (ranged)', 36, '#9ffff0'], moray: ['Gnashing Moray', 37, '#c8e070'], siren: ['Siren (ranged)', 38, '#ff9ae8'], shellback: ['Shellback', 39, '#a8d090'], kraken: ['The Kraken (Elite · 5 players)', 40, '#b890f0'], hvitserk: ['Hvitserk (Elite · 3 players)', 37, '#e0b43a'], ghostmaw: ['Ghostmaw (Elite · 3 players)', 39, '#d8f0f8'],
     voidmoth: ['Void Moth', 40, '#c7a8ff'], crystalwyrm: ['Crystalwyrm', 41, '#6de8ff'], orbitbeetle: ['Orbit Beetle', 42, '#f4a43a'], eclipsedryad: ['Eclipse Dryad', 43, '#9ed17a'], meteorgolem: ['Meteor Golem', 45, '#b39bd1'],
+    cometmaw: ['Cometmaw (Elite · 3 players)', 42, '#8fd8ff'], eclipsequeen: ['Eclipse Queen (Elite · 3 players)', 44, '#c49af0'], orbitwarden: ['Orbit Warden (Elite · 3 players)', 45, '#ffd68a'],
     miragejackal: ['Mirage Jackal',45,'#e7b990'], shardscarab:['Shard Scarab',46,'#99e6dc'], glassharrier:['Glass Harrier',47,'#d5c5ff'], prismsentinel:['Prism Sentinel',48,'#d5e9ed'], mirrorqueen:['Mirror Queen (Elite · 3 players)',49,'#e7b8ff'], sunshard:['Sunshard (Elite · 5 players)',50,'#ffd58a'],
-    bronzemantis:['Bronze Mantis',50,'#c8a66b'], gearling:['Gearling',51,'#9bc2be'], orbitseer:['Orbit Seer (ranged)',52,'#a3dce4'], chronoguard:['Chronoguard',53,'#b4a7ba'], pendulummatron:['Pendulum Matron (Elite · 3 players)',54,'#e1b5a9'], epochengine:['Epoch Engine (Elite · 5 players)',55,'#dab47d'],
+    bronzemantis:['Bronze Mantis',50,'#c8a66b'], gearling:['Gearling',51,'#9bc2be'], orbitseer:['Orbit Seer (ranged)',52,'#a3dce4'], chronoguard:['Chronoguard',53,'#b4a7ba'], pendulummatron:['Pendulum Matron (Elite · 3 players)',54,'#e1b5a9'], epochengine:['Epoch Engine (Elite · 5 players)',55,'#dab47d'], mainspringwyrm:['Mainspring Wyrm (Elite)',53,'#e6c27a'], shatterhorn:['Shatterhorn (Elite)',48,'#f0a8d0'], lamphermit:['Lamphouse Hermit (Elite · 3 players)',63,'#9fd2e8'], stormtusk:['Stormtusk (Elite)',62,'#d4ecff'],
     glowcapgrazer:['Glowcap Grazer',55,'#bbffae'], silkwing:['Silkwing',56,'#c7f8ee'], rootlurker:['Rootlurker',57,'#c9ae83'], lanternwraith:['Lantern Wraith (ranged)',58,'#b8ffa5'], mireheart:['Mireheart (Elite · 3 players)',58,'#efb9ba'], silverwidow:['Silver Widow (Elite · 3 players)',59,'#e9b9ff'], nightbloom:['Nightbloom (Elite · 5 players)',60,'#eafca1'],
     dew_moth:['Dew Moth',60,'#a8d5cf'], lumen_eel:['Lumen Eel',60,'#9af2d7'], rootbell:['Rootbell',60,'#f8e8ad'],
     tideglass_heron:['Tideglass Heron (Boss · 5 players)',60,'#a8d5cf'], hourpetal_stag:['Hourpetal Stag (Boss · 5 players)',60,'#f8e8ad'], moonskein_weaver:['Moonskein Weaver (Boss · 5 players)',60,'#f0a6be'],
@@ -105,15 +106,15 @@
     ribbongecko:['Ribbon Gecko',70,'#31c7bd'],balloonbeetle:['Balloon Beetle',71,'#b277db'],
     paintedmacaw:['Painted Macaw',72,'#52bbdf'],jesterling:['Jesterling',73,'#d36ab3'],
     paradegryphon:['Parade Gryphon (Elite · 3 players)',74,'#f7bb72'],
-    maskcolossus:['Masquerade Colossus (Elite · 5 players)',75,'#ae94dc'],
+    maskcolossus:['Masquerade Colossus (Elite · 5 players)',75,'#ae94dc'], whorlshell:['Whorlshell (Elite · 3 players)',73,'#f2b8e8'],
     orchidmantis:['Orchid Mantis',75,'#d5ef83'],canopyglider:['Canopy Glider',76,'#59c0b5'],
     poolcaiman:['Blackwater Caiman',77,'#6ea58c'],drumgorilla:['Drum Gorilla',78,'#c69a70'],
-    jadeanaconda:['Jade Anaconda (Elite · 3 players)',79,'#4dc098'],
+    jadeanaconda:['Jade Anaconda (Elite · 3 players)',79,'#4dc098'], rootcentipede:['Hollowroot Centipede (Elite · 3 players)',77,'#c8e68a'],
     crownjaguar:['Crown Jaguar (Elite · 5 players)',80,'#f1ce73'],
     sapbeetle:['Sap Beetle',80,'#e3ae59'],lanternhornet:['Lantern Hornet',80,'#d7cf74'],
     mosslemur:['Moss Lemur',80,'#c8d68a'],barkmimic:['Bark Mimic',80,'#c5a479'],
     sandhopper:['Sandhopper',80,'#ca9958'],dunefennec:['Dune Fennec',81,'#d6a278'],glassscorpion:['Glass Scorpion',82,'#71bed0'],sunvulture:['Sun Vulture',83,'#c69b76'],
-    dunecolossus:['Dune Colossus (Elite · 3 players)',84,'#d2a274'],mirageroc:['Mirage Roc (Elite · 5 players)',85,'#8dc3c6'],
+    avalanchebear:['Avalanche Bear (Elite)',92,'#cfe0f2'],harrowox:['Harrow Ox (Elite)',69,'#b8a07a'],equinoxstag:['Equinox Stag (Elite)',98,'#d49a52'],lanternqueen:['Lantern Queen (Elite · 3 players)',83,'#f6e27a'],barkcolossus:['Heartbark Colossus (Elite · 5 players)',84,'#b6965f'],dunecolossus:['Dune Colossus (Elite · 3 players)',84,'#d2a274'],mirageroc:['Mirage Roc (Elite · 5 players)',85,'#8dc3c6'],
     snowhare:['Snow Hare',85,'#c8dce4'],iceotter:['Ice Otter',86,'#86b3c5'],frostheron:['Frost Heron',87,'#b4d7e0'],glaciercrab:['Glacier Crab',88,'#66b4d0'],
     bellmammoth:['Bell Mammoth (Elite · 3 players)',88,'#d8ab68'],auroramanta:['Aurora Manta (Elite · 4 players)',89,'#68bcb8'],crevasseleviathan:['Crevasse Leviathan (Elite · 5 players)',90,'#77c9e4'],
     screeferret:['Scree Ferret',90,'#c4a78a'],stoneibex:['Stone Ibex',91,'#baa88c'],slateraven:['Slate Raven',92,'#828fa0'],ridgeadder:['Ridge Adder',93,'#a1ad87'],
@@ -203,12 +204,13 @@
       case 'pearllamp': return '#c8fff0';
       case 'lava': return '#ff6a2a';
       case 'ice': return '#4f93c8';
-      case 'water': return theme === 'sunward' ? '#70bcd4' : wyrd ? '#2f6f9a' : '#244f5c';
+      case 'water': return theme === 'sunward' ? '#70bcd4' : wyrd ? '#2f6f9a' : theme === 'frost' ? '#2f77c0' : '#244f5c';
       case 'oak_tree': case 'apple_tree': case 'willow_tree': return '#285d30';
       case 'birch_tree': return '#538547';
       case 'hawthorn_bush': return '#6a9d51';
       case 'wildflowers': return '#efe49d';
-      case 'vale_cottage': case 'watermill': return '#f2d9ad';
+      case 'vale_cottage': case 'watermill': case 'meadow_cottage': case 'meadow_mill': return '#f2d9ad';
+      case 'chapel_ruin': return '#c4bca8';
       case 'elder_hollow_gate': return '#f8df91';
       case 'stone_bridge': return '#e0d3ac';
       case 'fan_topiary': return '#58c5d0';
@@ -222,6 +224,7 @@
       case 'festival_bloom': return '#f4c65e';
       case 'ribbon_pole': case 'pinwheel': case 'confetti_lantern': return '#ef6998';
       case 'silk_pavilion': case 'painted_stall': return '#f7d36f';
+      case 'rw_blossom_tree': return '#f0a0c4';
       case 'parade_standard': case 'mask_dais': case 'grand_pavilion_gate': return '#fff0b5';
       case 'jungle_water': case 'jade_pool': return '#48b4bb';
       case 'kapok_tree': case 'strangler_fig': return '#1d6047';
@@ -237,6 +240,8 @@
       case 'thicket': return '#6a2f58';
       case 'tree': return wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a';
       case 'spire': return wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e';
+      case 'crag_peak': return '#d8d2cc';
+      case 'rime_peak': return '#eef3f8';
       case 'rock': return wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8';
       case 'rampart': return '#6f7078';
       case 'eye_wall': return '#527c8e';
@@ -291,7 +296,8 @@
     for (let n = 0; n < 70; n++) { g.fillStyle = rnd() < .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.07)'; g.beginPath(); g.arc(rnd() * px, rnd() * px, (4 + rnd() * 9) * k, 0, 6.283); g.fill(); }
     g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme]; g.lineWidth = 2.8 * k;
     for (const p of z.paths || []) { g.beginPath(); p.forEach(([x, y], i) => i ? g.lineTo(x * k, y * k) : g.moveTo(x * k, y * k)); g.stroke(); }
-    if (z.theme === 'meadow') { g.beginPath(); g.arc(36 * k, 36 * k, 3.5 * k, 0, 6.283); g.fill(); }
+    if (z.theme === 'meadow') { const o = z.shape ? z.shape.offset : [0, 0]; g.beginPath(); g.arc((36 + o[0]) * k, (36 + o[1]) * k, 3.5 * k, 0, 6.283); g.fill(); }
+    if (z.shapeFloor) { g.fillStyle = 'rgba(6,10,9,.9)'; z.shapeFloor.forEach((row, y) => { for (let x = 0; x < z.size; x++) if (row[x] !== '#') g.fillRect(x * k, y * k, k + .6, k + .6); }); }
     (z.sky || []).forEach((row, y) => { for (let x = 0; x < z.size; x++) { const c = row[x]; if (c && c !== ' ') { g.fillStyle = c === '=' ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .6, k + .6); } } });   // floating islands and their bridges
     (z.moonwellFloor || []).forEach((row,y)=>{for(let x=0;x<z.size;x++){const c=row[x];if(c&&c!==' '){g.fillStyle=c==='='?'#f8e8ad':'#a8d5cf';g.fillRect(x*k,y*k,k+.6,k+.6);}}});
     (z.forgeFloor || z.blackhourFloor || z.longshipFloor || []).forEach((row,y)=>{for(let x=0;x<z.size;x++)if(row[x]==='='){g.fillStyle=z.forgeFloor?'#b4a09c':z.blackhourFloor?'#87749b':Math.abs(x+.5-64)<2?'#668c80':'#bf9c71';g.fillRect(x*k,y*k,k+.6,k+.6);}});
@@ -370,7 +376,7 @@
   const TRANSPORT_GATES = new Set(['sky_gate', 'stormrift_down', 'maelstrom_down', 'maelstrom_up', 'nacre_gate', 'nacre_deep_gate', 'nacre_astral_gate', 'astral_nacre_gate']);
   const NAMES = { 'Emberwake Caldera': 'Emberwake', 'The Chained Forge': 'Chained Forge', 'Nornroot Barrow': 'Nornroot', 'The Shattered Span': 'Shattered Span', 'The Drowned Longship': 'Longship', 'The Black Hour Foundry': 'Black Hour', 'Greenmeadow': 'Greenmeadow', 'Emberfall Crags': 'Emberfall', 'Rimeveil Glacier': 'Rimeveil', 'Gloamfen': 'Gloamfen', 'Skaldholm': 'Skaldholm', 'The Undervault': 'Undervault', 'Wyrdwood': 'Wyrdwood',
     'Bifrost Reach': 'Bifrost Reach', 'Rán\'s Deep': 'Rán\'s Deep', 'Nacrehold': 'Nacrehold', 'The Drowned Cathedral — Flooded Cloister': 'Cloister', 'The Drowned Cathedral — Coral Reliquary': 'Reliquary', 'The Drowned Cathedral — Grand Nave': 'Grand Nave',
-    'Astralhollow': 'Astralhollow', 'The Prismwaste': 'Prismwaste', 'The Obsidian Orrery': 'Orrery', 'The Moonspore Canopy': 'Moonspore', 'Asterion': 'Asterion', 'The Moonwell': 'Moonwell', 'The Stormglass Shore': 'Stormglass', 'Sunward Vale': 'Sunward Vale',
+    'Astralhollow': 'Astralhollow', 'The Prismwaste': 'Prismwaste', 'The Obsidian Orrery': 'Orrery', 'The Moonspore Canopy': 'Moonspore', 'Asterion': 'Asterion', 'The Moonwell': 'Moonwell', 'The Stormglass Flats': 'Stormglass', 'Sunward Vale': 'Sunward Vale',
     'The Ribbonwild': 'Ribbonwild', 'The Tanglecrown': 'Tanglecrown', 'Veyrroot Canopy': 'Veyrroot', 'Veyrroot Heartwood': 'Heartwood', 'The Lapis Erg': 'Lapis Erg', 'Frostwake Shelf': 'Frostwake', 'The Cairnspine': 'Cairnspine', 'The Yearwheel': 'Yearwheel',
     'The Eye Below': 'Eye Below', 'The Elder Hollow': 'Elder Hollow', 'The Thousandfold Pavilion': 'Pavilion', 'Temple of the Rain Crown': 'Rain Crown', 'The Seed Vault': 'Seed Vault', 'The Sunken Astrolabe': 'Astrolabe', 'The Thunderheart Gate': 'Thunderheart',
     'The Blooming Labyrinth': 'Blooming', 'The Solar Crucible': 'Crucible', 'The Amber Archive': 'Amber Archive', 'The Silent Solstice': 'Solstice' };
@@ -416,6 +422,12 @@
     const city=ATLAS.cities.find(c=>c.zone===index&&c.parent!==index);
     if(city) return [city.at[0]+(x/zones[index].size-.5)*100,city.at[1]+(y/zones[index].size-.5)*100];
     const a=LAYOUT[index];
+    if(a?.polygon && zones[index].shape) {
+      const sh=zones[index].shape; let p=[(x+sh.T[0])/sh.k,(y+sh.T[1])/sh.k];
+      const r=PROVINCES.get(index),center=r.label||r.seed;
+      for(let q=0;q<20&&!insidePolygon(r.polygon,...p);q++) p=[p[0]*.8+center[0]*.2,p[1]*.8+center[1]*.2];
+      return p;
+    }
     if(a?.polygon) {
       const r=PROVINCES.get(index),center=r.label||r.seed;
       let p=[a.x+x/zones[index].size*a.w,a.y+y/zones[index].size*a.h];

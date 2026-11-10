@@ -170,14 +170,21 @@ mod bank;
 #[cfg(test)]
 mod compact_atlas_tests;
 mod inspect;
+mod landing;
+#[cfg(test)]
+mod landing_tests;
 mod mail;
 #[cfg(test)]
 mod raid_reward_tests;
 mod shop;
 mod signature;
+#[cfg(test)]
+mod zone_shape_tests;
 use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
+#[cfg(test)]
+mod astral_tests;
 #[cfg(test)]
 mod blackhour_tests;
 mod boss_mechanics;
@@ -244,6 +251,8 @@ mod gm_visibility;
 #[cfg(test)]
 mod halloween_tests;
 #[cfg(test)]
+mod heartwood_tests;
+#[cfg(test)]
 mod hierloom_tests;
 mod hold;
 mod hour_shards;
@@ -264,6 +273,8 @@ mod newyear_tests;
 #[cfg(test)]
 mod nornroot_tests;
 #[cfg(test)]
+mod orrery_tests;
+#[cfg(test)]
 mod owner_fixes_tests;
 #[cfg(test)]
 mod pack_recovery_tests;
@@ -271,6 +282,8 @@ mod packs;
 mod partyxp;
 #[cfg(test)]
 mod perks_tests;
+#[cfg(test)]
+mod prism_tests;
 mod pursuit;
 mod pvp;
 mod quest_journal;
@@ -334,6 +347,8 @@ mod valentines_tests;
 mod vault_tests;
 #[cfg(test)]
 mod vendor_weapon_tests;
+#[cfg(test)]
+mod veyrroot_tests;
 mod weather;
 #[cfg(test)]
 mod worldheart_tests;
@@ -480,6 +495,8 @@ struct Player {
     shop: shop::Session,
     bag_notice_at: f64,
     portal_at: f64,
+    /// Seconds until the dock's skipper greets a hero who arrived by ship (once per connection; world/landing.rs).
+    greet_in: f64,
     /// Opt-in status is deliberately cleared on reconnect.
     pvp_flag: bool,
     /// Personal god mode of a game master (the debug command `set_god_mode`): no damage for this player only.
@@ -608,6 +625,7 @@ impl Player {
             service_at: -99.,
             bag_notice_at: -99.,
             portal_at: -99.,
+            greet_in: 1.5,
             pvp_flag: false,
             god: false,
             hidden,
@@ -654,6 +672,18 @@ impl Player {
     }
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
+    }
+    /// What a client draws of a player seen across a seam: no inventory, quests or stats.
+    fn across_view(&self) -> Value {
+        let c = &self.character;
+        json!({"id":c.id,"look":c.look,"zone":c.zone,"x":r2(c.x),"y":r2(c.y),"r":PLAYER_RADIUS,"hp":r2(c.hp),"maxHp":r2(c.max_hp()),
+            "level":c.level,"fx":r2(self.face.x),"fy":r2(self.face.y),"moving":self.moving,"walk":r2(self.walk),"atkT":r2(self.attack),
+            "hurtT":r2(self.hurt),"dead":c.hp<=0.,"deadT":r2(self.dead_time),"fallen":c.hp<=0. && self.fallen,"dashT":r2(self.dash),
+            "buffs":self.buffs,"sparkTravel":c.spark_travel,"mount":c.mount,"mounted":c.mounted,"mountTint":c.mount_tint,
+            "reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"pvpFlag":self.pvp_flag,"stun":r2(self.stun),
+            "daze":r2(self.daze),"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":r2(self.absorb_left),
+            "danceT":self.dance,"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet,
+            "hired":self.merc.is_some()})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -793,7 +823,22 @@ struct Slime {
     #[serde(skip)]
     contributors: std::collections::BTreeSet<String>,
 }
+/// Two decimals, for what is only drawn.
+fn r2(v: f64) -> f64 {
+    (v * 100.).round() / 100.
+}
 impl Slime {
+    /// An enemy seen across a seam is drawn only while alive or dying.
+    fn shows_across(&self) -> bool {
+        !self.dead || self.die_t < 2.
+    }
+    /// What a client draws of an enemy seen across a seam (not the home point, respawn or attack timers).
+    fn across_view(&self) -> Value {
+        json!({"id":self.id,"kind":self.kind,"elite":self.elite,"zone":self.zone,"level":self.level,"x":r2(self.x),"y":r2(self.y),
+            "hp":r2(self.hp),"maxHp":r2(self.max_hp),"r":self.r,"state":self.state,"st":r2(self.st),"dir":r2(self.dir),
+            "hop":r2(self.hop),"hopV":r2(self.hop_v),"hurtT":r2(self.hurt_t),"recT":r2(self.rec_t),"landT":r2(self.land_t),
+            "dead":self.dead,"dieT":r2(self.die_t),"blink":r2(self.blink),"seed":self.seed,"windupTime":self.windup_time})
+    }
     // Health, damage, speed and body scale of a default-level enemy.
     /// (health, damage, speed, scale) of `kind` at its default level: the table below times the power in
     /// `world/elite-power.txt` (see `items::elite_power`).
@@ -819,6 +864,30 @@ impl Slime {
             "golem" => (1100., 64., 1.9, 1.5),
             // Two level-10 heroes, with skills and healing, rather than an ordinary solo pull.
             "cinderlord" => (2400., 180., 2.5, 1.7),
+            // Greenmeadow's three elites: a party of level-5 fighters, or one hero well past the zone.
+            "oldtusker" => (1500., 70., 3.0, 1.7),
+            "tidecrusher" => (1900., 60., 1.9, 1.8),
+            "orchardqueen" => (1200., 78., 3.2, 1.6),
+            // The Crags' two new elites, beside the Cinderlord: a party of level-10 fighters, or one hero well past the zone.
+            "slagmaw" => (2600., 150., 2.2, 1.9),
+            "ashwing" => (1900., 170., 3.4, 1.5),
+            // Rimeveil's three elites, beside the wyrms: a party of level-15 fighters, or one hero well past the zone.
+            "hoarhorn" => (5400., 230., 2.4, 2.0),
+            // Gloamfen's two new elites, beside the Gloomroot Colossus: a party of level-20 fighters, or one hero well past the zone.
+            "bellowmaw" => (8200., 280., 2.4, 2.0),
+            "rustmarshal" => (9400., 300., 2.2, 1.7),
+            // The Wyrdwood's new elite, beside the Oakhorn and Hrungnir: a party of level-26 fighters, or one hero well past the zone.
+            "hangedking" => (12600., 360., 2.6, 1.9),
+            // Bifrost Reach's three elites (the shapes pilot), beside the five storm kinds: a party of level-31 to 35 fighters, or one hero well past the zone.
+            "skoll" => (60000., 1100., 3.8, 1.5),
+            "shardking" => (110000., 1800., 2.0, 1.9),
+            "heimdallr" => (140000., 2300., 2.6, 1.8),
+            // Astralhollow's three elites (the shapes pilot): a party of level-42 to 45 fighters, or one hero well past the zone.
+            "cometmaw" => (150000., 1300., 3.6, 1.8),
+            "eclipsequeen" => (190000., 1500., 2.2, 1.9),
+            "orbitwarden" => (260000., 1900., 2.0, 2.2),
+            "whitewail" => (3800., 260., 3.4, 1.6),
+            "shardback" => (4800., 210., 2.2, 1.7),
             "crab" => (900., 60., 2.8, 1.1),
             "wolf" => (1000., 72., 3.6, 1.2),
             "yeti" => (1900., 88., 2.2, 1.6),
@@ -895,6 +964,10 @@ impl Slime {
             "chronoguard" => (130000., 1950., 1.9, 1.95),
             "pendulummatron" => (750000., 7600., 2.7, 2.15),
             "epochengine" => (1250000., 12000., 1.9, 2.6),
+            // The Mainspring Wyrm (the shapes pilot, no quest): a coil of brass gears round an obsidian spire, a fast serpent between the matron and the engine in strength. First guess.
+            "mainspringwyrm" => (600000., 6400., 3.4, 1.9),
+            // The Shatterhorn (the shapes pilot, no quest): a rhinoceros of rose glass among the Sunspire Reaches, a prism for a horn. First guess.
+            "shatterhorn" => (480000., 5200., 3.1, 1.8),
             // Moonspore Canopy: an overgrown moonfall with three distinct group courts.
             "glowcapgrazer" => (145000., 2100., 3.4, 1.45),
             "silkwing" => (150000., 2250., 3.9, 1.35),
@@ -917,6 +990,10 @@ impl Slime {
             "glassray" => (205000., 3300., 3.5, 1.5),
             "breakersentinel" => (270000., 3900., 2.0, 1.9),
             "maelstromheart" => (2100000., 17000., 2.0, 2.7),
+            // The Lamphouse Hermit (the shapes pilot, quest): a crab as big as a barn in a wrecked lamphouse, among the Salt Pans. First guess.
+            "lamphermit" => (1150000., 11800., 2.3, 2.1),
+            // The Stormtusk (the shapes pilot, no quest): a stranded narwhal of black glass whose tusk draws the lightning, below the Low Shards. First guess.
+            "stormtusk" => (980000., 10600., 3.4, 1.9),
             // Sunward Vale: four unmistakable animals, a hive bear and a wicker giant.
             "meadowhare" => (225000., 3400., 4.2, 1.45),
             "sunbacksnail" => (280000., 3600., 1.3, 1.35),
@@ -930,6 +1007,18 @@ impl Slime {
             "jesterling" => (390000., 5400., 3.0, 1.65),
             "paradegryphon" => (1950000., 16900., 2.4, 2.65),
             "maskcolossus" => (3200000., 23900., 1.8, 3.0),
+            // The Whorlshell (the shapes pilot, no quest): a giant snail whose spiral shell is a carousel of bands, slow and heavy, in the middle of the Ribbon Whorl. First guess.
+            "whorlshell" => (2300000., 18500., 1.7, 2.8),
+            // The Hollowroot Centipede (the shapes pilot, no quest): a giant jungle centipede that rears out of the strangler maze, fast for its size. First guess.
+            "rootcentipede" => (2350000., 19000., 2.5, 2.8),
+            // The Cobalt Basilisk (the shapes pilot, no quest): a huge lapis-scaled desert lizard that lies in the Glass Dunes, quick off the mark and heavy. First guess.
+            "cobaltbasilisk" => (3300000., 25500., 2.3, 2.9),
+            // The Lantern Queen (the shapes pilot, quest): the hornets' queen in a paper hive high in the north-western canopy, quick and fierce. First guess.
+            "lanternqueen" => (3000000., 23500., 3.0, 2.8),
+            // The Heartbark Colossus (the shapes pilot, quest): a walking grove of living bark in the Eastern Roots, slow and heavy. First guess.
+            "barkcolossus" => (4100000., 29500., 1.9, 3.1),
+            // The Amber Sap Golem (the shapes pilot, no quest): a hulk of hardened sap with whole insects trapped in it, on the southern sap flats. First guess.
+            "ambergolem" => (3700000., 27000., 1.7, 3.0),
             "orchidmantis" => (430000., 5700., 3.6, 1.45),
             "canopyglider" => (370000., 6100., 4.2, 1.35),
             "poolcaiman" => (510000., 6900., 2.1, 1.8),
@@ -960,6 +1049,10 @@ impl Slime {
             "cairnbehemoth" => (3700000., 26500., 1.7, 3.2),
             "whitebarktitan" => (4600000., 31500., 2.0, 3.4),
             "stormcondor" => (5600000., 37000., 3.1, 3.5),
+            // The Avalanche Bear (the shapes pilot, no quest): a mountain-sized white bear that sleeps in the Hollow Peaks, slow to start and very heavy. First guess.
+            "avalanchebear" => (4100000., 28500., 2.6, 3.3),
+            // The Harrow Ox (the shapes pilot, no quest): a plough-ox that dragged its iron harrow loose and never stopped, lumbering and very heavy. First guess, between Old Honeyjaw and the Wicker Warden.
+            "harrowox" => (2100000., 16800., 2.1, 2.6),
             "brooknewt" => (840000., 10500., 3.2, 1.5),
             "sundarter" => (900000., 11200., 3.8, 1.6),
             "acornmimic" => (970000., 12000., 2.5, 1.7),
@@ -976,6 +1069,8 @@ impl Slime {
             "rimesaber" => (5500000., 37000., 3.5, 3.3),
             "snowgiant" => (6900000., 43000., 1.8, 3.7),
             "longnightwyrm" => (8100000., 49000., 2.9, 3.9),
+            // The Equinox Stag (the shapes pilot, no quest): a great stag that carries the turning year in its antlers (blossom, leaf, ember and frost), loping the northern reaches of the wheel. First guess, level with the Snow Giant.
+            "equinoxstag" => (7400000., 46000., 3.2, 3.8),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -994,6 +1089,17 @@ impl Slime {
             "wraith" => 8,
             "golem" => 10,
             "cinderlord" => 10,
+            "oldtusker" | "tidecrusher" | "orchardqueen" => 7,
+            "slagmaw" | "ashwing" => 10,
+            "hoarhorn" | "whitewail" | "shardback" => 15,
+            "bellowmaw" | "rustmarshal" => 20,
+            "hangedking" => 26,
+            "skoll" => 31,
+            "shardking" => 33,
+            "heimdallr" => 35,
+            "cometmaw" => 42,
+            "eclipsequeen" => 44,
+            "orbitwarden" => 45,
             "crab" => 10,
             "wolf" => 12,
             "yeti" => 13,
@@ -1044,6 +1150,8 @@ impl Slime {
             "chronoguard" => 53,
             "pendulummatron" => 54,
             "epochengine" => 55,
+            "mainspringwyrm" => 53,
+            "shatterhorn" => 48,
             "glowcapgrazer" => 55,
             "silkwing" => 56,
             "rootlurker" => 57,
@@ -1058,6 +1166,8 @@ impl Slime {
             "glassray" => 62,
             "breakersentinel" => 64,
             "maelstromheart" => 65,
+            "lamphermit" => 63,
+            "stormtusk" => 62,
             "meadowhare" => 65,
             "sunbacksnail" => 66,
             "brushfox" => 67,
@@ -1070,6 +1180,12 @@ impl Slime {
             "jesterling" => 73,
             "paradegryphon" => 74,
             "maskcolossus" => 75,
+            "whorlshell" => 73,
+            "cobaltbasilisk" => 83,
+            "lanternqueen" => 82,
+            "barkcolossus" => 84,
+            "ambergolem" => 83,
+            "rootcentipede" => 77,
             "orchidmantis" => 75,
             "canopyglider" => 76,
             "poolcaiman" => 77,
@@ -1093,6 +1209,8 @@ impl Slime {
             "stoneibex" => 91,
             "slateraven" => 92,
             "ridgeadder" | "cairnbehemoth" => 93,
+            "avalanchebear" => 92,
+            "harrowox" => 69,
             "whitebarktitan" => 94,
             "stormcondor" => 95,
             "brooknewt" => 95,
@@ -1111,6 +1229,7 @@ impl Slime {
             "rimesaber" => 97,
             "snowgiant" => 98,
             "longnightwyrm" => 99,
+            "equinoxstag" => 98,
             _ => 2,
         }
     }
@@ -1127,6 +1246,17 @@ impl Slime {
             "wraith" => 36,
             "golem" => 55,
             "cinderlord" => 100,
+            "oldtusker" | "tidecrusher" | "orchardqueen" => 70,
+            "slagmaw" | "ashwing" => 110,
+            "hoarhorn" | "whitewail" | "shardback" => 260,
+            "bellowmaw" | "rustmarshal" => 900,
+            "hangedking" => 1400,
+            "skoll" => 3400,
+            "shardking" => 4200,
+            "heimdallr" => 5200,
+            "cometmaw" => 4800,
+            "eclipsequeen" => 5800,
+            "orbitwarden" => 7000,
             "crab" => 60,
             "wolf" => 78,
             "yeti" => 105,
@@ -1182,6 +1312,8 @@ impl Slime {
             "chronoguard" => 2750,
             "pendulummatron" => 8000,
             "epochengine" => 12000,
+            "mainspringwyrm" => 7000,
+            "shatterhorn" => 6000,
             "glowcapgrazer" => 3000,
             "silkwing" => 3250,
             "rootlurker" => 3500,
@@ -1201,6 +1333,8 @@ impl Slime {
             "glassray" => 4600,
             "breakersentinel" => 5200,
             "maelstromheart" => 26000,
+            "lamphermit" => 14000,
+            "stormtusk" => 12500,
             "meadowhare" => 4900,
             "sunbacksnail" => 5200,
             "brushfox" => 5650,
@@ -1213,6 +1347,12 @@ impl Slime {
             "jesterling" => 8900,
             "paradegryphon" => 27000,
             "maskcolossus" => 41000,
+            "whorlshell" => 33000,
+            "cobaltbasilisk" => 56000,
+            "lanternqueen" => 52000,
+            "barkcolossus" => 64000,
+            "ambergolem" => 58000,
+            "rootcentipede" => 34000,
             "orchidmantis" => 9900,
             "canopyglider" => 10500,
             "poolcaiman" => 11200,
@@ -1243,6 +1383,8 @@ impl Slime {
             "cairnbehemoth" => 86000,
             "whitebarktitan" => 96000,
             "stormcondor" => 110000,
+            "avalanchebear" => 90000,
+            "harrowox" => 24000,
             "brooknewt" => 25000,
             "sundarter" => 26500,
             "acornmimic" => 28500,
@@ -1259,6 +1401,7 @@ impl Slime {
             "rimesaber" => 120000,
             "snowgiant" => 140000,
             "longnightwyrm" => 160000,
+            "equinoxstag" => 150000,
             _ => 0,
         }
     }
@@ -1275,7 +1418,20 @@ impl Slime {
             "spider" => (0.4, 1.1, 8., 7.5),
             "wraith" => (0.5, 1.2, 7.5, 8.),
             "golem" => (0.6, 1.5, 6., 6.5),
-            "cinderlord" => (0.65, 1.25, 7., 7.),
+            "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw" | "ashwing"
+            | "hoarhorn" | "whitewail" | "shardback" | "bellowmaw" | "rustmarshal" => {
+                (0.65, 1.25, 7., 7.)
+            }
+            // The Hanged King swings his rope-wrapped beam: a long wind-up, a long reach.
+            "hangedking" => (0.85, 1.6, 7.5, 9.),
+            // Sköll lunges in two bounds, the Shard-King slams both fists, Heimdall's Shade sweeps his horn-spear in a wide arc.
+            "skoll" => (0.4, 1.1, 10., 10.),
+            "shardking" => (0.9, 1.7, 7., 8.),
+            "heimdallr" => (0.8, 1.5, 8.5, 10.),
+            // The Cometmaw bounds in a burning rush, the Eclipse Queen sweeps her crown-branches, the Orbit Warden slams his orbiting rings down.
+            "cometmaw" => (0.4, 1.1, 10., 10.),
+            "eclipsequeen" => (0.9, 1.6, 7.5, 9.),
+            "orbitwarden" => (1.0, 1.8, 8., 11.),
             "crab" => (0.4, 1., 8., 7.),
             "wolf" => (0.3, 0.9, 9.5, 9.),
             "yeti" => (0.7, 1.6, 6.5, 7.),
@@ -1337,6 +1493,10 @@ impl Slime {
             "chronoguard" => (0.95, 1.9, 6., 8.),
             "pendulummatron" => (0.9, 1.65, 8., 11.),
             "epochengine" => (1.15, 2.1, 6., 13.),
+            // The Wyrm lunges along its coil: a long reach, a fast wind-up.
+            "mainspringwyrm" => (0.8, 1.5, 8., 12.),
+            // The Shatterhorn paws the ground and then charges, head down: a short wind-up, a long reach.
+            "shatterhorn" => (0.85, 1.6, 8., 11.),
             "glowcapgrazer" => (0.35, 1.0, 10., 9.),
             "silkwing" => (0.45, 1.2, 11., 10.),
             "rootlurker" => (0.85, 1.7, 6., 8.),
@@ -1356,6 +1516,10 @@ impl Slime {
             "glassray" => (0.55, 1.4, 9.5, 10.),
             "breakersentinel" => (0.85, 1.7, 6.5, 9.),
             "maelstromheart" => (1.1, 2.1, 6., 15.),
+            // The Lamphouse Hermit rears and slams its claw: a long wind-up, a wide reach.
+            "lamphermit" => (0.95, 1.8, 6., 12.),
+            // The Stormtusk lowers its head and lunges along the tusk: a short wind-up, a long reach.
+            "stormtusk" => (0.8, 1.5, 9., 12.),
             "meadowhare" => (0.38, 1.15, 11., 9.),
             "sunbacksnail" => (0.7, 1.35, 5., 10.),
             "brushfox" => (0.55, 1.3, 9., 10.),
@@ -1368,6 +1532,18 @@ impl Slime {
             "jesterling" => (0.62, 1.5, 8., 11.),
             "paradegryphon" => (1.1, 2.0, 5.5, 14.),
             "maskcolossus" => (1.25, 2.2, 5., 16.),
+            // The Whorlshell rears and slams its shell down: a slow wind-up, a wide reach.
+            "whorlshell" => (1.2, 2.1, 5., 14.),
+            // The basilisk rears on its forelegs and snaps its whole neck forward: a moderate wind-up, a long reach.
+            "cobaltbasilisk" => (1.12, 2.0, 5.2, 15.),
+            // The queen rears and drives her stinger down: a short wind-up, a long reach.
+            "lanternqueen" => (0.9, 1.7, 6.0, 15.),
+            // The colossus raises both root-arms and brings them down together: a slow wind-up, a wide reach.
+            "barkcolossus" => (1.3, 2.2, 5.0, 15.),
+            // The golem draws back its slab of an arm and slams it forward: a slow wind-up.
+            "ambergolem" => (1.25, 2.1, 4.8, 14.),
+            // The centipede rears up and drops its whole length forward: a quick wind-up, a long reach.
+            "rootcentipede" => (1.05, 1.9, 5.5, 15.),
             "orchidmantis" => (0.54, 1.3, 9., 11.),
             "canopyglider" => (0.46, 1.25, 11., 10.),
             "poolcaiman" => (0.88, 1.55, 7., 12.),
@@ -1398,6 +1574,10 @@ impl Slime {
             "cairnbehemoth" => (1.28, 2.1, 5., 17.),
             "whitebarktitan" => (1.32, 2.2, 5., 18.),
             "stormcondor" => (1.36, 2.35, 7., 19.),
+            // The bear rears on its hind legs and brings both paws down: a slow wind-up, a wide reach.
+            "avalanchebear" => (1.3, 2.1, 5.5, 17.),
+            // The ox lowers its horns and the harrow swings round behind it: a slow wind-up, a wide sweep.
+            "harrowox" => (1.0, 1.95, 6., 16.),
             "brooknewt" => (0.58, 1.30, 9., 12.),
             "sundarter" => (0.57, 1.40, 10., 12.),
             "acornmimic" => (0.68, 1.55, 8., 13.),
@@ -1414,6 +1594,8 @@ impl Slime {
             "rimesaber" => (1.28, 2.20, 7., 18.),
             "snowgiant" => (1.35, 2.35, 5., 19.),
             "longnightwyrm" => (1.40, 2.45, 8., 21.),
+            // The stag lowers its antlers and the seasons bloom off them in a wide arc: a slow wind-up, a long reach.
+            "equinoxstag" => (1.37, 2.35, 6., 19.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -1517,6 +1699,12 @@ impl Slime {
             "wickerwarden" => 4.8,
             "paradegryphon" => 4.4,
             "maskcolossus" => 5.0,
+            "whorlshell" => 4.6,
+            "cobaltbasilisk" => 5.0,
+            "lanternqueen" => 5.2,
+            "barkcolossus" => 5.4,
+            "ambergolem" => 4.9,
+            "rootcentipede" => 4.7,
             "jadeanaconda" => 4.7,
             "crownjaguar" => 5.3,
             "dunecolossus" => 5.0,
@@ -1527,6 +1715,8 @@ impl Slime {
             "cairnbehemoth" => 5.4,
             "whitebarktitan" => 5.6,
             "stormcondor" => 6.0,
+            "avalanchebear" => 5.2,
+            "harrowox" => 4.4,
             "bloomtortoise" => 5.4,
             "petalchimera" => 5.5,
             "rainseraph" => 5.6,
@@ -1539,6 +1729,7 @@ impl Slime {
             "rimesaber" => 6.3,
             "snowgiant" => 6.4,
             "longnightwyrm" => 6.5,
+            "equinoxstag" => 6.4,
             _ => 0.,
         }
     }
@@ -1761,6 +1952,9 @@ pub struct World {
     pub god_mode: bool,
     // Test servers only (VALHALLA_START_LEVEL): new characters begin at this level; loaded ones are untouched.
     pub start_level: u32,
+    /// New characters arrive by ship on Greenmeadow's dock (world/landing.rs). Off in unit-test worlds, whose heroes
+    /// would otherwise collect the landing quests the moment a test moves them; `landing_tests` switch it on.
+    pub landings: bool,
     // Test servers only (VALHALLA_TEST_COMMANDS=1): players may send `debug` shortcuts. Never set on the public service.
     pub test_commands: bool,
     pub login_notifications: Option<mpsc::Sender<crate::notify::LoginNotice>>,
@@ -1875,6 +2069,7 @@ impl World {
             level_spread,
             god_mode: false,
             start_level: 1,
+            landings: !cfg!(test),
             test_commands: false,
             login_notifications: None,
             social: social::Social::default(),
@@ -2123,6 +2318,72 @@ impl World {
         }
         self.emit_zone(self.zone_of(actor), v);
     }
+    /// One player as every client in the zone sees them.
+    fn player_view(&self, session: u64, p: &Player) -> Value {
+        let mut view = self.raid_support(session).snapshot(p);
+        if p.character.gm {
+            view["session"] = json!(session);
+        }
+        // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
+        // each snapshot over the last, so a flag that vanished would stay set.
+        view["storyMemory"] = self.empty_seat_view(session);
+        view["mailUnread"] = json!(self.mail_unread.get(&p.character.id).copied().unwrap_or(0));
+        view["hired"] = json!(p.merc.is_some());
+        view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
+        view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
+        // The bells a hero has ringing and how long each has left (only listed while there are any).
+        let bells = self.chime.view(session);
+        if !bells.is_empty() {
+            view["bells"] = json!(
+                bells
+                    .iter()
+                    .map(|(place, left)| json!({"place":place,"left":left}))
+                    .collect::<Vec<_>>()
+            );
+        }
+        view
+    }
+    /// What lies across each seam border of `zone` (view only, shown through the border by the client): the neighbour's
+    /// players and enemies within ACROSS_RANGE (60) tiles of the line, in the neighbour's own coordinates.
+    fn across_view(&self, zone: usize) -> Vec<Value> {
+        const ACROSS_RANGE: f64 = 60.;
+        let mut out = Vec::new();
+        for portal in &self.maps[zone].portals {
+            // A seam is a long line; a vault (a landmark city's wall) is one doorway, so range is measured from its gate.
+            let shift = match (&portal.seam, portal.vault) {
+                (Some(seam), _) => seam.shift,
+                (None, Some(vault)) => vault,
+                (None, None) => continue,
+            };
+            let near = |p: Point| {
+                let here = Point {
+                    x: p.x - shift[0],
+                    y: p.y - shift[1],
+                };
+                match &portal.seam {
+                    Some(seam) => seam.distance(here) < ACROSS_RANGE,
+                    None => (here.x - portal.x).hypot(here.y - portal.y) < ACROSS_RANGE,
+                }
+            };
+            // Slim copies: only what the client draws of a ghost. A hidden GM is not listed at all.
+            let players: Vec<Value> = self
+                .players
+                .iter()
+                .filter(|(_, p)| {
+                    p.character.zone == portal.to && near(p.character.point()) && !p.is_hidden()
+                })
+                .map(|(_, p)| p.across_view())
+                .collect();
+            let slimes: Vec<Value> = self
+                .slimes
+                .iter()
+                .filter(|s| s.zone == portal.to && near(s.point()) && s.shows_across())
+                .map(Slime::across_view)
+                .collect();
+            out.push(json!({"to":portal.to,"shift":shift,"players":players,"slimes":slimes}));
+        }
+        out
+    }
     // What one client needs: its own zone's players, enemies, bolts and drops. Zones are separate maps, so
     // nothing about another zone is ever sent to this client.
     pub fn snapshot_for(&self, zone: usize) -> Value {
@@ -2135,23 +2396,7 @@ impl World {
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
         "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"easter":self.festival_view(seasonal_hunt::EASTER),"solstice":self.festival_view(seasonal_hunt::SOLSTICE),"valentine":self.festival_view(seasonal_hunt::VALENTINE),"newyear":self.festival_view(seasonal_hunt::NEWYEAR),
-        "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
-            let mut view = self.raid_support(*session).snapshot(p);
-            if p.character.gm { view["session"] = json!(session); }
-            // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
-            // each snapshot over the last, so a flag that vanished would stay set.
-            view["storyMemory"] = self.empty_seat_view(*session);
-            view["mailUnread"] = json!(self.mail_unread.get(&p.character.id).copied().unwrap_or(0));
-            view["hired"] = json!(p.merc.is_some());
-            view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
-            view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
-            // The bells a hero has ringing and how long each has left (only listed while there are any).
-            let bells = self.chime.view(*session);
-            if !bells.is_empty() {
-                view["bells"] = json!(bells.iter().map(|(place, left)| json!({"place":place,"left":left})).collect::<Vec<_>>());
-            }
-            view
-        }).collect::<Vec<_>>(),
+        "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| self.player_view(*session, p)).collect::<Vec<_>>(),
         "raidCrosses":self.raid_cross_view(zone),
         "slimes":self.slimes.iter().filter(|s| s.zone == zone && !idle).collect::<Vec<_>>(),
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
@@ -2159,6 +2404,10 @@ impl World {
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
         "chests":self.chests.list.iter().filter(|c| c.zone == zone).collect::<Vec<_>>(),
         "online":self.visible_online()});
+        let across = self.across_view(zone);
+        if !across.is_empty() {
+            view["across"] = json!(across);
+        }
         view["damageMeter"] = self.damage_meter_view(zone);
         let boss_mech = self.boss_mech_view(zone);
         if !boss_mech.is_empty() {
@@ -2268,9 +2517,9 @@ impl World {
                 }
                 let (c, _) = self
                     .store
-                    .create_character(Some(&id), look, self.maps[0].spawn, wants_gm)
+                    .create_character(Some(&id), look, self.newcomer_start(), wants_gm)
                     .map_err(storage)?;
-                (self.with_start_level(c), None)
+                (self.arrive(self.with_start_level(c)), None)
             }
             Identity::Guest { token: None, look } => {
                 let mut look = look.ok_or("Create a character first.")?;
@@ -2282,9 +2531,9 @@ impl World {
                 look.validate()?;
                 let (c, token) = self
                     .store
-                    .create(look, self.maps[0].spawn)
+                    .create(look, self.newcomer_start())
                     .map_err(storage)?;
-                (self.with_start_level(c), Some(token))
+                (self.arrive(self.with_start_level(c)), Some(token))
             }
         };
         if self.players.values().any(|p| p.character.id == c.id) {
@@ -2308,6 +2557,8 @@ impl World {
                 .map_err(|e| storage(Box::new(e)))?;
         }
         c.rested.join(crate::store::unix_now().max(0) as u64);
+        // The Empty Seat can no longer be abandoned: directions dropped before that rule come back.
+        c.abandoned_quests.retain(|id| !id.starts_with("es_"));
         if c.zone >= self.maps.len() || self.is_arena_zone(c.zone) {
             // A zone that no longer exists sends the character back to the start.
             c.zone = 0;
@@ -2375,6 +2626,7 @@ impl World {
         let zone = self.players[&session].character.zone;
         let mut snapshot = self.snapshot_for(zone);
         crate::visibility::filter_view(&mut snapshot, &id);
+        crate::visibility::cull_view(&mut snapshot, &id);
         Ok(json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":snapshot}))
     }
     /// Test servers may start new characters above level 1 (VALHALLA_START_LEVEL).
@@ -3424,10 +3676,34 @@ impl World {
         if p.ambient.is_none() {
             p.character
                 .explore_in(public, self.maps[p.character.zone].size);
-            for title in sync_progression(&mut p.character, &self.maps) {
+            // A hero still on the landing dock gets nothing yet: the landing quest arrives first, as they step ashore.
+            let arrived = if p.character.landing {
+                vec![]
+            } else {
+                sync_progression(&mut p.character, &self.maps)
+            };
+            for title in arrived {
                 let _ = p.peer.try_send(json!({"type":"system","text":format!(
                     "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
                 )}));
+            }
+            if let Some((npc, text)) = landing::greeting(p, &self.maps) {
+                let _ = p
+                    .peer
+                    .try_send(json!({"type":"npc_say","npc":npc,"text":text}));
+            }
+            // The dock's quest is the one announcement; the rest arrive like any automatic quest.
+            for (i, title) in landing::step_off(&mut p.character, &self.maps)
+                .into_iter()
+                .enumerate()
+            {
+                let text = format!(
+                    "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
+                );
+                let kind = if i == 0 { "announce" } else { "system" };
+                let _ = p
+                    .peer
+                    .try_send(json!({"type":kind,"kind":"quest","text":text}));
             }
             for place in sync_visits(&mut p.character, &self.maps) {
                 let _ = p.peer.try_send(
@@ -3611,6 +3887,10 @@ impl World {
             .portals
             .iter()
             .find(|portal| {
+                if let Some(seam) = &portal.seam {
+                    // A shared border: the walker is past the line.
+                    return p.moving && seam.crossing(here).is_some();
+                }
                 let walking_out = portal.walk.is_none_or(|side| {
                     let direction = if p.input.x != 0. || p.input.y != 0. {
                         p.input
@@ -3625,6 +3905,15 @@ impl World {
                     y: portal.y,
                 };
                 let distance = here.distance(centre);
+                // A vault is crossed anywhere across its opening, from the arch's centre on (the gate stands 3 tiles past it).
+                if let (Some(_), Some(half), Some(side)) =
+                    (portal.vault, portal.vault_half, portal.walk)
+                {
+                    let (wx, wy) = (f64::from(side[0]), f64::from(side[1]));
+                    let along = (here.x - centre.x) * wx + (here.y - centre.y) * wy;
+                    let across = ((here.x - centre.x) * -wy + (here.y - centre.y) * wx).abs();
+                    return walking_out && along >= -3. && across <= half;
+                }
                 // Keep authored arrival discs intact. The wider approach is intentional
                 // movement toward a visible opening, never a passive arrival trigger.
                 let toward = here.direction(centre);
@@ -3645,6 +3934,16 @@ impl World {
         };
         if portal.to >= self.maps.len() {
             return;
+        }
+        if let Some(seam) = &portal.seam
+            && let Some(arrival) = seam.crossing(here)
+        {
+            portal.tx = arrival.x;
+            portal.ty = arrival.y;
+        }
+        if let Some(shift) = portal.vault {
+            portal.tx = here.x + shift[0];
+            portal.ty = here.y + shift[1];
         }
         if self.maps[portal.to].sealed_template && self.public_zone(p.character.zone) != portal.to {
             return;
@@ -3785,7 +4084,7 @@ impl World {
         }
         let p = &self.players[&session];
         let actor = p.character.id.clone();
-        if portal.walk.is_none() {
+        if portal.walk.is_none() && portal.seam.is_none() {
             self.event("portal", &actor, here, 0., false);
         }
         let mut arrival = Point {
@@ -3802,7 +4101,7 @@ impl World {
         p.character.x = arrival.x;
         p.character.y = arrival.y;
         p.portal_at = time;
-        if portal.walk.is_some() {
+        if portal.walk.is_some() || portal.seam.is_some() {
             // Held movement continues across a road. A click goal keeps its remaining
             // local offset; no position or destination zone is accepted from the client.
             let limit = self.maps[portal.to].size as f64 - 0.7;
@@ -3818,7 +4117,7 @@ impl World {
         p.dash = 0.;
         let name = self.maps[portal.to].name.clone();
         let party = self.maps[portal.to].players;
-        let text = if portal.walk.is_some() {
+        let text = if portal.walk.is_some() || portal.seam.is_some() {
             match self.maps[portal.to].levels {
                 Some([low, high]) => format!("You enter {name}. Recommended levels {low}–{high}."),
                 None => format!("You enter {name}."),
@@ -3841,7 +4140,9 @@ impl World {
                 None => format!("You step through {} into {name}.", portal.name),
             }
         };
-        let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        if portal.seam.is_none() && portal.vault.is_none() {
+            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        }
         // Gathered humans and hired fighters cross together, so nobody is stranded behind the gate.
         for mate in raid_gate_crew.into_iter().filter(|mate| *mate != session) {
             let p = self.players.get_mut(&mate).unwrap();
@@ -3856,7 +4157,7 @@ impl World {
             let _ = p.peer.try_send(json!({"type":"system","text":text}));
         }
         self.separate_enemies();
-        if portal.walk.is_none() {
+        if portal.walk.is_none() && portal.seam.is_none() {
             self.event("portal", &actor, arrival, 0., false);
         }
         self.save();
@@ -4638,17 +4939,23 @@ impl World {
                 _ if self.spawns[id].ambush.is_some() => 1e9,
                 "big" => 0.,
                 "ember_firelord" => 1e9,
-                "cinderlord" => 180.,
+                "cinderlord" | "oldtusker" | "tidecrusher" | "orchardqueen" | "slagmaw"
+                | "ashwing" | "hoarhorn" | "whitewail" | "shardback" | "bellowmaw"
+                | "rustmarshal" | "hangedking" | "skoll" | "shardking" | "heimdallr"
+                | "cometmaw" | "eclipsequeen" | "orbitwarden" | "shatterhorn" | "lamphermit"
+                | "stormtusk" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
-                "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
+                "gloomroot" | "hrungnir" | "kraken" | "hvitserk" | "mainspringwyrm" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
-                | "wickerwarden" | "paradegryphon" | "maskcolossus" | "jadeanaconda"
-                | "crownjaguar" | "dunecolossus" | "mirageroc" | "bellmammoth" | "auroramanta"
-                | "crevasseleviathan" | "cairnbehemoth" | "whitebarktitan" | "stormcondor"
+                | "wickerwarden" | "paradegryphon" | "maskcolossus" | "whorlshell"
+                | "cobaltbasilisk" | "rootcentipede" | "jadeanaconda" | "crownjaguar"
+                | "lanternqueen" | "barkcolossus" | "ambergolem" | "dunecolossus" | "mirageroc"
+                | "bellmammoth" | "auroramanta" | "crevasseleviathan" | "cairnbehemoth"
+                | "whitebarktitan" | "stormcondor" | "avalanchebear" | "harrowox"
                 | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel"
                 | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber"
-                | "snowgiant" | "longnightwyrm" => 600.,
+                | "snowgiant" | "longnightwyrm" | "equinoxstag" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -5247,6 +5554,23 @@ impl World {
                         s.kind.as_str(),
                         "ember_firelord"
                             | "cinderlord"
+                            | "oldtusker"
+                            | "tidecrusher"
+                            | "orchardqueen"
+                            | "slagmaw"
+                            | "ashwing"
+                            | "hoarhorn"
+                            | "bellowmaw"
+                            | "rustmarshal"
+                            | "hangedking"
+                            | "skoll"
+                            | "shardking"
+                            | "heimdallr"
+                            | "cometmaw"
+                            | "eclipsequeen"
+                            | "orbitwarden"
+                            | "whitewail"
+                            | "shardback"
                             | "gloomroot"
                             | "hollow_rider"
                             | "grinch"
@@ -5263,6 +5587,10 @@ impl World {
                             | "sunshard"
                             | "pendulummatron"
                             | "epochengine"
+                            | "mainspringwyrm"
+                            | "shatterhorn"
+                            | "lamphermit"
+                            | "stormtusk"
                             | "mireheart"
                             | "silverwidow"
                             | "nightbloom"
@@ -5271,6 +5599,12 @@ impl World {
                             | "wickerwarden"
                             | "paradegryphon"
                             | "maskcolossus"
+                            | "whorlshell"
+                            | "cobaltbasilisk"
+                            | "lanternqueen"
+                            | "barkcolossus"
+                            | "ambergolem"
+                            | "rootcentipede"
                             | "jadeanaconda"
                             | "crownjaguar"
                             | "dunecolossus"
@@ -5281,6 +5615,8 @@ impl World {
                             | "cairnbehemoth"
                             | "whitebarktitan"
                             | "stormcondor"
+                            | "avalanchebear"
+                            | "harrowox"
                             | "bloomtortoise"
                             | "petalchimera"
                             | "rainseraph"
@@ -5293,6 +5629,7 @@ impl World {
                             | "rimesaber"
                             | "snowgiant"
                             | "longnightwyrm"
+                            | "equinoxstag"
                     ) || s.kind.starts_with("es_foe_")
                         || is_boss(&s.kind)
                         || (s.kind.starts_with("ew_") || s.kind.starts_with("cf_"))
@@ -8649,6 +8986,10 @@ mod tests {
             "sunshard",
             "pendulummatron",
             "epochengine",
+            "mainspringwyrm",
+            "shatterhorn",
+            "lamphermit",
+            "stormtusk",
             "mireheart",
             "silverwidow",
             "nightbloom",
@@ -8657,6 +8998,12 @@ mod tests {
             "wickerwarden",
             "paradegryphon",
             "maskcolossus",
+            "whorlshell",
+            "cobaltbasilisk",
+            "rootcentipede",
+            "lanternqueen",
+            "barkcolossus",
+            "ambergolem",
             "jadeanaconda",
             "crownjaguar",
             "dunecolossus",
@@ -8667,6 +9014,8 @@ mod tests {
             "cairnbehemoth",
             "whitebarktitan",
             "stormcondor",
+            "avalanchebear",
+            "harrowox",
             "bloomtortoise",
             "petalchimera",
             "rainseraph",
@@ -8679,6 +9028,7 @@ mod tests {
             "rimesaber",
             "snowgiant",
             "longnightwyrm",
+            "equinoxstag",
         ] {
             let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
             let zone = w.slimes[id].zone;
@@ -9276,7 +9626,10 @@ mod tests {
             "Skaldholm is the fifth map; every later zone is added after it"
         );
         assert_eq!(map.name, "Skaldholm");
-        assert_eq!(map.size, 160);
+        assert_eq!(
+            map.size, 184,
+            "the rebuilt city: one frame with its four neighbours (docs/skaldholm-rebuild.md)"
+        );
         assert_eq!(map.size % 8, 0, "whole ground chunks");
         assert!(map.slimes.is_empty() && w.slimes.iter().all(|s| s.zone != CITY));
         assert!(
@@ -9308,14 +9661,34 @@ mod tests {
             (100..=104).contains(&houses),
             "about a hundred houses, got {houses}"
         );
-        assert!(count("rampart") >= 60 && count("tower") >= 9);
+        // The city has no wall of its own: the four neighbours' walls enclose it (void collision lies beyond its ground).
+        assert!(
+            count("tower") <= 2 && (1..=40).contains(&count("rampart")),
+            "no wall of its own but the east wall's run from the Crags' wall down to Greenmeadow's"
+        );
+        assert!(count("void") > 0);
         assert_eq!(count("grandfountain"), 1);
         assert_eq!(count("meetingstone"), 1);
         assert!(count("stall") >= 14 && count("lamp") >= 30);
         // The great fountain sits in the middle of the plaza the city names.
         let city = map.city.as_ref().unwrap();
-        assert!(!city.contains(map.spawn), "you arrive outside the wall");
-        assert!(map.in_city(Point { x: 80., y: 76. }));
+        assert!(city.contains(map.spawn), "you arrive inside the city");
+        let fountain = {
+            let all: serde_json::Value =
+                serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
+            let o = all["zones"][CITY - 1]["objects"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|o| o["kind"] == "grandfountain")
+                .unwrap()
+                .clone();
+            Point {
+                x: o["x"].as_f64().unwrap(),
+                y: o["y"].as_f64().unwrap(),
+            }
+        };
+        assert!(map.in_city(fountain));
         // Gates: the glacier's Skaldholm Gate brings you to the forecourt, the Glacier Gate takes you back to its arrival.
         let up = w.maps[2]
             .portals
@@ -9324,7 +9697,11 @@ mod tests {
             .unwrap();
         let down = &map.portals[0];
         assert_eq!((up.to, down.to), (CITY, 2));
+        // One doorway in one frame: the vault drops you just inside the arch, on free ground, and the offsets cancel.
+        assert!(free_for_player(map, Point { x: up.tx, y: up.ty }));
         assert_eq!(down.id, "glacier_gate");
+        let (va, vb) = (up.vault.unwrap(), down.vault.unwrap());
+        assert!((va[0] + vb[0]).abs() < 0.011 && (va[1] + vb[1]).abs() < 0.011);
         let outside_gate = |gate: &Portal, p: Point| {
             p.distance(Point {
                 x: gate.x,
@@ -9345,34 +9722,9 @@ mod tests {
             ),
             "the summit arrival is clear of the Skaldholm Gate"
         );
-        // The glacier keeps all four of its wyrms, and no glacier spawn stands within 8 of any place a gate drops you.
-        let wyrms = w
-            .slimes
-            .iter()
-            .filter(|s| s.zone == 2 && s.kind == "wyrm")
-            .count();
-        assert_eq!(wyrms, 4);
-        for s in w.slimes.iter().filter(|s| s.zone == 2) {
-            for gate in w
-                .maps
-                .iter()
-                .flat_map(|m| m.portals.iter())
-                .filter(|p| p.to == 2)
-            {
-                assert!(
-                    s.point().distance(Point {
-                        x: gate.tx,
-                        y: gate.ty
-                    }) > 8.0,
-                    "a {} stands at {:?}, too near an arrival point",
-                    s.kind,
-                    s.point()
-                );
-            }
-        }
         // Everything solid is inside the map.
         for o in &map.objects {
-            assert!(o.x > 0. && o.y > 0. && o.x < 160. && o.y < 160.);
+            assert!(o.x > 0. && o.y > 0. && o.x < 184. && o.y < 184.);
         }
     }
 
@@ -9390,14 +9742,7 @@ mod tests {
         let mut ids = std::collections::HashSet::new();
         let mut walkers = 0;
         for npc in map.npcs.iter().filter(|n| !overlay_npc(&n.id)) {
-            assert!(
-                (npc.id.starts_with("city_")
-                    || npc.id == "travel_skaldholm"
-                    || npc.id == "banker_skaldholm")
-                    && ids.insert(&npc.id),
-                "{} is unique",
-                npc.id
-            );
+            assert!(ids.insert(&npc.id), "{} is unique", npc.id);
             if npc.route.is_empty() {
                 let p = Point { x: npc.x, y: npc.y };
                 assert!(free_for_player(map, p), "{} stands on free ground", npc.id);
@@ -9413,33 +9758,58 @@ mod tests {
         }
         assert!(map.npcs.len() >= 40, "{} people", map.npcs.len());
         assert!(walkers >= 12, "{walkers} walk");
-        // The plaza, the stone court, the gate and the far corners can all be walked to.
+        // The plaza, the stone court, every door and the south band can all be walked to.
+        let inside = |id: &str| {
+            let p = map.portals.iter().find(|p| p.id == id).unwrap();
+            let w = p.walk.unwrap();
+            Point {
+                x: p.x - 3. * f64::from(w[0]),
+                y: p.y - 3. * f64::from(w[1]),
+            }
+        };
+        let fountain = {
+            let all: serde_json::Value =
+                serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
+            let o = all["zones"][CITY - 1]["objects"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|o| o["kind"] == "grandfountain")
+                .unwrap()
+                .clone();
+            Point {
+                x: o["x"].as_f64().unwrap(),
+                y: o["y"].as_f64().unwrap(),
+            }
+        };
         for (name, p) in [
-            ("plaza", Point { x: 80., y: 66. }),
-            ("stone court", Point { x: 100., y: 123. }),
-            ("return gate", Point { x: 80., y: 153. }),
-            ("garden", Point { x: 27.4, y: 34. }),
-            ("orchard", Point { x: 121.4, y: 30. }),
+            (
+                "plaza",
+                Point {
+                    x: fountain.x,
+                    y: fountain.y + 9.,
+                },
+            ),
+            ("Rimeveil door", inside("glacier_gate")),
+            ("Greenmeadow door", inside("path_4_0")),
+            ("Crags door", inside("path_4_1")),
+            ("Gloamfen door", inside("path_4_3")),
         ] {
             assert!(reach(p).is_some(), "{name} is reachable");
         }
-        // The wall holds: the long way round the outside never gets in, so the Great Gate is the only door.
+        // No wall of its own: beyond the ground there is void, so the doors are the only way out.
         assert!(
-            !free_for_player(map, Point { x: 30., y: 12. }),
-            "the north wall is solid"
+            !free_for_player(map, Point { x: 30., y: 2. }),
+            "north of the ground is solid"
         );
         assert!(
-            !free_for_player(map, Point { x: 16., y: 100. }),
-            "the west wall is solid"
+            !free_for_player(map, Point { x: 8., y: 120. }),
+            "west of the ground is solid"
         );
+        let far = reach(inside("path_4_0")).unwrap() as f64 * 0.5;
         assert!(
-            free_for_player(map, Point { x: 80., y: 140. }),
-            "the Great Gate is open"
-        );
-        let gate_walk = *reach(Point { x: 80., y: 68. }).as_ref().unwrap() as f64 * 0.5;
-        assert!(
-            gate_walk > 78. && gate_walk < 110.,
-            "the forecourt to the plaza is a real walk: {gate_walk}"
+            far > 20. && far < 160.,
+            "the spawn to the south door is a real walk: {far}"
         );
     }
 
@@ -10838,6 +11208,7 @@ mod tests {
     #[test]
     fn enemies_block_each_other_but_players_can_walk_and_dash_through_actors() {
         let map = Map {
+            grid: Default::default(),
             crosses: vec![],
             name: String::new(),
             size: 96,
@@ -10849,6 +11220,7 @@ mod tests {
             quests: vec![],
             city: None,
             camps: vec![],
+            dock: None,
             places: vec![],
             portals: vec![],
             levels: None,
@@ -11472,6 +11844,9 @@ mod tests {
             muster: false,
             needs_quest: None,
             needs_boss: None,
+            seam: None,
+            vault: None,
+            vault_half: None,
         });
         w.use_portal(1);
         assert_eq!(w.players[&1].character.zone, 0);
@@ -11716,7 +12091,7 @@ mod tests {
             (14, "prism_orrery_gate"),
             (16, "moonspore_orrery_gate"),
             (19, "stormglass_sun_gate"),
-            (21, "ribbon_tangle_gate"),
+            (22, "tangle_worldheart_gate"),
             (23, "canopy_hollow_gate"),
             (23, "canopy_lapis_gate"),
             (27, "cairn_frostwake_gate"),

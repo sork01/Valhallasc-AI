@@ -30,7 +30,8 @@ fn compact_atlas_city_walkways_align_with_streets_and_real_wall_openings() {
         for e in entrances {
             let points = e["points"].as_array().unwrap();
             let point = |p: &Value| at(p[0].as_f64().unwrap(), p[1].as_f64().unwrap());
-            for pair in points.windows(2) {
+            // (Skaldholm's portal stands just beyond the arch line, on the neighbour's side: its path starts on the ground.)
+            for pair in points.windows(2).skip(usize::from(zone == 4)) {
                 assert!(
                     w.maps[zone].line_clear(point(&pair[0]), point(&pair[1]), 1.2),
                     "blocked city entry {zone}:{}",
@@ -41,7 +42,7 @@ fn compact_atlas_city_walkways_align_with_streets_and_real_wall_openings() {
             let street = e["street"].as_f64().unwrap();
             if zone == 0 {
                 assert_eq!(street, z["city"]["plaza"]["x"].as_f64().unwrap());
-            } else {
+            } else if zone != 4 {
                 // Match original streets, excluding paving created by this overlay.
                 assert!(
                     z["roads"].as_array().unwrap().iter().any(|r| {
@@ -70,16 +71,19 @@ fn compact_atlas_city_walkways_align_with_streets_and_real_wall_openings() {
             if let Some(id) = e["portal"].as_str() {
                 let portal = w.maps[zone].portals.iter().find(|p| p.id == id).unwrap();
                 assert_eq!(point(&points[0]), at(portal.x, portal.y));
-                assert_eq!(if vertical { portal.x } else { portal.y }, street);
+                if zone != 4 {
+                    assert_eq!(if vertical { portal.x } else { portal.y }, street);
+                }
                 let back = w.maps[portal.to]
                     .portals
                     .iter()
                     .find(|p| p.to == zone)
                     .unwrap();
-                assert!(at(back.tx, back.ty).distance(at(portal.x, portal.y)) >= 5.9);
+                assert!(zone == 4 || at(back.tx, back.ty).distance(at(portal.x, portal.y)) >= 5.9);
                 assert!(w.maps[zone].line_clear(at(back.tx, back.ty), point(&points[1]), 1.2));
             }
-            if let Some(opening) = e.get("opening") {
+            // Skaldholm (zone 4) has no wall of its own since the rebuild: its doors are the neighbours' vaults (zone_shape_tests).
+            if let Some(opening) = e.get("opening").filter(|_| zone != 4) {
                 let (x, y) = (
                     opening["x"].as_f64().unwrap(),
                     opening["y"].as_f64().unwrap(),
@@ -183,13 +187,20 @@ fn compact_atlas_bifrost_platform_edges_and_void_are_solid() {
         "checked exposed island and bridge edges: {edges}"
     );
     let _rx = join(&mut w, 1, Class::Warrior);
-    // All four edges of the added landing, outside the return gate trigger.
-    for (start, dir) in [
-        (at(30.5, 73.5), at(-1., 0.)),
-        (at(48.5, 71.5), at(1., 0.)),
-        (at(40.5, 70.5), at(0., -1.)),
-        (at(40.5, 82.5), at(0., 1.)),
-    ] {
+    // Along the rim of every updraft pad (both ways at right angles to its gate), outside the gate's trigger.
+    let mut sweeps = vec![];
+    for g in sky["portals"].as_array().unwrap() {
+        let Some(side) = g["walk"].as_array() else {
+            continue;
+        };
+        let (wx, wy) = (side[0].as_f64().unwrap(), side[1].as_f64().unwrap());
+        let (gx, gy) = (g["x"].as_f64().unwrap(), g["y"].as_f64().unwrap());
+        for sign in [-1., 1.] {
+            sweeps.push((at(gx - wx * 5., gy - wy * 5.), at(-wy * sign, wx * sign)));
+        }
+    }
+    assert_eq!(sweeps.len(), 8);
+    for (start, dir) in sweeps {
         place(&mut w, 1, 7, start);
         for _ in 0..40 {
             w.time += TICK;
@@ -311,7 +322,8 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
             .any(|r| r["zone"] == 17)
     );
     let pairs = routes(&data);
-    assert_eq!(pairs.len(), 48);
+    // 48 painted borders, minus the Lapis Erg-Yearwheel and the Frostwake-Yearwheel ones: a wall covers each up (the shapes pilot, owner 2026-11-09)
+    assert_eq!(pairs.len(), 46);
     let mut count = 0;
     for (i, j) in pairs.iter().flat_map(|&(i, j)| [(i, j), (j, i)]) {
         let m = &w.maps[i];
@@ -344,7 +356,7 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
         assert!(w.maps[j].line_clear(at(p.tx, p.ty), at(back.x, back.y), PLAYER_RADIUS));
         count += 1;
     }
-    assert_eq!(count, 96);
+    assert_eq!(count, 92);
     for (i, m) in w.maps.iter().enumerate().take(47) {
         let z = if i == 0 { &data } else { &data["zones"][i - 1] };
         let Some(paths) = z["atlasPaths"].as_array() else {
@@ -565,56 +577,52 @@ fn compact_atlas_city_archways_and_nacre_alcove_are_walkable() {
     for arch in arches {
         let x = arch["x"].as_f64().unwrap();
         let y = arch["y"].as_f64().unwrap();
-        let vertical = arch["vertical"].as_bool().unwrap();
-        let normal = if vertical { at(1., 0.) } else { at(0., 1.) };
+        // The doorway is on the city's ground edge: the street runs in from it, solid void lies beyond (the neighbour's vault takes over).
+        let id = arch["portal"].as_str().unwrap();
+        let portal = city.portals.iter().find(|p| p.id == id).unwrap();
+        let w_ = portal.walk.unwrap();
+        let inward = at(-f64::from(w_[0]), -f64::from(w_[1]));
         assert!(city.line_clear(
-            at(x - normal.x * 3., y - normal.y * 3.),
-            at(x + normal.x * 3., y + normal.y * 3.),
+            at(x + inward.x * 4., y + inward.y * 4.),
+            at(x + inward.x * 1.5, y + inward.y * 1.5),
             PLAYER_RADIUS
         ));
-        // The wall remains solid beside the new opening.
-        let beside = at(x + normal.y * 7., y + normal.x * 7.);
         assert!(!city.line_clear(
-            at(beside.x - normal.x * 3., beside.y - normal.y * 3.),
-            at(beside.x + normal.x * 3., beside.y + normal.y * 3.),
+            at(x + inward.x * 1.5, y + inward.y * 1.5),
+            at(x - inward.x * 4., y - inward.y * 4.),
             PLAYER_RADIUS
         ));
     }
-    // The south opening and crossing follow the Grand Avenue.
-    let south = arches.iter().find(|a| a["portal"] == "path_4_0").unwrap();
-    assert_eq!(south["x"].as_f64().unwrap(), 80.);
-    assert!(city.line_clear(at(80., 130.), at(80., 154.5), 1.2));
-    assert!(!city.line_clear(at(112., 137.), at(112., 143.), PLAYER_RADIUS));
-    assert!(!city.line_clear(at(104., 137.), at(104., 143.), PLAYER_RADIUS));
     let gate = w.maps[7]
         .portals
         .iter()
         .find(|p| p.to == 9)
         .unwrap()
         .clone();
-    assert_eq!((gate.x, gate.y), (122.5, 113.5));
+    // the Nacrehold updraft stands on its own pad in the south-east (the shapes pilot), six tiles from where Nacrehold sends you
+    assert_eq!((gate.x, gate.y), (330.8, 300.0));
     let back = w.maps[9].portals.iter().find(|p| p.to == 7).unwrap();
-    assert_eq!((back.tx, back.ty), (116.5, 113.5));
-    assert!(w.maps[7].line_clear(at(107.5, 106.5), at(119.5, 106.5), PLAYER_RADIUS));
+    assert_eq!((back.tx, back.ty), (gate.x - 6., gate.y));
     assert!(w.maps[7].line_clear(
-        at(gate.x, gate.y - 3.5),
-        at(gate.x, gate.y + 3.5),
+        at(gate.x - 6., gate.y),
+        at(gate.x - 1., gate.y),
         PLAYER_RADIUS
     ));
     let _rx = join(&mut w, 1, Class::Warrior);
-    place(&mut w, 1, 7, at(107.5, 106.5));
+    // passing along the pad, at right angles to the gate, must not travel
+    place(&mut w, 1, 7, at(gate.x - 5., gate.y - 4.));
     for _ in 0..40 {
         w.time += TICK;
         let p = w.players.get_mut(&1).unwrap();
-        p.input = at(1., 0.);
+        p.input = at(0., 1.);
         p.input_at = w.time;
         w.update_player(1);
         assert_eq!(
             w.players[&1].character.zone, 7,
-            "passing along the old bridge must not travel"
+            "passing along the pad must not travel"
         );
     }
-    assert!(w.players[&1].character.x > 114.);
+    assert!(w.players[&1].character.y > gate.y + 1.);
     for (zone, map) in std::iter::once(&data)
         .chain(data["zones"].as_array().unwrap())
         .enumerate()

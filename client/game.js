@@ -686,9 +686,9 @@
     mount.textContent = s.mounted ? `Dismount · ${mountKey}` : s.mountOwned ? `${window.Mounts?.name(s.mount) || 'Mount'} · ${mountKey} · 160% walking speed` : `Horse · ${mountKey}`;
     mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : `Ride the selected mount at 160% of normal walking speed (${mountKey}). Change it in the Character window.`) : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 500,000 gold. All mounts are listed in the Character window.';
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
-    if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
-    title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
-    title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
+    if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); if (!window.Field.seamless) { void title.offsetWidth; title.classList.add('show'); } }
+    title.querySelector('b').textContent = away ? s.area : inCity ? (s.hub && s.hub !== 'Alderhaven' ? s.hub : 'Alderhaven · Fountain Square') : s.area !== 'Greenmeadow' ? s.area : t('areaName');
+    title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : s.area !== 'Greenmeadow' ? 'Greenmeadow' : '푸른 초원';
     const statuses = [
       { id: 'daze', left: s.daze, time: 4, name: 'Dazed', icon: 'starfall', description: 'Movement speed is reduced by 50%.' },
       { id: 'stun', left: s.stun, time: 3, name: 'Stunned', icon: 'starfall', description: 'Cannot move, attack or cast.' },
@@ -1268,6 +1268,7 @@
     // Keep explicit choices; untouched devices start at 60% on touch and 80% on a mouse.
     get uiScale() { return save.uiScaleSet && Number.isFinite(+save.uiScale) ? Math.max(.6, Math.min(1.5, +save.uiScale)) : matchMedia('(pointer: coarse)').matches ? .6 : .8; },
     // Key bindings the player changed ({action: [code, code]}); keymap.js merges them over the shipped keys.
+    get minimapZoom() { return [1, 2, 3, 4].includes(+save.minimapZoom) ? +save.minimapZoom : 2; },
     get keys() { return save.keys && typeof save.keys === 'object' ? save.keys : {}; },
     get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },
     get panelSize() { return !save.panelSizeSet && !has(save.panelSize) ? DEFAULT_PANEL_SIZE : save.panelSize && typeof save.panelSize === 'object' ? save.panelSize : {}; },
@@ -1292,6 +1293,7 @@
       if ('ui' in patch) { save.ui = patch.ui || {}; save.uiSet = !!patch.ui; } // null = back to the shipped arrangement
       if ('uiScale' in patch && Number.isFinite(+patch.uiScale)) { save.uiScale = Math.max(.6, Math.min(1.5, +patch.uiScale)); save.uiScaleSet = true; }
       if ('winScale' in patch) save.winScale = patch.winScale;
+      if ('minimapZoom' in patch && [1, 2, 3, 4].includes(+patch.minimapZoom)) save.minimapZoom = +patch.minimapZoom;
       if ('keys' in patch) save.keys = patch.keys && typeof patch.keys === 'object' ? patch.keys : {};
       if ('panelSize' in patch) { save.panelSize = patch.panelSize || {}; save.panelSizeSet = !!patch.panelSize; }
       persist(); applyMusicLevel(.4);

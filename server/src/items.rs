@@ -313,6 +313,23 @@ pub fn material(kind: &str) -> &'static str {
         "spider" => "magma_fang",
         "wraith" => "ash_veil",
         "golem" | "cinderlord" => "basalt_heart",
+        "oldtusker" => "tusker_bristle",
+        "tidecrusher" => "tidecrusher_shard",
+        "orchardqueen" => "queen_stinger",
+        "slagmaw" => "slagmaw_gullet",
+        "ashwing" => "ashwing_plume",
+        "hoarhorn" => "hoarhorn_tusk",
+        "bellowmaw" => "bellowmaw_gullet",
+        "rustmarshal" => "rustmarshal_plate",
+        "hangedking" => "hangedking_noose",
+        "skoll" => "skoll_fang",
+        "shardking" => "shardking_crown",
+        "heimdallr" => "heimdallr_horn",
+        "cometmaw" => "cometmaw_tail",
+        "eclipsequeen" => "eclipsequeen_crown",
+        "orbitwarden" => "orbitwarden_ring",
+        "whitewail" => "whitewail_shroud",
+        "shardback" => "shardback_carapace",
         "crab" => "rime_shell",
         "wolf" => "frost_pelt",
         "yeti" => "yeti_horn",
@@ -366,6 +383,10 @@ pub fn material(kind: &str) -> &'static str {
         "chronoguard" => "chronoguard_plate",
         "pendulummatron" => "matron_pendulum",
         "epochengine" => "epoch_core",
+        "mainspringwyrm" => "mainspring_coil",
+        "shatterhorn" => "horn_prism",
+        "lamphermit" => "hermit_lens",
+        "stormtusk" => "tusk_storm",
         "glowcapgrazer" => "glowcap",
         "silkwing" => "moon_silk",
         "rootlurker" => "root_heart",
@@ -397,6 +418,12 @@ pub fn material(kind: &str) -> &'static str {
         "jesterling" => "jester_bell",
         "paradegryphon" => "gryphon_feather",
         "maskcolossus" => "masquerade_mask",
+        "whorlshell" => "whorl_shell",
+        "rootcentipede" => "hollow_chitin",
+        "cobaltbasilisk" => "basilisk_scale",
+        "lanternqueen" => "queen_amber",
+        "barkcolossus" => "heartbark_slab",
+        "ambergolem" => "golem_amber",
         "orchidmantis" => "mantis_petals",
         "canopyglider" => "glider_membrane",
         "poolcaiman" => "caiman_scale",
@@ -427,6 +454,8 @@ pub fn material(kind: &str) -> &'static str {
         "cairnbehemoth" => "behemoth_heartstone",
         "whitebarktitan" => "whitebark_core",
         "stormcondor" => "stormcondor_plume",
+        "avalanchebear" => "avalanche_claw",
+        "harrowox" => "harrow_horn",
         "brooknewt" => "newt_ribbon",
         "sundarter" => "sundarter_scale",
         "acornmimic" => "amber_acorn",
@@ -443,6 +472,7 @@ pub fn material(kind: &str) -> &'static str {
         "rimesaber" => "rimesaber_fang",
         "snowgiant" => "snowgiant_heart",
         "longnightwyrm" => "longnight_scale",
+        "equinoxstag" => "equinox_antler",
         _ => "slime_gel",
     }
 }
@@ -527,6 +557,23 @@ pub fn is_elite(kind: &str) -> bool {
         kind,
         "big"
             | "cinderlord"
+            | "oldtusker"
+            | "tidecrusher"
+            | "orchardqueen"
+            | "slagmaw"
+            | "ashwing"
+            | "hoarhorn"
+            | "bellowmaw"
+            | "rustmarshal"
+            | "hangedking"
+            | "skoll"
+            | "shardking"
+            | "heimdallr"
+            | "cometmaw"
+            | "eclipsequeen"
+            | "orbitwarden"
+            | "whitewail"
+            | "shardback"
             | "gloomroot"
             | "oakhorn"
             | "hrungnir"
@@ -537,6 +584,10 @@ pub fn is_elite(kind: &str) -> bool {
             | "sunshard"
             | "pendulummatron"
             | "epochengine"
+            | "mainspringwyrm"
+            | "shatterhorn"
+            | "lamphermit"
+            | "stormtusk"
             | "mireheart"
             | "silverwidow"
             | "nightbloom"
@@ -549,6 +600,12 @@ pub fn is_elite(kind: &str) -> bool {
             | "wickerwarden"
             | "paradegryphon"
             | "maskcolossus"
+            | "whorlshell"
+            | "rootcentipede"
+            | "cobaltbasilisk"
+            | "lanternqueen"
+            | "barkcolossus"
+            | "ambergolem"
             | "jadeanaconda"
             | "crownjaguar"
             | "dunecolossus"
@@ -559,6 +616,8 @@ pub fn is_elite(kind: &str) -> bool {
             | "cairnbehemoth"
             | "whitebarktitan"
             | "stormcondor"
+            | "avalanchebear"
+            | "harrowox"
             | "bloomtortoise"
             | "petalchimera"
             | "rainseraph"
@@ -571,6 +630,7 @@ pub fn is_elite(kind: &str) -> bool {
             | "rimesaber"
             | "snowgiant"
             | "longnightwyrm"
+            | "equinoxstag"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.

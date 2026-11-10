@@ -97,7 +97,7 @@ fn seasonal_expiry_retires_unfinished_quests_and_refuses_forged_claims() {
     }));
 }
 #[test]
-fn seasonal_catalog_has_twenty_valid_city_quests_and_old_saves_load() {
+fn seasonal_catalog_has_twenty_five_valid_city_quests_and_old_saves_load() {
     let w = world();
     let quests: Vec<_> = w
         .maps
@@ -105,7 +105,11 @@ fn seasonal_catalog_has_twenty_valid_city_quests_and_old_saves_load() {
         .flat_map(|m| &m.quests)
         .filter(|q| crate::seasonal::quest_event(&q.id).is_some() && !crate::seasonal::daily(&q.id))
         .collect();
-    assert_eq!(quests.len(), 20);
+    assert_eq!(
+        quests.len(),
+        25,
+        "five festivals in the five cities (Heartwood joined on the shapes pilot)"
+    );
     for q in quests {
         assert_eq!(q.min_level, q.level);
         assert!(q.repeatable);

@@ -967,6 +967,7 @@ mod follow_tests {
         let (mut w, _rx, _) = rig(Class::Warrior, false);
         w.maps[0].objects[0].width = 0.1;
         w.maps[0].objects[0].depth = 4.;
+        w.maps[0].grid = Default::default(); // an edit in place: the grid cannot see it
         let owner = w.players[&1].character.id.clone();
         for _ in 0..2 {
             w.place_mercenary(

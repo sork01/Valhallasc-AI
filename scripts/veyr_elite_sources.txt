@@ -1,0 +1,5 @@
+{
+  "lanternqueen": "6f7727eab7a3f4be",
+  "barkcolossus": "b51bde4bc0fa7eee",
+  "ambergolem": "00ee881e3f5b7730"
+}

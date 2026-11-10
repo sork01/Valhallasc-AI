@@ -1,0 +1,257 @@
+// Vault seamlessness (Skaldholm's wall): the SAME world point drawn from both sides of the vault must look the same. Derived from zone-shape-ui.cjs.
+// Zone shapes pilot (docs/zone-shapes.md): the real client draws Greenmeadow and the Emberfall Crags with the outline of
+// their province, and a walker cannot leave the land. Starts its own private world (test commands, own database) from
+// VALHALLA_BINARY and writes screenshots to test-results/zone-shapes/. Run it bounded:
+//   PART=seams bash scripts/test-touch-bounded.sh tests/zone-shape-ui.cjs   (then PART=rest, then PART=walls)
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { spawn } = require('node:child_process');
+const { chromium } = require('./lib/playwright.cjs');
+const root = path.resolve(__dirname, '..');
+const out = path.join(root, 'test-results/zone-shapes');
+fs.mkdirSync(out, { recursive: true });
+const port = 18400 + (process.pid % 400);
+const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'zone-shape-'));
+let server, browser, checks = 0;
+const check = (value, label) => { assert.ok(value, label); checks++; };
+const world = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
+const zoneDef = z => (z === 0 ? world : world.zones[z - 1]);
+const cityFree = (x, y) => onLand(4, x, y) && !zoneDef(4).objects.some(o => o.kind !== 'void' && (o.width ? Math.abs(x - o.x) < o.width / 2 + 1 && Math.abs(y - o.y) < o.depth / 2 + 1 : Math.hypot(x - o.x, y - o.y) < o.r + 1));
+const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)] === '#';
+(async () => {
+  server = spawn(process.env.VALHALLA_BINARY, [], {
+    cwd: root, stdio: 'ignore',
+    env: { ...process.env, VALHALLA_BIND: `127.0.0.1:${port}`, VALHALLA_DB: path.join(tmp, 'v.sqlite'), VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_TEST_COMMANDS: '1', VALHALLA_GOD_MODE: '1', VALHALLA_LEVEL_SPREAD: '0' },
+  });
+  for (let i = 0; i < 100; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/health`)).ok) break; } catch (_) {} await new Promise(r => setTimeout(r, 200)); }
+  browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })));
+  await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.locator('#name').fill('ShapeWalker'); await page.locator('#go').click({ timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
+  const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
+  const where = () => page.evaluate(() => ({ zone: Field.zone, x: Field.hero.nx, y: Field.hero.ny }));
+  // The meadow/Crags border geometry, shared by both parts.
+
+  // SHOTS=zone:x:y,... only takes screenshots at those places (for looking at walls), then stops.
+  if (process.env.SHOTS) {
+    for (const [zone, x, y] of process.env.SHOTS.split(',').map(v => v.split(':').map(Number))) {
+      await debug({ op: 'teleport', zone, x, y });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, x, y], { timeout: 20000 }).catch(() => console.log('no arrival', zone, x, y));
+      await page.waitForTimeout(2500);
+      await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+      await page.screenshot({ path: path.join(out, `shot-${zone}-${x}-${y}.png`) });
+    }
+    return;
+  }
+  const snap = async (zone, x, y) => {
+    await debug({ op: 'teleport', zone, x, y });
+    await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 1.5, [zone, x, y], { timeout: 20000 });
+    await page.waitForTimeout(2500);     // neighbour contexts are built one per timer tick after a zone change
+    const at = await where();
+    if (process.env.DEBUG === 'walls') console.log('wallGhosts', zone, JSON.stringify(await page.evaluate(() => Field.wallGhosts.filter(o => o[1] < 30 && o[2] > 20 && o[2] < 140))));
+    if (process.env.DEBUG) console.log('regions', zone, JSON.stringify(await page.evaluate(() => Field.vaultRegions.map(r => ({ to: r.to, shift: r.shift, other: r.other.map(v => Math.round(v)), strip: r.strip && r.strip.map(v => Math.round(v)) })))), 'hero', JSON.stringify(at), JSON.stringify(await page.evaluate(() => Field.ghostKinds)), JSON.stringify(await page.evaluate(() => Field.ghostNpcIds)));
+    if (process.env.FULL) await page.screenshot({ path: path.join(out, `vault-full-${zone}-${x.toFixed(0)}-${y.toFixed(0)}.png`) });
+    const data = await page.evaluate(() => {
+      const cv = document.getElementById('fieldcv'), W = 256, H = 160, o = document.createElement('canvas'); o.width = W; o.height = H;
+      const g = o.getContext('2d'); g.drawImage(cv, cv.width * .2, cv.height * .12, cv.width * .6, cv.height * .6, 0, 0, W, H);   // the middle of the field, clear of the HUD
+      return { px: Array.from(g.getImageData(0, 0, W, H).data), png: o.toDataURL('image/png') };
+    });
+    return { at, ...data };
+  };
+  const diff = (a, b) => { let sum = 0, big = 0, n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
+  const save = (name, im) => fs.writeFileSync(path.join(out, name), Buffer.from(im.png.split(',')[1], 'base64'));
+  // PART=corner: the south-west corner where Greenmeadow, Gloamfen and Skaldholm meet (atlas 368.9, 757.7; owner, 2026-11-06: "the wall is broken").
+  // Every frame must draw the SAME wall pieces around it (its own plus its ghosts, in atlas coordinates), and a hero walks between the two lands below the corner.
+  if (process.env.PART === 'corner') {
+    const C = [368.9, 757.7], R = 11, key = (o, T) => `${o[0]}@${(o[1] + T[0]).toFixed(1)},${(o[2] + T[1]).toFixed(1)}`;
+    const sets = {};
+    for (const [zone, dx, dy] of [[0, 14, 12], [3, -14, 2], [4, 14, -14]]) {
+      const T = zoneDef(zone).shape.T, hx = C[0] - T[0] + dx, hy = C[1] - T[1] + dy;
+      check(onLand(zone, hx, hy), `zone ${zone}: the viewing spot is on land`);
+      await debug({ op: 'teleport', zone, x: hx, y: hy });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, hx, hy], { timeout: 20000 });
+      await page.waitForTimeout(3500);
+      const near = o => Math.hypot(o[1] + T[0] - C[0], o[2] + T[1] - C[1]) < R;
+      const own = zoneDef(zone).objects.filter(o => (o.kind === 'rampart' || o.kind === 'tower') && near([o.kind, o.x, o.y])).map(o => [o.kind, o.x, o.y]);
+      const ghost = (await page.evaluate(() => Field.wallGhosts)).filter(near);
+      sets[zone] = new Set([...own, ...ghost].map(o => key(o, T)));
+      console.log(`zone ${zone}: ${own.length} own + ${ghost.length} ghost wall pieces within ${R} tiles of the corner: ${[...sets[zone]].sort().join(' ')}`);
+      await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+      await page.screenshot({ path: path.join(out, `corner-zone${zone}.png`) });
+    }
+    for (const a of [0, 3, 4]) for (const b of [0, 3, 4]) if (a < b) {
+      const only = [...sets[a]].filter(k => !sets[b].has(k)).concat([...sets[b]].filter(k => !sets[a].has(k)).map(k => '~' + k));
+      check(only.length === 0, `the corner's wall pieces are the same from zone ${a} and zone ${b} (differ: ${only.join(' ')})`);
+    }
+    check(sets[0].size >= 5 && [...sets[0]].some(k => k.startsWith('tower')), `the corner has its tower and at least five pieces (${sets[0].size})`);
+    // the ground south of the corner is Greenmeadow's from Gloamfen's frame too (it was painted as the city's flat outer ground: a lime slab)
+    const sample = async (zone, hx, hy, pts) => {
+      const T = zoneDef(zone).shape.T;
+      await debug({ op: 'teleport', zone, x: hx - T[0], y: hy - T[1] });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, hx - T[0], hy - T[1]], { timeout: 20000 });
+      await page.waitForTimeout(3500);
+      return page.evaluate(([pts, T]) => { const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'); return pts.map(([ax, ay]) => { const [fx, fy] = Field.screenOf(ax - T[0], ay - T[1]); const d = g.getImageData(Math.round(fx * cv.width) - 2, Math.round(fy * cv.height) - 2, 5, 5).data; let r = 0, gg = 0, b = 0; for (let i = 0; i < d.length; i += 4) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; } const n = d.length / 4; return [r / n, gg / n, b / n]; }); }, [pts, T]);
+    };
+    const ground = []; for (let gx = 371.5; gx <= 379; gx += 1.5) for (let gy = 759.5; gy <= 765; gy += 1.5) ground.push([gx, gy]);
+    const inFen = await sample(3, 363, 762, ground), inMeadow = await sample(0, 377, 764, ground);
+    const mean = L => [0, 1, 2].map(c => L.reduce((t, p) => t + p[c], 0) / L.length);      // (the average colour of the whole patch: flowers and shadows cancel)
+    const [mf, mm] = [mean(inFen), mean(inMeadow)], dist = Math.hypot(mf[0] - mm[0], mf[1] - mm[1], mf[2] - mm[2]);
+    console.log(`ground south of the corner: average colour from Gloamfen ${mf.map(Math.round)} from Greenmeadow ${mm.map(Math.round)}, distance ${dist.toFixed(1)}`);
+    check(dist < 12, `the ground south of the corner looks the same from Gloamfen and Greenmeadow (${dist.toFixed(1)})`);
+    // a walk below the corner: Gloamfen (x < 370) into Greenmeadow (x >= 370) and back, at y 762
+    const wy = 762 - zoneDef(3).shape.T[1];
+    const walk = async (fromZone, fromX, dirx, toZone) => {
+      await debug({ op: 'teleport', zone: fromZone, x: fromX, y: 762 - zoneDef(fromZone).shape.T[1] });
+      await page.waitForFunction(z => Field.zone === z, fromZone, { timeout: 20000 }); await page.waitForTimeout(1500);
+      const keys = isoKeys(dirx, 0);
+      for (const k of keys) await page.keyboard.down(k);
+      const t0 = Date.now(); let z = fromZone;
+      while (Date.now() - t0 < 9000 && z === fromZone) { await page.waitForTimeout(200); z = await page.evaluate(() => Field.zone); }
+      for (const k of keys) await page.keyboard.up(k);
+      const at = await where();
+      check(z === toZone, `walking ${dirx > 0 ? 'east' : 'west'} at y 762 leads from zone ${fromZone} to zone ${toZone} (ended in zone ${z} at ${at.x.toFixed(1)},${at.y.toFixed(1)})`);
+      return at;
+    };
+    const isoKeys = (dx, dy) => [dx - dy > .35 ? 'ArrowRight' : dx - dy < -.35 ? 'ArrowLeft' : null, dx + dy > .35 ? 'ArrowDown' : dx + dy < -.35 ? 'ArrowUp' : null].filter(Boolean);
+    const e = await walk(3, 366 - zoneDef(3).shape.T[0], 1, 0);
+    check(Math.abs(e.y + zoneDef(0).shape.T[1] - 762) < 2.5, `the crossing keeps the hero at y 762 (${(e.y + zoneDef(0).shape.T[1]).toFixed(1)})`);
+    await walk(0, 374 - zoneDef(0).shape.T[0], -1, 3);
+    // and the wall itself still stops a hero on the corner's north side (y 756-758 is wall)
+    assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
+    console.log(`vault-seamless-ui corner: ${checks} checks passed; screenshots in ${out}`);
+    return;
+  }
+  // PART=eastcorner: the city's south-east corner where Greenmeadow, the Crags and Skaldholm meet (atlas 456.2, 757.7; owner, 2026-11-06: "from the meadow side the wall
+  // is missing a tower, from the Crags side the tower is there"). Every frame must draw the SAME wall pieces around it (own plus ghosts, atlas coordinates).
+  if (process.env.PART === 'eastcorner') {
+    const C = (process.env.EC || '456.2,757.7').split(',').map(Number), R = 11, key = (o, T) => `${o[0]}@${(o[1] + T[0]).toFixed(1)},${(o[2] + T[1]).toFixed(1)}`;
+    const sets = {};
+    for (const [zone, dx, dy] of (process.env.EV || '0:9:8,1:9:-22,4:-12:-6').split(',').map(v => v.split(':').map(Number))) {
+      const T = zoneDef(zone).shape.T, hx = C[0] - T[0] + dx, hy = C[1] - T[1] + dy;
+      check(onLand(zone, hx, hy), `zone ${zone}: the viewing spot is on land`);
+      await debug({ op: 'teleport', zone, x: hx, y: hy });
+      await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 3, [zone, hx, hy], { timeout: 20000 });
+      await page.waitForTimeout(3500);
+      const near = o => Math.hypot(o[1] + T[0] - C[0], o[2] + T[1] - C[1]) < R;
+      const own = zoneDef(zone).objects.filter(o => (o.kind === 'rampart' || o.kind === 'tower') && near([o.kind, o.x, o.y])).map(o => [o.kind, o.x, o.y]);
+      const ghost = (await page.evaluate(() => Field.wallGhosts)).filter(near);
+      sets[zone] = new Set([...own, ...ghost].map(o => key(o, T)));
+      console.log(`zone ${zone}: ${own.length} own + ${ghost.length} ghost wall pieces within ${R} tiles of the corner: ${[...sets[zone]].sort().join(' ')}`);
+      await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+      await page.screenshot({ path: path.join(out, `eastcorner-zone${zone}.png`) });
+    }
+    for (const a of [0, 1, 4]) for (const b of [0, 1, 4]) if (a < b) {
+      const only = [...sets[a]].filter(k => !sets[b].has(k)).concat([...sets[b]].filter(k => !sets[a].has(k)).map(k => '~' + k));
+      check(only.length === 0, `the east corner's wall pieces are the same from zone ${a} and zone ${b} (differ: ${only.join(' ')})`);
+    }
+    assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
+    console.log(`vault-seamless-ui eastcorner: ${checks} checks passed`);
+    return;
+  }
+  const rows = [];
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
+    const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
+    const [wx, wy] = gate.walk, [vx, vy] = gate.vault;
+    for (const [s, t] of (process.env.SS || '0:0,-4:14').split(',').map(x => x.split(':').map(Number))) {
+      const px = arch.x + wx * s - wy * t, py = arch.y + wy * s + wx * t;       // one world point (t = along the wall), in the zone's frame...
+      if (!onLand(zone, px, py)) continue;                      // (the Crags' wall ends at the arch: nothing to stand on beyond it)
+      if (!cityFree(px + vx, py + vy)) continue;                // (nor in the city: the point must be ground with nothing standing on it)
+      const a = await snap(zone, px, py);                      // ...drawn from this zone,
+      const a2 = await snap(zone, px, py);                     // again (the noise floor: animation, timers)
+      const b = await snap(4, px + vx, py + vy);               // ...and from Skaldholm (arrival = here + vault)
+      const noise = diff(a, a2), d = diff(a, b);
+      save(`vault-z${zone}-s${s}-t${t}-zone.png`, a); save(`vault-z${zone}-s${s}-t${t}-city.png`, b);
+      rows.push({ zone, s: `${s}/${t}`, noise, d });
+      if (process.env.DEBUG) console.log('hero at', JSON.stringify([a.at, b.at]), 'wanted', JSON.stringify([[px, py], [px + vx, py + vy]]));
+      console.log(`zone ${zone} s ${s} t ${t}: noise ${noise.mean.toFixed(2)}/${(noise.big * 100).toFixed(1)}%  across the vault ${d.mean.toFixed(2)}/${(d.big * 100).toFixed(1)}% (mean abs diff / % of pixels off by >40)`);
+    }
+  }
+  // Nothing pops in: around each arch both frames draw the same scenery (kind and place), checked object by object.
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
+    const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal), [vx, vy] = gate.vault;
+    await debug({ op: 'teleport', zone, x: arch.x - gate.walk[0] * 2, y: arch.y - gate.walk[1] * 2 });
+    await page.waitForFunction(z => Field.zone === z, zone, { timeout: 20000 }); await page.waitForTimeout(1500);
+    const A = await page.evaluate(([x, y, R]) => Field.sceneAround(x, y, R), [arch.x, arch.y, +process.env.SCENE_R || 34]);
+    await debug({ op: 'teleport', zone: 4, x: arch.x + vx + gate.walk[0] * 2, y: arch.y + vy + gate.walk[1] * 2 });
+    await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 }); await page.waitForTimeout(1500);
+    const B = await page.evaluate(([x, y, R]) => Field.sceneAround(x, y, R), [arch.x + vx, arch.y + vy, +process.env.SCENE_R || 34]);
+    const near = (o, L, dx, dy) => L.some(q => q[0] === o[0] && Math.hypot(q[1] - o[1] - dx, q[2] - o[2] - dy) < .6);
+    const onlyZone = A.filter(o => !near(o, B, vx, vy)), onlyCity = B.filter(o => !near(o, A, -vx, -vy));
+    const fmt = (L, dx, dy) => L.map(o => `${o[0]}@${(o[1] + dx).toFixed(1)},${(o[2] + dy).toFixed(1)}`).join(' ');
+    console.log(`zone ${zone}: ${A.length} / ${B.length} objects near the arch; only in the zone frame: ${fmt(onlyZone, 0, 0) || '-'}; only in Skaldholm (zone coords): ${fmt(onlyCity, -vx, -vy) || '-'}`);
+    check(onlyZone.length + onlyCity.length === 0, `zone ${zone}: the same scenery around the arch from both sides`);
+  }
+  // The last row of the zone's land, in the opening, is the same ground from both sides (it once vanished on crossing: the clip stood at the arch, not the line).
+  const ground = async (zone, x, y, pts) => {
+    await debug({ op: 'teleport', zone, x, y });
+    await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < 1.5, [zone, x, y], { timeout: 20000 });
+    await page.waitForTimeout(2500);
+    return page.evaluate(pts => { const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'); return pts.map(([x, y]) => { const [fx, fy] = Field.screenOf(x, y); return [...g.getImageData(Math.round(fx * cv.width), Math.round(fy * cv.height), 1, 1).data].slice(0, 3); }); }, pts);
+  };
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
+    const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal), [wx, wy] = gate.walk, [vx, vy] = gate.vault;
+    const row = [-3.5, -1.5, 1.5, 3.5].map(t => [arch.x + wx * .6 - wy * t, arch.y + wy * .6 + wx * t]);
+    const hx = arch.x - wx * 4, hy = arch.y - wy * 4;
+    const a = await ground(zone, hx, hy, row), b = await ground(4, hx + vx, hy + vy, row.map(([x, y]) => [x + vx, y + vy]));
+    const dist = a.map((p, i) => Math.hypot(p[0] - b[i][0], p[1] - b[i][1], p[2] - b[i][2])).sort((p, q) => p - q), med = dist[2];
+    console.log(`zone ${zone}: last row of land in the opening, colour distance ${dist.map(d => d.toFixed(0)).join(' ')}`);
+    check(med < 40, `zone ${zone}: the last row of land is the same from both sides (${med.toFixed(0)})`);
+  }
+  // Skaldholm's own square is never touched by a neighbour's region (the borders lean across it: the Crags' region once covered its north-east corner).
+  await debug({ op: 'teleport', zone: 4, x: 75, y: 24 });      // (the rebuilt city: its north-east, beside the Archive)
+  await page.waitForFunction(() => Field.zone === 4, null, { timeout: 20000 });
+  await page.waitForTimeout(2500);
+  const intr = await page.evaluate(() => Field.cityIntrusion);
+  check(intr && intr.hidden === 0 && intr.ghosts === 0 && intr.season === 0, `no neighbour region hides or replaces anything inside Skaldholm's walls (${JSON.stringify(intr)})`);
+  await page.screenshot({ path: path.join(out, 'skaldholm-north-east.png') });
+  // A real walk through the vault, both ways: sample the canvas while walking; the step at the zone change must be no bigger than the
+  // steps of ordinary walking (a pop shows as a spike).
+  const isoKeys = (dx, dy) => [dx - dy > .35 ? 'ArrowRight' : dx - dy < -.35 ? 'ArrowLeft' : null, dx + dy > .35 ? 'ArrowDown' : dx + dy < -.35 ? 'ArrowUp' : null].filter(Boolean);
+  const grab = () => page.evaluate(() => {
+    const cv = document.getElementById('fieldcv'), W = 128, H = 80, o = document.createElement('canvas'); o.width = W; o.height = H;
+    const g = o.getContext('2d'); g.drawImage(cv, cv.width * .2, cv.height * .12, cv.width * .6, cv.height * .6, 0, 0, W, H);
+    return { zone: Field.zone, px: Array.from(g.getImageData(0, 0, W, H).data) };
+  });
+  const walkSpikes = [];
+  for (const zone of (process.env.ZONES || '3,0,1,2').split(',').map(Number)) {
+    const z = zoneDef(zone), arch = z.exitArches.find(a => a.name === 'Skaldholm'), gate = z.portals.find(p => p.id === arch.portal);
+    const [wx, wy] = gate.walk;
+    const inward = zone === 2 ? 2.5 : 9;                  // (the north door lands in the lane behind the Steward's Hall: the hall stands 5 tiles in)
+    for (const dir of [1, -1]) {                         // 1 = into Skaldholm, -1 = back out
+      const from = dir === 1 ? [zone, arch.x - wx * 9, arch.y - wy * 9] : [4, arch.x + gate.vault[0] + wx * inward, arch.y + gate.vault[1] + wy * inward];
+      await snap(from[0], from[1], from[2]);
+      const keys = isoKeys(wx * dir, wy * dir);
+      for (const k of keys) await page.keyboard.down(k);
+      // sample the canvas on every animation frame inside the page (polling from outside is far too slow)
+      await page.evaluate(() => {
+        const cv = document.getElementById('fieldcv'), W = 64, H = 40, o = document.createElement('canvas'); o.width = W; o.height = H;
+        const g = o.getContext('2d', { willReadFrequently: true }); window.__frames = []; window.__rec = true;
+        const tick = () => { if (!window.__rec) return; g.drawImage(cv, cv.width * .2, cv.height * .12, cv.width * .6, cv.height * .6, 0, 0, W, H); window.__frames.push({ zone: Field.zone, px: Array.from(g.getImageData(0, 0, W, H).data) }); requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+      });
+      const t0 = Date.now();
+      while (Date.now() - t0 < 9000) { await page.waitForTimeout(250); const z = await page.evaluate(() => Field.zone); if (z !== zone && dir === 1 || z === zone && dir === -1) { await page.waitForTimeout(1200); break; } }
+      for (const k of keys) await page.keyboard.up(k);
+      const frames = await page.evaluate(() => { window.__rec = false; return window.__frames; });
+      const steps = frames.slice(1).map((f, i) => ({ zone: f.zone, change: f.zone !== frames[i].zone, d: diff({ px: frames[i].px }, { px: f.px }).mean }));
+      const at0 = steps.findIndex(x => x.change);          // the frame the zone changes in, and the one drawn after it
+      const ordinary = steps.filter((x, i) => !(i === at0 || i === at0 + 1)).map(x => x.d).sort((p, q) => p - q);
+      const cross = steps.filter(x => x.change).length === 1 ? [Math.max(steps[at0].d, steps[at0 + 1]?.d || 0)] : steps.filter(x => x.change).map(x => x.d);
+      const p90 = ordinary[Math.floor(ordinary.length * .9)] || 0;
+      console.log(`zone ${zone} ${dir === 1 ? 'in' : 'out'}: ${frames.length} frames, crossing step ${cross.map(c => c.toFixed(1)).join(',') || 'none'}, ordinary 90th percentile ${p90.toFixed(1)}`);
+      check(cross.length === 1, `zone ${zone} ${dir === 1 ? 'in' : 'out'}: the walk crossed the vault once`);
+      check(cross[0] <= Math.max(p90 * 1.5, 6), `zone ${zone} ${dir === 1 ? 'in' : 'out'}: no spike at the crossing (${cross[0]?.toFixed(1)} vs ordinary ${p90.toFixed(1)})`);
+    }
+  }
+  // (10 percent: the walls differ in style, the city's long pieces against the zone's ramparts; the missing-neighbour bug was 20)
+  for (const r of rows) check(r.d.mean <= Math.max(10, r.noise.mean * 2 + 2) && r.d.big <= Math.max(.10, r.noise.big * 2 + .02), `zone ${r.zone} s ${r.s}: the same point looks the same from both sides of the vault (diff ${r.d.mean.toFixed(1)}, ${(r.d.big * 100).toFixed(1)}% off)`);
+  assert.deepEqual(errors, [], 'no page errors: ' + errors.join(' | '));
+  console.log(`vault-seamless-ui: ${checks} checks passed; screenshots in ${out}`);
+})().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => { try { await browser?.close(); } catch (_) {} server?.kill(); fs.rmSync(tmp, { recursive: true, force: true }); });

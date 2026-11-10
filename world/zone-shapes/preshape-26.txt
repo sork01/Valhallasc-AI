@@ -1,0 +1,4792 @@
+{
+ "name": "Frostwake Shelf",
+ "theme": "frostwake",
+ "tagline": "Blue crevasses, white snowfields and aurora-lit ice",
+ "size": 160,
+ "levels": [
+  85,
+  90
+ ],
+ "spawn": {
+  "x": 15,
+  "y": 137
+ },
+ "paths": [
+  [
+   [
+    7,
+    137
+   ],
+   [
+    25,
+    137
+   ],
+   [
+    43,
+    127
+   ],
+   [
+    62,
+    118
+   ],
+   [
+    82,
+    112
+   ],
+   [
+    107,
+    120
+   ],
+   [
+    132,
+    111
+   ]
+  ],
+  [
+   [
+    43,
+    127
+   ],
+   [
+    33,
+    105
+   ],
+   [
+    28,
+    83
+   ],
+   [
+    38,
+    59
+   ],
+   [
+    53,
+    38
+   ],
+   [
+    75,
+    27
+   ]
+  ],
+  [
+   [
+    75,
+    27
+   ],
+   [
+    96,
+    23
+   ],
+   [
+    122,
+    30
+   ],
+   [
+    139,
+    47
+   ],
+   [
+    132,
+    71
+   ]
+  ],
+  [
+   [
+    132,
+    111
+   ],
+   [
+    139,
+    87
+   ],
+   [
+    132,
+    71
+   ],
+   [
+    122,
+    30
+   ]
+  ],
+  [
+   [
+    28,
+    83
+   ],
+   [
+    55,
+    82
+   ],
+   [
+    79,
+    81
+   ],
+   [
+    105,
+    78
+   ],
+   [
+    132,
+    71
+   ]
+  ],
+  [
+   [
+    62,
+    118
+   ],
+   [
+    69,
+    99
+   ],
+   [
+    79,
+    81
+   ],
+   [
+    79,
+    69
+   ],
+   [
+    88,
+    60
+   ],
+   [
+    96,
+    23
+   ]
+  ],
+  [
+   [
+    38,
+    59
+   ],
+   [
+    65,
+    55
+   ],
+   [
+    88,
+    60
+   ]
+  ],
+  [
+   [
+    88,
+    60
+   ],
+   [
+    109,
+    93
+   ],
+   [
+    132,
+    111
+   ]
+  ],
+  [
+   [
+    139,
+    47
+   ],
+   [
+    139,
+    54
+   ],
+   [
+    151,
+    54
+   ]
+  ],
+  [
+   [
+    5.5,
+    73.5
+   ],
+   [
+    5.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ],
+  [
+   [
+    38.5,
+    154.5
+   ],
+   [
+    38.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ],
+  [
+   [
+    78.5,
+    154.5
+   ],
+   [
+    78.5,
+    147.5
+   ],
+   [
+    77.5,
+    147.5
+   ],
+   [
+    77.5,
+    141.5
+   ],
+   [
+    67.5,
+    141.5
+   ],
+   [
+    67.5,
+    138.5
+   ],
+   [
+    66.5,
+    138.5
+   ],
+   [
+    66.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ],
+  [
+   [
+    154.5,
+    99.5
+   ],
+   [
+    154.5,
+    124.5
+   ],
+   [
+    129.5,
+    124.5
+   ],
+   [
+    129.5,
+    126.5
+   ],
+   [
+    102.5,
+    126.5
+   ],
+   [
+    102.5,
+    129.5
+   ],
+   [
+    96.5,
+    129.5
+   ],
+   [
+    96.5,
+    130.5
+   ],
+   [
+    88.5,
+    130.5
+   ],
+   [
+    88.5,
+    131.5
+   ],
+   [
+    87.5,
+    131.5
+   ],
+   [
+    87.5,
+    132.5
+   ],
+   [
+    71.5,
+    132.5
+   ],
+   [
+    71.5,
+    134.5
+   ],
+   [
+    65.5,
+    134.5
+   ],
+   [
+    65.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ]
+ ],
+ "objects": [
+  {
+   "kind": "frostwake_signal",
+   "x": 29,
+   "y": 130,
+   "r": 0.7,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_camp",
+   "x": 23,
+   "y": 126,
+   "r": 0,
+   "v": 0,
+   "width": 4,
+   "depth": 3
+  },
+  {
+   "kind": "frostwake_camp",
+   "x": 35,
+   "y": 141,
+   "r": 0,
+   "v": 1,
+   "width": 4,
+   "depth": 3
+  },
+  {
+   "kind": "frostwake_camp",
+   "x": 45,
+   "y": 135,
+   "r": 0,
+   "v": 2,
+   "width": 4,
+   "depth": 3
+  },
+  {
+   "kind": "frostwake_hearth",
+   "x": 30,
+   "y": 135,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_obelisk",
+   "x": 125,
+   "y": 21,
+   "r": 1.6,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_fossil",
+   "x": 32,
+   "y": 50,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_frozen_pool",
+   "x": 79,
+   "y": 69,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_frozen_pool",
+   "x": 111,
+   "y": 100,
+   "r": 0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_mammoth_bells",
+   "x": 48,
+   "y": 44,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_leviathan_rib",
+   "x": 103,
+   "y": 35,
+   "r": 1.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 48,
+   "y": 94.0,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 55,
+   "y": 98.77,
+   "r": 0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 62,
+   "y": 100.98,
+   "r": 0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 69,
+   "y": 99.45,
+   "r": 0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 76,
+   "y": 94.99,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 83,
+   "y": 90.0,
+   "r": 0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 90,
+   "y": 87.16,
+   "r": 0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 97,
+   "y": 87.99,
+   "r": 0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 104,
+   "y": 92.04,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 111,
+   "y": 97.15,
+   "r": 0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 118,
+   "y": 100.57,
+   "r": 0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 125,
+   "y": 100.46,
+   "r": 0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 132,
+   "y": 96.88,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 73.0,
+   "y": 56.0,
+   "r": 0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 78.4,
+   "y": 54.78,
+   "r": 0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 83.8,
+   "y": 51.54,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 89.2,
+   "y": 47.41,
+   "r": 0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 94.6,
+   "y": 43.84,
+   "r": 0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 100.0,
+   "y": 42.07,
+   "r": 0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 105.4,
+   "y": 42.72,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 110.8,
+   "y": 45.57,
+   "r": 0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 116.2,
+   "y": 49.61,
+   "r": 0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 121.6,
+   "y": 53.44,
+   "r": 0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_crevasse",
+   "x": 127.0,
+   "y": 55.72,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 48.83,
+   "y": 71.17,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 77.8,
+   "y": 121.63,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 147.98,
+   "y": 65.35,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 20.97,
+   "y": 60.2,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 146.78,
+   "y": 118.0,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 89.65,
+   "y": 137.67,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 68.16,
+   "y": 62.62,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 97.94,
+   "y": 52.57,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 141.26,
+   "y": 69.64,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 20.62,
+   "y": 106.86,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 50.12,
+   "y": 117.98,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 27.1,
+   "y": 118.04,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 62.43,
+   "y": 131.52,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 96.03,
+   "y": 124.32,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 141.23,
+   "y": 74.34,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 107.5,
+   "y": 61.42,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 11.7,
+   "y": 92.33,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 117.47,
+   "y": 107.28,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 12.88,
+   "y": 114.23,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 17.59,
+   "y": 98.2,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 76.42,
+   "y": 42.01,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 144.12,
+   "y": 129.0,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 68.62,
+   "y": 90.94,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 77.03,
+   "y": 97.53,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 145.63,
+   "y": 94.64,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 83.62,
+   "y": 73.02,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 72.33,
+   "y": 49.74,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 12.0,
+   "y": 118.8,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 59.2,
+   "y": 60.01,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 122.32,
+   "y": 83.56,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 112.3,
+   "y": 61.63,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 139.15,
+   "y": 134.31,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 57.65,
+   "y": 74.07,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 92.34,
+   "y": 75.23,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 144.76,
+   "y": 64.75,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 44.38,
+   "y": 117.11,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 101.16,
+   "y": 146.29,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 120.79,
+   "y": 128.16,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 110.8,
+   "y": 109.67,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 104.78,
+   "y": 71.11,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 69.8,
+   "y": 139.69,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 73.38,
+   "y": 136.77,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 77.24,
+   "y": 105.91,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 73.71,
+   "y": 125.29,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 70.61,
+   "y": 110.47,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 104.17,
+   "y": 149.45,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 86.76,
+   "y": 127.98,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 22.42,
+   "y": 82.3,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 145.54,
+   "y": 98.84,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 82.98,
+   "y": 47.84,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 97.86,
+   "y": 99.86,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 105.64,
+   "y": 98.45,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 25.91,
+   "y": 110.35,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 59.91,
+   "y": 96.21,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 118.2,
+   "y": 46.9,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 39.42,
+   "y": 69.72,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 67.44,
+   "y": 136.11,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 104.15,
+   "y": 128.7,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 9.5,
+   "y": 77.23,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 46.07,
+   "y": 77.74,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 89.85,
+   "y": 133.02,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snow_pine",
+   "x": 79.43,
+   "y": 146.03,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 46.05,
+   "y": 24.06,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 23.16,
+   "y": 63.07,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 103.34,
+   "y": 124.74,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 87.64,
+   "y": 125.52,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 118.93,
+   "y": 60.68,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 113.36,
+   "y": 142.34,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 20.63,
+   "y": 96.09,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 119.71,
+   "y": 83.73,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 15.55,
+   "y": 105.94,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 51.22,
+   "y": 14.99,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 103.43,
+   "y": 61.52,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 86.55,
+   "y": 38.37,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 73.07,
+   "y": 32.18,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 114.92,
+   "y": 89.46,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 101.73,
+   "y": 103.62,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 147.72,
+   "y": 133.06,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 78.43,
+   "y": 34.37,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 122.95,
+   "y": 124.19,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 9.71,
+   "y": 113.83,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 142.76,
+   "y": 102.75,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 129.05,
+   "y": 42.33,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 117.15,
+   "y": 91.0,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 77.55,
+   "y": 10.76,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 62.53,
+   "y": 104.31,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 83.44,
+   "y": 14.02,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 33.17,
+   "y": 14.96,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 65.4,
+   "y": 69.0,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 136.18,
+   "y": 130.88,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 141.99,
+   "y": 98.64,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 25.04,
+   "y": 34.43,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 46.27,
+   "y": 103.52,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 146.59,
+   "y": 41.21,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 90.8,
+   "y": 124.49,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 136.99,
+   "y": 31.13,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 39.92,
+   "y": 107.0,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 131.03,
+   "y": 126.57,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 93.04,
+   "y": 95.45,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 80.83,
+   "y": 14.69,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 118.96,
+   "y": 81.15,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 140.3,
+   "y": 122.66,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 101.63,
+   "y": 150.09,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 31.14,
+   "y": 25.81,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 29.72,
+   "y": 63.2,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 71.21,
+   "y": 85.84,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 84.23,
+   "y": 88.59,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 69.9,
+   "y": 18.75,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 143.06,
+   "y": 11.12,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 85.97,
+   "y": 102.81,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 43.32,
+   "y": 18.15,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 46.48,
+   "y": 73.63,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 49.18,
+   "y": 111.4,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 67.27,
+   "y": 77.77,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 31.16,
+   "y": 11.52,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 28.13,
+   "y": 70.86,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 101.83,
+   "y": 39.72,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 18.08,
+   "y": 80.55,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 50.66,
+   "y": 68.87,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 65.45,
+   "y": 98.46,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 23.88,
+   "y": 45.73,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 25.31,
+   "y": 56.81,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 123.82,
+   "y": 60.4,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 88.11,
+   "y": 29.62,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 79.61,
+   "y": 141.16,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 21.37,
+   "y": 88.12,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 37.99,
+   "y": 97.06,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 140.76,
+   "y": 139.96,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 105.71,
+   "y": 68.87,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 80.05,
+   "y": 130.12,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 81.43,
+   "y": 11.29,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 22.62,
+   "y": 29.79,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 65.19,
+   "y": 23.46,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 104.51,
+   "y": 66.76,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 112.01,
+   "y": 123.13,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 20.29,
+   "y": 44.88,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 133.24,
+   "y": 149.29,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 15.34,
+   "y": 94.21,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 27.04,
+   "y": 101.38,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 89.75,
+   "y": 16.44,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 130.1,
+   "y": 93.23,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 99.49,
+   "y": 45.12,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 98.74,
+   "y": 131.09,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_ice_spire",
+   "x": 134.47,
+   "y": 89.31,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 68.95,
+   "y": 39.08,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 92.15,
+   "y": 30.84,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 101.23,
+   "y": 70.87,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 16.1,
+   "y": 92.66,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 141.96,
+   "y": 94.33,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 145.84,
+   "y": 34.83,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 54.01,
+   "y": 144.7,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 67.9,
+   "y": 35.84,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 85.16,
+   "y": 119.33,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 100.25,
+   "y": 61.1,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 92.32,
+   "y": 149.74,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 94.73,
+   "y": 97.84,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 145.89,
+   "y": 62.08,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 63.7,
+   "y": 89.55,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 9.11,
+   "y": 93.14,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 50.38,
+   "y": 85.26,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 11.79,
+   "y": 102.25,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 56.99,
+   "y": 118.06,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 81.65,
+   "y": 118.33,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 79.07,
+   "y": 15.1,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 82.47,
+   "y": 19.56,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 88.9,
+   "y": 127.02,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 89.02,
+   "y": 123.76,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 24.26,
+   "y": 38.71,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 113.07,
+   "y": 84.86,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 55.69,
+   "y": 24.4,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 79.18,
+   "y": 105.68,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 140.5,
+   "y": 148.15,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 141.95,
+   "y": 92.63,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 149.72,
+   "y": 66.15,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 15.05,
+   "y": 11.8,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 109.12,
+   "y": 129.28,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 64.77,
+   "y": 28.88,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 71.9,
+   "y": 126.82,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 148.83,
+   "y": 146.13,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 47.97,
+   "y": 31.12,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 93.72,
+   "y": 145.69,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 55.67,
+   "y": 88.31,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 41.29,
+   "y": 104.21,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 81.31,
+   "y": 94.38,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 130.41,
+   "y": 31.54,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 40.18,
+   "y": 41.71,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 68.92,
+   "y": 60.68,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 147.08,
+   "y": 131.35,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 146.36,
+   "y": 102.61,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 81.27,
+   "y": 35.75,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 95.63,
+   "y": 94.79,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 53.25,
+   "y": 73.54,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 77.11,
+   "y": 95.14,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 44.32,
+   "y": 43.24,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 33.48,
+   "y": 42.48,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 93.3,
+   "y": 140.8,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 74.25,
+   "y": 21.28,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 106.09,
+   "y": 137.46,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 24.29,
+   "y": 94.25,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 142.78,
+   "y": 145.16,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 146.73,
+   "y": 135.94,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 125.21,
+   "y": 144.44,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 58.21,
+   "y": 109.7,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 105.07,
+   "y": 37.54,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 96.13,
+   "y": 12.22,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 85.01,
+   "y": 75.73,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 131.86,
+   "y": 76.29,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 73.8,
+   "y": 48.08,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 136.21,
+   "y": 128.67,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 69.83,
+   "y": 69.65,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 126.7,
+   "y": 61.58,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 73.76,
+   "y": 54.22,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 47.89,
+   "y": 79.9,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 97.34,
+   "y": 136.8,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 35.19,
+   "y": 87.56,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 112.34,
+   "y": 11.6,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 24.58,
+   "y": 103.68,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 126.02,
+   "y": 80.76,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 102.01,
+   "y": 90.3,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 58.23,
+   "y": 139.58,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 84.18,
+   "y": 128.7,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 67.85,
+   "y": 149.57,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 124.95,
+   "y": 145.77,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 79.01,
+   "y": 143.44,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 54.54,
+   "y": 29.08,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 86.7,
+   "y": 147.57,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 27.75,
+   "y": 39.34,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 55.29,
+   "y": 74.95,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 133.46,
+   "y": 144.43,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 84.11,
+   "y": 131.22,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 31.94,
+   "y": 116.02,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 115.59,
+   "y": 22.73,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 102.14,
+   "y": 19.06,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 84.97,
+   "y": 148.36,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 17.52,
+   "y": 87.88,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 28.46,
+   "y": 47.75,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 113.55,
+   "y": 10.04,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 128.49,
+   "y": 33.21,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 47.59,
+   "y": 116.18,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 43.55,
+   "y": 68.81,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 135.15,
+   "y": 10.41,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 98.4,
+   "y": 88.44,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 120.74,
+   "y": 98.83,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 80.39,
+   "y": 105.72,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 66.65,
+   "y": 15.06,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 82.77,
+   "y": 51.7,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 133.37,
+   "y": 30.84,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 106.19,
+   "y": 43.48,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 13.6,
+   "y": 77.66,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 94.48,
+   "y": 48.63,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 123.34,
+   "y": 56.54,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 102.9,
+   "y": 32.81,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 110.21,
+   "y": 132.81,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 141.87,
+   "y": 82.7,
+   "r": 0.25,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 102.26,
+   "y": 101.38,
+   "r": 0.25,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 72.7,
+   "y": 133.74,
+   "r": 0.25,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 84.29,
+   "y": 55.09,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_snowdrift",
+   "x": 66.12,
+   "y": 125.82,
+   "r": 0.25,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 83.85,
+   "y": 98.96,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 30.91,
+   "y": 46.31,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 45.28,
+   "y": 54.45,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 13.02,
+   "y": 85.1,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 15.1,
+   "y": 67.0,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 143.06,
+   "y": 46.43,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 108.04,
+   "y": 83.25,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 121.29,
+   "y": 87.73,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 83.98,
+   "y": 33.42,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 111.21,
+   "y": 140.29,
+   "r": 0.17,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 65.08,
+   "y": 57.19,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 80.32,
+   "y": 148.81,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 54.69,
+   "y": 107.38,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 136.6,
+   "y": 65.54,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 142.64,
+   "y": 80.12,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 17.83,
+   "y": 59.83,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 125.23,
+   "y": 142.0,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 27.87,
+   "y": 26.69,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 107.59,
+   "y": 11.67,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 22.4,
+   "y": 10.11,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 67.93,
+   "y": 142.69,
+   "r": 0.17,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 94.76,
+   "y": 119.73,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 64.81,
+   "y": 122.88,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 14.99,
+   "y": 12.86,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 56.0,
+   "y": 59.46,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 141.11,
+   "y": 114.56,
+   "r": 0.17,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 80.45,
+   "y": 29.48,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 44.54,
+   "y": 100.24,
+   "r": 0.17,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 66.16,
+   "y": 34.13,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 117.57,
+   "y": 32.49,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 88.2,
+   "y": 101.11,
+   "r": 0.17,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 121.34,
+   "y": 88.92,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 78.69,
+   "y": 50.67,
+   "r": 0.17,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 51.97,
+   "y": 16.36,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 122.56,
+   "y": 78.45,
+   "r": 0.17,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_lantern",
+   "x": 124.37,
+   "y": 76.86,
+   "r": 0.17,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 102.12,
+   "y": 31.25,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 115.88,
+   "y": 150.85,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 119.05,
+   "y": 62.66,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 98.13,
+   "y": 33.63,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 35.07,
+   "y": 46.05,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 92.83,
+   "y": 110.97,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 22.13,
+   "y": 43.98,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 43.32,
+   "y": 22.36,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 17.8,
+   "y": 30.09,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 52.13,
+   "y": 9.37,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 57.32,
+   "y": 102.27,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 14.95,
+   "y": 40.83,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 75.2,
+   "y": 48.68,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 145.67,
+   "y": 70.67,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 127.22,
+   "y": 127.16,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 81.5,
+   "y": 38.3,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 148.16,
+   "y": 114.73,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 138.39,
+   "y": 31.78,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 131.14,
+   "y": 94.63,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 129.14,
+   "y": 75.08,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 131.4,
+   "y": 13.03,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 130.96,
+   "y": 48.08,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 95.08,
+   "y": 102.78,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 57.61,
+   "y": 123.79,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 53.37,
+   "y": 74.47,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 81.04,
+   "y": 147.59,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 131.31,
+   "y": 146.05,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 126.05,
+   "y": 75.44,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 22.75,
+   "y": 16.73,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 11.92,
+   "y": 76.02,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 91.69,
+   "y": 134.9,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 146.05,
+   "y": 139.7,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 91.67,
+   "y": 89.38,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 15.46,
+   "y": 62.99,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 146.42,
+   "y": 39.76,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 65.39,
+   "y": 132.38,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 64.7,
+   "y": 141.97,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 35.17,
+   "y": 35.14,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 118.45,
+   "y": 138.19,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 36.52,
+   "y": 95.63,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 30.97,
+   "y": 116.22,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 100.23,
+   "y": 20.99,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 84.32,
+   "y": 118.34,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 87.36,
+   "y": 86.41,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 41.96,
+   "y": 23.46,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 29.08,
+   "y": 108.28,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 140.94,
+   "y": 21.58,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 130.34,
+   "y": 141.18,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 68.82,
+   "y": 35.02,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 61.85,
+   "y": 133.83,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 118.1,
+   "y": 31.75,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 118.87,
+   "y": 122.07,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "frostwake_iceflower",
+   "x": 117.14,
+   "y": 62.82,
+   "r": 0.1,
+   "v": 0
+  }
+ ],
+ "slimes": [
+  {
+   "kind": "bellmammoth",
+   "x": 48,
+   "y": 32
+  },
+  {
+   "kind": "auroramanta",
+   "x": 128,
+   "y": 53
+  },
+  {
+   "kind": "crevasseleviathan",
+   "x": 102,
+   "y": 20
+  },
+  {
+   "kind": "snowhare",
+   "x": 113.01,
+   "y": 58.13
+  },
+  {
+   "kind": "snowhare",
+   "x": 100.98,
+   "y": 143.08
+  },
+  {
+   "kind": "snowhare",
+   "x": 143.07,
+   "y": 108.65
+  },
+  {
+   "kind": "snowhare",
+   "x": 137.21,
+   "y": 26.1
+  },
+  {
+   "kind": "snowhare",
+   "x": 149.15,
+   "y": 112.46
+  },
+  {
+   "kind": "snowhare",
+   "x": 99.96,
+   "y": 113.42
+  },
+  {
+   "kind": "snowhare",
+   "x": 95.32,
+   "y": 107.54
+  },
+  {
+   "kind": "snowhare",
+   "x": 143.14,
+   "y": 20.09
+  },
+  {
+   "kind": "snowhare",
+   "x": 74.37,
+   "y": 72.95
+  },
+  {
+   "kind": "snowhare",
+   "x": 145.43,
+   "y": 44.7
+  },
+  {
+   "kind": "iceotter",
+   "x": 90.71,
+   "y": 144.47
+  },
+  {
+   "kind": "iceotter",
+   "x": 120.83,
+   "y": 109.43
+  },
+  {
+   "kind": "iceotter",
+   "x": 55.81,
+   "y": 49.81
+  },
+  {
+   "kind": "iceotter",
+   "x": 135.53,
+   "y": 123.85
+  },
+  {
+   "kind": "iceotter",
+   "x": 113.86,
+   "y": 78.96
+  },
+  {
+   "kind": "iceotter",
+   "x": 45.04,
+   "y": 14.09
+  },
+  {
+   "kind": "iceotter",
+   "x": 147.62,
+   "y": 75.13
+  },
+  {
+   "kind": "iceotter",
+   "x": 68.94,
+   "y": 71.95
+  },
+  {
+   "kind": "iceotter",
+   "x": 86.77,
+   "y": 122.53
+  },
+  {
+   "kind": "iceotter",
+   "x": 147.76,
+   "y": 90.65
+  },
+  {
+   "kind": "frostheron",
+   "x": 118.58,
+   "y": 130.51
+  },
+  {
+   "kind": "frostheron",
+   "x": 149.6,
+   "y": 142.99
+  },
+  {
+   "kind": "frostheron",
+   "x": 141.08,
+   "y": 127.31
+  },
+  {
+   "kind": "frostheron",
+   "x": 14.04,
+   "y": 56.96
+  },
+  {
+   "kind": "frostheron",
+   "x": 85.43,
+   "y": 142.34
+  },
+  {
+   "kind": "frostheron",
+   "x": 108.95,
+   "y": 142.76
+  },
+  {
+   "kind": "frostheron",
+   "x": 79.17,
+   "y": 43.71
+  },
+  {
+   "kind": "frostheron",
+   "x": 70.41,
+   "y": 103.97
+  },
+  {
+   "kind": "frostheron",
+   "x": 121.8,
+   "y": 18.98
+  },
+  {
+   "kind": "frostheron",
+   "x": 67.1,
+   "y": 94.06
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 112.12,
+   "y": 65.13
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 11.07,
+   "y": 64.05
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 54.34,
+   "y": 95.49
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 141.0,
+   "y": 29.84
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 49.27,
+   "y": 104.91
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 65.26,
+   "y": 65.23
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 121.12,
+   "y": 119.05
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 14.15,
+   "y": 32.67
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 34.98,
+   "y": 39.89
+  },
+  {
+   "kind": "glaciercrab",
+   "x": 87.67,
+   "y": 106.46
+  },
+  {
+   "kind": "es_foe_22",
+   "x": 88,
+   "y": 77,
+   "ambush": "empty-seat:es_22_m"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "frostwake_captain",
+   "name": "Captain Svala Northlight",
+   "role": "Shelf captain",
+   "x": 29,
+   "y": 137,
+   "color": "#b5daef",
+   "dialogue": "The blue fissures change with the snow. Follow our lantern road and keep your eyes on the aurora.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   },
+   "art": "frostwake_captain"
+  },
+  {
+   "id": "frostwake_healer",
+   "name": "Neri Warmhands",
+   "role": "Snow healer",
+   "x": 18,
+   "y": 143,
+   "color": "#b5daef",
+   "dialogue": "Come close to the steam and thaw your fingers before the next crossing.",
+   "offers": [
+    {
+     "id": "blessing",
+     "label": "Receive a healing blessing",
+     "cost": 0,
+     "heal": 10000
+    },
+    {
+     "id": "potion",
+     "label": "Buy Health Potion",
+     "cost": 30,
+     "item": "health_potion",
+     "tiered": true
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   }
+  },
+  {
+   "id": "frostwake_surveyor",
+   "name": "Orin Riftline",
+   "role": "Crevasse surveyor",
+   "x": 43,
+   "y": 123,
+   "color": "#b5daef",
+   "dialogue": "The glass-blue breaks mark old pressure lines. The far rib belongs to something still awake.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   },
+   "art": "frostwake_surveyor"
+  },
+  {
+   "id": "frostwake_trader",
+   "name": "Halla Snowpack",
+   "role": "Sled trader",
+   "x": 39,
+   "y": 140,
+   "color": "#b5daef",
+   "dialogue": "I will buy what you bring back from the ice.",
+   "offers": [
+    {
+     "id": "stew",
+     "label": "Buy Traveler's Stew",
+     "cost": 12,
+     "item": "traveler_stew",
+     "tiered": true
+    },
+    {
+     "id": "satchel",
+     "label": "Buy Linen Satchel · 6 extra bag slots",
+     "cost": 500,
+     "bag": "linen_satchel"
+    },
+    {
+     "id": "bag_l10",
+     "label": "Buy Adventurer Satchel · 8 extra bag slots",
+     "cost": 1500,
+     "bag": "adventurer_satchel"
+    },
+    {
+     "id": "bag_l20",
+     "label": "Buy Trail Pack · 10 extra bag slots",
+     "cost": 4000,
+     "bag": "trail_pack_l20"
+    },
+    {
+     "id": "bag_l30",
+     "label": "Buy Ranger Pack · 12 extra bag slots",
+     "cost": 9000,
+     "bag": "ranger_pack_l30"
+    },
+    {
+     "id": "bag_l40",
+     "label": "Buy Expedition Pack · 14 extra bag slots",
+     "cost": 18000,
+     "bag": "expedition_pack_l40"
+    },
+    {
+     "id": "bag_l50",
+     "label": "Buy Traveler Pack · 16 extra bag slots",
+     "cost": 35000,
+     "bag": "traveler_pack"
+    },
+    {
+     "id": "bag_l60",
+     "label": "Buy Pathfinder Pack · 18 extra bag slots",
+     "cost": 60000,
+     "bag": "pathfinder_pack_l60"
+    },
+    {
+     "id": "bag_l70",
+     "label": "Buy Warden Pack · 20 extra bag slots",
+     "cost": 100000,
+     "bag": "warden_pack_l70"
+    },
+    {
+     "id": "bag_l80",
+     "label": "Buy Hero Pack · 22 extra bag slots",
+     "cost": 160000,
+     "bag": "hero_pack_l80"
+    },
+    {
+     "id": "bag_l90",
+     "label": "Buy Sovereign Pack · 24 extra bag slots",
+     "cost": 240000,
+     "bag": "sovereign_pack_l90"
+    },
+    {
+     "id": "buy_cloak_common",
+     "label": "Buy Travel Cloak",
+     "item": "cloak_l5_common",
+     "tiered": true,
+     "cost": 24
+    },
+    {
+     "id": "buy_cloak_uncommon",
+     "label": "Buy Sturdy Cloak",
+     "item": "cloak_l5_uncommon",
+     "tiered": true,
+     "cost": 160
+    },
+    {
+     "id": "buy_cloak_rare",
+     "label": "Buy Rare Cloak",
+     "item": "cloak_l5_rare",
+     "tiered": true,
+     "cost": 384
+    },
+    {
+     "id": "buy_green_weapon_warrior",
+     "label": "Buy Reinforced Royal Sword",
+     "item": "warrior_weapon_royal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_mage",
+     "label": "Buy Reinforced Crystal Staff",
+     "item": "mage_weapon_crystal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_assassin",
+     "label": "Buy Reinforced Moonfang Daggers",
+     "item": "assassin_weapon_moonfang_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_priest",
+     "label": "Buy Reinforced Sunbreaker Mace",
+     "item": "priest_weapon_sunmace_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_hunter",
+     "label": "Buy Reinforced Wildwarden Longbow",
+     "item": "hunter_weapon_wardenbow_l10_green",
+     "tiered": true,
+     "cost": 1000
+    }
+   ],
+   "buys": true,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   }
+  },
+  {
+   "id": "frostwake_scout",
+   "name": "Jorren Skirl",
+   "role": "Snow scout",
+   "x": 54,
+   "y": 113,
+   "color": "#b5daef",
+   "dialogue": "Hares hide under powder. Otters dive through the clear pools. Neither belongs near the supplies.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior"
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage"
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin"
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest"
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter"
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   }
+  },
+  {
+   "id": "frostwake_bellkeeper",
+   "name": "Ylva Bellward",
+   "role": "Mammoth bellkeeper",
+   "x": 36,
+   "y": 67,
+   "color": "#b5daef",
+   "dialogue": "When the old mammoth moves, every bronze bell on the western shelf answers.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior"
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage"
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin"
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest"
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter"
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   },
+   "art": "frostwake_bellkeeper"
+  },
+  {
+   "id": "frostwake_skywatcher",
+   "name": "Vessa Aurora",
+   "role": "Aurora watcher",
+   "x": 119,
+   "y": 70,
+   "color": "#b5daef",
+   "dialogue": "The manta swims through curtains of light above the eastern cliff.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior"
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage"
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin"
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest"
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter"
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   },
+   "art": "frostwake_skywatcher"
+  },
+  {
+   "id": "frostwake_ribkeeper",
+   "name": "Irik Deepice",
+   "role": "Leviathan watcher",
+   "x": 88,
+   "y": 37,
+   "color": "#b5daef",
+   "dialogue": "The shape below the crevasse can swallow a whole caravan. Bring five companions.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior"
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage"
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin"
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest"
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter"
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   },
+   "art": "frostwake_ribkeeper"
+  },
+  {
+   "id": "frostwake_stone",
+   "name": "Frostwake Meeting Stone",
+   "role": "Gather a party · hire fighters",
+   "x": 116,
+   "y": 29,
+   "color": "#b5daef",
+   "dialogue": "The last warm lantern before the deep ice.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior",
+     "open": true
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage",
+     "open": true
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin",
+     "open": true
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest",
+     "open": true
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter",
+     "open": true
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#d7ae91",
+    "hair": "#d9e9ee",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#4680a1"
+   },
+   "art": "stone"
+  },
+  {
+   "id": "travel_frostwake",
+   "name": "Travel Master Eira",
+   "role": "Aurora courier · Spark Travel",
+   "x": 46,
+   "y": 143,
+   "color": "#74d7d0",
+   "travelStop": "Frostwake Station",
+   "travelLinks": [
+    "travel_breakwater",
+    "travel_millbridge",
+    "travel_boulderwatch",
+    "travel_rimehold"
+   ],
+   "look": {
+    "hair": "#e4edf4",
+    "skin": "#edc5a1",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#328e97"
+   },
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "offers": [],
+   "buys": false,
+   "art": "frostwake_travel"
+  },
+  {
+   "id": "mailbox_26_frostwake_station",
+   "name": "Mailbox",
+   "role": "Player mail",
+   "x": 49.5,
+   "y": 143.5,
+   "color": "#cda75e",
+   "art": "mailbox",
+   "buys": false,
+   "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+   "offers": [
+    {
+     "id": "mail",
+     "label": "Open mailbox",
+     "cost": 0
+    }
+   ]
+  }
+ ],
+ "places": [
+  {
+   "id": "frostwake_pool",
+   "name": "Pool Beneath the Ice",
+   "x": 79,
+   "y": 74,
+   "r": 5
+  },
+  {
+   "id": "frostwake_obelisk",
+   "name": "Aurora Obelisk",
+   "x": 119,
+   "y": 25,
+   "r": 5
+  },
+  {
+   "id": "frostwake_rib",
+   "name": "Deep Ice Rib",
+   "x": 96,
+   "y": 37,
+   "r": 5
+  },
+  {
+   "id": "es_22_m",
+   "name": "An Apology Made of Ice",
+   "x": 86,
+   "y": 77,
+   "r": 2.1
+  }
+ ],
+ "quests": [
+  {
+   "id": "frostwake_welcome",
+   "title": "Lanterns on the Shelf",
+   "npc": "frostwake_captain",
+   "description": "Meet the healer, surveyor and snow scout.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "frostwake_healer",
+     "count": 1,
+     "label": "Meet Neri"
+    },
+    {
+     "kind": "talk",
+     "target": "frostwake_surveyor",
+     "count": 1,
+     "label": "Meet Orin"
+    },
+    {
+     "kind": "talk",
+     "target": "frostwake_scout",
+     "count": 1,
+     "label": "Meet Jorren"
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 8500,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_weapon_royal_l85_green",
+     "warrior_headgear_azure_l85_green",
+     "warrior_shoulders_azure_l85_green",
+     "warrior_gloves_azure_l85_green",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_weapon_crystal_l85_green",
+     "mage_headgear_runic_l85_green",
+     "mage_shoulders_runic_l85_green",
+     "mage_gloves_runic_l85_green",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_weapon_moonfang_l85_green",
+     "assassin_headgear_moon_l85_green",
+     "assassin_shoulders_moon_l85_green",
+     "assassin_gloves_moon_l85_green",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_weapon_sunmace_l85_green",
+     "priest_headgear_dawn_l85_green",
+     "priest_shoulders_dawn_l85_green",
+     "priest_gloves_dawn_l85_green",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_weapon_wardenbow_l85_green",
+     "hunter_headgear_warden_l85_green",
+     "hunter_shoulders_warden_l85_green",
+     "hunter_gloves_warden_l85_green",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_hares",
+   "title": "Tracks under Powder",
+   "npc": "frostwake_scout",
+   "description": "Clear snow hares from the sled road.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "snowhare",
+     "count": 6,
+     "label": "Defeat Snow Hares"
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 9400,
+   "requires": "frostwake_welcome",
+   "repeatable": false,
+   "rewardItem": "necklace_moonstone_l85_green",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_weapon_royal_l85_green",
+     "warrior_headgear_azure_l85_green",
+     "warrior_shoulders_azure_l85_green",
+     "warrior_gloves_azure_l85_green",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_weapon_crystal_l85_green",
+     "mage_headgear_runic_l85_green",
+     "mage_shoulders_runic_l85_green",
+     "mage_gloves_runic_l85_green",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_weapon_moonfang_l85_green",
+     "assassin_headgear_moon_l85_green",
+     "assassin_shoulders_moon_l85_green",
+     "assassin_gloves_moon_l85_green",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_weapon_sunmace_l85_green",
+     "priest_headgear_dawn_l85_green",
+     "priest_shoulders_dawn_l85_green",
+     "priest_gloves_dawn_l85_green",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_weapon_wardenbow_l85_green",
+     "hunter_headgear_warden_l85_green",
+     "hunter_shoulders_warden_l85_green",
+     "hunter_gloves_warden_l85_green",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_otters",
+   "title": "Under Clear Ice",
+   "npc": "frostwake_scout",
+   "description": "Bring warm otter pelts from the frozen pools.",
+   "objectives": [
+    {
+     "kind": "bring",
+     "target": "iceotter_pelt",
+     "count": 5,
+     "label": "Bring Ice Otter Pelts"
+    }
+   ],
+   "level": 86,
+   "rewardXp": 9210,
+   "rewardGold": 10300,
+   "requires": "frostwake_hares",
+   "repeatable": false,
+   "rewardItem": "pants_wayfarer_l85_green",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_weapon_royal_l85_green",
+     "warrior_headgear_azure_l85_green",
+     "warrior_shoulders_azure_l85_green",
+     "warrior_gloves_azure_l85_green",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_weapon_crystal_l85_green",
+     "mage_headgear_runic_l85_green",
+     "mage_shoulders_runic_l85_green",
+     "mage_gloves_runic_l85_green",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_weapon_moonfang_l85_green",
+     "assassin_headgear_moon_l85_green",
+     "assassin_shoulders_moon_l85_green",
+     "assassin_gloves_moon_l85_green",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_weapon_sunmace_l85_green",
+     "priest_headgear_dawn_l85_green",
+     "priest_shoulders_dawn_l85_green",
+     "priest_gloves_dawn_l85_green",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_weapon_wardenbow_l85_green",
+     "hunter_headgear_warden_l85_green",
+     "hunter_shoulders_warden_l85_green",
+     "hunter_gloves_warden_l85_green",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_herons",
+   "title": "White Wing Watch",
+   "npc": "frostwake_surveyor",
+   "description": "The frost herons crowd the central crossing.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "frostheron",
+     "count": 6,
+     "label": "Defeat Frost Herons"
+    }
+   ],
+   "level": 87,
+   "rewardXp": 9420,
+   "rewardGold": 11200,
+   "requires": "frostwake_otters",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_weapon_royal_l85_green",
+     "warrior_headgear_azure_l85_green",
+     "warrior_shoulders_azure_l85_green",
+     "warrior_gloves_azure_l85_green",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_weapon_crystal_l85_green",
+     "mage_headgear_runic_l85_green",
+     "mage_shoulders_runic_l85_green",
+     "mage_gloves_runic_l85_green",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_weapon_moonfang_l85_green",
+     "assassin_headgear_moon_l85_green",
+     "assassin_shoulders_moon_l85_green",
+     "assassin_gloves_moon_l85_green",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_weapon_sunmace_l85_green",
+     "priest_headgear_dawn_l85_green",
+     "priest_shoulders_dawn_l85_green",
+     "priest_gloves_dawn_l85_green",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_weapon_wardenbow_l85_green",
+     "hunter_headgear_warden_l85_green",
+     "hunter_shoulders_warden_l85_green",
+     "hunter_gloves_warden_l85_green",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_crabs",
+   "title": "Crack the Shell",
+   "npc": "frostwake_surveyor",
+   "description": "Glacier crabs have crept into the blue fissures.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "glaciercrab",
+     "count": 6,
+     "label": "Defeat Glacier Crabs"
+    }
+   ],
+   "level": 88,
+   "rewardXp": 9630,
+   "rewardGold": 12100,
+   "requires": "frostwake_herons",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_weapon_royal_l85_green",
+     "warrior_headgear_azure_l85_green",
+     "warrior_shoulders_azure_l85_green",
+     "warrior_gloves_azure_l85_green",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_weapon_crystal_l85_green",
+     "mage_headgear_runic_l85_green",
+     "mage_shoulders_runic_l85_green",
+     "mage_gloves_runic_l85_green",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_weapon_moonfang_l85_green",
+     "assassin_headgear_moon_l85_green",
+     "assassin_shoulders_moon_l85_green",
+     "assassin_gloves_moon_l85_green",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_weapon_sunmace_l85_green",
+     "priest_headgear_dawn_l85_green",
+     "priest_shoulders_dawn_l85_green",
+     "priest_gloves_dawn_l85_green",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_weapon_wardenbow_l85_green",
+     "hunter_headgear_warden_l85_green",
+     "hunter_shoulders_warden_l85_green",
+     "hunter_gloves_warden_l85_green",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_mammoth",
+   "title": "The Bells Begin",
+   "npc": "frostwake_bellkeeper",
+   "description": "Three companions should face the Bell Mammoth on the western shelf.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "bellmammoth",
+     "count": 1,
+     "label": "Defeat the Bell Mammoth"
+    }
+   ],
+   "level": 88,
+   "rewardXp": 9630,
+   "rewardGold": 20000,
+   "requires": "frostwake_herons",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 3,
+   "rewardItem": "accessory_amber_l90_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l85_blue",
+     "warrior_weapon_sword_l85_blue",
+     "warrior_headgear_crimson_l85_blue",
+     "warrior_shoulders_crimson_l85_blue",
+     "warrior_gloves_crimson_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l85_blue",
+     "mage_weapon_ash_l85_blue",
+     "mage_headgear_apprentice_l85_blue",
+     "mage_shoulders_apprentice_l85_blue",
+     "mage_gloves_apprentice_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l85_blue",
+     "assassin_weapon_daggers_l85_blue",
+     "assassin_headgear_shadow_l85_blue",
+     "assassin_shoulders_shadow_l85_blue",
+     "assassin_gloves_shadow_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l85_blue",
+     "priest_weapon_mace_l85_blue",
+     "priest_headgear_pilgrim_l85_blue",
+     "priest_shoulders_pilgrim_l85_blue",
+     "priest_gloves_pilgrim_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l85_blue",
+     "hunter_weapon_shortbow_l85_blue",
+     "hunter_headgear_scout_l85_blue",
+     "hunter_shoulders_scout_l85_blue",
+     "hunter_gloves_scout_l85_blue",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_manta",
+   "title": "A Sky Beneath Ice",
+   "npc": "frostwake_skywatcher",
+   "description": "Four companions must bring down the Aurora Manta.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "auroramanta",
+     "count": 1,
+     "label": "Defeat the Aurora Manta"
+    }
+   ],
+   "level": 89,
+   "rewardXp": 9840,
+   "rewardGold": 25000,
+   "requires": "frostwake_crabs",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 4,
+   "rewardItem": "necklace_moonstone_l90_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l85_blue",
+     "warrior_weapon_sword_l85_blue",
+     "warrior_headgear_crimson_l85_blue",
+     "warrior_shoulders_crimson_l85_blue",
+     "warrior_gloves_crimson_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l85_blue",
+     "mage_weapon_ash_l85_blue",
+     "mage_headgear_apprentice_l85_blue",
+     "mage_shoulders_apprentice_l85_blue",
+     "mage_gloves_apprentice_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l85_blue",
+     "assassin_weapon_daggers_l85_blue",
+     "assassin_headgear_shadow_l85_blue",
+     "assassin_shoulders_shadow_l85_blue",
+     "assassin_gloves_shadow_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l85_blue",
+     "priest_weapon_mace_l85_blue",
+     "priest_headgear_pilgrim_l85_blue",
+     "priest_shoulders_pilgrim_l85_blue",
+     "priest_gloves_pilgrim_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l85_blue",
+     "hunter_weapon_shortbow_l85_blue",
+     "hunter_headgear_scout_l85_blue",
+     "hunter_shoulders_scout_l85_blue",
+     "hunter_gloves_scout_l85_blue",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_leviathan",
+   "title": "The Deep Answer",
+   "npc": "frostwake_ribkeeper",
+   "description": "Five companions must silence the Crevasse Leviathan.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "crevasseleviathan",
+     "count": 1,
+     "label": "Defeat the Crevasse Leviathan"
+    }
+   ],
+   "level": 90,
+   "rewardXp": 10050,
+   "rewardGold": 31000,
+   "requires": "frostwake_crabs",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardItem": "pants_wayfarer_l90_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l90_blue",
+     "warrior_weapon_sword_l90_blue",
+     "warrior_headgear_crimson_l90_blue",
+     "warrior_shoulders_crimson_l90_blue",
+     "warrior_gloves_crimson_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l90_blue",
+     "mage_weapon_ash_l90_blue",
+     "mage_headgear_apprentice_l90_blue",
+     "mage_shoulders_apprentice_l90_blue",
+     "mage_gloves_apprentice_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l90_blue",
+     "assassin_weapon_daggers_l90_blue",
+     "assassin_headgear_shadow_l90_blue",
+     "assassin_shoulders_shadow_l90_blue",
+     "assassin_gloves_shadow_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l90_blue",
+     "priest_weapon_mace_l90_blue",
+     "priest_headgear_pilgrim_l90_blue",
+     "priest_shoulders_pilgrim_l90_blue",
+     "priest_gloves_pilgrim_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l90_blue",
+     "hunter_weapon_shortbow_l90_blue",
+     "hunter_headgear_scout_l90_blue",
+     "hunter_shoulders_scout_l90_blue",
+     "hunter_gloves_scout_l90_blue",
+     "cloak_l90_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_aurora",
+   "title": "Where the Light Falls",
+   "npc": "frostwake_skywatcher",
+   "description": "Trace the frozen pool and the aurora obelisk.",
+   "objectives": [
+    {
+     "kind": "visit",
+     "target": "frostwake_pool",
+     "count": 1,
+     "label": "Inspect the ice pool"
+    },
+    {
+     "kind": "visit",
+     "target": "frostwake_obelisk",
+     "count": 1,
+     "label": "Inspect the obelisk"
+    }
+   ],
+   "level": 89,
+   "rewardXp": 9840,
+   "rewardGold": 14800,
+   "requires": "frostwake_herons",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_weapon_royal_l85_green",
+     "warrior_headgear_azure_l85_green",
+     "warrior_shoulders_azure_l85_green",
+     "warrior_gloves_azure_l85_green",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_weapon_crystal_l85_green",
+     "mage_headgear_runic_l85_green",
+     "mage_shoulders_runic_l85_green",
+     "mage_gloves_runic_l85_green",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_weapon_moonfang_l85_green",
+     "assassin_headgear_moon_l85_green",
+     "assassin_shoulders_moon_l85_green",
+     "assassin_gloves_moon_l85_green",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_weapon_sunmace_l85_green",
+     "priest_headgear_dawn_l85_green",
+     "priest_shoulders_dawn_l85_green",
+     "priest_gloves_dawn_l85_green",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_weapon_wardenbow_l85_green",
+     "hunter_headgear_warden_l85_green",
+     "hunter_shoulders_warden_l85_green",
+     "hunter_gloves_warden_l85_green",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "frostwake_patrol",
+   "title": "Keep the Lanterns",
+   "npc": "frostwake_captain",
+   "description": "Patrol the road between the ice pools.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "snowhare",
+     "count": 3,
+     "label": "Defeat Snow Hares"
+    },
+    {
+     "kind": "kill",
+     "target": "glaciercrab",
+     "count": 3,
+     "label": "Defeat Glacier Crabs"
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 7600,
+   "requires": "frostwake_welcome",
+   "repeatable": true
+  },
+  {
+   "id": "frostwake_onward",
+   "title": "Across Frostwake",
+   "npc": "frostwake_captain",
+   "description": "Cross the Erg to Frostwake Shelf and report to Captain Svala Northlight.",
+   "objectives": [
+    {
+     "kind": "reach",
+     "target": "Frostwake Shelf",
+     "label": "Travel to Frostwake Shelf",
+     "count": 1
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 15000,
+   "requires": null,
+   "repeatable": false,
+   "autoLevel": 85
+  },
+  {
+   "id": "es_22",
+   "title": "An Apology Made of Ice",
+   "npc": "frostwake_bellkeeper",
+   "description": "Ylva caught a Warden's abandoned apology inside an ice bell. Call out the Penitent Chain and break it. The Wardens were offered places at the table. Each told himself that one more winter of silence would hurt nobody.",
+   "objectives": [
+    {
+     "kind": "echo",
+     "target": "es_22_m",
+     "label": "Penitent Chain",
+     "count": 1
+    }
+   ],
+   "level": 88,
+   "minLevel": 88,
+   "rewardXp": 9630,
+   "rewardGold": 1056,
+   "requires": "es_21",
+   "repeatable": false,
+   "story": {
+    "title": "The Empty Seat",
+    "chapter": 22,
+    "recap": [],
+    "next": "Next chapter: Teach the Mountain His Name. Speak to Edda Flintvoice in The Cairnspine at level 93."
+   },
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_headgear_azure_l85_green"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_headgear_runic_l85_green"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_headgear_moon_l85_green"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_headgear_dawn_l85_green"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_headgear_warden_l85_green"
+    ]
+   }
+  },
+  {
+   "id": "es_go_22",
+   "title": "Seek Ylva Bellward",
+   "npc": "frostwake_bellkeeper",
+   "description": "Speak to Ylva Bellward in Frostwake Shelf at level 88 to continue The Empty Seat: An Apology Made of Ice. This direction stays in your journal until you accept that chapter.",
+   "objectives": [
+    {
+     "kind": "handoff",
+     "target": "frostwake_bellkeeper",
+     "count": 1,
+     "label": "Speak to Ylva Bellward at level 88"
+    }
+   ],
+   "level": 88,
+   "minLevel": 1,
+   "rewardXp": 0,
+   "rewardGold": 0,
+   "requires": "es_21",
+   "autoLevel": 1,
+   "repeatable": false,
+   "handoffTo": "es_22"
+  }
+ ],
+ "city": {
+  "name": "Frostwake Station",
+  "x0": 9,
+  "x1": 53,
+  "y0": 117,
+  "y1": 151,
+  "plaza": {
+   "x": 29,
+   "y": 136
+  },
+  "radius": 7,
+  "entry": {
+   "x": 15,
+   "y": 137
+  }
+ },
+ "portals": [
+  {
+   "id": "frostwake_cairn_gate",
+   "name": "The Cairnspine",
+   "x": 5.5,
+   "y": 73.5,
+   "r": 1.2,
+   "to": 27,
+   "tx": 156.5,
+   "ty": 101.5,
+   "walk": [
+    -1,
+    0
+   ]
+  },
+  {
+   "id": "path_26_19",
+   "name": "The Stormglass Shore",
+   "r": 2.0,
+   "to": 19,
+   "x": 38.5,
+   "y": 154.5,
+   "tx": 90.5,
+   "ty": 11.5,
+   "walk": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "path_26_20",
+   "name": "Sunward Vale",
+   "r": 2.0,
+   "to": 20,
+   "x": 78.5,
+   "y": 154.5,
+   "tx": 62.5,
+   "ty": 11.5,
+   "walk": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "path_26_28",
+   "name": "The Yearwheel",
+   "r": 2.0,
+   "to": 28,
+   "x": 154.5,
+   "y": 99.5,
+   "tx": 11.5,
+   "ty": 187.5,
+   "walk": [
+    1,
+    0
+   ]
+  }
+ ],
+ "exitRoutes": [
+  {
+   "portal": "frostwake_cairn_gate",
+   "points": [
+    [
+     5.5,
+     73.5
+    ],
+    [
+     5.5,
+     91.5
+    ]
+   ]
+  },
+  {
+   "portal": "path_26_19",
+   "points": [
+    [
+     38.5,
+     154.5
+    ],
+    [
+     38.5,
+     137.5
+    ],
+    [
+     37.5,
+     137.5
+    ]
+   ]
+  },
+  {
+   "portal": "path_26_20",
+   "points": [
+    [
+     78.5,
+     154.5
+    ],
+    [
+     78.5,
+     147.5
+    ],
+    [
+     77.5,
+     147.5
+    ],
+    [
+     77.5,
+     141.5
+    ],
+    [
+     73.5,
+     141.5
+    ]
+   ]
+  },
+  {
+   "portal": "path_26_28",
+   "points": [
+    [
+     154.5,
+     99.5
+    ],
+    [
+     154.5,
+     117.5
+    ]
+   ]
+  }
+ ],
+ "atlasPaths": [
+  [
+   [
+    5.5,
+    73.5
+   ],
+   [
+    5.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ],
+  [
+   [
+    38.5,
+    154.5
+   ],
+   [
+    38.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ],
+  [
+   [
+    78.5,
+    154.5
+   ],
+   [
+    78.5,
+    147.5
+   ],
+   [
+    77.5,
+    147.5
+   ],
+   [
+    77.5,
+    141.5
+   ],
+   [
+    67.5,
+    141.5
+   ],
+   [
+    67.5,
+    138.5
+   ],
+   [
+    66.5,
+    138.5
+   ],
+   [
+    66.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ],
+  [
+   [
+    154.5,
+    99.5
+   ],
+   [
+    154.5,
+    124.5
+   ],
+   [
+    129.5,
+    124.5
+   ],
+   [
+    129.5,
+    126.5
+   ],
+   [
+    102.5,
+    126.5
+   ],
+   [
+    102.5,
+    129.5
+   ],
+   [
+    96.5,
+    129.5
+   ],
+   [
+    96.5,
+    130.5
+   ],
+   [
+    88.5,
+    130.5
+   ],
+   [
+    88.5,
+    131.5
+   ],
+   [
+    87.5,
+    131.5
+   ],
+   [
+    87.5,
+    132.5
+   ],
+   [
+    71.5,
+    132.5
+   ],
+   [
+    71.5,
+    134.5
+   ],
+   [
+    65.5,
+    134.5
+   ],
+   [
+    65.5,
+    137.5
+   ],
+   [
+    15.5,
+    137.5
+   ]
+  ]
+ ]
+}

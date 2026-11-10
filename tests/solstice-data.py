@@ -36,7 +36,7 @@ assert len(areas) == 47
 counts = {}
 for z, area in enumerate(areas):
     decor = area.get('solsticeDecor', [])
-    assert bool(decor) == (z in [0, 4, 9, 17])
+    assert bool(decor) == (z in [0, 4, 9, 17, 24])
     if not decor:
         continue
     counts[area['name']] = len(decor)

@@ -564,5 +564,155 @@
     180,
     0.2,
     3.0
+  ],
+  "oldtusker": [
+    180,
+    0.2,
+    3.0
+  ],
+  "orchardqueen": [
+    180,
+    0.2,
+    3.0
+  ],
+  "tidecrusher": [
+    180,
+    0.2,
+    3.0
+  ],
+  "slagmaw": [
+    180,
+    0.2,
+    3.0
+  ],
+  "ashwing": [
+    180,
+    0.2,
+    3.0
+  ],
+  "hoarhorn": [
+    180,
+    0.2,
+    3.0
+  ],
+  "whitewail": [
+    180,
+    0.2,
+    3.0
+  ],
+  "shardback": [
+    180,
+    0.2,
+    3.0
+  ],
+  "bellowmaw": [
+    180,
+    0.2,
+    3.0
+  ],
+  "rustmarshal": [
+    180,
+    0.2,
+    3.0
+  ],
+  "hangedking": [
+    180,
+    0.2,
+    3.0
+  ],
+  "skoll": [
+    180,
+    0.2,
+    3.0
+  ],
+  "shardking": [
+    180,
+    0.2,
+    3.0
+  ],
+  "heimdallr": [
+    180,
+    0.2,
+    3.0
+  ],
+  "cometmaw": [
+    180,
+    0.2,
+    3.0
+  ],
+  "eclipsequeen": [
+    180,
+    0.2,
+    3.0
+  ],
+  "orbitwarden": [
+    180,
+    0.2,
+    3.0
+  ],
+  "mainspringwyrm": [
+    180,
+    0.2,
+    3.0
+  ],
+  "shatterhorn": [
+    180,
+    0.2,
+    3.0
+  ],
+  "lamphermit": [
+    180,
+    0.2,
+    3.0
+  ],
+  "stormtusk": [
+    180,
+    0.2,
+    3.0
+  ],
+  "whorlshell": [
+    180,
+    0.2,
+    3.0
+  ],
+  "rootcentipede": [
+    180,
+    0.2,
+    3.0
+  ],
+  "cobaltbasilisk": [
+    180,
+    0.2,
+    3.0
+  ],
+  "lanternqueen": [
+    180,
+    0.2,
+    3.0
+  ],
+  "barkcolossus": [
+    180,
+    0.2,
+    3.0
+  ],
+  "ambergolem": [
+    180,
+    0.2,
+    3.0
+  ],
+  "avalanchebear": [
+    180,
+    0.2,
+    3.0
+  ],
+  "harrowox": [
+    180,
+    0.2,
+    3.0
+  ],
+  "equinoxstag": [
+    180,
+    0.2,
+    3.0
   ]
 }

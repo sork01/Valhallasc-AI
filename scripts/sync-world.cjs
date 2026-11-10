@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
+execFileSync('python3', [path.join(__dirname, 'zone_shapes.py'), 'unshape'], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'bag_tiers.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'stat_reset_npcs.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'bank_npcs.py')], { cwd: root, stdio: 'pipe' });
@@ -19,6 +20,8 @@ execFileSync('python3', [path.join(__dirname, 'boss_add_art_aliases.py')], { cwd
 execFileSync('python3', [path.join(__dirname, 'compact_atlas.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'seasonal_cities.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'mailboxes.py')], { cwd: root, stdio: 'pipe' });
+// Shaped zones (docs/zone-shapes.md) come last: every overlay above saw the old square layout.
+execFileSync('python3', [path.join(__dirname, 'zone_shapes.py'), 'apply'], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));

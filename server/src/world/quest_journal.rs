@@ -55,6 +55,12 @@ impl World {
             return;
         };
         let p = self.players.get_mut(&session).unwrap();
+        if !quest.abandonable() {
+            let _ = p.peer.try_send(
+                json!({"type":"error","text":"The Empty Seat cannot be abandoned. Its directions stay in your journal."}),
+            );
+            return;
+        }
         let Some(i) = p
             .character
             .quests

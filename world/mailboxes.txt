@@ -55,94 +55,6 @@
     }
   },
   {
-    "id": "mailbox_6_hollowmoot",
-    "zone": 6,
-    "hub": "Hollowmoot",
-    "x": 25.62,
-    "y": 155.62,
-    "anchor": {
-      "x": 23.5,
-      "y": 153.5
-    }
-  },
-  {
-    "id": "mailbox_6_skuldwatch",
-    "zone": 6,
-    "hub": "Skuldwatch",
-    "x": 91.5,
-    "y": 89.5,
-    "anchor": {
-      "x": 88.5,
-      "y": 89.5
-    }
-  },
-  {
-    "id": "mailbox_7_heimdall_s_perch",
-    "zone": 7,
-    "hub": "Heimdall's Perch",
-    "x": 89.27,
-    "y": 136.65,
-    "anchor": {
-      "x": 86.5,
-      "y": 135.5
-    }
-  },
-  {
-    "id": "mailbox_8_keelhaven",
-    "zone": 8,
-    "hub": "Keelhaven",
-    "x": 89.27,
-    "y": 155.65,
-    "anchor": {
-      "x": 86.5,
-      "y": 154.5
-    }
-  },
-  {
-    "id": "mailbox_9_nacrehold",
-    "zone": 9,
-    "hub": "Nacrehold",
-    "x": 103.5,
-    "y": 164.5,
-    "anchor": {
-      "x": 100.5,
-      "y": 164.5
-    }
-  },
-  {
-    "id": "mailbox_13_astralhollow",
-    "zone": 13,
-    "hub": "Astralhollow",
-    "x": 79.5,
-    "y": 119.5,
-    "anchor": {
-      "x": 76.5,
-      "y": 119.5
-    }
-  },
-  {
-    "id": "mailbox_14_the_last_shade",
-    "zone": 14,
-    "hub": "The Last Shade",
-    "x": 79.5,
-    "y": 119.5,
-    "anchor": {
-      "x": 76.5,
-      "y": 119.5
-    }
-  },
-  {
-    "id": "mailbox_15_the_stillpoint",
-    "zone": 15,
-    "hub": "The Stillpoint",
-    "x": 46.99,
-    "y": 121.17,
-    "anchor": {
-      "x": 44.5,
-      "y": 119.5
-    }
-  },
-  {
     "id": "mailbox_16_lamplight_refuge",
     "zone": 16,
     "hub": "Lamplight Refuge",
@@ -165,146 +77,960 @@
     }
   },
   {
-    "id": "mailbox_19_breakwater_camp",
-    "zone": 19,
-    "hub": "Breakwater Camp",
-    "x": 45.5,
-    "y": 119.5,
+    "id": "mailbox_0_stonefold",
+    "zone": 0,
+    "hub": "Stonefold",
+    "x": 96,
+    "y": 226.5,
     "anchor": {
-      "x": 42.5,
-      "y": 119.5
+      "x": 91,
+      "y": 217
     }
   },
   {
-    "id": "mailbox_20_millbridge",
-    "zone": 20,
-    "hub": "Millbridge",
-    "x": 49.5,
-    "y": 118.5,
+    "id": "mailbox_0_saltby",
+    "zone": 0,
+    "hub": "Saltby",
+    "x": 189,
+    "y": 275,
     "anchor": {
-      "x": 46.5,
-      "y": 118.5
+      "x": 188,
+      "y": 267
+    }
+  },
+  {
+    "id": "mailbox_0_applewick",
+    "zone": 0,
+    "hub": "Applewick",
+    "x": 343,
+    "y": 238,
+    "anchor": {
+      "x": 341,
+      "y": 225.5
+    }
+  },
+  {
+    "id": "mailbox_1_anvilrest",
+    "zone": 1,
+    "hub": "Anvilrest",
+    "x": 121,
+    "y": 291,
+    "anchor": {
+      "x": 117,
+      "y": 292
+    }
+  },
+  {
+    "id": "mailbox_1_ashford",
+    "zone": 1,
+    "hub": "Ashford",
+    "x": 199,
+    "y": 153,
+    "anchor": {
+      "x": 196,
+      "y": 157
+    }
+  },
+  {
+    "id": "mailbox_1_lasthearth",
+    "zone": 1,
+    "hub": "Lasthearth",
+    "x": 303,
+    "y": 207,
+    "anchor": {
+      "x": 306,
+      "y": 202
+    }
+  },
+  {
+    "id": "mailbox_2_driftwatch",
+    "zone": 2,
+    "hub": "Driftwatch",
+    "x": 123,
+    "y": 251,
+    "anchor": {
+      "x": 119,
+      "y": 252
+    }
+  },
+  {
+    "id": "mailbox_2_shearwind",
+    "zone": 2,
+    "hub": "Shearwind Post",
+    "x": 38,
+    "y": 173,
+    "anchor": {
+      "x": 35,
+      "y": 177
+    }
+  },
+  {
+    "id": "mailbox_2_peakrest",
+    "zone": 2,
+    "hub": "Peakrest",
+    "x": 283,
+    "y": 101,
+    "anchor": {
+      "x": 286,
+      "y": 96
+    }
+  },
+  {
+    "id": "mailbox_3_reedhallow",
+    "zone": 3,
+    "hub": "Reedhallow",
+    "x": 73,
+    "y": 101,
+    "anchor": {
+      "x": 69,
+      "y": 102
+    }
+  },
+  {
+    "id": "mailbox_3_dikewatch",
+    "zone": 3,
+    "hub": "Dikewatch",
+    "x": 144,
+    "y": 241,
+    "anchor": {
+      "x": 141,
+      "y": 245
+    }
+  },
+  {
+    "id": "mailbox_3_lastlight",
+    "zone": 3,
+    "hub": "Garrison's Rest",
+    "x": 212,
+    "y": 159,
+    "anchor": {
+      "x": 215,
+      "y": 154
+    }
+  },
+  {
+    "id": "mailbox_6_hollowmoot",
+    "zone": 6,
+    "hub": "Hollowmoot",
+    "x": 70.62,
+    "y": 282.62,
+    "anchor": {
+      "x": 68,
+      "y": 280
+    }
+  },
+  {
+    "id": "mailbox_6_skuldwatch",
+    "zone": 6,
+    "hub": "Skuldwatch",
+    "x": 161.5,
+    "y": 207.0,
+    "anchor": {
+      "x": 158,
+      "y": 206.5
+    }
+  },
+  {
+    "id": "mailbox_6_gallowsfoot",
+    "zone": 6,
+    "hub": "Gallowsfoot",
+    "x": 258,
+    "y": 298,
+    "anchor": {
+      "x": 254,
+      "y": 299
+    }
+  },
+  {
+    "id": "mailbox_6_ridgewatch",
+    "zone": 6,
+    "hub": "Ridgewatch",
+    "x": 182,
+    "y": 144,
+    "anchor": {
+      "x": 179,
+      "y": 146.5
+    }
+  },
+  {
+    "id": "mailbox_6_highmoor",
+    "zone": 6,
+    "hub": "Highmoor Hold",
+    "x": 148,
+    "y": 115,
+    "anchor": {
+      "x": 149,
+      "y": 115.5
+    }
+  },
+  {
+    "id": "mailbox_7_heimdall_s_perch",
+    "zone": 7,
+    "hub": "Heimdall's Perch",
+    "x": 196.27,
+    "y": 194.65,
+    "anchor": {
+      "x": 193,
+      "y": 193
+    }
+  },
+  {
+    "id": "mailbox_7_roost",
+    "zone": 7,
+    "hub": "Windward Roost",
+    "x": 114,
+    "y": 125,
+    "anchor": {
+      "x": 111,
+      "y": 127.5
+    }
+  },
+  {
+    "id": "mailbox_7_station",
+    "zone": 7,
+    "hub": "Stormcrown Station",
+    "x": 299,
+    "y": 255,
+    "anchor": {
+      "x": 295,
+      "y": 257.5
+    }
+  },
+  {
+    "id": "mailbox_7_landing",
+    "zone": 7,
+    "hub": "Eyrie Landing",
+    "x": 254,
+    "y": 103,
+    "anchor": {
+      "x": 255,
+      "y": 103.5
+    }
+  },
+  {
+    "id": "mailbox_8_keelhaven",
+    "zone": 8,
+    "hub": "Keelhaven",
+    "x": 105.27,
+    "y": 202.65,
+    "anchor": {
+      "x": 102,
+      "y": 201
+    }
+  },
+  {
+    "id": "mailbox_8_lanternrest",
+    "zone": 8,
+    "hub": "Lanternrest",
+    "x": 42.5,
+    "y": 112,
+    "anchor": {
+      "x": 39,
+      "y": 113.5
+    }
+  },
+  {
+    "id": "mailbox_8_gatewatch",
+    "zone": 8,
+    "hub": "Gatewatch",
+    "x": 229.5,
+    "y": 128,
+    "anchor": {
+      "x": 231,
+      "y": 129.5
+    }
+  },
+  {
+    "id": "mailbox_8_drownwatch",
+    "zone": 8,
+    "hub": "Drownwatch",
+    "x": 190.5,
+    "y": 207,
+    "anchor": {
+      "x": 183,
+      "y": 208.5
+    }
+  },
+  {
+    "id": "mailbox_9_nacrehold",
+    "zone": 9,
+    "hub": "Nacrehold",
+    "x": 137.5,
+    "y": 213.5,
+    "anchor": {
+      "x": 133.3,
+      "y": 213.7
+    }
+  },
+  {
+    "id": "mailbox_13_astralhollow",
+    "zone": 13,
+    "hub": "Astralhollow",
+    "x": 187.5,
+    "y": 297.5,
+    "anchor": {
+      "x": 184,
+      "y": 297
+    }
+  },
+  {
+    "id": "mailbox_13_choirrest",
+    "zone": 13,
+    "hub": "Choir Rest",
+    "x": 123,
+    "y": 193,
+    "anchor": {
+      "x": 119,
+      "y": 194
+    }
+  },
+  {
+    "id": "mailbox_13_cometwatch",
+    "zone": 13,
+    "hub": "Cometwatch",
+    "x": 224,
+    "y": 177,
+    "anchor": {
+      "x": 221,
+      "y": 179.5
+    }
+  },
+  {
+    "id": "mailbox_13_fallstone",
+    "zone": 13,
+    "hub": "Fallstone Hold",
+    "x": 170,
+    "y": 51,
+    "anchor": {
+      "x": 171,
+      "y": 51.5
+    }
+  },
+  {
+    "id": "mailbox_15_the_stillpoint",
+    "zone": 15,
+    "hub": "The Stillpoint",
+    "x": 96.99,
+    "y": 310.17,
+    "anchor": {
+      "x": 94,
+      "y": 308
+    }
+  },
+  {
+    "id": "mailbox_15_bellcourt",
+    "zone": 15,
+    "hub": "Bellcourt",
+    "x": 87,
+    "y": 125,
+    "anchor": {
+      "x": 83,
+      "y": 126
+    }
+  },
+  {
+    "id": "mailbox_15_crownwatch",
+    "zone": 15,
+    "hub": "Crownwatch",
+    "x": 192,
+    "y": 83,
+    "anchor": {
+      "x": 189,
+      "y": 85.5
+    }
+  },
+  {
+    "id": "mailbox_15_shardwatch",
+    "zone": 15,
+    "hub": "Shardwatch",
+    "x": 252,
+    "y": 131,
+    "anchor": {
+      "x": 253,
+      "y": 131.5
+    }
+  },
+  {
+    "id": "mailbox_14_the_last_shade",
+    "zone": 14,
+    "hub": "The Last Shade",
+    "x": 101.5,
+    "y": 177.5,
+    "anchor": {
+      "x": 98,
+      "y": 177
+    }
+  },
+  {
+    "id": "mailbox_14_mirrorfall",
+    "zone": 14,
+    "hub": "Mirrorfall",
+    "x": 109,
+    "y": 99,
+    "anchor": {
+      "x": 105,
+      "y": 100
+    }
+  },
+  {
+    "id": "mailbox_14_whitesun",
+    "zone": 14,
+    "hub": "Whitesun Post",
+    "x": 152,
+    "y": 71,
+    "anchor": {
+      "x": 149,
+      "y": 73.5
+    }
+  },
+  {
+    "id": "mailbox_14_cairnfoot",
+    "zone": 14,
+    "hub": "Cairnfoot",
+    "x": 196,
+    "y": 165,
+    "anchor": {
+      "x": 197,
+      "y": 165.5
+    }
+  },
+  {
+    "id": "mailbox_19_breakwater_camp",
+    "zone": 19,
+    "hub": "Breakwater Camp",
+    "x": 103.5,
+    "y": 273.5,
+    "anchor": {
+      "x": 100,
+      "y": 273
+    }
+  },
+  {
+    "id": "mailbox_19_rodstead",
+    "zone": 19,
+    "hub": "Rodstead",
+    "x": 103,
+    "y": 153,
+    "anchor": {
+      "x": 99,
+      "y": 154
+    }
+  },
+  {
+    "id": "mailbox_19_fulgur",
+    "zone": 19,
+    "hub": "Fulgur Post",
+    "x": 114,
+    "y": 65,
+    "anchor": {
+      "x": 111,
+      "y": 67.5
+    }
+  },
+  {
+    "id": "mailbox_19_bankhold",
+    "zone": 19,
+    "hub": "Bankhold",
+    "x": 214.0,
+    "y": 153.0,
+    "anchor": {
+      "x": 215.0,
+      "y": 153.5
+    }
+  },
+  {
+    "id": "mailbox_45_chainrest",
+    "zone": 45,
+    "hub": "Chainrest",
+    "x": 235,
+    "y": 90,
+    "anchor": {
+      "x": 227,
+      "y": 89
+    }
+  },
+  {
+    "id": "mailbox_45_door",
+    "zone": 45,
+    "hub": "Nine-Chain Hold",
+    "x": 312,
+    "y": 102,
+    "anchor": {
+      "x": 307,
+      "y": 98
+    }
+  },
+  {
+    "id": "mailbox_45_craterwatch",
+    "zone": 45,
+    "hub": "Craterwatch",
+    "x": 103,
+    "y": 129,
+    "anchor": {
+      "x": 99,
+      "y": 130
+    }
+  },
+  {
+    "id": "mailbox_45_cinderquay",
+    "zone": 45,
+    "hub": "Cinderquay",
+    "x": 188,
+    "y": 313,
+    "anchor": {
+      "x": 185,
+      "y": 315.5
+    }
+  },
+  {
+    "id": "mailbox_45_glasshold",
+    "zone": 45,
+    "hub": "Glasshold",
+    "x": 290,
+    "y": 229,
+    "anchor": {
+      "x": 291,
+      "y": 229.5
     }
   },
   {
     "id": "mailbox_21_jubilee_crossroads",
     "zone": 21,
     "hub": "Jubilee Crossroads",
-    "x": 39.56,
-    "y": 83.91,
+    "x": 183,
+    "y": 202,
     "anchor": {
-      "x": 42.5,
-      "y": 84.5
+      "x": 209,
+      "y": 200
+    }
+  },
+  {
+    "id": "mailbox_21_pavilion",
+    "zone": 21,
+    "hub": "Pavilion Steps",
+    "x": 287,
+    "y": 183,
+    "anchor": {
+      "x": 290,
+      "y": 201
+    }
+  },
+  {
+    "id": "mailbox_21_bunting",
+    "zone": 21,
+    "hub": "Bunting Post",
+    "x": 198,
+    "y": 83,
+    "anchor": {
+      "x": 195,
+      "y": 85.5
+    }
+  },
+  {
+    "id": "mailbox_21_tassel",
+    "zone": 21,
+    "hub": "Tassel Post",
+    "x": 123,
+    "y": 215,
+    "anchor": {
+      "x": 119,
+      "y": 217.5
+    }
+  },
+  {
+    "id": "mailbox_21_garland",
+    "zone": 21,
+    "hub": "Garland Rest",
+    "x": 303,
+    "y": 293,
+    "anchor": {
+      "x": 304,
+      "y": 293.5
     }
   },
   {
     "id": "mailbox_22_banyan_landing",
     "zone": 22,
     "hub": "Banyan Landing",
-    "x": 37.65,
-    "y": 127.27,
+    "x": 130.65,
+    "y": 207.27,
     "anchor": {
-      "x": 36.5,
-      "y": 124.5
+      "x": 129,
+      "y": 204
     }
   },
   {
-    "id": "mailbox_23_veyrroot_canopy",
-    "zone": 23,
-    "hub": "Veyrroot Canopy",
-    "x": 85.5,
-    "y": 96.5,
+    "id": "mailbox_22_rootgate",
+    "zone": 22,
+    "hub": "Rootgate Post",
+    "x": 172,
+    "y": 121,
     "anchor": {
-      "x": 82.5,
-      "y": 96.5
+      "x": 169,
+      "y": 123.5
     }
   },
   {
-    "id": "mailbox_24_veyrroot_heartwood",
-    "zone": 24,
-    "hub": "Veyrroot Heartwood",
-    "x": 51.5,
-    "y": 49.5,
+    "id": "mailbox_22_drumroot",
+    "zone": 22,
+    "hub": "Drumroot Post",
+    "x": 217,
+    "y": 129,
     "anchor": {
-      "x": 48.5,
-      "y": 49.5
+      "x": 213,
+      "y": 131.5
+    }
+  },
+  {
+    "id": "mailbox_22_stilt",
+    "zone": 22,
+    "hub": "Stilt Post",
+    "x": 158,
+    "y": 221,
+    "anchor": {
+      "x": 159,
+      "y": 221.5
+    }
+  },
+  {
+    "id": "mailbox_22_rainstep",
+    "zone": 22,
+    "hub": "Rainstep Camp",
+    "x": 261,
+    "y": 140,
+    "anchor": {
+      "x": 246,
+      "y": 152
     }
   },
   {
     "id": "mailbox_25_azure_wells",
     "zone": 25,
     "hub": "Azure Wells",
-    "x": 47.5,
-    "y": 135.5,
+    "x": 75.5,
+    "y": 202.5,
     "anchor": {
-      "x": 44.5,
-      "y": 135.5
+      "x": 74,
+      "y": 200
     }
   },
   {
-    "id": "mailbox_26_frostwake_station",
-    "zone": 26,
-    "hub": "Frostwake Station",
-    "x": 49.5,
-    "y": 143.5,
+    "id": "mailbox_25_wallwatch",
+    "zone": 25,
+    "hub": "Wallwatch Post",
+    "x": 97,
+    "y": 71,
     "anchor": {
-      "x": 46.5,
-      "y": 143.5
+      "x": 94,
+      "y": 73.5
+    }
+  },
+  {
+    "id": "mailbox_25_eastwell",
+    "zone": 25,
+    "hub": "Eastwell Post",
+    "x": 189,
+    "y": 173,
+    "anchor": {
+      "x": 185,
+      "y": 175.5
+    }
+  },
+  {
+    "id": "mailbox_25_saltpan",
+    "zone": 25,
+    "hub": "Saltpan Post",
+    "x": 148,
+    "y": 208,
+    "anchor": {
+      "x": 149,
+      "y": 208.5
+    }
+  },
+  {
+    "id": "mailbox_25_astro",
+    "zone": 25,
+    "hub": "Astrolabe Rest",
+    "x": 137,
+    "y": 72,
+    "anchor": {
+      "x": 122,
+      "y": 84
+    }
+  },
+  {
+    "id": "mailbox_23_veyrroot_canopy",
+    "zone": 23,
+    "hub": "Rootfoot",
+    "x": 226.5,
+    "y": 255.5,
+    "anchor": {
+      "x": 225,
+      "y": 253
+    }
+  },
+  {
+    "id": "mailbox_23_gladewatch",
+    "zone": 23,
+    "hub": "Gladewatch Post",
+    "x": 102,
+    "y": 193,
+    "anchor": {
+      "x": 99,
+      "y": 195.5
+    }
+  },
+  {
+    "id": "mailbox_23_rootstair",
+    "zone": 23,
+    "hub": "Rootstair Post",
+    "x": 209,
+    "y": 99,
+    "anchor": {
+      "x": 205,
+      "y": 101.5
+    }
+  },
+  {
+    "id": "mailbox_23_eastbark",
+    "zone": 23,
+    "hub": "Eastbark Post",
+    "x": 294,
+    "y": 201,
+    "anchor": {
+      "x": 295,
+      "y": 201.5
+    }
+  },
+  {
+    "id": "mailbox_23_lookout",
+    "zone": 23,
+    "hub": "Sunleaf Lookout",
+    "x": 257,
+    "y": 149,
+    "anchor": {
+      "x": 246,
+      "y": 150
+    }
+  },
+  {
+    "id": "mailbox_24_veyrroot_heartwood",
+    "zone": 24,
+    "hub": "Veyrroot Heartwood",
+    "x": 118.5,
+    "y": 174.5,
+    "anchor": {
+      "x": 117,
+      "y": 171
     }
   },
   {
     "id": "mailbox_27_boulderwatch",
     "zone": 27,
     "hub": "Boulderwatch",
-    "x": 50.5,
-    "y": 153.5,
+    "x": 173.5,
+    "y": 178.5,
     "anchor": {
-      "x": 47.5,
-      "y": 153.5
+      "x": 171,
+      "y": 176
+    }
+  },
+  {
+    "id": "mailbox_27_singing",
+    "zone": 27,
+    "hub": "Singing Cairn Post",
+    "x": 98,
+    "y": 93,
+    "anchor": {
+      "x": 95,
+      "y": 95.5
+    }
+  },
+  {
+    "id": "mailbox_27_whitebark",
+    "zone": 27,
+    "hub": "Whitebark Post",
+    "x": 143,
+    "y": 113,
+    "anchor": {
+      "x": 139,
+      "y": 115.5
+    }
+  },
+  {
+    "id": "mailbox_27_stormgate",
+    "zone": 27,
+    "hub": "Stormgate Camp",
+    "x": 174,
+    "y": 61,
+    "anchor": {
+      "x": 175,
+      "y": 61.5
+    }
+  },
+  {
+    "id": "mailbox_26_frostwake_station",
+    "zone": 26,
+    "hub": "Frostwake Station",
+    "x": 141.5,
+    "y": 276.5,
+    "anchor": {
+      "x": 139,
+      "y": 274
+    }
+  },
+  {
+    "id": "mailbox_26_bellward",
+    "zone": 26,
+    "hub": "Bellward Post",
+    "x": 164.5,
+    "y": 191.2,
+    "anchor": {
+      "x": 167,
+      "y": 189.5
+    }
+  },
+  {
+    "id": "mailbox_26_aurora",
+    "zone": 26,
+    "hub": "Aurora Post",
+    "x": 222.5,
+    "y": 67.2,
+    "anchor": {
+      "x": 225,
+      "y": 65.5
+    }
+  },
+  {
+    "id": "mailbox_26_ribwatch",
+    "zone": 26,
+    "hub": "Ribwatch Camp",
+    "x": 166,
+    "y": 43,
+    "anchor": {
+      "x": 167,
+      "y": 43.5
+    }
+  },
+  {
+    "id": "mailbox_20_millbridge",
+    "zone": 20,
+    "hub": "Millbridge",
+    "x": 115.5,
+    "y": 210.5,
+    "anchor": {
+      "x": 118,
+      "y": 208.5
+    }
+  },
+  {
+    "id": "mailbox_20_honeywood",
+    "zone": 20,
+    "hub": "Honeywood Steading",
+    "x": 88.5,
+    "y": 77.2,
+    "anchor": {
+      "x": 91,
+      "y": 75.5
+    }
+  },
+  {
+    "id": "mailbox_20_wickerfield",
+    "zone": 20,
+    "hub": "Wickerfield Post",
+    "x": 232.5,
+    "y": 99.2,
+    "anchor": {
+      "x": 235,
+      "y": 97.5
+    }
+  },
+  {
+    "id": "mailbox_20_elderroot",
+    "zone": 20,
+    "hub": "Elderroot Camp",
+    "x": 172.5,
+    "y": 71.2,
+    "anchor": {
+      "x": 175,
+      "y": 69.5
     }
   },
   {
     "id": "mailbox_28_springmere",
     "zone": 28,
     "hub": "Springmere",
-    "x": 87.5,
-    "y": 326.5,
+    "x": 311.5,
+    "y": 772.5,
     "anchor": {
-      "x": 84.5,
-      "y": 326.5
+      "x": 308,
+      "y": 772
     }
   },
   {
     "id": "mailbox_28_solhaven",
     "zone": 28,
     "hub": "Solhaven",
-    "x": 331.5,
-    "y": 318.5,
+    "x": 631.5,
+    "y": 662.5,
     "anchor": {
-      "x": 328.5,
-      "y": 318.5
+      "x": 628,
+      "y": 662
     }
   },
   {
     "id": "mailbox_28_harvestwatch",
     "zone": 28,
     "hub": "Harvestwatch",
-    "x": 332.5,
-    "y": 80.5,
+    "x": 631.5,
+    "y": 302.5,
     "anchor": {
-      "x": 329.5,
-      "y": 80.5
+      "x": 628,
+      "y": 302
     }
   },
   {
     "id": "mailbox_28_rimehold",
     "zone": 28,
     "hub": "Rimehold",
-    "x": 89.5,
-    "y": 80.5,
+    "x": 331.5,
+    "y": 302.5,
     "anchor": {
-      "x": 86.5,
-      "y": 80.5
+      "x": 328,
+      "y": 302
+    }
+  },
+  {
+    "id": "mailbox_28_wheelmark",
+    "zone": 28,
+    "hub": "Wheelmark Post",
+    "x": 332.5,
+    "y": 133.2,
+    "anchor": {
+      "x": 335,
+      "y": 131.5
+    }
+  },
+  {
+    "id": "mailbox_28_tidehollow",
+    "zone": 28,
+    "hub": "Tidehollow Camp",
+    "x": 686.5,
+    "y": 475.2,
+    "anchor": {
+      "x": 689,
+      "y": 473.5
+    }
+  },
+  {
+    "id": "mailbox_28_lowfall",
+    "zone": 28,
+    "hub": "Lowfall Rest",
+    "x": 476.5,
+    "y": 655.2,
+    "anchor": {
+      "x": 479,
+      "y": 653.5
     }
   }
 ]

@@ -1,0 +1,6438 @@
+{
+ "size": 96,
+ "spawn": {
+  "x": 36,
+  "y": 60
+ },
+ "objects": [
+  {
+   "kind": "bush",
+   "x": 6.607543809339404,
+   "y": 9.9118628250435,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 5.648860666900873,
+   "y": 13.854195329360664,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 9.65089132450521,
+   "y": 9.93454418797046,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 8.012955664657056,
+   "y": 17.08033544011414,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "rock",
+   "x": 26.827892635017633,
+   "y": 6.040924879722297,
+   "r": 0.4,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 18.06875854358077,
+   "y": 15.147569456137717,
+   "r": 0.42,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 24.582081062719226,
+   "y": 11.313738393597305,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 6.410851242952049,
+   "y": 30.217796912416816,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 23.504859981127083,
+   "y": 13.892901232466102,
+   "r": 0.42,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 18.413961452431977,
+   "y": 19.23923148959875,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 31.254711586982012,
+   "y": 8.856943386606872,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 17.1948026670143,
+   "y": 22.961934132501483,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 31.862679533660412,
+   "y": 10.703388250432909,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 23.83738366421312,
+   "y": 19.876490019261837,
+   "r": 0.42,
+   "v": 0
+  },
+  {
+   "kind": "rock",
+   "x": 10.21307692117989,
+   "y": 33.914849110879004,
+   "r": 0.4,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 45.377537910826504,
+   "y": 2.3436406403779984,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 17.58372419513762,
+   "y": 32.568533600308,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 13.198334325104952,
+   "y": 37.49511747341603,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 37.264689889736474,
+   "y": 15.99133575707674,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 46.77224580384791,
+   "y": 8.499272094108164,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "rock",
+   "x": 38.263125580735505,
+   "y": 17.159895919263363,
+   "r": 0.4,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 3.7222002865746617,
+   "y": 55.48463284224272,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 11.559666222892702,
+   "y": 49.47228262759745,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 46.525051303207874,
+   "y": 15.073094240389764,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 33.1705834120512,
+   "y": 29.40656667854637,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 8.245689024217427,
+   "y": 54.355851186439395,
+   "r": 0.42,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 15.067897994071245,
+   "y": 47.74139711353928,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 49.86731563694775,
+   "y": 13.613212608732283,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 18.290581887587905,
+   "y": 45.6492529315874,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 47.71104094013572,
+   "y": 16.47350155841559,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 5.828681647777557,
+   "y": 62.3723890921101,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 19.852313708513975,
+   "y": 48.52828637789935,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "rock",
+   "x": 27.695212482474744,
+   "y": 41.610013427212834,
+   "r": 0.4,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 62.047858570702374,
+   "y": 8.620214043185115,
+   "r": 0.42,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 24.001578089781106,
+   "y": 46.82251504808664,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 59.173260430805385,
+   "y": 12.15140200778842,
+   "r": 0.42,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 17.152151136659086,
+   "y": 55.20356313884258,
+   "r": 0.42,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 27.028665739111602,
+   "y": 45.89201689325273,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 29.830859859474003,
+   "y": 44.06021311879158,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 58.91516384296119,
+   "y": 15.14832713175565,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 23.66369048319757,
+   "y": 52.45416658837348,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 17.371552114374936,
+   "y": 58.83580209314823,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 60.85334527678788,
+   "y": 15.379661015234888,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 19.808688851073384,
+   "y": 57.86245507840067,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "rock",
+   "x": 7.797367978841066,
+   "y": 69.9876025794074,
+   "r": 0.4,
+   "v": 3
+  },
+  {
+   "kind": "tree",
+   "x": 54.33524693083018,
+   "y": 23.7303557805717,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 63.18328535929322,
+   "y": 14.895493225194514,
+   "r": 0.42,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 45.710095717571676,
+   "y": 33.12691314704716,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "rock",
+   "x": 21.431268458254635,
+   "y": 58.18309845030308,
+   "r": 0.4,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 18.866632777266204,
+   "y": 61.97620118223131,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "rock",
+   "x": 61.74068869557232,
+   "y": 19.90361966378987,
+   "r": 0.4,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 42.73399350326508,
+   "y": 39.36883798614144,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "tree",
+   "x": 53.39121903479099,
+   "y": 29.696701151318848,
+   "r": 0.42,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 56.325164468958974,
+   "y": 27.220509610138834,
+   "r": 0.42,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 41.254668738693,
+   "y": 42.3150886381045,
+   "r": 0.42,
+   "v": 2
+  },
+  {
+   "kind": "tree",
+   "x": 49.10196986515075,
+   "y": 35.22260572575033,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 43.79671903885901,
+   "y": 40.59097246732563,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 46.904094501398504,
+   "y": 37.95256249792874,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 30.835376216098666,
+   "y": 55.42891730647534,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "tree",
+   "x": 55.783678830601275,
+   "y": 30.838322261348367,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 28.513685569167137,
+   "y": 59.30483360309154,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 44.382887149229646,
+   "y": 45.2846936294809,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 27.13802409823984,
+   "y": 64.39493834227324,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "rock",
+   "x": 38.418795643374324,
+   "y": 53.870909799821675,
+   "r": 0.4,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 32.89579621050507,
+   "y": 64.02010662294924,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "rock",
+   "x": 29.137566652148962,
+   "y": 68.18429040443152,
+   "r": 0.4,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 53.35899959038943,
+   "y": 48.84581512026489,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 48.28434816002846,
+   "y": 56.67369352187961,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 63.873732895590365,
+   "y": 41.30065470561385,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 54.89317841362208,
+   "y": 55.85155644826591,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 48.915399773046374,
+   "y": 61.85985216964036,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 59.37169074360281,
+   "y": 52.36781114526093,
+   "r": 0.42,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 58.62158215325326,
+   "y": 53.86645955219865,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 67.608389348723,
+   "y": 46.333305295556784,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "bush",
+   "x": 56.96668861154467,
+   "y": 57.4137535430491,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "bush",
+   "x": 58.79606368299574,
+   "y": 57.954560631886125,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "tree",
+   "x": 60.6978155747056,
+   "y": 56.30230251420289,
+   "r": 0.42,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 58.487262481823564,
+   "y": 59.415373041294515,
+   "r": 0.42,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 49.90203244239092,
+   "y": 68.60379289742559,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 51.3283568713814,
+   "y": 69.27395828161389,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 57.701098256744444,
+   "y": 64.62842969968915,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "rock",
+   "x": 61.45952731091529,
+   "y": 63.74982342869043,
+   "r": 0.4,
+   "v": 1
+  },
+  {
+   "kind": "bush",
+   "x": 58.16416408214718,
+   "y": 69.27145818993449,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "bush",
+   "x": 63.84061768837273,
+   "y": 68.21036077383906,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "chapel",
+   "x": 29,
+   "y": 76,
+   "r": 0,
+   "v": 0,
+   "width": 3.4,
+   "depth": 3.2,
+   "label": "Sanctuary",
+   "color": "#6b8198"
+  },
+  {
+   "kind": "house",
+   "x": 43,
+   "y": 76,
+   "r": 0,
+   "v": 0,
+   "width": 3.4,
+   "depth": 3.2,
+   "label": "Moonleaf Apothecary",
+   "color": "#b65b65"
+  },
+  {
+   "kind": "house",
+   "x": 29,
+   "y": 88,
+   "r": 0,
+   "v": 0,
+   "width": 3.4,
+   "depth": 3.2,
+   "label": "Ember & Anvil",
+   "color": "#667c91"
+  },
+  {
+   "kind": "house",
+   "x": 43,
+   "y": 88,
+   "r": 0,
+   "v": 0,
+   "width": 3.4,
+   "depth": 3.2,
+   "label": "The Amber Inn",
+   "color": "#b8744e"
+  },
+  {
+   "kind": "fountain",
+   "x": 36,
+   "y": 83,
+   "r": 1.1,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 25,
+   "y": 79,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 25,
+   "y": 86,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 32,
+   "y": 79,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 32,
+   "y": 86,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 41,
+   "y": 79,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 41,
+   "y": 86,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 47,
+   "y": 79,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lamp",
+   "x": 47,
+   "y": 86,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "tree",
+   "x": 27,
+   "y": 74,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "tree",
+   "x": 27,
+   "y": 91,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "tree",
+   "x": 45,
+   "y": 74,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "tree",
+   "x": 45,
+   "y": 91,
+   "r": 0.42,
+   "v": 3
+  },
+  {
+   "kind": "flowers",
+   "x": 31,
+   "y": 80,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "flowers",
+   "x": 31,
+   "y": 86,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "flowers",
+   "x": 41,
+   "y": 80,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "flowers",
+   "x": 41,
+   "y": 86,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "stall",
+   "x": 28,
+   "y": 83,
+   "r": 0,
+   "v": 0,
+   "width": 1.8,
+   "depth": 1.2,
+   "color": "#c46760",
+   "label": "Sunrise Bakery"
+  },
+  {
+   "kind": "stall",
+   "x": 44,
+   "y": 83,
+   "r": 0,
+   "v": 0,
+   "width": 1.8,
+   "depth": 1.2,
+   "color": "#678c9b",
+   "label": "Market"
+  },
+  {
+   "kind": "bench",
+   "x": 33,
+   "y": 86,
+   "r": 0,
+   "v": 0,
+   "width": 1.5,
+   "depth": 0.45
+  },
+  {
+   "kind": "bench",
+   "x": 39,
+   "y": 86,
+   "r": 0,
+   "v": 0,
+   "width": 1.5,
+   "depth": 0.45
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 74,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 76,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 78,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 80,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 82,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 84,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 86,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 88,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 90,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 92,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 24,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 74,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 76,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 78,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 80,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 82,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 84,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 86,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 88,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 90,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 92,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 48,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 0.6,
+   "depth": 2
+  },
+  {
+   "kind": "wall",
+   "x": 25,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 27,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 29,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 31,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 33,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 39,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 41,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 43,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 45,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 47,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 25,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 27,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 29,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 31,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 33,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 39,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 41,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 43,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 45,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "wall",
+   "x": 47,
+   "y": 94,
+   "r": 0,
+   "v": 0,
+   "width": 2,
+   "depth": 0.6
+  },
+  {
+   "kind": "gate",
+   "x": 33,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 1.1,
+   "depth": 1.1
+  },
+  {
+   "kind": "gate",
+   "x": 39,
+   "y": 72,
+   "r": 0,
+   "v": 0,
+   "width": 1.1,
+   "depth": 1.1
+  },
+  {
+   "kind": "post",
+   "x": 52.5,
+   "y": 9.0,
+   "r": 0.45,
+   "v": 0
+  },
+  {
+   "kind": "post",
+   "x": 55.5,
+   "y": 9.0,
+   "r": 0.45,
+   "v": 0
+  },
+  {
+   "kind": "water",
+   "x": 79,
+   "y": 28,
+   "r": 2.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "water",
+   "x": 81.5,
+   "y": 29.5,
+   "r": 2.2,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "water",
+   "x": 78.2,
+   "y": 30.5,
+   "r": 1.7,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 85.54,
+   "y": 85.54,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 82.0,
+   "y": 87.0,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 78.46,
+   "y": 85.54,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 77.0,
+   "y": 82.0,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 78.46,
+   "y": 78.46,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 82.0,
+   "y": 77.0,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 85.54,
+   "y": 78.46,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 74.57,
+   "y": 16.69,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 74.28,
+   "y": 20.94,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 88.36,
+   "y": 13.44,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 90.78,
+   "y": 5.63,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 71.58,
+   "y": 9.94,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 82.61,
+   "y": 22.63,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 72.55,
+   "y": 4.28,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 67.44,
+   "y": 3.81,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 90.29,
+   "y": 16.82,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 92.99,
+   "y": 24.31,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 92.87,
+   "y": 14.08,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 92.17,
+   "y": 9.16,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 79.13,
+   "y": 7.3,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 68.95,
+   "y": 12.37,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 74.01,
+   "y": 11.19,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 68.6,
+   "y": 19.88,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 67.81,
+   "y": 6.71,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 83.16,
+   "y": 4.24,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 86.95,
+   "y": 17.95,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 73.26,
+   "y": 19.02,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 78.98,
+   "y": 18.73,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 72.61,
+   "y": 8.85,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 76.49,
+   "y": 24.17,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 84.25,
+   "y": 22.05,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 68.51,
+   "y": 4.87,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 79.74,
+   "y": 9.69,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 79.54,
+   "y": 3.64,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 71.93,
+   "y": 11.41,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 71.07,
+   "y": 17.94,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 68.54,
+   "y": 21.49,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 81.63,
+   "y": 24.25,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 74.84,
+   "y": 18.53,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 88.42,
+   "y": 3.36,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 84.28,
+   "y": 8.5,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 77.14,
+   "y": 18.61,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 78.65,
+   "y": 16.0,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 82.32,
+   "y": 5.33,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 85.51,
+   "y": 5.68,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 88.93,
+   "y": 6.62,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 77.51,
+   "y": 17.01,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 76.45,
+   "y": 5.68,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 91.11,
+   "y": 12.16,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 75.21,
+   "y": 50.92,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 67.56,
+   "y": 26.66,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 67.79,
+   "y": 38.88,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 77.44,
+   "y": 54.09,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 88.18,
+   "y": 39.87,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 69.7,
+   "y": 37.38,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 81.66,
+   "y": 49.28,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 67.53,
+   "y": 37.18,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 80.83,
+   "y": 45.72,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 77.29,
+   "y": 40.47,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 77.17,
+   "y": 48.25,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 89.97,
+   "y": 28.44,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 82.56,
+   "y": 51.74,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 67.19,
+   "y": 44.46,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 69.63,
+   "y": 51.81,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 73.74,
+   "y": 43.58,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 72.99,
+   "y": 33.22,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 70.05,
+   "y": 55.45,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 69.06,
+   "y": 32.7,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 82.25,
+   "y": 46.96,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 88.47,
+   "y": 53.76,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 87.2,
+   "y": 32.75,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 91.59,
+   "y": 56.33,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 73.49,
+   "y": 30.4,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 92.94,
+   "y": 54.07,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 78.91,
+   "y": 51.66,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 87.93,
+   "y": 37.89,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 80.01,
+   "y": 43.64,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 91.59,
+   "y": 44.06,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 87.99,
+   "y": 41.86,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 82.67,
+   "y": 44.63,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 75.7,
+   "y": 32.63,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 90.11,
+   "y": 41.63,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 71.62,
+   "y": 50.48,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 92.72,
+   "y": 40.86,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 69.11,
+   "y": 56.9,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 72.14,
+   "y": 54.71,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 85.68,
+   "y": 57.26,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 90.02,
+   "y": 39.71,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 71.11,
+   "y": 32.42,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 73.44,
+   "y": 42.02,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 87.45,
+   "y": 43.44,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 79.85,
+   "y": 52.9,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 67.99,
+   "y": 48.05,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 70.39,
+   "y": 29.1,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 90.58,
+   "y": 54.15,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 92.73,
+   "y": 47.29,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 71.88,
+   "y": 52.74,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 83.94,
+   "y": 48.46,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 67.43,
+   "y": 29.83,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 79.45,
+   "y": 68.7,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 87.23,
+   "y": 74.66,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 87.24,
+   "y": 70.88,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 91.15,
+   "y": 61.46,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 80.7,
+   "y": 62.45,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 71.84,
+   "y": 72.53,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 78.6,
+   "y": 64.08,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 74.76,
+   "y": 65.8,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 92.25,
+   "y": 59.62,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 71.37,
+   "y": 59.41,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 91.79,
+   "y": 78.53,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 89.66,
+   "y": 83.24,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 67.07,
+   "y": 72.17,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 69.83,
+   "y": 75.3,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 69.35,
+   "y": 77.21,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 92.25,
+   "y": 73.22,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 67.9,
+   "y": 84.7,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 68.8,
+   "y": 81.78,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 72.34,
+   "y": 60.64,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 83.49,
+   "y": 90.35,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 71.02,
+   "y": 82.18,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 88.01,
+   "y": 73.05,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 74.04,
+   "y": 89.38,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 67.94,
+   "y": 62.76,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 92.85,
+   "y": 63.66,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 70.55,
+   "y": 73.59,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 90.9,
+   "y": 70.78,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 81.7,
+   "y": 65.41,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 90.18,
+   "y": 67.93,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 77.73,
+   "y": 67.0,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 79.99,
+   "y": 90.98,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 73.81,
+   "y": 78.45,
+   "r": 0.42,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 90.57,
+   "y": 63.8,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 69.28,
+   "y": 79.54,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 67.73,
+   "y": 75.25,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 83.71,
+   "y": 61.7,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 68.15,
+   "y": 90.32,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 79.91,
+   "y": 66.1,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 85.2,
+   "y": 67.53,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 90.41,
+   "y": 82.18,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 87.81,
+   "y": 61.05,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 92.37,
+   "y": 75.54,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 73.82,
+   "y": 91.37,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 84.45,
+   "y": 70.04,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 90.2,
+   "y": 79.26,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 76.04,
+   "y": 74.99,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 77.04,
+   "y": 64.95,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 70.91,
+   "y": 77.51,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 66.07,
+   "y": 87.33,
+   "r": 0.3,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 84.65,
+   "y": 90.95,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 88.73,
+   "y": 91.65,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 85.62,
+   "y": 59.16,
+   "r": 0.42,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 66.45,
+   "y": 61.76,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 17.96,
+   "y": 89.26,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 11.6,
+   "y": 74.65,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 4.11,
+   "y": 66.02,
+   "r": 0.4,
+   "v": 0,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 7.99,
+   "y": 73.45,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 14.49,
+   "y": 89.2,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 7.01,
+   "y": 67.49,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 10.92,
+   "y": 85.34,
+   "r": 0.42,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 5.33,
+   "y": 77.89,
+   "r": 0.4,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 21.56,
+   "y": 86.36,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 11.59,
+   "y": 91.4,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 5.44,
+   "y": 73.95,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 11.59,
+   "y": 88.27,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 19.66,
+   "y": 77.27,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 19.23,
+   "y": 68.42,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 18.91,
+   "y": 87.64,
+   "r": 0.3,
+   "v": 3,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "tree",
+   "x": 20.74,
+   "y": 69.06,
+   "r": 0.42,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 10.81,
+   "y": 83.93,
+   "r": 0.3,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 4.81,
+   "y": 87.51,
+   "r": 0.4,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "bush",
+   "x": 15.12,
+   "y": 70.85,
+   "r": 0.3,
+   "v": 2,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "rock",
+   "x": 18.18,
+   "y": 78.99,
+   "r": 0.4,
+   "v": 1,
+   "layout": "greenmeadow_wide_v1"
+  }
+ ],
+ "slimes": [
+  {
+   "x": 60.31915994267911,
+   "y": 59.86766631156206,
+   "kind": "green"
+  },
+  {
+   "x": 50.25086440052837,
+   "y": 30.230367857962847,
+   "kind": "green"
+  },
+  {
+   "x": 56.245632897131145,
+   "y": 52.26217558979988,
+   "kind": "green"
+  },
+  {
+   "x": 27.987690017558634,
+   "y": 39.89055515639484,
+   "kind": "green"
+  },
+  {
+   "x": 36.82644720096141,
+   "y": 12.1912586633116,
+   "kind": "green"
+  },
+  {
+   "x": 64.81188611034304,
+   "y": 34.891897117719054,
+   "kind": "green"
+  },
+  {
+   "x": 11.20156652200967,
+   "y": 37.67912651784718,
+   "kind": "green"
+  },
+  {
+   "x": 8.810172247700393,
+   "y": 22.124681867659092,
+   "kind": "green"
+  },
+  {
+   "x": 38.01227142009884,
+   "y": 26.24961839430034,
+   "kind": "blue"
+  },
+  {
+   "x": 63.02,
+   "y": 4.64,
+   "kind": "blue"
+  },
+  {
+   "x": 59.45,
+   "y": 22.42,
+   "kind": "blue"
+  },
+  {
+   "x": 7.88057875726372,
+   "y": 30.520012764260173,
+   "kind": "pink"
+  },
+  {
+   "x": 30.668440804816782,
+   "y": 16.59471602551639,
+   "kind": "pink"
+  },
+  {
+   "x": 49.85645104106516,
+   "y": 39.33320735022426,
+   "kind": "big"
+  },
+  {
+   "x": 84,
+   "y": 41,
+   "kind": "big"
+  },
+  {
+   "x": 20.76609588135034,
+   "y": 35.910983042791486,
+   "kind": "yellow"
+  },
+  {
+   "x": 56,
+   "y": 30,
+   "kind": "beetle"
+  },
+  {
+   "x": 62,
+   "y": 42,
+   "kind": "beetle"
+  },
+  {
+   "x": 58,
+   "y": 52,
+   "kind": "beetle"
+  },
+  {
+   "x": 23,
+   "y": 23,
+   "kind": "beetle"
+  },
+  {
+   "x": 18,
+   "y": 42,
+   "kind": "beetle"
+  },
+  {
+   "kind": "green",
+   "x": 12,
+   "y": 79,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "green",
+   "x": 18,
+   "y": 74,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "green",
+   "x": 75,
+   "y": 58,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "green",
+   "x": 90,
+   "y": 88,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "blue",
+   "x": 72,
+   "y": 47,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "blue",
+   "x": 83,
+   "y": 16,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "blue",
+   "x": 81,
+   "y": 58,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "pink",
+   "x": 91,
+   "y": 32,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "yellow",
+   "x": 72,
+   "y": 24,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "beetle",
+   "x": 88,
+   "y": 49,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "beetle",
+   "x": 75,
+   "y": 86,
+   "layout": "greenmeadow_wide_v1"
+  },
+  {
+   "kind": "ember_firelord",
+   "x": 35.5,
+   "y": 47,
+   "ambush": "raid_key:0"
+  }
+ ],
+ "city": {
+  "name": "Alderhaven",
+  "x0": 24,
+  "x1": 48,
+  "y0": 72,
+  "y1": 94,
+  "plaza": {
+   "x": 36,
+   "y": 83
+  },
+  "radius": 4.8
+ },
+ "npcs": [
+  {
+   "id": "gatekeeper",
+   "name": "Captain Rowan",
+   "role": "City guard",
+   "x": 34,
+   "y": 74,
+   "color": "#627b9f",
+   "dialogue": "Alderhaven needs brave adventurers to keep the meadow paths clear. Start with the slimes, then speak to Bram about the Ironhides. Rest inside our walls whenever you need it.",
+   "offers": []
+  },
+  {
+   "id": "healer",
+   "name": "Sister Elara",
+   "role": "Sanctuary healer",
+   "x": 30,
+   "y": 78.5,
+   "color": "#e7e3da",
+   "dialogue": "A little kindness goes a long way. Rest here, traveler; the sanctuary offers healing to everyone.",
+   "offers": [
+    {
+     "id": "blessing",
+     "label": "Receive a healing blessing",
+     "cost": 0,
+     "heal": 10000
+    }
+   ]
+  },
+  {
+   "id": "apothecary",
+   "name": "Mira Moonleaf",
+   "role": "Apothecary",
+   "x": 42,
+   "y": 78.5,
+   "color": "#9a71aa",
+   "dialogue": "Fresh herbs from Greenmeadow, brewed right here. Drink a tonic at my counter before your next adventure, or carry a Health Potion: it heals 100 HP at once, then needs 60 seconds to recover.",
+   "offers": [
+    {
+     "id": "tonic",
+     "label": "Drink a tonic · restores 60 HP",
+     "cost": 8,
+     "heal": 60
+    },
+    {
+     "id": "buy_health_potion",
+     "label": "Buy Health Potion · 100 HP instantly",
+     "cost": 30,
+     "item": "health_potion",
+     "tiered": true
+    },
+    {
+     "id": "buy_mana_potion",
+     "label": "Buy Mana Potion · 100 mana instantly",
+     "cost": 30,
+     "item": "mana_potion",
+     "tiered": true
+    }
+   ]
+  },
+  {
+   "id": "smith",
+   "name": "Bram Emberforge",
+   "role": "Armorer",
+   "x": 31,
+   "y": 88,
+   "color": "#ac7650",
+   "dialogue": "I can replace and fit basic starter gear for free. Hunt enemies for rare upgrades, and bring me spare equipment or materials to sell. Open your inventory with ‹bags›.",
+   "offers": [
+    {
+     "id": "fitting",
+     "label": "Replace and fit starter gear",
+     "cost": 0,
+     "gear": true
+    },
+    {
+     "id": "buy_cloak_common",
+     "label": "Buy Travel Cloak",
+     "item": "cloak_l5_common",
+     "tiered": true,
+     "cost": 24
+    },
+    {
+     "id": "buy_cloak_uncommon",
+     "label": "Buy Sturdy Cloak",
+     "item": "cloak_l5_uncommon",
+     "tiered": true,
+     "cost": 160
+    },
+    {
+     "id": "buy_cloak_rare",
+     "label": "Buy Rare Cloak",
+     "item": "cloak_l5_rare",
+     "tiered": true,
+     "cost": 384
+    },
+    {
+     "id": "buy_green_weapon_warrior",
+     "label": "Buy Reinforced Royal Sword",
+     "item": "warrior_weapon_royal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_mage",
+     "label": "Buy Reinforced Crystal Staff",
+     "item": "mage_weapon_crystal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_assassin",
+     "label": "Buy Reinforced Moonfang Daggers",
+     "item": "assassin_weapon_moonfang_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_priest",
+     "label": "Buy Reinforced Sunbreaker Mace",
+     "item": "priest_weapon_sunmace_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_hunter",
+     "label": "Buy Reinforced Wildwarden Longbow",
+     "item": "hunter_weapon_wardenbow_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "repair",
+     "label": "Repair worn gear",
+     "cost": 0
+    }
+   ],
+   "buys": true
+  },
+  {
+   "id": "innkeeper",
+   "name": "Tessa Amber",
+   "role": "Innkeeper",
+   "x": 41,
+   "y": 88,
+   "color": "#76a6a0",
+   "dialogue": "Welcome to the Amber Inn. A warm meal and a quiet rest will have you ready for the road again.",
+   "offers": [
+    {
+     "id": "rest",
+     "label": "Meal & rest · fully restores HP",
+     "cost": 5,
+     "heal": 10000
+    }
+   ]
+  },
+  {
+   "id": "baker",
+   "name": "Pip",
+   "role": "Baker",
+   "x": 29,
+   "y": 84.5,
+   "color": "#e8bd78",
+   "dialogue": "Still warm from the oven! Enjoy a honey bun here in the square, or take a pot of my Traveler's Stew for the road. It heals 100 HP over 8 seconds, and only one meal can work at a time.",
+   "offers": [
+    {
+     "id": "bun",
+     "label": "Eat a honey bun · restores 20 HP",
+     "cost": 3,
+     "heal": 20
+    },
+    {
+     "id": "buy_traveler_stew",
+     "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
+     "cost": 12,
+     "item": "traveler_stew",
+     "tiered": true
+    },
+    {
+     "id": "halloween:hire:warrior",
+     "label": "Hire a Warrior",
+     "merc": "warrior",
+     "cost": 0,
+     "season": "halloween",
+     "quest": "halloween_hunt"
+    },
+    {
+     "id": "halloween:hire:mage",
+     "label": "Hire a Mage",
+     "merc": "mage",
+     "cost": 0,
+     "season": "halloween",
+     "quest": "halloween_hunt"
+    },
+    {
+     "id": "halloween:hire:assassin",
+     "label": "Hire a Assassin",
+     "merc": "assassin",
+     "cost": 0,
+     "season": "halloween",
+     "quest": "halloween_hunt"
+    },
+    {
+     "id": "halloween:hire:priest",
+     "label": "Hire a Priest",
+     "merc": "priest",
+     "cost": 0,
+     "season": "halloween",
+     "quest": "halloween_hunt"
+    },
+    {
+     "id": "halloween:hire:hunter",
+     "label": "Hire a Hunter",
+     "merc": "hunter",
+     "cost": 0,
+     "season": "halloween",
+     "quest": "halloween_hunt"
+    },
+    {
+     "id": "christmas:hire:warrior",
+     "label": "Hire a Warrior",
+     "merc": "warrior",
+     "cost": 0,
+     "season": "christmas",
+     "quest": "christmas_hunt"
+    },
+    {
+     "id": "christmas:hire:mage",
+     "label": "Hire a Mage",
+     "merc": "mage",
+     "cost": 0,
+     "season": "christmas",
+     "quest": "christmas_hunt"
+    },
+    {
+     "id": "christmas:hire:assassin",
+     "label": "Hire an Assassin",
+     "merc": "assassin",
+     "cost": 0,
+     "season": "christmas",
+     "quest": "christmas_hunt"
+    },
+    {
+     "id": "christmas:hire:priest",
+     "label": "Hire a Priest",
+     "merc": "priest",
+     "cost": 0,
+     "season": "christmas",
+     "quest": "christmas_hunt"
+    },
+    {
+     "id": "christmas:hire:hunter",
+     "label": "Hire a Hunter",
+     "merc": "hunter",
+     "cost": 0,
+     "season": "christmas",
+     "quest": "christmas_hunt"
+    },
+    {
+     "id": "easter:hire:warrior",
+     "label": "Hire a Warrior",
+     "merc": "warrior",
+     "cost": 0,
+     "season": "easter",
+     "quest": "easter_hunt"
+    },
+    {
+     "id": "easter:hire:mage",
+     "label": "Hire a Mage",
+     "merc": "mage",
+     "cost": 0,
+     "season": "easter",
+     "quest": "easter_hunt"
+    },
+    {
+     "id": "easter:hire:assassin",
+     "label": "Hire an Assassin",
+     "merc": "assassin",
+     "cost": 0,
+     "season": "easter",
+     "quest": "easter_hunt"
+    },
+    {
+     "id": "easter:hire:priest",
+     "label": "Hire a Priest",
+     "merc": "priest",
+     "cost": 0,
+     "season": "easter",
+     "quest": "easter_hunt"
+    },
+    {
+     "id": "easter:hire:hunter",
+     "label": "Hire a Hunter",
+     "merc": "hunter",
+     "cost": 0,
+     "season": "easter",
+     "quest": "easter_hunt"
+    },
+    {
+     "id": "solstice:hire:warrior",
+     "label": "Hire a Warrior",
+     "merc": "warrior",
+     "cost": 0,
+     "season": "solstice",
+     "quest": "solstice_hunt"
+    },
+    {
+     "id": "solstice:hire:mage",
+     "label": "Hire a Mage",
+     "merc": "mage",
+     "cost": 0,
+     "season": "solstice",
+     "quest": "solstice_hunt"
+    },
+    {
+     "id": "solstice:hire:assassin",
+     "label": "Hire an Assassin",
+     "merc": "assassin",
+     "cost": 0,
+     "season": "solstice",
+     "quest": "solstice_hunt"
+    },
+    {
+     "id": "solstice:hire:priest",
+     "label": "Hire a Priest",
+     "merc": "priest",
+     "cost": 0,
+     "season": "solstice",
+     "quest": "solstice_hunt"
+    },
+    {
+     "id": "solstice:hire:hunter",
+     "label": "Hire a Hunter",
+     "merc": "hunter",
+     "cost": 0,
+     "season": "solstice",
+     "quest": "solstice_hunt"
+    },
+    {
+     "id": "valentine:hire:warrior",
+     "label": "Hire a Warrior",
+     "merc": "warrior",
+     "cost": 0,
+     "season": "valentine",
+     "quest": "valentine_hunt"
+    },
+    {
+     "id": "valentine:hire:mage",
+     "label": "Hire a Mage",
+     "merc": "mage",
+     "cost": 0,
+     "season": "valentine",
+     "quest": "valentine_hunt"
+    },
+    {
+     "id": "valentine:hire:assassin",
+     "label": "Hire an Assassin",
+     "merc": "assassin",
+     "cost": 0,
+     "season": "valentine",
+     "quest": "valentine_hunt"
+    },
+    {
+     "id": "valentine:hire:priest",
+     "label": "Hire a Priest",
+     "merc": "priest",
+     "cost": 0,
+     "season": "valentine",
+     "quest": "valentine_hunt"
+    },
+    {
+     "id": "valentine:hire:hunter",
+     "label": "Hire a Hunter",
+     "merc": "hunter",
+     "cost": 0,
+     "season": "valentine",
+     "quest": "valentine_hunt"
+    },
+    {
+     "id": "newyear:hire:warrior",
+     "label": "Hire a Warrior",
+     "merc": "warrior",
+     "cost": 0,
+     "season": "newyear",
+     "quest": "newyear_hunt"
+    },
+    {
+     "id": "newyear:hire:mage",
+     "label": "Hire a Mage",
+     "merc": "mage",
+     "cost": 0,
+     "season": "newyear",
+     "quest": "newyear_hunt"
+    },
+    {
+     "id": "newyear:hire:assassin",
+     "label": "Hire an Assassin",
+     "merc": "assassin",
+     "cost": 0,
+     "season": "newyear",
+     "quest": "newyear_hunt"
+    },
+    {
+     "id": "newyear:hire:priest",
+     "label": "Hire a Priest",
+     "merc": "priest",
+     "cost": 0,
+     "season": "newyear",
+     "quest": "newyear_hunt"
+    },
+    {
+     "id": "newyear:hire:hunter",
+     "label": "Hire a Hunter",
+     "merc": "hunter",
+     "cost": 0,
+     "season": "newyear",
+     "quest": "newyear_hunt"
+    }
+   ]
+  },
+  {
+   "id": "merchant",
+   "name": "Linden",
+   "role": "Market merchant",
+   "x": 43,
+   "y": 84.5,
+   "color": "#859563",
+   "dialogue": "Bring me meadow materials or spare equipment. I buy loot from every class and protect equipped items. I sell six-slot Linen Satchels for 500 gold each. Carry up to four beside your backpack.",
+   "offers": [
+    {
+     "id": "satchel",
+     "label": "Buy Linen Satchel · 6 extra bag slots",
+     "cost": 500,
+     "bag": "linen_satchel"
+    },
+    {
+     "id": "bag_l10",
+     "label": "Buy Adventurer Satchel · 8 extra bag slots",
+     "cost": 1500,
+     "bag": "adventurer_satchel"
+    },
+    {
+     "id": "bag_l20",
+     "label": "Buy Trail Pack · 10 extra bag slots",
+     "cost": 4000,
+     "bag": "trail_pack_l20"
+    },
+    {
+     "id": "bag_l30",
+     "label": "Buy Ranger Pack · 12 extra bag slots",
+     "cost": 9000,
+     "bag": "ranger_pack_l30"
+    },
+    {
+     "id": "bag_l40",
+     "label": "Buy Expedition Pack · 14 extra bag slots",
+     "cost": 18000,
+     "bag": "expedition_pack_l40"
+    },
+    {
+     "id": "bag_l50",
+     "label": "Buy Traveler Pack · 16 extra bag slots",
+     "cost": 35000,
+     "bag": "traveler_pack"
+    },
+    {
+     "id": "bag_l60",
+     "label": "Buy Pathfinder Pack · 18 extra bag slots",
+     "cost": 60000,
+     "bag": "pathfinder_pack_l60"
+    },
+    {
+     "id": "bag_l70",
+     "label": "Buy Warden Pack · 20 extra bag slots",
+     "cost": 100000,
+     "bag": "warden_pack_l70"
+    },
+    {
+     "id": "bag_l80",
+     "label": "Buy Hero Pack · 22 extra bag slots",
+     "cost": 160000,
+     "bag": "hero_pack_l80"
+    },
+    {
+     "id": "bag_l90",
+     "label": "Buy Sovereign Pack · 24 extra bag slots",
+     "cost": 240000,
+     "bag": "sovereign_pack_l90"
+    },
+    {
+     "id": "buy_cloak_common",
+     "label": "Buy Travel Cloak",
+     "item": "cloak_l5_common",
+     "tiered": true,
+     "cost": 24
+    },
+    {
+     "id": "buy_cloak_uncommon",
+     "label": "Buy Sturdy Cloak",
+     "item": "cloak_l5_uncommon",
+     "tiered": true,
+     "cost": 160
+    },
+    {
+     "id": "buy_cloak_rare",
+     "label": "Buy Rare Cloak",
+     "item": "cloak_l5_rare",
+     "tiered": true,
+     "cost": 384
+    },
+    {
+     "id": "buy_green_weapon_warrior",
+     "label": "Buy Reinforced Royal Sword",
+     "item": "warrior_weapon_royal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_mage",
+     "label": "Buy Reinforced Crystal Staff",
+     "item": "mage_weapon_crystal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_assassin",
+     "label": "Buy Reinforced Moonfang Daggers",
+     "item": "assassin_weapon_moonfang_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_priest",
+     "label": "Buy Reinforced Sunbreaker Mace",
+     "item": "priest_weapon_sunmace_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_hunter",
+     "label": "Buy Reinforced Wildwarden Longbow",
+     "item": "hunter_weapon_wardenbow_l10_green",
+     "tiered": true,
+     "cost": 1000
+    }
+   ],
+   "buys": true
+  },
+  {
+   "id": "guide",
+   "name": "Wren",
+   "role": "Town guide",
+   "x": 38,
+   "y": 80,
+   "color": "#cc7d83",
+   "dialogue": "Welcome, adventurer! I have a little introduction to Alderhaven for you. Captain Rowan has work at the north gate, too. Open your quest journal with ‹quests› to follow your adventures.",
+   "offers": [
+    {
+     "id": "stat_reset",
+     "label": "Reset trained attributes",
+     "cost": 0
+    },
+    {
+     "id": "gauntlet",
+     "label": "Enter the Arena",
+     "cost": 0
+    }
+   ]
+  },
+  {
+   "id": "banker_alderhaven",
+   "name": "Brenna Coinwright",
+   "role": "Banker",
+   "x": 39,
+   "y": 82.5,
+   "color": "#c9a24b",
+   "dialogue": "Gold in your pocket is gold on the road. Leave what you cannot carry with me, and I will keep it as if it were my own. Mind that a quest counts only what you carry, not what is in the bank.",
+   "offers": [
+    {
+     "id": "bank",
+     "label": "Open the bank",
+     "cost": 0
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#edc5a1",
+    "hair": "#7a4a2a",
+    "style": "bun",
+    "hat": "bonnet",
+    "hatColor": "#8a6a2a"
+   },
+   "art": "bank_alderhaven"
+  },
+  {
+   "id": "travel_alderhaven",
+   "name": "Travel Master",
+   "role": "Spark Travel",
+   "x": 36,
+   "y": 85,
+   "color": "#74d7d0",
+   "travelStop": "Alderhaven",
+   "travelLinks": [
+    "travel_cinderwatch",
+    "travel_lanternmere",
+    "travel_skaldholm",
+    "travel_lamplight"
+   ],
+   "look": {
+    "hair": "#e4edf4",
+    "skin": "#edc5a1",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#328e97"
+   },
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "offers": [],
+   "buys": false
+  },
+  {
+   "id": "gearwright",
+   "name": "Alda Copperhand",
+   "role": "Gearwright",
+   "x": 36,
+   "y": 91,
+   "color": "#d5a474",
+   "dialogue": "I can merge two matching spare pieces or refine any piece with matching crystals and gold. Choose copies carefully: a merge keeps the lower refinement rank.",
+   "offers": [
+    {
+     "id": "merge",
+     "label": "Merge two equipment copies",
+     "cost": 0
+    },
+    {
+     "id": "refine",
+     "label": "Refine one equipment copy",
+     "cost": 0
+    },
+    {
+     "id": "crystal_common",
+     "label": "Buy Common Refinement Crystal",
+     "cost": 25,
+     "item": "refinement_crystal_common"
+    },
+    {
+     "id": "crystal_uncommon",
+     "label": "Buy Uncommon Refinement Crystal",
+     "cost": 50,
+     "item": "refinement_crystal_uncommon"
+    },
+    {
+     "id": "crystal_rare",
+     "label": "Buy Rare Refinement Crystal",
+     "cost": 100,
+     "item": "refinement_crystal_rare"
+    },
+    {
+     "id": "crystal_epic",
+     "label": "Buy Epic Refinement Crystal",
+     "cost": 200,
+     "item": "refinement_crystal_epic"
+    },
+    {
+     "id": "crystal_legendary",
+     "label": "Buy Legendary Refinement Crystal",
+     "cost": 300,
+     "item": "refinement_crystal_legendary"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#bd9471",
+    "hair": "#866d59",
+    "style": "braid",
+    "hat": "none",
+    "hatColor": "#866d59"
+   }
+  },
+  {
+   "id": "festival_dance_halloween_0",
+   "name": "Halloween Pumpkin",
+   "role": "Festival dance",
+   "art": "scenery",
+   "x": 32,
+   "y": 83,
+   "r": 0,
+   "season": "halloween",
+   "dialogue": "Dance two full laps around this centerpiece to receive Festival Spirit: +10% attack and +50% experience for two hours. Move or fight to cancel. The timer continues offline; another completed dance refreshes it.",
+   "offers": [
+    {
+     "id": "festival:dance",
+     "label": "Dance two laps · earn Festival Spirit",
+     "cost": 0
+    }
+   ],
+   "buys": false,
+   "festivalArt": "festivalPumpkins"
+  },
+  {
+   "id": "festival_dance_christmas_0",
+   "name": "Christmas Tree",
+   "role": "Festival dance",
+   "art": "scenery",
+   "x": 32,
+   "y": 83,
+   "r": 0,
+   "season": "christmas",
+   "dialogue": "Dance two full laps around this centerpiece to receive Festival Spirit: +10% attack and +50% experience for two hours. Move or fight to cancel. The timer continues offline; another completed dance refreshes it.",
+   "offers": [
+    {
+     "id": "festival:dance",
+     "label": "Dance two laps · earn Festival Spirit",
+     "cost": 0
+    }
+   ],
+   "buys": false,
+   "festivalArt": "christmasGrandTree"
+  },
+  {
+   "id": "festival_dance_easter_0",
+   "name": "Easter Egg",
+   "role": "Festival dance",
+   "art": "scenery",
+   "x": 32,
+   "y": 83,
+   "r": 0,
+   "season": "easter",
+   "dialogue": "Dance two full laps around this centerpiece to receive Festival Spirit: +10% attack and +50% experience for two hours. Move or fight to cancel. The timer continues offline; another completed dance refreshes it.",
+   "offers": [
+    {
+     "id": "festival:dance",
+     "label": "Dance two laps · earn Festival Spirit",
+     "cost": 0
+    }
+   ],
+   "buys": false,
+   "festivalArt": "easterGrandEgg"
+  },
+  {
+   "id": "festival_dance_solstice_0",
+   "name": "Midsummer Pole",
+   "role": "Festival dance",
+   "art": "scenery",
+   "x": 32,
+   "y": 83,
+   "r": 0,
+   "season": "solstice",
+   "dialogue": "Dance two full laps around this centerpiece to receive Festival Spirit: +10% attack and +50% experience for two hours. Move or fight to cancel. The timer continues offline; another completed dance refreshes it.",
+   "offers": [
+    {
+     "id": "festival:dance",
+     "label": "Dance two laps · earn Festival Spirit",
+     "cost": 0
+    }
+   ],
+   "buys": false,
+   "festivalArt": "solsticePole"
+  },
+  {
+   "id": "festival_dance_valentine_0",
+   "name": "Valentine Heart",
+   "role": "Festival dance",
+   "art": "scenery",
+   "x": 32,
+   "y": 83,
+   "r": 0,
+   "season": "valentine",
+   "dialogue": "Dance two full laps around this centerpiece to receive Festival Spirit: +10% attack and +50% experience for two hours. Move or fight to cancel. The timer continues offline; another completed dance refreshes it.",
+   "offers": [
+    {
+     "id": "festival:dance",
+     "label": "Dance two laps · earn Festival Spirit",
+     "cost": 0
+    }
+   ],
+   "buys": false,
+   "festivalArt": "valentineGrandHeart"
+  },
+  {
+   "id": "festival_dance_newyear_0",
+   "name": "New Year Rocket",
+   "role": "Festival dance",
+   "art": "scenery",
+   "x": 32,
+   "y": 83,
+   "r": 0,
+   "season": "newyear",
+   "dialogue": "Dance two full laps around this centerpiece to receive Festival Spirit: +10% attack and +50% experience for two hours. Move or fight to cancel. The timer continues offline; another completed dance refreshes it.",
+   "offers": [
+    {
+     "id": "festival:dance",
+     "label": "Dance two laps · earn Festival Spirit",
+     "cost": 0
+    }
+   ],
+   "buys": false,
+   "festivalArt": "newyearLaunchpad"
+  },
+  {
+   "id": "mailbox_0_alderhaven",
+   "name": "Mailbox",
+   "role": "Player mail",
+   "x": 38.17,
+   "y": 87.99,
+   "color": "#cda75e",
+   "art": "mailbox",
+   "buys": false,
+   "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+   "offers": [
+    {
+     "id": "mail",
+     "label": "Open mailbox",
+     "cost": 0
+    }
+   ]
+  }
+ ],
+ "quests": [
+  {
+   "id": "welcome",
+   "title": "A Home in Alderhaven",
+   "npc": "guide",
+   "description": "Wren wants you to meet the people who keep adventurers on their feet. Speak to Sister Elara, Bram, and Tessa, then return to the fountain.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "healer",
+     "label": "Speak to Sister Elara",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "smith",
+     "label": "Speak to Bram",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "innkeeper",
+     "label": "Speak to Tessa",
+     "count": 1
+    }
+   ],
+   "level": 1,
+   "rewardXp": 10,
+   "rewardGold": 12,
+   "requires": null,
+   "repeatable": false
+  },
+  {
+   "id": "slime_patrol",
+   "title": "Trouble at the Gate",
+   "npc": "gatekeeper",
+   "description": "Slimes are spilling onto the meadow paths. Defeat six ordinary slimes of any color, then report to Captain Rowan at the north gate.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "slime",
+     "label": "Defeat ordinary slimes",
+     "count": 6
+    }
+   ],
+   "level": 2,
+   "rewardXp": 20,
+   "rewardGold": 24,
+   "requires": null,
+   "repeatable": false,
+   "rewardItem": "necklace_moonstone_l1_green"
+  },
+  {
+   "id": "ironhide_hunt",
+   "title": "Shells of Steel",
+   "npc": "smith",
+   "description": "Ironhide Beetles are making the outer meadow dangerous. Defeat two of these charging beasts and report back to Bram.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "beetle",
+     "label": "Defeat Ironhide Beetles",
+     "count": 2
+    }
+   ],
+   "level": 4,
+   "rewardXp": 60,
+   "rewardGold": 35,
+   "requires": "slime_patrol",
+   "repeatable": false,
+   "rewardItem": "pants_upgrade"
+  },
+  {
+   "id": "king_challenge",
+   "title": "A Crown for the Meadow",
+   "npc": "gatekeeper",
+   "description": "A King Slime sometimes emerges in Greenmeadow. Watch for the world announcement, land the finishing blow, and bring Rowan news of its defeat.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "big",
+     "label": "Defeat a King Slime",
+     "count": 1
+    }
+   ],
+   "level": 5,
+   "rewardXp": 80,
+   "rewardGold": 60,
+   "requires": "ironhide_hunt",
+   "repeatable": false,
+   "rewardItem": "accessory_amber_l5_blue"
+  },
+  {
+   "id": "meadow_bounty",
+   "title": "Keep the Paths Clear",
+   "npc": "merchant",
+   "description": "Linden pays reliable adventurers to keep trade routes open. Defeat eight meadow enemies of any kind and return to the market. This bounty can be taken again.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "any",
+     "label": "Defeat meadow enemies",
+     "count": 8
+    }
+   ],
+   "level": 3,
+   "rewardXp": 40,
+   "rewardGold": 25,
+   "requires": "slime_patrol",
+   "repeatable": true
+  },
+  {
+   "id": "arena_alder_20",
+   "title": "Arena Trial: Initiate",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L20",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 20,
+   "rewardXp": 650,
+   "rewardGold": 1200,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l20_blue",
+     "cloak_l20_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l20_blue",
+     "cloak_l20_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l20_blue",
+     "cloak_l20_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l20_blue",
+     "cloak_l20_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l20_blue",
+     "cloak_l20_rare"
+    ]
+   },
+   "minLevel": 20
+  },
+  {
+   "id": "arena_alder_30",
+   "title": "Arena Trial: Challenger",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L30",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 30,
+   "rewardXp": 1320,
+   "rewardGold": 1200,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l30_blue",
+     "cloak_l30_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l30_blue",
+     "cloak_l30_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l30_blue",
+     "cloak_l30_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l30_blue",
+     "cloak_l30_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l30_blue",
+     "cloak_l30_rare"
+    ]
+   },
+   "minLevel": 30
+  },
+  {
+   "id": "arena_alder_40",
+   "title": "Arena Trial: Contender",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L40",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 40,
+   "rewardXp": 2210,
+   "rewardGold": 2400,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l40_blue",
+     "cloak_l40_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l40_blue",
+     "cloak_l40_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l40_blue",
+     "cloak_l40_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l40_blue",
+     "cloak_l40_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l40_blue",
+     "cloak_l40_rare"
+    ]
+   },
+   "minLevel": 40
+  },
+  {
+   "id": "arena_alder_50",
+   "title": "Arena Trial: Gladiator",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L50",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 50,
+   "rewardXp": 3330,
+   "rewardGold": 2500,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l50_blue",
+     "cloak_l50_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l50_blue",
+     "cloak_l50_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l50_blue",
+     "cloak_l50_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l50_blue",
+     "cloak_l50_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l50_blue",
+     "cloak_l50_rare"
+    ]
+   },
+   "minLevel": 50
+  },
+  {
+   "id": "arena_alder_60",
+   "title": "Arena Trial: Veteran",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L60",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 60,
+   "rewardXp": 4670,
+   "rewardGold": 5000,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l60_blue",
+     "cloak_l60_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l60_blue",
+     "cloak_l60_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l60_blue",
+     "cloak_l60_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l60_blue",
+     "cloak_l60_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l60_blue",
+     "cloak_l60_rare"
+    ]
+   },
+   "minLevel": 60
+  },
+  {
+   "id": "arena_alder_70",
+   "title": "Arena Trial: Champion",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L70",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 70,
+   "rewardXp": 6240,
+   "rewardGold": 9000,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l70_blue",
+     "cloak_l70_rare"
+    ]
+   },
+   "minLevel": 70
+  },
+  {
+   "id": "arena_alder_80",
+   "title": "Arena Trial: Warlord",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L80",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 15000,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l80_blue",
+     "cloak_l80_rare"
+    ]
+   },
+   "minLevel": 80
+  },
+  {
+   "id": "arena_alder_90",
+   "title": "Arena Trial: Legend",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L90",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 90,
+   "rewardXp": 10050,
+   "rewardGold": 18000,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l90_blue",
+     "cloak_l90_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l90_blue",
+     "cloak_l90_rare"
+    ]
+   },
+   "minLevel": 90
+  },
+  {
+   "id": "arena_alder_99",
+   "title": "Arena Trial: Immortal",
+   "npc": "guide",
+   "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+   "objectives": [
+    {
+     "kind": "gauntlet",
+     "target": "L99",
+     "label": "Win five Arena fights",
+     "count": 5
+    }
+   ],
+   "level": 99,
+   "rewardXp": 12060,
+   "rewardGold": 30000,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_sword_l95_blue",
+     "cloak_l95_rare"
+    ],
+    "mage": [
+     "mage_weapon_ash_l95_blue",
+     "cloak_l95_rare"
+    ],
+    "assassin": [
+     "assassin_weapon_daggers_l95_blue",
+     "cloak_l95_rare"
+    ],
+    "priest": [
+     "priest_weapon_mace_l95_blue",
+     "cloak_l95_rare"
+    ],
+    "hunter": [
+     "hunter_weapon_shortbow_l95_blue",
+     "cloak_l95_rare"
+    ]
+   },
+   "minLevel": 99
+  },
+  {
+   "id": "es_01",
+   "title": "Ash in the Bread",
+   "npc": "smith",
+   "description": "Bram found warm ash inside a loaf baked in a cold oven. Follow the ember print north of Alderhaven. Stand still in its circle and listen. Something beneath the meadow is remembering a name.",
+   "objectives": [
+    {
+     "kind": "memory",
+     "target": "es_01_m",
+     "label": "Ash in the Bread",
+     "count": 1
+    }
+   ],
+   "level": 2,
+   "minLevel": 2,
+   "rewardXp": 20,
+   "rewardGold": 24,
+   "requires": null,
+   "repeatable": false,
+   "story": {
+    "title": "The Empty Seat",
+    "chapter": 1,
+    "recap": [
+     "A giant hand cups a tiny flame against a blizzard. A voice says: Not the children. Take my winter instead. The ash spells ELDMARR, then cools."
+    ],
+    "next": "Next chapter: The Cinder That Followed You. Speak to Scout Kael in Emberfall Crags at level 7."
+   },
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_royal",
+     "warrior_armor_azure"
+    ],
+    "mage": [
+     "mage_weapon_crystal",
+     "mage_armor_runic"
+    ],
+    "assassin": [
+     "assassin_weapon_moonfang",
+     "assassin_armor_moon"
+    ],
+    "priest": [
+     "priest_weapon_sunmace",
+     "priest_armor_dawn"
+    ],
+    "hunter": [
+     "hunter_weapon_wardenbow",
+     "hunter_armor_warden"
+    ]
+   }
+  },
+  {
+   "id": "es_go_01",
+   "title": "Seek Bram Emberforge",
+   "npc": "smith",
+   "description": "Speak to Bram Emberforge in Greenmeadow at level 2 to begin The Empty Seat: Ash in the Bread. This direction stays in your journal until you accept that chapter.",
+   "objectives": [
+    {
+     "kind": "handoff",
+     "target": "smith",
+     "count": 1,
+     "label": "Speak to Bram Emberforge at level 2"
+    }
+   ],
+   "level": 2,
+   "minLevel": 1,
+   "rewardXp": 0,
+   "rewardGold": 0,
+   "requires": null,
+   "autoLevel": 1,
+   "landing": true,
+   "repeatable": false,
+   "handoffTo": "es_01"
+  },
+  {
+   "id": "es_28",
+   "title": "Leave One Chair Empty",
+   "npc": "smith",
+   "description": "Return to Bram Emberforge in Alderhaven. Tell him the true name of the one who warmed the first hearth. Then listen at the meadow memorial. The world needs a story that remembers both his gift and his last terrible choice.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "smith",
+     "label": "Tell Bram the keeper's true name",
+     "count": 1
+    },
+    {
+     "kind": "memory",
+     "target": "es_28_m",
+     "label": "Leave One Chair Empty",
+     "count": 1
+    }
+   ],
+   "level": 99,
+   "minLevel": 99,
+   "rewardXp": 12060,
+   "rewardGold": 1188,
+   "requires": "es_27",
+   "repeatable": false,
+   "story": {
+    "title": "The Empty Seat",
+    "chapter": 28,
+    "recap": [
+     "Bram leaves one chair empty beside the village hearth. No crown. No chains. Just a name: Eldmarr, who kept the first fire. Outside, the children plant a tree. The ground is warm enough for spring."
+    ],
+    "next": ""
+   },
+   "rewardChoices": {
+    "warrior": [
+     "warrior_headgear_azure_l95_green",
+     "warrior_shoulders_azure_l95_green"
+    ],
+    "mage": [
+     "mage_headgear_runic_l95_green",
+     "mage_shoulders_runic_l95_green"
+    ],
+    "assassin": [
+     "assassin_headgear_moon_l95_green",
+     "assassin_shoulders_moon_l95_green"
+    ],
+    "priest": [
+     "priest_headgear_dawn_l95_green",
+     "priest_shoulders_dawn_l95_green"
+    ],
+    "hunter": [
+     "hunter_headgear_warden_l95_green",
+     "hunter_shoulders_warden_l95_green"
+    ]
+   }
+  },
+  {
+   "id": "es_go_28",
+   "title": "Seek Bram Emberforge",
+   "npc": "smith",
+   "description": "Speak to Bram Emberforge in Greenmeadow at level 99 to continue The Empty Seat: Leave One Chair Empty. This direction stays in your journal until you accept that chapter.",
+   "objectives": [
+    {
+     "kind": "handoff",
+     "target": "smith",
+     "count": 1,
+     "label": "Speak to Bram Emberforge at level 99"
+    }
+   ],
+   "level": 99,
+   "minLevel": 1,
+   "rewardXp": 0,
+   "rewardGold": 0,
+   "requires": "es_27",
+   "autoLevel": 1,
+   "repeatable": false,
+   "handoffTo": "es_28"
+  },
+  {
+   "id": "halloween_alder",
+   "title": "A Light for Every Door",
+   "npc": "baker",
+   "description": "Pip wants every doorstep to glow for Halloween. Ask Linden for ribbons, Mira for lantern oil, and Tessa for warm cider, then bring Pip their good wishes.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "merchant",
+     "label": "Ask Linden for ribbons",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "apothecary",
+     "label": "Ask Mira about lantern oil",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "innkeeper",
+     "label": "Arrange warm cider with Tessa",
+     "count": 1
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 75,
+   "requires": null,
+   "repeatable": true,
+   "season": "halloween"
+  },
+  {
+   "id": "halloween_hunt",
+   "title": "The Hollow Rider",
+   "npc": "baker",
+   "givers": [
+    "baker",
+    "city_bard",
+    "nacre_gardener",
+    "asterion_singer",
+    "hw_baker"
+   ],
+   "description": "Gather five fighters and light the haunted lantern in Gloamfen. Defeat the Hollow Rider, then return to any city festival host. The Rider matches the average party level, rounded up. Each eligible hero has one independent 1% Nightmare Steed roll per day. Hired fighters can help.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "hollow_rider",
+     "count": 1,
+     "label": "Defeat the summoned Hollow Rider"
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 250,
+   "requires": null,
+   "repeatable": true,
+   "group": true,
+   "recommendedPlayers": 5,
+   "season": "halloween",
+   "seasonCadence": "daily",
+   "summonNpc": "halloween_lantern",
+   "summonZone": 3
+  },
+  {
+   "id": "christmas_alder",
+   "title": "A Gift for Every Hearth",
+   "npc": "baker",
+   "description": "Pip wants every home to have a little Christmas joy. Ask Linden for gift boxes, Mira for bright ribbons, and Tessa for hot chocolate, then bring their good wishes back to Pip.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "merchant",
+     "label": "Arrange gift boxes with Linden",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "apothecary",
+     "label": "Ask Mira for Christmas ribbons",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "innkeeper",
+     "label": "Arrange hot chocolate with Tessa",
+     "count": 1
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 100,
+   "requires": null,
+   "repeatable": true,
+   "season": "christmas"
+  },
+  {
+   "id": "christmas_hunt",
+   "title": "The Grinch",
+   "npc": "baker",
+   "givers": [
+    "baker",
+    "city_bard",
+    "nacre_gardener",
+    "asterion_singer",
+    "hw_baker"
+   ],
+   "description": "Gather five fighters at the great Christmas tree in Rimeveil Glacier. Press the tree to summon the Grinch and recover the stolen presents. He matches the highest level in your party. Hired fighters can help. Each eligible hero has one independent 5% Red-nosed Reindeer roll per day. Return to any city festival host.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "grinch",
+     "count": 1,
+     "label": "Defeat the summoned Grinch"
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 300,
+   "requires": null,
+   "repeatable": true,
+   "group": true,
+   "recommendedPlayers": 5,
+   "season": "christmas",
+   "seasonCadence": "daily",
+   "summonNpc": "christmas_tree",
+   "summonZone": 2
+  },
+  {
+   "id": "easter_alder",
+   "title": "An Egg for Every Hearth",
+   "npc": "baker",
+   "description": "Pip wants to share painted Easter eggs with every home. Ask Linden for egg baskets, Mira for pastel dyes and Tessa for spring buns, then bring their good wishes back to Pip.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "merchant",
+     "label": "Arrange egg baskets with Linden",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "apothecary",
+     "label": "Ask Mira for pastel egg dyes",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "innkeeper",
+     "label": "Arrange spring buns with Tessa",
+     "count": 1
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 100,
+   "requires": null,
+   "repeatable": true,
+   "season": "easter"
+  },
+  {
+   "id": "easter_hunt",
+   "title": "The Bloomwarden",
+   "npc": "baker",
+   "givers": [
+    "baker",
+    "city_bard",
+    "nacre_gardener",
+    "asterion_singer",
+    "hw_baker"
+   ],
+   "description": "Gather five fighters at the Springtide Egg Basket in Rimeveil Glacier. Press the shrine to summon the Bloomwarden, a moss-and-blossom guardian protecting the painted eggs. It matches the highest party level. Hired fighters can help. Each eligible hero has one independent 5% Springtide Bunny roll per Stockholm day. Return to any city festival host.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "bloomwarden",
+     "count": 1,
+     "label": "Defeat the summoned Bloomwarden"
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 300,
+   "requires": null,
+   "repeatable": true,
+   "group": true,
+   "recommendedPlayers": 5,
+   "season": "easter",
+   "seasonCadence": "daily",
+   "summonNpc": "easter_shrine",
+   "summonZone": 2
+  },
+  {
+   "id": "solstice_alder",
+   "title": "Flowers for Every Door",
+   "npc": "baker",
+   "description": "Pip is weaving flower crowns for Summer Solstice. Ask Linden for blue and yellow ribbons, Mira for wildflowers and Tessa for strawberry cakes, then return to Pip.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "merchant",
+     "label": "Ask Linden for blue and yellow ribbons",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "apothecary",
+     "label": "Gather wildflowers with Mira",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "innkeeper",
+     "label": "Arrange strawberry cakes with Tessa",
+     "count": 1
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 100,
+   "requires": null,
+   "repeatable": true,
+   "season": "solstice"
+  },
+  {
+   "id": "solstice_hunt",
+   "title": "The Birchcrown Guardian",
+   "npc": "baker",
+   "givers": [
+    "baker",
+    "city_bard",
+    "nacre_gardener",
+    "asterion_singer",
+    "hw_baker"
+   ],
+   "description": "Gather five fighters at the Sunwoven Midsummer Pole in Rimeveil Glacier. Press the pole to summon the Birchcrown Guardian, a birch-bark guardian crowned with wildflowers and sunlight. It matches the highest party level. Hired fighters can help. Each eligible hero has one independent 5% Sunwoven Stag roll per Stockholm day. Return to any city festival host.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "birchcrown",
+     "count": 1,
+     "label": "Defeat the summoned Birchcrown Guardian"
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 300,
+   "requires": null,
+   "repeatable": true,
+   "group": true,
+   "recommendedPlayers": 5,
+   "season": "solstice",
+   "seasonCadence": "daily",
+   "summonNpc": "solstice_pole",
+   "summonZone": 2
+  },
+  {
+   "id": "valentine_alder",
+   "title": "A Heart at Every Hearth",
+   "npc": "baker",
+   "description": "Pip wants nobody to feel forgotten on Valentine's Day. Ask Linden for letter paper, Mira for rose ribbons, and Tessa for heart biscuits, then bring their kind wishes back to Pip.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "merchant",
+     "label": "Ask Linden for letter paper",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "apothecary",
+     "label": "Ask Mira for rose ribbons",
+     "count": 1
+    },
+    {
+     "kind": "talk",
+     "target": "innkeeper",
+     "label": "Arrange heart biscuits with Tessa",
+     "count": 1
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 100,
+   "requires": null,
+   "repeatable": true,
+   "season": "valentine"
+  },
+  {
+   "id": "valentine_hunt",
+   "title": "The Briarheart",
+   "npc": "baker",
+   "givers": [
+    "baker",
+    "city_bard",
+    "nacre_gardener",
+    "asterion_singer",
+    "hw_baker"
+   ],
+   "description": "Gather five fighters at the Roseheart Shrine in Rimeveil Glacier. Press the shrine to summon the Briarheart, a thorn guardian holding the festival roses. It matches the highest party level. Hired fighters can help. Claim this daily quest at any city festival host to earn the Roseheart Unicorn, guaranteed. One claim per Stockholm day.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "briarheart",
+     "count": 1,
+     "label": "Defeat the summoned Briarheart"
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 300,
+   "rewardMount": "roseheart",
+   "requires": null,
+   "repeatable": true,
+   "group": true,
+   "recommendedPlayers": 5,
+   "season": "valentine",
+   "seasonCadence": "daily",
+   "summonNpc": "valentine_shrine",
+   "summonZone": 2
+  },
+  {
+   "id": "newyear_hunt",
+   "title": "The Starfire Rocketeer",
+   "npc": "baker",
+   "givers": [
+    "baker",
+    "city_bard",
+    "nacre_gardener",
+    "asterion_singer",
+    "hw_baker"
+   ],
+   "description": "Gather five fighters at the Festival Launchpad in Rimeveil Glacier. Press it to summon the Starfire Rocketeer at the highest level in your party. Hired fighters can help. Each eligible hero has one independent 5% Starflight Rocket roll per Stockholm day. Return to any city festival host to claim the quest and the Ring in the New Year achievement.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "starrocketeer",
+     "count": 1,
+     "label": "Defeat the summoned Starfire Rocketeer"
+    }
+   ],
+   "level": 1,
+   "minLevel": 1,
+   "rewardXp": 10,
+   "rewardGold": 300,
+   "requires": null,
+   "repeatable": true,
+   "group": true,
+   "recommendedPlayers": 5,
+   "season": "newyear",
+   "seasonCadence": "daily",
+   "summonNpc": "newyear_launchpad",
+   "summonZone": 2
+  }
+ ],
+ "name": "Greenmeadow",
+ "portals": [
+  {
+   "id": "emberfall_gate",
+   "name": "Emberfall Crags",
+   "x": 50.5,
+   "y": 5.5,
+   "r": 1.1,
+   "to": 1,
+   "tx": 35.5,
+   "ty": 84.5,
+   "walk": [
+    0,
+    -1
+   ]
+  },
+  {
+   "id": "atlas_0_3",
+   "name": "Gloamfen",
+   "r": 1.2,
+   "to": 3,
+   "x": 5.5,
+   "y": 47.5,
+   "tx": 116.5,
+   "ty": 92.5,
+   "walk": [
+    -1,
+    0
+   ]
+  },
+  {
+   "id": "path_0_4",
+   "name": "Skaldholm",
+   "r": 2.0,
+   "to": 4,
+   "x": 22.5,
+   "y": 5.5,
+   "tx": 80.0,
+   "ty": 148.5,
+   "walk": [
+    0,
+    -1
+   ]
+  },
+  {
+   "id": "path_0_16",
+   "name": "The Moonspore Canopy",
+   "r": 2.0,
+   "to": 16,
+   "x": 90.5,
+   "y": 76.5,
+   "tx": 11.5,
+   "ty": 74.5,
+   "walk": [
+    1,
+    0
+   ]
+  }
+ ],
+ "paths": [
+  [
+   [
+    36,
+    79
+   ],
+   [
+    36,
+    71
+   ],
+   [
+    36,
+    62
+   ],
+   [
+    33,
+    52
+   ],
+   [
+    38,
+    44
+   ],
+   [
+    36,
+    36
+   ],
+   [
+    42,
+    28
+   ],
+   [
+    50,
+    22
+   ],
+   [
+    54,
+    12
+   ]
+  ],
+  [
+   [
+    36,
+    36
+   ],
+   [
+    26,
+    32
+   ],
+   [
+    16,
+    26
+   ],
+   [
+    10,
+    16
+   ]
+  ],
+  [
+   [
+    33,
+    52
+   ],
+   [
+    21,
+    57
+   ],
+   [
+    11,
+    68
+   ],
+   [
+    8,
+    84
+   ]
+  ],
+  [
+   [
+    38,
+    44
+   ],
+   [
+    55,
+    42
+   ],
+   [
+    66,
+    43
+   ],
+   [
+    75,
+    39
+   ],
+   [
+    84,
+    34
+   ],
+   [
+    90,
+    20
+   ]
+  ],
+  [
+   [
+    50,
+    22
+   ],
+   [
+    64,
+    17
+   ],
+   [
+    78,
+    13
+   ],
+   [
+    89,
+    10
+   ]
+  ],
+  [
+   [
+    38,
+    52
+   ],
+   [
+    54,
+    60
+   ],
+   [
+    69,
+    66
+   ],
+   [
+    79,
+    72
+   ],
+   [
+    87,
+    81
+   ]
+  ],
+  [
+   [
+    36,
+    69
+   ],
+   [
+    52,
+    68
+   ],
+   [
+    67,
+    69
+   ],
+   [
+    79,
+    72
+   ]
+  ],
+  [
+   [
+    50.5,
+    5.5
+   ],
+   [
+    50.5,
+    12.5
+   ],
+   [
+    48.5,
+    12.5
+   ],
+   [
+    48.5,
+    13.5
+   ],
+   [
+    45.5,
+    13.5
+   ],
+   [
+    45.5,
+    31.5
+   ],
+   [
+    44.5,
+    31.5
+   ],
+   [
+    44.5,
+    37.5
+   ],
+   [
+    41.5,
+    37.5
+   ],
+   [
+    41.5,
+    40.5
+   ],
+   [
+    40.5,
+    40.5
+   ],
+   [
+    40.5,
+    41.5
+   ],
+   [
+    39.5,
+    41.5
+   ],
+   [
+    39.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ],
+  [
+   [
+    5.5,
+    47.5
+   ],
+   [
+    5.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ],
+  [
+   [
+    22.5,
+    5.5
+   ],
+   [
+    22.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ],
+  [
+   [
+    90.5,
+    76.5
+   ],
+   [
+    90.5,
+    72.5
+   ],
+   [
+    89.5,
+    72.5
+   ],
+   [
+    89.5,
+    69.5
+   ],
+   [
+    88.5,
+    69.5
+   ],
+   [
+    88.5,
+    63.5
+   ],
+   [
+    79.5,
+    63.5
+   ],
+   [
+    79.5,
+    62.5
+   ],
+   [
+    71.5,
+    62.5
+   ],
+   [
+    71.5,
+    61.5
+   ],
+   [
+    70.5,
+    61.5
+   ],
+   [
+    70.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ]
+ ],
+ "crosses": [
+  {
+   "id": "raid_cross_0",
+   "x": 38,
+   "y": 47,
+   "zone": 0,
+   "name": "Ember Grave Cross",
+   "shard": "ember_shard_0",
+   "bossName": "Ashwarden of Greenmeadow",
+   "color": "#d48b4b"
+  }
+ ],
+ "places": [
+  {
+   "id": "es_01_m",
+   "name": "Ash in the Bread",
+   "x": 40,
+   "y": 53,
+   "r": 2.1
+  },
+  {
+   "id": "es_28_m",
+   "name": "Leave One Chair Empty",
+   "x": 38,
+   "y": 62,
+   "r": 2.1
+  }
+ ],
+ "exitRoutes": [
+  {
+   "portal": "emberfall_gate",
+   "points": [
+    [
+     50.5,
+     5.5
+    ],
+    [
+     50.5,
+     12.5
+    ],
+    [
+     48.5,
+     12.5
+    ],
+    [
+     48.5,
+     13.5
+    ],
+    [
+     45.5,
+     13.5
+    ],
+    [
+     45.5,
+     18.5
+    ]
+   ]
+  },
+  {
+   "portal": "atlas_0_3",
+   "points": [
+    [
+     5.5,
+     47.5
+    ],
+    [
+     5.5,
+     60.5
+    ],
+    [
+     10.5,
+     60.5
+    ]
+   ]
+  },
+  {
+   "portal": "path_0_4",
+   "points": [
+    [
+     22.5,
+     5.5
+    ],
+    [
+     22.5,
+     23.5
+    ]
+   ]
+  },
+  {
+   "portal": "path_0_16",
+   "points": [
+    [
+     90.5,
+     76.5
+    ],
+    [
+     90.5,
+     72.5
+    ],
+    [
+     89.5,
+     72.5
+    ],
+    [
+     89.5,
+     69.5
+    ],
+    [
+     88.5,
+     69.5
+    ],
+    [
+     88.5,
+     63.5
+    ],
+    [
+     85.5,
+     63.5
+    ]
+   ]
+  }
+ ],
+ "roads": [],
+ "cityEntrances": [
+  {
+   "id": "alderhaven_north",
+   "points": [
+    [
+     36.0,
+     65.0
+    ],
+    [
+     36.0,
+     78.0
+    ]
+   ],
+   "axis": "y",
+   "street": 36.0,
+   "width": 3.2,
+   "opening": {
+    "x": 36.0,
+    "y": 72.0,
+    "vertical": false,
+    "halfWidth": 2.0
+   }
+  },
+  {
+   "id": "alderhaven_south",
+   "points": [
+    [
+     36.0,
+     95.0
+    ],
+    [
+     36.0,
+     89.0
+    ]
+   ],
+   "axis": "y",
+   "street": 36.0,
+   "width": 3.2,
+   "opening": {
+    "x": 36.0,
+    "y": 94.0,
+    "vertical": false,
+    "halfWidth": 2.0
+   }
+  }
+ ],
+ "atlasPaths": [
+  [
+   [
+    50.5,
+    5.5
+   ],
+   [
+    50.5,
+    12.5
+   ],
+   [
+    48.5,
+    12.5
+   ],
+   [
+    48.5,
+    13.5
+   ],
+   [
+    45.5,
+    13.5
+   ],
+   [
+    45.5,
+    31.5
+   ],
+   [
+    44.5,
+    31.5
+   ],
+   [
+    44.5,
+    37.5
+   ],
+   [
+    41.5,
+    37.5
+   ],
+   [
+    41.5,
+    40.5
+   ],
+   [
+    40.5,
+    40.5
+   ],
+   [
+    40.5,
+    41.5
+   ],
+   [
+    39.5,
+    41.5
+   ],
+   [
+    39.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ],
+  [
+   [
+    5.5,
+    47.5
+   ],
+   [
+    5.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ],
+  [
+   [
+    22.5,
+    5.5
+   ],
+   [
+    22.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ],
+  [
+   [
+    90.5,
+    76.5
+   ],
+   [
+    90.5,
+    72.5
+   ],
+   [
+    89.5,
+    72.5
+   ],
+   [
+    89.5,
+    69.5
+   ],
+   [
+    88.5,
+    69.5
+   ],
+   [
+    88.5,
+    63.5
+   ],
+   [
+    79.5,
+    63.5
+   ],
+   [
+    79.5,
+    62.5
+   ],
+   [
+    71.5,
+    62.5
+   ],
+   [
+    71.5,
+    61.5
+   ],
+   [
+    70.5,
+    61.5
+   ],
+   [
+    70.5,
+    60.5
+   ],
+   [
+    36.5,
+    60.5
+   ]
+  ]
+ ],
+ "seasonDecor": [
+  {
+   "kind": "festivalWeb",
+   "x": 29,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 26.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalWeb",
+   "x": 43,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 40.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalCandles",
+   "x": 45.65,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalWreath",
+   "x": 29,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalCandles",
+   "x": 31.65,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalWreath",
+   "x": 43,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 40.35,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalWreath",
+   "x": 28,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalWeb",
+   "x": 44,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalWreath",
+   "x": 33,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalWeb",
+   "x": 39,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 31.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 37.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalCandles",
+   "x": 40.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 25.5,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalLantern",
+   "x": 28.8,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 33.3,
+   "y": 76.8,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalLantern",
+   "x": 36.6,
+   "y": 76.8,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalScarecrow",
+   "x": 35.4,
+   "y": 80.1,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalPumpkins",
+   "x": 46.5,
+   "y": 83.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  },
+  {
+   "kind": "festivalLantern",
+   "x": 46.5,
+   "y": 90.0,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d48b45"
+  }
+ ],
+ "christmasDecor": [
+  {
+   "kind": "christmasGarland",
+   "x": 29,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 26.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGarland",
+   "x": 43,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 40.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasCandles",
+   "x": 45.65,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasWreath",
+   "x": 29,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasCandles",
+   "x": 31.65,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasWreath",
+   "x": 43,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 40.35,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasWreath",
+   "x": 28,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGarland",
+   "x": 44,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasWreath",
+   "x": 33,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGarland",
+   "x": 39,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 31.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 37.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasCandles",
+   "x": 40.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 25.5,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasLantern",
+   "x": 28.8,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 33.3,
+   "y": 76.8,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasTree",
+   "x": 35.4,
+   "y": 80.1,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasGifts",
+   "x": 46.5,
+   "y": 83.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "christmasLantern",
+   "x": 46.5,
+   "y": 90.0,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  }
+ ],
+ "easterDecor": [
+  {
+   "kind": "easterGarland",
+   "x": 29,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 26.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterGarland",
+   "x": 43,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 40.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterCandles",
+   "x": 45.65,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterWreath",
+   "x": 29,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterCandles",
+   "x": 31.65,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterWreath",
+   "x": 43,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 40.35,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterWreath",
+   "x": 28,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterGarland",
+   "x": 44,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterWreath",
+   "x": 33,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterGarland",
+   "x": 39,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 31.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 37.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterCandles",
+   "x": 40.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 25.5,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterLantern",
+   "x": 28.8,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 33.3,
+   "y": 76.8,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterEgg",
+   "x": 35.4,
+   "y": 80.1,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterFlowers",
+   "x": 46.5,
+   "y": 83.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "easterLantern",
+   "x": 46.5,
+   "y": 90.0,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  }
+ ],
+ "solsticeDecor": [
+  {
+   "kind": "solsticeGarland",
+   "x": 29,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 26.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeGarland",
+   "x": 43,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 40.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 45.65,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeWreath",
+   "x": 29,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 31.65,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeWreath",
+   "x": 43,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 40.35,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeWreath",
+   "x": 28,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeGarland",
+   "x": 44,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeWreath",
+   "x": 33,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeGarland",
+   "x": 39,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 31.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 37.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 40.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 25.5,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeLantern",
+   "x": 28.8,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeTable",
+   "x": 33.3,
+   "y": 76.8,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeBirch",
+   "x": 35.4,
+   "y": 80.1,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeFlowers",
+   "x": 46.5,
+   "y": 83.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "solsticeLantern",
+   "x": 46.5,
+   "y": 90.0,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  }
+ ],
+ "valentineDecor": [
+  {
+   "kind": "valentineGarland",
+   "x": 29,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 26.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineGarland",
+   "x": 43,
+   "y": 77.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 40.35,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineCandles",
+   "x": 45.65,
+   "y": 78.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineWreath",
+   "x": 29,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineCandles",
+   "x": 31.65,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineWreath",
+   "x": 43,
+   "y": 89.8,
+   "z": 76,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 40.35,
+   "y": 90.4,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineWreath",
+   "x": 28,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineGarland",
+   "x": 44,
+   "y": 83.8,
+   "z": 52,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineWreath",
+   "x": 33,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineGarland",
+   "x": 39,
+   "y": 86.42,
+   "z": 76,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 31.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 37.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineCandles",
+   "x": 40.5,
+   "y": 73.35,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 25.5,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineLantern",
+   "x": 28.8,
+   "y": 73.5,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 33.3,
+   "y": 76.8,
+   "z": 0,
+   "r": 0,
+   "v": 0,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineHeart",
+   "x": 35.4,
+   "y": 80.1,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineRoses",
+   "x": 46.5,
+   "y": 83.4,
+   "z": 0,
+   "r": 0,
+   "v": 1,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  },
+  {
+   "kind": "valentineLantern",
+   "x": 46.5,
+   "y": 90.0,
+   "z": 0,
+   "r": 0,
+   "v": 2,
+   "hub": "Alderhaven",
+   "color": "#d74848"
+  }
+ ]
+}

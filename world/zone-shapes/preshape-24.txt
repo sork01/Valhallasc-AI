@@ -1,0 +1,1085 @@
+{
+ "name": "Veyrroot Heartwood",
+ "theme": "heartwood",
+ "tagline": "The inhabited hollow of the world-tree: amber libraries, living rooms and an open seed vault",
+ "size": 96,
+ "levels": [
+  80,
+  80
+ ],
+ "spawn": {
+  "x": 48,
+  "y": 80
+ },
+ "paths": [
+  [
+   [
+    48,
+    87
+   ],
+   [
+    48,
+    75
+   ],
+   [
+    48,
+    63
+   ],
+   [
+    35,
+    57
+   ],
+   [
+    24,
+    43
+   ],
+   [
+    34,
+    28
+   ],
+   [
+    48,
+    22
+   ]
+  ],
+  [
+   [
+    48,
+    63
+   ],
+   [
+    63,
+    57
+   ],
+   [
+    73,
+    42
+   ],
+   [
+    62,
+    27
+   ],
+   [
+    48,
+    22
+   ]
+  ],
+  [
+   [
+    24,
+    43
+   ],
+   [
+    38,
+    43
+   ],
+   [
+    48,
+    48
+   ],
+   [
+    60,
+    43
+   ],
+   [
+    73,
+    42
+   ]
+  ],
+  [
+   [
+    35,
+    57
+   ],
+   [
+    30,
+    70
+   ],
+   [
+    48,
+    75
+   ],
+   [
+    67,
+    69
+   ],
+   [
+    63,
+    57
+   ]
+  ],
+  [
+   [
+    34,
+    28
+   ],
+   [
+    48,
+    34
+   ],
+   [
+    62,
+    27
+   ]
+  ]
+ ],
+ "objects": [
+  {
+   "kind": "heartwood_vault",
+   "x": 48,
+   "y": 14,
+   "r": 0,
+   "v": 0,
+   "place": "heart_seed_door",
+   "open": true
+  },
+  {
+   "kind": "heartwood_core",
+   "x": 48,
+   "y": 48,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "hollow_lift",
+   "x": 42,
+   "y": 82,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "amber_library",
+   "x": 25,
+   "y": 31,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "pith_forge",
+   "x": 70,
+   "y": 55,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "root_loom",
+   "x": 26,
+   "y": 65,
+   "r": 1.1,
+   "v": 0
+  },
+  {
+   "kind": "seed_chapel",
+   "x": 72,
+   "y": 30,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 76.18,
+   "y": 26.3,
+   "r": 0.65,
+   "v": 3
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 14.71,
+   "y": 68.19,
+   "r": 0.65,
+   "v": 0
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 55.48,
+   "y": 48.19,
+   "r": 0.65,
+   "v": 3
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 74.36,
+   "y": 51.35,
+   "r": 0.65,
+   "v": 3
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 70.48,
+   "y": 65.91,
+   "r": 0.65,
+   "v": 3
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 60.69,
+   "y": 73.72,
+   "r": 0.65,
+   "v": 1
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 58.77,
+   "y": 17.48,
+   "r": 0.65,
+   "v": 1
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 32.36,
+   "y": 39.19,
+   "r": 0.65,
+   "v": 0
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 17.09,
+   "y": 67.59,
+   "r": 0.65,
+   "v": 0
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 50.56,
+   "y": 41.49,
+   "r": 0.65,
+   "v": 0
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 18.71,
+   "y": 25.77,
+   "r": 0.65,
+   "v": 0
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 79.1,
+   "y": 50.41,
+   "r": 0.65,
+   "v": 1
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 46.19,
+   "y": 44.4,
+   "r": 0.65,
+   "v": 1
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 80.46,
+   "y": 79.61,
+   "r": 0.65,
+   "v": 3
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 23.09,
+   "y": 76.01,
+   "r": 0.65,
+   "v": 1
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 20.65,
+   "y": 15.16,
+   "r": 0.65,
+   "v": 3
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 48.96,
+   "y": 36.61,
+   "r": 0.65,
+   "v": 1
+  },
+  {
+   "kind": "heartwood_column",
+   "x": 28.02,
+   "y": 76.65,
+   "r": 0.65,
+   "v": 2
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 61.35,
+   "y": 47.11,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 76.13,
+   "y": 78.75,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 78.85,
+   "y": 75.26,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 21.67,
+   "y": 72.52,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 58.34,
+   "y": 79.83,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 19.86,
+   "y": 78.68,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 64.36,
+   "y": 78.01,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 34.21,
+   "y": 34.88,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 24.09,
+   "y": 74.52,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 35.22,
+   "y": 39.37,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 52.56,
+   "y": 68.8,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 74.15,
+   "y": 79.54,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 70.63,
+   "y": 32.87,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 23.74,
+   "y": 54.04,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 17.65,
+   "y": 70.36,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 23.9,
+   "y": 48.36,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 62.01,
+   "y": 36.91,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 68.28,
+   "y": 24.91,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 38.93,
+   "y": 38.59,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 15.17,
+   "y": 39.38,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 22.12,
+   "y": 73.46,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 54.78,
+   "y": 54.74,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 80.88,
+   "y": 30.21,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 16.57,
+   "y": 70.64,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 27.39,
+   "y": 70.74,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 17.64,
+   "y": 48.89,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 25.54,
+   "y": 62.5,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 14.66,
+   "y": 29.73,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 34.73,
+   "y": 17.13,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 67.6,
+   "y": 74.56,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 46.44,
+   "y": 38.05,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "glow_sconce",
+   "x": 37.97,
+   "y": 38.83,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "amber_window",
+   "x": 52.84,
+   "y": 53.64,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "amber_window",
+   "x": 63.07,
+   "y": 36.25,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "amber_window",
+   "x": 75.02,
+   "y": 28.32,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "amber_window",
+   "x": 38.01,
+   "y": 16.32,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "amber_window",
+   "x": 17.04,
+   "y": 40.08,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "amber_window",
+   "x": 14.56,
+   "y": 37.06,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "amber_window",
+   "x": 64.07,
+   "y": 18.49,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "amber_window",
+   "x": 76.09,
+   "y": 44.09,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "amber_window",
+   "x": 41.31,
+   "y": 50.02,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "amber_window",
+   "x": 56.07,
+   "y": 62.44,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "amber_window",
+   "x": 46.12,
+   "y": 29.3,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "amber_window",
+   "x": 16.82,
+   "y": 69.49,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "amber_window",
+   "x": 75.1,
+   "y": 48.34,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "amber_window",
+   "x": 77.35,
+   "y": 71.17,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "amber_window",
+   "x": 30.5,
+   "y": 47.46,
+   "r": 0.06,
+   "v": 2
+  },
+  {
+   "kind": "amber_window",
+   "x": 64.39,
+   "y": 23.45,
+   "r": 0.06,
+   "v": 3
+  },
+  {
+   "kind": "amber_window",
+   "x": 77.7,
+   "y": 65.57,
+   "r": 0.06,
+   "v": 1
+  },
+  {
+   "kind": "amber_window",
+   "x": 80.7,
+   "y": 23.17,
+   "r": 0.06,
+   "v": 0
+  },
+  {
+   "kind": "root_bench",
+   "x": 24.97,
+   "y": 57.32,
+   "r": 0.55,
+   "v": 2
+  },
+  {
+   "kind": "root_bench",
+   "x": 39.65,
+   "y": 66.0,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "root_bench",
+   "x": 45.42,
+   "y": 49.88,
+   "r": 0.55,
+   "v": 1
+  },
+  {
+   "kind": "root_bench",
+   "x": 15.57,
+   "y": 41.27,
+   "r": 0.55,
+   "v": 1
+  },
+  {
+   "kind": "root_bench",
+   "x": 40.13,
+   "y": 48.73,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "root_bench",
+   "x": 22.45,
+   "y": 61.74,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "root_bench",
+   "x": 15.34,
+   "y": 78.7,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "root_bench",
+   "x": 74.79,
+   "y": 46.79,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "root_bench",
+   "x": 25.44,
+   "y": 34.22,
+   "r": 0.55,
+   "v": 0
+  },
+  {
+   "kind": "root_bench",
+   "x": 51.18,
+   "y": 59.05,
+   "r": 0.55,
+   "v": 3
+  },
+  {
+   "kind": "root_bench",
+   "x": 20.41,
+   "y": 27.26,
+   "r": 0.55,
+   "v": 2
+  },
+  {
+   "kind": "root_bench",
+   "x": 28.28,
+   "y": 52.31,
+   "r": 0.55,
+   "v": 1
+  }
+ ],
+ "slimes": [],
+ "npcs": [
+  {
+   "id": "heart_archivist",
+   "name": "Oli Amberleaf",
+   "role": "Heartwood archivist",
+   "x": 30,
+   "y": 35,
+   "color": "#e4f7ae",
+   "dialogue": "The tree remembers every season in amber rings. The Seed Vault is older than the city.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#ad7857",
+    "hair": "#28574b",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#569e66"
+   },
+   "art": "heart_archivist"
+  },
+  {
+   "id": "heart_carver",
+   "name": "Ruva Rootsong",
+   "role": "Living wood carver",
+   "x": 69,
+   "y": 61,
+   "color": "#e4f7ae",
+   "dialogue": "We coax halls from the wood. We never cut the pith.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#ad7857",
+    "hair": "#28574b",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#569e66"
+   }
+  },
+  {
+   "id": "heart_oracle",
+   "name": "Veya of the Pith",
+   "role": "Pith oracle",
+   "x": 49,
+   "y": 45,
+   "color": "#e4f7ae",
+   "dialogue": "I hear a second heartbeat behind the Seed Vault door. It answers only to the old crown.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#ad7857",
+    "hair": "#28574b",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#569e66"
+   },
+   "art": "heart_oracle"
+  },
+  {
+   "id": "heart_custodian",
+   "name": "Mosslet",
+   "role": "Seed Vault custodian",
+   "x": 48,
+   "y": 25,
+   "color": "#e4f7ae",
+   "dialogue": "The Seed Vault is open. Gather your companions before entering its oldest chambers.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#ad7857",
+    "hair": "#28574b",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#569e66"
+   }
+  },
+  {
+   "id": "mailbox_24_veyrroot_heartwood",
+   "name": "Mailbox",
+   "role": "Player mail",
+   "x": 51.5,
+   "y": 49.5,
+   "color": "#cda75e",
+   "art": "mailbox",
+   "buys": false,
+   "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+   "offers": [
+    {
+     "id": "mail",
+     "label": "Open mailbox",
+     "cost": 0
+    }
+   ]
+  }
+ ],
+ "places": [
+  {
+   "id": "heart_core",
+   "name": "The Living Pith",
+   "x": 48,
+   "y": 53,
+   "r": 4
+  },
+  {
+   "id": "heart_seed_door",
+   "name": "The Seed Vault",
+   "x": 48,
+   "y": 20,
+   "r": 4
+  },
+  {
+   "id": "es_20_m",
+   "name": "A Third Answer",
+   "x": 48,
+   "y": 53,
+   "r": 2.1
+  }
+ ],
+ "quests": [
+  {
+   "id": "heart_rings",
+   "title": "What the Rings Remember",
+   "npc": "heart_archivist",
+   "description": "Visit the living core and speak with the oracle.",
+   "objectives": [
+    {
+     "kind": "visit",
+     "target": "heart_core",
+     "count": 1,
+     "label": "Read the living rings"
+    },
+    {
+     "kind": "talk",
+     "target": "heart_oracle",
+     "count": 1,
+     "label": "Consult Veya"
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 12500,
+   "requires": null,
+   "repeatable": false
+  },
+  {
+   "id": "heart_seed_vault",
+   "title": "The Living Door",
+   "npc": "heart_oracle",
+   "description": "Climb to the Seed Vault and speak with its custodian.",
+   "objectives": [
+    {
+     "kind": "visit",
+     "target": "heart_seed_door",
+     "count": 1,
+     "label": "Inspect the Seed Vault entrance"
+    },
+    {
+     "kind": "talk",
+     "target": "heart_custodian",
+     "count": 1,
+     "label": "Speak to Mosslet"
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 15000,
+   "requires": "heart_rings",
+   "repeatable": false
+  },
+  {
+   "id": "heart_seed_trials",
+   "title": "The Rings Awaken",
+   "npc": "heart_custodian",
+   "description": "Enter the Seed Vault with five companions. Defeat its first two wardens and gather five relics from the chambers.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "seed_warden",
+     "count": 1,
+     "label": "Defeat the Warden of Rings"
+    },
+    {
+     "kind": "kill",
+     "target": "seed_germinator",
+     "count": 1,
+     "label": "Defeat the Germinator"
+    },
+    {
+     "kind": "kill",
+     "target": "seed_mote",
+     "count": 5,
+     "label": "Clear awakened seedlings"
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 17500,
+   "requires": "heart_seed_vault",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5
+  },
+  {
+   "id": "heart_seed_final",
+   "title": "Heart of the Worldseed",
+   "npc": "heart_oracle",
+   "description": "Face the sleeping heart at the end of the Seed Vault.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "seed_worldseed",
+     "count": 1,
+     "label": "Defeat the Heart of the Worldseed"
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 30000,
+   "requires": "heart_seed_trials",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardItem": "accessory_amber_l80_blue"
+  },
+  {
+   "id": "es_20",
+   "title": "A Third Answer",
+   "npc": "heart_oracle",
+   "description": "Veya has heard two endings: leave the giant chained until the roots burn, or let him rise and melt them. Listen at the Living Pith for a third. Saving the world must not require calling the betrayal just.",
+   "objectives": [
+    {
+     "kind": "memory",
+     "target": "es_20_m",
+     "label": "A Third Answer",
+     "count": 1
+    }
+   ],
+   "level": 80,
+   "minLevel": 80,
+   "rewardXp": 8030,
+   "rewardGold": 960,
+   "requires": "es_19",
+   "repeatable": false,
+   "story": {
+    "title": "The Empty Seat",
+    "chapter": 20,
+    "recap": [
+     "The pith answers: Break the jailers. End the hand that would burn us. Keep the name they buried. We can carry the old warmth without carrying his wrath. One small green shoot opens in your palm."
+    ],
+    "next": "Next chapter: The Route Beneath Every Map. Speak to Ivo Starfold in The Lapis Erg at level 83."
+   },
+   "rewardChoices": {
+    "warrior": [
+     "warrior_gloves_crimson_l80_blue",
+     "warrior_weapon_sword_l80_blue"
+    ],
+    "mage": [
+     "mage_gloves_apprentice_l80_blue",
+     "mage_weapon_ash_l80_blue"
+    ],
+    "assassin": [
+     "assassin_gloves_shadow_l80_blue",
+     "assassin_weapon_daggers_l80_blue"
+    ],
+    "priest": [
+     "priest_gloves_pilgrim_l80_blue",
+     "priest_weapon_mace_l80_blue"
+    ],
+    "hunter": [
+     "hunter_gloves_scout_l80_blue",
+     "hunter_weapon_shortbow_l80_blue"
+    ]
+   }
+  },
+  {
+   "id": "es_go_20",
+   "title": "Seek Veya of the Pith",
+   "npc": "heart_oracle",
+   "description": "Speak to Veya of the Pith in Veyrroot Heartwood at level 80 to continue The Empty Seat: A Third Answer. This direction stays in your journal until you accept that chapter.",
+   "objectives": [
+    {
+     "kind": "handoff",
+     "target": "heart_oracle",
+     "count": 1,
+     "label": "Speak to Veya of the Pith at level 80"
+    }
+   ],
+   "level": 80,
+   "minLevel": 1,
+   "rewardXp": 0,
+   "rewardGold": 0,
+   "requires": "es_19",
+   "autoLevel": 1,
+   "repeatable": false,
+   "handoffTo": "es_20"
+  }
+ ],
+ "city": {
+  "name": "Veyrroot Heartwood",
+  "x0": 14,
+  "x1": 82,
+  "y0": 12,
+  "y1": 88,
+  "plaza": {
+   "x": 48,
+   "y": 48
+  },
+  "radius": 5,
+  "entry": {
+   "x": 48,
+   "y": 80
+  }
+ },
+ "futureInstance": {
+  "name": "The Seed Vault",
+  "level": 80,
+  "players": 5,
+  "status": "open",
+  "x": 48,
+  "y": 14,
+  "description": "The iris of bark and amber opens into the oldest chambers of the living tree."
+ },
+ "portals": [
+  {
+   "id": "hollow_canopy_gate",
+   "name": "The Hollow Arch",
+   "x": 48,
+   "y": 87,
+   "r": 1.2,
+   "to": 23,
+   "tx": 210.0,
+   "ty": 229.0,
+   "look": "worldtree"
+  },
+  {
+   "id": "heart_seed_gate",
+   "name": "The Seed Vault",
+   "x": 48,
+   "y": 17,
+   "r": 1.2,
+   "to": 33,
+   "tx": 48,
+   "ty": 82,
+   "look": "seed_vault"
+  }
+ ]
+}

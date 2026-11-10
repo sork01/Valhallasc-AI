@@ -25,7 +25,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>!Seasonal.isActive('valentine')&&Valentines.objects(2).length===0&&!Quests.offered('baker').some(q=>q.id.startsWith('valentine'))),'February 9: Valentines dressing, shrine and quests are absent');
  await debug({op:'season_time',unix:1802214000});await wait(()=>Seasonal.isActive('valentine'));
  check(await p.evaluate(()=>!Seasonal.isActive('halloween')&&__snap.halloween===null&&__snap.valentine!==null),'February 10 activates only Valentines, with its own ritual state');
- check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17].includes(i)?z.valentineDecor?.length>=20:!z.valentineDecor)),'Valentines city dressing is dense and restricted to the four major cities');
+ check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17,24].includes(i)?z.valentineDecor?.length>=20:!z.valentineDecor)),'Valentines city dressing is dense and restricted to the four major cities');
  const names={0:'alderhaven',4:'skaldholm',9:'nacrehold',17:'asterion'};
  if(!['hunt','titles'].includes(process.env.CHECK_ONLY))for(const z of [0,4,9,17]){
   const a=await area(z),q=a.quests.find(q=>q.season==='valentine'&&q.id!=='valentine_hunt');

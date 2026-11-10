@@ -37,6 +37,7 @@
     if (p && !p.claimed) return quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count) ? 'ready' : 'active';
     if (p?.claimed && !quest.repeatable) return 'completed';
     if (arenaLevel(quest) && arenaQuests.some(q => q.id !== quest.id && arenaLevel(q) === arenaLevel(quest) && state(q))) return 'unavailable';
+    if (quest.landing && !p && !abandoned.includes(quest.id)) return 'unavailable'; // Greenmeadow's landing quest finds only heroes who step off the dock
     if (quest.autoLevel && !abandoned.includes(quest.id)) return 'upcoming'; // a progression quest is accepted by the server, never offered
     if (quest.requires && !(state({ id: quest.requires })?.completions > 0)) return 'locked';
     if (quest.minLevel && heroLevel < quest.minLevel) return 'locked';
@@ -265,7 +266,7 @@
     if (!atNpc && ['active', 'ready'].includes(s)) node.append(button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
       track(quest.id); $('quest-close').focus();
     }));
-    if (!atNpc && ['active', 'ready'].includes(s)) {
+    if (!atNpc && ['active', 'ready'].includes(s) && !quest.id.startsWith('es_')) {      // the Empty Seat cannot be abandoned (server: Quest::abandonable)
       const asking = abandonConfirm === quest.id;
       if (asking) node.append(element('p', 'Abandon this quest? Current progress will be lost. You can take it again from its questgiver.', 'quest-abandon-warning'));
       const b = button(asking ? 'Confirm abandon' : 'Abandon quest', () => {

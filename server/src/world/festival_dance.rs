@@ -216,7 +216,7 @@ mod tests {
                 w.seasonal.active().iter().any(|e| e.id == season),
                 "{season}"
             );
-            for zone in [0, 4, 9, 17] {
+            for zone in [0, 4, 9, 17, 24] {
                 let id = format!("festival_dance_{season}_{zone}");
                 let n = w.maps[zone].npcs.iter().find(|n| n.id == id).unwrap();
                 let c = at(n.x, n.y);

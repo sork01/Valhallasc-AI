@@ -74,6 +74,13 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 - [x] `QUADRUPED-GROUNDING` — All remade four-legged animal monsters look like they are floating above the ground. Review every affected remade kind and correct its sprite placement/ground contact so planted feet sit naturally on the terrain. Verify the result in-game across idle, walking and combat animations with focused real-art checks; apply the same grounding requirement to upcoming remakes. (Completed across all reopened remakes through Beta 1.39.17; enforced in every `*-slime-art.cjs` check.)
 
+### Greenmeadow redesign (pilot, owner request 2026-11-06)
+
+**Owner requirements:** "redesign greenmeadow. keep shape and boarders etc. but redesign the rest of the map and the quests. to not have any filler land and to use the entire map" (for the pilot, `feat/zone-shapes`). **Owner decisions:** existing enemy kinds plus three new elites (two with quests, one without); 2-3 hamlets with their own quest givers.
+
+- [x] `MEADOW-DESIGN` - Nine regions, atlas road lattice, ponds, farms, orchards, three hamlets, 16 new quests, three elites: `docs/greenmeadow-design.md`.
+- [ ] `MEADOW-DESIGN-REVIEW` - Owner plays it on the pilot; elite stats are a first guess; decide pacing (level 5 after about 24 kills).
+
 ### Emberfall Crags enemies in the Greenmeadow slime style (owner request, 2026-11-03)
 
 **Owner requirements:** Remake the **Emberfall Crags enemies** (Fire Wisp, Lava Spider, Ash Wraith, Cinder Golem and the Cinderlord elite) in the **same style as the Greenmeadow slime**, and **remove the old enemy art**. The owner may not like the result, so **a rollback must stay possible**. Redo the enemies, then upload **before vs after pictures to FileDrop**.

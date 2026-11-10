@@ -48,7 +48,11 @@
   function draw(g, width, height, lights, project) {
     if (!clock.synced || outdoorBlend < .002) return;
     const h = hour(), n = night(h), w = warm(h), amount = window.Prefs?.night ?? 1;
-    const [darkColor, warmColor] = palette(zone?.theme);
+    // Near a border you can cross, the neighbour's light and glow mix in by the same weight as the ground (.5 at the line), so the
+    // light does not snap when the server moves you across.
+    const sb = window.Field?.seamBlend, wN = sb ? sb.w : 0, [dark1, warm1] = palette(zone?.theme), [dark2, warm2] = sb ? palette(sb.theme) : [dark1, warm1];
+    const mixRgb = (a, b) => a.split(',').map((v, i) => Math.round(+v + (+b.split(',')[i] - +v) * wN)).join(',');
+    const darkColor = mixRgb(dark1, dark2), warmColor = mixRgb(warm1, warm2);
     g.save();
     const warmAlpha = .075 * w * outdoorBlend;
     if (warmAlpha > .002) { g.fillStyle = `rgba(${warmColor},${warmAlpha})`; g.fillRect(0, 0, width, height); }
@@ -63,16 +67,23 @@
         g.fillRect(x, y, i % 5 === 0 ? 2 : 1, i % 5 === 0 ? 2 : 1);
       }
     }
-    if (n > .2 && zone?.theme === 'frostwake') {
-      g.fillStyle = `rgba(99,245,204,${.08 * n * outdoorBlend})`;
-      g.beginPath(); g.ellipse(width * .53, height * .08, width * .42, height * .09, -.13, 0, Math.PI * 2); g.fill();
-    } else if (n > .2 && zone?.theme === 'ember') {
-      g.fillStyle = `rgba(255,107,44,${.06 * n * outdoorBlend})`;
-      g.fillRect(0, height * .7, width, height * .3);
-    } else if (n > .2 && ['fen', 'worldtree', 'moonspore'].includes(zone?.theme)) {
-      g.fillStyle = `rgba(127,255,188,${.3 * n * outdoorBlend})`;
-      for (let i = 0; i < 8; i++) g.fillRect((i * 179 + 43) % width, height * (.55 + (i % 4) * .09), 3, 3);
-    }
+    // A zone's own night glow (fades in over its lower part; weight k when two zones mix).
+    const nightGlow = (theme, k) => {
+      if (n <= .2 || k < .01) return;
+      if (theme === 'frostwake') {
+        g.fillStyle = `rgba(99,245,204,${.08 * n * outdoorBlend * k})`;
+        g.beginPath(); g.ellipse(width * .53, height * .08, width * .42, height * .09, -.13, 0, Math.PI * 2); g.fill();
+      } else if (theme === 'ember') {
+        const gr = g.createLinearGradient(0, height * .6, 0, height);
+        gr.addColorStop(0, 'rgba(255,107,44,0)'); gr.addColorStop(1, `rgba(255,107,44,${.09 * n * outdoorBlend * k})`);
+        g.fillStyle = gr; g.fillRect(0, height * .6, width, height * .4);
+      } else if (['fen', 'worldtree', 'moonspore'].includes(theme)) {
+        g.fillStyle = `rgba(127,255,188,${.3 * n * outdoorBlend * k})`;
+        for (let i = 0; i < 8; i++) g.fillRect((i * 179 + 43) % width, height * (.55 + (i % 4) * .09), 3, 3);
+      }
+    };
+    nightGlow(zone?.theme, 1 - wN);
+    if (sb) nightGlow(sb.theme, wN);
     const daylight = h >= 6 && h < 18;
     const progress = daylight ? (h - 6) / 12 : ((h - 18 + 24) % 24) / 12;
     const orbX = width * (.13 + .74 * progress), orbY = height * (.19 - .11 * Math.sin(progress * Math.PI));

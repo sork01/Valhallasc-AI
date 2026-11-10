@@ -17,6 +17,9 @@ SPECS = [
     (17, 'halloween_aster', 'The Midnight Masquerade', 'asterion_singer', 60, 2600,
      'Vela is arranging a Halloween masquerade beneath the stars. Ask Mora to ring the opening bell, Umi to dress the balconies, and Nim to welcome the masked guests.',
      [('talk','asterion_bellkeeper','Arrange the opening bell with Mora'),('talk','asterion_gardener','Plan the balcony garlands with Umi'),('talk','asterion_merchant','Ask Nim to welcome the guests')]),
+(24, 'halloween_heart', 'Glow-Fruit for Every Hollow', 'hw_baker', 80, 4200,
+     'Olle wants every burl in Heartwood to glow for Halloween. Ask Pim for sap-lamps, Ingrid for amber lanterns, and Edda for a friendly ghost story, then bring Olle their good wishes.',
+     [('talk','hw_lamplighter','Ask Pim for sap-lamps'),('talk','hw_glassblower','Ask Ingrid for amber lanterns'),('talk','hw_storyteller','Ask Edda for a friendly ghost story')]),
 ]
 
 
@@ -28,9 +31,9 @@ def apply(world):
         area['quests'] = [q for q in area.get('quests', []) if q['id'] not in ids]
         area.pop('seasonDecor', None)
         zone=next(i for i,z in enumerate(areas) if z is area)
-        if zone not in [0,4,9,17]:continue
+        if zone not in [0,4,9,17,24]:continue
         hub=area['city'];cx,cy=hub['plaza']['x'],hub['plaza']['y'];decor=[]
-        accent={0:'#d48b45',4:'#b87442',9:'#52b9b4',17:'#a98bd9'}[zone]
+        accent={0:'#d48b45',4:'#b87442',9:'#52b9b4',17:'#a98bd9',24:'#8fc860'}[zone]
         def inside(x,y):return hub['x0']+.8<x<hub['x1']-.8 and hub['y0']+.8<y<hub['y1']-.8
         def safe(x,y):
             if not inside(x,y):return False
@@ -65,7 +68,7 @@ def apply(world):
             objectives=[dict(kind=k,target=t,label=l,count=1) for k,t,l in objectives],
             level=level,minLevel=level,rewardXp=levels[level-1]//10,rewardGold=gold,
             requires=None,repeatable=True,season='halloween'))
-    givers=['baker','city_bard','nacre_gardener','asterion_singer']
+    givers=['baker','city_bard','nacre_gardener','asterion_singer','hw_baker']
     for area in areas:
         for npc in area.get('npcs',[]):
             if npc['id'] in givers:
@@ -106,7 +109,7 @@ if __name__=='__main__':
     world=solstice_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
     world=valentines_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
     world=newyear_event.apply(world,json.loads((ROOT/'world/levels.txt').read_text()))
-    events=[dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer']}),christmas_cities.event(),easter_event.event(),solstice_event.event(),valentines_event.event(),newyear_event.event()]
+    events=[dict(id='halloween',start=[10,26],endExclusive=[11,10],quests=[r[1] for r in SPECS]+['halloween_hunt'],dailyQuests=['halloween_hunt'],givers={'halloween_hunt':['baker','city_bard','nacre_gardener','asterion_singer','hw_baker']}),christmas_cities.event(),easter_event.event(),solstice_event.event(),valentines_event.event(),newyear_event.event()]
     import season_dance
     world=season_dance.apply(world,events)
     path.write_text(json.dumps(world,ensure_ascii=False,indent=2)+'\n')

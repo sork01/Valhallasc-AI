@@ -29,7 +29,7 @@
     oval(g,0,3,39,11,'rgba(28,47,18,.24)');
     poly(g,[[-13,0],[-11,-92],[-37,-130],[-26,-136],[-1,-107],[14,-146],[28,-139],[13,-86],[14,0]],'#885336','#59452e');
     leaf(g,-44,-147,54,45,'#568936');leaf(g,43,-145,52,45,'#61943c');leaf(g,0,-183,65,53,'#69a144');
-    for(let i=0;i<16;i++){const x=(seed(i+2,o.v)-.5)*122,y=-122-seed(i+18,o.v)*94;oval(g,x,y,5,5,i%4?'#c93f32':'#e1bd48');oval(g,x-2,y-2,2,2,'#f6bf84');}
+    for(let i=0;i<16;i++){const x=(seed(i+2,o.v)-.5)*122,y=-122-seed(i*5+18,o.v)*94;oval(g,x,y,5,5,i%4?'#c93f32':'#e1bd48');oval(g,x-2,y-2,2,2,'#f6bf84');}
   }};
   City.art.willow_tree={box:[390,400,195,365],draw(g,o){
     shadow(g);poly(g,[[-17,0],[-14,-127],[-48,-178],[-30,-182],[0,-148],[29,-198],[43,-190],[13,-111],[18,0]],'#896546','#4b593b');
@@ -92,35 +92,36 @@
     for(const x of [-34,-17,1,19,35])stroke(g,[[x,-122],[x+4,-79]],'#cfab67',3);
   }};
 
-  City.art.elder_hollow_gate={box:[920,760,460,695],draw(g){
+  // The Elder Hollow's door, drawn isometric (owner rule: gates are never a flat front elevation): a stepped stone plinth, two split oak trunks standing on the long sides of the footprint
+  // (o.width x o.depth, the door on the +y wall) with a root arch between them over a dark stair, a root lintel and a leafy crown.
+  City.art.elder_hollow_gate={box:[920,760,460,695],draw(g,o,K){
+    const {iso,prism}=K;
     oval(g,0,17,254,49,'rgba(24,47,24,.38)');
-    // The rooted stair is open beneath one enormous, living oak.
-    poly(g,[[-168,4],[-137,-56],[-112,-133],[112,-133],[137,-56],[168,4]],'#8b8d70','#435445');
-    for(let i=-4;i<=4;i++){const y=-6-i*16,half=139-Math.abs(i)*11;
-      stroke(g,[[-half,y],[half,y]],i%2?'#ccb891':'#e2d2a6',5);
-    }
-    poly(g,[[-132,-65],[-119,-197],[-87,-279],[-42,-300],[42,-300],[87,-279],[119,-197],[132,-65]],'#795b42','#443e30');
-    poly(g,[[-76,-55],[-77,-196],[-52,-246],[0,-265],[52,-246],[77,-196],[76,-55]],'#263e35','#d4bd8a');
-    poly(g,[[-59,-56],[-59,-190],[-40,-225],[0,-242],[40,-225],[59,-190],[59,-56]],'#172d27','#e9d49c');
-    poly(g,[[-35,-57],[-35,-165],[0,-218],[35,-165],[35,-57]],'rgba(170,219,138,.24)');
+    g.save();g.translate(...iso(0,0));prism(g,9.4,4.4,12,'#b7b08f','#8d8870','#76735f');g.restore();
+    g.save();g.translate(...iso(0,.3));prism(g,6.6,3.2,8,'#c7bf9b','#9b957a','#85826a',12);g.restore();
+    g.save();g.translate(...iso(0,.5));prism(g,4.8,2.4,8,'#d6ceaa','#a8a186','#918e76',20);g.restore();
+    // the dark stair under the arch, on the +y wall
+    g.save();g.translate(...iso(0,1.55,12));g.transform(1,.5,0,1,0,0);
+    poly(g,[[-96,0],[-96,-150],[-70,-220],[0,-252],[70,-220],[96,-150],[96,0]],'#14261f','#e0cb92',6);
+    poly(g,[[-70,0],[-70,-140],[-48,-196],[0,-222],[48,-196],[70,-140],[70,0]],'rgba(170,219,138,.22)');
+    for(let i=0;i<5;i++)stroke(g,[[-70+i*4,-8-i*14],[70-i*4,-8-i*14]],'#ccb891',4);
+    g.restore();
     for(const side of [-1,1]){
-      stroke(g,[[side*61,-57],[side*48,-126],[side*57,-187]],'#9c805b',6);
-      stroke(g,[[side*53,-195],[side*25,-231]],'#b29265',5);
+      g.save();g.translate(...iso(side*3.05,0,12));prism(g,1.9,2.2,250,'#8a6a46','#5f4630','#4a3624');g.restore();
+      const [rx,ry]=iso(side*3.05,1.2,12);
+      for(let k=0;k<4;k++)stroke(g,[[rx+side*(8+k*14),ry+k*2],[rx+side*(34+k*16),ry-26+k*6],[rx+side*(52+k*14),ry-8+k*3]],'#7a5a3a',10-k*2);
+      for(let i=0;i<4;i++){const [bx,by]=iso(side*3.05,1.1,40+i*52);stroke(g,[[bx-9,by],[bx-4,by-18]],'#bb8e5d',3);}
     }
-    // The split trunks lean back together over the entrance, with broad leaf crowns.
-    poly(g,[[-231,4],[-208,-140],[-157,-264],[-202,-395],[-153,-450],[-109,-343],[-82,-298],[-119,-180],[-114,4]],'#775337','#3b3d2d');
-    poly(g,[[231,4],[208,-140],[157,-264],[202,-395],[153,-450],[109,-343],[82,-298],[119,-180],[114,4]],'#775337','#3b3d2d');
+    g.save();g.translate(...iso(0,0,262));prism(g,9,2.4,34,'#9a7a54','#6b5238','#584330');g.restore();
+    const [cx,cy]=iso(0,0,296);
     for(const side of [-1,1]){
-      stroke(g,[[side*174,-322],[side*238,-455],[side*328,-506]],'#735436',24);
-      stroke(g,[[side*154,-363],[side*54,-506],[0,-544]],'#765638',20);
-      leaf(g,side*247,-487,116,79,'#4e8139');
-      leaf(g,side*118,-538,115,81,'#5a923f');
-      for(let i=0;i<4;i++)stroke(g,[[side*(137+i*15),-255],[side*(144+i*12),-327]],'#bb8e5d',3);
+      stroke(g,[[cx+side*120,cy+40],[cx+side*190,cy-70],[cx+side*290,cy-120]],'#735436',22);
+      stroke(g,[[cx+side*90,cy+10],[cx+side*40,cy-120],[cx,cy-170]],'#765638',18);
+      leaf(g,cx+side*230,cy-110,116,79,'#4e8139');leaf(g,cx+side*110,cy-160,115,81,'#5a923f');
     }
-    leaf(g,0,-586,169,91,'#639c44');
-    for(let i=0;i<52;i++){const x=(seed(i,2)-.5)*530,y=-457-seed(i+59,1)*153;
-      oval(g,x,y,4,2.3,i%5?'#9bbd59':'#d1db7d');}
-    for(const x of [-187,187]){poly(g,[[x-9,0],[x-9,-53],[x+9,-53],[x+9,0]],'#a69670','#4b5846');oval(g,x,-61,13,13,'#ffe0a0');}
+    leaf(g,cx,cy-205,169,91,'#639c44');
+    for(let i=0;i<52;i++){const x=(seed(i,2)-.5)*530,y=cy-150-seed(i+59,1)*150;oval(g,x,y,4,2.3,i%5?'#9bbd59':'#d1db7d');}
+    for(const x of [-4.2,4.2]){g.save();g.translate(...iso(x,1.6,12));prism(g,.4,.4,48,'#a69670','#7d7255','#6b6149');g.restore();const [lx,ly]=iso(x,1.6,66);oval(g,lx,ly,13,13,'#ffe0a0');}
   },animate(g,o,sx,sy,t){
     g.save();g.globalAlpha=.22+.12*Math.sin(t*.6);g.fillStyle='#fff2b4';
     for(let i=0;i<18;i++){const x=sx+Math.sin(i*18.1+t*.34)*155,

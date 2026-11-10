@@ -42,6 +42,125 @@
     "sell": 40
   },
   {
+    "id": "tusker_bristle",
+    "name": "Old Tusker Bristle",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 40
+  },
+  {
+    "id": "tidecrusher_shard",
+    "name": "Tidecrusher Shell Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 40
+  },
+  {
+    "id": "queen_stinger",
+    "name": "Orchard Queen's Stinger",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 40
+  },
+  {
+    "id": "slagmaw_gullet",
+    "name": "Slagmaw Gullet Stone",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 60
+  },
+  {
+    "id": "ashwing_plume",
+    "name": "Ashwing Plume",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 60
+  },
+  {
+    "id": "hoarhorn_tusk",
+    "name": "Hoarhorn Tusk",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 120
+  },
+  {
+    "id": "whitewail_shroud",
+    "name": "Whitewail Shroud",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 120
+  },
+  {
+    "id": "shardback_carapace",
+    "name": "Shardback Carapace",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 120
+  },
+  {
+    "id": "bellowmaw_gullet",
+    "name": "Bellowmaw Gullet",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "rustmarshal_plate",
+    "name": "Rustmarshal Plate",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "hangedking_noose",
+    "name": "Hanged King's Noose",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 330
+  },
+  {
+    "id": "skoll_fang",
+    "name": "Sköll's Fang",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 620
+  },
+  {
+    "id": "shardking_crown",
+    "name": "Shard-King's Crown",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 700
+  },
+  {
+    "id": "heimdallr_horn",
+    "name": "Horn of Heimdall's Shade",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 780
+  },
+  {
+    "id": "cometmaw_tail",
+    "name": "Cometmaw's Burning Tail",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1020
+  },
+  {
+    "id": "eclipsequeen_crown",
+    "name": "Eclipse Queen's Crown",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1180
+  },
+  {
+    "id": "orbitwarden_ring",
+    "name": "Orbit Warden's Ring",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1400
+  },
+  {
     "id": "ember_core",
     "name": "Ember Core",
     "kind": "material",
@@ -25040,6 +25159,62 @@
     "sell": 1200
   },
   {
+    "id": "mainspring_coil",
+    "name": "Mainspring Coil",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1000
+  },
+  {
+    "id": "horn_prism",
+    "name": "Horn Prism",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1800
+  },
+  {
+    "id": "whorl_shell",
+    "name": "Whorl Shell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4400
+  },
+  {
+    "id": "hollow_chitin",
+    "name": "Hollowroot Chitin",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4300
+  },
+  {
+    "id": "basilisk_scale",
+    "name": "Cobalt Basilisk Scale",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8400
+  },
+  {
+    "id": "avalanche_claw",
+    "name": "Avalanche Bear Claw",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11200
+  },
+  {
+    "id": "hermit_lens",
+    "name": "Hermit Lens",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2600
+  },
+  {
+    "id": "tusk_storm",
+    "name": "Storm Tusk",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
     "id": "warrior_armor_crimson_l55_gray",
     "name": "Clockworn Crimson Armor",
     "kind": "armor",
@@ -33192,6 +33367,20 @@
     "kind": "material",
     "rarity": "common",
     "sell": 2700
+  },
+  {
+    "id": "harrow_horn",
+    "name": "Harrow Ox Horn",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3000
+  },
+  {
+    "id": "equinox_antler",
+    "name": "Equinox Antler",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 19000
   },
   {
     "id": "wicker_heart",
@@ -57951,6 +58140,27 @@
       "strength": 108,
       "agility": 108
     }
+  },
+  {
+    "id": "queen_amber",
+    "name": "Lantern Queen Amber",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8000
+  },
+  {
+    "id": "heartbark_slab",
+    "name": "Heartbark Slab",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 9000
+  },
+  {
+    "id": "golem_amber",
+    "name": "Amber Golem Core",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8600
   },
   {
     "id": "ember_shard_0",

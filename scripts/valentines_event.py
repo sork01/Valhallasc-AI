@@ -2,7 +2,7 @@
 import math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-GIVERS=['baker','city_bard','nacre_gardener','asterion_singer']
+GIVERS=['baker','city_bard','nacre_gardener','asterion_singer','hw_baker']
 SPECS=[
  (0,'valentine_alder','A Heart at Every Hearth','baker',1,100,
   "Pip wants nobody to feel forgotten on Valentine's Day. Ask Linden for letter paper, Mira for rose ribbons, and Tessa for heart biscuits, then bring their kind wishes back to Pip.",
@@ -16,6 +16,9 @@ SPECS=[
  (17,'valentine_aster','Written in the Stars','asterion_singer',60,2800,
   "Vela is preparing Valentine's wishes beneath Asterion's stars. Ask Mora for the opening chime, Umi for rose garlands, and Nim for sealed wish letters.",
   [('talk','asterion_bellkeeper','Arrange the opening chime with Mora'),('talk','asterion_gardener','Plan rose garlands with Umi'),('talk','asterion_merchant','Arrange sealed wish letters with Nim')]),
+ (24,'valentine_heart','Letters Between the Burls','hw_baker',80,4500,
+  'Olle is gathering love letters for the whole tree. Ask Bo for the courier bag, Ingrid for rose-coloured amber, and Edda for a gentle love song.',
+  [('talk','hw_courier','Ask Bo for the courier bag'),('talk','hw_glassblower','Ask Ingrid for rose-coloured amber'),('talk','hw_storyteller','Ask Edda for a gentle love song')]),
 ]
 def event():return dict(id='valentine',start=[2,10],endExclusive=[2,19],quests=[s[1] for s in SPECS]+['valentine_hunt'],dailyQuests=['valentine_hunt'],givers={'valentine_hunt':GIVERS})
 def apply(world,levels):
@@ -38,7 +41,7 @@ def apply(world,levels):
    if not o.get('z') and street_centre(o['x'],o['y']):continue
    kind=remap[o['kind']]
    if kind=='valentineHeart' and i%3==0:kind='valentineBouquet'
-   decor.append(dict(o,kind=kind,color={0:'#d74848',4:'#d2aa56',9:'#8bd8d2',17:'#c5a1df'}[zone]))
+   decor.append(dict(o,kind=kind,color={0:'#d74848',4:'#d2aa56',9:'#8bd8d2',17:'#c5a1df',24:'#9fd06a'}[zone]))
   # A district centrepiece where there is room; protect doorways and street centres.
   candidates=[o for o in decor if not o.get('z') and
    hub['x0']+2<o['x']<hub['x1']-2 and hub['y0']+2<o['y']<hub['y1']-2 and

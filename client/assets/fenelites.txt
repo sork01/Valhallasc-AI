@@ -1,0 +1,77 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "bellowmaw",
+    "rustmarshal"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "bellowmaw": "57a64472b4e71593",
+    "rustmarshal": "306e43dae551a1b7"
+  },
+  "tops": {
+    "bellowmaw": 62,
+    "rustmarshal": 120
+  },
+  "artStyle": "fen-elite",
+  "kindFrames": {
+    "bellowmaw": {
+      "frame": [
+        164,
+        80
+      ],
+      "anchor": [
+        50,
+        74
+      ]
+    },
+    "rustmarshal": {
+      "frame": [
+        146,
+        145
+      ],
+      "anchor": [
+        58,
+        138
+      ]
+    }
+  }
+}

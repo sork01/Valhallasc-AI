@@ -59,4 +59,27 @@
   City.art.frostwake_leviathan_rib={box:[460,390,230,335],draw(g){shadow(g,132);for(let j=-2;j<=2;j++)line(g,[[j*52,0],[j*55,-172-Math.cos(j)*90],[j*48,-258-Math.cos(j)*35]],'#cde5e5',13);line(g,[[-150,-10],[150,-10]],'#a7cbd2',17);}};
   City.art.frostwake_snowdrift={box:[200,100,100,70],draw(g,o){oval(g,0,-7,65+o.v*6,23,'#d7eff3');oval(g,-11,-12,50,14,'#f4fbf7');}};
   City.art.frostwake_iceflower={box:[110,120,55,95],draw(g,o){line(g,[[0,0],[0,-48]],'#7dabb5',3);for(let i=0;i<6;i++){let a=i*TAU/6;oval(g,Math.cos(a)*11,-55+Math.sin(a)*11,7,4,o.v%2?'#9cf2e1':'#c5dfff');}oval(g,0,-55,4,4,'#fff7c9');}};
+  // The Frostwake lodge, drawn isometric (owner rule 2026-11-09: buildings are never a flat front elevation): a snow-packed step, a dark left wall with a lit window, a lighter right wall
+  // (the +y wall) with the door, and a snow-laden hip roof on timber rafters.
+  City.art.frostwake_lodge={box:[620,570,310,480],draw(g,o){
+    shadow(g,215);
+    poly(g,[[-205,-16],[0,65],[205,-16],[0,-102]],'#b9ccd3','#4d6f86',6);
+    poly(g,[[-170,-21],[-170,-227],[0,-146],[0,48]],o.v%2?'#6f573f':'#614b38','#3b2f2a',6);
+    poly(g,[[0,48],[0,-146],[170,-227],[170,-21]],o.v%2?'#8f7358':'#826a52','#3b2f2a',6);
+    for(const x of [-85,-40])line(g,[[x,-21+(x+170)*.406],[x,-227+(x+170)*.476]],'#4a3a2e',4);
+    poly(g,[[-120,-150],[-120,-100],[-80,-84],[-80,-134]],'#ffd79a','#e8f4f6',4);
+    poly(g,[[60,24],[60,-101],[110,-122],[110,3]],'#2b3a4b','#e8f4f6',5);oval(g,85,-52,8,13,'#8cddd9');
+    poly(g,[[-191,-221],[0,-374],[191,-221],[0,-135]],'#e6f2f5','#5d869b',8);
+    poly(g,[[-191,-221],[0,-135],[0,-120],[-191,-206]],'#bfd6de');poly(g,[[0,-135],[191,-221],[191,-206],[0,-120]],'#d2e4ea');
+    for(let i=-3;i<=3;i++)line(g,[[i*50,-239],[i*49,-183]],'#cfe4ea',4);
+    line(g,[[0,-374],[0,-404]],'#5a7690',5);poly(g,[[0,-403],[44,-388],[0,-373]],'#7be4d4','#2c6783',4);
+  }};
+  // A small snowy peak of the painted shelf: slate shoulders under a white cap (solid, about 2 tiles across).
+  City.art.frostwake_peak={box:[460,560,230,500],draw(g,o){
+    shadow(g,175);const v=o.v||0,h=v%2?-318:-340;
+    poly(g,[[-176,0],[-118,-118],[-64,-188],[-8,h],[44,-250],[86,-186],[132,-98],[178,0],[0,42]],'#74869c','#34465b',6);
+    poly(g,[[-176,0],[-118,-118],[-64,-188],[-8,h],[2,-120],[0,42]],'#586c85');
+    poly(g,[[-64,-188],[-8,h],[44,-250],[86,-186],[44,-206],[12,-184],[-18,-214],[-42,-178]],'#f4fbff','#9bb8cc',4);
+    line(g,[[-8,h],[-2,-205]],'#c9dce8',4);
+  }};
 })();

@@ -1925,6 +1925,7 @@ mod tests {
             rooms: vec![],
             city: None,
             camps: vec![],
+            dock: None,
             ..Map::default()
         }
     }

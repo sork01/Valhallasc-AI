@@ -67,6 +67,8 @@ def main():
         city = (zone.get('city') or {}).get('name')
         spec = BANKERS.get(city)
         npcs = zone.get('npcs', [])
+        if spec is None and city == 'Veyrroot Heartwood':
+            continue                  # the sixth city: its banker is made by scripts/heartwood_design.py (the pilot's main city inside the world-tree), not by this pass
         if spec is None:
             stray = [n['id'] for n in npcs if n['id'].startswith('banker_') or any(o['id'] == 'bank' for o in n['offers'])]
             if stray:

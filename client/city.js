@@ -27,7 +27,7 @@
   function stoneTile(g, px, py, x, y) {
     const city = area().city; if (!city) return false;
     if (Field.zone > 0 && (Field.zoneTheme === 'city' || Field.zoneTheme === 'nacre' || Field.zoneTheme === 'asterion')) return false;     // zone roads are painted by field.js
-    const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
+    const inCity=inside(x+.5,y+.5), sh=(city && area().shape ? area().shape.offset : [0,0]), road=!Field.zone && y>=69+sh[1] && y<city.y0 && Math.abs(x+.5-36-sh[0])<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
       if (Field.zoneTheme === 'worldtree') {
@@ -52,7 +52,7 @@
       }
       if (Field.zoneTheme === 'yearwheel') {
         if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
-        const season=(x<200?(y<200?3:0):(y<200?2:1));
+        const yc=Field.yearCentre||[200,200],season=(x<yc[0]?(y<yc[1]?3:0):(y<yc[1]?2:1));
         const colors=[['#b9ddae','#d6efbd','#f3b5cf'],['#efd89d','#ffe8ae','#edab61'],['#dba070','#efc583','#bd684b'],['#b9dce7','#e5f4f4','#8ec6dc']][season];
         poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],colors[(x+y)%2],colors[2],1.3);
         if((x*5+y*7)%6===0)ellipse(g,px,py+21,2.8,2.8,colors[2]);
@@ -119,6 +119,8 @@
       Field.zoneTheme === 'frost' ? poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(210, 20%, ${52+(x*17+y*31)%7}%)`,'#6f8399',.6) : poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(22, 14%, ${25+(x*17+y*31)%6}%)`,'#51413c',.6);
       return true;
     }
+    // Greenmeadow's hamlets stand on the region's own ground; only Alderhaven is paved.
+    if (Field.zone===0 && !(x>=WORLD_MAP.city.x0 && x<=WORLD_MAP.city.x1 && y>=WORLD_MAP.city.y0 && y<=WORLD_MAP.city.y1)) return false;
     const garden=inCity && Math.abs(x+.5-36)>7 && (y<78 || y>88);
     if(garden) { poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],'#779969',null);return true; }
     const plaza=Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)<city.radius;
@@ -226,9 +228,11 @@
       poly(g,[[-9,-9],[0,-34],[10,-9]],'#ffe6a0',null);return;
     }
     if(o.kind==='noticeboard') {
+      g.save();g.transform(1,.5,0,1,0,0);       // the board stands in the +y wall plane (wallPlane), like a house door: isometric, never a front-on elevation
       line(g,[[-34,0],[-34,-100]],'#72543c',7);line(g,[[34,0],[34,-100]],'#72543c',7);
       poly(g,[[-56,-116],[56,-116],[56,-54],[-56,-54]],'#624533','#d4b27b',3);
       for(const x of [-31,0,31])poly(g,[[x-10,-101],[x+11,-99],[x+9,-67],[x-11,-69]],'#e9d3a0',null);
+      g.restore();
       text(g,o.label,0,-137,17,'#ffd58d');return;
     }
     if(o.kind==='house'||o.kind==='chapel')return building(g,o,live);
@@ -261,7 +265,7 @@
   const kit={iso,poly,line,ellipse,prism,text,wallPlane};
   function drawObject(g,o,sx,sy,fade=1) {
     const def=art[o.kind], live=!!o.label&&(o.sign==='live'||['house','chapel'].includes(o.kind));
-    const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0)+'|'+(def?.wallMounted&&o.z>0?1:0);let sprite=cache.get(key);
+    const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0)+'|'+(def?.wallMounted&&o.z>0?1:0)+'|'+(o.style||'');let sprite=cache.get(key);
     const [bw,bh,ox,oy]=def?.box||spriteBox(o);
     if(!sprite){const c=document.createElement('canvas');c.width=bw*2;c.height=bh*2;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(ox,oy);if(def)def.draw(cg,o,kit);else objectArt(cg,o,live);sprite=c;cache.set(key,c);}
     g.save();g.globalAlpha=fade;g.drawImage(sprite,sx-ox,sy-oy,bw,bh);
@@ -288,8 +292,8 @@
   const folk=new Map();
   function folkOf(zone) {
     if(!folk.has(zone)){
-      const quests=(area().quests||[]);
-      folk.set(zone,(area().npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||!!n.travelStop||quests.some(q=>q.npc===n.id)})));
+      const A=zone>0?WORLD_MAP.zones[zone-1]:WORLD_MAP,quests=(A.quests||[]);
+      folk.set(zone,(A.npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||!!n.travelStop||quests.some(q=>q.npc===n.id)})));
     }
     const people=folk.get(zone);return people.some(n=>n.season)?people.filter(n=>!n.season||window.Seasonal?.isActive(n.season)):people;
   }
@@ -297,7 +301,7 @@
   // Called every frame with the server's world time (seconds); walkers are placed, and face the way they go.
   function update(time) {
     clockAt=time;
-    for(const n of folkOf(Field.zone||0)){
+    for(const n of [...folkOf(Field.zone||0),...(Field.vaultZones||[]).flatMap(folkOf)]){      // the other side of a vault walks too
       if(!n.route)continue;
       const p=routePoint(n,time),dx=p.x-n.x,dy=p.y-n.y;
       n.moving=Math.hypot(dx,dy)>1e-4;if(n.moving){n.fx=dx;n.fy=dy;}
@@ -581,5 +585,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();

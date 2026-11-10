@@ -1,0 +1,4798 @@
+{
+ "name": "The Lapis Erg",
+ "theme": "lapiserg",
+ "tagline": "Ochre dunes, turquoise oases, date palms and a sunken brass astrolabe",
+ "size": 160,
+ "levels": [
+  80,
+  85
+ ],
+ "spawn": {
+  "x": 14,
+  "y": 128
+ },
+ "paths": [
+  [
+   [
+    7,
+    128
+   ],
+   [
+    27,
+    128
+   ],
+   [
+    42,
+    113
+   ],
+   [
+    56,
+    99
+   ],
+   [
+    75,
+    90
+   ],
+   [
+    91,
+    73
+   ],
+   [
+    111,
+    57
+   ],
+   [
+    130,
+    43
+   ],
+   [
+    139,
+    29
+   ]
+  ],
+  [
+   [
+    42,
+    113
+   ],
+   [
+    29,
+    92
+   ],
+   [
+    34,
+    68
+   ],
+   [
+    49,
+    55
+   ],
+   [
+    74,
+    45
+   ],
+   [
+    91,
+    73
+   ]
+  ],
+  [
+   [
+    56,
+    99
+   ],
+   [
+    82,
+    116
+   ],
+   [
+    107,
+    110
+   ],
+   [
+    129,
+    92
+   ],
+   [
+    111,
+    57
+   ]
+  ],
+  [
+   [
+    49,
+    55
+   ],
+   [
+    65,
+    29
+   ],
+   [
+    92,
+    21
+   ],
+   [
+    118,
+    22
+   ],
+   [
+    139,
+    29
+   ]
+  ],
+  [
+   [
+    34,
+    68
+   ],
+   [
+    54,
+    78
+   ],
+   [
+    75,
+    90
+   ]
+  ],
+  [
+   [
+    107,
+    110
+   ],
+   [
+    105,
+    81
+   ],
+   [
+    91,
+    73
+   ]
+  ],
+  [
+   [
+    74,
+    45
+   ],
+   [
+    103,
+    41
+   ],
+   [
+    118,
+    22
+   ]
+  ],
+  [
+   [
+    139,
+    29
+   ],
+   [
+    138,
+    34
+   ],
+   [
+    151,
+    31
+   ]
+  ],
+  [
+   [
+    81.5,
+    154.5
+   ],
+   [
+    81.5,
+    138.5
+   ],
+   [
+    72.5,
+    138.5
+   ],
+   [
+    72.5,
+    136.5
+   ],
+   [
+    69.5,
+    136.5
+   ],
+   [
+    69.5,
+    133.5
+   ],
+   [
+    57.5,
+    133.5
+   ],
+   [
+    57.5,
+    132.5
+   ],
+   [
+    51.5,
+    132.5
+   ],
+   [
+    51.5,
+    131.5
+   ],
+   [
+    50.5,
+    131.5
+   ],
+   [
+    50.5,
+    130.5
+   ],
+   [
+    39.5,
+    130.5
+   ],
+   [
+    39.5,
+    128.5
+   ],
+   [
+    14.5,
+    128.5
+   ]
+  ],
+  [
+   [
+    54.5,
+    5.5
+   ],
+   [
+    54.5,
+    31.5
+   ],
+   [
+    52.5,
+    31.5
+   ],
+   [
+    52.5,
+    57.5
+   ],
+   [
+    51.5,
+    57.5
+   ],
+   [
+    51.5,
+    87.5
+   ],
+   [
+    50.5,
+    87.5
+   ],
+   [
+    50.5,
+    92.5
+   ],
+   [
+    46.5,
+    92.5
+   ],
+   [
+    46.5,
+    125.5
+   ],
+   [
+    39.5,
+    125.5
+   ],
+   [
+    39.5,
+    128.5
+   ],
+   [
+    14.5,
+    128.5
+   ]
+  ],
+  [
+   [
+    5.5,
+    89.5
+   ],
+   [
+    5.5,
+    128.5
+   ],
+   [
+    14.5,
+    128.5
+   ]
+  ]
+ ],
+ "objects": [
+  {
+   "kind": "lapis_astrolabe",
+   "x": 140,
+   "y": 23,
+   "r": 0,
+   "v": 0,
+   "place": "lapis_vault",
+   "open": true
+  },
+  {
+   "kind": "lapis_oasis",
+   "x": 37,
+   "y": 116,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "lapis_oasis",
+   "x": 67,
+   "y": 71,
+   "r": 0,
+   "v": 1
+  },
+  {
+   "kind": "lapis_oasis",
+   "x": 116,
+   "y": 95,
+   "r": 0,
+   "v": 2
+  },
+  {
+   "kind": "lapis_caravan_tent",
+   "x": 22,
+   "y": 119,
+   "r": 0,
+   "v": 0,
+   "width": 4,
+   "depth": 3
+  },
+  {
+   "kind": "lapis_caravan_tent",
+   "x": 33,
+   "y": 137,
+   "r": 0,
+   "v": 1,
+   "width": 4,
+   "depth": 3
+  },
+  {
+   "kind": "lapis_caravan_tent",
+   "x": 43,
+   "y": 128,
+   "r": 0,
+   "v": 2,
+   "width": 4,
+   "depth": 3
+  },
+  {
+   "kind": "lapis_well",
+   "x": 29,
+   "y": 126,
+   "r": 1,
+   "v": 0
+  },
+  {
+   "kind": "lapis_mirror",
+   "x": 62,
+   "y": 69,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "lapis_roc_nest",
+   "x": 123,
+   "y": 84,
+   "r": 1.4,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_arch",
+   "x": 99,
+   "y": 35,
+   "r": 1.3,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 135.75,
+   "y": 76.04,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 60.08,
+   "y": 65.0,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 72.21,
+   "y": 68.73,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 109.16,
+   "y": 76.44,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 125.66,
+   "y": 72.39,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 98.55,
+   "y": 98.28,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 66.93,
+   "y": 81.02,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 71.61,
+   "y": 55.61,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 62.89,
+   "y": 75.48,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 91.76,
+   "y": 96.75,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 51.87,
+   "y": 137.05,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 20.62,
+   "y": 107.09,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 100.71,
+   "y": 83.35,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 135.33,
+   "y": 120.43,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 126.35,
+   "y": 109.5,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 102.52,
+   "y": 103.39,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 61.09,
+   "y": 88.47,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 116.53,
+   "y": 88.11,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 143.74,
+   "y": 85.77,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 25.85,
+   "y": 96.1,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 141.12,
+   "y": 97.63,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 109.0,
+   "y": 118.33,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 135.31,
+   "y": 97.79,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 84.81,
+   "y": 90.98,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 69.6,
+   "y": 78.67,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 60.26,
+   "y": 118.84,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 102.94,
+   "y": 68.48,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 111.46,
+   "y": 99.63,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 113.43,
+   "y": 87.72,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 60.27,
+   "y": 112.56,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 53.2,
+   "y": 59.07,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 139.67,
+   "y": 93.77,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 123.97,
+   "y": 119.26,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 50.56,
+   "y": 99.05,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 43.17,
+   "y": 98.42,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 81.4,
+   "y": 91.29,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 130.8,
+   "y": 83.45,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 18.64,
+   "y": 87.54,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 128.81,
+   "y": 110.71,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 53.75,
+   "y": 125.87,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 97.07,
+   "y": 90.46,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 18.1,
+   "y": 96.16,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 25.3,
+   "y": 92.71,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 42.66,
+   "y": 84.64,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 99.16,
+   "y": 123.82,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 121.78,
+   "y": 104.54,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 90.34,
+   "y": 46.53,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 46.59,
+   "y": 86.3,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 132.94,
+   "y": 107.87,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 58.56,
+   "y": 123.6,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 117.39,
+   "y": 120.22,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 48.23,
+   "y": 94.16,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 85.39,
+   "y": 87.13,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 60.53,
+   "y": 92.03,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 94.37,
+   "y": 52.01,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 39.99,
+   "y": 82.99,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 67.31,
+   "y": 58.11,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 38.79,
+   "y": 88.4,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 33.95,
+   "y": 107.29,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 115.71,
+   "y": 125.66,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 137.91,
+   "y": 89.24,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 73.54,
+   "y": 40.91,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 15.01,
+   "y": 102.77,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 25.6,
+   "y": 100.05,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 92.77,
+   "y": 103.08,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 141.67,
+   "y": 103.6,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 140.14,
+   "y": 82.7,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 52.9,
+   "y": 88.61,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 44.08,
+   "y": 53.09,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 111.37,
+   "y": 89.86,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 73.28,
+   "y": 74.87,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 55.77,
+   "y": 93.91,
+   "r": 1.05,
+   "v": 3
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 43.71,
+   "y": 94.44,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 139.77,
+   "y": 116.48,
+   "r": 1.05,
+   "v": 1
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 21.99,
+   "y": 87.94,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 81.84,
+   "y": 75.56,
+   "r": 1.05,
+   "v": 2
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 22.53,
+   "y": 93.41,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_date_palm",
+   "x": 43.75,
+   "y": 46.48,
+   "r": 1.05,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 62.21,
+   "y": 128.48,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 12.06,
+   "y": 76.86,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 25.87,
+   "y": 68.56,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 53.87,
+   "y": 138.95,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 132.0,
+   "y": 69.25,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 128.7,
+   "y": 106.05,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 40.12,
+   "y": 22.99,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 77.69,
+   "y": 122.45,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 112.5,
+   "y": 126.55,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 95.13,
+   "y": 150.82,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 82.31,
+   "y": 70.5,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 148.16,
+   "y": 115.74,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 87.62,
+   "y": 53.26,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 22.51,
+   "y": 33.55,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 118.89,
+   "y": 90.03,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 135.46,
+   "y": 93.29,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 100.71,
+   "y": 94.15,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 88.29,
+   "y": 9.58,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 48.78,
+   "y": 96.79,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 14.88,
+   "y": 88.3,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 101.16,
+   "y": 58.11,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 12.18,
+   "y": 68.1,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 106.46,
+   "y": 26.11,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 86.74,
+   "y": 34.64,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 103.3,
+   "y": 143.64,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 114.91,
+   "y": 13.56,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 134.01,
+   "y": 103.16,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 41.14,
+   "y": 78.88,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 88.61,
+   "y": 29.84,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 144.69,
+   "y": 100.88,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 11.65,
+   "y": 60.09,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 142.53,
+   "y": 130.59,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 38.8,
+   "y": 98.4,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 52.39,
+   "y": 23.27,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 72.62,
+   "y": 59.14,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 52.48,
+   "y": 12.55,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 140.68,
+   "y": 149.91,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 143.13,
+   "y": 79.39,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 21.02,
+   "y": 57.59,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 87.97,
+   "y": 16.41,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 39.19,
+   "y": 56.98,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 11.97,
+   "y": 49.41,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 12.74,
+   "y": 19.53,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 104.05,
+   "y": 116.48,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 113.93,
+   "y": 137.99,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 44.35,
+   "y": 68.99,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 139.96,
+   "y": 142.15,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 17.97,
+   "y": 72.49,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 50.12,
+   "y": 11.72,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 64.23,
+   "y": 13.95,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 49.35,
+   "y": 86.32,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 24.23,
+   "y": 57.23,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 96.47,
+   "y": 37.42,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 64.38,
+   "y": 145.54,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 26.32,
+   "y": 66.03,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 36.33,
+   "y": 45.23,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 137.02,
+   "y": 135.24,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 45.33,
+   "y": 80.99,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 110.33,
+   "y": 39.6,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 86.62,
+   "y": 143.84,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 104.56,
+   "y": 10.4,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 74.57,
+   "y": 95.09,
+   "r": 0.9,
+   "v": 1
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 126.17,
+   "y": 78.17,
+   "r": 0.9,
+   "v": 0
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 88.84,
+   "y": 39.1,
+   "r": 0.9,
+   "v": 3
+  },
+  {
+   "kind": "lapis_sandstone",
+   "x": 19.92,
+   "y": 39.88,
+   "r": 0.9,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 71.51,
+   "y": 134.64,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 117.51,
+   "y": 130.49,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 126.27,
+   "y": 145.35,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 48.65,
+   "y": 19.33,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 56.09,
+   "y": 14.41,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 95.0,
+   "y": 15.26,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 131.1,
+   "y": 141.98,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 139.2,
+   "y": 51.51,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 132.64,
+   "y": 91.36,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 85.76,
+   "y": 110.49,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 13.0,
+   "y": 64.48,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 56.92,
+   "y": 29.52,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 51.9,
+   "y": 91.41,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 53.39,
+   "y": 111.52,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 50.85,
+   "y": 140.04,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 69.74,
+   "y": 139.65,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 56.11,
+   "y": 115.68,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 12.4,
+   "y": 104.81,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 42.75,
+   "y": 25.76,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 133.72,
+   "y": 143.83,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 137.68,
+   "y": 45.91,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 106.89,
+   "y": 55.5,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 32.52,
+   "y": 58.54,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 131.69,
+   "y": 57.84,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 111.77,
+   "y": 73.65,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 84.97,
+   "y": 73.49,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 33.93,
+   "y": 20.75,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 71.05,
+   "y": 126.11,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 149.92,
+   "y": 49.44,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 53.95,
+   "y": 32.9,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 122.16,
+   "y": 12.47,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 150.03,
+   "y": 137.71,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 36.84,
+   "y": 26.37,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 75.45,
+   "y": 33.41,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 9.97,
+   "y": 105.31,
+   "r": 0.8,
+   "v": 3
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 150.15,
+   "y": 101.82,
+   "r": 0.8,
+   "v": 1
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 95.33,
+   "y": 86.01,
+   "r": 0.8,
+   "v": 2
+  },
+  {
+   "kind": "lapis_salt_spire",
+   "x": 71.94,
+   "y": 15.69,
+   "r": 0.8,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 137.83,
+   "y": 131.23,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 91.2,
+   "y": 38.13,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 37.02,
+   "y": 60.97,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 87.61,
+   "y": 109.34,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 148.71,
+   "y": 85.73,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 11.19,
+   "y": 9.32,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 24.74,
+   "y": 39.85,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 79.33,
+   "y": 148.85,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 126.64,
+   "y": 133.84,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 129.28,
+   "y": 48.54,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 149.83,
+   "y": 106.45,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 143.41,
+   "y": 55.41,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 116.34,
+   "y": 84.36,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 144.26,
+   "y": 93.9,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 11.86,
+   "y": 23.39,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 79.99,
+   "y": 17.18,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 142.5,
+   "y": 137.13,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 135.89,
+   "y": 51.54,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 120.89,
+   "y": 54.74,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 143.07,
+   "y": 113.15,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 39.08,
+   "y": 51.75,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 133.6,
+   "y": 121.94,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 20.56,
+   "y": 47.64,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 83.87,
+   "y": 107.16,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 125.39,
+   "y": 64.54,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 43.8,
+   "y": 106.64,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 67.8,
+   "y": 10.09,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 133.16,
+   "y": 44.78,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 24.22,
+   "y": 106.41,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 13.56,
+   "y": 12.33,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 135.24,
+   "y": 116.05,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 98.14,
+   "y": 31.19,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 72.91,
+   "y": 125.09,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 29.81,
+   "y": 39.7,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 41.65,
+   "y": 27.68,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 18.99,
+   "y": 22.93,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 97.03,
+   "y": 16.06,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 85.0,
+   "y": 19.77,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 107.63,
+   "y": 144.15,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 17.67,
+   "y": 81.88,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 80.15,
+   "y": 142.98,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 88.88,
+   "y": 87.13,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 146.44,
+   "y": 48.39,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 131.75,
+   "y": 61.82,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 100.39,
+   "y": 121.16,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 109.72,
+   "y": 51.57,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 58.39,
+   "y": 125.59,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 52.13,
+   "y": 130.82,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 10.54,
+   "y": 24.73,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 23.81,
+   "y": 47.87,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 120.36,
+   "y": 83.53,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 127.15,
+   "y": 9.94,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 36.95,
+   "y": 78.39,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 150.14,
+   "y": 44.66,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 104.87,
+   "y": 47.11,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 97.63,
+   "y": 106.07,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 87.81,
+   "y": 37.61,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 10.26,
+   "y": 93.65,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 104.69,
+   "y": 125.92,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 61.32,
+   "y": 72.69,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 142.56,
+   "y": 121.54,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 92.0,
+   "y": 137.13,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 78.66,
+   "y": 59.98,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 68.25,
+   "y": 52.74,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 35.69,
+   "y": 55.7,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 119.76,
+   "y": 119.25,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 58.11,
+   "y": 115.9,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 70.66,
+   "y": 14.62,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 64.44,
+   "y": 37.35,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 64.48,
+   "y": 114.95,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 41.35,
+   "y": 10.45,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 127.55,
+   "y": 33.5,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 114.0,
+   "y": 132.7,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 111.2,
+   "y": 138.81,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 139.3,
+   "y": 144.83,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 118.27,
+   "y": 16.27,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 101.69,
+   "y": 137.61,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 86.88,
+   "y": 101.98,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 120.33,
+   "y": 16.15,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 95.54,
+   "y": 29.93,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 71.38,
+   "y": 95.91,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 117.9,
+   "y": 27.21,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 139.71,
+   "y": 137.94,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 146.1,
+   "y": 130.07,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 41.38,
+   "y": 12.55,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 117.76,
+   "y": 112.5,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 148.16,
+   "y": 148.91,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 70.93,
+   "y": 35.97,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 13.97,
+   "y": 101.07,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 122.71,
+   "y": 67.03,
+   "r": 0.18,
+   "v": 1
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 74.71,
+   "y": 122.36,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 74.65,
+   "y": 12.39,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 113.8,
+   "y": 51.37,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 55.82,
+   "y": 142.88,
+   "r": 0.18,
+   "v": 3
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 91.88,
+   "y": 106.18,
+   "r": 0.18,
+   "v": 0
+  },
+  {
+   "kind": "lapis_dunegrass",
+   "x": 150.42,
+   "y": 57.86,
+   "r": 0.18,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 42.14,
+   "y": 39.57,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 86.37,
+   "y": 105.53,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 85.29,
+   "y": 137.19,
+   "r": 0.13,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 15.66,
+   "y": 37.11,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 117.03,
+   "y": 83.34,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 32.1,
+   "y": 56.54,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 78.24,
+   "y": 68.53,
+   "r": 0.13,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 69.12,
+   "y": 82.23,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 85.27,
+   "y": 13.26,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 82.68,
+   "y": 121.36,
+   "r": 0.13,
+   "v": 1
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 130.0,
+   "y": 99.38,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 98.78,
+   "y": 16.48,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 121.45,
+   "y": 89.67,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 16.34,
+   "y": 56.65,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 137.77,
+   "y": 129.02,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 144.22,
+   "y": 88.12,
+   "r": 0.13,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 148.21,
+   "y": 131.85,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 115.3,
+   "y": 39.83,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 44.63,
+   "y": 24.96,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 119.04,
+   "y": 122.71,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 76.27,
+   "y": 129.56,
+   "r": 0.13,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 59.27,
+   "y": 104.68,
+   "r": 0.13,
+   "v": 1
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 82.3,
+   "y": 125.85,
+   "r": 0.13,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 34.24,
+   "y": 15.59,
+   "r": 0.13,
+   "v": 1
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 142.63,
+   "y": 95.56,
+   "r": 0.13,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 74.86,
+   "y": 80.07,
+   "r": 0.13,
+   "v": 1
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 150.7,
+   "y": 89.56,
+   "r": 0.13,
+   "v": 1
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 143.85,
+   "y": 92.18,
+   "r": 0.13,
+   "v": 2
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 100.4,
+   "y": 122.25,
+   "r": 0.13,
+   "v": 1
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 119.5,
+   "y": 10.92,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 120.01,
+   "y": 111.82,
+   "r": 0.13,
+   "v": 3
+  },
+  {
+   "kind": "lapis_silk_flag",
+   "x": 108.47,
+   "y": 42.57,
+   "r": 0.13,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 12.2,
+   "y": 80.75,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 112.89,
+   "y": 98.17,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 67.27,
+   "y": 60.63,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 67.22,
+   "y": 52.5,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 81.72,
+   "y": 50.06,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 95.8,
+   "y": 39.15,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 145.45,
+   "y": 114.27,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 109.55,
+   "y": 124.04,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 87.51,
+   "y": 19.1,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 138.69,
+   "y": 43.52,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 121.9,
+   "y": 107.21,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 37.2,
+   "y": 80.35,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 134.58,
+   "y": 123.12,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 81.56,
+   "y": 106.1,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 139.61,
+   "y": 134.74,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 53.08,
+   "y": 148.5,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 137.51,
+   "y": 86.87,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 119.94,
+   "y": 107.5,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 60.67,
+   "y": 135.0,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 14.78,
+   "y": 48.6,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 111.15,
+   "y": 81.22,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 70.07,
+   "y": 104.63,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 26.21,
+   "y": 104.88,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 78.01,
+   "y": 70.95,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 91.68,
+   "y": 31.41,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 124.72,
+   "y": 67.86,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 109.81,
+   "y": 143.54,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 56.64,
+   "y": 111.35,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 56.86,
+   "y": 56.82,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 57.68,
+   "y": 47.75,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 98.62,
+   "y": 145.5,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 118.82,
+   "y": 106.86,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 11.51,
+   "y": 22.55,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 98.68,
+   "y": 12.27,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 26.88,
+   "y": 45.14,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 58.91,
+   "y": 132.54,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 90.25,
+   "y": 120.22,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 138.94,
+   "y": 132.05,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 84.66,
+   "y": 98.71,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 89.89,
+   "y": 91.8,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 95.15,
+   "y": 61.75,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 83.35,
+   "y": 94.05,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 73.55,
+   "y": 137.01,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 136.54,
+   "y": 114.39,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 76.03,
+   "y": 102.54,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 86.16,
+   "y": 123.85,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 96.4,
+   "y": 17.38,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 124.85,
+   "y": 123.88,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 35.78,
+   "y": 32.35,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 113.67,
+   "y": 83.72,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 81.52,
+   "y": 33.44,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 32.37,
+   "y": 15.75,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 133.89,
+   "y": 136.09,
+   "r": 0.08,
+   "v": 2
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 11.0,
+   "y": 54.62,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 19.24,
+   "y": 27.02,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 147.63,
+   "y": 12.19,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 80.14,
+   "y": 73.44,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 114.33,
+   "y": 116.66,
+   "r": 0.08,
+   "v": 1
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 119.55,
+   "y": 148.17,
+   "r": 0.08,
+   "v": 3
+  },
+  {
+   "kind": "lapis_blue_flower",
+   "x": 98.71,
+   "y": 136.37,
+   "r": 0.08,
+   "v": 0
+  },
+  {
+   "kind": "water",
+   "x": 36.41,
+   "y": 115.41,
+   "r": 4.3,
+   "v": 0
+  },
+  {
+   "kind": "water",
+   "x": 66.41,
+   "y": 70.41,
+   "r": 4.3,
+   "v": 0
+  },
+  {
+   "kind": "water",
+   "x": 115.41,
+   "y": 94.41,
+   "r": 4.3,
+   "v": 0
+  }
+ ],
+ "slimes": [
+  {
+   "kind": "dunecolossus",
+   "x": 69,
+   "y": 37
+  },
+  {
+   "kind": "mirageroc",
+   "x": 125,
+   "y": 84
+  },
+  {
+   "kind": "sandhopper",
+   "x": 14.05,
+   "y": 55.82
+  },
+  {
+   "kind": "sandhopper",
+   "x": 25.87,
+   "y": 30.23
+  },
+  {
+   "kind": "sandhopper",
+   "x": 71.8,
+   "y": 82.22
+  },
+  {
+   "kind": "sandhopper",
+   "x": 47.04,
+   "y": 24.55
+  },
+  {
+   "kind": "sandhopper",
+   "x": 33.16,
+   "y": 47.9
+  },
+  {
+   "kind": "sandhopper",
+   "x": 95.22,
+   "y": 34.31
+  },
+  {
+   "kind": "sandhopper",
+   "x": 116.8,
+   "y": 57.89
+  },
+  {
+   "kind": "sandhopper",
+   "x": 48.58,
+   "y": 79.06
+  },
+  {
+   "kind": "sandhopper",
+   "x": 147.05,
+   "y": 51.79
+  },
+  {
+   "kind": "sandhopper",
+   "x": 37.3,
+   "y": 41.27
+  },
+  {
+   "kind": "dunefennec",
+   "x": 95.95,
+   "y": 118.17
+  },
+  {
+   "kind": "dunefennec",
+   "x": 111.99,
+   "y": 46.74
+  },
+  {
+   "kind": "dunefennec",
+   "x": 35.03,
+   "y": 82.34
+  },
+  {
+   "kind": "dunefennec",
+   "x": 126.81,
+   "y": 100.34
+  },
+  {
+   "kind": "dunefennec",
+   "x": 144.52,
+   "y": 40.08
+  },
+  {
+   "kind": "dunefennec",
+   "x": 41.56,
+   "y": 102.52
+  },
+  {
+   "kind": "dunefennec",
+   "x": 68.68,
+   "y": 119.44
+  },
+  {
+   "kind": "dunefennec",
+   "x": 75.91,
+   "y": 69.52
+  },
+  {
+   "kind": "dunefennec",
+   "x": 33.52,
+   "y": 27.66
+  },
+  {
+   "kind": "dunefennec",
+   "x": 72.61,
+   "y": 19.99
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 51.09,
+   "y": 28.86
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 119.66,
+   "y": 45.93
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 125.73,
+   "y": 61.27
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 113.45,
+   "y": 68.59
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 140.98,
+   "y": 111.29
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 20.93,
+   "y": 71.01
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 28.44,
+   "y": 55.03
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 77.36,
+   "y": 16.61
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 144.99,
+   "y": 66.08
+  },
+  {
+   "kind": "glassscorpion",
+   "x": 83.85,
+   "y": 37.68
+  },
+  {
+   "kind": "sunvulture",
+   "x": 48.04,
+   "y": 48.36
+  },
+  {
+   "kind": "sunvulture",
+   "x": 100.93,
+   "y": 28.41
+  },
+  {
+   "kind": "sunvulture",
+   "x": 110.0,
+   "y": 97.13
+  },
+  {
+   "kind": "sunvulture",
+   "x": 54.47,
+   "y": 37.14
+  },
+  {
+   "kind": "sunvulture",
+   "x": 24.14,
+   "y": 24.09
+  },
+  {
+   "kind": "sunvulture",
+   "x": 66.75,
+   "y": 16.73
+  },
+  {
+   "kind": "sunvulture",
+   "x": 68.53,
+   "y": 65.68
+  },
+  {
+   "kind": "sunvulture",
+   "x": 104.23,
+   "y": 121.12
+  },
+  {
+   "kind": "sunvulture",
+   "x": 89.69,
+   "y": 123.13
+  },
+  {
+   "kind": "sunvulture",
+   "x": 61.06,
+   "y": 16.99
+  }
+ ],
+ "npcs": [
+  {
+   "id": "lapis_keeper",
+   "name": "Sahra Bluewell",
+   "role": "Oasis keeper",
+   "x": 27,
+   "y": 131,
+   "color": "#b7e5dc",
+   "dialogue": "The Lapis Erg has three waters. Follow the brass markers; the dunes move, but the wells do not.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   },
+   "art": "lapis_keeper"
+  },
+  {
+   "id": "lapis_healer",
+   "name": "Nima Reedglass",
+   "role": "Water healer",
+   "x": 17,
+   "y": 135,
+   "color": "#b7e5dc",
+   "dialogue": "Rest by the date palms. I keep clean water and tinctures for travelers.",
+   "offers": [
+    {
+     "id": "blessing",
+     "label": "Receive a healing blessing",
+     "cost": 0,
+     "heal": 10000
+    },
+    {
+     "id": "potion",
+     "label": "Buy Health Potion",
+     "cost": 30,
+     "item": "health_potion",
+     "tiered": true
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   }
+  },
+  {
+   "id": "lapis_cartographer",
+   "name": "Ivo Starfold",
+   "role": "Desert cartographer",
+   "x": 40,
+   "y": 122,
+   "color": "#b7e5dc",
+   "dialogue": "The buried astrolabe charts the sky below us. Its iris now opens for prepared parties. For Laleh's horizon lens, use the lowest star in the Mirrored Oasis's reflection as your bearing. The Astrolabe must be shown the sky below, not the sky above.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   },
+   "art": "lapis_cartographer"
+  },
+  {
+   "id": "lapis_trader",
+   "name": "Basma Silk",
+   "role": "Caravan trader",
+   "x": 36,
+   "y": 136,
+   "color": "#b7e5dc",
+   "dialogue": "Lapis dye, dates and dune maps. I will buy what the desert gives you.",
+   "offers": [
+    {
+     "id": "stew",
+     "label": "Buy Traveler's Stew",
+     "cost": 12,
+     "item": "traveler_stew",
+     "tiered": true
+    },
+    {
+     "id": "satchel",
+     "label": "Buy Linen Satchel · 6 extra bag slots",
+     "cost": 500,
+     "bag": "linen_satchel"
+    },
+    {
+     "id": "bag_l10",
+     "label": "Buy Adventurer Satchel · 8 extra bag slots",
+     "cost": 1500,
+     "bag": "adventurer_satchel"
+    },
+    {
+     "id": "bag_l20",
+     "label": "Buy Trail Pack · 10 extra bag slots",
+     "cost": 4000,
+     "bag": "trail_pack_l20"
+    },
+    {
+     "id": "bag_l30",
+     "label": "Buy Ranger Pack · 12 extra bag slots",
+     "cost": 9000,
+     "bag": "ranger_pack_l30"
+    },
+    {
+     "id": "bag_l40",
+     "label": "Buy Expedition Pack · 14 extra bag slots",
+     "cost": 18000,
+     "bag": "expedition_pack_l40"
+    },
+    {
+     "id": "bag_l50",
+     "label": "Buy Traveler Pack · 16 extra bag slots",
+     "cost": 35000,
+     "bag": "traveler_pack"
+    },
+    {
+     "id": "bag_l60",
+     "label": "Buy Pathfinder Pack · 18 extra bag slots",
+     "cost": 60000,
+     "bag": "pathfinder_pack_l60"
+    },
+    {
+     "id": "bag_l70",
+     "label": "Buy Warden Pack · 20 extra bag slots",
+     "cost": 100000,
+     "bag": "warden_pack_l70"
+    },
+    {
+     "id": "bag_l80",
+     "label": "Buy Hero Pack · 22 extra bag slots",
+     "cost": 160000,
+     "bag": "hero_pack_l80"
+    },
+    {
+     "id": "bag_l90",
+     "label": "Buy Sovereign Pack · 24 extra bag slots",
+     "cost": 240000,
+     "bag": "sovereign_pack_l90"
+    },
+    {
+     "id": "buy_cloak_common",
+     "label": "Buy Travel Cloak",
+     "item": "cloak_l5_common",
+     "tiered": true,
+     "cost": 24
+    },
+    {
+     "id": "buy_cloak_uncommon",
+     "label": "Buy Sturdy Cloak",
+     "item": "cloak_l5_uncommon",
+     "tiered": true,
+     "cost": 160
+    },
+    {
+     "id": "buy_cloak_rare",
+     "label": "Buy Rare Cloak",
+     "item": "cloak_l5_rare",
+     "tiered": true,
+     "cost": 384
+    },
+    {
+     "id": "buy_green_weapon_warrior",
+     "label": "Buy Reinforced Royal Sword",
+     "item": "warrior_weapon_royal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_mage",
+     "label": "Buy Reinforced Crystal Staff",
+     "item": "mage_weapon_crystal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_assassin",
+     "label": "Buy Reinforced Moonfang Daggers",
+     "item": "assassin_weapon_moonfang_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_priest",
+     "label": "Buy Reinforced Sunbreaker Mace",
+     "item": "priest_weapon_sunmace_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_hunter",
+     "label": "Buy Reinforced Wildwarden Longbow",
+     "item": "hunter_weapon_wardenbow_l10_green",
+     "tiered": true,
+     "cost": 1000
+    }
+   ],
+   "buys": true,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   }
+  },
+  {
+   "id": "lapis_scout",
+   "name": "Tarek Windstep",
+   "role": "Dune scout",
+   "x": 51,
+   "y": 105,
+   "color": "#b7e5dc",
+   "dialogue": "The fennecs cross the north flats at dusk. The scorpions favor the glassy salt.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior"
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage"
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin"
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest"
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter"
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   }
+  },
+  {
+   "id": "lapis_warden",
+   "name": "Ruma Sunward",
+   "role": "Oasis warden",
+   "x": 77,
+   "y": 86,
+   "color": "#b7e5dc",
+   "dialogue": "The stone giant stirs beyond the mirrored pool. Bring two friends before you face it.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior"
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage"
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin"
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest"
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter"
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   },
+   "art": "lapis_warden"
+  },
+  {
+   "id": "lapis_seer",
+   "name": "Laleh of the Lens",
+   "role": "Astrolabe seer",
+   "x": 127,
+   "y": 45,
+   "color": "#b7e5dc",
+   "dialogue": "The Sunken Astrolabe is open beneath its turning lenses. Bring five travelers.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   },
+   "art": "lapis_seer"
+  },
+  {
+   "id": "lapis_stone",
+   "name": "Lapis Meeting Stone",
+   "role": "Gather a party · hire fighters",
+   "x": 130,
+   "y": 38,
+   "color": "#b7e5dc",
+   "dialogue": "Gather here before descending into the Sunken Astrolabe.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior",
+     "open": true
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage",
+     "open": true
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin",
+     "open": true
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest",
+     "open": true
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter",
+     "open": true
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#a77250",
+    "hair": "#3b4156",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#228c98"
+   },
+   "art": "stone"
+  },
+  {
+   "id": "travel_azure_wells",
+   "name": "Travel Master Nadir",
+   "role": "Caravan courier · Spark Travel",
+   "x": 44,
+   "y": 135,
+   "color": "#74d7d0",
+   "travelStop": "Azure Wells",
+   "travelLinks": [
+    "travel_millbridge",
+    "travel_veyrroot",
+    "travel_solhaven"
+   ],
+   "look": {
+    "hair": "#e4edf4",
+    "skin": "#edc5a1",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#328e97"
+   },
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "offers": [],
+   "buys": false,
+   "art": "lapis_travel"
+  },
+  {
+   "id": "lapis_wrangler",
+   "name": "Zahir Dunereins",
+   "role": "Dune-wrangler",
+   "color": "#e8c98a",
+   "dialogue": "Sand lizards do not tire and do not sulk. A level-80 rider with 160,000 gold can have the best of my string; the rest can walk.",
+   "offers": [
+    {
+     "id": "buy_lizard",
+     "label": "Buy a riding lizard · level 80 · 160,000 gold",
+     "cost": 160000,
+     "mount": "lizard"
+    }
+   ],
+   "buys": false,
+   "x": 40.0,
+   "y": 134.0,
+   "look": {
+    "skin": "#b88b66",
+    "hair": "#3b2a1c",
+    "style": "short",
+    "hat": "hood",
+    "hatColor": "#c9a35a"
+   }
+  },
+  {
+   "id": "mailbox_25_azure_wells",
+   "name": "Mailbox",
+   "role": "Player mail",
+   "x": 47.5,
+   "y": 135.5,
+   "color": "#cda75e",
+   "art": "mailbox",
+   "buys": false,
+   "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+   "offers": [
+    {
+     "id": "mail",
+     "label": "Open mailbox",
+     "cost": 0
+    }
+   ]
+  }
+ ],
+ "places": [
+  {
+   "id": "lapis_vault",
+   "name": "The Sunken Astrolabe",
+   "x": 132,
+   "y": 29,
+   "r": 5
+  },
+  {
+   "id": "lapis_mirror",
+   "name": "Mirrored Oasis",
+   "x": 67,
+   "y": 72,
+   "r": 5
+  },
+  {
+   "id": "lapis_east",
+   "name": "Eastern Oasis",
+   "x": 112,
+   "y": 92,
+   "r": 5
+  },
+  {
+   "id": "es_21_0",
+   "name": "Oath Bell 1",
+   "x": 57,
+   "y": 60,
+   "r": 2.1,
+   "chain": "es_21_bells",
+   "burn": 30
+  },
+  {
+   "id": "es_21_1",
+   "name": "Oath Bell 2",
+   "x": 65,
+   "y": 54,
+   "r": 2.1,
+   "chain": "es_21_bells",
+   "burn": 30
+  },
+  {
+   "id": "es_21_2",
+   "name": "Oath Bell 3",
+   "x": 77,
+   "y": 57,
+   "r": 2.1,
+   "chain": "es_21_bells",
+   "burn": 30
+  }
+ ],
+ "quests": [
+  {
+   "id": "lapis_welcome",
+   "title": "Three Waters",
+   "npc": "lapis_keeper",
+   "description": "Meet the healer, cartographer and scout at Azure Wells.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "lapis_healer",
+     "count": 1,
+     "label": "Meet Nima"
+    },
+    {
+     "kind": "talk",
+     "target": "lapis_cartographer",
+     "count": 1,
+     "label": "Meet Ivo"
+    },
+    {
+     "kind": "talk",
+     "target": "lapis_scout",
+     "count": 1,
+     "label": "Meet Tarek"
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 8000,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l80_green",
+     "warrior_weapon_royal_l80_green",
+     "warrior_headgear_azure_l80_green",
+     "warrior_shoulders_azure_l80_green",
+     "warrior_gloves_azure_l80_green",
+     "cloak_l80_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l80_green",
+     "mage_weapon_crystal_l80_green",
+     "mage_headgear_runic_l80_green",
+     "mage_shoulders_runic_l80_green",
+     "mage_gloves_runic_l80_green",
+     "cloak_l80_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l80_green",
+     "assassin_weapon_moonfang_l80_green",
+     "assassin_headgear_moon_l80_green",
+     "assassin_shoulders_moon_l80_green",
+     "assassin_gloves_moon_l80_green",
+     "cloak_l80_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l80_green",
+     "priest_weapon_sunmace_l80_green",
+     "priest_headgear_dawn_l80_green",
+     "priest_shoulders_dawn_l80_green",
+     "priest_gloves_dawn_l80_green",
+     "cloak_l80_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l80_green",
+     "hunter_weapon_wardenbow_l80_green",
+     "hunter_headgear_warden_l80_green",
+     "hunter_shoulders_warden_l80_green",
+     "hunter_gloves_warden_l80_green",
+     "cloak_l80_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_hoppers",
+   "title": "Dune Dancers",
+   "npc": "lapis_scout",
+   "description": "Sandhoppers have taken the low caravan track.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "sandhopper",
+     "count": 6,
+     "label": "Defeat Sandhoppers"
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 9200,
+   "requires": "lapis_welcome",
+   "repeatable": false,
+   "rewardItem": "necklace_moonstone_l80_green",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l80_green",
+     "warrior_weapon_royal_l80_green",
+     "warrior_headgear_azure_l80_green",
+     "warrior_shoulders_azure_l80_green",
+     "warrior_gloves_azure_l80_green",
+     "cloak_l80_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l80_green",
+     "mage_weapon_crystal_l80_green",
+     "mage_headgear_runic_l80_green",
+     "mage_shoulders_runic_l80_green",
+     "mage_gloves_runic_l80_green",
+     "cloak_l80_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l80_green",
+     "assassin_weapon_moonfang_l80_green",
+     "assassin_headgear_moon_l80_green",
+     "assassin_shoulders_moon_l80_green",
+     "assassin_gloves_moon_l80_green",
+     "cloak_l80_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l80_green",
+     "priest_weapon_sunmace_l80_green",
+     "priest_headgear_dawn_l80_green",
+     "priest_shoulders_dawn_l80_green",
+     "priest_gloves_dawn_l80_green",
+     "cloak_l80_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l80_green",
+     "hunter_weapon_wardenbow_l80_green",
+     "hunter_headgear_warden_l80_green",
+     "hunter_shoulders_warden_l80_green",
+     "hunter_gloves_warden_l80_green",
+     "cloak_l80_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_fennecs",
+   "title": "Under the Date Palms",
+   "npc": "lapis_scout",
+   "description": "Gather fennec fur for the night shelter.",
+   "objectives": [
+    {
+     "kind": "bring",
+     "target": "fennec_fur",
+     "count": 5,
+     "label": "Bring Fennec Fur"
+    }
+   ],
+   "level": 81,
+   "rewardXp": 8220,
+   "rewardGold": 10000,
+   "requires": "lapis_hoppers",
+   "repeatable": false,
+   "rewardItem": "pants_wayfarer_l80_green",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l80_green",
+     "warrior_weapon_royal_l80_green",
+     "warrior_headgear_azure_l80_green",
+     "warrior_shoulders_azure_l80_green",
+     "warrior_gloves_azure_l80_green",
+     "cloak_l80_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l80_green",
+     "mage_weapon_crystal_l80_green",
+     "mage_headgear_runic_l80_green",
+     "mage_shoulders_runic_l80_green",
+     "mage_gloves_runic_l80_green",
+     "cloak_l80_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l80_green",
+     "assassin_weapon_moonfang_l80_green",
+     "assassin_headgear_moon_l80_green",
+     "assassin_shoulders_moon_l80_green",
+     "assassin_gloves_moon_l80_green",
+     "cloak_l80_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l80_green",
+     "priest_weapon_sunmace_l80_green",
+     "priest_headgear_dawn_l80_green",
+     "priest_shoulders_dawn_l80_green",
+     "priest_gloves_dawn_l80_green",
+     "cloak_l80_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l80_green",
+     "hunter_weapon_wardenbow_l80_green",
+     "hunter_headgear_warden_l80_green",
+     "hunter_shoulders_warden_l80_green",
+     "hunter_gloves_warden_l80_green",
+     "cloak_l80_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_scorpions",
+   "title": "The Blue Salt",
+   "npc": "lapis_cartographer",
+   "description": "Clear glass scorpions from the route to the mirrored oasis.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "glassscorpion",
+     "count": 6,
+     "label": "Defeat Glass Scorpions"
+    }
+   ],
+   "level": 82,
+   "rewardXp": 8420,
+   "rewardGold": 10900,
+   "requires": "lapis_fennecs",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l80_green",
+     "warrior_weapon_royal_l80_green",
+     "warrior_headgear_azure_l80_green",
+     "warrior_shoulders_azure_l80_green",
+     "warrior_gloves_azure_l80_green",
+     "cloak_l80_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l80_green",
+     "mage_weapon_crystal_l80_green",
+     "mage_headgear_runic_l80_green",
+     "mage_shoulders_runic_l80_green",
+     "mage_gloves_runic_l80_green",
+     "cloak_l80_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l80_green",
+     "assassin_weapon_moonfang_l80_green",
+     "assassin_headgear_moon_l80_green",
+     "assassin_shoulders_moon_l80_green",
+     "assassin_gloves_moon_l80_green",
+     "cloak_l80_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l80_green",
+     "priest_weapon_sunmace_l80_green",
+     "priest_headgear_dawn_l80_green",
+     "priest_shoulders_dawn_l80_green",
+     "priest_gloves_dawn_l80_green",
+     "cloak_l80_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l80_green",
+     "hunter_weapon_wardenbow_l80_green",
+     "hunter_headgear_warden_l80_green",
+     "hunter_shoulders_warden_l80_green",
+     "hunter_gloves_warden_l80_green",
+     "cloak_l80_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_vultures",
+   "title": "Wings over Water",
+   "npc": "lapis_keeper",
+   "description": "Keep sun vultures from the eastern water basin.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "sunvulture",
+     "count": 6,
+     "label": "Defeat Sun Vultures"
+    }
+   ],
+   "level": 83,
+   "rewardXp": 8610,
+   "rewardGold": 11800,
+   "requires": "lapis_scorpions",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l80_green",
+     "warrior_weapon_royal_l80_green",
+     "warrior_headgear_azure_l80_green",
+     "warrior_shoulders_azure_l80_green",
+     "warrior_gloves_azure_l80_green",
+     "cloak_l80_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l80_green",
+     "mage_weapon_crystal_l80_green",
+     "mage_headgear_runic_l80_green",
+     "mage_shoulders_runic_l80_green",
+     "mage_gloves_runic_l80_green",
+     "cloak_l80_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l80_green",
+     "assassin_weapon_moonfang_l80_green",
+     "assassin_headgear_moon_l80_green",
+     "assassin_shoulders_moon_l80_green",
+     "assassin_gloves_moon_l80_green",
+     "cloak_l80_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l80_green",
+     "priest_weapon_sunmace_l80_green",
+     "priest_headgear_dawn_l80_green",
+     "priest_shoulders_dawn_l80_green",
+     "priest_gloves_dawn_l80_green",
+     "cloak_l80_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l80_green",
+     "hunter_weapon_wardenbow_l80_green",
+     "hunter_headgear_warden_l80_green",
+     "hunter_shoulders_warden_l80_green",
+     "hunter_gloves_warden_l80_green",
+     "cloak_l80_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_colossus",
+   "title": "The Walking Dune",
+   "npc": "lapis_warden",
+   "description": "Three companions should confront the dune colossus beyond the mirrored pool.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "dunecolossus",
+     "count": 1,
+     "label": "Defeat the Dune Colossus"
+    }
+   ],
+   "level": 84,
+   "rewardXp": 8810,
+   "rewardGold": 19000,
+   "requires": "lapis_scorpions",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 3,
+   "rewardItem": "accessory_amber_l85_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l80_blue",
+     "warrior_weapon_sword_l80_blue",
+     "warrior_headgear_crimson_l80_blue",
+     "warrior_shoulders_crimson_l80_blue",
+     "warrior_gloves_crimson_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l80_blue",
+     "mage_weapon_ash_l80_blue",
+     "mage_headgear_apprentice_l80_blue",
+     "mage_shoulders_apprentice_l80_blue",
+     "mage_gloves_apprentice_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l80_blue",
+     "assassin_weapon_daggers_l80_blue",
+     "assassin_headgear_shadow_l80_blue",
+     "assassin_shoulders_shadow_l80_blue",
+     "assassin_gloves_shadow_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l80_blue",
+     "priest_weapon_mace_l80_blue",
+     "priest_headgear_pilgrim_l80_blue",
+     "priest_shoulders_pilgrim_l80_blue",
+     "priest_gloves_pilgrim_l80_blue",
+     "cloak_l80_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l80_blue",
+     "hunter_weapon_shortbow_l80_blue",
+     "hunter_headgear_scout_l80_blue",
+     "hunter_shoulders_scout_l80_blue",
+     "hunter_gloves_scout_l80_blue",
+     "cloak_l80_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_roc",
+   "title": "The Mirage Roc",
+   "npc": "lapis_seer",
+   "description": "Five companions must face the roc above the eastern oasis.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "mirageroc",
+     "count": 1,
+     "label": "Defeat the Mirage Roc"
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 26000,
+   "requires": "lapis_vultures",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardItem": "necklace_moonstone_l85_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l85_blue",
+     "warrior_weapon_sword_l85_blue",
+     "warrior_headgear_crimson_l85_blue",
+     "warrior_shoulders_crimson_l85_blue",
+     "warrior_gloves_crimson_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l85_blue",
+     "mage_weapon_ash_l85_blue",
+     "mage_headgear_apprentice_l85_blue",
+     "mage_shoulders_apprentice_l85_blue",
+     "mage_gloves_apprentice_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l85_blue",
+     "assassin_weapon_daggers_l85_blue",
+     "assassin_headgear_shadow_l85_blue",
+     "assassin_shoulders_shadow_l85_blue",
+     "assassin_gloves_shadow_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l85_blue",
+     "priest_weapon_mace_l85_blue",
+     "priest_headgear_pilgrim_l85_blue",
+     "priest_shoulders_pilgrim_l85_blue",
+     "priest_gloves_pilgrim_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l85_blue",
+     "hunter_weapon_shortbow_l85_blue",
+     "hunter_headgear_scout_l85_blue",
+     "hunter_shoulders_scout_l85_blue",
+     "hunter_gloves_scout_l85_blue",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_astrolabe",
+   "title": "The Buried Sky",
+   "npc": "lapis_seer",
+   "description": "Inspect the open astrolabe and consult the Meeting Stone.",
+   "objectives": [
+    {
+     "kind": "visit",
+     "target": "lapis_vault",
+     "count": 1,
+     "label": "Inspect the Sunken Astrolabe"
+    },
+    {
+     "kind": "talk",
+     "target": "lapis_stone",
+     "count": 1,
+     "label": "Consult the Meeting Stone"
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 14000,
+   "requires": "lapis_vultures",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l85_green",
+     "warrior_weapon_royal_l85_green",
+     "warrior_headgear_azure_l85_green",
+     "warrior_shoulders_azure_l85_green",
+     "warrior_gloves_azure_l85_green",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l85_green",
+     "mage_weapon_crystal_l85_green",
+     "mage_headgear_runic_l85_green",
+     "mage_shoulders_runic_l85_green",
+     "mage_gloves_runic_l85_green",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l85_green",
+     "assassin_weapon_moonfang_l85_green",
+     "assassin_headgear_moon_l85_green",
+     "assassin_shoulders_moon_l85_green",
+     "assassin_gloves_moon_l85_green",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l85_green",
+     "priest_weapon_sunmace_l85_green",
+     "priest_headgear_dawn_l85_green",
+     "priest_shoulders_dawn_l85_green",
+     "priest_gloves_dawn_l85_green",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l85_green",
+     "hunter_weapon_wardenbow_l85_green",
+     "hunter_headgear_warden_l85_green",
+     "hunter_shoulders_warden_l85_green",
+     "hunter_gloves_warden_l85_green",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_astro_trials",
+   "title": "The Meridian Wardens",
+   "npc": "lapis_seer",
+   "description": "Defeat the first two wardens and the mechanisms that protect the Sunken Astrolabe.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "astro_warden",
+     "count": 1,
+     "label": "Defeat the Meridian Warden"
+    },
+    {
+     "kind": "kill",
+     "target": "astro_navigator",
+     "count": 1,
+     "label": "Defeat the Lost Navigator"
+    },
+    {
+     "kind": "kill",
+     "target": "astro_gearling",
+     "count": 3,
+     "label": "Defeat Brass Gearlings"
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 23000,
+   "requires": "lapis_astrolabe",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l85_blue",
+     "warrior_weapon_sword_l85_blue",
+     "warrior_headgear_crimson_l85_blue",
+     "warrior_shoulders_crimson_l85_blue",
+     "warrior_gloves_crimson_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l85_blue",
+     "mage_weapon_ash_l85_blue",
+     "mage_headgear_apprentice_l85_blue",
+     "mage_shoulders_apprentice_l85_blue",
+     "mage_gloves_apprentice_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l85_blue",
+     "assassin_weapon_daggers_l85_blue",
+     "assassin_headgear_shadow_l85_blue",
+     "assassin_shoulders_shadow_l85_blue",
+     "assassin_gloves_shadow_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l85_blue",
+     "priest_weapon_mace_l85_blue",
+     "priest_headgear_pilgrim_l85_blue",
+     "priest_shoulders_pilgrim_l85_blue",
+     "priest_gloves_pilgrim_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l85_blue",
+     "hunter_weapon_shortbow_l85_blue",
+     "hunter_headgear_scout_l85_blue",
+     "hunter_shoulders_scout_l85_blue",
+     "hunter_gloves_scout_l85_blue",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_astro_final",
+   "title": "Axis of the Buried Sky",
+   "npc": "lapis_seer",
+   "description": "Destroy the buried axis and bring its starlight back to Azure Wells.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "astro_axis",
+     "count": 1,
+     "label": "Defeat the Axis of the Buried Sky"
+    }
+   ],
+   "level": 85,
+   "rewardXp": 9010,
+   "rewardGold": 36000,
+   "requires": "lapis_astro_trials",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardItem": "accessory_amber_l85_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l85_blue",
+     "warrior_weapon_sword_l85_blue",
+     "warrior_headgear_crimson_l85_blue",
+     "warrior_shoulders_crimson_l85_blue",
+     "warrior_gloves_crimson_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l85_blue",
+     "mage_weapon_ash_l85_blue",
+     "mage_headgear_apprentice_l85_blue",
+     "mage_shoulders_apprentice_l85_blue",
+     "mage_gloves_apprentice_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l85_blue",
+     "assassin_weapon_daggers_l85_blue",
+     "assassin_headgear_shadow_l85_blue",
+     "assassin_shoulders_shadow_l85_blue",
+     "assassin_gloves_shadow_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l85_blue",
+     "priest_weapon_mace_l85_blue",
+     "priest_headgear_pilgrim_l85_blue",
+     "priest_shoulders_pilgrim_l85_blue",
+     "priest_gloves_pilgrim_l85_blue",
+     "cloak_l85_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l85_blue",
+     "hunter_weapon_shortbow_l85_blue",
+     "hunter_headgear_scout_l85_blue",
+     "hunter_shoulders_scout_l85_blue",
+     "hunter_gloves_scout_l85_blue",
+     "cloak_l85_rare"
+    ]
+   }
+  },
+  {
+   "id": "lapis_patrol",
+   "title": "Follow the Blue Wells",
+   "npc": "lapis_keeper",
+   "description": "Patrol the desert routes between the basins.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "sandhopper",
+     "count": 3,
+     "label": "Defeat Sandhoppers"
+    },
+    {
+     "kind": "kill",
+     "target": "glassscorpion",
+     "count": 3,
+     "label": "Defeat Glass Scorpions"
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 7000,
+   "requires": "lapis_welcome",
+   "repeatable": true
+  },
+  {
+   "id": "lapis_onward",
+   "title": "The Lapis Road",
+   "npc": "lapis_keeper",
+   "description": "Leave Veyrroot for the Lapis Erg and report to Sahra Bluewell.",
+   "objectives": [
+    {
+     "kind": "reach",
+     "target": "The Lapis Erg",
+     "label": "Travel to the Lapis Erg",
+     "count": 1
+    }
+   ],
+   "level": 80,
+   "rewardXp": 8030,
+   "rewardGold": 12500,
+   "requires": null,
+   "repeatable": false,
+   "autoLevel": 80
+  },
+  {
+   "id": "entry_astro",
+   "title": "The Sky Beneath the Sand",
+   "description": "The Sunken Astrolabe has forgotten which way is up. Bring three Glass Scorpion Shards for a new horizon lens, ask Ivo Starfold at Azure Wells for the lost star bearing, and visit the Mirrored Oasis to catch the sky beneath your feet. Return to Laleh of the Lens; she will set the bearing and teach the door to recognise you. The shards are used to make the lens. This opens the Sunken Astrolabe permanently for you.",
+   "npc": "lapis_seer",
+   "level": 85,
+   "minLevel": 85,
+   "requires": null,
+   "repeatable": false,
+   "rewardXp": 9010,
+   "rewardGold": 0,
+   "objectives": [
+    {
+     "kind": "bring",
+     "target": "scorpion_glass",
+     "label": "Bring Glass Scorpion Shards for the horizon lens",
+     "count": 3
+    },
+    {
+     "kind": "talk",
+     "target": "lapis_cartographer",
+     "label": "Ask Ivo for the lost star bearing",
+     "count": 1
+    },
+    {
+     "kind": "visit",
+     "target": "lapis_mirror",
+     "label": "Catch the reflected sky at the Mirrored Oasis",
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "es_21",
+   "title": "The Route Beneath Every Map",
+   "npc": "lapis_cartographer",
+   "description": "Ivo sees the old forge roads reflected under the sand. Tune all three survey bells within thirty seconds. Their joined note will show where the failing chains are sending their heat.",
+   "objectives": [
+    {
+     "kind": "chime",
+     "target": "es_21_bells",
+     "label": "Ring the three oath bells together",
+     "count": 3
+    }
+   ],
+   "level": 83,
+   "minLevel": 83,
+   "rewardXp": 8610,
+   "rewardGold": 996,
+   "requires": "es_20",
+   "repeatable": false,
+   "story": {
+    "title": "The Empty Seat",
+    "chapter": 21,
+    "recap": [
+     "Every buried road points toward Asterion. The heat does not spread at random: Eldmarr is testing which root will carry him closest to the hall."
+    ],
+    "next": "Next chapter: An Apology Made of Ice. Speak to Ylva Bellward in Frostwake Shelf at level 88."
+   },
+   "rewardChoices": {
+    "warrior": [
+     "warrior_weapon_royal_l80_green",
+     "warrior_armor_azure_l80_green"
+    ],
+    "mage": [
+     "mage_weapon_crystal_l80_green",
+     "mage_armor_runic_l80_green"
+    ],
+    "assassin": [
+     "assassin_weapon_moonfang_l80_green",
+     "assassin_armor_moon_l80_green"
+    ],
+    "priest": [
+     "priest_weapon_sunmace_l80_green",
+     "priest_armor_dawn_l80_green"
+    ],
+    "hunter": [
+     "hunter_weapon_wardenbow_l80_green",
+     "hunter_armor_warden_l80_green"
+    ]
+   }
+  },
+  {
+   "id": "es_go_21",
+   "title": "Seek Ivo Starfold",
+   "npc": "lapis_cartographer",
+   "description": "Speak to Ivo Starfold in The Lapis Erg at level 83 to continue The Empty Seat: The Route Beneath Every Map. This direction stays in your journal until you accept that chapter.",
+   "objectives": [
+    {
+     "kind": "handoff",
+     "target": "lapis_cartographer",
+     "count": 1,
+     "label": "Speak to Ivo Starfold at level 83"
+    }
+   ],
+   "level": 83,
+   "minLevel": 1,
+   "rewardXp": 0,
+   "rewardGold": 0,
+   "requires": "es_20",
+   "autoLevel": 1,
+   "repeatable": false,
+   "handoffTo": "es_21"
+  }
+ ],
+ "city": {
+  "name": "Azure Wells",
+  "x0": 10,
+  "x1": 50,
+  "y0": 108,
+  "y1": 148,
+  "plaza": {
+   "x": 29,
+   "y": 128
+  },
+  "radius": 6,
+  "entry": {
+   "x": 14,
+   "y": 128
+  }
+ },
+ "futureInstance": {
+  "name": "The Sunken Astrolabe",
+  "level": 85,
+  "players": 5,
+  "status": "open",
+  "x": 140,
+  "y": 23,
+  "description": "A vast brass lens rises from the dune; a spiral stair descends beneath its open iris."
+ },
+ "portals": [
+  {
+   "id": "lapis_canopy_gate",
+   "name": "Veyrroot Canopy",
+   "x": 81.5,
+   "y": 154.5,
+   "r": 1.2,
+   "to": 23,
+   "tx": 62.5,
+   "ty": 11.5,
+   "walk": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "lapis_astrolabe_gate",
+   "name": "The Sunken Astrolabe",
+   "x": 140,
+   "y": 26,
+   "r": 1.2,
+   "to": 34,
+   "tx": 48,
+   "ty": 82,
+   "look": "sunken_astrolabe",
+   "needs_quest": "entry_astro"
+  },
+  {
+   "id": "atlas_25_28",
+   "name": "The Yearwheel",
+   "r": 1.2,
+   "to": 28,
+   "x": 54.5,
+   "y": 5.5,
+   "tx": 267.5,
+   "ty": 388.5,
+   "walk": [
+    0,
+    -1
+   ]
+  },
+  {
+   "id": "path_25_20",
+   "name": "Sunward Vale",
+   "r": 2.0,
+   "to": 20,
+   "x": 5.5,
+   "y": 89.5,
+   "tx": 116.5,
+   "ty": 56.5,
+   "walk": [
+    -1,
+    0
+   ]
+  }
+ ],
+ "exitRoutes": [
+  {
+   "portal": "lapis_canopy_gate",
+   "points": [
+    [
+     81.5,
+     154.5
+    ],
+    [
+     81.5,
+     138.5
+    ],
+    [
+     79.5,
+     138.5
+    ]
+   ]
+  },
+  {
+   "portal": "atlas_25_28",
+   "points": [
+    [
+     54.5,
+     5.5
+    ],
+    [
+     54.5,
+     23.5
+    ]
+   ]
+  },
+  {
+   "portal": "path_25_20",
+   "points": [
+    [
+     5.5,
+     89.5
+    ],
+    [
+     5.5,
+     107.5
+    ]
+   ]
+  }
+ ],
+ "atlasPaths": [
+  [
+   [
+    81.5,
+    154.5
+   ],
+   [
+    81.5,
+    138.5
+   ],
+   [
+    72.5,
+    138.5
+   ],
+   [
+    72.5,
+    136.5
+   ],
+   [
+    69.5,
+    136.5
+   ],
+   [
+    69.5,
+    133.5
+   ],
+   [
+    57.5,
+    133.5
+   ],
+   [
+    57.5,
+    132.5
+   ],
+   [
+    51.5,
+    132.5
+   ],
+   [
+    51.5,
+    131.5
+   ],
+   [
+    50.5,
+    131.5
+   ],
+   [
+    50.5,
+    130.5
+   ],
+   [
+    39.5,
+    130.5
+   ],
+   [
+    39.5,
+    128.5
+   ],
+   [
+    14.5,
+    128.5
+   ]
+  ],
+  [
+   [
+    54.5,
+    5.5
+   ],
+   [
+    54.5,
+    31.5
+   ],
+   [
+    52.5,
+    31.5
+   ],
+   [
+    52.5,
+    57.5
+   ],
+   [
+    51.5,
+    57.5
+   ],
+   [
+    51.5,
+    87.5
+   ],
+   [
+    50.5,
+    87.5
+   ],
+   [
+    50.5,
+    92.5
+   ],
+   [
+    46.5,
+    92.5
+   ],
+   [
+    46.5,
+    125.5
+   ],
+   [
+    39.5,
+    125.5
+   ],
+   [
+    39.5,
+    128.5
+   ],
+   [
+    14.5,
+    128.5
+   ]
+  ],
+  [
+   [
+    5.5,
+    89.5
+   ],
+   [
+    5.5,
+    128.5
+   ],
+   [
+    14.5,
+    128.5
+   ]
+  ]
+ ]
+}

@@ -330,6 +330,9 @@ pub struct Character {
     /// Automatic quests explicitly abandoned by the player stay dismissed until retaken.
     #[serde(default)]
     pub abandoned_quests: Vec<String>,
+    /// Set only when the character is created on Greenmeadow's dock; cleared when they step off it and its quest finds them.
+    #[serde(default)]
+    pub landing: bool,
     #[serde(default)]
     pub seasonal_claims: std::collections::BTreeMap<String, u32>,
     #[serde(default)]
@@ -567,6 +570,7 @@ impl Character {
             mount_tint: 0,
             starters_granted: vec![],
             bank: Default::default(),
+            landing: false,
         };
         c.seed_inventory();
         if let Some(piece) = crate::items::ITEMS
@@ -1014,6 +1018,10 @@ pub struct Quest {
     /// A rewardless direction to the next story giver, resolved when that chapter is accepted.
     #[serde(default)]
     pub handoff_to: Option<String>,
+    /// Greenmeadow's landing quest: never handed out by level or by a giver, only when a new hero steps off the dock
+    /// (`Map::dock`, world/landing.rs). It also carries `auto_level`, so no giver offers it and no one can accept it.
+    #[serde(default)]
+    pub landing: bool,
 }
 #[derive(Clone, Deserialize)]
 pub struct QuestObjective {
@@ -1063,6 +1071,10 @@ impl Quest {
             }
         }
         character.inventory.retain(|s| s.quantity > 0);
+    }
+    /// The Empty Seat (Eldmarr's story: chapters `es_NN` and their `es_go_NN` directions) cannot be abandoned (owner, 2026-11-07).
+    pub fn abandonable(&self) -> bool {
+        !self.id.starts_with("es_")
     }
     pub fn unlocked(&self, character: &Character) -> bool {
         self.requires.as_ref().is_none_or(|id| {
@@ -1133,6 +1145,7 @@ pub fn sync_progression(character: &mut Character, maps: &[Map]) -> Vec<String> 
         if quest
             .auto_level
             .is_some_and(|level| character.level >= level)
+            && !quest.landing
             && quest.unlocked(character)
             && !character.abandoned_quests.contains(&quest.id)
             && !character.quests.iter().any(|q| q.id == quest.id)
@@ -1232,6 +1245,9 @@ pub enum ClientMessage {
         session: Option<String>,
         #[serde(default)]
         character: Option<String>,
+        /// The client can inflate raw-deflate binary frames: snapshots then arrive compressed (`send_snapshot`).
+        #[serde(default)]
+        compress: bool,
     },
     Input {
         dx: f64,
@@ -1859,6 +1875,72 @@ pub struct Portal {
     /// A copy-local lift unlocks when this boss is dead; reset restores the boss.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub needs_boss: Option<String>,
+    /// A border you can cross anywhere along its length (docs/zone-shapes.md): the whole shared edge of two shaped zones.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seam: Option<Seam>,
+    /// A vault in a landmark city's wall (docs/zone-shapes-pilot.md): the gate and the city's own arch are one doorway seen from two
+    /// zones, so the walker keeps its place relative to it: the arrival is `here + vault`, no hop, and the client shows no banner,
+    /// journey notice or chat line (held movement carries on like across a seam).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vault: Option<[f64; 2]>,
+    /// Half the width of the vault's opening: the crossing happens anywhere across the opening (past the arch's centre), not only at
+    /// the gate point, so there is no way round it inside the arch.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vault_half: Option<f64>,
+}
+/// The shared border of two shaped zones. Both zones use one tile scale, so the other side is the same line shifted by
+/// `shift`. The land runs a few tiles past the line (the zone's margin) so a walker can step across it; the moment the
+/// walker is past the line the server moves it by `shift`, to the same spot of the other zone: no hop, no message.
+#[derive(Clone, Deserialize, Serialize)]
+pub struct Seam {
+    pub points: Vec<[f64; 2]>,
+    pub shift: [f64; 2],
+    /// +1 when the other zone lies to the left of the polyline's direction (cross product positive), -1 when to the right.
+    pub side: f64,
+}
+impl Seam {
+    /// Past the line by less than this is a crossing; the margin of land beyond the line is a little deeper.
+    pub const REACH: f64 = 3.;
+    /// How far `p` is from the border line.
+    pub fn distance(&self, p: Point) -> f64 {
+        self.points
+            .windows(2)
+            .map(|pair| {
+                let (a, b) = (pair[0], pair[1]);
+                let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+                let len2 = dx * dx + dy * dy;
+                let t = if len2 < 1e-12 {
+                    0.
+                } else {
+                    (((p.x - a[0]) * dx + (p.y - a[1]) * dy) / len2).clamp(0., 1.)
+                };
+                (p.x - a[0] - dx * t).hypot(p.y - a[1] - dy * t)
+            })
+            .fold(f64::MAX, f64::min)
+    }
+    /// The walker's new position when it stands beyond the border line, or None while it is still on this side.
+    pub fn crossing(&self, p: Point) -> Option<Point> {
+        let mut best: Option<(f64, f64)> = None;
+        for pair in self.points.windows(2) {
+            let (a, b) = (pair[0], pair[1]);
+            let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+            let len2 = dx * dx + dy * dy;
+            let t = if len2 < 1e-12 {
+                0.
+            } else {
+                (((p.x - a[0]) * dx + (p.y - a[1]) * dy) / len2).clamp(0., 1.)
+            };
+            let d = (p.x - a[0] - dx * t).hypot(p.y - a[1] - dy * t);
+            if best.is_none_or(|(bd, _)| d < bd) {
+                best = Some((d, dx * (p.y - a[1]) - dy * (p.x - a[0])));
+            }
+        }
+        let (d, cross) = best?;
+        (d < Self::REACH && cross * self.side > 0.).then_some(Point {
+            x: p.x + self.shift[0],
+            y: p.y + self.shift[1],
+        })
+    }
 }
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1870,6 +1952,28 @@ pub struct RaidCross {
     pub boss_name: String,
     pub color: String,
 }
+/// The pier new heroes arrive on (scripts/greenmeadow_dock.py): the box of its planks, where a new character
+/// starts, and the quest that finds them when they leave it.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Dock {
+    pub x0: f64,
+    pub x1: f64,
+    pub y0: f64,
+    pub y1: f64,
+    pub start: Point,
+    pub quest: String,
+    /// The NPC who greets a new arrival on the pier, and what they say (once, shortly after the hero appears).
+    #[serde(default)]
+    pub greeter: Option<String>,
+    #[serde(default)]
+    pub greeting: Option<String>,
+}
+impl Dock {
+    pub fn contains(&self, p: Point) -> bool {
+        p.x >= self.x0 && p.x <= self.x1 && p.y >= self.y0 && p.y <= self.y1
+    }
+}
+
 #[derive(Clone, Deserialize)]
 pub struct Map {
     #[serde(default)]
@@ -1879,6 +1983,9 @@ pub struct Map {
     pub size: u32,
     pub spawn: Point,
     pub objects: Vec<Obstacle>,
+    /// Built on first use; see `object_grid.rs`.
+    #[serde(skip)]
+    pub grid: crate::object_grid::GridSlot,
     pub slimes: Vec<SlimeSpawn>,
     #[serde(default)]
     pub npcs: Vec<Npc>,
@@ -1888,6 +1995,9 @@ pub struct Map {
     /// Further sanctuaries of a zone with more than one hub (the Wyrdwood's Skuldwatch): `city` is the first.
     #[serde(default)]
     pub camps: Vec<City>,
+    /// Greenmeadow's landing pier: new characters start on it and get its quest when they step off.
+    #[serde(default)]
+    pub dock: Option<Dock>,
     #[serde(default)]
     pub portals: Vec<Portal>,
     /// Spots that `visit` quest objectives name: standing inside one marks the objective done.
@@ -1951,50 +2061,62 @@ impl Map {
         {
             return false;
         }
-        !self.objects.iter().any(|o| {
-            if o.width > 0. && o.depth > 0. {
-                let mut lo: f64 = 0.;
-                let mut hi: f64 = 1.;
-                for (a, b, min, max) in [
-                    (
-                        start.x,
-                        end.x,
-                        o.x - o.width / 2. - radius,
-                        o.x + o.width / 2. + radius,
-                    ),
-                    (
-                        start.y,
-                        end.y,
-                        o.y - o.depth / 2. - radius,
-                        o.y + o.depth / 2. + radius,
-                    ),
-                ] {
-                    let d = b - a;
-                    if d.abs() < 1e-10 {
-                        if a < min || a > max {
-                            return false;
-                        }
-                    } else {
-                        let t1 = (min - a) / d;
-                        let t2 = (max - a) / d;
-                        lo = lo.max(t1.min(t2));
-                        hi = hi.min(t1.max(t2));
+        match self.grid.get(&self.objects, self.size) {
+            Some(grid) => !grid.along((start.x, start.y), (end.x, end.y), radius, |id| {
+                Self::blocks_line(&self.objects[id as usize], start, end, radius)
+            }),
+            None => self.line_clear_scan(start, end, radius),
+        }
+    }
+    fn line_clear_scan(&self, start: Point, end: Point, radius: f64) -> bool {
+        !self
+            .objects
+            .iter()
+            .any(|o| Self::blocks_line(o, start, end, radius))
+    }
+    fn blocks_line(o: &Obstacle, start: Point, end: Point, radius: f64) -> bool {
+        if o.width > 0. && o.depth > 0. {
+            let mut lo: f64 = 0.;
+            let mut hi: f64 = 1.;
+            for (a, b, min, max) in [
+                (
+                    start.x,
+                    end.x,
+                    o.x - o.width / 2. - radius,
+                    o.x + o.width / 2. + radius,
+                ),
+                (
+                    start.y,
+                    end.y,
+                    o.y - o.depth / 2. - radius,
+                    o.y + o.depth / 2. + radius,
+                ),
+            ] {
+                let d = b - a;
+                if d.abs() < 1e-10 {
+                    if a < min || a > max {
+                        return false;
                     }
-                }
-                lo <= hi
-            } else {
-                let dx = end.x - start.x;
-                let dy = end.y - start.y;
-                let len2 = dx * dx + dy * dy;
-                let t = if len2 < 1e-12 {
-                    0.
                 } else {
-                    ((o.x - start.x) * dx + (o.y - start.y) * dy) / len2
+                    let t1 = (min - a) / d;
+                    let t2 = (max - a) / d;
+                    lo = lo.max(t1.min(t2));
+                    hi = hi.min(t1.max(t2));
                 }
-                .clamp(0., 1.);
-                (start.x + t * dx - o.x).hypot(start.y + t * dy - o.y) <= o.r + radius
             }
-        })
+            lo <= hi
+        } else {
+            let dx = end.x - start.x;
+            let dy = end.y - start.y;
+            let len2 = dx * dx + dy * dy;
+            let t = if len2 < 1e-12 {
+                0.
+            } else {
+                ((o.x - start.x) * dx + (o.y - start.y) * dy) / len2
+            }
+            .clamp(0., 1.);
+            (start.x + t * dx - o.x).hypot(start.y + t * dy - o.y) <= o.r + radius
+        }
     }
     pub fn in_city(&self, point: Point) -> bool {
         self.city
@@ -2003,37 +2125,71 @@ impl Map {
             .any(|city| city.contains(point))
     }
     pub fn collide(&self, p: &mut Point, radius: f64) {
+        let Some(grid) = self.grid.get(&self.objects, self.size) else {
+            return self.collide_scan(p, radius);
+        };
+        let mut near = Vec::with_capacity(32);
         for _ in 0..2 {
-            for o in &self.objects {
-                if o.width > 0. && o.depth > 0. {
-                    // Expanded footprints also prevent dashes through buildings and walls.
-                    let hx = o.width / 2. + radius;
-                    let hy = o.depth / 2. + radius;
-                    let dx = p.x - o.x;
-                    let dy = p.y - o.y;
-                    if dx.abs() < hx && dy.abs() < hy {
-                        if hx - dx.abs() < hy - dy.abs() {
-                            p.x = o.x + if dx < 0. { -hx } else { hx };
-                        } else {
-                            p.y = o.y + if dy < 0. { -hy } else { hy };
-                        }
+            // File order, as the scan: a push moves `p`, so what is near is asked again for the obstacles still to come.
+            let mut from = 0;
+            'pass: loop {
+                grid.in_box(
+                    p.x - radius,
+                    p.y - radius,
+                    p.x + radius,
+                    p.y + radius,
+                    from,
+                    &mut near,
+                );
+                for &id in &near {
+                    let before = (p.x, p.y);
+                    Self::push_out(&self.objects[id as usize], p, radius);
+                    if before != (p.x, p.y) {
+                        from = id + 1;
+                        continue 'pass;
                     }
-                    continue;
                 }
-                let d = p.distance(Point { x: o.x, y: o.y });
-                let min = radius + o.r;
-                if d < min {
-                    let n = if d < 1e-8 {
-                        Point { x: 1., y: 0. }
-                    } else {
-                        normalize(p.x - o.x, p.y - o.y)
-                    };
-                    p.x = o.x + n.x * min;
-                    p.y = o.y + n.y * min;
-                }
+                break;
             }
             p.x = p.x.clamp(0.7, self.size as f64 - 0.7);
             p.y = p.y.clamp(0.7, self.size as f64 - 0.7);
+        }
+    }
+    fn collide_scan(&self, p: &mut Point, radius: f64) {
+        for _ in 0..2 {
+            for o in &self.objects {
+                Self::push_out(o, p, radius);
+            }
+            p.x = p.x.clamp(0.7, self.size as f64 - 0.7);
+            p.y = p.y.clamp(0.7, self.size as f64 - 0.7);
+        }
+    }
+    fn push_out(o: &Obstacle, p: &mut Point, radius: f64) {
+        if o.width > 0. && o.depth > 0. {
+            // Expanded footprints also prevent dashes through buildings and walls.
+            let hx = o.width / 2. + radius;
+            let hy = o.depth / 2. + radius;
+            let dx = p.x - o.x;
+            let dy = p.y - o.y;
+            if dx.abs() < hx && dy.abs() < hy {
+                if hx - dx.abs() < hy - dy.abs() {
+                    p.x = o.x + if dx < 0. { -hx } else { hx };
+                } else {
+                    p.y = o.y + if dy < 0. { -hy } else { hy };
+                }
+            }
+            return;
+        }
+        let d = p.distance(Point { x: o.x, y: o.y });
+        let min = radius + o.r;
+        if d < min {
+            let n = if d < 1e-8 {
+                Point { x: 1., y: 0. }
+            } else {
+                normalize(p.x - o.x, p.y - o.y)
+            };
+            p.x = o.x + n.x * min;
+            p.y = o.y + n.y * min;
         }
     }
     pub fn walk(&self, p: &mut Point, direction: Point, distance: f64, radius: f64) {
@@ -2050,6 +2206,100 @@ impl Map {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The grid must change nothing: every zone, random points and radii, near obstacles and far, sight lines short and long.
+    #[test]
+    fn grid_matches_the_full_scan() {
+        let world: Map = serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
+        let mut seed = 0x2545_f491_4f6c_dd1du64;
+        let mut roll = move || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            (seed >> 11) as f64 / (1u64 << 53) as f64
+        };
+        let (mut pushed, mut blocked, mut clear) = (0, 0, 0);
+        for map in std::iter::once(&world).chain(world.zones.iter()) {
+            assert!(map.grid.get(&map.objects, map.size).is_some());
+            let size = map.size as f64;
+            for k in 0..4000 {
+                // half the points beside an obstacle, so pushes and chains of pushes really happen
+                let (x, y) = match (k % 2 == 0, map.objects.len()) {
+                    (true, n) if n > 0 => {
+                        let o = &map.objects[(roll() * n as f64) as usize];
+                        (
+                            o.x + (roll() - 0.5) * (o.width + 3.),
+                            o.y + (roll() - 0.5) * (o.depth + 3.),
+                        )
+                    }
+                    _ => (roll() * (size + 8.) - 4., roll() * (size + 8.) - 4.),
+                };
+                let radius = [0., 0.05, 0.1, 0.3, 0.75, 1.2, 3.][k % 7];
+                let (mut a, mut b) = (Point { x, y }, Point { x, y });
+                map.collide(&mut a, radius);
+                map.collide_scan(&mut b, radius);
+                assert_eq!(
+                    (a.x, a.y),
+                    (b.x, b.y),
+                    "{} collide at {x},{y} r {radius}",
+                    map.name
+                );
+                pushed += usize::from((a.x, a.y) != (x, y));
+                let reach = [1., 6., 25., 120., size][k % 5];
+                let end = Point {
+                    x: (x + (roll() - 0.5) * reach).clamp(0., size),
+                    y: (y + (roll() - 0.5) * reach).clamp(0., size),
+                };
+                let start = Point {
+                    x: x.clamp(0., size),
+                    y: y.clamp(0., size),
+                };
+                let clear_now = map.line_clear(start, end, radius);
+                assert_eq!(
+                    clear_now,
+                    map.line_clear_scan(start, end, radius),
+                    "{} line {start:?} to {end:?} r {radius}",
+                    map.name
+                );
+                if clear_now {
+                    clear += 1;
+                } else {
+                    blocked += 1;
+                }
+            }
+        }
+        assert!(
+            pushed > 10000 && blocked > 10000 && clear > 10000,
+            "{pushed} {blocked} {clear}"
+        );
+    }
+
+    #[test]
+    fn a_map_whose_obstacles_were_replaced_uses_the_scan() {
+        let mut map = Map {
+            objects: vec![Obstacle {
+                x: 5.,
+                y: 5.,
+                r: 1.,
+                width: 0.,
+                depth: 0.,
+            }],
+            size: 16,
+            ..Map::default()
+        };
+        assert!(!map.line_clear(Point { x: 1., y: 5. }, Point { x: 9., y: 5. }, 0.));
+        map.objects = vec![Obstacle {
+            x: 5.,
+            y: 9.,
+            r: 1.,
+            width: 0.,
+            depth: 0.,
+        }];
+        assert!(map.line_clear(Point { x: 1., y: 5. }, Point { x: 9., y: 5. }, 0.));
+        let mut clone_source = map.clone();
+        clone_source.objects[0].y = 5.;
+        assert!(!clone_source.line_clear(Point { x: 1., y: 5. }, Point { x: 9., y: 5. }, 0.));
+    }
 
     #[test]
     fn sight_lines_stop_at_rectangular_walls_and_round_obstacles() {
@@ -2183,6 +2433,7 @@ mod tests {
     #[test]
     fn collision_blocks_dash_tunnelling_and_resolves_centres() {
         let map = Map {
+            grid: Default::default(),
             crosses: vec![],
             name: String::new(),
             size: 72,
@@ -2193,6 +2444,7 @@ mod tests {
             quests: vec![],
             city: None,
             camps: vec![],
+            dock: None,
             places: vec![],
             portals: vec![],
             levels: None,

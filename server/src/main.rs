@@ -10,6 +10,7 @@ mod items;
 mod mail;
 mod model;
 mod notify;
+mod object_grid;
 mod perks;
 mod rebirth;
 mod rested;
@@ -206,6 +207,7 @@ fn zone_view(snapshot: &Value, id: &str, zone: &mut usize) -> Option<Value> {
     }
     let mut view = zones.get(*zone).cloned()?;
     visibility::filter_view(&mut view, id);
+    visibility::cull_view(&mut view, id);
     Some(view)
 }
 pub(crate) fn origin_allowed(headers: &HeaderMap, configured: Option<&str>) -> bool {
@@ -251,7 +253,37 @@ async fn send(socket: &mut WebSocket, value: &Value) -> bool {
         Ok(Ok(()))
     )
 }
+/// A snapshot, deflated into a binary frame when the client asked for it at join (the WebSocket library under axum has
+/// no permessage-deflate). Raw deflate at the fastest level: snapshots are repetitive JSON and the host is shared.
+async fn send_snapshot(socket: &mut WebSocket, value: &Value, compress: bool) -> bool {
+    if !compress {
+        return send(socket, value).await;
+    }
+    let Ok(text) = serde_json::to_vec(value) else {
+        return false;
+    };
+    let packed = {
+        use std::io::Write;
+        let mut encoder = flate2::write::DeflateEncoder::new(
+            Vec::with_capacity(text.len() / 4),
+            flate2::Compression::fast(),
+        );
+        encoder.write_all(&text).and_then(|()| encoder.finish())
+    };
+    let Ok(packed) = packed else {
+        return false;
+    };
+    matches!(
+        tokio::time::timeout(
+            Duration::from_secs(2),
+            socket.send(Message::Binary(packed.into()))
+        )
+        .await,
+        Ok(Ok(()))
+    )
+}
 async fn connection(mut socket: WebSocket, mut app: App) {
+    let compress;
     let first = tokio::time::timeout(Duration::from_secs(8), socket.recv()).await;
     let identity = match first {
         Ok(Some(Ok(Message::Text(text)))) => {
@@ -262,17 +294,23 @@ async fn connection(mut socket: WebSocket, mut app: App) {
                     look,
                     session: None,
                     character: None,
-                }) => Identity::Guest {
-                    token,
-                    look: look.map(|l| *l),
-                },
+                    compress: wants,
+                }) => {
+                    compress = wants;
+                    Identity::Guest {
+                        token,
+                        look: look.map(|l| *l),
+                    }
+                }
                 Ok(ClientMessage::Join {
                     version: 1,
                     token: None,
                     look,
                     session: Some(session),
                     character,
+                    compress: wants,
                 }) => {
+                    compress = wants;
                     let store = app.store.clone();
                     let found = tokio::task::spawn_blocking(move || {
                         store.session_account(&session).map_err(|e| e.to_string())
@@ -363,7 +401,7 @@ async fn connection(mut socket: WebSocket, mut app: App) {
                 changed=app.snapshots.changed()=>{
                     if changed.is_err(){break;}
                     let view=zone_view(&app.snapshots.borrow_and_update(),&id,&mut zone);
-                    if let Some(view)=view && !send(&mut socket,&view).await{break;}
+                    if let Some(view)=view && !send_snapshot(&mut socket,&view,compress).await{break;}
                 }
                 event=events.recv()=>{
                     let Some(event)=event else {break;};if !send(&mut socket,&event).await{break;}

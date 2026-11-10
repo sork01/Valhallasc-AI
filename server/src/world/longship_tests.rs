@@ -6,7 +6,14 @@ const LONGSHIP: usize = 43;
 const DEEP: usize = 8;
 
 fn enter(w: &mut World, session: u64) {
-    place(w, session, DEEP, at(54., 146.));
+    // the Longship's door stands beside Keelhaven (it moved with the Deep's reshape on the zone-shapes pilot)
+    let door = w.maps[DEEP]
+        .portals
+        .iter()
+        .find(|p| p.id == "deep_longship")
+        .unwrap()
+        .clone();
+    place(w, session, DEEP, at(door.x, door.y));
     w.time += 2.;
     w.use_portal(session);
 }

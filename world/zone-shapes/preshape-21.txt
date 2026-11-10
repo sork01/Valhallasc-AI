@@ -1,0 +1,4319 @@
+{
+ "name": "The Ribbonwild",
+ "theme": "ribbonwild",
+ "tagline": "A vivid processional wheel of color courts, silk pavilions and painted lawns",
+ "size": 136,
+ "levels": [
+  70,
+  75
+ ],
+ "spawn": {
+  "x": 12,
+  "y": 70
+ },
+ "paths": [
+  [
+   [
+    72,
+    28
+   ],
+   [
+    97,
+    38
+   ],
+   [
+    108,
+    65
+   ],
+   [
+    97,
+    93
+   ],
+   [
+    72,
+    106
+   ],
+   [
+    46,
+    93
+   ],
+   [
+    36,
+    67
+   ],
+   [
+    46,
+    40
+   ],
+   [
+    72,
+    28
+   ]
+  ],
+  [
+   [
+    7,
+    70
+   ],
+   [
+    29,
+    70
+   ],
+   [
+    36,
+    67
+   ],
+   [
+    58,
+    67
+   ],
+   [
+    72,
+    67
+   ],
+   [
+    88,
+    67
+   ],
+   [
+    108,
+    65
+   ],
+   [
+    119,
+    65
+   ]
+  ],
+  [
+   [
+    72,
+    28
+   ],
+   [
+    72,
+    67
+   ],
+   [
+    72,
+    106
+   ]
+  ],
+  [
+   [
+    46,
+    40
+   ],
+   [
+    72,
+    67
+   ],
+   [
+    97,
+    93
+   ]
+  ],
+  [
+   [
+    46,
+    93
+   ],
+   [
+    72,
+    67
+   ],
+   [
+    97,
+    38
+   ]
+  ],
+  [
+   [
+    97,
+    93
+   ],
+   [
+    110,
+    108
+   ],
+   [
+    129,
+    117
+   ]
+  ],
+  [
+   [
+    72.5,
+    5.5
+   ],
+   [
+    72.5,
+    69.5
+   ],
+   [
+    62.5,
+    69.5
+   ],
+   [
+    62.5,
+    70.5
+   ],
+   [
+    12.5,
+    70.5
+   ]
+  ],
+  [
+   [
+    130.5,
+    72.5
+   ],
+   [
+    130.5,
+    69.5
+   ],
+   [
+    62.5,
+    69.5
+   ],
+   [
+    62.5,
+    70.5
+   ],
+   [
+    12.5,
+    70.5
+   ]
+  ],
+  [
+   [
+    5.5,
+    56.5
+   ],
+   [
+    5.5,
+    70.5
+   ],
+   [
+    12.5,
+    70.5
+   ]
+  ]
+ ],
+ "objects": [
+  {
+   "kind": "grand_pavilion_gate",
+   "x": 120,
+   "y": 65,
+   "r": 0,
+   "v": 0,
+   "open": true,
+   "place": "ribbon_pavilion"
+  },
+  {
+   "kind": "silk_pavilion",
+   "x": 17,
+   "y": 54,
+   "r": 0,
+   "v": 0,
+   "width": 5,
+   "depth": 4
+  },
+  {
+   "kind": "silk_pavilion",
+   "x": 42,
+   "y": 54,
+   "r": 0,
+   "v": 1,
+   "width": 5,
+   "depth": 4
+  },
+  {
+   "kind": "silk_pavilion",
+   "x": 17,
+   "y": 88,
+   "r": 0,
+   "v": 2,
+   "width": 5,
+   "depth": 4
+  },
+  {
+   "kind": "silk_pavilion",
+   "x": 42,
+   "y": 88,
+   "r": 0,
+   "v": 3,
+   "width": 5,
+   "depth": 4
+  },
+  {
+   "kind": "painted_stall",
+   "x": 22,
+   "y": 50,
+   "r": 0,
+   "v": 0,
+   "width": 3,
+   "depth": 2
+  },
+  {
+   "kind": "painted_stall",
+   "x": 37,
+   "y": 48,
+   "r": 0,
+   "v": 1,
+   "width": 3,
+   "depth": 2
+  },
+  {
+   "kind": "painted_stall",
+   "x": 21,
+   "y": 91,
+   "r": 0,
+   "v": 2,
+   "width": 3,
+   "depth": 2
+  },
+  {
+   "kind": "painted_stall",
+   "x": 35,
+   "y": 92,
+   "r": 0,
+   "v": 3,
+   "width": 3,
+   "depth": 2
+  },
+  {
+   "kind": "parade_standard",
+   "x": 65,
+   "y": 20,
+   "r": 0.8,
+   "v": 0,
+   "place": "ribbon_gryphon_court"
+  },
+  {
+   "kind": "mask_dais",
+   "x": 104,
+   "y": 91,
+   "r": 1.2,
+   "v": 0,
+   "place": "ribbon_mask_court"
+  },
+  {
+   "kind": "mosaic_disc",
+   "x": 72,
+   "y": 67,
+   "r": 0,
+   "v": 0
+  },
+  {
+   "kind": "oak_tree",
+   "x": 41.91,
+   "y": 14.56,
+   "r": 1.25,
+   "v": 3
+  },
+  {
+   "kind": "oak_tree",
+   "x": 13.39,
+   "y": 11.67,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 116.78,
+   "y": 10.41,
+   "r": 1.25,
+   "v": 1
+  },
+  {
+   "kind": "oak_tree",
+   "x": 43.53,
+   "y": 26.02,
+   "r": 1.25,
+   "v": 3
+  },
+  {
+   "kind": "oak_tree",
+   "x": 32.81,
+   "y": 35.28,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 90.33,
+   "y": 17.82,
+   "r": 1.25,
+   "v": 3
+  },
+  {
+   "kind": "oak_tree",
+   "x": 49.36,
+   "y": 51.62,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 94.25,
+   "y": 15.43,
+   "r": 1.25,
+   "v": 1
+  },
+  {
+   "kind": "oak_tree",
+   "x": 56.48,
+   "y": 118.21,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 110.37,
+   "y": 44.43,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 125.64,
+   "y": 83.15,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 58.55,
+   "y": 92.91,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 119.17,
+   "y": 80.02,
+   "r": 1.25,
+   "v": 2
+  },
+  {
+   "kind": "oak_tree",
+   "x": 90.44,
+   "y": 30.61,
+   "r": 1.25,
+   "v": 3
+  },
+  {
+   "kind": "birch_tree",
+   "x": 9.9,
+   "y": 107.4,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "birch_tree",
+   "x": 48.59,
+   "y": 27.41,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "birch_tree",
+   "x": 124.17,
+   "y": 94.64,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "birch_tree",
+   "x": 60.88,
+   "y": 46.5,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "birch_tree",
+   "x": 104.69,
+   "y": 113.19,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "birch_tree",
+   "x": 125.57,
+   "y": 39.12,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "birch_tree",
+   "x": 52.48,
+   "y": 121.57,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "birch_tree",
+   "x": 112.25,
+   "y": 113.85,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "birch_tree",
+   "x": 77.23,
+   "y": 116.8,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "birch_tree",
+   "x": 89.21,
+   "y": 72.22,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "birch_tree",
+   "x": 62.39,
+   "y": 25.29,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "birch_tree",
+   "x": 10.02,
+   "y": 20.59,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "birch_tree",
+   "x": 95.64,
+   "y": 103.57,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "apple_tree",
+   "x": 44.2,
+   "y": 104.28,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "apple_tree",
+   "x": 93.46,
+   "y": 117.18,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "apple_tree",
+   "x": 121.27,
+   "y": 41.72,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "apple_tree",
+   "x": 100.16,
+   "y": 107.24,
+   "r": 1.0,
+   "v": 1
+  },
+  {
+   "kind": "apple_tree",
+   "x": 79.94,
+   "y": 90.82,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "apple_tree",
+   "x": 85.74,
+   "y": 91.03,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "apple_tree",
+   "x": 85.77,
+   "y": 14.75,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "apple_tree",
+   "x": 107.13,
+   "y": 27.38,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "apple_tree",
+   "x": 123.92,
+   "y": 45.39,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "apple_tree",
+   "x": 59.13,
+   "y": 105.92,
+   "r": 1.0,
+   "v": 2
+  },
+  {
+   "kind": "apple_tree",
+   "x": 42.99,
+   "y": 97.52,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "apple_tree",
+   "x": 106.32,
+   "y": 35.78,
+   "r": 1.0,
+   "v": 3
+  },
+  {
+   "kind": "apple_tree",
+   "x": 11.6,
+   "y": 27.74,
+   "r": 1.0,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 84.03,
+   "y": 87.69,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 62.64,
+   "y": 11.61,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 39.19,
+   "y": 15.52,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 51.59,
+   "y": 13.45,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 112.61,
+   "y": 25.91,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 69.83,
+   "y": 118.98,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 94.58,
+   "y": 58.69,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 13.1,
+   "y": 109.0,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 18.37,
+   "y": 24.96,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 109.59,
+   "y": 118.85,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 119.66,
+   "y": 35.88,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 84.97,
+   "y": 107.67,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 20.16,
+   "y": 115.3,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 71.77,
+   "y": 120.82,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 70.88,
+   "y": 123.97,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 100.89,
+   "y": 25.85,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 125.59,
+   "y": 101.3,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 18.36,
+   "y": 20.76,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 49.98,
+   "y": 77.35,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 46.26,
+   "y": 22.39,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 105.1,
+   "y": 33.34,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 82.04,
+   "y": 94.34,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 65.32,
+   "y": 35.73,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 34.42,
+   "y": 107.57,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 40.85,
+   "y": 112.49,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 19.78,
+   "y": 102.76,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 68.29,
+   "y": 41.61,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 102.68,
+   "y": 111.34,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 47.85,
+   "y": 111.39,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 100.62,
+   "y": 72.16,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 88.93,
+   "y": 28.36,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 91.73,
+   "y": 11.22,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 23.58,
+   "y": 20.35,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 13.82,
+   "y": 118.4,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 103.76,
+   "y": 117.47,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 9.54,
+   "y": 44.57,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 100.88,
+   "y": 122.02,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 80.01,
+   "y": 112.15,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 110.81,
+   "y": 23.71,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 90.95,
+   "y": 122.15,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 112.5,
+   "y": 34.57,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 110.68,
+   "y": 27.03,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 59.53,
+   "y": 15.92,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 91.76,
+   "y": 113.51,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 105.98,
+   "y": 118.1,
+   "r": 0.85,
+   "v": 0
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 16.37,
+   "y": 41.03,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 108.22,
+   "y": 42.58,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 95.98,
+   "y": 71.2,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 14.13,
+   "y": 27.92,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 60.88,
+   "y": 63.14,
+   "r": 0.85,
+   "v": 2
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 23.65,
+   "y": 115.09,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 20.76,
+   "y": 21.9,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 59.39,
+   "y": 60.1,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 27.12,
+   "y": 18.49,
+   "r": 0.85,
+   "v": 3
+  },
+  {
+   "kind": "fan_topiary",
+   "x": 30.54,
+   "y": 37.9,
+   "r": 0.85,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 99.54,
+   "y": 17.69,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 87.14,
+   "y": 58.56,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 92.51,
+   "y": 73.44,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 77.67,
+   "y": 95.44,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 41.33,
+   "y": 20.33,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 61.31,
+   "y": 43.67,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 79.78,
+   "y": 53.54,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 107.56,
+   "y": 13.53,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 114.91,
+   "y": 24.49,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 107.72,
+   "y": 52.89,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 79.2,
+   "y": 38.93,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 95.52,
+   "y": 86.44,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 17.21,
+   "y": 107.32,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 51.34,
+   "y": 50.21,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 56.54,
+   "y": 106.19,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 123.2,
+   "y": 90.39,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 57.24,
+   "y": 40.37,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 70.14,
+   "y": 115.33,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 126.32,
+   "y": 22.77,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 88.09,
+   "y": 22.11,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 84.25,
+   "y": 105.13,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 88.56,
+   "y": 123.01,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 56.77,
+   "y": 86.14,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 84.8,
+   "y": 23.64,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 85.66,
+   "y": 59.97,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 64.0,
+   "y": 87.76,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 73.39,
+   "y": 111.33,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 98.86,
+   "y": 116.9,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 76.53,
+   "y": 38.36,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 36.22,
+   "y": 22.65,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 48.74,
+   "y": 20.1,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 67.98,
+   "y": 111.24,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 84.14,
+   "y": 71.37,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 39.9,
+   "y": 123.95,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 84.43,
+   "y": 123.81,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 48.35,
+   "y": 11.82,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 19.41,
+   "y": 31.37,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 65.69,
+   "y": 123.98,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 26.33,
+   "y": 26.47,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 88.24,
+   "y": 76.4,
+   "r": 0.35,
+   "v": 3
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 41.0,
+   "y": 96.78,
+   "r": 0.35,
+   "v": 0
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 127.0,
+   "y": 87.87,
+   "r": 0.35,
+   "v": 1
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 84.12,
+   "y": 16.75,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "ribbon_pole",
+   "x": 79.09,
+   "y": 48.05,
+   "r": 0.35,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 108.73,
+   "y": 39.63,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 51.92,
+   "y": 24.33,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 59.88,
+   "y": 42.07,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 112.72,
+   "y": 22.67,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 117.84,
+   "y": 17.69,
+   "r": 0.22,
+   "v": 1
+  },
+  {
+   "kind": "pinwheel",
+   "x": 54.31,
+   "y": 75.07,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 96.97,
+   "y": 50.0,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 63.06,
+   "y": 88.54,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 37.27,
+   "y": 122.21,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 15.62,
+   "y": 102.03,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 91.82,
+   "y": 20.68,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 33.16,
+   "y": 110.37,
+   "r": 0.22,
+   "v": 1
+  },
+  {
+   "kind": "pinwheel",
+   "x": 43.44,
+   "y": 29.81,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 124.12,
+   "y": 18.0,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 106.12,
+   "y": 14.59,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 75.26,
+   "y": 56.72,
+   "r": 0.22,
+   "v": 1
+  },
+  {
+   "kind": "pinwheel",
+   "x": 53.23,
+   "y": 24.62,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 120.89,
+   "y": 13.06,
+   "r": 0.22,
+   "v": 1
+  },
+  {
+   "kind": "pinwheel",
+   "x": 89.53,
+   "y": 105.9,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 75.3,
+   "y": 112.94,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 21.56,
+   "y": 123.5,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 24.39,
+   "y": 110.92,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 67.88,
+   "y": 49.71,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 30.97,
+   "y": 11.69,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 80.56,
+   "y": 108.94,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 85.55,
+   "y": 122.42,
+   "r": 0.22,
+   "v": 1
+  },
+  {
+   "kind": "pinwheel",
+   "x": 98.9,
+   "y": 122.29,
+   "r": 0.22,
+   "v": 1
+  },
+  {
+   "kind": "pinwheel",
+   "x": 114.79,
+   "y": 43.4,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 97.6,
+   "y": 15.36,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 112.82,
+   "y": 19.02,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 95.47,
+   "y": 97.52,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 19.93,
+   "y": 24.54,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 17.71,
+   "y": 33.95,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 80.16,
+   "y": 44.34,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 87.06,
+   "y": 37.56,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 107.08,
+   "y": 79.66,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 61.15,
+   "y": 27.45,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 54.49,
+   "y": 114.35,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 98.19,
+   "y": 114.99,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 55.51,
+   "y": 61.8,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 46.64,
+   "y": 32.09,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 53.78,
+   "y": 115.09,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 93.66,
+   "y": 99.93,
+   "r": 0.22,
+   "v": 0
+  },
+  {
+   "kind": "pinwheel",
+   "x": 23.57,
+   "y": 96.84,
+   "r": 0.22,
+   "v": 2
+  },
+  {
+   "kind": "pinwheel",
+   "x": 90.61,
+   "y": 53.71,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "pinwheel",
+   "x": 114.35,
+   "y": 53.25,
+   "r": 0.22,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 56.57,
+   "y": 56.13,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 60.24,
+   "y": 108.15,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 72.99,
+   "y": 109.44,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 103.01,
+   "y": 123.22,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 55.73,
+   "y": 87.19,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 122.33,
+   "y": 36.07,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 30.72,
+   "y": 109.2,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 60.08,
+   "y": 90.73,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 26.7,
+   "y": 96.08,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 23.12,
+   "y": 41.86,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 66.9,
+   "y": 77.11,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 112.09,
+   "y": 13.73,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 105.64,
+   "y": 119.56,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 42.72,
+   "y": 36.01,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 41.38,
+   "y": 21.63,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 34.16,
+   "y": 110.5,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 37.35,
+   "y": 118.67,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 13.0,
+   "y": 25.62,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 47.36,
+   "y": 114.31,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 96.92,
+   "y": 73.98,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 102.49,
+   "y": 116.23,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 112.02,
+   "y": 39.25,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 40.91,
+   "y": 43.03,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 82.38,
+   "y": 35.07,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 80.11,
+   "y": 45.76,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 23.49,
+   "y": 12.4,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 55.48,
+   "y": 107.04,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 34.52,
+   "y": 98.07,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 112.67,
+   "y": 11.92,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 92.13,
+   "y": 107.85,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 10.65,
+   "y": 13.09,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 95.09,
+   "y": 46.22,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 58.62,
+   "y": 89.09,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 120.33,
+   "y": 107.47,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 109.92,
+   "y": 73.62,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 33.96,
+   "y": 21.84,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 18.92,
+   "y": 13.34,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 62.15,
+   "y": 109.99,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 34.88,
+   "y": 110.8,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 115.91,
+   "y": 106.09,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 105.37,
+   "y": 31.54,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 82.88,
+   "y": 15.88,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 83.78,
+   "y": 72.83,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 120.33,
+   "y": 48.62,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 90.71,
+   "y": 57.55,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 85.23,
+   "y": 28.96,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 65.5,
+   "y": 11.25,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 56.41,
+   "y": 93.09,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 37.27,
+   "y": 37.63,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 45.74,
+   "y": 13.1,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 55.78,
+   "y": 23.7,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 83.06,
+   "y": 73.91,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 88.24,
+   "y": 62.15,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 81.84,
+   "y": 106.96,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 84.89,
+   "y": 18.61,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 108.43,
+   "y": 55.77,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 124.37,
+   "y": 87.35,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 94.23,
+   "y": 33.69,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 21.26,
+   "y": 104.96,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 35.87,
+   "y": 106.75,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 86.72,
+   "y": 60.75,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 9.84,
+   "y": 11.77,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 105.46,
+   "y": 23.88,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 31.81,
+   "y": 26.21,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 52.17,
+   "y": 81.23,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 122.03,
+   "y": 78.19,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 95.47,
+   "y": 26.28,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 79.0,
+   "y": 39.92,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 120.17,
+   "y": 25.18,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 66.89,
+   "y": 113.26,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 97.37,
+   "y": 70.53,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 100.14,
+   "y": 115.38,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 126.21,
+   "y": 14.98,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 60.61,
+   "y": 107.49,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 119.03,
+   "y": 120.57,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 125.04,
+   "y": 17.73,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 99.12,
+   "y": 109.64,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 40.47,
+   "y": 10.5,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 43.09,
+   "y": 107.54,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 126.32,
+   "y": 20.48,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 33.91,
+   "y": 118.12,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 37.42,
+   "y": 101.47,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 44.98,
+   "y": 14.14,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 54.72,
+   "y": 102.43,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 92.73,
+   "y": 20.32,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 60.5,
+   "y": 73.33,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 108.31,
+   "y": 54.42,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 126.87,
+   "y": 29.95,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 58.28,
+   "y": 39.57,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 100.47,
+   "y": 37.69,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 10.46,
+   "y": 36.64,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 123.58,
+   "y": 28.19,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 81.51,
+   "y": 63.44,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 19.88,
+   "y": 40.55,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 93.22,
+   "y": 114.87,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 49.77,
+   "y": 104.08,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 56.91,
+   "y": 112.35,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 121.06,
+   "y": 11.15,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 81.6,
+   "y": 16.47,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 85.58,
+   "y": 10.43,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 50.98,
+   "y": 104.18,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 94.25,
+   "y": 61.78,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 34.29,
+   "y": 39.75,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 65.78,
+   "y": 46.19,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 70.31,
+   "y": 112.92,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 91.88,
+   "y": 56.12,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 46.96,
+   "y": 30.79,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 49.71,
+   "y": 49.32,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 96.8,
+   "y": 54.5,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 90.71,
+   "y": 23.24,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 40.25,
+   "y": 25.26,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 85.68,
+   "y": 63.75,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 88.38,
+   "y": 20.04,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 53.52,
+   "y": 59.63,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 66.78,
+   "y": 56.45,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 16.17,
+   "y": 15.83,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 108.88,
+   "y": 25.06,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 51.17,
+   "y": 61.75,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 99.42,
+   "y": 77.63,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 42.24,
+   "y": 105.22,
+   "r": 0.1,
+   "v": 1
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 25.71,
+   "y": 122.99,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 30.41,
+   "y": 32.68,
+   "r": 0.1,
+   "v": 0
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 95.49,
+   "y": 99.29,
+   "r": 0.1,
+   "v": 2
+  },
+  {
+   "kind": "festival_bloom",
+   "x": 116.68,
+   "y": 27.55,
+   "r": 0.1,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 123.18,
+   "y": 105.45,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 97.52,
+   "y": 116.72,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 56.78,
+   "y": 19.89,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 22.52,
+   "y": 43.04,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 52.65,
+   "y": 55.55,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 35.13,
+   "y": 20.82,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 125.83,
+   "y": 110.14,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 9.37,
+   "y": 120.92,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 115.11,
+   "y": 103.65,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 71.57,
+   "y": 109.65,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 63.69,
+   "y": 71.34,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 81.13,
+   "y": 88.95,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 104.6,
+   "y": 43.91,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 98.93,
+   "y": 59.11,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 49.93,
+   "y": 62.99,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 62.31,
+   "y": 23.42,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 56.67,
+   "y": 14.93,
+   "r": 0.3,
+   "v": 1
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 75.19,
+   "y": 94.48,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 88.01,
+   "y": 11.54,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 116.39,
+   "y": 115.3,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 107.59,
+   "y": 120.72,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 11.43,
+   "y": 10.79,
+   "r": 0.3,
+   "v": 2
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 109.55,
+   "y": 112.54,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 106.38,
+   "y": 43.54,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 49.41,
+   "y": 60.75,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 11.5,
+   "y": 35.53,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 64.19,
+   "y": 90.03,
+   "r": 0.3,
+   "v": 0
+  },
+  {
+   "kind": "confetti_lantern",
+   "x": 56.56,
+   "y": 25.04,
+   "r": 0.3,
+   "v": 3
+  },
+  {
+   "kind": "oak_tree",
+   "x": 12,
+   "y": 60,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "apple_tree",
+   "x": 12,
+   "y": 81,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "birch_tree",
+   "x": 47,
+   "y": 58,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "oak_tree",
+   "x": 47,
+   "y": 85,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "apple_tree",
+   "x": 27,
+   "y": 43,
+   "r": 1.2,
+   "v": 0
+  },
+  {
+   "kind": "birch_tree",
+   "x": 30,
+   "y": 100,
+   "r": 1.2,
+   "v": 0
+  }
+ ],
+ "slimes": [
+  {
+   "kind": "paradegryphon",
+   "x": 72,
+   "y": 20
+  },
+  {
+   "kind": "maskcolossus",
+   "x": 112,
+   "y": 91
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 119.34,
+   "y": 33.12
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 106.67,
+   "y": 48.04
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 104.52,
+   "y": 29.68
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 24.03,
+   "y": 106.58
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 97.21,
+   "y": 60.98
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 21.71,
+   "y": 30.54
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 96.19,
+   "y": 111.66
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 104.08,
+   "y": 105.29
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 88.33,
+   "y": 39.91
+  },
+  {
+   "kind": "ribbongecko",
+   "x": 75.71,
+   "y": 48.19
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 90.46,
+   "y": 103.84
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 39.92,
+   "y": 105.34
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 58.39,
+   "y": 43.88
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 12.16,
+   "y": 39.34
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 95.94,
+   "y": 78.03
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 35.77,
+   "y": 29.6
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 108.82,
+   "y": 21.3
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 113.24,
+   "y": 45.36
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 15.95,
+   "y": 112.6
+  },
+  {
+   "kind": "balloonbeetle",
+   "x": 123.81,
+   "y": 25.75
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 19.71,
+   "y": 99.94
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 62.19,
+   "y": 81.25
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 64.6,
+   "y": 52.42
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 59.25,
+   "y": 24.8
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 68.49,
+   "y": 78.94
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 30.36,
+   "y": 20.12
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 102.72,
+   "y": 23.22
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 90.7,
+   "y": 81.68
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 96.55,
+   "y": 28.67
+  },
+  {
+   "kind": "paintedmacaw",
+   "x": 68.52,
+   "y": 86.28
+  },
+  {
+   "kind": "jesterling",
+   "x": 111.61,
+   "y": 51.61
+  },
+  {
+   "kind": "jesterling",
+   "x": 53.92,
+   "y": 77.12
+  },
+  {
+   "kind": "jesterling",
+   "x": 66.02,
+   "y": 94.66
+  },
+  {
+   "kind": "jesterling",
+   "x": 97.41,
+   "y": 96.37
+  },
+  {
+   "kind": "jesterling",
+   "x": 83.95,
+   "y": 47.85
+  },
+  {
+   "kind": "jesterling",
+   "x": 78.54,
+   "y": 36.39
+  },
+  {
+   "kind": "jesterling",
+   "x": 113.15,
+   "y": 76.32
+  },
+  {
+   "kind": "jesterling",
+   "x": 12.58,
+   "y": 105.66
+  },
+  {
+   "kind": "jesterling",
+   "x": 45.84,
+   "y": 109.16
+  },
+  {
+   "kind": "jesterling",
+   "x": 57.03,
+   "y": 109.08
+  },
+  {
+   "kind": "es_foe_17",
+   "x": 85,
+   "y": 25,
+   "ambush": "empty-seat:es_17_m"
+  }
+ ],
+ "npcs": [
+  {
+   "id": "ribbon_host",
+   "name": "Mira Vell",
+   "role": "Jubilee host",
+   "x": 32,
+   "y": 64,
+   "color": "#fff0b5",
+   "dialogue": "Four color courts and one great procession. The Pavilion waits at the far end, but its curtain is bound shut.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#bd8365",
+    "hair": "#714d54",
+    "style": "long",
+    "hat": "feather",
+    "hatColor": "#e0739d"
+   },
+   "art": "ribbon_host"
+  },
+  {
+   "id": "ribbon_medic",
+   "name": "Saffi Lark",
+   "role": "Festival physician",
+   "x": 22,
+   "y": 81,
+   "color": "#fff0b5",
+   "dialogue": "The best remedy is shade, water and a little music.",
+   "offers": [
+    {
+     "id": "blessing",
+     "label": "Receive a healing blessing",
+     "cost": 0,
+     "heal": 10000
+    },
+    {
+     "id": "buy_health_potion",
+     "label": "Buy Health Potion",
+     "cost": 30,
+     "item": "health_potion",
+     "tiered": true
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#bd8365",
+    "hair": "#714d54",
+    "style": "long",
+    "hat": "feather",
+    "hatColor": "#e0739d"
+   }
+  },
+  {
+   "id": "ribbon_tailor",
+   "name": "Tovin Tassel",
+   "role": "Ribbon tailor",
+   "x": 38,
+   "y": 79,
+   "color": "#fff0b5",
+   "dialogue": "My silk keeps vanishing into the geckos’ bright tails.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior"
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage"
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin"
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest"
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter"
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#bd8365",
+    "hair": "#714d54",
+    "style": "long",
+    "hat": "feather",
+    "hatColor": "#e0739d"
+   }
+  },
+  {
+   "id": "ribbon_keeper",
+   "name": "Iona Bell",
+   "role": "Pavilion keykeeper",
+   "x": 111,
+   "y": 58,
+   "color": "#fff0b5",
+   "dialogue": "The Thousandfold Pavilion remembers every performer. None may enter while the masks still sing outside.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#bd8365",
+    "hair": "#714d54",
+    "style": "long",
+    "hat": "feather",
+    "hatColor": "#e0739d"
+   },
+   "art": "ribbon_keeper"
+  },
+  {
+   "id": "ribbon_naturalist",
+   "name": "Perri Finch",
+   "role": "Garden naturalist",
+   "x": 31,
+   "y": 54,
+   "color": "#fff0b5",
+   "dialogue": "The macaws know each petal court by heart. Watch where the yellow road meets the violet grass.",
+   "offers": [],
+   "buys": false,
+   "look": {
+    "skin": "#bd8365",
+    "hair": "#714d54",
+    "style": "long",
+    "hat": "feather",
+    "hatColor": "#e0739d"
+   }
+  },
+  {
+   "id": "ribbon_merchant",
+   "name": "Jasper Gleam",
+   "role": "Jubilee provisions",
+   "x": 24,
+   "y": 60,
+   "color": "#fff0b5",
+   "dialogue": "The market buys field finds and sells stew and a spare bag.",
+   "offers": [
+    {
+     "id": "stew",
+     "label": "Buy Traveler's Stew",
+     "cost": 12,
+     "item": "traveler_stew",
+     "tiered": true
+    },
+    {
+     "id": "satchel",
+     "label": "Buy Linen Satchel · 6 extra bag slots",
+     "cost": 500,
+     "bag": "linen_satchel"
+    },
+    {
+     "id": "bag_l10",
+     "label": "Buy Adventurer Satchel · 8 extra bag slots",
+     "cost": 1500,
+     "bag": "adventurer_satchel"
+    },
+    {
+     "id": "bag_l20",
+     "label": "Buy Trail Pack · 10 extra bag slots",
+     "cost": 4000,
+     "bag": "trail_pack_l20"
+    },
+    {
+     "id": "bag_l30",
+     "label": "Buy Ranger Pack · 12 extra bag slots",
+     "cost": 9000,
+     "bag": "ranger_pack_l30"
+    },
+    {
+     "id": "bag_l40",
+     "label": "Buy Expedition Pack · 14 extra bag slots",
+     "cost": 18000,
+     "bag": "expedition_pack_l40"
+    },
+    {
+     "id": "bag_l50",
+     "label": "Buy Traveler Pack · 16 extra bag slots",
+     "cost": 35000,
+     "bag": "traveler_pack"
+    },
+    {
+     "id": "bag_l60",
+     "label": "Buy Pathfinder Pack · 18 extra bag slots",
+     "cost": 60000,
+     "bag": "pathfinder_pack_l60"
+    },
+    {
+     "id": "bag_l70",
+     "label": "Buy Warden Pack · 20 extra bag slots",
+     "cost": 100000,
+     "bag": "warden_pack_l70"
+    },
+    {
+     "id": "bag_l80",
+     "label": "Buy Hero Pack · 22 extra bag slots",
+     "cost": 160000,
+     "bag": "hero_pack_l80"
+    },
+    {
+     "id": "bag_l90",
+     "label": "Buy Sovereign Pack · 24 extra bag slots",
+     "cost": 240000,
+     "bag": "sovereign_pack_l90"
+    },
+    {
+     "id": "buy_cloak_common",
+     "label": "Buy Travel Cloak",
+     "item": "cloak_l5_common",
+     "tiered": true,
+     "cost": 24
+    },
+    {
+     "id": "buy_cloak_uncommon",
+     "label": "Buy Sturdy Cloak",
+     "item": "cloak_l5_uncommon",
+     "tiered": true,
+     "cost": 160
+    },
+    {
+     "id": "buy_cloak_rare",
+     "label": "Buy Rare Cloak",
+     "item": "cloak_l5_rare",
+     "tiered": true,
+     "cost": 384
+    },
+    {
+     "id": "buy_green_weapon_warrior",
+     "label": "Buy Reinforced Royal Sword",
+     "item": "warrior_weapon_royal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_mage",
+     "label": "Buy Reinforced Crystal Staff",
+     "item": "mage_weapon_crystal_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_assassin",
+     "label": "Buy Reinforced Moonfang Daggers",
+     "item": "assassin_weapon_moonfang_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_priest",
+     "label": "Buy Reinforced Sunbreaker Mace",
+     "item": "priest_weapon_sunmace_l10_green",
+     "tiered": true,
+     "cost": 1000
+    },
+    {
+     "id": "buy_green_weapon_hunter",
+     "label": "Buy Reinforced Wildwarden Longbow",
+     "item": "hunter_weapon_wardenbow_l10_green",
+     "tiered": true,
+     "cost": 1000
+    }
+   ],
+   "buys": true,
+   "look": {
+    "skin": "#bd8365",
+    "hair": "#714d54",
+    "style": "long",
+    "hat": "feather",
+    "hatColor": "#e0739d"
+   }
+  },
+  {
+   "id": "ribbon_stone",
+   "name": "Jubilee Meeting Stone",
+   "role": "Gather a party · hire fighters",
+   "x": 107,
+   "y": 76,
+   "color": "#fff0b5",
+   "dialogue": "Five companions may face the masked giant. The Pavilion itself stays sealed.",
+   "offers": [
+    {
+     "id": "merc_warrior",
+     "label": "Hire a Warrior mercenary · holds the line",
+     "cost": 250,
+     "merc": "warrior",
+     "open": true
+    },
+    {
+     "id": "merc_mage",
+     "label": "Hire a Mage mercenary · casts from range",
+     "cost": 250,
+     "merc": "mage",
+     "open": true
+    },
+    {
+     "id": "merc_assassin",
+     "label": "Hire a Assassin mercenary · strikes fast",
+     "cost": 250,
+     "merc": "assassin",
+     "open": true
+    },
+    {
+     "id": "merc_priest",
+     "label": "Hire a Priest mercenary · heals the party",
+     "cost": 250,
+     "merc": "priest",
+     "open": true
+    },
+    {
+     "id": "merc_hunter",
+     "label": "Hire a Hunter mercenary · shoots from range",
+     "cost": 250,
+     "merc": "hunter",
+     "open": true
+    },
+    {
+     "id": "merc_dismiss",
+     "label": "Send my mercenaries away",
+     "cost": 0,
+     "merc": "dismiss"
+    }
+   ],
+   "buys": false,
+   "look": {
+    "skin": "#bd8365",
+    "hair": "#714d54",
+    "style": "long",
+    "hat": "feather",
+    "hatColor": "#e0739d"
+   },
+   "art": "stone"
+  },
+  {
+   "id": "travel_jubilee",
+   "name": "Travel Master Luma",
+   "role": "Festival courier · Spark Travel",
+   "x": 42,
+   "y": 85,
+   "color": "#74d7d0",
+   "travelStop": "Jubilee Crossroads",
+   "travelLinks": [
+    "travel_millbridge",
+    "travel_banyan"
+   ],
+   "look": {
+    "hair": "#e4edf4",
+    "skin": "#edc5a1",
+    "style": "long",
+    "hat": "hood",
+    "hatColor": "#328e97"
+   },
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "offers": [],
+   "buys": false,
+   "art": "ribbon_travel"
+  },
+  {
+   "id": "mailbox_21_jubilee_crossroads",
+   "name": "Mailbox",
+   "role": "Player mail",
+   "x": 39.56,
+   "y": 83.91,
+   "color": "#cda75e",
+   "art": "mailbox",
+   "buys": false,
+   "dialogue": "Send letters, gold and unbound items to other characters. Delivery is free and instant.",
+   "offers": [
+    {
+     "id": "mail",
+     "label": "Open mailbox",
+     "cost": 0
+    }
+   ]
+  }
+ ],
+ "places": [
+  {
+   "id": "ribbon_pavilion",
+   "name": "The Thousandfold Pavilion",
+   "x": 113,
+   "y": 65,
+   "r": 4
+  },
+  {
+   "id": "ribbon_gryphon_court",
+   "name": "The Northern Dance Floor",
+   "x": 72,
+   "y": 20,
+   "r": 5
+  },
+  {
+   "id": "ribbon_mask_court",
+   "name": "The Mask Court",
+   "x": 111,
+   "y": 91,
+   "r": 5
+  },
+  {
+   "id": "es_17_m",
+   "name": "A Mask for the Man He Was",
+   "x": 83,
+   "y": 25,
+   "r": 2.1
+  }
+ ],
+ "quests": [
+  {
+   "id": "ribbon_welcome",
+   "title": "The Four Color Courts",
+   "npc": "ribbon_host",
+   "description": "Meet the festival physician, tailor and garden naturalist.",
+   "objectives": [
+    {
+     "kind": "talk",
+     "target": "ribbon_medic",
+     "count": 1,
+     "label": "Meet Saffi"
+    },
+    {
+     "kind": "talk",
+     "target": "ribbon_tailor",
+     "count": 1,
+     "label": "Meet Tovin"
+    },
+    {
+     "kind": "talk",
+     "target": "ribbon_naturalist",
+     "count": 1,
+     "label": "Meet Perri"
+    }
+   ],
+   "level": 70,
+   "rewardXp": 6240,
+   "rewardGold": 6500,
+   "requires": null,
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l70_green",
+     "warrior_weapon_royal_l70_green",
+     "warrior_headgear_azure_l70_green",
+     "warrior_shoulders_azure_l70_green",
+     "warrior_gloves_azure_l70_green",
+     "cloak_l70_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l70_green",
+     "mage_weapon_crystal_l70_green",
+     "mage_headgear_runic_l70_green",
+     "mage_shoulders_runic_l70_green",
+     "mage_gloves_runic_l70_green",
+     "cloak_l70_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l70_green",
+     "assassin_weapon_moonfang_l70_green",
+     "assassin_headgear_moon_l70_green",
+     "assassin_shoulders_moon_l70_green",
+     "assassin_gloves_moon_l70_green",
+     "cloak_l70_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l70_green",
+     "priest_weapon_sunmace_l70_green",
+     "priest_headgear_dawn_l70_green",
+     "priest_shoulders_dawn_l70_green",
+     "priest_gloves_dawn_l70_green",
+     "cloak_l70_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l70_green",
+     "hunter_weapon_wardenbow_l70_green",
+     "hunter_headgear_warden_l70_green",
+     "hunter_shoulders_warden_l70_green",
+     "hunter_gloves_warden_l70_green",
+     "cloak_l70_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_geckos",
+   "title": "Silk Tails",
+   "npc": "ribbon_tailor",
+   "description": "The ribbon geckos have stolen spools from the pink court.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "ribbongecko",
+     "count": 6,
+     "label": "Defeat Ribbon Geckos"
+    }
+   ],
+   "level": 70,
+   "rewardXp": 6240,
+   "rewardGold": 7200,
+   "requires": "ribbon_welcome",
+   "repeatable": false,
+   "rewardItem": "necklace_moonstone_l70_green",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l70_green",
+     "warrior_weapon_royal_l70_green",
+     "warrior_headgear_azure_l70_green",
+     "warrior_shoulders_azure_l70_green",
+     "warrior_gloves_azure_l70_green",
+     "cloak_l70_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l70_green",
+     "mage_weapon_crystal_l70_green",
+     "mage_headgear_runic_l70_green",
+     "mage_shoulders_runic_l70_green",
+     "mage_gloves_runic_l70_green",
+     "cloak_l70_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l70_green",
+     "assassin_weapon_moonfang_l70_green",
+     "assassin_headgear_moon_l70_green",
+     "assassin_shoulders_moon_l70_green",
+     "assassin_gloves_moon_l70_green",
+     "cloak_l70_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l70_green",
+     "priest_weapon_sunmace_l70_green",
+     "priest_headgear_dawn_l70_green",
+     "priest_shoulders_dawn_l70_green",
+     "priest_gloves_dawn_l70_green",
+     "cloak_l70_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l70_green",
+     "hunter_weapon_wardenbow_l70_green",
+     "hunter_headgear_warden_l70_green",
+     "hunter_shoulders_warden_l70_green",
+     "hunter_gloves_warden_l70_green",
+     "cloak_l70_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_beetles",
+   "title": "Lifted by Color",
+   "npc": "ribbon_tailor",
+   "description": "Gather luminous beetle silk for a new parade banner.",
+   "objectives": [
+    {
+     "kind": "bring",
+     "target": "balloon_silk",
+     "count": 5,
+     "label": "Bring Balloon Silk"
+    }
+   ],
+   "level": 71,
+   "rewardXp": 6410,
+   "rewardGold": 7800,
+   "requires": "ribbon_geckos",
+   "repeatable": false,
+   "rewardItem": "pants_wayfarer_l70_green",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l70_green",
+     "warrior_weapon_royal_l70_green",
+     "warrior_headgear_azure_l70_green",
+     "warrior_shoulders_azure_l70_green",
+     "warrior_gloves_azure_l70_green",
+     "cloak_l70_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l70_green",
+     "mage_weapon_crystal_l70_green",
+     "mage_headgear_runic_l70_green",
+     "mage_shoulders_runic_l70_green",
+     "mage_gloves_runic_l70_green",
+     "cloak_l70_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l70_green",
+     "assassin_weapon_moonfang_l70_green",
+     "assassin_headgear_moon_l70_green",
+     "assassin_shoulders_moon_l70_green",
+     "assassin_gloves_moon_l70_green",
+     "cloak_l70_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l70_green",
+     "priest_weapon_sunmace_l70_green",
+     "priest_headgear_dawn_l70_green",
+     "priest_shoulders_dawn_l70_green",
+     "priest_gloves_dawn_l70_green",
+     "cloak_l70_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l70_green",
+     "hunter_weapon_wardenbow_l70_green",
+     "hunter_headgear_warden_l70_green",
+     "hunter_shoulders_warden_l70_green",
+     "hunter_gloves_warden_l70_green",
+     "cloak_l70_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_macaws",
+   "title": "The Painted Flight",
+   "npc": "ribbon_naturalist",
+   "description": "Calm the fierce macaws circling the blue court.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "paintedmacaw",
+     "count": 6,
+     "label": "Defeat Painted Macaws"
+    }
+   ],
+   "level": 72,
+   "rewardXp": 6580,
+   "rewardGold": 8400,
+   "requires": "ribbon_beetles",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l70_green",
+     "warrior_weapon_royal_l70_green",
+     "warrior_headgear_azure_l70_green",
+     "warrior_shoulders_azure_l70_green",
+     "warrior_gloves_azure_l70_green",
+     "cloak_l70_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l70_green",
+     "mage_weapon_crystal_l70_green",
+     "mage_headgear_runic_l70_green",
+     "mage_shoulders_runic_l70_green",
+     "mage_gloves_runic_l70_green",
+     "cloak_l70_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l70_green",
+     "assassin_weapon_moonfang_l70_green",
+     "assassin_headgear_moon_l70_green",
+     "assassin_shoulders_moon_l70_green",
+     "assassin_gloves_moon_l70_green",
+     "cloak_l70_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l70_green",
+     "priest_weapon_sunmace_l70_green",
+     "priest_headgear_dawn_l70_green",
+     "priest_shoulders_dawn_l70_green",
+     "priest_gloves_dawn_l70_green",
+     "cloak_l70_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l70_green",
+     "hunter_weapon_wardenbow_l70_green",
+     "hunter_headgear_warden_l70_green",
+     "hunter_shoulders_warden_l70_green",
+     "hunter_gloves_warden_l70_green",
+     "cloak_l70_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_jesters",
+   "title": "A Dangerous Encore",
+   "npc": "ribbon_host",
+   "description": "The tiny jesterlings have turned the circuit into a trap.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "jesterling",
+     "count": 6,
+     "label": "Defeat Jesterlings"
+    }
+   ],
+   "level": 73,
+   "rewardXp": 6750,
+   "rewardGold": 9100,
+   "requires": "ribbon_macaws",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l70_green",
+     "warrior_weapon_royal_l70_green",
+     "warrior_headgear_azure_l70_green",
+     "warrior_shoulders_azure_l70_green",
+     "warrior_gloves_azure_l70_green",
+     "cloak_l70_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l70_green",
+     "mage_weapon_crystal_l70_green",
+     "mage_headgear_runic_l70_green",
+     "mage_shoulders_runic_l70_green",
+     "mage_gloves_runic_l70_green",
+     "cloak_l70_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l70_green",
+     "assassin_weapon_moonfang_l70_green",
+     "assassin_headgear_moon_l70_green",
+     "assassin_shoulders_moon_l70_green",
+     "assassin_gloves_moon_l70_green",
+     "cloak_l70_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l70_green",
+     "priest_weapon_sunmace_l70_green",
+     "priest_headgear_dawn_l70_green",
+     "priest_shoulders_dawn_l70_green",
+     "priest_gloves_dawn_l70_green",
+     "cloak_l70_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l70_green",
+     "hunter_weapon_wardenbow_l70_green",
+     "hunter_headgear_warden_l70_green",
+     "hunter_shoulders_warden_l70_green",
+     "hunter_gloves_warden_l70_green",
+     "cloak_l70_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_gryphon",
+   "title": "The Parade Gryphon",
+   "npc": "ribbon_naturalist",
+   "description": "A feather-crowned gryphon has claimed the northern dance floor. Bring three friends.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "paradegryphon",
+     "count": 1,
+     "label": "Defeat the Parade Gryphon"
+    }
+   ],
+   "level": 74,
+   "rewardXp": 6930,
+   "rewardGold": 14500,
+   "requires": "ribbon_macaws",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 3,
+   "rewardItem": "accessory_amber_l75_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l70_blue",
+     "warrior_weapon_sword_l70_blue",
+     "warrior_headgear_crimson_l70_blue",
+     "warrior_shoulders_crimson_l70_blue",
+     "warrior_gloves_crimson_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l70_blue",
+     "mage_weapon_ash_l70_blue",
+     "mage_headgear_apprentice_l70_blue",
+     "mage_shoulders_apprentice_l70_blue",
+     "mage_gloves_apprentice_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l70_blue",
+     "assassin_weapon_daggers_l70_blue",
+     "assassin_headgear_shadow_l70_blue",
+     "assassin_shoulders_shadow_l70_blue",
+     "assassin_gloves_shadow_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l70_blue",
+     "priest_weapon_mace_l70_blue",
+     "priest_headgear_pilgrim_l70_blue",
+     "priest_shoulders_pilgrim_l70_blue",
+     "priest_gloves_pilgrim_l70_blue",
+     "cloak_l70_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l70_blue",
+     "hunter_weapon_shortbow_l70_blue",
+     "hunter_headgear_scout_l70_blue",
+     "hunter_shoulders_scout_l70_blue",
+     "hunter_gloves_scout_l70_blue",
+     "cloak_l70_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_colossus",
+   "title": "Behind the Mask",
+   "npc": "ribbon_keeper",
+   "description": "The masked giant blocks the Pavilion. Gather five companions.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "maskcolossus",
+     "count": 1,
+     "label": "Defeat the Masquerade Colossus"
+    }
+   ],
+   "level": 75,
+   "rewardXp": 7100,
+   "rewardGold": 19000,
+   "requires": "ribbon_jesters",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardItem": "necklace_moonstone_l75_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l75_blue",
+     "warrior_weapon_sword_l75_blue",
+     "warrior_headgear_crimson_l75_blue",
+     "warrior_shoulders_crimson_l75_blue",
+     "warrior_gloves_crimson_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l75_blue",
+     "mage_weapon_ash_l75_blue",
+     "mage_headgear_apprentice_l75_blue",
+     "mage_shoulders_apprentice_l75_blue",
+     "mage_gloves_apprentice_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l75_blue",
+     "assassin_weapon_daggers_l75_blue",
+     "assassin_headgear_shadow_l75_blue",
+     "assassin_shoulders_shadow_l75_blue",
+     "assassin_gloves_shadow_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l75_blue",
+     "priest_weapon_mace_l75_blue",
+     "priest_headgear_pilgrim_l75_blue",
+     "priest_shoulders_pilgrim_l75_blue",
+     "priest_gloves_pilgrim_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l75_blue",
+     "hunter_weapon_shortbow_l75_blue",
+     "hunter_headgear_scout_l75_blue",
+     "hunter_shoulders_scout_l75_blue",
+     "hunter_gloves_scout_l75_blue",
+     "cloak_l75_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_curtain",
+   "title": "The Last Curtain",
+   "npc": "ribbon_keeper",
+   "description": "Inspect the sealed pavilion and consult the Meeting Stone.",
+   "objectives": [
+    {
+     "kind": "visit",
+     "target": "ribbon_pavilion",
+     "count": 1,
+     "label": "Inspect the Thousandfold Pavilion"
+    },
+    {
+     "kind": "talk",
+     "target": "ribbon_stone",
+     "count": 1,
+     "label": "Speak with the Meeting Stone"
+    }
+   ],
+   "level": 75,
+   "rewardXp": 7100,
+   "rewardGold": 11000,
+   "requires": "ribbon_jesters",
+   "repeatable": false,
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l75_green",
+     "warrior_weapon_royal_l75_green",
+     "warrior_headgear_azure_l75_green",
+     "warrior_shoulders_azure_l75_green",
+     "warrior_gloves_azure_l75_green",
+     "cloak_l75_rare"
+    ],
+    "mage": [
+     "mage_armor_runic_l75_green",
+     "mage_weapon_crystal_l75_green",
+     "mage_headgear_runic_l75_green",
+     "mage_shoulders_runic_l75_green",
+     "mage_gloves_runic_l75_green",
+     "cloak_l75_rare"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l75_green",
+     "assassin_weapon_moonfang_l75_green",
+     "assassin_headgear_moon_l75_green",
+     "assassin_shoulders_moon_l75_green",
+     "assassin_gloves_moon_l75_green",
+     "cloak_l75_rare"
+    ],
+    "priest": [
+     "priest_armor_dawn_l75_green",
+     "priest_weapon_sunmace_l75_green",
+     "priest_headgear_dawn_l75_green",
+     "priest_shoulders_dawn_l75_green",
+     "priest_gloves_dawn_l75_green",
+     "cloak_l75_rare"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l75_green",
+     "hunter_weapon_wardenbow_l75_green",
+     "hunter_headgear_warden_l75_green",
+     "hunter_shoulders_warden_l75_green",
+     "hunter_gloves_warden_l75_green",
+     "cloak_l75_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_folds",
+   "title": "A Thousand Unfoldings",
+   "npc": "ribbon_keeper",
+   "description": "Defeat the paper, ink and silk guardians within your party copy of the Pavilion.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "pavilion_foldling",
+     "count": 3,
+     "label": "Defeat Paper Foldlings"
+    },
+    {
+     "kind": "kill",
+     "target": "pavilion_inkmoth",
+     "count": 3,
+     "label": "Defeat Inkwing Moths"
+    },
+    {
+     "kind": "kill",
+     "target": "pavilion_silkguard",
+     "count": 3,
+     "label": "Defeat Silkguards"
+    }
+   ],
+   "level": 75,
+   "rewardXp": 7100,
+   "rewardGold": 15500,
+   "requires": "ribbon_curtain",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardItem": "pants_wayfarer_l75_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l75_blue",
+     "warrior_weapon_sword_l75_blue",
+     "warrior_headgear_crimson_l75_blue",
+     "warrior_shoulders_crimson_l75_blue",
+     "warrior_gloves_crimson_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l75_blue",
+     "mage_weapon_ash_l75_blue",
+     "mage_headgear_apprentice_l75_blue",
+     "mage_shoulders_apprentice_l75_blue",
+     "mage_gloves_apprentice_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l75_blue",
+     "assassin_weapon_daggers_l75_blue",
+     "assassin_headgear_shadow_l75_blue",
+     "assassin_shoulders_shadow_l75_blue",
+     "assassin_gloves_shadow_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l75_blue",
+     "priest_weapon_mace_l75_blue",
+     "priest_headgear_pilgrim_l75_blue",
+     "priest_shoulders_pilgrim_l75_blue",
+     "priest_gloves_pilgrim_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l75_blue",
+     "hunter_weapon_shortbow_l75_blue",
+     "hunter_headgear_scout_l75_blue",
+     "hunter_shoulders_scout_l75_blue",
+     "hunter_gloves_scout_l75_blue",
+     "cloak_l75_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_final",
+   "title": "The Last Fold",
+   "npc": "ribbon_keeper",
+   "description": "Defeat the Mirror Dancer and Thousandfold Weaver, then break the Sovereign’s final fold.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "pavilion_mirror",
+     "count": 1,
+     "label": "Defeat the Mirror Dancer"
+    },
+    {
+     "kind": "kill",
+     "target": "pavilion_weaver",
+     "count": 1,
+     "label": "Defeat the Thousandfold Weaver"
+    },
+    {
+     "kind": "kill",
+     "target": "pavilion_sovereign",
+     "count": 1,
+     "label": "Defeat the Sovereign of the Last Fold"
+    }
+   ],
+   "level": 75,
+   "rewardXp": 7100,
+   "rewardGold": 27000,
+   "requires": "ribbon_folds",
+   "repeatable": false,
+   "group": true,
+   "recommendedPlayers": 5,
+   "rewardItem": "accessory_amber_l75_blue",
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_crimson_l75_blue",
+     "warrior_weapon_sword_l75_blue",
+     "warrior_headgear_crimson_l75_blue",
+     "warrior_shoulders_crimson_l75_blue",
+     "warrior_gloves_crimson_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "mage": [
+     "mage_armor_apprentice_l75_blue",
+     "mage_weapon_ash_l75_blue",
+     "mage_headgear_apprentice_l75_blue",
+     "mage_shoulders_apprentice_l75_blue",
+     "mage_gloves_apprentice_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "assassin": [
+     "assassin_armor_shadow_l75_blue",
+     "assassin_weapon_daggers_l75_blue",
+     "assassin_headgear_shadow_l75_blue",
+     "assassin_shoulders_shadow_l75_blue",
+     "assassin_gloves_shadow_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "priest": [
+     "priest_armor_pilgrim_l75_blue",
+     "priest_weapon_mace_l75_blue",
+     "priest_headgear_pilgrim_l75_blue",
+     "priest_shoulders_pilgrim_l75_blue",
+     "priest_gloves_pilgrim_l75_blue",
+     "cloak_l75_rare"
+    ],
+    "hunter": [
+     "hunter_armor_scout_l75_blue",
+     "hunter_weapon_shortbow_l75_blue",
+     "hunter_headgear_scout_l75_blue",
+     "hunter_shoulders_scout_l75_blue",
+     "hunter_gloves_scout_l75_blue",
+     "cloak_l75_rare"
+    ]
+   }
+  },
+  {
+   "id": "ribbon_circuit",
+   "title": "Keep the Colors Turning",
+   "npc": "ribbon_host",
+   "description": "Keep the processional ring safe for every guest.",
+   "objectives": [
+    {
+     "kind": "kill",
+     "target": "ribbongecko",
+     "count": 3,
+     "label": "Defeat Ribbon Geckos"
+    },
+    {
+     "kind": "kill",
+     "target": "jesterling",
+     "count": 3,
+     "label": "Defeat Jesterlings"
+    }
+   ],
+   "level": 70,
+   "rewardXp": 6240,
+   "rewardGold": 5600,
+   "requires": "ribbon_welcome",
+   "repeatable": true
+  },
+  {
+   "id": "ribbon_onward",
+   "title": "Through the Ribbons",
+   "npc": "ribbon_host",
+   "description": "Follow the vale road into the Ribbonwild and meet Mira Vell.",
+   "objectives": [
+    {
+     "kind": "reach",
+     "target": "The Ribbonwild",
+     "label": "Travel to the Ribbonwild",
+     "count": 1
+    }
+   ],
+   "level": 70,
+   "rewardXp": 6240,
+   "rewardGold": 8000,
+   "requires": null,
+   "repeatable": false,
+   "autoLevel": 70
+  },
+  {
+   "id": "es_17",
+   "title": "A Mask for the Man He Was",
+   "npc": "ribbon_host",
+   "description": "Mira's dancers remember the forge keeper as a gentle festival giant. An angry memory has stolen their masks. Enter the circle and defeat the Uninvited Guest before its borrowed face becomes the only version anyone remembers.",
+   "objectives": [
+    {
+     "kind": "echo",
+     "target": "es_17_m",
+     "label": "The Uninvited Guest",
+     "count": 1
+    }
+   ],
+   "level": 73,
+   "minLevel": 73,
+   "rewardXp": 6750,
+   "rewardGold": 876,
+   "requires": "es_16",
+   "repeatable": false,
+   "story": {
+    "title": "The Empty Seat",
+    "chapter": 17,
+    "recap": [],
+    "next": "Next chapter: The Root That Refused the Order. Speak to Tavi Moss in The Tanglecrown at level 78."
+   },
+   "rewardChoices": {
+    "warrior": [
+     "warrior_armor_azure_l70_green",
+     "warrior_headgear_azure_l70_green"
+    ],
+    "mage": [
+     "mage_armor_runic_l70_green",
+     "mage_headgear_runic_l70_green"
+    ],
+    "assassin": [
+     "assassin_armor_moon_l70_green",
+     "assassin_headgear_moon_l70_green"
+    ],
+    "priest": [
+     "priest_armor_dawn_l70_green",
+     "priest_headgear_dawn_l70_green"
+    ],
+    "hunter": [
+     "hunter_armor_warden_l70_green",
+     "hunter_headgear_warden_l70_green"
+    ]
+   }
+  },
+  {
+   "id": "es_go_17",
+   "title": "Seek Mira Vell",
+   "npc": "ribbon_host",
+   "description": "Speak to Mira Vell in The Ribbonwild at level 73 to continue The Empty Seat: A Mask for the Man He Was. This direction stays in your journal until you accept that chapter.",
+   "objectives": [
+    {
+     "kind": "handoff",
+     "target": "ribbon_host",
+     "count": 1,
+     "label": "Speak to Mira Vell at level 73"
+    }
+   ],
+   "level": 73,
+   "minLevel": 1,
+   "rewardXp": 0,
+   "rewardGold": 0,
+   "requires": "es_16",
+   "autoLevel": 1,
+   "repeatable": false,
+   "handoffTo": "es_17"
+  }
+ ],
+ "city": {
+  "name": "Jubilee Crossroads",
+  "x0": 9,
+  "x1": 48,
+  "y0": 45,
+  "y1": 96,
+  "plaza": {
+   "x": 30,
+   "y": 70
+  },
+  "radius": 7,
+  "entry": {
+   "x": 12,
+   "y": 70
+  }
+ },
+ "futureInstance": {
+  "name": "The Thousandfold Pavilion",
+  "level": 75,
+  "players": 5,
+  "status": "open",
+  "x": 120,
+  "y": 65,
+  "description": "The gilded mask doors open into a private level-75 Pavilion."
+ },
+ "portals": [
+  {
+   "id": "ribbon_sun_gate",
+   "name": "Sunward Vale",
+   "x": 72.5,
+   "y": 5.5,
+   "r": 1.2,
+   "to": 20,
+   "tx": 62.5,
+   "ty": 116.5,
+   "walk": [
+    0,
+    -1
+   ]
+  },
+  {
+   "id": "ribbon_pavilion_gate",
+   "name": "The Thousandfold Pavilion",
+   "x": 119,
+   "y": 65,
+   "r": 1.2,
+   "to": 31,
+   "tx": 48,
+   "ty": 83,
+   "look": "thousandfold"
+  },
+  {
+   "id": "ribbon_tangle_gate",
+   "name": "The Tanglecrown",
+   "x": 130.5,
+   "y": 72.5,
+   "r": 1.2,
+   "to": 22,
+   "tx": 11.5,
+   "ty": 50.5,
+   "walk": [
+    1,
+    0
+   ]
+  },
+  {
+   "id": "path_21_45",
+   "name": "Emberwake Caldera",
+   "r": 2.0,
+   "to": 45,
+   "x": 5.5,
+   "y": 56.5,
+   "tx": 148.5,
+   "ty": 94.5,
+   "walk": [
+    -1,
+    0
+   ]
+  }
+ ],
+ "exitRoutes": [
+  {
+   "portal": "ribbon_sun_gate",
+   "points": [
+    [
+     72.5,
+     5.5
+    ],
+    [
+     72.5,
+     23.5
+    ]
+   ]
+  },
+  {
+   "portal": "ribbon_tangle_gate",
+   "points": [
+    [
+     130.5,
+     72.5
+    ],
+    [
+     130.5,
+     69.5
+    ],
+    [
+     115.5,
+     69.5
+    ]
+   ]
+  },
+  {
+   "portal": "path_21_45",
+   "points": [
+    [
+     5.5,
+     56.5
+    ],
+    [
+     5.5,
+     70.5
+    ],
+    [
+     9.5,
+     70.5
+    ]
+   ]
+  }
+ ],
+ "atlasPaths": [
+  [
+   [
+    72.5,
+    5.5
+   ],
+   [
+    72.5,
+    69.5
+   ],
+   [
+    62.5,
+    69.5
+   ],
+   [
+    62.5,
+    70.5
+   ],
+   [
+    12.5,
+    70.5
+   ]
+  ],
+  [
+   [
+    130.5,
+    72.5
+   ],
+   [
+    130.5,
+    69.5
+   ],
+   [
+    62.5,
+    69.5
+   ],
+   [
+    62.5,
+    70.5
+   ],
+   [
+    12.5,
+    70.5
+   ]
+  ],
+  [
+   [
+    5.5,
+    56.5
+   ],
+   [
+    5.5,
+    70.5
+   ],
+   [
+    12.5,
+    70.5
+   ]
+  ]
+ ]
+}

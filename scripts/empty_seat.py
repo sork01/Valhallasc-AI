@@ -57,7 +57,7 @@ def content():
 (17, 60, 'asterion_archon', tr('Before the Nine Chains', 'Före de nio kedjorna'),
  tr('Seraphine will open the city\'s buried memory. Walk through its three circles in order: the First Hearth, the Promised Table and the Closing Chain. Stand still at each to witness the Long Winter, the bargain and the betrayal. You remain yourself inside the vision; you can leave and return.', 'Seraphine öppnar stadens begravda minne. Gå genom dess tre cirklar i ordning: Den första härden, Det utlovade bordet och Kedjan som sluts. Stå stilla vid varje cirkel för att bevittna den långa vintern, avtalet och sveket. Du förblir dig själv i synen och kan lämna den och återvända.'), 'flashback', ''),
 (19, 63, 'stormglass_scholar', tr('The Sea Cannot Swallow This Fire', 'Havet kan inte svälja denna eld'),
- tr('Orrin found salt boiling on a cold shore. Hold the cooling circle for twenty seconds against escaped furnace sparks. The sea is not putting out Eldmarr\'s fire; his heat is travelling through the world\'s roots beneath it.', 'Orrin fann salt som kokade på en kall strand. Håll kylcirkeln i tjugo sekunder mot förrymda ugnsgnistor. Havet släcker inte Eldmarrs eld; hans hetta färdas genom världens rötter under det.'), 'hold',
+ tr('Orrin found salt boiling on the dry sea bed. Hold the cooling circle for twenty seconds against escaped furnace sparks. The sea that might have put out Eldmarr\'s fire is gone; his heat is travelling through the world\'s roots beneath the flats.', 'Orrin fann salt som kokade på den torra havsbottnen. Håll kylcirkeln i tjugo sekunder mot förrymda ugnsgnistor. Havet som kanske hade kunnat släcka Eldmarrs eld är borta; hans hetta färdas genom världens rötter under slätterna.'), 'hold',
  tr('Furnace Spark', 'Ugnsgnista')),
 (20, 68, 'sun_miller', tr('The Harvest of Tomorrow', 'Morgondagens skörd'),
  tr('Ada planted tomorrow\'s seed and harvested yesterday\'s ash. Read the ember furrow. Eldmarr is no longer sending memories by accident. He is offering you a warning, and a choice.', 'Ada sådde morgondagens frö och skördade gårdagens aska. Läs glödfåran. Eldmarr sänder inte längre minnen av misstag. Han erbjuder dig en varning och ett val.'), 'memory',
@@ -226,6 +226,14 @@ def install():
                 rewards.append(min((it for it in pool if it.get('requiredLevel',1)==tier), key=lambda it:(len(it['id']),it['id']))['id'])
             q['rewardChoices'][cls] = rewards
         z['quests'].append(q)
+        if i == 1:      # every hero is pointed to the first chapter (owner, 2026-11-07: make sure you get the questline)
+            sv_giver = swedish_names.get(giver['name'], giver['name'])
+            z['quests'].append(dict(id='es_go_01', title=tr(f'Seek {giver["name"]}', f'Sök upp {sv_giver}'), npc=npc,
+                description=tr(f'Speak to {giver["name"]} in {z["name"]} at level {level} to begin The Empty Seat: {title}. This direction stays in your journal until you accept that chapter.', f'Tala med {sv_giver} i {z["name"]} på nivå {level} för att börja Den tomma stolen: {TEXT[title]}. Vägvisningen finns kvar i din dagbok tills du tar emot det kapitlet.'),
+                objectives=[dict(kind='handoff', target=npc, count=1,
+                    label=tr(f'Speak to {giver["name"]} at level {level}', f'Tala med {sv_giver} på nivå {level}'))],
+                level=level, minLevel=1, rewardXp=0, rewardGold=0, requires=None,
+                autoLevel=1, landing=True, repeatable=False, handoffTo=qid))     # arrives with the landing quest (world/landing.rs)
         if i > 1:
             sv_giver = swedish_names.get(giver['name'], giver['name'])
             handoff_title = tr(f'Seek {giver["name"]}', f'Sök upp {sv_giver}')

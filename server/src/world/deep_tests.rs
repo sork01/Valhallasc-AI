@@ -12,9 +12,15 @@ const SKALD: usize = 4;
 const SKY: usize = 7;
 const DEEP: usize = 8;
 const KINDS: [&str; 5] = ["draugr", "angler", "moray", "siren", "shellback"];
-/// The Net's door in the maze's south wall, and the two doors of Ran's Court (the middles of the wall gaps).
-const NET_DOOR: (f64, f64) = (80., 120.);
-const COURT_DOORS: [(f64, f64); 2] = [(80., 40.), (80., 72.)];
+/// The Net's door in the maze's south wall (the Pearl Gate), and the two doors of Ran's Court (the middles of the wall gaps): the pilot map.
+const NET_DOOR: (f64, f64) = (96., 174.);
+const COURT_DOORS: [(f64, f64); 2] = [(120., 54.), (144., 46.)];
+/// The three camps and what lives in them.
+const CAMPS: [(&str, &str); 3] = [
+    ("lanternrest", "deep_lr_"),
+    ("gatewatch", "deep_gw_"),
+    ("drownwatch", "deep_dw_"),
+];
 
 fn npc(w: &World, id: &str) -> Npc {
     w.maps[DEEP]
@@ -156,18 +162,26 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     let w = world();
     let map = &w.maps[DEEP];
     assert_eq!(map.name, "R\u{e1}n's Deep");
-    assert_eq!((map.size, map.levels), (176, Some([35, 40])));
+    assert_eq!((map.size, map.levels), (256, Some([35, 40])));
     assert_eq!(map.size % 8, 0, "the ground is cut in chunks of eight");
     assert_eq!(map.copies, 0);
-    // enemies: every kind at its default level, in the counts the design lists, none asleep (this zone has no ambushes)
+    // enemies: every kind at its default level, in the counts the design lists; the two sleepers (the Ember Key's guardian and the Empty Seat's
+    // shadow) wake only for their own events
     let mut live = std::collections::BTreeMap::<&str, usize>::new();
+    let mut sleepers: Vec<&str> = w
+        .spawns
+        .iter()
+        .filter(|s| s.zone == DEEP && s.ambush.is_some())
+        .map(|s| s.kind.as_str())
+        .collect();
+    sleepers.sort_unstable();
+    assert_eq!(sleepers, ["ember_firelord", "es_foe_08"]);
     for (id, spawn) in w
         .spawns
         .iter()
         .enumerate()
-        .filter(|(_, s)| s.zone == DEEP && !overlay_enemy(&s.kind))
+        .filter(|(_, s)| s.zone == DEEP && s.ambush.is_none())
     {
-        assert!(spawn.ambush.is_none(), "{} is on the field", spawn.kind);
         *live.entry(spawn.kind.as_str()).or_default() += 1;
         assert!(!w.slimes[id].dead);
         assert!(!map.in_city(at(spawn.x, spawn.y)));
@@ -175,14 +189,14 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     assert_eq!(
         live.into_iter().collect::<Vec<_>>(),
         [
-            ("angler", 10),
-            ("draugr", 11),
+            ("angler", 16),
+            ("draugr", 26),
             ("ghostmaw", 1),
             ("hvitserk", 1),
             ("kraken", 1),
-            ("moray", 10),
-            ("shellback", 9),
-            ("siren", 10)
+            ("moray", 16),
+            ("shellback", 14),
+            ("siren", 16)
         ]
     );
     for (kind, level) in [
@@ -206,7 +220,9 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
     let elites: Vec<&str> = w
         .slimes
         .iter()
-        .filter(|s| s.zone == DEEP && s.elite && !overlay_enemy(&s.kind))
+        .filter(|s| {
+            s.zone == DEEP && s.elite && !matches!(s.kind.as_str(), "ember_firelord" | "es_foe_08")
+        })
         .map(|s| s.kind.as_str())
         .collect();
     assert_eq!(elites.len(), 3);
@@ -218,14 +234,14 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         w.spawns.iter().position(|s| s.zone == DEEP),
         Some(w.spawns.iter().filter(|s| s.zone < DEEP).count())
     );
-    // one hub on the sea floor in the south, safe ground, with a travel master
-    assert!(map.camps.is_empty());
+    // one hub on the sea floor in the south-west, safe ground, with a travel master, and three camps
+    assert_eq!(map.camps.len(), 3);
     assert_eq!(
         map.city.as_ref().map(|c| (c.x0, c.x1, c.y0, c.y1)),
-        Some((62., 98., 143., 172.))
+        Some((78., 114., 190., 219.))
     );
     assert!(
-        map.in_city(at(80., 155.)) && !map.in_city(at(30., 150.)) && !map.in_city(at(80., 100.))
+        map.in_city(at(96., 202.)) && !map.in_city(at(40., 150.)) && !map.in_city(at(96., 100.))
     );
     let master = map
         .npcs
@@ -234,9 +250,9 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         .expect("a travel master");
     assert_eq!(master.id, "travel_keelhaven");
     assert_eq!(
-        hosted_npc_count(map),
-        8,
-        "seven people and the travel master"
+        map.npcs.len(),
+        26,
+        "Keelhaven's eleven and the three camps' fifteen"
     );
     // the gate pair: Bifrost's Maelstrom down, Keelhaven's up; each arrival clear of every gate and of enemies
     let down = w.maps[SKY]
@@ -246,7 +262,19 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         .unwrap();
     let up = map.portals.iter().find(|p| p.id == "maelstrom_up").unwrap();
     assert_eq!((down.to, up.to), (DEEP, SKY));
-    // (The atlas moved the Maelstrom gates to the province borders: arrival points are checked by compact_atlas_tests.)
+    // each arrival is six tiles inside its gate, on the way the gate faces away from
+    let (dw, uw) = (down.walk.unwrap(), up.walk.unwrap());
+    assert_eq!(
+        (down.tx, down.ty),
+        (up.x - f64::from(uw[0]) * 6., up.y - f64::from(uw[1]) * 6.)
+    );
+    assert_eq!(
+        (up.tx, up.ty),
+        (
+            down.x - f64::from(dw[0]) * 6.,
+            down.y - f64::from(dw[1]) * 6.
+        )
+    );
     for (arrival, gates) in [
         (at(down.tx, down.ty), &map.portals),
         (at(up.tx, up.ty), &w.maps[SKY].portals),
@@ -260,8 +288,11 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
             );
         }
     }
-    for m in [map.spawn, at(up.tx, up.ty)] {
-        let zone = if m.x == map.spawn.x { DEEP } else { SKY };
+    for (zone, m) in [
+        (DEEP, map.spawn),
+        (DEEP, at(down.tx, down.ty)),
+        (SKY, at(up.tx, up.ty)),
+    ] {
         let mut clear = m;
         w.maps[zone].collide(&mut clear, PLAYER_RADIUS);
         assert!(clear.distance(m) < 1e-6, "{m:?} is free ground");
@@ -277,19 +308,24 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         w.maps[SKY].portals.len() >= 2 && w.maps[SKY].portals[0].id == "stormrift_down",
         "Bifrost Reach's old gate keeps index 0"
     );
-    // places: 5 landmarks and 12 bells in three chains; a map without `chain` and `burn` still loads
-    assert!(map.places.len() >= 17, "{} places", map.places.len());
+    // places: 5 landmarks, 7 for the new quests, the Empty Seat circle and 12 bells in three chains; a map without `chain` and `burn` still loads
+    assert_eq!(map.places.len(), 25);
     assert_eq!(
         map.places.iter().filter(|p| !p.chain.is_empty()).count(),
         12
     );
     let old: Place = serde_json::from_str(r#"{"id":"a","name":"A","x":1,"y":2,"r":3}"#).unwrap();
     assert!(old.chain.is_empty() && old.burn == 0. && old.waves.is_empty());
-    // everybody stands on free ground inside the hub
+    // everybody stands on free ground inside the hub or a camp
     let city = map.city.as_ref().unwrap();
-    // (The Longship's guides stand at its entrance, outside the hub.)
-    for n in map.npcs.iter().filter(|n| !overlay_npc(&n.id)) {
-        assert!(city.contains(at(n.x, n.y)), "{} is in Keelhaven", n.id);
+    for n in &map.npcs {
+        assert!(
+            n.id.starts_with("keel_") // (the Longship door's two people stand beside the door, just west of the plaza)
+                || city.contains(at(n.x, n.y))
+                || map.camps.iter().any(|c| c.contains(at(n.x, n.y))),
+            "{} is in Keelhaven or a camp",
+            n.id
+        );
         let mut clear = at(n.x, n.y);
         map.collide(&mut clear, PLAYER_RADIUS);
         assert!(
@@ -341,8 +377,8 @@ fn the_net_has_one_door_and_a_court_with_two_so_the_kinds_come_in_depth_order() 
             "ghostmaw"
         ]
     );
-    for p in map.places.iter().filter(|p| p.y < 118. || p.y > 130.) {
-        let inside = p.y < 118.;
+    for p in map.places.iter().filter(|p| p.y < 168. || p.y > 186.) {
+        let inside = p.y < 168.;
         assert_eq!(
             near(map, &sealed, at(p.x, p.y + 2.)) || near(map, &sealed, at(p.x, p.y)),
             !inside,
@@ -361,7 +397,7 @@ fn the_net_has_one_door_and_a_court_with_two_so_the_kinds_come_in_depth_order() 
         );
     }
     // a wall with no door cannot be crossed: the chamber's own walls stand where the doors are not
-    let wall = (96., 40., 8.);
+    let wall = (120., 70., 8.);
     assert!(
         kinds_cut(&open(&[wall])).is_empty(),
         "a disc on the plain wall changes nothing"
@@ -385,7 +421,8 @@ fn the_net_has_one_door_and_a_court_with_two_so_the_kinds_come_in_depth_order() 
         assert!(d.iter().all(|v| v.is_finite()), "{kind} is reachable");
         d.iter().sum::<f64>() / d.len() as f64
     };
-    let order = ["draugr", "angler", "moray", "siren", "shellback", "kraken"];
+    // (the draugr roam the whole width of the Shallows, so they are left out: the Net's kinds come in depth order)
+    let order = ["angler", "moray", "siren", "shellback", "kraken"];
     for pair in order.windows(2) {
         assert!(
             mean(pair[0]) < mean(pair[1]),
@@ -403,10 +440,13 @@ fn the_net_has_one_door_and_a_court_with_two_so_the_kinds_come_in_depth_order() 
         .find(|s| s.kind == "kraken")
         .unwrap()
         .point();
-    let straight = map.spawn.distance(boss);
+    // (measured from the Pearl Gate: the way from Keelhaven to the gate is open water)
+    let gate = at(NET_DOOR.0, NET_DOOR.1 + 2.);
+    let from_gate = walk_distance(map, &grid, gate);
+    let straight = gate.distance(boss);
     let walk = [(0., 0.), (3., 0.), (-3., 0.), (0., 3.), (0., -3.)]
         .iter()
-        .map(|(dx, dy)| dist[cell_at(map, at(boss.x + dx, boss.y + dy))])
+        .map(|(dx, dy)| from_gate[cell_at(map, at(boss.x + dx, boss.y + dy))])
         .fold(f64::INFINITY, f64::min);
     assert!(
         walk > 3. * straight,
@@ -479,9 +519,10 @@ fn every_deep_monster_has_its_own_stats_attacks_materials_and_rewards() {
         let c = &w.players[&1].character;
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
         assert_eq!(paid, xp, "{kind} xp");
+        // enemy gold drops are halved at the kill (MOB_GOLD_SCALE)
         assert_eq!(
             w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
-            mob_gold(gold)
+            ((f64::from(gold) * 0.5).round() as u32).max(1)
         );
         assert!(
             w.drops
@@ -662,13 +703,22 @@ fn both_three_player_elites_credit_nearby_heroes_and_pay_gear() {
 
 // ---- the questline -----------------------------------------------------------------------------------------------------------------
 #[test]
-fn the_questline_has_twenty_five_quests_with_three_chime_chains_and_the_old_objective_kinds() {
+fn the_questline_has_thirty_eight_deep_quests_with_three_chime_chains_and_the_old_objective_kinds()
+{
     let w = world();
     let map = &w.maps[DEEP];
-    assert_eq!(hosted_counts(map).1, 25);
+    // 38 of the zone's own, the Longship's three (`keel_*`, their people stand in the dungeon) and the Empty Seat's two
+    assert_eq!(map.quests.len(), 43);
+    assert_eq!(
+        map.quests
+            .iter()
+            .filter(|q| q.id.starts_with("deep_"))
+            .count(),
+        38
+    );
     let mut kinds = std::collections::BTreeSet::new();
     let mut chimes = vec![];
-    for q in map.quests.iter().filter(|q| !overlay_quest(&q.id)) {
+    for q in map.quests.iter().filter(|q| q.id.starts_with("deep_")) {
         assert!(npc_exists(map, &q.npc), "{} giver {}", q.id, q.npc);
         assert_eq!(
             q.reward_xp,
@@ -859,18 +909,28 @@ fn the_deep_progression_quest_comes_at_level_thirty_five_and_completes_on_arriva
 #[test]
 fn the_deep_spark_master_links_keelhaven_to_the_perch() {
     let w = world();
-    assert_links_include(
-        &npc(&w, "travel_keelhaven").travel_links,
-        &["travel_perch", "travel_nacrehold"],
-    );
-    assert_links_include(
-        &w.maps[SKY]
-            .npcs
-            .iter()
-            .find(|n| n.id == "travel_perch")
-            .unwrap()
-            .travel_links,
-        &["travel_skuldwatch", "travel_keelhaven"],
+    let links = npc(&w, "travel_keelhaven").travel_links;
+    for stop in [
+        "travel_perch",
+        "travel_nacrehold",
+        "travel_astralhollow",
+        "travel_lanternrest",
+        "travel_gatewatch",
+        "travel_drownwatch",
+    ] {
+        assert!(links.iter().any(|l| l == stop), "Keelhaven links to {stop}");
+    }
+    // (Bifrost's Perch also links the Cinderwatch camp and its own outposts now)
+    let perch = w.maps[SKY]
+        .npcs
+        .iter()
+        .find(|n| n.id == "travel_perch")
+        .unwrap()
+        .travel_links
+        .clone();
+    assert!(
+        perch.iter().any(|l| l == "travel_skuldwatch")
+            && perch.iter().any(|l| l == "travel_keelhaven")
     );
     assert!(w.maps[DEEP].in_city(at(
         npc(&w, "travel_keelhaven").x,
@@ -1275,20 +1335,371 @@ fn the_maelstrom_stands_on_the_eyrie_and_both_gates_work() {
         let row = floor[y as usize].as_str().unwrap().as_bytes();
         assert_ne!(row[x as usize], b' ', "({x}, {y}) is over the void");
     }
-    // walking into it carries the hero down to Keelhaven, and back up
+    // walking into it carries the hero down to Keelhaven, and back up (the updrafts are walk-in gates: the hero walks the way they face)
     let mut rx = join(&mut w, 1, Class::Warrior);
+    let side = down.walk.expect("a walk-in gate");
     place(&mut w, 1, SKY, at(down.x, down.y));
-    for _ in 0..40 {
-        push_through(&mut w, 1, &down);
-        run(&mut w, &mut rx, 1);
-    }
+    w.message(
+        1,
+        ClientMessage::Move {
+            x: down.x + f64::from(side[0]) * 3.,
+            y: down.y + f64::from(side[1]) * 3.,
+        },
+    );
+    run(&mut w, &mut rx, 40);
     assert_eq!(w.players[&1].character.zone, DEEP);
     let up = w.maps[DEEP].portals[0].clone();
+    let side = up.walk.expect("a walk-in gate");
     place(&mut w, 1, DEEP, at(up.x, up.y));
-    for _ in 0..40 {
-        push_through(&mut w, 1, &up);
-        run(&mut w, &mut rx, 1);
-    }
+    w.message(
+        1,
+        ClientMessage::Move {
+            x: up.x + f64::from(side[0]) * 3.,
+            y: up.y + f64::from(side[1]) * 3.,
+        },
+    );
+    run(&mut w, &mut rx, 40);
     assert_eq!(w.players[&1].character.zone, SKY);
     assert!(w.maps[SKALD].portals.len() >= 2);
+}
+
+// ---- the pilot map: gates on the rim, outposts, the Nacrehold band ------------------------------------------------------------------
+fn raw_deep() -> Value {
+    let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
+    raw["zones"][DEEP - 1].clone()
+}
+fn on_outline(raw: &Value, x: f64, y: f64) -> bool {
+    raw["shapeFloor"][y as usize]
+        .as_str()
+        .and_then(|r| r.as_bytes().get(x as usize).copied())
+        == Some(b'#')
+}
+fn segment_distance(p: (f64, f64), a: (f64, f64), b: (f64, f64)) -> f64 {
+    let (dx, dy) = (b.0 - a.0, b.1 - a.1);
+    let t = (((p.0 - a.0) * dx + (p.1 - a.1) * dy) / (dx * dx + dy * dy).max(1e-9)).clamp(0., 1.);
+    (p.0 - a.0 - t * dx).hypot(p.1 - a.1 - t * dy)
+}
+
+#[test]
+fn every_crossing_of_the_deep_stays_a_portal_on_the_rim_and_keeps_its_far_end() {
+    let w = world();
+    let raw = raw_deep();
+    let map = &w.maps[DEEP];
+    // the only seam in or out is the one to Nacrehold (owner, 2026-11-07); every other crossing of the Deep stays a portal
+    for (zone, m) in w.maps.iter().enumerate() {
+        for p in m.portals.iter().filter(|p| p.to == DEEP || zone == DEEP) {
+            assert!(
+                p.seam.is_none() || (zone == 9 && p.to == DEEP) || (zone == DEEP && p.to == 9),
+                "zone {zone}: {} is a seam",
+                p.id
+            );
+        }
+    }
+    let ids: Vec<&str> = map.portals.iter().map(|p| p.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        ["maelstrom_up", "nacre_gate", "deep_longship", "path_8_13"]
+    );
+    // each stands on the outline floor, a gate on the rim faces outwards and its arrival lies inside
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+        assert!(on_outline(&raw, p.x, p.y), "{} is on the floor", p.id);
+        if let Some(side) = p.walk {
+            let beyond = (p.x + f64::from(side[0]) * 6., p.y + f64::from(side[1]) * 6.);
+            assert!(
+                !on_outline(&raw, beyond.0, beyond.1),
+                "{} faces the rim: six tiles on is open sea",
+                p.id
+            );
+        }
+    }
+    // the far ends point back at the arrival six tiles inside each gate, or below the Longship's door
+    let arrival = |id: &str| {
+        let p = map.portals.iter().find(|p| p.id == id).unwrap();
+        let s = p.walk.unwrap();
+        (p.x - f64::from(s[0]) * 6., p.y - f64::from(s[1]) * 6.)
+    };
+    for (zone, id, gate) in [
+        (SKY, "maelstrom_down", "maelstrom_up"),
+        (13, "path_13_8", "path_8_13"),
+    ] {
+        let p = w.maps[zone].portals.iter().find(|p| p.id == id).unwrap();
+        let (x, y) = arrival(gate);
+        assert!(
+            (p.tx - x).abs() < 1e-6 && (p.ty - y).abs() < 1e-6,
+            "{id} arrives at the Deep's {gate}"
+        );
+        assert!(
+            on_outline(&raw, p.tx, p.ty),
+            "{id}: the arrival is on the floor"
+        );
+    }
+    let door = map
+        .portals
+        .iter()
+        .find(|p| p.id == "deep_longship")
+        .unwrap();
+    for id in ["keel_return", "keel_clear"] {
+        let p = w
+            .maps
+            .iter()
+            .flat_map(|m| &m.portals)
+            .find(|p| p.id == id)
+            .unwrap();
+        assert_eq!((p.tx, p.ty), (door.x, door.y + 5.), "{id}");
+    }
+    // and every one of them can be walked to from the spawn
+    let seen = flood(map, &blocked(map, &[]), map.spawn);
+    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+        let s = p.walk.unwrap_or([0, 0]);
+        assert!(
+            near(
+                map,
+                &seen,
+                at(
+                    p.x - f64::from(s[0]) * 2.,
+                    p.y - f64::from(s[1]) * 2. + if p.walk.is_none() { 3. } else { 0. }
+                )
+            ),
+            "{} can be reached on foot",
+            p.id
+        );
+    }
+}
+
+#[test]
+fn the_three_outposts_are_sanctuaries_with_their_people_a_master_a_mailbox_and_the_new_quests() {
+    let w = world();
+    let map = &w.maps[DEEP];
+    for (key, prefix) in CAMPS {
+        let master = npc(&w, &format!("travel_{key}"));
+        let camp = map
+            .camps
+            .iter()
+            .find(|c| c.contains(at(master.x, master.y)))
+            .unwrap_or_else(|| panic!("{key} has a camp"));
+        let people: Vec<&Npc> = map
+            .npcs
+            .iter()
+            .filter(|n| n.id.starts_with(prefix))
+            .collect();
+        assert_eq!(people.len(), 3, "{key}: two givers and a trader");
+        assert_eq!(
+            people.iter().filter(|n| n.buys).count(),
+            1,
+            "{key}: one trader"
+        );
+        for n in people {
+            assert!(camp.contains(at(n.x, n.y)), "{} stands in {key}", n.id);
+        }
+        let box_ = npc(&w, &format!("mailbox_8_{key}"));
+        assert!(camp.contains(at(box_.x, box_.y)), "{key} has its mailbox");
+        // every camp is linked with Keelhaven and with the other camps
+        assert!(
+            master
+                .travel_links
+                .contains(&"travel_keelhaven".to_string())
+        );
+        assert_eq!(
+            master.travel_links.len(),
+            3,
+            "{key}: Keelhaven and the two other camps"
+        );
+        assert!(
+            npc(&w, "travel_keelhaven")
+                .travel_links
+                .contains(&format!("travel_{key}")),
+            "Keelhaven links back to {key}"
+        );
+        // the camp's own quests: four each, every giver one of its people (the ledger is Keelhaven's)
+        let quests: Vec<&Quest> = map
+            .quests
+            .iter()
+            .filter(|q| q.id.starts_with(prefix))
+            .collect();
+        assert_eq!(quests.len(), 4, "{key}");
+        for q in quests {
+            assert!(q.npc.starts_with(prefix), "{} is given in {key}", q.id);
+        }
+    }
+    assert!(
+        map.quests
+            .iter()
+            .any(|q| q.id == "deep_kh_ledger" && q.npc == "deep_warden")
+    );
+    // every old quest id is still here
+    for id in [
+        "deep_welcome",
+        "deep_draugr",
+        "deep_coins",
+        "deep_longship",
+        "deep_harbour",
+        "deep_anglers",
+        "deep_lures",
+        "deep_morays",
+        "deep_teeth",
+        "deep_chapel",
+        "deep_captain",
+        "deep_net",
+        "deep_sirens",
+        "deep_pearls",
+        "deep_door",
+        "deep_shellbacks",
+        "deep_plates",
+        "deep_garden",
+        "deep_ghostmaw",
+        "deep_rans",
+        "deep_kraken",
+        "deep_patrol",
+        "deep_bounty",
+        "deep_vanguard",
+        "deep_onward",
+        "keel_entry",
+        "keel_cargo",
+        "keel_rigging",
+        "es_08",
+        "es_go_08",
+    ] {
+        quest(&w, id);
+    }
+    // the elites keep their quests and nobody new joined them
+    for (id, kind) in [
+        ("deep_captain", "hvitserk"),
+        ("deep_ghostmaw", "ghostmaw"),
+        ("deep_kraken", "kraken"),
+    ] {
+        assert!(
+            quest(&w, id).objectives.iter().any(|o| o.target == kind),
+            "{id}"
+        );
+    }
+}
+
+#[test]
+fn the_nacrehold_border_band_is_kept_free_for_the_seam() {
+    let w = world();
+    let raw = raw_deep();
+    let runs: Vec<Vec<(f64, f64)>> = raw["shape"]["edges"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|e| e["kind"] == "shared" && e["other"] == 9)
+        .map(|e| {
+            e["points"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| (p[0].as_f64().unwrap(), p[1].as_f64().unwrap()))
+                .collect()
+        })
+        .collect();
+    assert!(!runs.is_empty(), "the Deep shares a border with Nacrehold");
+    let band = |x: f64, y: f64| {
+        runs.iter()
+            .flat_map(|run| run.windows(2).map(|s| segment_distance((x, y), s[0], s[1])))
+            .fold(f64::INFINITY, f64::min)
+    };
+    for s in w.slimes.iter().filter(|s| s.zone == DEEP) {
+        assert!(
+            band(s.x, s.y) >= 7.,
+            "{} stands {:.1} from the Nacrehold border",
+            s.kind,
+            band(s.x, s.y)
+        );
+    }
+    for o in raw["objects"].as_array().unwrap() {
+        let (kind, x, y) = (
+            o["kind"].as_str().unwrap(),
+            o["x"].as_f64().unwrap(),
+            o["y"].as_f64().unwrap(),
+        );
+        if [
+            "house",
+            "chapel",
+            "stall",
+            "fountain",
+            "lamp",
+            "bench",
+            "noticeboard",
+            "tent",
+        ]
+        .contains(&kind)
+        {
+            assert!(
+                band(x, y) >= 20.,
+                "{kind} stands {:.1} from the border",
+                band(x, y)
+            );
+        } else if kind != "void" && kind != "reefwall" {
+            assert!(
+                band(x, y) >= 2.5,
+                "{kind} stands {:.1} from the border",
+                band(x, y)
+            );
+        }
+    }
+    // the rim reef that will open when the seam comes is tagged, so it can be found
+    let rim = raw["objects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|o| o["rim"] == 1)
+        .count();
+    assert!(rim > 200, "{rim} rim pieces");
+}
+
+#[test]
+fn the_tideway_and_the_way_to_astralhollow_are_walked_through_both_ways() {
+    let mut w = world();
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    for (gate_id, zone, back_id) in [
+        ("path_8_13", 13, "path_13_8"),
+        ("maelstrom_up", SKY, "maelstrom_down"),
+    ] {
+        let gate = w.maps[DEEP]
+            .portals
+            .iter()
+            .find(|p| p.id == gate_id)
+            .unwrap()
+            .clone();
+        let side = gate.walk.expect("a walk-in gate");
+        place(&mut w, 1, DEEP, at(gate.x, gate.y));
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: gate.x + f64::from(side[0]) * 3.,
+                y: gate.y + f64::from(side[1]) * 3.,
+            },
+        );
+        run(&mut w, &mut rx, 40);
+        assert_eq!(
+            w.players[&1].character.zone, zone,
+            "{gate_id} leads to {zone}"
+        );
+        // and back: the far side's gate carries the hero to the arrival six tiles inside this gate
+        let back = w.maps[zone]
+            .portals
+            .iter()
+            .find(|p| p.id == back_id)
+            .unwrap()
+            .clone();
+        let side = back.walk.expect("a walk-in gate");
+        place(&mut w, 1, zone, at(back.x, back.y));
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: back.x + f64::from(side[0]) * 3.,
+                y: back.y + f64::from(side[1]) * 3.,
+            },
+        );
+        run(&mut w, &mut rx, 40);
+        assert_eq!(
+            w.players[&1].character.zone, DEEP,
+            "{back_id} returns to the Deep"
+        );
+        let c = &w.players[&1].character;
+        assert!(
+            at(c.x, c.y).distance(at(gate.x, gate.y)) < 12.,
+            "{back_id} puts the hero near {gate_id}"
+        );
+    }
 }

@@ -25,7 +25,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>!Seasonal.isActive('christmas')&&Christmas.objects(2).length===0&&!Quests.offered('baker').some(q=>q.id.startsWith('christmas'))),'December 14: Christmas dressing, tree and quests are absent');
  await debug({op:'season_time',unix:1797289200});await wait(()=>Seasonal.isActive('christmas'));
  check(await p.evaluate(()=>!Seasonal.isActive('halloween')&&__snap.halloween===null&&__snap.christmas!==null),'December 15 activates only Christmas, with its own ritual state');
- check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17].includes(i)?z.christmasDecor?.length>=20:!z.christmasDecor)),'Christmas city dressing is dense and restricted to the four major cities');
+ check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17,24].includes(i)?z.christmasDecor?.length>=20:!z.christmasDecor)),'Christmas city dressing is dense and restricted to the four major cities');
  const names={0:'alderhaven',4:'skaldholm',9:'nacrehold',17:'asterion'};
  if(!['hunt','titles'].includes(process.env.CHECK_ONLY))for(const z of [0,4,9,17]){
   const a=await area(z),q=a.quests.find(q=>q.season==='christmas'&&q.id!=='christmas_hunt');
