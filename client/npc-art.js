@@ -42,12 +42,51 @@
     const phase = [...n.id].reduce((sum, char) => sum + char.charCodeAt(0), 0);
     return { key: who.art, clip: name, row: clip.row, step: Math.floor(t * clip.fps + phase) % clip.n, mirrored: !!n.moving && n.fx - n.fy < 0 };
   }
-  function draw(g, n, t, talk = false) {
+  // Merfolk swim (MERFOLK-SWIM): drawn from the same saved frames, so nothing but the drawing changes (routes, speed, names, dialogue stay).
+  // They float LIFT px above the floor (the shadow stays on it), drift up and down, lean along the way they swim, wave the tail in an S
+  // (the frame's lowest rows are sheared sideways, more towards the tip) and, while moving, let a few bubbles rise. A reduced-motion player
+  // gets the lift and the lean but no bob, wave or bubbles. The nameplate (`top`) and the costume sockets (`head`) follow the lift.
+  const LIFT = 25, TAIL_TOP = 66, WAIST = 62, LEAN = .5;
+  const calm = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const swimmer = n => assignment(n)?.identity?.species === 'merfolk' || n.look?.species === 'merfolk';
+  function swimPose(n, t, pose, portrait) {
+    if (!swimmer(n)) return null;
+    const phase = [...n.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 628 / 100, still = calm(), moving = pose.clip === 'walk';
+    const bob = still || portrait ? 0 : Math.sin(t * 1.7 + phase) * (moving ? 2.5 : 3.5);
+    return { lift: LIFT + bob, phase, moving, still, angle: moving && !portrait ? (pose.mirrored ? -LEAN : LEAN) : 0,
+      amp: still || portrait ? 0 : moving ? 4 : 1.5 };
+  }
+  function draw(g, n, t, talk = false, portrait = false) {
     const pose = frame(n, t, talk); if (!pose) return false;
     const img = source(pose.key); if (!img) return false;
-    const sheet = atlas(n, pose.key, img), [w, h] = meta.frame, [ax, ay] = meta.anchor, scale = meta.scale;
-    g.save(); g.imageSmoothingEnabled = false; if (pose.mirrored) g.scale(-1, 1);
-    g.drawImage(sheet, pose.step * w, pose.row * h, w, h, -ax * scale, -ay * scale, w * scale, h * scale); g.restore(); return true;
+    const sheet = atlas(n, pose.key, img), [w, h] = meta.frame, [ax, ay] = meta.anchor, scale = meta.scale, sw = swimPose(n, t, pose, portrait);
+    g.save(); g.imageSmoothingEnabled = false;
+    if (sw) {
+      g.translate(0, -sw.lift);
+      if (sw.angle) { const py = -(ay - WAIST) * scale; g.translate(0, py); g.rotate(sw.angle); g.translate(0, -py); }
+    }
+    if (pose.mirrored) g.scale(-1, 1);
+    const sx = pose.step * w, sy = pose.row * h, dx = -ax * scale, dy = -ay * scale;
+    if (!sw || !sw.amp) g.drawImage(sheet, sx, sy, w, h, dx, dy, w * scale, h * scale);
+    else {
+      // The body is one piece; the tail is cut into two-row strips, each pushed sideways by a travelling sine wave.
+      g.drawImage(sheet, sx, sy, w, TAIL_TOP, dx, dy, w * scale, Math.round(TAIL_TOP * scale));
+      for (let r = TAIL_TOP; r < h; r += 2) {
+        const off = sw.amp * ((r - TAIL_TOP) / (h - TAIL_TOP)) * Math.sin(t * 7 - r * .3 + sw.phase) * scale;
+        const top = Math.round((r - ay) * scale), bottom = Math.round((r + 2 - ay) * scale);
+        g.drawImage(sheet, sx, sy + r, w, 2, dx + off, top, w * scale, bottom - top);
+      }
+    }
+    g.restore();
+    if (sw?.moving && !sw.still && !portrait) {
+      g.save(); g.lineWidth = 1.5; g.strokeStyle = '#d6fbffcc'; g.fillStyle = '#d6fbff33';
+      for (let k = 0; k < 3; k++) {
+        const u = (t * .45 + k / 3 + sw.phase * .07) % 1;
+        g.globalAlpha = (1 - u) * .9; g.beginPath(); g.arc((k % 2 ? 1 : -1) * (26 + Math.sin(u * 9 + k * 2.1) * 5), -(LIFT + 70) - u * 90, 2.2 + (1 - u) * 1.6, 0, Math.PI * 2); g.fill(); g.stroke();
+      }
+      g.restore();
+    }
+    return true;
   }
   // Costume sockets come from the exported frame, never the tallest held prop.
   // Inspect each source frame once; tinting does not change its silhouette/material mask.
@@ -94,9 +133,16 @@
     }
     const socket = heads.get(key); if (!socket) return null;
     const scale = meta.scale * (n.look?.scale || 1);
-    return { x: socket.x * scale * (pose.mirrored ? -1 : 1), y: socket.y * scale, width: socket.width * scale, collar: socket.collar * scale };
+    let x = socket.x * scale * (pose.mirrored ? -1 : 1), y = socket.y * scale, collar = socket.collar * scale;
+    const sw = swimPose(n, t, pose, false);
+    if (sw) {
+      const py = -(ay - WAIST) * scale, c = Math.cos(sw.angle), s = Math.sin(sw.angle), ry = y - py;
+      const turnedX = x * c - ry * s, turnedY = py + x * s + ry * c, lift = sw.lift * (n.look?.scale || 1);
+      collar += turnedY - y - lift; x = turnedX; y = turnedY - lift;
+    }
+    return { x, y, width: socket.width * scale, collar };
   }
-  window.NpcArt = { ready, draw, frame, head, top(n) { const who = assignment(n); return who && meta.tops?.[who.art] ? (meta.tops[who.art] * meta.scale + 3) * (n.look?.scale || 1) : null; },
+  window.NpcArt = { ready, draw, frame, head, top(n) { const who = assignment(n); return who && meta.tops?.[who.art] ? (meta.tops[who.art] * meta.scale + 3 + (swimmer(n) ? LIFT : 0)) * (n.look?.scale || 1) : null; },
     readyFor(npcs) { return !!meta && npcs.every(n => { const who = assignment(n); return !who || !!source(who.art); }); },
     get manifest() { return meta; }, get cacheSize() { return tinted.size; }, get cacheLimit() { return cacheLimit(); } };
 })();

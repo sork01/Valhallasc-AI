@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.41.4",
+    "date": "2026-11-10",
+    "new": [
+      "The merfolk of Nacrehold now swim. They float a little above the sea floor, drift gently up and down, lean forward in the direction they swim and wave their tails. Swimming ones also leave a few bubbles behind. If you have reduced motion switched on, they only float and lean."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.41.3",
     "date": "2026-11-10",
     "new": [],
