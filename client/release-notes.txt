@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.41.1",
+    "date": "2026-11-10",
+    "new": [],
+    "changed": [
+      "The thin dark lines along the borders between two zones on the minimap are gone. Those lines are not on the real map, and the ground now meets cleanly across a border."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.41.0",
     "date": "2026-11-10",
     "new": [

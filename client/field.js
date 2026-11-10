@@ -5246,7 +5246,9 @@
     for (const p of zdef.portals) { if (p.seam || p.vault || p.after_clear && !instanceCleared) continue; if (p.walk) { g.strokeStyle='#f1d89b';g.lineWidth=2;g.beginPath();g.moveTo((p.x-p.walk[0]*2)*k,(p.y-p.walk[1]*2)*k);g.lineTo((p.x+p.walk[0]*2)*k,(p.y+p.walk[1]*2)*k);g.stroke();continue; } g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     if (zdef.shapeFloor || bigSky()) {                      // only the land is drawn: outside the outline the minimap shows the water (or a neighbour)
       g.globalCompositeOperation = 'destination-out';
-      for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (!map.floor[y * MAP + x]) g.fillRect(x * k - .25, y * k - .25, k + .5, k + .5);
+      // Along a border with another province the cut keeps two tiles of this zone's own ground: the two edges are soft after the downscale, and with nothing under them the dark sea showed through as a black line (no such line exists on the real map).
+      const ed = map.edgeDist, ec = map.edgeCoast;
+      for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) { const i = y * MAP + x; if (map.floor[i] || (ed && ed[i] && ed[i] <= 2 && ec && !ec[i])) continue; g.fillRect(x * k - .25, y * k - .25, k + .5, k + .5); }
       g.globalCompositeOperation = 'source-over';
     }
     return c;
@@ -5319,8 +5321,8 @@
     const U = miniUnits(), [c, g] = canvasOf(U, U, 4), k = U / MAP;
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {                  // lighter and greener near the shore, a foam line at the edge
       const i = y * MAP + x, d = map.edgeDist[i];
-      if (map.floor[i] || !d || d > 16) continue;
-      g.fillStyle = !map.edgeCoast[i] ? `rgba(43,36,33,${Math.min(1, (15 - d) / 4)})` : d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
+      if (map.floor[i] || !d || d > 16 || !map.edgeCoast[i]) continue;   // only a coast has shallows; a border with another province is that province's own ground
+      g.fillStyle = d === 1 ? 'rgba(214,244,250,.8)' : `rgba(70,184,200,${.62 * (1 - (d - 2) / 14)})`; g.fillRect(x * k, y * k, k + .5, k + .5);
     }
     return c;
   }
