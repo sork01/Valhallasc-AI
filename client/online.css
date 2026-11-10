@@ -1120,3 +1120,6 @@
 @keyframes cs-caption { 0% { opacity: 0; transform: translateY(.8cqw); } 12% { opacity: 1; transform: none; } 78% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .cs-bar { transition: none; } .cs-caption.on { animation-duration: 2.6s; } }
 .cs-view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; background: #05070d; }
+.cs-skip { z-index: 2; position: absolute; right: 2.2%; bottom: 3.4%; margin: 0; padding: .4cqw 1.2cqw; border-radius: .6cqw; background: #05070dcc; color: #dfe9f5; font: max(13px, 1.4cqw) 'Jua', sans-serif; letter-spacing: .02em; border: 1px solid #ffffff30; }
+.cs-skip[hidden] { display: none; }
+.cs-skip::after { content: ''; position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--skip, 0) * 100%); background: #ffd66b; border-radius: 0 0 .6cqw .6cqw; }

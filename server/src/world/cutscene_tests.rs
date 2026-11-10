@@ -1,5 +1,5 @@
 //! `CUTSCENE-SERVER` (`world/cutscene.rs`): each crossing cutscene plays once per hero, only on a real crossing, and the hero is safe while it plays.
-use super::cutscene::{Env, KINDS, scenes_for};
+use super::cutscene::{Env, INTRO_SECONDS, KINDS, scenes_for};
 use super::wyrd_tests::{at, calm, drain, join, place, world};
 use super::*;
 
@@ -63,7 +63,7 @@ fn the_scenes_of_each_crossing() {
     assert_eq!(scenes_for(Sky, Sea), ["sky_down", "dive"]);
     assert_eq!(scenes_for(Sea, Sky), ["surface", "sky_up"]);
     assert!(scenes_for(Sea, Sea).is_empty() && scenes_for(Land, Land).is_empty());
-    assert_eq!(KINDS, ["sky_up", "sky_down", "dive", "surface"]);
+    assert_eq!(KINDS, ["sky_up", "sky_down", "dive", "surface", "intro"]);
 }
 
 #[test]
@@ -256,4 +256,89 @@ fn nothing_hurts_the_hero_while_a_scene_plays_and_the_debug_op_exists() {
     );
     let command: DebugCommand = serde_json::from_str(r#"{"op":"enable_cutscenes"}"#).unwrap();
     assert!(matches!(command, DebugCommand::EnableCutscenes));
+}
+
+#[test]
+fn a_new_character_sees_the_intro_once_and_the_skip_flag_follows_the_account() {
+    let mut w = world();
+    calm(&mut w);
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    let id = w.players[&1].character.id.clone();
+    assert_eq!(
+        w.intro_pending.get(&id),
+        Some(&false),
+        "creating a character queues its intro (a guest has no other character)"
+    );
+    w.players.get_mut(&1).unwrap().character.landing = true; // test worlds have no dock, so stand in for the creation flag
+    w.update_lead_shoes();
+    let intro: Vec<Value> = drain(&mut rx)
+        .into_iter()
+        .filter(|m| m["type"] == "cutscene")
+        .collect();
+    assert_eq!(intro.len(), 1);
+    assert_eq!(intro[0]["scenes"], serde_json::json!(["intro"]));
+    assert_eq!(
+        intro[0]["skippable"], false,
+        "the first character of an account must watch it"
+    );
+    assert!(
+        w.players[&1]
+            .character
+            .cutscenes
+            .contains(&"intro".to_string())
+    );
+    assert!(
+        w.players[&1].cutscene_until > w.time + INTRO_SECONDS - 0.01,
+        "the grace covers the whole minute"
+    );
+    assert!(w.intro_pending.is_empty());
+
+    // A relog (a fresh first tick) never replays it, even with the creation flag still set and another entry queued.
+    w.players.get_mut(&1).unwrap().env = None;
+    w.intro_pending.insert(id.clone(), true);
+    w.update_lead_shoes();
+    assert!(heard(&mut rx).0.is_empty());
+
+    // A second character of an account may skip.
+    let mut rx2 = join(&mut w, 2, Class::Mage);
+    let id2 = w.players[&2].character.id.clone();
+    w.intro_pending.insert(id2, true);
+    w.players.get_mut(&2).unwrap().character.landing = true;
+    w.update_lead_shoes();
+    let intro: Vec<Value> = drain(&mut rx2)
+        .into_iter()
+        .filter(|m| m["type"] == "cutscene")
+        .collect();
+    assert_eq!(intro[0]["skippable"], true);
+}
+
+#[test]
+fn only_a_character_created_just_now_gets_the_intro() {
+    let mut w = world();
+    calm(&mut w);
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    // An old character that still stands on the pier (no queued intro) and a new one off the pier: neither.
+    let id = w.players[&1].character.id.clone();
+    w.intro_pending.remove(&id);
+    w.players.get_mut(&1).unwrap().character.landing = true;
+    w.update_lead_shoes();
+    assert!(
+        heard(&mut rx).0.is_empty(),
+        "no intro for a character that was not created this session"
+    );
+    let mut rx2 = join(&mut w, 2, Class::Mage);
+    w.players.get_mut(&2).unwrap().character.landing = false;
+    w.update_lead_shoes();
+    assert!(
+        drain(&mut rx2).iter().all(|m| m["type"] != "cutscene"),
+        "and none once they have left the pier"
+    );
+    // A test server plays it only on request.
+    let mut w = world();
+    calm(&mut w);
+    w.cutscene_opt_in = true;
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    w.players.get_mut(&1).unwrap().character.landing = true;
+    w.update_lead_shoes();
+    assert!(drain(&mut rx).iter().all(|m| m["type"] != "cutscene"));
 }

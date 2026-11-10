@@ -2015,6 +2015,9 @@ pub struct World {
     /// Test servers play no crossing cutscene until a test asks for it with the `enable_cutscenes` debug op, so the many older suites that walk the
     /// real routes into Bifrost and the sea are not locked in one (`world/cutscene.rs`). Set with `test_commands` in main.rs; never on the public service.
     pub cutscene_opt_in: bool,
+    /// Characters created in this process whose opening cutscene has not played yet, each with whether the player may skip it (the account
+    /// already has another character). Filled at creation, consumed on the character's first tick (`world/cutscene.rs`).
+    intro_pending: BTreeMap<String, bool>,
     pub login_notifications: Option<mpsc::Sender<crate::notify::LoginNotice>>,
     // Friend requests, party invites and parties. Nothing here is persisted except `Character::friends`.
     social: social::Social,
@@ -2131,6 +2134,7 @@ impl World {
             landings: !cfg!(test),
             test_commands: false,
             cutscene_opt_in: false,
+            intro_pending: BTreeMap::new(),
             login_notifications: None,
             social: social::Social::default(),
             trades: vec![],
@@ -2594,10 +2598,14 @@ impl World {
                         "Your account already has {MAX_ACCOUNT_CHARACTERS} characters. Delete one first."
                     ));
                 }
+                let others = self.store.account_character_count(&id).map_err(storage)?;
                 let (c, _) = self
                     .store
                     .create_character(Some(&id), look, self.newcomer_start(), wants_gm)
                     .map_err(storage)?;
+                if !wants_gm {
+                    self.intro_pending.insert(c.id.clone(), others >= 1);
+                }
                 (self.arrive(self.with_start_level(c)), None)
             }
             Identity::Guest { token: None, look } => {
@@ -2612,6 +2620,7 @@ impl World {
                     .store
                     .create(look, self.newcomer_start())
                     .map_err(storage)?;
+                self.intro_pending.insert(c.id.clone(), false);
                 (self.arrive(self.with_start_level(c)), Some(token))
             }
         };

@@ -229,9 +229,28 @@
   const sound = (kind, delay) => { try { window.CutsceneAudio?.play(kind, delay); } catch { /* sound is a nicety */ } };
 
   // ---- the player ---------------------------------------------------------------------------------------------------------------------
-  let queue = [], cur = null, startAt = 0, box = null, caption = null, lastCaption = -1, locked = false, shown = 0, shoeState = false, layer = null, view = null;
+  let queue = [], cur = null, curSkip = false, holdStart = null, lastFrame = 0, startAt = 0, box = null, caption = null, skipHint = null, lastCaption = -1, locked = false, shown = 0, shoeState = false, layer = null, view = null;
   // Browser shortcuts (reload, dev tools, zoom) still work; every game key is swallowed before any other handler sees it.
-  const blockKey = e => { if (e.ctrlKey || e.metaKey || /^F\d+$/.test(e.key || '')) return; e.preventDefault(); e.stopImmediatePropagation(); };
+  // A scene the player may skip (the opening, from the second character on) is skipped by holding any key or a finger on it for a second.
+  const blockKey = e => {
+    if (e.ctrlKey || e.metaKey || /^F\d+$/.test(e.key || '')) return;
+    if (curSkip) { if (e.type === 'keydown' && holdStart === null) holdStart = performance.now(); else if (e.type === 'keyup') holdStart = null; }
+    e.preventDefault(); e.stopImmediatePropagation();
+  };
+  // The narrator: the browser's speech synthesis, when there is a voice and the sound is on; otherwise the subtitles carry the story alone.
+  function speak(text, slot) {
+    const synth = window.speechSynthesis; if (!synth || !window.SpeechSynthesisUtterance || !window.Prefs?.sound) return;
+    try {
+      const sv = window.Prefs?.lang === 'sv', u = new SpeechSynthesisUtterance(text), want = sv ? 'sv' : 'en';
+      u.lang = sv ? 'sv-SE' : 'en-GB'; u.pitch = .78; u.volume = clamp(window.Prefs?.sfx ?? 1, .2, 1);
+      u.rate = clamp(text.split(/\s+/).length / Math.max(2, slot) / 2.6, .72, 1.18);
+      const voices = synth.getVoices?.() || [], mine = voices.filter(v => (v.lang || '').toLowerCase().startsWith(want));
+      const pick = mine.find(v => /male|daniel|george|arthur|oliver|david|mattias|alva/i.test(v.name) && !/female/i.test(v.name)) || mine.find(v => (v.lang || '').toLowerCase().startsWith(sv ? 'sv-se' : 'en-gb')) || mine[0];
+      if (pick) u.voice = pick;
+      synth.speak(u);
+    } catch { /* a missing voice only means no narration */ }
+  }
+  const hush = () => { try { window.speechSynthesis?.cancel(); } catch { /* nothing speaking */ } };
   function lock(on) {
     if (on === locked) return; locked = on;
     for (const type of ['keydown', 'keyup', 'keypress']) (on ? addEventListener : removeEventListener)(type, blockKey, true);
@@ -241,40 +260,55 @@
     if (box) return box;
     const stage = document.getElementById('stage') || document.body;
     box = document.createElement('div'); box.id = 'cutscene'; box.className = 'cutscene'; box.hidden = true; box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite');
-    box.innerHTML = '<canvas class="cs-view"></canvas><i class="cs-bar cs-top"></i><i class="cs-bar cs-bottom"></i><p class="cs-caption"></p>';
+    box.innerHTML = '<canvas class="cs-view"></canvas><i class="cs-bar cs-top"></i><i class="cs-bar cs-bottom"></i><p class="cs-caption"></p><p class="cs-skip" hidden></p>';
+    box.addEventListener('pointerdown', () => { if (curSkip && holdStart === null) holdStart = performance.now(); });
+    for (const type of ['pointerup', 'pointercancel', 'pointerleave']) box.addEventListener(type, () => { holdStart = null; });
     for (const type of ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'dblclick', 'contextmenu', 'touchstart', 'touchmove', 'wheel']) box.addEventListener(type, e => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
-    stage.append(box); caption = box.querySelector('.cs-caption'); view = box.querySelector('.cs-view'); return box;
+    stage.append(box); caption = box.querySelector('.cs-caption'); skipHint = box.querySelector('.cs-skip'); view = box.querySelector('.cs-view'); return box;
   }
-  function begin(id) {
-    cur = SCENES[id]; startAt = performance.now(); lastCaption = -1; shown++;
-    cur.fired = new Set(); build().hidden = false; box.dataset.scene = id; box.classList.add('on'); caption.textContent = ''; caption.classList.remove('on');
+  function begin(id, skippable) {
+    cur = SCENES[id]; curSkip = !!skippable; holdStart = null; lastFrame = performance.now(); startAt = performance.now(); lastCaption = -1; shown++;
+    cur.fired = new Set(); build().hidden = false; box.dataset.scene = id; box.classList.add('on'); caption.textContent = ''; caption.classList.remove('on'); skipHint.hidden = true;
     // The zone change reaches the client before this packet, so the plain "Ascending into the sky" notice may already be up: the scene tells it instead.
     window.ZoneJourney?.clear?.();
     lock(true);
   }
   function finish() {
-    cur = null; queue = []; lock(false);
+    cur = null; curSkip = false; holdStart = null; queue = []; lock(false); hush();
     if (box) { box.classList.remove('on'); box.hidden = true; delete box.dataset.scene; if (caption) caption.textContent = ''; }
   }
-  function next() { const id = queue.shift(); if (id) begin(id); else finish(); }
+  function next() { const e = queue.shift(); if (e) begin(e.id, e.skippable); else finish(); }
 
-  function play(scenes) {
+  // `opts.skippable` lets the player skip these scenes (the server says so for the opening cutscene of a second character).
+  function play(scenes, opts) {
     const ids = (Array.isArray(scenes) ? scenes : []).filter(id => SCENES[id]);
     if (!ids.length) return;
-    const idle = !cur; queue.push(...ids);
+    const idle = !cur; queue.push(...ids.map(id => ({ id, skippable: !!opts?.skippable })));
     if (idle) next();
   }
+  // Further scenes (the opening, client/intro.js) join the table the same way the four crossings are written.
+  const register = (id, scene) => { SCENES[id] = { id, ...scene }; };
   function reset() { finish(); }
 
   function draw(g, w, h, t, paintHero, hx, hy, hero, still) {
     if (!cur) return;
     let el = (performance.now() - startAt) / 1000;
     if (el >= cur.dur) { next(); if (!cur) return; el = (performance.now() - startAt) / 1000; }
-    const S = cur, c = { g, w, h, el, hx, hy, still: !!still, flash: 0, shake: 0 };
+    const now = performance.now(), dt = clamp((now - lastFrame) / 1000, 0, .1); lastFrame = now;
+    // Holding a key or a finger on a skippable scene for a second ends it (and the rest of the queue).
+    if (curSkip) {
+      const held = holdStart === null ? 0 : (now - holdStart) / 1000;
+      if (held >= 1) { finish(); return; }
+      skipHint.hidden = el < 2.5; skipHint.textContent = tr(held > 0 ? 'Skipping...' : 'Hold a key or your finger to skip'); skipHint.style.setProperty('--skip', String(held));
+    }
+    const S = cur, c = { g, w, h, el, dt, hx, hy, still: !!still, flash: 0, shake: 0 };
     // Captions and sounds fire once, in order.
-    for (const [at, text] of S.captions) if (el >= at && lastCaption < at) { lastCaption = at; caption.textContent = tr(text); caption.classList.remove('on'); void caption.offsetWidth; caption.classList.add('on'); }
+    for (const [at, text, hold] of S.captions) if (el >= at && lastCaption < at) {
+      lastCaption = at; caption.textContent = tr(text); caption.style.animationDuration = (hold || 2.6) + 's'; caption.classList.remove('on'); void caption.offsetWidth; caption.classList.add('on');
+      if (S.narrate) speak(tr(text), hold || 4);
+    }
     S.sounds.forEach(([at, kind], i) => { if (el >= at && !S.fired.has(i)) { S.fired.add(i); sound(kind, 0); } });
-    const fadeIn = ease(el / FADE_IN), fadeOut = 1 - ease((el - (S.dur - FADE_OUT)) / FADE_OUT), cover = Math.min(fadeIn, fadeOut);
+    const fi = S.fadeIn ?? FADE_IN, fo = S.fadeOut ?? FADE_OUT, fadeIn = ease(el / fi), fadeOut = 1 - ease((el - (S.dur - fo)) / fo), cover = Math.min(fadeIn, fadeOut);
     // The backdrop is painted on its own layer (the helpers set the alpha themselves), so the fades only blend the scene with the world.
     layer ||= document.createElement('canvas');
     if (layer.width !== w || layer.height !== h) { layer.width = w; layer.height = h; }
@@ -285,11 +319,18 @@
     g.save();
     if (c.shake) g.translate((Math.random() - .5) * c.shake * 2, (Math.random() - .5) * c.shake * 2);
     const mounted = hero.mounted; hero.mounted = false;
-    const hold = S.shoes(el);
-    // A close-up: the hero grows about their feet while the scene plays and settles back to life size for the fade-out.
-    const zoom = 1 + .5 * ease(el / .7) * (1 - ease((el - (S.dur - 1.0)) / .8));
-    g.translate(hx + (pose.dx || 0), hy + (pose.dy || 0)); g.scale(zoom * (pose.sx ?? 1), zoom * (pose.sy ?? 1)); g.translate(0, -45); g.rotate(pose.rot || 0); g.translate(0, 45);
-    shoeState = hold; try { paintHero(g, t); } finally { hero.mounted = mounted; }
+    const hold = S.shoes(el), walk = hero.walk, moving = hero.moving, fx = hero.fx, fy = hero.fy;
+    if (!pose.hidden) {
+      // A close-up: the hero grows about their feet while the scene plays and settles back to life size for the fade-out. A scene that sets
+      // `pose.abs` places the hero on its own camera instead (the opening), and `pose.walk` makes them walk that way.
+      const zoom = S.noZoom ? 1 : 1 + .5 * ease(el / .7) * (1 - ease((el - (S.dur - 1.0)) / .8));
+      if (pose.abs) g.translate(pose.abs.x, pose.abs.y), g.scale(pose.abs.k, pose.abs.k);
+      else g.translate(hx + (pose.dx || 0), hy + (pose.dy || 0)), g.scale(zoom * (pose.sx ?? 1), zoom * (pose.sy ?? 1)), g.translate(0, -45), g.rotate(pose.rot || 0), g.translate(0, 45);
+      g.globalAlpha = pose.alpha ?? 1;
+      if (pose.walk) { hero.moving = true; hero.fx = pose.walk[0]; hero.fy = pose.walk[1]; hero.walk = (walk || 0) + dt * 11; }
+      else if (pose.abs) hero.moving = false;
+      shoeState = hold; try { paintHero(g, t); } finally { hero.mounted = mounted; if (!pose.walk) hero.walk = walk; hero.moving = moving; hero.fx = fx; hero.fy = fy; }
+    } else hero.mounted = mounted;
     g.restore();
     if (c.veil > 0) { g.save(); g.globalAlpha = c.veil * cover; g.fillStyle = '#1b6fb0'; g.fillRect(0, 0, w, h); g.restore(); }
     if (c.flash > 0 && !still) { g.save(); g.globalAlpha = clamp(c.flash, 0, 1) * cover; g.fillStyle = '#f4fcff'; g.fillRect(0, 0, w, h); g.restore(); }
@@ -297,11 +338,11 @@
     if (view) { if (view.width !== w || view.height !== h) { view.width = w; view.height = h; } view.getContext('2d').drawImage(g.canvas, 0, 0, g.canvas.width, g.canvas.height, 0, 0, w, h); }
   }
   window.Cutscene = {
-    play, reset, draw,
+    play, reset, draw, register, clamp, ease, lerp, rnd,
     get active() { return !!cur; },
     shoes() { return shoeState; },
     // For tests: what is playing and how far along it is.
-    get state() { return cur ? { scene: cur.id, el: (performance.now() - startAt) / 1000, dur: cur.dur, queued: [...queue], played: shown } : null; },
+    get state() { return cur ? { scene: cur.id, el: (performance.now() - startAt) / 1000, dur: cur.dur, queued: queue.map(e => e.id), played: shown, skippable: curSkip } : null; },
     scenes: Object.fromEntries(Object.entries(SCENES).map(([k, v]) => [k, v.dur])),
   };
 })();

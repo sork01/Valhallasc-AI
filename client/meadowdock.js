@@ -139,6 +139,8 @@
   }
 
   window.MeadowDock = {
+    // The pieces, for the opening cutscene (client/intro.js), which sails the ship in on its own camera.
+    ship, pier, moor,
     draw(g, zdef, w2s, t) {
       const d = zdef.dock; if (!d) return;
       const s = d.ship;
