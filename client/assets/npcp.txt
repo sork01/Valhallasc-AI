@@ -1,0 +1,1143 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "scale": 1.4,
+  "clips": {
+    "idle": {
+      "row": 0,
+      "n": 6,
+      "fps": 6,
+      "editorStart": 0
+    },
+    "walk": {
+      "row": 1,
+      "n": 8,
+      "fps": 10,
+      "editorStart": 6
+    },
+    "talk": {
+      "row": 2,
+      "n": 6,
+      "fps": 6,
+      "editorStart": 14
+    }
+  },
+  "sprites": {
+    "sentinel": "08538d4b1cd1f5eb",
+    "physician": "726b276851ccc6de",
+    "smith": "291f7b2f1bf37dba",
+    "baker": "5ee5bbe278605992",
+    "innkeeper": "74f53726f46d7f20",
+    "merchant": "85044c19c7857111",
+    "ranger": "d4411111f5010262",
+    "scholar": "7515935ac5ee5716",
+    "herald": "aeb6aa87540bc1ea",
+    "gardener": "501579ab060403f5",
+    "fisher": "b2a4b98a53476e9e",
+    "weaver": "406f1d74e162ad47",
+    "courier": "221ad07dee831805",
+    "pilgrim": "dfdf2dd09a31bb85",
+    "bard": "5e2d0322d9825aef",
+    "child": "f3d72d94f3830e12",
+    "elder": "75d86c16b078da67",
+    "painter": "4c15790a1fafef7b",
+    "carpenter": "b7d1c390be6e2a32",
+    "alchemist": "312c180f85514b86",
+    "steward": "1d440c214db77505",
+    "stablehand": "f3d708dbc13e39f6",
+    "lamplighter": "5d711ecaba0a21da",
+    "banker": "7f7dba85ba1f2e57"
+  },
+  "designs": {
+    "sentinel": {
+      "general": true,
+      "name": "sentinel",
+      "materials": {
+        "skin0": "#88664f",
+        "skin1": "#b48669",
+        "skin2": "#dca480",
+        "skin3": "#e3b699",
+        "hair0": "#34241c",
+        "hair1": "#4f3529",
+        "hair2": "#694737",
+        "hair3": "#967e73",
+        "cloth0": "#26374c",
+        "cloth1": "#3b5676",
+        "cloth2": "#547ba8",
+        "cloth3": "#a1b6cf"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "physician": {
+      "general": true,
+      "name": "physician",
+      "materials": {
+        "skin0": "#724e37",
+        "skin1": "#976648",
+        "skin2": "#b87d58",
+        "skin3": "#c69779",
+        "hair0": "#726b57",
+        "hair1": "#aba082",
+        "hair2": "#e4d6ae",
+        "hair3": "#ece2c6",
+        "cloth0": "#576360",
+        "cloth1": "#889b95",
+        "cloth2": "#c2ddd5",
+        "cloth3": "#ddece8"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "smith": {
+      "general": true,
+      "name": "smith",
+      "materials": {
+        "skin0": "#907564",
+        "skin1": "#bf9b84",
+        "skin2": "#e9bda1",
+        "skin3": "#edcab4",
+        "hair0": "#1a1e31",
+        "hair1": "#282e4a",
+        "hair2": "#353d62",
+        "hair3": "#727791",
+        "cloth0": "#53321f",
+        "cloth1": "#824d30",
+        "cloth2": "#b96e45",
+        "cloth3": "#d8af99"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "baker": {
+      "general": true,
+      "name": "baker",
+      "materials": {
+        "skin0": "#674232",
+        "skin1": "#885742",
+        "skin2": "#a66a51",
+        "skin3": "#b88874",
+        "hair0": "#563128",
+        "hair1": "#804a3c",
+        "hair2": "#ab6250",
+        "hair3": "#c49184",
+        "cloth0": "#685a3f",
+        "cloth1": "#a28c63",
+        "cloth2": "#e8c88d",
+        "cloth3": "#f2e1c0"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "innkeeper": {
+      "general": true,
+      "name": "innkeeper",
+      "materials": {
+        "skin0": "#88664f",
+        "skin1": "#b48669",
+        "skin2": "#dca480",
+        "skin3": "#e3b699",
+        "hair0": "#242e28",
+        "hair1": "#35443d",
+        "hair2": "#475b51",
+        "hair3": "#7e8c85",
+        "cloth0": "#53303d",
+        "cloth1": "#814b5f",
+        "cloth2": "#b86b88",
+        "cloth3": "#d8aebe"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "merchant": {
+      "general": true,
+      "name": "merchant",
+      "materials": {
+        "skin0": "#724e37",
+        "skin1": "#976648",
+        "skin2": "#b87d58",
+        "skin3": "#c69779",
+        "hair0": "#3a3246",
+        "hair1": "#584a6a",
+        "hair2": "#75638d",
+        "hair3": "#9e92af",
+        "cloth0": "#443454",
+        "cloth1": "#695183",
+        "cloth2": "#9674bb",
+        "cloth3": "#c5b3da"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "ranger": {
+      "general": true,
+      "name": "ranger",
+      "materials": {
+        "skin0": "#907564",
+        "skin1": "#bf9b84",
+        "skin2": "#e9bda1",
+        "skin3": "#edcab4",
+        "hair0": "#34241c",
+        "hair1": "#4f3529",
+        "hair2": "#694737",
+        "hair3": "#967e73",
+        "cloth0": "#2d3d30",
+        "cloth1": "#465e4a",
+        "cloth2": "#64876a",
+        "cloth3": "#aabdad"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "scholar": {
+      "general": true,
+      "name": "scholar",
+      "materials": {
+        "skin0": "#674232",
+        "skin1": "#885742",
+        "skin2": "#a66a51",
+        "skin3": "#b88874",
+        "hair0": "#726b57",
+        "hair1": "#aba082",
+        "hair2": "#e4d6ae",
+        "hair3": "#ece2c6",
+        "cloth0": "#32364e",
+        "cloth1": "#4e5579",
+        "cloth2": "#7079ad",
+        "cloth3": "#b0b5d2"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "herald": {
+      "general": true,
+      "name": "herald",
+      "materials": {
+        "skin0": "#88664f",
+        "skin1": "#b48669",
+        "skin2": "#dca480",
+        "skin3": "#e3b699",
+        "hair0": "#1a1e31",
+        "hair1": "#282e4a",
+        "hair2": "#353d62",
+        "hair3": "#727791",
+        "cloth0": "#5c3028",
+        "cloth1": "#8f4b3f",
+        "cloth2": "#cc6b5a",
+        "cloth3": "#e3aea4"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "gardener": {
+      "general": true,
+      "name": "gardener",
+      "materials": {
+        "skin0": "#724e37",
+        "skin1": "#976648",
+        "skin2": "#b87d58",
+        "skin3": "#c69779",
+        "hair0": "#563128",
+        "hair1": "#804a3c",
+        "hair2": "#ab6250",
+        "hair3": "#c49184",
+        "cloth0": "#415233",
+        "cloth1": "#668050",
+        "cloth2": "#91b772",
+        "cloth3": "#c2d7b1"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "fisher": {
+      "general": true,
+      "name": "fisher",
+      "materials": {
+        "skin0": "#907564",
+        "skin1": "#bf9b84",
+        "skin2": "#e9bda1",
+        "skin3": "#edcab4",
+        "hair0": "#242e28",
+        "hair1": "#35443d",
+        "hair2": "#475b51",
+        "hair3": "#7e8c85",
+        "cloth0": "#2c474a",
+        "cloth1": "#456e73",
+        "cloth2": "#629da4",
+        "cloth3": "#a9c9cd"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "weaver": {
+      "general": true,
+      "name": "weaver",
+      "materials": {
+        "skin0": "#674232",
+        "skin1": "#885742",
+        "skin2": "#a66a51",
+        "skin3": "#b88874",
+        "hair0": "#3a3246",
+        "hair1": "#584a6a",
+        "hair2": "#75638d",
+        "hair3": "#9e92af",
+        "cloth0": "#51394f",
+        "cloth1": "#7e587a",
+        "cloth2": "#b47eaf",
+        "cloth3": "#d6b8d3"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "courier": {
+      "general": true,
+      "name": "courier",
+      "materials": {
+        "skin0": "#88664f",
+        "skin1": "#b48669",
+        "skin2": "#dca480",
+        "skin3": "#e3b699",
+        "hair0": "#34241c",
+        "hair1": "#4f3529",
+        "hair2": "#694737",
+        "hair3": "#967e73",
+        "cloth0": "#5e492c",
+        "cloth1": "#927144",
+        "cloth2": "#d0a261",
+        "cloth3": "#e5cca8"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "pilgrim": {
+      "general": true,
+      "name": "pilgrim",
+      "materials": {
+        "skin0": "#724e37",
+        "skin1": "#976648",
+        "skin2": "#b87d58",
+        "skin3": "#c69779",
+        "hair0": "#726b57",
+        "hair1": "#aba082",
+        "hair2": "#e4d6ae",
+        "hair3": "#ece2c6",
+        "cloth0": "#453e36",
+        "cloth1": "#6c6055",
+        "cloth2": "#9a8979",
+        "cloth3": "#c7beb5"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "bard": {
+      "general": true,
+      "name": "bard",
+      "materials": {
+        "skin0": "#907564",
+        "skin1": "#bf9b84",
+        "skin2": "#e9bda1",
+        "skin3": "#edcab4",
+        "hair0": "#1a1e31",
+        "hair1": "#282e4a",
+        "hair2": "#353d62",
+        "hair3": "#727791",
+        "cloth0": "#443557",
+        "cloth1": "#6a5387",
+        "cloth2": "#9776c1",
+        "cloth3": "#c6b4dd"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "child": {
+      "general": true,
+      "name": "child",
+      "materials": {
+        "skin0": "#674232",
+        "skin1": "#885742",
+        "skin2": "#a66a51",
+        "skin3": "#b88874",
+        "hair0": "#563128",
+        "hair1": "#804a3c",
+        "hair2": "#ab6250",
+        "hair3": "#c49184",
+        "cloth0": "#633e36",
+        "cloth1": "#9a6155",
+        "cloth2": "#dc8a79",
+        "cloth3": "#ecbfb5"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "elder": {
+      "general": true,
+      "name": "elder",
+      "materials": {
+        "skin0": "#88664f",
+        "skin1": "#b48669",
+        "skin2": "#dca480",
+        "skin3": "#e3b699",
+        "hair0": "#242e28",
+        "hair1": "#35443d",
+        "hair2": "#475b51",
+        "hair3": "#7e8c85",
+        "cloth0": "#3a444d",
+        "cloth1": "#5b6a78",
+        "cloth2": "#8297ac",
+        "cloth3": "#bac6d1"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "painter": {
+      "general": true,
+      "name": "painter",
+      "materials": {
+        "skin0": "#724e37",
+        "skin1": "#976648",
+        "skin2": "#b87d58",
+        "skin3": "#c69779",
+        "hair0": "#3a3246",
+        "hair1": "#584a6a",
+        "hair2": "#75638d",
+        "hair3": "#9e92af",
+        "cloth0": "#5d462f",
+        "cloth1": "#906c4a",
+        "cloth2": "#ce9b69",
+        "cloth3": "#e4c8ac"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "carpenter": {
+      "general": true,
+      "name": "carpenter",
+      "materials": {
+        "skin0": "#907564",
+        "skin1": "#bf9b84",
+        "skin2": "#e9bda1",
+        "skin3": "#edcab4",
+        "hair0": "#34241c",
+        "hair1": "#4f3529",
+        "hair2": "#694737",
+        "hair3": "#967e73",
+        "cloth0": "#4c3625",
+        "cloth1": "#765439",
+        "cloth2": "#a97852",
+        "cloth3": "#d0b5a0"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "alchemist": {
+      "general": true,
+      "name": "alchemist",
+      "materials": {
+        "skin0": "#674232",
+        "skin1": "#885742",
+        "skin2": "#a66a51",
+        "skin3": "#b88874",
+        "hair0": "#726b57",
+        "hair1": "#aba082",
+        "hair2": "#e4d6ae",
+        "hair3": "#ece2c6",
+        "cloth0": "#334c48",
+        "cloth1": "#4f7770",
+        "cloth2": "#71aaa0",
+        "cloth3": "#b1d0cb"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "steward": {
+      "general": true,
+      "name": "steward",
+      "materials": {
+        "skin0": "#88664f",
+        "skin1": "#b48669",
+        "skin2": "#dca480",
+        "skin3": "#e3b699",
+        "hair0": "#1a1e31",
+        "hair1": "#282e4a",
+        "hair2": "#353d62",
+        "hair3": "#727791",
+        "cloth0": "#443844",
+        "cloth1": "#6a576a",
+        "cloth2": "#977c98",
+        "cloth3": "#c6b7c6"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "stablehand": {
+      "general": true,
+      "name": "stablehand",
+      "materials": {
+        "skin0": "#724e37",
+        "skin1": "#976648",
+        "skin2": "#b87d58",
+        "skin3": "#c69779",
+        "hair0": "#563128",
+        "hair1": "#804a3c",
+        "hair2": "#ab6250",
+        "hair3": "#c49184",
+        "cloth0": "#54422b",
+        "cloth1": "#826642",
+        "cloth2": "#ba925f",
+        "cloth3": "#d9c3a7"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "lamplighter": {
+      "general": true,
+      "name": "lamplighter",
+      "materials": {
+        "skin0": "#907564",
+        "skin1": "#bf9b84",
+        "skin2": "#e9bda1",
+        "skin3": "#edcab4",
+        "hair0": "#242e28",
+        "hair1": "#35443d",
+        "hair2": "#475b51",
+        "hair3": "#7e8c85",
+        "cloth0": "#2c3744",
+        "cloth1": "#455569",
+        "cloth2": "#627a96",
+        "cloth3": "#a9b6c5"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "banker": {
+      "general": true,
+      "name": "banker",
+      "materials": {
+        "skin0": "#674232",
+        "skin1": "#885742",
+        "skin2": "#a66a51",
+        "skin3": "#b88874",
+        "hair0": "#3a3246",
+        "hair1": "#584a6a",
+        "hair2": "#75638d",
+        "hair3": "#9e92af",
+        "cloth0": "#35424c",
+        "cloth1": "#536676",
+        "cloth2": "#7692a8",
+        "cloth3": "#b4c3cf"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    }
+  },
+  "tops": {
+    "sentinel": 89,
+    "physician": 83,
+    "smith": 76,
+    "baker": 87,
+    "innkeeper": 87,
+    "merchant": 83,
+    "ranger": 87,
+    "scholar": 75,
+    "herald": 86,
+    "gardener": 86,
+    "fisher": 87,
+    "weaver": 81,
+    "courier": 76,
+    "pilgrim": 82,
+    "bard": 87,
+    "child": 67,
+    "elder": 83,
+    "painter": 86,
+    "carpenter": 79,
+    "alchemist": 85,
+    "steward": 79,
+    "stablehand": 79,
+    "lamplighter": 87,
+    "banker": 79
+  },
+  "bounds": {
+    "sentinel": [
+      29,
+      1,
+      68,
+      95
+    ],
+    "physician": [
+      28,
+      7,
+      69,
+      95
+    ],
+    "smith": [
+      29,
+      14,
+      70,
+      95
+    ],
+    "baker": [
+      32,
+      3,
+      73,
+      95
+    ],
+    "innkeeper": [
+      29,
+      3,
+      72,
+      95
+    ],
+    "merchant": [
+      28,
+      7,
+      74,
+      95
+    ],
+    "ranger": [
+      28,
+      3,
+      71,
+      95
+    ],
+    "scholar": [
+      29,
+      15,
+      73,
+      95
+    ],
+    "herald": [
+      29,
+      4,
+      78,
+      95
+    ],
+    "gardener": [
+      28,
+      4,
+      75,
+      95
+    ],
+    "fisher": [
+      28,
+      3,
+      68,
+      95
+    ],
+    "weaver": [
+      29,
+      9,
+      72,
+      95
+    ],
+    "courier": [
+      28,
+      14,
+      68,
+      95
+    ],
+    "pilgrim": [
+      28,
+      8,
+      76,
+      95
+    ],
+    "bard": [
+      29,
+      3,
+      72,
+      95
+    ],
+    "child": [
+      27,
+      23,
+      77,
+      93
+    ],
+    "elder": [
+      28,
+      7,
+      74,
+      95
+    ],
+    "painter": [
+      28,
+      4,
+      72,
+      95
+    ],
+    "carpenter": [
+      29,
+      11,
+      71,
+      95
+    ],
+    "alchemist": [
+      28,
+      5,
+      70,
+      95
+    ],
+    "steward": [
+      33,
+      11,
+      70,
+      95
+    ],
+    "stablehand": [
+      29,
+      11,
+      70,
+      95
+    ],
+    "lamplighter": [
+      28,
+      3,
+      70,
+      95
+    ],
+    "banker": [
+      34,
+      11,
+      73,
+      95
+    ]
+  }
+}
