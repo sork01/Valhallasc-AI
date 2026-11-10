@@ -1936,6 +1936,9 @@ pub struct World {
     casts_by_skill: BTreeMap<(u64, String), u32>,
     next_entity: u64,
     next_king_spawn: f64,
+    // Enemy indices per zone, built at the start of `step` and dropped at its end (no enemy changes zone or is added during a step), so
+    // `actor_bodies` reads one zone's enemies instead of scanning every enemy in the world (~5,500 since the shaped zones).
+    step_zone_slimes: Option<Vec<Vec<usize>>>,
     // The skill whose damage is being applied right now (empty: a basic attack); hit events carry it for the system log.
     cur_skill: String,
     set_pending: Vec<sets::Pending>,
@@ -2060,6 +2063,7 @@ impl World {
             casts_by_skill: BTreeMap::new(),
             next_entity: 1,
             next_king_spawn: 0.,
+            step_zone_slimes: None,
             cur_skill: String::new(),
             set_pending: vec![],
             signature: signature::State::default(),
@@ -2177,7 +2181,8 @@ impl World {
         let player_gap = enemy
             .map(|id| (1. - self.slimes[id].r).max(PLAYER_RADIUS))
             .unwrap_or(PLAYER_RADIUS);
-        self.players
+        let players = self
+            .players
             .iter()
             .filter(|(id, p)| {
                 Some(**id) != player
@@ -2185,14 +2190,27 @@ impl World {
                     && p.character.zone == zone
                     && p.character.spark_travel.is_none()
             })
-            .map(|(_, p)| (p.character.point(), player_gap))
-            .chain(
-                self.slimes
-                    .iter()
-                    .filter(|s| Some(s.id) != enemy && !s.dead && s.zone == zone)
-                    .map(|s| (s.point(), s.r)),
-            )
-            .collect()
+            .map(|(_, p)| (p.character.point(), player_gap));
+        // Same enemies in the same (ascending) order either way; the index only skips the other zones.
+        match self.step_zone_slimes.as_ref().and_then(|z| z.get(zone)) {
+            Some(indices) => players
+                .chain(
+                    indices
+                        .iter()
+                        .map(|&i| &self.slimes[i])
+                        .filter(|s| Some(s.id) != enemy && !s.dead)
+                        .map(|s| (s.point(), s.r)),
+                )
+                .collect(),
+            None => players
+                .chain(
+                    self.slimes
+                        .iter()
+                        .filter(|s| Some(s.id) != enemy && !s.dead && s.zone == zone)
+                        .map(|s| (s.point(), s.r)),
+                )
+                .collect(),
+        }
     }
     /// Zones with at least one hero, hired fighter or autonomous adventurer in them.
     fn populated_zones(&self) -> Vec<bool> {
@@ -2437,8 +2455,12 @@ impl World {
     // Published to every connection: one complete view per zone. Each connection forwards only the view
     // that holds its own character; `tick` and `online` also sit at the top for the health route.
     pub fn snapshot(&self) -> Value {
+        // Only a zone that holds a player is ever sent (`zone_view` picks the one listing the connection), so an empty zone gets a
+        // stub with no players. The array keeps one entry per zone (the index is the zone id). Building every view cost ~100 ms
+        // per snapshot once the shaped zones grew the world to ~5,500 enemies, so the server missed its 50 ms tick (2026-11-10).
+        let populated = self.populated_zones();
         json!({"tick":self.tick,"online":self.visible_online(),"humansOnline":self.visible_humans_online(),"roster":self.online_roster(),
-        "zones":(0..self.maps.len()).map(|zone| self.snapshot_for(zone)).collect::<Vec<_>>()})
+        "zones":(0..self.maps.len()).map(|zone| if populated[zone] { self.snapshot_for(zone) } else { json!({"type":"snapshot","tick":self.tick,"players":[]}) }).collect::<Vec<_>>()})
     }
 
     #[cfg(test)]
@@ -3484,6 +3506,17 @@ impl World {
         self.event(kind, &id, point, 0., false);
     }
     pub fn step(&mut self) {
+        let mut by_zone = vec![Vec::new(); self.maps.len()];
+        for (i, s) in self.slimes.iter().enumerate() {
+            if let Some(list) = by_zone.get_mut(s.zone) {
+                list.push(i);
+            }
+        }
+        self.step_zone_slimes = Some(by_zone);
+        self.step_inner();
+        self.step_zone_slimes = None;
+    }
+    fn step_inner(&mut self) {
         self.time += TICK;
         self.tick += 1;
         self.update_seasonal();
