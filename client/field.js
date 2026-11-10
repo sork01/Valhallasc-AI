@@ -159,9 +159,11 @@
       // Beyond the line the neighbour's own chunks paint its floor; the Deep and Nacrehold paint every cell (black water past the
       // outline), so they leave the neighbour's floor cells empty here, or their chunk would cover the neighbour's ground (and the
       // neighbour's chunk ours), and the same world point would look different from the two sides.
-      if (zdef.theme === 'deep' || zdef.theme === 'nacre') {
-        const rows = ZONES[nb]?.shapeFloor || [], sx = Math.round(seam.shift[0]), sy = Math.round(seam.shift[1]); map.nbFloor ||= new Uint8Array(MAP * MAP);
-        for (let y = 0; y < MAP; y++) { const row = rows[y + sy]; if (row) for (let x = 0; x < MAP; x++) if (!map.floor[y * MAP + x] && row[x + sx] === '#') map.nbFloor[y * MAP + x] = 1; }
+      // (Every shaped zone does the same near its seams, within the border band: our edge tiles for ANOTHER border (the Frostwake Shelf's tiles for the Yearwheel wall) lie over the seam neighbour's land
+      // at a corner and, drawn on top of its ground, changed its colour the moment you crossed. The cell holds the neighbour's index + 1 and is skipped once that neighbour's context exists.)
+      {
+        const rows = ZONES[nb]?.shapeFloor || [], sx = Math.round(seam.shift[0]), sy = Math.round(seam.shift[1]), wide = zdef.theme === 'deep' || zdef.theme === 'nacre'; map.nbFloor ||= new Uint8Array(MAP * MAP);
+        for (let y = wide ? 0 : Math.max(0, Math.floor(y0 - 20)); y < (wide ? MAP : Math.min(MAP, Math.ceil(y1 + 20))); y++) { const row = rows[y + sy]; if (row) for (let x = wide ? 0 : Math.max(0, Math.floor(x0 - 20)); x < (wide ? MAP : Math.min(MAP, Math.ceil(x1 + 20))); x++) if (!map.floor[y * MAP + x] && row[x + sx] === '#') map.nbFloor[y * MAP + x] = nb + 1; }
       }
       // The neighbour's trees and rocks beyond the line (view only: the walker never reaches them, the server moves it first).
       // A neighbour with a sprite set (meadow, ember, frost, fen) shows those sprites; any other theme (the Moonspore Canopy and later
@@ -811,7 +813,7 @@
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       if ((sky || moonwell) && !map.floor[i]) continue;                              // open water or sky
-      if (map.nbFloor?.[i]) continue;                                                // a seam neighbour's floor: its own chunk draws it
+      if (map.nbFloor?.[i] && (zdef.theme === 'deep' || zdef.theme === 'nacre' || ctxs.has(map.nbFloor[i] - 1))) continue;   // a seam neighbour's floor: its own chunk draws it
       if (zdef.shapeFloor && !map.floor[i] && zdef.theme !== 'deep' && zdef.theme !== 'nacre') { if (map.edge[i]) outsideTile(g, px, py, map.edge[i], x, y, tone, ((x + y) & 1) ? 1.4 : -1.4, zdef.theme === 'ember', map.edgeDist[i]); continue; }
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];

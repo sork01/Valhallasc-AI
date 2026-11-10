@@ -34,6 +34,12 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.route(/\.(mp3|ogg|wav)(\?.*)?$/, route => route.abort());      // the pilot client is at the memory cap: decoded music is the biggest thing a test never listens to
+  if (process.env.SEAMOFF) {      // diagnosis: no seam neighbour ground at all
+    await page.route(/\/field\.js(\?.*)?$/, async route => {
+      const src = fs.readFileSync(path.join(root, 'client/field.js'), 'utf8').replace('for (const p of zdef.portals) if (p.seam) { const nc = ctxs.get(p.to); if (nc) drawNeighbourGround', `for (const p of zdef.portals) if (p.seam && [${process.env.SEAMOFF}].includes(p.to)) { const nc = ctxs.get(p.to); if (nc) drawNeighbourGround`);
+      await route.fulfill({ contentType: 'application/javascript', body: src });
+    });
+  }
   if (process.env.MUTATE) {      // the vault drawing is switched off: both frames then draw only their own side of the arch
     await page.route(/\/field\.js(\?.*)?$/, async route => {
       const src = fs.readFileSync(path.join(root, 'client/field.js'), 'utf8').replace('map.ghosts = map.ghosts || []; map.vregs = vaultRegions();', 'map.ghosts = map.ghosts || []; map.vregs = [];');
@@ -78,6 +84,36 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
         shots.push(await page.screenshot({ path: path.join(out, `pop-z${z}-s${s}-t${t}.png`) }));
       }
       console.log('saved pop', s, t);
+    }
+    return;
+  }
+  // PART=seampop: full frames of one world point just inside Sunward's seam to the Frostwake Shelf, from both frames, as clusters of differing pixels outside the HUD
+  if (process.env.PART === 'seampop') {
+    const seam = zoneDef(VALE).portals.find(p => p.id === 'path_20_26').seam, [fx, fy] = seam.shift;
+    const yAt = x => { for (let i = 0; i < seam.points.length - 1; i++) { const [a, b] = [seam.points[i], seam.points[i + 1]]; if (x >= a[0] && x <= b[0]) return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0] || 1); } return seam.points.at(-1)[1]; };
+    for (const x of (process.env.SX || '208,196,170').split(',').map(Number)) {
+      const y = yAt(x) + 1.0;
+      for (const [z, px, py] of [[VALE, x, y], [26, x + fx, y + fy]]) {
+        await debug({ op: 'teleport', zone: z, x: px, y: py });
+        await page.waitForFunction(([z, x, y]) => Field.zone === z && Math.hypot(Field.hero.nx - x, Field.hero.ny - y) < .6, [z, px, py], { timeout: 30000 }).catch(() => console.log('no exact arrival', z, px, py));
+        await page.waitForTimeout(3500);
+        await page.addStyleTag({ content: '#dps-meter,.dps-meter{display:none!important}' });
+        await page.screenshot({ path: path.join(out, `seampop-z${z}-x${x}.png`) });
+      }
+      console.log('saved seampop', x, y.toFixed(1));
+    }
+    return;
+  }
+  // PART=seamscene: the scenery both frames draw around a point of the Sunward-Frostwake seam, object by object (what pops in or out when you cross)
+  if (process.env.PART === 'seamscene') {
+    const seam = zoneDef(VALE).portals.find(p => p.id === 'path_20_26').seam, [fx, fy] = seam.shift, R = +process.env.SCENE_R || 34;
+    for (const [x, y] of (process.env.SP || '200:6,170:8').split(',').map(v => v.split(':').map(Number))) {
+      const scene = async (z, px, py) => { await debug({ op: 'teleport', zone: z, x: px, y: py }); await page.waitForFunction(z => Field.zone === z, z, { timeout: 30000 }); await page.waitForTimeout(3500); return page.evaluate(([x, y, R]) => Field.sceneAround(x, y, R), [px, py, R]); };
+      const A = await scene(VALE, x, y), B = await scene(26, x + fx, y + fy);
+      const near = (o, L, dx, dy) => L.some(q => q[0] === o[0] && Math.hypot(q[1] - o[1] - dx, q[2] - o[2] - dy) < .6);
+      const onlyV = A.filter(o => !near(o, B, fx, fy)), onlyF = B.filter(o => !near(o, A, -fx, -fy));
+      const count = L => L.reduce((c, o) => (c[o[0]] = (c[o[0]] || 0) + 1, c), {});
+      console.log(`at ${x},${y}: ${A.length} / ${B.length}; only in Sunward's frame ${JSON.stringify(count(onlyV))} e.g. ${onlyV.slice(0, 4).map(o => o.join('@')).join(' ')}; only in Frostwake's ${JSON.stringify(count(onlyF))} e.g. ${onlyF.slice(0, 4).map(o => o.map((v, i) => i ? (v - (i === 1 ? fx : fy)).toFixed(1) : v).join('@')).join(' ')}`);
     }
     return;
   }
