@@ -9755,5 +9755,16 @@
   "in the south-east": "i sydost",
   "near the middle": "nära mitten",
   "Equipping lead shoes": "Tar på blyskor",
-  "Removing lead shoes": "Tar av blyskor"
+  "Removing lead shoes": "Tar av blyskor",
+  "The updraft catches you!": "Uppvinden fångar dig!",
+  "Faster and faster!": "Snabbare och snabbare!",
+  "Bifrost Reach, high above the clouds.": "Bifrost Reach, högt över molnen.",
+  "You let go of the sky.": "Du släpper taget om himlen.",
+  "The ground rushes up to meet you.": "Marken rusar upp mot dig.",
+  "A soft landing.": "En mjuk landning.",
+  "You plunge into the sea!": "Du störtar ner i havet!",
+  "Down, down, down...": "Ner, ner, ner...",
+  "You touch the seabed.": "Du når havsbotten.",
+  "You float up towards the light.": "Du svävar upp mot ljuset.",
+  "You break the surface!": "Du bryter ytan!"
 }

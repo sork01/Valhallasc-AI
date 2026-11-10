@@ -24,7 +24,8 @@
     if (badge) { badge.textContent = tr(label); badge.hidden = !label; }
     const trip = route(from, to);
     // Reconnecting to a saved location is not another climb or dive.
-    if (initial || !trip) return;
+    // A crossing cutscene tells the same story, so the plain notice would only repeat it.
+    if (initial || !trip || window.Cutscene?.active) return;
     active = { ...trip, at: performance.now() };
     const notice = document.getElementById('zone-journey');
     if (notice) {

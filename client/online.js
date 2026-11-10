@@ -147,6 +147,7 @@
           window.Field?.bubble('npc:' + packet.npc, text); log(text, npc?.name || packet.npc, 'npc'); break;
         }
         case 'system': log(packet.text); break;
+        case 'cutscene': window.Cutscene?.play(packet.scenes); break;
         case 'announce': log(packet.text); window.Announce?.show(packet.text, packet.kind); break;
         case 'notice': window.Achievements?.onNotice(packet); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;

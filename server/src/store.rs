@@ -254,6 +254,7 @@ impl Store {
             potion_ready: 0,
             meal_ready: 0,
             explored: vec![],
+            cutscenes: vec![],
             achievements: Default::default(),
             gm: false,
             party_points: 0,

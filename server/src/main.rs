@@ -100,6 +100,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     // For automated tests only: players may send `debug` shortcuts (levels, items, teleports...). Never set on the public service.
     world.test_commands = std::env::var("VALHALLA_TEST_COMMANDS").is_ok_and(|v| v == "1");
+    world.cutscene_opt_in = world.test_commands;
     if world.test_commands {
         tracing::warn!("VALHALLA_TEST_COMMANDS is on: players may use debug shortcuts");
         if let Ok(path) = std::env::var("VALHALLA_BOSSMECH_FILE") {

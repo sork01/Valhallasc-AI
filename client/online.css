@@ -1108,3 +1108,15 @@
 
 #name-change-form:not([hidden]) { display: flex; flex-direction: column; gap: .6rem; margin-block: 1rem; }
 #name-change-form input { min-height: 44px; padding: .5rem .7rem; font-size: 18px; color: #fff0c9; background: #172139; border: 1px solid #c9a566; border-radius: 6px; }
+
+/* Crossing cutscenes (cutscene.js): letterbox bars and a caption over the canvas. The whole box takes every click, so nothing underneath is reachable. */
+.cutscene { position: absolute; inset: 0; z-index: 120; pointer-events: auto; touch-action: none; cursor: default; overflow: hidden; }
+.cutscene[hidden] { display: none; }
+.cs-bar { z-index: 1; position: absolute; left: 0; width: 100%; height: 0; background: #05070d; transition: height .5s ease; }
+.cs-top { top: 0; } .cs-bottom { bottom: 0; }
+.cutscene.on .cs-bar { height: 11%; }
+.cs-caption { z-index: 2; position: absolute; left: 0; width: 100%; bottom: 13.5%; margin: 0; text-align: center; padding: 0 6%; box-sizing: border-box; color: #fff7e8; font: max(18px, 2.6cqw) 'Lilita One', 'Jua', sans-serif; text-shadow: 0 .15cqw .45cqw #000, 0 0 1cqw #4aa8e8; opacity: 0; }
+.cs-caption.on { animation: cs-caption 2.6s ease both; }
+@keyframes cs-caption { 0% { opacity: 0; transform: translateY(.8cqw); } 12% { opacity: 1; transform: none; } 78% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .cs-bar { transition: none; } .cs-caption.on { animation-duration: 2.6s; } }
+.cs-view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; background: #05070d; }

@@ -374,6 +374,9 @@ pub struct Character {
     /// character has stood in, bit `row * FOG_GRID + column`. The maps show only these cells.
     #[serde(default)]
     pub explored: Vec<u16>,
+    /// The crossing cutscenes this hero has seen (`world/cutscene.rs`): `sky_up`, `sky_down`, `dive`, `surface`. Each plays once.
+    #[serde(default)]
+    pub cutscenes: Vec<String>,
     /// Permanent achievement evidence, completions and selected title (docs/achievements.md).
     #[serde(default)]
     pub achievements: crate::achievements::Progress,
@@ -557,6 +560,7 @@ impl Character {
             potion_ready: 0,
             meal_ready: 0,
             explored: vec![],
+            cutscenes: vec![],
             achievements: Default::default(),
             gm: false,
             party_points: 0,
@@ -1550,6 +1554,8 @@ pub enum DebugCommand {
     },
     /// Uncovers every cell of every zone, so tests of the maps and the ground need not walk them all.
     ExploreAll,
+    /// Lets this session play the crossing cutscenes on a test server, where they are off unless asked for (`World::cutscene_opt_in`).
+    EnableCutscenes,
     SetGodMode {
         enabled: bool,
     },
