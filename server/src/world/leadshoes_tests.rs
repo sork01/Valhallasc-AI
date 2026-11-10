@@ -23,10 +23,18 @@ fn every_underwater_zone_is_listed_and_the_dry_ones_are_not() {
     // Rán's Deep, Nacrehold, the three Cathedral wings, the Moonwell, the Longship; every private copy of an
     // underwater dungeon too (they are clones of the template, so they keep its theme).
     for zone in [8, 9, 10, 11, 12, 18, 43] {
-        assert!(under.contains(&zone), "zone {zone} ({}) is under water", w.maps[zone].name);
+        assert!(
+            under.contains(&zone),
+            "zone {zone} ({}) is under water",
+            w.maps[zone].name
+        );
     }
     for zone in [0, 1, 4, 7, 13, 17, 19, 44] {
-        assert!(!under.contains(&zone), "zone {zone} ({}) is dry", w.maps[zone].name);
+        assert!(
+            !under.contains(&zone),
+            "zone {zone} ({}) is dry",
+            w.maps[zone].name
+        );
     }
 }
 
@@ -38,7 +46,10 @@ fn going_down_announces_the_shoes_once_and_surfacing_takes_them_off() {
     place(&mut w, 1, MEADOW, at(20., 20.));
     w.update_lead_shoes();
     assert!(!w.players[&1].shoed);
-    assert!(drain(&mut rx).iter().all(|m| m["type"] != "announce"), "dry land says nothing");
+    assert!(
+        drain(&mut rx).iter().all(|m| m["type"] != "announce"),
+        "dry land says nothing"
+    );
 
     let hp_before = w.players[&1].character.max_hp();
     let gear_before = w.players[&1].character.equipment.clone();
@@ -74,7 +85,11 @@ fn going_down_announces_the_shoes_once_and_surfacing_takes_them_off() {
             .filter(|m| m["type"] == "announce" && m["text"] == text)
             .count()
     };
-    assert_eq!(said("Removing lead shoes"), 1, "surfacing announces the shoes coming off");
+    assert_eq!(
+        said("Removing lead shoes"),
+        1,
+        "surfacing announces the shoes coming off"
+    );
     assert_eq!(said("Equipping lead shoes"), 0);
     // Staying dry says nothing more.
     w.update_lead_shoes();
