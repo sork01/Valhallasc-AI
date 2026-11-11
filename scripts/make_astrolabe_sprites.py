@@ -129,7 +129,10 @@ def bounds(frames):
     return bad
 
 
-def preview(kinds):
+THUNDER_KINDS = [e['kind'] for e in THUNDER]
+
+
+def _old_preview(kinds):
     out = ROOT / 'test-results/astrolabe-foes-preview'
     out.mkdir(parents=True, exist_ok=True)
     for kind in kinds:
@@ -144,7 +147,7 @@ def preview(kinds):
         print(target)
 
 
-def build(kinds):
+def _old_build(kinds):
     meta = json.loads(META.read_text())
     if any(k in meta['sprites'] for k in kinds):
         raise SystemExit('Sprites already exist; export preserves PixelFlow edits.')
@@ -171,7 +174,7 @@ def build(kinds):
         print(kind, sid, '34 editable frames', flush=True)
 
 
-def export(kinds):
+def _old_export(kinds):
     meta = json.loads(META.read_text())
     for kind in kinds:
         packet = api('get?sprite_id='+meta['sprites'][kind])
@@ -198,7 +201,7 @@ def export(kinds):
         print(ASSETS/f'cathedral_{kind}.png')
 
 
-def verify(kinds):
+def _old_verify(kinds):
     meta = json.loads(META.read_text())
     for kind in kinds:
         frames = render(kind)
@@ -214,10 +217,57 @@ def verify(kinds):
         print(kind, '34 frames match indexed source')
 
 
+def preview(kinds=None):
+    import thunderheart_slime_redraw as redraw
+    kinds = kinds or THUNDER_KINDS
+    if any(k in THUNDER_KINDS for k in kinds):
+        redraw.preview()
+    other = [k for k in kinds if k not in THUNDER_KINDS]
+    if other:
+        _old_preview(other)
+
+
+def build(kinds=None):
+    import thunderheart_slime_redraw as redraw
+    kinds = kinds or THUNDER_KINDS
+    if any(k in THUNDER_KINDS for k in kinds):
+        redraw.build()
+    other = [k for k in kinds if k not in THUNDER_KINDS]
+    if other:
+        _old_build(other)
+
+
+def export(kinds=None):
+    import thunderheart_slime_redraw as redraw
+    kinds = kinds or THUNDER_KINDS
+    if any(k in THUNDER_KINDS for k in kinds):
+        redraw.export()
+    other = [k for k in kinds if k not in THUNDER_KINDS]
+    if other:
+        _old_export(other)
+
+
+def verify(kinds=None):
+    import thunderheart_slime_redraw as redraw
+    kinds = kinds or THUNDER_KINDS
+    if any(k in THUNDER_KINDS for k in kinds):
+        redraw.verify()
+    other = [k for k in kinds if k not in THUNDER_KINDS]
+    if other:
+        _old_verify(other)
+
+
 if __name__ == '__main__':
-    action = sys.argv[1] if len(sys.argv) > 1 else ''
-    kinds = [k for k in sys.argv[2:] if k in KINDS] or KINDS
-    if action == 'preview':
+    import thunderheart_slime_redraw as redraw
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; native PixelFlow sources are preserved')
+    action = sys.argv[1] if len(sys.argv) > 1 else 'preview'
+    kinds = [k for k in sys.argv[2:] if k in KINDS] or THUNDER_KINDS
+    if action == 'extents':
+        redraw.extents()
+    elif action == 'refresh':
+        redraw.refresh()
+    elif action == 'preview':
         preview(kinds)
     elif action == 'build':
         build(kinds)
@@ -226,4 +276,4 @@ if __name__ == '__main__':
     elif action == 'verify':
         verify(kinds)
     else:
-        raise SystemExit('Usage: make_astrolabe_sprites.py preview | build | export | verify [kind...]')
+        raise SystemExit('Usage: make_astrolabe_sprites.py preview | extents | build | refresh KIND | export | verify [kind...]')

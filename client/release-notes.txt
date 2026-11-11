@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "Redrew all six enemies in the Thunderheart Gate (Forked Spark, Stormglass Ray, Slatebound Guard, Storm Conductor, the Thunder Bastion and Heart of the Stormgate) with cleaner storm-bronze, cobalt ray, slate plate, copper coil and stormgate ring silhouettes, full eight-frame wind-up and strike attacks, and defeat animations where lightning arcs discharge, furnace cores go dark and containment rings collapse."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

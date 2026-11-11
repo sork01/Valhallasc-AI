@@ -241,12 +241,12 @@
     "astro_warden": "4a5f58d13c8ff977",
     "astro_navigator": "ce24c505f013e7a8",
     "astro_axis": "c3eb3eee7bd13d5d",
-    "thunder_spark": "3d07a6b680376603",
-    "thunder_ray": "ab22374a25fd6af2",
-    "thunder_guard": "ec80ec788e2871c4",
-    "thunder_conductor": "5634d3d12ef9345b",
-    "thunder_bastion": "806929d046a5274c",
-    "thunder_heart": "1c70caa2e42135f0",
+    "thunder_spark": "8ad51bbeda9d8429",
+    "thunder_ray": "853b78ef204b839c",
+    "thunder_guard": "4c1fa519a8e66044",
+    "thunder_conductor": "5f56daa3d062c33a",
+    "thunder_bastion": "664577d6948ea045",
+    "thunder_heart": "d741bd17311337b8",
     "bloom_spore": "0858c35929a3f9c9",
     "bloom_moth": "1405e8be310d895b",
     "bloom_guard": "b6ae1174c904cda7",
@@ -389,12 +389,12 @@
     "astro_warden": 58,
     "astro_navigator": 56,
     "astro_axis": 69,
-    "thunder_spark": 54,
-    "thunder_ray": 59,
-    "thunder_guard": 59,
-    "thunder_conductor": 51,
-    "thunder_bastion": 53,
-    "thunder_heart": 71,
+    "thunder_spark": 63,
+    "thunder_ray": 62,
+    "thunder_guard": 61,
+    "thunder_conductor": 60,
+    "thunder_bastion": 65,
+    "thunder_heart": 66,
     "bloom_spore": 48,
     "bloom_moth": 71,
     "bloom_guard": 56,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "thunder_spark": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_ray": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_conductor": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_bastion": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

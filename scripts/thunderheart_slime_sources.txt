@@ -1,0 +1,8 @@
+{
+  "thunder_spark": "8ad51bbeda9d8429",
+  "thunder_ray": "853b78ef204b839c",
+  "thunder_guard": "4c1fa519a8e66044",
+  "thunder_conductor": "5f56daa3d062c33a",
+  "thunder_bastion": "664577d6948ea045",
+  "thunder_heart": "d741bd17311337b8"
+}

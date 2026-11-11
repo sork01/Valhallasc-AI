@@ -47,6 +47,12 @@ def cel_kinds(key):
 
 
 def build(key):
+    if key == 'thunder':
+        import thunderheart_slime_redraw as remake
+        remake.build()
+        remake.export()
+        remake.verify()
+        return
     mod = importlib.import_module(MAKERS[key])
     kinds = cel_kinds(key)
     meta = json.loads(mod.META.read_text())
@@ -61,6 +67,9 @@ def build(key):
 
 
 def preview(key):
+    if key == 'thunder':
+        import thunderheart_slime_redraw as remake
+        return remake.preview()
     importlib.import_module(REDRAWS[key]).main()
 
 
