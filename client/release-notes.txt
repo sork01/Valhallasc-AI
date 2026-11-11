@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "Redrew all six enemies in the Sunken Astrolabe (Brass Gearling, Fallen Starling, Orrery Sentinel, Meridian Warden, the Lost Navigator and Axis of the Buried Sky) with cleaner clockwork, brass, starlight and plate silhouettes, full eight-frame wind-up and strike attacks, and defeat animations where clockwork cores go dark, comet trails fade and armillary rings collapse."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

@@ -235,12 +235,12 @@
     "seed_warden": "977dd53533c5e3a1",
     "seed_germinator": "20f47d21caca4858",
     "seed_worldseed": "21941d4722b53b61",
-    "astro_gearling": "6e8235d93e1680b2",
-    "astro_starling": "bf4d0dbc0478a438",
-    "astro_sentinel": "b51e673017cb0040",
-    "astro_warden": "4a5f58d13c8ff977",
-    "astro_navigator": "ce24c505f013e7a8",
-    "astro_axis": "c3eb3eee7bd13d5d",
+    "astro_gearling": "fedc88bf48d85116",
+    "astro_starling": "b205896238d7dab4",
+    "astro_sentinel": "09e9dbd031298814",
+    "astro_warden": "69c4be21bec843b9",
+    "astro_navigator": "f95bd925aad9ed50",
+    "astro_axis": "26468296452d64a5",
     "thunder_spark": "3d07a6b680376603",
     "thunder_ray": "ab22374a25fd6af2",
     "thunder_guard": "ec80ec788e2871c4",
@@ -383,12 +383,12 @@
     "seed_warden": 52,
     "seed_germinator": 70,
     "seed_worldseed": 76,
-    "astro_gearling": 45,
-    "astro_starling": 58,
+    "astro_gearling": 42,
+    "astro_starling": 59,
     "astro_sentinel": 58,
-    "astro_warden": 58,
-    "astro_navigator": 56,
-    "astro_axis": 69,
+    "astro_warden": 64,
+    "astro_navigator": 58,
+    "astro_axis": 66,
     "thunder_spark": 54,
     "thunder_ray": 59,
     "thunder_guard": 59,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "astro_gearling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_starling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_sentinel": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_warden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_navigator": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_axis": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

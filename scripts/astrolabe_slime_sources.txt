@@ -1,0 +1,8 @@
+{
+  "astro_gearling": "fedc88bf48d85116",
+  "astro_starling": "b205896238d7dab4",
+  "astro_sentinel": "09e9dbd031298814",
+  "astro_warden": "69c4be21bec843b9",
+  "astro_navigator": "f95bd925aad9ed50",
+  "astro_axis": "26468296452d64a5"
+}
