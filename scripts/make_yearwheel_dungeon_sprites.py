@@ -228,6 +228,31 @@ def verify(kinds):
         print(kind, '34 frames match indexed source')
 
 
+# Preserve the legacy maker and independently delegate each approved native pipeline.
+_old_preview, _old_build, _old_export, _old_verify = preview, build, export, verify
+
+def _dispatch(action, kinds):
+    import importlib.util
+    selected = list(kinds)
+    for module in ('amber_slime_redraw', 'solstice_slime_redraw'):
+        if importlib.util.find_spec(module) is None:
+            continue  # Amber's independent candidate may not have been integrated yet.
+        redraw = __import__(module)
+        own = [k for k in selected if k in redraw.KINDS]
+        if own:
+            if '--replace' in sys.argv:
+                raise SystemExit('--replace is disabled; native PixelFlow sources are preserved')
+            redraw.preview() if action == 'preview' else getattr(redraw, action)(own)
+            selected = [k for k in selected if k not in own]
+    if selected:
+        {'preview': _old_preview, 'build': _old_build, 'export': _old_export, 'verify': _old_verify}[action](selected)
+
+def preview(kinds): return _dispatch('preview', kinds)
+def build(kinds): return _dispatch('build', kinds)
+def export(kinds): return _dispatch('export', kinds)
+def verify(kinds): return _dispatch('verify', kinds)
+
+
 if __name__ == '__main__':
     action = sys.argv[1] if len(sys.argv) > 1 else ''
     kinds = [k for k in sys.argv[2:] if k in KINDS] or KINDS

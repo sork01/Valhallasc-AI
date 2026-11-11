@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The six enemies of the Silent Solstice have new shaded artwork, distinct attacks and deaths suited to snow, feathers, armour, ice, spirits and crystal."
+    ],
+    "removed": [
+      "The previous Silent Solstice enemy artwork has been replaced to give each creature a clearer identity."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

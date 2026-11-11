@@ -265,12 +265,12 @@
     "amber_curator": "6ec26c3f958cc105",
     "amber_chronicle": "433c0b2f39d397f8",
     "amber_memory": "765edb3aae34e48d",
-    "solstice_flurry": "8f12653cc1520d6a",
-    "solstice_owl": "88895b5cdc0e5043",
-    "solstice_guard": "b5f85657b11da09e",
-    "solstice_watcher": "a8a85641f159d912",
-    "solstice_harbinger": "92d77572e732046a",
-    "solstice_heart": "2036902ed7471f75",
+    "solstice_flurry": "b1bc37890e38c354",
+    "solstice_owl": "8b3db14761a3a178",
+    "solstice_guard": "cb8d575f9bdfdc70",
+    "solstice_watcher": "6b9197351ae2e2a7",
+    "solstice_harbinger": "68c1c0853685b94c",
+    "solstice_heart": "ad4688477cdf218e",
     "choirsinger": "1180a4e2e4c0584c",
     "reliquarypearl": "4680314b634eddd9",
     "seed_sprout": "39768c572c917404",
@@ -413,12 +413,12 @@
     "amber_curator": 48,
     "amber_chronicle": 71,
     "amber_memory": 67,
-    "solstice_flurry": 52,
-    "solstice_owl": 64,
-    "solstice_guard": 51,
-    "solstice_watcher": 68,
-    "solstice_harbinger": 55,
-    "solstice_heart": 66,
+    "solstice_flurry": 68,
+    "solstice_owl": 60,
+    "solstice_guard": 65,
+    "solstice_watcher": 72,
+    "solstice_harbinger": 99,
+    "solstice_heart": 88,
     "choirsinger": 42,
     "reliquarypearl": 56,
     "seed_sprout": 59,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "solstice_flurry": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_owl": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_watcher": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_harbinger": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

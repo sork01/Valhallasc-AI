@@ -46,7 +46,19 @@ def cel_kinds(key):
     return list(importlib.import_module(REDRAWS[key]).KINDS)
 
 
+def native_redraw(key):
+    import importlib.util
+    module = {'amber': 'amber_slime_redraw', 'solstice': 'solstice_slime_redraw'}.get(key)
+    return importlib.import_module(module) if module and importlib.util.find_spec(module) else None
+
+
 def build(key):
+    native = native_redraw(key)
+    if native:
+        if '--replace' in sys.argv:
+            raise SystemExit('--replace is disabled; native PixelFlow sources are preserved')
+        native.build(); native.export(); native.verify()
+        return
     mod = importlib.import_module(MAKERS[key])
     kinds = cel_kinds(key)
     meta = json.loads(mod.META.read_text())
@@ -61,6 +73,9 @@ def build(key):
 
 
 def preview(key):
+    native = native_redraw(key)
+    if native:
+        return native.preview()
     importlib.import_module(REDRAWS[key]).main()
 
 
