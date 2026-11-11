@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The six enemies of the Shattered Span have new shaded artwork, individual faces, clear attacks and deaths suited to their bodies: a falling lynx, buckling sentinel, unravelling refractor, fallen toll keeper, folded weaving robes and a toppled crowned Archon."
+    ],
+    "removed": [
+      "The previous Shattered Span enemy drawings, replaced by editable artwork with distinct attack and death animations."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

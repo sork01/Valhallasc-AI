@@ -283,12 +283,12 @@
     "barrow_doorward": "9b04131dffdb3f64",
     "barrow_threadkeeper": "f0818193eda48cb0",
     "barrow_fatebound": "3b0c808a6676665e",
-    "span_lynx": "954c192fb7c3451a",
-    "span_sentinel": "91a65206f5a3b545",
-    "span_caster": "3af0fa48afd1b30c",
-    "span_warden": "549e6058571a2f7b",
-    "span_weaver": "63c4c158488c41b3",
-    "span_archon": "191212fbe85fe47c",
+    "span_lynx": "b117f296612f1f89",
+    "span_sentinel": "7a4c75d44af6a59d",
+    "span_caster": "44cbcf217c1a7f58",
+    "span_warden": "38523b9a2dc0c337",
+    "span_weaver": "ac25a2ea1ae665ec",
+    "span_archon": "9c9e7d705090cd96",
     "keel_crab": "c56de92686212091",
     "keel_deckhand": "eeb9cb4c79d8945f",
     "keel_lantern": "1806195cd517b44e",
@@ -431,11 +431,11 @@
     "barrow_doorward": 57,
     "barrow_threadkeeper": 58,
     "barrow_fatebound": 57,
-    "span_lynx": 45,
-    "span_sentinel": 68,
+    "span_lynx": 46,
+    "span_sentinel": 58,
     "span_caster": 57,
-    "span_warden": 58,
-    "span_weaver": 59,
+    "span_warden": 54,
+    "span_weaver": 56,
     "span_archon": 58,
     "keel_crab": 52,
     "keel_deckhand": 52,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "span_lynx": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_sentinel": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_caster": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_warden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_weaver": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_archon": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        88,
+        152
       ]
     }
   }

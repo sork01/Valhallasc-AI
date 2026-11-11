@@ -47,6 +47,10 @@ def cel_kinds(key):
 
 
 def build(key):
+    if key == 'skybridge':
+        import span_slime_redraw as native
+        native.build(); native.export(); native.verify()
+        return
     mod = importlib.import_module(MAKERS[key])
     kinds = cel_kinds(key)
     meta = json.loads(mod.META.read_text())
@@ -61,6 +65,9 @@ def build(key):
 
 
 def preview(key):
+    if key == 'skybridge':
+        import span_slime_redraw as native
+        return native.preview()
     importlib.import_module(REDRAWS[key]).main()
 
 
