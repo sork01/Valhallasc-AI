@@ -289,12 +289,12 @@
     "span_warden": "549e6058571a2f7b",
     "span_weaver": "63c4c158488c41b3",
     "span_archon": "191212fbe85fe47c",
-    "keel_crab": "c56de92686212091",
-    "keel_deckhand": "eeb9cb4c79d8945f",
-    "keel_lantern": "1806195cd517b44e",
-    "keel_cargomaw": "da01fea0e62149f9",
-    "keel_bosun": "516da622c3f6559b",
-    "keel_captain": "78a307dae4671b58",
+    "keel_crab": "0d388beb96b65af8",
+    "keel_deckhand": "e679482c03191623",
+    "keel_lantern": "5d9c94921707e831",
+    "keel_cargomaw": "c05448b9243d4434",
+    "keel_bosun": "d5a9cd7f76fd59ac",
+    "keel_captain": "e0fbac39f1a9e736",
     "null_hauler": "b09199744a951698",
     "null_breaker": "c7d17f6c605432f8",
     "null_coil": "27def242bbbbe5a4",
@@ -437,10 +437,10 @@
     "span_warden": 58,
     "span_weaver": 59,
     "span_archon": 58,
-    "keel_crab": 52,
+    "keel_crab": 45,
     "keel_deckhand": 52,
-    "keel_lantern": 71,
-    "keel_cargomaw": 69,
+    "keel_lantern": 88,
+    "keel_cargomaw": 61,
     "keel_bosun": 54,
     "keel_captain": 53,
     "null_hauler": 72,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "keel_crab": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_deckhand": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_lantern": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_cargomaw": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_bosun": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_captain": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }
