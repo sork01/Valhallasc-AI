@@ -253,12 +253,12 @@
     "bloom_thornkeeper": "8b23a6b3b459e1f0",
     "bloom_mirror": "9d1bf0a5e271d56a",
     "bloom_heart": "8cfa0101b1668b1b",
-    "solar_emberling": "ea0a0a56ede3fbd8",
-    "solar_sunmoth": "ac3859a920e569de",
-    "solar_crucible_guard": "d562fbe134bf8735",
-    "solar_ashwarden": "6309d444f486efae",
-    "solar_heliomancer": "e4008a9059f9f7f4",
-    "solar_heart": "2c5225af417cfb23",
+    "solar_emberling": "e7594982ee3d3da6",
+    "solar_sunmoth": "18849de5452c5ee9",
+    "solar_crucible_guard": "f8ae545abb94816e",
+    "solar_ashwarden": "23d4d0c9a8a7c6ce",
+    "solar_heliomancer": "0a25bf053743460c",
+    "solar_heart": "0e592ddf1d957a6b",
     "amber_page": "d6ee6bf656c880cf",
     "amber_moth": "4d3f403d3aa47482",
     "amber_sentinel": "78337a9f18a0d120",
@@ -275,7 +275,7 @@
     "reliquarypearl": "4680314b634eddd9",
     "seed_sprout": "39768c572c917404",
     "seed_treant": "215216cb71475ec0",
-    "solar_cinder": "270d38184ebc19fa",
+    "solar_cinder": "152360ad1558a592",
     "amber_cocoon": "1de97986cdfe4396",
     "barrow_scarab": "a12a73ac8dcf45b4",
     "barrow_hound": "dbaf498b20365275",
@@ -403,10 +403,10 @@
     "bloom_heart": 66,
     "solar_emberling": 53,
     "solar_sunmoth": 71,
-    "solar_crucible_guard": 54,
-    "solar_ashwarden": 48,
-    "solar_heliomancer": 54,
-    "solar_heart": 78,
+    "solar_crucible_guard": 58,
+    "solar_ashwarden": 61,
+    "solar_heliomancer": 63,
+    "solar_heart": 69,
     "amber_page": 55,
     "amber_moth": 70,
     "amber_sentinel": 53,
@@ -423,7 +423,7 @@
     "reliquarypearl": 56,
     "seed_sprout": 59,
     "seed_treant": 57,
-    "solar_cinder": 59,
+    "solar_cinder": 47,
     "amber_cocoon": 75,
     "barrow_scarab": 50,
     "barrow_hound": 40,
@@ -592,6 +592,76 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "solar_emberling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_sunmoth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_crucible_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_ashwarden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_heliomancer": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_cinder": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

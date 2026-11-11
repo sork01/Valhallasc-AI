@@ -1,0 +1,9 @@
+{
+  "solar_emberling": "e7594982ee3d3da6",
+  "solar_sunmoth": "18849de5452c5ee9",
+  "solar_crucible_guard": "f8ae545abb94816e",
+  "solar_ashwarden": "23d4d0c9a8a7c6ce",
+  "solar_heliomancer": "0a25bf053743460c",
+  "solar_heart": "0e592ddf1d957a6b",
+  "solar_cinder": "152360ad1558a592"
+}
