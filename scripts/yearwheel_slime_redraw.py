@@ -87,6 +87,37 @@ def fade(a,f):
 def drop(r,x,y,sz,col=None):
     r.poly([(x,y+sz*1.7),(x-sz*.85,y),(x,y-sz),(x+sz*.85,y)],col or AZURE[3],OUTLINE)
 
+def eye(r,x,y,shape,col,size=3.6):
+    """Per-creature eye shapes, drawn at a rig-transformed point (col is a ramp)."""
+    X,Y=r.t(x,y);a=r.a
+    if shape=='goat':       # amber eye with a horizontal bar pupil
+        a.ellipse(X,Y,size+1.5,size*.8+1.4,OUTLINE);a.ellipse(X,Y,size,size*.8,col[3])
+        a.poly([(X-size*.8,Y+1),(X+size*.8,Y+1),(X+size*.8,Y-1),(X-size*.8,Y-1)],OUTLINE);a.ellipse(X-size*.4,Y+size*.4,.9,.8,WHITE)
+    elif shape=='crystal':  # faceted diamond
+        a.poly([(X-size-1.2,Y),(X,Y+size*.95+1.2),(X+size+1.2,Y),(X,Y-size*.95-1.2)],OUTLINE)
+        a.poly([(X-size,Y),(X,Y+size*.9),(X+size,Y),(X,Y-size*.9)],col[2])
+        a.poly([(X-size*.5,Y),(X,Y+size*.55),(X+size*.3,Y)],col[4])
+    elif shape=='hollow':   # pale empty glow under a heavy slanted brow
+        a.ellipse(X,Y,size+1.5,size*.7+1.4,OUTLINE);a.ellipse(X,Y,size,size*.7,col[4])
+        a.line([(X-size-1,Y+size*.7+2.5),(X+size+1,Y-size*.15)],OUTLINE,2)
+    elif shape=='bead':     # reptile eye: round, vertical pupil, brow ridge
+        a.ellipse(X,Y,size+1.4,size+1.4,OUTLINE);a.ellipse(X,Y,size,size,col[3])
+        a.line([(X,Y-size*.9),(X,Y+size*.9)],OUTLINE,1);a.line([(X-size-1,Y+size+1.5),(X+size,Y+size-.5)],col[0],2)
+    elif shape=='round':    # big owl/bird eye with a heavy brow
+        a.ellipse(X,Y,size+1.5,size+1.5,OUTLINE);a.ellipse(X,Y,size,size,col[3])
+        a.ellipse(X,Y,size*.45,size*.45,OUTLINE);a.ellipse(X-size*.3,Y+size*.3,.9,.9,WHITE)
+        a.line([(X-size-1.5,Y+size+1),(X+size+1.5,Y+size-1.5)],OUTLINE,2)
+    elif shape=='tri':      # jack-o-lantern triangle
+        a.poly([(X-size-1.2,Y-size*.7-1),(X+size+1.2,Y-size*.7-1),(X,Y+size+1.4)],OUTLINE)
+        a.poly([(X-size,Y-size*.7),(X+size,Y-size*.7),(X,Y+size)],col[3])
+    elif shape=='orb':      # blank glowing orb
+        a.ellipse(X,Y,size+1.4,size+1.4,OUTLINE);a.ellipse(X,Y,size,size,col[4]);a.ellipse(X,Y,size*.55,size*.55,col[2])
+    elif shape=='dot':      # coal dot
+        a.ellipse(X,Y,size,size,OUTLINE);a.ellipse(X-.7,Y+.7,.8,.8,WHITE)
+    elif shape=='star':     # four-point star glint
+        a.poly([(X-size-1,Y),(X,Y+size*.8),(X+size+1,Y),(X,Y-size*.8)],OUTLINE)
+        a.line([(X-size,Y),(X+size,Y)],col[4],1);a.line([(X,Y-size*.7),(X,Y+size*.7)],col[3],1)
+
 def brooknewt(clip,n):
     a,r,w,s,d,ph,b=setup('brooknewt',clip,n,(0,10),-.07)
     cy=21+b-9*d-3*w
@@ -194,18 +225,18 @@ def petalchimera(clip,n):
         ang=.55+k*.62+math.sin(ph+k)*.04*(1-d)
         mx,my=hx-4+math.cos(ang)*17,hy+math.sin(ang)*17
         r.ball(mx,my,8,5.5,CORAL if k%2 else PINK,ang)
-    r.ball(hx,hy,15,13,PINK)
-    r.ball(hx+11,hy-4,10,6.5,FUR)
-    r.ball(hx+19,hy-1,3.4,2.6,CRIMSON)
+    r.ball(hx,hy,15,14,PINK)
+    r.ball(hx+9,hy-4,8,6,FUR)
+    r.ball(hx+15,hy-1,3.2,2.6,CRIMSON)
     gap=1+9*s+3*w
     r.poly([(hx+4,hy-7),(hx+20,hy-7),(hx+17,hy-9-gap),(hx+3,hy-9-gap*.6)],CRIMSON[0])
     r.poly([(hx+3,hy-8-gap*.6),(hx+18,hy-9-gap),(hx+14,hy-13-gap),(hx+3,hy-12-gap*.6)],PINK[2],OUTLINE)
     for x in (hx+8,hx+14):r.fang(x,hy-7,5,3,-1.57,BONE)
-    for k,x in enumerate((hx-1,hx+6)):r.poly([(x-3,hy+11),(x+1,hy+23+3*k),(x+4,hy+11)],GOLD[2],OUTLINE)   # horns
+    for k,x in enumerate((hx-3,hx+5)):r.taper([(x,hy+11),(x-5,hy+21+2*k),(x-14,hy+22+2*k)],GOLD,6,1)   # curled goat horns
     if d>.35:
         r.line([(hx+1,hy+3),(hx+9,hy+4)],OUTLINE,2)
     else:
-        slit(r.a,*r.t(hx+5,hy+4),4.8,3.4,GREEN,PINK[3])
+        eye(r,hx+5,hy+4,'goat',GOLD,4.6)
     if clip in('die','idle') and n in(3,4,5,6):   # petals drift loose
         for k in range(4):r.ball(-10+k*14+n*2,cy-4-(k*7+n*5)%27*(d>0),3,1.8,PINK)
     return a
@@ -227,16 +258,20 @@ def rainseraph(clip,n):
     hx,hy=2+3*s,hov+27
     for k in range(4):                                               # sharp rain-drop hair
         r.poly([(hx-7+k*3,hy+8),(hx-12+k*4.5-2*math.sin(ph+k)*(1-d),hy+22+k%2*3),(hx-3+k*3,hy+9)],AZURE[2],OUTLINE)
-    r.ball(hx-6,hy+4,10.5,11,AZURE)
-    r.ball(hx+1,hy-1,10.5,10,FUR)
-    r.poly([(hx-8,hy+8),(hx+9,hy+9),(hx+5,hy+3),(hx-1,hy+6)],AZURE[2],OUTLINE)
+    r.ball(hx-7,hy+3,11,12,AZURE)                                    # long swept hair
+    for k in range(3):r.taper([(hx-9,hy+6-k*4),(hx-17-k*2,hy-2-k*5),(hx-20-k*2,hy-14-k*6)],AZURE,5,1)
+    r.ball(hx+1,hy-1,11,11.5,FUR)
+    r.poly([(hx+3,hy-9),(hx+13,hy-3),(hx+4,hy-14)],FUR[2],OUTLINE)       # sharp chin
+    r.poly([(hx-9,hy+9),(hx+11,hy+10),(hx+8,hy+3),(hx+2,hy+7),(hx-2,hy+2)],AZURE[2],OUTLINE)   # jagged fringe
     halo=[(hx+math.cos(k*.5236)*12,hy+17+math.sin(k*.5236)*3.6) for k in range(13)]
     r.line(halo,GOLD[3],2)
     if d>.3 or (clip=='hurt' and n==0):
         r.line([(hx-3,hy+1),(hx+7,hy+3)],OUTLINE,2)
     else:
-        slit(r.a,*r.t(hx+4,hy),3.8,2.4,AZURE,FUR[2])
-        r.line([(hx+1,hy-6),(hx+7,hy-5)],AZURE[0],1)
+        eye(r,hx+7,hy,'orb',AZURE,3.4);eye(r,hx-1,hy+1,'orb',AZURE,2.5)
+        r.line([(hx-5,hy+6),(hx+11,hy+2.5)],AZURE[0],2)               # stern brow
+        r.line([(hx+4,hy-7),(hx+11,hy-6)],AZURE[0],1)
+        r.fang(hx+8,hy-6,3,2,-1.57,BONE)
     hand=(12+13*s-6*w,hov+14+8*w-5*s)
     r.limb([(5,hov+16),(9+4*s,hov+14+4*w),hand],AZURE,5)
     r.ball(hand[0]+1,hand[1],3.2,3.2,FUR)
@@ -287,7 +322,7 @@ def sundarter(clip,n):
     for x in (hx+10,hx+16):r.fang(x,hy-4,3+3*s,2,-1.57,BONE)
     for k in range(3):r.poly([(hx-6-k*3,hy+4),(hx-14-k*4,hy+7+k*2),(hx-7-k*3,hy-1)],CRIMSON[2],OUTLINE)
     if d>.3:r.line([(hx+1,hy+5),(hx+9,hy+3)],OUTLINE,2)
-    else:slit(r.a,*r.t(hx+6,hy+4),3.8,2.6,CRIMSON,AMBER[2],slant=.9)
+    else:eye(r,hx+6,hy+4,'bead',GOLD,3.2)
     return a
 
 def glasslion(clip,n):
@@ -317,21 +352,21 @@ def glasslion(clip,n):
         nx,ny=-math.sin(ang)*wd/2,math.cos(ang)*wd/2
         r.poly([(bx+nx,by+ny),(tx,ty),(bx-nx,by-ny)],TEAL[2] if k%2 else AZURE[2],OUTLINE)
         r.poly([(bx+nx*.35,by+ny*.35),(bx+(tx-bx)*.78+nx*.1,by+(ty-by)*.78+ny*.1),(bx-nx*.1,by-ny*.1)],AZURE[4])
-    r.ball(hx,hy,14,12.5,AMBER)
-    r.ball(hx+11,hy-4,10.5,6.5,GOLD)
-    r.ball(hx+19,hy-1,3.4,2.6,CRIMSON)
+    r.ball(hx,hy,12,11.5,AMBER)
+    r.ball(hx+13,hy-4,12,5.6,GOLD)
+    r.ball(hx+23,hy-2,3.2,2.6,CRIMSON)
     gap=1+10*s+3*w
     r.poly([(hx+4,hy-7),(hx+20,hy-7),(hx+17,hy-9-gap),(hx+3,hy-9-gap*.6)],CRIMSON[0])
     r.poly([(hx+3,hy-8-gap*.6),(hx+18,hy-9-gap),(hx+14,hy-13-gap),(hx+3,hy-12-gap*.6)],AMBER[2],OUTLINE)
     for x in (hx+8,hx+14):r.fang(x,hy-7,5,3,-1.57,BONE)
     if d>.35:r.line([(hx+1,hy+3),(hx+9,hy+4)],OUTLINE,2)
-    else:slit(r.a,*r.t(hx+5,hy+4),4.6,3.2,AZURE,AMBER[3],slant=.9)
+    else:eye(r,hx+6,hy+4,'crystal',AZURE,4.4)
     return a
 
 def sunwheel(clip,n):
     a,r,w,s,d,ph,b=setup('sunwheel',clip,n,(0,34),0)
-    R=18+2*w
-    hov=56+b*1.5-sm(min(1,d*1.15))*(56-R-4)
+    R=18
+    hov=40+b*1.5-sm(min(1,d*1.15))*(40-R-4)
     cx=-8*w+17*s
     ramp=GOLD if d<.2 else (ORANGE if d<.45 else (BROWN if d<.7 else TAUPE))
     rays=ORANGE if d<.2 else (BROWN if d<.5 else TAUPE)
@@ -339,6 +374,7 @@ def sunwheel(clip,n):
     for k in range(14):
         ang=spin+k*6.2832/14
         L=(11+6*w+7*s)*(1 if d<.45 else max(.25,1-d))+(k%2)*4
+        L*=1-.65*max(0,-math.sin(ang))          # rays pointing down stay short, so the disc can hover low
         bx,by=cx+math.cos(ang)*(R-1),hov+math.sin(ang)*(R-1)
         tx,ty=cx+math.cos(ang)*(R+L),hov+math.sin(ang)*(R+L)
         nx,ny=-math.sin(ang)*4.5,math.cos(ang)*4.5
@@ -358,7 +394,7 @@ def sunwheel(clip,n):
         for x in (-4,0,4):r.fang(ex+x,hov-8-gap,3,2.4,1.57,BONE)
     if d<.4:   # a scorch of flame trails below the disc
         for k in range(4):
-            fx=cx-9+k*6;fl=7+4*math.sin(ph+k)+3*s
+            fx=cx-9+k*6;fl=4+2*math.sin(ph+k)+2*s
             r.poly([(fx-2.5,hov-R+3),(fx+(k-1.5)*1.5,hov-R-fl),(fx+2.5,hov-R+3)],ORANGE[3],OUTLINE)
     if d>.6:r.ball(cx,hov-R+1,R*.8,3,TAUPE)
     return a
@@ -397,7 +433,7 @@ def firephoenix(clip,n):
     r.poly([(hx+5,hy-3-gap),(hx+23,hy-4-gap*.5),(hx+25,hy-8-gap),(hx+6,hy-5-gap)],GOLD[3],OUTLINE) if False else None
     r.poly([(hx+5,hy+1),(hx+22,hy-1+gap*0),(hx+17,hy+4),(hx+5,hy+5)],GOLD[3],OUTLINE)
     if d>.35:r.line([(hx,hy+4),(hx+8,hy+3)],OUTLINE,2)
-    else:slit(r.a,*r.t(hx+4,hy+5),3.6,2.5,CRIMSON,ramp[2],slant=.9)
+    else:eye(r,hx+4,hy+5,'round',GOLD,3.2)
     if s>.3:
         for k in range(6):
             fx,fy=hx+24+k*6*s,hy-3-(k%3)*2.5
@@ -453,7 +489,7 @@ def acornmimic(clip,n):
 
 def lanternowl(clip,n):
     a,r,w,s,d,ph,b=setup('lanternowl',clip,n,(0,34),-.5)
-    hov=30+26*(1-sm(min(1,d*1.1)))+b*1.4+3*w-3*s
+    hov=26+18*(1-sm(min(1,d*1.1)))+b*1.4+3*w-3*s
     ramp=TAUPE
     glow=1-min(1,d*1.6)
     flap=math.sin(ph)*(1-d)*.22-.45*w+.55*s+.35*d
@@ -468,7 +504,7 @@ def lanternowl(clip,n):
     r.ball(4,hov,9,12,BONE)
     for k in range(3):r.poly([(1+k*4,hov+8-k*4),(4+k*4,hov+2-k*4),(7+k*4,hov+8-k*4)],TAUPE[2],OUTLINE)
     # lantern hanging from the talon on a cord
-    lx,ly=4+13*s-4*w,hov-26+6*d
+    lx,ly=4+13*s-4*w,hov-23+6*d
     r.fang(0,hov-11,8,4,-1.5,GOLD)
     r.line([(2,hov-13),(lx,ly+9)],TAUPE[0],1)
     for k,col in enumerate(((AMBER if glow>.4 else TAUPE),)):
@@ -487,7 +523,7 @@ def lanternowl(clip,n):
     if d>.4:
         r.line([(hx-2,hy+3),(hx+4,hy+2)],OUTLINE,2);r.line([(hx+5,hy+2),(hx+11,hy+1)],OUTLINE,2)
     else:
-        for sg in (-1,1):slit(r.a,*r.t(hx+sg*4.5+3,hy+2),3.7,3,GOLD,TAUPE[2],side=-sg,slant=1.0)
+        for sg in (-1,1):eye(r,hx+sg*4.8+3,hy+2,'round',GOLD,4.3)
     return a
 
 def harvestreaper(clip,n):
@@ -507,7 +543,7 @@ def harvestreaper(clip,n):
     r.ball(hx,hy-4,9.5,10,AMBER)       # lantern-pumpkin face under the straw hat
     for sg in (-1,1):
         if d>.4:r.line([(hx+sg*4-2,hy-3),(hx+sg*4+2,hy-5)],OUTLINE,2)
-        else:slit(r.a,*r.t(hx+sg*4.3,hy-1),2.9,2.2,GOLD,AMBER[2],side=-sg,slant=1.1)
+        else:eye(r,hx+sg*4.3,hy-1,'tri',GOLD,2.9)
     r.poly([(hx-6,hy-8),(hx-3,hy-11),(hx,hy-8),(hx+3,hy-11),(hx+6,hy-8),(hx+4,hy-6),(hx-4,hy-6)],OUTLINE)
     for k in range(4):r.poly([(hx-5+k*3.2,hy-8),(hx-3.6+k*3.2,hy-6),(hx-5+k*3.2+1.5,hy-8)],BONE[4])
     r.ellipse(hx,hy+4+3*d,16,2.5,GOLD[1])                   # hat brim, tipped as it falls
@@ -614,9 +650,10 @@ def rimesaber(clip,n):
         r.poly([(-14+k*8-4,cy+12),(-14+k*8,cy+22-k*2),(-14+k*8+4,cy+12)],AZURE[3],OUTLINE)
     for k in range(5):r.line([(-18+k*8,cy+11),(-16+k*8,cy-4)],AZURE[1],2)      # ice stripes
     hx,hy=27+16*s-9*w,cy+7-4*d
-    r.ball(hx,hy,14,12.5,FUR)
-    r.ball(hx+11,hy-4,10.5,6.5,PEARL)
-    r.ball(hx+19,hy-1,3.4,2.6,SLATE)
+    r.ball(hx,hy,16,11,FUR)
+    r.ball(hx+12,hy-3,9,8,PEARL)
+    r.ball(hx+19,hy,3.6,3,SLATE)
+    r.poly([(hx-4,hy+8),(hx+15,hy+3),(hx+15,hy+7),(hx-3,hy+12)],AZURE[1],OUTLINE)
     for k,x in enumerate((hx-3,hx+5)):r.poly([(x-3,hy+11),(x+1,hy+21+3*k),(x+4,hy+11)],AZURE[2],OUTLINE)   # ear spikes
     gap=1+11*s+3*w
     r.poly([(hx+4,hy-7),(hx+20,hy-7),(hx+17,hy-9-gap),(hx+3,hy-9-gap*.6)],CRIMSON[0])
@@ -624,7 +661,7 @@ def rimesaber(clip,n):
     r.fang(hx+10,hy-6,17+4*s,5.5,-1.6,AZURE)        # the great sabre fangs
     r.fang(hx+16,hy-6,14+3*s,4.5,-1.5,AZURE)
     if d>.35:r.line([(hx+1,hy+3),(hx+9,hy+4)],OUTLINE,2)
-    else:slit(r.a,*r.t(hx+5,hy+4),4.6,3.2,AZURE,FUR[3],slant=1.0)
+    else:eye(r,hx+5,hy+4,'hollow',AZURE,4.6)
     return a
 
 def snowgiant(clip,n):
@@ -649,7 +686,7 @@ def snowgiant(clip,n):
     r.poly([(hx-12,hy+4),(hx+12,hy+4),(hx+9,hy+13),(hx-9,hy+13)],SLATE[2],OUTLINE)
     if d>.4:r.line([(hx-5,hy),(hx+8,hy-1)],OUTLINE,2)
     else:
-        for sg in (-1,1):slit(r.a,*r.t(hx+sg*5.5+1,hy+1),3.1,2.2,AZURE,SLATE[2],side=-sg,slant=1.1)
+        for sg in (-1,1):eye(r,hx+sg*5.5+1,hy+1,'dot',AZURE,2.4)
         r.line([(hx-5,hy-6),(hx+7,hy-5)],OUTLINE,2)
     sh=(10,top+26*k)
     ang=.6+w*1.4-s*3.1+d*(-.5)
@@ -694,7 +731,7 @@ def longnightwyrm(clip,n):
         r.poly([(hx-6-sg*4,hy+4),(hx-13-sg*6,hy+12+sg*3),(hx-9-sg*4,hy+1)],VIOLET[2],OUTLINE)   # night crest
         r.ellipse(hx-10-sg*5,hy+8+sg*2.5,1.4,1.4,GOLD[4])
     if d>.35:r.line([(hx+2,hy+3),(hx+10,hy+4)],OUTLINE,2)
-    else:slit(r.a,*r.t(hx+6,hy+3),4.4,3,AZURE,PURPLE[2],slant=1.0)
+    else:eye(r,hx+6,hy+3,'star',AZURE,4.4)
     return a
 
 

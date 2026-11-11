@@ -37,7 +37,7 @@ python3 scripts/yearwheel_slime_review.py review | verify | upload
 
 `make_yearwheel_sprites.py` keeps its helpers but its CLI delegates here; `build --replace` is refused.
 
-**Known weaknesses for the picture review:** fifteen kinds use the same `slit()` eye helper and the Petal Chimera, Glass Lion and Rime Saber heads are near copies (distinct eyes for those three is the cheap next fix: `refresh` them, export, verify, one bounded run, `review`). Sunwheel and Lantern Owl hover noticeably high above their shadow (the 12 px hover rule plus flame fringe/lantern). Rain Seraph's face is the weakest.
+**Face pass (2026-11-11):** each kind now has its own eye shape (`eye()` in `yearwheel_slime_redraw.py`: goat bar pupil on the Chimera, faceted crystal on the Glass Lion, hollow glow under a heavy brow on the Rime Saber, vertical-pupil bead, big round owl/bird eyes, jack-o'-lantern triangles, blank orbs on the Seraph, coal dots, star glints; slit eyes remain only on the Newt, Tortoise, Acorn, Sunwheel, Stoat), the three cats have different heads, the Rain Seraph has a swept-hair, two-eyed face, and Sunwheel (rays that point down are short) and Lantern Owl (shorter lantern cord) hover about 15 px lower. Re-checked: four bounded batches, 330 assertions, 0 failures.
 
 Backup: `/media/raid/valhallasc-data/yearwheel-slime-original-20261111` (16 atlases, `yearwheel.txt`, old PixelFlow IDs and tops, hashes). `python3 scripts/rollback_yearwheel_art.py --target <checkout> [--apply]` restores the 17 files, refusing a corrupt backup or changed NPC/other manifest data.
 
