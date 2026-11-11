@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "All six Black Hour Foundry enemies have new shaded clockwork artwork, with separate faces, clear attack wind-ups and strikes, and deaths where metal bodies fall and their current shuts off."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [
