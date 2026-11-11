@@ -166,17 +166,19 @@ pub(crate) fn overlay_quest(id: &str) -> bool {
 #[cfg(test)]
 mod activity_tests;
 #[cfg(test)]
-mod leadshoes_tests;
-#[cfg(test)]
 mod aggro_level_tests;
 mod ambient;
 mod bank;
 #[cfg(test)]
 mod compact_atlas_tests;
+#[cfg(test)]
+mod cutscene_tests;
 mod inspect;
 mod landing;
 #[cfg(test)]
 mod landing_tests;
+#[cfg(test)]
+mod leadshoes_tests;
 mod mail;
 #[cfg(test)]
 mod raid_reward_tests;
@@ -203,12 +205,12 @@ mod cathedral_tests;
 mod chained_forge_tests;
 mod chests;
 mod chime;
-mod leadshoes;
 #[cfg(test)]
 mod christmas_tests;
 #[cfg(test)]
 mod consumable_audit;
 mod consumables;
+mod cutscene;
 mod damage_meter;
 #[cfg(test)]
 mod damage_meter_tests;
@@ -264,6 +266,7 @@ mod hour_shards;
 mod instances;
 #[cfg(test)]
 mod lapis_tests;
+mod leadshoes;
 #[cfg(test)]
 mod longship_tests;
 mod mercs;
@@ -460,6 +463,12 @@ struct Player {
     fallen: bool,
     /// Wearing the lead shoes of the deep (`world/leadshoes.rs`); derived from the zone each tick, never saved.
     shoed: bool,
+    /// The kind of place the hero stood in at the previous tick, to notice a crossing (`world/cutscene.rs`); never saved.
+    env: Option<cutscene::Env>,
+    /// While a crossing cutscene plays (client side, input locked) nothing can hunt or hurt the hero until this time.
+    cutscene_until: f64,
+    /// A test asked this hero's session for cutscenes on a test server (`enable_cutscenes`).
+    cutscene_test: bool,
     /// A pack death returns to the entrance, even after an earlier boss rally.
     pack_death: bool,
     dash: f64,
@@ -604,6 +613,9 @@ impl Player {
             dead_time: 0.,
             fallen: false,
             shoed: false,
+            env: None,
+            cutscene_until: -99.,
+            cutscene_test: false,
             pack_death: false,
             dash: 0.,
             dash_cd: 0.,
@@ -1789,7 +1801,11 @@ impl Slime {
     /// level 5 needs about 48 kills instead of 24). The other zones are untouched.
     fn kill_xp(kind: &str, zone: usize, level: u32) -> u32 {
         let xp = enemy_xp(level) * Self::xp_multiplier(kind);
-        if zone == GREENMEADOW_ZONE { xp.div_ceil(2) } else { xp }
+        if zone == GREENMEADOW_ZONE {
+            xp.div_ceil(2)
+        } else {
+            xp
+        }
     }
     fn level_scale(kind: &str, level: u32, per_level: f64) -> f64 {
         (1. + per_level * (level as f64 - Self::default_level(kind) as f64)).max(0.2)
@@ -1996,6 +2012,12 @@ pub struct World {
     pub landings: bool,
     // Test servers only (VALHALLA_TEST_COMMANDS=1): players may send `debug` shortcuts. Never set on the public service.
     pub test_commands: bool,
+    /// Test servers play no crossing cutscene until a test asks for it with the `enable_cutscenes` debug op, so the many older suites that walk the
+    /// real routes into Bifrost and the sea are not locked in one (`world/cutscene.rs`). Set with `test_commands` in main.rs; never on the public service.
+    pub cutscene_opt_in: bool,
+    /// Characters created in this process whose opening cutscene has not played yet, each with whether the player may skip it (the account
+    /// already has another character). Filled at creation, consumed on the character's first tick (`world/cutscene.rs`).
+    intro_pending: BTreeMap<String, bool>,
     pub login_notifications: Option<mpsc::Sender<crate::notify::LoginNotice>>,
     // Friend requests, party invites and parties. Nothing here is persisted except `Character::friends`.
     social: social::Social,
@@ -2111,6 +2133,8 @@ impl World {
             start_level: 1,
             landings: !cfg!(test),
             test_commands: false,
+            cutscene_opt_in: false,
+            intro_pending: BTreeMap::new(),
             login_notifications: None,
             social: social::Social::default(),
             trades: vec![],
@@ -2574,10 +2598,14 @@ impl World {
                         "Your account already has {MAX_ACCOUNT_CHARACTERS} characters. Delete one first."
                     ));
                 }
+                let others = self.store.account_character_count(&id).map_err(storage)?;
                 let (c, _) = self
                     .store
                     .create_character(Some(&id), look, self.newcomer_start(), wants_gm)
                     .map_err(storage)?;
+                if !wants_gm {
+                    self.intro_pending.insert(c.id.clone(), others >= 1);
+                }
                 (self.arrive(self.with_start_level(c)), None)
             }
             Identity::Guest { token: None, look } => {
@@ -2592,6 +2620,7 @@ impl World {
                     .store
                     .create(look, self.newcomer_start())
                     .map_err(storage)?;
+                self.intro_pending.insert(c.id.clone(), false);
                 (self.arrive(self.with_start_level(c)), Some(token))
             }
         };
@@ -5343,6 +5372,7 @@ impl World {
                         .is_some_and(|m| !m.contains(&p.character.id))
                     || p.character.zone != zone
                     || p.character.spark_travel.is_some()
+                    || p.cutscene_until > self.time
                     || p.is_hidden()
                     || downed.is_some_and(|d| d.contains(&session))
             })
@@ -5403,6 +5433,7 @@ impl World {
                         .is_none_or(|m| m.contains(&p.character.id))
                     && p.character.zone == zone
                     && p.character.spark_travel.is_none()
+                    && p.cutscene_until <= self.time
                     && !p.is_hidden()
                     && !map.in_city(p.character.point())
                     && !downed.is_some_and(|d| d.contains(*session))
@@ -5435,6 +5466,7 @@ impl World {
                             .is_none_or(|m| m.contains(&p.character.id))
                         && p.character.zone == zone
                         && p.character.spark_travel.is_none()
+                        && p.cutscene_until <= self.time
                         && !p.is_hidden()
                         && !map.in_city(p.character.point())
                 })
@@ -5791,7 +5823,7 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        if p.character.spark_travel.is_some() {
+        if p.character.spark_travel.is_some() || p.cutscene_until > self.time {
             return;
         }
         if p.character.hp > 0. && !self.maps[p.character.zone].in_city(p.character.point()) {

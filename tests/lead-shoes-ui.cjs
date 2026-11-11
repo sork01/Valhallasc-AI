@@ -24,7 +24,7 @@ const errors = [];
   browser = await chromium.launch({ headless: true, args: ['--disable-gpu'] });
   const page = await browser.newPage({ viewport: { width: 960, height: 600 }, reducedMotion: 'reduce' });
   page.on('pageerror', e => errors.push(e.message));
-  if (process.env.MUTATE) await page.route('**/field.js*', route => route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(root, 'client/field.js'), 'utf8').replace('if (!who.leadShoes ||', 'if (true ||') }));
+  if (process.env.MUTATE) await page.route('**/field.js*', route => route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(root, 'client/field.js'), 'utf8').replace('if (!shod ||', 'if (true ||') }));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })));
   await page.goto(world.url);
   await page.locator('#start').click(); await page.locator('#login-guest').click();

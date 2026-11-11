@@ -222,6 +222,10 @@ impl World {
                 p.character.explored = vec![(1 << (FOG_GRID * FOG_GRID)) - 1; zones];
                 json!({"explored":p.character.explored})
             }
+            DebugCommand::EnableCutscenes => {
+                p.cutscene_test = true;
+                json!({"cutscenes":true})
+            }
             DebugCommand::ResetCooldowns => {
                 p.skill_cd.clear();
                 p.cooldown = 0.;

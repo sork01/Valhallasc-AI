@@ -3038,7 +3038,8 @@
   // Lead shoes (server flag `leadShoes`, LEAD-SHOES): an overlay on the feet of a hero under water, drawn over the rig for every
   // class and body. They are not an item, so they follow the walk cycle only roughly: each boot lifts a little on its own stride.
   function drawLeadShoes(g, who, t) {
-    if (!who.leadShoes || who.dead || who.sparkTravel || who.mounted) return;
+    const shod = who === hero && window.Cutscene?.active ? window.Cutscene.shoes() : who.leadShoes;   // a cutscene decides when they go on and come off
+    if (!shod || who.dead || who.sparkTravel || who.mounted) return;
     const stride = who.moving ? Math.sin((who.walk || 0) * 2) : 0;
     g.save(); g.lineJoin = 'round'; g.lineWidth = 2;
     for (const side of [-1, 1]) {
@@ -4761,6 +4762,13 @@
     g.beginPath(); g.moveTo(22, 0); g.lineTo(-2, -15); g.lineTo(-2, -6); g.lineTo(-20, -6);
     g.lineTo(-20, 6); g.lineTo(-2, 6); g.lineTo(-2, 15); g.closePath(); g.fill(); g.stroke(); g.restore();
   }
+  // The hero as the world draws them, at the origin: shells, aura, mount, the rig, lead shoes, stun. The crossing cutscenes paint the same.
+  function paintHeroBody(g, t) {
+    drawMageWardShell(g, hero, t, true); drawPriestBuffShell(g, hero, t, true); drawHunterBuffShell(g, hero, t, true); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); const seated = isModular() && seatedInArt(hero, mageSpr); if(!seated)drawMount(g,hero); if(hero.mounted&&!seated)g.translate(0,-23); if (isModular()) {
+        if (mageSpr) mageSpr.draw(g, hero, t);
+        else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
+      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawLeadShoes(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); }
+  }
   function draw(t) {
     const g = ctx, k = dpr * zoom; g.setTransform(k, 0, 0, k, 0, 0);
     drawSky(g, t);
@@ -4954,10 +4962,7 @@
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
-      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); drawMageWardShell(g, hero, t, true); drawPriestBuffShell(g, hero, t, true); drawHunterBuffShell(g, hero, t, true); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); const seated = isModular() && seatedInArt(hero, mageSpr); if(!seated)drawMount(g,hero); if(hero.mounted&&!seated)g.translate(0,-23); if (isModular()) {
-        if (mageSpr) mageSpr.draw(g, hero, t);
-        else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawLeadShoes(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
+      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); paintHeroBody(g, t); g.restore(); }
     }
     // Keep the soak readout legible even when another actor stands in front of the warded fighter.
     for (const who of [hero, ...remotePlayers.values()]) {
@@ -5117,6 +5122,8 @@
     window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
     drawQuestArrow(g);
     drawMini();
+    // A crossing cutscene (client/cutscene.js) covers the whole canvas, HUD pieces drawn above included, and paints the hero itself.
+    if (window.Cutscene?.active) { const [csx, csy] = w2s(hero.x, hero.y); window.Cutscene.draw(g, VW, VH, t, paintHeroBody, csx, csy, hero, reducedMotion()); }
   }
   // What the boss-mechanics drawing needs from the field: the projection, the room a point is in, and where a character or boss stands.
   const bossMechView = () => ({
@@ -5542,7 +5549,9 @@
       });
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
-    stop() { window.ZoneJourney?.clear(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
+    // A crossing cutscene starts: let go of everything the hero was doing, so nothing carries on underneath it.
+    cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
+    stop() { window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
     setTouchDirection(x, y) {
       if (!Field.canAct || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {

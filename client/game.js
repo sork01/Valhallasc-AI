@@ -932,6 +932,50 @@
     }
   }
   window.AchievementAudio = { play: achievementSound };
+  // Sounds of the crossing cutscenes (client/cutscene.js), synthesised and routed through the effect bus like every other effect.
+  function cutsceneSound(kind, delay = 0) {
+    if (!save.sound) return;
+    const c = audio(); if (!c || c.state !== 'running') return;
+    const out = sfxOut(c), now = c.currentTime + delay;
+    const noise = dur => { const b = c.createBuffer(1, Math.max(1, Math.floor(c.sampleRate * dur)), c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const s = c.createBufferSource(); s.buffer = b; return s; };
+    const shape = (gain, peak, attack, dur) => { gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(peak, now + attack); gain.gain.exponentialRampToValueAtTime(.0001, now + dur); };
+    const sweep = (dur, from, to, peak, q = 1.2) => {   // a band of noise whose centre glides: wind and rushing water
+      const n = noise(dur), f = c.createBiquadFilter(), g = c.createGain();
+      f.type = 'bandpass'; f.Q.value = q; f.frequency.setValueAtTime(from, now); f.frequency.exponentialRampToValueAtTime(to, now + dur);
+      shape(g, peak, Math.min(.6, dur / 3), dur); n.connect(f).connect(g).connect(out); n.start(now); n.stop(now + dur + .05);
+    };
+    const tone = (type, f0, f1, dur, peak, at = 0) => {
+      const o = c.createOscillator(), g = c.createGain(), t0 = now + at;
+      o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+      g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(peak, t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+      o.connect(g).connect(out); o.start(t0); o.stop(t0 + dur + .03);
+    };
+    if (kind === 'rush_up') sweep(4.4, 260, 2600, .22);
+    else if (kind === 'rush_down') sweep(4.4, 2600, 240, .22);
+    else if (kind === 'clank') { tone('square', 980, 620, .16, .07); tone('triangle', 1470, 930, .2, .05, .02); tone('square', 760, 480, .14, .05, .14); sweep(.12, 3000, 1800, .08, 4); }
+    else if (kind === 'splash') { sweep(.9, 3200, 380, .34, .7); tone('sine', 220, 60, .35, .16); }
+    else if (kind === 'bubbles') for (let i = 0; i < 14; i++) tone('sine', 380 + Math.random() * 500, 900 + Math.random() * 900, .07 + Math.random() * .05, .035, i * .2 + Math.random() * .1);
+    else if (kind === 'sea_bed') {   // the sea under the whole opening: swells of low water, a thin wind in the sail
+      const n = noise(62), f = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
+      f.type = 'lowpass'; f.frequency.value = 520; g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(.16, now + 3); g.gain.setValueAtTime(.16, now + 56); g.gain.exponentialRampToValueAtTime(.0001, now + 62);
+      lfo.frequency.value = .16; depth.gain.value = .07; lfo.connect(depth).connect(g.gain);
+      n.connect(f).connect(g).connect(out); n.start(now); n.stop(now + 62.1); lfo.start(now); lfo.stop(now + 62.1);
+      const w = noise(62), wf = c.createBiquadFilter(), wg = c.createGain();
+      wf.type = 'bandpass'; wf.frequency.value = 1400; wf.Q.value = .6; wg.gain.setValueAtTime(.0001, now); wg.gain.exponentialRampToValueAtTime(.035, now + 6); wg.gain.setValueAtTime(.035, now + 54); wg.gain.exponentialRampToValueAtTime(.0001, now + 62);
+      w.connect(wf).connect(wg).connect(out); w.start(now); w.stop(now + 62.1);
+    }
+    else if (kind === 'creak') tone('sawtooth', 190 + Math.random() * 60, 120 + Math.random() * 40, .45, .03);
+    else if (kind === 'ember') {   // a low rumble under the history, swelling and dying away
+      for (const [fr, vol] of [[46, .12], [61, .08]]) {
+        const o = c.createOscillator(), g = c.createGain(), t = c.createOscillator(), td = c.createGain();
+        o.type = 'sine'; o.frequency.value = fr; g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(vol, now + 4); g.gain.setValueAtTime(vol, now + 28); g.gain.exponentialRampToValueAtTime(.0001, now + 34);
+        t.frequency.value = 5.5; td.gain.value = vol * .35; t.connect(td).connect(g.gain); o.connect(g).connect(out); o.start(now); o.stop(now + 34.1); t.start(now); t.stop(now + 34.1);
+      }
+    }
+    else if (kind === 'chord') for (const [i, fr] of [220, 329.6, 440, 554.4].entries()) tone('sine', fr * .5, fr, 4.2, .05, i * .25);
+    else if (kind === 'thud') { tone('sine', 150, 42, .32, .22); sweep(.18, 900, 200, .1, 1.5); }
+  }
+  window.CutsceneAudio = { play: cutsceneSound };
   function onField(name, data) {
     if (SFX[name]) SFX[name](data);
     if (name === 'setTier') showToast(`${data.name}: ${data.tier}-piece bonus ${data.active ? 'active' : 'lost'}`);
