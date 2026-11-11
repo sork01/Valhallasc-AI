@@ -216,9 +216,7 @@ def export(verify=False):
  if verify:print('Cairnspine PixelFlow atlases verified')
  else:path.write_text(json.dumps(metadata(sprites),indent=2)+'\n')
 if __name__=='__main__':
+ import cairn_slime_redraw as remake
  cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
- if cmd=='preview':preview()
- elif cmd=='build':build('--replace' in sys.argv[2:])
- elif cmd=='export':export()
- elif cmd=='verify':export(True)
- else:raise SystemExit('preview | build [--replace] | export | verify')
+ {'preview':remake.preview,'extents':remake.extents,'build':remake.build,
+  'refresh':remake.refresh,'export':remake.export,'verify':remake.verify}[cmd]()
