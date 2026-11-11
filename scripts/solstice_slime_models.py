@@ -126,13 +126,41 @@ def harbinger(setup, clip, n):
                 tip=(x+side*(36-j*5)*fade,y+18-j*10+9*w-12*s+25*d)
                 r.poly([(x+side*9,y+14),(tip[0],tip[1]),(tip[0]-side*5,tip[1]-14*fade),(x+side*8,y-8)],SLATE[1+j%2],OUTLINE)
         r.poly([(x-13*fade,y+15+20*d),(x+13*fade,y+15+20*d),(x+24*fade,y-25+30*d),(x+6,y-18+30*d),(x-21*fade,y-24+30*d)],PURPLE[1],OUTLINE)
-        r.ball(x,y+24+24*d,11*fade,14*fade,PEARL)
-        r.poly([(x-13*fade,y+29+24*d),(x,y+47*fade+24*d),(x+14*fade,y+27+24*d)],SLATE[0],OUTLINE)
-        for side in (-1,1):r.line([(x+side*3,y+27+24*d),(x+side*8,y+29+24*d)],TEAL[3],2)
+        # Hood is BEHIND the face; the old triangle hid the brow and eyes.
+        fy=y+24+24*d
+        r.poly([(x-15*fade,fy-7*fade),(x-14*fade,fy+10*fade),(x,fy+27*fade),
+                (x+15*fade,fy+8*fade),(x+14*fade,fy-9*fade)],SLATE[0],OUTLINE)
+        r.ball(x,fy,10.5*fade,13*fade,PEARL)
+        # A distinct severe face: dark angular sockets, bright irises, nose and frown.
+        for side in (-1,1):
+            ex=x+side*5*fade
+            r.poly([(ex-4*fade,fy+5*fade),(ex+4*fade,fy+5*fade),
+                    (ex+3*fade,fy-1*fade),(ex-3*fade,fy-1*fade)],OUTLINE)
+            r.ball(ex,fy+2*fade,3*fade,3.6*fade,TEAL)
+            r.ellipse(ex+1.3*fade,fy+2*fade,.8*fade,2.5*fade,OUTLINE)
+            r.ellipse(ex,fy+3*fade,.8*fade,.8*fade,WHITE)
+            r.line([(ex-side*4*fade,fy+6*fade),(ex+side*4*fade,fy+9*fade)],SLATE[0],2)
+        r.poly([(x+fade,fy+fade),(x+4*fade,fy-5*fade),(x,fy-6*fade)],PEARL[0])
+        r.line([(x-4*fade,fy-9*fade),(x,fy-7*fade),(x+5*fade,fy-8*fade)],OUTLINE,2)
+        # Sleeves end at two visible articulated hands, rather than a bare staff and wing.
+        far=(x-22-5*w+8*s,y+3+9*w-6*s)
+        r.limb([(x-10*fade,y+12),(x-17,y+6),far],PURPLE,5*fade)
+        r.ball(*far,5.5*fade,5*fade,BONE)
+        for j in range(3):
+            r.limb([(far[0]+(j-1)*3*fade,far[1]),
+                    (far[0]+(j-1)*4*fade,far[1]-6*fade),
+                    (far[0]+(j-1)*4*fade+2*fade,far[1]-9*fade)],BONE,1.5*fade)
         hand=(x+23+28*s-7*w,y+4+18*w)
-        r.limb([(x+10,y+12),hand],PURPLE,4*fade)
-        r.line([(hand[0]-2,hand[1]-7*fade),(hand[0]+2,hand[1]+20*fade)],PEARL[2],2)
+        r.limb([(x+10,y+12),(hand[0]-8*fade,hand[1]+2*fade),hand],PURPLE,5*fade)
+        r.line([(hand[0]-2,hand[1]-7*fade),(hand[0]+2,hand[1]+20*fade)],PEARL[2],3)
         crescent(r,hand[0]+2,hand[1]+25*fade,7*fade)
+        r.ball(*hand,5.5*fade,6*fade,BONE)
+        # Fingers wrap across the shaft, thumb hooks over its near edge.
+        for j in range(3):
+            r.line([(hand[0]-3*fade,hand[1]+(3-j*2.5)*fade),
+                    (hand[0]+3*fade,hand[1]+(2-j*2.5)*fade)],BROWN[0],1)
+        r.limb([(hand[0]+3*fade,hand[1]+4*fade),
+                (hand[0]+6*fade,hand[1]+fade),(hand[0]+3*fade,hand[1]-fade)],BONE,2*fade)
     if d>0:
         for j in range(5):
             if j < round(5*(1-d)):

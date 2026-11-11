@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.2",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The Harbinger of Night now has a visible face, an open clawed hand and a hand gripping its crescent staff."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.1",
     "date": "2026-11-11",
     "new": [],

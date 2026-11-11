@@ -255,9 +255,10 @@ def upload():
     for name in expected_files():
         src = OUT / name
         mime = 'image/gif' if src.suffix == '.gif' else 'image/png'
-        subprocess.run(['bash', str(put_script), str(src), name, mime], check=True)
         dst = filedrop_dir / name
         meta_path = Path(str(dst) + '.meta.json')
+        if not dst.is_file() or not meta_path.is_file() or hashlib.sha256(dst.read_bytes()).digest() != hashlib.sha256(src.read_bytes()).digest():
+            subprocess.run(['bash', str(put_script), str(src), name, mime], check=True)
         assert dst.is_file() and meta_path.is_file(), f'FileDrop missing {name}'
         sha = hashlib.sha256(src.read_bytes()).hexdigest()
         assert hashlib.sha256(dst.read_bytes()).hexdigest() == sha, f'SHA mismatch for {name}'

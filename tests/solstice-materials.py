@@ -39,7 +39,9 @@ def bounds(mask):
 check(without_solstice(meta)==without_solstice(base) and len([k for k in base['kinds'] if k not in KINDS])==140,'all 140 unrelated Cathedral kinds and manifest fields preserved')
 hashes=json.loads((BACKUP/'manifest.txt').read_text())['unrelatedAtlasHashes']
 check(all(hashlib.sha256((ROOT/rel).read_bytes()).hexdigest()==digest for rel,digest in hashes.items()),f'all {len(hashes)} unrelated native atlases preserved')
-for kind in KINDS:
+selected=os.environ.get('SOLSTICE_MATERIAL_KINDS',','.join(KINDS)).split(',')
+assert selected and all(k in KINDS for k in selected), 'valid material selection'
+for kind in selected:
     w,h,ax,ay=kindframe.frame_of(meta,kind)
     check((w,h,ax,ay)==(176,172,88,164),f'{kind}: declared frame and anchor')
     attacks=[cell(kind,'attack',n) for n in range(8)]

@@ -417,7 +417,7 @@
     "solstice_owl": 60,
     "solstice_guard": 65,
     "solstice_watcher": 72,
-    "solstice_harbinger": 99,
+    "solstice_harbinger": 102,
     "solstice_heart": 88,
     "choirsinger": 42,
     "reliquarypearl": 56,

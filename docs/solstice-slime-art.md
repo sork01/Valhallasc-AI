@@ -1,6 +1,6 @@
 # Silent Solstice enemy artwork candidate
 
-Prepared 2026-11-11 in `/media/raid/valhallasc-data/silent-solstice-slime-work`, branch `feat/silent-solstice-slime-art`. Private candidate awaiting picture approval under the enemy remake rules in `TODO.md`. Candidate Beta 1.43.1; reconcile the current version and shared Cathedral manifest slices before deployment.
+Prepared 2026-11-11 in `/media/raid/valhallasc-data/silent-solstice-slime-work`, branch `feat/silent-solstice-slime-art`. Private candidate awaiting picture approval under the enemy remake rules in `TODO.md`. Candidate Beta 1.43.2; reconcile the current version and shared Cathedral manifest slices before deployment.
 
 Six native editable PixelFlow sources, 204 frames. Each uses a 176×172 frame and anchor (88,164), eight distinct wind-up/strike/recovery poses and eight distinct material-fitting death poses. The original clip counts and rates remain: idle 6 at 6 fps, walk 8 at 10 fps, attack 8 at 12 fps, hurt 4 at 10 fps, death 8 at 8 fps. The shared Cathedral manifest retains its 96×96 fallback, (48,90) anchor and all 140 unrelated kinds. All 129 unrelated native atlases remain byte-identical. Artwork only; no server, map, combat or reward changes.
 
@@ -48,7 +48,7 @@ Dry run by default. Disposable-copy verification: dry run writes nothing; applic
 
 ## Review pictures
 
-29 PNG/GIF files, 3,392,179 bytes, uploaded and verified against SHA-256, FileDrop MIME/metadata, byte counts, dimensions and animation frame counts. Receipt: `test-results/solstice-slime/filedrop-receipt.json`.
+29 PNG/GIF files, 3,475,732 bytes, uploaded and verified against SHA-256, FileDrop MIME/metadata, byte counts, dimensions and animation frame counts. Receipt: `test-results/solstice-slime/filedrop-receipt.json`.
 
 - [Before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-solstice-before-after.png)
 - [Attacks](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-solstice-attacks-before-after.png)
@@ -57,3 +57,11 @@ Dry run by default. Disposable-copy verification: dry run writes nothing; applic
 Each kind also has a full 34-frame sheet, combined animation GIF, attack comparison and death comparison under `valhallasc-solstice-<kind>-*`.
 
 Next enemy group: Nornroot Barrow (`NORNROOT-SLIME-ART`).
+
+## Harbinger face and hands correction (2026-11-11)
+
+Owner feedback: the Harbinger had no readable face or hands. Moved the hood behind the face; added bright teal eyes with dark sockets and brows, a nose and frown, an open clawed hand and a fingered hand visibly gripping the crescent staff. Both hands follow the sleeves throughout wind-up, strike and recovery, then dissipate with the spirit. Its existing native source `68c1c0853685b94c` now holds the corrected 34 frames; all 134 other native Cathedral atlases, including the five other Solstice enemies, remain unchanged. Previous model, raw frames, atlas, manifest and full editor packet are preserved at `/media/raid/valhallasc-data/solstice-harbinger-before-face-fix-20261111`.
+
+100 focused face/hand checks pass across 25 living poses (`tests/solstice-harbinger-face.py`); the pre-fix blank-face/handless atlas is rejected. The Harbinger's seven material/preservation checks pass. Its 34 editor frames equal the exported atlas. A focused bounded real-art client run passes 24 checks (`driver-xfyh4G`), including attacks, recovery, hovering, death, portrait and updated health-bar top. Review images/animations and the FileDrop receipt were refreshed. Upload skips byte-identical existing files and verifies every receipt entry. Candidate now Beta 1.43.2; still private pending picture approval.
+
+[Updated Harbinger animation](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-solstice-solstice_harbinger-animations.gif).
