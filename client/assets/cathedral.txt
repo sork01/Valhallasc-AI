@@ -277,12 +277,12 @@
     "seed_treant": "215216cb71475ec0",
     "solar_cinder": "270d38184ebc19fa",
     "amber_cocoon": "1de97986cdfe4396",
-    "barrow_scarab": "a12a73ac8dcf45b4",
-    "barrow_hound": "dbaf498b20365275",
-    "barrow_spinner": "72f19ac8cc4528cd",
-    "barrow_doorward": "9b04131dffdb3f64",
-    "barrow_threadkeeper": "f0818193eda48cb0",
-    "barrow_fatebound": "3b0c808a6676665e",
+    "barrow_scarab": "3a33b9a7d56b1d80",
+    "barrow_hound": "6137029beb8c9727",
+    "barrow_spinner": "1dd1b50eb3b8cf4f",
+    "barrow_doorward": "0534d58de1950897",
+    "barrow_threadkeeper": "bb7e69e9e70f9605",
+    "barrow_fatebound": "35a90f4049a0d909",
     "span_lynx": "954c192fb7c3451a",
     "span_sentinel": "91a65206f5a3b545",
     "span_caster": "3af0fa48afd1b30c",
@@ -425,12 +425,12 @@
     "seed_treant": 57,
     "solar_cinder": 59,
     "amber_cocoon": 75,
-    "barrow_scarab": 50,
-    "barrow_hound": 40,
-    "barrow_spinner": 57,
-    "barrow_doorward": 57,
-    "barrow_threadkeeper": 58,
-    "barrow_fatebound": 57,
+    "barrow_scarab": 41,
+    "barrow_hound": 46,
+    "barrow_spinner": 69,
+    "barrow_doorward": 58,
+    "barrow_threadkeeper": 59,
+    "barrow_fatebound": 60,
     "span_lynx": 45,
     "span_sentinel": 68,
     "span_caster": 57,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "barrow_hound": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_scarab": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_spinner": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_doorward": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_threadkeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_fatebound": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

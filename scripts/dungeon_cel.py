@@ -6,8 +6,9 @@ In a maker:  `import dungeon_cel; dungeon_cel.install(globals(), '<dungeon>_cel_
 `draw(enemy, clip, n)` then returns the redraw for every kind the redraw lists and the old art for the rest.
 
 Redo a dungeon from its redraw:  python3 scripts/dungeon_cel.py <key>   (preview | build)
-  key: eye_below elder_hollow thousandfold rain_crown seed_vault astrolabe thunder blooming solar amber solstice
-`build` deletes the PixelFlow sprites of the redrawn kinds, rebuilds them, exports their atlases and verifies them.
+  key: eye_below elder_hollow thousandfold rain_crown seed_vault astrolabe thunder blooming solar amber solstice nornroot
+Nornroot delegates to its native remake before the legacy deletion path.
+`build` for legacy groups deletes the PixelFlow sprites of the redrawn kinds, rebuilds them, exports their atlases and verifies them.
 """
 import importlib
 import json
@@ -47,6 +48,10 @@ def cel_kinds(key):
 
 
 def build(key):
+    if key == 'nornroot':
+        import nornroot_slime_redraw as native
+        native.build(); native.export(); native.verify()
+        return
     mod = importlib.import_module(MAKERS[key])
     kinds = cel_kinds(key)
     meta = json.loads(mod.META.read_text())
@@ -61,6 +66,9 @@ def build(key):
 
 
 def preview(key):
+    if key == 'nornroot':
+        import nornroot_slime_redraw as native
+        return native.preview()
     importlib.import_module(REDRAWS[key]).main()
 
 
