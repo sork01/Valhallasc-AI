@@ -1,0 +1,8 @@
+{
+  "pavilion_foldling": "107b28b9962b908b",
+  "pavilion_inkmoth": "c37280112de1df35",
+  "pavilion_silkguard": "1db30dcf725667e9",
+  "pavilion_mirror": "8867bd430ecd5f49",
+  "pavilion_weaver": "35bc5b0dd748cc15",
+  "pavilion_sovereign": "2bf7746f04ea01e8"
+}

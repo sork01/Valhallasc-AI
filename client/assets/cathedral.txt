@@ -217,12 +217,12 @@
     "elder_gatekeeper": "4e20500db67e5bce",
     "elder_matron": "5bd96d4e5268ca88",
     "elder_heart": "e1d401eb67826a4f",
-    "pavilion_foldling": "828735dbb8ea624f",
-    "pavilion_inkmoth": "7ee28d231f072fd2",
-    "pavilion_silkguard": "572fe84fe7faf398",
-    "pavilion_mirror": "21a7a55fe3479f83",
-    "pavilion_weaver": "3289fa3a2a60c11f",
-    "pavilion_sovereign": "b19383b79b78ec70",
+    "pavilion_foldling": "107b28b9962b908b",
+    "pavilion_inkmoth": "c37280112de1df35",
+    "pavilion_silkguard": "1db30dcf725667e9",
+    "pavilion_mirror": "8867bd430ecd5f49",
+    "pavilion_weaver": "35bc5b0dd748cc15",
+    "pavilion_sovereign": "2bf7746f04ea01e8",
     "rain_crown_droplet": "cebee698600a0c26",
     "rain_crown_oracle": "80a4b02edce612a5",
     "rain_crown_guard": "b1e7bb829162b8fc",
@@ -365,12 +365,12 @@
     "elder_gatekeeper": 60,
     "elder_matron": 52,
     "elder_heart": 63,
-    "pavilion_foldling": 59,
-    "pavilion_inkmoth": 70,
-    "pavilion_silkguard": 54,
-    "pavilion_mirror": 49,
-    "pavilion_weaver": 40,
-    "pavilion_sovereign": 60,
+    "pavilion_foldling": 55,
+    "pavilion_inkmoth": 73,
+    "pavilion_silkguard": 65,
+    "pavilion_mirror": 60,
+    "pavilion_weaver": 44,
+    "pavilion_sovereign": 69,
     "rain_crown_droplet": 51,
     "rain_crown_oracle": 55,
     "rain_crown_guard": 50,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "pavilion_foldling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_inkmoth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_silkguard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_mirror": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_weaver": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_sovereign": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

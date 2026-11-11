@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The six enemies of the Thousandfold Pavilion have new shaded artwork and distinct faces, clearer attacks and individual deaths. Paper folds, ink spills, silk crumples, mirrors crack and the Weaver curls its legs."
+    ],
+    "removed": [
+      "Replaced the old Pavilion enemy artwork to make each creature and its materials easier to recognize."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [
