@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "Temple of the Rain Crown enemies have new shaded artwork, separate faces and silhouettes, clearer attacks, and deaths that fit their water, cloth, armour and stone."
+    ],
+    "removed": [
+      "Replaced the six older Rain Crown enemy appearances to match the new enemy art style."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

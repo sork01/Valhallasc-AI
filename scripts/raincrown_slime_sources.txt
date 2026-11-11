@@ -1,0 +1,8 @@
+{
+  "rain_crown_droplet": "71a3b14a49f3c83a",
+  "rain_crown_oracle": "4d2820ab57795dd3",
+  "rain_crown_guard": "6bdb872224b5bda4",
+  "rain_crown_gatekeeper": "43bbd58541a82100",
+  "rain_crown_sibyl": "69122624349fb35e",
+  "rain_crown_sovereign": "dfc75558c8a13f18"
+}

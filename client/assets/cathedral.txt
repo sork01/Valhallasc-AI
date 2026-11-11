@@ -223,12 +223,12 @@
     "pavilion_mirror": "21a7a55fe3479f83",
     "pavilion_weaver": "3289fa3a2a60c11f",
     "pavilion_sovereign": "b19383b79b78ec70",
-    "rain_crown_droplet": "cebee698600a0c26",
-    "rain_crown_oracle": "80a4b02edce612a5",
-    "rain_crown_guard": "b1e7bb829162b8fc",
-    "rain_crown_gatekeeper": "e49a0a6de4b993f4",
-    "rain_crown_sibyl": "d2f274bd98dfa5e4",
-    "rain_crown_sovereign": "f667d982b70b58b4",
+    "rain_crown_droplet": "71a3b14a49f3c83a",
+    "rain_crown_oracle": "4d2820ab57795dd3",
+    "rain_crown_guard": "6bdb872224b5bda4",
+    "rain_crown_gatekeeper": "43bbd58541a82100",
+    "rain_crown_sibyl": "69122624349fb35e",
+    "rain_crown_sovereign": "dfc75558c8a13f18",
     "seed_mote": "29fbf7b67c98561a",
     "seed_amberwing": "5bc03c1778a4a21a",
     "seed_rootguard": "92f7eeb564e14479",
@@ -371,12 +371,12 @@
     "pavilion_mirror": 49,
     "pavilion_weaver": 40,
     "pavilion_sovereign": 60,
-    "rain_crown_droplet": 51,
-    "rain_crown_oracle": 55,
-    "rain_crown_guard": 50,
-    "rain_crown_gatekeeper": 52,
-    "rain_crown_sibyl": 66,
-    "rain_crown_sovereign": 75,
+    "rain_crown_droplet": 73,
+    "rain_crown_oracle": 53,
+    "rain_crown_guard": 49,
+    "rain_crown_gatekeeper": 53,
+    "rain_crown_sibyl": 79,
+    "rain_crown_sovereign": 87,
     "seed_mote": 46,
     "seed_amberwing": 68,
     "seed_rootguard": 56,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "rain_crown_droplet": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_oracle": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_gatekeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_sibyl": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_sovereign": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

@@ -227,15 +227,11 @@ def verify(kinds):
 
 
 if __name__ == '__main__':
-    action = sys.argv[1] if len(sys.argv) > 1 else ''
-    kinds = [k for k in sys.argv[2:] if k in KINDS] or KINDS
-    if action == 'preview':
-        preview(kinds)
-    elif action == 'build':
-        build(kinds)
-    elif action == 'export':
-        export(kinds)
-    elif action == 'verify':
-        verify(kinds)
-    else:
-        raise SystemExit('Usage: make_rain_crown_sprites.py preview | build | export | verify [kind...]')
+    import raincrown_slime_redraw as remake
+    action = sys.argv[1] if len(sys.argv) > 1 else 'preview'
+    commands = {'preview': remake.preview, 'extents': remake.extents,
+                'build': remake.build, 'refresh': remake.refresh,
+                'export': remake.export, 'verify': remake.verify}
+    if action not in commands:
+        raise SystemExit('Usage: make_rain_crown_sprites.py preview|extents|build|refresh KIND|export|verify')
+    commands[action]()
