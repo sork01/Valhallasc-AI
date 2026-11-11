@@ -1,0 +1,8 @@
+{
+  "eye_drifter": "a44e790d87d43cdc",
+  "eye_adept": "65fa46bfb8b94457",
+  "eye_lurker": "71b4258c6a3d9546",
+  "eye_lenswarden": "bceb4c1da3564610",
+  "eye_undertide": "c74c9d21b40eefbb",
+  "eye_unblinking": "5fe7fd198e15004f"
+}

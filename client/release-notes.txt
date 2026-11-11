@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The six enemies of The Eye Below have new glossy artwork, distinct menacing faces, clearer attacks and deaths that fit their bodies. The Silt Drifter and Unblinking Eye hover and fall to the floor when defeated."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

@@ -205,12 +205,12 @@
     "starseraph": "82a0f6b1f2b069b8",
     "tidejudicator": "bd9501ef46e5dd9d",
     "hierophant": "5db94628883ff5dc",
-    "eye_drifter": "96752b085e453e0b",
-    "eye_lurker": "b26920ddd3956cf3",
-    "eye_adept": "18a4a912b620f968",
-    "eye_lenswarden": "0eb143be7dc4f44d",
-    "eye_undertide": "cee54406ebec66b6",
-    "eye_unblinking": "08a70931a10944fc",
+    "eye_drifter": "a44e790d87d43cdc",
+    "eye_lurker": "71b4258c6a3d9546",
+    "eye_adept": "65fa46bfb8b94457",
+    "eye_lenswarden": "bceb4c1da3564610",
+    "eye_undertide": "c74c9d21b40eefbb",
+    "eye_unblinking": "5fe7fd198e15004f",
     "elder_thornling": "ed63c6133023dbfa",
     "elder_moth": "541493c0e137b7b9",
     "elder_barkguard": "e95cdb74da2065c5",
@@ -353,12 +353,12 @@
     "starseraph": 76,
     "tidejudicator": 78,
     "hierophant": 84,
-    "eye_drifter": 61,
-    "eye_lurker": 40,
-    "eye_adept": 56,
-    "eye_lenswarden": 55,
-    "eye_undertide": 61,
-    "eye_unblinking": 74,
+    "eye_drifter": 76,
+    "eye_lurker": 34,
+    "eye_adept": 57,
+    "eye_lenswarden": 56,
+    "eye_undertide": 57,
+    "eye_unblinking": 92,
     "elder_thornling": 34,
     "elder_moth": 65,
     "elder_barkguard": 61,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "eye_drifter": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_adept": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_lurker": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_lenswarden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_undertide": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_unblinking": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }
