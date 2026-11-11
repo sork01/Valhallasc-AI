@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.3",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The Harbinger of Night has rounded shoulders, a shaded chest and waist, and hanging robe folds with highlights and shadows."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.2",
     "date": "2026-11-11",
     "new": [],

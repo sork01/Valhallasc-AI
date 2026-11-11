@@ -1,6 +1,6 @@
 # Silent Solstice enemy artwork candidate
 
-Prepared 2026-11-11 in `/media/raid/valhallasc-data/silent-solstice-slime-work`, branch `feat/silent-solstice-slime-art`. Private candidate awaiting picture approval under the enemy remake rules in `TODO.md`. Candidate Beta 1.43.2; reconcile the current version and shared Cathedral manifest slices before deployment.
+Prepared 2026-11-11 in `/media/raid/valhallasc-data/silent-solstice-slime-work`, branch `feat/silent-solstice-slime-art`. Private candidate awaiting picture approval under the enemy remake rules in `TODO.md`. Candidate Beta 1.43.3; reconcile the current version and shared Cathedral manifest slices before deployment.
 
 Six native editable PixelFlow sources, 204 frames. Each uses a 176×172 frame and anchor (88,164), eight distinct wind-up/strike/recovery poses and eight distinct material-fitting death poses. The original clip counts and rates remain: idle 6 at 6 fps, walk 8 at 10 fps, attack 8 at 12 fps, hurt 4 at 10 fps, death 8 at 8 fps. The shared Cathedral manifest retains its 96×96 fallback, (48,90) anchor and all 140 unrelated kinds. All 129 unrelated native atlases remain byte-identical. Artwork only; no server, map, combat or reward changes.
 
@@ -48,7 +48,7 @@ Dry run by default. Disposable-copy verification: dry run writes nothing; applic
 
 ## Review pictures
 
-29 PNG/GIF files, 3,475,732 bytes, uploaded and verified against SHA-256, FileDrop MIME/metadata, byte counts, dimensions and animation frame counts. Receipt: `test-results/solstice-slime/filedrop-receipt.json`.
+29 PNG/GIF files, 3,578,653 bytes, uploaded and verified against SHA-256, FileDrop MIME/metadata, byte counts, dimensions and animation frame counts. Receipt: `test-results/solstice-slime/filedrop-receipt.json`.
 
 - [Before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-solstice-before-after.png)
 - [Attacks](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-solstice-attacks-before-after.png)
@@ -65,3 +65,9 @@ Owner feedback: the Harbinger had no readable face or hands. Moved the hood behi
 100 focused face/hand checks pass across 25 living poses (`tests/solstice-harbinger-face.py`); the pre-fix blank-face/handless atlas is rejected. The Harbinger's seven material/preservation checks pass. Its 34 editor frames equal the exported atlas. A focused bounded real-art client run passes 24 checks (`driver-xfyh4G`), including attacks, recovery, hovering, death, portrait and updated health-bar top. Review images/animations and the FileDrop receipt were refreshed. Upload skips byte-identical existing files and verifies every receipt entry. Candidate now Beta 1.43.2; still private pending picture approval.
 
 [Updated Harbinger animation](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-solstice-solstice_harbinger-animations.gif).
+
+## Harbinger body volume correction (2026-11-11)
+
+Owner feedback: the body was a flat triangle filled with one colour. Replaced that polygon with rounded shoulders, a shaded ribcage, a narrower waist and a rounded skirt of overlapping hanging cloth folds. All five purple ramp tones now describe light, midtones and shadow; the folds have recessed creases and lit edges. Fitted lapels and a moon clasp define the upper chest. The face, separate hands and staff grip remain readable. The falling crescent was retimed slightly so the longer split hem still dissipates into a monotonically descending death.
+
+All 34 editor frames equal the updated export. The focused regression now passes 125 face/hand/robe checks across 25 living poses; the previous one-colour robe fails the shading assertion (`harbinger-flat-body-mutation.json`). Seven Harbinger material/preservation checks and 24 bounded real-art client checks pass (`driver-VVx6jO`). All 134 other native Cathedral atlases remain unchanged. Reviews and FileDrop receipt refreshed. Previous model, raw/atlas/manifest and editor packet: `/media/raid/valhallasc-data/solstice-harbinger-before-volume-fix-20261111`. Candidate Beta 1.43.3, still private pending picture approval.

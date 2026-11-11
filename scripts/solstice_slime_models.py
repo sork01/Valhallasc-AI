@@ -125,7 +125,32 @@ def harbinger(setup, clip, n):
             for j in range(4):
                 tip=(x+side*(36-j*5)*fade,y+18-j*10+9*w-12*s+25*d)
                 r.poly([(x+side*9,y+14),(tip[0],tip[1]),(tip[0]-side*5,tip[1]-14*fade),(x+side*8,y-8)],SLATE[1+j%2],OUTLINE)
-        r.poly([(x-13*fade,y+15+20*d),(x+13*fade,y+15+20*d),(x+24*fade,y-25+30*d),(x+6,y-18+30*d),(x-21*fade,y-24+30*d)],PURPLE[1],OUTLINE)
+        # Rounded shoulders, ribcage and pinched waist give the cloak a body underneath.
+        # Every volume uses the five-tone purple ramp, lit from the upper left.
+        by=y+24*d
+        for side in (-1,1):
+            r.ball(x+side*13*fade,by+10*fade,7.5*fade,9*fade,PURPLE,side*.22)
+        r.ball(x-fade,by+4*fade,15*fade,17*fade,PURPLE,-.10)
+        r.ball(x,by-10*fade,10*fade,10*fade,PURPLE)
+        # Overlapping hanging cloth folds form a rounded, split hem instead of a triangle.
+        r.ball(x,by-22*fade,16*fade,12*fade,PURPLE)
+        for j,(dx,drop) in enumerate(((-10,31),(-3,35),(5,33),(12,29))):
+            flow=math.sin(ph+j*.7)*1.3 if clip in ('idle','walk') else -3*w+4*s
+            r.taper([(x+dx*.55*fade,by-12*fade),
+                     (x+(dx+flow)*fade,by-24*fade),
+                     (x+(dx+flow*.5)*fade,by-drop*fade)],PURPLE,6*fade,1.2*fade)
+        # Narrow crease shadows sit beside lit fabric ridges; these follow the belly.
+        for dx in (-7,3,10):
+            r.line([(x+dx*.5*fade,by-15*fade),(x+dx*fade,by-26*fade)],PURPLE[0],1)
+            r.line([(x+(dx-1)*fade,by-16*fade),(x+(dx-2)*fade,by-25*fade)],PURPLE[3],1)
+        r.line([(x-10*fade,by-10*fade),(x,by-13*fade),(x+9*fade,by-10*fade)],PURPLE[0],3)
+        # Two fitted lapels and a small moon clasp describe the chest's curve.
+        r.poly([(x-11*fade,by+16*fade),(x-4*fade,by+11*fade),(x,by+2*fade),
+                (x-8*fade,by+7*fade)],SLATE[1],OUTLINE)
+        r.poly([(x+10*fade,by+16*fade),(x+3*fade,by+10*fade),(x,by+2*fade),
+                (x+8*fade,by+6*fade)],SLATE[0],OUTLINE)
+        r.line([(x-10*fade,by+15*fade),(x-3*fade,by+9*fade)],PEARL[1],1)
+        r.ball(x,by+2*fade,3*fade,3*fade,GOLD)
         # Hood is BEHIND the face; the old triangle hid the brow and eyes.
         fy=y+24+24*d
         r.poly([(x-15*fade,fy-7*fade),(x-14*fade,fy+10*fade),(x,fy+27*fade),
@@ -166,7 +191,7 @@ def harbinger(setup, clip, n):
             if j < round(5*(1-d)):
                 r.ball(x-14+j*7,y+20+30*d+j*3,3*(1-d)+.5,5*(1-d)+.5,PURPLE)
     # The crescent relic alone falls; spirit colours vanish entirely at the end.
-    crescent(r,x-17-12*d,69-61*d**.25,7,SLATE[0])
+    crescent(r,x-17-12*d,69-61*d**.18,7,SLATE[0])
     return a
 
 

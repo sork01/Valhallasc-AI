@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check visible facial features and two separate hands in exported Harbinger art."""
+"""Check the face, separate hands and shaded robe in exported Harbinger art."""
 import hashlib,json,os,sys
 from pathlib import Path
 import numpy as np
@@ -7,7 +7,7 @@ from PIL import Image
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 import kindframe
-from astral_slime_redraw import PALETTE,BONE,TEAL,OUTLINE
+from astral_slime_redraw import PALETTE,BONE,TEAL,OUTLINE,PURPLE
 meta=json.loads((ROOT/'client/assets/cathedral.txt').read_text())
 w,h,ax,ay=kindframe.frame_of(meta,'solstice_harbinger')
 atlas=Image.open(os.environ.get('MUTATE_FACE_PNG',ROOT/'client/assets/cathedral_solstice_harbinger.png')).convert('RGBA')
@@ -45,8 +45,10 @@ for clip in ('idle','walk','attack','hurt'):
         assert len(hands)>=2 and min(map(len,hands[:2]))>=35,(clip,n,'two substantial visible hands')
         centers=[np.array(list(g)).mean(axis=0) for g in hands[:2]]
         assert abs(centers[0][1]-centers[1][1])>=20,(clip,n,'hands are separate at the sleeve ends')
-        checks+=4
+        robe=np.array([mask(im,[color]).sum() for color in PURPLE])
+        assert robe.min()>=20 and robe.max()/robe.sum()<.65,(clip,n,'robe has substantial shadows, midtones and highlights')
+        checks+=5
 backup=Path('/media/raid/valhallasc-data/solstice-harbinger-before-face-fix-20261111')
 other=json.loads((backup/'other-atlas-hashes.json').read_text())
 assert all(hashlib.sha256((ROOT/rel).read_bytes()).hexdigest()==sha for rel,sha in other.items()),'unrelated enemy atlases changed'
-print(f'Harbinger face/hands: {checks} checks across 25 living poses; {len(other)} other atlases unchanged')
+print(f'Harbinger face/hands/robe: {checks} checks across 25 living poses; {len(other)} other atlases unchanged')
