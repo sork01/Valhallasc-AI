@@ -287,10 +287,7 @@ def repair(kinds=None):
   print('repaired',kind,flush=True)
  export()
 if __name__=='__main__':
+ import yearwheel_slime_redraw as remake
  cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
- if cmd=='preview':preview()
- elif cmd=='build':build('--replace' in sys.argv[2:])
- elif cmd=='export':export()
- elif cmd=='verify':export(True)
- elif cmd=='repair':repair(sys.argv[2:] or None)
- else:raise SystemExit('preview | build [--replace] | export | verify | repair [creature kinds...]')
+ {'preview':remake.preview,'extents':remake.extents,'build':remake.build,
+  'refresh':remake.refresh,'export':remake.export,'verify':remake.verify}[cmd]()

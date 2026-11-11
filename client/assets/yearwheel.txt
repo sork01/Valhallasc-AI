@@ -74,40 +74,40 @@
     "year_su_travel": "318c7ac2fa7b1a24",
     "year_au_travel": "8d2c2c7c5672f557",
     "year_wi_travel": "9307a4cade00d21b",
-    "brooknewt": "26c6619f86ec0846",
-    "sundarter": "3ac8e98eef341551",
-    "acornmimic": "88ae4fadd28c192f",
-    "snowstoat": "fd115145f49a7639",
-    "bloomtortoise": "36fe65378a4d603a",
-    "petalchimera": "a2881d70c0f39c61",
-    "rainseraph": "8c663bd035785803",
-    "glasslion": "2936490c40fc143b",
-    "sunwheel": "2dfb4b0e8815a14a",
-    "firephoenix": "8291d58541a80588",
-    "lanternowl": "d083c1fe5db090bb",
-    "harvestreaper": "55b4553dba1555cb",
-    "ambermantis": "60ce554727b2ffc2",
-    "rimesaber": "1a01830346d5415b",
-    "snowgiant": "d5b89017161b7b40",
-    "longnightwyrm": "f5f5b550348b9fc8"
+    "brooknewt": "fc067e2389b30046",
+    "sundarter": "1e28ca147e7c0181",
+    "acornmimic": "582bd5acc8f00a26",
+    "snowstoat": "830603779d4c60ba",
+    "bloomtortoise": "f756db696158ea35",
+    "petalchimera": "ac59c455f6ec0be7",
+    "rainseraph": "7be03a87ef9a5b21",
+    "glasslion": "a4868fb465fa0962",
+    "sunwheel": "e318b0f09fcb4ecd",
+    "firephoenix": "e9f3000419bcd003",
+    "lanternowl": "c836a8c70ebf70ca",
+    "harvestreaper": "d803941942715dff",
+    "ambermantis": "fbdad2f694f01b05",
+    "rimesaber": "82ef18e108129524",
+    "snowgiant": "e073a605224ef33a",
+    "longnightwyrm": "b26fbcb9e6647bea"
   },
   "tops": {
-    "brooknewt": 28,
-    "sundarter": 42,
-    "acornmimic": 62,
-    "snowstoat": 34,
-    "bloomtortoise": 47,
-    "petalchimera": 56,
-    "rainseraph": 67,
-    "glasslion": 43,
-    "sunwheel": 70,
-    "firephoenix": 70,
-    "lanternowl": 64,
-    "harvestreaper": 58,
-    "ambermantis": 70,
-    "rimesaber": 51,
-    "snowgiant": 59,
-    "longnightwyrm": 51,
+    "brooknewt": 29,
+    "sundarter": 40,
+    "acornmimic": 67,
+    "snowstoat": 25,
+    "bloomtortoise": 53,
+    "petalchimera": 53,
+    "rainseraph": 92,
+    "glasslion": 44,
+    "sunwheel": 81,
+    "firephoenix": 89,
+    "lanternowl": 98,
+    "harvestreaper": 57,
+    "ambermantis": 58,
+    "rimesaber": 44,
+    "snowgiant": 68,
+    "longnightwyrm": 38,
     "year_sp_keeper": 83,
     "year_su_keeper": 83,
     "year_au_keeper": 83,
@@ -116,5 +116,167 @@
     "year_su_travel": 83,
     "year_au_travel": 83,
     "year_wi_travel": 83
+  },
+  "kindFrames": {
+    "brooknewt": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "bloomtortoise": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "petalchimera": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "rainseraph": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "sundarter": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "glasslion": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "sunwheel": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "firephoenix": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "acornmimic": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "lanternowl": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "harvestreaper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ambermantis": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "snowstoat": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "rimesaber": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    },
+    "snowgiant": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "longnightwyrm": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        96,
+        152
+      ]
+    }
   }
 }

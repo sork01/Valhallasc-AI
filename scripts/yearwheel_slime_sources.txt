@@ -1,0 +1,18 @@
+{
+  "brooknewt": "fc067e2389b30046",
+  "bloomtortoise": "f756db696158ea35",
+  "petalchimera": "ac59c455f6ec0be7",
+  "rainseraph": "7be03a87ef9a5b21",
+  "sundarter": "1e28ca147e7c0181",
+  "glasslion": "a4868fb465fa0962",
+  "sunwheel": "e318b0f09fcb4ecd",
+  "firephoenix": "e9f3000419bcd003",
+  "acornmimic": "582bd5acc8f00a26",
+  "lanternowl": "c836a8c70ebf70ca",
+  "harvestreaper": "d803941942715dff",
+  "ambermantis": "fbdad2f694f01b05",
+  "snowstoat": "830603779d4c60ba",
+  "rimesaber": "82ef18e108129524",
+  "snowgiant": "e073a605224ef33a",
+  "longnightwyrm": "b26fbcb9e6647bea"
+}
