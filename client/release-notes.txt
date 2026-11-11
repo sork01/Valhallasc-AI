@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The Amber Archive has new enemy artwork: Living Pages, Script Moths, Archive Sentinels, the Curator, the Living Chronicle, the Last Memory and Amber Cocoons each have their own look, attack and fitting death animation."
+    ],
+    "removed": [
+      "Replaced the old Amber Archive enemy artwork to give paper, armour, spirits and amber shells distinct movement."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

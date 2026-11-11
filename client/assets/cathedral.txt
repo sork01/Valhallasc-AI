@@ -259,12 +259,12 @@
     "solar_ashwarden": "6309d444f486efae",
     "solar_heliomancer": "e4008a9059f9f7f4",
     "solar_heart": "2c5225af417cfb23",
-    "amber_page": "d6ee6bf656c880cf",
-    "amber_moth": "4d3f403d3aa47482",
-    "amber_sentinel": "78337a9f18a0d120",
-    "amber_curator": "6ec26c3f958cc105",
-    "amber_chronicle": "433c0b2f39d397f8",
-    "amber_memory": "765edb3aae34e48d",
+    "amber_page": "72829a6edfe8151f",
+    "amber_moth": "e6680702d6dbbdfd",
+    "amber_sentinel": "f8fb0bd8e0cb3af9",
+    "amber_curator": "b55a6c9239a54146",
+    "amber_chronicle": "edeb25b4f2637140",
+    "amber_memory": "1dedbe85d6adf7ff",
     "solstice_flurry": "8f12653cc1520d6a",
     "solstice_owl": "88895b5cdc0e5043",
     "solstice_guard": "b5f85657b11da09e",
@@ -276,7 +276,7 @@
     "seed_sprout": "39768c572c917404",
     "seed_treant": "215216cb71475ec0",
     "solar_cinder": "270d38184ebc19fa",
-    "amber_cocoon": "1de97986cdfe4396",
+    "amber_cocoon": "556c4cbc0e04ffe1",
     "barrow_scarab": "a12a73ac8dcf45b4",
     "barrow_hound": "dbaf498b20365275",
     "barrow_spinner": "72f19ac8cc4528cd",
@@ -407,12 +407,12 @@
     "solar_ashwarden": 48,
     "solar_heliomancer": 54,
     "solar_heart": 78,
-    "amber_page": 55,
-    "amber_moth": 70,
-    "amber_sentinel": 53,
-    "amber_curator": 48,
-    "amber_chronicle": 71,
-    "amber_memory": 67,
+    "amber_page": 77,
+    "amber_moth": 60,
+    "amber_sentinel": 60,
+    "amber_curator": 56,
+    "amber_chronicle": 92,
+    "amber_memory": 87,
     "solstice_flurry": 52,
     "solstice_owl": 64,
     "solstice_guard": 51,
@@ -424,7 +424,7 @@
     "seed_sprout": 59,
     "seed_treant": 57,
     "solar_cinder": 59,
-    "amber_cocoon": 75,
+    "amber_cocoon": 62,
     "barrow_scarab": 50,
     "barrow_hound": 40,
     "barrow_spinner": 57,
@@ -592,6 +592,76 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "amber_page": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_moth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_sentinel": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_curator": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_chronicle": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_memory": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_cocoon": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

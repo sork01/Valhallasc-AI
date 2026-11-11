@@ -1,0 +1,9 @@
+{
+  "amber_page": "72829a6edfe8151f",
+  "amber_moth": "e6680702d6dbbdfd",
+  "amber_sentinel": "f8fb0bd8e0cb3af9",
+  "amber_curator": "b55a6c9239a54146",
+  "amber_chronicle": "edeb25b4f2637140",
+  "amber_memory": "1dedbe85d6adf7ff",
+  "amber_cocoon": "556c4cbc0e04ffe1"
+}

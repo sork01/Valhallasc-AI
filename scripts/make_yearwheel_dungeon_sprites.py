@@ -228,6 +228,37 @@ def verify(kinds):
         print(kind, '34 frames match indexed source')
 
 
+# Amber remakes preserve editable PixelFlow sources; Silent Solstice retains its existing maker.
+_old_preview, _old_build, _old_export, _old_verify = preview, build, export, verify
+
+def _dispatch(action, kinds):
+    import amber_slime_redraw as redraw
+    selected = list(kinds)
+    amber = [k for k in selected if k in redraw.KINDS]
+    other = [k for k in selected if k not in redraw.KINDS]
+    if amber:
+        if '--replace' in sys.argv:
+            raise SystemExit('--replace is disabled; native PixelFlow sources are preserved')
+        if action == 'preview':
+            redraw.preview()
+        else:
+            getattr(redraw, action)(amber)
+    if other:
+        {'preview': _old_preview, 'build': _old_build, 'export': _old_export, 'verify': _old_verify}[action](other)
+
+def preview(kinds):
+    return _dispatch('preview', kinds)
+
+def build(kinds):
+    return _dispatch('build', kinds)
+
+def export(kinds):
+    return _dispatch('export', kinds)
+
+def verify(kinds):
+    return _dispatch('verify', kinds)
+
+
 if __name__ == '__main__':
     action = sys.argv[1] if len(sys.argv) > 1 else ''
     kinds = [k for k in sys.argv[2:] if k in KINDS] or KINDS
@@ -240,4 +271,4 @@ if __name__ == '__main__':
     elif action == 'verify':
         verify(kinds)
     else:
-        raise SystemExit('Usage: make_blooming_sprites.py preview | build | export | verify [kind...]')
+        raise SystemExit('Usage: make_yearwheel_dungeon_sprites.py preview | build | export | verify [kind...]')
