@@ -8,16 +8,23 @@ from astral_slime_redraw import (
 
 def emberling(setup, clip, n):
     a, r, w, s, d, ph, b = setup('solar_emberling', clip, n, (0, 10), -0.34)
-    cy = 24 + b - 11 * d
     hx = 3 + 18 * s - 7 * w
     hy = 30 + b + 4 * w - 2 * s - 13 * d
 
     # Two planted basalt-cinder legs on the ground row.
-    for i, x in enumerate((-10, 10)):
-        step = math.sin(ph + i * math.pi) * 4 if clip == 'walk' else 0
-        lift = max(0, math.sin(ph + i * math.pi)) * 4 if clip == 'walk' else 0
-        r.limb([(x, cy - 6), (x + step * 0.5 - 4 * d, 11 + lift), (x + step - 7 * d, 3 + lift)], BROWN, 5)
-        r.ball(x + step - 7 * d, 3 + lift, 6.5, 3, SLATE)
+    # Anchored strictly to hx and hy so the body NEVER separates from the legs on attack!
+    for i, side in enumerate((-1, 1)):
+        step = math.sin(ph + i * math.pi) * 3.5 if clip == 'walk' else 0
+        lift = max(0, math.sin(ph + i * math.pi)) * 3.5 if clip == 'walk' else 0
+        atk_shift = (-4 * s if side < 0 else 6 * s) if clip == 'attack' else 0
+        death_shift = side * (4 * d) - 4 * d
+        foot_x = hx + side * 10 + step + atk_shift + death_shift
+        foot_y = 3 + lift
+        hip_x = hx + side * 8 + (side * 3 * d if d > 0.35 else 0)
+        hip_y = hy - 9
+        r.limb([(hip_x, hip_y), (foot_x, foot_y + 2)], BROWN, 5)
+        r.ball(foot_x, foot_y, 7, 3, SLATE)
+        r.ball(foot_x, foot_y + 1, 5, 2, BROWN)
 
     # Blazing three-pronged solar flame crown atop the coal imp (gutters out on death).
     if d < 0.65:
