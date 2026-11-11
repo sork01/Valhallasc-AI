@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.43.0",
+    "date": "2026-11-11",
+    "new": [
+      "Everybody in the towns is redrawn in the same style as the heroes: all 164 looks of the shopkeepers, guards, travel masters, quest givers and townsfolk, with the same bodies, faces and walking and talking animations as player characters. Each person keeps what makes them themselves: their clothes, hair, tools, hats, wings, bark or merfolk tail.",
+      "The people of Heartwood are now folk with bark skin, and the people of Bifrost Reach and the Shattered Span have feathered wings."
+    ],
+    "changed": [
+      "The merfolk of Nacrehold swim in the new style: longer tails that wave as they swim."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.42.0",
     "date": "2026-11-11",
     "new": [

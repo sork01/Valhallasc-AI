@@ -25,7 +25,7 @@ const errors = [];
   browser = await chromium.launch({ headless: true, args: ['--disable-gpu'] });
   const page = await browser.newPage({ viewport: { width: 960, height: 600 }, reducedMotion: 'reduce' });
   page.on('pageerror', e => errors.push(e.message));
-  const mutations = { lift: ['const LIFT = 25', 'const LIFT = 0'], lean: ['LEAN = .5', 'LEAN = 0'], wave: ['amp: [6, 2.2]', 'amp: [0, 0]'], style: ["new Set(['merfolk'])", 'new Set([])'], bubbles: ['if (sw?.moving && !sw.still && !portrait)', 'if (false)'] };
+  const mutations = { lift: ['const LIFT = 25', 'const LIFT = 0'], lean: ['LEAN = .5', 'LEAN = 0'], wave: ['amp: [6, 2.2]', 'amp: [0, 0]'], style: ['const isNew = !!fresh && !!fresh.sprites[who.art]', 'const isNew = false'], bubbles: ['if (sw?.moving && !sw.still && !portrait)', 'if (false)'] };
   if (process.env.MUTATE) {
     const [from, to] = mutations[process.env.MUTATE] || mutations.lift, src = fs.readFileSync(path.join(root, 'client/npc-art.js'), 'utf8');
     assert.ok(src.includes(from), 'the mutation applies');
@@ -52,7 +52,7 @@ const errors = [];
   });
   const styles = await page.evaluate(([a, b]) => ({ merfolk: NpcArt.styleOf(City.npcs.find(x => x.id === a)), plain: NpcArt.styleOf(window.__plain) }), [lab.first, lab.other]);
   check(styles.merfolk === 'player', `The merfolk are drawn from the player-style atlases (${styles.merfolk})`);
-  check(styles.plain === 'saved', `Everybody else keeps the saved art (${styles.plain})`);
+  check(styles.plain === 'player', `Everybody else is drawn in the player style too (${styles.plain})`);
   check(lab.merfolk >= 10, `Nacrehold shows many sprite-drawn merfolk (${lab.merfolk})`);
   check(lab.other, 'And a non-merfolk person with art to compare against');
 
@@ -149,8 +149,8 @@ const errors = [];
   check(tailRows(idleA, idleB) >= 0 && idleA.minY !== idleB.minY, 'A standing merfolk still bobs in place');
 
   // --- everybody else is unchanged: the same render is identical with and without time-based swim motion ---
-  const p1 = await key(lab.other, { moving: true, t: .2 }), p2 = await key(lab.other, { moving: true, t: .2 + 3 });
-  check(p1.maxY === p2.maxY && p1.minY === p2.minY, 'A non-merfolk keeps the same height at any time while walking');
+  const p1 = await key(lab.other, { moving: true, t: .2 }), p2 = await key(lab.other, { moving: true, t: .2 + 4 });   // 4 s = 40 steps = five whole walk cycles: the same art frame (the player-style walk bobs by itself)
+  check(p1.maxY === p2.maxY && p1.minY === p2.minY, 'A non-merfolk drawn from the same walk frame has the same height at any time (no swim bob)');
 
   assert.deepEqual(errors, []);
   console.log(`merfolk-swim-ui: ${checks} checks passed`);

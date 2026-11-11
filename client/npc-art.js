@@ -8,15 +8,14 @@
   // would continuously allocate full atlases in a busy town.
   const cacheLimit = () => Math.max(24, window.City?.npcs.length || 0);
   const loadMeta = url => fetch(url).then(r => { if (!r.ok) throw Error('NPC artwork unavailable'); return r.json(); });
-  // The player-style remake (`assets/npcp.txt`, atlases `npcp_<design>.png`, same frame, anchor, scale and clips) replaces the saved art of the species
-  // listed in NEW_STYLE, design by design; everybody else keeps the saved atlases. Both manifests name a design the same way.
-  const NEW_STYLE = new Set(['merfolk']);
+  // The player-style remake (`assets/npcp.txt`, atlases `npcp_<design>.png`, same frame, anchor, scale and clips) draws every person it has a design for;
+  // the saved atlases (`assets/npc.txt`) stay as the fallback (and carry the per-person assignment). Both manifests name a design the same way.
   const ready = Promise.all([loadMeta('assets/npc.txt').catch(() => null), loadMeta('assets/npcp.txt').catch(() => null)]).then(([a, b]) => { meta = a; fresh = b; return a; });
   const assignment = n => meta?.npcs[n.id];
   // Which manifest and atlas draw a person: the player-style one when their species is switched over and it has the design.
   function art(n) {
     const who = assignment(n); if (!who) return null;
-    const isNew = !!fresh && NEW_STYLE.has(who.identity?.species) && !!fresh.sprites[who.art], m = isNew ? fresh : meta;
+    const isNew = !!fresh && !!fresh.sprites[who.art], m = isNew ? fresh : meta;
     return { who, m, isNew, art: who.art, key: (isNew ? 'npcp_' : 'npc_') + who.art };
   }
   function source(key) {
@@ -34,7 +33,9 @@
     const who = assignment(n), identity = who.identity, signature = `${key}|${identity.skin}|${identity.hair}|${who.color}`;
     if (tinted.has(signature)) { const canvas = tinted.get(signature); tinted.delete(signature); tinted.set(signature, canvas); return canvas; }
     const remap = new Map(), materials = pose.m.designs[pose.art].materials;
-    for (const [group, color, amounts] of [['skin', identity.skin, [.65, 1, 1.5]], ['hair', identity.hair, [.6, 1, 1.4]], ['cloth', who.color, [.45, .7, 1, 1.45]]]) {
+    // The player-style manifest carries each design's own brightness steps (four per group); the saved one used these fixed ones.
+    const given = pose.m.designs[pose.art].amounts || {};
+    for (const [group, color, amounts] of [['skin', identity.skin, given.skin || [.65, 1, 1.5]], ['hair', identity.hair, given.hair || [.6, 1, 1.4]], ['cloth', who.color, given.cloth || [.45, .7, 1, 1.45]]]) {
       if (!/^#[0-9a-f]{6}$/i.test(color || '')) continue;
       amounts.forEach((amount, i) => { const from = rgb(materials[group + i]); remap.set((from[0] << 16) | (from[1] << 8) | from[2], shade(color, amount)); });
     }
@@ -150,7 +151,7 @@
     let x = socket.x * scale * (pose.mirrored ? -1 : 1), y = socket.y * scale, collar = socket.collar * scale;
     const sw = swimPose(n, t, pose, false);
     if (sw) {
-      const py = -(ay - sw.geo.waist) * scale, c = Math.cos(sw.angle), s = Math.sin(sw.angle), ry = y - py;
+      const py = -(pose.m.anchor[1] - sw.geo.waist) * scale, c = Math.cos(sw.angle), s = Math.sin(sw.angle), ry = y - py;
       const turnedX = x * c - ry * s, turnedY = py + x * s + ry * c, lift = sw.lift * (n.look?.scale || 1);
       collar += turnedY - y - lift; x = turnedX; y = turnedY - lift;
     }
