@@ -301,13 +301,13 @@
     "null_bell": "ea1994b72d8fd997",
     "null_conductor": "5ab4713e1a8a05fc",
     "null_hour": "b43118cf23ca300c",
-    "ew_ashback": "a849e2ae9ba603b0",
-    "ew_glasswing": "2b04c156614d4f2e",
-    "ew_slagjaw": "bbe03698e0ef272b",
-    "ew_cinderhorn": "d4c66d1eb185f731",
-    "ew_chainmaw": "9b4aefc7bf83f7df",
-    "ew_bellows": "e4e211cff75a6ee6",
-    "ew_crown": "fc20c92203450ba5",
+    "ew_ashback": "2bbd1d60a27e12d7",
+    "ew_glasswing": "122a4fe7c7d09fd0",
+    "ew_slagjaw": "cb0e594ac0aea3e2",
+    "ew_cinderhorn": "c16125cb432f4de7",
+    "ew_chainmaw": "79c86c8e75383576",
+    "ew_bellows": "7c912134420335fa",
+    "ew_crown": "f2c84ae0421f03c4",
     "cf_brute": "7a916892cb14946b",
     "cf_crawler": "e9bc0b1055785a8a",
     "cf_caster": "1bf6771b70493090",
@@ -449,12 +449,12 @@
     "null_bell": 75,
     "null_conductor": 68,
     "null_hour": 72,
-    "ew_ashback": 50,
-    "ew_glasswing": 68,
+    "ew_ashback": 51,
+    "ew_glasswing": 80,
     "ew_slagjaw": 49,
-    "ew_cinderhorn": 61,
-    "ew_chainmaw": 54,
-    "ew_bellows": 78,
+    "ew_cinderhorn": 62,
+    "ew_chainmaw": 52,
+    "ew_bellows": 76,
     "ew_crown": 80,
     "cf_brute": 59,
     "cf_crawler": 64,
@@ -592,6 +592,76 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "ew_ashback": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_glasswing": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_slagjaw": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_cinderhorn": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_chainmaw": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_bellows": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_crown": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

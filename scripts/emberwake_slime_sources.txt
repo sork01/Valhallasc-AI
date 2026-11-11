@@ -1,0 +1,9 @@
+{
+  "ew_ashback": "2bbd1d60a27e12d7",
+  "ew_glasswing": "122a4fe7c7d09fd0",
+  "ew_slagjaw": "cb0e594ac0aea3e2",
+  "ew_cinderhorn": "c16125cb432f4de7",
+  "ew_chainmaw": "79c86c8e75383576",
+  "ew_bellows": "7c912134420335fa",
+  "ew_crown": "f2c84ae0421f03c4"
+}

@@ -72,10 +72,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
     const result=[];
     for(const kind of meta.kinds.filter(k=>k.startsWith('ew_'))){
       const img=new Image();img.src='assets/cathedral_'+kind+'.png';await img.decode();
-      result.push({kind,w:img.width,h:img.height,editable:!!meta.sprites[kind],top:meta.tops[kind]});
+      const fr=Field.frameOf({meta},kind);
+      result.push({kind,w:img.width,h:img.height,fw:fr.w,fh:fr.h,editable:!!meta.sprites[kind],top:meta.tops[kind]});
     }return result;
   });
-  assert.equal(art.length,7);assert.ok(art.every(i=>i.w===768&&i.h===480&&i.editable&&i.top));
+  assert.equal(art.length,7);assert.ok(art.every(i=>i.w===8*i.fw&&i.h===5*i.fh&&i.editable&&i.top));
   await page.evaluate(()=>WorldMap.show());
   await page.locator('.wm-tile[data-zone="45"]').click();
   await page.waitForFunction(()=>WorldMap.zone===45&&WorldMap.view==='zone');

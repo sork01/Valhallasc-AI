@@ -63,9 +63,11 @@ REAL_SPRITES=1 node tests/emberwake-ui.cjs
 ```
 
 Use the Node path and NODE_PATH from AGENTS.md. Build/export use the PixelFlow
-API; `build --replace` discards only these seven sprites' editor changes.
-All seven atlases use the existing 96×96, anchor (48,90), 34-frame contract
-and are added to the shared cathedral manifest without overwriting old kinds.
+API. The native enemy-art candidate refuses `--replace`, preserves saved editor
+frames on export, and uses per-kind 176×172 frames anchored at (88,164),
+with the original 34-frame clip contract. It merges only these seven kinds
+into the shared Cathedral manifest. See [enemy-art candidate](emberwake-slime-art.md)
+for source IDs, focused checks, review pictures and guarded rollback.
 Full contact sheets contain all frames, not just the first six of each clip.
 Scenery lives in client/emberwakeart.js; there is no client build step.
 The molten river is a single cached terrain texture sampled in world coordinates
