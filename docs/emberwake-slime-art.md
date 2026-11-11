@@ -3,7 +3,7 @@
 Seven enemies are redrawn on `feat/emberwake-slime-art` in
 `/media/raid/valhallasc-data/emberwake-slime-work`. Live artwork stays unchanged.
 The enemy-art backlog requires picture approval before deployment. Candidate
-Beta 1.43.1 needs version reconciliation at integration.
+Beta 1.43.2 needs version reconciliation at integration.
 
 Seven native PixelFlow sources contain 238 editable frames. Every kind has
 its own fierce face, eight distinct attack poses and eight fitting death poses.
@@ -17,14 +17,15 @@ changes. No server build or restart.
 | `ew_ashback` | `2bbd1d60a27e12d7` | Long molten salamander, tapered tail, rock back plates and a narrow lizard socket. Coils back then lunges with its muzzle; four legs fold, torso settles and molten skin cools to stone. |
 | `ew_glasswing` | `122a4fe7c7d09fd0` | Six-legged glass moth, faceted compound eyes, antennae and rigid veined wing panels. Wings draw back then cast cinder shards; panels rotate at their roots, crack, fold and land from hover. |
 | `ew_slagjaw` | `cb0e594ac0aea3e2` | Squat plated burrower, interlocking dorsal blades, wedge snout and recessed reptilian eye. Lower jaw opens on its visible rear hinge then bites; legs tuck beneath the plated torso, jaw closes and fissures darken. |
-| `ew_cinderhorn` | `c16125cb432f4de7` | Tall-shouldered stone ram with spiral iron horns, rectangular pupil and beard. Raises its head then drives its horns down and forward; legs fold, belly settles and exposed fire cools. |
+| `ew_cinderhorn` | `c16125cb432f4de7` | Tall-shouldered stone ram with thick tapered iron curls rooted at the temples, rectangular pupil and beard. Raises its head then drives its horns down and forward; legs fold, belly settles and exposed fire cools. |
 | `ew_chainmaw` | `79c86c8e75383576` | Broad shackled beast with square muzzle, one scarred eye and attached jaw bridle. Opens and raises its jaws then slams; legs fold, molten seams cool and the linked bridle follows the jaw into the corpse. |
 | `ew_bellows` | `7c912134420335fa` | Yrsa has a severe human scowl, iron crown, burgundy coat and accordion forearms. Bellows expand on wind-up, compress into a two-nozzle flame cast, then recover; knees buckle, arms fold and flames extinguish. |
-| `ew_crown` | `f2c84ae0421f03c4` | Charcoal humanoid with asymmetric fissure eyes, furnace mouth, huge fists and a separate broken crown. Fists rise and hammer down; stone limbs buckle, the core cools and the crown drops to the ground beside the torso. |
+| `ew_crown` | `f2c84ae0421f03c4` | Charcoal humanoid with asymmetric fissure eyes, furnace mouth, huge fists and a broken crown seated on its head. Fists rise and hammer down; stone limbs buckle, the core cools and the crown drops to the ground beside the torso. |
 
 Original/new idle opaque dimensions: Ashback 72×48 / 72×49, Glasswing 73×55 /
-75×55, Slagjaw 70×47 / 69×48, Cinderhorn 72×59 / 72×61, Chainmaw 69×51 /
-70×51, Yrsa 74×75 / 73×75, Ember 76×79 / 77×79. Scale was chosen after original
+75×55, Slagjaw 70×47 / 69×48, Cinderhorn 72×59 / 72×65, Chainmaw 69×51 /
+70×51, Yrsa 74×75 / 73×75, Ember 76×79 / 77×70. The corrected horn outline is taller and the seated crown lower; body scale stays
+unchanged. Scale was chosen after original
 in-game captures and before creating sources; existing elite scaling stays intact.
 Grounded frames rest on the anchor; Glasswing hovers at least 12 pixels and
 lands monotonically on death. Raw canvas clipping is checked before grounding.
@@ -95,7 +96,7 @@ the same scale.
 33 review PNG/GIFs include rosters, before/after attacks and deaths, and each
 kind's complete sheet and animations. `emberwake_slime_review.py upload` checks
 SHA-256, byte lengths, MIME metadata, dimensions and animation counts.
-All 33 files / 4,592,622 bytes are uploaded and verified. Receipt:
+All 33 files are uploaded and verified, refreshed after the head corrections. Receipt:
 `test-results/emberwake-slime/filedrop-receipt.json`.
 
 - [Before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-emberwake-before-after.png)
@@ -104,3 +105,24 @@ All 33 files / 4,592,622 bytes are uploaded and verified. Receipt:
 
 Awaiting picture approval. Next enemy-art group: The Chained Forge
 (`FORGE-SLIME-ART`).
+
+## Head details corrected after owner review
+
+The owner reported Cinderhorn's odd horns and Ember's floating crown. Thin loop
+horns are replaced by thick tapered, shaded C-shaped ram curls with visible
+temple roots; the far curl sits behind the skull and the near curl overlaps the
+temple. The crown has a solid band overlapping the scalp and uses the head's
+transform through idle, walking, attacks and hurt. It detaches only during death,
+then lands beside the body. Source IDs and frame sizes stay unchanged.
+
+43 focused client assertions pass for these two kinds (`driver-9CLspU`), plus
+14 material/preservation assertions. A silhouette connectivity check verifies the
+crown remains joined to the head in every living pose and rejects the previous
+floating crown. All 68 changed editor/export frames match; every other native
+atlas remains byte-identical to the previous candidate. No encounter tests.
+
+The 33 review pictures/animations are refreshed, with one additional
+[focused correction comparison](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-emberwake-head-fixes.png).
+Previous candidate art/model/raw frames are retained in
+`/media/raid/valhallasc-data/emberwake-head-details-before-20261111`.
+Candidate Beta 1.43.2 remains private pending picture approval.

@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.2",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "Cinderhorn's horns are thick curved ram horns rooted in its head. The Uncrowned Ember wears its crown directly on its head until it falls off during death."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.1",
     "date": "2026-11-11",
     "new": [],

@@ -129,13 +129,24 @@ def cinderhorn(setup,clip,n):
     r.taper([(x-28,y+5),(x-35,y+12),(x-38,y+9)],cooled(d),4,1)
     hx=x+23+11*s-5*w;hy=y+15+14*w-16*s
     r.limb([(x+8,y+6),(hx-5,hy-4)],cooled(d),9)
+    def horn(rootx, rooty, size):
+        # A thick open ram curl rooted at the temple, with an inward-pointing tip.
+        curve=[(0,0),(-2,9),(-10,15),(-20,14),(-25,6),(-24,-4),(-17,-10),(-11,-7),(-12,-3)]
+        pts=[(rootx+u*size,rooty+v*size) for u,v in curve]
+        r.limb(pts[:6],IRON,10*size)
+        r.taper(pts[5:],IRON,5*size,.7*size)
+        r.ball(rootx,rooty,5.6*size,6.2*size,IRON)
+        # Lit upper ridge and short growth grooves follow the horn's solid curve.
+        r.line([(px,py+1.2*size) for px,py in pts[:6]],IRON[3],1)
+        for j in (1,2,3,4,5):
+            px,py=pts[j];vx=pts[j+1][0]-pts[j-1][0];vy=pts[j+1][1]-pts[j-1][1]
+            length=math.hypot(vx,vy);nx=-vy/length;ny=vx/length
+            width=(3.3-j*.35)*size
+            r.line([(px-nx*width,py-ny*width),(px+nx*width,py+ny*width)],IRON[1],1)
+    # Far curl is behind the skull; the larger near curl grows from the visible temple.
+    horn(hx+7,hy+10,.72)
     r.ball(hx,hy,12,14,cooled(d));r.ball(hx+6,hy-9,9,7,IRON)
-    # True spiral iron horns with a bright outer ridge, attached to the head.
-    for side in (-1,1):
-        cx=hx-8+side*9;cy=hy+10
-        pts=[(cx+math.cos(t)*rr,cy+math.sin(t)*rr) for t,rr in [(j*.30,12-j*.44) for j in range(20)]]
-        r.limb(pts,IRON,3)
-        r.line(pts[:10],GOLD[2],1)
+    horn(hx-3,hy+9,1.)
     r.poly([(hx+1,hy+3),(hx+10,hy+3),(hx+9,hy-1),(hx+2,hy-1)],OUTLINE)
     if d<.65:
         r.poly([(hx+3,hy+2),(hx+9,hy+2),(hx+9,hy),(hx+3,hy)],GOLD[3])
@@ -231,9 +242,18 @@ def crown(setup,clip,n):
         r.line([(hx-10,hy+4),(hx-5,hy+2)],FIRE[4],2)
         r.line([(hx+9,hy+7),(hx+7,hy)],FIRE[3],2)
     r.poly([(hx-8,hy-8),(hx-3,hy-6),(hx+1,hy-9),(hx+9,hy-7),(hx+6,hy-14),(hx-5,hy-15)],cooled(d)[2],OUTLINE)
-    # Separate broken crown drops onto the ground beside the fallen stone body.
-    cr=r if d<.5 else type(r)(a,0,0,0)
-    cx=hx if d<.5 else 20+24*d
-    cy=hy+27 if d<.5 else (hy+27)*(1-d)-3*d
-    plate(cr,[(cx-18,cy),(cx-20,cy+15),(cx-10,cy+8),(cx-6,cy+18),(cx-2,cy+3),(cx+6,cy),(cx+10,cy+13),(cx+14,cy+6),(cx+19,cy+14),(cx+17,cy-2)],GOLD)
+    # The solid rim overlaps the scalp; only the death clip sheds the crown.
+    seat=hy+12
+    if d<=.4:
+        cr,cx,cy=r,hx,seat
+    else:
+        t=(d-.4)/.6
+        sx,sy=r.t(hx,seat)
+        cx,cy=sx*(1-t)+44*t,sy*(1-t)-3*t
+        cr=type(r)(a,cx,cy,r.phi*(1-t))
+    plate(cr,[(cx-17,cy),(cx+17,cy),(cx+18,cy+7),(cx+19,cy+17),
+              (cx+11,cy+11),(cx+7,cy+20),(cx+3,cy+7),(cx-3,cy+7),
+              (cx-8,cy+18),(cx-12,cy+10),(cx-20,cy+16),(cx-18,cy+3)],GOLD)
+    cr.line([(cx-16,cy+3),(cx+16,cy+3)],GOLD[3],2)
+    cr.line([(cx-15,cy+6),(cx+15,cy+6)],GOLD[0],1)
     return a

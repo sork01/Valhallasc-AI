@@ -29,6 +29,27 @@ def bounds(mask):
     y,x=np.nonzero(mask);assert len(y),'material vanished'
     return int(x.min()),int(y.min()),int(x.max()),int(y.max())
 
+def crown_on_body(im):
+    # A worn crown must be part of the body's connected silhouette, not a floating island.
+    from collections import deque
+    alpha=im[:,:,3]>0;seen=np.zeros(alpha.shape,dtype=bool);largest=[]
+    for y,x in zip(*np.nonzero(alpha)):
+        if seen[y,x]:continue
+        seen[y,x]=True;component=[];todo=deque([(y,x)])
+        while todo:
+            yy,xx=todo.popleft();component.append((yy,xx))
+            for dy in (-1,0,1):
+                for dx in (-1,0,1):
+                    ny,nx=yy+dy,xx+dx
+                    if 0<=ny<alpha.shape[0] and 0<=nx<alpha.shape[1] and alpha[ny,nx] and not seen[ny,nx]:
+                        seen[ny,nx]=True;todo.append((ny,nx))
+        if len(component)>len(largest):largest=component
+    body=np.zeros(alpha.shape,dtype=bool)
+    for y,x in largest:body[y,x]=True
+    gold=material(im,R.GOLD)
+    return gold.any() and (body&gold).sum()>=gold.sum()*.98
+
+
 check(without_emberwake(meta)==without_emberwake(base),'all 139 unrelated Cathedral kinds and manifest fields preserved')
 hashes=json.loads((BACKUP/'manifest.txt').read_text())['unrelatedPngs']
 check(all(hashlib.sha256((R.ASSETS/name).read_bytes()).hexdigest()==digest for name,digest in hashes.items()),f'all {len(hashes)} unrelated native PNGs unchanged')
@@ -56,4 +77,6 @@ for kind in selected:
     else:
         check(db[3]-db[1]<(ib[3]-ib[1])*.75,'Uncrowned Ember: stone limbs buckle and torso slumps')
         gold=material(dead,R.GOLD);check(gold.sum()>30 and bounds(gold)[3]>=ay-4,'Uncrowned Ember: broken crown falls beside the body onto the ground')
+        living=[cell(kind,clip,n) for clip,(_,count) in R.CLIPS.items() if clip!='die' for n in range(count) if (clip,n)!=('hurt',0)]
+        check(all(crown_on_body(im) for im in living),'Uncrowned Ember: crown stays joined to the head silhouette in every living pose')
 print(f'emberwake-materials: {checks} checks')
