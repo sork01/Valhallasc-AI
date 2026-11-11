@@ -62,15 +62,15 @@ def ray(setup, clip, n):
     drift = math.sin(ph) * 2.5 if clip == 'walk' else 0
     flap = (math.sin(ph) * 10 if clip in ('idle', 'walk') else (14 * w - 12 * s)) * (1 - 0.9 * d)
     curl = d
-    x = 6 + 10 * s - 7 * w + drift
+    x = 12 + 8 * s - 5 * w + drift
     y = 58 + b + 5 * w - 2 * s - 28 * d + (math.cos(ph) * 1.5 if clip == 'walk' else 0)
 
     # 1. Smooth 9-point sinuous S-curve whip-tail streaming behind (-x) from the rear of the manta disc.
     tail_pts = []
     for k in range(9):
         u = k / 8.0
-        tx = x - 16 - u * (44 - 6 * curl) - 4 * w * u + 6 * s * u
-        wave = math.sin(ph - u * 3.6) * (1.5 + 4.5 * u) if clip in ('idle', 'walk') else (math.sin(u * 3.14) * (8 * w - 6 * s))
+        tx = x - 15 - u * (32 - 5 * curl) - 3 * w * u + 5 * s * u
+        wave = math.sin(ph - u * 3.6) * (1.5 + 4.0 * u) if clip in ('idle', 'walk') else (math.sin(u * 3.14) * (7 * w - 5 * s))
         ty = y + 2 - 2 * u + wave * (1 - curl) - 3 * curl * u
         tail_pts.append((tx, ty))
     r.taper(tail_pts, AZURE, 5, 1.5)
