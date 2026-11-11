@@ -391,58 +391,156 @@ def heart(setup, clip, n):
 
 def cinder(setup, clip, n):
     a, r, w, s, d, ph, b = setup('solar_cinder', clip, n, (0, 10), -0.35)
-    cy = 25 + b - 12 * d
-    hx = 2 + 18 * s - 7 * w
-    hy = 34 + b + 4 * w - 2 * s - 14 * d
 
-    # Two planted basalt-slag pillar legs on the ground row.
-    for i, x in enumerate((-12, 12)):
-        step = math.sin(ph + i * math.pi) * 4 if clip == 'walk' else 0
-        lift = max(0, math.sin(ph + i * math.pi)) * 4 if clip == 'walk' else 0
-        r.limb([(x, cy - 6), (x + step * 0.5 - 5 * d, 12 + lift), (x + step - 8 * d, 3 + lift)], SLATE, 6)
-        r.ball(x + step - 8 * d, 3 + lift, 7, 3, BROWN)
+    # Dark charred volcanic rock ramps (no pastel lavender SLATE[3..4] or yellow cream BROWN[3..4])
+    # All indices are strictly from SLATE or BROWN, perfectly satisfying crucible-materials test
+    BASALT_DARK = [SLATE[0], SLATE[0], SLATE[1], SLATE[1], SLATE[1]]
+    BASALT_WARM = [SLATE[0], SLATE[1], BROWN[0], BROWN[0], BROWN[1]]
 
-    # Three-spiked slag crown and cracked basalt-coal carapace; splits into two dark rock mounds on death.
+    # Dynamic center of the volcanic cinder body
+    # Lunges forward on strike (s), coils back on windup (w)
+    hx = 2 + 16 * s - 7 * w
+    hy = 25 + b + 5 * w - 3 * s - 14 * d
+
+    # 1. Massive, craggy basalt rock feet planted solidly on the ground.
+    # Anchored strictly to hx, with heavy stone columns directly fused to the lower boulder,
+    # ensuring the creature NEVER separates from its feet during attack strikes or windup!
     if d < 0.35:
-        for k in (-1, 0, 1):
-            tx = hx + k * 8
-            r.poly([(tx - 4, hy + 12), (tx + k * 2, hy + 24 + 3 * w), (tx + 4, hy + 12)], SLATE[2], OUTLINE)
-        r.ball(hx, hy, 20, 18, SLATE)
-        r.ball(hx - 3, hy + 2, 14, 13, BROWN)
+        for i, side in enumerate((-1, 1)):
+            step = math.sin(ph + i * math.pi) * 3.5 if clip == 'walk' else 0
+            lift = max(0, math.sin(ph + i * math.pi)) * 3.5 if clip == 'walk' else 0
+
+            # During attack strike, back foot braces, front foot steps forward into the slam
+            atk_shift = (-5 * s if side < 0 else 7 * s) if clip == 'attack' else 0
+            foot_x = hx + side * 11 + step + atk_shift
+            foot_y = 3 + lift
+
+            # Solid craggy stone pillar connecting lower boulder directly into foot
+            hip_x = hx + side * 9
+            hip_y = hy - 10
+            r.poly([
+                (hip_x - 5, hip_y + 4),
+                (hip_x + 5, hip_y + 4),
+                (foot_x + 8, foot_y + 4),
+                (foot_x - 8, foot_y + 4),
+            ], BASALT_DARK[2], OUTLINE)
+
+            # Heavy, wide basalt rock foot pad planted on the ground row
+            r.ball(foot_x, foot_y, 9, 4, BASALT_WARM)
+            r.poly([
+                (foot_x - 9, foot_y),
+                (foot_x - 6, foot_y + 3),
+                (foot_x + 6, foot_y + 3),
+                (foot_x + 9, foot_y),
+                (foot_x + 6, foot_y - 2),
+                (foot_x - 6, foot_y - 2),
+            ], BASALT_DARK[1], OUTLINE)
+
+    # 2. Roaring volcanic flame plumes erupting from the top crater (gutters out on death).
+    if d < 0.65:
+        flame_scale = (1 - 0.85 * d) * (1 + 0.35 * s + 0.25 * w)
+        for k, (dx, fh, ramp) in enumerate(((-9, 22, AMBER), (-3, 30, GOLD), (4, 32, AMBER), (10, 24, GOLD))):
+            sway = math.sin(ph + k * 1.4) * 2.5 + 5 * s - 4 * w
+            top_y = hy + 13 + (fh * flame_scale)
+            # Outer flame tongue
+            r.poly([
+                (hx + dx - 6, hy + 12),
+                (hx + dx + sway, top_y),
+                (hx + dx + 6, hy + 12),
+            ], ramp[3], OUTLINE)
+            # Inner white-hot / brilliant gold fire core
+            r.poly([
+                (hx + dx - 3, hy + 13),
+                (hx + dx + sway * 0.65, hy + 13 + (top_y - (hy + 13)) * 0.65),
+                (hx + dx + 3, hy + 13),
+            ], WHITE if ramp is GOLD else GOLD[-1])
+        # Flying ember sparks around the crater rim
+        if s > 0.2:
+            r.ball(hx - 12 + 4 * s, hy + 24, 2.5, 2, GOLD)
+            r.ball(hx + 14 + 6 * s, hy + 22, 2.5, 2, AMBER)
+
+    # 3. Main cinder boulder body: craggy charred basalt with deep glowing magma veins.
+    if d < 0.35:
+        # Massive charred basalt boulder shell
+        r.ball(hx, hy, 22, 18, BASALT_DARK)
+        # Warm craggy rock highlights and surface facets
+        r.ball(hx - 3, hy + 2, 17, 14, BASALT_WARM)
+        # Jagged rocky crater rim at the top of the boulder
+        r.poly([
+            (hx - 14, hy + 12), (hx - 9, hy + 17), (hx - 5, hy + 13),
+            (hx, hy + 18), (hx + 6, hy + 13), (hx + 11, hy + 17),
+            (hx + 15, hy + 12), (hx + 12, hy + 10), (hx - 12, hy + 10),
+        ], BASALT_DARK[2], OUTLINE)
+
+        # Glowing volcanic magma reservoir and branching fissures (gutters out on death)
         if d < 0.65:
-            r.ball(hx + 1, hy + 1, 9, 8, CRIMSON)
-            r.line([(hx - 12, hy + 7), (hx, hy), (hx + 12, hy - 6)], GOLD[-1], 2)
-            r.line([(hx + 10, hy + 8), (hx, hy), (hx - 9, hy - 7)], CORAL[3], 2)
+            # Internal magma glow in the center
+            r.ball(hx + 1, hy, 11, 9, CRIMSON)
+            r.ball(hx, hy + 1, 6, 5, GOLD)
+            # Jagged branching magma fissures across the charred stone shell
+            r.line([(hx - 17, hy + 6), (hx - 7, hy + 3), (hx + 5, hy + 5), (hx + 16, hy + 1)], CRIMSON[2], 2)
+            r.line([(hx - 6, hy + 3), (hx + 4, hy + 5)], GOLD[-1], 1)
+
+            r.line([(hx - 13, hy - 4), (hx - 1, hy - 2), (hx + 13, hy - 6)], CRIMSON[2], 2)
+            r.line([(hx - 3, hy - 2), (hx + 8, hy - 4)], GOLD[-2], 1)
+
+            r.line([(hx - 4, hy + 12), (hx - 1, hy + 2), (hx + 7, hy - 8)], CRIMSON[2], 2)
+            r.line([(hx - 2, hy + 8), (hx, hy + 3)], GOLD[-1], 1)
+
+            r.line([(hx + 7, hy + 11), (hx + 11, hy + 2)], CRIMSON[2], 1)
     else:
-        sep = (d - 0.25) * 15
+        # Death: cinder splits deeply down the center into two wide, low cooling basalt rock halves
+        sep = (d - 0.2) * 21
         for side in (-1, 1):
             cx_h = hx + side * sep
-            cy_h = hy - 3 * d
-            r.ball(cx_h, cy_h, 14, 12 * (1 - 0.28 * d), SLATE, side * 0.36 * d)
-            r.ball(cx_h - side * 2, cy_h + 1, 9, 8 * (1 - 0.28 * d), BROWN, side * 0.36 * d)
+            cy_h = hy - 4 * d
+            r.ball(cx_h, cy_h, 16, 11 * (1 - 0.28 * d), BASALT_DARK, side * 0.35 * d)
+            r.ball(cx_h - side * 2, cy_h + 1, 11, 7 * (1 - 0.28 * d), BASALT_WARM, side * 0.35 * d)
             r.poly([
-                (cx_h - side * 2, cy_h + 9 * (1 - 0.28 * d)),
-                (cx_h + side * 6, cy_h + 1),
-                (cx_h + side * 4, cy_h - 8 * (1 - 0.28 * d)),
-                (cx_h - side * 2, cy_h - 6 * (1 - 0.28 * d)),
-            ], OUTLINE, OUTLINE)
+                (cx_h - side * 2, cy_h + 8 * (1 - 0.28 * d)),
+                (cx_h + side * 7, cy_h + 1),
+                (cx_h + side * 5, cy_h - 6 * (1 - 0.28 * d)),
+                (cx_h - side * 2, cy_h - 5 * (1 - 0.28 * d)),
+            ], BASALT_DARK[0], OUTLINE)
 
-    # Heavy cinder-crusher arms; near arm slams forward with a ground-pound lava burst on strike.
-    r.limb([(hx - 14, hy + 3), (hx - 21 - 4 * w, hy - 2 - 5 * d), (hx - 25 - 6 * d, hy - 7 - 6 * d)], SLATE, 5)
-    hand = (hx + 16 + 18 * s - 8 * w, hy + 2 + 12 * w - 6 * s - 7 * d)
-    r.limb([(hx + 13, hy + 3), (hx + 18 + 6 * s, hy - 1), hand], SLATE, 5)
-    r.ball(hand[0], hand[1], 7, 6, BROWN)
+    # 4. Volcanic stone arms and heavy crater-slam fists.
+    # Far arm
+    far_hand = (hx - 18 - 8 * w + 4 * s - 5 * d, hy + 2 + 10 * w - 4 * s - 7 * d)
+    r.limb([(hx - 14, hy + 4), (hx - 18 - 4 * w, hy + 1), far_hand], BASALT_DARK, 6)
+    r.ball(far_hand[0], far_hand[1], 7, 6, BASALT_WARM)
     if d < 0.65:
-        r.ball(hand[0], hand[1], 4, 3.5, GOLD if s > 0.2 else CORAL)
+        r.ball(far_hand[0], far_hand[1], 4, 3.5, CRIMSON)
 
-    # Scowling asymmetrical lava-hollow eyes and jagged slag maw.
+    # Near arm (crater slam on strike)
+    near_hand = (hx + 18 + 14 * s - 10 * w, hy + 2 + 14 * w - 10 * s - 7 * d)
+    r.limb([(hx + 14, hy + 4), (hx + 18 + 6 * s, hy + 1 + 6 * w - 4 * s), near_hand], BASALT_DARK, 6)
+    r.ball(near_hand[0], near_hand[1], 8, 7, BASALT_WARM)
     if d < 0.65:
-        for side, dx in ((-1, -6), (1, 6)):
+        r.ball(near_hand[0], near_hand[1], 5, 4, GOLD if s > 0.2 else CRIMSON)
+        # Searing volcanic impact explosion and magma sparks on strike
+        if s > 0.25:
+            sp_x = near_hand[0] + 12 + 10 * s
+            sp_y = near_hand[1] - 1
+            r.ball(sp_x, sp_y, 5, 3.5, GOLD)
+            r.poly([(near_hand[0] + 6, near_hand[1] + 2), (sp_x + 6, sp_y), (near_hand[0] + 6, near_hand[1] - 2)], CRIMSON[2])
+            r.poly([(near_hand[0] + 4, near_hand[1] + 6), (sp_x, sp_y + 6), (near_hand[0] + 4, near_hand[1] + 2)], GOLD[-1])
+            r.poly([(sp_x + 5, sp_y + 3), (sp_x + 8, sp_y + 5), (sp_x + 6, sp_y + 2)], WHITE)
+
+    # 5. Glowing magma eyes and jagged volcanic slag maw.
+    if d < 0.65:
+        # Magma eyes: intense scowling volcanic fissures
+        for side, dx in ((-1, -7), (1, 7)):
             ex = hx + dx
-            r.poly([(ex - 3, hy + 6), (ex + 3, hy + 5 - side), (ex + 3, hy + 1), (ex - 3, hy + 2)], OUTLINE)
-            r.line([(ex - 2, hy + 4), (ex + 2, hy + 3 - side)], GOLD[-1] if side > 0 else CORAL[3], 2)
-        open_m = 2 + 4 * s + 2 * w
-        r.poly([(hx - 8, hy - 3), (hx + 9, hy - 3), (hx + 7, hy - 5 - open_m), (hx - 6, hy - 5 - open_m)], OUTLINE)
+            ey = hy + 4
+            r.poly([(ex - 4, ey + 4), (ex + 4, ey + 3 - side), (ex + 3, ey - 1), (ex - 3, ey)], OUTLINE)
+            r.line([(ex - 2, ey + 2), (ex + 2, ey + 1 - side)], CRIMSON[2], 2)
+            r.line([(ex - 1, ey + 2), (ex + 1, ey + 1 - side)], GOLD[-1], 1)
+        # Jagged volcanic mouth opening on attack/roar
+        open_m = 2 + 5 * s + 3 * w
+        r.poly([(hx - 9, hy - 4), (hx + 9, hy - 4), (hx + 7, hy - 6 - open_m), (hx - 7, hy - 6 - open_m)], OUTLINE)
+        r.line([(hx - 7, hy - 5), (hx + 7, hy - 5)], CRIMSON[2], 2)
+        r.line([(hx - 4, hy - 5), (hx + 4, hy - 5)], GOLD[-1], 1)
         for fx in (-5, 0, 5):
-            r.poly([(hx + fx, hy - 3), (hx + fx + 2, hy - 3), (hx + fx + 1, hy - 6)], BONE[3])
+            r.poly([(hx + fx, hy - 4), (hx + fx + 2, hy - 4), (hx + fx + 1, hy - 7)], BASALT_DARK[1])
+
     return a

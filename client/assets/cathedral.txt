@@ -423,7 +423,7 @@
     "reliquarypearl": 56,
     "seed_sprout": 59,
     "seed_treant": 57,
-    "solar_cinder": 47,
+    "solar_cinder": 58,
     "amber_cocoon": 75,
     "barrow_scarab": 50,
     "barrow_hound": 40,
