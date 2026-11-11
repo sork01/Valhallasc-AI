@@ -1,0 +1,9 @@
+{
+  "snowhare": "c614901c29f613b5",
+  "iceotter": "3c56f1a0bd323154",
+  "frostheron": "aaddb10193b578cf",
+  "glaciercrab": "97c834163abc0cc1",
+  "bellmammoth": "25d9abfd2fb25faf",
+  "auroramanta": "a21fd2af6c9d492f",
+  "crevasseleviathan": "41b769adc2366b00"
+}
