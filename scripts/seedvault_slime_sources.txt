@@ -1,0 +1,10 @@
+{
+  "seed_mote": "359353a06a459b31",
+  "seed_amberwing": "019c2b1d1989fdac",
+  "seed_rootguard": "87dbe7bb469121c9",
+  "seed_warden": "adc206a4a5734702",
+  "seed_germinator": "9407aa92547dcaae",
+  "seed_worldseed": "1f0805a5731e983c",
+  "seed_sprout": "eb156dd6173dfd20",
+  "seed_treant": "2fde0d88c7ed35cc"
+}

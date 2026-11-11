@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The Seed Vault enemies and Worldseed helpers have new shaded artwork, distinct faces and silhouettes, clearer attacks, and deaths that fit their seed shells, chitin wings, bark armour, tree rings and petals."
+    ],
+    "removed": [
+      "Replaced the eight older Seed Vault enemy appearances to match the new enemy art style."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

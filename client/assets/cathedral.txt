@@ -229,12 +229,12 @@
     "rain_crown_gatekeeper": "e49a0a6de4b993f4",
     "rain_crown_sibyl": "d2f274bd98dfa5e4",
     "rain_crown_sovereign": "f667d982b70b58b4",
-    "seed_mote": "29fbf7b67c98561a",
-    "seed_amberwing": "5bc03c1778a4a21a",
-    "seed_rootguard": "92f7eeb564e14479",
-    "seed_warden": "977dd53533c5e3a1",
-    "seed_germinator": "20f47d21caca4858",
-    "seed_worldseed": "21941d4722b53b61",
+    "seed_mote": "359353a06a459b31",
+    "seed_amberwing": "019c2b1d1989fdac",
+    "seed_rootguard": "87dbe7bb469121c9",
+    "seed_warden": "adc206a4a5734702",
+    "seed_germinator": "9407aa92547dcaae",
+    "seed_worldseed": "1f0805a5731e983c",
     "astro_gearling": "6e8235d93e1680b2",
     "astro_starling": "bf4d0dbc0478a438",
     "astro_sentinel": "b51e673017cb0040",
@@ -273,8 +273,8 @@
     "solstice_heart": "2036902ed7471f75",
     "choirsinger": "1180a4e2e4c0584c",
     "reliquarypearl": "4680314b634eddd9",
-    "seed_sprout": "39768c572c917404",
-    "seed_treant": "215216cb71475ec0",
+    "seed_sprout": "eb156dd6173dfd20",
+    "seed_treant": "2fde0d88c7ed35cc",
     "solar_cinder": "270d38184ebc19fa",
     "amber_cocoon": "1de97986cdfe4396",
     "barrow_scarab": "a12a73ac8dcf45b4",
@@ -377,12 +377,12 @@
     "rain_crown_gatekeeper": 52,
     "rain_crown_sibyl": 66,
     "rain_crown_sovereign": 75,
-    "seed_mote": 46,
+    "seed_mote": 65,
     "seed_amberwing": 68,
-    "seed_rootguard": 56,
-    "seed_warden": 52,
-    "seed_germinator": 70,
-    "seed_worldseed": 76,
+    "seed_rootguard": 60,
+    "seed_warden": 60,
+    "seed_germinator": 59,
+    "seed_worldseed": 65,
     "astro_gearling": 45,
     "astro_starling": 58,
     "astro_sentinel": 58,
@@ -421,8 +421,8 @@
     "solstice_heart": 66,
     "choirsinger": 42,
     "reliquarypearl": 56,
-    "seed_sprout": 59,
-    "seed_treant": 57,
+    "seed_sprout": 46,
+    "seed_treant": 54,
     "solar_cinder": 59,
     "amber_cocoon": 75,
     "barrow_scarab": 50,
@@ -592,6 +592,86 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "seed_mote": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_amberwing": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_rootguard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_warden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_germinator": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_worldseed": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_sprout": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_treant": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }
