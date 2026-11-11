@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The Blooming Labyrinth enemies have new shaded artwork, distinct faces and silhouettes, clearer attacks, and deaths that fit their spore pods, stained-glass wings, briar armour, thorn cloaks, mirror petals and crystal lotus heart."
+    ],
+    "removed": [
+      "Replaced the six older Blooming Labyrinth enemy appearances to match the new enemy art style."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

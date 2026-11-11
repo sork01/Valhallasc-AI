@@ -247,12 +247,12 @@
     "thunder_conductor": "5634d3d12ef9345b",
     "thunder_bastion": "806929d046a5274c",
     "thunder_heart": "1c70caa2e42135f0",
-    "bloom_spore": "0858c35929a3f9c9",
-    "bloom_moth": "1405e8be310d895b",
-    "bloom_guard": "b6ae1174c904cda7",
-    "bloom_thornkeeper": "8b23a6b3b459e1f0",
-    "bloom_mirror": "9d1bf0a5e271d56a",
-    "bloom_heart": "8cfa0101b1668b1b",
+    "bloom_spore": "f8251911148efb06",
+    "bloom_moth": "dd9a6428b08a2e30",
+    "bloom_guard": "43223246fcae8dce",
+    "bloom_thornkeeper": "560aed46e1fae71c",
+    "bloom_mirror": "33c196f7d4d11909",
+    "bloom_heart": "829b727ce0ad7cf6",
     "solar_emberling": "ea0a0a56ede3fbd8",
     "solar_sunmoth": "ac3859a920e569de",
     "solar_crucible_guard": "d562fbe134bf8735",
@@ -395,12 +395,12 @@
     "thunder_conductor": 51,
     "thunder_bastion": 53,
     "thunder_heart": 71,
-    "bloom_spore": 48,
+    "bloom_spore": 59,
     "bloom_moth": 71,
-    "bloom_guard": 56,
-    "bloom_thornkeeper": 56,
-    "bloom_mirror": 69,
-    "bloom_heart": 66,
+    "bloom_guard": 59,
+    "bloom_thornkeeper": 62,
+    "bloom_mirror": 67,
+    "bloom_heart": 70,
     "solar_emberling": 53,
     "solar_sunmoth": 71,
     "solar_crucible_guard": 54,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "bloom_spore": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_moth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_thornkeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_mirror": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }
