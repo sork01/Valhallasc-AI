@@ -308,32 +308,32 @@
     "ew_chainmaw": "9b4aefc7bf83f7df",
     "ew_bellows": "e4e211cff75a6ee6",
     "ew_crown": "fc20c92203450ba5",
-    "cf_brute": "7a916892cb14946b",
-    "cf_crawler": "e9bc0b1055785a8a",
-    "cf_caster": "1bf6771b70493090",
-    "cf_sentry": "3fd51f9acdc3ac6c",
-    "cf_kettil": "9c84ec5e867830e6",
-    "cf_ysolt": "89bd4bd3a01c81f5",
-    "cf_hallgrim": "9e589b01e2eb66f8",
-    "cf_sigrun": "d226346b24398667",
-    "cf_ingot": "3ffbfc5e3127b1ee",
-    "cf_dagfinn": "f9208d6722951418",
-    "cf_thorbjorg": "4fe09a98cf914345",
-    "cf_ragnhild": "65352991436624dc",
-    "cf_orm": "4fc1695f6a54fcd3",
-    "cf_hildr": "73339fa7bca515c0",
-    "cf_eldmarr": "5a4edb5546051b4e",
-    "ember_firelord": "5a4edb5546051b4e",
-    "es_foe_02": "9c84ec5e867830e6",
-    "es_foe_04": "9c84ec5e867830e6",
-    "es_foe_06": "9c84ec5e867830e6",
-    "es_foe_08": "5a4edb5546051b4e",
-    "es_foe_11": "9c84ec5e867830e6",
-    "es_foe_15": "9c84ec5e867830e6",
-    "es_foe_17": "9c84ec5e867830e6",
-    "es_foe_18": "9c84ec5e867830e6",
-    "es_foe_22": "9c84ec5e867830e6",
-    "es_foe_25": "5a4edb5546051b4e"
+    "cf_brute": "f768cc770a6ce84f",
+    "cf_crawler": "b17652d7f1b33381",
+    "cf_caster": "175b3dbe15a49463",
+    "cf_sentry": "02028e68de959256",
+    "cf_kettil": "5f11db244fed6262",
+    "cf_ysolt": "32225a25b4ebe783",
+    "cf_hallgrim": "67a9804b564bc831",
+    "cf_sigrun": "098cb2f08e52d45b",
+    "cf_ingot": "fcc441b26d81d7b2",
+    "cf_dagfinn": "6546bb3295515f4d",
+    "cf_thorbjorg": "d3bd89948d138ee1",
+    "cf_ragnhild": "d87af4838eba584a",
+    "cf_orm": "80dce1443154bc07",
+    "cf_hildr": "1501d542b9ba4767",
+    "cf_eldmarr": "b0df23f76b809be7",
+    "ember_firelord": "b0df23f76b809be7",
+    "es_foe_02": "5f11db244fed6262",
+    "es_foe_04": "5f11db244fed6262",
+    "es_foe_06": "5f11db244fed6262",
+    "es_foe_08": "b0df23f76b809be7",
+    "es_foe_11": "5f11db244fed6262",
+    "es_foe_15": "5f11db244fed6262",
+    "es_foe_17": "5f11db244fed6262",
+    "es_foe_18": "5f11db244fed6262",
+    "es_foe_22": "5f11db244fed6262",
+    "es_foe_25": "b0df23f76b809be7"
   },
   "tops": {
     "tidetemplar": 64,
@@ -456,32 +456,32 @@
     "ew_chainmaw": 54,
     "ew_bellows": 78,
     "ew_crown": 80,
-    "cf_brute": 59,
-    "cf_crawler": 64,
-    "cf_caster": 84,
-    "cf_sentry": 69,
-    "cf_kettil": 57,
+    "cf_brute": 58,
+    "cf_crawler": 63,
+    "cf_caster": 113,
+    "cf_sentry": 70,
+    "cf_kettil": 58,
     "cf_ysolt": 71,
     "cf_hallgrim": 56,
-    "cf_sigrun": 60,
-    "cf_ingot": 38,
+    "cf_sigrun": 61,
+    "cf_ingot": 28,
     "cf_dagfinn": 62,
-    "cf_thorbjorg": 69,
-    "cf_ragnhild": 60,
+    "cf_thorbjorg": 70,
+    "cf_ragnhild": 61,
     "cf_orm": 60,
-    "cf_hildr": 72,
-    "cf_eldmarr": 57,
-    "ember_firelord": 57,
-    "es_foe_02": 57,
-    "es_foe_04": 57,
-    "es_foe_06": 57,
-    "es_foe_08": 57,
-    "es_foe_11": 57,
-    "es_foe_15": 57,
-    "es_foe_17": 57,
-    "es_foe_18": 57,
-    "es_foe_22": 57,
-    "es_foe_25": 57
+    "cf_hildr": 74,
+    "cf_eldmarr": 59,
+    "ember_firelord": 59,
+    "es_foe_02": 58,
+    "es_foe_04": 58,
+    "es_foe_06": 58,
+    "es_foe_08": 59,
+    "es_foe_11": 58,
+    "es_foe_15": 58,
+    "es_foe_17": 58,
+    "es_foe_18": 58,
+    "es_foe_22": 58,
+    "es_foe_25": 59
   },
   "kindFrames": {
     "reliccrab": {
@@ -592,6 +592,266 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "cf_brute": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_crawler": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_caster": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_sentry": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_kettil": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_ysolt": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_hallgrim": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_sigrun": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_dagfinn": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_thorbjorg": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_ragnhild": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_orm": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_hildr": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_eldmarr": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_ingot": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_02": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_04": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_06": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_08": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_11": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_15": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_17": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_18": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_22": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_25": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "ember_firelord": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
       ]
     }
   }

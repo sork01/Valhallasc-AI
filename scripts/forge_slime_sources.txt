@@ -1,0 +1,17 @@
+{
+  "cf_brute": "f768cc770a6ce84f",
+  "cf_crawler": "b17652d7f1b33381",
+  "cf_caster": "175b3dbe15a49463",
+  "cf_sentry": "02028e68de959256",
+  "cf_kettil": "5f11db244fed6262",
+  "cf_ysolt": "32225a25b4ebe783",
+  "cf_hallgrim": "67a9804b564bc831",
+  "cf_sigrun": "098cb2f08e52d45b",
+  "cf_dagfinn": "6546bb3295515f4d",
+  "cf_thorbjorg": "d3bd89948d138ee1",
+  "cf_ragnhild": "d87af4838eba584a",
+  "cf_orm": "80dce1443154bc07",
+  "cf_hildr": "1501d542b9ba4767",
+  "cf_eldmarr": "b0df23f76b809be7",
+  "cf_ingot": "fcc441b26d81d7b2"
+}

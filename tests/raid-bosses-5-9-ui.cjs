@@ -56,7 +56,7 @@ const check=(value,message)=>{assert.ok(value,message);checks++;};
    const g=document.getElementById('fieldcv').getContext('2d'),fill=g.fillText,labels=[];g.fillText=function(s,...a){labels.push(s);return fill.call(this,s,...a);};
    try{Field._debug.drawFrame(performance.now()/1000);}finally{g.fillText=fill;}return labels;
   });check(state.tele.some(t=>t.label&&labels.some(s=>s.startsWith(t.label))),kind+' labels are drawn above actors');
-  if(!STUB){await page.waitForFunction(k=>Field.cathedralSprites?.img[k]?.complete,kind,{timeout:60000});check(await page.evaluate(k=>Field.cathedralSprites.meta.sprites[k]&&Field.cathedralSprites.img[k].naturalWidth===768,kind),kind+' editable original atlas loads');}
+  if(!STUB){await page.waitForFunction(k=>Field.cathedralSprites?.img[k]?.complete,kind,{timeout:60000});check(await page.evaluate(k=>Field.cathedralSprites.meta.sprites[k]&&Field.cathedralSprites.img[k].naturalWidth===Field.frameOf(Field.cathedralSprites,k).w*8,kind),kind+' editable original atlas loads');}
   await page.screenshot({path:path.join(world.runDir,kind+'-cast-desktop.png')});await page.setViewportSize({width:844,height:390});await page.screenshot({path:path.join(world.runDir,kind+'-cast-phone.png')});
   await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(world.runDir,kind+'-cast-portrait.png')});await page.setViewportSize({width:1440,height:900});
   const sign=await page.evaluate(k=>Field.signs.find(s=>s.id===k),kind);check(!!sign,kind+' approach sign exists');

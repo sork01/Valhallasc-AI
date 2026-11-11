@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "All fifteen kinds in The Chained Forge are redrawn with rounded shading, individual faces and articulated attacks. Rigid armour falls in pieces, fire gutters out, the crawler folds its legs, and numbered ingots crack apart. The Empty Seat memories use the same new Forge artwork."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

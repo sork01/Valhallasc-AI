@@ -70,8 +70,8 @@ const check=(value,message)=>{assert.ok(value,message);checks++;};
   });check(pixels>300,h.boss+' telegraph changes the real scene ('+pixels+' pixels)');
   if(!STUB){
    await page.waitForFunction(k=>Field.cathedralSprites?.img[k]?.complete,h.boss,{timeout:60000});
-   const art=await page.evaluate(k=>({id:Field.cathedralSprites.meta.sprites[k],width:Field.cathedralSprites.img[k].naturalWidth,name:Field.enemyName(k)}),h.boss);
-   check(art.id&&art.width===768&&!art.name.startsWith('cf_'),h.boss+' has its own editable named atlas');
+   const art=await page.evaluate(k=>({id:Field.cathedralSprites.meta.sprites[k],width:Field.cathedralSprites.img[k].naturalWidth,expectedWidth:Field.frameOf(Field.cathedralSprites,k).w*8,name:Field.enemyName(k)}),h.boss);
+   check(art.id&&art.width===art.expectedWidth&&!art.name.startsWith('cf_'),h.boss+' has its own editable named atlas');
   }
   await page.screenshot({path:path.join(world.runDir,h.boss+'-cast-desktop.png')});
   await page.setViewportSize({width:844,height:390});await page.waitForTimeout(180);
