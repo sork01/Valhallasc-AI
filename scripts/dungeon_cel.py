@@ -47,6 +47,12 @@ def cel_kinds(key):
 
 
 def build(key):
+    if key == 'elder_hollow':
+        import elder_slime_redraw as redo
+        redo.build()
+        redo.export()
+        redo.verify()
+        return
     mod = importlib.import_module(MAKERS[key])
     kinds = cel_kinds(key)
     meta = json.loads(mod.META.read_text())
@@ -61,6 +67,10 @@ def build(key):
 
 
 def preview(key):
+    if key == 'elder_hollow':
+        import elder_slime_redraw as redo
+        redo.preview()
+        return
     importlib.import_module(REDRAWS[key]).main()
 
 

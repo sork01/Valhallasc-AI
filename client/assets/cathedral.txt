@@ -211,12 +211,12 @@
     "eye_lenswarden": "0eb143be7dc4f44d",
     "eye_undertide": "cee54406ebec66b6",
     "eye_unblinking": "08a70931a10944fc",
-    "elder_thornling": "ed63c6133023dbfa",
-    "elder_moth": "541493c0e137b7b9",
-    "elder_barkguard": "e95cdb74da2065c5",
-    "elder_gatekeeper": "4e20500db67e5bce",
-    "elder_matron": "5bd96d4e5268ca88",
-    "elder_heart": "e1d401eb67826a4f",
+    "elder_thornling": "e0108ef21fc96fdf",
+    "elder_moth": "2ef4d15a290513e2",
+    "elder_barkguard": "3ca0909651b129ee",
+    "elder_gatekeeper": "c30845bf264e862c",
+    "elder_matron": "8b5f365a2bc7e82d",
+    "elder_heart": "7eff5c6170c86474",
     "pavilion_foldling": "828735dbb8ea624f",
     "pavilion_inkmoth": "7ee28d231f072fd2",
     "pavilion_silkguard": "572fe84fe7faf398",
@@ -359,12 +359,12 @@
     "eye_lenswarden": 55,
     "eye_undertide": 61,
     "eye_unblinking": 74,
-    "elder_thornling": 34,
-    "elder_moth": 65,
-    "elder_barkguard": 61,
-    "elder_gatekeeper": 60,
-    "elder_matron": 52,
-    "elder_heart": 63,
+    "elder_thornling": 39,
+    "elder_moth": 70,
+    "elder_barkguard": 62,
+    "elder_gatekeeper": 72,
+    "elder_matron": 62,
+    "elder_heart": 62,
     "pavilion_foldling": 59,
     "pavilion_inkmoth": 70,
     "pavilion_silkguard": 54,
@@ -592,6 +592,66 @@
       "anchor": [
         54,
         110
+      ]
+    },
+    "elder_thornling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_moth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_barkguard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_gatekeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_matron": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
       ]
     }
   }

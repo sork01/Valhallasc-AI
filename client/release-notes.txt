@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-11",
+    "new": [],
+    "changed": [
+      "The six enemies of the Elder Hollow have new shaded artwork, separate faces and clearer attacks. Each has its own death animation: the moth folds, the wooden guards split and slump, the Matron wilts and the Elder Heart breaks around its darkened core."
+    ],
+    "removed": [
+      "Replaced the old Elder Hollow enemy artwork to give each creature a distinct silhouette and material-appropriate movement."
+    ]
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [
