@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.42.0",
+    "date": "2026-11-11",
+    "new": [
+      "A new hero now starts with an opening cutscene, about a minute long. You sail on the Grey Gull towards Greenmeadow while a narrator tells why you were summoned to save the world from Eldmarr. It is subtitled, plays once per new character, and you can skip it by holding any key or a finger for a second, but only from your account's second character. You can watch it again from Settings with \"Replay intro\".",
+      "Short cutscenes the first time a hero makes each journey: the updraft up to Bifrost Reach, the fall back down, diving into the sea in lead shoes and sinking to the bottom, and floating up again with the shoes off. Each plays once per character and lasts about six seconds. Monsters leave you alone while one plays."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.41.5",
     "date": "2026-11-10",
     "new": [
