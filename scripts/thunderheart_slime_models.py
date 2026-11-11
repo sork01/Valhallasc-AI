@@ -58,52 +58,131 @@ def spark(setup, clip, n):
 
 
 def ray(setup, clip, n):
-    a, r, w, s, d, ph, b = setup('thunder_ray', clip, n, (0, 24), 0.18)
+    a, r, w, s, d, ph, b = setup('thunder_ray', clip, n, (0, 22), 0.18)
     drift = math.sin(ph) * 2.5 if clip == 'walk' else 0
-    flap = (math.sin(ph) * 7 if clip in ('idle', 'walk') else (10 * w - 9 * s)) * (1 - 0.85 * d)
-    x = 18 * s - 8 * w + drift
-    y = 50 + b + 6 * w - 5 * s - 18 * d + (math.cos(ph) * 2 if clip == 'walk' else 0)
-    # Whip-tail curving behind the manta; its golden lightning barb extinguishes on death.
-    tx1, ty1 = x - 16, y - 2
-    tx2, ty2 = x - 28 - 4 * w + 4 * s, y + 5 * w - 4 * d
-    tx3, ty3 = x - 38 - 5 * w + 6 * s, y + 9 * w - 7 * d
-    r.taper([(tx1, ty1), (tx2, ty2), (tx3, ty3)], AZURE, 5, 2)
+    flap = (math.sin(ph) * 10 if clip in ('idle', 'walk') else (14 * w - 12 * s)) * (1 - 0.9 * d)
+    curl = d
+    x = 6 + 10 * s - 7 * w + drift
+    y = 58 + b + 5 * w - 2 * s - 28 * d + (math.cos(ph) * 1.5 if clip == 'walk' else 0)
+
+    # 1. Smooth 9-point sinuous S-curve whip-tail streaming behind (-x) from the rear of the manta disc.
+    tail_pts = []
+    for k in range(9):
+        u = k / 8.0
+        tx = x - 16 - u * (44 - 6 * curl) - 4 * w * u + 6 * s * u
+        wave = math.sin(ph - u * 3.6) * (1.5 + 4.5 * u) if clip in ('idle', 'walk') else (math.sin(u * 3.14) * (8 * w - 6 * s))
+        ty = y + 2 - 2 * u + wave * (1 - curl) - 3 * curl * u
+        tail_pts.append((tx, ty))
+    r.taper(tail_pts, AZURE, 5, 1.5)
+    t_end = tail_pts[-1]
     if d < 0.65:
-        r.poly([(tx3 - 5, ty3 + 4), (tx3 + 4, ty3 + 7), (tx3 - 2, ty3 - 5)], GOLD[-1], OUTLINE)
-        r.ball(tx3, ty3, 3.5, 3.5, TEAL)
-    # Far swept-up wing, cobalt manta disc, pale pearl belly plates, violet dorsal ridge and near swept-down wing.
+        r.poly([(t_end[0] - 6, t_end[1] + 2), (t_end[0] + 3, t_end[1] + 5), (t_end[0] + 1, t_end[1] - 4)], GOLD[-1], OUTLINE)
+    else:
+        r.poly([(t_end[0] - 5, t_end[1] + 1), (t_end[0] + 2, t_end[1] + 3), (t_end[0], t_end[1] - 3)], SLATE[2], OUTLINE)
+
+    # 2. Far (upper-back) swept triangular manta wing with curved leading and trailing edges.
+    far_tip = (x - 16 - 4 * curl, y + 35 + flap * 0.8 - 13 * curl)
     r.poly([
-        (x - 10, y + 3),
-        (x - 22, y + 21 + flap - 10 * d),
-        (x - 32, y + 9 + flap * 0.6 - 8 * d),
-        (x - 18, y - 4),
+        (x + 16, y + 7 - 2 * curl),
+        (x + 5, y + 19 + flap * 0.35 - 5 * curl),
+        (x - 5, y + 29 + flap * 0.6 - 9 * curl),
+        far_tip,
+        (x - 20, y + 22 + flap * 0.45 - 7 * curl),
+        (x - 21, y + 11 + flap * 0.2 - 4 * curl),
+        (x - 16, y + 3 - curl),
     ], AZURE[1], OUTLINE)
-    r.line([(x - 12, y + 5), (x - 23, y + 17 + flap - 9 * d)], GOLD[2] if d < 0.65 else SLATE[2], 2)
-    r.ball(x - 3, y, 22, 11 * (1 - 0.22 * d), AZURE)
-    r.ball(x - 4, y - 3, 15, 6 * (1 - 0.22 * d), PEARL)
-    r.ball(x - 2, y + 4, 13, 6 * (1 - 0.22 * d), VIOLET)
     r.poly([
-        (x - 4, y - 4),
-        (x + 8, y - 18 - flap * 0.7 + 8 * d),
-        (x + 20, y - 10 - flap * 0.5 + 6 * d),
-        (x + 12, y - 2),
+        (x + 12, y + 7 - 2 * curl),
+        (x + 2, y + 17 + flap * 0.3 - 5 * curl),
+        (far_tip[0] + 3, far_tip[1] - 4),
+        (x - 16, y + 12 + flap * 0.25 - 4 * curl),
+        (x - 12, y + 4 - curl),
+    ], AZURE[2], None)
+    vein_col = (GOLD[-1] if s > 0.2 else GOLD[3]) if d < 0.65 else SLATE[2]
+    r.line([(x + 8, y + 7 - curl), (x - 4, y + 18 + flap * 0.4 - 5 * curl), (far_tip[0] + 3, far_tip[1] - 3)], vein_col, 2)
+    if d < 0.65:
+        r.ball(x - 4, y + 18 + flap * 0.4, 2.5, 2.5, TEAL)
+
+    # 3. Characteristic paired manta cephalic horn-lobes curving forward (+x) at the front of the head.
+    r.poly([
+        (x + 15, y + 8 - curl),
+        (x + 26 + 3 * s, y + 12 - 3 * curl),
+        (x + 31 + 3 * s, y + 8 - 2 * curl),
+        (x + 25 + 3 * s, y + 5 - 2 * curl),
+        (x + 17, y + 3 - curl),
     ], AZURE[2], OUTLINE)
-    r.line([(x, y - 5), (x + 9, y - 15 - flap * 0.7 + 7 * d)], GOLD[2] if d < 0.65 else SLATE[2], 2)
-    # Cephalic storm-horns and storm-bolt discharge on attack.
-    for side, dy in ((-1, 5), (1, -2)):
-        r.poly([(x + 12, y + dy + 2), (x + 23 + 4 * s, y + dy + side * 2), (x + 12, y + dy - 2)], AZURE[3], OUTLINE)
-    if s > 0.05 or w > 0.2:
-        reach = 22 + 24 * s - 6 * w
-        r.poly([(x + 16, y + 4), (x + reach, y + 1), (x + 16, y - 3)], TEAL[-1] if s > 0.3 else GOLD[-1], OUTLINE)
-    # Four predatory slit eyes along the brow and a hooked shark-maw underneath.
-    for dx, dy in ((4, 4), (10, 5), (6, 1), (12, 2)):
-        r.poly([(x + dx - 2, y + dy + 2), (x + dx + 3, y + dy + 1), (x + dx + 2, y + dy - 1), (x + dx - 2, y + dy - 1)], OUTLINE)
-        if d < 0.65:
-            r.line([(x + dx - 1, y + dy), (x + dx + 2, y + dy)], TEAL[-1], 1)
-    open_m = (2 + 4 * s + 2 * w) * (1 - 0.5 * d)
-    r.poly([(x + 1, y - 4), (x + 14, y - 4), (x + 12, y - 6 - open_m), (x + 2, y - 6 - open_m)], MAROON[0], OUTLINE)
-    for fx in (4, 8, 11):
-        r.poly([(x + fx, y - 4), (x + fx + 2, y - 4), (x + fx + 1, y - 7)], WHITE)
+    r.poly([
+        (x + 14, y - 3 + curl),
+        (x + 25 + 3 * s, y - 3 + curl),
+        (x + 30 + 3 * s, y - 5 + 2 * curl),
+        (x + 24 + 3 * s, y - 9 + 3 * curl),
+        (x + 13, y - 8 + 2 * curl),
+    ], AZURE[2], OUTLINE)
+
+    # 4. Seamless central diamond manta body & pale pearl ventral gill-plate underside.
+    r.poly([
+        (x - 18, y + 4 - curl),
+        (x + 4, y + 12 - 2 * curl),
+        (x + 22, y + 4 - curl),
+        (x + 19, y - 8 + 2 * curl),
+        (x - 2, y - 12 + 3 * curl),
+        (x - 18, y - 4 + curl),
+    ], AZURE[2], OUTLINE)
+    r.poly([
+        (x - 12, y - 3 + curl),
+        (x + 19, y - 1),
+        (x + 16, y - 8 + 2 * curl),
+        (x - 4, y - 11 + 2 * curl),
+    ], PEARL[2], OUTLINE)
+    for gx in (-2, 3, 8, 13):
+        r.line([(x + gx, y - 4 + curl), (x + gx + 2, y - 8 + 2 * curl)], AZURE[0], 1)
+
+    # 5. Violet dorsal spine crest and fierce storm-lit manta eye + brow.
+    r.poly([
+        (x - 13, y + 5 - curl),
+        (x + 6, y + 9 - 2 * curl),
+        (x + 17, y + 4 - curl),
+        (x + 4, y + 1 - curl),
+    ], VIOLET[2], None)
+    ex, ey = x + 13, y + 2 - curl
+    r.poly([(ex - 5, ey + 4), (ex + 5, ey + 2), (ex + 4, ey - 3), (ex - 4, ey - 2)], OUTLINE)
+    if d < 0.65:
+        r.poly([(ex - 3, ey + 2), (ex + 3, ey + 1), (ex + 2, ey - 1), (ex - 2, ey - 1)], TEAL[-1] if s > 0.2 else GOLD[-1])
+    r.line([(ex - 5, ey + 4), (ex + 5, ey + 2)], AZURE[0], 2)
+
+    # 6. Near (lower-front) swept triangular manta wing with broad root matching the far wing.
+    near_tip = (x - 14 - 3 * curl, y - 31 + flap * 0.55 + 12 * curl)
+    r.poly([
+        (x + 7, y - 4 + curl),
+        (x, y - 15 + flap * 0.25 + 5 * curl),
+        (x - 6, y - 24 + flap * 0.45 + 9 * curl),
+        near_tip,
+        (x - 20, y - 20 + flap * 0.35 + 8 * curl),
+        (x - 20, y - 10 + flap * 0.18 + 4 * curl),
+        (x - 15, y - 2 + curl),
+    ], AZURE[2], OUTLINE)
+    r.poly([
+        (x + 5, y - 5 + curl),
+        (x - 1, y - 15 + flap * 0.25 + 5 * curl),
+        (near_tip[0] + 2, near_tip[1] + 4),
+        (x - 16, y - 12 + flap * 0.2 + 4 * curl),
+        (x - 11, y - 3 + curl),
+    ], AZURE[3], None)
+    r.line([(x + 4, y - 5 + curl), (x - 4, y - 16 + flap * 0.3 + 5 * curl), (near_tip[0] + 2, near_tip[1] + 3)], vein_col, 2)
+    if d < 0.65:
+        r.ball(x - 4, y - 15 + flap * 0.3, 2.5, 2.5, TEAL)
+
+    # 7. Storm-orb charging between the cephalic horn-lobes on wind-up and jagged lightning bolt on strike.
+    if w > 0.15 and d == 0:
+        orb_r = int(round(3 + 4 * w))
+        r.ball(x + 30, y + 2, orb_r, orb_r, GOLD)
+        r.ball(x + 30, y + 2, max(2, orb_r - 2), max(2, orb_r - 2), TEAL)
+    if s > 0.05 and d == 0:
+        reach = int(round(14 + 24 * s))
+        bx0, by0 = x + 28, y + 1
+        pts = [(bx0, by0), (bx0 + reach * 0.35, by0 + 5), (bx0 + reach * 0.68, by0 - 4), (bx0 + reach, by0 + 1)]
+        r.line(pts, GOLD[-1], 4)
+        r.line(pts, TEAL[-1], 2)
     return a
 
 

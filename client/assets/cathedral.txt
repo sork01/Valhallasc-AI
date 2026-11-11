@@ -390,7 +390,7 @@
     "astro_navigator": 56,
     "astro_axis": 69,
     "thunder_spark": 63,
-    "thunder_ray": 62,
+    "thunder_ray": 102,
     "thunder_guard": 61,
     "thunder_conductor": 60,
     "thunder_bastion": 65,
