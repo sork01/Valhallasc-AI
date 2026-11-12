@@ -50,7 +50,14 @@ Local review: `scripts/npc_named_review.py` writes
 sheet have been visually inspected. The art advisor reviewed the initial
 approach and prototypes; near-duplicate outlines and Kessa's drum were corrected
 before final verification. Generic assignments, in-zone acceptance and release
-remain separate tasks. No FileDrop upload or live client edit was made.
+remain separate tasks. The owner requested FileDrop delivery on 2026-11-12: all 24 review files
+(roster, highlight animation and 22 zone sheets; 1,887,015 bytes) are uploaded,
+with stored SHA-256, byte lengths, MIME metadata, dimensions and frame counts
+verified. Receipt: `test-results/npc-named/filedrop-receipt.json`. Downloads use
+the normal FileDrop login. Live artwork and assignments remain unchanged.
+
+[Full roster](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-npc-named-roster.png) ·
+[Animation preview](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-npc-named-highlights.gif)
 
 The production plan is `docs/npc-art-plan.txt`. It inventories every speaking person by stable id, name, occupation, zone, earlier artwork and new assignment. Names, routes, offers, dialogue, quest ids, interaction distances and saved data stay in the authoritative world catalog. Stones and speaking scenery keep their scenery artwork.
 
