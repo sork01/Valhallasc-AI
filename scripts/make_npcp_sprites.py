@@ -118,14 +118,25 @@ def build():
         validate(key, data)
         assert len(palette) <= 255 and len(set(palette)) == len(palette), (key, len(palette))
         name = PREFIX + key
-        sid = existing.get(name) or api.create(name, 96, 96, 20, palette, fps=6)
-        offset = 0
-        for clip, count in CLIPS:
-            for grid in data[clip]:
-                api.draw_grid(sid, offset, 0, grid)
-                offset += 1
+        sid = existing.get(name)
+        if sid:
+            # An interrupted save may already exist; do not repaint editor work.
+            sp, _ = api.load(sid)
+            palette = sp['palette']
+        else:
+            ops = [dict(op='grid', frame=n, layer=0, x=0, y=0, rows=grid.astype(int).tolist())
+                   for n, grid in enumerate(grid for clip, _ in CLIPS for grid in data[clip])]
+            result = api.api('create', dict(name=name, width=96, height=96, frames=20,
+                             layers=1, fps=6, palette=palette, persist=True, ops=ops))
+            assert result.get('ok'), result.get('errors')
+            sid = result['sprite_id']
         saved[key] = sid
-        MANIFEST.write_text(json.dumps(metadata(saved, palettes_for(saved)), indent=2, ensure_ascii=False) + '\n')
+        # A new batch must retain every existing source, material table and bound.
+        old.setdefault('sprites', {})[key] = sid
+        old.setdefault('designs', {})[key] = design_meta(key, palette)
+        if 'frame' not in old:
+            old.update(metadata(saved, {key: palette}))
+        MANIFEST.write_text(json.dumps(old, indent=2, ensure_ascii=False) + '\n')
         print('built', key, sid, flush=True)
 
 
@@ -159,9 +170,39 @@ def export(verify=False):
             tops[key], bounds[key] = top, box
             print('exported', key, flush=True)
     if not verify:
-        manifest.update(metadata(manifest['sprites'], palettes_for(manifest['sprites'])))
+        for key in selected():
+            manifest.setdefault('designs', {})[key] = design_meta(key, palettes_for([key])[key])
         manifest['tops'], manifest['bounds'] = tops, bounds
         MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n')
+
+
+def refresh():
+    """Explicitly repaint only named candidate designs, never the existing library."""
+    keys = selected()
+    assert sys.argv[2:] and keys and all(k.startswith('named_') for k in keys), 'Name the new candidate designs explicitly'
+    assert 'named' not in sys.argv[2:] and 'all' not in sys.argv[2:], 'Refresh requires explicit design keys'
+    api = pf_api()
+    manifest = read_manifest()
+    for key in keys:
+        data, palette = frames(key)
+        validate(key, data)
+        sprite, _ = api.load(manifest['sprites'][key])
+        ops = [dict(op='grid', frame=n, layer=0, x=0, y=0, rows=grid.astype(int).tolist())
+               for n, grid in enumerate(grid for clip, _ in CLIPS for grid in data[clip])]
+        if sprite['palette'] != palette:
+            history = manifest.setdefault('sourceHistory', {}).setdefault(key, [])
+            version = len(history) + 2
+            result = api.api('create', dict(name=PREFIX + key + '_v' + str(version),
+                             width=96, height=96, frames=20, layers=1, fps=6,
+                             palette=palette, persist=True, ops=ops))
+            assert result.get('ok'), result.get('errors')
+            history.append(manifest['sprites'][key])
+            manifest['sprites'][key] = result['sprite_id']
+            MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n')
+        else:
+            result = api.api('draw', dict(sprite_id=manifest['sprites'][key], ops=ops))
+        assert result.get('ok'), result.get('errors')
+        print('refreshed', key, flush=True)
 
 
 def sheet():
@@ -186,4 +227,4 @@ def sheet():
 
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else 'build'
-    {'build': build, 'export': export, 'verify': lambda: export(True), 'sheet': sheet}[cmd]()
+    {'build': build, 'refresh': refresh, 'export': export, 'verify': lambda: export(True), 'sheet': sheet}[cmd]()

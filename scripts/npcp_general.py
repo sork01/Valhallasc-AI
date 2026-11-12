@@ -969,6 +969,7 @@ def render(key, clip, k):
         hc, old = head['H'](0, 0), head['H']
         head['H'] = lambda x, y, old=old, hc=hc: hc + (old(x, y) - hc) * 1.28
     spec = dict(OUTFITS[name], pants='pants')
+    spec.update(d.get('outfit', {}))
     if d.get('tail'):
         spec.update(legs=False, boots=None)
         if spec.get('skirt'):
@@ -1004,6 +1005,9 @@ def render(key, clip, k):
     PROPS[prop](ink, xf, joints, R, p, color)
     if d.get('ornament'):
         ORNAMENTS[d['ornament']](ink, xf, joints, R, p, color, head, d)
+    if d.get('named'):
+        import npcp_named
+        npcp_named.details(sys.modules[__name__], d, ink, xf, joints, R, p, color, head)
     idx, z = ink.resolve()
     pal = np.array([tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) + (255,) if len(h) == 7 else (0, 0, 0, 0) for h in palette], np.uint8)
     pal[0] = (0, 0, 0, 0)
@@ -1049,6 +1053,8 @@ def _build_registry():
     for key, d in out.items():
         if d.get('ornament') == 'wings':
             d.update(hover=True, orn=_blend(d['coat'], '#ffffff', .62))
+    import npcp_named
+    npcp_named.install(out, sys.modules[__name__])
     return out
 
 
@@ -1074,6 +1080,8 @@ def pick(args):
             out += SPECIAL
         elif a == 'all':
             out += list(DESIGNS)
+        elif a == 'named':
+            out += [k for k in DESIGNS if k.startswith('named_')]
         elif a in DESIGNS:
             out.append(a)
         else:

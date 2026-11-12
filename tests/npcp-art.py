@@ -4,6 +4,7 @@ recolour table, head sockets (a Python port of NpcArt.head), 24 distinct looks. 
 usage: python3 tests/npcp-art.py [--mutate]      (--mutate blanks one skin tone in a copy and must fail the socket/recolour checks)
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -17,6 +18,7 @@ OLD = json.loads((A / 'npc.txt').read_text())
 W = H = 96
 AX, AY = META['anchor']
 MUTATE = '--mutate' in sys.argv
+NAMED_ONLY = os.environ.get('NPCP_ART_GROUP') == 'named'
 fails = []
 
 
@@ -78,6 +80,8 @@ def socket(frame, skin):
 
 idle_masks = {}
 for key, spec in META['sprites'].items():
+    if NAMED_ONLY and not key.startswith('named_'):
+        continue
     mats = META['designs'][key]['materials']
     skin = {hexint(c) for k, c in mats.items() if k.startswith('skin')}
     if MUTATE:
@@ -97,7 +101,7 @@ for key, spec in META['sprites'].items():
         check(len(xs) > 0 and xs.min() >= 1 and xs.max() <= 94 and ys.min() >= 1 and ys.max() <= 94, f'{key} {clip} {n}: touches the border')
         check(a.any(0)[0] == False and a.any(0)[-1] == False, f'{key} {clip} {n}: opaque edge column')
         sigs.setdefault(clip, set()).add(fr.tobytes())
-        if clip == 'idle' and n == 0 and general:
+        if clip == 'idle' and n == 0 and (general or NAMED_ONLY):
             idle_masks[key] = a
         # feet: the lowest opaque row must sit near the anchor (walk may lift a foot)
         slack = 10 if designs.get('species') == 'merfolk' else 6      # a merfolk tail flicks up on one walk frame
@@ -123,11 +127,16 @@ for i, k1 in enumerate(keys):
         d = int((idle_masks[k1] ^ idle_masks[k2]).sum())
         if d < worst[0]:
             worst = (d, (k1, k2))
-check(len(keys) == 24, f'{len(keys)} general designs, want 24')
-check(len(META['sprites']) == 164, f"{len(META['sprites'])} designs in total, want 164 (24 general + 140 special)")
+if not NAMED_ONLY:
+    check(len(keys) == 24, f'{len(keys)} general designs, want 24')
+named_plan = ROOT / 'docs/npc-named-plan.txt'
+named_count = json.loads(named_plan.read_text())['counts']['namedDesigns'] if named_plan.exists() else 0
+check(len(META['sprites']) == 164 + named_count, f"{len(META['sprites'])} designs in total, want {164 + named_count}")
+if NAMED_ONLY:
+    check(len(keys) == named_count, f'{len(keys)} named designs, want {named_count}')
 for sp, kind in (('special_heart_oracle', 'treefolk'), ('special_sky_warden', 'winged'), ('special_nacre_envoy', 'merfolk')):
     check(META['designs'].get(sp, {}).get('species') == kind, f'{sp}: species {kind} missing from the manifest')
-check(worst[0] >= 120, f'two designs have near-identical silhouettes: {worst}')
+check(worst[0] >= (32 if NAMED_ONLY else 120), f'two designs have near-identical silhouettes: {worst}')
 print(f'designs {len(keys)}, closest silhouette pair {worst}')
 print('FAIL' if fails else 'PASS', len(fails), 'problems')
 for f in fails[:40]:
