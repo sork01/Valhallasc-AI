@@ -65,10 +65,28 @@ why the hero was summoned (owner request 2026-11-10, grill answers in `TODO.md` 
 - **The story in the sky** (screen-space overlays, `sky()`): ember glow on the edges, a far mountain with a ring of fire (the first forge), a gold light
   with an empty seat (the gods' hall), nine chains that appear one by one and fail one by one, burning roots, sparks; the sea warms from blue to red
   and back (`WARM`); the summoning is a ring of light with runes and a light column on the deck (`summon()`).
-- **Narrator**: seven lines in `LINES` (about 140 words, epic and solemn) shown as subtitles and read by `speechSynthesis` (`speak()` in `cutscene.js`:
-  English `en-GB` or Swedish `sv-SE` by the language setting, a male-sounding voice if one exists, pitch .78, rate fitted to the slot, silent when the
-  sound setting is off or no voice exists). Swedish text is written by hand in `scripts/sv-translations.txt`.
+- **Narrator (Beta 1.47.4)**: the owner's seven ElevenLabs English recordings replace browser TTS entirely. The world is named **Veyrheim**;
+  the last subtitle is “Welcome to Veyrheim, hero.” (`Välkommen till Veyrheim, hjälte.` in Swedish). Greenmeadow is the landing region.
+  English/Swedish subtitles follow the language setting; both use the supplied English recordings. Original MP3 bytes are preserved in
+  `client/assets/intro-narration-1.mp3` through `-7.mp3`; source names, SHA-256 hashes, durations and exact line mapping are in
+  `docs/intro-narration-sources.txt`. Local PocketSphinx recognition confirmed passage order; original FileDrop files remain untouched.
+- **Recorded voice lifecycle**: `CutsceneAudio.prepareNarration` fetches/decodes the clips once per page through the existing audio context.
+  `narrate` plays a single voice on `sfxOut`; the sound switch and effects volume apply. Mute, skip, reset, disconnect, completion and a new scene
+  stop active speech and invalidate pending playback. A 120 ms frame tolerance preserves normal line starts; slow decoding/network catches up
+  to the current passage instead of queuing stale speech over later captions. A failed asset leaves subtitles; there is no TTS fallback.
+- **Timing**: scene/server grace remains 62 seconds. Recording cues are 1.0, 12.5, 24, 34.5, 46.8, 51 and 58 seconds. The first cue starts half a
+  second earlier and the final welcome half a second later so every recording fits at its original speed, without overlap or truncation.
 - **Audio**: synthesised in `game.js` (`CutsceneAudio`): `sea_bed` (62 s of swell and a thin wind), `creak`, `ember` (a rumble under the history),
   `chord` (the summoning), `thud`.
-- **Checks**: `cargo test cutscene` (12), `tests/intro-ui.cjs` (19 checks: lock, narration order and language, subtitles, the sea on the canvas, no skip for a
-  first character, a held key skips a replay and silences the narrator, the full minute and control back; `MUTATE=lock|skip|narrate` fail it).
+- **Checks**: the existing twelve Rust cutscene checks cover server triggers/grace; no Rust changes are needed for this client release.
+  `tests/intro-ui.cjs` now runs an actual recorded-audio playback on a private server under the unchanged bounded browser wrapper. It checks
+  seven source hashes and cue boundaries, real MP3 decoding/WebAudio playback, first-character lock, all seven cues once/in order, the final
+  Veyrheim caption, sound/effects volume, muting, delayed-load cancellation, replay/skip and reset cleanup. `MUTATE=narrate` removes the cue
+  dispatch and fails at the first recorded-voice check. **20 focused checks pass**, including a full real-time playback; receipt and
+  screenshot: candidate `test-results/driver-v55O6d/intro-recordings.json` and `intro-veyrheim-recorded.png`. Source/locale/syntax/
+  whitespace checks pass. All **13 public client hashes** match, including seven `audio/mpeg` clips; public health passes and server
+  PID `339798` is unchanged. Client **Beta 1.47.4** is live. Receipt: candidate `test-results/intro-recordings-release.json`.
+  Prior client backup: `/media/raid/valhallasc-data/intro-recordings-original-20261112T194144Z`; metadata lists the seven newly added assets.
+  Owner invoked finish and deploy. The combined Beta 1.47.4 client release verifies all **17** changed public files, both health
+  endpoints, and an unchanged PID/executable. Finish receipt: candidate `test-results/mobile-intro-finish-release.json`;
+  session record: wiki `10_projects:valhallasc_veyrheim_mobile_intro_20261112`. The server remains at the tested 1.47.2 release.

@@ -237,20 +237,8 @@
     if (curSkip) { if (e.type === 'keydown' && holdStart === null) holdStart = performance.now(); else if (e.type === 'keyup') holdStart = null; }
     e.preventDefault(); e.stopImmediatePropagation();
   };
-  // The narrator: the browser's speech synthesis, when there is a voice and the sound is on; otherwise the subtitles carry the story alone.
-  function speak(text, slot) {
-    const synth = window.speechSynthesis; if (!synth || !window.SpeechSynthesisUtterance || !window.Prefs?.sound) return;
-    try {
-      const sv = window.Prefs?.lang === 'sv', u = new SpeechSynthesisUtterance(text), want = sv ? 'sv' : 'en';
-      u.lang = sv ? 'sv-SE' : 'en-GB'; u.pitch = .78; u.volume = clamp(window.Prefs?.sfx ?? 1, .2, 1);
-      u.rate = clamp(text.split(/\s+/).length / Math.max(2, slot) / 2.6, .72, 1.18);
-      const voices = synth.getVoices?.() || [], mine = voices.filter(v => (v.lang || '').toLowerCase().startsWith(want));
-      const pick = mine.find(v => /male|daniel|george|arthur|oliver|david|mattias|alva/i.test(v.name) && !/female/i.test(v.name)) || mine.find(v => (v.lang || '').toLowerCase().startsWith(sv ? 'sv-se' : 'en-gb')) || mine[0];
-      if (pick) u.voice = pick;
-      synth.speak(u);
-    } catch { /* a missing voice only means no narration */ }
-  }
-  const hush = () => { try { window.speechSynthesis?.cancel(); } catch { /* nothing speaking */ } };
+  // Recorded narration uses the same audio context/effects bus as the scene.
+  const hush = () => window.CutsceneAudio?.stopNarration();
   function lock(on) {
     if (on === locked) return; locked = on;
     for (const type of ['keydown', 'keyup', 'keypress']) (on ? addEventListener : removeEventListener)(type, blockKey, true);
@@ -267,7 +255,9 @@
     stage.append(box); caption = box.querySelector('.cs-caption'); skipHint = box.querySelector('.cs-skip'); view = box.querySelector('.cs-view'); return box;
   }
   function begin(id, skippable) {
+    hush();
     cur = SCENES[id]; curSkip = !!skippable; holdStart = null; lastFrame = performance.now(); startAt = performance.now(); lastCaption = -1; shown++;
+    window.CutsceneAudio?.prepareNarration(cur.narration || []);
     cur.fired = new Set(); build().hidden = false; box.dataset.scene = id; box.classList.add('on'); caption.textContent = ''; caption.classList.remove('on'); skipHint.hidden = true;
     // The zone change reaches the client before this packet, so the plain "Ascending into the sky" notice may already be up: the scene tells it instead.
     window.ZoneJourney?.clear?.();
@@ -303,9 +293,9 @@
     }
     const S = cur, c = { g, w, h, el, dt, hx, hy, still: !!still, flash: 0, shake: 0 };
     // Captions and sounds fire once, in order.
-    for (const [at, text, hold] of S.captions) if (el >= at && lastCaption < at) {
+    for (const [index, [at, text, hold]] of S.captions.entries()) if (el >= at && lastCaption < at) {
       lastCaption = at; caption.textContent = tr(text); caption.style.animationDuration = (hold || 2.6) + 's'; caption.classList.remove('on'); void caption.offsetWidth; caption.classList.add('on');
-      if (S.narrate) speak(tr(text), hold || 4);
+      if (S.narration?.[index]) window.CutsceneAudio?.narrate(S.narration[index], el - at);
     }
     S.sounds.forEach(([at, kind], i) => { if (el >= at && !S.fired.has(i)) { S.fired.add(i); sound(kind, 0); } });
     const fi = S.fadeIn ?? FADE_IN, fo = S.fadeOut ?? FADE_OUT, fadeIn = ease(el / fi), fadeOut = 1 - ease((el - (S.dur - fo)) / fo), cover = Math.min(fadeIn, fadeOut);

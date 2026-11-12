@@ -7,7 +7,14 @@ const suite = {
   },
   async test({ player, check, sleep, width, height, out }) {
     const page = await player('QuestWindows',process.env.QUEST_DESKTOP?{isMobile:false,hasTouch:false}:{});
-    const press=target=>process.env.QUEST_DESKTOP?target.click():target.tap();
+    const press = async target => {
+      if (!process.env.QUEST_DESKTOP && !await target.isVisible()) {
+        const id = await target.evaluate(n => n.closest('.pause')?.id);
+        const list = page.locator(`#${id} .quest-mobile-tabs [data-quest-pane="list"]`);
+        if (await list.isVisible()) await list.tap();
+      }
+      return process.env.QUEST_DESKTOP ? target.click() : target.tap();
+    };
     async function visit(zone, id) {
       const n = await page.evaluate(({zone,id}) => [WORLD_MAP,...WORLD_MAP.zones][zone].npcs.find(n => n.id === id), {zone,id});
       await debug(page,{op:'teleport',zone,x:n.x,y:n.y+1});
@@ -21,9 +28,10 @@ const suite = {
     await visit(0,'gatekeeper'); await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));
     const layout=await page.evaluate(()=>{
       const root=document.getElementById('npc-dialogue'), shell=root.querySelector('.gossip-window'), list=document.getElementById('npc-quest-list').getBoundingClientRect(), body=root.querySelector('.gossip-parchment').getBoundingClientRect(), actions=document.getElementById('npc-quest-actions').getBoundingClientRect(), frame=shell.getBoundingClientRect(), cv=document.getElementById('fieldcv').getBoundingClientRect();
-      return shell.classList.contains('quest-panel') && list.right<=body.left+1 && actions.top>=body.bottom-1 && frame.left>=cv.left-1 && frame.right<=cv.right+1 && frame.top>=cv.top-1 && frame.bottom<=cv.bottom+1;
+      const phone=matchMedia('(pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px)').matches;
+      return shell.classList.contains('quest-panel') && (phone ? list.width===0 && body.width>frame.width*.9 : list.right<=body.left+1) && actions.top>=body.bottom-1 && frame.left>=cv.left-1 && frame.right<=cv.right+1 && frame.top>=cv.top-1 && frame.bottom<=cv.bottom+1;
     });
-    check(layout,'acceptance uses the journal frame, dark sidebar, parchment and fixed bottom buttons within the viewport');
+    check(layout,'acceptance uses the responsive journal frame, parchment and fixed bottom buttons within the viewport');
     check(await page.locator('#npc-quest-list [aria-pressed="true"]').getAttribute('data-quest')==='slime_patrol','selected quest stays highlighted beside its acceptance page');
     await page.waitForFunction(()=>!document.getElementById('announce').children.length);
     await page.screenshot({path:`${out}/quest-accept-classic-${width}x${height}.png`});

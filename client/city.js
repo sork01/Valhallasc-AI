@@ -454,6 +454,18 @@
   let current=null,previousFocus=null,view={kind:'gossip'},lastPacket=null,pendingAccept=null,acceptTimer=0;
   const $=id=>document.getElementById(id);
   const node=(tag,text,cls)=>{const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n;};
+  const phoneQuest = window.matchMedia?.('(pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px)');
+  const paneScroll = { list: 0, detail: 0 };
+  function questPane(pane, focus = false) {
+    const shell = $('npc-dialogue').querySelector('.gossip-window');
+    const panes = { list: $('npc-quest-list'), detail: $('npc-quest-page') };
+    for (const [key, node] of Object.entries(panes)) if (node?.getClientRects().length) paneScroll[key] = node.scrollTop;
+    shell.dataset.questPane = pane;
+    for (const b of shell.querySelectorAll('[data-quest-pane]')) b.setAttribute('aria-pressed', String(b.dataset.questPane === pane));
+    if (panes[pane]) panes[pane].scrollTop = paneScroll[pane];
+    window.Inventory?.hideTooltip();
+    if (focus && phoneQuest?.matches) panes[pane]?.focus({ preventScroll: true });
+  }
   // Fixed markup, never player text: small glyphs for the kinds of service an NPC offers.
   const ICONS={
     vendor:'<svg viewBox="0 0 24 24"><path d="M6 9h12l1.5 11h-15z" fill="#8a5a2b" stroke="#3b2410" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 9V7a3 3 0 0 1 6 0v2" fill="none" stroke="#3b2410" stroke-width="1.5"/></svg>',
@@ -469,8 +481,14 @@
     const t=document.createElement('span');t.className='gossip-tag';t.textContent=tag||'';
     b.append(i,l,t);return b;
   }
-  function show(next,focus){view=next;render(focus);}
+  function show(next,focus){
+    if(view.kind!==next.kind||view.id!==next.id){paneScroll.detail=0;if($('npc-quest-page'))$('npc-quest-page').scrollTop=0;}
+    view=next;render(focus);if(next.kind==='quest')questPane('detail',true);
+  }
   function render(focus) {
+    const nav=$('npc-quest-list'),paper=$('npc-quest-page');
+    if(nav?.getClientRects().length)paneScroll.list=nav.scrollTop;
+    if(paper?.getClientRects().length)paneScroll.detail=paper.scrollTop;
     const packet=lastPacket,npc=current,offered=window.Quests?.offered(npc.id)||[];
     let quest=view.kind==='quest'&&offered.find(q=>q.id===view.id);
     if(view.kind==='quest'&&!quest)view={kind:'gossip'};
@@ -572,6 +590,7 @@
     if(view.kind==='merchant'||view.kind==='sell')window.Shop?.render(npc,$('npc-inventory'),packet);
     else { window.Shop?.close(); $('npc-inventory').className=''; }
     if(view.kind==='merge'||view.kind==='refine'||view.kind==='repair')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
+    if(nav)nav.scrollTop=paneScroll.list;if(paper)paper.scrollTop=paneScroll.detail;
     const target=focus&&$('npc-dialogue').querySelector(focus);
     (target&&!target.hidden?target:$('npc-x')).focus({preventScroll:true});
   }
@@ -597,7 +616,7 @@
     window.Quests?.update(packet.quests || [], packet.abandonedQuests);
     // Keep a selected quest readable after a refusal or a repeatable turn-in.
     if(accepting)view={kind:'quest',id:accepting};
-    else if(!same)view={kind:'gossip'};
+    else if(!same){view={kind:'gossip'};paneScroll.list=0;paneScroll.detail=0;questPane('list');}
     else if(view.kind==='quest'&&window.Quests?.offered(current.id).some(q=>q.id===view.id)){}
     else if(!['merchant','sell','merge','refine','repair','stat_reset'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
@@ -606,6 +625,7 @@
     lastPacket=packet;render();
   }
   function close(resume=true) {clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
+  for(const b of $('npc-dialogue').querySelectorAll('.quest-mobile-tabs button'))b.addEventListener('click',()=>questPane(b.dataset.questPane));
   $('npc-x').addEventListener('click',()=>close());
   $('npc-quest-close')?.addEventListener('click',()=>close());
   $('npc-back').addEventListener('click',()=>{const previous=view.kind==='merchant'?'buy':view.kind;show({kind:'gossip'},`[data-view="${previous}"]`);});

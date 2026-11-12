@@ -1,4 +1,7 @@
 {
+  "Welcome to Veyrheim, hero.": "Välkommen till Veyrheim, hjälte.",
+  "Quest list": "Uppdragslista",
+  "Select a quest from the list to read its story, objectives and rewards.": "Välj ett uppdrag i listan för att läsa berättelsen, målen och belöningarna.",
   "Dungeon loot": "Dungeonbyte",
   "Dungeon loot award": "Vunnet dungeonbyte",
   "Your bags were full. Your won item is enclosed.": "Dina väskor var fulla. Föremålet du vann finns bifogat.",

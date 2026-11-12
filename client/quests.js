@@ -9,6 +9,18 @@
   let groupKey = '', groupList = [];
   const closedGroups = new Set();
   let abandonConfirm = null, journalSelection = null;
+  const phoneQuest = window.matchMedia?.('(pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px)');
+  const paneScroll = { list: 0, detail: 0 };
+  function questPane(pane, focus = false) {
+    const shell = $('quest-journal').querySelector('.quest-panel');
+    const panes = { list: $('quest-list'), detail: $('quest-page') };
+    for (const [key, node] of Object.entries(panes)) if (node.getClientRects().length) paneScroll[key] = node.scrollTop;
+    shell.dataset.questPane = pane;
+    for (const b of shell.querySelectorAll('[data-quest-pane]')) b.setAttribute('aria-pressed', String(b.dataset.questPane === pane));
+    panes[pane].scrollTop = paneScroll[pane];
+    window.Inventory?.hideTooltip();
+    if (focus && phoneQuest?.matches) panes[pane].focus({ preventScroll: true });
+  }
   const state = quest => progress.find(p => p.id === quest.id);
   const allGivers=q=>q.givers?areas.flatMap((a,zone)=>a.npcs.filter(n=>q.givers.includes(n.id)).map(n=>({...n,zone}))):[{...areas[q.zone].npcs.find(n=>n.id===q.npc),zone:q.zone}];
   const giver = quest => allGivers(quest).find(n=>n.zone===(window.Field?.zone||0))||allGivers(quest)[0];
@@ -274,13 +286,14 @@
     const chosen = entries.find(e => key(e) === journalSelection) || entries.find(e => e.q.id === tracked && !e.history) || entries[0];
     journalSelection = chosen ? key(chosen) : null;
     const list = $('quest-list'), page = $('quest-page'), controls = $('quest-controls');
-    const scroll = list.scrollTop, reading = page.dataset.selection === journalSelection, pageScroll = reading ? page.scrollTop : 0;
+    const scroll = list.getClientRects().length ? list.scrollTop : paneScroll.list, reading = page.dataset.selection === journalSelection, pageScroll = reading ? (page.getClientRects().length ? page.scrollTop : paneScroll.detail) : 0;
+    paneScroll.list = scroll; paneScroll.detail = pageScroll;
     const memoriesOpen = reading && page.querySelector('.quest-memories')?.open;
     const previousStatus = list.querySelector('[aria-pressed="true"]')?.dataset.status;
     const focus = document.activeElement, focusKey = focus?.closest('.journal-quest')?.dataset.selection, focusAction = focus?.closest('#quest-controls button')?.dataset.action;
     const row = (q, history = false) => {
       const s = history ? 'completed' : status(q), selection = (history ? 'history:' : '') + q.id;
-      const b = button('', () => { journalSelection = selection; abandonConfirm = null; renderJournal(active); });
+      const b = button('', () => { journalSelection = selection; abandonConfirm = null; renderJournal(active); questPane('detail', true); });
       b.className = 'journal-quest'; b.dataset.quest = q.id; b.dataset.status = s; b.dataset.selection = selection; b.dataset.repeatable = String(!!q.repeatable);
       b.setAttribute('aria-pressed', String(selection === journalSelection));
       b.setAttribute('aria-controls', 'quest-page');
@@ -318,7 +331,7 @@
     page.replaceChildren(); controls.replaceChildren(); page.dataset.selection = journalSelection || '';
     if (chosen) journalPage(chosen.q, chosen.history, page, controls);
     else {
-      page.append(element('h4', 'Your next adventure'), element('p', 'Select a quest on the left to read its story, objectives and rewards.'));
+      page.append(element('h4', 'Your next adventure'), element('p', 'Select a quest from the list to read its story, objectives and rewards.'));
       page.append(element('p', 'Find new quests at townspeople and camp crews marked with a !.', 'journal-hint'));
     }
     if (memoriesOpen && page.querySelector('.quest-memories')) page.querySelector('.quest-memories').open = true;
@@ -380,6 +393,7 @@
   function show() {
     if (window.Skillbar?.open || !Online.connected || Field.hero.dead || City.open || !$('pause').hidden || !$('equipment').hidden) return;
     previousFocus = document.activeElement; journalSelection = null; closedGroups.clear(); closedGroups.add('completed'); closedGroups.add('abandoned'); abandonConfirm = null;
+    paneScroll.list = 0; paneScroll.detail = 0; questPane('list');
     Field.setPaused(true); $('quest-journal').hidden = false; render(); $('quest-close').focus();
   }
   function close(resume = true) {
@@ -387,6 +401,7 @@
     $('quest-journal').hidden = true;
     if (resume) { Field.setPaused(false); previousFocus?.focus?.({ preventScroll: true }); }
   }
+  for (const b of $('quest-journal').querySelectorAll('.quest-mobile-tabs button')) b.addEventListener('click', () => questPane(b.dataset.questPane));
   $('quest-tracker').addEventListener('click', event => { if (!event.target.closest('button')) show(); });
   $('quest-close').addEventListener('click', () => close());
   $('quest-x')?.addEventListener('click', () => close());

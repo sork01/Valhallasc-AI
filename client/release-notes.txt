@@ -1,5 +1,25 @@
 [
   {
+    "version": "Beta 1.47.4",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "The intro now uses seven recorded narration clips instead of browser text-to-speech.",
+      "The intro welcomes your hero to Veyrheim, the name of the world."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.47.3",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "Quest windows use full-width lists and details on phones, with large touch controls and fixed bottom actions.",
+      "Quest text scrolls by touch, and switching between the list and details keeps your reading position."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.47.2",
     "date": "2026-11-12",
     "new": [

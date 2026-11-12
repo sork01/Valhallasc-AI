@@ -1,109 +1,78 @@
-// INTRO-* in a real browser: the opening cutscene. A brand-new character cannot be made on a test server without the server's own first-tick trigger (covered
-// by `cargo test cutscene`), so the scene is started the way the client does when the packet arrives: Cutscene.play(['intro'], { skippable }).
-// Checks: it locks the hero (a held key moves nothing); the narrator speaks every line (speech synthesis is stubbed and records what is said, in order, in
-// English with the English voice setting); the subtitles show; a scene that is not skippable cannot be skipped and shows no skip hint; a skippable one shows
-// the hint after a few seconds and ends on a held key (and the narrator is silenced); Settings > Replay intro plays it skippable; the sea is on the canvas;
-// and a full minute plays through to the end, returns control and leaves the hero where they were. MUTATE=lock|skip|narrate must each fail.
-const assert = require('node:assert/strict');
-const path = require('node:path');
-const fs = require('node:fs');
-const { chromium } = require('./lib/playwright.cjs');
-const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
-const root = path.resolve(__dirname, '..');
-const client = new Client({ name: 'valhallasc-intro', version: '1.0.0' });
-let browser, started = false, checks = 0;
-const check = (value, message) => { assert.ok(value, message); checks++; console.log(`${checks}: ${message}`); };
-async function call(name, args = {}) {
-  const result = await client.callTool({ name, arguments: args });
-  assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`); return result.structuredContent;
-}
-const errors = [];
-(async () => {
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0', ...(process.env.VALHALLA_BINARY ? { VALHALLA_BINARY: process.env.VALHALLA_BINARY } : {}) } }));
-  const world = await call('start_world'); started = true;
-  browser = await chromium.launch({ headless: true, args: ['--disable-gpu'] });
-  const page = await browser.newPage({ viewport: { width: 960, height: 600 }, reducedMotion: 'no-preference' });
-  page.on('pageerror', e => { errors.push(e.message); console.log('PAGEERROR', e.message); });
-  const mutations = {
-    lock: ["for (const type of ['keydown', 'keyup', 'keypress'])", 'for (const type of [])'],
-    skip: ['if (held >= 1) { finish(); return; }', 'if (held >= 9999) { finish(); return; }'],
-    narrate: ['if (S.narrate) speak(tr(text), hold || 4);', ''],
-  };
-  if (process.env.MUTATE) {
-    const [from, to] = mutations[process.env.MUTATE] || mutations.lock, src = fs.readFileSync(path.join(root, 'client/cutscene.js'), 'utf8');
-    assert.ok(src.includes(from), 'the mutation applies');
-    await page.route('**/cutscene.js*', route => route.fulfill({ contentType: 'text/javascript', body: src.replace(from, to) }));
-  }
-  // A stub narrator: records every utterance and every cancel.
-  await page.addInitScript(() => {
-    window.AudioContext = undefined; window.webkitAudioContext = undefined;
-    localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null }));
-    window.__said = []; window.__cancelled = 0;
-    window.SpeechSynthesisUtterance = function (text) { this.text = text; };
-    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: u => window.__said.push({ text: u.text, lang: u.lang, rate: u.rate }), cancel: () => { window.__cancelled++; }, getVoices: () => [] } });
-  });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
-  await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Summoned'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
-  if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
-  await page.waitForTimeout(1500);
-  const hero = () => page.evaluate(() => ({ x: Field.hero.nx ?? Field.hero.x, y: Field.hero.ny ?? Field.hero.y }));
-  const state = () => page.evaluate(() => window.Cutscene.state);
-  const home = await hero();
-
-  // ---------- a first character: not skippable ----------
-  await page.evaluate(() => window.Cutscene.play(['intro'], { skippable: false }));
-  await page.waitForFunction(() => window.Cutscene.state?.scene === 'intro', null, { timeout: 5000 });
-  check(true, 'The opening cutscene starts');
-  check((await state()).dur > 55 && (await state()).dur < 70, `It is about a minute long (${(await state()).dur} s)`);
-  await page.keyboard.down('ArrowRight'); await page.keyboard.down('KeyW');
-  await page.waitForTimeout(2500);
-  const moved = await hero();
-  check(Math.hypot(moved.x - home.x, moved.y - home.y) < .05, 'A held key moves nothing while it plays');
-  check(await page.locator('#cutscene').isVisible() && (await page.locator('#cutscene .cs-caption').innerText()).length > 20, 'The narration is shown as subtitles');
-  const sea = await page.evaluate(() => {
-    const c = document.getElementById('fieldcv'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0, blue = 0;
-    for (let i = 0; i < d.length; i += 28) { n++; if (d[i + 2] > 110 && d[i + 2] > d[i] + 40) blue++; } return blue / n;
-  });
-  check(sea > .3, `The canvas shows the sea (${(sea * 100).toFixed(0)}% blue)`);
-  await page.waitForTimeout(3000);
-  const held = await state();
-  check(held && held.scene === 'intro', 'Holding a key for seconds does not skip a scene that cannot be skipped');
-  check(await page.locator('#cutscene .cs-skip').isHidden(), 'And it shows no skip hint');
-  await page.keyboard.up('ArrowRight'); await page.keyboard.up('KeyW');
-  const said = await page.evaluate(() => window.__said);
-  check(said.length >= 1 && said[0].text.startsWith('Before the first harvest'), 'The narrator speaks the first line');
-  check(said.every(s => s.lang === 'en-GB' && s.rate >= .72 && s.rate <= 1.18), 'In English, at a pace that fits each line');
-  check(await page.evaluate(() => Cutscene.state?.skippable === false), 'The scene reports itself as not skippable');
-
-  // ---------- the whole minute, then control returns ----------
-  await page.waitForFunction(() => !window.Cutscene.active, null, { timeout: 70000 });
-  const all = await page.evaluate(() => window.__said.map(s => s.text));
-  check(all.length === 7 && all[4] === 'And it found you.' && all[6] === 'Welcome to Greenmeadow, hero.', `All seven lines are spoken in order (${all.length})`);
-  check(await page.locator('#cutscene').isHidden(), 'The overlay hides at the end');
-  const end = await hero();
-  check(Math.hypot(end.x - home.x, end.y - home.y) < .05, 'The hero is exactly where they were: the scene never moved them');
-  const before = await hero();
-  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(900); await page.keyboard.up('ArrowRight');
-  const after = await hero();
-  check(Math.hypot(after.x - before.x, after.y - before.y) > .4, 'Control returns afterwards');
-
-  // ---------- Settings > Replay intro: skippable, and a held key ends it and silences the narrator ----------
-  await page.evaluate(() => { window.__said.length = 0; window.__cancelled = 0; });
-  await page.evaluate(() => document.getElementById('set-replay-intro')?.click());   // the button is part of Settings; clicking it directly keeps the test short
-  await page.waitForFunction(() => window.Cutscene.state?.scene === 'intro', null, { timeout: 6000 });
-  check(await page.evaluate(() => Cutscene.state.skippable === true), 'The replay from Settings can be skipped');
-  await page.waitForFunction(() => window.Cutscene.state?.el > 3, null, { timeout: 8000 });
-  check(await page.locator('#cutscene .cs-skip').isVisible(), 'The skip hint shows after a few seconds');
-  await page.keyboard.down('Space'); await page.waitForTimeout(500);
-  check(await page.evaluate(() => Cutscene.active), 'A short press does not skip (it must be held)');
-  await page.waitForTimeout(1300); await page.keyboard.up('Space');
-  await page.waitForFunction(() => !window.Cutscene.active, null, { timeout: 4000 });
-  check(true, 'Holding a key for a second skips it');
-  check((await page.evaluate(() => window.__cancelled)) >= 1, 'And the narrator is silenced');
-  assert.deepEqual(errors, []);
-  console.log(`intro-ui: ${checks} checks passed`);
-})().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => {
-  await browser?.close(); if (started) await call('stop_world').catch(() => {}); await client.close();
-});
+// Real recorded intro audio and private client. Run through test-touch-bounded.sh.
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const {chromium}=require('./lib/playwright.cjs');
+const {TestWorld}=require('../scripts/testing/driver.cjs');
+require('./lib/touch.cjs').requireMemoryLimit();
+const world=new TestWorld(), manifest=JSON.parse(fs.readFileSync('docs/intro-narration-sources.txt'));
+let browser,checks=0;
+const check=(ok,label)=>{assert.ok(ok,label);console.log(`${++checks}: ${label}`);};
+(async()=>{try{
+ check(manifest.files.length===7,'Seven recordings have a durable source mapping');
+ for(let i=0;i<7;i++){
+  const f=manifest.files[i],hash=crypto.createHash('sha256').update(fs.readFileSync(f.asset)).digest('hex');
+  assert.equal(hash,f.sha256,'Original ElevenLabs bytes are preserved');
+  assert(f.cue+f.duration+.12<=(manifest.files[i+1]?.cue??62),'Recordings fit without overlap at their normal speed');
+ }
+ check(true,'All seven originals match their hashes and fit inside the unchanged 62 seconds');
+ await world.start();browser=await chromium.launch({headless:true,args:['--disable-gpu']});
+ const page=await browser.newPage({viewport:{width:960,height:600}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ if(process.env.MUTATE==='narrate'){
+  const source=fs.readFileSync('client/cutscene.js','utf8'),from='if (S.narration?.[index]) window.CutsceneAudio?.narrate(S.narration[index], el - at);';
+  assert(source.includes(from));await page.route('**/cutscene.js*',r=>r.fulfill({contentType:'text/javascript',body:source.replace(from,'')}));
+ }
+ await page.addInitScript(()=>{
+  localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:true,musicVol:0,sfxVol:.4,weatherAudio:0,combatSounds:'synthesized'}));
+  window.__tts=0;window.SpeechSynthesisUtterance=function(){};
+  Object.defineProperty(window,'speechSynthesis',{configurable:true,value:{speak(){window.__tts++;},cancel(){},getVoices(){return[];}}});
+ });
+ await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('IntroRecords');await page.locator('#go').click({timeout:60000});
+ await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0);if(await page.locator('#low-gfx-dismiss').isVisible())await page.locator('#low-gfx-dismiss').click();
+ const paths=manifest.files.map(f=>f.asset.replace('client/',''));
+ const decoded=await page.evaluate(async paths=>(await CutsceneAudio.prepareNarration(paths)).map(b=>b?.duration||0),paths);
+ check(decoded.length===7&&decoded.every((d,i)=>d>0&&Math.abs(d-manifest.files[i].duration)<.1),'The browser decodes all seven actual MP3 assets');
+ await page.evaluate(()=>{
+  window.__narration=[];const narrate=CutsceneAudio.narrate;
+  CutsceneAudio.narrate=async(url,elapsed)=>{const started=await narrate(url,elapsed);__narration.push({url,started});return started;};
+  Cutscene.play(['intro'],{skippable:false});
+ });
+ await page.waitForFunction(()=>Cutscene.state?.scene==='intro');
+ check(await page.evaluate(()=>Cutscene.state.dur===62&&!Cutscene.state.skippable),'The first-character intro still lasts 62 seconds and cannot be skipped');
+ const home=await page.evaluate(()=>({x:Field.hero.nx,y:Field.hero.ny}));
+ await page.keyboard.down('ArrowRight');await page.waitForTimeout(2500);await page.keyboard.up('ArrowRight');
+ check(await page.evaluate(home=>Math.hypot(Field.hero.nx-home.x,Field.hero.ny-home.y)<.05,home),'The existing intro movement lock is retained');
+ check(await page.locator('#cutscene .cs-caption').textContent().then(t=>t.startsWith('Before the first harvest')),'Subtitles accompany the first recording');
+ check(await page.evaluate(()=>__narration.length===1&&__narration[0].started&&CutsceneAudio.narrating),'The first cue starts a real recorded WebAudio voice');
+ check(await page.evaluate(()=>Math.abs(__combatAudioTest.bus().gain.value-.16)<.001),'Narration uses the existing effects-volume bus');
+ check(await page.evaluate(()=>__tts===0),'Browser TTS is never used');
+ // One uninterrupted playback checks the actual recording/caption schedule.
+ await page.waitForFunction(()=>Cutscene.state?.el>58.2,null,{timeout:65000});
+ check(await page.locator('#cutscene .cs-caption').textContent()==='Welcome to Veyrheim, hero.','The final subtitle welcomes the hero to Veyrheim');
+ check(await page.evaluate(()=>CutsceneAudio.narrating),'The final Veyrheim recording is playing');
+ await page.screenshot({path:path.join(world.runDir,'intro-veyrheim-recorded.png')});
+ await page.waitForFunction(()=>!Cutscene.active,null,{timeout:6000});
+ const played=await page.evaluate(()=>__narration);
+ check(played.length===7&&played.every((v,i)=>v.started&&v.url===paths[i]),'All seven recordings play exactly once in the right order');
+ check(await page.evaluate(()=>__tts===0&&!CutsceneAudio.narrating),'Completion leaves no narrator running and never falls back to TTS');
+ check(await page.locator('#cutscene').isHidden(),'The cutscene closes normally');
+ // Sound setting and volume changes apply to active as well as future voices.
+ const sound=await page.evaluate(async url=>{
+  Prefs.set({sound:false});const muted=await CutsceneAudio.narrate(url,0);
+  Prefs.set({sound:true,sfxVol:.5});const started=await CutsceneAudio.narrate(url,0),volume=__combatAudioTest.bus().gain.value;
+  Prefs.set({sound:false});return{muted,started,volume,active:CutsceneAudio.narrating};
+ },paths[0]);
+ check(!sound.muted&&sound.started&&!sound.active&&Math.abs(sound.volume-.25)<.001,'Mute stops active narration; muted cues stay silent and volume is respected');
+ await page.route('**/intro-narration-1.mp3?late=1',async route=>{await page.waitForTimeout(350);await route.fulfill({path:'client/assets/intro-narration-1.mp3',contentType:'audio/mpeg'});});
+ const delayed=await page.evaluate(async()=>{Prefs.set({sound:true});const p=CutsceneAudio.narrate('assets/intro-narration-1.mp3?late=1',0);CutsceneAudio.stopNarration();return{started:await p,active:CutsceneAudio.narrating};});
+ check(!delayed.started&&!delayed.active,'A delayed recording cannot start after narration has been cancelled');
+ await page.evaluate(()=>document.getElementById('set-replay-intro').click());await page.waitForFunction(()=>Cutscene.state?.scene==='intro'&&Cutscene.state.el>2.7,null,{timeout:6500});
+ check(await page.evaluate(()=>Cutscene.state.skippable&&CutsceneAudio.narrating),'Settings replay is skippable and uses the recordings');
+ await page.keyboard.down('Space');await page.waitForTimeout(1200);await page.keyboard.up('Space');await page.waitForFunction(()=>!Cutscene.active);
+ check(await page.evaluate(()=>!CutsceneAudio.narrating),'Holding skip stops the recording immediately');
+ await page.evaluate(()=>{Cutscene.play(['intro'],{skippable:true});});await page.waitForFunction(()=>CutsceneAudio.narrating,null,{timeout:5000});
+ await page.evaluate(()=>Cutscene.reset());
+ check(await page.evaluate(()=>!Cutscene.active&&!CutsceneAudio.narrating),'Reset/disconnect cleanup stops the recorded voice');
+ check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
+ const report={checks,recordings:manifest.files.map(f=>({asset:f.asset,cue:f.cue,duration:f.duration,sha256:f.sha256})),runDir:world.runDir};
+ fs.writeFileSync(path.join(world.runDir,'intro-recordings.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({checks,runDir:world.runDir}));
+ }finally{await browser?.close();await world.stop();}})().catch(e=>{console.error(e);process.exitCode=1;});

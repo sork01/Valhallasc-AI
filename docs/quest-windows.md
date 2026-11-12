@@ -1,5 +1,50 @@
 # Quest rewards and acceptance
 
+## Mobile quest windows (Beta 1.47.3)
+
+On narrow or short touch screens (width at most 900 px or height at most
+500 px), the journal and NPC quest windows show a full-width quest list or a
+full-width parchment, selected with **Quest list / Details** buttons. Tapping a
+quest opens its details and moves focus to the visible parchment. Details also
+reaches an NPC's greeting and services. Larger tablets and mouse desktops keep
+both panes visible.
+
+The action footer and header stay fixed while the list and parchment scroll
+by touch. Navigation/buttons keep 44 physical pixel targets after the user's
+window scale is applied. List and reading positions survive pane changes and
+live quest updates; returning to the list clears item tooltips. Long quest
+names wrap in the phone list. Accept, turn-in, confirmed abandonment, tracking
+and Close retain the authoritative actions. A fresh opening starts on the list.
+The game's existing landscape-only policy is unchanged.
+
+Focused `tests/quest-mobile-ui.cjs` runs use the unchanged bounded wrapper:
+
+- 667×375 English phone: **36 checks**.
+- 844×390 Swedish phone: **37 checks**, including the new hand-written labels.
+- 1024×768 touch tablet: **31 checks**, both panes visible.
+- 1440×900 mouse desktop: **27 checks**, original two-pane layout.
+
+These checks use genuine touch swipes, real server acceptance and item-reward
+turn-in, fixed and visible footers, readable parchment, physical target sizes,
+focus/reading retention and cancelled abandonment. Screenshots of the small
+English journal and Swedish NPC turn-in were visually reviewed. Peak memory
+stayed below 900 MiB under the 1.5 GiB/no-swap/one-CPU cap. Updated older journal
+and quest-window checks navigate the phone pane buttons before selecting a
+hidden list entry. No general suite, encounter simulation or server change.
+
+Candidate: `/media/raid/valhallasc-data/quest-mobile-work`, branch
+`fix/quest-mobile`. Logs: `/media/raid/valhallasc-data/quest-mobile-*.log`;
+screenshots: candidate `test-results/touch/quest-mobile-*`. Client-only release;
+all seven changed public client hashes match the checked files, public health
+passes, and server PID `339798` is unchanged. Receipt: candidate
+`test-results/quest-mobile-release.json`. Original client backup:
+`/media/raid/valhallasc-data/quest-mobile-original-20261112T190933Z`. Changes
+are included in the combined Beta 1.47.4 client release. Owner invoked finish
+and deploy; all 17 combined public client hashes and both health endpoints pass,
+with the server PID/executable unchanged. Finish receipt: candidate
+`test-results/mobile-intro-finish-release.json`; session record: wiki
+`10_projects:valhallasc_veyrheim_mobile_intro_20261112`.
+
 ## Matching quest-giver windows (Beta 1.47.1)
 
 Quest-giver greetings, acceptance and turn-ins now reuse the journal's frame,
@@ -12,8 +57,8 @@ only on success; refused turn-ins retain the selected details and reason.
 
 The conversation's normal parchment is wrapped in a `display: contents`
 container outside quest mode. Merchant/services views remove the quest frame
-classes and retain their existing stock/bag layout. Client-only presentation;
-the new bag-space error and dungeon-mail requests remain in `TODO.md`.
+classes and retain their existing stock/bag layout. Client-only presentation. Bag-space errors and dungeon-roll mail were
+subsequently released in Beta 1.47.2; see `docs/todo-feedback-hats.md`.
 
 Focused `tests/quest-window-ui.cjs` checks pass: 15 on touch 844×390 and 19 on
 desktop 1440×900, including matching layout, reward tooltips, Enter acceptance,

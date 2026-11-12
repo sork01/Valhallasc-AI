@@ -178,3 +178,20 @@ html, body { overscroll-behavior: none; }
 @media (pointer: coarse) {
   .wm-name { min-width: calc(44px / var(--window-k, .8)); min-height: calc(44px / var(--window-k, .8)); }
 }
+
+/* Short/narrow touch screens read one full-width quest page at a time. */
+@media (pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px) {
+  #stage .pause > .quest-panel .journal-pages { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  #stage .pause > .quest-panel .journal-tab { display: none; }
+  #stage .pause > .quest-panel .quest-mobile-tabs { display: flex; gap: calc(6px / var(--window-k)); }
+  #stage .pause > .quest-panel .quest-mobile-tabs .gossip-button { padding: 0 calc(12px / var(--window-k)); }
+  .quest-mobile-tabs [aria-pressed="true"] { color: #fff1bd; border-color: #d5b05b; background: linear-gradient(#8f2d1e, #4d100a); }
+  #stage .pause > .quest-panel .journal-toolbar { min-height: 0; padding-top: calc(3px / var(--window-k)); padding-bottom: calc(3px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-titlebar .window-close { font-size: calc(24px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-pages > :is(nav, section, .gossip-parchment) { overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+  #stage .pause > .quest-panel[data-quest-pane="list"] :is(.journal-parchment, #quest-controls, #npc-quest-actions),
+  #stage .pause > .quest-panel[data-quest-pane="detail"] :is(#quest-list, #npc-quest-list) { display: none; }
+  #stage .pause > .quest-panel .journal-quest { padding: calc(6px / var(--window-k)) calc(10px / var(--window-k)); gap: calc(8px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-quest-name { white-space: normal; overflow-wrap: anywhere; }
+  #stage .pause > .quest-panel .journal-footer { padding-top: calc(3px / var(--window-k)); padding-bottom: calc(3px / var(--window-k)); }
+}

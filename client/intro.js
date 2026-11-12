@@ -5,7 +5,7 @@
 // The ship, pier and skipper are the game's own drawing (meadowdock.js, City.drawNpc) on a custom camera in the game's 2:1 projection, so the last
 // shot (the hero stepping onto the pier, zoom 1) is exactly the game's first view and the scene fades into the world without a cut. The sky tells
 // the history: ember glow, sparks, nine chains, a fire ring over a mountain, the sea warming from blue to red. Narration is shown as subtitles and read
-// by the browser's speech synthesis when a voice exists.
+// with the owner's seven recorded ElevenLabs narration clips.
 (() => {
   const CS = window.Cutscene, D = window.WORLD_MAP?.dock;
   if (!CS || !D) return;
@@ -153,18 +153,18 @@
 
   // ---- the narration (English here, Swedish by hand in scripts/sv-translations.txt) --------------------------------------------------
   const LINES = [
-    [1.5, 'Before the first harvest, a forge was lit beneath the roots of the world. Its keeper, Eldmarr the Ember-Lord, kept the great roots alive through the long winter.', 11],
-    [12.5, 'The gods raised their hall upon his fire and promised him a seat at their table. They never gave it. They bound him in stone with nine chains.', 11],
-    [24, 'But a fire cannot be chained forever. For a hundred years it has risen, and the roots that hold up the sky have begun to burn.', 10],
-    [34.5, 'No god may raise a hand against him, for all are bound by oath. So the old magic reached beyond the edge of the world, for someone who owed it nothing.', 12],
-    [46.8, 'And it found you.', 3.6],
-    [51, 'You did not ask for this. But the Grey Gull is nearing land, and the world is waiting.', 5.6],
-    [57.5, 'Welcome to Greenmeadow, hero.', 4],
+    [1.0, 'Before the first harvest, a forge was lit beneath the roots of the world. Its keeper, Eldmarr the Ember-Lord, kept the great roots alive through the long winter.', 11.4],
+    [12.5, 'The gods raised their hall upon his fire and promised him a seat at their table. They never gave it. They bound him in stone with nine chains.', 10.9],
+    [24, 'But a fire cannot be chained forever. For a hundred years it has risen, and the roots that hold up the sky have begun to burn.', 9.4],
+    [34.5, 'No god may raise a hand against him, for all are bound by oath. So the old magic reached beyond the edge of the world, for someone who owed it nothing.', 11.7],
+    [46.8, 'And it found you.', 2],
+    [51, 'You did not ask for this. But the Grey Gull is nearing land, and the world is waiting.', 6.7],
+    [58, 'Welcome to Veyrheim, hero.', 3.5],
   ];
 
   // ---- the scene -------------------------------------------------------------------------------------------------------------------------
   CS.register('intro', {
-    dur: DUR, captions: LINES, narrate: true, noZoom: true, fadeIn: 1.2, fadeOut: 2.2,
+    dur: DUR, captions: LINES, narration: LINES.map((_, i) => `assets/intro-narration-${i + 1}.mp3`), noZoom: true, fadeIn: 1.2, fadeOut: 2.2,
     sounds: [[0, 'sea_bed'], [2.5, 'creak'], [9, 'creak'], [12, 'ember'], [19, 'creak'], [28, 'creak'], [46.8, 'chord'], [53, 'creak'], [57, 'thud']],
     shoes: () => false,
     draw(c) {

@@ -8,7 +8,14 @@ const suite = {
     await debug(page,{op:'teleport',zone:0,...plaza});
     await page.waitForFunction(()=>Field.hero.quests.some(q=>q.id==='crags_onward'));
     const row = id => page.locator(`#quest-list .journal-quest[data-quest="${id}"]`);
-    const press = locator => process.env.JOURNAL_DESKTOP ? locator.click() : locator.tap();
+    const press = async target => {
+      if (!process.env.JOURNAL_DESKTOP && !await target.isVisible()) {
+        const id = await target.evaluate(n => n.closest('.pause')?.id);
+        const list = page.locator(`#${id} .quest-mobile-tabs [data-quest-pane="list"]`);
+        if (await list.isVisible()) await list.tap();
+      }
+      return process.env.JOURNAL_DESKTOP ? target.click() : target.tap();
+    };
     const control = name => page.locator(`#quest-controls [data-action="${name}"]`);
     async function quest(id, action) {
       console.log(`fixture: ${action} ${id}`);
@@ -30,11 +37,11 @@ const suite = {
     check(await page.locator('#quest-close').evaluate(n=>n===document.activeElement),'journal takes keyboard focus');
     const layout=await page.evaluate(()=>{
       const rect=id=>document.getElementById(id).getBoundingClientRect(), list=rect('quest-list'), parchment=rect('quest-page'), frame=document.querySelector('.quest-panel').getBoundingClientRect(), cv=rect('fieldcv'), footer=document.querySelector('.journal-footer').getBoundingClientRect();
-      return { side:list.right<=parchment.left+1, within:frame.left>=cv.left-1 && frame.right<=cv.right+1 && frame.top>=cv.top-1 && frame.bottom<=cv.bottom+1, footer:footer.top>=parchment.bottom-1, scroll:['quest-list','quest-page'].every(id=>getComputedStyle(document.getElementById(id)).overflowY==='auto') };
+      return { side:matchMedia('(pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px)').matches ? list.width>frame.width*.9 && parchment.width===0 : list.right<=parchment.left+1, within:frame.left>=cv.left-1 && frame.right<=cv.right+1 && frame.top>=cv.top-1 && frame.bottom<=cv.bottom+1, footer:footer.top>=parchment.bottom-1, scroll:['quest-list','quest-page'].every(id=>getComputedStyle(document.getElementById(id)).overflowY==='auto') };
     });
     console.log('layout:',JSON.stringify(layout));
     if(!layout.side || !layout.within || !layout.footer || !layout.scroll) await page.screenshot({path:`${out}/quest-journal-layout-failure-${width}x${height}.png`});
-    check(layout.side && layout.within && layout.footer && layout.scroll,'dark quest list and parchment fit side by side with independent scrolling and a bottom action bar');
+    check(layout.side && layout.within && layout.footer && layout.scroll,'quest list and parchment use the responsive layout with independent scrolling and a bottom action bar');
     check(await page.locator('#quest-list [data-group="zone:0"]').count()===1 && await page.locator('#quest-list [data-group="zone:1"]').count()===1,'unfinished quests are grouped by region');
     check(await page.locator('.quest-completed').evaluate(n=>!n.open && n===n.parentElement.lastElementChild),'completed history starts folded at the bottom');
     await press(row('slime_patrol'));
@@ -52,8 +59,9 @@ const suite = {
     await page.evaluate(()=>document.getElementById('quest-page').scrollTop=0);
     await page.waitForFunction(()=>!document.getElementById('announce').children.length);
     await page.screenshot({path:`${out}/quest-journal-${width}x${height}.png`});
+    const listTab = page.locator('#quest-journal .quest-mobile-tabs [data-quest-pane="list"]'); if(await listTab.isVisible())await press(listTab);
     await row('welcome').focus(); await page.keyboard.press('ArrowDown');
-    check(await page.evaluate(()=>document.activeElement.matches('.journal-quest[aria-pressed="true"]')),'arrow keys select and read visible quest rows');
+    check(await page.evaluate(()=>document.activeElement.matches('.journal-quest[aria-pressed="true"]') || document.activeElement.id==='quest-page' && matchMedia('(pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px)').matches),'arrow keys select and read visible quest rows');
     await press(row('slime_patrol')); await press(control('abandon'));
     check(await page.locator('#quest-page [role="alert"]').isVisible() && await control('abandon').textContent()==='Confirm abandon','Abandon requires an inline confirmation');
     await press(page.locator('#quest-page').getByRole('button',{name:'Cancel',exact:true}));

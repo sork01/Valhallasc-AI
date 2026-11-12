@@ -122,6 +122,7 @@
 .journal-emblem { position: absolute; left: .5cqw; top: .1cqw; z-index: 1; display: grid; place-items: center; width: 4.8cqw; height: 4.8cqw; border: 3px ridge #b6a16c; border-radius: 50%; background: radial-gradient(#454333, #131714 75%); box-shadow: 0 2px 4px #000; }
 .journal-emblem svg { width: 85%; height: 85%; }
 .journal-toolbar { display: flex; align-items: center; gap: 1.5cqw; flex-shrink: 0; min-height: 3.5cqw; padding: .45cqw 1.2cqw .35cqw 6cqw; background: linear-gradient(90deg, #24231e, #333026 50%, #22221e); border-bottom: 2px ridge #736b56; font: max(12px, 1.1cqw) Georgia, serif; color: #f4d77b; }
+.quest-mobile-tabs { display: none; }
 .journal-tab { align-self: stretch; display: flex; align-items: center; padding: .2cqw 1.1cqw; border: 1px solid #74603b; border-bottom-color: #151714; border-radius: .35cqw .35cqw 0 0; background: #121513; }
 #quest-count { padding: .25cqw 1.3cqw; border: 2px groove #5a5747; border-radius: .3cqw; background: #121513; }
 .journal-pages { display: grid; grid-template-columns: 46% minmax(0, 1fr); flex: 1; min-height: 0; gap: .5cqw; padding: .45cqw .55cqw; }

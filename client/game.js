@@ -987,7 +987,42 @@
     else if (kind === 'chord') for (const [i, fr] of [220, 329.6, 440, 554.4].entries()) tone('sine', fr * .5, fr, 4.2, .05, i * .25);
     else if (kind === 'thud') { tone('sine', 150, 42, .32, .22); sweep(.18, 900, 200, .1, 1.5); }
   }
-  window.CutsceneAudio = { play: cutsceneSound };
+  const narrationBuffers = new Map();
+  let narrationSource = null, narrationSerial = 0;
+  function stopNarration() {
+    narrationSerial++;
+    if (narrationSource) {
+      const source = narrationSource; narrationSource = null;
+      try { source.stop(); } catch { /* already ended */ }
+      source.disconnect();
+    }
+  }
+  function narrationBuffer(url, c) {
+    if (!narrationBuffers.has(url)) narrationBuffers.set(url, fetch(url)
+      .then(response => { if (!response.ok) throw Error('Narration unavailable'); return response.arrayBuffer(); })
+      .then(bytes => c.decodeAudioData(bytes)).catch(() => { narrationBuffers.delete(url); return null; }));
+    return narrationBuffers.get(url);
+  }
+  function prepareNarration(urls) {
+    if (!save.sound || !urls.length) return Promise.resolve([]);
+    const c = audio(); return c ? Promise.all(urls.map(url => narrationBuffer(url, c))) : Promise.resolve([]);
+  }
+  async function narrate(url, elapsed = 0) {
+    stopNarration();
+    if (!save.sound) return false;
+    const c = audio(); if (!c) return false;
+    const serial = narrationSerial, requested = performance.now(), buffer = await narrationBuffer(url, c);
+    if (!buffer || serial !== narrationSerial || !save.sound || c.state !== 'running') return false;
+    // Network/decode delays must not queue old speech over a later caption.
+    const offset = Math.max(0, elapsed + (performance.now() - requested) / 1000 - .12);
+    if (offset >= buffer.duration) return false;
+    const source = c.createBufferSource(); source.buffer = buffer;
+    source.connect(sfxOut(c)); narrationSource = source;
+    source.onended = () => { source.disconnect(); if (narrationSource === source) narrationSource = null; };
+    source.start(c.currentTime, offset); return true;
+  }
+  window.CutsceneAudio = { play: cutsceneSound, prepareNarration, narrate, stopNarration, get narrating() { return !!narrationSource; } };
+
   function onField(name, data) {
     if (SFX[name]) SFX[name](data);
     if (name === 'setTier') showToast(`${data.name}: ${data.tier}-piece bonus ${data.active ? 'active' : 'lost'}`);
@@ -1336,7 +1371,7 @@
       if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);
       if ('sound' in patch) save.sound = !!patch.sound;
       if ('combatSounds' in patch && ['recorded', 'synthesized'].includes(patch.combatSounds)) { save.combatSounds = patch.combatSounds; window.RecordedCombat?.stop(); }
-      if (!save.sound) window.RecordedCombat?.stop();
+      if (!save.sound) { window.RecordedCombat?.stop(); stopNarration(); }
       if (save.sound && save.combatSounds === 'recorded') { const c = audio(); if (c) window.RecordedCombat?.prime(c); }
       if ('touchSkills' in patch) save.touchSkills = patch.touchSkills && typeof patch.touchSkills === 'object' ? patch.touchSkills : {};
       if ('questArrow' in patch) save.questArrow = !!patch.questArrow;

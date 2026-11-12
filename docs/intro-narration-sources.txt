@@ -1,0 +1,70 @@
+{
+  "world": "Veyrheim",
+  "language": "en",
+  "voice": "Owner-provided ElevenLabs Adam recordings",
+  "files": [
+    {
+      "source": "ElevenLabs_2026-11-12T18_28_11_Adam_-_American_Dark_and_Tough_pvc_s50_sim75_v4.mp3",
+      "duration": 11.311,
+      "asset": "client/assets/intro-narration-1.mp3",
+      "sha256": "c7e6a948796013abaff681eab9df831a72566179b9ae48229e760285cf19682b",
+      "cue": 1.0,
+      "text": "Before the first harvest, a forge was lit beneath the roots of the world. Its keeper, Eldmarr the Ember-Lord, kept the great roots alive through the long winter.",
+      "subtitleSeconds": 11.4
+    },
+    {
+      "source": "ElevenLabs_2026-11-12T19_15_34_Adam_-_American_Dark_and_Tough_pvc_s50_sim75_v4.mp3",
+      "duration": 10.762438,
+      "asset": "client/assets/intro-narration-2.mp3",
+      "sha256": "97c0bf6d8bd8eed149e3bad537ddc7e71193dcb810ae0d75b5328f434f4570fc",
+      "cue": 12.5,
+      "text": "The gods raised their hall upon his fire and promised him a seat at their table. They never gave it. They bound him in stone with nine chains.",
+      "subtitleSeconds": 10.9
+    },
+    {
+      "source": "ElevenLabs_2026-11-12T19_17_14_Adam_-_American_Dark_and_Tough_pvc_s50_sim75_v4.mp3",
+      "duration": 9.168938,
+      "asset": "client/assets/intro-narration-3.mp3",
+      "sha256": "568b9192dac7952e55ad51b11d2fa261f5d2270fcdb71108a76b10328e3598d1",
+      "cue": 24,
+      "text": "But a fire cannot be chained forever. For a hundred years it has risen, and the roots that hold up the sky have begun to burn.",
+      "subtitleSeconds": 9.4
+    },
+    {
+      "source": "ElevenLabs_2026-11-12T19_18_28_Adam_-_American_Dark_and_Tough_pvc_s50_sim75_v4.mp3",
+      "duration": 11.46775,
+      "asset": "client/assets/intro-narration-4.mp3",
+      "sha256": "8deac8247d9682e8b74491922cd9175088e015e9d723fcab9eb7b104b8545d33",
+      "cue": 34.5,
+      "text": "No god may raise a hand against him, for all are bound by oath. So the old magic reached beyond the edge of the world, for someone who owed it nothing.",
+      "subtitleSeconds": 11.7
+    },
+    {
+      "source": "ElevenLabs_2026-11-12T19_19_28_Adam_-_American_Dark_and_Tough_pvc_s50_sim75_v4.mp3",
+      "duration": 1.410563,
+      "asset": "client/assets/intro-narration-5.mp3",
+      "sha256": "c5c5e44d3304421e72e681b42ca87d57a99a354aa5170899aa0ef35d73127aaf",
+      "cue": 46.8,
+      "text": "And it found you.",
+      "subtitleSeconds": 2
+    },
+    {
+      "source": "ElevenLabs_2026-11-12T19_20_40_Adam_-_American_Dark_and_Tough_pvc_s50_sim75_v4.mp3",
+      "duration": 6.530563,
+      "asset": "client/assets/intro-narration-6.mp3",
+      "sha256": "c36492af6ee67beb5cfdd85c4833e64d7888c916938739cc521508bf3c1688d8",
+      "cue": 51,
+      "text": "You did not ask for this. But the Grey Gull is nearing land, and the world is waiting.",
+      "subtitleSeconds": 6.7
+    },
+    {
+      "source": "ElevenLabs_2026-11-12T19_24_12_Adam_-_American_Dark_and_Tough_pvc_s50_sim75_v4.mp3",
+      "duration": 2.50775,
+      "asset": "client/assets/intro-narration-7.mp3",
+      "sha256": "6fc539f511f6c62ae02761dad5d2550258edc2deaef71c830414ded14f55388d",
+      "cue": 58,
+      "text": "Welcome to Veyrheim, hero.",
+      "subtitleSeconds": 3.5
+    }
+  ]
+}
