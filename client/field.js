@@ -1101,6 +1101,7 @@
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
   let pendingNpc = null, pendingChest = null, cityRoute = [], routeTime = 0;
+  let blockedAttack = null, autoAttackTarget = null;
   const routeMotion = { x: 0, y: 0, t: 0, v: 5.5 };   // the hero's recent speed over ground, for the route follower's look-ahead
   // Speech bubbles over characters that just chatted: id -> {text, until, lines}.
   const bubbles = new Map();
@@ -1428,7 +1429,7 @@
     rememberPointer(e); const { x: wx, y: wy } = pointer;
     const s = pickSlime(mx, my, wx, wy);
     const rival = !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
-    if (s) { hero.pvpTargetId = null; hero.target = s; hero.goal = null; Online.send({ type: 'target', id: s.id }); }
+    if (s) Field.targetEnemy(s.id);
     else if (rival) { pointer.down = false; hero.pvpTargetId = rival.id; hero.target = null; hero.goal = null; }
     else { hero.pvpTargetId = null; hero.target = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
     emitHud();
@@ -1605,6 +1606,26 @@
   // The server's world clock (seconds), as of the last snapshot plus the time since. Walking townspeople are placed from it.
   const clock = { t: 0, at: 0, ok: false };
   const serverNow = () => clock.ok ? clock.t + (performance.now() - clock.at) / 1000 : performance.now() / 1000;
+  // Feedback for a selected target that the authoritative actor cannot approach or attack.
+  // Combat remains server-owned; this only describes existing obstacle geometry, at snapshot rate.
+  function autoAttackFeedback(own) {
+    const target = hero.target;
+    if (!running || paused || !Online.connected || !target || target.id !== autoAttackTarget || target.dead || own.dead || own.moving
+        || own.atkCd > 0 || own.atkT > 0 || own.dashT > 0 || own.stun > 0 || own.frozen
+        || own.sparkTravel || window.Cutscene?.active || keyboardDirection().some(Boolean)) {
+      blockedAttack = null; return;
+    }
+    const now = performance.now();
+    if (!blockedAttack || blockedAttack.target !== target.id || blockedAttack.zone !== zone) {
+      blockedAttack = { target: target.id, zone, since: now, warned: -Infinity };
+    }
+    if (now - blockedAttack.since < 350) return;
+    const at = { x: target.nx ?? target.x, y: target.ny ?? target.y };
+    if (segmentFree(own, at, .05)) { blockedAttack = null; return; }
+    if (now - blockedAttack.warned >= 2000) {
+      Field.error('Out of line of sight.'); blockedAttack.warned = now;
+    }
+  }
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
     window.DayNight?.sync(packet.worldTime);
@@ -1697,6 +1718,7 @@
       return actor;
     });
     hero.target = selectedTarget == null ? null : slimes.find(s => s.id === selectedTarget && !s.dead) || null;
+    autoAttackFeedback(own);
     const present = new Set();
     for (const player of packet.players) {
       if (player.id === Online.id || !inZone(player)) continue;
@@ -1810,7 +1832,7 @@
         if (tier) burst(event.x, event.y, 8 + tier * 8, 4 + tier * 5, ['#ffffff', { 1: '#4ad66d', 2: '#64b5ff', 3: '#b45cff', 4: '#ff9a2e', 5: '#ffd24a' }[tier]]);
       }
     }
-    if (event.kind === 'shotBlocked') spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45);
+    if (event.kind === 'shotBlocked') { spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45); if (event.actor === Online.id) Field.error('Out of line of sight.'); }
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + DamageNumbers.format(event.value) + ' gold', '#ffe066', false, 'pickup');
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); effects.push({kind:'chestOpen',x:event.x,y:event.y,t:0,life:1.3}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
@@ -5530,6 +5552,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelHeldInput(); });
   const Field = {
     start(o) {
+      blockedAttack = null; autoAttackTarget = null;
       window.WorldFeedback?.reset();
       cv = o.canvas; ctx = cv.getContext('2d'); mini = o.mini; mctx = mini ? mini.getContext('2d') : null; opts = o.opts; onHud = o.onHud || onHud; onEvent = o.onEvent || onEvent;
       if (!sprites.tree.length) buildSprites();
@@ -5583,8 +5606,8 @@
       }
       if (!nearest) return false;
       Field.clearInput();
-      hero.pvpTargetId = null; hero.target = nearest; hero.goal = null; marker = null;
-      Online.send({ type: 'target', id: nearest.id }); emitHud(); return true;
+      marker = null;
+      return Field.targetEnemy(nearest.id);
     },
     // Minimap zoom: 1 is the whole zone, 4 is four times closer. Saved in Prefs.
     minimapZoom(step) {
@@ -5604,7 +5627,7 @@
       }
       return false;
     },
-    clearInput() { touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
+    clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
     setPaused(p) { paused = p; Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
       if (paused || !Online.connected || hero.dead) return;
@@ -5648,6 +5671,12 @@
       return Online.send({ type: 'equip', slots: { [slot]: item } });
     },
     get remotePlayers() { return [...remotePlayers.values()]; },
+    targetEnemy(id) {
+      const target = slimes.find(s => s.id === id && !s.dead);
+      if (!running || paused || !Online.connected || hero.dead || !target) return false;
+      autoAttackTarget = id; hero.pvpTargetId = null; hero.target = target; hero.goal = null;
+      Online.send({ type: 'target', id }); emitHud(); return true;
+    },
     targetPlayer(id) { if (!remotePlayers.has(id)) return false; hero.pvpTargetId = id; hero.target = null; hero.goal = null; emitHud(); return true; },
     // Shows `text` in a speech bubble over the character `id` for a few seconds (longer for longer messages).
     bubble(id, text, party = false) {

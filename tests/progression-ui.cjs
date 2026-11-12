@@ -54,7 +54,7 @@ async function call(name, args = {}) {
   check(text.includes('In progress') && text.includes('Captain Sera is in Emberfall Crags'), 'The journal points the player to the new zone and its captain');
   check(await card('rime_onward').count() === 0, 'The next one still waits for level 10');
   await closeJournal();
-  const row = await page.locator('#npc-quests .gossip-row[data-quest="crags_onward"]').count();
+  const row = await page.locator('#npc-quest-list .journal-quest[data-quest="crags_onward"]').count();
   check(row === 0, 'Nothing is listed at a giver that the player could accept');
 
   // Arriving in the zone completes the objective; the captain pays.
@@ -66,10 +66,10 @@ async function call(name, args = {}) {
   check(await card('crags_onward').locator('button', { hasText: 'Report to Captain Sera' }).count() === 1, 'The journal offers to take the player to the captain');
   await card('crags_onward').locator('button', { hasText: 'Report to Captain Sera' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
-  const done = page.locator('#npc-quests .gossip-row[data-quest="crags_onward"]');
-  check(await done.getAttribute('data-status') === 'ready' && await done.locator('.gossip-icon').textContent() === '?', 'The captain lists it as ready to hand in');
+  const done = page.locator('#npc-quest-list .journal-quest[data-quest="crags_onward"]');
+  check(await done.getAttribute('data-status') === 'ready' && await done.locator('.journal-quest-mark').textContent() === '?', 'The captain lists it as ready to hand in');
   await done.click();
-  await page.locator('#npc-quests [data-action="claim"]').click();
+  await page.locator('#npc-dialogue [data-action="claim"]').click();
   await page.waitForFunction(() => document.getElementById('npc-notice').textContent.includes('Quest complete: Onward to the Crags'), null, { timeout: 10000 });
   await page.locator('#npc-x').click();
   await journal();

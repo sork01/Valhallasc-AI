@@ -1,5 +1,49 @@
 [
   {
+    "version": "Beta 1.47.1",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "Quest givers now use the journal’s dark frame, quest list, parchment page and red bottom buttons when accepting or turning in quests.",
+      "Quest details stay open after a refused turn-in so its reason and rewards remain visible."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.47.0",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "The quest journal now has a classic two-pane layout: a dark list grouped by region, parchment quest details, a gold-trimmed frame, and actions along the bottom.",
+      "Read one selected quest at a time, with its story, objectives and reward icons. Ready quests and completed history stay below unfinished quests."
+    ],
+    "removed": [
+      "The old expanding quest cards and long introduction were replaced to make the journal easier to browse."
+    ]
+  },
+  {
+    "version": "Beta 1.46.2",
+    "date": "2026-11-12",
+    "new": [
+      "Blocked autoattacks now show “Out of line of sight.”"
+    ],
+    "changed": [
+      "Error text is smaller and appears near the top of the screen, in its own stack above chest and quest announcements. Up to five red messages remain visible, newest at the bottom, fading over two seconds."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.46.1",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "Errors appear as plain red text in the announcement area, fade away over two seconds, and stack up to five messages with the newest at the bottom.",
+      "Gold tooltips appear beside the hovered drop, including on wide screens.",
+      "Quests ready to turn in move below unfinished quests in the tracker on the left, even when tracked. Non-repeatable question marks are yellow; repeatable quest markers remain blue."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.46.0",
     "date": "2026-11-12",
     "new": [

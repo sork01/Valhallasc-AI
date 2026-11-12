@@ -1,7 +1,71 @@
 # Quest rewards and acceptance
 
-**Beta 1.46.0:** unfinished quests precede ready-to-turn-in quests even when a
-ready quest is tracked. Completed history stays last and includes claimed
+## Matching quest-giver windows (Beta 1.47.1)
+
+Quest-giver greetings, acceptance and turn-ins now reuse the journal's frame,
+dark quest sidebar, parchment, book emblem and red bottom controls. Selecting
+a title keeps the NPC's other offered quests available in the sidebar. Accept,
+Complete Quest and Decline/Back live in the footer beside Close, outside the
+scrolling details. Class-choice reward icons remain on the parchment with their
+existing hover/touch behavior. Acceptance still waits for the server and closes
+only on success; refused turn-ins retain the selected details and reason.
+
+The conversation's normal parchment is wrapped in a `display: contents`
+container outside quest mode. Merchant/services views remove the quest frame
+classes and retain their existing stock/bag layout. Client-only presentation;
+the new bag-space error and dungeon-mail requests remain in `TODO.md`.
+
+Focused `tests/quest-window-ui.cjs` checks pass: 15 on touch 844×390 and 19 on
+desktop 1440×900, including matching layout, reward tooltips, Enter acceptance,
+the real fixed-item turn-in, class filtering, server refusals, a successful
+chosen reward and return to merchant services. Screenshots of acceptance and
+turn-in were reviewed. Logs/images: `test-results/touch/quest-conversation-*`
+and `quest-{accept,turnin}-classic-*`. No broad suites or encounter tests.
+All eleven changed public client hashes match, public/bridge health is healthy,
+and server PID 183593 is unchanged. Swedish freshness, release notes, changed
+JavaScript syntax and whitespace checks pass.
+
+## Classic quest journal (Beta 1.47.0)
+
+The owner's FileDrop reference `pvw69993.png` replaces the earlier accordion
+journal with a dark, gold-trimmed frame and two independently scrolling panes.
+Unfinished quests are grouped by region in the left pane. Ready turn-ins follow
+them, then abandoned automatic quests and the folded completed history at the
+bottom. Region groups can be folded. Clicking a quest (or using the arrow keys
+on its row) selects the single parchment page on the right.
+
+The page shows the description, authoritative objective counts, giver/location,
+party progress, recovered memories, and the existing reward icons/tooltips.
+Reading rewards never claims them remotely. Abandon, Track, Show Map and Close
+sit along the bottom; the header X and outside dismissal use normal closing.
+Abandon still requires confirmation and sends the existing server command;
+Empty Seat quests remain protected. Recoverable automatic quests expose Restore
+quest. Completed history disables active-quest actions. No Share button is
+added because the game has no quest-sharing action.
+
+Selection, group folds, reading position and list scroll survive progress
+updates. Opening the journal selects the tracked quest or the first current
+quest and folds completed/recovery history. Only the selected detail is built,
+so long histories do not create hundreds of reward tooltips. The existing
+window size control remains available. All new headings/controls are translated.
+
+Focused private checks: `tests/quest-journal-ui.cjs` through
+`scripts/test-touch-bounded.sh`, at tablet and phone sizes. Earlier tests below
+describe the superseded accordion layout.
+
+Validation: 21 focused checks each at desktop 1440×900 and touch 844×390
+pass, including actual progress updates, reward tooltips, Track/Show Map,
+confirmed abandonment, recovery, read-only repeatable history, keyboard
+selection and outside dismissal. Swedish headings and controls also passed in
+the private tablet client. Desktop and phone screenshots were reviewed against
+the reference. Logs and images are in `test-results/touch/quest-journal-*`.
+Peak scope memory was 917 MiB under the unchanged 1.5 GiB cap. Release notes,
+Swedish freshness, changed-source syntax and whitespace checks pass. All ten
+changed public client hashes match; both health endpoints are healthy and
+server PID 183593 is unchanged. This is a client-only release.
+
+**Beta 1.46.1:** unfinished quests precede ready-to-turn-in quests in both the
+journal and the left-side tracker, even when a ready quest is tracked. Completed history stays last and includes claimed
 repeatable quests. Named objective-completion toasts are described in
 `docs/quest-feedback.md`.
 

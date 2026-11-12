@@ -3,12 +3,12 @@
   const $ = id => document.getElementById(id);
   const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
   const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
-  let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false, completedOpen = false;
+  let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
   let abandoned = [], initialized = false;
   const guidance = QuestGuidance.create(areas, window.QUEST_SOURCES || {});
   let groupKey = '', groupList = [];
-  const expanded = new Set();
-  let abandonConfirm = null, abandonedOpen = false;
+  const closedGroups = new Set();
+  let abandonConfirm = null, journalSelection = null;
   const state = quest => progress.find(p => p.id === quest.id);
   const allGivers=q=>q.givers?areas.flatMap((a,zone)=>a.npcs.filter(n=>q.givers.includes(n.id)).map(n=>({...n,zone}))):[{...areas[q.zone].npcs.find(n=>n.id===q.npc),zone:q.zone}];
   const giver = quest => allGivers(quest).find(n=>n.zone===(window.Field?.zone||0))||allGivers(quest)[0];
@@ -89,7 +89,7 @@
         if (!s) continue;
         const repeatable = offered.filter(p => p.s === s).every(p => p.q.repeatable);
         out.push({ x: n.x, y: n.y, npc: n.id, state: s, symbol: s === 'ready' ? '?' : '!', repeatable,
-          color: s === 'ready' || repeatable ? '#64b5ff' : '#ffdf88', label: `${n.name} · ${words[s]}` });
+          color: repeatable ? '#64b5ff' : '#ffdf88', label: `${n.name} · ${words[s]}` });
       }
       mapCache.set(zone, out);
     }
@@ -212,71 +212,9 @@
       return { name: m.name, done, text };
     });
   }
-  function card(quest, atNpc, history = false) {
-    const s = history ? 'completed' : status(quest), npc = giver(quest);
-    const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
-    node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
-    if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
-    if (!atNpc) node.append(element('small', `${areas[npc.zone??quest.zone].name} · ${hubName(quest) || 'Quest giver'}`, 'quest-location quest-history'));
-    const gap = quest.level - (heroLevel);
-    const rec = element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'); rec.dataset.level = String(quest.level);
-    if (gap >= 5) rec.style.color = '#ff6b6b'; else if (gap >= 3) rec.style.color = '#ffa65a'; else if (gap <= -5) rec.style.color = '#9fb0a0';
-    node.append(rec);
-    node.append(element('p', quest.description), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join(' · '), 'quest-objectives'));
-    if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
-    storyRecap(quest, node);
-    if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
-    const party = mates(quest);
-    if (party.length) {
-      const line = element('p', `Party on this quest: ${party.map(m => `${m.name} (${m.done ? 'ready' : m.text})`).join(', ')}`, 'quest-party');
-      line.dataset.partyQuest = String(party.length); node.append(line);
-    }
-    if (!quest.handoffTo) node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
-    const choices = rewards(quest, node, s === 'ready' && atNpc);
-    if (s === 'upcoming') {
-      node.append(element('p', `This quest finds you by itself at level ${quest.autoLevel}.`, 'quest-history'));
-    } else if (s === 'locked') {
-      const early = quest.requires && !(state({ id: quest.requires })?.completions > 0);
-      node.append(element('p', early ? `Complete “${definitions.find(q => q.id === quest.requires)?.title}” first.` : `This quest is for heroes of level ${quest.minLevel} and above.`));
-    } else if (atNpc && ['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
-      const action = s === 'ready' ? 'claim' : 'accept';
-      const b = button(s === 'ready' ? 'Collect reward' : state(quest)?.completions ? (quest.season ? (quest.seasonCadence==='daily'?'Take today’s quest':'Take this year’s quest') : 'Take bounty again') : 'Accept quest', () => {
-        questAction(quest, action, b);
-      });
-      b.dataset.action = action; node.append(b);
-    } else if (!atNpc && quest.autoLevel && abandoned.includes(quest.id) && s === 'available') {
-      const b = button('Restore quest', () => {
-        if (Online.send({ type: 'quest_restore', id: quest.id })) b.disabled = true;
-      });
-      b.dataset.action = 'restore'; node.append(b);
-    } else if (!atNpc && !['completed', 'upcoming'].includes(s)) {
-      if (Field.zone !== quest.zone) node.append(element('p', quest.zone === 0
-        ? `${npc.name} is back in Greenmeadow. Return through the gate first.`
-        : `${npc.name} is in ${areas[quest.zone].name}. Travel through the gate to ${hubName(quest) || 'meet them'}.`, 'quest-history'));
-      else node.append(button(`${s === 'ready' ? (quest.autoLevel ? 'Report to' : 'Return to') : s === 'available' ? 'Get quest from' : 'Visit'} ${npc.name}`, () => {
-        close(); Field.visitNpc(quest.npc);
-      }));
-    }
-    if (!atNpc && ['active', 'ready'].includes(s)) node.append(button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
-      track(quest.id); $('quest-close').focus();
-    }));
-    if (!atNpc && ['active', 'ready'].includes(s) && !quest.id.startsWith('es_')) {      // the Empty Seat cannot be abandoned (server: Quest::abandonable)
-      const asking = abandonConfirm === quest.id;
-      if (asking) node.append(element('p', 'Abandon this quest? Current progress will be lost. You can take it again from its questgiver.', 'quest-abandon-warning'));
-      const b = button(asking ? 'Confirm abandon' : 'Abandon quest', () => {
-        expanded.add(quest.id);
-        if (!asking) { abandonConfirm = quest.id; render(); $('quest-list').querySelector(`[data-quest="${quest.id}"] [data-action="abandon"]`).focus(); }
-        else if (Online.send({ type: 'quest_abandon', id: quest.id })) { b.disabled = true; }
-      });
-      b.dataset.action = 'abandon'; node.append(b);
-      if (asking) node.append(button('Cancel', () => { abandonConfirm = null; render(); }));
-    }
-    if (state(quest)?.completions) node.append(element('p', `Completed ${state(quest).completions} time${state(quest).completions === 1 ? '' : 's'}.`, 'quest-history'));
-    return node;
-  }
   function render() {
     const active = definitions.filter(q => ['ready', 'active'].includes(status(q)));
-    active.sort((a, b) => Number(b.id === tracked) - Number(a.id === tracked) || Number(status(b) === 'ready') - Number(status(a) === 'ready'));
+    active.sort((a, b) => Number(status(a) === 'ready') - Number(status(b) === 'ready') || Number(b.id === tracked) - Number(a.id === tracked));
     const tracker = $('quest-tracker');
     const header = element('div', '', 'tracker-heading');
     const journal = button(`Quests (${active.length}) · ${window.Keys ? Keys.label('quests', false) : 'Q'}`, show); journal.className = 'tracker-journal';
@@ -323,61 +261,125 @@
     tracker.append(list);
     if (open()) renderJournal(active);
   }
-  // The journal holds your own quests only: the ones in progress or ready to hand in (those of this zone first), and a
-  // folded list of the finished ones. Quests you have not taken are found at the people marked with !.
+  // One selected quest is read on the parchment; the dark list keeps regions,
+  // ready turn-ins, abandoned automatic quests and completed history separate.
   function renderJournal(active) {
     const zone = window.Field?.zone || 0;
     const mine = [...active].sort((a, b) => Number(status(a) === 'ready') - Number(status(b) === 'ready') || Number(b.id === tracked) - Number(a.id === tracked) || Number(b.zone === zone) - Number(a.zone === zone));
-    const nodes = mine.map(q => foldedCard(q));
+    const recoverable = definitions.filter(q => q.autoLevel && heroLevel >= q.autoLevel && abandoned.includes(q.id)
+      && status(q) === 'available' && (!q.handoffTo || !state({id: q.handoffTo})));
+    const done = definitions.filter(q => !q.handoffTo && (status(q) === 'completed' || state(q)?.claimed && state(q)?.completions > 0));
+    const entries = [...mine.map(q => ({ q, history: false })), ...recoverable.map(q => ({ q, history: false })), ...done.map(q => ({ q, history: true }))];
+    const key = entry => (entry.history ? 'history:' : '') + entry.q.id;
+    const chosen = entries.find(e => key(e) === journalSelection) || entries.find(e => e.q.id === tracked && !e.history) || entries[0];
+    journalSelection = chosen ? key(chosen) : null;
+    const list = $('quest-list'), page = $('quest-page'), controls = $('quest-controls');
+    const scroll = list.scrollTop, reading = page.dataset.selection === journalSelection, pageScroll = reading ? page.scrollTop : 0;
+    const memoriesOpen = reading && page.querySelector('.quest-memories')?.open;
+    const previousStatus = list.querySelector('[aria-pressed="true"]')?.dataset.status;
+    const focus = document.activeElement, focusKey = focus?.closest('.journal-quest')?.dataset.selection, focusAction = focus?.closest('#quest-controls button')?.dataset.action;
+    const row = (q, history = false) => {
+      const s = history ? 'completed' : status(q), selection = (history ? 'history:' : '') + q.id;
+      const b = button('', () => { journalSelection = selection; abandonConfirm = null; renderJournal(active); });
+      b.className = 'journal-quest'; b.dataset.quest = q.id; b.dataset.status = s; b.dataset.selection = selection; b.dataset.repeatable = String(!!q.repeatable);
+      b.setAttribute('aria-pressed', String(selection === journalSelection));
+      b.setAttribute('aria-controls', 'quest-page');
+      b.setAttribute('aria-label', `${q.title}, ${words[s]}${tracked === q.id && !history ? ', Tracking' : ''}`);
+      b.append(element('span', `[${q.level}] ${q.title}`, 'journal-quest-name'));
+      const mark = element('span', tracked === q.id && !history ? '◆' : s === 'ready' ? '?' : history ? '✓' : q.repeatable ? '↻' : '!', 'journal-quest-mark');
+      mark.setAttribute('aria-hidden', 'true'); b.append(mark);
+      return b;
+    };
+    const group = (name, id, quests, history = false, className = '') => {
+      const g = document.createElement('details'); g.className = 'journal-group ' + className; g.dataset.group = id;
+      g.open = !closedGroups.has(id);
+      g.append(element('summary', name));
+      for (const q of quests) g.append(row(q, history));
+      g.addEventListener('toggle', () => { if (g.isConnected) { if (g.open) closedGroups.delete(id); else closedGroups.add(id); } });
+      return g;
+    };
+    const nodes = [];
+    const unfinished = mine.filter(q => status(q) === 'active');
+    for (const z of [...new Set(unfinished.map(q => q.zone))]) nodes.push(group(areas[z].name, `zone:${z}`, unfinished.filter(q => q.zone === z)));
+    const ready = mine.filter(q => status(q) === 'ready');
+    if (ready.length) nodes.push(group(`Ready to turn in (${ready.length})`, 'ready', ready, false, 'quest-ready'));
     if (!mine.length) {
       nodes.push(element('p', 'You have no quests in progress. Speak to anyone with a ! over their head to take one.', 'quest-empty'));
       const next = definitions.find(q => q.zone === zone && status(q) === 'available') || definitions.find(q => status(q) === 'available');
       if (next) nodes.push(element('p', `Next: “${next.title}”. Speak to ${giver(next).name} in ${hubName(next) || areas[next.zone].name}.`, 'quest-empty quest-next'));
     }
-    const recoverable = definitions.filter(q => q.autoLevel && heroLevel >= q.autoLevel && abandoned.includes(q.id)
-      && status(q) === 'available' && (!q.handoffTo || !state({id: q.handoffTo})));
-    if (recoverable.length) {
-      const folded = document.createElement('details'); folded.className = 'quest-abandoned'; folded.open = abandonedOpen;
-      folded.addEventListener('toggle', () => { if (folded.isConnected) abandonedOpen = folded.open; });
-      folded.append(element('summary', `Abandoned automatic quests (${recoverable.length})`));
-      for (const q of recoverable) folded.append(foldedCard(q));
-      nodes.unshift(folded);
+    if (recoverable.length) nodes.push(group(`Abandoned automatic quests (${recoverable.length})`, 'abandoned', recoverable, false, 'quest-abandoned'));
+    if (done.length) nodes.push(group(`Completed (${done.length})`, 'completed', done, true, 'quest-completed'));
+    list.replaceChildren(...nodes); list.scrollTop = scroll;
+    if (chosen && (!reading || previousStatus !== (chosen.history ? 'completed' : status(chosen.q)))) {
+      [...list.querySelectorAll('.journal-quest')].find(n => n.dataset.selection === journalSelection)?.scrollIntoView({ block: 'nearest' });
     }
-    const done = definitions.filter(q => !q.handoffTo && (status(q) === 'completed' || state(q)?.claimed && state(q)?.completions > 0));
-    if (done.length) {
-      const folded = document.createElement('details'); folded.className = 'quest-completed'; folded.open = completedOpen;
-      folded.addEventListener('toggle', () => { if (folded.isConnected) completedOpen = folded.open; });
-      folded.append(element('summary', `Completed (${done.length})`));
-      for (const q of done) folded.append(foldedCard(q, true));
-      nodes.push(folded);
+    $('quest-count').textContent = `Quests: ${mine.length}`;
+    page.replaceChildren(); controls.replaceChildren(); page.dataset.selection = journalSelection || '';
+    if (chosen) journalPage(chosen.q, chosen.history, page, controls);
+    else {
+      page.append(element('h4', 'Your next adventure'), element('p', 'Select a quest on the left to read its story, objectives and rewards.'));
+      page.append(element('p', 'Find new quests at townspeople and camp crews marked with a !.', 'journal-hint'));
     }
-    $('quest-list').replaceChildren(...nodes);
+    if (memoriesOpen && page.querySelector('.quest-memories')) page.querySelector('.quest-memories').open = true;
+    page.scrollTop = pageScroll;
+    if (focusKey) [...list.querySelectorAll('.journal-quest')].find(n => n.dataset.selection === focusKey)?.focus({ preventScroll: true });
+    else if (focusAction) controls.querySelector(`[data-action="${focusAction}"]`)?.focus({ preventScroll: true });
   }
-  function foldedCard(quest, history = false) {
-    const s = history ? 'completed' : status(quest);
-    const node = document.createElement('details'); node.className = 'quest-entry'; node.dataset.quest = quest.id;
-    node.open = expanded.has(quest.id);
-    const summary = element('summary', `${s === 'ready' || s === 'completed' ? '✓' : '!'} ${quest.title}${s === 'ready' ? ' · Complete · Ready to turn in' : ''}`);
-    node.dataset.status = s;
-    node.append(summary);
-    // Completed histories can be long: render rewards/details only for entries being read.
-    const fill = () => {
-      if (node.querySelector(':scope > article')) return;
-      const body = card(quest, false, history); delete body.dataset.quest;
-      body.querySelector('h4')?.remove(); node.append(body);
-    };
-    if (node.open) fill();
-    node.addEventListener('toggle', () => {
-      if (!node.isConnected) return;
-      if (node.open) { expanded.add(quest.id); fill(); }
-      else { expanded.delete(quest.id); node.querySelector(':scope > article')?.remove(); }
+  function journalPage(quest, history, page, controls) {
+    const s = history ? 'completed' : status(quest), npc = handIn(quest) || giver(quest);
+    const node = element('article', '', 'journal-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
+    node.append(element('h4', quest.title), element('p', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+    if (quest.story) node.append(element('small', `${quest.story.title} · ${quest.story.chapter}/28`, 'quest-location'));
+    node.append(element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'));
+    node.append(element('h5', 'Description'), element('p', quest.description));
+    storyRecap(quest, node);
+    if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
+    node.append(element('h5', 'Objectives'));
+    const objectiveList = element('ul', '', 'journal-objectives');
+    quest.objectives.forEach((o, i) => {
+      const count = history ? o.count : Math.min(state(quest)?.counts[i] || 0, o.count), complete = count >= o.count;
+      objectiveList.append(element('li', `${complete ? '✓' : '•'} ${o.label}: ${count}/${o.count}${unit(o)}`, complete ? 'complete' : ''));
     });
-    return node;
+    node.append(objectiveList);
+    if (npc?.name) node.append(element('p', s === 'ready' ? `Hand in: ${npc.name} · ${areas[npc.zone ?? quest.zone].name}` : `Quest giver: ${npc.name} · ${areas[npc.zone ?? quest.zone].name}`, 'quest-location'));
+    if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
+    const party = mates(quest);
+    if (!history && party.length) { const line = element('p', `Party on this quest: ${party.map(m => `${m.name} (${m.done ? 'ready' : m.text})`).join(', ')}`, 'quest-party'); line.dataset.partyQuest = String(party.length); node.append(line); }
+    if (!quest.handoffTo) {
+      node.append(element('h5', 'Rewards'), element('p', 'You will receive:', 'quest-reward-label'));
+      rewards(quest, node, false);
+      node.append(element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
+    }
+    if (state(quest)?.completions) node.append(element('p', `Completed ${state(quest).completions} time${state(quest).completions === 1 ? '' : 's'}.`, 'quest-history'));
+    const action = (label, name, handler, disabled = false) => {
+      const b = button(label, handler); b.className = 'gossip-button'; b.dataset.action = name; b.disabled = disabled; controls.append(b); return b;
+    };
+    const current = !history && ['active', 'ready'].includes(s), asking = abandonConfirm === quest.id;
+    if (asking) {
+      const warning = element('div', '', 'journal-abandon-confirm'); warning.setAttribute('role', 'alert');
+      warning.append(element('p', 'Abandon this quest? Current progress will be lost. You can take it again from its questgiver.', 'quest-abandon-warning'));
+      const cancel = button('Cancel', () => { abandonConfirm = null; render(); controls.querySelector('[data-action="abandon"]')?.focus(); }); cancel.className = 'gossip-button'; warning.append(cancel); node.append(warning);
+    }
+    const abandon = action(asking ? 'Confirm abandon' : 'Abandon quest', 'abandon', () => {
+      if (!asking) { abandonConfirm = quest.id; render(); $('quest-controls').querySelector('[data-action="abandon"]').focus(); }
+      else if (Online.send({ type: 'quest_abandon', id: quest.id })) abandon.disabled = true;
+    }, !current || quest.id.startsWith('es_'));
+    action(tracked === quest.id && current ? 'Tracking' : 'Track quest', 'track', () => track(tracked === quest.id ? null : quest.id), !current);
+    action('Show Map', 'map', () => { track(quest.id); close(); window.WorldMap?.show(); }, !current);
+    if (!history && quest.autoLevel && abandoned.includes(quest.id) && s === 'available') {
+      const restore = action('Restore quest', 'restore', () => { if (Online.send({ type: 'quest_restore', id: quest.id })) restore.disabled = true; });
+    }
+    if (current && npc?.zone === Field.zone) {
+      const visit = button(`${s === 'ready' ? 'Return to' : 'Visit'} ${npc.name}`, () => { close(); Field.visitNpc(npc.id); });
+      visit.className = 'gossip-button journal-visit'; node.append(visit);
+    }
+    page.append(node);
   }
   function open() { return !$('quest-journal').hidden; }
   function show() {
     if (window.Skillbar?.open || !Online.connected || Field.hero.dead || City.open || !$('pause').hidden || !$('equipment').hidden) return;
-    previousFocus = document.activeElement; expanded.clear(); completedOpen = false; abandonedOpen = false; abandonConfirm = null;
+    previousFocus = document.activeElement; journalSelection = null; closedGroups.clear(); closedGroups.add('completed'); closedGroups.add('abandoned'); abandonConfirm = null;
     Field.setPaused(true); $('quest-journal').hidden = false; render(); $('quest-close').focus();
   }
   function close(resume = true) {
@@ -387,9 +389,16 @@
   }
   $('quest-tracker').addEventListener('click', event => { if (!event.target.closest('button')) show(); });
   $('quest-close').addEventListener('click', () => close());
+  $('quest-x')?.addEventListener('click', () => close());
+  $('quest-list').addEventListener('keydown', event => {
+    if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.code) || !event.target.matches('.journal-quest')) return;
+    const rows = [...$('quest-list').querySelectorAll('.journal-quest')].filter(n => n.getClientRects().length);
+    const index = rows.indexOf(event.target), next = event.code === 'Home' ? 0 : event.code === 'End' ? rows.length - 1 : Math.max(0, Math.min(rows.length - 1, index + (event.code === 'ArrowDown' ? 1 : -1)));
+    event.preventDefault(); rows[next]?.focus(); rows[next]?.click();
+  });
   $('quest-journal').addEventListener('keydown', event => {
-    if (event.key !== 'Tab') return;
-    const buttons = [...$('quest-journal').querySelectorAll('button:not(:disabled), summary')].filter(b => b.getClientRects().length);
+    if (event.code !== 'Tab') return;
+    const buttons = [...$('quest-journal').querySelectorAll('button:not(:disabled), summary, [tabindex="0"]')].filter(b => b.getClientRects().length);
     const first = buttons[0], last = buttons.at(-1);
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
@@ -438,7 +447,7 @@
       if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
       return done ? { state: 'done', burn: place.burn } : { state: 'none' };
     },
-    reset() { initialized = false; groupKey = ''; groupList = []; progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; abandonedOpen = false; signature = ''; tracked = null; bells = []; clearGuidance(); close(false); render(); },
+    reset() { initialized = false; groupKey = ''; groupList = []; progress = []; abandoned = []; journalSelection = null; closedGroups.clear(); abandonConfirm = null; signature = ''; tracked = null; bells = []; clearGuidance(); close(false); render(); },
     update(next, dismissed = abandoned) {
       const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return;
       if (initialized) for (const p of next) {
@@ -460,11 +469,18 @@
       return definitions.filter(q => (q.npc===id||q.givers?.includes(id)||(status(q)==='ready'&&handInAt(q,id))) && status(q) in rank)
         .sort((a, b) => rank[status(a)] - rank[status(b)] || Number(a.repeatable) - Number(b.repeatable));
     },
-    npc(id, container, pick) {
+    npc(id, container, pick, selected = null) {
+      const classic = container.classList.contains('npc-quest-nav');
       container.replaceChildren(...this.offered(id).map(q => {
         const s = status(q), gap = q.level - heroLevel;
         const row = element('button', '', 'gossip-row'); row.type = 'button'; row.dataset.quest = q.id; row.dataset.status = s;
         if (q.repeatable) row.dataset.repeatable = 'true';
+        if (classic) {
+          row.className = 'journal-quest'; row.setAttribute('aria-pressed', String(q.id === selected)); row.setAttribute('aria-controls', 'npc-quests');
+          const mark = element('span', s === 'ready' ? '?' : '!', 'journal-quest-mark'); mark.setAttribute('aria-hidden', 'true');
+          row.append(element('span', `[${q.level}] ${q.title}`, 'journal-quest-name'), mark);
+          row.setAttribute('aria-label', `${q.title}, ${words[s]}`); row.addEventListener('click', () => pick(q)); return row;
+        }
         const tag = element('span', `Lv ${q.level}`, 'gossip-tag'); tag.dataset.level = String(q.level);
         if (gap >= 5) tag.style.color = '#a31515'; else if (gap >= 3) tag.style.color = '#b8560f'; else if (gap <= -5) tag.style.color = '#6f6a58';
         const icon = element('span', s === 'available' ? '!' : '?', 'gossip-icon'); icon.setAttribute('aria-hidden', 'true');
@@ -475,11 +491,12 @@
       }));
     },
     // The quest page of a conversation: story, objectives, reward, then the accept / complete button.
-    detail(quest, container, back, npcId = quest.npc) {
+    detail(quest, container, back, npcId = quest.npc, actionContainer = null) {
       const s = status(quest);
       const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
       node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
       if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
+      if (actionContainer) node.append(element('p', `Recommended level ${quest.level}`, 'quest-level'), element('h5', 'Description'));
       node.append(element('p', quest.description));
       storyRecap(quest, node);
       if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
@@ -498,7 +515,8 @@
       }
       const decline = element('button', s === 'available' ? 'Decline' : 'Back', 'gossip-button'); decline.type = 'button'; decline.dataset.action = 'decline';
       decline.addEventListener('click', back); actions.append(decline);
-      node.append(actions);
+      if (actionContainer) actionContainer.replaceChildren(...actions.children);
+      else node.append(actions);
       container.replaceChildren(node);
     },
     marker(id) { return this.markerInfo(id).symbol; },
@@ -506,7 +524,7 @@
       for (const s of ['ready', 'available']) {
         const quest = definitions.find(q => (q.npc===id||q.givers?.includes(id)||(s==='ready'&&handInAt(q,id))) && status(q) === s && !q.repeatable)
           || definitions.find(q => (q.npc===id||q.givers?.includes(id)||(s==='ready'&&handInAt(q,id))) && status(q) === s);
-        if (quest) return { symbol: s === 'ready' ? '?' : '!', color: s === 'ready' || quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
+        if (quest) return { symbol: s === 'ready' ? '?' : '!', color: quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
       }
       if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => (o.kind === 'talk' || o.kind === 'escort' || o.kind === 'handoff') && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };
       return { symbol: '', color: '#ffdf88' };

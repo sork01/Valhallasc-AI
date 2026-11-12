@@ -130,9 +130,9 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await page.evaluate(() => Field.visitNpc('rime_warden'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-name').textContent() === 'Warden Halvard', 'Journal travel reaches the camp warden');
-  await page.locator('#npc-quests .gossip-row[data-quest="rime_welcome"]').click();
-  await page.locator('#npc-quests [data-quest="rime_welcome"] [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="rime_welcome"]')?.dataset.status === 'active');
+  await page.locator('#npc-quest-list .journal-quest[data-quest="rime_welcome"]').click();
+  await page.locator('#npc-dialogue [data-action="accept"]').click();
+  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="rime_welcome"]')?.dataset.status === 'active');
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Into the White') && t.includes('Huntress Brynja')), 'The introduction appears in the live tracker');
   await page.keyboard.press('Escape');
   check(await page.evaluate(() => City.npcs.length === 6 && City.npcs.every(n => n.id.startsWith('rime_') || n.id === 'travel_rimeward') && Quests.marker('rime_tracker') === '◆'), 'The camp NPCs, travel master and talk-objective markers are shown');
@@ -158,9 +158,9 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check((await introduction.textContent()).includes('Ready to turn in'), 'All four camp conversations complete the introduction');
   await introduction.locator('button').filter({ hasText: 'Return to Warden Halvard' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
-  await page.locator('#npc-quests .gossip-row[data-quest="rime_welcome"]').click();
-  await page.locator('#npc-quests [data-quest="rime_welcome"] [data-action="claim"]').click();
-  await page.waitForFunction(() => !document.querySelector('#npc-quests [data-quest="rime_welcome"]'));
+  await page.locator('#npc-quest-list .journal-quest[data-quest="rime_welcome"]').click();
+  await page.locator('#npc-dialogue [data-action="claim"]').click();
+  await page.waitForFunction(() => !document.querySelector('#npc-quest-list [data-quest="rime_welcome"]'));
   check(await page.evaluate(() => Quests.marker('rime_tracker') === '!' && Quests.markerInfo('rime_trader').repeatable), 'Turn-in unlocks the crab hunt and the repeatable camp patrol');
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Expand quest tracker' }).click();

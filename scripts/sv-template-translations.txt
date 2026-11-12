@@ -424,5 +424,9 @@
   "The Starfire Rocketeer · Level {0}": "Stjärneldsraketören · Nivå {0}",
   "Festival dance: {0} / 2 laps": "Festdans: {0} / 2 varv",
   "Quest completed: {0}": "Uppdrag slutfört: {0}",
-  "Visit {0} to discover its travel master first.": "Besök {0} för att upptäcka dess resemästare först."
+  "Visit {0} to discover its travel master first.": "Besök {0} för att upptäcka dess resemästare först.",
+  "Quests: {0}": "Uppdrag: {0}",
+  "Quest giver: {0} · {1}": "Uppdragsgivare: {0} · {1}",
+  "Ready to turn in ({0})": "Redo att lämna in ({0})",
+  "Recommended level {0}": "Rekommenderad nivå {0}"
 }

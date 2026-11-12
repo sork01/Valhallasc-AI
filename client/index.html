@@ -40,7 +40,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.46.0</p>
+    <p class="version">Beta 1.47.1</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -148,8 +148,6 @@
   <!-- THE FIELD: first map (isometric, Field in field.js) -->
   <section id="scene-game" class="scene" aria-label="Greenmeadow Field" hidden>
     <canvas id="fieldcv"></canvas>
-    <div id="hero-errors" class="hero-errors" role="status" aria-live="polite" hidden></div>
-    <div id="loot-gold-tooltip" class="item-tooltip" role="tooltip" hidden></div>
     <div id="touch-stick" class="touch-only" aria-label="Movement stick"><div class="stick-disc"><i></i></div></div>
     <div id="touch-skills" class="touch-only" role="group" aria-label="Touch skills"></div>
     <div id="touch-actions" class="touch-only" role="group" aria-label="Touch actions"></div>
@@ -217,6 +215,7 @@
     </aside>
     <div id="loot-rolls" class="loot-rolls" role="group" aria-label="Loot rolls" aria-live="polite"></div>
     <div id="announce" class="announce" role="status" aria-live="polite"></div>
+    <div id="error-messages" class="error-messages" role="status" aria-live="polite"></div>
     <div id="rare-pickup" class="rare-pickup" role="status" aria-live="polite" hidden><b></b><span></span></div>
     <div id="social-invites" class="social-invites" role="group" aria-label="Invitations" aria-live="polite"></div>
     <button id="city-travel" class="city-travel" type="button">Visit Alderhaven ↓</button>
@@ -224,12 +223,21 @@
     <div class="dead-msg" id="dead-msg" hidden><b data-i18n="defeated">Defeated!</b><span id="dead-sub" data-i18n="defeatedSub">You wake up back at the start…</span><span id="dead-wait" data-i18n="defeatedWait" hidden>You have fallen. Wait for the fight to end.</span><span id="dead-cause" hidden></span></div>
 
     <div class="pause" id="quest-journal" hidden>
-      <section class="panel npc-panel quest-panel" role="dialog" aria-modal="true" aria-labelledby="quest-title">
-        <p class="npc-role">Greenmeadow, Emberfall Crags, Rimeveil Glacier, Gloamfen, Skaldholm, the Wyrdwood &amp; Bifrost Reach</p>
-        <h3 id="quest-title">Quest Journal</h3>
-        <p>These are the quests you have taken. Find new ones at townspeople and camp crews marked with a !. Kills and conversations count once you have accepted, and a kill also counts for party members beside you who have the same quest; hand-in objectives count what is in your bags, and the items are taken when you collect the reward.</p>
-        <div id="quest-list"></div>
-        <button class="btn primary" id="quest-close" type="button">Back to adventure</button>
+      <section class="panel quest-panel" role="dialog" aria-modal="true" aria-labelledby="quest-title">
+        <header class="journal-titlebar">
+          <span class="journal-emblem" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 10 32 6 40 13 35 38 13 43 6 35Z" fill="#62559a" stroke="#d8b65b" stroke-width="2"/><path d="m13 13 21-4-5 25-20 4Z" fill="#353b73" stroke="#c7a75b"/><path d="m8 35 21-4 7 5-22 5Z" fill="#dfca8d"/><path d="m18 16 10-2-1 4-10 2Zm-2 9 10-2-1 4-10 2Z" fill="#dfc56b"/></svg></span>
+          <h3 id="quest-title">Quest Journal</h3>
+          <button class="window-close" id="quest-x" type="button" aria-label="Close quest journal">×</button>
+        </header>
+        <div class="journal-toolbar"><span class="journal-tab">All quests</span><span id="quest-count"></span></div>
+        <div class="journal-pages">
+          <nav id="quest-list" aria-label="Your quests"></nav>
+          <div id="quest-page" class="journal-parchment" role="region" aria-label="Quest details" tabindex="0"></div>
+        </div>
+        <footer class="journal-footer">
+          <div id="quest-controls"></div>
+          <button class="gossip-button" id="quest-close" type="button">Close</button>
+        </footer>
       </section>
     </div>
     <div class="pause" id="npc-dialogue" hidden>
@@ -238,17 +246,23 @@
           <h3 id="npc-name"></h3>
           <button class="window-close" id="npc-x" type="button" aria-label="Close conversation">×</button>
         </header>
-        <div class="gossip-parchment">
+        <div class="npc-quest-toolbar journal-toolbar" hidden><span class="journal-tab">Quests</span><span id="npc-quest-count"></span></div>
+        <div id="npc-quest-layout" class="npc-quest-layout">
+          <nav id="npc-quest-list" class="npc-quest-nav" aria-label="Quests from this person" hidden></nav>
+          <div class="gossip-parchment">
           <p id="npc-role" class="npc-role"></p>
           <p id="npc-text"></p>
           <div id="npc-quests" class="gossip-list"></div>
           <div id="npc-offers" class="npc-offers gossip-list"></div>
           <div id="npc-inventory"></div>
           <p id="npc-notice" role="status" aria-live="polite"></p>
+          </div>
         </div>
         <footer class="gossip-footer">
           <span id="npc-gold"></span>
+          <div id="npc-quest-actions" class="quest-actions" hidden></div>
           <button class="gossip-button" id="npc-back" type="button" hidden>Back</button>
+          <button class="gossip-button" id="npc-quest-close" type="button" hidden>Close</button>
         </footer>
       </section>
     </div>

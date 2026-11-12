@@ -1,5 +1,17 @@
 # Quest guidance and world feedback (Beta 1.46.0)
 
+**Beta 1.46.2 corrections (owner, 2026-11-12):** errors use a separate stack
+at five percent of the game height, with smaller text, so chest/quest banners
+cannot push them over the character. Blocked autoattacks show
+`Out of line of sight.` through this stack, including the touch Auto button.
+
+**Beta 1.46.1 corrections (owner, 2026-11-12):** errors share the fixed screen
+announcement stack as plain red text, with no border/background, up to five
+simultaneous lines, newest at the bottom, fading over two seconds. The left
+tracker now puts ready quests below unfinished ones even when tracked. Normal
+question marks are yellow; repeatable question marks are blue. Gold tooltips
+use a viewport overlay outside the transformed game stage.
+
 Owner requests, 2026-11-12: put finished quests last, name completed quests in a
 toast, identify ground loot on hover, correct all quest tracking, show brief
 errors above the hero, make repeatable minimap quests blue, fade the missing
@@ -9,7 +21,8 @@ Greenmeadow trees, and discover travel stops on reaching their hub.
 
 The journal lists unfinished objectives first, then quests ready to turn in,
 then the folded completed history. Tracking a ready quest does not move it above
-unfinished quests. Claimed repeatable quests also appear in completed history,
+unfinished quests. The same ordering now applies to the left-side tracker.
+Claimed repeatable quests also appear in completed history,
 while remaining available at their giver. History cards are read-only.
 
 An authoritative progress transition to all objectives complete shows
@@ -37,22 +50,37 @@ share these targets through `Quests.mapMarkers` and `Quests.navigationTarget`.
   crosses. Arena guidance continues to support every arena giver.
 - Route searches are cached; nearest destination selection uses the current
   position rather than retaining a destination chosen before the hero moved.
-- Available repeatable quests use blue exclamation marks. Ready turn-ins use
-  blue question marks. A non-repeatable available quest at the same giver keeps
-  priority over an available repeatable quest.
+- Repeatable quests use blue exclamation/question marks. Non-repeatable quests
+  use yellow exclamation/question marks on NPCs and both maps. A non-repeatable
+  available quest at the same giver keeps priority over an available repeatable
+  quest.
 
 ## Ground loot and action errors
 
 `client/worldfeedback.js` identifies the visible pile under the cursor and uses
 the inventory tooltip with that pile's quantity and actual gear copy. Gold has a
 small quantity tooltip. Pointer exit, pickup, pausing and field reset clear the
-hover tooltip; a stationary cursor is checked against the current camera.
+hover tooltip; a stationary cursor is checked against the current camera. Gold
+tooltips are appended to `document.body`, like inventory tooltips: the game
+stage has a CSS transform, which would otherwise offset fixed coordinates
+relative to the stage instead of the viewport on letterboxed screens.
 
-Nonfatal error packets and refused notices appear briefly above the local hero
-and remain in the existing chat log. The box holds at most two messages;
-repeated identical messages refresh their lifetime instead of stacking. It
-follows the hero, translates the refusal, expires after 2.4 seconds, and never
-captures input.
+Nonfatal error packets and refused notices use a fixed stack near the top of
+the game and remain in the existing chat log. Each error is
+plain red text with no background, border or shadow, and fades from full opacity
+to invisible over exactly two seconds. Up to five errors stack in arrival order,
+newest at the bottom; a sixth removes the oldest error. Repeated identical
+errors keep separate lines. Other announcements keep their own three-message
+limit and usual lifetime. Error text remains translated, ignores input, and
+keeps its opacity fade with reduced motion enabled.
+
+Autoattack feedback uses the selected target, authoritative movement/attack
+state, and existing obstacle geometry. After 350 ms stationary without an
+attack or cooldown, an obstructed line produces `Out of line of sight.` at
+most once every two seconds. Moving, attacking, clearing input, death, pausing
+and cutscenes suppress the hint. A player's projectile hitting an obstacle
+also produces the warning from the existing `shotBlocked` event. Combat and
+server collision rules are unchanged.
 
 Greenmeadow's oak, birch, apple and willow art now declares canopy occlusion.
 The existing sprite trees use their actual frame bounds for the same test.
@@ -80,12 +108,41 @@ tick; no save migration is needed.
   paired minimap/tree pixels, authoritative quest transitions, real dropped
   loot, errors, and Swedish guidance. No encounter grinding or balance sweeps.
 
-Verification: 21 browser checks passed in `test-results/driver-VGh0HP`, including
+Initial Beta 1.46.0 verification: 21 browser checks passed in `test-results/driver-VGh0HP`, including
 paired images for each of the four tree kinds. Screenshot review found that
 announcement banners could cover the error box; action errors now draw above
 them, checked separately with `PART=errors` (four banner/edge checks in
 `test-results/driver-zx41OL`). The twelve changed public client files match the
 checkout by SHA-256.
+
+## Beta 1.46.1 correction checks
+
+`PART=corrections VALHALLA_BINARY=<test-profile binary> bash
+scripts/test-touch-bounded.sh tests/todo-feedback-ui.cjs` passes all 15 checks
+in `test-results/driver-61QW4o`. It covers the actual tracker completion
+transition, yellow normal/blue repeatable question marks on NPCs and maps,
+five plain red errors in arrival order, fixed announcement placement, a
+half-opacity sample at one second, two-second expiry, normal chest notices
+remaining intact, duplicate errors, reset, and a real gold drop on a wide
+letterboxed viewport. Screenshots of the five-line stack and the corrected
+gold tooltip were reviewed. Test gold is created by one private shortcut kill;
+the owner retreats beyond the three-tile loot magnet before measuring it.
+
+All eight changed public client hashes match the checkout. JavaScript syntax,
+release notes, Swedish freshness and whitespace checks pass. This follow-up is
+client only; production PID 183593 and the running server remain unchanged.
+
+## Beta 1.46.2 correction checks
+
+`PART=attack-errors` passes nine focused checks in `test-results/driver-RY5s1D`:
+five simultaneous errors stay above the character independently of ordinary
+banners, text is smaller, real blocked mage/warrior autoattacks produce
+throttled warnings, and attacks resume without warnings after clearing the
+obstacle. The screenshot was reviewed. A focused touch Auto run
+(`ATTACK_CLASS=warrior`) passes seven checks in `test-results/driver-iuzhmO`,
+including the nearest-enemy targeting path. Nine changed public client hashes
+match, both health endpoints are healthy, and PID 183593 remains unchanged.
+Swedish freshness, release notes, syntax and whitespace checks pass.
 
 ## Production release
 

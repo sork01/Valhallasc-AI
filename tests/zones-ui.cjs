@@ -145,16 +145,16 @@ const look = page => page.evaluate(() => {
   await page.evaluate(() => Field.visitNpc('crags_captain'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-name').textContent() === 'Captain Sera', 'Travel reaches the camp commander');
-  await page.locator('#npc-quests .gossip-row[data-quest="crags_cinderlord"]').click();
+  await page.locator('#npc-quest-list .journal-quest[data-quest="crags_cinderlord"]').click();
   const eliteReward = page.locator('#npc-quests [data-quest="crags_cinderlord"] [data-item="necklace_moonstone_l10_blue"]');
   check(await eliteReward.textContent().then(t => t.includes('Runed Moonstone Necklace') && t.includes('Rare (blue)') && t.includes('All classes'))
     && await eliteReward.evaluate(e => getComputedStyle(e).color) === 'rgb(27, 94, 168)', 'Captain Sera shows the guaranteed all-class blue gear reward in blue');
   check(await eliteReward.textContent().then(t => t.includes('Rare (blue)'))
     && await page.locator('#npc-quests [data-quest="crags_cinderlord"] .quest-level').textContent().then(t => t.includes('2 players')), 'Captain Sera shows the group size and blue reward before acceptance');
-  await page.locator('#npc-quests [data-action="decline"]').click();
-  await page.locator('#npc-quests .gossip-row[data-quest="crags_welcome"]').click();
-  await page.locator('#npc-quests [data-quest="crags_welcome"] [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="crags_welcome"]')?.dataset.status === 'active');
+  await page.locator('#npc-dialogue [data-action="decline"]').click();
+  await page.locator('#npc-quest-list .journal-quest[data-quest="crags_welcome"]').click();
+  await page.locator('#npc-dialogue [data-action="accept"]').click();
+  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="crags_welcome"]')?.dataset.status === 'active');
   await page.waitForFunction(() => document.querySelector('#quest-tracker')?.textContent.includes('A Foothold in the Ash') && document.querySelector('#quest-tracker')?.textContent.includes('Scout Kael'), null, { timeout: 5000 });
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('A Foothold in the Ash') && t.includes('Scout Kael')), 'Camp introduction appears in the live tracker');
   await page.keyboard.press('Escape');
@@ -188,18 +188,18 @@ const look = page => page.evaluate(() => {
   check((await introduction.textContent()).includes('Ready to turn in'), 'All three camp conversations complete the introduction');
   await introduction.locator('button').filter({ hasText: 'Return to Captain Sera' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
-  check(await page.locator('#npc-quests .gossip-row[data-quest="crags_welcome"] .gossip-icon').textContent() === '?', 'A finished quest shows a question mark at its giver');
-  await page.locator('#npc-quests .gossip-row[data-quest="crags_welcome"]').click();
-  await page.locator('#npc-quests [data-quest="crags_welcome"] [data-action="claim"]').click();
-  await page.waitForFunction(() => !document.querySelector('#npc-quests [data-quest="crags_welcome"]'));
+  check(await page.locator('#npc-quest-list .journal-quest[data-quest="crags_welcome"] .gossip-icon').textContent() === '?', 'A finished quest shows a question mark at its giver');
+  await page.locator('#npc-quest-list .journal-quest[data-quest="crags_welcome"]').click();
+  await page.locator('#npc-dialogue [data-action="claim"]').click();
+  await page.waitForFunction(() => !document.querySelector('#npc-quest-list [data-quest="crags_welcome"]'));
   check(await page.evaluate(() => Quests.marker('crags_scout') === '!' && Quests.markerInfo('crags_supplier').repeatable), 'Turn-in unlocks the wisp hunt and blue repeatable camp patrol');
   await page.keyboard.press('Escape');
   await page.evaluate(() => Field.visitNpc('crags_supplier'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
-  const questTop = (await page.locator('#npc-quests .gossip-row').first().boundingBox()).y;
-  const offerTop = (await page.locator('#npc-offers .gossip-row').first().boundingBox()).y;
-  check(questTop < offerTop, 'Quests are listed above the shop services, as in World of Warcraft');
-  check(await page.locator('#npc-quests .gossip-row[data-repeatable="true"] .gossip-icon').first().evaluate(e => getComputedStyle(e).color) === 'rgb(93, 178, 255)', 'Repeatable bounties get a blue icon');
+  const questLeft = (await page.locator('#npc-quest-list .journal-quest').first().boundingBox()).x;
+  const offerLeft = (await page.locator('#npc-offers .gossip-row').first().boundingBox()).x;
+  check(questLeft < offerLeft, 'Quest titles use the dark sidebar beside the parchment services');
+  check(await page.locator('#npc-quest-list .journal-quest[data-repeatable="true"] .journal-quest-mark').first().evaluate(e => getComputedStyle(e).color) === 'rgb(100, 181, 255)', 'Repeatable bounties get a blue icon');
   await page.screenshot({ path: path.join(world.artifacts, 'npc-gossip.png') });
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Expand quest tracker' }).click();

@@ -206,9 +206,9 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   };
   await talkByClick('city_captain');
   check(await page.locator('#npc-name').textContent() === 'Captain Ingrid Stormwatch', 'A click on the gate captain reaches her');
-  await page.locator('#npc-quests .gossip-row[data-quest="city_welcome"]').click();
-  await page.locator('#npc-quests [data-quest="city_welcome"] [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="city_welcome"]')?.dataset.status === 'active');
+  await page.locator('#npc-quest-list .journal-quest[data-quest="city_welcome"]').click();
+  await page.locator('#npc-dialogue [data-action="accept"]').click();
+  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="city_welcome"]')?.dataset.status === 'active');
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('The Great Gate Opens') && t.includes('Herald Bran')), 'The welcome appears in the live tracker');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
@@ -227,17 +227,17 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check((await page.locator('#quest-list [data-quest="city_welcome"]').textContent()).includes('Ready to turn in'), 'Five conversations complete the introduction');
   await page.keyboard.press('Escape');
   await talkByClick('city_captain');
-  await page.locator('#npc-quests .gossip-row[data-quest="city_welcome"]').click();
-  await page.locator('#npc-quests [data-quest="city_welcome"] [data-action="claim"]').click();
-  await page.waitForFunction(() => !document.querySelector('#npc-quests [data-quest="city_welcome"]'));
+  await page.locator('#npc-quest-list .journal-quest[data-quest="city_welcome"]').click();
+  await page.locator('#npc-dialogue [data-action="claim"]').click();
+  await page.waitForFunction(() => !document.querySelector('#npc-quest-list [data-quest="city_welcome"]'));
   check(await page.evaluate(() => Quests.marker('city_herald') === '!' && Quests.marker('city_alchemist') === '!'), 'Turn-in unlocks the herald\'s letters and the alchemist\'s order');
   await page.keyboard.press('Escape');
 
   // A hand-in quest: the alchemist's gel. The tracker follows the bag; the reward takes the items.
   await talkByClick('city_alchemist');
-  await page.locator('#npc-quests .gossip-row[data-quest="city_gel"]').click();
-  await page.locator('#npc-quests [data-quest="city_gel"] [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="city_gel"]')?.dataset.status === 'active');
+  await page.locator('#npc-quest-list .journal-quest[data-quest="city_gel"]').click();
+  await page.locator('#npc-dialogue [data-action="accept"]').click();
+  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="city_gel"]')?.dataset.status === 'active');
   await page.keyboard.press('Escape');
   await debug({ op: 'give_item', item: 'slime_gel', quantity: 5 });
   await page.waitForFunction(() => /Bring Slime Gel: 5\/8/.test(document.getElementById('quest-tracker').textContent), null, { timeout: 10000 });
@@ -246,9 +246,9 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await debug({ op: 'give_item', item: 'blue_gel', quantity: 4 });
   await page.waitForFunction(() => /Return to Alchemist Orsolya Quill/.test(document.getElementById('quest-tracker').textContent), null, { timeout: 10000 });
   await talkByClick('city_alchemist');
-  await page.locator('#npc-quests .gossip-row[data-quest="city_gel"]').click();
-  await page.locator('#npc-quests [data-quest="city_gel"] [data-action="claim"]').click();
-  await page.waitForFunction(() => !document.querySelector('#npc-quests [data-quest="city_gel"]'));
+  await page.locator('#npc-quest-list .journal-quest[data-quest="city_gel"]').click();
+  await page.locator('#npc-dialogue [data-action="claim"]').click();
+  await page.waitForFunction(() => !document.querySelector('#npc-quest-list [data-quest="city_gel"]'));
   const bag = item => page.evaluate(item => (Field.hero.inventory.find(i => i.item === item) || {}).quantity || 0, item);
   check(await bag('slime_gel') === 2 && await bag('blue_gel') === 0, 'The reward took exactly eight gel and four blue gel from the bag');
   await page.keyboard.press('Escape');

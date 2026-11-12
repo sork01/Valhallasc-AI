@@ -846,7 +846,7 @@
     box.append(facts);
     box.append(el('h5', 'Quest markers', 'wm-side-title'));
     const legend = el('ul', '', 'wm-quest-legend');
-    for (const [symbol, text, state] of [['!', 'Available', 'available'], ['?', 'Ready to turn in', 'ready'], ['◇', 'Tracked quest', 'tracked']]) {
+    for (const [symbol, text, state] of [['!', 'Available', 'available'], ['?', 'Ready to turn in', 'ready'], ['?', 'Repeatable', 'repeatable'], ['◇', 'Tracked quest', 'tracked']]) {
       const row = el('li'), icon = el('i', symbol); icon.dataset.state = state; row.append(icon, el('span', text)); legend.append(row);
     }
     box.append(legend);

@@ -42,6 +42,8 @@
 .npc-panel :focus-visible, .city-travel:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
 @media (pointer: coarse) { .city-travel { min-height: 44px; } .npc-offers .btn, #npc-x { min-height: 44px; } }
 #npc-dialogue { z-index: 45; }
+.npc-quest-layout { display: contents; }
+.npc-quest-layout.journal-pages { display: grid; overflow: hidden; }
 /* NPC conversation: a parchment window like World of Warcraft's gossip frame. Quests first, then services. */
 .gossip-window { position: static; display: flex; flex-direction: column; width: min(max(31cqw, 320px), 96cqw); max-height: min(46cqw, 94cqh); padding: 0; overflow: hidden; border: .3cqw solid #5a4a30; border-radius: .7cqw; background: #261e15; color: #2b1b08; box-shadow: 0 .6cqw 2cqw #000a, inset 0 0 0 1px #b99d5c55; }
 .gossip-titlebar { position: relative; display: flex; align-items: center; justify-content: center; min-height: 2.8cqw; padding: .3cqw 3cqw; background: linear-gradient(#4b4436, #2a261f 55%, #1e1c18); border-bottom: 2px solid #7e6b43; }
@@ -111,15 +113,66 @@
 .tracker-journal:hover, .tracker-title:hover { color: #fff1b7; }
 .tracker-toggle:hover { background: #b89b5c33; }
 .quest-tracker button:focus-visible { outline: 2px solid #ffdc87; outline-offset: -2px; }
+/* Classic journal: iron frame, regional list, and a single parchment page. */
 #quest-journal { z-index: 46; }
-.quest-panel { width: 46cqw; max-height: 44cqw; }
-#quest-list { max-height: 28cqw; overflow: auto; }
-.quest-entry { margin: .6cqw 0; border: 1px solid #d9c49255; border-radius: .6cqw; background: #142820bb; }
-.quest-entry > summary { cursor: pointer; list-style: none; padding: 1cqw; color: #f1d493; font: 1.3cqw 'Jua', sans-serif; }
-.quest-entry > summary::-webkit-details-marker { display: none; }
-.quest-entry > summary:focus-visible { outline: 2px solid #f1d493; outline-offset: -2px; }
-.quest-entry > .quest-card { margin: 0; border: 0; }
-@media (pointer: coarse) { .quest-entry > summary { min-height: 44px; display: flex; align-items: center; } }
+.quest-panel { position: static; display: flex; flex-direction: column; width: 74cqw; height: 51cqw; max-width: 96cqw; max-height: 94cqh; padding: 0; overflow: hidden; color: #e4d7b2; border: 3px ridge #817763; border-radius: .7cqw; background: #1c1b18; box-shadow: 0 .7cqw 2cqw #000b, 0 0 0 2px #242723, inset 0 0 0 2px #060707; font-family: Georgia, 'Palatino Linotype', serif; text-align: left; }
+.journal-titlebar { position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; min-height: 3.1cqw; padding: .3cqw 4.5cqw; border-bottom: 2px ridge #766b51; background: linear-gradient(#4a4840, #22221f 35%, #121514 65%, #34332b); }
+.journal-titlebar h3 { margin: 0; color: #f5d365; font: bold max(15px, 1.5cqw) Georgia, serif; text-shadow: 0 2px 2px #000; letter-spacing: .03em; }
+.journal-titlebar .window-close { position: absolute; top: 50%; right: .45cqw; transform: translateY(-50%); }
+.journal-emblem { position: absolute; left: .5cqw; top: .1cqw; z-index: 1; display: grid; place-items: center; width: 4.8cqw; height: 4.8cqw; border: 3px ridge #b6a16c; border-radius: 50%; background: radial-gradient(#454333, #131714 75%); box-shadow: 0 2px 4px #000; }
+.journal-emblem svg { width: 85%; height: 85%; }
+.journal-toolbar { display: flex; align-items: center; gap: 1.5cqw; flex-shrink: 0; min-height: 3.5cqw; padding: .45cqw 1.2cqw .35cqw 6cqw; background: linear-gradient(90deg, #24231e, #333026 50%, #22221e); border-bottom: 2px ridge #736b56; font: max(12px, 1.1cqw) Georgia, serif; color: #f4d77b; }
+.journal-tab { align-self: stretch; display: flex; align-items: center; padding: .2cqw 1.1cqw; border: 1px solid #74603b; border-bottom-color: #151714; border-radius: .35cqw .35cqw 0 0; background: #121513; }
+#quest-count { padding: .25cqw 1.3cqw; border: 2px groove #5a5747; border-radius: .3cqw; background: #121513; }
+.journal-pages { display: grid; grid-template-columns: 46% minmax(0, 1fr); flex: 1; min-height: 0; gap: .5cqw; padding: .45cqw .55cqw; }
+#quest-list, .npc-quest-nav { min-width: 0; min-height: 0; max-height: none; overflow: auto; padding: .25cqw; border: 2px groove #787465; background: radial-gradient(ellipse at 20% 15%, #33312655, transparent 70%), repeating-linear-gradient(110deg, #ffffff02 0 1px, transparent 1px 5px), #111513; }
+.journal-group { margin: 0; padding: 0; border: 0; }
+.journal-group > summary { display: flex; align-items: center; gap: .5cqw; min-height: 2cqw; padding: .2cqw .25cqw; cursor: pointer; list-style: none; color: #bfb9a7; font: max(12px, 1.12cqw)/1.4 Georgia, serif; }
+.journal-group > summary::-webkit-details-marker { display: none; }
+.journal-group > summary::before { content: '+'; display: inline-grid; place-items: center; flex-shrink: 0; width: 1.05em; height: 1.05em; border: 1px solid #8b7544; border-radius: 3px; background: linear-gradient(#5e3428, #1e120c); color: #e8bf5b; font: bold .85em/1 Arial, sans-serif; box-shadow: inset 0 0 0 1px #090a08; }
+.journal-group[open] > summary::before { content: '−'; }
+.journal-group > summary:hover { color: #f6e7c7; }
+.journal-quest { display: flex; align-items: center; gap: .35cqw; width: 100%; min-height: 2.05cqw; padding: .25cqw .5cqw .25cqw 2cqw; border: 1px solid transparent; border-radius: 0; background: none; color: #f0d75b; text-align: left; font: max(12px, 1.12cqw)/1.35 Georgia, serif; cursor: pointer; }
+.journal-quest-name { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.journal-quest-mark { flex-shrink: 0; width: 1.1em; text-align: center; color: #f2ce5d; font-weight: bold; text-shadow: 0 1px 2px #000; }
+.journal-quest[data-repeatable="true"] .journal-quest-mark { color: #64b5ff; }
+.journal-quest[aria-pressed="true"] { color: #fff4c3; border-color: #9c7e3533; background: linear-gradient(90deg, #9b771955, #b08b2480 65%, #9b771900); }
+.journal-quest:hover { background-color: #b3954c26; }
+.journal-quest[data-status="completed"] { color: #96988b; }
+.journal-quest[data-status="completed"] .journal-quest-mark { color: #92ae75; }
+.journal-group.quest-ready, .journal-group.quest-abandoned, .journal-group.quest-completed { margin: .5cqw 0 0; padding-top: .4cqw; border-top: 1px solid #7b715144; }
+.quest-panel .quest-empty { padding: .6cqw; color: #bfb9a7; font: max(12px, 1.1cqw)/1.5 Georgia, serif; }
+.journal-parchment { --sb-track: #c9a766; --sb-thumb-a: #a47c3c; --sb-thumb-b: #7a5424; --sb-edge: #5b3d16; min-width: 0; min-height: 0; overflow: auto; padding: 1.4cqw 1.5cqw; border: 3px ridge #8c6a38; color: #2f1d0b; background: radial-gradient(ellipse at 35% 30%, #f1d99c55, transparent 65%), repeating-linear-gradient(35deg, #79500d06 0 1px, transparent 1px 4px), #d8b677; box-shadow: inset 0 0 .4cqw #533115, inset 0 0 2.5cqw #79511f99; font: max(13px, 1.2cqw)/1.45 Georgia, 'Palatino Linotype', serif; }
+.journal-parchment h4 { margin: 0 0 .4cqw; color: #34200b; font: max(19px, 1.95cqw)/1.15 Georgia, serif; font-variant: small-caps; }
+.journal-parchment h5 { margin: 1.3cqw 0 .45cqw; font: max(17px, 1.6cqw)/1.2 Georgia, serif; font-variant: small-caps; }
+.journal-parchment p { margin: .5cqw 0 .8cqw; white-space: pre-line; font: inherit; }
+.journal-parchment .quest-state, .journal-parchment .quest-location, .journal-parchment .quest-level, .journal-parchment .quest-history { color: #63441e; font: max(12px, 1.05cqw)/1.4 Georgia, serif; }
+.journal-parchment .quest-state { margin: 0 0 .7cqw; font-style: italic; }
+.journal-parchment .quest-reward { color: #3d260a; }
+.journal-parchment .quest-party { color: #35501d; }
+.journal-objectives { margin: .5cqw 0; padding: 0; list-style: none; }
+.journal-objectives li { margin-bottom: .4cqw; }
+.journal-objectives .complete { color: #3f5a25; }
+.journal-parchment .quest-memories summary { cursor: pointer; font-weight: bold; }
+.journal-parchment .journal-hint { margin-top: 2cqw; color: #6a4b25; font-style: italic; }
+.journal-abandon-confirm { margin-top: 1cqw; padding: .8cqw; border: 1px solid #8d321f; background: #8d321f18; }
+.journal-abandon-confirm .quest-abandon-warning { color: #792714; }
+.journal-parchment .journal-visit { margin-top: 1cqw; }
+.journal-footer { display: flex; align-items: center; flex-shrink: 0; gap: .5cqw; padding: .4cqw .7cqw .55cqw; border-top: 2px ridge #766b51; background: linear-gradient(#36332b, #191b18); }
+#quest-controls { display: flex; flex: 1; flex-wrap: wrap; gap: .5cqw; }
+.journal-footer .gossip-button { min-width: 9cqw; padding: .35cqw .7cqw; font-size: max(12px, 1.1cqw); }
+.quest-conversation { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
+.quest-conversation .gossip-parchment { margin: 0; }
+.quest-conversation .quest-detail { padding: 0; margin: 0; border: 0; background: none; }
+.quest-panel .quest-detail h4 { font: max(19px, 1.95cqw)/1.15 Georgia, serif; font-variant: small-caps; }
+.quest-panel .quest-detail h5 { margin: 1.3cqw 0 .45cqw; font: max(17px, 1.6cqw)/1.2 Georgia, serif; font-variant: small-caps; }
+.quest-conversation .quest-actions { flex: 1; flex-wrap: wrap; margin: 0; }
+.quest-conversation #npc-gold { flex: 1; }
+.quest-conversation .gossip-button.primary { background: linear-gradient(#a8301f, #5e1209); }
+.quest-conversation .gossip-button.primary:hover:not(:disabled) { background: linear-gradient(#c43a26, #7a1a0d); }
+.quest-panel :focus-visible { outline: 2px solid #ffd87e; outline-offset: -2px; }
+.journal-parchment:focus-visible { outline-color: #5c431b; }
+@media (pointer: coarse) { .journal-quest, .journal-group > summary, .journal-footer .gossip-button, .journal-titlebar .window-close, .journal-parchment .gossip-button { min-height: 44px; } .journal-titlebar .window-close { min-width: 44px; } }
 .quest-abandon-warning { color: #ffb6a6; }
 .quest-card { padding: 1cqw; margin: .8cqw 0; border: 1px solid #d9c49255; border-radius: .6cqw; background: #142820bb; }
 .quest-card h4 { margin: 0 0 .25cqw; color: #f1d493; font: 1.3cqw 'Jua', sans-serif; }
@@ -133,8 +186,6 @@
 .quest-card .quest-party { color: #9dffb2; font-size: .9cqw; }
 .tracker-objective.tracker-party { color: #9dffb2; }
 .quest-empty { margin: .8cqw 0; color: #cfd8cf; font-size: .95cqw; }
-.quest-abandoned, .quest-completed { margin: 1cqw 0 .4cqw; padding-top: .6cqw; border-top: 1px solid #d9c49244; }
-.quest-abandoned summary, .quest-completed summary { cursor: pointer; color: #b7d5b8; font: .95cqw 'Jua', sans-serif; }
 .quest-done { margin: .3cqw 0 .3cqw 1cqw; color: #9fb0a0; font-size: .9cqw; }
 .social-who .member-quests { display: block; color: #9dffb2; }
 .quest-card[data-repeatable="true"] { border-color: #64b5ff80; }
@@ -312,8 +363,6 @@
 .character-sets .set-tier { font-size:.74cqw; }
 .item-tooltip p { margin: 6px 0; }
 .loot-hover-anchor { position: fixed; width: 1px; height: 1px; pointer-events: none; opacity: 0; }
-.hero-errors { position: absolute; z-index: 64; transform: translate(-50%, -100%); max-width: min(340px, 65%); pointer-events: none; text-align: center; font: max(13px, 1.15cqw)/1.3 'Jua', sans-serif; }
-.hero-errors p { margin: 3px 0; padding: 5px 10px; color: #fff2ed; background: #471c22ed; border: 1px solid #ff8d80; border-radius: 6px; box-shadow: 0 2px 8px #0008; }
 .item-tooltip .stat-gain { color: #4ad66d; }
 .item-tooltip .stat-loss { color: #ff6b6b; }
 .item-restriction { color: #e0877d; }
@@ -675,7 +724,7 @@
 .wm-quest-legend { margin: 0; padding: 0; list-style: none; }
 .wm-quest-legend li { display: flex; align-items: center; gap: .4cqw; }
 .wm-quest-legend i { width: 1.2cqw; text-align: center; font-style: normal; color: #ffdf88; }
-.wm-quest-legend i[data-state="ready"] { color: #64b5ff; }
+.wm-quest-legend i[data-state="repeatable"] { color: #64b5ff; }
 .wm-quest-legend i[data-state="tracked"] { color: #a6ffcf; }
 .wm-gate { position: absolute; width: 2.4cqw; height: 2.4cqw; padding: 0; transform: translate(-50%, -50%); border: .25cqw solid var(--glow); border-radius: 50%; background: radial-gradient(#fff, var(--glow) 55%, transparent 75%); box-shadow: 0 0 1.2cqw var(--glow); cursor: pointer; }
 .wm-gate-label { position: absolute; left: 50%; top: 100%; margin-top: .25cqw; padding: .15cqw .6cqw; transform: translateX(-50%); white-space: nowrap; border-radius: .3cqw; background: #10141cdd; color: #fff4ca; font: .9cqw 'Jua', sans-serif; pointer-events: none; }
@@ -906,10 +955,13 @@
 
 /* Big centre announcements (announce.js): about 25% down, stacked, fading by themselves, never taking clicks. */
 .announce { position: absolute; left: 0; width: 100%; top: 25%; z-index: 63; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: .6cqw; }
+.error-messages { position: absolute; left: 0; width: 100%; top: 5%; z-index: 64; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: .2cqw; }
 .announce-line { --ann-col: #f2d27a; margin: 0; max-width: 80%; padding: .7cqw 2.6cqw; border: 2px solid var(--ann-col); border-radius: .8cqw; background: #10152ed9; box-shadow: 0 0 1.4cqw var(--ann-col); color: #fff7e8; text-align: center; font: max(18px, 2.4cqw) 'Lilita One', 'Jua', sans-serif; text-shadow: 0 .15cqw .4cqw #000, 0 0 .8cqw var(--ann-col); opacity: 1; transition: opacity .7s ease; animation: announce-in .45s cubic-bezier(.15,1.4,.3,1) both; }
 .announce-line[data-kind="boss"] { --ann-col: #ff6a5a; }
 .announce-line[data-kind="quest"] { --ann-col: #64b5ff; }
 .announce-line[data-kind="info"] { --ann-col: #cfd6e6; }
+.announce-line[data-kind="error"] { max-width: 85%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0; font-size: max(13px, 1.8cqw); line-height: 1.15; color: #ff4a4a; background: none; border: 0; border-radius: 0; box-shadow: none; text-shadow: none; transition: none; animation: error-fade 2s linear both; }
+@keyframes error-fade { from { opacity: 1; } to { opacity: 0; } }
 .announce-line.out { opacity: 0; }
 @keyframes announce-in { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .announce-line { animation: none; transition: none; } }

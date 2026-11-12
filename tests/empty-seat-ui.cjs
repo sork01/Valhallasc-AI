@@ -39,7 +39,7 @@ const check=(v,t)=>{assert.ok(v,t);checks++;console.log(t);};
  check((await page.locator('#npc-quests').textContent()).includes('Bram found warm ash'),'First chapter introduces the mystery through Bram');
  check(await page.locator('#npc-quests .quest-location').count()===1,'Quest page shows its campaign chapter once');
  check(await page.locator('#npc-quests .quest-reward-icon').count()===2,'Quest window offers two own-class green pieces');
- await page.locator('#npc-quests [data-action="accept"]').click();await page.waitForFunction(()=>Field.hero.quests.some(q=>q.id==='es_01'));
+ await page.locator('#npc-dialogue [data-action="accept"]').click();await page.waitForFunction(()=>Field.hero.quests.some(q=>q.id==='es_01'));
  await go('es_01_m');await page.waitForFunction(()=>EmptySeat.scene()?.id==='es_01_m');
  check(await page.evaluate(()=>Quests.mapMarkers(0).some(m=>m.state==='tracked')||EmptySeat.sites().some(p=>p.id==='es_01_m')),'Campaign circle is discoverable from accepted objectives');
  check(await page.evaluate(()=>document.getElementById('area-title').hidden),'Arrival banner yields to the memory caption');

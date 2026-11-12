@@ -8,29 +8,29 @@ const suite = {
   async function journal() { await page.evaluate(()=>{City.close();Quests.close();Quests.show();}); }
   async function abandon(id) {
    await journal();
-   const entry=page.locator(`#quest-list > .quest-entry[data-quest="${id}"]`);
-   await entry.locator(':scope > summary').tap();
-   await entry.getByRole('button',{name:'Abandon quest',exact:true}).tap();
-   await entry.getByRole('button',{name:'Confirm abandon',exact:true}).tap();
+   const entry=page.locator(`#quest-list > :not(.quest-abandoned) .journal-quest[data-quest="${id}"]`);
+   await entry.tap();
+   await page.locator('#quest-controls [data-action="abandon"]').tap();
+   await page.locator('#quest-controls [data-action="abandon"]').tap();
    await page.waitForFunction(id=>!Field.hero.quests.some(q=>q.id===id&&!q.claimed),id);
   }
   async function recover(id) {
    await abandon(id); await sleep(300); await journal();
-   check(await page.locator(`#quest-list > .quest-entry[data-quest="${id}"]`).count()===0,'automatic quest stays abandoned until restored');
+   check(await page.locator(`#quest-list > :not(.quest-abandoned) .journal-quest[data-quest="${id}"]`).count()===0,'automatic quest stays abandoned until restored');
    const group=page.locator('.quest-abandoned');
    check(await group.count()===1 && !await group.evaluate(n=>n.open),'journal has a collapsed recovery section');
    await group.locator(':scope > summary').tap();
-   const entry=group.locator(`.quest-entry[data-quest="${id}"]`);
-   check(await entry.count()===1 && !await entry.evaluate(n=>n.open),'abandoned quest remains findable by title');
-   await entry.locator(':scope > summary').tap();
-   const restore=entry.getByRole('button',{name:'Restore quest',exact:true});await restore.waitFor({state:'visible'});
+   const entry=group.locator(`.journal-quest[data-quest="${id}"]`);
+   check(await entry.count()===1,'abandoned quest remains findable by title');
+   await entry.tap();
+   const restore=page.locator('#quest-controls [data-action="restore"]');await restore.waitFor({state:'visible'});
    const before=await page.evaluate(()=>({xp:Field.hero.xp,gold:Field.hero.gold,x:Field.hero.nx,y:Field.hero.ny,zone:Field.zone}));
    await restore.scrollIntoViewIfNeeded();
    await page.screenshot({path:`${out}/quest-recovery-${id}-${width}x${height}.png`});
    await restore.tap();
    await page.waitForFunction(id=>Field.hero.quests.some(q=>q.id===id&&!q.claimed),id);
    check(await page.evaluate(b=>Field.zone===b.zone&&Field.hero.xp===b.xp&&Field.hero.gold===b.gold&&Math.hypot(Field.hero.nx-b.x,Field.hero.ny-b.y)<.1,before),'restore works remotely without movement or rewards');
-   check(await page.locator(`#quest-list > .quest-entry[data-quest="${id}"]`).count()===1,'restored quest returns to active journal');
+   check(await page.locator(`#quest-list > :not(.quest-abandoned) .journal-quest[data-quest="${id}"]`).count()===1,'restored quest returns to active journal');
    check(await page.locator(`.quest-abandoned [data-quest="${id}"]`).count()===0,'recovered quest leaves abandoned section');
   }
   await recover('crags_onward');

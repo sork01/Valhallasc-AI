@@ -1,5 +1,5 @@
 'use strict';
-// Short action errors follow the hero; ground loot uses the ordinary item tooltip.
+// Action errors share the screen announcement stack; ground loot uses viewport-positioned tooltips.
 window.WorldFeedback = (() => {
   let pointer = null, hover = null, anchor = null, tooltipSize = null;
   const tr = text => window.Locale?.translate(text) || text;
@@ -9,16 +9,15 @@ window.WorldFeedback = (() => {
     const gold = document.getElementById('loot-gold-tooltip'); if (gold) gold.hidden = true;
   }
   function error(text) {
-    const box = document.getElementById('hero-errors');
-    if (!box || !window.Online?.connected || !window.Field?.hero || typeof text !== 'string' || !text.trim()) return;
-    const value = tr(text), last = box.lastElementChild;
-    if (last?.textContent === value) last.dataset.until = String(performance.now() + 2400);
-    else {
-      const line = document.createElement('p'); line.textContent = value;
-      line.dataset.until = String(performance.now() + 2400); box.append(line);
-      while (box.children.length > 2) box.firstElementChild.remove();
-    }
-    box.hidden = false;
+    if (!window.Online?.connected || !window.Field?.hero || typeof text !== 'string' || !text.trim()) return;
+    window.Announce?.show(text.trim(), 'error');
+  }
+  function goldTooltip() {
+    let node = document.getElementById('loot-gold-tooltip');
+    if (!node) { node = document.createElement('div'); node.id = 'loot-gold-tooltip'; node.className = 'item-tooltip'; node.role = 'tooltip'; node.hidden = true; }
+    // A transformed game stage is a containing block for position:fixed. Keep viewport tooltips outside it.
+    if (node.parentElement !== document.body) document.body.append(node);
+    return node;
   }
   function placeTooltip(node) {
     if (!node || node.hidden || !pointer) return;
@@ -27,18 +26,7 @@ window.WorldFeedback = (() => {
     node.style.top = Math.max(8, Math.min(innerHeight - tooltipSize.height - 8, pointer.y + 12)) + 'px';
   }
   function draw({ canvas, hero, project, width, height, drops, blocked }) {
-    const rect = canvas.getBoundingClientRect(), box = document.getElementById('hero-errors');
-    if (box) {
-      for (const line of [...box.children]) if (+line.dataset.until <= performance.now()) line.remove();
-      box.hidden = !box.children.length || !rect.width || !!window.Cutscene?.active;
-      if (!box.hidden) {
-        const [x, y] = project(hero.x, hero.y, 156);
-        const scene = canvas.parentElement.getBoundingClientRect();
-        const margin = box.offsetWidth / 2 + 8;
-        box.style.left = Math.max(margin, Math.min(rect.width - margin, x / width * rect.width)) + 'px';
-        box.style.top = Math.max(box.offsetHeight + 8, y / height * rect.height + rect.top - scene.top) + 'px';
-      }
-    }
+    const rect = canvas.getBoundingClientRect();
     if (!pointer || blocked || !rect.width || window.Cutscene?.active) { clearHover(); return; }
     const mx = (pointer.x - rect.left) / rect.width * width, my = (pointer.y - rect.top) / rect.height * height;
     let selected = null, depth = -Infinity;
@@ -63,7 +51,7 @@ window.WorldFeedback = (() => {
       }
       placeTooltip(document.getElementById('item-tooltip'));
     } else if (!d.item) {
-      const gold = document.getElementById('loot-gold-tooltip');
+      const gold = goldTooltip();
       if (gold && hover !== key) {
         clearHover(); gold.textContent = tr(`${d.value} gold`); gold.hidden = false; hover = key;
       }
@@ -74,6 +62,6 @@ window.WorldFeedback = (() => {
     error, draw,
     pointer(event) { pointer = event.pointerType === 'touch' ? null : { x: event.clientX, y: event.clientY }; },
     leave() { pointer = null; clearHover(); },
-    reset() { pointer = null; clearHover(); document.getElementById('hero-errors')?.replaceChildren(); const box = document.getElementById('hero-errors'); if (box) box.hidden = true; },
+    reset() { pointer = null; clearHover(); window.Announce?.clearErrors(); },
   };
 })();

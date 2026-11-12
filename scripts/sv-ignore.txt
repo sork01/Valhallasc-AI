@@ -160,5 +160,7 @@
   "button:not(:disabled),input,textarea,select",
   "button[data-mail-busy]",
   "kindFrames rejected",
-  "link {0} absent, links are {1}"
+  "link {0} absent, links are {1}",
+  " : history ? ",
+  " : q.repeatable ? "
 ]

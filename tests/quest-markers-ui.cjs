@@ -40,8 +40,8 @@ async function call(name, args = {}) {
   }
   async function track(id) {
     await page.evaluate(() => { WorldMap.close(); Quests.close(); Quests.show(); });
-    await page.locator(`#quest-list .quest-entry[data-quest="${id}"] > summary`).click();
-    await page.locator(`#quest-list .quest-entry[data-quest="${id}"] button`).filter({ hasText: /^Track quest$|^Tracking$/ }).click();
+    await page.locator(`#quest-list .journal-quest[data-quest="${id}"]`).click();
+    if (await page.evaluate(id => Quests.tracked !== id, id)) await page.locator('#quest-controls [data-action="track"]').click();
     await page.evaluate(() => Quests.close());
   }
   // Capture two real frames synchronously with the guidance layer on/off. No shared files or server state are changed.
@@ -89,10 +89,10 @@ async function call(name, args = {}) {
   check(targets.length === 3 && targets.every(m => m.pixels > 15 && m.colored > 2), 'Tracked destinations are real green diamonds on the minimap');
   await quest('welcome', 'complete');
   await wait(() => document.querySelector('.wm-quest[data-npc="guide"][data-state="ready"]'));
-  check(await page.locator('.wm-quest[data-npc="guide"]').textContent() === '?' && await page.locator('.wm-quest[data-npc="guide"]').evaluate(n => getComputedStyle(n).color) === 'rgb(100, 181, 255)', 'Completion changes the giver to a blue ? without closing the map');
+  check(await page.locator('.wm-quest[data-npc="guide"]').textContent() === '?' && await page.locator('.wm-quest[data-npc="guide"]').evaluate(n => getComputedStyle(n).color) === 'rgb(255, 223, 136)', 'Completion changes the non-repeatable giver to a yellow ? without closing the map');
   check(await page.locator('.wm-quest[data-state="tracked"]').count() === 1 && await page.locator('.wm-quest[data-state="tracked"]').getAttribute('data-quest') === 'welcome', 'Completed tracked quest replaces objectives with its hand-in destination');
-  const blue = await miniDelta('ready', 'guide');
-  check(blue.length === 1 && blue[0].pixels > 15 && blue[0].colored > 2, 'Blue turn-in ? is drawn on the real minimap');
+  const yellow = await miniDelta('ready', 'guide');
+  check(yellow.length === 1 && yellow[0].pixels > 15 && yellow[0].colored > 2, 'Yellow non-repeatable turn-in ? is drawn on the real minimap');
   await page.screenshot({ path: path.join(world.artifacts, 'quest-turn-in-map.png') });
   await quest('welcome', 'claim');
   await wait(() => !document.querySelector('.wm-quest[data-npc="guide"]') && !document.querySelector('.wm-quest[data-state="tracked"]'));

@@ -135,6 +135,21 @@ html, body { overscroll-behavior: none; }
   #stage .pause > :is(.panel, .rpg-window) :is(input[type=checkbox], input[type=radio]) { margin: calc((var(--touch-target) - 22px) / 2); }
 
   #stage .pause > .touch-resizable-window, #stage #sign-panel.touch-resizable-window { padding-bottom: calc(12px + var(--touch-target)); }
+  /* The journal keeps two scrollable pages; the shared modal padding would
+     leave a large empty strip below its footer and shrink the reading area. */
+  #quest-journal { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
+  #stage .pause > .quest-panel { width: calc(94cqw / var(--window-k)); height: calc(92cqh / var(--window-k)); max-width: none; max-height: none; padding: 0; overflow: hidden; }
+  #stage .pause > .quest-panel .journal-titlebar { min-height: var(--touch-target); }
+  #stage .pause > .quest-panel .journal-titlebar h3 { font-size: calc(18px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-emblem { width: calc(50px / var(--window-k)); height: calc(50px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-toolbar { min-height: calc(36px / var(--window-k)); padding-left: calc(62px / var(--window-k)); font-size: calc(13px / var(--window-k)); }
+  #stage .pause > .quest-panel :is(.journal-quest, .journal-group > summary, .gossip-button) { font-size: calc(14px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-parchment { font-size: calc(15px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-parchment :is(p, small) { font-size: inherit; }
+  #stage .pause > .quest-panel .journal-parchment .quest-state { font-size: inherit; }
+  #stage .pause > .quest-panel .journal-parchment h4 { font-size: calc(24px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-parchment h5 { font-size: calc(20px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-footer { padding-right: calc(50px / var(--window-k)); }
   #sell-warning { width: min(92cqw, 600px); }
   #worldmap { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
   #stage .pause > .wm-panel { width: calc(94cqw / var(--window-k)); max-width: none; height: calc(var(--touch-stage-h) / var(--window-k)); max-height: calc(var(--touch-stage-h) / var(--window-k)); }
