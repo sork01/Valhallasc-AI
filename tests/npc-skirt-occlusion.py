@@ -5,6 +5,7 @@ Uses the actual pose/cloth geometry and a no-leg control render, rather than a
 border or frame-count check. The exported-atlas mode also guards saved pixels.
 """
 import json
+import hashlib
 import os
 import sys
 from pathlib import Path
@@ -78,7 +79,8 @@ result = dict(mode=mode, designs=len(keys), poses=poses, coveredPixels=covered_p
               uncoveredLegPixels=uncovered_leg_pixels, failures=failures)
 out = ROOT / 'test-results/npc-named/robes'
 out.mkdir(exist_ok=True, parents=True)
-(out / ('mutation-proof.json' if mutate else mode + '-occlusion-proof.json')).write_text(json.dumps(result, indent=2) + '\n')
+suffix = '' if os.environ.get('NPC_SKIRT_KINDS', 'named') == 'named' else '-' + hashlib.sha256(os.environ['NPC_SKIRT_KINDS'].encode()).hexdigest()[:8]
+(out / ('mutation-proof.json' if mutate else mode + '-occlusion-proof' + suffix + '.json')).write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps(dict(designs=len(keys), poses=poses, failures=len(failures))))
 for failure in failures[:30]:
     print(failure)

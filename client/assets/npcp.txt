@@ -340,7 +340,13 @@
     "named_ew_cq_brage": "b53c836a3449ffd5",
     "named_ew_cq_tove": "4a6471a499747499",
     "named_ew_gh_sunniva": "1510cff2487a6155",
-    "named_ew_gh_ivar": "255ae9e0847d3326"
+    "named_ew_gh_ivar": "255ae9e0847d3326",
+    "reuse_courier": "7a4fca855824254f",
+    "reuse_merchant": "5b1088ef406d9ee6",
+    "reuse_treefolk_merchant": "b73ee884c882f075",
+    "reuse_treefolk_courier": "348c7264ad7144b5",
+    "reuse_treefolk_sentinel": "057a320c02cd5664",
+    "reuse_treefolk_steward": "ec6cc3095ce8a21c"
   },
   "designs": {
     "sentinel": {
@@ -6513,6 +6519,238 @@
         "cloth2": "#a06f52",
         "cloth3": "#cbb0a0"
       }
+    },
+    "reuse_courier": {
+      "general": true,
+      "name": "Reused courier",
+      "materials": {
+        "skin0": "#88664f",
+        "skin1": "#b48669",
+        "skin2": "#dca480",
+        "skin3": "#e3b699",
+        "hair0": "#34241c",
+        "hair1": "#4f3529",
+        "hair2": "#694737",
+        "hair3": "#967e73",
+        "cloth0": "#5e492c",
+        "cloth1": "#927144",
+        "cloth2": "#d0a261",
+        "cloth3": "#e5cca8"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "reuse_merchant": {
+      "general": true,
+      "name": "Reused merchant",
+      "materials": {
+        "skin0": "#724e37",
+        "skin1": "#976648",
+        "skin2": "#b87d58",
+        "skin3": "#c69779",
+        "hair0": "#3a3246",
+        "hair1": "#584a6a",
+        "hair2": "#75638d",
+        "hair3": "#9e92af",
+        "cloth0": "#443454",
+        "cloth1": "#695183",
+        "cloth2": "#9674bb",
+        "cloth3": "#c5b3da"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
+    },
+    "reuse_treefolk_merchant": {
+      "general": true,
+      "name": "Reused treefolk merchant",
+      "materials": {
+        "skin0": "#594736",
+        "skin1": "#755e47",
+        "skin2": "#8f7357",
+        "skin3": "#a58f79",
+        "hair0": "#3d4a26",
+        "hair1": "#5c6e3a",
+        "hair2": "#7a934d",
+        "hair3": "#a2b382",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      },
+      "species": "treefolk"
+    },
+    "reuse_treefolk_courier": {
+      "general": true,
+      "name": "Reused treefolk courier",
+      "materials": {
+        "skin0": "#5b422d",
+        "skin1": "#78573c",
+        "skin2": "#926a49",
+        "skin3": "#a8886d",
+        "hair0": "#324529",
+        "hair1": "#4c683e",
+        "hair2": "#658a52",
+        "hair3": "#93ad86",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      },
+      "species": "treefolk"
+    },
+    "reuse_treefolk_sentinel": {
+      "general": true,
+      "name": "Reused treefolk sentinel",
+      "materials": {
+        "skin0": "#6b4f36",
+        "skin1": "#8e6947",
+        "skin2": "#ad8057",
+        "skin3": "#bd9979",
+        "hair0": "#283d22",
+        "hair1": "#3c5c32",
+        "hair2": "#507a43",
+        "hair3": "#84a27b",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      },
+      "species": "treefolk"
+    },
+    "reuse_treefolk_steward": {
+      "general": true,
+      "name": "Reused treefolk steward",
+      "materials": {
+        "skin0": "#6b4f36",
+        "skin1": "#8e6947",
+        "skin2": "#ad8057",
+        "skin3": "#bd9979",
+        "hair0": "#283d22",
+        "hair1": "#3c5c32",
+        "hair2": "#507a43",
+        "hair3": "#84a27b",
+        "cloth0": "#676f4e",
+        "cloth1": "#a0ad7a",
+        "cloth2": "#e4f7ae",
+        "cloth3": "#f0fbd2"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      },
+      "species": "treefolk"
     }
   },
   "tops": {
@@ -6827,7 +7065,13 @@
     "named_ew_cq_brage": 85,
     "named_ew_cq_tove": 87,
     "named_ew_gh_sunniva": 79,
-    "named_ew_gh_ivar": 79
+    "named_ew_gh_ivar": 79,
+    "reuse_courier": 76,
+    "reuse_merchant": 83,
+    "reuse_treefolk_merchant": 86,
+    "reuse_treefolk_courier": 87,
+    "reuse_treefolk_sentinel": 86,
+    "reuse_treefolk_steward": 86
   },
   "bounds": {
     "sentinel": [
@@ -8700,6 +8944,42 @@
       29,
       11,
       70,
+      95
+    ],
+    "reuse_courier": [
+      28,
+      14,
+      68,
+      95
+    ],
+    "reuse_merchant": [
+      28,
+      7,
+      74,
+      95
+    ],
+    "reuse_treefolk_merchant": [
+      28,
+      4,
+      75,
+      95
+    ],
+    "reuse_treefolk_courier": [
+      28,
+      3,
+      75,
+      95
+    ],
+    "reuse_treefolk_sentinel": [
+      28,
+      4,
+      75,
+      95
+    ],
+    "reuse_treefolk_steward": [
+      28,
+      4,
+      75,
       95
     ]
   },

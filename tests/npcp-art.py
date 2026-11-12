@@ -18,7 +18,9 @@ OLD = json.loads((A / 'npc.txt').read_text())
 W = H = 96
 AX, AY = META['anchor']
 MUTATE = '--mutate' in sys.argv
-NAMED_ONLY = os.environ.get('NPCP_ART_GROUP') == 'named'
+ART_GROUP = os.environ.get('NPCP_ART_GROUP')
+NAMED_ONLY = ART_GROUP == 'named'
+FOCUSED = ART_GROUP in ('named', 'reuse')
 fails = []
 
 
@@ -80,7 +82,7 @@ def socket(frame, skin):
 
 idle_masks = {}
 for key, spec in META['sprites'].items():
-    if NAMED_ONLY and not key.startswith('named_'):
+    if FOCUSED and not key.startswith(ART_GROUP + '_'):
         continue
     mats = META['designs'][key]['materials']
     skin = {hexint(c) for k, c in mats.items() if k.startswith('skin')}
@@ -101,7 +103,7 @@ for key, spec in META['sprites'].items():
         check(len(xs) > 0 and xs.min() >= 1 and xs.max() <= 94 and ys.min() >= 1 and ys.max() <= 94, f'{key} {clip} {n}: touches the border')
         check(a.any(0)[0] == False and a.any(0)[-1] == False, f'{key} {clip} {n}: opaque edge column')
         sigs.setdefault(clip, set()).add(fr.tobytes())
-        if clip == 'idle' and n == 0 and (general or NAMED_ONLY):
+        if clip == 'idle' and n == 0 and (FOCUSED or (general and not key.startswith('reuse_'))):
             idle_masks[key] = a
         # feet: the lowest opaque row must sit near the anchor (walk may lift a foot)
         slack = 10 if designs.get('species') == 'merfolk' else 6      # a merfolk tail flicks up on one walk frame
@@ -127,16 +129,19 @@ for i, k1 in enumerate(keys):
         d = int((idle_masks[k1] ^ idle_masks[k2]).sum())
         if d < worst[0]:
             worst = (d, (k1, k2))
-if not NAMED_ONLY:
+if not FOCUSED:
     check(len(keys) == 24, f'{len(keys)} general designs, want 24')
 named_plan = ROOT / 'docs/npc-named-plan.txt'
 named_count = json.loads(named_plan.read_text())['counts']['namedDesigns'] if named_plan.exists() else 0
-check(len(META['sprites']) == 164 + named_count, f"{len(META['sprites'])} designs in total, want {164 + named_count}")
+reuse_count = len([k for k in META['sprites'] if k.startswith('reuse_')])
+check(len(META['sprites']) == 164 + named_count + reuse_count, f"{len(META['sprites'])} designs in total, want {164 + named_count + reuse_count}")
 if NAMED_ONLY:
     check(len(keys) == named_count, f'{len(keys)} named designs, want {named_count}')
+elif ART_GROUP == 'reuse':
+    check(len(keys) == reuse_count == 6, f'{len(keys)} reuse designs, want 6')
 for sp, kind in (('special_heart_oracle', 'treefolk'), ('special_sky_warden', 'winged'), ('special_nacre_envoy', 'merfolk')):
     check(META['designs'].get(sp, {}).get('species') == kind, f'{sp}: species {kind} missing from the manifest')
-check(worst[0] >= (32 if NAMED_ONLY else 120), f'two designs have near-identical silhouettes: {worst}')
+check(worst[0] >= (32 if FOCUSED else 120), f'two designs have near-identical silhouettes: {worst}')
 print(f'designs {len(keys)}, closest silhouette pair {worst}')
 print('FAIL' if fails else 'PASS', len(fails), 'problems')
 for f in fails[:40]:

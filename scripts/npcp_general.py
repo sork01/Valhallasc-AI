@@ -1141,6 +1141,8 @@ def pick(args):
             out += list(DESIGNS)
         elif a == 'named':
             out += [k for k in DESIGNS if k.startswith('named_')]
+        elif a == 'reuse':
+            out += [k for k in DESIGNS if k.startswith('reuse_')]
         elif a in DESIGNS:
             out.append(a)
         else:

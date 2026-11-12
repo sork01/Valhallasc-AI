@@ -3,6 +3,7 @@
 import collections
 import json
 import re
+import subprocess
 from pathlib import Path
 import npc_art_catalog as legacy
 import npcp_named
@@ -27,7 +28,10 @@ yo_th_sunniva yo_lf_tove ew_cw_ragna ew_cq_tove ew_gh_sunniva'''.split())
 
 def inventory():
     world = json.loads((ROOT / 'world/map.txt').read_text())
-    assigned = json.loads((ROOT / 'client/assets/npc.txt').read_text())['npcs']
+    # This is the accepted design inventory's baseline, not a new gap scan after
+    # assignments are installed. Keep the approved spec reproducible on release.
+    assigned = json.loads(subprocess.check_output(
+        ['git', 'show', '8e982701:client/assets/npc.txt'], cwd=ROOT))['npcs']
     authored = {s['id']: s for s in npcp_named.catalog()}
     assert len(authored) == len(npcp_named.catalog())
     quests = collections.defaultdict(list)

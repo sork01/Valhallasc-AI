@@ -8,6 +8,13 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+REUSE_NATIVE = {'reuse_courier': 'courier', 'reuse_merchant': 'merchant'}
+REUSE_ALIASES = {
+    'reuse_treefolk_merchant': 'named_hw_sorter',
+    'reuse_treefolk_courier': 'named_hw_courier',
+    'reuse_treefolk_sentinel': 'named_hw_captain',
+    'reuse_treefolk_steward': 'named_hw_storyteller',
+}
 ROWS = '''
 fold_hild|pilgrim|crook|straw|long|wool
 fold_torvald|elder|tablet|hood|beard|runes
@@ -210,6 +217,9 @@ def install(designs, G):
         # Explicit per-person cut changes coat length, side panel and shoulder detail.
         base['outfit'] = dict(skirt=(hem + s['cut'], width + .35 * s['cut'], depth), hem_trim='accent')
         designs[person['designKey']] = base
+    for key, source in {**REUSE_NATIVE, **REUSE_ALIASES}.items():
+        designs[key] = dict(designs[source], general=True, reuse=True,
+                            name='Reused ' + key.removeprefix('reuse_').replace('_', ' '))
 
 
 def held_prop(G, name, ink, xf, joints, R, p, c):

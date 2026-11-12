@@ -6258,6 +6258,3005 @@
         "style": "bald"
       },
       "color": "#b96e45"
+    },
+    "fold_hild": {
+      "art": "named_fold_hild",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#b08a4a",
+        "style": "long",
+        "hat": "straw",
+        "hatColor": "#c9b070"
+      },
+      "color": "#b9c48a"
+    },
+    "fold_torvald": {
+      "art": "named_fold_torvald",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#d8d8d8",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#6a6a7a"
+      },
+      "color": "#9a9aa8"
+    },
+    "fold_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#6a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#7a9a5a"
+      },
+      "color": "#7a9a5a"
+    },
+    "salt_ragna": {
+      "art": "named_salt_ragna",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a2e2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#5f8aa0"
+      },
+      "color": "#7fa8ba"
+    },
+    "salt_odd": {
+      "art": "named_salt_odd",
+      "identity": {
+        "skin": "#b98a6a",
+        "hair": "#8a8a7a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#44606e"
+      },
+      "color": "#5f8aa0"
+    },
+    "salt_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a05a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#5f8aa0"
+      },
+      "color": "#5f8aa0"
+    },
+    "apple_maren": {
+      "art": "named_apple_maren",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a0502a",
+        "style": "long",
+        "hat": "straw",
+        "hatColor": "#d4b46a"
+      },
+      "color": "#c47a5a"
+    },
+    "apple_sten": {
+      "art": "named_apple_sten",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#5a4a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#d4b46a"
+      },
+      "color": "#d4b43a"
+    },
+    "apple_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#c9a050",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#b65b4a"
+      },
+      "color": "#b65b4a"
+    },
+    "apple_lotta": {
+      "art": "named_apple_lotta",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#d8b060",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#d8c8a0"
+      },
+      "color": "#d8c8a0"
+    },
+    "travel_stonefold": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_saltby": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_applewick": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "dock_skipper": {
+      "art": "named_dock_skipper",
+      "identity": {
+        "skin": "#c08a66",
+        "hair": "#d8d2c4",
+        "style": "short",
+        "hat": "cap",
+        "hatColor": "#2f4560"
+      },
+      "color": "#4f6d8a"
+    },
+    "anvil_ingrid": {
+      "art": "named_anvil_ingrid",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a2e2a",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#6a4a3a"
+      },
+      "color": "#a0704a"
+    },
+    "anvil_bror": {
+      "art": "named_anvil_bror",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#8a8a7a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#5a5a6a"
+      },
+      "color": "#7a7a8a"
+    },
+    "anvil_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#6a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#8a6a4a"
+      },
+      "color": "#8a6a4a"
+    },
+    "ford_tora": {
+      "art": "named_ford_tora",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#a05a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#b0603a"
+      },
+      "color": "#b0603a"
+    },
+    "ford_olaf": {
+      "art": "named_ford_olaf",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#5a4a3a",
+        "style": "short",
+        "hat": "straw",
+        "hatColor": "#a08a5a"
+      },
+      "color": "#8a7a5a"
+    },
+    "ford_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#c9a050",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#9a5a3a"
+      },
+      "color": "#9a5a3a"
+    },
+    "ford_ulf": {
+      "art": "named_ford_ulf",
+      "identity": {
+        "skin": "#b98a6a",
+        "hair": "#3a3028",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#5a4a3a"
+      },
+      "color": "#7a6a5a"
+    },
+    "hearth_sigrid": {
+      "art": "named_hearth_sigrid",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#d8d8d8",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#7a3a3a"
+      },
+      "color": "#a04a4a"
+    },
+    "hearth_elof": {
+      "art": "named_hearth_elof",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a4a7a"
+      },
+      "color": "#6a6a9a"
+    },
+    "hearth_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#7a3a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#7a4a4a"
+      },
+      "color": "#7a4a4a"
+    },
+    "travel_anvilrest": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_ashford": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_lasthearth": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "rime_dw_hild": {
+      "art": "named_rime_dw_hild",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a4a5a",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4f6f8f"
+      },
+      "color": "#6f93b8"
+    },
+    "rime_dw_nils": {
+      "art": "named_rime_dw_nils",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#7a6a4a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#6a5a4a"
+      },
+      "color": "#8a7a5a"
+    },
+    "rime_dw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#b89a6a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a87a45"
+      },
+      "color": "#a87a45"
+    },
+    "rime_sw_runa": {
+      "art": "named_rime_sw_runa",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#d8d8d8",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a7a9a"
+      },
+      "color": "#7a93b0"
+    },
+    "rime_sw_arne": {
+      "art": "named_rime_sw_arne",
+      "identity": {
+        "skin": "#b98a6a",
+        "hair": "#3a3028",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a5a4a"
+      },
+      "color": "#8a7a6a"
+    },
+    "rime_sw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#9a7a5a"
+      },
+      "color": "#9a7a5a"
+    },
+    "rime_pk_gunnar": {
+      "art": "named_rime_pk_gunnar",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#aaaaaa",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a5f8f"
+      },
+      "color": "#6a7fb0"
+    },
+    "rime_pk_sif": {
+      "art": "named_rime_pk_sif",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#2a2a3a",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#6a6a9a"
+      },
+      "color": "#8a8ab0"
+    },
+    "rime_pk_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#6a7fb0"
+      },
+      "color": "#6a7fb0"
+    },
+    "travel_driftwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_shearwind": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_peakrest": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "fen_rh_brid": {
+      "art": "named_fen_rh_brid",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a4a3a",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4f6f58"
+      },
+      "color": "#6f9a78"
+    },
+    "fen_rh_sten": {
+      "art": "named_fen_rh_sten",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#7a6a4a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#6a5a4a"
+      },
+      "color": "#8a7a5a"
+    },
+    "fen_rh_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#b89a6a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a87a45"
+      },
+      "color": "#a87a45"
+    },
+    "fen_dk_magnus": {
+      "art": "named_fen_dk_magnus",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#d8d8d8",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4f6f8f"
+      },
+      "color": "#6f8aa8"
+    },
+    "fen_dk_linnea": {
+      "art": "named_fen_dk_linnea",
+      "identity": {
+        "skin": "#b98a6a",
+        "hair": "#3a3028",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#6a5a4a"
+      },
+      "color": "#8a7a6a"
+    },
+    "fen_dk_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#7a8aa0"
+      },
+      "color": "#7a8aa0"
+    },
+    "fen_gr_ysolde": {
+      "art": "named_fen_gr_ysolde",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#aaaaaa",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a5a7a"
+      },
+      "color": "#6a7a9a"
+    },
+    "fen_gr_per": {
+      "art": "named_fen_gr_per",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#6a6a5a"
+      },
+      "color": "#8a8a7a"
+    },
+    "fen_gr_trader": {
+      "art": "named_fen_gr_trader",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a6a8a"
+      },
+      "color": "#6a6a8a"
+    },
+    "travel_reedhallow": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_dikewatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_lastlight": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "wyrd_gf_hild": {
+      "art": "named_wyrd_gf_hild",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a32",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4a3a5a"
+      },
+      "color": "#7a6a8a"
+    },
+    "wyrd_gf_orm": {
+      "art": "named_wyrd_gf_orm",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#7a7a7a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#3a3a4a"
+      },
+      "color": "#5a5a6a"
+    },
+    "wyrd_gf_trader": {
+      "art": "named_wyrd_gf_trader",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a8683a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a87a45"
+      },
+      "color": "#a87a45"
+    },
+    "wyrd_rw_dagny": {
+      "art": "named_wyrd_rw_dagny",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#b89a6a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a5a7a"
+      },
+      "color": "#5a7a9a"
+    },
+    "wyrd_rw_fenn": {
+      "art": "named_wyrd_rw_fenn",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a5a4a"
+      },
+      "color": "#8a7a5a"
+    },
+    "wyrd_rw_trader": {
+      "art": "named_wyrd_rw_trader",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#7a8aa0"
+      },
+      "color": "#7a8aa0"
+    },
+    "wyrd_hm_sunniva": {
+      "art": "named_wyrd_hm_sunniva",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfcfcf",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a5a7a"
+      },
+      "color": "#7a7aa8"
+    },
+    "wyrd_hm_loom": {
+      "art": "named_wyrd_hm_loom",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#6a4a7a"
+      },
+      "color": "#8a6a9a"
+    },
+    "wyrd_hm_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a6a8a"
+      },
+      "color": "#6a6a8a"
+    },
+    "travel_gallowsfoot": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_ridgewatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_highmoor": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "sky_wr_vigdis": {
+      "art": "named_sky_wr_vigdis",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a8683a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#8aa0c8"
+      },
+      "color": "#8aa0c8"
+    },
+    "sky_wr_leif": {
+      "art": "named_sky_wr_leif",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#7a7a7a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#5a7090"
+      },
+      "color": "#9ab0c8"
+    },
+    "sky_wr_trader": {
+      "art": "named_sky_wr_trader",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#c4a060"
+      },
+      "color": "#c4a060"
+    },
+    "sky_ss_ingrid": {
+      "art": "named_sky_ss_ingrid",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfcfcf",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a5a90"
+      },
+      "color": "#7a7ab0"
+    },
+    "sky_ss_bjorn": {
+      "art": "named_sky_ss_bjorn",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#8a8ac0"
+      },
+      "color": "#8a8ac0"
+    },
+    "sky_ss_trader": {
+      "art": "named_sky_ss_trader",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a0a0d0"
+      },
+      "color": "#a0a0d0"
+    },
+    "sky_el_gunnar": {
+      "art": "named_sky_el_gunnar",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#b89a6a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#6a5a90"
+      },
+      "color": "#9a8ab0"
+    },
+    "sky_el_hallveig": {
+      "art": "named_sky_el_hallveig",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#2a2a3a",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#7a6aa0"
+      },
+      "color": "#a89ac0"
+    },
+    "sky_el_trader": {
+      "art": "named_sky_el_trader",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#8a7aa8"
+      },
+      "color": "#8a7aa8"
+    },
+    "travel_roost": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_station": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_landing": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "deep_lr_solveig": {
+      "art": "named_deep_lr_solveig",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a8683a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#c8a458"
+      },
+      "color": "#c8a458"
+    },
+    "deep_lr_torvald": {
+      "art": "named_deep_lr_torvald",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#6a5a4a",
+        "style": "short",
+        "hat": "cap",
+        "hatColor": "#7a6a4a"
+      },
+      "color": "#b8945a"
+    },
+    "deep_lr_trader": {
+      "art": "named_deep_lr_trader",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#c4a060"
+      },
+      "color": "#c4a060"
+    },
+    "deep_gw_bergljot": {
+      "art": "named_deep_gw_bergljot",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfcfcf",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#3a7a90"
+      },
+      "color": "#5a9ab0"
+    },
+    "deep_gw_hallbjorn": {
+      "art": "named_deep_gw_hallbjorn",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "bald",
+        "hat": "none",
+        "hatColor": "#6aa8b8"
+      },
+      "color": "#6aa8b8"
+    },
+    "deep_gw_trader": {
+      "art": "named_deep_gw_trader",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a0b8c8"
+      },
+      "color": "#a0b8c8"
+    },
+    "deep_dw_ottilia": {
+      "art": "named_deep_dw_ottilia",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#2a2a3a",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a6a98"
+      },
+      "color": "#7a8ab8"
+    },
+    "deep_dw_skuli": {
+      "art": "named_deep_dw_skuli",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#7a7a7a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#8a7ab0"
+      },
+      "color": "#8a7ab0"
+    },
+    "deep_dw_trader": {
+      "art": "named_deep_dw_trader",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#8a3a1a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#c4a060"
+      },
+      "color": "#c4a060"
+    },
+    "travel_lanternrest": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_gatewatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_drownwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "nacre_harbourmaster": {
+      "art": "named_nacre_harbourmaster",
+      "identity": {
+        "species": "merfolk",
+        "female": true,
+        "tail": "#81d6cc",
+        "skin": "#abd4e4",
+        "hair": "#43827a",
+        "style": "long"
+      },
+      "color": "#81d6cc"
+    },
+    "nacre_gatewarden": {
+      "art": "named_nacre_gatewarden",
+      "identity": {
+        "species": "merfolk",
+        "female": true,
+        "tail": "#e9acc8",
+        "skin": "#a4dbc9",
+        "hair": "#b96289",
+        "style": "long"
+      },
+      "color": "#e9acc8"
+    },
+    "astral_cr_mael": {
+      "art": "named_astral_cr_mael",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#cfd8f0",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4a5a8a"
+      },
+      "color": "#8aa8d8"
+    },
+    "astral_cr_ide": {
+      "art": "named_astral_cr_ide",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#4a6a7a"
+      },
+      "color": "#7a9a8a"
+    },
+    "astral_cr_trader": {
+      "art": "named_astral_cr_trader",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a6aa8",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#7aa0b0"
+      },
+      "color": "#7aa0b0"
+    },
+    "astral_cw_brisa": {
+      "art": "named_astral_cw_brisa",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#b8503a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#7a3a3a"
+      },
+      "color": "#c8806a"
+    },
+    "astral_cw_oren": {
+      "art": "named_astral_cw_oren",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a5a4a"
+      },
+      "color": "#9a7a6a"
+    },
+    "astral_cw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a8683a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#b08a6a"
+      },
+      "color": "#b08a6a"
+    },
+    "astral_fh_aurel": {
+      "art": "named_astral_fh_aurel",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfcfe8",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a5a8a"
+      },
+      "color": "#8a8ac8"
+    },
+    "astral_fh_dov": {
+      "art": "named_astral_fh_dov",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a4a6a"
+      },
+      "color": "#7a7aa8"
+    },
+    "astral_fh_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#8a8aa8"
+      },
+      "color": "#8a8aa8"
+    },
+    "travel_choirrest": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_cometwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_fallstone": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "prism_mf_ilsa": {
+      "art": "named_prism_mf_ilsa",
+      "identity": {
+        "skin": "#e0bca0",
+        "hair": "#d8c8e0",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#7a5a8a"
+      },
+      "color": "#d8a0c8"
+    },
+    "prism_mf_dov": {
+      "art": "named_prism_mf_dov",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a2a3a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a5a6a"
+      },
+      "color": "#c8a8b8"
+    },
+    "prism_mf_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a8683a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#e0b48a"
+      },
+      "color": "#e0b48a"
+    },
+    "prism_ws_marek": {
+      "art": "named_prism_ws_marek",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#e8e0c8",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#a88a5a"
+      },
+      "color": "#f0d890"
+    },
+    "prism_ws_ottilie": {
+      "art": "named_prism_ws_ottilie",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#7a3a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#b08a6a"
+      },
+      "color": "#e8c0a0"
+    },
+    "prism_ws_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#5a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#f0d8a0"
+      },
+      "color": "#f0d8a0"
+    },
+    "prism_cf_runa": {
+      "art": "named_prism_cf_runa",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfcfe8",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a5a7a"
+      },
+      "color": "#a8a8c8"
+    },
+    "prism_cf_teo": {
+      "art": "named_prism_cf_teo",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a4a5a"
+      },
+      "color": "#a89888"
+    },
+    "prism_cf_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#b8a090"
+      },
+      "color": "#b8a090"
+    },
+    "travel_mirrorfall": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_whitesun": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_cairnfoot": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "orrery_bc_tolla": {
+      "art": "named_orrery_bc_tolla",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#cfd0d8",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4a5a7a"
+      },
+      "color": "#9aa8c8"
+    },
+    "orrery_bc_fenn": {
+      "art": "named_orrery_bc_fenn",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a2a1a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a5a4a"
+      },
+      "color": "#b8946a"
+    },
+    "orrery_bc_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#a8683a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#c8a66b"
+      },
+      "color": "#c8a66b"
+    },
+    "orrery_cn_isolde": {
+      "art": "named_orrery_cn_isolde",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#7a3a2a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#7a3a3a"
+      },
+      "color": "#c8806a"
+    },
+    "orrery_cn_quill": {
+      "art": "named_orrery_cn_quill",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a6a4a"
+      },
+      "color": "#a8a06a"
+    },
+    "orrery_cn_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#5a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#b0a06a"
+      },
+      "color": "#b0a06a"
+    },
+    "orrery_sw_kestrel": {
+      "art": "named_orrery_sw_kestrel",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfcfe8",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a4a8a"
+      },
+      "color": "#8a7ac8"
+    },
+    "orrery_sw_anselm": {
+      "art": "named_orrery_sw_anselm",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a4a6a"
+      },
+      "color": "#7a7aa8"
+    },
+    "orrery_sw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#8a8aa8"
+      },
+      "color": "#8a8aa8"
+    },
+    "travel_bellcourt": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_crownwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_shardwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "storm_rs_edda": {
+      "art": "named_storm_rs_edda",
+      "identity": {
+        "skin": "#e0bca0",
+        "hair": "#c8d4e0",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4a6a88"
+      },
+      "color": "#8fb4d0"
+    },
+    "storm_rs_jorun": {
+      "art": "named_storm_rs_jorun",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a7a7a"
+      },
+      "color": "#88a8a0"
+    },
+    "storm_rs_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#8a5a3a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#9fc3c9"
+      },
+      "color": "#9fc3c9"
+    },
+    "storm_fp_halv": {
+      "art": "named_storm_fp_halv",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#e0e4ec",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#5a6a88"
+      },
+      "color": "#b4c8e0"
+    },
+    "storm_fp_ingrid": {
+      "art": "named_storm_fp_ingrid",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#6a3a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#8a9aa8"
+      },
+      "color": "#a8b8c8"
+    },
+    "storm_fp_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#4a4a5a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#b8d0d0"
+      },
+      "color": "#b8d0d0"
+    },
+    "storm_bh_torvald": {
+      "art": "named_storm_bh_torvald",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfd4dc",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4a5a6a"
+      },
+      "color": "#9ab0c0"
+    },
+    "storm_bh_sigrid": {
+      "art": "named_storm_bh_sigrid",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a5058"
+      },
+      "color": "#a8b4b8"
+    },
+    "storm_bh_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#a8b4b8"
+      },
+      "color": "#a8b4b8"
+    },
+    "travel_rodstead": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_fulgur": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_bankhold": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "sv_hw_marit": {
+      "art": "named_sv_hw_marit",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#7a4a2c",
+        "style": "long",
+        "hat": "straw",
+        "hatColor": "#e2c67e"
+      },
+      "color": "#ffe6a5"
+    },
+    "sv_hw_ansgar": {
+      "art": "named_sv_hw_ansgar",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#3f342a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#568054"
+      },
+      "color": "#ffe6a5"
+    },
+    "sv_hw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#8a8f98",
+        "style": "short",
+        "hat": "straw",
+        "hatColor": "#d6bb70"
+      },
+      "color": "#ffe6a5"
+    },
+    "sv_wf_greta": {
+      "art": "named_sv_wf_greta",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#a84e39",
+        "style": "long",
+        "hat": "straw",
+        "hatColor": "#caa65f"
+      },
+      "color": "#ffe6a5"
+    },
+    "sv_wf_ottar": {
+      "art": "named_sv_wf_ottar",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#c9c2b4",
+        "style": "short",
+        "hat": "straw",
+        "hatColor": "#aa8659"
+      },
+      "color": "#ffe6a5"
+    },
+    "sv_wf_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#6a4a3a",
+        "style": "long",
+        "hat": "straw",
+        "hatColor": "#d6bb70"
+      },
+      "color": "#ffe6a5"
+    },
+    "sv_er_ingrid": {
+      "art": "named_sv_er_ingrid",
+      "identity": {
+        "skin": "#b78865",
+        "hair": "#d2c39b",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#568054"
+      },
+      "color": "#ffe6a5"
+    },
+    "sv_er_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#568054"
+      },
+      "color": "#ffe6a5"
+    },
+    "travel_honeywood": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_wickerfield": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_elderroot": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "rw_bp_aldis": {
+      "art": "named_rw_bp_aldis",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#8a4a5a",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#c4607e"
+      },
+      "color": "#d98aa8"
+    },
+    "rw_bp_pernille": {
+      "art": "named_rw_bp_pernille",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#5a3a4a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#c4607e"
+      },
+      "color": "#c47a96"
+    },
+    "rw_bp_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#3a3238",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#d8a0b4"
+      },
+      "color": "#d8a0b4"
+    },
+    "rw_tp_ysolde": {
+      "art": "named_rw_tp_ysolde",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#d8d4e8",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#6a52a0"
+      },
+      "color": "#9a82c8"
+    },
+    "rw_tp_calder": {
+      "art": "named_rw_tp_calder",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a52a0"
+      },
+      "color": "#8a72b8"
+    },
+    "rw_tp_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#4a4a58",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a894d0"
+      },
+      "color": "#a894d0"
+    },
+    "rw_gr_ruben": {
+      "art": "named_rw_gr_ruben",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#d8c89a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#b8842e"
+      },
+      "color": "#d8a64e"
+    },
+    "rw_gr_lisbet": {
+      "art": "named_rw_gr_lisbet",
+      "identity": {
+        "skin": "#e0bca0",
+        "hair": "#6a4a3a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#b8842e"
+      },
+      "color": "#c8943e"
+    },
+    "rw_gr_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#5a2a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#d8b870"
+      },
+      "color": "#d8b870"
+    },
+    "travel_bunting": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_tassel": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_garland": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_pavilion": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "tg_rg_ixel": {
+      "art": "named_tg_rg_ixel",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a3a2a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#3a7a56"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_rg_pomo": {
+      "art": "named_tg_rg_pomo",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#5a3a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#3a7a56"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_rg_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#3a3238",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#3a7a56"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_dr_kessa": {
+      "art": "named_tg_dr_kessa",
+      "identity": {
+        "skin": "#a87a5a",
+        "hair": "#1a1a22",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#8a5a2e"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_dr_yarrow": {
+      "art": "named_tg_dr_yarrow",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#6a4a3a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#8a5a2e"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_dr_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#8a5a2e"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_sp_marek": {
+      "art": "named_tg_sp_marek",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#4a5a4a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#2e6a6a"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_sp_odile": {
+      "art": "named_tg_sp_odile",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#3a2a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#2e6a6a"
+      },
+      "color": "#d6f1a2"
+    },
+    "tg_sp_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#2e6a6a"
+      },
+      "color": "#d6f1a2"
+    },
+    "travel_rootgate": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_drumroot": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_stilt": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_rainstep": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "ve_gw_ilsa": {
+      "art": "named_ve_gw_ilsa",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#28574b",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "ve_gw_nuri": {
+      "art": "named_ve_gw_nuri",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "ve_gw_trader": {
+      "art": "reuse_treefolk_merchant",
+      "identity": {
+        "skin": "#926a49",
+        "hair": "#658a52",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "ve_rs_corvin": {
+      "art": "named_ve_rs_corvin",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "ve_rs_trader": {
+      "art": "reuse_treefolk_merchant",
+      "identity": {
+        "skin": "#8f7357",
+        "hair": "#7a934d",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "ve_eb_dessa": {
+      "art": "named_ve_eb_dessa",
+      "identity": {
+        "skin": "#a87a5a",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "ve_eb_taro": {
+      "art": "named_ve_eb_taro",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#6a4a3a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "ve_eb_trader": {
+      "art": "reuse_treefolk_merchant",
+      "identity": {
+        "skin": "#ad8057",
+        "hair": "#507a43",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "travel_gladewatch": {
+      "art": "reuse_treefolk_courier",
+      "identity": {
+        "hair": "#507a43",
+        "skin": "#ad8057",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97",
+        "species": "treefolk"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_rootstair": {
+      "art": "reuse_treefolk_courier",
+      "identity": {
+        "hair": "#397c60",
+        "skin": "#b58e65",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97",
+        "species": "treefolk"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_eastbark": {
+      "art": "reuse_treefolk_courier",
+      "identity": {
+        "hair": "#397c60",
+        "skin": "#b58e65",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97",
+        "species": "treefolk"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_lookout": {
+      "art": "reuse_treefolk_courier",
+      "identity": {
+        "hair": "#658a52",
+        "skin": "#926a49",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97",
+        "species": "treefolk"
+      },
+      "color": "#74d7d0"
+    },
+    "hw_steward": {
+      "art": "named_hw_steward",
+      "identity": {
+        "skin": "#ad7857",
+        "hair": "#28574b",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "banker_heartwood": {
+      "art": "reuse_treefolk_steward",
+      "identity": {
+        "skin": "#b58e65",
+        "hair": "#397c60",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_smith": {
+      "art": "named_hw_smith",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_healer": {
+      "art": "named_hw_healer",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#7a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_trader": {
+      "art": "reuse_treefolk_merchant",
+      "identity": {
+        "skin": "#b58e65",
+        "hair": "#397c60",
+        "style": "bun",
+        "hat": "bonnet",
+        "hatColor": "#8a6a2a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_innkeeper": {
+      "art": "named_hw_innkeeper",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_captain": {
+      "art": "named_hw_captain",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_watch_a": {
+      "art": "reuse_treefolk_sentinel",
+      "identity": {
+        "skin": "#ad8057",
+        "hair": "#507a43",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_watch_b": {
+      "art": "reuse_treefolk_sentinel",
+      "identity": {
+        "skin": "#b58e65",
+        "hair": "#397c60",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_lamplighter": {
+      "art": "named_hw_lamplighter",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#3b4156",
+        "style": "bun",
+        "hat": "bonnet",
+        "hatColor": "#8a6a2a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_weaver": {
+      "art": "named_hw_weaver",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_logwarden": {
+      "art": "named_hw_logwarden",
+      "identity": {
+        "skin": "#ad7857",
+        "hair": "#28574b",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_bellringer": {
+      "art": "named_hw_bellringer",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_sorter": {
+      "art": "named_hw_sorter",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_storyteller": {
+      "art": "named_hw_storyteller",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#7a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_baker": {
+      "art": "named_hw_baker",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#3b4156",
+        "style": "bun",
+        "hat": "bonnet",
+        "hatColor": "#8a6a2a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_tapper": {
+      "art": "named_hw_tapper",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_gardener": {
+      "art": "named_hw_gardener",
+      "identity": {
+        "skin": "#ad7857",
+        "hair": "#28574b",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_glassblower": {
+      "art": "named_hw_glassblower",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_courier": {
+      "art": "named_hw_courier",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_pilgrim": {
+      "art": "named_hw_pilgrim",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#7a4a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_kid_pip": {
+      "art": "named_hw_kid_pip",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#3b4156",
+        "style": "bun",
+        "hat": "bonnet",
+        "hatColor": "#8a6a2a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_kid_mina": {
+      "art": "named_hw_kid_mina",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_kid_tove": {
+      "art": "named_hw_kid_tove",
+      "identity": {
+        "skin": "#ad7857",
+        "hair": "#28574b",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "hw_kid_ake": {
+      "art": "named_hw_kid_ake",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#569e66",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
+    "travel_heartwood": {
+      "art": "reuse_treefolk_courier",
+      "identity": {
+        "hair": "#397c60",
+        "skin": "#b58e65",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97",
+        "species": "treefolk"
+      },
+      "color": "#74d7d0"
+    },
+    "lp_ww_hesper": {
+      "art": "named_lp_ww_hesper",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#3b4156",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#228c98"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_ww_yeva": {
+      "art": "named_lp_ww_yeva",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#228c98"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_ww_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#228c98"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_sp_soraya": {
+      "art": "named_lp_sp_soraya",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#1a1a22",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#2e6a8a"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_sp_tomas": {
+      "art": "named_lp_sp_tomas",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#4a5a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#2e6a8a"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_sp_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#3a2a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#2e6a8a"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_ew_karim": {
+      "art": "named_lp_ew_karim",
+      "identity": {
+        "skin": "#a87a5a",
+        "hair": "#1a1a22",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#c9a35a"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_ew_lunet": {
+      "art": "named_lp_ew_lunet",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#6a4a3a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#c9a35a"
+      },
+      "color": "#b7e5dc"
+    },
+    "lp_ew_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#c9a35a"
+      },
+      "color": "#b7e5dc"
+    },
+    "travel_wallwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_eastwell": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_saltpan": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_astro": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "fw_bw_brynja": {
+      "art": "named_fw_bw_brynja",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#d9e9ee",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4680a1"
+      },
+      "color": "#b5daef"
+    },
+    "fw_bw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#8a8f98",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#4680a1"
+      },
+      "color": "#b5daef"
+    },
+    "fw_au_sigrun": {
+      "art": "named_fw_au_sigrun",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#2a2a32",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#4680a1"
+      },
+      "color": "#b5daef"
+    },
+    "fw_au_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#4680a1"
+      },
+      "color": "#b5daef"
+    },
+    "fw_rw_leif": {
+      "art": "named_fw_rw_leif",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#c9c2b4",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4680a1"
+      },
+      "color": "#b5daef"
+    },
+    "fw_rw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#6a4a3a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#4680a1"
+      },
+      "color": "#b5daef"
+    },
+    "travel_bellward": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_aurora": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_ribwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "cn_sc_halvar": {
+      "art": "named_cn_sc_halvar",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#d9d0c2",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#786b7c"
+      },
+      "color": "#d4b8aa"
+    },
+    "cn_sc_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#786b7c"
+      },
+      "color": "#d4b8aa"
+    },
+    "cn_wb_ingrid": {
+      "art": "named_cn_wb_ingrid",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#1a1a22",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#786b7c"
+      },
+      "color": "#d4b8aa"
+    },
+    "cn_wb_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#786b7c"
+      },
+      "color": "#d4b8aa"
+    },
+    "cn_sg_ragna": {
+      "art": "named_cn_sg_ragna",
+      "identity": {
+        "skin": "#a87a5a",
+        "hair": "#c9c2b4",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#786b7c"
+      },
+      "color": "#d4b8aa"
+    },
+    "cn_sg_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#6a4a3a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#786b7c"
+      },
+      "color": "#d4b8aa"
+    },
+    "travel_singing": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_whitebark": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_stormgate": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "yo_wm_ingrid": {
+      "art": "named_yo_wm_ingrid",
+      "identity": {
+        "skin": "#c99d78",
+        "hair": "#cfd8e0",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#9dbbd0"
+      },
+      "color": "#9dbbd0"
+    },
+    "yo_wm_orm": {
+      "art": "named_yo_wm_orm",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#3f342a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#6f8da2"
+      },
+      "color": "#9dbbd0"
+    },
+    "yo_wm_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#8a8f98",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#9dbbd0"
+      },
+      "color": "#9dbbd0"
+    },
+    "yo_th_halvar": {
+      "art": "named_yo_th_halvar",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#c9c2b4",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#bb835e"
+      },
+      "color": "#bb835e"
+    },
+    "yo_th_sunniva": {
+      "art": "named_yo_th_sunniva",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#a84e39",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#caa65f"
+      },
+      "color": "#bb835e"
+    },
+    "yo_th_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#a77250",
+        "hair": "#5a3a2a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#bb835e"
+      },
+      "color": "#bb835e"
+    },
+    "yo_lf_tove": {
+      "art": "named_yo_lf_tove",
+      "identity": {
+        "skin": "#b78865",
+        "hair": "#d2c39b",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#e6b45c"
+      },
+      "color": "#e6b45c"
+    },
+    "yo_lf_arvid": {
+      "art": "named_yo_lf_arvid",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#6a4a3a",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#caa65f"
+      },
+      "color": "#e6b45c"
+    },
+    "yo_lf_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#e0b89a",
+        "hair": "#8a8f98",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#e6b45c"
+      },
+      "color": "#e6b45c"
+    },
+    "travel_wheelmark": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_tidehollow": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_lowfall": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "ew_cw_ragna": {
+      "art": "named_ew_cw_ragna",
+      "identity": {
+        "skin": "#c69a7b",
+        "hair": "#8a8e98",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#5a4a50"
+      },
+      "color": "#9a8f98"
+    },
+    "ew_cw_sten": {
+      "art": "named_ew_cw_sten",
+      "identity": {
+        "skin": "#bd8c6f",
+        "hair": "#3a3238",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#6a5a5a"
+      },
+      "color": "#a8744f"
+    },
+    "ew_cw_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#e0bca0",
+        "hair": "#6a4a3a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a89aa0"
+      },
+      "color": "#a89aa0"
+    },
+    "ew_cq_brage": {
+      "art": "named_ew_cq_brage",
+      "identity": {
+        "skin": "#d9b08c",
+        "hair": "#d8d4cc",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#4a5260"
+      },
+      "color": "#8a96a8"
+    },
+    "ew_cq_tove": {
+      "art": "named_ew_cq_tove",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a2a2a",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#8a8f98"
+      },
+      "color": "#9a7455"
+    },
+    "ew_cq_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#4a4a58",
+        "style": "long",
+        "hat": "none",
+        "hatColor": "#a0a8b0"
+      },
+      "color": "#a0a8b0"
+    },
+    "ew_gh_sunniva": {
+      "art": "named_ew_gh_sunniva",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#cfc4d0",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#564a60"
+      },
+      "color": "#9a8aa0"
+    },
+    "ew_gh_ivar": {
+      "art": "named_ew_gh_ivar",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#5a4a46"
+      },
+      "color": "#a06f52"
+    },
+    "ew_gh_trader": {
+      "art": "reuse_merchant",
+      "identity": {
+        "skin": "#c99b7a",
+        "hair": "#5a3a4a",
+        "style": "short",
+        "hat": "none",
+        "hatColor": "#a89aa8"
+      },
+      "color": "#a89aa8"
+    },
+    "travel_chainrest": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_door": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_craterwatch": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_cinderquay": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
+    },
+    "travel_glasshold": {
+      "art": "reuse_courier",
+      "identity": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "color": "#74d7d0"
     }
   },
   "tops": {
