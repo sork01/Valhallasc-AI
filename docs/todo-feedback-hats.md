@@ -1,14 +1,28 @@
 # Quest chime, bag refusals, dungeon loot mail and headgear (Beta 1.47.2)
 
-Implemented from the four open owner requests of 2026-11-12. The candidate was
-built and checked in `/media/raid/valhallasc-data/todo-feedback-work`, branch
-`fix/todo-feedback-hats`. All 34 changed project files were applied to the main
-working tree after verification. The client is live as **Beta 1.47.2**: all 18
-changed public client files hash-match. The running server is still PID
-`183593`; its changes are built and tested but **deployment is pending**. No
-server restart or production database change was made. The owner has now explicitly invoked finish and deployment; the release
-build and backup are being prepared. Public hash receipt:
-`test-results/todo-feedback-public.json` in the candidate checkout.
+Implemented from the four owner requests of 2026-11-12 and **deployed 2026-11-12 18:07 CET**
+as **Beta 1.47.2**, source `d8e03c21`. The owner explicitly
+invoked finish and deploy. Client and server fixes are live; all four TODOs are
+complete. The candidate was tested in
+`/media/raid/valhallasc-data/todo-feedback-work`, with its own RAID target.
+
+- Restarted with nobody online: PID `183593` → `339798`.
+- All **38 character states / 24 guest records** are unchanged; no migration.
+- All **18 public client hashes**, the installed/running executable, public and
+  bridge health, advancing simulation, SQLite `quick_check`, production
+  environment and restart journal checks pass.
+- The exact production binary passed a private release probe: refused reward
+  says `Insufficient bag space`, no partial rewards, successful claim after
+  freeing space, **31 snapshots / 2997 ms**, tick gaps exactly two.
+- Backup: `deploy/backups/todo-feedback-release-20261112T170607Z`. Includes previous/new executable, online and stopped
+  SQLite backups, all 18 original client files, metadata, private probe,
+  restart journal and rollback instructions.
+- Running binary SHA-256: `f458c3f10239c89caa689c2ab65e83a46b234f0860ca5b6ccd2b94552271c6cc`.
+
+Binary rollback: stop the service, restore `valhalla-server.prev` to
+`target/release/valhalla-server`, start and verify health. Ordinary binary
+rollback can retain current saves; restore `stopped/valhalla.sqlite` only when
+a complete state rollback is intended. The existing mail table is reused.
 
 ## Completion chime
 
