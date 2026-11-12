@@ -1,5 +1,57 @@
 # NPC artwork
 
+## Missing named people — built 2026-11-12
+
+148 new bespoke designs are complete on `feat/npc-named-designs`, in
+`/media/raid/valhallasc-data/npc-named-work`. They cover 134 previously unassigned
+quest givers and 14 individually characterised residents, including Halvard,
+Lotta, Ulf and Heartwood residents/children. This is a private art candidate;
+assignments and deployment remain the separate NPC-ALL tasks.
+
+The corrected inventory is **269 missing people**, split into 148 bespoke designs
+and 121 generic-role reuses. Another 145 unassigned entries are scenery, meeting
+stones or mailboxes and are excluded. `docs/npc-named-plan.txt` records every
+person, zone, reason, reuse choice and explicit design spec; it includes
+Greenmeadow's top-level people and leaves the original plan/assignments intact.
+
+Each new person has an authored player-rig archetype, occupational prop, headwear,
+hair, garment cut and signature details. Added held props are a shepherd's crook,
+apple basket, honey pot, flail and drum. Shapes distinguish people independently
+of palette: the closest idle-alpha pair differs by 32 source pixels. All 26 new
+Veyrroot/Heartwood designs are treefolk; both mermaids keep their tails. The
+existing winged species cohort is unchanged.
+
+There are 148 current native PixelFlow sources and 2,960 editable frames, with
+the existing 96×96, (48,90), idle 6 / walk 8 / talk 6 contract. One pre-correction
+candidate palette/source is retained in `npcp.txt` `sourceHistory`. All 164 prior
+sources, material metadata, tops, bounds and PNG byte hashes are preserved.
+
+`scripts/npc_named_plan.py` writes the explicit inventory;
+`scripts/make_npcp_sprites.py build|export|verify named` produces the new group.
+Build creates each source and all twenty frames atomically through PixelFlow,
+merging only new metadata. Export reads saved editor frames and updates only
+selected designs. `refresh` requires explicit `named_*` keys; a palette change
+creates another source and retains the previous ID. The legacy catalog generator
+must not be used to regenerate this batch: it includes mailboxes and reclassifies
+unrelated people.
+
+Checks passed: all saved/editor-export frames match; focused
+`NPCP_ART_GROUP=named python3 tests/npcp-art.py` validates all new frames, heads,
+animation, grounding and silhouette differences; bounded
+`tests/npc-named-ui.cjs` draws all 2,960 production poses with finite head sockets,
+nameplate heights and no clipping/browser errors. Removing the new player-style
+entries fails its style assertion, as intended. Its assignments exist only in
+the private page's memory, so `client/assets/npc.txt` remains byte-identical.
+Swedish build validation and syntax checks pass. No encounter tests or grinding.
+
+Local review: `scripts/npc_named_review.py` writes
+`test-results/npc-named/roster.png`, 22 zone sheets (idle/walk/talk) and
+`highlights.gif`, all from saved exports. The roster and the Heartwood motion
+sheet have been visually inspected. The art advisor reviewed the initial
+approach and prototypes; near-duplicate outlines and Kessa's drum were corrected
+before final verification. Generic assignments, in-zone acceptance and release
+remain separate tasks. No FileDrop upload or live client edit was made.
+
 The production plan is `docs/npc-art-plan.txt`. It inventories every speaking person by stable id, name, occupation, zone, earlier artwork and new assignment. Names, routes, offers, dialogue, quest ids, interaction distances and saved data stay in the authoritative world catalog. Stones and speaking scenery keep their scenery artwork.
 
 The 24 general designs are sentinel, physician, smith, baker, innkeeper, merchant, ranger, scholar, herald, gardener, fisher, weaver, courier, pilgrim, bard, child, elder, painter, carpenter, alchemist, steward, stablehand, lamplighter and banker. The plan specifies each silhouette, build, hairstyle, headwear and occupational prop. They vary from short wide smiths and round bakers to tall formal stewards, hunched elders, children, narrow rangers and full-skirted innkeepers. Tools are part of the silhouette, rather than a colour change on a shared body.
