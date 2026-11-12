@@ -8,6 +8,14 @@ import mount_models as models
 import mount_toon as toon
 import make_mount_sprites as mounts
 ROOT=Path(__file__).resolve().parents[1]
+if __name__=='__main__' and (ROOT/'scripts/shared_slime_sources.txt').exists():
+ import shared_slime_redraw as shared
+ command=sys.argv[1] if len(sys.argv)>1 else 'preview'
+ assert command not in ('update','refresh') and '--replace' not in sys.argv,'Use shared_slime_redraw.py refresh briarheart to overwrite candidate frames explicitly'
+ if command=='build':shared.build(['briarheart'])
+ else:dict(preview=shared.preview,export=shared.export,verify=shared.verify)[command]()
+ raise SystemExit(0)
+
 CLIPS={'idle':(6,6),'walk':(10,8),'attack':(12,8),'hurt':(10,4),'die':(8,8)}
 MATS={'bark':['#2d2638','#513448','#785064','#ab7b86'],
  'leaf':['#173b36','#2c6251','#509274','#8bb997'],

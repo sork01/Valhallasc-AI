@@ -42,7 +42,7 @@ function check(ok,message){assert.ok(ok,message);checks++;console.log(message);}
  const boss=latest.slimes.find(s=>s.kind==='ember_firelord'&&!s.dead);check(boss.level===99,'Eligible cross summons a level-99 Firelord');
  await page.waitForFunction(()=>Field.cathedralSprites?.img.ember_firelord?.complete,null,{timeout:60000});
  check(await page.evaluate(()=>Field.enemyName('ember_firelord')==='Ashwarden of Greenmeadow'),'Herald uses its zone-specific name');
- check(await page.evaluate(()=>Field.cathedralSprites.img.ember_firelord.src.endsWith('cathedral_cf_eldmarr.png')&&Field.slimes.find(s=>s.kind==='ember_firelord').d.scale<3.2),'Firelord reuses Eldmarr art at a smaller scale');
+ check(await page.evaluate(()=>Field.cathedralSprites.img.ember_firelord.src.endsWith('cathedral_ember_firelord.png')&&Field.slimes.find(s=>s.kind==='ember_firelord').d.scale<3.2),'Firelord uses its independent artwork at the original cross-guardian scale');
  await page.screenshot({path:path.join(world.runDir,'raid-key-firelord.png')});
  const own=await page.evaluate(()=>({gold:Field.hero.gold,xp:Field.hero.xp}));
  await debug({op:'teleport',zone:0,x:boss.x,y:boss.y});await debug({op:'kill_enemy',id:boss.id});

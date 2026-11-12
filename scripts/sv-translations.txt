@@ -9776,5 +9776,6 @@
   "Welcome to Greenmeadow, hero.": "Välkommen till Greenmeadow, hjälte.",
   "Hold a key or your finger to skip": "Håll in en tangent eller ett finger för att hoppa över",
   "Skipping...": "Hoppar över...",
-  "Replay intro": "Spela upp introt igen"
+  "Replay intro": "Spela upp introt igen",
+  "Firelords and the six seasonal guardians have new artwork, with distinct attacks and deaths that fit their bodies and materials.": "Eldherrarna och de sex högtidsväktarna har fått ny grafik, med egna anfall och dödsanimationer som passar deras kroppar och material."
 }

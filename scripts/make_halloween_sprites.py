@@ -10,6 +10,14 @@ import mount_models as models
 import mount_toon as toon
 import make_mount_sprites as mounts
 ROOT=Path(__file__).resolve().parents[1]
+if __name__=='__main__' and (ROOT/'scripts/shared_slime_sources.txt').exists():
+ import shared_slime_redraw as shared
+ command=sys.argv[1] if len(sys.argv)>1 else 'preview'
+ assert command not in ('update','refresh') and '--replace' not in sys.argv,'Use shared_slime_redraw.py refresh hollow_rider to overwrite candidate frames explicitly'
+ if command=='build':shared.build(['hollow_rider'])
+ else:dict(preview=shared.preview,export=shared.export,verify=shared.verify)[command]()
+ raise SystemExit(0)
+
 CLIPS={'idle':(6,6),'walk':(10,8),'attack':(12,8),'hurt':(10,4),'die':(8,8)}
 MATS={**models.NIGHTMARE,'pumpkin':['#683025','#b64e21','#e28a2b','#ffc658'],'ember':['#ffe2a1','#ffe3a2','#ffe4a3','#ffe5a4'],'cloak':['#201726','#34243b','#53334d','#815066']}
 LOOK=toon.Look(MATS,{**models.FLAT,'flame':2,'ember':3})

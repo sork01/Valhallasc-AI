@@ -323,7 +323,7 @@
     "cf_orm": "4fc1695f6a54fcd3",
     "cf_hildr": "73339fa7bca515c0",
     "cf_eldmarr": "5a4edb5546051b4e",
-    "ember_firelord": "5a4edb5546051b4e",
+    "ember_firelord": "e96f0eceb385fe8a",
     "es_foe_02": "9c84ec5e867830e6",
     "es_foe_04": "9c84ec5e867830e6",
     "es_foe_06": "9c84ec5e867830e6",
@@ -593,6 +593,19 @@
         54,
         110
       ]
+    },
+    "ember_firelord": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        64,
+        164
+      ]
     }
+  },
+  "atlases": {
+    "ember_firelord": "cathedral_ember_firelord.png"
   }
 }

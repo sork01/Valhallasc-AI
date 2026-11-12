@@ -1,0 +1,12 @@
+{
+  "files": {
+    "client/field.js": "3186fa2e3b00cd173b8143e70704cece5839770d4bb0ad9144a82045122a1080",
+    "client/assets/cathedral_ember_firelord.png": "b707d6022ede4d5306add46ab68c777e00d0ec2290604d5e4fd5767d70ffc10c",
+    "client/assets/halloween_hollow_rider.png": "0c20cea15c59d88e083c10ae105b268a14e1b4dd4081a5106712ae5d60e18487",
+    "client/assets/christmas_grinch.png": "37010c692cce02299ef88a646bb22b2119ce5e7f58e5dffe67a408055fd00bc6",
+    "client/assets/easter_bloomwarden.png": "bd4830f0b56123b3512a5a4d9029eb06ad804e5931b54577c27a415c437ef146",
+    "client/assets/solstice_birchcrown.png": "3e6b290091f99bee0de2b699542a85823519171d82fcaa928b2c4b6b04d56c79",
+    "client/assets/valentines_briarheart.png": "00b47de128e36ec58331699ca9311b9756baf3c9bbb7fd6ee96ddc3899aee167",
+    "client/assets/newyear_starrocketeer.png": "c7f1eb99d6d8b211c85ac435e085f3d2ad42c129bf5eeddd6cf29e013e8ff63a"
+  }
+}

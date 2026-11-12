@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.43.1",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "Firelords and the six seasonal guardians have new artwork, with distinct attacks and deaths that fit their bodies and materials."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

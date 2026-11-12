@@ -3421,11 +3421,17 @@
         cairn: CAIRN_KINDS[0], year: YEAR_KINDS[0] }[prefix];
       if (kind) add(kind);
     }
+    const applyTops = (bank, kinds) => {
+      const tops = bank.source()?.meta.tops;
+      for (const kind of kinds) if (tops?.[kind] && SLIME[kind]) SLIME[kind].top = tops[kind];
+    };
     for (const [bank, kinds] of banks) {
+      applyTops(bank, kinds);
       if ([...kinds].every(kind => bank.source()?.img[kind]) || enemyArtPending.has(bank) || performance.now() < (enemyArtRetry.get(bank) || 0)) continue;
       enemyArtPending.add(bank);
       Promise.resolve().then(() => bank.load([...kinds])).finally(() => {
         enemyArtPending.delete(bank);
+        applyTops(bank, kinds);
         if ([...kinds].some(kind => !bank.source()?.img[kind])) enemyArtRetry.set(bank, performance.now() + 5000);
       });
     }
@@ -3850,7 +3856,7 @@
           if (meta.tops?.[kind]) SLIME[kind].top = meta.tops[kind];
           resolve();
         };
-        image.onerror = reject; image.src = `assets/cathedral_${artKind}.png`;
+        image.onerror = reject; image.src = `assets/${meta.atlases?.[kind] || ('cathedral_' + artKind + '.png')}`;
       })));
     }).catch(() => {});
   }
