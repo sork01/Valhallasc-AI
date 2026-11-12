@@ -189,26 +189,80 @@ def hat(ink, head, c, kind, p):
 
 
 # ------------------------------------------------------------------------------------------------ outfit
-def outfit(ink, xf, joints, R, p, c, o):
-    """Torso, sleeves, skirt/coat, belt and boots from a spec dict."""
+def garment_surface(ink, vertices, material, tone=2, bias=3.0, outline=True):
+    """Fit cloth depth to its plane, as for player robes and cloaks.
+
+    A single mean depth cannot cover a tall thigh: bones have both a depth
+    gradient and a radius bias. Keep the enclosing cloth ahead of that bias.
+    """
+    projected = [ink.project(v) for v in vertices]
+    xy = np.array([v[0] for v in projected])
+    depths = np.array([v[1] for v in projected])
+    slope = np.linalg.lstsq(np.c_[np.ones(len(xy)), xy], depths, rcond=None)[0]
+    g = slope[1:]
+    norm = float(np.linalg.norm(g))
+    if norm < 1e-6:
+        ink.poly(xy, ink.color[material][tone], float(depths.mean()) - bias, outline)
+        return
+    axis = g / norm
+    along, centre = xy @ axis, xy.mean(0)
+    a = centre + axis * (along.min() - centre @ axis)
+    b = centre + axis * (along.max() - centre @ axis)
+    za, zb = slope[0] + a @ g, slope[0] + b @ g
+    ink.poly(xy, ink.color[material][tone], -bias, outline, (a, b, za, zb))
+
+
+def skirt_panels(ink, xf, p, o):
     sw = p['sway']
     mat = o.get('mat', 'cloth')
-    core.body_layer(ink, xf, joints, R, c, legs=o.get('legs', True), cloth=mat, pants=o.get('pants', 'pants'))
-    cc.torso(ink, xf, mat, o.get('half', 8.5), 4.0, 40, 69)
     skirt = o.get('skirt')
     if skirt:
         hem, wide, deep = skirt
         wm = o.get('skirt_mat', mat)
         for sy, tone in ((-1, 1), (1, 2)):
-            ink.plate([xf(q) for q in [(-8.4, sy * 4.2, 42), (8.4, sy * 4.2, 42), (wide + sw * .8, sy * deep, hem), (-wide + sw * .8, sy * deep, hem)]], wm, tone)
+            garment_surface(ink, [xf(q) for q in [(-8.4, sy * 4.2, 42), (8.4, sy * 4.2, 42), (wide + sw * .8, sy * deep, hem), (-wide + sw * .8, sy * deep, hem)]], wm, tone)
         for sx in (-1, 1):
-            ink.plate([xf(q) for q in [(sx * 8.4, -4.2, 42), (sx * 8.4, 4.2, 42), (sx * wide + sw * .8, deep, hem), (sx * wide + sw * .8, -deep, hem)]], wm, 1)
+            garment_surface(ink, [xf(q) for q in [(sx * 8.4, -4.2, 42), (sx * 8.4, 4.2, 42), (sx * wide + sw * .8, deep, hem), (sx * wide + sw * .8, -deep, hem)]], wm, 1)
         if o.get('hem_trim'):
-            ink.plate([xf(q) for q in [(-wide + sw * .8, deep + .1, hem + 2.4), (wide + sw * .8, deep + .1, hem + 2.4), (wide + sw * .8, deep + .1, hem), (-wide + sw * .8, deep + .1, hem)]], o['hem_trim'], 2, True)
+            garment_surface(ink, [xf(q) for q in [(-wide + sw * .8, deep + .1, hem + 2.4), (wide + sw * .8, deep + .1, hem + 2.4), (wide + sw * .8, deep + .1, hem), (-wide + sw * .8, deep + .1, hem)]], o['hem_trim'], 2, outline=False)
+
+
+def lower_body(ink, joints, R, pants, boots):
+    """The same player-rig legs/feet, isolated so closed cloth can cover them."""
+    for key in 'LR':
+        j = joints[key]
+        ink.bone(j['hip'], j['knee'], 3.3, 2.9, pants)
+        ink.bone(j['knee'], j['ankle'], 2.7, 1.9, pants)
+        ink.bone(j['ankle'] + V(0, -1, -1.5), j['ankle'] + V(0, 4, -2), 2, 2.1, 'skin')
+    if boots:
+        core.boots(ink, joints, boots)
+
+
+def covered_lower_body(ink, xf, joints, R, p, o):
+    # Walking legs can move outside a rigid cloth plane. A closed skirt owns its
+    # projected silhouette: clip only the leg/boot layer, never hands or props.
+    cloth, legs = cc.Ink(0, ink.color), cc.Ink(0, ink.color)
+    cloth.turn = legs.turn = ink.turn
+    skirt_panels(cloth, xf, p, o)
+    ink._closed_garment_mask = cloth.index > 0
+    lower_body(legs, joints, R, o.get('pants', 'pants'), o.get('boots', 'leather'))
+    visible = (legs.index > 0) & (cloth.index == 0) & (legs.z <= ink.z + .001)
+    ink.index[visible], ink.z[visible] = legs.index[visible], legs.z[visible]
+
+
+def outfit(ink, xf, joints, R, p, c, o):
+    """Torso, sleeves, skirt/coat, belt and boots from a spec dict."""
+    mat = o.get('mat', 'cloth')
+    covered = bool(o.get('skirt') and o.get('legs', True))
+    if covered:
+        covered_lower_body(ink, xf, joints, R, p, o)
+    core.body_layer(ink, xf, joints, R, c, legs=o.get('legs', True) and not covered, cloth=mat, pants=o.get('pants', 'pants'))
+    cc.torso(ink, xf, mat, o.get('half', 8.5), 4.0, 40, 69)
+    skirt_panels(ink, xf, p, o)
     core.sleeves(ink, joints, o.get('sleeve_mat', mat), o.get('sleeve', 1.0), o.get('sleeve_r', 3.4))
     if o.get('belt'):
         core.belt(ink, xf, o['belt'], 38.5, 42.5, 8.5, 4.35)
-    if o.get('boots', 'leather') and o.get('legs', True):
+    if o.get('boots', 'leather') and o.get('legs', True) and not covered:
         core.boots(ink, joints, o.get('boots', 'leather'))
     if o.get('collar'):
         ink.plate([xf(q) for q in [(-4.4, 4.5, 69), (0, 4.9, 65.6), (4.4, 4.5, 69), (0, 4.7, 70.4)]], o['collar'], 3, True)
@@ -914,11 +968,16 @@ ORN_COLOR = dict(wings='#eef6ff', coral='#ff8f7a', stars='#ffe58a', crystal='#9f
 def treefolk(ink, xf, joints, R, p, c, head):
     """Bark and moss over the player body: root toes, bark plates and moss on the shoulders, cracks on the cheeks, a branch crown."""
     H, hd = head['H'], head['hd']
+    roots = cc.Ink(0, ink.color) if hasattr(ink, '_closed_garment_mask') else ink
+    roots.turn = ink.turn
     for key in 'LR':
         j = joints[key]
         a = j['ankle'] + V(0, .6, -1.2)
         for dx, dy in ((-4, 2), (0, 3.2), (4, 2), (-3, -2.6), (3, -2.6)):
-            ink.bone(a + V(dx * .2, dy * .2, 0), a + V(dx, dy, -.2), 1.4, .5, 'wood', -.4, 1)
+            roots.bone(a + V(dx * .2, dy * .2, 0), a + V(dx, dy, -.2), 1.4, .5, 'wood', -.4, 1)
+    if roots is not ink:
+        visible = (roots.index > 0) & ~ink._closed_garment_mask & (roots.z <= ink.z + .001)
+        ink.index[visible], ink.z[visible] = roots.index[visible], roots.z[visible]
     for sx in (-1, 1):
         ink.plate([xf(q) for q in [(sx * 7, 1, 72), (sx * 13.4, 0, 70), (sx * 14, 0, 64), (sx * 8.4, 1, 62)]], 'wood', 2)
         ink.plate([xf(q) for q in [(sx * 7.6, 1.2, 72.4), (sx * 12, 1, 71), (sx * 11, 1, 68), (sx * 8, 1.2, 68.6)]], 'leaf', 2, True)

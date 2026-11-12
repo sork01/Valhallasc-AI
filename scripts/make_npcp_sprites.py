@@ -7,6 +7,7 @@ per-design `amounts` for the client's skin/hair/cloth remap). Nothing reads npcp
 build creates only missing saves (editor work is never replaced); export always reads the saved frames back.
 """
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -187,6 +188,11 @@ def refresh():
         data, palette = frames(key)
         validate(key, data)
         sprite, _ = api.load(manifest['sprites'][key])
+        if os.environ.get('NPCP_REFRESH_BACKUP'):
+            backup = Path(os.environ['NPCP_REFRESH_BACKUP']) / 'editor' / (key + '.json')
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            if not backup.exists():
+                backup.write_text(json.dumps(sprite, ensure_ascii=False) + '\n')
         ops = [dict(op='grid', frame=n, layer=0, x=0, y=0, rows=grid.astype(int).tolist())
                for n, grid in enumerate(grid for clip, _ in CLIPS for grid in data[clip])]
         if sprite['palette'] != palette:

@@ -3,6 +3,7 @@
 import collections
 import json
 import math
+import sys
 from pathlib import Path
 from PIL import Image, ImageDraw
 
@@ -50,7 +51,34 @@ def main():
             frames.append(board(highlights,4,[(clip,frame)],f'Named NPCs: {clip}'))
             durations.append(ms)
     frames[0].save(OUT/'highlights.gif', save_all=True, append_images=frames[1:], loop=0, duration=durations, disposal=2)
+    if '--robes-before' in sys.argv:
+        before = Path(sys.argv[sys.argv.index('--robes-before') + 1])
+        robe_comparison(before)
     print('Saved roster,',len(by_zone),'zone sheets and highlight animation to',OUT)
+
+
+def robe_comparison(before):
+    names = ['fold_hild', 'hw_steward', 'hw_pilgrim', 'deep_dw_ottilia', 'prism_ws_ottilie', 'hw_innkeeper']
+    selected = [next(p for p in PEOPLE if p['id'] == name) for name in names]
+    old_meta = json.loads((before/'client/assets/npcp.txt').read_text())
+
+    def comparison(clip, frame):
+        out = Image.new('RGBA', (len(selected)*192, 460), '#253343')
+        d = ImageDraw.Draw(out)
+        d.text((4,4), 'BEFORE: legs through cloth', fill='#ffad9c')
+        d.text((4,234), 'CORRECTED: closed cloth covers legs', fill='#aeefb3')
+        for i,p in enumerate(selected):
+            row = old_meta['clips'][clip]['row']
+            old = Image.open(before/f'client/assets/npcp_{p["designKey"]}.png').convert('RGBA')
+            old = old.crop((frame*96,row*96,(frame+1)*96,(row+1)*96)).resize((192,192),Image.Resampling.NEAREST)
+            out.alpha_composite(old,(i*192,26))
+            out.alpha_composite(cell(p,clip,frame),(i*192,256))
+            d.text((i*192+3,216),p['name'],fill='#fff0d8')
+        return out
+
+    comparison('idle',0).save(OUT/'robe-fix-before-after.png')
+    frames = [comparison('walk',frame) for frame in range(8)]
+    frames[0].save(OUT/'robe-fix-walk.gif',save_all=True,append_images=frames[1:],duration=140,loop=0,disposal=2)
 
 
 if __name__ == '__main__':
