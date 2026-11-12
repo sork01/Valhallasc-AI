@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Local before/after boards and clips for picture approval; no publication side effects."""
-import json,sys
+"""Create local sprite reviews; upload only through the explicit upload command."""
+import hashlib,json,shutil,subprocess,sys
 from pathlib import Path
 from PIL import Image,ImageDraw
 import shared_slime_redraw as R
@@ -64,4 +64,58 @@ def review():
  OUT.mkdir(parents=True,exist_ok=True);board();clips();print('Review pictures:',OUT)
 
 
-if __name__=='__main__':review()
+def upload_files():
+ files={
+  'shared-roster.png':'valhallasc-shared-roster.png',
+  'shared-before-after.png':'valhallasc-shared-before-after.png',
+  'shared-attack.gif':'valhallasc-shared-attacks.gif',
+  'shared-die.gif':'valhallasc-shared-deaths.gif',
+  'baseline-game.png':'valhallasc-shared-firelord-before-game.png',
+  'firelord-game.png':'valhallasc-shared-firelord-after-game.png',
+ }
+ files.update({f'shared-{k}-frames.png':f'valhallasc-shared-{k}-frames.png' for k in R.KINDS})
+ return files
+
+
+def verify():
+ files=upload_files();assert len(files)==13
+ for name in files:
+  path=OUT/name;assert path.is_file() and path.stat().st_size>512,f'Missing/tiny review: {name}'
+  with Image.open(path) as im:
+   assert im.width>=300 and im.height>=180,(name,im.size)
+   if path.suffix=='.gif':assert getattr(im,'n_frames',1)>=8,(name,'eight animation poses required')
+   im.verify()
+ print('Verified 13 sprite review PNG/GIF files')
+
+
+def upload():
+ verify()
+ staging=OUT/'filedrop';staging.mkdir(exist_ok=True)
+ destination=Path('/home/serveperry/webserver/www/filedrop/data/Sork/files')
+ receipt=[]
+ for name,uploaded_name in upload_files().items():
+  src=OUT/name;prepared=staging/uploaded_name;shutil.copy2(src,prepared)
+  mime='image/gif' if src.suffix=='.gif' else 'image/png'
+  dst=destination/uploaded_name;sidecar=destination/(uploaded_name+'.meta.json')
+  digest=hashlib.sha256(src.read_bytes()).hexdigest()
+  wanted=dict(original_name=uploaded_name,type=mime,size=src.stat().st_size)
+  metadata=json.loads(sidecar.read_text()) if sidecar.is_file() else {}
+  if not dst.is_file() or hashlib.sha256(dst.read_bytes()).hexdigest()!=digest or any(metadata.get(k)!=v for k,v in wanted.items()):
+   subprocess.run(['bash',str(R.ROOT/'scripts/filedrop_put.sh'),str(prepared),uploaded_name,mime],check=True)
+  assert dst.is_file() and sidecar.is_file(),uploaded_name
+  assert hashlib.sha256(dst.read_bytes()).hexdigest()==digest,(uploaded_name,'SHA-256 mismatch')
+  metadata=json.loads(sidecar.read_text())
+  assert all(metadata.get(k)==v for k,v in wanted.items()),(uploaded_name,metadata)
+  assert dst.stat().st_size==src.stat().st_size
+  with Image.open(src) as original,Image.open(dst) as saved:
+   assert original.size==saved.size and getattr(original,'n_frames',1)==getattr(saved,'n_frames',1)
+   dimensions=list(saved.size);frames=getattr(saved,'n_frames',1)
+  receipt.append(dict(name=uploaded_name,bytes=dst.stat().st_size,sha256=digest,dimensions=dimensions,frames=frames,mime=mime,url='https://gunning.se/filedrop/api.php?action=download&file='+uploaded_name))
+  print('Verified FileDrop:',uploaded_name,flush=True)
+ (OUT/'filedrop-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+ print(f'Uploaded and verified {len(receipt)} review files / {sum(r["bytes"] for r in receipt):,} bytes')
+
+
+if __name__=='__main__':
+ command=sys.argv[1] if len(sys.argv)>1 else 'review'
+ dict(review=review,verify=verify,upload=upload)[command]()

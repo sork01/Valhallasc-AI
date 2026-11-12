@@ -105,9 +105,18 @@ The old Grinch atlas and an idle-as-death Rider atlas both fail the browser
 checks as intended. Mutation pose boards use a separate prefix so they cannot
 overwrite positive review captures.
 
-No FileDrop uploads have been made in this session. The FileDrop task remains
-open under the standing instruction to upload only when asked. Deployment awaits
-picture approval.
+Uploaded at the owner's request on 2026-11-12: **13 FileDrop PNG/GIF files,
+2,311,559 bytes**, with SHA-256, byte length, MIME metadata, dimensions and
+animation counts verified. The package contains the roster, before/after board,
+attack/death GIFs, seven complete frame sheets and original/candidate Firelord
+game screenshots. Receipt: `test-results/shared-slime/filedrop-receipt.json`.
+`shared_slime_review.py upload` is an explicit upload command; the default
+`review` command remains local. Deployment awaits picture approval.
+
+- [Roster](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-shared-roster.png)
+- [Before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-shared-before-after.png)
+- [Attacks](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-shared-attacks.gif)
+- [Deaths](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-shared-deaths.gif)
 
 ## Rollback
 
