@@ -1,6 +1,6 @@
 {
   "sprites": {
-    "birchcrown": "74e382ef9f09c4ba"
+    "birchcrown": "f9c56761469ca59b"
   },
   "frame": [
     96,
@@ -43,6 +43,21 @@
       "n": 8,
       "row": 4,
       "editorStart": 26
+    }
+  },
+  "tops": {
+    "birchcrown": 72
+  },
+  "kindFrames": {
+    "birchcrown": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        64,
+        164
+      ]
     }
   }
 }

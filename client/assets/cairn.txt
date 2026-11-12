@@ -61,27 +61,99 @@
     "cairn_grovekeeper": "d9aa2861785e30a0",
     "cairn_windseer": "e78d92e140ca8fa6",
     "cairn_travel": "f50a8011e0fdb729",
-    "screeferret": "0973816328d43612",
-    "stoneibex": "ddc905ed1bdf6e4d",
-    "slateraven": "41b6eeb6b8975541",
-    "ridgeadder": "a01f6e8a78976a28",
-    "cairnbehemoth": "fa43ad9bc5d3100f",
-    "whitebarktitan": "799f05d3d9eef19c",
-    "stormcondor": "e746cb0b17d70bff"
+    "screeferret": "bdb4362fff88ce62",
+    "stoneibex": "8d86deca63130dc7",
+    "slateraven": "b5ee4823749d24b8",
+    "ridgeadder": "ee0aad6c47c28524",
+    "cairnbehemoth": "33cf43446bfaa37f",
+    "whitebarktitan": "1f72f0ab429a96ea",
+    "stormcondor": "d27f0e32a1630344"
   },
   "tops": {
-    "screeferret": 37,
-    "stoneibex": 58,
+    "screeferret": 35,
+    "stoneibex": 61,
     "slateraven": 63,
-    "ridgeadder": 49,
-    "cairnbehemoth": 70,
-    "whitebarktitan": 71,
-    "stormcondor": 66,
+    "ridgeadder": 46,
+    "cairnbehemoth": 68,
+    "whitebarktitan": 73,
+    "stormcondor": 71,
     "cairn_warden": 82,
     "cairn_surveyor": 83,
     "cairn_stonesinger": 82,
     "cairn_grovekeeper": 82,
     "cairn_windseer": 82,
     "cairn_travel": 82
+  },
+  "kindFrames": {
+    "screeferret": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "stoneibex": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "slateraven": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ridgeadder": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "cairnbehemoth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "whitebarktitan": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "stormcondor": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    }
   }
 }

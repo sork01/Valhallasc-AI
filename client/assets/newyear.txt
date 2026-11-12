@@ -1,6 +1,6 @@
 {
   "sprites": {
-    "starrocketeer": "47efe29e4ebe94c0"
+    "starrocketeer": "30079c5e7fb42d7e"
   },
   "frame": [
     96,
@@ -43,6 +43,21 @@
       "n": 8,
       "row": 4,
       "editorStart": 26
+    }
+  },
+  "tops": {
+    "starrocketeer": 80
+  },
+  "kindFrames": {
+    "starrocketeer": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        64,
+        164
+      ]
     }
   }
 }

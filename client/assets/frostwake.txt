@@ -61,27 +61,99 @@
     "frostwake_skywatcher": "a5c5b843a1fe859c",
     "frostwake_ribkeeper": "aacfb4a024b4cb41",
     "frostwake_travel": "e5e53a1a152c3a2f",
-    "snowhare": "d83bee0ca8bcd1f5",
-    "iceotter": "581938975e4ff2ac",
-    "frostheron": "5e14413ca4765599",
-    "glaciercrab": "820fcb8688bb845a",
-    "bellmammoth": "9d0bc32d07609dd8",
-    "auroramanta": "7b8913a0da966336",
-    "crevasseleviathan": "31d24042ea51da64"
+    "snowhare": "c614901c29f613b5",
+    "iceotter": "3c56f1a0bd323154",
+    "frostheron": "aaddb10193b578cf",
+    "glaciercrab": "97c834163abc0cc1",
+    "bellmammoth": "25d9abfd2fb25faf",
+    "auroramanta": "a21fd2af6c9d492f",
+    "crevasseleviathan": "41b769adc2366b00"
   },
   "tops": {
-    "snowhare": 65,
-    "iceotter": 43,
-    "frostheron": 72,
-    "glaciercrab": 47,
-    "bellmammoth": 58,
-    "auroramanta": 71,
-    "crevasseleviathan": 67,
+    "snowhare": 70,
+    "iceotter": 42,
+    "frostheron": 84,
+    "glaciercrab": 53,
+    "bellmammoth": 75,
+    "auroramanta": 84,
+    "crevasseleviathan": 98,
     "frostwake_captain": 82,
     "frostwake_surveyor": 83,
     "frostwake_bellkeeper": 82,
     "frostwake_skywatcher": 82,
     "frostwake_ribkeeper": 82,
     "frostwake_travel": 82
+  },
+  "kindFrames": {
+    "snowhare": {
+      "frame": [
+        168,
+        180
+      ],
+      "anchor": [
+        84,
+        170
+      ]
+    },
+    "iceotter": {
+      "frame": [
+        168,
+        180
+      ],
+      "anchor": [
+        84,
+        170
+      ]
+    },
+    "frostheron": {
+      "frame": [
+        168,
+        180
+      ],
+      "anchor": [
+        84,
+        170
+      ]
+    },
+    "glaciercrab": {
+      "frame": [
+        168,
+        180
+      ],
+      "anchor": [
+        84,
+        170
+      ]
+    },
+    "bellmammoth": {
+      "frame": [
+        168,
+        180
+      ],
+      "anchor": [
+        84,
+        170
+      ]
+    },
+    "auroramanta": {
+      "frame": [
+        168,
+        180
+      ],
+      "anchor": [
+        84,
+        170
+      ]
+    },
+    "crevasseleviathan": {
+      "frame": [
+        168,
+        180
+      ],
+      "anchor": [
+        84,
+        170
+      ]
+    }
   }
 }

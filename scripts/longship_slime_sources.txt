@@ -1,0 +1,8 @@
+{
+  "keel_crab": "0d388beb96b65af8",
+  "keel_deckhand": "e679482c03191623",
+  "keel_lantern": "5d9c94921707e831",
+  "keel_cargomaw": "c05448b9243d4434",
+  "keel_bosun": "d5a9cd7f76fd59ac",
+  "keel_captain": "e0fbac39f1a9e736"
+}

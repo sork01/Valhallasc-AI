@@ -214,16 +214,30 @@ def verify(kinds):
         print(kind, '34 frames match indexed source')
 
 
+# Both dungeons now have independent native pipelines; retain legacy helpers for imports.
+_old_preview, _old_build, _old_export, _old_verify = preview, build, export, verify
+
+def _dispatch(action, kinds=None):
+    import importlib
+    selected = list(kinds or KINDS)
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is refused; native PixelFlow sources are preserved')
+    for module in ('astrolabe_slime_redraw', 'thunderheart_slime_redraw'):
+        redraw = importlib.import_module(module)
+        own = [k for k in selected if k in redraw.KINDS]
+        if own:
+            # These pipelines operate on their complete dungeon cast.
+            getattr(redraw, action)()
+            selected = [k for k in selected if k not in own]
+    if selected:
+        raise ValueError('Unknown native kinds: ' + ', '.join(selected))
+
+def preview(kinds=None): return _dispatch('preview', kinds)
+def build(kinds=None): return _dispatch('build', kinds)
+def export(kinds=None): return _dispatch('export', kinds)
+def verify(kinds=None): return _dispatch('verify', kinds)
+
 if __name__ == '__main__':
-    action = sys.argv[1] if len(sys.argv) > 1 else ''
+    action = sys.argv[1] if len(sys.argv) > 1 else 'preview'
     kinds = [k for k in sys.argv[2:] if k in KINDS] or KINDS
-    if action == 'preview':
-        preview(kinds)
-    elif action == 'build':
-        build(kinds)
-    elif action == 'export':
-        export(kinds)
-    elif action == 'verify':
-        verify(kinds)
-    else:
-        raise SystemExit('Usage: make_astrolabe_sprites.py preview | build | export | verify [kind...]')
+    _dispatch(action, kinds)

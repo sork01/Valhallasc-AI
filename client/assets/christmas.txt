@@ -1,6 +1,6 @@
 {
   "sprites": {
-    "grinch": "7b06061b960f7f72"
+    "grinch": "4264f8b9a8c77a00"
   },
   "frame": [
     96,
@@ -43,6 +43,21 @@
       "n": 8,
       "row": 4,
       "editorStart": 26
+    }
+  },
+  "tops": {
+    "grinch": 79
+  },
+  "kindFrames": {
+    "grinch": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        64,
+        164
+      ]
     }
   }
 }

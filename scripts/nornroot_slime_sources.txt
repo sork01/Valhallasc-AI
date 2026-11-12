@@ -1,0 +1,8 @@
+{
+  "barrow_hound": "6137029beb8c9727",
+  "barrow_scarab": "3a33b9a7d56b1d80",
+  "barrow_spinner": "1dd1b50eb3b8cf4f",
+  "barrow_doorward": "0534d58de1950897",
+  "barrow_threadkeeper": "bb7e69e9e70f9605",
+  "barrow_fatebound": "35a90f4049a0d909"
+}

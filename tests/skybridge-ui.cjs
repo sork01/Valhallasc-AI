@@ -74,7 +74,8 @@ const call = async (name, args = {}) => {
         const i = new Image();
         i.src = `assets/cathedral_${kind}.png`;
         await i.decode();
-        if (i.width === 768 && i.height === 480 && meta.sprites[kind] && meta.tops[kind]) n++;
+        const fr = Field.frameOf({ meta, img: { [kind]: i } }, kind);
+        if (i.width === fr.w * 8 && i.height === fr.h * 5 && meta.sprites[kind] && meta.tops[kind]) n++;
       }
       return n;
     }), 6, 'All six editable enemy atlases decode');

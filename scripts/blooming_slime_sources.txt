@@ -1,0 +1,8 @@
+{
+  "bloom_spore": "f8251911148efb06",
+  "bloom_moth": "dd9a6428b08a2e30",
+  "bloom_guard": "43223246fcae8dce",
+  "bloom_thornkeeper": "560aed46e1fae71c",
+  "bloom_mirror": "33c196f7d4d11909",
+  "bloom_heart": "829b727ce0ad7cf6"
+}

@@ -1,6 +1,6 @@
 {
   "sprites": {
-    "bloomwarden": "a8caa30825f18752"
+    "bloomwarden": "c89f57c121d6a4d0"
   },
   "frame": [
     96,
@@ -43,6 +43,21 @@
       "n": 8,
       "row": 4,
       "editorStart": 26
+    }
+  },
+  "tops": {
+    "bloomwarden": 72
+  },
+  "kindFrames": {
+    "bloomwarden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        64,
+        164
+      ]
     }
   }
 }

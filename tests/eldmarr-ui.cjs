@@ -41,7 +41,7 @@ const check=(ok,message)=>{assert.ok(ok,message);checks++;};
   results.push({name,pixels,labels,state});return state;
  };
  let state=await capture('forge-floor');check(state.tele.some(t=>t.total===8&&t.name==='The Forge Floor'),'Eight-second crack warnings');
- if(!STUB){await page.waitForFunction(()=>Field.cathedralSprites?.img.cf_eldmarr?.complete,null,{timeout:60000});check(await page.evaluate(()=>Field.cathedralSprites.img.cf_eldmarr.naturalWidth===768&&CATHEDRAL_ENEMIES.find(e=>e.kind==='cf_eldmarr').boss),'Original final-boss atlas loads');}
+ if(!STUB){await page.waitForFunction(()=>Field.cathedralSprites?.img.cf_eldmarr?.complete,null,{timeout:60000});check(await page.evaluate(()=>Field.cathedralSprites.img.cf_eldmarr.naturalWidth===Field.frameOf(Field.cathedralSprites,'cf_eldmarr').w*8&&CATHEDRAL_ENEMIES.find(e=>e.kind==='cf_eldmarr').boss),'Original final-boss atlas loads');}
  await page.waitForFunction(()=>valhalla.eldmarrMusic?.running&&valhalla.eldmarrMusic.loaded,null,{timeout:20000});check(true,'Actual Eldmarr encounter selects final-boss music');
  const id=state.boss;
  const strike=()=>debug({op:'kill_enemy',id});

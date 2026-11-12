@@ -129,101 +129,39 @@ def bounds(frames):
     return bad
 
 
-def preview(kinds):
-    out = ROOT / 'test-results/blooming-foes-preview'
-    out.mkdir(parents=True, exist_ok=True)
-    for kind in kinds:
-        frames = render(kind)
-        assert not bounds(frames), (kind, bounds(frames))
-        sheet = Image.new('RGBA', (W*6, H*5), '#201b31')
-        for row, (clip, (_, count)) in enumerate(CLIPS.items()):
-            for n in range(min(count, 6)):
-                sheet.alpha_composite(rgba(frames[clip][n], PALETTES[kind].hex), (n*W, row*H))
-        target = out / f'{kind}.png'
-        sheet.resize((W*12, H*10), Image.Resampling.NEAREST).save(target)
-        print(target)
+def preview(kinds=None):
+    import blooming_slime_redraw as redraw
+    return redraw.preview()
 
 
-def build(kinds):
-    meta = json.loads(META.read_text())
-    if any(k in meta['sprites'] for k in kinds):
-        raise SystemExit('Sprites already exist; export preserves PixelFlow edits.')
-    for kind in kinds:
-        frames = render(kind)
-        assert not bounds(frames), (kind, bounds(frames))
-        np.savez_compressed(ROOT/f'scripts/{kind}_raw.npz', **frames)
-        sid = api('create', {'name': 'valhallasc_'+kind+'_all',
-                             'width': W, 'height': H, 'frames': 34, 'layers': 1,
-                             'fps': 10, 'palette': PALETTES[kind].hex, 'persist': True,
-                             'ops': [{'op': 'set_layer', 'layer': 0, 'name': kind}]})['sprite_id']
-        offset = 0
-        try:
-            for clip, (_, count) in CLIPS.items():
-                for n, grid in enumerate(frames[clip]):
-                    api('draw', {'sprite_id': sid, 'frame': offset+n,
-                                 'ops': [{'op': 'grid', 'rows': grid.tolist(), 'x': 0, 'y': 0, 'layer': 0}]})
-                offset += count
-        except Exception:
-            api('delete', {'sprite_id': sid})
-            raise
-        meta['sprites'][kind] = sid
-        META.write_text(json.dumps(meta, indent=2)+'\n')
-        print(kind, sid, '34 editable frames', flush=True)
+def build(kinds=None):
+    import blooming_slime_redraw as redraw
+    return redraw.build()
 
 
-def export(kinds):
-    meta = json.loads(META.read_text())
-    for kind in kinds:
-        packet = api('get?sprite_id='+meta['sprites'][kind])
-        sp = packet.get('sprite', packet)
-        assert (sp['width'], sp['height'], len(sp['frames'])) == (W, H, 34)
-        atlas = Image.new('RGBA', (8*W, 5*H))
-        offset = 0
-        for row, (clip, (fps, count)) in enumerate(CLIPS.items()):
-            for n in range(count):
-                cel = sp['frames'][offset+n]['cels'][0]
-                if 'rle' in cel:
-                    runs = cel['rle']
-                    grid = np.repeat(np.array(runs[1::2], dtype=np.uint8), runs[0::2]).reshape(H, W)
-                else:
-                    grid = np.array(cel['grid'], dtype=np.uint8)
-                atlas.alpha_composite(rgba(grid, sp['palette']), (n*W, row*H))
-            meta['clips'][clip] = {'fps': fps, 'n': count, 'row': row, 'editorStart': offset}
-            offset += count
-        atlas.save(ASSETS/f'cathedral_{kind}.png', optimize=True)
-        meta['tops'][kind] = AY-atlas.crop((0, 0, 6*W, H)).getbbox()[1]
-        if kind not in meta['kinds']:
-            meta['kinds'].append(kind)
-        META.write_text(json.dumps(meta, indent=2)+'\n')
-        print(ASSETS/f'cathedral_{kind}.png')
+def export(kinds=None):
+    import blooming_slime_redraw as redraw
+    return redraw.export()
 
 
-def verify(kinds):
-    meta = json.loads(META.read_text())
-    for kind in kinds:
-        frames = render(kind)
-        assert not bounds(frames), (kind, bounds(frames))
-        atlas = Image.open(ASSETS/f'cathedral_{kind}.png').convert('RGBA')
-        assert atlas.size == (8*W, 5*H)
-        for row, (clip, (_, count)) in enumerate(CLIPS.items()):
-            for n in range(count):
-                expected = rgba(frames[clip][n], PALETTES[kind].hex)
-                actual = atlas.crop((n*W, row*H, (n+1)*W, (row+1)*H))
-                assert np.array_equal(np.array(expected), np.array(actual)), (kind, clip, n)
-        assert kind in meta['sprites'] and kind in meta['kinds']
-        print(kind, '34 frames match indexed source')
+def verify(kinds=None):
+    import blooming_slime_redraw as redraw
+    return redraw.verify()
 
 
 if __name__ == '__main__':
-    action = sys.argv[1] if len(sys.argv) > 1 else ''
-    kinds = [k for k in sys.argv[2:] if k in KINDS] or KINDS
-    if action == 'preview':
-        preview(kinds)
-    elif action == 'build':
-        build(kinds)
-    elif action == 'export':
-        export(kinds)
-    elif action == 'verify':
-        verify(kinds)
-    else:
-        raise SystemExit('Usage: make_blooming_sprites.py preview | build | export | verify [kind...]')
+    import blooming_slime_redraw as redraw
+    cmd = sys.argv[1] if len(sys.argv) > 1 else 'preview'
+    if '--replace' in sys.argv:
+        raise SystemExit('--replace is disabled; native PixelFlow sources are preserved')
+    fn = {
+        'preview': redraw.preview,
+        'extents': redraw.extents,
+        'build': redraw.build,
+        'refresh': redraw.refresh,
+        'export': redraw.export,
+        'verify': redraw.verify,
+    }.get(cmd)
+    if not fn:
+        raise SystemExit('Usage: make_blooming_sprites.py preview | extents | build | refresh KIND | export | verify')
+    fn()

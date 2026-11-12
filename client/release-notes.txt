@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.44.0",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "The remaining monsters, elites and bosses now share the glossy, rounded artwork of the Greenmeadow slimes, with their own faces and silhouettes. This includes Frostwake Shelf, Cairnspine, all four Yearwheel seasons, every remaining dungeon, Emberwake Caldera and the Chained Forge.",
+      "Firelords have their own artwork, and all six seasonal guardians have been remade. Each creature has a distinct attack and a death that fits its body and material: stone and armour buckle, beasts fall, plants splinter and flames die away."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.43.0",
     "date": "2026-11-11",
     "new": [

@@ -205,135 +205,135 @@
     "starseraph": "82a0f6b1f2b069b8",
     "tidejudicator": "bd9501ef46e5dd9d",
     "hierophant": "5db94628883ff5dc",
-    "eye_drifter": "96752b085e453e0b",
-    "eye_lurker": "b26920ddd3956cf3",
-    "eye_adept": "18a4a912b620f968",
-    "eye_lenswarden": "0eb143be7dc4f44d",
-    "eye_undertide": "cee54406ebec66b6",
-    "eye_unblinking": "08a70931a10944fc",
-    "elder_thornling": "ed63c6133023dbfa",
-    "elder_moth": "541493c0e137b7b9",
-    "elder_barkguard": "e95cdb74da2065c5",
-    "elder_gatekeeper": "4e20500db67e5bce",
-    "elder_matron": "5bd96d4e5268ca88",
-    "elder_heart": "e1d401eb67826a4f",
-    "pavilion_foldling": "828735dbb8ea624f",
-    "pavilion_inkmoth": "7ee28d231f072fd2",
-    "pavilion_silkguard": "572fe84fe7faf398",
-    "pavilion_mirror": "21a7a55fe3479f83",
-    "pavilion_weaver": "3289fa3a2a60c11f",
-    "pavilion_sovereign": "b19383b79b78ec70",
-    "rain_crown_droplet": "cebee698600a0c26",
-    "rain_crown_oracle": "80a4b02edce612a5",
-    "rain_crown_guard": "b1e7bb829162b8fc",
-    "rain_crown_gatekeeper": "e49a0a6de4b993f4",
-    "rain_crown_sibyl": "d2f274bd98dfa5e4",
-    "rain_crown_sovereign": "f667d982b70b58b4",
-    "seed_mote": "29fbf7b67c98561a",
-    "seed_amberwing": "5bc03c1778a4a21a",
-    "seed_rootguard": "92f7eeb564e14479",
-    "seed_warden": "977dd53533c5e3a1",
-    "seed_germinator": "20f47d21caca4858",
-    "seed_worldseed": "21941d4722b53b61",
-    "astro_gearling": "6e8235d93e1680b2",
-    "astro_starling": "bf4d0dbc0478a438",
-    "astro_sentinel": "b51e673017cb0040",
-    "astro_warden": "4a5f58d13c8ff977",
-    "astro_navigator": "ce24c505f013e7a8",
-    "astro_axis": "c3eb3eee7bd13d5d",
-    "thunder_spark": "3d07a6b680376603",
-    "thunder_ray": "ab22374a25fd6af2",
-    "thunder_guard": "ec80ec788e2871c4",
-    "thunder_conductor": "5634d3d12ef9345b",
-    "thunder_bastion": "806929d046a5274c",
-    "thunder_heart": "1c70caa2e42135f0",
-    "bloom_spore": "0858c35929a3f9c9",
-    "bloom_moth": "1405e8be310d895b",
-    "bloom_guard": "b6ae1174c904cda7",
-    "bloom_thornkeeper": "8b23a6b3b459e1f0",
-    "bloom_mirror": "9d1bf0a5e271d56a",
-    "bloom_heart": "8cfa0101b1668b1b",
-    "solar_emberling": "ea0a0a56ede3fbd8",
-    "solar_sunmoth": "ac3859a920e569de",
-    "solar_crucible_guard": "d562fbe134bf8735",
-    "solar_ashwarden": "6309d444f486efae",
-    "solar_heliomancer": "e4008a9059f9f7f4",
-    "solar_heart": "2c5225af417cfb23",
-    "amber_page": "d6ee6bf656c880cf",
-    "amber_moth": "4d3f403d3aa47482",
-    "amber_sentinel": "78337a9f18a0d120",
-    "amber_curator": "6ec26c3f958cc105",
-    "amber_chronicle": "433c0b2f39d397f8",
-    "amber_memory": "765edb3aae34e48d",
-    "solstice_flurry": "8f12653cc1520d6a",
-    "solstice_owl": "88895b5cdc0e5043",
-    "solstice_guard": "b5f85657b11da09e",
-    "solstice_watcher": "a8a85641f159d912",
-    "solstice_harbinger": "92d77572e732046a",
-    "solstice_heart": "2036902ed7471f75",
+    "eye_drifter": "a44e790d87d43cdc",
+    "eye_lurker": "71b4258c6a3d9546",
+    "eye_adept": "65fa46bfb8b94457",
+    "eye_lenswarden": "bceb4c1da3564610",
+    "eye_undertide": "c74c9d21b40eefbb",
+    "eye_unblinking": "5fe7fd198e15004f",
+    "elder_thornling": "e0108ef21fc96fdf",
+    "elder_moth": "2ef4d15a290513e2",
+    "elder_barkguard": "3ca0909651b129ee",
+    "elder_gatekeeper": "c30845bf264e862c",
+    "elder_matron": "8b5f365a2bc7e82d",
+    "elder_heart": "7eff5c6170c86474",
+    "pavilion_foldling": "107b28b9962b908b",
+    "pavilion_inkmoth": "c37280112de1df35",
+    "pavilion_silkguard": "1db30dcf725667e9",
+    "pavilion_mirror": "8867bd430ecd5f49",
+    "pavilion_weaver": "35bc5b0dd748cc15",
+    "pavilion_sovereign": "2bf7746f04ea01e8",
+    "rain_crown_droplet": "71a3b14a49f3c83a",
+    "rain_crown_oracle": "4d2820ab57795dd3",
+    "rain_crown_guard": "6bdb872224b5bda4",
+    "rain_crown_gatekeeper": "43bbd58541a82100",
+    "rain_crown_sibyl": "69122624349fb35e",
+    "rain_crown_sovereign": "dfc75558c8a13f18",
+    "seed_mote": "359353a06a459b31",
+    "seed_amberwing": "019c2b1d1989fdac",
+    "seed_rootguard": "87dbe7bb469121c9",
+    "seed_warden": "adc206a4a5734702",
+    "seed_germinator": "9407aa92547dcaae",
+    "seed_worldseed": "1f0805a5731e983c",
+    "astro_gearling": "fedc88bf48d85116",
+    "astro_starling": "b205896238d7dab4",
+    "astro_sentinel": "09e9dbd031298814",
+    "astro_warden": "69c4be21bec843b9",
+    "astro_navigator": "f95bd925aad9ed50",
+    "astro_axis": "26468296452d64a5",
+    "thunder_spark": "8ad51bbeda9d8429",
+    "thunder_ray": "853b78ef204b839c",
+    "thunder_guard": "4c1fa519a8e66044",
+    "thunder_conductor": "5f56daa3d062c33a",
+    "thunder_bastion": "664577d6948ea045",
+    "thunder_heart": "d741bd17311337b8",
+    "bloom_spore": "f8251911148efb06",
+    "bloom_moth": "dd9a6428b08a2e30",
+    "bloom_guard": "43223246fcae8dce",
+    "bloom_thornkeeper": "560aed46e1fae71c",
+    "bloom_mirror": "33c196f7d4d11909",
+    "bloom_heart": "829b727ce0ad7cf6",
+    "solar_emberling": "e7594982ee3d3da6",
+    "solar_sunmoth": "18849de5452c5ee9",
+    "solar_crucible_guard": "f8ae545abb94816e",
+    "solar_ashwarden": "23d4d0c9a8a7c6ce",
+    "solar_heliomancer": "0a25bf053743460c",
+    "solar_heart": "0e592ddf1d957a6b",
+    "amber_page": "72829a6edfe8151f",
+    "amber_moth": "e6680702d6dbbdfd",
+    "amber_sentinel": "f8fb0bd8e0cb3af9",
+    "amber_curator": "b55a6c9239a54146",
+    "amber_chronicle": "edeb25b4f2637140",
+    "amber_memory": "1dedbe85d6adf7ff",
+    "solstice_flurry": "b1bc37890e38c354",
+    "solstice_owl": "8b3db14761a3a178",
+    "solstice_guard": "cb8d575f9bdfdc70",
+    "solstice_watcher": "6b9197351ae2e2a7",
+    "solstice_harbinger": "68c1c0853685b94c",
+    "solstice_heart": "ad4688477cdf218e",
     "choirsinger": "1180a4e2e4c0584c",
     "reliquarypearl": "4680314b634eddd9",
-    "seed_sprout": "39768c572c917404",
-    "seed_treant": "215216cb71475ec0",
-    "solar_cinder": "270d38184ebc19fa",
-    "amber_cocoon": "1de97986cdfe4396",
-    "barrow_scarab": "a12a73ac8dcf45b4",
-    "barrow_hound": "dbaf498b20365275",
-    "barrow_spinner": "72f19ac8cc4528cd",
-    "barrow_doorward": "9b04131dffdb3f64",
-    "barrow_threadkeeper": "f0818193eda48cb0",
-    "barrow_fatebound": "3b0c808a6676665e",
-    "span_lynx": "954c192fb7c3451a",
-    "span_sentinel": "91a65206f5a3b545",
-    "span_caster": "3af0fa48afd1b30c",
-    "span_warden": "549e6058571a2f7b",
-    "span_weaver": "63c4c158488c41b3",
-    "span_archon": "191212fbe85fe47c",
-    "keel_crab": "c56de92686212091",
-    "keel_deckhand": "eeb9cb4c79d8945f",
-    "keel_lantern": "1806195cd517b44e",
-    "keel_cargomaw": "da01fea0e62149f9",
-    "keel_bosun": "516da622c3f6559b",
-    "keel_captain": "78a307dae4671b58",
-    "null_hauler": "b09199744a951698",
-    "null_breaker": "c7d17f6c605432f8",
-    "null_coil": "27def242bbbbe5a4",
-    "null_bell": "ea1994b72d8fd997",
-    "null_conductor": "5ab4713e1a8a05fc",
-    "null_hour": "b43118cf23ca300c",
-    "ew_ashback": "a849e2ae9ba603b0",
-    "ew_glasswing": "2b04c156614d4f2e",
-    "ew_slagjaw": "bbe03698e0ef272b",
-    "ew_cinderhorn": "d4c66d1eb185f731",
-    "ew_chainmaw": "9b4aefc7bf83f7df",
-    "ew_bellows": "e4e211cff75a6ee6",
-    "ew_crown": "fc20c92203450ba5",
-    "cf_brute": "7a916892cb14946b",
-    "cf_crawler": "e9bc0b1055785a8a",
-    "cf_caster": "1bf6771b70493090",
-    "cf_sentry": "3fd51f9acdc3ac6c",
-    "cf_kettil": "9c84ec5e867830e6",
-    "cf_ysolt": "89bd4bd3a01c81f5",
-    "cf_hallgrim": "9e589b01e2eb66f8",
-    "cf_sigrun": "d226346b24398667",
-    "cf_ingot": "3ffbfc5e3127b1ee",
-    "cf_dagfinn": "f9208d6722951418",
-    "cf_thorbjorg": "4fe09a98cf914345",
-    "cf_ragnhild": "65352991436624dc",
-    "cf_orm": "4fc1695f6a54fcd3",
-    "cf_hildr": "73339fa7bca515c0",
-    "cf_eldmarr": "5a4edb5546051b4e",
-    "ember_firelord": "5a4edb5546051b4e",
-    "es_foe_02": "9c84ec5e867830e6",
-    "es_foe_04": "9c84ec5e867830e6",
-    "es_foe_06": "9c84ec5e867830e6",
-    "es_foe_08": "5a4edb5546051b4e",
-    "es_foe_11": "9c84ec5e867830e6",
-    "es_foe_15": "9c84ec5e867830e6",
-    "es_foe_17": "9c84ec5e867830e6",
-    "es_foe_18": "9c84ec5e867830e6",
-    "es_foe_22": "9c84ec5e867830e6",
-    "es_foe_25": "5a4edb5546051b4e"
+    "seed_sprout": "eb156dd6173dfd20",
+    "seed_treant": "2fde0d88c7ed35cc",
+    "solar_cinder": "152360ad1558a592",
+    "amber_cocoon": "556c4cbc0e04ffe1",
+    "barrow_scarab": "3a33b9a7d56b1d80",
+    "barrow_hound": "6137029beb8c9727",
+    "barrow_spinner": "1dd1b50eb3b8cf4f",
+    "barrow_doorward": "0534d58de1950897",
+    "barrow_threadkeeper": "bb7e69e9e70f9605",
+    "barrow_fatebound": "35a90f4049a0d909",
+    "span_lynx": "b117f296612f1f89",
+    "span_sentinel": "7a4c75d44af6a59d",
+    "span_caster": "44cbcf217c1a7f58",
+    "span_warden": "38523b9a2dc0c337",
+    "span_weaver": "ac25a2ea1ae665ec",
+    "span_archon": "9c9e7d705090cd96",
+    "keel_crab": "0d388beb96b65af8",
+    "keel_deckhand": "e679482c03191623",
+    "keel_lantern": "5d9c94921707e831",
+    "keel_cargomaw": "c05448b9243d4434",
+    "keel_bosun": "d5a9cd7f76fd59ac",
+    "keel_captain": "e0fbac39f1a9e736",
+    "null_hauler": "4fe1c5e26eb58f13",
+    "null_breaker": "061f884379fa4fd7",
+    "null_coil": "86e4febf8ac3bafe",
+    "null_bell": "1a0c2717bc6fc677",
+    "null_conductor": "145fefb59b0e4ffc",
+    "null_hour": "42f2c63de6f74f4f",
+    "ew_ashback": "2bbd1d60a27e12d7",
+    "ew_glasswing": "122a4fe7c7d09fd0",
+    "ew_slagjaw": "cb0e594ac0aea3e2",
+    "ew_cinderhorn": "c16125cb432f4de7",
+    "ew_chainmaw": "79c86c8e75383576",
+    "ew_bellows": "7c912134420335fa",
+    "ew_crown": "f2c84ae0421f03c4",
+    "cf_brute": "f768cc770a6ce84f",
+    "cf_crawler": "b17652d7f1b33381",
+    "cf_caster": "175b3dbe15a49463",
+    "cf_sentry": "02028e68de959256",
+    "cf_kettil": "5f11db244fed6262",
+    "cf_ysolt": "32225a25b4ebe783",
+    "cf_hallgrim": "67a9804b564bc831",
+    "cf_sigrun": "098cb2f08e52d45b",
+    "cf_ingot": "fcc441b26d81d7b2",
+    "cf_dagfinn": "6546bb3295515f4d",
+    "cf_thorbjorg": "d3bd89948d138ee1",
+    "cf_ragnhild": "d87af4838eba584a",
+    "cf_orm": "80dce1443154bc07",
+    "cf_hildr": "1501d542b9ba4767",
+    "cf_eldmarr": "b0df23f76b809be7",
+    "ember_firelord": "e96f0eceb385fe8a",
+    "es_foe_02": "5f11db244fed6262",
+    "es_foe_04": "5f11db244fed6262",
+    "es_foe_06": "5f11db244fed6262",
+    "es_foe_08": "b0df23f76b809be7",
+    "es_foe_11": "5f11db244fed6262",
+    "es_foe_15": "5f11db244fed6262",
+    "es_foe_17": "5f11db244fed6262",
+    "es_foe_18": "5f11db244fed6262",
+    "es_foe_22": "5f11db244fed6262",
+    "es_foe_25": "b0df23f76b809be7"
   },
   "tops": {
     "tidetemplar": 64,
@@ -353,135 +353,135 @@
     "starseraph": 76,
     "tidejudicator": 78,
     "hierophant": 84,
-    "eye_drifter": 61,
-    "eye_lurker": 40,
-    "eye_adept": 56,
-    "eye_lenswarden": 55,
-    "eye_undertide": 61,
-    "eye_unblinking": 74,
-    "elder_thornling": 34,
-    "elder_moth": 65,
-    "elder_barkguard": 61,
-    "elder_gatekeeper": 60,
-    "elder_matron": 52,
-    "elder_heart": 63,
-    "pavilion_foldling": 59,
-    "pavilion_inkmoth": 70,
-    "pavilion_silkguard": 54,
-    "pavilion_mirror": 49,
-    "pavilion_weaver": 40,
-    "pavilion_sovereign": 60,
-    "rain_crown_droplet": 51,
-    "rain_crown_oracle": 55,
-    "rain_crown_guard": 50,
-    "rain_crown_gatekeeper": 52,
-    "rain_crown_sibyl": 66,
-    "rain_crown_sovereign": 75,
-    "seed_mote": 46,
+    "eye_drifter": 76,
+    "eye_lurker": 34,
+    "eye_adept": 57,
+    "eye_lenswarden": 56,
+    "eye_undertide": 57,
+    "eye_unblinking": 92,
+    "elder_thornling": 39,
+    "elder_moth": 70,
+    "elder_barkguard": 62,
+    "elder_gatekeeper": 72,
+    "elder_matron": 62,
+    "elder_heart": 62,
+    "pavilion_foldling": 55,
+    "pavilion_inkmoth": 73,
+    "pavilion_silkguard": 65,
+    "pavilion_mirror": 60,
+    "pavilion_weaver": 44,
+    "pavilion_sovereign": 69,
+    "rain_crown_droplet": 73,
+    "rain_crown_oracle": 53,
+    "rain_crown_guard": 49,
+    "rain_crown_gatekeeper": 53,
+    "rain_crown_sibyl": 79,
+    "rain_crown_sovereign": 87,
+    "seed_mote": 65,
     "seed_amberwing": 68,
-    "seed_rootguard": 56,
-    "seed_warden": 52,
-    "seed_germinator": 70,
-    "seed_worldseed": 76,
-    "astro_gearling": 45,
-    "astro_starling": 58,
+    "seed_rootguard": 60,
+    "seed_warden": 60,
+    "seed_germinator": 59,
+    "seed_worldseed": 65,
+    "astro_gearling": 42,
+    "astro_starling": 59,
     "astro_sentinel": 58,
-    "astro_warden": 58,
-    "astro_navigator": 56,
-    "astro_axis": 69,
-    "thunder_spark": 54,
-    "thunder_ray": 59,
-    "thunder_guard": 59,
-    "thunder_conductor": 51,
-    "thunder_bastion": 53,
-    "thunder_heart": 71,
-    "bloom_spore": 48,
+    "astro_warden": 64,
+    "astro_navigator": 58,
+    "astro_axis": 66,
+    "thunder_spark": 63,
+    "thunder_ray": 102,
+    "thunder_guard": 61,
+    "thunder_conductor": 60,
+    "thunder_bastion": 65,
+    "thunder_heart": 66,
+    "bloom_spore": 59,
     "bloom_moth": 71,
-    "bloom_guard": 56,
-    "bloom_thornkeeper": 56,
-    "bloom_mirror": 69,
-    "bloom_heart": 66,
+    "bloom_guard": 59,
+    "bloom_thornkeeper": 62,
+    "bloom_mirror": 67,
+    "bloom_heart": 70,
     "solar_emberling": 53,
     "solar_sunmoth": 71,
-    "solar_crucible_guard": 54,
-    "solar_ashwarden": 48,
-    "solar_heliomancer": 54,
-    "solar_heart": 78,
-    "amber_page": 55,
-    "amber_moth": 70,
-    "amber_sentinel": 53,
-    "amber_curator": 48,
-    "amber_chronicle": 71,
-    "amber_memory": 67,
-    "solstice_flurry": 52,
-    "solstice_owl": 64,
-    "solstice_guard": 51,
-    "solstice_watcher": 68,
-    "solstice_harbinger": 55,
-    "solstice_heart": 66,
+    "solar_crucible_guard": 58,
+    "solar_ashwarden": 61,
+    "solar_heliomancer": 63,
+    "solar_heart": 69,
+    "amber_page": 77,
+    "amber_moth": 60,
+    "amber_sentinel": 60,
+    "amber_curator": 56,
+    "amber_chronicle": 92,
+    "amber_memory": 87,
+    "solstice_flurry": 68,
+    "solstice_owl": 60,
+    "solstice_guard": 65,
+    "solstice_watcher": 72,
+    "solstice_harbinger": 102,
+    "solstice_heart": 88,
     "choirsinger": 42,
     "reliquarypearl": 56,
-    "seed_sprout": 59,
-    "seed_treant": 57,
-    "solar_cinder": 59,
-    "amber_cocoon": 75,
-    "barrow_scarab": 50,
-    "barrow_hound": 40,
-    "barrow_spinner": 57,
-    "barrow_doorward": 57,
-    "barrow_threadkeeper": 58,
-    "barrow_fatebound": 57,
-    "span_lynx": 45,
-    "span_sentinel": 68,
+    "seed_sprout": 46,
+    "seed_treant": 54,
+    "solar_cinder": 58,
+    "amber_cocoon": 62,
+    "barrow_scarab": 41,
+    "barrow_hound": 46,
+    "barrow_spinner": 69,
+    "barrow_doorward": 58,
+    "barrow_threadkeeper": 59,
+    "barrow_fatebound": 60,
+    "span_lynx": 46,
+    "span_sentinel": 58,
     "span_caster": 57,
-    "span_warden": 58,
-    "span_weaver": 59,
+    "span_warden": 54,
+    "span_weaver": 56,
     "span_archon": 58,
-    "keel_crab": 52,
+    "keel_crab": 45,
     "keel_deckhand": 52,
-    "keel_lantern": 71,
-    "keel_cargomaw": 69,
+    "keel_lantern": 88,
+    "keel_cargomaw": 61,
     "keel_bosun": 54,
     "keel_captain": 53,
-    "null_hauler": 72,
-    "null_breaker": 61,
-    "null_coil": 61,
-    "null_bell": 75,
-    "null_conductor": 68,
-    "null_hour": 72,
-    "ew_ashback": 50,
-    "ew_glasswing": 68,
+    "null_hauler": 70,
+    "null_breaker": 60,
+    "null_coil": 74,
+    "null_bell": 74,
+    "null_conductor": 77,
+    "null_hour": 71,
+    "ew_ashback": 51,
+    "ew_glasswing": 80,
     "ew_slagjaw": 49,
-    "ew_cinderhorn": 61,
-    "ew_chainmaw": 54,
-    "ew_bellows": 78,
-    "ew_crown": 80,
-    "cf_brute": 59,
-    "cf_crawler": 64,
-    "cf_caster": 84,
-    "cf_sentry": 69,
-    "cf_kettil": 57,
+    "ew_cinderhorn": 68,
+    "ew_chainmaw": 52,
+    "ew_bellows": 76,
+    "ew_crown": 71,
+    "cf_brute": 58,
+    "cf_crawler": 63,
+    "cf_caster": 113,
+    "cf_sentry": 70,
+    "cf_kettil": 58,
     "cf_ysolt": 71,
     "cf_hallgrim": 56,
-    "cf_sigrun": 60,
-    "cf_ingot": 38,
+    "cf_sigrun": 61,
+    "cf_ingot": 28,
     "cf_dagfinn": 62,
-    "cf_thorbjorg": 69,
-    "cf_ragnhild": 60,
+    "cf_thorbjorg": 70,
+    "cf_ragnhild": 61,
     "cf_orm": 60,
-    "cf_hildr": 72,
-    "cf_eldmarr": 57,
-    "ember_firelord": 57,
-    "es_foe_02": 57,
-    "es_foe_04": 57,
-    "es_foe_06": 57,
-    "es_foe_08": 57,
-    "es_foe_11": 57,
-    "es_foe_15": 57,
-    "es_foe_17": 57,
-    "es_foe_18": 57,
-    "es_foe_22": 57,
-    "es_foe_25": 57
+    "cf_hildr": 74,
+    "cf_eldmarr": 59,
+    "ember_firelord": 59,
+    "es_foe_02": 58,
+    "es_foe_04": 58,
+    "es_foe_06": 58,
+    "es_foe_08": 59,
+    "es_foe_11": 58,
+    "es_foe_15": 58,
+    "es_foe_17": 58,
+    "es_foe_18": 58,
+    "es_foe_22": 58,
+    "es_foe_25": 59
   },
   "kindFrames": {
     "reliccrab": {
@@ -593,6 +593,1279 @@
         54,
         110
       ]
+    },
+    "eye_drifter": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_adept": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_lurker": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_lenswarden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_undertide": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "eye_unblinking": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_matron": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_thornling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_gatekeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_barkguard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_moth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "elder_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_weaver": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_foldling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_sovereign": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_mirror": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_silkguard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "pavilion_inkmoth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_sovereign": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_sibyl": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_gatekeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_droplet": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "rain_crown_oracle": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_rootguard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_amberwing": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_worldseed": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_warden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_germinator": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_mote": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_sprout": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "seed_treant": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_gearling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_warden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_starling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_navigator": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_axis": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "astro_sentinel": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_bastion": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_spark": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_conductor": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_ray": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "thunder_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_mirror": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_spore": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_moth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "bloom_thornkeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_sunmoth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_crucible_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_cinder": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_heliomancer": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_emberling": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solar_ashwarden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_sentinel": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_memory": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_cocoon": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_page": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_curator": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_moth": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "amber_chronicle": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_owl": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_watcher": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_heart": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_flurry": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_harbinger": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "solstice_guard": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_spinner": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_fatebound": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_hound": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_doorward": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_threadkeeper": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "barrow_scarab": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_warden": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_sentinel": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_weaver": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_caster": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "span_archon": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        88,
+        152
+      ]
+    },
+    "span_lynx": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_bosun": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_cargomaw": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_captain": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_deckhand": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_lantern": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "keel_crab": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "null_coil": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "null_hauler": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "null_breaker": {
+      "frame": [
+        192,
+        160
+      ],
+      "anchor": [
+        76,
+        152
+      ]
+    },
+    "null_bell": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "null_hour": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "null_conductor": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_glasswing": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_cinderhorn": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_slagjaw": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_ashback": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_chainmaw": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_crown": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "ew_bellows": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        88,
+        164
+      ]
+    },
+    "cf_brute": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_22": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_04": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_06": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_eldmarr": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_17": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_kettil": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_hildr": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_02": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_sentry": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_18": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_caster": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_ingot": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_ragnhild": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_11": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_ysolt": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_crawler": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_orm": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_08": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_dagfinn": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "ember_firelord": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        64,
+        164
+      ]
+    },
+    "cf_hallgrim": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_sigrun": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "cf_thorbjorg": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_15": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
+    },
+    "es_foe_25": {
+      "frame": [
+        176,
+        172
+      ],
+      "anchor": [
+        72,
+        164
+      ]
     }
+  },
+  "atlases": {
+    "ember_firelord": "cathedral_ember_firelord.png"
   }
 }

@@ -54,7 +54,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
     const meta=await(await fetch('assets/cathedral.txt')).json();let n=0;
     for(const kind of meta.kinds.filter(k=>k.startsWith('keel_'))){
       const i=new Image();i.src=`assets/cathedral_${kind}.png`;await i.decode();
-      if(i.width===768&&i.height===480&&meta.sprites[kind]&&meta.tops[kind])n++;
+      const fr=Field.frameOf({meta},kind);
+      if(i.width===fr.w*8&&i.height===fr.h*5&&meta.sprites[kind]&&meta.tops[kind])n++;
     }return n;
   }),6,'All six editable enemy atlases decode');
   for(const [name,x,y] of [['stern',64,110],['hatch',64,72],['cargo',64,83],['capstan',64,57],['sail',80,78],['captain',64,26],['prow',60,10]]){

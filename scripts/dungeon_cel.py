@@ -7,7 +7,8 @@ In a maker:  `import dungeon_cel; dungeon_cel.install(globals(), '<dungeon>_cel_
 
 Redo a dungeon from its redraw:  python3 scripts/dungeon_cel.py <key>   (preview | build)
   key: eye_below elder_hollow thousandfold rain_crown seed_vault astrolabe thunder blooming solar amber solstice
-`build` deletes the PixelFlow sprites of the redrawn kinds, rebuilds them, exports their atlases and verifies them.
+`build` delegates to the native preserving pipeline for remade dungeons.
+The remaining legacy cel builders recreate their old sources.
 """
 import importlib
 import json
@@ -46,7 +47,26 @@ def cel_kinds(key):
     return list(importlib.import_module(REDRAWS[key]).KINDS)
 
 
+NATIVE_REDRAWS = dict(
+    eye_below='eye_slime_redraw', elder_hollow='elder_slime_redraw',
+    thousandfold='pavilion_slime_redraw', rain_crown='raincrown_slime_redraw',
+    seed_vault='seedvault_slime_redraw', astrolabe='astrolabe_slime_redraw',
+    thunder='thunderheart_slime_redraw', blooming='blooming_slime_redraw',
+    solar='crucible_slime_redraw', solar_crucible='crucible_slime_redraw',
+    amber='amber_slime_redraw', solstice='solstice_slime_redraw',
+    nornroot='nornroot_slime_redraw', skybridge='span_slime_redraw',
+    longship='longship_slime_redraw', blackhour='foundry_slime_redraw',
+)
+
+
 def build(key):
+    if key in NATIVE_REDRAWS:
+        if "--replace" in sys.argv:
+            raise SystemExit("--replace is refused; native PixelFlow sources are preserved")
+        native = importlib.import_module(NATIVE_REDRAWS[key])
+        native.build()
+        native.export()
+        return native.verify()
     mod = importlib.import_module(MAKERS[key])
     kinds = cel_kinds(key)
     meta = json.loads(mod.META.read_text())
@@ -61,6 +81,8 @@ def build(key):
 
 
 def preview(key):
+    if key in NATIVE_REDRAWS:
+        return importlib.import_module(NATIVE_REDRAWS[key]).preview()
     importlib.import_module(REDRAWS[key]).main()
 
 

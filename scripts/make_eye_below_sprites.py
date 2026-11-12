@@ -249,11 +249,7 @@ def verify(kinds):
         print(kind,'34 frames match indexed source')
 
 
-if __name__=='__main__':
-    action=sys.argv[1] if len(sys.argv)>1 else ''
-    kinds=[k for k in sys.argv[2:] if k in KINDS] or KINDS
-    if action=='preview': preview(kinds)
-    elif action=='build': build(kinds,'--replace' in sys.argv[2:])
-    elif action=='export': export(kinds)
-    elif action=='verify': verify(kinds)
-    else: raise SystemExit('Usage: make_eye_below_sprites.py preview | build [--replace] | export | verify [kind...]')
+if __name__ == '__main__':
+    import eye_slime_redraw as remake
+    action = sys.argv[1] if len(sys.argv) > 1 else 'preview'
+    {'preview': remake.preview, 'build': remake.build, 'export': remake.export, 'verify': remake.verify}[action]()

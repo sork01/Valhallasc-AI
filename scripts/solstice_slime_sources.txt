@@ -1,0 +1,8 @@
+{
+  "solstice_flurry": "b1bc37890e38c354",
+  "solstice_owl": "8b3db14761a3a178",
+  "solstice_guard": "cb8d575f9bdfdc70",
+  "solstice_watcher": "6b9197351ae2e2a7",
+  "solstice_harbinger": "68c1c0853685b94c",
+  "solstice_heart": "ad4688477cdf218e"
+}

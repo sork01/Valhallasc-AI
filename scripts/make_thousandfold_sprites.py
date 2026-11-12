@@ -246,15 +246,6 @@ def verify(kinds):
 
 
 if __name__ == '__main__':
-    action = sys.argv[1] if len(sys.argv) > 1 else ''
-    kinds = [k for k in sys.argv[2:] if k in KINDS] or KINDS
-    if action == 'preview':
-        preview(kinds)
-    elif action == 'build':
-        build(kinds)
-    elif action == 'export':
-        export(kinds)
-    elif action == 'verify':
-        verify(kinds)
-    else:
-        raise SystemExit('Usage: make_thousandfold_sprites.py preview | build | export | verify [kind...]')
+    import pavilion_slime_redraw as redo
+    action = sys.argv[1] if len(sys.argv)>1 else 'preview'
+    {'preview':redo.preview,'build':redo.build,'export':redo.export,'verify':redo.verify}[action]()

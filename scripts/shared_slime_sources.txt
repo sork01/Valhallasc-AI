@@ -1,0 +1,9 @@
+{
+  "ember_firelord": "e96f0eceb385fe8a",
+  "hollow_rider": "dda02b3df03b0402",
+  "grinch": "4264f8b9a8c77a00",
+  "bloomwarden": "c89f57c121d6a4d0",
+  "birchcrown": "f9c56761469ca59b",
+  "briarheart": "8f83798d9259a107",
+  "starrocketeer": "30079c5e7fb42d7e"
+}

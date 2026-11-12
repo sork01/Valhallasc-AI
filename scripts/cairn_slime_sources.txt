@@ -1,0 +1,9 @@
+{
+  "screeferret": "bdb4362fff88ce62",
+  "stoneibex": "8d86deca63130dc7",
+  "slateraven": "b5ee4823749d24b8",
+  "ridgeadder": "ee0aad6c47c28524",
+  "cairnbehemoth": "33cf43446bfaa37f",
+  "whitebarktitan": "1f72f0ab429a96ea",
+  "stormcondor": "d27f0e32a1630344"
+}

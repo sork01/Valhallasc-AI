@@ -1,0 +1,8 @@
+{
+  "elder_thornling": "e0108ef21fc96fdf",
+  "elder_moth": "2ef4d15a290513e2",
+  "elder_barkguard": "3ca0909651b129ee",
+  "elder_gatekeeper": "c30845bf264e862c",
+  "elder_matron": "8b5f365a2bc7e82d",
+  "elder_heart": "7eff5c6170c86474"
+}
