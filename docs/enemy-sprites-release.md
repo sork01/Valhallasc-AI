@@ -90,5 +90,12 @@ further work.
 
 ## Deployment
 
-Prepared for fast-forward into the live main checkout after focused validation.
-Public hashes, health, PID and executable verification are recorded after release.
+Deployed 2026-11-12 by fast-forwarding source `9b6c48e9` into the live main
+checkout. All 167 changed client files and 76 preserved asset checks match their
+public SHA-256 hashes. Public and bridge health report OK. Server PID 3337765 and
+the executable hash are unchanged; no service restart or public test characters.
+The public page displays Beta 1.44.0. Receipt:
+`test-results/enemy-sprites/public-release.json` in the release worktree.
+
+The planned enemy-sprite remake queue is now complete and released. The owner
+has accepted all artwork; historical candidate notes do not require new approval.
