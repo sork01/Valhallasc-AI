@@ -1,5 +1,12 @@
 # Quest map markers (UI-QUEST-MARKERS)
 
+**Beta 1.46.0 follow-up:** current behavior and focused verification are in
+`docs/quest-feedback.md`. Guidance now uses nearest real sources and live NPC
+positions, orders story scenes, follows an active escort to its safe endpoint,
+and resolves reach targets independently of language. Available repeatable
+markers are blue. Earlier central-spawn and same-color repeatable notes below
+describe historical releases.
+
 Beta 1.16.0 adds quest guidance to the minimap and the detailed zone view of the world map. Client only; no server restart, world generation or save changes.
 
 Every NPC whose gossip offers an available quest gets a gold `!`. A ready quest gets a blue `?`, taking priority when that giver also offers another quest. Repeatable quests use the same colors. Active, completed, locked and upcoming quests do not produce giver markers. This uses the existing journal `status()` rules, including prerequisites and minimum level.

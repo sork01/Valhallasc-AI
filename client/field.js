@@ -1412,6 +1412,7 @@
   }
   const SIGN_W = 28, SIGN_TOP = 70;   // the clickable body of a boss sign, in screen pixels
   function onPointerDown(e) {
+    window.WorldFeedback?.leave();
     if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel) return;
     pendingNpc = null; pendingChest = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
@@ -1519,7 +1520,7 @@
     }
     return out;
   }
-  function onPointerMove(e) { if (pointer.down) rememberPointer(e); else if (cv && running && !paused) { const r=cv.getBoundingClientRect(); cv.style.cursor = pickPortal((e.clientX-r.left)/r.width*VW,(e.clientY-r.top)/r.height*VH) ? 'pointer' : ''; } }
+  function onPointerMove(e) { window.WorldFeedback?.pointer(e); if (pointer.down) rememberPointer(e); else if (cv && running && !paused) { const r=cv.getBoundingClientRect(); cv.style.cursor = pickPortal((e.clientX-r.left)/r.width*VW,(e.clientY-r.top)/r.height*VH) ? 'pointer' : ''; } }
   function onPointerUp() { pointer.down = false; }
 
   // ---------- combat ----------
@@ -4910,7 +4911,7 @@
         }
         const spr = oset[o.kind][o.v % 4];
         // trees in front of the hero fade so he never disappears behind a canopy
-        const cover = o.kind === 'tree' && it.d > hd && Math.abs(it.sx - hsx) < 80 && it.sy - 190 < hsy && it.sy > hsy - 20;
+        const cover = ['tree', 'pine'].includes(o.kind) && it.d > hd && hsx > it.sx - spr.ax && hsx < it.sx + spr.w - spr.ax && hsy > it.sy - spr.ay && hsy - 110 < it.sy + spr.h - spr.ay;
         if (cover) g.globalAlpha = .45;
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
@@ -5128,6 +5129,7 @@
     window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
     drawQuestArrow(g);
     drawMini();
+    window.WorldFeedback?.draw({ canvas: cv, hero, project: w2s, width: VW, height: VH, drops, blocked: paused || pointer.down || hero.dead || !!hero.sparkTravel });
     // A crossing cutscene (client/cutscene.js) covers the whole canvas, HUD pieces drawn above included, and paints the hero itself.
     if (window.Cutscene?.active) { const [csx, csy] = w2s(hero.x, hero.y); window.Cutscene.draw(g, VW, VH, t, paintHeroBody, csx, csy, hero, reducedMotion()); }
   }
@@ -5528,6 +5530,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelHeldInput(); });
   const Field = {
     start(o) {
+      window.WorldFeedback?.reset();
       cv = o.canvas; ctx = cv.getContext('2d'); mini = o.mini; mctx = mini ? mini.getContext('2d') : null; opts = o.opts; onHud = o.onHud || onHud; onEvent = o.onEvent || onEvent;
       if (!sprites.tree.length) buildSprites();
       window.ZoneJourney?.clear();
@@ -5544,7 +5547,7 @@
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize); addEventListener('prefs-change', resize);
         for (const [id, step] of [['mini-zoom-in', 1], ['mini-zoom-out', -1]]) document.getElementById(id)?.addEventListener('click', () => Field.minimapZoom(step));
         if (mini) mini.addEventListener('wheel', e => { e.preventDefault(); Field.minimapZoom(e.deltaY < 0 ? 1 : -1); }, { passive: false });
-        cv.addEventListener('pointerdown', onPointerDown); cv.addEventListener('pointermove', onPointerMove); addEventListener('pointerup', onPointerUp);
+        cv.addEventListener('pointerdown', onPointerDown); cv.addEventListener('pointermove', onPointerMove); cv.addEventListener('pointerleave', () => window.WorldFeedback?.leave()); addEventListener('pointerup', onPointerUp);
         cv.addEventListener('pointercancel', onPointerUp); cv.addEventListener('lostpointercapture', onPointerUp);
         cv.addEventListener('contextmenu', e => e.preventDefault());
       }
@@ -5557,7 +5560,7 @@
     },
     // A crossing cutscene starts: let go of everything the hero was doing, so nothing carries on underneath it.
     cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
-    stop() { window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
+    stop() { window.WorldFeedback?.reset(); window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
     setTouchDirection(x, y) {
       if (!Field.canAct || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {
@@ -5639,6 +5642,7 @@
       return Online.send({ type: 'use_item', item: id });
     },
     floatHero(text, color = '#ffe066') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false, 'banner', 118); },
+    error(text) { if (running) window.WorldFeedback?.error(text); },
     equipSlot(slot, item) {
       if (!running || !Online.connected || hero.dead) return false;
       return Online.send({ type: 'equip', slots: { [slot]: item } });

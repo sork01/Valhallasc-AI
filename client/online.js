@@ -149,7 +149,7 @@
         case 'system': log(packet.text); break;
         case 'cutscene': window.Cutscene?.play(packet.scenes, { skippable: packet.skippable === true }); break;
         case 'announce': log(packet.text); window.Announce?.show(packet.text, packet.kind); break;
-        case 'notice': window.Achievements?.onNotice(packet); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
+        case 'notice': window.Achievements?.onNotice(packet); if (packet.ok === false) window.Field?.error(packet.text); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;
         case 'trade': window.Trade?.onPacket(packet); break;
@@ -166,6 +166,7 @@
         case 'party': window.Social?.onParty(packet.party); break;
         case 'who': window.Social?.onWho(packet.players); break;
         case 'error':
+          if (!packet.fatal) window.Field?.error(packet.text);
           // An interrupted socket can remain on the server until its heartbeat
           // expires. Wait for that slot without discarding the saved identity.
           if (packet.fatal && packet.code !== 'auth' && packet.text === 'This character is already online in another window.') {

@@ -8,6 +8,7 @@ import copy
 import json
 
 from quest_gear_rewards import reward_for
+from mercenary_offers import offers as mercenary_offers
 
 ELITES = [('oldtusker', 128, 172), ('tidecrusher', 232, 278), ('orchardqueen', 392, 226)]
 XP = {1: 10, 2: 20, 3: 40, 4: 60, 5: 80}
@@ -132,7 +133,7 @@ QUESTS = [
       [('visit', 'fold_hoar', 'Find the Hoar Oak in the Oldgrove', 1)], requires='fold_sisters'),
     Q('fold_tusker', 'Old Tusker', 'fold_hild', 5, 60,
       'A boar the size of a hay cart has taken eleven ewes. Its den is in a clearing in the north of the Oldgrove. Hild says nobody should go alone. Kill Old Tusker and she will sleep at night again.',
-      [('kill', 'oldtusker', 'Defeat Old Tusker', 1)], requires='fold_strays', recommendedPlayers=3),
+      [('kill', 'oldtusker', 'Defeat Old Tusker', 1)], requires='fold_strays', group=True, recommendedPlayers=2),
     # Saltby, on the Strand
     Q('salt_nets', 'Tarred and Mended', 'salt_ragna', 2, 20,
       'Blue slime gel makes a fair tar for torn nets. Bring Ragna five lumps from the Strand.',
@@ -189,6 +190,8 @@ def people(world, hamlets):
                  offers=copy.deepcopy(blessing + potion) if trader else [], buys=trader, look=s['look'])
         if 'escort' in s:
             n['escort'] = s['escort']
+        if n['id'] == 'fold_hild':
+            n['offers'] = mercenary_offers()
         out.append(n)
     spots = {'stonefold': (-1, -7), 'saltby': (-2, -5), 'applewick': (-4, -6.5)}
     for key, (dx, dy) in spots.items():

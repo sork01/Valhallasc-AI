@@ -30,6 +30,8 @@ The outline, seams, Skaldholm wall and vault, Alderhaven and its people, the spa
 
 `oldtusker` (the Oldgrove, quest), `tidecrusher` (the Strand, quest), `orchardqueen` (the wild hives, no quest). `tidecrusher` is not `saltclaw`: that id is a level-60 Stormglass enemy. Level 7, hard-coded in `world.rs`/`items.rs` like the Cinderlord, respawn 180 s, enrage `[180, 0.2, 3.0]`, materials `tusker_bristle`, `tidecrusher_shard`, `queen_stinger`. Art: `scripts/meadow_elite_redraw.py` (montage, preview, build, refresh, export, verify), sources `scripts/meadow_elite_sources.txt`, manifest `client/assets/greenmeadow.txt`. Stats are a first guess, not balanced: the owner tests fights.
 
+**Two-player Old Tusker (owner, 2026-11-12):** `fold_tusker` recommends two fighters and enables shared group kill credit. Hild offers the standard mercenary contracts, limited to one companion for a lone hirer. Old Tusker has 1,000 health (previously 1,500); damage, level and enrage stay as before. Fight timing remains for the owner to judge. These server changes require a release before they affect the public encounter.
+
 ## Pilot database
 
 `scripts/greenmeadow_positions.py --db FILE [--apply]` moves characters who now stand inside scenery to the spawn (service stopped, backup first).

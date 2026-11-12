@@ -907,7 +907,7 @@ impl Slime {
             // Two level-10 heroes, with skills and healing, rather than an ordinary solo pull.
             "cinderlord" => (2400., 180., 2.5, 1.7),
             // Greenmeadow's three elites: a party of level-5 fighters, or one hero well past the zone.
-            "oldtusker" => (1500., 70., 3.0, 1.7),
+            "oldtusker" => (1000., 70., 3.0, 1.7),
             "tidecrusher" => (1900., 60., 1.9, 1.8),
             "orchardqueen" => (1200., 78., 3.2, 1.6),
             // The Crags' two new elites, beside the Cinderlord: a party of level-10 fighters, or one hero well past the zone.
@@ -3603,6 +3603,7 @@ impl World {
             self.update_food(session);
             self.update_player(session);
         }
+        self.update_spark_discovery();
         // Players pass through actors; enemies yield before their own movement.
         self.separate_enemies();
         self.pursuit.retain(&self.players);
@@ -7177,6 +7178,43 @@ mod tests {
         w.time += 0.6;
         w.interact(1, npc, Some(&format!("merc_{class}")));
         dialogue_notice(rx)
+    }
+
+    #[test]
+    fn old_tusker_is_a_two_player_group_quest_with_one_hired_companion() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let q = w.maps[0]
+            .quests
+            .iter()
+            .find(|q| q.id == "fold_tusker")
+            .unwrap();
+        assert!(q.group);
+        assert_eq!(q.recommended_players, 2);
+        let tusker = w.slimes.iter().find(|s| s.kind == "oldtusker").unwrap();
+        assert_eq!(tusker.max_hp, 1000.);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 5;
+            c.gold = mercs::merc_price(5) * 3;
+            c.quests.push(QuestProgress {
+                id: "fold_strays".into(),
+                claimed: true,
+                completions: 1,
+                ..Default::default()
+            });
+        }
+        at_giver(&mut w, 0, "fold_hild");
+        w.time += 0.6;
+        w.interact(1, "fold_hild", Some("quest:accept:fold_tusker"));
+        drain(&mut rx);
+        let text = hire(&mut w, &mut rx, 0, "fold_hild", "priest");
+        assert!(text.contains("Merc Priest joins your party"), "{text}");
+        let gold = w.players[&1].character.gold;
+        let text = hire(&mut w, &mut rx, 0, "fold_hild", "mage");
+        assert!(text.contains("wants 2 fighters"), "{text}");
+        assert_eq!(mercs_of(&w).len(), 1);
+        assert_eq!(w.players[&1].character.gold, gold);
     }
 
     #[test]

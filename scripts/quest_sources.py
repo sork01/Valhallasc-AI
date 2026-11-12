@@ -47,10 +47,8 @@ def sources():
                         continue
                     groups.setdefault(kind, []).append(spawn)
                 for kind, spawns in groups.items():
-                    x = sum(s['x'] for s in spawns) / len(spawns)
-                    y = sum(s['y'] for s in spawns) / len(spawns)
-                    near = min(spawns, key=lambda s: (s['x'] - x)**2 + (s['y'] - y)**2)
-                    points.append({'zone': zone, 'x': near['x'], 'y': near['y'], 'enemy': kind})
+                    # Keep real candidates: the client chooses the nearest pack from the hero's current position.
+                    points.extend({'zone': zone, 'x': s['x'], 'y': s['y'], 'enemy': kind} for s in spawns)
                 for npc in area.get('npcs', []):
                     if any(o.get('item') == target for o in npc.get('offers', [])):
                         points.append({'zone': zone, 'x': npc['x'], 'y': npc['y'], 'npc': npc['id']})

@@ -1,5 +1,29 @@
 [
   {
+    "version": "Beta 1.46.0",
+    "date": "2026-11-12",
+    "new": [
+      "A toast names each quest when its objectives are complete. Brief error messages appear above your hero when an action fails.",
+      "Hover over ground loot to see its name, quantity and item details. Travel masters unlock automatically when you reach their city or hub."
+    ],
+    "changed": [
+      "Quest guidance uses the current world, follows walking townsfolk, chooses nearby hunt and gathering targets, and guides an active escort to safety. Story scenes are tracked in order.",
+      "Unfinished quests appear before quests ready to turn in, with completed quest history at the bottom of the journal. Repeatable quest markers are blue on the minimap.",
+      "Greenmeadow oaks, birches, apple trees and willows fade when they hide your hero. Older trees use their full canopy bounds for fading.",
+      "Old Tusker is now a quest for two fighters, with less health and shared kill credit. Hild Ewesward can hire one companion to join you."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.45.1",
+    "date": "2026-11-12",
+    "new": [],
+    "changed": [
+      "Old Tusker is now a quest for two fighters, with less health and shared kill credit. Hild Ewesward can hire one companion to join you."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.45.0",
     "date": "2026-11-12",
     "new": [

@@ -4,7 +4,9 @@
   const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
   const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
   let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false, completedOpen = false;
-  let abandoned = [];
+  let abandoned = [], initialized = false;
+  const guidance = QuestGuidance.create(areas, window.QUEST_SOURCES || {});
+  let groupKey = '', groupList = [];
   const expanded = new Set();
   let abandonConfirm = null, abandonedOpen = false;
   const state = quest => progress.find(p => p.id === quest.id);
@@ -57,90 +59,82 @@
   for (const q of definitions) {
     for(const id of q.givers||[q.npc]){if(!questsByNpc.has(id))questsByNpc.set(id,[]);questsByNpc.get(id).push(q);}
   }
-  const matchesEnemy = (target, kind) => target === kind || target === 'any'
-    || (target === 'slime' && ['green', 'blue', 'pink', 'yellow'].includes(kind));
+  const guidanceContext = () => ({
+    escorts: (window.Field?.remotePlayers || []).filter(p => p.escort?.owner === Online.id).map(p => p.escort),
+    npc: (zone, id) => window.City?.npcsOf?.(zone)?.find(n => n.id === id),
+  });
+  function objectiveGroups(q) {
+    const context = guidanceContext(), counts = state(q)?.counts || [];
+    const key = JSON.stringify([q.id, counts, context.escorts.map(e => e.npc)]);
+    if (key !== groupKey) {
+      groupKey = key; groupList = guidance.groups(q, counts, context); navigationCache.clear();
+    }
+    return groupList;
+  }
+  function reference(zone) {
+    const current = window.Field?.zone || 0, hero = window.Field?.hero;
+    if (hero && current === zone) return hero;
+    const from = areas[current]?.shape?.T, to = areas[zone]?.shape?.T;
+    if (hero && from && to) return { x: hero.x + from[0] - to[0], y: hero.y + from[1] - to[1] };
+    return areas[zone]?.spawn || { x: 0, y: 0 };
+  }
   function mapMarkers(zone) {
-    if (mapCache.has(zone)) return mapCache.get(zone);
-    const area = areas[zone], out = [];
-    if (!area) return out;
-    for (const n of area.npcs || []) {
-      const states = (questsByNpc.get(n.id) || []).map(status);
-      if (arenaGiverIds.has(n.id) && arenaQuests.some(q => status(q) === 'ready')) states.push('ready');
-      const s = states.includes('ready') ? 'ready' : states.includes('available') ? 'available' : null;
-      if (s) out.push({ x: n.x, y: n.y, npc: n.id, state: s, symbol: s === 'ready' ? '?' : '!',
-        color: s === 'ready' ? '#64b5ff' : '#ffdf88', label: `${n.name} · ${words[s]}` });
+    const area = areas[zone]; if (!area) return [];
+    if (!mapCache.has(zone)) {
+      const out = [];
+      for (const n of area.npcs || []) {
+        let offered = (questsByNpc.get(n.id) || []).map(q => ({ q, s: status(q) }));
+        if (arenaGiverIds.has(n.id)) offered = offered.concat(arenaQuests.filter(q => status(q) === 'ready').map(q => ({ q, s: 'ready' })));
+        const s = offered.some(p => p.s === 'ready') ? 'ready' : offered.some(p => p.s === 'available') ? 'available' : null;
+        if (!s) continue;
+        const repeatable = offered.filter(p => p.s === s).every(p => p.q.repeatable);
+        out.push({ x: n.x, y: n.y, npc: n.id, state: s, symbol: s === 'ready' ? '?' : '!', repeatable,
+          color: s === 'ready' || repeatable ? '#64b5ff' : '#ffdf88', label: `${n.name} · ${words[s]}` });
+      }
+      mapCache.set(zone, out);
     }
-    const q = definitions.find(q => q.id === tracked), s = q && status(q);
-    if (s === 'active' || s === 'ready') {
-      const add = (p, label) => {
-        if (!p || out.some(m => m.state === 'tracked' && m.x === p.x && m.y === p.y)) return;
-        out.push({ x: p.x, y: p.y, quest: q.id, state: 'tracked', symbol: '◆', color: '#a6ffcf',
-          label: `Tracked quest · ${q.title} · ${label}` });
-      };
-      if (s === 'ready') for (const n of turnIns(q)) { if (n.zone === zone) add(n, words.ready); }
-      else q.objectives.forEach((o, i) => {
-        if ((state(q)?.counts[i] || 0) >= o.count) return;
-        if (o.kind === 'kill') {
-          // A hub can send you into a neighbouring dungeon. Ordinary "any"/"slime" hunts stay in their own zone.
-          if(q.summonNpc){if(zone===q.summonZone)add((area.npcs||[]).find(n=>n.id===q.summonNpc),o.label);return;}
-          const home = areas[q.zone], local = (home.slimes || []).some(e => matchesEnemy(o.target, e.kind));
-          if (zone !== q.zone && (local || !home.portals?.some(p => p.to === zone))) return;
-          const spawns = (area.slimes || []).filter(e => matchesEnemy(o.target, e.kind) && !e.ambush);
-          if (!spawns.length) return;
-          // Anchor a hunt to a real spawn near its centre, rather than to empty space between packs.
-          const x = spawns.reduce((n, e) => n + e.x, 0) / spawns.length, y = spawns.reduce((n, e) => n + e.y, 0) / spawns.length;
-          add(spawns.reduce((best, e) => Math.hypot(e.x - x, e.y - y) < Math.hypot(best.x - x, best.y - y) ? e : best), o.label);
-        } else if (['visit', 'hold', 'chime', 'memory', 'echo'].includes(o.kind)) {
-          for (const p of area.places || []) if (o.kind === 'chime' ? p.chain === o.target : p.id === o.target) add(p, o.label);
-        } else if (o.kind === 'talk' || o.kind === 'escort' || o.kind === 'handoff') add((area.npcs || []).find(n => n.id === o.target), o.label);
-        else if (o.kind === 'reach') {
-          const name = window.Locale?.translate(o.target) || o.target;
-          if (area.name === name) add(area.spawn, o.label);
-          for (const p of area.portals || []) if (areas[p.to]?.name === name) add(p, o.label);
-        } else if (o.kind === 'bring') {
-          const sources = window.QUEST_SOURCES?.[o.target] || [];
-          if (sources.length) for (const source of sources) { if (source.zone === zone) add(source, o.label); }
-          else add((area.npcs || []).find(n => n.id === q.npc), o.label);
-        } else if (o.kind === 'gauntlet') for (const n of arenaGivers) { if (n.zone === zone) add(n, o.label); }
-      });
+    const context = guidanceContext(), ref = reference(zone);
+    const out = mapCache.get(zone).map(m => ({ ...m, ...(context.npc(zone, m.npc) ? { x: context.npc(zone, m.npc).x, y: context.npc(zone, m.npc).y } : {}) }));
+    const q = byId.get(tracked), s = q && status(q);
+    const add = (p, label) => {
+      if (!p || out.some(m => m.state === 'tracked' && m.x === p.x && m.y === p.y)) return;
+      out.push({ x: p.x, y: p.y, quest: q.id, state: 'tracked', symbol: '◆', color: '#a6ffcf', label: `Tracked quest · ${q.title} · ${label}` });
+    };
+    if (s === 'ready') for (const n of turnIns(q)) { if (n.zone === zone) add(context.npc(zone, n.id) || n, words.ready); }
+    else if (s === 'active') for (const group of objectiveGroups(q)) {
+      add(guidance.nearest(group.candidates, zone, ref.x, ref.y, context), group.label);
     }
-    mapCache.set(zone, out);
     return out;
   }
-  // Build zone routes only when tracking/progress changes; drawing only picks
-  // the nearest cached destination. This never runs walking pathfinding per frame.
+  // Cache zone routes, while selecting the nearest real destination from the hero's current position.
   function navigationTarget(zone, x, y) {
-    if (!tracked || !areas[zone]) return null;
+    const q = byId.get(tracked), s = q && status(q);
+    if (!q || !areas[zone] || !['active', 'ready'].includes(s)) return null;
+    const candidates = s === 'ready' ? turnIns(q).map(n => ({ ...n, npc: n.id })) : objectiveGroups(q).flatMap(g => g.candidates);
+    const local = guidance.nearest(candidates, zone, x, y, guidanceContext());
+    if (local) return { ...local, quest: q.id };
     const cacheKey = `${zone}:${!!(window.Field?.instanceCleared)}`;
     if (!navigationCache.has(cacheKey)) {
-      const goals = new Map();
-      for (let i = 0; i < areas.length; i++) {
-        const markers = mapMarkers(i).filter(m => m.state === 'tracked' && m.quest === tracked);
-        if (markers.length) goals.set(i, markers);
-      }
-      let targets = goals.get(zone) || [];
-      if (!targets.length) {
-        let best = Infinity; targets = [];
-        const usable = (from, portal) => areas[portal.to] && !areas[portal.to].sealedTemplate &&
-          (!portal.after_clear || (from === zone && window.Field?.instanceCleared));
-        for (const exit of areas[zone].portals || []) {
-          if (!usable(zone, exit)) continue;
-          const queue = [[exit.to, 1]], seen = new Set([zone]); let destination = null, hops = Infinity;
-          for (let i = 0; i < queue.length; i++) {
-            const [here, depth] = queue[i];
-            if (seen.has(here) || depth > best) continue;
-            seen.add(here);
-            if (goals.has(here)) { destination = here; hops = depth; break; }
-            for (const portal of areas[here].portals || []) if (usable(here, portal) && !seen.has(portal.to)) queue.push([portal.to, depth+1]);
+      const goals = new Set(candidates.map(p => p.zone)), targets = [];
+      const usable = (from, p) => areas[p.to] && !areas[p.to].sealedTemplate && (!p.after_clear || (from === zone && window.Field?.instanceCleared));
+      let best = Infinity;
+      for (const exit of areas[zone].portals || []) {
+        if (!usable(zone, exit)) continue;
+        const queue = [[exit.to, 1]], seen = new Set([zone]);
+        for (let i = 0; i < queue.length; i++) {
+          const [here, depth] = queue[i];
+          if (seen.has(here) || depth > best) continue;
+          seen.add(here);
+          if (goals.has(here)) {
+            if (depth < best) { best = depth; targets.length = 0; }
+            targets.push({ x: exit.x, y: exit.y, quest: tracked, viaPortal: true, destinationZone: here }); break;
           }
-          if (hops < best) { best = hops; targets = []; }
-          if (destination != null && hops === best) targets.push({ x: exit.x, y: exit.y, quest: tracked, viaPortal: true, destinationZone: destination });
+          for (const p of areas[here].portals || []) if (usable(here, p) && !seen.has(p.to)) queue.push([p.to, depth + 1]);
         }
       }
       navigationCache.set(cacheKey, targets);
     }
-    const targets = navigationCache.get(cacheKey);
-    return targets.reduce((best, target) => !best || Math.hypot(target.x-x, target.y-y) < Math.hypot(best.x-x, best.y-y) ? target : best, null);
+    return navigationCache.get(cacheKey).reduce((best, p) => !best || Math.hypot(p.x-x, p.y-y) < Math.hypot(best.x-x, best.y-y) ? p : best, null);
   }
   function element(tag, text, className) {
     const node = document.createElement(tag); node.textContent = text;
@@ -218,8 +212,8 @@
       return { name: m.name, done, text };
     });
   }
-  function card(quest, atNpc) {
-    const s = status(quest), npc = giver(quest);
+  function card(quest, atNpc, history = false) {
+    const s = history ? 'completed' : status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
     node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
     if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
@@ -333,7 +327,7 @@
   // folded list of the finished ones. Quests you have not taken are found at the people marked with !.
   function renderJournal(active) {
     const zone = window.Field?.zone || 0;
-    const mine = [...active].sort((a, b) => Number(b.id === tracked) - Number(a.id === tracked) || Number(status(b) === 'ready') - Number(status(a) === 'ready') || Number(b.zone === zone) - Number(a.zone === zone));
+    const mine = [...active].sort((a, b) => Number(status(a) === 'ready') - Number(status(b) === 'ready') || Number(b.id === tracked) - Number(a.id === tracked) || Number(b.zone === zone) - Number(a.zone === zone));
     const nodes = mine.map(q => foldedCard(q));
     if (!mine.length) {
       nodes.push(element('p', 'You have no quests in progress. Speak to anyone with a ! over their head to take one.', 'quest-empty'));
@@ -349,26 +343,27 @@
       for (const q of recoverable) folded.append(foldedCard(q));
       nodes.unshift(folded);
     }
-    const done = definitions.filter(q => !q.handoffTo && status(q) === 'completed');
+    const done = definitions.filter(q => !q.handoffTo && (status(q) === 'completed' || state(q)?.claimed && state(q)?.completions > 0));
     if (done.length) {
       const folded = document.createElement('details'); folded.className = 'quest-completed'; folded.open = completedOpen;
       folded.addEventListener('toggle', () => { if (folded.isConnected) completedOpen = folded.open; });
       folded.append(element('summary', `Completed (${done.length})`));
-      for (const q of done) folded.append(foldedCard(q));
+      for (const q of done) folded.append(foldedCard(q, true));
       nodes.push(folded);
     }
     $('quest-list').replaceChildren(...nodes);
   }
-  function foldedCard(quest) {
+  function foldedCard(quest, history = false) {
+    const s = history ? 'completed' : status(quest);
     const node = document.createElement('details'); node.className = 'quest-entry'; node.dataset.quest = quest.id;
     node.open = expanded.has(quest.id);
-    const summary = element('summary', `${status(quest) === 'ready' ? '✓' : '!'} ${quest.title}${status(quest) === 'ready' ? ' · Complete · Ready to turn in' : ''}`);
-    node.dataset.status = status(quest);
+    const summary = element('summary', `${s === 'ready' || s === 'completed' ? '✓' : '!'} ${quest.title}${s === 'ready' ? ' · Complete · Ready to turn in' : ''}`);
+    node.dataset.status = s;
     node.append(summary);
     // Completed histories can be long: render rewards/details only for entries being read.
     const fill = () => {
       if (node.querySelector(':scope > article')) return;
-      const body = card(quest, false); delete body.dataset.quest;
+      const body = card(quest, false, history); delete body.dataset.quest;
       body.querySelector('h4')?.remove(); node.append(body);
     };
     if (node.open) fill();
@@ -443,8 +438,20 @@
       if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
       return done ? { state: 'done', burn: place.burn } : { state: 'none' };
     },
-    reset() { progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; abandonedOpen = false; signature = ''; tracked = null; bells = []; clearGuidance(); close(false); render(); },
-    update(next, dismissed = abandoned) { const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return; progress = next; abandoned = dismissed || []; signature = key; if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null; if (abandonConfirm && !progress.some(p => p.id === abandonConfirm && !p.claimed)) abandonConfirm = null; clearGuidance(); render(); },
+    reset() { initialized = false; groupKey = ''; groupList = []; progress = []; abandoned = []; expanded.clear(); abandonConfirm = null; abandonedOpen = false; signature = ''; tracked = null; bells = []; clearGuidance(); close(false); render(); },
+    update(next, dismissed = abandoned) {
+      const key = `${Field.zone}:` + JSON.stringify([next, dismissed]); if (key === signature) return;
+      if (initialized) for (const p of next) {
+        const q = byId.get(p.id), before = progress.find(old => old.id === p.id);
+        if (!q || q.handoffTo || p.claimed || !q.objectives.every((o, i) => (p.counts[i] || 0) >= o.count)) continue;
+        const wasReady = before && !before.claimed && q.objectives.every((o, i) => (before.counts[i] || 0) >= o.count);
+        if (!wasReady) window.Announce?.show(`Quest completed: ${q.title}`, 'quest');
+      }
+      initialized = true; progress = next; abandoned = dismissed || []; signature = key;
+      if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null;
+      if (abandonConfirm && !progress.some(p => p.id === abandonConfirm && !p.claimed)) abandonConfirm = null;
+      groupKey = ''; clearGuidance(); render();
+    },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
     // Locked and finished quests are hidden, as they are there.
     active(id){const q=definitions.find(q=>q.id===id);return !!q&&status(q)==='active';},
@@ -499,7 +506,7 @@
       for (const s of ['ready', 'available']) {
         const quest = definitions.find(q => (q.npc===id||q.givers?.includes(id)||(s==='ready'&&handInAt(q,id))) && status(q) === s && !q.repeatable)
           || definitions.find(q => (q.npc===id||q.givers?.includes(id)||(s==='ready'&&handInAt(q,id))) && status(q) === s);
-        if (quest) return { symbol: s === 'ready' ? '?' : '!', color: quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
+        if (quest) return { symbol: s === 'ready' ? '?' : '!', color: s === 'ready' || quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
       }
       if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => (o.kind === 'talk' || o.kind === 'escort' || o.kind === 'handoff') && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };
       return { symbol: '', color: '#ffdf88' };

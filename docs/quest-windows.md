@@ -1,5 +1,10 @@
 # Quest rewards and acceptance
 
+**Beta 1.46.0:** unfinished quests precede ready-to-turn-in quests even when a
+ready quest is tracked. Completed history stays last and includes claimed
+repeatable quests. Named objective-completion toasts are described in
+`docs/quest-feedback.md`.
+
 Beta 1.19.0: pressing a window's backdrop invokes its normal close action.
 The shared handler in `settings.js` also covers equipment, skills, social,
 map, bank, settings, keyboard bindings, inspect, trade, rebirth, boss signs,

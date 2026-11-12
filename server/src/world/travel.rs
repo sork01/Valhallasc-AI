@@ -6,6 +6,52 @@ const LEG_COST: u32 = 20;
 const SPEED: f64 = 3.;
 
 impl World {
+    /// Entering a master's own city or camp discovers that stop, without opening a dialogue
+    /// or granting talk-objective credit. Flying over a hub does not count as a visit.
+    pub(super) fn update_spark_discovery(&mut self) {
+        let mut changed = false;
+        for player in self.players.values_mut() {
+            let c = &mut player.character;
+            if c.hp <= 0.
+                || c.spark_travel.is_some()
+                || player.merc.is_some()
+                || player.ambient.is_some()
+            {
+                continue;
+            }
+            let Some(map) = self.maps.get(c.zone) else {
+                continue;
+            };
+            if map.copies > 0 || map.template.is_some() {
+                continue;
+            }
+            let here = c.point();
+            for npc in &map.npcs {
+                let Some(name) = &npc.travel_stop else {
+                    continue;
+                };
+                if c.travel_stops.contains(&npc.id) {
+                    continue;
+                }
+                let at = npc.position_at(self.time);
+                let entered = map
+                    .city
+                    .iter()
+                    .chain(&map.camps)
+                    .any(|hub| hub.contains(here) && hub.contains(at));
+                if entered || here.distance(at) <= 2.8 {
+                    c.travel_stops.push(npc.id.clone());
+                    let _ = player.peer.try_send(json!({"type":"announce","kind":"info",
+                        "text":format!("Discovered {name} for Spark Travel.")}));
+                    changed = true;
+                }
+            }
+        }
+        if changed {
+            self.save();
+        }
+    }
+
     pub(super) fn spark_interact(&mut self, session: u64, npc_id: &str, offer: Option<&str>) {
         let p = &self.players[&session];
         let (zone, npc) = self.travel_master(npc_id).unwrap();
@@ -99,7 +145,7 @@ impl World {
                 let cost = route.as_ref().map(|r| c.spark_fare((r.len() as u32 - 1) * LEG_COST));
                 let stops: Vec<_> = route.iter().flatten().filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
                 let reason = if route.is_none() { "No connected Spark Travel route.".into() }
-                    else if !missing.is_empty() { format!("Talk to the travel master at {} first.", missing.join(", ")) }
+                    else if !missing.is_empty() { format!("Visit {} to discover its travel master first.", missing.join(", ")) }
                     else if c.gold < cost.unwrap_or(0) { "Not enough gold.".into() } else { String::new() };
                 json!({"id":n.id,"name":n.travel_stop,"cost":cost,"stops":stops,"missing":missing,"available":reason.is_empty(),"reason":reason})
             }).collect()
@@ -122,7 +168,7 @@ impl World {
             .ok_or("Choose a connected destination.")?;
         if let Some(id) = stops.iter().find(|id| !c.travel_stops.contains(id)) {
             return Err(format!(
-                "Talk to the travel master at {} first.",
+                "Visit {} to discover its travel master first.",
                 self.travel_master(id)
                     .unwrap()
                     .1
@@ -360,7 +406,7 @@ mod spark_tests {
     }
 
     #[test]
-    fn spark_discovery_requires_living_nearby_talk_and_saves_once() {
+    fn spark_talk_can_still_discover_a_nearby_master_and_saves_once() {
         let (mut w, mut rx, token) = world(Class::Warrior);
         w.interact(1, A, None);
         assert!(w.players[&1].character.travel_stops.is_empty());
@@ -388,6 +434,64 @@ mod spark_tests {
         assert_eq!(third["cost"], 40);
         assert_eq!(third["available"], false);
         assert!(third["reason"].as_str().unwrap().contains("Cinderwatch"));
+    }
+
+    #[test]
+    fn spark_hub_entry_discovers_and_persists_without_talking_or_repeating_the_notice() {
+        let (mut w, mut rx, token) = world(Class::Warrior);
+        let hub = w.maps[0].city.as_ref().unwrap().clone();
+        let point = Point {
+            x: hub.x0 + 1.,
+            y: hub.y0 + 1.,
+        };
+        let master = w.travel_master(A).unwrap().1.position_at(w.time);
+        assert!(point.distance(master) > 2.8);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.zone = 0;
+        c.x = point.x;
+        c.y = point.y;
+        let gold = c.gold;
+        drain(&mut rx);
+        w.update_spark_discovery();
+        w.update_spark_discovery();
+        assert_eq!(w.players[&1].character.travel_stops, [A]);
+        assert_eq!(w.players[&1].character.gold, gold);
+        assert_eq!(w.store.load(&token).unwrap().unwrap().travel_stops, [A]);
+        let packets = drain(&mut rx);
+        assert_eq!(
+            packets.iter().filter(|p| p["type"] == "announce").count(),
+            1
+        );
+        assert!(!packets.iter().any(|p| p["type"] == "dialogue"));
+    }
+
+    #[test]
+    fn spark_hub_entry_requires_a_living_grounded_hero_and_unlocks_only_the_visited_hub() {
+        let (mut w, _, _) = world(Class::Warrior);
+        stand(&mut w, A);
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        w.update_spark_discovery();
+        assert!(w.players[&1].character.travel_stops.is_empty());
+        w.players.get_mut(&1).unwrap().character.hp = 120.;
+        // The ordinary flight path passes over hubs, but must not discover them in transit.
+        w.players.get_mut(&1).unwrap().character.spark_travel = Some(SparkTravel {
+            destination: "Cinderwatch".into(),
+            stops: vec![],
+            points: vec![],
+            next: 0,
+        });
+        w.update_spark_discovery();
+        assert!(w.players[&1].character.travel_stops.is_empty());
+        w.players.get_mut(&1).unwrap().character.spark_travel = None;
+        stand(&mut w, "travel_stonefold");
+        w.update_spark_discovery();
+        assert_eq!(w.players[&1].character.travel_stops, ["travel_stonefold"]);
+        stand(&mut w, "travel_saltby");
+        w.update_spark_discovery();
+        assert_eq!(
+            w.players[&1].character.travel_stops,
+            ["travel_stonefold", "travel_saltby"]
+        );
     }
 
     #[test]

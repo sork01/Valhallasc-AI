@@ -63213,7 +63213,44 @@
       "y": 227,
       "color": "#b9c48a",
       "dialogue": "Thirty years on these Downs and I never lost a ewe to anything but winter. Now something in the Oldgrove has a taste for mutton.",
-      "offers": [],
+      "offers": [
+        {
+          "id": "merc_warrior",
+          "label": "Hire a Warrior mercenary · holds the line",
+          "cost": 250,
+          "merc": "warrior"
+        },
+        {
+          "id": "merc_mage",
+          "label": "Hire a Mage mercenary · casts from range",
+          "cost": 250,
+          "merc": "mage"
+        },
+        {
+          "id": "merc_assassin",
+          "label": "Hire a Assassin mercenary · strikes fast",
+          "cost": 250,
+          "merc": "assassin"
+        },
+        {
+          "id": "merc_priest",
+          "label": "Hire a Priest mercenary · heals the party",
+          "cost": 250,
+          "merc": "priest"
+        },
+        {
+          "id": "merc_hunter",
+          "label": "Hire a Hunter mercenary · shoots from range",
+          "cost": 250,
+          "merc": "hunter"
+        },
+        {
+          "id": "merc_dismiss",
+          "label": "Send my mercenaries away",
+          "cost": 0,
+          "merc": "dismiss"
+        }
+      ],
       "buys": false,
       "look": {
         "skin": "#edc5a1",
@@ -63933,7 +63970,8 @@
       "requires": "fold_strays",
       "repeatable": false,
       "rewardItem": "necklace_moonstone_l5_blue",
-      "recommendedPlayers": 3
+      "group": true,
+      "recommendedPlayers": 2
     },
     {
       "id": "salt_nets",
