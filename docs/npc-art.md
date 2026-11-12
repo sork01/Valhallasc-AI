@@ -1,5 +1,42 @@
 # NPC artwork
 
+## Complete NPC release — Beta 1.45.0
+
+The owner authorized deployment with "finish skill and deploy" after reviewing the
+robe correction. This supersedes the private/pending status in the history below.
+All 588 actual people are assigned: the original 319 identities are preserved,
+148 newly named people use their bespoke designs, and 121 generic roles reuse
+coloured role artwork. Mailboxes, meeting stones and scenery remain excluded.
+
+The library has 318 looks: the original 164, the 148 corrected named designs,
+two corrected native role templates and four treefolk aliases of corrected named
+sources. The latter reuse saved PixelFlow frames exactly, with their own material
+remap tables. All twelve generic Veyrroot/Heartwood roles use bark and leaf colours.
+No new winged cohort, people, dialogue, routes, quests or gameplay data is added.
+
+`assign_all_npc_art.py` preserves original identities, installs all missing
+assignments and validates exact coverage of actual people. The plan generator
+uses the accepted 319-person baseline from git, so the approved plan remains
+reproducible after all assignments are installed. `NpcArt` continues reading
+assignments from `npc.txt` and frames from the matching player-style bank.
+
+The two new role sources and all four aliases pass saved/editor export checks;
+all six reuse looks pass focused atlas/grounding/head tests. The two human role
+sources pass their new 40-pose garment-occlusion check. Existing named-art tests
+and all 164 original atlas hashes remain valid and unchanged.
+`tests/npc-assignment.cjs` asserts full coverage, source/species correctness and
+original identity preservation. `tests/npc-all-scene.cjs` checks one real zone per
+bounded process, including new people through `City.drawNpc` and personal colours.
+All 269 new assignments pass in 22 bounded real-zone runs. Disabling the
+player-style selection fails its check. Scene receipts are in
+`test-results/npc-full-release/scenes/`.
+
+This client-only release updates the displayed version, English release notes and
+Swedish keep-list/catalog together. The map, server binary and saved data remain
+unchanged; no restart or database backup is required. The release record and
+public verification will be added after deployment.
+
+
 ## Missing named people — built 2026-11-12
 
 ### Robe/skirt correction after owner review (2026-11-12)

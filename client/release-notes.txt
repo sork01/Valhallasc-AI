@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.45.0",
+    "date": "2026-11-12",
+    "new": [
+      "Everybody now has artwork in the heroes' style, including the people at outposts, camps, hamlets and travel stops. There are 148 new individual looks for quest givers and other named townsfolk, with their own clothes, hair, hats and tools."
+    ],
+    "changed": [
+      "The remaining traders, guards and travel masters use role-appropriate artwork in their own colours. The people of Heartwood and the Veyrroot Canopy keep their bark and leaves, and the two mermaid gatekeepers keep their tails.",
+      "The new skirts and robes cover the legs while standing, walking and talking, with feet visible below the hem."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.44.0",
     "date": "2026-11-12",
     "new": [],
