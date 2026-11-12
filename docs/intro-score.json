@@ -1,0 +1,30 @@
+{
+  "title": "Beyond the Nine Chains",
+  "project_id": "2930e63d0705e3be",
+  "project_url": "https://gunning.se/dybase2/?project=2930e63d0705e3be",
+  "seconds": 62,
+  "bpm": 96,
+  "bars": 24,
+  "key": "D minor, ending in D major",
+  "mono_rms_db": -23.994,
+  "mono_peak_db": -5.859,
+  "gain_db": 7.042,
+  "asset": "client/assets/music_intro.mp3",
+  "sha256": "3df865bad2042c60d12af0346e407f272878c7bea83441fade44383100af3181",
+  "size": 993133,
+  "renderer": "dybase2 offline string stems",
+  "listening": "Musical and rendered measurements checked; direct listening unavailable.",
+  "instruments": {
+    "Basses": "Sork-60 Juno Strings",
+    "Cellos": "Sork-60 Juno Strings",
+    "Violas": "Sork-60 Juno Strings",
+    "Second violins": "Sork-60 Juno Strings",
+    "First violins": "Sork-60 Juno Strings"
+  },
+  "render_projects": {
+    "low": "093d0fe611c1c057",
+    "high": "328a6460553e761e"
+  },
+  "integrated_lufs": -19.8,
+  "true_peak_dbtp": -4.9
+}

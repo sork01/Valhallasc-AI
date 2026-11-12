@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.47.5",
+    "date": "2026-11-12",
+    "new": [
+      "The opening cutscene has an original string score that builds toward your arrival in Veyrheim."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.47.4",
     "date": "2026-11-12",
     "new": [],

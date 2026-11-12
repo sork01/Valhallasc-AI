@@ -258,13 +258,14 @@
     hush();
     cur = SCENES[id]; curSkip = !!skippable; holdStart = null; lastFrame = performance.now(); startAt = performance.now(); lastCaption = -1; shown++;
     window.CutsceneAudio?.prepareNarration(cur.narration || []);
+    window.CutsceneAudio?.setScore(cur.music || null);
     cur.fired = new Set(); build().hidden = false; box.dataset.scene = id; box.classList.add('on'); caption.textContent = ''; caption.classList.remove('on'); skipHint.hidden = true;
     // The zone change reaches the client before this packet, so the plain "Ascending into the sky" notice may already be up: the scene tells it instead.
     window.ZoneJourney?.clear?.();
     lock(true);
   }
   function finish() {
-    cur = null; curSkip = false; holdStart = null; queue = []; lock(false); hush();
+    cur = null; curSkip = false; holdStart = null; queue = []; lock(false); hush(); window.CutsceneAudio?.setScore(null);
     if (box) { box.classList.remove('on'); box.hidden = true; delete box.dataset.scene; if (caption) caption.textContent = ''; }
   }
   function next() { const e = queue.shift(); if (e) begin(e.id, e.skippable); else finish(); }

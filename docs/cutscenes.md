@@ -90,3 +90,32 @@ why the hero was summoned (owner request 2026-11-10, grill answers in `TODO.md` 
   Owner invoked finish and deploy. The combined Beta 1.47.4 client release verifies all **17** changed public files, both health
   endpoints, and an unchanged PID/executable. Finish receipt: candidate `test-results/mobile-intro-finish-release.json`;
   session record: wiki `10_projects:valhallasc_veyrheim_mobile_intro_20261112`. The server remains at the tested 1.47.2 release.
+
+## Original intro score (Beta 1.47.5)
+
+“Beyond the Nine Chains” is a finite 62-second dybase2 score, project
+`2930e63d0705e3be`: 24 bars of 4/4 at 96 BPM in D minor, resolving to D major
+for the welcome to Veyrheim. Five Sork-60 Juno Strings sections provide basses,
+pulsing cellos, violas and two violin parts. The theme grows at 45 seconds;
+the closing cadence starts at 57.5 seconds beneath the final welcome.
+
+`create_intro_song.sh` creates the editable source through MCP. The five-synth
+export crashed under the shared-host cap; `render_intro_song.sh` renders low/high
+string groups in copies owned by codex, preserving the original five-track source.
+Run it through the same 1536M/no-swap/one-CPU scope as browser tests. Then run
+`python3 scripts/finish_intro_music.py`: sum the sample-aligned stems, high-pass
+at 25 Hz, fade the natural ending and encode 128 kbps at -24 dB mono RMS.
+The local 192 kbps preview stays in `test-results/intro-strings/`; no FileDrop upload.
+Source IDs, export measurements and the asset hash are in `intro-score.json`.
+Direct listening was unavailable; this is a technical delivery without auditory approval.
+
+`music_intro.js` plays once against `Cutscene.state.el`, seeking after download
+or AudioContext resume. `CutsceneAudio.setScore` suppresses title/field/day/night
+music until completion, skip or reset. Music volume is independent of narration's
+effects bus; the score has additional headroom beneath speech. Existing 62-second
+server grace and all seven narration recordings are unchanged. Replay starts a
+new run, and cancelled downloads cannot revive stopped playback.
+
+Focused validation: `tests/intro-music-ui.cjs` through the bounded runner, covering
+actual decoding/playback, narration overlap, sliders/mute, day/night suppression,
+audio resume, restoration, replay, skip, delayed cancellation and a finite ending.

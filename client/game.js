@@ -179,7 +179,7 @@
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
   let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, nornrootMusic = null, skybridgeMusic = null, blackhourMusic = null, longshipMusic = null, emberwakeMusic = null, emberwakeNightMusic = null, musicZone = 0;
   let nightMusic = null, meadowNightMusic = null, cragsNightMusic = null, rimeNightMusic = null, fenNightMusic = null, cityNightMusic = null, wyrdNightMusic = null, skyNightMusic = null, nacreNightMusic = null, astralNightMusic = null, prismNightMusic = null, moonsporeNightMusic = null, asterionNightMusic = null, stormglassNightMusic = null, sunwardNightMusic = null, ribbonwildNightMusic = null, tanglecrownNightMusic = null, veyrrootNightMusic = null, lapisNightMusic = null, frostwakeNightMusic = null, cairnNightMusic = null, yearwheelNightMusic = null, activeNightMusic = null, stormglassMusic = null, activeScore = null, lastNightMix = -1;
-  let raidMusic = null, eldmarrMusic = null, raidFinalFight = false;
+  let raidMusic = null, eldmarrMusic = null, raidFinalFight = false, cutsceneScore = null;
   const nightScores = new Map(); // completed outdoor remixes; other zones use nightMusic
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
@@ -275,14 +275,15 @@
     if (mix <= .001 && activeNightMusic.running) activeNightMusic.stop();
     if (Math.abs(mix - lastNightMix) < .005) return;
     lastNightMix = mix;
-    const volume = save.sound ? taper(save.musicVol) : 0;
+    const volume = save.sound && !cutsceneScore ? taper(save.musicVol) : 0;
     if (activeScore) activeScore.setLevel(volume * (1 - mix), secs);
     activeNightMusic.setLevel(volume * mix, secs);
   }
   setInterval(() => { if (scene === 'game') syncNightMusic(); }, 1000);
   function applyMusicLevel(secs = 1.5) {
-    if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    const volume = save.sound ? taper(save.musicVol) : 0, mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
+    if (cutsceneScore) cutsceneScore.setLevel(save.sound ? .55 * taper(save.musicVol) : 0, secs);
+    if (music) music.setLevel(save.sound && !cutsceneScore ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
+    const volume = save.sound && !cutsceneScore ? taper(save.musicVol) : 0, mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
     for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, stormglassMusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nornrootMusic, skybridgeMusic, blackhourMusic, longshipMusic, emberwakeMusic, raidMusic, eldmarrMusic, ...cathedralMusic]) if (m) m.setLevel(volume * (m === activeScore ? 1 - mix : 1), secs);
     for (const m of [nightMusic, ...nightScores.values()]) if (m) m.setLevel(m === activeNightMusic ? volume * mix : 0, secs);
   }
@@ -1021,7 +1022,20 @@
     source.onended = () => { source.disconnect(); if (narrationSource === source) narrationSource = null; };
     source.start(c.currentTime, offset); return true;
   }
-  window.CutsceneAudio = { play: cutsceneSound, prepareNarration, narrate, stopNarration, get narrating() { return !!narrationSource; } };
+  function setCutsceneScore(url) {
+    if (!cutsceneScore && !url) return;
+    cutsceneScore?.stop(); cutsceneScore = null;
+    if (url) {
+      const c = audio();
+      if (c && window.createCutsceneMusic) {
+        cutsceneScore = window.createCutsceneMusic(c, url, () => window.Cutscene?.state?.el || 0);
+        cutsceneScore.start();
+      }
+    }
+    applyMusicLevel(.35); lastNightMix = -1; syncNightMusic(.35);
+  }
+  window.CutsceneAudio = { play: cutsceneSound, prepareNarration, narrate, stopNarration, setScore: setCutsceneScore,
+    get score() { return cutsceneScore; }, get narrating() { return !!narrationSource; } };
 
   function onField(name, data) {
     if (SFX[name]) SFX[name](data);
