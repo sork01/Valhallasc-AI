@@ -87,6 +87,21 @@ them, checked separately with `PART=errors` (four banner/edge checks in
 `test-results/driver-zx41OL`). The twelve changed public client files match the
 checkout by SHA-256.
 
-These changes are prepared in the checkout. The client is served directly from
-disk; travel auto-discovery and the earlier Old Tusker adjustment require a
-server release. No production restart or database edit is part of this work.
+## Production release
+
+Released **2026-11-12 12:42 CET as Beta 1.46.0**, source `203d2ed7`,
+with the owner's explicit "finish skill and deploy" instruction. The service
+restarted with nobody online. Automatic travel discovery and the two-player
+Old Tusker adjustment are now live, alongside the client changes.
+
+Backup: `deploy/backups/quest-feedback-release-20261112T113457Z`. The prior executable is `valhalla-server.prev`;
+`stopped/valhalla.sqlite` is the consistent database at shutdown. No migration or
+manual database change was required. All 38 character states and the 24 guest
+records are unchanged. Running PID `183593` matches the saved release
+binary; public/bridge health, SQLite `quick_check`, absence of test flags and
+the restart journal pass. All twelve changed public client hashes match.
+
+The release executable also passed a private probe with ambient adventurers:
+31 snapshots in 3,007 ms, every tick gap exactly two, automatic hub discovery
+announced once, and Old Tusker's base health 1,000. No public test character was
+created. Rollback steps and verification receipts are stored with the backup.
