@@ -2,6 +2,36 @@
 
 ## Missing named people — built 2026-11-12
 
+### Robe/skirt correction after owner review (2026-11-12)
+
+The owner found legs visible through skirts and robes, including standing poses.
+The earlier contract/head-socket checks missed garment occlusion. The cause was
+`Ink.plate` using one averaged depth for a tall panel while limbs carry interpolated
+depth and a radius bias. Garments now use fitted depth planes. Closed skirts also
+clip the separate leg/boot layer to their projected coverage, keeping hands and
+props in front and visible legs below the hem. Treefolk root toes respect the
+same cloth coverage.
+
+All 148 named editor sources were corrected and re-exported; all 2,960 saved
+frames match their PNGs. `tests/npc-skirt-occlusion.py` compares each exported
+pose against the same pose with legs removed. Removing legs changes **zero**
+pixels inside the eroded garment coverage in all 2,920 poses of the 146 designs
+with legs; every design still has visible leg pixels outside the garment. The
+old flat-depth/unclipped rendering fails all 20 Hild poses, including every idle
+frame. The two mermaids have no legs. All 148 designs also pass the focused art
+checks and all 2,960 production-browser poses again, with no browser errors.
+
+Corrected standing and walking comparisons were visually inspected. All 24
+previous review pictures were replaced in FileDrop and two comparisons added:
+[Standing before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-npc-named-robe-fix-before-after.png),
+[Walking before/after](https://gunning.se/filedrop/api.php?action=download&file=valhallasc-npc-named-robe-fix-walk.gif).
+The 26 files total 2,154,397 bytes; stored hashes, metadata, dimensions and frame
+counts are verified. The pre-correction atlases, editor packets and pictures are
+retained in `/media/raid/valhallasc-data/npc-named-robes-before-20261112`.
+The original 164 designs and live assignments remain unchanged; this corrects
+the private named-NPC candidate. It is not deployed.
+
+
 148 new bespoke designs are complete on `feat/npc-named-designs`, in
 `/media/raid/valhallasc-data/npc-named-work`. They cover 134 previously unassigned
 quest givers and 14 individually characterised residents, including Halvard,
@@ -50,8 +80,9 @@ Local review: `scripts/npc_named_review.py` writes
 sheet have been visually inspected. The art advisor reviewed the initial
 approach and prototypes; near-duplicate outlines and Kessa's drum were corrected
 before final verification. Generic assignments, in-zone acceptance and release
-remain separate tasks. The owner requested FileDrop delivery on 2026-11-12: all 24 review files
-(roster, highlight animation and 22 zone sheets; 1,887,015 bytes) are uploaded,
+remain separate tasks. The owner requested FileDrop delivery on 2026-11-12: the corrected 26 review files
+(roster, highlight animation, 22 zone sheets and two robe-fix comparisons;
+2,154,397 bytes) are uploaded,
 with stored SHA-256, byte lengths, MIME metadata, dimensions and frame counts
 verified. Receipt: `test-results/npc-named/filedrop-receipt.json`. Downloads use
 the normal FileDrop login. Live artwork and assignments remain unchanged.
