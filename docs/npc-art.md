@@ -2,6 +2,10 @@
 
 ## Complete NPC release — Beta 1.45.0
 
+**Live 2026-11-12**, merge `3b732272`, source `9181d586`. All 588 people are
+assigned and public assets are verified. Older private/pending notes below are
+historical and superseded by this release.
+
 The owner authorized deployment with "finish skill and deploy" after reviewing the
 robe correction. This supersedes the private/pending status in the history below.
 All 588 actual people are assigned: the original 319 identities are preserved,
@@ -33,8 +37,21 @@ player-style selection fails its check. Scene receipts are in
 
 This client-only release updates the displayed version, English release notes and
 Swedish keep-list/catalog together. The map, server binary and saved data remain
-unchanged; no restart or database backup is required. The release record and
-public verification will be added after deployment.
+unchanged; no restart or database backup was required. All 158 changed public
+client files plus 168 preserved files match local SHA-256 values. Public and
+bridge health report OK; PID 3337765 and the executable hash are unchanged.
+The public manifests contain 588 assignments and 318 looks. Receipt:
+`test-results/npc-full-release/public-release.json` in the source worktree.
+
+Git retains the exact prior client. This client-only reverse patch passed its
+no-write check and restores this release without touching saved data:
+
+```sh
+git diff --binary 3b732272^1 3b732272 -- client scripts/sv-keep.txt | git apply --reverse
+```
+
+Add `--check` to `git apply` for a dry run. Reconcile tracked rollback changes
+before further releases. Existing art/editor snapshots remain available.
 
 
 ## Missing named people — built 2026-11-12
