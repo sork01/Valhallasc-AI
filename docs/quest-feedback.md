@@ -17,6 +17,8 @@ toast, identify ground loot on hover, correct all quest tracking, show brief
 errors above the hero, make repeatable minimap quests blue, fade the missing
 Greenmeadow trees, and discover travel stops on reaching their hub.
 
+**Beta 1.47.2:** completion banners now have a sound-setting-aware chime; bag-space refusals, including NPC quest rewards and refused ground pickups, use the top error stack. Details: [todo-feedback-hats.md](todo-feedback-hats.md).
+
 ## Journal and completion
 
 The journal lists unfinished objectives first, then quests ready to turn in,

@@ -496,3 +496,77 @@ fn mail_reopen_database_after_send_and_claim_preserves_receipts() {
     drop(store);
     std::fs::remove_file(path).unwrap();
 }
+
+#[test]
+fn dungeon_award_mail_persists_exact_bound_copy_and_receipt_after_collection() {
+    let path = std::env::temp_dir().join(format!(
+        "valhallasc-roll-mail-{}.sqlite",
+        uuid::Uuid::new_v4()
+    ));
+    let mut store = Store::open(&path).unwrap();
+    let (mut c, token) = store
+        .create(Look::default(), Point { x: 36., y: 83. })
+        .unwrap();
+    let base = ITEMS
+        .iter()
+        .find(|i| is_gear(i) && i.class.is_some() && !i.starter)
+        .unwrap();
+    let mut gear = GearInstance::new(777, base);
+    gear.rank = 3;
+    gear.wear = 40;
+    gear.attack += 7.;
+    gear.rolled_stats.strength = 9;
+    gear.open_trade_window(vec!["other-voter".into()], unix_now() as u64);
+    for i in ITEMS.iter().filter(|i| i.kind == "material") {
+        if c.bag_used() >= c.bag_capacity() {
+            break;
+        }
+        c.add_item(&i.id, 1);
+    }
+    c.materialize_gear_instances();
+    store.save_many([&c].into_iter()).unwrap();
+    store
+        .mail_roll_award(&c.id, &c.look.name, "award-receipt", &base.id, Some(&gear))
+        .unwrap();
+    store
+        .mail_roll_award(&c.id, &c.look.name, "award-receipt", &base.id, Some(&gear))
+        .unwrap();
+    assert_eq!(mail_count(&store), 1);
+    assert_eq!(
+        store.mail(&c, Request::Open).unwrap().1["letters"][0]["systemAward"],
+        true
+    );
+    let id = store.mail(&c, Request::Open).unwrap().1["letters"][0]["id"]
+        .as_i64()
+        .unwrap();
+    let before = serde_json::to_value(&c).unwrap();
+    assert!(store.mail(&c, Request::Collect { id }).is_err());
+    assert_eq!(serde_json::to_value(held(&store, &token)).unwrap(), before);
+    assert!(
+        store.mail(&c, Request::Return { id }).is_err(),
+        "system award cannot be returned"
+    );
+    c.inventory
+        .retain(|s| item(&s.item).is_none_or(|i| i.kind != "material"));
+    store.save_many([&c].into_iter()).unwrap();
+    drop(store);
+    let store = Store::open(&path).unwrap();
+    let c = held(&store, &token);
+    let (c, _) = store.mail(&c, Request::Collect { id }).unwrap();
+    let mut expected = gear.clone();
+    let received = c.gear_instances.iter().find(|g| g.item == base.id).unwrap();
+    expected.id = received.id;
+    assert_eq!(received, &expected);
+    assert_eq!(c.quantity(&base.id), 1);
+    let before = serde_json::to_value(&c).unwrap();
+    let (c, _) = store.mail(&c, Request::Collect { id }).unwrap();
+    assert_eq!(serde_json::to_value(&c).unwrap(), before);
+    let (c, _) = store.mail(&c, Request::Delete { id }).unwrap();
+    store
+        .mail_roll_award(&c.id, &c.look.name, "award-receipt", &base.id, Some(&gear))
+        .unwrap();
+    assert_eq!(mail_count(&store), 1);
+    assert_eq!(store.mail_unread(&c.id).unwrap(), 0);
+    drop(store);
+    std::fs::remove_file(path).unwrap();
+}

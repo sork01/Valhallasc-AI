@@ -1,4 +1,5 @@
 {
+  "Your bags are full. {0} was sent to your mailbox.": "Dina väskor är fulla. {0} skickades till din brevlåda.",
   "{0} strength": "{0} styrka",
   "{0} agility": "{0} smidighet",
   "{0} intellect": "{0} intelligens",

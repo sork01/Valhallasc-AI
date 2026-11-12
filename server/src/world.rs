@@ -6369,7 +6369,7 @@ fn quest_action_with_choice(
             }
             for id in quest.reward_item.as_deref().into_iter().chain(chosen) {
                 if !next.can_collect(id) {
-                    return refused("Your bags are full. Make room for the quest reward.");
+                    return refused("Insufficient bag space");
                 }
                 next.add_item(id, 1);
             }
@@ -6857,6 +6857,73 @@ mod tests {
     }
 
     #[test]
+    fn quest_bag_space_refusal_is_atomic_for_handins_and_multiple_rewards() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let mut q = w.maps[1]
+            .quests
+            .iter()
+            .find(|q| q.id == "crags_cinderlord")
+            .unwrap()
+            .clone();
+        let rewards: Vec<String> = ITEMS
+            .iter()
+            .filter(|i| is_gear(i) && !i.starter && i.class == Some(Class::Warrior))
+            .take(2)
+            .map(|i| i.id.clone())
+            .collect();
+        q.requires = None;
+        q.objectives = vec![QuestObjective {
+            kind: "bring".into(),
+            target: "slime_gel".into(),
+            count: 1,
+        }];
+        q.reward_item = Some(rewards[0].clone());
+        q.reward_choices
+            .insert("warrior".into(), vec![rewards[1].clone()]);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.quests.push(QuestProgress {
+            id: q.id.clone(),
+            counts: vec![1],
+            claimed: false,
+            completions: 0,
+        });
+        c.add_item("slime_gel", 1);
+        for i in ITEMS.iter().filter(|i| i.kind == "material") {
+            if c.bag_used() >= c.bag_capacity() {
+                break;
+            }
+            if c.quantity(&i.id) == 0 {
+                c.add_item(&i.id, 1);
+            }
+        }
+        let before = serde_json::to_value(&*c).unwrap();
+        let refusal = quest_action_with_choice(c, &q, "claim", Some(&rewards[1]));
+        assert_eq!(refusal.0, "Insufficient bag space");
+        assert!(!refusal.2);
+        assert_eq!(
+            serde_json::to_value(&*c).unwrap(),
+            before,
+            "no XP, gold, hand-in, item or quest-state changes"
+        );
+        let free = c
+            .inventory
+            .iter()
+            .find(|s| s.item != "slime_gel" && item(&s.item).unwrap().kind == "material")
+            .unwrap()
+            .item
+            .clone();
+        c.inventory.retain(|s| s.item != free);
+        assert!(quest_action_with_choice(c, &q, "claim", Some(&rewards[1])).2);
+        assert_eq!(c.quantity("slime_gel"), 0);
+        assert_eq!(c.quantity(&rewards[0]), 1);
+        assert_eq!(c.quantity(&rewards[1]), 1);
+        let before = serde_json::to_value(&*c).unwrap();
+        assert!(!quest_action_with_choice(c, &q, "claim", Some(&rewards[1])).2);
+        assert_eq!(serde_json::to_value(&*c).unwrap(), before);
+    }
+
+    #[test]
     fn cinderlord_gear_reward_checks_capacity_and_is_saved_once() {
         let mut w = world();
         let (tx, _rx) = mpsc::channel(4096);
@@ -6886,7 +6953,7 @@ mod tests {
         }
         assert_eq!(c.bag_used(), c.bag_capacity());
         let before = serde_json::to_value(&*c).unwrap();
-        assert!(quest_action(c, &q, "claim").0.contains("bags are full"));
+        assert!(quest_action(c, &q, "claim").0 == "Insufficient bag space");
         assert_eq!(serde_json::to_value(&*c).unwrap(), before);
         let free = c
             .inventory

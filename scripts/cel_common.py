@@ -555,7 +555,13 @@ class Sheet:
                             f'Three PixelFlow sprites per clip and facing ({self.pixel}<clip>_<facing>_{"|".join(self.groups)}). '
                             'ref_body layers are read-only context. build --replace discards edits.'),
                 **self.meta}
-        (ASSETS / f'{self.files}_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
+        metadata = ASSETS / f'{self.files}_sprites.txt'
+        # Head attachment axes belong to the rig, independent of saved colour edits.
+        # Re-export them with headgear_poses.py whenever pose geometry changes.
+        previous = json.loads(metadata.read_text()) if metadata.exists() else {}
+        if 'headFrames' in previous:
+            meta['headFrames'] = previous['headFrames']
+        metadata.write_text(json.dumps(meta, indent=2) + '\n')
         print('exported', len(parts), 'parts and depth maps', size, flush=True)
 
     def cli(self):

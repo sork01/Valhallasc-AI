@@ -31,6 +31,9 @@ pub(super) type Reward = (
 
 pub(super) struct Roll {
     id: u64,
+    receipt: String,
+    result: Option<(String, String)>,
+    mail_recipient: Option<(String, String)>,
     pub(super) item: String,
     gear: Option<GearInstance>,
     pub(super) zone: usize,
@@ -96,7 +99,9 @@ impl World {
             && self.time - p.bag_notice_at >= 5.
         {
             p.bag_notice_at = self.time;
-            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+            let _ = p
+                .peer
+                .try_send(json!({"type":"notice","ok":false,"text":text}));
         }
     }
 
@@ -267,6 +272,9 @@ impl World {
         }
         self.rolls.push(Roll {
             id,
+            receipt: uuid::Uuid::new_v4().to_string(),
+            result: None,
+            mail_recipient: None,
             item: item_id.into(),
             gear,
             zone,
@@ -462,16 +470,17 @@ impl World {
         let (done, open): (Vec<Roll>, Vec<Roll>) =
             std::mem::take(&mut self.rolls).into_iter().partition(|r| {
                 r.expires <= now
-                    || r.votes
-                        .iter()
-                        .all(|(who, vote)| vote.is_some() || !online.contains(who))
+                    || (r.result.is_none()
+                        && r.votes
+                            .iter()
+                            .all(|(who, vote)| vote.is_some() || !online.contains(who)))
             });
         self.rolls = open;
         for roll in done {
             self.finish_roll(roll);
         }
     }
-    fn finish_roll(&mut self, roll: Roll) {
+    fn choose_roll(&mut self, roll: &Roll) -> Option<(String, String)> {
         let name_of = |w: &World, id: &str| {
             w.players
                 .values()
@@ -532,10 +541,19 @@ impl World {
                         id.clone(),
                         format!("Everyone passed on {item_name}: {list}. {name} gets it."),
                     ),
-                    None => return,
+                    None => return None,
                 }
             }
         };
+        Some((recipient, text))
+    }
+    fn finish_roll(&mut self, mut roll: Roll) {
+        let Some((recipient, text)) = roll.result.clone().or_else(|| self.choose_roll(&roll))
+        else {
+            return;
+        };
+        roll.result = Some((recipient.clone(), text.clone()));
+        let item_name = item(&roll.item).map_or("a piece of gear", |i| i.name.as_str());
         let keeps = self.merc_id(&recipient);
         let text = if keeps {
             format!("{text} (A mercenary has no bags, so it keeps the piece.)")
@@ -546,20 +564,13 @@ impl World {
         let window = !keeps && item(&roll.item).is_some_and(|i| is_gear(i) && i.class.is_some());
         let hand_off =
             format!("{item_name} can be handed to the other players of this roll for two hours.");
-        for (who, ..) in &rolled {
-            if let Some(p) = self.players.values().find(|p| p.character.id == *who) {
-                let _ = p
-                    .peer
-                    .try_send(json!({"type":"roll","op":"end","id":roll.id}));
-                let _ = p.peer.try_send(json!({"type":"system","text":text}));
-                if window {
-                    let _ = p.peer.try_send(json!({"type":"system","text":hand_off}));
-                }
-            }
-        }
+
         if !keeps {
-            let mut gear = roll.gear;
-            if window && let Some(base) = item(&roll.item) {
+            let mut gear = roll.gear.clone();
+            if window
+                && roll.mail_recipient.is_none()
+                && let Some(base) = item(&roll.item)
+            {
                 let voters = roll
                     .votes
                     .keys()
@@ -570,11 +581,51 @@ impl World {
                 copy.open_trade_window(voters, unix_now());
                 gear = Some(copy);
             }
-            self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
-            if let Some(copy) = &gear {
-                self.drops.last_mut().unwrap().col = rarity_color(&copy.rarity);
+            let player = self.players.values().find(|p| p.character.id == recipient);
+            if roll.mail_recipient.is_none()
+                && self.is_instance(roll.zone)
+                && let Some(p) = player.filter(|p| !p.character.can_collect(&roll.item))
+            {
+                roll.mail_recipient = Some((recipient.clone(), p.character.look.name.clone()));
             }
-            self.drops.last_mut().unwrap().gear = gear;
+            if let Some((id, name)) = &roll.mail_recipient {
+                if let Err(error) =
+                    self.store
+                        .mail_roll_award(id, name, &roll.receipt, &roll.item, gear.as_ref())
+                {
+                    tracing::error!(%error, roll = roll.id, "Retrying dungeon loot mail");
+                    roll.gear = gear;
+                    roll.expires = self.time + 5.;
+                    self.rolls.push(roll);
+                    return;
+                }
+                if let Ok(count) = self.store.mail_unread(&recipient) {
+                    self.mail_unread.insert(recipient.clone(), count);
+                    if let Some(p) = player {
+                        let _ = p.peer.try_send(json!({"type":"mail_unread","count":count}));
+                    }
+                }
+                if let Some(p) = player {
+                    let _ = p.peer.try_send(json!({"type":"system","text":format!("Your bags are full. {item_name} was sent to your mailbox.")}));
+                }
+            } else {
+                self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
+                if let Some(copy) = &gear {
+                    self.drops.last_mut().unwrap().col = rarity_color(&copy.rarity);
+                }
+                self.drops.last_mut().unwrap().gear = gear;
+            }
+        }
+        for who in roll.votes.keys() {
+            if let Some(p) = self.players.values().find(|p| p.character.id == *who) {
+                let _ = p
+                    .peer
+                    .try_send(json!({"type":"roll","op":"end","id":roll.id}));
+                let _ = p.peer.try_send(json!({"type":"system","text":text}));
+                if window {
+                    let _ = p.peer.try_send(json!({"type":"system","text":hand_off}));
+                }
+            }
         }
     }
 }
@@ -664,6 +715,76 @@ mod tests {
             .expect("a roll start")["id"]
             .as_u64()
             .unwrap()
+    }
+
+    #[test]
+    fn dungeon_roll_full_bag_mails_once_and_retries_same_winner_after_save_failure() {
+        for fail in [false, true] {
+            let mut w = world();
+            let mut who = party(&mut w, &["Ann", "Bob"]);
+            let zone = w.instances[0].zone;
+            for p in w.players.values_mut() {
+                p.character.zone = zone;
+            }
+            let at = spot(&w);
+            let piece = green_for(Class::Mage);
+            let mut copy = GearInstance::new(0, piece);
+            copy.rank = 2;
+            copy.wear = 30;
+            copy.attack += 11.;
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            for item in ITEMS.iter().filter(|i| i.kind == "material") {
+                if c.bag_used() >= c.bag_capacity() {
+                    break;
+                }
+                c.add_item(&item.id, 1);
+            }
+            assert!(!c.can_collect(&piece.id));
+            w.loot_drop_with_gear(&who[0].1, zone, at, &piece.id, Some(copy.clone()));
+            let id = roll_id(&heard(&mut who[0].2));
+            vote(&mut w, &who[0], id, RollChoice::Greed);
+            vote(&mut w, &who[1], id, RollChoice::Need);
+            if fail {
+                w.store.conn().execute_batch("CREATE TRIGGER fail_award BEFORE INSERT ON mail BEGIN SELECT RAISE(ABORT,'injected failure'); END;").unwrap();
+            }
+            w.update_rolls();
+            if fail {
+                assert_eq!(w.rolls.len(), 1);
+                assert_eq!(w.rolls[0].result.as_ref().unwrap().0, who[1].1);
+                w.update_rolls();
+                assert_eq!(w.rolls.len(), 1, "wait before retrying");
+                w.players.remove(&2); // A disconnect must not lose or reroll the retained award.
+                w.store
+                    .conn()
+                    .execute_batch("DROP TRIGGER fail_award")
+                    .unwrap();
+                w.time += 5.;
+                w.update_rolls();
+            }
+            assert!(w.rolls.is_empty());
+            assert!(w.drops.is_empty(), "mail replaces the ground award");
+            let (recipient, contents): (String, String) = w
+                .store
+                .conn()
+                .query_row("SELECT recipient,contents FROM mail", [], |r| {
+                    Ok((r.get(0)?, r.get(1)?))
+                })
+                .unwrap();
+            assert_eq!(recipient, who[1].1);
+            let contents: Value = serde_json::from_str(&contents).unwrap();
+            let awarded: GearInstance =
+                serde_json::from_value(contents["gear"][0].clone()).unwrap();
+            copy.open_trade_window(vec![who[0].1.clone()], unix_now());
+            copy.trade_until = awarded.trade_until;
+            assert_eq!(awarded, copy);
+            w.update_rolls();
+            let count: u32 = w
+                .store
+                .conn()
+                .query_row("SELECT count(*) FROM mail", [], |r| r.get(0))
+                .unwrap();
+            assert_eq!(count, 1);
+        }
     }
 
     #[test]

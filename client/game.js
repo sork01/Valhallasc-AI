@@ -932,6 +932,18 @@
     }
   }
   window.AchievementAudio = { play: achievementSound };
+  window.QuestAudio = { play() {
+    if (!save.sound) return;
+    const c = audio(); if (!c || c.state !== 'running') return;
+    const now = c.currentTime, bus = sfxOut(c);
+    for (const [frequency, delay] of [[1046.5, 0], [1568, .12]]) {
+      const oscillator = c.createOscillator(), gain = c.createGain(), start = now + delay;
+      oscillator.type = 'sine'; oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0, start); gain.gain.linearRampToValueAtTime(.09, start + .006);
+      gain.gain.exponentialRampToValueAtTime(.0001, start + .48);
+      oscillator.connect(gain).connect(bus); oscillator.start(start); oscillator.stop(start + .5);
+    }
+  } };
   // Sounds of the crossing cutscenes (client/cutscene.js), synthesised and routed through the effect bus like every other effect.
   function cutsceneSound(kind, delay = 0) {
     if (!save.sound) return;

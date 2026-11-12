@@ -51,6 +51,8 @@ struct Contents {
     gold: u32,
     items: Vec<Attachment>,
     gear: Vec<GearInstance>,
+    #[serde(default)]
+    system_award: bool,
 }
 impl Contents {
     fn pending(&self) -> bool {
@@ -180,7 +182,9 @@ fn receive(c: &mut Character, contents: &Contents) -> Result<(), String> {
             .next_gear_id
             .checked_add(1)
             .ok_or("That gear copy cannot be collected yet.")?;
-        g.clear_trade_window();
+        if !contents.system_award {
+            g.clear_trade_window();
+        }
         c.gear_instances.push(g);
     }
     if c.bag_used() > c.bag_capacity() {
@@ -189,6 +193,33 @@ fn receive(c: &mut Character, contents: &Contents) -> Result<(), String> {
     Ok(())
 }
 impl Store {
+    /// Server awards bypass player-mail restrictions and caps. The permanent receipt
+    /// also survives collection/deletion, so retrying cannot create another attachment.
+    pub(crate) fn mail_roll_award(
+        &self,
+        recipient: &str,
+        name: &str,
+        receipt: &str,
+        id: &str,
+        gear: Option<&GearInstance>,
+    ) -> Result<(), String> {
+        let contents = Contents {
+            gold: 0,
+            items: vec![Attachment {
+                item: id.into(),
+                quantity: 1,
+                copy: gear.map(|g| g.id),
+            }],
+            gear: gear.cloned().into_iter().collect(),
+            system_award: true,
+        };
+        let mut db = self.conn();
+        let tx = db.transaction().map_err(storage)?;
+        tx.execute("INSERT OR IGNORE INTO mail(sender,recipient,sender_name,recipient_name,request,subject,body,contents,created,returned) VALUES('@dungeon-loot',?1,'Dungeon loot',?2,?3,'Dungeon loot award','Your bags were full. Your won item is enclosed.',?4,?5,1)",
+            params![recipient, name, receipt, serde_json::to_string(&contents).map_err(storage)?, unix_now()]).map_err(storage)?;
+        tx.commit().map_err(storage)?;
+        Ok(())
+    }
     pub fn mail_unread(&self, id: &str) -> rusqlite::Result<u32> {
         self.conn().query_row(
             "SELECT count(*) FROM mail WHERE recipient=?1 AND deleted=0 AND is_read=0",
@@ -361,8 +392,8 @@ impl Store {
         {
             return Err("The character is unavailable. Nothing was moved.".into());
         }
-        let letters: Vec<Value> = tx.prepare("SELECT id,sender_name,recipient_name,subject,body,contents,created,is_read,returned FROM mail WHERE recipient=?1 AND deleted=0 ORDER BY id DESC").map_err(storage)?
-            .query_map([&c.id], |r| Ok(json!({"id":r.get::<_,i64>(0)?,"sender":r.get::<_,String>(1)?,"recipient":r.get::<_,String>(2)?,"subject":r.get::<_,String>(3)?,"body":r.get::<_,String>(4)?,"contents":serde_json::from_str::<Value>(&r.get::<_,String>(5)?).unwrap_or(Value::Null),"created":r.get::<_,i64>(6)?,"read":r.get::<_,bool>(7)?,"returned":r.get::<_,bool>(8)?}))).map_err(storage)?.collect::<Result<_,_>>().map_err(storage)?;
+        let letters: Vec<Value> = tx.prepare("SELECT id,sender_name,recipient_name,subject,body,contents,created,is_read,returned,sender='@dungeon-loot' FROM mail WHERE recipient=?1 AND deleted=0 ORDER BY id DESC").map_err(storage)?
+            .query_map([&c.id], |r| Ok(json!({"id":r.get::<_,i64>(0)?,"sender":r.get::<_,String>(1)?,"recipient":r.get::<_,String>(2)?,"subject":r.get::<_,String>(3)?,"body":r.get::<_,String>(4)?,"contents":serde_json::from_str::<Value>(&r.get::<_,String>(5)?).unwrap_or(Value::Null),"created":r.get::<_,i64>(6)?,"read":r.get::<_,bool>(7)?,"returned":r.get::<_,bool>(8)?,"systemAward":r.get::<_,bool>(9)?}))).map_err(storage)?.collect::<Result<_,_>>().map_err(storage)?;
         tx.commit().map_err(storage)?;
         let packet = json!({"type":"mail","ok":true,"notice":notice,"letters":letters,"found":found,"sent":sent,"choices":choices(&c),"gold":c.gold,"inventory":c.inventory,"gearInstances":c.gear_instances,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity()});
         Ok((c, packet))

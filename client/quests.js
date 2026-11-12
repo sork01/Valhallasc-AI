@@ -454,7 +454,7 @@
         const q = byId.get(p.id), before = progress.find(old => old.id === p.id);
         if (!q || q.handoffTo || p.claimed || !q.objectives.every((o, i) => (p.counts[i] || 0) >= o.count)) continue;
         const wasReady = before && !before.claimed && q.objectives.every((o, i) => (before.counts[i] || 0) >= o.count);
-        if (!wasReady) window.Announce?.show(`Quest completed: ${q.title}`, 'quest');
+        if (!wasReady) { window.Announce?.show(`Quest completed: ${q.title}`, 'quest'); window.QuestAudio?.play(); }
       }
       initialized = true; progress = next; abandoned = dismissed || []; signature = key;
       if (tracked && !progress.some(p => p.id === tracked && !p.claimed)) tracked = null;

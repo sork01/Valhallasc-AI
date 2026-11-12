@@ -21,6 +21,11 @@
   let renamePending=false;
   let connected = false, id = null, initialEmptySlots = [], busySince = null;
   const $ = name => document.getElementById(name);
+  function serviceError(packet) {
+    if ((packet.ok === false || packet.type === 'dialogue') && /bag.*(?:full|space|room)|inventory.*(?:full|space)/i.test(packet.notice || '')) {
+      window.Field?.error(packet.notice);
+    }
+  }
   function status(text, ready) {
     $('network-status').textContent = text;
     $('network-status').dataset.state = ready ? 'online' : 'offline';
@@ -140,7 +145,7 @@
           break;
         }
         case 'event': window.SystemLog?.event(packet, id); callbacks.onEvent?.(packet); break;
-        case 'dialogue': window.City?.dialogue(packet); break;
+        case 'dialogue': serviceError(packet); window.City?.dialogue(packet); break;
         case 'chat': window.Field?.bubble(packet.id, packet.text, packet.channel === 'party'); log(packet.text, packet.channel === 'party' ? `[Party] ${packet.name}` : packet.name, packet.channel); break;
         case 'npc_say': {      // a townsperson speaks to this hero (the dock's skipper greets a new arrival)
           const npc = window.City?.npcs?.find(n => n.id === packet.npc), text = window.Locale?.translate(packet.text) || packet.text;
@@ -152,12 +157,12 @@
         case 'notice': window.Achievements?.onNotice(packet); if (packet.ok === false) window.Field?.error(packet.text); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;
-        case 'trade': window.Trade?.onPacket(packet); break;
+        case 'trade': serviceError(packet); window.Trade?.onPacket(packet); break;
         case 'inspect': window.Inspect?.onPacket(packet); break;
-        case 'shop': window.Shop?.onPacket(packet); break;
-        case 'mail': window.Mail?.onPacket(packet); break;
+        case 'shop': serviceError(packet); window.Shop?.onPacket(packet); break;
+        case 'mail': serviceError(packet); window.Mail?.onPacket(packet); break;
         case 'mail_unread': window.Mail?.onUnread(packet.count); break;
-        case 'bank': window.Bank?.onPacket(packet); break;
+        case 'bank': serviceError(packet); window.Bank?.onPacket(packet); break;
         case 'sign': window.BossSign?.onPacket(packet); break;
         case 'achievements': window.Achievements?.receive(packet); break;
         case 'rebirthPreview': window.Rebirth?.onPreview(packet); break;

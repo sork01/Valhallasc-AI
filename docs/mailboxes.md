@@ -28,3 +28,7 @@ Protocol examples (every action rechecks the mailbox):
 ```
 
 `read`, `return` and `delete` also name the inbox letter's numeric `id`. Gear attachments include `copy` and quantity 1. Replies are `type: mail`, the mailbox `npc`, `ok` and localized `notice`; success also supplies the authoritative inbox, gold/inventory/copy state and attachment choices with refusal reasons. `found` is only an exact public character name; `sent` is a persisted send receipt ID. `mail_unread` updates the owner's badge; the owner also receives `mailUnread` in their private snapshot. Other viewers do not receive this count.
+
+## Dungeon roll awards (Beta 1.47.2)
+
+Full-bag dungeon roll wins use server-generated mail, including bound class gear. System delivery bypasses player-mail caps and restrictions, keeps the exact rolled copy and its party hand-off window, and uses a permanent receipt to prevent duplicates. These letters cannot be returned. Ordinary player mail retains all its existing eligibility and trade-window rules. Details and focused validation: [todo-feedback-hats.md](todo-feedback-hats.md).

@@ -1,5 +1,18 @@
 [
   {
+    "version": "Beta 1.47.2",
+    "date": "2026-11-12",
+    "new": [
+      "A small chime plays when a quest-completed banner appears.",
+      "Dungeon loot-roll wins go to your mailbox when your bags have no room."
+    ],
+    "changed": [
+      "Bag-space refusals appear in the red error stack, including quest rewards and ground loot.",
+      "Hats follow the head when facing southeast, southwest, east and west."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.47.1",
     "date": "2026-11-12",
     "new": [],

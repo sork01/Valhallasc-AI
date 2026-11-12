@@ -8,9 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
-- [ ] `BAG-FULL-ERROR` — **Owner requests, 2026-11-12:** When there is no space in the bag, show the message in the red error stack at the top of the screen. Cover inventory-full refusals, including collecting loot. **Quest rewards:** block turning in a quest whose item reward cannot fit, and show “Insufficient bag space” in the top error stack. Keep the quest unclaimed and grant no partial rewards or consume hand-in items on refusal.
-- [ ] `DUNGEON-ROLL-MAIL` — **Owner request, 2026-11-12:** If a player wins a dungeon loot roll and has no bag space, send the won item to their mailbox. Preserve the exact awarded item and its properties, and ensure the award is delivered once.
-- [ ] `HAT-DIRECTION-FIX` — **Owner request, 2026-11-12:** Many hats do not turn correctly when the character faces southeast, southwest, west or east. Audit the affected hats and correct their directional frames/attachments so they follow the character in those four directions.
+- [x] `QUEST-COMPLETE-CHIME` — **Implemented and checked 2026-11-12, Beta 1.47.2.** The completion banner plays one short chime through the existing sound/effects settings; initial progress and repeated snapshots stay silent. Details: `docs/todo-feedback-hats.md`.
+- [x] `BAG-FULL-ERROR` — **Implemented and checked 2026-11-12, Beta 1.47.2.** Ground pickup and NPC/shop/bank/mail/trade bag-space refusals reach the red top error stack. Quest turn-ins say “Insufficient bag space”; a focused multi-reward/hand-in test proves no partial XP, gold, items, hand-in consumption or claimed state on refusal. Details: `docs/todo-feedback-hats.md`. Server changes built and privately checked; deployment pending.
+- [x] `DUNGEON-ROLL-MAIL` — **Implemented and checked 2026-11-12, Beta 1.47.2.** Full-bag dungeon roll wins enter persistent system mail with their exact rolled copy and party hand-off window. Permanent receipts prevent duplicate awards; failed saves retain the winner and retry, including after disconnect. Database reopen, full-bag collection, repeat collection and deleted receipts are checked. Details: `docs/todo-feedback-hats.md`. Server changes built and privately checked; deployment pending.
+- [x] `HAT-DIRECTION-FIX` — **Implemented and checked 2026-11-12, Beta 1.47.2.** Pose-matched head attachment fixes the camera-facing hats across all five classes and both bodies; 382 native layers / 51,952 poses pass in the four reported directions. Saved artwork/editor IDs remain intact; disabling the fix fails the focused test. Details: `docs/todo-feedback-hats.md`.
 
 ### Quest, loot and world feedback improvements (owner requests, 2026-11-12)
 

@@ -1,4 +1,8 @@
 {
+  "Dungeon loot": "Dungeonbyte",
+  "Dungeon loot award": "Vunnet dungeonbyte",
+  "Your bags were full. Your won item is enclosed.": "Dina väskor var fulla. Föremålet du vann finns bifogat.",
+  "Insufficient bag space": "Otillräckligt med plats i väskorna",
   " (as much as alone)": " (lika mycket som ensam)",
   " (critical)": " (kritiskt)",
   " (you)": " (du)",

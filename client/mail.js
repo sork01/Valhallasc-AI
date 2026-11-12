@@ -50,14 +50,16 @@
     }
     target.replaceChildren(...rows);
   }
+  const systemMail = { sender: 'Dungeon loot', subject: 'Dungeon loot award', body: 'Your bags were full. Your won item is enclosed.' };
+  const letterText = (letter, key) => letter.systemAward ? tr(systemMail[key]) : letter[key];
   function renderReader() {
     const letter = data?.letters.find(l => l.id === selected);
     $('mail-reader').hidden = !letter;
     if (!letter) return;
-    $('mail-subject-view').textContent = letter.subject;
-    $('mail-sender').textContent = letter.sender;
-    $('mail-body-view').textContent = letter.body;
-    $('mail-returned').hidden = !letter.returned;
+    $('mail-subject-view').textContent = letterText(letter, 'subject');
+    $('mail-sender').textContent = letterText(letter, 'sender');
+    $('mail-body-view').textContent = letterText(letter, 'body');
+    $('mail-returned').hidden = !letter.returned || letter.systemAward;
     attachmentsLine(letter.contents, $('mail-contents'));
     const has = letter.contents.gold > 0 || letter.contents.items.length > 0;
     $('mail-collect').disabled = !has;
@@ -70,9 +72,9 @@
       b.dataset.letter = l.id;
       b.dataset.unread = String(!l.read);
       b.setAttribute('aria-pressed', String(l.id === selected));
-      b.append(el('strong', l.subject, true), el('span', l.sender, true));
+      b.append(el('strong', letterText(l, 'subject'), true), el('span', letterText(l, 'sender'), true));
       if (!l.read) b.append(el('small', tr('Unread')));
-      if (l.returned) b.append(el('small', tr('Returned letter')));
+      if (l.returned && !l.systemAward) b.append(el('small', tr('Returned letter')));
       return b;
     });
     $('mail-letters').replaceChildren(...(rows.length ? rows : [el('p', tr('Your inbox is empty.'))]));

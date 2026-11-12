@@ -89,8 +89,49 @@
   }
   const bytesOf = text => { const raw = atob(text), out = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; };
   const loadImages = files => Promise.all([bitmap('assets/' + files.png), bitmap('assets/' + files.depth)]);
+  // Saved head layers were painted on a camera-facing plane. Attach that plane
+  // to the pose's head axes: side views narrow and pitch in opposite directions.
+  // Keep some shell width at a full profile, rather than collapsing a helmet to a line.
+  function turnHead(frame, pose, fw, fh) {
+    if (!pose || !frame.w || !frame.h) return frame;
+    const [cx, cy, rx, ry, front, side] = pose;
+    if (Math.abs(side) < .001) return frame;
+    const width = .7 + .3 * front * front; let pitch = side * .32;
+    const local = (x, y) => [(x - cx) * rx + (y - cy) * ry, (x - cx) * ry - (y - cy) * rx];
+    const screen = (x, y) => [cx + rx * x + ry * y, cy + ry * x - rx * y];
+    const project = (x, y) => { const [u, v] = local(x, y); return screen(u * width, v + pitch * u); };
+    // Tall hats can already be near an atlas edge in hurt/death poses. Limit
+    // the pitch there while keeping the head socket and side-view width fixed.
+    let room = 1;
+    for (let y = 0; y < frame.h; y++) for (let x = 0; x < frame.w; x++) {
+      if (!frame.pixels[(y * frame.w + x) * 4 + 3]) continue;
+      const [u, v] = local(frame.x + x + .5, frame.y + y + .5), base = screen(u * width, v);
+      const delta = [ry * pitch * u, -rx * pitch * u];
+      for (let axis = 0; axis < 2; axis++) {
+        const limit = (axis ? fh : fw) - 1.5;
+        if (delta[axis] > 0) room = Math.min(room, (limit - base[axis]) / delta[axis]);
+        else if (delta[axis] < 0) room = Math.min(room, (1.5 - base[axis]) / delta[axis]);
+      }
+    }
+    pitch *= Math.max(0, room);
+    const corners = [[frame.x, frame.y], [frame.x + frame.w, frame.y], [frame.x, frame.y + frame.h], [frame.x + frame.w, frame.y + frame.h]].map(([x, y]) => project(x, y));
+    const x = Math.max(0, Math.floor(Math.min(...corners.map(p => p[0])))), y = Math.max(0, Math.floor(Math.min(...corners.map(p => p[1]))));
+    const w = Math.min(fw, Math.ceil(Math.max(...corners.map(p => p[0])))) - x, h = Math.min(fh, Math.ceil(Math.max(...corners.map(p => p[1])))) - y;
+    const pixels = new Uint8ClampedArray(w * h * 4), z = new Uint16Array(w * h).fill(65535);
+    for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) {
+      const [u, v] = local(x + dx + .5, y + dy + .5), originalX = u / width;
+      const [sx, sy] = screen(originalX, v - pitch * originalX);
+      const ix = Math.floor(sx) - frame.x, iy = Math.floor(sy) - frame.y;
+      if (ix < 0 || iy < 0 || ix >= frame.w || iy >= frame.h) continue;
+      const source = iy * frame.w + ix, target = dy * w + dx;
+      if (!frame.pixels[source * 4 + 3]) continue;
+      pixels.set(frame.pixels.subarray(source * 4, source * 4 + 4), target * 4);
+      z[target] = Math.max(0, Math.min(65534, Math.round(frame.z[source] + side * originalX * .18 * 64)));
+    }
+    return { x, y, w, h, pixels, z };
+  }
   // Retain only occupied rectangles. `bounds` (4 bytes per frame, the sidecar's) tells which rectangle to copy.
-  async function decodePart(meta, bounds, images, slicer) {
+  async function decodePart(meta, bounds, images, slicer, part) {
     const [fw, fh] = meta.frame, [color, depth] = images;
     const readColor = reader('color', fw, fh), readDepth = reader('depth', fw, fh);
     const frames = {};
@@ -108,7 +149,8 @@
           z = new Uint16Array(width * height);
           for (let k = 0; k < z.length; k++) z[k] = d[k * 4] * 256 + d[k * 4 + 1];
         }
-        frames[`${clip}/${dir}/${i}`] = { x: box[0], y: box[1], w: box[2], h: box[3], pixels, z };
+        const key = `${clip}/${dir}/${i}`, frame = { x: box[0], y: box[1], w: box[2], h: box[3], pixels, z };
+        frames[key] = part?.startsWith('head_') ? turnHead(frame, meta.headFrames?.[key], fw, fh) : frame;
         if (slicer.due()) await slicer.yield();
       }
     } finally { color.close(); depth.close(); }
@@ -169,7 +211,7 @@
       for (let k = 0; k < names.length; k++) {
         const images = await (next || loadImages(meta.parts[names[k]]));
         next = k + 1 < names.length && !job.background ? loadImages(meta.parts[names[k + 1]]) : null;
-        parts[names[k]] = await decodePart(meta, boundsOf(names[k]), images, job.slicer);
+        parts[names[k]] = await decodePart(meta, boundsOf(names[k]), images, job.slicer, names[k]);
         if (!job.background) window.dispatchEvent(new CustomEvent('spriteprogress', { detail: [k + 1, names.length] }));
       }
     } catch (error) { next?.then(images => images.forEach(image => image.close()), () => {}); throw error; }
@@ -178,7 +220,7 @@
       let entry = loading.get(part);
       if (!entry) {
         entry = createJob(background, async slicer => {
-          try { parts[part] = await decodePart(meta, boundsOf(part), await loadImages(meta.parts[part]), slicer); }
+          try { parts[part] = await decodePart(meta, boundsOf(part), await loadImages(meta.parts[part]), slicer, part); }
           catch (error) { console.warn('Equipment art could not be loaded', part, error); }
         });
         loading.set(part, entry);
