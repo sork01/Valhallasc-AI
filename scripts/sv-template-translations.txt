@@ -1,4 +1,7 @@
 {
+  " ({0} base · 25%)": " ({0} bas · 25 %)",
+  "Return to your body ({0} tiles away)": "Återvänd till din kropp ({0} rutor bort)",
+  "You resurrected at the Spirit Guide with Resurrection Sickness (stats at 25% for 10 minutes). {0} worn piece(s) broke.": "Du återuppstod hos andeguiden med återuppståndelsesjuka (alla värden på 25 % i 10 minuter). {0} buret föremål gick sönder.",
   "Your bags are full. {0} was sent to your mailbox.": "Dina väskor är fulla. {0} skickades till din brevlåda.",
   "{0} strength": "{0} styrka",
   "{0} agility": "{0} smidighet",

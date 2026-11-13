@@ -51,9 +51,16 @@ const OWN_ONLY: &[&str] = &[
     "rested",
     "achievementPoints",
     "storyMemory",
+    "resurrectionSickness",
+    "effectiveAttributes",
 ];
 
 pub fn filter_view(view: &mut Value, viewer: &str) {
+    let viewer_ghost = view["players"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .any(|p| p["id"] == viewer && p["ghost"] == true);
     let hidden: Vec<(String, u64)> = view["players"]
         .as_array()
         .into_iter()
@@ -72,7 +79,16 @@ pub fn filter_view(view: &mut Value, viewer: &str) {
         .map(|(_, session)| *session)
         .collect();
     if let Some(players) = view["players"].as_array_mut() {
-        players.retain(|p| !blocked_ids.contains(p["id"].as_str().unwrap_or("")));
+        players.retain(|p| {
+            let id = p["id"].as_str().unwrap_or("");
+            if blocked_ids.contains(id) {
+                return false;
+            }
+            if !viewer_ghost && p["ghost"] == true && id != viewer {
+                return false;
+            }
+            true
+        });
         for player in players {
             if let Some(object) = player.as_object_mut() {
                 object.remove("session");
@@ -84,6 +100,22 @@ pub fn filter_view(view: &mut Value, viewer: &str) {
                         object.remove(*key);
                     }
                 }
+            }
+        }
+    }
+    if let Some(across) = view["across"].as_array_mut() {
+        for side in across {
+            if let Some(players) = side["players"].as_array_mut() {
+                players.retain(|p| {
+                    let id = p["id"].as_str().unwrap_or("");
+                    if blocked_ids.contains(id) || p["hidden"] == true {
+                        return false;
+                    }
+                    if !viewer_ghost && p["ghost"] == true && id != viewer {
+                        return false;
+                    }
+                    true
+                });
             }
         }
     }
@@ -184,6 +216,58 @@ mod tests {
         assert_eq!(gm["players"].as_array().unwrap().len(), 2);
         assert_eq!(gm["online"], 2);
         assert!(!gm.to_string().contains("\"session\""));
+    }
+
+    #[test]
+    fn live_viewers_cannot_see_ghosts_in_zone_or_across_seam() {
+        let raw = json!({
+            "players": [
+                {"id": "live", "hidden": false, "ghost": false, "session": 1, "x": 10},
+                {"id": "spirit", "hidden": false, "ghost": true, "session": 2, "x": 12}
+            ],
+            "across": [{
+                "to": 1,
+                "shift": [0, 0],
+                "players": [
+                    {"id": "other_live", "hidden": false, "ghost": false, "x": 5},
+                    {"id": "other_ghost", "hidden": false, "ghost": true, "x": 6}
+                ]
+            }],
+            "bolts": [],
+            "drops": [],
+            "online": 2
+        });
+        let mut live_view = raw.clone();
+        filter_view(&mut live_view, "live");
+        let ids: Vec<_> = live_view["players"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| p["id"].as_str().unwrap())
+            .collect();
+        assert_eq!(ids, vec!["live"], "live viewer must not see ghost players");
+        let across_ids: Vec<_> = live_view["across"][0]["players"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| p["id"].as_str().unwrap())
+            .collect();
+        assert_eq!(
+            across_ids,
+            vec!["other_live"],
+            "live viewer must not see ghost players across a seam"
+        );
+
+        let mut ghost_view = raw;
+        filter_view(&mut ghost_view, "spirit");
+        assert_eq!(ghost_view["players"].as_array().unwrap().len(), 2);
+        assert_eq!(
+            ghost_view["across"][0]["players"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
     }
 
     fn slime(id: u64, x: f64, y: f64, elite: bool, dead: bool, kind: &str) -> Value {

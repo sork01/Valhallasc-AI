@@ -22,6 +22,7 @@ execFileSync('python3', [path.join(__dirname, 'seasonal_cities.py')], { cwd: roo
 execFileSync('python3', [path.join(__dirname, 'mailboxes.py')], { cwd: root, stdio: 'pipe' });
 // Shaped zones (docs/zone-shapes.md) come last: every overlay above saw the old square layout.
 execFileSync('python3', [path.join(__dirname, 'zone_shapes.py'), 'apply'], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'spirit_guides.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));

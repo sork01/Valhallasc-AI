@@ -7,7 +7,7 @@ const read = p => JSON.parse(fs.readFileSync(path.join(root, p)));
 const world = read('world/map.txt'), old = read('client/assets/npc.txt'), fresh = read('client/assets/npcp.txt');
 const plan = read('docs/npc-named-plan.txt');
 const baseline = JSON.parse(execFileSync('git', ['show', 'c0b93e8e:client/assets/npc.txt'], { cwd: root }));
-const people = [world, ...world.zones].flatMap(z => z.npcs || []).filter(n => !['stone','scenery','mailbox'].includes(n.art) && !/meeting stone/i.test(n.name));
+const people = [world, ...world.zones].flatMap(z => z.npcs || []).filter(n => !['stone','scenery','mailbox','spirit_guide'].includes(n.art) && !/meeting stone/i.test(n.name));
 assert.equal(people.length, 588);
 assert.deepEqual(Object.keys(old.npcs).sort(), people.map(n => n.id).sort(), 'Every actual person, and no scenery, is assigned');
 for (const [key, value] of Object.entries(baseline)) if (key !== 'npcs') assert.deepEqual(old[key], value, key);

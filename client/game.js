@@ -41,7 +41,7 @@
       hunterLoading: 'Calling the Hunter…', hunterError: 'Hunter sprites could not load. Select Hunter again to retry.',
       hunterArmorNames: ['Simple cloth', 'Scout\u2019s Jerkin', 'Wildwarden Coat'], hunterWeaponNames: ['Empty hands', 'Hunter\u2019s Shortbow', 'Wildwarden Longbow'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
-      defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', lvl: 'Lv',
+      defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
       noGear: 'No gear', facingNames: ['Front', 'Front left', 'Left side', 'Back left', 'Back view', 'Back right', 'Right side', 'Front right'],
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
@@ -73,7 +73,7 @@
       hunterLoading: '사냥꾼 소환 중…', hunterError: '사냥꾼을 불러오지 못했습니다. 다시 선택해 주세요.',
       hunterArmorNames: ['기본 옷', '정찰병의 조끼', '와일드워든 코트'], hunterWeaponNames: ['맨손', '사냥꾼의 단궁', '와일드워든 장궁'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
-      defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', lvl: 'Lv',
+      defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
       noGear: '장비 없음', facingNames: ['정면', '왼쪽 앞', '왼쪽', '왼쪽 뒤', '뒷면', '오른쪽 뒤', '오른쪽', '오른쪽 앞'],
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
@@ -695,7 +695,15 @@
       { id: 'stun', left: s.stun, time: 3, name: 'Stunned', icon: 'starfall', description: 'Cannot move, attack or cast.' },
       { id: 'root', left: s.root, time: 3, name: 'Rooted', icon: 'storm', description: 'Cannot move or dash.' },
       { id: 'wound', left: s.woundLeft, time: 10, name: 'Wounded', icon: 'cuts', description: 'Healing received is reduced by 50%.' },
+      { id: 'resurrection_sickness', left: s.resurrectionSickness, time: 600, name: 'Resurrection Sickness', short: 'Sickness', icon: 'cuts', description: 'All stats are reduced to 25%.' },
     ].filter(b => b.left > 0 && s.hp > 0).map(b => ({ ...b, kind: 'status' }));
+    if ($('ghost-resurrect')) $('ghost-resurrect').disabled = !s.ghost || !s.corpseInRange;
+    if ($('ghost-sub')) {
+      $('ghost-sub').textContent = !s.ghost ? t('ghostSub')
+        : s.corpseInRange ? 'Press Resurrect to return to life'
+        : typeof s.corpseDist === 'number' ? `Return to your body (${Math.ceil(s.corpseDist)} tiles away)`
+        : t('ghostSub');
+    }
     if(s.festivalBuff?.left>0)statuses.push({id:'festivalspirit',kind:'status',left:s.festivalBuff.left,time:7200,name:'Festival Spirit',icon:'blessing',description:'+10% attack and +50% experience. Lasts two hours; time continues offline. Another completed dance refreshes it.'});
     renderBuffs([...(s.buffs || []), ...statuses]);
     const nextRaidFinalFight = !!s.raidFinalFight;
@@ -748,7 +756,7 @@
         const description = translate(def?.description || '');
         const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${name}: ${description}` }), glyph = el('span', { class: 'skill-icon' });
         glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph);
-        if (b.kind === 'status') chip.append(el('b', { text: b.name }));
+        if (b.kind === 'status') chip.append(el('b', { text: translate(b.short || b.name) }));
         chip.append(el('i'));
         if(b.id==='festivalspirit'){
           chip.tabIndex=0;chip.setAttribute('role','button');chip.setAttribute('aria-expanded','false');
@@ -761,7 +769,7 @@
     }
     for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) {
       const seconds = Math.ceil(b.left), label = b.kind === 'status' ? `${b.name} · ${seconds}s` : '';
-      chip.querySelector('i').textContent = b.id==='festivalspirit'?`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`:b.kind === 'status' ? `${seconds}s` : seconds;
+      chip.querySelector('i').textContent = (b.id === 'festivalspirit' || b.id === 'resurrection_sickness') ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : b.kind === 'status' ? `${seconds}s` : seconds;
       if (label) chip.setAttribute('aria-label', label);
       chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time)));
     } }
@@ -1046,7 +1054,7 @@
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
     if (name === 'death') { $('dead-msg').hidden = !!Field.hero?.ghost; $('ghost-msg').hidden = !Field.hero?.ghost; }
     if (name === 'ghost') { $('dead-msg').hidden = true; $('ghost-msg').hidden = false; }
-    if (name === 'unghost' || name === 'respawn') { $('ghost-msg').hidden = true; }
+    if (name === 'unghost' || name === 'respawn') { $('ghost-msg').hidden = true; window.City?.close?.(false); }
     if (name === 'respawn') $('dead-msg').hidden = true;
     // Down in a boss fight: the line says to wait for the fight instead of promising to wake at the start.
     if (name === 'fallen' || name === 'rallied' || name === 'respawn') {
@@ -1157,6 +1165,7 @@
     }
   });
   $('city-travel').addEventListener('click', () => Field.visitCity());
+  $('ghost-resurrect')?.addEventListener('click', () => Online.send({ type: 'resurrect' }));
   $('mount-toggle').addEventListener('click', () => Field.toggleMount());
   $('p-characters').addEventListener('click', async () => {
     const list = $('character-list'); list.hidden = !list.hidden;

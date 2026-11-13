@@ -1346,7 +1346,10 @@
     // Server fight state selects the raid finale; proximity and a selected target do not.
     const raidFinalFight = !!zdef.raid && (window.BossMech?.fights || []).some(f =>
       slimes.some(s => s.id === f.boss && s.kind === zdef.final_boss && !s.dead));
-    const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, festivalBuff:hero.festivalBuff, festivalDance:hero.festivalDance, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: areaName(), zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
+    const ghost = !!(hero.dead && hero.ghost);
+    const corpseDist = ghost && hero.corpse && hero.corpse.zone === zone ? Math.hypot(hero.x - hero.corpse.x, hero.y - hero.corpse.y) : null;
+    const rival = !ghost ? remotePlayers.get(hero.pvpTargetId) : null;
+    onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, rested: hero.rested, festivalBuff:hero.festivalBuff, festivalDance:hero.festivalDance, resurrectionSickness: hero.resurrectionSickness || 0, ghost, corpseDist, corpseInRange: corpseDist !== null && corpseDist <= 15, level: hero.level, gold: hero.gold, kills: hero.kills, target: !ghost && rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : !ghost && hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: areaName(), zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -1421,14 +1424,19 @@
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
     if (!ghostWalking) {
       if (window.RaidKey?.click(mx,my,w2s)) return;
-      const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
-      if (npc) { talkTo(npc); return; }
+    }
+    const npc = City.npcs.find(n => {
+      if (ghostWalking && n.art !== 'spirit_guide') return false;
+      const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12;
+    });
+    if (npc) { talkTo(npc); return; }
+    if (!ghostWalking) {
       const sign = signs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<=SIGN_W && my>=y-SIGN_TOP && my<=y+10; });
       if (sign) { talkTo(sign); return; }
       const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27*CHEST_SCALE && my>=y-37*CHEST_SCALE && my<=y+7*CHEST_SCALE; });
       if (chest) { openChest(chest); return; }
-      const portal = pickPortal(mx, my); if (portal) { visitPortal(portal); return; }
     }
+    const portal = pickPortal(mx, my); if (portal) { visitPortal(portal); return; }
     pointer.down = true; if (Number.isInteger(e.pointerId)) cv.setPointerCapture?.(e.pointerId);
     rememberPointer(e); const { x: wx, y: wy } = pointer;
     const s = ghostWalking ? null : pickSlime(mx, my, wx, wy);
@@ -1785,7 +1793,7 @@
         if (entry.sprite && entry.sprite.constructor === classSprite(c.look)) entry.sprite.set(c.look);
         else classSprite(c.look).load(c.look, { background: true }).then(sprite => { if (generation === spriteGeneration && entry.signature === lookKey) entry.sprite = sprite; }).catch(() => {});
       }
-      return { ...c, dead: true, ghost: false, corpse: true, deadT: 99, moving: false, atkT: 0, hurtT: 0, sprite: c.id === Online.id ? mageSpr : entry.sprite };
+      return { ...c, dead: true, ghost: false, isCorpse: true, deadT: 99, moving: false, atkT: 0, hurtT: 0, sprite: c.id === Online.id ? mageSpr : entry.sprite };
     });
     for (const cid of corpseSprites.keys()) if (!seenCorpses.has(cid)) corpseSprites.delete(cid);
     chests = (packet.chests || []).filter(inZone).map(c => ({...c, expiresAt:tAll+c.left}));
@@ -3195,7 +3203,8 @@
       }
       if (!paused && pendingNpc) {
         const {npc,until}=pendingNpc;
-        if(hero.dead || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
+        const canTalk = !hero.dead || (hero.ghost && npc.art === 'spirit_guide');
+        if(!canTalk || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
         else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];askNpc(npc);}
         else if(npc.route && tAll-routeTime>1) {                       // a walker has moved on: take a fresh route to where it is now
           const end=cityRoute[cityRoute.length-1];
@@ -3331,7 +3340,7 @@
     const lunge = atk ? Math.sin(clamp(atk * 1.4, 0, 1) * Math.PI) * 10 : 0;
     g.save();
     if (h.dead && h.ghost) g.globalAlpha *= .45;
-    if ((h.dead && !h.ghost) || h.corpse) { const k = h.corpse ? 1 : clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.45 * face); g.translate(0, k * 4); }
+    if ((h.dead && !h.ghost) || h.isCorpse) { const k = h.isCorpse ? 1 : clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.45 * face); g.translate(0, k * 4); }
     g.scale(face, 1); g.translate(lunge, 0);
     if (h.hurtT > 0) g.translate(-3, 0);
     const skinD = shade(skin, -.16), beardD = shade(beard, -.28), beardL = shade(beard, .25);
@@ -3962,7 +3971,7 @@
     const f = m.frames[frames[idx]], bob = walking || atk ? 0 : Math.sin(t * 2.2) * 1.2;
     g.save();
     if (h.dead && h.ghost) g.globalAlpha *= .45;
-    if ((h.dead && !h.ghost) || h.corpse) { const k = h.corpse ? 1 : clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.35 * (right ? 1 : -1)); g.translate(0, k * 6); }
+    if ((h.dead && !h.ghost) || h.isCorpse) { const k = h.isCorpse ? 1 : clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.35 * (right ? 1 : -1)); g.translate(0, k * 6); }
     g.scale(flip ? -K : K, K); g.translate(0, bob / K);
     g.drawImage(heroSpr.sheet, f.x, f.y, f.w, f.h, -f.ax, -f.ay, f.w, f.h);
     g.restore();
@@ -3995,7 +4004,7 @@
   }
   function warFrame(h, t) {                                 // -> [clip, frame index]; priority: dead, hurt, attack, walk, idle
     const C = warSpr.meta.clips;
-    if ((h.dead && !h.ghost) || h.corpse) return ['die', h.corpse ? C.die.n - 1 : Math.min(C.die.n - 1, Math.floor(h.deadT * C.die.fps))];
+    if ((h.dead && !h.ghost) || h.isCorpse) return ['die', h.isCorpse ? C.die.n - 1 : Math.min(C.die.n - 1, Math.floor(h.deadT * C.die.fps))];
     if (h.hurtT > 0) return ['hurt', clamp(Math.floor((1 - h.hurtT / .25) * C.hurt.n), 0, C.hurt.n - 1)];
     if (h.atkT > 0) return ['attack', Math.min(C.attack.n - 1, Math.floor(h.atkT / .42 * C.attack.n))];
     if (h.moving) return ['walk', Math.floor(h.walk * 1.1) % C.walk.n];
@@ -5009,7 +5018,7 @@
         if (cover) g.globalAlpha = .45;
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
-      } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,!it.ghostNpc && Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
+      } else if (it.npc) { const ghostNpc = !!(hero.dead && hero.ghost); City.drawNpc(g,it.npc,it.sx,it.sy,t,!it.ghostNpc && (!ghostNpc || it.npc.art === 'spirit_guide') && Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
       } else if (it.cross) { window.RaidKey?.draw(g,it.cross,it.sx,it.sy);
       } else if (it.chest) { drawChest(g,it.chest,it.sx,it.sy);
       } else if (it.sign) { drawSign(g,it.sign,it.sx,it.sy,Math.hypot(hero.x-it.sign.x,hero.y-it.sign.y)<2.8);
@@ -5726,22 +5735,23 @@
       miniZoomButtons(); return miniZoom;
     },
     action(action) {
+      if (action === 'talk' && running && !paused && Online.connected && !hero.sparkTravel && (!hero.dead || hero.ghost)) {
+        const list = hero.dead && hero.ghost ? City.npcs.filter(n => n.art === 'spirit_guide') : [...City.npcs, ...signs];
+        const npc = list.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
+        if (npc) talkTo(npc); return !!npc;
+      }
       if (!Field.canAct || hero.sparkTravel) return false;
       if (action === 'attack') return Field.useSkill('attack');
       if (action === 'dash') return isAssassin() && Field.useSkill('shadowstep');
       if (action === 'mount') { Field.toggleMount(); return true; }
       if (action === 'interact') return !!window.RaidKey?.interact();
-      if (action === 'talk') {
-        const npc = [...City.npcs, ...signs].filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
-        if (npc) talkTo(npc); return !!npc;
-      }
       return false;
     },
     clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
     setPaused(p) { paused = p; Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
-      if (paused || !Online.connected || hero.dead) return;
       const npc = City.npcs.find(n => n.id === id);
+      if (paused || !Online.connected || (hero.dead && !(hero.ghost && npc?.art === 'spirit_guide'))) return;
       if (npc) talkTo(npc);
     },
     visitCity() {

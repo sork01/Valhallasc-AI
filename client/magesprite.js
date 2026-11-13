@@ -707,7 +707,7 @@
       const C = this.meta.clips;
       const dying = h.dead && !h.ghost;
       let clip = 'idle', i = Math.floor(t * C.idle.fps) % C.idle.n;
-      if (dying || h.corpse) { clip = 'die'; i = h.corpse ? C.die.n - 1 : Math.floor(h.deadT * C.die.fps); }
+      if (dying || h.isCorpse) { clip = 'die'; i = h.isCorpse ? C.die.n - 1 : Math.floor(h.deadT * C.die.fps); }
       else if (h.hurtT > 0) { clip = 'hurt'; i = Math.floor((1 - h.hurtT / .25) * C.hurt.n); }
       else if (h.atkT > 0) { clip = 'attack'; i = Math.floor(h.atkT / this.meta.attack.duration * C.attack.n); }
       else if (h.moving) { clip = 'walk'; i = Math.floor(h.walk) % C.walk.n; }

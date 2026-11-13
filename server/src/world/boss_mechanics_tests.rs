@@ -3403,7 +3403,9 @@ fn the_fallen_wake_at_the_door_when_the_boss_dies() {
     let corpse = r.w.players[&2].character.corpse.clone().unwrap();
     r.put(2, corpse.x, corpse.y);
     steps(&mut r, 0.2);
-    assert!(r.alive(2), "reaching corpse resurrects at half HP");
+    assert!(r.w.players[&2].character.ghost, "manual Resurrect required");
+    r.w.message(2, ClientMessage::Resurrect);
+    assert!(r.alive(2), "pressing Resurrect near corpse resurrects at half HP");
     assert!(!r.w.players[&2].character.ghost);
 }
 

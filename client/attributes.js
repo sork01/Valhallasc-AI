@@ -44,8 +44,11 @@
       const name = stat[0].toUpperCase() + stat.slice(1), row = node('div', '', 'attribute-row'); row.dataset.stat = stat;
       const label = node('div', '', 'attribute-label');
       const trained = c.attributes?.[stat] || 0, gear = c.gearAttributes?.[stat] || 0, passive = c.passiveAttributes?.[stat] || 0;
+      const rawTotal = trained + gear + passive;
+      const effective = c.resurrectionSickness > 0 && c.effectiveAttributes ? (c.effectiveAttributes[stat] ?? Math.round(rawTotal * 0.25)) : rawTotal;
       const parts = [gear ? `${gear} gear` : '', passive ? `${passive} passive` : ''].filter(Boolean);
-      label.append(node('b', `${name} ${trained + gear + passive}${parts.length ? ` (${trained} trained + ${parts.join(' + ')})` : ''}${stat === best ? ' ★' : ''}`), node('small', descriptions[stat]));
+      const sickNote = c.resurrectionSickness > 0 ? ` (${rawTotal} base · 25%)` : '';
+      label.append(node('b', `${name} ${effective}${sickNote}${parts.length ? ` (${trained} trained + ${parts.join(' + ')})` : ''}${stat === best ? ' ★' : ''}`), node('small', descriptions[stat]));
       const capped = (stat === 'accuracy' && c.attributes?.accuracy >= 20) || (stat === 'dexterity' && c.attributes?.dexterity >= 70);
       const add = node('button', capped ? '✓' : '+', 'attribute-add'); add.type = 'button'; add.setAttribute('aria-label', capped ? `${name} at maximum` : `Increase ${name}`); add.title = descriptions[stat];
       add.disabled = capped || pending || points === 0 || c.dead || !Online.connected;
@@ -72,13 +75,14 @@
     }
     host.replaceChildren(header, grid, actions,
       node('p', `Hit ${percent(c.hitChance)} · Dodge ${percent(c.dodgeChance)} · Crit ${percent(c.critChance)} · Attack every ${Number((c.attackCooldown || 0).toFixed(2))}s`, 'attribute-derived'),
+      ...(c.resurrectionSickness > 0 ? [node('p', 'Resurrection Sickness: all stats reduced to 25%.', 'attribute-derived')] : []),
       node('small', '3 points per level · ★ Class specialty · A city steward can reset trained points for gold', 'attribute-help'));
     if (c.raidSupport) host.append(node('p', `Raid strength: +${c.raidSupport.attackPercent}% attack · ${c.raidSupport.damageReductionPercent}% damage reduction (${c.raidSupport.others} allies)`, 'attribute-derived raid-strength'));
   }
   window.Attributes = {
     render,
     update(c) {
-      const key = JSON.stringify([c.id, c.level, c.attributes, c.gearAttributes, c.passiveAttributes, c.statPoints, c.dead, c.look.class, c.hitChance, c.dodgeChance, c.critChance, c.attackCooldown, c.raidSupport]);
+      const key = JSON.stringify([c.id, c.level, c.attributes, c.gearAttributes, c.passiveAttributes, c.effectiveAttributes, (c.resurrectionSickness || 0) > 0, c.statPoints, c.dead, c.look.class, c.hitChance, c.dodgeChance, c.critChance, c.attackCooldown, c.raidSupport]);
       character = c; if (signature === key) return; signature = key; pending = false; previewOpen = false; render();
       dispatchEvent(new Event('character-stats-change'));
     },

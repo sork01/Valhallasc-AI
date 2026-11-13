@@ -1,5 +1,18 @@
 [
   {
+    "version": "Beta 1.49.1",
+    "date": "2026-11-13",
+    "new": [
+      "Added a Spirit Guide near graveyard camps and raid checkpoints so fallen ghosts can resurrect there, costing 50% worn-gear durability and 10 minutes of Resurrection Sickness that reduces all stats to 25%.",
+      "Walk within 15 tiles of your corpse and press Resurrect to return to life at 50% health instead of reviving automatically."
+    ],
+    "changed": [
+      "Player ghosts now stand and walk upright instead of lying dead on the ground.",
+      "Living players can no longer see ghosts, and ghosts can no longer fight, inspect or interact with anyone other than a Spirit Guide."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.49.0",
     "date": "2026-11-13",
     "new": [

@@ -5,7 +5,7 @@ use std::sync::LazyLock;
 #[cfg(test)]
 mod cloak_tests;
 mod gear_services;
-pub use gear_services::{DeathWear, GearInstance};
+pub use gear_services::{DeathWear, GearInstance, SPIRIT_GUIDE_WEAR};
 pub mod hierlooms;
 mod orange;
 pub mod raid_rewards;
@@ -1275,7 +1275,7 @@ impl Character {
         }
         bonus
     }
-    pub fn effective_attributes(&self) -> Attributes {
+    pub fn unscaled_effective_attributes(&self) -> Attributes {
         let bonus = self.gear_attributes();
         let passive = crate::skills::passive_bonus(self.look.class, self.level);
         Attributes {
@@ -1309,6 +1309,22 @@ impl Character {
                 .accuracy
                 .saturating_add(bonus.accuracy)
                 .saturating_add(passive.accuracy),
+        }
+    }
+    pub fn effective_attributes(&self) -> Attributes {
+        let raw = self.unscaled_effective_attributes();
+        let scale = self.stat_scale();
+        if (scale - 1.).abs() < f64::EPSILON {
+            return raw;
+        }
+        let s = |v: u32| ((v as f64) * scale).round() as u32;
+        Attributes {
+            strength: s(raw.strength),
+            agility: s(raw.agility),
+            intellect: s(raw.intellect),
+            stamina: s(raw.stamina),
+            dexterity: s(raw.dexterity),
+            accuracy: s(raw.accuracy),
         }
     }
     /// Keep missing HP/mana stable when an item's Stamina or Intellect changes the maxima.
@@ -1541,7 +1557,7 @@ impl Character {
     }
     pub fn stats(&self) -> (f64, f64) {
         let (mut attack, mut defense) = self.look.stats(self.level);
-        let effective = self.effective_attributes();
+        let effective = self.unscaled_effective_attributes();
         let a = &effective;
         attack += a.strength as f64
             * if self.look.class == Class::Warrior {
@@ -1587,12 +1603,14 @@ impl Character {
             }
             *occurrence += 1;
         }
+        let scale = self.stat_scale();
         (
             attack
                 * player_attack_scale(self.look.class, self.level)
                 * (1. + self.set_stat_bonus("attack"))
-                * self.festival_attack_at(crate::festival::now()),
-            defense * (1. + self.set_stat_bonus("defense")),
+                * self.festival_attack_at(crate::festival::now())
+                * scale,
+            defense * (1. + self.set_stat_bonus("defense")) * scale,
         )
     }
     pub fn sell_item(&mut self, id: &str, quantity: u32) -> Result<u32, &'static str> {

@@ -433,7 +433,12 @@ pub struct Character {
     /// True once the fallen hero has released to the nearest graveyard/camp as a spirit until reaching `corpse`.
     #[serde(default)]
     pub ghost: bool,
+    /// Remaining seconds of Resurrection Sickness (all stats reduced to 25%) after Spirit Guide resurrection.
+    #[serde(default)]
+    pub resurrection_sickness: f64,
 }
+pub const RESURRECTION_SICKNESS_DURATION: f64 = 600.;
+pub const RESURRECTION_SICKNESS_SCALE: f64 = 0.25;
 /// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every mount uses the same 1.6× walking-speed multiplier.
 pub struct MountDef {
     pub id: &'static str,
@@ -589,6 +594,7 @@ impl Character {
             bank: Default::default(),
             corpse: None,
             ghost: false,
+            resurrection_sickness: 0.,
             landing: false,
         };
         c.seed_inventory();
@@ -695,10 +701,18 @@ pub fn enemy_xp(level: u32) -> u32 {
     45 + 5 * level.max(1)
 }
 impl Character {
+    pub fn stat_scale(&self) -> f64 {
+        if self.resurrection_sickness > 0. {
+            RESURRECTION_SICKNESS_SCALE
+        } else {
+            1.
+        }
+    }
     pub fn max_resource(&self) -> f64 {
         let base = if self.look.class.resource_type() == "mana" {
-            100. + self.level.saturating_sub(1) as f64 * 10.
-                + self.effective_attributes().intellect as f64 * 5.
+            (100. + self.level.saturating_sub(1) as f64 * 10.
+                + self.unscaled_effective_attributes().intellect as f64 * 5.)
+                * self.stat_scale()
         } else {
             100.
         };
@@ -773,11 +787,12 @@ impl Character {
         self.legacy_max_hp()
             * player_health_scale(self.level)
             * (1. + self.set_stat_bonus("health"))
+            * self.stat_scale()
     }
     pub fn legacy_max_hp(&self) -> f64 {
         self.look.class.health()
             + self.level.saturating_sub(1) as f64 * 20.
-            + self.effective_attributes().stamina as f64 * 8.
+            + self.unscaled_effective_attributes().stamina as f64 * 8.
     }
     pub fn stat_points(&self) -> u32 {
         let a = &self.attributes;
@@ -887,7 +902,7 @@ impl Character {
         let before = self.attributes.clone();
         let mut next = self.clone();
         for _ in 0..points {
-            let effective = next.effective_attributes();
+            let effective = next.unscaled_effective_attributes();
             let values = [
                 effective.strength,
                 effective.agility,
@@ -929,14 +944,16 @@ impl Character {
             0.28
         } else {
             0.14
-        }) + self.effective_attributes().agility as f64 * 0.005)
+        }) + self.unscaled_effective_attributes().agility as f64 * 0.005)
             .min(0.60)
+            * self.stat_scale()
     }
     pub fn cooldown_multiplier(&self) -> f64 {
         1. - (self.effective_attributes().intellect as f64 * 0.01).min(0.30)
     }
     pub fn dodge_chance(&self) -> f64 {
-        (self.effective_attributes().dexterity as f64 * 0.005).min(0.35)
+        (self.unscaled_effective_attributes().dexterity as f64 * 0.005).min(0.35)
+            * self.stat_scale()
     }
     pub fn hit_chance(&self) -> f64 {
         (0.90 + self.effective_attributes().accuracy as f64 * 0.005).min(1.)
@@ -1343,6 +1360,8 @@ pub enum ClientMessage {
         npc: String,
         offer: Option<String>,
     },
+    /// Manually resurrects a ghost within `CORPSE_RESURRECT_RANGE` of its corpse at half health.
+    Resurrect,
     ShopOpen {
         npc: String,
     },
@@ -1736,6 +1755,8 @@ pub struct Npc {
     pub y: f64,
     pub dialogue: String,
     pub offers: Vec<Offer>,
+    #[serde(default)]
+    pub art: Option<String>,
     #[serde(default)]
     pub buys: bool,
     #[serde(default, rename = "travelStop")]

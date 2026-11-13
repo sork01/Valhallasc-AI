@@ -424,6 +424,8 @@ fn mana_survives_resume_while_rage_and_energy_reset_and_death_respawns_correctly
         p.character.x = corpse.x;
         p.character.y = corpse.y;
         w.update_player(2);
+        assert!(w.players[&2].character.ghost);
+        w.message(2, ClientMessage::Resurrect);
         let p = &w.players[&2];
         assert!(!p.character.ghost);
         assert_eq!(p.character.hp, (p.character.max_hp() * 0.5).round().max(1.));

@@ -63685,6 +63685,74 @@
         "hat": "cap",
         "hatColor": "#2f4560"
       }
+    },
+    {
+      "id": "spirit_guide_0_0",
+      "name": "Spirit Guide",
+      "role": "Resurrection",
+      "x": 252.4,
+      "y": 167.0,
+      "art": "spirit_guide",
+      "buys": false,
+      "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+      "offers": [
+        {
+          "id": "spirit_resurrect",
+          "label": "Resurrect at Spirit Guide",
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "id": "spirit_guide_0_1",
+      "name": "Spirit Guide",
+      "role": "Resurrection",
+      "x": 94.4,
+      "y": 224.0,
+      "art": "spirit_guide",
+      "buys": false,
+      "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+      "offers": [
+        {
+          "id": "spirit_resurrect",
+          "label": "Resurrect at Spirit Guide",
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "id": "spirit_guide_0_2",
+      "name": "Spirit Guide",
+      "role": "Resurrection",
+      "x": 192.4,
+      "y": 281.0,
+      "art": "spirit_guide",
+      "buys": false,
+      "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+      "offers": [
+        {
+          "id": "spirit_resurrect",
+          "label": "Resurrect at Spirit Guide",
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "id": "spirit_guide_0_3",
+      "name": "Spirit Guide",
+      "role": "Resurrection",
+      "x": 347.4,
+      "y": 232.0,
+      "art": "spirit_guide",
+      "buys": false,
+      "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+      "offers": [
+        {
+          "id": "spirit_resurrect",
+          "label": "Resurrect at Spirit Guide",
+          "cost": 0
+        }
+      ]
     }
   ],
   "quests": [
@@ -131074,6 +131142,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_1_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 158.08,
+          "y": 210.7,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_1_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 119.2,
+          "y": 292.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_1_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 197.62,
+          "y": 154.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_1_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 307.4,
+          "y": 204.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -206288,6 +206424,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_2_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 247.08,
+          "y": 244.7,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_2_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 121.2,
+          "y": 252.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_2_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 36.62,
+          "y": 174.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_2_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 287.4,
+          "y": 98.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -289514,6 +289718,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_3_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 180.4,
+          "y": 72.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_3_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 71.2,
+          "y": 102.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_3_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 142.62,
+          "y": 242.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_3_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 216.4,
+          "y": 156.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -316359,6 +316631,23 @@
           "speed": 1.4,
           "pause": 6.0,
           "phase": 20
+        },
+        {
+          "id": "spirit_guide_4_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 61.9,
+          "y": 104.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -347014,6 +347303,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_5_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 17.4,
+          "y": 111.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -434530,6 +434836,91 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_6_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 68.8,
+          "y": 283.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_6_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 168.9,
+          "y": 201.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_6_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 256.2,
+          "y": 299.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_6_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 180.62,
+          "y": 145.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_6_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 152.4,
+          "y": 112.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -486121,6 +486512,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_7_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 189.4,
+          "y": 204.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_7_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 112.62,
+          "y": 126.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_7_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 297.2,
+          "y": 256.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_7_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 258.4,
+          "y": 100.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -516672,6 +517131,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_8_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 98.4,
+          "y": 212.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_8_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 42.9,
+          "y": 109.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_8_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 234.9,
+          "y": 125.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_8_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 186.9,
+          "y": 204.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -538879,6 +539406,23 @@
             "style": "long"
           },
           "dialogue": "Five ways into Nacrehold and not one lock. We are quiet because we are hard to find: you need a gate, an updraft or a boat. I keep a ledger of every crossing."
+        },
+        {
+          "id": "spirit_guide_9_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 130.4,
+          "y": 217.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -592319,6 +592863,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_10_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 26.4,
+          "y": 140.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": []
@@ -598533,6 +599094,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_11_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 138.4,
+          "y": 140.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -606550,6 +607128,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_12_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 98.4,
+          "y": 172.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -643637,6 +644232,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_13_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 174.4,
+          "y": 294.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_13_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 121.2,
+          "y": 194.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_13_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 222.62,
+          "y": 178.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_13_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 174.4,
+          "y": 48.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -690269,6 +690932,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_14_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 88.4,
+          "y": 174.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_14_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 107.2,
+          "y": 100.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_14_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 150.62,
+          "y": 72.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_14_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 200.4,
+          "y": 162.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -743543,6 +744274,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_15_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 68.4,
+          "y": 301.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_15_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 85.2,
+          "y": 126.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_15_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 190.62,
+          "y": 84.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_15_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 256.4,
+          "y": 128.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -802793,6 +803592,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_16_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 131.4,
+          "y": 142.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -811192,6 +812008,23 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_17_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 92.4,
+          "y": 162.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -856642,6 +857475,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_18_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 23.4,
+          "y": 64.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -880589,6 +881439,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_19_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 73.4,
+          "y": 259.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_19_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 101.2,
+          "y": 154.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_19_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 112.62,
+          "y": 66.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_19_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 218.4,
+          "y": 150.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -928445,6 +929363,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_20_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 112.9,
+          "y": 201.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_20_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 94.4,
+          "y": 72.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_20_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 238.4,
+          "y": 94.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_20_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 178.4,
+          "y": 66.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -977102,6 +978088,91 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_21_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 197.4,
+          "y": 206.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_21_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 295.4,
+          "y": 192.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_21_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 196.62,
+          "y": 84.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_21_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 121.2,
+          "y": 216.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_21_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 307.4,
+          "y": 290.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1046134,6 +1047205,91 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_22_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 124.4,
+          "y": 203.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_22_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 170.62,
+          "y": 122.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_22_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 215.2,
+          "y": 130.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_22_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 162.4,
+          "y": 218.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_22_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 256.4,
+          "y": 146.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1094304,6 +1095460,91 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_23_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 194.9,
+          "y": 241.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_23_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 100.62,
+          "y": 194.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_23_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 207.2,
+          "y": 100.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_23_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 298.4,
+          "y": 198.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_23_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 254.4,
+          "y": 146.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1129837,6 +1131078,23 @@
           ],
           "buys": false,
           "festivalArt": "newyearLaunchpad"
+        },
+        {
+          "id": "spirit_guide_24_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 106.4,
+          "y": 170.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1198070,6 +1199328,91 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_25_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 48.4,
+          "y": 190.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_25_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 95.62,
+          "y": 72.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_25_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 187.2,
+          "y": 174.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_25_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 152.4,
+          "y": 205.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_25_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 132.4,
+          "y": 78.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "places": [
@@ -1239539,6 +1240882,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_26_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 109.9,
+          "y": 268.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_26_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 170.4,
+          "y": 186.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_26_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 228.4,
+          "y": 62.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_26_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 170.4,
+          "y": 40.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1287431,6 +1288842,74 @@
             {
               "id": "mail",
               "label": "Open mailbox",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_27_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 142.9,
+          "y": 170.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_27_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 96.62,
+          "y": 94.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_27_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 141.2,
+          "y": 114.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_27_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 178.4,
+          "y": 58.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1438319,6 +1439798,125 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_28_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 288.9,
+          "y": 770.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_28_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 622.4,
+          "y": 660.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_28_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 622.4,
+          "y": 300.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_28_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 322.4,
+          "y": 300.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_28_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 338.4,
+          "y": 128.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_28_5",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 692.4,
+          "y": 470.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_28_6",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 482.4,
+          "y": 650.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -1478021,6 +1479619,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_29_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -1481327,6 +1482942,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_30_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 83.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -1484468,6 +1486100,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_31_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 83.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -1487213,6 +1488862,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_32_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 83.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1490132,6 +1491798,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_33_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1493365,6 +1495048,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_34_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -1496371,6 +1498071,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_35_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1499827,6 +1501544,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_36_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -1503019,6 +1504753,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_37_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1506598,6 +1508349,23 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_38_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -1509997,6 +1511765,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_39_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 50.4,
+          "y": 82.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1513563,6 +1515348,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_41_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 58.4,
+          "y": 99.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1517482,6 +1519284,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_42_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 58.4,
+          "y": 99.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1523204,6 +1525023,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_43_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 66.4,
+          "y": 110.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1533479,6 +1535315,23 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_44_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 82.4,
+          "y": 143.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]
@@ -1591292,6 +1593145,91 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "spirit_guide_45_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 230.58,
+          "y": 92.7,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_45_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 318.4,
+          "y": 90.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_45_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 101.2,
+          "y": 130.08,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_45_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 186.62,
+          "y": 314.32,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_45_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 294.4,
+          "y": 226.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [
@@ -1626166,6 +1628104,193 @@
             {
               "id": "repair",
               "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_0",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 32.4,
+          "y": 303.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_1",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 64.4,
+          "y": 290.0,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_2",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 174.39,
+          "y": 274.89,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_3",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 281.55,
+          "y": 235.31,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_4",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 202.38,
+          "y": 196.5,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_5",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 91.83,
+          "y": 205.3,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_6",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 42.5,
+          "y": 147.96,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_7",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 124.01,
+          "y": 113.06,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_8",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 236.32,
+          "y": 128.09,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_9",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 273.63,
+          "y": 73.09,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
+              "cost": 0
+            }
+          ]
+        },
+        {
+          "id": "spirit_guide_46_10",
+          "name": "Spirit Guide",
+          "role": "Resurrection",
+          "x": 153.7,
+          "y": 45.63,
+          "art": "spirit_guide",
+          "buys": false,
+          "dialogue": "Your spirit lingers between worlds. I can restore you to life here, though it drains 50% of your gear durability and leaves you with 10 minutes of Resurrection Sickness (all stats at 25%).",
+          "offers": [
+            {
+              "id": "spirit_resurrect",
+              "label": "Resurrect at Spirit Guide",
               "cost": 0
             }
           ]

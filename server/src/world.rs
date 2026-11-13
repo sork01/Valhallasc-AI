@@ -549,7 +549,7 @@ struct Player {
     /// Frozen in amber by a boss mechanic: cannot move or act, and cannot be hurt, until the cocoon is broken.
     frozen: bool,
 }
-const CORPSE_RESURRECT_RANGE: f64 = 1.8;
+const CORPSE_RESURRECT_RANGE: f64 = 15.;
 
 impl Player {
     pub(super) fn mark_corpse(&mut self, at: Point) {
@@ -712,7 +712,12 @@ impl Player {
         view["achievementPoints"] = json!(c.achievement_points());
         view["ghost"] = json!(c.hp <= 0. && c.ghost);
         view["corpse"] = json!(c.corpse);
+        view["resurrectionSickness"] = json!(r2(c.resurrection_sickness));
+        view["effectiveAttributes"] = json!(c.effective_attributes());
         view
+    }
+    pub(super) fn is_ghost(&self) -> bool {
+        self.character.hp <= 0. && self.character.ghost
     }
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
@@ -2862,6 +2867,27 @@ impl World {
         let Some(p) = self.players.get_mut(&session) else {
             return;
         };
+        if (p.character.hp <= 0. && p.character.ghost)
+            && !matches!(
+                message,
+                ClientMessage::Input { .. }
+                    | ClientMessage::Stop
+                    | ClientMessage::Move { .. }
+                    | ClientMessage::Resurrect
+                    | ClientMessage::Interact { .. }
+                    | ClientMessage::Mount { mounted: false }
+                    | ClientMessage::Chat { .. }
+                    | ClientMessage::Ping { .. }
+                    | ClientMessage::Social {
+                        command: SocialCommand::Refresh
+                            | SocialCommand::Who
+                            | SocialCommand::PartyLeave
+                    }
+                    | ClientMessage::Debug { .. }
+            )
+        {
+            return;
+        }
         if (p.character.spark_travel.is_some() || p.frozen)
             && !matches!(
                 message,
@@ -3078,6 +3104,7 @@ impl World {
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
             }
+            ClientMessage::Resurrect => self.resurrect_command(session),
             ClientMessage::ShopOpen { npc } => self.shop(session, &npc, shop::Request::Open),
             ClientMessage::SellBatch { npc, items } => {
                 self.shop(session, &npc, shop::Request::Sell(items))
@@ -3140,6 +3167,9 @@ impl World {
                 }
                 p.chat_at = self.time;
                 if text.eq_ignore_ascii_case("/dance") {
+                    if p.character.hp <= 0. {
+                        return;
+                    }
                     self.toggle_dance(session);
                     return;
                 }
@@ -3164,6 +3194,33 @@ impl World {
         }
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
+        if let Some(p) = self.players.get(&session)
+            && p.character.hp <= 0.
+        {
+            let is_spirit_guide = self.maps[p.character.zone]
+                .npcs
+                .iter()
+                .find(|npc| npc.id == npc_id)
+                .is_some_and(|npc| npc.art.as_deref() == Some("spirit_guide"));
+            if p.is_ghost() && is_spirit_guide {
+                self.interact_spirit_guide(session, npc_id, offer_id);
+            } else {
+                let _ = p.peer.try_send(json!({
+                    "type": "error",
+                    "text": "You cannot interact with anyone while dead."
+                }));
+            }
+            return;
+        }
+        if offer_id == Some("spirit_resurrect") {
+            if let Some(p) = self.players.get(&session) {
+                let _ = p.peer.try_send(json!({
+                    "type": "error",
+                    "text": "Only spirits can resurrect at a Spirit Guide."
+                }));
+            }
+            return;
+        }
         if offer_id == Some("festival:dance") {
             if let Err(text) = self.start_festival_dance(session, npc_id) {
                 let _ = self.players[&session]
@@ -3739,23 +3796,90 @@ impl World {
                 y: (c.y0 + c.y1) * 0.5,
             };
             std::iter::once(map.spawn)
-                .chain(map.camps.iter().map(center))
+                .chain(
+                    map.camps
+                        .iter()
+                        .filter(|_| map.name != "Nacrehold")
+                        .map(center),
+                )
                 .min_by(|a, b| a.distance(death).total_cmp(&b.distance(death)))
                 .unwrap_or(map.spawn)
         };
         map.collide(&mut point, PLAYER_RADIUS);
         point
     }
+    fn interact_spirit_guide(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
+        let Some(p) = self.players.get(&session) else {
+            return;
+        };
+        let Some(npc) = self.maps[p.character.zone]
+            .npcs
+            .iter()
+            .find(|npc| npc.id == npc_id && npc.art.as_deref() == Some("spirit_guide"))
+            .cloned()
+        else {
+            return;
+        };
+        if p.character.point().distance(npc.position_at(self.time)) > 2.8 {
+            let _ = p.peer.try_send(json!({
+                "type": "error",
+                "text": "Walk closer to speak with the Spirit Guide."
+            }));
+            return;
+        }
+        if let Some(p) = self.players.get_mut(&session) {
+            p.stop();
+            p.attack = 0.;
+        }
+        if offer_id == Some("spirit_resurrect") {
+            self.resurrect_at_spirit_guide(session);
+            return;
+        }
+        let p = &self.players[&session];
+        let _ = p.peer.try_send(json!({
+            "type": "dialogue",
+            "npc": npc,
+            "notice": "",
+            "gold": p.character.gold,
+            "level": p.character.level,
+            "quests": p.character.quests,
+            "abandonedQuests": p.character.abandoned_quests,
+            "inventory": p.character.inventory,
+            "equipment": p.character.equipment,
+            "gearInstances": p.character.gear_instances,
+            "bags": p.character.bags,
+            "bagCapacity": p.character.bag_capacity(),
+            "look": p.character.look
+        }));
+    }
+    fn resurrect_command(&mut self, session: u64) {
+        let Some(p) = self.players.get(&session) else {
+            return;
+        };
+        if !p.is_ghost() {
+            return;
+        }
+        let in_range = p.character.corpse.as_ref().is_some_and(|corpse| {
+            corpse.zone == p.character.zone
+                && p.character.point().distance(Point {
+                    x: corpse.x,
+                    y: corpse.y,
+                }) <= CORPSE_RESURRECT_RANGE
+        });
+        if !in_range {
+            let _ = p.peer.try_send(json!({
+                "type": "error",
+                "text": "Move within 15 tiles of your corpse to resurrect."
+            }));
+            return;
+        }
+        self.resurrect_at_corpse(session);
+    }
     fn resurrect_at_corpse(&mut self, session: u64) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        let mut point = p
-            .character
-            .corpse
-            .as_ref()
-            .filter(|c| c.zone == p.character.zone)
-            .map_or_else(|| p.character.point(), |c| Point { x: c.x, y: c.y });
+        let mut point = p.character.point();
         self.maps[p.character.zone].collide(&mut point, PLAYER_RADIUS);
         let p = self.players.get_mut(&session).unwrap();
         p.character.x = point.x;
@@ -3778,6 +3902,55 @@ impl World {
             "type": "notice",
             "ok": true,
             "text": "You resurrected at your corpse with half health."
+        }));
+        self.event("respawn", &id, point, 0., false);
+        self.save();
+    }
+    fn resurrect_at_spirit_guide(&mut self, session: u64) {
+        let Some(p) = self.players.get(&session) else {
+            return;
+        };
+        if !p.is_ghost() {
+            return;
+        }
+        let mut point = p.character.point();
+        self.maps[p.character.zone].collide(&mut point, PLAYER_RADIUS);
+        let p = self.players.get_mut(&session).unwrap();
+        let wear = if p.merc.is_some() || p.ambient.is_some() {
+            DeathWear::default()
+        } else {
+            p.character
+                .wear_worn_gear_by(crate::items::SPIRIT_GUIDE_WEAR)
+        };
+        p.character.x = point.x;
+        p.character.y = point.y;
+        p.character.resurrection_sickness = crate::model::RESURRECTION_SICKNESS_DURATION;
+        p.character.hp = p.character.max_hp();
+        p.character.reset_resource();
+        p.character.corpse = None;
+        p.character.ghost = false;
+        p.character.mounted = false;
+        p.combat_left = 0.;
+        p.dead_time = 0.;
+        p.fallen = false;
+        p.pack_death = false;
+        p.attack = 0.;
+        p.cooldown = 0.;
+        p.last_hurt = self.time;
+        p.stop();
+        let id = p.character.id.clone();
+        let text = if wear.broken > 0 {
+            format!(
+                "You resurrected at the Spirit Guide with Resurrection Sickness (stats at 25% for 10 minutes). {} worn piece(s) broke.",
+                wear.broken
+            )
+        } else {
+            "You resurrected at the Spirit Guide, losing 50% gear durability and gaining Resurrection Sickness (stats at 25% for 10 minutes).".to_owned()
+        };
+        let _ = p.peer.try_send(json!({
+            "type": "notice",
+            "ok": true,
+            "text": text
         }));
         self.event("respawn", &id, point, 0., false);
         self.save();
@@ -3831,6 +4004,15 @@ impl World {
             b.left -= TICK;
             b.left > 0.
         });
+        if p.character.resurrection_sickness > 0. {
+            p.character.resurrection_sickness =
+                if p.character.resurrection_sickness - TICK < 1e-9 {
+                    0.
+                } else {
+                    p.character.resurrection_sickness - TICK
+                };
+            p.character.hp = p.character.hp.min(p.character.max_hp());
+        }
         if p.character.spark_travel.is_some() {
             self.update_spark(session);
             return;
@@ -3848,16 +4030,6 @@ impl World {
                 p.attack = 0.;
                 p.cooldown = 0.;
                 p.dash = 0.;
-                if let Some(corpse) = &p.character.corpse
-                    && corpse.zone == p.character.zone
-                    && p.character.point().distance(Point {
-                        x: corpse.x,
-                        y: corpse.y,
-                    }) <= CORPSE_RESURRECT_RANGE
-                {
-                    self.resurrect_at_corpse(session);
-                    return;
-                }
                 if self.time - p.input_at > 0.3 {
                     p.input = Point::default();
                 }
@@ -3885,16 +4057,6 @@ impl World {
                     p.character.y = point.y;
                     p.walk += TICK * 11.;
                     p.face = dir;
-                }
-                if let Some(corpse) = &p.character.corpse
-                    && corpse.zone == p.character.zone
-                    && p.character.point().distance(Point {
-                        x: corpse.x,
-                        y: corpse.y,
-                    }) <= CORPSE_RESURRECT_RANGE
-                {
-                    self.resurrect_at_corpse(session);
-                    return;
                 }
                 self.use_portal(session);
                 return;
@@ -3979,7 +4141,7 @@ impl World {
                     let _ = p.peer.try_send(json!({
                         "type": "notice",
                         "ok": true,
-                        "text": "You are a ghost. Return to your body to resurrect."
+                        "text": "You are a ghost. Return to your body or speak with a Spirit Guide to resurrect."
                     }));
                     self.event("ghost", &id, graveyard, 0., false);
                     self.save();
@@ -12650,13 +12812,15 @@ mod tests {
         assert!(c.ghost);
         assert_eq!(c.hp, 0.);
         assert!(c.point().distance(expected_graveyard) < 1.);
-        // Reaching the corpse resurrects at half HP on the corpse.
+        // Moving within 15 tiles stays ghost until the player presses Resurrect.
         {
             let p = w.players.get_mut(&1).unwrap();
             p.character.x = corpse_at.x;
             p.character.y = corpse_at.y;
         }
         w.update_player(1);
+        assert!(w.players[&1].character.ghost);
+        w.message(1, ClientMessage::Resurrect);
         let c = &w.players[&1].character;
         assert!(!c.ghost);
         assert!(c.corpse.is_none());
@@ -16313,30 +16477,150 @@ mod tests {
             "ghost should walk from spawn via Move goal, stayed at {moved_pt:?}"
         );
 
-        // Moving to within CORPSE_RESURRECT_RANGE resurrects at corpse at half HP.
-        w.message(
-            1,
-            ClientMessage::Move {
-                x: death_at.x,
-                y: death_at.y,
-            },
-        );
+        // Moving within 15 tiles does NOT auto-resurrect; pressing Resurrect beyond 15 tiles fails;
+        // pressing Resurrect within 15 tiles resurrects at the ghost's current safe position at half HP.
         {
             let p = w.players.get_mut(&1).unwrap();
-            p.character.x = death_at.x - 1.0;
+            p.character.x = (death_at.x - 18.0).clamp(1., w.maps[0].size as f64 - 1.);
             p.character.y = death_at.y;
         }
+        w.message(1, ClientMessage::Resurrect);
+        assert!(
+            w.players[&1].character.ghost,
+            "resurrecting beyond 15 tiles must fail"
+        );
+        let safe_near = (2..=14)
+            .rev()
+            .filter_map(|dx| {
+                let pt = Point {
+                    x: (death_at.x - f64::from(dx)).clamp(1., w.maps[0].size as f64 - 1.),
+                    y: death_at.y,
+                };
+                let mut check = pt;
+                w.maps[0].collide(&mut check, PLAYER_RADIUS);
+                (pt.distance(death_at) <= 15.0 && check.distance(pt) < 0.01).then_some(pt)
+            })
+            .next()
+            .expect("open ground within 15 tiles of death_at");
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.stop();
+            p.character.x = safe_near.x;
+            p.character.y = safe_near.y;
+        }
         w.update_player(1);
+        assert!(
+            w.players[&1].character.ghost,
+            "walking within 15 tiles must not auto-resurrect"
+        );
+        w.message(1, ClientMessage::Resurrect);
         let c = &w.players[&1].character;
         assert!(!c.ghost);
         assert!(c.corpse.is_none());
         assert_eq!(c.hp, (c.max_hp() * 0.5).round().max(1.));
-        assert!(c.point().distance(death_at) < 0.01);
+        assert!(c.point().distance(safe_near) < 0.01);
         let p_after = w.players[&1].snapshot();
         assert_eq!(p_after["ghost"], false);
         assert!(p_after["corpse"].is_null());
         let snap_after = w.snapshot_for(0);
         assert_eq!(snap_after["corpses"].as_array().map(|a| a.len()), Some(0));
+    }
+
+    #[test]
+    fn corpse_run_spirit_guide_drains_50_percent_durability_and_applies_resurrection_sickness() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        // Equip a non-starter sword/armor to verify 50% durability drain cleanly.
+        let weapon_id = crate::items::ITEMS
+            .iter()
+            .find(|i| !i.starter && i.rarity != "gm" && i.kind == "weapon" && i.class == Some(Class::Warrior))
+            .expect("non-starter warrior weapon")
+            .id
+            .clone();
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.level = 100;
+            p.character.attributes.strength = 40;
+            p.character.attributes.stamina = 40;
+            p.character.attributes.agility = 40;
+            p.character.attributes.dexterity = 20;
+            p.character.add_item(&weapon_id, 1);
+            p.character.equipment.insert("weapon".into(), weapon_id.clone());
+            p.character.materialize_gear_instances();
+            p.character.hp = p.character.max_hp();
+        }
+        let baseline_attrs = w.players[&1].character.effective_attributes();
+        let baseline_stats = w.players[&1].character.stats();
+        let baseline_hp = w.players[&1].character.max_hp();
+        let baseline_crit = w.players[&1].character.crit_chance();
+        let baseline_dodge = w.players[&1].character.dodge_chance();
+
+        let guide = w.maps[0]
+            .npcs
+            .iter()
+            .find(|n| n.art.as_deref() == Some("spirit_guide"))
+            .expect("Spirit Guide in Greenmeadow")
+            .clone();
+        // Regular NPC blocked for ghost, Spirit Guide allowed and resurrects with penalties.
+        let other_npc_id = w.maps[0]
+            .npcs
+            .iter()
+            .find(|n| n.art.as_deref() != Some("spirit_guide") && n.buys)
+            .expect("merchant in Greenmeadow")
+            .id
+            .clone();
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = 0;
+            p.character.hp = 0.;
+            p.character.ghost = true;
+            p.character.corpse = Some(Corpse {
+                zone: 0,
+                x: 20.,
+                y: 20.,
+            });
+            p.character.x = guide.x;
+            p.character.y = guide.y;
+        }
+        w.message(
+            1,
+            ClientMessage::Interact {
+                npc: other_npc_id,
+                offer: None,
+            },
+        );
+        assert!(w.players[&1].character.ghost);
+
+        w.message(
+            1,
+            ClientMessage::Interact {
+                npc: guide.id.clone(),
+                offer: Some("spirit_resurrect".into()),
+            },
+        );
+        let c = &w.players[&1].character;
+        assert!(!c.ghost);
+        assert!(c.corpse.is_none());
+        assert_eq!(c.resurrection_sickness, RESURRECTION_SICKNESS_DURATION);
+        let copy = c.worn_gear_instance(&weapon_id, 0).unwrap();
+        assert_eq!(copy.durability(), 50, "50% durability drained");
+        let sick_attrs = c.effective_attributes();
+        let sick_stats = c.stats();
+        let sick_hp = c.max_hp();
+        assert!((sick_attrs.strength as f64 - baseline_attrs.strength as f64 * 0.25).abs() <= 1.0);
+        assert!((sick_stats.0 - baseline_stats.0 * 0.25).abs() < 0.05);
+        assert!((sick_stats.1 - baseline_stats.1 * 0.25).abs() < 0.05);
+        assert!((sick_hp - baseline_hp * 0.25).abs() < 0.05);
+        assert!((c.crit_chance() - baseline_crit * 0.25).abs() < 0.01);
+        assert!((c.dodge_chance() - baseline_dodge * 0.25).abs() < 0.01);
+
+        // Once sickness wears off, stats return to 100%.
+        w.players.get_mut(&1).unwrap().character.resurrection_sickness = TICK;
+        w.update_player(1);
+        let c = &w.players[&1].character;
+        assert_eq!(c.resurrection_sickness, 0.);
+        assert!((c.max_hp() - baseline_hp).abs() < 0.05);
+        assert!((c.stats().0 - baseline_stats.0).abs() < 0.05);
     }
 
     #[test]

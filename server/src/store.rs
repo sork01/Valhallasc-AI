@@ -270,6 +270,7 @@ impl Store {
             bank: Default::default(),
             corpse: None,
             ghost: false,
+            resurrection_sickness: 0.,
             landing: false,
         };
         c.seed_inventory();

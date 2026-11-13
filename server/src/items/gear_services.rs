@@ -41,6 +41,8 @@ pub struct DeathWear {
 pub const WEAR_MAX: u8 = 100;
 /// One death wears every worn piece by a tenth of its durability, whatever its level or rarity.
 pub const WEAR_PER_DEATH: u8 = 10;
+/// Resurrecting at a Spirit Guide drains half of every worn piece's durability.
+pub const SPIRIT_GUIDE_WEAR: u8 = 50;
 /// Repairing a piece from broken to new costs this share of its sale value.
 pub const REPAIR_PRICE_SHARE: f64 = 0.25;
 
@@ -270,6 +272,10 @@ impl Character {
     /// A death: every worn piece loses `WEAR_PER_DEATH` of its durability. Starter and game master gear never wears,
     /// and a piece that is already broken stays worn and broken.
     pub fn wear_worn_gear(&mut self) -> DeathWear {
+        self.wear_worn_gear_by(WEAR_PER_DEATH)
+    }
+    /// Wears every worn non-exempt piece down by `amount` points of durability (`WEAR_MAX = 100`).
+    pub fn wear_worn_gear_by(&mut self, amount: u8) -> DeathWear {
         self.materialize_gear_instances();
         let mut out = DeathWear::default();
         for (piece, at) in self.worn_copy_positions() {
@@ -282,7 +288,7 @@ impl Character {
             if !copy.broken() {
                 out.worn += 1;
             }
-            copy.wear = copy.wear.saturating_add(WEAR_PER_DEATH).min(WEAR_MAX);
+            copy.wear = copy.wear.saturating_add(amount).min(WEAR_MAX);
             out.broken += u32::from(copy.broken());
         }
         out

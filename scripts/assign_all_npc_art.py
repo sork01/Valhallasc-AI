@@ -14,7 +14,7 @@ ASSETS = ROOT / 'client/assets'
 def people():
     world = json.loads((ROOT / 'world/map.txt').read_text())
     return [n for z in [world] + world['zones'] for n in z.get('npcs', [])
-            if n.get('art') not in ('mailbox', 'stone', 'scenery')
+            if n.get('art') not in ('mailbox', 'stone', 'scenery', 'spirit_guide')
             and 'meeting stone' not in n['name'].lower()]
 
 

@@ -309,7 +309,7 @@
     }
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
-  const baseHeadTop=n=>n.art==='mailbox'?96:window.NpcArt?.top(n) || (n.art==='stone'?330:n.art==='scenery'?90:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101);
+  const baseHeadTop=n=>n.art==='mailbox'?96:n.art==='spirit_guide'?112:window.NpcArt?.top(n) || (n.art==='stone'?330:n.art==='scenery'?90:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101);
   const headTop=n=>window.Seasonal?.headTop?.(n,baseHeadTop(n))??baseHeadTop(n);
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
@@ -369,6 +369,22 @@
       line(g,[[27,-28],[27,-126]],'#7e7287',3);ellipse(g,27,-129,8,10,'#ffe6a0','#947297',2);
     }
   }
+  function drawSpiritGuide(g,n,t) {
+    const hover=Math.sin(t*2.4+n.x)*4;
+    g.save();g.translate(0,hover);
+    g.globalAlpha*=0.24;ellipse(g,0,-60,30,48,'#9beeff');
+    g.globalAlpha=0.88;
+    poly(g,[[-18,-72],[18,-72],[23,-26],[10,-12],[0,-20],[-10,-10],[-22,-25]],'#6fa7c4','#d8f6ff',2);
+    poly(g,[[-11,-66],[11,-66],[14,-28],[0,-22],[-14,-28]],'#b7ecff');
+    line(g,[[-15,-60],[-25,-39]],'#8ecae6',9);line(g,[[15,-60],[25,-39]],'#8ecae6',9);
+    poly(g,[[-20,-68],[-19,-96],[0,-110],[19,-96],[20,-68],[11,-74],[-11,-74]],'#5c90ad','#d8f6ff',2);
+    ellipse(g,0,-79,13,15,'#193247','#a6ecff',1.5);
+    ellipse(g,-4.5,-80,2.3,3,'#d7fbff');ellipse(g,4.5,-80,2.3,3,'#d7fbff');
+    const wx=27+Math.sin(t*3.1)*2.5,wy=-58+Math.cos(t*2.7)*3;
+    g.globalAlpha=0.35;ellipse(g,wx,wy,11,11,'#a8f4ff');
+    g.globalAlpha=0.95;ellipse(g,wx,wy,4.5,4.5,'#e9feff','#7dd3fc',1.5);
+    g.restore();
+  }
   function drawNpc(g,n,sx,sy,t,near,portrait=false) {
     g.save();g.translate(sx,sy);const L=n.look,sc=L?.scale||1,moving=!!n.moving;
     if(n.travelStop)window.Spark?.draw(g,n,t,true);
@@ -378,6 +394,7 @@
     g.save();g.scale(sc,sc);if(n.art!=='mailbox'&&!window.NpcArt?.frame(n,t,current?.id===n.id))g.translate(0,-bob);
     if(n.art==='stone'||n.art==='scenery'){}    // a speaking stone or tablet is drawn as an object
     else if(n.art==='mailbox'){window.Mail?.draw(g);}
+    else if(n.art==='spirit_guide'){drawSpiritGuide(g,n,t);}
     else if(window.NpcArt?.draw(g,n,t,current?.id===n.id,portrait)){}
     else if(n.art?.startsWith('sun_') && Field.sunwardSprites?.img[n.art]){
       const src=Field.sunwardSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
@@ -562,6 +579,12 @@
           const b=row('coin',offer.label||'Repair worn gear',packet.repairQuote.length?`${total.toLocaleString()} gold`:'Nothing to repair');
           b.dataset.view='repair';b.dataset.offer='repair';b.addEventListener('click',()=>show({kind:'repair'},'#npc-back'));offers.push(b);continue;
         }
+        if(offer.id==='spirit_resurrect') {
+          const b=row('heal',offer.label||'Resurrect at Spirit Guide',Field.hero?.ghost?'50% durability · 10m sickness':'Only available in Spirit Form');
+          b.dataset.offer='spirit_resurrect';b.disabled=!Field.hero?.ghost;
+          b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:'spirit_resurrect'}))b.disabled=true;});
+          offers.push(b);continue;
+        }
         if(offer.id==='stat_reset') {
           const b=row('coin','Reset trained attributes',`${(packet.statResetPrice||0).toLocaleString()} gold`);
           b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;
@@ -610,7 +633,7 @@
     acceptTimer=setTimeout(()=>{pendingAccept=null;button.disabled=false;},4000); return true;
   }
   function dialogue(packet) {
-    if(!Online.connected || Field.hero.dead)return;
+    if(!Online.connected || (Field.hero.dead && (!Field.hero.ghost || packet.npc?.art!=='spirit_guide')))return;
     const accepting=current?.id===packet.npc.id && pendingAccept;
     if(accepting){clearTimeout(acceptTimer);pendingAccept=null;}
     if(accepting && packet.quests?.some(q=>q.id===accepting&&!q.claimed)){
