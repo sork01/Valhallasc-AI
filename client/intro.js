@@ -222,7 +222,16 @@
       if (vig > .01) { const v = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .38, w / 2, h / 2, Math.hypot(w, h) * .6); v.addColorStop(0, 'rgba(4,6,14,0)'); v.addColorStop(1, `rgba(4,6,14,${vig})`); g.fillStyle = v; g.fillRect(0, 0, w, h); }
       c.flash = c.still ? 0 : Math.max(0, 1 - Math.abs(t - 48.8) / .22) * .85;
       c.veil = 0;
-      return { abs: { x: px, y: py, k: f.k }, alpha: ease(t / 1.2), walk: H.walk, face: H.face };
+      // The hero is painted over the finished scene, but the sail stands nearer the camera than anyone forward of the mast: the ship is drawn once
+      // more, clipped to the sail's own outline (the same points as meadowdock.js `ship`), so the sail covers what it should.
+      const over = G => {
+        const um = .47, hz = 30 + 26 * (2 * um - 1) ** 4 + bob(t), sw = SHIP.beam / 2 * 1.35, sway = Math.sin(t * .7) * 3;
+        G.beginPath();
+        for (let i = 0; i <= 8; i++) { const [x, y] = P(ship.x - sw + 2 * sw * i / 8, ship.y0 + um * LEN, hz + 205); i ? G.lineTo(x, y) : G.moveTo(x, y); }
+        for (let i = 8; i >= 0; i--) { const q = i / 8, belly = Math.sin(q * Math.PI) * 9, [x, y] = P(ship.x - sw + 2 * sw * q, ship.y0 + (um + .012) * LEN, hz + 70); G.lineTo(x + belly * .4 + sway, y + belly); }
+        G.closePath(); G.clip(); window.MeadowDock.ship(G, d2, P, t);
+      };
+      return { abs: { x: px, y: py, k: f.k }, alpha: ease(t / 1.2), walk: H.walk, face: H.face, over };
     },
   });
 

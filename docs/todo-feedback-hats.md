@@ -79,7 +79,42 @@ with room still receives the ordinary ground award.
 
 The existing mail table is reused; there is no database schema migration.
 
-## Headgear directions
+## Headgear directions, corrected (Beta 1.48.1, `HELM-DIRECTIONS-PROPER`)
+
+The 1.47.2 approach below only narrowed and sheared the stored drawing, and the
+owner rejected the result ("good south and north, the rest look like shit").
+Cause: every head layer has two drawings per pose, a front (stored for S) and a
+back (stored for N); the side rows repeat one of them. `turnHead` in
+`client/magesprite.js` now rebuilds every turned pose from that pose's own S and
+N frames, using the same `headFrames` records (`[x, y, right-axis x, right-axis
+y, front, side]`); no sprite, bounds or manifest file changed.
+
+- **Shell:** each row of the hat has a radius about the head axis. The screen
+  shows the half-turn facing the camera: the front drawing covers a quarter turn
+  either side of the face, the back drawing the rest, shifted by the yaw. Each
+  drawing is sampled one pixel short of its side outline, so no outline lands
+  where they meet; the new side edges get the drawing's darkest colour.
+- **Far side:** where the near shell is open, the far shell shows, 40 px behind
+  in depth, so the head covers it.
+- **Standing parts** (ears, feathers, horns, plumes): whatever rises above the
+  running minimum of the outline from the head axis outwards. Drawn once, from
+  the front drawing for front-facing yaws and the back one otherwise, at
+  `h * cos(yaw)` (never under half), the far one behind.
+- **Depth:** the back drawing's half sits 8 px towards the camera so a turned
+  hood covers the hair behind the face; the front drawing's half keeps its own
+  depth so face and fringe show as they do from the front.
+- S and N (within 0.2 of a quarter turn) are returned untouched.
+
+Known limits: a deep hood hides most of the face in profile; winged helms splay
+both wings in profile; a crown's points bunch towards the middle. True side
+drawings per piece would be the only cure.
+
+Checks: `tests/headgear-directions.cjs` passes for all five classes and both
+bodies (382 layers, 51,952 poses, minimum 83 changed pixels). Contact sheets
+through the real compositor with `tests/gear-sheet.cjs` were reviewed for
+hunter, mage, warrior and assassin (idle) and a hunter hurt pose.
+
+## Headgear directions (1.47.2, superseded)
 
 The saved hat frames used a camera-facing head plane. `MageSprite` now attaches
 that plane to the rig's real head origin and axes when decoding head layers.

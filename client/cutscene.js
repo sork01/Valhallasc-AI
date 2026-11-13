@@ -323,6 +323,8 @@
       shoeState = hold; try { paintHero(g, t); } finally { hero.mounted = mounted; if (!pose.walk) hero.walk = walk; hero.moving = moving; hero.fx = fx; hero.fy = fy; }
     } else hero.mounted = mounted;
     g.restore();
+    // Scenery that stands in front of the hero (the opening's sail) is painted again over them.
+    if (pose.over && !pose.hidden) { g.save(); try { pose.over(g); } finally { g.restore(); } }
     if (c.veil > 0) { g.save(); g.globalAlpha = c.veil * cover; g.fillStyle = '#1b6fb0'; g.fillRect(0, 0, w, h); g.restore(); }
     if (c.flash > 0 && !still) { g.save(); g.globalAlpha = clamp(c.flash, 0, 1) * cover; g.fillStyle = '#f4fcff'; g.fillRect(0, 0, w, h); g.restore(); }
     // The finished frame is shown on an opaque canvas inside the overlay, which covers the HUD pieces drawn as page elements.

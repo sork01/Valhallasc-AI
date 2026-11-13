@@ -89,46 +89,110 @@
   }
   const bytesOf = text => { const raw = atob(text), out = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; };
   const loadImages = files => Promise.all([bitmap('assets/' + files.png), bitmap('assets/' + files.depth)]);
-  // Saved head layers were painted on a camera-facing plane. Attach that plane
-  // to the pose's head axes: side views narrow and pitch in opposite directions.
-  // Keep some shell width at a full profile, rather than collapsing a helmet to a line.
-  function turnHead(frame, pose, fw, fh) {
-    if (!pose || !frame.w || !frame.h) return frame;
-    const [cx, cy, rx, ry, front, side] = pose;
-    if (Math.abs(side) < .001) return frame;
-    const width = .7 + .3 * front * front; let pitch = side * .32;
-    const local = (x, y) => [(x - cx) * rx + (y - cy) * ry, (x - cx) * ry - (y - cy) * rx];
-    const screen = (x, y) => [cx + rx * x + ry * y, cy + ry * x - rx * y];
-    const project = (x, y) => { const [u, v] = local(x, y); return screen(u * width, v + pitch * u); };
-    // Tall hats can already be near an atlas edge in hurt/death poses. Limit
-    // the pitch there while keeping the head socket and side-view width fixed.
-    let room = 1;
-    for (let y = 0; y < frame.h; y++) for (let x = 0; x < frame.w; x++) {
-      if (!frame.pixels[(y * frame.w + x) * 4 + 3]) continue;
-      const [u, v] = local(frame.x + x + .5, frame.y + y + .5), base = screen(u * width, v);
-      const delta = [ry * pitch * u, -rx * pitch * u];
-      for (let axis = 0; axis < 2; axis++) {
-        const limit = (axis ? fh : fw) - 1.5;
-        if (delta[axis] > 0) room = Math.min(room, (limit - base[axis]) / delta[axis]);
-        else if (delta[axis] < 0) room = Math.min(room, (1.5 - base[axis]) / delta[axis]);
+  // Saved head layers have two drawings per pose: the front (stored for S) and the back (stored for N); the side rows only repeat one of them.
+  // A turned head therefore gets a real turn here: the two drawings are wrapped round the head's own axis (HELM-DIRECTIONS-PROPER, 2026-11-13).
+  //  - Each row of the hat has a radius about the head axis; inside it the drawing is a shell, and the screen shows the half-turn of it that
+  //    faces the camera: part of the front drawing and part of the back one, shifted by the head's yaw.
+  //  - Where the near shell is open (a face opening) the far shell shows, pushed behind the head in depth.
+  //  - What rises above the smooth outline of the shell (ears, a feather, horns) is a part STANDING on the head, drawn once: it keeps its
+  //    place across the head, foreshortened by the yaw, and the one on the far side goes behind the shell.
+  // `pose` rows are [head x, head y, right-axis x, right-axis y, front, side] (scripts/headgear_poses.py).
+  // The back drawing's half of the near shell sits a little towards the camera, so a turned hood covers the hair behind the face as it does from
+  // behind; the front drawing's half keeps its own depth, so the face and fringe show exactly as they do from the front.
+  const HEAD_NEAR = 8 * 64, HEAD_FAR = 40 * 64, QUARTER = Math.PI / 2;
+  const wrapTurn = a => { while (a > 2) a -= 4; while (a <= -2) a += 4; return a; };
+  function headView(frame, pose) {
+    const [cx, cy, rx, ry] = pose;
+    return {
+      frame, has: !!(frame && frame.w && frame.h),
+      local: (x, y) => [(x - cx) * rx + (y - cy) * ry, (x - cx) * ry - (y - cy) * rx],
+      at(u, v) {      // index of the drawing's pixel at head coordinates (u right on screen, v up), or -1
+        const ix = Math.floor(cx + rx * u + ry * v) - frame.x, iy = Math.floor(cy + ry * u - rx * v) - frame.y;
+        if (ix < 0 || iy < 0 || ix >= frame.w || iy >= frame.h) return -1;
+        const k = iy * frame.w + ix; return frame.pixels[k * 4 + 3] ? k : -1;
+      },
+    };
+  }
+  function turnHead(frame, pose, front, frontPose, back, backPose, fw, fh) {
+    if (!pose || !frontPose || !backPose) return frame;
+    const q = Math.atan2(pose[5], pose[4]) / QUARTER;      // quarter turns: 0 faces the camera, -1 faces screen left, +1 right, 2 away
+    if (Math.abs(q) < .2 || Math.abs(q) > 1.8) return frame;
+    const F = headView(front, frontPose), B = headView(back, backPose), T = headView(frame, pose);
+    if (!F.has || !B.has) return frame;
+    // Standing parts: per column of a drawing, whatever rises above the outline's running minimum from the head axis outwards.
+    const standing = V => { const f = V.frame, tops = new Map(), mask = new Uint8Array(f.w * f.h), col = [], row = [];
+      for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) { const k = y * f.w + x; if (!f.pixels[k * 4 + 3]) continue;
+        const [u, v] = V.local(f.x + x + .5, f.y + y + .5), c = Math.round(u); col[k] = c; row[k] = v; if (!(tops.get(c) >= v)) tops.set(c, v); }
+      const limit = new Map(), edge = Math.max(0, ...[...tops.keys()].map(Math.abs));
+      for (const side of [1, -1]) { let cur = tops.get(0) ?? Infinity; for (let c = 0; c <= edge; c++) { const t = tops.get(side * c); if (t !== undefined) cur = Math.min(cur, t); limit.set(side * c, cur); } }
+      for (let k = 0; k < mask.length; k++) if (f.pixels[k * 4 + 3] && row[k] > limit.get(col[k]) + 1.5) mask[k] = 1;
+      V.stand = mask; };
+    standing(F); standing(B);
+    // Row extents of the shell in head coordinates h (positive = the hero's left = screen right in the front drawing; the back one is mirrored).
+    const rows = new Map(); let vmin = Infinity, vmax = -Infinity, reach = 0, dark = null, darkL = Infinity;
+    const scan = (V, sign, isFront) => { const f = V.frame; for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
+      const k = y * f.w + x; if (!f.pixels[k * 4 + 3]) continue;
+      const [u, v0] = V.local(f.x + x + .5, f.y + y + .5), v = Math.round(v0), h = sign * u;
+      if (v < vmin) vmin = v; if (v > vmax) vmax = v; if (Math.abs(h) > reach) reach = Math.abs(h);
+      if (isFront) { const L = f.pixels[k * 4] * 3 + f.pixels[k * 4 + 1] * 6 + f.pixels[k * 4 + 2]; if (L < darkL) { darkL = L; dark = [f.pixels[k * 4], f.pixels[k * 4 + 1], f.pixels[k * 4 + 2], 255]; } }
+      if (V.stand[k]) continue;
+      let r = rows.get(v); if (!r) rows.set(v, r = { lo: Infinity, hi: -Infinity });
+      if (h < r.lo) r.lo = h; if (h > r.hi) r.hi = h;
+    } };
+    scan(F, 1, true); scan(B, -1, false);
+    if (!rows.size) return frame;
+    // A row's shell radius is its reach from the head axis; rows with standing parts only borrow the nearest shell row's.
+    let widest = 0; for (const r of rows.values()) widest = Math.max(widest, Math.max(-r.lo, r.hi));
+    if (widest < 2) return frame;
+    const radius = v => {
+      for (let d = 0; d <= vmax - vmin; d++) for (const vv of d ? [v - d, v + d] : [v]) { const r = rows.get(vv); if (r) { const R = Math.max(-r.lo, r.hi); if (R >= 1.5) return R; } }
+      return widest;
+    };
+    const R = new Map(); for (let v = vmin - 1; v <= vmax + 1; v++) R.set(v, radius(v));
+    // Output raster: everything can land within `reach` of the head axis.
+    const span = Math.ceil(reach) + 2, corners = [[-span, vmin - 2], [span, vmin - 2], [-span, vmax + 2], [span, vmax + 2]].map(([u, v]) => [pose[0] + pose[2] * u + pose[3] * v, pose[1] + pose[3] * u - pose[2] * v]);
+    const x0 = Math.max(1, Math.floor(Math.min(...corners.map(c => c[0])))), y0 = Math.max(1, Math.floor(Math.min(...corners.map(c => c[1]))));
+    const x1 = Math.min(fw - 1, Math.ceil(Math.max(...corners.map(c => c[0])))), y1 = Math.min(fh - 1, Math.ceil(Math.max(...corners.map(c => c[1]))));
+    const w = x1 - x0, h = y1 - y0; if (w <= 0 || h <= 0) return frame;
+    const pixels = new Uint8ClampedArray(w * h * 4), z = new Uint16Array(w * h).fill(65535), shell = new Uint8Array(w * h);
+    const put = (t, V, k, depth, kind) => { if (depth >= z[t]) return; pixels.set(V.frame.pixels.subarray(k * 4, k * 4 + 4), t * 4); z[t] = Math.max(0, Math.min(65534, depth)); shell[t] = kind; };
+    // The shell at surface angle `a` (quarter turns from the face) on row v: the front drawing covers -1..1, the back one the rest. Sampling
+    // stops one pixel short of each drawing's side outline, so no outline lands where the two meet.
+    const surface = (a, v, Rv) => {
+      const inner = Math.max(1, Rv - 1);
+      if (Math.abs(a) <= 1) { const k = F.at(a * inner, v); return k < 0 || F.stand[k] ? null : [F, k]; }
+      const k = B.at((a > 0 ? a - 2 : a + 2) * inner, v); return k < 0 || B.stand[k] ? null : [B, k];
+    };
+    for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) {
+      const [u, v0] = T.local(x0 + dx + .5, y0 + dy + .5), v = Math.round(v0), Rv = R.get(v); if (Rv === undefined) continue;
+      const s = u / Rv; if (Math.abs(s) > 1) continue;
+      const t = dy * w + dx, near = surface(wrapTurn(s - q), v0, Rv);
+      if (near) { put(t, near[0], near[1], near[0].frame.z[near[1]] - (near[0] === B ? HEAD_NEAR : 0), 1); continue; }
+      const far = surface(wrapTurn((s < 0 ? -2 - s : 2 - s) - q), v0, Rv);
+      if (far) put(t, far[0], far[1], far[0].frame.z[far[1]] + HEAD_FAR, 2);
+    }
+    // Standing parts, from the drawing that shows them from this side of the head.
+    {
+      const V = Math.abs(q) <= 1 ? F : B, sign = V === F ? 1 : -1, f = V.frame, sin = Math.sin(q * QUARTER);
+      let cos = Math.cos(q * QUARTER); if (Math.abs(cos) < .5) cos = cos < 0 ? -.5 : .5;
+      for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
+        const k = y * f.w + x; if (!V.stand[k]) continue;
+        const [u, v0] = V.local(f.x + x + .5, f.y + y + .5), hh = sign * u, uo = hh * cos, depth = f.z[k] + hh * sin * 64;
+        for (const du of Math.abs(cos) > .8 ? [0] : [-.4, .4]) {
+          const px = Math.floor(pose[0] + pose[2] * (uo + du) + pose[3] * v0) - x0, py = Math.floor(pose[1] + pose[3] * (uo + du) - pose[2] * v0) - y0;
+          if (px >= 0 && py >= 0 && px < w && py < h) put(py * w + px, V, k, depth, 3);
+        }
       }
     }
-    pitch *= Math.max(0, room);
-    const corners = [[frame.x, frame.y], [frame.x + frame.w, frame.y], [frame.x, frame.y + frame.h], [frame.x + frame.w, frame.y + frame.h]].map(([x, y]) => project(x, y));
-    const x = Math.max(0, Math.floor(Math.min(...corners.map(p => p[0])))), y = Math.max(0, Math.floor(Math.min(...corners.map(p => p[1]))));
-    const w = Math.min(fw, Math.ceil(Math.max(...corners.map(p => p[0])))) - x, h = Math.min(fh, Math.ceil(Math.max(...corners.map(p => p[1])))) - y;
-    const pixels = new Uint8ClampedArray(w * h * 4), z = new Uint16Array(w * h).fill(65535);
-    for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) {
-      const [u, v] = local(x + dx + .5, y + dy + .5), originalX = u / width;
-      const [sx, sy] = screen(originalX, v - pitch * originalX);
-      const ix = Math.floor(sx) - frame.x, iy = Math.floor(sy) - frame.y;
-      if (ix < 0 || iy < 0 || ix >= frame.w || iy >= frame.h) continue;
-      const source = iy * frame.w + ix, target = dy * w + dx;
-      if (!frame.pixels[source * 4 + 3]) continue;
-      pixels.set(frame.pixels.subarray(source * 4, source * 4 + 4), target * 4);
-      z[target] = Math.max(0, Math.min(65534, Math.round(frame.z[source] + side * originalX * .18 * 64)));
+    // The shell's new side edges get the drawing's own outline colour.
+    if (dark) for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) {
+      const t = dy * w + dx; if (shell[t] !== 1) continue;
+      if ((dx === 0 || !pixels[(t - 1) * 4 + 3]) || (dx === w - 1 || !pixels[(t + 1) * 4 + 3])) {
+        const [u] = T.local(x0 + dx + .5, y0 + dy + .5), Rv = R.get(Math.round(T.local(x0 + dx + .5, y0 + dy + .5)[1]));
+        if (Rv && Math.abs(u) > Rv - 1.6) pixels.set(dark, t * 4);
+      }
     }
-    return { x, y, w, h, pixels, z };
+    return { x: x0, y: y0, w, h, pixels, z };
   }
   // Retain only occupied rectangles. `bounds` (4 bytes per frame, the sidecar's) tells which rectangle to copy.
   async function decodePart(meta, bounds, images, slicer, part) {
@@ -150,10 +214,20 @@
           for (let k = 0; k < z.length; k++) z[k] = d[k * 4] * 256 + d[k * 4 + 1];
         }
         const key = `${clip}/${dir}/${i}`, frame = { x: box[0], y: box[1], w: box[2], h: box[3], pixels, z };
-        frames[key] = part?.startsWith('head_') ? turnHead(frame, meta.headFrames?.[key], fw, fh) : frame;
+        frames[key] = frame;
         if (slicer.due()) await slicer.yield();
       }
     } finally { color.close(); depth.close(); }
+    // Head layers: every turned pose is rebuilt from that pose's own front (S) and back (N) drawings.
+    if (part?.startsWith('head_') && meta.headFrames) {
+      const P = meta.headFrames, turned = {};
+      for (const key of Object.keys(frames)) {
+        const [clip, , i] = key.split('/'), fk = `${clip}/0/${i}`, bk = `${clip}/4/${i}`;
+        turned[key] = turnHead(frames[key], P[key], frames[fk], P[fk], frames[bk], P[bk], fw, fh);
+        if (slicer.due()) await slicer.yield();
+      }
+      return turned;
+    }
     return frames;
   }
   // Test mode (window.__valhallaTestSprites, set only by the automated tests): every class gets one tiny static figure

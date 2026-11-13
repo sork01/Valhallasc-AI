@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.48.1",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Helmets, hoods and hats now turn with your head: from the side you see the face opening at the front and the back of the helm behind it, instead of a front view on a sideways head.",
+      "Ears, feathers, horns and plumes on headgear stay in their place on the head when you turn.",
+      "In the opening cutscene the sail now passes in front of your hero when they walk behind it."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.48.0",
     "date": "2026-11-13",
     "new": [

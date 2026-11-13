@@ -37,7 +37,7 @@ const check=(ok,label)=>{assert.ok(ok,label);console.log(`${++checks}: ${label}`
  check(m.maxStep<.25&&m.maxZoomStep<.03,'The camera is one continuous move without jumps');
  check(Math.abs(m.end[0]-1)<.001&&Math.hypot(m.end[1],m.end[2])<.01&&Math.abs(m.end[3])<.01&&Math.hypot(...m.heroEnd)<.01,'It ends on the pier start at the game zoom with the hero there');
  await page.evaluate(()=>Cutscene.play(['intro'],{skippable:false}));
- for(const at of [2.5,8,12,18,23,29,36,42,48,49.5,52,55,57.5,60.5]){
+ for(const at of [2.5,8,12,18,23,29,36,42,48,49.5,52,54.4,55,55.6,57.5,60.5]){
   await page.waitForFunction(at=>!Cutscene.active||Cutscene.state.el>=at,at,{timeout:20000});
   await page.screenshot({path:path.join(world.runDir,`intro-${String(at).replace('.','_')}.png`)});
  }
