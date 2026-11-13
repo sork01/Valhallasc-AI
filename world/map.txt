@@ -1095823,7 +1095823,7 @@
           "name": "Travel Master Sol",
           "role": "Branchwing courier · Spark Travel",
           "x": 246,
-          "y": 150,
+          "y": 148.5,
           "color": "#74d7d0",
           "travelStop": "Sunleaf Lookout",
           "travelLinks": [

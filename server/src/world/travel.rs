@@ -445,12 +445,7 @@ mod spark_tests {
                 let point = n.position_at(0.);
                 let mut resolved = point;
                 map.collide(&mut resolved, PLAYER_RADIUS);
-                // The Sunleaf Lookout's master stands against scenery (found 2026-11-13, not moved here).
-                assert!(
-                    resolved.distance(point) < 1e-8 || n.id == "travel_lookout",
-                    "{} blocked",
-                    n.id
-                );
+                assert!(resolved.distance(point) < 1e-8, "{} blocked", n.id);
                 assert!(map.in_city(point));
                 assert!(
                     map.portals

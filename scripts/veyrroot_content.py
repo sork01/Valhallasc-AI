@@ -247,7 +247,7 @@ def people(world, zone, hamlets, old):
                  offers=copy.deepcopy(healer + [o for o in supplier if o['id'] == 'stew']) if trader else [], buys=trader, look=s['look'])
         out.append(n)
     keys = [k for k in hamlets if k != 'rootfoot']
-    spots = {'gladewatch': (-1, 3.5), 'rootstair': (-1, 3.5), 'eastbark': (-1, 3.5), 'lookout': (-6, 4)}
+    spots = {'gladewatch': (-1, 3.5), 'rootstair': (-1, 3.5), 'eastbark': (-1, 3.5), 'lookout': (-6, 2.5)}   # the lookout's leaf lantern stands at (-6, 4)
     for key in keys:
         dx, dy = spots[key]
         h = hamlets[key]
