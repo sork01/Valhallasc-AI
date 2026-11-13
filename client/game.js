@@ -1088,6 +1088,7 @@
       view.set(c); p.style.backgroundImage = `url(${view.snapshot()})`; p.style.backgroundSize = '200% auto'; p.style.backgroundPosition = '57% 26%';
     } else { p.style.backgroundImage = 'url(assets/warrior.webp)'; p.style.backgroundSize = '250% auto'; p.style.backgroundPosition = '57% 8%'; }
     $('hud-name').textContent = c.name; $('pause').hidden = true; $('equipment').hidden = true; $('dead-msg').hidden = true;
+    setCharacterTab('stats');
     $('p-equipment').hidden = !modular(c);
     Field.start({ canvas: $('fieldcv'), mini: $('minimap'), char: c, opts: OPT, onHud, onEvent: onField,
       onCharacter: look => {
@@ -1101,8 +1102,27 @@
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
   function leaveGame() { window.Settings?.close(false); if (window.Field) Field.stop(); }
-  let equipmentFocus = null, equipmentArtPending = null;
-  function setPause(on) { window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
+  const CHARACTER_TABS = ['stats', 'sets', 'achievements', 'mounts', 'rebirth'];
+  let equipmentFocus = null, equipmentArtPending = null, characterTab = 'stats';
+  function setCharacterTab(tab = 'stats') {
+    characterTab = CHARACTER_TABS.includes(tab) ? tab : 'stats';
+    const win = document.querySelector('#equipment .character-window');
+    if (win) win.dataset.tab = characterTab;
+    for (const button of document.querySelectorAll('#equipment .character-tab')) {
+      const active = button.dataset.tab === characterTab;
+      button.setAttribute('aria-selected', String(active));
+      button.tabIndex = active ? 0 : -1;
+      const panel = $(button.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !active;
+    }
+    if (characterTab !== 'stats') window.Attributes?.close?.();
+    if (!$('equipment').hidden) {
+      if (characterTab === 'achievements') window.Achievements?.onShow?.();
+      else renderEquipment();
+      window.Settings?.applyScale?.();
+    }
+  }
+  function setPause(on) { window.Attributes?.close?.(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
     mage.set(c);
@@ -1127,21 +1147,25 @@
     Inventory.renderEquipped(document.getElementById('equipped-slots'));
     Inventory.renderSets();
   }
-  function openEquipment(view = 'both') {
+  function openEquipment(view = 'both', tab) {
     window.Skillbar?.close(false);
     window.Quests?.close(false);
     City.close(false);
     if (scene !== 'game' || !Online.connected || Field.hero.dead || !modular(save.char)) return;
-    if ($('equipment').hidden) equipmentFocus = document.activeElement;
+    const wasHidden = $('equipment').hidden;
+    if (wasHidden) equipmentFocus = document.activeElement;
     const workspace = document.querySelector('.equipment-workspace');
     workspace.dataset.view = view; workspace.setAttribute('aria-labelledby', view === 'bags' ? 'bag-title' : 'equipment-title');
     $('pause').hidden = true; $('equipment').hidden = false; Field.setPaused(true);
+    setCharacterTab(tab || (wasHidden ? 'stats' : characterTab));
     $('equipmentcv').setAttribute('aria-label', 'Equipped ' + save.char.class);
     Inventory.renderEquipped($('equipped-slots'));
     ensureMage(save.char.class, save.char.gender).then(renderEquipment).catch(() => showToast(t(save.char.class + 'Error')));
     if (view === 'bags') $('bag-sort').focus({ preventScroll: true });
-    else $('field-' + save.char.class + 'Armor')?.focus({ preventScroll: true });
+    else if (characterTab === 'stats') $('field-' + save.char.class + 'Armor')?.focus({ preventScroll: true });
+    else $('character-tab-' + characterTab)?.focus({ preventScroll: true });
   }
+  window.CharacterPane = { open: tab => openEquipment('both', tab), close: () => { if (!$('equipment').hidden) setPause(false); }, setTab: setCharacterTab, get tab() { return characterTab; } };
   addEventListener('keydown', e => {
     if (scene !== 'game' || e.defaultPrevented || e.repeat) return;
     const isEsc = e.key === 'Escape' || Keys.is(e, 'menu'), isChar = Keys.is(e, 'character'), isBags = Keys.is(e, 'bags'), gearKey = isChar || isBags;
@@ -1188,9 +1212,19 @@
   $('bag-character').addEventListener('click', () => openEquipment(document.querySelector('.equipment-workspace').dataset.view === 'bags' ? 'both' : 'bags'));
   addEventListener('inventory-change', () => { if (!$('equipment').hidden) renderEquipment(); });
   addEventListener('character-stats-change', () => { if (!$('equipment').hidden) renderEquipment(); });
+  for (const button of document.querySelectorAll('#equipment .character-tab')) button.addEventListener('click', () => setCharacterTab(button.dataset.tab));
   $('equipment').addEventListener('keydown', event => {
+    if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key) && event.target.matches?.('.character-tab[role="tab"]')) {
+      event.preventDefault();
+      const i = CHARACTER_TABS.indexOf(event.target.dataset.tab);
+      const next = event.key === 'Home' ? CHARACTER_TABS[0] : event.key === 'End' ? CHARACTER_TABS.at(-1)
+        : CHARACTER_TABS[(i + (event.key === 'ArrowRight' ? 1 : CHARACTER_TABS.length - 1)) % CHARACTER_TABS.length];
+      setCharacterTab(next);
+      $('character-tab-' + next)?.focus({ preventScroll: true });
+      return;
+    }
     if (event.key !== 'Tab') return;
-    const nodes = [...$('equipment').querySelectorAll('button:not(:disabled), select:not(:disabled), input:not(:disabled)')];
+    const nodes = [...$('equipment').querySelectorAll('button:not(:disabled), select:not(:disabled), input:not(:disabled), [tabindex="0"]')];
     const visible = nodes.filter(n => n.getClientRects().length > 0), first = visible[0], last = visible.at(-1);
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }

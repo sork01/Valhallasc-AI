@@ -26,6 +26,7 @@ const debug = (page, command) => page.evaluate(command => Online.send({ type: 'd
 const level = (page, n) => debug(page, { op: 'set_level', level: n }).then(() => page.waitForFunction(n => Field.hero.level === n, n, { timeout: 10000 }));
 async function openPanel(page) {
   await page.keyboard.press('e');
+  await page.locator('#character-tab-rebirth').click();
   await page.waitForSelector('#character-rebirth .rebirth-perk');
 }
 async function closePanel(page) { await page.keyboard.press('Escape'); await page.waitForFunction(() => document.getElementById('equipment').hidden); }

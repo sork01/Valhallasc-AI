@@ -1096,12 +1096,14 @@
   "Champion's Banquet": "Mästarens bankett",
   "Changing either offer clears both confirmations. The exchange finishes only after both players confirm.": "Om någon av erbjudandena ändras nollställs båda bekräftelserna. Bytet slutförs först när båda spelarna har bekräftat.",
   "Character": "Karaktär",
+  "Character & stats": "Karaktär & attribut",
   "Character (E)": "Karaktär (E)",
   "Character and bags": "Karaktär och väskor",
   "Character button": "Karaktärsknapp",
   "Character creation": "Skapa karaktär",
   "Character frame": "Karaktärsruta",
   "Character key could not be saved. Keep this window open.": "Karaktärsnyckeln kunde inte sparas. Håll det här fönstret öppet.",
+  "Character sections": "Karaktärsavsnitt",
   "Character storage is unavailable.": "Karaktärslagringen är inte tillgänglig.",
   "Charge": "Rusning",
   "Chart the whole basin by defeating each of its deeper guardians.": "Kartlägg hela bäckenet genom att besegra var och en av dess djupare väktare.",
@@ -9834,5 +9836,8 @@
   "Hand in": "Lämna in",
   "Quests from this person": "Uppdrag från den här personen",
   "Outpost Guard": "Utpostvakt",
-  "Town Guard": "Stadsvakt"
+  "Town Guard": "Stadsvakt",
+  "Recommended stats": "Rekommenderade attribut",
+  "Spend stat points?": "Spendera attributpoäng?",
+  "Spend 1 point?": "Spendera 1 poäng?"
 }

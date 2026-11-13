@@ -5,8 +5,65 @@
   const primary = { warrior: 'strength', assassin: 'agility', mage: 'intellect', priest: 'intellect', hunter: 'agility' };
   const weights = {warrior:[40,5,0,30,10,15],mage:[0,5,45,25,10,15],assassin:[10,40,0,20,15,15],priest:[0,5,45,30,5,15],hunter:[5,40,0,25,15,15]};
   const reasons = {warrior:'Strength and stamina lead, with accuracy and defense as support.',mage:'Intellect leads for spell power and mana; stamina keeps you alive.',assassin:'Agility leads for attack and critical hits, with dodge and stamina.',priest:'Intellect and stamina support healing and survival.',hunter:'Agility leads bow damage; stamina and accuracy support safe shots.'};
+  const $ = id => document.getElementById(id);
+  const dialog = () => $('recommended-dialog');
   const node = (tag, text, cls) => { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; };
   const percent = n => `${Number(((n || 0) * 100).toFixed(1))}%`;
+  function closePreview(restoreFocus = false) {
+    previewOpen = false;
+    const dlg = dialog();
+    if (dlg) dlg.hidden = true;
+    if (restoreFocus) document.querySelector('#character-attributes .attribute-recommend')?.focus({ preventScroll: true });
+  }
+  function wirePreview() {
+    const dlg = dialog();
+    if (!dlg || dlg.dataset.wired) return;
+    dlg.dataset.wired = '1';
+    $('recommended-cancel')?.addEventListener('click', () => { closePreview(true); render(); });
+    $('recommended-confirm')?.addEventListener('click', () => {
+      if (!character || !(character.statPoints > 0) || pending) return;
+      if (Online.send({ type: 'allocate_recommended' })) { pending = true; closePreview(true); render(); }
+    });
+    document.addEventListener('keydown', e => {
+      const box = dialog();
+      if (!box || box.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); closePreview(true); render(); return; }
+      if (e.key !== 'Tab') return;
+      const buttons = [...box.querySelectorAll('button:not(:disabled)')].filter(n => n.getClientRects().length > 0);
+      if (!buttons.length) return;
+      const first = buttons[0], last = buttons.at(-1);
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }, true);
+  }
+  function syncPreview() {
+    const dlg = dialog();
+    if (!dlg) return;
+    const points = character?.statPoints || 0;
+    if (!previewOpen || !character || !points || character.dead || !Online.connected) {
+      previewOpen = false;
+      dlg.hidden = true;
+      return;
+    }
+    wirePreview();
+    const wasHidden = dlg.hidden;
+    const spent = recommended(character);
+    const rows = names.filter(name => spent[name] > 0).map(name => {
+      const li = node('li');
+      li.append(node('span', name[0].toUpperCase() + name.slice(1)), node('span', `+${spent[name]}`, 'recommended-gain'));
+      return li;
+    });
+    $('recommended-title').textContent = points === 1 ? 'Spend 1 point?' : `Spend ${points} points?`;
+    $('recommended-note').textContent = reasons[character.look.class] || '';
+    $('recommended-list').replaceChildren(...rows);
+    $('recommended-list').hidden = !rows.length;
+    $('recommended-empty').hidden = rows.length > 0;
+    const confirm = $('recommended-confirm');
+    confirm.disabled = pending || !rows.length;
+    dlg.hidden = false;
+    window.Settings?.applyScale?.();
+    if (wasHidden) (confirm.disabled ? $('recommended-cancel') : confirm)?.focus({ preventScroll: true });
+  }
   function recommended(c) {
     const spent = Object.fromEntries(names.map(name => [name, 0]));
     const w = weights[c.look.class] || weights.warrior;
@@ -62,25 +119,16 @@
     recommend.addEventListener('click', () => { previewOpen = true; render(); });
     actions.append(recommend);
     if (!points) actions.append(node('small', 'No unspent stat points. Level up to earn more.', 'attribute-no-points'));
-    if (previewOpen && points) {
-      const spent = recommended(c);
-      const summary = names.filter(name => spent[name]).map(name => `${name[0].toUpperCase()}${name.slice(1)} +${spent[name]}`).join(' · ');
-      const panel = node('div', '', 'attribute-preview');
-      panel.append(node('b', `Spend ${points} point${points === 1 ? '' : 's'}?`), node('p', summary || 'No eligible stats.'));
-      const confirm = node('button', 'Confirm recommended', 'attribute-recommend-confirm'); confirm.type = 'button'; confirm.disabled = pending || !summary;
-      confirm.addEventListener('click', () => { if (Online.send({type:'allocate_recommended'})) { pending = true; previewOpen = false; render(); } });
-      const cancel = node('button', 'Cancel', 'attribute-recommend-cancel'); cancel.type = 'button';
-      cancel.addEventListener('click', () => { previewOpen = false; render(); });
-      panel.append(confirm, cancel); actions.append(panel);
-    }
     host.replaceChildren(header, grid, actions,
       node('p', `Hit ${percent(c.hitChance)} · Dodge ${percent(c.dodgeChance)} · Crit ${percent(c.critChance)} · Attack every ${Number((c.attackCooldown || 0).toFixed(2))}s`, 'attribute-derived'),
       ...(c.resurrectionSickness > 0 ? [node('p', 'Resurrection Sickness: all stats reduced to 25%.', 'attribute-derived')] : []),
       node('small', '3 points per level · ★ Class specialty · A city steward can reset trained points for gold', 'attribute-help'));
     if (c.raidSupport) host.append(node('p', `Raid strength: +${c.raidSupport.attackPercent}% attack · ${c.raidSupport.damageReductionPercent}% damage reduction (${c.raidSupport.others} allies)`, 'attribute-derived raid-strength'));
+    syncPreview();
   }
   window.Attributes = {
     render,
+    close(restoreFocus = false) { closePreview(restoreFocus); },
     update(c) {
       const key = JSON.stringify([c.id, c.level, c.attributes, c.gearAttributes, c.passiveAttributes, c.effectiveAttributes, (c.resurrectionSickness || 0) > 0, c.statPoints, c.dead, c.look.class, c.hitChance, c.dodgeChance, c.critChance, c.attackCooldown, c.raidSupport]);
       character = c; if (signature === key) return; signature = key; pending = false; previewOpen = false; render();

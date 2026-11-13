@@ -432,5 +432,6 @@
   "Quests: {0}": "Uppdrag: {0}",
   "Quest giver: {0} · {1}": "Uppdragsgivare: {0} · {1}",
   "Ready to turn in ({0})": "Redo att lämna in ({0})",
-  "Recommended level {0}": "Rekommenderad nivå {0}"
+  "Recommended level {0}": "Rekommenderad nivå {0}",
+  "Spend {0} points?": "Spendera {0} poäng?"
 }

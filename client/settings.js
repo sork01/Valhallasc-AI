@@ -28,9 +28,8 @@
     ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false], ['keys-panel', '.keys-panel', 'Keyboard', '50% 50%', false],
     ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
     ['worldmap', '.wm-panel', 'World map', '50% 50%', true], ['social-panel', '.social-panel', 'Social', '50% 50%', true],
-    ['achievements-panel', '.achievements-window', 'Achievements', '50% 50%', true],
     ['activity-panel', '.activity-window', 'Activity log', '50% 50%', true],
-    ['trade-panel', '.trade-panel', 'Trade', '50% 50%', true], ['inspect-panel', '.inspect-window', 'Inspect', '50% 50%', true], ['rebirth-dialog', '.rebirth-dialog', 'Rebirth', '50% 50%', true],
+    ['trade-panel', '.trade-panel', 'Trade', '50% 50%', true], ['inspect-panel', '.inspect-window', 'Inspect', '50% 50%', true], ['rebirth-dialog', '.rebirth-dialog', 'Rebirth', '50% 50%', true], ['recommended-dialog', '.recommended-dialog', 'Recommended stats', '50% 50%', true],
     ['mail-panel', '.mail-window', 'Mailbox', '50% 50%', true],
     ['bank-panel', '.bank-panel', 'Bank', '50% 50%', true], ['skills-panel', '.skills-panel', 'Skills', '50% 50%', true],
     ['equipment', '.equipment-workspace', 'Character and bags', '50% 50%', true], ['sign-panel', null, 'Sign', '0 0', true],
@@ -450,8 +449,7 @@
   const outsideClose = {
     'whats-new': 'news-close', pause: 'p-resume', 'settings-panel': 'set-back', 'keys-panel': 'keys-back',
     'quest-journal': 'quest-close', 'npc-dialogue': 'npc-x', worldmap: 'wm-close',
-    'achievements-panel': 'achievements-close',
-    'social-panel': 'social-close', 'inspect-panel': 'inspect-close', 'rebirth-dialog': 'rebirth-cancel',
+    'social-panel': 'social-close', 'inspect-panel': 'inspect-close', 'rebirth-dialog': 'rebirth-cancel', 'recommended-dialog': 'recommended-cancel',
     'mail-panel': 'mail-close', 'bank-panel': 'bank-close', 'skills-panel': 'skills-close', equipment: 'equipment-close',
     'activity-panel': 'activity-close',
   };
