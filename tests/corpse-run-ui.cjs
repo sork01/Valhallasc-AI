@@ -103,6 +103,48 @@ async function measureCanvasColor(page) {
   await page.waitForFunction(id => Field.hero.equipment?.headgear === id, gearId, { timeout: 5000 });
   await sendDebug(page, { op: 'set_hp', hp: 99999 });
 
+  const spiritGuideSpawn = await page.evaluate(() => (WORLD_MAP.npcs || []).find(n => n.art === 'spirit_guide') || null);
+  check(!!spiritGuideSpawn, 'Spirit Guide exists in Greenmeadow map data');
+  await sendDebug(page, { op: 'teleport', zone: 0, x: spiritGuideSpawn.x + 1.2, y: spiritGuideSpawn.y });
+  await page.waitForFunction(({ x, y }) => Math.hypot(Field.hero.x - (x + 1.2), Field.hero.y - y) < 1.5, spiritGuideSpawn, { timeout: 10000 });
+  const livingGuideCheck = await page.evaluate(async guide => {
+    const drawn = [];
+    const origDrawNpc = City.drawNpc;
+    const origDrawPlate = City.drawNpcPlate;
+    City.drawNpc = function(g, n, ...rest) {
+      if (n.art === 'spirit_guide') drawn.push(n.id);
+      return origDrawNpc.call(this, g, n, ...rest);
+    };
+    City.drawNpcPlate = function(g, n, ...rest) {
+      if (n.art === 'spirit_guide') drawn.push(`plate:${n.id}`);
+      return origDrawPlate.call(this, g, n, ...rest);
+    };
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    City.drawNpc = origDrawNpc;
+    City.drawNpcPlate = origDrawPlate;
+    const inNpcs = City.npcs.some(n => n.art === 'spirit_guide');
+    const talkResult = Field.action('talk');
+    Field.visitNpc(guide.id);
+    const [sx, sy] = Field._debug.w2s(guide.x, guide.y);
+    const r = document.getElementById('fieldcv').getBoundingClientRect();
+    const clientX = r.left + sx / 1600 * r.width;
+    const clientY = r.top + (sy - 40) / 900 * r.height;
+    const wmOpened = WorldMap.show();
+    if (wmOpened) document.querySelector('.wm-tile[data-zone="0"]')?.click();
+    const wmZone = WorldMap.view === 'zone' && WorldMap.zone === 0;
+    const wmPeopleCount = document.querySelectorAll('.wm-person-button').length;
+    const wmPeopleHasGuide = !!document.querySelector(`.wm-person-button[data-npc="${guide.id}"]`);
+    if (wmOpened) WorldMap.close();
+    return { drawn, inNpcs, talkResult, wmOpened, wmZone, wmPeopleCount, wmPeopleHasGuide, clientX, clientY };
+  }, spiritGuideSpawn);
+  check(!livingGuideCheck.inNpcs, 'Living player does not see Spirit Guide in City.npcs');
+  check(livingGuideCheck.drawn.length === 0, `Living player does not render Spirit Guide or nameplate (${livingGuideCheck.drawn.join(', ')})`);
+  check(!livingGuideCheck.talkResult, 'Living player cannot F-talk to Spirit Guide');
+  check(livingGuideCheck.wmOpened && livingGuideCheck.wmZone && livingGuideCheck.wmPeopleCount > 0 && !livingGuideCheck.wmPeopleHasGuide, 'Living player does not see Spirit Guide in World Map directory');
+  await page.mouse.click(livingGuideCheck.clientX, livingGuideCheck.clientY);
+  await page.waitForTimeout(250);
+  check(await page.evaluate(() => document.getElementById('npc-dialogue').hidden), 'Clicking Spirit Guide spot while alive does not open dialogue');
+
   const readDurabilityAndStats = async () => {
     await page.keyboard.press('KeyE');
     await page.waitForFunction(() => !document.getElementById('equipment').hidden, null, { timeout: 5000 });
@@ -247,6 +289,19 @@ async function measureCanvasColor(page) {
   await page.waitForFunction(() => !document.getElementById('npc-dialogue').hidden && !!document.querySelector('[data-offer="spirit_resurrect"]'), null, { timeout: 5000 });
   const guideOfferEnabled = await page.evaluate(() => !document.querySelector('[data-offer="spirit_resurrect"]').disabled);
   check(guideOfferEnabled, 'Spirit Guide dialogue opens for ghost with enabled spirit_resurrect offer');
+  const ghostGuideVis = await page.evaluate(async guide => {
+    const drawn = [];
+    const origDrawNpc = City.drawNpc;
+    City.drawNpc = function(g, n, ...rest) {
+      if (n.art === 'spirit_guide') drawn.push(n.id);
+      return origDrawNpc.call(this, g, n, ...rest);
+    };
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    City.drawNpc = origDrawNpc;
+    const inNpcs = City.npcs.some(n => n.art === 'spirit_guide');
+    return { inNpcs, drawn };
+  }, ghostState.spiritGuide);
+  check(ghostGuideVis.inNpcs && ghostGuideVis.drawn.includes(ghostState.spiritGuide.id), 'Ghost sees and renders Spirit Guide');
   await page.screenshot({ path: path.join(shotDir, 'corpse-03b-spirit-guide.png') });
   await page.locator('#npc-x').click();
   await page.waitForFunction(() => document.getElementById('npc-dialogue').hidden, null, { timeout: 5000 });
@@ -317,6 +372,18 @@ async function measureCanvasColor(page) {
   await waitFrames(page);
   const dialogueClosed = await page.evaluate(() => document.getElementById('npc-dialogue').hidden);
   check(dialogueClosed, 'Spirit Guide dialogue closed after resurrecting');
+  const postReviveGuideHidden = await page.evaluate(async () => {
+    const drawn = [];
+    const origDrawNpc = City.drawNpc;
+    City.drawNpc = function(g, n, ...rest) {
+      if (n.art === 'spirit_guide') drawn.push(n.id);
+      return origDrawNpc.call(this, g, n, ...rest);
+    };
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    City.drawNpc = origDrawNpc;
+    return { inNpcs: City.npcs.some(n => n.art === 'spirit_guide'), drawn };
+  });
+  check(!postReviveGuideHidden.inNpcs && postReviveGuideHidden.drawn.length === 0, 'Spirit Guide disappears again once player is alive');
   const sickBuffVisible = await page.evaluate(() => !!document.querySelector('#buff-bar [data-buff="resurrection_sickness"]'));
   check(sickBuffVisible, 'Resurrection Sickness buff icon appears in #buff-bar');
 

@@ -295,7 +295,8 @@
       const A=zone>0?WORLD_MAP.zones[zone-1]:WORLD_MAP,quests=(A.quests||[]);
       folk.set(zone,(A.npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||!!n.travelStop||quests.some(q=>q.npc===n.id)})));
     }
-    const people=folk.get(zone);return people.some(n=>n.season)?people.filter(n=>!n.season||window.Seasonal?.isActive(n.season)):people;
+    const people=folk.get(zone),dead=!!window.Field?.hero?.dead;
+    return people.some(n=>n.season||n.art==='spirit_guide')?people.filter(n=>(!n.season||window.Seasonal?.isActive(n.season))&&(dead||n.art!=='spirit_guide')):people;
   }
   let clockAt=0;
   // Called every frame with the server's world time (seconds); walkers are placed, and face the way they go.
@@ -637,7 +638,7 @@
     acceptTimer=setTimeout(()=>{pendingAccept=null;button.disabled=false;},4000); return true;
   }
   function dialogue(packet) {
-    if(!Online.connected || (Field.hero.dead && (!Field.hero.ghost || packet.npc?.art!=='spirit_guide')))return;
+    if(!Online.connected || (Field.hero.dead ? (!Field.hero.ghost || packet.npc?.art!=='spirit_guide') : packet.npc?.art==='spirit_guide'))return;
     const accepting=current?.id===packet.npc.id && pendingAccept;
     if(accepting){clearTimeout(acceptTimer);pendingAccept=null;}
     if(accepting && packet.quests?.some(q=>q.id===accepting&&!q.claimed)){

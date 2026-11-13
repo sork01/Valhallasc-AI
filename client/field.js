@@ -1427,6 +1427,7 @@
     }
     const npc = City.npcs.find(n => {
       if (ghostWalking && n.art !== 'spirit_guide') return false;
+      if (!hero.dead && n.art === 'spirit_guide') return false;
       const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12;
     });
     if (npc) { talkTo(npc); return; }
@@ -3203,7 +3204,7 @@
       }
       if (!paused && pendingNpc) {
         const {npc,until}=pendingNpc;
-        const canTalk = !hero.dead || (hero.ghost && npc.art === 'spirit_guide');
+        const canTalk = (!hero.dead && npc.art !== 'spirit_guide') || (hero.ghost && npc.art === 'spirit_guide');
         if(!canTalk || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
         else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];askNpc(npc);}
         else if(npc.route && tAll-routeTime>1) {                       // a walker has moved on: take a fresh route to where it is now
@@ -4970,7 +4971,7 @@
     for (const portal of zdef.portals) { if (portal.seam || portal.vault || portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
     for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
-    for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
+    for (const n of City.npcs) { if ((n.escort && escorted(n.id)) || (n.art === 'spirit_guide' && !hero.dead)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of ghostSlimes.size ? [...slimes, ...ghostSlimes.values()] : slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, enemyCullMargin(s))) { const sk = enemyShadowK(s); shadow(g, s.x, s.y, 28 * sk * s.d.scale * (1 - s.hop * .12), 11 * sk * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, Math.round(70 * CHEST_SCALE))) { shadow(g,chest.x,chest.y,27 * CHEST_SCALE,9 * CHEST_SCALE,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
     for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
@@ -4991,7 +4992,7 @@
     for (const arch of zdef.exitArches || []) { const [sx,sy]=w2s(arch.x,arch.y); if(onScreen(sx,sy,480))list.push({d:arch.x+arch.y,arch,sx,sy}); }
     for (const R of map.vregs || []) {
       for (const o of vaultSeason(R)) { const [sx, sy] = w2s(o.x, o.y); if (onScreen(sx, sy, Math.max(220, City.art[o.kind]?.box?.[3] || 0))) list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); }
-      for (const n of City.npcsOf(R.to)) { const gx = n.x - R.shift[0], gy = n.y - R.shift[1]; if (!inRegion(R, gx, gy)) continue; const [sx, sy] = w2s(gx, gy); if (onScreen(sx, sy, 150)) list.push({ d: gx + gy, npc: { ...n, x: gx, y: gy }, sx, sy, ghostNpc: true }); }
+      for (const n of City.npcsOf(R.to)) { if (n.art === 'spirit_guide' && !hero.dead) continue; const gx = n.x - R.shift[0], gy = n.y - R.shift[1]; if (!inRegion(R, gx, gy)) continue; const [sx, sy] = w2s(gx, gy); if (onScreen(sx, sy, 150)) list.push({ d: gx + gy, npc: { ...n, x: gx, y: gy }, sx, sy, ghostNpc: true }); }
     }
     lastGhostDrawn = 0; for (const it of list) if (it.o && it.o.ghostSet) lastGhostDrawn++;
     list.sort((a, b) => a.d - b.d);
@@ -5017,7 +5018,7 @@
         if (cover) g.globalAlpha = .45;
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
-      } else if (it.npc) { const ghostNpc = !!(hero.dead && hero.ghost), near = !it.ghostNpc && (!ghostNpc || it.npc.art === 'spirit_guide') && Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8; City.drawNpc(g,it.npc,it.sx,it.sy,t,near,false,true); plates.push({npc:it.npc,sx:it.sx,sy:it.sy,near});
+      } else if (it.npc) { const ghostNpc = !!(hero.dead && hero.ghost), near = !it.ghostNpc && (!hero.dead || (ghostNpc && it.npc.art === 'spirit_guide')) && Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8; City.drawNpc(g,it.npc,it.sx,it.sy,t,near,false,true); plates.push({npc:it.npc,sx:it.sx,sy:it.sy,near});
       } else if (it.cross) { window.RaidKey?.draw(g,it.cross,it.sx,it.sy);
       } else if (it.chest) { drawChest(g,it.chest,it.sx,it.sy);
       } else if (it.sign) { drawSign(g,it.sign,it.sx,it.sy,Math.hypot(hero.x-it.sign.x,hero.y-it.sign.y)<2.8);
@@ -5591,7 +5592,7 @@
     // The NPCs of every other world zone in view, and what the neighbours across a seam show: the view-only enemies and players already moved into this frame.
     for (const w of near) {
       if (w.z === zone) continue;
-      for (const n of ZONES[w.z].npcs || []) if (!n.travelStop && seen(w.z, n.x, n.y)) { mctx.fillStyle = '#f5d477'; mctx.fillRect((n.x + w.ox) * s - 1, (n.y + w.oy) * s - 1, 2, 2); }
+      for (const n of ZONES[w.z].npcs || []) if (!n.travelStop && (n.art !== 'spirit_guide' || hero.dead) && seen(w.z, n.x, n.y)) { mctx.fillStyle = '#f5d477'; mctx.fillRect((n.x + w.ox) * s - 1, (n.y + w.oy) * s - 1, 2, 2); }
     }
     for (const p of seams) {
       const [shx, shy] = p.seam.shift;
@@ -5613,7 +5614,7 @@
       }
       mctx.globalAlpha = 1;
     };
-    for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    for (const n of City.npcs) { if (n.travelStop || (n.art === 'spirit_guide' && !hero.dead) || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
     const mA = wmode ? 1 : inA;       // a world zone's sparks and quest marks never fade at a border: every zone in view shows its own
     sparkLayer(City.npcs.filter(n => n.travelStop), 0, 0, mA);
     for (const w of near) if (w.z !== zone) sparkLayer(travelStops(w.z), w.ox, w.oy, 1);
@@ -5751,7 +5752,7 @@
     },
     action(action) {
       if (action === 'talk' && running && !paused && Online.connected && !hero.sparkTravel && (!hero.dead || hero.ghost)) {
-        const list = hero.dead && hero.ghost ? City.npcs.filter(n => n.art === 'spirit_guide') : [...City.npcs, ...signs];
+        const list = hero.dead && hero.ghost ? City.npcs.filter(n => n.art === 'spirit_guide') : [...City.npcs.filter(n => n.art !== 'spirit_guide'), ...signs];
         const npc = list.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
         if (npc) talkTo(npc); return !!npc;
       }
@@ -5766,7 +5767,7 @@
     setPaused(p) { paused = p; Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
       const npc = City.npcs.find(n => n.id === id);
-      if (paused || !Online.connected || (hero.dead && !(hero.ghost && npc?.art === 'spirit_guide'))) return;
+      if (paused || !Online.connected || (hero.dead ? !(hero.ghost && npc?.art === 'spirit_guide') : npc?.art === 'spirit_guide')) return;
       if (npc) talkTo(npc);
     },
     visitCity() {

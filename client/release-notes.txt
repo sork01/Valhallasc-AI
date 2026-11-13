@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.49.4",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Spirit Guides are now visible only to dead players and ghosts, remaining hidden from living adventurers in the world, on the minimap and on the world map."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.49.3",
     "date": "2026-11-13",
     "new": [],

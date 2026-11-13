@@ -287,7 +287,8 @@
   const FEATURE = new Set(['lava', 'ice', 'water', 'thicket']);
   const RADIUS = { crag: 1.3, pine: 1.4, elderash: 3.5, lava: 1.5, water: 1.1, ice: 1.15, thicket: 1.15, tree: 1.4, bush: .8, rock: .9, spire: 1, lamp: .5, flowers: .5 };
   function paint(index, px) {
-    const key = `${index}:${px}`; if (cache.has(key)) return cache.get(key);
+    const showSpirit = !!window.Field?.hero?.dead;
+    const key = `${index}:${px}:${showSpirit ? 1 : 0}`; if (cache.has(key)) return cache.get(key);
     const z = zones[index], k = px / z.size, c = document.createElement('canvas'); c.width = c.height = px;
     const g = c.getContext('2d');
     g.fillStyle = GROUND[z.theme]; g.fillRect(0, 0, px, px);
@@ -322,7 +323,7 @@
       g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (o.kind === 'water' || o.kind === 'ew_lava' ? o.r : RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();
     }
     if (z.city && z.theme !== 'city' && z.theme !== 'nacre' && z.theme !== 'asterion') for (const t of [z.city, ...(z.camps || [])]) { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(t.plaza.x * k, t.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
-    for (const n of (z.npcs||[]).filter(n=>!n.season||window.Seasonal?.isActive(n.season))) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }
+    for (const n of (z.npcs||[]).filter(n=>(!n.season||window.Seasonal?.isActive(n.season))&&(showSpirit||n.art!=='spirit_guide'))) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }
     cache.set(key, c); return c;
   }
   function copy(canvas, source) { canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height); }
@@ -782,7 +783,8 @@
       questPeople.add(q.npc);
       for (const o of q.objectives || []) if (o.kind === 'talk') questPeople.add(o.target);
     }
-    return (z.npcs || []).filter(n=>!n.season||window.Seasonal?.isActive(n.season)).filter(n => n.travelStop || n.buys || n.offers?.length || questPeople.has(n.id))
+    const showSpirit = !!window.Field?.hero?.dead;
+    return (z.npcs || []).filter(n=>(!n.season||window.Seasonal?.isActive(n.season))&&(showSpirit||n.art!=='spirit_guide')).filter(n => n.travelStop || n.buys || n.offers?.length || questPeople.has(n.id))
       .sort((a, b) => a.name.localeCompare(b.name));
   }
   function services(n) {
