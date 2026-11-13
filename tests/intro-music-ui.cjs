@@ -22,7 +22,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(`${++checks}: ${s}`);};
  await page.waitForTimeout(3500);
  check(await page.evaluate(()=>CutsceneAudio.narrating&&CutsceneAudio.score.playing),'Recorded narration and the new score play together');
  check(await page.evaluate(()=>Math.abs(CutsceneAudio.score.output.gain.value-.55*.8*.8)<.001),'The score uses the saved music volume with headroom for narration');
- check(await page.evaluate(()=>valhalla.fmusic.output.gain.value<.001&&valhalla.music.output.gain.value<.001),'Field and title music are silent beneath the intro');
+ check(await page.evaluate(()=>valhalla.fmusic.output.gain.value<.001&&(!valhalla.music.running||valhalla.music.output.gain.value<.001)),'Field and title music are silent beneath the intro');
  await page.evaluate(()=>Prefs.set({musicVol:.5,sfxVol:.7}));await page.waitForTimeout(500);
  check(await page.evaluate(()=>Math.abs(CutsceneAudio.score.output.gain.value-.55*.25)<.001&&Math.abs(__combatAudioTest.bus().gain.value-.49)<.001),'Music and narration keep independent volume controls');
  // The one-second day/night timer must not raise a field track under the score.

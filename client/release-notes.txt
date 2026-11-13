@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.47.6",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "In the opening cutscene your hero now stands at the bow of the Grey Gull from the very first moment.",
+      "The opening cutscene is filmed with one flowing camera move: it opens close on your hero, sweeps wide over the ship and pushes in again when the old magic finds you."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.47.5",
     "date": "2026-11-12",
     "new": [

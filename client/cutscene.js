@@ -313,13 +313,13 @@
     const hold = S.shoes(el), walk = hero.walk, moving = hero.moving, fx = hero.fx, fy = hero.fy;
     if (!pose.hidden) {
       // A close-up: the hero grows about their feet while the scene plays and settles back to life size for the fade-out. A scene that sets
-      // `pose.abs` places the hero on its own camera instead (the opening), and `pose.walk` makes them walk that way.
+      // `pose.abs` places the hero on its own camera instead (the opening), `pose.walk` makes them walk that way and `pose.face` turns a standing hero.
       const zoom = S.noZoom ? 1 : 1 + .5 * ease(el / .7) * (1 - ease((el - (S.dur - 1.0)) / .8));
       if (pose.abs) g.translate(pose.abs.x, pose.abs.y), g.scale(pose.abs.k, pose.abs.k);
       else g.translate(hx + (pose.dx || 0), hy + (pose.dy || 0)), g.scale(zoom * (pose.sx ?? 1), zoom * (pose.sy ?? 1)), g.translate(0, -45), g.rotate(pose.rot || 0), g.translate(0, 45);
       g.globalAlpha = pose.alpha ?? 1;
       if (pose.walk) { hero.moving = true; hero.fx = pose.walk[0]; hero.fy = pose.walk[1]; hero.walk = (walk || 0) + dt * 11; }
-      else if (pose.abs) hero.moving = false;
+      else if (pose.abs) { hero.moving = false; if (pose.face) { hero.fx = pose.face[0]; hero.fy = pose.face[1]; } }
       shoeState = hold; try { paintHero(g, t); } finally { hero.mounted = mounted; if (!pose.walk) hero.walk = walk; hero.moving = moving; hero.fx = fx; hero.fy = fy; }
     } else hero.mounted = mounted;
     g.restore();

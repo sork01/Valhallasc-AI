@@ -5,7 +5,8 @@
 // The ship, pier and skipper are the game's own drawing (meadowdock.js, City.drawNpc) on a custom camera in the game's 2:1 projection, so the last
 // shot (the hero stepping onto the pier, zoom 1) is exactly the game's first view and the scene fades into the world without a cut. The sky tells
 // the history: ember glow, sparks, nine chains, a fire ring over a mountain, the sea warming from blue to red. Narration is shown as subtitles and read
-// with the owner's seven recorded ElevenLabs narration clips.
+// with the owner's seven recorded ElevenLabs narration clips. The hero stands at the bow from the first frame (owner, 2026-11-13); the old magic finds
+// them there, and the camera is one continuous move (a spline through `SHOTS`), opening and peaking in a close-up of the hero.
 (() => {
   const CS = window.Cutscene, D = window.WORLD_MAP?.dock;
   if (!CS || !D) return;
@@ -16,23 +17,46 @@
   const SKIPPER = (window.WORLD_MAP.npcs || []).find(n => n.id === 'dock_skipper');
   D.bollards ||= [SHIP.y0 + 1.6, SHIP.y1 - 1.4];
   const deckZ = u => 30 + 26 * (2 * u - 1) ** 4 - 16;   // the ship's deck height above the waterline at fraction u of its length (meadowdock.js)
-  const HERO_U = .56, SKIPPER_U = .86;
+  // The hero stands well forward: clear of the sail's near end on screen (the hero is painted over the scene, so the sail cannot cover them).
+  const HERO_U = .12, PLANK_U = (SHIP.plank - SHIP.y0) / LEN, SKIPPER_U = .86;
+  const bob = t => Math.sin(t * .9) * 1.6;              // the swell lifting the hull (meadowdock.js `ship`)
 
   // ---- the voyage -----------------------------------------------------------------------------------------------------------------------
   // Offsets of the ship from its mooring: it comes in from the south-west and slows to a stop alongside the pier.
   const shipAt = t => { const q = 1 - clamp(t / ARRIVE, 0, 1); return { dx: -22 * q * q, dy: 150 * Math.pow(q, 1.7) }; };
 
-  // Camera shots: [time, zoom, across the ship (tiles), along the ship from its centre (tiles, negative towards the bow), height (px)].
-  const SHOTS = [[0, .42, 0, -9, 10], [6, .55, -1, -4, 14], [12, .74, 1, 2, 20], [20, .8, -2.5, 6, 26], [28, .92, 1, 1.5, 48], [36, 1.12, .6, 4.4, 34], [44, 1.35, 0, 1.4, 26], [49, 1.6, 0, .6, 24], [53, 1.4, .8, .2, 20]];
-  function camera(t, cx, cy) {
+  // Camera keys: [time, zoom, across the ship (tiles), along the ship from its centre (tiles, negative towards the bow), height (px)]. The camera is
+  // ONE continuous move: a Hermite spline through the keys (tangents from the neighbouring keys, zoom in log space), so it never stops at a key the way
+  // a per-shot ease does. It opens tight on the hero at the bow, cranes back to show the ship under the burning sky, glides down the hull to the
+  // skipper, lifts high for the failing chains, sweeps round the bow and pushes in hard on the hero as the magic finds them.
+  const HERO_Y = (HERO_U - .5) * LEN, SKIP_Y = (SKIPPER_U - .5) * LEN;
+  const SHOTS = [
+    [0, 2.3, 0, HERO_Y, 62], [5, 1.7, .5, HERO_Y + .5, 56], [11, .5, -3, -6, 20], [17, .8, 2.6, 3, 30], [23, 1.75, .2, SKIP_Y, 58],
+    [29, .6, -1.6, 0, 74], [36, 1.05, 1.6, -5.2, 30], [42, 1.6, .5, HERO_Y - .3, 52], [47.5, 2.6, 0, HERO_Y, 66], [50.5, 2.85, 0, HERO_Y, 68], [53, 1.5, .8, -1.5, 30],
+  ].map(s => [s[0], Math.log(s[1]), s[2], s[3], s[4]]);
+  const slope = (j, c) => j <= 0 || j >= SHOTS.length - 1 ? 0 : (SHOTS[j + 1][c] - SHOTS[j - 1][c]) / (SHOTS[j + 1][0] - SHOTS[j - 1][0]);
+  function camera(t, cx, cy, still) {
     let i = 0; while (i < SHOTS.length - 2 && t > SHOTS[i + 1][0]) i++;
-    const a = SHOTS[i], b = SHOTS[i + 1], v = ease((t - a[0]) / (b[0] - a[0]));
-    let f = { k: lerp(a[1], b[1], v), x: cx + lerp(a[2], b[2], v), y: cy + lerp(a[3], b[3], v), z: lerp(a[4], b[4], v) };
+    const a = SHOTS[i], b = SHOTS[i + 1], d = b[0] - a[0], u = clamp((t - a[0]) / d, 0, 1), u2 = u * u, u3 = u2 * u;
+    const at = c => (2 * u3 - 3 * u2 + 1) * a[c] + (u3 - 2 * u2 + u) * d * slope(i, c) + (3 * u2 - 2 * u3) * b[c] + (u3 - u2) * d * slope(i + 1, c);
+    // A slow drift on top, like a camera on another boat riding the same swell (not with reduced motion).
+    const sway = still ? 0 : 1 - ease((t - 53) / 3);
+    let f = { k: Math.exp(at(1)), x: cx + at(2) + Math.sin(t * .23) * .22 * sway, y: cy + at(3) + Math.cos(t * .17) * .28 * sway, z: at(4) + Math.sin(t * .9 + 1) * 2.2 * sway };
     if (t > 53) {   // the last shot settles on the pier at the game's own zoom
       const e = ease((t - 53) / 6.5), last = { k: 1, x: D.start.x, y: D.start.y, z: 0 };
       f = { k: lerp(f.k, last.k, e), x: lerp(f.x, last.x, e), y: lerp(f.y, last.y, e), z: lerp(f.z, last.z, e) };
     }
     return f;
+  }
+  // Where the hero stands (world x, y and height in px) and what they do: at the bow looking ahead for the whole voyage, lifted a little by the
+  // summoning light, then aft along the deck to the gangplank and down it to the pier start.
+  function heroAt(t, ship) {
+    const aft = ease((t - 53.2) / 3), u = lerp(HERO_U, PLANK_U, aft), gang = ease((t - 56.2) / 2.8);
+    const lift = bump(t, 47.2, 48.8, 50.4, 52) * 9, swell = bob(t) * (1 - gang);
+    return {
+      x: lerp(ship.x, D.start.x, gang), y: lerp(ship.y0 + u * LEN, D.start.y, gang), z: lerp(deckZ(u) + 2, 7, gang) + swell + lift,
+      walk: t > 53.2 && t < 56.2 ? [0, 1] : t >= 56.2 && t < 59 ? [1, 0] : null, face: t < 56.2 ? [0, -1] : [1, 0],
+    };
   }
   function projector(w, h, f, fix) {
     const ox = (f.x - f.y) * TW / 2, oy = (f.x + f.y) * TH / 2;
@@ -135,7 +159,7 @@
     } g.restore();
   }
 
-  // The summoning: a ring of light opens on the deck and a column of light climbs from it.
+  // The summoning: a ring of light opens on the deck round the hero and a column of light climbs from it.
   function summon(g, w, h, t, sx, sy, k) {
     const a = bump(t, 46.6, 48.6, 51, 52.8); if (a < .01) return;
     const r = lerp(8, 78, ease((t - 46.6) / 2.4)) * k;
@@ -171,7 +195,7 @@
     draw(c) {
       const { g, w, h, el: t, hx, hy } = c;
       const off = shipAt(t), ship = { x: SHIP.x + off.dx, y0: SHIP.y0 + off.dy, y1: SHIP.y1 + off.dy };
-      const f = camera(t, ship.x, MID + off.dy);
+      const f = camera(t, ship.x, MID + off.dy, c.still);
       // Near the end the projection is nudged so the pier start lands exactly on the hero's real screen position: the fade into the world is then seamless.
       const raw = projector(w, h, f, [0, 0]), at = raw(D.start.x, D.start.y, 0), e = ease((t - 53) / 6.5);
       const P = projector(w, h, f, [(hx - at[0]) * e, (hy - at[1]) * e]);
@@ -185,24 +209,25 @@
       if (off.dy < 1.2) window.MeadowDock.moor(g, d2, P);
       // Skipper Halvard at the steering oar, all the way.
       if (SKIPPER) {
-        const [sx, sy] = P(ship.x + .2, ship.y0 + SKIPPER_U * LEN, deckZ(SKIPPER_U) + 3), npc = { ...SKIPPER, x: -999, y: -999, key: false, offers: [], buys: null, moving: false, fx: 0, fy: 1 };
+        const [sx, sy] = P(ship.x + .2, ship.y0 + SKIPPER_U * LEN, deckZ(SKIPPER_U) + 3 + bob(t)), npc = { ...SKIPPER, x: -999, y: -999, key: false, offers: [], buys: null, moving: false, fx: 0, fy: 1 };
         window.NpcArt?.readyFor?.([npc]);
         g.save(); g.translate(sx, sy); g.scale(f.k, f.k); try { window.City?.drawNpc(g, npc, 0, 0, t, false, false); } catch { /* art still loading */ } g.restore();
       }
-      // The summoning on the deck, and the hero in it.
-      const deck = [ship.x - .15, ship.y0 + HERO_U * LEN], dz = deckZ(HERO_U) + 2;
-      const [rx, ry] = P(deck[0], deck[1], dz);
+      // The hero on the deck from the first frame, and the summoning that finds them there.
+      const H = heroAt(t, ship), [px, py] = P(H.x, H.y, H.z), [rx, ry] = P(H.x, H.y, deckZ(HERO_U) + 2 + bob(t));
       summon(g, w, h, t, rx, ry, f.k);
       sky(g, w, h, t, warm);
+      // A soft vignette for the film look; it lifts as the scene settles into the game's own view.
+      const vig = .42 * (1 - e);
+      if (vig > .01) { const v = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .38, w / 2, h / 2, Math.hypot(w, h) * .6); v.addColorStop(0, 'rgba(4,6,14,0)'); v.addColorStop(1, `rgba(4,6,14,${vig})`); g.fillStyle = v; g.fillRect(0, 0, w, h); }
       c.flash = c.still ? 0 : Math.max(0, 1 - Math.abs(t - 48.8) / .22) * .85;
       c.veil = 0;
-      if (t < 48.7) return { hidden: true };
-      // The hero: appears in the light, stands on the deck, then steps down the plank onto the pier.
-      const walk = ease((t - 56.2) / 2.8), wx = lerp(deck[0], D.start.x, walk), wy = lerp(deck[1], D.start.y, walk), wz = lerp(dz, 7, walk);
-      const [px, py] = P(wx, wy, wz);
-      return { abs: { x: px, y: py, k: f.k }, alpha: ease((t - 48.7) / 1.1), walk: t > 56.2 && t < 59 ? [1, 0] : null };
+      return { abs: { x: px, y: py, k: f.k }, alpha: ease(t / 1.2), walk: H.walk, face: H.face };
     },
   });
+
+  // For tests: the camera and the hero's place at any time of the scene.
+  window.IntroScene = { heroU: HERO_U, camera: t => { const o = shipAt(t); return camera(t, SHIP.x + o.dx, MID + o.dy, true); }, heroAt: t => { const o = shipAt(t); return heroAt(t, { x: SHIP.x + o.dx, y0: SHIP.y0 + o.dy }); }, dur: DUR };
 
   // ---- Settings > Replay intro --------------------------------------------------------------------------------------------------------
   const button = document.getElementById('set-replay-intro');

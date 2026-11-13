@@ -58,10 +58,15 @@ why the hero was summoned (owner request 2026-11-10, grill answers in `TODO.md` 
   Replay from Settings > "Replay intro" is always skippable and client-side.
 - **Scene (`client/intro.js`, registered with `Cutscene.register`)**: the ship, pier and mooring are `MeadowDock.ship/pier/moor` (exported from
   `meadowdock.js`) and the skipper is `City.drawNpc`, projected by a custom camera in the game's 2:1 projection (`TW 88, TH 44`). The ship sails in
-  from the south-west along the pier (`shipAt`) and the camera follows `SHOTS` (zoom .42 to 1.6, pans along the hull, a push in to the skipper, a close-up
-  of the summoning); from 53 s it settles on the pier at zoom 1 and the projection is nudged so the pier start lands on the hero's real screen position,
-  so the 2.2 s fade into the world has no jump. The hero (real look and class) is hidden until the summoning (48.7 s), stands on the deck, then walks the
-  plank to the pier start (`pose.walk`).
+  from the south-west along the pier (`shipAt`). **Camera (Beta 1.47.6, owner 2026-11-13):** one continuous move, a Hermite spline through `SHOTS`
+  (tangents from the neighbouring keys, zoom in log space, .49 to 2.96) with a slow swell drift on top (off with reduced motion): it opens tight on
+  the hero, cranes back to a high wide shot, glides down the hull to the skipper, lifts for the failing chains, sweeps round the bow and pushes in on
+  the hero at "And it found you"; a vignette lifts as it settles. From 53 s it settles on the pier at zoom 1 and the projection is nudged so the pier
+  start lands on the hero's real screen position, so the 2.2 s fade into the world has no jump. **The hero (real look and class) is aboard from the
+  first frame** (`heroAt`): at the bow (`HERO_U` .12, forward of the sail's near end because the hero is painted over the scene and the sail cannot
+  cover them) facing ahead (`pose.face`, new in `cutscene.js`), riding the hull's swell, lifted a little by the summoning light, then walking aft to
+  the gangplank and down it to the pier start (`pose.walk`). `window.IntroScene` exposes `camera(t)`/`heroAt(t)`; check `tests/intro-camera-ui.cjs`
+  (bounded runner, 8 checks, saves 14 frames in the run directory; `MUTATE=old` serves the previous `intro.js` and must fail).
 - **The story in the sky** (screen-space overlays, `sky()`): ember glow on the edges, a far mountain with a ring of fire (the first forge), a gold light
   with an empty seat (the gods' hall), nine chains that appear one by one and fail one by one, burning roots, sparks; the sea warms from blue to red
   and back (`WARM`); the summoning is a ring of light with runes and a light column on the deck (`summon()`).
