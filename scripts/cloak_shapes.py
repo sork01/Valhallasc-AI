@@ -37,28 +37,45 @@ def render(cls, gender, style, clip, facing, k):
     width = {'travel': 15, 'hooded': 18, 'mantle': 22, 'clasp': 20, 'ember': 23}[style]
     moving = clip == 'walk'; dying = clip == 'die'
     gain = 3.6 if moving else 2.2 if clip == 'attack' else .65
-    # At rest the hem stays below the shoulders; walk drag is always behind the wearer.
-    def point(u, v, front=False):
+    # The cloth hangs round the wearer's back as half a bell: it starts on both shoulders, wraps the back and
+    # ends beside the arms. Seen from behind it hides the back and the legs down to the hem, and from the side
+    # it is a real half width of cloth, not the edge of a flat sheet. Walk drag is always behind the wearer.
+    def point(u, v):
         lag = math.sin(phase - v * 1.8)
         sway = gain * lag * v * v
-        back = -6.2 - v * (7 + (5 if moving else 0)) - math.sin(u * math.pi * 3) * (1.1 + v)
-        if front: back = 6.4
-        z = 68 - length * v + math.cos(phase * 2 - v) * v * (.9 if moving else .3)
+        theta = u * math.radians(96 - 10 * v)
+        ripple = math.sin(u * math.pi * 3) * (.5 + v)
+        rx = 10.6 + (width - 9.5) * v + ripple
+        ry = 7.6 + 5.5 * v + ripple
+        drift = -v * v * (3.5 + (6 if moving else 0))
+        z = 69 - (length + 1) * v + math.cos(phase * 2 - v) * v * (.9 if moving else .3)
         if style == 'ember': z -= (2 if int((u + 1) * 4) % 2 else -2) * v ** 6
         if style == 'clasp': z += abs(u) * v ** 4 * 5
         if style == 'travel': z += abs(u) * v ** 3 * 3
-        q = xf((u * (9.5 + (width - 9.5) * v) + sway, back, z))
+        q = xf((rx * math.sin(theta) + sway, drift - ry * math.cos(theta), z))
         # A fallen cloak rests on the ground with its wearer, rather than crossing it.
         if dying: q[2] = max(1.5, q[2])
         return q
-    us = np.linspace(-1, 1, 9); vs = np.linspace(0, 1, 7)
+    # Armour and trousers are stored with one flat depth per plate, so a tunic's hem can claim to be nearer than
+    # cloth that really hangs behind it. A panel whose outside faces the camera is the outermost thing the
+    # wearer has on, so it is pulled towards the camera, more the further down it hangs.
+    def outer(points, v):
+        centre = np.mean(points, axis=0)
+        axis = xf((0, 0, 69 - (length + 1) * v)); away = centre - axis
+        if dying: axis = axis.copy(); axis[2] = max(1.5, axis[2]); away = centre - axis
+        reach = float(np.linalg.norm(away))
+        if reach < 1e-6: return 0
+        facing = (ink.project(axis)[1] - ink.project(centre)[1]) / reach
+        return -(3 + 11 * v) * max(0, min(1, facing * 1.6))
+    us = np.linspace(-1, 1, 13); vs = np.linspace(0, 1, 8)
     for row in range(len(vs)-1):
         for col in range(len(us)-1):
             u0,u1=us[col:col+2];v0,v1=vs[row:row+2]
             # Fold bands, with a contrasting sewn hem and outer binding.
-            mat = 'trim' if (row == 5 or col in (0,7)) and style in ('mantle','clasp','ember') else 'cloth'
-            tone = (1,2,2,3,2,1,2,2)[col]
-            surface(ink,[point(u0,v0),point(u1,v0),point(u1,v1),point(u0,v1)],mat,tone,outline=False)
+            mat = 'trim' if (row == len(vs)-2 or col in (0,len(us)-2)) and style in ('mantle','clasp','ember') else 'cloth'
+            tone = (1,2,2,3,2,1,2,3,2,2,1,2)[col]
+            quad = [point(u0,v0),point(u1,v0),point(u1,v1),point(u0,v1)]
+            surface(ink,quad,mat,tone,bias=outer(quad,(v0+v1)/2),outline=False)
     # Narrow shoulder yokes wrap around the sides. They leave hands and chest open.
     for side in (-1,1):
         surface(ink,[xf((side*4,-6.8,69.3)),xf((side*10.7,-5.2,69)),
@@ -71,5 +88,5 @@ def render(cls, gender, style, clip, facing, k):
                      xf((4.8,-10,65)),xf((0,-13,62)),xf((-4.8,-10,65))],'lining',2,bias=-.3)
     if style == 'ember':
         for u in (-.75,-.25,.25,.75):
-            surface(ink,[point(u-.045,.5),point(u+.045,.5),point(u+.06,.94),point(u,.86),point(u-.06,.94)],'lining',3,bias=-.12,outline=False)
+            surface(ink,[point(u-.045,.5),point(u+.045,.5),point(u+.06,.94),point(u,.86),point(u-.06,.94)],'lining',3,bias=outer([point(u,.72)],.72)-.12,outline=False)
     return ink.resolve(flash=clip == 'hurt' and k == 0)
