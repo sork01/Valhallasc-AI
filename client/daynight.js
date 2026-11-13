@@ -39,6 +39,42 @@
     const el = document.getElementById('world-clock');
     if (el) { el.textContent = label; const title = `World time · ${phase(h)}${isOutdoor(zone) ? '' : ' · indoor light'} · one day every 20 minutes`; el.title = window.Locale?.translate(title) || title; }
   }
+  // Emitter [dx, dy] from each object's ground origin (sx, sy) to its flame, bulb, or lit facade.
+  const LIGHT_ANCHORS = {
+    lamp: [0, -120],
+    astrolamp: [0, -123],
+    glasslamp: [0, -143],
+    pearllamp: [0, -78],
+    sporelamp: [0, -94],
+    stormlamp: [0, -98],
+    leaf_lantern: [0, -106],
+    frostwake_lantern: [0, -146],
+    year_lantern: [0, -194],
+    ew_lantern: [19, -127],
+    confetti_lantern: [0, -134],
+    brazier: [0, -68],
+    torch: [0, -88],
+    campfire: [0, -24],
+    lamphouse: [0, -164],
+    house: [0, -52],
+    aetherhouse: [0, -34],
+    astralhouse: [0, -18],
+    nacrehouse: [0, -36],
+    nacreinn: [0, -24],
+    meadow_cottage: [0, -16],
+    meadow_mill: [0, -24],
+  };
+  function lightAnchor(light) {
+    const k = light?.kind;
+    if (!k) return [0, -46];
+    if (LIGHT_ANCHORS[k]) return LIGHT_ANCHORS[k];
+    if (k.includes('campfire')) return [0, -24];
+    if (k.includes('brazier')) return [0, -68];
+    if (k.includes('torch')) return [0, -88];
+    if (k.includes('lamp') || k.includes('lantern')) return [0, -120];
+    if (k.includes('cottage') || k.includes('inn') || k.includes('house') || k.includes('shop')) return [0, -36];
+    return [0, -46];
+  }
   function glowSprite() {
     if (glow) return glow;
     glow = document.createElement('canvas'); glow.width = glow.height = 128;
@@ -60,9 +96,11 @@
     const visibleLights = [];
     if (!lowGfx && n > .01 && lights?.length) {
       for (const light of lights) {
-        const [x, y] = project(light.x, light.y);
-        if (x > -140 && x < width + 140 && y > -160 && y < height + 160) {
-          visibleLights.push([x, y]);
+        const [ax, ay] = lightAnchor(light);
+        const [bx, by] = project(light.x, light.y);
+        const lx = bx + ax, ly = by + ay;
+        if (lx > -140 && lx < width + 140 && ly > -140 && ly < height + 140) {
+          visibleLights.push([lx, ly]);
           if (visibleLights.length >= 32) break;
         }
       }
@@ -105,7 +143,7 @@
           v.fillStyle = gr; v.beginPath(); v.arc(cx, cy, cr, 0, Math.PI * 2); v.fill();
         };
         const lightCut = .92 * Math.min(1, n * 1.15);
-        for (const [lx, ly] of visibleLights) cut(lx, ly - 46, 120, lightCut);
+        for (const [lx, ly] of visibleLights) cut(lx, ly, 120, lightCut);
         if (focus?.hero) cut(focus.hero[0], focus.hero[1] - 34, 195, .36);
         if (focus?.target) cut(focus.target[0], focus.target[1] - 24, 95, .36);
       }
@@ -153,7 +191,7 @@
       const sprite = glowSprite();
       g.globalCompositeOperation = 'lighter';
       g.globalAlpha = glowAlpha;
-      for (const [lx, ly] of visibleLights) g.drawImage(sprite, lx - 64, ly - 110);
+      for (const [lx, ly] of visibleLights) g.drawImage(sprite, lx - 64, ly - 64);
       g.globalCompositeOperation = 'source-over';
     }
     g.restore();

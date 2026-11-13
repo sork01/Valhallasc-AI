@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.49.5",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Outdoor night glow and light pools now emit from the lantern heads of lamp posts instead of the middle of their pillars, with matching emitter heights for zone lanterns, braziers, torches, campfires and cottages."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.49.4",
     "date": "2026-11-13",
     "new": [],
