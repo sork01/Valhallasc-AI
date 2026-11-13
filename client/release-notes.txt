@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.51.2",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Removed dashed inter-zone border roads from the world map while keeping route previews, Spark stations, and entrance markers.",
+      "Removed brown dirt road spurs leading directly up to teleport gates and dungeon warps while keeping town roads, walkable zone crossings, and dungeon corridors intact."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.51.1",
     "date": "2026-11-13",
     "new": [

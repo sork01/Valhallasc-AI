@@ -423,7 +423,9 @@ def design(world, write=False):
     d.reach = seen
     zone['slimes'] = d.spawns()
     zone['objects'] = objects
-    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
+    # Omit non-seam gate roads (astral_nacre_gate, path_13_8) from visible brown paths.
+    visible_roads = [road for i, road in enumerate(d.ROADLIST) if i not in (14, 15)]
+    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in visible_roads]
     zone['atlasPaths'] = []
     seamed = {p['id'] for p in zone['portals'] if p.get('seam')}
     zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]

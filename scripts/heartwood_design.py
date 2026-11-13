@@ -377,7 +377,27 @@ def design(world, write=False):
             raise AssertionError(f"unplaced old portal {p['id']}")
         zone['portals'].append(p)
     zone.update(season_decor(city, npcs, zone['portals'], old))
-    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in r] for r in city.roads]
+    # Omit brown spurs/rim arcs directly touching the north Seed Vault or south Hollow Arch portals.
+    rim_arcs = []
+    cur = []
+    for x, y in city.roads[2]:
+        if math.hypot(x - DOOR[0], y - DOOR[1]) < 12.0 or math.hypot(x - GATE[0], y - GATE[1]) < 12.0:
+            if len(cur) >= 2:
+                rim_arcs.append(cur)
+            cur = []
+        else:
+            cur.append((x, y))
+    if len(cur) >= 2:
+        rim_arcs.append(cur)
+    road_keep = list(city.roads[:2]) + rim_arcs
+    for r in city.roads[3:]:
+        if r[-1] in ((104.0, 20.0), (104.0, 192.0)):
+            continue
+        if len(r) == 2 and r[0] == (104, 86) and r[1] == (104, 28):
+            road_keep.append([(104, 86), (104, 30)])
+        else:
+            road_keep.append(r)
+    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in r] for r in road_keep]
     zone['exitRoutes'] = [dict(portal='hollow_canopy_gate', points=[[GATE[0], GATE[1]], [GATE_ARRIVAL[0], GATE_ARRIVAL[1]]]), dict(portal='heart_seed_gate', points=[[DOOR[0], DOOR[1]], [DOOR_ARRIVAL[0], DOOR_ARRIVAL[1]]])]
     region = np.zeros((N, N), int)
     for y in range(N):

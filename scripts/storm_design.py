@@ -506,7 +506,18 @@ def design(world, write=False):
         objects = [o for o in objects if not (o['kind'] in loose and o.get('layout') == d.TAG and near(o))]
         d.late_dropped += before - len(objects)
     zone['objects'] = objects
-    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
+    # Keep terrain ROADLIST intact above, but remove/trim teleport spurs from visible brown paths
+    # (path_19_26, stormglass_asterion_gate, stormglass_eye_descent).
+    visible_roads = []
+    for i, road in enumerate(d.ROADLIST):
+        if i in (25, 27) or road is EYE_E:
+            continue
+        if road is EYE_W:
+            road = road[:-1]
+        elif road is VERT:
+            road = road[:-1] + [(177, 258)]
+        visible_roads.append(road)
+    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in visible_roads]
     zone['atlasPaths'] = []
     seamed = {p['id'] for p in zone['portals'] if p.get('seam')}      # Emberwake's seam replaced the south rim gate: its line is the border, not a gate
     zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]

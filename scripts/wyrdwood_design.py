@@ -509,7 +509,9 @@ def design(world, write=False):
     d.reach = seen
     zone['slimes'] = d.spawns()
     zone['objects'] = objects
-    zone['paths'] = [[list(p) for p in road] for road in ROADS]
+    # Keep terrain/bridge ROADS intact above, but omit teleport spurs from visible brown paths (wyrd_nornroot, sky_gate).
+    visible_roads = [road[:-1] if i == 10 else road for i, road in enumerate(ROADS) if i != 9]
+    zone['paths'] = [[list(p) for p in road] for road in visible_roads]
     zone['atlasPaths'] = []
     zone['bridges'] = [dict(x0=BRIDGE_X, y0=round(RIVER_Y - 10.99, 2), x1=BRIDGE_X, y1=round(RIVER_Y + 8.01, 2), w=5.0)]
     zone['exitRoutes'] = [dict(portal='sky_gate', points=[list(GATE), [GATE[0] - 6, GATE[1]]])]

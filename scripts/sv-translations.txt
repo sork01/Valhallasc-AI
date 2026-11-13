@@ -7391,6 +7391,7 @@
   "Chained Forge": "Fjättrade smedjan",
   "Longship": "Långskeppet",
   "Black Hour": "Svarta timmen",
+  "Scroll to zoom · Purple: entrance maps": "Rulla för att zooma · Lila: kartor över ingångar",
   "Scroll to explore · Gold: paths · Blue: portals · Purple: entrance maps": "Rulla för att utforska · Guld: stigar · Blått: portaler · Lila: kartor över ingångar",
   "Scroll to zoom · Gold: walking paths · Purple: entrance maps": "Rulla för att zooma · Guld: gångvägar · Lila: kartor över ingångar",
   "Scroll to explore · Gold: walking paths · Purple: entrance maps": "Rulla för att utforska · Guld: gångvägar · Lila: kartor över ingångar",

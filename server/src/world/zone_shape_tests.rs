@@ -1605,14 +1605,28 @@ fn the_crags_have_three_elites_two_with_a_quest() {
 fn a_crags_road_reaches_every_gate() {
     let w = world();
     let map = &w.maps[1];
-    // the road network reaches every crossing: each gate has a road end within a step of it
+    // the road network reaches every real crossing (seams / vaults), while teleport gates have no brown spur ending on them
     let data: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let paths = data["zones"][0]["paths"].as_array().unwrap();
-    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+    for p in map.portals.iter().filter(|p| p.vault.is_some()) {
         let near = paths.iter().flat_map(|r| r.as_array().unwrap()).any(|q| {
             at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.
         });
-        assert!(near, "a road reaches {}", p.id);
+        assert!(near, "a road reaches vault {}", p.id);
+    }
+    for p in map
+        .portals
+        .iter()
+        .filter(|p| p.seam.is_none() && p.vault.is_none())
+    {
+        let end_near = paths.iter().any(|r| {
+            let pts = r.as_array().unwrap();
+            [pts.first(), pts.last()]
+                .into_iter()
+                .flatten()
+                .any(|q| at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 5.)
+        });
+        assert!(!end_near, "no brown path ends at teleport {}", p.id);
     }
 }
 
@@ -2592,11 +2606,25 @@ fn a_wyrdwood_road_reaches_every_gate_and_the_river_is_solid() {
     let data = bundled();
     let z = zone_of(&data, 6);
     let paths = z["paths"].as_array().unwrap();
-    for p in map.portals.iter().filter(|p| p.seam.is_none()) {
+    for p in map.portals.iter().filter(|p| p.seam.is_some()) {
         let near = paths.iter().flat_map(|r| r.as_array().unwrap()).any(|q| {
-            at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.
+            at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 2.5
         });
-        assert!(near, "a road reaches {}", p.id);
+        assert!(near, "a road reaches seam {}", p.id);
+    }
+    for p in map
+        .portals
+        .iter()
+        .filter(|p| p.seam.is_none() && p.vault.is_none())
+    {
+        let end_near = paths.iter().any(|r| {
+            let pts = r.as_array().unwrap();
+            [pts.first(), pts.last()]
+                .into_iter()
+                .flatten()
+                .any(|q| at(q[0].as_f64().unwrap(), q[1].as_f64().unwrap()).distance(at(p.x, p.y)) < 5.)
+        });
+        assert!(!end_near, "no brown path ends at teleport {}", p.id);
     }
     let water: Vec<&Value> = z["objects"]
         .as_array()
@@ -2759,4 +2787,62 @@ fn the_gale_stones_wake_the_highmoor_and_count_twenty_seconds() {
 #[test]
 fn the_bridgehead_wakes_the_bank_and_counts_twenty_seconds() {
     wyrd_hold("wyrd_bridge_m", 26, "wyrd_s_bridge", "wyrd_bridge_m");
+}
+
+#[test]
+fn no_brown_path_ends_at_a_teleport_or_warp() {
+    // Vaults, Cathedral aisles, city cobbles, and dungeon/sky floor themes paint stone/floor geometry rather than brown dirt paths.
+    let non_dirt = [
+        "city",
+        "nacre",
+        "sky",
+        "arena",
+        "moonwell",
+        "cathedral_left",
+        "cathedral_right",
+        "cathedral_main",
+        "nornroot",
+        "skybridge",
+        "longship",
+        "blackhour",
+    ];
+    let data = bundled();
+    let mut zones: Vec<&Value> = vec![&data];
+    if let Some(arr) = data["zones"].as_array() {
+        zones.extend(arr.iter());
+    }
+    for (zi, z) in zones.iter().enumerate() {
+        let theme = z["theme"].as_str().unwrap_or("");
+        if non_dirt.contains(&theme) || z.get("rooms").is_some_and(|v| v.is_array()) {
+            continue;
+        }
+        let Some(paths) = z["paths"].as_array() else {
+            continue;
+        };
+        let Some(portals) = z["portals"].as_array() else {
+            continue;
+        };
+        for p in portals {
+            if p.get("seam").is_some_and(|v| !v.is_null())
+                || p.get("vault").is_some_and(|v| !v.is_null())
+            {
+                continue;
+            }
+            let px = p["x"].as_f64().unwrap();
+            let py = p["y"].as_f64().unwrap();
+            let id = p["id"].as_str().unwrap_or("?");
+            for (ri, r) in paths.iter().enumerate() {
+                let pts = r.as_array().unwrap();
+                for end in [pts.first(), pts.last()].into_iter().flatten() {
+                    let ex = end[0].as_f64().unwrap();
+                    let ey = end[1].as_f64().unwrap();
+                    let d = at(ex, ey).distance(at(px, py));
+                    assert!(
+                        d >= 5.0,
+                        "zone {zi} ({theme}) path[{ri}] endpoint ({ex},{ey}) is {d:.2} tiles from teleport/warp portal {id}"
+                    );
+                }
+            }
+        }
+    }
 }

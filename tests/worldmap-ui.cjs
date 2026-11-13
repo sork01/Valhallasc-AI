@@ -102,7 +102,7 @@ async function call(name, args = {}) {
   await press('m');
   const first = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled, fog: t.dataset.fog })));
   check(first[0].name === 'Greenmeadow' && /^Lv 2–5 · 1\/9 charted$/.test(first[0].small) && first.slice(1).every(t => t.name === 'Unexplored' && t.disabled && t.fog === 'full' && t.small === 'Not yet visited'), `Only Greenmeadow is known; every other tile reads Unexplored (${first.map(t => t.name)})`);
-  check(await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].every(r => r.getAttribute('visibility') === 'hidden')), 'No road is drawn to a gate nobody has seen');
+  check(await page.evaluate(() => document.querySelectorAll('.wm-roads, .wm-connection-path').length === 0), 'No inter-zone road SVG overlay is drawn on the world map');
   const tilePx = (zone, fx, fy) => page.evaluate(([zone, fx, fy]) => { const c = document.querySelector(`.wm-tile[data-zone="${zone}"] .wm-tile-fog`); return c.getContext('2d').getImageData(Math.round(fx * 219), Math.round(fy * 219), 1, 1).data[3]; }, [zone, fx, fy]);
   check(await tilePx(0, .5, .5) === 0 && await tilePx(0, .5, .5) < await tilePx(0, .1, .1) && await tilePx(0, .1, .1) > 200 && await tilePx(1, .5, .5) > 200, 'On the tiles the visited cell is clear and the rest is fog');
   const stage = await page.evaluate(() => { const r = document.getElementById('wm-world').getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; });
@@ -164,9 +164,7 @@ async function call(name, args = {}) {
     await page.locator('#wm-back').click();
   }
   check(/^Lv 5–10 · 1\/9/.test(all[1].small) && /^Lv 10–15 · 2\/9/.test(all[2].small) && /^Lv 15–20 · 1\/9/.test(all[3].small) && /^Safe city · 1\/9/.test(all[4].small) && /^Lv 20 · 5 players · 1\/9/.test(all[5].small) && /^Lv 2–5 · 1\/9/.test(all[0].small) && /^Lv 20–30 · 1\/9/.test(all[6].small), `Levels and charted counts on the tiles: ${all.map(t => t.small).join(' | ')}`);
-  const roads = await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].filter(r => r.getAttribute('visibility') === 'visible').map(r => r.dataset.road).sort());
-  const expectedRoads = [...new Set(visibleZones.flatMap((z,i) => z.portals.filter(to => to < visibleZones.length).map(to => [i,to].sort((a,b)=>a-b).join('-'))))].sort();
-  check(roads.join() === expectedRoads.join(), `Roads appear once either end's gate has been seen (${roads})`);
+  check(await page.evaluate(() => document.querySelectorAll('.wm-roads, .wm-connection-path').length === 0), 'No inter-zone dashed road connectors appear after charting zones');
   check(await page.evaluate(() => [...document.querySelectorAll('.wm-tile canvas:not(.wm-tile-fog)')].every(c => { const g = c.getContext('2d').getImageData(0, 0, 220, 220).data; const set = new Set(); for (let i = 0; i < g.length; i += 4 * 97) set.add((g[i] >> 4) + ',' + (g[i + 1] >> 4) + ',' + (g[i + 2] >> 4)); return set.size >= 6; })), 'Every tile carries drawn ground under its fog');
   await shot('map-world');
 
@@ -298,7 +296,7 @@ async function call(name, args = {}) {
   await press('m'); await page.locator('.wm-tile[data-zone="28"]').click();
   check(await page.locator('.wm-sealed').count() === 4, 'The four Yearwheel dungeon entrances have distinct sealed markers');
   check(await page.locator('.wm-route-text').textContent().then(t => t.includes('Route:') && t.includes('The Yearwheel')), 'The selected zone lists a reachable portal route from the current position');
-  check(await page.evaluate(() => document.querySelectorAll('.wm-route-road').length === WorldMap._route(Field.zone, 28).length - 1), 'The world sheet highlights every actual portal edge of that route');
+  check(await page.evaluate(() => document.querySelectorAll('.wm-roads, .wm-route-road').length === 0), 'No inter-zone road highlight SVG is rendered for routes');
   await page.locator('#wm-close').click();
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} world map UI checks passed; screenshots: ${world.artifacts}`);

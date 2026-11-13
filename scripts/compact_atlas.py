@@ -263,6 +263,7 @@ def apply(world):
         z=zones[i]
         for p in z['portals']:
             if p['to'] not in OUTDOORS:continue
+            if not p.get('seam') and not p.get('vault'):continue
             prev=connected(z,[q for q in z['portals'] if q is not p])
             assert int(p['y'])*z['size']+int(p['x']) in prev,f"{i}: {p['id']} cut off by another crossing"
             entrance=next((e for e in z.get('cityEntrances',[]) if e.get('portal')==p['id']),None)

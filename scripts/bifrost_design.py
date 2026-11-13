@@ -552,7 +552,8 @@ def design(world, write=False):
     for i, k in enumerate(('pylon', 'stormrift', 'maelstrom', 'nacre')):
         region[d.pads[k] & ~d.land_mask] = 7 + i
     zone['regions'] = dict(names=names, spans=ground_spans(region, d.walk))
-    zone['paths'] = roads
+    # Omit teleport/pad bridge spurs from visible brown paths while keeping interior island avenues intact.
+    zone['paths'] = [road[2:] if i == 0 else road for i, road in enumerate(roads) if i not in (6, 8, 9, 10)]
     zone['atlasPaths'] = []
     zone['exitRoutes'] = [dict(portal=pid, points=[list(g['gate']), list(g['arrival'])]) for pid, g in gates.items()]
     content.install(zone, hamlets, [p for p in places])
