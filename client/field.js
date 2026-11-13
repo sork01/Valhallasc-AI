@@ -4944,7 +4944,6 @@
       if (e.kind === 'slam') drawGroundSlam(g, e);
       else if (groundSkillFx(e)) drawSkillFx(g, e, 'floor');
     }
-    if (marker) { const [sx, sy] = w2s(marker.x, marker.y), p = (marker.t * 2) % 1; g.strokeStyle = `rgba(255,236,150,${1 - p * .6})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, 10 + p * 12, 5 + p * 6, 0, 0, 6.283); g.stroke(); }
     // Selection belongs to the floor, below every body and foreground object.
     if (hero.target && !hero.target.dead) {
       const target = hero.target, [sx, sy] = w2s(target.x, target.y);
@@ -4996,7 +4995,7 @@
     }
     lastGhostDrawn = 0; for (const it of list) if (it.o && it.o.ghostSet) lastGhostDrawn++;
     list.sort((a, b) => a.d - b.d);
-    const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y;
+    const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y, plates = [];
     for (const it of list) {
       if (it.arch) { ExitPaths.arch(g,it.arch,w2s); continue; }
       if (it.fx) { drawMeleeFx(g, it.fx, it.back); continue; }
@@ -5018,20 +5017,16 @@
         if (cover) g.globalAlpha = .45;
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
-      } else if (it.npc) { const ghostNpc = !!(hero.dead && hero.ghost); City.drawNpc(g,it.npc,it.sx,it.sy,t,!it.ghostNpc && (!ghostNpc || it.npc.art === 'spirit_guide') && Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
+      } else if (it.npc) { const ghostNpc = !!(hero.dead && hero.ghost), near = !it.ghostNpc && (!ghostNpc || it.npc.art === 'spirit_guide') && Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8; City.drawNpc(g,it.npc,it.sx,it.sy,t,near,false,true); plates.push({npc:it.npc,sx:it.sx,sy:it.sy,near});
       } else if (it.cross) { window.RaidKey?.draw(g,it.cross,it.sx,it.sy);
       } else if (it.chest) { drawChest(g,it.chest,it.sx,it.sy);
       } else if (it.sign) { drawSign(g,it.sign,it.sx,it.sy,Math.hypot(hero.x-it.sign.x,hero.y-it.sign.y)<2.8);
       } else if (it.s) {
-        const s = it.s, src = enemySource(s); g.save(); g.translate(it.sx, it.sy); if (src) drawSlimeSprite(g, s, t); else drawSlime(g, s, t);
-        const barY = src ? -(s.d.top ?? (s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28)) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
-        if (!s.dead && s.hp < s.maxHp) { const w = 52 * s.d.scale ** .7; g.fillStyle = 'rgba(20,10,30,.8)'; g.fillRect(-w / 2 - 2, barY - 2, w + 4, 8); g.fillStyle = '#ff5a6e'; g.fillRect(-w / 2, barY, w * s.hp / s.maxHp, 4); }
-        if (!s.dead && (hero.target === s || Math.hypot(hero.x - s.x, hero.y - s.y) < 7)) {
-          const label = `Lv ${s.level ?? '?'} ${s.d.name || s.kind}${s.d.elite ? ' · Elite' : ''}`;
-          g.font = '16px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = levelColor(s.level);
-          g.strokeText(label, 0, barY - 8); g.fillText(label, 0, barY - 8);
+        const s = it.s, src = enemySource(s); g.save(); g.translate(it.sx, it.sy); if (src) drawSlimeSprite(g, s, t); else drawSlime(g, s, t); g.restore();
+        if (!s.dead && (s.hp < s.maxHp || hero.target === s || Math.hypot(hero.x - s.x, hero.y - s.y) < 7)) {
+          const barY = src ? -(s.d.top ?? (s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28)) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
+          plates.push({ s, sx: it.sx, sy: it.sy, barY });
         }
-        g.restore();
       } else if (it.drop) {
         const d = it.drop, item = WORLD_ITEMS.find(i => i.id === d.item);
         drawLootPillar(g, d, item, it.sx, it.sy, t);
@@ -5050,13 +5045,8 @@
         g.fill(); g.stroke(); g.shadowBlur = 0;
         if (item?.class) { g.fillStyle = '#112b49'; g.font = 'bold 12px sans-serif'; g.textAlign = 'center'; g.fillText(item.kind === 'weapon' ? '⚔' : '◆', 0, 3); }
         else { g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(-2.4, -1, 1.8, 0, 6.283); g.fill(); }
-        if (d.gear && hero && Math.hypot(hero.x-d.x, hero.y-d.y) < 8) {
-          const gear = d.gear, a = Object.fromEntries(Object.keys(gear.bonusStats || {}).map(k => [k, (gear.bonusStats?.[k] || 0) + (gear.rolledStats?.[k] || 0)]));
-          const label = `${gear.rarity === 'epic' ? 'Epic · ' : ''}${item?.name || 'Gear'} · ${gear.attack} ATK · ${gear.defense} DEF · ${a.stamina || 0} STA · ${a.accuracy || 0} ACC · ${a.dexterity || 0} DEX`;
-          g.font = '12px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3;
-          g.strokeStyle = '#24120b'; g.fillStyle = gear.rarity === 'epic' ? '#b45cff' : '#ffb65b'; g.strokeText(label, 0, -24); g.fillText(label, 0, -24);
-        }
         g.restore();
+        if (d.gear && hero && Math.hypot(hero.x-d.x, hero.y-d.y) < 8) plates.push({ drop: d, item, sx: it.sx, sy: it.sy });
       } else if (it.remote) {
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);
         drawMageWardShell(g, remote, t, true); drawPriestBuffShell(g, remote, t, true); drawHunterBuffShell(g, remote, t, true);
@@ -5065,13 +5055,8 @@
         else if (remote.sprite) { const seated = seatedInArt(remote, remote.sprite); if(!seated)drawMount(g,remote); if(remote.mounted&&!seated)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted&&!seated)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
         drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t); drawLeadShoes(g, remote, t); drawPlayerStun(g, remote, t);
-        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag || remote.gauntlet ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
-        const nameText = (remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : (window.Achievements?.displayName(remote) || remote.look.name) + (remote.pvpFlag ? ' · PvP' : '')) + (remote.dead && remote.ghost ? ' · Ghost' : '');
-        g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
-        if (remote.reborn?.tier) { const label = window.Rebirth.title(remote.reborn.tier); g.font = '13px "Jua", sans-serif'; g.fillStyle = window.Rebirth.color(remote.reborn.tier); g.lineWidth = 3; g.strokeText(label, 0, -144); g.fillText(label, 0, -144); }
-        if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
-        g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
+        plates.push({ remote, sx: it.sx, sy: it.sy });
       } else if (it.body) {
         const body = it.body; g.save(); g.translate(it.sx, it.sy);
         if (isModular() && body.sprite) body.sprite.draw(g, body, t);
@@ -5079,16 +5064,48 @@
         else if (body.id === Online.id && heroSpr) drawHeroSprite(g, body, t);
         else if (body.id === Online.id) { g.scale(1.3, 1.3); drawHero(g, body, t); }
         else { g.fillStyle = '#c5d2e8'; g.strokeStyle = '#101826'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, -6, 16, 8, 0, 0, Math.PI * 2); g.fill(); g.stroke(); }
-        if (body.id === Online.id) {
-          const pulse = .55 + .25 * Math.sin(t * 3);
-          g.strokeStyle = `rgba(175, 225, 255, ${pulse})`; g.lineWidth = 2.5;
-          g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, Math.PI * 2); g.stroke();
-          g.font = '15px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3;
-          g.strokeStyle = '#101826'; g.fillStyle = '#d8f0ff';
-          g.strokeText('Your Corpse', 0, -56); g.fillText('Your Corpse', 0, -56);
-        }
         g.restore();
+        if (body.id === Online.id) plates.push({ body, sx: it.sx, sy: it.sy });
       } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); paintHeroBody(g, t); g.restore(); }
+    }
+    // Light is applied after the world and before UI plates, attacks, loot labels and other combat feedback.
+    const nightFocus = { hero: [hsx, hsy], target: hero.target && !hero.target.dead ? w2s(hero.target.x, hero.target.y) : null };
+    window.DayNight?.draw(g, VW, VH, map.vlights?.length ? nightLights.filter(o => !ownHidden(o)).concat(map.vlights) : nightLights, w2s, nightFocus);
+    if (marker) { const [sx, sy] = w2s(marker.x, marker.y), p = (marker.t * 2) % 1; g.strokeStyle = `rgba(255,236,150,${1 - p * .6})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, 10 + p * 12, 5 + p * 6, 0, 0, 6.283); g.stroke(); }
+    for (const p of plates) {
+      if (p.npc) { City.drawNpcPlate(g, p.npc, p.sx, p.sy, p.near); continue; }
+      if (p.s) {
+        const s = p.s; g.save(); g.translate(p.sx, p.sy);
+        if (s.hp < s.maxHp) { const w = 52 * s.d.scale ** .7; g.fillStyle = 'rgba(20,10,30,.8)'; g.fillRect(-w / 2 - 2, p.barY - 2, w + 4, 8); g.fillStyle = '#ff5a6e'; g.fillRect(-w / 2, p.barY, w * s.hp / s.maxHp, 4); }
+        if (hero.target === s || Math.hypot(hero.x - s.x, hero.y - s.y) < 7) {
+          const label = `Lv ${s.level ?? '?'} ${s.d.name || s.kind}${s.d.elite ? ' · Elite' : ''}`;
+          g.font = '16px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = levelColor(s.level);
+          g.strokeText(label, 0, p.barY - 8); g.fillText(label, 0, p.barY - 8);
+        }
+        g.restore(); continue;
+      }
+      if (p.drop) {
+        const d = p.drop, gear = d.gear, a = Object.fromEntries(Object.keys(gear.bonusStats || {}).map(k => [k, (gear.bonusStats?.[k] || 0) + (gear.rolledStats?.[k] || 0)]));
+        const label = `${gear.rarity === 'epic' ? 'Epic · ' : ''}${p.item?.name || 'Gear'} · ${gear.attack} ATK · ${gear.defense} DEF · ${a.stamina || 0} STA · ${a.accuracy || 0} ACC · ${a.dexterity || 0} DEX`;
+        g.save(); g.translate(p.sx + 12, p.sy - d.z); g.font = '12px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3;
+        g.strokeStyle = '#24120b'; g.fillStyle = gear.rarity === 'epic' ? '#b45cff' : '#ffb65b'; g.strokeText(label, 0, -24); g.fillText(label, 0, -24); g.restore(); continue;
+      }
+      if (p.remote) {
+        const remote = p.remote; g.save(); g.translate(p.sx, p.sy);
+        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag || remote.gauntlet ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
+        const nameText = (remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : (window.Achievements?.displayName(remote) || remote.look.name) + (remote.pvpFlag ? ' · PvP' : '')) + (remote.dead && remote.ghost ? ' · Ghost' : '');
+        g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
+        if (remote.reborn?.tier) { const label = window.Rebirth.title(remote.reborn.tier); g.font = '13px "Jua", sans-serif'; g.fillStyle = window.Rebirth.color(remote.reborn.tier); g.lineWidth = 3; g.strokeText(label, 0, -144); g.fillText(label, 0, -144); }
+        if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
+        g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
+        g.restore(); continue;
+      }
+      if (p.body) {
+        const pulse = .55 + .25 * Math.sin(t * 3); g.save(); g.translate(p.sx, p.sy);
+        g.strokeStyle = `rgba(175, 225, 255, ${pulse})`; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, Math.PI * 2); g.stroke();
+        g.font = '15px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = '#101826'; g.fillStyle = '#d8f0ff';
+        g.strokeText('Your Corpse', 0, -56); g.fillText('Your Corpse', 0, -56); g.restore();
+      }
     }
     // Keep the soak readout legible even when another actor stands in front of the warded fighter.
     for (const who of [hero, ...remotePlayers.values()]) {
@@ -5114,8 +5131,6 @@
         const [bx, by] = w2s(who.x, who.y); if (bx > -200 && bx < VW + 200 && by > -50 && by < VH + 250) drawBubble(g, b, bx, by - (who === hero ? 138 : 152), (b.until - now) / 1000);
       }
     }
-    // Light is applied after the world and before attacks, loot labels and other combat feedback.
-    window.DayNight?.draw(g, VW, VH, map.vlights?.length ? nightLights.filter(o => !ownHidden(o)).concat(map.vlights) : nightLights, w2s);
     window.Weather?.draw(g, VW, VH, t, { x: cx, y: cy });
     window.EmptySeat?.drawVision(g, w2s, VW, VH);
     window.Seasonal?.glow(g,zone,w2s);

@@ -6,18 +6,20 @@
   const indoorThemes = new Set(['vault', 'orrery', 'arena', 'heartwood', 'deep']);
   const isOutdoor = z => !!z && !(z.players > 0 || z.copies > 0 || z.template != null || indoorThemes.has(z.theme));
   const clock = { hour: 12, speed: 0, at: 0, synced: false };
-  let zone = null, outdoorBlend = 0, lastLabel = '', lastPaint = 0, glow = null;
+  let zone = null, outdoorBlend = 0, lastLabel = '', lastPaint = 0, glow = null, veil = null, veilG = null;
   const hour = () => (clock.hour + (performance.now() - clock.at) / 1000 * clock.speed) % 24;
   const phase = h => h < 5 || h >= 20 ? 'Night' : h < 7 ? 'Dawn' : h < 18 ? 'Day' : 'Dusk';
   const night = h => h < 5 ? 1 : h < 7 ? (7 - h) / 2 : h < 18 ? 0 : h < 20 ? (h - 18) / 2 : 1;
   const warm = h => Math.max(0, 1 - Math.abs(h - 6) / 1.5, 1 - Math.abs(h - 18.5) / 1.5);
+  // [shadow veil RGB, dusk/dawn warmth RGB, cool moonlight multiply RGB]
   const palette = theme => {
-    if (theme === 'ember' || theme === 'solar_crucible') return ['17,26,53', '235,105,49'];
-    if (theme === 'frost' || theme === 'frostwake' || theme === 'cairnspine') return ['16,37,76', '237,179,108'];
-    if (theme === 'fen' || theme === 'worldtree' || theme === 'tanglecrown' || theme === 'moonspore') return ['13,36,49', '208,145,84'];
-    if (theme === 'lapiserg') return ['27,26,68', '242,139,71'];
-    if (theme === 'yearwheel') return ['25,32,69', '242,161,93'];
-    return ['18,29,67', '246,157,98'];
+    if (theme === 'ember' || theme === 'emberwake' || theme === 'solar_crucible') return ['14,16,36', '235,105,49', '66,54,104'];
+    if (theme === 'frost' || theme === 'frostwake' || theme === 'cairnspine') return ['10,22,56', '237,179,108', '52,86,164'];
+    if (theme === 'fen' || theme === 'worldtree' || theme === 'tanglecrown' || theme === 'moonspore') return ['7,22,36', '208,145,84', '42,80,112'];
+    if (theme === 'lapiserg') return ['16,14,48', '242,139,71', '68,60,152'];
+    if (theme === 'yearwheel') return ['14,18,46', '242,161,93', '62,74,148'];
+    if (theme === 'wyrd') return ['12,18,40', '224,140,86', '54,68,124'];
+    return ['10,17,44', '246,157,98', '56,80,150'];
   };
   function sync(value) {
     if (!value || !Number.isFinite(value.hour) || !Number.isFinite(value.hoursPerSecond)) return;
@@ -45,24 +47,74 @@
     g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
     return glow;
   }
-  function draw(g, width, height, lights, project) {
+  function draw(g, width, height, lights, project, focus) {
     if (!clock.synced || outdoorBlend < .002) return;
     const h = hour(), n = night(h), w = warm(h), amount = window.Prefs?.night ?? 1;
     // Near a border you can cross, the neighbour's light and glow mix in by the same weight as the ground (.5 at the line), so the
     // light does not snap when the server moves you across.
-    const sb = window.Field?.seamBlend, wN = sb ? sb.w : 0, [dark1, warm1] = palette(zone?.theme), [dark2, warm2] = sb ? palette(sb.theme) : [dark1, warm1];
+    const sb = window.Field?.seamBlend, wN = sb ? sb.w : 0, [dark1, warm1, mul1] = palette(zone?.theme), [dark2, warm2, mul2] = sb ? palette(sb.theme) : [dark1, warm1, mul1];
     const mixRgb = (a, b) => a.split(',').map((v, i) => Math.round(+v + (+b.split(',')[i] - +v) * wN)).join(',');
-    const darkColor = mixRgb(dark1, dark2), warmColor = mixRgb(warm1, warm2);
+    const darkColor = mixRgb(dark1, dark2), warmColor = mixRgb(warm1, warm2), mulColor = mixRgb(mul1, mul2);
+    const nightDepth = n * outdoorBlend * amount;
+    const lowGfx = !!window.Prefs?.lowGraphics;
+    const visibleLights = [];
+    if (!lowGfx && n > .01 && lights?.length) {
+      for (const light of lights) {
+        const [x, y] = project(light.x, light.y);
+        if (x > -140 && x < width + 140 && y > -160 && y < height + 160) {
+          visibleLights.push([x, y]);
+          if (visibleLights.length >= 32) break;
+        }
+      }
+    }
     g.save();
     const warmAlpha = .075 * w * outdoorBlend;
     if (warmAlpha > .002) { g.fillStyle = `rgba(${warmColor},${warmAlpha})`; g.fillRect(0, 0, width, height); }
-    const darkAlpha = .27 * n * outdoorBlend * amount;
-    if (darkAlpha > .002) { g.fillStyle = `rgba(${darkColor},${darkAlpha})`; g.fillRect(0, 0, width, height); }
-    if (window.Prefs?.lowGraphics) { g.restore(); return; }
+    if (nightDepth > .002) {
+      g.globalCompositeOperation = 'multiply';
+      g.fillStyle = `rgba(${mulColor},${(.56 * nightDepth).toFixed(4)})`;
+      g.fillRect(0, 0, width, height);
+      g.globalCompositeOperation = 'source-over';
+    }
+    if (lowGfx) {
+      const darkAlpha = .44 * nightDepth;
+      if (darkAlpha > .002) { g.fillStyle = `rgba(${darkColor},${darkAlpha.toFixed(4)})`; g.fillRect(0, 0, width, height); }
+      g.restore(); return;
+    }
+    if (nightDepth > .002) {
+      const vw = Math.max(1, Math.round(width * .5)), vh = Math.max(1, Math.round(height * .5));
+      if (!veil) { veil = document.createElement('canvas'); veilG = veil.getContext('2d'); }
+      if (veil.width !== vw || veil.height !== vh) { veil.width = vw; veil.height = vh; }
+      const v = veilG;
+      v.globalCompositeOperation = 'source-over';
+      v.clearRect(0, 0, vw, vh);
+      v.fillStyle = `rgba(${darkColor},${(.44 * nightDepth).toFixed(4)})`;
+      v.fillRect(0, 0, vw, vh);
+      const vig = v.createRadialGradient(vw * .5, vh * .5, Math.min(vw, vh) * .34, vw * .5, vh * .5, Math.hypot(vw, vh) * .56);
+      vig.addColorStop(0, `rgba(${darkColor},0)`);
+      vig.addColorStop(1, `rgba(${darkColor},${(.24 * nightDepth).toFixed(4)})`);
+      v.fillStyle = vig; v.fillRect(0, 0, vw, vh);
+      if (visibleLights.length || focus?.hero || focus?.target) {
+        v.globalCompositeOperation = 'destination-out';
+        const cut = (sx, sy, r, peak) => {
+          const cx = sx * .5, cy = sy * .5, cr = r * .5;
+          const gr = v.createRadialGradient(cx, cy, cr * .08, cx, cy, cr);
+          gr.addColorStop(0, `rgba(0,0,0,${peak})`);
+          gr.addColorStop(.5, `rgba(0,0,0,${peak * .52})`);
+          gr.addColorStop(1, 'rgba(0,0,0,0)');
+          v.fillStyle = gr; v.beginPath(); v.arc(cx, cy, cr, 0, Math.PI * 2); v.fill();
+        };
+        const lightCut = .92 * Math.min(1, n * 1.15);
+        for (const [lx, ly] of visibleLights) cut(lx, ly - 46, 120, lightCut);
+        if (focus?.hero) cut(focus.hero[0], focus.hero[1] - 34, 195, .36);
+        if (focus?.target) cut(focus.target[0], focus.target[1] - 24, 95, .36);
+      }
+      g.drawImage(veil, 0, 0, width, height);
+    }
     if (n > .3) {
-      const alpha = n * outdoorBlend * .6;
+      const alpha = n * outdoorBlend * .75;
       g.fillStyle = `rgba(234,246,255,${alpha})`;
-      for (let i = 0; i < 22; i++) {
+      for (let i = 0; i < 28; i++) {
         const x = (i * 619 + 127) % width, y = (i * 137 + 19) % Math.max(1, height * .25);
         g.fillRect(x, y, i % 5 === 0 ? 2 : 1, i % 5 === 0 ? 2 : 1);
       }
@@ -71,14 +123,14 @@
     const nightGlow = (theme, k) => {
       if (n <= .2 || k < .01) return;
       if (theme === 'frostwake') {
-        g.fillStyle = `rgba(99,245,204,${.08 * n * outdoorBlend * k})`;
+        g.fillStyle = `rgba(99,245,204,${.1 * n * outdoorBlend * k})`;
         g.beginPath(); g.ellipse(width * .53, height * .08, width * .42, height * .09, -.13, 0, Math.PI * 2); g.fill();
-      } else if (theme === 'ember') {
+      } else if (theme === 'ember' || theme === 'emberwake') {
         const gr = g.createLinearGradient(0, height * .6, 0, height);
-        gr.addColorStop(0, 'rgba(255,107,44,0)'); gr.addColorStop(1, `rgba(255,107,44,${.09 * n * outdoorBlend * k})`);
+        gr.addColorStop(0, 'rgba(255,107,44,0)'); gr.addColorStop(1, `rgba(255,107,44,${.11 * n * outdoorBlend * k})`);
         g.fillStyle = gr; g.fillRect(0, height * .6, width, height * .4);
       } else if (['fen', 'worldtree', 'moonspore'].includes(theme)) {
-        g.fillStyle = `rgba(127,255,188,${.3 * n * outdoorBlend * k})`;
+        g.fillStyle = `rgba(127,255,188,${.34 * n * outdoorBlend * k})`;
         for (let i = 0; i < 8; i++) g.fillRect((i * 179 + 43) % width, height * (.55 + (i % 4) * .09), 3, 3);
       }
     };
@@ -87,17 +139,22 @@
     const daylight = h >= 6 && h < 18;
     const progress = daylight ? (h - 6) / 12 : ((h - 18 + 24) % 24) / 12;
     const orbX = width * (.13 + .74 * progress), orbY = height * (.19 - .11 * Math.sin(progress * Math.PI));
-    g.globalAlpha = outdoorBlend * (daylight ? .65 : .72 * n);
-    g.fillStyle = daylight ? '#fff2b7' : '#e5ecff';
+    if (!daylight && n > .15) {
+      const mh = g.createRadialGradient(orbX, orbY, 4, orbX, orbY, 34);
+      mh.addColorStop(0, `rgba(210,226,255,${(.32 * n * outdoorBlend).toFixed(4)})`);
+      mh.addColorStop(1, 'rgba(210,226,255,0)');
+      g.fillStyle = mh; g.beginPath(); g.arc(orbX, orbY, 34, 0, Math.PI * 2); g.fill();
+    }
+    g.globalAlpha = outdoorBlend * (daylight ? .65 : .85 * n);
+    g.fillStyle = daylight ? '#fff2b7' : '#edf2ff';
     g.beginPath(); g.arc(orbX, orbY, daylight ? 15 : 11, 0, Math.PI * 2); g.fill();
-    g.globalAlpha = Math.max(0, n * outdoorBlend * .7);
-    if (g.globalAlpha > .01 && lights?.length) {
+    const glowAlpha = Math.max(0, n * outdoorBlend * (.58 + .27 * amount));
+    if (glowAlpha > .01 && visibleLights.length) {
       const sprite = glowSprite();
-      let shown = 0;
-      for (const light of lights) {
-        const [x, y] = project(light.x, light.y);
-        if (x > -80 && x < width + 80 && y > -100 && y < height + 100) { g.drawImage(sprite, x - 64, y - 110); if (++shown >= 32) break; }
-      }
+      g.globalCompositeOperation = 'lighter';
+      g.globalAlpha = glowAlpha;
+      for (const [lx, ly] of visibleLights) g.drawImage(sprite, lx - 64, ly - 110);
+      g.globalCompositeOperation = 'source-over';
     }
     g.restore();
   }

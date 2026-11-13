@@ -385,7 +385,7 @@
     g.globalAlpha=0.95;ellipse(g,wx,wy,4.5,4.5,'#e9feff','#7dd3fc',1.5);
     g.restore();
   }
-  function drawNpc(g,n,sx,sy,t,near,portrait=false) {
+  function drawNpc(g,n,sx,sy,t,near,portrait=false,skipPlate=false) {
     g.save();g.translate(sx,sy);const L=n.look,sc=L?.scale||1,moving=!!n.moving;
     if(n.travelStop)window.Spark?.draw(g,n,t,true);
     const bob=L&&moving?Math.abs(Math.sin(t*9+n.x*3))*2.4:Math.sin(t*2+n.x)*1.2;
@@ -452,15 +452,19 @@
     }
     g.restore();
     window.Seasonal?.drawNpc(g,n,t,baseHeadTop(n),current?.id===n.id);
-    if(portrait){g.restore();return;}
+    g.restore();
+    if(!portrait&&!skipPlate)drawNpcPlate(g,n,sx,sy,near);
+  }
+  function drawNpcPlate(g,n,sx,sy,near) {
     // Everyone with work or wares always shows a nameplate; a passer-by in the city shows one only when you are close.
     const hero=window.Field?.hero,close=!hero||Math.hypot(hero.x-n.x,hero.y-n.y)<9;
-    if(n.key||close||near){
-      const top=headTop(n),roleY=-(top+5),nameY=roleY-17;
-      plate(g,`<${n.role}>`,roleY,13,'#f3e1a0');plate(g,n.name,nameY,18,'#ffd100');
-      const mark=window.Quests?.markerInfo(n.id);if(mark?.symbol)plate(g,mark.symbol,nameY-15,28,mark.color);
-    }
-    if(near)plate(g,'[ F ] Talk',30,13,'#ffdf88');g.restore();
+    if(!(n.key||close||near))return;
+    g.save();g.translate(sx,sy);
+    const top=headTop(n),roleY=-(top+5),nameY=roleY-17;
+    plate(g,`<${n.role}>`,roleY,13,'#f3e1a0');plate(g,n.name,nameY,18,'#ffd100');
+    const mark=window.Quests?.markerInfo(n.id);if(mark?.symbol)plate(g,mark.symbol,nameY-15,28,mark.color);
+    if(near)plate(g,'[ F ] Talk',30,13,'#ffdf88');
+    g.restore();
   }
   function drawPlaza(g,w2s) {
     const city = area().city; if (!city || Field.zone > 0) return;
@@ -664,5 +668,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawNpcPlate,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();
