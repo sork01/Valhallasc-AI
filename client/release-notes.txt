@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.48.2",
+    "date": "2026-11-13",
+    "new": [
+      "Slaying a monster now shows how much XP you earned as floating purple text above the kill, including shared party XP."
+    ],
+    "changed": [
+      "Gold, item pickup and XP floaters now stack cleanly above each other instead of overlapping when you loot several drops together."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.48.1",
     "date": "2026-11-13",
     "new": [],

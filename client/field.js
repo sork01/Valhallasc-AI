@@ -1539,7 +1539,7 @@
     const [sx, sy] = w2s(x, y);
     return sx > -100 && sx < VW + 100 && sy > -160 && sy < VH + 160;
   }
-  // kind: hit, crit, hurt, heal, miss, pickup, banner (names and notices), level; `head` overrides the start height (px).
+  // kind: hit, crit, hurt, heal, miss, pickup, xp, banner (names and notices), level; `head` overrides the start height (px).
   function floater(x, y, text, color, big, kind = big ? 'level' : 'banner', head) {
     if (!numberAnchorVisible(x, y)) return;
     DamageNumbers.spawn(floaters, { x, y, text, color, kind, head: head ?? (['hit', 'crit', 'hurt', 'heal', 'miss'].includes(kind) ? headAt(x, y, kind === 'hit' || kind === 'crit' ? currentHitKind : null) : 60) });
@@ -1834,6 +1834,7 @@
     }
     if (event.kind === 'shotBlocked') { spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45); if (event.actor === Online.id) Field.error('Out of line of sight.'); }
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + DamageNumbers.format(event.value) + ' gold', '#ffe066', false, 'pickup');
+    if ((event.kind === 'slimeDie' || event.kind === 'partyXp') && event.actor === Online.id && event.xp > 0) floater(event.x, event.y, '+' + DamageNumbers.format(event.xp) + ' XP', '#c99eff', false, 'xp');
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); effects.push({kind:'chestOpen',x:event.x,y:event.y,t:0,life:1.3}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
     if (event.kind === 'levelup') levelUpFx(event);

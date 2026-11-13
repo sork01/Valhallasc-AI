@@ -12,6 +12,7 @@
     heal:   { size: 26, rise: 44, life: 1.3,  pop: 1.08, hold: .6,  arc: 10, shake: 0, ease: .45 },
     miss:   { size: 18, rise: 34, life: .7,   pop: 1.05, hold: .35, arc: 12, shake: 0, ease: .85 },
     pickup: { size: 22, rise: 42, life: 1.5,  pop: 1.1,  hold: .6,  arc: 0,  shake: 0, ease: .5 },
+    xp:     { size: 22, rise: 42, life: 1.5,  pop: 1.1,  hold: .6,  arc: 0,  shake: 0, ease: .5 },
     banner: { size: 24, rise: 50, life: 1.1,  pop: 1,    hold: .3,  arc: 0,  shake: 0, ease: 0 },
     level:  { size: 34, rise: 50, life: 1.1,  pop: 1,    hold: .3,  arc: 0,  shake: 0, ease: 0 },
   };
@@ -47,18 +48,35 @@
   // Add a number to `list` (mutated). The lane and the starting height are the first free spot beside and above the numbers
   // still alive over the same head, so a run of hits fans out instead of stacking; the list is capped by fast-fading the oldest.
   function spawn(list, spec, rand = Math.random) {
-    const kind = KINDS[spec.kind] ? spec.kind : 'banner', k = KINDS[kind];
+    const kind = KINDS[spec.kind] ? spec.kind : 'banner', k = KINDS[kind], stacked = kind === 'pickup' || kind === 'xp';
     const delay = Math.min(MAX_DELAY, Math.max(0, spec.delay || 0));
     const f = { x: spec.x, y: spec.y, head: spec.head || 0, text: String(spec.text), color: spec.color, kind, t: -delay, lane: 0, z0: 0, side: rand() < .5 ? -1 : 1 };
-    const mates = list.filter(o => Math.hypot(o.x - f.x, o.y - f.y) < .6 && Math.abs(o.head - f.head) < 12 && o.t < (KINDS[o.kind] || KINDS.banner).life - .05);
+    const aliveAt = o => o.t < (KINDS[o.kind] || KINDS.banner).life - .05;
+    const screenOffset = o => ({ x: ((o.x - o.y) - (f.x - f.y)) * 44, y: ((o.x + o.y) - (f.x + f.y)) * 22 - (o.head - f.head) });
+    const delayMates = list.filter(o => aliveAt(o) && (stacked
+      ? ((o.kind === 'pickup' || o.kind === 'xp') && Math.hypot(o.x - f.x, o.y - f.y) < 1.2)
+      : (Math.hypot(o.x - f.x, o.y - f.y) < .6 && Math.abs(o.head - f.head) < 12)));
     // A busy party can hit faster than the stagger drains. Keep the delay
     // short so old damage cannot queue up for seconds after combat stops.
-    if (mates.length) f.t = -Math.min(MAX_DELAY, Math.max(delay, Math.max(...mates.map(o => -o.t)) + SPACING));
-    if (mates.length && k.arc) {
-      // The lowest start over each lane that clears every mate while both are moving. Follow both paths over the next 0.8 s
+    if (delayMates.length) f.t = -Math.min(MAX_DELAY, Math.max(delay, Math.max(...delayMates.map(o => -o.t)) + SPACING));
+    const mates = (k.arc || stacked) ? list.filter(aliveAt).map(o => {
+      if (!stacked && o.kind !== 'pickup' && o.kind !== 'xp') return (Math.hypot(o.x - f.x, o.y - f.y) < .6 && Math.abs(o.head - f.head) < 12) ? { o, ox: 0, oy: 0 } : null;
+      const off = screenOffset(o);
+      return (Math.abs(off.x) < 280 && Math.abs(off.y) < 220) ? { o, ox: off.x, oy: off.y } : null;
+    }).filter(Boolean) : [];
+    if (mates.length) {
+      // The lowest start over each lane that clears every mate while both are moving. Follow both paths over the next 0.8-1.2 s
       // (the newcomer is invisible until its delay is over, and that is when they are near); the mates' boxes are worked out once.
-      const taus = [], mateBoxes = [];
-      for (let tau = 0; tau <= .8; tau += .04) { taus.push(tau); mateBoxes.push(mates.map(o => ({ ...o, t: o.t + tau })).filter(o => pose(o).visible).map(o => box(o))); }
+      const taus = [], mateBoxes = [], horizon = stacked ? 1.2 : .8;
+      for (let tau = 0; tau <= horizon; tau += .04) {
+        taus.push(tau);
+        mateBoxes.push(mates.map(({ o, ox, oy }) => {
+          const moved = { ...o, t: o.t + tau };
+          if (!pose(moved).visible) return null;
+          const b = box(moved);
+          return (ox || oy) ? { x0: b.x0 + ox, x1: b.x1 + ox, y0: b.y0 + oy, y1: b.y1 + oy } : b;
+        }).filter(Boolean));
+      }
       const c = { ...f };
       let best = null;
       for (const lane of [0, 1, -1, 2, -2]) {
@@ -72,7 +90,7 @@
           }
           if (free) { best = { lane, side: c.side, z0 }; break; }
         }
-        if (best && best.z0 === 0) break;
+        if (best && (k.arc ? best.z0 === 0 : lane === 0)) break;
       }
       if (best) { f.lane = best.lane; f.side = best.side; f.z0 = best.z0; }
     }

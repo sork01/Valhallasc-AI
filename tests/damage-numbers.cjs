@@ -69,4 +69,40 @@ check(D.format(0) === '0' && D.format(-250) === '-250', 'zero and negatives');
   list = D.step(list, 2);
   check(list.length === 0, 'all numbers from a finished party burst expire within two seconds');
 }
+// Gold + item pickups + XP dropped together (same spot or slightly offset magnet tiles) never overlap in screen pixels.
+function screenBox(f) {
+  const b = D.box(f), ox = (f.x - f.y) * 44, oy = (f.x + f.y) * 22 - (f.head || 0);
+  return { x0: b.x0 + ox, x1: b.x1 + ox, y0: b.y0 + oy, y1: b.y1 + oy };
+}
+function screenOverlaps(specs) {
+  let list = [], worst = 0;
+  for (const s of specs) D.spawn(list, s, seeded(1));
+  for (let frame = 0; frame < 150; frame++) {
+    const vis = list.filter(f => D.pose(f).visible);
+    for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
+      const a = screenBox(vis[i]), b = screenBox(vis[j]);
+      if (a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1) worst++;
+    }
+    list = D.step(list, .016);
+  }
+  return { worst, list };
+}
+{
+  const sameSpot = [
+    { x: 10, y: 10, head: 60, kind: 'pickup', text: '+1 Iron Sword' },
+    { x: 10, y: 10, head: 60, kind: 'pickup', text: '+18 gold' },
+    { x: 10, y: 10, head: 60, kind: 'xp', text: '+45 XP' },
+  ];
+  const offsetSpot = [
+    { x: 10.35, y: 10.05, head: 60, kind: 'pickup', text: '+1 Iron Sword' },
+    { x: 9.85, y: 10.25, head: 60, kind: 'pickup', text: '+18 gold' },
+    { x: 10.1, y: 10.1, head: 80, kind: 'hit', text: '142' },
+    { x: 10.0, y: 10.0, head: 60, kind: 'xp', text: '+45 XP' },
+  ];
+  check(screenOverlaps(sameSpot).worst === 0, 'simultaneous item, gold, and XP pickups on same tile never overlap');
+  check(screenOverlaps(offsetSpot).worst === 0, 'offset magnet item, gold, XP, and hit floaters never overlap');
+  const stacked = [];
+  for (const s of sameSpot) D.spawn(stacked, s, seeded(1));
+  check(stacked.every(f => f.lane === 0), 'loot and XP stack vertically in lane 0 before spilling sideways');
+}
 console.log(`${checks} damage-number checks passed`);
