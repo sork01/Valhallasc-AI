@@ -9832,5 +9832,7 @@
   "You will receive:": "Du får:",
   "Show Map": "Visa karta",
   "Hand in": "Lämna in",
-  "Quests from this person": "Uppdrag från den här personen"
+  "Quests from this person": "Uppdrag från den här personen",
+  "Outpost Guard": "Utpostvakt",
+  "Town Guard": "Stadsvakt"
 }

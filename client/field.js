@@ -476,7 +476,7 @@
     window.Weather?.setZone(zdef);
     if (mini) buildMini();
     if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
-    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; farDots = []; remotePlayers.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
+    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; farDots = []; remotePlayers.clear(); guards.clear(); ghostSlimes.clear(); ghostPlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
 
@@ -1106,7 +1106,22 @@
   // Speech bubbles over characters that just chatted: id -> {text, until, lines}.
   const bubbles = new Map();
   let bubblesDrawn = 0, bubblesLast = 0;
-  let remotePlayers = new Map(), onCharacter = () => {}, inputT = 0, lastLook = '';
+  let remotePlayers = new Map(), guards = new Map(), onCharacter = () => {}, inputT = 0, lastLook = '';
+  const actorById = id => id === Online.id ? hero : remotePlayers.get(id) || guards.get(id);
+  function syncActor(map, data, present, snap) {
+    present.add(data.id);
+    let actor = map.get(data.id);
+    if (!actor) { actor = { ...data, sprite: null, signature: '' }; map.set(data.id, actor); }
+    applyActor(actor, data, snap || !!actor.sparkTravel !== !!data.sparkTravel);
+    const lookKey = JSON.stringify(data.look);
+    if (actor.signature !== lookKey) {
+      actor.signature = lookKey; const generation = spriteGeneration;
+      if (actor.sprite && actor.sprite.constructor === classSprite(data.look)) actor.sprite.set(data.look);
+      else classSprite(data.look).load(data.look, { background: true }).then(sprite => {
+        if (generation === spriteGeneration && actor.signature === lookKey) actor.sprite = sprite;
+      }).catch(() => say('spriteError'));
+    }
+  }
   const isMage = () => hero?.look?.class === 'mage';
   const isAssassin = () => hero?.look?.class === 'assassin';
   const isPriest = () => hero?.look?.class === 'priest';
@@ -1734,24 +1749,18 @@
     });
     hero.target = selectedTarget == null ? null : slimes.find(s => s.id === selectedTarget && !s.dead) || null;
     autoAttackFeedback(own);
-    const present = new Set();
+    const present = new Set(), presentGuards = new Set();
     for (const player of packet.players) {
       if (player.id === Online.id || !inZone(player)) continue;
-      present.add(player.id);
-      let remote = remotePlayers.get(player.id);
-      if (!remote) { remote = { ...player, sprite: null, signature: '' }; remotePlayers.set(player.id, remote); }
-      applyActor(remote, player, initial || moved || !!remote.sparkTravel !== !!player.sparkTravel);
-      const lookKey = JSON.stringify(player.look);
-      if (remote.signature !== lookKey) {
-        remote.signature = lookKey; const generation = spriteGeneration;
-        if (remote.sprite && remote.sprite.constructor === classSprite(player.look)) remote.sprite.set(player.look);
-        else classSprite(player.look).load(player.look, { background: true }).then(sprite => {
-          if (generation === spriteGeneration && remote.signature === lookKey) remote.sprite = sprite;
-        }).catch(() => say('spriteError'));
-      }
+      syncActor(remotePlayers, player, present, initial || moved);
     }
     for (const id of remotePlayers.keys()) if (!present.has(id)) remotePlayers.delete(id);
-    // Across a seam: the neighbour's enemies and players near the line, drawn but never targetable.
+    for (const guard of packet.guards || []) {
+      if (!inZone(guard)) continue;
+      syncActor(guards, guard, presentGuards, initial || moved);
+    }
+    for (const id of guards.keys()) if (!presentGuards.has(id)) guards.delete(id);
+    // Across a seam: the neighbour's enemies, guards and players near the line, drawn but never targetable.
     const seenSlimes = new Set(), seenPlayers = new Set();
     for (const a of moved && !seamShift ? [] : packet.across || []) {
       const [ax, ay] = a.shift;
@@ -1761,18 +1770,9 @@
         const prev = ghostSlimes.get(data.id), actor = prev || { ...moved_ };
         applyActor(actor, moved_, !prev); actor.d = SLIME[data.kind]; actor.ghost = true; ghostSlimes.set(data.id, actor);
       }
-      for (const data of a.players) {
+      for (const data of [...(a.players || []), ...(a.guards || [])]) {
         if (data.id === Online.id) continue;
-        const moved_ = { ...data, x: data.x - ax, y: data.y - ay }; seenPlayers.add(data.id);
-        let remote = ghostPlayers.get(data.id);
-        if (!remote) { remote = { ...moved_, sprite: null, signature: '' }; ghostPlayers.set(data.id, remote); }
-        applyActor(remote, moved_, !!remote.sparkTravel !== !!data.sparkTravel);
-        const lookKey = JSON.stringify(data.look);
-        if (remote.signature !== lookKey) {
-          remote.signature = lookKey; const generation = spriteGeneration;
-          if (remote.sprite && remote.sprite.constructor === classSprite(data.look)) remote.sprite.set(data.look);
-          else classSprite(data.look).load(data.look, { background: true }).then(sprite => { if (generation === spriteGeneration && remote.signature === lookKey) remote.sprite = sprite; }).catch(() => say('spriteError'));
-        }
+        syncActor(ghostPlayers, { ...data, x: data.x - ax, y: data.y - ay }, seenPlayers, false);
       }
     }
     for (const id of ghostSlimes.keys()) if (!seenSlimes.has(id)) ghostSlimes.delete(id);
@@ -1807,7 +1807,7 @@
     if (event.kind === 'bossmech') say('bossMech', event);
     if (event.actor === Online.id && !['death', 'respawn', 'swing', 'cast'].includes(event.kind)) say(event.crit && event.kind === 'hit' ? 'crit' : event.kind, event);
     if (event.kind === 'swing' || event.kind === 'cast') {
-      const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
+      const actor = actorById(event.actor);
       if (actor && (event.actor === Online.id || visibleCombatCue(event.x,event.y))) say('combatSwing', { actorId:event.actor, className:actor.look?.class, x:event.x, y:event.y, own:event.actor === Online.id });
     }
     if (event.kind === 'emberSummon') { effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:1,grow:1.5,col:'#ffad59'}); say('enemyAttack',{kind:'cf_eldmarr',boss:true,level:99,x:event.x,y:event.y}); }
@@ -1880,7 +1880,7 @@
     if (event.kind === 'healed' && event.value > 0) floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', true, 'heal');
     if (event.kind === 'regen') { floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', false, 'heal'); spark(event.x, event.y, 4, ['#9dffb4', '#d8ffe0'], 6, .6, .6); }
     if (event.kind === 'swing') {
-      const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
+      const actor = actorById(event.actor);
       if (actor) effects.push({ actor: event.actor, kind: actor.look.class === 'assassin' ? 'dualSlash' : 'slash', x: event.x, y: event.y, a: Math.atan2(actor.fy, actor.fx), t: -.12 });
     }
   }
@@ -2170,7 +2170,7 @@
     skAssassinFan: 38, skAssassinCast: 48, skAssassinLunge: 24, skMageVolley: 48,
     skAura: 60, skMageWard: 72, skAssassinBuff: 56, skHunterBuff: 83 };
   const meleeHeight = e => MELEE_HEIGHT[e.kind];
-  const fxOrigin = e => e.actor === Online.id ? hero : remotePlayers.get(e.actor) || e;
+  const fxOrigin = e => actorById(e.actor) || e;
   function drawMeleeFx(g, e, back) {
     if (e.t < 0) return;
     // The old fixed hero atlas contains its own painted rune slash. Modular
@@ -2477,7 +2477,7 @@
           g.arc(x + Math.cos(an) * d, y + Math.sin(an) * d * .65 - 30 * (1 - p), 4 + i % 3 * 2, 0, 6.283); g.fill(); }
       }
     } else if (e.kind === 'skHunterRoll') {
-      const who = e.actor === Online.id ? hero : remotePlayers.get(e.actor);
+      const who = actorById(e.actor);
       const [bx, by] = w2s(e.x, e.y, 4), [tx, ty] = who ? w2s(who.x, who.y, 4) : [bx, by];
       if (layer === 'floor') {
         layers(g, [[22, '#233223', .32, 0], [10, e.glow, .38, 1], [3, e.core, .72, 0]], fade, 0, () => {
@@ -2554,7 +2554,7 @@
         });
       }
     } else if (e.kind === 'skAssassinLunge') {
-      const who = e.actor === Online.id ? hero : remotePlayers.get(e.actor);
+      const who = actorById(e.actor);
       const [bx, by] = w2s(e.x, e.y, 5), [tx, ty] = who ? w2s(who.x, who.y, 5) : [bx, by];
       const moved = Math.hypot(tx - bx, ty - by) > 6;
       if (layer === 'floor') {
@@ -2667,7 +2667,7 @@
       g.translate(0, -72); g.scale(grow, grow); g.translate(0, 72);
       g.drawImage(mageWardArt().mist, -112, -220, 224, 320); g.restore();
     } else if (e.kind === 'skMageBlink') {
-      const who = e.actor === Online.id ? hero : remotePlayers.get(e.actor), to = who || { x: e.x, y: e.y };
+      const who = actorById(e.actor), to = who || { x: e.x, y: e.y };
       const [bx, by] = w2s(e.x, e.y, 6), [tx, ty] = w2s(to.x, to.y, 6), moved = Math.hypot(tx - bx, ty - by) > 8;
       if (layer === 'floor') {
         for (const [x, y, scale] of [[bx, by, 1], ...(moved ? [[tx, ty, 1.2]] : [])]) {
@@ -2762,7 +2762,7 @@
         });
       }
     } else if (e.kind === 'skWarCharge') {
-      const who = e.actor === Online.id ? hero : remotePlayers.get(e.actor);
+      const who = actorById(e.actor);
       const [bx, by] = w2s(e.x, e.y, 18), [tx, ty] = who ? w2s(who.x, who.y, 18) : [bx, by];
       const len = Math.hypot(tx - bx, ty - by);
       if (len > 7) {
@@ -3242,6 +3242,7 @@
         }
       }
       interpolate(hero, dt); for (const remote of remotePlayers.values()) interpolate(remote, dt);
+      for (const g of guards.values()) interpolate(g, dt);
       for (const slime of slimes) { interpolate(slime, dt); if (slime.dead) slime.dieT += dt; }
       for (const remote of ghostPlayers.values()) interpolate(remote, dt);
       for (const slime of ghostSlimes.values()) { interpolate(slime, dt); if (slime.dead) slime.dieT += dt; }
@@ -4939,7 +4940,7 @@
     window.EmptySeat?.drawFloor(g, w2s);
     window.BossMech?.drawFloor(g, t, bossMechView());
     // ground decals: splats, target marker, slash, shadows
-    for (const who of [hero, ...remotePlayers.values()]) drawBuffRings(g, who, t);
+    for (const who of [hero, ...remotePlayers.values(), ...guards.values()]) drawBuffRings(g, who, t);
     for (const e of effects) if (e.kind === 'splat') { const [sx, sy] = w2s(e.x, e.y), a = clamp(1 - (e.t - 3) / 3, 0, 1) * .5; g.fillStyle = e.col; g.globalAlpha = a; g.beginPath(); g.ellipse(sx, sy, 26 * e.s, 12 * e.s, 0, 0, 6.283); g.fill(); g.globalAlpha = 1; }
     for (const e of effects) {
       if (e.kind === 'slam') drawGroundSlam(g, e);
@@ -4981,7 +4982,7 @@
       const [sx, sy] = w2s(body.x, body.y);
       if (onScreen(sx, sy, 160)) { shadow(g, body.x, body.y, 28, 10, .25); list.push({ d: body.x + body.y, body, sx, sy }); }
     }
-    for (const remote of ghostPlayers.size ? [...remotePlayers.values(), ...ghostPlayers.values()] : remotePlayers.values()) {
+    for (const remote of [...remotePlayers.values(), ...guards.values(), ...ghostPlayers.values()]) {
       const [sx, sy] = w2s(remote.x, remote.y);
       if (onScreen(sx, sy, 160)) { shadow(g, remote.x, remote.y, 30, 12, .28); list.push({ d: remote.sparkTravel ? Infinity : remote.x + remote.y + .001, remote, sx, sy }); }
     }
@@ -5093,12 +5094,12 @@
       }
       if (p.remote) {
         const remote = p.remote; g.save(); g.translate(p.sx, p.sy);
-        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag || remote.gauntlet ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
-        const nameText = (remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : (window.Achievements?.displayName(remote) || remote.look.name) + (remote.pvpFlag ? ' · PvP' : '')) + (remote.dead && remote.ghost ? ' · Ghost' : '');
+        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag || remote.gauntlet ? '#ff9b9b' : remote.guard ? '#9fd8ff' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
+        const nameText = (remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : remote.guard ? `${remote.look.name} · Lv ${remote.level ?? ''}` : (window.Achievements?.displayName(remote) || remote.look.name) + (remote.pvpFlag ? ' · PvP' : '')) + (remote.dead && remote.ghost ? ' · Ghost' : '');
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
         if (remote.reborn?.tier) { const label = window.Rebirth.title(remote.reborn.tier); g.font = '13px "Jua", sans-serif'; g.fillStyle = window.Rebirth.color(remote.reborn.tier); g.lineWidth = 3; g.strokeText(label, 0, -144); g.fillText(label, 0, -144); }
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
-        g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
+        g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : remote.guard ? '#7cd4ff' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore(); continue;
       }
       if (p.body) {
@@ -5128,7 +5129,7 @@
           const [bx, by] = w2s(n.x, n.y); if (bx > -200 && bx < VW + 200 && by > -50 && by < VH + 250) drawBubble(g, b, bx, by - City.nameplateTop(n) - 18, (b.until - now) / 1000);
           continue;
         }
-        const who = id === Online.id ? hero : remotePlayers.get(id); if (!who || who.dead) continue;
+        const who = actorById(id); if (!who || who.dead) continue;
         const [bx, by] = w2s(who.x, who.y); if (bx > -200 && bx < VW + 200 && by > -50 && by < VH + 250) drawBubble(g, b, bx, by - (who === hero ? 138 : 152), (b.until - now) / 1000);
       }
     }
@@ -5147,7 +5148,7 @@
       if (e.t < .5) drawChestFrame(g, 1, Math.min(5, Math.floor(e.t * 12)), sx, sy); else drawChestFrame(g, 2, Math.floor((e.t - .5) * 4) % 2, sx, sy);
       g.restore();
     } else if (e.kind === 'forgeOrb') {
-      const actor = e.actor === Online.id ? hero : remotePlayers.get(e.actor);
+      const actor = actorById(e.actor);
       if (!actor || actor.dead || !actor.signatureWeapon) continue;
       const phase = reducedMotion() ? .8 : e.t * 3;
       const [sx, sy] = w2s(actor.x + Math.cos(phase) * .8, actor.y + Math.sin(phase) * .8, 75);
@@ -5692,7 +5693,7 @@
       cv = o.canvas; ctx = cv.getContext('2d'); mini = o.mini; mctx = mini ? mini.getContext('2d') : null; opts = o.opts; onHud = o.onHud || onHud; onEvent = o.onEvent || onEvent;
       if (!sprites.tree.length) buildSprites();
       window.ZoneJourney?.clear();
-      setZone(0); reset(); slimes = []; remotePlayers.clear(); lastLook = ''; onCharacter = o.onCharacter || (() => {}); hero.look = { ...(o.char || {}) }; resize();
+      setZone(0); reset(); slimes = []; remotePlayers.clear(); guards.clear(); lastLook = ''; onCharacter = o.onCharacter || (() => {}); hero.look = { ...(o.char || {}) }; resize();
       ++spriteGeneration; mageSpr = null; warSpr = null; heroSpr = null;
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
@@ -5718,7 +5719,7 @@
     },
     // A crossing cutscene starts: let go of everything the hero was doing, so nothing carries on underneath it.
     cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
-    stop() { window.WorldFeedback?.reset(); window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
+    stop() { window.WorldFeedback?.reset(); window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); guards.clear(); cancelAnimationFrame(raf); },
     setTouchDirection(x, y) {
       if (!running || paused || !Online.connected || (hero.dead && !hero.ghost) || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {
@@ -5807,6 +5808,7 @@
       return Online.send({ type: 'equip', slots: { [slot]: item } });
     },
     get remotePlayers() { return [...remotePlayers.values()]; },
+    get guards() { return [...guards.values()]; },
     targetEnemy(id) {
       const target = slimes.find(s => s.id === id && !s.dead);
       if (!running || paused || !Online.connected || hero.dead || !target) return false;

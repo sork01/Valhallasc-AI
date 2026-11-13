@@ -160,7 +160,11 @@ impl World {
             }
             let zone = s.zone;
             if !self.players.values().any(|p| {
-                p.character.zone == zone && p.merc.is_none() && p.ambient.is_none() && !p.gauntlet
+                p.character.zone == zone
+                    && p.merc.is_none()
+                    && p.ambient.is_none()
+                    && p.guard.is_none()
+                    && !p.gauntlet
             }) {
                 let s = &mut self.slimes[id];
                 s.dead = true;

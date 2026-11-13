@@ -286,6 +286,7 @@ impl World {
                 && p.character.hp > 0.
                 && p.merc.is_none()
                 && p.ambient.is_none()
+                && p.guard.is_none()
         })
     }
     /// Once per tick: despawn, announce, and count the roll timers down.

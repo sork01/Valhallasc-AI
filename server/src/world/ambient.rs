@@ -142,7 +142,7 @@ impl World {
     pub(super) fn visible_online(&self) -> usize {
         self.players
             .values()
-            .filter(|p| p.merc.is_none() && !p.is_hidden())
+            .filter(|p| p.merc.is_none() && p.guard.is_none() && !p.is_hidden())
             .count()
     }
 
@@ -154,7 +154,7 @@ impl World {
         for p in self
             .players
             .values()
-            .filter(|p| p.merc.is_none() && p.ambient.is_none())
+            .filter(|p| p.merc.is_none() && p.ambient.is_none() && p.guard.is_none())
         {
             if !self.is_instance(p.character.zone) {
                 occupied
@@ -339,14 +339,20 @@ impl World {
         point
     }
 
-    fn ambient_gear(&mut self, class: Class, kind: &str, level: u32) -> Option<String> {
+    pub(super) fn gear_for_npc(
+        &mut self,
+        class: Class,
+        kind: &str,
+        level: u32,
+        rarities: &[&str],
+    ) -> Option<String> {
         let choices: Vec<&Item> = ITEMS
             .iter()
             .filter(|i| {
                 i.kind == kind
                     && i.class == (if kind == "pants" { None } else { Some(class) })
                     && i.required_level <= level
-                    && matches!(i.rarity.as_str(), "common" | "uncommon" | "rare")
+                    && rarities.contains(&i.rarity.as_str())
                     && i.variant.is_some()
             })
             .collect();
@@ -357,6 +363,10 @@ impl World {
             .collect();
         let index = (self.random() * at_level.len() as f64) as usize;
         Some(at_level[index].id.clone())
+    }
+
+    fn ambient_gear(&mut self, class: Class, kind: &str, level: u32) -> Option<String> {
+        self.gear_for_npc(class, kind, level, &["common", "uncommon", "rare"])
     }
 
     fn ambient_quest(
@@ -663,6 +673,7 @@ impl World {
             && self.players.values().any(|other| {
                 other.merc.is_none()
                     && other.ambient.is_none()
+                    && other.guard.is_none()
                     && other.character.zone == zone
                     && other.character.point().distance(me) < 18.
             });

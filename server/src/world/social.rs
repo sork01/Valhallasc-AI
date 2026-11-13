@@ -128,7 +128,7 @@ impl World {
             }
             return self
                 .online(id)
-                .filter(|p| p.merc.is_none() && !p.is_hidden())
+                .filter(|p| p.merc.is_none() && p.guard.is_none() && !p.is_hidden())
                 .map(|p| p.character.id.clone())
                 .ok_or_else(|| "That player is not online.".into());
         }
@@ -139,6 +139,7 @@ impl World {
         let wanted = name.to_lowercase();
         let mut found = self.players.values().filter(|p| {
             p.merc.is_none()
+                && p.guard.is_none()
                 && !p.is_hidden()
                 && p.character.id != me
                 && p.character.look.name.to_lowercase() == wanted
@@ -438,7 +439,7 @@ impl World {
         let mut players: Vec<Value> = self
             .players
             .values()
-            .filter(|p| p.merc.is_none() && (!p.is_hidden() || p.character.id == me))
+            .filter(|p| p.merc.is_none() && p.guard.is_none() && (!p.is_hidden() || p.character.id == me))
             .map(|p| {
                 let c = &p.character;
                 json!({"id":c.id,"name":c.look.name,"class":c.look.class,"level":c.level,"place":self.zone_name(c.zone),

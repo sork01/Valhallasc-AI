@@ -12,7 +12,7 @@ impl World {
         let sessions: Vec<u64> = self
             .players
             .iter()
-            .filter(|(_, p)| p.merc.is_none() && p.ambient.is_none())
+            .filter(|(_, p)| p.merc.is_none() && p.ambient.is_none() && p.guard.is_none())
             .map(|(s, _)| *s)
             .collect();
         let mut changed = false;
