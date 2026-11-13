@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.51.0",
+    "date": "2026-11-13",
+    "new": [
+      "Added a non-blocking early-level guided tutorial that triggers once per character for movement and your first quest, spending stat points on level-up, equipping new gear, arranging newly unlocked active skills, using food and potions, and buying or selling at a merchant.",
+      "Added Disable tutorial buttons on tips and a Reset / Replay tutorial button in Settings; tutorial progress saves to your character and experienced characters above level 5 skip old onboarding automatically."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.50.2",
     "date": "2026-11-13",
     "new": [],

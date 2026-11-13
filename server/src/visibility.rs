@@ -53,6 +53,9 @@ const OWN_ONLY: &[&str] = &[
     "storyMemory",
     "resurrectionSickness",
     "effectiveAttributes",
+    "tutorialDone",
+    "tutorialDisabled",
+    "landing",
 ];
 
 pub fn filter_view(view: &mut Value, viewer: &str) {

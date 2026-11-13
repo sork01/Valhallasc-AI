@@ -1804,6 +1804,7 @@
   }
   function networkEvent(event) {
     window.BossMech?.onEvent(event, Online.id);
+    window.Tutorial?.onEvent(event);
     if (event.kind === 'bossmech') say('bossMech', event);
     if (event.actor === Online.id && !['death', 'respawn', 'swing', 'cast'].includes(event.kind)) say(event.crit && event.kind === 'hit' ? 'crit' : event.kind, event);
     if (event.kind === 'swing' || event.kind === 'cast') {

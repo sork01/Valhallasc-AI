@@ -302,6 +302,12 @@
   weatherAudio.addEventListener('input', () => { $('set-weather-audio-out').textContent = weatherAudio.value + '%'; window.Prefs.set({ weatherAudio: weatherAudio.value / 100 }); });
   size.addEventListener('input', () => { $('set-uiscale-out').textContent = size.value + '%'; window.Prefs.set({ uiScale: size.value / 100 }); applyScale(); refresh(); });
   $('set-win-reset').addEventListener('click', resetWindows);
+  $('set-reset-tutorial')?.addEventListener('click', () => {
+    window.Tutorial?.reset();
+    if (!panel.hidden) $('set-back')?.click();
+    if (!$('pause').hidden) $('p-resume')?.click();
+    window.Tutorial?.refresh();
+  });
   addEventListener('prefs-change', () => { if (!panel.hidden) syncPanel(); });
 
   function show() {
@@ -454,7 +460,7 @@
     'activity-panel': 'activity-close',
   };
   addEventListener('pointerdown', event => {
-    if (editing || event.button > 0 || event.target.closest('.win-grip, .panel-grip, .layout-handle')) return;
+    if (editing || event.button > 0 || event.target.closest('.win-grip, .panel-grip, .layout-handle, #tutorial-tip')) return;
     const warning = $('sell-warning');
     if (warning?.open) {
       const r = warning.getBoundingClientRect();

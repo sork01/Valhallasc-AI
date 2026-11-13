@@ -728,6 +728,9 @@ impl Player {
         view["corpse"] = json!(c.corpse);
         view["resurrectionSickness"] = json!(r2(c.resurrection_sickness));
         view["effectiveAttributes"] = json!(c.effective_attributes());
+        view["tutorialDone"] = json!(c.tutorial_done);
+        view["tutorialDisabled"] = json!(c.tutorial_disabled);
+        view["landing"] = json!(c.landing);
         view
     }
     pub(super) fn is_ghost(&self) -> bool {
@@ -3227,6 +3230,26 @@ impl World {
             ClientMessage::Roll { id, choice } => self.roll_vote(session, id, choice),
             ClientMessage::Ping { nonce } => {
                 let _ = p.peer.try_send(json!({"type":"pong","nonce":nonce}));
+            }
+            ClientMessage::Tutorial { command } => {
+                let changed = match command {
+                    TutorialCommand::Complete { id } => p.character.complete_tutorial(&id),
+                    TutorialCommand::Disable => {
+                        if !p.character.tutorial_disabled {
+                            p.character.tutorial_disabled = true;
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    TutorialCommand::Reset => {
+                        p.character.reset_tutorial();
+                        true
+                    }
+                };
+                if changed {
+                    self.save();
+                }
             }
             ClientMessage::Debug { reference, command } => {
                 self.debug(session, reference, command);

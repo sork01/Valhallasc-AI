@@ -1233,3 +1233,31 @@
 .quest-reward-cell[data-rarity="epic"] .quest-reward-name { color: #d2a5ff; }
 .quest-reward-cell[data-rarity="legendary"] .quest-reward-name { color: #ffbe73; }
 @media (pointer: coarse) { .quest-reward-named .quest-reward-cell .quest-reward-icon { width: var(--touch-target, 44px); height: var(--touch-target, 44px); } }
+
+/* Early-level non-blocking tutorial */
+.tutorial-layer { position: absolute; inset: 0; z-index: 65; pointer-events: none; overflow: hidden; }
+.tutorial-layer[hidden] { display: none; }
+.tutorial-glow { position: absolute; border: 2px solid #ffd56b; border-radius: 8px; box-shadow: 0 0 0 2px #1b1407cc, 0 0 18px 4px #ffb838aa, inset 0 0 12px #ffd56b44; pointer-events: none; animation: tutorial-pulse 1.5s ease-in-out infinite; }
+.tutorial-glow[hidden] { display: none; }
+@keyframes tutorial-pulse { 0%, 100% { box-shadow: 0 0 0 2px #1b1407cc, 0 0 14px 3px #ffb83899, inset 0 0 10px #ffd56b33; } 50% { box-shadow: 0 0 0 2px #1b1407cc, 0 0 24px 6px #ffd86bee, inset 0 0 14px #ffd56b66; } }
+.tutorial-tip { position: absolute; width: min(330px, 86cqw); padding: 12px 14px; border: 2px solid #e2b453; border-radius: 10px; background: linear-gradient(180deg, #252019f5, #14120ef7); color: #f6eedc; box-shadow: 0 10px 28px #000c, 0 0 0 1px #000a; pointer-events: auto; font-family: 'Jua', sans-serif; }
+.tutorial-tip[hidden] { display: none; }
+.tutorial-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 5px; }
+.tutorial-head strong { color: #ffd978; font-size: max(14px, 1.05cqw); }
+.tutorial-progress { color: #bda97c; font-size: max(11px, .85cqw); white-space: nowrap; }
+.tutorial-body { margin: 0 0 10px; color: #ece2cc; font-size: max(12.5px, .92cqw); line-height: 1.4; }
+.tutorial-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tutorial-btn { border: 1px solid #6b5a3a; border-radius: 6px; padding: 6px 11px; font: inherit; font-size: max(12px, .88cqw); cursor: pointer; min-height: 32px; }
+.tutorial-btn-primary { background: linear-gradient(180deg, #d7a645, #a97822); border-color: #f3cc73; color: #1a1205; font-weight: bold; }
+.tutorial-btn-primary:hover { filter: brightness(1.08); }
+.tutorial-btn-muted { background: #26221b; color: #cbbda2; }
+.tutorial-btn-muted:hover { color: #fff4dd; border-color: #9e8658; }
+.tutorial-arrow { position: absolute; width: 12px; height: 12px; background: #221d16; border: 2px solid #e2b453; transform: rotate(45deg); }
+.tutorial-arrow[hidden] { display: none; }
+.tutorial-arrow[data-side="bottom"] { top: -8px; margin-left: -6px; border-right: 0; border-bottom: 0; }
+.tutorial-arrow[data-side="top"] { bottom: -8px; margin-left: -6px; border-left: 0; border-top: 0; }
+.tutorial-arrow[data-side="right"] { left: -8px; margin-top: -6px; border-right: 0; border-top: 0; }
+.tutorial-arrow[data-side="left"] { right: -8px; margin-top: -6px; border-left: 0; border-bottom: 0; }
+.tutorial-focus-inline { outline: 2px solid #ffd56b; outline-offset: 2px; border-radius: 4px; box-shadow: 0 0 10px #ffb838aa; }
+@media (pointer: coarse) { .tutorial-btn { min-height: var(--touch-target, 44px); padding: 8px 12px; } }
+@media (prefers-reduced-motion: reduce) { .tutorial-glow { animation: none; } }
