@@ -1179,3 +1179,40 @@
 .cs-skip { z-index: 2; position: absolute; right: 2.2%; bottom: 3.4%; margin: 0; padding: .4cqw 1.2cqw; border-radius: .6cqw; background: #05070dcc; color: #dfe9f5; font: max(13px, 1.4cqw) 'Jua', sans-serif; letter-spacing: .02em; border: 1px solid #ffffff30; }
 .cs-skip[hidden] { display: none; }
 .cs-skip::after { content: ''; position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--skip, 0) * 100%); background: #ffd66b; border-radius: 0 0 .6cqw .6cqw; }
+
+/* NPC conversations (Beta 1.48.0, owner references questgiver.webp / npc_dialogue1.png): one tall parchment in a dark iron frame, the speaker's
+   face in a round frame on the top-left corner, their name on a plate beside it, red buttons along the bottom. Merchant mode keeps its own frame. */
+#npc-dialogue:not(.merchant-mode) > .gossip-window { width: min(max(30cqw, 340px), 96cqw); height: min(40cqw, 94cqh); max-height: none; overflow: visible; border: 3px ridge #7d7a70; border-radius: .5cqw; background: linear-gradient(#34332f, #1d1d1b 30%, #232320); box-shadow: 0 .7cqw 2cqw #000b, 0 0 0 2px #17181a, inset 0 0 0 2px #0a0b0c; }
+#npc-dialogue:not(.merchant-mode) .gossip-titlebar { align-items: flex-start; justify-content: flex-start; min-height: max(46px, 4.6cqw); padding: .35cqw calc(max(26px, 2.2cqw) + .9cqw) 0 max(58px, 5.6cqw); border-bottom: 0; background: none; }
+#npc-dialogue:not(.merchant-mode) .gossip-titlebar h3 { flex: 1; min-width: 0; padding: .3cqw .8cqw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border: 2px groove #6f6c62; border-radius: .9cqw; background: linear-gradient(#17181a, #26272a); color: #f4ead0; font: max(13px, 1.25cqw)/1.25 Georgia, 'Palatino Linotype', serif; text-shadow: 0 1px 2px #000; }
+.npc-portrait { position: absolute; left: -.5cqw; top: -.6cqw; z-index: 2; width: max(56px, 5.6cqw); height: max(56px, 5.6cqw); border: 3px ridge #c9ac62; border-radius: 50%; background: #1c2530; box-shadow: 0 2px 5px #000, inset 0 0 0 2px #0008; }
+#npc-dialogue.merchant-mode .npc-portrait { display: none; }
+#npc-dialogue:not(.merchant-mode) .gossip-titlebar .window-close { top: .35cqw; right: .4cqw; transform: none; width: max(24px, 2.1cqw); height: max(24px, 2.1cqw); border: 2px ridge #d9b25a; border-radius: .3cqw; background: linear-gradient(#a8301f, #5e1209); color: #ffd97a; font: bold max(16px, 1.5cqw)/1 Georgia, serif; }
+#npc-dialogue:not(.merchant-mode) .gossip-parchment { margin: 0 .55cqw; padding: 1cqw 1.2cqw; border: 2px solid #1a1612; border-radius: .2cqw; background: radial-gradient(ellipse at 35% 25%, #f0dba6aa, transparent 70%), repeating-linear-gradient(28deg, #7a4f0d07 0 1px, transparent 1px 5px), #dcbd82; box-shadow: inset 0 0 1.6cqw #7a4a1899, inset 0 -1.2cqw 1.6cqw -1cqw #5a3210aa; }
+#npc-dialogue:not(.merchant-mode) .gossip-parchment p { font: max(13px, 1.15cqw)/1.4 Georgia, 'Palatino Linotype', serif; color: #23160a; }
+#npc-dialogue:not(.merchant-mode) .gossip-parchment .npc-role { display: none; }
+#npc-dialogue:not(.merchant-mode) .gossip-footer { min-height: max(34px, 2.9cqw); padding: .4cqw .55cqw .45cqw; background: none; }
+#npc-dialogue:not(.merchant-mode) .gossip-footer .gossip-button { min-width: max(84px, 8.2cqw); padding: .3cqw .9cqw; border: 2px ridge #d9b25a; border-radius: .3cqw; background: linear-gradient(#b0261a, #6a0f08); color: #ffd97a; font: max(12px, 1.1cqw)/1.3 Georgia, serif; }
+#npc-dialogue:not(.merchant-mode) .gossip-footer .gossip-button:hover:not(:disabled) { background: linear-gradient(#cf3323, #861509); }
+#npc-dialogue:not(.merchant-mode) #npc-gold { color: #cdbf9c; font-size: max(11px, .9cqw); }
+#npc-quest-close, .gossip-footer #npc-back { margin-left: auto; }
+.quest-view #npc-quest-actions { display: flex; flex: 1; gap: .5cqw; margin: 0; }
+.quest-view #npc-quest-actions [data-action="decline"] { margin-left: auto; }
+.gossip-parchment .npc-quest-nav { max-height: none; overflow: visible; padding: 0; border: 0; background: none; }
+.gossip-parchment .npc-quest-nav:not([hidden]) { margin-bottom: .9cqw; }
+.gossip-parchment .journal-quest { min-height: 0; padding: .3cqw .5cqw; border: 0; border-radius: .25cqw; color: #2b1b08; font: max(13px, 1.2cqw)/1.3 Georgia, 'Palatino Linotype', serif; }
+.gossip-parchment .journal-quest .journal-quest-name { overflow: visible; white-space: normal; }
+.gossip-parchment .journal-quest:hover { background: linear-gradient(90deg, #9fc92f, #b7dd4f 70%, #c3e56a); }
+.gossip-parchment .journal-quest .journal-quest-mark { width: auto; }
+.quest-view .gossip-parchment .quest-detail h4 { margin: 0 0 .5cqw; color: #2a1505; font: bold max(18px, 1.85cqw)/1.15 Georgia, 'Palatino Linotype', serif; font-variant: small-caps; letter-spacing: .01em; }
+.quest-view .gossip-parchment .quest-detail h5 { margin: 1.1cqw 0 .3cqw; color: #2a1505; font: bold max(16px, 1.55cqw)/1.2 Georgia, 'Palatino Linotype', serif; font-variant: small-caps; }
+.quest-view .gossip-parchment .quest-detail .quest-state { margin-bottom: .6cqw; font-size: max(11px, .95cqw); }
+.quest-reward-named { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4cqw; }
+.quest-reward-cell { display: flex; align-items: center; min-width: 0; border: 1px solid #1c1610; border-radius: .25cqw; background: linear-gradient(#4a3f2f, #2b241a); box-shadow: inset 0 0 0 1px #8a744a66; }
+.quest-reward-named .quest-reward-cell .quest-reward-icon { width: max(40px, 3.7cqw); height: max(40px, 3.7cqw); }
+.quest-reward-name { flex: 1; min-width: 0; padding: 0 .6cqw; color: #f6efd9; font: max(12px, 1.05cqw)/1.2 Georgia, serif; text-shadow: 0 1px 1px #000; overflow-wrap: anywhere; }
+.quest-reward-cell[data-rarity="uncommon"] .quest-reward-name { color: #7fe796; }
+.quest-reward-cell[data-rarity="rare"] .quest-reward-name { color: #8fc1ff; }
+.quest-reward-cell[data-rarity="epic"] .quest-reward-name { color: #d2a5ff; }
+.quest-reward-cell[data-rarity="legendary"] .quest-reward-name { color: #ffbe73; }
+@media (pointer: coarse) { .quest-reward-named .quest-reward-cell .quest-reward-icon { width: var(--touch-target, 44px); height: var(--touch-target, 44px); } }

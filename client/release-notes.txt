@@ -1,5 +1,20 @@
 [
   {
+    "version": "Beta 1.48.0",
+    "date": "2026-11-13",
+    "new": [
+      "Conversations show the speaker's portrait in a round frame at the top of the window.",
+      "Quest rewards are shown on a plate with the item's name beside its icon."
+    ],
+    "changed": [
+      "Talking to someone opens one tall parchment: their greeting, then their quests and services as rows, with Goodbye at the bottom.",
+      "A quest from a quest giver fills that parchment with its story, Quest Objectives and Rewards, with Accept on the left and Decline on the right."
+    ],
+    "removed": [
+      "The side list of quests in conversations is gone, because the quests are now rows on the greeting page."
+    ]
+  },
+  {
     "version": "Beta 1.47.6",
     "date": "2026-11-13",
     "new": [],

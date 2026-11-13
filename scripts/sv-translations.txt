@@ -2404,6 +2404,7 @@
   "Golden Top Hat": "Gyllene cylinderhatt",
   "Good to know": "Bra att veta",
   "Goodbye": "Hejdå",
+  "Quest Objectives": "Uppdragsmål",
   "Grand Health Potion": "Stor hälsodryck",
   "Grand Mana Potion": "Stor manadryck",
   "Grand Nave — Level 50": "Grand Nave — nivå 50",

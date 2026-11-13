@@ -195,3 +195,25 @@ html, body { overscroll-behavior: none; }
   #stage .pause > .quest-panel .journal-quest-name { white-space: normal; overflow-wrap: anywhere; }
   #stage .pause > .quest-panel .journal-footer { padding-top: calc(3px / var(--window-k)); padding-bottom: calc(3px / var(--window-k)); }
 }
+
+/* NPC conversations on touch (Beta 1.48.0): the tall parchment fills the stage height and its text and targets are compensated for the window scale. */
+@media (pointer: coarse) {
+  /* Both tracks must be able to shrink, or the unscaled box overflows the stage downwards instead of centring. */
+  #npc-dialogue:not(.merchant-mode) { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-row { grid-template-columns: calc(26px / var(--window-k, .8)) minmax(0, 1fr) auto; gap: calc(8px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-icon { font-size: calc(22px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-glyph svg { width: calc(22px / var(--window-k, .8)); height: calc(22px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) > .gossip-window { width: calc(min(62cqw, 520px) / var(--window-k, .8)); height: calc(min(92cqh, 700px) / var(--window-k, .8)); max-width: none; max-height: none; padding: 0; }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-titlebar { min-height: calc(48px / var(--window-k, .8)); padding-left: calc(60px / var(--window-k, .8)); padding-right: calc(52px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-titlebar h3 { font-size: calc(16px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .npc-portrait { width: calc(54px / var(--window-k, .8)); height: calc(54px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-titlebar .window-close { width: calc(44px / var(--window-k, .8)); height: calc(44px / var(--window-k, .8)); font-size: calc(22px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment { overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment :is(p, small, .gossip-row, .quest-reward-name) { font-size: calc(15px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .gossip-tag, #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-state { font-size: calc(12px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-detail h4 { font-size: calc(22px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-detail h5 { font-size: calc(19px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-footer { padding-right: calc(50px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-footer .gossip-button { min-width: calc(92px / var(--window-k, .8)); font-size: calc(15px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) #npc-gold { font-size: calc(12px / var(--window-k, .8)); }
+}

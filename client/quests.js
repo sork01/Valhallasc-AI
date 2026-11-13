@@ -195,16 +195,18 @@
     if (claim) b.dataset.action = 'claim';
     return b;
   }
-  function rewards(quest, container, claimable, npcId = quest.npc) {
-    const icons = element('div', '', 'quest-reward-icons');
-    if (quest.rewardItem) { const n = rewardIcon(quest.rewardItem); if (n) icons.append(n); }
+  // `named` (a conversation's quest page) sets each reward icon on a plate with the item's name beside it.
+  function rewards(quest, container, claimable, npcId = quest.npc, named = false) {
+    const icons = element('div', '', 'quest-reward-icons' + (named ? ' quest-reward-named' : ''));
+    const put = n => { if (!n) return; if (!named) { icons.append(n); return; } const cell = element('div', '', 'quest-reward-cell'); cell.dataset.rarity = n.dataset.rarity; cell.append(n, element('span', Inventory.definition(n.dataset.item).name, 'quest-reward-name')); icons.append(cell); };
+    if (quest.rewardItem) put(rewardIcon(quest.rewardItem));
     const choices = classChoices(quest);
     if (choices.length) container.append(element('p', 'Choose one class reward:', 'quest-reward'));
     for (const id of choices) {
       const n = rewardIcon(id, claimable ? b => {
         if (Online.send({ type: 'interact', npc: npcId, offer: `quest:claim:${quest.id}:${id}` })) b.disabled = true;
       } : null);
-      if (n) icons.append(n);
+      put(n);
     }
     if (icons.childElementCount) container.append(icons);
     return choices;
@@ -491,9 +493,12 @@
         const row = element('button', '', 'gossip-row'); row.type = 'button'; row.dataset.quest = q.id; row.dataset.status = s;
         if (q.repeatable) row.dataset.repeatable = 'true';
         if (classic) {
-          row.className = 'journal-quest'; row.setAttribute('aria-pressed', String(q.id === selected)); row.setAttribute('aria-controls', 'npc-quests');
-          const mark = element('span', s === 'ready' ? '?' : '!', 'journal-quest-mark'); mark.setAttribute('aria-hidden', 'true');
-          row.append(element('span', `[${q.level}] ${q.title}`, 'journal-quest-name'), mark);
+          // A row on the conversation's parchment: the quest mark, the title, the level.
+          row.className = 'gossip-row journal-quest'; row.setAttribute('aria-controls', 'npc-quests');
+          const mark = element('span', s === 'available' ? '!' : '?', 'gossip-icon journal-quest-mark'); mark.setAttribute('aria-hidden', 'true');
+          const tag = element('span', `Lv ${q.level}`, 'gossip-tag'); tag.dataset.level = String(q.level);
+          if (gap >= 5) tag.style.color = '#a31515'; else if (gap >= 3) tag.style.color = '#b8560f'; else if (gap <= -5) tag.style.color = '#6f6a58';
+          row.append(mark, element('span', q.title, 'gossip-label journal-quest-name'), tag);
           row.setAttribute('aria-label', `${q.title}, ${words[s]}`); row.addEventListener('click', () => pick(q)); return row;
         }
         const tag = element('span', `Lv ${q.level}`, 'gossip-tag'); tag.dataset.level = String(q.level);
@@ -511,15 +516,14 @@
       const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
       node.append(element('h4', quest.title), element('span', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
       if (quest.story) node.prepend(element('small', quest.story.title + ' · ' + quest.story.chapter + '/28', 'quest-location'));
-      if (actionContainer) node.append(element('p', `Recommended level ${quest.level}`, 'quest-level'), element('h5', 'Description'));
       node.append(element('p', quest.description));
       storyRecap(quest, node);
       if (quest.story?.next) node.append(element('p', quest.story.next, 'quest-next'));
       if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
-      node.append(element('h5', 'Objectives'), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join('\n'), 'quest-objectives'));
+      node.append(element('h5', actionContainer ? 'Quest Objectives' : 'Objectives'), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join('\n'), 'quest-objectives'));
       if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
       if (!quest.handoffTo) node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
-      const choices = rewards(quest, node, s === 'ready', npcId);
+      const choices = rewards(quest, node, s === 'ready', npcId, !!actionContainer);
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
         const action = s === 'ready' ? 'claim' : 'accept';

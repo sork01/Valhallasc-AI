@@ -492,10 +492,12 @@
     const packet=lastPacket,npc=current,offered=window.Quests?.offered(npc.id)||[];
     let quest=view.kind==='quest'&&offered.find(q=>q.id===view.id);
     if(view.kind==='quest'&&!quest)view={kind:'gossip'};
-    const gossip=view.kind==='gossip',classic=!!$('npc-quest-list')&&(!!quest||gossip&&offered.length>0);
+    // One parchment column (owner references questgiver.webp / npc_dialogue1.png, 2026-11-13): the greeting with quests and services as rows, or one
+    // quest's page with Accept and Decline under it. The two-pane journal frame is the journal's alone again.
+    const gossip=view.kind==='gossip',classic=false;
     const shell=$('npc-dialogue').querySelector('.gossip-window');
     if(shell){
-      shell.classList.toggle('quest-panel',classic);$('npc-dialogue').classList.toggle('quest-conversation',classic);
+      shell.classList.toggle('quest-panel',classic);$('npc-dialogue').classList.toggle('quest-conversation',classic);shell.classList.toggle('quest-view',!!quest);delete shell.dataset.questPane;
       const header=shell.querySelector('.gossip-titlebar');header.classList.toggle('journal-titlebar',classic);
       let emblem=header.querySelector('.journal-emblem');
       if(!emblem&&classic){emblem=$('quest-journal')?.querySelector('.journal-emblem')?.cloneNode(true);if(emblem)header.prepend(emblem);}
@@ -506,14 +508,13 @@
     }
     if($('npc-quest-layout'))$('npc-quest-layout').classList.toggle('journal-pages',classic);
     if($('npc-quest-list')){
-      $('npc-quest-list').hidden=!classic;
-      if(classic)window.Quests.npc(npc.id,$('npc-quest-list'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'),quest?.id);
-      else $('npc-quest-list').replaceChildren();
+      $('npc-quest-list').hidden=!gossip||!offered.length;
+      window.Quests.npc(npc.id,$('npc-quest-list'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'),quest?.id);
       $('npc-quest-count').textContent=`Quests: ${offered.length}`;
       $('npc-quest-actions').replaceChildren();$('npc-quest-actions').hidden=!quest;
-      $('npc-quest-close').hidden=!classic;
+      $('npc-quest-close').hidden=!gossip;
     }
-    $('npc-name').textContent=npc.name;$('npc-role').textContent=npc.role;
+    $('npc-name').textContent=npc.name;$('npc-role').textContent=npc.role;portrait(npc);
     $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
     if(!['merchant','sell'].includes(view.kind))$('npc-notice').textContent=packet.notice;
     $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
@@ -522,11 +523,10 @@
     $('npc-back').textContent=view.kind==='merchant'?'Quests / services':'Back';
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
-      window.Quests.detail(quest,$('npc-quests'),()=>show({kind:'gossip'},`[data-quest="${view.id}"]`),npc.id,classic?$('npc-quest-actions'):null);
+      window.Quests.detail(quest,$('npc-quests'),()=>show({kind:'gossip'},`[data-quest="${view.id}"]`),npc.id,$('npc-quest-actions'));
     }
     if(view.kind==='gossip'){
-      if(classic)$('npc-quests').replaceChildren();
-      else window.Quests?.npc(npc.id,$('npc-quests'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'));
+      $('npc-quests').replaceChildren();
     }
     else if(['merchant','sell','merge','refine','repair','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
@@ -594,6 +594,15 @@
     const target=focus&&$('npc-dialogue').querySelector(focus);
     (target&&!target.hidden?target:$('npc-x')).focus({preventScroll:true});
   }
+  // The speaker's face in the round frame at the window's corner (the merchant view has its own, shop.js).
+  function portrait(npc){
+    const c=$('npc-portrait');if(!c)return;const g=c.getContext('2d'),plain=npc.art==='stone'||npc.art==='scenery'||npc.art==='mailbox';
+    g.clearRect(0,0,128,128);g.save();g.beginPath();g.arc(64,64,64,0,Math.PI*2);g.clip();
+    const sky=g.createLinearGradient(0,0,0,128);sky.addColorStop(0,'#3a4d63');sky.addColorStop(1,'#1c2530');g.fillStyle=sky;g.fillRect(0,0,128,128);
+    if(!plain){window.NpcArt?.readyFor?.([npc]);try{g.translate(64,0);g.scale(2.3,2.3);drawNpc(g,npc,0,headTop(npc)+7,0,false,true);}catch{/* art still loading */}}
+    g.restore();c.dataset.npc=npc.id;
+  }
+  setInterval(()=>{if(current&&!$('npc-dialogue').hidden)portrait(current);},700);   // late-loading art
   function acceptQuest(quest, button) {
     if (pendingAccept || current?.id !== quest.npc) return false;
     if (!Online.send({type:'interact',npc:quest.npc,offer:`quest:accept:${quest.id}`})) return false;

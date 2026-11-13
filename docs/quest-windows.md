@@ -1,5 +1,47 @@
 # Quest rewards and acceptance
 
+## One-column conversations (Beta 1.48.0)
+
+Owner references in FileDrop (2026-11-13): `questgiver.webp` for the quest
+giver's page and `npc_dialogue1.png` for the greeting. They show the layout to
+follow; the frame, parchment, fonts and icons are the game's own drawing.
+
+Every conversation is now one tall parchment in a dark iron frame, at every
+screen size. The journal keeps its two-pane frame; conversations no longer
+borrow it (no `quest-panel` / `journal-*` classes, no sidebar, no phone
+**Quest list / Details** tabs on `#npc-dialogue`).
+
+- **Header:** the speaker's face in a round frame on the top-left corner
+  (`#npc-portrait`, drawn by `portrait()` in `city.js` with `drawNpc(..., true)`;
+  hidden in merchant mode, which has its own), the name on a plate, a red close
+  square.
+- **Greeting (`view.kind === 'gossip'`):** the greeting text, then the quests as
+  rows (`#npc-quest-list .journal-quest[data-quest|data-status]`, now inside the
+  parchment and styled as gossip rows: mark, title, level), then services.
+  Footer: purse on the left, **Goodbye** (`#npc-quest-close`) on the right.
+- **Quest page:** title, state line, story, **Quest Objectives**, **Rewards**.
+  Each reward icon sits on a plate with the item's name beside it
+  (`.quest-reward-cell`, two per row; `rewards(..., named)` in `quests.js`; the
+  journal keeps bare icons). Footer: **Accept** / **Complete Quest** on the left,
+  **Decline** / **Back** on the right (returns to the greeting). The shell has
+  class `quest-view`; the quest rows stay in the DOM but hidden.
+- **Touch:** `touch.css` sizes the window from the stage and divides text and
+  targets by `--window-k`; both grid tracks of `#npc-dialogue` are
+  `minmax(0, 1fr)` so the unscaled box centres instead of overflowing downwards.
+- Merchant, merge, refine, repair and stat-reset views are unchanged in
+  behaviour; the non-merchant ones sit in the new frame.
+
+Checks (bounded runner): `tests/quest-window-ui.cjs` 21 at touch 844×390 and 21
+at desktop 1440×900 (`QUEST_DESKTOP=1 TOUCH_SIZE=1440x900`);
+`tests/quest-mobile-ui.cjs` 34 at 667×375. Screenshots
+`test-results/touch/npc-gossip-*`, `quest-accept-classic-*`, `quest-window-*`.
+Not rerun: the older zone suites that click `#npc-quest-list` rows
+(`zones-ui`, `skaldholm-ui`, `gloamfen-ui`, `rimeveil-ui`, `progression-ui`,
+`dungeon-admission-ui`, `quest-ui`, `todo-bags-chime-ui`); the row selectors and
+footer `data-action` buttons they use are kept, but a step that presses a quest
+row while a quest page is open, or `#npc-quest-close` on a quest page, needs
+Decline/Back first. The sections below describe earlier layouts.
+
 ## Mobile quest windows (Beta 1.47.3)
 
 On narrow or short touch screens (width at most 900 px or height at most

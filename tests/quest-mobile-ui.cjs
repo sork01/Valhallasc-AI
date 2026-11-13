@@ -61,9 +61,22 @@ const suite={name:'quest-mobile',async test({player,check,width,height,out}){
  await press(page.locator('#quest-close'));check(!await page.locator(j).isVisible(),'the persistent Close button dismisses the journal');
  const npc=await page.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='gatekeeper'));
  await debug(page,{op:'teleport',zone:0,x:npc.x,y:npc.y+1});await page.evaluate(()=>Field.visitNpc('gatekeeper'));await page.locator('#npc-dialogue').waitFor({state:'visible'});
- const n='#npc-dialogue', nShell=n+' .quest-panel',nList=n+' [data-quest-pane="list"]',nDetail=n+' [data-quest-pane="detail"]';
- await layout(nShell,'#npc-quest-list','#npc-quest-page');
- await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));await layout(nShell,'#npc-quest-list','#npc-quest-page');
+ const n='#npc-dialogue';
+ // The conversation is one parchment column at every size: the greeting with its quest rows, or one quest's page over fixed footer buttons.
+ async function npcLayout(questPage) {
+  await settled();const result=await page.evaluate(()=>{
+   const shell=document.querySelector('#npc-dialogue .gossip-window'),s=document.getElementById('stage').getBoundingClientRect(),r=shell.getBoundingClientRect(),p=document.getElementById('npc-quest-page').getBoundingClientRect(),footer=shell.querySelector('.gossip-footer').getBoundingClientRect(),face=document.getElementById('npc-portrait').getBoundingClientRect();
+   const shown=q=>!!document.querySelector(q)?.getClientRects().length;
+   return{fits:r.left>=s.left-1&&r.right<=s.right+1&&r.top>=s.top-1&&r.bottom<=s.bottom+1,journalFrame:shell.classList.contains('quest-panel'),tabs:shown('#npc-dialogue .quest-mobile-tabs'),rows:shown('#npc-quest-list .journal-quest'),goodbye:shown('#npc-quest-close'),greeting:shown('#npc-text'),pageWide:p.width>=r.width*.9,reading:p.height,footerFixed:footer.bottom<=r.bottom+1&&footer.top>=p.bottom-1,face:face.width>=40&&face.height>=40,
+    targets:[...shell.querySelectorAll('button')].filter(b=>{const r=b.getBoundingClientRect();return r.width&&r.height&&r.top>=s.top&&r.bottom<=s.bottom;}).every(b=>{const r=b.getBoundingClientRect();return r.height>=43.8&&r.width>=43.8;})};
+  });console.log('npc layout',JSON.stringify(result));
+  check(result.fits&&!result.journalFrame&&!result.tabs&&result.pageWide&&result.face,'the conversation is one parchment column with the speaker portrait, inside the stage');
+  check(questPage?!result.rows&&!result.goodbye&&!result.greeting:result.rows&&result.goodbye&&result.greeting,questPage?'a quest page replaces the greeting and its rows':'the greeting lists quests as rows above a Goodbye button');
+  check(result.reading>=140&&result.footerFixed,'readable parchment and actions stay above the fixed footer');
+  if(!mouse)check(result.targets,'visible conversation buttons remain 44 physical pixels');
+ }
+ await npcLayout(false);
+ await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));await npcLayout(true);
  check(await page.locator('#npc-quest-actions [data-action="claim"]').isVisible(),'turn-in action stays visible in the phone footer');
  await page.waitForFunction(()=>!document.getElementById('announce').children.length);
  await page.screenshot({path:`${out}/quest-mobile-turnin-${width}x${height}-${process.env.QUEST_LANG||'en'}.png`});
@@ -73,11 +86,10 @@ const suite={name:'quest-mobile',async test({player,check,width,height,out}){
  await press(page.locator('#npc-quest-close'));
  await debug(page,{op:'quest',id:'slime_patrol',action:'reset'});
  await page.evaluate(()=>Field.visitNpc('gatekeeper'));await page.locator('#npc-dialogue').waitFor({state:'visible'});
- if(isPhone){await press(page.locator(nDetail));check(await page.locator('#npc-text').isVisible(),'the Details button also reaches the conversation and services');await press(page.locator(nList));}
  await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));
  const accept=page.locator('#npc-quest-actions [data-action="accept"]');
  check(await accept.isVisible(),'Accept stays reachable without scrolling the parchment');
- if(isPhone){await swipe(page,'#npc-quest-page');check(await accept.isVisible(),'swiping NPC text keeps the Accept action fixed');await press(page.locator(nList));check(await page.locator('#npc-quest-list').isVisible(),'NPC quest list remains reachable after reading');await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));}
+ if(isPhone){await swipe(page,'#npc-quest-page');check(await accept.isVisible(),'swiping NPC text keeps the Accept action fixed');await press(page.locator('#npc-quest-actions [data-action="decline"]'));check(await page.locator('#npc-quest-list').isVisible(),'Decline returns to the greeting and its quest rows');await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));}
  await press(accept);await page.locator(n).waitFor({state:'hidden'});
  check(await page.evaluate(()=>Field.hero.quests.some(q=>q.id==='slime_patrol'&&!q.claimed)),'touch acceptance closes only after the server accepts');
  await page.context().close();
