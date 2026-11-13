@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.49.2",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Open-world enemies no longer break off chase and reset mid-fight when you stay close to them, and can step out when a bystander walks through them; running away out of range still resets them.",
+      "Dungeon and raid enemies keep unlimited chase."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.49.1",
     "date": "2026-11-13",
     "new": [

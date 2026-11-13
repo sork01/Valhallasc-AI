@@ -377,6 +377,10 @@ const ENRAGE_RANGE: f64 = 14.;
 /// Both grew 0.35 with the player melee reach (MELEE-REACH, 2026-11-10).
 const ENEMY_WINDUP_REACH: f64 = 1.5;
 const ENEMY_HIT_REACH: f64 = 1.25;
+/// An open-world enemy keeps chasing a target within this many tiles, even past `HOME_LEASH_RANGE`.
+/// Dungeons and raids (`hunting`) ignore both bounds and chase without limit.
+const CLOSE_CHASE_RANGE: f64 = 9.;
+const HOME_LEASH_RANGE: f64 = 14.;
 /// Health and damage change by this fraction per level from the default; gold changes by 10%. XP does not scale
 /// this way: an enemy pays `enemy_xp(level)`, set by its own level alone.
 const LEVEL_HP_DAMAGE: f64 = 0.12;
@@ -5880,7 +5884,7 @@ impl World {
                 })
         });
         let target = target
-            .filter(|(_, _, d)| hunting || *d < 9.)
+            .filter(|(_, _, d)| hunting || *d < CLOSE_CHASE_RANGE)
             .or(nearest)
             .filter(|_| !raid_grace);
         if s.state != "return"
@@ -5940,9 +5944,11 @@ impl World {
                 }
             }
             "chase" => {
-                if let Some((_, point, d)) = target
-                    .filter(|_| hunting || s.point().distance(Point { x: s.hx, y: s.hy }) < 14.)
-                {
+                if let Some((_, point, d)) = target.filter(|(_, _, d)| {
+                    hunting
+                        || *d < CLOSE_CHASE_RANGE
+                        || s.point().distance(Point { x: s.hx, y: s.hy }) < HOME_LEASH_RANGE
+                }) {
                     let attack_reach = ranged.as_ref().map_or(
                         ENEMY_WINDUP_REACH + s.r + if slam > 0. { 0.9 } else { 0. },
                         |r| r.range,
@@ -6650,11 +6656,20 @@ fn walk_with_actors(
                 offset.x.hypot(offset.y),
                 radius,
             );
-            if !actor_blocked(next, radius, bodies)
-                && bodies
-                    .iter()
-                    .all(|(other, r)| segment_distance(*other, previous, next) >= radius + r - 1e-8)
-            {
+            let clear = bodies.iter().all(|&(other, r)| {
+                let min_dist = radius + r - 1e-8;
+                let was_blocked =
+                    same_cell(previous, other) || previous.distance(other) < min_dist;
+                if was_blocked {
+                    (!same_cell(next, other) && next.distance(other) >= min_dist)
+                        || next.distance(other) > previous.distance(other) + 1e-8
+                } else {
+                    !same_cell(next, other)
+                        && next.distance(other) >= min_dist
+                        && segment_distance(other, previous, next) >= min_dist
+                }
+            });
+            if clear {
                 *point = next;
                 break;
             }
@@ -13521,6 +13536,156 @@ mod tests {
             w.update_slime(0);
             assert_eq!(w.slimes[0].state, state, "offset {extra:+}");
         }
+    }
+    /// ENEMY-CHASE-CLOSE-RANGE: open-world enemies keep chasing past `HOME_LEASH_RANGE` while the target is close,
+    /// and return home only once the target leaves close range.
+    #[test]
+    fn open_world_enemy_keeps_chasing_past_home_leash_when_target_is_close_and_returns_when_far() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        w.maps[0].objects.clear();
+        let home = w.slimes[0].point();
+        for i in 1..w.slimes.len() {
+            w.slimes[i].x = home.x + 400.;
+            w.slimes[i].y = home.y + 400.;
+        }
+        w.slimes[0] = Slime::new(
+            0,
+            &SlimeSpawn {
+                ambush: None,
+                kind: "green".into(),
+                zone: 0,
+                x: home.x,
+                y: home.y,
+            },
+        );
+        // Place the enemy beyond HOME_LEASH_RANGE, with the player still within CLOSE_CHASE_RANGE.
+        let enemy_x = home.x + HOME_LEASH_RANGE + 2.;
+        w.slimes[0].x = enemy_x;
+        w.slimes[0].y = home.y;
+        w.slimes[0].state = "chase".into();
+        w.slimes[0].target = Some(1);
+        w.slimes[0].atk_cd = 10.;
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.zone = 0;
+            c.x = enemy_x + 3.;
+            c.y = home.y;
+        }
+        w.update_slime(0);
+        assert_eq!(w.slimes[0].state, "chase");
+        assert_eq!(w.slimes[0].target, Some(1));
+        assert!(
+            w.slimes[0].x > enemy_x,
+            "enemy must continue pursuing toward close target"
+        );
+        // Once cooldown expires while close past HOME_LEASH_RANGE, the enemy still winds up and hits.
+        w.slimes[0].atk_cd = 0.;
+        w.players.get_mut(&1).unwrap().character.x = w.slimes[0].x + 1.2;
+        w.update_slime(0);
+        assert_eq!(w.slimes[0].state, "windup");
+        for _ in 0..30 {
+            w.update_slime(0);
+        }
+        assert!(
+            w.players[&1].character.hp < 120.,
+            "enemy past home leash must still land melee attacks on close target"
+        );
+        assert_ne!(w.slimes[0].state, "return");
+        // Moving outside CLOSE_CHASE_RANGE past the home leash drops chase and returns home.
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = w.slimes[0].x + CLOSE_CHASE_RANGE + 1.;
+            c.y = home.y;
+        }
+        w.update_slime(0);
+        assert_eq!(w.slimes[0].target, None);
+        assert_eq!(w.slimes[0].state, "return");
+    }
+    /// ENEMY-CHASE-CLOSE-RANGE: dungeon and raid enemies keep unlimited chase beyond both home and close ranges.
+    #[test]
+    fn dungeon_and_raid_enemies_keep_unlimited_chase_past_close_and_home_ranges() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let dungeon_zone = w
+            .instances
+            .iter()
+            .find(|i| !w.maps[i.template].raid)
+            .map(|i| i.zone)
+            .expect("dungeon instance");
+        let raid_zone = w
+            .instances
+            .iter()
+            .find(|i| w.maps[i.template].raid)
+            .map(|i| i.zone)
+            .expect("raid instance");
+        for zone in [dungeon_zone, raid_zone] {
+            w.maps[zone].objects.clear();
+            let id = w
+                .slimes
+                .iter()
+                .position(|s| s.zone == zone && !s.dead)
+                .expect("living enemy in instance");
+            let home = w.slimes[id].point();
+            w.slimes[id].x = home.x + HOME_LEASH_RANGE + 15.;
+            w.slimes[id].y = home.y;
+            w.slimes[id].state = "chase".into();
+            w.slimes[id].target = Some(1);
+            w.slimes[id].atk_cd = 10.;
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.zone = zone;
+                c.x = w.slimes[id].x + CLOSE_CHASE_RANGE + 10.;
+                c.y = home.y;
+            }
+            w.update_slime(id);
+            assert_eq!(w.slimes[id].state, "chase", "zone {zone} unlimited chase");
+            assert_eq!(w.slimes[id].target, Some(1), "zone {zone} target kept");
+        }
+    }
+    /// ENEMY-CHASE-CLOSE-RANGE: an enemy overlapped by a bystander player still steps out toward its chase target.
+    #[test]
+    fn enemy_walks_out_of_player_overlap_when_chasing() {
+        let mut w = world();
+        let _rx1 = join(&mut w, 1, Class::Warrior);
+        let _rx2 = join(&mut w, 2, Class::Mage);
+        w.maps[0].objects.clear();
+        let origin = w.slimes[0].point();
+        for i in 1..w.slimes.len() {
+            w.slimes[i].x = origin.x + 400.;
+            w.slimes[i].y = origin.y + 400.;
+        }
+        w.slimes[0] = Slime::new(
+            0,
+            &SlimeSpawn {
+                ambush: None,
+                kind: "green".into(),
+                zone: 0,
+                x: origin.x,
+                y: origin.y,
+            },
+        );
+        w.slimes[0].state = "chase".into();
+        w.slimes[0].target = Some(1);
+        w.slimes[0].atk_cd = 10.;
+        // Bystander stands directly on the enemy; target stands 4 tiles east.
+        {
+            let p2 = &mut w.players.get_mut(&2).unwrap().character;
+            p2.zone = 0;
+            p2.x = origin.x;
+            p2.y = origin.y;
+        }
+        {
+            let p1 = &mut w.players.get_mut(&1).unwrap().character;
+            p1.zone = 0;
+            p1.x = origin.x + 4.;
+            p1.y = origin.y;
+        }
+        w.update_slime(0);
+        assert!(
+            w.slimes[0].x > origin.x,
+            "enemy must step out of bystander overlap toward target"
+        );
     }
     #[test]
     fn autoattack_resumes_after_every_class_skill() {
