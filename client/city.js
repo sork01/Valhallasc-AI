@@ -2,6 +2,11 @@
 // Original canvas artwork, inspired by Prontera's stone plazas and timber houses.
 (() => {
   const cache = new Map();
+  // Scenery sprites are megabytes per zone and were never released. Each carries the "stay" it was last drawn in; Field calls
+  // sweepSprites on every zone change, and a sprite not drawn during the last two stays gives its pixels back (redrawn on return).
+  let spriteStay = 0;
+  function sweepSprites() { spriteStay++; let n = 0; for (const [k, c] of cache) if (c.stay < spriteStay - 2) { c.width = 0; c.height = 0; cache.delete(k); n++; } return n; }
+  const spriteInfo = () => { let px = 0; for (const c of cache.values()) px += c.width * c.height; return { sprites: cache.size, mb: Math.round(px * 4 / 1048576) }; };
   const area = () => window.Field?.zone > 0 ? WORLD_MAP.zones[Field.zone - 1] : WORLD_MAP;
   const iso = (x, y, z = 0) => [(x - y) * 44, (x + y) * 22 - z];
   // A zone has one hub (`city`) or several (`city` plus `camps`, like the Wyrdwood's Hollowmoot and Skuldwatch).
@@ -268,6 +273,7 @@
     const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0)+'|'+(def?.wallMounted&&o.z>0?1:0)+'|'+(o.style||'');let sprite=cache.get(key);
     const [bw,bh,ox,oy]=def?.box||spriteBox(o);
     if(!sprite){const c=document.createElement('canvas');c.width=bw*2;c.height=bh*2;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(ox,oy);if(def)def.draw(cg,o,kit);else objectArt(cg,o,live);sprite=c;cache.set(key,c);}
+    sprite.stay=spriteStay;
     g.save();g.globalAlpha=fade;g.drawImage(sprite,sx-ox,sy-oy,bw,bh);
     if(live)signBoard(g,o,sx,sy);
     g.restore();
@@ -666,5 +672,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawNpcPlate,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,sweepSprites,get spriteInfo(){return spriteInfo();},animateObject,drawNpc,drawNpcPlate,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();

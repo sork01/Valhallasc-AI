@@ -413,12 +413,17 @@
   // Everything the ground renderer reads about one zone. The hero's zone is current (the module variables); a seam neighbour
   // keeps its own context so its ground can be drawn beside the border and crossing swaps pointers, not a rebuild.
   const ctxs = new Map();
+  // Contexts are unloaded: only the hero's zone, its seam and vault neighbours and the last CTX_RECENT zones visited keep one (a zone's
+  // arrays, cloned objects and ground canvases are megabytes, and a long session or a Spark flight passes many zones). Anything else
+  // is dropped in setZone and built again by ctxFor on return.
+  const CTX_RECENT = 2; let ctxNear = new Set(), ctxRecent = [], ctxBuilds = 0, ctxDrops = 0;
+  function dropCtx(k, cc) { for (const { c } of cc.chunks.values()) { c.width = 0; c.height = 0; } cc.chunks.clear(); cc.empty.clear(); ctxs.delete(k); ctxDrops++; }
   const snapCtx = () => ({ z: zone, def: zdef, MAP, map, objects, nightLights, SHIFT, SPAWN, chunks });
   function adoptCtx(c) { zone = c.z; zdef = c.def; MAP = c.MAP; map = c.map; objects = c.objects; nightLights = c.nightLights; SHIFT = c.SHIFT; SPAWN = c.SPAWN; chunks = c.chunks; }
   function ctxFor(z) {
     let c = ctxs.get(z); if (c) return c;
     c = { z, def: ZONES[z], MAP: ZONES[z].size, map: { dirt: new Uint8Array(0), tone: new Float32Array(0) }, objects: [], nightLights: [], SHIFT: [0, 0], SPAWN: ZONES[z].spawn, chunks: new Map(), empty: new Set(), limit: 40 };
-    ctxs.set(z, c);
+    ctxs.set(z, c); ctxBuilds++;
     const keep = snapCtx(); adoptCtx(c);
     try { buildMap(); c.MAP = MAP; c.objects = objects; c.nightLights = nightLights; c.SHIFT = SHIFT; c.SPAWN = SPAWN; }
     finally { adoptCtx(keep); }
@@ -458,20 +463,29 @@
   function setZone(z) {
     miniFade = null;
     { const left = ctxs.get(zone); if (left) left.usedAt = performance.now(); }     // the zone you leave is still on screen: keep its ground
+    const leftZone = zone;
     zone = ZONES[z] ? z : 0;
+    ctxRecent = (leftZone === zone ? ctxRecent : [leftZone, ...ctxRecent]).filter((k, i, a) => k !== zone && a.indexOf(k) === i).slice(0, CTX_RECENT);
     adoptCtx(ctxFor(zone));
     // Neighbours across a seam keep a context too, built now so their ground is ready to draw beside the border and to swap
     // in when you cross; every other zone's ground is released.
     const keepZones = new Set([zone]);
     // At one tile scale the grids are big (up to ~420 tiles): building a neighbour's map arrays is the cost of a frame or more, so the
-    // neighbours are built one per timer tick right after the crossing instead of inside it, and a context is never thrown away
-    // (its arrays are small; only its ground canvases are released), so crossing back and forth rebuilds nothing.
+    // neighbours are built one per timer tick right after the crossing instead of inside it. A neighbour's and a recently left zone's
+    // context is kept (only its ground canvases are released), so crossing back and forth rebuilds nothing; the rest are dropped.
     let nbi = 0;
     for (const p of zdef.portals || []) if (p.seam || p.vault) {
       keepZones.add(p.to); const to = p.to;
-      setTimeout(() => { if (ZONES[to]) { ctxFor(to); loadSceneEnemyArt(ZONES[to].slimes || []); } }, ctxs.has(to) ? 0 : 150 + 300 * nbi++);
+      // (the timer may fire after a flight has already carried the hero on: build only what is still a neighbour)
+      setTimeout(() => { if (ZONES[to] && ctxNear.has(to)) { ctxFor(to); loadSceneEnemyArt(ZONES[to].slimes || []); } }, ctxs.has(to) ? 0 : 150 + 300 * nbi++);
     }
-    for (const [k, cc] of ctxs) if (!keepZones.has(k)) { for (const { c } of cc.chunks.values()) { c.width = 1; c.height = 1; } cc.chunks.clear(); cc.empty.clear(); }
+    ctxNear = keepZones;
+    const held = new Set([...keepZones, ...ctxRecent]);
+    for (const [k, cc] of [...ctxs]) {
+      if (!held.has(k)) dropCtx(k, cc);
+      else if (!keepZones.has(k)) { for (const { c } of cc.chunks.values()) { c.width = 1; c.height = 1; } cc.chunks.clear(); cc.empty.clear(); }
+    }
+    if (leftZone !== zone) City.sweepSprites?.();     // scenery sprites of zones left two stays ago
     window.DayNight?.setZone(zdef);
     window.Weather?.setZone(zdef);
     if (mini) buildMini();
@@ -5849,7 +5863,7 @@
       for (const o of map.ghosts || []) out.push([o.kind, o.x, o.y]);
       for (const R of map.vregs || []) for (const o of vaultSeason(R)) out.push([o.kind, o.x, o.y]);
       return out.filter(o => Math.hypot(o[1] - x, o[2] - y) < r);
-    }, get miniZones() { return [...miniCache.keys()].sort((a, b) => a - b); }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostWater() { return (map.ghostWater || []).length; }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { walls: (map.ghosts || []).filter(o => WALL_KINDS.has(o.kind)).map(o => [o.x, o.y]), slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
+    }, get miniZones() { return [...miniCache.keys()].sort((a, b) => a - b); }, get ctxInfo() { return { zones: [...ctxs.keys()].sort((a, b) => a - b), near: [...ctxNear].sort((a, b) => a - b), recent: [...ctxRecent], builds: ctxBuilds, drops: ctxDrops, chunks: Object.fromEntries([...ctxs].map(([k, c]) => [k, c.chunks.size])) }; }, get vaultZones() { return (map.vregs || []).map(r => r.to); }, get ghostWater() { return (map.ghostWater || []).length; }, get ghostKinds() { const c = {}; for (const o of map.ghosts || []) c[o.kind] = (c[o.kind] || 0) + 1; return c; }, get miniFade() { return miniFade ? { left: miniFade.zone, quests: miniFade.quests.length, far: miniFade.far.length, sparks: miniFade.sparks.length, t: (performance.now() - miniFade.start) / MINI_FADE_MS } : null; }, get miniRippleOrigin() { return miniRippleOrigin; }, get miniTiles() { return miniSpan() / miniZoom; }, get ghosts() { return { walls: (map.ghosts || []).filter(o => WALL_KINDS.has(o.kind)).map(o => [o.x, o.y]), slimes: ghostSlimes.size, players: ghostPlayers.size, objects: (map.ghosts || []).length, kinds: [...new Set((map.ghosts || []).map(o => o.kind))], shadowed: [...ghostShadowKinds], drawn: lastGhostDrawn }; }, get ghostObjects() { return map.ghosts || []; }, get seamBlend() {
       for (const p of zdef.portals || []) if (p.seam) {
         let d = 1e9; for (let k = 0; k < p.seam.points.length - 1; k++) d = Math.min(d, segDist(hero.x, hero.y, p.seam.points[k][0], p.seam.points[k][1], p.seam.points[k + 1][0], p.seam.points[k + 1][1]));
         const w = .5 * (1 - d / BLEND_REACH); if (w > 0) return { theme: ZONES[p.to]?.theme, w };

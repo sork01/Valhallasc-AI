@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.52.1",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "The game now frees the memory of zones you have left. It keeps the zone you are in, the zones you can walk into from it and the last two you visited; anything else is loaded again when you return. Zone music you no longer hear is released a minute after it stops. A long journey or a Spark Travel flight across many zones no longer makes the game use more and more memory."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.52.0",
     "date": "2026-11-13",
     "new": [

@@ -4,20 +4,24 @@
    API: const m = createLoopMusic(ctx, url); m.start(); m.setLevel(0..1, seconds); m.duck(seconds); m.stop();
    m.running tells whether it is meant to be playing, m.loaded whether the file has been decoded.
    The file is fetched and decoded on first use. A song that cannot load is silent, never an error, and is retried on
-   the next start(). Each play gets its own fade gain, so a quick stop and start never lets the old run back up. */
+   the next start(). Each play gets its own fade gain, so a quick stop and start never lets the old run back up.
+   A decoded loop is ~30 MB: a score that stays stopped for RELEASE_AFTER seconds gives its buffer back and decodes again on
+   its next start (every zone has a day and a night score, so keeping them all held hundreds of MB after a long tour). */
 (() => {
   const FADE_IN = 2.5, FADE_OUT = 1.2;
+  const releaseAfter = () => (window.__musicReleaseS ?? 60) * 1000;      // tests shorten it
   function createLoopMusic(ctx, url) {
     const master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-    let buffer = null, loading = null, voice = null, running = false, level = 1, duckUntil = 0;
+    let buffer = null, loading = null, voice = null, running = false, level = 1, duckUntil = 0, gen = 0, unload = 0;
 
     function load() {
       if (buffer) return Promise.resolve(buffer);
+      const g = gen;                                                  // a load that finishes after a release keeps nothing
       if (!loading) loading = fetch(url)
         .then(r => { if (!r.ok) throw new Error(`${url}: ${r.status}`); return r.arrayBuffer(); })
         .then(data => ctx.decodeAudioData(data))
-        .then(b => (buffer = b))
-        .catch(e => { loading = null; console.warn('music not loaded', e.message || e); return null; });
+        .then(b => g === gen ? (buffer = b) : null)
+        .catch(e => { if (g === gen) loading = null; console.warn('music not loaded', e.message || e); return null; });
       return loading;
     }
     function play() {
@@ -38,8 +42,11 @@
       master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(target, t + secs);
     }
     return {
-      start() { if (running) return; running = true; applyLevel(ctx.currentTime, .1); load().then(play); },
-      stop() { if (!running) return; running = false; if (voice) { release(voice); voice = null; } },
+      start() { if (running) return; running = true; clearTimeout(unload); applyLevel(ctx.currentTime, .1); load().then(play); },
+      stop() {
+        if (!running) return; running = false; if (voice) { release(voice); voice = null; }
+        clearTimeout(unload); unload = setTimeout(() => { if (!running) { gen++; buffer = null; loading = null; } }, releaseAfter());
+      },
       setLevel(v, secs = 1.5) { level = v; applyLevel(ctx.currentTime, secs); },
       duck(secs = 2.5) {                                              // dip under a sound effect (the horn)
         if (!running) return; const now = ctx.currentTime; duckUntil = now + secs; applyLevel(now, .15);
