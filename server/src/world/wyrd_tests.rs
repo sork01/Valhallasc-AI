@@ -714,15 +714,13 @@ fn the_five_wyrdwood_travel_masters_are_linked_and_a_flight_costs_twenty_gold_a_
     }
     let skuld = npc(&w, "travel_skuldwatch");
     assert!(
-        skuld.travel_links.iter().any(|l| l == "travel_perch"),
-        "the Bifrost link stays"
+        skuld.travel_links.iter().any(|l| l == "travel_roost"),
+        "Skuldwatch flies up to the Windward Roost, the Bifrost station nearest the rift"
     );
     for id in ["travel_gallowsfoot", "travel_ridgewatch", "travel_highmoor"] {
-        assert_eq!(
-            npc(&w, id).travel_links,
-            ["travel_hollowmoot", "travel_skuldwatch"],
-            "{id}"
-        );
+        for hub in ["travel_hollowmoot", "travel_skuldwatch"] {
+            assert!(npc(&w, id).travel_links.iter().any(|l| l == hub), "{id}");
+        }
     }
     let stop = npc(&w, "travel_highmoor");
     {

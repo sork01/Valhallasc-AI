@@ -929,7 +929,8 @@ fn the_deep_spark_master_links_keelhaven_to_the_perch() {
         .travel_links
         .clone();
     assert!(
-        perch.iter().any(|l| l == "travel_skuldwatch")
+        // towards the Wyrdwood the Perch flies to Ridgewatch, the station nearest the Stormrift
+        perch.iter().any(|l| l == "travel_ridgewatch")
             && perch.iter().any(|l| l == "travel_keelhaven")
     );
     assert!(w.maps[DEEP].in_city(at(
@@ -1499,11 +1500,12 @@ fn the_three_outposts_are_sanctuaries_with_their_people_a_master_a_mailbox_and_t
                 .travel_links
                 .contains(&"travel_keelhaven".to_string())
         );
-        assert_eq!(
-            master.travel_links.len(),
-            3,
-            "{key}: Keelhaven and the two other camps"
-        );
+        for other in ["lanternrest", "gatewatch", "drownwatch"] {
+            assert!(
+                other == key || master.travel_links.contains(&format!("travel_{other}")),
+                "{key}: the two other camps"
+            );
+        }
         assert!(
             npc(&w, "travel_keelhaven")
                 .travel_links

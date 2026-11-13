@@ -62989,13 +62989,17 @@
       "color": "#74d7d0",
       "travelStop": "Alderhaven",
       "travelLinks": [
-        "travel_cinderwatch",
-        "travel_lanternmere",
-        "travel_skaldholm",
-        "travel_lamplight",
         "travel_stonefold",
         "travel_saltby",
-        "travel_applewick"
+        "travel_applewick",
+        "travel_cinderwatch",
+        "travel_anvilrest",
+        "travel_ashford",
+        "travel_lasthearth",
+        "travel_lanternmere",
+        "travel_dikewatch",
+        "travel_skaldholm",
+        "travel_lamplight"
       ],
       "look": {
         "hair": "#e4edf4",
@@ -63557,7 +63561,16 @@
       "color": "#74d7d0",
       "travelStop": "Stonefold",
       "travelLinks": [
-        "travel_alderhaven"
+        "travel_alderhaven",
+        "travel_saltby",
+        "travel_applewick",
+        "travel_anvilrest",
+        "travel_lanternmere",
+        "travel_reedhallow",
+        "travel_dikewatch",
+        "travel_lastlight",
+        "travel_skaldholm",
+        "travel_lamplight"
       ],
       "look": {
         "hair": "#e4edf4",
@@ -63579,7 +63592,13 @@
       "color": "#74d7d0",
       "travelStop": "Saltby",
       "travelLinks": [
-        "travel_alderhaven"
+        "travel_alderhaven",
+        "travel_stonefold",
+        "travel_applewick",
+        "travel_anvilrest",
+        "travel_dikewatch",
+        "travel_skaldholm",
+        "travel_lamplight"
       ],
       "look": {
         "hair": "#e4edf4",
@@ -63601,7 +63620,13 @@
       "color": "#74d7d0",
       "travelStop": "Applewick",
       "travelLinks": [
-        "travel_alderhaven"
+        "travel_alderhaven",
+        "travel_stonefold",
+        "travel_saltby",
+        "travel_anvilrest",
+        "travel_dikewatch",
+        "travel_skaldholm",
+        "travel_lamplight"
       ],
       "look": {
         "hair": "#e4edf4",
@@ -130681,16 +130706,21 @@
           "travelStop": "Cinderwatch Camp",
           "travelLinks": [
             "travel_alderhaven",
-            "travel_rimeward",
-            "travel_skaldholm",
-            "travel_skuldwatch",
-            "travel_perch",
-            "travel_nacrehold",
-            "travel_stillpoint",
-            "travel_lamplight",
             "travel_anvilrest",
             "travel_ashford",
-            "travel_lasthearth"
+            "travel_lasthearth",
+            "travel_rimeward",
+            "travel_driftwatch",
+            "travel_shearwind",
+            "travel_peakrest",
+            "travel_skaldholm",
+            "travel_hollowmoot",
+            "travel_gallowsfoot",
+            "travel_perch",
+            "travel_station",
+            "travel_nacrehold",
+            "travel_stillpoint",
+            "travel_lamplight"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -131035,7 +131065,20 @@
           "color": "#74d7d0",
           "travelStop": "Anvilrest",
           "travelLinks": [
-            "travel_cinderwatch"
+            "travel_alderhaven",
+            "travel_stonefold",
+            "travel_saltby",
+            "travel_applewick",
+            "travel_cinderwatch",
+            "travel_ashford",
+            "travel_lasthearth",
+            "travel_peakrest",
+            "travel_skaldholm",
+            "travel_gallowsfoot",
+            "travel_station",
+            "travel_nacrehold",
+            "travel_stillpoint",
+            "travel_lamplight"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -131057,7 +131100,24 @@
           "color": "#74d7d0",
           "travelStop": "Ashford",
           "travelLinks": [
-            "travel_cinderwatch"
+            "travel_alderhaven",
+            "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_lasthearth",
+            "travel_peakrest",
+            "travel_skaldholm",
+            "travel_hollowmoot",
+            "travel_skuldwatch",
+            "travel_gallowsfoot",
+            "travel_ridgewatch",
+            "travel_highmoor",
+            "travel_perch",
+            "travel_roost",
+            "travel_station",
+            "travel_landing",
+            "travel_nacrehold",
+            "travel_stillpoint",
+            "travel_lamplight"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -131079,7 +131139,20 @@
           "color": "#74d7d0",
           "travelStop": "Lasthearth",
           "travelLinks": [
-            "travel_cinderwatch"
+            "travel_alderhaven",
+            "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_peakrest",
+            "travel_skaldholm",
+            "travel_gallowsfoot",
+            "travel_station",
+            "travel_nacrehold",
+            "travel_stillpoint",
+            "travel_bellcourt",
+            "travel_crownwatch",
+            "travel_shardwatch",
+            "travel_lamplight"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -205873,12 +205946,13 @@
           "travelStop": "Rimeward Camp",
           "travelLinks": [
             "travel_cinderwatch",
-            "travel_lanternmere",
-            "travel_skaldholm",
-            "travel_skuldwatch",
             "travel_driftwatch",
             "travel_shearwind",
-            "travel_peakrest"
+            "travel_peakrest",
+            "travel_lanternmere",
+            "travel_skaldholm",
+            "travel_hollowmoot",
+            "travel_gallowsfoot"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -206317,7 +206391,16 @@
           "color": "#74d7d0",
           "travelStop": "Driftwatch",
           "travelLinks": [
-            "travel_rimeward"
+            "travel_cinderwatch",
+            "travel_rimeward",
+            "travel_shearwind",
+            "travel_peakrest",
+            "travel_lanternmere",
+            "travel_reedhallow",
+            "travel_dikewatch",
+            "travel_lastlight",
+            "travel_skaldholm",
+            "travel_gallowsfoot"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -206339,7 +206422,13 @@
           "color": "#74d7d0",
           "travelStop": "Shearwind Post",
           "travelLinks": [
-            "travel_rimeward"
+            "travel_cinderwatch",
+            "travel_rimeward",
+            "travel_driftwatch",
+            "travel_peakrest",
+            "travel_lanternmere",
+            "travel_skaldholm",
+            "travel_gallowsfoot"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -206361,7 +206450,20 @@
           "color": "#74d7d0",
           "travelStop": "Peakrest",
           "travelLinks": [
-            "travel_rimeward"
+            "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_lasthearth",
+            "travel_rimeward",
+            "travel_driftwatch",
+            "travel_shearwind",
+            "travel_lanternmere",
+            "travel_skaldholm",
+            "travel_hollowmoot",
+            "travel_skuldwatch",
+            "travel_gallowsfoot",
+            "travel_ridgewatch",
+            "travel_highmoor"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -289237,11 +289339,15 @@
           "travelStop": "Lanternmere",
           "travelLinks": [
             "travel_alderhaven",
+            "travel_stonefold",
             "travel_rimeward",
-            "travel_skaldholm",
+            "travel_driftwatch",
+            "travel_shearwind",
+            "travel_peakrest",
             "travel_reedhallow",
             "travel_dikewatch",
-            "travel_lastlight"
+            "travel_lastlight",
+            "travel_skaldholm"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -289608,7 +289714,12 @@
           "color": "#74d7d0",
           "travelStop": "Reedhallow",
           "travelLinks": [
-            "travel_lanternmere"
+            "travel_stonefold",
+            "travel_driftwatch",
+            "travel_lanternmere",
+            "travel_dikewatch",
+            "travel_lastlight",
+            "travel_skaldholm"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -289630,7 +289741,15 @@
           "color": "#74d7d0",
           "travelStop": "Dikewatch",
           "travelLinks": [
-            "travel_lanternmere"
+            "travel_alderhaven",
+            "travel_stonefold",
+            "travel_saltby",
+            "travel_applewick",
+            "travel_driftwatch",
+            "travel_lanternmere",
+            "travel_reedhallow",
+            "travel_lastlight",
+            "travel_skaldholm"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -289652,7 +289771,12 @@
           "color": "#74d7d0",
           "travelStop": "Garrison's Rest",
           "travelLinks": [
-            "travel_lanternmere"
+            "travel_stonefold",
+            "travel_driftwatch",
+            "travel_lanternmere",
+            "travel_reedhallow",
+            "travel_dikewatch",
+            "travel_skaldholm"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -316260,9 +316384,21 @@
           "travelStop": "Skaldholm",
           "travelLinks": [
             "travel_alderhaven",
+            "travel_stonefold",
+            "travel_saltby",
+            "travel_applewick",
             "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_lasthearth",
             "travel_rimeward",
-            "travel_lanternmere"
+            "travel_driftwatch",
+            "travel_shearwind",
+            "travel_peakrest",
+            "travel_lanternmere",
+            "travel_reedhallow",
+            "travel_dikewatch",
+            "travel_lastlight"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -434313,10 +434449,16 @@
           "color": "#74d7d0",
           "travelStop": "Hollowmoot",
           "travelLinks": [
+            "travel_cinderwatch",
+            "travel_ashford",
+            "travel_rimeward",
+            "travel_peakrest",
             "travel_skuldwatch",
             "travel_gallowsfoot",
             "travel_ridgewatch",
-            "travel_highmoor"
+            "travel_highmoor",
+            "travel_perch",
+            "travel_roost"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -434338,13 +434480,13 @@
           "color": "#74d7d0",
           "travelStop": "Skuldwatch",
           "travelLinks": [
+            "travel_ashford",
+            "travel_peakrest",
             "travel_hollowmoot",
-            "travel_cinderwatch",
-            "travel_rimeward",
-            "travel_perch",
             "travel_gallowsfoot",
             "travel_ridgewatch",
-            "travel_highmoor"
+            "travel_highmoor",
+            "travel_roost"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -434723,8 +434865,19 @@
           "color": "#74d7d0",
           "travelStop": "Gallowsfoot",
           "travelLinks": [
+            "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_lasthearth",
+            "travel_rimeward",
+            "travel_driftwatch",
+            "travel_shearwind",
+            "travel_peakrest",
             "travel_hollowmoot",
-            "travel_skuldwatch"
+            "travel_skuldwatch",
+            "travel_ridgewatch",
+            "travel_highmoor",
+            "travel_roost"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -434746,8 +434899,16 @@
           "color": "#74d7d0",
           "travelStop": "Ridgewatch",
           "travelLinks": [
+            "travel_ashford",
+            "travel_peakrest",
             "travel_hollowmoot",
-            "travel_skuldwatch"
+            "travel_skuldwatch",
+            "travel_gallowsfoot",
+            "travel_highmoor",
+            "travel_perch",
+            "travel_roost",
+            "travel_station",
+            "travel_landing"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -434769,8 +434930,13 @@
           "color": "#74d7d0",
           "travelStop": "Highmoor Hold",
           "travelLinks": [
+            "travel_ashford",
+            "travel_peakrest",
             "travel_hollowmoot",
-            "travel_skuldwatch"
+            "travel_skuldwatch",
+            "travel_gallowsfoot",
+            "travel_ridgewatch",
+            "travel_roost"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -486029,12 +486195,14 @@
           "travelStop": "Heimdall's Perch",
           "travelLinks": [
             "travel_cinderwatch",
-            "travel_skuldwatch",
-            "travel_keelhaven",
-            "travel_nacrehold",
+            "travel_ashford",
+            "travel_hollowmoot",
+            "travel_ridgewatch",
             "travel_roost",
             "travel_station",
-            "travel_landing"
+            "travel_landing",
+            "travel_keelhaven",
+            "travel_nacrehold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -486396,9 +486564,17 @@
           "color": "#74d7d0",
           "travelStop": "Windward Roost",
           "travelLinks": [
+            "travel_ashford",
+            "travel_hollowmoot",
+            "travel_skuldwatch",
+            "travel_gallowsfoot",
+            "travel_ridgewatch",
+            "travel_highmoor",
             "travel_perch",
             "travel_station",
-            "travel_landing"
+            "travel_landing",
+            "travel_keelhaven",
+            "travel_nacrehold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -486420,9 +486596,19 @@
           "color": "#74d7d0",
           "travelStop": "Stormcrown Station",
           "travelLinks": [
+            "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_lasthearth",
+            "travel_ridgewatch",
             "travel_perch",
             "travel_roost",
-            "travel_landing"
+            "travel_landing",
+            "travel_keelhaven",
+            "travel_lanternrest",
+            "travel_gatewatch",
+            "travel_drownwatch",
+            "travel_nacrehold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -486444,9 +486630,13 @@
           "color": "#74d7d0",
           "travelStop": "Eyrie Landing",
           "travelLinks": [
+            "travel_ashford",
+            "travel_ridgewatch",
             "travel_perch",
             "travel_roost",
-            "travel_station"
+            "travel_station",
+            "travel_keelhaven",
+            "travel_nacrehold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -516650,11 +516840,15 @@
           "travelStop": "Keelhaven",
           "travelLinks": [
             "travel_perch",
-            "travel_nacrehold",
-            "travel_astralhollow",
+            "travel_roost",
+            "travel_station",
+            "travel_landing",
             "travel_lanternrest",
             "travel_gatewatch",
-            "travel_drownwatch"
+            "travel_drownwatch",
+            "travel_nacrehold",
+            "travel_astralhollow",
+            "travel_choirrest"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -517015,9 +517209,12 @@
           "color": "#74d7d0",
           "travelStop": "Lanternrest",
           "travelLinks": [
+            "travel_station",
             "travel_keelhaven",
             "travel_gatewatch",
-            "travel_drownwatch"
+            "travel_drownwatch",
+            "travel_nacrehold",
+            "travel_choirrest"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -517039,9 +517236,15 @@
           "color": "#74d7d0",
           "travelStop": "Gatewatch",
           "travelLinks": [
+            "travel_station",
             "travel_keelhaven",
             "travel_lanternrest",
-            "travel_drownwatch"
+            "travel_drownwatch",
+            "travel_nacrehold",
+            "travel_astralhollow",
+            "travel_choirrest",
+            "travel_cometwatch",
+            "travel_fallstone"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -517063,9 +517266,12 @@
           "color": "#74d7d0",
           "travelStop": "Drownwatch",
           "travelLinks": [
+            "travel_station",
             "travel_keelhaven",
             "travel_lanternrest",
-            "travel_gatewatch"
+            "travel_gatewatch",
+            "travel_nacrehold",
+            "travel_choirrest"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -538492,10 +538698,25 @@
           "travelStop": "Nacrehold",
           "travelLinks": [
             "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_lasthearth",
             "travel_perch",
+            "travel_roost",
+            "travel_station",
+            "travel_landing",
             "travel_keelhaven",
+            "travel_lanternrest",
+            "travel_gatewatch",
+            "travel_drownwatch",
             "travel_astralhollow",
-            "travel_stillpoint"
+            "travel_choirrest",
+            "travel_cometwatch",
+            "travel_fallstone",
+            "travel_stillpoint",
+            "travel_bellcourt",
+            "travel_crownwatch",
+            "travel_shardwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -643849,12 +644070,16 @@
           "travelStop": "Astralhollow",
           "travelLinks": [
             "travel_keelhaven",
+            "travel_gatewatch",
             "travel_nacrehold",
-            "travel_last_shade",
-            "travel_stillpoint",
             "travel_choirrest",
             "travel_cometwatch",
-            "travel_fallstone"
+            "travel_fallstone",
+            "travel_last_shade",
+            "travel_stillpoint",
+            "travel_bellcourt",
+            "travel_crownwatch",
+            "travel_shardwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -644119,9 +644344,16 @@
           "color": "#74d7d0",
           "travelStop": "Choir Rest",
           "travelLinks": [
+            "travel_keelhaven",
+            "travel_lanternrest",
+            "travel_gatewatch",
+            "travel_drownwatch",
+            "travel_nacrehold",
             "travel_astralhollow",
             "travel_cometwatch",
-            "travel_fallstone"
+            "travel_fallstone",
+            "travel_last_shade",
+            "travel_crownwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -644143,9 +644375,16 @@
           "color": "#74d7d0",
           "travelStop": "Cometwatch",
           "travelLinks": [
+            "travel_gatewatch",
+            "travel_nacrehold",
             "travel_astralhollow",
             "travel_choirrest",
-            "travel_fallstone"
+            "travel_fallstone",
+            "travel_last_shade",
+            "travel_mirrorfall",
+            "travel_whitesun",
+            "travel_cairnfoot",
+            "travel_crownwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -644167,9 +644406,13 @@
           "color": "#74d7d0",
           "travelStop": "Fallstone Hold",
           "travelLinks": [
+            "travel_gatewatch",
+            "travel_nacrehold",
             "travel_astralhollow",
             "travel_choirrest",
-            "travel_cometwatch"
+            "travel_cometwatch",
+            "travel_last_shade",
+            "travel_crownwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -690548,12 +690791,19 @@
           "travelStop": "The Last Shade",
           "travelLinks": [
             "travel_astralhollow",
-            "travel_stillpoint",
-            "travel_breakwater",
-            "travel_boulderwatch",
+            "travel_choirrest",
+            "travel_cometwatch",
+            "travel_fallstone",
             "travel_mirrorfall",
             "travel_whitesun",
-            "travel_cairnfoot"
+            "travel_cairnfoot",
+            "travel_stillpoint",
+            "travel_bellcourt",
+            "travel_crownwatch",
+            "travel_shardwatch",
+            "travel_breakwater",
+            "travel_fulgur",
+            "travel_boulderwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -690818,9 +691068,13 @@
           "color": "#74d7d0",
           "travelStop": "Mirrorfall",
           "travelLinks": [
+            "travel_cometwatch",
             "travel_last_shade",
             "travel_whitesun",
-            "travel_cairnfoot"
+            "travel_cairnfoot",
+            "travel_shardwatch",
+            "travel_fulgur",
+            "travel_boulderwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -690842,9 +691096,13 @@
           "color": "#74d7d0",
           "travelStop": "Whitesun Post",
           "travelLinks": [
+            "travel_cometwatch",
             "travel_last_shade",
             "travel_mirrorfall",
-            "travel_cairnfoot"
+            "travel_cairnfoot",
+            "travel_shardwatch",
+            "travel_fulgur",
+            "travel_boulderwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -690866,10 +691124,19 @@
           "color": "#74d7d0",
           "travelStop": "Cairnfoot",
           "travelLinks": [
+            "travel_cometwatch",
             "travel_last_shade",
             "travel_mirrorfall",
             "travel_whitesun",
-            "travel_boulderwatch"
+            "travel_shardwatch",
+            "travel_breakwater",
+            "travel_rodstead",
+            "travel_fulgur",
+            "travel_bankhold",
+            "travel_boulderwatch",
+            "travel_singing",
+            "travel_whitebark",
+            "travel_stormgate"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -743888,15 +744155,23 @@
           "travelStop": "The Stillpoint",
           "travelLinks": [
             "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_lasthearth",
             "travel_nacrehold",
             "travel_astralhollow",
             "travel_last_shade",
-            "travel_lamplight",
-            "travel_breakwater",
             "travel_bellcourt",
             "travel_crownwatch",
             "travel_shardwatch",
-            "travel_craterwatch"
+            "travel_lamplight",
+            "travel_breakwater",
+            "travel_rodstead",
+            "travel_chainrest",
+            "travel_door",
+            "travel_craterwatch",
+            "travel_cinderquay",
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -744161,9 +744436,16 @@
           "color": "#74d7d0",
           "travelStop": "Bellcourt",
           "travelLinks": [
+            "travel_lasthearth",
+            "travel_nacrehold",
+            "travel_astralhollow",
+            "travel_last_shade",
             "travel_stillpoint",
             "travel_crownwatch",
-            "travel_shardwatch"
+            "travel_shardwatch",
+            "travel_lamplight",
+            "travel_rodstead",
+            "travel_craterwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -744185,9 +744467,19 @@
           "color": "#74d7d0",
           "travelStop": "Crownwatch",
           "travelLinks": [
+            "travel_lasthearth",
+            "travel_nacrehold",
+            "travel_astralhollow",
+            "travel_choirrest",
+            "travel_cometwatch",
+            "travel_fallstone",
+            "travel_last_shade",
             "travel_stillpoint",
             "travel_bellcourt",
-            "travel_shardwatch"
+            "travel_shardwatch",
+            "travel_lamplight",
+            "travel_rodstead",
+            "travel_craterwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -744209,9 +744501,22 @@
           "color": "#74d7d0",
           "travelStop": "Shardwatch",
           "travelLinks": [
+            "travel_lasthearth",
+            "travel_nacrehold",
+            "travel_astralhollow",
+            "travel_last_shade",
+            "travel_mirrorfall",
+            "travel_whitesun",
+            "travel_cairnfoot",
             "travel_stillpoint",
             "travel_bellcourt",
-            "travel_crownwatch"
+            "travel_crownwatch",
+            "travel_lamplight",
+            "travel_breakwater",
+            "travel_rodstead",
+            "travel_fulgur",
+            "travel_bankhold",
+            "travel_craterwatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -803560,9 +803865,22 @@
           "travelStop": "Lamplight Refuge",
           "travelLinks": [
             "travel_alderhaven",
+            "travel_stonefold",
+            "travel_saltby",
+            "travel_applewick",
             "travel_cinderwatch",
+            "travel_anvilrest",
+            "travel_ashford",
+            "travel_lasthearth",
             "travel_stillpoint",
-            "travel_craterwatch"
+            "travel_bellcourt",
+            "travel_crownwatch",
+            "travel_shardwatch",
+            "travel_chainrest",
+            "travel_door",
+            "travel_craterwatch",
+            "travel_cinderquay",
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -811843,7 +812161,10 @@
           "color": "#74d7d0",
           "travelStop": "Asterion",
           "travelLinks": [
-            "travel_breakwater"
+            "travel_breakwater",
+            "travel_rodstead",
+            "travel_fulgur",
+            "travel_bankhold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -881051,15 +881372,20 @@
           "travelStop": "Breakwater Camp",
           "travelLinks": [
             "travel_last_shade",
+            "travel_cairnfoot",
             "travel_stillpoint",
+            "travel_shardwatch",
             "travel_asterion",
-            "travel_millbridge",
-            "travel_frostwake",
             "travel_rodstead",
             "travel_fulgur",
             "travel_bankhold",
+            "travel_millbridge",
+            "travel_frostwake",
             "travel_chainrest",
-            "travel_door"
+            "travel_door",
+            "travel_craterwatch",
+            "travel_cinderquay",
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -881324,9 +881650,18 @@
           "color": "#74d7d0",
           "travelStop": "Rodstead",
           "travelLinks": [
+            "travel_cairnfoot",
+            "travel_stillpoint",
+            "travel_bellcourt",
+            "travel_crownwatch",
+            "travel_shardwatch",
+            "travel_asterion",
             "travel_breakwater",
             "travel_fulgur",
-            "travel_bankhold"
+            "travel_bankhold",
+            "travel_millbridge",
+            "travel_frostwake",
+            "travel_chainrest"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -881348,9 +881683,18 @@
           "color": "#74d7d0",
           "travelStop": "Fulgur Post",
           "travelLinks": [
+            "travel_last_shade",
+            "travel_mirrorfall",
+            "travel_whitesun",
+            "travel_cairnfoot",
+            "travel_shardwatch",
+            "travel_asterion",
             "travel_breakwater",
             "travel_rodstead",
-            "travel_bankhold"
+            "travel_bankhold",
+            "travel_millbridge",
+            "travel_frostwake",
+            "travel_chainrest"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -881372,11 +881716,21 @@
           "color": "#74d7d0",
           "travelStop": "Bankhold",
           "travelLinks": [
+            "travel_cairnfoot",
+            "travel_shardwatch",
+            "travel_asterion",
             "travel_breakwater",
             "travel_rodstead",
             "travel_fulgur",
+            "travel_millbridge",
+            "travel_honeywood",
+            "travel_wickerfield",
+            "travel_elderroot",
             "travel_frostwake",
-            "travel_millbridge"
+            "travel_bellward",
+            "travel_aurora",
+            "travel_ribwatch",
+            "travel_chainrest"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -928983,18 +929337,26 @@
           "travelStop": "Millbridge",
           "travelLinks": [
             "travel_breakwater",
-            "travel_jubilee",
-            "travel_banyan",
-            "travel_veyrroot",
-            "travel_azure_wells",
-            "travel_frostwake",
-            "travel_bunting",
-            "travel_rootgate",
-            "travel_gladewatch",
+            "travel_rodstead",
+            "travel_fulgur",
+            "travel_bankhold",
             "travel_honeywood",
             "travel_wickerfield",
             "travel_elderroot",
-            "travel_bankhold",
+            "travel_jubilee",
+            "travel_bunting",
+            "travel_tassel",
+            "travel_garland",
+            "travel_pavilion",
+            "travel_banyan",
+            "travel_rootgate",
+            "travel_drumroot",
+            "travel_stilt",
+            "travel_rainstep",
+            "travel_veyrroot",
+            "travel_gladewatch",
+            "travel_azure_wells",
+            "travel_frostwake",
             "travel_springmere"
           ],
           "look": {
@@ -929243,9 +929605,16 @@
           "color": "#74d7d0",
           "travelStop": "Honeywood Steading",
           "travelLinks": [
+            "travel_bankhold",
             "travel_millbridge",
             "travel_wickerfield",
-            "travel_elderroot"
+            "travel_elderroot",
+            "travel_bunting",
+            "travel_rootgate",
+            "travel_gladewatch",
+            "travel_azure_wells",
+            "travel_frostwake",
+            "travel_springmere"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -929268,12 +929637,30 @@
           "color": "#74d7d0",
           "travelStop": "Wickerfield Post",
           "travelLinks": [
+            "travel_bankhold",
             "travel_millbridge",
             "travel_honeywood",
             "travel_elderroot",
+            "travel_bunting",
+            "travel_rootgate",
+            "travel_veyrroot",
             "travel_gladewatch",
+            "travel_rootstair",
+            "travel_eastbark",
+            "travel_lookout",
             "travel_azure_wells",
-            "travel_springmere"
+            "travel_wallwatch",
+            "travel_eastwell",
+            "travel_saltpan",
+            "travel_astro",
+            "travel_frostwake",
+            "travel_springmere",
+            "travel_solhaven",
+            "travel_harvestwatch",
+            "travel_rimehold",
+            "travel_wheelmark",
+            "travel_tidehollow",
+            "travel_lowfall"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -929296,10 +929683,19 @@
           "color": "#74d7d0",
           "travelStop": "Elderroot Camp",
           "travelLinks": [
+            "travel_bankhold",
             "travel_millbridge",
             "travel_honeywood",
             "travel_wickerfield",
-            "travel_frostwake"
+            "travel_bunting",
+            "travel_rootgate",
+            "travel_gladewatch",
+            "travel_azure_wells",
+            "travel_frostwake",
+            "travel_bellward",
+            "travel_aurora",
+            "travel_ribwatch",
+            "travel_springmere"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -977651,12 +978047,13 @@
           "travelStop": "Jubilee Crossroads",
           "travelLinks": [
             "travel_millbridge",
-            "travel_banyan",
-            "travel_glasshold",
-            "travel_pavilion",
             "travel_bunting",
             "travel_tassel",
-            "travel_garland"
+            "travel_garland",
+            "travel_pavilion",
+            "travel_banyan",
+            "travel_chainrest",
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -977922,11 +978319,16 @@
           "color": "#74d7d0",
           "travelStop": "Bunting Post",
           "travelLinks": [
+            "travel_millbridge",
+            "travel_honeywood",
+            "travel_wickerfield",
+            "travel_elderroot",
             "travel_jubilee",
-            "travel_pavilion",
             "travel_tassel",
             "travel_garland",
-            "travel_millbridge"
+            "travel_pavilion",
+            "travel_banyan",
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -977949,10 +978351,16 @@
           "color": "#74d7d0",
           "travelStop": "Tassel Post",
           "travelLinks": [
+            "travel_millbridge",
             "travel_jubilee",
-            "travel_pavilion",
             "travel_bunting",
             "travel_garland",
+            "travel_pavilion",
+            "travel_banyan",
+            "travel_chainrest",
+            "travel_door",
+            "travel_craterwatch",
+            "travel_cinderquay",
             "travel_glasshold"
           ],
           "look": {
@@ -977976,11 +978384,17 @@
           "color": "#74d7d0",
           "travelStop": "Garland Rest",
           "travelLinks": [
+            "travel_millbridge",
             "travel_jubilee",
-            "travel_pavilion",
             "travel_bunting",
             "travel_tassel",
-            "travel_banyan"
+            "travel_pavilion",
+            "travel_banyan",
+            "travel_rootgate",
+            "travel_drumroot",
+            "travel_stilt",
+            "travel_rainstep",
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -978003,10 +978417,13 @@
           "color": "#74d7d0",
           "travelStop": "Pavilion Steps",
           "travelLinks": [
+            "travel_millbridge",
             "travel_jubilee",
             "travel_bunting",
             "travel_tassel",
-            "travel_garland"
+            "travel_garland",
+            "travel_banyan",
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1046722,12 +1047139,16 @@
           "travelLinks": [
             "travel_millbridge",
             "travel_jubilee",
-            "travel_veyrroot",
+            "travel_bunting",
+            "travel_tassel",
+            "travel_garland",
+            "travel_pavilion",
             "travel_rootgate",
             "travel_drumroot",
             "travel_stilt",
             "travel_rainstep",
-            "travel_garland"
+            "travel_veyrroot",
+            "travel_gladewatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1047035,13 +1047456,20 @@
           "color": "#74d7d0",
           "travelStop": "Rootgate Post",
           "travelLinks": [
+            "travel_millbridge",
+            "travel_honeywood",
+            "travel_wickerfield",
+            "travel_elderroot",
+            "travel_garland",
             "travel_banyan",
             "travel_drumroot",
             "travel_stilt",
             "travel_rainstep",
-            "travel_millbridge",
             "travel_veyrroot",
-            "travel_gladewatch"
+            "travel_gladewatch",
+            "travel_rootstair",
+            "travel_eastbark",
+            "travel_lookout"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1047064,11 +1047492,13 @@
           "color": "#74d7d0",
           "travelStop": "Drumroot Post",
           "travelLinks": [
+            "travel_millbridge",
+            "travel_garland",
             "travel_banyan",
             "travel_rootgate",
             "travel_stilt",
             "travel_rainstep",
-            "travel_veyrroot"
+            "travel_gladewatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1047091,10 +1047521,13 @@
           "color": "#74d7d0",
           "travelStop": "Stilt Post",
           "travelLinks": [
+            "travel_millbridge",
+            "travel_garland",
             "travel_banyan",
             "travel_rootgate",
             "travel_drumroot",
-            "travel_rainstep"
+            "travel_rainstep",
+            "travel_gladewatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1047117,10 +1047550,13 @@
           "color": "#74d7d0",
           "travelStop": "Rainstep Camp",
           "travelLinks": [
+            "travel_millbridge",
+            "travel_garland",
             "travel_banyan",
             "travel_rootgate",
             "travel_drumroot",
-            "travel_stilt"
+            "travel_stilt",
+            "travel_gladewatch"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1095033,16 +1095469,16 @@
           "travelStop": "Rootfoot",
           "travelLinks": [
             "travel_millbridge",
+            "travel_wickerfield",
             "travel_banyan",
-            "travel_azure_wells",
-            "travel_drumroot",
             "travel_rootgate",
-            "travel_saltpan",
             "travel_gladewatch",
             "travel_rootstair",
             "travel_eastbark",
             "travel_lookout",
-            "travel_heartwood"
+            "travel_heartwood",
+            "travel_azure_wells",
+            "travel_saltpan"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1095290,13 +1095726,21 @@
           "color": "#74d7d0",
           "travelStop": "Gladewatch Post",
           "travelLinks": [
+            "travel_millbridge",
+            "travel_honeywood",
+            "travel_wickerfield",
+            "travel_elderroot",
+            "travel_banyan",
+            "travel_rootgate",
+            "travel_drumroot",
+            "travel_stilt",
+            "travel_rainstep",
             "travel_veyrroot",
             "travel_rootstair",
             "travel_eastbark",
             "travel_lookout",
-            "travel_millbridge",
-            "travel_rootgate",
-            "travel_wickerfield"
+            "travel_heartwood",
+            "travel_saltpan"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1095319,11 +1095763,18 @@
           "color": "#74d7d0",
           "travelStop": "Rootstair Post",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_rootgate",
             "travel_veyrroot",
             "travel_gladewatch",
             "travel_eastbark",
             "travel_lookout",
-            "travel_saltpan"
+            "travel_heartwood",
+            "travel_azure_wells",
+            "travel_wallwatch",
+            "travel_eastwell",
+            "travel_saltpan",
+            "travel_astro"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1095346,10 +1095797,14 @@
           "color": "#74d7d0",
           "travelStop": "Eastbark Post",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_rootgate",
             "travel_veyrroot",
             "travel_gladewatch",
             "travel_rootstair",
-            "travel_lookout"
+            "travel_lookout",
+            "travel_heartwood",
+            "travel_saltpan"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1095372,10 +1095827,14 @@
           "color": "#74d7d0",
           "travelStop": "Sunleaf Lookout",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_rootgate",
             "travel_veyrroot",
             "travel_gladewatch",
             "travel_rootstair",
-            "travel_eastbark"
+            "travel_eastbark",
+            "travel_heartwood",
+            "travel_saltpan"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1130945,7 +1131404,11 @@
           "color": "#74d7d0",
           "travelStop": "Veyrroot Heartwood",
           "travelLinks": [
-            "travel_veyrroot"
+            "travel_veyrroot",
+            "travel_gladewatch",
+            "travel_rootstair",
+            "travel_eastbark",
+            "travel_lookout"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1198864,12 +1199327,15 @@
           "travelStop": "Azure Wells",
           "travelLinks": [
             "travel_millbridge",
+            "travel_honeywood",
+            "travel_wickerfield",
+            "travel_elderroot",
             "travel_veyrroot",
+            "travel_rootstair",
             "travel_wallwatch",
             "travel_eastwell",
             "travel_saltpan",
-            "travel_astro",
-            "travel_wickerfield"
+            "travel_astro"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1199160,6 +1199626,8 @@
           "color": "#74d7d0",
           "travelStop": "Wallwatch Post",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_rootstair",
             "travel_azure_wells",
             "travel_eastwell",
             "travel_saltpan",
@@ -1199186,6 +1199654,8 @@
           "color": "#74d7d0",
           "travelStop": "Eastwell Post",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_rootstair",
             "travel_azure_wells",
             "travel_wallwatch",
             "travel_saltpan",
@@ -1199212,12 +1199682,16 @@
           "color": "#74d7d0",
           "travelStop": "Saltpan Post",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_veyrroot",
+            "travel_gladewatch",
+            "travel_rootstair",
+            "travel_eastbark",
+            "travel_lookout",
             "travel_azure_wells",
             "travel_wallwatch",
             "travel_eastwell",
-            "travel_astro",
-            "travel_veyrroot",
-            "travel_rootstair"
+            "travel_astro"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1199240,6 +1199714,8 @@
           "color": "#74d7d0",
           "travelStop": "Astrolabe Rest",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_rootstair",
             "travel_azure_wells",
             "travel_wallwatch",
             "travel_eastwell",
@@ -1240546,14 +1241022,18 @@
           "travelStop": "Frostwake Station",
           "travelLinks": [
             "travel_breakwater",
+            "travel_rodstead",
+            "travel_fulgur",
+            "travel_bankhold",
             "travel_millbridge",
-            "travel_boulderwatch",
-            "travel_stormgate",
+            "travel_honeywood",
+            "travel_wickerfield",
+            "travel_elderroot",
             "travel_bellward",
             "travel_aurora",
             "travel_ribwatch",
-            "travel_bankhold",
-            "travel_elderroot"
+            "travel_boulderwatch",
+            "travel_stormgate"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1240765,9 +1241245,12 @@
           "color": "#74d7d0",
           "travelStop": "Bellward Post",
           "travelLinks": [
+            "travel_bankhold",
+            "travel_elderroot",
             "travel_frostwake",
             "travel_aurora",
-            "travel_ribwatch"
+            "travel_ribwatch",
+            "travel_stormgate"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1240790,9 +1241273,12 @@
           "color": "#74d7d0",
           "travelStop": "Aurora Post",
           "travelLinks": [
+            "travel_bankhold",
+            "travel_elderroot",
             "travel_frostwake",
             "travel_bellward",
-            "travel_ribwatch"
+            "travel_ribwatch",
+            "travel_stormgate"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1240815,9 +1241301,14 @@
           "color": "#74d7d0",
           "travelStop": "Ribwatch Camp",
           "travelLinks": [
+            "travel_bankhold",
+            "travel_elderroot",
             "travel_frostwake",
             "travel_bellward",
             "travel_aurora",
+            "travel_boulderwatch",
+            "travel_singing",
+            "travel_whitebark",
             "travel_stormgate"
           ],
           "look": {
@@ -1288508,11 +1288999,14 @@
           "travelStop": "Boulderwatch",
           "travelLinks": [
             "travel_last_shade",
+            "travel_mirrorfall",
+            "travel_whitesun",
+            "travel_cairnfoot",
             "travel_frostwake",
+            "travel_ribwatch",
             "travel_singing",
             "travel_whitebark",
-            "travel_stormgate",
-            "travel_cairnfoot"
+            "travel_stormgate"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1288724,6 +1289218,8 @@
           "color": "#74d7d0",
           "travelStop": "Singing Cairn Post",
           "travelLinks": [
+            "travel_cairnfoot",
+            "travel_ribwatch",
             "travel_boulderwatch",
             "travel_whitebark",
             "travel_stormgate"
@@ -1288749,6 +1289245,8 @@
           "color": "#74d7d0",
           "travelStop": "Whitebark Post",
           "travelLinks": [
+            "travel_cairnfoot",
+            "travel_ribwatch",
             "travel_boulderwatch",
             "travel_singing",
             "travel_stormgate"
@@ -1288774,11 +1289272,14 @@
           "color": "#74d7d0",
           "travelStop": "Stormgate Camp",
           "travelLinks": [
+            "travel_cairnfoot",
+            "travel_frostwake",
+            "travel_bellward",
+            "travel_aurora",
+            "travel_ribwatch",
             "travel_boulderwatch",
             "travel_singing",
-            "travel_whitebark",
-            "travel_frostwake",
-            "travel_ribwatch"
+            "travel_whitebark"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1439200,13 +1439701,16 @@
           "color": "#74d7d0",
           "travelStop": "Springmere",
           "travelLinks": [
-            "travel_solhaven",
-            "travel_rimehold",
-            "travel_lowfall",
-            "travel_tidehollow",
-            "travel_wheelmark",
             "travel_millbridge",
-            "travel_wickerfield"
+            "travel_honeywood",
+            "travel_wickerfield",
+            "travel_elderroot",
+            "travel_solhaven",
+            "travel_harvestwatch",
+            "travel_rimehold",
+            "travel_wheelmark",
+            "travel_tidehollow",
+            "travel_lowfall"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1439229,8 +1439733,12 @@
           "color": "#74d7d0",
           "travelStop": "Solhaven",
           "travelLinks": [
+            "travel_wickerfield",
             "travel_springmere",
             "travel_harvestwatch",
+            "travel_rimehold",
+            "travel_wheelmark",
+            "travel_tidehollow",
             "travel_lowfall"
           ],
           "look": {
@@ -1439254,9 +1439762,13 @@
           "color": "#74d7d0",
           "travelStop": "Harvestwatch",
           "travelLinks": [
+            "travel_wickerfield",
+            "travel_springmere",
             "travel_solhaven",
             "travel_rimehold",
-            "travel_tidehollow"
+            "travel_wheelmark",
+            "travel_tidehollow",
+            "travel_lowfall"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1439279,9 +1439791,13 @@
           "color": "#74d7d0",
           "travelStop": "Rimehold",
           "travelLinks": [
-            "travel_harvestwatch",
+            "travel_wickerfield",
             "travel_springmere",
-            "travel_wheelmark"
+            "travel_solhaven",
+            "travel_harvestwatch",
+            "travel_wheelmark",
+            "travel_tidehollow",
+            "travel_lowfall"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1439676,10 +1440192,13 @@
           "color": "#74d7d0",
           "travelStop": "Wheelmark Post",
           "travelLinks": [
-            "travel_lowfall",
-            "travel_tidehollow",
+            "travel_wickerfield",
+            "travel_springmere",
+            "travel_solhaven",
+            "travel_harvestwatch",
             "travel_rimehold",
-            "travel_springmere"
+            "travel_tidehollow",
+            "travel_lowfall"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1439720,10 +1440239,13 @@
           "color": "#74d7d0",
           "travelStop": "Tidehollow Camp",
           "travelLinks": [
-            "travel_lowfall",
-            "travel_harvestwatch",
+            "travel_wickerfield",
             "travel_springmere",
-            "travel_wheelmark"
+            "travel_solhaven",
+            "travel_harvestwatch",
+            "travel_rimehold",
+            "travel_wheelmark",
+            "travel_lowfall"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1439764,10 +1440286,13 @@
           "color": "#74d7d0",
           "travelStop": "Lowfall Rest",
           "travelLinks": [
-            "travel_solhaven",
+            "travel_wickerfield",
             "travel_springmere",
-            "travel_tidehollow",
-            "travel_wheelmark"
+            "travel_solhaven",
+            "travel_harvestwatch",
+            "travel_rimehold",
+            "travel_wheelmark",
+            "travel_tidehollow"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1592934,11 +1593459,18 @@
           "color": "#74d7d0",
           "travelStop": "Chainrest",
           "travelLinks": [
+            "travel_stillpoint",
+            "travel_lamplight",
+            "travel_breakwater",
+            "travel_rodstead",
+            "travel_fulgur",
+            "travel_bankhold",
+            "travel_jubilee",
+            "travel_tassel",
             "travel_door",
             "travel_craterwatch",
             "travel_cinderquay",
-            "travel_glasshold",
-            "travel_breakwater"
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1592960,11 +1593492,14 @@
           "color": "#74d7d0",
           "travelStop": "Nine-Chain Hold",
           "travelLinks": [
+            "travel_stillpoint",
+            "travel_lamplight",
+            "travel_breakwater",
+            "travel_tassel",
             "travel_chainrest",
             "travel_craterwatch",
             "travel_cinderquay",
-            "travel_glasshold",
-            "travel_breakwater"
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1592986,12 +1593521,17 @@
           "color": "#74d7d0",
           "travelStop": "Craterwatch",
           "travelLinks": [
+            "travel_stillpoint",
+            "travel_bellcourt",
+            "travel_crownwatch",
+            "travel_shardwatch",
+            "travel_lamplight",
+            "travel_breakwater",
+            "travel_tassel",
             "travel_chainrest",
             "travel_door",
             "travel_cinderquay",
-            "travel_glasshold",
-            "travel_stillpoint",
-            "travel_lamplight"
+            "travel_glasshold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -1593013,6 +1593553,10 @@
           "color": "#74d7d0",
           "travelStop": "Cinderquay",
           "travelLinks": [
+            "travel_stillpoint",
+            "travel_lamplight",
+            "travel_breakwater",
+            "travel_tassel",
             "travel_chainrest",
             "travel_door",
             "travel_craterwatch",
@@ -1593038,12 +1593582,18 @@
           "color": "#74d7d0",
           "travelStop": "Glasshold",
           "travelLinks": [
+            "travel_stillpoint",
+            "travel_lamplight",
+            "travel_breakwater",
+            "travel_jubilee",
+            "travel_bunting",
+            "travel_tassel",
+            "travel_garland",
+            "travel_pavilion",
             "travel_chainrest",
             "travel_door",
             "travel_craterwatch",
-            "travel_cinderquay",
-            "travel_jubilee",
-            "travel_tassel"
+            "travel_cinderquay"
           ],
           "look": {
             "hair": "#e4edf4",

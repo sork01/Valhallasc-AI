@@ -794,7 +794,6 @@
 .party-level b { color: #ffd56b; }
 .party-level-bar { height: .7cqw; margin: .35cqw 0; border-radius: 999px; background: #0008; border: 1px solid #b89b5c80; overflow: hidden; }
 .party-level-bar i { display: block; height: 100%; background: linear-gradient(#ffe9a0, #d9a441); transition: width .2s; }
-.spark-route { grid-column: 2 / -1; display: block; font-size: .85em; color: #315d66; white-space: normal; }
 
 /* Player trade */
 .trade-request { position:absolute; left:50%; top:5cqw; transform:translateX(-50%); z-index:52; display:flex; align-items:center; gap:.8cqw; padding:.7cqw 1cqw; border:1px solid #d9c492aa; border-radius:.6cqw; background:#1f2d29f2; color:#f6ead0; font:1cqw 'Jua',sans-serif; box-shadow:0 .4cqw 1.2cqw #0009; }
@@ -1116,6 +1115,35 @@
 /* Separate buttons avoid nested controls and keep interior maps out of atlas geography. */
 .wm-entrance { position: absolute; z-index: 4; transform: translate(-50%, -50%); width: calc(32px / var(--window-k, .8)); height: calc(32px / var(--window-k, .8)); padding: 0; border: 2px solid #c99df4; border-radius: 50%; background: #271b39; color: #f3dbff; font-size: calc(17px / var(--window-k, .8)); line-height: 1; box-shadow: 0 1px 4px #0009; cursor: pointer; }
 .wm-entrance[hidden] { display: none; }
+/* Spark Travel on the world map: stations are chosen here, zones cannot be opened meanwhile. */
+.wm-body[data-mode="travel"] :is(.wm-tile, .wm-name, .wm-city, .wm-entrance) { pointer-events: none; }
+.wm-foot[hidden] { display: none; }
+.wm-foot-travel .wm-connection-key { color: #cdbf9d; }
+.wm-spark-layer { position: absolute; inset: 0; z-index: 8; }
+.wm-spark-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.wm-spark-route { stroke: #9ff4ea; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 2 7; filter: drop-shadow(0 0 2px #06262b); vector-effect: non-scaling-stroke; }
+.wm-spark { position: absolute; transform: translate(-50%, -50%); width: calc(22px / var(--window-k, .8)); height: calc(22px / var(--window-k, .8)); padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+.wm-spark i { position: absolute; inset: 22%; transform: rotate(45deg); border: 2px solid #06262b; border-radius: 22%; background: #74d7d0; box-shadow: 0 0 6px #9ff4ea, 0 0 2px #fff inset; }
+.wm-spark[data-state="here"] i { background: #ffe27a; box-shadow: 0 0 9px #ffe27a, 0 0 2px #fff inset; }
+.wm-spark[data-state="blocked"] i { background: #6f8f93; box-shadow: none; }
+.wm-spark[data-state="unknown"] { cursor: default; }
+.wm-spark[data-state="unknown"] i { inset: 32%; background: #2c444a; border-color: #8fb3b5; box-shadow: none; opacity: .85; }
+.wm-spark:is(:hover, :focus-visible, [data-shown="true"]) i { inset: 12%; }
+.wm-spark:focus-visible { outline: 3px solid #ffe099; outline-offset: 1px; }
+.wm-spark[data-state="here"] { cursor: default; }
+.wm-spark-card { position: absolute; z-index: 2; transform: translate(-50%, calc(-100% - 14px / var(--window-k, .8))); display: grid; gap: .25em; justify-items: center; max-width: 24em; padding: .5em .8em; border: 2px solid #74d7d0; border-radius: .6em; background: #0d262cf2; color: #eafffb; font: calc(13px / var(--window-k, .8)) 'Jua', sans-serif; text-align: center; white-space: nowrap; pointer-events: none; box-shadow: 0 3px 10px #000a; }
+.wm-spark-card[hidden] { display: none; }
+.wm-spark-card[data-below="true"] { transform: translate(-50%, calc(14px / var(--window-k, .8))); }
+.wm-spark-card[data-side="left"] { transform: translate(-12%, calc(-100% - 14px / var(--window-k, .8))); }
+.wm-spark-card[data-side="right"] { transform: translate(-88%, calc(-100% - 14px / var(--window-k, .8))); }
+.wm-spark-card[data-side="left"][data-below="true"] { transform: translate(-12%, calc(14px / var(--window-k, .8))); }
+.wm-spark-card[data-side="right"][data-below="true"] { transform: translate(-88%, calc(14px / var(--window-k, .8))); }
+.wm-spark-card[data-pinned="true"] { pointer-events: auto; }
+.wm-spark-card b { color: #fff; font-weight: normal; font-size: 1.1em; }
+.wm-spark-card small { max-width: 22em; white-space: normal; color: #a9d8d4; }
+.wm-spark-cost { color: #ffe27a; }
+.wm-spark-note { max-width: 20em; white-space: normal; color: #ffc9a8; }
+.wm-spark-fly { min-width: 6em; min-height: calc(44px / var(--window-k, .8)); padding: 0 1em; border: 2px solid #ffe27a; border-radius: .5em; background: #3b5d2c; color: #fff; font: inherit; cursor: pointer; }
 .wm-entrance:hover, .wm-entrance:focus-visible { outline: 3px solid #ffe099; background: #50365f; }
 .wm-entrance[data-here="true"] { border-color: #ffe27a; box-shadow: 0 0 10px #ffe27a; }
 

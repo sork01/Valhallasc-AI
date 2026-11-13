@@ -9832,5 +9832,9 @@
   "You will receive:": "Du får:",
   "Show Map": "Visa karta",
   "Hand in": "Lämna in",
-  "Quests from this person": "Uppdrag från den här personen"
+  "Quests from this person": "Uppdrag från den här personen",
+  "Choose on the map": "Välj på kartan",
+  "Fly": "Flyg",
+  "Choose a station to fly to · Esc closes": "Välj en hållplats att flyga till · Esc stänger",
+  "Scroll to zoom · Bright: stations you can fly to · Dim: not reachable yet": "Rulla för att zooma · Ljusa: hållplatser du kan flyga till · Dunkla: går inte att nå än"
 }

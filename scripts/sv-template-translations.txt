@@ -256,6 +256,7 @@
   "{0} gained. Press ‹mount› to mount.": "{0} förvärvat. Tryck på ‹mount› för att sitta upp.",
   "{0} goes to {1}: the party takes turns.": "{0} går till {1}: gruppen turas om.",
   "{0} gold": "{0} guld",
+  "{0}. You are here": "{0}. Du är här",
   "{0} has fallen.": "{0} har fallit.",
   "{0} has not confirmed.": "{0} har inte bekräftat.",
   "{0} has {1}s to return to the duel area.": "{0} har {1} s på sig att återvända till duellområdet.",

@@ -553,13 +553,10 @@
     else if(['merchant','sell','merge','refine','repair','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
-      for(const destination of packet.travel||[]){
-        const b=row('vendor',`Spark Travel · ${destination.name}`,destination.cost==null?'Unavailable':`${destination.cost} gold`);
-        b.dataset.travel=destination.id;b.disabled=!destination.available;
-        const detail=document.createElement('small');detail.className='spark-route';
-        detail.textContent=destination.available?destination.stops.join(' → '):destination.reason;
-        b.append(detail);b.title=destination.stops.join(' → ');
-        b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:`spark:${destination.id}`}))b.disabled=true;});offers.push(b);
+      if(packet.travel?.length){
+        // Destinations are chosen on the world map: it shows every station, its fare and the stops on the way.
+        const b=row('vendor','Spark Travel','Choose on the map');b.dataset.view='sparkmap';
+        b.addEventListener('click',()=>{const offers=packet.travel,stops=packet.travelStops;close(false);if(!window.WorldMap.showTravel(npc,offers,stops))Field.setPaused(false);});offers.push(b);
       }
       if(npc.buys){const b=row('vendor','Sell');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'merchant'},'#npc-x'));offers.push(b);}
       if(npc.offers.some(offer=>window.Shop?.isStockOffer(offer))){

@@ -173,6 +173,10 @@ html, body { overscroll-behavior: none; }
 
 @media (pointer: coarse) {
   .wm-entrance { width: calc(44px / var(--window-k, .8)); height: calc(44px / var(--window-k, .8)); }
+  /* Stations a finger can choose get a full target; the ones not yet discovered stay small dots. */
+  .wm-spark:not([data-state="unknown"]) { width: calc(44px / var(--window-k, .8)); height: calc(44px / var(--window-k, .8)); }
+  .wm-spark:not([data-state="unknown"]) i { inset: 30%; }
+  .wm-spark[data-state="unknown"] { pointer-events: none; }
 }
 
 @media (pointer: coarse) {

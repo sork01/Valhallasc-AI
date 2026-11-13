@@ -927,8 +927,101 @@
     $('wm-here').textContent = here === current ? 'You are here' : `You are in ${zones[here].name}`;
   }
 
+  // ---------- Spark Travel: the destination is chosen on the world view ----------
+  // The travel master's offers (name, fare, stops, reason) come from the server; the map only places them.
+  let travel = null;
+  const stationIndex = new Map();
+  function station(id) {
+    if (!stationIndex.size) zones.forEach((z, zone) => { for (const n of z.npcs || []) if (n.travelStop) stationIndex.set(n.id, { zone, n }); });
+    return stationIndex.get(id);
+  }
+  const stationAt = id => { const s = station(id); return atlasPosition(s.zone, s.n.x, s.n.y); };
+  const stagePos = at => ({ left: `${at[0] / STAGE.w * 100}%`, top: `${at[1] / STAGE.h * 100}%` });
+  function sparkCard(entry, pinned) {
+    const card = $('wm-spark-card'), line = $('wm-spark-line');
+    for (const b of $('wm-spark').querySelectorAll('.wm-spark')) b.dataset.shown = String(!!entry && b.dataset.station === entry.id);
+    if (!entry) { card.hidden = true; line.setAttribute('points', ''); return; }
+    const d = entry.offer, at = stationAt(entry.id);
+    const parts = [el('b', entry.name)];
+    if (entry.state === 'here') parts.push(el('span', 'You are here', 'wm-spark-note'));
+    else {
+      if (d.stops?.length > 2) parts.push(el('small', d.stops.join(' → ')));
+      parts.push(d.available ? el('span', `${d.cost} gold`, 'wm-spark-cost') : el('span', d.reason, 'wm-spark-note'));
+      if (d.available && pinned) {
+        const fly = el('button', 'Fly', 'wm-spark-fly'); fly.type = 'button'; fly.addEventListener('click', () => sparkFly(entry)); parts.push(fly);
+      }
+    }
+    card.replaceChildren(...parts); card.hidden = false; card.dataset.pinned = String(!!pinned);
+    // Keep the card inside the map: under the station near the top edge, pulled inwards near the sides.
+    card.dataset.below = String(at[1] < STAGE.h * .3); card.dataset.side = at[0] < STAGE.w * .16 ? 'left' : at[0] > STAGE.w * .84 ? 'right' : 'mid';
+    Object.assign(card.style, stagePos(at));
+    const ids = (d?.stops || []).map(name => travel.byName.get(name)).filter(Boolean);
+    line.setAttribute('points', entry.state === 'here' ? '' : ids.map(id => stationAt(id).map(v => v.toFixed(1)).join(',')).join(' '));
+  }
+  function sparkFly(entry) {
+    const npc = travel.npc;
+    close();
+    window.Online.send({ type: 'interact', npc: npc.id, offer: `spark:${entry.id}` });
+  }
+  function buildTravel() {
+    const stage = $('wm-world'), layer = el('div', '', 'wm-spark-layer'); layer.id = 'wm-spark';
+    const lines = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-spark-lines', 'aria-hidden': 'true' });
+    const line = svgNode('polyline', { id: 'wm-spark-line', class: 'wm-spark-route', fill: 'none', points: '' }); lines.append(line);
+    const card = el('div', '', 'wm-spark-card'); card.id = 'wm-spark-card'; card.hidden = true;
+    layer.append(lines);
+    const discovered = new Set(travel.known), own = station(travel.npc.id);
+    const entries = [{ id: travel.npc.id, name: own.n.travelStop, state: 'here', offer: null }];
+    for (const d of travel.options) {
+      const s = station(d.id); if (!s) continue;
+      const state = d.available ? 'open' : discovered.has(d.id) ? 'blocked' : 'unknown';
+      // A station nobody has told the hero about shows only where the hero has already charted the ground.
+      if (state === 'unknown' && !known(s.zone, s.n.x, s.n.y)) continue;
+      entries.push({ id: d.id, name: d.name, state, offer: d });
+    }
+    travel.entries = entries;
+    for (const entry of entries) {
+      const b = el('button', '', 'wm-spark'); b.type = 'button'; b.dataset.station = entry.id; b.dataset.state = entry.state;
+      b.append(el('i'));
+      const d = entry.offer;
+      b.setAttribute('aria-label', entry.state === 'here' ? `${entry.name}. You are here` : d.available ? `${entry.name}. ${d.cost} gold` : `${entry.name}. ${d.reason}`);
+      if (entry.state !== 'open') b.setAttribute('aria-disabled', 'true');
+      Object.assign(b.style, stagePos(stationAt(entry.id)));
+      const on = () => sparkCard(entry, false), off = () => sparkCard(travel?.pinned || null, !!travel?.pinned);
+      b.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') on(); });
+      b.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') off(); });
+      b.addEventListener('focus', () => { if (!travel.pinned) on(); }); b.addEventListener('blur', () => { if (travel && !travel.pinned) off(); });
+      b.addEventListener('click', event => {
+        // A mouse or the keyboard flies at once; a finger first shows the name and fare, with a Fly button.
+        const finger = event.pointerType === 'touch' || event.pointerType === 'pen';
+        if (entry.state === 'open' && !finger) { sparkFly(entry); return; }
+        travel.pinned = entry; sparkCard(entry, true);
+      });
+      layer.append(b);
+    }
+    layer.append(card);
+    layer.addEventListener('pointerdown', event => { if (event.target === layer && travel.pinned) { travel.pinned = null; sparkCard(null); } });
+    stage.append(layer);
+  }
+  function showTravel(npc, options, knownStops) {
+    if (!show()) return false;
+    travel = { npc, options: options || [], known: knownStops || [], pinned: null, byName: new Map() };
+    zones.forEach(z => { for (const n of z.npcs || []) if (n.travelStop) travel.byName.set(n.travelStop, n.id); });
+    $('wm-body').dataset.mode = 'travel';
+    $('wm-title-zone').replaceChildren(' › ', el('span', 'Spark Travel'));
+    $('wm-foot').hidden = true; $('wm-foot-travel').hidden = false;
+    buildTravel();
+    $('wm-spark').querySelector('[data-state="here"]')?.focus({ preventScroll: true });
+    return true;
+  }
+  function endTravel() {
+    if (!travel) return;
+    travel = null; $('wm-spark')?.remove(); delete $('wm-body').dataset.mode;
+    $('wm-foot').hidden = false; $('wm-foot-travel').hidden = true;
+  }
+
   // ---------- world and zone views ----------
   function setView(next) {
+    if (travel && next === 'zone') return;                          // choosing a destination stays on the world view
     const body = $('wm-body');
     if (view === 'world' && next === 'zone') worldScroll = [body.scrollLeft, body.scrollTop];
     view = next; $('wm-body').dataset.view = next; $('wm-zone').hidden = next !== 'zone'; $('wm-world').hidden = next !== 'world';
@@ -965,7 +1058,7 @@
   }
   function close(resume = true) {
     if (!open()) return;
-    clearInterval(tickTimer);
+    clearInterval(tickTimer); endTravel();
     const world = $('wm-world'); world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = '';
     $('worldmap').hidden = true; setView('world');
     if (resume) { window.Field?.setPaused(false); previousFocus?.focus?.({ preventScroll: true }); }
@@ -1003,7 +1096,7 @@
   }, true);
 
   window.WorldMap = {
-    show, close, get open() { return open(); }, get view() { return view; }, get zone() { return current; },
+    show, showTravel, close, get open() { return open(); }, get travel() { return !!travel; }, get view() { return view; }, get zone() { return current; },
     seasonChanged(){if(open()&&view==='zone')renderZone(current);},
     reset() { close(false); },
     // For the tests: the layout and kind table the map was written against.

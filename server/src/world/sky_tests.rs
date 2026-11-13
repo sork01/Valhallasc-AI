@@ -1200,8 +1200,9 @@ fn the_stormrift_carries_a_hero_up_and_the_perch_gate_carries_them_down_without_
 fn the_perch_has_its_own_spark_travel_master_linked_to_skuldwatch() {
     let w = world();
     let links = npc(&w, "travel_perch").travel_links;
+    // towards the Wyrdwood the Perch flies to Ridgewatch, the station nearest the Stormrift
     for want in [
-        "travel_skuldwatch",
+        "travel_ridgewatch",
         "travel_keelhaven",
         "travel_roost",
         "travel_station",
@@ -1209,16 +1210,15 @@ fn the_perch_has_its_own_spark_travel_master_linked_to_skuldwatch() {
     ] {
         assert!(links.iter().any(|l| l == want), "{want} in {links:?}");
     }
-    // the outposts link inside Bifrost only, and to each other
+    // the outposts link to the Perch and to each other (and across each crossing, scripts/spark_routes.py)
     for key in ["roost", "station", "landing"] {
         let m = npc(&w, &format!("travel_{key}"));
-        assert!(m.travel_links.iter().any(|l| l == "travel_perch"));
-        assert!(
-            m.travel_links
-                .iter()
-                .all(|l| l.starts_with("travel_") && npc_exists(&w.maps[SKY], l)),
-            "{key}"
-        );
+        for other in ["perch", "roost", "station", "landing"] {
+            assert!(
+                other == key || m.travel_links.contains(&format!("travel_{other}")),
+                "{key} to {other}"
+            );
+        }
     }
     assert!(
         w.maps[WYRD]
@@ -1228,7 +1228,8 @@ fn the_perch_has_its_own_spark_travel_master_linked_to_skuldwatch() {
             .unwrap()
             .travel_links
             .iter()
-            .any(|l| l == "travel_perch")
+            .any(|l| l == "travel_roost"),
+        "Skuldwatch flies up to the Windward Roost, the station nearest the rift's top"
     );
     let master = npc(&w, "travel_perch");
     let mut at_ = at(master.x, master.y);

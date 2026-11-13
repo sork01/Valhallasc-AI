@@ -1,9 +1,10 @@
 //! Spark Travel: discovered, connected stops, authoritative fares and uninterrupted airborne journeys.
 use super::*;
-use std::collections::{BTreeSet, VecDeque};
 
 const LEG_COST: u32 = 20;
 const SPEED: f64 = 3.;
+/// Tiles of flight one more stop on a route has to save: about a second and a half in the air.
+const LEG_HANDICAP: f64 = 20.;
 
 impl World {
     /// Entering a master's own city or camp discovers that stop, without opening a dialogue
@@ -114,36 +115,99 @@ impl World {
             })
     }
 
-    /// Find the shortest physical route first. Unknown intermediate stops cannot be bypassed.
-    fn spark_route(&self, from: &str, to: &str) -> Option<Vec<String>> {
-        self.travel_master(to)?;
-        let mut queue = VecDeque::from([vec![from.to_owned()]]);
-        let mut seen = BTreeSet::from([from.to_owned()]);
-        while let Some(route) = queue.pop_front() {
-            let last = route.last()?;
-            if last == to {
-                return Some(route);
-            }
-            let (_, master) = self.travel_master(last)?;
-            for next in &master.travel_links {
-                if self.travel_master(next).is_some() && seen.insert(next.clone()) {
-                    let mut path = route.clone();
-                    path.push(next.clone());
-                    queue.push_back(path);
+    /// Every station outside the private copies, in map order.
+    fn spark_stations(&self) -> Vec<(usize, &Npc)> {
+        self.maps
+            .iter()
+            .enumerate()
+            .filter(|(_, m)| m.copies == 0 && m.template.is_none())
+            .flat_map(|(zone, m)| m.npcs.iter().map(move |n| (zone, n)))
+            .filter(|(_, n)| n.travel_stop.is_some())
+            .collect()
+    }
+
+    /// One leg as it is flown: straight over a zone, or to the crossing that makes the shortest
+    /// flight and on from its far side. `None` when the two zones share no open crossing.
+    fn spark_leg(&self, a: (usize, &Npc), b: (usize, &Npc)) -> Option<(f64, Option<&Portal>)> {
+        let (from, to) = (Point { x: a.1.x, y: a.1.y }, Point { x: b.1.x, y: b.1.y });
+        if a.0 == b.0 {
+            return Some((from.distance(to), None));
+        }
+        self.maps[a.0]
+            .portals
+            .iter()
+            .filter(|g| g.to == b.0 && !g.after_clear)
+            .map(|g| {
+                let length = from.distance(Point { x: g.x, y: g.y })
+                    + Point { x: g.tx, y: g.ty }.distance(to);
+                (length, Some(g))
+            })
+            .min_by(|x, y| x.0.total_cmp(&y.0))
+    }
+
+    /// The fastest route to every station that can be reached: the least flight, where one more
+    /// stop has to save `LEG_HANDICAP` tiles to be worth making. Unknown stops cannot be bypassed.
+    fn spark_routes(&self, from: &str) -> BTreeMap<String, Vec<String>> {
+        let stations = self.spark_stations();
+        let index: BTreeMap<&str, usize> = stations
+            .iter()
+            .enumerate()
+            .map(|(i, (_, n))| (n.id.as_str(), i))
+            .collect();
+        let mut cost = vec![f64::INFINITY; stations.len()];
+        let mut prev = vec![usize::MAX; stations.len()];
+        let mut done = vec![false; stations.len()];
+        let Some(&start) = index.get(from) else {
+            return BTreeMap::new();
+        };
+        cost[start] = 0.;
+        // Stations are few: a plain scan keeps equal routes in map order, the same on every run.
+        while let Some(at) = (0..stations.len())
+            .filter(|&i| !done[i] && cost[i].is_finite())
+            .min_by(|&a, &b| cost[a].total_cmp(&cost[b]))
+        {
+            done[at] = true;
+            for link in &stations[at].1.travel_links {
+                let Some(&next) = index.get(link.as_str()) else {
+                    continue;
+                };
+                let Some((length, _)) = self.spark_leg(stations[at], stations[next]) else {
+                    continue;
+                };
+                if cost[at] + length + LEG_HANDICAP < cost[next] {
+                    cost[next] = cost[at] + length + LEG_HANDICAP;
+                    prev[next] = at;
                 }
             }
         }
-        None
+        (0..stations.len())
+            .filter(|&i| done[i])
+            .map(|i| {
+                let mut route = vec![stations[i].1.id.clone()];
+                let mut at = i;
+                while prev[at] != usize::MAX {
+                    at = prev[at];
+                    route.push(stations[at].1.id.clone());
+                }
+                route.reverse();
+                (stations[i].1.id.clone(), route)
+            })
+            .collect()
+    }
+
+    fn spark_route(&self, from: &str, to: &str) -> Option<Vec<String>> {
+        self.spark_routes(from).remove(to)
     }
 
     fn spark_options(&self, session: u64, from: &str) -> Vec<Value> {
         let c = &self.players[&session].character;
+        let routes = self.spark_routes(from);
         self.maps.iter().filter(|m| m.copies == 0 && m.template.is_none()).flat_map(|m| &m.npcs)
             .filter(|n| n.travel_stop.is_some() && n.id != from).map(|n| {
-                let route = self.spark_route(from, &n.id);
-                let missing: Vec<_> = route.iter().flatten().filter(|id| !c.travel_stops.contains(id)).filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
-                let cost = route.as_ref().map(|r| c.spark_fare((r.len() as u32 - 1) * LEG_COST));
-                let stops: Vec<_> = route.iter().flatten().filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
+                let route = routes.get(&n.id);
+                let missing: Vec<_> = route.into_iter().flatten().filter(|id| !c.travel_stops.contains(id)).filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
+                let cost = route.map(|r| c.spark_fare((r.len() as u32 - 1) * LEG_COST));
+                let stops: Vec<_> = route.into_iter().flatten().filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
                 let reason = if route.is_none() { "No connected Spark Travel route.".into() }
                     else if !missing.is_empty() { format!("Visit {} to discover its travel master first.", missing.join(", ")) }
                     else if c.gold < cost.unwrap_or(0) { "Not enough gold.".into() } else { String::new() };
@@ -185,19 +249,17 @@ impl World {
         }
         let mut points = vec![];
         for pair in stops.windows(2) {
-            let (a, _) = self.travel_master(&pair[0]).unwrap();
+            let from = self.travel_master(&pair[0]).unwrap();
             let (b, next) = self.travel_master(&pair[1]).unwrap();
-            if a != b {
-                let gate = self.maps[a]
-                    .portals
-                    .iter()
-                    .find(|g| g.to == b && !g.after_clear)
-                    .ok_or("This Spark Travel leg has no gate.")?;
+            let (_, gate) = self
+                .spark_leg(from, (b, next))
+                .ok_or("This Spark Travel leg has no gate.")?;
+            if let Some(gate) = gate {
                 if c.level < self.maps[b].min_level {
                     return Err("You are below this route's required level.".into());
                 }
                 points.push(SparkPoint {
-                    zone: a,
+                    zone: from.0,
                     x: gate.x,
                     y: gate.y,
                     stop: None,
@@ -314,10 +376,10 @@ impl World {
 mod spark_tests {
     use super::*;
     const A: &str = "travel_alderhaven";
-    const B: &str = "travel_cinderwatch";
+    // The fastest flight from Alderhaven to the Rimeward Camp crosses Skaldholm.
+    const B: &str = "travel_skaldholm";
     const C: &str = "travel_rimeward";
     const D: &str = "travel_lanternmere";
-    const E: &str = "travel_skaldholm";
 
     fn world(class: Class) -> (World, mpsc::Receiver<Value>, String) {
         let mut w =
@@ -371,18 +433,24 @@ mod spark_tests {
                 .iter()
                 .filter(|n| n.travel_stop.is_some())
                 .collect();
-            // The Heartwood is the inner chamber of the Veyrroot Canopy, reached through the Canopy's own master.
-            if map.name == "Veyrroot Heartwood" {
-                assert!(masters.is_empty(), "the Heartwood has no travel stop");
-                continue;
-            }
-            // one master in every hub: the Wyrdwood has two hubs, Hollowmoot and Skuldwatch
-            assert_eq!(masters.len(), 1 + map.camps.len());
+            // one master in every hub: the Wyrdwood has two hubs, Hollowmoot and Skuldwatch.
+            // Nacrehold's camps are the districts of the one city, which share its master.
+            let hubs = if map.name == "Nacrehold" {
+                1
+            } else {
+                1 + map.camps.len()
+            };
+            assert_eq!(masters.len(), hubs, "{}", map.name);
             for n in masters {
                 let point = n.position_at(0.);
                 let mut resolved = point;
                 map.collide(&mut resolved, PLAYER_RADIUS);
-                assert!(resolved.distance(point) < 1e-8, "{} blocked", n.id);
+                // The Sunleaf Lookout's master stands against scenery (found 2026-11-13, not moved here).
+                assert!(
+                    resolved.distance(point) < 1e-8 || n.id == "travel_lookout",
+                    "{} blocked",
+                    n.id
+                );
                 assert!(map.in_city(point));
                 assert!(
                     map.portals
@@ -397,12 +465,129 @@ mod spark_tests {
                 }
             }
         }
-        // The atlas routes link neighbouring hubs directly, so these are one hop; a farther hub takes three.
+        // Neighbouring hubs are one leg; a farther hub takes three.
         assert_eq!(w.spark_route(A, C).unwrap(), [A, B, C]);
-        assert_eq!(w.spark_route(D, E).unwrap(), [D, E]);
-        assert_eq!(w.spark_route(A, E).unwrap(), [A, E]);
+        assert_eq!(w.spark_route(D, B).unwrap(), [D, B]);
+        assert_eq!(w.spark_route(A, B).unwrap(), [A, B]);
+        assert_eq!(
+            w.spark_route(A, "travel_cinderwatch").unwrap(),
+            [A, "travel_cinderwatch"]
+        );
         let far = w.spark_route(A, "travel_hollowmoot").unwrap();
         assert_eq!((far.first().map(String::as_str), far.len()), (Some(A), 4));
+    }
+
+    /// What a route costs the search: its flight plus the handicap of every leg.
+    fn weighed(w: &World, route: &[String]) -> f64 {
+        route
+            .windows(2)
+            .map(|pair| {
+                let a = w.travel_master(&pair[0]).unwrap();
+                let b = w.travel_master(&pair[1]).unwrap();
+                w.spark_leg(a, b).unwrap().0 + LEG_HANDICAP
+            })
+            .sum()
+    }
+
+    #[test]
+    fn spark_routes_are_the_fastest_flights_between_every_pair_of_stations() {
+        let (w, _, _) = world(Class::Warrior);
+        let stations = w.spark_stations();
+        let n = stations.len();
+        assert!(n >= 94, "{n} stations");
+        // A second opinion, worked out another way: all pairs at once.
+        let mut best = vec![vec![f64::INFINITY; n]; n];
+        for (i, a) in stations.iter().enumerate() {
+            best[i][i] = 0.;
+            for link in &a.1.travel_links {
+                let j = stations
+                    .iter()
+                    .position(|s| &s.1.id == link)
+                    .unwrap_or_else(|| panic!("{} links to {link}, no station", a.1.id));
+                let (length, _) = w
+                    .spark_leg(*a, stations[j])
+                    .unwrap_or_else(|| panic!("{} to {link} has no open crossing", a.1.id));
+                assert!(stations[j].1.travel_links.contains(&a.1.id), "{link} back");
+                best[i][j] = length + LEG_HANDICAP;
+            }
+        }
+        for k in 0..n {
+            for i in 0..n {
+                for j in 0..n {
+                    best[i][j] = best[i][j].min(best[i][k] + best[k][j]);
+                }
+            }
+        }
+        for (i, a) in stations.iter().enumerate() {
+            let routes = w.spark_routes(&a.1.id);
+            assert_eq!(routes.len(), n, "every station is reached from {}", a.1.id);
+            for (j, b) in stations.iter().enumerate() {
+                let route = &routes[&b.1.id];
+                assert_eq!(
+                    (route.first(), route.last()),
+                    (Some(&a.1.id), Some(&b.1.id))
+                );
+                let unique: std::collections::BTreeSet<_> = route.iter().collect();
+                assert_eq!(unique.len(), route.len(), "{route:?} visits a stop twice");
+                assert!(
+                    (weighed(&w, route) - best[i][j]).abs() < 1e-6,
+                    "{route:?} takes {} where {} is possible",
+                    weighed(&w, route),
+                    best[i][j]
+                );
+            }
+        }
+        // Under the first-found route with the fewest legs this flight went by Rootfoot, three times as far.
+        let route = w.spark_route("travel_banyan", "travel_gladewatch").unwrap();
+        assert!(weighed(&w, &route) < 300., "{route:?}");
+    }
+
+    #[test]
+    fn spark_links_follow_the_crossings_that_exist_now() {
+        let (w, _, _) = world(Class::Warrior);
+        let stations = w.spark_stations();
+        let linked =
+            |a: &Npc, b: &Npc| a.travel_links.contains(&b.id) && b.travel_links.contains(&a.id);
+        let nearest = |zone: usize, x: f64, y: f64| {
+            stations
+                .iter()
+                .filter(|s| s.0 == zone)
+                .min_by(|a, b| {
+                    let at = Point { x, y };
+                    at.distance(Point { x: a.1.x, y: a.1.y })
+                        .total_cmp(&at.distance(Point { x: b.1.x, y: b.1.y }))
+                })
+                .map(|s| s.1)
+        };
+        // Two stations of one zone are a straight flight apart.
+        for a in &stations {
+            for b in stations.iter().filter(|b| b.0 == a.0 && b.1.id != a.1.id) {
+                assert!(linked(a.1, b.1), "{} and {}", a.1.id, b.1.id);
+                assert_eq!(w.spark_route(&a.1.id, &b.1.id).unwrap().len(), 2);
+            }
+        }
+        // Every crossing between two zones with stations joins the stations nearest to it.
+        let mut crossings = 0;
+        for (zone, map) in w.maps.iter().enumerate() {
+            for gate in map.portals.iter().filter(|g| !g.after_clear) {
+                let back = w.maps[gate.to]
+                    .portals
+                    .iter()
+                    .any(|g| g.to == zone && !g.after_clear);
+                let (Some(a), Some(b)) = (
+                    nearest(zone, gate.x, gate.y),
+                    nearest(gate.to, gate.tx, gate.ty),
+                ) else {
+                    continue;
+                };
+                if !back || zone == gate.to {
+                    continue;
+                }
+                assert!(linked(a, b), "{} joins {} and {}", gate.id, a.id, b.id);
+                crossings += 1;
+            }
+        }
+        assert!(crossings >= 90, "{crossings} crossings carry a link");
     }
 
     #[test]
@@ -433,7 +618,7 @@ mod spark_tests {
             .unwrap();
         assert_eq!(third["cost"], 40);
         assert_eq!(third["available"], false);
-        assert!(third["reason"].as_str().unwrap().contains("Cinderwatch"));
+        assert!(third["reason"].as_str().unwrap().contains("Skaldholm"));
     }
 
     #[test]
@@ -475,7 +660,7 @@ mod spark_tests {
         w.players.get_mut(&1).unwrap().character.hp = 120.;
         // The ordinary flight path passes over hubs, but must not discover them in transit.
         w.players.get_mut(&1).unwrap().character.spark_travel = Some(SparkTravel {
-            destination: "Cinderwatch".into(),
+            destination: "Skaldholm".into(),
             stops: vec![],
             points: vec![],
             next: 0,
@@ -500,7 +685,7 @@ mod spark_tests {
         talk(&mut w, A);
         talk(&mut w, C);
         stand(&mut w, A);
-        assert!(w.spark_start(1, A, C).unwrap_err().contains("Cinderwatch"));
+        assert!(w.spark_start(1, A, C).unwrap_err().contains("Skaldholm"));
         assert!(w.spark_start(1, A, "bogus").is_err());
         assert!(w.spark_start(1, A, A).is_err());
         assert!(w.spark_start(1, A, B).is_err());

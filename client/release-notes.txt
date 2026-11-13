@@ -1,5 +1,18 @@
 [
   {
+    "version": "Beta 1.50.0",
+    "date": "2026-11-13",
+    "new": [
+      "Spark Travel destinations are now chosen on the world map. Talk to a travel master and pick Spark Travel: every station you can fly to glows on the map, hovering one shows its name, the stops on the way and the fare, and a click starts the flight. On a phone or tablet, tap a station and then Fly."
+    ],
+    "changed": [
+      "Spark Travel now takes the fastest route between any two stations. The links between stations were rebuilt for the reshaped world: stations in the same zone connect directly, and neighbouring zones connect through the stations nearest their shared border."
+    ],
+    "removed": [
+      "The list of Spark Travel destinations in the travel master's conversation, because the map replaces it."
+    ]
+  },
+  {
     "version": "Beta 1.49.4",
     "date": "2026-11-13",
     "new": [],
