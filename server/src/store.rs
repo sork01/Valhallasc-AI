@@ -271,6 +271,9 @@ impl Store {
             corpse: None,
             ghost: false,
             resurrection_sickness: 0.,
+            tutorial_done: vec![],
+            tutorial_disabled: false,
+            tutorial_version: 1,
             landing: false,
         };
         c.seed_inventory();
@@ -590,6 +593,7 @@ fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
     character.grant_missing_gm_gear();
     character.sync_look();
     character.normalize_mounts();
+    character.migrate_tutorial();
     if character.health_curve_version == 0 {
         let ratio = (character.hp / character.legacy_max_hp()).clamp(0., 1.);
         character.hp = (character.max_hp() * ratio).round();
@@ -965,5 +969,85 @@ mod unique_name_tests {
         assert!(!store.needs_rename(&second.id).unwrap());
         drop(store);
         let _ = std::fs::remove_file(file);
+    }
+
+    #[test]
+    fn tutorial_migration_marks_veterans_over_level_five_only_once() {
+        let mut veteran = Character::mercenary(crate::model::Class::Mage, 6, "VeteranMage");
+        veteran.tutorial_version = 0;
+        veteran.tutorial_done.clear();
+        let upgraded = decode(&serde_json::to_string(&veteran).unwrap()).unwrap();
+        assert_eq!(upgraded.tutorial_version, 1);
+        for &id in crate::model::TUTORIAL_MILESTONES {
+            assert!(upgraded.tutorial_done.iter().any(|d| d == id), "missing {id}");
+        }
+        assert!(!upgraded.tutorial_disabled);
+
+        let mut lowbie = Character::mercenary(crate::model::Class::Warrior, 5, "Lowbie");
+        lowbie.tutorial_version = 0;
+        lowbie.tutorial_done.clear();
+        let loaded_lowbie = decode(&serde_json::to_string(&lowbie).unwrap()).unwrap();
+        assert_eq!(loaded_lowbie.tutorial_version, 1);
+        assert!(loaded_lowbie.tutorial_done.is_empty());
+
+        let mut fresh = Character::mercenary(crate::model::Class::Priest, 10, "FreshHero");
+        fresh.tutorial_version = 1;
+        fresh.tutorial_done.clear();
+        let loaded_fresh = decode(&serde_json::to_string(&fresh).unwrap()).unwrap();
+        assert_eq!(loaded_fresh.tutorial_version, 1);
+        assert!(loaded_fresh.tutorial_done.is_empty());
+    }
+
+    #[test]
+    fn tutorial_commands_validate_milestones_and_visibility_hides_own_fields() {
+        let s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let look = Look {
+            class: Class::Hunter,
+            name: "TutorTest".into(),
+            ..Look::default()
+        };
+        let (mut c, _token) = s.create(look, Point::default()).unwrap();
+        assert_eq!(c.tutorial_version, 1);
+        assert!(c.tutorial_done.is_empty());
+        assert!(!c.complete_tutorial("bogus_step"));
+        assert!(c.complete_tutorial("first_quest"));
+        assert!(c.complete_tutorial("first_quest"));
+        assert_eq!(c.tutorial_done, vec!["first_quest"]);
+        c.tutorial_disabled = true;
+        c.reset_tutorial();
+        assert!(c.tutorial_done.is_empty());
+        assert!(!c.tutorial_disabled);
+
+        let complete: crate::model::ClientMessage = serde_json::from_str(
+            r#"{"type":"tutorial","command":{"op":"complete","id":"merchant"}}"#,
+        )
+        .unwrap();
+        assert!(matches!(
+            complete,
+            crate::model::ClientMessage::Tutorial {
+                command: crate::model::TutorialCommand::Complete { .. }
+            }
+        ));
+
+        let mut view = serde_json::json!({
+            "players": [{
+                "id": "self",
+                "tutorialDone": ["first_quest"],
+                "tutorialDisabled": false,
+                "landing": true
+            }, {
+                "id": "other",
+                "tutorialDone": ["merchant"],
+                "tutorialDisabled": true,
+                "landing": true
+            }]
+        });
+        crate::visibility::filter_view(&mut view, "self");
+        let players = view["players"].as_array().unwrap();
+        assert!(players[0].get("tutorialDone").is_some());
+        assert!(players[0].get("landing").is_some());
+        assert!(players[1].get("tutorialDone").is_none());
+        assert!(players[1].get("tutorialDisabled").is_none());
+        assert!(players[1].get("landing").is_none());
     }
 }

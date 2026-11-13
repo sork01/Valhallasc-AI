@@ -1,7 +1,9 @@
 """Preview, build in PixelFlow, and export five cloak bases on all ten rigs.
 
 New builds resume saved IDs and never replace editable sprites. Export reads
-both male and female cels back from PixelFlow. Only cloak atlases are written.
+both male and female cels back from PixelFlow. `redraw` saves new sprites from
+changed shapes (editor changes to the old ones are not carried over; their IDs
+stay in the state file under `superseded`). Only cloak atlases are written.
 """
 import argparse
 import base64
@@ -80,6 +82,14 @@ def build(style):
         record['icon']=pipeline.save_sprite(f'cloak_{style}_icon',[grid],1);save()
     export(style)
 
+def redraw(style):
+    """New cloth drawings from the current shapes. The old PixelFlow sprites are kept and listed as superseded."""
+    state=json.loads(STATE.read_text());record=state[style]
+    if record['classes']:
+        record.setdefault('superseded',[]).append(record['classes']);record['classes']={}
+        STATE.write_text(json.dumps(state,indent=2)+'\n')
+    build(style)
+
 def export(style):
     state=json.loads(STATE.read_text());record=state[style];files=[]
     for cls,stem in META.items():
@@ -109,15 +119,17 @@ def export(style):
             bp=sprite_bounds.bounds_name(meta_path);bounds=json.loads(bp.read_text())
             bounds['parts'][part]=base64.b64encode(sprite_bounds.part_bounds(ASSETS/(name+'.png'),meta)).decode();bp.write_text(json.dumps(bounds,separators=(',',':'))+'\n')
     sprite,grids=pipeline.load_sprite(record['icon']);icon=Image.new('RGBA',(48,48));icon.paste(Image.fromarray(pipeline.PALETTE[grids[0]]),tuple(record['icon']['offset']))
-    path=ASSETS/('gear_icon_cloak_'+style+'.png');icon.save(path);files.append(str(path.relative_to(ROOT)))
+    path=ASSETS/('gear_icon_cloak_'+style+'.png');before=path.read_bytes() if path.exists() else b'';icon.save(path);files.append(str(path.relative_to(ROOT)))
     record['files']=files;STATE.write_text(json.dumps(state,indent=2)+'\n')
     manifest=json.loads(MANIFEST.read_text());manifest['CLOAK-'+style.upper()]=record;MANIFEST.write_text(json.dumps(manifest,indent=2)+'\n')
-    import cloak_catalog
-    cloak_catalog.append_icons()
+    # The inventory atlas is rebuilt only for a new or edited icon; a cloth redraw leaves the icon cells alone.
+    if path.read_bytes()!=before:
+        import cloak_catalog
+        cloak_catalog.append_icons()
     print(style,'exported',len(files),'files',flush=True)
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=('preview','build','export'));p.add_argument('styles',nargs='*',default=list(shape.STYLES));args=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=('preview','build','redraw','export'));p.add_argument('styles',nargs='*',default=list(shape.STYLES));args=p.parse_args()
     import fcntl
     lock_path=ROOT/'.tools/cloak-art.lock';lock_path.parent.mkdir(exist_ok=True)
     with lock_path.open('w') as lock:

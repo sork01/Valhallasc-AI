@@ -145,13 +145,13 @@ impl World {
     pub(super) fn humans_online(&self) -> usize {
         self.players
             .values()
-            .filter(|p| p.merc.is_none() && p.ambient.is_none())
+            .filter(|p| p.is_human())
             .count()
     }
     pub(super) fn visible_humans_online(&self) -> usize {
         self.players
             .values()
-            .filter(|p| p.merc.is_none() && p.ambient.is_none() && !p.is_hidden())
+            .filter(|p| p.is_human() && !p.is_hidden())
             .count()
     }
     /// The public "who is online" list: real, visible players only (no hired fighters, ambient adventurers or hidden
@@ -160,7 +160,7 @@ impl World {
         let mut roster: Vec<Value> = self
             .players
             .values()
-            .filter(|p| p.merc.is_none() && p.ambient.is_none() && !p.is_hidden())
+            .filter(|p| p.is_human() && !p.is_hidden())
             .map(|p| {
                 let c = &p.character;
                 let size = self.maps[c.zone].size.max(1) as f64;
@@ -174,7 +174,7 @@ impl World {
     pub(super) fn session_of(&self, character: &str) -> Option<u64> {
         self.players
             .iter()
-            .find(|(_, p)| p.merc.is_none() && p.ambient.is_none() && p.character.id == character)
+            .find(|(_, p)| p.is_human() && p.character.id == character)
             .map(|(session, _)| *session)
     }
     /// Whose rewards a kill by `session` pays: the hirer's when it is a mercenary's.

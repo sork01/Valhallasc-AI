@@ -146,7 +146,7 @@
     return node;
   }
 
-  let zones = null, graph = [], tiles = [], nameNodes = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, selectedPerson = null, tickTimer = 0, tileY = .54;
+  let zones = null, graph = [], tiles = [], nameNodes = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, selectedPerson = null, tickTimer = 0, tileY = .54;
   const cache = new Map();
 
   function load() {
@@ -174,10 +174,6 @@
       queue.push(gate.to);
     }
     return [];
-  }
-  function routePaint(to) {
-    const path = route(window.Field.zone || 0, to), edges = new Set(path.slice(1).map((n, i) => [path[i], n].sort((a, b) => a - b).join('-')));
-    roadRefs.forEach(r => r.node.classList.toggle('wm-route-road', edges.has(r.pair)));
   }
 
   // ---------- ground ----------
@@ -617,21 +613,8 @@
   },{passive:false});
   new ResizeObserver(()=>sizeWorld()).observe($('wm-body'),{box:'border-box'});
   function buildWorld() {
-    const stage=$('wm-world');stage.replaceChildren();tiles=Array(zones.length).fill(null);nameNodes=Array(zones.length).fill(null);roadRefs=[];tileY=1;
+    const stage=$('wm-world');stage.replaceChildren();tiles=Array(zones.length).fill(null);nameNodes=Array(zones.length).fill(null);tileY=1;
     const sea=el('canvas','','wm-sea');sea.width=STAGE.w;sea.height=STAGE.h;sea.setAttribute('aria-hidden','true');stage.append(sea);
-    const roads=svgNode('svg',{viewBox:`0 0 ${STAGE.w} ${STAGE.h}`,preserveAspectRatio:'none',class:'wm-roads','aria-hidden':'true'});
-    for(const link of ATLAS.links) {
-      const pair=[link.a,link.b].sort((a,b)=>a-b).join('-'),a=PROVINCES.get(link.a).seed,b=PROVINCES.get(link.b).seed;
-      const p=zones[link.a].portals.find(p=>p.to===link.b),back=zones[link.b].portals.find(p=>p.to===link.a);if(!p||!back)continue;
-      const road=svgNode('g',{'data-road':pair,'data-kind':'path',class:'wm-connection-path'});
-      // Paths meet at their shared province border rather than joining separate island tiles.
-      const dx=b[0]-a[0],dy=b[1]-a[1],n=Math.hypot(dx,dy),reach=26;
-      const bend=7;
-      const d=`M ${link.at[0]-dx/n*reach} ${link.at[1]-dy/n*reach} C ${link.at[0]-dy/n*bend} ${link.at[1]+dx/n*bend} ${link.at[0]+dy/n*bend} ${link.at[1]-dx/n*bend} ${link.at[0]+dx/n*reach} ${link.at[1]+dy/n*reach}`;
-      road.append(svgNode('path',{d,class:'wm-road-under',fill:'none'}),svgNode('path',{d,class:'wm-road',fill:'none'}));roads.append(road);
-      roadRefs.push({node:road,pair,shown:()=>known(link.a,p.x,p.y)||known(link.b,back.x,back.y)});
-    }
-    stage.append(roads);
     for(const r of ATLAS.regions) {
       const i=r.zone,z=zones[i],{x,y,w,h}=z.place,tile=el('button','','wm-tile');tile.type='button';tile.dataset.zone=String(i);tile.dataset.theme=z.theme;tile.dataset.branch=z.players?'dungeon':z.city&&!z.slimes.length?'city':'wild';
       Object.assign(tile.style,{left:`${x/STAGE.w*100}%`,top:`${y/STAGE.h*100}%`,width:`${w/STAGE.w*100}%`,height:`${h/STAGE.h*100}%`,clipPath:'polygon('+r.polygon.map(p=>`${(p[0]-x)/w*100}% ${(p[1]-y)/h*100}%`).join(',')+')'});
@@ -701,7 +684,6 @@
 
   function refreshFog() {
     fogSignature=JSON.stringify(window.Field.explored);
-    for(const r of roadRefs)r.node.setAttribute('visibility',r.shown()?'visible':'hidden');
     for(const r of ATLAS.regions) {
       const i=r.zone,z=zones[i],unseen=!visited(i),tile=tiles[i],name=nameNodes[i];
       tile.disabled=unseen;tile.dataset.fog=unseen?'full':'partial';tile.setAttribute('aria-label',unseen?'Unexplored zone':`${r.name}. Open its map`);
@@ -738,7 +720,6 @@
   function renderZone(index) {
     if (current !== index) selectedPerson = null;
     const z = zones[index]; current = index;
-    routePaint(index);
     copy($('wm-ground'), paint(index, 768)); highlight = null; drawDots(z);
     const fg = $('wm-fog').getContext('2d'); fg.clearRect(0, 0, 768, 768); window.Field.fog.paint(fg, 768, 768, index);
     const markers = $('wm-markers'); markers.replaceChildren();

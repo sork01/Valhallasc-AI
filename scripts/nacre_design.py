@@ -564,8 +564,8 @@ def design(world, margin, write=False):
     for o in voids:
         o.pop('layout', None)
     zone['objects'] = voids + p.objects
-    zone['paths'] = [[list(g['gate']), list(g['arrival']), [float(g['start'][0]), float(g['start'][1])]] for g in p.gates.values()]
-    zone['atlasPaths'] = copy.deepcopy(zone['paths'])
+    zone['paths'] = []
+    zone['atlasPaths'] = []
     zone['exitRoutes'] = [dict(portal=pid, points=[list(g['gate']), list(g['arrival'])]) for pid, g in p.gates.items()]
     zone['cityEntrances'] = [dict(id=pid, portal=pid, points=[list(g['gate']), list(g['arrival']), [float(g['start'][0]), float(g['start'][1])]],
                                   axis='y' if g['walk'][0] == 0 else 'x', street=float(g['start'][0] if g['walk'][0] == 0 else g['start'][1]),

@@ -433,7 +433,9 @@ def design(world, write=False):
         objects = [o for o in objects if o not in loose]
         d.late_dropped += len(loose)
     zone['objects'] = objects
-    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
+    # Omit cairn_thunderheart_gate spur (gate, index 4) from visible brown paths.
+    visible_roads = [road for i, road in enumerate(d.ROADLIST) if i != 4]
+    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in visible_roads]
     zone['atlasPaths'] = []
     zone['levels'] = [90, 95]
     seamed = {p['id'] for p in zone['portals'] if p.get('seam')}

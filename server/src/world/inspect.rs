@@ -32,7 +32,7 @@ impl World {
         ) else {
             return refused;
         };
-        if asker == target || b.is_hidden() || b.is_ghost() || a.is_ghost() {
+        if asker == target || b.is_hidden() || b.is_ghost() || a.is_ghost() || b.guard.is_some() {
             return refused;
         }
         let near = a.character.zone == b.character.zone

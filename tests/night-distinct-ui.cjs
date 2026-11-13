@@ -42,6 +42,13 @@ const taskSeconds = async cdp => (await cdp.send('Performance.getMetrics')).metr
         .replace(/\.24 \* nightDepth/g, '0');
       r.fulfill({ contentType: 'application/javascript', body });
     });
+  } else if (process.env.MUTATE === 'anchor') {
+    // Regression guard: reverting all emitters to the old flat y - 46 offset must fail anchor checks.
+    await page.route('**/daynight.js', r => {
+      const body = fs.readFileSync(path.join(root, 'client/daynight.js'), 'utf8')
+        .replace(/function lightAnchor\(light\) \{[\s\S]*?\n  \}/, 'function lightAnchor() { return [0, -46]; }');
+      r.fulfill({ contentType: 'application/javascript', body });
+    });
   }
   await page.addInitScript(() => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })); });
   await page.goto(world.url);
@@ -49,16 +56,16 @@ const taskSeconds = async cdp => (await cdp.send('Performance.getMetrics')).metr
   await page.locator('#name').fill('Nightwatch'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!window.DayNight && DayNight.hour >= 0 && Field.hero?.hp > 0, null, { timeout: 60000 });
 
-  // 1. Canvas unit checks across themes, Prefs.night, lowGraphics, and lamp light contrast.
+  // 1. Canvas unit checks across themes, Prefs.night, lowGraphics, lamp light contrast, and emitter anchors.
   const unit = await page.evaluate(() => {
-    const sample = (theme, h, setting, lowGfx = false, lights = [], pt = [100, 75]) => {
+    const sample = (theme, h, setting, lowGfx = false, lights = [], pt = [100, 75], size = [240, 160]) => {
       Prefs.set({ night: setting, lowGraphics: lowGfx });
       DayNight.setZone({ theme });
       DayNight.sync({ hour: h, hoursPerSecond: 0 });
       DayNight.tick(20);
-      const canvas = document.createElement('canvas'); canvas.width = 240; canvas.height = 160;
-      const g = canvas.getContext('2d'); g.fillStyle = '#a0b0a0'; g.fillRect(0, 0, 240, 160);
-      DayNight.draw(g, 240, 160, lights, (x, y) => [x, y]);
+      const canvas = document.createElement('canvas'); canvas.width = size[0]; canvas.height = size[1];
+      const g = canvas.getContext('2d'); g.fillStyle = '#a0b0a0'; g.fillRect(0, 0, size[0], size[1]);
+      DayNight.draw(g, size[0], size[1], lights, (x, y) => [x, y]);
       return [...g.getImageData(pt[0], pt[1], 1, 1).data].slice(0, 3);
     };
     const themes = ['meadow', 'ember', 'frostwake', 'fen', 'lapiserg', 'yearwheel', 'wyrd'];
@@ -75,8 +82,23 @@ const taskSeconds = async cdp => (await cdp.send('Performance.getMetrics')).metr
     }
     const lit = sample('meadow', 0, 1, false, [{ x: 120, y: 126 }], [120, 80]);
     const unlit = sample('meadow', 0, 1, false, [{ x: 120, y: 126 }], [20, 80]);
+    const anchors = {
+      lampHead: sample('meadow', 0, 1, false, [{ kind: 'lamp', x: 120, y: 200 }], [120, 80], [240, 240]),
+      lampMidPillar: sample('meadow', 0, 1, false, [{ kind: 'lamp', x: 120, y: 200 }], [120, 154], [240, 240]),
+      campfireFlame: sample('meadow', 0, 1, false, [{ kind: 'campfire', x: 120, y: 120 }], [120, 96], [240, 240]),
+      campfireHigh: sample('meadow', 0, 1, false, [{ kind: 'campfire', x: 120, y: 120 }], [120, 48], [240, 240]),
+      brazierFlame: sample('ember', 0, 1, false, [{ kind: 'brazier', x: 120, y: 160 }], [120, 92], [240, 240]),
+      brazierBase: sample('ember', 0, 1, false, [{ kind: 'brazier', x: 120, y: 160 }], [120, 154], [240, 240]),
+      ewLanternHead: sample('emberwake', 0, 1, false, [{ kind: 'ew_lantern', x: 100, y: 200 }], [119, 73], [240, 240]),
+      ewLanternLeft: sample('emberwake', 0, 1, false, [{ kind: 'ew_lantern', x: 100, y: 200 }], [81, 73], [240, 240]),
+      yearLanternOffBase: sample('yearwheel', 0, 1, false, [{ kind: 'year_lantern', x: 120, y: 310 }], [120, 116], [240, 160]),
+      lamphouseRoof: sample('moonspore', 0, 1, false, [{ kind: 'lamphouse', x: 120, y: 210 }], [120, 46], [240, 240]),
+      lamphouseWall: sample('moonspore', 0, 1, false, [{ kind: 'lamphouse', x: 120, y: 210 }], [120, 164], [240, 240]),
+      cottageWindow: sample('meadow', 0, 1, false, [{ kind: 'meadow_cottage', x: 120, y: 120 }], [120, 104], [240, 240]),
+      cottageRoof: sample('meadow', 0, 1, false, [{ kind: 'meadow_cottage', x: 120, y: 120 }], [120, 30], [240, 240]),
+    };
     Prefs.set({ night: 1, lowGraphics: false });
-    return { byTheme, lit, unlit };
+    return { byTheme, lit, unlit, anchors };
   });
 
   for (const [th, s] of Object.entries(unit.byTheme)) {
@@ -90,6 +112,20 @@ const taskSeconds = async cdp => (await cdp.send('Performance.getMetrics')).metr
   }
   check(lum(unit.lit) > lum(unit.unlit) * 1.8 && unit.lit[0] > unit.unlit[0] * 2,
     `lamp cutouts & warm glow pop against unlit night (${JSON.stringify(unit.lit)} vs ${JSON.stringify(unit.unlit)})`);
+  check(lum(unit.anchors.lampHead) > lum(unit.anchors.lampMidPillar) * 1.35,
+    `lamp glow peaks at lantern head y-120 rather than mid-pillar y-46 (${lum(unit.anchors.lampHead).toFixed(1)} vs ${lum(unit.anchors.lampMidPillar).toFixed(1)})`);
+  check(lum(unit.anchors.campfireFlame) > lum(unit.anchors.campfireHigh) * 1.15,
+    `campfire glow centers on low flames y-24 (${lum(unit.anchors.campfireFlame).toFixed(1)} vs ${lum(unit.anchors.campfireHigh).toFixed(1)})`);
+  check(lum(unit.anchors.brazierFlame) > lum(unit.anchors.brazierBase) * 1.25,
+    `brazier glow centers on bowl flames y-68 (${lum(unit.anchors.brazierFlame).toFixed(1)} vs ${lum(unit.anchors.brazierBase).toFixed(1)})`);
+  check(lum(unit.anchors.ewLanternHead) > lum(unit.anchors.ewLanternLeft) * 1.15,
+    `ew_lantern glow aligns with hanging arm (+19, -127) (${lum(unit.anchors.ewLanternHead).toFixed(1)} vs ${lum(unit.anchors.ewLanternLeft).toFixed(1)})`);
+  check(lum(unit.anchors.yearLanternOffBase) > lum(unit.unlit) * 1.6,
+    `tall year_lantern remains lit when its base is below the viewport (${lum(unit.anchors.yearLanternOffBase).toFixed(1)} vs ${lum(unit.unlit).toFixed(1)})`);
+  check(lum(unit.anchors.lamphouseRoof) > lum(unit.anchors.lamphouseWall) * 1.35,
+    `lamphouse glow centers on rooftop bulb y-164 (${lum(unit.anchors.lamphouseRoof).toFixed(1)} vs ${lum(unit.anchors.lamphouseWall).toFixed(1)})`);
+  check(lum(unit.anchors.cottageWindow) > lum(unit.anchors.cottageRoof) * 1.3,
+    `meadow_cottage glow aligns with ground windows y-16 (${lum(unit.anchors.cottageWindow).toFixed(1)} vs ${lum(unit.anchors.cottageRoof).toFixed(1)})`);
 
   // 2. Live world screenshots & brightness across Day, Dusk, Midnight (Alderhaven lamps + outdoor zones + Vault).
   await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_god_mode', enabled: true } }));

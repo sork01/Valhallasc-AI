@@ -32,8 +32,9 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await page.evaluate(() => document.activeElement?.blur?.());
     await page.keyboard.press('Space');
     await page.waitForFunction(() => !Field.hero.mounted, null, { timeout: 10000 });
-    // The Mounts list: five rows, the horse owned and selected, the rest greyed with their unlock hints.
+    // The Mounts list: rows in the Mounts tab, the horse owned and selected, the rest greyed with their unlock hints.
     await page.keyboard.press('e');
+    await page.locator('#character-tab-mounts').click();
     await page.waitForSelector('#character-mounts .mount-card');
     assert.equal(await page.locator('#character-mounts .mount-card').count(), 5, 'every mount is listed');
     assert.equal(await page.locator('.mount-card[data-mount="horse"]').getAttribute('data-selected'), 'true', 'the horse owner has it selected');
@@ -77,6 +78,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await page.waitForFunction(() => Field.hero.mounts.includes('sabertooth'), null, { timeout: 10000 });
     assert.equal(await page.evaluate(() => Inventory.quantity('sabertooth_whistle')), 0, 'the whistle is used up');
     assert.equal(await page.evaluate(() => Field.hero.mount), 'raptor', 'a later mount does not change the selection');
+    await page.locator('#character-tab-mounts').click();
     await page.waitForSelector('.mount-card[data-mount="sabertooth"][data-owned="true"]');
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => document.getElementById('equipment').hidden);

@@ -173,6 +173,7 @@ mod bank;
 mod compact_atlas_tests;
 #[cfg(test)]
 mod cutscene_tests;
+mod guards;
 mod inspect;
 mod landing;
 #[cfg(test)]
@@ -548,6 +549,8 @@ struct Player {
     /// Set on the opponent of an arena gauntlet run (see world/gauntlet.rs). Always with `merc` set to the hero's
     /// character id, so an opponent is never saved, counted as online or put in a party.
     gauntlet: bool,
+    /// Stationed outpost or town guard (see world/guards.rs): never saved, counted online, or rewarded kills/loot.
+    guard: Option<guards::Guard>,
     /// The confirmation from the last `rebirth_preview` (docs/rebirth.md).
     rebirth_nonce: Option<rebirth::Nonce>,
     /// Frozen in amber by a boss mechanic: cannot move or act, and cannot be hurt, until the cocoon is broken.
@@ -556,8 +559,14 @@ struct Player {
 const CORPSE_RESURRECT_RANGE: f64 = 15.;
 
 impl Player {
+    pub(super) fn is_human(&self) -> bool {
+        self.merc.is_none()
+            && self.ambient.is_none()
+            && !self.gauntlet
+            && self.guard.is_none()
+    }
     pub(super) fn mark_corpse(&mut self, at: Point) {
-        if self.merc.is_none() && self.ambient.is_none() && !self.gauntlet {
+        if self.is_human() {
             self.character.corpse = Some(Corpse {
                 zone: self.character.zone,
                 x: at.x,
@@ -571,7 +580,7 @@ impl Player {
     fn apply_death_penalty(&mut self) {
         self.dance = None;
         self.daze = 0.;
-        let wear = if self.merc.is_some() || self.ambient.is_some() {
+        let wear = if self.merc.is_some() || self.ambient.is_some() || self.guard.is_some() {
             DeathWear::default()
         } else {
             self.character.wear_worn_gear()
@@ -684,6 +693,7 @@ impl Player {
             ambient: None,
             escort: None,
             gauntlet: false,
+            guard: None,
             rebirth_nonce: None,
             shop: shop::Session::default(),
             frozen: false,
@@ -718,6 +728,9 @@ impl Player {
         view["corpse"] = json!(c.corpse);
         view["resurrectionSickness"] = json!(r2(c.resurrection_sickness));
         view["effectiveAttributes"] = json!(c.effective_attributes());
+        view["tutorialDone"] = json!(c.tutorial_done);
+        view["tutorialDisabled"] = json!(c.tutorial_disabled);
+        view["landing"] = json!(c.landing);
         view
     }
     pub(super) fn is_ghost(&self) -> bool {
@@ -736,7 +749,7 @@ impl Player {
             "reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"pvpFlag":self.pvp_flag,"stun":r2(self.stun),
             "daze":r2(self.daze),"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":r2(self.absorb_left),
             "danceT":self.dance,"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet,
-            "hired":self.merc.is_some()})
+            "guard":self.guard.is_some(),"hired":self.merc.is_some()})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -875,6 +888,9 @@ struct Slime {
     /// Character IDs, so reconnecting does not lose participation. Cleared on evade/respawn.
     #[serde(skip)]
     contributors: std::collections::BTreeSet<String>,
+    /// Cumulative damage dealt to this enemy by outpost guards since its last full reset.
+    #[serde(skip)]
+    guard_damage: f64,
 }
 /// Two decimals, for what is only drawn.
 fn r2(v: f64) -> f64 {
@@ -1887,6 +1903,7 @@ impl Slime {
             volley: false,
             hunt: false,
             contributors: Default::default(),
+            guard_damage: 0.,
         }
     }
     fn point(&self) -> Point {
@@ -2029,6 +2046,7 @@ pub struct World {
     /// When each zone last heard an ambient adventurer speak.
     ambient_chat_at: BTreeMap<usize, f64>,
     pub ambient_enabled: bool,
+    pub guards_enabled: bool,
     level_spread: i32,
     // Test servers only (VALHALLA_GOD_MODE=1): enemies still fight, but players take no damage.
     pub god_mode: bool,
@@ -2155,6 +2173,7 @@ impl World {
             ambient_targets: BTreeMap::new(),
             ambient_chat_at: BTreeMap::new(),
             ambient_enabled: false,
+            guards_enabled: !cfg!(test),
             level_spread,
             god_mode: false,
             start_level: 1,
@@ -2298,7 +2317,7 @@ impl World {
     /// Zones with at least one hero, hired fighter or autonomous adventurer in them.
     fn populated_zones(&self) -> Vec<bool> {
         let mut populated = vec![false; self.maps.len()];
-        for p in self.players.values() {
+        for p in self.players.values().filter(|p| p.guard.is_none()) {
             if let Some(zone) = populated.get_mut(p.character.zone) {
                 *zone = true;
             }
@@ -2449,6 +2468,12 @@ impl World {
         }
         view
     }
+    /// One outpost/town guard as every client in the zone sees them.
+    fn guard_view(&self, session: u64, p: &Player) -> Value {
+        let mut view = self.player_view(session, p);
+        view["guard"] = json!(true);
+        view
+    }
     /// What lies across each seam border of `zone` (view only, shown through the border by the client): the neighbour's
     /// players and enemies within ACROSS_RANGE (60) tiles of the line, in the neighbour's own coordinates.
     fn across_view(&self, zone: usize) -> Vec<Value> {
@@ -2476,7 +2501,21 @@ impl World {
                 .players
                 .iter()
                 .filter(|(_, p)| {
-                    p.character.zone == portal.to && near(p.character.point()) && !p.is_hidden()
+                    p.guard.is_none()
+                        && p.character.zone == portal.to
+                        && near(p.character.point())
+                        && !p.is_hidden()
+                })
+                .map(|(_, p)| p.across_view())
+                .collect();
+            let guards: Vec<Value> = self
+                .players
+                .iter()
+                .filter(|(_, p)| {
+                    p.guard.is_some()
+                        && p.character.zone == portal.to
+                        && near(p.character.point())
+                        && !p.is_hidden()
                 })
                 .map(|(_, p)| p.across_view())
                 .collect();
@@ -2486,7 +2525,7 @@ impl World {
                 .filter(|s| s.zone == portal.to && near(s.point()) && s.shows_across())
                 .map(Slime::across_view)
                 .collect();
-            out.push(json!({"to":portal.to,"shift":shift,"players":players,"slimes":slimes}));
+            out.push(json!({"to":portal.to,"shift":shift,"players":players,"guards":guards,"slimes":slimes}));
         }
         out
     }
@@ -2526,7 +2565,8 @@ impl World {
         };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
         "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"easter":self.festival_view(seasonal_hunt::EASTER),"solstice":self.festival_view(seasonal_hunt::SOLSTICE),"valentine":self.festival_view(seasonal_hunt::VALENTINE),"newyear":self.festival_view(seasonal_hunt::NEWYEAR),
-        "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| self.player_view(*session, p)).collect::<Vec<_>>(),
+        "players":self.players.iter().filter(|(_, p)| p.character.zone == zone && p.guard.is_none()).map(|(session, p)| self.player_view(*session, p)).collect::<Vec<_>>(),
+        "guards":self.players.iter().filter(|(_, p)| p.character.zone == zone && p.guard.is_some()).map(|(session, p)| self.guard_view(*session, p)).collect::<Vec<_>>(),
         "corpses":self.corpses_view(zone),
         "raidCrosses":self.raid_cross_view(zone),
         "slimes":self.slimes.iter().filter(|s| s.zone == zone && !idle).collect::<Vec<_>>(),
@@ -3191,6 +3231,26 @@ impl World {
             ClientMessage::Ping { nonce } => {
                 let _ = p.peer.try_send(json!({"type":"pong","nonce":nonce}));
             }
+            ClientMessage::Tutorial { command } => {
+                let changed = match command {
+                    TutorialCommand::Complete { id } => p.character.complete_tutorial(&id),
+                    TutorialCommand::Disable => {
+                        if !p.character.tutorial_disabled {
+                            p.character.tutorial_disabled = true;
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    TutorialCommand::Reset => {
+                        p.character.reset_tutorial();
+                        true
+                    }
+                };
+                if changed {
+                    self.save();
+                }
+            }
             ClientMessage::Debug { reference, command } => {
                 self.debug(session, reference, command);
             }
@@ -3716,6 +3776,7 @@ impl World {
         self.update_pack_fights();
         self.update_raid_wipes();
         self.update_ambient();
+        self.update_guards();
         self.update_mercenaries();
         self.update_gauntlets();
         self.update_escorts();
@@ -3769,6 +3830,7 @@ impl World {
             .filter(|(_, p)| {
                 p.merc.is_none()
                     && p.ambient.is_none()
+                    && p.guard.is_none()
                     && (p.peer.is_closed() || p.peer.capacity() == 0)
             })
             .map(|(id, _)| *id)
@@ -3920,7 +3982,7 @@ impl World {
         let mut point = p.character.point();
         self.maps[p.character.zone].collide(&mut point, PLAYER_RADIUS);
         let p = self.players.get_mut(&session).unwrap();
-        let wear = if p.merc.is_some() || p.ambient.is_some() {
+        let wear = if p.merc.is_some() || p.ambient.is_some() || p.guard.is_some() {
             DeathWear::default()
         } else {
             p.character
@@ -4028,7 +4090,7 @@ impl World {
             return;
         }
         if p.character.hp <= 0. {
-            if p.character.ghost && p.ambient.is_none() && p.merc.is_none() {
+            if p.character.ghost && p.ambient.is_none() && p.merc.is_none() && p.guard.is_none() {
                 p.character.mounted = false;
                 p.target = None;
                 p.attack = 0.;
@@ -4084,8 +4146,13 @@ impl World {
                 p.fallen = false;
                 p.dead_time = 0.;
             }
-            if p.dead_time >= 3.2 && !p.fallen {
-                if p.ambient.is_some() || p.merc.is_some() {
+            let respawn_delay = if p.guard.is_some() {
+                guards::GUARD_RESPAWN_DELAY
+            } else {
+                3.2
+            };
+            if p.dead_time >= respawn_delay && !p.fallen {
+                if p.ambient.is_some() || p.merc.is_some() || p.guard.is_some() {
                     let map = &self.maps[p.character.zone];
                     let rally = self
                         .instances
@@ -4094,7 +4161,11 @@ impl World {
                         .and_then(|i| i.rally)
                         .filter(|_| !p.pack_death)
                         .unwrap_or(map.spawn);
-                    let mut point = p.ambient.as_ref().map_or(rally, ambient::Ambient::hub);
+                    let mut point = if let Some(guard) = p.guard.as_ref() {
+                        guard.post
+                    } else {
+                        p.ambient.as_ref().map_or(rally, ambient::Ambient::hub)
+                    };
                     map.collide(&mut point, PLAYER_RADIUS);
                     p.character.x = point.x;
                     p.character.y = point.y;
@@ -4161,7 +4232,7 @@ impl World {
             .iter()
             .find(|i| i.zone == p.character.zone)
             .map_or(p.character.zone, |i| i.template);
-        if p.ambient.is_none() {
+        if p.ambient.is_none() && p.guard.is_none() {
             p.character
                 .explore_in(public, self.maps[p.character.zone].size);
             // A hero still on the landing dock gets nothing yet: the landing quest arrives first, as they step ashore.
@@ -4235,8 +4306,10 @@ impl World {
         let mut travel = 0.;
         let mut auto_attack = false;
         // A fighting escort finds its way round walls to its enemy like a hired fighter.
-        let hired =
-            p.merc.is_some() && p.escort.as_ref().is_none_or(|e| e.fighting()) && !p.gauntlet;
+        let hired = (p.merc.is_some()
+            && p.escort.as_ref().is_none_or(|e| e.fighting())
+            && !p.gauntlet)
+            || p.guard.is_some();
         let mut navigation_goal = None;
         if self.time - p.input_at > 0.3 {
             p.input = Point::default();
@@ -4360,7 +4433,7 @@ impl World {
         if auto_attack {
             self.start_attack(session);
         }
-        if self.players[&session].ambient.is_none() {
+        if self.players[&session].ambient.is_none() && self.players[&session].guard.is_none() {
             self.use_portal(session);
         }
     }
@@ -5402,6 +5475,7 @@ impl World {
         let s = &mut self.slimes[id];
         let p = self.players.get_mut(&session).unwrap();
         p.combat_left = 5.;
+        let is_guard = p.guard.is_some();
         if damage <= 0. {
             let point = s.point();
             self.event("miss", &actor, point, 0., false);
@@ -5422,13 +5496,18 @@ impl World {
         if p.character.look.class == Class::Warrior {
             p.character.change_resource(dealt * 0.5);
         }
-        if is_elite(&s.kind) {
+        if is_guard {
+            s.guard_damage += dealt;
+        } else if is_elite(&s.kind) {
             s.contributors.insert(actor.clone());
             s.contributors.insert(credit_id.clone());
         }
         s.hp = (s.hp - damage).max(0.);
         s.hurt_t = 0.4;
         s.target = Some(session);
+        if is_guard && s.state == "return" {
+            s.state = "chase".into();
+        }
         let point = s.point();
         let killed = s.hp <= 0.;
         let xp = s.xp;
@@ -5487,6 +5566,18 @@ impl World {
         if killed && kind == raid_key::KIND {
             self.raid_key_drops(id, zone, point);
             return dealt; // Shards only: never ordinary XP, gold, gear or elite loot.
+        }
+        let guard_tainted = {
+            let s = &self.slimes[id];
+            is_guard
+                || (s.guard_damage > 0. && is_elite(&kind))
+                || s.guard_damage > s.max_hp * 0.25
+        };
+        if killed && guard_tainted {
+            if kind == "big" {
+                self.next_king_spawn = self.time + self.king_spawn_delay();
+            }
+            return dealt;
         }
         if killed {
             // An instance kill can advance a quest offered at its public entrance.
@@ -5874,7 +5965,7 @@ impl World {
                         && p.character.spark_travel.is_none()
                         && p.cutscene_until <= self.time
                         && !p.is_hidden()
-                        && !map.in_city(p.character.point())
+                        && (!map.in_city(p.character.point()) || p.guard.is_some())
                 })
                 .map(|p| {
                     (
@@ -6160,6 +6251,9 @@ impl World {
                     } else {
                         (s.hp + s.max_hp * 0.5).min(s.max_hp)
                     };
+                    if s.hp >= s.max_hp - 1e-6 {
+                        s.guard_damage = 0.;
+                    }
                 } else {
                     goal = Some(home);
                 }
@@ -6183,8 +6277,13 @@ impl World {
             walk_with_actors(map, &mut point, direction, movement, s.r, &bodies);
             if map.in_city(point) {
                 point = s.point();
-                s.target = None;
-                s.state = "return".into();
+                if !s
+                    .target
+                    .is_some_and(|tid| self.players.get(&tid).is_some_and(|p| p.guard.is_some()))
+                {
+                    s.target = None;
+                    s.state = "return".into();
+                }
             }
             s.x = point.x;
             s.y = point.y;
@@ -6234,7 +6333,8 @@ impl World {
         if p.character.spark_travel.is_some() || p.cutscene_until > self.time {
             return;
         }
-        if p.character.hp > 0. && !self.maps[p.character.zone].in_city(p.character.point()) {
+        let in_city = self.maps[p.character.zone].in_city(p.character.point()) && p.guard.is_none();
+        if p.character.hp > 0. && !in_city {
             let p = self.players.get_mut(&session).unwrap();
             p.combat_left = 5.;
             p.character.mounted = false;
@@ -6245,7 +6345,7 @@ impl World {
             || p.frozen
             || p.is_hidden()
             || p.character.hp <= 0.
-            || self.maps[p.character.zone].in_city(p.character.point())
+            || in_city
             || p.dash > 0.
             || self.time - p.last_hurt < 0.65
         {
@@ -6497,6 +6597,7 @@ impl World {
                 .iter()
                 .filter(|(_, p)| {
                     p.merc.is_none()
+                        && p.guard.is_none()
                         && p.character.hp > 0.
                         && p.character.zone == zone
                         && p.character.spark_travel.is_none()

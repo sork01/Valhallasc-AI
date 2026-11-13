@@ -436,6 +436,58 @@ pub struct Character {
     /// Remaining seconds of Resurrection Sickness (all stats reduced to 25%) after Spirit Guide resurrection.
     #[serde(default)]
     pub resurrection_sickness: f64,
+    /// Completed early-level tutorial milestones (`TUTORIAL_MILESTONES`).
+    #[serde(default)]
+    pub tutorial_done: Vec<String>,
+    /// True once the player disables the guided early-level tutorial.
+    #[serde(default)]
+    pub tutorial_disabled: bool,
+    /// Schema marker so legacy characters above level 5 auto-skip onboarding once while new heroes keep it.
+    #[serde(default)]
+    pub tutorial_version: u8,
+}
+pub const TUTORIAL_MILESTONES: &[&str] = &[
+    "first_quest",
+    "levelup_stats",
+    "equip_gear",
+    "new_skill",
+    "consumables",
+    "merchant",
+];
+pub const TUTORIAL_VETERAN_LEVEL: u32 = 5;
+
+impl Character {
+    /// One-way migration for pre-tutorial saves: characters already past level 5 mark onboarding done so
+    /// veterans aren't prompted, while brand-new or low-level characters keep every milestone.
+    pub fn migrate_tutorial(&mut self) {
+        if self.tutorial_version == 0 {
+            if self.level > TUTORIAL_VETERAN_LEVEL {
+                for &id in TUTORIAL_MILESTONES {
+                    if !self.tutorial_done.iter().any(|done| done == id) {
+                        self.tutorial_done.push(id.to_string());
+                    }
+                }
+            }
+            self.tutorial_version = 1;
+        }
+    }
+
+    pub fn complete_tutorial(&mut self, id: &str) -> bool {
+        if !TUTORIAL_MILESTONES.contains(&id) {
+            return false;
+        }
+        self.tutorial_version = self.tutorial_version.max(1);
+        if !self.tutorial_done.iter().any(|done| done == id) {
+            self.tutorial_done.push(id.to_string());
+        }
+        true
+    }
+
+    pub fn reset_tutorial(&mut self) {
+        self.tutorial_done.clear();
+        self.tutorial_disabled = false;
+        self.tutorial_version = self.tutorial_version.max(1);
+    }
 }
 pub const RESURRECTION_SICKNESS_DURATION: f64 = 600.;
 pub const RESURRECTION_SICKNESS_SCALE: f64 = 0.25;
@@ -595,6 +647,9 @@ impl Character {
             corpse: None,
             ghost: false,
             resurrection_sickness: 0.,
+            tutorial_done: vec![],
+            tutorial_disabled: false,
+            tutorial_version: 1,
             landing: false,
         };
         c.seed_inventory();
@@ -1439,12 +1494,23 @@ pub enum ClientMessage {
     Ping {
         nonce: u64,
     },
+    Tutorial {
+        command: TutorialCommand,
+    },
     /// Test-server shortcuts (VALHALLA_TEST_COMMANDS=1); every other server refuses them.
     Debug {
         #[serde(default, rename = "ref")]
         reference: Option<u64>,
         command: DebugCommand,
     },
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum TutorialCommand {
+    Complete { id: String },
+    Disable,
+    Reset,
 }
 
 #[derive(Debug, Deserialize, Clone)]

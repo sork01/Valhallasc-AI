@@ -78,6 +78,7 @@
     if (character) window.Shop?.onSnapshot(character);
     if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
     callbacks.onSnapshot?.(packet); window.DpsMeter?.update(packet.damageMeter);
+    if (character) window.Tutorial?.onSnapshot(character);
   }
   function connect() {
     clearTimeout(retryTimer); clearInterval(heartbeat);
@@ -190,7 +191,7 @@
       clearTimeout(joinTimeout);
       if (!current()) return;
       clearSnapshot(); clearInterval(heartbeat);
-      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Inventory?.hideTooltip(); window.Tutorial?.onSnapshot(null); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay(waitingForRelease ? 'Waiting for your previous connection to close…' : 'Connection lost. Reconnecting to your character…');

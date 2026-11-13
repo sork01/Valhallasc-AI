@@ -1,9 +1,10 @@
 'use strict';
 (() => {
-  const $ = id => document.getElementById(id), root = $('achievements-panel');
+  const $ = id => document.getElementById(id), pane = $('character-achievements'), equipment = $('equipment');
+  const isVisible = () => !!pane && !pane.hidden && !!equipment && !equipment.hidden;
   const tr = text => window.Locale?.translate(text) || text;
   const node = (tag, text, cls) => { const n = document.createElement(tag); if (text != null) n.textContent = text; if (cls) n.className = cls; return n; };
-  let hero = null, data = null, signature = '', focus = null, category = '';
+  let hero = null, data = null, signature = '', category = '';
   const toast = $('achievement-toast'), pending = [], celebrated = new Set();
   let celebrationTimer = 0, batchTimer = 0;
   function celebrate() {
@@ -29,7 +30,7 @@
     clearTimeout(batchTimer); batchTimer = setTimeout(celebrate, 200);
   }
   function render() {
-    if (!data || root.hidden) return;
+    if (!data || !isVisible()) return;
     const key = JSON.stringify([data, category, $('achievements-filter').value, window.Locale?.language]);
     if (key === signature) return; signature = key;
     $('achievement-total').textContent = `${data.points} / ${data.maximum}`;
@@ -79,42 +80,27 @@
     if (!host.childElementCount) host.append(node('p', tr('No achievements in this view.')));
     host.scrollTop = scroll;
   }
-  function refresh() { if (!root.hidden && window.Online?.connected) Online.send({ type: 'achievements' }); }
-  function close() { root.hidden = true; window.Field?.setPaused(false); if (focus?.isConnected && !focus.closest('[hidden]')) focus.focus({ preventScroll: true }); else $('inventory-open').focus({ preventScroll: true }); }
+  function refresh() { if (isVisible() && window.Online?.connected) Online.send({ type: 'achievements' }); }
+  function onShow() { signature = ''; render(); refresh(); }
+  function close() { window.CharacterPane?.close?.(); }
   function open() {
     if (!window.Online?.connected) return;
-    focus = document.activeElement; $('pause').hidden = true;
-    root.hidden = false; signature = ''; window.Field?.setPaused(true); window.Settings?.applyScale();
-    render(); refresh(); $('achievements-close').focus({ preventScroll: true });
+    window.CharacterPane?.open?.('achievements');
   }
-  $('p-achievements').addEventListener('click', open);
-  $('character-achievements-open').addEventListener('click', () => { $('equipment').hidden = true; open(); });
-  $('achievements-close').addEventListener('click', close);
+  $('p-achievements')?.addEventListener('click', open);
   $('achievements-filter').addEventListener('change', () => { $('achievement-list').scrollTop = 0; render(); });
   $('achievement-categories').addEventListener('click', event => {
     const button = event.target.closest('button'); if (!button) return;
     category = button.dataset.category; $('achievement-list').scrollTop = 0; render();
   });
   $('achievement-title-select').addEventListener('change', event => Online.send({ type: 'select_title', achievement: event.target.value }));
-  root.addEventListener('click', event => { if (event.target === root) close(); });
-  document.addEventListener('keydown', event => {
-    if (root.hidden) return;
-    if (window.Keys ? Keys.is(event, 'menu') : event.code === 'Escape') { event.preventDefault(); event.stopImmediatePropagation(); close(); return; }
-    if (event.key === 'Tab') {
-      const controls = [$('achievements-close'), $('achievement-title-select'), $('achievements-filter'), ...$('achievement-categories').children, $('achievement-list')];
-      const first = controls[0], last = controls.at(-1);
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    }
-    event.stopPropagation();
-  }, true);
   setInterval(refresh, 1500);
   window.Achievements = {
-    open, close, onNotice,
+    open, close, onShow, onNotice,
     reset() {
       clearTimeout(celebrationTimer); clearTimeout(batchTimer); pending.length = 0; celebrated.clear();
       toast.hidden = true; toast.classList.remove('celebrate');
-      hero = null; data = null; signature = ''; category = ''; $('achievement-categories').replaceChildren(); $('achievement-list').replaceChildren(); $('achievement-total').textContent = '…'; root.hidden = true;
+      hero = null; data = null; signature = ''; category = ''; $('achievement-categories').replaceChildren(); $('achievement-list').replaceChildren(); $('achievement-total').textContent = '…';
     },
     receive(packet) { if (packet.character !== window.Online?.id) return; data = packet; render(); },
     update(own) {

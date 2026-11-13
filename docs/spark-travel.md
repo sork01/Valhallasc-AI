@@ -19,7 +19,7 @@ generators and designs may still write `travelLinks`; whatever they write is rep
 - `python3 scripts/spark_routes.py` rewrites `world/map.txt`; `--check` fails when the map is stale.
 - `--report` prints the size of the network and how direct its routes are, measured against a network where every
   pair of stations in neighbouring zones is linked. On 2026-11-13: 94 stations, 478 links, the
-  median route within 1% of that yardstick, 95% of routes within 8%. Against the network before Beta 1.50.0 the
+  median route within 1% of that yardstick, 95% of routes within 8%. Against the network before Beta 1.52.0 the
   average flight is about a quarter shorter and takes fewer legs (3.4 against 4.2), so it also costs less.
 
 ## Routes (`server/src/world/travel.rs`)
@@ -27,13 +27,13 @@ generators and designs may still write `travelLinks`; whatever they write is rep
 `spark_routes(from)` finds the fastest route to every station: the least flight in tiles, where one more stop has to
 save `LEG_HANDICAP` (20 tiles, about a second and a half) to be worth making. A leg between two zones uses the
 crossing that makes the shortest flight (`spark_leg`). The fare is 20 gold per leg of that route, and every stop on
-it must be discovered. Before Beta 1.50.0 the server took the first route with the fewest legs it found, which for
+it must be discovered. Before Beta 1.52.0 the server took the first route with the fewest legs it found, which for
 about a quarter of all pairs was more than 15% longer than the best one over the same links.
 
 Tests: `cargo test spark_` (the routes are checked against an all-pairs search written another way; the links
 against the crossings in the map).
 
-## Choosing a destination (`client/worldmap.js`, Beta 1.50.0)
+## Choosing a destination (`client/worldmap.js`, Beta 1.52.0)
 
 The travel master's conversation has one row, Spark Travel. It closes the conversation and opens the world map in
 travel mode (`WorldMap.showTravel(npc, offers, discoveredStops)`): zones cannot be opened, and every station is a

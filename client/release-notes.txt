@@ -1,6 +1,6 @@
 [
   {
-    "version": "Beta 1.50.0",
+    "version": "Beta 1.52.0",
     "date": "2026-11-13",
     "new": [
       "Spark Travel destinations are now chosen on the world map. Talk to a travel master and pick Spark Travel: every station you can fly to glows on the map, hovering one shows its name, the stops on the way and the fare, and a click starts the flight. On a phone or tablet, tap a station and then Fly."
@@ -11,6 +11,76 @@
     "removed": [
       "The list of Spark Travel destinations in the travel master's conversation, because the map replaces it."
     ]
+  },
+  {
+    "version": "Beta 1.51.2",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Removed dashed inter-zone border roads from the world map while keeping route previews, Spark stations, and entrance markers.",
+      "Removed brown dirt road spurs leading directly up to teleport gates and dungeon warps while keeping town roads, walkable zone crossings, and dungeon corridors intact."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.51.1",
+    "date": "2026-11-13",
+    "new": [
+      "Hovering over active buffs and debuffs now opens a tooltip showing what each effect does and how much time remains."
+    ],
+    "changed": [
+      "Buffs and their tooltips now have a gold border, while debuffs and their tooltips have a red border."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.51.0",
+    "date": "2026-11-13",
+    "new": [
+      "Added a non-blocking early-level guided tutorial that triggers once per character for movement and your first quest, spending stat points on level-up, equipping new gear, arranging newly unlocked active skills, using food and potions, and buying or selling at a merchant.",
+      "Added Disable tutorial buttons on tips and a Reset / Replay tutorial button in Settings; tutorial progress saves to your character and experienced characters above level 5 skip old onboarding automatically."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.50.2",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Clicking Recommended in the Character window now opens a centered confirmation popup with the proposed stat allocation instead of inserting it inline below the button."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.50.1",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "The Character window is now organized into five tabs: Character & stats, Dungeon sets, Achievements, Mounts and Rebirth."
+    ],
+    "removed": [
+      "Removed the separate Achievements popup window because Achievements now lives in its own tab inside the Character window (the World Menu Achievements button opens straight to it)."
+    ]
+  },
+  {
+    "version": "Beta 1.50.0",
+    "date": "2026-11-13",
+    "new": [
+      "Every town and outpost across the open world now stations patrolling Outpost Guards tuned to the area's level, engaging creatures that wander or get lured too close and returning to their posts once the perimeter is clear.",
+      "Outpost Guards help protect camps without overpowering enemies or trivializing elites, and creatures defeated by or heavily aided by guards award no experience, gold, loot or kill credit."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.49.5",
+    "date": "2026-11-13",
+    "new": [],
+    "changed": [
+      "Outdoor night glow and light pools now emit from the lantern heads of lamp posts instead of the middle of their pillars, with matching emitter heights for zone lanterns, braziers, torches, campfires and cottages."
+    ],
+    "removed": []
   },
   {
     "version": "Beta 1.49.4",

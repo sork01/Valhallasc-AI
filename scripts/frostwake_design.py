@@ -558,7 +558,9 @@ def design(world, write=False):
         objects = [o for o in objects if o not in decals]
         d.late_dropped += len(decals)
     zone['objects'] = objects
-    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
+    # Trim path_26_19's arrival spur from gate_sw in visible brown paths.
+    visible_roads = [road[1:] if i == 7 else road for i, road in enumerate(d.ROADLIST)]
+    zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in visible_roads]
     zone['atlasPaths'] = []
     seamed = {p['id'] for p in zone['portals'] if p.get('seam')}
     zone['exitRoutes'] = [dict(portal=g, points=[[round(gx, 2), round(gy, 2)], [round(arr[0], 2), round(arr[1], 2)]]) for g, (gx, gy, walk, arr) in G.items() if g not in seamed]

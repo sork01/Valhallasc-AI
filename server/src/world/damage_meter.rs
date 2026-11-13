@@ -20,6 +20,7 @@ impl Meter {
             || p.ambient.is_some()
             || p.escort.is_some()
             || p.gauntlet
+            || p.guard.is_some()
             || p.is_hidden()
         {
             return;
@@ -73,7 +74,7 @@ impl World {
         self.damage_meter.fights.retain(|zone, _| {
             self.players
                 .values()
-                .any(|p| p.character.zone == *zone && p.merc.is_none() && p.ambient.is_none())
+                .any(|p| p.character.zone == *zone && p.merc.is_none() && p.ambient.is_none() && p.guard.is_none())
         });
     }
 
@@ -85,6 +86,7 @@ impl World {
             p.character.zone == zone
                 && p.ambient.is_none()
                 && p.escort.is_none()
+                && p.guard.is_none()
                 && !p.gauntlet
                 && !p.is_hidden()
         }) {

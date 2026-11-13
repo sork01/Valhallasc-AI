@@ -17,6 +17,7 @@ impl World {
                 || c.spark_travel.is_some()
                 || player.merc.is_some()
                 || player.ambient.is_some()
+                || player.guard.is_some()
             {
                 continue;
             }
