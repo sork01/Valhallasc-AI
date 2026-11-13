@@ -2,7 +2,9 @@
 //! person's escort quest is taken and its escort objective is still open. The escort is an ordinary `Player`
 //! (so enemies fight it, a priest could heal it and every client draws it) that is never saved, never joins a
 //! party and whose input is decided here: it walks the route in the NPC's definition at its own pace, waits when
-//! its owner falls behind, stands still while an enemy is fighting it, and wakes the ambushers the route passes.
+//! its owner falls behind, wakes the ambushers the route passes, and fights: while an enemy has picked the escort or
+//! its hero as its target, the escort leaves the route, attacks that enemy with its class's skills (the mercenaries'
+//! combat code) and walks on once no such enemy is left.
 //! Reaching the last waypoint completes the objective. If the escort or its owner dies, the owner leaves the zone
 //! for good, or the owner is left far behind, the journey fails: the escort is gone, the objective stays open and
 //! speaking to the stranded person again starts it over.
@@ -13,8 +15,8 @@ const WAIT_DISTANCE: f64 = 12.;
 /// An owner this far from the escort (or in another zone) for `LOST_SECONDS` is deemed to have abandoned it.
 const LOST_DISTANCE: f64 = 40.;
 const LOST_SECONDS: f64 = 20.;
-/// An enemy this close that has picked the escort as its target stops the walk.
-const ENGAGED: f64 = 3.5;
+/// An enemy this close to the escort that has picked the escort or its hero as its target is fought.
+const ASSIST: f64 = 14.;
 /// A waypoint is reached inside this distance.
 const ARRIVE: f64 = 0.8;
 /// How long the escort stays after safety before it walks off.
@@ -39,11 +41,16 @@ pub struct Escort {
     stuck: f64,
     reminded: f64,
     arrived: Option<f64>,
+    fighting: bool,
 }
 impl Escort {
-    /// Walking speed in tiles per second.
-    pub fn speed(&self) -> f64 {
-        self.speed
+    /// Walking speed in tiles per second on the route; None while fighting (the class's own speed applies).
+    pub fn speed(&self) -> Option<f64> {
+        (!self.fighting).then_some(self.speed)
+    }
+    /// Whether the escort has left its route to fight an enemy.
+    pub fn fighting(&self) -> bool {
+        self.fighting
     }
     /// Whether the journey has ended in safety (the escort lingers a moment before it walks off).
     #[cfg(test)]
@@ -128,6 +135,7 @@ impl World {
             stuck: 0.,
             reminded: self.time,
             arrived: None,
+            fighting: false,
         };
         let session_id = mercs::MERC_BASE + self.merc_seq;
         self.merc_seq += 1;
@@ -155,7 +163,7 @@ impl World {
         }
     }
 
-    fn escort_think(&mut self, session: u64) {
+    pub(super) fn escort_think(&mut self, session: u64) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
@@ -239,17 +247,43 @@ impl World {
                 .fired
                 .push(tag);
         }
-        let engaged = self.slimes.iter().any(|s| {
-            !s.dead
-                && s.zone == zone
-                && s.target == Some(session)
-                && s.point().distance(me) < ENGAGED + s.r
-        });
+        // Whoever has picked the escort or its hero is fought: the one already being fought first, else the nearest.
+        let current = self.players[&session].target;
+        let threat = self
+            .slimes
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| {
+                !s.dead
+                    && s.zone == zone
+                    && (s.target == Some(session) || (together && s.target == Some(owner)))
+                    && !matches!(s.state.as_str(), "idle" | "wander" | "return" | "waiting")
+                    && s.point().distance(me) < ASSIST + s.r
+            })
+            .min_by(|(a, x), (b, y)| {
+                (current != Some(*a), x.point().distance(me))
+                    .partial_cmp(&(current != Some(*b), y.point().distance(me)))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .map(|(id, _)| id);
+        if let Some(id) = threat {
+            let p = self.players.get_mut(&session).unwrap();
+            let escort = p.escort.as_mut().unwrap();
+            escort.fighting = true;
+            escort.stuck = 0.;
+            p.goal = None;
+            p.input = Point::default();
+            p.target = Some(id);
+            self.ai_combat(session, &[owner], Some(id));
+            return;
+        }
         let waiting = gap > WAIT_DISTANCE;
         let time = self.time;
         let p = self.players.get_mut(&session).unwrap();
         let escort = p.escort.as_mut().unwrap();
-        if engaged || waiting {
+        escort.fighting = false;
+        p.target = None;
+        if waiting {
             p.goal = None;
             p.input = Point::default();
             escort.stuck = 0.;

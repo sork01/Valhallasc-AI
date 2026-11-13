@@ -4234,7 +4234,9 @@ impl World {
         let mut dir = Point::default();
         let mut travel = 0.;
         let mut auto_attack = false;
-        let hired = p.merc.is_some() && p.escort.is_none() && !p.gauntlet;
+        // A fighting escort finds its way round walls to its enemy like a hired fighter.
+        let hired =
+            p.merc.is_some() && p.escort.as_ref().is_none_or(|e| e.fighting()) && !p.gauntlet;
         let mut navigation_goal = None;
         if self.time - p.input_at > 0.3 {
             p.input = Point::default();
@@ -4307,14 +4309,13 @@ impl World {
                 p.character.point().direction(point)
             });
         }
-        let mut distance = (p.escort.as_ref().map_or(
+        let mut distance = (p.escort.as_ref().and_then(|e| e.speed()).unwrap_or(
             p.character.look.class.speed()
                 * if p.character.mounted {
                     p.character.mount_speed()
                 } else {
                     1.
                 },
-            |e| e.speed(),
         ) * (1. + p.buff(BuffKind::Haste))
             * if p.daze > 0. { 0.5 } else { 1. }
             * TICK

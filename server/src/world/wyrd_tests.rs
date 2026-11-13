@@ -1135,7 +1135,7 @@ fn speaking_to_eydis_starts_the_escort_only_for_a_hero_who_took_the_quest() {
 }
 
 #[test]
-fn eydis_walks_the_route_waits_for_her_hero_and_stops_when_an_enemy_fights_her() {
+fn eydis_walks_the_route_waits_for_her_hero_and_fights_what_attacks_her() {
     let (mut w, _rx) = escort_world();
     take_escort_quest(&mut w);
     let session = start_escort(&mut w);
@@ -1157,38 +1157,104 @@ fn eydis_walks_the_route_waits_for_her_hero_and_stops_when_an_enemy_fights_her()
         moved > 15. && moved < 30.,
         "10 s of walking at 2.5 per second: {moved}"
     );
-    // an enemy who has taken her as its target stops her where she stands
+    // an enemy who has taken her as its target is fought: she leaves the route, hurts it and walks on when it is dead
+    // (the walk may have woken an ambush: this test is about the one boar)
+    calm(&mut w);
+    let id = escort_boar(&mut w, session, session);
+    let hp = w.slimes[id].hp;
+    let frozen = w.players[&session].character.point();
+    for _ in 0..200 {
+        let there = w.players[&session].character.point();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = there.x - 1.;
+        c.y = there.y;
+        if w.slimes[id].dead || w.slimes[id].hp < hp {
+            break;
+        }
+        w.slimes[id].atk_cd = 99.;
+        w.slimes[id].target = Some(session);
+        w.slimes[id].state = "chase".into();
+        w.step();
+    }
+    assert!(
+        w.slimes[id].dead || w.slimes[id].hp < hp,
+        "she attacks the enemy that fights her: {} of {hp}",
+        w.slimes[id].hp
+    );
+    assert!(
+        w.players[&session].character.point().distance(frozen) < 6.,
+        "she stays to fight instead of walking on"
+    );
+    w.slimes[id].dead = true;
+    w.slimes[id].respawn = 1e9;
+    let frozen = w.players[&session].character.point();
+    walk_together(&mut w, session, 3.);
+    assert!(
+        !w.players[&session].escort.as_ref().unwrap().fighting(),
+        "the fight is over"
+    );
+    assert!(
+        w.players[&session].character.point().distance(frozen) > 3.,
+        "and she walks on once it is gone"
+    );
+}
+
+/// A living boar beside the escort that has picked `target`.
+fn escort_boar(w: &mut World, escort: u64, target: u64) -> usize {
     let id = w
         .slimes
         .iter()
         .position(|s| s.zone == WYRD && s.kind == "boar")
         .unwrap();
-    let here = w.players[&session].character.point();
+    let here = w.players[&escort].character.point();
     w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 21);
-    w.slimes[id].x = here.x + 1.5;
+    w.slimes[id].x = here.x + 3.;
     w.slimes[id].y = here.y;
-    w.slimes[id].target = Some(session);
+    (w.slimes[id].hx, w.slimes[id].hy) = (w.slimes[id].x, w.slimes[id].y);
+    w.slimes[id].target = Some(target);
     w.slimes[id].state = "chase".into();
-    let frozen = w.players[&session].character.point();
-    for _ in 0..30 {
-        let there = w.players[&session].character.point();
-        let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.x = there.x - 1.;
-        c.y = there.y;
+    id
+}
+
+#[test]
+fn escort_assist_eydis_attacks_an_enemy_that_goes_for_her_hero_and_ignores_one_that_fights_nobody()
+{
+    let (mut w, _rx) = escort_world();
+    take_escort_quest(&mut w);
+    let session = start_escort(&mut w);
+    walk_together(&mut w, session, 6.);
+    // an enemy with no quarrel is left alone and the walk goes on
+    let id = escort_boar(&mut w, session, session);
+    w.slimes[id].target = None;
+    w.slimes[id].state = "idle".into();
+    w.slimes[id].atk_cd = 99.;
+    let hp = w.slimes[id].hp;
+    w.escort_think(session);
+    assert!(!w.players[&session].escort.as_ref().unwrap().fighting());
+    assert_eq!(w.players[&session].target, None);
+    assert_eq!(w.slimes[id].hp, hp);
+    // the same enemy goes for the hero: she turns on it
+    let start = w.players[&session].character.point();
+    for _ in 0..60 {
+        if w.slimes[id].dead {
+            break;
+        }
         w.slimes[id].atk_cd = 99.;
-        w.slimes[id].target = Some(session);
-        w.step();
+        w.slimes[id].target = Some(1);
         w.slimes[id].state = "chase".into();
+        (w.slimes[id].x, w.slimes[id].y) = (start.x + 3., start.y);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        (c.x, c.y) = (start.x + 1., start.y + 1.);
+        w.step();
+        if !w.slimes[id].dead {
+            assert!(w.players[&session].escort.as_ref().unwrap().fighting());
+            assert_eq!(w.players[&session].target, Some(id));
+        }
     }
     assert!(
-        w.players[&session].character.point().distance(frozen) < 0.8,
-        "she holds still while she is fought"
-    );
-    w.slimes[id].dead = true;
-    walk_together(&mut w, session, 3.);
-    assert!(
-        w.players[&session].character.point().distance(frozen) > 3.,
-        "and walks on once it is gone"
+        w.slimes[id].dead || w.slimes[id].hp < hp,
+        "she helps her hero: {} of {hp}",
+        w.slimes[id].hp
     );
 }
 
