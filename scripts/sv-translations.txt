@@ -9872,5 +9872,7 @@
   "Town Guard": "Stadsvakt",
   "Recommended stats": "Rekommenderade attribut",
   "Spend stat points?": "Spendera attributpoäng?",
-  "Spend 1 point?": "Spendera 1 poäng?"
+  "Spend 1 point?": "Spendera 1 poäng?",
+  "Buff": "Förstärkning",
+  "Debuff": "Försvagning"
 }

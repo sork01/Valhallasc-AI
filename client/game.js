@@ -691,11 +691,11 @@
     title.querySelector('b').textContent = away ? s.area : inCity ? (s.hub && s.hub !== 'Alderhaven' ? s.hub : 'Alderhaven · Fountain Square') : s.area !== 'Greenmeadow' ? s.area : t('areaName');
     title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : s.area !== 'Greenmeadow' ? 'Greenmeadow' : '푸른 초원';
     const statuses = [
-      { id: 'daze', left: s.daze, time: 4, name: 'Dazed', icon: 'starfall', description: 'Movement speed is reduced by 50%.' },
-      { id: 'stun', left: s.stun, time: 3, name: 'Stunned', icon: 'starfall', description: 'Cannot move, attack or cast.' },
-      { id: 'root', left: s.root, time: 3, name: 'Rooted', icon: 'storm', description: 'Cannot move or dash.' },
-      { id: 'wound', left: s.woundLeft, time: 10, name: 'Wounded', icon: 'cuts', description: 'Healing received is reduced by 50%.' },
-      { id: 'resurrection_sickness', left: s.resurrectionSickness, time: 600, name: 'Resurrection Sickness', short: 'Sickness', icon: 'cuts', description: 'All stats are reduced to 25%.' },
+      { id: 'daze', left: s.daze, time: 4, name: 'Dazed', icon: 'starfall', description: 'Movement speed is reduced by 50%.', debuff: true },
+      { id: 'stun', left: s.stun, time: 3, name: 'Stunned', icon: 'starfall', description: 'Cannot move, attack or cast.', debuff: true },
+      { id: 'root', left: s.root, time: 3, name: 'Rooted', icon: 'storm', description: 'Cannot move or dash.', debuff: true },
+      { id: 'wound', left: s.woundLeft, time: 10, name: 'Wounded', icon: 'cuts', description: 'Healing received is reduced by 50%.', debuff: true },
+      { id: 'resurrection_sickness', left: s.resurrectionSickness, time: 600, name: 'Resurrection Sickness', short: 'Sickness', icon: 'cuts', description: 'All stats are reduced to 25%.', debuff: true },
     ].filter(b => b.left > 0 && s.hp > 0).map(b => ({ ...b, kind: 'status' }));
     if ($('ghost-resurrect')) $('ghost-resurrect').disabled = !s.ghost || !s.corpseInRange;
     if ($('ghost-sub')) {
@@ -745,34 +745,106 @@
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
     clearTimeout(luTimer); luTimer = setTimeout(() => { luBanner.hidden = true; luBanner.classList.remove('show'); luFlash.classList.remove('show'); }, calm ? 3200 : 5200);
   }
+  let buffTip = null, buffTipState = null;
+  function formatBuffRemaining(b) {
+    const seconds = Math.max(0, Math.ceil(b.left));
+    const span = (b.id === 'festivalspirit' || b.id === 'resurrection_sickness' || seconds >= 60)
+      ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : `${seconds}s`;
+    const translate = window.Locale?.translate || (text => text);
+    return translate(`${span} remaining`);
+  }
+  function suppressNativeTitle(chip, on) {
+    if (on) { if (chip.hasAttribute('title')) { chip.dataset.nativeTitle = chip.getAttribute('title'); chip.removeAttribute('title'); } }
+    else if (chip.dataset.nativeTitle !== undefined && !chip.hasAttribute('title')) { chip.setAttribute('title', chip.dataset.nativeTitle); delete chip.dataset.nativeTitle; }
+  }
+  function positionBuffTooltip(anchor) {
+    if (!buffTip || buffTip.hidden) return;
+    const r = anchor.getBoundingClientRect(), tr = buffTip.getBoundingClientRect();
+    const top = r.bottom + 8 + tr.height <= innerHeight - 8 ? r.bottom + 8 : Math.max(8, r.top - tr.height - 8);
+    buffTip.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.left)) + 'px';
+    buffTip.style.top = Math.max(8, Math.min(innerHeight - tr.height - 8, top)) + 'px';
+  }
+  function hideBuffTooltip() {
+    if (buffTipState?.chip) suppressNativeTitle(buffTipState.chip, false);
+    buffTipState = null;
+    if (buffTip) buffTip.hidden = true;
+  }
+  function showBuffTooltip(chip, b, pinned = false) {
+    if (document.querySelector('.stage')?.classList.contains('ui-editing')) return;
+    if (b.id === 'festivalspirit' && !chip.querySelector('.festival-buff-detail')?.hidden) { hideBuffTooltip(); return; }
+    if (!buffTip) { buffTip = el('div', { id: 'buff-tooltip', class: 'item-tooltip buff-tooltip', role: 'tooltip', hidden: true }); document.body.append(buffTip); }
+    const translate = window.Locale?.translate || (text => text);
+    const meta = chip._buffMeta || {};
+    const timeEl = el('small', { class: 'buff-tooltip-time', text: formatBuffRemaining(b) });
+    const parts = [el('b', { text: meta.name || translate(b.id) }), el('small', { class: 'buff-tooltip-type', text: translate(meta.polarity === 'debuff' ? 'Debuff' : 'Buff') })];
+    if (meta.description) parts.push(el('p', { text: meta.description }));
+    parts.push(timeEl);
+    if (buffTipState?.chip && buffTipState.chip !== chip) suppressNativeTitle(buffTipState.chip, false);
+    suppressNativeTitle(chip, true);
+    buffTip.dataset.polarity = meta.polarity || 'buff';
+    buffTip.replaceChildren(...parts);
+    buffTip.hidden = false;
+    buffTipState = { id: b.id, chip, timeEl, pinned };
+    positionBuffTooltip(chip);
+  }
+  document.addEventListener('pointerdown', e => {
+    if (buffTipState?.pinned && !buffBar.contains(e.target)) hideBuffTooltip();
+  });
   function renderBuffs(list) {
-    const key = `${Field.hero?.maxHp || 0}:${list.map(b => b.id).join()}`;
+    const key = `${Field.hero?.maxHp || 0}:${list.map(b => `${b.id}:${b.debuff ? 1 : 0}`).join()}`;
     if (buffBar.dataset.key !== key) {
+      const openId = buffTipState?.id, wasPinned = !!buffTipState?.pinned;
       buffBar.dataset.key = key;
       buffBar.replaceChildren(...list.map(b => {
         const food = WORLD_ITEMS.find(k => k.id === b.id), def = b.kind === 'status' ? b : WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: Inventory.effect(food) });
         const translate = window.Locale?.translate || (text => text);
         const name = translate(def?.name || b.id);
         const description = translate(def?.description || '');
-        const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${name}: ${description}` }), glyph = el('span', { class: 'skill-icon' });
+        const polarity = b.debuff ? 'debuff' : 'buff';
+        const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, 'data-polarity': polarity, title: `${name}: ${description}` }), glyph = el('span', { class: 'skill-icon' });
+        chip.tabIndex = 0;
+        chip._buffMeta = { name, description, polarity, current: b };
         glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph);
         if (b.kind === 'status') chip.append(el('b', { text: translate(b.short || b.name) }));
         chip.append(el('i'));
+        chip.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch') showBuffTooltip(chip, chip._buffMeta.current, false); });
+        chip.addEventListener('pointerleave', () => { if (buffTipState?.chip === chip && !buffTipState.pinned) hideBuffTooltip(); else suppressNativeTitle(chip, false); });
+        chip.addEventListener('focus', () => showBuffTooltip(chip, chip._buffMeta.current, false));
+        chip.addEventListener('blur', () => { if (buffTipState?.chip === chip) hideBuffTooltip(); else suppressNativeTitle(chip, false); });
+        if (b.id !== 'festivalspirit') {
+          chip.addEventListener('click', e => {
+            if (e.pointerType === 'mouse' && buffTipState?.chip === chip && !buffTipState.pinned) return;
+            if (buffTipState?.chip === chip && buffTipState.pinned) hideBuffTooltip();
+            else showBuffTooltip(chip, chip._buffMeta.current, true);
+          });
+        }
         if(b.id==='festivalspirit'){
-          chip.tabIndex=0;chip.setAttribute('role','button');chip.setAttribute('aria-expanded','false');
+          chip.setAttribute('role','button');chip.setAttribute('aria-expanded','false');
           const detail=el('span',{class:'festival-buff-detail',text:`${name}: ${description}`});detail.hidden=true;chip.append(detail);
-          const toggle=()=>{detail.hidden=!detail.hidden;chip.setAttribute('aria-expanded',String(!detail.hidden));};
+          const toggle=()=>{detail.hidden=!detail.hidden;chip.setAttribute('aria-expanded',String(!detail.hidden));if(!detail.hidden)hideBuffTooltip();};
           chip.addEventListener('click',toggle);chip.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}else if(e.key==='Escape'){detail.hidden=true;chip.setAttribute('aria-expanded','false');}});
         }
         return chip;
       }));
+      if (openId) {
+        const nextChip = [...buffBar.children].find(c => c.dataset.buff === openId);
+        const nextBuff = list.find(x => x.id === openId);
+        if (nextChip && nextBuff) showBuffTooltip(nextChip, nextBuff, wasPinned);
+        else hideBuffTooltip();
+      }
     }
     for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) {
+      if (chip._buffMeta) chip._buffMeta.current = b;
       const seconds = Math.ceil(b.left), label = b.kind === 'status' ? `${b.name} · ${seconds}s` : '';
       chip.querySelector('i').textContent = (b.id === 'festivalspirit' || b.id === 'resurrection_sickness') ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : b.kind === 'status' ? `${seconds}s` : seconds;
       if (label) chip.setAttribute('aria-label', label);
       chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time)));
     } }
+    if (buffTipState) {
+      const b = list.find(x => x.id === buffTipState.id);
+      if (!b || !buffTipState.chip.isConnected) hideBuffTooltip();
+      else { buffTipState.timeEl.textContent = formatBuffRemaining(b); positionBuffTooltip(buffTipState.chip); }
+    }
   }
   function noiseBurst(dur, f0, f1, vol, q = 1.2, type = 'bandpass') {
     if (!save.sound) return;
@@ -1122,7 +1194,7 @@
       window.Settings?.applyScale?.();
     }
   }
-  function setPause(on) { window.Attributes?.close?.(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
+  function setPause(on) { window.Attributes?.close?.(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); hideBuffTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
     mage.set(c);

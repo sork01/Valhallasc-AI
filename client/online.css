@@ -467,16 +467,22 @@
 
 /* ---- active effects ---- */
 .buff-bar { position: absolute; left: 1.4cqw; top: 10.8cqw; z-index: 20; display: flex; gap: .5cqw; pointer-events: none; }
-.buff-chip { --left: 1; position: relative; width: 3.6cqw; height: 3.6cqw; border-radius: .6cqw; border: .2cqw solid #cfb179; background: #0d1a2cd9; color: #ffe1a0; box-shadow: 0 0 1cqw var(--buff, #0006); }
-.buff-chip::after { content: ''; position: absolute; inset: 0; border-radius: .4cqw; background: #080e22a8; transform: scaleY(calc(1 - var(--left))); transform-origin: top; }
-.buff-chip .skill-icon { position: absolute; inset: 14% 14% 24%; z-index: 1; }
-.buff-chip i { position: absolute; z-index: 2; left: 0; right: 0; bottom: .1cqw; font: normal max(9px, .9cqw) 'Jua', sans-serif; text-align: center; color: #fff; text-shadow: 0 1px 2px #000; }
-.buff-chip[data-kind="damage"] { --buff: #ff9a3a; border-color: #ff9a3a; } .buff-chip[data-kind="shield"] { --buff: #59a8ff; border-color: #59a8ff; }
-.buff-chip[data-kind="status"] { --buff: #ffb877; border-color: #ffb877; width: 6.5cqw; }
+.buff-chip { --left: 1; position: relative; width: 3.6cqw; height: 3.6cqw; border-radius: .6cqw; border: .2cqw solid #f0c954; background: #0d1a2cd9; color: #ffe1a0; box-shadow: 0 0 1cqw var(--buff, #f0c95444); pointer-events: auto; cursor: help; }
+.buff-chip:focus-visible { outline: 2px solid #ffdc87; outline-offset: 2px; }
+.buff-chip::after { content: ''; position: absolute; inset: 0; border-radius: .4cqw; background: #080e22a8; transform: scaleY(calc(1 - var(--left))); transform-origin: top; pointer-events: none; }
+.buff-chip .skill-icon { position: absolute; inset: 14% 14% 24%; z-index: 1; pointer-events: none; }
+.buff-chip i { position: absolute; z-index: 2; left: 0; right: 0; bottom: .1cqw; font: normal max(9px, .9cqw) 'Jua', sans-serif; text-align: center; color: #fff; text-shadow: 0 1px 2px #000; pointer-events: none; }
+.buff-chip[data-kind="status"] { width: 6.5cqw; }
 .buff-chip[data-kind="status"] .skill-icon { inset: 12% auto 12% 4%; width: 2.2cqw; }
-.buff-chip[data-kind="status"] b { position: absolute; z-index: 2; left: 2.3cqw; right: .2cqw; top: .55cqw; font: normal max(9px, .85cqw) 'Jua', sans-serif; text-align: center; }
+.buff-chip[data-kind="status"] b { position: absolute; z-index: 2; left: 2.3cqw; right: .2cqw; top: .55cqw; font: normal max(9px, .85cqw) 'Jua', sans-serif; text-align: center; pointer-events: none; }
 .buff-chip[data-kind="status"] i { left: 2.3cqw; }
-.buff-chip[data-kind="haste"] { --buff: #ffe45a; border-color: #ffe45a; } .buff-chip[data-kind="dodge"] { --buff: #b9a8ff; border-color: #b9a8ff; } .buff-chip[data-kind="crit"] { --buff: #ff5c7a; border-color: #ff5c7a; }
+.buff-chip[data-polarity="buff"] { --buff: #f0c95466; border-color: #f0c954; }
+.buff-chip[data-polarity="debuff"] { --buff: #e6494988; border-color: #e64949; color: #ffd4d4; }
+.buff-tooltip[data-polarity="buff"] { border: 2px solid #f0c954; box-shadow: 0 5px 22px #000b, 0 0 12px #f0c95433; }
+.buff-tooltip[data-polarity="buff"] b, .buff-tooltip[data-polarity="buff"] .buff-tooltip-type { color: #ffe082; }
+.buff-tooltip[data-polarity="debuff"] { border: 2px solid #e64949; box-shadow: 0 5px 22px #000b, 0 0 12px #e6494944; }
+.buff-tooltip[data-polarity="debuff"] b, .buff-tooltip[data-polarity="debuff"] .buff-tooltip-type { color: #ff8a8a; }
+.buff-tooltip .buff-tooltip-time { margin-top: 2px; color: #b9baa9; }
 
 /* ---- Friends and party ---- */
 .social-open { position: absolute; right: 1.5cqw; bottom: calc(1cqw + 5.1cqw * var(--ui, .8)); z-index: 21; width: 4.8cqw; height: 5.1cqw; border: 2px solid #a88e5e; border-radius: .3cqw; background: linear-gradient(#4b4333, #171c1b); color: #e6cd98; cursor: pointer; box-shadow: 0 .3cqw .8cqw #0009; }
@@ -602,6 +608,7 @@
 .stage.ui-editing [data-ui][hidden] { display: block !important; }
 .stage.ui-editing #party-frame:empty, .stage.ui-editing #quest-tracker:empty { min-height: 3cqw; }
 .stage.ui-editing #buff-bar:empty { min-width: 8cqw; min-height: 3.4cqw; }
+.stage.ui-editing .buff-chip { pointer-events: none; }
 
 /* Food and potion quick slots, left of the skillbar's row, below the chat. */
 /* A child of the skillbar: it sits on the bar's top edge and follows its position, scale and width. The gap is divided by --ui because the bar's own scale applies to it; left -1px lines its outer edge up with the skillbar's border. */
@@ -612,7 +619,6 @@
 .quick-slot[data-kind="potion"]:not([data-item=""]) { color: #ff8aa0; }
 .quick-slot[data-kind="mana"]:not([data-item=""]) { color: #85baff; }
 .quick-count { position: absolute; z-index: 3; right: .3cqw; top: .2cqw; font: max(10px, .9cqw) 'Jua', sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
-.buff-chip[data-kind="regen"] { --buff: #58d68d; border-color: #58d68d; }
 .stage.ui-editing #quickuse:empty { min-width: 8cqw; min-height: 5cqw; }
 @media (pointer: coarse) { .quick-slot { min-width: 44px; min-height: 44px; } }
 

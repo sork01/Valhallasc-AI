@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.51.1",
+    "date": "2026-11-13",
+    "new": [
+      "Hovering over active buffs and debuffs now opens a tooltip showing what each effect does and how much time remains."
+    ],
+    "changed": [
+      "Buffs and their tooltips now have a gold border, while debuffs and their tooltips have a red border."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.51.0",
     "date": "2026-11-13",
     "new": [
