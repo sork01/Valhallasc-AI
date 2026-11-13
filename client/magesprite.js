@@ -705,8 +705,9 @@
     draw(g, h, t, scale = 1.3) {
       scale *= this.meta.displayScale || 1;
       const C = this.meta.clips;
+      const dying = h.dead && !h.ghost;
       let clip = 'idle', i = Math.floor(t * C.idle.fps) % C.idle.n;
-      if (h.dead) { clip = 'die'; i = Math.floor(h.deadT * C.die.fps); }
+      if (dying || h.corpse) { clip = 'die'; i = h.corpse ? C.die.n - 1 : Math.floor(h.deadT * C.die.fps); }
       else if (h.hurtT > 0) { clip = 'hurt'; i = Math.floor((1 - h.hurtT / .25) * C.hurt.n); }
       else if (h.atkT > 0) { clip = 'attack'; i = Math.floor(h.atkT / this.meta.attack.duration * C.attack.n); }
       else if (h.moving) { clip = 'walk'; i = Math.floor(h.walk) % C.walk.n; }
@@ -715,7 +716,7 @@
       if (dance) { clip = 'walk'; i = dance.frame % C.walk.n; dir = (dir + dance.turn + 8) % 8; }
       const [ax, ay] = this.meta.anchor;
       g.save(); g.imageSmoothingEnabled = false;
-      if (h.dead && !h.fallen) g.globalAlpha *= Math.max(0, Math.min(1, (3.2 - h.deadT) / .6));
+      if (h.dead && h.ghost) g.globalAlpha *= .45;
       g.scale(scale, scale);
       const mark = !h.dead && dungeonMark(this.equipment);
       if (mark) dungeonAura(g, mark, t);

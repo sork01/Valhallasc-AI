@@ -1,4 +1,5 @@
 [
+  "grayscale(100%) contrast(1.06) brightness(0.88)",
   "Narration unavailable",
   "(pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px)",
   "[data-quest-pane]",

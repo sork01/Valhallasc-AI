@@ -192,8 +192,11 @@ impl World {
                 }
                 let c = &mut p.character;
                 c.hp = hp.min(c.max_hp());
+                c.corpse = None;
+                c.ghost = false;
                 p.dead_time = 0.;
                 p.fallen = false;
+                p.pack_death = false;
                 json!({"hp":c.hp,"maxHp":c.max_hp()})
             }
             DebugCommand::Die => {
@@ -206,6 +209,7 @@ impl World {
                 p.attack = 0.;
                 p.buffs.clear();
                 p.stop();
+                p.mark_corpse(point);
                 p.apply_death_penalty();
                 self.event("death", &actor, point, 0., false);
                 self.save();

@@ -416,8 +416,19 @@ fn mana_survives_resume_while_rage_and_energy_reset_and_death_respawns_correctly
         assert_eq!(p.character.resource(), 0.);
         p.dead_time = 3.2;
         w.update_player(2);
+        assert!(w.players[&2].character.ghost);
+        assert_eq!(w.players[&2].character.resource(), 0.);
+        let corpse = w.players[&2].character.corpse.clone().unwrap();
+        let p = w.players.get_mut(&2).unwrap();
+        p.character.zone = corpse.zone;
+        p.character.x = corpse.x;
+        p.character.y = corpse.y;
+        w.update_player(2);
+        let p = &w.players[&2];
+        assert!(!p.character.ghost);
+        assert_eq!(p.character.hp, (p.character.max_hp() * 0.5).round().max(1.));
         assert_eq!(
-            w.players[&2].character.resource(),
+            p.character.resource(),
             if class == Class::Warrior { 0. } else { 100. }
         );
     }

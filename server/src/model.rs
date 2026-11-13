@@ -302,6 +302,13 @@ impl Look {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Corpse {
+    pub zone: usize,
+    pub x: f64,
+    pub y: f64,
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Character {
@@ -420,6 +427,12 @@ pub struct Character {
     /// The character's own store, the same in the five big cities (docs/bank.md, `crate::bank`).
     #[serde(default)]
     pub bank: crate::bank::Bank,
+    /// Where the fallen hero's physical body lies while running back as a ghost (`CORPSE-RUN-GHOST-RESPAWN`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub corpse: Option<Corpse>,
+    /// True once the fallen hero has released to the nearest graveyard/camp as a spirit until reaching `corpse`.
+    #[serde(default)]
+    pub ghost: bool,
 }
 /// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every mount uses the same 1.6× walking-speed multiplier.
 pub struct MountDef {
@@ -574,6 +587,8 @@ impl Character {
             mount_tint: 0,
             starters_granted: vec![],
             bank: Default::default(),
+            corpse: None,
+            ghost: false,
             landing: false,
         };
         c.seed_inventory();

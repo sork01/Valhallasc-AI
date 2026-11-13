@@ -41,7 +41,7 @@
       hunterLoading: 'Calling the Hunter…', hunterError: 'Hunter sprites could not load. Select Hunter again to retry.',
       hunterArmorNames: ['Simple cloth', 'Scout\u2019s Jerkin', 'Wildwarden Coat'], hunterWeaponNames: ['Empty hands', 'Hunter\u2019s Shortbow', 'Wildwarden Longbow'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
-      defeated: 'Defeated!', defeatedSub: 'You wake up back at the start…', defeatedWait: 'You have fallen. Wait for the fight to end.', lvl: 'Lv',
+      defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
       noGear: 'No gear', facingNames: ['Front', 'Front left', 'Left side', 'Back left', 'Back view', 'Back right', 'Right side', 'Front right'],
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
@@ -73,7 +73,7 @@
       hunterLoading: '사냥꾼 소환 중…', hunterError: '사냥꾼을 불러오지 못했습니다. 다시 선택해 주세요.',
       hunterArmorNames: ['기본 옷', '정찰병의 조끼', '와일드워든 코트'], hunterWeaponNames: ['맨손', '사냥꾼의 단궁', '와일드워든 장궁'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
-      defeated: '쓰러졌다!', defeatedSub: '시작 지점에서 깨어납니다…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', lvl: 'Lv',
+      defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
       noGear: '장비 없음', facingNames: ['정면', '왼쪽 앞', '왼쪽', '왼쪽 뒤', '뒷면', '오른쪽 뒤', '오른쪽', '오른쪽 앞'],
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
@@ -1044,7 +1044,9 @@
     if (name === 'levelup') levelBanner(data);
     if (name === 'rebirth') window.Rebirth?.celebrate(data);
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
-    if (name === 'death') $('dead-msg').hidden = false;
+    if (name === 'death') { $('dead-msg').hidden = !!Field.hero?.ghost; $('ghost-msg').hidden = !Field.hero?.ghost; }
+    if (name === 'ghost') { $('dead-msg').hidden = true; $('ghost-msg').hidden = false; }
+    if (name === 'unghost' || name === 'respawn') { $('ghost-msg').hidden = true; }
     if (name === 'respawn') $('dead-msg').hidden = true;
     // Down in a boss fight: the line says to wait for the fight instead of promising to wake at the start.
     if (name === 'fallen' || name === 'rallied' || name === 'respawn') {

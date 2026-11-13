@@ -1,5 +1,18 @@
 [
   {
+    "version": "Beta 1.49.0",
+    "date": "2026-11-13",
+    "new": [
+      "Dying now leaves your corpse where you fell and releases you as a see-through ghost at the nearest graveyard camp in a bleak black-and-white, misty world.",
+      "Follow the ghost compass arrow and corpse markers on the minimap and world map back to your body to resurrect there with 50% health.",
+      "While in Spirit Form, monsters ignore you and combat, skills and interactions remain disabled until you reclaim your body."
+    ],
+    "changed": [
+      "Releasing after death no longer teleports you straight back to town at full health."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.48.2",
     "date": "2026-11-13",
     "new": [

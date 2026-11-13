@@ -1,5 +1,11 @@
 {
   "Welcome to Veyrheim, hero.": "Välkommen till Veyrheim, hjälte.",
+  "Releasing your spirit…": "Frigör din ande…",
+  "Spirit Form": "Andeform",
+  "Return to your body to resurrect": "Återvänd till din kropp för att återuppstå",
+  "You are a ghost. Return to your body to resurrect.": "Du är ett spöke. Återvänd till din kropp för att återuppstå.",
+  "You resurrected at your corpse with half health.": "Du återuppstod vid ditt lik med halv hälsa.",
+  "Your Corpse": "Ditt lik",
   "Quest list": "Uppdragslista",
   "Select a quest from the list to read its story, objectives and rewards.": "Välj ett uppdrag i listan för att läsa berättelsen, målen och belöningarna.",
   "Dungeon loot": "Dungeonbyte",

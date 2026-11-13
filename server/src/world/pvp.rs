@@ -828,8 +828,10 @@ impl World {
             } else {
                 let p = self.players.get_mut(&defender_session).unwrap();
                 p.dead_time = 0.;
+                p.fallen = false;
                 p.buffs.clear();
                 p.stop();
+                p.mark_corpse(target_point);
                 p.pvp_flag = false;
                 self.event_with(
                     "death",

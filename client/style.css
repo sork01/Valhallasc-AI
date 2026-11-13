@@ -242,6 +242,12 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .dead-msg { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; background: radial-gradient(rgba(60, 0, 10, .2), rgba(20, 0, 8, .6)); pointer-events: none; }
 .dead-msg #dead-cause { margin-top: 1.2cqw; font-size: 2.8cqw; color: #ffd9a0; text-shadow: 0 .3cqw 0 #4a0a14; } .dead-msg #dead-cause[hidden] { display: none; }
 .dead-msg b { font-family: var(--display); font-weight: 400; font-size: 6cqw; color: #ff8a8a; text-shadow: 0 .4cqw 0 #4a0a14, 0 0 2cqw rgba(255, 80, 80, .6); } .dead-msg span { font-size: 2cqw; }
+.ghost-msg { position: absolute; left: 50%; top: 4.8cqw; transform: translateX(-50%); display: grid; gap: .2cqw; text-align: center; pointer-events: none; padding: .7cqw 1.8cqw; border-radius: 1.2cqw; background: rgba(12, 18, 28, .72); border: .16cqw solid rgba(170, 225, 255, .45); box-shadow: 0 .4cqw 1.4cqw rgba(0, 0, 0, .45); }
+.ghost-msg[hidden] { display: none; }
+.ghost-msg b { font-family: var(--display); font-weight: 400; font-size: 2.1cqw; color: #c8ebff; text-shadow: 0 .18cqw .4cqw #09111a; }
+.ghost-msg span { font-size: 1.3cqw; color: #e2f2ff; }
+.wm-corpse { position: absolute; width: 1.1cqw; height: 1.1cqw; margin: -.55cqw 0 0 -.55cqw; border-radius: 50%; background: #8cf0ff; border: .18cqw solid #0f1b2d; box-shadow: 0 0 .8cqw #8cf0ff; pointer-events: none; z-index: 4; }
+.wm-corpse[hidden] { display: none; }
 .pause { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(4, 8, 24, .6); z-index: 5; }
 .pause-panel { position: static; display: flex; flex-direction: column; gap: 1cqw; padding: 2.4cqw 4cqw; text-align: center; min-width: 26cqw; }
 .pause-panel h3 { margin: 0 0 .6cqw; font-family: var(--display); font-weight: 400; font-size: 2.6cqw; color: var(--gold); }

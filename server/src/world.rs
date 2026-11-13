@@ -549,7 +549,19 @@ struct Player {
     /// Frozen in amber by a boss mechanic: cannot move or act, and cannot be hurt, until the cocoon is broken.
     frozen: bool,
 }
+const CORPSE_RESURRECT_RANGE: f64 = 1.8;
+
 impl Player {
+    pub(super) fn mark_corpse(&mut self, at: Point) {
+        if self.merc.is_none() && self.ambient.is_none() && !self.gauntlet {
+            self.character.corpse = Some(Corpse {
+                zone: self.character.zone,
+                x: at.x,
+                y: at.y,
+            });
+            self.character.ghost = false;
+        }
+    }
     // Called once when hp reaches 0: a death wears the worn gear down (docs/durability.md) and costs no XP. Mercenaries
     // and ambient adventurers have no durability. The notice says what happened to the gear.
     fn apply_death_penalty(&mut self) {
@@ -584,8 +596,12 @@ impl Player {
         }
         if character.hp <= 0. {
             character.resource = Some(0.);
-        } else if character.look.class.resource_type() != "mana" {
-            character.reset_resource();
+        } else {
+            character.corpse = None;
+            character.ghost = false;
+            if character.look.class.resource_type() != "mana" {
+                character.reset_resource();
+            }
         }
         character.resource = Some(character.resource());
         let potion_cd = character.potion_cooldown_left();
@@ -694,6 +710,8 @@ impl Player {
         view["achievementTitle"] = json!(c.achievement_title());
         view["achievementTitlePosition"] = json!(c.achievement_title_position());
         view["achievementPoints"] = json!(c.achievement_points());
+        view["ghost"] = json!(c.hp <= 0. && c.ghost);
+        view["corpse"] = json!(c.corpse);
         view
     }
     fn is_hidden(&self) -> bool {
@@ -704,7 +722,7 @@ impl Player {
         let c = &self.character;
         json!({"id":c.id,"look":c.look,"zone":c.zone,"x":r2(c.x),"y":r2(c.y),"r":PLAYER_RADIUS,"hp":r2(c.hp),"maxHp":r2(c.max_hp()),
             "level":c.level,"fx":r2(self.face.x),"fy":r2(self.face.y),"moving":self.moving,"walk":r2(self.walk),"atkT":r2(self.attack),
-            "hurtT":r2(self.hurt),"dead":c.hp<=0.,"deadT":r2(self.dead_time),"fallen":c.hp<=0. && self.fallen,"dashT":r2(self.dash),
+            "hurtT":r2(self.hurt),"dead":c.hp<=0.,"ghost":c.hp<=0. && c.ghost,"deadT":r2(self.dead_time),"fallen":c.hp<=0. && self.fallen,"dashT":r2(self.dash),
             "buffs":self.buffs,"sparkTravel":c.spark_travel,"mount":c.mount,"mounted":c.mounted,"mountTint":c.mount_tint,
             "reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"pvpFlag":self.pvp_flag,"stun":r2(self.stun),
             "daze":r2(self.daze),"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":r2(self.absorb_left),
@@ -2463,6 +2481,30 @@ impl World {
         }
         out
     }
+    fn corpses_view(&self, zone: usize) -> Vec<Value> {
+        self.players
+            .values()
+            .filter_map(|p| {
+                if p.is_hidden() || p.character.hp > 0. {
+                    return None;
+                }
+                let cor = p.character.corpse.as_ref()?;
+                if cor.zone != zone || (!p.character.ghost && p.character.zone == zone) {
+                    return None;
+                }
+                Some(json!({
+                    "id": p.character.id,
+                    "name": p.character.look.name,
+                    "look": p.character.look,
+                    "zone": cor.zone,
+                    "x": r2(cor.x),
+                    "y": r2(cor.y),
+                    "fx": r2(p.face.x),
+                    "fy": r2(p.face.y),
+                }))
+            })
+            .collect()
+    }
     // What one client needs: its own zone's players, enemies, bolts and drops. Zones are separate maps, so
     // nothing about another zone is ever sent to this client.
     pub fn snapshot_for(&self, zone: usize) -> Value {
@@ -2476,6 +2518,7 @@ impl World {
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
         "weather":zone_weather,"seasons":self.seasonal.cached,"halloween":self.festival_view(seasonal_hunt::HALLOWEEN),"christmas":self.festival_view(seasonal_hunt::CHRISTMAS),"easter":self.festival_view(seasonal_hunt::EASTER),"solstice":self.festival_view(seasonal_hunt::SOLSTICE),"valentine":self.festival_view(seasonal_hunt::VALENTINE),"newyear":self.festival_view(seasonal_hunt::NEWYEAR),
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| self.player_view(*session, p)).collect::<Vec<_>>(),
+        "corpses":self.corpses_view(zone),
         "raidCrosses":self.raid_cross_view(zone),
         "slimes":self.slimes.iter().filter(|s| s.zone == zone && !idle).collect::<Vec<_>>(),
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
@@ -2500,9 +2543,12 @@ impl World {
             view["instance"] = json!({"cleared":instance.cleared});
             // A private copy is told it is the template zone, so a client has one dungeon whatever copy it stands in.
             if instance.template != zone {
-                for key in ["players", "slimes", "bolts", "ebolts", "drops", "chests"] {
+                for key in ["players", "slimes", "bolts", "ebolts", "drops", "chests", "corpses"] {
                     for item in view[key].as_array_mut().into_iter().flatten() {
                         item["zone"] = json!(instance.template);
+                        if key == "players" && item["corpse"].is_object() {
+                            item["corpse"]["zone"] = json!(instance.template);
+                        }
                     }
                 }
             }
@@ -2658,6 +2704,25 @@ impl World {
             && let Some(door) = self.maps[c.zone].portals.iter().find(|p| !p.after_clear)
         {
             (c.zone, c.x, c.y) = (door.to, door.tx, door.ty);
+        }
+        // If a character reconnects dead from an old instance or vanished zone, wake them at half HP at the safe arrival point.
+        if c.hp <= 0.
+            && (c.corpse.as_ref().is_some_and(|cor| {
+                cor.zone >= self.maps.len()
+                    || self.is_arena_zone(cor.zone)
+                    || (self.is_instance(cor.zone) && cor.zone != c.zone)
+            }) || (c.ghost && c.corpse.is_none()))
+        {
+            c.hp = (c.max_hp() * 0.5).round().max(1.);
+            c.corpse = None;
+            c.ghost = false;
+        }
+        if c.hp <= 0. && c.corpse.is_none() {
+            c.corpse = Some(Corpse {
+                zone: c.zone,
+                x: c.x,
+                y: c.y,
+            });
         }
         if self.maps[c.zone].players > 0 {
             c.mounted = false;
@@ -2859,10 +2924,11 @@ impl World {
                 p.input = Point::default();
             }
             ClientMessage::Target { id }
-                if self
-                    .slimes
-                    .get(id)
-                    .is_some_and(|s| !s.dead && s.zone == p.character.zone) =>
+                if p.character.hp > 0.
+                    && self
+                        .slimes
+                        .get(id)
+                        .is_some_and(|s| !s.dead && s.zone == p.character.zone) =>
             {
                 p.dance = None;
                 p.target = Some(id);
@@ -3658,6 +3724,64 @@ impl World {
             self.save();
         }
     }
+    fn nearest_graveyard(&self, zone: usize, death: Point, pack_death: bool) -> Point {
+        let map = &self.maps[zone];
+        let mut point = if self.is_instance(zone) {
+            self.instances
+                .iter()
+                .find(|i| i.zone == zone)
+                .and_then(|i| i.rally)
+                .filter(|_| !pack_death)
+                .unwrap_or(map.spawn)
+        } else {
+            let center = |c: &City| Point {
+                x: (c.x0 + c.x1) * 0.5,
+                y: (c.y0 + c.y1) * 0.5,
+            };
+            std::iter::once(map.spawn)
+                .chain(map.camps.iter().map(center))
+                .min_by(|a, b| a.distance(death).total_cmp(&b.distance(death)))
+                .unwrap_or(map.spawn)
+        };
+        map.collide(&mut point, PLAYER_RADIUS);
+        point
+    }
+    fn resurrect_at_corpse(&mut self, session: u64) {
+        let Some(p) = self.players.get(&session) else {
+            return;
+        };
+        let mut point = p
+            .character
+            .corpse
+            .as_ref()
+            .filter(|c| c.zone == p.character.zone)
+            .map_or_else(|| p.character.point(), |c| Point { x: c.x, y: c.y });
+        self.maps[p.character.zone].collide(&mut point, PLAYER_RADIUS);
+        let p = self.players.get_mut(&session).unwrap();
+        p.character.x = point.x;
+        p.character.y = point.y;
+        p.character.hp = (p.character.max_hp() * 0.5).round().max(1.);
+        p.character.reset_resource();
+        p.character.corpse = None;
+        p.character.ghost = false;
+        p.character.mounted = false;
+        p.combat_left = 0.;
+        p.dead_time = 0.;
+        p.fallen = false;
+        p.pack_death = false;
+        p.attack = 0.;
+        p.cooldown = 0.;
+        p.last_hurt = self.time;
+        p.stop();
+        let id = p.character.id.clone();
+        let _ = p.peer.try_send(json!({
+            "type": "notice",
+            "ok": true,
+            "text": "You resurrected at your corpse with half health."
+        }));
+        self.event("respawn", &id, point, 0., false);
+        self.save();
+    }
     fn update_player(&mut self, session: u64) {
         self.update_resource(session);
         let carry_speed = self.forge_carry_speed(session);
@@ -3718,6 +3842,63 @@ impl World {
             return;
         }
         if p.character.hp <= 0. {
+            if p.character.ghost && p.ambient.is_none() && p.merc.is_none() {
+                p.character.mounted = false;
+                p.target = None;
+                p.attack = 0.;
+                p.cooldown = 0.;
+                p.dash = 0.;
+                if let Some(corpse) = &p.character.corpse
+                    && corpse.zone == p.character.zone
+                    && p.character.point().distance(Point {
+                        x: corpse.x,
+                        y: corpse.y,
+                    }) <= CORPSE_RESURRECT_RANGE
+                {
+                    self.resurrect_at_corpse(session);
+                    return;
+                }
+                if self.time - p.input_at > 0.3 {
+                    p.input = Point::default();
+                }
+                let mut dir = Point::default();
+                let mut travel = 0.;
+                if p.input.x != 0. || p.input.y != 0. {
+                    dir = p.input;
+                    travel = f64::INFINITY;
+                } else if let Some(goal) = p.goal {
+                    travel = p.character.point().distance(goal);
+                    if travel < 0.12 {
+                        p.goal = None;
+                        travel = 0.;
+                    } else {
+                        dir = p.character.point().direction(goal);
+                    }
+                }
+                let distance = (p.character.look.class.speed() * TICK).min(travel);
+                p.moving = false;
+                if distance > 0. && (dir.x != 0. || dir.y != 0.) {
+                    let mut point = p.character.point();
+                    self.maps[p.character.zone].walk(&mut point, dir, distance, PLAYER_RADIUS);
+                    p.moving = point.distance(p.character.point()) > 1e-8;
+                    p.character.x = point.x;
+                    p.character.y = point.y;
+                    p.walk += TICK * 11.;
+                    p.face = dir;
+                }
+                if let Some(corpse) = &p.character.corpse
+                    && corpse.zone == p.character.zone
+                    && p.character.point().distance(Point {
+                        x: corpse.x,
+                        y: corpse.y,
+                    }) <= CORPSE_RESURRECT_RANGE
+                {
+                    self.resurrect_at_corpse(session);
+                    return;
+                }
+                self.use_portal(session);
+                return;
+            }
             p.moving = false;
             p.dead_time += TICK;
             p.stop();
@@ -3738,31 +3919,71 @@ impl World {
                 p.dead_time = 0.;
             }
             if p.dead_time >= 3.2 && !p.fallen {
-                let map = &self.maps[p.character.zone];
-                let rally = self
-                    .instances
-                    .iter()
-                    .find(|i| i.zone == p.character.zone)
-                    .and_then(|i| i.rally)
-                    .filter(|_| !p.pack_death)
-                    .unwrap_or(map.spawn);
-                let mut point = p.ambient.as_ref().map_or(rally, ambient::Ambient::hub);
-                map.collide(&mut point, PLAYER_RADIUS);
-                p.character.x = point.x;
-                p.character.y = point.y;
-                p.character.hp = p.character.max_hp();
-                p.character.reset_resource();
-                p.combat_left = 0.;
-                p.dead_time = 0.;
-                p.fallen = false;
-                p.pack_death = false;
-                p.attack = 0.;
-                p.cooldown = 0.;
-                if let Some(brain) = p.ambient.as_mut() {
-                    brain.on_respawn(self.time, point);
+                if p.ambient.is_some() || p.merc.is_some() {
+                    let map = &self.maps[p.character.zone];
+                    let rally = self
+                        .instances
+                        .iter()
+                        .find(|i| i.zone == p.character.zone)
+                        .and_then(|i| i.rally)
+                        .filter(|_| !p.pack_death)
+                        .unwrap_or(map.spawn);
+                    let mut point = p.ambient.as_ref().map_or(rally, ambient::Ambient::hub);
+                    map.collide(&mut point, PLAYER_RADIUS);
+                    p.character.x = point.x;
+                    p.character.y = point.y;
+                    p.character.hp = p.character.max_hp();
+                    p.character.reset_resource();
+                    p.character.corpse = None;
+                    p.character.ghost = false;
+                    p.combat_left = 0.;
+                    p.dead_time = 0.;
+                    p.fallen = false;
+                    p.pack_death = false;
+                    p.attack = 0.;
+                    p.cooldown = 0.;
+                    if let Some(brain) = p.ambient.as_mut() {
+                        brain.on_respawn(self.time, point);
+                    }
+                    let id = p.character.id.clone();
+                    self.event("respawn", &id, point, 0., false);
+                } else {
+                    let zone = p.character.zone;
+                    let death_point = p
+                        .character
+                        .corpse
+                        .as_ref()
+                        .filter(|c| c.zone == zone)
+                        .map_or_else(|| p.character.point(), |c| Point { x: c.x, y: c.y });
+                    if p.character.corpse.is_none() {
+                        p.character.corpse = Some(Corpse {
+                            zone,
+                            x: death_point.x,
+                            y: death_point.y,
+                        });
+                    }
+                    let pack_death = p.pack_death;
+                    let graveyard = self.nearest_graveyard(zone, death_point, pack_death);
+                    let p = self.players.get_mut(&session).unwrap();
+                    p.character.x = graveyard.x;
+                    p.character.y = graveyard.y;
+                    p.character.ghost = true;
+                    p.character.mounted = false;
+                    p.combat_left = 0.;
+                    p.dead_time = 0.;
+                    p.fallen = false;
+                    p.attack = 0.;
+                    p.cooldown = 0.;
+                    p.stop();
+                    let id = p.character.id.clone();
+                    let _ = p.peer.try_send(json!({
+                        "type": "notice",
+                        "ok": true,
+                        "text": "You are a ghost. Return to your body to resurrect."
+                    }));
+                    self.event("ghost", &id, graveyard, 0., false);
+                    self.save();
                 }
-                let id = p.character.id.clone();
-                self.event("respawn", &id, point, 0., false);
             }
             return;
         }
@@ -3979,7 +4200,10 @@ impl World {
     // Stepping into a portal disc moves the player; the zone is never client-chosen.
     fn use_portal(&mut self, session: u64) {
         let p = &self.players[&session];
-        if p.character.hp <= 0. || self.time - p.portal_at < PORTAL_DELAY || p.escort.is_some() {
+        if (p.character.hp <= 0. && !p.character.ghost)
+            || self.time - p.portal_at < PORTAL_DELAY
+            || p.escort.is_some()
+        {
             return;
         }
         let here = p.character.point();
@@ -4167,6 +4391,20 @@ impl World {
                 let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 return;
             }
+        }
+        if p.character.ghost
+            && ((self.is_instance(p.character.zone)
+                && p.character
+                    .corpse
+                    .as_ref()
+                    .is_some_and(|c| c.zone == p.character.zone))
+                || (self.maps[portal.to].copies > 0
+                    && p.character
+                        .corpse
+                        .as_ref()
+                        .is_none_or(|c| self.public_zone(c.zone) != self.public_zone(portal.to))))
+        {
+            return;
         }
         // A dungeon's door leads to a private copy: the party's own, or a free one.
         if self.maps[portal.to].copies > 0 && !internal_lift {
@@ -5906,6 +6144,7 @@ impl World {
             p.attack = 0.;
             p.buffs.clear();
             p.stop();
+            p.mark_corpse(point);
             p.apply_death_penalty();
         }
         self.event_with(
@@ -11634,11 +11873,20 @@ mod tests {
         let mut w = world();
         let _a = join(&mut w, 1, Class::Warrior);
         let _b = join(&mut w, 2, Class::Mage);
+        let camp = w.maps[0].spawn;
+        {
+            let a = w.players.get_mut(&1).unwrap();
+            a.character.x = camp.x;
+            a.character.y = camp.y;
+        }
         let occupied = w.players[&1].character.point();
         let p = w.players.get_mut(&2).unwrap();
+        p.character.x = camp.x;
+        p.character.y = camp.y;
         p.character.hp = 0.;
         p.dead_time = 3.2;
         w.update_player(2);
+        assert!(w.players[&2].character.ghost);
         assert!(same_cell(w.players[&2].character.point(), occupied));
         let enemy_spawn = w.maps[0].slimes[0].clone();
         w.players.get_mut(&1).unwrap().character.x = enemy_spawn.x;
@@ -12386,19 +12634,34 @@ mod tests {
         }
         w.update_player(1);
         assert_eq!(w.players[&1].character.zone, 0);
-        // Dying in the Crags brings you back at the Crags' own camp, healed.
+        // Dying in the Crags turns you into a ghost at the Crags' nearest camp/graveyard, and reaching your corpse brings you back at half HP.
+        let corpse_at = Point { x: 10., y: 10. };
+        let expected_graveyard = w.nearest_graveyard(1, corpse_at, false);
         {
             let p = w.players.get_mut(&1).unwrap();
             p.character.zone = 1;
-            p.character.x = 10.;
-            p.character.y = 10.;
+            p.character.x = corpse_at.x;
+            p.character.y = corpse_at.y;
             p.dead_time = 3.3;
         }
         w.update_player(1);
         let c = &w.players[&1].character;
         assert_eq!(c.zone, 1);
-        assert_eq!(c.hp, c.max_hp());
-        assert!(c.point().distance(w.maps[1].spawn) < 1.);
+        assert!(c.ghost);
+        assert_eq!(c.hp, 0.);
+        assert!(c.point().distance(expected_graveyard) < 1.);
+        // Reaching the corpse resurrects at half HP on the corpse.
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.x = corpse_at.x;
+            p.character.y = corpse_at.y;
+        }
+        w.update_player(1);
+        let c = &w.players[&1].character;
+        assert!(!c.ghost);
+        assert!(c.corpse.is_none());
+        assert_eq!(c.hp, (c.max_hp() * 0.5).round().max(1.));
+        assert!(c.point().distance(corpse_at) < 1.);
     }
 
     #[test]
@@ -15933,5 +16196,173 @@ mod tests {
         p.character.y = 10.;
         w.step();
         assert_eq!(w.players[&1].character.explored, Vec::<u16>::new());
+    }
+
+    #[test]
+    fn corpse_run_spawns_ghost_at_nearest_graveyard_and_resurrects_at_half_hp() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Mage);
+        let camp_city = w.maps[0]
+            .camps
+            .iter()
+            .max_by(|a, b| {
+                Point {
+                    x: (a.x0 + a.x1) * 0.5,
+                    y: (a.y0 + a.y1) * 0.5,
+                }
+                .distance(w.maps[0].spawn)
+                .total_cmp(
+                    &Point {
+                        x: (b.x0 + b.x1) * 0.5,
+                        y: (b.y0 + b.y1) * 0.5,
+                    }
+                    .distance(w.maps[0].spawn),
+                )
+            })
+            .expect("Greenmeadow has outlying camps")
+            .clone();
+        let camp = Point {
+            x: (camp_city.x0 + camp_city.x1) * 0.5,
+            y: (camp_city.y0 + camp_city.y1) * 0.5,
+        };
+        let death_at = (1..=40)
+            .filter_map(|dx| {
+                let pt = Point {
+                    x: camp_city.x1 + f64::from(dx),
+                    y: camp.y,
+                };
+                let mut check = pt;
+                w.maps[0].collide(&mut check, PLAYER_RADIUS);
+                (!w.maps[0].in_city(pt) && check.distance(pt) < 0.01).then_some(pt)
+            })
+            .next()
+            .expect("open ground outside camp");
+        w.time += 2.;
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.cutscene_until = 0.;
+            p.character.zone = 0;
+            p.character.x = death_at.x;
+            p.character.y = death_at.y;
+        }
+        w.hurt_player_by(1, 1e9, death_at, "slime", 1);
+        assert_eq!(w.players[&1].character.hp, 0.);
+        assert!(!w.players[&1].character.ghost);
+        assert_eq!(
+            w.players[&1].character.corpse.as_ref().map(|c| (c.zone, c.x, c.y)),
+            Some((0, death_at.x, death_at.y))
+        );
+
+        w.players.get_mut(&1).unwrap().dead_time = 3.2;
+        w.update_player(1);
+
+        let c = &w.players[&1].character;
+        assert!(c.ghost);
+        assert_eq!(c.hp, 0.);
+        assert!(
+            c.point().distance(camp) < 2. && camp.distance(w.maps[0].spawn) > 20.,
+            "ghost should spawn at nearest graveyard camp ({camp:?}), got {:?}",
+            c.point()
+        );
+
+        // Snapshot exposes ghost flag, personal corpse, and rendered corpse list.
+        let p_snap = w.players[&1].snapshot();
+        assert_eq!(p_snap["ghost"], true);
+        assert_eq!(p_snap["corpse"]["zone"], 0);
+        let snap = w.snapshot_for(0);
+        assert_eq!(
+            snap["corpses"].as_array().map(|a| a.len()),
+            Some(1),
+            "corpses list includes the ghost's own body"
+        );
+
+        // Ghost is peaceful: hostile enemies ignore it and attacks/mounts are ignored.
+        let ghost_pos = w.players[&1].character.point();
+        w.slimes[0].zone = 0;
+        w.slimes[0].dead = false;
+        w.slimes[0].hp = 60.;
+        w.slimes[0].x = ghost_pos.x + 1.;
+        w.slimes[0].y = ghost_pos.y;
+        w.slimes[0].hx = ghost_pos.x + 1.;
+        w.slimes[0].hy = ghost_pos.y;
+        w.slimes[0].target = Some(1);
+        w.slimes[0].state = "chase".into();
+        w.start_attack(1);
+        assert_eq!(w.players[&1].attack, 0.);
+        for _ in 0..5 {
+            w.step();
+        }
+        assert_ne!(w.slimes[0].target, Some(1));
+        assert!(w.players[&1].character.ghost);
+
+        // Ghost can walk via Move goal from Alderhaven spawn (250, 167) toward (242, 163).
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.x = w.maps[0].spawn.x;
+            p.character.y = w.maps[0].spawn.y;
+            p.character.ghost = true;
+            p.character.hp = 0.;
+        }
+        w.message(1, ClientMessage::Move { x: 242., y: 163. });
+        for _ in 0..20 {
+            w.step();
+        }
+        let moved_pt = w.players[&1].character.point();
+        assert!(
+            moved_pt.distance(w.maps[0].spawn) > 1.0,
+            "ghost should walk from spawn via Move goal, stayed at {moved_pt:?}"
+        );
+
+        // Moving to within CORPSE_RESURRECT_RANGE resurrects at corpse at half HP.
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: death_at.x,
+                y: death_at.y,
+            },
+        );
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.x = death_at.x - 1.0;
+            p.character.y = death_at.y;
+        }
+        w.update_player(1);
+        let c = &w.players[&1].character;
+        assert!(!c.ghost);
+        assert!(c.corpse.is_none());
+        assert_eq!(c.hp, (c.max_hp() * 0.5).round().max(1.));
+        assert!(c.point().distance(death_at) < 0.01);
+        let p_after = w.players[&1].snapshot();
+        assert_eq!(p_after["ghost"], false);
+        assert!(p_after["corpse"].is_null());
+        let snap_after = w.snapshot_for(0);
+        assert_eq!(snap_after["corpses"].as_array().map(|a| a.len()), Some(0));
+    }
+
+    #[test]
+    fn corpse_run_rejoining_with_missing_instance_corpse_recovers_safely() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.hp = 0.;
+            p.character.ghost = true;
+            p.character.corpse = Some(Corpse {
+                zone: 9999,
+                x: 25.,
+                y: 25.,
+            });
+            p.character.zone = 0;
+        }
+        w.leave(1);
+        let (tx2, _rx2) = mpsc::channel(256);
+        w.join(1, Some(token), None, tx2).unwrap();
+        let c = &w.players[&1].character;
+        assert!(!c.ghost);
+        assert!(c.corpse.is_none());
+        assert!(c.zone < w.maps.len());
+        assert_eq!(c.hp, (c.max_hp() * 0.5).round().max(1.));
     }
 }

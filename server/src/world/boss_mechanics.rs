@@ -1081,6 +1081,7 @@ impl World {
         p.attack = 0.;
         p.buffs.clear();
         p.stop();
+        p.mark_corpse(point);
         p.apply_death_penalty();
         let text = bm::death_message(ability, false);
         let _ = p.peer.try_send(json!({"type":"system","text":text}));

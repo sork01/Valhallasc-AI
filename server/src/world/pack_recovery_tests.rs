@@ -74,7 +74,8 @@ impl Rig {
     fn respawn_owner(&mut self) {
         self.w.players.get_mut(&1).unwrap().dead_time = 3.2;
         self.w.update_player(1);
-        assert!(self.w.players[&1].character.hp > 0.);
+        assert!(self.w.players[&1].character.ghost);
+        assert!(self.w.players[&1].character.corpse.is_some());
     }
 }
 
@@ -180,6 +181,15 @@ fn pack_recovery_survivors_finish_the_pull_then_rejoin_the_hirer() {
     }
     r.w.update_pack_fights();
     assert!(!r.w.pack_fights.contains_key(&r.zone));
+    let corpse = r.w.players[&1].character.corpse.clone().unwrap();
+    {
+        let p = r.w.players.get_mut(&1).unwrap();
+        p.character.zone = corpse.zone;
+        p.character.x = corpse.x;
+        p.character.y = corpse.y;
+    }
+    r.w.update_player(1);
+    assert!(r.w.players[&1].character.hp > 0.);
     for &session in &r.mercs {
         r.w.players.get_mut(&session).unwrap().combat_left = 0.;
     }

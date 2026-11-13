@@ -1327,12 +1327,13 @@
     return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
   };
   function newHero() {
-    return { x: SPAWN.x, y: SPAWN.y, r: .3, hp: 120, maxHp: 120, level: 1, xp: 0, gold: 0, kills: 0, fx: 1, fy: 1, moving: false, walk: 0, atkT: 0, atkCd: 0, atkHit: false, hurtT: 0, lastHurt: -99, dead: false, deadT: 0, target: null, goal: null, vx: 0, vy: 0, roar: 0, dashT: 0, dashCd: 0, dashX: 0, dashY: 0, dashTrail: 0 };
+    return { x: SPAWN.x, y: SPAWN.y, r: .3, hp: 120, maxHp: 120, level: 1, xp: 0, gold: 0, kills: 0, fx: 1, fy: 1, moving: false, walk: 0, atkT: 0, atkCd: 0, atkHit: false, hurtT: 0, lastHurt: -99, dead: false, ghost: false, corpse: null, deadT: 0, target: null, goal: null, vx: 0, vy: 0, roar: 0, dashT: 0, dashCd: 0, dashX: 0, dashY: 0, dashTrail: 0 };
   }
+  let corpses = []; const corpseSprites = new Map();
   function reset() {
     pendingNpc = null; pendingChest = null; cityRoute = [];
     window.Quests?.reset(); window.WorldMap?.reset(); explored = [];
-    hero = newHero(); drops = []; chests = []; signs = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
+    hero = newHero(); drops = []; chests = []; signs = []; corpses = []; corpseSprites.clear(); floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     touchDirection = [0, 0]; keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
@@ -1414,21 +1415,24 @@
   const SIGN_W = 28, SIGN_TOP = 70;   // the clickable body of a boss sign, in screen pixels
   function onPointerDown(e) {
     window.WorldFeedback?.leave();
-    if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel) return;
+    const ghostWalking = !!(hero.dead && hero.ghost);
+    if (!running || paused || !Online.connected || (hero.dead && !ghostWalking) || hero.sparkTravel) return;
     pendingNpc = null; pendingChest = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
-    if (window.RaidKey?.click(mx,my,w2s)) return;
-    const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
-    if (npc) { talkTo(npc); return; }
-    const sign = signs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<=SIGN_W && my>=y-SIGN_TOP && my<=y+10; });
-    if (sign) { talkTo(sign); return; }
-    const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27*CHEST_SCALE && my>=y-37*CHEST_SCALE && my<=y+7*CHEST_SCALE; });
-    if (chest) { openChest(chest); return; }
-    const portal = pickPortal(mx, my); if (portal) { visitPortal(portal); return; }
+    if (!ghostWalking) {
+      if (window.RaidKey?.click(mx,my,w2s)) return;
+      const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
+      if (npc) { talkTo(npc); return; }
+      const sign = signs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<=SIGN_W && my>=y-SIGN_TOP && my<=y+10; });
+      if (sign) { talkTo(sign); return; }
+      const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27*CHEST_SCALE && my>=y-37*CHEST_SCALE && my<=y+7*CHEST_SCALE; });
+      if (chest) { openChest(chest); return; }
+      const portal = pickPortal(mx, my); if (portal) { visitPortal(portal); return; }
+    }
     pointer.down = true; if (Number.isInteger(e.pointerId)) cv.setPointerCapture?.(e.pointerId);
     rememberPointer(e); const { x: wx, y: wy } = pointer;
-    const s = pickSlime(mx, my, wx, wy);
-    const rival = !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
+    const s = ghostWalking ? null : pickSlime(mx, my, wx, wy);
+    const rival = !ghostWalking && !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
     if (s) Field.targetEnemy(s.id);
     else if (rival) { pointer.down = false; hero.pvpTargetId = rival.id; hero.target = null; hero.goal = null; }
     else { hero.pvpTargetId = null; hero.target = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
@@ -1670,7 +1674,7 @@
     if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
     const selectedTarget = own.danceT != null ? null : hero.target?.id;
     if (own.danceT != null && hero.danceT == null) { Field.clearInput(); hero.goal = null; hero.pvpTargetId = null; }
-    const wasDead = hero.dead, wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
+    const wasDead = hero.dead, wasGhost = !!(hero.dead && hero.ghost), wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || (moved && !seamShift) || !!hero.sparkTravel !== !!own.sparkTravel);
     hero.raidSupport = own.raidSupport || null;
     if (!initial && !moved) for (const source of new Set([...Object.keys(oldSets), ...Object.keys(own.setCounts || {})])) {
@@ -1690,7 +1694,9 @@
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || [], own.abandonedQuests || []);
     if(seasonChanged)window.City?.refresh();
+    const isGhost = !!(hero.dead && hero.ghost);
     if (wasDead !== hero.dead) { say(hero.dead ? 'death' : 'respawn'); if (!hero.dead) window.BossMech?.setCause(''); }
+    if (wasGhost !== isGhost) say(isGhost ? 'ghost' : 'unghost');
     if (wasFallen !== !!hero.fallen) say(hero.fallen ? 'fallen' : 'rallied');
     if (initial || (moved && !seamShift)) { cam.x = hero.x; cam.y = hero.y; }
     const signature = JSON.stringify(own.look);
@@ -1768,6 +1774,20 @@
     ebolts = (packet.ebolts || []).filter(inZone).map(b => { const old = ebolts.find(o => o.id === b.id); return old && Math.hypot(old.x - b.x, old.y - b.y) < 2.5 ? Object.assign(old, b, { x: old.x + (b.x - old.x) * .5, y: old.y + (b.y - old.y) * .5 }) : { ...b }; });
     if (packet.instance) { if (packet.instance.cleared && !instanceCleared) { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); } instanceCleared = !!packet.instance.cleared; }
     drops = packet.drops.filter(inZone);
+    const seenCorpses = new Set();
+    corpses = (packet.corpses || []).filter(inZone).map(c => {
+      seenCorpses.add(c.id);
+      let entry = corpseSprites.get(c.id);
+      if (!entry) { entry = { sprite: null, signature: '' }; corpseSprites.set(c.id, entry); }
+      const lookKey = JSON.stringify(c.look || {});
+      if (c.look && entry.signature !== lookKey) {
+        entry.signature = lookKey; const generation = spriteGeneration;
+        if (entry.sprite && entry.sprite.constructor === classSprite(c.look)) entry.sprite.set(c.look);
+        else classSprite(c.look).load(c.look, { background: true }).then(sprite => { if (generation === spriteGeneration && entry.signature === lookKey) entry.sprite = sprite; }).catch(() => {});
+      }
+      return { ...c, dead: true, ghost: false, corpse: true, deadT: 99, moving: false, atkT: 0, hurtT: 0, sprite: c.id === Online.id ? mageSpr : entry.sprite };
+    });
+    for (const cid of corpseSprites.keys()) if (!seenCorpses.has(cid)) corpseSprites.delete(cid);
     chests = (packet.chests || []).filter(inZone).map(c => ({...c, expiresAt:tAll+c.left}));
     signs = (packet.signs || []).map(s => ({ ...s, sign: true }));   // the boss signs (BOSSMECH-SIGN-ENGINE): read like a townsperson
     if (pendingChest && !chests.some(c => c.id === pendingChest.id)) { pendingChest = null; cityRoute = []; }
@@ -3164,7 +3184,7 @@
       inputT -= dt;
       if (inputT <= 0) {
         const [dx, dy] = paused || hero.sparkTravel ? [0, 0] : keyboardDirection();
-        const heldMouse = !paused && !hero.dead && !hero.sparkTravel && pointer.down && !hero.target && !hero.pvpTargetId;
+        const heldMouse = !paused && (!hero.dead || hero.ghost) && !hero.sparkTravel && pointer.down && !hero.target && !hero.pvpTargetId;
         inputT = dx || dy || heldMouse ? .05 : .25;
         Online.send({ type: 'input', dx, dy });
         if (heldMouse) {
@@ -3197,7 +3217,7 @@
         }
       }
       if(!paused && cityRoute.length) {
-        if(hero.dead)cityRoute=[];
+        if(hero.dead && !hero.ghost)cityRoute=[];
         else {
           // Judge progress by where the server has the hero: the drawn sprite eases toward it and trails by about speed/14 tiles, so
           // waiting for the sprite made the server stand still at every waypoint until the sprite caught up. The next waypoint goes
@@ -3306,11 +3326,12 @@
     const o = OPT(), c = hero.look || {};
     const beard = o.hairSwatch[c.hairColor || 0] || '#c0501e', skin = o.skinSwatch[c.skin || 0] || '#f0a386', rune = o.runeSwatch[c.rune || 0] || '#59d9ff', armor = ARMOR[c.armor || 0] || ARMOR[0];
     const face = ((h.fx - h.fy) >= -0.02) ? 1 : -1;
-    const walking = h.moving && !h.dead, ph = h.walk, bob = walking ? Math.abs(Math.sin(ph)) * 4 : Math.sin(t * 2.2) * 1.2;
+    const walking = h.moving && (!h.dead || h.ghost), ph = h.walk, bob = walking ? Math.abs(Math.sin(ph)) * 4 : Math.sin(t * 2.2) * 1.2;
     const atk = h.atkT > 0 ? h.atkT / .42 : 0, swingA = atk ? lerp(-2.2, 1.1, clamp(atk * 1.6, 0, 1)) : (walking ? -.95 + Math.sin(ph) * .08 : -.95 + Math.sin(t * 1.6) * .03);
     const lunge = atk ? Math.sin(clamp(atk * 1.4, 0, 1) * Math.PI) * 10 : 0;
     g.save();
-    if (h.dead) { const k = clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.45 * face); g.translate(0, k * 4); }
+    if (h.dead && h.ghost) g.globalAlpha *= .45;
+    if ((h.dead && !h.ghost) || h.corpse) { const k = h.corpse ? 1 : clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.45 * face); g.translate(0, k * 4); }
     g.scale(face, 1); g.translate(lunge, 0);
     if (h.hurtT > 0) g.translate(-3, 0);
     const skinD = shade(skin, -.16), beardD = shade(beard, -.28), beardL = shade(beard, .25);
@@ -3933,14 +3954,15 @@
   }
   function drawHeroSprite(g, h, t) {
     const m = heroSpr.meta, K = .7, dxs = h.fx - h.fy, dys = h.fx + h.fy, south = dys >= 0, right = dxs >= 0;
-    const atk = h.atkT > 0 ? h.atkT / .42 : 0, walking = h.moving && !h.dead;
+    const atk = h.atkT > 0 ? h.atkT / .42 : 0, walking = h.moving && (!h.dead || h.ghost);
     let frames, flip = false;
     if (atk) { frames = south ? m.clips.atkSE : m.clips.atkN; flip = !right; }
     else { frames = south ? (right ? m.clips.walkSE : m.clips.walkSW) : m.clips.walkN; flip = !south && !right; }
     const idx = atk ? Math.min(frames.length - 1, Math.floor(atk * frames.length)) : walking ? Math.floor(h.walk * .8) % frames.length : 0;
     const f = m.frames[frames[idx]], bob = walking || atk ? 0 : Math.sin(t * 2.2) * 1.2;
     g.save();
-    if (h.dead) { const k = clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.35 * (right ? 1 : -1)); g.globalAlpha = 1 - k * .35; g.translate(0, k * 6); }
+    if (h.dead && h.ghost) g.globalAlpha *= .45;
+    if ((h.dead && !h.ghost) || h.corpse) { const k = h.corpse ? 1 : clamp(h.deadT * 2.2, 0, 1); g.rotate(k * 1.35 * (right ? 1 : -1)); g.translate(0, k * 6); }
     g.scale(flip ? -K : K, K); g.translate(0, bob / K);
     g.drawImage(heroSpr.sheet, f.x, f.y, f.w, f.h, -f.ax, -f.ay, f.w, f.h);
     g.restore();
@@ -3973,7 +3995,7 @@
   }
   function warFrame(h, t) {                                 // -> [clip, frame index]; priority: dead, hurt, attack, walk, idle
     const C = warSpr.meta.clips;
-    if (h.dead) return ['die', Math.min(C.die.n - 1, Math.floor(h.deadT * C.die.fps))];
+    if ((h.dead && !h.ghost) || h.corpse) return ['die', h.corpse ? C.die.n - 1 : Math.min(C.die.n - 1, Math.floor(h.deadT * C.die.fps))];
     if (h.hurtT > 0) return ['hurt', clamp(Math.floor((1 - h.hurtT / .25) * C.hurt.n), 0, C.hurt.n - 1)];
     if (h.atkT > 0) return ['attack', Math.min(C.attack.n - 1, Math.floor(h.atkT / .42 * C.attack.n))];
     if (h.moving) return ['walk', Math.floor(h.walk * 1.1) % C.walk.n];
@@ -3983,7 +4005,7 @@
     const m = warSpr.meta, [fw, fh] = m.frame, [ax, ay] = m.anchor, [clip, i] = warFrame(h, t), c = m.clips[clip];
     const gx = (h.fx - h.fy) / Math.SQRT2, gy = (h.fx + h.fy) / Math.SQRT2, dir = ((Math.round(-Math.atan2(gx, gy) / (Math.PI / 4)) % 8) + 8) % 8;   // 0 = facing the camera
     g.save();
-    if (h.dead && !h.fallen) g.globalAlpha = clamp((3.2 - h.deadT) / .6, 0, 1);
+    if (h.dead && h.ghost) g.globalAlpha *= .45;
     g.imageSmoothingEnabled = false; g.scale(WAR_K, WAR_K);
     g.drawImage(warSpr.sheet, i * fw, (c.row0 + dir) * fh, fw, fh, -ax, -ay, fw, fh);
     g.restore();
@@ -4779,6 +4801,39 @@
     }
     g.restore();
   }
+  function drawCorpseArrow(g) {
+    if (!hero.dead || !hero.ghost || !hero.corpse || hero.corpse.zone !== zone || hero.sparkTravel) return;
+    if (Math.hypot(hero.corpse.x - hero.x, hero.corpse.y - hero.y) < 1.2) return;
+    const [sx, sy] = w2s(hero.x, hero.y), [tx, ty] = w2s(hero.corpse.x, hero.corpse.y);
+    const angle = Math.atan2(ty - sy, tx - sx), ux = Math.cos(angle), uy = Math.sin(angle);
+    const distance = 82 + Math.max(0, -uy) * 90;
+    g.save(); g.translate(sx + ux * distance, sy + uy * distance); g.rotate(angle);
+    g.fillStyle = '#8cf0ff'; g.strokeStyle = '#0e2238'; g.lineWidth = 3; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(22, 0); g.lineTo(-2, -15); g.lineTo(-2, -6); g.lineTo(-20, -6);
+    g.lineTo(-20, 6); g.lineTo(-2, 6); g.lineTo(-2, 15); g.closePath(); g.fill(); g.stroke(); g.restore();
+  }
+  function drawGhostFog(g, t) {
+    g.save();
+    const gr = g.createLinearGradient(0, 0, 0, VH);
+    gr.addColorStop(0, 'rgba(195, 204, 214, .22)');
+    gr.addColorStop(.5, 'rgba(170, 180, 190, .13)');
+    gr.addColorStop(1, 'rgba(205, 212, 220, .28)');
+    g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
+    const veil = g.createRadialGradient(VW / 2, VH / 2, VH * .18, VW / 2, VH / 2, Math.max(VW, VH) * .68);
+    veil.addColorStop(0, 'rgba(210, 218, 226, .04)');
+    veil.addColorStop(.7, 'rgba(180, 190, 200, .18)');
+    veil.addColorStop(1, 'rgba(24, 28, 34, .34)');
+    g.fillStyle = veil; g.fillRect(0, 0, VW, VH);
+    const drift = reducedMotion() ? 0 : t;
+    for (let i = 0; i < 8; i++) {
+      const px = ((i * 383 + drift * (10 + (i % 3) * 4)) % (VW + 560) + VW + 560) % (VW + 560) - 280;
+      const py = ((i * 157 + Math.sin(drift * .25 + i) * 18) % VH + VH) % VH;
+      const rx = 170 + (i % 4) * 35, ry = 34 + (i % 3) * 10;
+      g.fillStyle = 'rgba(218, 224, 232, .12)';
+      g.beginPath(); g.ellipse(px, py, rx, ry, 0, 0, 6.283); g.fill();
+    }
+    g.restore();
+  }
   function drawQuestArrow(g) {
     if (!window.Prefs?.questArrow || hero.dead || hero.sparkTravel) return;
     const target = window.Quests?.navigationTarget(zone, hero.x, hero.y);
@@ -4799,8 +4854,20 @@
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
       } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawLeadShoes(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); }
   }
+  let ghostCv = null, ghostG = null;
   function draw(t) {
-    const g = ctx, k = dpr * zoom; g.setTransform(k, 0, 0, k, 0, 0);
+    const k = dpr * zoom;
+    const ghostMode = !!(hero.dead && hero.ghost);
+    let g = ctx;
+    if (ghostMode) {
+      if (!ghostCv) { ghostCv = document.createElement('canvas'); ghostG = ghostCv.getContext('2d'); }
+      if (ghostCv.width !== cv.width || ghostCv.height !== cv.height) { ghostCv.width = cv.width; ghostCv.height = cv.height; }
+      g = ghostG;
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.clearRect(0, 0, ghostCv.width, ghostCv.height);
+    }
+    g.setTransform(k, 0, 0, k, 0, 0);
+    g.save();
     drawSky(g, t);
     // ground
     const [cx, cy] = camS();
@@ -4900,7 +4967,11 @@
     for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, Math.round(70 * CHEST_SCALE))) { shadow(g,chest.x,chest.y,27 * CHEST_SCALE,9 * CHEST_SCALE,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
     for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
-    { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
+    { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, hero.ghost ? .15 : .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
+    for (const body of corpses) {
+      const [sx, sy] = w2s(body.x, body.y);
+      if (onScreen(sx, sy, 160)) { shadow(g, body.x, body.y, 28, 10, .25); list.push({ d: body.x + body.y, body, sx, sy }); }
+    }
     for (const remote of ghostPlayers.size ? [...remotePlayers.values(), ...ghostPlayers.values()] : remotePlayers.values()) {
       const [sx, sy] = w2s(remote.x, remote.y);
       if (onScreen(sx, sy, 160)) { shadow(g, remote.x, remote.y, 30, 12, .28); list.push({ d: remote.sparkTravel ? Infinity : remote.x + remote.y + .001, remote, sx, sy }); }
@@ -4986,11 +5057,27 @@
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
         drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t); drawLeadShoes(g, remote, t); drawPlayerStun(g, remote, t);
         g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag || remote.gauntlet ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
-        const nameText = remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : (window.Achievements?.displayName(remote) || remote.look.name) + (remote.pvpFlag ? ' · PvP' : '');
+        const nameText = (remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : (window.Achievements?.displayName(remote) || remote.look.name) + (remote.pvpFlag ? ' · PvP' : '')) + (remote.dead && remote.ghost ? ' · Ghost' : '');
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
         if (remote.reborn?.tier) { const label = window.Rebirth.title(remote.reborn.tier); g.font = '13px "Jua", sans-serif'; g.fillStyle = window.Rebirth.color(remote.reborn.tier); g.lineWidth = 3; g.strokeText(label, 0, -144); g.fillText(label, 0, -144); }
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
+        g.restore();
+      } else if (it.body) {
+        const body = it.body; g.save(); g.translate(it.sx, it.sy);
+        if (isModular() && body.sprite) body.sprite.draw(g, body, t);
+        else if (body.id === Online.id && warSpr) drawWarriorSprite(g, body, t);
+        else if (body.id === Online.id && heroSpr) drawHeroSprite(g, body, t);
+        else if (body.id === Online.id) { g.scale(1.3, 1.3); drawHero(g, body, t); }
+        else { g.fillStyle = '#c5d2e8'; g.strokeStyle = '#101826'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, -6, 16, 8, 0, 0, Math.PI * 2); g.fill(); g.stroke(); }
+        if (body.id === Online.id) {
+          const pulse = .55 + .25 * Math.sin(t * 3);
+          g.strokeStyle = `rgba(175, 225, 255, ${pulse})`; g.lineWidth = 2.5;
+          g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, Math.PI * 2); g.stroke();
+          g.font = '15px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3;
+          g.strokeStyle = '#101826'; g.fillStyle = '#d8f0ff';
+          g.strokeText('Your Corpse', 0, -56); g.fillText('Your Corpse', 0, -56);
+        }
         g.restore();
       } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); paintHeroBody(g, t); g.restore(); }
     }
@@ -5150,11 +5237,23 @@
     window.Solstice?.drawLabel(g,zone,w2s);
     window.ExitPaths?.labels(g,zdef,ZONES,w2s,hero,zoom);
     window.ZoneJourney?.draw(g, VW, VH, reducedMotion());
-    drawQuestArrow(g);
+    if (ghostMode) drawGhostFog(g, t);
+    g.restore();
+    if (ghostMode) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.filter = 'grayscale(100%) contrast(1.06) brightness(0.88)';
+      ctx.drawImage(ghostCv, 0, 0);
+      ctx.restore();
+      ctx.setTransform(k, 0, 0, k, 0, 0);
+    }
+    drawCorpseArrow(ctx);
+    drawQuestArrow(ctx);
     drawMini();
     window.WorldFeedback?.draw({ canvas: cv, hero, project: w2s, width: VW, height: VH, drops, blocked: paused || pointer.down || hero.dead || !!hero.sparkTravel });
     // A crossing cutscene (client/cutscene.js) covers the whole canvas, HUD pieces drawn above included, and paints the hero itself.
-    if (window.Cutscene?.active) { const [csx, csy] = w2s(hero.x, hero.y); window.Cutscene.draw(g, VW, VH, t, paintHeroBody, csx, csy, hero, reducedMotion()); }
+    if (window.Cutscene?.active) { const [csx, csy] = w2s(hero.x, hero.y); window.Cutscene.draw(ctx, VW, VH, t, paintHeroBody, csx, csy, hero, reducedMotion()); }
   }
   // What the boss-mechanics drawing needs from the field: the projection, the room a point is in, and where a character or boss stands.
   const bossMechView = () => ({
@@ -5520,6 +5619,16 @@
     questLayer(window.Quests?.mapMarkers(zone) || [], 0, 0, mA);
     for (const w of near) if (w.z !== zone) questLayer(window.Quests?.mapMarkers(w.z) || [], w.ox, w.oy, 1, false);
     if (miniFade && !wmode) questLayer(miniFade.quests, miniFade.shift[0], miniFade.shift[1], outA);
+    if (hero.corpse) {
+      const c = hero.corpse, nb = c.zone === zone ? { ox: 0, oy: 0 } : near.find(w => w.z === c.zone);
+      if (nb) {
+        const cx = (c.x + nb.ox) * s, cy = (c.y + nb.oy) * s;
+        const px = Math.max(vx * s + 8, Math.min(vx * s + W - 8, cx)), py = Math.max(vy * s + 8, Math.min(vy * s + W - 8, cy));
+        mctx.save(); mctx.fillStyle = '#8cf0ff'; mctx.strokeStyle = '#0e2238'; mctx.lineWidth = 2.5;
+        mctx.beginPath(); mctx.moveTo(px, py - 6); mctx.lineTo(px + 6, py); mctx.lineTo(px, py + 6); mctx.lineTo(px - 6, py); mctx.closePath();
+        mctx.stroke(); mctx.fill(); mctx.restore();
+      }
+    }
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
     mctx.restore();
   }
@@ -5586,7 +5695,7 @@
     cutsceneBegin() { City.close(false); keys.clear(); pointer.down = false; cityRoute = []; pendingNpc = null; pendingChest = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud(); },
     stop() { window.WorldFeedback?.reset(); window.ZoneJourney?.clear(); window.Cutscene?.reset(); window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
     setTouchDirection(x, y) {
-      if (!Field.canAct || hero.sparkTravel) { x = 0; y = 0; }
+      if (!running || paused || !Online.connected || (hero.dead && !hero.ghost) || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {
         pendingNpc = null; pendingChest = null; cityRoute = []; pointer.down = false;
         hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud();
@@ -5700,7 +5809,7 @@
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
     get priestSprites() { return isPriest() ? mageSpr : null; },
     get hunterSprites() { return isHunter() ? mageSpr : null; },
-    get hero() { return hero; }, get signs() { return signs; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
+    get hero() { return hero; }, get corpses() { return corpses; }, get signs() { return signs; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },

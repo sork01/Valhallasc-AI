@@ -772,6 +772,7 @@
       Object.assign(marker.style, pos(z, n.x, n.y)); markers.append(marker);
     }
     const me = el('span', '', 'wm-me'); me.append(el('i'), el('b', 'You')); me.hidden = true; me.dataset.me = 'true'; markers.append(me);
+    const corpse = el('span', '', 'wm-corpse'); corpse.title = 'Your Corpse'; corpse.hidden = true; markers.append(corpse);
     markers.append(el('div', '', 'wm-party'));
     side(z); markPerson(z); tick();
   }
@@ -904,7 +905,7 @@
   }
   function tick() {
     if (!open()) return;
-    if (window.Field?.hero?.dead || !window.Online?.connected) { close(); return; }
+    if ((window.Field?.hero?.dead && !window.Field?.hero?.ghost) || !window.Online?.connected) { close(); return; }
     if (JSON.stringify(window.Field.explored) !== fogSignature) { refreshFog(); if (view === 'zone') renderZone(current); }
     const hero = window.Field.hero, here = window.Field.zone || 0, parent = parentOf(here);
     zones.forEach((z, i) => {
@@ -915,8 +916,9 @@
     for (const marker of $('wm-world').querySelectorAll('.wm-entrance,.wm-city')) marker.dataset.here = String(Number(marker.dataset.to ?? marker.dataset.zone) === here);
     if (view !== 'zone') return;
     updateQuestMarkers();
-    const z = zones[current], me = $('wm-markers').querySelector('.wm-me');
+    const z = zones[current], me = $('wm-markers').querySelector('.wm-me'), corpseMark = $('wm-markers').querySelector('.wm-corpse');
     me.hidden = here !== current; if (!me.hidden) Object.assign(me.style, pos(z, hero.x, hero.y));
+    if (corpseMark) { const c = hero.corpse; corpseMark.hidden = !c || c.zone !== current; if (!corpseMark.hidden) Object.assign(corpseMark.style, pos(z, c.x, c.y)); }
     const party = $('wm-markers').querySelector('.wm-party');
     const mates = here === current ? (window.Field.remotePlayers || []).filter(r => window.Social?.isPartyMember(r.id) && known(here, r.x, r.y)) : [];
     party.replaceChildren(...mates.map(r => { const m = el('i', '', 'wm-mate'); m.title = r.name || 'Party member'; Object.assign(m.style, pos(z, r.x, r.y)); return m; }));
@@ -945,7 +947,7 @@
   }
   const open = () => !$('worldmap').hidden;
   function canShow() {
-    return !$('scene-game').hidden && window.Online?.connected && !window.Field?.hero?.dead && !open() && $('pause').hidden && $('equipment').hidden
+    return !$('scene-game').hidden && window.Online?.connected && (!window.Field?.hero?.dead || !!window.Field?.hero?.ghost) && !open() && $('pause').hidden && $('equipment').hidden
       && $('npc-dialogue').hidden && !window.Skillbar?.open && !window.Quests?.open && !window.Social?.open && !window.City?.open && !window.Settings?.active;
   }
   function show() {
