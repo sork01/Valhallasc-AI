@@ -43,14 +43,31 @@
   }
   // The loading screen shows one of five paintings picked at random; it keeps its picture while it stays open (retries do not swap it).
   const LOADING_ART = 5;
-  function overlay(text, fatal = false) {
-    const screen = $('connection-overlay');
-    if (screen.hidden || !screen.dataset.art) {
-      const n = 1 + Math.floor(Math.random() * LOADING_ART);
-      screen.dataset.art = String(n); screen.style.setProperty('--loading-art', `url("assets/loading_${n}.webp")`);
+  // A tip for the bottom of the screen, changing every few seconds while it stays open.
+  let loadToken = 0, tipTimer = 0;
+  function showTip() { const tip = $('loading-tip'); if (tip && window.LoadingTips) tip.textContent = window.LoadingTips.next(); }
+  // `panel`: show the connection panel (message and buttons) over the picture. A normal first connection shows only the title and a tip.
+  function overlay(text, fatal = false, panel = true) {
+    const screen = $('connection-overlay'); loadToken++;
+    if (screen.hidden || !screen.dataset?.art) {
+      // Only paintings that are already decoded are picked, so the screen appears at once; all five are fetched when the page starts.
+      const pool = window.LoadGate?.art.ready.length ? window.LoadGate.art.ready : Array.from({ length: LOADING_ART }, (_, i) => i + 1);
+      const n = [...pool].sort((a, b) => a - b)[Math.floor(Math.random() * pool.length)];
+      if (screen.dataset) screen.dataset.art = String(n); screen.style?.setProperty?.('--loading-art', `url("assets/loading_${n}.webp")`);
+      showTip();
     }
+    if (!tipTimer) tipTimer = setInterval(() => { if (screen.hidden) { clearInterval(tipTimer); tipTimer = 0; } else showTip(); }, 7000);
+    screen.classList?.toggle('show-panel', !!panel);
     screen.hidden = false; $('connection-text').textContent = text;
     $('connection-retry').hidden = fatal;
+  }
+  // Welcome received: keep the loading screen until every image and file the world asked for has arrived, then drop it.
+  function finishLoading() {
+    const screen = $('connection-overlay'), mine = ++loadToken;
+    screen.classList?.remove('show-panel');
+    const close = () => { if (mine === loadToken && connected) screen.hidden = true; };
+    if (!window.LoadGate) { close(); return; }
+    window.LoadGate.whenIdle().then(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))).then(close);
   }
   function send(message) {
     if (!connected || socket?.readyState !== WebSocket.OPEN) return false;
@@ -93,7 +110,7 @@
     const currentGeneration = ++generation; clearSnapshot();
     const old = socket; socket = null; old?.close();
     connected = false;
-    status('Connecting to Veyrheim…', false); overlay('Connecting to the world…');
+    status('Connecting to Veyrheim…', false); overlay('Connecting to the world…', false, failures > 0);
     // Offer deflated snapshots only when the inflater loaded.
     const deflateOffer = () => (window.pako?.inflateRaw ? { compress: true } : {});
     const ws = new WebSocket(endpoint); socket = ws;
@@ -139,7 +156,7 @@
           window.DpsMeter?.update(packet.snapshot.damageMeter);
           window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
           window.Mail?.onUnread(character?.mailUnread || 0, character?.mailTotal);
-          $('connection-overlay').hidden = true; $('chat-input').disabled = false;
+          finishLoading(); $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
           const L = (a, all) => Keys.label(a, all), T = window.Locale?.translate || (x => x), word = text => T(text).toLowerCase();
           log(`${T('Welcome to Greenmeadow.')} ${L('character', false)}: ${word('Character')} · ${L('bags').replace(' / ', '/')}: ${word('Bags')} · ${L('skills', false)}: ${word('Skills')} · ${Keys.skillRange()}: ${word('Skillbar')} · ${L('quests', false)}: ${word('Quests')} · ${L('friends', false)}: ${word('Friends')} · ${L('party', false)}: ${word('Party')} · ${L('talk', false)}: ${word('Talk or read')} · ${L('chat', false)}: ${word('Chat')}. ${T('Type /p to talk to your party.')}`);
@@ -186,7 +203,7 @@
             busySince ??= Date.now();
             if (Date.now() - busySince < 90000) { waitingForRelease = true; ws.close(); break; }
           }
-          if(packet.code==='name'){$('name-change-form').hidden=false;$('new-character-name').focus();}
+          if(packet.code==='name'){$('name-change-form').hidden=false;$('connection-overlay').classList?.add('show-panel');$('new-character-name').focus();}
           log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text); window.Rebirth?.onError(packet.text);
           if (packet.code === 'auth') { acct.session = null; accountList = []; persistAccount(); }
           if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, packet.text !== 'This character is already online in another window.'); status('Unable to enter world', false); ws.close(); }
@@ -215,7 +232,7 @@
       active = false; generation++; clearSnapshot(); connected = false; id = null; busySince = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;
-      $('chat').hidden = true; $('connection-overlay').hidden = true;
+      $('chat').hidden = true; loadToken++; $('connection-overlay').hidden = true;
       $('network-status').textContent = 'Valhalla · Shared world';
     },
     newCharacter({ emptySlots = [] } = {}) { initialEmptySlots = [...emptySlots]; if (mode === 'account') { acct.current = null; persistAccount(); } else { saved.current = null; persist(); } },

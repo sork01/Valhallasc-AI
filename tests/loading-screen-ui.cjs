@@ -1,6 +1,7 @@
-// Browser check for the loading screen: it says "Veyrheim awaits", covers the whole stage with one of the five loading paintings (never the game scene
-// behind it) and the picture follows the random pick. Run via: bash scripts/test-touch-bounded.sh tests/loading-screen-ui.cjs
-// MUTATE=1 serves the previous online.js (no random picture) and must fail.
+// Browser check for the loading screen: only "Veyrheim awaits" at the top, one of the five paintings behind it (already loaded before the screen
+// first appears), a random tip at the bottom and no connection panel; and it stays up until every image the world asked for has arrived.
+// Run via: bash scripts/test-touch-bounded.sh tests/loading-screen-ui.cjs
+// MUTATE=1 serves the previous online.js (panel, no tips, closes at once) and must fail.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -40,41 +41,54 @@ function requireMemoryLimit() {
       page.on('pageerror', e => errors.push(e.message));
       if (process.env.MUTATE === '1') {
         const { execFileSync } = require('node:child_process');
-        const old = execFileSync('git', ['show', 'HEAD:client/online.js'], { cwd: root, encoding: 'utf8' });
+        const old = execFileSync('git', ['show', '53a4a132:client/online.js'], { cwd: root, encoding: 'utf8' });
         await page.route('**/online.js*', route => route.fulfill({ contentType: 'text/javascript', body: old }));
       }
+      // Every game image (not the loading paintings) takes a second and a half, so the screen must wait for them.
+      const delayed = { count: 0, last: 0 };
+      await page.route(/\/assets\/(?!loading_)[^/]*\.png(\?.*)?$/, async route => {
+        await new Promise(r => setTimeout(r, 1500));
+        const response = await route.fetch(); await route.fulfill({ response });
+        delayed.count++; delayed.last = Date.now();
+      });
       await page.addInitScript(p => {
         window.AudioContext = undefined; window.webkitAudioContext = undefined;
-        Math.random = (r => () => (window.__pickNext ? window.__pickNext() : r()))(Math.random);
-        window.__pickNext = () => p;
+        const real = Math.random; Math.random = () => (window.__pick === undefined ? real() : window.__pick); window.__pick = p;
         localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {}, char: null, draft: null }));
-        // Record what the overlay looks like the moment it first opens.
-        window.__shot = null;
+        window.__shot = null; window.__hiddenAt = 0;
         addEventListener('DOMContentLoaded', () => {
           const o = document.getElementById('connection-overlay');
           new MutationObserver(() => {
-            if (o.hidden || window.__shot) return;
+            if (o.hidden) { if (window.__shot && !window.__hiddenAt) window.__hiddenAt = performance.timeOrigin + performance.now(); return; }
+            if (window.__shot) return;
             const r = o.getBoundingClientRect(), s = document.getElementById('stage').getBoundingClientRect(), cs = getComputedStyle(o);
-            window.__shot = { title: o.querySelector('h3').textContent, bg: cs.backgroundImage, art: o.dataset.art, covers: r.left <= s.left + 1 && r.top <= s.top + 1 && r.right >= s.right - 1 && r.bottom >= s.bottom - 1, size: cs.backgroundSize, text: document.getElementById('connection-text').textContent };
+            const t = document.getElementById('loading-title').getBoundingClientRect(), tip = document.getElementById('loading-tip').getBoundingClientRect();
+            window.__shot = { title: document.getElementById('loading-title').textContent, titleTop: t.top < s.top + s.height * 0.2 && t.width > 0, tip: document.getElementById('loading-tip').textContent, tipBottom: tip.top > s.top + s.height * 0.7 && tip.width > 0,
+              panel: getComputedStyle(document.querySelector('#connection-overlay .connection-panel')).display, bg: cs.backgroundImage, art: o.dataset.art, size: cs.backgroundSize,
+              covers: r.left <= s.left + 1 && r.top <= s.top + 1 && r.right >= s.right - 1 && r.bottom >= s.bottom - 1, tips: window.LoadingTips.list };
           }).observe(o, { attributes: true, attributeFilter: ['hidden'] });
         });
       }, pick);
       await page.goto(world.url);
+      // The paintings are decoded while the player is still on the title screen.
+      await page.waitForFunction(() => window.LoadGate?.art.ready.length === 5, null, { timeout: 15000 });
+      check(true, `[${want}] all five loading paintings are decoded before the screen first appears`);
       await page.locator('#start').click();
       await page.locator('#login-guest').click();
       await page.locator('#name').fill(`Loader${want}`);
       await page.locator('#go').click({ timeout: 60000 });
-      await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
-      const shot = await page.evaluate(() => window.__shot);
+      if (process.env.SHOT_DIR) { await page.waitForFunction(() => !document.getElementById('connection-overlay').hidden && document.getElementById('loading-tip').textContent, null, { timeout: 30000 }); await page.waitForTimeout(400); await page.screenshot({ path: path.join(process.env.SHOT_DIR, `loading-${want}.png`) }); }
+      await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0 && document.getElementById('connection-overlay').hidden, null, { timeout: 90000 });
+      const shot = await page.evaluate(() => window.__shot), hiddenAt = await page.evaluate(() => window.__hiddenAt);
       check(shot, `[${want}] the loading screen opened while connecting`);
-      check(shot.title === 'Veyrheim awaits', `[${want}] it says Veyrheim awaits (got "${shot.title}")`);
-      check(shot.covers && shot.size === 'cover', `[${want}] it covers the whole stage with the picture (${shot.size})`);
+      check(shot.title === 'Veyrheim awaits' && shot.titleTop, `[${want}] "Veyrheim awaits" is written at the top (got "${shot.title}")`);
+      check(shot.tipBottom && shot.tips.includes(shot.tip), `[${want}] a game tip sits at the bottom ("${shot.tip}")`);
+      check(shot.panel === 'none', `[${want}] the connection panel is not shown (${shot.panel})`);
+      check(shot.covers && shot.size === 'cover', `[${want}] the picture covers the whole stage (${shot.size})`);
       check(shot.art === String(want) && shot.bg.includes(`loading_${want}.webp`), `[${want}] random pick ${pick} shows loading_${want}.webp (${shot.bg})`);
-      const status = await page.evaluate(() => document.getElementById('network-status').textContent);
-      check(!/Greenmeadow awaits|Connecting to Greenmeadow/.test(status), `[${want}] status line does not name Greenmeadow while loading`);
-      check(await page.evaluate(() => document.getElementById('connection-overlay').hidden), `[${want}] the loading screen closes once connected`);
-      const ok = await page.evaluate(async n => (await fetch(`assets/loading_${n}.webp`)).ok, want);
-      check(ok, `[${want}] the picture file is served`);
+      check(delayed.count > 0, `[${want}] the test held back ${delayed.count} game images`);
+      check(hiddenAt >= delayed.last, `[${want}] the screen stayed up until the last image arrived (${Math.round(hiddenAt - delayed.last)} ms later)`);
+      check(await page.evaluate(() => LoadGate.pending === 0), `[${want}] nothing is still loading when the screen goes`);
       await ctx.close();
     }
     assert.equal(errors.length, 0, `Page errors: ${errors.join('; ')}`);

@@ -68,7 +68,7 @@ const suite = {
     await page.evaluate(() => Social.show('pvp')); await audit('#social-panel .social-panel', 'arena'); await clear();
     await page.evaluate(() => { document.querySelector('#rebirth-dialog').hidden = false; }); await audit('#rebirth-dialog .rebirth-dialog', 'rebirth'); await clear();
     await page.evaluate(() => WhatsNew.show()); await audit('#whats-new .news-panel', 'whats-new'); await clear();
-    await page.evaluate(() => { document.querySelector('#connection-overlay').hidden = false; }); await audit('#connection-overlay .connection-panel', 'connection'); await clear();
+    await page.evaluate(() => { document.querySelector('#connection-overlay').classList.add('show-panel'); document.querySelector('#connection-overlay').hidden = false; }); await audit('#connection-overlay .connection-panel', 'connection'); await clear();
     await page.evaluate(() => GMTest.open()); await audit('#gmtest-panel .gmtest-window', 'gm-dungeon-gauntlet'); await clear();
     await debug(page, { op: 'teleport', zone: 0, x: smith.x, y: smith.y + 1 });
     await page.waitForFunction(p => Math.hypot(Field.hero.nx-p.x, Field.hero.ny-p.y) < 2, smith);

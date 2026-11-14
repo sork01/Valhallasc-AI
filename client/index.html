@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="achievements.css">
 <link rel="stylesheet" href="rested.css">
 <script src="compat.js"></script>
+<script src="loadgate.js"></script>
 <link rel="stylesheet" href="festival.css">
 </head>
 <body>
@@ -680,8 +681,9 @@
     <button id="layout-done" class="btn primary" type="button">Done</button>
   </div>
   <div id="connection-overlay" class="connection-overlay" hidden>
+    <h2 id="loading-title" class="loading-title">Veyrheim awaits</h2>
     <section class="panel connection-panel" role="dialog" aria-modal="true" aria-label="World connection">
-      <h3>Veyrheim awaits</h3><p id="connection-text"></p>
+      <p id="connection-text"></p>
       <button id="connection-retry" class="btn primary" type="button">Retry now</button>
       <form id="name-change-form" hidden>
         <label for="new-character-name">Choose a unique character name</label>
@@ -691,6 +693,7 @@
       <button id="connection-new" class="btn ghost" type="button">New Character</button>
       <button id="connection-title" class="btn ghost" type="button">Back to Title</button>
     </section>
+    <p id="loading-tip" class="loading-tip" aria-live="off"></p>
   </div>
   <div class="pause" id="whats-new" lang="en" translate="no" hidden>
     <section class="panel news-panel" role="dialog" aria-modal="true" aria-labelledby="news-title" aria-describedby="news-label">
