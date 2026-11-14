@@ -23,9 +23,11 @@ async function resume(page) {
 }
 async function select(page, kind) {
   console.log('Selecting '+kind);
-  const spot = await page.evaluate(kind => { const enemy = Field.slimes.find(s => s.kind === kind && !s.dead); return {x:enemy.x-4,y:enemy.y}; }, kind);
+  const spot = await page.evaluate(kind => { const enemy = Field.slimes.find(s => s.kind === kind && !s.dead && (kind==='big'||s.level===99)); if (!enemy) throw new Error(`no living ${kind}: ${JSON.stringify(Field.slimes.map(s => [s.kind, s.level, s.dead]))}`); return {x:enemy.x-4,y:enemy.y}; }, kind);
   await debug(page, {op:'teleport',zone:0,...spot});
-  await page.waitForFunction(p => Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<2,spot);
+  // The teleport lands on the nearest free ground, which may be a few tiles off the requested point (a tree in the shaped map).
+  await page.waitForFunction(p => Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<8,spot,{timeout:30000});
+  await page.waitForTimeout(300);
   // Selection is local input state; snapshots retain it by id. Use the same state/action
   // as the pointer handler so a moving enemy/camera cannot make the fixture click its neighbour.
   await page.evaluate(kind => {
@@ -36,15 +38,24 @@ async function select(page, kind) {
   await page.waitForFunction(kind => Field.hero.target?.kind === kind && !document.querySelector('#hud-target').hidden && document.querySelector('#hud-target-name').textContent === Locale.translate(Field.hero.target.d.name), kind);
 }
 async function frameChecks(page, label) {
+  // A teleport lands on the nearest free ground (80,80 is blocked in the shaped Greenmeadow), so settle there and place the fixtures from the hero's actual position.
   await debug(page, { op: 'teleport', zone: 0, x: 80, y: 80 });
-  await page.waitForFunction(() => Math.hypot(Field.hero.x - 80, Field.hero.y - 80) < 2);
-  for (const [kind, x] of [['cinderlord', 84], ['green', 76]]) {
-    await debug(page, { op: 'spawn_enemy', kind, level: 99, x, y: 84 });
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 80, Field.hero.y - 80) < 6, null, { timeout: 30000 });
+  await page.waitForTimeout(500);
+  const home = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+  for (const [kind, dx] of [['cinderlord', 4], ['green', -4]]) {
+    await debug(page, { op: 'spawn_enemy', kind, level: 99, x: home.x + dx, y: home.y + 4 });
     await page.waitForFunction(kind => Field.slimes.some(s => s.kind === kind && !s.dead && s.level === 99), kind);
   }
   await debug(page, {op:'summon_king'});
   await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'big' && !s.dead));
   for (const kind of ['cinderlord', 'green', 'big', 'green', 'cinderlord']) {
+    // A selected level-99 green can die in the meantime (the hero auto-attacks a targeted enemy in reach), so respawn one beside the hero.
+    if (kind === 'green' && !(await page.evaluate(() => Field.slimes.some(s => s.kind === 'green' && !s.dead && s.level === 99)))) {
+      const at = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+      await debug(page, { op: 'spawn_enemy', kind: 'green', level: 99, x: at.x - 4, y: at.y + 4 });
+      await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'green' && !s.dead && s.level === 99));
+    }
     await select(page, kind);
     const expected = kind !== 'green';
     check(await page.locator('.hud-elite-dragon').isVisible() === expected, `${label}: ${kind} has exactly the correct frame after selection changes`);
@@ -74,7 +85,8 @@ async function frameChecks(page, label) {
 async function audioChecks(page) {
   check(await page.evaluate(() => Prefs.combatSounds) === 'synthesized', 'Legacy preferences without a mode default to synthesized sounds');
   await page.evaluate(() => Prefs.set({ combatSounds: 'recorded' }));
-  await page.waitForFunction(() => RecordedCombat.ready, null, { timeout: 30000 });
+  // All 68 recorded cues decode one per idle callback; under the 1-CPU cap that takes minutes (same as startup-loading-ui).
+  await page.waitForFunction(() => RecordedCombat.ready, null, { timeout: 300000 });
   if (process.env.MUTATE !== 'audio') {
   // One actual server attack verifies the new enemy-hurt path, without grinding an encounter.
   await page.evaluate(() => {
@@ -82,9 +94,15 @@ async function audioChecks(page) {
     RecordedCombat.play = function (...args) { __heard.push([args[2], args[3]]); return play(...args); };
   });
   await debug(page, {op:'teleport', zone:0, x:80, y:80});
-  await page.waitForFunction(() => Math.hypot(Field.hero.x-80,Field.hero.y-80)<.2);
-  await debug(page, {op:'spawn_enemy', kind:'green', level:99, x:81.2, y:80});
-  await page.waitForFunction(() => Field.slimes.some(s=>s.kind==='green'&&!s.dead&&Math.hypot(s.x-Field.hero.x,s.y-Field.hero.y)<1.8));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x-80,Field.hero.y-80)<6, null, { timeout: 30000 });
+  await page.waitForTimeout(500);
+  const spot = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+  await debug(page, {op:'spawn_enemy', kind:'green', level:99, x:spot.x+1.2, y:spot.y});
+  await page.waitForFunction(() => Field.slimes.some(s=>s.kind==='green'&&!s.dead&&s.level===99));
+  // The spawn may be placed on the nearest free ground, so walk the hero beside it (the teleport lands on free ground too).
+  const g = await page.evaluate(() => { const e = Field.slimes.find(s=>s.kind==='green'&&!s.dead&&s.level===99); return { x: e.x, y: e.y }; });
+  await debug(page, {op:'teleport', zone:0, x:g.x-1.2, y:g.y});
+  await page.waitForFunction(p => Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<2.5 && Field.slimes.some(s=>s.kind==='green'&&!s.dead&&s.level===99&&Math.hypot(s.x-Field.hero.x,s.y-Field.hero.y)<2.5), g, { timeout: 30000 });
   await debug(page, {op:'reset_cooldowns'});
   await page.evaluate(() => { const e = Field.slimes.find(s => s.kind === 'green' && !s.dead && s.level===99); Online.send({type:'attack', fx:e.x-Field.hero.x, fy:e.y-Field.hero.y}); });
   try { await page.waitForFunction(() => __heard.some(([,stage]) => stage === 'hurt'), null, { timeout: 10000 }); }

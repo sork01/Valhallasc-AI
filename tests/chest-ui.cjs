@@ -49,7 +49,7 @@ async function call(name, args = {}) {
   await debug({ op: 'spawn_chest', distance: 1.2 });
   await page.waitForFunction(() => Field._debug.chests.length === 1, null, { timeout: 5000 });
   const [near] = await chests();
-  check(near.left > 170 && near.left <= 180, `a new chest has about three minutes (${near.left})`);
+  check(near.left > 295 && near.left <= 300, `a new chest has about five minutes (${near.left})`);
   await page.waitForFunction(() => /treasure chest has appeared/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
   check(true, 'the spawn announcement reached the chat');
 
@@ -78,7 +78,10 @@ async function call(name, args = {}) {
   const standNextTo = async chest => {
     await debug({ op: 'teleport', zone: 0, x: chest.x - 1, y: chest.y });
     await page.waitForFunction(({ x, y }) => Math.hypot(Field.hero.x - x, Field.hero.y - y) < 1.6, chest, { timeout: 8000 });
-    await page.waitForTimeout(150); // a frame or two: the camera jumps to the hero
+    // The camera eases onto the hero; wait until the chest's screen position stops moving, or the click lands beside it.
+    await page.waitForFunction(({ x, y }) => { const p = Field._debug.w2s(x, y), last = window.__chestAt; window.__chestAt = p;
+      return !!last && Math.hypot(last[0] - p[0], last[1] - p[1]) < .5; }, chest, { polling: 'raf', timeout: 8000 });
+    await page.waitForTimeout(300);
   };
   await standNextTo(near);
   // The open effect (a gold ring) exists for a moment, so watch for it on every animation frame from before the click.
@@ -91,7 +94,7 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'chestOpen' && e.t > .55 && e.t < .9), null, { polling: 'raf', timeout: 8000 });
   const lid = await page.evaluate(() => {
     const e = Field._debug.effects.find(e => e.kind === 'chestOpen'), [sx, sy] = Field._debug.w2s(e.x, e.y), cv = document.getElementById('fieldcv'), k = cv.width / 1600, g = cv.getContext('2d');
-    const data = g.getImageData(Math.round((sx + 3) * k), Math.round((sy - 42) * k), Math.round(15 * k), Math.round(15 * k)).data;   // the right half, away from the hero standing on the left
+    const data = g.getImageData(Math.round((sx + 3) * k), Math.round((sy - 75) * k), Math.round(27 * k), Math.round(26 * k)).data;   // CHEST-BIGGER: the lining sits 49-75 px above the feet at 1.75x; the right half, away from the hero standing on the left
     let lining = 0;   // the lining is red with equal green and blue; wood has far less blue
     for (let i = 0; i < data.length; i += 4) { const [r, gr, b] = [data[i], data[i + 1], data[i + 2]]; if (r > 100 && r < 190 && Math.abs(b - gr) < 12 && r > gr + 50) lining++; }
     return { lining, total: data.length / 4 };
