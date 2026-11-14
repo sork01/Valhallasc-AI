@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.54.0",
+    "date": "2026-11-14",
+    "new": [],
+    "changed": [
+      "Hired mercenaries now wear the same level and rarity of gear as you. For every piece you have on, your fighter wears a piece of its own class at that level and rarity (set pieces count as ordinary pieces of that level, never above purple), so the better you are geared, the easier dungeons and elites become. A slot you have left empty or filled with a starter piece stays as it was. Hire prices are unchanged, and your fighters take your gear as it is when you hire them."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.53.3",
     "date": "2026-11-14",
     "new": [
