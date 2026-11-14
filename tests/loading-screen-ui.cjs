@@ -1,6 +1,7 @@
 // Browser check for the loading screen: only "Veyrheim awaits" at the top, one of the five paintings behind it (already loaded before the screen
 // first appears), a random tip at the bottom and no connection panel; and it stays up until every image the world asked for has arrived.
 // Run via: bash scripts/test-touch-bounded.sh tests/loading-screen-ui.cjs
+// REAL_SPRITES=1 uses the real character art (a slow decode). MUTATE=sprite serves the previous field.js and magesprite.js and must fail it.
 // MUTATE=1 serves the previous online.js (panel, no tips, closes at once) and must fail.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -34,20 +35,28 @@ function requireMemoryLimit() {
   let checks = 0;
   const check = (cond, msg) => { assert.ok(cond, msg); checks++; };
   try {
-    for (const pick of [0, 0.99]) {
+    const real = process.env.REAL_SPRITES === '1';   // the real art decodes slowly on one capped CPU: one pass, no artificial delay
+    for (const pick of real ? [0] : [0, 0.99]) {
       const want = pick === 0 ? 1 : 5;
       const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
       const page = await ctx.newPage();
       page.on('pageerror', e => errors.push(e.message));
+      if (process.env.MUTATE === 'sprite') {   // the screen as it was before it waited for your own character's sprite
+        const { execFileSync } = require('node:child_process');
+        for (const f of ['field', 'magesprite']) {
+          const old = execFileSync('git', ['show', `b145065d:client/${f}.js`], { cwd: root, encoding: 'utf8' });
+          await page.route(`**/${f}.js*`, route => route.fulfill({ contentType: 'text/javascript', body: old }));
+        }
+      }
       if (process.env.MUTATE === '1') {
         const { execFileSync } = require('node:child_process');
         const old = execFileSync('git', ['show', '53a4a132:client/online.js'], { cwd: root, encoding: 'utf8' });
         await page.route('**/online.js*', route => route.fulfill({ contentType: 'text/javascript', body: old }));
       }
-      // Every game image (not the loading paintings) takes a second and a half, so the screen must wait for them.
+      // One game image takes 2.5 s (the screen must wait for it; plain downloads are waited for at most 8 s, so only one is held back).
       const delayed = { count: 0, last: 0 };
-      await page.route(/\/assets\/(?!loading_)[^/]*\.png(\?.*)?$/, async route => {
-        await new Promise(r => setTimeout(r, 1500));
+      if (!real) await page.route(/\/assets\/chest\.png(\?.*)?$/, async route => {
+        await new Promise(r => setTimeout(r, 2500));
         const response = await route.fetch(); await route.fulfill({ response });
         delayed.count++; delayed.last = Date.now();
       });
@@ -59,7 +68,7 @@ function requireMemoryLimit() {
         addEventListener('DOMContentLoaded', () => {
           const o = document.getElementById('connection-overlay');
           new MutationObserver(() => {
-            if (o.hidden) { if (window.__shot && !window.__hiddenAt) window.__hiddenAt = performance.timeOrigin + performance.now(); return; }
+            if (o.hidden) { if (window.__shot && !window.__hiddenAt) { window.__hiddenAt = performance.timeOrigin + performance.now(); window.__heroSprite = !!(Field.warriorSprites || Field.mageSprites || Field.assassinSprites || Field.priestSprites || Field.hunterSprites); } return; }
             if (window.__shot) return;
             const r = o.getBoundingClientRect(), s = document.getElementById('stage').getBoundingClientRect(), cs = getComputedStyle(o);
             const t = document.getElementById('loading-title').getBoundingClientRect(), tip = document.getElementById('loading-tip').getBoundingClientRect();
@@ -69,16 +78,19 @@ function requireMemoryLimit() {
           }).observe(o, { attributes: true, attributeFilter: ['hidden'] });
         });
       }, pick);
-      await page.goto(world.url);
+      const step = m => { if (process.env.VERBOSE === '1') console.log(`[${want}] ${((Date.now() - T0) / 1000).toFixed(1)}s ${m}`); };
+      const T0 = Date.now();
+      await page.goto(world.url); step('page loaded');
       // The paintings are decoded while the player is still on the title screen.
       await page.waitForFunction(() => window.LoadGate?.art.ready.length === 5, null, { timeout: 15000 });
       check(true, `[${want}] all five loading paintings are decoded before the screen first appears`);
       await page.locator('#start').click();
       await page.locator('#login-guest').click();
       await page.locator('#name').fill(`Loader${want}`);
-      await page.locator('#go').click({ timeout: 60000 });
+      await page.locator('#go').click({ timeout: 60000 }); step('clicked go');
       if (process.env.SHOT_DIR) { await page.waitForFunction(() => !document.getElementById('connection-overlay').hidden && document.getElementById('loading-tip').textContent, null, { timeout: 30000 }); await page.waitForTimeout(400); await page.screenshot({ path: path.join(process.env.SHOT_DIR, `loading-${want}.png`) }); }
-      await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0 && document.getElementById('connection-overlay').hidden, null, { timeout: 90000 });
+      await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0 && document.getElementById('connection-overlay').hidden, null, { timeout: real ? 420000 : 90000 });
+      step('overlay closed');
       const shot = await page.evaluate(() => window.__shot), hiddenAt = await page.evaluate(() => window.__hiddenAt);
       check(shot, `[${want}] the loading screen opened while connecting`);
       check(shot.title === 'Veyrheim awaits' && shot.titleTop, `[${want}] "Veyrheim awaits" is written at the top (got "${shot.title}")`);
@@ -86,8 +98,10 @@ function requireMemoryLimit() {
       check(shot.panel === 'none', `[${want}] the connection panel is not shown (${shot.panel})`);
       check(shot.covers && shot.size === 'cover', `[${want}] the picture covers the whole stage (${shot.size})`);
       check(shot.art === String(want) && shot.bg.includes(`loading_${want}.webp`), `[${want}] random pick ${pick} shows loading_${want}.webp (${shot.bg})`);
-      check(delayed.count > 0, `[${want}] the test held back ${delayed.count} game images`);
-      check(hiddenAt >= delayed.last, `[${want}] the screen stayed up until the last image arrived (${Math.round(hiddenAt - delayed.last)} ms later)`);
+      if (!real) check(delayed.count > 0, `[${want}] the test held back ${delayed.count} game image`);
+      if (!real) check(hiddenAt >= delayed.last, `[${want}] the screen stayed up until the last image arrived (${Math.round(hiddenAt - delayed.last)} ms later)`);
+      if (!real) check(hiddenAt - delayed.last < 6000, `[${want}] and it did not linger long after it`);
+      check(await page.evaluate(() => window.__heroSprite === true), `[${want}] your own character's sprite is loaded when the screen goes`);
       check(await page.evaluate(() => LoadGate.pending === 0), `[${want}] nothing is still loading when the screen goes`);
       await ctx.close();
     }

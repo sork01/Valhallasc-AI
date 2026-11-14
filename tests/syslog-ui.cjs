@@ -37,7 +37,7 @@ const errors = [];
   await page.locator('#tab-system').click();
   check(await page.locator('#system-log').isVisible() && await page.locator('#chat-log').isHidden(), 'The System tab swaps the log');
   check(await page.locator('#tab-system').getAttribute('aria-selected') === 'true' && await page.locator('#tab-chat').getAttribute('aria-selected') === 'false', 'The selected tab is marked');
-  check((await system()).includes('Welcome to Greenmeadow'), 'Game notices are on the System tab');
+  check((await system()).includes('Welcome to Veyrheim'), 'Game notices are on the System tab');
   await page.locator('#tab-chat').click();
 
   // --- unread dot ---

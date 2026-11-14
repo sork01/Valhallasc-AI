@@ -1742,9 +1742,12 @@
       lastLook = signature; onCharacter(own.look);
       const generation = spriteGeneration;
       if (mageSpr && mageSpr.constructor === classSprite(own.look)) mageSpr.set(own.look);
-      else classSprite(own.look).load(own.look).then(sprite => {
-        if (generation === spriteGeneration && lastLook === signature) mageSpr = sprite;
-      }).catch(() => say('spriteError'));
+      else {
+        const release = window.LoadGate?.hold?.('hero sprite');   // the loading screen waits for your own character's sprite
+        classSprite(own.look).load(own.look).then(sprite => {
+          if (generation === spriteGeneration && lastLook === signature) mageSpr = sprite;
+        }).catch(() => say('spriteError')).finally(() => release?.());
+      }
     }
     loadSceneEnemyArt(packet.slimes.filter(inZone));
     farDots = packet.far || [];   // enemies the server left out as too far to draw: [x, y, big], minimap only

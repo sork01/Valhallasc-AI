@@ -2,10 +2,12 @@
 // world has really finished loading. Must be the first script after compat.js (it patches Image.src and fetch before anything else creates one).
 // Combat sound cues (assets/combat/) are deliberately loaded lazily in idle time and are not waited for.
 (() => {
-  let pending = 0, changed = performance.now();
+  let pending = 0, essential = 0, changed = performance.now();   // `essential`: holds (your own character); the rest are plain downloads
+  const waiting = new Map(), started = performance.now();   // what is still on its way (label -> ms since the page started), for diagnosing a slow screen
+  let serial = 0;
   const touch = () => { changed = performance.now(); };
-  const begin = () => { pending++; touch(); };
-  const end = () => { pending = Math.max(0, pending - 1); touch(); };
+  const begin = (label, isHold) => { pending++; if (isHold) essential++; touch(); const key = ++serial; waiting.set(key, { text: `${label || '?'} @${Math.round(performance.now() - started)}ms`, isHold: !!isHold }); return key; };
+  const end = key => { const entry = waiting.get(key); if (!entry) return; waiting.delete(key); pending = Math.max(0, pending - 1); if (entry.isHold) essential = Math.max(0, essential - 1); touch(); };
 
   // Images: every src that is not already complete counts until it loads, fails or is replaced.
   try {
@@ -16,9 +18,9 @@
         this.__gateDone?.();
         desc.set.call(this, value);
         if (this.complete || this.loading === 'lazy' || typeof value !== 'string' || !value || value.startsWith('data:')) return;
-        begin();
+        const key = begin(`img ${value}`);
         let done = false;
-        const finish = () => { if (done) return; done = true; this.__gateDone = null; end(); };
+        const finish = () => { if (done) return; done = true; this.__gateDone = null; end(key); };
         this.__gateDone = finish;
         this.addEventListener('load', finish, { once: true }); this.addEventListener('error', finish, { once: true });
       },
@@ -32,12 +34,12 @@
     const track = /(^|\/)assets\//.test(url) && !/assets\/combat\//.test(url) && (!init || init.priority !== 'low');
     const result = realFetch.apply(this, arguments);
     if (!track) return result;
-    begin();
+    const key = begin(`fetch ${url}`), finish = () => end(key);
     return result.then(response => {
-      let body; try { body = response.clone().arrayBuffer(); } catch (_) { end(); return response; }
-      body.then(end, end);
+      let body; try { body = response.clone().arrayBuffer(); } catch (_) { finish(); return response; }
+      body.then(finish, finish);
       return response;
-    }, error => { end(); throw error; });
+    }, error => { finish(); throw error; });
   };
 
   // The five loading paintings are fetched and decoded as soon as the page starts (while the player is still on the title screen), so the
@@ -51,13 +53,17 @@
   window.LoadGate = {
     art,
     get pending() { return pending; },
-    // Resolves once nothing has been loading for `quiet` ms (and at least `minWait` ms have passed); gives up after `max` ms.
-    whenIdle({ quiet = 450, minWait = 350, max = 45000 } = {}) {
+    // Hold the loading screen until the returned function is called. Used for work that is not a plain download: decoding your own character's art.
+    hold(label = 'hold') { const key = begin(label, true); let done = false; return () => { if (!done) { done = true; end(key); } }; },
+    get waiting() { return [...waiting.values()].map(entry => entry.text); },
+    // Resolves once nothing has been loading for `quiet` ms (and at least `minWait` ms have passed). Plain downloads are waited for at most
+    // `assetMax` ms; your own character (a hold) at most `max` ms, so a slow connection never keeps you on this screen for long.
+    whenIdle({ quiet = 450, minWait = 350, assetMax = 8000, max = 20000 } = {}) {
       const start = performance.now();
       return new Promise(resolve => {
         const check = () => {
-          const now = performance.now();
-          if (now - start >= max || (now - start >= minWait && pending === 0 && now - changed >= quiet)) resolve(pending === 0);
+          const now = performance.now(), age = now - start;
+          if (age >= max || (age >= minWait && essential === 0 && ((pending === 0 && now - changed >= quiet) || age >= assetMax))) resolve(pending === 0);
           else setTimeout(check, 80);
         };
         check();

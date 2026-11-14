@@ -167,5 +167,7 @@
   "kindFrames rejected",
   "link {0} absent, links are {1}",
   " : history ? ",
-  " : q.repeatable ? "
+  " : q.repeatable ? ",
+  "hero sprite",
+  "sprite job"
 ]

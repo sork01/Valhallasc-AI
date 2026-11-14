@@ -36,6 +36,8 @@
         work(job.slicer, job).then(resolve, reject).finally(() => { if (!job.background) leaveForeground(); });
       };
     });
+    // Your own character's art (a foreground load) keeps the loading screen up until it is decoded; other players' art loads quietly in the background.
+    if (!background) { const release = window.LoadGate?.hold?.('sprite job'); if (release) job.promise.then(release, release); }
     if (background) backgroundChain = backgroundChain.then(whenForegroundIdle).then(() => { job.start(); return job.promise.catch(() => {}); });
     else job.start();
     return job;

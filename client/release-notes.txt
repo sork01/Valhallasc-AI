@@ -3,10 +3,10 @@
     "version": "Beta 1.53.2",
     "date": "2026-11-14",
     "new": [
-      "The loading screen now shows one of five paintings, picked at random each time you connect, with Veyrheim awaits written at the top and a random tip about the game at the bottom. It stays up until everything has finished loading, so the world no longer pops in around you."
+      "The loading screen now shows one of five paintings, picked at random each time you connect, with Veyrheim awaits written at the top and a random tip about the game at the bottom. It stays up until the world and your character have finished loading (at most 8 seconds for the world, 20 for your character), so the world no longer pops in around you."
     ],
     "changed": [
-      "The status line now reads Connecting to Veyrheim. The connection message and its buttons only appear when something needs your attention, such as a lost connection or a name to choose."
+      "The status line now reads Connecting to Veyrheim, and the first chat line welcomes you to Veyrheim. The connection message and its buttons only appear when something needs your attention, such as a lost connection or a name to choose."
     ],
     "removed": []
   },
