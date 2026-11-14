@@ -429,6 +429,8 @@
     show, close, get open() { return open(); },
     setLevel(level) { if (heroLevel !== level) { heroLevel = level; clearGuidance(); render(); } },
     mapMarkers, navigationTarget, track, get tracked() { return tracked; },
+    // The highest quest level an NPC offers (null when they give none): the level their target frame shows in a city.
+    npcLevel(id) { const l = (questsByNpc.get(id) || []).map(q => q.level).filter(Number.isFinite); return l.length ? Math.max(...l) : null; },
     get anyReady() { return definitions.some(q => status(q) === 'ready'); },
     refresh() { render(); },
     seasonChanged() { clearGuidance(); render(); },

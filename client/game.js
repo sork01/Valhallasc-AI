@@ -659,13 +659,20 @@
     if (target) {
       $('hud-target-name').textContent = target.name;
       $('hud-target-level').textContent = ` Lv ${target.level}`;
-      const targetColor = target.player ? '' : Field.enemyLevelColor(target.level, s.level);
+      const targetColor = target.player || target.npc ? '' : Field.enemyLevelColor(target.level, s.level);
       $('hud-target-name').style.color = targetColor;
       $('hud-target-level').style.color = targetColor;
-      $('hud-target-fill').style.width = `${Math.max(0, Math.min(100, target.hp / target.maxHp * 100))}%`;
-      $('hud-target-text').textContent = `${Math.min(wholeHp(target.hp), wholeMax(target.maxHp))} / ${wholeMax(target.maxHp)}`;
-      $('hud-target-hp').setAttribute('aria-valuenow', wholeHp(target.hp));
-      $('hud-target-hp').setAttribute('aria-valuemax', wholeMax(target.maxHp));
+      // A townsperson has no health: the bar shows their role instead, full and neutral.
+      const bar = $('hud-target-hp'), npc = !!target.npc;
+      bar.classList.toggle('npc', npc);
+      if (npc) {
+        $('hud-target-fill').style.width = '100%'; $('hud-target-text').textContent = target.role || '';
+        bar.removeAttribute('aria-valuenow'); bar.removeAttribute('aria-valuemax'); bar.setAttribute('aria-label', 'Role');
+      } else {
+        $('hud-target-fill').style.width = `${Math.max(0, Math.min(100, target.hp / target.maxHp * 100))}%`;
+        $('hud-target-text').textContent = `${Math.min(wholeHp(target.hp), wholeMax(target.maxHp))} / ${wholeMax(target.maxHp)}`;
+        bar.setAttribute('aria-valuenow', wholeHp(target.hp)); bar.setAttribute('aria-valuemax', wholeMax(target.maxHp)); bar.setAttribute('aria-label', 'Target health');
+      }
       if (portraitTarget !== target.id || !portraitReady) {
         portraitTarget = target.id;
         portraitReady = Field.drawTargetPortrait(target, $('hud-target-face'));

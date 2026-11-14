@@ -13984,5 +13984,6 @@
   "Everlasting Ember Cloak of Might": "Evig glödmantel av kraft",
   "Worldcrowned Ember Cloak of Swiftness and Vitality": "Världskrönt glödmantel av snabbhet och vitalitet",
   "Worldcrowned Ember Cloak of Might and Swiftness": "Världskrönt glödmantel av kraft och snabbhet",
-  "Main Questline": "Huvuduppdrag"
+  "Main Questline": "Huvuduppdrag",
+  "Role": "Roll"
 }

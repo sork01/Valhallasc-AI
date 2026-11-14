@@ -1115,6 +1115,9 @@
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
   let pendingNpc = null, pendingChest = null, cityRoute = [], routeTime = 0;
+  // A townsperson picked by clicking: shown in the target frame (portrait, name, level) until something else is picked or the hero walks off.
+  let npcTarget = null;
+  const npcLevel = n => { const q = window.Quests?.npcLevel?.(n.id), top = zdef.levels?.[1]; return Number.isFinite(top) ? top : Number.isFinite(q) ? q : 99; };
   let blockedAttack = null, autoAttackTarget = null;
   const routeMotion = { x: 0, y: 0, t: 0, v: 5.5 };   // the hero's recent speed over ground, for the route follower's look-ahead
   // Speech bubbles over characters that just chatted: id -> {text, until, lines}.
@@ -1378,7 +1381,7 @@
     const ghost = !!(hero.dead && hero.ghost);
     const corpseDist = ghost && hero.corpse && hero.corpse.zone === zone ? Math.hypot(hero.x - hero.corpse.x, hero.y - hero.corpse.y) : null;
     const rival = !ghost ? remotePlayers.get(hero.pvpTargetId) : null;
-    onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, maxLevel: !!hero.maxLevel, rested: hero.rested, festivalBuff:hero.festivalBuff, festivalDance:hero.festivalDance, resurrectionSickness: hero.resurrectionSickness || 0, ghost, corpseDist, corpseInRange: corpseDist !== null && corpseDist <= 15, level: hero.level, gold: hero.gold, kills: hero.kills, target: !ghost && rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : !ghost && hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: areaName(), zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
+    onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, maxLevel: !!hero.maxLevel, rested: hero.rested, festivalBuff:hero.festivalBuff, festivalDance:hero.festivalDance, resurrectionSickness: hero.resurrectionSickness || 0, ghost, corpseDist, corpseInRange: corpseDist !== null && corpseDist <= 15, level: hero.level, gold: hero.gold, kills: hero.kills, target: !ghost && !rival && !hero.target && npcTarget && npcTarget.zone === zone && City.npcs.includes(npcTarget.npc) ? { id: npcTarget.npc.id, npc: true, name: npcTarget.npc.name, role: npcTarget.npc.role, art: npcTarget.npc.art, level: npcLevel(npcTarget.npc) } : !ghost && rival && !rival.dead ? { id: rival.id, player: true, name: window.Achievements?.displayName(rival) || rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : !ghost && hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, elite: !!hero.target.d.elite, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: areaName(), zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, daze: hero.daze || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat, raidFinalFight }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -1408,7 +1411,7 @@
     const code = Keys.codeOf(e);
     for (const [action, step] of [['minimapIn', 1], ['minimapOut', -1]]) if (Keys.is(e, action)) { e.preventDefault(); if (!e.repeat) Field.minimapZoom(step); return; }
     for (const action of ['interact', 'talk', 'mount']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
-    if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; emitHud(); e.preventDefault(); }
+    if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; npcTarget = null; emitHud(); e.preventDefault(); }
     if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.action('attack'); }
     if (Keys.is(e, 'dash') && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.action('dash'); }
   }
@@ -1473,13 +1476,14 @@
     const rival = !ghostWalking && !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
     if (s) Field.targetEnemy(s.id);
     else if (rival) { pointer.down = false; hero.pvpTargetId = rival.id; hero.target = null; hero.goal = null; }
-    else { hero.pvpTargetId = null; hero.target = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
+    else { hero.pvpTargetId = null; hero.target = null; npcTarget = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
     emitHud();
   }
   // A boss sign is read with its own message; every townsperson is spoken to with `interact`.
   const askNpc = npc => Online.send(npc.sign ? {type:'sign_read',sign:npc.id} : {type:'interact',npc:npc.id});
   function talkTo(npc) {
-    keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = []; emitHud();
+    keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = [];
+    npcTarget = npc.sign ? null : { npc, zone }; emitHud();
     if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) askNpc(npc);
     else { cityRoute = routeTo(npc, true); pendingNpc = { npc, until: tAll + Math.max(20, cityRoute.length * .6) }; routeTime = 0; }
   }
@@ -3557,6 +3561,7 @@
     return b;
   }
   function drawTargetPortrait(target, canvas) {
+    if (target.npc) { const n = City.npcs.find(n => n.id === target.id); return n ? City.portraitTo(n, canvas) : false; }
     if (target.player) {
       const g=canvas.getContext('2d'), remote=remotePlayers.get(target.id); g.clearRect(0,0,96,96);
       if (remote?.sprite) { const sprite=remote.sprite, frame=sprite.frame('idle',MageSprite.direction(remote.fx,remote.fy),0); g.imageSmoothingEnabled=false; g.drawImage(frame,...(sprite.meta.portrait||[56,18,48,48]),0,0,96,96); return true; }
@@ -5832,10 +5837,10 @@
     targetEnemy(id) {
       const target = slimes.find(s => s.id === id && !s.dead);
       if (!running || paused || !Online.connected || hero.dead || !target) return false;
-      autoAttackTarget = id; hero.pvpTargetId = null; hero.target = target; hero.goal = null;
+      autoAttackTarget = id; hero.pvpTargetId = null; hero.target = target; hero.goal = null; npcTarget = null;
       Online.send({ type: 'target', id }); emitHud(); return true;
     },
-    targetPlayer(id) { if (!remotePlayers.has(id)) return false; hero.pvpTargetId = id; hero.target = null; hero.goal = null; emitHud(); return true; },
+    targetPlayer(id) { if (!remotePlayers.has(id)) return false; npcTarget = null; hero.pvpTargetId = id; hero.target = null; hero.goal = null; emitHud(); return true; },
     // Shows `text` in a speech bubble over the character `id` for a few seconds (longer for longer messages).
     bubble(id, text, party = false) {
       text = String(text || '').trim(); if (!id || !text) return;

@@ -225,7 +225,7 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .hud-name { margin: 0 0 .4cqw; font-size: 1.5cqw; } .hud-name b { font-family: var(--display); font-weight: 400; color: #fff3c4; } .hud-name span { color: var(--gold); font-size: 1.2cqw; }
 .bar { position: relative; height: 1.9cqw; border-radius: 999px; background: rgba(0, 0, 0, .5); border: .15cqw solid rgba(255, 255, 255, .25); overflow: hidden; }
 .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 999px; transition: width .15s; }
-.bar.hp i { background: linear-gradient(#ff8a8a, #d63a4e); } .bar.xp { height: .9cqw; margin-top: .5cqw; } .bar.xp i { background: linear-gradient(#9af0ff, #3a9be0); width: 0; }
+.bar.hp i { background: linear-gradient(#ff8a8a, #d63a4e); } .bar.hp.npc i { background: linear-gradient(#f5d477, #a8802a); } .bar.xp { height: .9cqw; margin-top: .5cqw; } .bar.xp i { background: linear-gradient(#9af0ff, #3a9be0); width: 0; }
 .bar.resource { margin-top: .35cqw; }
 .bar.resource[data-type="mana"] i { background: linear-gradient(#85c8ff, #3464db); }
 .bar.resource[data-type="energy"] i { background: linear-gradient(#fff08c, #dca52e); }

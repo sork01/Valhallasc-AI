@@ -626,12 +626,14 @@
     (target&&!target.hidden?target:$('npc-x')).focus({preventScroll:true});
   }
   // The speaker's face in the round frame at the window's corner (the merchant view has its own, shop.js).
-  function portrait(npc){
-    const c=$('npc-portrait');if(!c)return;const g=c.getContext('2d'),plain=npc.art==='stone'||npc.art==='scenery'||npc.art==='mailbox';
-    g.clearRect(0,0,128,128);g.save();g.beginPath();g.arc(64,64,64,0,Math.PI*2);g.clip();
-    const sky=g.createLinearGradient(0,0,0,128);sky.addColorStop(0,'#3a4d63');sky.addColorStop(1,'#1c2530');g.fillStyle=sky;g.fillRect(0,0,128,128);
-    if(!plain){window.NpcArt?.readyFor?.([npc]);try{g.translate(64,0);g.scale(2.3,2.3);drawNpc(g,npc,0,headTop(npc)+7,0,false,true);}catch{/* art still loading */}}
-    g.restore();c.dataset.npc=npc.id;
+  // `c` is the dialogue's round frame by default; the target frame passes its own (any square canvas). True once the art is ready.
+  function portrait(npc,c=$('npc-portrait')){
+    if(!c)return false;const g=c.getContext('2d'),plain=npc.art==='stone'||npc.art==='scenery'||npc.art==='mailbox',N=c.width,k=N/128;
+    g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,N,N);g.save();g.beginPath();g.arc(N/2,N/2,N/2,0,Math.PI*2);g.clip();
+    const sky=g.createLinearGradient(0,0,0,N);sky.addColorStop(0,'#3a4d63');sky.addColorStop(1,'#1c2530');g.fillStyle=sky;g.fillRect(0,0,N,N);
+    const ready=plain||!!window.NpcArt?.readyFor?.([npc]);
+    if(!plain){window.NpcArt?.readyFor?.([npc]);try{g.translate(N/2,0);g.scale(2.3*k,2.3*k);drawNpc(g,npc,0,headTop(npc)+7,0,false,true);}catch{/* art still loading */}}
+    g.restore();c.dataset.npc=npc.id;return ready;
   }
   setInterval(()=>{if(current&&!$('npc-dialogue').hidden)portrait(current);},700);   // late-loading art
   function acceptQuest(quest, button) {
@@ -672,5 +674,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,sweepSprites,get spriteInfo(){return spriteInfo();},animateObject,drawNpc,drawNpcPlate,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={portraitTo:portrait,signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,sweepSprites,get spriteInfo(){return spriteInfo();},animateObject,drawNpc,drawNpcPlate,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();
