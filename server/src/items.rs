@@ -1210,6 +1210,76 @@ impl Character {
         };
         score(i) > current
     }
+    /// `MERC-MIRROR-GEAR`: a hired fighter wears what its hirer wears, slot by slot. For every non-starter piece the hirer has on,
+    /// the fighter gets its own class's ordinary piece (or the same class-neutral kind) of the same level and rarity; the hirer's
+    /// worn copy decides the rarity (a merged copy counts as its new tier). Set pieces, orange, Hierloom and GM pieces map to the
+    /// ordinary ladder piece of that level, capped at epic; when that exact level and tier do not exist the best piece at or
+    /// below them is used. A slot the hirer leaves empty or fills with a starter keeps the fighter's own starter gear and cloak.
+    /// Nothing is saved: the pieces live in the mercenary's memory only, and wear stays zero.
+    pub fn mirror_gear_of(&mut self, hirer: &Character) {
+        let class = self.look.class;
+        let rank = |rarity: &str| match rarity {
+            "common" => 0,
+            "uncommon" => 1,
+            "rare" => 2,
+            _ => 3,
+        };
+        let (mut armor, mut weapon) = {
+            let (a, w) = self.gear();
+            (a.to_owned(), w.to_owned())
+        };
+        let mut chosen: Vec<(String, &'static Item)> = vec![];
+        let mut occurrences = std::collections::BTreeMap::<&str, usize>::new();
+        for (slot, worn) in hirer.worn_slots() {
+            let nth = occurrences.entry(&worn.id).or_default();
+            let copy = hirer.worn_gear_instance(&worn.id, *nth);
+            *nth += 1;
+            if worn.starter || worn.required_level > hirer.level || copy.is_some_and(|c| c.broken())
+            {
+                continue;
+            }
+            let target = rank(copy.map_or(worn.rarity.as_str(), |c| c.rarity.as_str()));
+            let level = worn.required_level.min(self.level);
+            let best = ITEMS
+                .iter()
+                .filter(|i| {
+                    i.kind == worn.kind
+                        && !i.starter
+                        && i.source.is_none()
+                        && matches!(i.rarity.as_str(), "common" | "uncommon" | "rare" | "epic")
+                        && rank(&i.rarity) <= target
+                        && i.required_level <= level
+                        && if worn.class.is_some() {
+                            i.class == Some(class)
+                        } else {
+                            i.class.is_none()
+                        }
+                })
+                .max_by_key(|i| (i.required_level, rank(&i.rarity)));
+            if let Some(piece) = best {
+                match slot {
+                    "chest" => armor = piece.variant.clone().unwrap_or_else(|| "none".into()),
+                    "hands" => weapon = piece.variant.clone().unwrap_or_else(|| "none".into()),
+                    other => {
+                        self.equipment.insert(other.to_owned(), piece.id.clone());
+                    }
+                }
+                chosen.push((slot.to_owned(), piece));
+            }
+        }
+        for (_, piece) in &chosen {
+            if self.quantity(&piece.id) < self.equipped_count(piece).max(1) {
+                self.add_item(&piece.id, 1);
+            }
+        }
+        let _ = self.look.equip(&armor, &weapon);
+        self.sync_look();
+        // Re-spend the stat points now that the gear is on (the recommended spread looks at the effective attributes).
+        self.attributes = Attributes::default();
+        let _ = self.allocate_recommended();
+        self.hp = self.max_hp();
+        self.reset_resource();
+    }
     /// Every worn piece: the extra slots plus the class armor and weapon.
     pub(crate) fn worn_items(&self) -> Vec<&'static Item> {
         self.worn_slots().into_iter().map(|(_, i)| i).collect()

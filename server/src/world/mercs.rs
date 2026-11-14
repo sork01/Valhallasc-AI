@@ -262,6 +262,11 @@ impl World {
             name = format!("{name} {}", same + 1);
         }
         let mut character = Character::mercenary(class, level, &name);
+        if self.merc_mirror_gear
+            && let Some(hirer) = self.players.values().find(|p| p.character.id == owner)
+        {
+            character.mirror_gear_of(&hirer.character);
+        }
         character.zone = zone;
         let arrival = beside(&self.maps[zone], point, Point { x: 1.5, y: 1.5 });
         character.x = arrival.x;
@@ -1115,5 +1120,145 @@ mod follow_tests {
             w.update_player(merc);
         }
         assert!(!w.players.contains_key(&merc), "the fighter died and left");
+    }
+}
+
+/// `MERC-MIRROR-GEAR`: a hired fighter wears the hirer's level and rarity of gear in its own class.
+#[cfg(test)]
+mod mirror_tests {
+    use super::*;
+    use crate::items::item;
+
+    fn hirer_with(class: Class, level: u32, ids: &[(&str, &str)]) -> Character {
+        let mut c = Character::mercenary(class, level, "Hirer");
+        for (slot, id) in ids {
+            c.add_item(id, 1);
+            c.equip_slots(&[(slot.to_string(), id.to_string())].into())
+                .unwrap_or_else(|e| panic!("{id} in {slot}: {e}"));
+        }
+        c
+    }
+    fn worn(c: &Character) -> std::collections::BTreeMap<String, (String, u32)> {
+        c.worn_slots()
+            .into_iter()
+            .map(|(slot, i)| (slot.to_owned(), (i.rarity.clone(), i.required_level)))
+            .collect()
+    }
+    const BLUE: [(&str, &str); 3] = [
+        ("chest", "warrior_armor_crimson_l45_blue"),
+        ("headgear", "warrior_headgear_crimson_l45_blue"),
+        ("pants", "pants_wayfarer_l45_blue"),
+    ];
+
+    #[test]
+    fn a_hire_wears_the_same_level_and_rarity_in_its_own_class() {
+        let hirer = hirer_with(Class::Warrior, 45, &BLUE);
+        let mut merc = Character::mercenary(Class::Mage, 45, "Merc Mage");
+        merc.mirror_gear_of(&hirer);
+        let got = worn(&merc);
+        for slot in ["chest", "headgear", "pants"] {
+            assert_eq!(
+                got.get(slot),
+                Some(&("rare".to_owned(), 45)),
+                "{slot}: {got:?}"
+            );
+        }
+        for (slot, piece) in merc.worn_slots() {
+            assert!(
+                piece.class.is_none_or(|c| c == Class::Mage) && piece.source.is_none(),
+                "{slot}: {}",
+                piece.id
+            );
+        }
+        // The shared piece is the very same class-neutral item, owned by the hire.
+        assert_eq!(
+            merc.equipment.get("pants").map(String::as_str),
+            Some("pants_wayfarer_l45_blue")
+        );
+        assert!(merc.quantity("pants_wayfarer_l45_blue") >= 1);
+        assert_eq!(merc.gear_instances.len(), 0, "nothing is saved or ledgered");
+        assert_eq!(merc.hp, merc.max_hp());
+    }
+
+    #[test]
+    fn a_geared_hirer_makes_a_stronger_hire_and_an_ungeared_one_changes_nothing() {
+        let plain = Character::mercenary(Class::Mage, 45, "Merc Mage");
+        let mut ungeared = plain.clone();
+        ungeared.mirror_gear_of(&Character::mercenary(Class::Warrior, 45, "Hirer"));
+        assert_eq!(
+            worn(&ungeared),
+            worn(&plain),
+            "a starter-geared hirer changes nothing"
+        );
+        assert_eq!(ungeared.look, plain.look);
+        let mut geared = plain.clone();
+        geared.mirror_gear_of(&hirer_with(Class::Warrior, 45, &BLUE));
+        let (a0, d0) = plain.stats();
+        let (a1, d1) = geared.stats();
+        assert!(a1 + d1 > a0 + d0, "plain {a0}/{d0}, mirrored {a1}/{d1}");
+        assert!(geared.max_hp() >= plain.max_hp());
+    }
+
+    #[test]
+    fn set_pieces_map_to_the_ordinary_ladder_piece_and_never_carry_a_set() {
+        let set = item("warrior_armor_crimson_l45_reliquary").unwrap();
+        assert!(set.source.is_some());
+        let hirer = hirer_with(Class::Warrior, 45, &[("chest", &set.id)]);
+        let mut merc = Character::mercenary(Class::Priest, 45, "Merc Priest");
+        merc.mirror_gear_of(&hirer);
+        let chest = merc
+            .worn_slots()
+            .into_iter()
+            .find(|(s, _)| *s == "chest")
+            .unwrap()
+            .1;
+        assert_eq!((chest.rarity.as_str(), chest.required_level), ("rare", 45));
+        assert!(
+            chest.source.is_none() && chest.class == Some(Class::Priest),
+            "{}",
+            chest.id
+        );
+        assert!(merc.set_counts().is_empty());
+    }
+
+    #[test]
+    fn hiring_mirrors_only_when_the_world_switch_is_on() {
+        for on in [true, false] {
+            let mut w =
+                World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
+            let (tx, _rx) = mpsc::channel(4096);
+            w.join(1, None, Some(Look::default()), tx).unwrap();
+            w.merc_mirror_gear = on;
+            let hirer = hirer_with(Class::Warrior, 45, &BLUE);
+            let p = w.players.get_mut(&1).unwrap();
+            let id = p.character.id.clone();
+            let keep = (p.character.id.clone(), p.character.look.name.clone());
+            p.character = hirer;
+            p.character.id = keep.0;
+            p.character.look.name = keep.1;
+            w.place_mercenary(
+                &id,
+                Class::Hunter,
+                45,
+                0,
+                Point { x: 40., y: 40. },
+                false,
+                None,
+            )
+            .unwrap();
+            let merc = w.players.values().find(|p| p.merc.is_some()).unwrap();
+            let chest = merc
+                .character
+                .worn_slots()
+                .into_iter()
+                .find(|(s, _)| *s == "chest")
+                .unwrap()
+                .1;
+            if on {
+                assert_eq!(chest.rarity, "rare");
+            } else {
+                assert!(chest.starter, "{}", chest.id);
+            }
+        }
     }
 }

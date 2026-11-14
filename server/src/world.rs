@@ -2061,6 +2061,9 @@ pub struct World {
     /// New characters arrive by ship on Greenmeadow's dock (world/landing.rs). Off in unit-test worlds, whose heroes
     /// would otherwise collect the landing quests the moment a test moves them; `landing_tests` switch it on.
     pub landings: bool,
+    /// Hired fighters wear the hirer's level and rarity of gear (`Character::mirror_gear_of`, `MERC-MIRROR-GEAR`). Off in unit-test
+    /// worlds so the many calibration and harness tests keep their plain starter-geared hires; `mirror_tests` switch it on.
+    pub merc_mirror_gear: bool,
     // Test servers only (VALHALLA_TEST_COMMANDS=1): players may send `debug` shortcuts. Never set on the public service.
     pub test_commands: bool,
     /// Test servers play no crossing cutscene until a test asks for it with the `enable_cutscenes` debug op, so the many older suites that walk the
@@ -2184,6 +2187,7 @@ impl World {
             god_mode: false,
             start_level: 1,
             landings: !cfg!(test),
+            merc_mirror_gear: !cfg!(test),
             test_commands: false,
             cutscene_opt_in: false,
             intro_pending: BTreeMap::new(),
