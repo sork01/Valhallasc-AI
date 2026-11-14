@@ -605,6 +605,7 @@
 .layout-bar { position: absolute; left: 50%; top: 3.2cqw; transform: translateX(-50%); z-index: 52; display: flex; align-items: center; gap: 1cqw; padding: .6cqw 1.2cqw; max-width: 96cqw; border: .2cqw solid #f5c542; border-radius: 1cqw; background: #0b1230f2; color: #f1ecda; font: 1.05cqw 'Jua', sans-serif; box-shadow: 0 .4cqw 1.6cqw #000a; }
 .layout-bar b { color: var(--gold); font-size: 1.3cqw; white-space: nowrap; }
 .layout-bar span { flex: 1; min-width: 0; color: #cdd7ea; }
+.layout-bar .layout-window { font: inherit; max-width: 16cqw; padding: .3em .5em; color: #f1ecda; background: #1b2748; border: 1px solid #f5c542; border-radius: .5cqw; }
 .layout-bar .btn { font-size: clamp(12px, 1.2cqw, 20px); padding: .35em 1.1em; white-space: nowrap; }
 .layout-bar :focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
 @media (pointer: coarse) { .layout-bar .btn { min-height: 44px; } }

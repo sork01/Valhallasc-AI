@@ -97,7 +97,7 @@
   function placeGrip(w) {
     if (!w.grip) return;
     const r = w.el.getBoundingClientRect(), s = stage.getBoundingClientRect();
-    w.grip.hidden = editing || !r.width || !r.height;
+    w.grip.hidden = !editing || !r.width || !r.height;
     if (w.grip.hidden) return;
     const g = w.grip.offsetWidth || 16;
     w.grip.style.left = Math.min(r.right, s.right) - s.left - g - 3 + 'px'; w.grip.style.top = Math.min(r.bottom, s.bottom) - s.top - g - 3 + 'px';
@@ -213,7 +213,7 @@
   function placePanelGrip(p) {
     if (!p.grip) return;
     const r = p.el.getBoundingClientRect(), s = stage.getBoundingClientRect(), body = p.body(p.el);
-    p.grip.hidden = editing || !r.width || !r.height || !body || !body.offsetHeight;
+    p.grip.hidden = !editing || !r.width || !r.height || !body || !body.offsetHeight;
     if (p.grip.hidden) return;
     const g = p.grip.offsetWidth || 18;
     p.grip.style.left = Math.min(r.right, s.right) - s.left - g - 3 + 'px';
@@ -318,7 +318,7 @@
   }
   // toMenu: go back to the World Menu; false: just shut everything (the caller is closing the menus itself).
   function close(toMenu = true) {
-    if (editing) stopEdit(false);
+    if (editing && !previewing) stopEdit(false);
     if (!keysPanel.hidden) { closeKeys(false); if (toMenu) { $('pause').hidden = false; $('p-settings').focus({ preventScroll: true }); } return; }
     if (panel.hidden) return;
     panel.hidden = true;
@@ -407,6 +407,30 @@
     h.addEventListener('pointerup', end); h.addEventListener('pointercancel', end);
     return h;
   }
+  // Windows are only resizable while Edit UI is on, and the Esc menu closes every window, so the bar has a picker that opens one
+  // for the resize grip. Only windows that open without an NPC or server exchange are offered. A window's own close() would call
+  // Settings.close() and end Edit UI, hence `previewing`; closing without resuming keeps the game paused like Edit UI itself.
+  const PREVIEW = {
+    equipment: [() => window.CharacterPane?.open('stats'), () => { $('equipment').hidden = true; }],
+    'skills-panel': [() => window.Skillbar?.show(), () => window.Skillbar?.close(false)],
+    'quest-journal': [() => window.Quests?.show(), () => window.Quests?.close(false)],
+    worldmap: [() => window.WorldMap?.show(), () => window.WorldMap?.close(false)],
+    'social-panel': [() => window.Social?.show(), () => window.Social?.close(false)],
+    'whats-new': [() => window.WhatsNew?.show(), () => window.WhatsNew?.close()],
+  };
+  let previewing = false, previewId = '';
+  function closePreview() {
+    const entry = PREVIEW[previewId]; previewId = '';
+    if (entry) { previewing = true; try { entry[1](); } finally { previewing = false; } }
+    for (const w of wins) placeGrip(w);
+  }
+  function openPreview(id) {
+    closePreview();
+    const entry = PREVIEW[id]; if (!entry) return;
+    previewing = true; try { entry[0](); previewId = id; } finally { previewing = false; }
+    for (const w of wins) placeGrip(w);
+  }
+  $('layout-window')?.addEventListener('change', e => openPreview(e.target.value));
   function startEdit() {
     if (editing) return;
     editing = true; panel.hidden = true; $('pause').hidden = true;
@@ -419,6 +443,7 @@
   }
   function stopEdit(toPanel = true) {
     if (!editing) return;
+    closePreview(); const pick = $('layout-window'); if (pick) pick.value = '';
     editing = false; drag = null; store();
     window.TouchControls?.edit(false);
     stage.classList.remove('ui-editing'); bar.hidden = true; for (const w of wins) placeGrip(w); placePanelGrips(); layer.remove(); layer = null; handles.clear(); selected = null;
@@ -486,7 +511,7 @@
       event.preventDefault(); event.stopImmediatePropagation(); window.BossSign.close();
     }
   }, true);
-  window.Settings = { registerWindow, unregisterWindow, show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
+  window.Settings = { registerWindow, unregisterWindow, show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !previewing && (!panel.hidden || editing); }, get editing() { return editing; }, get layout() { return layout; } };
   const suggestion = $('low-gfx-suggestion');
   suggestion.hidden = !matchMedia('(pointer: coarse)').matches || window.Prefs.touchGraphicsSuggested || window.Prefs.lowGraphics;
   for (const [id, accept] of [['low-gfx-accept', true], ['low-gfx-dismiss', false]]) $(id).addEventListener('click', () => {

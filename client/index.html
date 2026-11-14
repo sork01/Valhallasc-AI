@@ -42,7 +42,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.55.1</p>
+    <p class="version">Beta 1.55.2</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -677,6 +677,15 @@
   <div id="layout-bar" class="layout-bar" role="toolbar" aria-label="Edit UI" hidden>
     <b>Edit UI</b>
     <span>Drag the highlighted pieces · arrow keys nudge (Shift: bigger) · Esc to finish</span>
+    <select id="layout-window" class="layout-window" aria-label="Open a window to resize it">
+      <option value="">Resize a window…</option>
+      <option value="equipment">Character and bags</option>
+      <option value="skills-panel">Skills</option>
+      <option value="quest-journal">Quest journal</option>
+      <option value="worldmap">World map</option>
+      <option value="social-panel">Social</option>
+      <option value="whats-new">What's new</option>
+    </select>
     <button id="layout-reset" class="btn ghost" type="button">Reset layout</button>
     <button id="layout-done" class="btn primary" type="button">Done</button>
   </div>

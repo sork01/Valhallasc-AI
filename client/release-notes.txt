@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.55.2",
+    "date": "2026-11-14",
+    "new": [
+      "Edit UI has a \"Resize a window…\" list: pick the Character window, Skills, Quest journal, World map, Social or What's new to open it and drag its corner."
+    ],
+    "changed": [
+      "Windows, the quest tracker and the chat can now only be resized while Edit UI is on, so a stray drag in the corner no longer changes them.",
+      "The DPS meter now starts at the far right of the screen. If you already moved it, it stays where you put it."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.1",
     "date": "2026-11-14",
     "new": [

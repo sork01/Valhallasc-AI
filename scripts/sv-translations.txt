@@ -4305,6 +4305,8 @@
   "Reset": "Återställ",
   "Reset all keys": "Återställ alla tangenter",
   "Reset layout": "Återställ layout",
+  "Resize a window…": "Ändra storlek på ett fönster…",
+  "Open a window to resize it": "Öppna ett fönster för att ändra storleken",
   "Reset trained attributes": "Nollställ tränade attribut",
   "Reset window sizes": "Återställ fönsterstorlekar",
   "Resource": "Resurs",
