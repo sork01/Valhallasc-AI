@@ -92,7 +92,8 @@ const botSchema = z.object({
 }).strict();
 
 function spacingViolation(snapshot) {
-  const actors = [...snapshot.players, ...snapshot.slimes].filter(a => !a.dead && !a.sparkTravel);
+  // A zone nobody stands in gets a stub snapshot (players only, 2026-11-10 tick budget), so every list may be missing or null.
+  const actors = [...(snapshot.players || []), ...(snapshot.slimes || [])].filter(a => !a.dead && !a.sparkTravel);
   for (let i = 0; i < actors.length; i++) for (let j = i + 1; j < actors.length; j++) {
     const a = actors[i], b = actors[j];
     if (!a.kind && !b.kind) continue;
@@ -139,9 +140,9 @@ class TestWorld extends EventEmitter {
     }
     if (!best.size) return this.merged;
     const views = [...best.values()], newest = views.reduce((a, b) => b.tick > a.tick ? b : a);
-    const all = key => views.flatMap(v => v[key]);
+    const all = key => views.flatMap(v => v[key] || []);
     return { ...newest, players: all('players'), slimes: all('slimes'), bolts: all('bolts'), drops: all('drops'),
-      online: Math.max(...views.map(v => v.online)), zonesSeen: [...best.keys()].sort() };
+      online: Math.max(...views.map(v => v.online || 0)), zonesSeen: [...best.keys()].sort() };
   }
   async start() {
     if (this.child || this.runDir) throw Error('This world has already been started; create a new TestWorld.');

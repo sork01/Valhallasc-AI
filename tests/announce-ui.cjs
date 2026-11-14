@@ -36,24 +36,26 @@ const errors = [];
   const lines = () => page.locator('#announce .announce-line').allInnerTexts();
 
   // --- a real server announcement: the chest spawn ---
+  // a new hero spawns in Saltby and is told it discovered Spark Travel there: let that line fade first
+  await page.waitForFunction(() => document.querySelectorAll('#announce .announce-line').length === 0, null, { timeout: 15000 });
   check((await lines()).length === 0, 'No announcement before anything happens');
   await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'spawn_chest', distance: 1.2 } }));
   await page.waitForFunction(() => document.querySelectorAll('#announce .announce-line').length === 1, null, { timeout: 5000 });
   const first = (await lines())[0];
   check(/A treasure chest has appeared! (It's (on the (west|east|north|south) side|in the (north|south)-(west|east)|near the middle)\. )?It will vanish in 5 minutes\./.test(first), `The chest spawn is announced (${first})`);
   check(await page.locator('#announce .announce-line').getAttribute('data-kind') === 'treasure', 'It carries the treasure kind');
-  const chat = await page.locator('#chat-log').innerText();
-  check((chat.match(/treasure chest has appeared/g) || []).length === 1, 'The same line is in the chat log once');
-  await page.locator('#tab-system').click();
-  check(/treasure chest has appeared/.test(await page.locator('#system-log').innerText()), 'And on the System tab');
-  await page.locator('#tab-chat').click();
-
   // --- where it sits and that it never takes a click ---
   const geo = await page.evaluate(() => {
     const stage = document.getElementById('stage').getBoundingClientRect(), line = document.querySelector('#announce .announce-line').getBoundingClientRect();
     const hit = document.elementFromPoint(line.left + line.width / 2, line.top + line.height / 2);
     return { top: (line.top - stage.top) / stage.height, centre: (line.left + line.width / 2 - stage.left) / stage.width, readable: line.width > 100 && line.height > 20, pe: getComputedStyle(document.getElementById('announce')).pointerEvents, hitInside: !!hit?.closest('#announce') };
   });
+  const chat = await page.locator('#chat-log').innerText();
+  check((chat.match(/treasure chest has appeared/g) || []).length === 1, 'The same line is in the chat log once');
+  await page.locator('#tab-system').click();
+  check(/treasure chest has appeared/.test(await page.locator('#system-log').innerText()), 'And on the System tab');
+  await page.locator('#tab-chat').click();
+
   check(Math.abs(geo.top - .25) < .03, `The line starts about 25% down the stage (${geo.top.toFixed(3)})`);
   check(Math.abs(geo.centre - .5) < .01, `It is centred (${geo.centre.toFixed(3)})`);
   check(geo.readable, 'It has a readable size');
@@ -79,10 +81,11 @@ const errors = [];
   check(true, 'Every line has faded out and been removed after a few seconds');
 
   // --- Swedish ---
+  await page.close(); // two live clients exceed the 1.5 GiB cap and the second page never finishes loading
   const sv = await enter(world, 'Svensken', 'sv');
   await sv.evaluate(() => Announce.show('The treasure chest has vanished.', 'treasure'));
   check(await sv.locator('#announce .announce-line').last().innerText() === 'Skattkistan har försvunnit.', 'With Swedish selected the line is Swedish');
-  check(/^En skattkista har dykt upp!/.test(await sv.locator('#announce .announce-line').first().innerText()), 'The chest still standing is announced to the late arrival, in Swedish');
+  check((await sv.locator('#announce .announce-line').allInnerTexts()).some(t => /^En skattkista har dykt upp!/.test(t)), 'The chest still standing is announced to the late arrival, in Swedish');
   assert.deepEqual(errors, []);
   console.log(`announce-ui: ${checks} checks passed`);
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => {

@@ -245,7 +245,8 @@ const scenarios = {
       const original = { ...w.player('Warrior') };
       // Find a clear short segment so map collision cannot be confused with player collision.
       let point;
-      for (const [dx, dy] of [[2, 0], [-2, 0], [0, 2], [0, -2]]) {
+      // New heroes stand on the Greenmeadow pier (3 tiles wide, long in y), so try along it before across it.
+      for (const [dx, dy] of [[0, -2], [0, 2], [2, 0], [-2, 0]]) {
         const goal = { x: original.x + dx, y: original.y + dy };
         const points = route(map, original, goal);
         if (points.length <= 2) { point = goal; break; }

@@ -181,8 +181,10 @@ test('MCP shortcuts: every tool advertised, strict inputs, and server-side effec
     assert.equal((await call('quest', { bot: 'Gm', id: 'meadow_bounty', action: 'complete' })).quest.counts[0], 8);
     const moved = await call('teleport', { bot: 'Gm', to: { spawn: 1 } });
     assert.equal(moved.player.zone, 1);
-    assert.equal(moved.player.x, 48);
-    const elite = await call('spawn_enemy', { bot: 'Gm', kind: 'cinderlord', level: 10, x: 84, y: 10 });
+    // The Crags' spawn comes from the shaped map, so read it instead of pinning a coordinate.
+    const crags = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')).zones[0].spawn;
+    assert.equal(moved.player.x, crags.x);
+    const elite = await call('spawn_enemy', { bot: 'Gm', kind: 'cinderlord', level: 10, x: crags.x + 3, y: crags.y });
     assert.equal(elite.enemy.kind, 'cinderlord');
     assert.equal(elite.enemy.level, 10);
     assert.equal(elite.enemy.zone, 1);
@@ -194,11 +196,18 @@ test('MCP shortcuts: every tool advertised, strict inputs, and server-side effec
     const slain = await call('kill_enemies', { bot: 'Gm', kind: 'wisp', max: 2 });
     assert.equal(slain.count, 2);
     assert.ok(slain.xpGained > 0 || slain.levelsGained > 0);
-    // God mode is off in this world, so the bot can be defeated for real and then respawns.
+    // God mode is off in this world, so the bot can be defeated for real. Death makes a ghost (corpse run), not an instant respawn.
     await call('set_health', { bot: 'Gm', defeat: true });
     assert.equal((await call('inspect_world', { bot: 'Gm', events: 0 })).snapshot.dead, true);
-    const respawn = await call('wait_for_event', { type: 'event', kind: 'respawn', bot: 'Gm', timeout: 8000 });
-    assert.equal(respawn.received, true);
+    const ghost = await call('wait_for_event', { type: 'event', kind: 'ghost', bot: 'Gm', timeout: 8000 });
+    assert.equal(ghost.received, true);
+    // The event and the snapshot arrive separately, so give the snapshot a moment to show the ghost.
+    let isGhost = false;
+    for (let attempt = 0; attempt < 20 && !isGhost; attempt++) {
+      isGhost = (await call('inspect_world', { bot: 'Gm', events: 0 })).snapshot.ghost === true;
+      if (!isGhost) await delay(100);
+    }
+    assert.equal(isGhost, true, 'a defeated hero is shown as a ghost');
     assert.equal((await call('set_god_mode', { bot: 'Gm', enabled: true })).godMode, true);
     const setup = await call('setup_character', { bot: 'Gm', level: 7, gold: 50, items: [{ item: 'slime_gel', quantity: 3 }], teleportTo: { npc: 'healer' } });
     assert.equal(setup.player.level, 7);
