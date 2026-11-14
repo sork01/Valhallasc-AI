@@ -75,6 +75,7 @@ function requireMemoryLimit() {
             window.__shot = { title: document.getElementById('loading-title').textContent, titleTop: t.top < s.top + s.height * 0.2 && t.width > 0, tip: document.getElementById('loading-tip').textContent, tipBottom: tip.top > s.top + s.height * 0.7 && tip.width > 0,
               panel: getComputedStyle(document.querySelector('#connection-overlay .connection-panel')).display, bg: cs.backgroundImage, art: o.dataset.art, size: cs.backgroundSize,
               covers: r.left <= s.left + 1 && r.top <= s.top + 1 && r.right >= s.right - 1 && r.bottom >= s.bottom - 1, tips: window.LoadingTips.list };
+            window.__pick = undefined;   // the screen has chosen its painting and tip; a constant Math.random would hang any retry loop in the game that starts next
           }).observe(o, { attributes: true, attributeFilter: ['hidden'] });
         });
       }, pick);

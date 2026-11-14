@@ -36,8 +36,11 @@ const median = a => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)];
     window.WebSocket = function (...args) {
       const ws = new Native(...args);
       ws.addEventListener('message', e => {
-        if (typeof e.data !== 'string' || !e.data.includes('"type":"snapshot"')) return;
-        const p = JSON.parse(e.data), own = p.players?.find(q => q.id === window.Online?.id);
+        // Snapshots are raw-deflate binary frames when the client offers compress:true; inflate them the way online.js does.
+        let text = e.data;
+        if (typeof text !== 'string') { try { text = window.pako.inflateRaw(new Uint8Array(text), { to: 'string' }); } catch (_) { return; } }
+        if (!text.includes('"type":"snapshot"')) return;
+        const p = JSON.parse(text), own = p.players?.find(q => q.id === window.Online?.id);
         if (own && window.__record) window.__snaps.push([p.time, own.x, own.y]);
       });
       return ws;
@@ -49,21 +52,24 @@ const median = a => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)];
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('WalkRoute');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
-  // Far east of Alderhaven, in Greenmeadow, so the Visit button shows and the walk is long.
-  await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone: 0, x: 80, y: 25 } }));
-  await page.waitForFunction(() => Math.hypot(Field.hero.x - 80, Field.hero.y - 25) < 3, null, { timeout: 10000 });
+  // Open ground in Greenmeadow straight south of Alderhaven (a start that needs no detour round scenery: a hairpin at the start made the hero pause at its first corner), outside every hub and about 49 tiles from the Visit button's goal in Alderhaven (the old (36,79) plus the zone's shape offset (207,107)): the Visit button shows and the walk is long.
+  // The pier a new hero starts on is Saltby's hub, where the button is hidden.
+  const START = { x: 250, y: 235 }, GOAL = { x: 243, y: 186 };
+  await page.evaluate(p => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone: 0, x: p.x, y: p.y } }), START);
+  await page.waitForFunction(p => Math.hypot(Field.hero.x - p.x, Field.hero.y - p.y) < 3, START, { timeout: 10000 });
   await page.waitForTimeout(1500);
+  const start = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
   check(await page.evaluate(() => !document.getElementById('city-travel').hidden), 'The Visit Alderhaven button shows away from the city');
 
   // The route is a few straight runs, not a waypoint on every tile.
-  const route = await page.evaluate(() => Field._debug.routeTo({ x: 36, y: 79 }));
-  const length = route.reduce((sum, p, i) => sum + Math.hypot(p.x - (i ? route[i - 1].x : 80), p.y - (i ? route[i - 1].y : 25)), 0);
+  const route = await page.evaluate(g => Field._debug.routeTo(g), GOAL);
+  const length = route.reduce((sum, p, i) => sum + Math.hypot(p.x - (i ? route[i - 1].x : start.x), p.y - (i ? route[i - 1].y : start.y)), 0);
   check(length > 40 && route.length <= length / 4, `The route of ${length.toFixed(0)} tiles has ${route.length} waypoints (at most one per 4 tiles)`);
-  check(Math.hypot(route.at(-1).x - 36, route.at(-1).y - 79) < 1.5, 'The route ends at the Alderhaven goal');
+  check(Math.hypot(route.at(-1).x - GOAL.x, route.at(-1).y - GOAL.y) < 1.5, 'The route ends at the Alderhaven goal');
 
   await page.evaluate(() => { window.__snaps.length = 0; window.__record = true; });
   await page.locator('#city-travel').click();
-  await page.waitForFunction(() => window.__snaps.length > 0 && Math.hypot(window.__snaps.at(-1)[1] - 80, window.__snaps.at(-1)[2] - 25) > 24, null, { timeout: 30000 });
+  await page.waitForFunction(s0 => window.__snaps.length > 0 && Math.hypot(window.__snaps.at(-1)[1] - s0.x, window.__snaps.at(-1)[2] - s0.y) > 24, start, { timeout: 30000 });
   const snaps = await page.evaluate(() => { window.__record = false; return window.__snaps; });
 
   // Speed between consecutive snapshots, in game time. Drop the start (the hero is still standing) and the end (arrival).

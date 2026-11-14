@@ -44,7 +44,9 @@ const check = (ok, label) => { assert.ok(ok, label); checks++; };
     window.weatherCameras = []; const draw = Weather.draw;
     Weather.draw = function (...args) { weatherCameras.push(args[4]); return draw.apply(this, args); };
   });
-  await page.keyboard.down('w'); await sleep(1000); await page.keyboard.up('w');
+  // New heroes stand on the 3-wide Greenmeadow pier, where a diagonal key press (arrows follow the screen axes) walks into the rail: order a walk along the pier instead.
+  await page.evaluate(() => Online.send({ type: 'move', x: Field.hero.nx, y: Field.hero.ny - 4 })); await sleep(1500);
+  await page.evaluate(() => Online.send({ type: 'stop' }));
   const cameras = await page.evaluate(() => weatherCameras);
   check(cameras.length > 2 && cameras.every(c => c && Number.isFinite(c.x) && Number.isFinite(c.y)), 'the real field renderer passes its camera into weather drawing');
   check(cameras.some(c => Math.hypot(c.x - cameras[0].x, c.y - cameras[0].y) > 1), 'walking changes the weather camera');
