@@ -103,11 +103,14 @@
     w.grip.style.left = Math.min(r.right, s.right) - s.left - g - 3 + 'px'; w.grip.style.top = Math.min(r.bottom, s.bottom) - s.top - g - 3 + 'px';
   }
   function applyWindow(w) {
-    const k = windowScale(w);
+    const targetK = Math.max(WIN_MIN, uiScale() * (winScale[w.id] || 1));
     w.el.classList.toggle('touch-resizable-window', w.resizable);
-    w.el.style.setProperty('--window-k', String(k));
     w.el.style.setProperty('--touch-stage-h', stage.clientHeight * .94 + 'px');
+    w.el.style.setProperty('--window-k', String(targetK));
+    const k = windowScale(w);
+    if (Math.abs(k - targetK) > .0005) w.el.style.setProperty('--window-k', String(k));
     w.el.style.scale = Math.abs(k - 1) < .005 ? '' : String(Math.round(k * 1000) / 1000);
+    if (w.id === 'worldmap') window.WorldMap?.layout?.();
     placeGrip(w);
   }
   function applyScale() {

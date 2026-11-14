@@ -153,9 +153,10 @@ window.Tutorial = (() => {
 
   function isAnyBlockingModalOpen(allowedId) {
     const blockers = ['pause', 'settings-panel', 'keys-panel', 'whats-new', 'worldmap',
-      'social-panel', 'inspect-panel', 'rebirth-dialog', 'recommended-dialog', 'sell-warning',
-      'mail-panel', 'bank-panel', 'activity-panel', 'quest-journal',
-      'equipment', 'skills-panel', 'npc-dialogue'];
+      'social-panel', 'inspect-panel', 'trade-panel', 'trade-request', 'rebirth-dialog',
+      'recommended-dialog', 'sell-warning', 'mail-panel', 'bank-panel', 'activity-panel',
+      'quest-journal', 'equipment', 'skills-panel', 'npc-dialogue', 'connection-overlay',
+      'gmtest-panel', 'sign-panel'];
     for (const id of blockers) {
       if (id === allowedId) continue;
       if (isShown($(id))) return true;
@@ -400,7 +401,7 @@ window.Tutorial = (() => {
     const inShop = dlg.classList.contains('merchant-mode');
     if (inShop) merchantModeSeen = true;
     const target = inShop
-      ? (isShown($('sell-junk')) && $('sell-junk').offsetParent ? $('npc-inventory') : $('npc-inventory'))
+      ? (isShown($('sell-junk')) && $('sell-junk').offsetParent ? $('sell-junk') : $('npc-inventory'))
       : $('npc-offers');
     return {
       id: 'merchant',
@@ -648,8 +649,14 @@ window.Tutorial = (() => {
     if (targetRect) avoid.push(targetRect);
     const stickRect = COARSE() ? stageRectFor($('touch-stick'), stage) : null;
     if (stickRect && step.target !== $('touch-stick')) avoid.push(stickRect);
+    const lowGfxRect = stageRectFor($('low-gfx-suggestion'), stage);
+    if (lowGfxRect) avoid.push(lowGfxRect);
     const dlgEl = step.allowedDialog ? $(step.allowedDialog) : null;
     if (dlgEl && isShown(dlgEl)) {
+      if (dlgEl.classList.contains('merchant-mode')) {
+        const invRect = stageRectFor($('inventory-list'), stage);
+        if (invRect) avoid.push(invRect);
+      }
       for (const btn of dlgEl.querySelectorAll('button')) {
         if (step.target && (btn === step.target || step.target.contains(btn))) continue;
         const br = stageRectFor(btn, stage);
@@ -686,9 +693,10 @@ window.Tutorial = (() => {
         if (!best || penalty < best.penalty) best = { ...c, x: clampedX, y: clampedY, penalty };
       }
     } else {
-      // Fallback floating placement in upper-left/center, clear of touch-stick
+      // Fallback floating placement in upper-left/center, clear of touch-stick and low-gfx banner
       let x = Math.max(margin, Math.min(W - tipW - margin, (W - tipW) / 2));
       let y = Math.max(margin, Math.min(H - tipH - margin, COARSE() ? margin + 10 : Math.round(H * 0.14)));
+      if (lowGfxRect && y < lowGfxRect.bottom + gap) y = Math.min(H - tipH - margin, lowGfxRect.bottom + gap);
       const box = { left: x, top: y, right: x + tipW, bottom: y + tipH };
       if (stickRect && rectsOverlap(box, stickRect)) y = margin + 8;
       best = { side: 'none', x, y };

@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.53.1",
+    "date": "2026-11-14",
+    "new": [],
+    "changed": [
+      "Phone and tablet windows have been remade so the character pane and all five of its tabs, your bags, the quest journal, conversations, merchants, the world map, skills, the bank, keyboard settings and signs fit cleanly inside the screen with finger-sized buttons and smooth scrolling inside each pane."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.53.0",
     "date": "2026-11-14",
     "new": [

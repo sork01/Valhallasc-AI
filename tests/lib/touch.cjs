@@ -33,12 +33,15 @@ async function run(suites) {
   const check = (value, label) => { assert.ok(value, label); checks++; };
   try {
     await world.start();
+    const seenNames = new Map();
     for (const suite of suites) for (const [width, height] of sizes) {
       console.log(`${suite.name}: ${width}x${height}`);
       browser = await chromium.launch({ headless: true, ignoreDefaultArgs: ['--hide-scrollbars'] });
       const errors = [];
       async function player(name, opts = {}) {
-        const { keepSuggestion = false, lang = 'en', characterClass = 'mage', onPacket, ...contextOptions } = opts;
+        const count = (seenNames.get(name) || 0) + 1; seenNames.set(name, count);
+        const charName = count === 1 ? name : `${name.slice(0, 14)}${count}`;
+        const { keepSuggestion = false, keepTutorial = false, lang = 'en', characterClass = 'mage', onPacket, ...contextOptions } = opts;
         const context = await browser.newContext({ viewport: { width, height }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, reducedMotion: 'reduce', ...contextOptions });
         const page = await context.newPage(); page.on('pageerror', e => { errors.push(e.message); console.error('Browser:', e.message); });
         if (onPacket) page.on('websocket', socket => socket.on('framereceived', ({ payload }) => onPacket(JSON.parse(payload.toString()))));
@@ -49,10 +52,11 @@ async function run(suites) {
         }, lang);
         if (process.env.MUTATE) await suite.mutate?.(page);
         await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
-        await page.locator('#cls-' + characterClass).click(); await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 60000 });
+        await page.locator('#cls-' + characterClass).click(); await page.locator('#name').fill(charName); await page.locator('#go').click({ timeout: 60000 });
         await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
         await page.waitForFunction(() => window.TouchControls && (!matchMedia('(pointer: coarse)').matches || document.querySelector('#touch-skills [data-skill]')));
         if (!keepSuggestion && await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
+        if (!keepTutorial) await page.evaluate(() => window.Tutorial?.disable?.());
         return page;
       }
       await suite.test({ player, check, world, browser, width, height, out, sleep });
@@ -73,8 +77,9 @@ const replace = async (page, file, before, after) => {
 };
 const debug = (page, command) => page.evaluate(command => Online.send({ type: 'debug', command }), command);
 async function safeSpot(page) {
-  await debug(page, { op: 'teleport', zone: 0, x: 80, y: 80 });
-  await page.waitForFunction(() => Math.hypot(Field.hero.nx - 80, Field.hero.ny - 80) < 2);
+  const spot = await page.evaluate(() => ({ x: WORLD_MAP.spawn.x, y: WORLD_MAP.spawn.y }));
+  await debug(page, { op: 'teleport', zone: 0, x: spot.x, y: spot.y });
+  await page.waitForFunction(s => Math.hypot(Field.hero.nx - s.x, Field.hero.ny - s.y) < 2, spot);
   await page.evaluate(() => { Field.clearInput(); Online.send({ type: 'stop' }); }); await sleep(250);
 }
 async function record(page) {

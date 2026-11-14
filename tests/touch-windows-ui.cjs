@@ -1,7 +1,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { run, replace, debug, safeSpot } = require('./lib/touch.cjs');
-const smith = JSON.parse(fs.readFileSync(path.join(__dirname, '../world/map.txt'), 'utf8')).npcs.find(n => n.id === 'smith');
+const mapData = JSON.parse(fs.readFileSync(path.join(__dirname, '../world/map.txt'), 'utf8'));
+const smith = mapData.npcs.find(n => n.id === 'smith');
+const banker = mapData.npcs.find(n => n.id === 'banker_alderhaven');
 const suite = {
   name: 'touch-windows',
   mutate: page => replace(page, 'touch.css', 'min-width: var(--touch-target); min-height: var(--touch-target);', 'min-width: 12px; min-height: 12px;'),
@@ -21,7 +23,7 @@ const suite = {
         const stage = document.querySelector('#stage').getBoundingClientRect(), r = el.getBoundingClientRect(), problems = [];
         if (r.left < stage.left - 1 || r.top < stage.top - 1 || r.right > stage.right + 1 || r.bottom > stage.bottom + 1) problems.push(`window outside stage: ${[r.left, r.top, r.right, r.bottom].map(Math.round)}`);
         if (r.width < stage.width * .3 || r.height < 44) problems.push('window collapsed');
-        const controls = [...el.querySelectorAll('button, select, input:not([type=hidden]):not([type=checkbox]):not([type=radio]), summary, [role=button]')].filter(n => {
+        const controls = [...el.querySelectorAll('button:not(.wm-tile), select, input:not([type=hidden]):not([type=checkbox]):not([type=radio]), summary, [role=button]')].filter(n => {
           if (!n.getClientRects().length || !n.getBoundingClientRect().width) return false;
           for (let p = n.parentElement; p && p !== el; p = p.parentElement) if (p.tagName === 'DETAILS' && !p.open && p.querySelector(':scope > summary') !== n) return false;
           return true;
@@ -54,8 +56,13 @@ const suite = {
     await page.evaluate(() => Quests.show()); await audit('#quest-journal .quest-panel', 'quests'); await clear();
     await debug(page, { op: 'explore_all' }); await page.waitForFunction(() => Object.values(Field.explored || {}).filter(Boolean).length > 20);
     await page.evaluate(() => WorldMap.show()); await audit('#worldmap .wm-panel', 'world-map');
-    await page.locator('.wm-tile[data-zone="0"]').click(); await audit('#worldmap .wm-panel', 'zone-map'); await clear();
-    await page.keyboard.press('e'); await audit('.equipment-workspace', 'character-bags'); await clear();
+    await page.locator('.wm-name[data-zone="0"]').click(); await audit('#worldmap .wm-panel', 'zone-map'); await clear();
+    await page.keyboard.press('e'); await audit('.equipment-workspace', 'character-bags');
+    for (const tab of ['sets', 'achievements', 'mounts', 'rebirth']) {
+      await page.locator(`#character-tab-${tab}`).click();
+      await audit('.equipment-workspace', `character-${tab}`);
+    }
+    await clear();
     await page.evaluate(() => Keys.invoke('bags')); await audit('.equipment-workspace', 'bags'); await clear();
     await page.evaluate(() => Social.show('party')); await audit('#social-panel .social-panel', 'party-raid'); await clear();
     await page.evaluate(() => Social.show('pvp')); await audit('#social-panel .social-panel', 'arena'); await clear();
@@ -68,15 +75,17 @@ const suite = {
     await debug(page, { op: 'give_item', item: 'warrior_weapon_royal_l10_purple', quantity: 1, force: true });
     await sleep(550); await page.evaluate(() => Online.send({ type: 'interact', npc: 'smith' }));
     await audit('#npc-dialogue .gossip-window', 'npc');
+    await page.locator('#npc-offers [data-view="buy"]').click();
     await page.locator('.merchant-workspace[aria-busy="false"]').waitFor();
+    await audit('#npc-dialogue .gossip-window', 'merchant');
     await audit('#merchant-bags .bag-window', 'merchant-bags');
     await page.locator('#inventory-list [data-item="warrior_weapon_royal_l10_purple"] .item-tile').tap();
     await audit('#sell-warning', 'sell-confirmation');
     await page.locator('#sell-cancel').click();
     await page.locator('[data-action="repair-one"]').click(); await audit('#npc-dialogue .gossip-window', 'repair');
     await clear();
-    await debug(page, { op: 'teleport', zone: 0, x: 39, y: 83.6 });
-    await page.waitForFunction(() => Math.hypot(Field.hero.nx-39, Field.hero.ny-83.6) < 2); await sleep(550);
+    await debug(page, { op: 'teleport', zone: 0, x: banker.x, y: banker.y + 1 });
+    await page.waitForFunction(p => Math.hypot(Field.hero.nx-p.x, Field.hero.ny-p.y) < 2, banker); await sleep(550);
     await page.evaluate(() => Online.send({ type: 'interact', npc: 'banker_alderhaven' }));
     await page.locator('#npc-dialogue [data-offer="bank"]').click(); await audit('#bank-panel .bank-panel', 'bank'); await clear();
     const other = await player('InspectTouch'); await safeSpot(other); await safeSpot(page);
@@ -94,11 +103,12 @@ const suite = {
     await page.evaluate(() => Online.send({ type: 'social', command: { op: 'party_raid', on: true } }));
     await page.waitForFunction(() => Social.state.party?.raid);
     await page.evaluate(() => Social.show('party')); await audit('#social-panel .social-panel', 'raid-members'); await clear();
+    await other.context().close();
     await debug(page, { op: 'set_level', level: 99 });
-    await debug(page, { op: 'teleport', zone: 46, x: 35, y: 303 });
+    await debug(page, { op: 'teleport', zone: 46, x: 36, y: 303 });
     await page.waitForFunction(() => Field.zone === 46 || Field.zoneTheme === 'chained_forge'); await sleep(550);
     await page.evaluate(() => Online.send({ type: 'interact', npc: 'cf_quartermaster' })); await audit('#npc-dialogue .gossip-window', 'raid-hiring'); await clear();
-    await debug(page, { op: 'teleport', zone: 41, x: 64, y: 110 });
+    await debug(page, { op: 'teleport', zone: 41, x: 56, y: 99 });
     await page.waitForFunction(() => Field.zoneTheme === 'nornroot');
     const sign = await page.evaluate(() => Field.signs[0]);
     if (sign) {

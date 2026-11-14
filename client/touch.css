@@ -4,7 +4,7 @@ html, body { overscroll-behavior: none; }
   backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
   animation: none !important;
 }
-#low-gfx-suggestion { position: absolute; z-index: 51; left: 50%; top: 8px; transform: translateX(-50%); max-width: 90%; background: #101e46; border: 1px solid #f5c542; padding: 8px; pointer-events: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
+#low-gfx-suggestion { position: absolute; z-index: 66; left: 50%; top: 8px; transform: translateX(-50%); max-width: 90%; background: #101e46; border: 1px solid #f5c542; padding: 8px; pointer-events: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
 #low-gfx-suggestion button { min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); font-size: 14px; }
 
 
@@ -15,14 +15,17 @@ html, body { overscroll-behavior: none; }
 @media (pointer: coarse) {
   .stage { width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)); height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); aspect-ratio: auto; left: env(safe-area-inset-left); top: env(safe-area-inset-top); transform: none; }
   .rotate { z-index: 1000; }
+  #pause, #activity-panel { z-index: 49; }
+  #stage .pause:where(:not(.merchant-mode)) { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
   #stage .pause > :is(.panel, .rpg-window), .equipment-workspace, #sign-panel {
     --touch-target: calc(44px / var(--window-k, .8));
     min-width: 0; min-height: 0;
-    max-width: 96cqw; max-height: var(--touch-stage-h, 94dvh);
+    max-width: calc(96cqw / var(--window-k, .8));
+    max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
     overflow: auto; overscroll-behavior: contain;
-    font-size: max(16px, 1.2cqw);
+    font-size: calc(14px / var(--window-k, .8));
   }
-  #stage .pause > :is(.panel, .rpg-window) { width: min(94cqw, 760px); padding: 12px; }
+  #stage .pause > :is(.panel, .rpg-window) { width: min(calc(92cqw / var(--window-k, .8)), 860px); padding: 12px; }
   #stage .pause > :is(.panel, .rpg-window) :is(button, select, input:not([type=hidden]), summary),
   .equipment-workspace :is(button, select, input:not([type=hidden])), #sign-panel button {
     min-width: var(--touch-target); min-height: var(--touch-target); flex-shrink: 0;
@@ -31,19 +34,349 @@ html, body { overscroll-behavior: none; }
   #stage .pause > :is(.panel, .rpg-window) :is(input[type=checkbox], input[type=radio]) { min-width: 22px; min-height: 22px; margin: 11px; }
   .setting-check { min-height: var(--touch-target); display: flex; align-items: center; }
   .setting-row { min-height: var(--touch-target); gap: 8px; }
-  #stage .pause > :is(.panel, .rpg-window) :is(h2, h3, h4) { font-size: max(18px, 1.8cqw); }
-  #stage .pause > :is(.panel, .rpg-window) :is(p, label, small, .btn) { font-size: max(16px, 1.1cqw); }
+  #stage .pause > :is(.panel, .rpg-window) :is(h2, h3, h4) { font-size: calc(18px / var(--window-k, .8)); }
+  #stage .pause > :is(.panel, .rpg-window) :is(p, label, small, .btn) { font-size: calc(14px / var(--window-k, .8)); }
   #stage .pause > :is(.panel, .rpg-window) > * { min-width: 0; }
   .gossip-titlebar, .gossip-footer, .window-titlebar, .bank-footer, .bank-tools, .news-panel header, .news-panel footer { flex-shrink: 0; }
   .gossip-content, .gossip-page, .bank-body, #news-body, .social-body, .quest-list { min-height: 0; overflow: auto; }
-  .equipment-workspace { align-items: flex-start; width: min(96cqw, 1000px); }
-  .character-window, .bag-window { flex: 1 0 300px; width: auto; min-width: 0; }
-  .bag-grid, #inventory-list { max-width: none; }
-  .skills-panel .skill-card { min-width: 0; white-space: normal; }
+
+  /* Character pane & Bags (#equipment): full-stage two-pane workspace on phone with internal scroll per pane. */
+  #stage .equipment-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: calc(6px / var(--window-k, .8));
+    width: calc(96cqw / var(--window-k, .8));
+    max-width: calc(96cqw / var(--window-k, .8));
+    height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
+    max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
+    padding: calc(4px / var(--window-k, .8));
+    overflow: hidden;
+  }
+  #stage .equipment-workspace[data-view="bags"] {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(calc(84cqw / var(--window-k, .8)), 780px);
+  }
+  #stage .equipment-workspace[data-view="bags"] > .character-window {
+    display: none;
+  }
+  #stage .equipment-workspace > .character-window,
+  #stage .equipment-workspace > .bag-window {
+    width: auto; min-width: 0; height: 100%; min-height: 0;
+    display: flex; flex-direction: column; overflow: hidden;
+    padding: 0 calc(8px / var(--window-k, .8)) calc(8px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .rpg-titlebar,
+  #stage #merchant-bags .rpg-titlebar {
+    flex: 0 0 auto;
+    min-height: var(--touch-target);
+    margin: 0 calc(-8px / var(--window-k, .8));
+    padding: calc(2px / var(--window-k, .8)) calc(6px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .rpg-titlebar h3,
+  #stage #merchant-bags .rpg-titlebar h3 {
+    font-size: calc(15px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .window-emblem,
+  #stage #merchant-bags .window-emblem {
+    width: calc(26px / var(--window-k, .8));
+    height: calc(26px / var(--window-k, .8));
+    font-size: calc(15px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace #character-subtitle {
+    flex: 0 0 auto;
+    margin: calc(3px / var(--window-k, .8)) 0 calc(2px / var(--window-k, .8));
+    font-size: calc(11.5px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .character-tabs {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: calc(3px / var(--window-k, .8));
+    margin: calc(2px / var(--window-k, .8)) 0 calc(4px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .character-tab {
+    flex: 1 1 auto;
+    padding: calc(2px / var(--window-k, .8)) calc(4px / var(--window-k, .8));
+    font-size: calc(10.5px / var(--window-k, .8));
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  #stage .equipment-workspace .character-tabpanel:not([hidden]) {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding-bottom: calc(8px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .character-instructions,
+  #stage .equipment-workspace .bag-instructions {
+    display: none;
+  }
+  .equipment-workspace .paper-doll {
+    height: calc(var(--touch-target) * 5 + 14px);
+    flex: 0 0 auto;
+  }
+  .equipment-workspace #equipmentcv {
+    top: calc(6px / var(--window-k, .8));
+    width: calc(120px / var(--window-k, .8));
+    height: calc(158px / var(--window-k, .8));
+  }
+  #equipped-slots {
+    inset: calc(3px / var(--window-k, .8));
+    grid-template-columns: calc(var(--touch-target) * 2 + 4px) minmax(calc(var(--touch-target) * 2 + 4px), 1fr) calc(var(--touch-target) * 2 + 4px);
+    grid-template-rows: repeat(5, var(--touch-target));
+    row-gap: calc(2px / var(--window-k, .8));
+  }
+  .equipment-workspace .equipped-slot {
+    width: calc(var(--touch-target) * 2 + 4px);
+    height: var(--touch-target);
+  }
+  .equipment-workspace .equipped-slot .gear-icon {
+    width: var(--touch-target);
+    height: var(--touch-target);
+    margin: 0 auto;
+  }
+  .equipment-workspace .equipped-slot:has(select) .gear-icon {
+    margin: 0;
+  }
+  .equipment-workspace .equipped-slot select {
+    top: 0; right: 0; bottom: auto;
+    width: var(--touch-target);
+    height: var(--touch-target);
+  }
+  .equipment-workspace .equipped-slot .gear-label {
+    font-size: calc(8.5px / var(--window-k, .8));
+    line-height: 1.1;
+    margin: 0;
+    padding: 0 2px;
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 1px;
+    z-index: 2;
+    background: #0b1014cc;
+    border-radius: 0 0 2px 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+  }
+  #stage .equipment-workspace .character-stats {
+    margin: calc(4px / var(--window-k, .8)) 0 0;
+    padding: calc(5px / var(--window-k, .8)) calc(8px / var(--window-k, .8));
+    font-size: calc(12px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .character-attributes {
+    margin-top: calc(4px / var(--window-k, .8));
+    padding: calc(6px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .attribute-heading {
+    font-size: calc(12px / var(--window-k, .8));
+    margin-bottom: calc(4px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .attribute-grid {
+    gap: calc(4px / var(--window-k, .8)) calc(6px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .attribute-label b {
+    font-size: calc(12px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .attribute-label small,
+  #stage .equipment-workspace .attribute-help {
+    font-size: calc(10px / var(--window-k, .8));
+    line-height: 1.25;
+  }
+  #stage .equipment-workspace .attribute-recommended,
+  #stage .equipment-workspace .attribute-derived {
+    font-size: calc(11px / var(--window-k, .8));
+    line-height: 1.35;
+  }
+  #stage .equipment-workspace :is(.character-sets, .character-mounts, .character-rebirth, .character-achievements) {
+    font-size: calc(12px / var(--window-k, .8));
+    line-height: 1.35;
+    padding: calc(6px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace :is(.character-sets, .character-mounts, .character-rebirth, .character-achievements) h4 {
+    font-size: calc(14px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace :is(.set-tier, .mount-help, .mount-text small, .rebirth-perk small) {
+    font-size: calc(11px / var(--window-k, .8));
+  }
+  #stage #equipment .character-achievements #achievement-list {
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+  }
+  #stage #equipment .character-achievements .achievement-card {
+    padding: calc(10px / var(--window-k, .8)) calc(14px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .bag-tabs,
+  #stage #merchant-bags .bag-tabs {
+    flex: 0 0 auto;
+    gap: calc(3px / var(--window-k, .8));
+    margin: calc(4px / var(--window-k, .8)) 0;
+    min-height: var(--touch-target);
+  }
+  #stage .equipment-workspace .bag-tab,
+  #stage #merchant-bags .bag-tab {
+    padding: calc(2px / var(--window-k, .8)) calc(5px / var(--window-k, .8));
+    font-size: calc(10.5px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .bag-tab svg,
+  #stage #merchant-bags .bag-tab svg {
+    width: calc(18px / var(--window-k, .8));
+    height: calc(18px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .bag-toolbar,
+  #stage #merchant-bags .bag-toolbar {
+    flex: 0 0 auto;
+    gap: calc(4px / var(--window-k, .8));
+    margin-bottom: calc(4px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace .bag-toolbar .window-tool,
+  #stage #merchant-bags .bag-toolbar .window-tool,
+  #stage .equipment-workspace .rpg-titlebar .window-tool {
+    padding: calc(2px / var(--window-k, .8)) calc(7px / var(--window-k, .8));
+    font-size: calc(11px / var(--window-k, .8));
+  }
+  .bag-grid, #inventory-list {
+    max-width: none;
+    width: 100%;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-content: start;
+    grid-template-columns: repeat(4, var(--touch-target));
+    justify-content: center;
+    gap: calc(4px / var(--window-k, .8));
+    padding: calc(4px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace #bag-details {
+    flex: 0 0 auto;
+    min-height: calc(48px / var(--window-k, .8));
+    max-height: calc(88px / var(--window-k, .8));
+    overflow-y: auto;
+    margin-top: calc(4px / var(--window-k, .8));
+    padding: calc(4px / var(--window-k, .8)) calc(42px / var(--window-k, .8)) calc(4px / var(--window-k, .8)) calc(6px / var(--window-k, .8));
+    font-size: calc(11.5px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace #bag-details .item-name {
+    font-size: calc(12.5px / var(--window-k, .8));
+  }
+  #stage .equipment-workspace #bag-details small {
+    font-size: calc(11px / var(--window-k, .8));
+    line-height: 1.3;
+  }
+  #stage .equipment-workspace .bag-footer,
+  #stage #merchant-bags .bag-footer {
+    flex: 0 0 auto;
+    padding: calc(3px / var(--window-k, .8)) calc(42px / var(--window-k, .8)) 0 calc(2px / var(--window-k, .8));
+    font-size: calc(11.5px / var(--window-k, .8));
+  }
+
+  /* Skills & Skillbar (#skills-panel) and other modal panels on phone */
+  #stage #skills-panel > .skills-panel {
+    width: min(calc(94cqw / var(--window-k, .8)), 880px);
+    padding: calc(8px / var(--window-k, .8)) calc(12px / var(--window-k, .8)) calc(12px + var(--touch-target));
+  }
+  #stage #skills-panel .skills-panel h3 {
+    margin: calc(2px / var(--window-k, .8)) 0 calc(4px / var(--window-k, .8));
+  }
+  #stage #skills-panel .skills-panel p {
+    margin: calc(2px / var(--window-k, .8)) 0;
+  }
+  #stage #skills-panel #skill-library {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: none;
+    overflow: visible;
+    gap: calc(6px / var(--window-k, .8));
+    margin: calc(6px / var(--window-k, .8)) 0;
+  }
+  .skills-panel .skill-card {
+    min-width: 0;
+    white-space: normal;
+    grid-template-columns: calc(34px / var(--window-k, .8)) minmax(0, 1fr);
+    padding: calc(5px / var(--window-k, .8)) calc(8px / var(--window-k, .8));
+  }
+  #stage #skills-panel .skill-card b { font-size: calc(13px / var(--window-k, .8)); }
+  #stage #skills-panel .skill-card small { font-size: calc(11px / var(--window-k, .8)); line-height: 1.25; }
+  #stage #skills-panel #skill-editor-slots {
+    flex-wrap: wrap;
+    gap: calc(4px / var(--window-k, .8));
+  }
+  #stage #skills-panel .skill-slot {
+    width: calc(48px / var(--window-k, .8));
+    height: calc(52px / var(--window-k, .8));
+  }
+  #stage #keys-panel > .keys-panel {
+    display: flex;
+    flex-direction: column;
+    width: min(calc(92cqw / var(--window-k, .8)), 820px);
+    height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
+    overflow: hidden;
+  }
+  #stage #keys-panel #keys-list {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+  #stage #social-panel > .social-panel {
+    width: min(calc(90cqw / var(--window-k, .8)), 780px);
+    height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
+    overflow: hidden;
+  }
+  #stage #social-panel .social-body {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+  }
+  #stage #bank-panel > .bank-panel {
+    width: calc(94cqw / var(--window-k, .8));
+    height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
+    max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8));
+  }
+  #stage #bank-panel .bank-body {
+    flex: 1 1 0;
+    min-height: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #stage #bank-panel .bank-grid {
+    grid-template-columns: repeat(auto-fill, minmax(var(--touch-target), 1fr));
+    grid-auto-rows: var(--touch-target);
+    max-height: calc(var(--touch-target) * 2 + 16px);
+    overflow-y: auto;
+  }
+  #stage #bank-panel .bank-grid .bag-cell-empty {
+    min-height: var(--touch-target);
+  }
+  #stage #bank-panel .bank-footer {
+    padding-right: calc(48px / var(--window-k, .8));
+  }
+  #stage #sign-panel {
+    width: min(calc(84cqw / var(--window-k, .8)), calc(520px / var(--window-k, .8)));
+  }
   .wm-panel .wm-stage { min-height: 140px; }
   .trade-columns, .sell-columns, .inspect-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gossip-row { white-space: normal; }
   .win-grip, .panel-grip { min-width: 44px; min-height: 44px; }
+
+  /* HUD Quest Tracker (#quest-tracker): readable text and bounded height above #touch-stick */
+  #stage #quest-tracker {
+    top: 96px;
+    width: var(--pw, calc(205px / var(--ui, .8)));
+    font-size: calc(11.5px / var(--ui, .8));
+    line-height: 1.25;
+  }
+  #stage #quest-tracker:not([data-sized]) .tracker-list {
+    max-height: calc(74px / var(--ui, .8));
+  }
+  #stage #quest-tracker .tracker-title { font-size: calc(11.5px / var(--ui, .8)); padding: calc(2px / var(--ui, .8)) calc(4px / var(--ui, .8)); }
+  #stage #quest-tracker .tracker-objective { font-size: calc(10.5px / var(--ui, .8)); padding: calc(1px / var(--ui, .8)) calc(4px / var(--ui, .8)) calc(1px / var(--ui, .8)) calc(10px / var(--ui, .8)); }
+  #stage #quest-tracker .tracker-track { font-size: calc(10px / var(--ui, .8)); padding: calc(2px / var(--ui, .8)) calc(5px / var(--ui, .8)); }
 
   .touch-only { display: block; position: absolute; z-index: 24; pointer-events: auto; }
   #touch-stick { left: 8px; bottom: 8px; width: calc(180px / var(--ui, .8)); height: calc(166px / var(--ui, .8)); touch-action: none; }
@@ -95,31 +428,23 @@ html, body { overscroll-behavior: none; }
   #touch-skill-editor select { width: 100%; }
 
   .quest-reward-icons .quest-reward-icon { width: var(--touch-target); height: var(--touch-target); min-width: var(--touch-target); min-height: var(--touch-target); }
-  .bag-grid, #inventory-list { grid-template-columns: repeat(4, calc(44px / var(--window-k, .8))); justify-content: center; }
 
   .gossip-titlebar, .rpg-titlebar { min-height: var(--touch-target, 55px); }
   /* These two HUD bars follow UI size, retaining their old size at 80%. */
   #touch-actions { width: calc(320px / .8); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(60px / .8), 1fr); grid-template-columns: none; overflow-x: auto; padding: 2px; }
   #touch-quickuse { max-width: calc(240px / .8); }
-  #touch-actions button, #touch-quickuse button { min-width: calc(44px / .8); min-height: calc(44px / .8); font-size: calc(12px / .8); }
-  #connection-overlay > .connection-panel, #sell-warning { --touch-target: calc(44px / var(--window-k, .8)); max-width: 94cqw; max-height: var(--touch-stage-h, 94dvh); overflow: auto; }
+  #touch-actions button, #touch-quickuse button { min-width: calc(44px / .6); min-height: calc(44px / .6); font-size: calc(12px / .8); }
+  #connection-overlay > .connection-panel, #sell-warning { --touch-target: calc(44px / var(--window-k, .8)); max-width: calc(94cqw / var(--window-k, .8)); max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8)); overflow: auto; }
   #sell-warning :is(button, input, select), #connection-overlay button { min-width: var(--touch-target); min-height: var(--touch-target); font-size: 16px; }
   #touch-skills, #touch-stick { pointer-events: none; }
   #touch-stick { pointer-events: auto; }
   #touch-skills button { pointer-events: auto; }
   .ui-editing #touch-skills, .ui-editing #touch-stick { pointer-events: auto; }
 
- #connection-overlay > .connection-panel { width: min(94cqw, 600px); }
+  #connection-overlay > .connection-panel { width: min(calc(94cqw / var(--window-k, .8)), 600px); }
 
   #gmtest-panel { z-index: 51; }
   #stage:has(.pause:not([hidden]), #equipment:not([hidden]), #connection-overlay:not([hidden])) .panel-grip { display: none; }
-  .character-window { min-width: calc(var(--touch-target) * 6 + 60px); }
-  .equipment-workspace .paper-doll { height: calc((var(--touch-target) + 20px) * 5 + 16px); }
-  #equipped-slots { grid-template-columns: calc(var(--touch-target) * 2 + 4px) minmax(calc(var(--touch-target) * 2 + 4px), 1fr) calc(var(--touch-target) * 2 + 4px); grid-template-rows: repeat(5, calc(var(--touch-target) + 20px)); }
-  .equipment-workspace .equipped-slot { width: calc(var(--touch-target) * 2 + 4px); height: calc(var(--touch-target) + 18px); }
-  .equipment-workspace .equipped-slot .gear-icon { width: var(--touch-target); height: var(--touch-target); margin: 0; }
-  .equipment-workspace .equipped-slot select { top: 0; right: 0; bottom: auto; width: var(--touch-target); height: var(--touch-target); }
-  .equipment-workspace .equipped-slot .gear-label { font-size: 14px; margin: 0; position: absolute; bottom: 0; width: 100%; }
   .wm-body[data-view="world"] { overflow: auto; }
   .wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 2048 / 1041; }
 
@@ -134,25 +459,31 @@ html, body { overscroll-behavior: none; }
   .gmtest-check, .setting-check { min-width: var(--touch-target); min-height: var(--touch-target); }
   #stage .pause > :is(.panel, .rpg-window) :is(input[type=checkbox], input[type=radio]) { margin: calc((var(--touch-target) - 22px) / 2); }
 
-  #stage .pause > .touch-resizable-window, #stage #sign-panel.touch-resizable-window { padding-bottom: calc(12px + var(--touch-target)); }
+  #stage .pause > .touch-resizable-window:where(:not(.equipment-workspace, .quest-panel, .gossip-window, .wm-panel, .bank-panel)), #stage #sign-panel.touch-resizable-window { padding-bottom: calc(12px + var(--touch-target)); }
   /* The journal keeps two scrollable pages; the shared modal padding would
      leave a large empty strip below its footer and shrink the reading area. */
   #quest-journal { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
-  #stage .pause > .quest-panel { width: calc(94cqw / var(--window-k)); height: calc(92cqh / var(--window-k)); max-width: none; max-height: none; padding: 0; overflow: hidden; }
+  #stage .pause > .quest-panel { width: calc(94cqw / var(--window-k)); height: calc(var(--touch-stage-h, 94dvh) / var(--window-k)); max-width: none; max-height: none; padding: 0; overflow: hidden; }
+  #stage .pause > .quest-panel .journal-pages { overflow: hidden; }
   #stage .pause > .quest-panel .journal-titlebar { min-height: var(--touch-target); }
-  #stage .pause > .quest-panel .journal-titlebar h3 { font-size: calc(18px / var(--window-k)); }
-  #stage .pause > .quest-panel .journal-emblem { width: calc(50px / var(--window-k)); height: calc(50px / var(--window-k)); }
-  #stage .pause > .quest-panel .journal-toolbar { min-height: calc(36px / var(--window-k)); padding-left: calc(62px / var(--window-k)); font-size: calc(13px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-titlebar h3 { font-size: calc(17px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-emblem { width: calc(44px / var(--window-k)); height: calc(44px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-toolbar { min-height: calc(34px / var(--window-k)); padding: calc(2px / var(--window-k)) calc(10px / var(--window-k)) calc(2px / var(--window-k)) calc(54px / var(--window-k)); font-size: calc(13px / var(--window-k)); }
   #stage .pause > .quest-panel :is(.journal-quest, .journal-group > summary, .gossip-button) { font-size: calc(14px / var(--window-k)); }
-  #stage .pause > .quest-panel .journal-parchment { font-size: calc(15px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-parchment { font-size: calc(15px / var(--window-k)); padding: calc(12px / var(--window-k)) calc(14px / var(--window-k)); }
   #stage .pause > .quest-panel .journal-parchment :is(p, small) { font-size: inherit; }
-  #stage .pause > .quest-panel .journal-parchment .quest-state { font-size: inherit; }
-  #stage .pause > .quest-panel .journal-parchment h4 { font-size: calc(24px / var(--window-k)); }
-  #stage .pause > .quest-panel .journal-parchment h5 { font-size: calc(20px / var(--window-k)); }
-  #stage .pause > .quest-panel .journal-footer { padding-right: calc(50px / var(--window-k)); }
-  #sell-warning { width: min(92cqw, 600px); }
+  #stage .pause > .quest-panel .journal-parchment .quest-state { font-size: inherit; margin-bottom: calc(6px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-parchment h4 { font-size: calc(23px / var(--window-k)); margin: 0 0 calc(5px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-parchment h5 { font-size: calc(19px / var(--window-k)); margin: calc(10px / var(--window-k)) 0 calc(4px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-footer { padding: calc(2px / var(--window-k)) calc(50px / var(--window-k)) calc(2px / var(--window-k)) calc(8px / var(--window-k)); }
+  #sell-warning { width: min(calc(92cqw / var(--window-k, .8)), 600px); }
   #worldmap { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
-  #stage .pause > .wm-panel { width: calc(94cqw / var(--window-k)); max-width: none; height: calc(var(--touch-stage-h) / var(--window-k)); max-height: calc(var(--touch-stage-h) / var(--window-k)); }
+  #stage .pause > .wm-panel { width: calc(94cqw / var(--window-k)); max-width: none; height: calc(var(--touch-stage-h) / var(--window-k)); max-height: calc(var(--touch-stage-h) / var(--window-k)); padding: calc(6px / var(--window-k, .8)) calc(10px / var(--window-k, .8)); gap: calc(4px / var(--window-k, .8)); }
+  #stage .wm-panel .wm-head { min-height: var(--touch-target); margin: 0; }
+  #stage .wm-panel .wm-foot { margin: 0; font-size: calc(11px / var(--window-k, .8)); line-height: 1.15; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 calc(8px / var(--window-k, .8)); }
+  #stage .wm-panel .wm-connection-key { display: inline; }
+  #stage .wm-panel .wm-name { padding: 0 .2cqw; }
+  #stage .wm-panel .wm-name small { font-size: max(.7cqw, calc(10px / var(--window-k, .8))); }
   .wm-panel .wm-body { width: 100%; flex: 1; min-height: 0; }
   .wm-panel .wm-zone { display: grid; grid-template-columns: minmax(0, 1fr) minmax(calc(180px / var(--window-k)), 32%); height: 100%; min-height: 0; }
   .wm-panel .wm-zone .wm-stage { height: 100%; width: auto; min-height: 0; max-width: 100%; margin: 0; justify-self: center; }
@@ -164,7 +495,66 @@ html, body { overscroll-behavior: none; }
 }
 
 @media (pointer: coarse) {
-  #npc-dialogue.merchant-mode > .gossip-window, #merchant-bags .bag-window { width: calc(46cqw / var(--window-k, .8)) !important; height: calc(92cqh / var(--window-k, .8)); max-width: none !important; max-height: none !important; }
+  #npc-dialogue.merchant-mode > .gossip-window, #merchant-bags .bag-window {
+    width: calc(47cqw / var(--window-k, .8)) !important;
+    height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8)) !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+  #merchant-bags .bag-window {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0 calc(8px / var(--window-k, .8)) calc(8px / var(--window-k, .8));
+  }
+  #npc-dialogue.merchant-mode .gossip-titlebar {
+    min-height: var(--touch-target);
+    padding: calc(2px / var(--window-k, .8)) calc(48px / var(--window-k, .8)) calc(2px / var(--window-k, .8)) calc(6px / var(--window-k, .8));
+  }
+  #npc-dialogue.merchant-mode #merchant-portrait {
+    width: calc(36px / var(--window-k, .8));
+    height: calc(36px / var(--window-k, .8));
+  }
+  #npc-dialogue.merchant-mode .gossip-parchment {
+    margin: calc(3px / var(--window-k, .8));
+    padding: calc(5px / var(--window-k, .8));
+  }
+  #npc-dialogue.merchant-mode .merchant-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: calc(4px / var(--window-k, .8));
+    overflow: hidden;
+  }
+  #npc-dialogue.merchant-mode .merchant-catalog {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    gap: calc(4px / var(--window-k, .8));
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  #npc-dialogue.merchant-mode .merchant-grid {
+    align-content: start;
+    grid-auto-rows: minmax(var(--touch-target), auto);
+    gap: calc(4px / var(--window-k, .8));
+  }
+  #npc-dialogue.merchant-mode .merchant-empty {
+    display: none;
+  }
+  #npc-dialogue.merchant-mode .merchant-pages {
+    flex: 0 0 auto;
+    gap: calc(6px / var(--window-k, .8));
+  }
+  #npc-dialogue.merchant-mode .merchant-tools {
+    flex: 0 0 auto;
+    padding-top: calc(4px / var(--window-k, .8));
+    gap: calc(6px / var(--window-k, .8));
+  }
+  #npc-dialogue.merchant-mode .gossip-footer {
+    padding: calc(3px / var(--window-k, .8)) calc(46px / var(--window-k, .8)) calc(3px / var(--window-k, .8)) calc(6px / var(--window-k, .8));
+    gap: calc(4px / var(--window-k, .8));
+  }
 }
 
 @media (pointer: coarse) and (orientation: portrait) {
@@ -185,39 +575,40 @@ html, body { overscroll-behavior: none; }
 
 /* Short/narrow touch screens read one full-width quest page at a time. */
 @media (pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px) {
-  #stage .pause > .quest-panel .journal-pages { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  #stage .pause > .quest-panel .journal-pages { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); padding: calc(3px / var(--window-k)) calc(5px / var(--window-k)); }
   #stage .pause > .quest-panel .journal-tab { display: none; }
   #stage .pause > .quest-panel .quest-mobile-tabs { display: flex; gap: calc(6px / var(--window-k)); }
   #stage .pause > .quest-panel .quest-mobile-tabs .gossip-button { padding: 0 calc(12px / var(--window-k)); }
   .quest-mobile-tabs [aria-pressed="true"] { color: #fff1bd; border-color: #d5b05b; background: linear-gradient(#8f2d1e, #4d100a); }
-  #stage .pause > .quest-panel .journal-toolbar { min-height: 0; padding-top: calc(3px / var(--window-k)); padding-bottom: calc(3px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-toolbar { min-height: 0; padding-top: calc(2px / var(--window-k)); padding-bottom: calc(2px / var(--window-k)); }
   #stage .pause > .quest-panel .journal-titlebar .window-close { font-size: calc(24px / var(--window-k)); }
   #stage .pause > .quest-panel .journal-pages > :is(nav, section, .gossip-parchment) { overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
   #stage .pause > .quest-panel[data-quest-pane="list"] :is(.journal-parchment, #quest-controls, #npc-quest-actions),
   #stage .pause > .quest-panel[data-quest-pane="detail"] :is(#quest-list, #npc-quest-list) { display: none; }
-  #stage .pause > .quest-panel .journal-quest { padding: calc(6px / var(--window-k)) calc(10px / var(--window-k)); gap: calc(8px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-quest { padding: calc(5px / var(--window-k)) calc(10px / var(--window-k)); gap: calc(8px / var(--window-k)); }
   #stage .pause > .quest-panel .journal-quest-name { white-space: normal; overflow-wrap: anywhere; }
-  #stage .pause > .quest-panel .journal-footer { padding-top: calc(3px / var(--window-k)); padding-bottom: calc(3px / var(--window-k)); }
+  #stage .pause > .quest-panel .journal-footer { padding-top: calc(2px / var(--window-k)); padding-bottom: calc(2px / var(--window-k)); }
 }
 
-/* NPC conversations on touch (Beta 1.48.0): the tall parchment fills the stage height and its text and targets are compensated for the window scale. */
+/* NPC conversations on touch (Beta 1.48.0+): wide, readable parchment that fills the stage height with touch-compensated text and targets. */
 @media (pointer: coarse) {
   /* Both tracks must be able to shrink, or the unscaled box overflows the stage downwards instead of centring. */
   #npc-dialogue:not(.merchant-mode) { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-row { grid-template-columns: calc(26px / var(--window-k, .8)) minmax(0, 1fr) auto; gap: calc(8px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-row { grid-template-columns: calc(26px / var(--window-k, .8)) minmax(0, 1fr) auto; gap: calc(8px / var(--window-k, .8)); padding: calc(3px / var(--window-k, .8)) calc(6px / var(--window-k, .8)); }
   #stage #npc-dialogue:not(.merchant-mode) .gossip-icon { font-size: calc(22px / var(--window-k, .8)); }
   #stage #npc-dialogue:not(.merchant-mode) .gossip-glyph svg { width: calc(22px / var(--window-k, .8)); height: calc(22px / var(--window-k, .8)); }
-  #stage #npc-dialogue:not(.merchant-mode) > .gossip-window { width: calc(min(62cqw, 520px) / var(--window-k, .8)); height: calc(min(92cqh, 700px) / var(--window-k, .8)); max-width: none; max-height: none; padding: 0; }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-titlebar { min-height: calc(48px / var(--window-k, .8)); padding-left: calc(60px / var(--window-k, .8)); padding-right: calc(52px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) > .gossip-window { width: calc(min(84cqw, 640px) / var(--window-k, .8)); height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8)); max-width: none; max-height: none; padding: 0; }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-titlebar { min-height: calc(46px / var(--window-k, .8)); padding-left: calc(58px / var(--window-k, .8)); padding-right: calc(50px / var(--window-k, .8)); }
   #stage #npc-dialogue:not(.merchant-mode) .gossip-titlebar h3 { font-size: calc(16px / var(--window-k, .8)); }
-  #stage #npc-dialogue:not(.merchant-mode) .npc-portrait { width: calc(54px / var(--window-k, .8)); height: calc(54px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .npc-portrait { width: calc(52px / var(--window-k, .8)); height: calc(52px / var(--window-k, .8)); }
   #stage #npc-dialogue:not(.merchant-mode) .gossip-titlebar .window-close { width: calc(44px / var(--window-k, .8)); height: calc(44px / var(--window-k, .8)); font-size: calc(22px / var(--window-k, .8)); }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment { overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment :is(p, small, .gossip-row, .quest-reward-name) { font-size: calc(15px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment { overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; padding: calc(10px / var(--window-k, .8)) calc(14px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment p { margin: 0 0 calc(8px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment :is(p, small, .gossip-row, .quest-reward-name) { font-size: calc(14.5px / var(--window-k, .8)); }
   #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .gossip-tag, #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-state { font-size: calc(12px / var(--window-k, .8)); }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-detail h4 { font-size: calc(22px / var(--window-k, .8)); }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-detail h5 { font-size: calc(19px / var(--window-k, .8)); }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-footer { padding-right: calc(50px / var(--window-k, .8)); }
-  #stage #npc-dialogue:not(.merchant-mode) .gossip-footer .gossip-button { min-width: calc(92px / var(--window-k, .8)); font-size: calc(15px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-detail h4 { font-size: calc(20px / var(--window-k, .8)); margin: 0 0 calc(4px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-parchment .quest-detail h5 { font-size: calc(17px / var(--window-k, .8)); margin: calc(8px / var(--window-k, .8)) 0 calc(3px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-footer { padding: calc(3px / var(--window-k, .8)) calc(50px / var(--window-k, .8)) calc(3px / var(--window-k, .8)) calc(8px / var(--window-k, .8)); }
+  #stage #npc-dialogue:not(.merchant-mode) .gossip-footer .gossip-button { min-width: calc(92px / var(--window-k, .8)); font-size: calc(14.5px / var(--window-k, .8)); }
   #stage #npc-dialogue:not(.merchant-mode) #npc-gold { font-size: calc(12px / var(--window-k, .8)); }
 }

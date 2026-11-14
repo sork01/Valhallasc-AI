@@ -593,7 +593,9 @@
     if (!open() || view !== 'world') return;
     // Use the full inner box so scrollbars appearing during zoom do not change the fit scale.
     const width=body.offsetWidth-2*body.clientLeft,height=body.offsetHeight-2*body.clientTop;
-    const w=Math.floor(Math.min(width,height*STAGE.w/STAGE.h))*worldZoom,h=w*STAGE.h/STAGE.w;
+    const scaleK=body.getBoundingClientRect().width/(body.offsetWidth||1)||1;
+    const minW=matchMedia('(pointer: coarse)').matches?Math.ceil(1200/scaleK):0;
+    const w=Math.floor(Math.max(Math.min(width,height*STAGE.w/STAGE.h),minW))*worldZoom,h=w*STAGE.h/STAGE.w;
     Object.assign(stage.style,{width:`${w}px`,height:`${h}px`,marginLeft:`${Math.max(0,(width-w)/2)}px`,marginTop:`${Math.max(0,(height-h)/2)}px`});
     layoutEntrances(stage);
   }
@@ -672,9 +674,16 @@
       const target=atlasPosition(source,p.x,p.y),pad=size/2+2;
       const [x,y,w,h]=region.box,candidates=[];
       for(let py=y;py<=y+h;py+=6)for(let px=x;px<=x+w;px+=6) {
+        if(px<pad||px>STAGE.w-pad||py<pad||py>STAGE.h-pad)continue;
         if(!insidePolygon(region.polygon,px,py))continue;
         if(occupied.some(b=>px+pad>b.x&&px-pad<b.x+b.w&&py+pad>b.y&&py-pad<b.y+b.h))continue;
         candidates.push([px,py]);
+      }
+      if(!candidates.length) {
+        for(let py=Math.max(pad,y-40);py<=Math.min(STAGE.h-pad,y+h+40);py+=6)for(let px=Math.max(pad,x-40);px<=Math.min(STAGE.w-pad,x+w+40);px+=6) {
+          if(occupied.some(b=>px+pad>b.x&&px-pad<b.x+b.w&&py+pad>b.y&&py-pad<b.y+b.h))continue;
+          candidates.push([px,py]);
+        }
       }
       candidates.sort((a,b)=>Math.hypot(a[0]-target[0],a[1]-target[1])-Math.hypot(b[0]-target[0],b[1]-target[1]));
       const at=candidates[0]||target;Object.assign(marker.style,{left:`${at[0]/STAGE.w*100}%`,top:`${at[1]/STAGE.h*100}%`});
@@ -1077,7 +1086,7 @@
   }, true);
 
   window.WorldMap = {
-    show, showTravel, close, get open() { return open(); }, get travel() { return !!travel; }, get view() { return view; }, get zone() { return current; },
+    show, showTravel, close, layout: sizeWorld, get open() { return open(); }, get travel() { return !!travel; }, get view() { return view; }, get zone() { return current; },
     seasonChanged(){if(open()&&view==='zone')renderZone(current);},
     reset() { close(false); },
     // For the tests: the layout and kind table the map was written against.
