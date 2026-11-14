@@ -24,7 +24,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => {
-    if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null })); }
+    if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null, panelSizeSet: true, panelSize: {} })); }
   });
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Sizer'); await page.locator('#go').click({ timeout: 60000 });
@@ -56,12 +56,14 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   // --- Edit UI still lines up at another size ---
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
   for (const id of ['skillbar', 'chat', 'bags']) { const h = await rect(page, `.layout-handle[data-id="${id}"]`), e = await rect(page, `[data-ui="${id}"]`); check(near(h.l, e.l) && near(h.t, e.t) && near(h.w, e.w) && near(h.h, e.h), `The ${id} handle covers the scaled piece`); }
-  check(await page.locator('.win-grip:visible').count() === 0, 'No resize grips while editing the layout');
+  check(await page.locator('.win-grip:visible').count() === 0, 'No window is open, so no window grips while editing the layout');
   await page.locator('#layout-done').click(); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
 
   // --- window resizing ---
   await page.keyboard.press('k');
   check(await page.locator('#skills-panel').isVisible(), 'K opens the skills window');
+  check(await page.locator('.win-grip:visible').count() === 0, 'Resize grips are hidden outside Edit UI');
+  await page.evaluate(() => Settings.startEdit()); // grips exist only in Edit UI; the window stays open (the Esc menu would close it)
   const grip = page.locator('.win-grip[aria-label^="Resize Skills"]');
   check(await grip.isVisible(), 'The skills window has a resize grip');
   const win0 = await rect(page, '#skills-panel .skills-panel'), g0 = await rect(page, '.win-grip[aria-label^="Resize Skills"]');
@@ -97,7 +99,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   const g4 = await rect(page, '.win-grip[aria-label^="Resize Skills"]');
   await page.mouse.move(g4.cx, g4.cy); await page.mouse.down(); await page.mouse.move(win4.cx + (g4.cx - win4.cx) * .7, win4.cy + (g4.cy - win4.cy) * .7, { steps: 8 }); await page.mouse.up();
   const sized = await rect(page, '#skills-panel .skills-panel');
-  await page.keyboard.press('Escape');
+  await page.evaluate(() => Skillbar.close(false));
   check(await page.locator('.win-grip:visible').count() === 0, 'Grips go with their windows');
 
   // --- the quest tracker and the chat get a real width and height ---
@@ -132,14 +134,14 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   const c3 = await chatBox();
   check(near(c3.w, c0.w, 2) && near(c3.log, c0.log, 2), `Double-clicking the chat grip restores the normal size (${c3.w.toFixed(1)}x${c3.log.toFixed(1)})`);
   check((await stored(page)).panelSize.chat === undefined && !!(await stored(page)).panelSize.quests, `Only the tracker size is stored now: ${JSON.stringify((await stored(page)).panelSize)}`);
-  await page.locator('#quest-tracker .tracker-toggle').click();
+  const toggle = () => page.evaluate(() => document.querySelector('#quest-tracker .tracker-toggle').click()); // the Edit UI layer covers it
+  await toggle();
   check(await page.locator(pg('quests')).isHidden(), 'The tracker grip goes when the list is collapsed');
-  await page.locator('#quest-tracker .tracker-toggle').click();
+  await toggle();
   check(await page.locator(pg('quests')).isVisible(), 'And comes back when it is expanded');
   const trackerSized = await tracker();
-  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
-  check(await page.locator('.panel-grip:visible').count() === 0, 'No panel grips while editing the layout');
-  await page.locator('#layout-done').click(); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
+  await page.evaluate(() => Settings.stopEdit(false));
+  check(await page.locator('.panel-grip:visible').count() === 0, 'The panel grips go when Edit UI ends');
   await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.waitForFunction(() => Online.connected && Field.hero.level > 0, null, { timeout: 60000 }).catch(() => {});
   if (await page.locator('#scene-create').isVisible()) await page.locator('#go').click({ timeout: 60000 });
@@ -155,7 +157,10 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
 
   // --- the other windows get grips, and the bag/character pair scales as one ---
   await page.keyboard.press('b');
-  check(await page.locator('#equipment').isVisible() && await page.locator('.win-grip[aria-label^="Resize Character and bags"]').isVisible(), 'The character and bag windows share one grip');
+  check(await page.locator('#equipment').isVisible() && await page.locator('.win-grip:visible').count() === 0, 'The character and bag windows have no grip outside Edit UI');
+  await page.evaluate(() => Settings.startEdit());
+  check(await page.locator('.win-grip[aria-label^="Resize Character and bags"]').isVisible(), 'In Edit UI the character and bag windows share one grip');
+  await page.evaluate(() => Settings.stopEdit(false));
   const eq = await rect(page, '#equipment .equipment-workspace');
   check(eq.w <= stage.w + 1 && eq.h <= stage.h + 1, 'At 150% the bag windows still fit the stage');
   await page.keyboard.press('Escape');
@@ -164,7 +169,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
   await page.locator('#set-win-reset').click();
   check(Object.keys((await stored(page)).winScale || {}).length === 0, 'Reset window sizes clears every stored factor');
-  check(Object.keys((await stored(page)).panelSize || {}).length === 0 && !(await page.locator('#quest-tracker').evaluate(n => n.dataset.sized)), 'And the tracker and chat sizes');
+  check(Object.keys((await stored(page)).panelSize || {}).length === 0 && Math.abs((await tracker()).w - trackerSized.w) > 2, 'And the tracker and chat sizes (back to the default arrangement)');
   await page.locator('#set-uiscale').fill('100');
   check((await rect(page, '[data-ui="skillbar"]')).w - base.skillbar.w < 1.5, 'Back at 100% the skillbar is its old size');
   check(await page.locator('[data-ui="skillbar"]').evaluate(n => n.style.scale === ''), 'And the inline scale is gone');

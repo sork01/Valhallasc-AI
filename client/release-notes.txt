@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.3",
+    "date": "2026-11-14",
+    "new": [],
+    "changed": [
+      "In Edit UI the arrow keys now resize a window, the quest tracker or the chat when its corner grip has focus, instead of being ignored."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.2",
     "date": "2026-11-14",
     "new": [

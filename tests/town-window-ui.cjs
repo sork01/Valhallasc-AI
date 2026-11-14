@@ -60,7 +60,8 @@ const suite = {
       await debug(page, { op: 'teleport', zone, x: arrival.x, y: arrival.y });
       await page.waitForFunction(zone => Field.zone === zone, zone);
       await page.evaluate(() => WorldMap.show());
-      await page.locator(`.wm-tile[data-zone="${zone}"]`).tap();
+      const label = page.locator(`.wm-name[data-zone="${zone}"]`);
+      await ((await label.count()) ? label : page.locator(`.wm-tile[data-zone="${zone}"]`)).tap(); // the label button covers its tile
       await page.waitForFunction(() => WorldMap.view === 'zone');
       check(await page.locator('.wm-people-list').isVisible(), `zone ${zone} has a people directory`);
       check(await page.locator('#wm-side').evaluate(n => n.getBoundingClientRect().width >= 160), 'directory keeps a readable width on mobile');
@@ -122,8 +123,11 @@ const suite = {
     await page.touchscreen.tap(stage.x + 2, stage.y + 2);
     await page.waitForFunction(() => !document.getElementById('sell-warning'));
     check(await page.evaluate(id => Inventory.quantity(id) === 1 && Shop.open, valuable), 'outside valuable confirmation cancels only the sale and preserves the item');
+    check(await page.locator('.win-grip[data-window="npc-dialogue"]').isHidden(), 'no resize grip outside Edit UI');
+    await page.evaluate(() => Settings.startEdit());
     await page.locator('.win-grip[data-window="npc-dialogue"]').click();
     check(await page.locator('#npc-dialogue').isVisible(), 'resize grip does not dismiss the merchant');
+    await page.evaluate(() => Settings.stopEdit(false));
     await outside('npc-dialogue');
     console.log('non-buying vendor explanation, real sale and outside confirmation cancellation passed');
     await page.evaluate(() => Prefs.set({ uiScale: .8 }));

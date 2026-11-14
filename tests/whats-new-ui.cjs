@@ -47,7 +47,7 @@ async function newPage() {
   check(await page.locator('#news-body kbd').allTextContents().then(keys => keys.join(',') === 'R,A,S,D,V,T,U'), 'Welcome controls follow changed bindings while it is open');
   check(await page.locator('#news-close').evaluate(el => el === document.activeElement), 'Close receives focus');
   await page.keyboard.press('Tab');
-  check(await page.evaluate(() => !!document.activeElement.closest('#whats-new, .win-grip[data-window="whats-new"]')), 'Tab stays inside the window and its grip');
+  check(await page.evaluate(() => !!document.activeElement.closest('#whats-new')), 'Tab stays inside the window (its grip only exists in Edit UI)');
   await page.keyboard.press('Enter');
   check(!(await shown(page)) && await page.locator('#stage').getAttribute('data-scene') === 'splash', 'Enter closes without activating the title screen');
   await page.reload(); await settle(page);
@@ -56,11 +56,11 @@ async function newPage() {
   await page.evaluate(storage => localStorage.setItem(storage, 'Beta 1.14.33'), storage);
   await page.reload(); await waitOpen(page);
   check(await page.locator('#news-label').textContent() === "What's new", 'A changed version shows the latest notes');
-  check(await page.locator('#news-body > ul li').allTextContents().then(texts => JSON.stringify(texts) === JSON.stringify(entries[0].new)), 'The latest notes show the exact English prose from the notes file');
+  check(await page.locator('#news-body > ul li').allTextContents().then(texts => JSON.stringify(texts) === JSON.stringify([...entries[0].new, ...entries[0].changed, ...entries[0].removed])), 'The latest notes show the exact English prose from the notes file');
   await page.locator('.news-history > summary').click();
   check(await page.locator('.news-history details > summary').allTextContents().then(versions => JSON.stringify(versions) === JSON.stringify(entries.slice(1).map(entry => entry.version))), 'Older updates lists every archived version');
   await page.locator('.news-history details > summary').first().click();
-  check(await page.locator('.news-history details').first().innerText().then(text => /selling window/.test(text) && /Removed/.test(text) && /so you can/.test(text)), 'An older update opens with lists and the reason for its removal');
+  check(await page.locator('.news-history details').first().innerText().then(text => [...entries[1].new, ...entries[1].changed, ...entries[1].removed].every(item => text.includes(item)) && (!entries[1].removed.length || /Removed/.test(text))), 'An older update opens with all its lists');
   const text = await page.locator('#news-body').innerText();
   check(!/\b(?:const|function|undefined|localStorage|protocol|binary|Rust|MCP)\b|\w+\.(?:js|rs)\b/.test(text), 'The visible notes contain everyday language');
   await page.locator('#news-close').click();
@@ -83,9 +83,7 @@ async function newPage() {
   check(await page.locator('.news-panel').evaluate(el => el.getBoundingClientRect().width) > beforeScale * 1.15, 'The window follows the global UI size');
   await page.evaluate(() => Settings.sizeWindow('whats-new', .85));
   check(await page.locator('.news-panel').evaluate(el => Math.abs(parseFloat(getComputedStyle(el).scale) - .85) < .01), 'The window has its own saved scale');
-  const grip = page.locator('.win-grip[data-window="whats-new"]');
-  await grip.focus(); await page.keyboard.press('ArrowLeft');
-  check(await page.evaluate(() => Prefs.winScale['whats-new'] < .85), 'The corner grip can resize the window by keyboard');
+  check(await page.locator('.win-grip[data-window="whats-new"]').isHidden(), 'The corner grip is hidden outside Edit UI');
   await page.keyboard.press('Escape');
   check(!(await shown(page)) && await page.locator('#settings-panel').isVisible(), 'Esc closes only the notes and returns to Settings');
   check(await page.locator('#set-whats-new').evaluate(el => el === document.activeElement), 'Closing restores focus to the Settings row');
@@ -114,7 +112,7 @@ async function newPage() {
   const sv = await newPage(); await seed(sv, 'sv');
   await sv.goto(world.url); await waitOpen(sv);
   check(await sv.locator('#news-label').textContent() === "What's new" && await sv.locator('#news-close').textContent() === 'Close', 'Swedish players see the window labels in English');
-  check(await sv.locator('#news-body > h3').textContent() === 'New' && await sv.locator('#news-body > ul li').allTextContents().then(texts => JSON.stringify(texts) === JSON.stringify(entries[0].new)), 'Swedish does not translate the notes or section headings');
+  check(await sv.locator('#news-body > h3').first().textContent() === 'New' && await sv.locator('#news-body > ul li').allTextContents().then(texts => JSON.stringify(texts) === JSON.stringify([...entries[0].new, ...entries[0].changed, ...entries[0].removed])), 'Swedish does not translate the notes or section headings');
   await sv.locator('.news-history > summary').click(); await sv.locator('.news-history details > summary').last().click();
   check(await sv.locator('.news-history details').last().locator('h3').allTextContents().then(texts => texts.includes('Changed') && texts.includes('Removed')), 'Changed and Removed also stay English in history');
   check(await sv.locator('#set-whats-new').textContent() === "What's new", 'The Settings row stays English while the rest of Settings uses Swedish');

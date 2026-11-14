@@ -468,7 +468,7 @@
       e.preventDefault(); e.stopImmediatePropagation();
       const step = e.shiftKey ? 1 : .25;
       nudge(handle.dataset.id, e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0, e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0);
-    } else if (!bar.contains(e.target) && e.key !== 'Tab') e.stopImmediatePropagation();
+    } else if (!bar.contains(e.target) && !e.target.closest?.('.win-grip, .panel-grip') && e.key !== 'Tab') e.stopImmediatePropagation();
   }, true);
   addEventListener('resize', () => { if (editing) syncHandles(); refresh(); applyScale(); });
 
