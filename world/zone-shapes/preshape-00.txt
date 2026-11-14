@@ -3242,7 +3242,7 @@
    "x": 43,
    "y": 84.5,
    "color": "#859563",
-   "dialogue": "Bring me meadow materials or spare equipment. I buy loot from every class and protect equipped items. I sell six-slot Linen Satchels for 500 gold each. Carry up to four beside your backpack.",
+   "dialogue": "Bring me meadow materials or spare equipment. I buy loot from every class and protect equipped items. I sell six-slot Linen Satchels for 5 silver each. Carry up to four beside your backpack.",
    "offers": [
     {
      "id": "satchel",
@@ -3430,7 +3430,7 @@
     "hat": "hood",
     "hatColor": "#328e97"
    },
-   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 copper per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
    "offers": [],
    "buys": false
   },

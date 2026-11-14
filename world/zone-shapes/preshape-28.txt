@@ -11382,7 +11382,7 @@
     "hat": "hood",
     "hatColor": "#328e97"
    },
-   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 copper per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
    "offers": [],
    "buys": false,
    "art": "year_sp_travel"
@@ -11407,7 +11407,7 @@
     "hat": "hood",
     "hatColor": "#328e97"
    },
-   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 copper per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
    "offers": [],
    "buys": false,
    "art": "year_su_travel"
@@ -11431,7 +11431,7 @@
     "hat": "hood",
     "hatColor": "#328e97"
    },
-   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 copper per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
    "offers": [],
    "buys": false,
    "art": "year_au_travel"
@@ -11456,7 +11456,7 @@
     "hat": "hood",
     "hatColor": "#328e97"
    },
-   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 copper per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
    "offers": [],
    "buys": false,
    "art": "year_wi_travel"

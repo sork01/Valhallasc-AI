@@ -10800,9 +10800,11 @@ mod tests {
             "hydra_fang",
         ] {
             assert!(
-                map.quests
-                    .iter()
-                    .any(|q| q.objectives.iter().any(|o| o.target == item)),
+                map.quests.iter().any(|q| {
+                    q.objectives.iter().any(|o| {
+                        o.target == item || crate::items::item(&o.target).is_some_and(|i| i.quest_material.as_deref() == Some(item))
+                    })
+                }),
                 "{item}"
             );
         }
@@ -10894,6 +10896,15 @@ mod tests {
         assert_eq!(c2.quests[1].counts, vec![1, 1, 1, 1]);
     }
 
+    /// The quest-only item of `quest` that is made from `material` (QUEST-ITEM-DROPS).
+    fn qi(quest: &str, material: &str) -> String {
+        ITEMS
+            .iter()
+            .find(|i| i.id.starts_with(&format!("qi_{quest}")) && i.quest_material.as_deref() == Some(material))
+            .unwrap_or_else(|| panic!("no quest item for {quest}/{material}"))
+            .id
+            .clone()
+    }
     fn give(w: &mut World, item: &str, n: u32) {
         w.players.get_mut(&1).unwrap().character.add_item(item, n);
     }
@@ -10924,9 +10935,11 @@ mod tests {
     fn hand_in_objectives_count_the_bag_take_exactly_the_items_and_pay_once() {
         let mut w = world();
         city_player(&mut w);
+        // The quest asks for its own quest items (QUEST-ITEM-DROPS), made from slime gel and blue gel.
+        let (gel, blue) = (qi("city_gel", "slime_gel"), qi("city_gel", "blue_gel"));
         // Materials gathered before accepting already count.
-        give(&mut w, "slime_gel", 10);
-        give(&mut w, "blue_gel", 3);
+        give(&mut w, &gel, 10);
+        give(&mut w, &blue, 3);
         quest_interact(&mut w, "city_alchemist", Some("quest:accept:city_gel"));
         assert_eq!(
             counts(&w, "city_gel"),
@@ -10936,7 +10949,7 @@ mod tests {
         // Short of the blue gel: the reward is refused and nothing is taken.
         quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
         assert_eq!(w.players[&1].character.gold, 0);
-        assert_eq!(w.players[&1].character.quantity("slime_gel"), 10);
+        assert_eq!(w.players[&1].character.quantity(&gel), 10);
         assert!(
             !w.players[&1]
                 .character
@@ -10947,15 +10960,14 @@ mod tests {
                 .claimed
         );
         // A tick later the count follows the bag as items arrive and leave.
-        give(&mut w, "blue_gel", 5);
+        give(&mut w, &blue, 5);
         w.update_player(1);
         assert_eq!(counts(&w, "city_gel"), vec![8, 4], "capped at the count");
         w.players
             .get_mut(&1)
             .unwrap()
             .character
-            .sell_item("slime_gel", 5)
-            .unwrap();
+            .consume_item(&gel, 5);
         w.update_player(1);
         assert_eq!(
             counts(&w, "city_gel"),
@@ -10965,15 +10977,15 @@ mod tests {
         quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
         assert_eq!(
             w.players[&1].character.gold,
-            5 * 3,
-            "no reward while a hand-in is short (only the sale gold)"
+            0,
+            "no reward while a hand-in is short"
         );
-        give(&mut w, "slime_gel", 4);
+        give(&mut w, &gel, 4);
         quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
         let c = &w.players[&1].character;
-        assert_eq!(c.gold, 480 + 15, "reward paid");
-        // Exactly 8 and 4 were taken: 9 gel - 8 = 1, 8 blue - 4 = 4.
-        assert_eq!((c.quantity("slime_gel"), c.quantity("blue_gel")), (1, 4));
+        assert_eq!(c.gold, 480, "reward paid");
+        // Exactly 8 and 4 were taken, and the copies left over (1 gel, 4 blue) are discarded: no other quest needs them.
+        assert_eq!((c.quantity(&gel), c.quantity(&blue)), (0, 0));
         assert!(
             c.quests
                 .iter()
@@ -10985,12 +10997,12 @@ mod tests {
         quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
         assert_eq!(w.players[&1].character.gold, before, "no second reward");
         assert_eq!(
-            w.players[&1].character.quantity("slime_gel"),
-            1,
+            w.players[&1].character.quantity(&gel),
+            0,
             "nothing more is taken"
         );
         // The count freezes once claimed: later items do not change a finished quest.
-        give(&mut w, "slime_gel", 20);
+        give(&mut w, &gel, 20);
         w.update_player(1);
         assert_eq!(
             counts(&w, "city_gel"),
@@ -11003,10 +11015,11 @@ mod tests {
     fn the_standing_order_can_be_handed_in_again_and_again() {
         let mut w = world();
         city_player(&mut w);
+        let (fang, shell) = (qi("city_order", "magma_fang"), qi("city_order", "rime_shell"));
         quest_interact(&mut w, "city_guildmaster", Some("quest:accept:city_order"));
         for round in 1..=2u32 {
-            give(&mut w, "magma_fang", 3);
-            give(&mut w, "rime_shell", 4);
+            give(&mut w, &fang, 3);
+            give(&mut w, &shell, 4);
             w.update_player(1);
             assert_eq!(counts(&w, "city_order"), vec![3, 3]);
             quest_interact(&mut w, "city_guildmaster", Some("quest:claim:city_order"));
@@ -11019,15 +11032,11 @@ mod tests {
                     .completions,
                 round
             );
-            assert_eq!(c.quantity("magma_fang"), 0);
-            assert_eq!(
-                c.quantity("rime_shell"),
-                round,
-                "one spare shell per round stays in the bag"
-            );
+            assert_eq!(c.quantity(&fang), 0);
+            assert_eq!(c.quantity(&shell), 0, "the spare shell is discarded at the hand-in: nothing else needs it");
             quest_interact(&mut w, "city_guildmaster", Some("quest:accept:city_order"));
-            // Accepting again re-counts what is already in the bag (the spare shells), never the handed-in ones.
-            assert_eq!(counts(&w, "city_order"), vec![0, round]);
+            // Accepting again starts from nothing: neither the handed-in copies nor the discarded spare are left.
+            assert_eq!(counts(&w, "city_order"), vec![0, 0]);
         }
         assert_eq!(w.players[&1].character.gold, 2 * 540);
     }
@@ -11115,7 +11124,9 @@ mod tests {
         ] {
             quest_interact(&mut w, npc, Some(&format!("quest:accept:{quest}")));
             for (item, n) in items {
-                give(&mut w, item, n);
+                // The quest asks for its own quest item made from that material, unless it asks for the material itself (a drowned gauntlet).
+                let own = ITEMS.iter().find(|i| i.id.starts_with(&format!("qi_{quest}")) && i.quest_material.as_deref() == Some(item));
+                give(&mut w, own.map_or(item, |i| i.id.as_str()), n);
             }
             w.update_player(1);
             quest_interact(&mut w, npc, Some(&format!("quest:claim:{quest}")));

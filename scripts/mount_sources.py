@@ -82,14 +82,14 @@ def hatchling_npc():
 def wrangler_npc():
     return dict(
         id=WRANGLER, name='Zahir Dunereins', role='Dune-wrangler', color='#e8c98a',
-        dialogue='Sand lizards do not tire and do not sulk. A level-80 rider with 160,000 gold can have the best of my string; the rest can walk.',
-        offers=[dict(id='buy_lizard', label='Buy a riding lizard · level 80 · 160,000 gold', cost=160000, mount='lizard')],
+        dialogue='Sand lizards do not tire and do not sulk. A level-80 rider with 16 gold can have the best of my string; the rest can walk.',
+        offers=[dict(id='buy_lizard', label='Buy a riding lizard · level 80 · 16 gold', cost=160000, mount='lizard')],
         buys=False, x=40.0, y=134.0,
         look=dict(skin='#b88b66', hair='#3b2a1c', style='short', hat='hood', hatColor='#c9a35a'))
 
 
 def hatch_offer():
-    return dict(id=HATCH, label='Hatch a Gryphon Egg · level 95 · 250,000 gold', cost=250000, mount='gryphon',
+    return dict(id=HATCH, label='Hatch a Gryphon Egg · level 95 · 25 gold', cost=250000, mount='gryphon',
                 needs='gryphon_egg')
 
 

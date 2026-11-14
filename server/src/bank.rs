@@ -112,6 +112,10 @@ impl Character {
         if i.rarity == GM_RARITY {
             return Err("Game master gear cannot be banked.");
         }
+        // A quest-only item belongs to one quest: banking it would hide copies from the need rule (`QUEST-ITEM-DROPS`).
+        if i.quest_material.is_some() {
+            return Err("Quest items cannot be banked.");
+        }
         if quantity == 0 || (copy.is_some() && quantity != 1) {
             return Err("Choose a quantity to store.");
         }

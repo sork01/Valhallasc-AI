@@ -619,7 +619,8 @@ mod tests {
         assert!(saw_reengage, "returning foe hit by guard should switch back to chase");
         let ttk = killed_at.expect("high-zone guards must defeat stray enemy");
         assert!(ttk > 0.8, "high-zone guards should not one-shot foes (ttk={ttk:.2}s)");
-        assert!(ttk < 25.0, "high-zone guards took too long (ttk={ttk:.2}s)");
+        // 30 s: the guards' class rotations changed with AOE-SKILL-AT-20 (an area skill at 20 instead of Charge), which shifts this a few seconds.
+        assert!(ttk < 30.0, "high-zone guards took too long (ttk={ttk:.2}s)");
     }
 }
 

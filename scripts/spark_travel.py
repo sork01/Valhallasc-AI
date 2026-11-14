@@ -47,7 +47,7 @@ def ensure(world):
                 master = dict(id=id_, name='Travel Master', role='Spark Travel', x=x, y=y,
                               color='#74d7d0', travelStop=name, travelLinks=links,
                               look=dict(hair='#e4edf4', skin='#edc5a1', style='long', hat='hood', hatColor='#328e97'),
-                              dialogue='This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.',
+                              dialogue='This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 copper per leg, at three times walking speed. Talk to every travel master along a route before you can use it.',
                               offers=[], buys=False)
                 if name == 'Nacrehold':
                     master.update(name='Travel Master Auralis', role='Mermaid · Spark Travel')

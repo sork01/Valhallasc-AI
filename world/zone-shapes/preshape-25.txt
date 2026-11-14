@@ -3504,7 +3504,7 @@
     "hat": "hood",
     "hatColor": "#328e97"
    },
-   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+   "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 copper per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
    "offers": [],
    "buys": false,
    "art": "lapis_travel"
@@ -3514,11 +3514,11 @@
    "name": "Zahir Dunereins",
    "role": "Dune-wrangler",
    "color": "#e8c98a",
-   "dialogue": "Sand lizards do not tire and do not sulk. A level-80 rider with 160,000 gold can have the best of my string; the rest can walk.",
+   "dialogue": "Sand lizards do not tire and do not sulk. A level-80 rider with 16 gold can have the best of my string; the rest can walk.",
    "offers": [
     {
      "id": "buy_lizard",
-     "label": "Buy a riding lizard · level 80 · 160,000 gold",
+     "label": "Buy a riding lizard · level 80 · 16 gold",
      "cost": 160000,
      "mount": "lizard"
     }

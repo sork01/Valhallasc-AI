@@ -685,7 +685,7 @@
     mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
     const mountKey = Keys.label('mount', false);
     mount.textContent = s.mounted ? `Dismount · ${mountKey}` : s.mountOwned ? `${window.Mounts?.name(s.mount) || 'Mount'} · ${mountKey} · 160% walking speed` : `Horse · ${mountKey}`;
-    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : `Ride the selected mount at 160% of normal walking speed (${mountKey}). Change it in the Character window.`) : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 500,000 gold. All mounts are listed in the Character window.';
+    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : `Ride the selected mount at 160% of normal walking speed (${mountKey}). Change it in the Character window.`) : `Buy a horse from Stable-hand Greta in Skaldholm at level 50 for ${Money.text(500000)}. All mounts are listed in the Character window.`;
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); if (!window.Field.seamless) { void title.offsetWidth; title.classList.add('show'); } }
     title.querySelector('b').textContent = away ? s.area : inCity ? (s.hub && s.hub !== 'Alderhaven' ? s.hub : 'Alderhaven · Fountain Square') : s.area !== 'Greenmeadow' ? s.area : t('areaName');

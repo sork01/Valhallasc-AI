@@ -413,9 +413,9 @@ fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
         .collect();
     assert!(
         said.iter().any(|t| t.contains(&format!(
-            "+{} XP and +{} gold",
+            "+{} XP and +{}",
             c.boosted_xp(want.0),
-            c.boosted_gold(want.1)
+            crate::model::money_text(c.boosted_gold(want.1))
         ))),
         "the message names what was paid: {said:?}"
     );

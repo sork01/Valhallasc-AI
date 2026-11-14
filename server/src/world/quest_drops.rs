@@ -134,7 +134,7 @@ pub(super) fn migrate_quest_items(c: &mut Character, maps: &[Map]) -> (u32, u32)
             }
         }
     }
-    // Quest items nobody asks for any more (and the bank's: a quest item cannot be banked) are not kept.
+    // Quest items nobody asks for any more are not kept.
     let stray: Vec<String> = c
         .inventory
         .iter()
@@ -149,11 +149,12 @@ pub(super) fn migrate_quest_items(c: &mut Character, maps: &[Map]) -> (u32, u32)
             removed += have - keep;
         }
     }
+    // A quest-only item cannot be banked (`bank_deposit`), so one that is already there goes; the older quest items (shards, keys) stay.
     let banked: Vec<String> = c
         .bank
         .items
         .iter()
-        .filter(|s| item(&s.item).is_some_and(is_quest_item))
+        .filter(|s| item(&s.item).is_some_and(|i| is_quest_item(i) && i.quest_material.is_some()))
         .map(|s| s.item.clone())
         .collect();
     for id in banked {

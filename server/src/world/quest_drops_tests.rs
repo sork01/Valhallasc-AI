@@ -217,3 +217,21 @@ fn an_old_save_converts_its_progress_and_loses_the_quest_items_nobody_needs() {
     assert_eq!(migrate_quest_items(c, &w.maps), (0, 0));
     assert_eq!(c.quantity(&stray), 1);
 }
+
+#[test]
+fn the_migration_keeps_banked_shards_and_keys_but_a_quest_item_cannot_be_banked() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    let (_quest, item_id, _from, _count, _chance, _kind) = pick(&w);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.quest_items_version = 0;
+    c.bank.items.push(ItemStack { item: "ember_shard_0".into(), quantity: 2 });
+    c.bank.items.push(ItemStack { item: item_id.clone(), quantity: 3 });
+    migrate_quest_items(c, &w.maps);
+    assert_eq!(c.bank.quantity("ember_shard_0"), 2, "raid-key progress in the bank survives");
+    assert_eq!(c.bank.quantity(&item_id), 0, "a banked remapped quest item is dropped");
+    // And nothing new goes in.
+    c.add_item(&item_id, 2);
+    assert!(c.bank_deposit(&item_id, 2, None).is_err());
+    assert_eq!(c.quantity(&item_id), 2);
+}

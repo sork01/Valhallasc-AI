@@ -464,5 +464,6 @@
   "A mercenary costs {0}.": "En legosoldat kostar {0}.",
   "Spark Travel to {0}: {1}.": "Gnistresa till {0:t}: {1}.",
   "Took {0}.": "Tog ut {0}.",
-  "Discarded {0} × {1}.": "Kastade {0} × {1:t}."
+  "Discarded {0} × {1}.": "Kastade {0} × {1:t}.",
+  "Buy a horse from Stable-hand Greta in Skaldholm at level 50 for {0}. All mounts are listed in the Character window.": "Köp en häst av Stallhjälpen Greta i Skaldholm på nivå 50 för {0}. Alla riddjur finns i karaktärsfönstret."
 }

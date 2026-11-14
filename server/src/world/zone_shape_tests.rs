@@ -1826,7 +1826,7 @@ fn every_glacier_quest_can_be_done_on_the_map() {
                 "bring" => assert!(
                     w.slimes
                         .iter()
-                        .any(|s| s.zone == 2 && crate::items::material(&s.kind) == o.target),
+                        .any(|s| s.zone == 2 && crate::items::material(&s.kind) == crate::items::item(&o.target).and_then(|i| i.quest_material.as_deref()).unwrap_or(o.target.as_str())),
                     "{}: some enemy of the glacier drops {}",
                     q.id,
                     o.target
@@ -2142,7 +2142,7 @@ fn every_fen_quest_can_be_done_on_the_map() {
                 "bring" => assert!(
                     w.slimes
                         .iter()
-                        .any(|s| s.zone == 3 && crate::items::material(&s.kind) == o.target),
+                        .any(|s| s.zone == 3 && crate::items::material(&s.kind) == crate::items::item(&o.target).and_then(|i| i.quest_material.as_deref()).unwrap_or(o.target.as_str())),
                     "{}: some enemy of the fen drops {}",
                     q.id,
                     o.target
@@ -2532,7 +2532,7 @@ fn every_wyrdwood_quest_can_be_done_on_the_map() {
                 "bring" => assert!(
                     w.slimes
                         .iter()
-                        .any(|s| s.zone == 6 && crate::items::material(&s.kind) == o.target),
+                        .any(|s| s.zone == 6 && crate::items::material(&s.kind) == crate::items::item(&o.target).and_then(|i| i.quest_material.as_deref()).unwrap_or(o.target.as_str())),
                     "{}: some enemy of the Wyrdwood drops {}",
                     q.id,
                     o.target
