@@ -39,8 +39,13 @@ async function call(name, args = {}) {
     const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
     // Open meadow ground, away from the town and its sanctuary. A raid pack has enough health for this short check.
     await debug({ op: 'teleport', zone: 0, x: 80, y: 25 });
-    await page.waitForFunction(() => Math.hypot(Field.hero.x - 80, Field.hero.y - 25) < .2);
-    const nearby = await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - 80, s.y - 25) < 15).map(s => s.id));
+    // A teleport lands on the nearest free ground, which need not be the requested point (80, 25 is a tree in the shaped
+    // Greenmeadow and the hero arrives about 3.7 tiles east). Settle there, then test from where the hero actually stands.
+    await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 80, Field.hero.y - 25) < 6, null, { timeout: 30000 });
+    await page.waitForTimeout(500);
+    const home = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+    console.log(`home ${home.x.toFixed(2)}, ${home.y.toFixed(2)}`);
+    const nearby = await page.evaluate(h => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - h.x, s.y - h.y) < 15).map(s => s.id), home);
     for (const id of nearby) await debug({ op: 'kill_enemy', id });
     const skills = await page.evaluate(cls => [
       ...WORLD_SKILLS.filter(s => s.class === cls).map(s => s.id), ...(cls === 'assassin' ? ['shadowstep'] : []),
@@ -48,11 +53,11 @@ async function call(name, args = {}) {
     assert.equal(skills.length, cls === 'assassin' ? 11 : 10, `${cls}: every active skill is covered`);
     for (const skill of skills.filter(id => !process.env.AUTOATTACK_SKILL_ONLY || id === process.env.AUTOATTACK_SKILL_ONLY)) {
       await page.evaluate(() => { Field.hero.target = null; Online.send({ type: 'stop' }); });
-      await debug({ op: 'teleport', zone: 0, x: 80, y: 25 });
-      await page.waitForFunction(() => Math.hypot(Field.hero.x - 80, Field.hero.y - 25) < .2);
+      await debug({ op: 'teleport', zone: 0, x: home.x, y: home.y });
+      await page.waitForFunction(h => Math.hypot(Field.hero.x - h.x, Field.hero.y - h.y) < .2, home);
       await debug({ op: 'reset_cooldowns' }); await debug({ op: 'set_resource', amount: 1000 });
       await debug({ op: 'set_hp', hp: await page.evaluate(() => Field.hero.maxHp * .4) });
-      await debug({ op: 'spawn_enemy', kind: 'cf_brute', level: 99, x: 84, y: 25 });
+      await debug({ op: 'spawn_enemy', kind: 'cf_brute', level: 99, x: home.x + 4, y: home.y });
       await page.waitForFunction(id => Field.hero.resource >= 60 && !Field.hero.skillCd[id] && Field.hero.dashCd <= 0 && Field.hero.hp < Field.hero.maxHp && Field.slimes.some(s => s.kind === 'cf_brute' && !s.dead), skill);
       const target = await page.evaluate(() => {
         const s = Field.slimes.find(s => s.kind === 'cf_brute' && !s.dead);
