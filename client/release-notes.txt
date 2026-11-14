@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.53.2",
+    "date": "2026-11-14",
+    "new": [
+      "The loading screen now shows one of five paintings, picked at random each time you connect, instead of the Greenmeadow field behind the message."
+    ],
+    "changed": [
+      "The connection message now reads Veyrheim awaits, and the status line reads Connecting to Veyrheim."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.53.1",
     "date": "2026-11-14",
     "new": [],

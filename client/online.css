@@ -13,8 +13,9 @@
 .chat form { display: flex; border-top: 1px solid #a9b4dc40; }
 .chat input { min-width: 0; flex: 1; background: #0e142a; border: 0; color: white; padding: .65cqw; font: inherit; }
 .chat button { border: 0; background: #304466; color: #f1e2b0; padding: .55cqw .8cqw; font: inherit; cursor: pointer; }
-.connection-overlay { position: absolute; inset: 0; z-index: 80; display: grid; place-items: center; background: #0a102bad; }
-.connection-panel { width: 34cqw; padding: 2cqw; text-align: center; }
+.connection-overlay { position: absolute; inset: 0; z-index: 80; display: grid; place-items: end center; padding-bottom: 6cqw; background: #0a102b var(--loading-art, none) center / cover no-repeat; }
+.connection-overlay[hidden] { display: none; }
+.connection-panel { width: 34cqw; padding: 2cqw; text-align: center; background: #0a102bd9; box-shadow: 0 0 2cqw #000a; }
 .connection-panel h3 { font-size: 2cqw; color: #f5df9b; margin: 0 0 1cqw; }
 .connection-panel p { font-size: 1.1cqw; line-height: 1.5; }
 .connection-panel .btn { margin: .4cqw; }

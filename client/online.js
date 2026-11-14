@@ -41,8 +41,15 @@
     // Everything that is not a player's chat line is also kept on the System tab.
     if (!name) window.SystemLog?.add(text, channel === 'refused' ? 'sys-taken' : 'sys-note');
   }
+  // The loading screen shows one of five paintings picked at random; it keeps its picture while it stays open (retries do not swap it).
+  const LOADING_ART = 5;
   function overlay(text, fatal = false) {
-    $('connection-overlay').hidden = false; $('connection-text').textContent = text;
+    const screen = $('connection-overlay');
+    if (screen.hidden || !screen.dataset.art) {
+      const n = 1 + Math.floor(Math.random() * LOADING_ART);
+      screen.dataset.art = String(n); screen.style.setProperty('--loading-art', `url("assets/loading_${n}.webp")`);
+    }
+    screen.hidden = false; $('connection-text').textContent = text;
     $('connection-retry').hidden = fatal;
   }
   function send(message) {
@@ -86,7 +93,7 @@
     const currentGeneration = ++generation; clearSnapshot();
     const old = socket; socket = null; old?.close();
     connected = false;
-    status('Connecting to Greenmeadow…', false); overlay('Connecting to the world…');
+    status('Connecting to Veyrheim…', false); overlay('Connecting to the world…');
     // Offer deflated snapshots only when the inflater loaded.
     const deflateOffer = () => (window.pako?.inflateRaw ? { compress: true } : {});
     const ws = new WebSocket(endpoint); socket = ws;
