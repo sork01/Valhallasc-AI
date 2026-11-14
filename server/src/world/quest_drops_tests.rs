@@ -235,3 +235,30 @@ fn the_migration_keeps_banked_shards_and_keys_but_a_quest_item_cannot_be_banked(
     assert!(c.bank_deposit(&item_id, 2, None).is_err());
     assert_eq!(c.quantity(&item_id), 2);
 }
+
+/// Release rehearsal (`REHEARSE_DB=<copy of the live database> cargo test rehearse_migration -- --ignored --nocapture`): every stored
+/// character goes through the tutorial v2 step, the level clamp and the quest-item migration, and the counts are printed.
+#[test]
+#[ignore = "needs REHEARSE_DB, a copy of the live database"]
+fn rehearse_migration_on_a_copy_of_the_live_database() {
+    let Ok(path) = std::env::var("REHEARSE_DB") else {
+        return;
+    };
+    let w = world();
+    let db = rusqlite::Connection::open(path).unwrap();
+    let mut stmt = db.prepare("SELECT state FROM characters").unwrap();
+    let states: Vec<String> = stmt.query_map([], |r| r.get(0)).unwrap().map(Result::unwrap).collect();
+    assert!(!states.is_empty());
+    for state in states {
+        let mut c: Character = serde_json::from_str(&state).expect("a stored character decodes");
+        let before = (c.level, c.tutorial_version, c.tutorial_done.len(), c.inventory.len(), c.bank.items.len());
+        c.migrate_tutorial();
+        c.clamp_level();
+        let (converted, removed) = migrate_quest_items(&mut c, &w.maps);
+        assert!(c.level <= MAX_LEVEL && c.bag_used() <= c.bag_capacity().max(c.bag_used()));
+        println!(
+            "{:<12} level {:>2} tutorial v{}->v{} done {}->{} converted {} removed {} bag cells {}/{} bank {}",
+            c.look.name, c.level, before.1, c.tutorial_version, before.2, c.tutorial_done.len(), converted, removed, c.bag_used(), c.bag_capacity(), c.bank.used()
+        );
+    }
+}
