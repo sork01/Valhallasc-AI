@@ -121,6 +121,8 @@ pub(super) fn gear_set(class: Class, level: u32, rarity: &str) -> Vec<(&'static 
                         && i.required_level == want
                         && i.source.is_none()
                         && !i.starter
+                        && !i.id.ends_with("_b")
+                        && !i.id.ends_with("_c")
                         && i.class.is_none_or(|c| c == class)
                 })
                 .collect();

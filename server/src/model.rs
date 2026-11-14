@@ -707,6 +707,8 @@ impl Character {
                 i.kind == "cloak"
                     && i.rarity == "uncommon"
                     && i.source.is_none()
+                    && !i.id.ends_with("_b")
+                    && !i.id.ends_with("_c")
                     && i.required_level <= level
             })
             .max_by_key(|i| i.required_level)

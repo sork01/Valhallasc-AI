@@ -1246,6 +1246,8 @@ impl Character {
                     i.kind == worn.kind
                         && !i.starter
                         && i.source.is_none()
+                        && !i.id.ends_with("_b")
+                        && !i.id.ends_with("_c")
                         && matches!(i.rarity.as_str(), "common" | "uncommon" | "rare" | "epic")
                         && rank(&i.rarity) <= target
                         && i.required_level <= level
@@ -2059,7 +2061,7 @@ mod tests {
                 Some(Class::Assassin | Class::Hunter) => {
                     &["agility", "stamina", "strength", "accuracy", "dexterity"]
                 }
-                None if i.required_level >= 75 => &["stamina", "strength", "agility"],
+                None if i.required_level >= 40 => &["stamina", "dexterity", "strength", "agility"],
                 None => &["stamina", "accuracy", "dexterity"],
             };
             for (name, value) in values {
@@ -3924,5 +3926,100 @@ mod tests {
             (h.look.head.as_str(), h.look.gloves.as_str()),
             ("scout", "scout")
         );
+    }
+
+    #[test]
+    fn ordinary_gear_has_three_distinct_variants_per_slot_level_and_rarity() {
+        use std::collections::{BTreeMap, BTreeSet};
+        let raw: BTreeMap<String, serde_json::Value> =
+            serde_json::from_str::<Vec<serde_json::Value>>(include_str!("../../world/items.txt"))
+                .unwrap()
+                .into_iter()
+                .map(|v| (v["id"].as_str().unwrap().to_owned(), v))
+                .collect();
+        let mut by_cell: BTreeMap<(&str, Option<u8>, u32, &str), Vec<&Item>> = BTreeMap::new();
+        let mut count = 0usize;
+        for i in ITEMS.iter().filter(|i| {
+            is_gear(i)
+                && i.source.is_none()
+                && !i.starter
+                && matches!(i.rarity.as_str(), "common" | "uncommon" | "rare" | "epic")
+        }) {
+            count += 1;
+            by_cell
+                .entry((&i.kind, i.class.map(|c| c as u8), i.required_level, &i.rarity))
+                .or_default()
+                .push(i);
+        }
+        assert_eq!(count, 5940);
+        for ((kind, class, level, rarity), trio) in &by_cell {
+            assert_eq!(trio.len(), 3, "{kind} {class:?} L{level} {rarity}");
+            let base = trio[0];
+            let tints: BTreeSet<(i32, i32, i32)> = trio
+                .iter()
+                .map(|i| {
+                    let t = &raw[&i.id]["tint"];
+                    if t.is_object() {
+                        (
+                            t["hue"].as_f64().unwrap().round() as i32,
+                            (t["saturate"].as_f64().unwrap() * 100.).round() as i32,
+                            (t["brightness"].as_f64().unwrap() * 100.).round() as i32,
+                        )
+                    } else {
+                        (0, 100, 100)
+                    }
+                })
+                .collect();
+            assert_eq!(tints.len(), 3, "{kind} {class:?} L{level} {rarity} tint collision");
+            let names: BTreeSet<&str> = trio.iter().map(|i| i.name.as_str()).collect();
+            assert_eq!(names.len(), 3, "{kind} {class:?} L{level} {rarity} name collision");
+            for v in trio {
+                assert_eq!(v.attack, base.attack, "{}", v.id);
+                assert_eq!(v.defense, base.defense, "{}", v.id);
+                assert_eq!(v.sell, base.sell, "{}", v.id);
+            }
+            if matches!(*rarity, "rare" | "epic") {
+                let rolls: BTreeSet<Vec<&str>> = trio
+                    .iter()
+                    .map(|i| {
+                        let a = &i.bonus_stats;
+                        [
+                            ("strength", a.strength),
+                            ("agility", a.agility),
+                            ("intellect", a.intellect),
+                            ("stamina", a.stamina),
+                            ("dexterity", a.dexterity),
+                            ("accuracy", a.accuracy),
+                        ]
+                        .into_iter()
+                        .filter(|(_, val)| *val > 0)
+                        .map(|(k, _)| k)
+                        .collect()
+                    })
+                    .collect();
+                assert_eq!(rolls.len(), 3, "{kind} {class:?} L{level} {rarity} stat roll collision");
+            }
+        }
+    }
+
+    #[test]
+    fn equipment_of_rarity_samples_all_three_variants_equally() {
+        let mut counts = [0usize; 3];
+        let steps = 6000;
+        for n in 0..steps {
+            let item = equipment_of_rarity("rare", 30, n as f64 / steps as f64).unwrap();
+            let idx = if item.id.ends_with("_b") {
+                1
+            } else if item.id.ends_with("_c") {
+                2
+            } else {
+                0
+            };
+            counts[idx] += 1;
+        }
+        assert_eq!(counts.iter().sum::<usize>(), steps);
+        for c in counts {
+            assert!((c as isize - (steps / 3) as isize).abs() <= 10, "{counts:?}");
+        }
     }
 }

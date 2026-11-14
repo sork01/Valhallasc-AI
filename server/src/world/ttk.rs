@@ -307,6 +307,8 @@ pub fn normal_gear_of(class: Class, level: u32, rarity: &str) -> Vec<(&'static s
                         && i.required_level == want
                         && i.source.is_none()
                         && !i.starter
+                        && !i.id.ends_with("_b")
+                        && !i.id.ends_with("_c")
                         && i.class.is_none_or(|c| c == class)
                 })
                 .collect();

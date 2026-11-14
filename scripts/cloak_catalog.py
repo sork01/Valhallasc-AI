@@ -86,6 +86,18 @@ def pieces(items):
             item['tint']=dict(hue=(LEVELS.index(level)*47+tier*23+13)%360,saturate=(.45, .9,1.2,1.4)[tier],brightness=(.82,1,1.12,1.24)[tier])
             if tier==2:item['family']='cloak_rare';item['price']=item['sell']*4
             result.append(item)
+            t0=item['tint']
+            for suffix,hue_off,sat_off,bri_off in (('_b',119,.06,-.04),('_c',239,-.06,.04)):
+                cid=f'{item["id"]}{suffix}'
+                v=dict(id=cid,name='',kind='cloak',rarity=rarity,requiredLevel=level,sell=item['sell'],
+                       attack=0,defense=0,**{'class':None},variant=cid,art=item['art'],starter=False)
+                if tier<2:v['bonusStats']=copy.deepcopy(item['bonusStats'])
+                else:
+                    v['bonusStats']=gear.bonus_stats(v)
+                    if level==99:v['bonusStats']={stat:114 for stat in v['bonusStats']}
+                v['tint']=dict(hue=(t0['hue']+hue_off)%360,saturate=round(t0['saturate']+sat_off,2),brightness=round(t0['brightness']+bri_off,2))
+                v['name']=gear.variant_name(item['name'],rarity,v['bonusStats'],suffix)
+                result.append(v)
     # Dungeon necklaces supply the same authored level and attribute budget.
     for source,(name,_) in DUNGEONS.items():
         necklace=next((i for i in items if i['kind']=='necklace' and i.get('source')==source),None)
@@ -157,6 +169,6 @@ def append_icons():
         cell=[n%cols,n//cols];icon=Image.open(assets/('gear_icon_cloak_'+style+'.png')).convert('RGBA')
         picture.paste(icon,(cell[0]*size,cell[1]*size))
         for item in cloaks:
-            if item['art']==style:at[item['id']]=cell
+            if item.get('art')==style:at[item['id']]=cell
     meta.update(rows=rows,at=at);picture.save(assets/'items.png',optimize=True);path.write_text(json.dumps(meta,indent=1)+'\n')
     (ROOT/'client/itemicons.js').write_text("'use strict';\nwindow.ITEM_ICONS = "+json.dumps(dict(size=size,cols=cols,rows=rows,at=at),separators=(',',':'))+';\n')

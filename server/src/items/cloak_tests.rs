@@ -44,7 +44,7 @@ fn cloak_catalog_ladder_and_all_ten_bodies_equip_only_the_cloak_slot() {
                 )
         })
         .collect();
-    assert_eq!(cloaks.len(), 100);
+    assert_eq!(cloaks.len(), 240);
     assert!(EXTRA_SLOTS.contains(&"cloak"));
     assert!(
         cloaks

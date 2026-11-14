@@ -21,7 +21,7 @@ def apply(items, world):
         for level in LEVELS:
             matches = [i for i in items if i['kind'] == 'weapon' and i.get('class') == cls
                        and i['rarity'] == 'uncommon' and i.get('requiredLevel') == level
-                       and not i.get('source')]
+                       and not i.get('source') and not i['id'].endswith(('_b', '_c'))]
             assert len(matches) == 1, (cls, level, len(matches))
             item = matches[0]
             item.update(family=f'vendor_weapon_{cls}', price=price(level))

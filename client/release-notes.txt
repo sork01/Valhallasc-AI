@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.0",
+    "date": "2026-11-14",
+    "new": [
+      "Three times the equipment variety in the world: every ordinary world-drop piece across every armour, weapon, jewellery and cloak slot now comes in three distinct variants at each level and rarity (three tints, alternate looks on lower-level class gear, and different attribute focuses on blue and purple pieces), all dropping at equal odds."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.54.0",
     "date": "2026-11-14",
     "new": [],

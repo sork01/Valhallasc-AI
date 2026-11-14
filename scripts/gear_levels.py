@@ -135,19 +135,106 @@ def budget(kind, cls, rarity, level):
     return round(values['attack'], 1), round(values['defense'], 1)
 
 
+STAT_EN = {
+    'strength': 'Might',
+    'agility': 'Swiftness',
+    'intellect': 'Intellect',
+    'spirit': 'Spirit',
+    'stamina': 'Vitality',
+    'dexterity': 'Evasion',
+    'accuracy': 'Precision',
+}
+PAIR_STATS = ('strength', 'agility', 'intellect', 'spirit', 'stamina', 'dexterity', 'accuracy')
+
+
 def bonus_stats(i):
     """One useful attribute on blue, two different ones on purple, fixed by item ID.
 
     Attribute amounts follow the requested level ladder, while the existing
     17.5% attack/defense tier increase remains intact. Shared gear only rolls
-    universally useful stats.
+    universally useful stats. _b and _c variants pick distinct stats/pairs from
+    the base item at that slot/level/rarity.
     """
     count = {'rare': 1, 'epic': 2}.get(i['rarity'], 0)
-    digest = hashlib.sha256(i['id'].encode()).digest()
+    if not count:
+        return {}
     step = min(95, max(5, i.get('requiredLevel', 1) // 5 * 5))
     amount = ATTRIBUTE_BONUS[step]
-    choices = bonus_choices(i.get('class'), amount)
-    return {choices.pop(digest[n] % len(choices)): amount for n in range(count)}
+    cls = i.get('class')
+    choices = bonus_choices(cls, amount)
+    raw_id = i['id'][:-2] if i['id'].endswith(('_b', '_c')) else i['id']
+    digest = hashlib.sha256(raw_id.encode()).digest()
+    pool = list(choices)
+    base_picks = [pool.pop(digest[n] % len(pool)) for n in range(count)]
+    if not i['id'].endswith(('_b', '_c')):
+        return {s: amount for s in base_picks}
+    ext = list(choices)
+    if len(ext) < 3:
+        for s in ('strength', 'agility', 'stamina', 'dexterity'):
+            if s not in ext:
+                ext.append(s)
+                if len(ext) >= 3:
+                    break
+    idx = ext.index(base_picks[0])
+    step_off = 1 if i['id'].endswith('_b') else 2
+    if count == 1:
+        return {ext[(idx + step_off) % len(ext)]: amount}
+    third = next(s for s in ext if s not in base_picks)
+    picks = (base_picks[0], third) if step_off == 1 else (base_picks[1], third)
+    return {s: amount for s in picks}
+
+
+def variant_name(orig_name, rarity, bonus, suffix):
+    if rarity == 'common':
+        return ('Coarse ' if suffix == '_b' else 'Mended ') + orig_name
+    if rarity == 'uncommon':
+        return ('Fine ' if suffix == '_b' else 'Ornate ') + orig_name
+    if rarity == 'rare':
+        stat = next(iter(bonus))
+        return f"{orig_name} of {STAT_EN[stat]}"
+    stats = [s for s in PAIR_STATS if s in bonus]
+    return f"{orig_name} of {STAT_EN[stats[0]]} and {STAT_EN[stats[1]]}"
+
+
+def multiply_ordinary_gear(out, bases):
+    """Add two distinct variants (_b, _c) for every non-starter ordinary world-drop gear item."""
+    target_kinds = set(CLASS_KINDS) | set(SHARED_KINDS)
+    originals = [
+        i for i in out
+        if i['kind'] in target_kinds and not i.get('source') and not i.get('starter')
+        and i['rarity'] in ('common', 'uncommon', 'rare', 'epic')
+    ]
+    extra = []
+    for orig in originals:
+        level = orig.get('requiredLevel', 1)
+        cls = orig.get('class')
+        kind = orig['kind']
+        rarity = orig['rarity']
+        t0 = orig.get('tint') or tint(level, rarity, cls is None)
+        orig_art = orig.get('art') or orig['variant']
+        if cls:
+            draw0 = bases[(cls, kind, (1, 'common'))]['variant']
+            draw1 = bases[(cls, kind, (1, 'uncommon'))]['variant']
+            opp_art = draw0 if orig_art == draw1 else draw1
+        else:
+            opp_art = orig_art
+        for suffix, hue_off, sat_off, bri_off in (('_b', 119, 0.06, -0.04), ('_c', 239, -0.06, 0.04)):
+            copy = {'id': f"{orig['id']}{suffix}", 'name': '', 'kind': kind, 'rarity': rarity, 'sell': 0}
+            if cls:
+                copy['class'] = cls
+            copy['variant'] = f"{orig['variant']}{suffix}"
+            copy['art'] = opp_art if suffix == '_b' else orig_art
+            copy['tint'] = {
+                'hue': (t0['hue'] + hue_off) % 360,
+                'saturate': round(t0['saturate'] + sat_off, 2),
+                'brightness': round(t0['brightness'] + bri_off, 2),
+            }
+            if 'starter' in orig:
+                copy['starter'] = False
+            copy = finish(copy, level, rarity)
+            copy['name'] = variant_name(orig['name'], rarity, copy.get('bonusStats', {}), suffix)
+            extra.append(copy)
+    out.extend(extra)
 
 
 def ordered(i):
@@ -210,6 +297,7 @@ def main():
     out.extend(dungeon_pieces(out, 'solar_crucible', 'solar', 'Sunforged', {'hue':34,'saturate':1.35,'brightness':1.22}))
     out.extend(dungeon_pieces(out, 'amber_archive', 'amber', 'Archivist', {'hue':42,'saturate':1.22,'brightness':1.18}))
     out.extend(dungeon_pieces(out, 'silent_solstice', 'solstice', 'Nightglass', {'hue':207,'saturate':1.2,'brightness':1.23}))
+    multiply_ordinary_gear(out, bases)
     import cloak_catalog
     out = cloak_catalog.apply(out)
     # Keep existing catalog order stable: migrations, item-icon cells and reviews need no reshuffle.
