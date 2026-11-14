@@ -75,7 +75,7 @@ Signature damage and control target enemies only.
 | `longship` | +5% defense | `secondwind` | `whirlwind` | `battlecry` |
 | `nornroot` | +5% health | `shieldwall` | `cleave` | `battlecry` |
 | `skybridge` | +5% attack | `groundslam` | `whirlwind` | `charge` |
-| `undervault` | +5% defense | `shieldwall` | `cleave` | `charge` |
+| `undervault` | +5% defense | `shieldwall` | `cleave` | `groundslam` |
 | `cathedral_cloister` | +5% health | `charge` | `whirlwind` | `groundslam` |
 | `cathedral_reliquary` | +5% defense | `secondwind` | `earthshatter` | `shieldwall` |
 | `cathedral_nave` | +5% attack | `battlecry` | `titanswrath` | `secondwind` |
@@ -101,7 +101,7 @@ Signature damage and control target enemies only.
 | `longship` | +5% defense | `arcaneward` | `barrage` | `lifedrain` |
 | `nornroot` | +5% health | `blink` | `twinbolt` | `fireball` |
 | `skybridge` | +5% attack | `chainlightning` | `fireball` | `blink` |
-| `undervault` | +5% defense | `arcaneward` | `twinbolt` | `blink` |
+| `undervault` | +5% defense | `arcaneward` | `twinbolt` | `chainlightning` |
 | `cathedral_cloister` | +5% health | `blink` | `barrage` | `arcanestorm` |
 | `cathedral_reliquary` | +5% defense | `arcaneward` | `chainlightning` | `meteor` |
 | `cathedral_nave` | +5% attack | `arcanestorm` | `starfall` | `twinbolt` |
@@ -127,7 +127,7 @@ Signature damage and control target enemies only.
 | `longship` | +5% defense | `shadowveil` | `throwingknives` | `deadlyfocus` |
 | `nornroot` | +5% health | `evasion` | `flurry` | `lunge` |
 | `skybridge` | +5% attack | `cycloneblades` | `flurry` | `evasion` |
-| `undervault` | +5% defense | `evasion` | `flurry` | `shadowveil` |
+| `undervault` | +5% defense | `evasion` | `flurry` | `cycloneblades` |
 | `cathedral_cloister` | +5% health | `lunge` | `cycloneblades` | `knifering` |
 | `cathedral_reliquary` | +5% defense | `shadowveil` | `throwingknives` | `evasion` |
 | `cathedral_nave` | +5% attack | `deadlyfocus` | `thousandcuts` | `flurry` |
@@ -179,7 +179,7 @@ Signature damage and control target enemies only.
 | `longship` | +5% defense | `rollaway` | `explosivearrow` | `huntersmark` |
 | `nornroot` | +5% health | `rollaway` | `powershot` | `huntersmark` |
 | `skybridge` | +5% attack | `rapidfire` | `piercingarrow` | `rollaway` |
-| `undervault` | +5% defense | `huntersmark` | `powershot` | `multishot` |
+| `undervault` | +5% defense | `explosivearrow` | `powershot` | `multishot` |
 | `cathedral_cloister` | +5% health | `rollaway` | `multishot` | `rainofarrows` |
 | `cathedral_reliquary` | +5% defense | `huntersmark` | `piercingarrow` | `eaglesight` |
 | `cathedral_nave` | +5% attack | `rapidfire` | `arrowstorm` | `powershot` |

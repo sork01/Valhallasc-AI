@@ -74,9 +74,9 @@ const results = [];
     await page.waitForFunction(() => Online.connected && Field.hero);
     check(await page.evaluate(() => Prefs.dpsMeter === false), 'hidden preference survives a reload');
     check(await page.locator('#dps-meter').isHidden(), 'meter stays hidden on reconnect');
-    await page.keyboard.press('Escape'); await page.locator('#dps-toggle').click();
-    check(await page.evaluate(() => Prefs.dpsMeter === true), 'World Menu can restore the meter');
-    await page.keyboard.press('Escape'); check(await page.locator('#dps-meter').isVisible(), 'restored meter is visible');
+    await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#dps-toggle').check();
+    check(await page.evaluate(() => Prefs.dpsMeter === true), 'Settings can restore the meter');
+    await page.locator('#set-back').click(); await page.keyboard.press('Escape'); check(await page.locator('#dps-meter').isVisible(), 'restored meter is visible');
     check(await page.evaluate(() => Locale.translate('DPS meter') === 'DPS meter'), 'English label stays English');
     if (viewport.width < 1000) { const close = await page.locator('#dps-close').boundingBox(); check(close.width >= 43.5 && close.height >= 43.5, 'touch hide target remains reachable at the saved UI scale'); }
     await Promise.all([page.waitForNavigation(), page.evaluate(() => Prefs.set({ lang: 'sv' }))]);

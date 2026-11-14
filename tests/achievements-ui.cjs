@@ -7,9 +7,9 @@ const suite = {
   async test({ player, check, width, height, out }) {
     const page = await player('Pathfinder'); await safeSpot(page);
     await page.evaluate(() => { window.__nameplates = []; const fill = CanvasRenderingContext2D.prototype.fillText; CanvasRenderingContext2D.prototype.fillText = function(s,...args) { if (String(s).includes('Pathfinder')) window.__nameplates.push(String(s)); return fill.call(this,s,...args); }; });
-    await page.keyboard.press('Escape'); await page.locator('#p-achievements').click();
+    await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
     await page.waitForSelector('.achievement-card');
-    check(await page.locator('#character-tab-achievements').getAttribute('aria-selected') === 'true', 'World Menu Achievements opens the Achievements tab in Character');
+    check(await page.locator('#character-tab-achievements').getAttribute('aria-selected') === 'true', 'the Character pane Achievements tab is selected');
     check(await page.locator('.achievement-card').count() === 102, 'all 102 achievements shown');
     check(await page.locator('.achievement-group-heading').allTextContents().then(a => a.join(',') === 'Adventure,Combat,Quests,Exploration'), 'all achievements are grouped under their catalog categories');
     check(await page.locator('#achievement-categories').evaluate(n => n.scrollWidth <= n.clientWidth + 1), 'category buttons fit cleanly without horizontal overflow');
@@ -95,7 +95,7 @@ const suite = {
     await page.locator('#equipment-close').click();
     await page.evaluate(() => { const key='valhallasc.save.v1'; const s=JSON.parse(localStorage.getItem(key)); s.lang='sv'; localStorage.setItem(key,JSON.stringify(s)); });
     await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
-    await page.waitForFunction(() => Online.connected && Field.hero.id); await page.keyboard.press('Escape'); await page.locator('#p-achievements').click();
+    await page.waitForFunction(() => Online.connected && Field.hero.id); await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
     await page.locator('#achievements-filter').selectOption('');
     await page.waitForSelector('[data-achievement="explorer"]');
     check(await page.locator('#achievements-heading').textContent() === 'Prestationer', 'Swedish panel heading');

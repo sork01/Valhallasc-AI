@@ -13,7 +13,7 @@ async function call(name, args = {}) {
   const result = await client.callTool({ name, arguments: args });
   assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`); return result.structuredContent;
 }
-const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink', 'chainlightning', 'meteor', 'lifedrain', 'arcanestorm', 'starfall'];
+const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainlightning', 'blink', 'meteor', 'lifedrain', 'arcanestorm', 'starfall'];
 (async () => {
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment(), VALHALLA_START_LEVEL: '40' } }));
   const world = await call('start_world'); started = true;

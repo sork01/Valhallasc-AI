@@ -298,6 +298,7 @@
   }, true);
 
   window.Social = {
+    get hasPartyInvite() { return state.incoming.some(i => i.kind === 'party'); },
     show, close, command, refreshPvp() { if (open() && (tab === 'pvp' || tab === 'online')) renderPanel(); }, get open() { return open(); },
     get state() { return state; }, get roster() { return roster; },
     isPartyMember: id => inParty(id), isFriend, questMates,

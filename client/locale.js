@@ -15,7 +15,7 @@
   // item kinds, as the item tooltips print them).
   const manual = {
     'light':'lätt', 'medium':'måttlig', 'heavy':'kraftig', 'none':'ingen',
-    'gold':'guld', 'slots':'platser', 'Indoors':'Inomhus',
+    'gold':'guld', 'copper':'koppar', 'slots':'platser', 'Indoors':'Inomhus',
     warrior:'krigare', mage:'magiker', assassin:'lönnmördare', priest:'präst', hunter:'jägare',
     headgear:'huvudbonad', shoulders:'axlar', gloves:'handskar', armor:'rustning', weapon:'vapen', pants:'byxor',
     necklace:'halsband', accessory:'smycke',

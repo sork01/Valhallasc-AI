@@ -704,7 +704,7 @@ fn the_meeting_stone_hires_fighters_for_any_party_of_up_to_five_with_no_quest_an
     assert!(drain(&mut rx).iter().any(|v| v["type"] == "error"));
     at(&mut w, stone.x, stone.y + 1.);
     w.players.get_mut(&1).unwrap().character.level = 20;
-    assert!(hire(&mut w, &mut rx, "mage").contains("1200 gold"));
+    assert!(hire(&mut w, &mut rx, "mage").contains("12 silver"));
     // With gold: no quest needed, one seat at a time up to a party of five.
     w.players.get_mut(&1).unwrap().character.gold = 4900;
     for (n, class) in ["priest", "mage", "hunter", "warrior"].iter().enumerate() {
@@ -1302,7 +1302,8 @@ fn a_hired_party_clears_trash_packs_faster_and_safer_than_a_lone_hero() {
         // The healer keeps three heroes about as safe as five now (65% against 64% in the barracks), so the difference
         // that remains is time: clearly slower, and still hurt.
         assert!(
-            three.secs > five.secs * 1.2 && three.low < 0.9,
+            // 1.1 since every class learns an area skill at level 20 (AOE-SKILL-AT-20): the hired five clear a pack a little faster.
+            three.secs > five.secs * 1.1 && three.low < 0.9,
             "{name}: but slower ({:.0}s against {:.0}s) and hurt (lowest {:.0}%)",
             three.secs,
             five.secs,

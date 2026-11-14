@@ -15,3 +15,5 @@
 @media (pointer: coarse) {
   #rested-status { min-height: calc(44px / var(--ui, .8)); }
 }
+
+.bar.xp.max-level i#xp-fill { background: linear-gradient(#ffe9a3, #d9a62e); }

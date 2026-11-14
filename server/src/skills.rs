@@ -256,6 +256,53 @@ mod tests {
 
     const LAST_SKILL_LEVEL: u32 = 40;
 
+    /// `AOE-SKILL-AT-20`: every class gains an area skill at level 20; the four that used to get something else there
+    /// now get it at 24, with their ranks shifted by the same four levels.
+    #[test]
+    fn every_class_unlocks_an_area_skill_at_level_20_and_the_swapped_skill_at_24() {
+        let classes = [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ];
+        let area = |s: &Skill| match &s.effect {
+            Effect::Nova { .. } | Effect::Chain { .. } => true,
+            Effect::Volley { blast, .. } => *blast > 0.,
+            _ => false,
+        };
+        for class in classes {
+            let at20: Vec<_> = SKILLS
+                .iter()
+                .filter(|s| s.class == class && s.level == 20)
+                .collect();
+            assert_eq!(at20.len(), 1, "{class:?}: one skill unlocks at 20");
+            assert!(area(at20[0]), "{class:?}: {} is an area skill", at20[0].id);
+            assert_eq!(at20[0].ranks[0].level, 22);
+            assert_eq!(unlocked(class, 19, 20)[0], at20[0].id);
+        }
+        for (class, id) in [
+            (Class::Warrior, "charge"),
+            (Class::Mage, "blink"),
+            (Class::Assassin, "shadowveil"),
+            (Class::Hunter, "huntersmark"),
+        ] {
+            let skill = find(class, id).unwrap();
+            assert_eq!(skill.level, 24, "{id} moved to 24");
+            assert_eq!(skill.ranks[0].level, 26, "{id} rank two follows it");
+            assert!(!unlocked(class, 19, 23).contains(&id), "{id} is not learned before 24");
+            assert!(unlocked(class, 23, 24).contains(&id));
+        }
+        assert_eq!(find(Class::Priest, "blessing").unwrap().level, 24);
+        // The ten skills still unlock at 4, 8, ..., 40, one each.
+        for class in classes {
+            let mut levels: Vec<u32> = SKILLS.iter().filter(|s| s.class == class).map(|s| s.level).collect();
+            levels.sort();
+            assert_eq!(levels, (1..=10).map(|n| n * 4).collect::<Vec<u32>>(), "{class:?}");
+        }
+    }
+
     #[test]
     fn every_class_learns_a_new_skill_every_four_levels_through_forty() {
         for class in [
@@ -448,13 +495,14 @@ mod tests {
             }
             _ => panic!("Twin Bolt must stay a volley"),
         }
+        // Blink is learned at 24 now (Chain Lightning took level 20), and its ranks follow it.
         let blink = find(Class::Mage, "blink").unwrap();
-        assert_eq!(blink.at_level(21).cooldown, blink.cooldown);
-        assert!((blink.at_level(22).cooldown - blink.cooldown * 0.85).abs() < 0.0001);
-        assert_eq!(blink.at_level(49).cooldown, blink.cooldown * 0.85);
-        assert!((blink.at_level(50).cooldown - blink.cooldown * 0.7).abs() < 0.0001);
-        assert_eq!(blink.at_level(69).cooldown, blink.cooldown * 0.7);
-        assert!((blink.at_level(70).cooldown - blink.cooldown * 0.55).abs() < 0.0001);
+        assert_eq!(blink.at_level(25).cooldown, blink.cooldown);
+        assert!((blink.at_level(26).cooldown - blink.cooldown * 0.85).abs() < 0.0001);
+        assert_eq!(blink.at_level(51).cooldown, blink.cooldown * 0.85);
+        assert!((blink.at_level(52).cooldown - blink.cooldown * 0.7).abs() < 0.0001);
+        assert_eq!(blink.at_level(71).cooldown, blink.cooldown * 0.7);
+        assert!((blink.at_level(72).cooldown - blink.cooldown * 0.55).abs() < 0.0001);
         let ward = find(Class::Mage, "arcaneward").unwrap();
         match ward.at_level(10).effect {
             Effect::Buff { amount, .. } => assert!((amount - 0.48).abs() < 0.0001),

@@ -33,6 +33,8 @@ def sources():
                     catalog[row['kind']] = row
     targets = {o['target'] for area in areas for q in area.get('quests', [])
                for o in q['objectives'] if o['kind'] == 'bring'}
+    # A quest-only item (scripts/quest_items.py) drops from the monsters of the material it is made from.
+    source_of = {i['id']: i['questMaterial'] for i in json.loads((ROOT / 'world/items.txt').read_text()) if i.get('questMaterial')}
     out = {}
     for target in sorted(targets):
         points = []
@@ -42,7 +44,7 @@ def sources():
                 groups = {}
                 for spawn in area.get('slimes', []):
                     kind = spawn['kind']
-                    if (materials.get(kind) != target or spawn.get('ambush')
+                    if (materials.get(kind) != source_of.get(target, target) or spawn.get('ambush')
                             or catalog.get(kind, {}).get('add') or kind == 'ember_firelord'):
                         continue
                     groups.setdefault(kind, []).append(spawn)

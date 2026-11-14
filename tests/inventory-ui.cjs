@@ -87,7 +87,7 @@ async function reloadGuest(world) {
   await page.waitForFunction(() => Inventory.quantity('slime_gel') === 1, null, { timeout: 15000 });
   await page.evaluate(() => Online.send({ type: 'stop' }));
   await page.locator('#inventory-open').click();
-  check(await page.locator('#inventory-list [data-item="slime_gel"]').textContent().then(t => t.includes('3 gold each')), 'Real mob material displays its sale value');
+  check(await page.locator('#inventory-list [data-item="slime_gel"]').textContent().then(t => t.includes('3 copper each')), 'Real mob material displays its sale value');
   await page.locator('#inventory-list [data-item="slime_gel"] button').click();
   check(await page.locator('#bag-details [data-action="equip"]').count() === 0, 'Materials have no equip action');
   await page.screenshot({ path: path.join(world.artifacts, 'inventory-real-loot.png') });
@@ -113,7 +113,7 @@ async function reloadGuest(world) {
   const before = await page.evaluate(() => Field.hero.gold);
   await page.locator('#npc-inventory [data-sell="materials"]').click();
   await page.waitForFunction(gold => Inventory.quantity('slime_gel') === 0 && Field.hero.gold === gold + 3, before);
-  check(await page.locator('#npc-notice').textContent().then(t => t.includes('3 gold')), 'Sell all materials consumes loot and displays payment');
+  check(await page.locator('#npc-notice').textContent().then(t => t.includes('3 copper')), 'Sell all materials consumes loot and displays payment');
   check(await page.locator('#npc-inventory [data-item="slime_gel"]').count() === 0 && await page.locator('#npc-inventory [data-sell="materials"]').count() === 0, 'Shop removes sold materials while allowing any rare gear found in combat');
   await page.screenshot({ path: path.join(world.artifacts, 'inventory-sold.png') });
   await page.locator('#npc-x').click(); await page.locator('#inventory-open').click();
@@ -199,7 +199,7 @@ async function reloadGuest(world) {
   await rare.locator('button').click({ button: 'right' });
   check(await fixture.locator('#npc-inventory [data-item="warrior_weapon_royal"] button').count() === 1, 'Cross-class gear can be sold');
   check(await fixture.locator('#npc-inventory [data-item="mage_armor_runic"] button').count() === 1, 'Sale controls reserve one equipped copy');
-  check(await fixture.locator('#npc-inventory [data-sell="materials"]').textContent().then(t => t.includes('9 gold')), 'Bulk sale displays the total material value');
+  check(await fixture.locator('#npc-inventory [data-sell="materials"]').textContent().then(t => t.includes('9 copper')), 'Bulk sale displays the total material value');
   await fixture.evaluate(() => Quests.update([{id:'slime_patrol',claimed:true,completions:1,counts:[6]}]));
   check(await fixture.evaluate(() => Quests.markerInfo('merchant').symbol === '!' && Quests.markerInfo('merchant').color === '#64b5ff'), 'Repeatable availability uses a blue exclamation mark');
   await fixture.evaluate(() => Quests.update([{id:'slime_patrol',claimed:true,completions:1,counts:[6]},{id:'meadow_bounty',claimed:false,completions:0,counts:[8]}]));

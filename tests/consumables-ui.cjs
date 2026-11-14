@@ -50,7 +50,7 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
 
   // --- buying: the baker sells food, the apothecary potions ---
   await visit('baker');
-  check(await page.locator('#npc-offers [data-offer="buy_traveler_stew"]').textContent().then(t => t.includes('up to 60 HP (50% max) and 100 rage over 8 s') && t.includes('3 gold')), 'The baker lists Traveler\'s Stew with its effect and price');
+  check(await page.locator('#npc-offers [data-offer="buy_traveler_stew"]').textContent().then(t => t.includes('up to 60 HP (50% max) and 100 rage over 8 s') && t.includes('3 copper')), 'The baker lists Traveler\'s Stew with its effect and price');
   check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').count() === 0, 'The baker does not list potions');
   await page.waitForTimeout(900);
   await page.locator('#npc-offers [data-offer="buy_traveler_stew"]').click();
@@ -62,7 +62,7 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   check(await page.locator('#npc-inventory [data-item]').count() === 0, 'The baker sells but does not buy');
   await page.locator('#npc-x').click();
   await visit('apothecary');
-  check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').textContent().then(t => t.includes('up to 60 HP (50% max) at once') && t.includes('5 gold')), 'The apothecary lists Health Potion');
+  check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').textContent().then(t => t.includes('up to 60 HP (50% max) at once') && t.includes('5 copper')), 'The apothecary lists Health Potion');
   await page.waitForTimeout(900);
   await page.locator('#npc-offers [data-offer="buy_health_potion"]').click();
   await page.waitForFunction(() => Inventory.quantity('health_potion') === 1 && Field.hero.gold === 5);
@@ -153,8 +153,8 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   await page.evaluate(() => { Online.send({ type: 'debug', ref: 901, command: { op: 'set_level', level: 20 } }); Online.send({ type: 'debug', ref: 902, command: { op: 'set_gold', gold: 500 } }); });
   await page.waitForFunction(() => Field.hero.level === 20 && Field.hero.gold === 500, null, { timeout: 10000 });
   await visit('apothecary');
-  check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').textContent().then(t => t.includes('Superior Health Potion') && t.includes('up to ') && t.includes('40% max') && t.includes('110 gold')), 'At level 20 the apothecary sells the Superior Health Potion for 110 gold');
-  check(await page.locator('#npc-offers [data-offer="buy_mana_potion"]').textContent().then(t => t.includes('Superior Mana Potion') && t.includes('78 rage') && t.includes('110 gold')), 'and the Superior Mana Potion for rage');
+  check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').textContent().then(t => t.includes('Superior Health Potion') && t.includes('up to ') && t.includes('40% max') && t.includes('1 silver 10 copper')), 'At level 20 the apothecary sells the Superior Health Potion for 110 gold');
+  check(await page.locator('#npc-offers [data-offer="buy_mana_potion"]').textContent().then(t => t.includes('Superior Mana Potion') && t.includes('78 rage') && t.includes('1 silver 10 copper')), 'and the Superior Mana Potion for rage');
   await page.waitForTimeout(600);
   await page.locator('#npc-offers [data-offer="buy_health_potion"]').click();
   await page.waitForFunction(() => Inventory.quantity('health_potion_l20') === 1 && Field.hero.gold === 390);

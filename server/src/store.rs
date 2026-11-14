@@ -273,7 +273,8 @@ impl Store {
             resurrection_sickness: 0.,
             tutorial_done: vec![],
             tutorial_disabled: false,
-            tutorial_version: 1,
+            tutorial_version: 2,
+            quest_items_version: 1,
             landing: false,
         };
         c.seed_inventory();
@@ -594,6 +595,7 @@ fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
     character.sync_look();
     character.normalize_mounts();
     character.migrate_tutorial();
+    character.clamp_level();
     if character.health_curve_version == 0 {
         let ratio = (character.hp / character.legacy_max_hp()).clamp(0., 1.);
         character.hp = (character.max_hp() * ratio).round();
@@ -977,7 +979,8 @@ mod unique_name_tests {
         veteran.tutorial_version = 0;
         veteran.tutorial_done.clear();
         let upgraded = decode(&serde_json::to_string(&veteran).unwrap()).unwrap();
-        assert_eq!(upgraded.tutorial_version, 1);
+        assert_eq!(upgraded.tutorial_version, 2);
+        assert_eq!(crate::model::TUTORIAL_MILESTONES.len(), 18);
         for &id in crate::model::TUTORIAL_MILESTONES {
             assert!(upgraded.tutorial_done.iter().any(|d| d == id), "missing {id}");
         }
@@ -987,15 +990,35 @@ mod unique_name_tests {
         lowbie.tutorial_version = 0;
         lowbie.tutorial_done.clear();
         let loaded_lowbie = decode(&serde_json::to_string(&lowbie).unwrap()).unwrap();
-        assert_eq!(loaded_lowbie.tutorial_version, 1);
-        assert!(loaded_lowbie.tutorial_done.is_empty());
+        assert_eq!(loaded_lowbie.tutorial_version, 2);
+        assert!(loaded_lowbie.tutorial_done.is_empty(), "a low-level hero keeps every step");
 
-        let mut fresh = Character::mercenary(crate::model::Class::Priest, 10, "FreshHero");
-        fresh.tutorial_version = 1;
-        fresh.tutorial_done.clear();
-        let loaded_fresh = decode(&serde_json::to_string(&fresh).unwrap()).unwrap();
-        assert_eq!(loaded_fresh.tutorial_version, 1);
-        assert!(loaded_fresh.tutorial_done.is_empty());
+        // A hero saved under version 1 who has since passed level 5: the twelve new steps are skipped, nothing else changes.
+        let mut v1 = Character::mercenary(crate::model::Class::Priest, 10, "FreshHero");
+        v1.tutorial_version = 1;
+        v1.tutorial_done = vec!["first_quest".into()];
+        let loaded_v1 = decode(&serde_json::to_string(&v1).unwrap()).unwrap();
+        assert_eq!(loaded_v1.tutorial_version, 2);
+        let first_six = &crate::model::TUTORIAL_MILESTONES[..crate::model::TUTORIAL_V1_COUNT];
+        assert!(loaded_v1.tutorial_done.iter().any(|d| d == "first_quest"));
+        for &id in &crate::model::TUTORIAL_MILESTONES[crate::model::TUTORIAL_V1_COUNT..] {
+            assert!(loaded_v1.tutorial_done.iter().any(|d| d == id), "new step {id} is skipped for a veteran");
+        }
+        assert!(
+            first_six.iter().filter(|id| **id != "first_quest").all(|id| !loaded_v1.tutorial_done.iter().any(|d| d == id)),
+            "the version-1 steps the hero had not finished stay as they were"
+        );
+        // A hero saved under version 1 at level 3 gets the new steps, and a version-2 save is left alone.
+        let mut v1_low = Character::mercenary(crate::model::Class::Hunter, 3, "EarlyBird");
+        v1_low.tutorial_version = 1;
+        v1_low.tutorial_done.clear();
+        let loaded_low = decode(&serde_json::to_string(&v1_low).unwrap()).unwrap();
+        assert_eq!((loaded_low.tutorial_version, loaded_low.tutorial_done.len()), (2, 0));
+        let mut v2 = Character::mercenary(crate::model::Class::Mage, 40, "Settled");
+        v2.tutorial_version = 2;
+        v2.tutorial_done.clear();
+        let loaded_v2 = decode(&serde_json::to_string(&v2).unwrap()).unwrap();
+        assert!(loaded_v2.tutorial_done.is_empty(), "version 2 is migrated exactly once");
     }
 
     #[test]
@@ -1007,9 +1030,12 @@ mod unique_name_tests {
             ..Look::default()
         };
         let (mut c, _token) = s.create(look, Point::default()).unwrap();
-        assert_eq!(c.tutorial_version, 1);
+        assert_eq!(c.tutorial_version, 2);
         assert!(c.tutorial_done.is_empty());
         assert!(!c.complete_tutorial("bogus_step"));
+        assert!(c.complete_tutorial("first_death"), "the new ids are accepted");
+        assert!(c.complete_tutorial("party_mercs"));
+        c.reset_tutorial();
         assert!(c.complete_tutorial("first_quest"));
         assert!(c.complete_tutorial("first_quest"));
         assert_eq!(c.tutorial_done, vec!["first_quest"]);

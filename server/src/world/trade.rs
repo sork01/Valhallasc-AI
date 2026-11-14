@@ -350,7 +350,7 @@ fn settle_trade(
         .ok_or("Gold amount is too large.")?;
     move_items(&mut next_a, &mut next_b, ao, &b.id, now)?;
     move_items(&mut next_b, &mut next_a, bo, &a.id, now)?;
-    if next_a.bag_used() > next_a.bag_capacity() || next_b.bag_used() > next_b.bag_capacity() {
+    if a.overfills(&next_a) || b.overfills(&next_b) {
         return Err("The trade would overfill a player's bags.".into());
     }
     Ok((next_a, next_b))

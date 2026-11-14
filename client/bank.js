@@ -24,6 +24,14 @@
     bank: { stacks: bankStacks, copies: bankCopies, capacity: () => data?.bank.capacity || 0, where: 'in the bank', hint: 'Click to take · Shift-click takes all' },
     bags: { stacks: () => Inventory.looseStacks(), copies: id => Inventory.looseCopies(id), capacity: () => data?.bagCapacity || 0, where: 'in your bags', hint: 'Click to store · Shift-click stores all' },
   };
+  // Gear never stacks (GEAR-NO-STACK): each copy fills a cell of its own on both sides. Every other item keeps one cell per kind.
+  const cellsOf = side => sides[side].stacks().flatMap(stack => {
+    const i = item(stack.item);
+    if (!gear(i)) return [stack];
+    const copies = sides[side].copies(stack.item);
+    return Array.from({ length: stack.quantity }, (_, k) => ({ item: stack.item, quantity: 1, copy: copies[k]?.id ?? null }));
+  });
+  const used = side => cellsOf(side).length;
   const other = side => side === 'bank' ? 'bags' : 'bank';
   const order = stacks => !sorted ? stacks : [...stacks].sort((a, b) => {
     const x = item(a.item), y = item(b.item);
@@ -45,8 +53,8 @@
     if (!i || !data) return false;
     if (!Number.isSafeInteger(amount) || amount < 1) { say(toBank ? 'Choose a quantity to store.' : 'Choose a quantity to take.', false); return false; }
     if (toBank && i.rarity === 'gm') { say('Game master gear cannot be banked.', false); return false; }
-    if (toBank && !bankStacks().some(s => s.item === id) && data.bank.used >= data.bank.capacity) { say('The bank is full.', false); return false; }
-    if (!toBank && !Inventory.looseStacks().some(s => s.item === id) && Inventory.looseStacks().length >= data.bagCapacity) { say('Your bags are full. Make room first.', false); return false; }
+    if (toBank && (gear(i) || !bankStacks().some(s => s.item === id)) && data.bank.used >= data.bank.capacity) { say('The bank is full.', false); return false; }
+    if (!toBank && (gear(i) || !Inventory.looseStacks().some(s => s.item === id)) && used('bags') >= data.bagCapacity) { say('Your bags are full. Make room first.', false); return false; }
     const message = toBank ? { type: 'bank_deposit', item: id, quantity: amount } : { type: 'bank_withdraw', item: id, quantity: amount };
     if (copy != null) message.copy = copy;
     return send(message);
@@ -56,6 +64,7 @@
   function activate(side, stack, event) {
     Inventory.hideTooltip();
     const i = item(stack.item), copies = sides[side].copies(stack.item);
+    if (gear(i) && stack.copy != null) { selected = null; move(side, stack.item, 1, stack.copy); return; }
     if (event.shiftKey) { selected = null; move(side, stack.item, stack.quantity); return; }
     if (gear(i) && copies.length > 1) {
       selected = selected?.side === side && selected.item === stack.item ? null : { side, item: stack.item };
@@ -66,19 +75,20 @@
     move(side, stack.item, gear(i) ? 1 : Math.min(asked, stack.quantity));
   }
   function cell(side, stack) {
-    const i = item(stack.item), copies = sides[side].copies(stack.item);
+    const i = item(stack.item), copies = stack.copy != null ? sides[side].copies(stack.item).filter(g => g.id === stack.copy) : sides[side].copies(stack.item);
     const wrap = make('div', '', 'bag-cell inventory-item bank-cell');
-    wrap.dataset.item = i.id; wrap.dataset.side = side; wrap.dataset.rarity = Inventory.bestRarity(i, copies);
+    wrap.dataset.item = i.id; wrap.dataset.side = side; wrap.dataset.rarity = Inventory.bestRarity(i, copies); if (stack.copy != null) wrap.dataset.copy = stack.copy;
     const b = make('button', '', 'item-tile'); b.type = 'button';
     b.innerHTML = Inventory.icon(i, undefined, copies.find(g => Inventory.conditionState(g) === 'broken'));
-    b.append(make('span', String(stack.quantity), 'item-stack'), make('b', i.name, 'sr-only'));
+    if (!gear(i)) b.append(make('span', String(stack.quantity), 'item-stack'));
+    b.append(make('b', i.name, 'sr-only'));
     b.setAttribute('aria-label', side === 'bank' ? `${i.name} ×${stack.quantity} in the bank` : `${i.name} ×${stack.quantity} in your bags`);
-    b.setAttribute('aria-pressed', String(selected?.side === side && selected.item === i.id));
+    b.setAttribute('aria-pressed', String(selected?.side === side && selected.item === i.id));   // only a plain stack is ever selected now
     if (side === 'bags' && i.rarity === 'gm') b.setAttribute('aria-disabled', 'true');
     b.addEventListener('click', event => activate(side, stack, event));
     Inventory.attachTooltip(b, () => i, null, () => ({ copies: sides[side].copies(i.id), count: stack.quantity, in: sides[side].where, hint: sides[side].hint }));
     b.draggable = true;
-    b.addEventListener('dragstart', event => { Inventory.hideTooltip(); event.dataTransfer.setData(dragType, JSON.stringify({ side, item: i.id })); event.dataTransfer.effectAllowed = 'move'; });
+    b.addEventListener('dragstart', event => { Inventory.hideTooltip(); event.dataTransfer.setData(dragType, JSON.stringify({ side, item: i.id, copy: stack.copy ?? null })); event.dataTransfer.effectAllowed = 'move'; });
     wrap.append(b); return wrap;
   }
   // Dropping a stack on the other side's grid moves the quantity in the box, as a click does.
@@ -89,12 +99,12 @@
       event.preventDefault(); grid.classList.remove('drop-ready');
       let drag = null; try { drag = JSON.parse(event.dataTransfer.getData(dragType)); } catch (_) {}
       if (!drag || drag.side === side) return;
-      const stack = sides[drag.side].stacks().find(s => s.item === drag.item); if (!stack) return;
+      const stack = cellsOf(drag.side).find(s => s.item === drag.item && (drag.copy == null || s.copy === drag.copy)); if (!stack) return;
       activate(drag.side, stack, { shiftKey: false });
     });
   }
   function grid(side, container) {
-    const stacks = order(sides[side].stacks()), size = Math.max(sides[side].capacity(), stacks.length);
+    const stacks = order(cellsOf(side)), size = Math.max(sides[side].capacity(), stacks.length);
     const cells = stacks.map(stack => cell(side, stack));
     for (let n = stacks.length; n < size; n++) { const empty = make('div', '', 'bag-cell bag-cell-empty'); empty.setAttribute('aria-label', `Empty ${side === 'bank' ? 'bank' : 'bag'} slot ${n + 1}`); cells.push(empty); }
     container.replaceChildren(...cells);
@@ -113,16 +123,16 @@
   }
   function gold() {
     const bank = data.bank;
-    $('bank-gold').textContent = `${number(bank.gold)} gold`;
-    $('bank-purse').textContent = `Your purse: ${number(data.gold)} gold`;
+    Money.set($('bank-gold'), bank.gold);
+    $('bank-purse').innerHTML = `${Locale.translate('Your purse:')} ${Money.html(data.gold)}`;
     const expand = $('bank-expand'), price = bank.nextPrice;
     $('bank-expand-text').textContent = price == null
       ? `The bank is at its largest: ${number(bank.capacity)} cells.`
-      : `Expansion ${bank.expansions + 1} of ${bank.expansionsMax}: +${bank.expansionCells} cells for ${number(price)} gold. It is never refunded.`;
+      : `Expansion ${bank.expansions + 1} of ${bank.expansionsMax}: +${bank.expansionCells} cells for ${Money.text(price)}. It is never refunded.`;
     expand.hidden = price == null;
-    expand.textContent = price == null ? '' : `Expand the bank · ${number(price)} gold`;
+    expand.textContent = price == null ? '' : `Expand the bank · ${Money.text(price)}`;
     expand.disabled = price != null && data.gold < price;
-    $('bank-expand-short').textContent = price != null && data.gold < price ? `You need ${number(price - data.gold)} more gold.` : '';
+    $('bank-expand-short').textContent = price != null && data.gold < price ? `You need ${Money.text(price - data.gold)} more.` : '';
   }
   function render() {
     if (!data || !isOpen()) return;
@@ -130,7 +140,7 @@
     const focus = $('bank-panel').contains(document.activeElement) ? document.activeElement.closest('[data-item]')?.dataset : null;
     $('bank-title').textContent = npc.name;
     $('bank-capacity').textContent = `${data.bank.used}/${data.bank.capacity} slots · ${Math.max(0, data.bank.capacity - data.bank.used)} free`;
-    const bagUsed = Inventory.looseStacks().length;
+    const bagUsed = used('bags');
     $('bank-bag-capacity').textContent = `${bagUsed}/${data.bagCapacity} slots · ${Math.max(0, data.bagCapacity - bagUsed)} free`;
     $('bank-capacity').classList.toggle('bags-full', data.bank.used >= data.bank.capacity);
     $('bank-bag-capacity').classList.toggle('bags-full', bagUsed >= data.bagCapacity);
@@ -191,11 +201,12 @@
   $('bank-sort').addEventListener('click', () => { sorted = !sorted; $('bank-sort').setAttribute('aria-pressed', String(sorted)); render(); });
   function goldMove(deposit) {
     const amount = Number($('bank-gold-amount').value);
-    if (!Number.isSafeInteger(amount) || amount < 1 || amount > MOST_GOLD) { say('Choose an amount of gold.', false); return; }
+    if (!Number.isSafeInteger(amount) || amount < 1 || amount > MOST_GOLD) { say('Choose an amount of copper.', false); return; }
     if (deposit && amount > data.gold) { say('You do not carry that much gold.', false); return; }
     if (!deposit && amount > data.bank.gold) { say('The bank does not hold that much gold.', false); return; }
     send({ type: 'bank_gold', deposit, amount });
   }
+  Money.preview($('bank-gold-amount'));
   $('bank-gold-deposit').addEventListener('click', () => goldMove(true));
   $('bank-gold-withdraw').addEventListener('click', () => goldMove(false));
   $('bank-gold-amount').addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); goldMove(!event.shiftKey); } });

@@ -84,11 +84,11 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   const offer=page.locator('[data-action="repair-one"]');
   await offer.waitFor();
   assert.equal(await offer.count(),1);
-  assert.match(await page.locator('[data-action="repair-all"]').getAttribute('title'),/60 gold/);
+  assert.match(await page.locator('[data-action="repair-all"]').getAttribute('title'),/60 copper/);
   await offer.click();
   assert.equal(await page.locator('#npc-inventory .repair-row[data-state="broken"]').count(),1);
   await page.locator('#npc-inventory [data-action="repair_all"]').click();
-  await page.getByText(/Repaired one piece for 60 gold/).waitFor({timeout:10000});
+  await page.getByText(/Repaired one piece for 60 copper/).waitFor({timeout:10000});
   await page.waitForFunction(()=>Field.hero.gold===940,null,{timeout:15000});
   await page.locator('#npc-x').click();
   await page.keyboard.press('e');
@@ -102,11 +102,11 @@ async function call(name,args={}){const result=await client.callTool({name,argum
     await page.waitForFunction(()=>Field.zone===5);
     await page.evaluate(()=>Field.visitNpc('dungeon_repair_5'));
     await page.locator('[data-offer="repair"]').waitFor();
-    assert.match(await page.locator('[data-offer="repair"]').textContent(),/24 gold/,'dungeon quote is four times the 6-gold town price');
+    assert.match(await page.locator('[data-offer="repair"]').textContent(),/24 copper/,'dungeon quote is four times the 6-copper town price');
     await page.locator('[data-offer="repair"]').click();
     assert.match(await page.locator('#npc-inventory').textContent(),/four times the town price/);
     await page.locator('#npc-inventory [data-action="repair_all"]').click();
-    await page.getByText(/Repaired one piece for 24 gold/).waitFor();
+    await page.getByText(/Repaired one piece for 24 copper/).waitFor();
     await page.waitForFunction(()=>Field.hero.gold===916);
   }
   assert.deepEqual(errors,[]);

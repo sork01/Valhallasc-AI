@@ -43,7 +43,8 @@ Always the same word, in every window:
 | skill / passive / skillbar | färdighet / passiv / färdighetsfält | Rebirth / Reborn | Pånyttfödelse / Pånyttfödd |
 | cooldown | nedkylning | mount / mount licence | riddjur / riddjurslicens |
 | bag / backpack | väska / ryggsäck | bank | bank |
-| gold / level / XP | guld / nivå / XP | Need / Greed / Pass | Behov / Girighet / Passa |
+| gold / silver / copper | guld / silver / koppar |
+| level / XP | nivå / XP | Need / Greed / Pass | Behov / Girighet / Passa |
 | raid (a party of ten) | raid | | |
 
 Rules that came up:

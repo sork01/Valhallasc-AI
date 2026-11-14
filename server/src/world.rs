@@ -264,6 +264,9 @@ mod heartwood_tests;
 mod hierloom_tests;
 mod hold;
 mod hour_shards;
+mod quest_drops;
+#[cfg(test)]
+mod quest_drops_tests;
 mod instances;
 #[cfg(test)]
 mod lapis_tests;
@@ -522,6 +525,8 @@ struct Player {
     shop: shop::Session,
     bag_notice_at: f64,
     portal_at: f64,
+    /// The last tick a Spark flight moved this hero (flights cross gates and land without playing crossing cutscenes; world/cutscene.rs).
+    spark_at: f64,
     /// Seconds until the dock's skipper greets a hero who arrived by ship (once per connection; world/landing.rs).
     greet_in: f64,
     /// Opt-in status is deliberately cleared on reconnect.
@@ -680,6 +685,7 @@ impl Player {
             service_at: -99.,
             bag_notice_at: -99.,
             portal_at: -99.,
+            spark_at: -99.,
             greet_in: 1.5,
             pvp_flag: false,
             god: false,
@@ -1990,7 +1996,7 @@ pub struct World {
     // Every zone's enemy spawns in one list, so enemy ids stay stable and global.
     spawns: Vec<SlimeSpawn>,
     store: Store,
-    mail_unread: BTreeMap<String, u32>,
+    mail_unread: BTreeMap<String, (u32, u32)>,
     players: BTreeMap<u64, Player>,
     slimes: Vec<Slime>,
     bolts: Vec<Bolt>,
@@ -2451,7 +2457,10 @@ impl World {
         // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
         // each snapshot over the last, so a flag that vanished would stay set.
         view["storyMemory"] = self.empty_seat_view(session);
-        view["mailUnread"] = json!(self.mail_unread.get(&p.character.id).copied().unwrap_or(0));
+        let (mail_unread, mail_total) = self.mail_unread.get(&p.character.id).copied().unwrap_or((0, 0));
+        view["mailUnread"] = json!(mail_unread);
+        view["mailTotal"] = json!(mail_total);
+        view["maxLevel"] = json!(p.character.at_max_level());
         view["hired"] = json!(p.merc.is_some());
         view["leadShoes"] = json!(p.shoed);
         view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
@@ -2801,9 +2810,10 @@ impl World {
         self.mail_unread.insert(
             id.clone(),
             self.store
-                .mail_unread(&id)
+                .mail_counts(&id)
                 .map_err(|e| storage(Box::new(e)))?,
         );
+        quest_drops::migrate_quest_items(&mut c, &self.maps);
         self.players.insert(session, Player::new(c, peer));
         self.audit_player(
             session,
@@ -3102,6 +3112,9 @@ impl World {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 }
             },
+            ClientMessage::PreferCopy { copy } => {
+                p.character.prefer_loose_copy(copy);
+            }
             ClientMessage::Equip {
                 armor,
                 weapon,
@@ -3394,9 +3407,9 @@ impl World {
                                     quest_changed = true;
                                     stats_changed = true;
                                     notice = if pieces == 1 {
-                                        format!("Repaired one piece for {gold} gold.")
+                                        format!("Repaired one piece for {}.", money_text(gold))
                                     } else {
-                                        format!("Repaired {pieces} pieces for {gold} gold.")
+                                        format!("Repaired {pieces} pieces for {}.", money_text(gold))
                                     };
                                 }
                                 Err(text) => notice = text.into(),
@@ -3465,10 +3478,10 @@ impl World {
                             Ok((result, gold, crystals)) => {
                                 quest_changed = true;
                                 notice = format!(
-                                    "Refined {} to rank {} for {} gold and {} crystals.",
+                                    "Refined {} to rank {} for {} and {} crystals.",
                                     item(&result.item).map_or("piece", |i| i.name.as_str()),
                                     result.rank,
-                                    gold,
+                                    money_text(gold),
                                     crystals
                                 );
                             }
@@ -3521,6 +3534,11 @@ impl World {
                         } else {
                             (notice, levels, quest_changed) =
                                 quest_action_with_choice(&mut p.character, quest, action, choice);
+                            if action == "claim" && quest_changed {
+                                for (name, count) in quest_drops::discard_excess_quest_items(&mut p.character, quest, &self.maps) {
+                                    let _ = p.peer.try_send(json!({"type":"system","text":format!("Discarded {count} × {name}.")}));
+                                }
+                            }
                             if quest_changed && let Some(year) = year {
                                 if action == "accept" {
                                     p.character.seasonal_started.insert(quest.id.clone(), year);
@@ -3544,7 +3562,7 @@ impl World {
                         ) {
                             Ok(value) => {
                                 quest_changed = true;
-                                notice = format!("Items sold for {value} gold.");
+                                notice = format!("Items sold for {}.", money_text(value));
                             }
                             Err(text) => notice = text.into(),
                         }
@@ -3564,8 +3582,8 @@ impl World {
                                     quest_changed = true;
                                     stats_changed = true;
                                     notice = format!(
-                                        "Stats reset: {refunded} points refunded. Your next reset costs {} gold.",
-                                        p.character.stat_reset_price()
+                                        "Stats reset: {refunded} points refunded. Your next reset costs {}.",
+                                        money_text(p.character.stat_reset_price())
                                     );
                                 }
                                 Err(text) => notice = text,
@@ -3590,7 +3608,7 @@ impl World {
                         } else if needed.is_some_and(|(id, _)| c.quantity(id) == 0) {
                             notice = format!("You need a {} for this.", needed.unwrap().1);
                         } else if c.gold < offer.cost {
-                            notice = format!("You need {} gold for the {}.", offer.cost, def.name);
+                            notice = format!("You need {} for the {}.", money_text(offer.cost), def.name);
                         } else {
                             c.gold -= offer.cost;
                             if let Some((id, _)) = needed {
@@ -3645,7 +3663,7 @@ impl World {
                                 notice = format!("Requires level {}.", i.required_level);
                             }
                             Some(_) if p.character.gold < cost => {
-                                notice = format!("You need {cost} gold for this purchase.");
+                                notice = format!("You need {} for this purchase.", money_text(cost));
                             }
                             Some(i) if !p.character.can_collect(&i.id) => {
                                 notice = "Your bags are full. Make room first.".into();
@@ -3658,7 +3676,7 @@ impl World {
                             }
                         }
                     } else if p.character.gold < offer.cost {
-                        notice = format!("You need {} gold for this service.", offer.cost);
+                        notice = format!("You need {} for this service.", money_text(offer.cost));
                     } else {
                         quest_changed = true;
                         p.character.gold -= offer.cost;
@@ -5685,6 +5703,8 @@ impl World {
             let value = self.pile_for(&credit_id, value);
             self.gold_drop(&credit_id, zone, point, value);
             self.loot_stack(&credit_id, zone, point, material(&kind), boost);
+            // The quest items of that material fall only for heroes who still need them (world/quest_drops.rs).
+            self.quest_item_drops(&kind, zone, point, &credit_id, boost);
             // A bag roll is independent of gold, materials and every gear pool.
             for _ in 0..copies(BAG_DROP_CHANCE, boost, || self.random()) {
                 if let Some(bag) = roll_bag(level, 0.) {
@@ -6905,10 +6925,10 @@ fn quest_action_with_choice(
             let (xp, levels) = character.reward_xp(quest.reward_xp);
             (
                 format!(
-                    "Quest complete: {}! +{} XP and +{} gold.{}",
+                    "Quest complete: {}! +{} XP and +{}.{}",
                     quest.title,
                     xp,
-                    gold,
+                    money_text(gold),
                     quest
                         .reward_item
                         .as_deref()
@@ -7395,6 +7415,7 @@ mod tests {
             kind: "bring".into(),
             target: "slime_gel".into(),
             count: 1,
+            drop_chance: None,
         }];
         q.reward_item = Some(rewards[0].clone());
         q.reward_choices
@@ -7817,7 +7838,7 @@ mod tests {
         drain(&mut rx);
         // Too poor.
         let text = hire(&mut w, &mut rx, 1, "crags_captain", "mage");
-        assert!(text.contains("400 gold"), "{text}");
+        assert!(text.contains("4 silver"), "{text}");
         w.players.get_mut(&1).unwrap().character.gold = 600;
         let text = hire(&mut w, &mut rx, 1, "crags_captain", "mage");
         assert!(text.contains("Merc Mage joins your party"), "{text}");
@@ -8364,7 +8385,7 @@ mod tests {
         assert_eq!(text, "Bought Greater Health Potion.");
         assert_eq!(w.players[&1].character.gold, 40);
         let text = buy(&mut w, &mut rx, 20, 100);
-        assert!(text.contains("need 110 gold"), "{text}");
+        assert!(text.contains("need 1 silver 10 copper"), "{text}");
         let text = buy(&mut w, &mut rx, 20, 300);
         assert_eq!(text, "Bought Superior Health Potion.");
         assert_eq!(w.players[&1].character.gold, 190);
@@ -11575,7 +11596,7 @@ mod tests {
         assert_eq!(before.stat_points(), 57);
         quest_interact(&mut w, "guide", Some("stat_reset"));
         assert_eq!(w.players[&1].character.attributes, before.attributes);
-        assert!(dialogue_notice(&mut rx).contains("130000 gold"));
+        assert!(dialogue_notice(&mut rx).contains("13 gold"));
         assert_eq!(w.players[&1].character.gold, 129_999);
         w.players.get_mut(&1).unwrap().character.gold = 500_000;
         w.players.get_mut(&1).unwrap().combat_left = 4.;
@@ -11695,15 +11716,18 @@ mod tests {
                     w.store.load(token).unwrap().unwrap().attributes,
                     c.attributes
                 );
-                w.players.get_mut(&1).unwrap().character.level += 1;
-                w.message(
-                    1,
-                    ClientMessage::AllocateStat {
-                        stat: "stamina".into(),
-                    },
-                );
-                assert_eq!(w.players[&1].character.stat_points(), 2);
-                assert_eq!(w.store.load(token).unwrap().unwrap().stat_points(), 2);
+                // One more level earns three more points (not past the highest level, which a save is clamped to).
+                if level < MAX_LEVEL {
+                    w.players.get_mut(&1).unwrap().character.level += 1;
+                    w.message(
+                        1,
+                        ClientMessage::AllocateStat {
+                            stat: "stamina".into(),
+                        },
+                    );
+                    assert_eq!(w.players[&1].character.stat_points(), 2);
+                    assert_eq!(w.store.load(token).unwrap().unwrap().stat_points(), 2);
+                }
             }
         }
     }
@@ -14508,7 +14532,12 @@ mod tests {
         assert_eq!(ch(&w).attributes, Attributes::default());
         assert_eq!(ch(&w).stat_points(), 6);
         assert!(dbg(&mut w, DebugCommand::SetLevel { level: 0 }).is_err());
+        assert!(dbg(&mut w, DebugCommand::SetLevel { level: 100 }).is_err());
         assert!(dbg(&mut w, DebugCommand::SetLevel { level: 101 }).is_err());
+        dbg(&mut w, DebugCommand::SetLevel { level: 99 }).unwrap();
+        dbg(&mut w, DebugCommand::GiveXp { amount: 50_000 }).unwrap();
+        assert_eq!((ch(&w).level, ch(&w).xp), (99, 0), "/xp does nothing at the cap");
+        dbg(&mut w, DebugCommand::SetLevel { level: 3 }).unwrap();
         dbg(&mut w, DebugCommand::GiveXp { amount: 2_000 }).unwrap();
         assert!(ch(&w).level > 3, "xp still levels through grant_xp");
     }
@@ -14755,6 +14784,16 @@ mod tests {
             .unwrap()
             .id
             .clone();
+        // Gear takes a cell per copy now, so the bags above may be too full to hold a spare: add one by force.
+        dbg(
+            &mut w,
+            DebugCommand::GiveItem {
+                item: worn_id.clone(),
+                quantity: 1,
+                force: true,
+            },
+        )
+        .unwrap();
         let owned = ch(&w).quantity(&worn_id);
         assert!(
             dbg(
@@ -15801,6 +15840,15 @@ mod tests {
         assert_eq!(w.players[&1].character.zone, zone);
         run(&mut w, 1, r#"{"op":"goto","name":"nobody"}"#);
         assert_eq!(packets(&mut gm_rx, "debug").pop().unwrap()["ok"], false);
+        // A target inside a private dungeon copy: the GM lands in that copy's zone id, not the template's.
+        let copy = w.maps.len() - 1;
+        w.players.get_mut(&2).unwrap().character.zone = copy;
+        run(
+            &mut w,
+            1,
+            &format!(r#"{{"op":"goto","name":"{}"}}"#, name.to_lowercase()),
+        );
+        assert_eq!(w.players[&1].character.zone, copy);
     }
 
     #[test]

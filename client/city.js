@@ -506,7 +506,7 @@
     const b=document.createElement('button');b.type='button';b.className='gossip-row';
     const i=document.createElement('span');i.className='gossip-icon gossip-glyph';i.setAttribute('aria-hidden','true');i.innerHTML=ICONS[icon];
     const l=document.createElement('span');l.className='gossip-label';l.textContent=label;
-    const t=document.createElement('span');t.className='gossip-tag';t.textContent=tag||'';
+    const t=document.createElement('span');t.className='gossip-tag';if(tag&&typeof tag==='object')t.innerHTML=Money.html(tag.money);else t.textContent=tag||'';
     b.append(i,l,t);return b;
   }
   function show(next,focus){
@@ -545,7 +545,7 @@
     $('npc-name').textContent=npc.name;$('npc-role').textContent=npc.role;portrait(npc);
     $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
     if(!['merchant','sell'].includes(view.kind))$('npc-notice').textContent=packet.notice;
-    $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
+    $('npc-gold').innerHTML=`${Locale.translate('Your purse:')} ${Money.html(packet.gold)}`;
     $('npc-gold').hidden=!!quest;
     $('npc-back').hidden=!['merchant','sell','merge','refine','repair','stat_reset'].includes(view.kind);
     $('npc-back').textContent=view.kind==='merchant'?'Quests / services':'Back';
@@ -584,7 +584,7 @@
           // An older server sends no repairQuote and cannot repair, so it offers nothing.
           if(!packet.repairQuote)continue;
           const total=packet.repairQuote.reduce((sum,[,price])=>sum+price,0);
-          const b=row('coin',offer.label||'Repair worn gear',packet.repairQuote.length?`${total.toLocaleString()} gold`:'Nothing to repair');
+          const b=row('coin',offer.label||'Repair worn gear',packet.repairQuote.length?{money:total}:'Nothing to repair');
           b.dataset.view='repair';b.dataset.offer='repair';b.addEventListener('click',()=>show({kind:'repair'},'#npc-back'));offers.push(b);continue;
         }
         if(offer.id==='spirit_resurrect') {
@@ -594,11 +594,11 @@
           offers.push(b);continue;
         }
         if(offer.id==='stat_reset') {
-          const b=row('coin','Reset trained attributes',`${(packet.statResetPrice||0).toLocaleString()} gold`);
+          const b=row('coin','Reset trained attributes',{money:packet.statResetPrice||0});
           b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;
         }
         const cost=offer.merc&&offer.merc!=='dismiss'&&packet.mercPrice?packet.mercPrice:offer.cost;
-        const b=row(iconFor(offer),offer.label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
+        const b=row(iconFor(offer),offer.label,cost?{money:cost}:'Free');b.dataset.offer=offer.id;
         b.disabled=packet.gold<cost;
         b.addEventListener('click',()=>{
           if(offer.id==='merge'||offer.id==='refine')show({kind:offer.id},'#npc-back');
@@ -609,10 +609,10 @@
       const price=packet.statResetPrice||0,refunded=packet.trainedPoints||0;
       const heading=document.createElement('h4');heading.textContent='Reset trained attributes';offers.push(heading);
       offers.push(node('p',`Refund ${refunded} trained point${refunded===1?'':'s'}. Your ${(packet.statPoints||0)} unspent points remain available.`, 'stat-reset-detail'));
-      offers.push(node('p',`Price: ${price.toLocaleString()} gold · Your purse: ${(packet.gold||0).toLocaleString()} gold · Previous resets: ${packet.statResets||0}`, 'stat-reset-price'));
+      {const p=node('p','', 'stat-reset-price');p.innerHTML=`${Locale.translate('Price:')} ${Money.html(price)} · ${Locale.translate('Your purse:')} ${Money.html(packet.gold||0)} · ${Locale.translate('Previous resets:')} ${packet.statResets||0}`;offers.push(p);}
       offers.push(node('p','This purchase cannot be undone. Gear, skills and passive bonuses stay in place. Use Recommended in the character panel to spend the refunded points.', 'stat-reset-warning'));
-      if(refunded>0 && packet.gold<price)offers.push(node('p',`You need ${(price-packet.gold).toLocaleString()} more gold.`, 'stat-reset-short'));
-      const confirm=row('coin','Confirm stat reset',`${price.toLocaleString()} gold`);confirm.dataset.offer='stat_reset';
+      if(refunded>0 && packet.gold<price)offers.push(node('p',`You need ${Money.text(price-packet.gold)} more.`, 'stat-reset-short'));
+      const confirm=row('coin','Confirm stat reset',{money:price});confirm.dataset.offer='stat_reset';
       confirm.disabled=!refunded||packet.gold<price;
       confirm.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:'stat_reset'}))confirm.disabled=true;});offers.push(confirm);
     }

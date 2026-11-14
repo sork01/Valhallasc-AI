@@ -137,7 +137,7 @@ fn vendor_weapon_refuses_wrong_class_low_level_funds_remote_and_full_bag_without
     );
     assert_eq!(w.players[&1].character.gold, 1_000_000);
     w.players.get_mut(&1).unwrap().character.gold = 999;
-    assert!(buy(&mut w, &mut rx, Class::Warrior).contains("1000 gold"));
+    assert!(buy(&mut w, &mut rx, Class::Warrior).contains("10 silver"));
     assert_eq!(w.players[&1].character.gold, 999);
     assert_eq!(w.players[&1].character.quantity(&id), 0);
     let p = &mut w.players.get_mut(&1).unwrap().character;

@@ -38,6 +38,13 @@ window.Rested = (() => {
       // Reserve is bonus XP in level units; only the part fitting this level is painted.
       reserve.style.left = `${progress}%`;
       reserve.style.width = `${Math.min(percent, 100 - progress)}%`;
+      if (s.maxLevel) {   // the highest level: the bar is full, XP no longer counts and the reserve is not spent
+        reserve.style.width = '0%';
+        const full = window.Locale?.translate('Max level') || 'Max level';
+        if (tooltip.textContent !== full) tooltip.textContent = full;
+        meter.setAttribute('aria-valuenow', 1); meter.setAttribute('aria-valuemax', 1); meter.setAttribute('aria-valuetext', full);
+        holder.hidden = true; close(); return;
+      }
       const amount = Math.floor(percent * 10) / 10;
       const bonus = Math.floor(percent * need / 100);
       const detail = s.rested ? `${xp}/${need} (${amount}% rested ${bonus}xp)` : `${xp}/${need}`;

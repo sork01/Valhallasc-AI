@@ -50,12 +50,28 @@
   }
   // Where the hero stands (world x, y and height in px) and what they do: at the bow looking ahead for the whole voyage, lifted a little by the
   // summoning light, then aft along the deck to the gangplank and down it to the pier start.
+  // The hero's place on the ship's own frame (the ship's drift is not walking): the deck, then the gangplank down to the pier.
+  const rel = t => {
+    const aft = ease((t - 53.2) / 3), u = lerp(HERO_U, PLANK_U, aft), gang = ease((t - 56.2) / 2.8);
+    return [lerp(SHIP.x, D.start.x, gang), lerp(SHIP.y0 + u * LEN, D.start.y, gang)];
+  };
+  // How fast the hero actually walks (tiles/s along the ground) and in which direction: from the path itself, so the legs follow the ground covered.
+  // The walk eases in and out, and at either end the speed falls to nothing: there the hero stands (idle) instead of treading on the spot.
+  const WALK_MIN = .35, EPS = .04;
+  function stride(t) {
+    const [x0, y0] = rel(t - EPS), [x1, y1] = rel(t + EPS), d = Math.hypot(x1 - x0, y1 - y0), speed = d / (2 * EPS);
+    return { speed, dir: d > 1e-9 ? [(x1 - x0) / d, (y1 - y0) / d] : null };
+  }
   function heroAt(t, ship) {
     const aft = ease((t - 53.2) / 3), u = lerp(HERO_U, PLANK_U, aft), gang = ease((t - 56.2) / 2.8);
     const lift = bump(t, 47.2, 48.8, 50.4, 52) * 9, swell = bob(t) * (1 - gang);
+    const move = stride(t), walking = t > 53.2 && t < 59 && move.speed >= WALK_MIN && move.dir;
+    // Facing: ahead for the voyage, then the way the walk goes (aft along the deck, then down the plank).
+    const [pxn, pyn] = rel(56.2), plank = Math.hypot(D.start.x - pxn, D.start.y - pyn) || 1;
+    const face = t < 53.2 ? [0, -1] : t < 56.2 ? [0, 1] : [(D.start.x - pxn) / plank, (D.start.y - pyn) / plank];
     return {
       x: lerp(ship.x, D.start.x, gang), y: lerp(ship.y0 + u * LEN, D.start.y, gang), z: lerp(deckZ(u) + 2, 7, gang) + swell + lift,
-      walk: t > 53.2 && t < 56.2 ? [0, 1] : t >= 56.2 && t < 59 ? [1, 0] : null, face: t < 56.2 ? [0, -1] : [1, 0],
+      walk: walking ? move.dir : null, speed: walking ? move.speed : 0, face: walking ? move.dir : face,
     };
   }
   function projector(w, h, f, fix) {
@@ -231,7 +247,7 @@
         for (let i = 8; i >= 0; i--) { const q = i / 8, belly = Math.sin(q * Math.PI) * 9, [x, y] = P(ship.x - sw + 2 * sw * q, ship.y0 + (um + .012) * LEN, hz + 70); G.lineTo(x + belly * .4 + sway, y + belly); }
         G.closePath(); G.clip(); window.MeadowDock.ship(G, d2, P, t);
       };
-      return { abs: { x: px, y: py, k: f.k }, alpha: ease(t / 1.2), walk: H.walk, face: H.face, over };
+      return { abs: { x: px, y: py, k: f.k }, alpha: ease(t / 1.2), walk: H.walk, speed: H.speed, face: H.face, over };
     },
   });
 

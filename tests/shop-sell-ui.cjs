@@ -40,7 +40,7 @@ const suite = {
     check(!smallTargets.length,`merchant controls meet 44px floors: ${JSON.stringify(smallTargets)}`);
     await page.locator('#inventory-list [data-item="slime_gel"] .item-tile').hover();
     await page.locator('#item-tooltip').waitFor({state:'visible'});
-    check(await page.locator('#item-tooltip').textContent().then(t=>t.includes('Sell for 23 gold')),'bag tooltip quotes the exact rebirth-adjusted stack price');
+    check(await page.locator('#item-tooltip').textContent().then(t=>t.includes('Sell for 23 copper')),'bag tooltip quotes the exact rebirth-adjusted stack price');
     check(await page.locator('#merchant-portrait').isVisible(),'circular NPC portrait accompanies the name');
     check(await page.locator('#merchant-stock > *').count()===10,'stock uses ten rectangular slots');
     check(await page.locator('.merchant-grid').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length)===2,'stock has two columns');

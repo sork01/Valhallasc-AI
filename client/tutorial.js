@@ -2,7 +2,8 @@
 window.Tutorial = (() => {
   const $ = id => document.getElementById(id);
   const tr = s => window.Locale?.translate ? window.Locale.translate(s) : s;
-  const MILESTONES = ['first_quest', 'levelup_stats', 'equip_gear', 'new_skill', 'consumables', 'merchant'];
+  const MILESTONES = ['first_quest', 'levelup_stats', 'equip_gear', 'new_skill', 'consumables', 'merchant',
+    'target_attack', 'loot', 'quest_turnin', 'first_death', 'map', 'spark_travel', 'elite', 'rested', 'repair', 'bags_full', 'mail_bank', 'party_mercs'];
   const COARSE = () => !!(window.matchMedia?.('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) <= 500);
 
   let hero = null;
@@ -176,12 +177,13 @@ window.Tutorial = (() => {
     return false;
   }
 
-  function isInterrupted(allowedDialogId) {
+  function isInterrupted(allowedDialogId, allowGhost) {
     if ($('scene-game')?.hidden) return true;
     if (!window.Online?.connected) return true;
     if (window.Cutscene?.active) return true;
     const h = window.Field?.hero || hero;
-    if (!h || h.dead || h.ghost || (h.hp !== undefined && h.hp <= 0)) return true;
+    if (!h) return true;
+    if (allowGhost ? (h.dead && !h.ghost) : (h.dead || h.ghost || (h.hp !== undefined && h.hp <= 0))) return true;
     if (nearbyBossActive()) return true;
     if (isAnyBlockingModalOpen(allowedDialogId)) return true;
     return false;
@@ -412,8 +414,108 @@ window.Tutorial = (() => {
     };
   }
 
+  // ---- The twelve later steps (TUTORIAL-MORE-STEPS). Each fires once per character, the first time it happens at any level; a hero past level 5
+  // when the steps arrived has them marked done by the server. A step is a note anchored to one control, finished by "Got it" or by doing the thing.
+  const fh = () => window.Field?.hero;
+  const dist = (x, y) => { const h = fh(); return h && Number.isFinite(x) && Number.isFinite(y) ? Math.hypot(x - h.x, y - h.y) : Infinity; };
+  const enemies = () => (window.Field?.slimes || []).filter(s => s && !s.dead && s.state !== 'waiting' && !s.d?.add);
+  const npcNear = (test, r = 6) => (window.City?.npcs || []).find(n => n && test(n) && dist(n.x, n.y) <= r);
+  const hasOffer = (n, ...ids) => (n.offers || []).some(o => ids.includes(o.id));
+  const touchOr = (touchSelector, desktop) => COARSE() && isShown(document.querySelector(touchSelector)) ? document.querySelector(touchSelector) : desktop;
+  const FULL = () => { const h = hero; return !!h && h.bagCapacity > 0 && h.bagUsed >= h.bagCapacity; };
+  const MORE = {
+    first_death: {
+      when: () => !!(fh()?.ghost || hero?.ghost), allowGhost: true,
+      target: () => isShown($('ghost-resurrect')) ? $('ghost-resurrect') : $('ghost-msg'),
+      title: 'You are a spirit',
+      body: 'Run back to your body and press Resurrect when you are within 15 tiles, at half health. Or talk to a Spirit Guide: that costs half the durability of your worn gear and ten minutes of Resurrection Sickness.',
+      expiresOn: () => !!(fh()?.ghost || hero?.ghost),
+    },
+    target_attack: {
+      when: () => enemies().some(s => dist(s.x, s.y) <= 9),
+      target: () => touchOr('#touch-actions [data-action="attack"], #touch-skills .touch-attack', $('skillbar')),
+      title: 'Fight!',
+      body: 'Click an enemy to target it. Your hero attacks on its own while it is targeted; use the skillbar below (keys 1-9) for stronger moves.',
+      touchBody: 'Tap an enemy to target it, then tap Attack. The skill buttons beside it are stronger moves.',
+    },
+    loot: {
+      when: () => (window.Field?.drops || []).some(d => dist(d.x, d.y) <= 8),
+      target: () => $('inventory-open'),
+      title: 'Loot on the ground',
+      body: 'Walk over a drop to pick it up (money goes straight to your purse). Colour shows rarity: grey, green, blue, purple. Everything you take lands in your Bags.',
+      touchBody: 'Walk over a drop to pick it up. Colour shows rarity: grey, green, blue, purple. Everything lands in your Bags.',
+    },
+    quest_turnin: {
+      when: () => !!window.Quests?.anyReady,
+      target: () => isShown($('quest-tracker')) ? $('quest-tracker') : $('minimap'),
+      title: 'A quest is ready',
+      body: 'A yellow ? marks the person to hand it in to, on your minimap and in the world. Walk back to them, talk, and choose your reward.',
+    },
+    map: {
+      when: () => (hero?.quests?.length || 0) > 0 && (hero?.level || 1) >= 2,
+      target: () => $('wm-open'),
+      title: 'Find your way',
+      body: 'The minimap marks quest givers and goals. Press M for the world map, and track a quest to see where to go next.',
+    },
+    spark_travel: {
+      when: () => !!npcNear(n => hasOffer(n, 'travel') || String(n.id).startsWith('travel_'), 7),
+      target: () => $('wm-open'),
+      title: 'Spark Travel',
+      body: 'This is a Spark Travel master. Talk to one to discover its station, and the world map will let you fly between the stations you know.',
+    },
+    elite: {
+      when: () => enemies().some(s => s.d?.elite && dist(s.x, s.y) <= 16),
+      target: () => isShown($('hud-target')) ? $('hud-target') : $('skillbar'),
+      title: 'An elite enemy',
+      body: 'Elites are much tougher than normal enemies. Bring a group, or hire mercenaries at a Meeting Stone, before you take one on.',
+    },
+    rested: {
+      when: () => !!hero?.rested && hero.rested.percent > 0,
+      target: () => $('xp-meter'),
+      title: 'Rested',
+      body: 'You rested while away. The light-green part of your experience bar is bonus experience: monsters and quests give extra until it is used up.',
+    },
+    repair: {
+      when: () => ['low', 'broken'].includes($('inventory-open')?.dataset.gear),
+      target: () => $('inventory-open'),
+      title: 'Your gear is worn',
+      body: 'A worn piece is low or broken (the ! on your Bags button). Visit a smith to repair it; a broken piece gives no stats.',
+    },
+    bags_full: {
+      when: FULL,
+      target: () => $('inventory-open'),
+      title: 'Your bags are full',
+      body: 'Sell what you do not need to a merchant (Sell junk clears grey items at once), or buy a bigger bag. Full bags cannot take new loot.',
+    },
+    mail_bank: {
+      when: () => !!npcNear(n => hasOffer(n, 'mail', 'bank') || n.art === 'mailbox', 5),
+      target: () => $('mail-open'),
+      title: 'Mail and bank',
+      body: 'A mailbox sends letters and items to other players, and holds loot you won while your bags were full. A banker stores items and money safely for you.',
+    },
+    party_mercs: {
+      when: () => !!window.Social?.hasPartyInvite || !!npcNear(n => (n.offers || []).some(o => o.merc), 6),
+      target: () => window.Social?.hasPartyInvite ? $('social-open') : $('social-open'),
+      title: 'Parties and mercenaries',
+      body: 'Open Friends (O) to invite players to a party; parties share experience and loot. At a Meeting Stone you can hire mercenaries to fight beside you.',
+    },
+  };
+  const MORE_ORDER = ['target_attack', 'loot', 'quest_turnin', 'elite', 'repair', 'bags_full', 'rested', 'mail_bank', 'spark_travel', 'party_mercs', 'map'];
+  function moreStep(id) {
+    const def = MORE[id];
+    if (!def || done.has(id) || !def.when()) return null;
+    const touch = COARSE();
+    return { id, sub: id, allowedDialog: null, allowGhost: !!def.allowGhost, expiresOn: def.expiresOn, target: def.target(), title: def.title, body: touch && def.touchBody ? def.touchBody : def.body };
+  }
+  function nextMoreStep() {
+    for (const id of MORE_ORDER) { const step = moreStep(id); if (step) return step; }
+    return null;
+  }
+
   function pickNextStep() {
     if (!hero || disabled) return null;
+    const ghostStep = moreStep('first_death');
+    if (ghostStep) return ghostStep;
     const dlg = currentDialogContext();
     const statPoints = hero.statPoints || 0;
     const gear = !done.has('equip_gear') ? compatibleWearableItems() : [];
@@ -434,7 +536,7 @@ window.Tutorial = (() => {
     if (!done.has('equip_gear') && gear.length) return stepEquipGear(gear);
     if (!done.has('new_skill') && skill) return stepNewSkill(skill);
     if (!done.has('consumables') && consumables.length) return stepConsumables(consumables);
-    return null;
+    return nextMoreStep();
   }
 
   function updateAutoCompletions() {
@@ -476,6 +578,10 @@ window.Tutorial = (() => {
           return;
         }
       }
+    }
+    // The later steps finish by themselves once the thing they pointed at is over (the foe is dead, the quest handed in, the gear repaired...).
+    for (const id of Object.keys(MORE)) {
+      if (!done.has(id) && seenSubsteps.has(id) && !MORE[id].when()) { complete(id); return; }
     }
     // merchant: complete after transacting or closing npc-dialogue after seeing shop view
     if (!done.has('merchant') && (merchantTransacted || (merchantModeSeen && !isShown($('npc-dialogue'))))) {
@@ -615,7 +721,7 @@ window.Tutorial = (() => {
     if (disabled) { hide(); return; }
 
     const step = pickNextStep();
-    if (!step || isInterrupted(step.allowedDialog)) {
+    if (!step || isInterrupted(step.allowedDialog, step.allowGhost)) {
       hide();
       return;
     }
@@ -639,6 +745,7 @@ window.Tutorial = (() => {
     else clearAttrFocus();
 
     const idx = MILESTONES.indexOf(step.id) + 1;
+    if (step.expiresOn && !step.expiresOn()) { hide(); return; }
     titleEl.textContent = tr(step.title);
     progressEl.textContent = `${done.size}/${MILESTONES.length}`;
     bodyEl.textContent = tr(step.body);

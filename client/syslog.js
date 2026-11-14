@@ -47,7 +47,7 @@
       case 'consume': return [[`You use ${itemName(e.item)}${e.value > 0 ? `: +${e.value} health` : ''}${e.mana > 0 ? `${e.value > 0 ? ',' : ':'} +${e.mana} ${e.resourceType || 'mana'}` : ''}.`, 'sys-heal']];
       case 'itemPickup': { const bag=(window.WORLD_ITEMS||[]).find(i=>i.id===e.item&&i.kind==='bag');return [[bag?`You fit ${bag.name}: +${bag.bagSlots} bag slots.`:`You pick up ${e.quantity > 1 ? e.quantity + ' × ' : ''}${e.name || itemName(e.item)}.`, 'sys-loot']]; }
       case 'shotBlocked': return [['Your shot hits a wall.', 'sys-dealt']];
-      case 'pickup': return [[`You pick up ${e.value} gold.`, 'sys-loot']];
+      case 'pickup': return [[`You pick up ${Money.text(e.value)}.`, 'sys-loot']];
       case 'levelup': return [[`You reached level ${e.level}!${e.unlocked?.length ? ` New skills: ${e.unlocked.map(skillName).join(', ')}.` : ''}`, 'sys-xp']];
       case 'portal': return [['You pass through a portal.', 'sys-skill']];
       default: return [];

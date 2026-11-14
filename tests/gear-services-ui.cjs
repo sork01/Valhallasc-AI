@@ -48,7 +48,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   assert.ok(merged,'Merged copy appears in refinement list');
   await select.selectOption(merged);
   await page.getByRole('button',{name:'Preview refinement'}).click();
-  await page.getByText(/Cost: 200 gold and 1 Uncommon Refinement Crystal/).waitFor({timeout:10000});
+  await page.getByText(/Cost: 2 silver and 1 Uncommon Refinement Crystal/).waitFor({timeout:10000});
   await page.getByRole('button',{name:'Confirm refinement'}).click();
   await page.getByText(/Refined .* to rank 1/).waitFor({timeout:10000});
   // Orange copies use their own editor-exported art and retain individually visible stats.

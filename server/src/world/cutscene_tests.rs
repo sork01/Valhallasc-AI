@@ -180,6 +180,75 @@ fn logging_in_inside_a_scene_zone_or_a_landing_that_is_no_crossing_plays_nothing
     assert!(w.players[&1].character.cutscenes.is_empty());
 }
 
+/// A Spark flight whose path crosses into `zones` in turn, one point per zone.
+fn fly(w: &mut World, zones: &[usize]) {
+    let points = zones
+        .iter()
+        .map(|zone| SparkPoint {
+            zone: *zone,
+            x: 20.,
+            y: 20.,
+            stop: None,
+        })
+        .collect();
+    w.players.get_mut(&1).unwrap().character.spark_travel = Some(SparkTravel {
+        destination: "Test".into(),
+        stops: vec![],
+        points,
+        next: 0,
+    });
+}
+
+#[test]
+fn spark_travel_never_plays_a_crossing_cutscene_or_marks_one_seen() {
+    let mut w = world();
+    calm(&mut w);
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    settle(&mut w, LAND);
+    drain(&mut rx);
+    // A flight from the land over Bifrost and down into the sea: on foot that is a climb and a dive, in the air it is neither.
+    fly(&mut w, &[BIFROST, DEEP]);
+    for _ in 0..8 {
+        w.update_spark(1);
+        w.update_lead_shoes();
+        w.time += TICK;
+    }
+    assert!(w.players[&1].character.spark_travel.is_none(), "the flight landed");
+    assert_eq!(w.players[&1].character.zone, DEEP);
+    // The landing tick and the ticks after it are quiet too.
+    for _ in 0..6 {
+        w.update_lead_shoes();
+        w.time += TICK;
+    }
+    let (scenes, _) = heard(&mut rx);
+    assert!(scenes.is_empty(), "no cutscene during or after a Spark flight: {scenes:?}");
+    assert!(w.players[&1].character.cutscenes.is_empty(), "nothing is recorded as seen");
+    assert!(w.players[&1].cutscene_until < w.time, "no grace window was opened");
+    // The same crossings on foot still play, because the scenes were never used up.
+    w.time += 1.;
+    cross(&mut w, LAND);
+    assert_eq!(heard(&mut rx).0, [vec!["surface".to_string()]]);
+    w.time += 5.;
+    cross(&mut w, BIFROST);
+    assert_eq!(heard(&mut rx).0, [vec!["sky_up".to_string()]]);
+}
+
+#[test]
+fn a_landing_in_the_same_tick_as_a_gate_crossing_is_still_no_scene() {
+    let mut w = world();
+    calm(&mut w);
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    settle(&mut w, LAND);
+    drain(&mut rx);
+    // One-point flight into Bifrost: the zone changes and the flight ends in the same tick.
+    fly(&mut w, &[BIFROST]);
+    w.update_spark(1);
+    assert!(w.players[&1].character.spark_travel.is_none());
+    w.update_lead_shoes();
+    assert!(heard(&mut rx).0.is_empty());
+    assert!(w.players[&1].character.cutscenes.is_empty());
+}
+
 #[test]
 fn mercenaries_and_ambient_adventurers_get_nothing() {
     let mut w = world();

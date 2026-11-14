@@ -1,5 +1,7 @@
 # Bank
 
+> Money (2026-11): every amount below called "gold" is stored as copper and shown as gold, silver and copper (100 copper = 1 silver, 100 silver = 1 gold); see [money.md](money.md).
+
 These settle `BANK-RULES` in [TODO.md](../TODO.md). `BANK-SERVER` stores the bank and the requests, `BANK-NPC` places the bankers, `BANK-UI` adds the window, `BANK-ART` the sprites and `BANK-CHECK` verifies it all. Every number below lives once, in a `bank` module of the server, and no test may repeat it.
 
 Owner's decisions (2026-10-17): a bank and a banker in **the five big cities** (Alderhaven, Skaldholm, Nacrehold, Astralhollow, Asterion, the same five that offer the stat reset), and the bank belongs to **one character**. The rest was settled on 2026-10-17 from the code as it stands.

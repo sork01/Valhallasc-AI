@@ -1,5 +1,7 @@
 # Sky and ocean crossings
 
+> Money (2026-11): every amount below called "gold" is stored as copper and shown as gold, silver and copper (100 copper = 1 silver, 100 silver = 1 gold); see [money.md](money.md).
+
 Beta 1.32.4 makes Bifrost Reach's height and the ocean-floor setting of
 Rán's Deep and Nacrehold explicit. This is a presentation change; the existing
 authoritative walking crossings, collision, input and arrival positions remain

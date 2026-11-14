@@ -91,9 +91,9 @@ async function enter(browser, world, { lang = 'en', touch = false, name = 'TabTe
     check(await page.locator('#character-pane-stats').isVisible() && await page.locator('#character-mounts').isHidden(), 'E opens Character & stats by default');
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
-    await page.locator('#p-achievements').click();
+    await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
     await page.waitForSelector('#character-achievements .achievement-card');
-    check(await page.locator('#character-achievements').isVisible() && await page.locator('#character-pane-stats').isHidden(), 'World Menu Achievements opens Character pane directly on Achievements tab');
+    check(await page.locator('#character-achievements').isVisible() && await page.locator('#character-pane-stats').isHidden(), 'the Achievements tab of the Character pane opens the achievements list');
     await page.locator('#equipment-close').click();
     await page.context().close();
 

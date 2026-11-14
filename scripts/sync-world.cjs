@@ -25,6 +25,8 @@ execFileSync('python3', [path.join(__dirname, 'zone_shapes.py'), 'apply'], { cwd
 execFileSync('python3', [path.join(__dirname, 'spirit_guides.py')], { cwd: root, stdio: 'pipe' });
 // Spark Travel links follow the finished geography (docs/spark-travel.md): every earlier list is replaced.
 execFileSync('python3', [path.join(__dirname, 'spark_routes.py')], { cwd: root, stdio: 'pipe' });
+// Quest-only items for the `bring` quests (docs/quest-items.md) are made last, from the finished quests, before anything reads them.
+execFileSync('python3', [path.join(__dirname, 'quest_items.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));

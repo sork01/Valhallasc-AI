@@ -599,10 +599,10 @@ impl World {
                     self.rolls.push(roll);
                     return;
                 }
-                if let Ok(count) = self.store.mail_unread(&recipient) {
-                    self.mail_unread.insert(recipient.clone(), count);
+                if let Ok(counts) = self.store.mail_counts(&recipient) {
+                    self.mail_unread.insert(recipient.clone(), counts);
                     if let Some(p) = player {
-                        let _ = p.peer.try_send(json!({"type":"mail_unread","count":count}));
+                        let _ = p.peer.try_send(json!({"type":"mail_unread","count":counts.0,"total":counts.1}));
                     }
                 }
                 if let Some(p) = player {

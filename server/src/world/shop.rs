@@ -39,7 +39,8 @@ fn discardable(c: &Character, maps: &[Map], id: &str) -> bool {
     let Some(i) = item(id).filter(|i| i.kind == "material") else {
         return false;
     };
-    if is_quest_item(i)
+    // A remapped quest item (`QUEST-ITEM-DROPS`) is a leftover like the material it used to be, once its quest is finished or abandoned.
+    if (is_quest_item(i) && i.quest_material.is_none())
         || id.contains("key")
         || id.starts_with("hour_shard_")
         || id.starts_with("ember_shard_")
@@ -64,7 +65,7 @@ fn discardable(c: &Character, maps: &[Map], id: &str) -> bool {
 }
 
 fn sellable(i: &Item) -> bool {
-    !i.starter && i.rarity != GM_RARITY && i.kind != "mount_licence" && !is_quest_item(i)
+    i.rarity != GM_RARITY && i.kind != "mount_licence" && !is_quest_item(i)
 }
 
 /// Operates only on the caller's staged character. A failure discards all preceding lines.
@@ -276,9 +277,7 @@ impl World {
                     if next.gold < row.paid {
                         return Err("You do not have enough gold to buy that back.");
                     }
-                    if next.quantity(&row.item) <= next.equipped_count(catalog)
-                        && next.bag_used() >= next.bag_capacity()
-                    {
+                    if !next.has_room_for(catalog) {
                         return Err("Your bags are full. Make room first.");
                     }
                     if next.quantity(&row.item).checked_add(row.quantity).is_none() {
@@ -316,9 +315,9 @@ impl World {
                 if changed && discarding {
                     "Quest leftovers discarded. No gold was paid.".into()
                 } else if changed && spent > 0 {
-                    format!("Bought back for {spent} gold.")
+                    format!("Bought back for {}.", money_text(spent))
                 } else if changed {
-                    format!("Items sold for {paid} gold.")
+                    format!("Items sold for {}.", money_text(paid))
                 } else {
                     String::new()
                 }
@@ -385,7 +384,9 @@ mod tests {
             .find(|q| q.id == "city_gel")
             .unwrap()
             .clone();
+        let gel = q.objectives[0].target.clone();
         let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.add_item(&gel, 5);
         c.level = 99;
         c.quests.push(QuestProgress {
             id: q.id.clone(),
@@ -394,36 +395,36 @@ mod tests {
         });
         assert!(c.quests.iter().any(|g| g.id == q.id && !g.claimed));
         let before = state(&w);
-        let response = message(&mut w, &mut rx, Request::Discard("slime_gel".into(), 1));
+        let response = message(&mut w, &mut rx, Request::Discard(gel.clone(), 1));
         assert_eq!(response["ok"], false);
         assert_eq!(state(&w), before);
         assert_eq!(
             message(
                 &mut w,
                 &mut rx,
-                Request::Sell(vec![line("slime_gel", 1, None)])
+                Request::Sell(vec![line(&gel, 1, None)])
             )["ok"],
             false
         );
         w.abandon_quest(1, &q.id);
         let gold = w.players[&1].character.gold;
-        let quantity = w.players[&1].character.quantity("slime_gel");
+        let quantity = w.players[&1].character.quantity(&gel);
         let response = message(&mut w, &mut rx, Request::Open);
         assert!(
             response["discardable"]
                 .as_array()
                 .unwrap()
                 .iter()
-                .any(|r| r["item"] == "slime_gel")
+                .any(|r| r["item"] == gel.as_str())
         );
         assert_eq!(
-            message(&mut w, &mut rx, Request::Discard("slime_gel".into(), 2))["ok"],
+            message(&mut w, &mut rx, Request::Discard(gel.clone(), 2))["ok"],
             true
         );
         assert_eq!(w.players[&1].character.gold, gold);
-        assert_eq!(w.players[&1].character.quantity("slime_gel"), quantity - 2);
+        assert_eq!(w.players[&1].character.quantity(&gel), quantity - 2);
         assert_eq!(
-            w.store.load(&token).unwrap().unwrap().quantity("slime_gel"),
+            w.store.load(&token).unwrap().unwrap().quantity(&gel),
             quantity - 2
         );
         assert!(w.players[&1].shop.merchants.values().all(Vec::is_empty));
@@ -445,7 +446,7 @@ mod tests {
             message(
                 &mut w,
                 &mut rx,
-                Request::Discard("slime_gel".into(), u32::MAX)
+                Request::Discard(gel.clone(), u32::MAX)
             )["ok"],
             false
         );
@@ -573,6 +574,49 @@ mod tests {
         assert_eq!(state(&w), before);
     }
 
+    /// `SELL-STARTER-GEAR`: a loose starter piece sells for its small price and comes back through buyback; the worn one never sells.
+    #[test]
+    fn a_loose_starter_piece_sells_and_buys_back_but_the_worn_one_is_refused() {
+        let (mut w, mut rx, _) = fixture();
+        let (loose, worn) = {
+            let c = &w.players[&1].character;
+            let own = |f: &dyn Fn(&Item) -> bool| {
+                ITEMS
+                    .iter()
+                    .find(|i| i.starter && i.class == Some(c.look.class) && f(i))
+                    .unwrap()
+                    .id
+                    .clone()
+            };
+            (
+                own(&|i| c.quantity(&i.id) > c.equipped_count(i)),
+                own(&|i| c.equipped_count(i) > 0),
+            )
+        };
+        let price = item(&loose).unwrap().sell;
+        assert!(price > 0);
+        let (gold, held) = {
+            let c = &w.players[&1].character;
+            (c.gold, c.quantity(&loose))
+        };
+        let reply = message(&mut w, &mut rx, Request::Sell(vec![line(&loose, 1, None)]));
+        assert_eq!(reply["ok"], true, "{reply}");
+        let buy_back = reply["buyBack"].as_array().unwrap().iter().find(|r| r["item"] == loose.as_str()).unwrap()["id"].as_u64().unwrap();
+        let paid = w.players[&1].character.boosted_gold(price);
+        assert_eq!(reply["paid"], paid);
+        assert_eq!(w.players[&1].character.gold, gold + paid);
+        assert_eq!(w.players[&1].character.quantity(&loose), held - 1);
+        // The worn armour or weapon, including the one the look names, never sells, and nothing changes.
+        let before = state(&w);
+        let reply = message(&mut w, &mut rx, Request::Sell(vec![line(&worn, 1, None)]));
+        assert_eq!(reply["ok"], false, "{reply}");
+        assert_eq!(state(&w), before);
+        // Buyback restores the piece for what it paid.
+        let back = message(&mut w, &mut rx, Request::BuyBack(buy_back));
+        assert_eq!(back["ok"], true, "{back}");
+        assert_eq!(w.players[&1].character.quantity(&loose), held);
+    }
+
     #[test]
     fn shop_batch_rolls_back_invalid_duplicate_equipped_starter_quest_and_overflow_lines() {
         let (mut w, mut rx, _) = fixture();
@@ -595,7 +639,6 @@ mod tests {
             line("unknown", 1, None),
             line("slime_gel", 99, None),
             line("slime_gel", 0, None),
-            line(&starter, 1, None),
             line(&quest, 1, None),
             line(PIECE, 1, Some(id)),
             line(PIECE, 2, Some(copies(&w)[1].id)),

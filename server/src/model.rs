@@ -445,6 +445,9 @@ pub struct Character {
     /// Schema marker so legacy characters above level 5 auto-skip onboarding once while new heroes keep it.
     #[serde(default)]
     pub tutorial_version: u8,
+    /// 0 for a save from before the quest-only items (`QUEST-ITEM-DROPS`): the next login converts and trims (`quest_drops::migrate_quest_items`).
+    #[serde(default)]
+    pub quest_items_version: u8,
 }
 pub const TUTORIAL_MILESTONES: &[&str] = &[
     "first_quest",
@@ -453,22 +456,66 @@ pub const TUTORIAL_MILESTONES: &[&str] = &[
     "new_skill",
     "consumables",
     "merchant",
+    // `tutorial_version` 2 (TUTORIAL-MORE-STEPS): combat and quests, the world, services and social.
+    "target_attack",
+    "loot",
+    "quest_turnin",
+    "first_death",
+    "map",
+    "spark_travel",
+    "elite",
+    "rested",
+    "repair",
+    "bags_full",
+    "mail_bank",
+    "party_mercs",
 ];
+/// How many of the milestones above existed in `tutorial_version` 1; the rest came with version 2.
+pub const TUTORIAL_V1_COUNT: usize = 6;
 pub const TUTORIAL_VETERAN_LEVEL: u32 = 5;
+/// An amount of money as the player reads it. Every stored amount is whole copper: 100 copper = 1 silver, 100 silver = 1 gold
+/// (`COIN-DENOMINATIONS`). Zero parts are left out, and nothing is "0 copper".
+pub fn money_text(copper: u32) -> String {
+    let (gold, silver, copper) = (copper / 10_000, copper / 100 % 100, copper % 100);
+    let mut parts = vec![];
+    if gold > 0 {
+        parts.push(format!("{gold} gold"));
+    }
+    if silver > 0 {
+        parts.push(format!("{silver} silver"));
+    }
+    if copper > 0 || parts.is_empty() {
+        parts.push(format!("{copper} copper"));
+    }
+    parts.join(" ")
+}
+/// The highest level a hero can reach. XP is not earned past it (`grant_xp`), the debug commands stop at it, and `levels.txt` is unchanged.
+pub const MAX_LEVEL: u32 = 99;
 
 impl Character {
     /// One-way migration for pre-tutorial saves: characters already past level 5 mark onboarding done so
     /// veterans aren't prompted, while brand-new or low-level characters keep every milestone.
     pub fn migrate_tutorial(&mut self) {
-        if self.tutorial_version == 0 {
-            if self.level > TUTORIAL_VETERAN_LEVEL {
-                for &id in TUTORIAL_MILESTONES {
-                    if !self.tutorial_done.iter().any(|done| done == id) {
-                        self.tutorial_done.push(id.to_string());
-                    }
+        // Version 1 added the first six steps, version 2 the other twelve: each step of the ladder marks its own ids done for a veteran
+        // (above level 5) and never touches the ones from another version, so a hero who was in the middle of version 1 keeps their progress.
+        let mark = |c: &mut Character, ids: &[&str]| {
+            for &id in ids {
+                if !c.tutorial_done.iter().any(|done| done == id) {
+                    c.tutorial_done.push(id.to_string());
                 }
             }
+        };
+        if self.tutorial_version == 0 {
+            if self.level > TUTORIAL_VETERAN_LEVEL {
+                mark(self, &TUTORIAL_MILESTONES[..TUTORIAL_V1_COUNT]);
+            }
             self.tutorial_version = 1;
+        }
+        if self.tutorial_version == 1 {
+            if self.level > TUTORIAL_VETERAN_LEVEL {
+                mark(self, &TUTORIAL_MILESTONES[TUTORIAL_V1_COUNT..]);
+            }
+            self.tutorial_version = 2;
         }
     }
 
@@ -476,7 +523,7 @@ impl Character {
         if !TUTORIAL_MILESTONES.contains(&id) {
             return false;
         }
-        self.tutorial_version = self.tutorial_version.max(1);
+        self.tutorial_version = self.tutorial_version.max(2);
         if !self.tutorial_done.iter().any(|done| done == id) {
             self.tutorial_done.push(id.to_string());
         }
@@ -649,7 +696,8 @@ impl Character {
             resurrection_sickness: 0.,
             tutorial_done: vec![],
             tutorial_disabled: false,
-            tutorial_version: 1,
+            tutorial_version: 2,
+            quest_items_version: 1,
             landing: false,
         };
         c.seed_inventory();
@@ -892,7 +940,7 @@ impl Character {
         }
         let price = self.stat_reset_price();
         if self.gold < price {
-            return Err(format!("You need {price} gold to reset your stats."));
+            return Err(format!("You need {} to reset your stats.", money_text(price)));
         }
         let refunded = self.trained_points();
         self.gold -= price;
@@ -1043,10 +1091,18 @@ impl Character {
             y: self.y,
         }
     }
+    /// True at the highest level: XP stops counting there.
+    pub fn at_max_level(&self) -> bool {
+        self.level >= MAX_LEVEL
+    }
     pub fn grant_xp(&mut self, xp: u32) -> u32 {
+        if self.at_max_level() {
+            self.xp = 0;
+            return 0;
+        }
         self.xp = self.xp.saturating_add(xp);
         let mut levels = 0;
-        while self.xp >= self.xp_need() && self.level < 1000 {
+        while self.xp >= self.xp_need() && self.level < MAX_LEVEL {
             self.xp -= self.xp_need();
             self.level += 1;
             self.hp = self.max_hp();
@@ -1055,7 +1111,18 @@ impl Character {
             }
             levels += 1;
         }
+        if self.at_max_level() {
+            self.xp = 0;
+        }
         levels
+    }
+    /// One-way load migration: a save above the cap (only debug commands could get one there) comes down to it.
+    pub fn clamp_level(&mut self) {
+        if self.level > MAX_LEVEL {
+            self.level = MAX_LEVEL;
+            self.xp = 0;
+            self.hp = self.hp.min(self.max_hp());
+        }
     }
 }
 
@@ -1119,6 +1186,9 @@ pub struct QuestObjective {
     pub kind: String,
     pub target: String,
     pub count: u32,
+    /// For a `bring` objective that asks for a quest-only item: the chance (0.30 to 0.80) that a kill of one of its monsters drops it.
+    #[serde(default, rename = "dropChance")]
+    pub drop_chance: Option<f64>,
 }
 impl Quest {
     /// The level of an arena gauntlet quest (`docs/arena-quests.md`): its one objective is `gauntlet` with the target
@@ -1394,6 +1464,10 @@ pub enum ClientMessage {
     /// Reads the sign before a final boss (server/src/world/boss_signs.rs); `sign` is the boss's kind.
     SignRead {
         sign: String,
+    },
+    /// Names the loose gear copy the next `Equip` of its item should wear (every copy has a cell of its own).
+    PreferCopy {
+        copy: u64,
     },
     Equip {
         armor: Option<String>,
@@ -2509,6 +2583,20 @@ mod tests {
         }
         assert!(serde_json::from_str::<Look>(r#"{"gender":"other"}"#).is_err());
         assert!(serde_json::from_str::<Look>(r#"{"gender":2}"#).is_err());
+    }
+
+    #[test]
+    fn money_is_split_into_gold_silver_and_copper_with_zero_parts_left_out() {
+        assert_eq!(money_text(0), "0 copper");
+        assert_eq!(money_text(5), "5 copper");
+        assert_eq!(money_text(99), "99 copper");
+        assert_eq!(money_text(100), "1 silver");
+        assert_eq!(money_text(101), "1 silver 1 copper");
+        assert_eq!(money_text(10_000), "1 gold");
+        assert_eq!(money_text(10_001), "1 gold 1 copper");
+        assert_eq!(money_text(500_000), "50 gold");
+        assert_eq!(money_text(123_456), "12 gold 34 silver 56 copper");
+        assert_eq!(money_text(u32::MAX), "429496 gold 72 silver 95 copper");
     }
 
     #[test]

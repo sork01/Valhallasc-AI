@@ -363,7 +363,7 @@ impl World {
         let level = c.level;
         let price = merc_price(level);
         if c.gold < price {
-            return Err(format!("A mercenary costs {price} gold."));
+            return Err(format!("A mercenary costs {}.", money_text(price)));
         }
         let (zone, point) = (c.zone, c.point());
         let name =

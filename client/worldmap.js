@@ -927,7 +927,7 @@
     if (entry.state === 'here') parts.push(el('span', 'You are here', 'wm-spark-note'));
     else {
       if (d.stops?.length > 2) parts.push(el('small', d.stops.join(' → ')));
-      parts.push(d.available ? el('span', `${d.cost} gold`, 'wm-spark-cost') : el('span', d.reason, 'wm-spark-note'));
+      parts.push(d.available ? el('span', Money.text(d.cost), 'wm-spark-cost') : el('span', d.reason, 'wm-spark-note'));
       if (d.available && pinned) {
         const fly = el('button', 'Fly', 'wm-spark-fly'); fly.type = 'button'; fly.addEventListener('click', () => sparkFly(entry)); parts.push(fly);
       }
@@ -964,7 +964,7 @@
       const b = el('button', '', 'wm-spark'); b.type = 'button'; b.dataset.station = entry.id; b.dataset.state = entry.state;
       b.append(el('i'));
       const d = entry.offer;
-      b.setAttribute('aria-label', entry.state === 'here' ? `${entry.name}. You are here` : d.available ? `${entry.name}. ${d.cost} gold` : `${entry.name}. ${d.reason}`);
+      b.setAttribute('aria-label', entry.state === 'here' ? `${entry.name}. You are here` : d.available ? `${entry.name}. ${Money.text(d.cost)}` : `${entry.name}. ${d.reason}`);
       if (entry.state !== 'open') b.setAttribute('aria-disabled', 'true');
       Object.assign(b.style, stagePos(stationAt(entry.id)));
       const on = () => sparkCard(entry, false), off = () => sparkCard(travel?.pinned || null, !!travel?.pinned);

@@ -6,7 +6,7 @@
 //! it runs is written to the log. For it `set_god_mode` is personal instead of world-wide.
 use super::*;
 
-const MAX_DEBUG_LEVEL: u32 = 100;
+const MAX_DEBUG_LEVEL: u32 = MAX_LEVEL;
 
 impl World {
     pub(super) fn debug(&mut self, session: u64, reference: Option<u64>, command: DebugCommand) {

@@ -101,6 +101,9 @@ pub struct Item {
     #[serde(default = "first_level", rename = "requiredLevel")]
     pub required_level: u32,
     pub sell: u32,
+    /// A quest-only item (`scripts/quest_items.py`): the ordinary material whose monsters drop it for a hero who needs it.
+    #[serde(default, rename = "questMaterial")]
+    pub quest_material: Option<String>,
     #[serde(default)]
     pub attack: f64,
     #[serde(default)]
@@ -1043,18 +1046,35 @@ impl Character {
                 .map(|i| i.bag_slots)
                 .sum::<usize>()
     }
+    /// Bag cells in use. Materials, potions and the like share one cell per kind; gear never stacks, so every loose
+    /// copy (not worn) takes a cell of its own, even when two are identical (`GEAR-NO-STACK`).
     pub fn bag_used(&self) -> usize {
         self.inventory
             .iter()
-            .filter(|s| item(&s.item).is_some_and(|i| s.quantity > self.equipped_count(i)))
-            .count()
+            .map(|s| {
+                item(&s.item).map_or(0, |i| {
+                    let loose = s.quantity.saturating_sub(self.equipped_count(i)) as usize;
+                    if is_gear(i) { loose } else { loose.min(1) }
+                })
+            })
+            .sum()
+    }
+    /// Whether one more `id` fits: a stack already in a cell, or (gear: always) a free cell.
+    pub fn has_room_for(&self, i: &Item) -> bool {
+        (!is_gear(i) && self.quantity(&i.id) > self.equipped_count(i))
+            || self.bag_used() < self.bag_capacity()
+    }
+    /// A staged change that leaves the bags over capacity is refused only if it makes things worse: an old save that
+    /// already holds more loose gear than it has cells may still sell, bank, equip and discard its way down.
+    pub fn overfills(&self, next: &Character) -> bool {
+        next.bag_used() > next.bag_capacity() && next.bag_used() > self.bag_used()
     }
     pub fn can_collect(&self, id: &str) -> bool {
         item(id).is_some_and(|i| {
             if i.kind == "bag" {
                 self.can_fit_bag(id).is_ok()
             } else {
-                self.quantity(id) > self.equipped_count(i) || self.bag_used() < self.bag_capacity()
+                self.has_room_for(i)
             }
         })
     }
@@ -1487,7 +1507,7 @@ impl Character {
         let mut next = self.clone();
         next.look.equip(armor, weapon)?;
         next.check_required_levels(self)?;
-        if next.bag_used() > next.bag_capacity() {
+        if self.overfills(&next) {
             return Err("Your bags are full. Make room before unequipping gear.");
         }
         next.preserve_vitals_after_equipping(self);
@@ -1548,7 +1568,7 @@ impl Character {
                 return Err("Each equipped slot needs its own copy of the item.");
             }
         }
-        if next.bag_used() > next.bag_capacity() {
+        if self.overfills(&next) {
             return Err("Your bags are full. Make room before unequipping gear.");
         }
         next.preserve_vitals_after_equipping(self);
@@ -1615,9 +1635,6 @@ impl Character {
     }
     pub fn sell_item(&mut self, id: &str, quantity: u32) -> Result<u32, &'static str> {
         let i = item(id).ok_or("Unknown item.")?;
-        if i.starter {
-            return Err("Starter gear cannot be sold.");
-        }
         if i.rarity == GM_RARITY {
             return Err("Game master gear cannot be sold.");
         }
@@ -2299,7 +2316,7 @@ mod tests {
         }
     }
     #[test]
-    fn spare_starter_pieces_are_refused_by_merchants_and_never_come_back_once_banked() {
+    fn spare_starter_pieces_sell_for_their_price_and_never_come_back_once_sold() {
         let mut c = character();
         let spare: Vec<_> = ITEMS
             .iter()
@@ -2309,15 +2326,17 @@ mod tests {
             .collect();
         assert!(spare.len() >= 3, "a new hero carries spare starter pieces");
         let used = c.bag_used();
+        let gold = c.gold;
+        let mut paid = 0;
         for id in &spare {
-            // Merchants refuse starter gear (docs/shop-selling.md); a bank deposit takes it out of the bag for good.
-            assert_eq!(
-                c.sell_item(id, 1),
-                Err("Starter gear cannot be sold."),
-                "{id}"
-            );
-            assert!(c.consume_item(id, 1), "{id}");
+            // `SELL-STARTER-GEAR`: a loose starter piece sells like any other gear, for the level 1 common price.
+            let price = item(id).unwrap().sell;
+            assert_eq!(price, 4, "{id} has the level 1 common price");
+            let got = c.sell_item(id, 1).unwrap_or_else(|e| panic!("{id}: {e}"));
+            assert_eq!(got, c.boosted_gold(price), "{id}");
+            paid += got;
         }
+        assert_eq!(c.gold, gold + paid);
         assert_eq!(c.bag_used(), used - spare.len());
         // Worn pieces are still kept.
         let worn = ITEMS
@@ -3079,7 +3098,8 @@ mod tests {
         assert_eq!(c.sell_item("slime_gel", 3).unwrap(), 9);
         assert!(c.sell_item("slime_gel", 1).is_err());
         c.equip_owned("none", "none").unwrap();
-        assert!(c.sell_item("warrior_weapon_sword", 1).is_err());
+        // The starter sword is loose now, and loose starter gear sells (SELL-STARTER-GEAR) for the level 1 common price.
+        assert_eq!(c.sell_item("warrior_weapon_sword", 1).unwrap(), 4);
         c.hp = 0.;
         assert!(c.equip_owned("crimson", "royal").is_err());
     }
@@ -3367,6 +3387,77 @@ mod tests {
         c.equip_slots(&[("hands".into(), "none".into())].into())
             .unwrap();
         assert_eq!(c.bag_used(), 17);
+    }
+    /// `GEAR-NO-STACK`: every loose gear copy takes its own cell, identical or not; everything else keeps stacking.
+    #[test]
+    fn identical_gear_takes_a_cell_per_copy_while_materials_stack_in_one() {
+        let mut c = character();
+        let base = c.bag_used();
+        c.add_item("headgear_upgrade", 1);
+        assert_eq!(c.bag_used(), base + 1);
+        c.add_item("headgear_upgrade", 1);
+        c.add_item("headgear_upgrade", 1);
+        assert_eq!(c.bag_used(), base + 3, "three identical helms, three cells");
+        c.add_item("slime_gel", 40);
+        assert_eq!(c.bag_used(), base + 4, "a stack of materials is one cell");
+        // A worn copy leaves the bags.
+        c.level = item("headgear_upgrade").unwrap().required_level.max(1);
+        c.equip_slots(&[("headgear".into(), "headgear_upgrade".into())].into())
+            .unwrap();
+        assert_eq!(c.bag_used(), base + 3);
+        // A full bag refuses another copy of gear it already holds, but not more of a stack it already holds.
+        while c.bag_used() < c.bag_capacity() {
+            c.add_item("headgear_upgrade", 1);
+        }
+        assert!(!c.can_collect("headgear_upgrade"), "no free cell, so no third copy");
+        assert!(c.can_collect("slime_gel"), "the stack of gel already has its cell");
+        assert_eq!(c.bag_used(), c.bag_capacity());
+    }
+    #[test]
+    fn an_old_save_with_more_gear_than_cells_can_shed_but_never_grow() {
+        let mut c = character();
+        let helm = item("headgear_upgrade").unwrap();
+        c.level = helm.required_level.max(1);
+        c.add_item("headgear_upgrade", 30);
+        assert!(c.bag_used() > c.bag_capacity(), "30 helms overfill 16 cells");
+        let used = c.bag_used();
+        assert!(!c.can_collect("headgear_upgrade"));
+        assert!(!c.can_collect("slime_gel"), "no free cell for a new stack either");
+        // Wearing one swaps nothing into the bags: allowed even though the bags are over.
+        c.equip_slots(&[("headgear".into(), "headgear_upgrade".into())].into())
+            .unwrap();
+        assert_eq!(c.bag_used(), used - 1);
+        // Taking it off would put a copy back into a bag that is already over: refused, so it can never grow.
+        assert!(
+            c.equip_slots(&[("headgear".into(), "none".into())].into())
+                .is_err()
+        );
+        assert_eq!(c.bag_used(), used - 1);
+        let used = used - 1;
+        // Selling brings it down, one copy at a time.
+        let paid = c.sell_item("headgear_upgrade", 5).unwrap();
+        assert!(paid > 0 || helm.sell == 0);
+        assert_eq!(c.bag_used(), used - 5);
+    }
+    #[test]
+    fn a_chosen_loose_copy_is_the_one_that_gets_worn() {
+        let mut c = character();
+        c.level = item("headgear_upgrade").unwrap().required_level.max(1);
+        c.add_item("headgear_upgrade", 3);
+        c.materialize_gear_instances();
+        let ids: Vec<u64> = c.gear_instances.iter().filter(|g| g.item == "headgear_upgrade").map(|g| g.id).collect();
+        assert_eq!(ids.len(), 3);
+        c.prefer_loose_copy(ids[2]);
+        c.equip_slots(&[("headgear".into(), "headgear_upgrade".into())].into())
+            .unwrap();
+        let item_copies: Vec<u64> = c.gear_instances.iter().filter(|g| g.item == "headgear_upgrade").map(|g| g.id).collect();
+        assert_eq!(item_copies[0], ids[2], "the named copy is now the first, the worn one");
+        assert!(c.gear_instance_equipped(ids[2]));
+        assert!(!c.gear_instance_equipped(ids[0]));
+        // A worn or unknown copy is ignored.
+        c.prefer_loose_copy(ids[2]);
+        c.prefer_loose_copy(u64::MAX);
+        assert!(c.gear_instance_equipped(ids[2]));
     }
     #[test]
     fn purchases_validate_funds_life_and_four_bags_and_upgrade_the_smallest() {

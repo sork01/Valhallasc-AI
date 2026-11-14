@@ -96,7 +96,7 @@ async function type(page, text) {
     await type(sork, '/level 20');
     await sork.waitForFunction(() => /level 20/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
     await type(sork, '/gold 12345');
-    await sork.waitForFunction(() => /12345 gold/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
+    await sork.waitForFunction(() => /1 gold 23 silver 45 copper/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
     await type(sork, '/give health potion 3');
     await sork.waitForFunction(() => /health_potion: you now have 3/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
     await type(sork, '/give royal sword');

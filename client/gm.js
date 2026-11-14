@@ -19,8 +19,8 @@
     const q = String(text || '').toLowerCase();
     if (!q) return null;
     if ('alderhaven'.startsWith(q) || 'city'.startsWith(q)) return 0;
-    const hits = names.map((name, i) => [name.toLowerCase(), i]).filter(([name]) => name.includes(q));
-    return hits.length === 1 ? hits[0][1] : null;
+    const hits = names.map((name, i) => [name.toLowerCase(), i]).filter(([name]) => name.includes(q)), exact = hits.filter(([name]) => name === q);
+    return exact.length === 1 ? exact[0][1] : hits.length === 1 ? hits[0][1] : null;
   }
   // An item by id, exact name or a unique part of either.
   function findItem(text) {
@@ -37,10 +37,11 @@
   // name -> [usage, help, build(args) -> a debug command, or a string with the problem]
   const COMMANDS = {
     god: ['[on|off]', 'Take no damage (only you; others are unaffected).', a => ({ op: 'set_god_mode', enabled: a[0] ? !/^(off|0|false|no)$/i.test(a[0]) : !(self?.god) })],
-    tp: ['<zone> [x y] | <x y>', 'Teleport: a zone number or name (to its start point, or to x y), or just x y in this zone.', a => {
+    tp: ['<zone> [x y] | <x y> | <player>', 'Teleport: a zone number or name (to its start point, or to x y), just x y in this zone, or the name of an online player (to where they are, in any zone or dungeon copy).', a => {
       if (a.length === 2 && number(a[0]) !== null && number(a[1]) !== null) return { op: 'teleport', zone: self?.zone ?? 0, x: number(a[0]), y: number(a[1]) };
       const zone = findZone(a[0]);
-      if (zone === null) return `Unknown zone. Zones: ${zoneNames().map((n, i) => `${i} ${n}`).join(', ')}.`;
+      // Zones keep priority (a number, an exact name or a unique part of one); any other text is a player's name.
+      if (zone === null) return a.length && number(a[0]) === null ? { op: 'goto', name: a.join(' ') } : `No zone or online player named ${a.join(' ') || '…'}. Zones: ${zoneNames().map((n, i) => `${i} ${n}`).join(', ')}.`;
       const start = spawnOf(zone), x = a.length >= 3 ? number(a[1]) : start?.x, y = a.length >= 3 ? number(a[2]) : start?.y;
       return x === null || y === null || x === undefined || y === undefined ? 'Use /tp <zone> [x y].' : { op: 'teleport', zone, x, y };
     }],
@@ -53,7 +54,7 @@
       const last = a.length > 1 ? whole(a.at(-1)) : null, quantity = last ?? 1, found = findItem((last === null ? a : a.slice(0, -1)).join(' '));
       return found.error || { op: 'take_item', item: found.item.id, quantity };
     }],
-    level: ['<1-100>', 'Set your level (XP resets; skills unlock as usual).', a => whole(a[0]) === null ? 'Use /level <1-100>.' : { op: 'set_level', level: whole(a[0]) }],
+    level: ['<1-99>', 'Set your level (XP resets; skills unlock as usual; 99 is the highest).', a => whole(a[0]) === null ? 'Use /level <1-99>.' : { op: 'set_level', level: whole(a[0]) }],
     time: ['<0-23.99|resume> [freeze]', 'Set the shared world hour. Freeze is temporary; resume starts the clock again.', a => {
       if (a[0] === 'resume') return { op: 'set_time', hour: null, freeze: false };
       const hour = number(a[0]);
@@ -68,7 +69,7 @@
     show: ['', 'Become visible to other players.', () => ({ op: 'visibility', mode: 'on' })],
     hide: ['', 'Become hidden from other players and monsters.', () => ({ op: 'visibility', mode: 'off' })],
     xp: ['<amount>', 'Grant XP (levels up as usual).', a => whole(a[0]) === null || whole(a[0]) < 0 ? 'Use /xp <amount>.' : { op: 'give_xp', amount: whole(a[0]) }],
-    gold: ['<amount>', 'Set your gold.', a => whole(a[0]) === null || whole(a[0]) < 0 ? 'Use /gold <amount>.' : { op: 'set_gold', gold: whole(a[0]) }],
+    gold: ['<amount>', 'Set your money in copper (100 copper = 1 silver, 100 silver = 1 gold).', a => whole(a[0]) === null || whole(a[0]) < 0 ? 'Use /gold <amount>.' : { op: 'set_gold', gold: whole(a[0]) }],
     hp: ['[amount]', 'Set your health (default: full). Also revives.', a => ({ op: 'set_hp', hp: a[0] === undefined ? 1e9 : (number(a[0]) ?? 1e9) })],
     mana: ['[amount]', 'Set your mana, energy or rage (default: full).', a => ({ op: 'set_resource', amount: a[0] === undefined ? 1e9 : (number(a[0]) ?? 1e9) })],
     cd: ['', 'Clear every cooldown.', () => ({ op: 'reset_cooldowns' })],
@@ -119,7 +120,7 @@
       case 'visibility': return result.hidden ? 'You are hidden.' : 'You are visible.';
       case 'give_xp': return `level ${result.level}, ${result.xp} xp`;
       case 'give_item': case 'take_item': return `${result.item}: you now have ${result.owned}`;
-      case 'set_gold': return `${result.gold} gold`;
+      case 'set_gold': return Money.text(result.gold);
       case 'set_hp': return `${Math.round(result.hp)} / ${Math.round(result.maxHp)} health`;
       case 'set_resource': return `${Math.round(result.resource)} / ${Math.round(result.maxResource)}`;
       case 'spawn_enemy': return `enemy ${result.id} (${result.kind}, level ${result.level}) at ${Math.round(result.x)}, ${Math.round(result.y)}`;

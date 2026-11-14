@@ -1,5 +1,7 @@
 # Mailboxes
 
+> Money (2026-11): every amount below called "gold" is stored as copper and shown as gold, silver and copper (100 copper = 1 silver, 100 silver = 1 gold); see [money.md](money.md).
+
 Owner requirements (2026-11-03): players can mail messages, gold and **unbound** items to other players; every city and hub has an accessible mailbox. A party loot hand-off window never makes bound class gear eligible for mail.
 
 Implementation defaults (chosen for this implementation, not additional owner decisions):

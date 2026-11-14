@@ -132,7 +132,7 @@
       "stat": "defense",
       "cooldownSkill": "shieldwall",
       "doubleSkill": "cleave",
-      "triggerSkill": "charge"
+      "triggerSkill": "groundslam"
     },
     {
       "source": "cathedral_cloister",
@@ -300,7 +300,7 @@
       "stat": "defense",
       "cooldownSkill": "arcaneward",
       "doubleSkill": "twinbolt",
-      "triggerSkill": "blink"
+      "triggerSkill": "chainlightning"
     },
     {
       "source": "cathedral_cloister",
@@ -468,7 +468,7 @@
       "stat": "defense",
       "cooldownSkill": "evasion",
       "doubleSkill": "flurry",
-      "triggerSkill": "shadowveil"
+      "triggerSkill": "cycloneblades"
     },
     {
       "source": "cathedral_cloister",
@@ -802,7 +802,7 @@
       "source": "undervault",
       "class": "hunter",
       "stat": "defense",
-      "cooldownSkill": "huntersmark",
+      "cooldownSkill": "explosivearrow",
       "doubleSkill": "powershot",
       "triggerSkill": "multishot"
     },

@@ -166,6 +166,7 @@ fn receive(c: &mut Character, contents: &Contents) -> Result<(), String> {
         .checked_add(contents.gold)
         .ok_or("You cannot carry that much gold.")?;
     c.materialize_gear_instances();
+    let before_used = c.bag_used();
     for a in &contents.items {
         if item(&a.item).is_none() {
             return Err("An attachment is unavailable. Keep this letter for later.".into());
@@ -187,7 +188,7 @@ fn receive(c: &mut Character, contents: &Contents) -> Result<(), String> {
         }
         c.gear_instances.push(g);
     }
-    if c.bag_used() > c.bag_capacity() {
+    if c.bag_used() > c.bag_capacity() && c.bag_used() > before_used {
         return Err("Your bags are full. Make room first.".into());
     }
     Ok(())
@@ -219,6 +220,14 @@ impl Store {
             params![recipient, name, receipt, serde_json::to_string(&contents).map_err(storage)?, unix_now()]).map_err(storage)?;
         tx.commit().map_err(storage)?;
         Ok(())
+    }
+    /// (unread, total) letters in a character's inbox, for the minimap mail icon.
+    pub fn mail_counts(&self, id: &str) -> rusqlite::Result<(u32, u32)> {
+        self.conn().query_row(
+            "SELECT coalesce(sum(is_read=0),0), count(*) FROM mail WHERE recipient=?1 AND deleted=0",
+            [id],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )
     }
     pub fn mail_unread(&self, id: &str) -> rusqlite::Result<u32> {
         self.conn().query_row(

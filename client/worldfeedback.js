@@ -53,7 +53,7 @@ window.WorldFeedback = (() => {
     } else if (!d.item) {
       const gold = goldTooltip();
       if (gold && hover !== key) {
-        clearHover(); gold.textContent = tr(`${d.value} gold`); gold.hidden = false; hover = key;
+        clearHover(); gold.textContent = Money.text(d.value); gold.hidden = false; hover = key;
       }
       placeTooltip(gold);
     }

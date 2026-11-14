@@ -49,16 +49,16 @@
       const row=make('div','','repair-row');row.dataset.copy=String(g.id);row.dataset.state=left<=0?'broken':left<=30?'low':'worn';
       const state=left<=0?'Broken':`Durability ${left}%`;
       const name=make('span',`${item(g.item)?.name||g.item} · ${g.rarity}${worn.has(g.id)?' · equipped':''} · ${state}`,'repair-name');
-      const button=make('button',`Repair · ${price.toLocaleString()} gold`,'btn ghost');button.type='button';button.dataset.action='repair';
+      const button=make('button','','btn ghost');button.innerHTML=`${Locale.translate('Repair')} · ${Money.html(price)}`;button.type='button';button.dataset.action='repair';
       button.disabled=packet.gold<price;
       button.addEventListener('click',()=>{button.disabled=true;send(`repair:${g.id}`);});
       row.append(name,button);elements.push(row);
     }
-    const all=make('button',`Repair all · ${total.toLocaleString()} gold`,'btn');all.type='button';all.dataset.action='repair_all';
+    const all=make('button','','btn');all.innerHTML=`${Locale.translate('Repair all')} · ${Money.html(total)}`;all.type='button';all.dataset.action='repair_all';
     all.disabled=packet.gold<total;
     all.addEventListener('click',()=>{all.disabled=true;send('repair_all');});
     elements.push(all);
-    if(packet.gold<total)elements.push(make('p',`You need ${(total-packet.gold).toLocaleString()} more gold to repair everything.`));
+    if(packet.gold<total)elements.push(make('p',`You need ${Money.text(total-packet.gold)} more to repair everything.`));
     container.replaceChildren(...elements);
   }
   function render(kind,npc,packet,container){
@@ -97,7 +97,7 @@
       if(preview.kind==='refine'&&preview.id===chosen.refine){
         const crystal=item(preview.material),owned=(packet.inventory||[]).find(s=>s.item===preview.material)?.quantity||0;
         elements.push(make('p',`Rank ${preview.result.rank}: ${stats(preview.result)}`),
-          make('p',`Cost: ${preview.gold} gold and ${preview.crystals} ${crystal?.name||preview.material} (owned: ${owned}).`));
+          make('p',`Cost: ${Money.text(preview.gold)} and ${preview.crystals} ${crystal?.name||preview.material} (owned: ${owned}).`));
         const confirm=make('button','Confirm refinement','btn');confirm.type='button';
         confirm.disabled=packet.gold<preview.gold||owned<preview.crystals;
         confirm.addEventListener('click',()=>{confirm.disabled=true;send(`refine_confirm:${chosen.refine}`);});elements.push(confirm);

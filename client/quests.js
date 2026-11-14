@@ -364,7 +364,7 @@
     if (!quest.handoffTo) {
       node.append(element('h5', 'Rewards'), element('p', 'You will receive:', 'quest-reward-label'));
       rewards(quest, node, false);
-      node.append(element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
+      { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(quest.rewardGold)}`; node.append(p); }
     }
     if (state(quest)?.completions) node.append(element('p', `Completed ${state(quest).completions} time${state(quest).completions === 1 ? '' : 's'}.`, 'quest-history'));
     const action = (label, name, handler, disabled = false) => {
@@ -424,6 +424,7 @@
     show, close, get open() { return open(); },
     setLevel(level) { if (heroLevel !== level) { heroLevel = level; clearGuidance(); render(); } },
     mapMarkers, navigationTarget, track, get tracked() { return tracked; },
+    get anyReady() { return definitions.some(q => status(q) === 'ready'); },
     refresh() { render(); },
     seasonChanged() { clearGuidance(); render(); },
     // The merchant protects every material until its active quest is handed in or abandoned.
@@ -522,7 +523,7 @@
       if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
       node.append(element('h5', actionContainer ? 'Quest Objectives' : 'Objectives'), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join('\n'), 'quest-objectives'));
       if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
-      if (!quest.handoffTo) node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
+      if (!quest.handoffTo) { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(quest.rewardGold)}`; node.append(element('h5', 'Rewards'), p); }
       const choices = rewards(quest, node, s === 'ready', npcId, !!actionContainer);
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {

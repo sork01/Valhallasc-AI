@@ -7,7 +7,7 @@
   const button = (text, fn) => { const b = el('button', tr(text)); b.type = 'button'; b.className = 'btn ghost'; b.onclick = fn; return b; };
   const icon = new Image(); icon.src = 'assets/mailbox.png';
   let npc = null, zone = 0, data = null, selected = null, attached = [], receipt = null;
-  let pending = null, timer = 0, watch = 0, priorFocus = null, unread = 0, draftOwner = null;
+  let pending = null, timer = 0, watch = 0, priorFocus = null, unread = 0, total = null, draftOwner = null;
   const visible = () => !$('mail-panel').hidden;
   const say = (message, ok = false) => { $('mail-notice').textContent = tr(message); $('mail-notice').dataset.state = ok ? 'ok' : 'error'; };
   const near = () => {
@@ -41,7 +41,7 @@
   }
   function attachmentsLine(contents, target) {
     const rows = [];
-    if (contents.gold) rows.push(el('p', `${contents.gold.toLocaleString()} ${tr('gold')}`));
+    if (contents.gold) { const p = el('p'); Money.set(p, contents.gold); rows.push(p); }
     for (const a of contents.items || []) {
       const i = WORLD_ITEMS.find(i => i.id === a.item), g = contents.gear?.find(g => g.id === a.copy);
       const p = el('p', `${tr(i?.name || a.item)} ×${a.quantity}`);
@@ -100,7 +100,7 @@
     const op = pending; settle();
     if (!packet.ok) {
       say(packet.notice);
-      if (!visible()) { $('npc-notice').textContent = tr(packet.notice); $('mail-menu-notice').textContent = tr(packet.notice); }
+      if (!visible()) { $('npc-notice').textContent = tr(packet.notice); window.Announce?.show(tr(packet.notice), 'error'); }
       return;
     }
     if (!visible()) {
@@ -123,8 +123,7 @@
     if (visible() || pending || !Online.connected) return false;
     const h = Field.hero;
     box ||= City.npcs.filter(n => n.offers?.some(o => o.id === 'mail')).sort((a,b) => Math.hypot(h.x-a.x,h.y-a.y)-Math.hypot(h.x-b.x,h.y-b.y))[0];
-    $('mail-menu-notice').textContent = '';
-    if (!box || Math.hypot(h.x-box.x,h.y-box.y)>2.8) { $('mail-menu-notice').textContent = tr('Walk closer to a mailbox.'); return false; }
+    if (!box || Math.hypot(h.x-box.x,h.y-box.y)>2.8) { window.Announce?.show(tr('Walk closer to a mailbox.'), 'error'); return false; }
     if (draftOwner !== Online.id) { attached = []; receipt = null; confirmed = null; $('mail-compose-form').reset(); $('mail-recipient-result').textContent = ''; draftOwner = Online.id; }
     npc = box; zone = Field.zone;
     return send({ op: 'open' });
@@ -133,12 +132,18 @@
     const wasVisible = visible(); settle(); clearInterval(watch); $('mail-panel').hidden = true; npc = null; data = null; selected = null;
     if (wasVisible && resume) { Field.setPaused(false); priorFocus?.focus?.({ preventScroll: true }); }
   }
-  function onUnread(count) {
-    const changed = unread !== count; unread = count;
-    $('mail-unread').textContent = count ? ` (${count})` : '';
-    $('mail-open').dataset.unread = String(count > 0);
+  function label() {
+    if (total != null && total > 0) return tr(`Mail: ${total} in total, ${unread} unread`);
+    return unread ? tr(`Mail: ${unread} unread`) : tr('Mail: no unread letters');
+  }
+  function onUnread(count, all) {
+    const changed = unread !== count; unread = count; total = Number.isFinite(all) ? all : (count > 0 ? Math.max(total ?? 0, count) : total);
+    const dot = $('mail-unread'), btn = $('mail-open'), text = label();
+    dot.textContent = count > 99 ? '99+' : String(count); dot.hidden = !count;
+    btn.dataset.unread = String(count > 0); btn.title = text; btn.setAttribute('aria-label', text);
     if (changed && visible() && !pending && !$('mail-inbox-view').hidden) send({ op: 'open' });
   }
+  Money.preview($('mail-gold'));
   $('mail-open').onclick = () => open();
   $('mail-close').onclick = () => close();
   $('mail-inbox-tab').onclick = () => { tab(false); send({ op: 'open' }); };
@@ -158,7 +163,7 @@
     event.preventDefault();
     if (pending) return;
     const gold = Number($('mail-gold').value);
-    if (!Number.isSafeInteger(gold) || gold<0 || gold>data.gold) { say('You do not have that much gold.'); return; }
+    if (!Number.isSafeInteger(gold) || gold<0 || gold>data.gold) { say('You do not have that much copper.'); return; }
     confirmed = { op:'send',request:receipt ||= crypto.randomUUID(),recipient:$('mail-recipient').value.trim(),subject:$('mail-subject').value.trim(),body:$('mail-body').value,gold,attachments:attached.map(a => ({...a})) };
     $('mail-confirm-recipient').textContent = confirmed.recipient;
     $('mail-confirm-subject').textContent = confirmed.subject;

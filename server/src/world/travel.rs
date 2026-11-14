@@ -245,7 +245,8 @@ impl World {
         let cost = c.spark_fare((stops.len() as u32 - 1) * LEG_COST);
         if c.gold < cost {
             return Err(format!(
-                "Spark Travel costs {cost} gold. You do not have enough."
+                "Spark Travel costs {}. You do not have enough.",
+                money_text(cost)
             ));
         }
         let mut points = vec![];
@@ -307,7 +308,7 @@ impl World {
             }
         }
         let p = &self.players[&session];
-        let _ = p.peer.try_send(json!({"type":"notice","ok":true,"text":format!("Spark Travel to {destination}: {cost} gold.")}));
+        let _ = p.peer.try_send(json!({"type":"notice","ok":true,"text":format!("Spark Travel to {destination}: {}.", money_text(cost))}));
         self.save();
         Ok(())
     }
@@ -320,6 +321,7 @@ impl World {
         };
         let mut budget = p.character.look.class.speed() * SPEED * TICK;
         let mut visited = vec![];
+        p.spark_at = self.time;
         while let Some(point) = flight.points.get(flight.next) {
             let goal = Point {
                 x: point.x,

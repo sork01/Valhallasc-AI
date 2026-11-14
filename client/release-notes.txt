@@ -1,5 +1,29 @@
 [
   {
+    "version": "Beta 1.53.0",
+    "date": "2026-11-14",
+    "new": [
+      "Money is now counted in gold, silver and copper: 100 copper make 1 silver and 100 silver make 1 gold. Prices, your purse, quest rewards, repairs and the bank show the three coins. Every amount you had before is now shown in copper, so a level 1 drop of 5 is 5 copper and the horse costs 50 gold.",
+      "Quest items. A quest that asks you to bring monster materials now asks for its own quest item. It drops only while you are on that quest and still need it, only as many as you need, and not every time (some quests drop it more often than others). In a party each item goes to the next member who still needs it. Handing in the quest throws away any extra copies you hold.",
+      "A mail icon sits under the world map button at the edge of the minimap. Point at it to see how many letters you have, and click it at a mailbox to open your mail.",
+      "Twelve new tutorial tips: fighting, loot, handing in a quest, dying and getting back, the map, Spark Travel, elite enemies, being rested, repairs, full bags, mail and the bank, and parties and mercenaries. Each shows once, and heroes above level 5 do not see them.",
+      "Every class now learns an area skill at level 20.",
+      "Level 99 is the highest level. Experience is no longer earned there and your experience bar shows Max level."
+    ],
+    "changed": [
+      "Gear no longer stacks in your bags or the bank: every piece, even an identical one, takes a cell of its own and shows its own condition. If an old character holds more gear than it has cells, nothing is lost: you can still sell, store, equip and throw away, and new gear simply will not fit until there is room.",
+      "Starter gear can be sold once you have taken it off. It sells for a few copper and is never picked up by Sell junk.",
+      "The DPS meter switch moved from the World Menu to Settings.",
+      "Warrior Ground Slam, Mage Chain Lightning, Assassin Cyclone Blades and Hunter Explosive Arrow are now learned at level 20, and Charge, Blink, Shadow Veil and Hunter's Mark at level 24. Their ranks moved with them.",
+      "The opening scene: the hero's legs now follow the ground covered while walking along the deck and down the gangplank, and stand still when the hero does.",
+      "Spark Travel flights no longer play the climb, dive and fall scenes, and do not use them up.",
+      "A game master can type /tp followed by a player's name to go to where that player is."
+    ],
+    "removed": [
+      "The Mail, Equipment & Inventory, Achievements and DPS meter buttons from the World Menu, because mail has its own icon, the bags and character window open with a key or button, and the DPS switch is in Settings."
+    ]
+  },
+  {
     "version": "Beta 1.52.1",
     "date": "2026-11-13",
     "new": [],

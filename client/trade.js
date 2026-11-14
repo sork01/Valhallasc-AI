@@ -46,7 +46,7 @@
       list.append(row);
     }
     if (!list.childElementCount) list.append(make('li', 'No items'));
-    list.append(make('li', `${offer?.gold || 0} gold`));
+    { const li = make('li'); Money.set(li, offer?.gold || 0); list.append(li); }
   }
   function render() {
     $('trade-request').hidden = state?.state !== 'request';
@@ -132,10 +132,11 @@
     draft.items = items;
     send({ op: 'offer', items, gold: draft.gold });
   });
+  Money.preview($('trade-gold'));
   $('trade-set-gold').addEventListener('click', () => {
     const gold = Number($('trade-gold').value);
     if (!Number.isSafeInteger(gold) || gold < 0 || gold > (character?.gold || 0)) {
-      $('trade-status').textContent = 'Choose a gold amount you have.'; return;
+      $('trade-status').textContent = 'Choose an amount of copper you have.'; return;
     }
     draft.gold = gold;
     send({ op: 'offer', items: draft.items, gold });

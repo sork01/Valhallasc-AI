@@ -13,6 +13,8 @@
   const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
   const mix = (a, b, v) => `rgb(${a.map((c, i) => Math.round(lerp(c, b[i], v))).join(',')})`;
   const FADE_IN = .35, FADE_OUT = .6;
+  let legPhase = 0;      // the walk cycle of a hero who walks in a scene: the game loop resets `hero.walk` between frames, so the scene keeps its own
+  const RUN_SPEED = 5.2;   // tiles/s: the pace at which the game's walk cycle advances 11 per second (field.js `walk += dt * 11`)
 
   // ---- drawing helpers -----------------------------------------------------------------------------------------------------------------
   const vgrad = (g, h, stops) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([p, c]) => gr.addColorStop(p, c)); return gr; };
@@ -272,6 +274,7 @@
 
   // `opts.skippable` lets the player skip these scenes (the server says so for the opening cutscene of a second character).
   function play(scenes, opts) {
+    legPhase = 0;
     const ids = (Array.isArray(scenes) ? scenes : []).filter(id => SCENES[id]);
     if (!ids.length) return;
     const idle = !cur; queue.push(...ids.map(id => ({ id, skippable: !!opts?.skippable })));
@@ -318,9 +321,9 @@
       if (pose.abs) g.translate(pose.abs.x, pose.abs.y), g.scale(pose.abs.k, pose.abs.k);
       else g.translate(hx + (pose.dx || 0), hy + (pose.dy || 0)), g.scale(zoom * (pose.sx ?? 1), zoom * (pose.sy ?? 1)), g.translate(0, -45), g.rotate(pose.rot || 0), g.translate(0, 45);
       g.globalAlpha = pose.alpha ?? 1;
-      if (pose.walk) { hero.moving = true; hero.fx = pose.walk[0]; hero.fy = pose.walk[1]; hero.walk = (walk || 0) + dt * 11; }
+      if (pose.walk) { hero.moving = true; hero.fx = pose.walk[0]; hero.fy = pose.walk[1]; legPhase += dt * 11 * (pose.speed == null ? 1 : pose.speed / RUN_SPEED); hero.walk = legPhase; }
       else if (pose.abs) { hero.moving = false; if (pose.face) { hero.fx = pose.face[0]; hero.fy = pose.face[1]; } }
-      shoeState = hold; try { paintHero(g, t); } finally { hero.mounted = mounted; if (!pose.walk) hero.walk = walk; hero.moving = moving; hero.fx = fx; hero.fy = fy; }
+      shoeState = hold; try { paintHero(g, t); } finally { hero.mounted = mounted; hero.walk = walk; hero.moving = moving; hero.fx = fx; hero.fy = fy; }
     } else hero.mounted = mounted;
     g.restore();
     // Scenery that stands in front of the hero (the opening's sail) is painted again over them.
@@ -335,7 +338,7 @@
     get active() { return !!cur; },
     shoes() { return shoeState; },
     // For tests: what is playing and how far along it is.
-    get state() { return cur ? { scene: cur.id, el: (performance.now() - startAt) / 1000, dur: cur.dur, queued: queue.map(e => e.id), played: shown, skippable: curSkip } : null; },
+    get state() { return cur ? { legs: legPhase, scene: cur.id, el: (performance.now() - startAt) / 1000, dur: cur.dur, queued: queue.map(e => e.id), played: shown, skippable: curSkip } : null; },
     scenes: Object.fromEntries(Object.entries(SCENES).map(([k, v]) => [k, v.dur])),
   };
 })();

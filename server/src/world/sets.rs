@@ -617,7 +617,7 @@ mod tests {
             (w.slimes[0].hp - (1_000_000. - expected)).abs() < 1e-8,
             "doubled rank-adjusted hit"
         );
-        w.use_skill(1, "charge", Point { x: 1., y: 0. });
+        w.use_skill(1, "groundslam", Point { x: 1., y: 0. });   // the Undervault trigger (Charge is learned at 24 now, past the set's level 20)
         assert!(w.players[&1].set_shield > 0.);
         assert!(w.players[&1].set_cd.contains_key("undervault"));
         assert_eq!(w.players[&1].snapshot()["setCounts"]["undervault"], 8);

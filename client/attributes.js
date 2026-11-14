@@ -122,7 +122,7 @@
     host.replaceChildren(header, grid, actions,
       node('p', `Hit ${percent(c.hitChance)} · Dodge ${percent(c.dodgeChance)} · Crit ${percent(c.critChance)} · Attack every ${Number((c.attackCooldown || 0).toFixed(2))}s`, 'attribute-derived'),
       ...(c.resurrectionSickness > 0 ? [node('p', 'Resurrection Sickness: all stats reduced to 25%.', 'attribute-derived')] : []),
-      node('small', '3 points per level · ★ Class specialty · A city steward can reset trained points for gold', 'attribute-help'));
+      node('small', '3 points per level · ★ Class specialty · A city steward can reset trained points for a fee', 'attribute-help'));
     if (c.raidSupport) host.append(node('p', `Raid strength: +${c.raidSupport.attackPercent}% attack · ${c.raidSupport.damageReductionPercent}% damage reduction (${c.raidSupport.others} allies)`, 'attribute-derived raid-strength'));
     syncPreview();
   }

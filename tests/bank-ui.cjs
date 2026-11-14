@@ -55,8 +55,8 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     assert.equal(await page.locator('#bank-grid .bag-cell').count(), 48, 'one cell per bank slot');
     assert.equal(await count('slime_gel', 'bags'), 30);
     assert.match(await page.locator('#bank-gold').textContent(), /^0 gold$/);
-    assert.match(await page.locator('#bank-purse').textContent(), /20,000 gold/);
-    assert.match(await page.locator('#bank-expand').textContent(), /10,000 gold/);
+    assert.match(await page.locator('#bank-purse').textContent(), /2 gold/);
+    assert.match(await page.locator('#bank-expand').textContent(), /1 gold/);
 
     // Click moves the box quantity (1), the box moves part of a stack, shift-click moves the rest.
     await bank('slime_gel', 'bags').locator('button').click();
@@ -106,20 +106,20 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     await page.locator('#bank-gold-amount').fill('5000');
     await page.locator('#bank-gold-deposit').click();
     await page.waitForFunction(() => /^5,000 gold$/.test(document.getElementById('bank-gold').textContent));
-    assert.match(await page.locator('#bank-purse').textContent(), /15,000 gold/);
+    assert.match(await page.locator('#bank-purse').textContent(), /1 gold\s*50 silver/);
     await page.locator('#bank-gold-amount').fill('2000');
     await page.locator('#bank-gold-withdraw').click();
     await page.waitForFunction(() => /^3,000 gold$/.test(document.getElementById('bank-gold').textContent));
-    assert.match(await page.locator('#bank-purse').textContent(), /17,000 gold/);
+    assert.match(await page.locator('#bank-purse').textContent(), /1 gold\s*70 silver/);
 
     // The expansion: 10,000 gold, +12 cells, and the next one costs more than the purse holds.
     await page.locator('#bank-expand').click();
     await page.waitForFunction(() => /\/60 slots/.test(document.getElementById('bank-capacity').textContent));
     assert.equal(await page.locator('#bank-grid .bag-cell').count(), 60);
-    assert.match(await page.locator('#bank-purse').textContent(), /7,000 gold/);
-    assert.match(await page.locator('#bank-expand-text').textContent(), /Expansion 2 of 4: \+12 cells for 40,000 gold/);
+    assert.match(await page.locator('#bank-purse').textContent(), /70 silver/);
+    assert.match(await page.locator('#bank-expand-text').textContent(), /Expansion 2 of 4: \+12 cells for 4 gold/);
     assert.equal(await page.locator('#bank-expand').isDisabled(), true);
-    assert.match(await page.locator('#bank-expand-short').textContent(), /You need 33,000 more gold\./);
+    assert.match(await page.locator('#bank-expand-short').textContent(), /You need 3 gold 30 silver more\./);
 
     // Gear: two loose copies of one ID open a copy list, and one named copy goes in; the worn copy stays on the hero.
     const looseBefore = await page.evaluate(g => Inventory.looseCopies(g).length, GEAR);
@@ -218,7 +218,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     await sv.locator('#bank-panel .bank-cell[data-side="bank"] button').hover();
     await sv.locator('#item-tooltip').waitFor({ state: 'visible' });
     const svText = await sv.evaluate(() => document.getElementById('bank-panel').innerText + '\n' + document.getElementById('item-tooltip').innerText + '\n' + [...document.querySelectorAll('#bank-panel [aria-label]')].map(n => n.getAttribute('aria-label')).join('\n'));
-    for (const english of ['Deposit gold', 'Withdraw gold', 'Gold in the bank', 'Sort by kind', 'Click an item', 'Expand the bank', 'Expansion 1', 'It is never refunded', 'in the bank', 'Empty bank slot', 'Click to take', 'Close the bank', 'Choose a quantity'])
+    for (const english of ['Deposit', 'Withdraw', 'Money in the bank', 'Sort by kind', 'Click an item', 'Expand the bank', 'Expansion 1', 'It is never refunded', 'in the bank', 'Empty bank slot', 'Click to take', 'Close the bank', 'Choose a quantity'])
       assert.ok(!svText.includes(english), `"${english}" is translated in Swedish`);
     for (const swedish of ['Sätt in guld', 'Ta ut guld', 'Guld i banken', 'Utökning 1 av 4', 'Stäng', 'Klicka för att ta ut', 'i banken'])
       assert.ok(svText.includes(swedish), `"${swedish}" is shown in Swedish`);

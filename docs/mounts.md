@@ -1,5 +1,7 @@
 # Mounts
 
+> Money (2026-11): every amount below called "gold" is stored as copper and shown as gold, silver and copper (100 copper = 1 silver, 100 silver = 1 gold); see [money.md](money.md).
+
 These settle `MOUNT-RULES` in [TODO.md](../TODO.md). `MOUNT-SERVER` stores the owned set, `MOUNT-SOURCES` adds the acquisitions below, `MOUNT-UI` adds the picker, `MOUNT-GRYPHON`/`LIZARD`/`RAPTOR`/`SABERTOOTH` draw the sprites and `MOUNT-CHECK` verifies it all. The horse keeps its price (500,000 gold), level (50), vendor (Stable-hand Greta, Skaldholm) and every rule in the README.
 
 ## One cosmetic choice at one speed
@@ -15,9 +17,9 @@ Each uses a different route, and the later the mount the harder it is. A charact
 | Roseheart Unicorn | Valentine Briarheart daily quest in Rimeveil Glacier | 1 | Guaranteed ownership on claim by each eligible real player; five fighters, highest party level. |
 | Red-nosed Reindeer | Christmas Grinch daily hunt in Rimeveil Glacier | 1 | One independent 5% roll per eligible real player per Stockholm day; five fighters, highest party level. |
 | Nightmare Steed | Halloween Hollow Rider daily hunt in Gloamfen | 1 | One independent 1% roll per eligible real player per Stockholm day; five fighters, average level rounded up. |
-| Horse | Shop: Stable-hand Greta, Skaldholm (unchanged) | 50 | 500,000 gold |
+| Horse | Shop: Stable-hand Greta, Skaldholm (unchanged) | 50 | 500,000 copper (50 gold) |
 | Raptor | Quest chain in the Tanglecrown: *The Banyan Run*, four steps given by Mara Vines (Canopy tracker) | 75 | No gold fee. Kill 25 canopy monsters, bring 10 of the zone's materials, win one elite fight and escort a hatchling back. One-time, class-neutral. |
-| Lizard | Shop: a new Dune-wrangler NPC in the Lapis Erg hub (beside Basma Silk) | 80 | 160,000 gold (the price of a level-80 Hero Pack, the same wealth tier as the horse at its level) |
+| Lizard | Shop: a new Dune-wrangler NPC in the Lapis Erg hub (beside Basma Silk) | 80 | 160,000 copper (16 gold) (the price of a level-80 Hero Pack, the same wealth tier as the horse at its level) |
 | Sabertooth | Rare drop: a **Sabertooth Whistle** from the Rimesaber, the level-97 elite of the Yearwheel's winter court | 95 | 4% per Rimesaber kill; a 5.5-million-HP elite, so it needs a group and a long fight |
 | Gryphon | Dungeon reward, the hardest: a **Gryphon Egg** from the final boss of the Thunderheart Gate (level 95), hatched by Oren Highwind, Summit windseer, in the Cairnspine | 95 | 3% per final-boss kill, plus 250,000 gold to hatch. At 3% about 33 clears are expected. |
 

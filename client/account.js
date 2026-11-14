@@ -109,7 +109,7 @@
           // The bank is deleted with the character, so say what is in it before the second click.
           const banked = c.bank?.items || c.bank?.gold;
           armed = setTimeout(() => { armed = 0; del.textContent = 'Delete'; if (banked) say('chars-msg', ''); }, banked ? 8000 : 4000); del.textContent = 'Really?';
-          if (banked) say('chars-msg', `Deleting ${c.look.name} also deletes the bank. Items in it: ${c.bank.items.toLocaleString()}. Gold in it: ${c.bank.gold.toLocaleString()}. Press Really? to confirm.`);
+          if (banked) say('chars-msg', `Deleting ${c.look.name} also deletes the bank. Items in it: ${c.bank.items.toLocaleString()}. Money in it: ${Money.text(c.bank.gold)}. Press Really? to confirm.`);
           return;
         }
         clearTimeout(armed); del.disabled = true;

@@ -7,7 +7,7 @@
   const key = row => `${row.item}:${row.copy || 0}`;
   const price = row => Math.min(4294967295, Math.floor((row.base * row.quantity * (100 + (data?.goldPercent || 0)) + 50) / 100));
   const rarity = row => row.rarity || row.gear?.[0]?.rarity || Inventory.definition(row.item)?.rarity;
-  const isJunk = row => !window.Quests?.needsMaterial(row.item) && row.rarity === 'common' && (!!row.gear || Inventory.definition(row.item)?.kind === 'material');
+  const isJunk = row => !window.Quests?.needsMaterial(row.item) && row.rarity === 'common' && !Inventory.definition(row.item)?.starter && (!!row.gear || Inventory.definition(row.item)?.kind === 'material');   // starter gear sells, but is never swept up as junk
   let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null, lastNotice = '';
   const bag = document.querySelector('.bag-window'), bagHome = bag.parentElement, bagNext = bag.nextSibling;
   const dock = make('div'); dock.id = 'merchant-bags'; dock.hidden = true; $('npc-dialogue').append(dock);
@@ -55,7 +55,7 @@
     }
     const yes = button('Yes, sell', submit), cancel = button('Cancel', () => { closeWarning(); $('sell-junk')?.focus(); });
     yes.id = 'sell-yes'; cancel.id = 'sell-cancel';
-    warning.append(list, make('p', `You receive: ${[...basket.values()].reduce((sum, row) => sum + price(row), 0)} gold`), cancel, yes);
+    warning.append(list, make('p', `You receive: ${Money.text([...basket.values()].reduce((sum, row) => sum + price(row), 0))}`), cancel, yes);
     warning.addEventListener('cancel', event => { event.preventDefault(); closeWarning(); $('sell-junk')?.focus(); });
     warning.addEventListener('keydown', event => event.stopPropagation());
     $('stage').append(warning); warning.showModal();
@@ -125,13 +125,13 @@
         b.className = 'merchant-slot'; b.dataset.item = item.id; b.dataset.rarity = row ? rarity(row) : item.rarity;
         if (offer) b.dataset.offer = offer.id;
         const glyph = make('span','','merchant-item-icon'); glyph.innerHTML = Inventory.icon(item, undefined, row?.gear?.find(g => Inventory.conditionState(g) === 'broken'));
-        const detail = make('span','','merchant-item-detail'); detail.append(make('b',item.name),make('small',`${cost} gold${row?.quantity > 1 ? ` ×${row.quantity}` : ''}`));
+        const detail = make('span','','merchant-item-detail'); { const price = make('small'); Money.set(price, cost); if (row?.quantity > 1) price.append(` ×${row.quantity}`); detail.append(make('b',item.name), price); }
         if (offer?.bag) detail.append(make('small', `+${item.bagSlots} slots · Lv ${item.requiredLevel}`));
         if (offer?.mount) detail.append(make('small', offer.label));
         const fitted = packet.bags || [], growsBag = !offer?.bag || fitted.length < 4 || fitted.some(id => (Inventory.definition(id)?.bagSlots || 0) < item.bagSlots);
         const ownsMount = offer?.mount && Field.hero.mounts?.includes(offer.mount);
         b.append(glyph, detail); b.disabled = pending || (data?.gold ?? packet.gold) < cost || (!row && ((packet.level || 1) < (item.requiredLevel || 1) || !growsBag || ownsMount || (offer?.needs && !Inventory.quantity(offer.needs))));
-        Inventory.attachTooltip(b, () => item, undefined, row ? () => ({copies:row.gear || [],count:row.quantity,in:'Buyback',hint:`${row.paid} gold`}) : undefined);
+        Inventory.attachTooltip(b, () => item, undefined, row ? () => ({copies:row.gear || [],count:row.quantity,in:'Buyback',hint:Money.text(row.paid)}) : undefined);
         grid.append(b);
       }
       while (grid.childElementCount < 10) grid.append(make('div','','merchant-empty'));
@@ -144,7 +144,7 @@
     if ((npc.offers || []).some(o=>o.id==='repair') && packet.repairQuote) {
       const repair = utility('Repair one piece',anvil,()=>{tab='repair';draw();}); repair.dataset.action='repair-one';
       const all = utility('Repair All Items',anvil,()=>{if(send({type:'interact',offer:'repair_all'}))draw();}); all.dataset.action='repair-all';
-      const total=packet.repairQuote.reduce((sum,[,cost])=>sum+cost,0); all.title=`Repair All Items · ${total} gold`; all.disabled=pending||!total||packet.gold<total; tools.append(repair,all);
+      const total=packet.repairQuote.reduce((sum,[,cost])=>sum+cost,0); all.title=`Repair All Items · ${Money.text(total)}`; all.disabled=pending||!total||packet.gold<total; tools.append(repair,all);
     }
     const junk = utility('Sell all junk',pouch,()=>{
       basket.clear(); for(const row of data?.available || []) {if(isJunk(row))basket.set(key(row),{...row});} confirm();

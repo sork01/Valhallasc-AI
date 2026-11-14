@@ -73,7 +73,7 @@
     const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
     status(`${away || window.Field?.areaName || 'Greenmeadow'} · ${packet.online} online`, true);
     const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
-    if (character) { window.GM?.onSelf(character); window.Mail?.onUnread(character.mailUnread || 0); }
+    if (character) { window.GM?.onSelf(character); window.Mail?.onUnread(character.mailUnread || 0, character.mailTotal); }
     if (character) window.Trade?.onSnapshot(character);
     if (character) window.Shop?.onSnapshot(character);
     if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
@@ -131,7 +131,7 @@
           callbacks.onWelcome?.(packet);
           window.DpsMeter?.update(packet.snapshot.damageMeter);
           window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
-          window.Mail?.onUnread(character?.mailUnread || 0);
+          window.Mail?.onUnread(character?.mailUnread || 0, character?.mailTotal);
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
           const L = (a, all) => Keys.label(a, all), T = window.Locale?.translate || (x => x), word = text => T(text).toLowerCase();
@@ -162,7 +162,7 @@
         case 'inspect': window.Inspect?.onPacket(packet); break;
         case 'shop': serviceError(packet); window.Shop?.onPacket(packet); break;
         case 'mail': serviceError(packet); window.Mail?.onPacket(packet); break;
-        case 'mail_unread': window.Mail?.onUnread(packet.count); break;
+        case 'mail_unread': window.Mail?.onUnread(packet.count, packet.total); break;
         case 'bank': serviceError(packet); window.Bank?.onPacket(packet); break;
         case 'sign': window.BossSign?.onPacket(packet); break;
         case 'achievements': window.Achievements?.receive(packet); break;

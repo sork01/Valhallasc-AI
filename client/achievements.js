@@ -87,7 +87,6 @@
     if (!window.Online?.connected) return;
     window.CharacterPane?.open?.('achievements');
   }
-  $('p-achievements')?.addEventListener('click', open);
   $('achievements-filter').addEventListener('change', () => { $('achievement-list').scrollTop = 0; render(); });
   $('achievement-categories').addEventListener('click', event => {
     const button = event.target.closest('button'); if (!button) return;

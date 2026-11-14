@@ -19,32 +19,32 @@ const { castSkill } = require('../scripts/testing/tools.cjs');
     assert.ok(ranked.cast, 'ranked Arcane Ward casts through the same ID');
     await world.waitFor(() => world.summary('RankMage').buffs.some(b => b.id === 'arcaneward'), 3000, 'ranked ward buff');
 
-    await world.debug('RankMage', { op: 'set_level', level: 21 });
+    await world.debug('RankMage', { op: 'set_level', level: 25 });   // Blink is learned at 24 (Chain Lightning took 20)
     const baseBlink = await castSkill(world, 'RankMage', { skill: 'blink', resetCooldown: true });
     assert.ok(baseBlink.cast && baseBlink.cooldownLeft > 0, JSON.stringify(baseBlink));
-    const blinkAdvance = await world.debug('RankMage', { op: 'set_level', level: 22 });
+    const blinkAdvance = await world.debug('RankMage', { op: 'set_level', level: 26 });
     assert.ok(blinkAdvance.result.unlocked.includes('blink'));
     const rankedBlink = await castSkill(world, 'RankMage', { skill: 'blink', resetCooldown: true });
     assert.ok(rankedBlink.cast && rankedBlink.cooldownLeft < baseBlink.cooldownLeft - 0.8,
       'rank 2 reduces the authoritative cooldown');
 
-    await world.debug('RankMage', { op: 'set_level', level: 49 });
-    const thirdAdvance = await world.debug('RankMage', { op: 'set_level', level: 50 });
-    assert.ok(thirdAdvance.result.unlocked.includes('blink') && thirdAdvance.result.unlocked.includes('mage_milestone_50'));
+    await world.debug('RankMage', { op: 'set_level', level: 51 });
+    const thirdAdvance = await world.debug('RankMage', { op: 'set_level', level: 52 });
+    assert.ok(thirdAdvance.result.unlocked.includes('blink'));
     const thirdBlink = await castSkill(world, 'RankMage', { skill: 'blink', resetCooldown: true });
     assert.ok(thirdBlink.cast && thirdBlink.cooldownLeft < rankedBlink.cooldownLeft - 0.8,
       'rank 3 reduces the authoritative cooldown further');
 
-    await world.debug('RankMage', { op: 'set_level', level: 69 });
-    const fourthAdvance = await world.debug('RankMage', { op: 'set_level', level: 70 });
-    assert.ok(fourthAdvance.result.unlocked.includes('blink') && fourthAdvance.result.unlocked.includes('mage_milestone_70'));
+    await world.debug('RankMage', { op: 'set_level', level: 71 });
+    const fourthAdvance = await world.debug('RankMage', { op: 'set_level', level: 72 });
+    assert.ok(fourthAdvance.result.unlocked.includes('blink'));
     const fourthBlink = await castSkill(world, 'RankMage', { skill: 'blink', resetCooldown: true });
     assert.ok(fourthBlink.cast && fourthBlink.cooldownLeft < thirdBlink.cooldownLeft - 0.5,
       'rank 4 reduces the authoritative cooldown further');
 
-    await world.debug('RankMage', { op: 'set_level', level: 89 });
-    const fifthAdvance = await world.debug('RankMage', { op: 'set_level', level: 90 });
-    assert.ok(fifthAdvance.result.unlocked.includes('blink') && fifthAdvance.result.unlocked.includes('mage_milestone_90'));
+    await world.debug('RankMage', { op: 'set_level', level: 91 });
+    const fifthAdvance = await world.debug('RankMage', { op: 'set_level', level: 92 });
+    assert.ok(fifthAdvance.result.unlocked.includes('blink'));
     const fifthBlink = await castSkill(world, 'RankMage', { skill: 'blink', resetCooldown: true });
     assert.ok(fifthBlink.cast && fifthBlink.cooldownLeft < fourthBlink.cooldownLeft - 0.5,
       'rank 5 reduces the authoritative cooldown further');

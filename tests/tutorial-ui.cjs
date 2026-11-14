@@ -166,7 +166,8 @@ async function run() {
       // Verify persistence across page reload (all 6 milestones saved on server)
       await resumeAfterReload(page);
       const reloadedDone = await page.evaluate(() => Tutorial.state().done);
-      check(reloadedDone.length === 6, `all 6 milestones persisted across reload (${reloadedDone.join(',')})`);
+      const first = ['first_quest', 'levelup_stats', 'equip_gear', 'new_skill', 'consumables', 'merchant'];
+      check(first.every(id => reloadedDone.includes(id)), `all 6 first milestones persisted across reload (${reloadedDone.join(',')})`);
 
       // Reset / Replay tutorial from Settings
       await page.keyboard.press('Escape');

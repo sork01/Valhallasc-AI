@@ -40,8 +40,8 @@ const suite = {
         await page.evaluate(() => TouchControls.update());
         check(await page.locator('#touch-skills .touch-skill:visible').count() === 0, 'reloaded locked custom choices stay hidden');
         check(await page.evaluate(() => TouchControls.assign(2, 'twinbolt') && Prefs.touchSkills.mage.join(',') === 'fireball,arcaneward,twinbolt,blink'), 'editing another slot preserves locked custom choices');
-        await debug(page, { op: 'set_level', level: 20 });
-        await page.waitForFunction(() => Field.hero.level === 20);
+        await debug(page, { op: 'set_level', level: 24 });   // Blink is learned at 24 now (Chain Lightning took level 20)
+        await page.waitForFunction(() => Field.hero.level === 24);
         await page.evaluate(() => TouchControls.update());
         check(await page.locator('#touch-skills .touch-skill:visible').evaluateAll(nodes => nodes.map(n => n.dataset.skill).join(',') === 'fireball,arcaneward,twinbolt,blink'), 'custom skills appear automatically when earned');
         check(await page.evaluate(() => TouchControls.assign(0, null)), 'an earned slot can be deliberately emptied');

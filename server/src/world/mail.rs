@@ -49,10 +49,10 @@ impl World {
         for (peer_session, p) in self.players.iter().filter(|(peer_session, p)| {
             (**peer_session == session || notify_others) && p.merc.is_none() && p.ambient.is_none()
         }) {
-            if let Ok(count) = self.store.mail_unread(&p.character.id) {
-                let previous = self.mail_unread.insert(p.character.id.clone(), count);
-                if previous != Some(count) || *peer_session == session {
-                    let _ = p.peer.try_send(json!({"type":"mail_unread","count":count}));
+            if let Ok(counts) = self.store.mail_counts(&p.character.id) {
+                let previous = self.mail_unread.insert(p.character.id.clone(), counts);
+                if previous != Some(counts) || *peer_session == session {
+                    let _ = p.peer.try_send(json!({"type":"mail_unread","count":counts.0,"total":counts.1}));
                 }
             }
         }

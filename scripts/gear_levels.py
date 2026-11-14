@@ -158,7 +158,7 @@ def ordered(i):
 def finish(i, level, rarity):
     i['rarity'] = rarity
     i['requiredLevel'] = level
-    i['sell'] = 0 if i.get('starter') else round(SELL_BASE[rarity] * LEVEL_FACTOR[level])
+    i['sell'] = round(SELL_BASE[rarity] * LEVEL_FACTOR[level])   # starters too (SELL-STARTER-GEAR): the level 1 common price
     i['attack'], i['defense'] = budget(i['kind'], i.get('class'), rarity, level)
     i.pop('bonusStats', None)
     if bonus := bonus_stats(i):

@@ -70,8 +70,8 @@ let checks=0;const ok=(v,label)=>{assert.ok(v,label);checks++;};
    ok(fit.grip,`${label}: normal resize grip`);
    await page.screenshot({path:path.join(w.runDir,`mail-${label}-${lang}.png`)});
    await page.locator('#mail-close').click();await page.waitForFunction(()=>Field.canAct);checks++;
-   // Actual World Menu button has unread marker and opens a nearby mailbox.
-   if(label==='phone')await page.locator('#touch-actions [data-action="menu"]').click();else await page.keyboard.press('Escape');await page.locator('#mail-open').click();await page.locator('#mail-panel').waitFor({state:'visible'});
+   // The minimap mail icon has the unread marker and opens a nearby mailbox.
+   await page.locator('#mail-open').click();await page.locator('#mail-panel').waitFor({state:'visible'});
    ok(await page.locator('#pause').isHidden(),`${label}: menu closes behind mail`);
    await debug({op:'teleport',zone:0,x:box.x-12,y:box.y});await page.locator('#mail-panel').waitFor({state:'hidden'});checks++;
    ok(errors.length===0,`${label}: browser errors ${errors.join('; ')}`);

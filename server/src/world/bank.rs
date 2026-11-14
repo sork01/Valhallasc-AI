@@ -71,9 +71,9 @@ impl World {
                 .map(|()| format!("Took {quantity} {} from the bank.", name(&item))),
             BankRequest::Gold { deposit, amount } => next.bank_gold(deposit, amount).map(|()| {
                 if deposit {
-                    format!("Stored {amount} gold.")
+                    format!("Stored {}.", money_text(amount))
                 } else {
-                    format!("Took {amount} gold.")
+                    format!("Took {}.", money_text(amount))
                 }
             }),
             BankRequest::Expand => next

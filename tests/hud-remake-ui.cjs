@@ -44,7 +44,7 @@ const errors = [];
   check(await page.locator('#inventory-open').isVisible() && await page.locator('#social-open').isVisible(), 'Bags and Social stay');
   await page.keyboard.press('e');
   check(await page.locator('#equipment').isVisible(), 'E still opens the character window');
-  check(await page.locator('#bag-gold').textContent().then(t => /^\d+ gold$/.test(t)), 'Gold is shown in the bags window');
+  check(await page.locator('#bag-gold').textContent().then(t => /^[\d,]+ (gold|silver|copper)/.test(t.trim())), 'Money is shown in the bags window');
   await page.keyboard.press('Escape');
 
   // --- zone and online count under the minimap ---

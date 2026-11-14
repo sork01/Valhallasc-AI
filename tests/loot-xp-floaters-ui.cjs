@@ -30,7 +30,7 @@ async function call(name, args = {}) {
     requestAnimationFrame(stepFrame);
     const proto = CanvasRenderingContext2D.prototype, fill = proto.fillText;
     proto.fillText = function (text, x, y) {
-      if (/Lilita/.test(this.font) && /^(?:\+\d+\s|\+[\d,.]+(?:[kM])?\s(?:gold|XP))/.test(String(text))) {
+      if (/Lilita/.test(this.font) && /^(?:\+\d+\s|\+[\d,.]+(?:[kM])?\s(?:gold|XP)|\+[\d,]+[gsc])/.test(String(text))) {
         const w = this.measureText(text).width, h = parseFloat(this.font);
         window.__draws.push({ frame: window.__frame, text: String(text), x, y, w, h, color: String(this.fillStyle), alpha: this.globalAlpha });
       }
@@ -64,7 +64,7 @@ async function call(name, args = {}) {
   });
   await page.waitForFunction(() => {
     const texts = new Set(window.__draws.map(d => d.text));
-    return texts.has('+1 Golden Test Sword') && texts.has('+42 gold') && texts.has('+150 XP');
+    return texts.has('+1 Golden Test Sword') && texts.has('+42c') && texts.has('+150 XP');
   }, null, { timeout: 10000 });
   await page.waitForTimeout(900);
 
@@ -84,7 +84,7 @@ async function call(name, args = {}) {
       }
     }
     const xpDraw = window.__draws.find(d => d.text === '+150 XP');
-    const goldDraw = window.__draws.find(d => d.text === '+42 gold');
+    const goldDraw = window.__draws.find(d => d.text === '+42c');
     return { total: window.__draws.length, overlaps, xpColor: xpDraw?.color, goldColor: goldDraw?.color };
   });
   assert.equal(report.overlaps.length, 0, `expected zero frame overlaps, got ${JSON.stringify(report.overlaps.slice(0, 5))}`);

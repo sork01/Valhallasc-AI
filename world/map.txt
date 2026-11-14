@@ -63899,9 +63899,10 @@
       "objectives": [
         {
           "kind": "bring",
-          "target": "slime_gel",
+          "target": "qi_fields_flour",
           "label": "Bring slime gel",
-          "count": 4
+          "count": 4,
+          "dropChance": 0.36
         }
       ],
       "level": 1,
@@ -64074,9 +64075,10 @@
       "objectives": [
         {
           "kind": "bring",
-          "target": "blue_gel",
+          "target": "qi_salt_nets",
           "label": "Bring blue slime gel",
-          "count": 5
+          "count": 5,
+          "dropChance": 0.35
         }
       ],
       "level": 2,
@@ -131640,9 +131642,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ember_core",
+              "target": "qi_anvil_coal",
               "label": "Bring ember cores",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.73
             }
           ],
           "level": 5,
@@ -131745,9 +131748,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ash_veil",
+              "target": "qi_ford_veils",
               "label": "Bring ash veils",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.36
             }
           ],
           "level": 8,
@@ -131764,9 +131768,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "basalt_heart",
+              "target": "qi_ford_stones",
               "label": "Bring basalt hearts",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.43
             }
           ],
           "level": 9,
@@ -131867,9 +131872,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "magma_fang",
+              "target": "qi_hearth_fangs",
               "label": "Bring magma fangs",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.46
             }
           ],
           "level": 7,
@@ -206957,9 +206963,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "frost_pelt",
+              "target": "qi_rime_dw_pelts",
               "label": "Bring frost pelts",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.37
             }
           ],
           "level": 11,
@@ -207022,9 +207029,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "rime_shell",
+              "target": "qi_rime_dw_shells",
               "label": "Bring rime shells",
-              "count": 6
+              "count": 6,
+              "dropChance": 0.4
             }
           ],
           "level": 12,
@@ -207060,9 +207068,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "yeti_horn",
+              "target": "qi_rime_sw_horns",
               "label": "Bring yeti horns",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.45
             }
           ],
           "level": 13,
@@ -207146,9 +207155,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "wyrm_scale",
+              "target": "qi_rime_pk_scales",
               "label": "Bring wyrm scales",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.79
             }
           ],
           "level": 14,
@@ -207270,9 +207280,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "rime_shell",
+              "target": "qi_rime_ice_salve",
               "label": "Bring rime shells",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.69
             }
           ],
           "level": 12,
@@ -290370,9 +290381,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "toad_gland",
+              "target": "qi_fen_rh_gland",
               "label": "Bring toad glands",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.79
             }
           ],
           "level": 15,
@@ -290450,9 +290462,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "croc_hide",
+              "target": "qi_fen_dk_hides",
               "label": "Bring crocodile hides",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.67
             }
           ],
           "level": 17,
@@ -290515,9 +290528,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "drowned_gauntlet",
+              "target": "qi_fen_dk_salvage",
               "label": "Bring drowned gauntlets",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.38
             }
           ],
           "level": 19,
@@ -290560,9 +290574,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "drowned_gauntlet",
+              "target": "qi_fen_gr_gauntlets",
               "label": "Bring drowned gauntlets",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.32
             }
           ],
           "level": 18,
@@ -290605,9 +290620,10 @@
             },
             {
               "kind": "bring",
-              "target": "hydra_fang",
+              "target": "qi_fen_gr_fangs",
               "label": "Bring hydra fangs",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.61
             }
           ],
           "level": 20,
@@ -316833,15 +316849,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "slime_gel",
+              "target": "qi_city_gel",
               "label": "Bring Slime Gel",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.5
             },
             {
               "kind": "bring",
-              "target": "blue_gel",
+              "target": "qi_city_gel_2",
               "label": "Bring Blue Slime Gel",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.35
             }
           ],
           "level": 12,
@@ -316859,15 +316877,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ember_core",
+              "target": "qi_city_forge",
               "label": "Bring Ember Cores",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.62
             },
             {
               "kind": "bring",
-              "target": "magma_fang",
+              "target": "qi_city_forge_2",
               "label": "Bring Magma Fangs",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.67
             }
           ],
           "level": 13,
@@ -316884,15 +316904,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "frost_pelt",
+              "target": "qi_city_pelts",
               "label": "Bring Frost Pelts",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.39
             },
             {
               "kind": "bring",
-              "target": "yeti_horn",
+              "target": "qi_city_pelts_2",
               "label": "Bring Yeti Horns",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.34
             }
           ],
           "level": 14,
@@ -316947,15 +316969,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "toad_gland",
+              "target": "qi_city_marsh",
               "label": "Bring Fen Toad Glands",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.55
             },
             {
               "kind": "bring",
-              "target": "croc_hide",
+              "target": "qi_city_marsh_2",
               "label": "Bring Mire Crocodile Hides",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.78
             }
           ],
           "level": 17,
@@ -316978,9 +317002,10 @@
             },
             {
               "kind": "bring",
-              "target": "drowned_gauntlet",
+              "target": "qi_city_archive",
               "label": "Bring Drowned Gauntlets",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.67
             }
           ],
           "level": 18,
@@ -316997,21 +317022,24 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "hydra_fang",
+              "target": "qi_city_stone",
               "label": "Bring Hydra Fangs",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.49
             },
             {
               "kind": "bring",
-              "target": "wyrm_scale",
+              "target": "qi_city_stone_2",
               "label": "Bring Wyrm Scales",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.55
             },
             {
               "kind": "bring",
-              "target": "basalt_heart",
+              "target": "qi_city_stone_3",
               "label": "Bring Basalt Hearts",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.75
             }
           ],
           "level": 20,
@@ -317028,27 +317056,31 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ironhide_shell",
+              "target": "qi_city_tribute",
               "label": "Bring Ironhide Shells",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.61
             },
             {
               "kind": "bring",
-              "target": "ash_veil",
+              "target": "qi_city_tribute_2",
               "label": "Bring Ash Veils",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.4
             },
             {
               "kind": "bring",
-              "target": "rime_shell",
+              "target": "qi_city_tribute_3",
               "label": "Bring Rime Shells",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.67
             },
             {
               "kind": "bring",
-              "target": "croc_hide",
+              "target": "qi_city_tribute_4",
               "label": "Bring Mire Crocodile Hides",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.57
             }
           ],
           "level": 20,
@@ -317066,15 +317098,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "magma_fang",
+              "target": "qi_city_order",
               "label": "Bring Magma Fangs",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.32
             },
             {
               "kind": "bring",
-              "target": "rime_shell",
+              "target": "qi_city_order_2",
               "label": "Bring Rime Shells",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.37
             }
           ],
           "level": 14,
@@ -435111,9 +435145,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "rotfang_tusk",
+              "target": "qi_wyrd_tusks",
               "label": "Bring Rotfang Tusks",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.6
             }
           ],
           "level": 21,
@@ -435175,9 +435210,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "gallows_feather",
+              "target": "qi_wyrd_feathers",
               "label": "Bring Gallows Feathers",
-              "count": 10
+              "count": 10,
+              "dropChance": 0.61
             }
           ],
           "level": 23,
@@ -435382,9 +435418,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "mosshide_scrap",
+              "target": "qi_wyrd_scrap",
               "label": "Bring Mosshide Scrap",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.43
             }
           ],
           "level": 26,
@@ -435471,9 +435508,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "fate_thread",
+              "target": "qi_wyrd_fate",
               "label": "Bring Frayed Fate Threads",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.64
             }
           ],
           "level": 28,
@@ -435869,9 +435907,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "gallows_feather",
+              "target": "qi_wyrd_gf_quills",
               "label": "Bring Gallows Feathers",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.37
             }
           ],
           "level": 23,
@@ -435984,9 +436023,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "stormram_horn",
+              "target": "qi_wyrd_rw_horns",
               "label": "Bring Stormram Horns",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.51
             }
           ],
           "level": 28,
@@ -436068,9 +436108,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "fate_thread",
+              "target": "qi_wyrd_hm_threads",
               "label": "Bring Frayed Fate Threads",
-              "count": 6
+              "count": 6,
+              "dropChance": 0.47
             }
           ],
           "level": 29,
@@ -486694,9 +486735,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "gale_fang",
+              "target": "qi_sky_fangs",
               "label": "Bring Gale Fangs",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.73
             }
           ],
           "level": 30,
@@ -486777,9 +486819,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "prism_shard",
+              "target": "qi_sky_shards",
               "label": "Bring Prism Shards",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.57
             }
           ],
           "level": 32,
@@ -486840,9 +486883,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "stormray_wing",
+              "target": "qi_sky_wings",
               "label": "Bring Stormray Wings",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.3
             }
           ],
           "level": 33,
@@ -486903,9 +486947,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "rune_token",
+              "target": "qi_sky_tokens",
               "label": "Bring Rune Tokens",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.61
             }
           ],
           "level": 34,
@@ -486986,9 +487031,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "thunderroc_quill",
+              "target": "qi_sky_quills",
               "label": "Bring Thunderroc Quills",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.73
             }
           ],
           "level": 35,
@@ -487363,9 +487409,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "gale_fang",
+              "target": "qi_sky_wr_pelts",
               "label": "Bring Gale Fangs",
-              "count": 6
+              "count": 6,
+              "dropChance": 0.38
             }
           ],
           "level": 30,
@@ -487442,9 +487489,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "stormray_wing",
+              "target": "qi_sky_ss_wings",
               "label": "Bring Stormray Wings",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.76
             }
           ],
           "level": 33,
@@ -487553,9 +487601,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "thunderroc_quill",
+              "target": "qi_sky_el_quills",
               "label": "Bring Thunderroc Quills",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.56
             }
           ],
           "level": 35,
@@ -517329,9 +517378,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "drowned_coin",
+              "target": "qi_deep_coins",
               "label": "Bring Drowned Coins",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.42
             }
           ],
           "level": 35,
@@ -517412,9 +517462,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "angler_lure",
+              "target": "qi_deep_lures",
               "label": "Bring Angler Lures",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.78
             }
           ],
           "level": 37,
@@ -517450,9 +517501,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "moray_tooth",
+              "target": "qi_deep_teeth",
               "label": "Bring Moray Teeth",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.71
             }
           ],
           "level": 37,
@@ -517555,9 +517607,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "siren_pearl",
+              "target": "qi_deep_pearls",
               "label": "Bring Siren Pearls",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.41
             }
           ],
           "level": 39,
@@ -517618,9 +517671,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "shellback_plate",
+              "target": "qi_deep_plates",
               "label": "Bring Shellback Plates",
-              "count": 8
+              "count": 8,
+              "dropChance": 0.37
             }
           ],
           "level": 40,
@@ -518038,9 +518092,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "moray_tooth",
+              "target": "qi_deep_lr_teeth",
               "label": "Bring Moray Teeth",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.44
             }
           ],
           "level": 37,
@@ -518122,9 +518177,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "shellback_plate",
+              "target": "qi_deep_gw_plates",
               "label": "Bring Shellback Plates",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.78
             }
           ],
           "level": 39,
@@ -518212,9 +518268,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "drowned_coin",
+              "target": "qi_deep_dw_coins",
               "label": "Bring Drowned Coins",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.45
             }
           ],
           "level": 36,
@@ -539761,9 +539818,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "siren_pearl",
+              "target": "qi_nacre_lamps",
               "label": "Bring Siren Pearls",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.66
             }
           ],
           "level": 38,
@@ -539780,9 +539838,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "shellback_plate",
+              "target": "qi_nacre_smithwork",
               "label": "Bring Shellback Plates",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.8
             }
           ],
           "level": 39,
@@ -539825,9 +539884,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "drowned_coin",
+              "target": "qi_nacre_supplies",
               "label": "Bring Drowned Coins",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.42
             }
           ],
           "level": 35,
@@ -644740,9 +644800,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "voidwing",
+              "target": "qi_astral_garden",
               "label": "Bring Void Wings",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.4
             }
           ],
           "level": 40,
@@ -644801,9 +644862,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "astral_scale",
+              "target": "qi_astral_lens",
               "label": "Bring Astral Scales",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.75
             }
           ],
           "level": 41,
@@ -645600,9 +645662,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "voidwing",
+              "target": "qi_astral_cr_lanterns",
               "label": "Bring Void Wings",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.66
             }
           ],
           "level": 41,
@@ -645696,9 +645759,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "orbit_shell",
+              "target": "qi_astral_cw_shells",
               "label": "Bring Orbit Shells",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.54
             }
           ],
           "level": 43,
@@ -645781,9 +645845,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "meteor_core",
+              "target": "qi_astral_fh_cores",
               "label": "Bring Meteor Cores",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.66
             }
           ],
           "level": 45,
@@ -691287,9 +691352,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "harrier_pinions",
+              "target": "qi_prism_wings",
               "count": 5,
-              "label": "Bring Harrier Pinions"
+              "label": "Bring Harrier Pinions",
+              "dropChance": 0.44
             }
           ],
           "level": 47,
@@ -691870,9 +691936,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "shard_carapace",
+              "target": "qi_prism_mf_lenses",
               "label": "Bring Shard Carapaces",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.6
             }
           ],
           "level": 46,
@@ -691954,9 +692021,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "prism_heart",
+              "target": "qi_prism_ws_hearts",
               "label": "Bring Prism Hearts",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.76
             }
           ],
           "level": 48,
@@ -692044,9 +692112,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "mirage_fang",
+              "target": "qi_prism_cf_fangs",
               "label": "Bring Mirage Fangs",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.62
             }
           ],
           "level": 47,
@@ -744642,9 +744711,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "gearling_tooth",
+              "target": "qi_orrery_teeth",
               "count": 5,
-              "label": "Bring Gearling Teeth"
+              "label": "Bring Gearling Teeth",
+              "dropChance": 0.53
             }
           ],
           "level": 51,
@@ -745227,9 +745297,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "mantis_blade",
+              "target": "qi_orrery_bc_blades",
               "label": "Bring Bronze Mantis Blades",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.43
             }
           ],
           "level": 51,
@@ -745317,9 +745388,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "chronoguard_plate",
+              "target": "qi_orrery_cn_plates",
               "label": "Bring Chronoguard Plates",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.32
             }
           ],
           "level": 53,
@@ -745356,9 +745428,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "seer_lens",
+              "target": "qi_orrery_cn_lens",
               "label": "Bring Orbit Seer Lenses",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.34
             }
           ],
           "level": 54,
@@ -745401,9 +745474,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "gearling_tooth",
+              "target": "qi_orrery_sw_glass",
               "label": "Bring Gearling Teeth",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.39
             }
           ],
           "level": 52,
@@ -803938,9 +804012,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "glowcap",
+              "target": "qi_moonspore_caps",
               "count": 5,
-              "label": "Bring Glowcaps"
+              "label": "Bring Glowcaps",
+              "dropChance": 0.59
             }
           ],
           "level": 55,
@@ -803999,9 +804074,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "moon_silk",
+              "target": "qi_moonspore_silk",
               "count": 5,
-              "label": "Bring Moon Silk"
+              "label": "Bring Moon Silk",
+              "dropChance": 0.33
             }
           ],
           "level": 56,
@@ -812059,9 +812135,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "moon_silk",
+              "target": "qi_asterion_lamps",
               "label": "Bring Moon Silk",
-              "count": 6
+              "count": 6,
+              "dropChance": 0.48
             }
           ],
           "level": 60,
@@ -812079,15 +812156,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "glowcap",
+              "target": "qi_asterion_roots",
               "label": "Bring Glowcaps",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.52
             },
             {
               "kind": "bring",
-              "target": "root_heart",
+              "target": "qi_asterion_roots_2",
               "label": "Bring Rootlurker Heartwood",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.4
             }
           ],
           "level": 60,
@@ -812105,15 +812184,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "wraith_lantern",
+              "target": "qi_asterion_charts",
               "label": "Bring Lantern Wraith Embers",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.45
             },
             {
               "kind": "bring",
-              "target": "widow_silk",
+              "target": "qi_asterion_charts_2",
               "label": "Bring Widow Silk",
-              "count": 2
+              "count": 2,
+              "dropChance": 0.3
             }
           ],
           "level": 60,
@@ -812171,15 +812252,17 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "moon_silk",
+              "target": "qi_asterion_market",
               "label": "Bring Moon Silk",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.58
             },
             {
               "kind": "bring",
-              "target": "glowcap",
+              "target": "qi_asterion_market_2",
               "label": "Bring Glowcaps",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.37
             }
           ],
           "level": 60,
@@ -881812,9 +881895,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "glassfin",
+              "target": "qi_stormglass_rays",
               "count": 5,
-              "label": "Bring Glassfins"
+              "label": "Bring Glassfins",
+              "dropChance": 0.8
             }
           ],
           "level": 62,
@@ -882431,9 +882515,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "saltclaw_shell",
+              "target": "qi_storm_rs_reeds",
               "label": "Bring Saltclaw Shells",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.66
             }
           ],
           "level": 61,
@@ -882521,9 +882606,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "stormgull_feather",
+              "target": "qi_storm_fp_feathers",
               "label": "Bring Stormgull Feathers",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.58
             }
           ],
           "level": 62,
@@ -882611,9 +882697,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "breaker_core",
+              "target": "qi_storm_bh_cores",
               "label": "Bring Breaker Cores",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.67
             }
           ],
           "level": 63,
@@ -929703,9 +929790,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "sunback_shell",
+              "target": "qi_sun_snails",
               "count": 5,
-              "label": "Bring Sunback Shells"
+              "label": "Bring Sunback Shells",
+              "dropChance": 0.46
             }
           ],
           "level": 66,
@@ -930427,9 +930515,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "fox_tail_tuft",
+              "target": "qi_svs_hw_tufts",
               "label": "Bring Brush Fox Tail Tufts",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.41
             }
           ],
           "level": 67,
@@ -930517,9 +930606,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "hare_whisker",
+              "target": "qi_svs_wf_whiskers",
               "label": "Bring Meadow Hare Whiskers",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.62
             }
           ],
           "level": 68,
@@ -930607,9 +930697,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "sunback_shell",
+              "target": "qi_svs_er_shells",
               "label": "Bring Sunback Shells",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.33
             }
           ],
           "level": 69,
@@ -978455,9 +978546,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "balloon_silk",
+              "target": "qi_ribbon_beetles",
               "count": 5,
-              "label": "Bring Balloon Silk"
+              "label": "Bring Balloon Silk",
+              "dropChance": 0.69
             }
           ],
           "level": 71,
@@ -979178,9 +979270,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ribbon_tail",
+              "target": "qi_ribbon_bp_tails",
               "label": "Bring Ribbon Gecko Tails",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.36
             }
           ],
           "level": 70,
@@ -979268,9 +979361,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "macaw_plume",
+              "target": "qi_ribbon_tp_plumes",
               "label": "Bring Painted Macaw Plumes",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.68
             }
           ],
           "level": 72,
@@ -979358,9 +979452,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "jester_bell",
+              "target": "qi_ribbon_gr_bells",
               "label": "Bring Jesterling Bells",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.8
             }
           ],
           "level": 74,
@@ -1047594,9 +1047689,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "glider_membrane",
+              "target": "qi_tangle_gliders",
               "count": 5,
-              "label": "Bring Glider Membrane"
+              "label": "Bring Glider Membrane",
+              "dropChance": 0.65
             }
           ],
           "level": 76,
@@ -1048206,27 +1048302,31 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "mantis_petals",
+              "target": "qi_tangle_banyan_2",
               "count": 3,
-              "label": "Bring Orchid Mantis Petals"
+              "label": "Bring Orchid Mantis Petals",
+              "dropChance": 0.64
             },
             {
               "kind": "bring",
-              "target": "glider_membrane",
+              "target": "qi_tangle_banyan_2_2",
               "count": 3,
-              "label": "Bring Glider Membrane"
+              "label": "Bring Glider Membrane",
+              "dropChance": 0.77
             },
             {
               "kind": "bring",
-              "target": "caiman_scale",
+              "target": "qi_tangle_banyan_2_3",
               "count": 2,
-              "label": "Bring Blackwater Caiman Scales"
+              "label": "Bring Blackwater Caiman Scales",
+              "dropChance": 0.6
             },
             {
               "kind": "bring",
-              "target": "gorilla_drumskin",
+              "target": "qi_tangle_banyan_2_4",
               "count": 2,
-              "label": "Bring Drum Gorilla Hide"
+              "label": "Bring Drum Gorilla Hide",
+              "dropChance": 0.43
             }
           ],
           "level": 76,
@@ -1048431,9 +1048531,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "mantis_petals",
+              "target": "qi_tangle_rg_petals",
               "label": "Bring Orchid Mantis Petals",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.3
             }
           ],
           "level": 76,
@@ -1048521,9 +1048622,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "caiman_scale",
+              "target": "qi_tangle_sp_scales",
               "label": "Bring Blackwater Caiman Scales",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.72
             }
           ],
           "level": 77,
@@ -1048611,9 +1048713,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "gorilla_drumskin",
+              "target": "qi_tangle_dr_skins",
               "label": "Bring Drum Gorilla Hides",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.64
             }
           ],
           "level": 78,
@@ -1096071,9 +1096174,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "mosslemur_fur",
+              "target": "qi_veyr_gw_fur",
               "label": "Bring Moss Lemur Fur",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.41
             }
           ],
           "level": 81,
@@ -1096161,9 +1096265,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "hornet_amber",
+              "target": "qi_veyr_rs_amber",
               "label": "Bring Lantern Hornet Amber",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.34
             }
           ],
           "level": 82,
@@ -1096251,9 +1096356,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "barkmimic_chip",
+              "target": "qi_veyr_eb_chip",
               "label": "Bring Bark Mimic Chips",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.66
             }
           ],
           "level": 84,
@@ -1131682,9 +1131788,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "sapbeetle_resin",
+              "target": "qi_hw_resin",
               "label": "Bring Sap Beetle Resin",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.37
             }
           ],
           "level": 81,
@@ -1131702,9 +1131809,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "hornet_amber",
+              "target": "qi_hw_panes",
               "label": "Bring Lantern Hornet Amber",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.56
             }
           ],
           "level": 81,
@@ -1131722,9 +1131830,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "mosslemur_fur",
+              "target": "qi_hw_blankets",
               "label": "Bring Moss Lemur Fur",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.71
             }
           ],
           "level": 81,
@@ -1131742,9 +1131851,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "barkmimic_chip",
+              "target": "qi_hw_stools",
               "label": "Bring Bark Mimic Chips",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.39
             }
           ],
           "level": 82,
@@ -1199704,9 +1199814,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "fennec_fur",
+              "target": "qi_lapis_fennecs",
               "count": 5,
-              "label": "Bring Fennec Fur"
+              "label": "Bring Fennec Fur",
+              "dropChance": 0.38
             }
           ],
           "level": 81,
@@ -1200273,9 +1200384,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "scorpion_glass",
+              "target": "qi_entry_astro",
               "label": "Bring Glass Scorpion Shards for the horizon lens",
-              "count": 3
+              "count": 3,
+              "dropChance": 0.47
             },
             {
               "kind": "talk",
@@ -1200448,9 +1200560,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "fennec_fur",
+              "target": "qi_lapis_ww_fur",
               "label": "Bring Dune Fennec Fur",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.32
             }
           ],
           "level": 81,
@@ -1200538,9 +1200651,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "scorpion_glass",
+              "target": "qi_lapis_sp_glass",
               "label": "Bring Glass Scorpion Shards",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.58
             }
           ],
           "level": 82,
@@ -1200628,9 +1200742,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "vulture_quill",
+              "target": "qi_lapis_ew_quill",
               "label": "Bring Sun Vulture Quills",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.46
             }
           ],
           "level": 84,
@@ -1241235,9 +1241350,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "iceotter_pelt",
+              "target": "qi_frostwake_otters",
               "count": 5,
-              "label": "Bring Ice Otter Pelts"
+              "label": "Bring Ice Otter Pelts",
+              "dropChance": 0.52
             }
           ],
           "level": 86,
@@ -1241870,9 +1241986,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "snowhare_fur",
+              "target": "qi_fws_bw_fur",
               "label": "Bring Snow Hare Furs",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.56
             }
           ],
           "level": 86,
@@ -1241960,9 +1242077,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "heron_feather",
+              "target": "qi_fws_au_feathers",
               "label": "Bring Frost Heron Feathers",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.33
             }
           ],
           "level": 88,
@@ -1242050,9 +1242168,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "iceotter_pelt",
+              "target": "qi_fws_rw_pelts",
               "label": "Bring Ice Otter Pelts",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.38
             }
           ],
           "level": 89,
@@ -1289203,9 +1289322,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ibex_horn",
+              "target": "qi_cairn_ibex",
               "count": 5,
-              "label": "Bring Ibex Horns"
+              "label": "Bring Ibex Horns",
+              "dropChance": 0.68
             }
           ],
           "level": 91,
@@ -1289979,9 +1290099,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "slate_raven_feather",
+              "target": "qi_crn_sc_feathers",
               "label": "Bring Slate Raven Feathers",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.41
             }
           ],
           "level": 91,
@@ -1290069,9 +1290190,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ibex_horn",
+              "target": "qi_crn_wb_horn",
               "label": "Bring Stone Ibex Horns",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.76
             }
           ],
           "level": 92,
@@ -1290159,9 +1290281,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "screeferret_pelt",
+              "target": "qi_crn_sg_pelts",
               "label": "Bring Scree Ferret Pelts",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.37
             }
           ],
           "level": 94,
@@ -1441337,9 +1441460,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "stoat_silverfur",
+              "target": "qi_yrs_wm_fur",
               "label": "Bring Silver Stoat Furs",
-              "count": 6
+              "count": 6,
+              "dropChance": 0.65
             }
           ],
           "level": 97,
@@ -1441427,9 +1441551,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "amber_acorn",
+              "target": "qi_yrs_th_acorns",
               "label": "Bring Amber Acorns",
-              "count": 6
+              "count": 6,
+              "dropChance": 0.7
             }
           ],
           "level": 98,
@@ -1441517,9 +1441642,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "sundarter_scale",
+              "target": "qi_yrs_lf_scales",
               "label": "Bring Sundarter Scales",
-              "count": 6
+              "count": 6,
+              "dropChance": 0.41
             }
           ],
           "level": 97,
@@ -1593743,9 +1593869,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ew_ashback_relic",
+              "target": "qi_ew_cw_scales",
               "label": "Bring Ashback Salamander Relics",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.73
             }
           ],
           "level": 96,
@@ -1593833,9 +1593960,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ew_glasswing_relic",
+              "target": "qi_ew_cq_wings",
               "label": "Bring Obsidian Glasswing Relics",
-              "count": 5
+              "count": 5,
+              "dropChance": 0.46
             }
           ],
           "level": 97,
@@ -1593923,9 +1594051,10 @@
           "objectives": [
             {
               "kind": "bring",
-              "target": "ew_cinderhorn_relic",
+              "target": "qi_ew_gh_horns",
               "label": "Bring Cinderhorn Ram Relics",
-              "count": 4
+              "count": 4,
+              "dropChance": 0.42
             }
           ],
           "level": 98,

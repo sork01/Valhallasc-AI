@@ -1,5 +1,7 @@
 # Gear durability and repair
 
+> Money (2026-11): every amount below called "gold" is stored as copper and shown as gold, silver and copper (100 copper = 1 silver, 100 silver = 1 gold); see [money.md](money.md).
+
 Owner, 2026-10-22: "remove exp penalty when dying. introduce gear durability and repair instead". A death used to take a third of the
 current level's XP (`Character::lose_death_xp`, removed). It now wears the gear you wear, and a smith repairs it for gold.
 Decisions were made in two rounds on 2026-10-22 (recorded in TODO.md under `DEATH-RULES`).

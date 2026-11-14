@@ -1,5 +1,7 @@
 # Rebirth
 
+> Money (2026-11): every amount below called "gold" is stored as copper and shown as gold, silver and copper (100 copper = 1 silver, 100 silver = 1 gold); see [money.md](money.md).
+
 These settle `REBIRTH-RULES` in [TODO.md](../TODO.md). `REBIRTH-SERVER` stores the state and the `rebirth` message, `REBIRTH-PERKS` implements each perk, `REBIRTH-UI` adds the panel, `REBIRTH-ART` the looks and `REBIRTH-CHECK` verifies the loop. The perks are implemented (`REBIRTH-PERKS`): the table lives once in `world/rebirth.txt`, the derivation and `copies`/`scaled` helpers in `server/src/perks.rs`, and the tests in `server/src/world/perks_tests.rs`.
 
 Owner's decisions (2026-10-17): perks **stack** across rebirths; the **drop rate boost covers everything** (changed the same day to a stacking ×2 to ×5 that includes the purple chances); quest rewards can be **earned again**. The rest was settled on 2026-10-17 from the code as it stands.

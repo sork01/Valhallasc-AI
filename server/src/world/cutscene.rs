@@ -97,6 +97,10 @@ impl World {
         let Some(before) = before.filter(|b| *b != now) else {
             return vec![];
         };
+        // Spark Travel crosses gates and lands in a new place, but it is no climb, dive or fall: never a scene, and never marked as seen.
+        if time - p.spark_at <= CROSSING_WINDOW || p.character.spark_travel.is_some() {
+            return vec![];
+        }
         if time - p.portal_at > CROSSING_WINDOW || (opt_in && !p.cutscene_test) {
             return vec![];
         }

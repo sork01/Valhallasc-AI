@@ -36,12 +36,15 @@ impl Bank {
             .find(|s| s.item == id)
             .map_or(0, |s| s.quantity)
     }
-    /// One cell per distinct catalog ID. An ID that has left the catalog is kept but neither counted nor shown.
+    /// One cell per distinct catalog ID, except gear, which never stacks: every copy takes a cell (`GEAR-NO-STACK`).
+    /// An ID that has left the catalog is kept but neither counted nor shown.
     pub fn used(&self) -> usize {
         self.items
             .iter()
-            .filter(|s| s.quantity > 0 && item(&s.item).is_some())
-            .count()
+            .filter(|s| s.quantity > 0)
+            .filter_map(|s| item(&s.item).map(|i| (i, s.quantity)))
+            .map(|(i, quantity)| if is_gear(i) { quantity as usize } else { 1 })
+            .sum()
     }
     pub fn capacity(&self) -> usize {
         BASE_CELLS + EXPANSION_CELLS * (self.expansions as usize).min(EXPANSION_PRICES.len())
@@ -95,9 +98,7 @@ impl Bank {
 impl Character {
     /// Whether `quantity` more of `id` fit the bags: a stack already counted, or a free cell.
     fn bags_have_room_for(&self, id: &str) -> bool {
-        item(id).is_some_and(|i| {
-            self.quantity(id) > self.equipped_count(i) || self.bag_used() < self.bag_capacity()
-        })
+        item(id).is_some_and(|i| self.has_room_for(i))
     }
     /// Moves `quantity` loose units of `id` from the bags into the bank. A gear copy keeps all of its data; `copy`
     /// names one loose copy (and then `quantity` must be 1), otherwise the first loose copies go.
@@ -117,11 +118,12 @@ impl Character {
         if quantity > self.quantity(id).saturating_sub(self.equipped_count(i)) {
             return Err("You can only store items you own. Worn pieces must stay on you.");
         }
-        if self.bank.quantity(id) == 0 && self.bank.used() >= self.bank.capacity() {
-            return Err("The bank is full.");
-        }
         let mut next_bank = self.bank.clone();
         next_bank.add(id, quantity)?;
+        // A bank that already holds more gear than it has cells (an old save) can still be emptied, never filled further.
+        if next_bank.used() > next_bank.capacity() && next_bank.used() > self.bank.used() {
+            return Err("The bank is full.");
+        }
         let mut moved = vec![];
         if is_gear(i) {
             self.materialize_gear_instances();
@@ -167,7 +169,9 @@ impl Character {
         if quantity > self.bank.quantity(id) {
             return Err("The bank does not hold that many.");
         }
-        if !self.bags_have_room_for(id) {
+        if !self.bags_have_room_for(id)
+            || (is_gear(i) && self.bag_used() + quantity as usize > self.bag_capacity())
+        {
             return Err("Your bags are full. Make room first.");
         }
         if self.quantity(id).checked_add(quantity).is_none() {

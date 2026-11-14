@@ -49,6 +49,10 @@ impl Character {
     /// All real XP payouts share this path. Rested adds 200% of base XP alongside
     /// the existing additive rebirth/Hierloom bonuses; it never multiplies those.
     pub fn reward_xp(&mut self, base: u32) -> (u32, u32) {
+        // At the highest level XP is not earned, and the reserve is not spent on it.
+        if self.at_max_level() {
+            return (0, 0);
+        }
         let normal = self.boosted_xp(base);
         let need = self.xp_need();
         let got = normal + self.rested.bonus(base, normal, need);
@@ -123,6 +127,37 @@ mod tests {
         assert_eq!(c.rested.reserve, reserve);
         assert_eq!(c.reward_xp(u32::MAX).0, u32::MAX);
         assert_eq!(c.rested.reserve, reserve);
+    }
+
+    #[test]
+    fn level_99_is_the_cap_xp_stops_and_the_reserve_is_kept() {
+        use crate::model::MAX_LEVEL;
+        assert_eq!(MAX_LEVEL, 99);
+        let mut c = hero();
+        c.level = MAX_LEVEL - 1;
+        c.xp = c.xp_need() - 1;
+        // The last level is earned, and what is left over is not kept.
+        assert_eq!(c.grant_xp(5_000_000), 1);
+        assert_eq!((c.level, c.xp), (MAX_LEVEL, 0));
+        assert!(c.at_max_level());
+        // At the cap no XP accumulates, from any source, and no level is gained.
+        assert_eq!(c.grant_xp(1_000_000), 0);
+        assert_eq!((c.level, c.xp), (MAX_LEVEL, 0));
+        c.rested.reserve = CAP;
+        assert_eq!(c.reward_xp(10_000), (0, 0));
+        assert_eq!((c.level, c.xp), (MAX_LEVEL, 0));
+        assert_eq!(c.rested.reserve, CAP, "the rested reserve is not spent at the cap");
+        // A save above the cap (debug commands could make one) comes down on load.
+        c.level = 120;
+        c.xp = 77;
+        c.clamp_level();
+        assert_eq!((c.level, c.xp), (MAX_LEVEL, 0));
+        assert!(c.hp <= c.max_hp());
+        // Below the cap everything is as before.
+        let mut d = hero();
+        d.level = MAX_LEVEL - 1;
+        assert_eq!(d.reward_xp(10).0, 10);
+        assert_eq!(d.xp, 10);
     }
 
     #[test]

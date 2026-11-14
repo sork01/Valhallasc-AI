@@ -9,7 +9,7 @@
   function render(force = false) {
     const host = $('dps-meter'), enabled = window.Prefs?.dpsMeter !== false;
     host.hidden = !enabled || !data;
-    $('dps-toggle').setAttribute('aria-pressed', String(enabled));
+    $('dps-toggle').checked = enabled;
     if (host.hidden || (!force && performance.now() - painted < 450)) return;
     painted = performance.now();
     const elapsed = Math.floor(data.elapsed || 0), time = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
@@ -25,8 +25,9 @@
       return tr;
     }));
   }
-  const toggle = () => { window.Prefs?.set({ dpsMeter: window.Prefs?.dpsMeter === false }); render(true); };
-  $('dps-toggle').addEventListener('click', toggle);
+  const toggle = () => { window.Prefs?.set({ dpsMeter: $('dps-toggle').checked }); render(true); };
+  $('dps-toggle').addEventListener('change', toggle);
+  $('dps-toggle').checked = window.Prefs?.dpsMeter !== false;
   $('dps-close').addEventListener('click', () => { window.Prefs?.set({ dpsMeter: false }); render(true); });
   window.addEventListener('prefs-change', () => render(true));
   window.DpsMeter = {

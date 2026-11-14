@@ -10,11 +10,11 @@
     {id:'springtide',name:'Springtide Bunny',level:1,route:'Easter: defeat the Bloomwarden with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'reindeer',name:'Red-nosed Reindeer',level:1,route:'Christmas: summon the Grinch with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'nightmare',name:'Nightmare Steed',level:1,route:'Halloween: summon the Hollow Rider with five fighters in Gloamfen',cost:'One independent 1% chance per eligible hero per day'},
-    { id: 'horse', name: 'Riding horse', level: 50, route: 'Buy from Stable-hand Greta in Skaldholm', cost: '500,000 gold' },
+    { id: 'horse', name: 'Riding horse', level: 50, route: 'Buy from Stable-hand Greta in Skaldholm', cost: Money.text(500000) },
     { id: 'raptor', name: 'Raptor', level: 75, route: 'Quest chain The Banyan Run, from Mara Vines in the Tanglecrown', cost: 'no gold fee' },
-    { id: 'lizard', name: 'Lizard', level: 80, route: 'Buy from the Dune-wrangler in the Lapis Erg hub', cost: '160,000 gold' },
+    { id: 'lizard', name: 'Lizard', level: 80, route: 'Buy from the Dune-wrangler in the Lapis Erg hub', cost: Money.text(160000) },
     { id: 'sabertooth', name: 'Sabertooth', level: 95, route: 'Rare drop: Sabertooth Whistle from the Rimesaber in the Yearwheel', cost: '4% per kill' },
-    { id: 'gryphon', name: 'Gryphon', level: 95, route: 'Dungeon reward: Gryphon Egg from the Thunderheart Gate\'s final boss, hatched by Oren Highwind in the Cairnspine', cost: '3% per kill and 250,000 gold to hatch; also earned by defeating all ten Chained Forge bosses' },
+    { id: 'gryphon', name: 'Gryphon', level: 95, route: 'Dungeon reward: Gryphon Egg from the Thunderheart Gate\'s final boss, hatched by Oren Highwind in the Cairnspine', cost: `3% per kill and ${Money.text(250000)} to hatch; also earned by defeating all ten Chained Forge bosses` },
   ];
   const byId = Object.fromEntries(MOUNTS.map(m => [m.id, m]));
   let hero = null, signature = '';

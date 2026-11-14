@@ -42,7 +42,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     assert.equal(await raptorCard.getAttribute('data-owned'), 'false');
     assert.match(await raptorCard.textContent(), /Level 75.*Banyan Run/, 'an unowned mount shows its level and route');
     assert.equal(await raptorCard.locator('button').count(), 0, 'an unowned mount has no Select button');
-    assert.match(await page.locator('.mount-card[data-mount="gryphon"]').textContent(), /3% per kill and 250,000 gold/, 'price and drop rate are shown');
+    assert.match(await page.locator('.mount-card[data-mount="gryphon"]').textContent(), /3% per kill and 25 gold/, 'price and drop rate are shown');
     assert.ok(await page.evaluate(() => getComputedStyle(document.querySelector('.mount-card[data-mount="raptor"]')).opacity) < 1, 'unowned rows are greyed');
     assert.equal(await page.locator('.mount-card[data-mount="horse"] button').isDisabled(), true, 'the selected mount cannot be re-selected');
     // A second mount: it is owned but not selected until chosen, and the server refuses a mount that is not owned.

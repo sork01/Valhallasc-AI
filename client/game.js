@@ -678,9 +678,9 @@
     resource.title = kind === 'energy' ? 'Energy · regenerates 10 per second, including in combat · food and resource potions restore it' : kind === 'rage' ? 'Rage · gained by dealing and taking damage, fades outside combat · food and resource potions restore it' : 'Mana · regenerates outside combat · food and mana potions restore it';
     $('resource-fill').style.width = (current / max * 100).toFixed(1) + '%';
     $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.min(wholeRes(current), max)} / ${max}`;
-    hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`; window.Quests?.setLevel(s.level);
+    hud.xp.style.width = s.maxLevel ? '100%' : (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.xp.parentElement.classList.toggle('max-level', !!s.maxLevel); hud.lv.textContent = ` ${t('lvl')} ${s.level}${s.maxLevel ? ' · ' + (window.Locale?.translate('Max level') || 'Max level') : ''}`; window.Quests?.setLevel(s.level);
     window.Rested?.update(s);
-    $('bag-gold').textContent = `${s.gold} gold`;
+    Money.set($('bag-gold'), s.gold);
     const mount = $('mount-toggle');
     mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
     const mountKey = Keys.label('mount', false);
@@ -1161,7 +1161,6 @@
     } else { p.style.backgroundImage = 'url(assets/warrior.webp)'; p.style.backgroundSize = '250% auto'; p.style.backgroundPosition = '57% 8%'; }
     $('hud-name').textContent = c.name; $('pause').hidden = true; $('equipment').hidden = true; $('dead-msg').hidden = true;
     setCharacterTab('stats');
-    $('p-equipment').hidden = !modular(c);
     Field.start({ canvas: $('fieldcv'), mini: $('minimap'), char: c, opts: OPT, onHud, onEvent: onField,
       onCharacter: look => {
         save.char = { ...look }; persist(); $('hud-name').textContent = look.name;
@@ -1275,7 +1274,6 @@
     }));
     if (!list.children.length) list.textContent = 'Your character will appear here after connecting.';
   });
-  $('p-equipment').addEventListener('click', () => openEquipment());
   Keys.register('menu', () => { if (scene !== 'game') return false; setPause($('pause').hidden); return true; });
   Keys.register('bags', () => { if (scene !== 'game') return false; openEquipment(); return true; });
   $('inventory-open').addEventListener('click', () => openEquipment());

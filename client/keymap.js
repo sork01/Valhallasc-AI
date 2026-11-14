@@ -167,7 +167,6 @@
     attr('mount-toggle', 'aria-label', ['mount'], `Mount or dismount (${first('mount')})`);
     attr('quickuse', 'aria-label', ['quickFood', 'quickPotion', 'quickMana'], `Quick use, ${first('quickFood')} food, ${first('quickPotion')} health potion, ${first('quickMana')} mana potion`);
     attr('chat-input', 'placeholder', ['chat'], `${first('chat')} to chat…`);
-    body('#p-equipment', ['character'], `Equipment & Inventory (${first('character')})`);
     body('#skills-open kbd', ['skills'], first('skills'));
     body('#set-sound-row kbd', ['sound'], list('sound', ' / '));
     put('wm-foot', ['map'], () => {

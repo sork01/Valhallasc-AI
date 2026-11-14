@@ -1,5 +1,7 @@
 # Merchant selling
 
+> Money (2026-11): every amount below called "gold" is stored as copper and shown as gold, silver and copper (100 copper = 1 silver, 100 silver = 1 gold); see [money.md](money.md).
+
 Beta 1.19.0: every NPC shop shows **Buys items** or **Does not buy items** below
 the NPC's name. NPCs who sell supplies without buying loot previously rejected
 every bag tap with the misleading item-specific message. Their message now

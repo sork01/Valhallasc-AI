@@ -22,9 +22,9 @@ const suite={
   for(const item of ['slime_gel','blue_gel']){
    await page.locator(`#inventory-list [data-item="${item}"] .item-tile`).tap();
    await page.waitForFunction(id=>Inventory.quantity(id)===0,item);
-   await page.waitForFunction(()=>/sold.*gold/i.test(document.querySelector('#npc-notice').textContent));
+   await page.waitForFunction(()=>/sold.*(gold|silver|copper)/i.test(document.querySelector('#npc-notice').textContent));
    const receipt=await page.locator('#npc-notice').textContent();
-   check(/gold/.test(receipt),'successful sale displays its gold receipt');
+   check(/gold|silver|copper/.test(receipt),'successful sale displays its gold receipt');
    const before=await page.evaluate(()=>noticePackets.length);
    await page.evaluate(()=>Online.send({type:'shop_open',npc:'smith'}));
    await page.waitForFunction(before=>noticePackets.length>before&&noticePackets.at(-1).notice==='',before);

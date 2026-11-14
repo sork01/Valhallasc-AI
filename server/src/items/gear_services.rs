@@ -213,6 +213,31 @@ impl Character {
     }
     /// Legacy equipment references are catalog IDs. The first owned copies of each ID are its
     /// worn allocation; all later copies are loose and eligible for a merge or sale.
+    /// Puts the loose copy `id` first among its item's loose copies, so that the next equip of that item wears it
+    /// (the worn copies are always the first ones of an ID). Does nothing for a worn or unknown copy.
+    pub fn prefer_loose_copy(&mut self, id: u64) {
+        self.materialize_gear_instances();
+        let Some(at) = self.gear_instances.iter().position(|g| g.id == id) else {
+            return;
+        };
+        let item_id = self.gear_instances[at].item.clone();
+        let Some(catalog) = item(&item_id) else {
+            return;
+        };
+        if self.gear_instance_equipped(id) {
+            return;
+        }
+        let copy = self.gear_instances.remove(at);
+        let worn = self.equipped_count(catalog) as usize;
+        let front = self
+            .gear_instances
+            .iter()
+            .enumerate()
+            .filter(|(_, g)| g.item == item_id)
+            .nth(worn)
+            .map_or(self.gear_instances.len(), |(at, _)| at);
+        self.gear_instances.insert(front, copy);
+    }
     pub fn gear_instance_equipped(&self, id: u64) -> bool {
         let Some(g) = self.gear_instances.iter().find(|g| g.id == id) else {
             return false;
@@ -422,7 +447,7 @@ impl Character {
             .retain(|g| g.id != first && g.id != second);
         next.next_gear_id += 1;
         next.gear_instances.push(result.clone());
-        if next.bag_used() > next.bag_capacity() {
+        if self.overfills(&next) {
             return Err("Your bags are full.");
         }
         *self = next;
@@ -691,9 +716,11 @@ mod tests {
         {
             c.add_item(&material.id, 1);
         }
-        let full = serde_json::to_value(&c).unwrap();
-        assert!(c.merge_gear(ids[0], ids[1]).is_err());
-        assert_eq!(serde_json::to_value(&c).unwrap(), full);
+        // Two copies take two cells and the merged piece one, so merging never needs room: even an overfull bag can do it.
+        let used = c.bag_used();
+        assert!(used > c.bag_capacity());
+        c.merge_gear(ids[0], ids[1]).unwrap();
+        assert_eq!(c.bag_used(), used - 1);
     }
     #[test]
     fn refinement_charges_matching_crystals_and_updates_worn_stats_without_compounding() {

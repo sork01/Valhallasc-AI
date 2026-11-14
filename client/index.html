@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="touch.css">
 <link rel="stylesheet" href="dpsmeter.css">
 <link rel="stylesheet" href="mail.css">
+<link rel="stylesheet" href="money.css">
 <link rel="stylesheet" href="activity.css">
 <link rel="stylesheet" href="achievements.css">
 <link rel="stylesheet" href="rested.css">
@@ -40,7 +41,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.52.1</p>
+    <p class="version">Beta 1.53.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -198,6 +199,7 @@
         <button id="mini-zoom-in" class="mini-zoom" type="button" title="Zoom the minimap in" aria-label="Zoom the minimap in">+</button>
         <button id="mini-zoom-out" class="mini-zoom" type="button" title="Zoom the minimap out" aria-label="Zoom the minimap out">&minus;</button>
         <button id="wm-open" class="wm-open" type="button" title="World map (M)" aria-label="Open the world map (M)"><svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="16" cy="16" r="12"/><ellipse cx="16" cy="16" rx="5.2" ry="12"/><path d="M4.5 12h23M4.5 20h23M16 4v24"/></svg></button>
+        <button id="mail-open" class="mail-open" type="button" title="Mail" aria-label="Mail" data-unread="false"><svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="24" height="16" rx="2.5"/><path d="M4.8 9.6 16 18.4l11.2-8.8"/></svg><i id="mail-unread" class="mail-dot" aria-hidden="true" hidden></i></button>
       </div>
       <p id="network-status" class="network-status" role="status">Valhalla · Shared world</p>
       <p id="world-clock" class="world-clock" title="World time">☀ 12:00</p>
@@ -352,8 +354,8 @@
             <label>Item <select id="trade-item" aria-label="Item to offer"></select></label>
             <label>Quantity <input id="trade-quantity" type="number" min="1" step="1" value="1"></label>
             <button id="trade-set-item" class="window-tool" type="button">Set item</button>
-            <label>Gold <input id="trade-gold" type="number" min="0" step="1" value="0"></label>
-            <button id="trade-set-gold" class="window-tool" type="button">Set gold</button>
+            <label>Copper <input id="trade-gold" type="number" min="0" step="1" value="0"></label>
+            <button id="trade-set-gold" class="window-tool" type="button">Set copper</button>
             <p id="trade-my-ready"></p>
           </section>
           <section><h4 id="trade-partner-heading">Their offer</h4><ul id="trade-theirs"></ul><p id="trade-their-ready"></p></section>
@@ -450,7 +452,7 @@
             <div class="mail-tools"><button class="btn ghost" id="mail-lookup" type="button">Find character</button><output id="mail-recipient-result" translate="no"></output></div>
             <label>Subject<input id="mail-subject" maxlength="80" required></label>
             <label>Message<textarea id="mail-body" maxlength="2000" rows="5"></textarea></label>
-            <label>Attach gold<input id="mail-gold" type="number" min="0" max="4294967295" step="1" value="0" required></label>
+            <label>Attach copper<input id="mail-gold" type="number" min="0" max="4294967295" step="1" value="0" required></label>
             <p>Up to six attachments. Bound and worn items cannot be mailed.</p>
             <div class="mail-attachment-controls"><label>Item or gear copy<select id="mail-item"></select></label><label>Quantity<input id="mail-quantity" type="number" min="1" step="1" value="1"></label><button class="btn ghost" id="mail-add" type="button">Add attachment</button></div>
             <div id="mail-attached"></div><button class="btn primary" id="mail-review" type="submit">Review letter</button>
@@ -473,11 +475,11 @@
             <header class="bank-head"><h4 id="bank-bank-heading">Bank</h4><span id="bank-capacity"></span></header>
             <div id="bank-grid" class="bank-grid"></div>
             <div class="bank-gold">
-              <p>Gold in the bank: <b id="bank-gold"></b></p>
+              <p>Money in the bank: <b id="bank-gold"></b></p>
               <div class="bank-gold-row">
-                <input id="bank-gold-amount" type="number" min="1" step="1" value="100" aria-label="Amount of gold">
-                <button id="bank-gold-deposit" class="btn ghost" type="button">Deposit gold</button>
-                <button id="bank-gold-withdraw" class="btn ghost" type="button">Withdraw gold</button>
+                <input id="bank-gold-amount" type="number" min="1" step="1" value="100" aria-label="Amount of copper">
+                <button id="bank-gold-deposit" class="btn ghost" type="button">Deposit</button>
+                <button id="bank-gold-withdraw" class="btn ghost" type="button">Withdraw</button>
               </div>
             </div>
             <div class="bank-expansion">
@@ -506,11 +508,7 @@
         <h3>World Menu</h3>
         <p class="world-menu-note">The world keeps running while this menu is open.</p>
         <button class="btn primary" id="p-resume" type="button" data-i18n="resume">Resume</button>
-        <button class="btn ghost" id="p-equipment" type="button" hidden>Equipment &amp; Inventory (E)</button>
-        <button class="btn ghost" id="p-achievements" type="button">Achievements</button>
         <button class="btn ghost" id="p-settings" type="button">Settings</button>
-        <button class="btn ghost" id="mail-open" type="button"><span>Mail</span><span id="mail-unread"></span></button><p id="mail-menu-notice" role="status"></p>
-        <button class="btn ghost" id="dps-toggle" type="button" aria-pressed="true">DPS meter</button>
         <button class="btn ghost" id="p-characters" type="button">Your Characters</button>
         <div id="character-list" class="character-list" hidden></div>
         <button class="btn ghost" id="p-new" type="button" data-i18n="newChar">New Character</button>
@@ -543,6 +541,7 @@
         <label class="setting-row" for="set-weather-audio"><span>Weather sound</span><input id="set-weather-audio" type="range" min="0" max="100" step="1"><output id="set-weather-audio-out" for="set-weather-audio"></output></label>
         <label class="setting-check" id="set-sound-row"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
         <label class="setting-check"><input id="set-low-graphics" type="checkbox"> Low graphics</label>
+        <label class="setting-check"><input id="dps-toggle" type="checkbox" checked> DPS meter</label>
         <label class="setting-check" title="Point toward the tracked quest objective."><input id="set-quest-arrow" type="checkbox"> Arrow</label>
         <button class="btn ghost" id="set-fullscreen" type="button" hidden>Fullscreen</button>
         <button class="btn ghost" id="set-keys" type="button">Keyboard</button>
@@ -659,7 +658,7 @@
           <div id="inventory-list" class="bag-grid" role="group" aria-label="Bag slots"></div>
           <div id="bag-details" class="bag-details" aria-live="polite"></div>
           <footer class="bag-footer"><span id="bag-capacity"></span><span id="bag-gold" class="bag-gold"></span></footer>
-          <p class="bag-instructions">Right-click gear to equip · Drag to move · Six-slot bags: 500 gold at Linden</p>
+          <p class="bag-instructions">Right-click gear to equip · Drag to move · Six-slot bags: 5 silver at Linden</p>
         </section>
       </div>
     </div>
@@ -793,6 +792,7 @@
 <script src="passives.js"></script>
 <script src="sv-data.js"></script>
 <script src="locale.js"></script>
+<script src="money.js"></script>
 <script src="keymap.js"></script>
 <script src="whatsnew.js"></script>
 <script src="raidrewards.js"></script>

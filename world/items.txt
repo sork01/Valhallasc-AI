@@ -257,7 +257,7 @@
     "kind": "armor",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "warrior",
     "variant": "crimson",
     "attack": 0.0,
@@ -283,7 +283,7 @@
     "kind": "weapon",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "warrior",
     "variant": "sword",
     "attack": 4.0,
@@ -309,7 +309,7 @@
     "kind": "armor",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "mage",
     "variant": "apprentice",
     "attack": 0.0,
@@ -335,7 +335,7 @@
     "kind": "weapon",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "mage",
     "variant": "ash",
     "attack": 4.0,
@@ -361,7 +361,7 @@
     "kind": "armor",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "assassin",
     "variant": "shadow",
     "attack": 0.0,
@@ -387,7 +387,7 @@
     "kind": "weapon",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "assassin",
     "variant": "daggers",
     "attack": 4.0,
@@ -413,7 +413,7 @@
     "kind": "armor",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "priest",
     "variant": "pilgrim",
     "attack": 0.0,
@@ -439,7 +439,7 @@
     "kind": "weapon",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "priest",
     "variant": "mace",
     "attack": 4.0,
@@ -883,7 +883,7 @@
     "kind": "armor",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "hunter",
     "variant": "scout",
     "attack": 0.0,
@@ -909,7 +909,7 @@
     "kind": "weapon",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "hunter",
     "variant": "shortbow",
     "attack": 4.0,
@@ -935,7 +935,7 @@
     "kind": "headgear",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "warrior",
     "variant": "crimson",
     "attack": 0.0,
@@ -961,7 +961,7 @@
     "kind": "shoulders",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "warrior",
     "variant": "crimson",
     "attack": 0.0,
@@ -987,7 +987,7 @@
     "kind": "gloves",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "warrior",
     "variant": "crimson",
     "attack": 0.0,
@@ -1013,7 +1013,7 @@
     "kind": "headgear",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "mage",
     "variant": "apprentice",
     "attack": 0.0,
@@ -1039,7 +1039,7 @@
     "kind": "shoulders",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "mage",
     "variant": "apprentice",
     "attack": 0.0,
@@ -1065,7 +1065,7 @@
     "kind": "gloves",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "mage",
     "variant": "apprentice",
     "attack": 0.0,
@@ -1091,7 +1091,7 @@
     "kind": "headgear",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "assassin",
     "variant": "shadow",
     "attack": 0.0,
@@ -1117,7 +1117,7 @@
     "kind": "shoulders",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "assassin",
     "variant": "shadow",
     "attack": 0.0,
@@ -1143,7 +1143,7 @@
     "kind": "gloves",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "assassin",
     "variant": "shadow",
     "attack": 0.0,
@@ -1169,7 +1169,7 @@
     "kind": "headgear",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "hunter",
     "variant": "scout",
     "attack": 0.0,
@@ -1195,7 +1195,7 @@
     "kind": "shoulders",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "hunter",
     "variant": "scout",
     "attack": 0.0,
@@ -1221,7 +1221,7 @@
     "kind": "gloves",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "hunter",
     "variant": "scout",
     "attack": 0.0,
@@ -1247,7 +1247,7 @@
     "kind": "headgear",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "priest",
     "variant": "pilgrim",
     "attack": 0.0,
@@ -1273,7 +1273,7 @@
     "kind": "shoulders",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "priest",
     "variant": "pilgrim",
     "attack": 0.0,
@@ -1299,7 +1299,7 @@
     "kind": "gloves",
     "rarity": "common",
     "requiredLevel": 1,
-    "sell": 0,
+    "sell": 4,
     "class": "priest",
     "variant": "pilgrim",
     "attack": 0.0,
@@ -58161,6 +58161,1038 @@
     "kind": "material",
     "rarity": "common",
     "sell": 8600
+  },
+  {
+    "id": "qi_fields_flour",
+    "name": "Slime Gel (Gel in the Flour)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "slime_gel"
+  },
+  {
+    "id": "qi_salt_nets",
+    "name": "Blue Slime Gel (Tarred and Mended)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "blue_gel"
+  },
+  {
+    "id": "qi_anvil_coal",
+    "name": "Ember Core (Cold Furnace)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ember_core"
+  },
+  {
+    "id": "qi_ford_veils",
+    "name": "Ash Veil (Toll in Ash)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ash_veil"
+  },
+  {
+    "id": "qi_ford_stones",
+    "name": "Basalt Heart (Stepping Stones)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "basalt_heart"
+  },
+  {
+    "id": "qi_hearth_fangs",
+    "name": "Magma Fang (Needles for the Stars)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "magma_fang"
+  },
+  {
+    "id": "qi_rime_dw_pelts",
+    "name": "Frost Pelt (Pelts for the Watch)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "frost_pelt"
+  },
+  {
+    "id": "qi_rime_dw_shells",
+    "name": "Rime Shell (Shell Plating)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "rime_shell"
+  },
+  {
+    "id": "qi_rime_sw_horns",
+    "name": "Yeti Horn (Horn for the Hunters)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "yeti_horn"
+  },
+  {
+    "id": "qi_rime_pk_scales",
+    "name": "Wyrm Scale (Scale and Rope)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "wyrm_scale"
+  },
+  {
+    "id": "qi_rime_ice_salve",
+    "name": "Rime Shell (Salve from Shell)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "rime_shell"
+  },
+  {
+    "id": "qi_fen_rh_gland",
+    "name": "Fen Toad Gland (Glands for the Wicks)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "toad_gland"
+  },
+  {
+    "id": "qi_fen_dk_hides",
+    "name": "Mire Crocodile Hide (Hides for the Dike)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "croc_hide"
+  },
+  {
+    "id": "qi_fen_dk_salvage",
+    "name": "Drowned Gauntlet (Armour from the Silt)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "drowned_gauntlet"
+  },
+  {
+    "id": "qi_fen_gr_gauntlets",
+    "name": "Drowned Gauntlet (Gauntlets for the Gravekeeper)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "drowned_gauntlet"
+  },
+  {
+    "id": "qi_fen_gr_fangs",
+    "name": "Hydra Fang (Fangs for the Surveyor)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "hydra_fang"
+  },
+  {
+    "id": "qi_city_gel",
+    "name": "Slime Gel (Clear Gel for Clear Heads)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "slime_gel"
+  },
+  {
+    "id": "qi_city_gel_2",
+    "name": "Blue Slime Gel (Clear Gel for Clear Heads)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "blue_gel"
+  },
+  {
+    "id": "qi_city_forge",
+    "name": "Ember Core (Cinders for the Forge)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ember_core"
+  },
+  {
+    "id": "qi_city_forge_2",
+    "name": "Magma Fang (Cinders for the Forge)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "magma_fang"
+  },
+  {
+    "id": "qi_city_pelts",
+    "name": "Frost Pelt (Winter Cloaks for the Watch)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "frost_pelt"
+  },
+  {
+    "id": "qi_city_pelts_2",
+    "name": "Yeti Horn (Winter Cloaks for the Watch)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "yeti_horn"
+  },
+  {
+    "id": "qi_city_marsh",
+    "name": "Fen Toad Gland (Marsh Medicine)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "toad_gland"
+  },
+  {
+    "id": "qi_city_marsh_2",
+    "name": "Mire Crocodile Hide (Marsh Medicine)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "croc_hide"
+  },
+  {
+    "id": "qi_city_archive",
+    "name": "Drowned Gauntlet (The Drowned Archive)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "drowned_gauntlet"
+  },
+  {
+    "id": "qi_city_stone",
+    "name": "Hydra Fang (Runes for the Meeting Stone)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "hydra_fang"
+  },
+  {
+    "id": "qi_city_stone_2",
+    "name": "Wyrm Scale (Runes for the Meeting Stone)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "wyrm_scale"
+  },
+  {
+    "id": "qi_city_stone_3",
+    "name": "Basalt Heart (Runes for the Meeting Stone)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "basalt_heart"
+  },
+  {
+    "id": "qi_city_tribute",
+    "name": "Ironhide Shell (Tribute of Four Lands)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ironhide_shell"
+  },
+  {
+    "id": "qi_city_tribute_2",
+    "name": "Ash Veil (Tribute of Four Lands)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ash_veil"
+  },
+  {
+    "id": "qi_city_tribute_3",
+    "name": "Rime Shell (Tribute of Four Lands)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "rime_shell"
+  },
+  {
+    "id": "qi_city_tribute_4",
+    "name": "Mire Crocodile Hide (Tribute of Four Lands)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "croc_hide"
+  },
+  {
+    "id": "qi_city_order",
+    "name": "Magma Fang (The Guild’s Standing Order)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "magma_fang"
+  },
+  {
+    "id": "qi_city_order_2",
+    "name": "Rime Shell (The Guild’s Standing Order)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "rime_shell"
+  },
+  {
+    "id": "qi_wyrd_tusks",
+    "name": "Rotfang Tusk (Tusks for the Palisade)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "rotfang_tusk"
+  },
+  {
+    "id": "qi_wyrd_feathers",
+    "name": "Gallows Feather (Quills for the Songbreaker)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gallows_feather"
+  },
+  {
+    "id": "qi_wyrd_scrap",
+    "name": "Mosshide Scrap (Mosshide for the Mantlets)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "mosshide_scrap"
+  },
+  {
+    "id": "qi_wyrd_fate",
+    "name": "Frayed Fate Thread (Frayed Fate)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "fate_thread"
+  },
+  {
+    "id": "qi_wyrd_gf_quills",
+    "name": "Gallows Feather (Feathers for the Fletcher)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gallows_feather"
+  },
+  {
+    "id": "qi_wyrd_rw_horns",
+    "name": "Stormram Horn (Horns for the Hearth)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "stormram_horn"
+  },
+  {
+    "id": "qi_wyrd_hm_threads",
+    "name": "Frayed Fate Thread (Threads for the Storm Loom)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "fate_thread"
+  },
+  {
+    "id": "qi_sky_fangs",
+    "name": "Gale Fang (Fangs for the Windcatchers)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gale_fang"
+  },
+  {
+    "id": "qi_sky_shards",
+    "name": "Prism Shard (Bring Me Bifrost)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "prism_shard"
+  },
+  {
+    "id": "qi_sky_wings",
+    "name": "Stormray Wing (Wings for the Weathervane)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "stormray_wing"
+  },
+  {
+    "id": "qi_sky_tokens",
+    "name": "Worn Rune Token (Tokens of the Fallen)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "rune_token"
+  },
+  {
+    "id": "qi_sky_quills",
+    "name": "Thunderroc Quill (Quills of the Storm Roc)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "thunderroc_quill"
+  },
+  {
+    "id": "qi_sky_wr_pelts",
+    "name": "Gale Fang (Fangs for the Roost)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gale_fang"
+  },
+  {
+    "id": "qi_sky_ss_wings",
+    "name": "Stormray Wing (Wings for the Wire)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "stormray_wing"
+  },
+  {
+    "id": "qi_sky_el_quills",
+    "name": "Thunderroc Quill (Quills for the Fletcher)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "thunderroc_quill"
+  },
+  {
+    "id": "qi_deep_coins",
+    "name": "Drowned Coin (Coins for the Ferryman)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "drowned_coin"
+  },
+  {
+    "id": "qi_deep_lures",
+    "name": "Angler Lure (Brass from the Deep)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "angler_lure"
+  },
+  {
+    "id": "qi_deep_teeth",
+    "name": "Moray Tooth (A Net Full of Teeth)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "moray_tooth"
+  },
+  {
+    "id": "qi_deep_pearls",
+    "name": "Siren Pearl (Pearls for the Tidehealer)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "siren_pearl"
+  },
+  {
+    "id": "qi_deep_plates",
+    "name": "Shellback Plate (Plates of the Shellback)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "shellback_plate"
+  },
+  {
+    "id": "qi_deep_lr_teeth",
+    "name": "Moray Tooth (Teeth for the Brine Stall)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "moray_tooth"
+  },
+  {
+    "id": "qi_deep_gw_plates",
+    "name": "Shellback Plate (Plate for the Reef-Smith)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "shellback_plate"
+  },
+  {
+    "id": "qi_deep_dw_coins",
+    "name": "Drowned Coin (Coins for the Salt Stall)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "drowned_coin"
+  },
+  {
+    "id": "qi_nacre_lamps",
+    "name": "Siren Pearl (A Pearl for Every Window)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "siren_pearl"
+  },
+  {
+    "id": "qi_nacre_smithwork",
+    "name": "Shellback Plate (Coral That Remembers Iron)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "shellback_plate"
+  },
+  {
+    "id": "qi_nacre_supplies",
+    "name": "Drowned Coin (The Tide’s Standing Order)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "drowned_coin"
+  },
+  {
+    "id": "qi_astral_garden",
+    "name": "Voidwing (A Garden Under Strange Stars)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "voidwing"
+  },
+  {
+    "id": "qi_astral_lens",
+    "name": "Astral Scale (A Lens of Singing Glass)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "astral_scale"
+  },
+  {
+    "id": "qi_astral_cr_lanterns",
+    "name": "Voidwing (Shades for the Lanterns)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "voidwing"
+  },
+  {
+    "id": "qi_astral_cw_shells",
+    "name": "Orbit Shell (Shells for the Smithy)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "orbit_shell"
+  },
+  {
+    "id": "qi_astral_fh_cores",
+    "name": "Meteor Core (Cores for the Masonry)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "meteor_core"
+  },
+  {
+    "id": "qi_prism_wings",
+    "name": "Harrier Pinions (Sharp as Sunlight)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "harrier_pinions"
+  },
+  {
+    "id": "qi_prism_mf_lenses",
+    "name": "Shard Carapace (Carapace for the Grinder)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "shard_carapace"
+  },
+  {
+    "id": "qi_prism_ws_hearts",
+    "name": "Prism Heart (Hearts for the Veils)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "prism_heart"
+  },
+  {
+    "id": "qi_prism_cf_fangs",
+    "name": "Mirage Fang (Fangs for the Carver)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "mirage_fang"
+  },
+  {
+    "id": "qi_orrery_teeth",
+    "name": "Gearling Tooth (A Broken Sequence)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gearling_tooth"
+  },
+  {
+    "id": "qi_orrery_bc_blades",
+    "name": "Bronze Mantis Blade (Blades for the Gearwright)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "mantis_blade"
+  },
+  {
+    "id": "qi_orrery_cn_plates",
+    "name": "Chronoguard Plate (Plates for the Watch)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "chronoguard_plate"
+  },
+  {
+    "id": "qi_orrery_cn_lens",
+    "name": "Orbit Seer Lens (Lenses for the Scribe)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "seer_lens"
+  },
+  {
+    "id": "qi_orrery_sw_glass",
+    "name": "Gearling Tooth (Teeth for the Glass)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gearling_tooth"
+  },
+  {
+    "id": "qi_moonspore_caps",
+    "name": "Glowcap (A Cure in the Cap)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "glowcap"
+  },
+  {
+    "id": "qi_moonspore_silk",
+    "name": "Moon Silk (Silver Thread)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "moon_silk"
+  },
+  {
+    "id": "qi_asterion_lamps",
+    "name": "Moon Silk (A Thousand Little Suns)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "moon_silk"
+  },
+  {
+    "id": "qi_asterion_roots",
+    "name": "Glowcap (The City Has Roots)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "glowcap"
+  },
+  {
+    "id": "qi_asterion_roots_2",
+    "name": "Rootlurker Heartwood (The City Has Roots)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "root_heart"
+  },
+  {
+    "id": "qi_asterion_charts",
+    "name": "Lantern Wraith Ember (A Map That Breathes)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "wraith_lantern"
+  },
+  {
+    "id": "qi_asterion_charts_2",
+    "name": "Silver Widow Silk (A Map That Breathes)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "widow_silk"
+  },
+  {
+    "id": "qi_asterion_market",
+    "name": "Moon Silk (The Night Market Never Sleeps)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "moon_silk"
+  },
+  {
+    "id": "qi_asterion_market_2",
+    "name": "Glowcap (The Night Market Never Sleeps)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "glowcap"
+  },
+  {
+    "id": "qi_stormglass_rays",
+    "name": "Glassfin (Glass in the Sand)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "glassfin"
+  },
+  {
+    "id": "qi_storm_rs_reeds",
+    "name": "Saltclaw Shell (Shells for the Weaver)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "saltclaw_shell"
+  },
+  {
+    "id": "qi_storm_fp_feathers",
+    "name": "Stormgull Feather (Feathers for the Rodsmith)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "stormgull_feather"
+  },
+  {
+    "id": "qi_storm_bh_cores",
+    "name": "Breaker Core (Cores for the Stonewright)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "breaker_core"
+  },
+  {
+    "id": "qi_sun_snails",
+    "name": "Sunback Shell (The Orchard Shells)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "sunback_shell"
+  },
+  {
+    "id": "qi_svs_hw_tufts",
+    "name": "Brush Fox Tail Tuft (Tails for the Hive Straps)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "fox_tail_tuft"
+  },
+  {
+    "id": "qi_svs_wf_whiskers",
+    "name": "Meadow Hare Whisker (Whiskers for the Straw Brushes)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "hare_whisker"
+  },
+  {
+    "id": "qi_svs_er_shells",
+    "name": "Sunback Shell (Shells for the Root Stair)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "sunback_shell"
+  },
+  {
+    "id": "qi_ribbon_beetles",
+    "name": "Balloon Beetle Silk (Lifted by Color)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "balloon_silk"
+  },
+  {
+    "id": "qi_ribbon_bp_tails",
+    "name": "Ribbon Gecko Tail (Tails for the Spoolwright)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ribbon_tail"
+  },
+  {
+    "id": "qi_ribbon_tp_plumes",
+    "name": "Painted Macaw Plume (Plumes for the Binder)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "macaw_plume"
+  },
+  {
+    "id": "qi_ribbon_gr_bells",
+    "name": "Jesterling Bell (Bells for the Bellfounder)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "jester_bell"
+  },
+  {
+    "id": "qi_tangle_gliders",
+    "name": "Canopy Glider Membrane (Above the Green)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "glider_membrane"
+  },
+  {
+    "id": "qi_tangle_banyan_2",
+    "name": "Orchid Mantis Petals (The Banyan Run: The Nest Offering)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "mantis_petals"
+  },
+  {
+    "id": "qi_tangle_banyan_2_2",
+    "name": "Canopy Glider Membrane (The Banyan Run: The Nest Offering)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "glider_membrane"
+  },
+  {
+    "id": "qi_tangle_banyan_2_3",
+    "name": "Blackwater Caiman Scale (The Banyan Run: The Nest Offering)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "caiman_scale"
+  },
+  {
+    "id": "qi_tangle_banyan_2_4",
+    "name": "Drum Gorilla Hide (The Banyan Run: The Nest Offering)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gorilla_drumskin"
+  },
+  {
+    "id": "qi_tangle_rg_petals",
+    "name": "Orchid Mantis Petals (Petals for the Bark Weaver)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "mantis_petals"
+  },
+  {
+    "id": "qi_tangle_sp_scales",
+    "name": "Blackwater Caiman Scale (Scales for the Smith)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "caiman_scale"
+  },
+  {
+    "id": "qi_tangle_dr_skins",
+    "name": "Drum Gorilla Hide (Hides for the Skin Binder)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "gorilla_drumskin"
+  },
+  {
+    "id": "qi_veyr_gw_fur",
+    "name": "Moss Lemur Fur (Fur for the Glade Bunks)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "mosslemur_fur"
+  },
+  {
+    "id": "qi_veyr_rs_amber",
+    "name": "Lantern Hornet Amber (Amber for the Nectar Keeper)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "hornet_amber"
+  },
+  {
+    "id": "qi_veyr_eb_chip",
+    "name": "Bark Mimic Chip (Chips for the Carver)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "barkmimic_chip"
+  },
+  {
+    "id": "qi_hw_resin",
+    "name": "Sap Beetle Resin (Resin for the Pith Forge)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "sapbeetle_resin"
+  },
+  {
+    "id": "qi_hw_panes",
+    "name": "Lantern Hornet Amber (Amber for the Windows)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "hornet_amber"
+  },
+  {
+    "id": "qi_hw_blankets",
+    "name": "Moss Lemur Fur (Fur for the Loomrow)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "mosslemur_fur"
+  },
+  {
+    "id": "qi_hw_stools",
+    "name": "Bark Mimic Chip (Chips for the Rootwright)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "barkmimic_chip"
+  },
+  {
+    "id": "qi_lapis_fennecs",
+    "name": "Dune Fennec Fur (Under the Date Palms)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "fennec_fur"
+  },
+  {
+    "id": "qi_entry_astro",
+    "name": "Glass Scorpion Shard (The Sky Beneath the Sand)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "scorpion_glass"
+  },
+  {
+    "id": "qi_lapis_ww_fur",
+    "name": "Dune Fennec Fur (Fur for the Wall Watch)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "fennec_fur"
+  },
+  {
+    "id": "qi_lapis_sp_glass",
+    "name": "Glass Scorpion Shard (Shards for the Glassblower)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "scorpion_glass"
+  },
+  {
+    "id": "qi_lapis_ew_quill",
+    "name": "Sun Vulture Quill (Quills for the Fletcher)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "vulture_quill"
+  },
+  {
+    "id": "qi_frostwake_otters",
+    "name": "Ice Otter Pelt (Under Clear Ice)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "iceotter_pelt"
+  },
+  {
+    "id": "qi_fws_bw_fur",
+    "name": "Snow Hare Fur (Fur for the Sled Teams)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "snowhare_fur"
+  },
+  {
+    "id": "qi_fws_au_feathers",
+    "name": "Frost Heron Feather (Feathers for the Aurora Lamps)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "heron_feather"
+  },
+  {
+    "id": "qi_fws_rw_pelts",
+    "name": "Ice Otter Pelt (Pelts for the Rope Crews)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "iceotter_pelt"
+  },
+  {
+    "id": "qi_cairn_ibex",
+    "name": "Stone Ibex Horn (Horns of the Ridge)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ibex_horn"
+  },
+  {
+    "id": "qi_crn_sc_feathers",
+    "name": "Slate Raven Feather (Feathers for the Stone Singer)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "slate_raven_feather"
+  },
+  {
+    "id": "qi_crn_wb_horn",
+    "name": "Stone Ibex Horn (Horns for the Wood Reeve)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ibex_horn"
+  },
+  {
+    "id": "qi_crn_sg_pelts",
+    "name": "Scree Ferret Pelt (Pelts for the Camp)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "screeferret_pelt"
+  },
+  {
+    "id": "qi_yrs_wm_fur",
+    "name": "Silver Stoat Fur (Silver for the Furrier)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "stoat_silverfur"
+  },
+  {
+    "id": "qi_yrs_th_acorns",
+    "name": "Amber Acorn (Amber from the Sand)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "amber_acorn"
+  },
+  {
+    "id": "qi_yrs_lf_scales",
+    "name": "Sundarter Scale (Scales for the Glaze)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "sundarter_scale"
+  },
+  {
+    "id": "qi_ew_cw_scales",
+    "name": "Ashback Salamander Relic (Relics for the Ashsmith)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ew_ashback_relic"
+  },
+  {
+    "id": "qi_ew_cq_wings",
+    "name": "Obsidian Glasswing Relic (Relics for the Kilnwright)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ew_glasswing_relic"
+  },
+  {
+    "id": "qi_ew_gh_horns",
+    "name": "Cinderhorn Ram Relic (Relics for the Slagwright)",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0,
+    "questMaterial": "ew_cinderhorn_relic"
   },
   {
     "id": "ember_shard_0",
