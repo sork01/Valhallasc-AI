@@ -1,6 +1,6 @@
 // Browser check for MENU-TO-SETTINGS-DPS, MINIMAP-MAIL-ICON and MENU-REMOVE-EQUIP-ACHIEVEMENTS.
 // Run via: bash scripts/test-touch-bounded.sh tests/menu-cleanup-ui.cjs
-// MUTATE=1 puts a removed menu button back and moves the mail icon onto the globe: the run must fail.
+// MUTATE=1 puts a removed menu button back, moves the mail icon onto the globe and shows it with no mail: the run must fail.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -66,7 +66,28 @@ async function openHero(context, world, { lang = 'en', name = 'MenuHero' } = {})
       if (process.env.MUTATE === '1') {
         await page.evaluate(() => { const b = document.createElement('button'); b.id = 'p-achievements'; document.querySelector('#pause .pause-panel').append(b); });
         await page.addStyleTag({ content: '.mail-open { top: .8cqw !important; }' });
+        await page.addStyleTag({ content: '.mail-open[hidden] { display: grid !important; }' });   // the old always-visible icon
       }
+
+      // 0. MAIL-ICON-ONLY-WITH-MAIL: a hero with no letters sees no envelope at all (not just a transparent one). The snapshot re-applies the
+      //    mail count on every tick, so each sequence below runs inside one synchronous evaluate.
+      check(await page.evaluate(() => { const b = document.getElementById('mail-open'); return b.hidden && getComputedStyle(b).display === 'none' && b.getBoundingClientRect().width === 0; }), tag('no letters: the mail icon is not displayed'));
+      const seq = await page.evaluate(() => {
+        const b = document.getElementById('mail-open'), shown = () => getComputedStyle(b).display !== 'none' && b.getBoundingClientRect().width > 4, out = {};
+        Mail.onUnread(0, 0); out.zero = shown();
+        Mail.onUnread(0, 1); out.read = shown(); out.readTitle = b.title; out.tab = b.tabIndex;
+        Mail.onUnread(0, 0); out.emptied = shown();
+        Mail.onUnread(1, 1); out.arrived = shown();
+        Mail.reset(); out.reset = shown();
+        return out;
+      });
+      check(seq.zero === false, tag('0 in total keeps it hidden'));
+      check(seq.read === true && seq.readTitle === 'Mail: 1 in total, 0 unread', tag(`one letter, already read, shows it (${seq.readTitle})`));
+      check(seq.emptied === false, tag('the last letter deleted or collected hides it again'));
+      check(seq.arrived === true, tag('a new letter makes it appear on its own'));
+      check(seq.reset === false, tag('switching character (reset) hides it'));
+      // From here on pretend the mailbox holds one letter, whatever the snapshots say (they say none).
+      await page.evaluate(() => { window.__realOnUnread = Mail.onUnread; Mail.onUnread = (c, t) => window.__realOnUnread(c, Math.max(t ?? 0, 1)); Mail.onUnread(0, 1); });
 
       // 1. The World Menu no longer lists the moved or removed controls.
       const menu = await page.evaluate(() => ['p-equipment', 'p-achievements', 'mail-open', 'mail-unread', 'mail-menu-notice', 'dps-toggle'].map(id => !!document.querySelector(`#pause .pause-panel #${id}`)));
@@ -112,9 +133,10 @@ async function openHero(context, world, { lang = 'en', name = 'MenuHero' } = {})
       const text = await page.evaluate(() => {
         const read = () => ({ title: document.getElementById('mail-open').title, label: document.getElementById('mail-open').getAttribute('aria-label'), dot: document.getElementById('mail-unread').hidden ? '' : document.getElementById('mail-unread').textContent, unread: document.getElementById('mail-open').dataset.unread });
         const out = {};
-        Mail.onUnread(0, 0); out.none = read();
-        Mail.onUnread(3, 5); out.some = read(); out.dotShown = getComputedStyle(document.getElementById('mail-unread')).display !== 'none' && document.getElementById('mail-unread').getBoundingClientRect().width > 4;
-        Mail.onUnread(120, 130); out.many = read();
+        const real = window.__realOnUnread;
+        real(0, 0); out.none = read();
+        real(3, 5); out.some = read(); out.dotShown = getComputedStyle(document.getElementById('mail-unread')).display !== 'none' && document.getElementById('mail-unread').getBoundingClientRect().width > 4;
+        real(120, 130); out.many = read();
         return out;
       });
       check(text.none.title === 'Mail: no unread letters' && text.none.dot === '' && text.none.unread === 'false', tag(`no mail: ${JSON.stringify(text.none)}`));
@@ -147,6 +169,7 @@ async function openHero(context, world, { lang = 'en', name = 'MenuHero' } = {})
     check(svTitle === 'Post: 5 totalt, 3 olästa', `Swedish mail text (${svTitle})`);
     await sv.evaluate(() => Mail.onUnread(0, 0));
     check((await sv.locator('#mail-open').getAttribute('title')) === 'Post: inga olästa brev', 'Swedish empty text');
+    check(await sv.evaluate(() => getComputedStyle(document.getElementById('mail-open')).display === 'none'), 'Swedish: hidden with no letters');
     await svCtx.close();
 
     assert.equal(errors.length, 0, `Page errors: ${errors.join('; ')}`);

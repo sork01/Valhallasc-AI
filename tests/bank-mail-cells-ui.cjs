@@ -77,6 +77,7 @@ function requireMemoryLimit() {
     const box = await page.evaluate(() => WORLD_MAP.npcs.find(n => (n.offers || []).some(o => o.id === 'mail')));
     await debug({ op: 'teleport', zone: 0, x: box.x, y: box.y + 1.2 });
     await page.waitForFunction(b => Math.hypot(Field.hero.x - b.x, Field.hero.y - b.y) < 2.5, box);
+    await page.evaluate(() => { const real = Mail.onUnread; Mail.onUnread = (c, t) => real(c, Math.max(t ?? 0, 1)); Mail.onUnread(0, 1); });   // the icon only exists while you have mail: pretend one letter, the snapshots say none
     await page.locator('#mail-open').click();
     await page.locator('#mail-panel').waitFor({ state: 'visible', timeout: 10000 });
     check(await page.locator('#mail-panel').isVisible(), 'clicking the mail icon beside a mailbox opens the mail window');

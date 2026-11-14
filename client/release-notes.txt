@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.53.3",
+    "date": "2026-11-14",
+    "new": [
+      "The System tab now shows an item's rarity when you pick it up: the name of what you picked up is written in its rarity colour (grey, green, blue, purple or orange), and the rest of the line is plain. Potions and food you use are coloured the same way."
+    ],
+    "changed": [
+      "The mail icon next to the minimap now only appears while you have a letter waiting. It shows up by itself when one arrives and disappears again when your mailbox is empty."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.53.2",
     "date": "2026-11-14",
     "new": [

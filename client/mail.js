@@ -140,6 +140,7 @@
     const changed = unread !== count; unread = count; total = Number.isFinite(all) ? all : (count > 0 ? Math.max(total ?? 0, count) : total);
     const dot = $('mail-unread'), btn = $('mail-open'), text = label();
     dot.textContent = count > 99 ? '99+' : String(count); dot.hidden = !count;
+    btn.hidden = !(total > 0);   // the envelope exists only while the mailbox holds a letter
     btn.dataset.unread = String(count > 0); btn.title = text; btn.setAttribute('aria-label', text);
     if (changed && visible() && !pending && !$('mail-inbox-view').hidden) send({ op: 'open' });
   }
@@ -183,7 +184,7 @@
     }
     event.stopPropagation();
   });
-  window.Mail = { open, onPacket, onUnread, close, reset() { close(false); onUnread(0); },
+  window.Mail = { open, onPacket, onUnread, close, reset() { close(false); onUnread(0, 0); },
     draw(g) { if (icon.complete && icon.naturalWidth) { g.imageSmoothingEnabled=false; g.drawImage(icon,-48,-104,96,112); } },
     get visible() { return visible(); } };
 })();

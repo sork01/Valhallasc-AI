@@ -125,7 +125,7 @@ const LATER = ['target_attack', 'loot', 'quest_turnin', 'first_death', 'map', 's
       check(!!npc, `Greenmeadow has a ${kind} NPC`);
       await debug({ op: 'teleport', zone: 0, x: npc.x, y: npc.y + 1.2 });
       await page.waitForFunction(n => Math.hypot(Field.hero.x - n.x, Field.hero.y - n.y) < 3, npc);
-      await expectStep(id, {}, id === 'mail_bank' ? 'mail-open' : 'wm-open', `standing by the ${kind} NPC`);
+      await expectStep(id, {}, 'wm-open', `standing by the ${kind} NPC`);
     }
 
     // Once per character: every id is accepted by the server and none is shown twice.

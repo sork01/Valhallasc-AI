@@ -490,7 +490,7 @@ window.Tutorial = (() => {
     },
     mail_bank: {
       when: () => !!npcNear(n => hasOffer(n, 'mail', 'bank') || n.art === 'mailbox', 5),
-      target: () => $('mail-open'),
+      target: () => isShown($('mail-open')) ? $('mail-open') : $('wm-open'),   // the envelope only exists while you have mail
       title: 'Mail and bank',
       body: 'A mailbox sends letters and items to other players, and holds loot you won while your bags were full. A banker stores items and money safely for you.',
     },
