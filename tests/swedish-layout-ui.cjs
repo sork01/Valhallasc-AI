@@ -45,7 +45,7 @@ async function run(world, lang, sizeName) {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(seed(lang));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
-  await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Utsikt' + lang); await page.locator('#go').click({ timeout: 60000 });
+  await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Utsikt' + lang + sizeName); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero.id);
   const debug = (ref, command) => page.evaluate(([ref, command]) => Online.send({ type: 'debug', ref, command }), [ref, command]);
   await debug(1, { op: 'set_gold', gold: 5000 }); await debug(2, { op: 'give_item', item: 'slime_gel', quantity: 5 });
