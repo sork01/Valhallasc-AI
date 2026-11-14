@@ -71,6 +71,7 @@ let checks=0;const ok=(v,label)=>{assert.ok(v,label);checks++;};
    await page.screenshot({path:path.join(w.runDir,`mail-${label}-${lang}.png`)});
    await page.locator('#mail-close').click();await page.waitForFunction(()=>Field.canAct);checks++;
    // The minimap mail icon has the unread marker and opens a nearby mailbox.
+   await page.evaluate(()=>{const real=Mail.onUnread;Mail.onUnread=(c,t)=>real(c,Math.max(t??0,1));Mail.onUnread(0,1);});   // the icon only exists while you have mail
    await page.locator('#mail-open').click();await page.locator('#mail-panel').waitFor({state:'visible'});
    ok(await page.locator('#pause').isHidden(),`${label}: menu closes behind mail`);
    await debug({op:'teleport',zone:0,x:box.x-12,y:box.y});await page.locator('#mail-panel').waitFor({state:'hidden'});checks++;
