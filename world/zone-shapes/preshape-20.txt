@@ -3606,7 +3606,11 @@
    "name": "The Harvest of Tomorrow",
    "x": 36,
    "y": 43,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 58673
+   }
   }
  ],
  "quests": [

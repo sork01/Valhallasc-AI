@@ -3673,7 +3673,11 @@
    "name": "An Apology Made of Ice",
    "x": 86,
    "y": 77,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 34915
+   }
   }
  ],
  "quests": [

@@ -3705,7 +3705,11 @@
    "name": "A Constellation With One Star Missing",
    "x": 79,
    "y": 111,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 64963
+   }
   }
  ],
  "quests": [

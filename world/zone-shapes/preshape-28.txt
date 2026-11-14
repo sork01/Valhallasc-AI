@@ -13042,28 +13042,44 @@
    "name": "A Spring That Grows",
    "x": 72,
    "y": 319,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 89080
+   }
   },
   {
    "id": "es_24_1",
    "name": "A Summer That Feeds",
    "x": 316,
    "y": 311,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 60046
+   }
   },
   {
    "id": "es_24_2",
    "name": "An Autumn That Shares",
    "x": 319,
    "y": 100,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 35476
+   }
   },
   {
    "id": "es_24_3",
    "name": "A Winter That Shelters",
    "x": 71,
    "y": 97,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 130
+   }
   }
  ],
  "futureInstances": [

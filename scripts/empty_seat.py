@@ -3,6 +3,7 @@
 import json
 import math
 import sys
+import zlib
 from collections import deque
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
@@ -152,7 +153,9 @@ def install():
         _,y,x=min(candidates);used.setdefault(zone,[]).append((x,y));return x,y
     def add_place(zone,pid,name,near,hostile=False):
         x,y=site(zone,near,hostile)
-        p=dict(id=pid,name=name,x=x,y=y,r=2.1)
+        # A ring of small standing stones (drawn by client/emptyseat.js, never an obstacle): the count follows the radius and the seed
+        # makes each ring's stones sit a little differently. Visual only, so the walkable circle is unchanged.
+        p=dict(id=pid,name=name,x=x,y=y,r=2.1,ring=dict(stones=12,seed=zlib.crc32(pid.encode())%100000))
         zones[zone]['places'].append(p)
         return p
     for i,(zone,level,npc,title,desc,mode,reveal) in enumerate(chapters,1):

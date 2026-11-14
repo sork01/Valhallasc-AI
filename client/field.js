@@ -5009,6 +5009,7 @@
       list.push({ d: origin.x + origin.y - .002, fx: e, back: true }, { d: origin.x + origin.y + .002, fx: e, back: false });
     }
     for (const arch of zdef.exitArches || []) { const [sx,sy]=w2s(arch.x,arch.y); if(onScreen(sx,sy,480))list.push({d:arch.x+arch.y,arch,sx,sy}); }
+    if (window.EmptySeat) list.push(...EmptySeat.ringItems(w2s, onScreen));      // the Empty Seat's standing-stone rings (emptyseat.js)
     for (const R of map.vregs || []) {
       for (const o of vaultSeason(R)) { const [sx, sy] = w2s(o.x, o.y); if (onScreen(sx, sy, Math.max(220, City.art[o.kind]?.box?.[3] || 0))) list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); }
       for (const n of City.npcsOf(R.to)) { if (n.art === 'spirit_guide' && !hero.dead) continue; const gx = n.x - R.shift[0], gy = n.y - R.shift[1]; if (!inRegion(R, gx, gy)) continue; const [sx, sy] = w2s(gx, gy); if (onScreen(sx, sy, 150)) list.push({ d: gx + gy, npc: { ...n, x: gx, y: gy }, sx, sy, ghostNpc: true }); }
@@ -5018,6 +5019,7 @@
     const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y, plates = [];
     for (const it of list) {
       if (it.arch) { ExitPaths.arch(g,it.arch,w2s); continue; }
+      if (it.stone) { EmptySeat.drawStone(g, it); continue; }
       if (it.fx) { drawMeleeFx(g, it.fx, it.back); continue; }
       if (it.o) {
         const o = it.o;

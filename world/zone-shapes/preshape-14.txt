@@ -3090,7 +3090,11 @@
    "name": "Break the Beautiful Lie",
    "x": 70,
    "y": 80,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 80404
+   }
   }
  ],
  "quests": [

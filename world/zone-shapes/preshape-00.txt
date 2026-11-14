@@ -4874,14 +4874,22 @@
    "name": "Ash in the Bread",
    "x": 40,
    "y": 53,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 79409
+   }
   },
   {
    "id": "es_28_m",
    "name": "Leave One Chair Empty",
    "x": 38,
    "y": 62,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 64437
+   }
   }
  ],
  "exitRoutes": [

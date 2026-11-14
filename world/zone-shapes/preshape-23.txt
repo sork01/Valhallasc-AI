@@ -2048,7 +2048,11 @@
    "name": "Count the Windows, Not the Thrones",
    "x": 76,
    "y": 87,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 54956
+   }
   }
  ],
  "quests": [

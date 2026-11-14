@@ -1,5 +1,16 @@
 [
   {
+    "version": "Beta 1.55.1",
+    "date": "2026-11-14",
+    "new": [
+      "The Empty Seat story now says so: its quests carry a gold \"Main Questline\" tag above the title in the quest tracker on the left, and on the quest's page in your journal."
+    ],
+    "changed": [
+      "The glowing circles where you fight Eldmarr's shades, listen to the narrator, ring the oath bells and keep a root alive are now rings of small standing stones with a carved empty chair on a flat stone in the middle. They stay in the world all the time, you can walk straight through them, and the stones light up with a warm glow while you stand inside the circle you need."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.0",
     "date": "2026-11-14",
     "new": [

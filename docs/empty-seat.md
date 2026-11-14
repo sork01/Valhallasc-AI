@@ -129,3 +129,18 @@ Explicitly abandoned handoffs stay dismissed, like other automatic quests.
 Chapter prerequisites, level requirements, story/reward cadence, zone IDs and
 raid admission are unchanged. The 27 handoffs deliberately have zero rewards;
 the ordinary tenth-of-level XP rule still applies to all 28 story chapters.
+
+## Stone rings and the Main Questline tag (Beta 1.55.1)
+
+- Every `es_` place (38 across the zones) carries `ring: {stones: 12, seed}` written by `scripts/empty_seat.py`
+  (`add_place`). `client/emptyseat.js` lays the stones from the seed (`stonesOf`) on the place's own radius and draws them in the
+  depth-sorted scenery list (`EmptySeat.ringItems` pushed in `field.js`, drawn by `EmptySeat.drawStone`), so heroes walk behind the far
+  stones and in front of the near ones. A flat slab with the carved empty chair is drawn in the floor pass (`drawFloor`).
+- The rings are **visual only**: no obstacle, no change to the server, the quest sites or `r`. A hero can cross them anywhere.
+- A ring is lit (warm gold, violet for an `echo` site) only while the hero stands inside a site the current chapter asks for;
+  `EmptySeat.litOf(id)` reads the eased value. Reduced motion switches at once. Caption and hint text still show only for active sites.
+- The old filled ellipse is gone. A place's stones are never part of `objects`, so a zone resync cannot reshuffle scatter.
+- `Main Questline`: `isMainQuest` in `client/quests.js` (`es_NN` and `es_go_NN`) adds a gold tag line above the title in the tracker
+  (`.tracker-main`) and under the title on the journal page (`.quest-main`). Swedish: "Huvuduppdrag".
+- Checks: `tests/seat-rings-ui.cjs` (`MUTATE=rings|tag` fail); data check inside it (38 places, 12 stones each).
+

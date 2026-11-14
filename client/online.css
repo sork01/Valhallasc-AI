@@ -116,6 +116,11 @@
 .tracker-title { display: block; color: #ffdf80; font-size: .95cqw; font-weight: bold; }
 .tracker-objective { display: block; padding: .1cqw .5cqw .1cqw 1.4cqw; color: #e5e1d6; font-size: .85cqw; }
 .tracker-objective.complete { color: #8be18e; }
+/* Main questline tag: a small gold line above the quest title in the tracker, and under it on the journal page. */
+.tracker-main, .quest-main { display: block; color: #f0c954; font-weight: bold; letter-spacing: .04em; text-transform: uppercase; }
+.tracker-main { padding: .05cqw .5cqw 0; font-size: .72cqw; }
+.quest-main { margin-top: .2cqw; font-size: .8cqw; }
+.journal-parchment .quest-main { color: #8a5a00; font-size: max(11px, .95cqw); }
 .tracker-journal:hover, .tracker-title:hover { color: #fff1b7; }
 .tracker-toggle:hover { background: #b89b5c33; }
 .quest-tracker button:focus-visible { outline: 2px solid #ffdc87; outline-offset: -2px; }

@@ -153,6 +153,8 @@
     if (className) node.className = className;
     return node;
   }
+  // The Empty Seat campaign (chapters and their "seek" handoffs) is the main questline.
+  const isMainQuest = quest => /^es_(go_)?\d+$/.test(quest.id);
   function button(text, action) {
     const node = element('button', text, 'btn ghost'); node.type = 'button';
     node.addEventListener('click', action); return node;
@@ -240,6 +242,7 @@
       const row = element('div', '', 'tracker-quest'); row.dataset.quest = quest.id;
       row.dataset.status = status(quest);
       row.dataset.tracked = String(tracked === quest.id); row.setAttribute('role', 'group'); row.setAttribute('aria-label', quest.title);
+      if (isMainQuest(quest)) row.append(element('small', 'Main Questline', 'tracker-main'));
       const heading = element('div', '', 'tracker-quest-heading');
       const title = button(quest.title, () => { track(quest.id); show(); }); title.className = 'tracker-title';
       const tracking = button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
@@ -344,7 +347,9 @@
   function journalPage(quest, history, page, controls) {
     const s = history ? 'completed' : status(quest), npc = handIn(quest) || giver(quest);
     const node = element('article', '', 'journal-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
-    node.append(element('h4', quest.title), element('p', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+    node.append(element('h4', quest.title));
+    if (isMainQuest(quest)) node.append(element('small', 'Main Questline', 'quest-main'));
+    node.append(element('p', words[s] + (quest.season ? (quest.seasonCadence==='daily'?' · Daily festival quest':' · Annual festival quest') : quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
     if (quest.story) node.append(element('small', `${quest.story.title} · ${quest.story.chapter}/28`, 'quest-location'));
     node.append(element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'));
     node.append(element('h5', 'Description'), element('p', quest.description));

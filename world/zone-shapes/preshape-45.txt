@@ -2910,14 +2910,22 @@
    "name": "The Guest at the Last Door",
    "x": 115,
    "y": 49,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 1446
+   }
   },
   {
    "id": "es_26_m",
    "name": "A Place for the Living",
    "x": 127,
    "y": 31,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 93983
+   }
   }
  ],
  "portals": [

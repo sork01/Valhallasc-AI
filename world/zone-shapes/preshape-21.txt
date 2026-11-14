@@ -3283,7 +3283,11 @@
    "name": "A Mask for the Man He Was",
    "x": 83,
    "y": 25,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 39078
+   }
   }
  ],
  "quests": [

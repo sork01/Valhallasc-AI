@@ -3190,7 +3190,11 @@
    "name": "The Clock That Counts Downward",
    "x": 73,
    "y": 52,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 94125
+   }
   }
  ],
  "quests": [

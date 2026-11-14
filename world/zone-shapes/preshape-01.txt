@@ -3721,7 +3721,11 @@
    "name": "The Cinder That Followed You",
    "x": 35,
    "y": 73,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 55656
+   }
   }
  ],
  "exitRoutes": [

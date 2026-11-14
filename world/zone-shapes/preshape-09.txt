@@ -3979,7 +3979,11 @@
    "name": "What the Archive Was Paid to Forget",
    "x": 144,
    "y": 72,
-   "r": 2.1
+   "r": 2.1,
+   "ring": {
+    "stones": 12,
+    "seed": 54569
+   }
   }
  ],
  "quests": [
