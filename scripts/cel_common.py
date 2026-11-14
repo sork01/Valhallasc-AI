@@ -27,7 +27,9 @@ from scipy import ndimage as ndi
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / 'client' / 'assets'
-sys.path.insert(0, os.environ.get('VALHALLA_TOOLS', str(ROOT.parent / 'Valhalla' / 'tools')))
+# The rig comes from the old project's tools/. That project left www/ on 2026-11-07; its tools are kept on the RAID.
+_RIG_DIRS = [ROOT.parent / 'Valhalla' / 'tools', Path('/media/raid/valhallasc-data/valhalla-tools')]
+sys.path.insert(0, os.environ.get('VALHALLA_TOOLS') or str(next((d for d in _RIG_DIRS if d.is_dir()), _RIG_DIRS[0])))
 import make_warrior_sprites as rig  # noqa: E402
 
 # `--female` (anywhere on the command line) draws the female body for every class script: its own atlas files

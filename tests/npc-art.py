@@ -9,7 +9,7 @@ import make_npc_sprites as npc
 plan=json.loads((ROOT/'docs/npc-art-plan.txt').read_text());meta=json.loads((ROOT/'client/assets/npc.txt').read_text())
 assert len([s for s in plan['designs'].values() if s['general']])>=24
 assert set(meta['sprites'])==set(plan['designs'])
-world=json.loads((ROOT/'world/map.txt').read_text());people=[n for z in [world]+world['zones'] for n in z.get('npcs',[]) if n.get('art') not in ('stone','scenery')]
+world=json.loads((ROOT/'world/map.txt').read_text());people=[n for z in [world]+world['zones'] for n in z.get('npcs',[]) if n.get('art') not in ('stone','scenery','mailbox','spirit_guide')]
 assert set(meta['npcs'])=={n['id'] for n in people}
 silhouettes=set();full=set()
 for key,spec in plan['designs'].items():
@@ -29,7 +29,9 @@ for key,spec in plan['designs'].items():
  assert meta['tops'][key]>35 and len(meta['bounds'][key])==4
 assert len(silhouettes)>=20 and len(full)>=24,(len(silhouettes),len(full))
 for person in people:
- assignment=meta['npcs'][person['id']];spec=plan['designs'][assignment['art']]
+ assignment=meta['npcs'][person['id']]
+ if assignment['art'] not in plan['designs']: continue  # named/player-style designs: covered by tests/npcp-art.py
+ spec=plan['designs'][assignment['art']]
  if person.get('art') or person.get('look',{}).get('species')=='merfolk':assert not spec['general'],person['id']
  if person.get('look',{}).get('species')=='merfolk':assert spec['build']=='merfolk'
 print(f'NPC art: {len(plan["designs"])} designs, {len(people)} identities, {len(silhouettes)} general silhouettes; all frames/anchors/feet checked')

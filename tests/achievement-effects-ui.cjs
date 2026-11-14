@@ -11,6 +11,8 @@ const busSource = gameSource.match(/function sfxOut\(c\) \{[\s\S]*?\n  \}/)[0];
 const measureAudio = new Function(`return async () => {
   let offline, save, sfxGain = null;
   const taper = v => v * v, audio = () => offline;
+  // The recorded voice (tests/recorded-audio.cjs) is a separate path: this test measures the synthesised fallback.
+  const recordedVoice = () => false;
   ${busSource}
   ${soundSource}
   const results = [];

@@ -28,7 +28,7 @@ def bag_overflow(state):
     look = state.get('look', {})
     for item in ITEMS.values():
         kind = item.get('kind')
-        if item.get('class') == look.get('class') and kind in ('armor', 'weapon'):
+        if look.get('class') and item.get('class') == look.get('class') and kind in ('armor', 'weapon'):
             field = look['class'] + ('Armor' if kind == 'armor' else 'Weapon')
             if look.get(field) == item.get('variant'):
                 equipped[item['id']] += 1

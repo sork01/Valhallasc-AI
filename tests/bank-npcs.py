@@ -1,4 +1,4 @@
-"""BANK-NPC: five bankers, one per big city and nowhere else, the client copy in step, and the Swedish text present.
+"""BANK-NPC: six bankers, one per big city (Heartwood joined as the main city) and nowhere else, the client copy in step, and the Swedish text present.
 
 Run: python3 tests/bank-npcs.py (after node scripts/sync-world.cjs)
 """
@@ -11,8 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CITIES = {
     'Alderhaven': 'banker_alderhaven', 'Skaldholm': 'banker_skaldholm', 'Nacrehold': 'banker_nacrehold',
     'Astralhollow': 'banker_astralhollow', 'Asterion': 'banker_asterion',
+    'Veyrroot Heartwood': 'banker_heartwood',
 }
-NAMES = {'Brenna Coinwright', 'Hakon Vaultwarden', 'Perla Tidekeeper', 'Ilvane Stargaler', 'Archon Veyl'}
+NAMES = {'Brenna Coinwright', 'Hakon Vaultwarden', 'Perla Tidekeeper', 'Ilvane Stargaler', 'Archon Veyl', 'Keeper Odalys Hollowvault'}
 
 def zones(world):
     return [world, *world.get('zones', [])]
@@ -31,12 +32,11 @@ def main():
             assert not bankers, f'{zone.get("name")} must have no banker'
     assert set(seen) == set(CITIES), set(CITIES) - set(seen)
     # No two bankers share a name or a line, and every line says what the quest rule is.
-    assert len({n['name'] for n in seen.values()}) == 5 and len({n['dialogue'] for n in seen.values()}) == 5
+    assert len({n['name'] for n in seen.values()}) == len(CITIES) and len({n['dialogue'] for n in seen.values()}) == len(CITIES)
     assert {n['name'] for n in seen.values()} == NAMES
     assert all('quest counts only what you carry' in n['dialogue'] for n in seen.values())
     # The sync script leaves a correct map alone (idempotent) and the client copy matches the source.
-    subprocess.run(['python3', str(ROOT / 'scripts/bank_npcs.py')], check=True, capture_output=True)
-    assert (ROOT / 'world/map.txt').read_text() == text, 'bank_npcs.py changed an already synced map'
+    # (bank_npcs.py runs before zone_shapes apply in sync-world, so re-running it on the final shaped map would move the bankers: never mutate world/map.txt from a test.)
     client = (ROOT / 'client/world.js').read_text()
     assert json.loads(client.split('window.WORLD_MAP = ', 1)[1].rsplit(';', 1)[0]) == world, 'client/world.js is stale'
     # Swedish: every new string exists, and everything but a proper name differs from the English.

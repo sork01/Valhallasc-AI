@@ -994,6 +994,18 @@ mod tests {
     fn adventurers_speak_rarely_and_a_zone_hears_one_at_a_time() {
         let mut w = world();
         let mut rx = join(&mut w, 1);
+        // Adventurers talk only near a real player: stand in Alderhaven's square, where they gather (the pier is far away).
+        let plaza = {
+            let c = w.maps[0].city.as_ref().unwrap();
+            Point {
+                x: (c.x0 + c.x1) / 2.,
+                y: (c.y0 + c.y1) / 2.,
+            }
+        };
+        (
+            w.players.get_mut(&1).unwrap().character.x,
+            w.players.get_mut(&1).unwrap().character.y,
+        ) = (plaza.x, plaza.y);
         let mut said: Vec<(f64, String)> = Vec::new();
         // Twenty-five minutes at 20 ticks a second; the human stays put and the adventurers wander near the hub.
         for _ in 0..30_000 {

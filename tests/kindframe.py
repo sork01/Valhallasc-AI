@@ -50,6 +50,8 @@ cath = json.loads((ROOT/'client/assets/cathedral.txt').read_text())
 kinds = ['tidetemplar', 'tidecantor', 'tideleech', 'bellkeeper', 'mournsister', 'rootabbot', 'choirmother', 'choirsinger']
 same = kf.merge_kind_entries(cath, kinds, {k: cath['sprites'][k] for k in kinds}, {k: cath['tops'][k] for k in kinds})
 check(json.dumps(same) == json.dumps(cath), 'cathedral.txt: merging the eight kinds unchanged is byte-identical')
+# The live manifest now carries per-kind frames for later art; the logic checks below start from a clean one.
+cath = {k: v for k, v in cath.items() if k != 'kindFrames'}
 big = kf.merge_kind_entries(cath, kinds, {k: cath['sprites'][k] for k in kinds}, {k: cath['tops'][k] for k in kinds}, {'rootabbot': (160, 160, 80, 154)})
 other = [k for k in cath['sprites'] if k not in kinds]
 check(big['kindFrames'] == {'rootabbot': {'frame': [160, 160], 'anchor': [80, 154]}}, 'only the resized Cloister kind gets an entry')
@@ -77,7 +79,8 @@ for p in sorted((ROOT/'client/assets').glob('*.txt')):
     try: d = json.loads(p.read_text())
     except Exception: continue
     if isinstance(d, dict) and 'kinds' in d and 'clips' in d and 'frame' in d:
-        assert 'kindFrames' not in d, p.name
+        for kind, e in d.get('kindFrames', {}).items():  # per-kind entries are valid; each must be a legal frame
+            kf.check_frame(*e['frame'], *e['anchor'])
         kf.check_frame(*d['frame'], *d['anchor']) if d['frame'][0] >= kf.MIN_FRAME else None
         n += 1
-print(f'{n}: every live enemy manifest has no kindFrames (backward compatible)')
+print(f'{n}: every live enemy manifest has a valid shared frame and valid per-kind frames')

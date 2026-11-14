@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('./playwright.cjs');
+const { frameJson } = require('./frames.cjs');
 const { TestWorld } = require('../../scripts/testing/driver.cjs');
 const root = path.resolve(__dirname, '../..');
 const out = path.join(root, 'test-results/touch');
@@ -44,7 +45,7 @@ async function run(suites) {
         const { keepSuggestion = false, keepTutorial = false, lang = 'en', characterClass = 'mage', onPacket, ...contextOptions } = opts;
         const context = await browser.newContext({ viewport: { width, height }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, reducedMotion: 'reduce', ...contextOptions });
         const page = await context.newPage(); page.on('pageerror', e => { errors.push(e.message); console.error('Browser:', e.message); });
-        if (onPacket) page.on('websocket', socket => socket.on('framereceived', ({ payload }) => onPacket(JSON.parse(payload.toString()))));
+        if (onPacket) page.on('websocket', socket => socket.on('framereceived', ({ payload }) => onPacket(frameJson(payload))));
         await page.addInitScript(lang => {
           // These checks exercise controls and layout. Skip audio decoding in each browser.
           window.AudioContext = undefined; window.webkitAudioContext = undefined;

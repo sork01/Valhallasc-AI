@@ -16,7 +16,8 @@ fn mounts_use_160_percent_actual_travel_for_every_mount_and_class() {
             assert_eq!(mount.speed, 1.6);
             let mut distances = Vec::new();
             for riding in [false, true] {
-                place(&mut w, 1, 4, at(80., 140.));
+                // Open Greenmeadow ground (8+ tiles clear of scenery); half a second of travel stays inside it.
+                place(&mut w, 1, 0, at(276., 226.));
                 let p = w.players.get_mut(&1).unwrap();
                 p.character.look.class = class;
                 p.character.grant_mount(mount.id);
@@ -30,12 +31,12 @@ fn mounts_use_160_percent_actual_travel_for_every_mount_and_class() {
                 p.root = 0.;
                 p.stun = 0.;
                 p.buffs.clear();
-                for _ in 0..20 {
+                for _ in 0..10 {
                     w.time += TICK;
                     w.message(1, ClientMessage::Input { dx: 0., dy: -1. });
                     w.update_player(1);
                 }
-                distances.push(w.players[&1].character.point().distance(at(80., 140.)));
+                distances.push(w.players[&1].character.point().distance(at(276., 226.)));
             }
             assert!(
                 (distances[1] / distances[0] - 1.6).abs() < 1e-9,

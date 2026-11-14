@@ -1044,8 +1044,9 @@ mod tests {
             )
             .unwrap();
         let p = w.players.get_mut(&session).unwrap();
-        p.character.x = 8. + session as f64;
-        p.character.y = 8.;
+        // Open Greenmeadow ground (the zone is shaped: the old (8, 8) is outside its floor and blocks every line).
+        p.character.x = 276. + session as f64;
+        p.character.y = 226.;
         welcome["id"].as_str().unwrap().into()
     }
     #[test]
@@ -1076,8 +1077,8 @@ mod tests {
         w.pvp_command(1, PvpCommand::DuelRequest { id: b.clone() });
         w.pvp_command(2, PvpCommand::DuelAccept { id: a });
         w.maps[0].objects = vec![crate::model::Obstacle {
-            x: 9.5,
-            y: 8.,
+            x: 277.5,
+            y: 226.,
             r: 0.,
             width: 0.2,
             depth: 2.,
@@ -1094,19 +1095,19 @@ mod tests {
         let b = add(&mut w, 2, "Bob");
         w.pvp_command(1, PvpCommand::DuelRequest { id: b });
         w.pvp_command(2, PvpCommand::DuelAccept { id: a });
-        w.players.get_mut(&2).unwrap().character.x = 45.;
-        w.players.get_mut(&2).unwrap().character.y = 45.;
+        w.players.get_mut(&2).unwrap().character.x = 313.;
+        w.players.get_mut(&2).unwrap().character.y = 263.;
         w.update_pvp();
         assert_eq!(w.pvp.duels[0].outside[1], Some(0.));
         w.time = 9.9;
         w.update_pvp();
         assert_eq!(w.pvp.duels.len(), 1);
-        w.players.get_mut(&2).unwrap().character.x = 10.;
-        w.players.get_mut(&2).unwrap().character.y = 8.;
+        w.players.get_mut(&2).unwrap().character.x = 278.;
+        w.players.get_mut(&2).unwrap().character.y = 226.;
         w.update_pvp();
         assert_eq!(w.pvp.duels[0].outside[1], None);
-        w.players.get_mut(&2).unwrap().character.x = 45.;
-        w.players.get_mut(&2).unwrap().character.y = 45.;
+        w.players.get_mut(&2).unwrap().character.x = 313.;
+        w.players.get_mut(&2).unwrap().character.y = 263.;
         w.update_pvp();
         assert_eq!(w.pvp.duels[0].outside[1], Some(9.9));
         w.time = 19.8;

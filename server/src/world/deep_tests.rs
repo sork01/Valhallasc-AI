@@ -250,7 +250,10 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         .expect("a travel master");
     assert_eq!(master.id, "travel_keelhaven");
     assert_eq!(
-        map.npcs.len(),
+        map.npcs
+            .iter()
+            .filter(|n| !n.id.starts_with("spirit_guide_"))
+            .count(),
         26,
         "Keelhaven's eleven and the three camps' fifteen"
     );

@@ -19,6 +19,9 @@ fn setup(class: Class) -> (World, mpsc::Receiver<Value>) {
         s.dead = true;
         s.respawn = 10000.;
     }
+    // New heroes land on the pier, inside a sanctuary where nothing hurts them: stand on open ground.
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    (c.x, c.y) = (276., 226.);
     (w, rx)
 }
 fn resource(w: &World) -> f64 {

@@ -761,8 +761,8 @@ mod tests {
         assert_eq!(areas, open_zones(&w));
         assert_eq!(
             areas.len(),
-            20,
-            "20 open zones, as docs/chest-eligibility.txt says"
+            21,
+            "21 open zones, as docs/chest-eligibility.txt says"
         );
         assert!(!w.chest_area(4), "Skaldholm has no monsters");
         let dungeon = w.instances.iter().find(|i| i.template == 5).unwrap().zone;

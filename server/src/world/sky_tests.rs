@@ -171,6 +171,7 @@ fn bifrost_reach_is_a_sky_zone_with_five_kinds_three_elites_one_hub_three_outpos
                 && n.y <= hub.y1
                 && !n.id.starts_with("span_")
                 && !n.id.starts_with("mailbox")
+                && !n.id.starts_with("spirit_guide_")
         })
         .collect();
     assert_eq!(perch_npcs.len(), 8, "seven people and the travel master");

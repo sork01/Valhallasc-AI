@@ -10,6 +10,11 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 import gear_levels as gear
+import vendor_weapons
+
+
+# Pieces other generators own (they run after gear_levels.py in the pipeline).
+OTHER_OWNERS = ('orange_pool', 'chained_forge', 'chained_forge_packs', 'raid_hierlooms')
 
 
 class GearGeneratorTests(unittest.TestCase):
@@ -25,9 +30,14 @@ class GearGeneratorTests(unittest.TestCase):
     def run_generator(self, fn=None):
         with contextlib.redirect_stdout(io.StringIO()):
             (fn or gear.main)()
+        # sync-world runs the vendor-weapon overlay right after the generator; gear_levels.py alone drops it.
+        items = json.loads(gear.ITEMS.read_text())
+        vendor_weapons.apply(items, json.loads((ROOT / 'world/map.txt').read_text()))
+        gear.ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False) + '\n')
 
     def test_extending_old_catalog_preserves_every_old_item_and_game_master_gear(self):
-        old = [i for i in self.catalog if i.get('requiredLevel', 1) <= 20 or i['kind'] not in gear.CLASS_KINDS + gear.SHARED_KINDS]
+        old = [i for i in self.catalog if i.get('requiredLevel', 1) <= 20 or i['kind'] not in gear.CLASS_KINDS + gear.SHARED_KINDS
+               or i.get('source') in OTHER_OWNERS]
         gear.ITEMS.write_text(json.dumps(old))
         self.run_generator()
         new = {i['id']: i for i in json.loads(gear.ITEMS.read_text())}
@@ -59,7 +69,7 @@ class GearGeneratorTests(unittest.TestCase):
         self.run_generator()
         seen = set()
         for i in json.loads(gear.ITEMS.read_text()):
-            if not i.get('art'):
+            if not i.get('art') or 'tint' not in i:  # unique dungeon art is not a recolour
                 continue
             t = i['tint']
             self.assertFalse(t['hue'] % 360 == 0 and t['saturate'] == t['brightness'] == 1, i['id'])
@@ -71,14 +81,16 @@ class GearGeneratorTests(unittest.TestCase):
         self.run_generator()
         items = json.loads(gear.ITEMS.read_text())
         for item in items:
-            if item['kind'] not in gear.CLASS_KINDS + gear.SHARED_KINDS or item['rarity'] == 'gm' or item.get('source') == 'orange_pool':
+            if item['kind'] not in gear.CLASS_KINDS + gear.SHARED_KINDS or item['rarity'] == 'gm' or item.get('source') in OTHER_OWNERS:
                 continue
             bonus = item.get('bonusStats', {})
             expected = {'rare': 1, 'epic': 2}.get(item['rarity'], 0)
             self.assertEqual(len(bonus), expected, item['id'])
             self.assertEqual(bonus, gear.bonus_stats(item), item['id'])
             level = min(95, max(5, item.get('requiredLevel', 1) // 5 * 5))
-            self.assertTrue(all(value == gear.ATTRIBUTE_BONUS[level] and stat in gear.bonus_choices(item.get('class'), value)
+            variant = item['id'].endswith(('_b', '_c'))  # variants may roll the extended shared pool
+            self.assertTrue(all(value == gear.ATTRIBUTE_BONUS[level] and (stat in gear.bonus_choices(item.get('class'), value)
+                                                                          or (variant and stat in gear.PAIR_STATS))
                                 for stat, value in bonus.items()), item['id'])
 
     def test_attribute_bonus_scales_beyond_the_current_catalog(self):

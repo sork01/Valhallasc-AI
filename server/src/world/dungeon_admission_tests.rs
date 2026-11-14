@@ -74,11 +74,18 @@ fn dungeon_admission_four_new_exterior_quests_preserve_existing_keys_and_reachab
         let seen = flood(map, &blocked(map, &[]), map.spawn);
         for site in map.places.iter().filter(|s| s.id.starts_with("admit_")) {
             // The prop has a small solid foot; enter its surrounding objective circle.
-            let point = at(site.x + 1.1, site.y);
-            assert!(reached(map, &seen, point), "{} unreachable", site.id);
-            let mut actual = point;
-            map.collide(&mut actual, PLAYER_RADIUS);
-            assert!(actual.distance(point) < 0.01, "{} blocked", site.id);
+            // (Any free, reachable spot beside it will do: a reshaped zone may put scenery on one side.)
+            let free = |p: &Point| {
+                let mut actual = *p;
+                map.collide(&mut actual, PLAYER_RADIUS);
+                actual.distance(*p) < 0.01
+            };
+            let point = [(1.1, 0.), (-1.1, 0.), (0., 1.1), (0., -1.1), (1.6, 0.), (-1.6, 0.)]
+                .iter()
+                .map(|(dx, dy)| at(site.x + dx, site.y + dy))
+                .find(|p| free(p) && reached(map, &seen, *p))
+                .unwrap_or_else(|| panic!("{} has no free, reachable spot beside it", site.id));
+            let _ = point;
             assert!(map.objects.iter().any(|o| o.x == site.x && o.y == site.y));
             assert!(
                 map.portals
@@ -202,7 +209,7 @@ fn dungeon_admission_level_bell_expiry_and_vigil_pause_and_death() {
         [0]
     );
     talk(&mut w, "yr_wi_lead", Some("quest:accept:entry_solstice"));
-    place(&mut w, 1, 28, at(58.1, 153.));
+    place(&mut w, 1, 28, at(273.1, 387.));
     for _ in 0..40 {
         w.update_holds();
     }
@@ -216,7 +223,7 @@ fn dungeon_admission_level_bell_expiry_and_vigil_pause_and_death() {
             .counts[2]
     };
     assert_eq!(progress(&w), 2);
-    place(&mut w, 1, 28, at(62., 153.));
+    place(&mut w, 1, 28, at(277., 387.));
     for _ in 0..40 {
         w.update_holds();
     }

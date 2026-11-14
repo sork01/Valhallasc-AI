@@ -27,6 +27,10 @@ execFileSync('python3', [path.join(__dirname, 'spirit_guides.py')], { cwd: root,
 execFileSync('python3', [path.join(__dirname, 'spark_routes.py')], { cwd: root, stdio: 'pipe' });
 // Quest-only items for the `bring` quests (docs/quest-items.md) are made last, from the finished quests, before anything reads them.
 execFileSync('python3', [path.join(__dirname, 'quest_items.py')], { cwd: root, stdio: 'pipe' });
+// Cloak offers and cloak quest rewards also reach the shaped zones' new traders and quests, so repeat them after the shapes.
+execFileSync('python3', [path.join(__dirname, 'cloak_catalog.py')], { cwd: root, stdio: 'pipe' });
+// The vendor-weapon stock goes to every merchant and armorer: shaped zones add traders after the early pass, so run it again.
+execFileSync('python3', [path.join(__dirname, 'vendor_weapons.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));

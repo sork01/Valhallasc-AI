@@ -261,7 +261,9 @@ mod tests {
             .collect();
         assert_eq!(hubs, recorded);
         assert_eq!(hubs.len(), directory.len());
-        for d in directory {
+        // Every hub is checked and all the problems are reported together.
+        let mut problems: Vec<String> = vec![];
+        for d in &directory {
             let zi = d["zone"].as_u64().unwrap() as usize;
             let id = d["id"].as_str().unwrap();
             let map = &w.maps[zi];
@@ -269,17 +271,24 @@ mod tests {
             let point = Point { x: n.x, y: n.y };
             let mut resolved = point;
             map.collide(&mut resolved, 0.6);
-            assert!(point.distance(resolved) < 0.01, "{} blocked", d["hub"]);
+            if point.distance(resolved) >= 0.01 {
+                problems.push(format!("{} blocked at ({}, {})", d["hub"], n.x, n.y));
+            }
             let anchor = Point {
                 x: d["anchor"]["x"].as_f64().unwrap(),
                 y: d["anchor"]["y"].as_f64().unwrap(),
             };
-            assert!(map.line_clear(anchor, point, 0.4), "{} approach", d["hub"]);
-            assert!(
-                map.portals
-                    .iter()
-                    .all(|p| point.distance(Point { x: p.x, y: p.y }) > p.r + 1.5)
-            );
+            if !map.line_clear(anchor, point, 0.4) {
+                problems.push(format!("{} approach from ({}, {})", d["hub"], anchor.x, anchor.y));
+            }
+            if !map
+                .portals
+                .iter()
+                .filter(|p| p.seam.is_none() && p.vault.is_none())
+                .all(|p| point.distance(Point { x: p.x, y: p.y }) > p.r + 1.5)
+            {
+                problems.push(format!("{} stands beside a gate", d["hub"]));
+            }
             let p = w.players.get_mut(&1).unwrap();
             p.character.zone = zi;
             p.character.x = point.x;
@@ -287,5 +296,6 @@ mod tests {
             open(&mut w, id);
             assert_eq!(last(&mut rx)["ok"], true, "{} opens", d["hub"]);
         }
+        assert!(problems.is_empty(), "{problems:#?}");
     }
 }

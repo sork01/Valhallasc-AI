@@ -469,5 +469,14 @@
     ],
     "variant": "ash",
     "inside": false
+  },
+  {
+    "zone": 46,
+    "theme": "chained_forge",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
   }
 ]

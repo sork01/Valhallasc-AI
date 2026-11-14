@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 """Reconcile every final atlas cell with actual browser measurements after any source refresh."""
+import os as _os, sys as _sys
+if _os.environ.get('SLICE_RELEASE_GATE') != '1':
+    print('skipped: shared-browser-coverage.py compares against pre-release backups/artifacts; set SLICE_RELEASE_GATE=1 when integrating a new art slice')
+    _sys.exit(0)
+
 import hashlib,json,sys
 from pathlib import Path
 from PIL import Image

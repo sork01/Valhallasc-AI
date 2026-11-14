@@ -41,6 +41,83 @@ pub(super) fn place(w: &mut World, session: u64, zone: usize, at: Point) {
     c.y = at.y;
     c.hp = c.max_hp();
 }
+/// Walks a hero over the shared border (seam) from `from` into `to`, the way a walker does: half a tile past the line,
+/// moving. Greenmeadow's neighbours are seams now, not gates. Returns the arrival point.
+pub(super) fn cross_seam(w: &mut World, session: u64, from: usize, to: usize) -> Point {
+    let seam = w.maps[from]
+        .portals
+        .iter()
+        .find(|p| p.to == to && p.seam.is_some())
+        .unwrap_or_else(|| panic!("zone {from} borders zone {to} with a seam"))
+        .seam
+        .clone()
+        .unwrap();
+    let (a, b) = seam
+        .points
+        .windows(2)
+        .map(|pair| (pair[0], pair[1]))
+        .max_by(|p, q| {
+            (p.1[0] - p.0[0])
+                .hypot(p.1[1] - p.0[1])
+                .total_cmp(&(q.1[0] - q.0[0]).hypot(q.1[1] - q.0[1]))
+        })
+        .unwrap();
+    let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+    let len = dx.hypot(dy);
+    let (nx, ny) = (-dy / len * seam.side.signum(), dx / len * seam.side.signum());
+    let past = Point {
+        x: (a[0] + b[0]) / 2. + nx * 0.5,
+        y: (a[1] + b[1]) / 2. + ny * 0.5,
+    };
+    {
+        let p = w.players.get_mut(&session).unwrap();
+        p.character.zone = from;
+        (p.character.x, p.character.y) = (past.x, past.y);
+        p.moving = true;
+        p.portal_at = -99.;
+        p.input = Point { x: nx, y: ny };
+        p.input_at = w.time;
+    }
+    w.use_portal(session);
+    Point {
+        x: past.x + seam.shift[0],
+        y: past.y + seam.shift[1],
+    }
+}
+
+/// Crosses the portal `id` of `zone` the way a walker does (a seam border, a vaulted wall opening or a gate disc).
+/// Returns where the hero should arrive.
+pub(super) fn cross_portal(w: &mut World, session: u64, zone: usize, id: &str) -> Point {
+    let gate = w.maps[zone]
+        .portals
+        .iter()
+        .find(|p| p.id == id)
+        .unwrap_or_else(|| panic!("zone {zone} has portal {id}"))
+        .clone();
+    if gate.seam.is_some() {
+        return cross_seam(w, session, zone, gate.to);
+    }
+    {
+        let p = w.players.get_mut(&session).unwrap();
+        p.character.zone = zone;
+        p.character.x = gate.x;
+        p.character.y = gate.y;
+        p.portal_at = -99.;
+        walk_out(p, &gate);
+    }
+    w.use_portal(session);
+    gate.vault.map_or(
+        Point {
+            x: gate.tx,
+            y: gate.ty,
+        },
+        |v| Point {
+            x: gate.x + v[0],
+            y: gate.y + v[1],
+        },
+    )
+}
+
 pub(super) fn at(x: f64, y: f64) -> Point {
     Point { x, y }
 }
@@ -493,7 +570,10 @@ fn both_hubs_have_valid_connected_quests_with_every_kind_of_objective_across_lev
     let w = world();
     let map = &w.maps[WYRD];
     assert_eq!(
-        map.npcs.len(),
+        map.npcs
+            .iter()
+            .filter(|n| !n.id.starts_with("spirit_guide_"))
+            .count(),
         36,
         "7 + 7 people, the stranded Eydis, the barrow's two, nine at the outposts, five travel masters, five mailboxes"
     );
@@ -1269,7 +1349,8 @@ fn enemies_pick_the_escort_as_a_target_and_hurt_her() {
         .position(|s| s.zone == WYRD && s.kind == "boar")
         .unwrap();
     w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 21);
-    w.slimes[id].x = here.x + 4.;
+    // Level-gap aggro (Beta 1.40.3) shrinks a boar's notice radius towards its 3 tile floor: stand inside it.
+    w.slimes[id].x = here.x + 2.5;
     w.slimes[id].y = here.y;
     (w.slimes[id].hx, w.slimes[id].hy) = (w.slimes[id].x, w.slimes[id].y);
     w.update_slime(id);

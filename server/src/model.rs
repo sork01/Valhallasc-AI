@@ -2623,16 +2623,30 @@ mod tests {
     #[test]
     fn city_footprints_block_walks_and_dashes_but_gate_is_open() {
         let map = Map::default();
-        let mut point = Point { x: 36., y: 70. };
-        map.walk(&mut point, Point { x: 0., y: 1. }, 8., 0.3);
-        assert!((point.y - 78.).abs() < 1e-6);
+        let city = map.city.clone().expect("Greenmeadow has a city");
+        assert!(map.in_city(Point {
+            x: (city.x0 + city.x1) / 2.,
+            y: (city.y0 + city.y1) / 2.,
+        }));
+        // A house stops a walker coming from the west: it never reaches the house's middle.
+        let house = map
+            .objects
+            .iter()
+            .find(|o| {
+                o.width > 1.
+                    && o.depth > 1.
+                    && o.r == 0.
+                    && city.contains(Point { x: o.x, y: o.y })
+                    && map.in_city(Point { x: o.x - o.width / 2. - 3., y: o.y })
+            })
+            .expect("a house in the city");
+        let mut point = Point {
+            x: house.x - house.width / 2. - 3.,
+            y: house.y,
+        };
+        map.walk(&mut point, Point { x: 1., y: 0. }, 8., 0.3);
+        assert!(point.x < house.x - 0.1, "the house is solid: {point:?}");
         assert!(map.in_city(point));
-        point = Point { x: 43., y: 80. };
-        map.walk(&mut point, Point { x: 0., y: -1. }, 6., 0.3);
-        assert!(point.y >= 77.9 - 1e-8);
-        point = Point { x: 22., y: 80. };
-        map.walk(&mut point, Point { x: 1., y: 0. }, 4., 0.3);
-        assert!(point.x <= 23.4 + 1e-8);
         for npc in &map.npcs {
             let original = Point { x: npc.x, y: npc.y };
             let mut resolved = original;

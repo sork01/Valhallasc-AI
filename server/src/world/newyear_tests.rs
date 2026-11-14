@@ -40,9 +40,9 @@ fn gather(w: &mut World) {
             s,
             2,
             if s == 1 {
-                at(110.5, 100.)
+                at(291.5, 225.)
             } else {
-                at(100. + s as f64 * 0.7, 99.)
+                at(281. + s as f64 * 0.7, 224.)
             },
         );
     }
@@ -50,7 +50,7 @@ fn gather(w: &mut World) {
 #[test]
 fn newyear_summon_scales_to_highest_and_freezes_five_participants() {
     let mut w = fixture();
-    place(&mut w, 2, 2, at(110.5, 100.));
+    place(&mut w, 2, 2, at(291.5, 225.));
     w.summon_festival(2, seasonal_hunt::NEWYEAR).unwrap();
     let e = w.seasonal_hunt.as_ref().unwrap().enemy;
     assert_eq!(w.slimes[e].level, 26);
@@ -59,7 +59,7 @@ fn newyear_summon_scales_to_highest_and_freezes_five_participants() {
     assert_eq!(w.slimes[e].max_hp, hp);
     assert!(w.summon_festival(1, seasonal_hunt::NEWYEAR).is_err());
     let _rx = join(&mut w, 6, Class::Mage);
-    place(&mut w, 6, 2, at(103., 101.));
+    place(&mut w, 6, 2, at(284., 226.));
     assert_eq!(w.hit_slime(e, 6, 1e12, false), 0.);
     assert_eq!(w.slimes[e].hp, hp);
     assert!(w.festival_view(seasonal_hunt::HALLOWEEN).is_null());
@@ -246,7 +246,7 @@ fn newyear_city_scope_catalog_and_calendar_edges() {
     assert_eq!(seasonal_quests[0].id, "newyear_hunt");
     assert!(crate::seasonal::daily("newyear_hunt"));
     assert!(w.festival_view(seasonal_hunt::CHRISTMAS).is_null());
-    assert!(w.maps[2].line_clear(at(103., 100.), at(112., 100.), 1.2));
+    assert!(w.maps[2].line_clear(at(284., 225.), at(293., 225.), 1.2));
     assert_eq!(
         w.spawns
             .iter()

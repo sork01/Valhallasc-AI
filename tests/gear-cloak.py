@@ -11,11 +11,17 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 import cloak_catalog as cloak
 import gear_levels as gear
+import vendor_weapons
 import orange_rules
 
 class Cloaks(unittest.TestCase):
     def setUp(self):
-        self.items=json.loads((ROOT/'world/items.txt').read_text());self.cloaks=[i for i in self.items if i['kind']=='cloak']
+        self.items=json.loads((ROOT/'world/items.txt').read_text())
+        # The catalogue of 100: the plain ladder plus one per dungeon. Variants (_b/_c, GEAR-VARIETY-3X) and the pieces other
+        # generators own (Chainforged, Hierloom) are checked separately.
+        self.all_cloaks=[i for i in self.items if i['kind']=='cloak']
+        self.variants=[i for i in self.all_cloaks if i['id'].endswith(('_b','_c'))]
+        self.cloaks=[i for i in self.all_cloaks if not i['id'].endswith(('_b','_c')) and i.get('source') not in ('chained_forge','raid_hierlooms')]
     def test_catalogue_and_stamina_budget(self):
         self.assertEqual(len(self.cloaks),100)
         self.assertTrue(all(not i.get('class') and not i.get('starter') and i['attack']==i['defense']==0 for i in self.cloaks))
@@ -29,6 +35,11 @@ class Cloaks(unittest.TestCase):
                     expected=sum(necklace['bonusStats'].values()) if necklace else (114*(2 if i['rarity']=='epic' else 1))
                     self.assertEqual(sum(i['bonusStats'].values()),expected)
         self.assertEqual(len({i['name'] for i in self.cloaks}),100)
+        # Two tinted variants of each of the 70 plain cloaks, with their own names.
+        plain_ids={i['id'] for i in self.cloaks if not i.get('source')}
+        self.assertEqual(len(self.variants),140)
+        self.assertEqual({v['id'][:-2] for v in self.variants},plain_ids)
+        self.assertEqual(len({i['name'] for i in self.all_cloaks if i['id'] in plain_ids or i in self.variants}),210)
         colours=set()
         for item in self.cloaks:
             self.assertIn(item['art'],cloak.STYLES)
@@ -49,14 +60,25 @@ class Cloaks(unittest.TestCase):
             try:
                 gear.ITEMS=path
                 before=path.read_bytes()
-                with contextlib.redirect_stdout(io.StringIO()):gear.main()
-                self.assertEqual(path.read_bytes(),before)
-                with contextlib.redirect_stdout(io.StringIO()):gear.main()
-                self.assertEqual(path.read_bytes(),before)
+                world=json.loads((ROOT/'world/map.txt').read_text())
+                def generate():
+                    with contextlib.redirect_stdout(io.StringIO()):gear.main()
+                    # sync-world runs the vendor-weapon overlay right after the generator; gear_levels.py alone drops it.
+                    items=json.loads(path.read_text());vendor_weapons.apply(items,copy.deepcopy(world))
+                    path.write_text(json.dumps(items,indent=2,ensure_ascii=False)+'\n')
+                generate();self.assertEqual(path.read_bytes(),before)
+                generate();self.assertEqual(path.read_bytes(),before)
             finally:gear.ITEMS=old
 
     def test_dungeons_quests_and_tiered_vendors(self):
-        world=json.loads((ROOT/'world/map.txt').read_text());self.assertEqual(cloak.apply_world(copy.deepcopy(world),self.items),world)
+        world=json.loads((ROOT/'world/map.txt').read_text());
+        def ordered(w):  # the cloak offers are added before the vendor-weapon stock in the pipeline; compare as sets of offers
+            w=copy.deepcopy(w)
+            for area in [w,*w['zones']]:
+                for npc in area.get('npcs',[]):
+                    if 'offers' in npc:npc['offers']=sorted(npc['offers'],key=lambda o:o['id'])
+            return w
+        self.assertEqual(ordered(cloak.apply_world(copy.deepcopy(world),self.items)),ordered(world))
         vendors=0;quests=0
         for area in [world,*world['zones']]:
             for npc in area.get('npcs',[]):
@@ -99,10 +121,10 @@ class Cloaks(unittest.TestCase):
                     actual=sprite_bounds.part_bounds(assets/meta['parts'][part]['png'],meta)
                     self.assertEqual(base64.b64decode(bounds['parts'][part]),actual)
         self.assertEqual(len(ids),255);self.assertEqual(len(set(ids)),255)
-        for item in self.cloaks:self.assertIn(item['id'],icons)
+        for item in self.cloaks+self.variants:self.assertIn(item['id'],icons)
 
     def test_handwritten_swedish_for_every_cloak(self):
         sv=json.loads((ROOT/'scripts/sv-translations.txt').read_text())
-        for i in self.cloaks:self.assertTrue(sv.get(i['name']),i['name'])
+        for i in self.all_cloaks:self.assertTrue(sv.get(i['name']),i['name'])
 
 if __name__=='__main__':unittest.main()

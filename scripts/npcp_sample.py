@@ -16,7 +16,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-os.environ.setdefault('VALHALLA_TOOLS', str(ROOT / 'rig-tools'))
+if (ROOT / 'rig-tools').is_dir():
+    os.environ.setdefault('VALHALLA_TOOLS', str(ROOT / 'rig-tools'))  # otherwise cel_common finds the archived tools on the RAID
 sys.path.insert(0, str(HERE))
 import numpy as np  # noqa: E402
 from PIL import Image, ImageDraw  # noqa: E402

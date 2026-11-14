@@ -192,9 +192,11 @@ fn the_undervault_is_a_five_player_dungeon_with_four_private_copies_four_bosses_
         assert!(p.id != "undervault_stairs" || p.r < 1.3);
     }
     // Arrival points are outside every gate of the zone they land in.
+    // (A seam or a vaulted opening has no arrival disc: the walker's own position carries across.)
+    let disc = |p: &&Portal| p.seam.is_none() && p.vault.is_none();
     for map in &w.maps {
-        for p in &map.portals {
-            for q in &w.maps[p.to].portals {
+        for p in map.portals.iter().filter(disc) {
+            for q in w.maps[p.to].portals.iter().filter(disc) {
                 let arrival = Point { x: p.tx, y: p.ty };
                 assert!(
                     arrival.distance(Point { x: q.x, y: q.y }) > q.r + 0.5,
@@ -371,7 +373,8 @@ fn copies_do_not_share_enemies_players_or_snapshots_and_clients_are_told_the_tem
         assert_eq!(v["instance"]["cleared"], false);
     }
     // An unused copy sends no enemies at all.
-    assert!(zones[COPY + 1]["slimes"].as_array().unwrap().is_empty());
+    // (Only zones that hold a player get a view built, so an unused copy has no enemy list at all.)
+    assert!(zones[COPY + 1]["slimes"].as_array().is_none_or(Vec::is_empty));
     // main.rs picks the view that lists the hero, so each client gets its own copy.
     assert_eq!(view_index(&all, &w.players[&2].character.id), COPY);
 }
@@ -443,7 +446,7 @@ fn a_dungeon_copy_resets_when_its_last_hero_leaves_and_a_hero_who_logged_out_ins
     let c = &w.players[&8].character;
     assert_eq!(c.zone, SKALD);
     assert!(
-        c.x > 100. && c.y > 118.,
+        c.point().distance(Point { x: 81.2, y: 122.7 }) < 10.,
         "beside the Meeting Stone: {}, {}",
         c.x,
         c.y

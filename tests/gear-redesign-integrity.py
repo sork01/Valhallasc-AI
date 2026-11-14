@@ -102,12 +102,13 @@ for task in [t for t in high if t['group'] == 'L95'] + dungeon:
 print('83 new sets have editable PixelFlow records for both bodies and every animation')
 
 instance = read('docs/instance-gear-state.txt')['tasks']
-assert len(instance) == 308
+assert len(instance) == 392  # 14 dungeons x 28 pieces
 instance_sources = {'eye': 'eye_below', 'elder': 'elder_hollow', 'pavilion': 'thousandfold',
                     'rain': 'rain_crown', 'seed': 'seed_vault', 'astro': 'sunken_astrolabe',
                     'thunder': 'thunderheart_gate', 'bloom': 'blooming_labyrinth',
                     'solar': 'solar_crucible', 'amber': 'amber_archive',
-                    'solstice': 'silent_solstice'}
+                    'solstice': 'silent_solstice', 'span': 'skybridge',
+                    'keel': 'longship', 'null': 'blackhour'}
 for task in instance:
     if not task['done']:
         continue
@@ -131,4 +132,4 @@ for task in instance:
             assert part in metadata[name]['parts'], (job, cls, gender)
             assert metadata[name]['gearSprites'][part] == sprites, (job, cls, gender)
 
-print(f'{sum(task["done"] for task in instance)}/308 later instance pieces have unique art, icons and both-body PixelFlow records')
+print(f'{sum(task["done"] for task in instance)}/392 later instance pieces have unique art, icons and both-body PixelFlow records')

@@ -123,7 +123,8 @@ def choices(quest,items):
     levels={i['requiredLevel'] for i in eligible if not i.get('source')}
     rewards=quest.get('rewardChoices',{})
     references=[by_id[id_] for ids in rewards.values() for id_ in ids if id_ in by_id and by_id[id_]['kind'] in ('armor','weapon','headgear','shoulders','gloves','pants','necklace','accessory','cloak')]
-    if not references or quest.get('level',1)<5:return quest
+    # The Empty Seat campaign (es_*) is built after this pass and keeps exactly its two own-class choices.
+    if quest['id'].startswith('es_') or not references or quest.get('level',1)<5:return quest
     source=next((i.get('source') for i in references if i.get('source') in DUNGEONS),None)
     if source and next(i for i in eligible if i.get('source')==source)['requiredLevel']<=quest['level']:cloak=next(i for i in eligible if i.get('source')==source)
     else:

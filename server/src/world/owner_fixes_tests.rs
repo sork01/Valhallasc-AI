@@ -67,10 +67,11 @@ fn owner_fixes_unfittable_bag_stays_put_solo_and_party_with_full_inventory() {
 fn owner_fixes_wider_gate_approach_keeps_arrivals_and_access_rules() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
-    let portal = w.maps[0]
+    // Greenmeadow's neighbours are seams now: use a gate with a real disc (the Wyrdwood's way up to Bifrost Reach).
+    let portal = w.maps[6]
         .portals
         .iter()
-        .find(|p| p.to == 1)
+        .find(|p| p.id == "sky_gate")
         .unwrap()
         .clone();
     let side = portal.walk.unwrap();
@@ -90,6 +91,7 @@ fn owner_fixes_wider_gate_approach_keeps_arrivals_and_access_rules() {
         }) > portal.r
     );
     let p = w.players.get_mut(&1).unwrap();
+    p.character.zone = 6;
     p.character.x = here.x;
     p.character.y = here.y;
     p.character.level = 10;
@@ -98,29 +100,29 @@ fn owner_fixes_wider_gate_approach_keeps_arrivals_and_access_rules() {
     p.portal_at = -99.;
     w.use_portal(1);
     assert_eq!(
-        w.players[&1].character.zone, 1,
+        w.players[&1].character.zone, 7,
         "approach just outside the old disc should cross"
     );
     w.use_portal(1);
     assert_eq!(
-        w.players[&1].character.zone, 1,
+        w.players[&1].character.zone, 7,
         "cooldown prevents immediate bounce"
     );
     w.time += PORTAL_DELAY + 1.;
     w.use_portal(1);
     assert_eq!(
-        w.players[&1].character.zone, 1,
+        w.players[&1].character.zone, 7,
         "outward movement after arrival must not bounce"
     );
     // The same wider approach still honors the destination level requirement.
-    w.maps[1].min_level = 20;
+    w.maps[7].min_level = 40;
     let p = w.players.get_mut(&1).unwrap();
-    p.character.zone = 0;
+    p.character.zone = 6;
     p.character.x = here.x;
     p.character.y = here.y;
     p.moving = true;
     p.input = direction;
     p.portal_at = -99.;
     w.use_portal(1);
-    assert_eq!(w.players[&1].character.zone, 0);
+    assert_eq!(w.players[&1].character.zone, 6);
 }

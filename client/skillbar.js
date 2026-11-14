@@ -209,7 +209,8 @@
       else if (slot >= 0) { event.preventDefault(); selected = slot; renderEditor(); }
       return;
     }
-    if (Keys.is(event, 'skills')) { event.preventDefault(); show(); }
+    // The Character pane (stats, gear, achievements) is a modal window: the Skills key must not open a second one behind it.
+    if (Keys.is(event, 'skills')) { if ($('equipment') && !$('equipment').hidden) return; event.preventDefault(); show(); }
     else if (slot >= 0 && Field.canAct) { event.preventDefault(); const skill = find(slots[slot]); if (skill) Field.useSkill(skill.id); }
   });
   addEventListener('keymap-change', () => { if (character) render(); });

@@ -34,7 +34,7 @@ assert len(texts) > 6000 and len(template_sources) > 200, f'harvest looks broken
 
 ENGLISH = re.compile(r'\b(the|and|you|your|with|from|for|of|this|that|are|have|will)\b')
 # Names that contain an English function word and are kept as written in the Swedish text.
-NAMES = ('Heart of the', 'Bag of')
+NAMES = ('Heart of the', 'Bag of', 'of the Lens', 'of the Pith', 'Temple of the Rain Crown', 'The Prismwaste')
 half = [(k, v) for k, v in list(text.items()) + list(templates.items()) + list(phrases.items()) if ENGLISH.search(v) and not any(n in v for n in NAMES)]
 assert not half, 'English words left in Swedish text:\n  ' + '\n  '.join(f'{k!r} -> {v!r}' for k, v in half[:30])
 
@@ -42,7 +42,7 @@ phrases = json.loads(build.PHRASE_FILE.read_text())
 expected = build.assemble(text, templates, phrases)
 assert (ROOT / 'client' / 'sv-data.js').read_text() == expected, 'client/sv-data.js is stale: run python3 scripts/build_swedish.py'
 
-assert 'fest' not in ' '.join(re.findall(r'\bfest\w*', ' '.join(text.values()))).split(), 'party must be "grupp", not "fest"'
+assert 'fest' not in ' '.join(re.findall(r'\bfest\w*', ' '.join(v for k, v in text.items() if 'festival' not in k.lower()))).split(), 'party must be "grupp", not "fest" (fest is right only for a festival)'
 assert text['Invite to party'] == 'Bjud in till grupp'
 assert text['Ash Staff'] == 'Askstav' and text['Crystal Staff'] == 'Kristallstav'
 assert text['Gather a party and face the Glasslion.'].startswith('Samla en grupp')

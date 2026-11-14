@@ -188,7 +188,8 @@ fn pack_recovery_survivors_finish_the_pull_then_rejoin_the_hirer() {
         p.character.x = corpse.x;
         p.character.y = corpse.y;
     }
-    r.w.update_player(1);
+    // The fallen hero is a ghost (corpse run): standing at the corpse, they resurrect.
+    r.w.resurrect_command(1);
     assert!(r.w.players[&1].character.hp > 0.);
     for &session in &r.mercs {
         r.w.players.get_mut(&session).unwrap().combat_left = 0.;

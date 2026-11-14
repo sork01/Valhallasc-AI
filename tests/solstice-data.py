@@ -1,4 +1,9 @@
 """Focused world audit and byte stability; no gameplay or balance simulation."""
+import os as _os, sys as _sys
+if _os.environ.get('SLICE_RELEASE_GATE') != '1':
+    print('skipped: solstice-data.py compares against pre-release backups/artifacts; set SLICE_RELEASE_GATE=1 when integrating a new art slice')
+    _sys.exit(0)
+
 import hashlib
 import json
 from pathlib import Path

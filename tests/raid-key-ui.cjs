@@ -1,3 +1,4 @@
+const { frameJson } = require('./lib/frames.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {TestWorld}=require('../scripts/testing/driver.cjs');
 const {chromium}=require('./lib/playwright.cjs');
@@ -7,7 +8,7 @@ function check(ok,message){assert.ok(ok,message);checks++;console.log(message);}
  world.startLevel=99;world.godMode=true;world.levelSpread=0;await world.start();
  browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
  let latest;const errors=[];page.on('pageerror',e=>errors.push(e.message));
- page.on('websocket',s=>s.on('framereceived',({payload})=>{const p=JSON.parse(payload.toString());if(p.type==='snapshot')latest=p;}));
+ page.on('websocket',s=>s.on('framereceived',({payload})=>{const p=frameJson(payload);if(p.type==='snapshot')latest=p;}));
  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false})));
  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-hunter').click();await page.locator('#name').fill('EmberTester');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero.level===99);

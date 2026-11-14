@@ -1028,6 +1028,15 @@ mod follow_tests {
         }
     }
 
+    fn behind_the_wall(w: &World, merc: u64, status: &str) -> bool {
+        let at = w.players[&merc].character.point();
+        if status == "dead" {
+            at.distance(w.players[&1].character.point()) > 2.
+        } else {
+            at.x < 40.
+        }
+    }
+
     #[test]
     fn merc_follow_immobilization_and_death_do_not_build_a_catch_up_shortcut() {
         for status in ["stun", "root", "frozen", "dead"] {
@@ -1042,7 +1051,8 @@ mod follow_tests {
                 }
                 tick(&mut w, merc);
                 assert!(
-                    w.players[&merc].character.x < 40.,
+                    // A fallen hire respawns at the zone's spawn (far from the hirer): it must not land beside them.
+                    behind_the_wall(&w, merc, status),
                     "{status}: must not warp"
                 );
             }
@@ -1053,7 +1063,7 @@ mod follow_tests {
             p.character.hp = p.character.max_hp();
             tick(&mut w, merc);
             assert!(
-                w.players[&merc].character.x < 40.,
+                behind_the_wall(&w, merc, status),
                 "{status}: immobilized time must not count as stuck"
             );
         }

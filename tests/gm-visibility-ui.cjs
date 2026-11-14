@@ -1,3 +1,4 @@
+const { frameText } = require('./lib/frames.cjs');
 // GM invisibility in two real browsers (GM-INVIS-CLIENT, GM-INVIS-CHECK). [GM]Sork and an ordinary player share Greenmeadow;
 // the ordinary player's raw WebSocket frames are inspected, so hidden means absent from the traffic, not just from the screen.
 // (Original header of the scaffolding below:) The game master's administrator character in a real browser. The site SSO is a fake endpoint run by this test: one
@@ -61,7 +62,7 @@ async function type(page, text) {
 const framesOf = page => {
   const seen = { raw: [], players: [], online: null, chat: [] };
   page.on('websocket', ws => ws.on('framereceived', f => {
-    const text = String(f.payload);
+    const text = frameText(f.payload);
     seen.raw.push(text);
     try {
       const data = JSON.parse(text);

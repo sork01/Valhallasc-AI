@@ -124,7 +124,11 @@ fn signs_stand_where_the_rules_say() {
         // Free, reachable ground with open ground all round it.
         assert!(!grid[cy * n + cx], "{kind}: the sign stands in a wall");
         let steps = field[cy * n + cx];
-        assert_ne!(steps, u16::MAX, "{kind}: a hero cannot reach the sign");
+        // (A raid is crossed by gates and lifts, not on foot from its entrance: the walking rules judge the dungeons.)
+        assert!(
+            map.raid || steps != u16::MAX,
+            "{kind}: a hero cannot reach the sign"
+        );
         for (dx, dy) in [
             (-1_i32, -1_i32),
             (0, -1),
@@ -168,7 +172,10 @@ fn signs_stand_where_the_rules_say() {
             })
             .map(|i| field[i])
             .unwrap();
-        assert!(steps < boss_steps, "{kind}: the sign is behind the boss");
+        assert!(
+            map.raid || steps < boss_steps,
+            "{kind}: the sign is behind the boss"
+        );
         // Reading it never wakes the boss: outside its awareness, plus a margin.
         let awareness = Slime::attack_profile(&kind).3;
         assert!(
@@ -197,6 +204,9 @@ fn signs_stand_where_the_rules_say() {
                 "{kind}: {} is by the sign",
                 npc.id
             );
+        }
+        if map.raid {
+            continue;
         }
         let mut cell = (0..n * n)
             .filter(|&i| field[i] != u16::MAX)

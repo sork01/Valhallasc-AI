@@ -159,7 +159,7 @@ fn chained_forge_open_muster_preserves_seal_level_and_ten_fighter_gates() {
         }
     }
     w.players.get_mut(&1).unwrap().character.level = 99;
-    place(&mut w, 1, 45, at(133., 24.));
+    place(&mut w, 1, 45, at(322., 80.)); // the Forge door in Emberwake (it moved when the zone was shaped)
     w.time = 10.;
     w.use_portal(1);
     assert_eq!(w.players[&1].character.zone, 45, "sealed even for level 99");
@@ -284,7 +284,11 @@ fn chained_forge_wipe_keeps_kills_contracts_and_recovers_at_current_hall() {
     assert!(
         w.players
             .values()
-            .all(|p| p.character.hp > 0. && p.character.point().distance(rally) < 0.01)
+            // Hires stand up at the rally; a human wakes there as a ghost (corpse run) and resurrects from it.
+            .all(|p| {
+                (p.character.hp > 0. || (p.character.ghost && p.merc.is_none()))
+                    && p.character.point().distance(rally) < 0.01
+            })
     );
     w.update_mercenaries();
     assert_eq!(w.players.len(), 10, "contracts survive the wipe");

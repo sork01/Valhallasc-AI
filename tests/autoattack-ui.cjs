@@ -1,3 +1,4 @@
+const { frameJson } = require('./lib/frames.cjs');
 // Every class resumes basic attacks after each skill, without another click/key.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -25,7 +26,7 @@ async function call(name, args = {}) {
     const snapshots = [], events = [], errors = [];
     page.on('pageerror', error => errors.push(error.message));
     page.on('websocket', socket => socket.on('framereceived', ({ payload }) => {
-      const packet = JSON.parse(payload.toString());
+      const packet = frameJson(payload);
       if (packet.type === 'snapshot') snapshots.push(packet);
       if (packet.type === 'event') events.push({ ...packet, time: snapshots.at(-1)?.time || 0 });
     }));

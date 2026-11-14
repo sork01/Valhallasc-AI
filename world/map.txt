@@ -63316,6 +63316,62 @@
           "cost": 30,
           "item": "mana_potion",
           "tiered": true
+        },
+        {
+          "id": "buy_green_weapon_warrior",
+          "label": "Buy Reinforced Royal Sword",
+          "item": "warrior_weapon_royal_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_mage",
+          "label": "Buy Reinforced Crystal Staff",
+          "item": "mage_weapon_crystal_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_assassin",
+          "label": "Buy Reinforced Moonfang Daggers",
+          "item": "assassin_weapon_moonfang_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_priest",
+          "label": "Buy Reinforced Sunbreaker Mace",
+          "item": "priest_weapon_sunmace_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_hunter",
+          "label": "Buy Reinforced Wildwarden Longbow",
+          "item": "hunter_weapon_wardenbow_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_cloak_common",
+          "label": "Buy Travel Cloak",
+          "item": "cloak_l5_common",
+          "tiered": true,
+          "cost": 24
+        },
+        {
+          "id": "buy_cloak_uncommon",
+          "label": "Buy Sturdy Cloak",
+          "item": "cloak_l5_uncommon",
+          "tiered": true,
+          "cost": 160
+        },
+        {
+          "id": "buy_cloak_rare",
+          "label": "Buy Rare Cloak",
+          "item": "cloak_l5_rare",
+          "tiered": true,
+          "cost": 384
         }
       ],
       "buys": true,
@@ -63397,6 +63453,62 @@
           "cost": 30,
           "item": "mana_potion",
           "tiered": true
+        },
+        {
+          "id": "buy_green_weapon_warrior",
+          "label": "Buy Reinforced Royal Sword",
+          "item": "warrior_weapon_royal_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_mage",
+          "label": "Buy Reinforced Crystal Staff",
+          "item": "mage_weapon_crystal_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_assassin",
+          "label": "Buy Reinforced Moonfang Daggers",
+          "item": "assassin_weapon_moonfang_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_priest",
+          "label": "Buy Reinforced Sunbreaker Mace",
+          "item": "priest_weapon_sunmace_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_hunter",
+          "label": "Buy Reinforced Wildwarden Longbow",
+          "item": "hunter_weapon_wardenbow_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_cloak_common",
+          "label": "Buy Travel Cloak",
+          "item": "cloak_l5_common",
+          "tiered": true,
+          "cost": 24
+        },
+        {
+          "id": "buy_cloak_uncommon",
+          "label": "Buy Sturdy Cloak",
+          "item": "cloak_l5_uncommon",
+          "tiered": true,
+          "cost": 160
+        },
+        {
+          "id": "buy_cloak_rare",
+          "label": "Buy Rare Cloak",
+          "item": "cloak_l5_rare",
+          "tiered": true,
+          "cost": 384
         }
       ],
       "buys": true,
@@ -63478,6 +63590,62 @@
           "cost": 30,
           "item": "mana_potion",
           "tiered": true
+        },
+        {
+          "id": "buy_green_weapon_warrior",
+          "label": "Buy Reinforced Royal Sword",
+          "item": "warrior_weapon_royal_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_mage",
+          "label": "Buy Reinforced Crystal Staff",
+          "item": "mage_weapon_crystal_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_assassin",
+          "label": "Buy Reinforced Moonfang Daggers",
+          "item": "assassin_weapon_moonfang_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_priest",
+          "label": "Buy Reinforced Sunbreaker Mace",
+          "item": "priest_weapon_sunmace_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_green_weapon_hunter",
+          "label": "Buy Reinforced Wildwarden Longbow",
+          "item": "hunter_weapon_wardenbow_l10_green",
+          "tiered": true,
+          "cost": 1000
+        },
+        {
+          "id": "buy_cloak_common",
+          "label": "Buy Travel Cloak",
+          "item": "cloak_l5_common",
+          "tiered": true,
+          "cost": 24
+        },
+        {
+          "id": "buy_cloak_uncommon",
+          "label": "Buy Sturdy Cloak",
+          "item": "cloak_l5_uncommon",
+          "tiered": true,
+          "cost": 160
+        },
+        {
+          "id": "buy_cloak_rare",
+          "label": "Buy Rare Cloak",
+          "item": "cloak_l5_rare",
+          "tiered": true,
+          "cost": 384
         }
       ],
       "buys": true,
@@ -130782,6 +130950,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -130864,6 +131088,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -131005,6 +131285,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -206122,6 +206458,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -206204,6 +206596,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -206339,6 +206787,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -289446,6 +289950,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -289528,6 +290088,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -289671,6 +290287,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -434679,6 +435351,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -434761,6 +435489,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -434843,6 +435627,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -486297,6 +487137,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -486379,6 +487275,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -486461,6 +487413,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -516954,6 +517962,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -517036,6 +518100,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -517118,6 +518238,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -643964,6 +645140,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -644039,6 +645271,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -644114,6 +645402,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -690697,6 +692041,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -690772,6 +692172,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -690847,6 +692303,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -744055,6 +745567,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -744130,6 +745698,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -744205,6 +745829,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -881232,6 +882912,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -881307,6 +883043,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -881382,6 +883174,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -929199,6 +931047,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -929274,6 +931178,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -929331,6 +931291,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -977899,6 +979915,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -977974,6 +980046,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -978049,6 +980177,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1047044,6 +1049228,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1047119,6 +1049359,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1047194,6 +1049490,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1095266,8 +1097618,8 @@
           "id": "mailbox_23_veyrroot_canopy",
           "name": "Mailbox",
           "role": "Player mail",
-          "x": 226.5,
-          "y": 255.5,
+          "x": 223.5,
+          "y": 256.0,
           "color": "#cda75e",
           "art": "mailbox",
           "buys": false,
@@ -1095344,6 +1097696,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1095401,6 +1097809,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1095476,6 +1097940,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1096529,35 +1099049,40 @@
               "warrior_weapon_sword_l80_blue",
               "warrior_headgear_crimson_l80_blue",
               "warrior_shoulders_crimson_l80_blue",
-              "warrior_gloves_crimson_l80_blue"
+              "warrior_gloves_crimson_l80_blue",
+              "cloak_l80_rare"
             ],
             "mage": [
               "mage_armor_apprentice_l80_blue",
               "mage_weapon_ash_l80_blue",
               "mage_headgear_apprentice_l80_blue",
               "mage_shoulders_apprentice_l80_blue",
-              "mage_gloves_apprentice_l80_blue"
+              "mage_gloves_apprentice_l80_blue",
+              "cloak_l80_rare"
             ],
             "assassin": [
               "assassin_armor_shadow_l80_blue",
               "assassin_weapon_daggers_l80_blue",
               "assassin_headgear_shadow_l80_blue",
               "assassin_shoulders_shadow_l80_blue",
-              "assassin_gloves_shadow_l80_blue"
+              "assassin_gloves_shadow_l80_blue",
+              "cloak_l80_rare"
             ],
             "priest": [
               "priest_armor_pilgrim_l80_blue",
               "priest_weapon_mace_l80_blue",
               "priest_headgear_pilgrim_l80_blue",
               "priest_shoulders_pilgrim_l80_blue",
-              "priest_gloves_pilgrim_l80_blue"
+              "priest_gloves_pilgrim_l80_blue",
+              "cloak_l80_rare"
             ],
             "hunter": [
               "hunter_armor_scout_l80_blue",
               "hunter_weapon_shortbow_l80_blue",
               "hunter_headgear_scout_l80_blue",
               "hunter_shoulders_scout_l80_blue",
-              "hunter_gloves_scout_l80_blue"
+              "hunter_gloves_scout_l80_blue",
+              "cloak_l80_rare"
             ]
           }
         },
@@ -1096588,35 +1099113,40 @@
               "warrior_weapon_sword_l80_blue",
               "warrior_headgear_crimson_l80_blue",
               "warrior_shoulders_crimson_l80_blue",
-              "warrior_gloves_crimson_l80_blue"
+              "warrior_gloves_crimson_l80_blue",
+              "cloak_l80_rare"
             ],
             "mage": [
               "mage_armor_apprentice_l80_blue",
               "mage_weapon_ash_l80_blue",
               "mage_headgear_apprentice_l80_blue",
               "mage_shoulders_apprentice_l80_blue",
-              "mage_gloves_apprentice_l80_blue"
+              "mage_gloves_apprentice_l80_blue",
+              "cloak_l80_rare"
             ],
             "assassin": [
               "assassin_armor_shadow_l80_blue",
               "assassin_weapon_daggers_l80_blue",
               "assassin_headgear_shadow_l80_blue",
               "assassin_shoulders_shadow_l80_blue",
-              "assassin_gloves_shadow_l80_blue"
+              "assassin_gloves_shadow_l80_blue",
+              "cloak_l80_rare"
             ],
             "priest": [
               "priest_armor_pilgrim_l80_blue",
               "priest_weapon_mace_l80_blue",
               "priest_headgear_pilgrim_l80_blue",
               "priest_shoulders_pilgrim_l80_blue",
-              "priest_gloves_pilgrim_l80_blue"
+              "priest_gloves_pilgrim_l80_blue",
+              "cloak_l80_rare"
             ],
             "hunter": [
               "hunter_armor_scout_l80_blue",
               "hunter_weapon_shortbow_l80_blue",
               "hunter_headgear_scout_l80_blue",
               "hunter_shoulders_scout_l80_blue",
-              "hunter_gloves_scout_l80_blue"
+              "hunter_gloves_scout_l80_blue",
+              "cloak_l80_rare"
             ]
           }
         }
@@ -1132195,19 +1134725,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l20_blue"
+              "warrior_weapon_sword_l20_blue",
+              "cloak_l20_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l20_blue"
+              "mage_weapon_ash_l20_blue",
+              "cloak_l20_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l20_blue"
+              "assassin_weapon_daggers_l20_blue",
+              "cloak_l20_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l20_blue"
+              "priest_weapon_mace_l20_blue",
+              "cloak_l20_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l20_blue"
+              "hunter_weapon_shortbow_l20_blue",
+              "cloak_l20_rare"
             ]
           },
           "minLevel": 20
@@ -1132232,19 +1134767,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l30_blue"
+              "warrior_weapon_sword_l30_blue",
+              "cloak_l30_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l30_blue"
+              "mage_weapon_ash_l30_blue",
+              "cloak_l30_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l30_blue"
+              "assassin_weapon_daggers_l30_blue",
+              "cloak_l30_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l30_blue"
+              "priest_weapon_mace_l30_blue",
+              "cloak_l30_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l30_blue"
+              "hunter_weapon_shortbow_l30_blue",
+              "cloak_l30_rare"
             ]
           },
           "minLevel": 30
@@ -1132269,19 +1134809,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l40_blue"
+              "warrior_weapon_sword_l40_blue",
+              "cloak_l40_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l40_blue"
+              "mage_weapon_ash_l40_blue",
+              "cloak_l40_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l40_blue"
+              "assassin_weapon_daggers_l40_blue",
+              "cloak_l40_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l40_blue"
+              "priest_weapon_mace_l40_blue",
+              "cloak_l40_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l40_blue"
+              "hunter_weapon_shortbow_l40_blue",
+              "cloak_l40_rare"
             ]
           },
           "minLevel": 40
@@ -1132306,19 +1134851,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l50_blue"
+              "warrior_weapon_sword_l50_blue",
+              "cloak_l50_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l50_blue"
+              "mage_weapon_ash_l50_blue",
+              "cloak_l50_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l50_blue"
+              "assassin_weapon_daggers_l50_blue",
+              "cloak_l50_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l50_blue"
+              "priest_weapon_mace_l50_blue",
+              "cloak_l50_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l50_blue"
+              "hunter_weapon_shortbow_l50_blue",
+              "cloak_l50_rare"
             ]
           },
           "minLevel": 50
@@ -1132343,19 +1134893,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l60_blue"
+              "warrior_weapon_sword_l60_blue",
+              "cloak_l60_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l60_blue"
+              "mage_weapon_ash_l60_blue",
+              "cloak_l60_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l60_blue"
+              "assassin_weapon_daggers_l60_blue",
+              "cloak_l60_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l60_blue"
+              "priest_weapon_mace_l60_blue",
+              "cloak_l60_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l60_blue"
+              "hunter_weapon_shortbow_l60_blue",
+              "cloak_l60_rare"
             ]
           },
           "minLevel": 60
@@ -1132380,19 +1134935,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l70_blue"
+              "warrior_weapon_sword_l70_blue",
+              "cloak_l70_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l70_blue"
+              "mage_weapon_ash_l70_blue",
+              "cloak_l70_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l70_blue"
+              "assassin_weapon_daggers_l70_blue",
+              "cloak_l70_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l70_blue"
+              "priest_weapon_mace_l70_blue",
+              "cloak_l70_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l70_blue"
+              "hunter_weapon_shortbow_l70_blue",
+              "cloak_l70_rare"
             ]
           },
           "minLevel": 70
@@ -1132417,19 +1134977,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l80_blue"
+              "warrior_weapon_sword_l80_blue",
+              "cloak_l80_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l80_blue"
+              "mage_weapon_ash_l80_blue",
+              "cloak_l80_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l80_blue"
+              "assassin_weapon_daggers_l80_blue",
+              "cloak_l80_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l80_blue"
+              "priest_weapon_mace_l80_blue",
+              "cloak_l80_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l80_blue"
+              "hunter_weapon_shortbow_l80_blue",
+              "cloak_l80_rare"
             ]
           },
           "minLevel": 80
@@ -1132454,19 +1135019,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l90_blue"
+              "warrior_weapon_sword_l90_blue",
+              "cloak_l90_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l90_blue"
+              "mage_weapon_ash_l90_blue",
+              "cloak_l90_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l90_blue"
+              "assassin_weapon_daggers_l90_blue",
+              "cloak_l90_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l90_blue"
+              "priest_weapon_mace_l90_blue",
+              "cloak_l90_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l90_blue"
+              "hunter_weapon_shortbow_l90_blue",
+              "cloak_l90_rare"
             ]
           },
           "minLevel": 90
@@ -1132491,19 +1135061,24 @@
           "repeatable": false,
           "rewardChoices": {
             "warrior": [
-              "warrior_weapon_sword_l95_blue"
+              "warrior_weapon_sword_l95_blue",
+              "cloak_l95_rare"
             ],
             "mage": [
-              "mage_weapon_ash_l95_blue"
+              "mage_weapon_ash_l95_blue",
+              "cloak_l95_rare"
             ],
             "assassin": [
-              "assassin_weapon_daggers_l95_blue"
+              "assassin_weapon_daggers_l95_blue",
+              "cloak_l95_rare"
             ],
             "priest": [
-              "priest_weapon_mace_l95_blue"
+              "priest_weapon_mace_l95_blue",
+              "cloak_l95_rare"
             ],
             "hunter": [
-              "hunter_weapon_shortbow_l95_blue"
+              "hunter_weapon_shortbow_l95_blue",
+              "cloak_l95_rare"
             ]
           },
           "minLevel": 99
@@ -1199181,6 +1201756,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1199256,6 +1201887,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1199331,6 +1202018,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1240849,6 +1243592,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1240906,6 +1243705,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1240963,6 +1243818,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1288808,6 +1291719,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1288865,6 +1291832,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1288922,6 +1291945,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1439748,6 +1442827,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1439823,6 +1442958,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1439898,6 +1443089,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1593034,6 +1596281,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1593109,6 +1596412,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,
@@ -1593184,6 +1596543,62 @@
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
+            },
+            {
+              "id": "buy_green_weapon_warrior",
+              "label": "Buy Reinforced Royal Sword",
+              "item": "warrior_weapon_royal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_mage",
+              "label": "Buy Reinforced Crystal Staff",
+              "item": "mage_weapon_crystal_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_assassin",
+              "label": "Buy Reinforced Moonfang Daggers",
+              "item": "assassin_weapon_moonfang_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_priest",
+              "label": "Buy Reinforced Sunbreaker Mace",
+              "item": "priest_weapon_sunmace_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_green_weapon_hunter",
+              "label": "Buy Reinforced Wildwarden Longbow",
+              "item": "hunter_weapon_wardenbow_l10_green",
+              "tiered": true,
+              "cost": 1000
+            },
+            {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
             }
           ],
           "buys": true,

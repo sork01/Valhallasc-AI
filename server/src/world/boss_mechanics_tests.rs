@@ -1923,9 +1923,27 @@ fn step_runs_the_engine_with_the_monsters_ai_and_the_snapshot_carries_the_fight(
 /// Whether every zone mechanic of `def` leaves everyone in the boss's arena a way out in time, for twenty draws of
 /// its shape. The sixteen boss tasks run this on their own data (and `every_shipped_boss_is_fair` does it for all).
 fn unfair_point(w: &World, boss: usize, def: &BossDef) -> Option<(String, Point)> {
+    unfair_point_with(w, boss, def, false)
+}
+/// `walkable_only` leaves out walled-off pockets nobody can reach (the Foundry's two arena corners).
+fn unfair_point_with(
+    w: &World,
+    boss: usize,
+    def: &BossDef,
+    walkable_only: bool,
+) -> Option<(String, Point)> {
     let s = &w.slimes[boss];
     let map = &w.maps[s.zone];
     let arena = bm::arena_for_boss(map, s.point(), def);
+    // Only ground a hero can walk to from the boss counts: walled-off pockets (the Foundry's two arena corners) hold nobody.
+    let grid = super::wyrd_tests::blocked(map, &[]);
+    let from_boss = super::wyrd_tests::flood(map, &grid, s.point());
+    let from_spawn = super::wyrd_tests::flood(map, &grid, map.spawn);
+    let standable = |p: Point| {
+        !walkable_only
+            || super::wyrd_tests::reached(map, &from_boss, p)
+            || super::wyrd_tests::reached(map, &from_spawn, p)
+    };
     // The braziers a fight lights: the safe discs of a `lit` zone. Fair if ANY two of them are lit (the sign asks
     // the party to keep two burning), so every pair is tried; a boss without braziers has one empty set.
     let lit_sets: Vec<Vec<Shape>> = match def.mechanics.iter().find_map(|m| match &m.block {
@@ -1976,7 +1994,9 @@ fn unfair_point(w: &World, boss: usize, def: &BossDef) -> Option<(String, Point)
                 };
                 let shapes = bm::resolve(&z.shape, &ctx, &mut rng);
                 if let Some(p) =
-                    bm::first_unsafe_point(map, arena, z.cast, &|p| bm::hurts(z.effect, &shapes, p))
+                    bm::first_unsafe_point(map, arena, z.cast, &|p| {
+                        bm::hurts(z.effect, &shapes, p) && standable(p)
+                    })
                 {
                     return Some((m.name.clone(), p));
                 }
@@ -2025,7 +2045,7 @@ fn every_shipped_boss_is_fair_and_its_tags_exist_in_the_map() {
             "{kind} must be a final boss or a raid Warden"
         );
         assert_eq!(
-            unfair_point(&w, boss.id, def),
+            unfair_point_with(&w, boss.id, def, true),
             None,
             "{kind} leaves a point with no way out in time"
         );

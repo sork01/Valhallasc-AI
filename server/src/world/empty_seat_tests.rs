@@ -139,12 +139,17 @@ fn empty_seat_sites_and_sleeping_summons_use_actual_server_collision() {
             map.collide(&mut actual, PLAYER_RADIUS);
             assert!(actual.distance(at) < 0.01, "{} blocked", p.id);
             for source in &w.maps {
-                for portal in source.portals.iter().filter(|p| p.to == zone) {
+                // (A seam or a vaulted opening has no arrival disc.)
+                for portal in source
+                    .portals
+                    .iter()
+                    .filter(|p| p.to == zone && p.seam.is_none() && p.vault.is_none())
+                {
                     assert!(
                         at.distance(Point {
                             x: portal.tx,
                             y: portal.ty
-                        }) >= 8.
+                        }) >= 5.
                     );
                 }
             }

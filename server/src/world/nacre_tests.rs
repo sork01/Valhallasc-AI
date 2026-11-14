@@ -33,7 +33,14 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
         .map(|o| o["label"].as_str().unwrap())
         .collect();
     assert_eq!(names.len(), 120);
-    assert_eq!(m.npcs.len(), 40);
+    // (The Spirit Guide of the corpse run is not one of the city's forty people.)
+    assert_eq!(
+        m.npcs
+            .iter()
+            .filter(|n| !n.id.starts_with("spirit_guide_"))
+            .count(),
+        40
+    );
     assert_eq!(m.quests.len(), 32);
     // Every dungeon added since keeps its copies after the file zones, so the count only grows.
     assert!(w.maps.len() >= 49, "{} maps", w.maps.len());

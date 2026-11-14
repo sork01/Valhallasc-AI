@@ -191,7 +191,7 @@ mod tests {
         w.seasonal.override_unix = Some(unix);
         w.seasonal.next_check = 0.;
         w.update_seasonal();
-        place(&mut w, 1, 0, at(33.8, 83.));
+        place(&mut w, 1, 0, at(247.8, 190.));
         w
     }
     fn ticks(w: &mut World, n: usize) {
@@ -312,7 +312,7 @@ mod tests {
         ticks(&mut w, 500);
         assert_eq!(w.players[&1].character.festival_spirit.until, 0);
         w.seasonal.override_unix = Some(1813183200);
-        place(&mut w, 1, 0, at(33.8, 83.));
+        place(&mut w, 1, 0, at(247.8, 190.));
         w.players
             .get_mut(&1)
             .unwrap()
@@ -343,7 +343,7 @@ mod tests {
         ticks(&mut w, 500);
         assert!(w.players[&2].festival_dance.is_none());
         assert_eq!(w.players[&2].character.festival_spirit.until, 0);
-        place(&mut w, 2, 0, at(33.8, 83.));
+        place(&mut w, 2, 0, at(247.8, 190.));
         w.start_festival_dance(2, "festival_dance_solstice_0")
             .unwrap();
         ticks(&mut w, 405);

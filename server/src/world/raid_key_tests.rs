@@ -153,8 +153,9 @@ fn raid_key_private_shards_only_for_near_living_eligible_contributors() {
     for s in [1, 3, 4, 5, 6, 7, 8] {
         w.hit_slime(id, s, 1., false);
     }
-    w.players.get_mut(&3).unwrap().character.x = 90.;
-    w.players.get_mut(&3).unwrap().character.y = 90.;
+    let cross = w.maps[0].crosses[0].clone();
+    w.players.get_mut(&3).unwrap().character.x = cross.x + 50.;
+    w.players.get_mut(&3).unwrap().character.y = cross.y + 50.;
     w.players
         .get_mut(&5)
         .unwrap()
@@ -194,8 +195,8 @@ fn raid_key_private_shards_only_for_near_living_eligible_contributors() {
         w.start_raid_channel(1, "raid_cross_0").is_err(),
         "pending drop prevents duplicates"
     );
-    w.players.get_mut(&3).unwrap().character.x = 38.;
-    w.players.get_mut(&3).unwrap().character.y = 48.;
+    w.players.get_mut(&3).unwrap().character.x = cross.x;
+    w.players.get_mut(&3).unwrap().character.y = cross.y + 1.;
     assert!(
         w.start_raid_channel(3, "raid_cross_0").is_ok(),
         "death re-arms immediately for another hero"

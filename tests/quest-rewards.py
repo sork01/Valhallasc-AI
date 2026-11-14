@@ -20,9 +20,14 @@ class QuestGearRewards(unittest.TestCase):
                 quest, gear = quests[quest_id], items[reward_id]
                 self.assertEqual(quest['rewardItem'], reward_id)
                 self.assertFalse(quest['repeatable'])
-                self.assertIn(gear['rarity'], ('uncommon', 'rare'))
                 self.assertNotIn('class', gear)
-                self.assertNotIn('source', gear)
+                if quest_id.startswith(('null_', 'keel_', 'barrow_')):
+                    # The Black Hour, Longship and Nornroot quests hand out a class-neutral piece of their own dungeon set.
+                    self.assertEqual(gear.get('source'), {'null_': 'blackhour', 'keel_': 'longship', 'barrow_': 'nornroot'}[quest_id.split('_')[0] + '_'])
+                    self.assertIn(gear['rarity'], ('rare', 'epic') if quest_id.startswith('null_') else ('rare',))
+                else:
+                    self.assertIn(gear['rarity'], ('uncommon', 'rare'))
+                    self.assertNotIn('source', gear)
                 self.assertLessEqual(gear['requiredLevel'], quest['level'] + 5)
 
     def test_zone_generators_apply_the_shared_reward_table(self):
@@ -61,9 +66,11 @@ class QuestGearRewards(unittest.TestCase):
         quests = {q['id']: (zone, q) for zone, area in enumerate(areas) for q in area.get('quests', [])}
         for zone_name, (id, _, npc, level, *_rest) in PROGRESSION.items():
             zone, q = quests[id]
-            self.assertEqual(areas[zone]['name'], zone_name)
+            # Display-only rename (storm_design.rename): the generator key keeps the old name.
+            shown = {'The Stormglass Shore': 'The Stormglass Flats'}.get(zone_name, zone_name)
+            self.assertEqual(areas[zone]['name'], shown)
             self.assertEqual((q['autoLevel'], q['level'], q['npc']), (level, level, npc))
-            self.assertEqual([(o['kind'], o['target']) for o in q['objectives']], [('reach', zone_name)])
+            self.assertEqual([(o['kind'], o['target']) for o in q['objectives']], [('reach', shown)])
         for id, targets in {
             'city_vault_bosses': {'gatewarden', 'choir', 'colossus', 'hollowking'},
             'nacre_cloister_clear': {'bellkeeper', 'mournsister', 'rootabbot', 'choirmother'},

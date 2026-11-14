@@ -1,3 +1,4 @@
+const { frameJson } = require('./lib/frames.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -35,7 +36,7 @@ async function makePlayer(type, name) {
   page.on('pageerror', error => page.errors.push(error.message));
   page.debugReplies = new Map();
   page.on('websocket', socket => socket.on('framereceived', ({payload}) => {
-    const packet=JSON.parse(payload.toString());
+    const packet=frameJson(payload);
     if(packet.type==='debug') page.debugReplies.set(packet.ref,packet);
     if(packet.type==='event' && packet.kind==='pickup') page.pickups.push(packet);
     const snapshot=packet.type==='snapshot'?packet:packet.type==='welcome'?packet.snapshot:null;

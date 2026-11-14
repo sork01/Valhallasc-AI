@@ -266,7 +266,16 @@ fn cathedral_encounters_have_materials_fixed_levels_distinct_profiles_and_guaran
             e.stats
         );
         for s in w.slimes.iter().filter(|s| s.kind == e.kind) {
-            assert_eq!(s.xp, enemy_xp(s.level) * if e.boss { 12 } else { 1 });
+            let full = enemy_xp(s.level) * if e.boss { 12 } else { 1 };
+            // (Greenmeadow kills pay half XP, rounded up.)
+            assert_eq!(
+                s.xp,
+                if s.zone == GREENMEADOW_ZONE {
+                    full.div_ceil(2)
+                } else {
+                    full
+                }
+            );
             assert!(e.add || overlay_enemy(&e.kind) || e.level < 40 || s.gold >= 850);
         }
         // Later dungeons share this enemy table with their own sets; only the Cathedral's wings are checked here.

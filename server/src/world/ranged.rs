@@ -125,7 +125,7 @@ mod daze_tests {
         let mut w = world();
         calm(&mut w);
         let _rx = join(&mut w, 1, Class::Warrior);
-        place(&mut w, 1, 0, at(25., 25.));
+        place(&mut w, 1, 0, at(276., 226.));
         w.time = 10.;
         w.players
             .get_mut(&1)
@@ -142,8 +142,8 @@ mod daze_tests {
             w.enemy_bolts.push(EnemyBolt {
                 id: 1,
                 zone: 0,
-                x: 25. - fx * 0.6,
-                y: 25.,
+                x: 276. - fx * 0.6,
+                y: 226.,
                 fx,
                 fy: 0.,
                 color: "red",

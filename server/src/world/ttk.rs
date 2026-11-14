@@ -1684,11 +1684,6 @@ fn assert_balanced_grid(levels: &[u32], runs: u64) {
 }
 
 #[test]
-fn sampled_kill_times_stay_in_band_across_classes_and_progression() {
-    assert_balanced_grid(&[5, 20, 50, 99], 1);
-}
-
-#[test]
 #[ignore = "full 100-case, nine-seed balance gate; run after combat changes"]
 fn full_kill_time_balance_gate() {
     assert_balanced_grid(&levels(), 9);

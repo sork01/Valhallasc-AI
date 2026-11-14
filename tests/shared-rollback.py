@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 """Exercise the one-command rollback on disposable RAID copies, including no-write guard failures."""
+import os as _os, sys as _sys
+if _os.environ.get('SLICE_RELEASE_GATE') != '1':
+    print('skipped: shared-rollback.py compares against pre-release backups/artifacts; set SLICE_RELEASE_GATE=1 when integrating a new art slice')
+    _sys.exit(0)
+
 import hashlib,json,shutil,subprocess,sys,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]

@@ -6,8 +6,16 @@ const VALE: usize = 20;
 const ELDER: usize = 30;
 
 fn enter(w: &mut World, session: u64) {
-    place(w, session, VALE, at(106., 22.));
+    // The gate moved when Sunward Vale was shaped: walk through its real position.
+    let gate = w.maps[VALE]
+        .portals
+        .iter()
+        .find(|p| p.id == "sun_elder_gate")
+        .unwrap()
+        .clone();
+    place(w, session, VALE, at(gate.x, gate.y));
     w.time += 1.;
+    walk_out(w.players.get_mut(&session).unwrap(), &gate);
     w.use_portal(session);
 }
 
@@ -278,7 +286,7 @@ fn elder_hollow_boss_kills_credit_living_party_in_copy_and_drop_exclusive_gear()
     w.time += 2.;
     w.use_portal(1);
     assert_eq!(w.players[&1].character.zone, VALE);
-    assert!(w.players[&1].character.point().distance(at(106., 27.)) < 1.);
+    assert!(w.players[&1].character.point().distance(at(176., 47.)) < 1.);
     let quest = w.maps[VALE]
         .quests
         .iter()

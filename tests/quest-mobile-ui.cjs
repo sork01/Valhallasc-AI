@@ -1,3 +1,4 @@
+const { frameJson } = require('./lib/frames.cjs');
 // Quest-only touch layout checks against the private server, without grinding.
 const { run, debug, record } = require('./lib/touch.cjs');
 const phone = (w,h) => !process.env.QUEST_MOUSE && (w<=900 || h<=500);
@@ -14,7 +15,7 @@ async function swipe(page, selector) {
 const suite={name:'quest-mobile',async test({player,check,width,height,out}){
  const isPhone=phone(width,height), mouse=!!process.env.QUEST_MOUSE, press=n=>mouse?n.click():n.tap();
  const page=await player('QuestMobile',{lang:process.env.QUEST_LANG||'en',...(mouse?{isMobile:false,hasTouch:false}:{})});
- const packets=[];page.on('websocket',ws=>ws.on('framereceived',({payload})=>packets.push(JSON.parse(payload.toString()))));
+ const packets=[];page.on('websocket',ws=>ws.on('framereceived',({payload})=>packets.push(frameJson(payload))));
  async function quest(id,action){await debug(page,{op:'quest',id,action});await page.waitForFunction(({id,action})=>{const p=Field.hero.quests.find(q=>q.id===id);if(!p)return false;if(action==='accept')return !p.claimed;const q=[WORLD_MAP,...WORLD_MAP.zones].flatMap(z=>z.quests||[]).find(q=>q.id===id);return q.objectives.every((o,i)=>p.counts[i]>=o.count);},{id,action});}
  async function settled(){await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));}
  async function layout(root,list,detail) {

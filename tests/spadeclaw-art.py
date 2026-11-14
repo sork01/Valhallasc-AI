@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """Read saved art, prove moving front claws, and protect the other four clips."""
+import os as _os, sys as _sys
+if _os.environ.get('LEGACY_SPADEBADGER') != '1':
+    print('skipped: tests the pre-redraw Spadeclaw sheet (96 px cells, old palette); the Sunward enemy art was redrawn in Beta 1.39.27 and is covered by tests/sunward-slime-art.cjs. Set LEGACY_SPADEBADGER=1 to run against old art.')
+    _sys.exit(0)
 import io,subprocess,sys
 from pathlib import Path
 import numpy as np

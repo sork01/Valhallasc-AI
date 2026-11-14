@@ -21,14 +21,15 @@ quests=[q for area in [world,*world['zones']] for q in area['quests'] if q.get('
 assert len(quests)==1 and quests[0]['id']=='newyear_hunt'
 assert len('quest:accept:'+quests[0]['id'])<=32
 assert quests[0]['rewardXp']==read('world/levels.txt')[0]//10
-assert len(quests[0]['givers'])==4 and quests[0]['recommendedPlayers']==5
+assert len(quests[0]['givers'])==5 and quests[0]['recommendedPlayers']==5
 meta=read('client/assets/newyear.txt')
 assert sum(c['n'] for c in meta['clips'].values())==34 and len(meta['sprites'])==1
 atlas=Image.open(root/'client/assets/newyear_starrocketeer.png').convert('RGBA')
+fw,fh=meta['kindFrames']['starrocketeer']['frame']  # the shared-slime redraw gave the kind its own frame
 for clip in meta['clips'].values():
     for k in range(clip['n']):
-        crop=atlas.crop((k*96,clip['row']*96,(k+1)*96,(clip['row']+1)*96))
-        box=crop.getbbox();assert box and min(box[:2])>0 and max(box[2:])<96
+        crop=atlas.crop((k*fw,clip['row']*fh,(k+1)*fw,(clip['row']+1)*fh))
+        box=crop.getbbox();assert box and min(box[:2])>0 and box[2]<fw and box[3]<fh
 m=read('client/assets/mounts_sprites.txt')['mounts']['rocket']
 assert len(m['sprites'])==16 and set(m['clips'])=={'idle','run'}
 color=Image.open(root/'client/assets/mount_rocket.png').convert('RGBA')

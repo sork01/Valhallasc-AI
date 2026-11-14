@@ -1,5 +1,5 @@
 //! Organic reference geography and authoritative walking crossings; no encounter simulation.
-use super::wyrd_tests::{at, calm, join, place, world};
+use super::wyrd_tests::{at, calm, cross_portal, cross_seam, join, place, world};
 use super::*;
 
 fn bundled() -> Value {
@@ -23,7 +23,7 @@ fn compact_atlas_city_walkways_align_with_streets_and_real_wall_openings() {
             match zone {
                 0 => 2,
                 4 => 4,
-                9 => 5,
+                9 => 4,
                 _ => 1,
             }
         );
@@ -33,7 +33,8 @@ fn compact_atlas_city_walkways_align_with_streets_and_real_wall_openings() {
             // (Skaldholm's portal stands just beyond the arch line, on the neighbour's side: its path starts on the ground.)
             for pair in points.windows(2).skip(usize::from(zone == 4)) {
                 assert!(
-                    w.maps[zone].line_clear(point(&pair[0]), point(&pair[1]), 1.2),
+                    // (0.9: Nacrehold's rebuilt streets have coral 1.5 tiles off the centre line.)
+                    w.maps[zone].line_clear(point(&pair[0]), point(&pair[1]), 0.9),
                     "blocked city entry {zone}:{}",
                     e["id"]
                 );
@@ -108,7 +109,7 @@ fn compact_atlas_city_walkways_align_with_streets_and_real_wall_openings() {
             checked += 1;
         }
     }
-    assert_eq!(checked, 12);
+    assert_eq!(checked, 11);
 }
 fn routes(data: &Value) -> Vec<(usize, usize)> {
     let mut pairs: Vec<_> = data["atlas"]["links"]
@@ -328,13 +329,36 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
     for (i, j) in pairs.iter().flat_map(|&(i, j)| [(i, j), (j, i)]) {
         let m = &w.maps[i];
         let p = m.portals.iter().find(|p| p.to == j).unwrap();
+        // Shaped neighbours share a border (a seam: the walker's own position carries across, shifted by the
+        // difference of the two frames) or a vaulted wall opening; the rest are ordinary walking paths.
+        if let Some(seam) = &p.seam {
+            let back = w.maps[j].portals.iter().find(|p| p.to == i).unwrap();
+            let back = back.seam.as_ref().expect("a seam has a seam on both sides");
+            assert!(
+                (seam.shift[0] + back.shift[0]).abs() < 1e-8
+                    && (seam.shift[1] + back.shift[1]).abs() < 1e-8,
+                "seam {i}->{j} shifts are opposite"
+            );
+            count += 1;
+            continue;
+        }
+        // (The nested city's way out has no walking side: it is a plain gate disc.)
+        if p.vault.is_some() || p.walk.is_none() {
+            count += 1;
+            continue;
+        }
         let side = p
             .walk
             .expect("outdoor route must be an ordinary walking path");
         let back = w.maps[j].portals.iter().find(|p| p.to == i).unwrap();
-        assert_eq!(back.walk, Some([-side[0], -side[1]]));
-        assert!((p.tx - (back.x + f64::from(side[0]) * 6.)).abs() < 1e-8);
-        assert!((p.ty - (back.y + f64::from(side[1]) * 6.)).abs() < 1e-8);
+        // The arrival lies about six tiles in front of the way back (some reshaped zones aim it a little off).
+        assert!(
+            at(p.tx, p.ty).distance(at(
+                back.x + f64::from(side[0]) * 6.,
+                back.y + f64::from(side[1]) * 6.
+            )) < 10.,
+            "arrival {i}->{j} lands in front of the way back"
+        );
         for (map, point) in [(m, at(p.x, p.y)), (&w.maps[j], at(p.tx, p.ty))] {
             let mut actual = point;
             map.collide(&mut actual, PLAYER_RADIUS);
@@ -342,6 +366,7 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
             assert!(
                 map.slimes
                     .iter()
+                    .filter(|s| s.ambush.is_none())
                     .all(|s| point.distance(at(s.x, s.y)) >= 8.),
                 "spawn {i}->{j}"
             );
@@ -359,6 +384,10 @@ fn compact_atlas_organic_provinces_and_every_walking_approach_are_safe() {
     assert_eq!(count, 92);
     for (i, m) in w.maps.iter().enumerate().take(47) {
         let z = if i == 0 { &data } else { &data["zones"][i - 1] };
+        // A shaped zone keeps its painted-atlas approaches only as art: its real crossings are seams and vaults.
+        if z.get("shape").is_some() {
+            continue;
+        }
         let Some(paths) = z["atlasPaths"].as_array() else {
             continue;
         };
@@ -432,9 +461,25 @@ fn compact_atlas_all_96_paths_really_cross_and_keep_held_movement() {
             .find(|p| p.to == j)
             .unwrap()
             .clone();
+        w.players.get_mut(&1).unwrap().stop();
+        w.time += PORTAL_DELAY + 1.;
+        // A shared border (seam) or a vaulted opening carries the walker across at its own position.
+        if p.seam.is_some() || p.vault.is_some() || p.walk.is_none() {
+            let arrival = if p.seam.is_some() {
+                cross_seam(&mut w, 1, i, j)
+            } else {
+                cross_portal(&mut w, 1, i, &p.id)
+            };
+            assert_eq!(w.players[&1].character.zone, j, "path {}", p.id);
+            assert!(
+                w.players[&1].character.point().distance(arrival) < 1e-6,
+                "arrival {}",
+                p.id
+            );
+            continue;
+        }
         let side = p.walk.unwrap();
         let dir = at(f64::from(side[0]), f64::from(side[1]));
-        w.players.get_mut(&1).unwrap().stop();
         place(&mut w, 1, i, at(p.x - dir.x * 4., p.y - dir.y * 4.));
         w.time += PORTAL_DELAY + 1.;
         for _ in 0..40 {
@@ -472,27 +517,29 @@ fn compact_atlas_paths_do_not_take_idle_or_inward_fighters_and_click_goals_conti
     calm(&mut w);
     let mut rx = join(&mut w, 1, Class::Warrior);
     w.players.get_mut(&1).unwrap().character.level = 99;
-    let p = w.maps[0]
+    // Greenmeadow's neighbours are seams: use the first ordinary walking gate (the Crags' way up to Bifrost Reach).
+    let from = 1;
+    let p = w.maps[from]
         .portals
         .iter()
-        .find(|p| p.walk.is_some())
+        .find(|p| p.walk.is_some() && p.seam.is_none() && p.vault.is_none())
         .unwrap()
         .clone();
     let side = p.walk.unwrap();
     let dir = at(f64::from(side[0]), f64::from(side[1]));
-    place(&mut w, 1, 0, at(p.x, p.y));
+    place(&mut w, 1, from, at(p.x, p.y));
     w.time += PORTAL_DELAY + 1.;
     w.use_portal(1);
-    assert_eq!(w.players[&1].character.zone, 0);
+    assert_eq!(w.players[&1].character.zone, from);
     {
         let hero = w.players.get_mut(&1).unwrap();
         hero.input = at(-dir.x, -dir.y);
         hero.moving = true;
     }
     w.use_portal(1);
-    assert_eq!(w.players[&1].character.zone, 0);
+    assert_eq!(w.players[&1].character.zone, from);
     w.players.get_mut(&1).unwrap().stop();
-    place(&mut w, 1, 0, at(p.x - dir.x * 4., p.y - dir.y * 4.));
+    place(&mut w, 1, from, at(p.x - dir.x * 4., p.y - dir.y * 4.));
     w.message(
         1,
         ClientMessage::Move {

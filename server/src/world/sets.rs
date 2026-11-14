@@ -682,11 +682,12 @@ mod tests {
             s.dead = true;
         }
         w.slimes[0].dead = false;
-        w.slimes[0].x = 12.;
-        w.slimes[0].y = 12.;
+        // Open Greenmeadow ground: the old (10, 12) is outside the shaped zone's floor.
+        w.slimes[0].x = 278.;
+        w.slimes[0].y = 226.;
         let p = &mut w.players.get_mut(&1).unwrap().character;
-        p.x = 10.;
-        p.y = 12.;
+        p.x = 276.;
+        p.y = 226.;
         let origin = p.point();
         assert_eq!(
             w.apply_set_signature(

@@ -2519,8 +2519,8 @@ mod tests {
             ("gm", "gm")
         );
         let piece_defense: f64 = GM_GEAR.iter().map(|id| item(id).unwrap().defense).sum();
-        assert_eq!(piece_defense, 570_004.);
-        assert!(gm.stats().1 >= 560_000., "{}", gm.stats().1);
+        assert_eq!(piece_defense, 1_710_012.);
+        assert!(gm.stats().1 >= 1_700_000., "{}", gm.stats().1);
         assert!(gm.look.validate().is_ok());
     }
     #[test]

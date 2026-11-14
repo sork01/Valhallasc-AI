@@ -1,3 +1,4 @@
+const { frameJson } = require('./lib/frames.cjs');
 // Private Chromium check of Asterion's original architecture, distinct moving NPCs and Moonwell descent.
 const assert=require('node:assert/strict');
 const path=require('node:path');
@@ -17,7 +18,7 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
   const errors=[],debugPackets=[];page.on('pageerror',e=>errors.push(e.message));
-  page.on('websocket',ws=>ws.on('framereceived',frame=>{try{const p=JSON.parse(frame.payload);if(p.type==='debug')debugPackets.push(p);}catch{}}));
+  page.on('websocket',ws=>ws.on('framereceived',frame=>{try{const p=frameJson(frame.payload);if(p.type==='debug')debugPackets.push(p);}catch{}}));
   page.on('console',m=>{if(m.type()==='error'&&!/401|Failed to load resource/.test(m.text()))errors.push(m.text());});
   await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();

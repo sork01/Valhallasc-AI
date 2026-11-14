@@ -156,8 +156,8 @@
     "colors": [
       "red"
     ],
-    "x": 32.5,
-    "y": 32.5
+    "x": 44.5,
+    "y": 40.5
   },
   "thunder_heart": {
     "title": "Heart of the Stormgate",
@@ -338,8 +338,8 @@
     ]
   },
   "cf_eldmarr": {
-    "x": 151.3,
-    "y": 45.63,
+    "x": 256.5,
+    "y": 33.5,
     "title": "Eldmarr, the Ember-Lord",
     "what": "The Forge Floor: move after 3 seconds on one tile. Cracks warn for 8 seconds, then burn for 40. Rest for 10 seconds at 66% and 33%.",
     "todo": "Rising Heat: blue wells cool 3 friends each and move every 30 seconds. Full heat gives 5 seconds to cool or explode within 5 steps.",
