@@ -27,8 +27,7 @@ const GROUND = ['The Sunlit Glade', 'The Fernbreak'], lums = {};
 (async () => {
   check(Z.name === 'Veyrroot Canopy' && Z.size === 352 && Z.shapeFloor && Z.shape.neighbours.join() === '20,22,25', 'the Veyrroot is the 352 grid with its outline and three neighbours');
   const seams = Z.portals.filter(p => p.seam).map(p => p.to).sort();
-  check(seams.join() === '22,25', 'the Tanglecrown and the Lapis Erg are seams');
-  check(Z.portals.some(p => p.to === 20 && p.walk), 'Sunward Vale is a rim gate you walk through');
+  check(seams.join() === '20,22,25', 'the Sunward Vale, the Tanglecrown and the Lapis Erg are seams (the Veyrroot has no rim gate any more)');
   check(Z.portals.some(p => p.id === 'canopy_hollow_gate' && p.to === 24), 'the Hollow Arch leads to Heartwood');
   for (const p of Z.portals) check(onFloor(Z, p.x, p.y) || p.seam, `${p.id} stands on the floor`);
   check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 25, 'fourteen regions, five hubs and 25 quests');
@@ -92,18 +91,18 @@ const GROUND = ['The Sunlit Glade', 'The Fernbreak'], lums = {};
   for (const [id, x, y] of [['great-tree', 210, 232], ['arch', 210, 226], ['lookout-far', 252, 156], ['hive', 150, 118], ['twin-roots', 240, 90], ['east-roots', 304, 156], ['sap-flats', 204, 266]]) { await go(23, x, y); await page.screenshot({ path: path.join(out, `${id}.png`) }); }
   for (const g of Z.portals.filter(p => !p.seam)) { const wk = g.walk || [0, 1]; await go(23, g.x - wk[0] * 6, g.y - wk[1] * 6); await page.screenshot({ path: path.join(out, `gate-${g.id}.png`) }); }
   // ---- the two seams: stand three tiles inland of each crossing, hold the key toward the neighbour, end up there; then hold the key back and end up here again
-  for (const [other, dy] of [[22, 1], [25, -1]]) {
+  for (const [other, dx, dy] of [[22, 0, 1], [25, 0, -1], [20, -1, 0]]) {
     const p = Z.portals.find(q => q.to === other && q.seam);
-    await go(23, p.x, p.y - dy * 3, 1500);
+    await go(23, p.x - dx * 3, p.y - dy * 3, 1500);
     await page.screenshot({ path: path.join(out, `seam-${other}-before.png`) });
-    let keys = keysFor([0, dy]);
+    let keys = keysFor([dx, dy]);
     for (const key of keys) await page.keyboard.down(key);
     await page.waitForFunction(z => Field.zone === z, other, { timeout: 20000 }).catch(() => {});
     for (const key of keys) await page.keyboard.up(key);
     await page.waitForTimeout(600);
     check((await where()).zone === other, `a held key walks over the seam into zone ${other}`);
     await page.screenshot({ path: path.join(out, `seam-${other}-after.png`) });
-    keys = keysFor([0, -dy]);
+    keys = keysFor([-dx, -dy]);
     for (const key of keys) await page.keyboard.down(key);
     await page.waitForFunction(z => Field.zone === z, 23, { timeout: 20000 }).catch(() => {});
     for (const key of keys) await page.keyboard.up(key);
@@ -114,9 +113,9 @@ const GROUND = ['The Sunlit Glade', 'The Fernbreak'], lums = {};
   // ---- the same world point on the line, drawn from the Veyrroot and from the Tanglecrown, looks the same (the ground blend toward a neighbour must be its real ground classes, not a generic tint)
   const diff = (a, b) => { let sum = 0, big = 0; const n = a.px.length / 4; for (let i = 0; i < a.px.length; i += 4) { const d = (Math.abs(a.px[i] - b.px[i]) + Math.abs(a.px[i + 1] - b.px[i + 1]) + Math.abs(a.px[i + 2] - b.px[i + 2])) / 3; sum += d; if (d > 40) big++; } return { mean: sum / n, big: big / n }; };
   const snap = async (zone, x, y, wx, wy) => { await go(zone, x, y, 2500); await page.evaluate(() => { window.__freezeT = 600000; }); await page.waitForTimeout(300); const shot = await page.evaluate(([wx, wy]) => { const cv = document.getElementById('fieldcv'), [fx, fy] = Field.screenOf(wx, wy), Wd = 256, H = 160, cw = cv.width * .26, chh = cv.height * .26, o = document.createElement('canvas'); o.width = Wd; o.height = H; const g = o.getContext('2d'); g.drawImage(cv, fx * cv.width - cw / 2, fy * cv.height - chh / 2, cw, chh, 0, 0, Wd, H); return { px: Array.from(g.getImageData(0, 0, Wd, H).data), png: o.toDataURL('image/png') }; }, [wx, wy]); await page.evaluate(() => { delete window.__freezeT; }); return shot; };
-  for (const partner of [22, 25]) {
+  for (const partner of seams) {
     const sp = Z.portals.find(q => q.seam && q.to === partner), pts = sp.seam.points, [shx, shy] = sp.seam.shift, rows = [];
-    for (const k of JSON.parse(process.env.KS || '[4, 9]')) {
+    for (const k of JSON.parse(process.env.KS || '[4, 9]').map(k0 => Math.min(k0, pts.length - 2))) {      // the Sunward seam has 12 points
       const a = pts[k], b = pts[k + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]), q = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
       const inward = onFloor(Z, q[0] + nrm[0] * 4, q[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
       const Pt = [q[0] + inward[0] * .5, q[1] + inward[1] * .5], B = [q[0] - inward[0] * .5 + shx, q[1] - inward[1] * .5 + shy], C = [q[0] + (b[0] - a[0]) / len * 7, q[1] + (b[1] - a[1]) / len * 7];

@@ -3,6 +3,7 @@ const assert=require('node:assert/strict');
 const path=require('node:path');
 const fs=require('node:fs');
 const {chromium,STUB}=require('./lib/playwright.cjs');
+const MAP=JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname,'..'),'world/map.txt'),'utf8'));   // counts come from the map, not from a pinned number
 const {Client}=require('@modelcontextprotocol/sdk/client/index.js');
 const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js');
 const root=path.resolve(__dirname,'..');
@@ -21,22 +22,28 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('TanglecrownUI');await page.locator('#go').click({timeout:60000});
-  await page.waitForFunction(()=>Online.connected&&!!Field.tanglecrownSprites?.img.crownjaguar,null,{timeout:60000});
+  await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
+  // a new hero starts in Saltby (zone 0): the zone's sprites load only once the hero is in it, so teleport first
+  await page.evaluate(()=>Online.send({type:'debug',ref:400,command:{op:'teleport',zone:22,x:122,y:190}}));
+  await page.waitForFunction(()=>Field.zone===22&&!!Field.tanglecrownSprites?.img.crownjaguar,null,{timeout:60000});
   const data=await page.evaluate(()=>{const zones=Field._debug.zones,z=zones[22],src=Field.tanglecrownSprites;return {count:zones.length,name:z.name,theme:z.theme,levels:z.levels,quests:z.quests.length,npcs:z.npcs.length,spawns:z.slimes.length,kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>{const f=Field.frameOf(src,k);return [src.img[k].naturalWidth,src.img[k].naturalHeight,f.w*8,f.h*5];}),art:['kapok_tree','strangler_fig','jungle_water','banyan_lodge','rain_crown_temple'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,seal:z.futureInstance,gate:zones[21].portals.find(p=>p.id==='ribbon_tangle_gate'),travel:z.npcs.find(n=>n.id==='travel_banyan'),host:z.npcs.find(n=>n.id==='tangle_warden'),keeper:z.npcs.find(n=>n.id==='tangle_scholar')};});
-  check(data.count===40&&data.name==='The Tanglecrown'&&data.theme==='tanglecrown'&&data.levels.join(',')==='75,80','Level 75–80 zone loads');
+  const Zt=MAP.zones[21];
+  check(data.count===MAP.zones.length+1&&data.name==='The Tanglecrown'&&data.theme==='tanglecrown'&&data.levels.join(',')==='75,80','Level 75–80 zone loads');
   check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h,ew,eh])=>w===ew&&h===eh)),'Nine PixelFlow atlases load');
   check(data.art&&data.layout>=30,'Jungle art and world map load');
-  check(data.npcs===8&&data.quests===12&&data.spawns===42,'Quest hub and six encounters load');
+  check(data.npcs===Zt.npcs.length&&data.quests===Zt.quests.length&&data.spawns===Zt.slimes.length,'Every NPC, quest and encounter of the Tanglecrown loads');
   check(data.seal?.status==='open'&&data.seal?.name==='Temple of the Rain Crown'&&data.gate?.to===22,'Epic entrance is open and reachable');
   check(data.travel?.travelLinks.includes('travel_jubilee')&&data.travel?.art==='tangle_travel'&&data.host?.art==='tangle_warden'&&data.keeper?.art==='tangle_scholar','Three distinct NPC atlases load');
   let ref=401;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);
-  await debug({op:'teleport',zone:22,x:29,y:110});
-  await page.waitForFunction(()=>Field.zone===22&&Math.hypot(Field.hero.x-29,Field.hero.y-110)<2,null,{timeout:15000});
+  await debug({op:'teleport',zone:22,x:122,y:190});
+  await page.waitForFunction(()=>Field.zone===22&&Math.hypot(Field.hero.x-122,Field.hero.y-190)<3,null,{timeout:15000});
   await page.waitForTimeout(1200);
   await page.screenshot({path:path.join(world.artifacts,'tanglecrown-landing.png')});await capture('tanglecrown-landing-clean.png');
-  check(await page.evaluate(()=>Field.zoneTheme==='tanglecrown'&&City.npcs.length===8),'Banyan Landing paints in live zone');
-  await debug({op:'teleport',zone:22,x:111,y:27});
-  await page.waitForFunction(()=>Field.zone===22&&Math.hypot(Field.hero.x-111,Field.hero.y-27)<2,null,{timeout:15000});
+  const folk=Zt.npcs.filter(n=>!n.season&&n.art!=='spirit_guide').length;   // City.npcs is the whole zone's folk for a living hero: no Spirit Guide, no season that is out
+  const landed=await page.evaluate(()=>({theme:Field.zoneTheme,npcs:City.npcs.map(n=>n.id)}));
+  check(landed.theme==='tanglecrown'&&landed.npcs.length===folk,`Banyan Landing paints in live zone (theme ${landed.theme}, ${landed.npcs.length} folk, want ${folk}: ${landed.npcs.join(',')})`);
+  await debug({op:'teleport',zone:22,x:254,y:142});
+  await page.waitForFunction(()=>Field.zone===22&&Math.hypot(Field.hero.x-254,Field.hero.y-142)<3,null,{timeout:15000});
   await page.waitForTimeout(1500);
   await page.screenshot({path:path.join(world.artifacts,'tanglecrown-temple.png')});await capture('tanglecrown-temple-clean.png');
   check(await page.evaluate(()=>Field._debug.zones[22].portals.some(p=>p.to===32)&&Field.zone===22),'Temple has a playable portal');

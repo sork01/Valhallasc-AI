@@ -28,8 +28,7 @@ const GROUND = ['The Drum Terraces', 'The Blackwater Edge'], lums = {};
 (async () => {
   check(Z.name === 'The Tanglecrown' && Z.size === 304 && Z.shapeFloor && Z.shape.neighbours.join() === '20,21,23', 'The Tanglecrown is the 304 grid with its outline and three neighbours');
   const seams = Z.portals.filter(p => p.seam);
-  check(seams.map(p => p.to).join() === '21', 'the only seam is the one to the Ribbonwild');
-  for (const to of [20, 23]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
+  check(seams.map(p => p.to).sort((a, b) => a - b).join() === '20,21,23', 'the seams are Sunward Vale, the Ribbonwild and the Veyrroot Canopy (the Tanglecrown has no rim gate any more)');
   check(Z.portals.some(p => p.id === 'tangle_rain_gate' && p.to === 32), 'the temple door leads to the Temple of the Rain Crown');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
   check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 32, 'fourteen regions, five hubs and 32 quests');
@@ -100,7 +99,7 @@ const GROUND = ['The Drum Terraces', 'The Blackwater Edge'], lums = {};
   const rows = [];
   for (const sp of seams.filter(p => !process.env.PARTNERS || JSON.parse(process.env.PARTNERS).includes(p.to))) {      // PARTNERS='[19]': one seam only
     const partner = sp.to, P = W.zones[partner - 1], pts = sp.seam.points, [shx, shy] = sp.seam.shift;
-    for (const k of JSON.parse(process.env.KS || '[7, 12]')) {
+    for (const k of JSON.parse(process.env.KS || '[7, 12]').map(k0 => Math.min(k0, pts.length - 2))) {      // the Sunward seam has 12 points: clamp to a real segment
       const a = pts[k], b = pts[k + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
       const q = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], nrm = [-(b[1] - a[1]) / len, (b[0] - a[0]) / len];
       const inward = onFloor(Z, q[0] + nrm[0] * 4, q[1] + nrm[1] * 4) ? nrm : [-nrm[0], -nrm[1]];
