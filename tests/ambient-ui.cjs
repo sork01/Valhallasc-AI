@@ -28,8 +28,19 @@ const check = (condition, message) => { assert.ok(condition, message); checks++;
   check(first.every(p => names.has(p.name) && p.level >= 1 && p.level <= 5 && p.sprite), 'Names, map levels and class sprites are present');
   check(new Set(first.map(p => p.name)).size === first.length, 'Names do not repeat within the zone');
   check(first.every(p => p.x < 24 || p.x > 48 || p.y < 72 || p.y > 94), 'Field arrivals do not appear inside the Alderhaven quest hub');
-  const health = await (await fetch(started.url + 'health')).json();
-  check(health.online === 1 && health.visibleOnline === first.length + 1, 'The real connection count stays separate from visible players');
+  // The zone fills toward its target one adventurer every 0.5 s (world/ambient.rs), and the client learns of each one a snapshot
+  // later. Wait until the server count and the client roster agree for 1.2 s (longer than one arrival gap), then compare.
+  let settled = null, agreeSince = 0;
+  for (const deadline = Date.now() + 30000; !settled && Date.now() < deadline;) {
+    const h = await (await fetch(started.url + 'health')).json();
+    const remote = await page.evaluate(() => Field.remotePlayers.length);
+    if (h.visibleOnline === remote + 1) {
+      agreeSince ||= Date.now();
+      if (Date.now() - agreeSince >= 1200) settled = { health: h, remote };
+    } else agreeSince = 0;
+    if (!settled) await page.waitForTimeout(250);
+  }
+  check(settled && settled.health.online === 1 && settled.health.visibleOnline === settled.remote + 1, 'The real connection count stays separate from visible players');
   await page.keyboard.press('o');
   await page.locator('#social-panel').waitFor({ state: 'visible' });
   await page.locator('#social-tab-online').click();
