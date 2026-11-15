@@ -7,6 +7,43 @@ const kit = require('./tools.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+// Where a walker starts and steps toward to cross a gate: a walk gate fires only moving out through its side; a seam
+// fires only within its reach on its own side of the border line (Seam.crossing), so start 2 tiles on that side.
+// The claim offer for a quest with class reward choices: the rewardItem is automatic, the warrior's first choice is picked.
+const claimOf = (area, id) => {
+  const q = area.quests.find(x => x.id === id);
+  return `quest:claim:${id}` + (q?.rewardChoices?.warrior?.[0] ? `:${q.rewardChoices.warrior[0]}` : '');
+};
+// A live enemy of `kind` in game zone `gameZone`. Snapshots only carry enemies within ~56 tiles of the hero, so when none is
+// in view the hero is taken to that kind's authored spawn first (the shaped map puts elites far from the arrival).
+async function enemyOf(w, bot, gameZone, area, kind) {
+  const pick = () => w.snapshot.slimes.find(s => s.kind === kind && s.zone === gameZone && !s.dead);
+  if (!pick()) {
+    const authored = area.slimes.find(s => s.kind === kind);
+    await kit.teleport(w, bot, { zone: gameZone, x: authored.x + 3, y: authored.y + 3 });
+    await w.waitFor(() => !!pick(), 8000, `Find a live ${kind}`);
+  }
+  return pick();
+}
+function crossingPath(gate) {
+  if (gate.walk) return { start: { x: gate.x - gate.walk[0] * 4, y: gate.y - gate.walk[1] * 4 }, goal: { x: gate.x + gate.walk[0] * 2, y: gate.y + gate.walk[1] * 2 } };
+  const pts = gate.seam.points;
+  let best = null;
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
+    const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1;
+    const t = Math.max(0, Math.min(1, ((gate.x - ax) * dx + (gate.y - ay) * dy) / (len * len)));
+    const d = Math.hypot(gate.x - (ax + dx * t), gate.y - (ay + dy * t));
+    if (!best || d < best.d) best = { d, gx: -dy / len, gy: dx / len };
+  }
+  const s = gate.seam.side;
+  return {
+    start: { x: gate.x + s * 2 * best.gx, y: gate.y + s * 2 * best.gy },
+    goal: { x: gate.x - s * 2 * best.gx, y: gate.y - s * 2 * best.gy },
+  };
+}
+// People of a zone: its NPCs minus the stone, mailboxes, festival dance scenery and Spirit Guides.
+const peopleOf = zone => zone.npcs.filter(n => !/^(stone|mailbox|scenery|spirit_guide)$/.test(n.art || '') && !/Gather your party|Player mail|Festival dance|Resurrection/.test(n.role || ''));
 
 const crags = map.zones[0];
 const rime = map.zones[1];
@@ -223,7 +260,8 @@ const scenarios = {
       await w.waitFor(() => w.player('Sage').dashT > 0 || Math.hypot(w.player('Sage').x - start.x, w.player('Sage').y - start.y) > 2, 3000, 'Blink');
       await w.advance(500);
       check(Math.hypot(w.player('Sage').x - start.x, w.player('Sage').y - start.y) > 2.5, 'Blink moves the mage in one jump');
-      // Assassin: a ring of knives, a damaging dash.
+      // Assassin: a ring of knives, a damaging dash. Shade starts on the pier, where walls block the knives and the dash.
+      await kit.teleport(w, 'Shade', { zone: 0, x: 250, y: 235 });
       await cast(w, 'Shade', 'knifering');
       await w.waitFor(() => w.snapshot.bolts.filter(b => b.color === '#f3d8ff').length >= 12, 5000, 'Knife ring');
       check(w.snapshot.bolts.filter(b => b.color === '#f3d8ff').length === 12, 'Knife Ring throws twelve knives');
@@ -659,6 +697,8 @@ const scenarios = {
       await w.waitFor(() => w.events.some(e => !beforeReset.has(e) && e.bot === 'Gm' && e.kind === 'skill' && e.skill === 'battlecry'), 3000, 'Second Battle Cry event');
       check(true, 'resetCooldown allows an immediate second cast');
       await w.connect({ bot: 'Rookie', class: 'mage' });
+      // A new hero starts on the pier, where walls block a default-aim cast: stand on open ground first.
+      await kit.teleport(w, 'Rookie', { zone: 0, x: 250, y: 235 });
       const locked = await kit.castSkill(w, 'Rookie', { skill: 'meteor', unlock: false, settleMs: 300 });
       check(!locked.cast && locked.refused.some(t => /unlocks at level 28/.test(t)), 'The server refuses a skill above the level when unlock is off');
       const beforeMeteor = new Set(w.events);
@@ -700,7 +740,8 @@ const scenarios = {
       await kit.teleport(w, 'Gm', { portal: 'emberfall_gate' });
       const gate = kit.zones[0].portals.find(p => p.id === 'emberfall_gate');
       check(me().zone === 0 && Math.hypot(me().x - gate.x, me().y - gate.y) > gate.r, 'teleport to a portal stops short of the gate');
-      await w.action('Gm', { type: 'move', x: gate.x, y: gate.y });
+      // The Crags gate is a seam: the Crags lie north of its line (shift [-172, 248]), so walk past the line.
+      await w.action('Gm', { type: 'move', x: gate.x, y: gate.y - 3 });
       await w.waitFor(() => me().zone === 1, 10000, 'Portal');
       check(true, 'Walking into the gate crosses into the Crags');
       await w.debug('Gm', { op: 'set_level', level: 20 });
@@ -708,11 +749,18 @@ const scenarios = {
       check(me().level === 20 && me().xp === 0, 'The character is level 20 with an empty bar before dying');
       await w.debug('Gm', { op: 'die' });
       await w.waitFor(() => me().dead, 3000, 'Defeat');
-      await w.waitFor(() => me().level === 19, 3000, 'Penalty');
-      check(me().xp === me().xpNeed - Math.floor(need20 / 3), 'Dying costs a third of level 20\'s XP and, with an empty bar, takes the character down to level 19');
-      await kit.waitForEvent(w, { kind: 'respawn', bot: 'Gm', timeout: 8000 });
-      await w.waitFor(() => !me().dead && me().hp === me().maxHp, 3000, 'Respawn heals');
-      check(true, 'A defeated character respawns at full health');
+      // Obsolete since 2026-10-22 (docs/durability.md): dying no longer costs XP or a level; it wears worn gear instead.
+      check(me().level === 20 && me().xp === 0 && me().xpNeed === need20, 'Dying costs no XP and no level: the character stays level 20 and gear wears instead');
+      // Death makes a ghost after a 3.2 s timer (corpse run): walk back within 15 tiles of the body and press Resurrect (half health).
+      await w.waitFor(() => me().ghost, 8000, 'Ghost form');
+      const corpse = w.events.filter(e => e.bot === 'Gm' && e.kind === 'death').at(-1);
+      await w.action('Gm', { type: 'move', x: corpse.x, y: corpse.y - 6 });
+      await w.waitFor(() => distance(me(), corpse) < 12, 15000, 'Ghost returns to the body');
+      await w.action('Gm', { type: 'stop' });
+      // The MCP action schema lacks 'resurrect': send it on the bot socket, as the browser does.
+      w.bots.get('Gm').socket.send(JSON.stringify({ type: 'resurrect' }));
+      await w.waitFor(() => !me().dead, 3000, 'Resurrect');
+      check(me().hp > 0 && me().hp <= me().maxHp / 2 + 1, 'A defeated character resurrects at its body at half health');
       const snapshot = w.summary('Gm'), history = me().quests.map(q => [q.id, q.completions]);
       await w.restart();
       await w.waitFor(() => w.player('Gm') && w.player('Gm').level === 19, 10000, 'Resume');
@@ -2806,23 +2854,26 @@ const scenarios = {
       await w.connect({ bot: watcher, class: 'mage' });
       await kit.setupCharacter(w, bot, { gold: 2000 });
       const town = map.zones[8], gate = deep.portals.find(p => p.id === 'nacre_gate'), back = town.portals[0];
-      check(town.objects.filter(o => o.kind === 'nacrehouse').length === 120 && town.npcs.length === 30 && town.slimes.length === 0, '120 homes, 30 people, no enemies');
-      check(town.futureInstance.status === 'open' && town.futureInstance.players === 5 && town.portals.length === 5, 'The Drowned Cathedral has three open wings and Astralhollow has its Nacrehold starway');
+      check(town.objects.filter(o => o.kind === 'nacrehouse').length === 120 && peopleOf(town).length >= 30 && town.slimes.length === 0, `120 homes, ${peopleOf(town).length} people, no enemies`);
+      check(town.futureInstance.status === 'open' && town.futureInstance.players === 5 && town.portals.filter(p => p.look === 'cathedral').length === 3 && town.portals.some(p => p.id === 'nacre_astral_gate'), 'The Drowned Cathedral has three open wings and Astralhollow has its Nacrehold starway (the five-ways paths are extra)');
       await kit.teleport(w, bot, { npc: 'travel_keelhaven' });
       await kit.talkTo(w, bot, 'travel_keelhaven');
       await kit.teleport(w, bot, { zone: 8, x: gate.x, y: gate.y - 4 });
-      await w.action(bot, { type: 'move', x: gate.x, y: gate.y });
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y + 3 }); // the gate is a seam: walk past its line
       await w.waitFor(() => w.player(bot).zone === 9, 15000, 'Walk into the Tideway');
       await w.action(bot, { type: 'stop' });
-      check(distance(w.player(bot), { x: gate.tx, y: gate.ty }) < 1.5, 'The Tideway arrives at the south city boulevard');
+      check(distance(w.player(bot), { x: gate.tx, y: gate.ty }) < 1.5, 'The Tideway arrives at the north landing beside the Tideway place (the city spawn is south; the seam makes this the north edge)');
       const view = b => w.views.get(b);
       check(view(bot).slimes.length === 0 && view(bot).players.every(p => p.zone === 9) && view(watcher).players.every(p => p.zone === 0), 'City and meadow sockets receive separate zone views');
+      // The Tideway lands on the north edge, ~190 tiles from the envoy: teleport rather than walk through the Cathedral wing portal on the way.
+      await kit.teleport(w, bot, { npc: 'nacre_envoy' });
       const reply = await kit.talkTo(w, bot, 'nacre_envoy', 'quest:accept:nacre_welcome');
       await w.waitFor(() => !!quest(w, bot, 'nacre_welcome'));
       check(reply.dialogue.includes('hundred and twenty') && !!quest(w, bot, 'nacre_welcome'), 'The mermaid envoy introduces the city and accepts its quest');
       await kit.walkTo(w, bot, { zone: 9, x: 96, y: 151 });
       check(distance(w.player(bot), { x: 96, y: 151 }) < .6, 'A real walk follows the clear residential avenue');
-      const house = town.objects.find(o => o.kind === 'nacrehouse' && o.y === 151);
+      // The shell home nearest the avenue point (the map's homes move with the layout).
+      const house = town.objects.filter(o => o.kind === 'nacrehouse').sort((p, q) => Math.hypot(p.x - 96, p.y - 151) - Math.hypot(q.x - 96, q.y - 151))[0];
       await kit.teleport(w, bot, { zone: 9, x: house.x, y: house.y + 4 });
       await w.action(bot, { type: 'move', x: house.x, y: house.y });
       await w.advance(1800); await w.action(bot, { type: 'stop' });
@@ -2858,14 +2909,16 @@ const scenarios = {
       await w.waitFor(() => !w.player(bot).sparkTravel && w.player(bot).zone === 8, 30000, 'Fly to Keelhaven');
       check(w.player(bot).gold === fare - 20 && distance(w.player(bot), deep.npcs.find(n => n.id === 'travel_keelhaven')) < 2, 'The linked Spark flight costs 20 gold and reaches Keelhaven');
       await kit.teleport(w, bot, { zone: 8, x: gate.x, y: gate.y - 4 });
-      await w.action(bot, { type: 'move', x: gate.x, y: gate.y });
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y + 3 }); // the gate is a seam: walk past its line
       await w.waitFor(() => w.player(bot).zone === 9, 15000);
       await w.action(bot, { type: 'stop' });
       await w.advance(1200);
-      await w.action(bot, { type: 'move', x: back.x, y: back.y });
+      // Start south of the seam line so the walk crosses it at the gate, not where the hero happened to stand.
+      await kit.teleport(w, bot, { zone: 9, x: back.x, y: back.y + 4 });
+      await w.action(bot, { type: 'move', x: back.x, y: back.y - 3 }); // the return gate is a seam: walk past its line (north)
       await w.waitFor(() => w.player(bot).zone === 8, 15000, 'Walk back to the sea floor');
       await w.action(bot, { type: 'stop' });
-      check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 1.5, 'The return Tideway arrives outside its gate disc');
+      check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 1.5, `The return Tideway arrives outside its gate disc (at ${w.player(bot).x.toFixed(1)},${w.player(bot).y.toFixed(1)}, expected ${back.tx},${back.ty})`);
     },
   },
   nacre_quests: {
@@ -2873,12 +2926,16 @@ const scenarios = {
     startLevel: 40,
     async run(w, check) {
       const bot = 'Shellcourier', town = map.zones[8];
+      // The nine city quests (talk, visit, bring). The Cathedral wing clears (kill), arena trials, Empty Seat chapters and seasonal standing orders have their own scenarios.
+      const NINE = ['nacre_welcome', 'nacre_gardens', 'nacre_districts', 'nacre_history', 'nacre_cathedral', 'nacre_lamps', 'nacre_smithwork', 'nacre_letters', 'nacre_supplies'];
+      const ordinary = NINE.map(id => town.quests.find(q => q.id === id));
+      check(ordinary.every(Boolean), 'The nine city quests exist on the map');
       await w.connect({ bot, class: 'warrior' });
       await kit.setupCharacter(w, bot, { gold: 0 });
       await kit.teleport(w, bot, { npc: 'nacre_warden' });
       await kit.talkTo(w, bot, 'nacre_warden', 'quest:accept:nacre_cathedral');
       check(!quest(w, bot, 'nacre_cathedral'), 'The Cathedral preparation requires the city history first');
-      for (const q of town.quests) {
+      for (const q of ordinary) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
         await w.waitFor(() => !!quest(w, bot, q.id));
@@ -2906,14 +2963,14 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before + q.rewardGold, `${q.title}: duplicate claim pays nothing`);
       }
-      const repeat = town.quests.find(q => q.repeatable);
+      const repeat = ordinary.find(q => q.repeatable);
       await kit.talkTo(w, bot, repeat.npc, `quest:accept:${repeat.id}`);
       await w.debug(bot, { op: 'give_item', item: 'drowned_coin', quantity: 4 });
       await kit.talkTo(w, bot, repeat.npc, `quest:claim:${repeat.id}`);
       await w.waitFor(() => quest(w, bot, repeat.id).completions === 2);
       check(quest(w, bot, repeat.id).completions === 2, 'The standing order repeats with a second real hand-in');
       await w.restart();
-      check(town.quests.every(q => quest(w, bot, q.id).claimed), 'All nine claimed quests survive Rust restart');
+      check(ordinary.every(q => quest(w, bot, q.id).claimed), 'All nine claimed quests survive Rust restart');
     },
   },
 
@@ -2928,13 +2985,14 @@ const scenarios = {
       await kit.setupCharacter(w, bot, { gold: 2000 });
       const gate = map.zones[8].portals.find(p => p.id === 'nacre_astral_gate');
       const back = area.portals.find(p => p.id === 'astral_nacre_gate');
-      check(!!gate && !!back && area.quests.length === 12 && area.npcs.length === 7 && area.objects.length >= 400, 'The Nacrehold link, inhabited hub, quests and dense scenery exist');
-      check(distance(area.spawn, back) <= 4.5 && back.y > area.spawn.y, 'The return gate is near and in front of arrival');
-      await kit.teleport(w, bot, { zone: 9, x: gate.x, y: gate.y + 4 });
-      await w.action(bot, { type: 'move', x: gate.x, y: gate.y });
+      check(!!gate && !!back && area.quests.length >= 12 && area.npcs.length >= 7 && area.objects.length >= 400, 'The Nacrehold link, inhabited hub, quests and dense scenery exist');
+      check(!!back.walk && back.to === 9, 'The return gate is a walk-through gate back to Nacrehold (shaped layout: arrival is no longer beside it)');
+      // A walk gate fires only for a hero moving out through its side: approach from behind it.
+      await kit.teleport(w, bot, { zone: 9, x: gate.x - gate.walk[0] * 4, y: gate.y - gate.walk[1] * 4 });
+      await w.action(bot, { type: 'move', x: gate.x + gate.walk[0] * 2, y: gate.y + gate.walk[1] * 2 });
       await w.waitFor(() => w.player(bot).zone === 13, 15000, 'Enter Astralhollow');
       await w.action(bot, { type: 'stop' });
-      check(distance(w.player(bot), area.spawn) < 2, 'The Nacrehold starway reaches the sanctuary');
+      check(distance(w.player(bot), { x: gate.tx, y: gate.ty }) < 2, 'The Nacrehold starway arrives at the gate landing (shaped layout: the landing is not the spawn)');
       await kit.teleport(w, bot, { npc: 'astral_steward' });
       await kit.talkTo(w, bot, 'astral_steward', 'quest:accept:astral_welcome');
       await w.waitFor(() => !!quest(w, bot, 'astral_welcome'));
@@ -2946,15 +3004,15 @@ const scenarios = {
       check(quest(w, bot, 'astral_welcome').counts.every(n => n === 1), 'The introductory quest counts real sanctuary conversations');
       await kit.teleport(w, bot, { npc: 'astral_steward' });
       const before = w.player(bot).gold;
-      await kit.talkTo(w, bot, 'astral_steward', 'quest:claim:astral_welcome');
+      await kit.talkTo(w, bot, 'astral_steward', `quest:claim:astral_welcome:${area.quests[0].rewardChoices.warrior[0]}`);
       await w.waitFor(() => quest(w, bot, 'astral_welcome').claimed);
       check(w.player(bot).gold === before + area.quests[0].rewardGold, 'The steward pays the quest reward exactly once');
       await kit.teleport(w, bot, { npc: 'travel_astralhollow' });
       await kit.talkTo(w, bot, 'travel_astralhollow');
       await w.waitFor(() => w.player(bot).travelStops.includes('travel_astralhollow'));
       check(w.player(bot).travelStops.includes('travel_astralhollow'), 'The Astralhollow travel master discovers the stop');
-      await kit.teleport(w, bot, { zone: 13, x: back.x, y: back.y - 4 });
-      await w.action(bot, { type: 'move', x: back.x, y: back.y });
+      await kit.teleport(w, bot, { zone: 13, x: back.x - back.walk[0] * 4, y: back.y - back.walk[1] * 4 });
+      await w.action(bot, { type: 'move', x: back.x + back.walk[0] * 2, y: back.y + back.walk[1] * 2 });
       await w.waitFor(() => w.player(bot).zone === 9, 15000, 'Return to Nacrehold');
       check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 2, 'The nearby return gate works without bouncing');
     },
@@ -2970,19 +3028,21 @@ const scenarios = {
       const gate=map.zones[12].portals.find(p=>p.id==='astral_prism_gate');
       const back=area.portals.find(p=>p.id==='prism_astral_gate');
       check(!!gate && !!back && gate.to===14 && back.to===13,'The two Starbreak gates point at the paired zones');
-      check(area.levels.join(',')==='45,50' && area.slimes.length===42 && area.npcs.length===6 && area.quests.length===10,'The level range, six families, refuge and quests are present');
+      check(area.levels.join(',')==='45,50' && area.slimes.length>=42 && area.npcs.length>=6 && area.quests.length>=10,'The level range, six families, refuge and quests are present');
       const kinds=Object.fromEntries([...new Set(area.slimes.map(s=>s.kind))].map(k=>[k,area.slimes.filter(s=>s.kind===k).length]));
-      check(JSON.stringify(kinds)===JSON.stringify({mirrorqueen:1,sunshard:1,miragejackal:11,shardscarab:10,glassharrier:10,prismsentinel:9}),'Four ordinary families and two single-spawn elites hold separate bands');
-      await kit.teleport(w,bot,{zone:13,x:gate.x,y:gate.y+4});
-      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      check(['mirrorqueen','sunshard','miragejackal','shardscarab','glassharrier','prismsentinel'].every(k=>kinds[k]>=1) && kinds.mirrorqueen===1 && kinds.sunshard===1,'Four ordinary families and two single-spawn elites hold separate bands (floor: the shaped map adds shatterhorn and Empty Seat foes)');
+      const enter=crossingPath(gate);
+      await kit.teleport(w,bot,{zone:13,x:enter.start.x,y:enter.start.y});
+      await w.advance(700); // a teleport holds portals for PORTAL_DELAY (0.5 s): wait before walking into the seam
+      await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===14,15000,'Enter the Prismwaste');
       await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'The northern Astralhollow gate reaches the Last Shade refuge');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'The northern Astralhollow gate lands at its arrival point (shaped layout: not the refuge spawn)');
       await w.connect({bot:'MeadowWitness',class:'mage'});
       check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0) && w.views.get(bot).slimes.every(s=>s.zone===14),'Each bot sees only the enemies in its own zone');
       const ordinary=[['miragejackal','mirage_fang'],['shardscarab','shard_carapace'],['glassharrier','harrier_pinions'],['prismsentinel','prism_heart']];
       for(const [kind,material] of ordinary){
-        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===14 && !s.dead);
+        const enemy=await enemyOf(w,bot,14,area,kind);
         const before=totalXp(w.player(bot));
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===14 && d.item===material),5000,`${material} drop`);
@@ -2998,19 +3058,21 @@ const scenarios = {
         await kit.teleport(w,bot,{npc:giver});
         await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
         await w.waitFor(()=>!!quest(w,bot,id),5000,`Accept ${id}`);
-        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===14 && !s.dead);
+        const enemy=await enemyOf(w,bot,14,area,kind);
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>quest(w,bot,id).counts[0]===1,5000,`Credit ${id}`);
         check(w.snapshot.drops.some(d=>d.zone===14 && d.item===(kind==='mirrorqueen'?'queens_mirror':'sunshard_core')),`${kind} drops its named material`);
         await kit.teleport(w,bot,{npc:giver});
-        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await kit.talkTo(w,bot,giver,claimOf(area,id));
         await w.waitFor(()=>quest(w,bot,id).claimed,5000,`Claim ${id}`);
         check(w.player(bot).inventory.some(i=>i.item===reward),`${id} awards its level-50 blue item`);
       }
       await w.restart();
       check(w.player(bot).zone===14 && ['prism_queen','prism_sunshard'].every(id=>quest(w,bot,id)?.claimed),'Zone and elite claims persist through Rust restart');
-      await kit.teleport(w,bot,{zone:14,x:back.x,y:back.y-4});
-      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      const home=crossingPath(back);
+      await kit.teleport(w,bot,{zone:14,x:home.start.x,y:home.start.y});
+      await w.advance(700);
+      await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
       await w.waitFor(()=>w.player(bot).zone===13,15000,'Return to Astralhollow');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'The return gate arrives clear of its paired gate');
     },
@@ -3026,17 +3088,19 @@ const scenarios = {
       const gate=map.zones[13].portals.find(p=>p.id==='prism_orrery_gate');
       const back=area.portals.find(p=>p.id==='orrery_prism_gate');
       check(!!gate && !!back && gate.to===15 && back.to===14,'Hourglass Pass has reciprocal gates');
-      check(area.levels.join(',')==='50,55' && area.slimes.length===42 && area.npcs.length===6 && area.quests.length===10,'The level-50–55 refuge and quest catalog load');
-      await kit.teleport(w,bot,{zone:14,x:gate.x-9,y:gate.y});
-      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      check(area.levels.join(',')==='50,55' && area.slimes.length>=42 && area.npcs.length>=6 && area.quests.length>=10,'The level-50–55 refuge and quest catalog load');
+      const enter=crossingPath(gate);
+      await kit.teleport(w,bot,{zone:14,x:enter.start.x,y:enter.start.y});
+      await w.advance(700);
+      await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===15,15000,'Enter the Orrery');
       await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'The entrance arrives clear of its return gate');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'The entrance arrives at its landing, clear of its return gate (shaped layout)');
       await w.connect({bot:'MeadowWitness',class:'mage'});
       check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0) && w.views.get(bot).slimes.every(s=>s.zone===15),'Only local enemies enter each zone view');
       const ordinary=[['bronzemantis','mantis_blade'],['gearling','gearling_tooth'],['orbitseer','seer_lens'],['chronoguard','chronoguard_plate']];
       for(const [kind,material] of ordinary){
-        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===15 && !s.dead);
+        const enemy=await enemyOf(w,bot,15,area,kind);
         const before=totalXp(w.player(bot));
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===15 && d.item===material),5000,`${material} drop`);
@@ -3052,20 +3116,22 @@ const scenarios = {
         await kit.teleport(w,bot,{npc:giver});
         await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
         await w.waitFor(()=>!!quest(w,bot,id),5000,`Accept ${id}`);
-        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===15 && !s.dead);
+        const enemy=await enemyOf(w,bot,15,area,kind);
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>quest(w,bot,id).counts[0]===1,5000,`Credit ${id}`);
         check(w.snapshot.drops.some(d=>d.zone===15 && d.item===material),`${kind} drops its named material`);
         check(w.snapshot.drops.some(d=>d.zone===15 && kit.items.some(i=>i.id===d.item && i.rarity==='uncommon' && i.requiredLevel>=50)),`${kind} guarantees level-appropriate green gear`);
         await kit.teleport(w,bot,{npc:giver});
-        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await kit.talkTo(w,bot,giver,claimOf(area,id));
         await w.waitFor(()=>quest(w,bot,id).claimed,5000,`Claim ${id}`);
         check(w.player(bot).inventory.some(i=>i.item===reward),`${id} awards level-55 blue gear`);
       }
       await w.restart();
       check(w.player(bot).zone===15 && ['orrery_matron','orrery_engine'].every(id=>quest(w,bot,id)?.claimed),'Zone and elite claims persist through restart');
-      await kit.teleport(w,bot,{zone:15,x:back.x+5,y:back.y});
-      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      const home=crossingPath(back);
+      await kit.teleport(w,bot,{zone:15,x:home.start.x,y:home.start.y});
+      await w.advance(700);
+      await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
       await w.waitFor(()=>w.player(bot).zone===14,15000,'Return to Prismwaste');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrival does not bounce');
     },
@@ -3122,7 +3188,7 @@ const scenarios = {
         check(w.snapshot.drops.some(d=>d.zone===16 && d.item===material),`${kind} drops its named material`);
         check(w.snapshot.drops.some(d=>d.zone===16 && kit.items.some(i=>i.id===d.item && i.rarity==='uncommon' && i.requiredLevel>=55)),`${kind} guarantees level-appropriate green gear`);
         await kit.teleport(w,bot,{npc:giver});
-        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await kit.talkTo(w,bot,giver,claimOf(area,id));
         await w.waitFor(()=>quest(w,bot,id).claimed,5000,`Claim ${id}`);
         check(w.player(bot).inventory.some(i=>i.item===reward),`${id} awards the blue gear`);
       }
@@ -4011,11 +4077,12 @@ const scenarios = {
     async run(w,check) {
       const gate=map.zones[23].portals.find(p=>p.id==='heart_seed_gate');
       const floor=map.zones[32], quests=map.zones[23].quests;
-      check(gate?.to===33&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='seed_worldseed','Open Seed Vault has twelve encounters');
+      // Twelve encounters; the eighteen ambush sleepers (seed_sprout, seed_treant) wake only when the vault's mechanics trigger them.
+      check(gate?.to===33&&!floor.sealedTemplate&&floor.slimes.filter(s=>!s.ambush).length===12&&floor.final_boss==='seed_worldseed','Open Seed Vault has twelve encounters');
       check(quests.some(q=>q.id==='heart_seed_trials')&&quests.some(q=>q.id==='heart_seed_final'),'Two linked Seed Vault quests are offered');
       for(const bot of ['SeedLead','SeedAlly','SeedOther','SeedLow']) await w.connect({bot,class:'warrior'});
       await w.debug('SeedLow',{op:'set_level',level:79});
-      await kit.teleport(w,'SeedLow',{zone:24,x:48,y:22});
+      await kit.teleport(w,'SeedLow',{zone:24,x:gate.x,y:gate.y+3});
       const before=w.events.length;
       await w.action('SeedLow',{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='SeedLow'&&e.type==='error'&&/level 80/.test(e.text)),12000,'Level-79 player is rejected');
@@ -4023,7 +4090,7 @@ const scenarios = {
       await w.social('SeedLead',{op:'party_invite',bot:'SeedAlly'});
       await w.social('SeedAlly',{op:'party_accept',bot:'SeedLead'});
       for(const bot of ['SeedLead','SeedAlly','SeedOther']) {
-        await kit.teleport(w,bot,{zone:24,x:48,y:22});
+        await kit.teleport(w,bot,{zone:24,x:gate.x,y:gate.y+3});
         await w.action(bot,{type:'move',x:gate.x,y:gate.y});
         await w.waitFor(()=>w.player(bot).zone===33,15000,`${bot} enters Seed Vault`);
         await w.action(bot,{type:'stop'});
