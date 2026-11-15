@@ -45,6 +45,9 @@ const allies = ['PriestAllyA', 'PriestAllyB'];
   const catalog = await page.evaluate(() => WORLD_SKILLS.filter(s => s.class === 'priest').map(s => ({ id: s.id, icon: s.icon })));
   assert.deepEqual(catalog.map(s => s.id).sort(), skills.map(s => s[0]).sort());
   assert.equal(new Set(catalog.map(s => s.icon)).size, 10);
+  // The hero starts on the Saltby pier: move to open ground and read the real position back.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 30000 });
   const caster = await page.evaluate(() => ({ id: Online.id, x: Field.hero.x, y: Field.hero.y }));
   for (const bot of allies) {
     await page.evaluate(name => Online.send({ type: 'social', command: { op: 'party_invite', name } }), bot);
@@ -111,7 +114,7 @@ const allies = ['PriestAllyA', 'PriestAllyB'];
     if (id === 'holynova') { assert.equal(frame.radius, 3.4); assert.equal(frame.healRadius, 6); assert.ok(frame.targets >= 3); }
     if (id === 'heavenswrath') { assert.equal(frame.radius, 5); assert.equal(frame.healRadius, 8); assert.ok(frame.targets >= 3); assert.ok(frame.crown); }
     if (id === 'divinehymn') assert.equal(frame.radius, 12);
-    if (id === 'searinglight') assert.ok(frame.heal > 0, 'Searing Light reports real healing return');
+    if (id === 'searinglight') assert.ok(frame.heal > 0, `Searing Light reports real healing return (heal ${frame.heal}, targets ${frame.targets}, hp ${await page.evaluate(() => Math.round(Field.hero.hp))}/${await page.evaluate(() => Math.round(Field.hero.maxHp))})`);
     const output = path.join(world.artifacts, `priest-${id}.png`);
     fs.writeFileSync(output, Buffer.from(frame.image.split(',')[1], 'base64'));
     assert.ok(fs.statSync(output).size > 100_000, `${id} captured a real game frame`);

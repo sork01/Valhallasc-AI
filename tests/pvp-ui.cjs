@@ -25,8 +25,8 @@ async function call(name, args = {}) {
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
-    await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 9, y: 9 } }));
-    await page.waitForFunction(() => Math.hypot(Field.hero.x - 9, Field.hero.y - 9) < 2);
+    await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+    await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 30000 });
     return page;
   }
   const alice = await player('PvPAlice'), bob = await player('PvPBob');
@@ -46,18 +46,27 @@ async function call(name, args = {}) {
   await alice.waitForFunction(() => Pvp.state.duel?.name === 'PvPBob');
   await bob.waitForFunction(() => Pvp.state.duel?.name === 'PvPAlice');
   check(await bob.evaluate(() => Pvp.state.duel?.name === 'PvPAlice'), 'Both players enter the same duel');
-  await bob.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 45, y: 45 } }));
+  await bob.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 280, y: 235 } }));
   await bob.waitForFunction(() => typeof Pvp.state.duel?.returnIn === 'number' && Pvp.state.duel.returnIn <= 10);
   check(await bob.locator('#pvp-duel-warning').isVisible(), 'Leaving the duel ring starts a visible return timer');
-  await bob.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 9, y: 9 } }));
+  await bob.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
   await bob.waitForFunction(() => Pvp.state.duel?.returnIn == null);
   check(await bob.locator('#pvp-duel-warning').isHidden(), 'Returning inside the ring clears the timer');
   await alice.locator('#social-body').getByRole('button', { name: 'End duel' }).click();
   await bob.waitForFunction(() => Pvp.state.duel === null);
   await alice.waitForFunction(() => Pvp.state.duel === null);
   check(await alice.evaluate(() => Pvp.state.duel === null), 'Ending a duel clears both states');
+  // The flag cannot change while the duel's combat timer runs: wait for it to clear.
+  // Wild enemies near the duel ground keep striking the hero; clear them so the timer can run out.
+  const nearby = await alice.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 12).map(s => s.id));
+  for (const id of nearby) await alice.evaluate(id => Online.send({ type: 'debug', command: { op: 'kill_enemy', id } }), id);
+  await alice.waitForFunction(() => !Field.hero.inCombat, null, { timeout: 30000 }).catch(async e => {
+    throw new Error(`Combat did not clear: ${await alice.evaluate(() => JSON.stringify({ hp: Field.hero.hp, dead: Field.hero.dead, inCombat: Field.hero.inCombat, duel: Pvp.state.duel, arena: Pvp.state.arena, queue: Pvp.state.queue, zone: Field.zone }))}`, { cause: e });
+  });
   await alice.locator('#social-body').getByRole('button', { name: 'Turn PvP on' }).click();
-  await alice.waitForFunction(() => Pvp.state.flag && Field.hero.pvpFlag);
+  await alice.waitForFunction(() => Pvp.state.flag && Field.hero.pvpFlag, null, { timeout: 10000 }).catch(async e => {
+    throw new Error(`PvP flag did not turn on: ${await alice.evaluate(() => `flag=${Pvp.state.flag} hero=${Field.hero.pvpFlag} chat=${document.getElementById('chat-log').textContent.slice(-240)}`)}`, { cause: e });
+  });
   await bob.waitForFunction(id => Field.remotePlayers.find(p => p.id === id)?.pvpFlag === true, aliceId);
   check(await bob.evaluate(id => Field.remotePlayers.find(p => p.id === id)?.pvpFlag, aliceId), 'PvP flag appears in authoritative player snapshots');
   await alice.locator('#social-body').getByRole('button', { name: 'Turn PvP off' }).click();

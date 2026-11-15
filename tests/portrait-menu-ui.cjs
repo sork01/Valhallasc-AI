@@ -41,7 +41,10 @@ async function call(name, args = {}) {
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
     return page;
   }
+  // A new character gets the early-level tutorial glow, which sits over the badge menu: dismiss it.
+  const dismissTutorial = page => page.evaluate(() => { const t = document.getElementById('tutorial-tip'); if (t && !t.hidden) document.getElementById('tutorial-disable')?.click(); });
   const alice = await player('MenuAlice'), bob = await player('MenuBob');
+  await dismissTutorial(alice); await dismissTutorial(bob);
   const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
   const bobId = await bob.evaluate(() => Online.id);
   const badge = alice.locator('#hud-target'), menu = alice.locator('#portrait-menu');
@@ -130,7 +133,8 @@ async function call(name, args = {}) {
   const statsText = await alice.locator('#inspect-stats').textContent();
   check(statsText.includes(String(bobAttack)), `The stat sheet carries Bob's attack (${bobAttack})`);
   check(await alice.locator('#inspect-panel').evaluate(n => getComputedStyle(n).zIndex) === '50', 'The window sits above the other modals');
-  await alice.screenshot({ path: '/media/raid/valhallasc-data/portrait-inspect.png' });
+  fs.mkdirSync(path.join(root, 'test-results'), { recursive: true });
+  await alice.screenshot({ path: path.join(root, 'test-results', 'portrait-inspect.png') });
   const iconBox = await alice.evaluate(() => { const b = document.querySelector('#inspect-slots [data-slot="necklace"] button'); const r = b.getBoundingClientRect(), c = getComputedStyle(b); return { w: r.width, h: r.height, display: c.display, width: c.width, art: b.innerHTML.length > 0 }; });
   check(iconBox.w > 20 && iconBox.h > 20 && iconBox.art, `The slot icons have real size and art ${JSON.stringify(iconBox)}`);
   if (process.env.REAL_SPRITES === '1') {
@@ -173,9 +177,17 @@ async function call(name, args = {}) {
     await alice.waitForFunction(id => { const p = Field.remotePlayers.find(p => p.id === id); return p && Math.hypot(p.nx - Field.hero.nx, p.ny - Field.hero.ny) < 3; }, near.id, { timeout: 10000 });
     await target(near.id);
   };
-  await stand();
-  await badge.click({ button: 'right' });
-  check(!await tradeOff(), 'Trade is enabled for an adventurer like for a person');
+  // The adventurer walks, so it can leave the four-step range between standing and opening the menu: re-stand and retry.
+  let adventurerTradeWhy = 'none';
+  for (let attempt = 0; attempt < 4; attempt++) {
+    await stand();
+    await badge.click({ button: 'right' });
+    adventurerTradeWhy = await entry('trade').locator('.pm-reason').count() ? (await entry('trade').locator('.pm-reason').textContent()).trim() : 'none';
+    if (!await tradeOff()) break;
+    await alice.keyboard.press('Escape');
+  }
+  check(!await tradeOff(), `Trade is enabled for an adventurer like for a person (reason shown: ${adventurerTradeWhy})`);
+  await dismissTutorial(alice);
   await entry('trade').click();
   await alice.waitForFunction(() => document.getElementById('chat-log').textContent.includes('declined your trade request'), null, { timeout: 10000 });
   check(await alice.locator('#trade-panel').isHidden() && await alice.evaluate(() => Trade.state === null), 'The adventurer declines the trade and no window opens');
