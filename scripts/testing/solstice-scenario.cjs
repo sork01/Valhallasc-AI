@@ -18,8 +18,8 @@ module.exports = kit => ({
       await w.action(bot,{type:'interact',npc:'city_bard',offer:`solstice:hire:${cls}`});
       await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired).length===['priest','mage','hunter','warrior'].indexOf(cls)+1);
     }
-    await w.debug(bot,{op:'teleport',zone:2,x:110.5,y:100});
-    await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-103,p.y-100)<=12).length===4,15000,'Hired fighters gather');
+    await w.debug(bot,{op:'teleport',zone:2,x:291,y:225});
+    await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-284,p.y-225)<=12).length===4,15000,'Hired fighters gather');
     await w.action(bot,{type:'interact',npc:'solstice_pole',offer:'solstice:summon'});
     await w.waitFor(()=>w.views.get(bot).solstice?.active);
     check(w.views.get(bot).solstice.level===20,'The real Sunwoven Midsummer Pole summons at the five fighters’ highest level');
@@ -43,7 +43,7 @@ module.exports = kit => ({
     await w.debug(bot,{op:'season_time',unix:1813960800});
     await w.waitFor(()=>w.views.get(bot).seasons.length===0);
     check(w.views.get(bot).solstice===null,'June 26 removes the ritual encounter state');
-    await w.debug(bot,{op:'teleport',zone:2,x:110.5,y:100});
+    await w.debug(bot,{op:'teleport',zone:2,x:291,y:225});
     await w.action(bot,{type:'interact',npc:'solstice_pole',offer:'solstice:summon'});
     await w.advance(300);
     check(!w.views.get(bot).solstice&&!w.views.get(bot).slimes.some(s=>s.kind==='birchcrown'&&!s.dead&&s.state!=='waiting'),'A forged off-season summon cannot create the elite');

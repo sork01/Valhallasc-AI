@@ -12,7 +12,8 @@ const check=(v,s)=>{if(replaying)return;assert.ok(v,s);console.log(++checks+': '
  await p.addInitScript(()=>{
   window.AudioContext=window.webkitAudioContext=undefined;window.__ach=null;
   if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:false,lowGraphics:false,lowGraphicsSet:true}));
-  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{try{const v=JSON.parse(e.data);if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;if(v.type==='achievements')window.__ach=v;}catch{}});}};
+  const take=v=>{if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;if(v.type==='achievements')window.__ach=v;};
+  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
  await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('Newyear Check');await p.locator('#go').click({timeout:60000});
@@ -44,10 +45,10 @@ const check=(v,s)=>{if(replaying)return;assert.ok(v,s);console.log(++checks+': '
  }
  await npc('city_bard');await interact('city_bard','quest:accept:newyear_hunt');await wait(()=>__self().quests.some(q=>q.id==='newyear_hunt'&&!q.claimed));
  await p.evaluate(()=>Quests.track('newyear_hunt'));
- check(await p.evaluate(()=>Quests.mapMarkers(2).some(m=>m.quest==='newyear_hunt'&&m.x===112&&m.y===100)),'The quest tracks the actual Festival Launchpad');
+ check(await p.evaluate(()=>Quests.mapMarkers(2).some(m=>m.quest==='newyear_hunt'&&m.x===293&&m.y===225)),'The quest tracks the actual Festival Launchpad');
  await debug({op:'set_gold',gold:1000000});await wait(()=>__self().gold===1000000);
  for(const [i,cls]of['priest','mage','hunter','warrior'].entries()){await interact('city_bard','newyear:hire:'+cls);await wait(n=>__snap.players.filter(p=>p.hired).length===n,i+1);}
- await stand(2,110.5,100);await wait(()=>__snap.players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-103,p.y-100)<=12).length===4);
+ await stand(2,291,225);await wait(()=>__snap.players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-284,p.y-225)<=12).length===4);
  check(await p.evaluate(()=>!City.npcs.some(n=>n.id==='christmas_tree')&&City.npcs.some(n=>n.id==='newyear_launchpad')),'The New Year launchpad uses the winter clearing without the retired Christmas tree');
  await capture('valhallasc-newyear-outdoors.png');
  await p.evaluate(()=>Field.visitNpc('newyear_launchpad'));await p.locator('#npc-dialogue').waitFor({state:'visible'});await p.locator('[data-offer="newyear:summon"]').click();await wait(()=>__snap.slimes.some(s=>s.kind==='starrocketeer'&&!s.dead));
@@ -64,14 +65,14 @@ const check=(v,s)=>{if(replaying)return;assert.ok(v,s);console.log(++checks+': '
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(n=>!Quests.offered(n).some(q=>q.id==='newyear_hunt'))),'Changing hosts cannot repeat today’s quest');
  await debug({op:'give_mount',mount:'rocket'});await wait(()=>__self().mounts.includes('rocket'));
  await send({type:'select_mount',mount:'rocket'});await p.evaluate(()=>MountArt.preload('rocket'));await wait(()=>MountArt.ready('rocket'));
- await stand(2,110.5,100);await send({type:'mount',mounted:true});await wait(()=>__self().mounted);await capture('valhallasc-newyear-rocket.png');
+ await stand(2,291,225);await send({type:'mount',mounted:true});await wait(()=>__self().mounted);await capture('valhallasc-newyear-rocket.png');
  await debug({op:'season_time',unix:1798758000});await wait(()=>__snap.seasons.find(s=>s.id==='newyear')?.day===20270101);
  check(await p.evaluate(()=>__snap.seasons.find(s=>s.id==='newyear').year===2026&&Quests.offered('baker').some(q=>q.id==='newyear_hunt')),'January 1 retains the December season year and opens a new daily allowance');
  await npc('baker');await interact('baker','quest:accept:newyear_hunt');await wait(()=>__self().quests.some(q=>q.id==='newyear_hunt'&&!q.claimed));
  await debug({op:'season_time',unix:1798930799});await wait(()=>__snap.seasons.find(s=>s.id==='newyear')?.day===20270102);
  check(await p.evaluate(()=>Seasonal.isActive('newyear')),'January 2 remains active through its final second');
  await debug({op:'season_time',unix:1798930800});await wait(()=>!Seasonal.isActive('newyear')&&__snap.newyear===null);
- check(await p.evaluate(()=>NewYear.objects(2).length===0&&NewYear.fireworksPlan(2,{x:103,y:100},3,false,1440,960).length===0&&!__self().quests.some(q=>q.id==='newyear_hunt'&&!q.claimed)&&__self().mounts.includes('rocket')),'January 3 retires unfinished content and fireworks while keeping the rocket');
+ check(await p.evaluate(()=>NewYear.objects(2).length===0&&NewYear.fireworksPlan(2,{x:284,y:225},3,false,1440,960).length===0&&!__self().quests.some(q=>q.id==='newyear_hunt'&&!q.claimed)&&__self().mounts.includes('rocket')),'January 3 retires unfinished content and fireworks while keeping the rocket');
  const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
  await p.evaluate(()=>Achievements.open());await wait(()=>__ach?.entries.find(a=>a.id==='newyear').complete);
  check(await p.evaluate(id=>Online.id===id&&__self().mounts.includes('rocket')&&__self().seasonalRolls.newyear_hunt===20261229,id),'Reconnect preserves permanent achievement, rocket and spent daily attempt');

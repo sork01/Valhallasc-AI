@@ -18,8 +18,8 @@ module.exports = kit => ({
       await w.action(bot,{type:'interact',npc:'city_bard',offer:`christmas:hire:${cls}`});
       await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired).length===['priest','mage','hunter','warrior'].indexOf(cls)+1);
     }
-    await w.debug(bot,{op:'teleport',zone:2,x:110.5,y:100});
-    await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-103,p.y-100)<=12).length===4,15000,'Hired fighters gather');
+    await w.debug(bot,{op:'teleport',zone:2,x:291,y:225});
+    await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-284,p.y-225)<=12).length===4,15000,'Hired fighters gather');
     await w.action(bot,{type:'interact',npc:'christmas_tree',offer:'christmas:summon'});
     await w.waitFor(()=>w.views.get(bot).christmas?.active);
     check(w.views.get(bot).christmas.level===20,'The real Christmas tree summons at the five fighters’ highest level');
@@ -42,7 +42,7 @@ module.exports = kit => ({
     await w.debug(bot,{op:'season_time',unix:1798498800});
     await w.waitFor(()=>w.views.get(bot).seasons.length===0);
     check(w.views.get(bot).christmas===null,'December 29 removes the ritual encounter state');
-    await w.debug(bot,{op:'teleport',zone:2,x:110.5,y:100});
+    await w.debug(bot,{op:'teleport',zone:2,x:291,y:225});
     await w.action(bot,{type:'interact',npc:'christmas_tree',offer:'christmas:summon'});
     await w.advance(300);
     check(!w.views.get(bot).christmas&&!w.views.get(bot).slimes.some(s=>s.kind==='grinch'&&!s.dead&&s.state!=='waiting'),'A forged off-season summon cannot create the elite');
