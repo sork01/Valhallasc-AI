@@ -36,11 +36,18 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     await p.locator('#cls-warrior').click(); await p.locator('#name').fill('WyrdArt');
     await p.locator('#go').click({ timeout: 60000 });
     await p.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
-    await p.evaluate(() => {
-      Online.send({ type: 'debug', command: { op: 'teleport', zone: 6, x: 31, y: 166 } });
-      Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } });
+    // Stand beside a real Wyrdwood boar spawn (the old fixed (31,166) point is void in the shaped world).
+    const spot = await p.evaluate(() => {
+      const z = WORLD_MAP.zones.find(z => z.name === 'Wyrdwood');
+      const s = z && z.slimes.find(s => s.kind === 'boar');
+      return s && { x: s.x, y: s.y };
     });
-    await p.waitForFunction(() => Field.wyrdSprites && Field.slimes.some(s => s.kind === 'boar'), null, { timeout: 30000 });
+    assert.ok(spot, 'Wyrdwood has a boar spawn to stand beside');
+    await p.evaluate(spot => {
+      Online.send({ type: 'debug', command: { op: 'teleport', zone: 6, x: spot.x - 3, y: spot.y - 3 } });
+      Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } });
+    }, spot);
+    await p.waitForFunction(() => Field.wyrdSprites && Field.slimes.some(s => s.kind === 'boar' && !s.dead), null, { timeout: 30000 });
     const result = await p.evaluate(() => {
       const src = Field.wyrdSprites, { meta, img } = src;
       const data = {};

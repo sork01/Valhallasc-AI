@@ -39,7 +39,16 @@ const call = async(name,args={}) => {
   let count = 0;
   for (const z of zones) {
     await page.waitForFunction(src=>!!Field[src],z.src,{timeout:30000}).catch(()=>{});
-    if (!(await page.evaluate(src=>!!Field[src],z.src))) { await page.evaluate(()=>Online.send({type:'debug',ref:1,command:{op:'teleport',zone:1,x:20,y:20}})); await page.waitForFunction(src=>!!Field[src],z.src,{timeout:30000}); }
+    // The zone's sprite set loads only when one of its kinds is in view: stand beside real spawns of the zone
+    // (the old fixed (20,20) point in zone 1 is void in the shaped world) until the set appears.
+    if (!(await page.evaluate(src=>!!Field[src],z.src))) {
+      const spots=await page.evaluate(zone=>WORLD_MAP.zones[zone-1].slimes.map(s=>({x:s.x,y:s.y})),z.zone);
+      for (const spot of spots) {
+        await page.evaluate(({zone,x,y})=>Online.send({type:'debug',ref:1,command:{op:'teleport',zone,x,y}}),{zone:z.zone,x:spot.x+3,y:spot.y+3});
+        if (await page.waitForFunction(src=>!!Field[src],z.src,{timeout:8000}).then(()=>true,()=>false)) break;
+      }
+      await page.waitForFunction(src=>!!Field[src],z.src,{timeout:30000});
+    }
     const kinds=await page.evaluate(src=>Field[src].meta.kinds,z.src);
     const spawns=await page.evaluate(({zone,kinds})=>WORLD_MAP.zones[zone-1].slimes.filter(s=>kinds.includes(s.kind)),{zone:z.zone,kinds});
     for (const kind of kinds) {
@@ -51,14 +60,21 @@ const call = async(name,args={}) => {
       await page.waitForFunction(src=>!!Field[src],z.src,{timeout:30000});
       await page.waitForFunction(({src,kind})=>Field[src].img[kind]?.complete,{src:z.src,kind},{timeout:30000});
       await page.waitForTimeout(350);
-      const art=await page.evaluate(({src,kind})=>({
-        width:Field[src].img[kind].naturalWidth,
-        height:Field[src].img[kind].naturalHeight,
-        tops:Field[src].meta.tops?.[kind],
-        clip:Field._debug.enemyFrame(Field.slimes.find(s=>s.kind===kind))
-      }),{src:z.src,kind});
-      assert.equal(art.width,768,`${kind} atlas width`);
-      assert.equal(art.height,480,`${kind} atlas height`);
+      const art=await page.evaluate(({src,kind})=>{
+        const fr=Field.frameOf(Field[src],kind);   // a kind may have its own kindFrames entry
+        return {
+          width:Field[src].img[kind].naturalWidth,
+          height:Field[src].img[kind].naturalHeight,
+          expectedWidth:fr.w*8,
+          expectedHeight:fr.h*5,
+          tops:Field[src].meta.tops?.[kind],
+          clip:Field._debug.enemyFrame(Field.slimes.find(s=>s.kind===kind))
+        };
+      },{src:z.src,kind});
+      // MUTATE=1 expects the old fixed 96px zone frame (768x480): kinds with their own kindFrames must then fail.
+      const expW = process.env.MUTATE ? 768 : art.expectedWidth, expH = process.env.MUTATE ? 480 : art.expectedHeight;
+      assert.equal(art.width,expW,`${kind} atlas width`);
+      assert.equal(art.height,expH,`${kind} atlas height`);
       assert.ok(art.tops>20&&art.clip[0],`${kind} has a fitted health-bar height and draws a frame`);
       await page.screenshot({path:path.join(world.artifacts,`${z.tag}-${kind}.png`)});
       count++;
