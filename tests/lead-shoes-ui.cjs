@@ -51,26 +51,29 @@ const errors = [];
   await page.waitForTimeout(3500);
   // Close the DPS meter, which opens in the middle of the stage and hides the hero.
   if (await page.locator('#dps-close').isVisible()) await page.locator('#dps-close').click();
+  // The early-level tutorial tip can sit over the hero: dismiss it the way money-ui does.
+  await page.evaluate(() => { const tip = document.getElementById('tutorial-tip'); if (tip && !tip.hidden) document.getElementById('tutorial-disable')?.click(); });
   // --- the shoes are drawn: pin the flag on or off (snapshots would overwrite it) and compare the real frame at the feet ---
   const pin = on => page.evaluate(on => Object.defineProperty(Field.hero, 'leadShoes', { configurable: true, get: () => on, set() {} }), on);
-  const shot = async on => { await pin(on); await page.waitForTimeout(400); return page.screenshot({ clip: { x: 420, y: 250, width: 120, height: 90 } }); };
+  const shot = async on => { await pin(on); await page.waitForTimeout(400); return page.screenshot({ clip: { x: 460, y: 280, width: 40, height: 32 } }); };   // the feet only: the water behind them shimmers
   const withShoes = await shot(true), without = await shot(false), again = await shot(true);
   if (process.env.LEAD_SHOES_PNG) {
     fs.writeFileSync(process.env.LEAD_SHOES_PNG, await page.screenshot({ clip: { x: 380, y: 220, width: 200, height: 150 } }));
   }
-  // Count the shoe's own steel tones (mid and light ramp stops of drawLeadShoes) in each crop: the ground never has them.
-  const steel = png => page.evaluate(async b64 => {
-    const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
-    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
-    const g = c.getContext('2d'); g.drawImage(img, 0, 0);
-    const d = g.getImageData(0, 0, c.width, c.height).data, near = (i, r, gr, b) => Math.abs(d[i] - r) + Math.abs(d[i + 1] - gr) + Math.abs(d[i + 2] - b) < 30;
-    let n = 0; for (let i = 0; i < d.length; i += 4) if (near(i, 0x5d, 0x67, 0x78) || near(i, 0x9a, 0xa6, 0xb8) || near(i, 0xc8, 0xd1, 0xde)) n++;
+  // Compare the real crops pixel by pixel: the flag changes only the shoes, so the on/off difference is the shoes, and the
+  // two "on" frames (before and after the off frame) must agree with each other far more than either agrees with the off frame.
+  const diffs = (a, b) => page.evaluate(async ([pa, pb]) => {
+    const load = async b64 => { const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+      const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+      return g.getImageData(0, 0, c.width, c.height).data; };
+    const [x, y] = [await load(pa), await load(pb)];
+    let n = 0; for (let i = 0; i < x.length; i += 4) if (Math.abs(x[i] - y[i]) + Math.abs(x[i + 1] - y[i + 1]) + Math.abs(x[i + 2] - y[i + 2]) > 60) n++;
     return n;
-  }, png.toString('base64'));
-  const [onN, offN, againN] = [await steel(withShoes), await steel(without), await steel(again)];
-  check(onN >= 20 && againN >= 20, `With the shoes on the feet show their steel tones (${onN}, ${againN} pixels)`);
-  check(offN < onN / 4, `With the flag off they do not (${offN} pixels)`);
-  check(withShoes.length > 500, 'The crops are real pictures');
+  }, [a.toString('base64'), b.toString('base64')]);
+  const [onOff, onAgain] = [await diffs(withShoes, without), await diffs(withShoes, again)];
+  check(onOff >= 12, `The shoes change the pixels at the feet (${onOff} pixels differ from the same frame with the flag off)`);
+  check(onAgain * 3 < onOff, `Two frames with the shoes agree (${onAgain} pixels differ) far more than with the flag off (${onOff})`);
+  check(withShoes.length > 200, 'The crops are real pictures');
   await page.evaluate(() => { delete Field.hero.leadShoes; });
 
   // --- between two underwater zones the shoes stay on and are not announced again ---

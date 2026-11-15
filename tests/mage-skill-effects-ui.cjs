@@ -41,6 +41,11 @@ const skills = [
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('MageEffects');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero.level === 99 && !!Field.mageSprites, null, { timeout: 60000 });
+  await page.evaluate(() => { window.__errs = []; const box = document.querySelector('#error-messages'); new MutationObserver(() => window.__errs.push(box.innerText)).observe(box, { childList: true, subtree: true, characterData: true }); });
+  // New heroes start on the Saltby pier, where a wall blocks every bolt (shotBlocked): stand on open ground in zone 0.
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 7, command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 2, null, { timeout: 20000 });
+  await page.waitForTimeout(1000);
   const catalog = await page.evaluate(() => WORLD_SKILLS.filter(s => s.class === 'mage').map(s => ({ id: s.id, icon: s.icon, description: s.description })));
   assert.deepEqual(catalog.map(s => s.id).sort(), skills.map(s => s[0]).sort(), 'All ten Mage skills have catalog entries');
   assert.equal(new Set(catalog.map(s => s.icon)).size, 10, 'The Mage icons are distinct');
@@ -48,6 +53,10 @@ const skills = [
 
   for (const [id, kind, style, age] of skills.filter(([id]) => !process.env.MAGE_SKILL_ONLY || id === process.env.MAGE_SKILL_ONLY)) {
     await page.waitForFunction(() => Field._debug.effects.every(e => !e.kind.startsWith('sk')) && Field._debug.bolts.length === 0);
+    // Clear what the previous skill left behind (its spawned foe and blast) so each capture starts from the same open ground.
+    const leftovers = await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 8).map(s => s.id));
+    for (const enemy of leftovers) await page.evaluate(id => Online.send({ type: 'debug', command: { op: 'kill_enemy', id } }), enemy);
+    await page.waitForTimeout(300);
     await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_resource', amount: 1000 } }));
     await page.waitForFunction(() => Field.hero.resource >= 60);
     if (id === 'lifedrain') {
@@ -59,9 +68,9 @@ const skills = [
       const kinds = id === 'chainlightning' ? ['green', 'blue', 'pink'] : ['green'];
       for (let i = 0; i < kinds.length; i++) {
         await page.evaluate(({ enemy, i, id }) => Online.send({ type: 'debug', command: { op: 'spawn_enemy', kind: enemy,
-          x: Field.hero.x + (id === 'lifedrain' ? 4 : 2.5) + i * .8, y: Field.hero.y + (i % 2 ? 1.3 : 0), level: 99 } }), { enemy: kinds[i], i, id });
+          x: Field.hero.x + (id === 'lifedrain' ? 4 : id === 'fireball' ? 5.5 : 2.5) + i * .8, y: Field.hero.y + (i % 2 ? 1.3 : 0), level: 99 } }), { enemy: kinds[i], i, id });
       }
-      await page.waitForFunction(kinds => kinds.some(kind => Field.slimes.some(s => s.kind === kind && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 5)), kinds);
+      await page.waitForFunction(kinds => kinds.some(kind => Field.slimes.some(s => s.kind === kind && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 7)), kinds);
     }
     if (id === 'lifedrain') {
       await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_hp', hp: Field.hero.maxHp * .4 } }));
@@ -70,7 +79,7 @@ const skills = [
     const frame = await page.evaluate(({ id, kind, style, age }) => new Promise((resolve, reject) => {
       const initial = new Set(Field._debug.effects), deadline = performance.now() + 8000;
       let alternateImage = null;
-      const target = Field.slimes.find(s => s.kind === 'green' && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 5);
+      const target = Field.slimes.find(s => s.kind === 'green' && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 7);
       const fx = target && ['fireball', 'chainlightning', 'lifedrain'].includes(id) ? target.x - Field.hero.x : 1;
       const fy = target && ['fireball', 'chainlightning', 'lifedrain'].includes(id) ? target.y - Field.hero.y : 0;
       function sample() {
@@ -87,7 +96,7 @@ const skills = [
             moved: Math.hypot(Field.hero.x - effect.x, Field.hero.y - effect.y), age: effect.t });
           return;
         }
-        if (performance.now() > deadline) { reject(new Error(`${id} effect ${kind}/${style} did not reach its capture window`)); return; }
+        if (performance.now() > deadline) { reject(new Error(`${id} effect ${kind}/${style} did not reach its capture window (effects ${JSON.stringify(Field._debug.effects.filter(e => e.kind.startsWith('sk')).map(e => [e.kind, e.style, +(e.t || 0).toFixed(2)]))}, bolts ${JSON.stringify(Field._debug.bolts.map(b => b.skill))}, hero ${Field.hero.x.toFixed(1)},${Field.hero.y.toFixed(1)} zone ${Field.zone}, errors ${JSON.stringify(window.__errs.slice(-5))}, chat ${JSON.stringify((document.querySelector("#chat-log")?.innerText || "").slice(-300))})`)); return; }
         requestAnimationFrame(sample);
       }
       requestAnimationFrame(sample);
