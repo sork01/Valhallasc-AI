@@ -34,10 +34,10 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   const duration = await page.evaluate(() => valhalla.stormglassMusic.duration);
   assert.ok(Math.abs(duration - 80) < 1, `Stormglass MP3 duration ${duration}`);
   await debug(page, { op: 'set_time', hour: 0, freeze: true });
-  await page.waitForFunction(() => DayNight.nightMix === 1 && valhalla.nightMusic?.running, null, { timeout: 10000 });
+  await page.waitForFunction(() => DayNight.nightMix === 1 && valhalla.activeNightMusic === valhalla.stormglassNightMusic && valhalla.stormglassNightMusic?.running, null, { timeout: 10000 });
   assert.equal(await page.evaluate(() => valhalla.stormglassMusic.running), true, 'day score stays available for the dawn crossfade');
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
-  await page.waitForFunction(() => DayNight.nightMix === 0 && !valhalla.nightMusic.running, null, { timeout: 10000 });
+  await page.waitForFunction(() => DayNight.nightMix === 0 && !valhalla.stormglassNightMusic.running, null, { timeout: 10000 });
   assert.deepEqual(errors, [], 'no browser errors');
   console.log('Stormglass score selects, decodes and follows the existing night mix');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
