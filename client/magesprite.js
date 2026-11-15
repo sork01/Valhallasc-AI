@@ -20,13 +20,16 @@
   const foregroundIdle = [];
   const leaveForeground = () => { if (--foreground === 0) for (const wake of foregroundIdle.splice(0)) wake(); };
   const whenForegroundIdle = () => foreground === 0 ? Promise.resolve() : new Promise(resolve => foregroundIdle.push(resolve));
+  // A background job parked here must wake when it is promoted: promote() adds the job itself to the foreground count,
+  // so waiting for that count to reach zero would wait for the job itself (a permanent stall).
+  const whenIdleOrPromoted = job => new Promise(resolve => { job.wake = resolve; whenForegroundIdle().then(resolve); });
   // `work(slicer)` does the decoding. A background job can be promoted when your own character needs the same art.
   function createJob(background, work) {
     const job = { background, started: false };
     let slicedAt = performance.now();
     job.slicer = {
       due: () => performance.now() - slicedAt > SLICE_MS,
-      yield: async () => { await yieldMain(); if (job.background) await whenForegroundIdle(); slicedAt = performance.now(); },
+      yield: async () => { await yieldMain(); if (job.background) await whenIdleOrPromoted(job); slicedAt = performance.now(); },
     };
     job.promise = new Promise((resolve, reject) => {
       job.start = () => {
@@ -45,6 +48,7 @@
   function promote(job) {
     if (!job.background) return;
     job.background = false;
+    if (job.wake) { const wake = job.wake; job.wake = null; wake(); }
     if (job.started) foreground++; else job.start();
   }
   const bitmap = async url => {

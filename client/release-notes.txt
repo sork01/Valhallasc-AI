@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.13",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "Fixed a rare freeze while characters load: if another player's character was still being drawn in the background when yours needed the same art, your loading screen could wait forever. Your character's art now takes over and finishes."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.12",
     "date": "2026-11-15",
     "new": [],
