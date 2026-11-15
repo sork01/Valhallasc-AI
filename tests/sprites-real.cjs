@@ -21,16 +21,19 @@ async function startServer(db) {
     server.once('error', reject); server.once('exit', code => reject(Error(`Server exited ${code}: ${logs}`)));
   }), 15000, 'Server did not start');
 }
+// The release notes window covers #start for a first visit: acknowledge the current release, as tests/lib/playwright.cjs does.
+const newsVersion = fs.readFileSync(path.join(root, 'client/index.html'), 'utf8').match(/class="version">([^<]+)</)[1];
 async function enter(stub, cls, name) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
-  await context.addInitScript(stub => {
+  await context.addInitScript(({ stub, newsVersion }) => {
     if (stub) window.__valhallaTestSprites = true;
     if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null }));
-  }, stub);
+    localStorage.setItem('valhallasc.whats-new.v1', newsVersion);
+  }, { stub, newsVersion });
   const page = await context.newPage(); page.errors = []; page.on('pageerror', e => page.errors.push(e.message));
   await page.goto(url, { waitUntil: 'domcontentloaded' }); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-' + cls).click(); await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 90000 });
-  await page.waitForFunction(cls => Online.connected && !!valhalla[cls] && !!Field.beetleSprites && !!Field.cragSprites, cls, { timeout: 90000 });
+  await page.waitForFunction(cls => Online.connected && !!valhalla[cls] && !!Field.cragSprites, cls, { timeout: 90000 });
   return page;
 }
 // Visible pixels of the idle frame under the current equipment, and a fingerprint of them. `female` loads and uses the
@@ -202,11 +205,17 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       // Animation: the walk and the attack are different pictures from standing still, in the female set too.
       check(await page.evaluate(cls => { const hash = (clip, i) => { const c = femaleSprites[cls].frame(clip, 3, i), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let k = 3; k < d.length; k += 4) h = (h * 31 + d[k - 3] + d[k - 2] * 3) >>> 0; return h; }; return new Set([hash('idle', 0), hash('walk', 2), hash('attack', 4), hash('die', 7)]).size === 4; }, cls), `${cls} (female): idle, walk, attack and die are four different pictures`);
       if (cls === 'mage') {
-        const sizes = await page.evaluate(() => ({
-          beetle: [Field.beetleSprites.img.beetle.naturalWidth, Field.beetleSprites.img.beetle.naturalHeight],
-          crags: Object.fromEntries(Field.cragSprites.meta.kinds.map(k => [k, [Field.cragSprites.img[k].naturalWidth, Field.cragSprites.img[k].naturalHeight]])),
+        // The Ironhide atlas loads only when a beetle is in view, so decode the served file instead of the client's copy.
+        const ironhide = JSON.parse(fs.readFileSync(path.join(root, 'client/assets/ironhide.txt'), 'utf8'));
+        const beetleImage = await page.evaluate(() => new Promise(resolve => {
+          const img = new Image(); img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight }); img.onerror = () => resolve({ w: 0, h: 0 }); img.src = 'assets/ironhide.png';
         }));
-        check(sizes.beetle.join() === '576,320', 'the Ironhide atlas is 576x320');
+        const sizes = {
+          beetle: [beetleImage.w, beetleImage.h],
+          crags: await page.evaluate(() => Object.fromEntries(Field.cragSprites.meta.kinds.map(k => [k, [Field.cragSprites.img[k].naturalWidth, Field.cragSprites.img[k].naturalHeight]]))),
+        };
+        const [fw, fh] = ironhide.frame, cols = 8, rows = 5;   // 8 frames per clip row, 5 clip rows (idle..die)
+        check(sizes.beetle.join() === [cols * fw, rows * fh].join(), `the Ironhide atlas is ${cols * fw}x${rows * fh} (manifest frame ${fw}x${fh})`);
         // The Crags atlases on disk are the expectation: every crags_<kind>.png is listed and loaded, none is missing.
         const onDisk = fs.readdirSync(path.join(root, 'client/assets')).flatMap(f => /^crags_(.+)\.png$/.exec(f)?.[1] ?? []).sort();
         check(onDisk.length >= 5 && Object.keys(sizes.crags).sort().join() === onDisk.join(), `every Crags monster atlas on disk is listed by the metadata (${onDisk.join(', ')})`);
@@ -223,7 +232,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
     check(robed.hash !== bare.hash && other.hash !== robed.hash, 'each armour and weapon still changes the stub pixels');
     const still = await stub.evaluate(() => { const s = valhalla.mage, sum = c => { const d = s.frame(c, 3, 2).getContext('2d').getImageData(0, 0, 256, 256).data; let h = 0; for (let i = 3; i < d.length; i += 4) h = (h * 31 + d[i]) >>> 0; return h; }; return new Set(['idle', 'walk', 'attack', 'hurt', 'die'].map(sum)).size; });
     check(still === 1, 'the stub has no animation: every clip is the same picture');
-    check(await stub.evaluate(() => Field.beetleSprites.meta.kinds.join() === 'beetle' && Field.slimes.length > 0), 'enemy stubs keep the real kind lists');
+    check(await stub.evaluate(() => ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'].every(k => Field.cragSprites.meta.kinds.includes(k)) && Field.slimes.length > 0), 'enemy stubs keep the real kind lists');
     check(stub.errors.length === 0, 'the stub run has no page errors: ' + stub.errors.join('; '));
     console.log(`real sprites: ${checks} checks passed`);
   } finally {

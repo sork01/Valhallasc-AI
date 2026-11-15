@@ -37,12 +37,12 @@ function check(value, label) { if (process.env.SOFT_CHECKS && !value) { failed.p
     await p.locator('#cls-warrior').click(); await p.locator('#name').fill('StormglassArt');
     await p.locator('#go').click({ timeout: 60000 });
     await p.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
-    // The Stormglass Shore is index 18 in map.txt (zone 19 in the docs); look it up by name, never by a hard-coded index.
-    const zoneInfo = await p.evaluate(all => { const i = WORLD_MAP.zones.findIndex(z => z.name === 'The Stormglass Shore');
+    // The Stormglass Flats is index 18 in map.txt (zone 19 in the docs); look it up by name, never by a hard-coded index.
+    const zoneInfo = await p.evaluate(all => { const i = WORLD_MAP.zones.findIndex(z => z.name === 'The Stormglass Flats');
       return { index: i, spawns: WORLD_MAP.zones[i].slimes.filter(s => all.includes(s.kind)).map(s => ({ kind: s.kind, x: s.x, y: s.y })) }; }, allKinds);
     const spawns = zoneInfo.spawns, zid = zoneInfo.index + 1;
     const first = spawns.find(s => s.kind === 'saltclaw');
-    check(first && zoneInfo.index === 18, 'The Stormglass Shore (index 18, zone 19) spawns the Saltclaw');
+    check(first && zoneInfo.index === 18, 'The Stormglass Flats (index 18, zone 19) spawns the Saltclaw');
     await p.evaluate(spot => {
       Online.send({ type: 'debug', command: { op: 'teleport', zone: 19, x: spot.x+3, y: spot.y+3 } });
       Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } });
@@ -156,7 +156,7 @@ function check(value, label) { if (process.env.SOFT_CHECKS && !value) { failed.p
       if (presence[kind]) {
         check(presence[kind].top === m.top && presence[kind].source === sources[kind] &&
           presence[kind].frame.w === kw && presence[kind].frame.h === kh,
-          `${kind}: authoritative The Stormglass Shore presence uses the new source, ${kw}×${kh} frame and production health-bar top`);
+          `${kind}: authoritative The Stormglass Flats presence uses the new source, ${kw}×${kh} frame and production health-bar top`);
       }
       check(d.ready && d.portraitPixels > 80, `${kind}: production target portrait renders`);
     }
