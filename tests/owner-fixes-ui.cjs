@@ -45,7 +45,8 @@ async function nearNpc(page, id) {
 }
 async function portalTest(page, touch) {
   await page.evaluate(() => { City.close(); Quests.close(); WorldMap.close(); Field.clearInput(); });
-  const p = await page.evaluate(() => WORLD_MAP.portals.find(p=>p.to===1));
+  // The first walk-through gate of Greenmeadow (to Skaldholm's vault). The Crags border is a seam now, not a gate.
+  const p = await page.evaluate(() => WORLD_MAP.portals.find(p=>p.walk));
   const length = Math.hypot(...p.walk), back = 5;
   await debug(page,{op:'teleport',zone:0,x:p.x-p.walk[0]/length*back,y:p.y-p.walk[1]/length*back});
   await page.waitForTimeout(500);
@@ -60,10 +61,10 @@ async function portalTest(page, touch) {
     check(await page.locator('#fieldcv').evaluate(n=>n.style.cursor==='pointer'),'Hover near a gate shows an actionable cursor');
     await page.mouse.click(hit.x,hit.y);
   } else await page.touchscreen.tap(hit.x,hit.y);
-  await wait(page, () => Field.zone === 1).catch(async e => { console.error('Portal failure', {touch,hit,p}, await page.evaluate(() => ({zone:Field.zone,hero:{x:Field.hero.x,y:Field.hero.y},route:Field._debug.cityRoute,paused:document.getElementById('pause').hidden,hitElement:document.elementFromPoint(innerWidth*.6,innerHeight*.5)?.outerHTML.slice(0,150)}))); await page.screenshot({path:path.join(world.runDir,'portal-failure.png')}); throw e; });
+  await wait(page, to => Field.zone === to, p.to).catch(async e => { console.error('Portal failure', {touch,hit,p}, await page.evaluate(() => ({zone:Field.zone,hero:{x:Field.hero.x,y:Field.hero.y},route:Field._debug.cityRoute,paused:document.getElementById('pause').hidden,hitElement:document.elementFromPoint(innerWidth*.6,innerHeight*.5)?.outerHTML.slice(0,150)}))); await page.screenshot({path:path.join(world.runDir,'portal-failure.png')}); throw e; });
   check(true, `${touch?'Touch':'Mouse'} near the opening follows a route and crosses the gate`);
   await page.waitForTimeout(800);
-  check(await page.evaluate(()=>Field.zone===1),'Arrival remains in the destination after the portal cooldown');
+  check(await page.evaluate(to=>Field.zone===to, p.to),'Arrival remains in the destination after the portal cooldown');
 }
 (async () => {
   await world.start(); browser = await chromium.launch({headless:true});
@@ -78,10 +79,10 @@ async function portalTest(page, touch) {
   const gathering = await page.evaluate(()=>({markers:Quests.mapMarkers(0).filter(m=>m.quest==='city_gel'),target:Quests.navigationTarget(4,80,80)}));
   check(gathering.markers.length>=2 && gathering.markers.every(m=>!m.npc),'Bring quest marks real green and blue slime sources instead of the giver');
   check(gathering.target?.viaPortal && gathering.target.destinationZone===0,'Arrow routes from Skaldholm to the gathering zone');
-  await debug(page,{op:'give_item',item:'slime_gel',quantity:8});
+  await debug(page,{op:'give_item',item:'qi_city_gel',quantity:8});
   await wait(page,()=>Quests.mapMarkers(0).filter(m=>m.quest==='city_gel').length===1);
   check(await page.evaluate(()=>Quests.mapMarkers(0).filter(m=>m.quest==='city_gel').length===1),'A finished individual bring objective removes only its own gathering marker');
-  await debug(page,{op:'give_item',item:'blue_gel',quantity:4});
+  await debug(page,{op:'give_item',item:'qi_city_gel_2',quantity:4});
   await wait(page,()=>document.querySelector('.tracker-quest[data-quest="city_gel"]')?.dataset.status==='ready');
   const ready = await page.evaluate(()=>({
     text:document.querySelector('.tracker-quest[data-quest="city_gel"]').textContent,
@@ -92,7 +93,8 @@ async function portalTest(page, touch) {
   check(ready.local.length===0 && ready.remote.length===1 && ready.remote[0].x===WORLD_GEL_NPC_X(),'Final objective switches all guidance to the remote hand-in NPC');
   check(ready.target?.viaPortal && ready.target.destinationZone===4,'Ready quest Arrow routes to the hand-in zone');
   await page.evaluate(()=>Quests.show());
-  check((await page.locator('.quest-entry[data-quest="city_gel"] > summary').textContent()).includes('Complete · Ready to turn in'),'Folded journal exposes the ready state without opening the quest');
+  // The journal list shows each quest as a row with its state; the row is ready without opening the detail page.
+  check(await page.locator('#quest-list .journal-quest[data-quest="city_gel"][data-status="ready"]').count()===1,'Journal row exposes the ready state without opening the quest');
   await page.evaluate(()=>Quests.close());
   // The same final-count transition for each supported objective kind, without grinding.
   const kinds = await page.evaluate(()=>{
@@ -135,25 +137,25 @@ async function portalTest(page, touch) {
   await wait(page,()=>Shop.open);
   check(await page.locator('[data-tab="leftovers"]').count()===1,'Merchant exposes quest leftovers separately from Sell all junk');
   await page.locator('[data-tab="leftovers"]').click();
-  check(await page.locator('[data-action="discard-leftovers"][data-item="slime_gel"]').count()===0,'Active ready-to-hand-in materials are excluded from discard');
+  check(await page.locator('[data-action="discard-leftovers"][data-item="qi_city_gel"]').count()===0,'Active ready-to-hand-in materials are excluded from discard');
   await page.evaluate(()=>City.close());
   await send(page,{type:'quest_abandon',id:'city_gel'}); await page.waitForTimeout(220);
   await nearNpc(page,'merchant'); await page.locator('[data-view="buy"]').click(); await wait(page,()=>Shop.open);
   await page.locator('[data-tab="leftovers"]').click();
-  await page.locator('[data-action="discard-leftovers"][data-item="slime_gel"]').click();
+  await page.locator('[data-action="discard-leftovers"][data-item="qi_city_gel"]').click();
   check(await page.locator('#sell-warning').isVisible() && (await page.locator('#sell-warning').innerText()).includes('No gold or buyback'),'Discard requires an explicit confirmation explaining permanent removal');
   await page.locator('#sell-warning [data-action="discard"]').click();
   await wait(page,()=>document.getElementById('npc-notice').textContent.includes('Quest leftovers discarded'));
-  check(await page.locator('[data-action="discard-leftovers"][data-item="slime_gel"]').count()===0,'Confirmed discard removes the leftover stack');
+  check(await page.locator('[data-action="discard-leftovers"][data-item="qi_city_gel"]').count()===0,'Confirmed discard removes the leftover stack');
   await page.evaluate(()=>City.close());
   // A real dropped bag remains at a fixed world position while the hero walks.
   for(let n=0;n<4;n++) await debug(page,{op:'give_item',item:'linen_satchel',quantity:1});
-  await debug(page,{op:'teleport',zone:0,x:15,y:15});
+  await debug(page,{op:'teleport',zone:0,x:250,y:235});   // open ground (the old (15,15) is void in the shaped world)
   await debug(page,{op:'drop_item',item:'linen_satchel',quantity:1});
   await wait(page,()=>Field._debug.drops.some(d=>d.item==='linen_satchel' && d.t>.6));
   const pile = await page.evaluate(()=>Field._debug.drops.find(d=>d.item==='linen_satchel'));
-  await send(page,{type:'move',x:18,y:15});
-  await wait(page,()=>Field.hero.x>17.5);
+  await send(page,{type:'move',x:253,y:235});
+  await wait(page,()=>Field.hero.x>252.5);
   check(await page.evaluate(p=>{const d=Field._debug.drops.find(d=>d.id===p.id);return d && d.x===p.x && d.y===p.y;},pile),'Refused bag pickup stays at its original coordinates as the hero walks away');
   await send(page,{type:'stop'});
   await portalTest(page,false);

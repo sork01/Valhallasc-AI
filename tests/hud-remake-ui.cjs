@@ -3,6 +3,7 @@
 // The scrollbars use the gilded in-game theme. Client-only; nothing here touches gameplay state.
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
 const { chromium } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
@@ -22,6 +23,14 @@ async function enter(browser, url, name, viewport, seed) {
   const page = await browser.newPage({ viewport, reducedMotion: 'reduce' });
   page.on('pageerror', e => errors.push(`${name}: ${e.message}`));
   await page.addInitScript(seed => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify(seed)); } }, seed);
+  // MUTATE=handle adds a food/potion handle to the Edit UI list; the handle-id check must fail.
+  // MUTATE=reset makes Reset keep the saved layout; the shipped-layout check must fail.
+  if (process.env.MUTATE === 'handle' || process.env.MUTATE === 'reset') await page.route('**/settings.js', route => {
+    let body = fs.readFileSync(path.join(root, 'client/settings.js'), 'utf8');
+    if (process.env.MUTATE === 'handle') body = body.replace('const ITEMS = [', "const ITEMS = [['quickuse', 'Quick slots', '#skillbar', '0 0'], ");
+    else body = body.replace('window.Prefs.set({ ui: null }); refresh();', 'refresh();');
+    return route.fulfill({ body, contentType: 'text/javascript' });
+  });
   await page.goto(url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-mage').click(); await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
@@ -49,32 +58,42 @@ const errors = [];
 
   // --- zone and online count under the minimap ---
   const place = async () => { const m = await rect(page, '#minimap'), s = await rect(page, '#network-status'); return { m, s }; };
-  await page.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+  await page.waitForFunction(() => /^.+ · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+  const HOME = (await text(page)).split(' · ')[0];   // the pier is inside Saltby's sanctuary: the hub name, not the zone
+  const online = n => `${HOME} · ${n} online`;
   let { m, s } = await place();
   check(s.t >= m.b - 1 && s.t - m.b < 40, `The pill sits right under the minimap (${m.b.toFixed(0)} -> ${s.t.toFixed(0)})`);
   check(Math.abs(s.r - m.r) < 2 && s.l >= m.l - 2, 'It is right-aligned with the minimap and no wider than it');
   check(await page.locator('.hud-tr #network-status').count() === 1 && await page.locator('#network-status').count() === 1, 'There is one pill, inside the minimap column');
+  // The Visit button only shows outside a hub (the pier is inside Saltby's sanctuary): stand on open ground in zone 0, then go back.
+  const pier = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 949, command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => !document.getElementById('city-travel').hidden, null, { timeout: 15000 });
   const horse = await rect(page, '#mount-toggle'), travel = await rect(page, '#city-travel');
   check(travel.t >= horse.b - 1, `Visit button clears the minimap column (${horse.b.toFixed(0)} -> ${travel.t.toFixed(0)})`);
+  await page.evaluate(spot => Online.send({ type: 'debug', ref: 952, command: { op: 'teleport', zone: 0, x: spot.x, y: spot.y } }), pier);
+  await page.waitForFunction(want => document.getElementById('network-status').textContent === want, online(1), { timeout: 15000 });
   const top = await rect(page, '#stage');
   check(s.t > top.t + 10, 'Nothing is left at the top centre');
-  check(await text(page) === 'Greenmeadow · 1 online', `One player online reads "${await text(page)}"`);
+  check(await text(page) === online(1), `One player online reads "${await text(page)}"`);
   const second = await enter(browser, world.url, 'Visitor', { width: 1440, height: 900 }, { lang: 'en', sound: false, char: null, draft: null });
-  await page.waitForFunction(() => document.getElementById('network-status').textContent === 'Greenmeadow · 2 online', null, { timeout: 10000 });
+  await page.waitForFunction(want => document.getElementById('network-status').textContent === want, online(2), { timeout: 10000 });
   check(true, 'A second player makes it 2 online');
   await second.close();
-  await page.waitForFunction(() => document.getElementById('network-status').textContent === 'Greenmeadow · 1 online', null, { timeout: 15000 });
+  await page.waitForFunction(want => document.getElementById('network-status').textContent === want, online(1), { timeout: 15000 });
   check(true, 'The count drops again when they leave');
   const home = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y })), crags = await page.evaluate(() => WORLD_MAP.zones[0].spawn);
   await page.evaluate(spot => Online.send({ type: 'debug', ref: 950, command: { op: 'teleport', zone: 1, x: spot.x, y: spot.y } }), crags);
   await page.waitForFunction(() => /^Emberfall Crags · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
   check(true, 'The zone name follows a zone change');
   await page.evaluate(spot => Online.send({ type: 'debug', ref: 951, command: { op: 'teleport', zone: 0, x: spot.x, y: spot.y } }), home);
-  await page.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+  await page.waitForFunction(want => document.getElementById('network-status').textContent === want, online(1), { timeout: 10000 });
 
   // --- the layout migrates: Edit UI saves only the pieces that exist ---
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
-  check(await page.locator('.layout-handle').count() === 10, 'Edit UI offers ten pieces (the food and potion bar is part of the skillbar)');
+  // The pieces that exist are offered; the removed ones and the food and potion bar (part of the skillbar) are not.
+  const handleIds = await page.locator('.layout-handle').evaluateAll(ns => ns.map(n => n.dataset.id));
+  check(['frame', 'map', 'bags', 'skillbar', 'chat'].every(id => handleIds.includes(id)) && !['character', 'hint', 'quickuse'].some(id => handleIds.includes(id)), `Edit UI offers the live pieces and not the removed ones: ${handleIds.join(', ')}`);
   await page.locator('#layout-done').click(); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
   const ui = (await stored(page)).ui || {};
   check(!('character' in ui) && !('hint' in ui) && 'bags' in ui, `Saved layout dropped the removed pieces: ${JSON.stringify(ui)}`);
@@ -124,7 +143,7 @@ const errors = [];
 
   // --- phone width ---
   const phone = await enter(browser, world.url, 'Phoner', { width: 844, height: 390 }, { lang: 'en', sound: false, char: null, draft: null });
-  await phone.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+  await phone.waitForFunction(() => /^.+ · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
   const pm = await rect(phone, '#minimap'), ps = await rect(phone, '#network-status'), pst = await rect(phone, '#stage');
   check(ps.t >= pm.b - 1 && ps.l >= pst.l && ps.r <= pst.r + 1 && ps.w <= pm.w + 2, `At 844x390 the pill stays under the minimap and inside the stage (${JSON.stringify(ps)})`);
   // The food and potion bar is anchored to the skillbar, so it follows it on a small stage too.
@@ -132,11 +151,12 @@ const errors = [];
   check(pq.b <= pb.t + 1 && pb.t - pq.b < 0.02 * pst.w && Math.abs(pq.l - pb.l) < 1.5, `At 844x390 the food and potion bar sits on the skillbar (${JSON.stringify({ pq, pb })})`);
   // A visitor who never moved anything gets Sork's arrangement; Reset goes back to it, and a layout of one's own is kept.
   check(await phone.evaluate(() => JSON.stringify(Prefs.layout.party) === '{"x":61.04,"y":17.53}' && Prefs.layout.quests.y === -2.48 && Prefs.panelSize.chat.w === 34.36 && Prefs.panelSize.quests.h === 31.28), 'A fresh visitor gets the shipped layout and panel sizes');
+  const shippedKeys = await phone.evaluate(() => Object.keys(Prefs.layout).sort().join());   // the shipped pieces (grows with the remake: dps joined in 1.55.2)
   check(await phone.evaluate(() => document.getElementById('chat').style.getPropertyValue('--pw') !== '' || getComputedStyle(document.getElementById('chat')).getPropertyValue('--pw') !== ''), 'The default chat width is applied');
   await phone.evaluate(() => { Settings.startEdit(); Settings.layout.bags = { x: 0, y: 0 }; Prefs.set({ ui: { map: { x: 2, y: 2 } } }); Settings.refresh(); });
   check(await phone.evaluate(() => Object.keys(Prefs.layout).join() === 'map'), 'A layout the player saved replaces the shipped one');
   await phone.evaluate(() => { Settings.stopEdit(); Settings.reset(); });
-  check(await phone.evaluate(() => Object.keys(Prefs.layout).length === 9 && Settings.layout.party.x === 61.04), 'Reset returns to the shipped layout');
+  check(await phone.evaluate(keys => Object.keys(Prefs.layout).sort().join() === keys && Settings.layout.party.x === 61.04, shippedKeys), 'Reset returns to the shipped layout');
   await phone.screenshot({ path: path.join(world.artifacts, 'hud-remake-844x390.png') });
   await phone.close();
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);
