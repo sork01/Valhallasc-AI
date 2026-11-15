@@ -4304,7 +4304,9 @@ const scenarios = {
       await kit.teleport(w,'ThunderLead',{zone:35,x:70,y:15});
       await w.action('ThunderLead',{type:'move',x:70,y:12});
       await w.waitFor(()=>w.player('ThunderLead').zone===27,15000,'Clear exit returns to the Cairnspine');
-      check(Math.hypot(w.player('ThunderLead').x-151,w.player('ThunderLead').y-20)<2,'Return landing is safe and separate from entrance');
+      // The landing comes from the clear exit (the Cairnspine's Thunderheart landing moved; the old (151,20) is void).
+      const thunderBack=map.zones[34].portals.find(p=>p.id==='thunderheart_gate_exit');
+      check(Math.hypot(w.player('ThunderLead').x-thunderBack.tx,w.player('ThunderLead').y-thunderBack.ty)<2,'Return landing is safe and separate from entrance');
       await w.restart();
       check(quest(w,'ThunderLead','cairn_thunder_final')?.claimed,'Quest claim persists through restart');
     },
