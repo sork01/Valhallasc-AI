@@ -147,9 +147,13 @@ async function type(page, text) {
     await other.locator('#chars-new').click(); await other.locator('#cls-warrior').click(); await other.locator('#name').fill('Plainhero'); await other.locator('#go').click();
     await connected(other);
     check(await other.evaluate(() => Online.gm === false), 'an ordinary character is not a game master');
+    // A brand-new character opens on the locked intro, which swallows every key (cutscene.js blockKey) for about 62 s.
+    await other.waitForFunction(() => !!window.Cutscene?.active, null, { timeout: 15000 }).catch(() => {});
+    await other.waitForFunction(() => !window.Cutscene?.active, null, { timeout: 120000 });
     await type(other, '/level 20');
-    await other.waitForTimeout(600);
-    check(!(await chatLog(other)).includes('Game master') && /\/level 20/.test(await chatLog(other)), 'slash text from an ordinary player is plain chat');
+    await other.waitForFunction(() => /\/level 20/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 }).catch(() => {});
+    const plainLog = await chatLog(other);
+    check(!plainLog.includes('Game master') && /\/level 20/.test(plainLog), 'slash text from an ordinary player is plain chat');
     const reply = await other.evaluate(() => new Promise(resolve => {
       const timer = setTimeout(() => resolve(null), 3000);
       GM.onReply = packet => { clearTimeout(timer); resolve(packet); };
