@@ -50,7 +50,8 @@ const pressed = (page, id) => page.locator(id).getAttribute('aria-pressed');
   }
   // Gear lists and colours are the class's own for both bodies.
   await a.locator('#cls-hunter').click(); await a.locator('#gender-female').click();
-  check(await a.locator('#create-hunterArmor option').allTextContents().then(t => t.length === 1 && t[0].includes('Jerkin')) && await a.locator('#custom .swatches .sw').count() === 10, 'The female Hunter has the same starter gear and the same six hair and four skin choices');
+  // The select always carries a "none" option (game.js buildControls); only the starter piece is compared.
+  check(await a.locator('#create-hunterArmor option:not([value="none"])').allTextContents().then(t => t.length === 1 && t[0].includes('Jerkin')) && await a.locator('#custom .swatches .sw').count() === 10, 'The female Hunter has the same starter gear and the same six hair and four skin choices');
 
   // Play a female Hunter. The server stores the look, so it also survives a reload.
   await a.locator('#name').fill('Freya'); await a.locator('#go').click({ timeout: 30000 });

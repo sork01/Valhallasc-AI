@@ -60,7 +60,7 @@ const check = (value, message) => { assert.ok(value, message); checks++; };
         check(await left.getAttribute('aria-label') === (lang === 'sv' ? 'Vrid åt vänster' : 'Turn left'), 'rotation label is localized');
         check(await page.locator('#create-no-gear').textContent() === (lang === 'sv' ? 'Ingen utrustning' : 'No gear'), 'No gear is localized');
         if (cls === 'priest') await page.screenshot({ path: path.join(output, `creation-${width}x${height}.png`) });
-        await page.locator('#name').fill('Bare' + cls);
+        await page.locator('#name').fill('Bare' + cls + '_' + width); // names are unique per server: one per viewport
         await page.locator('#go').click();
         await page.waitForFunction(cls => Online.connected && Field.hero?.equipment && Object.keys(Field.hero.equipment).length === 0 && Field.hero.look[cls + 'Armor'] === 'none' && Field.hero.look[cls + 'Weapon'] === 'none', cls);
         check(await page.evaluate(cls => Object.values(Field.hero.equipment).length === 0 && Field.hero.look[cls + 'Armor'] === 'none' && Field.hero.look[cls + 'Weapon'] === 'none', cls), `${cls}: server confirms nothing equipped`);

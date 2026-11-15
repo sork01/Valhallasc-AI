@@ -33,18 +33,21 @@ let browser,checks=0;const check=(v,label)=>{assert.ok(v,label);checks++;console
  await page.locator('#cls-warrior').click();await page.locator('#gender-female').click();await page.locator('#name').fill('FollowupCheck');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0);
  await debug(page,{op:'set_gold',gold:2000000});
- await debug(page,{op:'teleport',zone:0,x:80,y:80});await page.waitForFunction(()=>Math.hypot(Field.hero.x-80,Field.hero.y-80)<1);
- for(const [kind,bank,x] of [['crab','rimeSprites',84],['toad','fenSprites',76]]){
-  await debug(page,{op:'spawn_enemy',kind,x,y:80,level:1});
-  await page.waitForFunction(([kind,bank])=>Field[bank]?.img[kind]&&Field.slimes.some(s=>s.kind===kind&&!s.dead&&Math.hypot(s.x-80,s.y-80)<8),[kind,bank]);
-  const trace=await page.evaluate(([kind,bank])=>{
-   const s=Field.slimes.find(s=>s.kind===kind&&!s.dead&&Math.hypot(s.x-80,s.y-80)<8);Field.hero.target=s;
+ await debug(page,{op:'teleport',zone:0,x:250,y:235});await page.waitForFunction(()=>Math.hypot(Field.hero.x-250,Field.hero.y-235)<8);
+ const B=await page.evaluate(()=>({x:Field.hero.x,y:Field.hero.y})); // (80,80) is blocked ground: the fixture uses the hero's real spot
+ await sleep(300);
+ for(const [kind,bank,dx] of [['crab','rimeSprites',4],['toad','fenSprites',-4]]){
+  const x=B.x+dx,y=B.y;
+  await debug(page,{op:'spawn_enemy',kind,x,y,level:1});
+  await page.waitForFunction(([kind,bank,x,y])=>Field[bank]?.img[kind]&&Field.slimes.some(s=>s.kind===kind&&!s.dead&&Math.hypot(s.x-x,s.y-y)<8),[kind,bank,x,y]);
+  const trace=await page.evaluate(([kind,bank,x,y])=>{
+   const s=Field.slimes.find(s=>s.kind===kind&&!s.dead&&Math.hypot(s.x-x,s.y-y)<8);Field.hero.target=s;
    const g=document.getElementById('fieldcv').getContext('2d'),stroke=g.stroke,draw=g.drawImage,events=[];
    g.stroke=function(...args){if(this.strokeStyle==='#ffe066')events.push('ring');return stroke.apply(this,args);};
    g.drawImage=function(image,...args){if(image===Field[bank].img[kind])events.push('enemy');return draw.call(this,image,...args);};
    try{Field._debug.drawFrame(performance.now()/1000);}finally{g.stroke=stroke;g.drawImage=draw;Field.hero.target=null;}
    return events;
-  },[kind,bank]);
+  },[kind,bank,x,y]);
   check(trace.includes('ring')&&trace.includes('enemy')&&trace.indexOf('ring')<trace.indexOf('enemy'),kind+' selection ring paints below its sprite');
  }
  async function visit(id,zone=0){
