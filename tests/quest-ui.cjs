@@ -26,17 +26,8 @@ async function call(name, args = {}) {
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('QuestUI');
   await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Speak to Wren')), 'HUD introduces the first quest');
-  // The name above an NPC's head is part of the click target, as in World of Warcraft.
-  const plate = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'guide'); const [x, y] = Field._debug.w2s(n.x, n.y); return { x, y: y - City.nameplateTop(n) + 8 }; });
-  const canvas = await page.locator('#fieldcv').boundingBox();
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: path.join(world.artifacts, 'npc-nameplates.png') });
-  await page.mouse.click(canvas.x + plate.x / 1600 * canvas.width, canvas.y + plate.y / 900 * canvas.height);
-  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
-  check(await page.locator('#npc-name').textContent() === 'Wren', 'Clicking the nameplate talks to the NPC');
-  await page.keyboard.press('Escape');
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible(), 'Q opens the journal');
   check(await page.locator('#quest-page .journal-detail').count() === 0 && await page.locator('#quest-list [data-quest]').count() === 0, 'The journal lists only quests you have taken: none yet, no locked or untaken cards');
@@ -51,6 +42,18 @@ async function call(name, args = {}) {
   check(await page.locator('#quest-journal').isHidden(), 'Escape closes the journal');
   await page.locator('#quest-tracker').click();
   check(await page.locator('#quest-journal').isVisible(), 'HUD button opens the journal');
+  await page.keyboard.press('Escape');
+  // New heroes start on the Saltby pier, far from Alderhaven: move to the plaza beside Wren.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, ...WORLD_MAP.city.plaza } }));
+  await page.waitForFunction(() => { const p = WORLD_MAP.city.plaza; return Math.hypot(Field.hero.x - p.x, Field.hero.y - p.y) < 8; }, null, { timeout: 60000 });
+  // The name above an NPC's head is part of the click target, as in World of Warcraft.
+  const plate = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'guide'); const [x, y] = Field._debug.w2s(n.x, n.y); return { x, y: y - City.nameplateTop(n) + 8 }; });
+  const canvas = await page.locator('#fieldcv').boundingBox();
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(world.artifacts, 'npc-nameplates.png') });
+  await page.mouse.click(canvas.x + plate.x / 1600 * canvas.width, canvas.y + plate.y / 900 * canvas.height);
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
+  check(await page.locator('#npc-name').textContent() === 'Wren', 'Clicking the nameplate talks to the NPC');
   await page.keyboard.press('Escape');
   await page.evaluate(() => Field.visitNpc('guide'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
@@ -75,7 +78,8 @@ async function call(name, args = {}) {
   check(await page.locator('#quest-page .journal-detail').count() === 1 && await page.locator('#quest-page [data-quest="welcome"] .quest-level').textContent() === 'Recommended level 1', 'The journal now shows just the accepted quest, with its recommended level');
   await page.keyboard.press('Escape');
   const trackerBounds = await page.locator('#quest-tracker').boundingBox();
-  check(trackerBounds.x > 720, 'Objective tracker sits on the right side of the world');
+  // Sork's default arrangement (a373195c) puts the tracker in the left column, clear of the centre.
+  check(trackerBounds.x + trackerBounds.width / 2 < 720, 'Objective tracker sits on the left side of the world, clear of the centre');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
   check(await page.locator('.tracker-list').isHidden(), 'Quest tracker collapses without opening the journal');
   await page.getByRole('button', { name: 'Expand quest tracker' }).click();
@@ -95,16 +99,17 @@ async function call(name, args = {}) {
   check(await page.locator('#quest-page').textContent().then(t => t.includes('Speak to Bram: 0/1')), 'Journal displays authoritative partial progress');
   await page.screenshot({ path: path.join(world.artifacts, 'quest-progress.png') });
   await page.keyboard.press('Escape');
-  check(await page.locator('.tracker-objective.complete').count() === 1, 'Completed objectives are visibly marked in green');
+  check(await page.locator('#quest-tracker .tracker-quest[data-quest="welcome"] .tracker-objective.complete').count() === 1, 'Completed objectives are visibly marked in green');
   // Display-only ledger fixture checks multiple objectives without forging combat.
   const fixture = await browser.newPage({ viewport: { width: 1440, height: 900 }, bypassCSP: true });
   await fixture.goto(new URL('health', world.url).href);
-  await fixture.setContent('<main id="stage" class="stage" data-scene="game"><section id="quest-tracker" class="quest-tracker"></section><div id="quest-journal" hidden><div id="quest-list"></div><div id="quest-page"></div><div id="quest-controls"></div><span id="quest-count"></span><button id="quest-close"></button></div><div id="pause" hidden></div><div id="equipment" hidden></div></main>');
+  await fixture.setContent('<main id="stage" class="stage" data-scene="game"><section id="quest-tracker" class="quest-tracker"></section><div id="quest-journal" hidden><section class="quest-panel"><div id="quest-list"></div><div id="quest-page"></div><div id="quest-controls"></div><span id="quest-count"></span><button id="quest-close"></button></section></div><div id="pause" hidden></div><div id="equipment" hidden></div></main>');
   await fixture.addStyleTag({ path: path.join(root, 'client/style.css') });
   await fixture.addStyleTag({ path: path.join(root, 'client/online.css') });
   await fixture.addScriptTag({ path: path.join(root, 'client/world.js') });
   await fixture.addScriptTag({ path: path.join(root, 'client/items.js') });
   await fixture.evaluate(() => { window.Online = { connected: true }; window.Field = { hero: { dead: false, look: { class: 'warrior' } }, setPaused: () => {} }; window.City = { open: false }; });
+  for (const file of ['sv-data.js', 'locale.js', 'money.js']) await fixture.addScriptTag({ path: path.join(root, 'client', file) });
   await fixture.addScriptTag({ path: path.join(root, 'client/inventory.js') });
   await fixture.evaluate(() => Inventory.update([], {class:'warrior'}));
   await fixture.addScriptTag({ path: path.join(root, 'client/quest-guidance.js') });
@@ -133,12 +138,15 @@ async function call(name, args = {}) {
     Quests.update([{ id: q.id, counts: q.objectives.map(o => o.count), claimed: false, completions: 0 }]);
     Quests.detail(q, container, () => {});
   });
-  check(await fixture.locator('#choice-fixture [data-action="claim"][data-item]').count() === 5 && await fixture.locator('#choice-fixture [data-action="claim"]:not([data-item])').count() === 0, 'Ready class quest offers five explicit equipment choices');
+  const choiceCount = await fixture.evaluate(() => WORLD_MAP.zones[12].quests.find(q => q.id === 'astral_welcome').rewardChoices.warrior.length);
+  // The class choices are five gear pieces and the level 40 cloak (cloaks are the tenth slot).
+  check(await fixture.locator('#choice-fixture [data-action="claim"][data-item]').count() === choiceCount && await fixture.locator('#choice-fixture [data-action="claim"]:not([data-item])').count() === 0, 'Ready class quest offers every explicit class reward choice');
   await fixture.locator('#choice-fixture [data-action="claim"][data-item]').first().click();
   check(await fixture.evaluate(() => chosenQuestReward.offer === `quest:claim:astral_welcome:${WORLD_MAP.zones[12].quests.find(q => q.id === 'astral_welcome').rewardChoices.warrior[0]}`), 'Chosen reward ID reaches the server in the claim action');
-  check(await fixture.locator('.tracker-quest[data-quest="meadow_bounty"] .complete').textContent().then(t => t.includes('Return to Linden')), 'Completed quests display their turn-in destination');
+  // The turn-in row is the tracker's own complete line plus a Hand in button naming the giver.
+  const trackerText = await fixture.evaluate(() => document.querySelector('#quest-tracker').textContent); check(trackerText.includes('Ready to turn in') && trackerText.includes('Hand in:'), 'Completed quests display their turn-in destination');
   await fixture.screenshot({ path: path.join(world.artifacts, 'quest-tracker.png') });
-  check(await page.evaluate(stub => !!Field.warriorSprites.source.parts.body && (stub || Field.beetleSprites.img.beetle.complete), STUB), 'Character and enemy artwork load');
+  check(await page.evaluate(stub => !!Field.warriorSprites.source.parts.body && (stub || Field.beetleSprites?.img?.beetle?.complete), STUB), 'Character and enemy artwork load');
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} focused quest UI checks passed; screenshots: ${world.artifacts}`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

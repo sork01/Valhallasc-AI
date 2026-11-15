@@ -37,7 +37,10 @@ const suite = {
   await page.evaluate(()=>Quests.close());
   await debug(page,{op:'quest',id:'es_01',action:'finish'});
   await page.waitForFunction(()=>Field.hero.quests.some(q=>q.id==='es_go_02'&&!q.claimed));
-  await recover('es_go_02');
+  // Empty Seat chapters cannot be abandoned (world/quest_journal.rs, Quest::abandonable): the journal disables the control instead.
+  await journal();
+  await page.locator('#quest-list > :not(.quest-abandoned) .journal-quest[data-quest="es_go_02"]').tap();
+  check(await page.locator('#quest-controls [data-action="abandon"]').isDisabled(), 'The Empty Seat cannot be abandoned: its journal control stays disabled');
   await page.evaluate(()=>Quests.close());
   await page.context().close();
   const sv=await player('RecoverySvenska',{lang:'sv'});

@@ -35,7 +35,7 @@ async function call(name, args = {}) {
   const quest = (id, action) => debug({ op: 'quest', id, action });
   async function map(zone) {
     await page.evaluate(() => { Quests.close(); WorldMap.close(); WorldMap.show(); });
-    await page.locator(`.wm-tile[data-zone="${zone}"]`).click();
+    await page.locator(`.wm-name[data-zone="${zone}"]`).click();
     await wait(zone => WorldMap.view === 'zone' && WorldMap.zone === zone, zone);
   }
   async function track(id) {
@@ -51,9 +51,11 @@ async function call(name, args = {}) {
       const list = original(Field.zone), wanted = list.filter(m => m.state === state && (!npc || m.npc === npc));
       const render = on => { Quests.mapMarkers = zone => on ? original(zone) : []; Field._debug.drawFrame(5); return g.getImageData(0, 0, cv.width, cv.height).data; };
       try {
-        const a = render(false), b = render(true), size = Field._debug.zones[Field.zone].size;
+        const a = render(false), b = render(true);
         return wanted.map(m => {
-          let pixels = 0, colored = 0; const x = Math.round(m.x / size * cv.width), y = Math.round(m.y / size * cv.height);
+          let pixels = 0, colored = 0; const W = cv.width, zoom = Math.max(1, Math.min(4, Math.round(+window.Prefs?.minimapZoom || 2))), V = 240 / zoom, sc = W / V;
+          const vx = Field.hero.x - V / 2, vy = Field.hero.y - V / 2, clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+          const x = Math.round(clamp((m.x - vx) * sc, 7, W - 7)), y = Math.round(clamp((m.y - vy) * sc, 8, W - 8));
           const rgb = m.color.slice(1).match(/../g).map(h => parseInt(h, 16));
           for (let py = Math.max(0, y - 9); py < Math.min(cv.height, y + 10); py++) for (let px = Math.max(0, x - 9); px < Math.min(cv.width, x + 10); px++) {
             const k = (py * cv.width + px) * 4;
@@ -73,11 +75,13 @@ async function call(name, args = {}) {
   check(gold.length === 1 && gold[0].fogged && gold[0].pixels > 15 && gold[0].colored > 2, 'Gold ! is painted on the actual minimap above unexplored fog');
   await map(0);
   check(await page.locator('.wm-quest[data-npc="guide"]').textContent() === '!', 'Zone map shows the same available giver');
-  check(await page.locator('.wm-quest[data-npc="guide"]').evaluate(n => getComputedStyle(n).color) === 'rgb(255, 223, 136)', 'Zone map gold matches the minimap');
+    // The layer is rebuilt every 250 ms, so read the marker and its colour in one page call.
+  check(await page.evaluate(() => getComputedStyle(document.querySelector('.wm-quest[data-npc="guide"]')).color) === 'rgb(255, 223, 136)', 'Zone map gold matches the minimap');
   check(await page.locator('.wm-quest[data-npc="guide"]').evaluate(n => {
     const npc = WORLD_MAP.npcs.find(n => n.id === 'guide'); return Math.abs(parseFloat(n.style.left) - npc.x / WORLD_MAP.size * 100) < .001 && Math.abs(parseFloat(n.style.top) - npc.y / WORLD_MAP.size * 100) < .001;
   }), 'Giver marker uses the actual NPC coordinates');
-  check(await page.locator('#wm-fog').evaluate(cv => cv.getContext('2d').getImageData(304, 640, 1, 1).data[3] > 100), 'Guidance does not clear the ground fog');
+  // Sample the fog at the giver's own spot (unexplored after the pier start); the old fixed pixel predates the reshaped Greenmeadow.
+  check(await page.locator('#wm-fog').evaluate(cv => { const npc = WORLD_MAP.npcs.find(n => n.id === 'guide'); return cv.getContext('2d').getImageData(Math.round(npc.x / WORLD_MAP.size * cv.width), Math.round(npc.y / WORLD_MAP.size * cv.height), 1, 1).data[3] > 100; }), 'Guidance does not clear the ground fog');
   check(await page.locator('.wm-quest-legend').textContent().then(t => t.includes('Available') && t.includes('Ready to turn in') && t.includes('Tracked quest')), 'Zone map explains all three symbols');
   await quest('welcome', 'accept');
   await wait(() => document.querySelector('.tracker-quest[data-quest="welcome"]'));
@@ -89,7 +93,7 @@ async function call(name, args = {}) {
   check(targets.length === 3 && targets.every(m => m.pixels > 15 && m.colored > 2), 'Tracked destinations are real green diamonds on the minimap');
   await quest('welcome', 'complete');
   await wait(() => document.querySelector('.wm-quest[data-npc="guide"][data-state="ready"]'));
-  check(await page.locator('.wm-quest[data-npc="guide"]').textContent() === '?' && await page.locator('.wm-quest[data-npc="guide"]').evaluate(n => getComputedStyle(n).color) === 'rgb(255, 223, 136)', 'Completion changes the non-repeatable giver to a yellow ? without closing the map');
+  check(await page.evaluate(() => { const n = document.querySelector('.wm-quest[data-npc="guide"][data-state="ready"]'); return n && n.textContent === '?' && getComputedStyle(n).color === 'rgb(255, 223, 136)'; }), 'Completion changes the non-repeatable giver to a yellow ? without closing the map');
   check(await page.locator('.wm-quest[data-state="tracked"]').count() === 1 && await page.locator('.wm-quest[data-state="tracked"]').getAttribute('data-quest') === 'welcome', 'Completed tracked quest replaces objectives with its hand-in destination');
   const yellow = await miniDelta('ready', 'guide');
   check(yellow.length === 1 && yellow[0].pixels > 15 && yellow[0].colored > 2, 'Yellow non-repeatable turn-in ? is drawn on the real minimap');
@@ -118,7 +122,8 @@ async function call(name, args = {}) {
   await quest('meadow_bounty', 'complete'); await wait(() => document.querySelector('.wm-quest[data-npc="merchant"][data-state="ready"]'));
   check((await markers()).find(m => m.npc === 'merchant')?.color === '#64b5ff', 'Repeatable turn-in uses the same blue ?');
   await quest('meadow_bounty', 'claim'); await wait(() => document.querySelector('.wm-quest[data-npc="merchant"][data-state="available"]'));
-  check((await markers()).find(m => m.npc === 'merchant')?.color === '#ffdf88', 'Repeatable quest becomes a gold ! again after claiming');
+  // Repeatable quests keep the blue marks (docs/quest-markers.md): claiming makes it an available blue !, not a gold one.
+  check((await markers()).find(m => m.npc === 'merchant')?.color === '#64b5ff', 'Repeatable quest is a blue ! again after claiming');
   await quest('welcome', 'reset'); await wait(() => Quests.offered('guide').some(q => q.id === 'welcome'));
   await quest('welcome', 'accept'); await wait(() => document.querySelector('.tracker-quest[data-quest="welcome"]'));
   await quest('welcome', 'complete'); await wait(() => document.querySelector('.wm-quest[data-npc="guide"][data-state="ready"]'));
@@ -145,12 +150,11 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => {
     const marks = Quests.mapMarkers(1).filter(m => m.state === 'tracked'), n = WORLD_MAP.zones[0].npcs.find(n => n.id === 'crags_captain'); return marks.length === 1 && marks[0].x === n.x && marks[0].y === n.y;
   }), 'Cross-zone talk targets resolve only the NPC in the zone being viewed');
-  await fixture([state('city_vault_bosses', [0, 0, 0, 0])]); await track('city_vault_bosses'); await map(5);
-  check(await page.locator('.wm-quest[data-state="tracked"]').count() === 4, 'A hub quest tracks its four boss targets inside the adjacent dungeon');
+  await fixture([state('city_vault_bosses', [0, 0, 0, 0])]); await track('city_vault_bosses'); await map(3);
+  // The entrance stays hidden until the stairs are explored, so count the four tracked marks in the dungeon's own data.
+  check(await page.evaluate(() => Quests.mapMarkers(5).filter(m => m.state === 'tracked').length) === 4, 'A hub quest tracks its four boss targets inside the adjacent dungeon');
   await fixture([state('slime_patrol', [6], true), state('ironhide_hunt', [0])]); await track('ironhide_hunt'); await map(0);
-  await page.locator('.wm-quest[data-npc="guide"]').hover();
   check(await page.locator('.wm-quest[data-npc="guide"]').getAttribute('title').then(t => t.includes('Available')), 'Available marker has a useful tooltip');
-  await page.locator('.wm-quest[data-state="tracked"]').hover();
   check(await page.locator('.wm-quest[data-state="tracked"]').getAttribute('title').then(t => t.startsWith('Tracked quest') && t.includes('Ironhide Beetles')), 'Tracked diamond can be hovered for the quest and objective');
   check(await page.evaluate(() => [WORLD_MAP, ...WORLD_MAP.zones].every((z, zone) => {
     const expected = [];
@@ -174,13 +178,13 @@ async function call(name, args = {}) {
   await sv.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'sv', sound: false })));
   await sv.goto(world.url); await sv.locator('#start').click(); await sv.locator('#login-guest').click(); await sv.locator('#name').fill('Kart Uppdrag'); await sv.locator('#go').click({ timeout: 60000 });
   await sv.waitForFunction(() => Online.connected && Field.warriorSprites?.source?.parts?.body, null, { timeout: 60000 });
-  await sv.evaluate(() => { WorldMap.show(); }); await sv.locator('.wm-tile[data-zone="0"]').click();
+  await sv.evaluate(() => { WorldMap.show(); }); await sv.locator('.wm-name[data-zone="0"]').click();
   check(await sv.locator('.wm-quest-legend').textContent().then(t => t.includes('Uppdragsmarkörer') || t.includes('Spårat uppdrag')), 'Swedish legend is translated by hand');
   check(await sv.locator('.wm-quest[data-npc="guide"]').getAttribute('aria-label').then(t => t.includes('Tillgänglig')), 'Swedish giver tooltip is translated');
   await sv.evaluate(() => { WorldMap.close(); Online.send({ type: 'debug', command: { op: 'quest', id: 'welcome', action: 'accept' } }); });
   await sv.waitForFunction(() => document.querySelector('.tracker-quest[data-quest="welcome"]'));
   await sv.locator('.tracker-quest[data-quest="welcome"] .tracker-title').click();
-  await sv.evaluate(() => { Quests.close(); WorldMap.show(); }); await sv.locator('.wm-tile[data-zone="0"]').click();
+  await sv.evaluate(() => { Quests.close(); WorldMap.show(); }); await sv.locator('.wm-name[data-zone="0"]').click();
   await sv.waitForFunction(() => document.querySelector('.wm-quest[data-state="tracked"]'));
   check(await sv.locator('.wm-quest[data-state="tracked"]').first().getAttribute('aria-label').then(t => t.startsWith('Spårat uppdrag')), 'Swedish tracked-objective tooltip is translated');
   check(errors.length === 0, 'No browser runtime errors: ' + errors.join('; '));

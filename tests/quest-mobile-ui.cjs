@@ -92,6 +92,8 @@ const suite={name:'quest-mobile',async test({player,check,width,height,out}){
  check(await accept.isVisible(),'Accept stays reachable without scrolling the parchment');
  if(isPhone){await swipe(page,'#npc-quest-page');check(await accept.isVisible(),'swiping NPC text keeps the Accept action fixed');await press(page.locator('#npc-quest-actions [data-action="decline"]'));check(await page.locator('#npc-quest-list').isVisible(),'Decline returns to the greeting and its quest rows');await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));}
  await press(accept);await page.locator(n).waitFor({state:'hidden'});
+ // The ledger arrives with the next snapshot (10 Hz) after the dialogue has closed: wait for it, then assert.
+ await page.waitForFunction(()=>Field.hero.quests.some(q=>q.id==='slime_patrol'&&!q.claimed),null,{timeout:10000}).catch(()=>{});
  check(await page.evaluate(()=>Field.hero.quests.some(q=>q.id==='slime_patrol'&&!q.claimed)),'touch acceptance closes only after the server accepts');
  await page.context().close();
 }};

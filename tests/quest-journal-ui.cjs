@@ -93,7 +93,7 @@ const suite = {
       await sv.waitForFunction(()=>Field.hero.quests.some(q=>q.id==='slime_patrol'));
       await sv.evaluate(()=>Quests.show());
       await press(sv.locator('#quest-list [data-quest="slime_patrol"]'));
-      check(await sv.locator('.journal-tab').textContent()==='Alla uppdrag' && await sv.locator('#quest-page h5').first().textContent()==='Beskrivning' && await sv.locator('#quest-controls [data-action="map"]').textContent()==='Visa karta','new journal headings and controls translate in the actual Swedish client');
+      check(await sv.locator('#quest-journal .journal-tab').textContent()==='Alla uppdrag' && await sv.locator('#quest-page h5').first().textContent()==='Beskrivning' && await sv.locator('#quest-controls [data-action="map"]').textContent()==='Visa karta','new journal headings and controls translate in the actual Swedish client');
       await sv.context().close();
     }
   }
