@@ -24,6 +24,9 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainl
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Archmage'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && Field.hero.level === 40 && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
+  // A new hero stands on the Saltby pier, where a wall stops aimed casts ("A wall blocks your skill."): move to open ground.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 8, null, { timeout: 30000 });
   await page.evaluate(() => {
     window.sent = []; const original = Online.send; Online.send = message => { if (message.type === 'skill') sent.push(message); return original(message); };
   });
@@ -53,13 +56,14 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainl
   await page.keyboard.press('2'); await page.waitForTimeout(150);
   check(await page.evaluate(n => sent.length === n, before), 'A skill on cooldown sends nothing');
   await page.keyboard.press('3');
-  await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'skAura'));
+  // Arcane Ward draws its own shell (skMageWard), not the generic aura.
+  await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'skMageWard'));
   await page.waitForFunction(() => Field.hero.buffs?.some(b => b.id === 'arcaneward'));
   check(await page.locator('#buff-bar [data-buff="arcaneward"]').isVisible() && Number(await page.locator('#buff-bar [data-buff="arcaneward"] i').textContent()) >= 7, 'Arcane Ward shows in the effects bar with its seconds left');
-  check(await page.evaluate(() => Field._debug.effects.some(e => e.kind === 'skAura')), 'Casting a buff starts an aura effect');
+  check(await page.evaluate(() => Field._debug.effects.some(e => e.kind === 'skMageWard')), 'Casting a buff starts its effect (Arcane Ward shell)');
   await page.keyboard.press('8');
-  await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'skMeteor'));
-  check(await page.evaluate(() => { const m = Field._debug.effects.find(e => e.kind === 'skMeteor'); return m.r === 2.6 && Number.isFinite(m.x); }), 'Meteor draws a falling star at its authoritative impact point');
+  await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'skMageMeteor'));
+  check(await page.evaluate(() => { const m = Field._debug.effects.find(e => e.kind === 'skMageMeteor'); return m.r === 2.6 && Number.isFinite(m.x); }), 'Meteor draws a falling star at its authoritative impact point');
   await page.keyboard.press('10'.slice(0, 1)); // key 1 is the basic attack: it stays usable beside learned skills
   await page.keyboard.press('0');
   await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'skNova' && e.r === 5), null, { timeout: 5000 });
@@ -136,11 +140,11 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainl
     }
     return result;
   });
-  check(looks.earthshatter.some(e => e.kind === 'skCone') && looks.earthshatter.some(e => e.style === 'cracks'), 'Earthshatter sweeps a directional fissure');
-  check(looks.starfall.some(e => e.kind === 'skMeteor') && looks.starfall.some(e => e.stars === 28), 'Starfall paints a distant celestial impact');
-  check(looks.thousandcuts.filter(e => e.kind === 'skCut').length >= 10, 'Thousand Cuts fans out ten blade trails');
-  check(looks.guardianlight.some(e => e.kind === 'skBeam'), 'Guardian Light shows a sanctuary beam');
-  check(looks.arrowstorm.some(e => e.style === 'arrows'), 'Arrow Storm draws outward arrows');
+  check(looks.earthshatter.some(e => e.kind === 'skWarFissure'), 'Earthshatter sweeps a directional fissure');
+  check(looks.starfall.some(e => e.kind === 'skNova' && e.style === 'mageStarfield') && looks.starfall.some(e => e.stars === 28), 'Starfall paints a distant celestial impact');
+  check(looks.thousandcuts.some(e => e.kind === 'skAssassinFan'), 'Thousand Cuts fans out its blade arc');
+  check(looks.guardianlight.some(e => e.kind === 'skPriestSanctuary'), 'Guardian Light shows a sanctuary');
+  check(looks.arrowstorm.some(e => e.kind === 'skHunterStorm'), 'Arrow Storm draws its hunter storm');
   await page.evaluate(() => Online.send({ type: 'debug', ref: 912, command: { op: 'set_level', level: 99 } }));
   await page.waitForFunction(() => Field.hero.level === 99);
   await page.evaluate(() => Online.saveSkillSlots(['attack', 'starfall', 'twinbolt', null, null, null, null, null, null, null, null, null], 99));

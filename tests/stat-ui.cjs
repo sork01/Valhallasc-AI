@@ -89,7 +89,8 @@ async function call(name, args = {}) {
     statSent.length = 0;
   });
   await page.locator('#npc-offers [data-view="stat_reset"]').click();
-  check(await page.locator('#npc-offers').textContent().then(t => t.includes('130,000 gold') && t.includes('12 trained points') && t.includes('cannot be undone')), 'Reset view shows price, refund and warning');
+  // Amounts are copper (COIN-DENOMINATIONS): 130000 copper shows as 13 gold, so the price is checked by its copper value.
+  check(await page.locator('#npc-offers .stat-reset-price .money[data-copper="130000"]').count() === 1 && await page.locator('#npc-offers').textContent().then(t => t.includes('12 trained point') && t.includes('cannot be undone')), 'Reset view shows price, refund and warning');
   check(await page.evaluate(() => !statSent.some(a => a.type === 'interact' && a.offer === 'stat_reset')), 'Opening reset view sends no purchase');
   await page.locator('#npc-offers [data-offer="stat_reset"]').click();
   check(await page.evaluate(() => statSent.filter(a => a.type === 'interact' && a.offer === 'stat_reset' && a.npc === 'guide').length === 1), 'Separate confirmation sends the NPC offer');
@@ -98,7 +99,7 @@ async function call(name, args = {}) {
       statPoints: 147, trainedPoints: 0, statResetPrice: 260000, statResets: 1,
       statPlayer: {id:'display-only', statPoints:147, attributes:{}},
       attributes: {}, inventory: [], equipment: {}, bags: [], quests: [], look: {class: 'mage', name: 'Tester'}}); });
-  check(await page.locator('#npc-offers').textContent().then(t => t.includes('260,000 gold') && t.includes('147 unspent points')) && await page.locator('#npc-offers [data-offer="stat_reset"]').isDisabled(), 'Reply immediately shows rising price and refunded pool');
+  check(await page.locator('#npc-offers .stat-reset-price .money[data-copper="260000"]').count() === 1 && await page.locator('#npc-offers').textContent().then(t => t.includes('147 unspent points')) && await page.locator('#npc-offers [data-offer="stat_reset"]').isDisabled(), 'Reply immediately shows rising price and refunded pool');
   // Live snapshots of the private world also reach the hook, so look for the reply's own player among every call.
   check(await page.evaluate(() => statPlayersSeen.some(c => c.id === 'display-only' && c.statPoints === 147)), 'Reset reply immediately refreshes the attribute panel');
   check(errors.length === 0, `No browser errors: ${errors.join('; ')}`);

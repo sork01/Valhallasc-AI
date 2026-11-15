@@ -1,12 +1,14 @@
 // Real browser input against a private world: upper sprite clicks select enemies and the adjacent badge follows them.
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { chromium } = require('./lib/playwright.cjs');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-target-ui', version: '1.0.0' });
 let browser, started = false, checks = 0;
+// The upper-sprite geometry needs the real monster art: the 12-pixel stub is too short to clear the ground radius.
+if (STUB) throw new Error('target-ui needs real artwork: run with REAL_SPRITES=1');
 const check = (value, label) => { assert.ok(value, label); checks++; };
 async function call(name, args = {}) {
   const r = await client.callTool({ name, arguments: args });
@@ -22,7 +24,13 @@ async function call(name, args = {}) {
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('TargetUI'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.hero, null, { timeout: 60000 });
+  // A new hero stands on the Saltby pier, beside a wall: move to open ground first (the spawns sit four tiles either side).
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 8, null, { timeout: 30000 });
+  // The hero's drawn position eases to the server's (a teleport can land on the nearest free ground): wait until they agree.
+  await page.waitForFunction(() => Math.hypot(Field.hero.x - Field.hero.nx, Field.hero.y - Field.hero.ny) < 0.05, null, { timeout: 15000 });
+  await page.waitForTimeout(500);
   const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
   const badge = page.locator('#hud-target');
   check(await badge.isHidden(), 'No target badge before selecting an enemy');
@@ -33,15 +41,25 @@ async function call(name, args = {}) {
     return at;
   };
   const clickUpperBody = async (kind, at) => {
-    const p = await page.evaluate(([kind, at]) => {
-      const s = Field.slimes.filter(s => s.kind === kind && !s.dead).sort((a, b) => Math.hypot(a.x - at.x, a.y - at.y) - Math.hypot(b.x - at.x, b.y - at.y))[0];
-      const [sx, sy] = Field._debug.w2s(s.x, s.y), b = Field._debug.enemyHitbox(s), y = sy + (b.y0 * .7 + b.y1 * .3) * 2.1 * s.d.scale;
-      return { id: s.id, x: sx, y, groundDistance: Math.hypot(s.x - Field._debug.s2w(sx, y)[0], s.y - Field._debug.s2w(sx, y)[1]) };
-    }, [kind, at]);
-    const box = await page.locator('#fieldcv').boundingBox();
-    await page.mouse.click(box.x + p.x / 1600 * box.width, box.y + p.y / 900 * box.height);
-    await page.waitForFunction(id => Field.hero.target?.id === id && !document.querySelector('#hud-target').hidden, p.id);
-    return p;
+    // The hero can take a late server correction after a teleport, so each attempt re-reads the sprite and its screen point.
+    let last;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const p = await page.evaluate(([kind, at]) => {
+        const s = Field.slimes.filter(s => s.kind === kind && !s.dead).sort((a, b) => Math.hypot(a.x - at.x, a.y - at.y) - Math.hypot(b.x - at.x, b.y - at.y))[0];
+        const [sx, sy] = Field._debug.w2s(s.x, s.y), b = Field._debug.enemyHitbox(s), y = sy + (b.y0 * .7 + b.y1 * .3) * 2.1 * s.d.scale;
+        const cv = document.querySelector('#fieldcv');
+        return { id: s.id, x: sx, y, cw: cv.width, ch: cv.height, groundDistance: Math.hypot(s.x - Field._debug.s2w(sx, y)[0], s.y - Field._debug.s2w(sx, y)[1]) };
+      }, [kind, at]);
+      const box = await page.locator('#fieldcv').boundingBox();
+      // Screen points are in the canvas's own pixels, so scale by its intrinsic size (the viewport is not 1600x900).
+      await page.mouse.click(box.x + p.x / p.cw * box.width, box.y + p.y / p.ch * box.height);
+      const selected = await page.waitForFunction(id => Field.hero.target?.id === id && !document.querySelector('#hud-target').hidden, p.id, { timeout: 4000 }).then(() => true, () => false);
+      if (selected) return p;
+      last = p;
+      await page.waitForTimeout(400);
+    }
+    const probe = await page.evaluate(id => { const s = Field.slimes.find(z => z.id === id); return { target: Field.hero.target ? { id: Field.hero.target.id, kind: Field.hero.target.kind } : null, hero: { x: Field.hero.x, y: Field.hero.y, nx: Field.hero.nx, ny: Field.hero.ny }, slime: s ? { x: s.x, y: s.y, dead: s.dead, dir: s.dir, box: Field._debug.enemyHitbox(s), scale: s.d.scale } : null }; }, last.id);
+    throw new Error(`click on ${kind} ${last.id} did not select it after 3 attempts: ${JSON.stringify({ point: [last.x, last.y], canvas: [last.cw, last.ch], probe })}`);
   };
   const greenAt = await stage('green', 4, 0);
   const green = await clickUpperBody('green', greenAt);

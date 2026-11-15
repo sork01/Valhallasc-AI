@@ -2,13 +2,15 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { chromium } = require('./lib/playwright.cjs');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-warrior-skill-effects', version: '1.0.0' });
 let browser, started = false;
+// Every effect is captured from the real artwork (the stub has no frames to draw).
+if (STUB) throw new Error('warrior-skill-effects-ui captures real artwork: run with REAL_SPRITES=1');
 async function call(name, args = {}) {
   const result = await client.callTool({ name, arguments: args });
   assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`);
@@ -41,6 +43,10 @@ const skills = [
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('WarriorEffects');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero.level === 99 && !!Field.warriorSprites, null, { timeout: 60000 });
+  // A new hero stands on the Saltby pier, beside a wall: move to open ground so the level-99 spawn lands next to it.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 8, null, { timeout: 30000 });
+  await page.waitForTimeout(1500); // let the camera settle on the hero before any spawn is placed beside it
   const catalog = await page.evaluate(() => WORLD_SKILLS.filter(s => s.class === 'warrior').map(s => ({ id: s.id, icon: s.icon, description: s.description })));
   assert.deepEqual(catalog.map(s => s.id).sort(), skills.map(s => s[0]).sort(), 'All ten warrior skills have a catalog entry');
   assert.equal(new Set(catalog.map(s => s.icon)).size, 10, 'All warrior skills have distinct icons');
@@ -55,9 +61,16 @@ const skills = [
       await page.waitForFunction(() => Field.hero.hp < Field.hero.maxHp * .5);
     }
     if (id === 'titanswrath') {
-      await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'spawn_enemy', kind: 'green',
-        x: Field.hero.x + 2, y: Field.hero.y, level: 99 } }));
-      await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'green' && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 4));
+      // Debug replies only reach window.GM.onReply: capture them so a refused spawn says why.
+    await page.evaluate(() => { window.debugReplies = []; window.GM = { onReply: p => debugReplies.push(p) }; });
+    // One resend if the first request gets no answer; the reply is checked below.
+      let spawned = false;
+      for (let attempt = 0; attempt < 2 && !spawned; attempt++) {
+        await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'spawn_enemy', kind: 'green',
+          x: Field.hero.x + 2, y: Field.hero.y, level: 99 } }));
+        spawned = await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'green' && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 4), null, { timeout: 8000 }).then(() => true, () => false);
+      }
+      if (!spawned) throw new Error(`titanswrath: the level-99 green spawn did not appear (server replies: ${JSON.stringify(await page.evaluate(() => debugReplies))}; hero ${JSON.stringify(await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y, zone: Field.zone })))}; level99 ${JSON.stringify(await page.evaluate(() => Field.slimes.filter(s => s.level === 99 || s.id === 0).map(s => ({ id: s.id, kind: s.kind, x: s.x, y: s.y, nx: s.nx, ny: s.ny, level: s.level, dead: s.dead }))))}; slimes ${await page.evaluate(() => Field.slimes.length)})`);
     }
     const frame = await page.evaluate(({ id, visual }) => new Promise((resolve, reject) => {
       const initial = new Set(Field._debug.effects), deadline = performance.now() + 6000;
