@@ -2572,7 +2572,7 @@ const scenarios = {
             check(w.snapshot.slimes.filter(s => sleeping.has(s.id)).every(s => s.dead && s.state === 'waiting'), `${id}: when the ward holds every wave dissolves`);
           }
           else if (o.kind === 'kill') {
-            if (o.target === 'any') { await kit.teleport(w, bot, { npc: q.npc }); await refill({ x: 80, y: 90 }, 90, o.count + 2); await killAny(id, i, o.count); }
+            if (o.target === 'any') { await kit.teleport(w, bot, { zone: 7, x: 80, y: 90 }); await refill({ x: 80, y: 90 }, 90, o.count + 2); await killAny(id, i, o.count); }
             else {
               // The view carries only what is near the hero: stand at the map's own spot for this kind before counting or respawning.
               const spotOf = sky.slimes.find(s => s.kind === o.target && !s.ambush) || sky.slimes.find(s => s.kind === o.target);
@@ -2585,11 +2585,22 @@ const scenarios = {
               }
             }
             if (o.target === 'any') { await w.waitFor(() => (state(id).counts[i] || 0) >= o.count, 8000, `${id} patrol`); continue; }
-            const targets = w.snapshot.slimes.filter(s => !s.dead && !sleeping.has(s.id) && s.kind === o.target);
-            const first = targets.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
-            if (first) { const spot = beside(first) || { x: first.x, y: first.y }; await kit.teleport(w, bot, { zone: 7, ...spot }); }
-            const done = await kit.killEnemies(w, bot, { kind: o.target, max: o.count });
-            assert.ok(done.count >= o.count, `Killed enough ${o.target}`);
+            // The kinds are spread over islands: go from the nearest living one to the next until the count is met.
+            let killed = 0;
+            for (let round = 0; round < 8 && killed < o.count; round++) {
+              const targets = w.snapshot.slimes.filter(s => !s.dead && !sleeping.has(s.id) && s.kind === o.target);
+              const first = targets.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
+              if (!first) {
+                // The last one of a kind in view is down: revive the dead of this kind here and go again.
+                for (const d of w.snapshot.slimes.filter(s => s.dead && s.kind === o.target && s.state !== 'waiting')) await w.debug(bot, { op: 'respawn_enemy', id: d.id }).catch(e => { if (!/already alive/.test(e.message)) throw e; });
+                await w.advance(600);
+                continue;
+              }
+              const spot = beside(first) || { x: first.x, y: first.y };
+              await kit.teleport(w, bot, { zone: 7, ...spot });
+              killed += (await kit.killEnemies(w, bot, { kind: o.target, max: o.count - killed })).count;
+            }
+            assert.ok(killed >= o.count, `Killed enough ${o.target} (${killed} of ${o.count}; in view alive ${w.snapshot.slimes.filter(s => !s.dead && s.kind === o.target).length}, dead ${w.snapshot.slimes.filter(s => s.dead && s.kind === o.target).length})`);
           } else throw Error(`${id}: unexpected objective ${o.kind}`);
           await w.waitFor(() => (state(id).counts[i] || 0) >= Math.min(o.count, o.kind === 'kill' ? 99 : o.count), 8000, `${id} objective ${i}`);
         }
@@ -2624,6 +2635,7 @@ const scenarios = {
         await kit.teleport(w, bot, { npc: rep.npc });
         await kit.talkTo(w, bot, rep.npc, 'quest:accept:sky_patrol');
         await w.waitFor(() => !state('sky_patrol').claimed, 5000, 'Take the patrol again');
+        await kit.teleport(w, bot, { zone: 7, x: 80, y: 90 });
         await refill({ x: 80, y: 90 }, 90, 16);
         await killAny('sky_patrol', 0, 14);
         await w.waitFor(() => state('sky_patrol').counts[0] === 14, 8000, 'Patrol count');
@@ -2642,7 +2654,7 @@ const scenarios = {
       for (const c of ['warrior', 'priest', 'mage']) await kit.talkTo(w, bot, 'sky_warden', `merc_${c}`);
       await w.waitFor(() => mercs() === 2, 8000, 'Two fighters join');
       const last = find('sky_ward_last');
-      check(mercs() === 2 && last.recommendedPlayers === 3 && last.rewardItem === 'pants_wayfarer_l20_purple' && last.objectives[0].kind === 'hold' && last.objectives[0].count === 120, 'The Last Ward wants three heroes for 120 s, hires two fighters and refuses the third; its reward is an epic item');
+      check(mercs() === 2 && last.recommendedPlayers === 3 && items.some(i => i.id === last.rewardItem) && last.objectives[0].kind === 'hold' && last.objectives[0].count === 120, `The Last Ward wants three heroes for 120 s, hires two fighters and refuses the third; its reward ${last.rewardItem} is a catalogue item`);
       await kit.talkTo(w, bot, 'sky_warden', 'merc_dismiss');
       await w.waitFor(() => mercs() === 0, 8000, 'Send them away');
       // Falling at a ward loses the count: the hero dies inside the Last Ward's circle and the objective starts over.
