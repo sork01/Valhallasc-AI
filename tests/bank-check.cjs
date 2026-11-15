@@ -10,13 +10,13 @@ const { TestWorld, root } = require('../scripts/testing/driver.cjs');
 
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
-const CITIES = ['Alderhaven', 'Skaldholm', 'Nacrehold', 'Astralhollow', 'Asterion'];
+const CITIES = ['Alderhaven', 'Skaldholm', 'Nacrehold', 'Astralhollow', 'Asterion', 'Heartwood'];
 const bankers = [];
 // The top level of map.txt is zone 0 (Alderhaven's meadow); map.zones[k] is zone k + 1.
 [map, ...map.zones].forEach((zone, zoneIndex) => {
   for (const n of zone.npcs || []) if ((n.offers || []).some(o => o.id === 'bank')) bankers.push({ id: n.id, zone: zoneIndex, x: n.x, y: n.y });
 });
-assert.equal(bankers.length, 5, 'exactly five bankers in the world');
+assert.equal(bankers.length, 6, 'exactly six bankers in the world (five cities and Veyrroot Heartwood, the main city in the tree)');
 assert.deepEqual(bankers.map(b => b.id.replace('banker_', '')).sort(), CITIES.map(c => c.toLowerCase()).sort());
 
 const materials = items.filter(i => i.kind === 'material').map(i => i.id);

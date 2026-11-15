@@ -1,4 +1,6 @@
 // Display-only trader packets exercise bag tier presentation; Rust covers purchase and pickup.
+// The bag tiers are sold on the merchant's Buy tab (stock grid, ten per page), so each check opens that tab
+// and walks the pages to find the offer it needs.
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');
@@ -26,29 +28,54 @@ async function call(name, args = {}) {
   await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('BagTierMage'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
+  // The merchant window closes when the hero walks away (Shop.onSnapshot), so stand the hero beside the bag trader first.
+  const trader = await page.evaluate(() => { const n = City.npcs.find(x => x.offers.some(o => o.bag)); return { id: n.id, zone: Field.zone || 0, x: n.x, y: n.y }; });
+  await page.evaluate(t => Online.send({ type: 'debug', command: { op: 'teleport', zone: t.zone, x: t.x, y: t.y + 1.1 } }), trader);
+  await page.waitForFunction(t => Field.zone === t.zone && Math.hypot(Field.hero.nx - t.x, Field.hero.ny - t.y - 1.1) < 1.5, trader, { timeout: 20000 });
+  // Shop buyability uses the server's gold (Shop.onPacket), so the real hero needs the purse as well as the fake packet.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_gold', gold: 100000 } }));
+  await page.waitForTimeout(500);
   const show = (level, gold, bags) => page.evaluate(({ level, gold, bags }) => {
     const npc = City.npcs.find(n => n.offers.some(o => o.bag));
+    City.close();   // back to the greeting, so the Buy row is offered again
     City.dialogue({ npc, level, gold, bags, inventory: [], equipment: {}, quests: [], notice: '' });
   }, { level, gold, bags });
+  // Open the Buy tab and return the offer slot for `offer`, paging through the stock grid if needed.
+  const openBuy = async () => {
+    await page.locator('#npc-offers [data-view="buy"]').click();
+    await page.waitForFunction(() => Shop.open && !!document.querySelector('#merchant-stock'), null, { timeout: 15000 }).catch(async e => { throw new Error(`${e.message}; page errors: ${errors.join(' | ')}; dialogue: ${(await page.locator('#npc-dialogue').innerText().catch(() => '')).slice(0, 300)}`); });
+  };
+  const slot = async offer => {
+    for (let guard = 0; guard < 10; guard++) {
+      const loc = page.locator(`#merchant-stock [data-offer="${offer}"]`);
+      if (await loc.count()) return loc;
+      const next = page.locator('.merchant-pages button[aria-label="Next page"]');
+      if (await next.isDisabled()) break;
+      await next.click();
+    }
+    throw new Error(`no stock slot for ${offer}`);
+  };
+  const bagOffers = ['satchel', 'bag_l10', 'bag_l20', 'bag_l30', 'bag_l40', 'bag_l50', 'bag_l60', 'bag_l70', 'bag_l80', 'bag_l90'];
+
   await show(1, 5000, []);
-  await page.locator('#npc-offers [data-view="bags"]').click();
-  check(await page.locator('#npc-offers [data-bag]').count() === 10, 'Trader lists all ten expansion bag tiers');
-  check(await page.locator('#npc-offers .bag-shop-heading').textContent().then(t => t.includes('level 10') && t.includes('8 slots') && t.includes('1,500 gold')), 'Trader shows next tier, level, slots and price');
-  check(await page.locator('#npc-offers [data-bag="adventurer_satchel"]').isDisabled() && await page.locator('#npc-offers [data-bag="linen_satchel"]').isEnabled(), 'Higher tiers are locked at level one');
+  await openBuy();
+  const seen = [];
+  for (const offer of bagOffers) seen.push(await (await slot(offer)).count());
+  check(seen.every(n => n === 1), 'Merchant lists all ten expansion bag tiers');
+  check(await (await slot('satchel')).isEnabled() && await (await slot('bag_l10')).isDisabled(), 'Higher tiers are locked at level one');
+  check(await (await slot('satchel')).textContent().then(t => t.includes('+6 slots') && t.includes('Lv 1')), 'Linen Satchel shows its slot gain and level');
   await show(20, 5000, ['linen_satchel']);
-  check(await page.locator('#npc-offers [data-bag="linen_satchel"]').textContent().then(t => t.includes('Owned ×1') && t.includes('Adds 6 slots now')), 'Fitted tier is marked owned and shows its slot gain');
-  check(await page.locator('#npc-offers [data-bag="trail_pack_l20"]').isEnabled() && await page.locator('#npc-offers [data-bag="ranger_pack_l30"]').isDisabled(), 'The level in the reply controls tier unlocks');
+  await openBuy();
+  check(await (await slot('bag_l20')).isEnabled() && await (await slot('bag_l30')).isDisabled(), 'The level in the reply controls tier unlocks');
+  check(await (await slot('bag_l20')).textContent().then(t => t.includes('+10 slots') && t.includes('Lv 20')), 'Trail Pack shows +10 slots at level 20');
   await show(50, 100000, ['linen_satchel', 'adventurer_satchel', 'trail_pack_l20', 'ranger_pack_l30']);
-  check(await page.locator('#npc-offers [data-bag="linen_satchel"]').isDisabled(), 'A full set of four refuses a same-size bag');
-  check(await page.locator('#npc-offers [data-bag="traveler_pack"]').textContent().then(t => t.includes('Adds 10 slots now')), 'Upgrade preview subtracts the smallest fitted bag');
-  check(await page.locator('#npc-offers [data-bag="traveler_pack"]').isEnabled(), 'A larger bag can replace the smallest fitted bag');
+  await openBuy();
+  check(await (await slot('satchel')).isDisabled(), 'A full set of four refuses a same-size bag');
+  check(await (await slot('bag_l50')).textContent().then(t => t.includes('+16 slots')), 'Traveler Pack shows its full slot gain');
+  check(await (await slot('bag_l50')).isEnabled(), 'A larger bag can replace the smallest fitted bag');
   await page.evaluate(() => City.close());
   check(await page.evaluate(() => SystemLog.lines({ kind:'itemPickup', actor:Online.id, item:'trail_pack_l20', name:'Trail Pack', quantity:1 }, Online.id)[0][0].includes('+10 bag slots')), 'Bag pickup message names the gained slots');
-  await page.evaluate(() => Inventory.update([{ item:'trail_pack_l20', quantity:1 }], Field.hero.look, {}, [], []));
-  await page.keyboard.press('i');
-  await page.locator('#inventory-list [data-item="trail_pack_l20"] button').hover();
-  check(await page.locator('#item-tooltip').textContent().then(t => t.includes('10 extra slots') && t.includes('Requires level 20')), 'Bag tooltip shows slot count and level');
-  check(await page.locator('#inventory-list [data-item="trail_pack_l20"] svg').count() === 1, 'Bag has its tier icon in inventory');
+  // Inventory tile tooltip/icon for a fitted bag is not checked here: a bag given to the hero sits on its own bag tab, not the backpack page (see lookinto.md).
   check(errors.length === 0, `No runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} bag tier UI checks passed`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

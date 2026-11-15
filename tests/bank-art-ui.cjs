@@ -1,5 +1,6 @@
-// BANK-ART: each of the five bankers is drawn from its own PixelFlow atlas (idle, and talk while the window is open),
-// the five atlases differ, and the bank window shows its icon. Screenshots go to test-results for a human look.
+// BANK-ART: each of the five city bankers is drawn from its own PixelFlow atlas (idle, and talk while the window is open),
+// the five atlases differ, and the bank window shows its icon. Veyrroot Heartwood's banker (the sixth) has no bank atlas
+// yet and is drawn as a player-style NPC; it must still be a banker that opens the bank (see lookinto.md). Screenshots go to test-results for a human look.
 const assert = require('node:assert/strict');
 const path = require('node:path');
 process.env.REAL_SPRITES = '1';   // the atlases themselves are under test, so no stub sprites
@@ -26,7 +27,7 @@ const seed = `if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setI
 
     const bankers = await page.evaluate(() => [WORLD_MAP, ...WORLD_MAP.zones].flatMap((zone, index) => (zone.npcs || [])
       .filter(n => n.offers.some(o => o.id === 'bank')).map(n => ({ id: n.id, zone: index, x: n.x, y: n.y, art: n.art }))));
-    assert.equal(bankers.length, 5);
+    assert.equal(bankers.length, 6, 'six bankers: five cities and Heartwood');
     const meta = await page.evaluate(() => Field.bankSprites.meta);
     assert.deepEqual(meta.frame, [96, 96]); assert.equal(meta.clips.idle.n, 6); assert.equal(meta.clips.talk.n, 6);
 
@@ -43,14 +44,16 @@ const seed = `if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setI
     const debug = (ref, command) => page.evaluate(([ref, command]) => Online.send({ type: 'debug', ref, command }), [ref, command]);
     let ref = 1;
     for (const banker of bankers) {
-      ok(banker.art === `bank_${banker.id.slice('banker_'.length)}`, `${banker.id} names its own art`);
+      if (banker.art) ok(banker.art === `bank_${banker.id.slice('banker_'.length)}`, `${banker.id} names its own art`);
+      else assert.equal(banker.id, 'banker_heartwood', 'only Heartwood has no bank atlas');
       await debug(ref++, { op: 'teleport', zone: banker.zone, x: banker.x, y: banker.y + 3.2 });
       await page.waitForFunction(b => Field.zone === b.zone && Math.hypot(Field.hero.x - b.x, Field.hero.y - b.y - 3.2) < 1, banker, { timeout: 10000 });
       await page.waitForTimeout(700);
       await page.screenshot({ path: path.join(OUT, `bank-art-${banker.id}.png`), clip: { x: 420, y: 150, width: 600, height: 500 } });
       // The NPC is drawn from the atlas: its box on screen holds the atlas's own colours, not the procedural folk.
       const drawn = await page.evaluate(id => { const n = City.npcs.find(x => x.id === id); return !!n && n.art && !!Field.bankSprites.img[n.art]; }, banker.id);
-      ok(drawn, `${banker.id} resolves to a loaded atlas`);
+      if (banker.art) ok(drawn, `${banker.id} resolves to a loaded atlas`);
+      else ok(await page.evaluate(id => !!City.npcs.find(x => x.id === id), banker.id), `${banker.id} is drawn as an NPC`);
     }
 
     // The window: the icon is a real, visible 48px image beside the title, and the banker switches to the talk clip while it is open.
@@ -61,7 +64,10 @@ const seed = `if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setI
     await page.locator('#npc-dialogue [data-offer="bank"]').click({ timeout: 10000 });
     await page.locator('#bank-panel').waitFor({ state: 'visible', timeout: 10000 });
     const icon = await page.locator('.bank-icon').evaluate(i => { const r = i.getBoundingClientRect(); return { loaded: i.complete && i.naturalWidth === 48 && i.naturalHeight === 48, w: r.width, h: r.height, left: r.left, top: r.top }; });
-    ok(icon.loaded, 'the icon loads at 48x48'); ok(icon.w >= 28 && icon.h >= 28, 'the icon is visible');
+    ok(icon.loaded, 'the icon loads at 48x48');
+    // The layout size (32px CSS) is what must be visible; the on-screen box also carries the UI and window scale (80% by default).
+    const layout = await page.locator('.bank-icon').evaluate(i => ({ w: i.offsetWidth, h: i.offsetHeight }));
+    ok(layout.w >= 28 && layout.h >= 28 && icon.w > 0 && icon.h > 0, 'the icon is visible at its layout size');
     ok(await page.locator('.bank-icon').getAttribute('alt') === '', 'the icon is decorative');
     await page.screenshot({ path: path.join(OUT, 'bank-art-window.png') });
     await page.setViewportSize({ width: 844, height: 390 });
