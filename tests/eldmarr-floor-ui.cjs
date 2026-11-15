@@ -21,10 +21,12 @@ const results = [];
     await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })));
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.locator('#name').fill('Floor Observer ' + viewport.width); await page.locator('#go').click({ timeout: 60000 });
-    await page.waitForFunction(() => Online.connected && Field.hero && Field.cathedralSprites?.img.cf_eldmarr?.complete, null, { timeout: 60000 });
+    await page.waitForFunction(() => Online.connected && Field.hero, null, { timeout: 60000 });
     if (process.env.MUTATE) await page.evaluate(() => { BossMech.drawForeground = () => {}; });
     await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 46, x: 109, y: 41 } }));
     await page.waitForFunction(() => Field.zone === 46 && BossMech.fights.some(f => f.throne && f.tele.some(t => t.lava === false)), null, { timeout: 30000 });
+    // The Cathedral sprite sheets load for the raid's zone, so Eldmarr's atlas is only there after the teleport.
+    await page.waitForFunction(() => Field.cathedralSprites?.img.cf_eldmarr?.complete, null, { timeout: 60000 });
     for (const lava of [false, true]) {
       await page.waitForFunction(lava => BossMech.fights.some(f => f.throne && f.tele.some(t => t.lava === lava)), lava, { timeout: 15000 });
       const proof = await page.evaluate(({ lava }) => {

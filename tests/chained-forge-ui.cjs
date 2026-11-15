@@ -59,7 +59,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  await page.setViewportSize({width:1440,height:900});
  await page.evaluate(()=>WorldMap.show());
  check(await page.evaluate(()=>!WORLD_MAP.zones[45].sealedTemplate),'The published entrance is open');
- check(await page.locator('.wm-tile[data-zone="46"]').count()===1,'Open raid is visible on the world atlas');
+ // The raid is an interior: it has no atlas tile, only its open entrance button on the Emberwake map.
+ check(await page.locator('.wm-entrance[data-to="46"]').count()>=1,'Open raid is visible on the world atlas');
  check(await page.evaluate(()=>WorldMap._layout.length===Field._debug.zones.length),'Every file zone has an atlas placement');
  await page.screenshot({path:path.join(world.artifacts,'chained-forge-atlas-open.png')});
  await page.keyboard.press('Escape');

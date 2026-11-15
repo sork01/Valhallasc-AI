@@ -47,6 +47,9 @@ async function call(name, args = {}) {
   await page.locator('#name').fill('Watcher'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.hero.x, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => { Online.send({ type: 'debug', ref: Math.floor(Math.random() * 1e9), command }); }, command).then(() => page.waitForTimeout(300));
+  // New heroes start on the Saltby pier (a sanctuary, and walls block casts): move to open ground in zone 0 first.
+  await debug({ op: 'teleport', zone: 0, x: 250, y: 235 });
+  await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 15000 });
   const hero = () => page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
   const fights = () => page.evaluate(() => JSON.parse(JSON.stringify(BossMech.fights)));
   const spawn = async kind => {
@@ -120,6 +123,12 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => getComputedStyle(document.getElementById('dead-cause')).display !== 'none'), 'the cause is visible');
   await page.screenshot({ path: path.join(world.artifacts, 'bossmech-defeat.png') });
   check(/You were killed by Test Toll\./.test(await page.locator('#system-log').innerText()), 'the system tab says "You were killed by Test Toll."');
+  // A death is a ghost (corpse run): no timer revives it. Release it by the Resurrect button beside the corpse.
+  await page.waitForFunction(() => Field.hero.ghost, null, { timeout: 15000 }).catch(async e => { throw new Error('no spirit release: ' + JSON.stringify(await page.evaluate(() => ({ dead: Field.hero.dead, ghost: Field.hero.ghost, corpse: Field.hero.corpse, pos: [Field.hero.x, Field.hero.y], btn: document.getElementById('ghost-resurrect').disabled }))) + ' ' + e.message); });
+  // The spirit is released at the spawn, not at the corpse: walk it back within 15 tiles (teleport) before Resurrect is offered.
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone: 0, x: Field.hero.corpse.x, y: Field.hero.corpse.y - 2 } }));
+  await page.waitForFunction(() => !document.getElementById('ghost-resurrect').disabled, null, { timeout: 15000 }).catch(async e => { throw new Error('Resurrect stays disabled: ' + JSON.stringify(await page.evaluate(() => ({ zone: Field.zone, hero: [Field.hero.x, Field.hero.y], corpse: Field.hero.corpse, ghost: Field.hero.ghost, dead: Field.hero.dead })))+ ' ' + e.message); });
+  await page.locator('#ghost-resurrect').click();
   await page.waitForFunction(() => !Field.hero.dead, null, { timeout: 30000 });
   check(await page.evaluate(() => document.getElementById('dead-cause').hidden), 'the cause is gone after the respawn');
   await debug({ op: 'set_god_mode', enabled: true });

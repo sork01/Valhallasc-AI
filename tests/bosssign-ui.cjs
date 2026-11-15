@@ -69,7 +69,10 @@ async function call(name, args = {}) {
 
   // ---- 1. a dungeon whose boss has a mechanic shows its sign; no other zone does -------------------------------------------------
   check(await page.evaluate(() => Field.signs.length) === 0, 'the starting meadow has no sign');
-  await goNear([0, 1.2], [1.2, 0], [-1.2, 0]);
+  // A fresh guest sees the fog of war over unexplored ground, which dims the board: explore the zone first.
+  await debugOp({ op: 'explore_all' });
+  // Stand beside the sign, not in front of it: a hero 1.2 tiles south covers the board on screen (the board is drawn above the anchor).
+  await goNear([1.2, 0], [-1.2, 0], [0, 1.2]);
   const listed = await page.evaluate(() => Field.signs.map(s => ({ id: s.id, x: s.x, y: s.y, title: s.title, keys: Object.keys(s).sort().join() })));
   check(listed.length === 1 && listed[0].id === 'hollowking' && listed[0].x === sign.x && listed[0].y === sign.y, `the server says where the sign stands (${JSON.stringify(listed)})`);
   check(!/what|todo|tip/.test(listed[0].keys), 'the snapshot carries no words');
@@ -80,10 +83,13 @@ async function call(name, args = {}) {
     let gold = 0, wood = 0; for (let i = 0; i < d.length; i += 4) { if (d[i] > 200 && d[i + 1] > 160 && d[i] - d[i + 2] > 90) gold++; if (d[i] > 130 && d[i] < 190 && d[i + 1] > 80 && d[i + 1] < 130 && d[i + 2] < 80) wood++; }
     return { gold, wood };
   });
+  // The arrival banner ("Ashore at Saltby") stacks over the top of the field and tints the board: hide it for this pixel read.
+  await page.addStyleTag({ content: '#announce{display:none !important}' });
   await page.waitForTimeout(300);
   const drawn = await board();
-  check(drawn.wood > 200 && drawn.gold > 15, `the board and its gold "!" are drawn (${JSON.stringify(drawn)})`);
   await page.screenshot({ path: path.join(world.artifacts, 'bosssign-board.png') });
+  const where = await page.evaluate(() => { const s = Field.signs[0]; return { sign: [s.x, s.y], hero: [Field.hero.x, Field.hero.y], screen: Field._debug.w2s(s.x, s.y), cv: [document.getElementById('fieldcv').width, document.getElementById('fieldcv').height] }; });
+  check(drawn.wood > 200 && drawn.gold > 15, `the board and its gold "!" are drawn (${JSON.stringify(drawn)} ${JSON.stringify(where)})`);
 
   // ---- 2. F reads it: the window shows the server's words in the three parts, with the colour strip ------------------------------
   await page.keyboard.press('f');
