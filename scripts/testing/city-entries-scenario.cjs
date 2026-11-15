@@ -18,6 +18,8 @@ module.exports = kit => ({
         check(true,`${map.city.name}/${e.id}: authoritative movement reaches the city street`);count++;
       }
     }
-    check(count===12,'All twelve city entrances were walked');
+    // The expected count comes from the map: the shaped map has 11 entrances (Moonspore's Asterion gate is gone).
+    const expected=[0,4,9,17].reduce((n,z)=>n+kit.zones[z].cityEntrances.length,0);
+    check(count===expected,`All ${expected} city entrances were walked`);
   }
 });
