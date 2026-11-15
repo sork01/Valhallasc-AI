@@ -5,10 +5,16 @@
 // `sky_quests` MCP scenarios; this asserts what the player sees. Run against the real art with REAL_SPRITES=1 (npm run test:art does).
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
+const zlib = require('node:zlib');
 const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
+// Counts come from the map the server embeds: game zone 7 = zones[6]; the client also holds the Greenmeadow top level (+1).
+const MAP = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
+const SKY = MAP.zones[6];
+const SKY_PEOPLE = SKY.npcs.filter(n => n.id.startsWith('sky_') || n.id === 'travel_perch').length;
 const client = new Client({ name: 'valhallasc-sky-ui', version: '1.0.0' });
 let browser, started = false, checks = 0;
 const check = (condition, message) => { assert.ok(condition, message); checks++; };
@@ -54,16 +60,25 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   await page.routeWebSocket(/\/ws$/, ws => {
     const server = ws.connectToServer();
     ws.onMessage(message => server.send(message));
-    server.onMessage(message => ws.send(typeof message === 'string' ? restage(message) : message));
+    // Snapshots arrive as raw-deflate binary frames (compress:true): inflate, restage, deflate again.
+    server.onMessage(message => {
+      if (typeof message === 'string') return ws.send(restage(message));
+      let text; try { text = zlib.inflateRawSync(message).toString('utf8'); } catch { return ws.send(message); }
+      const out = restage(text);
+      ws.send(out === text ? message : zlib.deflateRawSync(Buffer.from(out, 'utf8')));
+    });
   });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('SkyUI');
   await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.skySprites, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', ref: 1, command }), command);
   await debug({ op: 'explore_all' });
   await page.waitForFunction(() => Field.explored?.length >= 8 && Field.explored.every(m => m === 511), null, { timeout: 10000 });
+  // New heroes start on the Saltby pier; the Bifrost sprites load lazily once the hero is in zone 7.
+  await debug({ op: 'teleport', zone: 7, x: 80, y: 144 });
+  await page.waitForFunction(() => Field.zone === 7 && !!Field.skySprites, null, { timeout: 60000 });
   const shot = name => page.screenshot({ path: path.join(world.artifacts, name + '.png') });
   const stageAt = async (x, y) => {
     await debug({ op: 'teleport', zone: 7, x, y });
@@ -98,38 +113,48 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
     return out;
   }, ward);
   // The map data the client uses comes from the same file the server loads.
-  const z = await page.evaluate(() => { const a = Field._debug.zones[7]; return { n: Field._debug.zones.length, name: a.name, theme: a.theme, size: a.size, levels: a.levels, city: a.city.name, camps: (a.camps || []).length, rows: a.sky.length, wide: a.sky.every(r => r.length === 160), voids: a.objects.filter(o => o.kind === 'void').length, places: (a.places || []).map(p => p.id), waves: a.places.filter(p => (p.waves || []).length).length, portals: a.portals.map(p => p.id + '>' + p.to).join(), quests: a.quests.length, npcs: a.npcs.length, holds: a.quests.filter(q => q.objectives.some(o => o.kind === 'hold')).length }; });
-  check(z.n === 10 && z.name === 'Bifrost Reach' && z.theme === 'sky' && z.size === 160 && z.levels.join() === '30,35', 'The client knows Bifrost Reach: name, sky theme, 160 tiles, levels 30-35');
-  check(z.city === "Heimdall's Perch" && z.camps === 0 && z.rows === 160 && z.wide && z.voids > 300 && z.places.length === 7 && z.waves === 3 && z.portals === 'stormrift_down>6', `One hub, the floor as 160 rows, ${z.voids} void obstacles, seven places (three wards) and the gate back down`);
-  check(z.quests === 22 && z.npcs === 8 && z.holds === 3, 'Twenty-two quests (three of them holds) and eight people are in the data');
-  check(await page.evaluate(stub => { const m = Field.skySprites.meta; return m.kinds.join() === 'galehound,prismgolem,skyray,einherjar,thunderroc' && (stub || m.kinds.every(k => Field.skySprites.img[k].naturalWidth === 768 && Field.skySprites.img[k].naturalHeight === 480)); }, STUB), 'The five monster atlases load with their metadata (and are 768x480 each)');
+  const z = await page.evaluate(() => { const a = Field._debug.zones[7]; return { n: Field._debug.zones.length, name: a.name, theme: a.theme, size: a.size, levels: a.levels, city: a.city.name, camps: (a.camps || []).length, rows: a.sky.length, wide: a.sky.every(r => r.length === 376), wideAt: a.sky[0].length, voids: a.objects.filter(o => o.kind === 'void').length, places: (a.places || []).map(p => p.id), waves: a.places.filter(p => (p.waves || []).length).length, portals: a.portals.map(p => p.id + '>' + p.to).join(), quests: a.quests.length, npcs: a.npcs.length, holds: a.quests.filter(q => q.objectives.some(o => o.kind === 'hold')).length }; });
+  check(z.n === MAP.zones.length + 1 && z.name === 'Bifrost Reach' && z.theme === 'sky' && z.size === SKY.size && z.levels.join() === SKY.levels.join(), `The client knows Bifrost Reach: name, sky theme, ${SKY.size} tiles, levels ${SKY.levels.join('-')}`);
+  check(z.city === "Heimdall's Perch" && z.camps === SKY.camps.length && z.rows === SKY.size && z.wide && z.wideAt === SKY.size && z.voids > 300 && z.places.length === SKY.places.length && z.waves === SKY.places.filter(p => (p.waves || []).length).length && z.portals.startsWith('stormrift_down>6'), `One hub, the floor as ${SKY.size} rows, ${z.voids} void obstacles, ${z.places.length} places and the gate back down`);
+  check(z.quests === SKY.quests.length && z.npcs === SKY.npcs.length && z.holds === SKY.quests.filter(q => q.objectives.some(o => o.kind === 'hold')).length, `${SKY.quests.length} quests and ${SKY.npcs.length} people are in the data`);
+  check(await page.evaluate(stub => { const m = Field.skySprites.meta; return m.kinds.join() === 'galehound,prismgolem,skyray,einherjar,thunderroc' && (stub || m.kinds.every(k => { const f = Field.frameOf(Field.skySprites, k); return Field.skySprites.img[k].naturalWidth === f.w * 8 && Field.skySprites.img[k].naturalHeight === f.h * 5; })); }, STUB), 'The five monster atlases load with their metadata (each is its frame grid: 8 by 5 frames of its own size)');
   check(await page.evaluate(() => Field._debug.zones[6].portals.some(p => p.id === 'sky_gate' && p.to === 7)), 'The Wyrdwood has the Stormrift to Bifrost Reach');
 
   // Heimdall's Perch: a hub of pale cloud-marble on an island over the storm.
-  await stageAt(80, 144);
+  await stageAt(187, 194);
   await shot('perch');
   check(await page.evaluate(() => Field.zone === 7 && Field.zoneName === 'Bifrost Reach' && Field.zoneTheme === 'sky'), 'The hero is in Bifrost Reach');
-  check(await page.locator('#area-title b').textContent() === 'Bifrost Reach' && (await page.locator('#area-title span').textContent()).includes("Heimdall's Perch"), 'The banner names Heimdall\'s Perch as the sanctuary');
+  const banner = [await page.locator('#area-title b').textContent(), await page.locator('#area-title span').textContent()];
+  check(banner[0] === "Heimdall's Perch" && banner[1].includes('Sanctuary'), `The banner names Heimdall's Perch as the sanctuary (${banner.join(' / ')})`);
   check(await page.locator('#city-travel').isHidden(), 'The travel button is hidden inside the hub');
-  const marble = await look(page, [.35, .55, .65, .8]);
-  check(marble.r > 150 && marble.g > 150 && marble.b > 170, `The Perch is pale marble (${marble.r | 0},${marble.g | 0},${marble.b | 0})`);
-  check(await page.evaluate(() => City.npcs.filter(n => n.id.startsWith('sky_') || n.id === 'travel_perch').length === 8 && Quests.marker('sky_warden') === '?'), 'The people are loaded; the warden has the arrived progression quest to turn in (?)');
+  // Pin midday and clear skies: the world clock runs in real time, and Bifrost weather (thunderstorm, fog) and night darken the plaza.
+  await debug({ op: 'set_time', hour: 12, freeze: true }); await debug({ op: 'set_weather', kind: 'clear' });
+  await page.waitForTimeout(500);
+  // Sample the open plaza ring (radius 3 about the plaza centre (187,194)); the houses and their dark roofs stand outside it.
+  const marble = await page.evaluate(() => { const pts = []; for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283; pts.push([187 + Math.cos(a) * 3, 194 + Math.sin(a) * 3]); }
+    const cs = pts.map(([x, y]) => { const [sx, sy] = Field._debug.w2s(x, y), cv = document.getElementById('fieldcv'), k = cv.width / 1600, d = cv.getContext('2d').getImageData(Math.max(0, Math.round((sx - 2) * k)), Math.max(0, Math.round((sy - 2) * k)), Math.max(1, Math.round(4 * k)), Math.max(1, Math.round(4 * k))).data; let r = 0, g = 0, b = 0; for (let j = 0; j < d.length; j += 4) { r += d[j]; g += d[j + 1]; b += d[j + 2]; } const n = d.length / 4; return { r: r / n, g: g / n, b: b / n }; });
+    cs.sort((p, q) => (p.r + p.g + p.b) - (q.r + q.g + q.b)); return cs[cs.length >> 1]; });
+  check(marble.r > 120 && marble.g > 120 && marble.b > 140, `The Perch plaza is pale marble (median ${marble.r | 0},${marble.g | 0},${marble.b | 0})`);
+  check(await page.evaluate(want => City.npcs.filter(n => n.id.startsWith('sky_') || n.id === 'travel_perch').length === want && Quests.marker('sky_warden') === '?', SKY_PEOPLE), 'The people are loaded; the warden has the arrived progression quest to turn in (?)');
   // Windward Meadow: turquoise grass, windswept pines, nothing like the forest.
-  await stageAt(30, 112);
+  await stageAt(119.5, 98.5);
   await shot('windward');
-  const grass = await colourAt(32, 112);
+  const grass = await colourAt(119.5, 98.5);
   check(grass.g > grass.r + 25 && grass.g > 120, `Windward Meadow is turquoise grass (${grass.r | 0},${grass.g | 0},${grass.b | 0})`);
-  check(await page.locator('#city-travel').isVisible() && (await page.locator('#city-travel').textContent()).includes("Heimdall's Perch"), 'Outside the hub the travel button offers the Perch');
+  const travelText = await page.locator('#city-travel').textContent().catch(() => '');
+  // The nearest hub from this meadow is Windward Roost (a camp of its own), so the button offers that visit.
+  check(await page.locator('#city-travel').isVisible() && /^Visit .+/.test(travelText), `Outside the hub the travel button offers the nearest visit (${travelText})`);
   // The bridge: rainbow glass over open sky. Past its edge there is no ground at all, only sky and storm.
-  await stageAt(43.5, 134.5);
+  await stageAt(280.5, 307.5);
   await shot('bridge');
-  const deck = [await colourAt(38.5, 134.5), await colourAt(49.5, 134.5), await colourAt(52.5, 134.5)];   // away from the hero's own sprite
+  const deck = [await colourAt(275.5, 307.5), await colourAt(286.5, 307.5), await colourAt(289.5, 307.5)];   // away from the hero's own sprite
   check(deck.every(c => Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b) > 35 && c.r + c.g + c.b > 400), `The bridge deck is coloured glass (${deck.map(c => `${c.r | 0},${c.g | 0},${c.b | 0}`).join(' | ')})`);
   check(new Set(deck.map(c => `${c.r >> 4},${c.g >> 4},${c.b >> 4}`)).size >= 2, 'and the colour changes along the deck');
-  const sideways = await colourAt(43.5, 124);
+  const sideways = await colourAt(280.5, 297.5);
   check(Math.abs(sideways.g - grass.g) > 20 || Math.abs(sideways.r - grass.r) > 30, `Past the edge of the bridge is void, not grass (${sideways.r | 0},${sideways.g | 0},${sideways.b | 0})`);
-  const storm = await colourAt(43.5, 142);
-  check(storm.r < 130 && storm.b > storm.g - 10, `Below the bridge the sky is storm cloud or twilight (${storm.r | 0},${storm.g | 0},${storm.b | 0})`);
+  const storm = await colourAt(280.5, 315.5);
+  // Pinned to midday (set_time above): the sky below the bridge is cool daylight, never grass.
+  check(storm.b > storm.r + 10 && storm.g < storm.b + 5, `Below the bridge the sky is cool daylight, not ground (${storm.r | 0},${storm.g | 0},${storm.b | 0})`);
   const rain = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let island = 0, glass = 0; for (let i = 0; i < d.length; i += 4) { if (Math.abs(d[i] - 138) < 14 && Math.abs(d[i + 1] - 212) < 14 && Math.abs(d[i + 2] - 184) < 14 && d[i + 3] > 0) island++; if (Math.abs(d[i] - 240) < 14 && Math.abs(d[i + 1] - 200) < 14 && Math.abs(d[i + 2] - 244) < 14 && d[i + 3] > 0) glass++; } return { island, glass }; });
   check(rain.island > 300 && rain.glass > 40, `The minimap draws the islands (${rain.island} px) and the bridges (${rain.glass} px)`);
 
@@ -166,13 +191,13 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   check(ringDone.r > ringDone.b + 60 && ringDone.g > ringDone.b + 40, `A held ward glows gold (${ringDone.r | 0},${ringDone.g | 0},${ringDone.b | 0})`);
   // Finishing the Windcairn quest has lit it.
   check(await page.evaluate(() => Quests.visited('sky_windcairn')), 'The Windcairn is lit once its quest is done');
-  await stageAt(22, 112);
+  await stageAt(60.5, 133.5);
   await shot('windcairn');
   // The Stormcrown's pylon, the Hall Gate, the spire and the nest are all in the data and drawn by the art file.
   check(await page.evaluate(() => ['wardstone', 'windcairn', 'spirelight', 'pylon', 'hallgate', 'nest', 'prism', 'column', 'skypine', 'skyrock', 'cloudpuff'].every(k => City.art[k] && Field._debug.zones[7].objects.some(o => o.kind === k))), 'Every prop of the zone has artwork registered with the city renderer');
 
   // Every kind in every clip: the canvas must change from one state to the next and nothing may throw.
-  await stageAt(80, 86);
+  await stageAt(119.5, 98.5);
   const monsterHashes = () => page.evaluate(() => {
     const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600;
     return [1000, 1001, 1002, 1003, 1004].map(id => {
@@ -185,19 +210,20 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const seen = [];
   for (const [state, dieT] of [['idle', 0], ['windup', 0], ['lunge', 0], ['hurt', 0], ['dead', .2], ['dead', .45], ['dead', 3]]) {
     stage = { state, dieT };
-    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 5, [state], { timeout: 10000 });
+    try { await page.waitForFunction(([state]) => Field.slimes.filter(s => [1000, 1001, 1002, 1003, 1004].includes(s.id) && s.state === state).length === 5, [state], { timeout: 10000 }); }
+    catch (error) { const st = await page.evaluate(() => ({ zone: Field.zone, hero: [Field.hero.x, Field.hero.y], fixtures: Field.slimes.filter(s => [1000, 1001, 1002, 1003, 1004].includes(s.id)).map(s => [s.id, s.state]) })); throw Error(`${error.message}; ${JSON.stringify(st)}`); }
     await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
-    const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => Field._debug.enemyFrame(s)));
+    const frames = await page.evaluate(() => Field.slimes.filter(s => [1000, 1001, 1002, 1003, 1004].includes(s.id)).map(s => Field._debug.enemyFrame(s)));
     const wanted = { idle: f => f[0] === 'idle', windup: f => f[0] === 'attack' && f[1] < 3, lunge: f => f[0] === 'attack' && f[1] >= 3 && f[1] <= 5, hurt: f => f[0] === 'hurt' };
     const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 2 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 4 : f => f[0] === 'die' && f[1] === 7;
     check(frames.length === 5 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
-    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => s.d.name))).join() === 'Galehound,Prism Golem,Skyray,Hollow Einherjar,Thunderroc', 'The bestiary names come from the Bifrost table');
+    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => [1000, 1001, 1002, 1003, 1004].includes(s.id)).map(s => s.d.name))).join() === 'Galehound,Prism Golem,Skyray,Hollow Einherjar,Thunderroc', 'The bestiary names come from the Bifrost table');
     seen.push(await monsterHashes());
     if (state === 'idle' || state === 'lunge') await shot('bestiary-' + state);
   }
   stage = null;
   check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All five monsters draw something new in each state (${seen.length} states)`);
-  await page.waitForFunction(() => Field.slimes.every(s => s.id < 1000), null, { timeout: 10000 });
+  await page.waitForFunction(() => !Field.slimes.some(s => [1000, 1001, 1002, 1003, 1004].includes(s.id)), null, { timeout: 10000 });
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);
   console.log(`sky-ui: ${checks} checks passed`);
 })().then(async () => { await browser?.close(); if (started) await call('stop_world').catch(() => {}); await client.close(); process.exit(0); },

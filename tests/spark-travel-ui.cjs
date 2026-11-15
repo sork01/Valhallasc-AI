@@ -24,7 +24,7 @@ async function call(name, args = {}) {
   if (process.env.MUTATE) await page.route('**/worldmap.js*', route => {
     let source = fs.readFileSync(path.join(root, 'client/worldmap.js'), 'utf8');
     const swap = (from, to) => { assert.ok(source.includes(from), `mutation target: ${from}`); source = source.replace(from, to); };
-    if (process.env.MUTATE === 'fare') swap("el('span', `${d.cost} gold`, 'wm-spark-cost')", "el('span', '', 'wm-spark-cost')");
+    if (process.env.MUTATE === 'fare') swap("el('span', Money.text(d.cost), 'wm-spark-cost')", "el('span', '', 'wm-spark-cost')");
     if (process.env.MUTATE === 'touch') swap("const finger = event.pointerType === 'touch' || event.pointerType === 'pen';", 'const finger = false;');
     route.fulfill({ contentType: 'text/javascript', body: source });
   });
@@ -95,7 +95,7 @@ async function call(name, args = {}) {
   await station(C).hover();
   const text = await card.innerText();
   check(text.includes('Rimeward Camp'), 'Hovering a station shows its name');
-  check(text.includes('40 gold'), `Hovering a two-leg station shows 40 gold (${text.replace(/\n/g, ' | ')})`);
+  check(text.includes('40 copper'), `Hovering a two-leg station shows 40 copper (${text.replace(/\n/g, ' | ')})`);
   check(text.includes('Alderhaven → Skaldholm → Rimeward Camp'), 'The card lists every stop in order');
   check(await page.evaluate(() => document.getElementById('wm-spark-line').getAttribute('points').trim().split(/\s+/).length === 3), 'The route is drawn through its three stations');
   check(await page.evaluate(() => {
@@ -103,7 +103,7 @@ async function call(name, args = {}) {
     return c.width > 40 && c.left >= b.left && c.right <= b.right && c.top >= b.top && c.bottom <= b.bottom;
   }), 'The card stays inside the map');
   await station(B).hover();
-  check((await card.innerText()).includes('Skaldholm') && (await card.innerText()).includes('20 gold'), 'Hovering a one-leg station shows 20 gold');
+  check((await card.innerText()).includes('Skaldholm') && (await card.innerText()).includes('20 copper'), 'Hovering a one-leg station shows 20 copper');
   await page.screenshot({ path: path.join(world.artifacts, 'spark-travel-map.png') });
 
   // A finger first sees the name and the fare; the flight starts from the Fly button.
@@ -112,10 +112,10 @@ async function call(name, args = {}) {
   const fly = page.locator('#wm-spark-card .wm-spark-fly');
   await tap(C);
   check(await page.evaluate(() => WorldMap.open && !Field.hero.sparkTravel && Field.hero.gold === 100), 'A tap does not fly at once');
-  check(await fly.isVisible() && (await card.innerText()).includes('40 gold'), 'The tapped station keeps its card with the fare and a Fly button');
+  check(await fly.isVisible() && (await card.innerText()).includes('40 copper'), 'The tapped station keeps its card with the fare and a Fly button');
   check((await fly.boundingBox()).height >= 34, 'The Fly button is a comfortable target');
   await tap(S);
-  check((await card.innerText()).includes('Saltby') && (await card.innerText()).includes('20 gold') && await fly.isVisible(), 'Tapping another station moves the card to it');
+  check((await card.innerText()).includes('Saltby') && (await card.innerText()).includes('20 copper') && await fly.isVisible(), 'Tapping another station moves the card to it');
   await page.evaluate(() => {
     window.sparkDraws = 0; const draw = Spark.draw;
     Spark.draw = (g, actor, t, beacon) => { if (!beacon && actor.sparkTravel) window.sparkDraws++; return draw(g, actor, t, beacon); };
@@ -126,7 +126,7 @@ async function call(name, args = {}) {
   await fly.click();
   await page.waitForFunction(() => !!Field.hero.sparkTravel && window.sparkDraws > 2);
   check(await page.locator('#worldmap').isHidden() && await page.locator('#npc-dialogue').isHidden(), 'Departure closes the map and leaves no conversation open');
-  check(await page.evaluate(() => Field.hero.gold === 80 && Field.hero.sparkTravel.destination === 'Saltby'), 'The server charges exactly 20 gold and selects the destination');
+  check(await page.evaluate(() => Field.hero.gold === 80 && Field.hero.sparkTravel.destination === 'Saltby'), 'The server charges exactly 20 copper and selects the destination');
   check(await page.locator('#city-travel').isDisabled() && (await page.locator('#city-travel').innerText()).includes('Spark Travel'), 'The HUD labels the active flight');
   await page.keyboard.press('w'); await page.keyboard.press('Space'); await page.keyboard.press('Shift');
   await page.locator('#fieldcv').click({ position: { x: 700, y: 400 } });
@@ -143,7 +143,7 @@ async function call(name, args = {}) {
   check(await station(S).getAttribute('data-state') === 'here' && await station(A).getAttribute('data-state') === 'open', 'The map follows the hero to the new station');
   await station(A).click();
   await page.waitForFunction(() => Field.hero.sparkTravel?.destination === 'Alderhaven');
-  check(await page.locator('#worldmap').isHidden() && await page.evaluate(() => Field.hero.gold === 60), 'A mouse click on a station starts the flight for 20 gold');
+  check(await page.locator('#worldmap').isHidden() && await page.evaluate(() => Field.hero.gold === 60), 'A mouse click on a station starts the flight for 20 copper');
   check(await page.evaluate(() => Field.hero.hp === Field.hero.maxHp && !Field.hero.inCombat), 'Flight remains safe with god mode disabled');
   check(errors.length === 0, `No browser errors: ${errors.join('; ')}`);
   console.log(JSON.stringify({ passed: true, checks, artifacts: world.artifacts }));

@@ -30,7 +30,8 @@ const PARTNERS = (process.env.PARTNERS || '26').split(',').map(Number);
   const seams = Z.portals.filter(p => p.seam).map(p => p.to).sort((a, b) => a - b);
   check(seams.join() === '19,21,22,23,25,26', 'the six shaped neighbours are all seams');
   check(Z.portals.filter(p => p.to === 28).length === 1 && Z.portals.some(p => p.to === 28 && p.walk) && Z.exitArches.some(a => a.portal === 'path_20_28'), 'the Yearwheel has one portal, the walked-through vault, with its arch');
-  for (const p of Z.portals) check(onFloor(Z, p.x, p.y) || p.seam, `${p.id} stands on the floor`);
+  // The Yearwheel vault sits in the wall's arch on the border (checked above: walked through, with its arch), so it is not on the floor.
+  for (const p of Z.portals) check(onFloor(Z, p.x, p.y) || p.seam || p.vault, `${p.id} stands on the floor`);
   check(Z.regions.names.length === 15 && Z.camps.length === 3 && Z.quests.length >= 28, 'fifteen regions, four hubs and the quests');
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',
     env: { ...process.env, VALHALLA_BIND: `127.0.0.1:${port}`, VALHALLA_DB: path.join(tmp, 'v.sqlite'), VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_TEST_COMMANDS: '1', VALHALLA_GOD_MODE: '1', VALHALLA_START_LEVEL: process.env.START_LEVEL || '99', VALHALLA_LEVEL_SPREAD: '0' } });

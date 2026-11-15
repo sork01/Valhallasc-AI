@@ -6,6 +6,9 @@ const {chromium,STUB}=require('./lib/playwright.cjs');
 const {Client}=require('@modelcontextprotocol/sdk/client/index.js');
 const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js');
 const root=path.resolve(__dirname,'..');
+// Counts come from the map the server embeds: game zone 20 = zones[19]; the client also holds the Greenmeadow top level (+1).
+const MAP=JSON.parse(fs.readFileSync(path.join(root,'world/map.txt'),'utf8'));
+const SUN=MAP.zones[19];
 const client=new Client({name:'valhallasc-sunward-ui',version:'1.0.0'});
 let browser,started=false,checks=0;
 const check=(value,message)=>{assert.ok(value,message);checks++;};
@@ -24,7 +27,10 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('SunwardUI');await page.locator('#go').click({timeout:60000});
-  await page.waitForFunction(()=>Online.connected&&!!Field.sunwardSprites?.img.wickerwarden,null,{timeout:60000});
+  await page.waitForFunction(()=>Online.connected,null,{timeout:60000});
+  // New heroes start on the Saltby pier. The Sunward sprites load lazily, so stand the hero in zone 20 (Millbridge) first.
+  await page.evaluate(()=>Online.send({type:'debug',ref:300,command:{op:'teleport',zone:20,x:126,y:201}}));
+  await page.waitForFunction(()=>Field.zone===20&&!!Field.sunwardSprites?.img.wickerwarden,null,{timeout:60000});
   const data=await page.evaluate(()=>{
     const zones=Field._debug.zones,z=zones[20],src=Field.sunwardSprites;
     return {count:zones.length,name:z.name,theme:z.theme,levels:z.levels,quests:z.quests.length,npcs:z.npcs.length,
@@ -34,26 +40,26 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
       seal:z.futureInstance,gate:zones[19].portals.find(p=>p.id==='stormglass_sun_gate'),
       travel:z.npcs.find(n=>n.id==='travel_millbridge'),miller:z.npcs.find(n=>n.id==='sun_miller'),keeper:z.npcs.find(n=>n.id==='sun_keeper'),trees:z.objects.filter(o=>['oak_tree','birch_tree','apple_tree','willow_tree'].includes(o.kind)).length};
   });
-  check(data.count===27&&data.name==='Sunward Vale'&&data.theme==='sunward'&&data.levels.join(',')==='65,70','Zone 20 and levels load');
+  check(data.count===MAP.zones.length+1&&data.name===SUN.name&&data.theme==='sunward'&&data.levels.join(',')===SUN.levels.join(','),`Zone 20 and levels load (${JSON.stringify({count:data.count,name:data.name,levels:data.levels})})`);
   check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h,ew,eh])=>w===ew&&h===eh)),'Six enemy and three NPC PixelFlow atlases load');
-  check(data.art&&data.layout===29&&data.legend&&data.trees>=170,'Real trees, mill, bridges and world map catalog load');
-  check(data.npcs===8&&data.quests===9&&data.spawns===42,'Camp, quest hub and encounters load');
-  check(data.seal?.status==='sealed'&&data.seal?.name==='The Elder Hollow'&&data.gate?.to===20,'Instance entrance is sealed and Sunward Cut exists');
+  check(data.art&&data.layout===MAP.zones.length+1&&data.legend&&data.trees>=170,`Real trees, mill, bridges and world map catalog load (${JSON.stringify({art:data.art,layout:data.layout,legend:data.legend,trees:data.trees})})`);
+  check(data.npcs===SUN.npcs.length&&data.quests===SUN.quests.length&&data.spawns===SUN.slimes.length,`Camp, quest hub and encounters load (${JSON.stringify({npcs:data.npcs,quests:data.quests,spawns:data.spawns})})`);
+  check(data.seal?.status==='open'&&data.seal?.name==='The Elder Hollow'&&data.gate?.to===20,'The Elder Hollow is open (futureInstance status) and Sunward Cut exists');
   check(data.travel?.travelLinks.includes('travel_breakwater')&&data.travel?.art==='sun_travel'&&data.miller?.art==='sun_miller'&&data.keeper?.art==='sun_keeper','Three distinct PixelFlow NPCs load');
   let ref=301;
   const debug=async command=>{check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);};
-  await debug({op:'teleport',zone:20,x:32,y:113});
-  await page.waitForFunction(()=>Field.zone===20&&Math.hypot(Field.hero.x-32,Field.hero.y-113)<2,null,{timeout:15000});
+  await debug({op:'teleport',zone:20,x:126,y:201});
+  await page.waitForFunction(()=>Field.zone===20&&Math.hypot(Field.hero.x-126,Field.hero.y-201)<2,null,{timeout:15000});
   await page.waitForTimeout(1200);
   await page.screenshot({path:path.join(world.artifacts,'sunward-camp.png')});
   await capture('sunward-camp-clean.png');
-  check(await page.evaluate(()=>Field.zoneTheme==='sunward'&&City.npcs.length===8),'Millbridge paints in the live zone');
-  await debug({op:'teleport',zone:20,x:105,y:13});
-  await page.waitForFunction(()=>Field.zone===20&&Math.hypot(Field.hero.x-105,Field.hero.y-13)<2,null,{timeout:15000});
+  check(await page.evaluate(()=>Field.zoneTheme==='sunward'&&['sun_miller','sun_keeper','travel_millbridge'].every(id=>City.npcs.some(n=>n.id===id))),'Millbridge paints in the live zone with its miller, keeper and travel master');
+  await debug({op:'teleport',zone:20,x:176,y:46});
+  await page.waitForFunction(()=>Field.zone===20&&Math.hypot(Field.hero.x-176,Field.hero.y-46)<4,null,{timeout:15000});
   await page.waitForTimeout(1600);
   await page.screenshot({path:path.join(world.artifacts,'sunward-elder-hollow.png')});
   await capture('sunward-elder-hollow-clean.png');
-  check(await page.evaluate(()=>Field._debug.zones[20].portals.length===1&&Field.zone===20),'The Elder Hollow has no playable dungeon portal');
+  check(await page.evaluate(()=>Field._debug.zones[20].portals.some(p=>p.id==='sun_elder_gate'&&p.to===30)&&Field.zone===20),'The Elder Hollow gate leads to its dungeon (zone 30)');
   check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
   console.log(`Sunward UI: ${checks} checks; screenshots in ${world.artifacts}`);
 })().catch(e=>{console.error(e.stack);process.exitCode=1;}).finally(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();});

@@ -1,6 +1,6 @@
 // The Stormglass Flats as an authored night plain (scripts/storm_design.py): the real client names each of the twelve regions, draws its ground classes, the four hubs
-// name themselves, the elites draw from their art, the three rim gates and Asterion's gate stand on the floor, and the two seams (the Prismwaste on the north, the Obsidian
-// Orrery on the west) are crossed anywhere without a banner, with the neighbour's scenery ready beyond the line and the same world point looking the same from both frames.
+// name themselves, the elites draw from their art, the rim gate and Asterion's gate stand on the floor, and the four seams (the Prismwaste on the north, the Obsidian
+// Orrery on the west, Sunward Vale and the Emberwake) are crossed anywhere without a banner, with the neighbour's scenery ready beyond the line and the same world point looking the same from both frames.
 // Pictures in test-results/storm-design/.
 //   REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/storm-design-ui.cjs
 //   SEAM_ONLY=1 KS='[7]': only the seams, one point each (the bounded runner's memory and time caps).
@@ -21,15 +21,15 @@ const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[18];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
 const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
-const HUBS = [['breakwater', 88, 262, 'Breakwater Camp'], ['rodstead', 100, 152, 'Rodstead'], ['fulgur', 112, 64, 'Fulgur Post'], ['bankhold', 272, 150, 'Bankhold']];
+const HUBS = [['breakwater', 88, 262, 'Breakwater Camp'], ['rodstead', 100, 152, 'Rodstead'], ['fulgur', 112, 64, 'Fulgur Post'], ['bankhold', 216, 150, 'Bankhold']];
 const ELITES = [['maelstromheart', 178, 50], ['lamphermit', 62, 228], ['stormtusk', 254, 284]];
 // regions that paint their own ground class: [region name, darker than, lighter than] as luminance
 const GROUND = { 'The Compass Floor': [null, 80], 'The Eye Basin': [60, null] };
 (async () => {
   check(Z.name === 'The Stormglass Flats' && Z.size === 328 && Z.shapeFloor && Z.shape.neighbours.join() === '14,15,20,26,45', 'the Stormglass Flats are the 328 grid with their outline and five neighbours');
   const seams = Z.portals.filter(p => p.seam);
-  check(seams.map(p => p.to).sort().join() === '14,15', 'the only seams are the ones to the Prismwaste and the Orrery');
-  for (const to of [20, 26, 45]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
+  check(seams.map(p => p.to).sort().join() === '14,15,20,45', 'the seams are the ones to the Prismwaste, the Orrery, Sunward Vale and Emberwake');
+  check(Z.portals.some(p => p.to === 26 && p.walk && !p.seam), 'the way to Frostwake is a rim gate you walk through');
   check(Z.portals.some(p => p.to === 17 && !p.walk && !p.seam), 'Asterion\'s gate stands in the open on the compass rose');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
   check(Z.regions.names.length === 12 && Z.camps.length === 3 && Z.quests.length === 28, 'twelve regions, three outposts and 28 quests');
