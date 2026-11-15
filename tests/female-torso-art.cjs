@@ -21,12 +21,14 @@ function preflight() {
     for (const dir of [candidates, before]) {
       const meta = path.join(dir, stem + '_sprites.txt');
       if (!fs.existsSync(meta)) { missing.push(`  ${meta}`); continue; }
-      for (const part of Object.values(JSON.parse(fs.readFileSync(meta, 'utf8')).parts)) for (const key of ['png', 'depth']) if (part[key] && !fs.existsSync(path.join(dir, part[key]))) missing.push(`  ${path.join(dir, part[key])}`);
+      // Only body and armor_* parts: the exporter writes those, and the server below serves only those.
+      const parts = Object.entries(JSON.parse(fs.readFileSync(meta, 'utf8')).parts).filter(([name]) => name === 'body' || name.startsWith('armor_'));
+      for (const [, part] of parts) for (const key of ['png', 'depth']) if (part[key] && !fs.existsSync(path.join(dir, part[key]))) missing.push(`  ${path.join(dir, part[key])}`);
     }
   }
   if (missing.length) throw Error(`female-torso-art: TORSO_ART_DIR=${out} is missing git-ignored inputs:\n${missing.join('\n')}\n` +
-    `Make <dir>/assets with: ${classes.map(c => `python3 scripts/export_character_torso.py ${c} --out ${candidates}`).join(' ; ')}\n` +
-    `Make <dir>/before by copying the current client/assets/*_f_* files (sprites, bounds, body/outfit PNG and depth) into it.`);
+    `Generate both folders with: TORSO_ART_DIR=${out} bash scripts/make_test_art_inputs.sh torso\n` +
+    `(assets/ from scripts/export_character_torso.py; before/ from git at TORSO_BASE_REV, default c5fb4749^).`);
 }
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
