@@ -1,4 +1,5 @@
 // Focused real-client check for the seven Grand Nave enemy atlases.
+process.env.REAL_SPRITES = process.env.REAL_SPRITES || '1';   // stub mode replaces every enemy, so no atlas would load
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');
@@ -50,10 +51,11 @@ const call = async(name,args={}) => {
       width:Field.cathedralSprites.img[kind].naturalWidth,
       height:Field.cathedralSprites.img[kind].naturalHeight,
       top:Field.cathedralSprites.meta.tops[kind],
+      frame:Field.frameOf(Field.cathedralSprites,kind),
       clip:Field._debug.enemyFrame(Field.slimes.find(s=>s.kind===kind))
     }),kind);
-    assert.equal(art.width,768,`${kind} atlas width`);
-    assert.equal(art.height,480,`${kind} atlas height`);
+    assert.equal(art.width,8*art.frame.w,`${kind} atlas width (8 frames of its own ${art.frame.w}px)`);
+    assert.equal(art.height,5*art.frame.h,`${kind} atlas height (5 rows of its own ${art.frame.h}px)`);
     assert.ok(art.top>20&&art.clip[0],`${kind} draws a fitted frame`);
     await page.screenshot({path:path.join(world.artifacts,`nave-${kind}.png`)});
   }
