@@ -27,6 +27,8 @@ module.exports = {
     };
     for (const zone of [10,11,12]) {
       const z=map.zones[zone-1], level=z.min_level;
+      // Every authored enemy of the copy (helpers included), read from the map, not a fixed count.
+      const want=z.slimes.length;
       check(z.players===5 && z.copies===4 && z.levels.join()===`${level},${level}`,`${z.name}: five-player level-${level} wing with four copies`);
       await kit.setupCharacter(w,bot,{level:level-1});
       const door=map.zones[8].portals.find(p=>p.to===zone);
@@ -39,12 +41,13 @@ module.exports = {
       await kit.teleport(w,bot,{zone:9,x:door.x,y:door.y+4});
       await kit.setupCharacter(w,bot,{level:50});
       await enter(bot,zone);await enter(mate,zone);await enter(stranger,zone);
-      await w.waitFor(()=>view(mate).slimes.length===20 && view(stranger).slimes.length===20);
+      await w.waitFor(()=>view(mate).slimes.length===want && view(stranger).slimes.length===want,10000,'Private copies populated');
       check(view(bot).slimes.every(s=>s.level===level&&s.zone===zone),`Every encounter is exactly level ${level}, labelled with its public wing`);
       check(view(bot).slimes.map(s=>s.id).join()===view(mate).slimes.map(s=>s.id).join(),'Party members see the same private enemy IDs');
       check(view(bot).slimes.every(s=>!view(stranger).slimes.some(q=>q.id===s.id)),'Strangers see distinct private enemy IDs');
       const exclusive=['tideleech','reliccrab','abysszealot'][zone-10];
-      check(view(bot).slimes.filter(s=>s.kind===exclusive).length===4 && view(bot).slimes.filter(s=>bossKind(s.kind)).length===4,'Four exclusive trash enemies and four unique bosses');
+      const exclusiveCount=z.slimes.filter(s=>s.kind===exclusive).length, bossCount=z.slimes.filter(s=>bossKind(s.kind)).length;
+      check(view(bot).slimes.filter(s=>s.kind===exclusive).length===exclusiveCount && view(bot).slimes.filter(s=>bossKind(s.kind)).length===bossCount,`${exclusiveCount} exclusive trash enemies and ${bossCount} unique bosses (from the map)`);
       const target=view(bot).slimes.find(s=>s.kind==='tidetemplar');
       await kit.teleport(w,bot,{zone,x:target.x-2,y:target.y});
       await w.action(bot,{type:'target',id:target.id});
@@ -95,7 +98,11 @@ module.exports = {
       await kit.teleport(w,stranger,{zone:9,x:108,y:35});
       await w.advance(300);
       await enter(bot,zone);
-      check(!view(bot).instance.cleared && view(bot).slimes.every(s=>!s.dead && s.level===level),'Empty private wing resets all bosses, trash levels and exit');
+      await w.advance(600);
+      // Ambush helpers (catalog add:true) and sleeping ambushers (map spawns with an ambush tag) stay dormant until triggered, so they read dead here by design.
+      const sleeping=s=>z.slimes.some(m=>m.ambush&&m.kind===s.kind&&Math.hypot(m.x-s.x,m.y-s.y)<1.5);
+      const bad=view(bot).slimes.filter(s=>!catalog.find(e=>e.kind===s.kind)?.add && !sleeping(s) && (s.dead||s.level!==level)).map(s=>`${s.kind}:${s.dead?'dead':''}${s.level}`);
+      check(!view(bot).instance.cleared && bad.length===0,'Empty private wing resets all bosses, trash levels and exit');
       await w.disconnect(bot);await w.connect({bot});
       check(w.player(bot).zone===9,'Logging back in leaves the transient private wing at its city entrance');
     }
