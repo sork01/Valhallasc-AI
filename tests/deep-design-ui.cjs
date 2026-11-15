@@ -21,9 +21,9 @@ const onFloor = (x, y) => (Z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] ===
 (async () => {
   check(Z.name === "Rán's Deep" && Z.size === 256, "Rán's Deep is the 256 grid");
   check(Z.shapeFloor && Z.shape.neighbours.join() === '7,9,13', 'it has its outline floor and borders Bifrost, Nacrehold and Astralhollow');
-  check(!Z.portals.some(p => p.seam), 'no seam: every crossing is a portal (the Nacrehold seam comes after its reshape)');
+  check(Z.portals.filter(p => p.seam).map(p => p.to).join() === '9', 'one seam, to Nacrehold (zone 9); the other crossings are portals');
   check(Z.camps.length === 3 && Z.camps.map(c => c.name).sort().join() === 'Drownwatch,Gatewatch,Lanternrest', 'three outposts');
-  for (const p of Z.portals) check(onFloor(p.x, p.y), `${p.id} stands on the floor`);
+  for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(p.x, p.y), `${p.id} stands on the floor`);   // a seam portal sits on the shared border line, off the floor by design
   for (const p of Z.portals.filter(p => p.walk)) check(p.walk.some(v => v !== 0), `${p.id} is a walk-in gate`);
   const kinds = k => Z.slimes.filter(s => s.kind === k && !s.ambush).length;
   check(['kraken', 'hvitserk', 'ghostmaw'].every(k => kinds(k) === 1), 'the three elites stand once each');

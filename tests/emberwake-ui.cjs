@@ -51,8 +51,13 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.waitForFunction(()=>Field.hero.level===99);
   await page.locator('#levelup-banner').waitFor({state:'hidden'});
   await teleport(17,90,25);await shot('asterion');
-  await page.evaluate(()=>Online.send({type:'move',x:90,y:18}));
-  await page.waitForFunction(()=>Field.zone===45,null,{timeout:20000});
+  // The Asterion gate (90,18) was removed from map.txt (Beta 1.29.0 atlas): the Caldera is now entered by its seams.
+  // Walk from the Stormglass Flats (zone 19) across its south seam (path_19_45, the portal at 159.19,317).
+  await teleport(19,159,310);
+  // Held input is refreshed every 50 ms, as the keyboard does; the walker must pass the seam line at y 317 while moving.
+  await page.evaluate(([dx,dy])=>{window.__seamWalk=setInterval(()=>Online.send({type:'input',dx,dy}),50);},process.env.MUTATE?[1,0]:[0,1]);   // MUTATE walks east, parallel to the seam: it must never cross, so the wait fails
+  await page.waitForFunction(()=>Field.zone===45,null,{timeout:30000});
+  await page.evaluate(()=>{clearInterval(window.__seamWalk);Online.send({type:'input',dx:0,dy:0});});
   await page.evaluate(()=>Online.send({type:'stop'}));
   await debug({op:'set_time',hour:12,freeze:true});
   await debug({op:'set_weather',kind:'clear'});
@@ -63,7 +68,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   assert.ok(await page.locator('#world-weather').textContent().then(t=>!t.includes('Indoors')),'The caldera has outdoor weather');
   assert.ok(await page.evaluate(()=>WORLD_MAP.zones[44].objects.some(o=>o.kind==='meetingstone')),'The hire service has a visible Meeting Stone');
   if(!STUB)await page.waitForFunction(()=>Field.cathedralSprites?.meta.kinds.filter(k=>k.startsWith('ew_')).length===7);
-  assert.equal(await page.evaluate(()=>WORLD_MAP.zones[44].slimes.filter(s=>CATHEDRAL_ENEMIES.find(e=>e.kind===s.kind)?.elite).length),3);
+  // The zone's three authored elites; the Empty Seat overlay adds an es_ foe (Shade of the Unbound King) at its echo circle, which is not one of them.
+  assert.equal(await page.evaluate(()=>WORLD_MAP.zones[44].slimes.filter(s=>!s.kind.startsWith('es_')&&CATHEDRAL_ENEMIES.find(e=>e.kind===s.kind)?.elite).length),3);
   for(const [name,x,y]of [['arrival',22,137],['causeway',71,96],['lava',104,92],['shackle',108,118],['bellows',43,50],['door',124,15]]){
     await teleport(45,x,y);await shot(name);
   }
@@ -97,8 +103,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.setViewportSize({width:844,height:390});
   assert.ok(!await page.locator('.rotate').isVisible(),'Touch landscape shows the game');
   await shot('door-mobile');
-  await teleport(45,20,140);await page.evaluate(()=>Online.send({type:'move',x:14,y:140}));
-  await page.waitForFunction(()=>Field.zone===17,null,{timeout:20000});
+  // The return is the north seam back to the Stormglass Flats (zone 19): the Asterion return portal (14,140) is gone from map.txt.
+  await teleport(45,276,54);
+  await page.evaluate(()=>{window.__seamWalk=setInterval(()=>Online.send({type:'input',dx:0,dy:-1}),50);});
+  await page.waitForFunction(()=>Field.zone===19,null,{timeout:30000});
+  await page.evaluate(()=>{clearInterval(window.__seamWalk);Online.send({type:'input',dx:0,dy:0});});
   assert.ok(await page.evaluate(()=>!valhalla.emberwakeMusic.running&&!valhalla.emberwakeNightMusic.running));
   assert.deepEqual(bad,[]);assert.deepEqual(errors,[]);
   console.log(JSON.stringify({passed:true,mode:STUB?'stub':'real',artifacts:world.artifacts}));

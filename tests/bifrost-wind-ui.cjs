@@ -35,7 +35,9 @@ const check = (ok, label) => { assert.ok(ok, label); console.log(`${++checks}: $
     await page.evaluate(command => Online.send({type:'debug',command}), {op:'teleport',zone,x,y});
     await page.waitForFunction(({zone,x,y}) => Field.zone === zone && Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<.2, {zone,x,y});
   };
-  for (const [name,x,y,dx,dy] of [['east',48.5,71.5,1,0],['west',30.5,73.5,-1,0],['north',40.5,70.5,0,-1],['south',40.5,82.5,0,1]]) {
+  // Rim cells of the authored sky (map.txt, zone 7): a platform cell with void beyond it in each direction (the old starts were void since the reshape).
+  for (const [name,x0,y,dx,dy] of [['east',296.5,62.5,1,0],['west',259.5,54.5,-1,0],['north',279.5,46.5,0,-1],['south',251.5,53.5,0,1]]) {
+    const x = process.env.MUTATE==='rim' && name==='east' ? x0-5 : x0;   // MUTATE=rim starts 5 tiles inside: the walker must reach the rim and fail the boundary check
     await teleport(7,x,y);
     await page.evaluate(([dx,dy]) => Field.setTouchDirection(dx-dy,dx+dy),[dx,dy]);
     const samples = await page.evaluate(async () => {
