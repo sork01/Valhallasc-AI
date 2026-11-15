@@ -244,16 +244,29 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   for (const id of ['city_herald', 'city_librarian', 'city_guildmaster', 'city_stonewarden', 'city_healer']) {
     await talkByClick(id);
     check(await page.locator('#npc-name').textContent() === await page.evaluate(id => City.npcs.find(n => n.id === id).name, id), `Canvas interaction reaches ${id}`);
-    if (id === 'city_healer') check((await page.locator('#npc-offers').textContent()).includes('Health Potion'), 'Sister Liv offers healing supplies');
-    if (id === 'city_guildmaster') check((await page.locator('#npc-offers').textContent()).includes('Stew') && (await page.locator('#npc-offers').textContent()).includes('Satchel'), 'Tobias offers food and bags');
+    if (id === 'city_guildmaster' || id === 'city_healer') {
+      // Merchants list their stock behind the Buy tab (`#merchant-stock`), not in the greeting. The expected names come from the
+      // map's offers and the item catalogue. Tiered items (stew, potions) show whichever member of their family the hero's level
+      // gets (Hearty Stew at level 1), so any family name counts; a bag shows its own name (Linen Satchel).
+      const offers = mapData.zones[3].npcs.find(n => n.id === id).offers;
+      const catalogue = JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'world/items.txt'), 'utf8'));
+      const familyNames = itemId => { const family = catalogue.find(i => i.id === offers.find(o => o.item === itemId).item)?.family ?? catalogue.find(i => i.id === itemId).family; return catalogue.filter(i => i.family === family).map(i => i.name); };
+      const expected = id === 'city_healer' ? { tiered: familyNames('health_potion'), label: 'Health Potion' } : { tiered: familyNames('traveler_stew'), bag: catalogue.find(i => i.id === offers.find(o => o.bag === 'linen_satchel').bag).name, label: 'food and bags' };
+      await page.locator('#npc-offers [data-view="buy"]').click();
+      await page.waitForFunction(() => Shop.open && !!document.querySelector('#merchant-stock'), null, { timeout: 15000 });
+      const stock = await page.locator('#merchant-stock').textContent();
+      const ok = expected.tiered.some(n => stock.includes(n)) && (expected.bag === undefined || stock.includes(expected.bag));
+      check(ok, `${id === 'city_healer' ? 'Sister Liv offers healing supplies' : 'Tobias offers food and bags'} (${expected.label}) in ${JSON.stringify(stock.replace(/\s+/g, ' ').slice(0, 300))}`);
+    }
     await page.keyboard.press('Escape');
     await page.waitForTimeout(500);
   }
   await page.getByRole('button', { name: 'Expand quest tracker' }).click();
   await page.keyboard.press('q');
-  await page.locator('#quest-list [data-quest="city_welcome"] > summary').click();
-  await page.locator('#quest-list [data-quest="city_welcome"] .quest-state').waitFor({state:'visible'});
-  check((await page.locator('#quest-list [data-quest="city_welcome"]').textContent()).includes('Ready to turn in'), 'Five conversations complete the introduction');
+  // The journal lists quests as buttons; the selected quest fills the parchment page beside the list.
+  await page.locator('#quest-list [data-quest="city_welcome"]').click();
+  await page.locator('#quest-page h4').filter({ hasText: 'The Great Gate Opens' }).waitFor({ state: 'visible' });
+  check((await page.locator('#quest-page').textContent()).includes('Ready to turn in'), 'Five conversations complete the introduction');
   await page.keyboard.press('Escape');
   await talkByClick('city_captain');
   await page.locator('#npc-quest-list .journal-quest[data-quest="city_welcome"]').click();
@@ -266,20 +279,27 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await talkByClick('city_alchemist');
   await page.locator('#npc-quest-list .journal-quest[data-quest="city_gel"]').click();
   await page.locator('#npc-dialogue [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="city_gel"]')?.dataset.status === 'active');
-  await page.keyboard.press('Escape');
-  await debug({ op: 'give_item', item: 'slime_gel', quantity: 5 });
+  // Accepting closes the conversation (the hidden row is not re-rendered), so the live tracker shows the accepted quest.
+  await page.waitForFunction(() => /Bring Slime Gel: \d+\/8/.test(document.getElementById('quest-tracker')?.textContent || ''), null, { timeout: 30000 });
+  if (await page.locator('#npc-dialogue').isVisible()) await page.keyboard.press('Escape');
+  // The bring objectives count the quest's own items (qi_city_gel, qi_city_gel_2: map target), not ordinary Slime Gel.
+  await debug({ op: 'give_item', item: 'qi_city_gel', quantity: 5 });
   await page.waitForFunction(() => /Bring Slime Gel: 5\/8/.test(document.getElementById('quest-tracker').textContent), null, { timeout: 10000 });
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Bring Slime Gel: 5/8')), 'The tracker counts five Slime Gel straight from the bag');
-  await debug({ op: 'give_item', item: 'slime_gel', quantity: 5 });
-  await debug({ op: 'give_item', item: 'blue_gel', quantity: 4 });
-  await page.waitForFunction(() => /Return to Alchemist Orsolya Quill/.test(document.getElementById('quest-tracker').textContent), null, { timeout: 10000 });
+  await debug({ op: 'give_item', item: 'qi_city_gel', quantity: 5 });
+  await debug({ op: 'give_item', item: 'qi_city_gel_2', quantity: 4 });
+  // The finished bring turns into a hand-in line that names the alchemist (the map's name).
+  const alchemist = mapData.zones[3].npcs.find(n => n.id === 'city_alchemist').name;
+  await page.waitForFunction(name => (document.getElementById('quest-tracker').textContent || '').includes('Hand in: ' + name), alchemist, { timeout: 10000 });
   await talkByClick('city_alchemist');
   await page.locator('#npc-quest-list .journal-quest[data-quest="city_gel"]').click();
   await page.locator('#npc-dialogue [data-action="claim"]').click();
   await page.waitForFunction(() => !document.querySelector('#npc-quest-list [data-quest="city_gel"]'));
+  // The claim takes the eight bring items; the two spare quest items are then discarded (`discard_excess_quest_items`:
+  // no active quest wants them any more), so the bag holds no quest gel at all.
   const bag = item => page.evaluate(item => (Field.hero.inventory.find(i => i.item === item) || {}).quantity || 0, item);
-  check(await bag('slime_gel') === 2 && await bag('blue_gel') === 0, 'The reward took exactly eight gel and four blue gel from the bag');
+  const gelLeft = [await bag('qi_city_gel'), await bag('qi_city_gel_2')];
+  check(gelLeft[0] === 0 && gelLeft[1] === 0, `The claim used the quest gel, and the spare quest gel was discarded (left ${gelLeft.join(' / ')})`);
   await page.keyboard.press('Escape');
   await shot('city-quests');
 
@@ -292,10 +312,13 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await click(back.x, back.y - 1.2);
   await page.waitForFunction(() => Field.zone === 2, null, { timeout: 30000 });
   await page.waitForTimeout(600);
-  check(await page.locator('#area-title b').textContent() === 'Rimeveil Glacier', 'Returning restores the glacier banner');
+  // The banner names the authored region under the hero (the gate's arrival is in one of the glacier's regions), so check it is one of the map's glacier regions.
+  const glacierBanner = await page.locator('#area-title b').textContent();
+  check(mapData.zones[1].regions.names.includes(glacierBanner) || glacierBanner === mapData.zones[1].name, `Returning restores the glacier banner (${glacierBanner})`);
   check(await page.evaluate(([x, y]) => Math.hypot(Field.hero.x - x, Field.hero.y - y) < 2, [back.tx, back.ty]), 'The Glacier Gate arrives beside the Skaldholm Gate');
   check(await page.evaluate(() => Field.slimes.length > 0 && Field.slimes.every(s => s.zone === 2)), 'Back on the glacier only glacier enemies are shown');
-  const again = await look(page);
+  // Sampled on open snow above the city wall: the whole-view average also takes in the sandstone wall and purple roofs beside the gate.
+  const again = await look(page, [.6, .08, .72, .2]);
   check(again.b > again.r, `The glacier is cold-toned again (${again.r | 0},${again.g | 0},${again.b | 0})`);
   await shot('glacier-again');
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
