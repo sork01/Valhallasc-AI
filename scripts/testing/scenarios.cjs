@@ -317,7 +317,12 @@ const scenarios = {
     description: 'A mage walks to an Ironhide, defeats it through normal target actions, and collects its loot.',
     async run(w, check) {
       await w.connect({ bot: 'Mage', class: 'mage' });
-      const beetle = () => w.snapshot.slimes.find(s => s.kind === 'beetle' && s.hx === 18 && s.hy === 42);
+      // The pier is far from the meadow beetles and snapshots only show enemies nearby: stand beside the beetle spawn nearest the pier.
+      const pier = map.spawn, near = map.slimes.filter(s => s.kind === 'beetle').sort((a, b) => distance(a, pier) - distance(b, pier))[0];
+      await kit.teleport(w, 'Mage', { zone: 0, x: near.x, y: near.y + 4 });
+      await w.waitFor(() => w.snapshot.slimes.some(s => s.kind === 'beetle' && !s.dead), 5000, 'A beetle is in view');
+      // The old home tile (18, 42) is void on the shaped meadow: take the living beetle nearest the mage.
+      const beetle = () => w.snapshot.slimes.filter(s => s.kind === 'beetle' && !s.dead && !s.zone).sort((a, b) => distance(a, w.player('Mage')) - distance(b, w.player('Mage')))[0];
       const before = { ...w.player('Mage') };
       const enemy = beetle();
       assert.ok(enemy && !enemy.dead, 'The meadow Ironhide is alive');
@@ -1932,7 +1937,7 @@ const scenarios = {
       const refusal = await w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'error' && /level 20/.test(e.text)), 20000, 'The door refuses level 19');
       await w.action(bot, { type: 'stop' });
       check(w.player(bot).zone === 4 && /level 19/.test(refusal.text), 'A level-19 hero is told to come back at level 20 and stays in Skaldholm');
-      await kit.teleport(w, bot, { zone: 4, x: 100, y: 128 });       // off the stairs: at level 20 the door would take them in at once
+      await kit.teleport(w, bot, { npc: 'city_meetingstone' });       // beside the Stone, 3.5 tiles from the stairs: standing still never enters the door
       await kit.setupCharacter(w, bot, { level: 20 });
       await w.debug(bot, { op: 'set_gold', gold: 6000 });
       for (let i = 0; i < 3; i++) await w.debug(bot, { op: 'give_item', item: 'linen_satchel', quantity: 1 });   // room for five pieces
@@ -2752,6 +2757,12 @@ const scenarios = {
         for (const d of w.snapshot.slimes.filter(s => s.dead && s.kind === kind).slice(0, n - alive())) await w.debug(bot, { op: 'respawn_enemy', id: d.id }).catch(e => { if (!/already alive/.test(e.message)) throw e; });
         await w.waitFor(() => alive() >= n, 10000, `Respawn ${kind}`);
       }
+      // The view carries only the monsters within reach of the hero, so stand at a pack of the kind first (the map's own spawn).
+      async function stage(kind) {
+        const pack = deep.slimes.find(s => s.kind === kind && !s.elite);
+        await kit.teleport(w, bot, { zone: 8, x: pack.x + 3, y: pack.y });
+        await w.advance(400);
+      }
       // Kills "any" enemy until a quest counter is full, going from pack to pack and keeping away from the elites.
       async function killAny(id, index, n) {
         for (let round = 0; round < 20 && (state(id).counts[index] || 0) < n; round++) {
@@ -2810,6 +2821,7 @@ const scenarios = {
           }
           else if (o.kind === 'kill') {
             if (o.target === 'any') { await kit.teleport(w, bot, { npc: q.npc }); await killAny(id, i, o.count); await w.waitFor(() => (state(id).counts[i] || 0) >= o.count, 8000, `${id} patrol`); continue; }
+            await stage(o.target);
             await refill(o.target, o.count);
             const targets = w.snapshot.slimes.filter(s => !s.dead && s.kind === o.target && !nearElite(s));
             const first = targets.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
@@ -2851,7 +2863,7 @@ const scenarios = {
         await kit.teleport(w, bot, { npc: rep.npc });
         await kit.talkTo(w, bot, rep.npc, 'quest:accept:deep_patrol');
         await w.waitFor(() => !state('deep_patrol').claimed, 5000, 'Take the patrol again');
-        for (const kind of ['draugr', 'angler', 'moray', 'siren', 'shellback']) await refill(kind, 4);
+        for (const kind of ['draugr', 'angler', 'moray', 'siren', 'shellback']) { await stage(kind); await refill(kind, 4); }
         await killAny('deep_patrol', 0, 14);
         await w.waitFor(() => state('deep_patrol').counts[0] === 14, 8000, 'Patrol count');
         await kit.teleport(w, bot, { npc: rep.npc });
@@ -3749,11 +3761,11 @@ const scenarios = {
       await w.connect({bot,class:'warrior'});
       const gate=shelf.portals.find(p=>p.id==='frostwake_cairn_gate'),back=area.portals.find(p=>p.id==='cairn_frostwake_gate');
       check(gate?.to===27&&back?.to===26,'The High Pass gates are reciprocal');
-      check(area.theme==='cairnspine'&&area.levels.join(',')==='90,95'&&area.slimes.length===43&&area.slimes.filter(s=>['cairnbehemoth','whitebarktitan','stormcondor'].includes(s.kind)).length===3,'Level 90–95 mountain and three elites load');
-      check(area.futureInstance?.status==='sealed'&&area.quests.length===10&&area.objects.filter(o=>o.kind==='cairn_dead_tree').length>=70,'Sealed gate, quests and bare grove load');
-      await kit.teleport(w,bot,{zone:26,x:145,y:54});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      check(area.theme==='cairnspine'&&area.levels.join(',')==='90,95'&&area.slimes.length>=43&&area.slimes.filter(s=>['cairnbehemoth','whitebarktitan','stormcondor'].includes(s.kind)).length===3,'Level 90–95 mountain and three elites load');
+      check(area.futureInstance?.status==='open'&&area.futureInstance?.name==='The Thunderheart Gate'&&area.portals.some(p=>p.to===35)&&area.quests.length>=10&&area.objects.filter(o=>o.kind==='cairn_dead_tree').length>=70,'The Thunderheart Gate is open on the shaped map (was sealed), quests and bare grove load');
+      const enter=crossingPath(gate);await kit.teleport(w,bot,{zone:26,x:enter.start.x,y:enter.start.y});await w.advance(700);await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===27,15000,'Enter Cairnspine');await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'High Pass arrives at the hub edge');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'High Pass arrives at its seam landing (shaped layout)');
       await w.connect({bot:'MeadowWitness',class:'mage'});
       check(w.views.get(bot).slimes.every(s=>s.zone===27)&&w.views.get('MeadowWitness').slimes.every(s=>s.zone===0),'Mountain encounters stay in their own view');
       await kit.teleport(w,bot,{npc:'travel_boulderwatch'});
@@ -3762,11 +3774,11 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'cairn_warden'});await kit.talkTo(w,bot,'cairn_warden','quest:accept:cairn_welcome');
       for(const id of ['cairn_healer','cairn_surveyor','cairn_scout']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
       await w.waitFor(()=>quest(w,bot,'cairn_welcome')?.counts.every(n=>n===1),5000,'Meet Boulderwatch crew');
-      await kit.teleport(w,bot,{npc:'cairn_warden'});await kit.talkTo(w,bot,'cairn_warden','quest:claim:cairn_welcome');
+      await kit.teleport(w,bot,{npc:'cairn_warden'});await kit.talkTo(w,bot,'cairn_warden',claimOf(area,'cairn_welcome'));
       await w.waitFor(()=>quest(w,bot,'cairn_welcome')?.claimed,5000,'Claim Boulderwatch introduction');
       check(quest(w,bot,'cairn_welcome')?.claimed,'The hub introduction claims');
       for(const [kind,material] of [['screeferret','screeferret_pelt'],['stoneibex','ibex_horn'],['slateraven','slate_raven_feather'],['ridgeadder','ridgeadder_scale'],['cairnbehemoth','behemoth_heartstone'],['whitebarktitan','whitebark_core'],['stormcondor','stormcondor_plume']]){
-        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        const enemy=await enemyOf(w,bot,27,area,kind),before=totalXp(w.player(bot));
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
         check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
@@ -3774,7 +3786,8 @@ const scenarios = {
       await kit.teleport(w,bot,{zone:27,x:134,y:26});
       await w.restart();
       check(w.player(bot).zone===27&&w.player(bot).travelStops.includes('travel_boulderwatch')&&quest(w,bot,'cairn_welcome')?.claimed,'Mountain position, quest and travel discovery persist');
-      await kit.teleport(w,bot,{zone:27,x:14,y:145});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      const home=crossingPath(back);
+      await kit.teleport(w,bot,{zone:27,x:home.start.x,y:home.start.y});await w.advance(700);await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
       await w.waitFor(()=>w.player(bot).zone===26,15000,'Return to Frostwake');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return lands safely on Frostwake shelf');
     },
