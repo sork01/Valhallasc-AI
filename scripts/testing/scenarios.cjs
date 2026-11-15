@@ -3740,11 +3740,12 @@ const scenarios = {
       const entrance = vale.portals.find(p => p.id === 'sun_elder_gate');
       check(entrance?.to === 30 && hollow.portals[0].to === 20 && !hollow.sealedTemplate,
         'The oak entrance and return route lead to an open private dungeon');
-      check(map.zones[38].sealedTemplate && map.zones[38].portals.length === 1,
-        'The Silent Solstice remains a sealed four-copy floor plan');
+      check(!map.zones[38].sealedTemplate && map.zones[38].copies === 4 && map.zones[38].portals.length === 2,
+        'The Silent Solstice is an open four-copy dungeon with its gate and exit (was asserted sealed, obsolete since the Yearwheel opened)');
       for (const bot of [hero, partner, outsider, low]) await w.connect({ bot, class: 'warrior' });
       await w.debug(low, { op: 'set_level', level: 69 });
-      await kit.teleport(w, low, { zone: 20, x: 106, y: 26 });
+      // The gate stands at (176, 41) now; a teleport lands on the nearest free ground beside it.
+      await kit.teleport(w, low, { zone: 20, x: entrance.x, y: entrance.y + 3 });
       const earlier = new Set(w.events);
       await w.action(low, { type: 'move', x: entrance.x, y: entrance.y });
       await w.waitFor(() => w.events.some(e => !earlier.has(e) && e.bot === low && e.type === 'error' && /level 70/.test(e.text)),
@@ -3759,7 +3760,7 @@ const scenarios = {
       await kit.talkTo(w, hero, 'sun_keeper', 'quest:accept:sun_hollow_trials');
       await w.waitFor(() => !!quest(w, hero, 'sun_hollow_trials'), 5000, 'Accept root trials');
       const enter = async bot => {
-        await kit.teleport(w, bot, { zone: 20, x: 106, y: 26 });
+        await kit.teleport(w, bot, { zone: 20, x: entrance.x, y: entrance.y + 3 });
         await w.action(bot, { type: 'move', x: entrance.x, y: entrance.y });
         await w.waitFor(() => w.player(bot).zone === 30, 15000, `${bot} enters Elder Hollow`);
         await w.action(bot, { type: 'stop' });
