@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.55.9",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "The opening cutscene has a new look: the forge is now a proper volcano with a glowing lava crater, lava running down its sides and a plume of smoke, instead of a flat dark shape.",
+      "The nine chains that bind Eldmarr are now heavy iron links that stretch from the crater to the gods' empty seat. They glow red-hot and snap one by one, and they pass behind the ship instead of over it."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.8",
     "date": "2026-11-15",
     "new": [],

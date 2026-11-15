@@ -126,40 +126,92 @@
   }
 
   // Sky overlays in screen space: the forge, the hall, the nine chains, burning roots, sparks, an ember glow on the edges.
-  function sky(g, w, h, t, warm) {
-    const forge = bump(t, 3, 5.5, 20, 24), hall = bump(t, 12.5, 15, 22, 25), roots = bump(t, 24, 26.5, 36, 40);
-    // The ember glow along the edges.
-    const glow = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .35, w / 2, h / 2, Math.max(w, h) * .75);
-    glow.addColorStop(0, 'rgba(255,90,30,0)'); glow.addColorStop(1, `rgba(255,70,20,${.5 * warm})`); g.fillStyle = glow; g.fillRect(0, 0, w, h);
+  function sky(g, w, h, t, warm, far) {   // far: the forge, the hall and the chains, drawn behind the ship; otherwise the glow, roots and sparks in front of it
+    const forge = bump(t, 3, 5.5, 33, 37), hall = bump(t, 12.5, 15, 33, 36), roots = bump(t, 24, 26.5, 36, 40);
     const px = w * .22, py = h * .26;
-    if (forge > .01) {   // a far mountain with a ring of fire: the first forge under the roots
-      g.save(); g.globalAlpha = forge; g.fillStyle = '#26151a'; g.beginPath(); g.moveTo(w * .03, h * .5); g.lineTo(px - 30, py + 14); g.lineTo(px, py - 12); g.lineTo(px + 40, py + 16); g.lineTo(w * .44, h * .5); g.closePath(); g.fill();
-      const rg = g.createRadialGradient(px, py - 6, 4, px, py - 6, 120); rg.addColorStop(0, 'rgba(255,210,120,.95)'); rg.addColorStop(.3, 'rgba(255,120,40,.55)'); rg.addColorStop(1, 'rgba(255,80,20,0)'); g.fillStyle = rg; g.fillRect(px - 130, py - 130, 260, 260);
-      g.strokeStyle = `rgba(255,${170 + Math.round(Math.sin(t * 6) * 30)},70,.95)`; g.lineWidth = 5; g.beginPath(); g.ellipse(px, py - 6, 30 + Math.sin(t * 3) * 2, 10, 0, 0, Math.PI * 2); g.stroke(); g.restore();
+    if (!far) {   // the ember glow along the edges
+      const glow = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .35, w / 2, h / 2, Math.max(w, h) * .75);
+      glow.addColorStop(0, 'rgba(255,90,30,0)'); glow.addColorStop(1, `rgba(255,70,20,${.5 * warm})`); g.fillStyle = glow; g.fillRect(0, 0, w, h);
     }
-    if (hall > .01) {    // the gods' hall: a pale gold light with an empty seat
+    if (far && forge > .01) {   // the first forge: a real volcano with a lava crater, lava on its flanks, smoke, and a lit foot on the water
+      const sc = h / 600, hw = w * .27, base = h * .54, erupt = bump(t, 20, 27, 33, 37), pulse = .5 + Math.sin(t * 3.1) * .5;
+      const top = x => { const d = Math.abs(x - px) / hw; return d >= 1 ? base : Math.max(py, base - (base - py) * Math.pow(1 - d, 1.45) + (rnd(Math.round(x / 6)) - .5) * 5 * sc); };
+      g.save(); g.globalAlpha = forge;
+      // A paler ridge behind, so the cone has depth.
+      g.fillStyle = '#3a2328'; g.beginPath(); g.moveTo(px - hw * 1.5, base); for (let x = px - hw * 1.5; x <= px + hw * 1.5; x += 8) g.lineTo(x, base - (base - py) * .55 * Math.pow(Math.max(0, 1 - Math.abs(x - (px + hw * .55)) / (hw * 1.0)), 1.3)); g.lineTo(px + hw * 1.5, base); g.closePath(); g.fill();
+      // The cone, lit from the crater.
+      const cone = g.createLinearGradient(0, py, 0, base); cone.addColorStop(0, '#6a2f20'); cone.addColorStop(.35, '#3a1d1c'); cone.addColorStop(1, '#1b1115');
+      g.fillStyle = cone; g.beginPath(); g.moveTo(px - hw, base); for (let x = px - hw; x <= px + hw; x += 4) g.lineTo(x, top(x)); g.lineTo(px + hw, base); g.closePath(); g.fill();
+      // Rock ribs down the flanks.
+      g.strokeStyle = 'rgba(20,10,12,.55)'; g.lineWidth = 2 * sc; for (let i = 0; i < 9; i++) { const sx = px + (i - 4) * hw * .13, ex = px + (i - 4) * hw * .3; g.beginPath(); g.moveTo(sx, top(sx) + 6 * sc); g.lineTo(ex, base); g.stroke(); }
+      // Lava rivers from the rim, brighter as it erupts.
+      for (let i = 0; i < 5; i++) {
+        const dir = (i - 2) * .32 + (rnd(i) - .5) * .1, len = (.45 + rnd(i + 3) * .4 + erupt * .25), sx = px + dir * hw * .22;
+        let x = sx, y = py + 4 * sc; g.beginPath(); g.moveTo(x, y);
+        for (let k = 1; k <= 8; k++) { const f = k / 8; x = sx + dir * hw * .9 * f * len + Math.sin(f * 7 + i * 2) * 7 * sc; y = py + (base - py) * Math.min(1, f * len) * .98; g.lineTo(x, y); }
+        g.strokeStyle = `rgba(255,${110 + Math.round(pulse * 40)},30,${.5 + erupt * .4})`; g.lineWidth = (4.5 - i % 2) * sc; g.lineCap = 'round'; g.shadowColor = 'rgba(255,110,30,.9)'; g.shadowBlur = 10 * sc; g.stroke();
+        g.shadowBlur = 0; g.strokeStyle = 'rgba(255,225,140,.85)'; g.lineWidth = 1.4 * sc; g.stroke();
+      }
+      // The crater: a glowing lava lake with a flickering rim of flame.
+      const cr = 34 * sc, glow = g.createRadialGradient(px, py - 4 * sc, 2, px, py - 4 * sc, 150 * sc); glow.addColorStop(0, 'rgba(255,215,130,.95)'); glow.addColorStop(.25, 'rgba(255,125,40,.6)'); glow.addColorStop(1, 'rgba(255,80,20,0)');
+      g.fillStyle = glow; g.fillRect(px - 160 * sc, py - 160 * sc, 320 * sc, 320 * sc);
+      g.fillStyle = '#2a1114'; g.beginPath(); g.ellipse(px, py, cr * 1.15, 11 * sc, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = `rgb(255,${150 + Math.round(pulse * 50)},50)`; g.beginPath(); g.ellipse(px, py, cr, 8 * sc, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#fff0b0'; g.beginPath(); g.ellipse(px, py - sc, cr * .55, 3.5 * sc, 0, 0, Math.PI * 2); g.fill();
+      for (let i = 0; i < 7; i++) {
+        const fx = px + (i - 3) * cr * .28, fh = (16 + rnd(i + 20) * 20 + erupt * 26) * sc * (.7 + .3 * Math.sin(t * 8 + i * 1.7)), fw = 6 * sc;
+        const fl = g.createLinearGradient(0, py, 0, py - fh); fl.addColorStop(0, 'rgba(255,230,140,.95)'); fl.addColorStop(1, 'rgba(255,80,20,0)');
+        g.fillStyle = fl; g.beginPath(); g.moveTo(fx - fw, py); g.quadraticCurveTo(fx - fw * .4, py - fh * .6, fx + Math.sin(t * 5 + i) * 4 * sc, py - fh); g.quadraticCurveTo(fx + fw * .4, py - fh * .6, fx + fw, py); g.closePath(); g.fill();
+      }
+      // Smoke and ash drifting up and to the right, thicker in the eruption.
+      for (let i = 0; i < 14; i++) {
+        const u = (t * .07 + i / 14) % 1, sx2 = px + u * w * .16 + Math.sin(t * .8 + i) * 8 * sc, sy2 = py - 14 * sc - u * h * .3, r = (14 + u * 42) * sc;
+        g.fillStyle = `rgba(${52 + Math.round((1 - u) * 60)},${34 + Math.round((1 - u) * 22)},38,${(1 - u) * (.28 + erupt * .3)})`; g.beginPath(); g.arc(sx2, sy2, r, 0, Math.PI * 2); g.fill();
+      }
+      // The foot: sea haze over the base and the glow on the water.
+      g.save(); g.translate(px, base + 2 * sc); g.scale(1, .2); const haze = g.createRadialGradient(0, 0, hw * .2, 0, 0, hw * 1.7); haze.addColorStop(0, 'rgba(110,60,56,.97)'); haze.addColorStop(.6, 'rgba(110,60,56,.8)'); haze.addColorStop(1, 'rgba(110,60,56,0)'); g.fillStyle = haze; g.beginPath(); g.arc(0, 0, hw * 1.7, 0, Math.PI * 2); g.fill(); g.restore();
+      for (let i = 0; i < 12; i++) { const rx = px + (rnd(i + 40) - .5) * hw * .8, ry = base + 6 * sc + i * 5 * sc, rw = (26 - i * 1.4) * sc * (.7 + .3 * Math.sin(t * 2 + i)); g.fillStyle = `rgba(255,${130 + i * 6},60,${.3 - i * .02})`; g.beginPath(); g.ellipse(rx, ry, rw, 1.6 * sc, 0, 0, Math.PI * 2); g.fill(); }
+      g.restore();
+    }
+    if (far && hall > .01) {    // the gods' hall: a pale gold light with an empty seat
       const hx = w * .8, gr = g.createLinearGradient(hx, 0, hx, h * .46); gr.addColorStop(0, `rgba(255,236,170,${.6 * hall})`); gr.addColorStop(1, 'rgba(255,236,170,0)');
       g.fillStyle = gr; g.beginPath(); g.moveTo(hx - 16, 0); g.lineTo(hx + 16, 0); g.lineTo(hx + 90, h * .46); g.lineTo(hx - 90, h * .46); g.closePath(); g.fill();
       g.save(); g.globalAlpha = hall * .95; g.fillStyle = '#2a2030'; g.fillRect(hx - 9, h * .27, 18, 24); g.fillRect(hx - 13, h * .27 + 24, 26, 6); g.fillRect(hx - 13, h * .27 + 30, 4, 12); g.fillRect(hx + 9, h * .27 + 30, 4, 12); g.restore();
     }
-    // The nine chains from the hall to the forge: they appear one by one, then fail one by one.
-    for (let i = 0; i < 9; i++) {
-      const born = 14.5 + i * .35, dies = 26.5 + i * .9, a = ease((t - born) / .6) * (1 - ease((t - dies) / .8));
-      if (a < .02) continue;
-      const sx = w * (.18 + i * .075), fall = Math.max(0, t - dies), cx0 = (sx + px) / 2 + Math.sin(i) * 30, cy0 = h * (.08 + (i % 3) * .02);
-      g.save(); g.globalAlpha = a * .9;
-      // A thin cable under the links so the chain reads as one line, then big links, each turned a quarter from the last.
-      const at = u => [(1 - u) * (1 - u) * sx + 2 * u * (1 - u) * cx0 + u * u * px, 2 * u * (1 - u) * cy0 + u * u * (py - 6)];
-      if (fall < .3) { g.strokeStyle = 'rgba(120,132,160,.55)'; g.lineWidth = 3; g.beginPath(); for (let k = 0; k <= 20; k++) { const [x, y] = at(k / 20); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
-      g.fillStyle = '#dfe6f2'; g.strokeStyle = '#4f5a78'; g.lineWidth = 2;
-      for (let k = 0; k <= 12; k++) {
-        const [x, y] = at(k / 12), [x2, y2] = at(Math.min(1, (k + 1) / 12)), ang = Math.atan2(y2 - y, x2 - x);
-        g.save(); g.translate(x + (fall * 14) * (rnd(i + k) - .5), y + fall * fall * 70 * rnd(i * 3 + k)); g.rotate(ang);
-        g.beginPath(); g.ellipse(0, 0, k % 2 ? 6 : 10, k % 2 ? 6 : 4.5, 0, 0, Math.PI * 2); g.fill(); g.stroke(); g.restore();
+    // The nine chains: heavy iron from the crater to the gods' empty seat. They appear one by one, glow red-hot, then snap one by one.
+    if (far) {
+      const sc = h / 600, seatX = w * .8, seatY = h * .3, cx = px, cy = py;
+      for (let i = 0; i < 9; i++) {
+        const born = 14.5 + i * .35, dies = 26.5 + i * .9, a = ease((t - born) / .6);
+        if (a < .02 || t > dies + 2.4) continue;
+        const fall = Math.max(0, t - dies), heat = ease((t - (dies - 3)) / 3), cut = .3 + rnd(i + 60) * .4;
+        const x0 = cx + (i - 4) * 6 * sc, y0 = cy - 2 * sc + (i - 4) * 1.5 * sc, x1 = seatX + (i - 4) * 3 * sc, y1 = seatY + 22 * sc + (i - 4) * 15 * sc, sag = (i - 4) * 13 * sc + 8 * sc + Math.sin(t * 1.3 + i) * 2 * sc;
+        const at = u => [x0 + (x1 - x0) * u, y0 + (y1 - y0) * u + Math.sin(u * Math.PI) * sag];
+        const n = Math.round(Math.hypot(x1 - x0, y1 - y0) / (8.5 * sc));
+        g.save(); g.globalAlpha = a * (1 - ease((fall - 1.4) / 1)); g.lineJoin = 'round';
+        for (let k = 0; k <= n; k++) {
+          const u = k / n, [x, y] = at(u), [x2, y2] = at(Math.min(1, u + 1 / n)), ang = Math.atan2(y2 - y, x2 - x), side = u < cut ? -1 : 1;
+          const off = fall > 0 ? fall * fall * 46 * sc * (side < 0 ? 1 + (cut - u) * 2 : .6 + rnd(i * 7 + k) * .8) : 0, sw = fall > 0 ? fall * 34 * sc * (rnd(k + i * 5) - .5) : 0;
+          g.save(); g.translate(x + sw, y + off); g.rotate(ang + (fall > 0 ? side * fall * .9 * (rnd(k + 3) - .3) : 0));
+          const iron = [Math.round(52 + heat * 203), Math.round(56 + heat * 70), Math.round(68 - heat * 30)], hot = heat > .05;
+          if (hot) { g.shadowColor = `rgba(255,110,30,${heat})`; g.shadowBlur = 8 * sc * heat; }
+          if (k % 2 === 0) {   // a link seen face-on: an iron ring with a pale highlight on the upper edge
+            g.strokeStyle = `rgb(${iron})`; g.lineWidth = 2.6 * sc; g.beginPath(); g.ellipse(0, 0, 5.4 * sc, 3.2 * sc, 0, 0, Math.PI * 2); g.stroke();
+            g.shadowBlur = 0; g.strokeStyle = `rgba(${170 + heat * 80},${178 - heat * 40},${200 - heat * 120},.8)`; g.lineWidth = 1 * sc; g.beginPath(); g.ellipse(0, -.5 * sc, 5.4 * sc, 3.2 * sc, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
+          } else {   // a link seen edge-on: a short bar through the ring either side of it
+            g.fillStyle = `rgb(${iron})`; g.fillRect(-3.6 * sc, -1.4 * sc, 7.2 * sc, 2.8 * sc); g.shadowBlur = 0; g.fillStyle = `rgba(${170 + heat * 80},${178 - heat * 40},${200 - heat * 120},.7)`; g.fillRect(-3.6 * sc, -1.4 * sc, 7.2 * sc, .9 * sc);
+          }
+          g.restore();
+        }
+        // Where it snaps: a flash and a burst of sparks.
+        if (fall > 0 && fall < 1.2) {
+          const [bx, by] = at(cut); g.globalAlpha = 1 - fall / 1.2;
+          for (let k = 0; k < 14; k++) { const ang = rnd(k + i * 9) * Math.PI * 2, r = fall * (30 + rnd(k + 5) * 50) * sc; g.fillStyle = k % 2 ? '#ffb14a' : '#fff0a0'; g.beginPath(); g.arc(bx + Math.cos(ang) * r, by + Math.sin(ang) * r + fall * fall * 30 * sc, (1.2 + rnd(k) * 1.6) * sc, 0, Math.PI * 2); g.fill(); }
+        }
+        g.restore();
       }
-      g.restore();
     }
-    if (roots > .01) {   // the roots that hold up the sky begin to burn
+    if (!far && roots > .01) {   // the roots that hold up the sky begin to burn
       g.save(); g.lineCap = 'round';
       for (let i = 0; i < 7; i++) {
         const x = w * (.1 + i * .13), len = h * (.14 + rnd(i) * .1) * roots;
@@ -168,11 +220,11 @@
       }
       g.restore();
     }
-    const s = keyed(t, SPARKS);
-    g.save(); for (let i = 0; i < 70; i++) {
+    const s = far ? 0 : keyed(t, SPARKS);
+    if (s > 0) { g.save(); for (let i = 0; i < 70; i++) {
       const u = (t * (.08 + rnd(i) * .1) + rnd(i + 9)) % 1, x = rnd(i + 3) * w + Math.sin(t + i) * 20, y = h * (1.02 - u * 1.1);
       g.globalAlpha = s * (1 - u) * (.4 + rnd(i + 7) * .6); g.fillStyle = i % 3 ? '#ffb14a' : '#ffe08a'; g.beginPath(); g.arc(x, y, 1.2 + rnd(i + 11) * 2.2, 0, Math.PI * 2); g.fill();
-    } g.restore();
+    } g.restore(); }
   }
 
   // The summoning: a ring of light opens on the deck round the hero and a column of light climbs from it.
@@ -219,6 +271,7 @@
       sea(g, w, h, t, P, f, warm);
       if (t > 30) coast(g, w, h, P, t);
       wake(g, P, f, ship, t);
+      sky(g, w, h, t, warm, true);
       const d2 = { ...D, ship: { ...SHIP, x: ship.x, y0: ship.y0, y1: ship.y1 } };
       if (t > 36) window.MeadowDock.pier(g, D, P, t);
       window.MeadowDock.ship(g, d2, P, t);
@@ -232,7 +285,7 @@
       // The hero on the deck from the first frame, and the summoning that finds them there.
       const H = heroAt(t, ship), [px, py] = P(H.x, H.y, H.z), [rx, ry] = P(H.x, H.y, deckZ(HERO_U) + 2 + bob(t));
       summon(g, w, h, t, rx, ry, f.k);
-      sky(g, w, h, t, warm);
+      sky(g, w, h, t, warm, false);
       // A soft vignette for the film look; it lifts as the scene settles into the game's own view.
       const vig = .42 * (1 - e);
       if (vig > .01) { const v = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .38, w / 2, h / 2, Math.hypot(w, h) * .6); v.addColorStop(0, 'rgba(4,6,14,0)'); v.addColorStop(1, `rgba(4,6,14,${vig})`); g.fillStyle = v; g.fillRect(0, 0, w, h); }
