@@ -231,12 +231,14 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(await page.locator('#npc-name').textContent() === 'Captain Ingrid Stormwatch', 'A click on the gate captain reaches her');
   await page.locator('#npc-quest-list .journal-quest[data-quest="city_welcome"]').click();
   await page.locator('#npc-dialogue [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="city_welcome"]')?.dataset.status === 'active', null, { timeout: 15000 }).catch(async error => {
+  // A successful accept closes the dialogue (City.dialogue -> close() once the authoritative ledger lists the quest), so the
+  // hidden #npc-quest-list row is never re-rendered: read the window closing and the live tracker, not that stale row.
+  await page.waitForFunction(() => document.getElementById('npc-dialogue').hidden && /The Great Gate Opens/.test(document.getElementById('quest-tracker')?.textContent || ''), null, { timeout: 15000 }).catch(async error => {
     const state = await page.evaluate(() => ({ row: document.querySelector('#npc-quest-list [data-quest="city_welcome"]')?.dataset.status ?? null, level: Field.hero.level, errors: document.getElementById('error-messages')?.textContent || '', dialogue: document.getElementById('npc-dialogue')?.textContent?.slice(0, 160) }));
     await shot('welcome-accept');
     throw new Error('Accepting the welcome quest did not make it active: ' + JSON.stringify(state), { cause: error });
   });
-  await page.keyboard.press('Escape');
+  // No Escape here: the accept already closed the dialogue, and a bare Escape would open #pause and block the canvas clicks below.
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('The Great Gate Opens') && t.includes('Herald Bran')), 'The welcome appears in the live tracker');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
   for (const id of ['city_herald', 'city_librarian', 'city_guildmaster', 'city_stonewarden', 'city_healer']) {
