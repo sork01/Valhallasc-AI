@@ -185,24 +185,44 @@ const look = page => page.evaluate(() => {
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('A Foothold in the Ash') && t.includes('Scout Kael')), 'Camp introduction appears in the live tracker');
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-journal').isHidden(), 'The journal closes again');
+  // Accepting may already have closed the dialogue; a bare Escape then opens the pause menu, which covers the canvas.
+  if (await page.locator('#npc-dialogue').isVisible()) await page.keyboard.press('Escape');
+  await page.waitForFunction(() => document.getElementById('npc-dialogue').hidden, null, { timeout: 5000 }).catch(() => {});
+  if (await page.locator('#pause').isVisible()) await page.keyboard.press('Escape');
+  check(await page.locator('#pause').isHidden(), 'No pause menu covers the canvas before the camp walk');
   const campIds = ['crags_captain', 'crags_scout', 'crags_healer', 'crags_supplier', 'travel_cinderwatch'];
   check(await page.evaluate(([ids, zoneIds]) => ids.every(id => City.npcs.some(n => n.id === id)) && City.npcs.every(n => zoneIds.includes(n.id)) && Quests.marker('crags_scout') === '◆', [campIds, MAP_CRAGS_NPCS]), 'The camp NPCs, travel master and talk-objective markers are shown');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
   await page.waitForTimeout(700);
   for (const id of ['crags_scout', 'crags_healer', 'crags_supplier']) {
-    // Real canvas clicks on the NPC body exercise picking and obstacle-aware automatic travel.
+    // Stand beside each person first (inside the two-tile talk reach), as tests/rimeveil-ui.cjs does: from seven tiles
+    // away the walk to the body stalls one step short of the talk reach and the dialogue never opens (lookinto.md).
+    const beside = await page.evaluate(id => { const n = City.npcs.find(n => n.id === id); return [n.x - 1, n.y + 1]; }, id);
+    await stageAt(1, ...beside);
+    // Real canvas clicks on the NPC body exercise picking.
     const [sx, sy] = await page.evaluate(id => { const n = City.npcs.find(n => n.id === id); return Field._debug.w2s(n.x, n.y); }, id);
     const box = await page.locator('#fieldcv').boundingBox();
-    await page.mouse.click(box.x + sx / 1600 * box.width, box.y + (sy - 55) / 900 * box.height);
+    const cx = box.x + sx / 1600 * box.width, cy = box.y + (sy - 55) / 900 * box.height;
+    await page.mouse.click(cx, cy);
     await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 }).catch(async error => {
       if (!page.isClosed()) await shot('camp-interaction-stuck').catch(() => {});
       const state = page.isClosed() ? 'page closed' : JSON.stringify(await page.evaluate(() => ({ hero: { x: Field.hero.x, y: Field.hero.y, goal: Field.hero.goal }, errors: document.getElementById('npc-notice')?.textContent })).catch(() => 'page unavailable'));
       throw Error(`NPC ${id}, click ${sx},${sy}: ${state}`, { cause: error });
     });
     check(await page.locator('#npc-name').textContent() === await page.evaluate(id => City.npcs.find(n => n.id === id).name, id), `Canvas interaction reaches ${id}`);
-    if (id === 'crags_healer') check((await page.locator('#npc-offers').textContent()).includes('Health Potion'), 'Camp healer offers healing supplies');
-    if (id === 'crags_supplier') check((await page.locator('#npc-offers').textContent()).includes('Stew') && (await page.locator('#npc-offers').textContent()).includes('Satchel'), 'Quartermaster offers food and bags');
-    await page.keyboard.press('Escape');
+    // The stock is one step down: the greeting offers Buy, and the wares (Health Potion, Stew, Satchel) are listed behind it.
+    if (id === 'crags_healer' || id === 'crags_supplier') {
+      await page.locator('#npc-offers [data-view="buy"]').click();
+      await page.waitForFunction(() => Shop.open && document.querySelector('.merchant-workspace[aria-busy="false"]'), null, { timeout: 15000 });
+      const stock = await page.evaluate(() => document.getElementById('merchant-stock')?.textContent || '');
+      if (id === 'crags_healer') check(stock.includes('Health Potion'), `Camp healer offers healing supplies (${JSON.stringify(stock.slice(0, 200))})`);
+      else check(stock.includes('Stew') && stock.includes('Satchel'), `Quartermaster offers food and bags (${JSON.stringify(stock.slice(0, 200))})`);
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !Shop.open, null, { timeout: 5000 }).catch(() => {});
+    }
+    // Close only what is still open: a bare Escape with nothing open opens the pause menu, which covers the canvas.
+    if (await page.locator('#npc-dialogue').isVisible()) await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.getElementById('npc-dialogue').hidden, null, { timeout: 5000 }).catch(() => {});
     await page.waitForTimeout(600);
   }
   await page.keyboard.press('f');
@@ -211,9 +231,10 @@ const look = page => page.evaluate(() => {
   await page.keyboard.press('Escape');
   await page.keyboard.press('q');
   const introduction = page.locator('#quest-list [data-quest="crags_welcome"]');
-  await introduction.locator(':scope > summary').click(); await introduction.locator('.quest-state').waitFor({state:'visible'});
-  check((await introduction.textContent()).includes('Ready to turn in'), 'All three camp conversations complete the introduction');
-  await introduction.locator('button').filter({ hasText: 'Return to Captain Sera' }).click();
+  // The journal row is the quest button; its detail opens on the page beside the list.
+  await introduction.click(); const detail = page.locator('#quest-page article[data-quest="crags_welcome"]'); await detail.locator('.quest-state').waitFor({state:'visible'});
+  check((await detail.locator('.quest-state').textContent()).includes('Ready to turn in'), 'All three camp conversations complete the introduction');
+  await detail.locator('.journal-visit').filter({ hasText: 'Return to Captain Sera' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-quest-list .journal-quest[data-quest="crags_welcome"] .gossip-icon').textContent() === '?', 'A finished quest shows a question mark at its giver');
   await page.locator('#npc-quest-list .journal-quest[data-quest="crags_welcome"]').click();
@@ -223,10 +244,12 @@ const look = page => page.evaluate(() => {
   await page.keyboard.press('Escape');
   await page.evaluate(() => Field.visitNpc('crags_supplier'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
-  const questLeft = (await page.locator('#npc-quest-list .journal-quest').first().boundingBox()).x;
-  const offerLeft = (await page.locator('#npc-offers .gossip-row').first().boundingBox()).x;
-  check(questLeft < offerLeft, 'Quest titles use the dark sidebar beside the parchment services');
-  check(await page.locator('#npc-quest-list .journal-quest[data-repeatable="true"] .journal-quest-mark').first().evaluate(e => getComputedStyle(e).color) === 'rgb(100, 181, 255)', 'Repeatable bounties get a blue icon');
+  // Since the one-column conversation window (Beta 1.48.0) the quest rows sit in the parchment above the services.
+  const questTop = (await page.locator('#npc-quest-list .journal-quest').first().boundingBox()).y;
+  const offerTop = (await page.locator('#npc-offers .gossip-row').first().boundingBox()).y;
+  check(questTop < offerTop, `Quest titles sit in the parchment above the services (${Math.round(questTop)} < ${Math.round(offerTop)})`);
+  // The conversation rows are gossip rows now: a repeatable bounty's icon is blue (online.css `.gossip-row[data-repeatable]`).
+  check(await page.locator('#npc-quest-list .gossip-row[data-repeatable="true"] .gossip-icon').first().evaluate(e => getComputedStyle(e).color) === 'rgb(93, 178, 255)', 'Repeatable bounties get a blue icon');
   await page.screenshot({ path: path.join(world.artifacts, 'npc-gossip.png') });
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Expand quest tracker' }).click();
@@ -262,9 +285,10 @@ const look = page => page.evaluate(() => {
   // Needs the real animation frames; the stub is one still picture. `npm run test:art` runs this suite on the real art.
   check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All five monsters draw something new in each state: idle, windup, lunge, hurt, early and late dying frames, then gone (${seen.length} states)`);
   const campPosition = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
-  await stageAt(1, 81, 10);
+  // the Cinderlord's arena is on the Horned Terrace: its authored spawn is (246,160) in map.txt zones[0] (zone 1)
+  await stageAt(1, 243, 162);
   await page.waitForTimeout(800);
-  check(await page.evaluate(() => { const s = Field.slimes.find(s => s.kind === 'cinderlord'); return s && s.d.elite && s.d.name === 'Cinderlord' && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 7; }), 'The real Cinderlord appears in the northeastern arena with an elite nameplate');
+  check(await page.evaluate(() => { const s = Field.slimes.find(s => s.kind === 'cinderlord'); return s && s.d.elite && s.d.name === 'Cinderlord' && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 7; }), 'The real Cinderlord appears on the Horned Terrace with an elite nameplate');
   await shot('cinderlord-elite');
   await stageAt(1, campPosition.x, campPosition.y);
   await page.waitForFunction(() => !Field.slimes.some(s => s.id >= 1000 && s.id <= 1004), null, { timeout: 10000 });
@@ -273,7 +297,9 @@ const look = page => page.evaluate(() => {
   // Walk north along the trail through the first ford, stopping as soon as a monster comes into view (before it
   // can notice us), and look at the lava river, the charred scenery and the monster's level label.
   const route = await page.evaluate(() => { const z = Field._debug.zones[1]; return Field._debug.routeTo({ x: z.paths[0][4][0], y: z.paths[0][4][1] + 1 }, true); });
-  check(route.length > 30, `The client can route across the Crags through the first ford (${route.length} steps)`);
+  // The route comes back as waypoints (8 for this stretch), so judge its length in tiles, from the hero to the end.
+  const routeTiles = await page.evaluate(route => { let at = { x: Field.hero.x, y: Field.hero.y }, sum = 0; for (const p of route) { sum += Math.hypot(p.x - at.x, p.y - at.y); at = p; } return sum; }, route);
+  check(route.length >= 6 && routeTiles > 60, `The client can route across the Crags along the first trail (${route.length} waypoints, ${routeTiles.toFixed(0)} tiles)`);
   const nearest = () => page.evaluate(() => Math.min(...Field.slimes.filter(s => !s.dead).map(s => Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y))));
   let lavaSeen = 0;
   // Start from the step where the first wisp spawn is about 20 units away, so the last stretch (and the lava on it) is still walked for real.
@@ -303,7 +329,9 @@ const look = page => page.evaluate(() => {
   await click(back.x, back.y + 1.2);
   await page.waitForFunction(() => Field.zone === 0, null, { timeout: 30000 });
   await page.waitForTimeout(600);
-  check(await page.locator('#area-title b').textContent() === 'Greenmeadow Field' && await page.locator('#city-travel').isVisible(), 'Returning restores the meadow banner and travel button');
+  const backBanner = await page.locator('#area-title b').textContent(), backTravel = await page.locator('#city-travel').isVisible(), backSpan = await page.locator('#area-title span').textContent();
+  // The banner names the meadow region the gate returns to (the Ironhide Scarp, not a fixed name) and the zone (Greenmeadow).
+  check(backBanner.length > 0 && backSpan.includes('Greenmeadow') && backTravel, `Returning restores the meadow banner and travel button (${JSON.stringify({ backBanner, backTravel, backSpan })})`);
   check(await page.evaluate(() => Field.slimes.length > 0 && Field.slimes.every(s => s.zone === 0)), 'Back in the meadow only meadow enemies are shown');
   const again = await look(page);
   check(again.g > again.r, 'The meadow is green again');
