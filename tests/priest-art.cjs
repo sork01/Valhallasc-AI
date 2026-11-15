@@ -113,7 +113,7 @@ const server = http.createServer((req, res) => {
       assert.ok(report.trim[2] < -2, 'west-facing hood opening turns left');
       assert.ok(report.trim[6] > 2, 'east-facing hood opening turns right');
       assert.ok(Math.abs(report.trim[0]) < 2, 'front-facing hood stays centered');
-      assert.ok([3, 4, 5].every(dir => report.trim[dir] === null), 'rear-facing hoods stay closed');
+      assert.ok([3, 4, 5].every(dir => report.trim[dir] === null), 'rear-facing hoods stay closed: trim ' + JSON.stringify(report.trim));
     }
     assert.deepEqual(errors, []);
     fs.mkdirSync(output, { recursive: true });
