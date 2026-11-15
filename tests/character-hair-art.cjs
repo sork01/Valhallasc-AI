@@ -11,6 +11,18 @@ const output = path.resolve(__dirname, '../test-results/turning-hair');
 const candidates = path.join(output, 'assets');
 const classes = ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
 const prefix = cls => cls === 'warrior' ? 'warrior_layered' : cls;
+// Inputs are git-ignored generated data. Each rig's `<stem>_hair-check.txt` comes from the full exporter run (not --measure-only,
+// which needs the candidate PNGs that the same run writes). The exporter imports the Python rig make_warrior_sprites.py from
+// VALHALLA_TOOLS or /media/raid/valhallasc-data/valhalla-tools, and needs numpy, Pillow and scipy.
+const generator = (cls, gender) => `python3 scripts/export_character_body.py ${cls}${gender === 'female' ? ' --female' : ''}`;
+function preflight() {
+  const missing = [];
+  for (const cls of classes) for (const gender of ['male', 'female']) {
+    const file = path.join(candidates, prefix(cls) + (gender === 'female' ? '_f' : '') + '_hair-check.txt');
+    if (!fs.existsSync(file)) missing.push(`  ${path.relative(path.resolve(__dirname, '..'), file)}  <-  ${generator(cls, gender)}`);
+  }
+  if (missing.length) throw Error(`character-hair-art: candidate data is missing (git-ignored, not in the repo). Generate it from the repo root with the commands below, then rerun:\n${missing.join('\n')}`);
+}
 const server = http.createServer((req, res) => {
   const name = new URL(req.url, 'http://localhost').pathname;
   if (name === '/') {
@@ -39,6 +51,7 @@ function variation(data, frames) {
 (async () => {
   let browser, total = 0;
   const reports = [];
+  preflight();
   try {
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     browser = await chromium.launch({ headless: true });

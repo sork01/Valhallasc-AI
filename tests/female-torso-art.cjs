@@ -9,6 +9,25 @@ const root = path.resolve(__dirname, '../client');
 const out = process.env.TORSO_ART_DIR ? path.resolve(process.env.TORSO_ART_DIR) : path.resolve(__dirname, '../test-results/female-torso');
 const candidates = path.join(out, 'assets'), before = path.join(out, 'before');
 const classes = ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
+// Usage: TORSO_ART_DIR=<dir> node tests/female-torso-art.cjs (default <repo>/test-results/female-torso). The dir must hold
+//   <dir>/assets/   the candidate female body/outfit files, made by: python3 scripts/export_character_torso.py <class> --out <dir>/assets
+//   <dir>/before/   the same files as they are in client/assets now, copied from client/assets (<class>_f_* for all five classes)
+// The exporter imports the Python rig make_warrior_sprites.py (VALHALLA_TOOLS or /media/raid/valhallasc-data/valhalla-tools).
+const stemOf = cls => (cls === 'warrior' ? 'warrior_layered' : cls) + '_f';
+function preflight() {
+  const missing = [];
+  for (const cls of classes) {
+    const stem = stemOf(cls);
+    for (const dir of [candidates, before]) {
+      const meta = path.join(dir, stem + '_sprites.txt');
+      if (!fs.existsSync(meta)) { missing.push(`  ${meta}`); continue; }
+      for (const part of Object.values(JSON.parse(fs.readFileSync(meta, 'utf8')).parts)) for (const key of ['png', 'depth']) if (part[key] && !fs.existsSync(path.join(dir, part[key]))) missing.push(`  ${path.join(dir, part[key])}`);
+    }
+  }
+  if (missing.length) throw Error(`female-torso-art: TORSO_ART_DIR=${out} is missing git-ignored inputs:\n${missing.join('\n')}\n` +
+    `Make <dir>/assets with: ${classes.map(c => `python3 scripts/export_character_torso.py ${c} --out ${candidates}`).join(' ; ')}\n` +
+    `Make <dir>/before by copying the current client/assets/*_f_* files (sprites, bounds, body/outfit PNG and depth) into it.`);
+}
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   if (url.pathname === '/') {
@@ -30,6 +49,7 @@ const server = http.createServer((req, res) => {
 });
 (async () => {
   let browser, checks = 0;
+  preflight();
   try {
     await new Promise(r => server.listen(0, '127.0.0.1', r));
     browser = await chromium.launch({ headless: true });
