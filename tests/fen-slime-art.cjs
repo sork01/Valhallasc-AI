@@ -129,7 +129,13 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
       check(dd[7].opaque > i0.opaque*.6, `${kind}: rigid armour/bark keeps its mass in the death sequence (${dd[7].opaque} vs idle ${i0.opaque})`);
     }
     fs.writeFileSync(path.join(w.runDir, 'fen-slime-portraits.png'), Buffer.from(result.portraits.split(',')[1], 'base64'));
+    // Stand beside a real spawn of this kind before reading it: after the previous kind's teleport, this kind can be out of the snapshot range.
+    const gloamSpawns = JSON.parse(fs.readFileSync(path.join(__dirname, '../world/map.txt'), 'utf8')).zones[2].slimes;
     for (const kind of kinds) {
+      const sp = gloamSpawns.find(s => s.kind === kind);
+      check(sp, `${kind}: map has a Gloamfen spawn to stand beside`);
+      await p.evaluate(s => Online.send({ type: 'debug', command: { op: 'teleport', zone: 3, x: s.x + 3, y: s.y + 2 } }), sp);
+      await p.waitForFunction(k => Field.slimes.some(s => s.kind === k && !s.dead), kind, { timeout: 30000 });
       const spot = await p.evaluate(kind => {
         const s = Field.slimes.find(s => s.kind === kind && !s.dead);
         return s && { x: s.x, y: s.y, top:s.d.top };

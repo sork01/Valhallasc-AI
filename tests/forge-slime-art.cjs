@@ -33,6 +33,7 @@ function check(value, label) {
     browser = await chromium.launch({ headless: true });
     const p = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
     p.on('pageerror', e => errors.push(e.message));
+    if (process.env.MUTATE_FIRELORD) await p.route('**/assets/cathedral.txt*', async r => { const res = await r.fetch(); const m = await res.json(); delete m.atlases.ember_firelord; r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(m) }); });
     if (process.env.MUTATE_PNG) {
       await p.route(`**/assets/cathedral_${process.env.MUTATE_KIND}.png*`, r => r.fulfill({ path: process.env.MUTATE_PNG, contentType: 'image/png' }));
     }
@@ -198,7 +199,7 @@ function check(value, label) {
     check(new Set(kinds.map(k => result.data[k].rows.find(r => r.clip === 'die' && r.n === 7).hash)).size === kinds.length, 'Checked kinds retain distinct final death silhouettes');
     const borrowed = await p.evaluate(async all => {
       const src=Field.cathedralSprites;
-      const aliases=CATHEDRAL_ENEMIES.filter(e=>all.includes(e.artFrom));
+      const aliases=CATHEDRAL_ENEMIES.filter(e=>all.includes(e.artFrom)&&e.kind!=='ember_firelord');
       for(const e of aliases) if(!src.img[e.kind]?.complete) {const im=new Image();im.src='assets/cathedral_'+e.artFrom+'.png';await im.decode();src.img[e.kind]=im;}
       return aliases.map(e=>{
         const k=e.kind, base=e.artFrom, fr=Field.frameOf(src,k), bf=Field.frameOf(src,base);
@@ -212,6 +213,11 @@ function check(value, label) {
     }, kinds);
     for(const e of borrowed) check(e.sameFrame&&e.sameSource&&e.sameTop&&e.ready&&e.opaque>80,
       e.kind+': borrowed Forge art follows '+e.base+' source, frame, top and portrait');
+    // ember_firelord is not a borrower any more: its manifest names its own atlas and its own PixelFlow source (Beta 1.44.0).
+    // Its artFrom link to cf_eldmarr is stale and must not be followed. MUTATE_FIRELORD=1 drops the atlas entry and must fail.
+    const fl = await p.evaluate(() => { const m = Field.cathedralSprites.meta;
+      return { atlas: m.atlases?.ember_firelord || '', own: m.sprites.ember_firelord !== m.sprites.cf_eldmarr, frame: m.kindFrames?.ember_firelord?.frame?.join() || '' }; });
+    check(fl.atlas === 'cathedral_ember_firelord.png' && fl.own && fl.frame === '176,172', 'ember_firelord: own atlas, own PixelFlow source and own frame (not borrowed from cf_eldmarr)');
     const portraitBuf = Buffer.from(result.portraits.split(',')[1], 'base64');
     fs.writeFileSync(path.join(w.runDir, 'forge-slime-portraits.png'), portraitBuf);
     if (!mutateKind) fs.writeFileSync(path.join(outDir, 'forge-slime-portraits.png'), portraitBuf);
