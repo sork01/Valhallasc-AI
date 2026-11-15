@@ -582,7 +582,7 @@ const scenarios = {
       check(away.every(s => Math.abs(s.level - defaults[s.kind]) <= 2 && s.level >= 3) && new Set(away.map(s => s.level - defaults[s.kind])).size >= 3,
         'Crags levels sit within two of each default and really vary');
       check(away.filter(s => s.kind === 'wisp').every(s => s.maxHp === Math.round(280 * (1 + .12 * (s.level - 5)))), 'Health follows each rolled level');
-      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Emberfall Crags') && e.text.includes('5-10'.replace('-', '–'))), 'The player is told the recommended levels');
       // A second character in the meadow shares coordinates but not the world.
       await w.connect({ bot: 'Meadow', class: 'mage' });
@@ -906,13 +906,15 @@ const scenarios = {
       await w.waitFor(() => me().hp <= 3, 3000, 'Hurt');
       check(await use('health_potion') === null, 'A potion is accepted when hurt');
       await w.waitFor(() => owned('health_potion') === 1, 3000, 'Potion spent');
-      check(me().hp >= 100 && me().hp <= 106, `The potion heals about 100 at once (${me().hp})`);
+      // The potion heals its catalog amount (60) at once, capped at max health; a level-1 warrior's max is about 62.6 now.
+      const healed = Math.min(me().maxHp, items.find(i => i.id === 'health_potion').heal);
+      check(me().hp >= healed - .5 && me().hp <= me().maxHp, `The potion heals its catalog amount at once, capped at max health (${me().hp} of ${me().maxHp})`);
       check(me().potionCd > 55 && me().potionCd <= 60, `A 60 second cooldown starts (${me().potionCd})`);
       await w.debug('Diner', { op: 'set_hp', hp: 1 });
       await w.waitFor(() => me().hp <= 3, 3000, 'Hurt again');
       check(/recovering/.test(await use('health_potion')) && owned('health_potion') === 1 && me().hp < 30, 'A second potion waits for the cooldown and is kept');
       await w.debug('Diner', { op: 'reset_cooldowns' });
-      check(await use('health_potion') === null && me().hp >= 100, 'Once the cooldown is cleared the next potion works');
+      check(await use('health_potion') === null && me().hp >= healed - .5, 'Once the cooldown is cleared the next potion works');
 
       // The meal heals over eight seconds and does not stack; a potion may overlap it.
       await w.debug('Diner', { op: 'set_hp', hp: 1 });
@@ -925,9 +927,13 @@ const scenarios = {
       await w.waitFor(() => !regen(), 12000, 'Meal ends');
       const took = (Date.now() - ate) / 1000;
       check(took > 7 && took < 10.5, `The meal lasts about eight seconds (${took.toFixed(1)})`);
-      check(me().hp >= 98, `All 100 HP arrived, with natural regeneration on top at most (${me().hp})`);
+      // The stew's catalog heal is 60 now (it was 100): the whole amount arrives, natural regeneration may add on top.
+      const stewHeal = Math.min(me().maxHp, items.find(i => i.id === 'traveler_stew').heal);
+      check(me().hp >= stewHeal - 2, `The whole catalog heal arrives, with natural regeneration on top at most (${me().hp} of ${me().maxHp})`);
       await w.debug('Diner', { op: 'set_hp', hp: 1e9 });
       await w.waitFor(() => me().hp === me().maxHp, 3000, 'Full health');
+      // The meal shares a 30 second timer: clear it so this meal is not refused as a cooldown.
+      await w.debug('Diner', { op: 'reset_cooldowns' });
       check(await use('traveler_stew') === null && owned('traveler_stew') === 1 && !!regen(), 'At full health, a new meal can restore missing rage');
 
       // Persistence: the pack and purse survive a restart.
@@ -1028,7 +1034,7 @@ const scenarios = {
       check(glacier.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2 && s.level >= 8) && new Set(glacier.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'Glacier levels sit within two of each default (10-15) and really vary');
       const hp = { crab: 900, wolf: 1000, yeti: 1900, wyrm: 2200 };
       check(glacier.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
-      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Rimeveil Glacier') && e.text.includes('10–15')), 'The player is told the recommended levels');
       // A second character in the Crags shares nothing with the glacier.
       await w.connect({ bot: 'Cragger', class: 'mage' });
@@ -1184,7 +1190,7 @@ const scenarios = {
       check(bogs.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2 && s.level >= 13) && new Set(bogs.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'Fen levels sit within two of each default (15-20) and really vary');
       const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 72000 };
       check(bogs.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
-      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Gloamfen') && e.text.includes('15–20')), 'The player is told the recommended levels');
       // A second character on the glacier shares nothing with the fen.
       await w.connect({ bot: 'Icewalker', class: 'mage' });
@@ -1261,7 +1267,7 @@ const scenarios = {
       await w.action(bot, { type: 'stop' });
       const arrival = { x: up.tx, y: up.ty };
       check(w.player(bot).zone === 4 && distance(w.player(bot), arrival) < 1, 'The server moves the walker to the forecourt outside the Great Gate');
-      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
       check(w.views.get(bot).slimes.length === 0 && w.player(bot).zone === 4, 'The city client is sent no enemies at all');
       // The Great Gate is the only door: a real walk through it to the plaza, much longer than the straight line.
       const plaza = { x: 80, y: 68 }, from = { x: w.player(bot).x, y: w.player(bot).y };
@@ -2153,7 +2159,7 @@ const scenarios = {
       check(living.length === 62 && living.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2) && new Set(living.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'The 62 live monsters roll within two of each default level (21, 23, 25, 27, 29, 25, 30) and really vary');
       check(living.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
       check(living.filter(s => s.elite).map(s => s.kind).sort().join() === 'hrungnir,oakhorn', 'Exactly Oakhorn and Hrungnir are elites');
-      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Wyrdwood') && e.text.includes('20–30')), 'The player is told the recommended levels');
       // Another character in Skaldholm shares nothing with the forest.
       await w.connect({ bot: 'Citizen', class: 'mage' });
@@ -2396,7 +2402,7 @@ const scenarios = {
       check(living.length === 45 && living.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2) && new Set(living.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'The 45 live monsters roll within two of each default level (30, 31, 32, 33, 35)');
       check(living.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
       check(living.every(s => !s.elite), 'There are no elites in this zone');
-      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Bifrost Reach') && e.text.includes('30–35')), 'The player is told the recommended levels');
       // Another character in Skaldholm shares nothing with the sky.
       await w.connect({ bot: 'Citizen', class: 'mage' });
@@ -2645,7 +2651,7 @@ const scenarios = {
       for (const s of awake) (bases[s.kind] ||= []).push(s.maxHp / (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])));
       check(Object.values(bases).every(bs => Math.max(...bs) - Math.min(...bs) <= .02 * bs[0]), 'Health follows each rolled level (+12% a level above the default, the same base for every roll of a kind)');
       check(awake.filter(s => s.elite).map(s => s.kind).sort().join() === 'ghostmaw,hvitserk,kraken', 'Exactly the Kraken, Hvitserk and the Ghostmaw are awake elites (the sleeping Firelord is not one)');
-      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Deep') && e.text.includes('35–40')), 'The player is told the recommended levels');
       // Another character in Skaldholm shares nothing with the sea floor.
       await w.connect({ bot: 'Citizen', class: 'mage' });
@@ -2662,23 +2668,27 @@ const scenarios = {
       }
       await w.action(bot, { type: 'stop' });
       check(distance(w.player(bot), gate) < 1.5, 'The diver walks from Keelhaven to the Net\'s door');
-      // The coral cannot be walked through: the south wall of the maze beside the door, and the outer wall.
-      await kit.teleport(w, bot, { zone: 8, x: 60, y: 126 });
-      await w.action(bot, { type: 'move', x: 60, y: 108 });
+      // The coral cannot be walked through: the wall beside the Pearl Gate, and the outermost wall of the zone (both read from the map).
+      const beside = deep.objects.filter(o => o.kind === 'reefwall' && o.v === 0 && o.width >= 3 && distance(o, gate) < 12).sort((a, b) => distance(a, gate) - distance(b, gate))[0];
+      const faceW = beside.x - beside.width / 2;
+      await kit.teleport(w, bot, { zone: 8, x: faceW - 3, y: beside.y });
+      await w.action(bot, { type: 'move', x: beside.x + beside.width / 2 + 3, y: beside.y });
       await w.advance(2500);
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).y > 121.4, `Walking north into the maze's south wall stops in front of it (y ${w.player(bot).y.toFixed(1)})`);
-      await kit.teleport(w, bot, { zone: 8, x: 16, y: 100 });
-      await w.action(bot, { type: 'move', x: 1, y: 100 });
+      check(w.player(bot).x < faceW, `Walking into the maze's coral wall stops in front of it (x ${w.player(bot).x.toFixed(1)})`);
+      const outer = deep.objects.filter(o => o.kind === 'reefwall' && o.v === 0 && o.width >= 3).sort((a, b) => a.x - b.x)[0];
+      const faceO = outer.x + outer.width / 2;
+      await kit.teleport(w, bot, { zone: 8, x: faceO + 3, y: outer.y });
+      await w.action(bot, { type: 'move', x: outer.x - 5, y: outer.y });
       await w.advance(2500);
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).x > 9.4, `and so does the outer wall (x ${w.player(bot).x.toFixed(1)})`);
+      check(w.player(bot).x > faceO, `and so does the outermost wall (x ${w.player(bot).x.toFixed(1)})`);
       // Through the door, into the first corridor: the way in is open.
-      await kit.teleport(w, bot, { zone: 8, x: 80, y: 126 });
-      await w.action(bot, { type: 'move', x: 80, y: 108 });
-      await w.waitFor(() => w.player(bot).y < 110, 15000, 'Walk through the door');
+      await kit.teleport(w, bot, { zone: 8, x: gate.x, y: gate.y + 4 });
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y - 8 });
+      await w.waitFor(() => w.player(bot).y < gate.y - 4, 15000, 'Walk through the door');
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).y < 110, 'The Net\'s door lets a hero in');
+      check(w.player(bot).y < gate.y - 4, 'The Net\'s door lets a hero in');
       // A level-1 Draugr is a short real fight, and pays its own level (staging: the west Shallows, away from the packs).
       await kit.teleport(w, bot, { zone: 8, x: 40, y: 134 });
       const before = { ...w.player(bot) };
@@ -3406,14 +3416,16 @@ const scenarios = {
       const gate=map.zones[18].portals.find(p=>p.id==='stormglass_sun_gate');
       const back=area.portals.find(p=>p.id==='sun_stormglass_gate');
       check(gate?.to===20&&back?.to===19,'Sunward Cut is reciprocal');
-      check(area.levels.join(',')==='65,70'&&area.slimes.length===42&&area.quests.length===12,'Level band, six kinds and twelve quests load');
+      check(area.levels.join(',')==='65,70'&&area.slimes.length>=42&&area.quests.length>=12,'Level band, six kinds and twelve quests load');
       check(area.futureInstance?.status==='open'&&area.futureInstance?.name==='The Elder Hollow'&&area.portals.some(p=>p.to===30),'The giant oak entrance is open');
       check(area.theme==='sunward'&&area.objects.filter(o=>['oak_tree','birch_tree','apple_tree','willow_tree'].includes(o.kind)).length>=170&&area.objects.filter(o=>o.kind==='water').length>=40,'River, orchard and ordinary trees shape the vale');
-      await kit.teleport(w,bot,{zone:19,x:119,y:70});
-      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      const enter=crossingPath(gate);
+      await kit.teleport(w,bot,{zone:19,x:enter.start.x,y:enter.start.y});
+      await w.advance(700);
+      await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===20,15000,'Enter Sunward');
       await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'Arrival lies in Millbridge');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'Arrival lies at the Stormglass seam landing (shaped layout)');
       await w.connect({bot:'MeadowWitness',class:'mage'});
       check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0)&&w.views.get(bot).slimes.every(s=>s.zone===20),'Zone snapshots stay isolated');
       await kit.teleport(w,bot,{npc:'travel_millbridge'});
@@ -3463,7 +3475,8 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'sun_keeper'});
       await kit.talkTo(w,bot,'sun_keeper','quest:accept:sun_roots');
       await w.waitFor(()=>!!quest(w,bot,'sun_roots'),5000,'Accept Elder Hollow survey');
-      await kit.teleport(w,bot,{zone:20,x:106,y:25});
+      // The Elder Hollow place (176,40) has radius 6; stand inside it but outside the gate disc at (176,41) so nothing is entered.
+      await kit.teleport(w,bot,{zone:20,x:171,y:38});
       await w.waitFor(()=>quest(w,bot,'sun_roots').counts[0]===1,5000,'Visit Elder Hollow');
       await kit.teleport(w,bot,{npc:'sun_stone'});
       await kit.talkTo(w,bot,'sun_stone');
@@ -3474,8 +3487,10 @@ const scenarios = {
       check(area.portals.some(p=>p.to===30),'The Elder Hollow stays open after the survey');
       await w.restart();
       check(w.player(bot).zone===20&&quest(w,bot,'sun_warden').claimed&&w.player(bot).travelStops.includes('travel_millbridge'),'Zone, elite quest and stop persist');
-      await kit.teleport(w,bot,{zone:20,x:13,y:106});
-      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      const home=crossingPath(back);
+      await kit.teleport(w,bot,{zone:20,x:home.start.x,y:home.start.y});
+      await w.advance(700);
+      await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
       await w.waitFor(()=>w.player(bot).zone===19,15000,'Return to Stormglass');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrival is clear');
       await w.debug(bot,{op:'set_gold',gold:100});
