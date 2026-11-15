@@ -14008,5 +14008,6 @@
   "The Shard-King (Elite)": "Skärvkungen (Elit)",
   "The Starfire Rocketeer (Elite)": "Stjärneldsraketören (Elit)",
   "Tidecrusher (Elite)": "Tidkrossaren (Elit)",
-  "Whitewail (Elite)": "Whitewail (Elit)"
+  "Whitewail (Elite)": "Whitewail (Elit)",
+  "That person is out of reach.": "Personen är utom räckhåll."
 }

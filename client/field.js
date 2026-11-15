@@ -3227,7 +3227,7 @@
       if (!paused && pendingNpc) {
         const {npc,until}=pendingNpc;
         const canTalk = (!hero.dead && npc.art !== 'spirit_guide') || (hero.ghost && npc.art === 'spirit_guide');
-        if(!canTalk || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
+        if(!canTalk || tAll>until) {const gaveUp=canTalk;pendingNpc=null;cityRoute=[];Online.send({type:'stop'});if(gaveUp)window.Announce?.show('That person is out of reach.','error');}
         else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];askNpc(npc);}
         else if(npc.route && tAll-routeTime>.35) {                       // a walker has moved on: take a fresh route to where it is now
           const end=cityRoute[cityRoute.length-1];
@@ -5886,7 +5886,7 @@
       }
       return null;
     }, get zoneTheme() { return zdef.theme; }, get yearCentre() { return zdef.yearCentre || null; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox, drawSlimeSprite, enemyCullMargin, enemyShadowK, enemySource },
+    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, expirePendingNpc() { if (pendingNpc) pendingNpc.until = -1; return !!pendingNpc; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, pickPortal, visitPortal, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox, drawSlimeSprite, enemyCullMargin, enemyShadowK, enemySource },
   };
   window.Field = Field;
 })();

@@ -24,6 +24,12 @@ async function call(name, args = {}) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
+  if (process.env.MUTATE) { // drop the give-up notice from the served field.js: the notice check must fail
+    const fs = require('node:fs'); const src = fs.readFileSync(path.join(root, 'client/field.js'), 'utf8');
+    const changed = src.replace("window.Announce?.show('That person is out of reach.','error')", '0');
+    assert.notEqual(changed, src, 'mutation target exists');
+    await page.route('**/field.js*', r => r.fulfill({ contentType: 'text/javascript', body: changed }));
+  }
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('WalkerTalk');
   await page.locator('#go').click({ timeout: 60000 });
@@ -77,6 +83,25 @@ async function call(name, args = {}) {
   check(longestIdle < 0.5, `the hero keeps walking to her while the talk is pending (idle ${longestIdle.toFixed(1)} s with no route and her more than 2.5 tiles away)`);
   check(opened, `The conversation with the walking courier opens after a click on her (hero ${h1.x.toFixed(1)},${h1.y.toFixed(1)}; courier ${c1.x.toFixed(1)},${c1.y.toFixed(1)}; ${Math.hypot(h1.x - c1.x, h1.y - c1.y).toFixed(1)} tiles apart)`);
   if (opened) check((await page.locator('#npc-name').textContent()).includes('Courier Fia'), 'the dialogue is the courier\'s');
+  // The 20 s give-up: expire a second pending talk at once (debug hook) and read the notice the player sees.
+  if (opened) { await page.locator('#npc-dialogue .gossip-row, #npc-quest-close').first().waitFor({ state: 'attached', timeout: 5000 }).catch(() => {}); await page.keyboard.press('Escape').catch(() => {}); }
+  await page.waitForTimeout(300);
+  await debug({ op: 'teleport', zone: 4, x: spot.x, y: spot.y });
+  await page.waitForTimeout(800);
+  const far = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'city_courier'); const [x, y] = Field._debug.w2s(n.x, n.y), cv = document.getElementById('fieldcv'), r = cv.getBoundingClientRect(); return Math.hypot(Field.hero.nx - n.x, Field.hero.ny - n.y) > 2.5; });
+  let pending = false;
+  if (far) pending = await page.evaluate(() => {
+    const n = City.npcs.find(n => n.id === 'city_courier');
+    const [x, y] = Field._debug.w2s(n.x, n.y), cv = document.getElementById('fieldcv'), r = cv.getBoundingClientRect();
+    const clientX = r.left + x / 1600 * r.width, clientY = r.top + (y - City.nameplateTop(n) / 2) / (cv.height * 1600 / cv.width) * r.height;
+    cv.dispatchEvent(new PointerEvent('pointerdown', { clientX, clientY, bubbles: true }));
+    window.dispatchEvent(new PointerEvent('pointerup', { clientX, clientY, bubbles: true }));
+    return Field._debug.expirePendingNpc();
+  });
+  check(far && pending, 'a second click on the walking courier leaves a pending talk to expire');
+  await page.waitForFunction(() => /out of reach/i.test(document.getElementById('error-messages')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+  const notice = await page.evaluate(() => document.getElementById('error-messages')?.textContent || '');
+  check(/That person is out of reach/.test(notice), 'giving up on a pending talk says so: ' + JSON.stringify(notice));
   check(errors.length === 0, 'no page errors: ' + errors.join(' | '));
   console.log(`walker-talk-ui: ${checks} checks passed`);
 })().catch(err => { console.error(err.message); process.exitCode = 1; }).finally(async () => {

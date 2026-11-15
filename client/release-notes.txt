@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.8",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "If you click a townsperson who keeps walking away and you cannot catch up within about 20 seconds, the game now tells you that person is out of reach instead of stopping silently."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.7",
     "date": "2026-11-15",
     "new": [],
