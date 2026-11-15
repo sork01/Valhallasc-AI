@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.55.7",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "The world map legend now lists every elite enemy, and the Lantern Queen shows the right level (82).",
+      "Dungeon and raid entrance markers on the world map no longer sit on top of each other or on town names.",
+      "Walking up to a townsperson who is on the move now re-plans the route more often, so you catch up with them sooner.",
+      "The chat window is a little narrower by default so it no longer overlaps the quick slots."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.6",
     "date": "2026-11-15",
     "new": [],

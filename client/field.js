@@ -3229,7 +3229,7 @@
         const canTalk = (!hero.dead && npc.art !== 'spirit_guide') || (hero.ghost && npc.art === 'spirit_guide');
         if(!canTalk || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
         else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];askNpc(npc);}
-        else if(npc.route && tAll-routeTime>1) {                       // a walker has moved on: take a fresh route to where it is now
+        else if(npc.route && tAll-routeTime>.35) {                       // a walker has moved on: take a fresh route to where it is now
           const end=cityRoute[cityRoute.length-1];
           if(!end || Math.hypot(end.x-npc.x,end.y-npc.y)>2.2) {cityRoute=routeTo(npc,true);routeTime=tAll;}
         }

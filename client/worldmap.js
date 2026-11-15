@@ -114,7 +114,7 @@
     sapbeetle:['Sap Beetle',80,'#e3ae59'],lanternhornet:['Lantern Hornet',80,'#d7cf74'],
     mosslemur:['Moss Lemur',80,'#c8d68a'],barkmimic:['Bark Mimic',80,'#c5a479'],
     sandhopper:['Sandhopper',80,'#ca9958'],dunefennec:['Dune Fennec',81,'#d6a278'],glassscorpion:['Glass Scorpion',82,'#71bed0'],sunvulture:['Sun Vulture',83,'#c69b76'],
-    avalanchebear:['Avalanche Bear (Elite)',92,'#cfe0f2'],harrowox:['Harrow Ox (Elite)',69,'#b8a07a'],equinoxstag:['Equinox Stag (Elite)',98,'#d49a52'],lanternqueen:['Lantern Queen (Elite · 3 players)',83,'#f6e27a'],barkcolossus:['Heartbark Colossus (Elite · 5 players)',84,'#b6965f'],dunecolossus:['Dune Colossus (Elite · 3 players)',84,'#d2a274'],mirageroc:['Mirage Roc (Elite · 5 players)',85,'#8dc3c6'],
+    avalanchebear:['Avalanche Bear (Elite)',92,'#cfe0f2'],harrowox:['Harrow Ox (Elite)',69,'#b8a07a'],equinoxstag:['Equinox Stag (Elite)',98,'#d49a52'],lanternqueen:['Lantern Queen (Elite · 3 players)',82,'#f6e27a'],barkcolossus:['Heartbark Colossus (Elite · 5 players)',84,'#b6965f'],dunecolossus:['Dune Colossus (Elite · 3 players)',84,'#d2a274'],mirageroc:['Mirage Roc (Elite · 5 players)',85,'#8dc3c6'],
     snowhare:['Snow Hare',85,'#c8dce4'],iceotter:['Ice Otter',86,'#86b3c5'],frostheron:['Frost Heron',87,'#b4d7e0'],glaciercrab:['Glacier Crab',88,'#66b4d0'],
     bellmammoth:['Bell Mammoth (Elite · 3 players)',88,'#d8ab68'],auroramanta:['Aurora Manta (Elite · 4 players)',89,'#68bcb8'],crevasseleviathan:['Crevasse Leviathan (Elite · 5 players)',90,'#77c9e4'],
     screeferret:['Scree Ferret',90,'#c4a78a'],stoneibex:['Stone Ibex',91,'#baa88c'],slateraven:['Slate Raven',92,'#828fa0'],ridgeadder:['Ridge Adder',93,'#a1ad87'],
@@ -125,6 +125,14 @@
     lanternowl:['Lantern Owl (Elite)',97,'#e5a76e'],harvestreaper:['Harvest Reaper (Elite)',98,'#ac6c4b'],ambermantis:['Amber Mantis (Elite)',99,'#f2b861'],
     rimesaber:['Rime Saber (Elite)',97,'#a4d9ed'],snowgiant:['Snow Giant (Elite)',98,'#d8eff7'],longnightwyrm:['Longnight Wyrm (Elite)',99,'#9abbd9'],
     ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
+    slagmaw: ['Slagmaw (Elite)', 10, '#e0702a'], ashwing: ['Ashwing (Elite)', 10, '#8a8078'], grinch: ['The Grinch (Elite)', 1, '#badb73'],
+    bloomwarden: ['The Bloomwarden (Elite)', 1, '#ef829d'], birchcrown: ['The Birchcrown Guardian (Elite)', 1, '#ef829d'], briarheart: ['The Briarheart (Elite)', 1, '#e8c967'],
+    starrocketeer: ['The Starfire Rocketeer (Elite)', 1, '#e8c967'], hoarhorn: ['Hoarhorn (Elite)', 15, '#d8e4ee'], whitewail: ['Whitewail (Elite)', 15, '#eef6fc'],
+    shardback: ['Shardback (Elite)', 15, '#7ac8ee'], hollow_rider: ['The Hollow Rider (Elite)', 1, '#ffbd62'], bellowmaw: ['Bellowmaw (Elite)', 20, '#a8c860'],
+    rustmarshal: ['Rustmarshal (Elite)', 20, '#b86a3a'], hangedking: ['The Hanged King (Elite)', 26, '#b8a8c8'], skoll: ['Sköll, the Gale-Alpha (Elite)', 31, '#e4f0ff'],
+    shardking: ['The Shard-King (Elite)', 33, '#bfe9ff'], heimdallr: ["Heimdall's Shade (Elite)", 35, '#cfd8f0'], ambergolem: ['Amber Sap Golem (Elite)', 83, '#f2b445'],
+    cobaltbasilisk: ['Cobalt Basilisk (Elite)', 83, '#9ad0f0'], oldtusker: ['Old Tusker (Elite)', 7, '#8a6548'], orchardqueen: ['The Orchard Queen (Elite)', 7, '#f8d040'],
+    tidecrusher: ['Tidecrusher (Elite)', 7, '#5cae94'],
   };
   for (const e of CATHEDRAL_ENEMIES) KINDS[e.kind]=[e.name+(e.boss?' (Boss)':''),e.level,e.color];
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
@@ -672,21 +680,15 @@
       const source=+marker.dataset.source,p=zones[source].portals.find(p=>p.id===marker.dataset.portal),region=PROVINCES.get(+marker.dataset.parent);
       const hidden=marker.hidden;marker.hidden=false;const size=marker.getBoundingClientRect().width/scale;marker.hidden=hidden;
       const target=atlasPosition(source,p.x,p.y),pad=size/2+2;
-      const [x,y,w,h]=region.box,candidates=[];
-      for(let py=y;py<=y+h;py+=6)for(let px=x;px<=x+w;px+=6) {
-        if(px<pad||px>STAGE.w-pad||py<pad||py>STAGE.h-pad)continue;
-        if(!insidePolygon(region.polygon,px,py))continue;
-        if(occupied.some(b=>px+pad>b.x&&px-pad<b.x+b.w&&py+pad>b.y&&py-pad<b.y+b.h))continue;
-        candidates.push([px,py]);
-      }
-      if(!candidates.length) {
-        for(let py=Math.max(pad,y-40);py<=Math.min(STAGE.h-pad,y+h+40);py+=6)for(let px=Math.max(pad,x-40);px<=Math.min(STAGE.w-pad,x+w+40);px+=6) {
-          if(occupied.some(b=>px+pad>b.x&&px-pad<b.x+b.w&&py+pad>b.y&&py-pad<b.y+b.h))continue;
-          candidates.push([px,py]);
-        }
-      }
-      candidates.sort((a,b)=>Math.hypot(a[0]-target[0],a[1]-target[1])-Math.hypot(b[0]-target[0],b[1]-target[1]));
-      const at=candidates[0]||target;Object.assign(marker.style,{left:`${at[0]/STAGE.w*100}%`,top:`${at[1]/STAGE.h*100}%`});
+      const [x,y,w,h]=region.box;
+      const clear=(px,py)=>!occupied.some(b=>px+pad>b.x&&px-pad<b.x+b.w&&py+pad>b.y&&py-pad<b.y+b.h);
+      const search=(x0,y0,x1,y1,ok)=>{const found=[];for(let py=y0;py<=y1;py+=6)for(let px=x0;px<=x1;px+=6){if(px<pad||px>STAGE.w-pad||py<pad||py>STAGE.h-pad)continue;if(ok(px,py)&&clear(px,py))found.push([px,py]);}return found;};
+      const nearest=list=>list.sort((a,b)=>Math.hypot(a[0]-target[0],a[1]-target[1])-Math.hypot(b[0]-target[0],b[1]-target[1]))[0];
+      const at=nearest(search(x,y,x+w,y+h,(px,py)=>insidePolygon(region.polygon,px,py)))
+        ||nearest(search(x-40,y-40,x+w+40,y+h+40,()=>true))
+        ||nearest(search(pad,pad,STAGE.w-pad,STAGE.h-pad,()=>true))
+        ||target;
+      Object.assign(marker.style,{left:`${at[0]/STAGE.w*100}%`,top:`${at[1]/STAGE.h*100}%`});
       occupied.push({x:at[0]-size/2,y:at[1]-size/2,w:size,h:size});
     }
   }
