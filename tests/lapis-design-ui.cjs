@@ -25,11 +25,14 @@ const ELITES = [['dunecolossus', 58, 96], ['mirageroc', 203, 130], ['cobaltbasil
 const GROUND = ['The Blue Salt Pans', 'The Roc Crag'], lums = {};
 (async () => {
   check(Z.name === 'The Lapis Erg' && Z.size === 296 && Z.shapeFloor && Z.shape.neighbours.join() === '20,23,28', 'The Lapis Erg is the 296 grid with its outline and three neighbours');
-  check(!Z.portals.some(p => p.seam), 'no seam anywhere: none of its neighbours is on the pilot yet');
+  // seamless crossings exist only to the shaped Sunward Vale (20) and Veyrroot Canopy (23); the Yearwheel (28) stays a solid wall with no portal either way
+  check(JSON.stringify(Z.portals.filter(p => p.seam).map(p => p.to).sort((a, b) => a - b)) === '[20,23]', 'the seams are exactly the Sunward Vale (20) and the Veyrroot Canopy (23)');
   check(!Z.portals.some(p => p.to === 28) && !W.zones[27].portals.some(p => p.to === 25), 'the Yearwheel has no portal in either direction');
-  for (const to of [20, 23]) check(Z.portals.some(p => p.to === to && p.walk), `the way to zone ${to} is a rim gate you walk through`);
+  for (const to of [20, 23]) check(Z.portals.some(p => p.to === to && p.seam), `the way to zone ${to} is a seam portal on the shared border`);
   check(Z.portals.some(p => p.id === 'lapis_astrolabe_gate' && p.to === 34), 'the astrolabe door leads to the Sunken Astrolabe');
-  for (const p of Z.portals) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
+  // a seam portal sits on the shared border, one tile outside the floor by design: it must touch the floor within 3 tiles
+  const nearFloor = (x, y) => { for (let i = -3; i <= 3; i++) for (let j = -3; j <= 3; j++) if (onFloor(Z, x + i, y + j)) return true; return false; };
+  for (const p of Z.portals) check(p.seam ? nearFloor(p.x, p.y) : onFloor(Z, p.x, p.y), `${p.id} stands on the floor${p.seam ? ' (seam: on the shared border)' : ''}`);
   check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 29, 'fourteen regions, five hubs and 29 quests');
   const wall = Z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower');
   check(wall.filter(o => o.kind === 'rampart').length >= 50 && wall.filter(o => o.kind === 'tower').length >= 4, `the wall is ${wall.length} isometric rampart and tower objects`);

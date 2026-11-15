@@ -29,14 +29,14 @@ const KINDS = ['meadow_cottage', 'meadow_mill', 'chapel_ruin'];
   const version = fs.readFileSync(path.join(root, 'client/index.html'), 'utf8').match(/Beta [0-9.]+/)[0];
   await page.addInitScript(v => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', v); }, version);
   await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.evaluate(k => { window.__drawn = new Set(); for (const kind of k) { const def = City.art[kind], draw = def.draw; def.draw = (g, o, kit) => { window.__drawn.add(`${o.kind}|${o.style || ''}|${o.v}`); return draw(g, o, kit); }; } }, KINDS);
   await page.locator('#name').fill('Thatcher'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
 
   // In the game first (the sprite cache is keyed by kind, style and variant, so the field must be the first to draw each one): walk to each place.
-  await page.evaluate(k => { window.__drawn = new Set(); for (const kind of k) { const def = City.art[kind], draw = def.draw; def.draw = (g, o, kit) => { window.__drawn.add(`${o.kind}|${o.style || ''}|${o.v}`); return draw(g, o, kit); }; } }, KINDS);
   const debug = c => page.evaluate(x => Online.send({ type: 'debug', command: x }), c);
   await debug({ op: 'set_time', hour: 12, freeze: true }); await debug({ op: 'set_weather', kind: 'clear' });
-  for (const [id, x, y] of [['stonefold', 92, 226], ['saltby', 190, 274], ['applewick', 345, 234], ['mill', 343, 158], ['hollowend', 346, 309]]) {
+  for (const [id, x, y] of [['stonefold', 92, 226], ['saltby', 190, 274], ['fisher-hamlet', 186, 273], ['applewick', 345, 234], ['mill', 343, 158], ['hollowend', 346, 309]]) {
     await debug({ op: 'teleport', zone: 0, x, y });
     await page.waitForFunction(([a, b]) => Field.zone === 0 && Math.hypot(Field.hero.nx - a, Field.hero.ny - b) < 2, [x, y], { timeout: 20000 });
     await page.waitForTimeout(1200);
@@ -71,6 +71,7 @@ const KINDS = ['meadow_cottage', 'meadow_mill', 'chapel_ruin'];
   check(dist(stone, fisher) > 20 && dist(stone, thatch) > 20 && dist(fisher, thatch) > 20, `each hamlet has its own colours (stone ${stone.map(Math.round)}, fisher ${fisher.map(Math.round)}, thatch ${thatch.map(Math.round)})`);
 
   const drawn = await page.evaluate(() => [...window.__drawn]);
+  console.log('drawn:', JSON.stringify(drawn), 'hero:', await page.evaluate(() => [Field.hero.nx, Field.hero.ny, Field.zone]));
   for (const s of sprites) check(drawn.includes(`${s.kind}|${s.style}|${s.v}`), `the field drew ${s.kind} ${s.style} v${s.v} with its new art`);
   check(errors.length === 0, `no page errors (${errors.join('; ')})`);
   console.log(`${checks} checks passed`);

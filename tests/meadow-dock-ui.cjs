@@ -75,10 +75,15 @@ async function sailRed(page, box) {
   await page.screenshot({ path: path.join(out, 'ashore.png') });
   await page.keyboard.press('KeyQ');
   await page.waitForSelector('#quest-list [data-quest="es_go_01"]', { timeout: 5000 });
-  for (const id of ['es_go_01', 'meadow_landing']) await page.locator(`#quest-list [data-quest="${id}"] summary`).first().click().catch(() => {});
-  await page.waitForTimeout(300);
-  const abandon = await page.evaluate(() => ['es_go_01', 'meadow_landing'].map(id => document.querySelectorAll(`#quest-list [data-quest="${id}"] [data-action="abandon"]`).length));
-  check(abandon[0] === 0 && abandon[1] === 1, `the Empty Seat has no Abandon button, an ordinary quest has one (${abandon})`);
+  // the journal rows select a quest (button.journal-quest); its Abandon action lives in the detail pane's #quest-controls
+  const abandon = [];
+  for (const id of ['es_go_01', 'meadow_landing']) {
+    await page.locator(`#quest-list button.journal-quest[data-quest="${id}"]`).first().click().catch(() => {});
+    await page.waitForTimeout(300);
+    // an Empty Seat chapter shows its Abandon action disabled (server: Quest::abandonable is false for es_*); an ordinary quest shows it enabled
+    abandon.push(await page.evaluate(() => { const b = document.querySelector('#quest-controls [data-action="abandon"]'); return b ? (b.disabled ? 'disabled' : 'enabled') : 'absent'; }));
+  }
+  check(abandon[0] === 'disabled' && abandon[1] === 'enabled', `the Empty Seat's Abandon is disabled, an ordinary quest's is enabled (${abandon})`);
   await page.screenshot({ path: path.join(out, 'journal.png') });
   check(errors.length === 0, `no page errors (${errors.join('; ')})`);
   console.log(`${checks} checks passed`);

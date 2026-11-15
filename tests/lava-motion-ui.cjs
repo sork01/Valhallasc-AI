@@ -24,7 +24,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   const debug=command=>page.evaluate(command=>Online.send({type:'debug',command}),command);
   await debug({op:'set_time',hour:12,freeze:true});await debug({op:'set_weather',kind:'clear'});
   const results=[];
-  for(const [zone,x,y,name]of [[45,104,92,'emberwake'],[46,30,303,'chained-forge']]){
+  for(const [zone,x,y,name]of [[45,166,84,'emberwake'],[46,30,303,'chained-forge']]){
     await debug({op:'teleport',zone,x,y});
     await page.waitForFunction(([zone,x,y])=>Field.zone===zone&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<1.5,[zone,x,y],{timeout:20000});
     await page.waitForTimeout(800);

@@ -21,18 +21,23 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('LapisUI');await page.locator('#go').click({timeout:60000});
-  await page.waitForFunction(()=>Online.connected&&!!Field.lapisSprites?.img.mirageroc,null,{timeout:60000});
-  const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[25],src=Field.lapisSprites;return {count:z.length,name:a.name,theme:a.theme,levels:a.levels,npcs:a.npcs.length,quests:a.quests.length,enemies:a.slimes.length,oases:a.objects.filter(o=>o.kind==='lapis_oasis').length,seal:a.futureInstance,gates:[z[23].portals.find(p=>p.id==='canopy_lapis_gate'),a.portals.find(p=>p.id==='lapis_canopy_gate')],kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>{const f=Field.frameOf(src,k);return [src.img[k].naturalWidth,src.img[k].naturalHeight,8*f.w,5*f.h];}),art:['lapis_oasis','lapis_astrolabe','lapis_date_palm','lapis_caravan_tent'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,travel:a.npcs.find(n=>n.id==='travel_azure_wells')};});
+  // a new hero starts on the Greenmeadow pier: the Lapis Erg's sprites and zone data load only once the zone is occupied, so stand in its hub first
+  await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
+  await page.evaluate(()=>Online.send({type:'debug',ref:600,command:{op:'teleport',zone:25,x:29,y:127}}));
+  await page.waitForFunction(()=>Field.zone===25&&!!Field.lapisSprites?.img.mirageroc,null,{timeout:60000});
+  const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[25],src=Field.lapisSprites;return {count:z.length,name:a.name,theme:a.theme,levels:a.levels,npcs:a.npcs.length,quests:a.quests.length,enemies:a.slimes.length,oases:a.objects.filter(o=>o.kind==='lapis_oasis').length,seal:a.futureInstance,gates:[z[23].portals.find(p=>p.id==='canopy_lapis_gate'),a.portals.find(p=>p.id==='lapis_canopy_gate')],kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>{const f=Field.frameOf(src,k);return [src.img[k].naturalWidth,src.img[k].naturalHeight,8*f.w,5*f.h];}),art:['lapis_oasis','lapis_astrolabe','lapis_date_palm','lapis_caravan_tent'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,placed:!!WorldMap._layout[25]?.w,travel:a.npcs.find(n=>n.id==='travel_azure_wells')};});
   check(data.count>=40&&data.name==='The Lapis Erg'&&data.theme==='lapiserg'&&data.levels.join(',')==='80,85','Level 80–85 desert loads');
-  check(data.npcs===9&&data.quests===12&&data.enemies===42&&data.oases===3,'Oases, quest hub and encounters load');
+  // counts come from the authored zone (world/map.txt, 2026-11-15 redesign: 33 people, 29 quests, 130 enemies), not a fixed number
+  const MAP=JSON.parse(fs.readFileSync(path.join(root,'world/map.txt'),'utf8')).zones[24];
+  check(data.npcs===MAP.npcs.length&&data.quests===MAP.quests.length&&data.enemies===MAP.slimes.length&&data.oases===3,`Oases, quest hub and encounters load (${data.npcs} people, ${data.quests} quests, ${data.enemies} enemies)`);
   check(data.kinds.length===11&&(STUB||data.sizes.every(([w,h,ew,eh])=>w===ew&&h===eh)),'Eleven PixelFlow atlases load');
-  check(data.art&&data.layout===35,'Desert scenery and world-map placement load');
+  check(data.art&&data.placed,'Desert scenery and the Lapis Erg world-map tile load');
   check(data.gates.every(Boolean)&&data.gates[0].to===25&&data.gates[1].to===23,'Reciprocal Sunroad gates load');
   check(data.travel?.travelLinks.includes('travel_veyrroot')&&data.travel?.art==='lapis_travel','Travel Master Nadir has unique art and return service');
   check(data.seal?.status==='open'&&data.seal?.name==='The Sunken Astrolabe','Instance entrance is open');
   let ref=601;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);
   async function stage(x,y,label){await debug({op:'teleport',zone:25,x,y});await page.waitForFunction(([x,y])=>Field.zone===25&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<3,[x,y],{timeout:15000});await page.waitForTimeout(950);await page.screenshot({path:path.join(world.artifacts,`lapis-${label}.png`)});await capture(`lapis-${label}-clean.png`);}
-  await stage(29,127,'hub');check(await page.evaluate(()=>Field.zoneTheme==='lapiserg'&&City.npcs.length===9),'Azure Wells paints live');
+  await stage(29,127,'hub');check(await page.evaluate(n=>Field.zoneTheme==='lapiserg'&&City.npcs.length===n,MAP.npcs.filter(n=>!n.season&&n.art!=='spirit_guide').length),'Azure Wells paints live');
   await stage(67,72,'mirror-oasis');
   await stage(116,95,'east-oasis');
   await stage(132,29,'astrolabe');
