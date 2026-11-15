@@ -71,7 +71,8 @@ async function call(name, args = {}) {
     const boss = map.zones[zone - 1].slimes.find(s => s.kind === kind);
     check(boss, `${kind} is placed in zone ${zone}`);
     let placed = null;
-    const melee = shipped[kind].mechanics.some(m => ['shield', 'adds', 'split', 'static'].includes(m.block));
+    // Valves reach 70% and 40% only by damage: stand in melee and swing (Dagfinn has no other mechanic that asks for it).
+    const melee = shipped[kind].mechanics.some(m => ['shield', 'adds', 'split', 'static', 'valves'].includes(m.block));
     for (const [dx, dy] of [...(melee ? [[-1.6, 0], [1.6, 0], [0, 1.6], [0, -1.6]] : []), [-6, 0], [6, 0], [0, 6], [0, -6], [-4, 4], [4, -4], [-9, 0], [9, 0]]) {
       await debug({ op: 'teleport', zone, x: boss.x + dx, y: boss.y + dy });
       placed = await page.evaluate(() => ({ zone: Field.zone, x: Field.hero.x, y: Field.hero.y }));
@@ -82,8 +83,11 @@ async function call(name, args = {}) {
     // The arrival banner covers the top of the screen for a few seconds, and the last boss's fight clears with the zone.
     await page.waitForFunction(() => !BossMech.active, null, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(4500);
+    // Valves only trigger at 70% and 40% of health, and a level-99 hero cannot grind a warden there: a test-only debug op sets the
+    // living boss to 69% (no kill, no rewards), so the first valve casts and its stations show.
+    if (shipped[kind].mechanics.some(m => m.block === 'valves')) { await debug({ op: 'damage_enemy', kind, share: 0.69 }); await page.waitForTimeout(600); }
     const seen = new Map();
-    const shieldBoss = shipped[kind].mechanics.some(m => m.block === 'shield' || m.block === 'adds' || m.block === 'split' || m.block === 'static');
+    const shieldBoss = shipped[kind].mechanics.some(m => m.block === 'shield' || m.block === 'adds' || m.block === 'split' || m.block === 'static' || m.block === 'valves');
     const started = Date.now();
     let fightSeen = false;
     while (Date.now() - started < seconds * 1000 * (melee ? 2.2 : 1)) {
