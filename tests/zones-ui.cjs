@@ -73,6 +73,12 @@ const look = page => page.evaluate(() => {
       ws.send(out === text ? message : out);
     });
   });
+  // MUTATE=lava: the Crags' molten rivers are not drawn (the Crags lava filter is removed), so the lava checks must fail.
+  if (process.env.MUTATE === 'lava') await page.route('**/emberwakeart.js', async route => {
+    const response = await route.fetch(), body = await response.text(), from = "(z.theme==='ember'&&o.kind==='lava')";
+    assert.ok(body.includes(from), 'emberwakeart.js still has the Crags lava filter');
+    await route.fulfill({ response, body: body.replace(from, 'false') });
+  });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('ZoneUI');
@@ -317,7 +323,16 @@ const look = page => page.evaluate(() => {
   await page.waitForTimeout(300);
   await shot('crags-monster');
   check(monster.kind === 'wisp' && monster.distance < 12 && monster.level >= 3 && monster.level <= 7, `A level ${monster.level} ${monster.name} is in view ${monster.distance.toFixed(1)} units away`);
-  check(lavaSeen > .004, `Lava is drawn as a glowing river (${(lavaSeen * 100).toFixed(2)}% of the view on the way)`);
+  // The walk stops whenever a monster comes near, so the trail does not always bring a river into view: the lava lies 10 tiles
+  // or more off the first trail, and the walk's share came out at 0.09% to 0.38% between runs of the same route. So the river
+  // nearest the trail is also judged from a fixed spot beside it (teleported, camera settled), with the same colour test.
+  const trail = MAP_JSON.zones[0].paths[0];
+  const segmentDistance = ([px, py], [ax, ay], [bx, by]) => { const dx = bx - ax, dy = by - ay, len = dx * dx + dy * dy, t = len ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len)) : 0; return Math.hypot(ax + t * dx - px, ay + t * dy - py); };
+  const river = MAP_JSON.zones[0].objects.filter(o => o.kind === 'lava').map(o => ({ o, gap: Math.min(...trail.slice(1).map((b, i) => segmentDistance([o.x, o.y], trail[i], b))) - o.r })).sort((a, b) => a.gap - b.gap)[0].o;
+  await page.evaluate(([x, y]) => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone: 1, x, y } }), [river.x, river.y]);
+  await page.waitForTimeout(2500);
+  const riverLava = (await look(page)).lava;
+  check(Math.max(lavaSeen, riverLava) > .004, `Lava is drawn as a glowing river (${(lavaSeen * 100).toFixed(2)}% of the view on the way, ${(riverLava * 100).toFixed(2)}% beside the trail)`);
   check(await page.evaluate(() => Field.cragSprites.meta.kinds.includes(Field.hero.target.kind) && Field.hero.target.d.top > 0), 'The monster is drawn from its own sprite atlas');
   await page.evaluate(() => { Field.hero.target = null; });
   // Back out through the Meadow Gate by clicking.
