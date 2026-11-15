@@ -1,6 +1,6 @@
 // The Prismwaste as an authored desert (scripts/prism_design.py): the real client names each of the twelve regions, draws its ground classes, the four hubs
-// name themselves, the three elites draw from their art, the two rim gates stand on the floor, and the two seams (Astralhollow on the west, the Obsidian Orrery in the
-// south-west corner) are crossed anywhere without a banner, with the neighbour's scenery ready beyond the line and the same world point looking the same from both frames.
+// name themselves, the three elites draw from their art, the four seams (Astralhollow on the west, the Obsidian Orrery in the
+// south-west corner, the Stormglass Flats on the north side and the Cairnspine on the east side) are crossed anywhere without a banner, with the neighbour's scenery ready beyond the line and the same world point looking the same from both frames.
 // Pictures in test-results/prism-design/.
 //   REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/prism-design-ui.cjs
 //   SEAM_ONLY=1 KS='[7]': only the seams, one point each (the bounded runner's memory and time caps).
@@ -28,8 +28,7 @@ const GROUND = { 'The Broken Crown': [null, 150], 'The Broken Watch': [118, null
 (async () => {
   check(Z.name === 'The Prismwaste' && Z.size === 288 && Z.shapeFloor && Z.shape.neighbours.join() === '13,15,19,27', 'the Prismwaste is the 288 grid with its outline and four neighbours');
   const seams = Z.portals.filter(p => p.seam);
-  check(seams.map(p => p.to).sort().join() === '13,15', 'the only seams are the ones to Astralhollow and the Orrery');
-  for (const to of [19, 27]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
+  check(seams.map(p => p.to).sort((a, b) => a - b).join() === '13,15,19,27', 'the seams are the ones to Astralhollow, the Orrery, the Stormglass Flats and the Cairnspine (no rim gates left)');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
   check(Z.regions.names.length === 12 && Z.camps.length === 3 && Z.quests.length === 27, 'twelve regions, three outposts and 27 quests');
   server = spawn(process.env.VALHALLA_BINARY, [], { cwd: root, stdio: 'ignore',

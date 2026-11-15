@@ -1,5 +1,5 @@
 // The Ribbonwild as an authored map (scripts/ribbon_design.py): the real client names each of the fourteen regions, draws its colour-court ground classes, the five hubs name
-// themselves, the three elites draw from their art, the two rim gates and the Pavilion door stand on the floor, and the seam to Emberwake Caldera is crossed anywhere without a
+// themselves, the three elites draw from their art, the Pavilion door stands on the floor, and the seams to Sunward Vale, the Tanglecrown and Emberwake Caldera are crossed anywhere without a
 // banner, with the neighbour's scenery ready beyond the line and the same world point looking the same. Pictures in test-results/ribbon-design/.
 //   REAL_SPRITES=1 bash scripts/test-touch-bounded.sh tests/ribbon-design-ui.cjs
 //   SEAM_ONLY=1 KS='[7]': only the seam, one point each (the bounded runner's memory and time caps).
@@ -28,8 +28,7 @@ const GROUND = ['The Rose Court', 'The Teal Court'], lums = {};
 (async () => {
   check(Z.name === 'The Ribbonwild' && Z.size === 368 && Z.shapeFloor && Z.shape.neighbours.join() === '20,22,45', 'The Ribbonwild is the 368 grid with its outline and three neighbours');
   const seams = Z.portals.filter(p => p.seam);
-  check(seams.map(p => p.to).join() === '22,45', 'the seams are the one to the Tanglecrown and the one to Emberwake');
-  for (const to of [20]) check(Z.portals.some(p => p.to === to && p.walk && !p.seam), `the way to zone ${to} is a rim gate you walk through`);
+  check(seams.map(p => p.to).sort((a, b) => a - b).join() === '20,22,45', 'the seams are the ones to Sunward Vale, the Tanglecrown and Emberwake Caldera');
   check(Z.portals.some(p => p.id === 'ribbon_pavilion_gate' && p.to === 31), 'the Pavilion door leads to the Thousandfold Pavilion');
   for (const p of Z.portals.filter(p => !p.seam)) check(onFloor(Z, p.x, p.y), `${p.id} stands on the floor`);
   check(Z.regions.names.length === 14 && Z.camps.length === 4 && Z.quests.length === 28, 'fourteen regions, five hubs and 28 quests');
