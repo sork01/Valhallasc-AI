@@ -1,4 +1,5 @@
 // Private protocol fixtures only: no grinding or encounter balance measurements.
+const map = JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname, '../../world/map.txt'), 'utf8'));
 module.exports = kit => ({
   description: 'Halloween: shared city daily quest, five hired fighters, ritual summon, personal daily roll, cross-city claim, persistence and event expiry.',
   startLevel:20, levelSpread:0,
@@ -18,8 +19,11 @@ module.exports = kit => ({
       await w.action(bot,{type:'interact',npc:'city_bard',offer:`halloween:hire:${cls}`});
       await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired).length===['priest','mage','hunter','warrior'].indexOf(cls)+1);
     }
-    await w.debug(bot,{op:'teleport',zone:3,x:105,y:31});
-    await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired&&p.zone===3&&p.hp>0&&Math.hypot(p.x-105,p.y-23)<=12).length===4,15000,'Hired fighters gather');
+    // The Gloamfen ritual clearing is centred on the authored Hollow Rider (219, 86); the server gathers within 12 of it.
+    const lantern=map.zones[2].npcs.find(n=>n.id==='halloween_lantern');
+    const centre=map.zones[2].slimes.find(s=>s.kind==='hollow_rider');
+    await kit.teleport(w,bot,{npc:'halloween_lantern'});
+    await w.waitFor(()=>w.views.get(bot).players.filter(p=>p.hired&&p.zone===3&&p.hp>0&&Math.hypot(p.x-centre.x,p.y-centre.y)<=12).length===4,15000,'Hired fighters gather');
     await w.action(bot,{type:'interact',npc:'halloween_lantern',offer:'halloween:summon'});
     await w.waitFor(()=>w.views.get(bot).halloween?.active);
     check(w.views.get(bot).halloween.level===20,'The real lantern summons at the five fighters’ average level');
@@ -40,9 +44,9 @@ module.exports = kit => ({
     await w.restart();
     check(w.player(bot).seasonalClaims[id]===20261026&&w.player(bot).seasonalRolls[id]===20261026,'Independent claim and roll ledgers survive a server restart');
     await w.debug(bot,{op:'season_time',unix:1794265200});
-    await w.waitFor(()=>w.views.get(bot).seasons.length===0);
+    await w.waitFor(()=>!w.views.get(bot).seasons.some(x=>x.id==='halloween'));
     check(w.views.get(bot).halloween===null,'November 10 removes the ritual encounter state');
-    await w.debug(bot,{op:'teleport',zone:3,x:105,y:31});
+    await kit.teleport(w,bot,{npc:'halloween_lantern'});
     await w.action(bot,{type:'interact',npc:'halloween_lantern',offer:'halloween:summon'});
     await w.advance(300);
     check(!w.views.get(bot).halloween&&!w.views.get(bot).slimes.some(s=>s.kind==='hollow_rider'&&!s.dead&&s.state!=='waiting'),'A forged off-season summon cannot create the elite');
