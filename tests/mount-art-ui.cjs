@@ -31,7 +31,8 @@ const SHOTS = process.env.SHOTS;
       await page.waitForFunction(() => Field.hero.mounts?.length === 5, null, { timeout: 15000 });
       const meta = await page.evaluate(async () => (await (await fetch('assets/mounts_sprites.txt')).text()));
       const info = JSON.parse(meta);
-      assert.deepEqual(Object.keys(info.mounts).sort(), [...MOUNTS].sort(), 'the atlas lists every mount');
+      // the atlas now also lists the seasonal mounts (nightmare, reindeer, ...): this suite checks the five base mounts
+      for (const id of [...MOUNTS, ...(process.env.MUTATE ? ['phantom'] : [])]) assert.ok(info.mounts[id], `the atlas lists the ${id} mount`);
       for (const id of MOUNTS) {
         const m = info.mounts[id];
         assert.equal(m.clips.idle.n, 4); assert.equal(m.clips.run.n, 8); assert.equal(m.bob.run.length, 8);
