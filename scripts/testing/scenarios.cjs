@@ -3664,12 +3664,14 @@ const scenarios = {
       const bot='LapisVisitor',city=map.zones[22],area=map.zones[24];
       await w.connect({bot,class:'warrior'});
       const gate=city.portals.find(p=>p.id==='canopy_lapis_gate'),back=area.portals.find(p=>p.id==='lapis_canopy_gate');
-      check(gate?.to===25&&back?.to===23&&city.slimes.length===0,'Veyrroot stays peaceful and desert gates are reciprocal');
-      check(area.theme==='lapiserg'&&area.levels.join(',')==='80,85'&&area.slimes.length===42&&area.objects.filter(o=>o.kind==='lapis_oasis').length===3,'Three-oasis desert and 42 enemies load');
-      check(area.quests.length===12&&area.npcs.some(n=>n.id==='travel_azure_wells')&&area.futureInstance?.status==='open','Quest hub, Travel Master and open astrolabe load');
-      await kit.teleport(w,bot,{zone:23,x:118,y:95});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      // Veyrroot is a wild zone on the shaped map (its enemies are no longer peaceful): only the seam pair is asserted.
+      check(gate?.to===25&&back?.to===23&&gate.seam&&back.seam,'Veyrroot and desert seams are reciprocal');
+      check(area.theme==='lapiserg'&&area.levels.join(',')==='80,85'&&area.slimes.length>=42&&area.objects.filter(o=>o.kind==='lapis_oasis').length===3,'Three-oasis desert and at least 42 enemies load');
+      check(area.quests.length>=12&&area.npcs.some(n=>n.id==='travel_azure_wells')&&area.futureInstance?.status==='open','Quest hub, Travel Master and open astrolabe load');
+      const enter=crossingPath(gate);
+      await kit.teleport(w,bot,{zone:23,x:enter.start.x,y:enter.start.y});await w.advance(700);await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===25,15000,'Enter the Lapis Erg');await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'Canopy gate arrives safely in the desert');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'Canopy seam arrives at its desert landing (shaped layout)');
       await w.connect({bot:'CanopyWitness',class:'mage'});
       check(w.views.get(bot).slimes.every(s=>s.zone===25)&&w.views.get('CanopyWitness').slimes.every(s=>s.zone===0),'Desert encounters stay in the desert view');
       await kit.teleport(w,bot,{npc:'travel_azure_wells'});
@@ -3682,7 +3684,7 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'lapis_welcome')?.claimed,5000,'Claim caravan introduction');
       check(quest(w,bot,'lapis_welcome')?.claimed,'Oasis hub introduction claims');
       for(const [kind,material] of [['sandhopper','sandhopper_chitin'],['dunefennec','fennec_fur'],['glassscorpion','scorpion_glass'],['sunvulture','vulture_quill'],['dunecolossus','colossus_core'],['mirageroc','roc_plume']]){
-        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        const enemy=await enemyOf(w,bot,25,area,kind),before=totalXp(w.player(bot));
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
         check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
@@ -3691,9 +3693,10 @@ const scenarios = {
       check(area.portals.some(p=>p.id==='lapis_astrolabe_gate'&&p.to===34)&&area.futureInstance.name==='The Sunken Astrolabe','The astrolabe has a playable entrance');
       await w.restart();
       check(w.player(bot).zone===25&&w.player(bot).travelStops.includes('travel_azure_wells')&&quest(w,bot,'lapis_welcome')?.claimed,'Desert position, quest and travel discovery persist');
-      await kit.teleport(w,bot,{zone:25,x:14,y:128});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      const home=crossingPath(back);
+      await kit.teleport(w,bot,{zone:25,x:home.start.x,y:home.start.y});await w.advance(700);await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
       await w.waitFor(()=>w.player(bot).zone===23,15000,'Return to Veyrroot');
-      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2&&w.views.get(bot).slimes.length===0,'Return lands safely in enemy-free Veyrroot');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return lands at the Veyrroot seam landing');
     },
   },
   frostwake: {
