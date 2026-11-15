@@ -78,6 +78,13 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8], fenWater = false) => 
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('FenUI');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
+  // The loading screen (#connection-overlay) closes only when LoadGate has seen every asset the world asked for (LoadGate.whenIdle),
+  // which can be seconds after the welcome. It covers the canvas until then: a click under it never reaches the field (the summit
+  // click was lost under it, pointerdown target #connection-overlay). The first canvas click waits for it to close.
+  await page.waitForFunction(() => document.getElementById('connection-overlay').hidden, null, { timeout: 60000 });
+  // MUTATE=overlay brings the loading screen back over the canvas: the assertion below must fail.
+  if (process.env.MUTATE === 'overlay') await page.evaluate(() => { document.getElementById('connection-overlay').hidden = false; });
+  check(await page.evaluate(() => document.getElementById('connection-overlay').hidden), 'The loading screen is closed before the first canvas click');
   // The maps are fogged until a cell is visited; these checks read the whole minimap, so uncover it all first.
   await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'explore_all' } }));
   await page.waitForFunction(() => Field.explored?.length >= 5 && Field.explored.every(m => m === 511), null, { timeout: 10000 });
@@ -94,6 +101,10 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8], fenWater = false) => 
   // Staging only: a test shortcut puts the hero near what is under test, instead of a long walk across the map. The gate
   // crossings, the NPC clicks, the walk through the first gap and the last steps of each approach stay real.
   const click = async (x, y) => {
+    // The fen's monsters chase the hero during a walk. A step with live monsters on it was sent as a plain move (no client goal), and
+    // one run stopped 2.2 tiles short of such a step (143,50) with no goal and never arrived. Its monster positions were not logged,
+    // so this is the probable cause, not a verified one. Defeat the live monsters near the step first (the clearMonsters kill path).
+    await clearMonsters([{ x, y }]);
     // The camera eases after the walker: a click computed mid-walk lands off its step (the walk to 82,59 went wrong this way).
     // Wait until the hero has stopped and the target's screen point stops moving, then read the point and click it.
     let prev = null;
