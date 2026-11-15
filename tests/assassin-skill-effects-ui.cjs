@@ -45,6 +45,15 @@ const skills = [
   assert.deepEqual(catalog.map(s => s.id).sort(), skills.map(s => s[0]).sort());
   assert.equal(new Set(catalog.map(s => s.icon)).size, 10);
 
+  // A new hero stands on the Saltby pier, where a wall a few tiles east stops every knife at once (shotBlocked). Move to open
+  // ground south of Alderhaven, then clear the slimes near it, so the fixed-aim bolts reach their three-bolt frame.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 8, null, { timeout: 30000 });
+  await page.waitForTimeout(1500);
+  for (const enemy of await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 9).map(s => s.id)))
+    await page.evaluate(id => Online.send({ type: 'debug', command: { op: 'kill_enemy', id } }), enemy);
+  await page.waitForFunction(() => Field.slimes.every(s => s.dead || Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) >= 9), null, { timeout: 20000 });
+
   const selected = skills.filter(([id]) => !process.env.ASSASSIN_SKILL_ONLY || id === process.env.ASSASSIN_SKILL_ONLY);
   for (const [id, kind, age] of selected) {
     await page.waitForFunction(() => Field._debug.effects.every(e => !e.kind.startsWith('sk')) && Field._debug.bolts.length === 0);
@@ -64,7 +73,7 @@ const skills = [
       await page.waitForFunction(id => Field.slimes.some(s => s.kind === (id === 'flurry' ? 'gloomroot' : 'green') && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 5), id);
     }
     const frame = await page.evaluate(({ id, kind, age }) => new Promise((resolve, reject) => {
-      const initial = new Set(Field._debug.effects), deadline = performance.now() + 8000;
+      const initial = new Set(Field._debug.effects), deadline = performance.now() + 8000, seen = { maxBolts: 0, kinds: [] };
       const needBolts = id === 'throwingknives' ? 3 : id === 'knifering' ? 12 : 0;
       const target = Field.slimes.find(s => s.kind === (id === 'flurry' ? 'gloomroot' : 'green') && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 5);
       const fx = target && ['lunge', 'flurry', 'assassinate'].includes(id) ? target.x - Field.hero.x : 1;
@@ -81,7 +90,9 @@ const skills = [
             bolts, moved: Math.hypot(Field.hero.x - effect.x, Field.hero.y - effect.y),
             buff: Field.hero.buffs?.some(b => b.id === id && b.left > 0) || false }); return;
         }
-        if (performance.now() > deadline) { reject(new Error(`${id} effect ${kind} did not reach its capture window`)); return; }
+        seen.maxBolts = Math.max(seen.maxBolts, bolts);
+        seen.kinds = [...new Set([...seen.kinds, ...Field._debug.effects.filter(e => e.kind.startsWith('sk')).map(e => e.kind)])];
+        if (performance.now() > deadline) { reject(new Error(`${id} effect ${kind} did not reach its capture window (most bolts seen ${seen.maxBolts}; effects ${seen.kinds.join(',')}; hero ${Field.hero.x.toFixed(1)},${Field.hero.y.toFixed(1)})`)); return; }
         requestAnimationFrame(sample);
       }
       requestAnimationFrame(sample);

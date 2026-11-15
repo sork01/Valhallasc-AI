@@ -6,7 +6,7 @@ let browser;const world=new TestWorld();
 (async()=>{
  requireMemoryLimit();world.godMode=true;await world.start();browser=await chromium.launch({headless:true});
  const page=await browser.newPage({viewport:{width:844,height:390},reducedMotion:'reduce'});
- if(process.env.MUTATE)await page.route('**/field.js',r=>r.fulfill({contentType:'text/javascript',body:execFileSync('git',['show','HEAD:client/field.js'],{cwd:path.resolve(__dirname,'..'),encoding:'utf8'})}));
+ if(process.env.MUTATE){/* the old backlog: the numbers age by one clamped frame step (0.05 s), not by the real elapsed time */const src=require('fs').readFileSync(path.resolve(__dirname,'../client/field.js'),'utf8');const from='floaters = DamageNumbers.step(floaters, textDt);';assert.ok(src.includes(from),'mutation anchor present');await page.route('**/field.js',r=>r.fulfill({contentType:'text/javascript',body:src.replace(from,'floaters = DamageNumbers.step(floaters, dt);')}));}
  await page.addInitScript(()=>{
   window.AudioContext=window.webkitAudioContext=undefined;
   localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,lowGraphics:true,lowGraphicsSet:true}));

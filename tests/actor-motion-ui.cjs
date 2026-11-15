@@ -79,7 +79,9 @@ const stats = a => { const m = a.reduce((s, v) => s + v, 0) / a.length, sd = Mat
   // Arrow keys move along the screen: Right + Down together is world +x.
   const start = Date.now();
   await page.keyboard.down('ArrowRight'); await page.keyboard.down('ArrowDown');
-  await page.waitForTimeout(4200);
+  // 6.5 s, not 4.2: a freshly teleported hero stands still for about 2 s on this host (snapshots 200-1100 ms apart), and the
+  // distance check needs the walk after that stall. The steady-speed window is measured from the first moving frame.
+  await page.waitForTimeout(6500);
   await page.keyboard.up('ArrowRight'); await page.keyboard.up('ArrowDown');
   const frames = await page.evaluate(() => { window.__sample = false; return window.__frames; });
   const heroClock = await page.evaluate(() => window.__hero);

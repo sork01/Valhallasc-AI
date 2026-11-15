@@ -23,12 +23,13 @@ async function call(name, args = {}) {
   const classes = (process.env.AUTOATTACK_CLASSES || 'warrior,mage,assassin,priest,hunter').split(',');
   for (const cls of classes) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    const snapshots = [], events = [], errors = [];
+    const snapshots = [], events = [], errors = [], serverErrors = [];
     page.on('pageerror', error => errors.push(error.message));
     page.on('websocket', socket => socket.on('framereceived', ({ payload }) => {
       const packet = frameJson(payload);
       if (packet.type === 'snapshot') snapshots.push(packet);
       if (packet.type === 'event') events.push({ ...packet, time: snapshots.at(-1)?.time || 0 });
+      if (packet.type === 'error') serverErrors.push(packet.text);
     }));
     await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })));
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
@@ -38,10 +39,10 @@ async function call(name, args = {}) {
     const actor = await page.evaluate(() => Online.id);
     const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
     // Open meadow ground, away from the town and its sanctuary. A raid pack has enough health for this short check.
-    await debug({ op: 'teleport', zone: 0, x: 80, y: 25 });
+    await debug({ op: 'teleport', zone: 0, x: 250, y: 235 });
     // A teleport lands on the nearest free ground, which need not be the requested point (80, 25 is a tree in the shaped
     // Greenmeadow and the hero arrives about 3.7 tiles east). Settle there, then test from where the hero actually stands.
-    await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 80, Field.hero.y - 25) < 6, null, { timeout: 30000 });
+    await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 30000 });
     await page.waitForTimeout(500);
     const home = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
     console.log(`home ${home.x.toFixed(2)}, ${home.y.toFixed(2)}`);
@@ -57,15 +58,27 @@ async function call(name, args = {}) {
       await page.waitForFunction(h => Math.hypot(Field.hero.x - h.x, Field.hero.y - h.y) < .2, home);
       await debug({ op: 'reset_cooldowns' }); await debug({ op: 'set_resource', amount: 1000 });
       await debug({ op: 'set_hp', hp: await page.evaluate(() => Field.hero.maxHp * .4) });
-      await debug({ op: 'spawn_enemy', kind: 'cf_brute', level: 99, x: home.x + 4, y: home.y });
-      await page.waitForFunction(id => Field.hero.resource >= 60 && !Field.hero.skillCd[id] && Field.hero.dashCd <= 0 && Field.hero.hp < Field.hero.maxHp && Field.slimes.some(s => s.kind === 'cf_brute' && !s.dead), skill);
-      const target = await page.evaluate(() => {
-        const s = Field.slimes.find(s => s.kind === 'cf_brute' && !s.dead);
-        Field.hero.target = s; Online.send({ type: 'target', id: s.id }); return s.id;
-      });
-      await page.waitForFunction(() => Field.hero.atkCd > 0);
-      await page.locator(`#skillbar-slots [data-skill="${skill}"]`).click();
-      await page.waitForFunction(id => id === 'shadowstep' ? Field.hero.dashCd > 0 : Field.hero.skillCd[id] > 0, skill);
+      // The brute must stand where the skill's line is clear: a cone blocked by a wall or tree is refused with no cooldown
+      // ("A wall blocks your skill."). Try the eight points around home in turn and keep the first the server accepts.
+      const offsets = [[4, 0], [-4, 0], [0, 4], [0, -4], [3, 3], [-3, -3], [3, -3], [-3, 3]];
+      let target = null;
+      for (const [dx, dy] of offsets) {
+        serverErrors.length = 0;
+        await debug({ op: 'spawn_enemy', kind: 'cf_brute', level: 99, x: home.x + dx, y: home.y + dy });
+        await page.waitForFunction(id => Field.hero.resource >= 60 && !Field.hero.skillCd[id] && Field.hero.dashCd <= 0 && Field.hero.hp < Field.hero.maxHp && Field.slimes.some(s => s.kind === 'cf_brute' && !s.dead), skill);
+        const attempt = await page.evaluate(() => {
+          const s = Field.slimes.find(s => s.kind === 'cf_brute' && !s.dead);
+          Field.hero.target = s; Online.send({ type: 'target', id: s.id }); return s.id;
+        });
+        await page.waitForFunction(() => Field.hero.atkCd > 0);
+        await page.locator(`#skillbar-slots [data-skill="${skill}"]`).click();
+        const accepted = await page.waitForFunction(id => id === 'shadowstep' ? Field.hero.dashCd > 0 : Field.hero.skillCd[id] > 0, skill, { timeout: 2500 }).then(() => true, () => false);
+        if (accepted) { target = attempt; break; }
+        await page.evaluate(() => { Field.hero.target = null; Online.send({ type: 'stop' }); });
+        await debug({ op: 'kill_enemy', id: attempt });
+        await page.waitForFunction(id => Field.slimes.find(s => s.id === id)?.dead, attempt);
+      }
+      assert.ok(target !== null, `${cls}/${skill}: no cooldown started at any of ${offsets.length} spots; server said: ${JSON.stringify(serverErrors)}`);
       const after = snapshots.at(-1).time + .5;
       await page.waitForFunction(id => !Field.hero.dead && Field.slimes.some(s => s.id === id && !s.dead), target);
       // Use server time: a slow private world cannot make this pass or fail based on wall-clock attack timing.
