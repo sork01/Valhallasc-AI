@@ -763,8 +763,8 @@ const scenarios = {
       check(me().hp > 0 && me().hp <= me().maxHp / 2 + 1, 'A defeated character resurrects at its body at half health');
       const snapshot = w.summary('Gm'), history = me().quests.map(q => [q.id, q.completions]);
       await w.restart();
-      await w.waitFor(() => w.player('Gm') && w.player('Gm').level === 19, 10000, 'Resume');
-      check(me().level === 19 && me().xp === snapshot.xp && me().gold === snapshot.gold && me().zone === snapshot.zone, 'Level, gold and zone survive restarting Rust');
+      await w.waitFor(() => w.player('Gm') && w.player('Gm').level === 20, 10000, 'Resume');
+      check(me().level === 20 && me().xp === snapshot.xp && me().gold === snapshot.gold && me().zone === snapshot.zone, 'Level, gold and zone survive restarting Rust');
       check(JSON.stringify(me().quests.map(q => [q.id, q.completions])) === JSON.stringify(history), 'Finished quests survive restarting Rust');
     },
   },
