@@ -9,7 +9,8 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results/cloaks'
  try{
   await world.start();browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
+  const newsVersion=fs.readFileSync(path.join(root,'client/index.html'),'utf8').match(/class="version">([^<]+)</)[1];
+  await page.addInitScript(version=>{localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null}));localStorage.setItem('valhallasc.whats-new.v1',version);},newsVersion);
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-mage').click();await page.locator('#gender-female').click();await page.locator('#name').fill('CloakCheck');await page.locator('#go').click({timeout:90000});
   // Inspect the portrait panel under the game's existing rotate-device curtain, only in this private test.
   await page.addStyleTag({content:'.rotate {display:none!important}'});
@@ -36,7 +37,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results/cloaks'
   assert.ok(Math.hypot(moved.x-start.x,moved.y-start.y)>.5,'the equipped wearer really moves');assert.equal(moved.cloak,'cloak_l50_rare');
   await debug({op:'set_gold',gold:100000});const smith=await page.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='smith'));
   await debug({op:'teleport',zone:0,x:smith.x,y:smith.y-1});await page.waitForTimeout(300);
-  await page.evaluate(()=>Online.send({type:'interact',npc:'smith'}));await page.locator('[data-offer="buy_cloak_uncommon"]').click();
+  await page.evaluate(()=>Field.visitNpc('smith'));await page.locator('#npc-offers [data-view="buy"]').click();await page.waitForFunction(()=>Shop.open&&document.querySelector('.merchant-workspace[aria-busy="false"]'));await page.locator('[data-offer="buy_cloak_uncommon"]').click();
   await page.waitForFunction(()=>Inventory.quantity('cloak_l50_uncommon')===1);assert.ok(await page.evaluate(()=>Field.hero.gold<100000),'vendor charges for the level-appropriate cloak');
   await page.locator('#npc-x').click();await page.screenshot({path:path.join(out,'private-equipped-world.png')});
   assert.deepEqual(errors,[]);console.log('PASS: female Mage, real worn art, equipment, movement, tiered vendor and mobile window in a private world');
