@@ -8,8 +8,10 @@ module.exports = (kit, map) => ({
     check(!area.sealedTemplate, 'The released raid template is open');
     await w.connect({ bot, class: 'hunter' });
     await w.debug(bot, { op:'quest', id:'raid_key', action:'finish' });
-    await kit.teleport(w, bot, { zone: 45, x: 133, y: 27 });
-    await w.action(bot, { type: 'move', x: 133, y: 24 });
+    // The raid door is Emberwake's ew_raid (322,80) now; a teleport lands beside it.
+    const door = map.zones[44].portals.find(p => p.id === 'ew_raid');
+    await kit.teleport(w, bot, { zone: 45, x: door.x, y: door.y + 3 });
+    await w.action(bot, { type: 'move', x: door.x, y: door.y });
     await w.waitFor(() => w.player(bot).zone === 46, 15000, 'Public muster entrance');
     await w.action(bot, { type: 'stop' });
     check(w.player(bot).y > 290, 'The public door reaches the separate muster chamber');
@@ -36,7 +38,9 @@ module.exports = (kit, map) => ({
     check(true, 'The actual first Warden emits authoritative cast geometry');
     await w.debug(bot, { op: 'kill_enemy', id: boss.id });
     await w.waitFor(() => w.views.get(bot).slimes.find(s => s.id === boss.id)?.dead, 5000, 'First Warden fixture kill');
-    check(w.views.get(bot).slimes.filter(s => s.kind.startsWith('cf_') && !s.dead).length >= 49, 'Other encounters remain alive after one boss dies');
+    // Floor from the map: the non-ambush Forge encounters minus the one boss killed here (ambushers stay dormant).
+    const forgeFoes = area.slimes.filter(s => s.kind.startsWith('cf_') && !s.ambush).length - 1;
+    check(w.views.get(bot).slimes.filter(s => s.kind.startsWith('cf_') && !s.dead).length >= forgeFoes, 'Other encounters remain alive after one boss dies');
     const pieceIds = new Set(JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname, '../../world/items.txt'))).filter(i => i.source === 'chained_forge').map(i => i.id));
     await w.waitFor(() => w.player(bot).inventory.some(s => pieceIds.has(s.item)) || w.views.get(bot).drops.some(d => pieceIds.has(d.item)), 5000, 'Actual orange boss rewards');
     check(true, 'The real kill pays guaranteed Chainforged orange rewards');
@@ -45,6 +49,8 @@ module.exports = (kit, map) => ({
     await w.waitFor(() => w.player(bot).zone === 45, 15000, 'Safe raid return');
     await w.action(bot, { type: 'stop' });
     await w.waitFor(() => !w.views.get(bot).players.some(p => p.look.name.startsWith('Merc ')), 5000, 'Contracts end outside');
-    check(Math.hypot(w.player(bot).x - 127, w.player(bot).y - 25) < 2, 'The exit lands safely outside the entrance disc');
+    // The landing is cf_return's (316,81), read from the map (the old (127,25) is void).
+    const back = area.portals.find(p => p.id === 'cf_return');
+    check(Math.hypot(w.player(bot).x - back.tx, w.player(bot).y - back.ty) < 2, 'The exit lands safely outside the entrance disc');
   }
 });
