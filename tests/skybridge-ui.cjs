@@ -54,9 +54,10 @@ const call = async (name, args = {}) => {
   await debug({ op: 'explore_all' });
 
   // Bifrost Reach gate
-  await teleport(7, 58, 133);
+  // The Bifrost gate is the sky_shattered_span portal at (165,186) (moved by the shaped Bifrost); approach it from 5 tiles south.
+  await teleport(7, 165, 191);
   await shot('entrance');
-  await page.evaluate(() => Online.send({ type: 'move', x: 58, y: 128 }));
+  await page.evaluate(() => Online.send({ type: 'move', x: 165, y: 186 }));
   await page.waitForFunction(() => Field.zone === 42, null, { timeout: 15000 });
   await page.evaluate(() => Online.send({ type: 'stop' }));
 

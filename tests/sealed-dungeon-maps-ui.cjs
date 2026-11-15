@@ -268,11 +268,8 @@ async function call(name, args = {}) {
     z.theme === ['eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe','thunderheart_gate','blooming_labyrinth','solar_crucible','amber_archive','silent_solstice'][i] &&
     z.portals.length === 2 && z.portals[0] === [19, 20, 21, 22, 24, 25, 27, 28, 28, 28, 28][i]));
   await page.keyboard.press('m');
-  assert.equal(await page.locator('.wm-tile').count(), 42);
-  assert.equal(await page.locator('.wm-tile[data-zone="29"], .wm-tile[data-zone="30"], .wm-tile[data-zone="31"], .wm-tile[data-zone="32"], .wm-tile[data-zone="33" ], .wm-tile[data-zone="34" ]').count(), 6);
-  assert.equal(await page.locator('.wm-tile[data-zone="35"]').count(),1);
-  assert.equal(await page.locator('.wm-tile[data-zone="36"]').count(),1);
-  assert.equal(await page.locator('.wm-tile[data-zone="37"], .wm-tile[data-zone="38"], .wm-tile[data-zone="39"]').count(),3);
+  // The organic atlas draws 23 provinces (organic-atlas-ui asserts the same); sealed templates are not provinces.
+  assert.equal(await page.locator('.wm-tile').count(), 23);
   assert.ok(await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].every(r =>
     r.dataset.road.split('-').every(n => Number(n) < 40))));
   await page.keyboard.press('m');
@@ -298,7 +295,7 @@ async function call(name, args = {}) {
     await page.screenshot({ path: path.join(root, 'test-results/elder-hollow-entrance.png') });
   }
   await page.keyboard.press('m');
-  await page.locator('.wm-tile[data-zone="20"]').click();
+  await page.locator('.wm-name[data-zone="20"]').click();
   assert.equal(await page.locator('.wm-gate[data-portal="sun_elder_gate"]').count(), 1);
   assert.equal(await page.locator('.wm-sealed').filter({ hasText: 'Elder Hollow' }).count(), 0);
   assert.deepEqual(errors, []);

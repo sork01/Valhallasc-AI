@@ -23,7 +23,7 @@ const check = (ok, label) => { assert.ok(ok, label); console.log(`${++checks}: $
   }
   if (process.env.MUTATE) await page.route('**/field.js', async r => {
     const body = process.env.QUEST_ARROW_CANDIDATE ? fs.readFileSync(path.join(process.env.QUEST_ARROW_CANDIDATE, 'field.js'), 'utf8') : await (await r.fetch()).text();
-    await r.fulfill({ body: body.replace('    drawQuestArrow(g);', '    /* disabled guidance mutation */'), contentType: 'text/javascript' });
+    await r.fulfill({ body: body.replace('    drawQuestArrow(ctx);', '    /* disabled guidance mutation */'), contentType: 'text/javascript' });
   });
   await page.addInitScript(touch => {
     window.AudioContext = undefined; window.webkitAudioContext = undefined;
@@ -51,11 +51,15 @@ const check = (ok, label) => { assert.ok(ok, label); console.log(`${++checks}: $
   await trackButton('welcome').click();
   check(await page.evaluate(() => Quests.tracked === 'welcome' && document.getElementById('quest-journal').hidden), 'Tracker starts tracking without opening the journal');
   check(await trackButton('welcome').getAttribute('aria-pressed') === 'true', 'Selected tracking control exposes its pressed state');
-  check(await page.evaluate(() => {
+  const nav = await page.evaluate(() => {
     const { x, y } = Field.hero, target = Quests.navigationTarget(Field.zone, x, y);
     const goals = Quests.mapMarkers(Field.zone).filter(m => m.state === 'tracked');
-    return goals.length === 3 && goals.includes(target) && goals.every(m => Math.hypot(m.x-x, m.y-y) >= Math.hypot(target.x-x, target.y-y));
-  }), 'Navigation chooses the closest unfinished local objective');
+    // navigationTarget returns a copy of the marker, so match the destination by position, not identity.
+    const ok = goals.length === 3 && !!target && goals.some(m => m.x === target.x && m.y === target.y) && goals.every(m => Math.hypot(m.x-x, m.y-y) >= Math.hypot(target.x-x, target.y-y));
+    return { ok, zone: Field.zone, hero: [x, y], target, goals: goals.map(m => ({ x: m.x, y: m.y, quest: m.quest?.id ?? m.id, state: m.state })) };
+  });
+  if (!nav.ok) console.error('navigation probe:', JSON.stringify(nav));
+  check(nav.ok, 'Navigation chooses the closest unfinished local objective');
   await trackButton('welcome').click();
   check(await page.evaluate(() => Quests.tracked === null && Quests.navigationTarget(0, 0, 0) === null), 'Tracking button can turn guidance off');
   await trackButton('welcome').click();
