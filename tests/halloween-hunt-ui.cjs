@@ -35,7 +35,11 @@ async function npc(p,id){const n=await p.evaluate(id=>[WORLD_MAP,...WORLD_MAP.zo
  check(await p.evaluate(id=>Online.id!==id&&__self().look.name==='HuntHero',original),'Choosing a free name enters normally without overwriting the older character');
  await debug(p,{op:'season_time',unix:1792969200});await wait(p,()=>Seasonal.active&&__snap.seasons[0].day===20261026);
  // Real decoration draw and NPC accessories, only in the four city bounds.
- check(await p.evaluate(()=>[WORLD_MAP,...WORLD_MAP.zones].every((z,i)=>[0,4,9,17,24].includes(i)?z.seasonDecor?.length>=24:!z.seasonDecor)), 'Only the four main cities have seasonal prop metadata');
+ // Expected counts come from world/map.txt, which sync-world copies to the client. Greenmeadow (index 0) is decorated too
+ // by scripts/seasonal_cities.py, with 23 props (the old floor of 24 was wrong for it); the four cities are 492-969.
+ const authored=JSON.parse(fs.readFileSync(path.join(__dirname,'..','world/map.txt'),'utf8'));
+ if(process.env.MUTATE==='1')await p.evaluate(()=>{delete WORLD_MAP.zones[8].seasonDecor;});
+ check(await p.evaluate(counts=>[WORLD_MAP,...WORLD_MAP.zones].map(z=>z.seasonDecor?.length||0).every((n,i)=>n===counts[i]),[authored,...authored.zones].map(z=>z.seasonDecor?.length||0))&&await p.evaluate(()=>JSON.stringify([WORLD_MAP,...WORLD_MAP.zones].flatMap((z,i)=>z.seasonDecor?.length?[i]:[]))==='[0,4,9,17,24]'),'Only Greenmeadow and the four main cities have seasonal prop metadata, with the map counts');
  for(const zone of [0,4,9,17]){
   const o=await p.evaluate(z=>[WORLD_MAP,...WORLD_MAP.zones][z].seasonDecor.find(o=>!o.z),zone);await stand(p,zone,o.x,o.y);
   const data=await p.evaluate(()=>{const drawn=[],draw=City.drawObject;City.drawObject=function(g,o,...a){if(o.kind.startsWith('festival'))drawn.push(o.kind);return draw.call(this,g,o,...a);};try{Field._debug.drawFrame(3);return drawn;}finally{City.drawObject=draw;}});
