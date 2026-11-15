@@ -11,7 +11,9 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  await p.addInitScript(()=>{
   window.AudioContext=window.webkitAudioContext=undefined;
   if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:false,lowGraphics:false,lowGraphicsSet:true}));
-  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{try{const v=JSON.parse(e.data);if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;if(v.type==='achievements')window.__ach=v;}catch{}});}};
+  // The client sets binaryType 'arraybuffer' and sends compressed snapshots once pako is loaded (client/online.js).
+  const take=v=>{if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;if(v.type==='achievements')window.__ach=v;};
+  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
  await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('Christmas Check');await p.locator('#go').click({timeout:60000});
@@ -46,7 +48,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   await npc(host);await interact(host,'quest:accept:'+qid);await wait(id=>__self().quests.some(q=>q.id===id&&!q.claimed),qid);await debug({op:'quest',id:qid,action:'complete'});await interact(host,'quest:claim:'+qid);await wait(id=>__self().seasonalClaims[id]===2026,qid);
  }
  await p.evaluate(()=>Achievements.open());await wait(()=>window.__ach?.entries);
- check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='merry').complete===false&&__ach.maximum===2275),'Four city errands alone do not grant the Merry title');
+ check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='merry').complete===false&&__ach.maximum===2325),'Four city errands alone do not grant the Merry title');
  if(process.env.CHECK_ONLY==='titles'){
   await npc('baker');await interact('baker','quest:accept:christmas_hunt');await wait(()=>__self().quests.some(q=>q.id==='christmas_hunt'&&!q.claimed));await debug({op:'quest',id:'christmas_hunt',action:'complete'});await interact('baker','quest:claim:christmas_hunt');await wait(()=>__self().seasonalClaims.christmas_hunt===20261215);
   await send({type:'select_title',achievement:'merry'});await wait(()=>document.querySelector('#hud-name').textContent==='Christmas Check the Merry');await debug({op:'give_mount',mount:'reindeer'});await wait(()=>__self().mounts.includes('reindeer'));
@@ -54,10 +56,10 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(n=>Quests.offered(n).some(q=>q.id==='christmas_hunt'))),'All four city hosts offer the same daily Grinch hunt');
  await npc('city_bard');await interact('city_bard','quest:accept:christmas_hunt');await wait(()=>__self().quests.some(q=>q.id==='christmas_hunt'&&!q.claimed));
  await p.evaluate(()=>{City.close();Quests.track('christmas_hunt');});
- check(await p.evaluate(()=>Quests.mapMarkers(2).some(m=>m.quest==='christmas_hunt'&&m.x===112&&m.y===100)),'The daily quest marker points at the actual great Christmas tree');
+ check(await p.evaluate(()=>Quests.mapMarkers(2).some(m=>m.quest==='christmas_hunt'&&m.x===293&&m.y===225)),'The daily quest marker points at the actual great Christmas tree');
  await debug({op:'set_gold',gold:1000000});await wait(()=>__self().gold===1000000);
  for(const [i,cls]of['priest','mage','hunter','warrior'].entries()){await interact('city_bard','christmas:hire:'+cls);await wait(n=>__snap.players.filter(p=>p.hired).length===n,i+1);}
- await stand(2,110.5,100);await wait(()=>__snap.players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-103,p.y-100)<=12).length===4);
+ await stand(2,290.5,225);await wait(()=>__snap.players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-284,p.y-225)<=12).length===4);
  await p.evaluate(()=>Field.visitNpc('christmas_tree'));await p.locator('#npc-dialogue').waitFor({state:'visible'});await p.locator('[data-offer="christmas:summon"]').click();await wait(()=>__snap.slimes.some(s=>s.kind==='grinch'&&!s.dead));
  check(await p.evaluate(()=>__snap.christmas.active&&__snap.christmas.level===99),'Pressing the actual tree summons the five-fighter elite at the highest party level');
  await p.evaluate(()=>City.close());await wait(()=>Christmas.source);await p.screenshot({path:path.join(w.runDir,'christmas-grinch-summoned.png')});
@@ -73,8 +75,8 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>Quests.offered('baker').some(q=>q.id==='christmas_hunt')),'Stockholm midnight opens the next daily hunt');
  await npc('baker');await interact('baker','quest:accept:christmas_hunt');await wait(()=>__self().quests.some(q=>q.id==='christmas_hunt'&&!q.claimed));
  }
- await debug({op:'season_time',unix:1798498800});await wait(()=>!Seasonal.active&&__snap.christmas===null&&!__self().quests.some(q=>q.id==='christmas_hunt'&&!q.claimed));
- await stand(2,110.5,100);
+ await debug({op:'season_time',unix:1798498800});await wait(()=>!Seasonal.isActive('christmas')&&__snap.christmas===null&&!__self().quests.some(q=>q.id==='christmas_hunt'&&!q.claimed));
+ await stand(2,290.5,225);
  check(await p.evaluate(()=>Christmas.objects(2).length===0&&!City.npcs.some(n=>n.id==='christmas_tree')&&[0,4,9,17].every(z=>Seasonal.decor(z).length===0)),'December 29 removes the tree, encounter, unfinished quest and all Christmas dressing');
  check(await p.evaluate(()=>__self().mounts.includes('reindeer')&&document.querySelector('#hud-name').textContent==='Christmas Check the Merry'),'Owned mount and earned suffix survive the event’s end');
  const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);

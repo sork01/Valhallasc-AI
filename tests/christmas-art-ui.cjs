@@ -47,6 +47,8 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
     const tree=await p.evaluate(z=>{const a=[WORLD_MAP,...WORLD_MAP.zones][z];return a.christmasDecor.find(o=>o.kind==='christmasGrandTree')||a.christmasDecor.find(o=>o.kind==='christmasTree');},zone);
     await p.evaluate(([zone,x,y])=>{City.close();Quests.close();Field.clearInput();Online.send({type:'stop'});Online.send({type:'debug',command:{op:'teleport',zone,x,y}});Online.send({type:'debug',command:{op:'set_time',hour:18,freeze:true}});},[zone,tree.x+2,tree.y+2]);
     await p.waitForFunction(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<1.3,[zone,tree.x+2,tree.y+2]);await p.waitForFunction(()=>NpcArt.readyFor(City.npcs));await p.waitForTimeout(400);await p.evaluate(()=>ZoneJourney.clear());
+    // A host must stand inside the city box (client/seasonal.js eligible()); fail here by name, not with a TypeError.
+    check(await p.evaluate(()=>!!City.npcs.find(n=>Seasonal.hat(n))),`${name}: a festive host stands inside the city box`);
     const costume=await p.evaluate(()=>{const n=City.npcs.find(n=>Seasonal.hat(n)),c=document.createElement('canvas');c.width=c.height=400;const g=c.getContext('2d');g.translate(200,250);Seasonal.drawNpc(g,n,3,100);return g.getImageData(0,0,400,400).data.filter((v,i)=>i%4===3&&v>0).length;});
     check(costume>100,`${name}: festive NPC accessories render with real production artwork`);
     const png=await p.evaluate(()=>{Field._debug.drawFrame(3);return document.querySelector('#fieldcv').toDataURL();});

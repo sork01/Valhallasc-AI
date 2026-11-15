@@ -14,7 +14,9 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  await page.addInitScript(()=>{
   window.AudioContext=window.webkitAudioContext=undefined;window.__valhallaTestSprites=true;
   if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,lowGraphics:true,lowGraphicsSet:true,dpsMeter:false}));
-  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{try{const v=JSON.parse(e.data);if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;window.__packets=(window.__packets||[]).concat(v.type==='dialogue'?[v]:[]).slice(-10);}catch{}});}};
+  // The client sets binaryType 'arraybuffer' and sends compressed snapshots once pako is loaded (client/online.js).
+  const take=v=>{if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;window.__packets=(window.__packets||[]).concat(v.type==='dialogue'?[v]:[]).slice(-10);};
+  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('Festival Check');await page.locator('#go').click({timeout:60000});
