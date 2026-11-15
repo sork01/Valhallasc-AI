@@ -6,8 +6,10 @@ module.exports=(kit,map)=>({
   const bot='ForgeWalker',area=map.zones[45];
   await w.connect({bot,class:'warrior'});
   await w.debug(bot,{op:'quest',id:'raid_key',action:'finish'});
-  await kit.teleport(w,bot,{zone:45,x:133,y:27});
-  await w.action(bot,{type:'move',x:133,y:24});await w.advance(1600);await w.action(bot,{type:'stop'});
+  // The raid door is Emberwake's ew_raid (322,80) now; a teleport lands beside it on the nearest free ground.
+  const door=map.zones[44].portals.find(p=>p.id==='ew_raid');
+  await kit.teleport(w,bot,{zone:45,x:door.x,y:door.y+3});
+  await w.action(bot,{type:'move',x:door.x,y:door.y});await w.advance(1600);await w.action(bot,{type:'stop'});
   check(w.player(bot).zone===46,'The authored raid door admits a level-99 player to muster');
   await kit.teleport(w,bot,{zone:46,x:30,y:303});
   check(w.views.get(bot).instance?.template===46||w.player(bot).zone===46,'Private staging enters a raid copy');
@@ -42,7 +44,9 @@ module.exports=(kit,map)=>({
   await w.action(bot,{type:'move',x:22,y:303});await w.waitFor(()=>w.player(bot).zone===45,15000,'Raid exit');
   await w.action(bot,{type:'stop'});
   await w.waitFor(()=>!w.views.get(bot).players.some(p=>p.look.name.startsWith('Merc ')),5000,'Contracts end outside');
-  check(Math.hypot(w.player(bot).x-127,w.player(bot).y-25)<2,'Exit is clear of the door and does not bounce');
+  // The landing is cf_return's (316,81) beside Emberwake's door, which must not pull the hero back in.
+  const back=area.portals.find(p=>p.id==='cf_return');
+  check(Math.hypot(w.player(bot).x-back.tx,w.player(bot).y-back.ty)<2&&Math.hypot(w.player(bot).x-door.x,w.player(bot).y-door.y)>3,'Exit is clear of the door and does not bounce');
   check(!w.views.get(bot).players.some(p=>p.look.name.startsWith('Merc ')),'Raid contracts end before entering the outdoor company');
   console.error('Chained Forge measured walking: '+JSON.stringify(times));
  }
