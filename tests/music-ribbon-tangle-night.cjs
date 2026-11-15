@@ -52,7 +52,7 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.waitForFunction(() => valhalla.tanglecrownNightMusic.output.gain.value > .95, null, { timeout: 10000 });
 
   await debug(page, { op: 'teleport', zone: 25, x: 14, y: 128 });
-  await page.waitForFunction(() => Field.zone === 25 && valhalla.activeNightMusic === valhalla.nightMusic && valhalla.nightMusic.running && !valhalla.tanglecrownNightMusic.running, null, { timeout: 15000 });
+  await page.waitForFunction(() => Field.zone === 25 && valhalla.activeNightMusic === valhalla.lapisNightMusic && valhalla.lapisNightMusic.running && !valhalla.nightMusic.running && !valhalla.tanglecrownNightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 15, x: 16, y: 112 });
   await page.waitForFunction(() => Field.zone === 15 && DayNight.nightMix === 0 && !valhalla.nightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 22, x: 14, y: 111 });
@@ -61,7 +61,7 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 0 && !valhalla.tanglecrownNightMusic.running && valhalla.jmusic.running, null, { timeout: 15000 });
   assert.deepEqual(errors, [], 'no browser errors');
-  console.log('Two remixes route by zone, decode, crossfade, mute, yield to fallback, and stay out of enclosed zones');
+  console.log('Two remixes route by zone, decode, crossfade, mute, yield to the zone 25 Lapis score, and stay out of enclosed zones');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   await browser?.close();
   if (started) await call('stop_world').catch(() => {});

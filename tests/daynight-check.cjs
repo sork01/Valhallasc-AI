@@ -64,7 +64,10 @@ const taskSeconds = async cdp => (await cdp.send('Performance.getMetrics')).metr
     await debug(a, { op: 'set_time', hour: 12, freeze: true });
     await debug(a, { op: 'teleport', zone: z.n, x: z.spawn.x, y: z.spawn.y });
     try { await a.waitForFunction(n => Field.zone === n, z.n, { timeout: 5000 }); } catch { skipped.push(`${z.n} ${z.name}`); continue; }
-    await a.waitForFunction(outdoor => outdoor ? DayNight.outdoorBlend > .9 : DayNight.outdoorBlend < .1, z.outdoor, { timeout: 6000 });
+    await a.waitForFunction(outdoor => outdoor ? DayNight.outdoorBlend > .9 : DayNight.outdoorBlend < .1, z.outdoor, { timeout: 15000 }).catch(async e => {   // blend eases with a 1.2 s time constant per frame; slow frames on the box need ~10
+      const blend = await a.evaluate(() => DayNight.outdoorBlend);
+      throw new Error(`zone ${z.n} ${z.name} (outdoor ${z.outdoor}): outdoorBlend ${blend}; ${e.message}`);
+    });
     await a.waitForFunction(() => Math.abs(DayNight.hour - 12) < .01, null, { timeout: 5000 });
     await a.waitForTimeout(700);
     const noon = await brightness(a);
