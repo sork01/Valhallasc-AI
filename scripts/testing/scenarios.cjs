@@ -1630,7 +1630,7 @@ const scenarios = {
     },
   },
   cinderlord: {
-    description: 'Two level-20 warriors (the level-10 elite now has 19,200 HP and needs a stronger pair than the original two level-10 warriors) fight the Cinderlord with real damage, skills and potions, both earn quest credit and guaranteed blue gear, then equip it and retain the reward after restart.',
+    description: 'Two level-20 warriors (the level-10 elite now has 7,680 HP (2,400 x 3.2) and needs a stronger pair than the original two level-10 warriors) fight the Cinderlord with real damage, skills and potions, both earn quest credit and guaranteed blue gear, then equip it and retain the reward after restart.',
     startLevel: 10, godMode: false, levelSpread: 0,
     async run(w, check) {
       const bots = ['Ember', 'Cinder'], qid = 'crags_cinderlord', reward = 'necklace_moonstone_l10_blue';
@@ -1644,7 +1644,9 @@ const scenarios = {
         check(quest(w, bot, qid).counts[0] === 0, `${bot} accepts the elite quest with no kill credit`);
       }
       const elite = w.snapshot.slimes.find(s => s.kind === 'cinderlord');
-      check(elite.elite && elite.level === 10 && elite.maxHp === 2400 * 8 && elite.zone === 1, 'Exactly the new level-10 elite is present with authoritative '+elite.maxHp+' HP (DIAG)');
+      // Expected HP = the Cinderlord's base 2,400 (server/src/world.rs base_stats) x its health power in world/elite-power.txt (3.2), at level 10.
+      const cinderPower = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/elite-power.txt'), 'utf8')).cinderlord[0];
+      check(elite.elite && elite.level === 10 && elite.maxHp === Math.round(2400 * cinderPower) && elite.zone === 1, `Exactly the new level-10 elite is present with authoritative ${Math.round(2400 * cinderPower)} HP (2,400 x ${cinderPower}, world/elite-power.txt)`);
       for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 1, x: elite.x + (i ? 2 : -2), y: elite.y });
       for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });
       const current = () => w.snapshot.slimes.find(s => s.id === elite.id), began = Date.now(), lowest = {};
