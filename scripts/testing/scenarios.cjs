@@ -4442,11 +4442,12 @@ const scenarios = {
     async run(w,check) {
       const floor=map.zones[36];
       const gate=map.zones[27].portals.find(p=>p.id==='year_solar_descent');
-      check(gate?.to===37&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='solar_heart'&&floor.portals.some(p=>p.after_clear),'Solar entrance and clear exit are active');
+      // The sleeping ambusher (solar_cinder) is not an encounter; the twelve are.
+      check(gate?.to===37&&!floor.sealedTemplate&&floor.slimes.filter(s=>!s.ambush).length===12&&floor.final_boss==='solar_heart'&&floor.portals.some(p=>p.after_clear),'Solar entrance and clear exit are active');
       check(map.zones[27].quests.some(q=>q.id==='yr_su_solar_trials')&&map.zones[27].quests.some(q=>q.id==='yr_su_solar_final'),'Linked level-98 party quests exist');
       for(const bot of ['SolarLead','SolarAlly','SolarOther','SolarLow'])await w.connect({bot,class:'warrior'});
       await w.debug('SolarLow',{op:'set_level',level:97});
-      await kit.teleport(w,'SolarLow',{zone:28,x:352,y:261});
+      await kit.teleport(w,'SolarLow',{zone:28,x:gate.x,y:gate.y+3});
       const before=w.events.length;
       await w.action('SolarLow',{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='SolarLow'&&e.type==='error'&&/level 98/.test(e.text)),12000,'Level-97 player is rejected');
@@ -4455,7 +4456,7 @@ const scenarios = {
       await w.social('SolarLead',{op:'party_invite',bot:'SolarAlly'});
       await w.social('SolarAlly',{op:'party_accept',bot:'SolarLead'});
       for(const bot of ['SolarLead','SolarAlly','SolarOther']){
-        await kit.teleport(w,bot,{zone:28,x:352,y:261});
+        await kit.teleport(w,bot,{zone:28,x:gate.x,y:gate.y+3});
         await w.action(bot,{type:'move',x:gate.x,y:gate.y});
         await w.waitFor(()=>w.player(bot).zone===37,15000,`${bot} enters Solar`);
         await w.action(bot,{type:'stop'});
@@ -4493,7 +4494,9 @@ const scenarios = {
       await kit.teleport(w,'SolarLead',{zone:37,x:48,y:16});
       await w.action('SolarLead',{type:'move',x:48,y:12});
       await w.waitFor(()=>w.player('SolarLead').zone===28,15000,'Clear exit returns to Yearwheel');
-      check(Math.hypot(w.player('SolarLead').x-346,w.player('SolarLead').y-248)<2,'Solar return landing is safe');
+      // The landing is read from the clear exit (the Yearwheel moved; the old (346,248) is void).
+      const exitLanding=floor.portals.find(p=>p.id==='solar_crucible_exit');
+      check(Math.hypot(w.player('SolarLead').x-exitLanding.tx,w.player('SolarLead').y-exitLanding.ty)<2,'Solar return landing is safe');
       await w.restart();
       check(quest(w,'SolarLead','yr_su_solar_final')?.claimed,'Solar quest claim persists after restart');
     },
