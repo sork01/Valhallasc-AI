@@ -1,7 +1,7 @@
 // Private-world check: rank effects come from saved level and keep the same skill ID.
 const assert = require('node:assert/strict');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
-const { castSkill } = require('../scripts/testing/tools.cjs');
+const { castSkill, teleport } = require('../scripts/testing/tools.cjs');
 
 (async () => {
   const world = new TestWorld();
@@ -69,6 +69,8 @@ const { castSkill } = require('../scripts/testing/tools.cjs');
       await world.debug(bot, { op: 'set_level', level: 98 });
       assert.deepEqual((await world.debug(bot, { op: 'set_level', level: 99 })).result.unlocked, [skill], `${bot} earns its capstone at 99`);
       await world.debug(bot, { op: 'set_resource', amount: 100 });
+      // The default aim can point into a wall on the shaped world ("A wall blocks your skill"): stand on open ground first.
+      await teleport(world, bot, { zone: 0, x: 250, y: 235 });
       const capstone = await castSkill(world, bot, { skill, resetCooldown: true });
       assert.ok(capstone.cast && capstone.events.some(e => e.kind === 'skill' && e.skill === skill && e.capstone), `${bot} casts with capstone feedback`);
     }
