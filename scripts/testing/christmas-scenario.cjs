@@ -40,7 +40,8 @@ module.exports = kit => ({
     await w.restart();
     check(w.player(bot).seasonalClaims[id]===20261215&&w.player(bot).seasonalRolls[id]===20261215,'Independent claim and roll ledgers survive a server restart');
     await w.debug(bot,{op:'season_time',unix:1798498800});
-    await w.waitFor(()=>w.views.get(bot).seasons.length===0);
+    // New Year starts on December 29 (world/seasons.txt), so the list is not empty: only Christmas must be gone.
+    await w.waitFor(()=>!w.views.get(bot).seasons.some(x=>x.id==='christmas'));
     check(w.views.get(bot).christmas===null,'December 29 removes the ritual encounter state');
     await w.debug(bot,{op:'teleport',zone:2,x:291,y:225});
     await w.action(bot,{type:'interact',npc:'christmas_tree',offer:'christmas:summon'});
