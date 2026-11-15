@@ -1,4 +1,5 @@
 // Focused real-client check for the seven Flooded Cloister enemy atlases.
+process.env.REAL_SPRITES = process.env.REAL_SPRITES || '1';   // stub mode replaces every enemy, so no atlas would load
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');

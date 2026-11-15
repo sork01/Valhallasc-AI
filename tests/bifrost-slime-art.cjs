@@ -156,7 +156,13 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     }
     check(new Set(kinds.map(k => result.data[k].rows.find(r => r.clip === 'die' && r.n === 7).hash)).size === kinds.length, 'Checked kinds retain distinct final corpse silhouettes');
     fs.writeFileSync(path.join(w.runDir, 'bifrost-slime-portraits.png'), Buffer.from(result.portraits.split(',')[1], 'base64'));
+    const spawns = await p.evaluate(all => WORLD_MAP.zones[6].slimes.filter(s => all.includes(s.kind)).map(s => ({ kind: s.kind, x: s.x, y: s.y })), allKinds);
     for (const kind of kinds) {
+      // Walk to this kind's own spawn first: earlier teleports can leave it outside the snapshot.
+      const home = spawns.find(s => s.kind === kind);
+      check(home, `${kind}: Bifrost Reach (zone 7) spawns the kind`);
+      await p.evaluate(spot => Online.send({ type: 'debug', command: { op: 'teleport', zone: 7, x: spot.x+3, y: spot.y+2 } }), home);
+      await p.waitForFunction(kind => Field.zone === 7 && Field.slimes.some(s => s.kind === kind), kind, { timeout: 30000 });
       const spot = await p.evaluate(kind => {
         const s = Field.slimes.find(s => s.kind === kind);
         return s && { x: s.x, y: s.y, top: s.d.top };
