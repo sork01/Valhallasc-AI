@@ -25,13 +25,16 @@ const root = path.resolve(__dirname, '..');
       window.__valhallaTestSprites = true; // isolate input/geography checks from unrelated atlas decoding
       localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null }));
     });
+    let mutant = null; // served to every page the suite opens (the touch pages open later)
     if (process.env.MUTATE) {
-      const file = { mouse: 'field.js', horse: 'mountart.js', atlas: 'worldmap.js' }[process.env.MUTATE];
+      const file = { mouse: 'field.js', horse: 'mountart.js', atlas: 'worldmap.js', here: 'worldmap.js' }[process.env.MUTATE];
       let source = fs.readFileSync(path.join(root, 'client', file), 'utf8');
       if (process.env.MUTATE === 'mouse') source = source.replace('[pointer.x, pointer.y] = pointerWorld(pointer);', '/* stale world destination */');
       if (process.env.MUTATE === 'horse') source = source.replace("if (id === 'horse' && clip === 'run') i = (C.n - i) % C.n;", '/* backwards hooves */');
       if (process.env.MUTATE === 'atlas') source = source.replace('  const GROUND =', '  LAYOUT[1].y = LAYOUT[0].y + 10;\n  const GROUND =');
-      await page.route(`**/${file}`, r => r.fulfill({ contentType: 'text/javascript', body: source }));
+      if (process.env.MUTATE === 'here') source = source.replace("tiles[i].dataset.here = String(i === parent);", "tiles[i].dataset.here = 'false';");
+      mutant = { file, source };
+      await page.route(`**/${file}*`, r => r.fulfill({ contentType: 'text/javascript', body: source }));
     }
     await page.goto(world.url);
     await page.locator('#start').click(); await page.locator('#login-guest').click();
@@ -54,13 +57,17 @@ const root = path.resolve(__dirname, '..');
       await page.waitForTimeout(350); // settle the interpolated camera before projecting the cursor
     };
     if (!process.env.CHECK_ONLY || process.env.CHECK_ONLY === 'mouse') {
-      for (const mounted of [false, true]) {
-        await stand(4, 80, 145);
+      // Riding first: the server refuses a mount while the hero is in combat (combat_left), and a walk over the field can leave a fight timer running.
+      for (const mounted of [true, false]) {
+        await stand(0, 250, 235); // open ground in Greenmeadow (Skaldholm's shaped walls left (80,145) unreliable)
         await page.evaluate(mounted => Online.send({ type: 'mount', mounted }), mounted);
-        await page.waitForFunction(mounted => Field.hero.mounted === mounted, mounted);
+        await page.waitForFunction(mounted => Field.hero.mounted === mounted, mounted).catch(async error => {
+          const state = await page.evaluate(() => ({ mounted: Field.hero.mounted, mounts: Field.hero.mounts, zone: Field.zone, dead: Field.hero.dead, hp: Field.hero.hp, cutscene: window.Cutscene?.active, sent: travelSent.map(m => m.type).filter(t => t !== 'input').slice(-6), errors: document.getElementById('error-messages')?.textContent || '', feed: document.getElementById('syslog-list')?.textContent?.slice(-300) || '' }));
+          throw new Error('mount did not take: ' + JSON.stringify(state), { cause: error });
+        });
         const point = await page.evaluate(() => {
           const cv = document.querySelector('#fieldcv'), r = cv.getBoundingClientRect();
-          const [x, y] = Field._debug.w2s(80, 139);
+          const [x, y] = Field._debug.w2s(250, 229);
           return { x: r.left + x / 1600 * r.width, y: r.top + y / 1600 * r.width };
         });
         await page.evaluate(() => { travelSent.length = 0; });
@@ -72,14 +79,14 @@ const root = path.resolve(__dirname, '..');
         console.log(mounted ? 'riding' : 'walking', { y:progress.y, moves:progress.moves.length, first:progress.moves[0]?.y, last:progress.moves.at(-1)?.y });
         check(progress.moves.length >= 5, `${mounted ? 'Riding' : 'Walking'}: held mouse sends movement (${progress.moves.length})`);
         check(Math.min(...progress.moves.map(m => m.y)) < progress.moves[0].y - 6, 'Stationary cursor follows the moving camera instead of the old world point');
-        check(progress.y < 136 && progress.mounted === mounted && !progress.target, 'Actual fighter continues beyond the original destination');
+        check(progress.y < 226 && progress.mounted === mounted && !progress.target, 'Actual fighter continues beyond the original destination');
         check(progress.moves.length + progress.inputs.length < (mounted ? 160 : 248), 'Held movement stays below the connection rate limit');
         await page.evaluate(() => { travelSent.length = 0; }); await page.waitForTimeout(350);
         check(await page.evaluate(() => travelSent.every(m => m.type !== 'move')), 'Releasing the mouse stops destination refreshes');
       }
       // Cancelling capture or losing focus must not resume a held movement stream.
       for (const event of ['pointercancel', 'lostpointercapture', 'blur']) {
-        await stand(4, 80, 145);
+        await stand(0, 250, 235); // open ground in Greenmeadow (Skaldholm's shaped walls left (80,145) unreliable)
         await page.mouse.down();
         await page.evaluate(event => { (event === 'blur' ? window : document.querySelector('#fieldcv')).dispatchEvent(new Event(event)); travelSent.length = 0; }, event);
         await page.waitForTimeout(300); await page.mouse.up();
@@ -126,23 +133,32 @@ const root = path.resolve(__dirname, '..');
         browser = await chromium.launch({headless:true});
         const touchPage = await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
         touchPage.on('pageerror', e => errors.push(e.message));
+        if (mutant) await touchPage.route(`**/${mutant.file}*`, r => r.fulfill({ contentType: 'text/javascript', body: mutant.source }));
         await touchPage.addInitScript(() => {
           window.__valhallaTestSprites=true; window.AudioContext=undefined; window.webkitAudioContext=undefined;
           localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null}));
         });
         await touchPage.goto(world.url); await touchPage.locator('#start').click(); await touchPage.locator('#login-guest').click();
-        await touchPage.locator('#cls-warrior').click(); await touchPage.locator('#name').fill('AtlasTouch'); await touchPage.locator('#go').click({timeout:60000});
-        await touchPage.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
+        await touchPage.locator('#cls-warrior').click(); await touchPage.locator('#name').fill('AtlasT' + width); await touchPage.locator('#go').click({timeout:60000});
+        await touchPage.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000}).catch(async error => {
+          const state = await touchPage.evaluate(() => ({ connected: Online.connected, hero: !!Field.hero, hp: Field.hero?.hp, cutscene: window.Cutscene?.active, intro: window.IntroScene?.active, game: !document.getElementById('scene-game')?.hidden, start: !document.getElementById('start')?.hidden, login: !document.getElementById('login-guest')?.hidden, name: document.getElementById('name')?.value, err: document.getElementById('login-error')?.textContent || '' }));
+          throw new Error('touch login stalled: ' + JSON.stringify(state), { cause: error });
+        });
         if (await touchPage.locator('#low-gfx-dismiss').isVisible()) await touchPage.locator('#low-gfx-dismiss').click();
         await touchPage.evaluate(()=>WorldMap.show());
-        check(await touchPage.evaluate(()=>{
+        const fit = await touchPage.evaluate(()=>{
           const panel=document.querySelector('.wm-panel').getBoundingClientRect(),body=document.querySelector('#wm-body'),r=body.getBoundingClientRect();
-          const tile=document.querySelector('.wm-tile[data-zone="0"]').getBoundingClientRect(),legend=document.querySelector('.wm-connection-key').getBoundingClientRect();
-          return panel.left>=-1&&panel.top>=-1&&panel.right<=innerWidth+1&&panel.bottom<=innerHeight+1
-            &&body.scrollWidth>body.clientWidth&&body.scrollHeight>body.clientHeight
-            &&tile.left>=r.left&&tile.right<=r.right&&tile.top>=r.top&&tile.bottom<=r.bottom&&legend.bottom<=panel.bottom;
-        }),`${width}x${height}: atlas fits, scrolls, centers the hero and shows the connection key`);
-        await touchPage.locator('.wm-tile[data-zone="0"]').tap();
+          // The atlas opens at its fitted view (scroll reset, Beta 1.29.1), so the hero's region is marked "here" rather than scrolled to.
+          const tile=document.querySelector('.wm-tile[data-zone="0"]').getBoundingClientRect(),legend=document.querySelector('#wm-foot .wm-connection-key').getBoundingClientRect();
+          return {
+            panelInside: panel.left>=-1&&panel.top>=-1&&panel.right<=innerWidth+1&&panel.bottom<=innerHeight+1,
+            scrolls: body.scrollWidth>body.clientWidth||body.scrollHeight>body.clientHeight, // the touch atlas is at least 1200 px wide: at 1024x768 it pans sideways only
+            legendInPanel: legend.bottom<=panel.bottom,
+            focused: document.querySelector('.wm-tile[data-zone="0"]')?.dataset.here === 'true', values: {panel:[panel.left,panel.top,panel.right,panel.bottom], body:[r.left,r.top,r.right,r.bottom], sw:body.scrollWidth, cw:body.clientWidth, sh:body.scrollHeight, ch:body.clientHeight, tile:[tile.left,tile.top,tile.right,tile.bottom], legend:legend.bottom}
+          };
+        });
+        check(fit.panelInside&&fit.scrolls&&fit.focused&&fit.legendInPanel,`${width}x${height}: atlas fits, scrolls, marks the hero's region as here and shows the connection key: `+JSON.stringify(fit));
+        await touchPage.locator('.wm-name[data-zone="0"]').tap(); // the label button covers its tile (as in town-window-ui)
         check(await touchPage.evaluate(()=>WorldMap.view==='zone'),`${width}x${height}: touching a region opens its detail map`);
         await touchPage.locator('#wm-back').tap();
         check(await touchPage.evaluate(()=>WorldMap.view==='world'),`${width}x${height}: returning to the atlas works`);

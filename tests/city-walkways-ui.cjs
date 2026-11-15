@@ -11,14 +11,16 @@ const check=(ok,text)=>{assert.ok(ok,text);console.log(++checks+': '+text);};
   await p.addInitScript(()=>{
    window.AudioContext=undefined;
    localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,lowGraphics:true,lowGraphicsSet:true,dpsMeter:false}));
-   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{const v=JSON.parse(e.data);if(v.type==='welcome'||v.type==='snapshot')window.__snap=v.snapshot||v;});}};
+   // Snapshots arrive as binary deflate frames (compress:true): inflate them with the page's pako, as tests/christmas-ui.cjs does.
+   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{const take=v=>{if(v.type==='welcome'||v.type==='snapshot')window.__snap=v.snapshot||v;};if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   });
   await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('CityEntry'+zone);await p.locator('#go').click({timeout:60000});await p.waitForFunction(()=>Online.connected&&Field.hero.hp>0);
   const send=message=>p.evaluate(m=>Online.send(m),message);
   const move=async([x,y])=>{await send({type:'move',x,y});await p.waitForFunction(([z,x,y])=>{const s=__snap.players.find(p=>p.id===Online.id);return s?.zone===z&&Math.hypot(s.x-x,s.y-y)<.45;},[zone,x,y],{timeout:18000});await send({type:'stop'});};
   const at=async([x,y])=>{await p.evaluate(([z,x,y])=>{Field.clearInput();Online.send({type:'stop'});Online.send({type:'debug',command:{op:'teleport',zone:z,x,y}});Online.send({type:'debug',command:{op:'set_time',hour:12,freeze:true}});},[zone,x,y]);await p.waitForFunction(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<.5,[zone,x,y]);await p.evaluate(()=>ZoneJourney.clear());};
   const z=await p.evaluate(zone=>[WORLD_MAP,...WORLD_MAP.zones][zone],zone);
-  check(z.cityEntrances.length===({0:2,4:4,9:5,17:1})[zone],`${z.city.name}: every walking entrance is covered`);
+  // Nacrehold's north gate (nacre_deep_gate) became a seam with Ran's Deep in the zone-shapes rebuild, so it is no walking entrance any more (5 -> 4).
+  check(z.cityEntrances.length===({0:2,4:4,9:4,17:1})[zone],`${z.city.name}: every walking entrance is covered (${z.cityEntrances.length})`);
   for(const e of z.cityEntrances){
    const portal=z.portals.find(p=>p.id===e.portal),first=e.points[0],dir=portal?.walk;
    const start=portal?[first[0]-dir[0]*6,first[1]-dir[1]*6]:first;
@@ -36,7 +38,9 @@ const check=(ok,text)=>{assert.ok(ok,text);console.log(++checks+': '+text);};
     await send({type:'move',x:portal.x,y:portal.y});await p.waitForFunction(to=>Field.zone===to,portal.to,{timeout:18000});await send({type:'stop'});
     const back=await p.evaluate(zone=>[WORLD_MAP,...WORLD_MAP.zones][Field.zone].portals.find(p=>p.to===zone),zone);
     await send({type:'move',x:back.x,y:back.y});await p.waitForFunction(zone=>Field.zone===zone,zone,{timeout:18000});await send({type:'stop'});await p.waitForTimeout(200);
-    check(await p.evaluate(([z,id])=>{const own=__snap.players.find(p=>p.id===Online.id),gate=[WORLD_MAP,...WORLD_MAP.zones][z].portals.find(p=>p.id===id);return own.zone===z&&Math.hypot(own.x-gate.x,own.y-gate.y)>3;},[zone,portal.id]),`${e.id}: reciprocal travel returns safely without bouncing`);
+    // A bounce would put the hero back inside the gate's disc (radius gate.r); the stop point after walking out varies by ~1-2 tiles.
+    const back_ = await p.evaluate(([z,id,bx,by])=>{const own=__snap.players.find(p=>p.id===Online.id),gate=[WORLD_MAP,...WORLD_MAP.zones][z].portals.find(p=>p.id===id);return {ok:own.zone===z&&Math.hypot(own.x-gate.x,own.y-gate.y)>gate.r*2,zone:own.zone,x:own.x,y:own.y,gate:[gate.x,gate.y],back:[bx,by]};},[zone,portal.id,back.x,back.y]);
+    check(back_.ok,`${e.id}: reciprocal travel returns safely without bouncing ${JSON.stringify(back_)}`);
    }else{
     await p.evaluate(()=>ZoneJourney.clear());await p.screenshot({path:path.join(w.runDir,`${zone}-${e.id}-desktop.png`)});
     for(const point of e.points.slice(0,-1).reverse())await move(point);

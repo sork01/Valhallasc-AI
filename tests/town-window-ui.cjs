@@ -61,7 +61,9 @@ const suite = {
       await page.waitForFunction(zone => Field.zone === zone, zone);
       await page.evaluate(() => WorldMap.show());
       const label = page.locator(`.wm-name[data-zone="${zone}"]`);
-      await ((await label.count()) ? label : page.locator(`.wm-tile[data-zone="${zone}"]`)).tap(); // the label button covers its tile
+      // Asterion (17) is a nested city landmark: a .wm-city button, with no tile or name of its own.
+      const tile = page.locator(`.wm-tile[data-zone="${zone}"], .wm-city[data-zone="${zone}"]`).first();
+      await ((await label.count()) ? label : tile).tap(); // the label button covers its tile
       await page.waitForFunction(() => WorldMap.view === 'zone');
       check(await page.locator('.wm-people-list').isVisible(), `zone ${zone} has a people directory`);
       check(await page.locator('#wm-side').evaluate(n => n.getBoundingClientRect().width >= 160), 'directory keeps a readable width on mobile');
@@ -98,6 +100,9 @@ const suite = {
       await debug(page, { op: 'teleport', zone: 0, x: n.x, y: n.y + 1 });
       await page.waitForFunction(n => Math.hypot(Field.hero.nx - n.x, Field.hero.ny - n.y - 1) < .5, n);
       await page.evaluate(id => Field.visitNpc(id), id);
+      // The greeting lists Buy first; the stock opens from that row (as inventory-ui does).
+      await page.locator('#npc-offers [data-view="buy"]').waitFor({ state: 'visible', timeout: 15000 });
+      await page.locator('#npc-offers [data-view="buy"]').click();
       await page.waitForFunction(() => Shop.open && document.querySelector('.merchant-workspace[aria-busy="false"]'));
     }
     await visit('apothecary');
@@ -113,7 +118,9 @@ const suite = {
     check(await page.locator('#merchant-service').textContent() === 'Buys items', 'buying merchant clearly accepts sales');
     await page.locator('#inventory-list [data-item="slime_gel"] .item-tile').tap();
     await page.waitForFunction(() => Inventory.quantity('slime_gel') === 0);
-    check(/sold.*gold/i.test(await page.locator('#npc-notice').textContent()), 'Android browser tap sells to an accepting merchant');
+    // The receipt is the server's "Items sold for N copper." (amounts are copper now, not gold).
+    await page.waitForFunction(() => /sold.*(gold|silver|copper)/i.test(document.querySelector('#npc-notice').textContent));
+    check(/sold.*(gold|silver|copper)/i.test(await page.locator('#npc-notice').textContent()), 'Android browser tap sells to an accepting merchant');
     const valuable = await page.evaluate(() => WORLD_ITEMS.find(i => i.rarity === 'epic' && i.kind === 'necklace' && !i.starter).id);
     await debug(page, { op: 'give_item', item: valuable, quantity: 1 });
     await page.waitForFunction(id => document.querySelector('#inventory-list [data-item="' + id + '"] .item-tile'), valuable);

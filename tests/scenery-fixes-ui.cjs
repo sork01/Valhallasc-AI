@@ -48,7 +48,11 @@ const world=new TestWorld();let browser,checks=0;const check=(value,message)=>{a
   check(await page.evaluate(()=>window.__moltenCalls>0),'Crags ground uses the shared molten renderer');
   const terrain=await page.evaluate(()=>{
     const z=WORLD_MAP.zones[0],lava=z.objects.filter(o=>o.kind==='lava'),ew={...z,theme:'emberwake',objects:lava.map(o=>({...o,kind:'ew_lava'}))};
-    const draw=zone=>{const c=document.createElement('canvas');c.width=1000;c.height=1000;const g=c.getContext('2d');EmberwakeArt.molten(g,{x0:60,y0:53,ox:-394,oy:2552},12,88,44,zone);return g.getImageData(0,0,1000,1000).data;};
+    // The window is centred on the Crags lava piece nearest the middle of the river network (the shaped Crags moved the old fixed window off all lava).
+    const mx=lava.reduce((s,o)=>s+o.x,0)/lava.length,my=lava.reduce((s,o)=>s+o.y,0)/lava.length;
+    const near=lava.reduce((b,o)=>Math.hypot(o.x-mx,o.y-my)<Math.hypot(b.x-mx,b.y-my)?o:b);
+    const cx=Math.floor(near.x),cy=Math.floor(near.y),TW=88,TH=44,G={x0:cx-6,y0:cy-6,ox:(cx-cy)*TW/2-500,oy:(cx+cy)*TH/2-500};
+    const draw=zone=>{const c=document.createElement('canvas');c.width=1000;c.height=1000;const g=c.getContext('2d');EmberwakeArt.molten(g,G,12,TW,TH,zone);return g.getImageData(0,0,1000,1000).data;};
     const a=draw(z),b=draw(ew);let pixels=0,differences=0,alphaDifferences=0;for(let i=0;i<a.length;i++){if(i%4===3&&a[i])pixels++;if(a[i]!==b[i]){if(i%4===3)alphaDifferences++;else differences++;}}return {pixels,differences,alphaDifferences};
   });
   check(terrain.pixels>1000&&terrain.alphaDifferences===0&&terrain.differences>1000,'Crags has open red lava inside the same footprint as the caldera texture: '+JSON.stringify(terrain));

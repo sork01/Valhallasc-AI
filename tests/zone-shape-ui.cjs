@@ -54,6 +54,9 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     for (let y = 8; y < n - 8; y++) for (let x = 8; x < n - 8; x++) if (land(x, y) && !land(x + dx, y + dy) && land(x - 6 * dx, y - 6 * dy) && !land(x + 4 * dx, y + 4 * dy) ) edge.push([x, y]);
     // a vault in the border is a way through, not an edge: keep clear of it (and of its wall)
     for (let i = edge.length - 1; i >= 0; i--) if ((z.exitArches || []).some(a => Math.hypot(edge[i][0] - a.x, edge[i][1] - a.y) < 16)) edge.splice(i, 1);
+    // a seam border is a crossing too (the Crags' east edge is its Orrery seam): walking off it changes zone, so keep clear of it
+    const seamPoints = (z.portals || []).filter(p => p.seam).flatMap(p => p.seam.points);
+    for (let i = edge.length - 1; i >= 0; i--) if (seamPoints.some(([sx, sy]) => Math.hypot(edge[i][0] - sx, edge[i][1] - sy) < 24)) edge.splice(i, 1);
     check(edge.length > 10, `zone ${zone} has an edge to test`);
     const [ex, ey] = edge[Math.floor(edge.length / 2)], sx = ex - 2 * dx + .5, sy = ey - 2 * dy + .5;
     await debug({ op: 'teleport', zone, x: sx, y: sy });
@@ -61,11 +64,12 @@ const onLand = (z, x, y) => zoneDef(z).shapeFloor[Math.floor(y)]?.[Math.floor(x)
     await page.waitForTimeout(1500);
     await page.screenshot({ path: path.join(out, `zone${zone}-edge.png`) });
     await page.keyboard.down(key);
-    await page.waitForTimeout(3500);
+    const trail = [];
+    for (let t = 0; t < 14; t++) { await page.waitForTimeout(250); trail.push(await where()); }
     await page.keyboard.up(key);
     await page.waitForTimeout(600);
     const p = await where();
-    check(p.zone === zone && onLand(zone, p.x, p.y), `zone ${zone}: held ${key} for 3.5 s from (${ex},${ey}), stopped on land at (${p.x.toFixed(1)},${p.y.toFixed(1)})`);
+    check(p.zone === zone && onLand(zone, p.x, p.y), `zone ${zone}: held ${key} for 3.5 s from (${ex},${ey}), stopped on land at (${p.x.toFixed(1)},${p.y.toFixed(1)}) trail ${JSON.stringify(trail.map(t => [t.zone, +t.x.toFixed(1), +t.y.toFixed(1)]))}`);
     // Centre of the core: normal ground, objects and trees draw (the old square is intact).
     const cx = z.shape.warp ? z.city.plaza.x + .5 : z.shape.offset[0] + 48.5, cy = z.shape.warp ? z.city.plaza.y + 3.5 : z.shape.offset[1] + 48.5;
     await debug({ op: 'teleport', zone, x: cx, y: cy });
