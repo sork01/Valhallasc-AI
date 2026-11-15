@@ -34,7 +34,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.waitForFunction(()=>Field.hero.level===25);
   await page.locator('#levelup-banner').waitFor({state:'hidden'});
   const gear=await page.evaluate(()=>WORLD_ITEMS.filter(i=>i.source==='nornroot'&&(!i.class||i.class==='warrior')).map(i=>({id:i.id,slot:({armor:'chest',weapon:'hands',accessory:'accessory1'})[i.kind]||i.kind})));
-  assert.equal(gear.length,8);
+  // Eight set pieces plus the cloak: cloaks take a slot but never count toward the set.
+  assert.equal(gear.length,9);
   for(const piece of gear){
     await debug({op:'give_item',item:piece.id,quantity:1});
     await page.waitForFunction(id=>Field.hero.inventory?.some(s=>s.item===id),piece.id);
@@ -42,8 +43,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.evaluate(gear=>Online.send({type:'equip',slots:Object.fromEntries(gear.map(p=>[p.slot,p.id]))}),gear);
   await page.waitForFunction(()=>Field.hero.setCounts?.nornroot===8);
   if(!STUB)await page.waitForFunction(()=>Field.warriorSprites?.equipment?.armor==='fatewoven'&&Field.warriorSprites?.source?.parts?.weapon_fatewoven);
-  await teleport(6,84,71);await shot('entrance');
-  await page.evaluate(()=>Online.send({type:'move',x:84,y:66}));
+  // The Barrow door is shut until entry_norn is done; finish it (with its chain) through the test shortcut.
+  await debug({op:'quest',id:'entry_norn',action:'finish'});
+  // Wyrdwood's entrance to the Barrow is (154,183.5); (154,188.5) is the arrival tile from the Barrow's return.
+  await teleport(6,154,188.5);await shot('entrance');
+  await page.evaluate(()=>Online.send({type:'move',x:154,y:183.5}));
   await page.waitForFunction(()=>Field.zone===41,null,{timeout:15000});
   await page.evaluate(()=>Online.send({type:'stop'}));
   await page.waitForFunction(()=>valhalla.nornrootMusic?.running&&valhalla.nornrootMusic.loaded,null,{timeout:30000});

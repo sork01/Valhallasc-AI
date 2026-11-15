@@ -28,12 +28,13 @@ const check=(ok,label)=>{assert.ok(ok,label);console.log(`${++checks}: ${label}`
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('DepthProof');await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(()=>Online.connected&&Field.warriorSprites?.source?.parts?.body,null,{timeout:60000});
   if(await page.locator('#low-gfx-dismiss').isVisible())await page.locator('#low-gfx-dismiss').click();
-  await page.evaluate(()=>Online.send({type:'debug',command:{op:'teleport',zone:0,x:15,y:15}}));
-  await page.waitForFunction(()=>Math.hypot(Field.hero.x-15,Field.hero.y-15)<.1);
+  // (250,235) is open ground in zone 0; teleports otherwise settle on the nearest free ground.
+  await page.evaluate(()=>Online.send({type:'debug',command:{op:'teleport',zone:0,x:250,y:235}}));
+  await page.waitForFunction(()=>Math.hypot(Field.hero.x-250,Field.hero.y-235)<3,null,{timeout:30000});
   await page.evaluate(()=>Online.send({type:'debug',command:{op:'set_time',hour:12,freeze:true}}));
   await page.waitForTimeout(250);
   await world.connect({bot:'DepthRemote',class:'warrior'});
-  await world.debug('DepthRemote',{op:'teleport',zone:0,x:18,y:15});
+  await world.debug('DepthRemote',{op:'teleport',zone:0,x:250+3,y:235});
   await page.waitForFunction(()=>Field.remotePlayers.some(p=>p.look?.name==='DepthRemote'&&p.sprite?.source?.parts?.body),null,{timeout:60000});
   const results=await page.evaluate(()=>{
     Field.setPaused(true);
