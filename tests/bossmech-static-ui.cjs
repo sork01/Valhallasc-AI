@@ -15,8 +15,9 @@ const release = path.join(root, 'target/release/valhalla-server');
 const debug = path.join(root, 'target/debug/valhalla-server');
 const newest = [release, debug].filter(f => fs.existsSync(f)).sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0];
 const binary = process.env.VALHALLA_BINARY || newest;
-const spawn = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')).spawn;
-const rods = [[spawn.x + 5, spawn.y - 4], [spawn.x + 5, spawn.y + 4], [spawn.x - 5, spawn.y - 4], [spawn.x - 5, spawn.y + 4]];
+// The hero is moved to open ground at (250, 235) in zone 0 before the fight (the Saltby pier is a sanctuary), so the rods sit around that point.
+const base = { x: 250, y: 235 };
+const rods = [[base.x + 5, base.y - 4], [base.x + 5, base.y + 4], [base.x - 5, base.y - 4], [base.x - 5, base.y + 4]];
 const dir = fs.mkdtempSync(path.join(root, 'test-results', 'bossmech-static-'));
 const table = path.join(dir, 'boss-mechanics.txt');
 fs.writeFileSync(table, JSON.stringify({
@@ -47,6 +48,9 @@ async function call(name, args = {}) {
   const send = command => page.evaluate(command => { Online.send({ type: 'debug', ref: Math.floor(Math.random() * 1e9), command }); }, command).then(() => page.waitForTimeout(300));
   const fight = () => page.evaluate(() => JSON.parse(JSON.stringify(BossMech.fights[0] || null)));
   await send({ op: 'set_god_mode', enabled: true });
+  // a new hero starts on the Saltby pier, inside the sanctuary, where no enemy notices them: move to open ground first
+  await send({ op: 'teleport', zone: 0, x: 250, y: 235 });
+  await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 15000 });
   const h = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
   await send({ op: 'spawn_enemy', kind: 'green', x: h.x + 2, y: h.y, level: 99 });
   await page.waitForFunction(() => BossMech.active, null, { timeout: 15000 });
@@ -57,6 +61,9 @@ async function call(name, args = {}) {
   check(rodTeles.length === 4 && rodTeles.every(t => t.tele === 'blue' && t.lit === true && t.shapes[0].r === 1.8), 'four ready rods, blue, radius 1.8');
   check(first.static && first.static.limit === 12 && first.static.warnAt === 2 && first.static.radius === 5, 'the snapshot carries the limit, the warning and the blast radius');
   const rod = rodTeles[0].shapes[0];
+  // the server's clock may be night, and the darkening hides a telegraph painted under it: the pixel checks run at noon
+  await page.evaluate(() => { DayNight.sync({ hour: 12, hoursPerSecond: 0 }); DayNight.tick(20); });
+  await page.waitForTimeout(300);
   await page.screenshot({ path: path.join(world.artifacts, 'bossmech-static-rods.png') });
   const blueAt = await page.evaluate(({ x, y }) => {
     const [sx, sy] = Field._debug.w2s(x, y), cv = document.getElementById('fieldcv'), k = cv.width / 1600, g = cv.getContext('2d');

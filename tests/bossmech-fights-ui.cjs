@@ -26,7 +26,9 @@ const env = { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0', ...(binary
 if (phase === 2) {
   const dir = fs.mkdtempSync(path.join(root, 'test-results', 'bossmech-phase2-'));
   const table = {};
+  // Only the bosses fought in this run are changed: the Eldmarr check refuses a table that drops its crack/heat/seats windows.
   for (const [kind, def] of Object.entries(shipped)) {
+    if (!kinds.includes(kind)) continue;
     const mechanics = def.mechanics.filter(m => m.hp_min === undefined).map(m => { const { hp_max, ...rest } = m; return m.block === 'split' ? { ...m, hp: 0.99 } : hp_max === undefined ? m : { ...rest, hp_max: 1 }; });
     if (mechanics.some(m => m.hp_max !== undefined || m.block === 'split')) table[kind] = { ...def, mechanics };
   }

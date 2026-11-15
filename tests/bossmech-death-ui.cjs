@@ -46,6 +46,9 @@ async function call(name, args = {}) {
   const hero = () => page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
   const text = id => page.evaluate(id => { const el = document.getElementById(id); return { hidden: el.hidden, shown: getComputedStyle(el).display !== 'none', text: el.textContent }; }, id);
 
+  // a new hero starts on the Saltby pier, inside the sanctuary, where no enemy notices them: move to open ground first
+  await debug({ op: 'teleport', zone: 0, x: 250, y: 235 });
+  await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 15000 });
   // a second hero who stays alive: a bot beside the first, strong enough to outlast the boss for the length of the test
   await call('connect_bot', { bot: 'Anchor', class: 'warrior' });
   await call('set_level', { bot: 'Anchor', level: 99 });
@@ -82,15 +85,17 @@ async function call(name, args = {}) {
   check(still, 'the kill does not wake the hero at once: the usual three seconds start now');
   const normal = await text('dead-sub'), waiting = await text('dead-wait');
   check(normal.shown && !waiting.shown, 'the defeat screen goes back to its normal line once the fight is over');
-  await page.waitForFunction(() => !Field.hero.dead, null, { timeout: 8000 });
-  check(await page.evaluate(() => document.getElementById('dead-msg').hidden), 'the defeat screen closes when the hero wakes');
+  // A human who is not held does not wake on a timer any more: after the three seconds the hero is a ghost (the server's ghost
+  // event), and the defeat screen gives way to the ghost line.
+  await page.waitForFunction(() => Field.hero.ghost === true, null, { timeout: 8000 });
+  check(await page.evaluate(() => document.getElementById('dead-msg').hidden && !document.getElementById('ghost-msg').hidden), 'the fight is over: the hero is a ghost and the ghost line shows');
 
   // ---- 4. a death with no fight is as before ------------------------------------------------------------------------------------
   await debug({ op: 'die' });
   await page.waitForFunction(() => Field.hero.dead, null, { timeout: 5000 });
   check(!(await text('dead-sub')).hidden && (await text('dead-wait')).hidden, 'no fight: the normal line');
   check(await page.evaluate(() => !Field.hero.fallen), 'no fight: not held');
-  await page.waitForFunction(() => !Field.hero.dead, null, { timeout: 8000 });
+  await page.waitForFunction(() => Field.hero.ghost === true, null, { timeout: 8000 });
 
   // ---- 5. the new text exists in Swedish, written by hand ----------------------------------------------------------------------------
   const sv = await browser.newPage({ viewport: { width: 1000, height: 700 } });
