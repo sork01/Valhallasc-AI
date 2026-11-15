@@ -64,6 +64,10 @@ const results = [];
     await page.waitForFunction(before => window.__meter.rows.filter(r => r.hired).reduce((n, r) => n + r.damage, 0) > before, before, { timeout: 20000 });
     check(await page.evaluate(() => Field.hero.dead), 'owner stays fallen while the hires keep fighting');
     check(await page.evaluate(before => window.__meter.rows.filter(r => r.hired).reduce((n, r) => n + r.damage, 0) > before, before), 'surviving mercenaries keep dealing damage after owner death');
+    // A debug kill is credited to the owner, and the server refuses it while the owner is a ghost (hit_slime returns at
+    // hp <= 0), so the owner is revived by set_hp before the raid is cleared.
+    await page.evaluate(() => GM.request({ op: 'set_hp', hp: 1e6 }));
+    await page.waitForFunction(() => !Field.hero.dead, null, { timeout: 10000 });
     for (const id of enemies) await page.evaluate(id => GM.request({ op: 'kill_enemy', id }), id);
     // The hires keep fighting the raid's other living packs, and the pull stays open while any of them is engaged
     // (packs.rs). Clear the rest of this raid's living enemies so the fight can end.
