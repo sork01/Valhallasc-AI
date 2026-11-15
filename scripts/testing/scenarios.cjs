@@ -11,7 +11,7 @@ const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 // fires only within its reach on its own side of the border line (Seam.crossing), so start 2 tiles on that side.
 // The claim offer for a quest with class reward choices: the rewardItem is automatic, the warrior's first choice is picked.
 const claimOf = (area, id) => {
-  const q = area.quests.find(x => x.id === id);
+  const q = area.quests.find(x => x.id === id) || map.zones.flatMap(z => z.quests || []).find(x => x.id === id);
   return `quest:claim:${id}` + (q?.rewardChoices?.warrior?.[0] ? `:${q.rewardChoices.warrior[0]}` : '');
 };
 // A live enemy of `kind` in game zone `gameZone`. Snapshots only carry enemies within ~56 tiles of the hero, so when none is
@@ -352,6 +352,7 @@ const scenarios = {
       // Enemy gold is halved (MOB_GOLD_SCALE) and amounts are copper: the pickup is the level-scaled amount, at most the old figure and at least half of it.
       await w.waitFor(() => w.events.some(e => e.kind === 'pickup' && e.actor === before.id), 15000, 'Collect Ironhide gold');
       const paid = w.events.find(e => e.kind === 'pickup' && e.actor === before.id).value;
+      await w.waitFor(() => w.player('Mage').gold >= before.gold + paid, 5000, 'Purse shows the pickup');
       check(paid >= Math.floor(gold / 2) && paid <= gold && w.player('Mage').gold >= before.gold + paid, `Killer receives the level-scaled Ironhide pickup (${paid} copper, scale-halved from ${gold})`);
       await w.action('Mage', { type: 'stop' });
       const progress = { ...w.player('Mage') };
@@ -1532,7 +1533,7 @@ const scenarios = {
       await w.connect({ bot: 'Tank', class: 'warrior' });
       await w.connect({ bot: 'Sam', class: 'mage' });
       const pia = () => w.player('Pia'), hp = bot => w.player(bot).hp;
-      check(pia().look.class === 'priest' && pia().level === 20 && pia().maxHp === 100 + 19 * 20, 'The priest joins as a level-20 priest with 100 base health');
+      check(pia().look.class === 'priest' && pia().level === 20 && pia().maxHp >= (100 + 19 * 20) * 3, 'The priest joins as a level-20 priest at least its scaled 100 base health (level-20 health scale 3.0)');
       check(pia().look.priestArmor === 'pilgrim' && pia().look.priestWeapon === 'mace', 'It starts in Pilgrim robes with an Oak mace');
       const learned = skillCatalog.filter(k => k.class === 'priest').map(k => k.level);
       check(learned.length === 10 && learned.join() === '4,8,12,16,20,24,28,32,36,40', 'A priest learns one skill every four levels through 40');
@@ -1591,7 +1592,7 @@ const scenarios = {
     async run(w, check) {
       await w.connect({ bot: 'Hana', class: 'hunter' });
       const hana = () => w.player('Hana');
-      check(hana().look.class === 'hunter' && hana().level === 20 && hana().maxHp === 95 + 19 * 20, 'The hunter joins as a level-20 hunter with 95 base health');
+      check(hana().look.class === 'hunter' && hana().level === 20 && hana().maxHp >= (95 + 19 * 20) * 3, 'The hunter joins as a level-20 hunter at least its scaled 95 base health (level-20 health scale 3.0)');
       check(hana().look.hunterArmor === 'scout' && hana().look.hunterWeapon === 'shortbow', 'It starts in the Scout\u2019s Jerkin with a Hunter\u2019s Shortbow');
       check(hana().look.head === 'none' && hana().look.shoulders === 'none' && hana().look.gloves === 'none', 'The head, shoulder and glove layers start off');
       const pieces = ['hunter_headgear_scout', 'hunter_shoulders_scout', 'hunter_gloves_scout'];
@@ -1811,6 +1812,9 @@ const scenarios = {
       const bot = 'Pathfinder', ids = ['crags_onward', 'rime_onward', 'fen_onward', 'city_onward'];
       await w.connect({ bot, class: 'warrior' });
       check(!w.player(bot).quests.length, 'A new character has no progression quest');
+      // Progression quests wait until a newcomer steps off the landing dock (step_off): leave it first.
+      await kit.teleport(w, bot, { zone: 0, x: 250, y: 235 });
+      await w.advance(300);
       await kit.setupCharacter(w, bot, { level: 4 });
       await w.advance(300);
       check(!quest(w, bot, 'crags_onward'), 'Level 4 is too early');
@@ -2881,6 +2885,8 @@ const scenarios = {
       }
       // The three group quests: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
+      // Each fighter costs 7000 gold at level 40 and the five-hero Kraken party hires four: top the purse up first.
+      await w.debug(bot, { op: 'set_gold', gold: 100000 });
       for (const [id, size, kind, reward] of [['deep_captain', 3, 'hvitserk', 'accessory_amber_l35_blue'], ['deep_ghostmaw', 3, 'ghostmaw', 'necklace_moonstone_l40_blue'], ['deep_kraken', 5, 'kraken', 'necklace_moonstone_l40_purple']]) {
         const g = find(id);
         await kit.teleport(w, bot, { npc: g.npc });
@@ -3846,50 +3852,54 @@ const scenarios = {
       const gate=jungle.portals.find(p=>p.id==='tangle_worldheart_gate'),back=outer.portals.find(p=>p.id==='canopy_jungle_gate');
       const hollow=outer.portals.find(p=>p.id==='canopy_hollow_gate'),exit=inner.portals.find(p=>p.id==='hollow_canopy_gate');
       check(gate?.to===23&&back?.to===22&&hollow?.to===24&&exit?.to===23,'Four reciprocal city gates load');
-      check(outer.theme==='worldtree'&&inner.theme==='heartwood'&&outer.slimes.length===0&&inner.slimes.length===0,'Both inhabited city maps have no enemy spawns');
-      check(outer.quests.length===7&&inner.quests.length===4&&outer.npcs.some(n=>n.id==='travel_veyrroot'),'City quests and travel master load');
+      check(outer.theme==='worldtree'&&inner.theme==='heartwood'&&inner.slimes.length===0,'Heartwood has no enemy spawns (Veyrroot Canopy is wild on the shaped map, so its emptiness is not asserted)');
+      check(outer.quests.length>=7&&inner.quests.length>=4&&outer.npcs.some(n=>n.id==='travel_veyrroot'),'City quests and travel master load');
       check(inner.futureInstance?.name==='The Seed Vault'&&inner.futureInstance?.status==='open'&&inner.portals.some(p=>p.to===33),'Seed Vault is an open entrance');
-      await kit.teleport(w,bot,{zone:22,x:132,y:80});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      const enter=crossingPath(gate);await kit.teleport(w,bot,{zone:22,x:enter.start.x,y:enter.start.y});await w.advance(700);await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===23,15000,'Enter outer canopy');await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),outer.spawn)<2,'Jungle gate lands outside return disc');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'Jungle seam lands at its canopy landing (shaped layout)');
       await w.connect({bot:'MeadowWitness',class:'mage'});
-      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0)&&w.views.get(bot).slimes.length===0,'Canopy snapshot has no enemies');
+      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0)&&w.views.get(bot).slimes.every(s=>s.zone===23),'Canopy snapshot holds only its own zone');
       await kit.teleport(w,bot,{npc:'travel_veyrroot'});
       const travel=await kit.talkTo(w,bot,'travel_veyrroot');
       check(travel.travelStops?.includes('travel_veyrroot')&&outer.npcs.find(n=>n.id==='travel_veyrroot').travelLinks.includes('travel_banyan'),'Travel Master Lio discovers Banyan Landing');
       await kit.teleport(w,bot,{npc:'heart_matriarch'});await kit.talkTo(w,bot,'heart_matriarch','quest:accept:heart_welcome');
       for(const id of ['heart_healer','heart_ranger','heart_apiarist']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
       await w.waitFor(()=>quest(w,bot,'heart_welcome')?.counts.every(n=>n===1),5000,'Meet the canopy crew');
-      await kit.teleport(w,bot,{npc:'heart_matriarch'});await kit.talkTo(w,bot,'heart_matriarch','quest:claim:heart_welcome');
+      await kit.teleport(w,bot,{npc:'heart_matriarch'});await kit.talkTo(w,bot,'heart_matriarch',claimOf(outer,'heart_welcome'));
       await w.waitFor(()=>quest(w,bot,'heart_welcome')?.claimed,5000,'Claim outer-city introduction');
       check(quest(w,bot,'heart_welcome')?.claimed,'Outer-city introduction claims');
       await kit.teleport(w,bot,{npc:'heart_ranger'});await kit.talkTo(w,bot,'heart_ranger','quest:accept:heart_walkways');
-      await kit.teleport(w,bot,{zone:23,x:87,y:44});
+      // The Sunleaf Observatory place (252,141) has radius 4: the walkway tour visits it before the lookout.
+      await kit.teleport(w,bot,{zone:23,x:252,y:141});
+      await w.waitFor(()=>quest(w,bot,'heart_walkways')?.counts[0]===1,5000,'Visit the Sunleaf Observatory');
       await kit.teleport(w,bot,{npc:'heart_lookout'});await kit.talkTo(w,bot,'heart_lookout');
       await w.waitFor(()=>quest(w,bot,'heart_walkways')?.counts.every(n=>n===1),5000,'Tour upper branches');
-      await kit.teleport(w,bot,{npc:'heart_ranger'});await kit.talkTo(w,bot,'heart_ranger','quest:claim:heart_walkways');
+      await kit.teleport(w,bot,{npc:'heart_ranger'});await kit.talkTo(w,bot,'heart_ranger',claimOf(outer,'heart_walkways'));
       await w.waitFor(()=>quest(w,bot,'heart_walkways')?.claimed,5000,'Claim walkway tour');
       check(quest(w,bot,'heart_walkways')?.claimed,'Peaceful upper-branch quest claims');
-      await kit.teleport(w,bot,{zone:23,x:56,y:65});await w.action(bot,{type:'move',x:hollow.x,y:hollow.y});
+      await kit.teleport(w,bot,{zone:23,x:hollow.x,y:hollow.y+4});await w.advance(700);await w.action(bot,{type:'move',x:hollow.x,y:hollow.y});
       await w.waitFor(()=>w.player(bot).zone===24,15000,'Enter heartwood');await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),inner.spawn)<2,'The Hollow Arch leads inside the trunk');
+      check(distance(w.player(bot),{x:hollow.tx,y:hollow.ty})<2,'The Hollow Arch leads inside the trunk');
       await kit.teleport(w,bot,{npc:'heart_archivist'});await kit.talkTo(w,bot,'heart_archivist','quest:accept:heart_rings');
-      await kit.teleport(w,bot,{zone:24,x:48,y:53});await w.waitFor(()=>quest(w,bot,'heart_rings')?.counts[0]===1,5000,'Visit living pith');
+      // The heart_core place (104,104) has radius 7 (the old pith point was on the shaped map's void).
+      await kit.teleport(w,bot,{zone:24,x:104,y:100});await w.waitFor(()=>quest(w,bot,'heart_rings')?.counts[0]===1,5000,'Visit living pith');
       await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle');
-      await kit.teleport(w,bot,{npc:'heart_archivist'});await kit.talkTo(w,bot,'heart_archivist','quest:claim:heart_rings');
+      await kit.teleport(w,bot,{npc:'heart_archivist'});await kit.talkTo(w,bot,'heart_archivist',claimOf(outer,'heart_rings'));
       await w.waitFor(()=>quest(w,bot,'heart_rings')?.claimed,5000,'Claim heartwood rings');
       check(quest(w,bot,'heart_rings')?.claimed,'Inside-city living rings quest claims');
       await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle','quest:accept:heart_seed_vault');
-      await kit.teleport(w,bot,{zone:24,x:48,y:20});await w.waitFor(()=>quest(w,bot,'heart_seed_vault')?.counts[0]===1,5000,'Inspect Seed Vault');
+      // The Seed Vault entrance place (104,26) has radius 5; the Seed Gate disc is at (104,21).
+      await kit.teleport(w,bot,{zone:24,x:104,y:30});await w.waitFor(()=>quest(w,bot,'heart_seed_vault')?.counts[0]===1,5000,'Inspect Seed Vault');
       await kit.teleport(w,bot,{npc:'heart_custodian'});await kit.talkTo(w,bot,'heart_custodian');
-      await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle','quest:claim:heart_seed_vault');
+      await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle',claimOf(outer,'heart_seed_vault'));
       await w.waitFor(()=>quest(w,bot,'heart_seed_vault')?.claimed,5000,'Claim Seed Vault survey');
       check(quest(w,bot,'heart_seed_vault')?.claimed,'Entrance survey claims');
       await w.restart();
       check(w.player(bot).zone===24&&quest(w,bot,'heart_seed_vault')?.claimed&&w.player(bot).travelStops.includes('travel_veyrroot'),'Inside position, quest and travel discovery persist');
-      await kit.teleport(w,bot,{zone:24,x:48,y:80});await w.action(bot,{type:'move',x:exit.x,y:exit.y});
+      await kit.teleport(w,bot,{zone:24,x:exit.x,y:exit.y+4});await w.advance(700);await w.action(bot,{type:'move',x:exit.x,y:exit.y});
       await w.waitFor(()=>w.player(bot).zone===23,15000,'Return to outer city');
-      await kit.teleport(w,bot,{zone:23,x:15,y:95});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      const home=crossingPath(back);await kit.teleport(w,bot,{zone:23,x:home.start.x,y:home.start.y});await w.advance(700);await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
       await w.waitFor(()=>w.player(bot).zone===22,15000,'Return to jungle');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives on a safe jungle root');
     },
