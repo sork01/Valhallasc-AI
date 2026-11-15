@@ -471,7 +471,7 @@
     "cf_orm": 60,
     "cf_hildr": 74,
     "cf_eldmarr": 59,
-    "ember_firelord": 59,
+    "ember_firelord": 57,
     "es_foe_02": 58,
     "es_foe_04": 58,
     "es_foe_06": 58,

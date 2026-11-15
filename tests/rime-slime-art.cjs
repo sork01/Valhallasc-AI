@@ -11,6 +11,20 @@ const kinds = ['crab', 'wolf', 'yeti', 'wyrm'];
 const frames = { crab: [112, 96, 52, 90], wolf: [112, 96, 52, 90], yeti: [112, 112, 56, 106], wyrm: [144, 96, 56, 90] };
 const sources = JSON.parse(fs.readFileSync(path.join(__dirname, '../scripts/rime_slime_sources.txt')));
 let browser, checks = 0;
+// Stand 3 tiles from a real Rimeveil Glacier spawn of this kind (fixed points are void: new heroes are not near them)
+async function standBy(p, kind) {
+  const spot = await p.evaluate(kind => {
+    const z = WORLD_MAP.zones.find(z => z.name === 'Rimeveil Glacier');
+    const s = z && z.slimes.find(s => s.kind === kind);
+    return s && { x: s.x, y: s.y };
+  }, kind);
+  check(spot, `Rimeveil Glacier has a ${kind} spawn to stand beside`);
+  await p.evaluate(spot => {
+    Online.send({ type: 'debug', command: { op: 'teleport', zone: 2, x: spot.x - 3, y: spot.y - 3 } });
+    Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } });
+  }, spot);
+  await p.waitForFunction(kind => Field.slimes.some(s => s.kind === kind && !s.dead), kind, { timeout: 30000 });
+}
 const errors = [];
 function check(value, label) { assert.ok(value, label); console.log(++checks + ': ' + label); }
 (async () => {
@@ -30,11 +44,8 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     await p.locator('#cls-warrior').click(); await p.locator('#name').fill('RimeArt');
     await p.locator('#go').click({ timeout: 60000 });
     await p.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
-    await p.evaluate(() => {
-      Online.send({ type: 'debug', command: { op: 'teleport', zone: 2, x: 50, y: 50 } });
-      Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } });
-    });
-    await p.waitForFunction(() => Field.rimeSprites && Field.slimes.some(s => s.kind === 'crab'), null, { timeout: 30000 });
+    await standBy(p, 'crab');
+    await p.waitForFunction(() => Field.rimeSprites, null, { timeout: 30000 });
     const result = await p.evaluate(() => {
       const src = Field.rimeSprites, { meta, img } = src;
       const data = {};
@@ -121,6 +132,7 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     check(wyrmIdle.top < 12, 'wyrm: idle crest stays clear of the top border');
     fs.writeFileSync(path.join(w.runDir, 'rime-slime-portraits.png'), Buffer.from(result.portraits.split(',')[1], 'base64'));
     for (const kind of kinds) {
+      await standBy(p, kind);
       const spot = await p.evaluate(kind => {
         const s = Field.slimes.find(s => s.kind === kind && !s.dead);
         return s && { x: s.x, y: s.y, top:s.d.top };
