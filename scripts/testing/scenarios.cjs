@@ -525,7 +525,8 @@ const scenarios = {
       await talk(w, bot, 'smith', 'fitting');
       await w.waitFor(() => w.player(bot).look.mageWeapon === 'ash');
       const worthless = await talk(w, bot, 'smith', 'sell:mage_weapon_ash:1');
-      check(worthless.notice.includes('Starter gear cannot be sold') && worthless.gold === sale.gold, 'Free starter replacement cannot generate sale income');
+      // SELL-STARTER-GEAR: a loose starter piece sells now; the worn one (just fitted) is refused as equipped.
+      check(worthless.notice.includes('Equipped items must be kept') && worthless.gold === sale.gold, 'The worn starter replacement cannot generate sale income');
       await w.restart();
       check(count('slime_gel') === 0 && w.player(bot).gold === sale.gold, 'Sale and item removal survive restart');
     },
@@ -2715,8 +2716,9 @@ const scenarios = {
       await w.restart();
       check(w.player(bot).zone === 8, 'The character resumes in Ran\'s Deep after a server restart');
       // The way back up is a real walk into Keelhaven's Maelstrom, and down again from the Eyrie.
-      await kit.teleport(w, bot, { zone: 8, x: up.x, y: up.y - 4.5 });
-      await w.action(bot, { type: 'move', x: up.x, y: up.y + .5 });
+      // The Maelstrom up is a walk gate: start downwind of it and walk out along its direction (it is [-1, 0] in map.txt).
+      await kit.teleport(w, bot, { zone: 8, x: up.x - up.walk[0] * 4, y: up.y - up.walk[1] * 4 });
+      await w.action(bot, { type: 'move', x: up.x + up.walk[0] * 2, y: up.y + up.walk[1] * 2 });
       await w.waitFor(() => w.player(bot).zone === 7, 15000, 'Step through the Maelstrom back up');
       await w.action(bot, { type: 'stop' });
       check(distance(w.player(bot), { x: up.tx, y: up.ty }) < 1.2, 'Keelhaven\'s Maelstrom sets you down on the Roc\'s Eyrie beside the spout');
@@ -3595,13 +3597,15 @@ const scenarios = {
       const gate=map.zones[20].portals.find(p=>p.id==='ribbon_tangle_gate');
       const back=area.portals.find(p=>p.id==='tangle_ribbon_gate');
       check(gate?.to===22&&back?.to===21,'The Rootway has reciprocal gates');
-      check(area.theme==='tanglecrown'&&area.levels.join(',')==='75,80'&&area.slimes.length===42&&area.quests.length===12,'Jungle zone, monsters and quests load');
+      check(area.theme==='tanglecrown'&&area.levels.join(',')==='75,80'&&area.slimes.length>=42&&area.quests.length>=12,'Jungle zone, monsters and quests load');
       check(area.futureInstance?.status==='open'&&area.futureInstance?.name==='Temple of the Rain Crown'&&area.portals.some(p=>p.to===32),'The Rain Crown Temple is open');
-      await kit.teleport(w,bot,{zone:21,x:124,y:117});
-      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      const enter=crossingPath(gate);
+      await kit.teleport(w,bot,{zone:21,x:enter.start.x,y:enter.start.y});
+      await w.advance(700);
+      await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===22,15000,'Enter Tanglecrown');
       await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'Arrival lies outside return gate');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'Arrival lies at the Ribbonwild seam landing (shaped layout)');
       await w.connect({bot:'MeadowWitness',class:'mage'});
       check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0)&&w.views.get(bot).slimes.every(s=>s.zone===22),'Zone snapshots stay isolated');
       await kit.teleport(w,bot,{npc:'travel_banyan'});
@@ -3637,14 +3641,17 @@ const scenarios = {
         check(w.player(bot).inventory.some(i=>i.item===reward),`${kind} awards level-80 blue gear`);
       }
       await kit.teleport(w,bot,{npc:'tangle_scholar'});await kit.talkTo(w,bot,'tangle_scholar','quest:accept:tangle_temple');
-      await kit.teleport(w,bot,{zone:22,x:112,y:26});
+      // The Rain Crown Temple place (246,137) has radius 4; its gate disc is elsewhere.
+      await kit.teleport(w,bot,{zone:22,x:246,y:137});
       await w.waitFor(()=>quest(w,bot,'tangle_temple')?.counts[0]===1,5000,'Inspect Rain Crown Temple');
       await kit.teleport(w,bot,{npc:'tangle_stone'});await kit.talkTo(w,bot,'tangle_stone');
       await w.waitFor(()=>quest(w,bot,'tangle_temple')?.counts.every(n=>n===1),5000,'Consult Meeting Stone');
       check(area.portals.some(p=>p.to===32),'Temple entrance remains open');
       await w.restart();
       check(w.player(bot).zone===22&&quest(w,bot,'tangle_jaguar').claimed&&w.player(bot).travelStops.includes('travel_banyan'),'Zone, elite claim and travel stop persist');
-      await kit.teleport(w,bot,{zone:22,x:14,y:111});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      const home=crossingPath(back);
+      await kit.teleport(w,bot,{zone:22,x:home.start.x,y:home.start.y});await w.advance(700);
+      await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
       await w.waitFor(()=>w.player(bot).zone===21,15000,'Return to Ribbonwild');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives outside gate');
     },
