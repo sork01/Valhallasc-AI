@@ -20,16 +20,18 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   return {vertical,samples};
  }));
  check(faces.every(f=>f.samples.every(c=>c[0]>180&&c[1]>170&&c[2]>145&&c[3]===255)),'Both arch orientations have a continuous light stone face without dark overlapping roof triangles');
- const south=await p.evaluate(()=>{const z=WORLD_MAP.zones[3],a=z.exitArches.find(a=>a.portal==='path_4_0');return {x:a.x,y:a.y,street:z.roads.find(r=>r.x0===76.5&&r.x1===83.5),route:z.exitRoutes.find(r=>r.portal===a.portal).points};});
- check(south.x===(south.street.x0+south.street.x1)/2&&south.y===140,'The southern arch is centred on the actual Grand Avenue paving');
- check(south.route.some(([x,y])=>x===80&&y<140)&&south.route.some(([x,y])=>x===80&&y>140),'The highlighted approach runs through the arch into the street');
- for(const [name,x,y]of[['left',20,76],['bottom',80,144]]){
+ // The south arch (path_4_0, to Greenmeadow) stands at the foot of the Grand Avenue, the 7-wide paving that runs north from it.
+ const south=await p.evaluate(()=>{const z=WORLD_MAP.zones[3],a=z.exitArches.find(a=>a.portal==='path_4_0');return {x:a.x,y:a.y,street:z.roads.find(r=>r.x1-r.x0===7&&r.x0<=a.x&&a.x<=r.x1&&r.y1>=150),route:z.exitRoutes.find(r=>r.portal===a.portal).points};});
+ check(south.street&&south.x===(south.street.x0+south.street.x1)/2,'The southern arch is centred on the actual Grand Avenue paving');
+ check(south.route.some(([x,y])=>x===south.x&&y<south.y-10),'The highlighted approach runs north from the arch into the city');
+ for(const [name,x,y]of[['south',59.5,165],['east',98,79]]){
   await at(x,y);await p.waitForTimeout(300);await p.screenshot({path:path.join(w.runDir,name+'-desktop.png')});
   await p.setViewportSize({width:844,height:390});await p.waitForTimeout(300);await p.screenshot({path:path.join(w.runDir,name+'-phone.png')});await p.setViewportSize({width:1280,height:900});
  }
- for(const [name,x,y,tx,ty]of[['left',21,76,11,76],['bottom',80,134,80,146]]){
-  await at(x,y);await p.evaluate(([x,y])=>Online.send({type:'move',x,y}),[tx,ty]);await p.waitForFunction(([x,y])=>Field.zone===4&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<.6,[tx,ty],{timeout:15000});
-  await p.evaluate(()=>Online.send({type:'stop'}));check(true,`${name}: normal server-authoritative walking crosses the visible opening`);
+ // Both openings are gates out of the city: walking onto the arch's portal crosses to its zone (path_4_0 to Greenmeadow 0, path_4_1 to the Crags 1).
+for(const [name,x,y,tx,ty,to]of[['south',59.5,165,59.5,174.7,0],['east',98,79,105.2,79,1]]){
+  await at(x,y);await p.evaluate(([x,y])=>Online.send({type:'move',x,y}),[tx,ty]);await p.waitForFunction(to=>Field.zone===to,to,{timeout:20000});
+  await p.evaluate(()=>Online.send({type:'stop'}));check(true,`${name}: normal server-authoritative walking crosses the visible opening into zone ${to}`);
  }
  check(errors.length===0,'No browser errors');console.log(`skaldholm-arches-ui: ${checks} checks; ${w.runDir}`);
 }finally{await browser?.close();await w.stop();}})().catch(e=>{console.error(e);process.exitCode=1;});

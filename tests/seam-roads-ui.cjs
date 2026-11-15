@@ -47,7 +47,6 @@ const only = process.env.PAIR;
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })));
-  await page.addInitScript(() => localStorage.setItem('valhallasc.whats-new.v1', 'Beta 1.39.30'));
   await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('RoadWalker'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
