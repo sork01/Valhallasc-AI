@@ -33,10 +33,11 @@ const check = (ok, label) => { assert.ok(ok, label); checks++; };
       total++; if (a[0]>180 && a[0]>a[1]*1.7) hot++; if (a[0]<115) crust++; green+=a[1];
       if (a.some((v,i) => v!==b[i])) changed++;
     }
+    // Window centred on the river piece at (79.5, 55.9); the old window (52,52) held no Crags lava any more.
     // Render a real river segment through both themes. Colour may differ;
     // alpha must still describe the same obstacles and clear fords.
     const ew = { ...z, theme: 'emberwake', objects: pieces.map(o => ({ ...o, kind: 'ew_lava' })) };
-    const render = zone => { const c=document.createElement('canvas');c.width=c.height=640;const g=c.getContext('2d');EmberwakeArt.molten(g,{x0:52,y0:52,ox:-320,oy:2232},12,88,44,zone);return g.getImageData(0,0,640,640).data; };
+    const render = zone => { const c=document.createElement('canvas');c.width=c.height=640;const g=c.getContext('2d');EmberwakeArt.molten(g,{x0:73,y0:50,ox:692,oy:2650},12,88,44,zone);return g.getImageData(0,0,640,640).data; };
     const a=render(z), b=render(ew); let opaque=0, footprint=0, differences=0;
     for (let i=0;i<a.length;i+=4) { if(a[i+3])opaque++;if(a[i+3]!==b[i+3])footprint++;if(a[i]!==b[i]||a[i+1]!==b[i+1]||a[i+2]!==b[i+2])differences++; }
     return {total,hot:hot/total,crust:crust/total,green:green/total,changed:changed/total,opaque,footprint,differences};
@@ -44,7 +45,7 @@ const check = (ok, label) => { assert.ok(ok, label); checks++; };
   check(sample.total>10000, 'sample the full Crags river network');
   check(sample.hot>.85 && sample.crust<.05, 'narrow rivers read as continuous molten lava: '+JSON.stringify(sample));
   check(sample.green<100 && sample.changed>.9, 'Crags lava has its own deep red palette');
-  check(sample.opaque>10000 && sample.footprint===0 && sample.differences>10000, 'redrawn terrain retains every bank and ford');
+  check(sample.opaque>10000 && sample.footprint===0 && sample.differences>10000, 'redrawn terrain retains every bank and ford: '+JSON.stringify(sample));
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', command }), command);
   await debug({ op:'set_time',hour:12,freeze:true }); await debug({ op:'set_weather',kind:'clear' });
   for (const [x,y,name] of [[78,61,'river'],[91,62,'ford']]) {

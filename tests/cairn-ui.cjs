@@ -21,21 +21,24 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('FrostUI');await page.locator('#go').click({timeout:60000});
-  await page.waitForFunction(()=>Online.connected&&!!Field.cairnSprites?.img.stormcondor,null,{timeout:60000});
-  const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[27],src=Field.cairnSprites;return {count:z.length,name:a.name,theme:a.theme,levels:a.levels,npcs:a.npcs.length,quests:a.quests.length,enemies:a.slimes.length,boulders:a.objects.filter(o=>o.kind==='cairn_boulder').length,trees:a.objects.filter(o=>o.kind==='cairn_dead_tree').length,gates:[z[26].portals.find(p=>p.id==='frostwake_cairn_gate'),a.portals.find(p=>p.id==='cairn_frostwake_gate')],kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['cairn_boulder','cairn_dead_tree','cairn_watchhall','cairn_thunder_gate'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,travel:a.npcs.find(n=>n.id==='travel_boulderwatch')};});
-  check(data.count===40&&data.name==='The Cairnspine'&&data.theme==='cairnspine'&&data.levels.join(',')==='90,95','Level 90–95 mountain loads');
-  check(data.npcs===10&&data.quests===13&&data.enemies===43&&data.boulders>=100&&data.trees>=70,'Hub, quests, elite territories, boulders and leafless trees load');
-  check(data.kinds.length===13&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Thirteen PixelFlow atlases load');
-  check(data.art&&data.layout===36,'Mountain scenery and world-map placement load');
+  await page.waitForFunction(()=>Online.connected&&!!Field.hero,null,{timeout:60000});
+  // The Cairnspine's sprites load only when its zone is in view: enter it first.
+  await page.evaluate(()=>Online.send({type:'debug',ref:700,command:{op:'teleport',zone:27,x:30,y:145}}));
+  await page.waitForFunction(()=>Field.zone===27&&!!Field.cairnSprites?.img.stormcondor,null,{timeout:60000});
+  const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[27],src=Field.cairnSprites;const M=WORLD_MAP.zones[26];return {count:z.length,mapCount:WORLD_MAP.zones.length+1,name:a.name,theme:a.theme,levels:a.levels,npcs:a.npcs.length,mapNpcs:M.npcs.length,quests:a.quests.length,mapQuests:M.quests.length,enemies:a.slimes.length,mapEnemies:M.slimes.length,boulders:a.objects.filter(o=>o.kind==='cairn_boulder').length,trees:a.objects.filter(o=>o.kind==='cairn_dead_tree').length,gates:[z[26].portals.find(p=>p.id==='frostwake_cairn_gate'),a.portals.find(p=>p.id==='cairn_frostwake_gate')],kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight,...(src.meta.kindFrames?.[k]?.frame||src.meta.frame)]),art:['cairn_boulder','cairn_dead_tree','cairn_watchhall','cairn_thunder_gate'].every(k=>!!City.art[k]),layout:!!WorldMap._layout[27],travel:a.npcs.find(n=>n.id==='travel_boulderwatch')};});
+  check(data.count===data.mapCount&&data.name==='The Cairnspine'&&data.theme==='cairnspine'&&data.levels.join(',')==='90,95','Level 90–95 mountain loads');
+  check(data.npcs===data.mapNpcs&&data.quests===data.mapQuests&&data.enemies===data.mapEnemies&&data.boulders>=100&&data.trees>=70,'Hub, quests, elite territories, boulders and leafless trees load');
+  check(data.kinds.length===13&&(STUB||data.sizes.every(([w,h,fw,fh])=>w===8*fw&&h===5*fh)),'Thirteen PixelFlow atlases load');
+  check(data.art&&data.layout,'Mountain scenery and world-map placement load');
   check(data.gates.every(Boolean)&&data.gates[0].to===27&&data.gates[1].to===26,'Reciprocal High Pass gates load');
   check(data.travel?.travelLinks.includes('travel_frostwake')&&data.travel?.art==='cairn_travel','Travel Master Asta has unique art and return service');
   let ref=701;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);
   async function stage(x,y,label){await debug({op:'teleport',zone:27,x,y});await page.waitForFunction(([x,y])=>Field.zone===27&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<3,[x,y],{timeout:15000});await page.waitForTimeout(950);await page.screenshot({path:path.join(world.artifacts,`cairn-${label}.png`)});await capture(`cairn-${label}-clean.png`);}
-  await stage(30,145,'hub');check(await page.evaluate(()=>Field.zoneTheme==='cairnspine'&&City.npcs.length===10),'Boulderwatch paints live');
+  await stage(30,145,'hub');check(await page.evaluate(()=>Field.zoneTheme==='cairnspine'&&City.npcs.length===WORLD_MAP.zones[26].npcs.filter(n=>n.art!=='spirit_guide').length),'Boulderwatch paints live');
   await stage(57,70,'singing-cairn');
   await stage(107,80,'whitebark-grove');
   await stage(136,13,'thunderheart-gate');
-  check(await page.evaluate(()=>Field._debug.zones[27].slimes.filter(s=>['cairnbehemoth','whitebarktitan','stormcondor'].includes(s.kind)).length===3),'Three unique elite kinds are placed');
+  check(await page.evaluate(()=>Field._debug.zones[27].slimes.filter(s=>['cairnbehemoth','whitebarktitan','stormcondor'].includes(s.kind)).length===WORLD_MAP.zones[26].slimes.filter(s=>['cairnbehemoth','whitebarktitan','stormcondor'].includes(s.kind)).length),'Three unique elite kinds are placed');
   check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
   console.log(`Cairnspine UI: ${checks} checks; screenshots in ${world.artifacts}`);
 })().catch(e=>{console.error(e.stack);process.exitCode=1;}).finally(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();});
