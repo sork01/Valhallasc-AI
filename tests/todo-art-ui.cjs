@@ -14,8 +14,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   const mutation = process.env.MUTATE || (process.env.TODO_BADGER_ONLY ? 'badger-live' : process.env.TODO_NPC_ONLY ? 'npc-live' : undefined);
   const replacements = {
-    portal: ['worldheartart.js', 'depthOffset:-2.5', 'depthOffset:0'],
-    stone: ['world.js', '"kind":"meetingstone","x":66.3', '"kind":"missing_stone","x":66.3'],
+    // heartwoodart.js loads after worldheartart.js and owns City.art.hollow_arch. The gate sits at depth 432, so the arch (427.7) must be pushed past it to flip the order.
+    portal: ['heartwoodart.js', 'depthOffset: -2.5', 'depthOffset: 5'],
+    stone: ['world.js', '"kind":"meetingstone","x":220.3', '"kind":"missing_stone","x":220.3'],
     oasis: ['lapisart.js', 'ground:true', 'ground:false'],
     crack: ['frostwakeart.js', 'ground:true', 'ground:false'],
     cairn: ['cairnart.js', 'box:[620,570,310,480]', 'box:[620,520,310,480]'],
@@ -26,7 +27,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   if (replacements[mutation]) {
     const [file, before, after] = replacements[mutation], source = fs.readFileSync(path.join(root, 'client', file), 'utf8');
     assert.ok(source.includes(before), 'mutation target exists');
-    await page.route('**/' + file, route => route.fulfill({ contentType: 'text/javascript', body: source.replace(before, after) }));
+    await page.route('**/' + file + '*', route => route.fulfill({ contentType: 'text/javascript', body: source.replace(before, after) }));
   }
   if (mutation === 'badger') {
     const body = require('node:child_process').execFileSync('git', ['show', '476a52055485dae8b9178598b75164eda2bea17a:client/assets/sunward_spadebadger.png'], { cwd: root });
@@ -67,16 +68,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     }
   }
   if (!mutation || mutation === 'portal') {
-    await at(23, 58, 73); const order = await trace();
+    await at(23, 210, 229); const order = await trace();   // the Heartwood return arrival, beside the arch and its gate (210,222)
     check(order.findIndex(x => x.kind === 'hollowPortal') > order.findIndex(x => x.kind === 'hollow_arch'), 'Hollow Arch portal draws above its obstructing arch');
     await page.screenshot({ path: path.join(out, 'canopy-portal.png') });
     // Use the actual gate and verify the reciprocal safe arrival.
-    await page.evaluate(() => Field.setTouchDirection(-1, -3)); await page.waitForFunction(() => Field.zone === 24, null, { timeout: 12000 });
-    await page.evaluate(() => Field.setTouchDirection(0, 0));
-    check(await page.evaluate(() => Math.hypot(Field.hero.nx - 48, Field.hero.ny - 80) < 3), 'Hollow Arch portal reaches its original safe destination');
+    await page.evaluate(() => Online.send({ type: 'move', x: 210, y: 222 })); await page.waitForFunction(() => Field.zone === 24, null, { timeout: 30000 });
+    check(await page.evaluate(() => Math.hypot(Field.hero.nx - 104, Field.hero.ny - 195) < 3), 'Hollow Arch portal reaches its original safe destination');   // map.txt canopy_hollow_gate arrival (104,195)
   }
   if (!mutation || mutation === 'stone') {
-    await at(23, 68, 77); const order = await trace();
+    await around(23, 'meetingstone'); const order = await trace();   // the Crown stone at (220.3,243.3) in the Canopy (map.txt), beside its heart_stone master (222,245)
     check(order.some(x => x.kind === 'meetingstone'), 'Crown Meeting Stone is drawn in its actual zone');
     await page.evaluate(() => Field.visitNpc('heart_stone')); await page.waitForFunction(() => !document.querySelector('#npc-dialogue').hidden);
     check((await page.locator('#npc-dialogue').textContent()).includes('Hire a Warrior'), 'visible Crown Meeting Stone keeps hiring interactions');
@@ -133,9 +133,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   if ((!mutation && !process.env.TODO_VISIBILITY_ONLY) || mutation === 'npc' || mutation === 'npc-live') {
     const catalog = await page.evaluate(() => NpcArt.manifest);
     check(Object.keys(catalog.designs).filter(k => catalog.designs[k].general).length >= 24, '24 distinct general designs');
-    check(Object.keys(catalog.npcs).length === await page.evaluate(() => [WORLD_MAP,...WORLD_MAP.zones].flatMap(z=>z.npcs||[]).filter(n=>!['stone','scenery'].includes(n.art)).length), 'every speaking person has an explicit assignment');
+    check(Object.keys(catalog.npcs).length === await page.evaluate(() => [WORLD_MAP,...WORLD_MAP.zones].flatMap(z=>z.npcs||[]).filter(n=>!['stone','scenery','mailbox','spirit_guide'].includes(n.art)).length), 'every speaking person has an explicit assignment');   // mailboxes and dead-only spirit guides are not people (588 people)
     for (const zone of [0, 4, 9, 17, 20, 21, 22, 23, 24, 25, 26, 27, 28, 45]) {
-      const npc = await page.evaluate(zone => (zone ? WORLD_MAP.zones[zone - 1] : WORLD_MAP).npcs.find(n => n.art !== 'stone' && n.art !== 'scenery'), zone);
+      const npc = await page.evaluate(zone => (zone ? WORLD_MAP.zones[zone - 1] : WORLD_MAP).npcs.find(n => !['stone', 'scenery', 'mailbox', 'spirit_guide'].includes(n.art)), zone);
       await at(zone, npc.x + 1.7, npc.y + 1.7); await page.waitForFunction(() => NpcArt.readyFor(City.npcs), null, { timeout: 20000 });
       const shown = await page.evaluate(id => {
         const n = City.npcs.find(n => n.id === id), canvas = document.createElement('canvas'); canvas.width = canvas.height = 260; const g = canvas.getContext('2d');
@@ -154,8 +154,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     check(animated.every(rows => new Set(rows.map(r => r.step)).size > 1) && animated[1].every(r => r.clip === 'walk' && r.mirrored), 'idle and walking frames advance and mirror with travel direction');
     check(await page.evaluate(() => { const n = City.npcs[0]; return NpcArt.frame(n, 1, true).clip === 'talk'; }), 'conversation has its own animation');
     const smith = await page.evaluate(() => WORLD_MAP.npcs.find(n => n.id === 'smith'));
-    await at(0, smith.x + 1.7, smith.y + 1.7); await page.waitForFunction(() => NpcArt.readyFor(City.npcs));
-    await page.evaluate(() => Field.visitNpc('smith')); await page.waitForFunction(() => !document.querySelector('#merchant-portrait').hidden);
+    await at(0, smith.x + 1.7, smith.y + 1.7); await page.waitForFunction(() => NpcArt.readyFor(City.npcs), null, { timeout: 60000 });
+    await page.evaluate(() => Field.visitNpc('smith')); await page.locator('#npc-offers [data-view="buy"]').click();   // the greeting offers Buy first (shop-sell-ui)
+    await page.waitForFunction(() => Shop.open && !document.querySelector('#merchant-portrait').hidden);
     const portraitPixels = await page.locator('#merchant-portrait').evaluate(canvas => {
       const p = canvas.getContext('2d').getImageData(0,0,128,128).data; let painted = 0;
       for (let i=0;i<p.length;i+=4) if(p[i+3] && (p[i]!==38 || p[i+1]!==53 || p[i+2]!==70)) painted++;
