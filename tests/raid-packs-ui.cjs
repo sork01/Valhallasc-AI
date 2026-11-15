@@ -28,8 +28,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  for(const kind of ['cf_brute','cf_crawler','cf_caster','cf_sentry']){
   const art=await page.evaluate(kind=>{
    const s=Field.slimes.find(s=>s.kind===kind),f=Field._debug.enemyFrame(s);
-   return {elite:s.elite,frame:!!f[0],name:Field.enemyName(kind),top:Field.cathedralSprites?.meta.tops[kind],
-    width:Field.cathedralSprites?.img[kind]?.naturalWidth,editable:!!Field.cathedralSprites?.meta.sprites[kind]};
+   return {elite:s.elite,frame:!!f[0],name:Field.enemyName(kind),top:Field.cathedralSprites?.meta.tops?.[kind],
+    width:Field.cathedralSprites?.img[kind]?.naturalWidth,editable:!!Field.cathedralSprites?.meta.sprites?.[kind]};
   },kind);
   check(art.elite&&art.frame&&art.name!==kind,kind+' uses its named elite renderer');
   if(!STUB)check(art.width===768&&art.top>25&&art.editable,kind+' has original fitted PixelFlow art');

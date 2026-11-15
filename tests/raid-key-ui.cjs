@@ -1,7 +1,7 @@
 const { frameJson } = require('./lib/frames.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {TestWorld}=require('../scripts/testing/driver.cjs');
-const {chromium}=require('./lib/playwright.cjs');
+const {chromium,STUB}=require('./lib/playwright.cjs');
 const world=new TestWorld();let browser,checks=0;
 function check(ok,message){assert.ok(ok,message);checks++;console.log(message);}
 (async()=>{
@@ -12,10 +12,11 @@ function check(ok,message){assert.ok(ok,message);checks++;console.log(message);}
  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false})));
  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-hunter').click();await page.locator('#name').fill('EmberTester');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero.level===99);
+ const HOME=await page.evaluate(()=>{const c=WORLD_MAP.crosses.find(c=>c.id==='raid_cross_0');return {x:c.x,y:c.y+1};});
  const send=a=>page.evaluate(a=>Online.send(a),a),debug=command=>send({type:'debug',command});
  const wait=async(f,label)=>world.waitFor(f,15000,label);
  const advance=async(seconds)=>{const t=latest.time;await wait(()=>latest.time>=t+seconds,'Server time advances');};
- await debug({op:'teleport',zone:0,x:38,y:48});await page.waitForFunction(()=>Math.hypot(Field.hero.x-38,Field.hero.y-48)<.1&&RaidKey.imageReady);
+ await debug({op:'teleport',zone:0,x:HOME.x,y:HOME.y});await page.waitForFunction(h=>Math.hypot(Field.hero.x-h.x,Field.hero.y-h.y)<.1&&RaidKey.imageReady,HOME);
  if(process.env.MUTATE)await page.evaluate(()=>RaidKey.draw=()=>{});
  const pixels=await page.evaluate(()=>{
   const cv=document.getElementById('fieldcv'),g=cv.getContext('2d'),draw=RaidKey.draw,t=performance.now()/1000;
@@ -26,11 +27,12 @@ function check(ok,message){assert.ok(ok,message);checks++;console.log(message);}
  check(await page.evaluate(()=>!RaidKey.nearest()),'Cross has no interaction prompt without the quest');
  await send({type:'raid_cross',id:'raid_cross_0'});await advance(3.2);
  check(latest.slimes.filter(s=>s.kind==='ember_firelord').every(s=>s.dead),'Inert cross refuses a summon');
- await debug({op:'teleport',zone:45,x:23,y:132});await page.waitForFunction(()=>Field.zone===45);
+ const KEEPER=await page.evaluate(()=>{const n=WORLD_MAP.zones[44].npcs.find(n=>n.id==='raid_key_keeper');return {x:n.x,y:n.y+1};});
+ await debug({op:'teleport',zone:45,x:KEEPER.x,y:KEEPER.y});await page.waitForFunction(()=>Field.zone===45);
  await send({type:'interact',npc:'raid_key_keeper',offer:'quest:accept:raid_key'});
  await page.waitForFunction(()=>Field.hero.quests.some(q=>q.id==='raid_key'&&!q.claimed));
  check(true,'Quest accepted from the Emberwake keeper');
- await page.evaluate(()=>City.close());await debug({op:'teleport',zone:0,x:38,y:48});await page.waitForFunction(()=>Field.zone===0&&!!RaidKey.nearest());
+ await page.evaluate(()=>City.close());await debug({op:'teleport',zone:0,x:HOME.x,y:HOME.y});await page.waitForFunction(()=>Field.zone===0&&!!RaidKey.nearest());
  check(await page.evaluate(()=>Keys.slots('interact').includes('KeyG')),'Interaction uses the configurable key map');
  await page.evaluate(()=>Keys.bind('interact',0,'KeyR'));
  check(await page.evaluate(()=>Keys.label('interact',false)==='R'),'Cross interaction follows a remapped key');
@@ -38,12 +40,12 @@ function check(ok,message){assert.ok(ok,message);checks++;console.log(message);}
  check(latest.raidCrosses[0].channel.left<=3&&latest.raidCrosses[0].channel.left>0,'Server publishes the three-second glow/countdown');
  await page.keyboard.down('d');await page.waitForTimeout(200);await page.keyboard.up('d');await wait(()=>!latest.raidCrosses[0].channel,'Movement cancels');await advance(3.1);
  check(latest.slimes.filter(s=>s.kind==='ember_firelord').every(s=>s.dead),'Moving cancels the channel without spawning a boss');
- await debug({op:'teleport',zone:0,x:38,y:48});await page.waitForFunction(()=>!!RaidKey.nearest());
+ await debug({op:'teleport',zone:0,x:HOME.x,y:HOME.y});await page.waitForFunction(()=>!!RaidKey.nearest());
  await page.keyboard.press('r');await wait(()=>latest.slimes.some(s=>s.kind==='ember_firelord'&&!s.dead),'Herald rises');
  const boss=latest.slimes.find(s=>s.kind==='ember_firelord'&&!s.dead);check(boss.level===99,'Eligible cross summons a level-99 Firelord');
- await page.waitForFunction(()=>Field.cathedralSprites?.img.ember_firelord?.complete,null,{timeout:60000});
+ if(!STUB)await page.waitForFunction(()=>Field.cathedralSprites?.img.ember_firelord?.complete,null,{timeout:60000});
  check(await page.evaluate(()=>Field.enemyName('ember_firelord')==='Ashwarden of Greenmeadow'),'Herald uses its zone-specific name');
- check(await page.evaluate(()=>Field.cathedralSprites.img.ember_firelord.src.endsWith('cathedral_ember_firelord.png')&&Field.slimes.find(s=>s.kind==='ember_firelord').d.scale<3.2),'Firelord uses its independent artwork at the original cross-guardian scale');
+ if(!STUB)check(await page.evaluate(()=>Field.cathedralSprites.img.ember_firelord.src.endsWith('cathedral_ember_firelord.png')&&Field.slimes.find(s=>s.kind==='ember_firelord').d.scale<3.2),'Firelord uses its independent artwork at the original cross-guardian scale');
  await page.screenshot({path:path.join(world.runDir,'raid-key-firelord.png')});
  const own=await page.evaluate(()=>({gold:Field.hero.gold,xp:Field.hero.xp}));
  await debug({op:'teleport',zone:0,x:boss.x,y:boss.y});await debug({op:'kill_enemy',id:boss.id});
