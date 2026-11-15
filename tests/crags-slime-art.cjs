@@ -28,10 +28,17 @@ function check(value, label) { assert.ok(value, label); console.log(++checks + '
     await p.locator('#cls-warrior').click(); await p.locator('#name').fill('CragsArt');
     await p.locator('#go').click({ timeout: 60000 });
     await p.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
-    await p.evaluate(() => {
-      Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: 50, y: 50 } });
-      Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } });
+    // Stand beside a real Emberfall Crags wisp spawn (the old fixed point (50,50) is not near any Crags spawn).
+    const wispSpawn = await p.evaluate(() => {
+      const z = WORLD_MAP.zones.find(z => z.name === 'Emberfall Crags');
+      const s = z && z.slimes.find(s => s.kind === 'wisp');
+      return s && { x: s.x, y: s.y };
     });
+    check(wispSpawn, 'Emberfall Crags has a wisp spawn to stand beside');
+    await p.evaluate(spot => {
+      Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: spot.x - 3, y: spot.y - 3 } });
+      Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } });
+    }, wispSpawn);
     await p.waitForFunction(() => Field.cragSprites && Field.slimes.some(s => s.kind === 'wisp'), null, { timeout: 30000 });
     const result = await p.evaluate(() => {
       const { meta, img } = Field.cragSprites;
