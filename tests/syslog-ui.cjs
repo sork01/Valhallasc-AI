@@ -20,15 +20,20 @@ async function join(world, name) {
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
+  // A new character plays the locked opening intro (about 62 s) and lands on the Saltby pier, a sanctuary: wait for the intro, then stand on open ground.
+  await page.waitForFunction(() => !window.Cutscene?.active, null, { timeout: 120000 });
+  await dbgOn(page, { op: 'teleport', zone: 0, x: 250, y: 235 });
+  await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8 && Field.hero.hp > 0, null, { timeout: 30000 });
   return page;
 }
 const errors = [];
+const dbgOn = (page, command) => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
 (async () => {
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0' } }));
   const world = await call('start_world', { godMode: false }); started = true;
   browser = await chromium.launch({ headless: true });
   const page = await join(world, 'Fighter'), other = await join(world, 'Bystander');
-  const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
+  const debug = command => dbgOn(page, command);
   const system = () => page.locator('#system-log').innerText();
 
   // --- tabs ---
@@ -50,7 +55,10 @@ const errors = [];
   const here = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
   await debug({ op: 'spawn_enemy', kind: 'green', x: here.x + 1.4, y: here.y, level: 1 });
   await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'green' && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 3));
-  await page.waitForFunction(() => /Green Slime \(Lv 1\) hits you for \d+\./.test(document.getElementById('system-log').textContent), null, { timeout: 20000 });
+  await page.waitForFunction(() => /Green Slime \(Lv 1\) hits you for \d+\./.test(document.getElementById('system-log').textContent), null, { timeout: 20000 }).catch(async e => {
+    console.log('PROBE', JSON.stringify(await page.evaluate(() => ({ hero: [Field.hero.x, Field.hero.y, Field.hero.hp, Field.hero.zone, Field.hero.dead], slimes: Field.slimes.filter(s => s.kind === 'green').map(s => [s.x, s.y, s.dead, s.state, s.hunting, s.level]), cutscene: !!window.Cutscene?.active, syslog: document.getElementById('system-log').textContent.slice(-300) }))));
+    throw e;
+  });
   check(true, 'Damage taken names the enemy, its level and the amount');
   check(await page.locator('#system-log .sys-taken').count() > 0, 'Damage taken has its own colour class');
   await page.evaluate(() => { const s = Field.slimes.find(s => s.kind === 'green' && !s.dead); window.__slimeId = s.id; });
