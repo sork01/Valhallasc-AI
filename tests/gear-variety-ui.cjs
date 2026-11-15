@@ -1,7 +1,8 @@
 // Browser check for GEAR-VARIETY-3X: all three variants (base, _b, _c) of ordinary world-drop gear load,
 // render valid bag icons and distinct character/piece art+tints, and translate cleanly in Swedish.
 // Run via: bash scripts/test-touch-bounded.sh tests/gear-variety-ui.cjs
-// MUTATE=1 replaces WORLD_ITEMS with HEAD:client/items.js (no _b/_c variants) and must fail.
+// MUTATE=1 replaces WORLD_ITEMS with the pre-GEAR-VARIETY client/items.js (ccb7a4ce~1, no _b/_c variants) and must fail.
+// It used to serve HEAD, which already carries the variants, so the mutation was a no-op (fixed 2026-11-15).
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -35,7 +36,7 @@ function requireMemoryLimit() {
     const page = await ctx.newPage();
     page.on('pageerror', e => errors.push(e.message));
     if (process.env.MUTATE === '1') {
-      const old = execFileSync('git', ['show', 'HEAD:client/items.js'], { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+      const old = execFileSync('git', ['show', 'ccb7a4ce~1:client/items.js'], { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
       await page.route('**/items.js*', route => route.fulfill({ contentType: 'text/javascript', body: old }));
     }
     await page.addInitScript(() => {

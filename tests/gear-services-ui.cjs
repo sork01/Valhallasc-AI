@@ -29,9 +29,11 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.waitForFunction(()=>Inventory.quantity('warrior_weapon_sword_l5_gray')>=2,null,{timeout:15000});
   await debug({op:'give_item',item:'refinement_crystal_uncommon',quantity:1});
   await page.waitForFunction(()=>Inventory.quantity('refinement_crystal_uncommon')>=1,null,{timeout:15000});
-  await debug({op:'teleport',zone:0,x:36,y:91});
+  // Alda stands at (250,198) in Greenmeadow's shaped world; the old (36,91) point is void ground now.
+  await debug({op:'teleport',zone:0,x:250,y:203});
+  await page.waitForFunction(()=>Field.hero&&Math.hypot(Field.hero.x-250,Field.hero.y-198)<8,null,{timeout:15000});
   await page.waitForTimeout(500);
-  await page.evaluate(()=>Online.send({type:'interact',npc:'gearwright'}));
+  await page.evaluate(()=>Field.visitNpc('gearwright'));
   await page.locator('#npc-dialogue').waitFor({state:'visible',timeout:15000});
   assert.equal(await page.locator('[data-offer="merge"]').count(),1);
   assert.equal(await page.locator('[data-offer="refine"]').count(),1);
@@ -59,7 +61,8 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await debug({op:'give_item',item:'orange_01',quantity:2});
   await page.waitForFunction(()=>Inventory.quantity('orange_01')===2,null,{timeout:15000});
   await page.keyboard.press('e');
-  const orange=page.locator('#inventory-list [data-item="orange_01"]');
+  // Each copy now takes its own bag cell (GEAR-NO-STACK), so two orange_01 cells exist: inspect the first.
+  const orange=page.locator('#inventory-list [data-item="orange_01"]').first();
   assert.equal(await orange.getAttribute('data-rarity'),'legendary');
   assert.equal(await orange.locator('.orange-item-art').count(),1);
   await orange.locator('button').click();
