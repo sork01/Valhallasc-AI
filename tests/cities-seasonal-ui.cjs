@@ -89,24 +89,29 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  }
  }
  await page.setViewportSize({width:1280,height:800});await debug({op:'set_time',hour:12,freeze:true});
- await at(4,104.2,125.4);await page.screenshot({path:path.join(world.runDir,'undervault-opening.png')});
+ // The stairs moved with the shaped city: the hero is set down where the Undervault's own stairs-up send the hero back (zone 5 tx/ty), beside the stairs.
+const beside=await page.evaluate(()=>{const s=Field._debug.zones[4].portals.find(p=>p.id==='undervault_stairs'),b=Field._debug.zones[5].portals.find(p=>p.id==='undervault_stairs_up');return{stairs:[s.x,s.y],back:[b.tx,b.ty]};});
+await at(4,beside.back[0],beside.back[1]);await page.screenshot({path:path.join(world.runDir,'undervault-opening.png')});
  await page.evaluate(()=>Field._debug.visitPortal(Field._debug.zones[4].portals.find(p=>p.id==='undervault_stairs')));
  await wait(()=>Field.zone===5||Field._debug.zones[Field.zone]?.name==='The Undervault');
  check(await page.evaluate(()=>Field.zone!==4),'Undervault stairs still admit the player into a private dungeon');
  await page.waitForTimeout(1700);await page.evaluate(()=>Field._debug.visitPortal(Field._debug.zones[Field.zone].portals.find(p=>p.to===4&&!p.after_clear)));await wait(()=>Field.zone===4);
- check(await page.evaluate(()=>Math.hypot(Field.hero.nx-104.2,Field.hero.ny-125.4)<2),'Undervault return lands safely beside the same stairs');
+ check(await page.evaluate(([x,y])=>Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<2,beside.back),'Undervault return lands safely beside the same stairs');
  await at(7,107.5,106.5);await page.evaluate(()=>Field.setTouchDirection(1,0));await wait(()=>Field.zone!==7||Field.hero.nx>115);await page.evaluate(()=>Field.setTouchDirection(0,0));
  check(await page.evaluate(()=>Field.zone===7&&Field.hero.nx>114),'Walking past the old narrow-path location stays in Bifrost');
- await at(7,116.5,113.5);await page.screenshot({path:path.join(world.runDir,'bifrost-nacre-landing.png')});
+ // The Nacrehold gate and its return landing both moved with the shaped Bifrost: read them from the map, the landing is the Nacrehold return's tx/ty.
+const nac=await page.evaluate(()=>{const out=Field._debug.zones[7].portals.find(p=>p.to===9),back=Field._debug.zones[9].portals.find(p=>p.to===7);return{portal:[out.x,out.y],landing:[back.tx,back.ty]};});
+ await at(7,nac.landing[0],nac.landing[1]);await page.screenshot({path:path.join(world.runDir,'bifrost-nacre-landing.png')});
  const sign=await page.evaluate(()=>{const p=Field._debug.zones[7].portals.find(p=>p.to===9),[x,y]=Field._debug.w2s(p.x,p.y,132),r=document.querySelector('#fieldcv').getBoundingClientRect();return{x:r.left+x*r.width/1600,y:r.top+y*r.width/1600};});
  await page.touchscreen.tap(sign.x,sign.y);await wait(()=>Field.zone===9);
  await page.waitForTimeout(1700);await page.evaluate(()=>Field._debug.visitPortal(Field._debug.zones[9].portals.find(p=>p.to===7)));await wait(()=>Field.zone===7);
- check(await page.evaluate(()=>Math.hypot(Field.hero.nx-116.5,Field.hero.ny-113.5)<2),'Nacrehold return arrives on the new broad Bifrost landing');
+ check(await page.evaluate(([x,y])=>Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<2,nac.landing),'Nacrehold return arrives on the new broad Bifrost landing');
  // Readable real-frame destination labels and paving on representative terrain, night/day and phone.
  for(const [width,height]of[[1280,800],[844,390]]){
   await page.setViewportSize({width,height});
-  for(const zone of [0,4,7,9,26]){
-   const z=await area(zone),p=z.portals.find(p=>p.walk);await at(zone,p.x-p.walk[0]*8,p.y-p.walk[1]*8);
+  // Zones 0 and 4 have only vault doorways (Skaldholm's gates), which draw no destination plaque by design (commit 38b50807): they are not checked here.
+  for(const zone of [1,7,9,26]){
+   const z=await area(zone),p=z.portals.find(p=>p.walk&&!p.vault);await at(zone,p.x-p.walk[0]*8,p.y-p.walk[1]*8);
    for(const hour of [12,0]){
     await debug({op:'set_time',hour,freeze:true});await wait(h=>Math.abs(DayNight.hour-h)<.01,hour);
     const labels=await page.evaluate(()=>{

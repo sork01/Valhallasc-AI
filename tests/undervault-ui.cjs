@@ -123,19 +123,53 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // ---- a ranged enemy: arrows in flight, drawn and carried between snapshots
   // Pick an archer that is not already in a fight with the hero (a chasing archer parked beside the hero backs off into a corner and never looses a shot).
-  const archer = await page.evaluate(() => {
-    const h = Field.hero, far = Field.slimes.filter(s => s.kind === 'archer' && !s.dead && s.state !== 'chase' && Math.hypot(s.x - h.x, s.y - h.y) > 9);
-    far.sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y));
-    const a = far[0] || Field.slimes.find(s => s.kind === 'archer' && !s.dead);
-    return { id: a.id, x: a.x, y: a.y };
-  });
-  await stageAt(5, archer.x - 7, archer.y);
-  await page.waitForFunction(() => Field._debug.ebolts.some(b => b.kind === 'archer'), null, { timeout: 25000 }).catch(async (err) => {
+  // The hero is staged 7 tiles from an archer INSIDE the same room, on a line that clears every wall, pillar and bone
+  // by 0.9 tiles. A point across a vault wall (x 47.5 in zone 5) is outside every room, so the teleport snaps it to the
+  // nearest free ground behind the wall: the archer then has no line and no path to the hero, and never shoots.
+  // MUTATE=wall restores the old fixture (nearest archer, 7 tiles west of it): the wait below must then fail.
+  const archer = await page.evaluate(mutate => {
+    const z = Field._debug.zones[5], h = Field.hero;
+    if (mutate) {   // the old fixture: the nearest archer, staged 7 tiles west of it whatever lies between
+      const far = Field.slimes.filter(s => s.kind === 'archer' && !s.dead && s.state !== 'chase' && Math.hypot(s.x - h.x, s.y - h.y) > 9);
+      far.sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y));
+      const a = far[0] || Field.slimes.find(s => s.kind === 'archer' && !s.dead);
+      return { id: a.id, x: a.x, y: a.y, hx: a.x - 7, hy: a.y };
+    }
+    const room = (x, y) => z.rooms.find(([a, b, c, d]) => x >= a + 1.5 && x <= c - 1.5 && y >= b + 1.5 && y <= d - 1.5);
+    const solids = z.objects.filter(o => o.kind !== 'void' && o.r > 0);
+    const clear = (ax, ay, bx, by) => solids.every(o => {
+      const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((o.x - ax) * dx + (o.y - ay) * dy) / L));
+      return Math.hypot(ax + dx * t - o.x, ay + dy * t - o.y) > o.r + 0.9;
+    });
+    const free = (x, y) => solids.every(o => Math.hypot(o.x - x, o.y - y) > o.r + 0.9);
+    const options = [];
+    for (const s of Field.slimes) {
+      if (s.kind !== 'archer' || s.dead || s.state === 'chase') continue;
+      const home = room(s.x, s.y);
+      if (!home) continue;
+      for (let k = 0; k < 8; k++) {
+        const hx = s.x + Math.cos(k * Math.PI / 4) * 7, hy = s.y + Math.sin(k * Math.PI / 4) * 7;
+        if (room(hx, hy) === home && free(hx, hy) && clear(hx, hy, s.x, s.y)) options.push({ id: s.id, x: s.x, y: s.y, hx, hy, d: Math.hypot(s.x - h.x, s.y - h.y) });
+      }
+    }
+    options.sort((a, b) => a.d - b.d);
+    const a = options[0];
+    if (!a) throw new Error('no archer in a room with a clear 7-tile line to stand in');
+    return a;
+  }, process.env.MUTATE === 'wall');
+  await stageAt(5, archer.hx, archer.hy);
+  // Capture the arrow inside the wait itself: at 2 tiles it lands within a few frames, so a later read finds it gone.
+  await page.waitForFunction(() => {
+    const b = Field._debug.ebolts.find(b => b.kind === 'archer');
+    if (b) window.__archerArrow = { speed: b.speed, color: b.color, x0: b.x, y0: b.y };
+    return !!b;
+  }, null, { timeout: 25000 }).catch(async (err) => {
     // Diagnostic on failure: where the archers are, what state they are in and where the hero stands.
     console.error('archer probe', JSON.stringify(await page.evaluate(() => ({ hero: [Field.hero.x, Field.hero.y], zone: Field.zone, archers: Field.slimes.filter(s => s.kind === 'archer').map(s => ({ id: s.id, x: +s.x.toFixed(1), y: +s.y.toFixed(1), state: s.state, dead: s.dead, target: s.target ?? null, dormant: s.dormant ?? null })) }))));
     throw err;
   });
-  const arrow = await page.evaluate(() => { const b = Field._debug.ebolts.find(b => b.kind === 'archer'); const x0 = b.x, y0 = b.y; return { speed: b.speed, color: b.color, x0, y0 }; });
+  const arrow = await page.evaluate(() => window.__archerArrow);
   await page.waitForTimeout(60);
   check(arrow.speed > 5 && /^#/.test(arrow.color), `An arrow flies at ${arrow.speed} tiles a second`);
   await shot('archer-arrows');
@@ -173,7 +207,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await page.keyboard.press('m');
   // Dungeon interiors have no atlas tile: the Undervault opens from its entrance marker on Skaldholm (data-to 5), named by aria-label.
   await page.locator('#worldmap .wm-entrance[data-to="5"]').waitFor({ timeout: 10000 });
-  check(await page.evaluate(() => (document.querySelector('#worldmap .wm-entrance[data-to="5"]').getAttribute('aria-label') || '').startsWith('The Undervault') && Field._debug.zones[5].min === 20), 'The world map shows the Undervault entrance; its door is level 20');
+  check(await page.evaluate(() => (document.querySelector('#worldmap .wm-entrance[data-to="5"]').getAttribute('aria-label') || '').startsWith('The Undervault') && Field._debug.zones[5].min_level === 20), 'The world map shows the Undervault entrance; its door is level 20');
   await shot('world-map');
   await page.keyboard.press('Escape');
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);
