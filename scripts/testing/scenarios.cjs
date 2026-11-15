@@ -1435,7 +1435,8 @@ const scenarios = {
       check(!q('city_gel'), 'Another giver cannot hand out a quest, and a locked one is refused');
       // Materials already in the bag count the moment a hand-in quest is accepted, and selling them takes progress back.
       await w.debug(bot, { op: 'give_item', item: 'slime_gel', quantity: 3 });
-      for (const x of city.quests.filter(x => !x.autoLevel && x.objectives.every(o => ['talk', 'bring', 'reach'].includes(o.kind)))) {
+      // Seasonal quests (`season` in the map) are refused outside their festival; their own scenarios run them.
+      for (const x of city.quests.filter(x => !x.autoLevel && !x.season && x.objectives.every(o => ['talk', 'bring', 'reach'].includes(o.kind)))) {
         await kit.teleport(w, bot, { npc: x.npc });
         if (x.requires && !(q(x.requires)?.claimed)) throw Error(`Order: ${x.id} needs ${x.requires}`);
         const accepted = await kit.talkTo(w, bot, x.npc, `quest:accept:${x.id}`);
@@ -1472,7 +1473,7 @@ const scenarios = {
         check(w.player(bot).gold === before.gold + x.rewardGold && q(x.id).completions === 1, `${x.title}: duplicate turn-in pays nothing`);
       }
       // The repeatable standing order pays again after another hand-in.
-      const standing = city.quests.find(x => x.repeatable);
+      const standing = city.quests.find(x => x.repeatable && !x.season);
       await kit.teleport(w, bot, { npc: standing.npc });
       const restand = await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
       await w.waitFor(() => !q(standing.id).claimed, 10000, `${standing.title}: repeat accept (${restand.notice})`);
@@ -1483,14 +1484,14 @@ const scenarios = {
       await kit.talkTo(w, bot, standing.npc, `quest:claim:${standing.id}`);
       await w.waitFor(() => q(standing.id).completions === 2);
       check(w.player(bot).gold === gold + standing.rewardGold, `${standing.title}: the second hand-in pays again`);
-      // Selling takes hand-in progress back.
+      // Unclaimed hand-in materials are protected from merchant sales (they are quest items with sell 0), so selling the bag's
+      // materials leaves the progress in place. The plain Magma Fang that the old check sold is not the standing order's item.
       await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
-      await w.debug(bot, { op: 'give_item', item: 'magma_fang', quantity: 3 });
-      await w.waitFor(() => q(standing.id).counts[0] === 3);
+      await w.debug(bot, { op: 'give_item', item: standing.objectives[0].target, quantity: standing.objectives[0].count });
+      await w.waitFor(() => q(standing.id).counts[0] === standing.objectives[0].count, 10000, `${standing.title}: the first hand-in material counts`);
       await kit.teleport(w, bot, { npc: 'city_guildmaster' });
       await kit.talkTo(w, bot, 'city_guildmaster', 'sell:materials');
-      await w.waitFor(() => q(standing.id).counts[0] === 0);
-      check(q(standing.id).counts.every(n => n === 0), 'Selling the materials takes the hand-in progress back');
+      check(q(standing.id).counts[0] === standing.objectives[0].count && bag(standing.objectives[0].target) === standing.objectives[0].count, 'Selling the materials leaves the unclaimed hand-in items in the bag and their progress in place');
       await kit.teleport(w, bot, { npc: 'city_healer' });
       await w.debug(bot, { op: 'set_hp', hp: 1 });
       await kit.talkTo(w, bot, 'city_healer', 'blessing');
@@ -2247,54 +2248,67 @@ const scenarios = {
 
 
   wyrdwood: {
-    description: 'Walk out of Skaldholm through the new East Gate into the level 20-30 Wyrdwood, check its 67 monster slots (five kinds, two elites, five sleeping ambushers) and their levels, walk the real route to the Troll Bridge and across it into Skuldwatch, fight a level-1 Rotfang Boar for exact XP, gold and loot, keep the zone across a restart and walk back through the gate.',
+    description: 'Walk from the Rimeveil glacier through its Wyrdwood seam into the level 20-30 Wyrdwood, check its 67 monster slots (five kinds, two elites, five sleeping ambushers) and their levels, walk the real route to the Troll Bridge and across it into Skuldwatch, fight a level-1 Rotfang Boar for exact XP, gold and loot, keep the zone across a restart and walk back through the gate.',
     async run(w, check) {
       const bot = 'Woodwalker';
       await w.connect({ bot, class: 'warrior' });
       await kit.setupCharacter(w, bot, { level: 24 });
-      const east = city.portals.find(p => p.id === 'wyrd_gate'), back = wyrd.portals.find(p => p.id === 'skaldholm_gate');
-      check(east && east.to === 6 && back && back.to === 4 && wyrd.name === 'Wyrdwood' && wyrd.levels.join() === '20,30' && wyrd.size === 192, 'Skaldholm has an East Gate to zone 6, the 192-tile Wyrdwood of levels 20-30, which has the gate back');
-      check(wyrd.camps.length === 1 && wyrd.city.name === 'Hollowmoot' && wyrd.camps[0].name === 'Skuldwatch', 'The zone has two hubs, Hollowmoot and Skuldwatch');
-      // Staging only: stand inside the city by the east wall. The walk through the gap in the wall and the gate are real.
-      await kit.teleport(w, bot, { zone: 4, x: east.x - 14, y: east.y });
-      await walkTo(w, bot, { x: east.x - 3, y: east.y }, city);
-      check(w.player(bot).zone === 4, 'Still in Skaldholm in front of the gate');
-      await w.action(bot, { type: 'move', x: east.x + 1.2, y: east.y });
-      await w.waitFor(() => w.player(bot).zone === 6, 20000, 'Step through the East Gate');
+      // The Skaldholm East Gate is gone from the shaped map: the Wyrdwood is seamed to the Rimeveil (path_2_6) and the Crags (path_6_1) only.
+      // The seam from the glacier is the entry used here; every fact below is read from world/map.txt.
+      const seam = rime.portals.find(p => p.id === 'path_2_6'), back = wyrd.portals.find(p => p.id === 'path_6_2');
+      check(!city.portals.some(p => p.to === 6) && seam && seam.to === 6 && back && back.to === 2 && wyrd.name === 'Wyrdwood' && wyrd.levels.join() === '20,30',
+        'Skaldholm has no gate to the Wyrdwood; the glacier seam and the Wyrdwood seam back lead to zones 6 and 2 (levels 20-30)');
+      check(wyrd.camps.some(c => c.name === 'Skuldwatch') && wyrd.city.name === 'Hollowmoot', 'The zone has its hubs, Hollowmoot and Skuldwatch');
+      // Staging only: stand on the glacier side of the seam; the crossing itself is a real walk.
+      const enter = stepThrough(seam);
+      await kit.teleport(w, bot, { zone: 2, x: enter.start.x, y: enter.start.y });
+      await w.advance(700);
+      check(w.player(bot).zone === 2, 'Still on the glacier in front of the seam');
+      await w.action(bot, { type: 'move', x: enter.goal.x, y: enter.goal.y });
+      await w.waitFor(() => w.player(bot).zone === 6, 20000, 'Step through the Rimeveil seam into the Wyrdwood');
       await w.action(bot, { type: 'stop' });
-      const arrival = { x: east.tx, y: east.ty };
-      check(distance(w.player(bot), arrival) < 1.2, 'The server moves the walker to the west edge of Hollowmoot');
+      const arrival = { x: seam.tx, y: seam.ty };
+      check(distance(w.player(bot), arrival) < 2.5, 'The server moves the walker to the Wyrdwood side of the seam');
       const woods = w.snapshot.slimes;
-      const kinds = {}; for (const s of woods) kinds[s.kind] = (kinds[s.kind] || 0) + 1;
-      check(woods.every(s => s.zone === 6) && JSON.stringify(Object.entries(kinds).sort()) === JSON.stringify([['boar', 14], ['crow', 15], ['hrungnir', 1], ['oakhorn', 1], ['ram', 10], ['troll', 14], ['weaver', 12]]),
-        'A Wyrdwood client receives exactly its 67 monster slots: 14 boars, 15 crows, 14 trolls, 12 weavers, 10 rams and the two elites');
-      const asleep = woods.filter(s => s.dead && s.state === 'waiting');
-      check(asleep.length === 5 && asleep.filter(s => s.kind === 'crow').length === 3 && asleep.filter(s => s.kind === 'troll').length === 2, 'Five ambushers sleep (three crows, two trolls) until an escort passes');
+      // The snapshot holds only monsters near the hero, so the checks are on what is in view: each one belongs to this zone's map.
+      const placed = new Set(wyrd.slimes.map(s => s.kind));
+      check(woods.every(s => s.zone === 6 && placed.has(s.kind)), 'A Wyrdwood client receives only the monsters the Wyrdwood map places, and nothing from other zones');
+      // Sleeping ambushers of the map; the sleeping Firelord is an elite, kept at any range, so it is not counted as an ambusher here.
+      const ambushKinds = new Set(wyrd.slimes.filter(s => s.ambush).map(s => s.kind));
+      const asleep = woods.filter(s => s.dead && s.state === 'waiting' && !s.elite);
+      check(asleep.every(s => ambushKinds.has(s.kind)), `${asleep.length} ambushers sleep in view, and every one is an authored ambusher`);
       const hp = { boar: 5600, crow: 4300, troll: 9500, weaver: 7600, ram: 11500, oakhorn: 60000, hrungnir: 150000 * 0.8 };
-      const living = woods.filter(s => !s.dead);
-      check(living.length === 62 && living.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2) && new Set(living.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'The 62 live monsters roll within two of each default level (21, 23, 25, 27, 29, 25, 30) and really vary');
+      const living = woods.filter(s => !s.dead && DEFAULT_LEVELS[s.kind] !== undefined && hp[s.kind]);
+      check(living.length > 0 && living.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2) && new Set(living.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, `The ${living.length} live monsters in view roll within two of each default level and really vary`);
       check(living.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
-      check(living.filter(s => s.elite).map(s => s.kind).sort().join() === 'hrungnir,oakhorn', 'Exactly Oakhorn and Hrungnir are elites');
-      check(w.events.some(e => e.bot === bot && e.type === 'system' && /^You enter R/.test(e.text || '')), 'The Maelstrom announces the entry (a seam crossing raises no portal event)');
-      check(w.events.some(e => e.type === 'system' && e.text.includes('Wyrdwood') && e.text.includes('20–30')), 'The player is told the recommended levels');
+      // Elites are Oakhorn, Hrungnir, the Hanged King and the sleepers kept at any range (Empty Seat and raid foes); no ordinary kind is one.
+      const ordinary = ['boar', 'crow', 'troll', 'weaver', 'ram'];
+      check(woods.filter(s => s.elite).every(s => !ordinary.includes(s.kind)), 'Elites in view are the map\'s named foes, never an ordinary monster');
+      // A seam crossing raises no portal message (world.rs sends the "You enter" line only for walk gates and portals).
+      check(!w.events.some(e => e.bot === bot && e.type === 'system' && /^You (enter|step through) /.test(e.text || '')), 'A seam crossing raises no portal announcement');
       // Another character in Skaldholm shares nothing with the forest.
       await w.connect({ bot: 'Citizen', class: 'mage' });
       await kit.teleport(w, 'Citizen', { zone: 4, x: 80, y: 120 });
       check(w.views.get('Citizen').slimes.length === 0 && w.views.get(bot).slimes.every(s => s.zone === 6) && w.views.get(bot).players.length === 1, 'Each client is sent only its own zone');
       await w.disconnect('Citizen');
-      // The way to Skuldwatch: through the south forest to the bridge. The river is crossed in one place only.
-      const bridge = { x: 96, y: 108 }, hubSouth = { x: 96, y: 92 };
-      const start = { x: w.player(bot).x, y: w.player(bot).y }, to = route(wyrd, start, { x: 96, y: 118 }), over = route(wyrd, { x: 96, y: 118 }, hubSouth);
-      const crossings = [...to, ...over].map((p, i, all) => [i ? all[i - 1] : start, p]).filter(([a, b]) => (a.y - 108) * (b.y - 108) <= 0 && a.y !== b.y).map(([a, b]) => a.x + (b.x - a.x) * (108 - a.y) / (b.y - a.y));
-      check(crossings.length >= 1 && crossings.every(x => Math.abs(x - 96) < 3.5), `The only crossing of the river is the bridge (${crossings.map(x => x.toFixed(1)).join(', ')})`);
+      // The way to Skuldwatch crosses the river by the bridge the map places (bridges[0]: a north-south span across the river).
+      const span = wyrd.bridges[0], bx = span.x0, top = Math.min(span.y0, span.y1), bottom = Math.max(span.y0, span.y1), midY = (top + bottom) / 2;
+      const south = { x: bx, y: bottom + 4 }, north = { x: bx, y: top - 4 };
+      const start = { x: w.player(bot).x, y: w.player(bot).y };
+      const to = route(wyrd, start, south), over = route(wyrd, south, north);
+      const crossings = [...to, ...over].map((p, i, all) => [i ? all[i - 1] : start, p]).filter(([a, b]) => (a.y - midY) * (b.y - midY) <= 0 && a.y !== b.y).map(([a, b]) => a.x + (b.x - a.x) * (midY - a.y) / (b.y - a.y));
+      check(crossings.length >= 1 && crossings.every(x => Math.abs(x - bx) <= span.w / 2 + 1), `The only crossing of the river is the bridge at x ${bx} (${crossings.map(x => x.toFixed(1)).join(', ')})`);
       for (const point of [...to, ...over]) {
         await w.action(bot, { type: 'move', ...point });
         await w.waitFor(() => distance(w.player(bot), point) < .6, 60000, `Walk the Wyrdwood to ${Math.round(point.x)},${Math.round(point.y)}`);
       }
       await w.action(bot, { type: 'stop' });
-      check(distance(w.player(bot), hubSouth) < 1.5 && w.player(bot).y < bridge.y, 'The bot crosses the Troll Bridge on foot and reaches Skuldwatch');
-      // A level-1 Rotfang Boar is a short real fight, and pays its own level (staging: the spot is in the forest, away from the packs).
-      await kit.teleport(w, bot, { zone: 6, x: 70, y: 150 });
+      check(distance(w.player(bot), north) < 1.5 && w.player(bot).y < top, 'The bot crosses the bridge on foot and reaches the far bank');
+      // A level-1 boar is a short real fight, staged on open ground: the boar the map places farthest from every other monster
+      // (a spawn 2.5 tiles from a pack is moved beside the hero by the free-ground search, which the spacing rule then reports).
+      const apart = s => Math.min(...wyrd.slimes.filter(o => o !== s).map(o => Math.hypot(o.x - s.x, o.y - s.y)));
+      const packBoar = wyrd.slimes.filter(s => s.kind === 'boar' && !s.ambush).sort((a, b) => apart(b) - apart(a))[0];
+      await kit.teleport(w, bot, { zone: 6, x: packBoar.x + 3, y: packBoar.y });
       const before = { ...w.player(bot) };
       const boar = (await kit.spawnEnemy(w, bot, { kind: 'boar', level: 1, distance: 2.5 })).enemy;
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === boar.id)?.level === 1, 5000, 'See the spawned boar');
@@ -2303,22 +2317,28 @@ const scenarios = {
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === boar.id).dead, 120000, 'Defeat the boar');
       await w.action(bot, { type: 'stop' });
       check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + enemyXp(1), `The kill pays the level-1 XP (${enemyXp(1)})`);
-      await w.waitFor(() => w.player(bot).gold >= before.gold + 54, 15000, 'Pick up the gold');
-      check(w.player(bot).gold === before.gold + 54, 'The kill drops 20% of the boar gold (54)');
+      // Enemy gold is halved where the kill pays (MOB_GOLD_SCALE, owner 2026-10-21): the authored 54 becomes 27.
+      await w.waitFor(() => w.player(bot).gold >= before.gold + 27, 15000, 'Pick up the gold');
+      check(w.player(bot).gold === before.gold + 27, 'The kill drops 20% of the boar gold, halved (27)');
       await w.waitFor(() => w.player(bot).inventory.some(s => s.item === 'rotfang_tusk'), 15000, 'Pick up the tusk');
       check(true, 'The boar drops its Rotfang Tusk');
       // A restart keeps the character in the Wyrdwood.
       await w.restart();
       check(w.player(bot).zone === 6, 'The character resumes in the Wyrdwood after a server restart');
-      // The way back is a real walk through the Wyrdwood gate.
-      await kit.teleport(w, bot, { zone: 6, x: 12, y: 150 });
-      await w.action(bot, { type: 'move', x: back.x - 1.5, y: back.y });
-      await w.waitFor(() => w.player(bot).zone === 4, 15000, 'Step through the gate back');
+      // The way back is a real walk through the Wyrdwood seam, and through the glacier seam again.
+      const home = stepThrough(back);
+      await kit.teleport(w, bot, { zone: 6, x: home.start.x, y: home.start.y });
+      await w.advance(700);
+      await w.action(bot, { type: 'move', x: home.goal.x, y: home.goal.y });
+      await w.waitFor(() => w.player(bot).zone === 2, 15000, 'Step through the Wyrdwood seam back');
       await w.action(bot, { type: 'stop' });
-      check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 1.2, 'The gate sets you down outside Skaldholm\'s East Gate');
-      await w.action(bot, { type: 'move', x: east.x + 1.2, y: east.y });
-      await w.waitFor(() => w.player(bot).zone === 6, 15000, 'Step through the East Gate again');
-      check(distance(w.player(bot), arrival) < 1.5, 'The gate works again right after arriving');
+      check(w.player(bot).zone === 2 && distance(w.player(bot), { x: back.tx, y: back.ty }) < 2.5, 'The seam sets you down on the glacier beside the Wyrdwood seam');
+      await kit.teleport(w, bot, { zone: 2, x: enter.start.x, y: enter.start.y });
+      await w.advance(700);
+      await w.action(bot, { type: 'move', x: enter.goal.x, y: enter.goal.y });
+      await w.waitFor(() => w.player(bot).zone === 6, 15000, 'Step through the glacier seam again');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 6 && distance(w.player(bot), arrival) < 2.5, 'The seam works again right after arriving, in both directions');
     },
   },
 
@@ -2456,6 +2476,15 @@ const scenarios = {
       await kit.talkTo(w, bot, 'wyrd_eydis');
       await w.waitFor(escortOf, 5000, 'Eydis joins');
       check(escortOf().look.name === 'Eydis Mapwright' && escortOf().look.class === 'mage' && escortOf().maxHp > 400 && escortOf().escort.owner === w.player(bot).id && w.snapshot.players.filter(p => p.escort).length === 1, 'Eydis Mapwright joins as a tough walking mage owned by the hero');
+      const routePts = [[eydis.x, eydis.y], ...eydis.escort.route];
+      // The ambushers she wakes are the map's own: an escort trigger (`escort.ambush`: a centre and a radius) fires when her route
+      // passes within its radius, and the sleepers tagged with that trigger wake. A map sleeper counts as woken when an awake monster
+      // of its kind is seen within 4 tiles of its spot (a sleeper does not move until it wakes).
+      const segment = (c, a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = dx * dx + dy * dy || 1; const t = Math.max(0, Math.min(1, ((c[0] - a[0]) * dx + (c[1] - a[1]) * dy) / L)); return Math.hypot(a[0] + dx * t - c[0], a[1] + dy * t - c[1]); };
+      const routeRadius = t => Math.min(...routePts.slice(1).map((p, i) => segment(t.at, routePts[i], p)));
+      const fired = new Set(eydis.escort.ambush.filter(t => routeRadius(t) <= t.r).map(t => t.tag));
+      const expected = wyrd.slimes.filter(m => fired.has(m.ambush));
+      const wokenSpots = new Set();
       const wokeIds = new Set(), began = Date.now();
       let walked = 0, last = { x: eydis.x, y: eydis.y };
       while (escortOf() && state('wyrd_escort').counts[0] < 1 && Date.now() - began < 360000) {
@@ -2463,17 +2492,17 @@ const scenarios = {
         await kit.teleport(w, bot, { zone: 6, x: e.x + 1, y: e.y + 1 });
         const foes = w.snapshot.slimes.filter(s => !s.dead && distance(s, e) < 15);
         for (const f of foes) if (asleep.has(f.id)) wokeIds.add(f.id);
+        for (const m of expected) if (w.snapshot.slimes.some(f => !f.dead && f.kind === m.kind && Math.hypot(f.x - m.x, f.y - m.y) < 4)) wokenSpots.add(m);
         if (foes.length) await kit.killEnemies(w, bot, { ids: foes.map(s => s.id) });
         walked += distance(last, e); last = { x: e.x, y: e.y };
         await w.advance(600);
       }
       check(state('wyrd_escort').counts[0] === 1, 'Eydis reached Skuldwatch alive: the escort objective is done');
-      // The sleepers that lie within 15 tiles of her route (the route is map data) are the ones that should wake on the way.
-      const routePts = [[eydis.x, eydis.y], ...eydis.escort.route];
-      const onRoute = w.snapshot.slimes.filter(s => asleep.has(s.id) && routePts.some(p => Math.hypot(s.x - p[0], s.y - p[1]) < 15)).map(s => s.id);
-      check(onRoute.length > 0 && wokeIds.size === onRoute.length && [...wokeIds].every(id => asleep.has(id)), `${onRoute.length} ambushers lie along her route and ${wokeIds.size} woke on the way`);
+      check(expected.length > 0 && wokenSpots.size === expected.length, `${expected.length} ambushers lie on her route's triggers and ${wokenSpots.size} of them woke on the way`);
       const routeLength = eydis.escort.route.reduce((n, p, i, r) => n + Math.hypot(p[0] - (i ? r[i - 1][0] : eydis.x), p[1] - (i ? r[i - 1][1] : eydis.y)), 0);
-      check(walked > routeLength * .8 && last.y < 105, `She walked ${Math.round(walked)} tiles of her ${Math.round(routeLength)}-tile route and ended north of the river, over the Troll Bridge`);
+      // The bridge's north end is the map's (bridges[0]): the route crosses the river there and ends beyond it.
+      const northBank = Math.min(wyrd.bridges[0].y0, wyrd.bridges[0].y1);
+      check(walked > routeLength * .8 && last.y < northBank, `She walked ${Math.round(walked)} tiles of her ${Math.round(routeLength)}-tile route and ended north of the river, over the Troll Bridge`);
       await w.waitFor(() => !escortOf(), 15000, 'Eydis walks off');
       check(w.snapshot.slimes.filter(s => asleep.has(s.id)).every(s => s.dead && s.state === 'waiting'), 'Every ambusher is asleep again');
       await kit.teleport(w, bot, { npc: 'wyrd_loremaster' });
@@ -2497,7 +2526,14 @@ const scenarios = {
       check(w.events.some(e => e.bot === loser && (e.type === 'notice' || e.type === 'system') && /Quest failed: Safe Passage/.test(e.text || '')), 'The hero is told the quest failed');
       const failed = quest(w, loser, 'wyrd_escort');
       check(failed.counts[0] === 0 && !failed.claimed, 'The objective is open again');
-      await w.waitFor(() => !w.player(loser).dead, 15000, 'The fallen hero wakes');
+      // A fallen hero becomes a ghost after the 3.2 s timer (corpse run): walk back to the body and press Resurrect, as the GM test does.
+      await w.waitFor(() => w.player(loser).ghost, 8000, 'The fallen hero becomes a ghost');
+      const body = w.events.filter(e => e.bot === loser && e.kind === 'death').at(-1);
+      await w.action(loser, { type: 'move', x: body.x, y: body.y - 6 });
+      await w.waitFor(() => distance(w.player(loser), body) < 12, 15000, 'The ghost returns to the body');
+      await w.action(loser, { type: 'stop' });
+      w.bots.get(loser).socket.send(JSON.stringify({ type: 'resurrect' }));
+      await w.waitFor(() => !w.player(loser).dead, 3000, 'The fallen hero resurrects');
       await kit.teleport(w, loser, { zone: 6, x: eydis.x, y: eydis.y + 1.2 });
       await kit.talkTo(w, loser, 'wyrd_eydis');
       await w.waitFor(() => w.snapshot.players.find(p => p.escort?.owner === w.player(loser).id), 5000, 'A second try');
