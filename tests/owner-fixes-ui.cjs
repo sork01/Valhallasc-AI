@@ -25,6 +25,13 @@ async function player(touch = false) {
       await page.route(name === 'index.html' ? world.url : '**/' + name, r => r.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html' }));
     }
   }
+  // MUTATE=cursor: the pointer is never set near a gate, so the hover assertion must fail.
+  if (process.env.MUTATE === 'cursor') await page.route('**/field.js', r => {
+    const src = fs.readFileSync(path.join(candidate || 'client', 'field.js'), 'utf8');
+    const body = src.replace("? 'pointer' : ''", "? '' : ''");
+    assert.notEqual(body, src, 'Mutation applied');
+    return r.fulfill({ body, contentType: 'text/javascript' });
+  });
   await page.addInitScript(({ touch, version }) => {
     window.AudioContext = undefined; window.webkitAudioContext = undefined;
     localStorage.setItem('valhallasc.save.v1', JSON.stringify({lang:touch?'sv':'en', sound:false, dpsMeter:false, uiSet:true,ui:{},panelSizeSet:true,panelSize:{}}));
@@ -45,10 +52,14 @@ async function nearNpc(page, id) {
 }
 async function portalTest(page, touch) {
   await page.evaluate(() => { City.close(); Quests.close(); WorldMap.close(); Field.clearInput(); });
-  // The first walk-through gate of Greenmeadow (to Skaldholm's vault). The Crags border is a seam now, not a gate.
-  const p = await page.evaluate(() => WORLD_MAP.portals.find(p=>p.walk));
+  // A click gate is a plain portal: pickPortal (field.js) ignores seams and vaults on purpose (commit 38b50807), so the
+  // Greenmeadow walk portal (the Skaldholm vault) is never a click target. Greenmeadow has no plain portal at all.
+  const p = await page.evaluate(() => [WORLD_MAP,...WORLD_MAP.zones].flatMap((a,zone)=>(a.portals||[]).map(q=>({...q,zone})))
+    .find(q=>q.walk&&!q.seam&&!q.vault&&!q.after_clear));
+  check(!!p, 'The map has a plain walk-through gate for the click test');
   const length = Math.hypot(...p.walk), back = 5;
-  await debug(page,{op:'teleport',zone:0,x:p.x-p.walk[0]/length*back,y:p.y-p.walk[1]/length*back});
+  await debug(page,{op:'teleport',zone:p.zone,x:p.x-p.walk[0]/length*back,y:p.y-p.walk[1]/length*back});
+  await wait(page, zone => Field.zone === zone, p.zone);
   await page.waitForTimeout(500);
   // Click beside the opening, outside its old trigger circle. The shared picker
   // must build a route that actually carries the authoritative hero across.
@@ -56,12 +67,15 @@ async function portalTest(page, touch) {
     const [x,y] = Field._debug.w2s(p.x,p.y), cv=document.getElementById('fieldcv'), b=cv.getBoundingClientRect();
     return { x:b.x+(x+60)/1600*b.width, y:b.y+y/(b.height/b.width*1600)*b.height };
   },p);
+  // A level-up tutorial tip (the Swedish touch page) can cover the top middle of the 844x390 screen for a while; wait until the tap point is the canvas.
+  await page.waitForFunction(h => document.elementFromPoint(h.x, h.y)?.id === 'fieldcv', hit, { timeout: 15000 }).catch(() => {});
+  check(await page.evaluate(h => document.elementFromPoint(h.x, h.y)?.id === 'fieldcv', hit), 'The gate tap point reaches the field canvas');
   if (!touch) {
     await page.mouse.move(hit.x,hit.y);
     check(await page.locator('#fieldcv').evaluate(n=>n.style.cursor==='pointer'),'Hover near a gate shows an actionable cursor');
     await page.mouse.click(hit.x,hit.y);
   } else await page.touchscreen.tap(hit.x,hit.y);
-  await wait(page, to => Field.zone === to, p.to).catch(async e => { console.error('Portal failure', {touch,hit,p}, await page.evaluate(() => ({zone:Field.zone,hero:{x:Field.hero.x,y:Field.hero.y},route:Field._debug.cityRoute,paused:document.getElementById('pause').hidden,hitElement:document.elementFromPoint(innerWidth*.6,innerHeight*.5)?.outerHTML.slice(0,150)}))); await page.screenshot({path:path.join(world.runDir,'portal-failure.png')}); throw e; });
+  await wait(page, to => Field.zone === to, p.to).catch(async e => { console.error('Portal failure', {touch,hit,p}, await page.evaluate(h => ({zone:Field.zone,hero:{x:Field.hero.x,y:Field.hero.y,nx:Field.hero.nx,ny:Field.hero.ny},route:Field._debug.cityRoute,probe:Field._debug.routeTo({x:h.px,y:h.py},true,Field.hero,1.65)?.length,paused:document.getElementById('pause').hidden,running:Online.connected,canAct:Field.canAct,hitElement:document.elementFromPoint(h.x,h.y)?.outerHTML.slice(0,150)}), {...hit,px:p.x,py:p.y})); await page.screenshot({path:path.join(world.runDir,'portal-failure.png')}); throw e; });
   check(true, `${touch?'Touch':'Mouse'} near the opening follows a route and crosses the gate`);
   await page.waitForTimeout(800);
   check(await page.evaluate(to=>Field.zone===to, p.to),'Arrival remains in the destination after the portal cooldown');
@@ -163,6 +177,10 @@ async function portalTest(page, touch) {
   }
   const phone = await player(true);
   await debug(phone,{op:'set_level',level:99});
+  // set_level 99 grants stat points, and the tutorial's levelup_stats tip then covers the top middle of the 844x390 page
+  // over the gate. Disable the tutorial for this test hero, as tests/lib/touch.cjs does for every touch player.
+  // MUTATE=tip keeps the tip up, so the tap-point assertion below must fail.
+  if (process.env.MUTATE !== 'tip') await phone.evaluate(()=>window.Tutorial?.disable?.());
   if (process.env.OWNER_FIXES_ONLY !== 'locale') await portalTest(phone,true);
   // Swedish ready presentation remains explicit on the short touch layout.
   await debug(phone,{op:'quest',id:'welcome',action:'accept'});
