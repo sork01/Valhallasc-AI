@@ -1,4 +1,22 @@
 // New zone only: real movement, both gates, quests, kill drops and persistence.
+// The Caldera is entered by walking across the Orrery's shared border (a seam), not through a gate on Asterion.
+// A seam fires only moving across its line on its own side, so start 2 tiles back on that side (as scenarios.cjs does).
+function crossingPath(gate) {
+  const pts = gate.seam.points;
+  let best = null;
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const [ax, ay] = pts[i], [bx, by] = pts[i + 1];
+    const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1;
+    const t = Math.max(0, Math.min(1, ((gate.x - ax) * dx + (gate.y - ay) * dy) / (len * len)));
+    const d = Math.hypot(gate.x - (ax + dx * t), gate.y - (ay + dy * t));
+    if (!best || d < best.d) best = { d, gx: -dy / len, gy: dx / len };
+  }
+  const s = gate.seam.side;
+  return {
+    start: { x: gate.x + s * 2 * best.gx, y: gate.y + s * 2 * best.gy },
+    goal: { x: gate.x - s * 2 * best.gx, y: gate.y - s * 2 * best.gy },
+  };
+}
 module.exports=(kit,map)=>({
   description:'Emberwake Caldera: walk from Asterion to the raid door, quests, outdoor loot and return.',
   startLevel:99,levelSpread:0,godMode:true,
@@ -6,13 +24,17 @@ module.exports=(kit,map)=>({
     const bot='EmberWalker',area=map.zones[44];
     const q=id=>w.player(bot).quests.find(q=>q.id===id);
     await w.connect({bot,class:'warrior'});
-    await kit.teleport(w,bot,{zone:17,x:90,y:42});
-    await kit.walkTo(w,bot,{x:90,y:25});
-    await w.action(bot,{type:'move',x:90,y:18});
-    await w.waitFor(()=>w.player(bot).zone===45,15000,'Asterion gate');
+    const entry=map.zones[14].portals.find(p=>p.id==='atlas_15_45'), home=area.portals.find(p=>p.id==='atlas_45_15');
+    const enter=crossingPath(entry);
+    await kit.teleport(w,bot,{zone:15,x:enter.start.x,y:enter.start.y});
+    await w.advance(700); // a teleport holds portals for PORTAL_DELAY (0.5 s): wait before walking into the seam
+    await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
+    await w.waitFor(()=>w.player(bot).zone===45,15000,'Cross the Orrery border into the Caldera');
     await w.action(bot,{type:'stop'});
-    check(Math.hypot(w.player(bot).x-22,w.player(bot).y-137)<2,'Asterion gate reaches a safe caldera arrival');
-    check(w.views.get(bot).slimes.length===area.slimes.length,'Only Emberwake enemies are in the view');
+    check(Math.hypot(w.player(bot).x-entry.tx,w.player(bot).y-entry.ty)<2,'The Orrery border reaches a safe caldera arrival');
+    // Snapshots cull distant enemies, so the view holds some of the Caldera's floor, never the Orrery's.
+    await w.waitFor(()=>w.views.get(bot).slimes.length>0,5000,'Caldera enemies arrive in view');
+    check(w.views.get(bot).slimes.every(s=>s.zone===45),'Only Emberwake enemies are in the view');
     await kit.talkTo(w,bot,'ew_guide','quest:accept:ew_warm');
     await w.waitFor(()=>q('ew_warm'),5000,'Accept the road introduction');
     await kit.talkTo(w,bot,'ew_keeper');
@@ -27,8 +49,10 @@ module.exports=(kit,map)=>({
     await w.waitFor(()=>q('ew_road')?.claimed,5000,'Claim road quest');
     await kit.talkTo(w,bot,'ew_guide','quest:accept:ew_voice');
     await w.waitFor(()=>q('ew_voice'),5000,'Accept Eldmarr quest');
-    for(const [x,y]of area.paths[0].slice(1))await kit.walkTo(w,bot,{x,y},120000);
-    check(w.player(bot).zone===45&&Math.hypot(w.player(bot).x-133,w.player(bot).y-26)<2,'The whole chain road can be walked to the raid door');
+    // The raid door is ew_raid (322,80) now: walk the real collision to a point in front of it.
+    const door=area.portals.find(p=>p.id==='ew_raid');
+    await kit.walkTo(w,bot,{x:door.x,y:door.y+3},120000);
+    check(w.player(bot).zone===45&&Math.hypot(w.player(bot).x-door.x,w.player(bot).y-(door.y+3))<2,'The whole chain road can be walked to the raid door');
     const seal=await kit.talkTo(w,bot,'ew_seal');
     check(JSON.stringify(seal).includes('Quartermaster Halla'),'The Nine-Chain Door explains how to assemble ten fighters');
     await kit.talkTo(w,bot,'ew_echo');
@@ -50,11 +74,14 @@ module.exports=(kit,map)=>({
     await w.waitFor(()=>q('ew_link')?.claimed,5000,'Claim elite quest');
     await kit.talkTo(w,bot,'ew_guide','quest:claim:ew_voice');
     await w.waitFor(()=>q('ew_voice')?.claimed,5000,'Claim Eldmarr quest');
-    await kit.walkTo(w,bot,{x:20,y:140});await w.action(bot,{type:'move',x:14,y:140});
-    await w.waitFor(()=>w.player(bot).zone===17,15000,'Return gate');
+    const back=crossingPath(home);
+    await kit.teleport(w,bot,{zone:45,x:back.start.x,y:back.start.y});
+    await w.advance(700);
+    await w.action(bot,{type:'move',x:back.goal.x,y:back.goal.y});
+    await w.waitFor(()=>w.player(bot).zone===15,15000,'Return across the border to the Orrery');
     await w.action(bot,{type:'stop'});
-    check(Math.hypot(w.player(bot).x-90,w.player(bot).y-25)<2,'Return lands outside Asterion gate without bouncing');
+    check(Math.hypot(w.player(bot).x-home.tx,w.player(bot).y-home.ty)<2,'Return lands at the Orrery arrival without bouncing');
     await w.restart();
-    check(w.player(bot).zone===17&&['ew_warm','ew_road','ew_voice','ew_link'].every(id=>q(id)?.claimed),'Quest claims and safe return survive restart');
+    check(w.player(bot).zone===15&&['ew_warm','ew_road','ew_voice','ew_link'].every(id=>q(id)?.claimed),'Quest claims and safe return survive restart');
   }
 });
