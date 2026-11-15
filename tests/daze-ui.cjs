@@ -41,14 +41,14 @@ async function pixels(page, id, suppress) {
     await page.goto(info.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.locator('#cls-warrior').click(); await page.locator('#name').fill(name); await page.locator('#go').click();
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
-    await debug(page, { op: 'teleport', zone: 0, x, y: 25 });
-    await page.waitForFunction(x => Math.abs(Field.hero.x - x) < .2, x);
+    await debug(page, { op: 'teleport', zone: 0, x, y: 235 });
+    await page.waitForFunction(x => Math.abs(Field.hero.x - x) < .2, x, { timeout: 30000 });
     return page;
   }
-  const victim = await player('DazeVictim', 25), witness = await player('DazeWitness', 30);
+  const victim = await player('DazeVictim', 250), witness = await player('DazeWitness', 255);
   const id = await victim.evaluate(() => Online.id);
   await send(victim, { type: 'attack', fx: 1, fy: 0 });
-  await debug(victim, { op: 'spawn_enemy', kind: 'green', x: 23.5, y: 25, level: 1 });
+  await debug(victim, { op: 'spawn_enemy', kind: 'green', x: 248.5, y: 235, level: 1 });
   await victim.waitForFunction(() => Field.hero.daze > 2, null, { timeout: 30000 });
   await debug(victim, { op: 'set_god_mode', enabled: true });
   check(await victim.evaluate(() => !Field.hero.stun), 'daze is separate from stun');

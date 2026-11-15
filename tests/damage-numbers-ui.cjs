@@ -40,7 +40,12 @@ async function call(name, args = {}) {
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero.level === 99, null, { timeout: 60000 });
   const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
-  const near = await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 14).map(s => s.id));
+  // A new hero starts on the Saltby pier: stand on open ground south of Alderhaven first (zone 0 (250,235)).
+  await debug({ op: 'teleport', zone: 0, x: 250, y: 235 });
+  // The teleport lands on the nearest free ground, so settle within 8 tiles and spawn from the hero's real position.
+  await page.waitForFunction(() => Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 8, null, { timeout: 60000 });
+  const home = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+  const near =await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 14).map(s => s.id));
   for (const id of near) await debug({ op: 'kill_enemy', id });
   await page.waitForFunction(() => Field.slimes.every(s => s.dead || Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) >= 14));
   fs.mkdirSync(path.join(world.artifacts, 'damage-numbers'), { recursive: true });
@@ -48,7 +53,7 @@ async function call(name, args = {}) {
   const heads = {};
   for (const kind of ['green', 'snowgiant']) {
     await debug({ op: 'reset_cooldowns' });
-    await debug({ op: 'spawn_enemy', kind, x: 0, y: 0, level: 99 });     // moved next to the hero below, once it exists
+    await debug({ op: 'spawn_enemy', kind, x: home.x + 4, y: home.y, level: 99 }); // beside the hero's real position; moved next to the hero below, once it exists
     await page.waitForFunction(k => Field.slimes.some(s => s.kind === k && s.level === 99 && !s.dead), kind);
     const feetAt = await page.evaluate(k => { const s = Field.slimes.find(x => x.kind === k && x.level === 99 && !x.dead); return { x: s.x, y: s.y }; }, kind);
     await debug({ op: 'teleport', zone: await page.evaluate(() => Field.zone), x: feetAt.x - 1.3, y: feetAt.y });
@@ -56,17 +61,18 @@ async function call(name, args = {}) {
     await page.evaluate(() => { window.__nums.length = 0; });
     const got = await page.evaluate(k => new Promise(resolve => {
       const slime = Field.slimes.find(x => x.kind === k && x.level === 99 && !x.dead), feet = [], start = performance.now();
-      let sentAt = -1e9;
+      let sentAt = -1e9, frames = 0, hits = 0;
       (function frame() {
+        frames++;
         const [fx, fy] = Field._debug.w2s(slime.x, slime.y, 0);
         if (!window.__nums.length && performance.now() - sentAt > 700) { sentAt = performance.now(); Online.send({ type: 'attack', fx: slime.x - Field.hero.x, fy: slime.y - Field.hero.y }); }
         const first = window.__nums[0];
         if (first) feet.push({ at: performance.now(), fx, fy });
-        if (window.__nums.length && performance.now() - window.__nums[0].at > 1700 || performance.now() - start > 8000) resolve({ nums: window.__nums.slice(), feet });
+        if (window.__nums.length && performance.now() - window.__nums[0].at > 1700 || performance.now() - start > 8000) resolve({ nums: window.__nums.slice(), feet, frames, ms: Math.round(performance.now() - start) });
         else requestAnimationFrame(frame);
       })();
     }), kind);
-    check(got.nums.length > 10, `${kind}: a number was drawn (${got.nums.length} draws)`);
+    check(got.nums.length > 10, `${kind}: a number was drawn (${got.nums.length} draws in ${got.frames} frames, ${got.ms} ms)`);
     // The first number: its consecutive draws (same text), until a different one appears.
     const text = got.nums[0].text, run = []; for (const n of got.nums) { if (n.text !== text) break; run.push(n); }
     const feet = got.feet.reduce((a, b) => Math.abs(b.at - run[0].at) < Math.abs(a.at - run[0].at) ? b : a);
