@@ -1507,6 +1507,8 @@ const scenarios = {
       await w.waitFor(() => classes.every(cls => w.player('F' + cls) && w.player('M' + cls)), 20000, 'All ten characters join');
       check(classes.every(cls => w.player('F' + cls).look.gender === 'female' && w.player('F' + cls).look.class === cls), 'Each class can be created as a woman, and the server says so');
       check(classes.every(cls => w.player('M' + cls).look.gender === 'male'), 'Leaving the choice alone gives a man');
+      // The last joiners reach the snapshot a tick after their session exists: wait for all ten bodies to be listed.
+      await w.waitFor(() => classes.every(cls => w.snapshot.players.some(p => p.look.name === 'F' + cls) && w.snapshot.players.some(p => p.look.name === 'M' + cls)), 5000, 'Snapshot lists every body');
       const seen = w.snapshot.players;
       check(classes.every(cls => seen.find(p => p.look.name === 'F' + cls)?.look.gender === 'female' && seen.find(p => p.look.name === 'M' + cls)?.look.gender === 'male'), 'Every player\u2019s snapshot carries the others\u2019 body type');
       check(classes.every(cls => w.player('F' + cls).look[cls + 'Armor'] === w.player('M' + cls).look[cls + 'Armor'] && w.player('F' + cls).maxHp === w.player('M' + cls).maxHp), 'Starter gear and health do not depend on the body');
@@ -1563,8 +1565,12 @@ const scenarios = {
       await cast(w, 'Pia', 'prayer');
       await w.waitFor(() => hp('Tank') > 100 && hp('Pia') > 100, 5000, 'Prayer of Healing');
       check(hp('Tank') > 100 && hp('Pia') > 100, 'Prayer of Healing heals the whole party');
-      // A blessing and a nova reach the party, never the stranger.
-      await cast(w, 'Pia', 'blessing');
+      // A blessing and a nova reach the party, never the stranger. Blessing reaches 9 metres and costs mana: stand the warrior beside the priest and refill.
+      await kit.teleport(w, 'Tank', { bot: 'Pia' });
+      await w.debug('Pia', { op: 'set_resource', amount: 100 });
+      await w.advance(300);
+      // Blessing of Might unlocks at level 24: the unlock shortcut raises the priest to it, as the server does for a shortcut cast.
+      await kit.castSkill(w, 'Pia', { skill: 'blessing', settleMs: 300 });
       await w.waitFor(() => w.player('Tank').buffs.some(b => b.id === 'blessing'), 5000, 'Blessing');
       check(pia().buffs.some(b => b.id === 'blessing') && !w.player('Sam').buffs.some(b => b.id === 'blessing'), 'Blessing of Might buffs the priest and the party, not a stranger');
       await w.debug('Tank', { op: 'set_hp', hp: 50 });
@@ -4696,7 +4702,8 @@ const scenarios = {
       check(common.length===2&&w.player(bot).bagUsed===w.player(bot).bagCapacity,'Full bag has two matching spare copies');
       await reply(`merge_confirm:${common[0]}:${common[1]}`);
       await w.waitFor(()=>w.player(bot).gearInstances.filter(g=>g.item===piece&&g.rarity==='uncommon').length===2,5000,'Full-bag merge');
-      check(w.player(bot).bagUsed===w.player(bot).bagCapacity,'Merge succeeds at full capacity because its output fits');
+      // Gear takes a cell per copy: two spare commons free two cells and their one uncommon output takes one.
+      check(w.player(bot).bagUsed===w.player(bot).bagCapacity-1,'Merge succeeds at full capacity because its output fits in the freed cells');
       await w.restart();
       check(w.player(bot).gearInstances.some(g=>g.id===output.id&&g.rank===1)&&w.player(bot).gearInstances.some(g=>g.id===wornId&&g.rank===1),'Both refined copies survive restart');
     },
