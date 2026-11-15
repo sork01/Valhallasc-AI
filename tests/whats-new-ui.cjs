@@ -112,7 +112,9 @@ async function newPage() {
   const sv = await newPage(); await seed(sv, 'sv');
   await sv.goto(world.url); await waitOpen(sv);
   check(await sv.locator('#news-label').textContent() === "What's new" && await sv.locator('#news-close').textContent() === 'Close', 'Swedish players see the window labels in English');
-  check(await sv.locator('#news-body > h3').first().textContent() === 'New' && await sv.locator('#news-body > ul li').allTextContents().then(texts => JSON.stringify(texts) === JSON.stringify([...entries[0].new, ...entries[0].changed, ...entries[0].removed])), 'Swedish does not translate the notes or section headings');
+  // Headings come from the notes file: a section with no items is not rendered (Beta 1.55.11 has no New items).
+  const headings = ['New', 'Changed', 'Removed'].filter((heading, index) => entries[0][['new', 'changed', 'removed'][index]].length);
+  check(JSON.stringify(await sv.locator('#news-body > h3').allTextContents()) === JSON.stringify(headings) && await sv.locator('#news-body > ul li').allTextContents().then(texts => JSON.stringify(texts) === JSON.stringify([...entries[0].new, ...entries[0].changed, ...entries[0].removed])), 'Swedish does not translate the notes or section headings');
   await sv.locator('.news-history > summary').click(); await sv.locator('.news-history details > summary').last().click();
   check(await sv.locator('.news-history details').last().locator('h3').allTextContents().then(texts => texts.includes('Changed') && texts.includes('Removed')), 'Changed and Removed also stay English in history');
   check(await sv.locator('#set-whats-new').textContent() === "What's new", 'The Settings row stays English while the rest of Settings uses Swedish');
