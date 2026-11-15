@@ -23,6 +23,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, musicVol: 1 })));
+  // MUTATE=wyrd drops Wyrdwood's night registration: zone 6 must then fall back to the shared score and fail.
+  if (process.env.MUTATE === 'wyrd') await page.route('**/game.js*', async route => { const r = await route.fetch(); await route.fulfill({ response: r, body: (await r.text()).replace('nightScores.set(6, wyrdNightMusic);', '') }); });
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('MereLantern'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.zone === 0 && !!valhalla.fmusic?.running, null, { timeout: 60000 });
@@ -46,12 +48,12 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.waitForFunction(() => valhalla.cityNightMusic.output.gain.value > .95, null, { timeout: 10000 });
 
   await debug(page, { op: 'teleport', zone: 6, x: 9.5, y: 150 });
-  await page.waitForFunction(() => Field.zone === 6 && valhalla.activeNightMusic === valhalla.nightMusic && valhalla.nightMusic.running && !valhalla.cityNightMusic.running, null, { timeout: 10000 });
+  await page.waitForFunction(() => Field.zone === 6 && valhalla.activeNightMusic === valhalla.wyrdNightMusic && valhalla.wyrdNightMusic.running && !valhalla.cityNightMusic.running, null, { timeout: 10000 });
   await debug(page, { op: 'teleport', zone: 4, x: 80, y: 150 });
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
   await page.waitForFunction(() => Field.zone === 4 && DayNight.nightMix === 0 && !valhalla.cityNightMusic.running && valhalla.smusic.running, null, { timeout: 10000 });
   assert.deepEqual(errors, [], 'no browser errors');
-  console.log('Gloamfen and Skaldholm night remixes decode, crossfade, mute, and use the shared fallback elsewhere');
+  console.log('Gloamfen and Skaldholm night remixes decode, crossfade, mute, and Wyrdwood plays its own night score');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   await browser?.close();
   if (started) await call('stop_world').catch(() => {});
