@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.6",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "Walking a route no longer pauses at sharp corners: the next leg starts a little before the corner, so the hero keeps moving through a tight turn."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.5",
     "date": "2026-11-15",
     "new": [],

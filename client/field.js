@@ -3254,11 +3254,13 @@
           // Judge progress by where the server has the hero: the drawn sprite eases toward it and trails by about speed/14 tiles, so
           // waiting for the sprite made the server stand still at every waypoint until the sprite caught up. The next waypoint goes
           // out speed x .45 s early (snapshots are up to .1 s old, plus a slow frame and the trip back), so the server never runs
-          // dry, but only when the straight line to it clears the objects.
+          // dry, but only when the straight line to it clears the objects. At a hard corner that line is blocked until the hero stands on the
+          // corner, and the server then stood still for the trip to the client and back, so the last .15 s of the leg goes out regardless
+          // (the server slides the hero along the object).
           const sx=Number.isFinite(hero.nx)?hero.nx:hero.x, sy=Number.isFinite(hero.ny)?hero.ny:hero.y, m=routeMotion;
           if(tAll-m.t>=.25){const moved=Math.hypot(sx-m.x,sy-m.y);if(moved>0)m.v=clamp(moved/(tAll-m.t),3,30);m.x=sx;m.y=sy;m.t=tAll;}
           const ahead=clamp(m.v*.45,.9,6);let advanced=false;
-          while(cityRoute.length>1&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<ahead&&segmentFree({x:sx,y:sy},cityRoute[1],.45)){cityRoute.shift();advanced=true;}
+          while(cityRoute.length>1&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<ahead&&(segmentFree({x:sx,y:sy},cityRoute[1],.45)||Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<m.v*.15)){cityRoute.shift();advanced=true;}
           if(cityRoute.length===1&&(Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<.32||Math.hypot(hero.x-cityRoute[0].x,hero.y-cityRoute[0].y)<.32)){cityRoute.shift();advanced=true;}
           if(cityRoute.length&&(advanced||tAll-routeTime>.35)){Online.send({type:'move',...cityRoute[0]});routeTime=tAll;}
         }
