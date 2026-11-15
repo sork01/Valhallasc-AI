@@ -44,7 +44,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   if(cls==='warrior'&&gender==='male'){
    await p.evaluate(()=>Online.send({type:'debug',command:{op:'season_time',unix:1813183200}}));await p.waitForFunction(()=>Seasonal.isActive('solstice'));
    for(const [zone,name]of[[0,'alderhaven'],[4,'skaldholm'],[9,'nacrehold'],[17,'asterion']]){
-    const tree=await p.evaluate(z=>{const a=[WORLD_MAP,...WORLD_MAP.zones][z];return a.solsticeDecor.find(o=>o.kind==='solsticePole')||a.solsticeDecor.find(o=>o.kind==='solsticePole');},zone);
+    const tree=await p.evaluate(z=>{const a=[WORLD_MAP,...WORLD_MAP.zones][z];return a.npcs.find(n=>n.id==='festival_dance_solstice_'+z);},zone);
     await p.evaluate(([zone,x,y])=>{City.close();Quests.close();Field.clearInput();Online.send({type:'stop'});Online.send({type:'debug',command:{op:'teleport',zone,x,y}});Online.send({type:'debug',command:{op:'set_time',hour:18,freeze:true}});},[zone,tree.x+2,tree.y+2]);
     await p.waitForFunction(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<1.3,[zone,tree.x+2,tree.y+2]);await p.waitForFunction(()=>NpcArt.readyFor(City.npcs));await p.waitForTimeout(400);await p.evaluate(()=>ZoneJourney.clear());
     const costume=await p.evaluate(()=>{const n=City.npcs.find(n=>Seasonal.hat(n)),c=document.createElement('canvas');c.width=c.height=400;const g=c.getContext('2d');g.translate(200,250);Seasonal.drawNpc(g,n,3,100);return g.getImageData(0,0,400,400).data.filter((v,i)=>i%4===3&&v>0).length;});

@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.55.5",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "Townspeople anywhere in Nacrehold now wear the seasonal costumes and decorations, not just the few near the middle of the city.",
+      "The Chainforged Broken Link necklace is drawn on your character again. The Legacy pieces that share a look with another item now show that look."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.4",
     "date": "2026-11-14",
     "new": [

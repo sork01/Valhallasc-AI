@@ -312,7 +312,17 @@
   let catalog = null, catalogSize = -1;
   const gearIndex = () => {
     const items = window.WORLD_ITEMS || [];
-    if (!catalog || catalogSize !== items.length) { catalog = new Map(items.filter(i => i.variant).map(i => [`${i.kind}|${i.variant}`, i])); catalogSize = items.length; }
+    if (!catalog || catalogSize !== items.length) {
+      // Hierloom pieces reuse another piece's worn variant (docs/hierlooms.md) and carry no art of their own, so on a shared
+      // kind|variant the entry that has art or a tint is the drawing; a later artless entry must not replace it.
+      catalog = new Map();
+      for (const i of items) {
+        if (!i.variant) continue;
+        const key = `${i.kind}|${i.variant}`, held = catalog.get(key);
+        if (!held || !((held.art || held.tint) && !(i.art || i.tint))) catalog.set(key, i);
+      }
+      catalogSize = items.length;
+    }
     return catalog;
   };
   const PROGRESSION = ['regearl25', 'regearl30', 'regearl35', 'regearl40', 'regearl45', 'regearl50', 'regearcloister', 'regearreliquary', 'regearnave'];
