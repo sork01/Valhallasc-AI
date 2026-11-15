@@ -211,12 +211,43 @@
         g.restore();
       }
     }
-    if (!far && roots > .01) {   // the roots that hold up the sky begin to burn
-      g.save(); g.lineCap = 'round';
-      for (let i = 0; i < 7; i++) {
-        const x = w * (.1 + i * .13), len = h * (.14 + rnd(i) * .1) * roots;
-        g.strokeStyle = '#3a2216'; g.lineWidth = 6; g.beginPath(); g.moveTo(x, 0); g.quadraticCurveTo(x + Math.sin(t + i) * 16, len * .5, x + (rnd(i + 5) - .5) * 40, len); g.stroke();
-        g.strokeStyle = `rgba(255,${130 + Math.round(Math.sin(t * 7 + i) * 50)},40,${.85 * roots})`; g.lineWidth = 2.5; g.stroke();
+    if (far && roots > .01) {   // the roots that hold up the sky begin to burn: thick, gnarled, branching, cracked with lava, flames along them and embers falling
+      const sc = h / 600;
+      const build = (x0, y0, len, ang, seed) => { const pts = []; let x = x0, y = y0, a = ang; const N = 12; for (let k = 0; k <= N; k++) { pts.push([x, y, k / N]); a += (rnd(seed + k) - .5) * .5 + Math.sin(t * .5 + seed + k * .4) * .012; x += Math.sin(a) * len / N; y += Math.cos(a) * len / N; } return pts; };
+      const root = (pts, wd0, seed, fire) => {
+        g.lineCap = 'round';
+        for (let k = 0; k < pts.length - 1; k++) {   // bark with a lit edge
+          const [x, y, u] = pts[k], [x2, y2] = pts[k + 1], wd = wd0 * (1 - u * .85);
+          g.strokeStyle = '#2b1810'; g.lineWidth = wd; g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke();
+          g.strokeStyle = 'rgba(128,82,52,.5)'; g.lineWidth = wd * .22; g.beginPath(); g.moveTo(x - wd * .24, y); g.lineTo(x2 - wd * .24, y2); g.stroke();
+        }
+        g.shadowColor = 'rgba(255,110,30,.95)'; g.shadowBlur = 9 * sc;
+        for (let k = 0; k < pts.length - 1; k++) {   // glowing cracks along the middle, flickering
+          const [x, y, u] = pts[k], [x2, y2] = pts[k + 1], wd = wd0 * (1 - u * .85), flick = .55 + .45 * Math.sin(t * 7 + seed * 3 + k * 1.9);
+          g.strokeStyle = `rgba(255,${120 + Math.round(flick * 80)},40,${.9 * flick * roots * fire})`; g.lineWidth = Math.max(1.2 * sc, wd * .16); g.beginPath(); g.moveTo(x + Math.sin(k + seed) * wd * .12, y); g.lineTo(x2 + Math.sin(k + 1 + seed) * wd * .12, y2); g.stroke();
+        }
+        g.shadowBlur = 0;
+        for (let k = 1; k < pts.length; k++) {   // flame tongues licking up the root
+          if (rnd(seed + k * 3) < .35) continue;
+          const [x, y, u] = pts[k], wd = wd0 * (1 - u * .85), flick = .6 + .4 * Math.sin(t * 8.5 + seed + k * 2.3), fh = (20 + rnd(seed + k) * 34) * sc * flick * roots * fire, fw = Math.max(5 * sc, wd * .7), fx = x + (rnd(seed + k + 5) - .5) * wd * .5;
+          const fl = g.createLinearGradient(0, y, 0, y - fh); fl.addColorStop(0, 'rgba(255,225,130,.8)'); fl.addColorStop(.45, 'rgba(255,120,35,.5)'); fl.addColorStop(1, 'rgba(255,70,20,0)');
+          g.fillStyle = fl; g.beginPath(); g.moveTo(fx - fw, y); g.bezierCurveTo(fx - fw * 1.1, y - fh * .4, fx - fw * .3, y - fh * .75, fx + Math.sin(t * 5 + k + seed) * 5 * sc, y - fh); g.bezierCurveTo(fx + fw * .3, y - fh * .75, fx + fw * 1.1, y - fh * .4, fx + fw, y); g.closePath(); g.fill();
+        }
+        const [tx, ty] = pts[pts.length - 1], tg = g.createRadialGradient(tx, ty, 1, tx, ty, 16 * sc); tg.addColorStop(0, `rgba(255,200,110,${.9 * roots * fire})`); tg.addColorStop(1, 'rgba(255,90,20,0)'); g.fillStyle = tg; g.beginPath(); g.arc(tx, ty, 16 * sc, 0, Math.PI * 2); g.fill();   // the burning tip
+        for (let j = 0; j < 5; j++) {   // embers dropping from the tip and the branches
+          const u = (t * (.16 + rnd(seed + j) * .08) + rnd(seed + j + 9)) % 1, [ex, ey] = pts[pts.length - 1 - (j % 4)];
+          g.fillStyle = `rgba(255,${170 + j * 15},70,${(1 - u) * .9 * roots * fire})`; g.beginPath(); g.arc(ex + Math.sin(t * 1.3 + j + seed) * 6 * sc + (rnd(seed + j) - .5) * 14 * sc, ey + u * h * .32, (1.6 + rnd(seed + j + 2) * 1.8) * sc, 0, Math.PI * 2); g.fill();
+        }
+      };
+      g.save();
+      for (let i = 0; i < 6; i++) {
+        const seed = i * 17 + 3, x0 = w * (.07 + i * .17) + (rnd(seed) - .5) * w * .05, len = h * (.36 + rnd(seed + 2) * .14) * roots, wd0 = (32 + rnd(seed + 4) * 14) * sc;
+        const main = build(x0, -8 * sc, len, (rnd(seed + 6) - .5) * .25, seed);
+        root(main, wd0, seed, 1);
+        for (const [bk, side] of [[4, -1], [8, 1]]) {   // two side roots, thinner, with their own fire
+          const [bx, by] = main[bk]; if (rnd(seed + bk) < .2) continue;
+          root(build(bx, by, len * (.34 + rnd(seed + bk + 1) * .14), side * (.7 + rnd(seed + bk + 2) * .5), seed + bk * 7), wd0 * .5 * (1 - main[bk][2] * .6), seed + bk, .8);
+        }
       }
       g.restore();
     }

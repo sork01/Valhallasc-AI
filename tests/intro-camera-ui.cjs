@@ -1,6 +1,7 @@
 // The opening cutscene's camera and the hero aboard from the first frame. Run through test-touch-bounded.sh.
 // MUTATE=old serves the previous intro.js (hero hidden until the summoning, per-shot eases) and must fail.
 // MUTATE=beads serves the intro.js from before the volcano and iron-chain redraw (flat triangle, pale bead chains) and must fail.
+// MUTATE=thinroots serves the intro.js from before the root redraw (thin red lines) and must fail.
 // MUTATE=legs serves the previous cutscene.js + intro.js (walk phase advancing 11 per second whatever the ground covered) and must fail.
 const assert=require('node:assert/strict'),path=require('node:path'),{execFileSync}=require('node:child_process');
 const {chromium}=require('./lib/playwright.cjs');
@@ -8,12 +9,14 @@ const {TestWorld}=require('../scripts/testing/driver.cjs');
 require('./lib/touch.cjs').requireMemoryLimit();
 const world=new TestWorld();let browser,checks=0;
 const check=(ok,label)=>{assert.ok(ok,label);console.log(`${++checks}: ${label}`);};
+const ROOT_BARK=8000; // measured on the box at 29 s: 17,020 with the redraw, 664 with the old thin lines
 (async()=>{try{
  await world.start();browser=await chromium.launch({headless:true,args:['--disable-gpu']});
  const page=await browser.newPage({viewport:{width:960,height:600}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  if(process.env.MUTATE==='old'){const body=execFileSync('git',['show','8b0bf236:client/intro.js'],{encoding:'utf8'});await page.route('**/intro.js*',r=>r.fulfill({contentType:'text/javascript',body}));}
  if(process.env.MUTATE==='beads'){const body=execFileSync('git',['show','8072eaae356ba7230201689f33ad197f4859a3b8:client/intro.js'],{encoding:'utf8',cwd:path.resolve(__dirname,'..')});await page.route('**/intro.js*',r=>r.fulfill({contentType:'text/javascript',body}));}
+ if(process.env.MUTATE==='thinroots'){const body=execFileSync('git',['show','fd00a4a5386185763cf48f905b6d36dd279238a0:client/intro.js'],{encoding:'utf8',cwd:path.resolve(__dirname,'..')});await page.route('**/intro.js*',r=>r.fulfill({contentType:'text/javascript',body}));}
  if(process.env.MUTATE==='legs'){for(const f of ['intro','cutscene']){const body=execFileSync('git',['show','0106bebd:client/'+f+'.js'],{encoding:'utf8',cwd:path.resolve(__dirname,'..')});await page.route('**/'+f+'.js*',r=>r.fulfill({contentType:'text/javascript',body}));}}
  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false})));
  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('IntroCamera');await page.locator('#go').click({timeout:60000});
@@ -60,6 +63,13 @@ const check=(ok,label)=>{assert.ok(ok,label);console.log(`${++checks}: ${label}`
  for(const at of [2.5,8,12,18,23,29,36,42,48,49.5,52,54.4,55,55.6,57.5,60.5]){
   await page.waitForFunction(at=>!Cutscene.active||Cutscene.state.el>=at,at,{timeout:20000});
   await page.screenshot({path:path.join(world.runDir,`intro-${String(at).replace('.','_')}.png`)});
+  if(at===29){   // the roots that hold up the sky: thick bark trunks (dark brown) with flames and lava cracks on them, not thin red lines
+   const rt=await page.evaluate(()=>{const c=document.querySelector('.cs-view'),g=c.getContext('2d'),w=c.width,h=c.height,d=g.getImageData(0,Math.round(h*.15),w,Math.round(h*.2)).data;let bark=0,fire=0;
+    for(let i=0;i<d.length;i+=4){const r=d[i],gr=d[i+1],b=d[i+2];if(r>35&&r<75&&gr>18&&gr<45&&b>10&&b<38)bark++;if(r>220&&gr>90&&gr<215&&b<110)fire++;}
+    return{bark,fire};});
+   console.log(JSON.stringify(rt));
+   check(rt.bark>ROOT_BARK,`The sky roots are thick bark trunks (${rt.bark} bark pixels in the upper band; the old thin lines gave about 660)`);
+  }
   if(at===18){   // the nine chains are heavy dark iron (not the old strings of pale beads), and the forge is a lit volcano
    const px=await page.evaluate(()=>{const c=document.querySelector('.cs-view'),g=c.getContext('2d'),w=c.width,h=c.height,x0=Math.round(w*.3),y0=Math.round(h*.2),d=g.getImageData(x0,y0,Math.round(w*.45),Math.round(h*.25)).data;let pale=0,iron=0;
     for(let i=0;i<d.length;i+=4){const r=d[i],gr=d[i+1],b=d[i+2];if(r>190&&b>r+12)pale++;if(r<115&&b>=r&&b>55&&r>35)iron++;}

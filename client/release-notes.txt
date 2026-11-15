@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.10",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "The burning roots in the opening cutscene are redrawn: thick, gnarled roots hang from the sky with side branches, glowing lava cracks, flames along them and embers falling from their tips, instead of thin red lines."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.9",
     "date": "2026-11-15",
     "new": [],
