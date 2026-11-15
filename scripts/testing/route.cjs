@@ -1,12 +1,22 @@
 const assert = require('node:assert/strict');
 // Find a route through the REAL exported collision geometry, without changing server state.
 function route(map, start, goal) {
-  const segmentFree = (a,b,margin=.4) => map.objects.every(o => {
-    const dx=b.x-a.x,dy=b.y-a.y;
-    if(o.width) { const steps=Math.ceil(Math.hypot(dx,dy)/.1);for(let i=0;i<=steps;i++){const t=i/(steps||1);if(Math.abs(a.x+dx*t-o.x)<o.width/2+margin&&Math.abs(a.y+dy*t-o.y)<o.depth/2+margin)return false;}return true; }
-    const t=Math.max(0,Math.min(1,((o.x-a.x)*dx+(o.y-a.y)*dy)/(dx*dx+dy*dy || 1)));
-    return Math.hypot(o.x-a.x-dx*t,o.y-a.y-dy*t)>o.r+margin;
-  });
+  // Objects are bucketed in 4-tile cells (inflated by 1 tile, more than any margin used here), so a segment tests only the few
+  // objects near it: the shaped zones hold thousands of objects and a full scan per segment blocked this process for seconds, long
+  // enough for the server to drop the bot (its packet queue filled). The per-object test is unchanged.
+  const H=4,cells=bucketsOf(map,H);
+  const segmentFree = (a,b,margin=.4) => {
+    const x0=Math.floor((Math.min(a.x,b.x)-margin)/H),x1=Math.floor((Math.max(a.x,b.x)+margin)/H),y0=Math.floor((Math.min(a.y,b.y)-margin)/H),y1=Math.floor((Math.max(a.y,b.y)+margin)/H);
+    const seen=new Set();
+    for(let cy=y0;cy<=y1;cy++)for(let cx=x0;cx<=x1;cx++)for(const o of cells.get(cy*cells.w+cx)||[]){
+      if(seen.has(o))continue;seen.add(o);
+      const dx=b.x-a.x,dy=b.y-a.y;
+      if(o.width) { const steps=Math.ceil(Math.hypot(dx,dy)/.1);for(let i=0;i<=steps;i++){const t=i/(steps||1);if(Math.abs(a.x+dx*t-o.x)<o.width/2+margin&&Math.abs(a.y+dy*t-o.y)<o.depth/2+margin)return false;}continue; }
+      const t=Math.max(0,Math.min(1,((o.x-a.x)*dx+(o.y-a.y)*dy)/(dx*dx+dy*dy || 1)));
+      if(!(Math.hypot(o.x-a.x-dx*t,o.y-a.y-dy*t)>o.r+margin))return false;
+    }
+    return true;
+  };
   const key = p => `${p.x},${p.y}`;
   // An actor's real point can be clear while its rounded grid cell is inside a tree.
   const nearby = point => {
@@ -34,5 +44,19 @@ function route(map, start, goal) {
   const simplified=[];let anchor=start;
   for (let i=0;i<points.length;) {let j=i;while(j+1<points.length && segmentFree(anchor,points[j+1],simplified.length===0?.3-1e-6:.4)) j++;simplified.push(points[j]);anchor=points[j];i=j+1;}
   return simplified;
+}
+const bucketCache = new WeakMap();
+function bucketsOf(map, H) {
+  const hit = bucketCache.get(map.objects);
+  if (hit) return hit;
+  const cells = new Map(); cells.w = Math.ceil((map.size || 512) / H) + 8;
+  for (const o of map.objects) {
+    const hx = (o.width ? o.width / 2 : o.r) + 1, hy = (o.width ? o.depth / 2 : o.r) + 1;
+    for (let cy = Math.floor((o.y - hy) / H); cy <= Math.floor((o.y + hy) / H); cy++) for (let cx = Math.floor((o.x - hx) / H); cx <= Math.floor((o.x + hx) / H); cx++) {
+      const k = cy * cells.w + cx; (cells.get(k) || cells.set(k, []).get(k)).push(o);
+    }
+  }
+  bucketCache.set(map.objects, cells);
+  return cells;
 }
 module.exports = { route };
