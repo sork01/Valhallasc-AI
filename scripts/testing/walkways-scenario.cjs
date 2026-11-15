@@ -12,7 +12,7 @@ function approachOf(p){
    if(!best||d<best.d)best={d,gx:-dy/len,gy:dx/len};
   }
   const s=p.seam.side;
-  return{start:{x:p.x+s*2*best.gx,y:p.y+s*2*best.gy},goal:{x:p.x-s*2*best.gx,y:p.y-s*2*best.gy}};
+  return{start:{x:p.x-s*2*best.gx,y:p.y-s*2*best.gy},goal:{x:p.x+s*2*best.gx,y:p.y+s*2*best.gy}};
  }
  return{start:{x:p.x,y:p.y+4},goal:{x:p.x,y:p.y+1}};
 }

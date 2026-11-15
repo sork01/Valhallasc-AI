@@ -11,10 +11,11 @@ function crossingPath(gate) {
     const d = Math.hypot(gate.x - (ax + dx * t), gate.y - (ay + dy * t));
     if (!best || d < best.d) best = { d, gx: -dy / len, gy: dx / len };
   }
+  // Start on the walker's own side and walk to a goal past the line (see scenarios.cjs crossingPath).
   const s = gate.seam.side;
   return {
-    start: { x: gate.x + s * 2 * best.gx, y: gate.y + s * 2 * best.gy },
-    goal: { x: gate.x - s * 2 * best.gx, y: gate.y - s * 2 * best.gy },
+    start: { x: gate.x - s * 2 * best.gx, y: gate.y - s * 2 * best.gy },
+    goal: { x: gate.x + s * 2 * best.gx, y: gate.y + s * 2 * best.gy },
   };
 }
 module.exports=(kit,map)=>({

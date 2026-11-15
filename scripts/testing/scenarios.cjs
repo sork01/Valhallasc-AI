@@ -43,10 +43,13 @@ function crossingPath(gate) {
     const d = Math.hypot(gate.x - (ax + dx * t), gate.y - (ay + dy * t));
     if (!best || d < best.d) best = { d, gx: -dy / len, gy: dx / len };
   }
+  // Seam.crossing fires only past the line on the side where the other zone lies (cross * side > 0, within REACH). The walker
+  // starts on its OWN side (cross * side < 0) and walks to a goal 2 tiles past the line. The server keeps the goal's remaining
+  // offset across, so a goal on the walker's own side would walk it straight back (the old start/goal were the other way round).
   const s = gate.seam.side;
   return {
-    start: { x: gate.x + s * 2 * best.gx, y: gate.y + s * 2 * best.gy },
-    goal: { x: gate.x - s * 2 * best.gx, y: gate.y - s * 2 * best.gy },
+    start: { x: gate.x - s * 2 * best.gx, y: gate.y - s * 2 * best.gy },
+    goal: { x: gate.x + s * 2 * best.gx, y: gate.y + s * 2 * best.gy },
   };
 }
 // People of a zone: its NPCs minus the stone, mailboxes, festival dance scenery and Spirit Guides.
@@ -4945,3 +4948,31 @@ scenarios.valentines = require('./valentines-scenario.cjs')(kit);
 scenarios.newyear = require('./newyear-scenario.cjs')(kit);
 
 scenarios.festival = require('./festival-scenario.cjs')(kit);
+
+// Every shared border of two shaped zones, from both sides: the walker starts on its own side (no crossing on arrival), walks
+// over the line, and then stays on the far side. The server carries the goal's remaining offset across, so a goal on the
+// walker's own side walks it back over the line (the old start/goal sides did exactly that): check three seconds after arrival.
+scenarios.seam_walks = {
+  description: 'Every shared border of two shaped zones, from both sides: start on the walker\'s own side, walk over the line, and stay on the far side for three seconds.',
+  startLevel: 1, levelSpread: 0, godMode: true,
+  async run(w, check) {
+    const bot = 'SeamWalker';
+    await w.connect({ bot, class: 'warrior' });
+    const zones = [map, ...map.zones];
+    const crossings = zones.flatMap((zone, from) => (zone.portals || []).filter(p => p.seam).map(p => ({ from, portal: p })));
+    check(crossings.length >= 50, `The map has a seam portal on each side of every shared border (${crossings.length} found, at least 50 expected)`);
+    for (const { from, portal: p } of crossings) {
+      const c = crossingPath(p), label = `${from}->${p.to} (${p.id})`;
+      await kit.teleport(w, bot, { zone: from, x: c.start.x, y: c.start.y });
+      await w.advance(700); // a teleport holds portals for PORTAL_DELAY (0.5 s): wait before walking into the seam
+      check(w.player(bot).zone === from, `${label}: the walker starts on its own side of the border`);
+      await w.action(bot, { type: 'move', x: c.goal.x, y: c.goal.y });
+      await w.waitFor(() => w.player(bot).zone === p.to, 15000, `Walk over the border ${label}`);
+      await w.advance(3000);
+      const arrival = { x: c.goal.x + p.seam.shift[0], y: c.goal.y + p.seam.shift[1] };
+      const at = w.player(bot);
+      check(at.zone === p.to && distance(at, arrival) < 2, `${label}: the walker stays on the far side, ${at.zone === p.to ? `${distance(at, arrival).toFixed(2)} tiles from its arrival` : `back in zone ${at.zone}`}`);
+      await w.action(bot, { type: 'stop' });
+    }
+  },
+};
