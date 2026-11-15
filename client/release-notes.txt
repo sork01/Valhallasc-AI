@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.12",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "The Summer Solstice flower crowns now sit on top of townspeople's heads while they walk, whichever way they face, instead of floating beside the helmet."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.11",
     "date": "2026-11-15",
     "new": [],

@@ -33,6 +33,6 @@
   drawLabel(g,zone,w2s){if(!state||zone!==2)return;const[x,y]=w2s(state.x,state.y,130);g.save();g.font='20px "Jua",sans-serif';g.textAlign='center';g.strokeStyle='#263d38';g.lineWidth=5;g.fillStyle='#fff0cf';const lines=[state.active?`The Birchcrown Guardian · Level ${state.level}`:'Five fighters · highest party level',rolls.solstice_hunt===day?'Daily mount roll used · resets at Stockholm midnight':'Daily Sunwoven Stag chance: 5% per hero'];for(const[i,t]of lines.entries()){const text=window.Locale?.translate(t)||t;g.strokeText(text,x,y+i*25);g.fillText(text,x,y+i*25);}g.restore();},
   head(n,t,talk=false){return window.Christmas.head(n,t,talk);},
   headTop(n,t=0){const h=this.head(n,t);return -h.y+7*h.width/17;},
-  drawNpc(g,n,t,top,talk=false){const h=this.head(n,t,talk),s=h.width/17;g.save();g.translate(h.x,0);ribbon(g,0,h.collar+2,.45*s);for(const[x,y,r,c]of[[3,3,4,'#fff0cf'],[8,5,3.8,'#9cb8ec'],[7,0,3,'#fff3d7']]){ellipse(g,(x-1)*s,h.y+(y+1)*s,4*s,2*s,'#6d9849');flower(g,x*s,h.y+y*s,r*s,c);}g.restore();}
+  drawNpc(g,n,t,top,talk=false){const h=this.head(n,t,talk),s=h.width/17,face=h.mirrored?-1:1,hx=(h.top??h.x)-h.x;g.save();g.translate(h.x,0);ribbon(g,0,h.collar+2,.45*s);for(const[x,y,r,c]of[[3,3,4,'#fff0cf'],[8,5,3.8,'#9cb8ec'],[7,0,3,'#fff3d7']]){ellipse(g,hx+face*(x-1)*s,h.y+(y+1)*s,4*s,2*s,'#6d9849');flower(g,hx+face*x*s,h.y+y*s,r*s,c);}g.restore();}
  };
 })();

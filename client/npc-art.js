@@ -143,19 +143,26 @@
           for (let x = Math.ceil(cx - half); x <= Math.floor(cx + half); x++) if (px[(y * w + x) * 4 + 3]) { visible = true; break; }
           if (!visible) break; crown = y;
         }
-        heads.set(key, { x: cx - ax, y: crown + 1 - ay, width: Math.max(10, (right - left + 1) / 2 + 1), collar: Math.max(...ys) + 2 - ay });
+        // The cap's own centre (where a flower crown sits). The skin socket above follows the visible face, which can sit a few pixels off the
+        // top of a helmet in a walk pose; `top` follows the opaque pixels of the first rows of the cap instead.
+        let capL = Infinity, capR = -Infinity;
+        for (let y = crown; y <= crown + 3; y++) for (let x = Math.max(0, Math.floor(cx - half * 2)); x <= Math.min(w - 1, Math.ceil(cx + half * 2)); x++) {
+          if (px[(y * w + x) * 4 + 3] > 100) { capL = Math.min(capL, x); capR = Math.max(capR, x); }
+        }
+        const capX = capR >= capL ? (capL + capR) / 2 - ax : cx - ax;
+        heads.set(key, { x: cx - ax, y: crown + 1 - ay, width: Math.max(10, (right - left + 1) / 2 + 1), collar: Math.max(...ys) + 2 - ay, top: capX });
       }
     }
     const socket = heads.get(key); if (!socket) return null;
     const scale = pose.m.scale * (n.look?.scale || 1);
-    let x = socket.x * scale * (pose.mirrored ? -1 : 1), y = socket.y * scale, collar = socket.collar * scale;
+    let x = socket.x * scale * (pose.mirrored ? -1 : 1), y = socket.y * scale, collar = socket.collar * scale, topX = socket.top * scale * (pose.mirrored ? -1 : 1);
     const sw = swimPose(n, t, pose, false);
     if (sw) {
       const py = -(pose.m.anchor[1] - sw.geo.waist) * scale, c = Math.cos(sw.angle), s = Math.sin(sw.angle), ry = y - py;
       const turnedX = x * c - ry * s, turnedY = py + x * s + ry * c, lift = sw.lift * (n.look?.scale || 1);
-      collar += turnedY - y - lift; x = turnedX; y = turnedY - lift;
+      collar += turnedY - y - lift; topX = topX * c - ry * s; x = turnedX; y = turnedY - lift;
     }
-    return { x, y, width: socket.width * scale, collar };
+    return { x, y, width: socket.width * scale, collar, top: topX, mirrored: !!pose.mirrored };
   }
   window.NpcArt = { ready, draw, frame, head, top(n) { const a = art(n); return a && a.m.tops?.[a.art] ? (a.m.tops[a.art] * a.m.scale + 3 + (swimmer(n) ? LIFT : 0)) * (n.look?.scale || 1) : null; },
     readyFor(npcs) { return !!meta && npcs.every(n => { const a = art(n); return !a || !!source(a.key); }); },
