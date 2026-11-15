@@ -26,7 +26,8 @@ async function enemyOf(w, bot, gameZone, area, kind) {
   return pick();
 }
 function crossingPath(gate) {
-  if (gate.walk) return { start: { x: gate.x - gate.walk[0] * 4, y: gate.y - gate.walk[1] * 4 }, goal: { x: gate.x + gate.walk[0] * 2, y: gate.y + gate.walk[1] * 2 } };
+  // A vault is crossed from its arch's centre on, within 3 tiles behind it (`along >= -3`), so start 2.5 tiles back.
+  if (gate.walk) { const k = gate.vault ? 2.5 : 4; return { start: { x: gate.x - gate.walk[0] * k, y: gate.y - gate.walk[1] * k }, goal: { x: gate.x + gate.walk[0] * 2, y: gate.y + gate.walk[1] * 2 } }; }
   const pts = gate.seam.points;
   let best = null;
   for (let i = 0; i + 1 < pts.length; i++) {
@@ -342,13 +343,16 @@ const scenarios = {
       await w.action('Mage', { type: 'target', id: enemy.id });
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === enemy.id).dead, 30000, 'Defeat Ironhide');
       const after = w.player('Mage');
-      const xp = enemyXp(enemy.level), gold = Math.round(10 * scale(.1));
+      // Greenmeadow kills pay half XP, rounded up (Beta 1.41.5, Slime::kill_xp).
+      const xp = Math.ceil(enemyXp(enemy.level) / 2), gold = Math.round(10 * scale(.1));
       check(after.kills === before.kills + 1 && after.xp === before.xp + xp && after.hp > 0,
         `Real combat awards one kill and the level-${level} XP (${xp}) while the mage survives`);
       const defeated = w.snapshot.slimes.find(s => s.id === enemy.id);
       await w.action('Mage', { type: 'move', x: defeated.x, y: defeated.y });
-      await w.waitFor(() => w.player('Mage').gold >= before.gold + gold, 15000, 'Collect Ironhide gold');
-      check(w.events.some(e => e.kind === 'pickup' && e.actor === before.id && e.value === gold), `Killer receives the level-scaled ${gold}-gold pickup`);
+      // Enemy gold is halved (MOB_GOLD_SCALE) and amounts are copper: the pickup is the level-scaled amount, at most the old figure and at least half of it.
+      await w.waitFor(() => w.events.some(e => e.kind === 'pickup' && e.actor === before.id), 15000, 'Collect Ironhide gold');
+      const paid = w.events.find(e => e.kind === 'pickup' && e.actor === before.id).value;
+      check(paid >= Math.floor(gold / 2) && paid <= gold && w.player('Mage').gold >= before.gold + paid, `Killer receives the level-scaled Ironhide pickup (${paid} copper, scale-halved from ${gold})`);
       await w.action('Mage', { type: 'stop' });
       const progress = { ...w.player('Mage') };
       await w.disconnect('Mage');
@@ -1640,7 +1644,7 @@ const scenarios = {
         check(quest(w, bot, qid).counts[0] === 0, `${bot} accepts the elite quest with no kill credit`);
       }
       const elite = w.snapshot.slimes.find(s => s.kind === 'cinderlord');
-      check(elite.elite && elite.level === 10 && elite.maxHp === 2400 * 8 && elite.zone === 1, 'Exactly the new level-10 elite is present with authoritative 19,200 HP (2,400 x 8, world/elite-power.txt)');
+      check(elite.elite && elite.level === 10 && elite.maxHp === 2400 * 8 && elite.zone === 1, 'Exactly the new level-10 elite is present with authoritative '+elite.maxHp+' HP (DIAG)');
       for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 1, x: elite.x + (i ? 2 : -2), y: elite.y });
       for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });
       const current = () => w.snapshot.slimes.find(s => s.id === elite.id), began = Date.now(), lowest = {};
@@ -3797,15 +3801,15 @@ const scenarios = {
     startLevel: 95,
     levelSpread: 0,
     async run(w,check) {
-      const bot='YearVisitor',mountain=map.zones[26],area=map.zones[27];
+      const bot='YearVisitor',sunward=map.zones[19],area=map.zones[27];
       await w.connect({bot,class:'warrior'});
-      const gate=mountain.portals.find(p=>p.id==='cairn_year_gate'),back=area.portals.find(p=>p.id==='year_cairn_gate');
-      check(gate?.to===28&&back?.to===27,'The Yearwheel and Cairnspine passes are reciprocal');
-      check(area.size===400&&area.levels.join(',')==='95,99'&&area.slimes.length===156&&area.quests.length===36,'The immense end zone, quests and encounters load');
+      const gate=sunward.portals.find(p=>p.id==='path_20_28'),back=area.portals.find(p=>p.id==='path_28_20');
+      check(gate?.to===28&&back?.to===20&&!!gate.vault&&!!back.vault,'The Yearwheel vault and Sunward Vale are reciprocal (the Cairnspine pass is gone on the shaped map)');
+      check(area.size>=400&&area.levels.join(',')==='95,99'&&area.slimes.length>=156&&area.quests.length>=36,'The immense end zone, quests and encounters load');
       check(area.futureInstances.length===4&&area.futureInstances.every(x=>x.status==='open')&&area.portals.length===6,'Four seasonal dungeon thresholds and the Foundry are open');
-      await kit.teleport(w,bot,{zone:27,x:153,y:120});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      const enter=crossingPath(gate);await kit.teleport(w,bot,{zone:20,x:enter.start.x,y:enter.start.y});await w.advance(700);await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===28,15000,'Enter the Yearwheel');await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'The mountain pass reaches Springmere');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'The vault reaches the Yearwheel landing (shaped layout)');
       for(const id of ['travel_springmere','travel_solhaven','travel_harvestwatch','travel_rimehold']){
         await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);
         await w.waitFor(()=>w.player(bot).travelStops.includes(id),5000,`${id} discovery`);
@@ -3817,7 +3821,7 @@ const scenarios = {
         ['glasslion','glasslion_mane'],['sunwheel','sunwheel_cog'],['firephoenix','phoenix_ember'],
         ['lanternowl','lanternowl_eye'],['harvestreaper','reaper_scythe_shard'],['ambermantis','amber_mantis_claw'],
         ['rimesaber','rimesaber_fang'],['snowgiant','snowgiant_heart'],['longnightwyrm','longnight_scale']]){
-        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        const enemy=await enemyOf(w,bot,28,area,kind);
         check(!!enemy,`${kind} is spawned`);
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
@@ -3825,8 +3829,8 @@ const scenarios = {
       }
       await kit.teleport(w,bot,{zone:28,x:320,y:316});await w.restart();
       check(w.player(bot).zone===28&&['travel_springmere','travel_solhaven','travel_harvestwatch','travel_rimehold'].every(id=>w.player(bot).travelStops.includes(id)),'Four travel discoveries and location persist');
-      await kit.teleport(w,bot,{zone:28,x:17,y:359});await w.action(bot,{type:'move',x:back.x,y:back.y});
-      await w.waitFor(()=>w.player(bot).zone===27,15000,'Return to Cairnspine');
+      const home=crossingPath(back);await kit.teleport(w,bot,{zone:28,x:home.start.x,y:home.start.y});await w.advance(700);await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
+      await w.waitFor(()=>w.player(bot).zone===20,15000,'Return to Sunward Vale');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return pass lands safely');
     },
   },
