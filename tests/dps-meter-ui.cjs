@@ -14,13 +14,21 @@ const results = [];
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     if (process.env.MUTATE) await page.route('**/dpsmeter.js', async route => {
       const response = await route.fetch(), body = await response.text();
-      assert.ok(body.includes('data.rows.map(row => {'));
-      await route.fulfill({ response, body: body.replace('data.rows.map(row => {', 'data.rows.filter(row => !row.hired).map(row => {') });
+      // MUTATE=freeze: the elapsed clock keeps running after the fight ends, so the frozen check must fail.
+      const [from, to] = process.env.MUTATE === 'freeze'
+        ? ['data = value && Array.isArray(value.rows) ? value : null;', 'data = value && Array.isArray(value.rows) ? Object.assign(value, { elapsed: value.elapsed + (performance.now() % 1000) / 1000 }) : null;']
+        : ['data.rows.map(row => {', 'data.rows.filter(row => !row.hired).map(row => {'];
+      assert.ok(body.includes(from), 'mutation anchor found');
+      await route.fulfill({ response, body: body.replace(from, to) });
     });
     await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })); });
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
-    await page.locator('#name').fill('DPS Observer'); await page.locator('#go').click({ timeout: 60000 });
-    await page.waitForFunction(() => Online.connected && Field.hero, null, { timeout: 60000 });
+    // Each viewport logs in again in the same world, and a guest name is unique (characters.name_key), so the name carries the viewport.
+    await page.locator('#name').fill('DpsOwner' + viewport.width); await page.locator('#go').click({ timeout: 60000 });
+    await page.waitForFunction(() => Online.connected && Field.hero, null, { timeout: 60000 }).catch(async error => {
+      const overlay = await page.evaluate(() => document.querySelector('#connection-overlay')?.innerText?.slice(0, 300) || '').catch(() => '');
+      throw new Error('The private world did not accept the guest login; overlay: ' + JSON.stringify(overlay) + ' ' + error.message);
+    });
     await page.evaluate(() => { const update = DpsMeter.update; DpsMeter.update = value => { window.__meter = value; return update(value); }; });
     const owner = await page.evaluate(() => Online.id), bot = 'DpsFriend' + viewport.width;
     await world.connect({ bot, class: 'mage' });
@@ -71,7 +79,10 @@ const results = [];
     for (const id of enemies) await page.evaluate(id => GM.request({ op: 'kill_enemy', id }), id);
     // The hires keep fighting the raid's other living packs, and the pull stays open while any of them is engaged
     // (packs.rs). Clear the rest of this raid's living enemies so the fight can end.
-    const living = () => (world.snapshot?.slimes || []).filter(s => !s.dead && s.zone === 46 && !enemies.includes(s.id)).map(s => s.id);
+    // The final boss is left out: a debug strike on Eldmarr starts his boss fight (state chase, phase cap at 66% health), and a
+    // boss fight holds the meter open (damage_meter.rs pull_active), so he can never be cleared this way. The probe showed him
+    // idle at full health before the loop and in chase afterwards, with the meter still active.
+    const living = () => (world.snapshot?.slimes || []).filter(s => !s.dead && s.zone === 46 && !enemies.includes(s.id) && s.kind !== 'cf_eldmarr').map(s => s.id);
     for (let round = 0; round < 12 && living().length; round++) {
       for (const id of living()) await page.evaluate(id => GM.request({ op: 'kill_enemy', id }), id);
       await page.waitForTimeout(400);
@@ -81,9 +92,13 @@ const results = [];
     });
     await page.evaluate(() => dispatchEvent(new Event('prefs-change')));
     check((await page.locator('#dps-status').textContent()).includes('Last fight'), 'completed fight remains visible');
-    const frozen = await page.evaluate(() => JSON.stringify(window.__meter));
-    await page.waitForTimeout(700);
-    check(await page.evaluate(frozen => JSON.stringify(window.__meter) === frozen, frozen), 'completed totals and DPS freeze');
+    // The completed record freezes: its elapsed time, active flag, and the damage and DPS of every row that dealt damage.
+    // A hire doomed by its hirer's death leaves the party later (mercs.rs), so a row with no damage may drop out of the list.
+    const totals = meter => JSON.stringify({ active: meter.active, elapsed: meter.elapsed, rows: meter.rows.filter(row => row.damage > 0).sort((a, b) => a.id.localeCompare(b.id)).map(row => [row.id, row.damage, row.dps]) });
+    const frozen = await page.evaluate(() => JSON.parse(JSON.stringify(window.__meter)));
+    const samples = [];
+    for (let i = 0; i < 8; i++) { await page.waitForTimeout(100); samples.push(await page.evaluate(() => JSON.parse(JSON.stringify(window.__meter)))); }
+    check(frozen.active === false && samples.every(sample => totals(sample) === totals(frozen)), 'completed totals and DPS freeze');
     await page.locator('#dps-close').click(); check(await page.locator('#dps-meter').isHidden(), 'hide button works');
     await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.waitForFunction(() => Online.connected && Field.hero);
