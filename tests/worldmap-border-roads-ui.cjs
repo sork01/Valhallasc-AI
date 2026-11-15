@@ -92,10 +92,13 @@ async function openHero(context, world, { lang = 'en', name = 'RoadCheck' } = {}
       routeRoads: document.querySelectorAll('#worldmap .wm-route-road').length,
       tiles: document.querySelectorAll('#worldmap .wm-tile').length,
       sparks: document.querySelectorAll('#worldmap .wm-spark-dot, #worldmap .wm-travel-badge').length,
-      keyText: document.querySelector('#worldmap .wm-connection-key')?.textContent?.trim() || '',
+      keyText: document.querySelector('#wm-foot .wm-connection-key')?.textContent?.trim() || '',
       routeText: document.getElementById('wm-route')?.textContent?.trim() || '',
     }));
-    check(desk.version === 'Beta 1.51.2', `Version label updated (${desk.version})`);
+    // The label moves with every release: accept any Beta 1.x.y at or after the release that removed the roads (1.51.2).
+    const [, vMinor, vPatch] = /^Beta 1\.(\d+)\.(\d+)$/.exec(desk.version || '') || [];
+    const sinceRemoval = vMinor !== undefined && (Number(vMinor) > 51 || (Number(vMinor) === 51 && Number(vPatch) >= 2));
+    check(sinceRemoval, `Version label is Beta 1.51.2 or later (${desk.version})`);
     check(desk.roads === 0 && desk.connPaths === 0 && desk.roadStrokes === 0 && desk.routeRoads === 0,
       `No inter-zone border road SVG elements render (roads=${desk.roads}, paths=${desk.connPaths}, strokes=${desk.roadStrokes}, route=${desk.routeRoads})`);
     check(desk.tiles >= 20, `World tiles intact (${desk.tiles})`);
@@ -149,7 +152,7 @@ async function openHero(context, world, { lang = 'en', name = 'RoadCheck' } = {}
     await mobPage.waitForFunction(() => WorldMap.open && WorldMap.view === 'world');
     const mob = await mobPage.evaluate(() => {
       const panel = document.querySelector('.wm-panel').getBoundingClientRect();
-      const key = document.querySelector('.wm-connection-key');
+      const key = document.querySelector('#wm-foot .wm-connection-key');
       const kr = key.getBoundingClientRect();
       return {
         roads: document.querySelectorAll('#worldmap .wm-roads, #worldmap .wm-connection-path, #worldmap .wm-route-road').length,

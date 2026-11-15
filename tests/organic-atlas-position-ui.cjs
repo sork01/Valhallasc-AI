@@ -6,7 +6,7 @@ const {chromium}=require(path.join(root,'tests/lib/playwright.cjs'));const {Test
 await page.addInitScript(()=>{window.__valhallaTestSprites=true;window.AudioContext=undefined;window.webkitAudioContext=undefined;localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null}));});
 await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('AtlasDot');await page.locator('#go').click({timeout:60000});await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0);
 await page.evaluate(()=>Online.send({type:'debug',command:{op:'explore_all'}}));await page.waitForFunction(()=>Field.explored?.[46]===511);
-for(const zone of [0,6,19,23]){
+for(const zone of [0,6,19,7]){ // 23 (Canopy) has no walking portal since its Lapis seam; 7 has one
 const p=await page.evaluate(zone=>[WORLD_MAP,...WORLD_MAP.zones][zone].portals.find(p=>p.walk),zone);
 await page.evaluate(([zone,p])=>Online.send({type:'debug',command:{op:'teleport',zone,x:p.x,y:p.y}}),[zone,p]);await page.waitForFunction(zone=>Field.zone===zone,zone);await page.evaluate(()=>WorldMap.show());
 await page.waitForFunction(zone=>document.querySelector(`.wm-tile[data-zone="${zone}"]`)?.dataset.here==='true',zone);

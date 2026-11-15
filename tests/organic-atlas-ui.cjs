@@ -19,7 +19,7 @@ const root=path.resolve(__dirname,'..');
     if(process.env.MUTATE==='layout')changed=source.replace('for (const r of ATLAS.regions) {',"for (const r of ATLAS.regions) { if(r.zone===0){const [x,y,w,h]=r.box;r.polygon=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]];}");
     assert.notEqual(changed,source,'mutation target exists');await page.route('**/worldmap.js',r=>r.fulfill({contentType:'text/javascript',body:changed}));
    }
-   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('OrganicAtlas');await page.locator('#go').click({timeout:60000});
+   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill(`Org${width}`);await page.locator('#go').click({timeout:60000});
    await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
    if(await page.locator('#low-gfx-dismiss').isVisible())await page.locator('#low-gfx-dismiss').click();
    const debug=c=>page.evaluate(c=>Online.send({type:'debug',command:c}),c);
@@ -64,7 +64,7 @@ const root=path.resolve(__dirname,'..');
     return{errors,roads:stage.querySelectorAll('[data-road]').length,entrances:buttons.length,cities:stage.querySelectorAll('.wm-city').length,ratio:sr.width/sr.height,fit:frame.left>=-1&&frame.top>=-1&&frame.right<=innerWidth+1&&frame.bottom<=innerHeight+1};
    });
    check(audit.errors.length===0,`${width}x${height}: organic terrain, printed names and separated controls: ${audit.errors.join('; ')}`);
-   check(audit.roads===47&&audit.entrances===22&&audit.cities===2,'All outdoor borders, interior doors and nested cities are represented');
+   check(audit.roads===0&&audit.entrances===22&&audit.cities===2,'No inter-zone road overlay (removed in Beta 1.51.2), 22 interior doors and 2 nested cities are represented');
    check(audit.fit&&Math.abs(audit.ratio-2048/1041)<.01,'The landscape atlas fits its window with the reference proportions');
    for(const c of [17,23]){await page.locator(`.wm-city[data-zone="${c}"]`).click();check(await page.evaluate(c=>WorldMap.view==='zone'&&WorldMap.zone===c,c),`City ${c} opens its own detailed map`);await page.locator('#wm-back').click();}
    for(const to of await page.locator('.wm-entrance').evaluateAll(bs=>bs.map(b=>+b.dataset.to))){await page.locator(`.wm-entrance[data-to="${to}"]`).click();check(await page.evaluate(to=>WorldMap.zone===to&&WorldMap.view==='zone',to),`Entrance ${to} opens the matching interior`);await page.locator('#wm-back').click();}
@@ -75,7 +75,7 @@ const root=path.resolve(__dirname,'..');
    await page.screenshot({path:path.join(world.runDir,`organic-${width}x${height}.png`)});
    if(!touch){
     await page.locator('#wm-close').click();
-    for(const [from,to] of [[0,1],[1,0],[6,7],[7,6],[17,19],[19,17],[23,25],[25,23]]) {
+    for(const [from,to] of [[6,7],[7,6],[17,19]]) { // Pairs with a walking portal in map.txt; 0<->1 and 23<->25 are now seams, 19->17 is an unwalked gate
      const p=await page.evaluate(([from,to])=>[WORLD_MAP,...WORLD_MAP.zones][from].portals.find(p=>p.to===to),[from,to]);assert.ok(p?.walk,'walking route exists');
      await page.evaluate(()=>{Field.clearInput();Online.send({type:'stop'});});await debug({op:'teleport',zone:from,x:p.x-p.walk[0]*6,y:p.y-p.walk[1]*6});
      await page.waitForFunction(from=>Field.zone===from,from);await page.waitForTimeout(1300);

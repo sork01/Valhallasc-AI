@@ -20,7 +20,7 @@ async function call(name, args = {}) {
   const rust = fs.readFileSync(path.join(root, 'server/src/world.rs'), 'utf8');
   const body = rust.slice(rust.indexOf('pub fn default_level'), rust.indexOf('// Gold carried by a default-level enemy'));
   const server = {}; for (const [, names, level] of body.matchAll(/((?:"\w+"\s*\|?\s*)+)=>\s*(\d+)/g)) for (const [, name] of names.matchAll(/"(\w+)"/g)) server[name] = Number(level);
-  for (const catalog of ['cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice']) {
+  for (const catalog of ['cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice', 'emberwake', 'empty-seat-enemies', 'raid_key', 'chained_forge', 'blackhour', 'longship', 'nornroot', 'skybridge']) {
     Object.assign(server, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, `world/${catalog}.txt`), 'utf8')).map(e => [e.kind, e.level])));
   }
   check(Object.keys(server).length >= 17, `Parsed ${Object.keys(server).length} enemy levels from world.rs`);
