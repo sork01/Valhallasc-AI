@@ -12,7 +12,9 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  await p.addInitScript(()=>{
   window.AudioContext=window.webkitAudioContext=undefined;
   if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:false,lowGraphics:false,lowGraphicsSet:true}));
-  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{try{const v=JSON.parse(e.data);if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;if(v.type==='achievements')window.__ach=v;}catch{}});}};
+  // The client sends compressed snapshots once pako is loaded (client/online.js): inflate binary frames, or __snap goes stale after join.
+  const take=v=>{if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;if(v.type==='achievements')window.__ach=v;};
+  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
  await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('Sork');await p.locator('#go').click({timeout:60000});
@@ -57,10 +59,10 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(n=>Quests.offered(n).some(q=>q.id==='easter_hunt'))),'All four city hosts offer the same daily Bloomwarden hunt');
  await npc('city_bard');await interact('city_bard','quest:accept:easter_hunt');await wait(()=>__self().quests.some(q=>q.id==='easter_hunt'&&!q.claimed));
  await p.evaluate(()=>{City.close();Quests.track('easter_hunt');});
- check(await p.evaluate(()=>Quests.mapMarkers(2).some(m=>m.quest==='easter_hunt'&&m.x===112&&m.y===100)),'The daily quest marker points at the actual Springtide Egg Basket');
+ check(await p.evaluate(()=>{const s=[WORLD_MAP,...WORLD_MAP.zones][2].npcs.find(n=>n.id==='easter_shrine');return !!s&&Quests.mapMarkers(2).some(m=>m.quest==='easter_hunt'&&m.x===s.x&&m.y===s.y);}),'The daily quest marker points at the actual Springtide Egg Basket');
  await debug({op:'set_gold',gold:1000000});await wait(()=>__self().gold===1000000);
  for(const [i,cls]of['priest','mage','hunter','warrior'].entries()){await interact('city_bard','easter:hire:'+cls);await wait(n=>__snap.players.filter(p=>p.hired).length===n,i+1);}
- await stand(2,110.5,100);await wait(()=>__snap.players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-103,p.y-100)<=12).length===4);
+ await stand(2,291,225);await wait(()=>__snap.players.filter(p=>p.hired&&p.zone===2&&p.hp>0&&Math.hypot(p.x-284,p.y-225)<=12).length===4);
  await p.evaluate(()=>Field.visitNpc('easter_shrine'));await p.locator('#npc-dialogue').waitFor({state:'visible'});await p.locator('[data-offer="easter:summon"]').click();await wait(()=>__snap.slimes.some(s=>s.kind==='bloomwarden'&&!s.dead));
  check(await p.evaluate(()=>__snap.easter.active&&__snap.easter.level===99),'Pressing the actual shrine summons the five-fighter elite at the highest party level');
  await p.evaluate(()=>City.close());await wait(()=>Easter.source);await p.screenshot({path:path.join(w.runDir,'valhallasc-easter-bloomwarden.png')});
@@ -79,7 +81,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  await npc('baker');await interact('baker','quest:accept:easter_hunt');await wait(()=>__self().quests.some(q=>q.id==='easter_hunt'&&!q.claimed));
  }
  await debug({op:'season_time',unix:1806962400});await wait(()=>!Seasonal.active&&__snap.easter===null&&!__self().quests.some(q=>q.id==='easter_hunt'&&!q.claimed));
- await stand(2,110.5,100);
+ await stand(2,291,225);
  check(await p.evaluate(()=>Easter.objects(2).length===0&&!City.npcs.some(n=>n.id==='easter_shrine')&&[0,4,9,17].every(z=>Seasonal.decor(z).length===0)),'April 6 removes the shrine, encounter, unfinished quest and all Easter dressing');
  check(await p.evaluate(()=>__self().mounts.includes('springtide')&&document.querySelector('#hud-name').textContent==='Sork the Springbringer'),'Owned mount and earned suffix survive the event’s end');
  await p.evaluate(()=>Achievements.open());await send({type:'achievements'});await wait(()=>__ach?.entries.find(a=>a.id==='eggstraordinary')?.complete);
@@ -91,7 +93,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  const other=await browser.newPage({viewport:{width:844,height:390},hasTouch:true});
  await other.addInitScript(()=>{window.AudioContext=undefined;window.__names=[];const fill=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(s,...a){if(String(s).includes('Sork'))window.__names.push(String(s));return fill.call(this,s,...a);};localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false}));});
  await other.goto(w.url);await other.locator('#start').click();await other.locator('#login-guest').click();await other.locator('#cls-warrior').click();await other.locator('#name').fill('SpringWitness');await other.locator('#go').click({timeout:60000});await other.waitForFunction(()=>Online.connected&&Field.hero.hp>0);
- await other.evaluate(()=>Online.send({type:'debug',command:{op:'teleport',zone:2,x:110.5,y:100}}));
+ await other.evaluate(()=>Online.send({type:'debug',command:{op:'teleport',zone:2,x:291,y:225}}));
  await other.waitForFunction(()=>window.__names.includes('Sork the Springbringer'),null,{timeout:20000});check(true,'A second real browser paints Sork the Springbringer on the remote world nameplate');await other.close();
  const sv=await browser.newPage();await sv.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sv.goto(w.url);
  check(await sv.evaluate(()=>Locale.language==='sv'&&Locale.translate('the Springbringer')==='vårbringaren'&&Locale.translate('The Bloomwarden')==='Blomväktaren'&&Locale.translate('Springtide Bunny')==='Vårtidens kanin'),'The actual Swedish client presents the permanent suffix, elite and bunny');await sv.close();

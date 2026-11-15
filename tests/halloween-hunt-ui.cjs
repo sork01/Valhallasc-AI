@@ -12,7 +12,9 @@ async function create(name,duplicate=false){
  await p.addInitScript(()=>{
   window.__valhallaTestSprites=true;window.AudioContext=window.webkitAudioContext=undefined;
   if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:false,lowGraphics:true,lowGraphicsSet:true}));
-  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{try{const v=JSON.parse(e.data);if(v.type==='welcome'||v.type==='snapshot')window.__snap=v.snapshot||v;}catch{}});}};
+  // The client sends compressed snapshots once pako is loaded (client/online.js): inflate binary frames, or __snap goes stale after join.
+  const take=v=>{if(v.type==='welcome'||v.type==='snapshot')window.__snap=v.snapshot||v;};
+  const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}if(e.data instanceof ArrayBuffer){try{take(JSON.parse(window.pako.inflateRaw(new Uint8Array(e.data),{to:'string'})));}catch{}return;}e.data.arrayBuffer().then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
  await p.goto(world.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill(name);await p.locator('#go').click({timeout:60000});
@@ -29,6 +31,7 @@ async function npc(p,id){const n=await p.evaluate(id=>[WORLD_MAP,...WORLD_MAP.zo
  let p=await create('HuntTaken');const original=await p.evaluate(()=>Online.id);await p.close();
  p=await create('hUNTTaken',true);check((await p.locator('#connection-text').textContent()).includes('already taken'),'A case-varied name owned by an offline guest is refused in character creation');
  await p.locator('#new-character-name').fill('HuntHero');await p.locator('#name-change-form button').click();await wait(p,()=>Online.connected&&Field.hero.hp>0);
+ await wait(p,id=>Online.id!==id&&!!__self(),original);
  check(await p.evaluate(id=>Online.id!==id&&__self().look.name==='HuntHero',original),'Choosing a free name enters normally without overwriting the older character');
  await debug(p,{op:'season_time',unix:1792969200});await wait(p,()=>Seasonal.active&&__snap.seasons[0].day===20261026);
  // Real decoration draw and NPC accessories, only in the four city bounds.
@@ -47,13 +50,13 @@ async function npc(p,id){const n=await p.evaluate(id=>[WORLD_MAP,...WORLD_MAP.zo
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(id=>Quests.offered(id).some(q=>q.id==='halloween_hunt'))),'Every city host offers the same daily quest');
  await npc(p,'city_bard');await send(p,{type:'interact',npc:'city_bard',offer:'quest:accept:halloween_hunt'});await wait(p,()=>__self().quests.some(q=>q.id==='halloween_hunt'&&!q.claimed));
  await p.evaluate(()=>{City.close();Quests.track('halloween_hunt');});
- check(await p.evaluate(()=>Quests.mapMarkers(3).some(m=>m.quest==='halloween_hunt'&&m.npc===undefined&&m.x===105&&m.y===32)),'The tracked daily hunt points at the real haunted lantern');
+ check(await p.evaluate(()=>{const l=[WORLD_MAP,...WORLD_MAP.zones][3].npcs.find(n=>n.id==='halloween_lantern');return !!l&&Quests.mapMarkers(3).some(m=>m.quest==='halloween_hunt'&&m.npc===undefined&&m.x===l.x&&m.y===l.y);}),'The tracked daily hunt points at the real haunted lantern');
  await debug(p,{op:'set_gold',gold:1000000});await wait(p,()=>__self().gold===1000000);
  for(const [i,cls]of['priest','mage','hunter','warrior'].entries()){
   await p.waitForTimeout(600);await send(p,{type:'interact',npc:'city_bard',offer:'halloween:hire:'+cls});await wait(p,n=>__snap.players.filter(p=>p.hired).length===n,i+1);
  }
  check(true,'A non-Alderhaven host hires four real fighters for the same shared daily quest');
- await stand(p,3,105,31);await wait(p,()=>__snap.players.filter(p=>p.hired&&p.zone===3&&p.hp>0&&Math.hypot(p.x-105,p.y-23)<=12).length===4);
+ await stand(p,3,217,95);await wait(p,()=>__snap.players.filter(p=>p.hired&&p.zone===3&&p.hp>0&&Math.hypot(p.x-219,p.y-86)<=12).length===4);
  await p.evaluate(()=>Field.visitNpc('halloween_lantern'));await p.locator('#npc-dialogue').waitFor({state:'visible'});await p.locator('[data-offer="halloween:summon"]').click();
  await wait(p,()=>__snap.slimes.some(s=>s.kind==='hollow_rider'&&!s.dead));
  check(await p.evaluate(()=>__snap.halloween.level===99&&__snap.halloween.active),'The real lantern summons a level-99 elite for the five level-99 fighters');
@@ -70,7 +73,7 @@ async function npc(p,id){const n=await p.evaluate(id=>[WORLD_MAP,...WORLD_MAP.zo
  await debug(p,{op:'give_mount',mount:'nightmare'});await wait(p,()=>__self().mounts.includes('nightmare'));
  await debug(p,{op:'season_time',unix:1794265200});await wait(p,()=>!Seasonal.active&&__snap.halloween===null&&!__self().quests.some(q=>q.id==='halloween_hunt'&&!q.claimed));
  check(await p.evaluate(()=>[0,4,9,17,3].every(z=>Seasonal.decor(z).length===0)&&__self().mounts.includes('nightmare')),'November 10 removes event dressing/quests while the earned mount stays owned');
- await stand(p,3,105,31);check(await p.evaluate(()=>!City.npcs.some(n=>n.id==='halloween_lantern')&&Halloween.objects(3).length===0),'The ritual lantern and its interaction disappear outside the season');
+ await stand(p,3,217,95);check(await p.evaluate(()=>!City.npcs.some(n=>n.id==='halloween_lantern')&&Halloween.objects(3).length===0),'The ritual lantern and its interaction disappear outside the season');
  // Authenticated rename of an existing flagged character; all progress survives.
  const id=await p.evaluate(()=>Online.id);await debug(p,{op:'set_gold',gold:123456});await wait(p,()=>__self().gold===123456);
  cp.execFileSync('python3',['-c',"import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.execute('UPDATE characters SET name_key=NULL,rename_required=1 WHERE id=?',(sys.argv[2],)); c.commit()",world.db,id]);

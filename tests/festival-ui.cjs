@@ -7,14 +7,14 @@ const seasons=[['halloween',1793055600],['christmas',1797289200],['newyear',1798
 (async()=>{try{
  w.startLevel=20;w.godMode=true;await w.start();browser=await chromium.launch({headless:true});
  const p=await browser.newPage({viewport:{width:1280,height:800},reducedMotion:'reduce'});p.on('pageerror',e=>errors.push(e.message));
- await p.addInitScript(()=>{window.AudioContext=window.webkitAudioContext=undefined;if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:true,lowGraphics:true,lowGraphicsSet:true,touchGraphicsSuggested:true}));const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{try{const v=JSON.parse(e.data);if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;}catch{}});}};window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);});
+ await p.addInitScript(()=>{window.AudioContext=window.webkitAudioContext=undefined;if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:true,lowGraphics:true,lowGraphicsSet:true,touchGraphicsSuggested:true}));const take=v=>{if(v.type==='snapshot'||v.type==='welcome')window.__snap=v.snapshot||v;};const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}if(e.data instanceof ArrayBuffer){try{take(JSON.parse(window.pako.inflateRaw(new Uint8Array(e.data),{to:'string'})));}catch{}return;}e.data.arrayBuffer().then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);});
  await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('FestivalGuest');await p.locator('#go').click({timeout:60000});
  const wait=(fn,arg)=>p.waitForFunction(fn,arg,{timeout:30000}),debug=command=>p.evaluate(command=>Online.send({type:'debug',command}),command);
  await wait(()=>Online.connected&&Field.hero.hp>0);
  for(const [season,unix]of (process.env.CHECK_ONLY==='phone'?[seasons[5]]:seasons)){
   await debug({op:'season_time',unix});await wait(id=>Seasonal.isActive(id),season);
-  await p.evaluate(()=>{City.close();Field.clearInput();Online.send({type:'stop'});Online.send({type:'debug',command:{op:'teleport',zone:0,x:33.8,y:83}});});
-  await wait(()=>Field.zone===0&&Math.hypot(Field.hero.nx-33.8,Field.hero.ny-83)<.2);await p.waitForTimeout(200);await p.evaluate(()=>ZoneJourney.clear());
+  await p.evaluate(()=>{City.close();Field.clearInput();Online.send({type:'stop'});Online.send({type:'debug',command:{op:'teleport',zone:0,x:247.8,y:190}});});
+  await wait(()=>Field.zone===0&&Math.hypot(Field.hero.nx-247.8,Field.hero.ny-190)<1.3);await p.waitForTimeout(200);await p.evaluate(()=>ZoneJourney.clear());
   const id=`festival_dance_${season}_0`;
   check(await p.evaluate(id=>City.npcs.some(n=>n.id===id)&&Festival.objects(0).length===1,id),`${season}: only its own dance centerpiece is visible`);
   await p.evaluate(id=>Field.visitNpc(id),id);await p.locator('[data-offer="festival:dance"]').waitFor({state:'visible'});await p.locator('[data-offer="festival:dance"]').click();await wait(()=>!!__self().festivalDance);
@@ -31,7 +31,7 @@ const seasons=[['halloween',1793055600],['christmas',1797289200],['newyear',1798
  }
  // Cancellation uses the real progress control, and cannot refresh the earned buff.
  const before=await p.evaluate(()=>__self().festivalBuff.until);
- await p.evaluate(()=>{City.close();Online.send({type:'debug',command:{op:'teleport',zone:0,x:33.8,y:83}});});await p.waitForTimeout(500);await p.evaluate(()=>Field.visitNpc('festival_dance_solstice_0'));await p.locator('[data-offer="festival:dance"]').click();await wait(()=>!!__self().festivalDance);
+ await p.evaluate(()=>{City.close();Online.send({type:'debug',command:{op:'teleport',zone:0,x:247.8,y:190}});});await p.waitForTimeout(500);await p.evaluate(()=>Field.visitNpc('festival_dance_solstice_0'));await p.locator('[data-offer="festival:dance"]').click();await wait(()=>!!__self().festivalDance);
  await p.locator('#festival-dance-progress button').click();await wait(()=>__self().festivalDance===null);check(await p.evaluate(t=>__self().festivalBuff.until===t,before),'Cancelling a partial dance does not refresh or remove the earned buff');
  const identity=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();await wait(()=>Online.connected&&__self());check(await p.evaluate(([id,t])=>Online.id===id&&__self().festivalBuff.until===t&&__self().festivalDance===null,[identity,before]),'Reconnect preserves expiry and never resumes a partial dance');
  await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem('valhallasc.save.v1'));s.lang='sv';localStorage.setItem('valhallasc.save.v1',JSON.stringify(s));});await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();await wait(()=>Online.connected&&__self());await p.setViewportSize({width:844,height:390});
@@ -40,7 +40,7 @@ const seasons=[['halloween',1793055600],['christmas',1797289200],['newyear',1798
   await p.setViewportSize({width:1280,height:800});
   for(const[season,unix]of seasons){
    await debug({op:'season_time',unix});await wait(id=>Seasonal.isActive(id),season);
-   await p.evaluate(()=>{City.close();Field.clearInput();Online.send({type:'stop'});Online.send({type:'debug',command:{op:'teleport',zone:0,x:33.8,y:83}});Online.send({type:'debug',command:{op:'set_time',hour:12,freeze:true}});});await wait(()=>Math.hypot(__self().x-33.8,__self().y-83)<.2);await p.evaluate(()=>ZoneJourney.clear());
+   await p.evaluate(()=>{City.close();Field.clearInput();Online.send({type:'stop'});Online.send({type:'debug',command:{op:'teleport',zone:0,x:247.8,y:190}});Online.send({type:'debug',command:{op:'set_time',hour:12,freeze:true}});});await wait(()=>Math.hypot(__self().x-247.8,__self().y-190)<1.3);await p.evaluate(()=>ZoneJourney.clear());
    await p.evaluate(id=>Online.send({type:'interact',npc:id,offer:'festival:dance'}),`festival_dance_${season}_0`);await wait(()=>__self().festivalDance?.laps>.45);
    await p.screenshot({path:path.join(w.runDir,`festival-${season}-dancing.png`)});await p.locator('#festival-dance-progress button').click();await wait(()=>__self().festivalDance===null);
    const b=p.locator('[data-buff="festivalspirit"]');if(await b.getAttribute('aria-expanded')!=='true')await b.click();await p.screenshot({path:path.join(w.runDir,`festival-${season}-buff.png`)});await b.click();
