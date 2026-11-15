@@ -27,7 +27,7 @@ const check = (value, label) => { assert.ok(value, label); checks++; };
   }
   await browser.close(); browser = null;
   await world.connect({ bot: 'MountedDaze', class: 'warrior' });
-  await world.debug('MountedDaze', { op: 'teleport', zone: 0, x: 80, y: 80 });
+  await world.debug('MountedDaze', { op: 'teleport', zone: 0, x: 250, y: 235 }); // open ground: a blocked spot moves the enemy to the side, where no hit can daze
   await world.action('MountedDaze', { type: 'input', dx: 1, dy: 0 });
   await world.waitFor(() => world.player('MountedDaze').fx > .99, 3000, 'east-facing fixture');
   await world.action('MountedDaze', { type: 'stop' });
@@ -36,7 +36,8 @@ const check = (value, label) => { assert.ok(value, label); checks++; };
   await world.waitFor(() => world.player('MountedDaze').mounted, 3000, 'mounted fixture');
   check(true, 'victim is mounted before the enemy attack');
   const { x, y } = world.player('MountedDaze');
-  await world.debug('MountedDaze', { op: 'spawn_enemy', kind: 'green', x: x - 1.5, y, level: 1 });
+  const spawned = await world.debug('MountedDaze', { op: 'spawn_enemy', kind: 'green', x: x - 1.5, y, level: 1 });
+  check(Math.abs(spawned.result.x - (x - 1.5)) < .01 && Math.abs(spawned.result.y - y) < .01, 'the enemy spawns directly behind the rider');
   await world.waitFor(() => world.player('MountedDaze').daze > 0, 30000, 'real rear-hit daze');
   check(world.player('MountedDaze').mounted === false, 'real rear-hit daze dismounts the rider');
   await world.action('MountedDaze', { type: 'mount', mounted: true });
