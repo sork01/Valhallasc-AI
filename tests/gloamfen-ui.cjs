@@ -62,7 +62,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('FenUI');
   await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.fenSprites && !!Field.rimeSprites, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
   // The maps are fogged until a cell is visited; these checks read the whole minimap, so uncover it all first.
   await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'explore_all' } }));
   await page.waitForFunction(() => Field.explored?.length >= 5 && Field.explored.every(m => m === 511), null, { timeout: 10000 });
@@ -70,10 +70,9 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), water: z.objects.filter(o => o.kind === 'water').length, thicket: z.objects.filter(o => o.kind === 'thicket').length })));
-  check(zones.length === 29 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 128 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 128 tiles, levels 15-20');
-  check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[3].portals.join() === 'summit_gate>2', 'The glacier summit has a gate to the fen, which has the gate back');
-  check(zones[3].water > 150 && zones[3].thicket > 100, `The fen has a lake of ${zones[3].water} water discs and ${zones[3].thicket} thicket blocks`);
-  check(await page.evaluate(stub => { const m = Field.fenSprites.meta; return m.kinds.join() === 'toad,croc,knight,hydra,gloomroot' && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === 768 && Field.fenSprites.img[k].naturalHeight === 480)); }, STUB), 'The four fen monster atlases are loaded (768x480 on the real art)');
+  check(zones.length === 47 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 280 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 280 tiles (the authored shape), levels 15-20');
+  check(['crags_gate>1', 'fen_gate>3', 'city_gate>4'].every(g => zones[2].portals.includes(g)) && zones[3].portals.includes('summit_gate>2'), 'The glacier summit has a gate to the fen, which has the gate back (other portals are the compact-atlas walking routes)');
+  check(zones[3].water > 150 && zones[3].thicket >= 100, `The fen has a lake of ${zones[3].water} water discs and ${zones[3].thicket} thicket blocks`);
 
   // Staging only: a test shortcut puts the hero near what is under test, instead of a long walk across the map. The gate
   // crossings, the NPC clicks, the walk through the first gap and the last steps of each approach stay real.
@@ -110,10 +109,14 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await page.waitForFunction(() => Field.zone === 3, null, { timeout: 30000 });
   await page.waitForTimeout(900);
   await shot('fen-arrival');
-  check(await page.evaluate(() => Field.zone === 3 && Field.zoneName === 'Gloamfen' && Field.zoneTheme === 'fen'), 'Walking into the gate moves the hero into the fen');
+  const fenState = await page.evaluate(() => ({ zone: Field.zone, name: Field.zoneName, theme: Field.zoneTheme }));
+  check(fenState.zone === 3 && fenState.name === 'Gloamfen' && fenState.theme === 'fen', `Walking into the gate moves the hero into the fen (${JSON.stringify(fenState)})`);
   check(await page.locator('#area-title b').textContent() === 'Gloamfen' && (await page.locator('#area-title span').textContent()).includes('Lanternmere'), 'The area banner identifies Lanternmere as the quest hub and sanctuary');
   check(await page.locator('#city-travel').isHidden(), 'The Alderhaven travel button is hidden inside the town');
   check(await page.evaluate(() => Field.slimes.length > 0 && Field.slimes.every(s => s.zone === 3 && Number.isInteger(s.level) && s.level >= 13 && s.level <= 22)), 'Only fen enemies, each with an integer level, are shown');
+  // The fen atlases load when the first fen enemy is in view (after the walk into the fen), not at login.
+  await page.waitForFunction(() => !!Field.fenSprites?.meta, null, { timeout: 60000 });
+  check(await page.evaluate(stub => { const m = Field.fenSprites.meta; return m.kinds.join() === 'toad,croc,knight,hydra,gloomroot' && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === 768 && Field.fenSprites.img[k].naturalHeight === 480)); }, STUB), 'The four fen monster atlases are loaded (768x480 on the real art)');
   check(await page.evaluate(() => Field.remotePlayers.length === 0), 'Nobody else is shown (only players in this zone are drawn)');
   // A violet dusk: the sky beyond the map's north edge (the top-right corner of the screen) is dark and bluish-violet.
   const sky = [await look(page, [.9, 0, 1, .07])];

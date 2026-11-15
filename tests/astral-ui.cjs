@@ -27,7 +27,26 @@ async function call(name, args = {}) {
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('AstralUI');
   await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.astralSprites, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
+  const music = await page.evaluate(async () => { const bytes=await fetch('assets/music_astral.mp3').then(r => r.arrayBuffer());const size=bytes.byteLength;const c=new AudioContext();const b=await c.decodeAudioData(bytes);await c.close();return { seconds:b.duration, bytes:size }; });
+  check(music.seconds > 88 && music.seconds < 90 && music.bytes > 1000000, `The browser decodes the full original score (${JSON.stringify(music)})`);
+
+  const debug = command => page.evaluate(command => Online.send({ type:'debug',ref:17,command }), command);
+  await debug({ op:'teleport',zone:9,x:230,y:44 });
+  await page.waitForFunction(() => Field.zone===9 && Math.hypot(Field.hero.x-230,Field.hero.y-44)<2,null,{timeout:10000});
+  await page.evaluate(() => Online.send({type:'move',x:238,y:44}));
+  await page.waitForFunction(() => Field.zone===13,null,{timeout:30000});
+  await page.evaluate(() => Online.send({type:'stop'}));
+  await page.waitForTimeout(700);
+  const arrival = await page.evaluate(() => {
+    const g=Field._debug.zones[13].portals[0],screen=Field._debug.w2s(g.x,g.y);
+    return {zone:Field.zone,near:Math.hypot(Field.hero.x-97.5,Field.hero.y-296.5),screen,theme:Field.zoneTheme,objects:Field._debug.objects.length,npcs:City.npcs.length};
+  });
+  check(arrival.zone===13 && arrival.near<4.5 && arrival.theme==='astral' && arrival.objects>=400 && arrival.npcs===24,`The real Nacrehold gate arrives inside the inhabited Astralhollow sanctuary (${JSON.stringify(arrival)})`);
+  check(arrival.screen[0]>100 && arrival.screen[0]<1500 && arrival.screen[1]>70 && arrival.screen[1]<830,'The return portal is visible on arrival');
+  await page.screenshot({path:path.join(world.artifacts,'astral-arrival.png')});
+  // The Astralhollow atlases load when its enemies are in the snapshot (after the arrival), not at login.
+  await page.waitForFunction(() => !!Field.astralSprites, null, { timeout: 60000 });
   const data = await page.evaluate(() => {
     const z = Field._debug.zones[13], p = z.portals[0], kinds = Field.astralSprites.meta.kinds;
     return { count: Field._debug.zones.length, name: z.name, objects: z.objects.length, kinds,
@@ -37,36 +56,17 @@ async function call(name, args = {}) {
       map: WorldMap._layout.length, legend: kinds.every(k => WorldMap._kinds[k]?.[1] >= 40),
       imageSizes: kinds.map(k => { const fr = Field.frameOf(Field.astralSprites, k); return [Field.astralSprites.img[k].naturalWidth,Field.astralSprites.img[k].naturalHeight,fr.w*8,fr.h*5]; }) };
   });
-  check(data.count === 19 && data.name === 'Astralhollow' && data.objects >= 400 && data.npcs === 7 && data.quests === 12, 'The complete zone, hub and quest catalog are loaded');
-  check(data.gate[1] > data.arrival[1] && Math.hypot(data.gate[0]-data.arrival[0],data.gate[1]-data.arrival[1]) <= 4.5, 'The return gate stands in front of the arrival plaza');
-  check(data.oldGate?.to === 13 && data.art && data.map === 19 && data.legend, 'Nacrehold gate, original scenery art and world-map legend are present');
+  check(data.count === 47 && data.name === 'Astralhollow' && data.objects >= 400 && data.npcs === 28 && data.quests === 38, 'The complete zone, hub and quest catalog are loaded');
+  check(data.gate[0] < 97.5 && Math.hypot(data.gate[0]-97.5,data.gate[1]-296.5) <= 6.5, 'The return gate stands six tiles west of the arrival plaza (97.5, 296.5)');
+  check(data.oldGate?.to === 13 && data.art && data.map === 47 && data.legend, 'Nacrehold gate, original scenery art and world-map legend are present');
   check(STUB || data.imageSizes.every(([w,h,ew,eh]) => w === ew && h === eh), 'All five real 34-frame enemy atlases loaded');
-  const music = await page.evaluate(async () => { const bytes=await fetch('assets/music_astral.mp3').then(r => r.arrayBuffer());const size=bytes.byteLength;const c=new AudioContext();const b=await c.decodeAudioData(bytes);await c.close();return { seconds:b.duration, bytes:size }; });
-  check(music.seconds > 88 && music.seconds < 90 && music.bytes > 1000000, `The browser decodes the full original score (${JSON.stringify(music)})`);
-
-  const debug = command => page.evaluate(command => Online.send({ type:'debug',ref:17,command }), command);
-  await debug({ op:'teleport',zone:9,x:166,y:30 });
-  await page.waitForFunction(() => Field.zone===9 && Math.hypot(Field.hero.x-166,Field.hero.y-30)<2,null,{timeout:10000});
-  await page.evaluate(() => Online.send({type:'move',x:166,y:24}));
-  await page.waitForFunction(() => Field.zone===13,null,{timeout:30000});
-  await page.evaluate(() => Online.send({type:'stop'}));
-  await page.waitForTimeout(700);
-  const arrival = await page.evaluate(() => {
-    const g=Field._debug.zones[13].portals[0],screen=Field._debug.w2s(g.x,g.y);
-    return {zone:Field.zone,near:Math.hypot(Field.hero.x-64,Field.hero.y-116),screen,theme:Field.zoneTheme,objects:Field._debug.objects.length,npcs:City.npcs.length};
-  });
-  check(arrival.zone===13 && arrival.near<2 && arrival.theme==='astral' && arrival.objects>=400 && arrival.npcs===7,'The real Nacrehold gate arrives inside the inhabited Astralhollow sanctuary');
-  check(arrival.screen[0]>100 && arrival.screen[0]<1500 && arrival.screen[1]>70 && arrival.screen[1]<830,'The return portal is visible on arrival');
-  await page.screenshot({path:path.join(world.artifacts,'astral-arrival.png')});
-  await debug({ op:'teleport',zone:13,x:64,y:89 });
-  await page.waitForFunction(() => Field.zone===13 && Math.abs(Field.hero.y-89)<2,null,{timeout:10000});
+  await debug({ op:'teleport',zone:13,x:95,y:296.5 });
+  await page.waitForFunction(() => Field.zone===13 && Math.hypot(Field.hero.x-95,Field.hero.y-296.5)<2,null,{timeout:10000});
   await page.waitForTimeout(500);
   await page.screenshot({path:path.join(world.artifacts,'astral-grove.png')});
-  await debug({ op:'teleport',zone:13,x:64,y:116 });
-  await page.waitForFunction(() => Field.zone===13 && Math.abs(Field.hero.y-116)<2,null,{timeout:10000});
-  await page.evaluate(() => Online.send({type:'move',x:64,y:120}));
+  await page.evaluate(() => Online.send({type:'move',x:88,y:296.5}));
   await page.waitForFunction(() => Field.zone===9,null,{timeout:30000});
-  check(await page.evaluate(() => Field.zone===9 && Math.hypot(Field.hero.x-166,Field.hero.y-32)<2), 'The visible return portal walks back to Nacrehold without bouncing');
+  check(await page.evaluate(() => Field.zone===9 && Math.hypot(Field.hero.x-230.8,Field.hero.y-44)<2), 'The visible return portal walks back to Nacrehold without bouncing');
   check(errors.length===0, `No browser errors (${errors.join('; ')})`);
   console.log(`Astralhollow UI: ${checks} checks; screenshots in ${world.artifacts}`);
 })().catch(error => { console.error(error.stack); process.exitCode=1; }).finally(async () => {

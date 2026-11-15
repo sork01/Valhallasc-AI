@@ -23,7 +23,31 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('AsterionUI');await page.locator('#go').click({timeout:60000});
-  await page.waitForFunction(()=>Online.connected&&Field.moonwellSprites?.img.moonwell_echo&&Field.moonwellGardenSprites?.img.moonskein_weaver,null,{timeout:60000});
+  await page.waitForFunction(()=>Online.connected,null,{timeout:60000});
+  let debugRef=117;
+  const debug=command=>page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,debugRef++]);
+  const stage=async(zone,x,y)=>{const sent=await debug({op:'teleport',zone,x,y});check(sent,`Send private teleport to ${zone}:${x},${y}`);try{await page.waitForFunction(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<2,[zone,x,y],{timeout:15000,polling:100});}catch(error){const at=await page.evaluate(()=>({connected:Online.connected,zone:Field.zone,x:Field.hero.x,y:Field.hero.y}));throw Error(`Teleport to ${zone}:${x},${y} ended at ${JSON.stringify(at)}; debug ${JSON.stringify(debugPackets.at(-1))}: ${error.message}`);}await page.waitForTimeout(500);};
+  await stage(17,90,153);
+  await page.waitForFunction(()=>valhalla.hmusic?.loaded&&valhalla.hmusic.running,null,{timeout:15000,polling:100});
+  check(await page.evaluate(()=>valhalla.hmusic.duration>68&&valhalla.hmusic.duration<69),'The dybase2 Asterion score decodes and plays in the city');
+  await page.screenshot({path:path.join(world.artifacts,'asterion-arrival.png')});
+  check(await page.evaluate(()=>Field.zoneTheme==='asterion'&&City.npcs.length===24),'Asterion is rendered with its town population (31 entries less six seasonal dances not active and the spirit guide, alive)');
+  await stage(17,90,99);
+  await page.screenshot({path:path.join(world.artifacts,'asterion-astrolabe.png')});
+  const moving=await page.evaluate(()=>City.npcs.filter(n=>n.route).map(n=>[n.id,n.x,n.y]));
+  await page.waitForTimeout(600);
+  check(await page.evaluate(before=>City.npcs.filter(n=>n.route).some(n=>{const p=before.find(x=>x[0]===n.id);return Math.hypot(n.x-p[1],n.y-p[2])>.1}),moving),'NPCs move along their server-timed routes');
+  await stage(17,123,84);
+  await page.screenshot({path:path.join(world.artifacts,'asterion-meeting-stone.png')});
+  await stage(17,127,97);
+  // The stairs are gated by the Moonwell entry quest (needs_quest entry_moon): the test shortcut finishes it, the stairs stay real.
+  await debug({op:'quest',id:'entry_moon',action:'accept'});await debug({op:'quest',id:'entry_moon',action:'finish'});
+  await page.waitForTimeout(500);
+  await page.evaluate(()=>Online.send({type:'move',x:125,y:93}));
+  await page.waitForFunction(()=>Field.zone===18,null,{timeout:20000});
+  check(await page.evaluate(()=>Field.zoneTheme==='moonwell'&&Field.slimes.some(s=>s.kind==='moonwell_echo')),'The stairs lead into the water garden');
+  // The Moonwell atlases load when the first water-garden enemy is in view (the stairs above), not at login.
+  await page.waitForFunction(()=>!!Field.moonwellSprites?.img.moonwell_echo&&!!Field.moonwellGardenSprites?.img.moonskein_weaver,null,{timeout:60000});
   const data=await page.evaluate(()=>{
     const city=Field._debug.zones[17],well=Field._debug.zones[18],houses=city.objects.filter(o=>o.kind==='aetherhouse');
     return {zones:Field._debug.zones.length,city:city.name,theme:city.theme,size:city.size,
@@ -40,31 +64,12 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   });
   check(data.zones>=19&&data.city==='Asterion'&&data.theme==='asterion'&&data.size===180,'The full city loads as zone 17');
   check(data.houses>=120&&data.labels===data.houses,'Every one of the glass-roof houses has a unique address');
-  check(data.npcs===21&&data.walkers===10&&data.looks>=8,'Moving townspeople carry distinct clothes and props');
-  check(data.quests===6&&data.travel?.includes('travel_lamplight')&&data.stone==='stone','Quest hub, Travel Master and interactive Meeting Stone load');
+  check(data.npcs===31&&data.walkers===10&&data.looks>=8,'Moving townspeople carry distinct clothes and props');
+  check(data.quests===23&&data.travel?.join()==='travel_breakwater,travel_rodstead,travel_fulgur,travel_bankhold'&&data.stone==='stone','Quest hub (23 quests), Travel Master (its four Spark links) and interactive Meeting Stone load');
   check(data.art&&data.map>=19&&data.legend===60&&data.music,'Art, world map and dybase2 music hook load');
   check(data.well.join(',')==='The Moonwell,moonwell,4,60,moonwell_echo,20,4'&&data.gardenArt,'Floating Moonwell garden and four bosses load');
   check(STUB||data.sprite.join(',')==='768,480','PixelFlow boss atlas loads in its five-clip format');
   check(STUB||data.gardenSprite===768,'Six new five-clip monster atlases load');
-  let debugRef=117;
-  const debug=command=>page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,debugRef++]);
-  const stage=async(zone,x,y)=>{const sent=await debug({op:'teleport',zone,x,y});check(sent,`Send private teleport to ${zone}:${x},${y}`);try{await page.waitForFunction(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<2,[zone,x,y],{timeout:15000,polling:100});}catch(error){const at=await page.evaluate(()=>({connected:Online.connected,zone:Field.zone,x:Field.hero.x,y:Field.hero.y}));throw Error(`Teleport to ${zone}:${x},${y} ended at ${JSON.stringify(at)}; debug ${JSON.stringify(debugPackets.at(-1))}: ${error.message}`);}await page.waitForTimeout(500);};
-  await stage(17,90,153);
-  await page.waitForFunction(()=>valhalla.hmusic?.loaded&&valhalla.hmusic.running,null,{timeout:15000,polling:100});
-  check(await page.evaluate(()=>valhalla.hmusic.duration>68&&valhalla.hmusic.duration<69),'The dybase2 Asterion score decodes and plays in the city');
-  await page.screenshot({path:path.join(world.artifacts,'asterion-arrival.png')});
-  check(await page.evaluate(()=>Field.zoneTheme==='asterion'&&City.npcs.length===21),'Asterion is rendered with its town population');
-  await stage(17,90,99);
-  await page.screenshot({path:path.join(world.artifacts,'asterion-astrolabe.png')});
-  const moving=await page.evaluate(()=>City.npcs.filter(n=>n.route).map(n=>[n.id,n.x,n.y]));
-  await page.waitForTimeout(600);
-  check(await page.evaluate(before=>City.npcs.filter(n=>n.route).some(n=>{const p=before.find(x=>x[0]===n.id);return Math.hypot(n.x-p[1],n.y-p[2])>.1}),moving),'NPCs move along their server-timed routes');
-  await stage(17,123,84);
-  await page.screenshot({path:path.join(world.artifacts,'asterion-meeting-stone.png')});
-  await stage(17,127,97);
-  await page.evaluate(()=>Online.send({type:'move',x:125,y:93}));
-  await page.waitForFunction(()=>Field.zone===18,null,{timeout:20000});
-  check(await page.evaluate(()=>Field.zoneTheme==='moonwell'&&Field.slimes.some(s=>s.kind==='moonwell_echo')),'The stairs lead into the water garden');
   await page.waitForFunction(()=>valhalla.mmusic?.running&&!valhalla.hmusic?.running,null,{timeout:10000,polling:100});
   check(await page.evaluate(()=>valhalla.mmusic.running&&!valhalla.hmusic.running),'The garden has its own luminous score');
   await stage(18,102,104);

@@ -21,20 +21,22 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
   await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('FrostUI');await page.locator('#go').click({timeout:60000});
-  await page.waitForFunction(()=>Online.connected&&!!Field.frostwakeSprites?.img.crevasseleviathan,null,{timeout:60000});
-  const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[26],src=Field.frostwakeSprites;return {count:z.length,name:a.name,theme:a.theme,levels:a.levels,npcs:a.npcs.length,quests:a.quests.length,enemies:a.slimes.length,fractures:a.objects.filter(o=>o.kind==='frostwake_crevasse').length,gates:[z[25].portals.find(p=>p.id==='lapis_frostwake_gate'),a.portals.find(p=>p.id==='frostwake_lapis_gate')],kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['frostwake_crevasse','frostwake_obelisk','frostwake_snow_pine','frostwake_camp'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,travel:a.npcs.find(n=>n.id==='travel_frostwake')};});
-  check(data.count===27&&data.name==='Frostwake Shelf'&&data.theme==='frostwake'&&data.levels.join(',')==='85,90','Level 85–90 glacier loads');
-  check(data.npcs===10&&data.quests===10&&data.enemies===43&&data.fractures>=20,'Camp, quests, elite territories and blue fissures load');
-  check(data.kinds.length===13&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Thirteen PixelFlow atlases load');
-  check(data.art&&data.layout===29,'Glacier scenery and world-map placement load');
-  check(data.gates.every(Boolean)&&data.gates[0].to===26&&data.gates[1].to===25,'Reciprocal Snowline gates load');
-  check(data.travel?.travelLinks.includes('travel_azure_wells')&&data.travel?.art==='frostwake_travel','Travel Master Eira has unique art and return service');
+  await page.waitForFunction(()=>Online.connected&&!!Field.warriorSprites,null,{timeout:60000});
   let ref=701;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);
   async function stage(x,y,label){await debug({op:'teleport',zone:26,x,y});await page.waitForFunction(([x,y])=>Field.zone===26&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<3,[x,y],{timeout:15000});await page.waitForTimeout(950);await page.screenshot({path:path.join(world.artifacts,`frostwake-${label}.png`)});await capture(`frostwake-${label}-clean.png`);}
-  await stage(40,145,'hub');check(await page.evaluate(()=>Field.zoneTheme==='frostwake'&&City.npcs.length===10),'Frostwake Station paints live');
-  await stage(111,100,'frozen-pool');
-  await stage(124,27,'aurora-obelisk');
-  await stage(99,39,'leviathan-rib');
+  await stage(40,145,'hub');check(await page.evaluate(()=>Field.zoneTheme==='frostwake'&&City.npcs.length===23),'Frostwake Station paints live (23 people shown: 27 entries less the four spirit guides, alive)');
+  // Frostwake atlases load when a zone-26 snapshot arrives (the hub stage above), not at login on the pier.
+  await page.waitForFunction(()=>!!Field.frostwakeSprites?.img.crevasseleviathan,null,{timeout:60000});
+  const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[26],src=Field.frostwakeSprites;return {count:z.length,name:a.name,theme:a.theme,levels:a.levels,npcs:a.npcs.length,quests:a.quests.length,enemies:a.slimes.length,fractures:a.objects.filter(o=>o.kind==='frostwake_crevasse').length,gates:[z[27].portals.find(p=>p.id==='cairn_frostwake_gate'),a.portals.find(p=>p.id==='frostwake_cairn_gate')],kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['frostwake_crevasse','frostwake_obelisk','frostwake_snow_pine','frostwake_camp'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,travel:a.npcs.find(n=>n.id==='travel_frostwake')};});
+  check(data.count===47&&data.name==='Frostwake Shelf'&&data.theme==='frostwake'&&data.levels.join(',')==='85,90','Level 85–90 glacier loads');
+  check(data.npcs===27&&data.quests===27&&data.enemies===157&&data.fractures>=20,'Camp, quests, elite territories and blue fissures load');
+  check(data.kinds.length===13&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Thirteen PixelFlow atlases load');
+  check(data.art&&data.layout===47,'Glacier scenery and world-map placement load');
+  check(data.gates.every(Boolean)&&data.gates[0].to===26&&data.gates[1].to===27,'The seamless border with Cairnspine loads both sides (the Yearwheel and Lapis have no gate)');
+  check(data.travel?.travelLinks.includes('travel_bellward')&&data.travel?.art==='frostwake_travel','Travel Master Eira has unique art and return service');
+  await stage(208,84,'frozen-pool');
+  await stage(244,50,'aurora-obelisk');
+  await stage(198,30,'leviathan-rib');
   check(await page.evaluate(()=>Field._debug.zones[26].slimes.filter(s=>['bellmammoth','auroramanta','crevasseleviathan'].includes(s.kind)).length===3),'Three unique elite kinds are placed');
   check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
   console.log(`Frostwake UI: ${checks} checks; screenshots in ${world.artifacts}`);

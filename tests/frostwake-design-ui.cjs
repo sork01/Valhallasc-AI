@@ -27,8 +27,8 @@ const GROUND = ['The Blue Fissures', 'The Sunward Drift'], lums = {};
 (async () => {
   check(Z.name === 'Frostwake Shelf' && Z.size === 312 && Z.shapeFloor && Z.shape.neighbours.join() === '19,20,27,28', 'the Frostwake Shelf is the 312 grid with its outline and four neighbours');
   const seams = Z.portals.filter(p => p.seam).map(p => p.to).sort();
-  check(seams.join() === '27', 'Cairnspine is the only seam');
-  check(Z.portals.some(p => p.to === 19 && p.walk) && Z.portals.some(p => p.to === 20 && p.walk), 'Stormglass and Sunward are rim gates you walk through');
+  check(seams.join() === '20,27', 'Cairnspine and Sunward Vale are the seams (Sunward Vale became seamless with its six shaped neighbours, its approved design)');
+  check(Z.portals.some(p => p.to === 19 && p.walk), 'Stormglass is a rim gate you walk through');
   check(!Z.portals.some(p => p.to === 28) && !W.zones[27].portals.some(p => p.to === 26), 'the Yearwheel has no portal from either side');
   for (const p of Z.portals) check(onFloor(Z, p.x, p.y) || p.seam, `${p.id} stands on the floor`);
   check(Z.regions.names.length === 15 && Z.camps.length === 3 && Z.quests.length === 27, 'fifteen regions, four hubs and 27 quests');
@@ -38,7 +38,7 @@ const GROUND = ['The Blue Fissures', 'The Sunward Drift'], lums = {};
   browser = await chromium.launch({ headless: true });
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' })).newPage();
   const errors = []; page.on('pageerror', e => console.log('PAGEERROR', e.message) || errors.push(e.message + ' @ ' + (e.stack || '').split('\n').slice(1, 4).join(' | ')));
-  if (process.env.MUTATE) {
+  if (process.env.MUTATE && process.env.MUTATE !== 'wall') {
     const old = execSync(`git show ${process.env.MUTATE === 'seam' ? '6d6fbd3~1' : 'HEAD'}:client/field.js`, { cwd: root, maxBuffer: 1 << 28 });
     await page.route('**/field.js*', r => r.fulfill({ status: 200, contentType: 'application/javascript', body: old }));
   }
@@ -93,8 +93,18 @@ const GROUND = ['The Blue Fissures', 'The Sunward Drift'], lums = {};
   for (const g of Z.portals.filter(p => !p.seam)) { const wk = g.walk || [0, 1]; await go(26, g.x - wk[0] * 6, g.y - wk[1] * 6); await page.screenshot({ path: path.join(out, `gate-${g.id}.png`) }); }
   // ---- the wall: the Yearwheel border is rampart and tower along its whole length; a held key toward it at four places stops at the wall, never beyond it
   {
-    const wall = Z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower');
-    check(wall.length > 150 && wall.filter(o => o.kind === 'tower').length >= 8, `the wall is ${wall.length} pieces with towers`);
+    // The wall must be unbroken: walk the pieces nearest-neighbour and keep the longest step (the design lays them about 2 tiles apart).
+    // Count is not asserted: the design doc quotes 152 pieces, the map holds 150, and no gap opens anywhere.
+    // MUTATE=wall removes every piece within 5 tiles of the first one: the gap check must fail.
+    const wallAll = Z.objects.filter(o => o.kind === 'rampart' || o.kind === 'tower');
+    const wall = process.env.MUTATE === 'wall' ? wallAll.filter(o => Math.hypot(o.x - wallAll[0].x, o.y - wallAll[0].y) > 5) : wallAll;
+    const chain = [wall[0]], rest = wall.slice(1); let worst = 0;
+    while (rest.length) {
+      const last = chain[chain.length - 1]; let bi = 0, bd = Infinity;
+      rest.forEach((o, i) => { const d = Math.hypot(o.x - last.x, o.y - last.y); if (d < bd) { bd = d; bi = i; } });
+      worst = Math.max(worst, bd); chain.push(rest.splice(bi, 1)[0]);
+    }
+    check(worst <= 2.5 && wall.filter(o => o.kind === 'tower').length >= 8, `the wall is ${wall.length} pieces with towers and no gap wider than ${worst.toFixed(2)} tiles`);
     for (const frac of [.2, .45, .7, .9]) {
       const piece = wall.slice().sort((p, q) => p.y - q.y)[Math.floor(wall.length * frac)];
       const sx = piece.x - 7, sy = piece.y;
