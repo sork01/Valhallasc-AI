@@ -44,6 +44,11 @@ const angleDiff = (a, b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)
   await page.locator('#cls-hunter').click(); await page.locator('#name').fill('ArrowAim');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero.level === 99, null, { timeout: 60000 });
+  // A new hero stands on the Saltby pier, where a wall a few tiles east stops every arrow (shotBlocked). Move to open ground
+  // south of Alderhaven and let the hero settle there (the teleport lands on the nearest free ground).
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 8, null, { timeout: 30000 });
+  await page.waitForTimeout(1500);
   const debug = command => page.evaluate(c => Online.send({ type: 'debug', command: c }), command);
   const nearby = await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 12).map(s => s.id));
   for (const id of nearby) await debug({ op: 'kill_enemy', id });

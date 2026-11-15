@@ -74,7 +74,10 @@ const skills = [
     }
     const frame = await page.evaluate(({ id, kind, age }) => new Promise((resolve, reject) => {
       const initial = new Set(Field._debug.effects), deadline = performance.now() + 8000, seen = { maxBolts: 0, kinds: [] };
-      const needBolts = id === 'throwingknives' ? 3 : id === 'knifering' ? 12 : 0;
+      const needBolts = id === 'throwingknives' ? 3 : 0;
+      // Knife Ring launches twelve knives at once, but a knife that meets a wall or a tree is removed early, so the frame is taken
+      // while at least ten are in flight (the launch count itself is checked from the effect below).
+      const minBolts = id === 'knifering' ? 10 : 0;
       const target = Field.slimes.find(s => s.kind === (id === 'flurry' ? 'gloomroot' : 'green') && s.level === 99 && !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 5);
       const fx = target && ['lunge', 'flurry', 'assassinate'].includes(id) ? target.x - Field.hero.x : 1;
       const fy = target && ['lunge', 'flurry', 'assassinate'].includes(id) ? target.y - Field.hero.y : 0;
@@ -84,7 +87,7 @@ const skills = [
           (id !== 'flurry' || e.index >= 1));
         const effect = matching.find(e => e.t >= age);
         const bolts = Field._debug.bolts.filter(b => b.skill === id).length;
-        if (effect && (!needBolts || bolts === needBolts)) {
+        if (effect && (!needBolts || bolts === needBolts) && bolts >= minBolts) {
           resolve({ image: document.querySelector('#fieldcv').toDataURL('image/png'), kind: effect.kind,
             age: effect.t, radius: effect.r || 0, arc: effect.arc || 0, count: effect.count || effect.total || 0,
             bolts, moved: Math.hypot(Field.hero.x - effect.x, Field.hero.y - effect.y),
@@ -99,7 +102,7 @@ const skills = [
       Online.send({ type: 'skill', id, fx, fy });
     }), { id, kind, age });
     if (id === 'throwingknives') assert.equal(frame.bolts, 3);
-    if (id === 'knifering') assert.equal(frame.bolts, 12);
+    if (id === 'knifering') { assert.equal(frame.count, 12, 'the volley launches twelve knives'); assert.ok(frame.bolts >= 10 && frame.bolts <= 12, `${frame.bolts} knives in flight`); }
     if (id === 'lunge') assert.ok(frame.moved > .4, 'Lunge shows observed player movement');
     if (id === 'flurry') assert.equal(frame.count, 4, 'Flurry rendered four real target hits');
     if (id === 'cycloneblades') assert.equal(frame.radius, 2.6);

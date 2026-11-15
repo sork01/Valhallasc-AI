@@ -35,6 +35,11 @@ const skills = [
   await page.locator('#cls-hunter').click(); await page.locator('#name').fill('HunterEffects');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero.level === 99 && !!Field.hunterSprites, null, { timeout: 60000 });
+  // A new hero stands on the Saltby pier, where a wall a few tiles east stops every arrow (shotBlocked). Move to open ground
+  // south of Alderhaven and let the hero settle there (the teleport lands on the nearest free ground).
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 250, y: 235 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 8, null, { timeout: 30000 });
+  await page.waitForTimeout(1500);
   const catalog = await page.evaluate(() => WORLD_SKILLS.filter(s => s.class === 'hunter').map(s => ({ id: s.id, icon: s.icon })));
   assert.deepEqual(catalog.map(s => s.id).sort(), skills.map(s => s[0]).sort());
   assert.equal(new Set(catalog.map(s => s.icon)).size, 10);

@@ -2,7 +2,7 @@
 // about every 100 ms; the old ease-out surged at every snapshot, so the drawn speed from one frame to the next pulsed at 10 Hz.
 // The test holds the keys along a clear stretch of Greenmeadow, samples the drawn hero position on every frame, and measures how
 // even the speed is (coefficient of variation of the per-frame speed, with the frame time taken into account).
-//   OLD=1  serves `git show HEAD:client/field.js` (the ease-out) instead: the same check must FAIL, which proves it has teeth.
+//   OLD=1  serves `git show 1ea4403^:client/field.js` (the ease-out) instead: the same check must FAIL, which proves it has teeth.
 // Run through the bounded runner: bash scripts/test-touch-bounded.sh tests/actor-motion-ui.cjs
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -34,7 +34,9 @@ const stats = a => { const m = a.reduce((s, v) => s + v, 0) / a.length, sd = Mat
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   if (process.env.OLD) {
-    const old = execFileSync('git', ['show', 'HEAD:client/field.js'], { cwd: root, maxBuffer: 1 << 28 });
+    // The ease-out client is the parent of the commit that added ActorMotion (1ea4403, Beta 1.40.1). HEAD already has ActorMotion,
+    // so HEAD:client/field.js would make this switch a no-op.
+    const old = execFileSync('git', ['show', '1ea4403^:client/field.js'], { cwd: root, maxBuffer: 1 << 28 });
     await page.route('**/field.js*', route => route.fulfill({ status: 200, contentType: 'text/javascript', body: old }));
   }
   await page.addInitScript(() => {
