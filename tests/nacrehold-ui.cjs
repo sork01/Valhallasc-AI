@@ -1,10 +1,13 @@
 // Private Chromium checks of Nacrehold's controls and original canvas art.
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
+// Counts come from world/map.txt (zone 9), not from an old layout: Nacrehold is now a 248-tile authored city with 41 residents, 33 of them people.
+const mapZone9 = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')).zones[8];
 const client = new Client({ name: 'nacrehold-ui', version: '1.0.0' });
 let browser, world, checks = 0;
 const check = (value, label) => { assert.ok(value, label); checks++; };
@@ -40,13 +43,15 @@ async function call(name, args = {}) {
   };
   const shot = name => page.screenshot({ path: path.join(world.artifacts, name + '.png') });
   const z = await page.evaluate(() => WORLD_MAP.zones[8]);
-  check(z.name === 'Nacrehold' && z.theme === 'nacre' && z.size === 192 && !z.levels, 'A 192-tile underwater city without combat levels');
-  check(z.objects.filter(o => o.kind === 'nacrehouse').length === 120 && z.npcs.length === 30 && z.quests.length === 9, '120 houses, 30 people and nine quests');
+  check(z.name === 'Nacrehold' && z.theme === 'nacre' && z.size === mapZone9.size && !z.levels, `An underwater city of ${mapZone9.size} tiles without combat levels`);
+  const people = mapZone9.npcs.filter(n => n.look).length;
+  check(z.objects.filter(o => o.kind === 'nacrehouse').length === 120 && z.npcs.length === mapZone9.npcs.length && z.npcs.filter(n => n.look).length === people && z.quests.length === mapZone9.quests.length, `120 houses, ${people} people among ${z.npcs.length} residents and ${z.quests.length} quests`);
   check(z.slimes.length === 0 && z.npcs.filter(n => n.route).length === 18, 'A safe city with eighteen swimming residents');
-  check(z.npcs.filter(n => n.art !== 'stone').every(n => n.look.species === 'merfolk') && z.npcs.some(n => n.look.female) && z.npcs.some(n => n.look.female === false), 'Both mermaids and mermen, including the travel master');
+  const folk = z.npcs.filter(n => n.look && n.art !== 'stone');
+  check(folk.length > 0 && folk.every(n => n.look.species === 'merfolk') && folk.some(n => n.look.female) && folk.some(n => n.look.female === false), 'Both mermaids and mermen, including the travel master');
   check(z.futureInstance.name === 'The Drowned Cathedral' && z.futureInstance.status === 'open' && z.futureInstance.players === 5, 'The Cathedral has three open five-player wings');
   check(await page.evaluate(() => WORLD_MAP.zones[7].portals.some(p => p.id === 'nacre_gate' && p.to === 9)), 'Ran’s Deep includes the incoming Tideway');
-  await stage(96, 164);
+  await stage(128, 217);   // the city's arrival point (map.txt spawn); (96,164) is a house now
   check(await page.locator('#area-title b').textContent() === 'Nacrehold', 'The arrival banner names the city');
   check(await page.locator('#city-travel').isHidden(), 'The city is sanctuary, with no redundant town travel button');
   check(await page.evaluate(() => Field.slimes.length === 0 && City.inside(Field.hero.x, Field.hero.y)), 'The live city snapshot contains no enemies');
@@ -89,23 +94,29 @@ async function call(name, args = {}) {
   await page.evaluate(() => document.querySelector('.tracker-toggle')?.click());
   await stage(90, 25); await shot('nacrehold-cathedral-and-stone');
   check(await page.evaluate(() => City.art.meetingstone && City.art.nacrecathedral), 'The Cathedral and Meeting Stone are both rendered');
-  await stage(96, 32);
+  await stage(127, 57);   // beside the warden (map.txt nacre_warden 128,59)
   await page.evaluate(() => Field.visitNpc('nacre_warden'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible' });
   check((await page.locator('#npc-text').textContent()).includes('level 40'), 'The warden explains the open level-40 Cathedral wing');
   check((await page.locator('#npc-text').textContent()).includes('Grand Nave'), 'The warden describes all three playable wings');
-  await stage(90.7, 33.7);
-  await debug({ op: 'set_gold', gold: 1000 });
+  await stage(110.7, 57.2);   // beside the Meeting Stone (map.txt nacre_stone 111.7,59.2)
+  await debug({ op: 'set_gold', gold: 20000 });   // amounts are copper: a level-40 priest hire is 5,000 (merc_price anchors)
   await page.evaluate(() => Field.visitNpc('nacre_stone'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible' });
   check(await page.locator('[data-offer="merc_priest"]').isEnabled(), 'The Meeting Stone offers the existing priest hire');
   check(await page.locator('[data-offer^="merc_"]').count() === 6, 'All five classes and dismissal are offered');
-  await stage(100, 164);
+  await stage(132.3, 211.7);   // beside the travel master (map.txt 133.3,213.7)
   await page.evaluate(() => Field.visitNpc('travel_nacrehold'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible' });
   check((await page.locator('#npc-name').textContent()) === 'Travel Master Auralis', 'The mermaid travel master opens her dialogue');
-  check(await page.locator('[data-travel="travel_keelhaven"]').count() === 1, 'Spark Travel lists Keelhaven');
-  await stage(92, 166);
+  // Spark Travel now opens the world map in travel mode (Beta 1.52.0), not a list in the conversation.
+  check(await page.locator('[data-view="sparkmap"]').count() === 1 && await page.locator('[data-travel]').count() === 0, 'The conversation offers the map, not a list of destinations');
+  await page.locator('[data-view="sparkmap"]').click();
+  await page.locator('#wm-spark').waitFor({ state: 'visible' });
+  // Stations appear once a stop is discovered (the hero has not talked to Keelhaven), so the link is checked on the master's data.
+  check(await page.evaluate(() => !!City.npcs.find(n => n.id === 'travel_nacrehold')?.travelLinks?.includes('travel_keelhaven')), 'Spark Travel links to Keelhaven');
+  await page.evaluate(() => WorldMap.close());
+  await stage(121, 211);   // beside the envoy (map.txt 122,213)
   await page.evaluate(() => Field.visitNpc('nacre_envoy'));
   await page.locator('[data-quest="nacre_welcome"]').click();
   await page.locator('[data-action="accept"]').click();
@@ -123,7 +134,7 @@ async function call(name, args = {}) {
   await page.locator('.wm-tile[data-zone="9"]').click();
   await page.waitForFunction(() => document.getElementById('wm-body').dataset.view === 'zone');
   check(await page.locator('.wm-gate[data-portal="nacre_deep_gate"]').count() === 1, 'The detailed city map shows the return Tideway');
-  check(await page.evaluate(() => document.querySelector('.wm-tile[data-zone="9"]').getAttribute('aria-label').includes('safe city')), 'The city map advertises sanctuary rather than combat levels');
+  check((await page.locator('.wm-facts').first().textContent()).includes('No enemies inside the walls'), 'The city map advertises sanctuary rather than combat levels');
   check(errors.length === 0, `No browser errors: ${errors.join(' | ')}`);
   console.log(`nacrehold-ui: ${checks} checks passed; ${world.artifacts}`);
 })().then(async () => { await browser?.close(); if (world) await call('stop_world'); await client.close(); }, async e => {
