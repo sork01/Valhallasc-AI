@@ -75,6 +75,9 @@ async function call(name, args = {}) {
     const melee = shipped[kind].mechanics.some(m => ['shield', 'adds', 'split', 'static', 'valves'].includes(m.block));
     for (const [dx, dy] of [...(melee ? [[-1.6, 0], [1.6, 0], [0, 1.6], [0, -1.6]] : []), [-6, 0], [6, 0], [0, 6], [0, -6], [-4, 4], [4, -4], [-9, 0], [9, 0]]) {
       await debug({ op: 'teleport', zone, x: boss.x + dx, y: boss.y + dy });
+      // The teleport answers late and the server may correct the spot (nearest free ground): read the hero only once it has
+      // settled on the requested point, or a stale reading picks the wrong candidate (coralregent, after choirmother).
+      await page.waitForFunction(([zone, x, y]) => Field.zone === zone && Math.hypot(Field.hero.x - x, Field.hero.y - y) < 0.8, [zone, boss.x + dx, boss.y + dy], { timeout: 3000 }).catch(() => {});
       placed = await page.evaluate(() => ({ zone: Field.zone, x: Field.hero.x, y: Field.hero.y }));
       if (Math.hypot(placed.x - boss.x - dx, placed.y - boss.y - dy) < 2) break;
     }
@@ -89,7 +92,7 @@ async function call(name, args = {}) {
     const seen = new Map();
     const shieldBoss = shipped[kind].mechanics.some(m => m.block === 'shield' || m.block === 'adds' || m.block === 'split' || m.block === 'static' || m.block === 'valves');
     const started = Date.now();
-    let fightSeen = false;
+    let fightSeen = false, diagShot = false;
     while (Date.now() - started < seconds * 1000 * (melee ? 2.2 : 1)) {
       const state = await page.evaluate(({ bx, by }) => {
         const f = BossMech.fights[0];
@@ -102,7 +105,7 @@ async function call(name, args = {}) {
           shield: !!f.shield, brk: !!(f.break && f.break.needed > 0), stunned: f.stunned || 0, marked: (f.marked || []).length, frozen: (f.frozen || []).length,
           cover: (f.tele || []).filter(t => t.tele === 'cover').length, live };
       }, { bx: boss.x, by: boss.y });
-      if (process.env.DIAG && Date.now() - started > 15000 && !seen.has('diag')) { seen.set('diag', 1); await page.screenshot({ path: path.join(world.artifacts, `diag-${kind}.png`) }); }
+      if (process.env.DIAG && Date.now() - started > 15000 && !diagShot) { diagShot = true; await page.screenshot({ path: path.join(world.artifacts, `diag-${kind}.png`) }); }
       if (process.env.DIAG && Math.round((Date.now() - started) / 500) % 12 === 0) console.log(kind, Math.round((Date.now() - started) / 1000), JSON.stringify(await page.evaluate(() => ({ f: BossMech.fights[0] || null, hero: { x: Field.hero.x, y: Field.hero.y, dir: Field.hero.dir, dead: Field.hero.dead } }))).slice(0, 700));
       if (state) {
         fightSeen = true;
