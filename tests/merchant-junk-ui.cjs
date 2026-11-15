@@ -5,7 +5,7 @@ const suite={name:'merchant-junk',mutate:page=>replace(page,'shop.js',"row.rarit
  for(const [item,quantity] of [[gray,2],['slime_gel',3],...protectedIds.map(id=>[id,1])])await debug(page,{op:'give_item',item,quantity,force:true});
  await page.waitForFunction(id=>Inventory.quantity(id)===2,gray);await page.evaluate(id=>Online.send({type:'equip',slots:{headgear:id}}),gray);await page.waitForFunction(id=>Field.hero.equipment.headgear===id,gray);
  await page.evaluate(()=>{window.junkPackets=[];const receive=Shop.onPacket;Shop.onPacket=p=>{junkPackets.push(p);receive(p);};});
- const n=await page.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='smith'));await debug(page,{op:'teleport',zone:0,x:n.x,y:n.y+1});await page.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);await page.evaluate(()=>Field.visitNpc('smith'));
+ const n=await page.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='smith'));await debug(page,{op:'teleport',zone:0,x:n.x,y:n.y+1});await page.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);await page.evaluate(()=>Field.visitNpc('smith'));await page.locator('#npc-offers [data-view="buy"]').click();
  await page.waitForFunction(()=>junkPackets.length&&document.querySelector('.merchant-workspace[aria-busy="false"]'));
  const quote=await page.evaluate(()=>junkPackets.at(-1)), before=await page.evaluate(()=>Field.hero.gold),expected=quote.available.filter(r=>r.item===gray||r.item==='slime_gel').reduce((sum,r)=>sum+r.base*r.quantity,0);
  await record(page);await page.locator('#sell-junk').tap();await page.waitForFunction(()=>Inventory.quantity('slime_gel')===0);
