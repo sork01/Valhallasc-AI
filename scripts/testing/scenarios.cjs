@@ -3704,28 +3704,30 @@ const scenarios = {
     startLevel: 85,
     levelSpread: 0,
     async run(w,check) {
-      const bot='SnowVisitor',desert=map.zones[24],area=map.zones[25];
+      // Shaped map: the Snowline is entered from Sunward Vale (path 20-26 seam), not from the Erg (no Lapis gate remains).
+      const bot='SnowVisitor',desert=map.zones[19],area=map.zones[25];
       await w.connect({bot,class:'warrior'});
-      const gate=desert.portals.find(p=>p.id==='lapis_frostwake_gate'),back=area.portals.find(p=>p.id==='frostwake_lapis_gate');
-      check(gate?.to===26&&back?.to===25,'The Snowline gates are reciprocal');
-      check(area.theme==='frostwake'&&area.levels.join(',')==='85,90'&&area.slimes.length===43&&area.slimes.filter(s=>['bellmammoth','auroramanta','crevasseleviathan'].includes(s.kind)).length===3,'Level 85–90 glacier and three elites load');
-      check(area.quests.length===10&&area.npcs.some(n=>n.id==='travel_frostwake')&&area.objects.filter(o=>o.kind==='frostwake_crevasse').length>=20,'Lantern hub, Travel Master and fractured shelf load');
-      await kit.teleport(w,bot,{zone:25,x:138,y:34});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      const gate=desert.portals.find(p=>p.id==='path_20_26'),back=area.portals.find(p=>p.id==='path_26_20');
+      check(gate?.to===26&&back?.to===20&&!!gate.seam&&!!back.seam,'The Snowline seam to Sunward Vale is reciprocal');
+      check(area.theme==='frostwake'&&area.levels.join(',')==='85,90'&&area.slimes.length>=43&&area.slimes.filter(s=>['bellmammoth','auroramanta','crevasseleviathan'].includes(s.kind)).length===3,'Level 85–90 glacier and three elites load');
+      check(area.quests.length>=10&&area.npcs.some(n=>n.id==='travel_frostwake')&&area.objects.filter(o=>o.kind==='frostwake_crevasse').length>=20,'Lantern hub, Travel Master and fractured shelf load');
+      const enter=crossingPath(gate);await kit.teleport(w,bot,{zone:20,x:enter.start.x,y:enter.start.y});await w.advance(700);await w.action(bot,{type:'move',x:enter.goal.x,y:enter.goal.y});
       await w.waitFor(()=>w.player(bot).zone===26,15000,'Enter Frostwake');await w.action(bot,{type:'stop'});
-      check(distance(w.player(bot),area.spawn)<2,'Snowline arrives at a safe camp edge');
+      check(distance(w.player(bot),{x:gate.tx,y:gate.ty})<2,'Snowline seam arrives at its landing (shaped layout)');
       await w.connect({bot:'DesertWitness',class:'mage'});
       check(w.views.get(bot).slimes.every(s=>s.zone===26)&&w.views.get('DesertWitness').slimes.every(s=>s.zone===0),'Glacier encounters stay in their own view');
       await kit.teleport(w,bot,{npc:'travel_frostwake'});
       const travel=await kit.talkTo(w,bot,'travel_frostwake');
-      check(travel.travelStops?.includes('travel_frostwake')&&area.npcs.find(n=>n.id==='travel_frostwake').travelLinks.includes('travel_azure_wells'),'Travel Master Eira links Azure Wells');
+      const frostLinks=area.npcs.find(n=>n.id==='travel_frostwake').travelLinks;
+      check(travel.travelStops?.includes('travel_frostwake')&&frostLinks.includes('travel_millbridge')&&frostLinks.every(id=>map.zones.some(z=>z.npcs.some(n=>n.id===id&&n.travelLinks?.includes('travel_frostwake')))),'Travel Master Eira links Millbridge, and every link is reciprocal (Azure Wells is no longer linked)');
       await kit.teleport(w,bot,{npc:'frostwake_captain'});await kit.talkTo(w,bot,'frostwake_captain','quest:accept:frostwake_welcome');
       for(const id of ['frostwake_healer','frostwake_surveyor','frostwake_scout']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
       await w.waitFor(()=>quest(w,bot,'frostwake_welcome')?.counts.every(n=>n===1),5000,'Meet snow crew');
-      await kit.teleport(w,bot,{npc:'frostwake_captain'});await kit.talkTo(w,bot,'frostwake_captain','quest:claim:frostwake_welcome');
+      await kit.teleport(w,bot,{npc:'frostwake_captain'});await kit.talkTo(w,bot,'frostwake_captain',claimOf(area,'frostwake_welcome'));
       await w.waitFor(()=>quest(w,bot,'frostwake_welcome')?.claimed,5000,'Claim snow introduction');
       check(quest(w,bot,'frostwake_welcome')?.claimed,'The quest hub introduction claims');
       for(const [kind,material] of [['snowhare','snowhare_fur'],['iceotter','iceotter_pelt'],['frostheron','heron_feather'],['glaciercrab','glaciercrab_shell'],['bellmammoth','mammoth_bell'],['auroramanta','manta_aurora'],['crevasseleviathan','leviathan_fang']]){
-        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        const enemy=await enemyOf(w,bot,26,area,kind),before=totalXp(w.player(bot));
         await w.debug(bot,{op:'kill_enemy',id:enemy.id});
         await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
         check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
@@ -3733,9 +3735,9 @@ const scenarios = {
       await kit.teleport(w,bot,{zone:26,x:119,y:25});
       await w.restart();
       check(w.player(bot).zone===26&&w.player(bot).travelStops.includes('travel_frostwake')&&quest(w,bot,'frostwake_welcome')?.claimed,'Glacier location, quest and travel discovery persist');
-      await kit.teleport(w,bot,{zone:26,x:15,y:137});await w.action(bot,{type:'move',x:back.x,y:back.y});
-      await w.waitFor(()=>w.player(bot).zone===25,15000,'Return to Lapis Erg');
-      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return lands safely on the desert rim');
+      const home=crossingPath(back);await kit.teleport(w,bot,{zone:26,x:home.start.x,y:home.start.y});await w.advance(700);await w.action(bot,{type:'move',x:home.goal.x,y:home.goal.y});
+      await w.waitFor(()=>w.player(bot).zone===20,15000,'Return to Sunward Vale');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return lands at the Snowline seam landing in Sunward Vale');
     },
   },
   cairn: {
