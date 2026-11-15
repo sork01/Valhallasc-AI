@@ -6,6 +6,7 @@ const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
 const w = new TestWorld();
+const mutateKind = process.env.MUTATE_KIND || '';
 const allKinds = [
   'astro_gearling', 'astro_starling', 'astro_sentinel',
   'astro_warden', 'astro_navigator', 'astro_axis',

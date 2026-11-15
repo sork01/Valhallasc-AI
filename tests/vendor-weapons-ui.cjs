@@ -11,10 +11,11 @@ const check = (ok, message) => { assert.ok(ok, message); checks++; };
   for (const [cls, lang] of [['warrior','en'], ['mage','en'], ['assassin','en'], ['priest','en'], ['hunter','en'], ['hunter','sv']]) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } }), errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    if (process.env.MUTATE) await page.route('**/city.js', route => {
-      const code = fs.readFileSync(path.join(__dirname, '../client/city.js'), 'utf8');
-      const guard = "if(weapon&&tier.class!==(packet.look?.class||Field.hero.look.class))continue;";
-      assert.ok(code.includes(guard)); return route.fulfill({ contentType: 'application/javascript', body: code.replace(guard, '') });
+    if (process.env.MUTATE) await page.route('**/shop.js', route => {
+      // Mutation: the stock shows other classes' weapons; the own-class count check must fail.
+      const code = fs.readFileSync(path.join(__dirname, '../client/shop.js'), 'utf8');
+      const guard = "(item.kind !== 'weapon' || !item.class || item.class === Field.hero.look.class)";
+      assert.ok(code.includes(guard)); return route.fulfill({ contentType: 'application/javascript', body: code.replace(guard, 'true') });
     });
     await page.addInitScript(lang => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang, sound: false })), lang);
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
@@ -29,23 +30,28 @@ const check = (ok, message) => { assert.ok(ok, message); checks++; };
       await page.waitForFunction(level => Field.hero.level === level && Field.hero.gold === 100000, level);
       await page.waitForTimeout(650);
       await page.evaluate(() => Online.send({ type: 'interact', npc: 'smith' }));
-      const row = page.locator(`#npc-offers [data-offer="buy_green_weapon_${cls}"]`);
+      // The greeting opens with Buy and Sell; the weapon stock lives behind Buy.
+      await page.locator('#npc-offers [data-view="buy"]').click();
+      await page.waitForFunction(() => Shop.open && document.querySelector('.merchant-workspace[aria-busy="false"]'));
+      const row = page.locator(`#merchant-stock [data-offer="buy_green_weapon_${cls}"]`);
       await row.waitFor({ state: 'visible' });
-      check(await page.locator('#npc-offers [data-offer^="buy_green_weapon_"]').count() === 1, `${cls}/${lang}/${level}: only own-class weapon is shown`);
+      check(await page.locator('#merchant-stock [data-offer^="buy_green_weapon_"]').count() === 1, `${cls}/${lang}/${level}: only own-class weapon is shown`);
       const step = Math.max(10, Math.min(90, Math.floor(level / 10) * 10));
       const item = items.find(i => i.family === `vendor_weapon_${cls}` && i.requiredLevel === step);
-      check(await row.getAttribute('data-tier') === item.id, `${cls}/${level}: correct decade weapon`);
-      check((await row.locator('.gossip-tag').textContent()).includes(String(10 * step * step)), `${cls}/${level}: correct catalog price`);
+      // The row shows the tier's name (the client picks the best tier at or below the level, falling back to the first tier).
+      const tierName = await page.evaluate(name => Locale.translate(name), item.name);
+      check((await row.textContent()).includes(tierName), `${cls}/${level}: correct decade weapon`);
+      check(await row.locator('.money').first().getAttribute('data-copper') === String(item.price) && item.price === 10 * step * step, `${cls}/${level}: correct catalog price`);
       check(await row.isDisabled() === (level < 10), `${cls}/${level}: level gate matches server`);
       check(!(await row.textContent()).includes('undefined'), `${cls}/${level}: weapon details do not use consumable text`);
       if (lang === 'sv') {
-        await page.waitForFunction(() => document.querySelector('[data-offer="buy_green_weapon_hunter"]').textContent.includes('nivå 90'));
-        check((await row.textContent()).startsWith('Köp '), 'Swedish weapon purchase label and level are translated');
+        await page.waitForFunction(() => document.querySelector('#merchant-stock [data-offer="buy_green_weapon_hunter"] .merchant-item-detail b')?.textContent.trim());
+        check((await row.textContent()).includes(await page.evaluate(name => Locale.translate(name), item.name)), 'Swedish weapon name is translated in the shop row');
         check(await page.evaluate(() => Locale.translate('Requires level 10.')) === 'Kräver nivå 10.', 'Swedish level refusal is translated');
         check(await page.evaluate(() => Locale.translate('This weapon is for another class.')) === 'Det här vapnet är för en annan klass.', 'Swedish class refusal is translated');
       }
       if ([10,90].includes(level)) {
-        check(await row.locator('.gossip-label').evaluate(n => getComputedStyle(n).color) === 'rgb(111, 207, 134)', 'Green weapon rarity is visible in the shop');
+        check(await row.getAttribute('data-rarity') === 'uncommon' && item.rarity === 'uncommon', 'Green weapon rarity is recorded on the shop row');
         await row.hover(); await page.locator('#item-tooltip').waitFor({ state: 'visible' });
         const translatedName = await page.evaluate(name => Locale.translate(name), item.name);
         check((await page.locator('#item-tooltip').textContent()).includes(translatedName), 'Weapon tooltip opens without errors');

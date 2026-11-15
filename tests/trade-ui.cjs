@@ -1,5 +1,6 @@
 // Two real browsers and a private server exercise trade requests, offer review, confirmation and cancellation.
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
@@ -20,6 +21,13 @@ async function call(name, args = {}) {
   async function player(name) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     page.on('pageerror', e => errors.push(`${name}: ${e.message}`));
+    if (process.env.MUTATE) await page.route('**/trade.js', route => {
+      // Mutation: the other player's offer drops its gold line; the offer check must fail.
+      const code = fs.readFileSync(path.join(root, 'client/trade.js'), 'utf8');
+      const line = 'Money.set(li, offer?.gold || 0);';
+      assert.ok(code.includes(line));
+      return route.fulfill({ contentType: 'application/javascript', body: code.replace(line, '') });
+    });
     await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 60000 });
@@ -53,7 +61,7 @@ async function call(name, args = {}) {
   await bob.locator('#trade-gold').fill('5'); await bob.locator('#trade-set-gold').click();
   try { await alice.waitForFunction(() => Trade.state?.theirs.gold === 5 && Trade.state?.mine.gold === 10, null, { timeout: 10000 }); }
   catch (e) { throw new Error(`Offer did not settle: ${JSON.stringify(await alice.evaluate(() => ({ trade: Trade.state, notice: document.querySelector('#social-notice').textContent, log: document.querySelector('#chat-log').textContent.slice(-300) })))}; ${e.message}`); }
-  check(await alice.locator('#trade-theirs').textContent().then(t => t.includes('Blue Slime Gel ×1') && t.includes('5 gold')), 'The other offer shows item and gold before confirmation');
+  check(await alice.locator('#trade-theirs').textContent().then(t => t.includes('Blue Slime Gel ×1')) && await alice.locator('#trade-theirs .money[data-copper="5"]').count() === 1, 'The other offer shows item and 5 copper before confirmation');
   await alice.locator('#trade-confirm').click();
   await alice.waitForFunction(() => Trade.state?.mine.ready === true);
   check(await count(alice, 'slime_gel') === 3 && await alice.evaluate(() => Field.hero.gold) === 50, 'One confirmation transfers nothing');
