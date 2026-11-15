@@ -132,7 +132,7 @@ async function stageAt(page, point) {
   await warrior.keyboard.down('d');await delay(500);await warrior.keyboard.up('d');await delay(400);
   await warrior.waitForFunction(()=>!Field.hero.moving && Math.hypot(Field.hero.x-Field.hero.nx,Field.hero.y-Field.hero.ny)<.05);
   const moved=await warrior.evaluate(()=>({x:Field.hero.nx,y:Field.hero.ny}));
-  check(Math.hypot(moved.x-start.x,moved.y-start.y)>.8 && Math.hypot(moved.x-start.x,moved.y-start.y)<4, 'Server controlled keyboard movement');
+  check(Math.hypot(moved.x-start.x,moved.y-start.y)>.8 && Math.hypot(moved.x-start.x,moved.y-start.y)<4, 'Server controlled keyboard movement (moved '+Math.hypot(moved.x-start.x,moved.y-start.y).toFixed(2)+' tiles from '+JSON.stringify(start)+' to '+JSON.stringify(moved)+')');
   await mage.waitForFunction(({id,x,y})=>{const p=Field.remotePlayers.find(p=>p.id===id);return p && Math.hypot(p.x-x,p.y-y)<.2;},{id:warriorId,...moved});passed++;
   const blocker=await warrior.evaluate(()=>{const p=Field.remotePlayers.find(p=>p.look.class==='assassin');return {x:p.x,y:p.y};});
   await warrior.evaluate(p=>Online.send({type:'move',...p}),blocker);
@@ -173,11 +173,13 @@ async function stageAt(page, point) {
     await warrior.evaluate(()=>Online.send({type:'interact',npc:'healer',offer:'blessing'}));
     await warrior.waitForFunction(()=>document.getElementById('chat-log').textContent.includes('Walk closer'));passed++;
     check(await warrior.locator('#npc-dialogue').isHidden(),'Remote NPC interaction cannot open a shop');
-    // Staged near the gate, so the walk through it (what is under test) is short.
-    await stageAt(warrior,{x:36,y:69});
+    // Staged near the north gate (the Greenmeadow spawn, 12 tiles above Alderhaven's opening), so the walk through it (what is under test) is short.
+    // The old stage (36,69) was a pocket the client cannot route out of: Field.visitCity's route was empty and the hero never moved.
+    const gate=map.cityEntrances.find(e=>e.id==='alderhaven_north').opening;
+    await stageAt(warrior,{x:map.spawn.x,y:map.spawn.y});
     await warrior.locator('#city-travel').click();
     try {
-      await warrior.waitForFunction(()=>Field.hero.y>78.6&&Field.hero.y<80&&Math.abs(Field.hero.x-36)<.4,null,{timeout:40000});
+      await warrior.waitForFunction(g=>Field.hero.y>g.y+1.5&&Math.abs(Field.hero.x-g.x)<g.halfWidth,gate,{timeout:40000});
     } catch(error) {
       console.error('City travel stalled:',await warrior.evaluate(()=>({hero:{x:Field.hero.x,y:Field.hero.y},nearby:[...Field.remotePlayers,...Field.slimes].filter(a=>!a.dead&&Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)<4).map(a=>({id:a.id,x:a.x,y:a.y}))})));
       throw error;
@@ -197,16 +199,19 @@ async function stageAt(page, point) {
     }
     async function clickNpc(page,id) {
       const point=await page.evaluate(id=>{const n=City.npcs.find(n=>n.id===id),[x,y]=Field._debug.w2s(n.x,n.y),r=document.getElementById('fieldcv').getBoundingClientRect();return {x:r.left+x/1600*r.width,y:r.top+(y-60)/900*r.height};},id);
+      // A tutorial tip (a new quest, Alderhaven's first visit) can sit over the NPC and take the click: dismiss it first, as other suites do.
+      await page.evaluate(() => { const tip = document.getElementById('tutorial-tip'); if (tip && !tip.hidden) document.getElementById('tutorial-disable')?.click(); });
       await page.mouse.click(point.x,point.y);await page.locator('#npc-dialogue').waitFor({state:'visible'});
     }
-    await walkTo(warrior,{x:32,y:80});await delay(400);await clickNpc(warrior,'healer');
+    // Alderhaven's plaza (map.city.plaza) is open ground in the middle of the town; the old (32,80) sat outside the shaped city.
+    await walkTo(warrior,{x:map.city.plaza.x,y:map.city.plaza.y});await delay(400);await clickNpc(warrior,'healer');
     check(await warrior.locator('#npc-name').textContent()==='Sister Elara','Clicking an NPC opens the correct dialogue');
     const cityGold=await warrior.evaluate(()=>Field.hero.gold);
     await warrior.locator('[data-offer="blessing"]').click();
     await warrior.waitForFunction(()=>document.getElementById('npc-notice').textContent.includes('full health'));
     check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Sanctuary blessing is free and does not charge full-health players');
     await warrior.locator('#npc-x').click();
-    await walkTo(warrior,{x:33,y:88});await delay(400);
+    await walkTo(warrior,{x:map.city.plaza.x,y:map.city.plaza.y});await delay(400);
     await warrior.evaluate(()=>Online.send({type:'equip',armor:'none',weapon:'none'}));
     await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='none');
     await clickNpc(warrior,'smith');await warrior.locator('[data-offer="fitting"]').click();
@@ -214,7 +219,7 @@ async function stageAt(page, point) {
     await mage.waitForFunction(id=>Field.remotePlayers.find(p=>p.id===id)?.look.warriorWeapon==='sword',warriorId);passed++;
     check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Armorer service equips server-owned class gear without charging');
     await warrior.screenshot({path:path.join(root,'test-results/city-armorer.png')});await warrior.locator('#npc-x').click();
-    await walkTo(warrior,{x:40,y:79});await delay(400);await clickNpc(warrior,'apothecary');
+    await walkTo(warrior,{x:map.city.plaza.x,y:map.city.plaza.y});await delay(400);await clickNpc(warrior,'apothecary');
     check(await warrior.locator('[data-offer="tonic"]').isDisabled(),'Shop shows an unaffordable item without allowing a purchase');
     await warrior.locator('#npc-x').click();
   };
@@ -241,9 +246,15 @@ async function stageAt(page, point) {
   await mage.locator('#npc-x').click();
   // Beetles moved with the shaped Greenmeadow: stage the fighter on open ground with no other monster within 20 tiles (the crowd at x 280 killed
   // other beetles and paid their gold into the same window), and keep the warrior in snapshot range to see the death.
-  await stageAt(warrior,{x:252,y:192});
-  await stageAt(mage,{x:244,y:188});
+  // The beetle must stand clear of every guarded hub: outpost guards (world/guards.rs) fight any enemy within 3 tiles of a hub (6.5 once it
+  // chases), and a guard's kill pays no XP, gold or kill credit to any player (hit_slime's guard_tainted return). The previous staging at
+  // (244,188) sat inside Alderhaven, and the beetle spawned 1 tile above its edge, so the guards killed it.
+  const guardedHubs=[map.city,...(map.camps||[])];
+  const hubGap=p=>Math.min(...guardedHubs.map(h=>Math.hypot(Math.max(h.x0-p.x,0,p.x-h.x1),Math.max(h.y0-p.y,0,p.y-h.y1))));
+  await stageAt(warrior,{x:252,y:236});
+  await stageAt(mage,{x:244,y:236});
   const at=await mage.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));
+  check(hubGap(at)>=10 && hubGap({x:at.x+3,y:at.y})>=10, 'The beetle is staged at least 10 tiles from every guarded hub (guards kill enemies that come near a hub and pay no XP or kill credit for them)');
   const spawned=await shortcut(mage,{op:'spawn_enemy',kind:'beetle',x:at.x+3,y:at.y,level:1});
   await mage.waitForFunction(({id,x})=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&s.kind==='beetle';},{id:spawned.id},{timeout:10000});
   const beetleState=await mage.evaluate(id=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.id===id),kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level,xpNeed:Field.hero.xpNeed,gold:Field.hero.gold}),spawned.id);
