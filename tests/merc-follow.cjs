@@ -5,13 +5,19 @@ const { route } = require('../scripts/testing/route.cjs');
 const fs = require('node:fs');
 const map = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, '../world/map.txt'))).zones[3];
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+// Perpendicular distance from the straight line from->to: a detour bends off it, a straight walk does not.
+const offLine = (p, from, to) => {
+  const dx = to.x - from.x, dy = to.y - from.y, len = Math.hypot(dx, dy) || 1;
+  return Math.abs((p.x - from.x) * dy - (p.y - from.y) * dx) / len;
+};
 const w = new TestWorld();
 const mercs = () => (w.snapshot?.players || []).filter(p => p.look.name.startsWith('Merc '));
 (async () => {
   w.startLevel = 20; w.levelSpread = 0;
   await w.start(); await w.connect({ bot: 'hirer', class: 'warrior' });
   await w.debug('hirer', { op: 'set_gold', gold: 10000 });
-  await w.debug('hirer', { op: 'teleport', zone: 4, x: 101.7, y: 119.7 });
+  // Beside the Meeting Stone (zones[3] NPC city_meetingstone at 81.2,122.7); interact range is 2.8 tiles.
+  await w.debug('hirer', { op: 'teleport', zone: 4, x: 81.2, y: 123.7 });
   for (const cls of ['mage', 'assassin', 'priest', 'hunter']) {
     await w.advance(600);
     await w.action('hirer', { type: 'interact', npc: 'city_meetingstone', offer: `merc_${cls}` });
@@ -21,8 +27,10 @@ const mercs = () => (w.snapshot?.players || []).filter(p => p.look.name.startsWi
   assert.equal(w.player('hirer').gold, 5200);
   let checks = 2;
   for (const [from, to] of [
-    [{ x: 93, y: 58 }, { x: 107, y: 58 }],
-    [{ x: 69, y: 27 }, { x: 55, y: 27 }],
+    // Shaped Skaldholm (2026-11): the old x 93..107 / 55..69 endpoints are void. Each pair runs straight through a
+    // building's centre (the Hall at 79.5,61 and the house at 85.5,99), so the route bends 4+ tiles off the line.
+    [{ x: 79.5, y: 66.5 }, { x: 79.5, y: 55.5 }],
+    [{ x: 79.5, y: 99.5 }, { x: 91.5, y: 98.5 }],
   ]) {
     // Cross-zone setup brings the whole hired group to a known, safe starting point.
     await w.debug('hirer', { op: 'teleport', zone: 0, x: 80, y: 25 });
@@ -50,7 +58,8 @@ const mercs = () => (w.snapshot?.players || []).filter(p => p.look.name.startsWi
       await w.waitFor(() => mercs().length === 4 && mercs().every(p => distance(p, to) < 4), 30000, 'All four hired fighters walk around the building');
       assert.equal(failure, undefined); checks++;
       for (const cls of ['mage', 'assassin', 'priest', 'hunter']) {
-        assert.ok(trace.some(p => p.class === cls && Math.abs(p.y - from.y) > 2.5), `${cls} took the detour`); checks++;
+        const worst = Math.max(0, ...trace.filter(p => p.class === cls).map(p => offLine(p, from, to)));
+        assert.ok(worst > 2.5, `${cls} took the detour (largest offset ${worst.toFixed(2)}, samples ${trace.filter(p => p.class === cls).length})`); checks++;
       }
     } finally { w.off('change', inspect); }
   }
