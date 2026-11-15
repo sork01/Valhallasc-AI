@@ -160,9 +160,14 @@
     const put = (t, V, k, depth, kind) => { if (depth >= z[t]) return; pixels.set(V.frame.pixels.subarray(k * 4, k * 4 + 4), t * 4); z[t] = Math.max(0, Math.min(65534, depth)); shell[t] = kind; };
     // The shell at surface angle `a` (quarter turns from the face) on row v: the front drawing covers -1..1, the back one the rest. Sampling
     // stops one pixel short of each drawing's side outline, so no outline lands where the two meet.
+    // Past the profile (|q| > 1.25) the front drawing shows only the face opening's rim beyond the visible half, so it is never used there.
+    // The sliver instead folds the back drawing's outer half over itself (a -> 2 sign(a) - a), which meets the back drawing at a = +-1.
+    // The threshold sits in the empty gap between the side poses (|q| <= 1.13) and the back-quarter poses (|q| >= 1.37), so no animation frame switches.
+    const backTurn = Math.abs(q) > 1.25;
     const surface = (a, v, Rv) => {
       const inner = Math.max(1, Rv - 1);
-      if (Math.abs(a) <= 1) { const k = F.at(a * inner, v); return k < 0 || F.stand[k] ? null : [F, k]; }
+      if (Math.abs(a) <= 1 && !backTurn) { const k = F.at(a * inner, v); return k < 0 || F.stand[k] ? null : [F, k]; }
+      if (Math.abs(a) <= 1) a = (a >= 0 ? 2 : -2) - a;
       const k = B.at((a > 0 ? a - 2 : a + 2) * inner, v); return k < 0 || B.stand[k] ? null : [B, k];
     };
     for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) {

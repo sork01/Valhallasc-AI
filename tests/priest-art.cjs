@@ -98,7 +98,16 @@ const server = http.createServer((req, res) => {
           g.drawImage(sprite.frame('idle', dir, 0), dir * 160, row * 200 + 25);
           g.fillText(`${row ? 'Female' : 'Male'} ${sprite.meta.dirs[dir]}`, dir * 160 + 35, row * 200 + 20);
         }
-        reports.push({ frames, trim });
+        // Every pose and frame: the rear-quarter facings (3, 4, 5) must show no gold trim anywhere in the head layer.
+        let backGold = 0;
+        for (const [clip, spec] of Object.entries(sprite.meta.clips)) for (const dir of [3, 4, 5]) for (let k = 0; k < spec.n; k++) {
+          const f = sprite.source.parts.head_pilgrim[`${clip}/${dir}/${k}`];
+          for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
+            const p = (y * f.w + x) * 4;
+            if (f.pixels[p] === 232 && f.pixels[p + 1] === 184 && f.pixels[p + 2] === 64 && f.pixels[p + 3]) backGold++;
+          }
+        }
+        reports.push({ frames, trim, backGold });
       }
       return { reports, png: canvas.toDataURL() };
     }, hair);
@@ -114,6 +123,7 @@ const server = http.createServer((req, res) => {
       assert.ok(report.trim[6] > 2, 'east-facing hood opening turns right');
       assert.ok(Math.abs(report.trim[0]) < 2, 'front-facing hood stays centered');
       assert.ok([3, 4, 5].every(dir => report.trim[dir] === null), 'rear-facing hoods stay closed: trim ' + JSON.stringify(report.trim));
+      assert.equal(report.backGold, 0, 'rear-facing hoods stay closed in every pose and frame: gold trim pixels ' + report.backGold);
     }
     assert.deepEqual(errors, []);
     fs.mkdirSync(output, { recursive: true });

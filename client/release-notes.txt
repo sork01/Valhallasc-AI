@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.55.11",
+    "date": "2026-11-15",
+    "new": [],
+    "changed": [
+      "Hoods and helmets now look closed from behind. Seen from the back or the back corners, a hood no longer shows its gold face-opening trim or a patch of face; you see the back of the hood, as when walking straight away."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.10",
     "date": "2026-11-15",
     "new": [],
