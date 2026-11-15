@@ -62,7 +62,7 @@ const skills = [
     }
     if (id === 'titanswrath') {
       // Debug replies only reach window.GM.onReply: capture them so a refused spawn says why.
-    await page.evaluate(() => { window.debugReplies = []; window.GM = { onReply: p => debugReplies.push(p) }; });
+    await page.evaluate(() => { window.debugReplies = []; window.GM = Object.assign(window.GM || {}, { onReply: p => debugReplies.push(p) }); });
     // One resend if the first request gets no answer; the reply is checked below.
       let spawned = false;
       for (let attempt = 0; attempt < 2 && !spawned; attempt++) {
