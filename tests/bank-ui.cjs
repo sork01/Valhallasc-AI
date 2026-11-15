@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const { chromium } = require('./lib/playwright.cjs');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
 
-const BANKER = { id: 'banker_alderhaven', zone: 0, x: 39, y: 83.6 };
+const BANKER = { id: 'banker_alderhaven', zone: 0, x: 253, y: 189.5 };
 const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: '${lang}', sound: false, char: null, draft: null }));`;
 
 (async () => {
@@ -24,8 +24,9 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     assert.ok(GEAR, 'the hero wears a weapon from the catalog');
     const debug = (ref, command) => page.evaluate(([ref, command]) => Online.send({ type: 'debug', ref, command }), [ref, command]);
     const gotoBanker = async () => {
-      await debug(1, { op: 'teleport', zone: BANKER.zone, x: BANKER.x, y: BANKER.y });
-      await page.waitForFunction(b => Field.zone === b.zone && Math.hypot(Field.hero.x - b.x, Field.hero.y - b.y) < 1, BANKER, { timeout: 10000 });
+      // Stand two tiles north of the banker (teleport lands on the nearest free ground; the same pattern as consumables-ui).
+      await debug(1, { op: 'teleport', zone: BANKER.zone, x: BANKER.x, y: BANKER.y - 2 });
+      await page.waitForFunction(b => Field.zone === b.zone && Math.hypot(Field.hero.x - b.x, Field.hero.y - b.y) < 2.6, BANKER, { timeout: 10000 });
     };
     const openBank = async () => {
       await page.evaluate(id => Online.send({ type: 'interact', npc: id }), BANKER.id);
@@ -54,7 +55,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     assert.match(await page.locator('#bank-capacity').textContent(), /^0\/48 slots · 48 free$/);
     assert.equal(await page.locator('#bank-grid .bag-cell').count(), 48, 'one cell per bank slot');
     assert.equal(await count('slime_gel', 'bags'), 30);
-    assert.match(await page.locator('#bank-gold').textContent(), /^0 gold$/);
+    assert.match(await page.locator('#bank-gold').textContent(), /^0 copper\s*$/);
     assert.match(await page.locator('#bank-purse').textContent(), /2 gold/);
     assert.match(await page.locator('#bank-expand').textContent(), /1 gold/);
 
@@ -105,11 +106,11 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     // Gold has its own balance and never touches the services' purse.
     await page.locator('#bank-gold-amount').fill('5000');
     await page.locator('#bank-gold-deposit').click();
-    await page.waitForFunction(() => /^5,000 gold$/.test(document.getElementById('bank-gold').textContent));
+    await page.waitForFunction(() => /^50 silver\s*$/.test(document.getElementById('bank-gold').textContent));
     assert.match(await page.locator('#bank-purse').textContent(), /1 gold\s*50 silver/);
     await page.locator('#bank-gold-amount').fill('2000');
     await page.locator('#bank-gold-withdraw').click();
-    await page.waitForFunction(() => /^3,000 gold$/.test(document.getElementById('bank-gold').textContent));
+    await page.waitForFunction(() => /^30 silver\s*$/.test(document.getElementById('bank-gold').textContent));
     assert.match(await page.locator('#bank-purse').textContent(), /1 gold\s*70 silver/);
 
     // The expansion: 10,000 gold, +12 cells, and the next one costs more than the purse holds.
@@ -124,11 +125,12 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     // Gear: two loose copies of one ID open a copy list, and one named copy goes in; the worn copy stays on the hero.
     const looseBefore = await page.evaluate(g => Inventory.looseCopies(g).length, GEAR);
     assert.ok(looseBefore >= 2, 'two loose copies');
-    await bank(GEAR, 'bags').locator('button').click();
-    await page.locator('#bank-details .bank-copy').first().waitFor();
-    assert.equal(await page.locator('#bank-details .bank-copy').count(), looseBefore);
-    const copyId = await page.locator('#bank-details .bank-copy').last().getAttribute('data-copy');
-    await page.locator('#bank-details .bank-copy').last().locator('button').click();
+    // GEAR-NO-STACK: each loose copy has its own bag cell (with data-copy), so one click on a cell moves that copy.
+    const gearCells = bank(GEAR, 'bags');
+    assert.equal(await gearCells.count(), looseBefore, 'one bag cell per loose copy');
+    const copyId = await gearCells.last().getAttribute('data-copy');
+    assert.ok(copyId, 'the copy cell names its copy');
+    await gearCells.last().locator('button').click();
     await page.waitForFunction(g => document.querySelector(`#bank-grid [data-item="${g}"]`), GEAR);
     assert.equal(await page.evaluate(g => Inventory.looseCopies(g).length, GEAR), looseBefore - 1, 'one copy left the bags');
     assert.equal(await page.evaluate(g => Inventory.quantity(g) - Inventory.bagQuantity(g), GEAR), 1, 'the worn copy stays on the hero');
@@ -162,7 +164,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     await openBank();
     assert.equal(await count('slime_gel', 'bank'), 27);
     assert.ok(await bank(GEAR).count(), 'the gear copy is still banked');
-    assert.match(await page.locator('#bank-gold').textContent(), /^3,000 gold$/);
+    assert.match(await page.locator('#bank-gold').textContent(), /^30 silver\s*$/);
     assert.match(await page.locator('#bank-capacity').textContent(), /^2\/60 slots/);
     await page.keyboard.press('Escape');
 
@@ -220,7 +222,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     const svText = await sv.evaluate(() => document.getElementById('bank-panel').innerText + '\n' + document.getElementById('item-tooltip').innerText + '\n' + [...document.querySelectorAll('#bank-panel [aria-label]')].map(n => n.getAttribute('aria-label')).join('\n'));
     for (const english of ['Deposit', 'Withdraw', 'Money in the bank', 'Sort by kind', 'Click an item', 'Expand the bank', 'Expansion 1', 'It is never refunded', 'in the bank', 'Empty bank slot', 'Click to take', 'Close the bank', 'Choose a quantity'])
       assert.ok(!svText.includes(english), `"${english}" is translated in Swedish`);
-    for (const swedish of ['Sätt in guld', 'Ta ut guld', 'Guld i banken', 'Utökning 1 av 4', 'Stäng', 'Klicka för att ta ut', 'i banken'])
+    for (const swedish of ['Sätt in', 'Ta ut', 'Pengar i banken', 'Utökning 1 av 4', 'Stäng', 'Klicka för att ta ut', 'i banken'])
       assert.ok(svText.includes(swedish), `"${swedish}" is shown in Swedish`);
     await sv.close();
 
@@ -245,7 +247,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     const fit = await phone.evaluate(() => {
       const r = document.querySelector('.bank-panel').getBoundingClientRect();
       const small = [...document.querySelectorAll('#bank-panel button:not([hidden]), #bank-panel input')].filter(n => n.offsetParent && !n.closest('.bank-grid'))
-        .map(n => ({ id: n.id || n.textContent.trim(), w: n.getBoundingClientRect().width, h: n.getBoundingClientRect().height })).filter(n => n.w < 44 || n.h < 44);
+        .map(n => ({ id: n.id || n.textContent.trim(), w: n.getBoundingClientRect().width, h: n.getBoundingClientRect().height })).filter(n => n.w < 43.9 || n.h < 43.9); // 0.1px tolerance: the window scale transform rounds 44 to 43.997
       const wide = [...document.querySelectorAll('#bank-panel *')].filter(n => n.getBoundingClientRect().right > r.right + 1).map(n => n.tagName + '.' + n.className);
       return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, w: innerWidth, h: innerHeight, scrollW: document.documentElement.scrollWidth, small, wide };
     });
@@ -278,7 +280,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     assert.equal(await acct.locator('#chars-msg').textContent(), '', 'no warning before the first click');
     await acct.locator('.char-del').first().click();
     assert.equal(await acct.locator('.char-del').first().textContent(), 'Really?');
-    assert.match(await acct.locator('#chars-msg').textContent(), /Deleting Vaulter also deletes the bank\. Items in it: 4\. Gold in it: 1,200\./);
+    assert.match(await acct.locator('#chars-msg').textContent(), /Deleting Vaulter also deletes the bank\. Items in it: 4\. Money in it: 12 silver\./);
     await acct.close();
 
     assert.deepEqual(errors, [], 'bank UI has no page errors');

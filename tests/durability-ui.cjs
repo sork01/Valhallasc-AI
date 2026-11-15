@@ -54,7 +54,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='worn',null,{timeout:15000});
   assert.equal(await slot.evaluate(el=>el.style.getPropertyValue('--dur')),'90');
   await slot.locator('.gear-icon').hover();
-  await page.waitForFunction(()=>/Durability 90%/.test(document.querySelector('.item-tooltip,#item-tooltip,[role="tooltip"]')?.textContent||''),null,{timeout:10000});
+  await page.waitForFunction(()=>/Durability 90%/.test(document.querySelector("#item-tooltip")?.textContent||''),null,{timeout:10000});
   assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'ok');
   for(let n=0;n<6;n++)await die(); // 70% worn
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='low',null,{timeout:15000});
@@ -63,11 +63,13 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   const crack=slot.locator('.item-break');
   assert.equal(await crack.count(),1,'broken worn gear has a crack across the icon');
   assert.equal(await crack.evaluate(el=>getComputedStyle(el).pointerEvents),'none','the crack does not block item controls');
-  const red=Number(execFileSync('python3',['-c','import sys,io; from PIL import Image; im=Image.open(io.BytesIO(sys.stdin.buffer.read())).convert("RGB"); w,h=im.size; print(sum(1 for y in range(int(h*.2)+1,int(h*.8)) for x in range(int(w*.2)+1,int(w*.8)) if (lambda c:c[0]>200 and c[1]<85 and c[2]<85)(im.getpixel((x,y)))))'],{input:await slot.locator('.gear-icon').screenshot(),encoding:'utf8'}));
+  // Count the red pixels in the icon's middle inside the browser (no Python imaging library on the test host).
+  const shot=(await slot.locator('.gear-icon').screenshot()).toString('base64');
+  const red=await page.evaluate(async b64=>{const img=new Image();img.src='data:image/png;base64,'+b64;await img.decode();const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);const w=c.width,h=c.height,d=x.getImageData(0,0,w,h).data;let n=0;for(let y=Math.floor(h*.2)+1;y<Math.floor(h*.8);y++)for(let X=Math.floor(w*.2)+1;X<Math.floor(w*.8);X++){const i=(y*w+X)*4;if(d[i]>200&&d[i+1]<85&&d[i+2]<85)n++;}return n;},shot);
   assert.ok(red>10,'a large red crack is painted over the actual icon');
   assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'broken','the bags button warns while a worn piece is broken');
   await slot.locator('.gear-icon').hover();
-  await page.waitForFunction(()=>/Broken/.test(document.querySelector('.item-tooltip,#item-tooltip,[role="tooltip"]')?.textContent||''),null,{timeout:10000});
+  await page.waitForFunction(()=>/Broken/.test(document.querySelector("#item-tooltip")?.textContent||''),null,{timeout:10000});
   assert.equal(await page.evaluate(()=>Field.hero.equipment.necklace),'necklace_upgrade','a broken piece stays worn');
   await page.evaluate(()=>Field.equipSlot('necklace','none'));
   await page.waitForFunction(()=>document.querySelector('#inventory-list [data-item="necklace_upgrade"] .item-break'));
@@ -77,17 +79,18 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   // The smith: a quarter of 240 gold for a full repair.
   await debug({op:'set_gold',gold:1000});
   await page.waitForFunction(()=>Field.hero.gold===1000,null,{timeout:15000});
-  await debug({op:'teleport',zone:0,x:31,y:88});
-  await page.waitForTimeout(500);
+  // Bram Emberforge stands at (245, 195) in Alderhaven: stand two tiles north of him and wait until the hero is in reach.
+  await debug({op:'teleport',zone:0,x:245,y:193});
+  await page.waitForFunction(()=>Math.hypot(Field.hero.x-245,Field.hero.y-195)<2.6,null,{timeout:15000});
   await page.evaluate(()=>Online.send({type:'interact',npc:'smith'}));
   await page.locator('#npc-dialogue').waitFor({state:'visible',timeout:15000});
-  const offer=page.locator('[data-action="repair-one"]');
+  // The smith's gossip has a Repair row; it opens the repair view. One broken copy: its row's Repair button fixes it for 60 copper.
+  await page.locator('#npc-dialogue [data-offer="repair"]').click();
+  const offer=page.locator('#npc-inventory .repair-row[data-state="broken"] [data-action="repair"]');
   await offer.waitFor();
   assert.equal(await offer.count(),1);
-  assert.match(await page.locator('[data-action="repair-all"]').getAttribute('title'),/60 copper/);
+  assert.match(await page.locator('#npc-inventory [data-action="repair_all"]').textContent(),/60 copper/);
   await offer.click();
-  assert.equal(await page.locator('#npc-inventory .repair-row[data-state="broken"]').count(),1);
-  await page.locator('#npc-inventory [data-action="repair_all"]').click();
   await page.getByText(/Repaired one piece for 60 copper/).waitFor({timeout:10000});
   await page.waitForFunction(()=>Field.hero.gold===940,null,{timeout:15000});
   await page.locator('#npc-x').click();
