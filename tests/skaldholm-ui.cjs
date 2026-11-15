@@ -116,23 +116,22 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   const sky = await look(page, [.0, .93, .08, 1]);
   check(sky.r + sky.g + sky.b > 380 || (await look(page, [.92, 0, 1, .07])).b > 150, `The sky is bright (${sky.r | 0},${sky.g | 0},${sky.b | 0})`);
 
-  // Real walk: the travel button routes through the Great Gate into the city.
-  await page.locator('#city-travel').click();
-  await page.waitForFunction(() => Field.hero.y < 133, null, { timeout: 60000 });
-  await page.evaluate(() => Online.send({ type: 'stop' }));
+  // Real walk: the arrival is already inside the city hub, so the travel button stays hidden. Walk down the Grand Avenue
+  // (x 56-63, the north-south road) to the plaza by canvas clicks instead.
+  for (const step of await page.evaluate(([x, y]) => Field._debug.routeTo({ x, y }), [59.5, 64])) { await click(step.x, step.y); await reach(step.x, step.y, 1.3, 4); }
   await page.waitForTimeout(700);
-  await shot('great-gate');
-  check(await page.evaluate(() => Field.hero.y < 134 && Math.abs(Field.hero.x - 80) < 12), 'The travel button walks the hero through the Great Gate onto the avenue');
+  await shot('avenue-walk');
+  check(await page.evaluate(() => Math.abs(Field.hero.x - 59.5) < 6 && Math.abs(Field.hero.y - 64) < 2.5), 'Walking the Grand Avenue by canvas clicks brings the hero to the plaza road');
   check(await page.locator('#city-travel').isHidden() || await page.locator('#area-title span').textContent().then(t => t.includes('Sanctuary')), 'Inside the walls the area is a sanctuary');
 
   // Ground: cobbles on the avenue (grey-beige), marble in the plaza (pale), lawn between the streets, brick in the stone court.
-  await stageAt(4, 80, 96);
+  await stageAt(4, 59.5, 96);
   await page.waitForTimeout(700);
   await shot('plaza-south');
   const groundTypes = await page.evaluate(() => {
     const out = {}; const z = Field._debug.zones[4];
     const type = (x, y) => { let t = 0; for (const r of z.roads) { const rect = r.x0 !== undefined; const d = rect ? 0 : Math.hypot(x - r.x, y - r.y); const inside = rect ? x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1 : (r.r0 !== undefined ? d >= r.r0 && d <= r.r1 : d <= r.r); if (inside) t = r.t; } return t; };
-    for (const [name, x, y] of [['avenue', 80.5, 120.5], ['plaza', 80.5, 62.5], ['court', 100.5, 124.5], ['lawn', 64.5, 120.5], ['trade', 30.5, 76.5]]) out[name] = type(x, y);
+    for (const [name, x, y] of [['avenue', 59.5, 120.5], ['plaza', 59.5, 70.5], ['court', 100.5, 124.5], ['lawn', 64.5, 120.5], ['trade', 30.5, 76.5]]) out[name] = type(x, y);
     return out;
   });
   check(groundTypes.avenue === 1 && groundTypes.plaza === 2 && groundTypes.court === 3 && groundTypes.lawn === 0 && groundTypes.trade === 1, `The road list paints avenue ${groundTypes.avenue}, plaza ${groundTypes.plaza}, court ${groundTypes.court}, lawn ${groundTypes.lawn}`);
@@ -140,10 +139,10 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(Math.abs(cobbles.r - cobbles.b) < 50 && cobbles.r > 90 && cobbles.r < 200, `The avenue is warm-grey cobbles (${cobbles.r | 0},${cobbles.g | 0},${cobbles.b | 0})`);
 
   // The Great Fountain: pale marble and blue water in the middle of the view, with moving jets.
-  await stageAt(4, 80, 90);
+  await stageAt(4, 59.5, 90);
   await page.waitForTimeout(900);
   const fountainShot = () => page.evaluate(() => {
-    const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600, [sx, sy] = Field._debug.w2s(80, 76);
+    const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600, [sx, sy] = Field._debug.w2s(59.5, 76);
     const x = Math.max(0, Math.round((sx - 330) * k)), y = Math.max(0, Math.round((sy - 330) * k)), d = g.getImageData(x, y, Math.round(660 * k), Math.round(300 * k)).data;
     let blue = 0, h = 0; for (let i = 0; i < d.length; i += 4) { if (d[i + 2] > d[i] + 40 && d[i + 2] > 140) blue++; h = (Math.imul(h, 31) + d[i] + (d[i + 1] << 3) + (d[i + 2] << 6)) | 0; }
     return { blue: blue / (d.length / 4), h };
@@ -154,26 +153,26 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await shot('fountain');
 
   // The Meeting Stone: glowing blue runes round a dark monolith.
-  await stageAt(4, 100, 126);
+  await stageAt(4, 79.5, 130);
   await page.waitForTimeout(900);
   const stoneGlow = () => page.evaluate(() => {
-    const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600, [sx, sy] = Field._debug.w2s(100, 118);
+    const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600, [sx, sy] = Field._debug.w2s(79.5, 118);
     const x = Math.max(0, Math.round((sx - 130) * k)), y = Math.max(0, Math.round((sy - 330) * k)), d = g.getImageData(x, y, Math.round(260 * k), Math.round(360 * k)).data;
     let cyan = 0; for (let i = 0; i < d.length; i += 4) if (d[i] < 170 && d[i + 1] > 190 && d[i + 2] > 220) cyan++;
     return cyan;
   });
   const glow = await stoneGlow();
   check(glow > 60, `The Meeting Stone's runes glow cyan (${glow} bright pixels)`);
-  check(await page.evaluate(() => Field._debug.objects.some(o => o.kind === 'meetingstone' && Math.abs(o.x - 100) < 1 && Math.abs(o.y - 118) < 1) && City.npcs.some(n => n.id === 'city_stonewarden')), 'The stone stands in its court beside its warden');
+  check(await page.evaluate(() => Field._debug.objects.some(o => o.kind === 'meetingstone' && Math.abs(o.x - 79.5) < 1 && Math.abs(o.y - 121) < 1) && City.npcs.some(n => n.id === 'city_stonewarden')), 'The stone stands in its court beside its warden');
   await shot('meeting-stone');
 
-  // The wall: stage at the north wall from inside; ramparts and towers are drawn there and block the hero.
+  // The north edge: the rebuilt city has no wall of its own; the land (shapeFloor) starts at row 16 under x 30, so the void holds the hero back there.
   await stageAt(4, 30, 17);
   await debug({ op: 'teleport', zone: 4, x: 30, y: 17 });
   await page.evaluate(() => Online.send({ type: 'move', x: 30, y: 2 }));
   await page.waitForTimeout(2500);
-  await shot('north-wall');
-  check(await page.evaluate(() => Field.hero.y > 12.5 && Field.hero.y < 16.5), 'The north wall holds the hero back');
+  await shot('north-edge');
+  check(await page.evaluate(() => Field.hero.y > 14.5 && Field.hero.y < 17.5), 'The land\'s north edge holds the hero back');
   await page.evaluate(() => Online.send({ type: 'stop' }));
 
   // Walking townspeople: the client places them from the server's clock with the same arithmetic as the Rust tests (reference values from there).
@@ -183,8 +182,8 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   });
   const want = [[0, 0], [1, 0], [10, 0], [10, 3], [9.105573, 4.552786], [0, 0]];
   check(ref.every((p, i) => Math.abs(p.x - want[i][0]) < 1e-5 && Math.abs(p.y - want[i][1]) < 1e-5), `The client's walking arithmetic equals the server's (${ref.map(p => p.x.toFixed(2) + ',' + p.y.toFixed(2)).join(' ')})`);
-  await stageAt(4, 80, 112);
-  const kid = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'city_watch_avenue'); return { x: n.x, y: n.y }; });
+  await stageAt(4, 59.5, 96);
+  const kid =await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'city_watch_avenue'); return { x: n.x, y: n.y }; });
   await page.waitForTimeout(3200);
   const kid2 = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'city_watch_avenue'); return { x: n.x, y: n.y, moving: n.moving }; });
   const moved = await page.evaluate(() => City.npcs.filter(n => n.route && n.moving).length);
@@ -192,15 +191,15 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(Math.hypot(kid.x - kid2.x, kid.y - kid2.y) > .05 || kid2.moving === false, 'Positions change over time (or the watchman is pausing)');
   const spread = await page.evaluate(() => { const ps = ['city_kid_lotta', 'city_kid_pelle', 'city_kid_ebba', 'city_kid_anton'].map(id => City.npcs.find(n => n.id === id)); return Math.min(...ps.flatMap((a, i) => ps.slice(i + 1).map(b => Math.hypot(a.x - b.x, a.y - b.y)))); });
   check(spread > 3, `The four children are spread round the fountain (closest pair ${spread.toFixed(1)} apart)`);
-  // Click a walker on the canvas at the place the client draws him, and reach his conversation.
-  await page.waitForFunction(() => { const n = City.npcs.find(n => n.id === 'city_courier'); return n && !n.moving; }, null, { timeout: 30000 }).catch(() => {});
-  const walker = await page.evaluate(() => City.npcs.find(n => n.id === 'city_courier'));
-  await stageAt(4, walker.x + 2.4, walker.y + 2.4);
-  const [wx, wy] = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'city_courier'); return Field._debug.w2s(n.x, n.y); });
-  const box = await page.locator('#fieldcv').boundingBox();
-  await page.mouse.click(box.x + wx / 1600 * box.width, box.y + (wy - 55) / 900 * box.height);
+  // Click a townsperson on the canvas and reach his conversation. Walkers are not used here: a click on a walker routes the
+  // hero to where she stood, and a courier (2.6 tiles a second) leaves the 2.5-tile talk reach before the hero arrives
+  // (see lookinto.md, slot E round 13).
+  await stageAt(4, 62.1, 28.9);
+  const [sx, sy] = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'city_steward'); return Field._debug.w2s(n.x, n.y); });
+  const stewardBox = await page.locator('#fieldcv').boundingBox();
+  await page.mouse.click(stewardBox.x + sx / 1600 * stewardBox.width, stewardBox.y + (sy - 55) / 900 * stewardBox.height);
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
-  check(await page.locator('#npc-name').textContent() === 'Courier Fia' && (await page.locator('#npc-text').textContent()).includes('parcels'), 'A click on a walking courier opens her conversation');
+  check(await page.locator('#npc-name').textContent() === 'Steward Halden Voss', 'A click on the steward on the canvas opens his conversation');
   await page.keyboard.press('Escape');
 
   // Minimap: city colours, with the buildings as footprints and the fountain as a blue disc.
@@ -208,10 +207,14 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(mini.green > 1500 && mini.blue > 20 && mini.red > 150, `The minimap shows lawn (${mini.green}), the fountain (${mini.blue}) and house roofs (${mini.red})`);
 
   // The journal: eleven city quests, local ones first; the first conversation at the gate captain through a real canvas click.
-  await stageAt(4, 80, 128);
+  await stageAt(4, 59.5, 128);
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && await page.locator('#quest-list .quest-card').count() === 0 && await page.locator('#quest-list .quest-empty').count() > 0, 'The journal lists no quest that has not been taken');
-  check(await page.evaluate(() => { const q = WORLD_MAP.zones.flatMap(z => z.quests || []); const g = q.find(x => x.id === 'city_gel'); return q.filter(x => x.id.startsWith('city_')).length === 12 && g.level === 12 && g.objectives[0].label.includes('Slime Gel') && g.objectives[0].count === 8; }), 'The city catalogue has twelve quests, including the hand-in of eight Slime Gel at level 12');
+  // A new hero already holds the automatic landing quest (meadow_landing), so the journal is not empty; the check is that no city quest is listed yet.
+  const listedBefore = await page.locator('#quest-list [data-quest]').evaluateAll(nodes => nodes.map(n => n.dataset.quest));
+  check(await page.locator('#quest-journal').isVisible() && !listedBefore.some(id => id.startsWith('city_')), `The journal lists no city quest that has not been taken (listed: ${listedBefore.join(', ') || 'none'})`);
+  // The count comes from the map (the rebuilt city has fourteen city_ quests, not twelve).
+  const cityQuests = mapData.zones[3].quests.filter(q => q.id.startsWith('city_')).length;
+  check(await page.evaluate(cityQuests => { const q = WORLD_MAP.zones.flatMap(z => z.quests || []); const g = q.find(x => x.id === 'city_gel'); return q.filter(x => x.id.startsWith('city_')).length === cityQuests && g.level === 12 && g.objectives[0].label.includes('Slime Gel') && g.objectives[0].count === 8; }, cityQuests), `The city catalogue has ${cityQuests} quests, including the hand-in of eight Slime Gel at level 12`);
   await page.keyboard.press('Escape');
   const nameplate = id => page.evaluate(id => { const n = City.npcs.find(n => n.id === id); return Field._debug.w2s(n.x, n.y); }, id);
   const talkByClick = async id => {
@@ -221,11 +224,18 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
     await page.mouse.click(b.x + sx / 1600 * b.width, b.y + (sy - 55) / 900 * b.height);
     await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   };
+  // The city quests need level 11 or 12 to accept (server: accept refuses a level below the quest's minimum); a new hero is level 1.
+  await debug({ op: 'set_level', level: 12 });
+  await page.waitForFunction(() => Field.hero.level === 12, null, { timeout: 15000 });
   await talkByClick('city_captain');
   check(await page.locator('#npc-name').textContent() === 'Captain Ingrid Stormwatch', 'A click on the gate captain reaches her');
   await page.locator('#npc-quest-list .journal-quest[data-quest="city_welcome"]').click();
   await page.locator('#npc-dialogue [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="city_welcome"]')?.dataset.status === 'active');
+  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="city_welcome"]')?.dataset.status === 'active', null, { timeout: 15000 }).catch(async error => {
+    const state = await page.evaluate(() => ({ row: document.querySelector('#npc-quest-list [data-quest="city_welcome"]')?.dataset.status ?? null, level: Field.hero.level, errors: document.getElementById('error-messages')?.textContent || '', dialogue: document.getElementById('npc-dialogue')?.textContent?.slice(0, 160) }));
+    await shot('welcome-accept');
+    throw new Error('Accepting the welcome quest did not make it active: ' + JSON.stringify(state), { cause: error });
+  });
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('The Great Gate Opens') && t.includes('Herald Bran')), 'The welcome appears in the live tracker');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
@@ -273,10 +283,11 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // Back out through the Glacier Gate by clicking.
   const back = await page.evaluate(() => Field._debug.zones[4].portals[0]);
-  await stageAt(4, back.x, back.y - 6);
-  for (const step of await page.evaluate(([x, y]) => Field._debug.routeTo({ x, y }), [back.x, back.y - 3])) { await click(step.x, step.y); await reach(step.x, step.y, 1.3, 4); }
+  // The glacier gate is in the north wall of the city and its walk is -y (north): approach from the south and walk north through it.
+  await stageAt(4, back.x, back.y + 6);
+  for (const step of await page.evaluate(([x, y]) => Field._debug.routeTo({ x, y }), [back.x, back.y + 3])) { await click(step.x, step.y); await reach(step.x, step.y, 1.3, 4); }
   await page.waitForTimeout(700);
-  await click(back.x, back.y + 1.2);
+  await click(back.x, back.y - 1.2);
   await page.waitForFunction(() => Field.zone === 2, null, { timeout: 30000 });
   await page.waitForTimeout(600);
   check(await page.locator('#area-title b').textContent() === 'Rimeveil Glacier', 'Returning restores the glacier banner');
