@@ -1,4 +1,5 @@
 // Focused real-client check for the seven Coral Reliquary enemy atlases.
+process.env.REAL_SPRITES = process.env.REAL_SPRITES || '1';   // stub mode replaces every enemy, so no atlas would load
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium } = require('./lib/playwright.cjs');
@@ -50,10 +51,14 @@ const call = async(name,args={}) => {
       width:Field.cathedralSprites.img[kind].naturalWidth,
       height:Field.cathedralSprites.img[kind].naturalHeight,
       top:Field.cathedralSprites.meta.tops[kind],
+      frame:(({w,h})=>[w,h])(Field.frameOf(Field.cathedralSprites,kind)),
       clip:Field._debug.enemyFrame(Field.slimes.find(s=>s.kind===kind))
     }),kind);
-    assert.equal(art.width,768,`${kind} atlas width`);
-    assert.equal(art.height,480,`${kind} atlas height`);
+    // 8 x 5 frames at the kind's own frame (kindFrames, Field.frameOf): these atlases are not 96px any more
+    // MUTATE=1 expects the old zone-wide 96px frame instead of the kind's own, which must fail
+    const frameW = process.env.MUTATE ? 96 : art.frame[0], frameH = process.env.MUTATE ? 96 : art.frame[1];
+    assert.equal(art.width,8*frameW,`${kind} atlas width (8 frames of ${frameW}px)`);
+    assert.equal(art.height,5*frameH,`${kind} atlas height (5 rows of ${frameH}px)`);
     assert.ok(art.top>20&&art.clip[0],`${kind} draws a fitted frame`);
     await page.screenshot({path:path.join(world.artifacts,`reliquary-${kind}.png`)});
   }
