@@ -29,13 +29,16 @@ async function call(name, args = {}) {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   check(await page.evaluate(() => { const s = document.getElementById('scene-game'); s.hidden = true; void s.offsetWidth; s.hidden = false; return s.getAnimations().length > 0; }), 'The scene fade replays with motion on');
   await page.waitForFunction(() => document.getElementById('scene-game').getAnimations().every(a => a.playState === 'finished'), null, { timeout: 10000 });
-  check(await page.evaluate(() => {
+  // The loading screen (#connection-overlay, LoadGate) can still cover the stage while the hero's sprite decodes; it is not part of this check.
+  await page.locator('#connection-overlay').waitFor({ state: 'hidden', timeout: 30000 });
+  const paint = await page.evaluate(() => {
     const c = document.getElementById('chat').getBoundingClientRect(), top = document.elementFromPoint(c.left + c.width / 2, c.top + c.height / 2);
-    return !!top && !!top.closest('#equipment');
-  }), 'Equipment pane paints above the chat');
+    return { ok: !!top && !!top.closest('#equipment'), top: top ? (top.id ? '#' + top.id : top.tagName) + ' ' + (top.className || '') : null, at: [c.left + c.width / 2, c.top + c.height / 2] };
+  });
+  check(paint.ok, 'Equipment pane paints above the chat (top element ' + paint.top + ' at ' + JSON.stringify(paint.at) + ')');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const labels = await page.locator('#equipped-slots label').allTextContents();
-  check(JSON.stringify(labels) === JSON.stringify(['HEADGEAR', 'SHOULDERS', 'CHEST', 'PANTS', 'GLOVES', 'HANDS', 'NECKLACE', 'ACCESSORY 1', 'ACCESSORY 2']), 'All nine requested equipment slots appear');
+  check(JSON.stringify(labels) === JSON.stringify(['HEADGEAR', 'SHOULDERS', 'CHEST', 'PANTS', 'GLOVES', 'HANDS', 'NECKLACE', 'CLOAK', 'ACCESSORY 1', 'ACCESSORY 2']), 'All ten equipment slots appear (the cloak slot is the tenth)');
   check(await page.locator('[data-slot="chest"] b').textContent() === 'Apprentice Robes', 'Existing armor fills Chest');
   check(await page.locator('[data-slot="hands"] b').textContent() === 'Ash Staff', 'Existing weapon fills Hands');
   check(await page.locator('#field-headgear option').count() === 2 && await page.locator('#field-headgear option').nth(1).textContent() === "Apprentice's Hat", 'Headgear offers None and the starter piece the mage owns; unowned gear is unavailable');
@@ -70,9 +73,11 @@ async function call(name, args = {}) {
   await page.screenshot({ path: path.join(world.artifacts, 'equipment-nine-slots.png') });
   await page.keyboard.press('e');
   check(await page.locator('#equipment').isHidden(), 'E closes equipment even from a selector');
-  await page.keyboard.press('i'); check(await page.locator('#equipment').isVisible() && await page.locator('.character-window').isHidden(), 'I opens the separate bag view');
+  await page.keyboard.press('i'); check(await page.locator('#equipment').isVisible() && await page.evaluate(() => document.querySelector('.equipment-workspace').dataset.view) === 'both', 'I opens the character and bag view together (I and B share one view now)');
   await page.keyboard.press('b'); check(await page.locator('#equipment').isHidden(), 'B toggles bags closed');
-  await page.keyboard.press('b'); check(await page.locator('#equipment').isVisible(), 'B reopens bags');
+  // Wait for the close to settle before the second press (an immediate re-press raced the close in one run; see lookinto.md, batch 5).
+  await page.locator('#equipment').waitFor({ state: 'hidden' });
+  await page.keyboard.press('b'); await page.locator('#equipment').waitFor({ state: 'visible', timeout: 5000 }).catch(() => {}); check(await page.locator('#equipment').isVisible(), 'B reopens bags');
   await page.keyboard.press('Escape');
   await page.evaluate(() => {
     window.actions = [];
@@ -89,8 +94,9 @@ async function call(name, args = {}) {
   await page.keyboard.press('k');
   check(await page.locator('#skills-panel').isVisible(), 'K opens skill assignment');
   check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1, 'A level-1 mage can use only its attack');
-  const locked = await page.locator('#skill-library .skill-card.locked small').allTextContents();
-  check(locked.length === 10 && locked.every((text, i) => text.startsWith(`Unlocks at level ${(i + 1) * 2}.`)), 'Ten more skills are listed, locked, one per even level up to 20');
+  // Mage skills unlock at 4, 8, ... 40 (world/skills.txt); locked milestone passives are separate cards and are excluded here.
+  const locked = await page.locator('#skill-library .skill-card.locked:not(.passive-card) small').allTextContents();
+  check(locked.length === 10 && locked.every((text, i) => text.startsWith(`Unlocks at level ${(i + 1) * 4}.`)), 'Ten more skills are listed, locked, at levels 4 to 40');
   await page.locator('#skill-library .skill-card.locked').first().click({ force: true });
   check(await page.locator('#skill-editor-slots [data-slot="1"]').getAttribute('data-skill') === 'attack' && await page.locator('#skill-editor-slots [data-skill="twinbolt"]').count() === 0, 'Clicking a locked skill assigns nothing');
   const before = await page.evaluate(() => actions.length);
@@ -127,7 +133,7 @@ async function call(name, args = {}) {
   await page.keyboard.press('2'); await page.waitForFunction(() => Field.hero.dashCd > 0);
   check(await page.locator('#skillbar-slots [data-slot="2"]').isDisabled(), 'Assassin slot 2 triggers authoritative Shadowstep cooldown');
   await page.keyboard.press('k');
-  check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 2 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'Assassin can assign attack and Shadowstep and sees its ten locked skills');
+  check(await page.locator('#skill-library .skill-card:not(.locked):not(.passive-card)').count() === 2 && await page.locator('#skill-library .skill-card.locked:not(.passive-card)').count() === 10, 'Assassin can assign attack and Shadowstep and sees its ten locked skills (milestone passives are separate cards)');
   await page.locator('#skill-reset').click();
   check(await page.locator('#skill-editor-slots [data-slot="1"]').getAttribute('data-skill') === 'attack', 'Reset restores default skills');
   await page.keyboard.press('e');
@@ -140,13 +146,13 @@ async function call(name, args = {}) {
   await page.keyboard.press('Escape'); await page.locator('#p-new').click();
   await page.locator('#cls-priest').click();
   check(await page.locator('#class-name').textContent() === 'PRIEST (사제)' && await page.locator('#cls-priest').getAttribute('aria-pressed') === 'true', 'The creation screen offers the Priest');
-  check(await page.locator('#create-priestArmor option').count() === 1 && await page.locator('#create-priestWeapon option').count() === 1, 'A new priest can only start in its starter robes and mace');
+  check(await page.locator('#create-priestArmor option').count() === 2 && await page.locator('#create-priestWeapon option').count() === 2, 'A new priest can only start in its starter robes and mace (None plus the one starter piece each)');
   await page.locator('#name').fill('SkillPriest'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.priestSprites && document.querySelector('#skillbar-slots [data-slot="1"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
   check(await page.evaluate(() => Field.hero.look.class === 'priest' && Field.hero.maxHp === 100 && Field.hero.look.priestWeapon === 'mace'), 'The server made a level-1 priest with 100 health and the Oak mace');
   check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('aria-label').then(t => /Mace Strike/.test(t || '')) , 'The priest\'s basic attack is Mace Strike');
   await page.keyboard.press('k');
-  check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The priest starts with its attack and sees ten locked skills');
+  check(await page.locator('#skill-library .skill-card:not(.locked):not(.passive-card)').count() === 1 && await page.locator('#skill-library .skill-card.locked:not(.passive-card)').count() === 10, 'The priest starts with its attack and sees ten locked skills (passives are separate cards)');
   check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Mend/.test(t) && /4/.test(t)), 'The first skill to earn is Mend, at level 4');
   await page.keyboard.press('Escape');
   // The Priest wears pilgrim and dawn head, shoulder and glove pieces like every other class (it used to have none).
@@ -166,13 +172,13 @@ async function call(name, args = {}) {
   await page.keyboard.press('Escape'); await page.locator('#p-new').click();
   await page.locator('#cls-hunter').click();
   check(await page.locator('#class-name').textContent() === 'HUNTER (사냥꾼)' && await page.locator('#cls-hunter').getAttribute('aria-pressed') === 'true', 'The creation screen offers the Hunter');
-  check(await page.locator('#create-hunterArmor option').count() === 1 && await page.locator('#create-hunterWeapon option').count() === 1, 'A new hunter can only start in its starter jerkin and shortbow');
+  check(await page.locator('#create-hunterArmor option').count() === 2 && await page.locator('#create-hunterWeapon option').count() === 2, 'A new hunter can only start in its starter jerkin and shortbow (None plus the one starter piece each)');
   await page.locator('#name').fill('SkillHunter'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.hunterSprites && document.querySelector('#skillbar-slots [data-slot="1"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
   check(await page.evaluate(() => Field.hero.look.class === 'hunter' && Field.hero.maxHp === 95 && Field.hero.look.hunterWeapon === 'shortbow' && Field.hero.look.head === 'none'), 'The server made a level-1 hunter with 95 health, a shortbow and no head, shoulder or glove pieces');
   check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('aria-label').then(t => /Arrow Shot/.test(t || '')), 'The hunter\u2019s basic attack is Arrow Shot');
   await page.keyboard.press('k');
-  check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The hunter starts with its attack and sees ten locked skills');
+  check(await page.locator('#skill-library .skill-card:not(.locked):not(.passive-card)').count() === 1 && await page.locator('#skill-library .skill-card.locked:not(.passive-card)').count() === 10, 'The hunter starts with its attack and sees ten locked skills');
   check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Power Shot/.test(t) && /4/.test(t)), 'The first skill to earn is Power Shot, at level 4');
   await page.keyboard.press('Escape'); await page.keyboard.press('e');
   const layerFigure = () => page.evaluate(() => { const c = Field.hunterSprites.frame('idle', 0, 0), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) h = (h * 31 + d[i] * 3 + d[i + 1] * 5 + d[i + 2] * 7 + i) >>> 0; return h; });
@@ -190,7 +196,8 @@ async function call(name, args = {}) {
   await page.keyboard.press('Escape');
   // Healing effects: a healed party member gets a number and a glow, and a Mend cast draws on each person it reached.
   const fx = await page.evaluate(() => {
-    const me = Field.hero, count = () => Field._debug.effects.filter(e => e.kind === 'skAura').length, before = count();
+    // A priest's Mend draws one skPriestMend with its target list (not a skAura per person), so count the targets of both shapes.
+    const me = Field.hero, count = () => Field._debug.effects.reduce((n, e) => n + (e.kind === 'skAura' ? 1 : e.kind === 'skPriestMend' ? (e.targets?.length || 0) : 0), 0), before = count();
     Field._debug.event({ type: 'event', kind: 'healed', actor: 'someone', from: Online.id, x: me.x + 1, y: me.y, value: 77, crit: false });
     Field._debug.event({ type: 'event', kind: 'skill', skill: 'mend', actor: Online.id, x: me.x, y: me.y, fx: 1, fy: 0, value: 0, points: [[me.x + 1, me.y], [me.x - 1, me.y]], heal: 0 });
     return count() - before;
@@ -206,15 +213,16 @@ async function call(name, args = {}) {
   await fixture.setContent('<div id="equipped-slots"></div><div id="inventory-list"></div><div id="npc-inventory"></div>');
   await fixture.addScriptTag({ path: path.join(root, 'client/items.js') });
   await fixture.evaluate(() => { window.sent = []; window.Field = { hero: { dead: false }, equipSlot: (slot, item) => { sent.push({ slot, item }); return true; } }; window.Online = { connected: true, send: () => true }; });
+  await fixture.addScriptTag({ path: path.join(root, 'client/money.js') });
   await fixture.addScriptTag({ path: path.join(root, 'client/inventory.js') });
   await fixture.evaluate(() => {
     Inventory.update([{ item: 'headgear_upgrade', quantity: 1 }, { item: 'accessory_upgrade', quantity: 3 }], { class: 'mage', mageArmor: 'none', mageWeapon: 'none' }, { accessory1: 'accessory_upgrade', accessory2: 'accessory_upgrade' }, ['traveler_pack']);
-    Inventory.renderEquipped(document.getElementById('equipped-slots')); Inventory.render(document.getElementById('inventory-list')); Inventory.renderShop({ id: 'merchant', buys: true }, document.getElementById('npc-inventory'));
+    Inventory.renderEquipped(document.getElementById('equipped-slots')); Inventory.render(document.getElementById('inventory-list'));
   });
   await fixture.locator('#field-headgear').selectOption('headgear_upgrade');
   check(await fixture.evaluate(() => JSON.stringify(sent[0]) === '{"slot":"headgear","item":"headgear_upgrade"}'), 'Headgear selector sends its slot and owned item');
   check(await fixture.locator('[data-slot="accessory2"] b').textContent() === 'Amber Ring', 'Both accessory slots show equipped copies');
-  check(await fixture.locator('#npc-inventory [data-item="accessory_upgrade"] button').count() === 1, 'Merchant preserves two equipped accessory copies');
+  // Merchant lists are now server-fed by client/shop.js (Shop.render), not Inventory.renderShop: that check moved out of this suite.
   // Full-bag fixtures check overflow and loose copies without forging combat.
   const workspace = await page.locator('.equipment-workspace').innerHTML();
   await fixture.setContent(`<main id="stage" class="stage" data-scene="game"><div class="pause" id="equipment"><div class="equipment-workspace" data-view="both">${workspace}</div></div></main>`);
@@ -226,10 +234,12 @@ async function call(name, args = {}) {
     window.Field = { hero: { dead: false, gold: 137 }, equipSlot: (slot, item) => { sent.push({ slot, item }); return true; } };
     window.Online = { connected: true, currentToken: 'display-fixture', send: () => true, saveBagLayout: layout => fixtureLayouts.push([...layout]) };
   });
+  await fixture.addScriptTag({ path: path.join(root, 'client/money.js') });
   await fixture.addScriptTag({ path: path.join(root, 'client/inventory.js') });
   await fixture.evaluate(() => {
     // Keep this display fixture within its 32 cells and include every piece its assertions use.
     const fixtureItems = WORLD_ITEMS.filter(i => i.kind !== 'bag').slice(0, 32);
+    if (!fixtureItems.some(i => i.id === 'warrior_weapon_royal')) fixtureItems[7] = WORLD_ITEMS.find(i => i.id === 'warrior_weapon_royal');
     ['headgear_upgrade', 'shoulders_upgrade', 'pants_upgrade', 'gloves_upgrade', 'necklace_upgrade', 'accessory_upgrade'].forEach((id, index) => {
       if (!fixtureItems.some(i => i.id === id)) fixtureItems[index] = WORLD_ITEMS.find(i => i.id === id);
     });
@@ -267,11 +277,12 @@ async function call(name, args = {}) {
   check(overflow > 0 && await fixture.locator('#inventory-list .inventory-item').count() === overflow, `Overflow bag displays the next ${overflow} stacks`);
   await fixture.locator('#bag-search').fill('amber');
   check(await fixture.locator('#inventory-list .inventory-item').count() === 1, 'Search finds items across both bags');
-  check(await fixture.locator('#inventory-list [data-item="accessory_upgrade"] .item-stack').textContent() === '1', 'Two worn accessory copies leave one bag copy');
+  // Gear takes one bag cell per copy (GEAR-NO-STACK), so there is no stack count: one cell is left after two are worn.
+  check(await fixture.locator('#inventory-list [data-item="accessory_upgrade"]').count() === 1, 'Two worn accessory copies leave one bag copy');
   await fixture.locator('#inventory-list [data-item="accessory_upgrade"] button').click();
   check(await fixture.locator('#bag-details [data-action="equip"]').count() === 0, 'Already filled accessory slots show no redundant equip action');
   await fixture.locator('#bag-search').fill('royal sword');
-  await fixture.locator('#inventory-list [data-item="warrior_weapon_royal"] button').click({ button: 'right' });
+  await fixture.locator('#inventory-list [data-item="warrior_weapon_royal"] button').first().click({ button: 'right' });
   check(await fixture.evaluate(() => sent.length === 0), 'Right-clicking another class’s weapon sends no equip request');
   await fixture.locator('#bag-search').fill(''); await fixture.locator('#bag-sort').click();
   check(await fixture.evaluate(() => fixtureLayouts.length > 0 && fixtureLayouts.at(-1).length === 32), 'Sorting retains all stacks in two saved bags');

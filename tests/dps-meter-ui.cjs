@@ -60,10 +60,21 @@ const results = [];
     const before = await page.evaluate(() => window.__meter.rows.filter(r => r.hired).reduce((n, r) => n + r.damage, 0));
     const died = await page.evaluate(() => GM.request({ op: 'die' })); check(died.ok, 'private death goes through normal death handling');
     await page.waitForFunction(() => Field.hero.dead);
-    await page.waitForFunction(() => !Field.hero.dead, null, { timeout: 10000 });
+    // A death leaves the owner a ghost until released/resurrected (corpse run), so the hires must keep dealing damage meanwhile.
+    await page.waitForFunction(before => window.__meter.rows.filter(r => r.hired).reduce((n, r) => n + r.damage, 0) > before, before, { timeout: 20000 });
+    check(await page.evaluate(() => Field.hero.dead), 'owner stays fallen while the hires keep fighting');
     check(await page.evaluate(before => window.__meter.rows.filter(r => r.hired).reduce((n, r) => n + r.damage, 0) > before, before), 'surviving mercenaries keep dealing damage after owner death');
     for (const id of enemies) await page.evaluate(id => GM.request({ op: 'kill_enemy', id }), id);
-    await page.waitForFunction(() => window.__meter && !window.__meter.active);
+    // The hires keep fighting the raid's other living packs, and the pull stays open while any of them is engaged
+    // (packs.rs). Clear the rest of this raid's living enemies so the fight can end.
+    const living = () => (world.snapshot?.slimes || []).filter(s => !s.dead && s.zone === 46 && !enemies.includes(s.id)).map(s => s.id);
+    for (let round = 0; round < 12 && living().length; round++) {
+      for (const id of living()) await page.evaluate(id => GM.request({ op: 'kill_enemy', id }), id);
+      await page.waitForTimeout(400);
+    }
+    await page.waitForFunction(() => window.__meter && !window.__meter.active, null, { timeout: 30000 }).catch(async error => {
+      throw new Error('The fight did not end; living raid enemies: ' + JSON.stringify((world.snapshot?.slimes || []).filter(s => !s.dead && s.zone === 46).map(s => [s.id, s.kind, s.state, s.target])).slice(0, 800) + ' ' + error.message);
+    });
     await page.evaluate(() => dispatchEvent(new Event('prefs-change')));
     check((await page.locator('#dps-status').textContent()).includes('Last fight'), 'completed fight remains visible');
     const frozen = await page.evaluate(() => JSON.stringify(window.__meter));

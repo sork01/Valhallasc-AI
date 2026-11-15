@@ -34,23 +34,28 @@ async function call(name, args = {}) {
   await dialogue.waitFor({ state: 'visible' });
   // Asking before the quest is taken is refused and the button comes back.
   await dialogue.locator('[data-offer="gauntlet"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-dialogue').textContent.includes('Take one of my arena quests first'));
+  await page.waitForFunction(() => document.querySelector('#npc-dialogue').textContent.includes('Take an arena quest from any arena giver first'));
   check(await dialogue.locator('[data-offer="gauntlet"]').isEnabled(), 'A refusal leaves the Enter the Arena button usable');
   const accept = dialogue.locator('.gossip-row[data-quest="arena_skald_20"]');
   check(await accept.count() === 1, 'The steward lists the level 20 arena trial');
   await accept.click();
   await dialogue.locator('[data-action=accept]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-dialogue').textContent.includes('Quest accepted: Arena Trial: Initiate'));
+  // Accepting closes the dialogue once the server's accepted ledger arrives (City.dialogue), so wait for it to close.
+  await dialogue.waitFor({ state: 'hidden', timeout: 15000 });
   await page.evaluate(() => Field.visitNpc('city_steward'));
   await dialogue.waitFor({ state: 'visible' });
   await dialogue.locator('[data-offer="gauntlet"]').click();
-  await page.waitForFunction(() => Field.hero.zone === 40 && Pvp.state.gauntlet?.fight === 1, null, { timeout: 30000 });
+  await page.waitForFunction(() => Field.hero.zone === 40 && Pvp.state.gauntlet?.fight === 1, null, { timeout: 30000 }).catch(async error => {
+    const why = await page.evaluate(() => ({ zone: Field.hero.zone, pos: [Field.hero.x, Field.hero.y], notice: document.querySelector('#npc-notice')?.textContent, dialogue: document.querySelector('#npc-dialogue')?.textContent.slice(0, 300), gauntlet: Pvp.state.gauntlet || null, errors: [] }));
+    throw new Error('The run did not start: ' + JSON.stringify(why));
+  });
   check(await page.locator('#gauntlet-banner').isVisible(), 'The banner shows while the run lasts');
   check(await dialogue.isHidden(), 'The giver\'s dialogue closes when the run starts');
   const title = await page.locator('#gauntlet-title').textContent();
   check(title.includes('Fight 1 of 5'), 'The banner names the fight');
   const first = await page.evaluate(() => Pvp.state.gauntlet.countdown);
-  check(first > 0 && first <= 10, 'A countdown runs before the first fight');
+  // The server counts 10 s (COUNTDOWN); the first read can be 11 because ceil() of a just-started clock (see lookinto.md, batch 5).
+  check(first > 0 && first <= 11, `A countdown runs before the first fight (read ${first})`);
   await page.waitForFunction(() => Pvp.state.gauntlet?.opponent, null, { timeout: 30000 });
   const opponent = await page.evaluate(() => Pvp.state.gauntlet.opponent);
   check(opponent.name.startsWith('Arena '), 'The opponent is named after its class');
@@ -82,7 +87,8 @@ async function call(name, args = {}) {
   await page.evaluate(() => Field.visitNpc('city_steward'));
   await dialogue.waitFor({ state: 'visible' });
   await dialogue.locator('.gossip-row[data-quest="arena_skald_20"]').click();
-  await dialogue.locator('[data-action="claim"][data-item]').click();
+  // The reward offers the class weapon and a cloak (the cloak was added to the choices later): take the weapon.
+  await dialogue.locator('[data-action="claim"][data-item*="_weapon_"]').click();
   await page.waitForFunction(() => document.querySelector('#npc-dialogue').textContent.includes('Quest complete: Arena Trial: Initiate'));
   check((await dialogue.innerText()).includes('Received'), 'The turn-in pays the weapon');
   assert.deepEqual(errors, [], 'No browser errors');
