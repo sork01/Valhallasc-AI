@@ -15,19 +15,19 @@ const suite = {
     });
     actor = await page.evaluate(() => Online.id);
     await debug(page, { op: 'set_level', level: 99 });
-    await debug(page, { op: 'teleport', zone: 0, x: 80, y: 25 });
-    await page.waitForFunction(() => Field.hero.level === 99 && Math.hypot(Field.hero.nx - 80, Field.hero.ny - 25) < 1);
+    await debug(page, { op: 'teleport', zone: 0, x: 250, y: 235 });
+    await page.waitForFunction(() => Field.hero.level === 99 && Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 1);
     // Stage a short control check on open ground, using durable monsters and test shortcuts.
-    const nearby = await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - 80, s.y - 25) < 15).map(s => s.id));
+    const nearby = await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - 250, s.y - 235) < 15).map(s => s.id));
     for (const id of nearby) await debug(page, { op: 'kill_enemy', id });
     await page.waitForFunction(ids => ids.every(id => Field.slimes.find(s => s.id === id)?.dead), nearby);
-    await debug(page, { op: 'spawn_enemy', kind: 'green', level: 1, x: 80.5, y: 25 });
-    await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'green' && !s.dead && Math.hypot(s.nx - 80.5, s.ny - 25) < 2));
-    const corpse = await page.evaluate(() => Field.slimes.find(s => s.kind === 'green' && !s.dead && Math.hypot(s.nx - 80.5, s.ny - 25) < 2).id);
+    await debug(page, { op: 'spawn_enemy', kind: 'green', level: 1, x: 250.5, y: 235 });
+    await page.waitForFunction(() => Field.slimes.some(s => s.kind === 'green' && !s.dead && Math.hypot(s.nx - 250.5, s.ny - 235) < 2));
+    const corpse = await page.evaluate(() => Field.slimes.find(s => s.kind === 'green' && !s.dead && Math.hypot(s.nx - 250.5, s.ny - 235) < 2).id);
     await debug(page, { op: 'kill_enemy', id: corpse });
     await page.waitForFunction(id => Field.slimes.find(s => s.id === id)?.dead, corpse);
-    await debug(page, { op: 'spawn_enemy', kind: 'cf_crawler', level: 99, x: 88, y: 25 });
-    await debug(page, { op: 'spawn_enemy', kind: 'cf_brute', level: 99, x: 84, y: 25 });
+    await debug(page, { op: 'spawn_enemy', kind: 'cf_crawler', level: 99, x: 258, y: 235 });
+    await debug(page, { op: 'spawn_enemy', kind: 'cf_brute', level: 99, x: 254, y: 235 });
     await page.waitForFunction(() => Field.slimes.filter(s => !s.dead && ['cf_brute', 'cf_crawler'].includes(s.kind)).length === 2);
     const expected = await page.evaluate(() => Field.slimes.filter(s => !s.dead && ['cf_brute', 'cf_crawler'].includes(s.kind))
       .sort((a, b) => Math.hypot(a.nx - Field.hero.nx, a.ny - Field.hero.ny) - Math.hypot(b.nx - Field.hero.nx, b.ny - Field.hero.ny))[0].id);
