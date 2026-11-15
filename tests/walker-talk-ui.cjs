@@ -53,17 +53,28 @@ async function call(name, args = {}) {
     return { courier: [n.x, n.y], hero: [Field.hero.nx, Field.hero.ny], goal: Field.hero.goal ? [Field.hero.goal.x, Field.hero.goal.y] : null, route: Field._debug.cityRoute.length };
   });
   console.log('clicked', JSON.stringify(clicked));
+  // Sample the talk walk every 100 ms until the dialogue opens. An idle hero is one that does not move while the talk is
+  // pending (no route left) and she is still more than 2.5 tiles away: the client must then re-route at once.
+  const sample = () => page.evaluate(() => { const n = City.npcs.find(n => n.id === 'city_courier'); return { hero: [Field.hero.nx, Field.hero.ny], route: Field._debug.cityRoute.length, npc: [n.x, n.y] }; });
   const trace = [];
-  for (let i = 0; i < 6; i++) {
-    const t = await page.evaluate(() => ({ hero: [+Field.hero.nx.toFixed(1), +Field.hero.ny.toFixed(1)], goal: Field.hero.goal ? [+Field.hero.goal.x.toFixed(1), +Field.hero.goal.y.toFixed(1)] : null, route: Field._debug.cityRoute.length, target: Field.hero.target ? Field.hero.target.kind : null, npc: (() => { const n = City.npcs.find(n => n.id === 'city_courier'); return [+n.x.toFixed(1), +n.y.toFixed(1)]; })() }));
-    trace.push(t);
-    await page.waitForTimeout(500);
+  let idle = 0, longestIdle = 0, prev = null;
+  for (let t = 0; t < 80; t++) {
+    const s0 = await sample();
+    const opened = await page.evaluate(() => { const d = document.getElementById('npc-dialogue'); return !!d && !d.hidden && getComputedStyle(d).display !== 'none'; });
+    const far = Math.hypot(s0.hero[0] - s0.npc[0], s0.hero[1] - s0.npc[1]) > 2.5;
+    const still = prev && Math.hypot(s0.hero[0] - prev.hero[0], s0.hero[1] - prev.hero[1]) < 0.02;
+    idle = opened || !far || !still || s0.route > 0 ? 0 : idle + 0.1;
+    longestIdle = Math.max(longestIdle, idle);
+    if (t % 5 === 0) trace.push({ t: t / 10, hero: s0.hero.map(v => +v.toFixed(1)), route: s0.route, npc: s0.npc.map(v => +v.toFixed(1)) });
+    if (opened) break;
+    prev = s0;
+    await page.waitForTimeout(100);
   }
-  console.log('trace', JSON.stringify(trace));
-  const opened = await page.waitForFunction(() => { const d = document.getElementById('npc-dialogue'); return d && !d.hidden && getComputedStyle(d).display !== 'none'; }, null, { timeout: 30000, polling: 250 }).then(() => true, () => false);
+  const opened = await page.evaluate(() => { const d = document.getElementById('npc-dialogue'); return !!d && !d.hidden && getComputedStyle(d).display !== 'none'; });
   const h1 = await hero(), c1 = await courier();
-  trace.push({ hero: h1, courier: c1, dist: Math.hypot(h1.x - c1.x, h1.y - c1.y).toFixed(2) });
-  console.log('after click', JSON.stringify(trace), 'opened', opened);
+  console.log('trace', JSON.stringify(trace));
+  console.log('after click', JSON.stringify({ opened, longestIdle: +longestIdle.toFixed(1), hero: h1, courier: c1, dist: +Math.hypot(h1.x - c1.x, h1.y - c1.y).toFixed(2) }));
+  check(longestIdle < 0.5, `the hero keeps walking to her while the talk is pending (idle ${longestIdle.toFixed(1)} s with no route and her more than 2.5 tiles away)`);
   check(opened, `The conversation with the walking courier opens after a click on her (hero ${h1.x.toFixed(1)},${h1.y.toFixed(1)}; courier ${c1.x.toFixed(1)},${c1.y.toFixed(1)}; ${Math.hypot(h1.x - c1.x, h1.y - c1.y).toFixed(1)} tiles apart)`);
   if (opened) check((await page.locator('#npc-name').textContent()).includes('Courier Fia'), 'the dialogue is the courier\'s');
   check(errors.length === 0, 'no page errors: ' + errors.join(' | '));
