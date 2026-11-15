@@ -48,7 +48,7 @@ const root=path.resolve(__dirname,'..');
      if(!inside(parent.polygon,...c.at))errors.push('city outside parent '+c.zone);
      const b=document.querySelector(`.wm-city[data-zone="${c.zone}"]`).getBoundingClientRect();if(b.width<43||b.height<43)errors.push('small city '+c.zone);
     }
-    const buttons=[...stage.querySelectorAll('.wm-entrance')],labels=[...stage.querySelectorAll('.wm-name,.wm-city')];
+    const buttons=[...stage.querySelectorAll('.wm-entrance')],labels=[...stage.querySelectorAll('.wm-name,.wm-city,.wm-city b')];
     for(const b of buttons) {
      const box=b.getBoundingClientRect(),size=touch=>touch?44:32;
      if(box.width<size(matchMedia('(pointer:coarse)').matches)-1||box.height<size(matchMedia('(pointer:coarse)').matches)-1)errors.push('small entrance '+b.dataset.to);
