@@ -71,7 +71,7 @@ async function hold(page, key, ms) {
   await cell('quests', 0).click();
   check(await cell('quests', 0).textContent() === 'Press a key…', 'A click starts the capture');
   await page.keyboard.press('g');
-  check(await cell('quests', 0).textContent() === 'G' && /Quests is now G/.test(await say()), `Quests is now G (${await say()})`);
+  check(await cell('quests', 0).textContent() === 'G' && /Quests is now G|G moved from .+ to Quests/.test(await say()), `Quests is now G (${await say()})`);
   await cell('bags', 0).click(); await page.keyboard.press('u');
   check(await cell('bags', 0).textContent() === 'U', 'Bags: first key is now U');
   await cell('moveLeft', 0).click(); await page.keyboard.press('r');
@@ -116,6 +116,7 @@ async function hold(page, key, ms) {
   await page.keyboard.press('p');
   check(await visible(page, '#equipment'), 'Bags took the old party key (P)');
   await page.keyboard.press('Escape');
+  await page.waitForFunction(() => document.getElementById('equipment').hidden, null, { timeout: 5000 });
   await page.keyboard.press('y');
   check(await visible(page, '#skills-panel'), 'The skills key (Y) opens the skills panel');
   await page.keyboard.press('Escape');

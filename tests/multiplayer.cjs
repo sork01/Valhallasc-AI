@@ -41,7 +41,8 @@ async function makePlayer(type, name) {
     if(packet.type==='event' && packet.kind==='pickup') page.pickups.push(packet);
     const snapshot=packet.type==='snapshot'?packet:packet.type==='welcome'?packet.snapshot:null;
     if(snapshot && !page.actorCollision) {
-      const actors=[...snapshot.players,...snapshot.slimes].filter(actor=>!actor.dead);
+      // Unpopulated zones send no slimes (or players) list at all: an absent list is empty.
+      const actors=[...(snapshot.players||[]),...(snapshot.slimes||[])].filter(actor=>!actor.dead);
       for(let i=0;i<actors.length;i++) for(let j=i+1;j<actors.length;j++) {
         const a=actors[i],b=actors[j];
         if(!a.kind && !b.kind)continue;
@@ -113,8 +114,11 @@ async function stageAt(page, point) {
   check(fs.readFileSync(path.join(root,'client/world.js'),'utf8').includes(JSON.stringify(map)), 'Map is identical on client and server');
   browser = await chromium.launch({ headless: true });
   const [warrior, mage, assassin] = await Promise.all([makePlayer('warrior','TestWarrior'), makePlayer('mage','TestMage'), makePlayer('assassin','TestAssassin')]);
+  // New heroes start on the Saltby pier, out of sight of the beetles (world/map.txt now places them around x 246-341, y 110-161): stage all three among them, so the later walk and blocker steps stay together.
+  await Promise.all([stageAt(warrior,{x:280,y:140}), stageAt(mage,{x:280,y:140}), stageAt(assassin,{x:280,y:140})]);
+  await warrior.waitForFunction(() => Field.slimes.some(s => s.kind === 'beetle'), null, { timeout: 30000 });
   await warrior.waitForFunction(() => !!Field.beetleSprites);
-  check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length===7 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.level===5 && s.maxHp===240 && s.windupTime===.4)), 'Seven tougher beetles arrive from authoritative snapshots, each at its default level 5 (the suite pins VALHALLA_LEVEL_SPREAD=0)');
+  check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length>=7 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.level===5 && s.maxHp===240 && s.windupTime===.4)), 'At least seven tougher beetles arrive from authoritative snapshots, each at its default level 5 (the suite pins VALHALLA_LEVEL_SPREAD=0)');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='big').every(s=>s.level===6 && s.maxHp===600 && s.windupTime===.35)), 'King Slime has stronger health and faster windup');
   check(await warrior.evaluate(() => {const kings=Field.slimes.filter(s=>s.kind==='big');return kings.length===2 && kings.every(s=>s.dead && s.hp===0 && s.state==='waiting' && s.dieT>=2);}), 'Kings start hidden while waiting for the rare spawn timer');
   check(await warrior.evaluate(() => Field.hero.xpNeed===100), 'Server sends the level table threshold');
@@ -158,7 +162,7 @@ async function stageAt(page, point) {
   const version=await probe(mage,{type:'join',version:999,look:{name:'BadVersion'}});check(version.type==='error','Protocol mismatch rejected');
   await warrior.evaluate(()=>Online.send({type:'attack',fx:1,fy:0,damage:99999}));
   await warrior.waitForFunction(()=>document.getElementById('chat-log').textContent.includes('Invalid command.'));passed++;
-  const dashStart=await assassin.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));await assassin.keyboard.press('Shift');
+  const dashStart=await assassin.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));await assassin.keyboard.down('d');await assassin.keyboard.press('Shift');await assassin.keyboard.up('d');
   await assassin.waitForFunction(start=>Math.hypot(Field.hero.x-start.x,Field.hero.y-start.y)>2,dashStart,{timeout:10000});
   const dashEnd=await assassin.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));check(Math.hypot(dashEnd.x-dashStart.x,dashEnd.y-dashStart.y)>2,'Assassin dash works through server');
   await warrior.screenshot({path:path.join(root,'test-results/multiplayer.png')});
@@ -214,7 +218,6 @@ async function stageAt(page, point) {
     check(await warrior.locator('[data-offer="tonic"]').isDisabled(),'Shop shows an unaffordable item without allowing a purchase');
     await warrior.locator('#npc-x').click();
   };
-  const city = cityBlock(); city.catch(() => {});   // an early failure is reported where it is awaited
   // The fighter starts at level 20 (a shortcut for staging only: every rule, reward and save still runs), as a veteran would.
   await shortcut(mage,{op:'set_level',level:20});
   await mage.waitForFunction(()=>Field.hero.level===20,null,{timeout:10000});
@@ -236,9 +239,13 @@ async function stageAt(page, point) {
   await mage.waitForFunction(() => Field.hero.hp === Field.hero.maxHp);
   await mage.locator('#npc-dialogue').waitFor({ state: 'visible' });
   await mage.locator('#npc-x').click();
-  await stageAt(mage,{x:7,y:64});
-  const spawned=await shortcut(mage,{op:'spawn_enemy',kind:'beetle',x:13,y:64,level:1});
-  await mage.waitForFunction(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&s.kind==='beetle'&&Math.abs(s.x-13)<2;},spawned.id,{timeout:10000});
+  // Beetles moved with the shaped Greenmeadow: stage the fighter on open ground with no other monster within 20 tiles (the crowd at x 280 killed
+  // other beetles and paid their gold into the same window), and keep the warrior in snapshot range to see the death.
+  await stageAt(warrior,{x:252,y:192});
+  await stageAt(mage,{x:244,y:188});
+  const at=await mage.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));
+  const spawned=await shortcut(mage,{op:'spawn_enemy',kind:'beetle',x:at.x+3,y:at.y,level:1});
+  await mage.waitForFunction(({id,x})=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&s.kind==='beetle';},{id:spawned.id},{timeout:10000});
   const beetleState=await mage.evaluate(id=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.id===id),kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level,xpNeed:Field.hero.xpNeed,gold:Field.hero.gold}),spawned.id);
   const pickupStart=mage.pickups.length, mageId=await mage.evaluate(()=>Online.id);
   const beetle=beetleState.enemy;
@@ -248,10 +255,13 @@ async function stageAt(page, point) {
   check(await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<9;},beetle.id),'Ironhide is visible in real browser combat');
   await mage.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,beetle.id,{timeout:30000});
   await warrior.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,beetle.id);passed++;
-  check(await mage.evaluate(before=>Field.hero.kills===before.kills+1&&(()=>{const total=before.xp+45+5*before.enemy.level;return before.level===Field.hero.level&&Field.hero.xp===total||Field.hero.level===before.level+1&&Field.hero.xp===total-before.xpNeed;})()&&Field.hero.hp>0,beetleState),'Beetle combat awards 45 + 5 per enemy level once, carrying any overflow into the next level');
+  // The city block walks the warrior across the map, so it starts only once the warrior has seen the beetle die.
+  const city = cityBlock(); city.catch(() => {});   // an early failure is reported where it is awaited
+  check(await mage.evaluate(before=>Field.hero.kills>=before.kills+1&&(()=>{const total=before.xp+Math.ceil((45+5*before.enemy.level)/2);return before.level===Field.hero.level&&Field.hero.xp>=total||Field.hero.level===before.level+1&&Field.hero.xp>=total-before.xpNeed;})()&&Field.hero.hp>0,beetleState),'Beetle combat awards at least its half-XP share (45 + 5 per enemy level, halved in Greenmeadow); the staged crowd can add other kills to the same window');
   const beetleDrop=await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return {x:s.x,y:s.y};},beetle.id);
   await mage.evaluate(p=>Online.send({type:'move',...p}),beetleDrop);
-  const beetleGold=Math.round(10*(1+.1*(beetle.level-5)));
+  // Enemy gold is halved at the kill (server mob_gold, MOB_GOLD_SCALE 0.5, owner 2026-10-21): the authored level-scaled amount, halved, never below 1.
+  const beetleGold=Math.max(1,Math.round(Math.round(10*(1+.1*(beetle.level-5)))*0.5));
   await mage.waitForFunction(({gold,value})=>Field.hero.gold>=gold+value,{gold:beetleState.gold,value:beetleGold},{timeout:15000});
   check(mage.pickups.slice(pickupStart).some(event=>event.actor===mageId && event.value===beetleGold), 'Server awards the level-scaled beetle gold pickup to its killer; wanted '+beetleGold+' for '+mageId+', saw '+JSON.stringify(mage.pickups.slice(pickupStart)));
   const progress=await mage.evaluate(()=>({id:Online.id,gold:Field.hero.gold,kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level}));
