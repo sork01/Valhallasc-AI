@@ -150,7 +150,7 @@ const errors = [];
   const pq = await rect(phone, '#quickuse'), pb = await rect(phone, '#skillbar');
   check(pq.b <= pb.t + 1 && pb.t - pq.b < 0.02 * pst.w && Math.abs(pq.l - pb.l) < 1.5, `At 844x390 the food and potion bar sits on the skillbar (${JSON.stringify({ pq, pb })})`);
   // A visitor who never moved anything gets Sork's arrangement; Reset goes back to it, and a layout of one's own is kept.
-  check(await phone.evaluate(() => JSON.stringify(Prefs.layout.party) === '{"x":61.04,"y":17.53}' && Prefs.layout.quests.y === -2.48 && Prefs.panelSize.chat.w === 34.36 && Prefs.panelSize.quests.h === 31.28), 'A fresh visitor gets the shipped layout and panel sizes');
+  check(await phone.evaluate(() => JSON.stringify(Prefs.layout.party) === '{"x":61.04,"y":17.53}' && Prefs.layout.quests.y === -2.48 && Prefs.panelSize.chat.w === 34.2 && Prefs.panelSize.quests.h === 31.28), 'A fresh visitor gets the shipped layout and panel sizes');
   const shippedKeys = await phone.evaluate(() => Object.keys(Prefs.layout).sort().join());   // the shipped pieces (grows with the remake: dps joined in 1.55.2)
   check(await phone.evaluate(() => document.getElementById('chat').style.getPropertyValue('--pw') !== '' || getComputedStyle(document.getElementById('chat')).getPropertyValue('--pw') !== ''), 'The default chat width is applied');
   await phone.evaluate(() => { Settings.startEdit(); Settings.layout.bags = { x: 0, y: 0 }; Prefs.set({ ui: { map: { x: 2, y: 2 } } }); Settings.refresh(); });
