@@ -7024,6 +7024,7 @@
   "Buy": "Köp",
   "Waiting for your previous connection to close…": "Väntar på att din förra anslutning ska stängas…",
   "Sell all junk": "Sälj allt skräp",
+  "Sell for": "Sälj för",
   "Sell valuable items?": "Sälj värdefulla föremål?",
   "That buy-back item is no longer available.": "Det återköpsföremålet är inte längre tillgängligt.",
   "That gear copy is not available to buy back.": "Det utrustningsexemplaret är inte tillgängligt för återköp.",

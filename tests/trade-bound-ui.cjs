@@ -58,7 +58,8 @@ async function call(name, args = {}) {
   check(tip.windowed.includes('tradeable for 1 h 42 min with the party of the roll'), `An open window names the time left: ${tip.windowed}`);
   await alice.keyboard.press('i');
 
-  await alice.keyboard.press('o'); await alice.locator('#social-tab-online').click();
+  await alice.evaluate(() => document.activeElement?.blur?.());
+  await alice.keyboard.press('o'); await alice.locator('#social-panel').waitFor({ state: 'visible' }); await alice.locator('#social-tab-online').click();
   await alice.waitForFunction(() => [...document.querySelectorAll('#social-body [data-player]')].some(n => n.textContent.includes('BoundBob')));
   await alice.locator('#social-body [data-player]', { hasText: 'BoundBob' }).getByRole('button', { name: 'Trade' }).click();
   await bob.locator('#trade-request').waitFor({ state: 'visible' });

@@ -65,11 +65,15 @@ async function closePanel(page) { await page.keyboard.press('Escape'); await pag
     await closePanel(page);
 
     // 3. In combat the button is disabled with the reason; leaving combat enables it again.
-    await debug(page, { op: 'teleport', zone: 0, x: 48, y: 20 });
-    await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 48, Field.hero.y - 20) < 2, null, { timeout: 10000 });
-    const prey = await page.waitForFunction(() => Field.slimes.find(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 40)?.id, null, { timeout: 15000 }).then(h => h.jsonValue());
+    // Open ground in Greenmeadow (new heroes start on the Saltby pier; (48,20) has no enemy near it any more).
+    await debug(page, { op: 'teleport', zone: 0, x: 250, y: 235 });
+    await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 250, Field.hero.y - 235) < 2, null, { timeout: 10000 });
+    await debug(page, { op: 'spawn_enemy', kind: 'green', level: 50, x: 253, y: 235 });
+    const prey = await page.waitForFunction(() => Field.slimes.find(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 6)?.id, null, { timeout: 15000 }).then(h => h.jsonValue());
     await debug(page, { op: 'kill_enemy', id: prey });
     await page.waitForFunction(() => Field.hero.inCombat, null, { timeout: 5000 });
+    // The meadow camp has other greens within reach that keep the hero in combat; they are cleared too.
+    await page.evaluate(() => Field.slimes.filter(s => !s.dead && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 15).forEach(s => Online.send({ type: 'debug', ref: 1, command: { op: 'kill_enemy', id: s.id } })));
     await openPanel(page);
     assert.equal(await page.locator('#rebirth-open').isDisabled(), true, 'combat blocks the button');
     assert.match(await page.locator('.rebirth-reason').textContent(), /Leave combat before you are reborn/);

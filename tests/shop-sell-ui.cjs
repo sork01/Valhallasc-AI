@@ -3,6 +3,8 @@ const { run, replace, debug, record } = require('./lib/touch.cjs');
 const suite = {
   name: 'merchant-frame',
   mutate(page) {
+    // The bag tooltip with the old hard-coded "gold" unit (a copper amount read as gold): the tooltip check must fail.
+    if (process.env.MUTATE === 'gold') return replace(page,'shop.js',"`${Locale.translate('Sell for')} ${Money.text(price(row))}`","Locale.translate(`Sell for ${price(row)} gold`)");
     if (process.env.MUTATE === 'layout') return replace(page,'online.css','#npc-dialogue.merchant-mode { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);','#npc-dialogue.merchant-mode { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr);');
     return replace(page,'shop.js','if (!precious.length)','if (true)');
   },
@@ -25,6 +27,8 @@ const suite = {
       await page.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);
       await sleep(600); console.log('merchant: visiting '+id);
       await page.evaluate(id=>Field.visitNpc(id),id);
+      // The greeting opens with Buy and Sell choices; the merchant workspace only opens after Buy is chosen.
+      await page.locator('#npc-offers [data-view="buy"]').click();
       await page.waitForFunction(()=>Shop.open&&document.querySelector('.merchant-workspace[aria-busy="false"]'));
     }
     console.log('merchant: setup complete');
@@ -40,15 +44,17 @@ const suite = {
     check(!smallTargets.length,`merchant controls meet 44px floors: ${JSON.stringify(smallTargets)}`);
     await page.locator('#inventory-list [data-item="slime_gel"] .item-tile').hover();
     await page.locator('#item-tooltip').waitFor({state:'visible'});
-    check(await page.locator('#item-tooltip').textContent().then(t=>t.includes('Sell for 23 copper')),'bag tooltip quotes the exact rebirth-adjusted stack price');
+    const tipText=await page.locator('#item-tooltip').textContent();
+    const sellFor=await page.evaluate(()=>{const r=shopPackets.at(-1).available.find(r=>r.item==='slime_gel');return Money.text(Math.floor((r.base*r.quantity*110+50)/100));});
+    check(tipText.includes('Sell for '+sellFor),`bag tooltip quotes the exact rebirth-adjusted stack price: "${tipText}" vs "Sell for ${sellFor}"`);
     check(await page.locator('#merchant-portrait').isVisible(),'circular NPC portrait accompanies the name');
     check(await page.locator('#merchant-stock > *').count()===10,'stock uses ten rectangular slots');
     check(await page.locator('.merchant-grid').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length)===2,'stock has two columns');
     check(await page.evaluate(()=>shopPackets.at(-1).available.filter(r=>r.item==='warrior_headgear_crimson_l5_gray').length)===1,'server excludes the equipped copy');
     check(await page.evaluate(id=>!shopPackets.at(-1).available.some(r=>r.item===id),quest),'quest item is protected');
     const quote=await page.evaluate(()=>shopPackets.at(-1));
-    const junk=quote.available.filter(r=>r.rarity==='common'&&(r.gear||r.item==='slime_gel'));
-    const total=junk.reduce((sum,r)=>sum+Math.floor((r.base*r.quantity*110+50)/100),0),before=await page.evaluate(()=>Field.hero.gold);
+    // The junk the server sells: common loose gear and materials, never starter gear (isJunk in shop.js), priced with the rebirth gold percent.
+    const total=await page.evaluate(()=>{const q=shopPackets.at(-1);return q.available.filter(r=>r.rarity==='common'&&(r.gear||r.item==='slime_gel')&&!Inventory.definition(r.item)?.starter).reduce((sum,r)=>sum+Math.floor((r.base*r.quantity*(100+q.goldPercent)+50)/100),0);}),before=await page.evaluate(()=>Field.hero.gold);
     await record(page); await page.locator('#sell-junk').tap();
     await page.waitForFunction(total=>shopPackets.some(p=>p.changed&&p.paid===total),total);
     await page.waitForFunction(gold=>Field.hero.gold===gold,before+total);
@@ -97,6 +103,7 @@ const suite = {
     if(width===844) {
       const sv=await player('MerchantSvenska',{lang:'sv'}); const n=await sv.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='smith'));
       await debug(sv,{op:'teleport',zone:0,x:n.x,y:n.y+1});await sv.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);await sv.evaluate(()=>Field.visitNpc('smith'));
+      await sv.locator('#npc-offers [data-view="buy"]').click();
       await sv.locator('.merchant-tabs [data-tab="merchant"]').waitFor();
       check(await sv.locator('.merchant-tabs [data-tab="merchant"]').textContent()==='Handlare'&&await sv.locator('.merchant-tabs [data-tab="back"]').textContent()==='Återköp','merchant tabs have Swedish labels');await sv.context().close();
     }
