@@ -3,6 +3,7 @@
 // persistence are exercised by the Rust tests and the `gloamfen` / `fen_quests` MCP scenarios; this walks with real
 // canvas clicks and asserts what the player sees. Run against the real art with REAL_SPRITES=1 (npm run test:art does).
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const path = require('node:path');
 const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
@@ -116,7 +117,10 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(await page.evaluate(() => Field.slimes.length > 0 && Field.slimes.every(s => s.zone === 3 && Number.isInteger(s.level) && s.level >= 13 && s.level <= 22)), 'Only fen enemies, each with an integer level, are shown');
   // The fen atlases load when the first fen enemy is in view (after the walk into the fen), not at login.
   await page.waitForFunction(() => !!Field.fenSprites?.meta, null, { timeout: 60000 });
-  check(await page.evaluate(stub => { const m = Field.fenSprites.meta; return m.kinds.join() === 'toad,croc,knight,hydra,gloomroot' && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === 768 && Field.fenSprites.img[k].naturalHeight === 480)); }, STUB), 'The four fen monster atlases are loaded (768x480 on the real art)');
+  // Each fen atlas is an 8 x 5 grid of frames at its own frame size (client/assets/fen.txt kindFrames), so the size is derived per kind.
+  const fenManifest = JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'client/assets/fen.txt'), 'utf8'));
+  const fenFrames = Object.fromEntries(Object.entries(fenManifest.kindFrames).map(([k, v]) => [k, v.frame]));
+  check(await page.evaluate(([stub, kinds, frames]) => { const m = Field.fenSprites.meta; return m.kinds.join() === kinds.join() && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === frames[k][0] * 8 && Field.fenSprites.img[k].naturalHeight === frames[k][1] * 5)); }, [STUB, fenManifest.kinds, fenFrames]), 'The four fen monster atlases are loaded (8 x 5 frames of each kind\'s size on the real art)');
   check(await page.evaluate(() => Field.remotePlayers.length === 0), 'Nobody else is shown (only players in this zone are drawn)');
   // A violet dusk: the sky beyond the map's north edge (the top-right corner of the screen) is dark and bluish-violet.
   const sky = [await look(page, [.9, 0, 1, .07])];
