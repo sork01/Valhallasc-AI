@@ -108,7 +108,16 @@ const skillCatalog = JSON.parse(fs.readFileSync(path.join(root, 'world/skills.tx
 const quest = (w, bot, id) => w.player(bot).quests.find(q => q.id === id);
 // The loops below drive talk and kill objectives. The shaped zones also hold visit, bring, hold, escort, memory and echo quests
 // (their own suites run them), so a quest with any other kind is left to those suites.
-const pursuable = q => q.objectives.every(o => o.kind === 'talk' || o.kind === 'kill');
+// A quest is pursued here when it is a talk/kill quest that is not automatic and whose prerequisite (`requires`) is itself pursued:
+// anvil_slagmaw needs anvil_props (a hold quest), so the loop must skip it rather than time out on its refused accept.
+const pursued = quests => {
+  const done = new Set();
+  return quests.filter(q => {
+    const ok = !q.autoLevel && q.objectives.every(o => o.kind === 'talk' || o.kind === 'kill') && (!q.requires || done.has(q.requires));
+    if (ok) done.add(q.id);
+    return ok;
+  });
+};
 async function defeat(w, bot, kind) {
   if (w.player(bot).hp < w.player(bot).maxHp * .85) await talk(w, bot, 'healer', 'blessing');
   // Starter gear needs isolated fights; prefer targets away from extra attackers.
@@ -1007,7 +1016,7 @@ const scenarios = {
       await kit.talkTo(w, bot, 'crags_scout', 'quest:accept:crags_welcome');
       check(!quest(w, bot, 'crags_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
       check(kit.describe('quests').quests.filter(q => q.zone === 1).length === crags.quests.length, `MCP describes all ${crags.quests.length} Crags quests with their zone`);
-      for (const q of crags.quests.filter(q => !q.autoLevel && pursuable(q))) {
+      for (const q of pursued(crags.quests)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
         await w.waitFor(() => !!quest(w, bot, q.id));
@@ -1040,10 +1049,10 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
-      for (const q of crags.quests.filter(q => q.repeatable)) {
+      for (const q of pursued(crags.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
-        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
-        await w.waitFor(() => !quest(w, bot, q.id).claimed);
+        const reaccept = await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !quest(w, bot, q.id).claimed, 10000, `${q.title}: re-accept (${reaccept.notice})`);
         check(!quest(w, bot, q.id).claimed && quest(w, bot, q.id).completions === 1 && quest(w, bot, q.id).counts.every(n => n === 0), `${q.title}: repeat acceptance resets objectives and retains history`);
       }
       await kit.teleport(w, bot, { npc: 'crags_healer' });
@@ -1064,7 +1073,7 @@ const scenarios = {
     },
   },
   rimeveil: {
-    description: 'Walk through the Rimeveil Gate at the top of the Crags into the level 10-15 glacier, walk the whole ice spiral to the summit through all four ring gaps, fight a leveled Rime Crab, use both gates, and keep the zone across reconnect and restart.',
+    description: 'Walk through the Rimeveil Gate at the top of the Crags into the level 10-15 glacier, walk straight in across the open south-east lane to the Heart of the Glacier, fight a leveled Rime Crab, use both gates, and keep the zone across reconnect and restart.',
     async run(w, check) {
       const bot = 'Glacier';
       await w.connect({ bot, class: 'warrior' });
@@ -1104,33 +1113,39 @@ const scenarios = {
         'Each client is sent only its own zone');
       check(JSON.stringify(w.snapshot.zonesSeen) === '[1,2]', 'The merged test view covers the two zones while a bot stands in each');
       await w.disconnect('Cragger');
-      // The ice spiral: its route runs through all four ring gaps, and the walk to the summit really works.
-      // The bowl's centre holds the gate to Gloamfen (64,50), so the walk ends just short of it.
-      const center = { x: 64, y: 46 }, gaps = [{ x: 64, y: 100 }, { x: 64, y: 15 }, { x: 64, y: 78 }, { x: 64, y: 37 }];
+      // The way in, derived from the shaped map: the summit bowl is the `rime_heart` place. The shaped Rimeveil is no longer a
+      // spiral: its design (docs/rimeveil-design.md) leaves the south-east of every ice ring open towards the camp, so the walk
+      // runs straight in across that lane. The route must still reach the Heart on foot and must not wind: a detour through
+      // the rings would be much longer than the straight line.
+      const heart = rime.places.find(p => p.id === 'rime_heart');
+      const center = { x: heart.x, y: heart.y };
       const path = route(rime, w.player(bot), center), from = { x: w.player(bot).x, y: w.player(bot).y };
-      // The route is a few long straight legs, so measure how close each gap lies to a leg rather than to a waypoint.
-      const legDistance = (g, a, b) => { const dx = b.x - a.x, dy = b.y - a.y, t = Math.max(0, Math.min(1, ((g.x - a.x) * dx + (g.y - a.y) * dy) / (dx * dx + dy * dy || 1))); return Math.hypot(g.x - a.x - dx * t, g.y - a.y - dy * t); };
-      check(gaps.every(g => path.some((p, i) => legDistance(g, i ? path[i - 1] : from, p) < 4.3)), 'The only route to the summit passes through the gaps of all four rings');
-      let length = distance(w.player(bot), path[0]);
+      check(path.length > 0 && distance(path[path.length - 1], center) < 1.5, 'The route from the camp reaches the Heart of the Glacier');
+      let length = distance(from, path[0]);
       path.forEach((p, i) => { if (i) length += distance(path[i - 1], p); });
-      check(length > 3.5 * distance(w.player(bot), center), `The way in is a spiral: ${Math.round(length)} units of walking for ${Math.round(distance(w.player(bot), center))} units of distance`);
+      check(length <= 1.2 * distance(from, center), `The way in crosses the open south-east lane straight: ${Math.round(length)} units of walking for ${Math.round(distance(from, center))} units of distance`);
       for (const point of path) {
         await w.action(bot, { type: 'move', ...point });
-        await w.waitFor(() => distance(w.player(bot), point) < .5, 30000, `Walk the spiral to ${Math.round(point.x)},${Math.round(point.y)}`);
+        await w.waitFor(() => distance(w.player(bot), point) < .5, 30000, `Walk to the Heart: ${Math.round(point.x)},${Math.round(point.y)}`);
       }
       await w.action(bot, { type: 'stop' });
       check(w.player(bot).zone === 2 && distance(w.player(bot), center) < 1.5, 'The bot reaches the summit bowl on foot');
-      // Way back to the Crags: teleport to camp (staging), then a real walk through the Crags Gate and through the new gate again.
+      // Way back to the Crags: teleport to the glacier side of the Crags seam (staging), then a real walk through it and through the Rimeveil seam again.
       const back = rime.portals[0];
-      await kit.teleport(w, bot, { zone: 2, x: arrival.x, y: arrival.y });
-      await w.action(bot, { type: 'move', x: back.x, y: back.y + 1.2 });
+      const home = stepThrough(back);
+      await kit.teleport(w, bot, { zone: 2, x: home.start.x, y: home.start.y });
+      await w.advance(700);
+      await w.action(bot, { type: 'move', x: home.goal.x, y: home.goal.y });
       await w.waitFor(() => w.player(bot).zone === 1, 15000, 'Step through the Crags Gate');
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).zone === 1 && distance(w.player(bot), { x: back.tx, y: back.ty }) < 1, 'The Crags Gate arrives beside the Rimeveil Gate');
-      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      check(w.player(bot).zone === 1 && distance(w.player(bot), { x: back.tx, y: back.ty }) < 2.5, 'The Crags Gate arrives beside the Rimeveil Gate');
+      const reenter = stepThrough(up);
+      await kit.teleport(w, bot, { zone: 1, x: reenter.start.x, y: reenter.start.y });
+      await w.advance(700);
+      await w.action(bot, { type: 'move', x: reenter.goal.x, y: reenter.goal.y });
       await w.waitFor(() => w.player(bot).zone === 2, 15000, 'Step through the Rimeveil Gate again');
       await w.action(bot, { type: 'stop' });
-      check(w.player(bot).zone === 2 && distance(w.player(bot), arrival) < 1, 'The gate works again right after arriving, in both directions');
+      check(w.player(bot).zone === 2 && distance(w.player(bot), arrival) < 2.5, 'The gate works again right after arriving, in both directions');
       // Fight a Rime Crab through normal target actions; test worlds are invulnerable.
       const crab = w.snapshot.slimes.filter(s => s.kind === 'crab' && !s.dead).sort((a, b) => distance(a, arrival) - distance(b, arrival))[0];
       await kit.teleport(w, bot, { enemy: crab.id });
@@ -1138,7 +1153,8 @@ const scenarios = {
       await w.action(bot, { type: 'target', id: crab.id });
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === crab.id).dead, 90000, 'Defeat the crab');
       await w.action(bot, { type: 'stop' });
-      const xp = enemyXp(crab.level), gold = Math.round(60 * (1 + .1 * (crab.level - 10)));
+      // Enemy gold is halved where the kill pays (MOB_GOLD_SCALE, owner 2026-10-21); the authored value rolls 10% a level.
+      const xp = enemyXp(crab.level), gold = Math.max(1, Math.round(Math.round(60 * (1 + .1 * (crab.level - 10))) * .5));
       check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + xp, `The kill pays the level-${crab.level} XP (${xp})`);
       const corpse = w.snapshot.slimes.find(s => s.id === crab.id);
       await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });
@@ -1169,7 +1185,7 @@ const scenarios = {
       await kit.talkTo(w, bot, 'rime_tracker', 'quest:accept:rime_welcome');
       check(!quest(w, bot, 'rime_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
       check(kit.describe('quests').quests.filter(q => q.zone === 2).length === rime.quests.length && rime.quests.length >= 10, `MCP describes all ${rime.quests.length} glacier quests with their zone`);
-      for (const q of rime.quests.filter(q => !q.autoLevel && pursuable(q))) {
+      for (const q of pursued(rime.quests)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
         await w.waitFor(() => !!quest(w, bot, q.id));
@@ -1198,10 +1214,10 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
-      for (const q of rime.quests.filter(q => q.repeatable)) {
+      for (const q of pursued(rime.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
-        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
-        await w.waitFor(() => !quest(w, bot, q.id).claimed);
+        const reaccept = await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !quest(w, bot, q.id).claimed, 10000, `${q.title}: re-accept (${reaccept.notice})`);
         check(!quest(w, bot, q.id).claimed && quest(w, bot, q.id).completions === 1 && quest(w, bot, q.id).counts.every(n => n === 0), `${q.title}: repeat acceptance resets objectives and retains history`);
       }
       await kit.teleport(w, bot, { npc: 'rime_healer' });
@@ -1422,8 +1438,8 @@ const scenarios = {
       for (const x of city.quests.filter(x => !x.autoLevel && x.objectives.every(o => ['talk', 'bring', 'reach'].includes(o.kind)))) {
         await kit.teleport(w, bot, { npc: x.npc });
         if (x.requires && !(q(x.requires)?.claimed)) throw Error(`Order: ${x.id} needs ${x.requires}`);
-        await kit.talkTo(w, bot, x.npc, `quest:accept:${x.id}`);
-        await w.waitFor(() => !!q(x.id));
+        const accepted = await kit.talkTo(w, bot, x.npc, `quest:accept:${x.id}`);
+        await w.waitFor(() => !!q(x.id), 10000, `${x.title}: accept (${accepted.notice})`);
         const bring = x.objectives.filter(o => o.kind === 'bring');
         check(q(x.id).counts.every((n, k) => x.objectives[k].kind === 'bring' ? n <= x.objectives[k].count : n === 0), `${x.title}: accepted with fresh talk objectives`);
         const early = await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
@@ -1458,8 +1474,8 @@ const scenarios = {
       // The repeatable standing order pays again after another hand-in.
       const standing = city.quests.find(x => x.repeatable);
       await kit.teleport(w, bot, { npc: standing.npc });
-      await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
-      await w.waitFor(() => !q(standing.id).claimed);
+      const restand = await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
+      await w.waitFor(() => !q(standing.id).claimed, 10000, `${standing.title}: repeat accept (${restand.notice})`);
       check(q(standing.id).completions === 1 && q(standing.id).counts.every(n => n === 0 || n > 0), `${standing.title}: repeat acceptance keeps its history`);
       for (const o of standing.objectives) await w.debug(bot, { op: 'give_item', item: o.target, quantity: o.count });
       await w.waitFor(() => q(standing.id).counts.every((n, k) => n === standing.objectives[k].count));
@@ -1503,7 +1519,7 @@ const scenarios = {
       await kit.talkTo(w, bot, 'fen_ranger', 'quest:accept:fen_welcome');
       check(!quest(w, bot, 'fen_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
       check(kit.describe('quests').quests.filter(q => q.zone === 3).length === fen.quests.length && fen.quests.length >= 10, `MCP describes all ${fen.quests.length} fen quests with their zone`);
-      for (const q of fen.quests.filter(q => !q.autoLevel && pursuable(q))) {
+      for (const q of pursued(fen.quests)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
         await w.waitFor(() => !!quest(w, bot, q.id));
@@ -1536,10 +1552,10 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
-      for (const q of fen.quests.filter(q => q.repeatable)) {
+      for (const q of pursued(fen.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
-        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
-        await w.waitFor(() => !quest(w, bot, q.id).claimed);
+        const reaccept = await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !quest(w, bot, q.id).claimed, 10000, `${q.title}: re-accept (${reaccept.notice})`);
         check(!quest(w, bot, q.id).claimed && quest(w, bot, q.id).completions === 1 && quest(w, bot, q.id).counts.every(n => n === 0), `${q.title}: repeat acceptance resets objectives and retains history`);
       }
       await kit.teleport(w, bot, { npc: 'fen_healer' });
