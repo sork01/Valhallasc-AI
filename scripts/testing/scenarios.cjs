@@ -2965,7 +2965,7 @@ const scenarios = {
       }
       const repeat = ordinary.find(q => q.repeatable);
       await kit.talkTo(w, bot, repeat.npc, `quest:accept:${repeat.id}`);
-      await w.debug(bot, { op: 'give_item', item: 'drowned_coin', quantity: 4 });
+      for (const o of repeat.objectives.filter(o => o.kind === 'bring')) await w.debug(bot, { op: 'give_item', item: o.target, quantity: o.count });
       await kit.talkTo(w, bot, repeat.npc, `quest:claim:${repeat.id}`);
       await w.waitFor(() => quest(w, bot, repeat.id).completions === 2);
       check(quest(w, bot, repeat.id).completions === 2, 'The standing order repeats with a second real hand-in');
