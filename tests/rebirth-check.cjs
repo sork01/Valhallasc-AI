@@ -40,6 +40,13 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
     const owned = id => (me().inventory.find(s => s.item === id)?.quantity || 0);
     const rebirth = async (level, expectTier) => {
       await debug('set_level', { level });
+      // A stuck chaser elsewhere in the zone (a snowstoat hunting the hero from 17 tiles, Yearwheel, 2026-11-15) keeps
+      // the combat timer refreshed for as long as it stays in chase, so the hero leaves the zone (to the pier, a sanctuary) to end the fight.
+      if (me().inCombat) {
+        // The Saltby pier is a sanctuary (nothing there starts a fight); open ground beside the spawn has a wandering blue.
+        await debug('teleport', { zone: 0, x: 250, y: 167 });
+        await w.waitFor(() => (me().zone || 0) === 0 && Math.hypot(me().x - 250, me().y - 167) < 2, 10000, 'to the Greenmeadow');
+      }
       await w.waitFor(() => !me().inCombat, 12000, 'leave combat');
       const before = me().reborn.count;
       const preview = await ask({ type: 'rebirth_preview' }, 'rebirthPreview');
