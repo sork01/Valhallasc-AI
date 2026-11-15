@@ -57,7 +57,11 @@ const call = async (name, args = {}) => {
       }
       socket.send(JSON.stringify(packet));
     });
-    socket.onMessage(message => server.send(message));
+    // The page offers deflated snapshots (pako); the fixture needs readable JSON frames, so ask for plain text.
+    socket.onMessage(message => {
+      if (typeof message === 'string') { try { const join = JSON.parse(message); if (join.type === 'join') { delete join.compress; message = JSON.stringify(join); } } catch {} }
+      server.send(message);
+    });
   });
   await page.addInitScript(() => {
     if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, musicVol: .45, sfxVol: 0 }));

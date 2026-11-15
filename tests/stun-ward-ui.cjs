@@ -59,9 +59,10 @@ async function pixelDelta(page, id, kind) {
     await page.waitForTimeout(500);
     return page;
   }
-  const mage = await player('WardMage', 'mage', 9, 9);
-  const assassin = await player('StunAssassin', 'assassin', 10.5, 9);
-  const observer = await player('Bystander', 'warrior', 8, 10.5);
+  // New heroes start in Saltby's sanctuary, where PvP is illegal: fight on open ground in zone 0.
+  const mage = await player('WardMage', 'mage', 250, 235);
+  const assassin = await player('StunAssassin', 'assassin', 251.5, 235);
+  const observer = await player('Bystander', 'warrior', 249, 236.5);
   const mageId = await mage.evaluate(() => Online.id), assassinId = await assassin.evaluate(() => Online.id), observerId = await observer.evaluate(() => Online.id);
   await pvp(assassin, { op: 'duel_request', id: mageId });
   await mage.waitForFunction(() => Pvp.state.requests.length > 0);
@@ -118,18 +119,22 @@ async function pixelDelta(page, id, kind) {
   check(await pixelDelta(observer, mageId, 'ward') > 300, 'opponent and bystander see the ward');
   check(await pixelDelta(observer, observerId, 'ward') === 0, 'unwarded character has no ward effect');
   const ice = await mage.evaluate(() => {
-    const c = document.createElement('canvas'); c.width = 240; c.height = 280;
-    const g = c.getContext('2d'); g.translate(120, 205);
-    Field._debug.drawMageWardShell(g, { ...Field.hero, wardHitAt: -99, wardBreakAt: -99 }, 0);
-    const blue = ([x,y,w,h]) => { const d = g.getImageData(x + 120, y + 205, w, h).data; let count = 0;
+    // The ward draws in two passes (back ice behind the body, front ice over it), so each cluster is read from its own pass.
+    const pass = back => { const c = document.createElement('canvas'); c.width = 240; c.height = 280;
+      const g = c.getContext('2d'); g.translate(120, 205);
+      Field._debug.drawMageWardShell(g, { ...Field.hero, wardHitAt: -99, wardBreakAt: -99 }, 0, back);
+      return g; };
+    const front = pass(false), backG = pass(true), g = front;
+    const blue = ([x,y,w,h], g) => { const d = g.getImageData(x + 120, y + 205, w, h).data; let count = 0;
       for (let i = 0; i < d.length; i += 4) if (d[i+3] > 150 && d[i+2] > d[i] + 20 && d[i+2] > d[i+1] + 5) count++;
       return count;
     };
-    const clusters = [[-95,-160,60,80],[-30,-195,60,70],[35,-160,65,80],[-95,-45,65,100],[25,-45,70,100]].map(blue);
+    const clusters = [[-95,-160,60,80],[-30,-195,60,70],[35,-160,65,80]].map(r => blue(r, backG))
+      .concat([[-95,-45,65,100],[25,-45,70,100]].map(r => blue(r, front)));
     const center = g.getImageData(105, 110, 30, 65).data; let covered = 0;
     for (let i = 3; i < center.length; i += 4) if (center[i] > 100) covered++;
     const aura = [[-84,-67,7,8],[77,-67,7,8],[-4,37,8,7]].map(([x,y,w,h]) => {
-      const d = g.getImageData(x + 120, y + 205, w, h).data; let peak = 0;
+      const d = backG.getImageData(x + 120, y + 205, w, h).data; let peak = 0;   // the mist (the aura) is drawn in the back pass
       for (let i = 3; i < d.length; i += 4) peak = Math.max(peak, d[i]);
       return peak;
     });

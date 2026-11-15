@@ -58,7 +58,9 @@ const check = (value, label) => { assert.ok(value, label); checks++; };
   await page.evaluate(() => { __soundTap.starts = []; Online.send({ type: 'debug', command: { op: 'die' } }); });
   await page.waitForFunction(() => __soundTap.starts.some(s => s.cue?.startsWith('player-female-death')));
   check(true, 'authoritative female death plays a female recording');
-  await page.waitForFunction(() => !Field.hero.dead, null, { timeout: 15000 });
+  // Humans no longer respawn on a timer: the death leaves a ghost until the corpse run or Resurrect, so the hero stays dead.
+  await page.waitForFunction(() => Field.hero.dead, null, { timeout: 15000 });
+  check(await page.evaluate(() => Field.hero.dead === true), 'authoritative death keeps the hero down (ghost, no timer respawn)');
   await page.evaluate(() => Field.stop());
   await page.waitForTimeout(1200);
   const played = await page.evaluate(async () => {

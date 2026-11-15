@@ -58,7 +58,7 @@ const check = (ok, text) => { assert.ok(ok, text); checks++; console.log(text); 
   await page.locator('#npc-dialogue button[data-action="claim"]').click();
   await page.waitForFunction(() => Field.hero.quests.find(q => q.id === 'entry_moon').completions === 1);
   check(true, 'The bell quest turns in through Complete Quest');
-  for (const [x, y] of [[97.1, 58], [97.1, 65], [89.1, 71]]) await teleport(6, x, y);
+  for (const [x, y] of [[166, 175.5], [166, 182.5], [158, 188.5]]) await teleport(6, x, y); // admit_cradle, admit_oath, admit_farewell (map.txt zones[5] places)
   await speak(6, 'barrow_scribe');
   check((await page.locator('#npc-text').textContent()).includes('Alva'), 'Egil actually tells the forgotten names');
   await page.waitForFunction(() => Field.hero.quests.find(q => q.id === 'entry_norn').counts.every(n => n === 1));
