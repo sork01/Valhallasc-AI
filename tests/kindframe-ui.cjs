@@ -23,17 +23,30 @@ const SPEC = {
   cinderlord: { frame: [193, 96],  anchor: [96, 90],   rgb: [40, 250, 80] },     // 193 px: refused, falls back to the zone-wide frame
 };
 const ZONE = { frame: [96, 96], anchor: [48, 90] };
+// Emberfall Crags is zone 1 in game terms. The old fixed point (50,50) is not near any Crags spawn (the hero starts on the Saltby pier),
+// so stand at the spawn point with the most of the five kinds within 40 tiles (the snapshot culls enemies beyond 56 tiles).
+const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'];
+const CRAG_SPOT = kinds => {   // runs in the page
+  const z = WORLD_MAP.zones.find(z => z.name === 'Emberfall Crags'), pool = (z?.slimes || []).filter(s => kinds.includes(s.kind));
+  let best = null;
+  for (const a of pool) { const n = new Set(pool.filter(b => Math.hypot(b.x - a.x, b.y - a.y) <= 40).map(b => b.kind)).size; if (!best || n > best.n) best = { n, x: a.x, y: a.y }; }
+  return best;
+};
 const body = (f, a) => { const bx0 = Math.round(f[0] * .15), by0 = Math.round(f[1] * .12); return { bx0, bx1: f[0] - bx0, by0, by1: a[1] + 1 }; };
 const LIVE = JSON.parse(fs.readFileSync(path.join(root, 'client/assets/crags.txt'), 'utf8'));
 const COUNTS = Object.values(LIVE.clips).map(c => c.n);                          // 6, 8, 8, 4, 8 = 34 frames
 
 (async () => {
   try {
-    // ---- backward compatibility, part 1: no live manifest or atlas changed, none carries kindFrames
+    // ---- backward compatibility, part 1: no live manifest or atlas changed; every kindFrames entry already live is within the contract
     const manifests = fs.readdirSync(path.join(root, 'client/assets')).filter(f => f.endsWith('.txt')).map(f => [f, (() => { try { return JSON.parse(fs.readFileSync(path.join(root, 'client/assets', f), 'utf8')); } catch (_) { return null; } })()])
       .filter(([, d]) => d && typeof d === 'object' && d.kinds && d.clips && d.frame && d.anchor);
     check(manifests.length >= 25, `${manifests.length} live enemy manifests found (floor 25)`);
-    check(manifests.every(([, d]) => !('kindFrames' in d)), 'no live manifest carries kindFrames: every live kind keeps its zone-wide frame');
+    // Per-kind frames went live with the enemy-art program (Beta 1.44.0): a live entry must be an integer frame of 32..192 with its anchor inside it.
+    const ownEntries = manifests.flatMap(([f, d]) => Object.entries(d.kindFrames || {}).map(([k, e]) => [f, k, e]));
+    const sane = ([, , e]) => Number.isInteger(e.frame?.[0]) && Number.isInteger(e.frame?.[1]) && e.frame.every(v => v >= 32 && v <= 192)
+      && Number.isInteger(e.anchor?.[0]) && Number.isInteger(e.anchor?.[1]) && e.anchor[0] >= 0 && e.anchor[0] < e.frame[0] && e.anchor[1] >= 0 && e.anchor[1] < e.frame[1];
+    check(ownEntries.length > 0 && ownEntries.every(sane), `${ownEntries.length} live kindFrames entries in ${new Set(ownEntries.map(x => x[0])).size} manifests, every one an integer 32..192 frame with its anchor inside`);
     const dirty = execFileSync('git', ['status', '--porcelain', '--', 'client/assets'], { cwd: root, encoding: 'utf8' }).trim();
     check(dirty === '', 'client/assets (every live manifest and atlas) is byte-identical to HEAD' + (dirty ? ': ' + dirty : ''));
 
@@ -83,24 +96,26 @@ const COUNTS = Object.values(LIVE.clips).map(c => c.n);                         
 
     // ---- backward compatibility, part 2: real unmodified art in two live zones renders pixel-identically to the old formula
     const live = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
-    await setup(live, null, 'KindLive');
+    await setup(live, process.env.MUTATE_LIVE || null, 'KindLive');
     await live.waitForFunction(() => Field.slimes.some(s => !s.dead && Field._debug.enemySource(s)), null, { timeout: 30000 });
     const exhaustive = await live.evaluate(async list => {      // frameOf for EVERY kind of EVERY live manifest equals the zone-wide frame
       let kinds = 0, bad = [];
       for (const [name, meta] of list) for (const kind of meta.kinds) {
-        const f = Field.frameOf({ meta, img: {} }, kind); kinds++;
-        if (f.w !== meta.frame[0] || f.h !== meta.frame[1] || f.ax !== meta.anchor[0] || f.ay !== meta.anchor[1] || f.own || f.shadow !== 1) bad.push(name + ':' + kind);
+        const f = Field.frameOf({ meta, img: {} }, kind), e = meta.kindFrames?.[kind], [w, h] = e ? e.frame : meta.frame, [ax, ay] = e ? e.anchor : meta.anchor; kinds++;
+        if (f.w !== w || f.h !== h || f.ax !== ax || f.ay !== ay || f.own !== !!e || f.shadow !== w / meta.frame[0]) bad.push(name + ':' + kind);
       }
       return { kinds, bad };
     }, manifests);
-    check(exhaustive.kinds >= 300 && exhaustive.bad.length === 0, `frameOf equals the zone-wide frame, own=false, shadow 1 for all ${exhaustive.kinds} kinds of all ${manifests.length} live manifests` + (exhaustive.bad.length ? ': ' + exhaustive.bad.slice(0, 5) : ''));
+    check(exhaustive.kinds >= 300 && exhaustive.bad.length === 0, `frameOf equals each kind's kindFrames entry (own, shadow = width/96) or the zone-wide frame otherwise, for all ${exhaustive.kinds} kinds of all ${manifests.length} live manifests` + (exhaustive.bad.length ? ': ' + exhaustive.bad.slice(0, 5) : ''));
     const compat = await live.evaluate(() => {
-      const results = [], seen = new Set();
+      const results = [], seen = new Map();      // one zone-wide and one own-frame kind per manifest (a full sweep is too heavy for the cap)
       for (const actor of Field.slimes) {
         const src = Field._debug.enemySource(actor);
-        if (!src || seen.has(src.meta)) continue;
-        seen.add(src.meta);
-        const [fw, fh] = src.meta.frame, [ax, ay] = src.meta.anchor, K = 2.1 * actor.d.scale;
+        if (!src || actor.kind === 'ember_firelord') continue;      // drawSlimeSprite recolours the Firelord sheet (RaidKey.tint): its pixels are checked by the raid suites
+        const tag = src.meta.kindFrames?.[actor.kind] ? 'own' : 'zone', done = seen.get(src.meta) || new Set();
+        if (done.has(tag)) continue;
+        done.add(tag); seen.set(src.meta, done);
+        const F = Field.frameOf(src, actor.kind), [fw, fh] = [F.w, F.h], [ax, ay] = [F.ax, F.ay], K = 2.1 * actor.d.scale;
         for (const [state, clip, n] of [['idle', 'idle', 0], ['lunge', 'attack', 4]]) {
           const s = { ...actor, dead: false, dir: 1, hurtT: 0, state, st: .15, recT: 0, hop: 0, hopV: 0, landT: 0, blink: 0, seed: 0 };
           const mk = () => { const c = document.createElement('canvas'); c.width = 700; c.height = 700; return c; };
@@ -110,13 +125,16 @@ const COUNTS = Object.values(LIVE.clips).map(c => c.n);                         
           gb.drawImage(src.img[actor.kind], n * fw, src.meta.clips[clip].row * fh, fw, fh, -ax, -ay, fw, fh); gb.restore();
           const da = ga.getImageData(0, 0, 700, 700).data, db = gb.getImageData(0, 0, 700, 700).data;
           let diff = 0, opaque = 0; for (let i = 0; i < da.length; i++) { if (da[i] !== db[i]) diff++; if (i % 4 === 3 && da[i]) opaque++; }
-          results.push({ kind: actor.kind, state, diff, opaque, frame: [fw, fh] });
+          results.push({ kind: actor.kind, state, diff, opaque, frame: [fw, fh], own: F.own });
         }
       }
       return results;
     });
-    check(compat.length >= 4 && compat.every(r => r.diff === 0 && r.opaque > 100), `pixel-identical to the old formula for ${compat.length / 2} live zone sources (${[...new Set(compat.map(r => r.kind + ' ' + r.frame.join('x')))].join(', ')}), idle and attack frames`);
-    await live.evaluate(() => { Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: 50, y: 50 } }); });
+    const badCompat = compat.filter(r => !(r.diff === 0 && r.opaque > 100));
+    check(compat.length >= 4 && badCompat.length === 0, `pixel-identical to the zone-wide or own-frame formula for ${compat.length / 2} live sources (${[...new Set(compat.map(r => r.kind + ' ' + r.frame.join('x') + (r.own ? ' own' : '')))].join(', ')}), idle and attack frames` + (badCompat.length ? ': differs ' + JSON.stringify(badCompat) : ''));
+    const cragSpot = await live.evaluate(CRAG_SPOT, CRAG_KINDS);
+    check(cragSpot && cragSpot.n === 5, `Emberfall Crags has a spot with all five art kinds within 40 tiles (${cragSpot?.n})`);
+    await live.evaluate(spot => { Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: spot.x - 3, y: spot.y - 3 } }); }, cragSpot);
     await live.waitForFunction(() => Field.slimes.some(s => s.kind === 'wisp') && Field._debug.enemySource(Field.slimes.find(s => s.kind === 'wisp')), null, { timeout: 30000 });
     const crags = await live.evaluate(() => {
       const actor = Field.slimes.find(s => s.kind === 'wisp'), src = Field._debug.enemySource(actor), [fw, fh] = src.meta.frame, [ax, ay] = src.meta.anchor, K = 2.1 * actor.d.scale;
@@ -146,7 +164,8 @@ const COUNTS = Object.values(LIVE.clips).map(c => c.n);                         
     await page.route('**/assets/crags.txt', r => r.fulfill({ body: JSON.stringify(scratch), contentType: 'text/plain' }));
     for (const [kind, data] of Object.entries(atlases)) await page.route(`**/assets/crags_${kind}.png`, r => r.fulfill({ body: Buffer.from(data, 'base64'), contentType: 'image/png' }));
     await setup(page, process.env.MUTATE || null, 'KindScratch');
-    await page.evaluate(() => { Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: 50, y: 50 } }); });
+    const scratchSpot = await page.evaluate(CRAG_SPOT, CRAG_KINDS);
+    await page.evaluate(spot => { Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: spot.x - 3, y: spot.y - 3 } }); }, scratchSpot);
     await page.waitForFunction(() => Field.cragSprites && ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'].every(k => Field.slimes.some(s => s.kind === k)), null, { timeout: 30000 });
     const kinds = Object.keys(SPEC);
     const R = await page.evaluate(({ kinds, spec, zone }) => {

@@ -9,7 +9,10 @@ const w=new TestWorld();let browser,checks=0;const errors=[];const check=(v,s)=>
  // Mutation control: serve an atlas whose every pixel is moved up one row (grounding and the eight-frame checks must fail).
  if(process.env.MUTATE_PNG)await p.route('**/assets/ironhide.png',r=>r.fulfill({path:process.env.MUTATE_PNG,contentType:'image/png'}));
  await p.addInitScript(()=>{window.AudioContext=window.webkitAudioContext=undefined;localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:false,lowGraphics:true,lowGraphicsSet:true,touchGraphicsSuggested:true}));});
- await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('BeetleArt');await p.locator('#go').click({timeout:60000});await p.waitForFunction(()=>Online.connected&&Field.beetleSprites,null,{timeout:30000});
+ await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('BeetleArt');await p.locator('#go').click({timeout:60000});await p.waitForFunction(()=>Online.connected,null,{timeout:30000});
+ // beetle sprites load lazily, when a beetle is in view: a new hero starts on the Saltby pier, so walk to a real Greenmeadow beetle first
+ const beetle0=await p.evaluate(()=>WORLD_MAP.slimes.find(s=>s.kind==='beetle'));await p.evaluate(s=>{Online.send({type:'debug',command:{op:'teleport',zone:0,x:s.x+3,y:s.y+2}});},beetle0);
+ await p.waitForFunction(()=>Field.beetleSprites,null,{timeout:60000});
  const result=await p.evaluate(async()=>{
   const src=Field.beetleSprites,{meta,img}=src,im=img.beetle,[FW,FH]=meta.frame,c=document.createElement('canvas');c.width=im.width;c.height=im.height;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const rows=[];
   const gallery=document.createElement('canvas');gallery.width=8*FW*2;gallery.height=5*(FH*2+24);const gg=gallery.getContext('2d');gg.imageSmoothingEnabled=false;gg.fillStyle='#315441';gg.fillRect(0,0,gallery.width,gallery.height);
