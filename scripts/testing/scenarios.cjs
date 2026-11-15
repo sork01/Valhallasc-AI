@@ -48,6 +48,10 @@ function crossingPath(gate) {
 const OUTPOST = /^deep_(lr|gw|dw)_/;
 const hubQuests = () => deep.quests.filter(q => q.id.startsWith('deep_') && !OUTPOST.test(q.npc || ''));
 const hubPeople = () => peopleOf(deep).filter(n => /^(deep_|keel_|travel_keelhaven)/.test(n.id) && !OUTPOST.test(n.id));
+// The Perch's hub: Heimdall's Perch's own people and quests (the three outposts are separate hubs, as at Keelhaven).
+const SKY_OUTPOST = /^sky_(wr|ss|el)_/;
+const skyHubQuests = () => sky.quests.filter(q => q.id.startsWith('sky_') && !SKY_OUTPOST.test(q.npc || ''));
+const skyHubPeople = () => peopleOf(sky).filter(n => /^(sky_|travel_perch)/.test(n.id) && !SKY_OUTPOST.test(n.id));
 const peopleOf = zone => zone.npcs.filter(n => !/^(stone|mailbox|scenery|spirit_guide)$/.test(n.art || '') && !/Gather your party|Player mail|Festival dance|Resurrection/.test(n.role || ''));
 
 const crags = map.zones[0];
@@ -2050,7 +2054,8 @@ const scenarios = {
     godMode: false,
     levelSpread: 0,
     async run(w, check) {
-      const bot = 'Spark', A = 'travel_alderhaven', B = 'travel_cinderwatch', C = 'travel_rimeward';
+      // The fastest route Alderhaven -> Rimeward now runs through Skaldholm (the shaped Spark links), so B is Skaldholm.
+      const bot = 'Spark', A = 'travel_alderhaven', B = 'travel_skaldholm', C = 'travel_rimeward';
       await w.connect({ bot, class: 'warrior' });
       await kit.setupCharacter(w, bot, { gold: 100 });
       const visit = async id => { await kit.teleport(w, bot, { npc: id }); return kit.talkTo(w, bot, id); };
@@ -2061,15 +2066,17 @@ const scenarios = {
         return w.waitFor(() => w.events.find(e => !before.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'notice')), 5000, 'Spark reply');
       };
       let reply = await visit(A);
-      check(reply.travel.length === 6, 'Every other settlement appears as a destination');
+      check(reply.travel.length >= 6 && [B, C].every(id => reply.travel.some(d => d.id === id)), 'Every other settlement appears as a destination (floor: the network grew)');
       check(reply.travel.find(d => d.id === C).cost === 40, 'Two legs cost 40 gold');
       await visit(C); await kit.teleport(w, bot, { npc: A });
       reply = await choose(A, C);
-      check(reply.notice.includes('Cinderwatch'), 'A missing intermediate master blocks the third stop');
+      check(reply.notice.includes('Skaldholm'), 'A missing intermediate master blocks the third stop');
       check(w.player(bot).gold === 100 && !w.player(bot).sparkTravel, 'Blocked travel spends no gold and does not launch');
       await visit(B); await visit(A);
-      await w.waitFor(() => w.player(bot).travelStops.length === 3);
-      check(new Set(w.player(bot).travelStops).size === 3, 'Talking twice never duplicates discovery');
+      // A new hero also starts with Saltby discovered on the shaped map, so the count is taken from the hero, not assumed.
+      await w.waitFor(() => [A, B, C].every(id => w.player(bot).travelStops.includes(id)));
+      const known = w.player(bot).travelStops.length;
+      check(new Set(w.player(bot).travelStops).size === known, 'Talking twice never duplicates discovery');
       await w.debug(bot, { op: 'set_gold', gold: 39 });
       reply = await choose(A, C);
       check(reply.notice.includes('enough'), 'A hero with 39 gold cannot buy a 40-gold flight');
@@ -2091,7 +2098,7 @@ const scenarios = {
       check(!!w.player(bot).sparkTravel && w.player(bot).atkT === 0, 'Ground inputs cannot interrupt or attack during a flight');
       await w.restart();
       check(w.player(bot).gold === 60 && !!w.player(bot).sparkTravel, 'A private server restart resumes the paid flight');
-      check(w.player(bot).travelStops.length === 3, 'Discovered masters survive restart');
+      check(w.player(bot).travelStops.length === known, 'Discovered masters survive restart');
       await w.waitFor(() => !w.player(bot).sparkTravel && w.player(bot).zone === 2, 30000, 'Arrive at the third stop');
       const stops = w.events.filter(e => !oldEvents.has(e) && e.bot === bot && e.kind === 'sparkStop').map(e => e.stop);
       check(stops.join(',') === [B,C].join(','), 'The spark passes the second master before stopping at the third');
@@ -2101,10 +2108,10 @@ const scenarios = {
       reply = await kit.talkTo(w, bot, C);
       check(reply.travel.find(d => d.id === B).cost === 20 && reply.travel.find(d => d.id === A).cost === 40, 'Return fares count the same legs');
       await choose(C, B);
-      await w.waitFor(() => !w.player(bot).sparkTravel && w.player(bot).zone === 1, 20000, 'Return to Cinderwatch');
+      await w.waitFor(() => !w.player(bot).sparkTravel && w.player(bot).zone === 4, 20000, 'Return to Skaldholm');
       check(w.player(bot).gold === 40, 'One-leg return charges exactly 20 gold');
       await w.disconnect(bot); await w.connect({ bot });
-      check(w.player(bot).gold === 40 && w.player(bot).zone === 1 && w.player(bot).travelStops.length === 3, 'Arrival and discoveries survive logout');
+      check(w.player(bot).gold === 40 && w.player(bot).zone === 4 && w.player(bot).travelStops.length === known, 'Arrival and discoveries survive logout');
     },
   },
 
@@ -2492,8 +2499,8 @@ const scenarios = {
       const bot = 'Wardholder';
       await w.connect({ bot, class: 'warrior' });
       await kit.setupCharacter(w, bot, { level: 33, gold: 4000 });
-      const defs = sky.quests, npcs = sky.npcs;
-      check(npcs.length === 8 && defs.length === 22 && defs.every(q => q.id.startsWith('sky_')), `The Perch holds ${npcs.length} people and ${defs.length} quests`);
+      const defs = skyHubQuests(), npcs = skyHubPeople();
+      check(npcs.length >= 8 && defs.length >= 22 && defs.every(q => q.id.startsWith('sky_')), `The Perch holds ${npcs.length} people and ${defs.length} quests`);
       const find = id => defs.find(q => q.id === id);
       const placeOf = id => sky.places.find(p => p.id === id);
       const state = id => quest(w, bot, id);
@@ -2523,7 +2530,11 @@ const scenarios = {
       await w.waitFor(() => w.player(bot).zone === 7 && w.snapshot.slimes.some(s => s.zone === 7), 8000, 'Arrive on the Perch');
       const sleepers = () => new Set(w.snapshot.slimes.filter(s => s.dead && s.state === 'waiting').map(s => s.id));
       const sleeping = sleepers();
-      check(sleeping.size === 11, 'Eleven ambushers sleep before any ward is held');
+      // The view carries the sleepers within 56 tiles of the hero (the map's own ambushers there), so count those.
+      const nearAmbush = sky.slimes.filter(s => s.ambush && Math.abs(s.x - 80) <= 56 && Math.abs(s.y - 144) <= 56).length;
+      // The sleeping Firelord (an elite, kept at any range) is not an ambusher.
+      const ambushers = [...sleeping].filter(id => !w.snapshot.slimes.find(s => s.id === id)?.elite).length;
+      check(ambushers === nearAmbush && nearAmbush > 0, `${nearAmbush} ambushers in view sleep before any ward is held`);
       async function playQuest(id) {
         const q = find(id);
         await kit.teleport(w, bot, { npc: q.npc });
@@ -2563,6 +2574,10 @@ const scenarios = {
           else if (o.kind === 'kill') {
             if (o.target === 'any') { await kit.teleport(w, bot, { npc: q.npc }); await refill({ x: 80, y: 90 }, 90, o.count + 2); await killAny(id, i, o.count); }
             else {
+              // The view carries only what is near the hero: stand at the map's own spot for this kind before counting or respawning.
+              const spotOf = sky.slimes.find(s => s.kind === o.target && !s.ambush) || sky.slimes.find(s => s.kind === o.target);
+              await kit.teleport(w, bot, { zone: 7, x: spotOf.x + 3, y: spotOf.y });
+              await w.advance(400);
               const alive = () => w.snapshot.slimes.filter(s => !s.dead && s.kind === o.target && !sleeping.has(s.id)).length;
               if (alive() < o.count) {
                 for (const d of w.snapshot.slimes.filter(s => s.dead && s.kind === o.target && s.state !== 'waiting').slice(0, o.count - alive())) await w.debug(bot, { op: 'respawn_enemy', id: d.id }).catch(e => { if (!/already alive/.test(e.message)) throw e; });
