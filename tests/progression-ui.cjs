@@ -24,11 +24,17 @@ async function call(name, args = {}) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
+  // MUTATE=giver serves the journal without its giver line: the run must fail.
+  if (process.env.MUTATE === 'giver') await page.route('**/quests.js', async r => { const res = await r.fetch(); await r.fulfill({ response: res, body: (await res.text()).replace('`Quest giver: ${', '`Giver: ${') }); });
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Progress');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', ref: 1, command }), command);
+  // A new hero starts on the Saltby landing dock, and progression quests only arrive once the hero has stepped ashore.
+  await debug({ op: 'teleport', zone: 0, x: 250, y: 235 });
+  await page.waitForFunction(() => Math.hypot(Field.hero.nx - 250, Field.hero.ny - 235) < 2, null, { timeout: 20000 });
+  await page.evaluate(() => { Field.clearInput(); Online.send({ type: 'stop' }); });
   const tracker = () => page.locator('#quest-tracker').textContent();
   const journal = async () => { await page.keyboard.press('q'); await page.locator('#quest-journal').waitFor({ state: 'visible' }); for (const row of await page.locator('#quest-list > .quest-entry').all()) { await row.locator(':scope > summary').click(); await row.locator('.quest-state').waitFor({state:'visible'}); } };
   const card = id => page.locator(`#quest-list [data-quest="${id}"]`);
@@ -50,9 +56,10 @@ async function call(name, args = {}) {
   check((await tracker()).includes('Travel to the Emberfall Crags: 0/1'), 'The HUD shows the travel objective');
   check(await page.locator('.tracker-quest[data-quest="crags_onward"]').count() === 1 && await page.locator('.tracker-quest[data-quest="rime_onward"]').count() === 0, 'Only the quest for this level arrived');
   await journal();
-  let text = await card('crags_onward').textContent();
-  check(text.includes('In progress') && text.includes('Captain Sera is in Emberfall Crags'), 'The journal points the player to the new zone and its captain');
   check(await card('rime_onward').count() === 0, 'The next one still waits for level 10');
+  await card('crags_onward').click();
+  const text = await page.locator('#quest-page article.journal-detail[data-quest="crags_onward"]').textContent();
+  check(text.includes('In progress') && text.includes('Quest giver: Captain Sera · Emberfall Crags'), `The journal points the player to the new zone and its captain: ${JSON.stringify(text)}`);
   await closeJournal();
   const row = await page.locator('#npc-quest-list .journal-quest[data-quest="crags_onward"]').count();
   check(row === 0, 'Nothing is listed at a giver that the player could accept');
@@ -60,11 +67,18 @@ async function call(name, args = {}) {
   // Arriving in the zone completes the objective; the captain pays.
   await debug({ op: 'teleport', zone: 1, x: 46, y: 84 });
   await page.waitForFunction(() => Field.zone === 1, null, { timeout: 10000 });
-  await page.waitForFunction(() => document.getElementById('quest-tracker').textContent.includes('Report to Captain Sera for your reward'), null, { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('.tracker-quest[data-quest="crags_onward"] .tracker-destination')?.textContent.includes('Hand in: Captain Sera · Emberfall Crags'), null, { timeout: 10000 });
   check(await page.locator('.tracker-quest[data-quest="crags_onward"] .tracker-objective.complete').count() === 1, 'Arriving in the Crags completes it in the HUD');
   await journal();
-  check(await card('crags_onward').locator('button', { hasText: 'Report to Captain Sera' }).count() === 1, 'The journal offers to take the player to the captain');
-  await card('crags_onward').locator('button', { hasText: 'Report to Captain Sera' }).click();
+  await card('crags_onward').click();
+  const ready = await page.locator('#quest-page article.journal-detail[data-quest="crags_onward"]').textContent();
+  check(ready.includes('Ready to turn in') && ready.includes('Hand in: Captain Sera · Emberfall Crags'), `The journal names the captain to hand it in to: ${JSON.stringify(ready)}`);
+  await closeJournal();
+  // The captain stands far off in the Crags and a long walk to him did not reach the dialogue in time; stand beside him first.
+  const captain = await page.evaluate(() => { const c = City.npcs.find(n => n.id === 'crags_captain'); return { x: c.x, y: c.y }; });
+  await debug({ op: 'teleport', zone: 1, x: captain.x, y: captain.y });
+  await page.waitForFunction(c => Math.hypot(Field.hero.nx - c.x, Field.hero.ny - c.y) < 6, captain, { timeout: 15000 });
+  await page.locator('.tracker-quest[data-quest="crags_onward"] .tracker-destination').click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
   const done = page.locator('#npc-quest-list .journal-quest[data-quest="crags_onward"]');
   check(await done.getAttribute('data-status') === 'ready' && await done.locator('.journal-quest-mark').textContent() === '?', 'The captain lists it as ready to hand in');

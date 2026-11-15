@@ -22,12 +22,17 @@ async function call(name, args = {}) {
   const errors = [];
   async function player(name, cls = 'warrior') {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+    // MUTATE=invite drops the Invite button from the online list: the run must fail.
+    if (process.env.MUTATE === 'invite') await page.route('**/social.js', async r => { const res = await r.fetch(); await r.fulfill({ response: res, body: (await res.text()).replace("'Invite', `invite:", "'Invitex', `invite:") }); });
     page.on('pageerror', error => errors.push(`${name}: ${error.message}`));
     await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.locator('#cls-' + cls).click(); await page.locator('#name').fill(name);
     await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero && Field.hero.hp > 0, null, { timeout: 60000 });
+    // A new hero plays the locked opening intro (about 62 s), which swallows the game keys this test presses.
+    await page.waitForFunction(() => !!window.Cutscene?.active, null, { timeout: 15000 }).catch(() => {});
+    await page.waitForFunction(() => !window.Cutscene?.active, null, { timeout: 120000 });
     return page;
   }
   const alice = await player('Alice'), bobby = await player('Bobby', 'mage'), eve = await player('<u>Eve</u>', 'assassin');
@@ -128,7 +133,7 @@ async function call(name, args = {}) {
   check(await alice.locator('#social-body [data-list="online"]').textContent().then(t => t.includes('<u>Eve</u>')), 'A name with markup in it is displayed literally');
   check(await alice.locator('#social-body u').count() === 0, 'No element is created from a player\'s name');
   check(await alice.locator('#social-body [data-player]', { hasText: 'Bobby' }).textContent().then(t => t.includes('Friend') && t.includes('In your party')), 'The online list labels friends and party members');
-  check(await alice.locator('#social-body [data-player]', { hasText: 'Eve' }).locator('button').allTextContents().then(t => t.join() === 'Trade,Add friend,Invite'), 'A stranger offers Trade, Add friend and Invite');
+  check(await alice.locator('#social-body [data-player]', { hasText: 'Eve' }).locator('button').allTextContents().then(t => t.filter(label => label !== 'Duel' && label !== 'Target').join() === 'Trade,Add friend,Invite'), 'A stranger offers Trade, Add friend and Invite (Duel and Target appear when PvP is on)');
   await alice.locator('#social-body [data-player]', { hasText: 'Eve' }).locator('button', { hasText: 'Invite' }).click();
   await eve.locator('#social-invites .invite-card').waitFor({ state: 'visible', timeout: 10000 });
   check(await eve.locator('#social-invites .invite-card p').textContent().then(t => t.startsWith('Alice')), 'The invited stranger sees the prompt');

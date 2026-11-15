@@ -23,6 +23,8 @@ const stageRect = page => rect(page, '#stage');
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
+  // MUTATE=taper serves game.js with a linear music slider instead of the squared taper: the run must fail.
+  if (process.env.MUTATE === 'taper') await page.route('**/game.js', async r => { const res = await r.fetch(); await r.fulfill({ response: res, body: (await res.text()).replace('const taper = v => v * v;', 'const taper = v => v;') }); });
   // Record what is wired straight into the speakers: the music players' outputs and exactly one effects bus.
   await page.addInitScript(() => {
     window.__dest = new Set(); const connect = AudioNode.prototype.connect;
@@ -36,6 +38,10 @@ const stageRect = page => rect(page, '#stage');
     window.sent = []; const original = Online.send; Online.send = message => { sent.push(message.type === 'input' && !message.dx && !message.dy ? 'ping' : message.type); return original(message); };
     window.levels = []; for (const m of [valhalla.music, valhalla.fmusic]) { const set = m.setLevel; m.setLevel = (v, s) => { levels.push(v); return set.call(m, v, s); }; }
   });
+
+  // The field score is only the day track at noon: the server clock decides night, and night moves the level to another track.
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'set_time', hour: 12, freeze: true } }));
+  await page.waitForFunction(() => window.DayNight?.nightMix === 0, null, { timeout: 15000 });
 
   // --- the menu entry ---
   check(await page.locator('#p-settings').isHidden(), 'Settings is not on screen before the menu opens');
@@ -51,14 +57,16 @@ const stageRect = page => rect(page, '#stage');
   check(await page.locator('#set-music-out').textContent() === '50%', 'The music slider shows its percentage');
   check(await page.evaluate(() => Math.abs(levels.at(-1) - .25) < 1e-9), 'Music level follows a squared taper (50% slider = 0.25 gain)');
   check((await stored(page)).musicVol === .5, 'The music level is saved on this device');
+  await page.waitForTimeout(2500); // the music slider ramps its levels over 1.5 s; read the gains once they settle
+  await page.evaluate(() => { window.__gains0 = new Map([...__dest].filter(n => n.gain).map(n => [n, n.gain.value])); });
   await page.locator('#set-sfx').fill('50');
   await page.evaluate(() => Prefs.preview());
-  const bus = await page.evaluate(() => [...__dest].filter(n => !Object.values(valhalla).some(m => m?.output === n)).map(n => ({ type: n.constructor.name, gain: n.gain?.value })));
-  const gains = bus.filter(n => n.type === 'GainNode');
-  check(gains.length === 1 && Math.abs(gains[0].gain - .25) < 1e-6, `Every effect goes through one bus at 0.25 (${JSON.stringify(bus)})`);
+  const changedBus = await page.evaluate(() => [...__gains0].filter(([n, v]) => n.gain.value !== v).map(([n]) => ({ gain: n.gain.value })));
+  check(changedBus.length === 1 && Math.abs(changedBus[0].gain - .25) < 1e-6, `Every effect goes through one bus, and it moves to 0.25 (${JSON.stringify(changedBus.map(m => m.gain))})`);
+  await page.evaluate(() => { window.__sfxBus = [...__gains0].find(([n, v]) => n.gain.value !== v)[0]; });
   check((await stored(page)).sfxVol === .5, 'The effects level is saved');
   await page.locator('#set-sfx').fill('0'); await page.evaluate(() => Prefs.preview());
-  check(await page.evaluate(() => [...__dest].find(n => n instanceof GainNode && !Object.values(valhalla).some(m => m?.output === n)).gain.value) === 0, 'Effects at 0% are silent');
+  check(await page.evaluate(() => __sfxBus.gain.value) === 0, 'Effects at 0% are silent');
   await page.locator('#set-sfx').fill('100');
   await page.locator('#set-sound').uncheck();
   check(await page.evaluate(() => levels.at(-1) === 0), 'Turning sound off silences the music whatever the slider says');
@@ -80,14 +88,14 @@ const stageRect = page => rect(page, '#stage');
   await page.locator('#p-resume').click();
 
   // --- Edit UI ---
-  const ids = ['frame', 'buffs', 'party', 'map', 'travel', 'quests', 'bags', 'social', 'skillbar', 'chat'];
+  const ids = ['frame', 'buffs', 'party', 'dps', 'map', 'travel', 'quests', 'bags', 'social', 'skillbar', 'chat'];
   const before = {}; for (const id of ids) before[id] = await rect(page, `[data-ui="${id}"]`);
-  check(ids.length === 10, 'Ten movable pieces');
+  check(ids.length === 11, 'Eleven movable pieces (the DPS meter joined them in Beta 1.55.2)');
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
   await page.locator('#set-edit-ui').click();
   check(await page.locator('#layout-bar').isVisible() && await page.locator('#settings-panel').isHidden(), 'Edit UI hides the panel and shows its toolbar');
   const handles = await page.locator('.layout-handle').evaluateAll(list => list.map(n => ({ id: n.dataset.id, w: n.getBoundingClientRect().width, h: n.getBoundingClientRect().height, hidden: n.hidden })));
-  check(handles.length === 10 && handles.every(h => !h.hidden && h.w > 10 && h.h > 10), `Every piece, even the empty party frame and tracker, gets a visible handle: ${JSON.stringify(handles.filter(h => h.hidden || h.w <= 10))}`);
+  check(ids.every(id => handles.some(h => h.id === id && !h.hidden && h.w > 10 && h.h > 10)), `Every piece, even the empty party frame and tracker, gets a visible handle: ${JSON.stringify(handles.filter(h => h.hidden || h.w <= 10))}`);
   for (const id of ids) { const h = await rect(page, `.layout-handle[data-id="${id}"]`), e = await rect(page, `[data-ui="${id}"]`); check(Math.abs(h.l - e.l) < 1.5 && Math.abs(h.t - e.t) < 1.5, `The ${id} handle sits on its piece`); }
   await page.screenshot({ path: path.join(world.artifacts, 'edit-ui.png') });
   await page.evaluate(() => { sent.length = 0; });
@@ -115,9 +123,9 @@ const stageRect = page => rect(page, '#stage');
   // keyboard
   await page.locator('.layout-handle[data-id="chat"]').focus();
   const chat0 = await rect(page, '#chat');
-  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Shift+ArrowRight');
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowUp'); await page.keyboard.press('Shift+ArrowRight'); // up, not down: the chat sits on the bottom edge and a drop would clamp
   const chat1 = await rect(page, '#chat');
-  check(Math.abs((chat1.l - chat0.l) - stage.w * 1.25 / 100) < 1 && Math.abs((chat1.t - chat0.t) - stage.w * .25 / 100) < 1, 'Arrow keys nudge the focused handle; Shift moves four times as far');
+  check(Math.abs((chat1.l - chat0.l) - stage.w * 1.25 / 100) < 1 && Math.abs((chat1.t - chat0.t) + stage.w * .25 / 100) < 1, 'Arrow keys nudge the focused handle; Shift moves four times as far');
   // move a button and an empty frame too
   const tracker0 = await rect(page, '#quest-tracker');
   await page.mouse.move(tracker0.l + 10, tracker0.t + 10); await page.mouse.down(); await page.mouse.move(tracker0.l + 110, tracker0.t + 60, { steps: 5 }); await page.mouse.up();
