@@ -35,6 +35,11 @@ async function call(name, args = {}) {
       return fill.apply(this, arguments);
     };
   });
+  // MUTATE=pop serves damagenumbers.js with no pop-in (hit peak 1.0): the curve check must fail.
+  if (process.env.MUTATE === 'pop') await page.route('**/damagenumbers.js*', async route => {
+    const response = await route.fetch(); const body = (await response.text()).replace('pop: 1.25', 'pop: 1');
+    await route.fulfill({ response, body });
+  });
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Numbers');
   await page.locator('#go').click({ timeout: 60000 });
@@ -59,20 +64,29 @@ async function call(name, args = {}) {
     await debug({ op: 'teleport', zone: await page.evaluate(() => Field.zone), x: feetAt.x - 1.3, y: feetAt.y });
     await page.waitForFunction(p => Math.hypot(Field.hero.x - p.x, Field.hero.y - p.y) < 2, { x: feetAt.x - 1.3, y: feetAt.y });
     await page.evaluate(() => { window.__nums.length = 0; });
-    const got = await page.evaluate(k => new Promise(resolve => {
-      const slime = Field.slimes.find(x => x.kind === k && x.level === 99 && !x.dead), feet = [], start = performance.now();
+    const got = await page.evaluate(([kind, reducedFlag]) => new Promise(resolve => {
+      const slime = Field.slimes.find(x => x.kind === kind && x.level === 99 && !x.dead), feet = [], start = performance.now();
       let sentAt = -1e9, frames = 0, hits = 0;
-      (function frame() {
+      const snaps = [], reduced = reducedFlag;
+      (function frame() { try {
         frames++;
+        if (window.__nums.length) snaps.push({ at: performance.now(), fl: Field._debug.floaters.map(f => { const p = DamageNumbers.pose(f, reduced); return { text: f.text, kind: f.kind, visible: p.visible, size: Math.round((DamageNumbers.KINDS[f.kind] || DamageNumbers.KINDS.banner).size * p.scale) }; }) });
         const [fx, fy] = Field._debug.w2s(slime.x, slime.y, 0);
-        if (!window.__nums.length && performance.now() - sentAt > 700) { sentAt = performance.now(); Online.send({ type: 'attack', fx: slime.x - Field.hero.x, fy: slime.y - Field.hero.y }); }
+        // Numbers left over from the setup kills (pickups, XP) are still drawn for about a second: wait until the canvas has been quiet
+        // for 1.1 s, then clear the list and swing, so the first number drawn afterwards is this hit.
+        const last = window.__nums[window.__nums.length - 1];
+        if (performance.now() - sentAt > 700 && (!last || performance.now() - last.at > 1100)) { sentAt = performance.now(); window.__nums.length = 0; Online.send({ type: 'attack', fx: slime.x - Field.hero.x, fy: slime.y - Field.hero.y }); }
         const first = window.__nums[0];
         if (first) feet.push({ at: performance.now(), fx, fy });
-        if (window.__nums.length && performance.now() - window.__nums[0].at > 1700 || performance.now() - start > 8000) resolve({ nums: window.__nums.slice(), feet, frames, ms: Math.round(performance.now() - start) });
+        if (window.__nums.length && performance.now() - window.__nums[0].at > 1700 || performance.now() - start > 8000) {
+          const numKind = 'hit', life = DamageNumbers.KINDS[numKind].life, curve = []; for (let t = 0; t <= life; t += .01) curve.push(DamageNumbers.pose({ kind: numKind, t, lane: 0, z0: 0, side: 1 }, reduced).scale);
+          resolve({ nums: window.__nums.slice(), feet, frames, ms: Math.round(performance.now() - start), snaps, peak: Math.max(...curve), settled: DamageNumbers.pose({ kind: numKind, t: life * .6, lane: 0, z0: 0, side: 1 }, reduced).scale, rise: DamageNumbers.pose({ kind: numKind, t: life - .001, lane: 0, z0: 0, side: 1 }).dz - DamageNumbers.pose({ kind: numKind, t: 0, lane: 0, z0: 0, side: 1 }).dz }); }
         else requestAnimationFrame(frame);
-      })();
-    }), kind);
-    check(got.nums.length > 10, `${kind}: a number was drawn (${got.nums.length} draws in ${got.frames} frames, ${got.ms} ms)`);
+      } catch (e) { resolve({ error: String(e && e.stack || e), nums: window.__nums.slice(), feet, frames, ms: 0, snaps, peak: 1, settled: 1 }); } })();
+    }), [kind, reduced]);
+    assert.ok(!got.error, `${kind}: the frame loop threw: ${got.error}`);
+    // A 1.0 s hit on the box's loaded page (about 9-10 frames a second) is drawn 8-10 times, so the floor is 6 (was 10 at 60 fps); the curve checks below carry the rest.
+    check(got.nums.length >= 6, `${kind}: a number was drawn (${got.nums.length} draws in ${got.frames} frames, ${got.ms} ms)`);
     // The first number: its consecutive draws (same text), until a different one appears.
     const text = got.nums[0].text, run = []; for (const n of got.nums) { if (n.text !== text) break; run.push(n); }
     const feet = got.feet.reduce((a, b) => Math.abs(b.at - run[0].at) < Math.abs(a.at - run[0].at) ? b : a);
@@ -82,10 +96,15 @@ async function call(name, args = {}) {
       check(run.every(n => Math.abs(n.y - run[0].y) < 4), `${kind}: fades in place under reduced motion ${run.map(n => Math.round(n.y)).join(',')}`);
       check(run.every(n => n.size === run[0].size), `${kind}: no pop under reduced motion`);
     } else {
-      const sizes = run.map(n => n.size), settled = sizes[sizes.length - 1];
-      check(Math.max(...sizes) >= settled * 1.15 && sizes[0] < Math.max(...sizes), `${kind}: pops in past full size and settles (${sizes.slice(0, 8).join(',')} ... ${settled})`);
-      for (let i = 1; i < run.length; i++) check(run[i].y <= run[i - 1].y + .6 || run[i - 1].y < 40 || Math.abs(run[i].at - run[i - 1].at) > 200, `${kind}: climbs monotonically at draw ${i}`);
-      check(run[0].y < 40 || run[run.length - 1].y < run[0].y - 25, `${kind}: climbed ${(run[0].y - run[run.length - 1].y).toFixed(0)} px`);
+      // The pop lasts 0.12 s, and the page draws only a few frames a second on the box, so sampled sizes cannot show it reliably.
+      // The pop is checked on the curve (pose over the number's life), and each drawn size must equal the curve at that draw's own age
+      // (the same frame's live floater, from Field._debug.floaters).
+      check(got.peak >= got.settled * 1.15, `${kind}: the curve pops past full size and settles (${(got.peak / got.settled).toFixed(2)}x)`);
+      const matched = run.filter(n => { const s = got.snaps.find(x => x.at >= n.at); return s && s.fl.some(f => f.visible && f.text === n.text && f.size === n.size); }).length;
+      check(matched === run.length && run.length >= 3, `${kind}: every drawn size is the curve's size at its age (${matched}/${run.length} draws)`);
+      for (let i = 1; i < run.length; i++) check(run[i].y <= run[i - 1].y + .6 || run[i - 1].y < 40 || Math.abs(run[i].at - run[i - 1].at) > 200, `${kind}: climbs monotonically at draw ${i} (${run.slice(0, 6).map(n => `${n.size}px@${Math.round(n.y)}`).join(' ')})`);
+      // Sampled first and last draws can both fall late in the life on a slow page, so the climb is the curve's own rise (pose dz).
+      check(got.rise > 25, `${kind}: the curve climbs ${got.rise.toFixed(0)} px over its life (drawn ${(run[0].y - run[run.length - 1].y).toFixed(0)} px)`);
     }
     check(run.some(n => n.alpha === 1) && run[run.length - 1].alpha < .5, `${kind}: holds at full opacity, then fades (${run[run.length - 1].alpha.toFixed(2)} at the end)`);
     fs.writeFileSync(path.join(world.artifacts, 'damage-numbers', `${kind}${reduced ? '-reduced' : ''}.json`), JSON.stringify(run.slice(0, 60)));

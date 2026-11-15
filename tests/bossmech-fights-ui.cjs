@@ -34,7 +34,7 @@ if (phase === 2) {
   }
   fs.writeFileSync(path.join(dir, 'boss-mechanics.txt'), JSON.stringify(table));
   env.VALHALLA_BOSSMECH_FILE = path.join(dir, 'boss-mechanics.txt');
-  for (const k of kinds.slice()) if (!table[k]) kinds.splice(kinds.indexOf(k), 1);
+  for (const k of kinds.slice()) if (!table[k]) { kinds.splice(kinds.indexOf(k), 1); console.log(`PHASE=2 skips ${k}: no hp_max or split mechanic to move (valves hold at the validator's fixed 70/40 thresholds)`); }
 }
 
 const client = new Client({ name: 'valhallasc-bossmech-fights-ui', version: '1.0.0' });

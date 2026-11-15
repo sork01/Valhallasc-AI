@@ -77,12 +77,20 @@ async function call(name, args = {}) {
   check(listed.length === 1 && listed[0].id === 'hollowking' && listed[0].x === sign.x && listed[0].y === sign.y, `the server says where the sign stands (${JSON.stringify(listed)})`);
   check(!/what|todo|tip/.test(listed[0].keys), 'the snapshot carries no words');
   check(!(await visible()), 'the window is closed until the sign is read');
-  const board = () => page.evaluate(() => {
+  // The dungeon draws its whole scene under a blue-dark veil (about a quarter of (10,18,48) over everything, sign included), so the
+  // sign's palette is read through that veil: field.js drawSign has board #a26d3a and gold #ffd866; measured on the Undervault
+  // (cloud box, 2026-11-15) the board reads ~(128,88,56) and the gold ~(196,170,88), which this veil reproduces within 4 units.
+  // A plain-palette threshold (gold r > 200) therefore misses the "!" and a floor tile can pass a loose wood band; both colours
+  // are matched by distance instead, and the gold alone decides presence (floor and walls are never that gold).
+  const veiled = hex => { const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)); return c.map((v, i) => Math.round(v * 0.75 + [10, 18, 48][i] * 0.25)); };
+  const WOOD = veiled('#a26d3a'), GOLD = veiled('#ffd866');
+  const board = () => page.evaluate(({ WOOD, GOLD, shift }) => {
     const s = Field.signs[0], [sx, sy] = Field._debug.w2s(s.x, s.y), cv = document.getElementById('fieldcv'), k = cv.width / 1600, g = cv.getContext('2d');
-    const d = g.getImageData(Math.round((sx - 26) * k), Math.round((sy - 66) * k), Math.round(52 * k), Math.round(34 * k)).data;
-    let gold = 0, wood = 0; for (let i = 0; i < d.length; i += 4) { if (d[i] > 200 && d[i + 1] > 160 && d[i] - d[i + 2] > 90) gold++; if (d[i] > 130 && d[i] < 190 && d[i + 1] > 80 && d[i + 1] < 130 && d[i + 2] < 80) wood++; }
+    const d = g.getImageData(Math.round((sx - 26) * k), Math.round((sy - 66 - shift) * k), Math.round(52 * k), Math.round(34 * k)).data;
+    const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+    let gold = 0, wood = 0; for (let i = 0; i < d.length; i += 4) { const p = [d[i], d[i + 1], d[i + 2]]; if (dist(p, GOLD) <= 30) gold++; if (dist(p, WOOD) <= 26) wood++; }
     return { gold, wood };
-  });
+  }, { WOOD, GOLD, shift: process.env.MUTATE ? 150 : 0 });   // MUTATE=1 reads an empty patch of field 150 px higher: the gold must vanish
   // The arrival banner ("Ashore at Saltby") stacks over the top of the field and tints the board: hide it for this pixel read.
   await page.addStyleTag({ content: '#announce{display:none !important}' });
   await page.waitForTimeout(300);
