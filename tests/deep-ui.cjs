@@ -62,7 +62,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('DeepUI');
   await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.deepSprites, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', ref: 1, command }), command);
   await debug({ op: 'explore_all' });
   await page.waitForFunction(() => Field.explored?.length >= 9 && Field.explored.every(m => m === 511), null, { timeout: 10000 });
@@ -98,10 +98,12 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
     return out;
   }, bell);
   // The map data the client uses comes from the same file the server loads.
-  const z = await page.evaluate(() => { const a = Field._debug.zones[8]; return { n: Field._debug.zones.length, name: a.name, theme: a.theme, size: a.size, levels: a.levels, city: a.city.name, camps: (a.camps || []).length, walls: a.objects.filter(o => o.kind === 'reefwall').length, bells: a.places.filter(p => p.chain).length, places: a.places.length, portals: a.portals.map(p => p.id + '>' + p.to + ':' + p.look).join(), quests: a.quests.length, npcs: a.npcs.length, chimes: a.quests.filter(q => q.objectives.some(o => o.kind === 'chime')).length, elites: a.slimes.filter(s => ['kraken', 'hvitserk', 'ghostmaw'].includes(s.kind)).length, trail: a.paths.length, bounds: a.bounds }; });
-  check(z.n === 10 && z.name === "Rán's Deep" && z.theme === 'deep' && z.size === 176 && z.levels.join() === '35,40', 'The client knows Ran\'s Deep: name, deep theme, 176 tiles, levels 35-40');
-  check(z.city === 'Keelhaven' && z.camps === 0 && z.walls > 300 && z.bells === 12 && z.places === 17 && z.portals === 'maelstrom_up>7:maelstrom,nacre_gate>9:undefined' && z.trail === 1, `One hub, ${z.walls} coral wall pieces, twelve bells, seventeen places, a trail and the Maelstrom up`);
-  check(z.quests === 24 && z.npcs === 8 && z.chimes === 3 && z.elites === 3, 'Twenty-four quests (three of them chimes), eight people and three elites are in the data');
+  const z = await page.evaluate(() => { const a = Field._debug.zones[8]; return { n: Field._debug.zones.length, name: a.name, theme: a.theme, size: a.size, levels: a.levels, city: a.city.name, camps: (a.camps || []).length, walls: a.objects.filter(o => o.kind === 'reefwall').length, bells: a.places.filter(p => p.chain).length, places: a.places.length, portals: a.portals.map(p => p.id + '>' + p.to).join(), quests: a.quests.length, npcs: a.npcs.length, chimes: a.quests.filter(q => q.objectives.some(o => o.kind === 'chime')).length, elites: a.slimes.filter(s => ['kraken', 'hvitserk', 'ghostmaw'].includes(s.kind)).length, trail: a.paths.length, bounds: a.bounds }; });
+  check(z.n === 47 && z.name === "Rán's Deep" && z.theme === 'deep' && z.size === 256 && z.levels.join() === '35,40', `The client knows Ran's Deep: name, deep theme, 256 tiles, levels 35-40 (${JSON.stringify({ n: z.n, name: z.name, theme: z.theme, size: z.size, levels: z.levels })})`);
+  check(z.city === 'Keelhaven' && z.camps === 3 && z.walls > 300 && z.bells === 12 && z.places === 25 && z.portals === 'maelstrom_up>7,nacre_gate>9,deep_longship>43,path_8_13>13' && z.trail === 1, `One hub, ${z.walls} coral wall pieces, twelve bells, twenty-five places, a trail and the Maelstrom up`);
+  check(z.quests === 43 && z.npcs === 30 && z.chimes === 3 && z.elites === 3, 'Forty-three quests (three of them chimes), thirty people and three elites are in the data');
+  // Ran's Deep art loads with the zone, so enter it before reading the sprite set.
+  await stageAt(80, 160);
   check(await page.evaluate(stub => { const m = Field.deepSprites.meta; return m.kinds.join() === 'draugr,angler,moray,siren,shellback,kraken,hvitserk,ghostmaw' && (stub || m.kinds.every(k => Field.deepSprites.img[k].naturalWidth === 768 && Field.deepSprites.img[k].naturalHeight === 480)); }, STUB), 'The eight monster atlases load with their metadata (and are 768x480 each)');
   check(await page.evaluate(() => Field._debug.zones[7].portals.some(p => p.id === 'maelstrom_down' && p.to === 8 && p.look === 'maelstrom')), 'Bifrost Reach has the Maelstrom down to Ran\'s Deep');
 

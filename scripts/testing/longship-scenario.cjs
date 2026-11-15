@@ -7,16 +7,16 @@ module.exports = (kit, map) => ({
     const longship=map.zones[42],parent=map.zones[7];
     const q=(bot,id)=>w.player(bot).quests.find(q=>q.id===id);
     const enter=async bot=>{
-      await kit.teleport(w,bot,{zone:8,x:54,y:151});
-      await w.action(bot,{type:'move',x:54,y:146});
+      await kit.teleport(w,bot,{zone:8,x:70,y:198});
+      await w.action(bot,{type:'move',x:70,y:193});
       await w.waitFor(()=>w.player(bot).zone===43,12000,`${bot} enters the Keel`);
       await w.action(bot,{type:'stop'});
     };
     for(const bot of [hero,ally,other,low])await w.connect({bot,class:'warrior'});
     await w.debug(low,{op:'set_level',level:34});
-    await kit.teleport(w,low,{zone:8,x:54,y:151});
+    await kit.teleport(w,low,{zone:8,x:70,y:198});
     const before=new Set(w.events);
-    await w.action(low,{type:'move',x:54,y:146});
+    await w.action(low,{type:'move',x:70,y:193});
     await w.waitFor(()=>w.events.some(e=>!before.has(e)&&e.bot===low&&e.type==='error'&&/level 35/.test(e.text)),12000,'Level 34 is refused');
     await w.action(low,{type:'stop'});
     check(w.player(low).zone===8,'Level-34 heroes stay in Rán’s Deep');

@@ -92,7 +92,9 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
     await page.waitForTimeout(800);
     check(await page.evaluate(theme=>Field.zoneTheme===theme,z.theme),`${z.cathedralWing}: real canvas entry switches theme`);
     check((await page.locator('#area-title b').textContent())===z.name&&(await page.locator('#area-title span').textContent()).includes('Dungeon · 5 players'),`${z.cathedralWing}: dungeon banner names wing and party size`);
-    check(await page.evaluate(level=>Field.slimes.length===20&&Field.slimes.every(s=>s.level===level),z.min_level),`${z.cathedralWing}: twenty authoritative enemies at wing level`);
+    const wingFoes=await page.evaluate(([level,zone])=>({n:Field.slimes.length,want:WORLD_MAP.zones[zone-1].slimes.length,levels:[...new Set(Field.slimes.map(s=>s.level))],hero:[Field.hero.x,Field.hero.y],dead:Field.slimes.filter(s=>s.dead).length}),[z.min_level,zone]);
+    console.log(`${z.cathedralWing}: ${JSON.stringify(wingFoes)}`);
+    check(wingFoes.n===wingFoes.want&&wingFoes.levels.length===1&&wingFoes.levels[0]===z.min_level,`${z.cathedralWing}: every authoritative enemy of the wing (map count) at wing level`);
     await page.waitForFunction(i=>valhalla.cathedralMusic[i]?.running&&valhalla.cathedralMusic[i]?.loaded,i,{timeout:15000});
     check(await page.evaluate(i=>valhalla.cathedralMusic.every((m,n)=>m.running===(n===i))&&!valhalla.nmusic.running,i),`${z.cathedralWing}: only its unique music loop plays`);
     hues.push(await page.evaluate(theme=>CathedralArt.ground(theme,4,4,.5,0),z.theme));
@@ -106,7 +108,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   check(await page.evaluate(()=>valhalla.cathedralMusic.map(m=>Math.round(m.duration)).join()==='87,69,128'),'All three music loops decode to their own score lengths');
   await page.evaluate(()=>{City.close();Quests.close();WorldMap.show();});
   check(await page.evaluate(()=>WorldMap.open), 'World map opens from the Cathedral');
-  check((await page.locator('#worldmap').textContent()).includes('Drowned Cathedral'),'World map includes the Cathedral wings');
+  check(/Cloister/.test(await page.locator('#worldmap').textContent())&&/Reliquary/.test(await page.locator('#worldmap').textContent())&&/Grand Nave/.test(await page.locator('#worldmap').textContent()),'World map includes the three Cathedral wings');
   check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
   console.log(`PASS Cathedral UI: ${checks} checks (${STUB?'stub':'real'} sprites), ${world.artifacts}`);
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();if(world)await call('stop_world').catch(()=>{});await client.close().catch(()=>{});});

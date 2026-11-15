@@ -33,7 +33,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await debug({op:'set_level',level:99});await debug({op:'explore_all'});
   await page.waitForFunction(()=>Field.hero.level===99);
   await page.locator('#levelup-banner').waitFor({state:'hidden'});
-  const gear=await page.evaluate(()=>WORLD_ITEMS.filter(i=>i.source==='blackhour'&&(!i.class||i.class==='warrior')).map(i=>({id:i.id,slot:({armor:'chest',weapon:'hands',accessory:'accessory1'})[i.kind]||i.kind})));
+  const gear=await page.evaluate(()=>WORLD_ITEMS.filter(i=>i.source==='blackhour'&&i.kind!=='cloak'&&(!i.class||i.class==='warrior')).map(i=>({id:i.id,slot:({armor:'chest',weapon:'hands',accessory:'accessory1'})[i.kind]||i.kind})));
   assert.equal(gear.length,8);
   for(const piece of gear){
     await debug({op:'give_item',item:piece.id,quantity:1});
@@ -42,8 +42,14 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await page.evaluate(gear=>Online.send({type:'equip',slots:Object.fromEntries(gear.map(p=>[p.slot,p.id]))}),gear);
   await page.waitForFunction(()=>Field.hero.setCounts?.blackhour===8);
   if(!STUB)await page.waitForFunction(()=>Field.warriorSprites?.equipment?.armor==='regearnull'&&Field.warriorSprites?.source?.parts?.weapon_regearnull);
-  await teleport(28,214,200);await shot('entrance');
-  await page.evaluate(()=>Online.send({type:'move',x:208,y:200}));
+  // The Foundry door is shut until the Four Hours Returned quest (null_keys) is complete (Portal.needs_quest).
+  await debug({op:'quest',id:'null_keys',action:'accept'});
+  for(const shard of ['hour_shard_bloom','hour_shard_solar','hour_shard_amber','hour_shard_silent'])await debug({op:'give_item',item:shard,quantity:1});
+  await page.waitForTimeout(500);await debug({op:'quest',id:'null_keys',action:'finish'});await page.waitForTimeout(500);
+  // The Yearwheel door is the year_blackhour portal at (448,480) in the shaped Yearwheel.
+  await debug({op:'teleport',zone:28,x:448,y:486});
+  await page.waitForFunction(()=>Field.zone===28&&Math.hypot(Field.hero.x-448,Field.hero.y-486)<3,null,{timeout:15000});await shot('entrance');
+  await page.evaluate(()=>Online.send({type:'move',x:448,y:480}));
   await page.waitForFunction(()=>Field.zone===44,null,{timeout:15000});
   await page.evaluate(()=>Online.send({type:'stop'}));
   await page.waitForFunction(()=>valhalla.blackhourMusic?.running&&valhalla.blackhourMusic.loaded,null,{timeout:30000});
