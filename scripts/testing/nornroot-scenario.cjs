@@ -5,18 +5,21 @@ module.exports = (kit, map) => ({
   async run(w,check) {
     const hero='BarrowRunner', ally='BarrowAlly', other='BarrowOther', low='BarrowLow';
     const barrow=map.zones[40],parent=map.zones[5];
+    const gate=parent.portals.find(p=>p.id==='wyrd_nornroot'),spot={zone:6,x:gate.x,y:gate.y+4};   // the shaped Wyrdwood's door, 4 tiles south of it
     const q=(bot,id)=>w.player(bot).quests.find(q=>q.id===id);
     const enter=async bot=>{
-      await kit.teleport(w,bot,{zone:6,x:84,y:70});
-      await w.action(bot,{type:'move',x:84,y:66});
+      await kit.teleport(w,bot,spot);
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===41,12000,`${bot} enters the Barrow`);
       await w.action(bot,{type:'stop'});
     };
     for(const bot of [hero,ally,other,low])await w.connect({bot,class:'warrior'});
+    // The door is keyed: it checks its quest before the level.
+    if(gate.needs_quest)for(const bot of [hero,ally,other,low])await w.debug(bot,{op:'quest',id:gate.needs_quest,action:'finish'});
     await w.debug(low,{op:'set_level',level:24});
-    await kit.teleport(w,low,{zone:6,x:84,y:70});
+    await kit.teleport(w,low,spot);
     const before=new Set(w.events);
-    await w.action(low,{type:'move',x:84,y:66});
+    await w.action(low,{type:'move',x:gate.x,y:gate.y});
     await w.waitFor(()=>w.events.some(e=>!before.has(e)&&e.bot===low&&e.type==='error'&&/level 25/.test(e.text)),12000,'Level 24 is refused');
     await w.action(low,{type:'stop'});
     check(w.player(low).zone===6,'Level-24 heroes stay in Wyrdwood');

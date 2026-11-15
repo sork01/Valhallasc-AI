@@ -5,13 +5,16 @@ module.exports=(kit,map)=>({
  async run(w,check){
   const hero='NullRunner',ally='NullAlly',other='NullOther',low='NullLow';
   const q=(bot,id)=>w.player(bot).quests.find(q=>q.id===id);
+  const gate=map.zones[27].portals.find(p=>p.id==='year_blackhour'),spot={zone:28,x:gate.x+6,y:gate.y};   // the shaped Yearwheel's door; its return lands 6 tiles east
   const enter=async bot=>{
-   await kit.teleport(w,bot,{zone:28,x:214,y:200});await w.action(bot,{type:'move',x:208,y:200});
+   await kit.teleport(w,bot,spot);await w.action(bot,{type:'move',x:gate.x,y:gate.y});
    await w.waitFor(()=>w.player(bot).zone===44,15000,'Enter the Foundry');await w.action(bot,{type:'stop'});
   };
   for(const bot of [hero,ally,other,low])await w.connect({bot,class:'warrior'});
-  await w.debug(low,{op:'set_level',level:98});await kit.teleport(w,low,{zone:28,x:214,y:200});
-  const before=new Set(w.events);await w.action(low,{type:'move',x:208,y:200});
+  // The door is keyed (null_keys): it checks the quest before the level.
+  if(gate.needs_quest)for(const bot of [hero,ally,other,low])await w.debug(bot,{op:'quest',id:gate.needs_quest,action:'finish'});
+  await w.debug(low,{op:'set_level',level:98});await kit.teleport(w,low,spot);
+  const before=new Set(w.events);await w.action(low,{type:'move',x:gate.x,y:gate.y});
   await w.waitFor(()=>w.events.some(e=>!before.has(e)&&e.bot===low&&e.type==='error'&&/level 99/.test(e.text)),15000,'Level 98 refused');
   await w.action(low,{type:'stop'});check(w.player(low).zone===28,'Level-98 heroes remain in Yearwheel');
   await w.social(hero,{op:'party_invite',bot:ally});await w.social(ally,{op:'party_accept',bot:hero});

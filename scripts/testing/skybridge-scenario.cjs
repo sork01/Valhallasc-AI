@@ -5,10 +5,11 @@ module.exports = (kit, map) => ({
   async run(w, check) {
     const hero = 'SpanRunner', ally = 'SpanAlly', other = 'SpanOther', low = 'SpanLow';
     const span = map.zones[41], parent = map.zones[6];
+    const gate = parent.portals.find(p => p.id === 'sky_shattered_span'), spot = { zone: 7, x: gate.x, y: gate.y + 5 };   // the shaped Bifrost's door, 5 tiles south of it
     const q = (bot, id) => w.player(bot).quests.find(q => q.id === id);
     const enter = async bot => {
-      await kit.teleport(w, bot, { zone: 7, x: 58, y: 133 });
-      await w.action(bot, { type: 'move', x: 58, y: 128 });
+      await kit.teleport(w, bot, spot);
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y });
       await w.waitFor(() => w.player(bot).zone === 42, 12000, `${bot} enters The Shattered Span`);
       await w.action(bot, { type: 'stop' });
     };
@@ -17,9 +18,9 @@ module.exports = (kit, map) => ({
 
     // Level gate: 29 is refused
     await w.debug(low, { op: 'set_level', level: 29 });
-    await kit.teleport(w, low, { zone: 7, x: 58, y: 133 });
+    await kit.teleport(w, low, spot);
     const before = new Set(w.events);
-    await w.action(low, { type: 'move', x: 58, y: 128 });
+    await w.action(low, { type: 'move', x: gate.x, y: gate.y });
     await w.waitFor(() => w.events.some(e => !before.has(e) && e.bot === low && e.type === 'error' && /level 30/.test(e.text)), 12000, 'Level 29 is refused');
     await w.action(low, { type: 'stop' });
     check(w.player(low).zone === 7, 'Level-29 heroes stay in Bifrost Reach');

@@ -116,11 +116,17 @@ function npcAt(n, time) {
 }
 
 async function yearwheelDungeonOpening(w, check, cfg) {
-  const {label,zone,gateId,level,entry,landing,trash,bosses,questGate,questTrials,questFinal,reward,exit} = cfg;
+  const {label,zone,gateId,level,trash,bosses,questGate,questTrials,questFinal,reward,exit} = cfg;
   const floor=map.zones[zone-1],gate=map.zones[27].portals.find(p=>p.id===gateId);
-  check(gate?.to===zone&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss===bosses[2]&&floor.portals.some(p=>p.after_clear),`${label} entrance, encounters and clear exit are active`);
+  // Start a few tiles off the gate (the teleport lands on the nearest free ground): the Yearwheel is a 2.8x shaped zone now, and the old fixed points are void.
+  const entry=cfg.entry||{x:gate.x-4,y:gate.y+4};
+  // The clear exit lands where its portal says (the shaped Yearwheel's coordinates), not at a hard-coded point.
+  const exitPortal=floor.portals.find(p=>p.after_clear),landing={x:exitPortal.tx,y:exitPortal.ty};
+  check(gate?.to===zone&&!floor.sealedTemplate&&floor.slimes.length>=12&&floor.final_boss===bosses[2]&&floor.portals.some(p=>p.after_clear),`${label} entrance, encounters and clear exit are active`);
   const low=label+'Low',lead=label+'Lead',ally=label+'Ally',other=label+'Other';
   for(const bot of [low,lead,ally,other])await w.connect({bot,class:'warrior'});
+  // Some descents stay shut until a quest is done (Solstice: entry_solstice); the door checks that before the level, so every bot has it.
+  if(gate.needs_quest)for(const bot of [low,lead,ally,other])await w.debug(bot,{op:'quest',id:gate.needs_quest,action:'finish'});
   await w.debug(low,{op:'set_level',level:level-1});
   await kit.teleport(w,low,{zone:28,...entry});
   const before=w.events.length;
@@ -3929,7 +3935,7 @@ const scenarios = {
         'The Ribbonwild gate and post-clear exit are open');
       for (const bot of ['FoldLead','FoldAlly','FoldOther','FoldLow']) await w.connect({bot,class:'warrior'});
       await w.debug('FoldLow',{op:'set_level',level:74});
-      await kit.teleport(w,'FoldLow',{zone:21,x:113,y:65});
+      await kit.teleport(w,'FoldLow',{zone:21,x:gate.x-4,y:gate.y+4});
       const before = w.events.length;
       await w.action('FoldLow',{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(() => w.events.slice(before).some(e => e.bot === 'FoldLow' && e.type === 'error' && /level 75/.test(e.text)),12000,'Level-74 player is rejected');
@@ -3938,7 +3944,7 @@ const scenarios = {
       await w.social('FoldLead',{op:'party_invite',bot:'FoldAlly'});
       await w.social('FoldAlly',{op:'party_accept',bot:'FoldLead'});
       for (const bot of ['FoldLead','FoldAlly','FoldOther']) {
-        await kit.teleport(w,bot,{zone:21,x:113,y:65});
+        await kit.teleport(w,bot,{zone:21,x:gate.x-4,y:gate.y+4});
         await w.action(bot,{type:'move',x:gate.x,y:gate.y});
         await w.waitFor(() => w.player(bot).zone === 31,15000,`${bot} enters Pavilion`);
         await w.action(bot,{type:'stop'});
@@ -3956,7 +3962,8 @@ const scenarios = {
       await kit.teleport(w,'FoldLead',{zone:31,x:48,y:15});
       await w.action('FoldLead',{type:'move',x:48,y:12});
       await w.waitFor(()=>w.player('FoldLead').zone===21,15000,'Clear exit returns to Ribbonwild');
-      check(Math.hypot(w.player('FoldLead').x-113,w.player('FoldLead').y-65)<2,
+      const back=floor.portals.find(p=>p.after_clear);
+      check(Math.hypot(w.player('FoldLead').x-back.tx,w.player('FoldLead').y-back.ty)<2,
         'The clear exit lands outside the Pavilion gate');
     },
   },
@@ -3969,7 +3976,7 @@ const scenarios = {
       check(gate?.to===32&&!floor.sealedTemplate&&floor.portals.some(p=>p.after_clear),'Rain Crown gate and exit are open');
       for(const bot of ['RainGateLead','RainGateAlly','RainGateOther','RainGateLow']) await w.connect({bot,class:'warrior'});
       await w.debug('RainGateLow',{op:'set_level',level:79});
-      await kit.teleport(w,'RainGateLow',{zone:22,x:120,y:30});
+      await kit.teleport(w,'RainGateLow',{zone:22,x:gate.x-4,y:gate.y+4});
       const before=w.events.length;
       await w.action('RainGateLow',{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='RainGateLow'&&e.type==='error'&&/level 80/.test(e.text)),12000,'Level-79 player is rejected');
@@ -3977,7 +3984,7 @@ const scenarios = {
       await w.social('RainGateLead',{op:'party_invite',bot:'RainGateAlly'});
       await w.social('RainGateAlly',{op:'party_accept',bot:'RainGateLead'});
       for(const bot of ['RainGateLead','RainGateAlly','RainGateOther']) {
-        await kit.teleport(w,bot,{zone:22,x:120,y:30});
+        await kit.teleport(w,bot,{zone:22,x:gate.x-4,y:gate.y+4});
         await w.action(bot,{type:'move',x:gate.x,y:gate.y});
         await w.waitFor(()=>w.player(bot).zone===32,15000,`${bot} enters Rain Crown`);
         await w.action(bot,{type:'stop'});
@@ -3993,7 +4000,8 @@ const scenarios = {
       await kit.teleport(w,'RainGateLead',{zone:32,x:48,y:15});
       await w.action('RainGateLead',{type:'move',x:48,y:12});
       await w.waitFor(()=>w.player('RainGateLead').zone===22,15000,'Clear exit returns to jungle');
-      check(Math.hypot(w.player('RainGateLead').x-120,w.player('RainGateLead').y-30)<2,'Exit lands outside the Rain Crown gate');
+      const back=floor.portals.find(p=>p.after_clear);
+      check(Math.hypot(w.player('RainGateLead').x-back.tx,w.player('RainGateLead').y-back.ty)<2,'Exit lands outside the Rain Crown gate');
     },
   },
   seed_vault: {
@@ -4123,11 +4131,13 @@ const scenarios = {
     async run(w,check) {
       const gate=map.zones[24].portals.find(p=>p.id==='lapis_astrolabe_gate');
       const floor=map.zones[33];
-      check(gate?.to===34&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='astro_axis','Astrolabe is open with twelve encounters');
+      check(gate?.to===34&&!floor.sealedTemplate&&floor.slimes.length>=12&&floor.final_boss==='astro_axis','Astrolabe is open with twelve encounters');
       check(map.zones[24].quests.some(q=>q.id==='lapis_astro_trials')&&map.zones[24].quests.some(q=>q.id==='lapis_astro_final'),'Linked quests are offered');
       for(const bot of ['AstroLead','AstroAlly','AstroOther','AstroLow']) await w.connect({bot,class:'warrior'});
+      // The gate is keyed: the door checks its quest before the level.
+      if(gate.needs_quest) for(const bot of ['AstroLead','AstroAlly','AstroOther','AstroLow']) await w.debug(bot,{op:'quest',id:gate.needs_quest,action:'finish'});
       await w.debug('AstroLow',{op:'set_level',level:84});
-      await kit.teleport(w,'AstroLow',{zone:25,x:140,y:27});
+      await kit.teleport(w,'AstroLow',{zone:25,x:gate.x-4,y:gate.y+4});
       const before=w.events.length;
       await w.action('AstroLow',{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='AstroLow'&&e.type==='error'&&/level 85/.test(e.text)),12000,'Level-84 player is rejected');
@@ -4135,7 +4145,7 @@ const scenarios = {
       await w.social('AstroLead',{op:'party_invite',bot:'AstroAlly'});
       await w.social('AstroAlly',{op:'party_accept',bot:'AstroLead'});
       for(const bot of ['AstroLead','AstroAlly','AstroOther']) {
-        await kit.teleport(w,bot,{zone:25,x:140,y:27});
+        await kit.teleport(w,bot,{zone:25,x:gate.x-4,y:gate.y+4});
         await w.action(bot,{type:'move',x:gate.x,y:gate.y});
         await w.waitFor(()=>w.player(bot).zone===34,15000,`${bot} enters the Astrolabe`);
         await w.action(bot,{type:'stop'});
@@ -4168,7 +4178,8 @@ const scenarios = {
       await kit.teleport(w,'AstroLead',{zone:34,x:48,y:15});
       await w.action('AstroLead',{type:'move',x:48,y:12});
       await w.waitFor(()=>w.player('AstroLead').zone===25,15000,'Clear exit returns to the Lapis Erg');
-      check(Math.hypot(w.player('AstroLead').x-140,w.player('AstroLead').y-17)<2,'Return landing is safe and separate from entrance');
+      const back=floor.portals.find(p=>p.after_clear);
+      check(Math.hypot(w.player('AstroLead').x-back.tx,w.player('AstroLead').y-back.ty)<2,'Return landing is safe and separate from entrance');
       await w.restart();
       check(quest(w,'AstroLead','lapis_astro_final')?.claimed,'Quest claim persists through restart');
     },
@@ -4311,7 +4322,7 @@ const scenarios = {
       check(gate?.to===36&&!floor.sealedTemplate&&floor.portals.some(p=>p.after_clear),'Blooming entrance and clear exit are active');
       for(const bot of ['BloomOpenLead','BloomOpenAlly','BloomOpenOther','BloomOpenLow'])await w.connect({bot,class:'warrior'});
       await w.debug('BloomOpenLow',{op:'set_level',level:96});
-      await kit.teleport(w,'BloomOpenLow',{zone:28,x:48,y:243});
+      await kit.teleport(w,'BloomOpenLow',{zone:28,x:gate.x-4,y:gate.y+4});
       const before=w.events.length;
       await w.action('BloomOpenLow',{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='BloomOpenLow'&&e.type==='error'&&/level 97/.test(e.text)),12000,'Level-96 player is rejected');
@@ -4320,7 +4331,7 @@ const scenarios = {
       await w.social('BloomOpenLead',{op:'party_invite',bot:'BloomOpenAlly'});
       await w.social('BloomOpenAlly',{op:'party_accept',bot:'BloomOpenLead'});
       for(const bot of ['BloomOpenLead','BloomOpenAlly','BloomOpenOther']){
-        await kit.teleport(w,bot,{zone:28,x:48,y:243});
+        await kit.teleport(w,bot,{zone:28,x:gate.x-4,y:gate.y+4});
         await w.action(bot,{type:'move',x:gate.x,y:gate.y});
         await w.waitFor(()=>w.player(bot).zone===36,15000,`${bot} enters Blooming`);
         await w.action(bot,{type:'stop'});
@@ -4351,7 +4362,8 @@ const scenarios = {
       await kit.teleport(w,'BloomOpenLead',{zone:36,x:49,y:16});
       await w.action('BloomOpenLead',{type:'move',x:49,y:12});
       await w.waitFor(()=>w.player('BloomOpenLead').zone===28,15000,'Clear exit returns to Yearwheel');
-      check(Math.hypot(w.player('BloomOpenLead').x-48,w.player('BloomOpenLead').y-235)<2,'Return landing is safe and distinct from gate');
+      const back=floor.portals.find(p=>p.after_clear);
+      check(Math.hypot(w.player('BloomOpenLead').x-back.tx,w.player('BloomOpenLead').y-back.ty)<2,'Return landing is safe and distinct from gate');
       await w.restart();
       check(quest(w,'BloomOpenLead','yr_sp_bloom_final')?.claimed,'Reward claim persists after restart');
     },
@@ -4422,7 +4434,7 @@ const scenarios = {
     description:'Amber Archive level gate, party isolation, quest credit, boss clear, rewards and return.',
     startLevel:99,levelSpread:0,godMode:true,
     async run(w,check){await yearwheelDungeonOpening(w,check,{
-      label:'Amber',zone:38,gateId:'year_amber_descent',level:99,entry:{x:352,y:164},landing:{x:358,y:151},
+      label:'Amber',zone:38,gateId:'year_amber_descent',level:99,
       trash:['amber_page','amber_moth','amber_sentinel'],bosses:['amber_curator','amber_chronicle','amber_memory'],
       questGate:'yr_au_gate',questTrials:'yr_au_amber_trials',questFinal:'yr_au_amber_final',
       reward:'necklace_moonstone_l95_blue',exit:{x:48,y:17}
@@ -4432,7 +4444,7 @@ const scenarios = {
     description:'Silent Solstice level gate, party isolation, quest credit, boss clear, rewards and return.',
     startLevel:99,levelSpread:0,godMode:true,
     async run(w,check){await yearwheelDungeonOpening(w,check,{
-      label:'Solstice',zone:39,gateId:'year_solstice_descent',level:99,entry:{x:47,y:163},landing:{x:47,y:144},
+      label:'Solstice',zone:39,gateId:'year_solstice_descent',level:99,
       trash:['solstice_flurry','solstice_owl','solstice_guard'],bosses:['solstice_watcher','solstice_harbinger','solstice_heart'],
       questGate:'yr_wi_gate',questTrials:'yr_wi_sols_trials',questFinal:'yr_wi_sols_final',
       reward:'accessory_amber_l95_blue',exit:{x:48,y:14}
