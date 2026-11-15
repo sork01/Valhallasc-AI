@@ -92,12 +92,18 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
     const first = await claim('welcome');
     assert.deepEqual([first.xp, first.gold], [10, 12], 'the unreborn reward');
 
+    // A real hero has already stepped off the Greenmeadow dock (world/landing.rs grants the landing quests once, on
+    // the first step off). Do the same here, so the rebirth below resets a character that has arrived.
+    await debug('teleport', { zone: 0, x: 48, y: 20 });
+    await w.waitFor(() => Math.hypot(me().x - 48, me().y - 20) < 2, 10000, 'off the dock');
+    await sleep(600);
+
     // 2. Rebirth at level 50: tier 1. The reset and keep lists.
     await rebirth(50, 1);
     assert.deepEqual(me().rebirthTiers, [1, 0, 0, 0, 0]);
     assert.deepEqual(me().reborn, { count: 1, tier: 1 });
     assert.equal(me().xp, 0);
-    assert.equal(me().quests.length, 0, 'the quest ledger is empty: every quest can be taken again');
+    assert.equal(me().quests.length, 0, `the quest ledger is empty: every quest can be taken again (${JSON.stringify(me().quests.map(q => q.id))})`);
     keeps('tier 1');
     assert.equal(perk('xp'), 10);
     assert.equal(perk('gold'), 0, 'the gold perk starts at tier 2');
@@ -106,8 +112,9 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
     // 3. The same quest again pays its rewards again, with the XP bonus (level 1 has a 100 XP bar, 10 XP + 10% = 11).
     const again = await claim('welcome');
     assert.deepEqual([again.xp, again.gold], [percentOf(10, 10), 12], 'a repeated quest pays again, boosted');
-    // A real kill pays the XP bonus too. The party of two shares it at party level 1 (40% of a level-1 slime's 50 XP
-    // is 20 each); the reborn hero's 20 becomes 22 and the unreborn friend keeps 20.
+    // A real kill pays the XP bonus too. Greenmeadow kills pay half XP (world.rs kill_xp: a level-1 slime's 50 XP is 25),
+    // and the party of two shares it at party level 1 (40% of 25 is 10 each); the reborn hero's 10 becomes 11, the
+    // unreborn friend keeps 10.
     await debug('teleport', { zone: 0, x: 48, y: 20 });
     await debug('teleport', { zone: 0, x: 49, y: 20 }, 'Mate');
     await w.waitFor(() => Math.hypot(me().x - 48, me().y - 20) < 2 && Math.hypot(w.player('Mate').x - 49, w.player('Mate').y - 20) < 2, 10000, 'to the meadow');
@@ -115,8 +122,8 @@ const VARIANT = armor.id.replace('warrior_armor_', '');
     const spawned = await debug('spawn_enemy', { kind: 'green', x: 50, y: 20, level: 1 });
     await debug('kill_enemy', { id: spawned.result.id });
     await w.waitFor(() => me().xp !== xpBefore && w.player('Mate').xp !== mateBefore, 5000, 'kill XP');
-    assert.equal(w.player('Mate').xp - mateBefore, 20, 'the unreborn friend gets the plain share');
-    assert.equal(me().xp - xpBefore, percentOf(20, 10), 'the reborn hero gets the same share with the tier-1 bonus');
+    assert.equal(w.player('Mate').xp - mateBefore, 10, 'the unreborn friend gets the plain share (40% of the half-XP Greenmeadow kill)');
+    assert.equal(me().xp - xpBefore, percentOf(10, 10), 'the reborn hero gets the same share with the tier-1 bonus');
 
     // 4. Rebirth at 70: tier 3 earns bag cells and the gold perk once, and XP counts both rebirths.
     await rebirth(70, 3);
