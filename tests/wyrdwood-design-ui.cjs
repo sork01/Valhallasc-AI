@@ -72,10 +72,11 @@ const WATER = [[90, 236, 90, 226], [220, 235, 220, 227], [60, 236, 60, 227]];   
     // the Mere, its side channel and the stream are drawn as water, not as ground: the pixel over them is far darker than the bank beside it
     for (const [sx, sy, x, y] of WATER) {
       await go(sx, sy);
+      await page.waitForTimeout(1200);   // the bank beside the stand must be painted: an unpainted bank samples the canvas background
       const px = await page.evaluate(([a, b, p0, q0]) => { const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), at = (p, q) => { const [fx, fy] = Field.screenOf(p, q); return [...g.getImageData(Math.round(fx * cv.width), Math.round(fy * cv.height), 1, 1).data].slice(0, 3); }; return { water: at(a, b), bank: at(p0 + (p0 - a) * .3, q0 + (q0 - b) * .3) }; }, [x, y, sx, sy]);
       const lum = c => c[0] * .3 + c[1] * .59 + c[2] * .11;
-      check(px.water[2] > px.water[0] + 12 && lum(px.water) < lum(px.bank) - 6, `the river at (${x},${y}) is blue water (${px.water} against the bank ${px.bank})`);
       await page.screenshot({ path: path.join(out, `water-${x}.png`) });
+      check(px.water[2] > px.water[0] + 12 && lum(px.water) < lum(px.bank) - 6, `the river at (${x},${y}) is blue water (${px.water} against the bank ${px.bank})`);
     }
     for (const [id, x, y] of [['bridge', 166, 232], ['norn', 160, 180], ['east-gap', 222, 163], ['west-gap', 113, 131], ['mill', 316, 322], ['gallows', 302, 318], ['glade', 150, 298], ['cross', 114, 285]]) { await go(x, y); await page.screenshot({ path: path.join(out, `${id}.png`) }); }
     check((await fetch(`http://127.0.0.1:${port}/assets/wyrdelites.txt`)).ok, "the Hanged King's art is served");

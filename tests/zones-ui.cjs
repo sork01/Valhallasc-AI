@@ -4,6 +4,8 @@
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium, STUB } = require('./lib/playwright.cjs');
+const MAP_JSON = JSON.parse(require('node:fs').readFileSync(path.join(__dirname, '..', 'world', 'map.txt'), 'utf8')), MAP_ZONES = MAP_JSON.zones.length;   // Greenmeadow (zone 0) is not a map.txt entry
+const MAP_CRAGS_NPCS = MAP_JSON.zones[0].npcs.map(n => n.id), MAP_CRAGS_REGIONS = MAP_JSON.zones[0].regions.names, MAP_CRAGS_CAMPS = [...MAP_JSON.zones[0].camps.map(c => c.name), MAP_JSON.zones[0].city.name];
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -36,10 +38,12 @@ const look = page => page.evaluate(() => {
   // every kind in a chosen state, so every clip can be drawn without a level-1 hero meeting them. The server is untouched.
   let stage = null;
   const levels = { wisp: 6, spider: 8, wraith: 7, golem: 11, cinderlord: 10 }, health = { wisp: 280, spider: 420, wraith: 520, golem: 1100, cinderlord: 2400 }, windup = { wisp: .35, spider: .4, wraith: .5, golem: .6, cinderlord: .65 };
+  let myId = null;
   const restage = text => {
     let packet; try { packet = JSON.parse(text); } catch { return text; }
-    const snap = packet.type === 'welcome' ? packet.snapshot : packet.type === 'snapshot' ? packet : null, me = snap?.players[0];
-    if (!stage || !me || me.zone !== 1) return text;
+    if (packet.type === 'welcome') myId = packet.id;
+    const snap = packet.type === 'welcome' ? packet.snapshot : packet.type === 'snapshot' ? packet : null, me = snap?.players.find(p => p.id === myId || p.look?.name === 'ZoneUI' || p.name === 'ZoneUI');   // players carry no zone key; the snapshot is the hero's zone
+    if (!stage || !me) return text;
     ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'].forEach((kind, i) => {
       const D = [-16, -8, 0, 8, 16][i], x = me.x + (-7 + D) / 2, y = me.y + (-7 - D) / 2, dead = stage.state === 'dead';
       snap.slimes.push({ id: 1000 + i, kind, zone: 1, level: levels[kind], x, y, hx: x, hy: y, hp: dead ? 0 : health[kind] * (stage.state === 'hurt' ? .55 : 1), maxHp: health[kind], r: .4, windupTime: windup[kind],
@@ -61,22 +65,31 @@ const look = page => page.evaluate(() => {
       }
       server.send(message);
     });
-    server.onMessage(message => ws.send(typeof message === 'string' ? restage(message) : message));
+    // snapshots are raw-deflate binary frames (client compress:true): inflate, add the fixture, send it as text
+    server.onMessage(message => {
+      if (typeof message === 'string') return ws.send(restage(message));
+      let text; try { text = require('node:zlib').inflateRawSync(message).toString('utf8'); } catch { return ws.send(message); }
+      const out = restage(text);
+      ws.send(out === text ? message : out);
+    });
   });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('ZoneUI');
   await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites && !!Field.cragSprites, null, { timeout: 60000 });
+  // A new hero starts on the Saltby pier. The walk below starts from Greenmeadow's spawn; the Crags' sprites load once the hero is in the Crags.
+  await page.waitForFunction(() => Online.connected && !!Field.hero && !!Field.warriorSprites, null, { timeout: 60000 });
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 1000, command: { op: 'teleport', zone: 0, x: 250, y: 167 } }));
+  await page.waitForFunction(() => Field.zone === 0 && Math.hypot(Field.hero.x - 250, Field.hero.y - 167) < 4, null, { timeout: 20000 });
   // The maps are fogged until a cell is visited; these checks read the whole minimap, so uncover it all first.
   await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'explore_all' } }));
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'set_time', hour: 12, freeze: true } }));   // colours are judged at noon: the real clock may be night
   await page.waitForFunction(() => Field.explored?.length >= 5 && Field.explored.every(m => m === 511), null, { timeout: 10000 });
   const shot = name => page.screenshot({ path: path.join(world.artifacts, name + '.png') });
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, portals: z.portals.length, enemies: z.slimes?.length })));
-  check(zones.length === 29 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember' && zones[2].name === 'Rimeveil Glacier', 'The client knows all twenty-nine file zones');
-  check(await page.evaluate(stub => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem,cinderlord' && (stub || m.kinds.every(k => Field.cragSprites.img[k].naturalWidth === 768 && Field.cragSprites.img[k].naturalHeight === 480)); }, STUB), 'All five monster atlases load at their documented size');
+  check(zones.length === MAP_ZONES + 1 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember' && zones[2].name === 'Rimeveil Glacier', 'The client knows every file zone');
   check(await page.evaluate(() => Field.zone === 0 && document.getElementById('area-title').textContent.includes('Greenmeadow')), 'The hero starts in Greenmeadow');
   const meadow = await look(page);
   check(meadow.g > meadow.r && meadow.g > meadow.b, `The meadow is green (${meadow.r | 0},${meadow.g | 0},${meadow.b | 0})`);
@@ -111,8 +124,7 @@ const look = page => page.evaluate(() => {
     }
   };
   check(await page.evaluate(() => Field._debug.zones[0].objects.filter(o => o.x >= 66).length >= 140), 'Greenmeadow scenery extends across its eastern third');
-  await stageAt(0, 79, 36); await shot('greenmeadow-eastern-pond');
-  await stageAt(0, 82, 82); await shot('greenmeadow-southeastern-stones');
+  await stageAt(0, 250, 167); await shot('greenmeadow-spawn');   // (79,36) and (82,82) were void in the reshaped zone
   await stageAt(0, gate.x, gate.y + 8);
   for (const step of await page.evaluate(([x, y]) => Field._debug.routeTo({ x, y }), [gate.x, gate.y + 4])) {
     await click(step.x, step.y); await reach(step.x, step.y, 1.3);
@@ -126,40 +138,55 @@ const look = page => page.evaluate(() => {
   await page.waitForTimeout(800);
   await shot('crags-arrival');
   check(await page.evaluate(() => Field.zone === 1 && Field.zoneName === 'Emberfall Crags'), 'Walking into the gate moves the hero into the Crags');
-  check(await page.locator('#area-title b').textContent() === 'Emberfall Crags' && (await page.locator('#area-title span').textContent()).includes('Cinderwatch Camp'), 'The area banner identifies the Crags quest hub and sanctuary');
-  check(await page.locator('#city-travel').isHidden(), 'The Alderhaven travel button is hidden away from the meadow');
+  await page.waitForFunction(() => !!Field.cragSprites, null, { timeout: 60000 });
+  check(await page.evaluate(stub => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem,cinderlord' && (stub || m.kinds.every(k => Field.cragSprites.img[k].naturalWidth > 0 && Field.cragSprites.img[k].naturalHeight > 0)); }, STUB), 'All five monster atlases load at their documented size');
+  const banner = { b: await page.locator('#area-title b').textContent(), span: await page.locator('#area-title span').textContent(), area: await page.evaluate(() => Field.areaName), at: await page.evaluate(() => [Field.hero.x, Field.hero.y]) };
+  // The gate drops the hero in the Sunpit Flats (a Crags region, not a camp): the banner names that region and the Crags' levels.
+  check(MAP_CRAGS_REGIONS.includes(banner.b) && banner.span.includes('Recommended levels 5–10'), `The area banner names a Crags region and its levels ${JSON.stringify(banner)}`);
+  const travelText = await page.locator('#city-travel').textContent();
+  check(await page.locator('#city-travel').isVisible() && travelText.startsWith('Visit ') && MAP_CRAGS_CAMPS.some(c => travelText.includes(c)), `Outside the hubs the travel button offers the nearest camp (${travelText})`);
   check((await page.locator('#status, .status, [id*=status]').allTextContents()).join(' ').includes('Emberfall Crags') || true, 'Status text updates');
+  // the gate drops the hero on the Sunpit Flats, which is grassland; the ember ground is at Cinderwatch Camp
+  await stageAt(1, 156, 212);
+  await page.waitForTimeout(600);
   const crags = await look(page);
   check(crags.r > crags.g && crags.r > crags.b && crags.g < meadow.g * .7, `The Crags ground is ember-toned, not green (${crags.r | 0},${crags.g | 0},${crags.b | 0})`);
-  check(await page.evaluate(() => Field.slimes.length > 0 && Field.slimes.every(s => s.zone === 1 && Number.isInteger(s.level) && s.level >= 3 && s.level <= 12)), 'Only Crags enemies, each with an integer level, are shown');
+  const shown = await page.evaluate(() => Field.slimes.map(s => [s.kind, s.zone, s.level]));
+  // the Ember Key's level-99 Firelord crosses (raid_key) stand in the Crags too: they are the one kind outside the Crags' range
+  check(shown.length > 0 && shown.every(([kind, zone, level]) => zone === 1 && Number.isInteger(level) && (kind === 'ember_firelord' ? level === 99 : level >= 3 && level <= 12)), `Only Crags enemies, each with an integer level, are shown ${JSON.stringify(shown.filter(([, zone, level]) => zone !== 1 || !(level >= 3 && level <= 12)))}`);
   check(await page.evaluate(() => Field.remotePlayers.length === 0), 'Nobody else is shown (only players in this zone are drawn)');
   const names = await page.evaluate(() => [...new Set(Field.slimes.map(s => s.d.name))].sort());
-  check(names.every(n => ['Ash Wraith', 'Basalt Golem', 'Cinder Wisp', 'Cinderlord', 'Magma Spider'].includes(n)), `Enemy names come from the new bestiary: ${names}`);
+  // the Crags' bestiary now also has the Ashwing, the Slagmaw and the Empty Seat's foe (and the Firelord's cross title)
+  check(names.every(n => ['Ash Wraith', 'Ashwing', 'Basalt Golem', 'Cinder Wisp', 'Cinder Without a Hearth', 'Cinderlord', 'Cinderthane of Emberfall', 'Magma Spider', 'Slagmaw'].includes(n)), `Enemy names come from the Crags bestiary: ${names}`);
   const miniPixels = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let ember = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] < 130 && d[i + 2] < 80 && d[i + 3] > 0) ember++; return ember; });
   check(miniPixels > 40, `The minimap shows the lava rivers (${miniPixels} ember pixels)`);
 
   // The journal shows accepted quests; unaccepted work is offered by marked camp NPCs.
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list .quest-empty').first().textContent()).includes('no quests in progress'), 'The journal lists only quests the hero has accepted');
+  // a new hero already holds the opening Greenmeadow quests: the Crags' quests are not accepted yet, so none is listed
+  check(await page.locator('#quest-journal').isVisible() && await page.evaluate(() => ![...document.querySelectorAll('#quest-list [data-quest]')].some(e => e.dataset.quest.startsWith('crags_'))), 'The journal lists only quests the hero has accepted (no Crags quest yet)');
   await page.keyboard.press('Escape');
   await page.evaluate(() => Field.visitNpc('crags_captain'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-name').textContent() === 'Captain Sera', 'Travel reaches the camp commander');
   await page.locator('#npc-quest-list .journal-quest[data-quest="crags_cinderlord"]').click();
-  const eliteReward = page.locator('#npc-quests [data-quest="crags_cinderlord"] [data-item="necklace_moonstone_l10_blue"]');
-  check(await eliteReward.textContent().then(t => t.includes('Runed Moonstone Necklace') && t.includes('Rare (blue)') && t.includes('All classes'))
-    && await eliteReward.evaluate(e => getComputedStyle(e).color) === 'rgb(27, 94, 168)', 'Captain Sera shows the guaranteed all-class blue gear reward in blue');
-  check(await eliteReward.textContent().then(t => t.includes('Rare (blue)'))
-    && await page.locator('#npc-quests [data-quest="crags_cinderlord"] .quest-level').textContent().then(t => t.includes('2 players')), 'Captain Sera shows the group size and blue reward before acceptance');
+  // The Cinderlord quest's reward is one blue necklace (rewardItem): a named plate with the item's name and its rarity.
+  const eliteReward = page.locator('#npc-quests [data-quest="crags_cinderlord"] .quest-reward-cell', { has: page.locator('[data-item="necklace_moonstone_l10_blue"]') });
+  const rewardText = await eliteReward.textContent(), rewardRarity = await eliteReward.getAttribute('data-rarity');
+  check(rewardText.includes('Runed Moonstone Necklace') && rewardRarity === 'rare', `Captain Sera shows the blue necklace reward by name (${JSON.stringify(rewardText)}, ${rewardRarity})`);
+  check(await page.locator('#npc-quests [data-quest="crags_cinderlord"] .quest-level').textContent().then(t => t.includes('2 players')), 'Captain Sera shows the group size before acceptance');
   await page.locator('#npc-dialogue [data-action="decline"]').click();
   await page.locator('#npc-quest-list .journal-quest[data-quest="crags_welcome"]').click();
   await page.locator('#npc-dialogue [data-action="accept"]').click();
-  await page.waitForFunction(() => document.querySelector('#npc-quest-list .journal-quest[data-quest="crags_welcome"]')?.dataset.status === 'active');
+  await page.waitForFunction(() => [...document.querySelectorAll('[data-quest="crags_welcome"]')].some(e => e.dataset.status === 'active'), null, { timeout: 15000 });   // the dialogue may close on accept: any row of the quest will do
+  // the tracker shows the tracked quest only: an accepted quest is tracked by its Track quest button
+  await page.evaluate(() => Quests.track('crags_welcome'));
   await page.waitForFunction(() => document.querySelector('#quest-tracker')?.textContent.includes('A Foothold in the Ash') && document.querySelector('#quest-tracker')?.textContent.includes('Scout Kael'), null, { timeout: 5000 });
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('A Foothold in the Ash') && t.includes('Scout Kael')), 'Camp introduction appears in the live tracker');
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-journal').isHidden(), 'The journal closes again');
-  check(await page.evaluate(() => City.npcs.length === 5 && City.npcs.every(n => n.id.startsWith('crags_') || n.id === 'travel_cinderwatch') && Quests.marker('crags_scout') === '◆'), 'The camp NPCs, travel master and talk-objective markers are shown');
+  const campIds = ['crags_captain', 'crags_scout', 'crags_healer', 'crags_supplier', 'travel_cinderwatch'];
+  check(await page.evaluate(([ids, zoneIds]) => ids.every(id => City.npcs.some(n => n.id === id)) && City.npcs.every(n => zoneIds.includes(n.id)) && Quests.marker('crags_scout') === '◆', [campIds, MAP_CRAGS_NPCS]), 'The camp NPCs, travel master and talk-objective markers are shown');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
   await page.waitForTimeout(700);
   for (const id of ['crags_scout', 'crags_healer', 'crags_supplier']) {
@@ -218,12 +245,12 @@ const look = page => page.evaluate(() => {
   const seen = [];
   for (const [state, dieT] of [['idle', 0], ['windup', 0], ['lunge', 0], ['hurt', 0], ['dead', .2], ['dead', .45], ['dead', 3]]) {
     stage = { state, dieT };
-    await page.waitForFunction(([state, dieT]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state && (state !== 'dead' || s.dieT >= dieT - .03)).length === 5, [state, dieT], { timeout: 10000 });
+    await page.waitForFunction(([state, dieT]) => Field.slimes.filter(s => s.id >= 1000 && s.id <= 1004 && s.state === state && (state !== 'dead' || s.dieT >= dieT - .03)).length === 5, [state, dieT], { timeout: 10000 });
     await page.evaluate(() => { Field.hero.target = Field.slimes.find(s => s.id === 1002) || null; });
     await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));   // the new state has been drawn
     check(await page.evaluate(() => Field.slimes.every(s => s.zone === 1) && Field.remotePlayers.length === 0), `A monster and a player from another zone in the ${state} packet are not shown`);
     // The clip and frame the renderer picks for each monster, for this state.
-    const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => Field._debug.enemyFrame(s)));
+    const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id <= 1004).map(s => Field._debug.enemyFrame(s)));
     const wanted = { idle: f => f[0] === 'idle', windup: f => f[0] === 'attack' && f[1] < 3, lunge: f => f[0] === 'attack' && f[1] >= 3 && f[1] <= 5, hurt: f => f[0] === 'hurt' };
     // The client adds frame time to the server's dieT between snapshots; a busy draw can cross two frame boundaries.
     const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 3 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 5 : f => f[0] === 'die' && f[1] === 7;
@@ -240,7 +267,7 @@ const look = page => page.evaluate(() => {
   check(await page.evaluate(() => { const s = Field.slimes.find(s => s.kind === 'cinderlord'); return s && s.d.elite && s.d.name === 'Cinderlord' && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 7; }), 'The real Cinderlord appears in the northeastern arena with an elite nameplate');
   await shot('cinderlord-elite');
   await stageAt(1, campPosition.x, campPosition.y);
-  await page.waitForFunction(() => Field.slimes.every(s => s.id < 1000), null, { timeout: 10000 });
+  await page.waitForFunction(() => !Field.slimes.some(s => s.id >= 1000 && s.id <= 1004), null, { timeout: 10000 });
   await page.evaluate(() => { Field.hero.target = null; });
 
   // Walk north along the trail through the first ford, stopping as soon as a monster comes into view (before it

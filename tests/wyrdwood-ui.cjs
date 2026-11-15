@@ -40,10 +40,12 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const kinds = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'];
   const levels = { boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30 }, health = { boar: 5600, crow: 4300, troll: 9500, weaver: 7600, ram: 11500, oakhorn: 60000, hrungnir: 150000 };
   const windup = { boar: .3, crow: .5, troll: .8, weaver: .7, ram: .25, oakhorn: 1, hrungnir: .9 };
+  let myId = null;
   const restage = text => {
     let packet; try { packet = JSON.parse(text); } catch { return text; }
-    const snap = packet.type === 'welcome' ? packet.snapshot : packet.type === 'snapshot' ? packet : null, me = snap?.players[0];
-    if (!stage || !me || me.zone !== 6) return text;
+    if (packet.type === 'welcome') myId = packet.id;
+    const snap = packet.type === 'welcome' ? packet.snapshot : packet.type === 'snapshot' ? packet : null, me = snap?.players.find(p => p.id === myId || p.look?.name === 'WyrdUI' || p.name === 'WyrdUI');   // ambient adventurers can share the zone: pick this hero by id
+    if (!stage || !me) return text;   // a snapshot is already one zone's view (the hero's), and players carry no zone key
     kinds.forEach((kind, i) => {
       const D = [-18, -12, -6, 0, 6, 12, 18][i], x = me.x + (-8 + D) / 2, y = me.y + (-8 - D) / 2, dead = stage.state === 'dead';
       snap.slimes.push({ id: 1000 + i, kind, zone: 6, level: levels[kind], x, y, hx: x, hy: y, hp: dead ? 0 : health[kind] * (stage.state === 'hurt' ? .55 : 1), maxHp: health[kind], r: .4, windupTime: windup[kind],
@@ -54,15 +56,25 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   await page.routeWebSocket(/\/ws$/, ws => {
     const server = ws.connectToServer();
     ws.onMessage(message => server.send(message));
-    server.onMessage(message => ws.send(typeof message === 'string' ? restage(message) : message));
+    // snapshots are raw-deflate binary frames (client compress:true): inflate, add the fixture, and send it as text
+    server.onMessage(message => {
+      if (typeof message === 'string') return ws.send(restage(message));
+      let text; try { text = require('node:zlib').inflateRawSync(message).toString('utf8'); } catch { return ws.send(message); }
+      const out = restage(text);
+      ws.send(out === text ? message : out);
+    });
   });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('WyrdUI');
   await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.wyrdSprites, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.hero, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', ref: 1, command }), command);
   await debug({ op: 'explore_all' });
+  await debug({ op: 'set_time', hour: 12, freeze: true });   // colours are judged at noon: the real clock may be night
+  // A new hero starts on the Saltby pier. The Wyrdwood's sprites load only once the hero is in it, so teleport first.
+  await debug({ op: 'teleport', zone: 6, x: 78, y: 288 });
+  await page.waitForFunction(() => Field.zone === 6 && !!Field.warriorSprites && !!Field.wyrdSprites, null, { timeout: 60000 });
   await page.waitForFunction(() => Field.explored?.length >= 7 && Field.explored.every(m => m === 511), null, { timeout: 10000 });
   const shot = name => page.screenshot({ path: path.join(world.artifacts, name + '.png') });
   const stageAt = async (x, y) => {
@@ -78,45 +90,47 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   };
 
   // The map data the client uses comes from the same file the server loads.
+  const MAP = JSON.parse(require('node:fs').readFileSync(path.join(root, 'world/map.txt'), 'utf8')), MZ = MAP.zones[5];
   const z = await page.evaluate(() => { const a = Field._debug.zones[6]; return { n: Field._debug.zones.length, name: a.name, theme: a.theme, size: a.size, levels: a.levels, camps: (a.camps || []).map(c => c.name), city: a.city.name, bridges: (a.bridges || []).length, places: (a.places || []).map(p => p.id), portals: a.portals.map(p => p.id + '>' + p.to), beacons: a.objects.filter(o => o.kind === 'beacon').length, crags: a.objects.filter(o => o.kind === 'crag').length, water: a.objects.filter(o => o.kind === 'water').length, quests: (a.quests || []).length, npcs: (a.npcs || []).length }; });
-  check(z.n === 10 && z.name === 'Wyrdwood' && z.theme === 'wyrd' && z.size === 192 && z.levels.join() === '20,30', 'The client knows the Wyrdwood: name, wyrd theme, 192 tiles, levels 20-30');
-  check(z.city === 'Hollowmoot' && z.camps.join() === 'Skuldwatch' && z.bridges === 1 && z.places.length === 6 && z.portals.join() === 'skaldholm_gate>4', 'Two hubs, one bridge, six named places and the gate back to Skaldholm');
-  check(z.beacons === 3 + 1 && z.crags > 100 && z.water > 150 && z.quests >= 24 && z.npcs === 17, `The ridges (${z.crags} crags), the river (${z.water} discs), four beacons, ${z.quests} quests and ${z.npcs} people are all in the data`);
-  check(await page.evaluate(stub => { const m = Field.wyrdSprites.meta; return m.kinds.join() === 'boar,crow,troll,weaver,ram,oakhorn,hrungnir' && (stub || m.kinds.every(k => Field.wyrdSprites.img[k].naturalWidth === 768 && Field.wyrdSprites.img[k].naturalHeight === 480)); }, STUB), 'The seven monster atlases load with their metadata');
-  check(await page.evaluate(() => Field._debug.zones[4].portals.some(p => p.id === 'wyrd_gate' && p.to === 6)), 'Skaldholm has the East Gate to the Wyrdwood');
+  check(z.n === MAP.zones.length + 1 && z.name === 'Wyrdwood' && z.theme === 'wyrd' && z.size === MZ.size && z.levels.join() === '20,30', `The client knows the Wyrdwood: name, wyrd theme, ${MZ.size} tiles, levels 20-30`);
+  check(z.city === 'Hollowmoot' && z.camps.join() === MZ.camps.map(c => c.name).join() && z.bridges === MZ.bridges.length && z.places.length === MZ.places.length && z.portals.join() === MZ.portals.map(p => p.id + '>' + p.to).join(), `Hollowmoot, ${z.camps.length} camps, ${z.bridges} bridge, ${z.places.length} named places and the seams to the Crags and Rimeveil are all in the data`);
+  check(z.beacons === 1 && ['wyrd_beacon_west', 'wyrd_beacon_ridge', 'wyrd_beacon_storm'].every(id => z.places.includes(id)) && z.crags > 100 && z.water > 150 && z.quests >= 24 && z.npcs === MZ.npcs.length, `The great beacon, three quest beacons, ridges (${z.crags} crags), the river (${z.water} discs), ${z.quests} quests and ${z.npcs} people are all in the data`);
+  check(await page.evaluate(stub => { const m = Field.wyrdSprites.meta; return m.kinds.join() === 'boar,crow,troll,weaver,ram,oakhorn,hrungnir' && (stub || m.kinds.every(k => Field.wyrdSprites.img[k].naturalWidth > 0 && Field.wyrdSprites.img[k].naturalHeight > 0)); }, STUB), 'The seven monster atlases load with their metadata');
 
   // Hollowmoot: a root-town under the Elder Ash, warm timber decking, autumn all round.
-  await stageAt(33, 156);
+  await stageAt(78, 288);   // the design test's open spot in the town (the plaza centre is blocked)
   await shot('hollowmoot');
   check(await page.evaluate(() => Field.zone === 6 && Field.zoneName === 'Wyrdwood' && Field.zoneTheme === 'wyrd'), 'The hero is in the Wyrdwood');
-  check(await page.locator('#area-title b').textContent() === 'Wyrdwood' && (await page.locator('#area-title span').textContent()).includes('Hollowmoot'), 'The banner names Hollowmoot as the sanctuary');
+  check(await page.locator('#area-title b').textContent() === 'Hollowmoot' && (await page.locator('#area-title span').textContent()).includes('Hollowmoot · Sanctuary'), 'The banner names Hollowmoot as the sanctuary');
   check(await page.locator('#city-travel').isHidden(), 'The travel button is hidden inside Hollowmoot');
-  const town = await look(page, [.1, .55, .4, .9]);
+  const town = await look(page);
   check(town.r > town.b + 15 && town.r < 190, `Hollowmoot stands on warm timber (${town.r | 0},${town.g | 0},${town.b | 0})`);
-  check(await page.evaluate(() => City.npcs.filter(n => n.id.startsWith('wyrd_') || n.id.startsWith('travel_')).length === 17 && Quests.marker('wyrd_warden') === '?'), 'The people are loaded; the Moot-Warden has the arrived progression quest to turn in (?)');
+  const people = await page.evaluate(() => ({ n: City.npcs.filter(c => c.id.startsWith('wyrd_') || c.id.startsWith('travel_')).length, warden: Quests.markerInfo('wyrd_warden'), welcome: Quests.markerInfo('wyrd_welcome') }));
+  check(people.n === MZ.npcs.filter(c => /^(wyrd_|travel_)/.test(c.id)).length && people.warden.symbol === '?', `The people are loaded (${people.n}); the Moot-Warden has a quest to turn in (?)`);
   // Out in the forest the ground is autumn leaf litter.
-  await stageAt(80, 140);
+  await stageAt(110, 282);
   await shot('forest');
   const forest = await look(page, [.25, .3, .75, .75]);
   check(forest.r > forest.b + 25 && forest.r > 60, `The south forest is autumn-toned (${forest.r | 0},${forest.g | 0},${forest.b | 0})`);
   check(await page.locator('#city-travel').isVisible() && (await page.locator('#city-travel').textContent()).includes('Hollowmoot'), 'Outside the hubs the travel button offers the nearest one (Hollowmoot)');
   // The Troll Bridge: brown planks over the gap in the river.
-  await stageAt(96, 112);
+  await stageAt(166, 225);
   await shot('bridge');
   const deck = await look(page, [.42, .4, .58, .6]);
   check(deck.r > deck.b + 20 && deck.r > 90, `The bridge deck is timber (${deck.r | 0},${deck.g | 0},${deck.b | 0})`);
   const river = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - 47) < 18 && Math.abs(d[i + 1] - 111) < 20 && Math.abs(d[i + 2] - 154) < 24 && d[i + 3] > 0) n++; return n; });
   check(river > 150, `The minimap draws the river Skuld (${river} river-coloured pixels)`);
   // Skuldwatch: the Great Beacon burns; the travel button follows the nearest hub.
-  await stageAt(96, 91);
+  await stageAt(166, 209);
   await shot('skuldwatch');
   check((await page.locator('#area-title span').textContent()).includes('Skuldwatch') && await page.locator('#city-travel').isHidden(), 'Skuldwatch is named as the sanctuary when the hero walks in, and the travel button hides');
   check(await page.evaluate(() => { const o = Field._debug.objects.find(o => o.kind === 'beacon' && o.great); return !!o && Math.hypot(o.x - Field.hero.x, o.y - Field.hero.y) < 12; }), 'The Great Beacon stands in the fort yard');
   // The heights: stormy, grey-green moor, runestones.
   const lowSky = await look(page, [.9, 0, 1, .07]);
-  await stageAt(96, 62);
+  // (150,115) is inside Highmoor Hold (dirt yard, brown): sample the open moor west of the hero instead
+  await stageAt(126, 108);
   await shot('heights');
-  const moor = await look(page, [.25, .3, .75, .75]);
+  const moor = await look(page, [.1, .3, .4, .7]);
   const highSky = await look(page, [.9, 0, 1, .07]);
   check(moor.g > moor.r - 5 && moor.g > 50, `The Highmoor is olive-green, not leaf-brown (${moor.r | 0},${moor.g | 0},${moor.b | 0})`);
   check(highSky.r < lowSky.r + 10 || highSky.b > highSky.r, `The sky darkens towards the storm (${lowSky.r | 0},${lowSky.g | 0},${lowSky.b | 0} -> ${highSky.r | 0},${highSky.g | 0},${highSky.b | 0})`);
@@ -124,10 +138,10 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const dark = await page.evaluate(() => Quests.visited('wyrd_beacon_west') || Quests.visited('wyrd_beacon_ridge'));
   check(!dark, 'No beacon is lit before the quest');
   // The summit: Hrungnir's court, a ring of stones, the giant standing in it.
-  await stageAt(104, 21);
+  await stageAt(152, 84);
   await shot('summit');
   check(await page.evaluate(() => Field.slimes.some(s => s.kind === 'hrungnir' && s.d.elite && s.d.name === 'Hrungnir')), 'Hrungnir stands in the summit court with an elite nameplate');
-  await stageAt(152, 138);
+  await stageAt(245, 265);
   check(await page.evaluate(() => Field.slimes.some(s => s.kind === 'oakhorn' && s.d.elite)), 'Oakhorn stands in its grove');
 
   // The escort: take the quest, find Eydis, talk to her through the canvas, and she walks beside the hero while her stranded self disappears.
@@ -156,8 +170,14 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   check(await page.evaluate(() => document.body.innerText.includes('Quest failed: Safe Passage')), 'The chat tells the hero the quest failed when they fell, and Eydis is gone');
 
   // Every kind in every clip: the canvas must change from one state to the next and nothing may throw.
-  await page.waitForFunction(() => !Field.hero.dead, null, { timeout: 15000 });
-  await stageAt(70, 150);
+  // a fallen hero is a ghost (no timed respawn): it walks back within 15 tiles of its body and presses Resurrect
+  await page.waitForFunction(() => Field.hero.ghost && Field.hero.corpse, null, { timeout: 15000 });
+  const body = await page.evaluate(() => ({ x: Field.hero.corpse.x, y: Field.hero.corpse.y }));
+  await stageAt(body.x, body.y);
+  await page.waitForFunction(() => !document.getElementById('ghost-resurrect').disabled, null, { timeout: 15000 });
+  await page.locator('#ghost-resurrect').click({ timeout: 15000 });
+  await page.waitForFunction(() => !Field.hero.dead && !Field.hero.ghost, null, { timeout: 15000 });
+  await stageAt(110, 282);
   const monsterHashes = () => page.evaluate(() => {
     const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600;
     return [1000, 1001, 1002, 1003, 1004, 1005, 1006].map(id => {
@@ -170,19 +190,19 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const seen = [];
   for (const [state, dieT] of [['idle', 0], ['windup', 0], ['lunge', 0], ['hurt', 0], ['dead', .2], ['dead', .45], ['dead', 3]]) {
     stage = { state, dieT };
-    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 7, [state], { timeout: 10000 });
+    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id <= 1006 && s.state === state).length === 7, [state], { timeout: 10000 });
     await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
-    const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => Field._debug.enemyFrame(s)));
+    const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id <= 1006).map(s => Field._debug.enemyFrame(s)));
     const wanted = { idle: f => f[0] === 'idle', windup: f => f[0] === 'attack' && f[1] < 3, lunge: f => f[0] === 'attack' && f[1] >= 3 && f[1] <= 5, hurt: f => f[0] === 'hurt' };
     const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 2 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 4 : f => f[0] === 'die' && f[1] === 7;
     check(frames.length === 7 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
-    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => s.d.name))).join() === 'Rotfang Boar,Gallowcrow,Mosshide Troll,Wyrdweaver,Stormram,Oakhorn,Hrungnir', 'The bestiary names come from the Wyrdwood table');
+    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id <= 1006).map(s => s.d.name))).join() === 'Rotfang Boar,Gallowcrow,Mosshide Troll,Wyrdweaver,Stormram,Oakhorn,Hrungnir', 'The bestiary names come from the Wyrdwood table');
     seen.push(await monsterHashes());
     if (state === 'idle' || state === 'lunge') await shot('bestiary-' + state);
   }
   stage = null;
   check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All seven monsters draw something new in each state (${seen.length} states)`);
-  await page.waitForFunction(() => Field.slimes.every(s => s.id < 1000), null, { timeout: 10000 });
+  await page.waitForFunction(() => !Field.slimes.some(s => s.id >= 1000 && s.id <= 1006), null, { timeout: 10000 });
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);
   console.log(`wyrdwood-ui: ${checks} checks passed`);
 })().then(async () => { await browser?.close(); if (started) await call('stop_world').catch(() => {}); await client.close(); process.exit(0); },

@@ -31,11 +31,12 @@ const check = (ok, text) => { assert.ok(ok, text); console.log(`${++checks}: ${t
       localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: touch ? 'sv' : 'en', sound: false, char: null, draft: null }));
     }, touch);
     await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
-    await page.locator('#cls-warrior').click(); await page.locator('#name').fill('SkyAndSea'); await page.locator('#go').click({ timeout: 60000 });
+    await page.locator('#cls-warrior').click(); await page.locator('#name').fill(touch ? 'SkyAndSeaT' : 'SkyAndSeaD'); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
     if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
     const debug = command => page.evaluate(command => Online.send({ type: 'debug', command }), command);
-    const crossings = process.env.MUTATE ? [] : touch ? [[6,7],[13,9]] : [[6,7],[7,8],[7,9],[13,8],[13,9],[8,9]];
+    // 8 -> 9 is a seam (nacre_gate, no walk portal) in the reshaped map: no height change to test, so it is not in the list
+    const crossings = process.env.MUTATE ? [] : touch ? [[6,7],[13,9]] : [[6,7],[7,8],[7,9],[13,8],[13,9]];
     for (const [from,to] of crossings) {
       const p = await page.evaluate(([from,to]) => Field._debug.zones[from].portals.find(p => p.to === to && p.walk), [from,to]);
       assert.ok(p, 'real walking crossing');
