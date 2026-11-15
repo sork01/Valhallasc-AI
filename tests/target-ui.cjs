@@ -52,14 +52,18 @@ async function call(name, args = {}) {
       }, [kind, at]);
       const box = await page.locator('#fieldcv').boundingBox();
       // Screen points are in the canvas's own pixels, so scale by its intrinsic size (the viewport is not 1600x900).
-      await page.mouse.click(box.x + p.x / p.cw * box.width, box.y + p.y / p.ch * box.height);
+      // w2s is in logical units (1600 x VH, client `VW`), the same space the pointer handler maps clicks into.
+      const logicalH = p.ch * 1600 / p.cw;
+      await page.mouse.click(box.x + p.x / 1600 * box.width, box.y + p.y / logicalH * box.height);
       const selected = await page.waitForFunction(id => Field.hero.target?.id === id && !document.querySelector('#hud-target').hidden, p.id, { timeout: 4000 }).then(() => true, () => false);
       if (selected) return p;
       last = p;
       await page.waitForTimeout(400);
     }
     const probe = await page.evaluate(id => { const s = Field.slimes.find(z => z.id === id); return { target: Field.hero.target ? { id: Field.hero.target.id, kind: Field.hero.target.kind } : null, hero: { x: Field.hero.x, y: Field.hero.y, nx: Field.hero.nx, ny: Field.hero.ny }, slime: s ? { x: s.x, y: s.y, dead: s.dead, dir: s.dir, box: Field._debug.enemyHitbox(s), scale: s.d.scale } : null }; }, last.id);
-    throw new Error(`click on ${kind} ${last.id} did not select it after 3 attempts: ${JSON.stringify({ point: [last.x, last.y], canvas: [last.cw, last.ch], probe })}`);
+    const cbox = await page.locator('#fieldcv').boundingBox();
+    const under = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? `${e.tagName}#${e.id}.${e.className}` : null; }, [cbox.x + last.x / 1600 * cbox.width, cbox.y + last.y / (last.ch * 1600 / last.cw) * cbox.height]);
+    throw new Error(`click on ${kind} ${last.id} did not select it after 3 attempts (topmost element at the click: ${under}): ${JSON.stringify({ point: [last.x, last.y], canvas: [last.cw, last.ch], probe })}`);
   };
   // Eight tiles out: a level-1 slime four tiles away walks onto the hero within seconds and its upper body then sits under the hero's own sprite.
   const greenAt = await stage('green', 8, 0);
