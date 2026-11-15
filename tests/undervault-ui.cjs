@@ -122,9 +122,19 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(nameOf.join('|') === 'Vault Thrall|Bone Archer|Hollow Acolyte|Hrolf Bonegate|Valka, the Hollow Choir|Ironwake, the Vault Colossus|Haldor, the Hollow King', 'Every kind has its name for the system log');
 
   // ---- a ranged enemy: arrows in flight, drawn and carried between snapshots
-  const archer = await page.evaluate(() => Field.slimes.find(s => s.kind === 'archer' && !s.dead));
+  // Pick an archer that is not already in a fight with the hero (a chasing archer parked beside the hero backs off into a corner and never looses a shot).
+  const archer = await page.evaluate(() => {
+    const h = Field.hero, far = Field.slimes.filter(s => s.kind === 'archer' && !s.dead && s.state !== 'chase' && Math.hypot(s.x - h.x, s.y - h.y) > 9);
+    far.sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y));
+    const a = far[0] || Field.slimes.find(s => s.kind === 'archer' && !s.dead);
+    return { id: a.id, x: a.x, y: a.y };
+  });
   await stageAt(5, archer.x - 7, archer.y);
-  await page.waitForFunction(() => Field._debug.ebolts.some(b => b.kind === 'archer'), null, { timeout: 25000 });
+  await page.waitForFunction(() => Field._debug.ebolts.some(b => b.kind === 'archer'), null, { timeout: 25000 }).catch(async (err) => {
+    // Diagnostic on failure: where the archers are, what state they are in and where the hero stands.
+    console.error('archer probe', JSON.stringify(await page.evaluate(() => ({ hero: [Field.hero.x, Field.hero.y], zone: Field.zone, archers: Field.slimes.filter(s => s.kind === 'archer').map(s => ({ id: s.id, x: +s.x.toFixed(1), y: +s.y.toFixed(1), state: s.state, dead: s.dead, target: s.target ?? null, dormant: s.dormant ?? null })) }))));
+    throw err;
+  });
   const arrow = await page.evaluate(() => { const b = Field._debug.ebolts.find(b => b.kind === 'archer'); const x0 = b.x, y0 = b.y; return { speed: b.speed, color: b.color, x0, y0 }; });
   await page.waitForTimeout(60);
   check(arrow.speed > 5 && /^#/.test(arrow.color), `An arrow flies at ${arrow.speed} tiles a second`);
@@ -161,8 +171,9 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // ---- the world map has a tile for it
   await page.keyboard.press('m');
-  await page.locator('#worldmap .wm-tile[data-zone="5"]').waitFor({ timeout: 10000 });
-  check(await page.locator('#worldmap .wm-tile[data-zone="5"]').textContent().then(t => t.includes('The Undervault') && t.includes('Lv 20')), 'The world map shows The Undervault, Lv 20');
+  // Dungeon interiors have no atlas tile: the Undervault opens from its entrance marker on Skaldholm (data-to 5), named by aria-label.
+  await page.locator('#worldmap .wm-entrance[data-to="5"]').waitFor({ timeout: 10000 });
+  check(await page.evaluate(() => (document.querySelector('#worldmap .wm-entrance[data-to="5"]').getAttribute('aria-label') || '').startsWith('The Undervault') && Field._debug.zones[5].min === 20), 'The world map shows the Undervault entrance; its door is level 20');
   await shot('world-map');
   await page.keyboard.press('Escape');
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);

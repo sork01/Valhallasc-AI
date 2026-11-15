@@ -61,13 +61,14 @@ async function call(name, args = {}) {
     const probe = await page.evaluate(id => { const s = Field.slimes.find(z => z.id === id); return { target: Field.hero.target ? { id: Field.hero.target.id, kind: Field.hero.target.kind } : null, hero: { x: Field.hero.x, y: Field.hero.y, nx: Field.hero.nx, ny: Field.hero.ny }, slime: s ? { x: s.x, y: s.y, dead: s.dead, dir: s.dir, box: Field._debug.enemyHitbox(s), scale: s.d.scale } : null }; }, last.id);
     throw new Error(`click on ${kind} ${last.id} did not select it after 3 attempts: ${JSON.stringify({ point: [last.x, last.y], canvas: [last.cw, last.ch], probe })}`);
   };
-  const greenAt = await stage('green', 4, 0);
+  // Eight tiles out: a level-1 slime four tiles away walks onto the hero within seconds and its upper body then sits under the hero's own sprite.
+  const greenAt = await stage('green', 8, 0);
   const green = await clickUpperBody('green', greenAt);
   check(green.groundDistance > 1.1, `Upper sprite click is outside the old ground target radius (${green.groundDistance.toFixed(2)})`);
   check((await page.locator('#hud-target-name').textContent()).includes('Green Slime'), 'Badge shows the selected monster name');
   check(await page.evaluate(() => { const c = document.querySelector('#hud-target-face'); return [...c.getContext('2d').getImageData(0, 0, c.width, c.height).data].some((v, i) => i % 4 === 3 && v > 0); }), 'Badge paints the monster portrait');
   check(await page.evaluate(() => document.querySelector('#hud-target-text').textContent === `${Math.min(Math.ceil(Field.hero.target.hp), Math.round(Field.hero.target.maxHp))} / ${Math.round(Field.hero.target.maxHp)}`), 'Badge shows authoritative monster HP');
-  const blueAt = await stage('blue', -4, 0);
+  const blueAt = await stage('blue', -8, 0);
   const blue = await clickUpperBody('blue', blueAt);
   check(blue.id !== green.id && (await page.locator('#hud-target-name').textContent()).includes('Blue Slime'), 'Selecting another monster updates the badge');
   await page.keyboard.press('w');

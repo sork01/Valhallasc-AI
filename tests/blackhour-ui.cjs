@@ -73,7 +73,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
     hidden:Object.fromEntries(['scene-game','pause','equipment','npc-dialogue'].map(id=>[id,document.getElementById(id).hidden])),
     skill:Skillbar.open,quests:Quests.open,social:Social.open,city:City.open,settings:Settings.active}));
   assert.ok(mapOpen.opened,JSON.stringify(mapOpen));
-  await page.locator('.wm-tile[data-zone="44"]').click();
+  // Dungeon interiors have no atlas tile: the Foundry opens from its entrance marker on the Yearwheel (data-to 44).
+  await page.locator('.wm-entrance[data-to="44"]').click();
   await page.waitForFunction(()=>WorldMap.zone===44&&WorldMap.view==='zone');
   assert.ok(await page.evaluate(()=>WORLD_MAP.zones[43].blackhourFloor[100][80]===' '&&WORLD_MAP.zones[43].blackhourFloor[143][80]==='='),'World-map floor follows the physical clock and sump');
   await page.screenshot({path:path.join(world.artifacts,'blackhour-map.png')});

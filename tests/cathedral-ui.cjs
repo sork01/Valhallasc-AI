@@ -108,7 +108,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   check(await page.evaluate(()=>valhalla.cathedralMusic.map(m=>Math.round(m.duration)).join()==='87,69,128'),'All three music loops decode to their own score lengths');
   await page.evaluate(()=>{City.close();Quests.close();WorldMap.show();});
   check(await page.evaluate(()=>WorldMap.open), 'World map opens from the Cathedral');
-  check(/Cloister/.test(await page.locator('#worldmap').textContent())&&/Reliquary/.test(await page.locator('#worldmap').textContent())&&/Grand Nave/.test(await page.locator('#worldmap').textContent()),'World map includes the three Cathedral wings');
+  // Wings are interiors of Nacrehold (zone 9): they appear as entrance markers (data-to 10/11/12), named by aria-label, not as tiles or labels in the text.
+  check(await page.evaluate(()=>['Flooded Cloister','Coral Reliquary','Grand Nave'].every(n=>[...document.querySelectorAll('#worldmap .wm-entrance')].some(b=>(b.getAttribute('aria-label')||'').includes(n)))),'World map includes the three Cathedral wings');
   check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
   console.log(`PASS Cathedral UI: ${checks} checks (${STUB?'stub':'real'} sprites), ${world.artifacts}`);
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();if(world)await call('stop_world').catch(()=>{});await client.close().catch(()=>{});});
