@@ -854,6 +854,8 @@ def design(world, write=False):
         else:
             g = gates[p['id']]
             p.update(x=g['gate'][0], y=g['gate'][1], walk=g['walk'])
+            if p['id'] == 'maelstrom_up':       # the Maelstrom's waterspout: client/field.js draws it from this look (the shaped pipeline had dropped it)
+                p['look'] = 'maelstrom'
     zone['exitRoutes'] = [dict(portal=pid, points=[list(g['gate']), list(g['arrival'])]) for pid, g in gates.items()]
     names = ['The Pearl Shallows', 'The Naglfar Flats', 'The Chapel Reach', 'The Lantern Maze', 'The Moray Gardens', 'The Siren Halls', 'The Shellback Deeps', "Rán's Court"]
     region = np.zeros((n, n), np.int16)

@@ -542,6 +542,8 @@ def design(world, write=False):
         else:
             g = gates[p['id']]
             p.update(x=g['gate'][0], y=g['gate'][1], walk=g['walk'])
+            if p['id'] == 'maelstrom_down':     # the Maelstrom's waterspout: client/field.js draws it from this look (the shaped pipeline had dropped it)
+                p['look'] = 'maelstrom'
     # region names for the HUD: each island and pad, the bridges between (a hub or an outpost names itself over its region)
     names = ['Windward Meadow', "Heimdall's Perch", 'The Hall of the Fallen', "The Roc's Eyrie", 'The Stormcrown', 'The Shardfields',
              'The Bifrost Pylon', 'The Stormrift Pad', 'The Maelstrom Pad', 'The Nacrehold Pad', 'The Rainbow Bridges']

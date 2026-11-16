@@ -6,6 +6,7 @@
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium, STUB } = require('./lib/playwright.cjs');
+const { frameText } = require('./lib/frames.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -34,7 +35,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && !/401|Failed to load resource/.test(message.text())) errors.push(message.text()); });
-  // Display-only fixture: while `stage` is set, the browser's copy of each Ran's Deep snapshot gets one extra monster of every kind in a
+  // Display-only fixture (ids 900000+: the server's own ids reach 1000+ in this zone): while `stage` is set, the browser's copy of each Ran's Deep snapshot gets one extra monster of every kind in a
   // chosen state, so every clip can be drawn without a hero meeting them. The server is untouched.
   let stage = null;
   const kinds = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'];
@@ -48,7 +49,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
     if (!stage || !me || me.zone !== 8) return text;
     kinds.forEach((kind, i) => {
       const D = [-14, -10, -6, -2, 2, 6, 10, 14][i], x = me.x + (-8 + D) / 2, y = me.y + (-8 - D) / 2, dead = stage.state === 'dead';
-      snap.slimes.push({ id: 1000 + i, kind, zone: 8, level: levels[kind], x, y, hx: x, hy: y, hp: dead ? 0 : health[kind] * (stage.state === 'hurt' ? .55 : 1), maxHp: health[kind], r: .4, windupTime: windup[kind],
+      snap.slimes.push({ id: 900000 + i, kind, zone: 8, level: levels[kind], x, y, hx: x, hy: y, hp: dead ? 0 : health[kind] * (stage.state === 'hurt' ? .55 : 1), maxHp: health[kind], r: .4, windupTime: windup[kind],
         state: stage.state, st: stage.state === 'windup' ? .1 : stage.state === 'lunge' ? .15 : 1, hop: 0, hopV: 0, hurtT: stage.state === 'hurt' ? .2 : 0, recT: 0, landT: 0, dead, dieT: dead ? stage.dieT : 0, respawn: 0, atkCd: 1, blink: 2, seed: i, dir: 1, elite: elite.has(kind), hunt: false });
     });
     return JSON.stringify(packet);
@@ -56,7 +57,8 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   await page.routeWebSocket(/\/ws$/, ws => {
     const server = ws.connectToServer();
     ws.onMessage(message => server.send(message));
-    server.onMessage(message => ws.send(typeof message === 'string' ? restage(message) : message));
+    // Snapshots are raw-deflate binary frames now (compress:true): read them as text for the fixture, send the original when nothing is staged.
+    server.onMessage(message => { if (typeof message === 'string') return ws.send(restage(message)); const text = frameText(message), out = restage(text); ws.send(out === text ? message : out); });
   });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
@@ -103,40 +105,42 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   check(z.city === 'Keelhaven' && z.camps === 3 && z.walls > 300 && z.bells === 12 && z.places === 25 && z.portals === 'maelstrom_up>7,nacre_gate>9,deep_longship>43,path_8_13>13' && z.trail === 1, `One hub, ${z.walls} coral wall pieces, twelve bells, twenty-five places, a trail and the Maelstrom up`);
   check(z.quests === 43 && z.npcs === 30 && z.chimes === 3 && z.elites === 3, 'Forty-three quests (three of them chimes), thirty people and three elites are in the data');
   // Ran's Deep art loads with the zone, so enter it before reading the sprite set.
-  await stageAt(80, 160);
+  await stageAt(97, 200);
+  await page.waitForFunction(() => !!Field.deepSprites, null, { timeout: 20000 });
   check(await page.evaluate(stub => { const m = Field.deepSprites.meta; return m.kinds.join() === 'draugr,angler,moray,siren,shellback,kraken,hvitserk,ghostmaw' && (stub || m.kinds.every(k => Field.deepSprites.img[k].naturalWidth === 768 && Field.deepSprites.img[k].naturalHeight === 480)); }, STUB), 'The eight monster atlases load with their metadata (and are 768x480 each)');
   check(await page.evaluate(() => Field._debug.zones[7].portals.some(p => p.id === 'maelstrom_down' && p.to === 8 && p.look === 'maelstrom')), 'Bifrost Reach has the Maelstrom down to Ran\'s Deep');
 
   // Keelhaven: weathered ship decks under a bell of light, with the sea beyond.
-  await stageAt(80, 160);
+  await stageAt(97, 200);
   await shot('keelhaven');
   check(await page.evaluate(() => Field.zone === 8 && Field.zoneName === "Rán's Deep" && Field.zoneTheme === 'deep'), 'The hero is in Ran\'s Deep');
-  check(await page.locator('#area-title b').textContent() === "Rán's Deep" && (await page.locator('#area-title span').textContent()).includes('Keelhaven'), 'The banner names Keelhaven as the sanctuary');
+  { const bt = await page.locator('#area-title b').textContent(), st = await page.locator('#area-title span').textContent(); check(bt === 'Keelhaven' && st.includes('Keelhaven') && st.includes('Sanctuary'), `The banner names Keelhaven as the sanctuary (the hub's own name since the city banner change: "${bt}" / "${st}")`); }
   check(await page.locator('#city-travel').isHidden(), 'The travel button is hidden inside the hub');
-  const deck = await colourAt(84, 163);
+  const deck = await colourAt(97, 198);
   check(deck.b > deck.r - 5 && deck.r + deck.g + deck.b < 520, `Keelhaven's decks are cool, dim timber (${deck.r | 0},${deck.g | 0},${deck.b | 0})`);
-  check(await page.evaluate(() => City.npcs.filter(n => n.id.startsWith('deep_') || n.id === 'travel_keelhaven').length === 8 && Quests.marker('deep_warden') === '?'), 'The people are loaded; the warden has the arrived progression quest to turn in (?)');
+  check(await page.evaluate(() => City.npcs.filter(n => (n.id.startsWith('deep_') && !/^deep_(lr|gw|dw)_/.test(n.id)) || n.id === 'travel_keelhaven').length === 8 && Quests.marker('deep_warden') === '?'), 'The people are loaded; the warden has the arrived progression quest to turn in (?)');
   // The Shallows: teal-grey sand with the underwater tint over it, and a pale trail.
-  await stageAt(34, 134);
+  await stageAt(67, 195);
   await shot('shallows');
-  const sand = await colourAt(40, 138);
+  const sand = await colourAt(67, 195);
   check(sand.b > sand.r + 10 && sand.g > sand.r && sand.r + sand.g + sand.b < 330, `The Shallows are dark teal sand (${sand.r | 0},${sand.g | 0},${sand.b | 0})`);
   check(await page.locator('#city-travel').isVisible() && (await page.locator('#city-travel').textContent()).includes('Keelhaven'), 'Outside the hub the travel button offers Keelhaven');
-  await stageAt(80, 130);
-  const trail = await colourAt(80, 128), off = await colourAt(92, 128);
+  await stageAt(96, 134);
+  const trail = await colourAt(96, 133), off = await colourAt(88, 121);
   check(trail.r > off.r + 25 && trail.r > 110, `The trail to the Net is pale shell-sand (${trail.r | 0},${trail.g | 0},${trail.b | 0}) against dark sand beside it (${off.r | 0})`);
   // The Net: pink and violet coral walls, a trail between them.
   await stageAt(96, 114);
   await shot('net-door');
-  const wall = await colourAt(100, 120, 34);
+  const wall = await colourAt(100, 126, 30);
   check(Math.max(wall.r, wall.b) > wall.g + 35, `Coral walls are rose and violet, not sea-coloured (${wall.r | 0},${wall.g | 0},${wall.b | 0})`);
   const mini = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let walls = 0, bells = 0, trail = 0; for (let i = 0; i < d.length; i += 4) { if (Math.abs(d[i] - 216) < 18 && Math.abs(d[i + 1] - 106) < 18 && Math.abs(d[i + 2] - 120) < 18 && d[i + 3] > 0) walls++; if (d[i] > 235 && Math.abs(d[i + 1] - 211) < 14 && d[i + 2] < 140 && d[i + 3] > 0) bells++; if (Math.abs(d[i] - 200) < 10 && Math.abs(d[i + 1] - 194) < 10 && Math.abs(d[i + 2] - 154) < 10 && d[i + 3] > 0) trail++; } return { walls, bells, trail }; });
   check(mini.walls > 400 && mini.trail > 40, `The minimap draws the Net's walls (${mini.walls} px) and the trail (${mini.trail} px)`);
   // Beyond the outer wall there is only black water.
-  await stageAt(14, 100);
-  const beyond = await colourAt(4, 100);
+  await stageAt(25.8, 101.5);   // the floor's west edge (the outer reef wall stands at x 20-24); the black water lies beyond it
+  const beyond = await colourAt(18, 101);
   check(beyond.r + beyond.g + beyond.b < 190 && beyond.r + beyond.g + beyond.b < sand.r + sand.g + sand.b - 60, `Past the outer wall the water is black (${beyond.r | 0},${beyond.g | 0},${beyond.b | 0})`);
   // The underwater tint: the whole frame leans blue-green.
+  await stageAt(67, 195);   // over the sand: the frame is mostly ground, not the black beyond
   const frame = await page.evaluate(() => { const cv = document.getElementById('fieldcv'), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let r = 0, g = 0, b = 0, n = 0; for (let i = 0; i < d.length; i += 40) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; } return { r: r / n, g: g / n, b: b / n }; });
   check(frame.b > frame.r + 15 && frame.g > frame.r, `The whole view leans blue-green (${frame.r | 0},${frame.g | 0},${frame.b | 0})`);
 
@@ -157,7 +161,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   await shot('bell-waiting');
   const waiting = await ringAt(bell);
   const amberOf = ring => ring.reduce((m, c) => Math.max(m, c.r - c.b), -999);
-  check(amberOf(waiting) > amberOf(idle) + 25, `Taking the chime quest turns the circle amber (best red-minus-blue ${amberOf(waiting).toFixed(0)} against ${amberOf(idle).toFixed(0)} idle)`);
+  check(amberOf(waiting) > amberOf(idle) + 12, `Taking the chime quest turns the circle amber (threshold 12 on the shaped Keelhaven shore: the old 25 was tuned to the old backdrop; the screenshot shows the ring) (best red-minus-blue ${amberOf(waiting).toFixed(0)} against ${amberOf(idle).toFixed(0)} idle)`);
   check(await page.locator('#quest-tracker').textContent().then(t => /Ring the Harbour Bells: 0\/3 ringing/.test(t)), 'The tracker shows the objective as bells ringing (0/3 ringing)');
   await stageAt(bell.x, bell.y + 2);
   await page.waitForFunction(() => Quests.chime('deep_harbour_a1').state === 'ringing', null, { timeout: 10000 });
@@ -170,7 +174,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   check(on.reduce((m, c) => Math.max(m, c.b + c.g - c.r), -999) > idle.reduce((m, c) => Math.max(m, c.b + c.g - c.r), -999) + 40, 'A ringing bell draws a bright blue-white circle with its arc');
   // The time left falls, and walking away leaves the bell ringing until it is spent.
   const t0 = ringing.left;
-  await stageAt(80, 165);
+  await stageAt(67, 195);
   await page.waitForTimeout(3200);
   const later = await page.evaluate(() => Quests.chime('deep_harbour_a1'));
   check(later.state === 'ringing' && later.left < t0 - 2.5, `The bell keeps sounding after the hero leaves, and its time falls (${later.left.toFixed(1)} s)`);
@@ -183,15 +187,15 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   check(done.r > done.b + 20 && done.g > done.b + 12, `A rung chain glows gold (${done.r | 0},${done.g | 0},${done.b | 0})`);
   check(await page.evaluate(() => ['tidebell', 'reefwall', 'kelp', 'coral', 'clam', 'shiprib', 'anchor', 'deeprock', 'vent', 'pearllamp', 'anemone', 'sunkencolumn'].every(k => City.art[k] && Field._debug.zones[8].objects.some(o => o.kind === k)) && typeof DeepArt.maelstrom === 'function'), 'Every prop of the zone has artwork registered with the city renderer');
   // The Maelstrom up, drawn as a spout with the destination's name.
-  await stageAt(80, 164);
+  await stageAt(43, 208);
   await shot('maelstrom');
   check(await page.evaluate(() => Field._debug.zones[8].portals[0].look === 'maelstrom'), 'The gate in Keelhaven is the Maelstrom');
 
   // Every kind in every clip: the canvas must change from one state to the next and nothing may throw.
-  await stageAt(80, 90);
+  await stageAt(96, 134);
   const monsterHashes = () => page.evaluate(() => {
     const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600;
-    return [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007].map(id => {
+    return [900000, 900001, 900002, 900003, 900004, 900005, 900006, 900007].map(id => {
       const s = Field.slimes.find(m => m.id === id), [sx, sy] = Field._debug.w2s(s.x, s.y);
       const x = Math.max(0, Math.round((sx - 110) * k)), y = Math.max(0, Math.round((sy - 280) * k)), d = g.getImageData(x, y, Math.round(220 * k), Math.round(300 * k)).data;
       let h = 0; for (let i = 0; i < d.length; i += 5) h = (Math.imul(h, 31) + d[i] + (d[i + 1] << 3) + (d[i + 2] << 6)) | 0;
@@ -201,20 +205,20 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const seen = [];
   for (const [state, dieT] of [['idle', 0], ['windup', 0], ['lunge', 0], ['hurt', 0], ['dead', .2], ['dead', .45], ['dead', 3]]) {
     stage = { state, dieT };
-    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 8, [state], { timeout: 10000 });
+    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 900000 && s.id < 900100 && s.state === state).length === 8, [state], { timeout: 10000 });
     await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
-    const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => Field._debug.enemyFrame(s)));
+    const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 900000 && s.id < 900100).map(s => Field._debug.enemyFrame(s)));
     const wanted = { idle: f => f[0] === 'idle', windup: f => f[0] === 'attack' && f[1] < 3, lunge: f => f[0] === 'attack' && f[1] >= 3 && f[1] <= 5, hurt: f => f[0] === 'hurt' };
     const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 2 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 4 : f => f[0] === 'die' && f[1] === 7;
     check(frames.length === 8 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
-    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => s.d.name))).join() === 'Drowned Draugr,Lantern Angler,Gnashing Moray,Siren,Shellback,The Kraken,Hvitserk the Drowned,Ghostmaw', 'The bestiary names come from the Deep table');
+    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => s.id >= 900000 && s.id < 900100).map(s => s.d.name))).join() === 'Drowned Draugr,Lantern Angler,Gnashing Moray,Siren,Shellback,The Kraken,Hvitserk the Drowned,Ghostmaw', 'The bestiary names come from the Deep table');
     seen.push(await monsterHashes());
     if (state === 'idle' || state === 'lunge') await shot('bestiary-' + state);
   }
   stage = null;
   const same = []; seen.forEach((hashes, i) => i && hashes.forEach((h, kind) => { if (h === seen[i - 1][kind]) same.push(`${kinds[kind]}@${i}`); }));
   check(STUB || same.length === 0, `All eight monsters draw something new in each state (${seen.length} states; unchanged: ${same.join(', ') || 'none'})`);
-  await page.waitForFunction(() => Field.slimes.every(s => s.id < 1000), null, { timeout: 10000 });
+  await page.waitForFunction(() => Field.slimes.every(s => s.id < 900000), null, { timeout: 10000 });
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);
   console.log(`deep-ui: ${checks} checks passed`);
 })().then(async () => { await browser?.close(); if (started) await call('stop_world').catch(() => {}); await client.close(); process.exit(0); },
