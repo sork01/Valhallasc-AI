@@ -1,10 +1,16 @@
 const {run,debug} = require('./lib/touch.cjs');
+const fs = require('node:fs');
+const path = require('node:path');
+// The Skaldholm arrival point, read from world/map.txt (zone 0 is the top-level map, zones[i] is zone i+1).
+const mapData = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'world', 'map.txt'), 'utf8'));
+const skaldholmZone = mapData.zones.findIndex(z => z.name === 'Skaldholm') + 1;
+const skaldholmSpawn = mapData.zones[skaldholmZone - 1].spawn;
 const suite = {
  name:'quest-recovery',
  async test({player,check,sleep,width,height,out}) {
   const page=await player('QuestRecovery');
-  await debug(page,{op:'teleport',zone:4,x:104.2,y:125.4});
-  await page.waitForFunction(()=>Field.zone===4 && Field.hero.quests.some(q=>q.id==='crags_onward'));
+  await debug(page,{op:'teleport',zone:skaldholmZone,x:skaldholmSpawn.x,y:skaldholmSpawn.y});
+  await page.waitForFunction(zone=>Field.zone===zone && Field.hero.quests.some(q=>q.id==='crags_onward'),skaldholmZone);
   async function journal() { await page.evaluate(()=>{City.close();Quests.close();Quests.show();}); }
   async function abandon(id) {
    await journal();

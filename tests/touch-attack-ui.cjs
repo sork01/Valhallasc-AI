@@ -1,4 +1,10 @@
 const { run, replace, debug, record, touch } = require('./lib/touch.cjs');
+const fs = require('node:fs');
+const path = require('node:path');
+// The Skaldholm arrival point, read from world/map.txt (zone 0 is the top-level map, zones[i] is zone i+1).
+const mapData = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'world', 'map.txt'), 'utf8'));
+const skaldholmZone = mapData.zones.findIndex(z => z.name === 'Skaldholm') + 1;
+const skaldholmSpawn = mapData.zones[skaldholmZone - 1].spawn;
 const suite = {
   name: 'touch-attack',
   mutate: page => replace(page, 'touch.js', 'Field.startNearestAutoattack()', "Field.action('attack')"),
@@ -50,8 +56,8 @@ const suite = {
     await page.waitForFunction(() => Field.hero.atkCd > 0);
     check(await page.locator('#touch-skills .touch-attack').isEnabled(), 'the target action is available during a basic-attack cooldown');
     tracking = false;
-    await debug(page, { op: 'teleport', zone: 4, x: 104.2, y: 125.4 });
-    await page.waitForFunction(() => Field.zone === 4 && Field.slimes.length === 0);
+    await debug(page, { op: 'teleport', zone: skaldholmZone, x: skaldholmSpawn.x, y: skaldholmSpawn.y });
+    await page.waitForFunction(zone => Field.zone === zone && Field.slimes.length === 0, skaldholmZone);
     await page.evaluate(() => { touchSent.length = 0; });
     await page.locator('#touch-skills .touch-attack').tap();
     check(await page.evaluate(() => !touchSent.some(p => ['target', 'attack', 'pvp'].includes(p.type))), 'no monsters means no target, NPC or player is attacked');
