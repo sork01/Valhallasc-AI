@@ -3,6 +3,9 @@
 // every "below x% health" mechanic is live from full health and every "above x%" one is dropped, so the second phase can be seen
 // without grinding the boss down. BOSSES=a,b limits the run, SECONDS caps the watch per boss (default 80). The server decides all
 // of it; this checks what the player is told: each cast has a name, a countdown, drawn shapes inside the screen, and no page error.
+// A swing aims at hero.target (else the pointer), so the suite targets the boss first (AIM=0 turns that off, for the mutation check).
+// A split (60%) or valves (70%, 40%) need the boss hurt that far: a starter hero takes minutes, so those bosses are entered through
+// the game master's menu op (blue gear, four hires; GEAR=0 turns that off, for the mutation check) and teleported inside that copy.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -20,7 +23,11 @@ const seconds = Number(process.env.SECONDS || 80);
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const shipped = JSON.parse(fs.readFileSync(path.join(root, 'world/boss-mechanics.txt'), 'utf8'));
 const wanted = (process.env.BOSSES || '').split(',').filter(Boolean);
-const kinds = Object.keys(shipped).filter(k => !wanted.length || wanted.includes(k));
+const aim = process.env.AIM !== '0', geared_route = process.env.GEAR !== '0';
+// The geared entry (below) leaves its blue gear and four hires on the hero, so a boss run after it would meet a far stronger hero:
+// the geared bosses run last, in table order.
+const needsDamage = def => def.mechanics.some(m => m.block === 'split' || m.block === 'valves');
+const kinds = Object.keys(shipped).filter(k => !wanted.length || wanted.includes(k)).sort((a, b) => Number(needsDamage(shipped[a])) - Number(needsDamage(shipped[b])));
 
 const env = { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0', ...(binary ? { VALHALLA_BINARY: binary } : {}) };
 if (phase === 2) {
@@ -66,13 +73,21 @@ async function call(name, args = {}) {
   const report = [];
 
   for (const kind of kinds) {
-    const zone = map.zones.findIndex(z => z.final_boss === kind || (z.raid && z.slimes.some(s => s.kind === kind))) + 1;
+    let zone = map.zones.findIndex(z => z.final_boss === kind || (z.raid && z.slimes.some(s => s.kind === kind))) + 1;
     check(zone > 0, `${kind} has a dungeon`);
     const boss = map.zones[zone - 1].slimes.find(s => s.kind === kind);
     check(boss, `${kind} is placed in zone ${zone}`);
     let placed = null;
     // Valves reach 70% and 40% only by damage: stand in melee and swing (Dagfinn has no other mechanic that asks for it).
     const melee = shipped[kind].mechanics.some(m => ['shield', 'adds', 'split', 'static', 'valves'].includes(m.block));
+    // A split (60%) or valves (70%, 40%) need the boss hurt that far. A starter hero does about 6k a second against 8.2M (solar_heart),
+    // so the threshold is minutes away and the watch never sees the cast (verified 2026-11-16: 0 screens). The menu op enters the copy
+    // at its door with blue gear and four hires (level 99); the hero then stands in that copy, and the boss reaches 60% / 70% in ~20-60 s.
+    if (needsDamage(shipped[kind]) && geared_route) {
+      await debug({ op: 'gm_dungeon_enter', zone, at: 'door', level: true, gear: 'blue', mercs: true });
+      await page.waitForTimeout(4000);
+      zone = await page.evaluate(() => Field.zone);
+    }
     for (const [dx, dy] of [...(melee ? [[-1.6, 0], [1.6, 0], [0, 1.6], [0, -1.6]] : []), [-6, 0], [6, 0], [0, 6], [0, -6], [-4, 4], [4, -4], [-9, 0], [9, 0]]) {
       await debug({ op: 'teleport', zone, x: boss.x + dx, y: boss.y + dy });
       // The teleport answers late and the server may correct the spot (nearest free ground): read the hero only once it has
@@ -86,9 +101,6 @@ async function call(name, args = {}) {
     // The arrival banner covers the top of the screen for a few seconds, and the last boss's fight clears with the zone.
     await page.waitForFunction(() => !BossMech.active, null, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(4500);
-    // Valves only trigger at 70% and 40% of health, and a level-99 hero cannot grind a warden there: a test-only debug op sets the
-    // living boss to 69% (no kill, no rewards), so the first valve casts and its stations show.
-    if (shipped[kind].mechanics.some(m => m.block === 'valves')) { await debug({ op: 'damage_enemy', kind, share: 0.69 }); await page.waitForTimeout(600); }
     const seen = new Map();
     const shieldBoss = shipped[kind].mechanics.some(m => m.block === 'shield' || m.block === 'adds' || m.block === 'split' || m.block === 'static' || m.block === 'valves');
     const started = Date.now();
@@ -97,8 +109,7 @@ async function call(name, args = {}) {
       const state = await page.evaluate(({ bx, by }) => {
         const f = BossMech.fights[0];
         if (!f) return null;
-        const hero = Field.hero, d = Math.atan2(by - hero.y, bx - hero.x);
-        Field.hero.dir = { x: Math.cos(d), y: Math.sin(d) };
+        const hero = Field.hero;
         const live = t => Math.max(0, (t.left || 0) - (performance.now() / 1000 - 0));
         return { name: f.cast?.name || f.banner || '', castLeft: f.cast?.left ?? null, castTotal: f.cast?.total ?? null, banner: f.banner || '',
           tele: (f.tele || []).filter(t => t.tele !== 'cover' && t.shapes?.length).map(t => ({ tele: t.tele, shapes: t.shapes.map(s => s.t), left: t.left, total: t.total })),
@@ -137,6 +148,8 @@ async function call(name, args = {}) {
         }
       }
       // Swing only while a break bar or a shield asks for damage, or the level-99 hero ends the fight before every cast has been seen.
+      // swing() aims at hero.target (set by targetEnemy) or the pointer; the swing only lands on the boss once it is the target.
+      if (aim) await page.evaluate(k => { const b = Field.slimes.find(s => s.kind === k && !s.dead); if (b && Field.hero.target?.id !== b.id) Field.targetEnemy(b.id); }, kind);
       if (state && (state.brk || state.shield || shieldBoss)) await page.keyboard.press('Space');
       await page.waitForTimeout(500);
     }
