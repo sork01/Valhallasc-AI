@@ -547,6 +547,45 @@ impl World {
         };
         Some((recipient, text))
     }
+    /// A rolled piece goes straight into the winner's bags, wherever they stand (no walk back to the body). False, and nothing changes,
+    /// when the winner is not an online player with room for it.
+    fn award_roll_item(&mut self, recipient: &str, item_id: &str, gear: Option<GearInstance>) -> bool {
+        let Some(p) = self
+            .players
+            .values_mut()
+            .find(|p| p.character.id == recipient && p.merc.is_none() && p.ambient.is_none())
+        else {
+            return false;
+        };
+        if !p.character.can_collect(item_id) {
+            return false;
+        }
+        // Materialize old copies before adding this one, so the new copy cannot be mistaken for a missing legacy record.
+        if gear.is_some() {
+            p.character.materialize_gear_instances();
+        }
+        if item(item_id).is_some_and(|i| i.kind == "bag") {
+            if p.character.fit_bag(item_id).is_err() {
+                return false;
+            }
+        } else {
+            p.character.add_item(item_id, 1);
+        }
+        let rarity = gear.as_ref().map(|g| g.rarity.clone()).or_else(|| item(item_id).map(|i| i.rarity.clone()));
+        if let Some(mut copy) = gear {
+            copy.id = p.character.next_gear_id;
+            p.character.next_gear_id += 1;
+            p.character.gear_instances.push(copy);
+        }
+        let (id, at, zone) = (p.character.id.clone(), p.character.point(), p.character.zone);
+        self.emit_zone(
+            zone,
+            json!({"type":"event","kind":"itemPickup","actor":id,"x":at.x,"y":at.y,
+            "item":item_id,"quantity":1,"name":item(item_id).map(|i| &i.name),"by":Value::Null,"rarity":rarity}),
+        );
+        self.save();
+        true
+    }
     fn finish_roll(&mut self, mut roll: Roll) {
         let Some((recipient, text)) = roll.result.clone().or_else(|| self.choose_roll(&roll))
         else {
@@ -608,7 +647,8 @@ impl World {
                 if let Some(p) = player {
                     let _ = p.peer.try_send(json!({"type":"system","text":format!("Your bags are full. {item_name} was sent to your mailbox.")}));
                 }
-            } else {
+            } else if !self.award_roll_item(&recipient, &roll.item, gear.clone()) {
+                // No room in the winner's bags (or they are gone): the piece lies on the ground for them, as before.
                 self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
                 if let Some(copy) = &gear {
                     self.drops.last_mut().unwrap().col = rarity_color(&copy.rarity);
@@ -1144,12 +1184,11 @@ mod tests {
         vote(&mut w, &who[1], id, RollChoice::Need);
         w.update_rolls();
         assert!(w.rolls.is_empty());
-        assert_eq!(owned_by(&w, &who[1].1).len(), 1);
-        assert_eq!(
-            owned_by(&w, &who[1].1)[0].item.as_deref(),
-            Some(piece.id.as_str())
-        );
-        assert!(owned_by(&w, &who[0].1).is_empty() && owned_by(&w, &who[2].1).is_empty());
+        // The winner's piece goes straight into their bags: nothing lies on the ground to walk back to.
+        assert!(w.drops.is_empty());
+        assert_eq!(w.players[&2].character.quantity(&piece.id), 1);
+        assert_eq!(w.players[&1].character.quantity(&piece.id), 0);
+        assert_eq!(w.players[&3].character.quantity(&piece.id), 0);
         let text = heard(&mut who[2].2)
             .into_iter()
             .find(|v| v["type"] == "system")
@@ -1164,6 +1203,44 @@ mod tests {
         // Voting again is refused: the roll is over.
         vote(&mut w, &who[2], id, RollChoice::Greed);
         assert!(heard(&mut who[2].2).iter().any(|v| v["type"] == "error"));
+    }
+
+    #[test]
+    fn a_roll_winner_gets_the_piece_in_the_bags_even_from_far_away_and_with_a_full_bag_it_lies_on_the_ground() {
+        let mut w = world();
+        let mut who = party(&mut w, &["Ann", "Bob", "Cat"]);
+        let at = spot(&w);
+        let piece = green_for(Class::Mage);
+        w.loot_drop(&who[0].1, 0, at, &piece.id);
+        let id = roll_id(&heard(&mut who[0].2));
+        vote(&mut w, &who[1], id, RollChoice::Need);
+        vote(&mut w, &who[0], id, RollChoice::Pass);
+        vote(&mut w, &who[2], id, RollChoice::Pass);
+        // The winner has wandered far from the body before the dice are read.
+        w.players.get_mut(&2).unwrap().character.x += 150.;
+        w.update_rolls();
+        assert!(w.drops.is_empty(), "nothing to walk back for");
+        assert_eq!(w.players[&2].character.quantity(&piece.id), 1);
+        // A winner with no room still gets the old ground drop, owned by them.
+        let mut w = world();
+        let mut who = party(&mut w, &["Ann", "Bob", "Cat"]);
+        let at = spot(&w);
+        let c = &mut w.players.get_mut(&2).unwrap().character;
+        for i in ITEMS.iter().filter(|i| i.kind != "bag") {
+            if c.bag_used() >= c.bag_capacity() {
+                break;
+            }
+            c.add_item(&i.id, 1);
+        }
+        assert!(!c.can_collect(&piece.id), "the fixture bag is full");
+        w.loot_drop(&who[0].1, 0, at, &piece.id);
+        let id = roll_id(&heard(&mut who[0].2));
+        vote(&mut w, &who[1], id, RollChoice::Need);
+        vote(&mut w, &who[0], id, RollChoice::Pass);
+        vote(&mut w, &who[2], id, RollChoice::Pass);
+        w.update_rolls();
+        assert_eq!(owned_by(&w, &who[1].1).len(), 1, "a full bag leaves the piece on the ground for the winner");
+        assert_eq!(w.players[&2].character.quantity(&piece.id), 0);
     }
 
     #[test]
@@ -1190,8 +1267,7 @@ mod tests {
                 .any(|t| t.contains("can be handed to the other players of this roll")),
             "{said:?}"
         );
-        assert_eq!(w.drops[0].gear.as_ref().unwrap().trade_with.len(), 2);
-        collect_all(&mut w);
+        assert!(w.drops.is_empty(), "the piece went straight to the winner");
         let bob = &w.players[&2].character;
         let copy = bob
             .gear_instances
@@ -1258,11 +1334,7 @@ mod tests {
         vote(&mut w, &who[0], id, RollChoice::Pass);
         vote(&mut w, &who[1], id, RollChoice::Need);
         w.update_rolls();
-        assert_eq!(
-            w.drops[0].gear.as_ref().unwrap().bonus_stats,
-            sampled.bonus_stats
-        );
-        collect_all(&mut w);
+        assert!(w.drops.is_empty(), "the piece went straight to the winner");
         let c = &mut w.players.get_mut(&2).unwrap().character;
         let copy = c
             .gear_instances
@@ -1303,7 +1375,7 @@ mod tests {
         w.time += 2.;
         w.update_rolls();
         assert!(w.rolls.is_empty());
-        assert_eq!(owned_by(&w, &who[1].1).len(), 1);
+        assert_eq!(w.players[&2].character.quantity(&piece.id), 1);
         assert!(
             heard(&mut who[2].2)
                 .iter()
@@ -1317,7 +1389,7 @@ mod tests {
         vote(&mut w, &who[2], id, RollChoice::Greed);
         w.time += ROLL_SECONDS + 1.;
         w.update_rolls();
-        assert_eq!(owned_by(&w, &who[2].1).len(), 1);
+        assert_eq!(w.players[&3].character.quantity(&piece.id), 1);
     }
 
     #[test]
@@ -1423,7 +1495,7 @@ mod tests {
         vote(&mut w, &who[1], id, RollChoice::Pass);
         w.update_rolls();
         assert!(w.rolls.is_empty());
-        assert_eq!(owned_by(&w, &who[0].1).len(), 1, "Ann wins what Bob passes");
+        assert_eq!(w.players[&1].character.quantity(&piece.id), 1, "Ann wins what Bob passes");
     }
 
     #[test]
@@ -1555,12 +1627,18 @@ mod tests {
         let (mut human, mut merc) = (0, 0);
         for _ in 0..40 {
             w.drops.clear();
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            let have = c.quantity(&piece.id);
+            if have > 0 {
+                c.consume_item(&piece.id, have);
+            }
             w.loot_drop(&who[0].1, 0, at, &piece.id);
             let id = w.rolls[0].id;
             vote(&mut w, &who[0], id, RollChoice::Greed);
             vote(&mut w, &who[1], id, RollChoice::Pass);
             w.update_rolls();
-            if w.drops.is_empty() {
+            // The human's win goes straight into their bags; the mercenary keeps the piece and leaves nothing.
+            if w.drops.is_empty() && w.players[&1].character.quantity(&piece.id) == 0 {
                 merc += 1
             } else {
                 human += 1

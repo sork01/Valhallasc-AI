@@ -861,7 +861,8 @@ fn every_boss_drops_shared_random_gear_and_every_nearby_party_member_rolls_once_
             }
         }
         w.update_rolls();
-        let drops: Vec<_> = w
+        // The winner's pieces go straight into their bags (the roll no longer leaves them on the ground to walk back to).
+        let on_ground = w
             .drops
             .iter()
             .filter(|d| {
@@ -870,17 +871,16 @@ fn every_boss_drops_shared_random_gear_and_every_nearby_party_member_rolls_once_
                     .and_then(item)
                     .is_some_and(|i| i.source.as_deref() == Some("undervault"))
             })
-            .collect();
-        assert_eq!(
-            drops.len(),
-            pieces,
-            "one award per piece, no personal copies"
-        );
-        assert!(
-            drops
-                .iter()
-                .all(|d| d.owner == w.players[&3].character.id && d.quantity == 1)
-        );
+            .count();
+        assert_eq!(on_ground, 0, "nothing lies on the ground: the awards went into the winner's bags");
+        let held: u32 = w.players[&3]
+            .character
+            .inventory
+            .iter()
+            .filter(|s| item(&s.item).is_some_and(|i| i.source.as_deref() == Some("undervault")))
+            .map(|s| s.quantity)
+            .sum();
+        assert_eq!(held as usize, pieces, "one award per piece, no personal copies");
         let boss = &w.slimes[first(&w, VAULT, kind)];
         assert_eq!(boss.xp, enemy_xp(boss.level) * 12);
     }
