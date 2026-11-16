@@ -230,7 +230,8 @@
   }
   function render() {
     const active = definitions.filter(q => ['ready', 'active'].includes(status(q)));
-    active.sort((a, b) => Number(status(a) === 'ready') - Number(status(b) === 'ready') || Number(b.id === tracked) - Number(a.id === tracked));
+    // The tracker lists quests by level (lowest first); equal levels keep the catalogue order. Each title shows its level like the journal does.
+    active.sort((a, b) => (a.level || 0) - (b.level || 0) || definitions.indexOf(a) - definitions.indexOf(b));
     const tracker = $('quest-tracker');
     const header = element('div', '', 'tracker-heading');
     const journal = button(`Quests (${active.length}) · ${window.Keys ? Keys.label('quests', false) : 'Q'}`, show); journal.className = 'tracker-journal';
@@ -244,7 +245,7 @@
       row.dataset.tracked = String(tracked === quest.id); row.setAttribute('role', 'group'); row.setAttribute('aria-label', quest.title);
       if (isMainQuest(quest)) row.append(element('small', 'Main Questline', 'tracker-main'));
       const heading = element('div', '', 'tracker-quest-heading');
-      const title = button(quest.title, () => { track(quest.id); show(); }); title.className = 'tracker-title';
+      const title = button(`[${quest.level}] ${quest.title}`, () => { track(quest.id); show(); }); title.className = 'tracker-title';
       const tracking = button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
         track(tracked === quest.id ? null : quest.id);
         $('quest-tracker').querySelector(`[data-quest="${quest.id}"] .tracker-track`)?.focus({ preventScroll: true });
