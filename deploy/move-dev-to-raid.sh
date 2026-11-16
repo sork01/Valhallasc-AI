@@ -9,7 +9,7 @@
 # Rollback (before you delete the old folder): see the last lines this script prints.
 set -euo pipefail
 OLD=/home/serveperry/webserver/www/Valhallasc
-NEW=${NEW:-/media/raid/valhalla-dev}
+NEW=${NEW:-/media/raid/valhallasc-data/valhalla-dev}      # /media/raid itself is root-owned; valhallasc-data is ours
 WWW=/home/serveperry/webserver/www
 DATA=$WWW/Valhalla/data
 UNIT=$HOME/.config/systemd/user/valhalla.service
@@ -35,16 +35,34 @@ say "worktrees to repair afterwards: $(git -C "$OLD" worktree list | wc -l)"
 say "tracked files with the old path inside: $(git -C "$OLD" grep -l 'webserver/www/Valhallasc' | wc -l)"
 cat <<EOF
 == plan
- 1. stop valhalla.service, back up the database (online + stopped copies) to $OLD/deploy/backups
- 2. move the database to $DATA (the game reads and vronline inspects it there)
- 3. copy $OLD -> $NEW (cp -a, then diff -rq without target and .git; git status must be clean in the copy)
- 4. in the copy: replace the old path in tracked files, git worktree repair for every worktree, commit
+ 0. copy $OLD -> $NEW while the game runs (cp -a, then diff -rq without target and .git; git status must be clean in the copy)
+ 4. (still running) in the copy: replace the old path in tracked files, git worktree repair for every worktree, commit
+ 1. stop valhalla.service, back up the database (online + stopped copies), copy it to $DATA
  5. valhalla.service: WorkingDirectory, ExecStart and VALHALLA_DB follow the move; RequiresMountsFor=/media/raid
  6. vronline/inspect.php reads $DATA
  7. start the game, verify (health, binary path, database, client, public URLs)
  8. copy the Claude project memory to $MEM_NEW; rename $OLD to $OLD.moved-$STAMP (nothing is deleted)
 EOF
 [ "$CHECK" = 1 ] && { say "check only: nothing was changed"; exit 0; }
+
+# ---- 0. copy the repo while the game still runs (it takes minutes; the database is copied again after the stop) ------
+say "copying the repo to $NEW (a few minutes)"
+cp -a "$OLD" "$NEW"
+OLDHEAD=$(git -C "$OLD" rev-parse HEAD)
+diff -rq --exclude=target --exclude=.git --exclude=data "$OLD" "$NEW" && say "copy verified (everything except target, .git and data)"
+[ "$OLDHEAD" = "$(git -C "$NEW" rev-parse HEAD)" ] || fail "HEAD differs in the copy"
+[ -z "$(git -C "$NEW" status --porcelain --untracked-files=no)" ] || fail "the copy is not clean"
+
+# ---- 4. fix the copy -----------------------------------------------------------------------------------------------
+say "replacing the old path in tracked files"
+git -C "$NEW" grep -l 'webserver/www/Valhallasc' | grep -v '^deploy/apache.conf$' | while read -r f; do sed -i "s#/home/serveperry/webserver/www/Valhallasc#$NEW#g" "$NEW/$f"; done
+git -C "$NEW" commit -qam "The dev repo lives on the RAID ($NEW): paths follow the move
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>" || true
+say "repairing the worktrees"
+wts=$(git -C "$NEW" worktree list --porcelain | awk '/^worktree /{print $2}' | grep -v "^$OLD\$" | grep -v "^$NEW\$" || true)
+[ -z "$wts" ] || git -C "$NEW" worktree repair $wts
+git -C "$NEW" worktree prune
 
 # ---- 1. stop and back up -------------------------------------------------------------------------------------------
 B=$OLD/deploy/backups/move-to-raid-$STAMP; mkdir -p "$B/stopped"
@@ -59,29 +77,12 @@ sleep 2
 cp -a "$OLD"/data/valhalla.sqlite* "$B/stopped/"
 mkdir -p "$DATA"
 cp -a "$OLD"/data/. "$DATA"/
+[ "$(git -C "$OLD" rev-parse HEAD)" = "$OLDHEAD" ] || fail "HEAD moved while copying"
 python3 - <<PY
 import sqlite3,sys
 c=sqlite3.connect('$DATA/valhalla.sqlite'); r=c.execute('pragma quick_check').fetchone(); n=c.execute('select count(*) from characters').fetchone()
 print('database in the new place', r, 'characters', n); sys.exit(0 if r==('ok',) else 1)
 PY
-
-# ---- 3. copy the repo ----------------------------------------------------------------------------------------------
-say "copying the repo to $NEW (a few minutes)"
-cp -a "$OLD" "$NEW"
-diff -rq --exclude=target --exclude=.git --exclude=data "$OLD" "$NEW" && say "copy verified (everything except target, .git and data)"
-[ "$(git -C "$OLD" rev-parse HEAD)" = "$(git -C "$NEW" rev-parse HEAD)" ] || fail "HEAD differs in the copy"
-[ -z "$(git -C "$NEW" status --porcelain --untracked-files=no)" ] || fail "the copy is not clean"
-
-# ---- 4. fix the copy -----------------------------------------------------------------------------------------------
-say "replacing the old path in tracked files"
-git -C "$NEW" grep -l 'webserver/www/Valhallasc' | grep -v '^deploy/apache.conf$' | while read -r f; do sed -i "s#/home/serveperry/webserver/www/Valhallasc#$NEW#g" "$NEW/$f"; done
-git -C "$NEW" commit -qam "The dev repo lives on the RAID ($NEW): paths follow the move
-
-Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>" || true
-say "repairing the worktrees"
-wts=$(git -C "$NEW" worktree list --porcelain | awk '/^worktree /{print $2}' | grep -v "^$OLD\$" | grep -v "^$NEW\$" || true)
-[ -z "$wts" ] || git -C "$NEW" worktree repair $wts
-git -C "$NEW" worktree prune
 
 # ---- 5. unit -------------------------------------------------------------------------------------------------------
 say "updating valhalla.service"
@@ -116,6 +117,7 @@ cat <<EOF
 Rollback (only while the old folder exists):
   systemctl --user stop valhalla.service
   mv $OLD.moved-$STAMP $OLD
+  git -C $OLD worktree repair \$(git -C $OLD worktree list --porcelain | awk '/^worktree /{print \$2}' | grep -v "^$OLD\$")
   cp $B/valhalla.service.before $UNIT && systemctl --user daemon-reload
   cp $B/inspect.php.before $WWW/vronline/inspect.php
   systemctl --user start valhalla.service
