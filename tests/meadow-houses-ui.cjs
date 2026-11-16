@@ -26,7 +26,7 @@ const KINDS = ['meadow_cottage', 'meadow_mill', 'chapel_ruin'];
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   if (process.env.MUTATE) await page.route('**/meadowart.js', route => route.fulfill({ contentType: 'text/javascript',
     body: fs.readFileSync(path.join(root, 'client/meadowart.js'), 'utf8') + "\nCity.art.meadow_cottage.draw = (g, o) => City.art.vale_cottage.draw(g, o); City.art.meadow_mill.draw = (g, o) => City.art.watermill.draw(g, o);\n" }));
-  const version = fs.readFileSync(path.join(root, 'client/index.html'), 'utf8').match(/Beta [0-9.]+/)[0];
+  const version = fs.readFileSync(path.join(root, 'client/index.html'), 'utf8').match(/<p class="version">([^<]+)<\/p>/)[1];
   await page.addInitScript(v => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', v); }, version);
   await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.evaluate(k => { window.__drawn = new Set(); for (const kind of k) { const def = City.art[kind], draw = def.draw; def.draw = (g, o, kit) => { window.__drawn.add(`${o.kind}|${o.style || ''}|${o.v}`); return draw(g, o, kit); }; } }, KINDS);

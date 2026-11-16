@@ -19,7 +19,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[19];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['millbridge', 126, 201, 'Millbridge'], ['honeywood', 92, 72, 'Honeywood Steading'], ['wickerfield', 236, 94, 'Wickerfield Post'], ['elderroot', 176, 66, 'Elderroot Camp']];
 const ELITES = [['honeyjaw', 62, 50, 'Old Honeyjaw'], ['wickerwarden', 290, 78, 'The Wicker Warden'], ['harrowox', 208, 282, 'Harrow Ox']];
 // regions whose ground classes are compared: the golden leas against the dark oakwood floor

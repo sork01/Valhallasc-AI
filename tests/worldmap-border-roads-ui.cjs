@@ -97,8 +97,9 @@ async function openHero(context, world, { lang = 'en', name = 'RoadCheck' } = {}
     }));
     // The label moves with every release: accept any Beta 1.x.y at or after the release that removed the roads (1.51.2).
     const [, vMinor, vPatch] = /^Beta 1\.(\d+)\.(\d+)$/.exec(desk.version || '') || [];
-    const sinceRemoval = vMinor !== undefined && (Number(vMinor) > 51 || (Number(vMinor) === 51 && Number(vPatch) >= 2));
-    check(sinceRemoval, `Version label is Beta 1.51.2 or later (${desk.version})`);
+    // 1.0.0 (2026-11-16) dropped the Beta prefix: a label without it is a release after the Beta line, so it counts as later.
+    const sinceRemoval = /^\d+\.\d+\.\d+$/.test(desk.version || '') || (vMinor !== undefined && (Number(vMinor) > 51 || (Number(vMinor) === 51 && Number(vPatch) >= 2)));
+    check(sinceRemoval, `Version label is Beta 1.51.2 or later, or a 1.x release (${desk.version})`);
     check(desk.roads === 0 && desk.connPaths === 0 && desk.roadStrokes === 0 && desk.routeRoads === 0,
       `No inter-zone border road SVG elements render (roads=${desk.roads}, paths=${desk.connPaths}, strokes=${desk.roadStrokes}, route=${desk.routeRoads})`);
     check(desk.tiles >= 20, `World tiles intact (${desk.tiles})`);

@@ -18,7 +18,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[24];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['wells', 60, 190, 'Azure Wells'], ['astro', 130, 78, 'Astrolabe Rest'], ['wallwatch', 95, 70, 'Wallwatch Post'], ['saltpan', 150, 205, 'Saltpan Post'], ['eastwell', 186, 172, 'Eastwell Post']];
 const ELITES = [['dunecolossus', 58, 96], ['mirageroc', 203, 130], ['cobaltbasilisk', 246, 226]];
 // regions whose ground classes are compared: pale blue-white salt crust against dark red crag rock (the old client painted everything the same ochre)

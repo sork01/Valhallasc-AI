@@ -19,7 +19,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[22];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['rootfoot', 210, 241, 'Rootfoot'], ['lookout', 252, 146, 'Sunleaf Lookout'], ['gladewatch', 100, 192, 'Gladewatch Post'], ['rootstair', 206, 98, 'Rootstair Post'], ['eastbark', 296, 198, 'Eastbark Post']];
 const ELITES = [['lanternqueen', 132, 104, 'Lantern Queen'], ['barkcolossus', 312, 118, 'Heartbark Colossus'], ['ambergolem', 262, 266, 'Amber Sap Golem']];
 // regions whose ground classes are compared: the pale pollen glade against the deep fern shade (the old client painted the whole zone one green)

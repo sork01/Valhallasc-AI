@@ -16,7 +16,7 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'heartwood-'));
 let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[23];
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const onFloor = (x, y) => (Z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
 const SPOTS = [['library', 140, 52], ['forge', 128, 168], ['loom', 146, 152], ['chapel', 80, 44], ['vault', 104, 28], ['arch', 104, 180], ['market', 170, 104], ['pith', 104, 112], ['homes', 60, 150], ['homes-north', 70, 28], ['inn', 152, 94], ['rim', 160, 150]];
 (async () => {

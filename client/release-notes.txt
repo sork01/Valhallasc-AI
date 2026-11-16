@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.0.0",
+    "date": "2026-11-16",
+    "new": [
+      "Valhalla Rumble is out of Beta: this is the first full release, version 1.0.0.",
+      "The game has a new address: gunning.se/Valhalla. The old address, gunning.se/Valhallasc, sends you here, and your characters, settings and window layout carry over."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.55.13",
     "date": "2026-11-15",
     "new": [],

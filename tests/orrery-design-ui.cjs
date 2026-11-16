@@ -20,7 +20,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[14];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['stillpoint', 79, 301, 'The Stillpoint'], ['bellcourt', 84, 124, 'Bellcourt'], ['crownwatch', 190, 82, 'Crownwatch'], ['shardwatch', 254, 128, 'Shardwatch']];
 // the Epoch Engine stands 21+ tiles from every seam now (orrery_content.py ELITES moved it from (192, 34), 10 tiles off the Astralhollow seam)
 const ELITES = [['pendulummatron', 118, 100], ['epochengine', 202, 45.5], ['mainspringwyrm', 262, 218]];

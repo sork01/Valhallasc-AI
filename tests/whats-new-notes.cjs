@@ -12,7 +12,7 @@ assert.equal(new Set(notes.map(entry => entry.version)).size, notes.length, 'Dup
 const code = /\b(?:undefined|null|const|function|localStorage|server|client|protocol|binary|packet|fixture|database|commit|MCP|Rust|JavaScript)\b|\.\w+\.(?:js|rs)|=>|\bx\d+(?:\.\d+)?\b|\d+[.,]\d+\s*%/i;
 let lines = 0;
 for (const entry of notes) {
-  assert.match(entry.version, /^(Beta|Multiplayer alpha) \d+\.\d+\.\d+$/);
+  assert.match(entry.version, /^((Beta|Multiplayer alpha) )?\d+\.\d+\.\d+$/);      // 1.0.0 (2026-11-16) dropped the Beta prefix
   assert.match(entry.date, /^\d{4}-\d{2}-\d{2}$/);
   let count = 0;
   for (const field of ['new', 'changed', 'removed']) {

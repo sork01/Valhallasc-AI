@@ -19,7 +19,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[25];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['station', 124, 268, 'Frostwake Station'], ['bellward', 168, 186, 'Bellward Post'], ['aurora', 226, 62, 'Aurora Post'], ['ribwatch', 168, 40, 'Ribwatch Camp']];
 const ELITES = [['bellmammoth', 112, 206, 'The Bell Mammoth'], ['auroramanta', 252, 108, 'The Aurora Manta'], ['crevasseleviathan', 240, 20, 'The Crevasse Leviathan']];
 // regions whose ground classes are compared: the deep blue ice of the fissures against the white powder of the Sunward Drift (the old client painted the whole zone one white)

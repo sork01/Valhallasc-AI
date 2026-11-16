@@ -22,7 +22,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[44];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['chainrest', 228, 84, 'Chainrest'], ['door', 316, 90, 'Nine-Chain Hold'], ['craterwatch', 100, 128, 'Craterwatch'], ['cinderquay', 186, 312, 'Cinderquay'], ['glasshold', 292, 226, 'Glasshold']];
 const ELITES = [['ew_chainmaw', 136, 206], ['ew_bellows', 163, 111], ['ew_crown', 253, 277]];
 // regions whose ground classes are compared: pale ash against black sand (the old client painted both the same dark ash)

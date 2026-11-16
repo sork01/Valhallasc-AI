@@ -36,7 +36,7 @@ async function sailRed(page, box) {
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' })).newPage();
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   if (process.env.MUTATE) await page.route('**/meadowdock.js', route => route.fulfill({ contentType: 'text/javascript', body: 'window.MeadowDock = { draw() {} };' }));
-  const version = fs.readFileSync(path.join(root, 'client/index.html'), 'utf8').match(/Beta [0-9.]+/)[0];
+  const version = fs.readFileSync(path.join(root, 'client/index.html'), 'utf8').match(/<p class="version">([^<]+)<\/p>/)[1];
   await page.addInitScript(v => { localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: v.lang, sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })); localStorage.setItem('valhallasc.whats-new.v1', v.version); }, { version, lang: process.env.SWEDISH ? 'sv' : 'en' });
   await page.goto(`http://127.0.0.1:${port}/`); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#name').fill('Sailor'); await page.locator('#go').click({ timeout: 60000 });

@@ -20,7 +20,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[20];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['jubilee', 195, 190, 'Jubilee Crossroads'], ['pavilion', 293, 192, 'Pavilion Steps'], ['bunting', 196, 82, 'Bunting Post'], ['tassel', 120, 214, 'Tassel Post'], ['garland', 305, 290, 'Garland Rest']];
 const ELITES = [['paradegryphon', 165, 88], ['maskcolossus', 300, 232], ['whorlshell', 70, 198]];
 // regions whose ground classes are compared: pale ash against black sand (the old client painted both the same dark ash)

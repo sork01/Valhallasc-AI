@@ -15,7 +15,7 @@ const port = 19600 + (process.pid % 400);
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'astral-'));
 let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const OUTPOSTS = [['court', 172, 296, 'Astralhollow'], ['choirrest', 120, 194, 'Choir Rest'], ['cometwatch', 222, 178, 'Cometwatch'], ['fallstone', 172, 50, 'Fallstone Hold']];
 const ELITES = [['cometmaw', 246, 142], ['eclipsequeen', 112, 76], ['orbitwarden', 178, 150]];
 // regions that paint their own ground class, and what the pixel beside the hero must be: [region name, darker than, lighter than] as luminance

@@ -19,7 +19,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[26];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['boulderwatch', 156, 170, 'Boulderwatch'], ['singing', 96, 92, 'Singing Cairn Post'], ['whitebark', 140, 112, 'Whitebark Post'], ['stormgate', 176, 58, 'Stormgate Camp']];
 const ELITES = [['cairnbehemoth', 160, 244, 'The Cairn Behemoth'], ['whitebarktitan', 130, 48, 'The Whitebark Titan'], ['stormcondor', 212, 30, 'The Storm Condor'], ['avalanchebear', 62, 52, 'Avalanche Bear']];
 // regions whose ground classes are compared: the white snow of the Frostwake rim against the dark shale of the toe (the old client painted the whole zone one blue-grey)

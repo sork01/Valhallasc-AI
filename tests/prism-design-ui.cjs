@@ -20,7 +20,7 @@ let server, browser, checks = 0;
 const check = (v, l) => { assert.ok(v, l); checks++; console.log('ok', l); };
 const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')), Z = W.zones[13];
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
-const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
+const VERSION = /<p class="version">([^<]+)<\/p>/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[1];
 const HUBS = [['last-shade', 86, 172, 'The Last Shade'], ['mirrorfall', 106, 98, 'Mirrorfall'], ['whitesun', 150, 70, 'Whitesun Post'], ['cairnfoot', 198, 162, 'Cairnfoot']];
 const ELITES = [['mirrorqueen', 50, 84], ['sunshard', 92, 46], ['shatterhorn', 238, 212]];
 // regions that paint their own ground class: [region name, darker than, lighter than] as luminance
