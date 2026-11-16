@@ -308,6 +308,11 @@ pub struct Corpse {
     pub zone: usize,
     pub x: f64,
     pub y: f64,
+    /// The way the body faced when it fell: it lies still like that while its ghost walks (0, 0 in an old save: the ghost's own facing).
+    #[serde(default)]
+    pub fx: f64,
+    #[serde(default)]
+    pub fy: f64,
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]

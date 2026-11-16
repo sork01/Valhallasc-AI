@@ -577,6 +577,8 @@ impl Player {
                 zone: self.character.zone,
                 x: at.x,
                 y: at.y,
+                fx: self.face.x,
+                fy: self.face.y,
             });
             self.character.ghost = false;
         }
@@ -2561,8 +2563,9 @@ impl World {
                     "zone": cor.zone,
                     "x": r2(cor.x),
                     "y": r2(cor.y),
-                    "fx": r2(p.face.x),
-                    "fy": r2(p.face.y),
+                    // The way it fell; an old save without one takes the ghost's own facing.
+                    "fx": r2(if cor.fx == 0. && cor.fy == 0. { p.face.x } else { cor.fx }),
+                    "fy": r2(if cor.fx == 0. && cor.fy == 0. { p.face.y } else { cor.fy }),
                 }))
             })
             .collect()
@@ -2785,6 +2788,8 @@ impl World {
                 zone: c.zone,
                 x: c.x,
                 y: c.y,
+                fx: 0.,
+                fy: 0.,
             });
         }
         if self.maps[c.zone].players > 0 {
@@ -4224,6 +4229,8 @@ impl World {
                             zone,
                             x: death_point.x,
                             y: death_point.y,
+                            fx: p.face.x,
+                            fy: p.face.y,
                         });
                     }
                     let pack_death = p.pack_death;
@@ -16299,6 +16306,7 @@ mod tests {
             p.character.zone = 0;
             p.character.x = death_at.x;
             p.character.y = death_at.y;
+            p.face = Point { x: 1., y: 0. };
         }
         w.hurt_player_by(1, 1e9, death_at, "slime", 1);
         assert_eq!(w.players[&1].character.hp, 0.);
@@ -16329,6 +16337,14 @@ mod tests {
             snap["corpses"].as_array().map(|a| a.len()),
             Some(1),
             "corpses list includes the ghost's own body"
+        );
+        // The body lies as it fell (facing east) while the ghost turns and walks about.
+        w.players.get_mut(&1).unwrap().face = Point { x: -1., y: 0. };
+        let turned = w.snapshot_for(0);
+        assert_eq!(
+            (turned["corpses"][0]["fx"].as_f64(), turned["corpses"][0]["fy"].as_f64()),
+            (Some(1.), Some(0.)),
+            "the corpse keeps the facing it died with"
         );
 
         // Ghost is peaceful: hostile enemies ignore it and attacks/mounts are ignored.
@@ -16469,6 +16485,8 @@ mod tests {
                 zone: 0,
                 x: 20.,
                 y: 20.,
+                fx: 0.,
+                fy: 0.,
             });
             p.character.x = guide.x;
             p.character.y = guide.y;
@@ -16528,6 +16546,8 @@ mod tests {
                 zone: 9999,
                 x: 25.,
                 y: 25.,
+                fx: 0.,
+                fy: 0.,
             });
             p.character.zone = 0;
         }
