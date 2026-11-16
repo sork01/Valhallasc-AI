@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/moonspore-slime-original-20261104')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/moonspore-slime'
 KINDS = ['glowcapgrazer', 'silkwing', 'rootlurker', 'lanternwraith', 'mireheart', 'silverwidow', 'nightbloom']
 NAMES = dict(glowcapgrazer='Glowcap Grazer', silkwing='Silkwing', rootlurker='Rootlurker', lanternwraith='Lantern Wraith', mireheart='The Mireheart', silverwidow='The Silver Widow', nightbloom='The Nightbloom')

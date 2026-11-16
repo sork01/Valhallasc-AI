@@ -85,7 +85,7 @@ seven previous PNGs and `wyrd.txt`, with all eight SHA256 hashes and previous
 PixelFlow IDs in `manifest.txt`. It is outside live and candidate trees.
 
 ```sh
-python3 /media/raid/valhallasc-data/wyrd-slime-work/scripts/rollback_wyrd_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 /media/raid/valhallasc-data/wyrd-slime-work/scripts/rollback_wyrd_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run without `--apply`. The command preflights the exact file set, all source
@@ -111,7 +111,7 @@ build refusal and unchanged live art. Python/JavaScript syntax, Swedish check,
 release-note guard and diff checks pass. No full suites run.
 
 ```sh
-PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/wyrd-slime-art.cjs
+PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/wyrd-slime-art.cjs
 python3 scripts/wyrd_slime_review.py review
 python3 scripts/wyrd_slime_review.py verify
 python3 scripts/wyrd_slime_review.py upload

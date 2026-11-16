@@ -37,7 +37,7 @@ Models: `solstice_slime_models.py`; source registry: `solstice_slime_sources.txt
 Seven original files, old PixelFlow IDs, byte counts, dimensions, SHA-256 hashes and 129 unrelated atlas hashes are saved at `/media/raid/valhallasc-data/solstice-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_solstice_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_solstice_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run by default. Disposable-copy verification: dry run writes nothing; application restores all seven originals exactly; corrupt backups and unrelated Cathedral manifest changes are refused before writes. Receipt: `test-results/solstice-slime/rollback-proof.json`. Both old and new PixelFlow sources remain saved.

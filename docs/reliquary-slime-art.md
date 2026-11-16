@@ -32,18 +32,18 @@ Registry `scripts/reliquary_slime_sources.txt`, raw arrays `scripts/reliquary_sl
 
 `/media/raid/valhallasc-data/reliquary-slime-original-20261104` holds the six pre-change PNGs, `manifest.txt` (SHA256 hashes, old PixelFlow IDs, old `tops`, `oldFrames: {}`) and a full reference copy of `cathedral.txt`.
 ```sh
-python3 scripts/rollback_reliquary_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_reliquary_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 Dry run without `--apply`; preflights every backup file hash before writing and uses `kindframe.restore_kind_entries` so only the six Coral Reliquary entries in `cathedral.txt` are restored (preserving Flooded Cloister and all other kinds).
 
 ## Verification
 
-* `python3 scripts/reliquary_slime_review.py review|verify|upload`: builds the 28 FileDrop comparison sheets, per-kind 34-frame sheets and original-rate GIFs, verifies all 204 saved editor frames match the exported atlases, tests the rollback script (including preserving an unrelated manifest edit and rejecting a corrupt backup), confirms live `/home/serveperry/webserver/www/Valhallasc` files are untouched, and uploads the 28 files to FileDrop.
+* `python3 scripts/reliquary_slime_review.py review|verify|upload`: builds the 28 FileDrop comparison sheets, per-kind 34-frame sheets and original-rate GIFs, verifies all 204 saved editor frames match the exported atlases, tests the rollback script (including preserving an unrelated manifest edit and rejecting a corrupt backup), confirms live `/media/raid/valhallasc-data/valhalla-dev` files are untouched, and uploads the 28 files to FileDrop.
 * Bounded real-art browser test:
   ```sh
   PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-  NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-  VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server \
+  NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+  VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server \
   bash scripts/test-touch-bounded.sh tests/reliquary-slime-art.cjs
   ```
   Runs 147 checks across all six Reliquary kinds and inherited `tidetemplar`/`tidecantor` in Zone 11, with mutation controls (`MUTATE_KIND` + `MUTATE_PNG`) for floating feet and still-attack frames.

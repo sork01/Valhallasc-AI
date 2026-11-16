@@ -42,7 +42,7 @@ Use the RAID build cache and the private database supplied by the test driver:
 ```bash
 CARGO_TARGET_DIR=/media/raid/valhallasc-data/raid-bosses-5-9-target bash scripts/cargo.sh test eldmarr_ -- --nocapture
 CARGO_TARGET_DIR=/media/raid/valhallasc-data/raid-bosses-5-9-target bash scripts/cargo.sh build --profile test
-REAL_SPRITES=1 VALHALLA_BINARY=/media/raid/valhallasc-data/raid-bosses-5-9-target/debug/valhalla-server NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules /home/serveperry/.nvm/versions/node/v20.20.2/bin/node tests/eldmarr-ui.cjs
+REAL_SPRITES=1 VALHALLA_BINARY=/media/raid/valhallasc-data/raid-bosses-5-9-target/debug/valhalla-server NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules /home/serveperry/.nvm/versions/node/v20.20.2/bin/node tests/eldmarr-ui.cjs
 ```
 
 The worktree has no `.tools/cargo` installation. In that checkout also export `CARGO_HOME`, `RUSTUP_HOME` and `PATH` pointing to the primary checkout's `.tools/cargo` and `.tools/rustup`.

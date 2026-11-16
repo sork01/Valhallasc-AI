@@ -37,7 +37,7 @@ was superseded after resizing the Kraken, Shellback and eels; it stays in PixelF
 
 `/media/raid/valhallasc-data/deep-slime-original-20261103` holds the nine original files (`deep.txt` + eight PNGs), `manifest.txt` with SHA256 and old IDs.
 ```sh
-python3 /media/raid/valhallasc-data/deep-slime-work/scripts/rollback_deep_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 /media/raid/valhallasc-data/deep-slime-work/scripts/rollback_deep_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 Dry run without `--apply`; preflights every hash and path. Restoration on disposable copies and corrupt-backup refusal pass. Version/notes rollback is separate.
 

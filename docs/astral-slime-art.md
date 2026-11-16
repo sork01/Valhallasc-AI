@@ -25,18 +25,18 @@ Registry `scripts/astral_slime_sources.txt`, raw arrays `scripts/astral_slime_<k
 
 `/media/raid/valhallasc-data/astral-slime-original-20261104` holds the five pre-change PNGs, `client/assets/astral.txt`, and `manifest.txt` (SHA256 hashes, old PixelFlow IDs, old `tops`, `oldFrames: {}`).
 ```sh
-python3 scripts/rollback_astral_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_astral_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 Dry run without `--apply`; preflights every backup file hash before writing and restores `client/assets/astral.txt` and all five `astral_<kind>.png` atlases in one command.
 
 ## Verification
 
-* `python3 scripts/astral_slime_review.py review|verify|upload`: builds the 24 FileDrop comparison sheets, per-kind 34-frame sheets and original-rate GIFs, verifies all 170 saved editor frames match the exported atlases, tests the rollback script (including rejecting a corrupt backup), confirms live `/home/serveperry/webserver/www/Valhallasc` files are untouched, and uploads the 24 files to FileDrop.
+* `python3 scripts/astral_slime_review.py review|verify|upload`: builds the 24 FileDrop comparison sheets, per-kind 34-frame sheets and original-rate GIFs, verifies all 170 saved editor frames match the exported atlases, tests the rollback script (including rejecting a corrupt backup), confirms live `/media/raid/valhallasc-data/valhalla-dev` files are untouched, and uploads the 24 files to FileDrop.
 * Bounded real-art browser test:
   ```sh
   PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-  NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-  VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server \
+  NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+  VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server \
   bash scripts/test-touch-bounded.sh tests/astral-slime-art.cjs
   ```
   Runs 123 checks across all five Astralhollow kinds in Zone 13, with mutation controls (`MUTATE_KIND` + `MUTATE_PNG`) for floating feet and still-attack frames.

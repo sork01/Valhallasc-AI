@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/sunward-slime-original-20261104')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/sunward-slime'
 KINDS = ['meadowhare', 'sunbacksnail', 'brushfox', 'spadebadger', 'honeyjaw', 'wickerwarden']
 NAMES = dict(meadowhare='Meadow Hare', sunbacksnail='Sunback Snail', brushfox='Brush Fox', spadebadger='Spade Badger', honeyjaw='Honeyjaw', wickerwarden='Wicker Warden')

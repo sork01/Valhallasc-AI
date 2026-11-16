@@ -39,7 +39,7 @@ Models: `nornroot_slime_models.py`; registry: `nornroot_slime_sources.txt`. `bui
 Seven originals, old editor IDs, byte counts, PNG dimensions, SHA-256 hashes and all unrelated native atlas hashes are saved outside the live tree at `/media/raid/valhallasc-data/nornroot-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_nornroot_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_nornroot_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run by default. A disposable-copy check proved that dry run writes nothing, application restores all seven originals, and corrupt backups or unrelated manifest changes are refused before any write. Receipt: `test-results/nornroot-slime/rollback-proof.json`. Both original and new editor IDs remain saved.

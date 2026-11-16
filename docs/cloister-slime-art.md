@@ -36,7 +36,7 @@ Registry `scripts/cloister_slime_sources.txt`, arrays `scripts/cloister_slime_<k
 
 `/media/raid/valhallasc-data/cloister-slime-original-20261103` holds the eight original PNGs, `manifest.txt` (SHA256, old IDs, old tops) and a full reference copy of the manifest.
 ```sh
-python3 scripts/rollback_cloister_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_cloister_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 Dry run without `--apply`; preflights every hash and path. It restores the eight PNGs and **merges only the eight `sprites`/`tops` entries** back into the live `cathedral.txt` (never the whole file, because the Reliquary work edits it too). Tested on a scratch copy whose manifest carries an unrelated Reliquary edit (it survives) and with a corrupt backup (refused, nothing changed). Version/notes rollback is separate.
 

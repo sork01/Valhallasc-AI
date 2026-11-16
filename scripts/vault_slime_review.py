@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[1]
 V1 = Path('/media/raid/valhallasc-data/vault-slime-v1-20261104')
 ORIGINAL = Path('/media/raid/valhallasc-data/vault-slime-original-20261103')
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT/'test-results/vault-slime'
 KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking']
 NAMES = dict(thrall='Vault Thrall', archer='Bone Archer', acolyte='Hollow Acolyte', gatewarden='Hrolf Bonegate', choir='Valka, the Hollow Choir', colossus='Ironwake', hollowking='Haldor, the Hollow King')

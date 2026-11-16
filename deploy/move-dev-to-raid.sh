@@ -8,7 +8,7 @@
 # Nothing is deleted: the old folder is renamed to Valhallasc.moved-<date> and removed by hand once you are happy.
 # Rollback (before you delete the old folder): see the last lines this script prints.
 set -euo pipefail
-OLD=/home/serveperry/webserver/www/Valhallasc
+OLD=/media/raid/valhallasc-data/valhalla-dev
 NEW=${NEW:-/media/raid/valhallasc-data/valhalla-dev}      # /media/raid itself is root-owned; valhallasc-data is ours
 WWW=/home/serveperry/webserver/www
 DATA=$WWW/Valhalla/data
@@ -55,7 +55,7 @@ diff -rq --exclude=target --exclude=.git --exclude=data "$OLD" "$NEW" && say "co
 
 # ---- 4. fix the copy -----------------------------------------------------------------------------------------------
 say "replacing the old path in tracked files"
-git -C "$NEW" grep -l 'webserver/www/Valhallasc' | grep -v '^deploy/apache.conf$' | while read -r f; do sed -i "s#/home/serveperry/webserver/www/Valhallasc#$NEW#g" "$NEW/$f"; done
+git -C "$NEW" grep -l 'webserver/www/Valhallasc' | grep -v '^deploy/apache.conf$' | while read -r f; do sed -i "s#/media/raid/valhallasc-data/valhalla-dev#$NEW#g" "$NEW/$f"; done
 git -C "$NEW" commit -qam "The dev repo lives on the RAID ($NEW): paths follow the move
 
 Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>" || true

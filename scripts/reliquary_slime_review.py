@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/reliquary-slime-original-20261104')
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/reliquary-slime'
 KINDS = ['reliccrab', 'pearlwidow', 'glasscantor', 'relicwarden', 'coralregent', 'reliquarypearl']
 NAMES = dict(

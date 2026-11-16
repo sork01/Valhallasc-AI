@@ -30,18 +30,18 @@ Registry `scripts/nave_slime_sources.txt`, raw arrays `scripts/nave_slime_<kind>
 
 `/media/raid/valhallasc-data/nave-slime-original-20261104` holds the five pre-change PNGs, `manifest.txt` (SHA256 hashes, old PixelFlow IDs, old `tops`, `oldFrames: {}`) and a full reference copy of `cathedral.txt`.
 ```sh
-python3 scripts/rollback_nave_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_nave_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 Dry run without `--apply`; preflights every backup file hash before writing and uses `kindframe.restore_kind_entries` so only the five Grand Nave entries in `cathedral.txt` are restored (preserving Flooded Cloister, Coral Reliquary and all other kinds).
 
 ## Verification
 
-* `python3 scripts/nave_slime_review.py review|verify|upload`: builds the 24 FileDrop comparison sheets, per-kind 34-frame sheets and original-rate GIFs, verifies all 170 saved editor frames match the exported atlases, tests the rollback script (including preserving an unrelated manifest edit and rejecting a corrupt backup), confirms live `/home/serveperry/webserver/www/Valhallasc` files are untouched, and uploads the 24 files to FileDrop.
+* `python3 scripts/nave_slime_review.py review|verify|upload`: builds the 24 FileDrop comparison sheets, per-kind 34-frame sheets and original-rate GIFs, verifies all 170 saved editor frames match the exported atlases, tests the rollback script (including preserving an unrelated manifest edit and rejecting a corrupt backup), confirms live `/media/raid/valhallasc-data/valhalla-dev` files are untouched, and uploads the 24 files to FileDrop.
 * Bounded real-art browser test:
   ```sh
   PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-  NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-  VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server \
+  NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+  VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server \
   bash scripts/test-touch-bounded.sh tests/nave-slime-art.cjs
   ```
   Runs 118 checks across all five Grand Nave kinds and inherited `tidetemplar`/`tidecantor` in Zone 12, with mutation controls (`MUTATE_KIND` + `MUTATE_PNG`) for floating feet and still-attack frames.

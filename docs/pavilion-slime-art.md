@@ -40,7 +40,7 @@ The legacy maker retains helpers used by other dungeon makers; its CLI delegates
 Seven original files, their SHA-256 hashes and the old PixelFlow IDs are preserved outside the served tree at `/media/raid/valhallasc-data/pavilion-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_pavilion_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_pavilion_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run by default. Every backup and destination, plus unrelated shared-manifest entries, is checked before writing. A real restore on a disposable copy passed; corrupt-backup and unrelated-kind tampering were both refused with no destination writes.
@@ -56,8 +56,8 @@ All 204 saved editor frames equal the exported cells. Original served art and th
 ```sh
 PAVILION_ART_KINDS=pavilion_foldling,pavilion_inkmoth,pavilion_silkguard \
 PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/debug/valhalla-server \
+NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/debug/valhalla-server \
 bash scripts/test-touch-bounded.sh tests/pavilion-slime-art.cjs
 ```
 

@@ -66,7 +66,7 @@ all five original PNGs and `sky.txt`. `manifest.txt` records six SHA256 hashes,
 previous PixelFlow IDs and base revision. It is outside live and candidate trees.
 
 ```sh
-python3 /media/raid/valhallasc-data/bifrost-slime-work/scripts/rollback_bifrost_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 /media/raid/valhallasc-data/bifrost-slime-work/scripts/rollback_bifrost_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a dry run. The command preflights the exact file set, every
@@ -98,7 +98,7 @@ and verified FileDrop count. Python/JavaScript syntax, Swedish consistency,
 release-note guard and diff checks pass.
 
 ```sh
-PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/bifrost-slime-art.cjs
+PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/bifrost-slime-art.cjs
 python3 scripts/bifrost_slime_review.py review
 python3 scripts/bifrost_slime_review.py verify
 python3 scripts/bifrost_slime_review.py upload

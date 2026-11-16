@@ -122,7 +122,7 @@ def verify():
     for entry in ('make_deep_sprites.py', 'deep_slime_redraw.py'):
         refused=subprocess.run(['python3',str(ROOT/'scripts'/entry),'build','--replace'],capture_output=True)
         assert refused.returncode != 0 and b'--replace is refused' in refused.stderr
-    live=Path('/home/serveperry/webserver/www/Valhallasc')
+    live=Path('/media/raid/valhallasc-data/valhalla-dev')
     assert all(sha(live/name)==digest for name,digest in backup_meta['files'].items())
     (OUT/'validation.json').write_text(json.dumps({'editorFramesMatch':count, 'liveArtUnchanged':True,
         'rollbackNineFilesVerified':True,'corruptBackupRefusedWithoutChanges':True,'destructiveBuildRefused':True,

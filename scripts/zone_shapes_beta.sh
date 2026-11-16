@@ -6,7 +6,7 @@
 # configtest and only then reloads gracefully; `off` removes the block the same way. The pilot server itself (port 8081, own
 # database copy) is a separate process; the live game on 8080 is never touched.
 set -euo pipefail
-CONF=/home/serveperry/webserver/www/Valhallasc/deploy/apache.conf
+CONF=/media/raid/valhallasc-data/valhalla-dev/deploy/apache.conf
 BEGIN='# BEGIN zone-shapes-pilot'
 END='# END zone-shapes-pilot'
 block() { cat <<'EOF'

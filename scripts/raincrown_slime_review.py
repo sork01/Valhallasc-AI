@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/raincrown-slime-original-20261111')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/raincrown-slime'
 KINDS = ['rain_crown_droplet','rain_crown_oracle','rain_crown_guard','rain_crown_gatekeeper','rain_crown_sibyl','rain_crown_sovereign']
 NAMES = dict(zip(KINDS, ['Crowned Droplet','Jade Rain Oracle','Monsoon Guard','Keeper of the Floodgate','Sibyl of the Rain','The Rain Crown']))

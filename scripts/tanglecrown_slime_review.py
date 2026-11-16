@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/tanglecrown-slime-original-20261104')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/tanglecrown-slime'
 KINDS = ['jadeanaconda', 'crownjaguar', 'orchidmantis', 'canopyglider', 'poolcaiman', 'drumgorilla']
 NAMES = dict(jadeanaconda='The Jade Anaconda', crownjaguar='The Crown Jaguar', orchidmantis='Orchid Mantis', canopyglider='Canopy Glider', poolcaiman='Blackwater Caiman', drumgorilla='Drum Gorilla')

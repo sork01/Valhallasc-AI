@@ -59,7 +59,7 @@ Seven originals, hashes, sizes, dimensions and old PixelFlow IDs are outside the
 live tree at `/media/raid/valhallasc-data/foundry-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_foundry_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_foundry_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a dry run. All guards precede writes. Disposable-copy proof

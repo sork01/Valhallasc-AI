@@ -41,7 +41,7 @@ Models live in `amber_slime_models.py`; source IDs in `amber_slime_sources.txt`.
 Eight original files, their SHA-256 hashes, dimensions, byte sizes and old PixelFlow IDs are saved at `/media/raid/valhallasc-data/amber-slime-original-20261111`. `manifest.txt` also records hashes of the 128 unrelated native Cathedral atlases.
 
 ```sh
-python3 scripts/rollback_amber_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_amber_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run by default. Tested on a disposable copy: dry run writes nothing, `--apply` restores all eight files byte-for-byte, corrupt backups are refused before writes, and unrelated Cathedral manifest changes are refused before writes. Old and new PixelFlow sources are retained. Receipt: `test-results/amber-slime/rollback-proof.json`.

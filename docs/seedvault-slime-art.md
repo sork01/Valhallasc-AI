@@ -41,7 +41,7 @@ python3 tests/seedvault-materials.py
 Nine originals (`client/assets/cathedral.txt` and the eight `client/assets/cathedral_<kind>.png` atlases), SHA-256 hashes, byte sizes, dimensions and old PixelFlow IDs are saved outside the served tree at `/media/raid/valhallasc-data/seedvault-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_seedvault_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_seedvault_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run by default. All backup sources and destinations are validated before writes. Restoring on a disposable copy, refusing a corrupt backup and refusing an unrelated Cathedral-manifest edit all pass. Rollback never deletes old or new PixelFlow sources.

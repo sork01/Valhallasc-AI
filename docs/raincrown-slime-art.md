@@ -39,7 +39,7 @@ python3 tests/raincrown-materials.py
 Seven originals, SHA-256 hashes, old PixelFlow IDs and any old per-kind dimensions are saved outside the served tree at `/media/raid/valhallasc-data/raincrown-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_raincrown_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_raincrown_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run by default. All backup sources and destinations are validated before writes. Restoring seven files on a disposable target passed; a corrupt backup and an unrelated Cathedral-manifest edit were both refused before any writes. The rollback never deletes either old or new PixelFlow sources.
@@ -57,8 +57,8 @@ All 204 saved editor frames match their exported cells. All six full frame sheet
 ```sh
 RAINCROWN_ART_KINDS=rain_crown_droplet,rain_crown_oracle,rain_crown_guard \
 PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/debug/valhalla-server \
+NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/debug/valhalla-server \
 bash scripts/test-touch-bounded.sh tests/raincrown-slime-art.cjs
 ```
 

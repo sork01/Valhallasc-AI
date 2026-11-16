@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/prism-slime-original-20261104')
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/prism-slime'
 KINDS = ['miragejackal', 'shardscarab', 'glassharrier', 'prismsentinel', 'mirrorqueen', 'sunshard']
 NAMES = dict(miragejackal='Mirage Jackal', shardscarab='Shard Scarab', glassharrier='Glass Harrier', prismsentinel='Prism Sentinel', mirrorqueen='Mirror Queen', sunshard='Sunshard')

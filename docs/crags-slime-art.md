@@ -70,7 +70,7 @@ This directory contains the exact previous `crags.txt` and five PNGs.
 One-command rollback of a deployed version (only run when rollback is wanted):
 
 ```sh
-python3 /media/raid/valhallasc-data/crags-slime-work/scripts/rollback_crags_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 /media/raid/valhallasc-data/crags-slime-work/scripts/rollback_crags_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a dry run. Use `--target` for an alternate checkout and
@@ -102,7 +102,7 @@ Chromium at `/home/serveperry/.cache/ms-playwright` was used successfully.
 Run the focused check from the candidate with:
 
 ```sh
-PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/crags-slime-art.cjs
+PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/crags-slime-art.cjs
 ```
 
 Release integration on the current Rimeveil stack also passes all **58** focused

@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/serveperry/webserver/www/Valhallasc
-ExecStart=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server
+WorkingDirectory=/media/raid/valhallasc-data/valhalla-dev
+ExecStart=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server
 Environment=VALHALLA_BIND=172.18.0.1:8080
-Environment=VALHALLA_DB=/home/serveperry/webserver/www/Valhallasc/data/valhalla.sqlite
+Environment=VALHALLA_DB=/media/raid/valhallasc-data/valhalla-dev/data/valhalla.sqlite
 Environment=VALHALLA_ORIGIN=https://gunning.se
 Environment=VALHALLA_AMBIENT_PLAYERS=1
 # Login pushes go through Surv's notify endpoint, which sends them to Gotify with Surv's own token and logs them in

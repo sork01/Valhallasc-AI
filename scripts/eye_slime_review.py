@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/eye-slime-original-20261111')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/eye-slime'
 KINDS = ['eye_drifter','eye_adept','eye_lurker','eye_lenswarden','eye_undertide','eye_unblinking']
 NAMES = dict(zip(KINDS, ['Silt Drifter','Veil Adept','Glassjaw Lurker','The Lenswarden','The Undertide Sibyl','The Unblinking Eye']))

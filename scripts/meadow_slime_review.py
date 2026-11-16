@@ -159,7 +159,7 @@ def verify():
         failed = subprocess.run(command+['--backup', str(damaged)], capture_output=True)
         assert failed.returncode != 0
         assert all(sha(target/name)==digest for name,digest in before.items())
-    live = Path('/home/serveperry/webserver/www/Valhallasc')
+    live = Path('/media/raid/valhallasc-data/valhalla-dev')
     assert all(sha(live/name)==digest for name,digest in manifest['files'].items())
     (OUT/'validation.json').write_text(json.dumps(dict(editorFramesMatch=34,
         rollbackTwoFilesVerified=True, corruptBackupRefusedWithoutChanges=True,

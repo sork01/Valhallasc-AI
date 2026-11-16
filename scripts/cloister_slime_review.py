@@ -135,7 +135,7 @@ def verify():
     # the old maker must still serve every other kind: a different kind is not refused
     other=subprocess.run(['python3',str(ROOT/'scripts/make_cathedral_sprites.py'),'verify','abysszealot'],capture_output=True)
     assert other.returncode==0 and b'pixel-identical' in other.stdout
-    live=Path('/home/serveperry/webserver/www/Valhallasc')
+    live=Path('/media/raid/valhallasc-data/valhalla-dev')
     (OUT/'validation.json').write_text(json.dumps({'editorFramesMatch':count,
         'rollbackEightAtlasesAndManifestEntriesVerified':True,'unrelatedManifestEditSurvivesRollback':True,
         'corruptBackupRefusedWithoutChanges':True,'destructiveBuildRefused':True,'otherCathedralKindsStillVerify':True,

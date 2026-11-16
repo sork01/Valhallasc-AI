@@ -80,7 +80,7 @@ IDs are backed up outside the live checkout at
 `/media/raid/valhallasc-data/forge-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_forge_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_forge_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a no-write dry run. All backup and unrelated-manifest guards

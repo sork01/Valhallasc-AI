@@ -146,7 +146,7 @@ contains all five previous PNGs and `fen.txt`, plus hashes and previous
 PixelFlow IDs in `manifest.txt`. It is outside both live and candidate trees.
 
 ```sh
-python3 /media/raid/valhallasc-data/fen-slime-work/scripts/rollback_fen_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 /media/raid/valhallasc-data/fen-slime-work/scripts/rollback_fen_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for dry run. All six source hashes and target paths are checked
@@ -177,7 +177,7 @@ syntax, Swedish generation/check, release-note guard and diff checks pass.
 No full test suites or Rust checks were needed for this art-only change.
 
 ```sh
-PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/fen-slime-art.cjs
+PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server bash scripts/test-touch-bounded.sh tests/fen-slime-art.cjs
 python3 scripts/fen_slime_review.py review
 python3 scripts/fen_slime_review.py verify
 ```

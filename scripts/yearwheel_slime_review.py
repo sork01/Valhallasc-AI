@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/yearwheel-slime-original-20261111')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/yearwheel-slime'
 SEASONS = {'spring': ['brooknewt', 'bloomtortoise', 'petalchimera', 'rainseraph'], 'summer': ['sundarter', 'glasslion', 'sunwheel', 'firephoenix'],
            'autumn': ['acornmimic', 'lanternowl', 'harvestreaper', 'ambermantis'], 'winter': ['snowstoat', 'rimesaber', 'snowgiant', 'longnightwyrm']}

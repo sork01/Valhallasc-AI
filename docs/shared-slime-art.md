@@ -129,7 +129,7 @@ outside the live checkout in
 `/media/raid/valhallasc-data/shared-slime-original-20261112`.
 
 ```sh
-python3 scripts/rollback_shared_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_shared_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Without `--apply`, all guards run and nothing is written. Rollback restores the

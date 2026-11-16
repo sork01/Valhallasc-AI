@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/frostwake-slime-original-20261111')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/frostwake-slime'
 KINDS = ['snowhare', 'iceotter', 'frostheron', 'glaciercrab', 'bellmammoth', 'auroramanta', 'crevasseleviathan']
 NAMES = {'snowhare': 'Snow Hare', 'iceotter': 'Ice Otter', 'frostheron': 'Frost Heron', 'glaciercrab': 'Glacier Crab', 'bellmammoth': 'Bell Mammoth', 'auroramanta': 'Aurora Manta', 'crevasseleviathan': 'Crevasse Leviathan'}

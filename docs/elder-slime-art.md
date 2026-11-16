@@ -40,7 +40,7 @@ The legacy maker retains helper functions imported by other dungeon makers; its 
 Seven originals, their SHA-256 hashes and old PixelFlow IDs are backed up outside the served tree at `/media/raid/valhallasc-data/elder-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_elder_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_elder_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a dry run. All sources/destinations and unrelated shared-manifest entries are checked before any write. A real restore on a disposable copy passed; corrupt backups and unrelated-kind changes were both refused without destination writes. After another Cathedral group is deployed, reconcile the shared manifest rather than bypassing that refusal.
@@ -54,8 +54,8 @@ All 204 saved editor frames equal their exported cells. Original art in the serv
 ```sh
 ELDER_ART_KINDS=elder_thornling,elder_moth,elder_barkguard \
 PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/debug/valhalla-server \
+NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/debug/valhalla-server \
 bash scripts/test-touch-bounded.sh tests/elder-slime-art.cjs
 ```
 

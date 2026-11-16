@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/orrery-slime-v1-20261104')  # the live Beta 1.39.22 art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/orrery-slime'
 KINDS = ['bronzemantis', 'gearling', 'orbitseer', 'chronoguard', 'pendulummatron', 'epochengine']
 NAMES = dict(bronzemantis='Bronze Mantis', gearling='Gearling', orbitseer='Orbit Seer', chronoguard='Chronoguard', pendulummatron='Pendulum Matron', epochengine='Epoch Engine')

@@ -63,7 +63,7 @@ Eight originals, hashes, byte lengths, dimensions and old PixelFlow IDs are at
 `/media/raid/valhallasc-data/emberwake-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_emberwake_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_emberwake_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a no-write dry run. All backup and unrelated-manifest guards

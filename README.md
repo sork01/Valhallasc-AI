@@ -287,7 +287,7 @@ The MCP wrapper uses the official SDK and stdio. Configure your MCP client to la
   "mcpServers": {
     "valhallasc-testing": {
       "command": "/home/serveperry/.nvm/versions/node/v20.20.2/bin/node",
-      "args": ["/home/serveperry/webserver/www/Valhallasc/scripts/test-mcp.cjs"]
+      "args": ["/media/raid/valhallasc-data/valhalla-dev/scripts/test-mcp.cjs"]
     }
   }
 }

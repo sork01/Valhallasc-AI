@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = Path('/media/raid/valhallasc-data/pavilion-slime-original-20261111')  # the original cel-shaded art this redo replaces
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT / 'test-results/pavilion-slime'
 KINDS = ['pavilion_foldling','pavilion_inkmoth','pavilion_silkguard','pavilion_mirror','pavilion_weaver','pavilion_sovereign']
 NAMES = dict(zip(KINDS, ['Paper Foldling','Inkwing Moth','Silkguard','The Mirror Dancer','The Thousandfold Weaver','Sovereign of the Last Fold']))

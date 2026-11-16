@@ -42,7 +42,7 @@ python3 scripts/eye_slime_review.py verify
 Seven original files, SHA-256 digests and old PixelFlow IDs are preserved outside the served tree in `/media/raid/valhallasc-data/eye-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_eye_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_eye_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a dry run. The script validates every backup before writing and refuses if any unrelated shared-manifest entry changed. The review verifier exercised a real seven-file rollback on a disposable copy, corrupt-backup refusal with no destination writes, and unrelated-kind tampering refusal with no writes. It also checks destructive build refusal and that live art remains unchanged.
@@ -61,8 +61,8 @@ Run browser checks in batches under the standard 1.5 GiB cap:
 ```sh
 EYE_ART_KINDS=eye_drifter,eye_adept,eye_lurker \
 PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/debug/valhalla-server \
+NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/debug/valhalla-server \
 bash scripts/test-touch-bounded.sh tests/eye-slime-art.cjs
 ```
 

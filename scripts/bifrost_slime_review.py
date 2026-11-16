@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[1]
 V1 = Path('/media/raid/valhallasc-data/bifrost-slime-v1-20261104')
 ORIGINAL = Path('/media/raid/valhallasc-data/bifrost-slime-original-20261103')
-LIVE = Path('/home/serveperry/webserver/www/Valhallasc')
+LIVE = Path('/media/raid/valhallasc-data/valhalla-dev')
 OUT = ROOT/'test-results/bifrost-slime'
 KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc']
 NAMES = dict(galehound='Galehound', prismgolem='Prism Golem', skyray='Skyray',

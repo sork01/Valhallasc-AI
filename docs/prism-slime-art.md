@@ -43,7 +43,7 @@ Every attack has eight unique poses: ready, anticipation, maximum wind-up, relea
 `/media/raid/valhallasc-data/prism-slime-original-20261104` holds all six previous atlases, `client/assets/prism.txt`, SHA256 hashes, old PixelFlow IDs, tops and frame overrides (`oldFrames: {}`).
 
 ```sh
-python3 scripts/rollback_prism_art.py --target /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_prism_art.py --target /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Omit `--apply` for a dry run. All seven source hashes and target paths are checked before the first write. Both actual restoration and corrupt-backup refusal were checked in a scratch directory. The previous PixelFlow sprites remain intact.
@@ -52,8 +52,8 @@ Omit `--apply` for a dry run. All seven source hashes and target paths are check
 
 ```sh
 PLAYWRIGHT_BROWSERS_PATH=/home/serveperry/.cache/ms-playwright \
-NODE_PATH=/home/serveperry/webserver/www/Valhallasc/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
-VALHALLA_BINARY=/home/serveperry/webserver/www/Valhallasc/target/release/valhalla-server \
+NODE_PATH=/media/raid/valhallasc-data/valhalla-dev/node_modules:/home/serveperry/webserver/www/dybase2/node_modules \
+VALHALLA_BINARY=/media/raid/valhallasc-data/valhalla-dev/target/release/valhalla-server \
 bash scripts/test-touch-bounded.sh tests/prism-slime-art.cjs
 ```
 

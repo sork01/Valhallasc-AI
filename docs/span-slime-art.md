@@ -39,7 +39,7 @@ python3 scripts/span_slime_review.py review
 Seven original files, hashes, sizes, dimensions, editor IDs and unrelated native atlas hashes are saved at `/media/raid/valhallasc-data/span-slime-original-20261111`.
 
 ```sh
-python3 scripts/rollback_span_art.py --root /home/serveperry/webserver/www/Valhallasc --apply
+python3 scripts/rollback_span_art.py --root /media/raid/valhallasc-data/valhalla-dev --apply
 ```
 
 Dry run is the default. Disposable-copy checks proved that dry run writes nothing and apply restores all seven originals; corrupt backups and unrelated shared-manifest changes are refused before writes. Receipt: `test-results/span-slime/rollback-proof.json`. Both original and new PixelFlow sources remain available.
