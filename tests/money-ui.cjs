@@ -1,6 +1,6 @@
 // Browser check for COIN-DENOMINATIONS: the shared formatter, and the purse and a merchant price showing coin icons with the right split.
 // Run via: bash scripts/test-touch-bounded.sh tests/money-ui.cjs
-// MUTATE=1 makes the formatter print the old "<n> gold" with no coins: the purse check must fail.
+// MUTATE=1 makes the formatter print the old "<n> gold" with no coins: the purse check must fail. MUTATE=purse restores the old buy-window purse line.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -37,6 +37,13 @@ function requireMemoryLimit() {
       const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
       const page = await ctx.newPage();
       page.on('pageerror', e => errors.push(e.message));
+      if (process.env.MUTATE === 'purse') {      // the old shopGold: a bare number and the word gold
+        await page.route('**/city.js*', async route => {
+          const response = await route.fetch(), text = await response.text(), fixed = "$('npc-gold').innerHTML=`${Locale.translate('Your purse:')} ${Money.html(gold)}`";
+          assert.ok(text.includes(fixed), 'the fix is in city.js');
+          await route.fulfill({ response, body: text.replace(fixed, "$('npc-gold').textContent=`Your purse: ${gold} gold`") });
+        });
+      }
       if (process.env.MUTATE === '1') await page.addInitScript(() => addEventListener('DOMContentLoaded', () => { Money.html = n => `<span class="money" data-copper="${n}">${n} gold</span>`; }));
       await page.addInitScript(l => {
         window.AudioContext = undefined; window.webkitAudioContext = undefined;
@@ -90,6 +97,11 @@ function requireMemoryLimit() {
       });
       check(price && price.coins >= 1 && Number.isFinite(price.copper) && price.copper > 0, tag(`a merchant price shows coin icons: ${JSON.stringify(price)}`));
       check(/^(\d[\d,]*) (gold|silver|copper|guld|koppar)/.test(price.text), tag(`the price also reads in words: ${price.text}`));
+      // The purse line of the buy window follows every purchase (shop.js calls City.shopGold with the new total): coins, not "<n> gold".
+      await page.evaluate(() => City.shopGold(123456));
+      const buyPurse = await page.evaluate(() => { const e = document.getElementById('npc-gold'); return { coins: e.querySelectorAll('.coin').length, text: e.textContent.replace(/\s+/g, ' ').trim() }; });
+      check(buyPurse.coins === 3, tag(`the buy window's purse shows three coins: ${JSON.stringify(buyPurse)}`));
+      check(lang === 'en' ? buyPurse.text === 'Your purse: 12 gold 34 silver 56 copper' : buyPurse.text === 'Din börs: 12 guld 34 silver 56 koppar', tag(`the buy window's purse reads "${buyPurse.text}"`));
       await page.locator('#npc-x').click();
       await ctx.close();
     }
