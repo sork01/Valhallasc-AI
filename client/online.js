@@ -343,7 +343,7 @@
     else if (text && send({ type: 'chat', text })) input.value = '';
     input.blur(); $('stage').classList.remove('touch-chat-open');
   });
-  $('chat-input').addEventListener('focus', () => { window.Field?.clearInput(); send({ type: 'stop' }); });
+  $('chat-input').addEventListener('focus', () => { if (window.Field?.stopMoving) window.Field.stopMoving(); else { window.Field?.clearInput(); send({ type: 'stop' }); } });
   $('chat-input').addEventListener('keydown', event => {
     event.stopPropagation(); if (event.key === 'Escape') { event.preventDefault(); event.currentTarget.blur(); $('stage').classList.remove('touch-chat-open'); }
   });

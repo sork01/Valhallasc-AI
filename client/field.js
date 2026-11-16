@@ -5792,7 +5792,14 @@
       return false;
     },
     clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
-    setPaused(p) { paused = p; Field.clearInput(); Online.send({ type: 'stop' }); },
+    // Opening or closing a window (or focusing the chat) halts held movement, but a selected monster stays selected: the server keeps
+    // attacking it (an input of zero stops walking and clears nothing else; `stop` would also drop the target).
+    stopMoving() {
+      const id = autoAttackTarget, keepAttack = id !== null && hero.target?.id === id && !hero.dead;
+      Field.clearInput();
+      if (keepAttack) { autoAttackTarget = id; Online.send({ type: 'input', dx: 0, dy: 0 }); } else Online.send({ type: 'stop' });
+    },
+    setPaused(p) { paused = p; Field.stopMoving(); },
     visitNpc(id) {
       const npc = City.npcs.find(n => n.id === id);
       if (paused || !Online.connected || (hero.dead ? !(hero.ghost && npc?.art === 'spirit_guide') : npc?.art === 'spirit_guide')) return;
