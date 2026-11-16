@@ -63318,6 +63318,27 @@
           "tiered": true
         },
         {
+          "id": "buy_cloak_common",
+          "label": "Buy Travel Cloak",
+          "item": "cloak_l5_common",
+          "tiered": true,
+          "cost": 24
+        },
+        {
+          "id": "buy_cloak_uncommon",
+          "label": "Buy Sturdy Cloak",
+          "item": "cloak_l5_uncommon",
+          "tiered": true,
+          "cost": 160
+        },
+        {
+          "id": "buy_cloak_rare",
+          "label": "Buy Rare Cloak",
+          "item": "cloak_l5_rare",
+          "tiered": true,
+          "cost": 384
+        },
+        {
           "id": "buy_green_weapon_warrior",
           "label": "Buy Reinforced Royal Sword",
           "item": "warrior_weapon_royal_l10_green",
@@ -63351,27 +63372,6 @@
           "item": "hunter_weapon_wardenbow_l10_green",
           "tiered": true,
           "cost": 1000
-        },
-        {
-          "id": "buy_cloak_common",
-          "label": "Buy Travel Cloak",
-          "item": "cloak_l5_common",
-          "tiered": true,
-          "cost": 24
-        },
-        {
-          "id": "buy_cloak_uncommon",
-          "label": "Buy Sturdy Cloak",
-          "item": "cloak_l5_uncommon",
-          "tiered": true,
-          "cost": 160
-        },
-        {
-          "id": "buy_cloak_rare",
-          "label": "Buy Rare Cloak",
-          "item": "cloak_l5_rare",
-          "tiered": true,
-          "cost": 384
         }
       ],
       "buys": true,
@@ -63455,6 +63455,27 @@
           "tiered": true
         },
         {
+          "id": "buy_cloak_common",
+          "label": "Buy Travel Cloak",
+          "item": "cloak_l5_common",
+          "tiered": true,
+          "cost": 24
+        },
+        {
+          "id": "buy_cloak_uncommon",
+          "label": "Buy Sturdy Cloak",
+          "item": "cloak_l5_uncommon",
+          "tiered": true,
+          "cost": 160
+        },
+        {
+          "id": "buy_cloak_rare",
+          "label": "Buy Rare Cloak",
+          "item": "cloak_l5_rare",
+          "tiered": true,
+          "cost": 384
+        },
+        {
           "id": "buy_green_weapon_warrior",
           "label": "Buy Reinforced Royal Sword",
           "item": "warrior_weapon_royal_l10_green",
@@ -63488,27 +63509,6 @@
           "item": "hunter_weapon_wardenbow_l10_green",
           "tiered": true,
           "cost": 1000
-        },
-        {
-          "id": "buy_cloak_common",
-          "label": "Buy Travel Cloak",
-          "item": "cloak_l5_common",
-          "tiered": true,
-          "cost": 24
-        },
-        {
-          "id": "buy_cloak_uncommon",
-          "label": "Buy Sturdy Cloak",
-          "item": "cloak_l5_uncommon",
-          "tiered": true,
-          "cost": 160
-        },
-        {
-          "id": "buy_cloak_rare",
-          "label": "Buy Rare Cloak",
-          "item": "cloak_l5_rare",
-          "tiered": true,
-          "cost": 384
         }
       ],
       "buys": true,
@@ -63592,6 +63592,27 @@
           "tiered": true
         },
         {
+          "id": "buy_cloak_common",
+          "label": "Buy Travel Cloak",
+          "item": "cloak_l5_common",
+          "tiered": true,
+          "cost": 24
+        },
+        {
+          "id": "buy_cloak_uncommon",
+          "label": "Buy Sturdy Cloak",
+          "item": "cloak_l5_uncommon",
+          "tiered": true,
+          "cost": 160
+        },
+        {
+          "id": "buy_cloak_rare",
+          "label": "Buy Rare Cloak",
+          "item": "cloak_l5_rare",
+          "tiered": true,
+          "cost": 384
+        },
+        {
           "id": "buy_green_weapon_warrior",
           "label": "Buy Reinforced Royal Sword",
           "item": "warrior_weapon_royal_l10_green",
@@ -63625,27 +63646,6 @@
           "item": "hunter_weapon_wardenbow_l10_green",
           "tiered": true,
           "cost": 1000
-        },
-        {
-          "id": "buy_cloak_common",
-          "label": "Buy Travel Cloak",
-          "item": "cloak_l5_common",
-          "tiered": true,
-          "cost": 24
-        },
-        {
-          "id": "buy_cloak_uncommon",
-          "label": "Buy Sturdy Cloak",
-          "item": "cloak_l5_uncommon",
-          "tiered": true,
-          "cost": 160
-        },
-        {
-          "id": "buy_cloak_rare",
-          "label": "Buy Rare Cloak",
-          "item": "cloak_l5_rare",
-          "tiered": true,
-          "cost": 384
         }
       ],
       "buys": true,
@@ -130952,6 +130952,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -130985,27 +131006,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -131090,6 +131090,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -131123,27 +131144,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -131287,6 +131287,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -131320,27 +131341,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -206460,6 +206460,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -206493,27 +206514,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -206598,6 +206598,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -206631,27 +206652,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -206789,6 +206789,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -206822,27 +206843,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -289952,6 +289952,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -289985,27 +290006,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -290090,6 +290090,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -290123,27 +290144,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -290289,6 +290289,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -290322,27 +290343,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -435353,6 +435353,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -435386,27 +435407,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -435491,6 +435491,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -435524,27 +435545,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -435629,6 +435629,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -435662,27 +435683,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -487139,6 +487139,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -487172,27 +487193,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -487277,6 +487277,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -487310,27 +487331,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -487415,6 +487415,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -487448,27 +487469,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -488717,7 +488717,8 @@
           "walk": [
             1,
             0
-          ]
+          ],
+          "look": "maelstrom"
         },
         {
           "id": "sky_shattered_span",
@@ -517964,6 +517965,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -517997,27 +518019,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -518102,6 +518103,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -518135,27 +518157,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -518240,6 +518241,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -518273,27 +518295,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -519567,7 +519568,8 @@
           "walk": [
             -1,
             0
-          ]
+          ],
+          "look": "maelstrom"
         },
         {
           "id": "nacre_gate",
@@ -645142,6 +645144,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -645175,27 +645198,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -645273,6 +645275,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -645306,27 +645329,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -645404,6 +645406,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -645437,27 +645460,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -692043,6 +692045,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -692076,27 +692099,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -692174,6 +692176,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -692207,27 +692230,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -692305,6 +692307,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -692338,27 +692361,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -745569,6 +745571,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -745602,27 +745625,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -745700,6 +745702,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -745733,27 +745756,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -745831,6 +745833,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -745864,27 +745887,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -882914,6 +882916,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -882947,27 +882970,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -883045,6 +883047,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -883078,27 +883101,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -883176,6 +883178,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -883209,27 +883232,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -931049,6 +931051,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -931082,27 +931105,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -931180,6 +931182,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -931213,27 +931236,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -931293,6 +931295,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -931326,27 +931349,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -979917,6 +979919,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -979950,27 +979973,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -980048,6 +980050,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -980081,27 +980104,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -980179,6 +980181,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -980212,27 +980235,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1049230,6 +1049232,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1049263,27 +1049286,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1049361,6 +1049363,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1049394,27 +1049417,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1049492,6 +1049494,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1049525,27 +1049548,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1097698,6 +1097700,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1097731,27 +1097754,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1097811,6 +1097813,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1097844,27 +1097867,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1097942,6 +1097944,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1097975,27 +1097998,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1201758,6 +1201760,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1201791,27 +1201814,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1201889,6 +1201891,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1201922,27 +1201945,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1202020,6 +1202022,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1202053,27 +1202076,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1243594,6 +1243596,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1243627,27 +1243650,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1243707,6 +1243709,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1243740,27 +1243763,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1243820,6 +1243822,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1243853,27 +1243876,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1291721,6 +1291723,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1291754,27 +1291777,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1291834,6 +1291836,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1291867,27 +1291890,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1291947,6 +1291949,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1291980,27 +1292003,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1442829,6 +1442831,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1442862,27 +1442885,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1442960,6 +1442962,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1442993,27 +1443016,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1443091,6 +1443093,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1443124,27 +1443147,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1596283,6 +1596285,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1596316,27 +1596339,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1596414,6 +1596416,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1596447,27 +1596470,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
@@ -1596545,6 +1596547,27 @@
               "tiered": true
             },
             {
+              "id": "buy_cloak_common",
+              "label": "Buy Travel Cloak",
+              "item": "cloak_l5_common",
+              "tiered": true,
+              "cost": 24
+            },
+            {
+              "id": "buy_cloak_uncommon",
+              "label": "Buy Sturdy Cloak",
+              "item": "cloak_l5_uncommon",
+              "tiered": true,
+              "cost": 160
+            },
+            {
+              "id": "buy_cloak_rare",
+              "label": "Buy Rare Cloak",
+              "item": "cloak_l5_rare",
+              "tiered": true,
+              "cost": 384
+            },
+            {
               "id": "buy_green_weapon_warrior",
               "label": "Buy Reinforced Royal Sword",
               "item": "warrior_weapon_royal_l10_green",
@@ -1596578,27 +1596601,6 @@
               "item": "hunter_weapon_wardenbow_l10_green",
               "tiered": true,
               "cost": 1000
-            },
-            {
-              "id": "buy_cloak_common",
-              "label": "Buy Travel Cloak",
-              "item": "cloak_l5_common",
-              "tiered": true,
-              "cost": 24
-            },
-            {
-              "id": "buy_cloak_uncommon",
-              "label": "Buy Sturdy Cloak",
-              "item": "cloak_l5_uncommon",
-              "tiered": true,
-              "cost": 160
-            },
-            {
-              "id": "buy_cloak_rare",
-              "label": "Buy Rare Cloak",
-              "item": "cloak_l5_rare",
-              "tiered": true,
-              "cost": 384
             }
           ],
           "buys": true,
