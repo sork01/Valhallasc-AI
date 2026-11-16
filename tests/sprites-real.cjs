@@ -42,7 +42,9 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
   const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite, hunter: HunterSprite }[cls];
   window.femaleSprites = window.femaleSprites || {};
   const sprite = female ? (window.femaleSprites[cls] = window.femaleSprites[cls] || await C.Female.load({ ...valhalla[cls].look, gender: 'female' })) : valhalla[cls];
-  const look = { ...sprite.look, head: 'none', shoulders: 'none', gloves: 'none', pants: 'none', necklace: 'none', accessory: 'none', ...extras, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
+  // Every figure starts bare: the look is shared between the male and female sprites (the female one is built from the male look),
+  // so a cloak left on by an earlier figure (the starter cloak, or the 'everything' set) would otherwise carry into every later one.
+  const look = { ...sprite.look, head: 'none', shoulders: 'none', gloves: 'none', pants: 'none', necklace: 'none', accessory: 'none', cloak: 'none', ...extras, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
   sprite.set(look);
   // The class-independent layers are decoded on demand: wait for whatever this look wears, then rebuild the frames.
   await Promise.all(Object.entries(sprite.equipment).map(([slot, v]) => v !== 'none' && sprite.source.ensure(slot + '_' + v)));
@@ -117,7 +119,11 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       check(everything.visible > dressed.visible && everything.hash !== dressed.hash, `${cls}: all six generic pieces worn together make a bigger figure`);
       // Recoloured pieces (the catalog's `art` + `tint`): drawn as their base drawing, same silhouette, different colours,
       // and every set of the same drawing looks different from every other.
-      const recoloured = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && !MageSprite.DUNGEON_PALETTES[i.art] && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind) && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
+      // A recolour is a piece that carries a `tint`, or whose `art` is a drawing other pieces are tinted from (a base piece with that
+      // variant, or a set whose siblings are tinted, so a tint dropped from one of them still shows). A piece with none of these is a
+      // dedicated drawing (its own original art, e.g. Fatewoven, Keelbound, Nullforged, Chainforged): it has no base to recolour, so it
+      // is checked below as a drawing of its own (docs/nornroot.md, docs/longship.md).
+      const recoloured = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && !MageSprite.DUNGEON_PALETTES[i.art] && (i.tint || WORLD_ITEMS.some(j => j.art === i.art && j.tint) || WORLD_ITEMS.some(j => j.variant === i.art && j.art !== i.art)) && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind) && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
       // Dungeon sets are painted from MageSprite.DUNGEON_PALETTES by their drawing, whatever tint the item names, so the
       // checks below do not apply: every piece must draw on a bare figure, and every drawing must have a palette of its own.
       const dungeon = await page.evaluate(([cls]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && MageSprite.DUNGEON_PALETTES[i.art]).map(i => [i.kind, i.variant]), [cls]);
@@ -125,6 +131,11 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       const bareNaked = naked, undrawn = [];
       for (const [kind, variant] of dungeon) { const w = await bare(kind, variant); if (!(w.visible > 0 && w.hash !== bareNaked.hash)) undrawn.push(kind + ':' + variant); }
       check(dungeon.length >= 50 && !undrawn.length, `${cls}: all ${dungeon.length} dungeon pieces are drawn (not drawn: ${undrawn.join(', ')})`);
+      // Dedicated drawings (no tint, and no base piece they recolour): each must draw on a bare figure, not be a recolour check.
+      const dedicated = await page.evaluate(([cls]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && !i.tint && !MageSprite.DUNGEON_PALETTES[i.art] && !(i.tint || WORLD_ITEMS.some(j => j.art === i.art && j.tint) || WORLD_ITEMS.some(j => j.variant === i.art && j.art !== i.art)) && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind)).map(i => [i.kind, i.variant]), [cls]);
+      const dedicatedUndrawn = [];
+      for (const [kind, variant] of dedicated) { const w = await bare(kind, variant); if (!(w.visible > 0 && w.hash !== bareNaked.hash)) dedicatedUndrawn.push(kind + ':' + variant); }
+      check(dedicated.length > 0 && !dedicatedUndrawn.length, `${cls}: all ${dedicated.length} dedicated-drawing pieces are drawn (not drawn: ${dedicatedUndrawn.join(', ')})`);
       check(new Set(Object.values(await page.evaluate(() => MageSprite.DUNGEON_PALETTES)).map(p => p.join())).size === Object.keys(await page.evaluate(() => MageSprite.DUNGEON_PALETTES)).length, `${cls}: every dungeon drawing has a palette of its own`);
       const baseOf = new Map(), silhouetteOf = new Map(), byArt = new Map(), colourGroups = new Map();
       // Inspect each small piece on the bare figure: a robe can hide two differently coloured pants identically.
@@ -167,7 +178,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         check(w.hash !== fDressed.hash && w.visible > 0 && (await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): the generic ${slot} piece is drawn and 'none' removes it`);
       }
       // High-level and Cathedral colours must draw on the female layers too, including every small worn slot.
-      const newPieces = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && !MageSprite.DUNGEON_PALETTES[i.art] && i.requiredLevel > 20 && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
+      const newPieces = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && !MageSprite.DUNGEON_PALETTES[i.art] && i.requiredLevel > 20 && (i.tint || WORLD_ITEMS.some(j => j.art === i.art && j.tint) || WORLD_ITEMS.some(j => j.variant === i.art && j.art !== i.art)) && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
       const femaleWear = (kind, v) => kind === 'armor' ? f(v, gear.weapon[0]) : kind === 'weapon' ? f(gear.armor[0], v) : f('none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
       const femaleBases = new Map(), femaleShapes = new Map(), femaleColours = new Map();
       let femaleChanged = 0, femaleSilhouette = 0;
