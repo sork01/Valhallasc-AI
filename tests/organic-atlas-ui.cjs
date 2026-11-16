@@ -13,7 +13,11 @@ const root=path.resolve(__dirname,'..');
    console.log(`organic atlas ${width}x${height}`);browser=await chromium.launch({headless:true});
    const page=await browser.newPage({viewport:{width,height},isMobile:touch,hasTouch:touch,reducedMotion:'reduce'});const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.addInitScript(()=>{window.__valhallaTestSprites=true;window.AudioContext=undefined;window.webkitAudioContext=undefined;localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null}));});
-   if(process.env.MUTATE) {
+   if(process.env.MUTATE==='stall') { // a zone change drops the held direction: the walk after a crossing must fail
+    const source=fs.readFileSync(path.join(root,'client/field.js'),'utf8');const changed=source.replace('  function setZone(z) {','  function setZone(z) { touchDirection = [0, 0]; Online.send({ type: \'input\', dx: 0, dy: 0 });');
+    assert.notEqual(changed,source,'stall mutation target exists');await page.route('**/field.js',r=>r.fulfill({contentType:'text/javascript',body:changed}));
+   }
+   if(process.env.MUTATE && process.env.MUTATE!=='stall') {
     const source=fs.readFileSync(path.join(root,'client/worldmap.js'),'utf8');let changed=source;
     if(process.env.MUTATE==='entrance')changed=source.replace("renderZone(p.to);setView('zone');$('wm-back').focus();","renderZone(parent);setView('zone');$('wm-back').focus();");
     if(process.env.MUTATE==='layout')changed=source.replace('for (const r of ATLAS.regions) {',"for (const r of ATLAS.regions) { if(r.zone===0){const [x,y,w,h]=r.box;r.polygon=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]];}");
@@ -80,8 +84,12 @@ const root=path.resolve(__dirname,'..');
      await page.evaluate(()=>{Field.clearInput();Online.send({type:'stop'});});await debug({op:'teleport',zone:from,x:p.x-p.walk[0]*6,y:p.y-p.walk[1]*6});
      await page.waitForFunction(from=>Field.zone===from,from);await page.waitForTimeout(1300);
      await page.evaluate(p=>Field.setTouchDirection(p.walk[0]-p.walk[1],p.walk[0]+p.walk[1]),p);
-     await page.waitForFunction(to=>Field.zone===to,to,{timeout:20000});const before=await page.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));await page.waitForTimeout(400);
-     const after=await page.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));await page.evaluate(()=>{Field.clearInput();Online.send({type:'stop'});});
+     await page.waitForFunction(to=>Field.zone===to,to,{timeout:20000});
+     // Server position (hero.nx/ny, updated per snapshot), not the eased sprite. The window is open until the
+     // walk shows in snapshots, so a slow snapshot stream cannot make a fixed 400 ms sample come up short.
+     const before=await page.evaluate(()=>({x:Field.hero.nx,y:Field.hero.ny}));
+     await page.waitForFunction(([b,dx,dy])=>(Field.hero.nx-b.x)*dx+(Field.hero.ny-b.y)*dy>.3,[before,p.walk[0],p.walk[1]],{timeout:15000,polling:100}).catch(()=>{});
+     const after=await page.evaluate(()=>({x:Field.hero.nx,y:Field.hero.ny}));await page.evaluate(()=>{Field.clearInput();Online.send({type:'stop'});});
      check((after.x-before.x)*p.walk[0]+(after.y-before.y)*p.walk[1]>.3,`Held movement continues through actual path ${from}->${to}`);
     }
    }
