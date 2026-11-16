@@ -4,7 +4,7 @@ const { app, BrowserWindow, shell, Menu } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-const GAME_URL = 'https://gunning.se/Valhallasc/';
+const GAME_URL = 'https://gunning.se/Valhalla/';
 const ALLOWED_HOSTS = new Set(['gunning.se', 'www.gunning.se']); // the SSO sign-in is on gunning.se too
 
 // Music starts without waiting for the first click.

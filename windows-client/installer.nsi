@@ -4,7 +4,7 @@ Unicode true
 !define APP "Valhalla Rumble"
 !define REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\se.gunning.valhallasc"
 !ifndef VERSION
-  !define VERSION "1.0.0"
+  !define VERSION "1.0.1"
 !endif
 !ifndef SRC
   !error "pass -DSRC=<win-unpacked dir>"

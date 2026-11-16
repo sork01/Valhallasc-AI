@@ -1,8 +1,8 @@
 {
   "name": "valhallasc-windows-client",
   "productName": "Valhalla Rumble",
-  "version": "1.0.0",
-  "description": "Windows client for Valhalla Rumble: a window around https://gunning.se/Valhallasc/",
+  "version": "1.0.1",
+  "description": "Windows client for Valhalla Rumble: a window around https://gunning.se/Valhalla/",
   "main": "main.js",
   "author": "sork01",
   "license": "UNLICENSED",
