@@ -341,6 +341,24 @@ class Prismwaste(Designer):
         for name in REGIONS:
             self.fill(name, DENSITY[name])
 
+    def clear_seams(self, zone):
+        """Every spawn at least 21 tiles from every seam (scripts/seam_clearance.py), after the late-seam drops: an ordinary spawn already clear stays put,
+        one too close moves to a clear cell at about the same distance from the refuge. Sleepers and authored elites are not moved. Spawns the drops removed are not replaced, so the population is unchanged."""
+        from seam_clearance import clear_of_seams
+        keep = self.blocked.copy()
+        for h in content.HAMLETS.values():
+            keep[max(h['y'] - h['hh'] - 10, 0):h['y'] + h['hh'] + 11, max(h['x'] - h['hw'] - 10, 0):h['x'] + h['hw'] + 11] = True
+        city = zone['city']
+        keep[city['y0'] - 8:city['y1'] + 9, city['x0'] - 8:city['x1'] + 9] = True
+        solid = Grid()
+        for o in self.fixed + self.objects:
+            if o['kind'] != 'void':
+                solid.add(o['x'], o['y'], max(o['r'], (o.get('width', 0) + o.get('depth', 0)) / 4))
+        valid = self.inner & self.reach & ~keep & (self.road > 4.4) & (self.reserve > 7)
+        self.seam_moves = clear_of_seams(zone['slimes'], zone, valid, lambda x, y: solid.free(x, y, .6, .15), self.n,
+                                         movable=lambda s: s.get('layout') == self.TAG and 'ambush' not in s,       # sleepers and authored elites stay put
+                                         anchor=(zone['spawn']['x'], zone['spawn']['y']))      # a family keeps its distance from the refuge
+
     # ---- spawns ------------------------------------------------------------------------------------------------------------
     def spawns(self):
         rng, w = self.rng, self.w
@@ -434,6 +452,7 @@ def design(world, write=False):
     for late in (19, 27):      # Stormglass's seam (2026-11-08) replaced the south gate and Cairnspine's (2026-11-09) the east gate: only the spawns within 7 tiles of each go
         if any(p.get('seam') and p['to'] == late for p in zone['portals']):
             d.late_dropped += drop_near_seam(zone, d, late)
+    d.clear_seams(zone)
     zone['objects'] = objects
     zone['paths'] = [[[round(a, 2), round(b, 2)] for a, b in road] for road in d.ROADLIST]
     zone['atlasPaths'] = []

@@ -30,6 +30,15 @@ ELITES = [('pendulummatron', 118, 100), ('epochengine', 192, 34), ('mainspringwy
 ELITE_LEVEL = {'pendulummatron': 54, 'epochengine': 55, 'mainspringwyrm': 53}
 AWARENESS = {'pendulummatron': 11., 'epochengine': 13., 'mainspringwyrm': 12.}
 
+# The Epoch Engine stood 10 tiles from the Astralhollow seam. ELITES stays as authored (it also lays out the scenery clearings and the spawn spacing:
+# moving it there reshuffles the whole plain); orrery_design.clear_seams moves the finished spawn to ELITE_MOVES, 21+ tiles from every seam and still
+# awareness + 3 tiles from every road, place, person and hub, in the `crown` region (the design checks use elites_final()).
+ELITE_MOVES = {'epochengine': (202.0, 45.5)}
+
+
+def elites_final():
+    return [(k, *ELITE_MOVES.get(k, (x, y))) for k, x, y in ELITES]
+
 PAVILION = dict(r=1.7, width=4, depth=3)
 
 DRESSING = {

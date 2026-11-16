@@ -345,6 +345,29 @@ class Orrery(Designer):
         for name in REGIONS:
             self.fill(name, DENSITY[name])
 
+    def clear_seams(self, zone):
+        """Every spawn at least 21 tiles from every seam (scripts/seam_clearance.py), after the late-seam drops: an ordinary spawn already clear stays put,
+        one too close moves to a clear cell at about the same distance from the refuge. Sleepers and authored elites are not moved. Spawns the drops removed are not replaced, so the population is unchanged."""
+        from seam_clearance import clear_of_seams
+        keep = self.blocked.copy()
+        for h in content.HAMLETS.values():
+            keep[max(h['y'] - h['hh'] - 10, 0):h['y'] + h['hh'] + 11, max(h['x'] - h['hw'] - 10, 0):h['x'] + h['hw'] + 11] = True
+        city = zone['city']
+        keep[city['y0'] - 8:city['y1'] + 9, city['x0'] - 8:city['x1'] + 9] = True
+        solid = Grid()
+        for o in self.fixed + self.objects:
+            if o['kind'] != 'void':
+                solid.add(o['x'], o['y'], max(o['r'], (o.get('width', 0) + o.get('depth', 0)) / 4))
+        valid = self.inner & self.reach & ~keep & (self.road > 4.4) & (self.reserve > 7)
+        for s in zone['slimes']:      # the authored elites that stand too close to a seam move to their ELITE_MOVES spot (after everything else is placed)
+            if s['kind'] in content.ELITE_MOVES and 'layout' not in s and 'ambush' not in s:
+                s['x'], s['y'] = content.ELITE_MOVES[s['kind']]
+        pockets = [(s['x'], s['y'], 11.0) for s in zone['slimes'] if s['kind'] in content.ELITE_MOVES and 'layout' not in s]     # an elite keeps 11 tiles round it clear of ordinary spawns
+        self.seam_moves = clear_of_seams(zone['slimes'], zone, valid, lambda x, y: solid.free(x, y, .6, .15), self.n, keep_off=pockets,
+                                         also=lambda s: any(math.hypot(s['x'] - px, s['y'] - py) < pr for px, py, pr in pockets),
+                                         movable=lambda s: s.get('layout') == self.TAG and 'ambush' not in s,       # sleepers and authored elites stay put
+                                         anchor=(zone['spawn']['x'], zone['spawn']['y']))      # a family keeps its distance from the refuge
+
     # ---- spawns ------------------------------------------------------------------------------------------------------------
     def spawns(self):
         rng, w = self.rng, self.w
@@ -431,6 +454,7 @@ def design(world, write=False):
     for late in sorted(Orrery.LATE_SEAMS):      # Stormglass's, the Crags' and Emberwake's seams (2026-11-08) replaced rim gates: only the spawns within 7 tiles of each go
         if any(p.get('seam') and p['to'] == late for p in zone['portals']):
             d.late_dropped += drop_near_seam(zone, d, late)
+    d.clear_seams(zone)
     zone['objects'] = objects
     # Omit non-seam gate road (path_15_9) from visible brown paths.
     visible_roads = [road for i, road in enumerate(d.ROADLIST) if i != 28]
@@ -511,7 +535,7 @@ def check(zone, d, solid, seen, G):
     # an elite stands clear of everything a player walks to: awareness plus 3 tiles from every road, place and person, and from every hub
     walked = [(p, 'road') for road in d.ROADLIST for p in dense_points(road)]
     walked += [((q['x'], q['y']), f"place {q['id']}") for q in zone['places']] + [((n['x'], n['y']), f"npc {n['id']}") for n in zone['npcs']]
-    for kind, ex, ey in content.ELITES:
+    for kind, ex, ey in content.elites_final():
         near = min(((math.dist((ex, ey), p), what) for p, what in walked), key=lambda t: t[0])
         if near[0] < content.AWARENESS[kind] + 3:
             problems.append(f'{kind} stands {near[0]:.1f} tiles from a {near[1]}: its awareness is {content.AWARENESS[kind]:.0f}')
@@ -545,7 +569,7 @@ def check(zone, d, solid, seen, G):
     def region_of(x, y):
         return names[int(d.region[int(y), int(x)])]
     want = {'pendulummatron': 'westcourt', 'epochengine': 'crown', 'mainspringwyrm': 'reaches'}
-    for kind, ex, ey in content.ELITES:
+    for kind, ex, ey in content.elites_final():
         if region_of(ex, ey) != want[kind]:
             problems.append(f'{kind} stands in {region_of(ex, ey)}')
     # the hold circles, visit places and hamlets stand in the regions their quests name

@@ -22,7 +22,8 @@ const W = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')),
 const onFloor = (z, x, y) => (z.shapeFloor[Math.floor(y)] || '')[Math.floor(x)] === '#';
 const VERSION = /Beta \d+\.\d+\.\d+/.exec(fs.readFileSync(path.join(root, 'client/index.html'), 'utf8'))[0];
 const HUBS = [['stillpoint', 79, 301, 'The Stillpoint'], ['bellcourt', 84, 124, 'Bellcourt'], ['crownwatch', 190, 82, 'Crownwatch'], ['shardwatch', 254, 128, 'Shardwatch']];
-const ELITES = [['pendulummatron', 118, 100], ['epochengine', 192, 34], ['mainspringwyrm', 262, 218]];
+// the Epoch Engine stands 21+ tiles from every seam now (orrery_content.py ELITES moved it from (192, 34), 10 tiles off the Astralhollow seam)
+const ELITES = [['pendulummatron', 118, 100], ['epochengine', 202, 45.5], ['mainspringwyrm', 262, 218]];
 // regions that paint their own ground class: [region name, darker than, lighter than] as luminance
 const GROUND = { 'The Obsidian Reaches': [45, null] };
 (async () => {
