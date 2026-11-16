@@ -52,6 +52,31 @@ async function call(name, args = {}) {
   check(pixels.midnight[0] < pixels.noon[0] && pixels.midnight[1] < pixels.noon[1], `midnight tint darkens the world: ${JSON.stringify(pixels)}`);
   check(JSON.stringify(pixels.off) === JSON.stringify(pixels.noon), 'the night darkening setting can remove the tint');
 
+  // No sun or moon disc crosses the sky: the time of day is the clock under the minimap. Draw onto a flat canvas and compare the
+  // spot where the old disc sat (the pixels there and 60 px below it must match). MUTATE=orb wraps draw() to add the old disc back.
+  if (process.env.MUTATE === 'orb') await page.evaluate(() => {
+    const real = DayNight.draw;
+    DayNight.draw = (g, w, h, l, p, f) => { real(g, w, h, l, p, f); const hr = DayNight.hour, day = hr >= 6 && hr < 18, q = day ? (hr - 6) / 12 : ((hr - 18 + 24) % 24) / 12;
+      g.fillStyle = day ? '#fff2b7' : '#edf2ff'; g.beginPath(); g.arc(w * (.13 + .74 * q), h * (.19 - .11 * Math.sin(q * Math.PI)), day ? 15 : 11, 0, 7); g.fill(); };
+  });
+  const orbs = await page.evaluate(() => [12, 0, 6.5, 19, 3].map(h => {
+    Prefs.set({ night: 1 }); DayNight.setZone({ theme: 'meadow' });
+    DayNight.sync({ hour: h, hoursPerSecond: 0 }); DayNight.tick(20);
+    const W = 400, H = 240, canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+    const g = canvas.getContext('2d'); g.fillStyle = '#a0b0a0'; g.fillRect(0, 0, W, H);
+    DayNight.draw(g, W, H, [], () => [0, 0]);
+    const day = h >= 6 && h < 18, q = day ? (h - 6) / 12 : ((h - 18 + 24) % 24) / 12;
+    const x = Math.round(W * (.13 + .74 * q)), y = Math.round(H * (.19 - .11 * Math.sin(q * Math.PI)));
+    let worst = 0;
+    for (const [dx, dy] of [[0, 0], [7, 0], [-7, 0], [0, 7], [0, -7]]) {
+      const a = g.getImageData(x + dx, y + dy, 1, 1).data, b = g.getImageData(x + dx, y + dy + 60, 1, 1).data;
+      worst = Math.max(worst, ...[0, 1, 2].map(c => Math.abs(a[c] - b[c])));
+    }
+    return { hour: h, worst };
+  }));
+  await page.evaluate(() => Prefs.set({ night: 0 }));            // the slider check below starts from the state the sample block left
+  for (const o of orbs) check(o.worst < 22, `no sun or moon disc at ${o.hour}:00 (pixel difference ${o.worst})`);
+
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
   check(await page.locator('#set-night').inputValue() === '0', 'the settings panel reads the saved night slider');
   await page.locator('#set-night').fill('50');

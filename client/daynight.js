@@ -174,18 +174,7 @@
     };
     nightGlow(zone?.theme, 1 - wN);
     if (sb) nightGlow(sb.theme, wN);
-    const daylight = h >= 6 && h < 18;
-    const progress = daylight ? (h - 6) / 12 : ((h - 18 + 24) % 24) / 12;
-    const orbX = width * (.13 + .74 * progress), orbY = height * (.19 - .11 * Math.sin(progress * Math.PI));
-    if (!daylight && n > .15) {
-      const mh = g.createRadialGradient(orbX, orbY, 4, orbX, orbY, 34);
-      mh.addColorStop(0, `rgba(210,226,255,${(.32 * n * outdoorBlend).toFixed(4)})`);
-      mh.addColorStop(1, 'rgba(210,226,255,0)');
-      g.fillStyle = mh; g.beginPath(); g.arc(orbX, orbY, 34, 0, Math.PI * 2); g.fill();
-    }
-    g.globalAlpha = outdoorBlend * (daylight ? .65 : .85 * n);
-    g.fillStyle = daylight ? '#fff2b7' : '#edf2ff';
-    g.beginPath(); g.arc(orbX, orbY, daylight ? 15 : 11, 0, Math.PI * 2); g.fill();
+    // No sun or moon crosses the sky any more (they were hard to read); the time of day is the clock under the minimap.
     const glowAlpha = Math.max(0, n * outdoorBlend * (.58 + .27 * amount));
     if (glowAlpha > .01 && visibleLights.length) {
       const sprite = glowSprite();
