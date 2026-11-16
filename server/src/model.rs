@@ -1192,6 +1192,14 @@ pub struct QuestObjective {
     #[serde(default, rename = "dropChance")]
     pub drop_chance: Option<f64>,
 }
+/// What the bag holds towards a `bring` objective: the target item, plus the ordinary material a quest-only item is made from
+/// (`QUEST-ITEM-DROPS`), so a hero's own slime gel counts even when no quest item dropped for them.
+fn bring_have(character: &Character, target: &str) -> u32 {
+    let extra = crate::items::item(target)
+        .and_then(|i| i.quest_material.as_deref())
+        .map_or(0, |m| character.quantity(m));
+    character.quantity(target).saturating_add(extra)
+}
 impl Quest {
     /// The level of an arena gauntlet quest (`docs/arena-quests.md`): its one objective is `gauntlet` with the target
     /// `L<level>`, and the count is the number of fights.
@@ -1217,7 +1225,7 @@ impl Quest {
         };
         for (i, o) in self.objectives.iter().enumerate() {
             if o.kind == "bring" {
-                let have = character.quantity(&o.target).min(o.count);
+                let have = bring_have(character, &o.target).min(o.count);
                 let counts = &mut character.quests[at].counts;
                 if counts.len() <= i {
                     counts.resize(i + 1, 0);
@@ -1229,8 +1237,15 @@ impl Quest {
     /// Takes the handed-in items out of the bag; call only after `ready` agreed.
     pub fn take_bring(&self, character: &mut Character) {
         for o in self.objectives.iter().filter(|o| o.kind == "bring") {
-            if let Some(stack) = character.inventory.iter_mut().find(|s| s.item == o.target) {
-                stack.quantity = stack.quantity.saturating_sub(o.count);
+            // The quest item goes first; what it lacks is made up from the ordinary material it comes from (`bring_have`).
+            let mut owed = o.count;
+            let sources = std::iter::once(o.target.clone()).chain(crate::items::item(&o.target).and_then(|i| i.quest_material.clone()));
+            for id in sources {
+                if let Some(stack) = character.inventory.iter_mut().find(|s| s.item == id) {
+                    let used = stack.quantity.min(owed);
+                    stack.quantity -= used;
+                    owed -= used;
+                }
             }
         }
         character.inventory.retain(|s| s.quantity > 0);

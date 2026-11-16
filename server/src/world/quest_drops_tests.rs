@@ -262,3 +262,23 @@ fn rehearse_migration_on_a_copy_of_the_live_database() {
         );
     }
 }
+
+#[test]
+fn ordinary_material_counts_for_the_quest_item_and_is_handed_in() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    let (quest, item_id, from, count, _chance, _kind) = pick(&w);
+    take_quest(&mut w, 1, &quest);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    // No quest item has dropped, but the hero carries plenty of the ordinary material in ONE stack: it all counts.
+    c.add_item(&from, count + 19);
+    quest.sync_bring(c);
+    let at = quest.objectives.iter().position(|o| o.target == item_id).unwrap();
+    let held = c.quests.iter().find(|q| q.id == quest.id).unwrap().counts[at];
+    assert_eq!(held, count, "a stack counts by its quantity, up to the objective's count");
+    // A mixed bag: the quest item first, the ordinary material makes up the rest.
+    c.add_item(&item_id, 1);
+    quest.take_bring(c);
+    assert_eq!(c.quantity(&item_id), 0, "the quest item goes first");
+    assert_eq!(c.quantity(&from), 19 + 1, "only the missing {} come out of the ordinary stack", count - 1);
+}
