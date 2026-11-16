@@ -355,6 +355,7 @@
   });
   // Head, shoulder and glove pieces use the class's tier, shared gear, or a catalog art layer.
   // A part missing from the class atlas is simply not drawn.
+  const FRONT_DIRS = [0, 1, 7], CLOTHES_OVER_HAIR = ['armor', 'pants', 'shoulders', 'gloves', 'necklace', 'accessory'], HAIR_TIE = 400;
   const SLOT_ORDER = ['cloak', 'armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
   // A dungeon set needs a silhouette at field scale, not only a different tint on
   // the same 160px equipment rig. These marks sit behind the animated figure and
@@ -675,6 +676,7 @@
       }
       this.tint = new Map();
       const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+      this.hairColours = new Set((this.meta.ramps.hair || []).map(c => { const v = hex(c); return v[0] * 65536 + v[1] * 256 + v[2]; }));
       const lum = c => c[0] * .299 + c[1] * .587 + c[2] * .114;
       const hair = this.constructor.HAIR, skin = this.constructor.SKIN;
       for (const [role, target] of [['hair', hair[look.hairColor || 0]], ['brow', hair[look.hairColor || 0]], ['skin', skin[look.skin || 0]]]) {
@@ -695,11 +697,19 @@
       const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
       const chosen = ['body'];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
+      // Facing the camera, a lock of hair lies almost flush on the sleeve or robe: a depth tie, so it showed through the clothes
+      // (shoulders, chest, hands). There the worn piece wins over hair that is only just nearer (HAIR_TIE); hair clearly in front stays.
+      const front = FRONT_DIRS.includes(dir), hairAt = front ? new Uint8Array(fw * fh) : null;
       for (const part of chosen) {
         const f = this.source.parts[part][key];
+        const clothes = front && part !== 'body' && CLOTHES_OVER_HAIR.some(slot => part.startsWith(slot + '_'));
         for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
           const pixel = y * f.w + x, src = pixel * 4, dst = (f.y + y) * fw + f.x + x;
-          if (!f.pixels[src + 3] || f.z[pixel] > nearest[dst]) continue;
+          if (!f.pixels[src + 3]) continue;
+          if (f.z[pixel] > nearest[dst]) {
+            if (!(clothes && hairAt[dst] && f.z[pixel] - nearest[dst] < HAIR_TIE)) continue;
+          }
+          if (hairAt) hairAt[dst] = part === 'body' && this.hairColours.has(f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2]) ? 1 : 0;
           nearest[dst] = f.z[pixel];
           const packed = f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2];
           const tint = part === 'body' && this.tint.get(packed);
