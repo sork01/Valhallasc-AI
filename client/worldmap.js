@@ -865,16 +865,6 @@
       });
       box.append(list);
     }
-    const seenGates = z.portals.filter(p => zones[p.to] && known(current, p.x, p.y));
-    if (seenGates.length) {
-      box.append(el('h5', 'Routes & entrances', 'wm-side-title'));
-      const list = el('ul', '', 'wm-gates');
-      seenGates.forEach(p => {
-        const row = el('li'), b = el('button', `${p.name[0].toUpperCase()}${p.name.slice(1)} → ${visited(p.to) ? zones[p.to].name : 'unexplored lands'}`, 'window-tool'); b.type = 'button'; b.dataset.to = String(p.to); b.disabled = !visited(p.to);
-        b.addEventListener('click', () => { renderZone(p.to); setView('zone'); }); row.append(b); list.append(row);
-      });
-      box.append(list);
-    }
   }
 
   // ---------- live markers ----------

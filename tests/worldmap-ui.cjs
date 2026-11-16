@@ -1,7 +1,8 @@
 // Browser checks for the world map (M) on the organic atlas: it opens and closes with the keys, shows one tile per
 // outdoor province from the painted reference, marks dungeon entrances, zooms into a zone with its gates and enemies,
 // follows the hero, and leaves the other panels alone. The enemy legend must cover every kind the map spawns.
-// MUTATE=legend drops one map kind from the legend; MUTATE=levels puts the Lantern Queen back at 83. Both must fail.
+// MUTATE=legend drops one map kind from the legend; MUTATE=levels puts the Lantern Queen back at 83; MUTATE=gateslist adds a Routes & entrances
+// list to the side panel again. Each must fail.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -36,7 +37,7 @@ const check = (condition, message) => { assert.ok(condition, message); checks++;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && !/401|Failed to load resource/.test(message.text())) errors.push(message.text()); });
-  if (process.env.MUTATE) {
+  if (process.env.MUTATE && process.env.MUTATE !== 'gateslist') {
     const source = fs.readFileSync(path.join(root, 'client/worldmap.js'), 'utf8');
     let changed = source;
     if (process.env.MUTATE === 'legend') changed = source.replace(/\n\s*slagmaw: \['Slagmaw \(Elite\)'[^\n]*\n/, '\n');
@@ -45,6 +46,9 @@ const check = (condition, message) => { assert.ok(condition, message); checks++;
     await page.route('**/worldmap.js', r => r.fulfill({ contentType: 'text/javascript', body: changed }));
   }
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
+  if (process.env.MUTATE === 'gateslist') await page.addInitScript(() => addEventListener('DOMContentLoaded', () => {
+    new MutationObserver(() => { const side = document.getElementById('wm-side'); if (side && !side.querySelector('.wm-gates')) { const h = document.createElement('h5'); h.textContent = 'Routes & entrances'; const u = document.createElement('ul'); u.className = 'wm-gates'; side.append(h, u); } }).observe(document.body, { childList: true, subtree: true });
+  }));
   await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('MapUI');
   await page.locator('#go').click({ timeout: 60000 });
@@ -199,8 +203,9 @@ const check = (condition, message) => { assert.ok(condition, message); checks++;
   check(await page.locator('#wm-title').textContent() === `World Map › ${next}`, `Pressing a gate opens the zone beyond it (${next})`);
   await page.locator('#wm-back').click();
   await openTile(rimeveil);
-  await page.locator(`.wm-gates button[data-to="${gate.to}"]`).click();
-  check(await page.locator('#wm-title').textContent() === `World Map › ${next}`, 'The Gates list navigates too');
+  // The side panel no longer has a "Routes & entrances" list: the gates are pressed on the map itself.
+  check(await page.locator('.wm-gates').count() === 0 && !(await page.locator('#wm-side').textContent()).includes('Routes & entrances'), 'The side panel has no Routes & entrances list');
+  check(await page.locator(`.wm-gate[data-portal="${gate.id}"]`).count() === 1, 'The gate is still pressable on the map');
   // --- stepping back ---
   await press('Escape');
   check(await visible('#worldmap') && await visible('#wm-world') && await page.locator('#wm-zone').isHidden(), 'Esc from a zone goes back to the world, not out of the map');
