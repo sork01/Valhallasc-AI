@@ -59,7 +59,24 @@ module.exports=(kit,map)=>({
     await kit.talkTo(w,bot,'ew_echo');
     await w.waitFor(()=>q('ew_voice')?.counts[0]===1,5000,'Hear Eldmarr');
     check(area.portals.some(p=>p.id==='ew_raid'&&!map.zones[p.to-1].sealedTemplate),'The raid portal is open');
-    for(const kind of ['ew_ashback','ew_glasswing','ew_slagjaw','ew_cinderhorn']){
+    // Snapshots cull enemies more than 56 tiles from the hero (visibility::cull_view). The hero stands at the Echo, where
+    // the only Ashback in reach sits on that edge and wanders out of it, so the kill found nothing. Before each kill, walk
+    // to 12 tiles from the nearest authored (non-ambush) spawn of that kind when the hero is farther than 40 tiles, and
+    // wait until the kind is in view, naming what is missing if it is not.
+    const kinds=[...new Set(area.slimes.filter(s=>s.kind.startsWith('ew_')&&!s.ambush).map(s=>s.kind))];
+    const wanted=['ew_ashback','ew_glasswing','ew_slagjaw','ew_cinderhorn'];
+    for(const kind of wanted){
+      if(!kinds.includes(kind)) throw Error(kind+' has no authored spawn in the Caldera (map.txt zone 45)');
+      const spawns=area.slimes.filter(s=>s.kind===kind&&!s.ambush);
+      const at=()=>w.player(bot), gap=s=>Math.hypot(s.x-at().x,s.y-at().y);
+      const near=spawns.reduce((a,b)=>gap(b)<gap(a)?b:a);
+      const d=gap(near);
+      if(d>40){
+        const k=12/d, p=at();
+        await kit.walkTo(w,bot,{x:near.x+(p.x-near.x)*k,y:near.y+(p.y-near.y)*k},60000);
+      }
+      const seen=()=>w.views.get(bot).slimes.filter(s=>s.kind===kind&&!s.dead).length;
+      await w.waitFor(()=>seen()>0,10000,`${kind} in view within 56 tiles of the hero at (${Math.round(at().x)},${Math.round(at().y)}) on zone ${at().zone}: ${seen()} living in view, ${spawns.length} authored`);
       const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
       await w.debug(bot,{op:'kill_enemy',id:enemy.id});
       await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===kind+'_relic'),5000,kind+' material');
