@@ -330,6 +330,9 @@ pub struct Character {
     pub rested: crate::rested::Rested,
     #[serde(default)]
     pub festival_spirit: crate::festival::Spirit,
+    /// Seconds this character has been online (`/played`): counted every tick while a real player is in the world.
+    #[serde(default)]
+    pub played_secs: f64,
     pub gold: u32,
     pub kills: u32,
     #[serde(default)]
@@ -657,6 +660,7 @@ impl Character {
             xp: 0,
             rested: Default::default(),
             festival_spirit: Default::default(),
+            played_secs: 0.,
             gold: 0,
             kills: 0,
             quests: vec![],
@@ -1629,6 +1633,8 @@ pub enum RollChoice {
 pub enum SocialCommand {
     Refresh,
     Who,
+    /// How long this character has been online: answered with one `played` packet.
+    Played,
     FriendRequest {
         id: Option<String>,
         name: Option<String>,

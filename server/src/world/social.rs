@@ -377,7 +377,7 @@ impl World {
         if self.players[&session].is_hidden()
             && !matches!(
                 command,
-                SocialCommand::Refresh | SocialCommand::Who | SocialCommand::FriendRemove { .. }
+                SocialCommand::Refresh | SocialCommand::Who | SocialCommand::Played | SocialCommand::FriendRemove { .. }
             )
         {
             self.tell(&me, "Show yourself before using social actions.", false);
@@ -390,6 +390,12 @@ impl World {
             }
             SocialCommand::Who => {
                 self.send_who(&me);
+                Ok(())
+            }
+            SocialCommand::Played => {
+                if let Some(p) = self.online(&me) {
+                    let _ = p.peer.try_send(json!({"type":"played","seconds":p.character.played_secs as u64}));
+                }
                 Ok(())
             }
             SocialCommand::FriendRequest { id, name } => {
@@ -1902,6 +1908,25 @@ mod tests {
         assert_eq!(row("Bob")["inParty"], false);
         assert_eq!(row("Cat")["party"], true);
         assert_eq!(row("Cat")["friend"], false);
+    }
+
+    #[test]
+    fn played_counts_online_seconds_for_real_players_only() {
+        let mut w = world();
+        let mut ann = add(&mut w, 1, "Ann");
+        heard(&mut ann);
+        for _ in 0..200 {
+            w.step();
+        }
+        say(&mut w, &ann, SocialCommand::Played);
+        let played = heard(&mut ann)
+            .into_iter()
+            .find(|v| v["type"] == "played")
+            .unwrap();
+        // 200 ticks at 20 Hz = 10 s (the join itself may add a tick).
+        let seconds = played["seconds"].as_u64().unwrap();
+        assert!((9..=11).contains(&seconds), "{seconds}");
+        assert_eq!(w.players[&1].character.played_secs.floor() as u64, seconds);
     }
 
     #[test]

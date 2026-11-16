@@ -2940,6 +2940,7 @@ impl World {
                     | ClientMessage::Social {
                         command: SocialCommand::Refresh
                             | SocialCommand::Who
+                            | SocialCommand::Played
                             | SocialCommand::PartyLeave
                     }
                     | ClientMessage::Debug { .. }
@@ -4048,6 +4049,9 @@ impl World {
         self.update_resource(session);
         let carry_speed = self.forge_carry_speed(session);
         let p = self.players.get_mut(&session).unwrap();
+        if p.merc.is_none() && p.ambient.is_none() && p.guard.is_none() {
+            p.character.played_secs += TICK;
+        }
         p.cooldown = (p.cooldown - TICK).max(0.);
         p.hurt = (p.hurt - TICK).max(0.);
         for timer in [

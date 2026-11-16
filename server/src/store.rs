@@ -230,6 +230,7 @@ impl Store {
             level: 1,
             xp: 0,
             festival_spirit: Default::default(),
+            played_secs: 0.,
             rested: crate::rested::Rested {
                 last_seen: unix_now().max(0) as u64,
                 ..Default::default()

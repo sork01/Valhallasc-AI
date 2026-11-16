@@ -254,6 +254,7 @@
     if (name === '/friend' || name === '/addfriend') { send({ op: 'friend_request', name: arg }); return true; }
     if (name === '/invite') { send({ op: 'party_invite', name: arg }); return true; }
     if (name === '/leave') { send({ op: 'party_leave' }); return true; }
+    if (name === '/played') { send({ op: 'played' }); return true; }
     return false;
   }
 

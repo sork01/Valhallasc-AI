@@ -30,6 +30,18 @@
     $('network-status').textContent = text;
     $('network-status').dataset.state = ready ? 'online' : 'offline';
   }
+  // `/played`: the server sends whole seconds online; days, hours and minutes are shown in the player's language (English fallback).
+  // PLAYED-BEGIN (tests/played-text.cjs runs this block)
+  const PLAYED = {
+    en: { head: 'Time played: ', units: [['day', 'days'], ['hour', 'hours'], ['minute', 'minutes']] },
+    sv: { head: 'Speltid: ', units: [['dag', 'dagar'], ['timme', 'timmar'], ['minut', 'minuter']] },
+  };
+  function playedText(seconds) {
+    const total = Math.max(0, Math.floor((Number(seconds) || 0) / 60)), L = PLAYED[window.Locale?.language] || PLAYED.en;
+    const parts = [Math.floor(total / 1440), Math.floor(total / 60) % 24, total % 60];
+    return L.head + parts.map((n, i) => n + ' ' + L.units[i][n === 1 ? 0 : 1]).join(', ');
+  }
+  // PLAYED-END
   function log(text, name, channel) {
     if (!name) text = window.Locale?.translate(text) || text;
     const line = document.createElement('p');
@@ -177,6 +189,7 @@
           window.Field?.bubble('npc:' + packet.npc, text); log(text, npc?.name || packet.npc, 'npc'); break;
         }
         case 'system': log(packet.text); break;
+        case 'played': log(playedText(packet.seconds)); break;
         case 'cutscene': window.Cutscene?.play(packet.scenes, { skippable: packet.skippable === true }); break;
         case 'announce': log(packet.text); window.Announce?.show(packet.text, packet.kind); break;
         case 'notice': window.Achievements?.onNotice(packet); if (packet.ok === false) window.Field?.error(packet.text); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
