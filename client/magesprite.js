@@ -355,7 +355,9 @@
   });
   // Head, shoulder and glove pieces use the class's tier, shared gear, or a catalog art layer.
   // A part missing from the class atlas is simply not drawn.
-  const FRONT_DIRS = [0, 1, 7], CLOTHES_OVER_HAIR = ['armor', 'pants', 'shoulders', 'gloves', 'necklace', 'accessory'], HAIR_TIE = 400;
+  const FRONT_DIRS = [0, 1, 7], BACK_DIRS = [3, 4, 5], CLOTHES_OVER_HAIR = ['armor', 'pants', 'shoulders', 'gloves', 'necklace', 'accessory'];
+  const HAIR_TIE = 400, BACK_SHOULDER_TIE = 150;
+  const hairTie = (dir, part) => FRONT_DIRS.includes(dir) ? (CLOTHES_OVER_HAIR.some(slot => part.startsWith(slot + '_')) ? HAIR_TIE : 0) : part.startsWith('shoulders_') ? BACK_SHOULDER_TIE : 0;
   const SLOT_ORDER = ['cloak', 'armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
   // A dungeon set needs a silhouette at field scale, not only a different tint on
   // the same 160px equipment rig. These marks sit behind the animated figure and
@@ -697,17 +699,17 @@
       const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
       const chosen = ['body'];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
-      // Facing the camera, a lock of hair lies almost flush on the sleeve or robe: a depth tie, so it showed through the clothes
-      // (shoulders, chest, hands). There the worn piece wins over hair that is only just nearer (HAIR_TIE); hair clearly in front stays.
-      const front = FRONT_DIRS.includes(dir), hairAt = front ? new Uint8Array(fw * fh) : null;
+      // Where hair lies almost flush on a worn piece (a depth tie) it flickered through the cloth: in the front views over sleeves,
+      // chest and hands, from the back quarters over the shoulder pieces as the walk cycle swings them. There the worn piece wins
+      // over hair that is only just nearer (`hairTie`); hair clearly in front stays.
+      const tracked = FRONT_DIRS.includes(dir) || BACK_DIRS.includes(dir), hairAt = tracked ? new Uint8Array(fw * fh) : null;
       for (const part of chosen) {
-        const f = this.source.parts[part][key];
-        const clothes = front && part !== 'body' && CLOTHES_OVER_HAIR.some(slot => part.startsWith(slot + '_'));
+        const f = this.source.parts[part][key], tie = part === 'body' || !tracked ? 0 : hairTie(dir, part);
         for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
           const pixel = y * f.w + x, src = pixel * 4, dst = (f.y + y) * fw + f.x + x;
           if (!f.pixels[src + 3]) continue;
           if (f.z[pixel] > nearest[dst]) {
-            if (!(clothes && hairAt[dst] && f.z[pixel] - nearest[dst] < HAIR_TIE)) continue;
+            if (!(tie && hairAt[dst] && f.z[pixel] - nearest[dst] < tie)) continue;
           }
           if (hairAt) hairAt[dst] = part === 'body' && this.hairColours.has(f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2]) ? 1 : 0;
           nearest[dst] = f.z[pixel];

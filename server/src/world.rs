@@ -129,8 +129,8 @@ pub(crate) fn hosted_counts(m: &Map) -> (usize, usize) {
     (slimes, quests)
 }
 
-/// Enemies that overlays put in many zones: the Ember Key crosses and the Empty Seat foes.
-#[cfg(test)]
+/// Enemies that overlays put in many zones: the Ember Key crosses, the Empty Seat foes and the yearly hunts. They belong to
+/// no zone's own level range (a chest's gear tier must ignore them: `chest_area_profile`).
 pub(crate) fn overlay_enemy(kind: &str) -> bool {
     kind == "ember_firelord"
         || kind.starts_with("es_foe")

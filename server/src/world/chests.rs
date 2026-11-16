@@ -538,6 +538,11 @@ impl World {
         let mut count = 0.;
         let mut kinds: Vec<String> = vec![];
         for s in self.slimes.iter().filter(|s| s.zone == zone) {
+            // The zone's own monsters set the gear tier, the gold and the material: a level 99 Ember Key cross or a hunt
+            // enemy standing in Greenmeadow must not make its chest drop level 75+ gear (or Firelord gold).
+            if overlay_enemy(&s.kind) {
+                continue;
+            }
             top = top.max(s.level);
             gold += s.gold as f64;
             count += 1.;
@@ -1043,6 +1048,36 @@ mod tests {
             .filter(|id| item(id).is_some_and(is_gear))
             .count();
         assert!(gear <= CHEST_GEAR_ROLLS + 1, "{gear}");
+    }
+
+    #[test]
+    fn a_chest_holds_only_what_its_own_area_drops_not_what_an_overlay_enemy_would() {
+        let mut w = world();
+        calm(&mut w);
+        let _rx = join(&mut w, 1, Class::Warrior);
+        // Greenmeadow holds a level 99 Ember Key cross (an overlay). Its chests are still Greenmeadow chests.
+        assert!(w.slimes.iter().any(|s| s.zone == 0 && s.kind == "ember_firelord"), "the fixture has the cross in zone 0");
+        let (top, _, kinds) = w.chest_area_profile(0);
+        let own = w.slimes.iter().filter(|s| s.zone == 0 && !overlay_enemy(&s.kind)).map(|s| s.level).max().unwrap();
+        assert_eq!(top, own);
+        assert!(top <= 10, "Greenmeadow tops out at {top}");
+        assert!(!kinds.iter().any(|k| overlay_enemy(k)), "{kinds:?}");
+        // Whatever a chest rolls there is gear of that tier, however often it is opened.
+        place(&mut w, 1, 0, at(60., 60.));
+        let before = w.drops.len();
+        for _ in 0..300 {
+            w.chest_contents(&w.players[&1].character.id.clone(), 0, at(60., 60.));
+        }
+        let limit = max_drop_level(top);
+        let worst = w.drops[before..]
+            .iter()
+            .filter_map(|d| d.item.as_deref())
+            .filter_map(item)
+            .filter(|i| is_gear(i) && i.source.is_none())
+            .map(|i| i.required_level)
+            .max()
+            .unwrap_or(0);
+        assert!(worst <= limit, "a Greenmeadow chest dropped level {worst} gear (limit {limit})");
     }
 
     #[test]
