@@ -2263,6 +2263,7 @@ mod tests {
         let mut sealed = open_map(60);
         sealed.objects = vec![
             crate::model::Obstacle {
+                surface: Default::default(),
                 x: 30.,
                 y: 19.,
                 width: 24.,
@@ -2270,6 +2271,7 @@ mod tests {
                 r: 0.,
             },
             crate::model::Obstacle {
+                surface: Default::default(),
                 x: 30.,
                 y: 41.,
                 width: 24.,
@@ -2277,6 +2279,7 @@ mod tests {
                 r: 0.,
             },
             crate::model::Obstacle {
+                surface: Default::default(),
                 x: 18.,
                 y: 30.,
                 width: 1.,
@@ -2284,6 +2287,7 @@ mod tests {
                 r: 0.,
             },
             crate::model::Obstacle {
+                surface: Default::default(),
                 x: 42.,
                 y: 30.,
                 width: 1.,

@@ -139976,5 +139976,468 @@
     "class": null,
     "variant": "cloak_l99_epic",
     "source": "raid_hierlooms"
+  },
+  {
+    "id": "fish_pier_sprat",
+    "name": "Pier Sprat",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_saltby_herring",
+    "name": "Saltby Herring",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_sand_dab",
+    "name": "Sand Dab",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_copper_mackerel",
+    "name": "Copper Mackerel",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_tide_flounder",
+    "name": "Tide Flounder",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_glass_eel",
+    "name": "Glass Eel",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_moonscale_carp",
+    "name": "Moonscale Carp",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_snow_minnow",
+    "name": "Snow Minnow",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_frost_char",
+    "name": "Frost Char",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_ice_perch",
+    "name": "Ice Perch",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_silver_smelt",
+    "name": "Silver Smelt",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_blue_grayling",
+    "name": "Blue Grayling",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_aurora_trout",
+    "name": "Aurora Trout",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_frostwake_pike",
+    "name": "Frostwake Pike",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_mud_loach",
+    "name": "Mud Loach",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_reed_bream",
+    "name": "Reed Bream",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_bog_dace",
+    "name": "Bog Dace",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_moss_catfish",
+    "name": "Moss Catfish",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_peat_eel",
+    "name": "Peat Eel",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_lantern_gar",
+    "name": "Lantern Gar",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_fen_crownfin",
+    "name": "Fen Crownfin",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_alder_trout",
+    "name": "Alder Trout",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_brook_dace",
+    "name": "Brook Dace",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_willow_chub",
+    "name": "Willow Chub",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_fern_perch",
+    "name": "Fern Perch",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_root_barb",
+    "name": "Root Barb",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_amber_salmon",
+    "name": "Amber Salmon",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_antler_sturgeon",
+    "name": "Antler Sturgeon",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_jade_barb",
+    "name": "Jade Barb",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_vine_tetra",
+    "name": "Vine Tetra",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_rain_guppy",
+    "name": "Rain Guppy",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_orchid_gourami",
+    "name": "Orchid Gourami",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_parrot_perch",
+    "name": "Parrot Perch",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_canopy_arowana",
+    "name": "Canopy Arowana",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_jade_dragonfish",
+    "name": "Jade Dragonfish",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_sand_tilapia",
+    "name": "Sand Tilapia",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_palm_minnow",
+    "name": "Palm Minnow",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_dune_carp",
+    "name": "Dune Carp",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_lapis_bream",
+    "name": "Lapis Bream",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_dusk_catfish",
+    "name": "Dusk Catfish",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_mirage_eel",
+    "name": "Mirage Eel",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_sapphire_lungfish",
+    "name": "Sapphire Lungfish",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_blossom_dace",
+    "name": "Blossom Dace",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_thaw_minnow",
+    "name": "Thaw Minnow",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_petal_chub",
+    "name": "Petal Chub",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_vernal_trout",
+    "name": "Vernal Trout",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_equinox_perch",
+    "name": "Equinox Perch",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_wheel_koi",
+    "name": "Wheel Koi",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_yearling_crownray",
+    "name": "Yearling Crownray",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_cinder_fry",
+    "name": "Cinder Fry",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 3
+  },
+  {
+    "id": "fish_slag_sucker",
+    "name": "Slag Sucker",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 4
+  },
+  {
+    "id": "fish_ash_barb",
+    "name": "Ash Barb",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 5
+  },
+  {
+    "id": "fish_basalt_eel",
+    "name": "Basalt Eel",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 9
+  },
+  {
+    "id": "fish_furnace_bass",
+    "name": "Furnace Bass",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 12
+  },
+  {
+    "id": "fish_obsidian_gar",
+    "name": "Obsidian Gar",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 30
+  },
+  {
+    "id": "fish_phoenix_koi",
+    "name": "Phoenix Koi",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 100
+  },
+  {
+    "id": "fish_sunfire_ray",
+    "name": "Sunfire Ray",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 110
+  },
+  {
+    "id": "rod_twig_rod",
+    "name": "Twig Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 1
+  },
+  {
+    "id": "rod_willow_rod",
+    "name": "Willow Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 10
+  },
+  {
+    "id": "rod_reedglass_rod",
+    "name": "Reedglass Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 25
+  },
+  {
+    "id": "rod_silverline_rod",
+    "name": "Silverline Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 40
+  },
+  {
+    "id": "rod_starcatch_rod",
+    "name": "Starcatch Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 60
+  },
+  {
+    "id": "rod_worldwire_rod",
+    "name": "Worldwire Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 80
+  },
+  {
+    "id": "rod_emberline_rod",
+    "name": "Emberline Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 5
+  },
+  {
+    "id": "rod_magma_reel",
+    "name": "Magma Reel",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 45
   }
 ]

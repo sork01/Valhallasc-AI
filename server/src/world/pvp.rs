@@ -1077,6 +1077,7 @@ mod tests {
         w.pvp_command(1, PvpCommand::DuelRequest { id: b.clone() });
         w.pvp_command(2, PvpCommand::DuelAccept { id: a });
         w.maps[0].objects = vec![crate::model::Obstacle {
+            surface: Default::default(),
             x: 277.5,
             y: 226.,
             r: 0.,

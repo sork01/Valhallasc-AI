@@ -231,6 +231,7 @@ impl Store {
             xp: 0,
             festival_spirit: Default::default(),
             played_secs: 0.,
+            fishing: Default::default(),
             rested: crate::rested::Rested {
                 last_seen: unix_now().max(0) as u64,
                 ..Default::default()

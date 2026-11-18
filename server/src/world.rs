@@ -11,6 +11,9 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod fishing;
+#[cfg(test)]
+mod fishing_tests;
 mod achievements;
 mod activity;
 /// Face a hero the way an atlas path demands: a `walk` portal only fires for a hero moving out through its side.
@@ -449,6 +452,7 @@ pub enum Command {
 }
 
 struct Player {
+    fishing: fishing::Session,
     character: Character,
     peer: Peer,
     input: Point,
@@ -633,6 +637,7 @@ impl Player {
             character,
             peer,
             input: Point::default(),
+            fishing: Default::default(),
             input_at: -99.,
             goal: None,
             target: None,
@@ -722,6 +727,11 @@ impl Player {
         view["abandonedQuests"] = json!(c.abandoned_quests);
         view["seasonalClaims"] = json!(c.seasonal_claims);
         view["seasonalRolls"] = json!(c.seasonal_rolls);
+        if let Some(line) = self.fishing.line {
+            view["fishing"] = line.view();
+            if line.biting { view["fishDeadline"] = json!(line.deadline()); }
+        }
+        if c.fishing.total > 0 { view["fishingLog"] = json!(c.fishing); }
         view["daze"] = json!(self.daze);
         view["danceT"] = json!(self.dance);
         view["festivalDance"] = self
@@ -2931,6 +2941,10 @@ impl World {
         let Some(p) = self.players.get_mut(&session) else {
             return;
         };
+        if matches!(message, ClientMessage::ShopPresence { open: false }) {
+            p.fishing.shopping = false;
+            return;
+        }
         if (p.character.hp <= 0. && p.character.ghost)
             && !matches!(
                 message,
@@ -3002,6 +3016,11 @@ impl World {
                         .peer
                         .try_send(json!({"type":"error","text":text}));
                 }
+            }
+            ClientMessage::Fish {} => self.fish_press(session, fishing::now()),
+            ClientMessage::ShopPresence { open } => {
+                p.fishing.shopping = open;
+                if open && p.fishing.line.is_some() { self.fish_end(session, "Line pulled in.", false, fishing::now()); }
             }
             ClientMessage::Stop => p.stop(),
             ClientMessage::Move { x, y } if x.is_finite() && y.is_finite() => {
@@ -3819,6 +3838,9 @@ impl World {
         for session in sessions {
             self.update_food(session);
             self.update_player(session);
+            if self.players.get(&session).is_some_and(|p| p.fishing.line.is_some()) {
+                self.fish_update(session, fishing::now());
+            }
         }
         self.update_spark_discovery();
         // Players pass through actors; enemies yield before their own movement.
@@ -11586,6 +11608,7 @@ mod tests {
     fn enemies_block_each_other_but_players_can_walk_and_dash_through_actors() {
         let map = Map {
             grid: Default::default(),
+            fishing_spots: vec![],
             crosses: vec![],
             name: String::new(),
             theme: String::new(),
@@ -12964,6 +12987,7 @@ mod tests {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Hunter);
         w.maps[0].objects = vec![crate::model::Obstacle {
+            surface: Default::default(),
             x: 32.,
             y: 30.,
             r: 0.,

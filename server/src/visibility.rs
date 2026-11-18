@@ -6,6 +6,8 @@ use std::collections::BTreeSet;
 /// Player fields sent only to their owner (see `filter_view`). Everything else stays for other clients: what is drawn
 /// (look, position, health, buffs, mount, `signatureWeapon`), PvP/trade/party flags and the nameplate title.
 const OWN_ONLY: &[&str] = &[
+    "fishDeadline",
+    "fishingLog",
     "quests",
     "inventory",
     "equipment",

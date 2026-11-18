@@ -1,0 +1,10 @@
+[
+{"item": "rod_twig_rod", "tier": 1, "lava": false},
+{"item": "rod_willow_rod", "tier": 2, "lava": false},
+{"item": "rod_reedglass_rod", "tier": 3, "lava": false},
+{"item": "rod_silverline_rod", "tier": 4, "lava": false},
+{"item": "rod_starcatch_rod", "tier": 5, "lava": false},
+{"item": "rod_worldwire_rod", "tier": 6, "lava": false},
+{"item": "rod_emberline_rod", "tier": 1, "lava": true},
+{"item": "rod_magma_reel", "tier": 2, "lava": true}
+]

@@ -314,6 +314,21 @@ pub struct Corpse {
     #[serde(default)]
     pub fy: f64,
 }
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FishingLog {
+    pub total: u64,
+    pub legendary: u64,
+    pub longest_streak: u64,
+    pub species: std::collections::BTreeMap<String, FishRecord>,
+}
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FishRecord {
+    pub count: u64,
+    pub best_kg: u32,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Character {
@@ -338,6 +353,8 @@ pub struct Character {
     /// Seconds this character has been online (`/played`): counted every tick while a real player is in the world.
     #[serde(default)]
     pub played_secs: f64,
+    #[serde(default)]
+    pub fishing: FishingLog,
     pub gold: u32,
     pub kills: u32,
     #[serde(default)]
@@ -666,6 +683,7 @@ impl Character {
             rested: Default::default(),
             festival_spirit: Default::default(),
             played_secs: 0.,
+            fishing: FishingLog::default(),
             gold: 0,
             kills: 0,
             quests: vec![],
@@ -1423,6 +1441,8 @@ pub fn quest_progress(character: &mut Character, quests: &[Quest], kind: &str, t
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ClientMessage {
+    Fish {},
+    ShopPresence { open: bool },
     Join {
         version: u32,
         token: Option<String>,
@@ -1870,8 +1890,27 @@ pub enum QuestDebug {
     Reset,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FishingSurface {
+    Water,
+    Seafoam,
+    JungleWater,
+    YearSpringPool,
+    FrostwakeFrozenPool,
+    JadePool,
+    LapisOasis,
+    Lava,
+    EwLava,
+    Void,
+    #[default]
+    #[serde(other)]
+    Other,
+}
 #[derive(Clone, Deserialize)]
 pub struct Obstacle {
+    #[serde(default, rename = "kind")]
+    pub surface: FishingSurface,
     pub x: f64,
     pub y: f64,
     pub r: f64,
@@ -2166,6 +2205,8 @@ pub struct RaidCross {
 /// starts, and the quest that finds them when they leave it.
 #[derive(Clone, Debug, Deserialize)]
 pub struct Dock {
+    #[serde(default)]
+    pub ship: Option<DockShip>,
     pub x0: f64,
     pub x1: f64,
     pub y0: f64,
@@ -2177,6 +2218,13 @@ pub struct Dock {
     pub greeter: Option<String>,
     #[serde(default)]
     pub greeting: Option<String>,
+}
+#[derive(Clone, Debug, Deserialize)]
+pub struct DockShip {
+    pub x: f64,
+    pub y0: f64,
+    pub y1: f64,
+    pub beam: f64,
 }
 impl Dock {
     pub fn contains(&self, p: Point) -> bool {
@@ -2196,6 +2244,8 @@ pub struct Map {
     pub size: u32,
     pub spawn: Point,
     pub objects: Vec<Obstacle>,
+    #[serde(default, rename = "fishingSpots")]
+    pub fishing_spots: Vec<Point>,
     /// Built on first use; see `object_grid.rs`.
     #[serde(skip)]
     pub grid: crate::object_grid::GridSlot,
@@ -2505,6 +2555,7 @@ mod tests {
     fn a_map_whose_obstacles_were_replaced_uses_the_scan() {
         let mut map = Map {
             objects: vec![Obstacle {
+                surface: Default::default(),
                 x: 5.,
                 y: 5.,
                 r: 1.,
@@ -2516,6 +2567,7 @@ mod tests {
         };
         assert!(!map.line_clear(Point { x: 1., y: 5. }, Point { x: 9., y: 5. }, 0.));
         map.objects = vec![Obstacle {
+            surface: Default::default(),
             x: 5.,
             y: 9.,
             r: 1.,
@@ -2532,6 +2584,7 @@ mod tests {
     fn sight_lines_stop_at_rectangular_walls_and_round_obstacles() {
         let mut map = Map {
             objects: vec![Obstacle {
+                surface: Default::default(),
                 x: 5.,
                 y: 5.,
                 width: 1.,
@@ -2554,6 +2607,7 @@ mod tests {
             "a clear corner gap stays usable"
         );
         map.objects = vec![Obstacle {
+            surface: Default::default(),
             x: 5.,
             y: 5.,
             width: 0.,
@@ -2689,6 +2743,7 @@ mod tests {
     fn collision_blocks_dash_tunnelling_and_resolves_centres() {
         let map = Map {
             grid: Default::default(),
+            fishing_spots: vec![],
             crosses: vec![],
             name: String::new(),
             theme: String::new(),
@@ -2714,6 +2769,7 @@ mod tests {
             raid: false,
             template: None,
             objects: vec![Obstacle {
+                surface: Default::default(),
                 x: 5.,
                 y: 5.,
                 r: 0.4,

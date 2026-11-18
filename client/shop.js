@@ -22,6 +22,7 @@
   function request() { send({ type: 'shop_open' }); }
   function closeWarning() { if (warning) { warning.close(); warning.remove(); warning = null; } }
   function close() {
+    if (npc) Online.send({type:'shop_presence',open:false});
     closeWarning(); settle(); npc = null; container = null; data = null; packet = null; basket.clear(); snapshotKey = ''; lastNotice = '';
     $('merchant-service')?.remove();
     $('npc-dialogue').classList.remove('merchant-mode'); portrait.hidden = true; $('npc-dialogue').querySelector('.merchant-tabs')?.remove();
@@ -178,7 +179,7 @@
   window.Shop = {
     render(merchant, target, dialogue) {
       const opening = npc?.id !== merchant.id || container !== target;
-      if (opening) { close(); npc=merchant; zone=Field.zone||0; container=target; tab='merchant'; page=0; packet=dialogue; lastNotice=dialogue.notice || ''; mount(); draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} }
+      if (opening) { close(); Online.send({type:'shop_presence',open:true}); npc=merchant; zone=Field.zone||0; container=target; tab='merchant'; page=0; packet=dialogue; lastNotice=dialogue.notice || ''; mount(); draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} }
       else { const answered=packet!==dialogue&&pendingKind==='interact'; packet=dialogue; if(dialogue.notice)lastNotice=dialogue.notice; if(answered){settle();if(npc.buys)request();else data={available:[],buyBack:[],gold:packet.gold};} draw(); }
     }, close, isStockOffer,
     bagTooltip(id) { if (window.Quests?.needsMaterial(id)) return {copies:[],count:1,in:Locale.translate('Your bags'),hint:Locale.translate('Needed for an active quest · cannot sell or discard')}; if (data?.discardable?.some(row => row.item === id)) return {copies:[],count:data.discardable.find(row=>row.item===id).quantity,in:Locale.translate('Your bags'),hint:Locale.translate('Sell this material or open Quest leftovers to discard it for no gold.')}; const row=data?.available?.find(row=>row.item===id); return npc&&row?{copies:row.gear?[row.gear]:[],count:row.quantity,in:Locale.translate('Your bags'),hint:`${Locale.translate('Sell for')} ${Money.text(price(row))}`}:undefined; },
