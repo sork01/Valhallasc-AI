@@ -4,8 +4,8 @@ Owner request (2026-11-18): fishing with craftable rods, a bobber in the water y
 
 ## Release 1.1.0 (2026-11-19)
 
-The full feature is prepared for public release as **1.1.0**. Activation awaits
-the owner's live-game restart approval. This section supersedes earlier
+The full feature is **live as 1.1.0**, released after the owner explicitly
+approved activation and the public-game restart. This section supersedes earlier
 "not live" task handoffs below; the design above those handoffs is current.
 
 The release contains all 57 species, eight cumulative rod upgrades, 13 Fishers,
@@ -47,6 +47,25 @@ are part of this release. Executable, consistent running SQLite backup and
 previous proxy config are saved under
 `deploy/backups/fishing-release-20261119T172440Z/`; the deployment receipt is
 `www/Valhalla/fishing-release-receipt.json`.
+
+### Verified deployment
+
+Released `1.1.0-6894bda4` from source `6894bda4011d729bc6d6fd8a1fe11a25e25ebbf0`. Live PID `820312`;
+executable SHA-256 `a076bb1024f21a0958ebb802f7c07e914d63fe697dfa7bd889c32a0c0c4ac821`. Both public/bridge health pass;
+all 34 changed public client files match their released bytes, SQLite
+`quick_check` is `ok`, and the deployment journal has no errors. Production uses
+its original database/current-client paths with no test-only flags. The manual
+service retains PID `785724` and its independent database; its health,
+HTTPS route and fishing assets pass. Apache config remains valid.
+
+The release client was validated and copied byte-for-byte through
+`release_client.sh` into a staging root, then moved to the final releases folder.
+Only after approval and a separate service stop were the final database copy,
+candidate executable and retained proxy config installed; the release helper's
+atomic link swap activated the prepared client, followed by a separate start.
+The previous client release and executable/running/stopped database backups are
+retained. The later documentation-only completion commit does not require another
+client release or game restart.
 
 ## Grill answers (2026-11-18)
 - **Bite:** pure timing, one press. Every fish has the same window. Rarity comes from the tables, rod and spot, never from a harder press.
