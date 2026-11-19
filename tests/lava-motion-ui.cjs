@@ -12,7 +12,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe',env:{...process.env}}));
   const world=await call('start_world',{godMode:true,startLevel:99,levelSpread:0});started=true;
   browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/home/serveperry/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome'});
-  const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'no-preference'}),errors=[];
+  const page=await browser.newPage({viewport:{width:Number(process.env.VW)||1440,height:Number(process.env.VH)||900},reducedMotion:'no-preference'}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   if(process.env.MUTATE)await page.route('**/emberwakeart.js',async route=>{
     const r=await route.fetch();await route.fulfill({response:r,body:(await r.text())+'\nEmberwakeArt.moltenMotion=()=>{};'});

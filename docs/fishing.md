@@ -492,7 +492,7 @@ recreation and stop commands. The transient service lasts until stopped/rebooted
 the starter preserves its existing database. A normal later client release
 replaces the Apache include, so retain/remove the test route deliberately then.
 
-FISH-RELEASE remains pending. Final post-rich-fix lava/language browser reruns remain pending. The latest lava browser closed during startup before its assertions; prior clean 18-check run and mutation passed. Extra runs stopped when the owner reported only 2% usage remaining.
+FISH-CHECK is complete. After the owner resumed work, the final post-rich-fix lava and full Swedish browser reruns passed. Lava uses `VW=960 VH=600` and the cached headless shell to reduce its rendering footprint; the 1.5 GiB/no-swap/one-CPU limits and all 18 assertions/thresholds remain unchanged. `tests/lava-motion-ui.cjs` retains its normal viewport by default and now accepts the explicit override. Rich-spot mutation checks use placeholder character sprites while preserving the actual painted pond; the normal rich-spot scene/hover/cast run used real character art. FISH-RELEASE remains pending.
 
 No version bump, release notes, live release link
 swap, production game restart, world sync or FileDrop upload belongs to this check.
