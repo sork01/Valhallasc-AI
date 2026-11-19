@@ -2,6 +2,52 @@
 
 Owner request (2026-11-18): fishing with craftable rods, a bobber in the water you press for when a fish bites, animations, fish icons, rare drops, places to fish, and heat-resistant line upgrades for lava. Backlog chain: `FISH-*` in `TODO.md`.
 
+## Release 1.1.0 (2026-11-19)
+
+The full feature is prepared for public release as **1.1.0**. Activation awaits
+the owner's live-game restart approval. This section supersedes earlier
+"not live" task handoffs below; the design above those handoffs is current.
+
+The release contains all 57 species, eight cumulative rod upgrades, 13 Fishers,
+52 ordinary Fisher quests, 16 cooked dishes with ten-minute bonuses, the fishing
+log/records, 13 achievements and two titles. The manual instance at
+https://gunning.se/ValhallaFishing/ keeps its independent service, database and
+saved progress. Its proxy block is now retained in `deploy/apache.conf`, so a
+normal client release preserves it. Production keeps its existing database and
+normal configuration; manual-test grants and test flags are not deployed.
+
+Final release checks:
+- `tests/fishing-progression-ui.cjs`, explicitly approved on the bounded local
+  runner: real-art desktop/600x390 phone ladder, current/next rod, ingredient and
+  replacement descriptions, food tooltip and actual ten-minute buff pass. The
+  screenshots in `test-results/driver-YGpzT6/` and the corrected production-build
+  run `test-results/driver-IZXDbW/` were inspected. `MUTATE=ladder`
+  removes real served rows and fails the complete-eight-rods assertion.
+- Screenshot review caught long desktop recipe descriptions squeezed beside
+  the craft button. Recipes now use full-width text above the button at every
+  viewport; the visual test checks actual text width and button position, and
+  `MUTATE=workshop` restores the cramped layout to prove that check.
+- `tests/fishing-release.cjs`: label/notes/keep list, separate public/manual
+  routes, WebSocket ordering and matching generated fish/rod/food definitions
+  pass. `MUTATE=route` fails when the manual HTTP route is removed.
+- Production `cargo build --release` succeeds (54 MiB executable); its private
+  `tests/fishing-progression.cjs` probe passes seven predecessor-consuming
+  upgrades, ordinary water/both lava areas/Yearwheel, named rod gates, actual
+  food bonus/shared cooldown and inventory persistence. Only the previously
+  documented `mail_unread` dead-code warning remains in this build.
+- The existing 90 progression client assertions and standard client release
+  dry-run (notes, Swedish freshness and all JavaScript syntax checks) pass.
+  Removing the newest notes also fails the existing notes mutation guard.
+- All 47 authored zone identities/order match main: no private-copy zone ID
+  migration. Current and candidate Apache directives are identical, apart from
+  the manual block's retention comment; Apache reports `Syntax OK`.
+
+No balance suites, full world regeneration or public guest-login smoke test
+are part of this release. Executable, consistent running SQLite backup and
+previous proxy config are saved under
+`deploy/backups/fishing-release-20261119T172440Z/`; the deployment receipt is
+`www/Valhalla/fishing-release-receipt.json`.
+
 ## Grill answers (2026-11-18)
 - **Bite:** pure timing, one press. Every fish has the same window. Rarity comes from the tables, rod and spot, never from a harder press.
 - **Where:** any shore next to water (or lava once platinum line is unlocked), plus marked rich ripple spots.

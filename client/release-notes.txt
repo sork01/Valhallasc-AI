@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.1.0",
+    "date": "2026-11-19",
+    "new": [
+      "Fishing is here: face the water, press R to cast, and press again when a fish bites. Touch controls offer Cast and Hook.",
+      "Discover 57 fish species across rivers, coasts, icy pools, swamps, jungle waters, oases, springs and lava. Rich ripple spots offer better chances of rare catches and move when their shared fish run out.",
+      "Visit waterside Fishers to buy a Twig Rod and craft seven upgrades. Platinum line unlocks Crags lava, tempered platinum line unlocks Emberwake, and every upgrade keeps your earlier waters.",
+      "Cook fish into 16 dishes with ten-minute bonuses, complete Fisher quests, and track your catches and weight records in the fishing log.",
+      "Earn 13 fishing achievements and unlock the Angler and Lavacaster titles."
+    ],
+    "changed": [
+      "Fisher workshops show upgrade requirements above the craft button so long descriptions stay readable."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.0.1",
     "date": "2026-11-19",
     "new": [],

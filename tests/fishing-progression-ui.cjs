@@ -1,0 +1,55 @@
+// Approved browser host only; complete process tree must use the bounded runner.
+require('./lib/touch.cjs').requireMemoryLimit();
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {chromium}=require('./lib/playwright.cjs'),{TestWorld}=require('../scripts/testing/driver.cjs');
+const root=path.resolve(__dirname,'..'),world=JSON.parse(fs.readFileSync(path.join(root,'world/map.txt'))),rods=JSON.parse(fs.readFileSync(path.join(root,'world/rods.txt')));
+const w=new TestWorld();w.startLevel=99;w.levelSpread=0;let browser,page;const errors=[];
+(async()=>{
+ await w.start();browser=await chromium.launch({headless:true,args:['--disable-gpu']});
+ page=await browser.newPage({viewport:{width:960,height:600},reducedMotion:'reduce'});
+ page.on('pageerror',e=>errors.push(e.message));
+ if(process.env.MUTATE==='ladder'){
+  const source=fs.readFileSync(path.join(root,'client/fishing.js'),'utf8');assert(source.includes('ladder.append(row);'));
+  await page.route('**/fishing.js',r=>r.fulfill({contentType:'application/javascript',body:source.replace('ladder.append(row);','')}));
+ }
+ if(process.env.MUTATE==='workshop')await page.route('**/online.css',r=>r.fulfill({contentType:'text/css',body:fs.readFileSync(path.join(root,'client/online.css'),'utf8')+'\n.fisher-recipe { flex-direction:row !important; }'}));
+ await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
+ await page.goto(w.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('RodReleaseUI');await page.locator('#go').click({timeout:60000});
+ await page.waitForFunction(()=>Online.connected&&Field.warriorSprites,null,{timeout:60000});await page.locator('#connection-overlay').waitFor({state:'hidden'});
+ const debug=command=>page.evaluate(command=>Online.send({type:'debug',command}),command);
+ await page.evaluate(()=>window.Tutorial?.disable?.());if(await page.locator('#low-gfx-dismiss').isVisible())await page.locator('#low-gfx-dismiss').click();
+ await debug({op:'give_item',item:'rod_emberline_rod',quantity:1});await debug({op:'give_item',item:'dish_shore_grill',quantity:1});
+ await page.waitForFunction(()=>Inventory.bagQuantity('rod_emberline_rod')===1&&Inventory.bagQuantity('dish_shore_grill')===1);
+ await page.evaluate(()=>Fishing.open());const progression=page.locator('.fishing-progression');
+ assert((await progression.innerText()).includes('Current rod: Platinum Rod'));assert((await progression.innerText()).includes('Next upgrade: Willow Rod'));
+ await progression.locator('summary').click();const rows=progression.locator('details > div');
+ assert.equal(await rows.count(),rods.length,'complete eight-rod ladder is rendered');
+ assert.deepEqual(await rows.locator('b').allTextContents(),rods.map(r=>r.name));
+ assert((await rows.nth(1).innerText()).includes('Crags lava'));assert((await rows.nth(5).innerText()).includes('Emberwake lava'));
+ assert((await rows.last().innerText()).includes('42% shorter waits'));assert((await rows.last().innerText()).includes('+70% rare catch bonus'));
+ assert(await page.locator('.fishing-window').evaluate(e=>e.scrollWidth<=e.clientWidth+1));
+ await page.screenshot({path:path.join(w.runDir,'progression-desktop.png')});
+ await page.setViewportSize({width:600,height:390});await rows.last().scrollIntoViewIfNeeded();
+ assert(await rows.last().isVisible());assert(await page.locator('.fishing-window').evaluate(e=>e.scrollWidth<=e.clientWidth+1),'expanded ladder fits small landscape phones');
+ await page.screenshot({path:path.join(w.runDir,'progression-phone.png')});
+ await page.locator('#fishing-close').click();await page.setViewportSize({width:960,height:600});
+ const npc=world.npcs.find(n=>n.id==='fisher_meadow_0');await debug({op:'teleport',zone:0,x:npc.x,y:npc.y});
+ await page.waitForFunction(n=>Math.hypot(Field.hero.x-n.x,Field.hero.y-n.y)<.1,npc);
+ await page.evaluate(()=>Online.send({type:'interact',npc:'fisher_meadow_0'}));await page.locator('[data-view="fisher"]').click();
+ const recipe=page.locator('[data-recipe="rod:2"]');
+ assert((await recipe.innerText()).includes('Upgrading consumes the previous rod.'));assert((await recipe.innerText()).includes('Platinum Rod: 1 / 1'));
+ assert(await recipe.evaluate(e=>{const text=e.firstElementChild.getBoundingClientRect(),button=e.querySelector('button').getBoundingClientRect(),row=e.getBoundingClientRect();return text.width>=row.width-1&&button.top>=text.bottom;}),'desktop upgrade description has the full recipe width above its craft button');
+ await recipe.scrollIntoViewIfNeeded();await page.screenshot({path:path.join(w.runDir,'progression-workshop.png')});
+ await page.setViewportSize({width:600,height:390});await recipe.scrollIntoViewIfNeeded();
+ assert(await page.locator('.gossip-parchment').evaluate(e=>e.scrollWidth<=e.clientWidth+1),'detailed upgrade recipe fits a small phone');
+ await page.screenshot({path:path.join(w.runDir,'progression-workshop-phone.png')});await page.locator('#npc-x').click();
+ await page.setViewportSize({width:960,height:600});
+ await page.evaluate(()=>Inventory.showTooltip(document.getElementById('inventory-open'),Inventory.definition('dish_shore_grill')));
+ const tip=page.locator('#item-tooltip');await tip.waitFor({state:'visible'});assert((await tip.innerText()).includes('2% attack speed for 10 min.'));assert((await tip.innerText()).includes('One food bonus at a time.'));
+ await page.screenshot({path:path.join(w.runDir,'progression-food-tooltip.png')});
+ await page.evaluate(()=>{Inventory.hideTooltip();Online.send({type:'use_item',item:'dish_shore_grill'});});
+ const buff=page.locator('[data-buff="meal:dish_shore_grill"]');await buff.waitFor({state:'visible'});assert.match(await buff.locator('i').textContent(),/^(10:00|9:\d\d)$/);
+ await buff.hover();await page.locator('#buff-tooltip').waitFor({state:'visible'});assert((await page.locator('#buff-tooltip').innerText()).includes('2% attack speed'));
+ await page.screenshot({path:path.join(w.runDir,'progression-food-buff.png')});assert.deepEqual(errors,[]);
+ console.log('Progression UI: current/next rod, full cumulative ladder, desktop/phone layout, workshop ingredients, food tooltip and real ten-minute bonus pass.');console.log('Screenshots:',w.runDir);
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();await w.stop();});
