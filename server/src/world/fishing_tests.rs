@@ -380,3 +380,13 @@ fn fishing_achievements_titles_survive_sqlite_reconnect_and_snapshot() {
             .is_some_and(|text| text.starts_with("Achievement earned:"))
     }));
 }
+
+#[test]
+fn fishing_client_shared_clock_is_unix_time() {
+    let (w, _) = angler();
+    let before = fishing::now();
+    let snapshot = w.snapshot_for(0);
+    let time = snapshot["fishingTime"].as_f64().expect("shared Unix clock");
+    assert!((before..=fishing::now()).contains(&time));
+    assert!(time > 1_700_000_000.);
+}

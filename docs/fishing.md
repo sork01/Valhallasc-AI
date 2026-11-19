@@ -310,3 +310,81 @@ the same art. The bobber, line, cast arc and splash remain procedural overlays.
 This work is private and has no version bump or release note; those belong to
 FISH-RELEASE. No world data, saved characters, production DB, running binary or
 live release link changed. Nothing was uploaded to FileDrop.
+
+## FISH-CLIENT implementation (2026-11-19, feature branch only)
+
+The fishing client is implemented in `client/fishing.js`, with Field hooks in the
+ground and foreground passes. It draws cast arcs, rods/lines, water and ember
+bobbers, wait ripples, bite splashes and a draining server-clock ring, reel/fish
+arcs, miss ripples and three-second catch cards. Other players' public lines are
+drawn from their snapshots. Rich ripples use **only active `snapshot.fishingSpots`**;
+the map's candidate pool is never drawn. Low graphics and reduced motion simplify
+the effects and suppress the legendary edge glow.
+
+The new `fish` action defaults to **R**, verified free with `Keys.holders`, and is
+rebindable in Keyboard settings. Held-key repeat and text entry cannot cast.
+Every fresh press sends only `{type:"fish"}`; the world owns eligibility, timing,
+loot and records. Touch uses one contextual Cast/Hook button beside the skills,
+with pointerdown activation and synthetic-click suppression. Shore visibility
+checks matching usable rods and the facing ray against pools or Saltby's dock
+sea mask; it is a cached UI hint, with authoritative validation unchanged.
+
+**World Menu → Fishing log** opens the resizable collection window. It lists all
+57 species with silhouettes until caught, filters by habitat, and shows saved
+catch totals, legendary catches, longest streaks and per-species counts/best
+weights. Habitat option values remain English IDs when their labels translate.
+Catch cards and the log reuse `Inventory.icon`. All new UI text is hand-written
+in Swedish. Catch events add one rarity-marked System line; misses use the red
+error stack. Reconnect/character changes clear private UI and pending effects.
+
+All seven existing recorded cues play through `sfxOut(c)` and honour Sound/SFX
+preferences. Plop plays at landing, bite on the event, reel before the card, then
+one ordinary catch **or** legendary celebration. Decoded audio is cached; muted,
+late and out-of-game requests do not play obsolete cues.
+
+Two small presentation protocol additions complete the UI: `snapshot.fishingTime`
+shares the Unix clock used by private bite deadlines, and a legendary hook emits
+one `announce`/`treasure` packet to its zone. The announcement carries its actor
+so existing hidden-GM filtering applies. Ordinary catches, junk, treasure and
+rebirth extra copies do not create additional legendary announcements.
+
+### FISH-CLIENT verification
+
+- `node tests/fishing-client.cjs`: **717 behavioural checks**, including all 644
+  authored shore witnesses, the real Field key/action routing and touch handlers,
+  key rebinding/repeat/typing guards, active-point rendering/depletion, other
+  players' bobbers, server-clock countdown, reel/card timing, record filters,
+  silhouettes, cleanup, reduced motion, System lines, real Swedish translation
+  and recorded-audio bus/mute/cache/latency handling. Catch cards stay inside
+  phone screen edges after converting between scene and CSS pixels.
+- Its nine in-memory `MUTATE=input|spots|records|deadline|privacy|cleanup|sound|cardX|cardY`
+  controls fail their intended behavioural assertions; they remain effective
+  after committing because they mutate the current implementation directly.
+- Three focused Rust checks pass for the Unix clock, one legendary announcement
+  (ordinary/junk catches excluded, rebirth copies counted once), zone delivery,
+  hidden actors and private catch events. `tests/fishing-client-mutations.py`
+  catches four independent protocol mutations (clock, missing announcement,
+  ordinary announcement and wrong zone). Source is restored in `finally`;
+  clean focused tests and a private executable rebuild pass afterwards. The
+  runner requires exclusive worktree access.
+- `tests/fishing-client-probe.cjs` drives the actual client controller with real
+  WebSocket packets from a disposable private server/DB: cast, public bobber,
+  private deadline/result, hook, reel/card/sound order, bag award and reconnect
+  persistence pass. **30 snapshots in 2.915 seconds**, tick gaps of two. No loot
+  grinding or encounter/balance testing.
+- Swedish freshness, the catalogue gate and 23 existing locale checks pass.
+  Changed JS/Python syntax and diff whitespace pass. Strict all-target Clippy
+  reports only the documented baseline: `mail_unread`, hosted-count helpers,
+  quest-drop documentation indentation and the quest-journal single-element
+  loop. No source lint suppressions were added.
+- Browser coverage is prepared in `tests/fishing-ui.cjs` for actual keyboard and
+  touch casting, catch cards, early misses, collection/filter UI and landscape
+  phone layout. **It has not run:** the approved cloud host was retired and the
+  owner bars browser suites on this production host. Its disabled-feature
+  `MUTATE=1` control and visual review remain for an approved replacement host
+  under **FISH-CHECK**, alongside the existing lava-motion/achievement checks.
+
+This slice does not change the 57 species, eight rods, art assets, world data or
+achievement catalogue. It has no version bump, release note, public deployment,
+service restart or production database change. **FISH-CHECK and FISH-RELEASE remain
+open.** Release/version work belongs to FISH-RELEASE.

@@ -42,7 +42,7 @@
     b.addEventListener('click', e => { if (!e.detail || performance.now() - lastTouch > 700) Keys.invoke(action); }); parent.append(b); return b;
   }
   Keys.register('attack', () => coarse.matches && !Field.hero?.pvpTargetId ? Field.startNearestAutoattack() : Field.action('attack'));
-  for (const name of ['dash', 'talk', 'interact', 'mount']) Keys.register(name, () => Field.action(name));
+  for (const name of ['dash', 'talk', 'interact', 'mount', 'fish']) Keys.register(name, () => Field.action(name));
   for (let i = 0; i < 12; i++) Keys.register('skill' + (i + 1), () => {
     const id = $('skillbar-slots').children[i]?.dataset.skill; return id ? Field.useSkill(id) : false;
   });
@@ -58,6 +58,7 @@
     return Online.focusChat();
   });
   Keys.register('quests', () => { Quests.show(); return true; });
+  const fish = button('Cast', 'fish', arc); fish.className = 'touch-fish'; fish.hidden = true;
   const attack = button('Attack', 'attack', arc); attack.className = 'touch-attack';
   const skillButtons = Array.from({ length: 4 }, (_, i) => {
     const action = 'touchSkill' + (i + 1), b = button('Empty', action, arc); b.className = 'touch-skill'; b.dataset.arc = i; b.hidden = true;
@@ -167,6 +168,8 @@
   let lastState = '';
   function update() {
     if (!coarse.matches || !Field.hero) return;
+    fish.hidden = !window.Fishing?.available(); fish.disabled = !Field.canAct || !!Field.hero.sparkTravel;
+    const bite = window.Fishing?.phase === 'bite'; fish.dataset.bite = String(bite); fish.textContent = tr(bite ? 'Hook!' : 'Cast');
     const ids = assignments(), states = ids.map(id => Skillbar.state(id));
     attack.disabled = !Field.canAct || !!Field.hero.sparkTravel;
     targetMenu.hidden = $('hud-target').hidden || !$('hud-target').classList.contains('has-menu');

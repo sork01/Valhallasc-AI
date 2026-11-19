@@ -949,7 +949,22 @@
     const buffer = bossCueBuffers[cue[0]] ||= fetch(`assets/sfx_boss_${cue[0]}.mp3`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).catch(() => null);
     buffer.then(b => { if (!b || !save.sound) return; const source = c.createBufferSource(), gain = c.createGain(); gain.gain.value = cue[1]; source.buffer = b; source.connect(gain); gain.connect(sfxOut(c)); source.start(); });
   }
+  // FISHING-SOUND-BEGIN: recorded cues share the ordinary Sound/SFX bus.
+  const fishingCueBuffers = {};
+  function fishingSound(cue) {
+    if (!['cast', 'plop', 'bite', 'reel', 'catch', 'legendary', 'lava'].includes(cue) || !save.sound) return;
+    const c = audio(); if (!c) return;
+    const requested = performance.now();
+    const buffer = fishingCueBuffers[cue] ||= fetch(`assets/sfx_fish_${cue}.mp3`).then(r => { if (!r.ok) throw Error('fish_audio'); return r.arrayBuffer(); }).then(b => c.decodeAudioData(b)).catch(() => { delete fishingCueBuffers[cue]; return null; });
+    buffer.then(b => {
+      if (!b || !save.sound || scene !== 'game' || performance.now() - requested > 1200) return;
+      const source = c.createBufferSource(); source.buffer = b; source.connect(sfxOut(c)); source.start();
+    });
+  }
+  // FISHING-SOUND-END
   const SFX = {
+    fishingSound,
+
     bossMech: bossMechSound,
     forgeProc: ev => {
       const base = {warrior:110, mage:440, assassin:220, priest:660, hunter:330}[ev.weapon] || 220;
@@ -1200,7 +1215,7 @@
       window.Settings?.applyScale?.();
     }
   }
-  function setPause(on) { window.Attributes?.close?.(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); hideBuffTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
+  function setPause(on) { window.Fishing?.close(false); window.Attributes?.close?.(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); hideBuffTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
     mage.set(c);

@@ -176,9 +176,17 @@ fn fishing_lava_catches_use_local_species_junk_tiers_and_legendaries() {
             let line = w.players[&1].fishing.line.unwrap();
             w.rng = seed;
             w.fish_press(1, line.deadline());
-            let catch = std::iter::from_fn(|| rx.try_recv().ok())
-                .find(|v| v["kind"] == "fish_catch")
-                .unwrap();
+            let packets: Vec<_> = std::iter::from_fn(|| rx.try_recv().ok()).collect();
+            let catch = packets.iter().find(|v| v["kind"] == "fish_catch").unwrap();
+            let announcements: Vec<_> = packets.iter().filter(|v| v["type"] == "announce").collect();
+            assert_eq!(announcements.len(), usize::from(expected == legendary));
+            if expected == legendary {
+                assert_eq!(announcements[0]["kind"], "treasure");
+                let text = announcements[0]["text"].as_str().unwrap();
+                assert!(text.contains("Fisher"));
+                assert!(text.contains(item(expected).unwrap().name.as_str()));
+                assert!(text.contains(&format!("ca {} kg", catch["kg"])));
+            }
             assert_eq!(catch["item"], expected, "zone {zone}, seed {seed}");
             let c = &w.players[&1].character;
             assert_eq!(c.point().distance(from), 0.);
@@ -268,5 +276,67 @@ fn fishing_lava_active_spots_spend_one_fish_and_damage_cancels() {
             inventory
         );
         assert_eq!(w.rich_fishing[&zone][0].remaining, 4);
+    }
+}
+
+#[test]
+fn fishing_client_legendary_announcement_is_zone_scoped_and_respects_hidden_actors() {
+    let (mut w, mut owner) = super::super::fishing_tests::angler();
+    let (same_tx, mut same) = mpsc::channel(128);
+    let (other_tx, mut other) = mpsc::channel(128);
+    w.join(
+        2,
+        None,
+        Some(Look {
+            name: "ShoreObserver".into(),
+            ..Default::default()
+        }),
+        same_tx,
+    )
+    .unwrap();
+    w.join(
+        3,
+        None,
+        Some(Look {
+            name: "FarObserver".into(),
+            ..Default::default()
+        }),
+        other_tx,
+    )
+    .unwrap();
+    w.players.get_mut(&2).unwrap().character.zone = 1;
+    for rx in [&mut owner, &mut same, &mut other] {
+        std::iter::from_fn(|| rx.try_recv().ok()).for_each(drop);
+    }
+    for (time, hidden) in [(20., false), (100., true)] {
+        pool(&mut w, 1, "lava", "rod_magma_reel");
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.gm = hidden;
+        p.hidden = hidden;
+        w.fish_press(1, time);
+        let deadline = w.players[&1].fishing.line.unwrap().deadline();
+        w.rng = 1434;
+        w.fish_press(1, deadline);
+        let packets: Vec<_> = std::iter::from_fn(|| owner.try_recv().ok()).collect();
+        let catches: Vec<_> = packets
+            .iter()
+            .filter(|p| p["kind"] == "fish_catch")
+            .collect();
+        assert_eq!(catches.len(), 1);
+        assert_eq!(catches[0]["rarity"], "legendary");
+        assert_eq!(
+            packets.iter().filter(|p| p["type"] == "announce").count(),
+            1
+        );
+        let packets: Vec<_> = std::iter::from_fn(|| same.try_recv().ok()).collect();
+        assert_eq!(
+            packets.iter().filter(|p| p["type"] == "announce").count(),
+            usize::from(!hidden)
+        );
+        assert!(!packets.iter().any(|p| p["kind"] == "fish_catch"));
+        assert!(
+            !std::iter::from_fn(|| other.try_recv().ok())
+                .any(|p| p["type"] == "announce" || p["kind"] == "fish_catch")
+        );
     }
 }

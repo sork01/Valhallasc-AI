@@ -1410,7 +1410,7 @@
     if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || Keys.typing(e)) return;
     const code = Keys.codeOf(e);
     for (const [action, step] of [['minimapIn', 1], ['minimapOut', -1]]) if (Keys.is(e, action)) { e.preventDefault(); if (!e.repeat) Field.minimapZoom(step); return; }
-    for (const action of ['interact', 'talk', 'mount']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
+    for (const action of ['interact', 'talk', 'mount', 'fish']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
     if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; npcTarget = null; emitHud(); e.preventDefault(); }
     if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.action('attack'); }
     if (Keys.is(e, 'dash') && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.action('dash'); }
@@ -1728,6 +1728,7 @@
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
     window.RaidKey?.sync(packet, own, zone);
     window.EmptySeat?.sync(own, zone);
+    window.Fishing?.sync(packet, own, zdef, cue => say('fishingSound', cue));
     window.Attributes?.update(own);
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
@@ -1824,6 +1825,8 @@
     emitHud();
   }
   function networkEvent(event) {
+    window.Fishing?.event(event, Online.id, cue => say('fishingSound', cue));
+    if (event.kind === 'fish_cast' && event.actor === Online.id) { hero.atkT = .3; hero.goal = null; hero.target = null; hero.pvpTargetId = null; }
     window.BossMech?.onEvent(event, Online.id);
     window.Tutorial?.onEvent(event);
     if (event.kind === 'bossmech') say('bossMech', event);
@@ -4891,6 +4894,7 @@
       } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawLeadShoes(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); }
   }
   let ghostCv = null, ghostG = null;
+  function drawFishing(g, ground = false) { window.Fishing?.drawFishing(g, w2s, VW, VH, ground, reducedMotion() || !!window.Prefs?.lowGraphics); }
   function draw(t) {
     const k = dpr * zoom;
     const ghostMode = !!(hero.dead && hero.ghost);
@@ -4941,6 +4945,7 @@
     if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge' || zdef.theme === 'ember') {
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
     }
+    drawFishing(g, true);
     City.drawPlaza(g, w2s);
     window.ExitPaths?.floor(g,zdef,w2s,hero);      // (a vault has no road marking: it is a doorway, not a signposted exit)
     window.Halloween?.drawFloor(g,zone,w2s);
@@ -5280,6 +5285,7 @@
     if (zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme)) { drawDarkness(g, t); drawBossBar(g); }
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.NewYear?.drawFireworks(g,zone,hero,t,VW,VH,reducedMotion());
+    drawFishing(g);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     window.Halloween?.drawLabel(g,zone,w2s);
@@ -5785,6 +5791,7 @@
         if (npc) talkTo(npc); return !!npc;
       }
       if (!Field.canAct || hero.sparkTravel) return false;
+      if (action === 'fish') return !!window.Fishing?.press();
       if (action === 'attack') return Field.useSkill('attack');
       if (action === 'dash') return isAssassin() && Field.useSkill('shadowstep');
       if (action === 'mount') { Field.toggleMount(); return true; }

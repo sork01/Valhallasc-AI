@@ -466,5 +466,11 @@
   "Took {0}.": "Tog ut {0}.",
   "Discarded {0} × {1}.": "Kastade {0} × {1:t}.",
   "Buy a horse from Stable-hand Greta in Skaldholm at level 50 for {0}. All mounts are listed in the Character window.": "Köp en häst av Stallhjälpen Greta i Skaldholm på nivå 50 för {0}. Alla riddjur finns i karaktärsfönstret.",
-  "Tier {0} · Requires level {1}": "Steg {0} · Kräver nivå {1}"
+  "Tier {0} · Requires level {1}": "Steg {0} · Kräver nivå {1}",
+  "Caught: {0} · Species: {1}/{2} · Legendary: {3} · Best streak: {4}": "Fångster: {0} · Arter: {1}/{2} · Legendariska: {3} · Bästa svit: {4}",
+  "{0} caught · Best: ca {1} kg": "{0} fångade · Rekord: ca {1} kg",
+  "Quantity: {0}": "Antal: {0}",
+  "You reel in {0} ×{1}.": "Du vevar in {0:t} ×{1}.",
+  "You catch {0} (ca {1} kg) ×{2}.": "Du fångar {0:t} (ca {1} kg) ×{2}.",
+  "{0} caught {1} (ca {2} kg)!": "{0} fångade {1:t} (ca {2} kg)!"
 }

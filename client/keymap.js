@@ -13,6 +13,7 @@
     ['Movement', 'moveRight', 'Move right', ['KeyD', 'ArrowRight']],
     ['Movement', 'mount', 'Mount or dismount', ['KeyH']],
     ['Movement', 'talk', 'Talk or read', ['KeyF']],
+    ['Movement', 'fish', 'Cast or hook a fish', ['KeyR']],
     ['Movement', 'interact', 'Interact with a cross', ['KeyG']],
     ['Combat', 'attack', 'Attack', ['Space', 'KeyJ']],
     ['Combat', 'dash', 'Shadow Step (Assassin)', ['Shift']],

@@ -1,0 +1,57 @@
+// Drive the actual fishing controller with real private WebSocket packets, without Chromium.
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const {TestWorld}=require('../scripts/testing/driver.cjs');
+const root=path.resolve(__dirname,'..'),world=JSON.parse(fs.readFileSync(path.join(root,'world/map.txt')));
+const fixtureSource=fs.readFileSync(path.join(__dirname,'fishing-client.cjs'),'utf8').split('const f=fixture(),')[0];
+const fixture=new Function('require','__dirname',fixtureSource+'\nreturn fixture;')(require,__dirname);
+const f=fixture(),w=new TestWorld(),bot='ClientAngler',watcher='ShoreWitness';
+let timer;
+(async()=>{
+ await w.start();await w.connect({bot,class:'warrior',gender:'male'});await w.connect({bot:watcher,class:'priest',gender:'female'});
+ await w.debug(bot,{op:'give_item',item:'rod_twig_rod',quantity:1});
+ await w.debug(bot,{op:'teleport',zone:0,...world.dock.start});
+ await w.action(bot,{type:'input',dx:1,dy:0});await w.waitFor(()=>w.player(bot).x>world.dock.start.x+.01);await w.action(bot,{type:'stop'});
+ const identity=w.bots.get(bot),socket=identity.socket,started=performance.now(),cues=[],ticks=[],times=[];
+ const receive=packet=>{
+   const snap=packet.type==='welcome'?packet.snapshot:packet.type==='snapshot'?packet:null;
+   if(snap){const own=snap.players.find(p=>p.id===identity.id);if(own){f.ctx.Field.hero=own;f.ctx.Fishing.sync(snap,own,world,c=>cues.push(c));}}
+   else if(packet.type==='event')f.ctx.Fishing.event(packet,identity.id,c=>cues.push(c));
+ };
+ const initial=w.views.get(bot);receive(initial);
+ assert(Number.isFinite(initial.fishingTime)&&Math.abs(initial.fishingTime-Date.now()/1000)<2,'shared clock reaches a real client');
+ const onMessage=raw=>{const p=JSON.parse(raw);receive(p);if(p.type==='snapshot'){ticks.push(p.tick);times.push(performance.now());}};
+ socket.on('message',onMessage);
+ const inputs=[];f.ctx.Online.send=p=>{inputs.push(p);socket.send(JSON.stringify(p));return true;};
+ timer=setInterval(()=>{f.setTime(performance.now()-started);f.draw();},25);
+ assert(f.ctx.Fishing.available(),'real pier snapshot enables the fishing control');
+ assert(f.ctx.Fishing.press(),'controller casts');
+ await w.waitFor(()=>f.ctx.Fishing.phase==='waiting'||f.ctx.Fishing.phase==='cast');
+ const publicLine=await w.waitFor(()=>w.views.get(watcher)?.players.find(p=>p.id===identity.id)?.fishing);
+ assert(Number.isFinite(publicLine.x)&&Number.isFinite(publicLine.y),'other players receive bobber position');
+ await w.waitFor(()=>f.ctx.Fishing.phase==='bite',15000,'controller receives bite');
+ const view=w.views.get(watcher).players.find(p=>p.id===identity.id);
+ assert.equal(view.fishDeadline,undefined);assert.equal(view.fishingLog,undefined);
+ assert(f.ctx.Fishing.press(),'controller hooks without supplying a time or catch');
+ await w.waitFor(()=>w.events.some(e=>e.bot===bot&&e.kind==='fish_catch'));
+ const caught=w.events.find(e=>e.bot===bot&&e.kind==='fish_catch');
+ await w.waitFor(()=>!f.el('fishing-catch').hidden,3000,'controller shows the real catch card');
+ assert(!w.events.some(e=>e.bot===watcher&&e.kind==='fish_catch'),'catch result remains owner-only');
+ assert.equal(inputs.length,2);assert(inputs.every(p=>JSON.stringify(p)==='{"type":"fish"}'));
+ assert(cues.includes('cast')&&cues.includes('plop')&&cues.includes('bite')&&cues.includes('reel'));
+ assert.equal(cues.filter(c=>['catch','legendary'].includes(c)).length,1,'one catch celebration');
+ await w.waitFor(()=>w.player(bot).inventory.some(s=>s.item===caught.item&&s.quantity===caught.quantity));
+ if(caught.kg!=null)assert.equal(w.player(bot).fishingLog.species[caught.item].bestKg,caught.kg);
+ assert(f.el('fishing-catch').textContent.includes(f.ctx.Inventory.definition(caught.item).name));
+ const saved=JSON.stringify(w.player(bot).fishingLog||{});
+ await w.waitFor(()=>ticks.length>=30,3800,'30 snapshots');
+ clearInterval(timer);socket.off('message',onMessage);f.ctx.Fishing.reset();await w.disconnect(bot);await w.connect({bot,class:'warrior',gender:'male'});
+ assert.equal(JSON.stringify(w.player(bot).fishingLog||{}),saved,'collection log survives reconnect');
+ assert(w.player(bot).inventory.some(s=>s.item===caught.item&&s.quantity===caught.quantity));
+ assert(!f.ctx.Fishing.available()&&f.el('fishing-catch').hidden,'controller clears private UI');
+ assert(ticks.length>=30,'received at least 30 snapshots during the loop');
+ assert(ticks.slice(1,30).every((tick,i)=>tick-ticks[i]===2));
+ const elapsed=Math.round(times[29]-times[0]);assert(elapsed<=3000,`30 snapshots took ${elapsed} ms`);
+ console.log(`Private fishing controller: real cast/bite/hook/card, public bobber/private result, sound order and persistence pass; 30 snapshots in ${elapsed} ms.`);
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{clearInterval(timer);await w.stop();});

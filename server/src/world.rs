@@ -2617,6 +2617,7 @@ impl World {
         if !across.is_empty() {
             view["across"] = json!(across);
         }
+        view["fishingTime"] = json!(fishing::now());
         view["fishingSpots"] = json!(self.rich_fishing.get(&zone).map(|spots| spots.iter().map(|s| s.point).collect::<Vec<_>>()).unwrap_or_default());
         view["damageMeter"] = self.damage_meter_view(zone);
         let boss_mech = self.boss_mech_view(zone);

@@ -1,0 +1,24 @@
+#fishing-panel { position: absolute; inset: 0; z-index: 72; display: grid; place-items: center; background: #050b1699; }
+#fishing-panel[hidden], #fishing-catch[hidden] { display: none; }
+.fishing-window { width: min(680px, 92%); max-height: 85%; overflow: auto; padding: 18px; color: #f1e5c9; background: #15202e; border: 2px solid #a38b56; border-radius: 10px; box-shadow: 0 10px 60px #000b; }
+.fishing-window header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.fishing-window h2 { margin: 0; }
+.fishing-window button, .fishing-window select { min-height: 44px; color: #f4e8cf; background: #27374a; border: 1px solid #9b875e; border-radius: 5px; padding: 7px 12px; }
+#fishing-records { line-height: 1.6; color: #f3d28c; }
+#fishing-species { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; padding: 0; list-style: none; }
+.fishing-species { display: flex; gap: 10px; align-items: center; padding: 10px; background: #0e1824; border-radius: 6px; }
+.fishing-species strong, .fishing-species small, .fishing-species div > span { display: block; }
+.fishing-species small { margin: 3px 0; color: #b6c1cb; }
+.fishing-icon { display: inline-flex; width: 48px; height: 48px; flex: 0 0 48px; align-items: center; justify-content: center; }
+.fishing-icon .item-art { width: 48px; height: 48px; }
+.fishing-icon.silhouette { filter: brightness(0); opacity: .55; }
+#fishing-catch { position: absolute; z-index: 48; pointer-events: none; transform: translate(-50%, -100%); display: grid; grid-template-columns: 48px 1fr; column-gap: 10px; min-width: 220px; max-width: min(350px, 90%); padding: 10px 14px; background: #0f1929f2; color: #ece7dc; border: 2px solid var(--fish-rarity, #ddd); border-radius: 8px; box-shadow: 0 5px 18px #0009; }
+#fishing-catch .fishing-icon { grid-row: span 2; }
+#fishing-catch strong { color: var(--fish-rarity); align-self: end; }
+#stage.fishing-legendary::after { content: ''; position: absolute; inset: 0; z-index: 47; pointer-events: none; box-shadow: inset 0 0 75px #ffb93888; }
+@media (pointer: coarse) {
+  #touch-skills .touch-fish { right: calc(205px / var(--ui, .8)); bottom: 0; width: calc(64px / var(--ui, .8)); height: calc(64px / var(--ui, .8)); border-color: #d3c081; background: #173c4d; border-radius: 50%; }
+  #touch-skills .touch-fish[data-bite="true"] { color: #241808; background: #ffe07d; border: 3px solid #fff4c0; }
+  .fishing-window { max-height: 88%; padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { #stage.fishing-legendary::after { display: none; } }

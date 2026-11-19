@@ -64,6 +64,12 @@
         if (bag) return [[`You fit ${def.name}: +${def.bagSlots} bag slots.`, 'sys-loot']];
         return [[`You pick up ${e.quantity > 1 ? e.quantity + ' × ' : ''}${name}.`, 'sys-loot sys-item', { name, rarity: e.rarity || def?.rarity }]];
       }
+      case 'fish_catch': {
+        const name = itemName(e.item), amount = e.quantity || 1;
+        const text = e.kg == null ? `You reel in ${name} ×${amount}.` : `You catch ${name} (ca ${e.kg} kg) ×${amount}.`;
+        return [[text, 'sys-loot sys-item', { name, rarity: e.rarity || rarityOf(e.item)?.rarity }]];
+      }
+      case 'fish_miss': return [[e.text || 'It got away.', 'sys-taken']];
       case 'shotBlocked': return [['Your shot hits a wall.', 'sys-dealt']];
       case 'pickup': return [[`You pick up ${Money.text(e.value)}.`, 'sys-loot']];
       case 'levelup': return [[`You reached level ${e.level}!${e.unlocked?.length ? ` New skills: ${e.unlocked.map(skillName).join(', ')}.` : ''}`, 'sys-xp']];

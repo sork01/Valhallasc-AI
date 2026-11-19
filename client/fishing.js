@@ -1,0 +1,216 @@
+'use strict';
+// Presentation and inputs only. Every cast, bite, catch, record and active spot comes from the world.
+(() => {
+  const $ = id => document.getElementById(id);
+  const tr = text => window.Locale?.translate(text) || text;
+  const now = () => performance.now();
+  const clamp = n => Math.max(0, Math.min(1, n));
+  const colours = { common: '#ddd6c7', uncommon: '#83df83', rare: '#80bdff', epic: '#cf9bff', legendary: '#ffbd59' };
+  const catalogue = () => (window.WORLD_ITEMS || []).filter(i => i.kind === 'fish');
+  const definition = id => window.Inventory?.definition(id);
+  const node = (tag, text, cls) => { const el = document.createElement(tag); if (text != null) el.textContent = text; if (cls) el.className = cls; return el; };
+  let own = null, zone = null, spots = [], log = {}, cast = null, result = null, miss = null, signature = '', shoreHint = false;
+  let lastPress = -Infinity, sound = () => {}, clockOffset = 0;
+  const lines = new Map();
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const calm = () => !!window.Prefs?.lowGraphics || motion.matches;
+
+  // A visibility hint, never a claim that the world will accept a cast. Match the facing ray and liquid shapes.
+  function shore(hero, map) {
+    if (!hero || !map || ![0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45].includes(hero.zone || 0)) return false;
+    const lava = [1, 45].includes(hero.zone), level = hero.level || 1;
+    if (!(hero.inventory || []).some(s => {
+      const i = definition(s.item); return s.quantity > 0 && i?.kind === 'rod' && i.requiredLevel <= level && !!i.fishing?.lava === lava;
+    })) return false;
+    const length = Math.hypot(hero.fx, hero.fy); if (!length) return false;
+    const fx = hero.fx / length, fy = hero.fy / length, dock = map.dock;
+    const onDock = dock && hero.x >= dock.x0 && hero.x <= dock.x1 && hero.y >= dock.y0 && hero.y <= dock.y1;
+    for (const o of map.objects || []) {
+      let start, end;
+      const waters = ['water', 'jungle_water', 'jade_pool'], small = ['seafoam', 'year_spring_pool', 'frostwake_frozen_pool', 'lapis_oasis'];
+      const r = lava ? (['lava', 'ew_lava'].includes(o.kind) ? o.r : 0) : waters.includes(o.kind) ? o.r : small.includes(o.kind) ? Math.max(1, o.r || 0) : 0;
+      if (r) {
+        const dx = o.x - hero.x, dy = o.y - hero.y, along = dx * fx + dy * fy, square = r * r - (dx * fy - dy * fx) ** 2;
+        if (Math.hypot(dx, dy) < r) return false;
+        if (square <= 0) continue;
+        start = along - Math.sqrt(square); end = along + Math.sqrt(square);
+      } else if (!lava && o.kind === 'void' && onDock) {
+        const interval = (p, d, c, size) => Math.abs(d) < 1e-8 ? (Math.abs(p - c) < size / 2 ? [-Infinity, Infinity] : [Infinity, -Infinity]) : [(c - size / 2 - p) / d, (c + size / 2 - p) / d].sort((a, b) => a - b);
+        const x = interval(hero.x, fx, o.x, o.w || o.width), y = interval(hero.y, fy, o.y, o.d || o.depth);
+        start = Math.max(x[0], y[0]); end = Math.min(x[1], y[1]);
+      } else continue;
+      const lo = Math.max(3, start), hi = Math.min(6, end);
+      if (start < 0 || start > 4 || lo >= hi) continue;
+      const distance = (lo + hi) / 2, x = hero.x + fx * distance, y = hero.y + fy * distance, ship = dock?.ship;
+      if (ship && Math.abs(x - ship.x) < ship.beam / 2 && y >= ship.y0 && y <= ship.y1) continue;
+      return true;
+    }
+    return false;
+  }
+  function available() {
+    return !!own && !own.dead && !own.ghost && !own.sparkTravel && !own.inCombat && !(own.stun > 0) && !window.Cutscene?.active && !!(own.fishing || shoreHint);
+  }
+  function press() {
+    if (!window.Field?.canAct || window.Cutscene?.active || Field.hero?.sparkTravel || now() - lastPress < 160) return false;
+    lastPress = now();
+    Field.clearInput();
+    // Do not send a stop packet here: it can clear facing/targets before the authoritative cast check.
+    return Online.send({ type: 'fish' });
+  }
+  function reset() {
+    own = null; zone = null; spots = []; log = {}; cast = null; result = null; miss = null; signature = ''; shoreHint = false; lastPress = -Infinity; clockOffset = 0;
+    lines.clear(); $('fishing-panel').hidden = true; $('fishing-catch').hidden = true; $('stage').classList.remove('fishing-legendary');
+  }
+  function sync(packet, hero, map, emit) {
+    if (emit) sound = emit;
+    if (own && (own.id !== hero.id || own.zone !== hero.zone)) { lines.clear(); cast = null; result = null; miss = null; }
+    own = hero; zone = map; log = hero.fishingLog || {}; shoreHint = shore(hero, map);
+    // Server's Unix clock, when supplied, avoids relying on the device wall clock for the draining ring.
+    if (Number.isFinite(packet.fishingTime)) clockOffset = packet.fishingTime * 1000 - Date.now();
+    spots = (packet.fishingSpots || []).filter(p => Number.isFinite(p.x) && Number.isFinite(p.y));
+    const seen = new Set();
+    for (const p of packet.players || []) {
+      if ((p.zone || 0) !== (hero.zone || 0) || !p.fishing) continue;
+      seen.add(p.id);
+      const old = lines.get(p.id), f = p.fishing;
+      const same = old && old.x === f.x && old.y === f.y;
+      const line = { ...f, actor: p, at: same ? old.at : now(), biteAt: f.state === 'bite' ? (same && old.biteAt || now()) : null };
+      lines.set(p.id, line);
+      if (p.id === hero.id) {
+        if (!same && !cast) { cast = { ...line, at: now(), landed: f.state !== 'cast' }; }
+        if (Number.isFinite(hero.fishDeadline)) line.deadline = hero.fishDeadline;
+      }
+    }
+    for (const id of lines.keys()) if (!seen.has(id)) lines.delete(id);
+    if (cast && !hero.fishing && now() - cast.at > 700) cast = null;
+    if (hero.dead || hero.sparkTravel) { cast = null; result = null; miss = null; }
+    if (!hero.fishing && cast?.landed) cast = null;
+    if (!$('fishing-panel').hidden) renderLog();
+  }
+  function event(e, self, emit) {
+    if (emit) sound = emit;
+    if (e.actor !== self || !e.kind?.startsWith('fish_')) return;
+    if (e.kind === 'fish_cast') {
+      result = null; miss = null; cast = { x: e.x, y: e.y, lava: [1, 45].includes(own?.zone), at: now(), landed: false };
+      sound('cast');
+    } else if (e.kind === 'fish_bite') {
+      const line = lines.get(self); if (line) { line.state = 'bite'; line.deadline = e.deadline; line.biteAt = now(); }
+      sound('bite');
+    } else if (e.kind === 'fish_catch') {
+      const from = lines.get(self) || cast;
+      result = { ...e, from: from && { x: from.x, y: from.y, lava: from.lava }, at: now(), celebrated: false };
+      lines.delete(self); cast = null; sound('reel');
+    } else if (e.kind === 'fish_miss') {
+      const from = lines.get(self) || cast;
+      miss = from && { ...from, at: now() }; lines.delete(self); cast = null;
+      window.Announce?.show(e.text || 'It got away.', 'error');
+    }
+  }
+  function icon(item) {
+    const el = node('span', null, 'fishing-icon');
+    // Inventory.icon is trusted renderer output; item names and all packet text use textContent.
+    el.innerHTML = window.Inventory?.icon(item) || ''; return el;
+  }
+  function renderLog() {
+    const species = catalogue(), key = JSON.stringify([log, $('fishing-filter').value, window.Locale?.language]);
+    if (key === signature) return; signature = key;
+    const caught = species.filter(i => (log.species?.[i.id]?.count || 0) > 0).length;
+    $('fishing-records').textContent = tr('Caught: {0} · Species: {1}/{2} · Legendary: {3} · Best streak: {4}')
+      .replace('{0}', log.total || 0).replace('{1}', caught).replace('{2}', species.length).replace('{3}', log.legendary || 0).replace('{4}', log.longestStreak || 0);
+    const rows = species.filter(i => !$('fishing-filter').value || i.fishing?.habitat === $('fishing-filter').value).map(i => {
+      const record = log.species?.[i.id], known = (record?.count || 0) > 0, row = node('li', null, 'fishing-species'); row.dataset.item = i.id; row.dataset.caught = String(known);
+      const art = icon(i); art.classList.toggle('silhouette', !known);
+      const details = node('div'), name = node('strong', tr(known ? i.name : 'Undiscovered fish'));
+      name.style.color = known ? colours[i.rarity] || colours.common : colours.common;
+      details.append(name, node('small', tr(i.fishing.habitat)), node('span', known ? tr('{0} caught · Best: ca {1} kg').replace('{0}', record.count).replace('{1}', record.bestKg) : tr('Catch this species to reveal its record.')));
+      row.append(art, details); return row;
+    });
+    $('fishing-species').replaceChildren(...rows);
+  }
+  function close(resume = true) { $('fishing-panel').hidden = true; if (resume) window.Field?.setPaused(false); }
+  function open() {
+    if (!window.Online?.connected) return false;
+    $('pause').hidden = true; $('fishing-panel').hidden = false; signature = ''; renderLog(); window.Field?.setPaused(true);
+    $('fishing-close').focus({ preventScroll: true }); return true;
+  }
+  function card(project, width, height) {
+    const el = $('fishing-catch'), age = result ? now() - result.at : Infinity;
+    const show = result && age >= 600 && age < 3600 && own && !own.dead;
+    el.hidden = !show;
+    $('stage').classList.toggle('fishing-legendary', !!show && result.rarity === 'legendary' && !calm());
+    if (!show) { if (age >= 3600) result = null; return; }
+    if (!result.celebrated) {
+      result.celebrated = true;
+      const item = definition(result.item), name = tr(item?.name || result.item);
+      el.replaceChildren(icon(item), node('strong', name), node('span', result.kg == null ? tr('Quantity: {0}').replace('{0}', result.quantity || 1) : tr('ca {0} kg · ×{1}').replace('{0}', result.kg).replace('{1}', result.quantity || 1)));
+      el.style.setProperty('--fish-rarity', colours[result.rarity] || colours.common);
+      sound(result.rarity === 'legendary' ? 'legendary' : 'catch');
+    }
+    const hero = window.Field?.hero || own, [x, y] = project(hero.x, hero.y), stage = $('stage'), box = el.getBoundingClientRect();
+    // The scene uses virtual pixels; this DOM card uses device-sized CSS pixels, including on phones.
+    const half = ((box.width || 240) / 2 + 8) / (stage.clientWidth || width) * width;
+    const top = ((box.height || 80) + 8) / (stage.clientHeight || height) * height;
+    el.style.left = `${Math.max(half, Math.min(width - half, x)) / width * 100}%`;
+    el.style.top = `${Math.max(top, Math.min(height - 8, y - 145)) / height * 100}%`;
+  }
+  function ring(g, x, y, r, colour, alpha = 1) {
+    g.save(); g.globalAlpha *= alpha; g.strokeStyle = colour; g.lineWidth = 1.6; g.beginPath(); g.ellipse(x, y, r, r * .42, 0, 0, Math.PI * 2); g.stroke(); g.restore();
+  }
+  // Ground ripples run below people; rods, bobbers and the reel arc run after the scene's depth-sorted actors.
+  function drawFishing(g, project, width, height, ground = false, reduced = calm()) {
+    const time = now(); reduced = reduced || calm();
+    if (ground) {
+      for (const spot of spots) {
+        const [x, y] = project(spot.x, spot.y), phase = reduced ? .5 : (time / 1400 + spot.x) % 1;
+        ring(g, x, y, 16 + phase * 25, [1, 45].includes(own?.zone) ? '#ffa652' : '#b9efff', .85 - phase * .5);
+        if (!reduced) ring(g, x, y, 12 + ((phase + .5) % 1) * 25, '#e1f7ff', .45);
+      }
+      return;
+    }
+    if (cast && !cast.landed && time - cast.at >= 500) { cast.landed = true; sound('plop'); if (cast.lava) sound('lava'); }
+    for (const [id, line] of lines) {
+      const actor = id === own?.id ? window.Field?.hero || line.actor : line.actor;
+      const [hx, hy] = project(actor.x, actor.y), [bx, by] = project(line.x, line.y);
+      if (Math.max(hx, bx) < -100 || Math.min(hx, bx) > width + 100 || Math.max(hy, by) < -150 || Math.min(hy, by) > height + 150) continue;
+      const age = time - (id === own?.id && cast ? cast.at : line.at), progress = line.state === 'cast' ? clamp(age / 500) : 1;
+      const biting = line.state === 'bite', bob = reduced ? 0 : Math.sin(time / 220) * 1.5;
+      const x = reduced ? bx : hx + (bx - hx) * progress, y = reduced ? by : hy - 55 + (by - hy + 55) * progress - Math.sin(progress * Math.PI) * 75;
+      g.save(); g.lineCap = 'round';
+      const handX = hx + (bx > hx ? 16 : -16), handY = hy - 55, tipX = handX + (bx > hx ? 25 : -25), tipY = handY - (biting ? 20 : 38);
+      g.strokeStyle = line.lava ? '#ca8252' : '#b8a17a'; g.lineWidth = 3; g.beginPath(); g.moveTo(handX, handY + 15); g.quadraticCurveTo(tipX, tipY - 10, tipX, tipY); g.stroke();
+      g.strokeStyle = line.lava ? '#ffc486' : '#e1e4db'; g.lineWidth = .9; g.beginPath(); g.moveTo(tipX, tipY); g.quadraticCurveTo((tipX + x) / 2, (tipY + y) / 2 + (biting ? 0 : 20), x, y + bob); g.stroke();
+      if (progress === 1) ring(g, bx, by, biting ? 18 : reduced ? 9 : 7 + (time / 1400 % 1) * 15, line.lava ? '#ffc080' : '#cfedff', .65);
+      const dip = biting ? 3 : 0;
+      g.fillStyle = line.lava ? '#30251f' : '#fff3dd'; g.beginPath(); g.ellipse(x, y + bob + dip - 4, 4, 7, .15, 0, Math.PI * 2); g.fill();
+      g.fillStyle = line.lava ? '#ffb33b' : '#df4d49'; g.fillRect(x - 3, y + bob + dip - 10, 6, 5);
+      if (line.lava && !reduced) { g.fillStyle = '#ffd581'; g.fillRect(x + 5 * Math.sin(time / 200), y - 15 - (time / 80 % 10), 2, 3); }
+      if (biting) {
+        g.fillStyle = '#ffe078'; g.font = 'bold 28px sans-serif'; g.textAlign = 'center'; g.fillText('!', bx, by - 24);
+        const left = Number.isFinite(line.deadline) ? clamp((line.deadline * 1000 - Date.now() - clockOffset) / 1200) : clamp(1 - (time - line.biteAt) / 1200);
+        g.strokeStyle = '#ffdf71'; g.lineWidth = 3; g.beginPath(); g.arc(bx, by - 35, 20, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left); g.stroke();
+        if (!reduced) for (let i = 0; i < 5; i++) { const a = i * 1.256 + time / 300; g.fillStyle = line.lava ? '#ffae61' : '#c0eeff'; g.fillRect(bx + Math.cos(a) * 15, by - 10 + Math.sin(a) * 7, 2, 4); }
+        if (id === own?.id) { g.font = 'bold 14px sans-serif'; g.globalAlpha *= reduced ? 1 : .8 + .2 * Math.sin(time / 90); g.fillText(tr('Hook!') + '  ' + Keys.label('fish'), hx, hy + 27); }
+      }
+      g.restore();
+    }
+    if (result?.from && time - result.at < 600 && own) {
+      const h = window.Field?.hero || own, [hx, hy] = project(h.x, h.y), [bx, by] = project(result.from.x, result.from.y), p = clamp((time - result.at) / 600);
+      const x = bx + (hx - bx) * p, y = by + (hy - by - 65) * p - (reduced ? 0 : Math.sin(p * Math.PI) * 90);
+      g.save(); g.strokeStyle = '#c9aa7c'; g.lineWidth = 3; g.beginPath(); g.moveTo(hx + 12, hy - 42); g.quadraticCurveTo(hx + 50, hy - 115, hx + 25, hy - 85); g.stroke();
+      g.strokeStyle = '#e8dec2'; g.lineWidth = 1; g.beginPath(); g.moveTo(hx + 25, hy - 85); g.lineTo(x, y); g.stroke();
+      if (result.from.lava && !reduced) { g.strokeStyle = '#ff8d3c'; g.lineWidth = 4; g.beginPath(); g.moveTo(x + (bx - hx) * .12, y + 12); g.lineTo(x, y); g.stroke(); }
+      g.fillStyle = colours[result.rarity] || colours.common; g.beginPath(); g.ellipse(x, y, 10, 5, -.4, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(x + 7, y); g.lineTo(x + 16, y - 7); g.lineTo(x + 16, y + 6); g.closePath(); g.fill(); g.restore();
+    }
+    if (miss) { const age = (time - miss.at) / 600; if (age >= 1) miss = null; else { const [x, y] = project(miss.x, miss.y); ring(g, x, y, 8 + age * 24, '#b9dce7', 1 - age); } }
+    card(project, width, height);
+  }
+  $('fishing-open').addEventListener('click', open); $('fishing-close').addEventListener('click', () => close());
+  $('fishing-filter').addEventListener('change', renderLog);
+  $('fishing-panel').addEventListener('click', e => { if (e.target === $('fishing-panel')) close(); });
+  document.addEventListener('keydown', e => {
+    if (!$('fishing-panel').hidden && Keys.is(e, 'menu')) { e.preventDefault(); e.stopPropagation(); close(); }
+  }, true);
+  addEventListener('keymap-change', () => { $('fishing-hint').textContent = tr('Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.'); });
+  window.Fishing = { sync, event, reset, press, available, shore, open, close, drawFishing, get phase() { return lines.get(own?.id)?.state || 'idle'; } };
+})();

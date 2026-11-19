@@ -1309,5 +1309,6 @@
   "Beta 1.55.13",
   "1.0.0",
   "Time played: ",
-  "Speltid: "
+  "Speltid: ",
+  "Lava"
 ]

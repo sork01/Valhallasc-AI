@@ -14217,5 +14217,22 @@
   "A Legendary Catch": "En legendarisk fångst",
   "Catch 1 legendary fish.": "Fånga 1 legendarisk fisk.",
   "Heavy Haul": "Tung fångst",
-  "Catch a fish weighing at least 20 kg.": "Fånga en fisk som väger minst 20 kg."
+  "Catch a fish weighing at least 20 kg.": "Fånga en fisk som väger minst 20 kg.",
+  "Cast or hook a fish": "Kasta eller kroka en fisk",
+  "Fishing log": "Fiskeloggen",
+  "Close fishing log": "Stäng fiskeloggen",
+  "Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.": "Vänd dig mot vattnet med ett spö och tryck på ‹fish› för att kasta. Tryck igen när en fisk nappar.",
+  "Cast": "Kasta",
+  "Hook!": "Kroka!",
+  "Habitat": "Livsmiljö",
+  "All habitats": "Alla livsmiljöer",
+  "Undiscovered fish": "Okänd fisk",
+  "Catch this species to reveal its record.": "Fånga arten för att visa dess rekord.",
+  "Shore": "Kust",
+  "Cold": "Kallvatten",
+  "Swamp": "Träsk",
+  "Forest": "Skog",
+  "Jungle": "Djungel",
+  "Oasis": "Oas",
+  "Spring": "Källvatten"
 }

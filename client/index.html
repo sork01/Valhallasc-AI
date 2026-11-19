@@ -25,6 +25,7 @@
 <script src="compat.js"></script>
 <script src="loadgate.js"></script>
 <link rel="stylesheet" href="festival.css">
+<link rel="stylesheet" href="fishing.css">
 </head>
 <body>
 <div class="backdrop" aria-hidden="true"></div>
@@ -510,6 +511,7 @@
         <p class="world-menu-note">The world keeps running while this menu is open.</p>
         <button class="btn primary" id="p-resume" type="button" data-i18n="resume">Resume</button>
         <button class="btn ghost" id="p-settings" type="button">Settings</button>
+        <button class="btn ghost" id="fishing-open" type="button">Fishing log</button>
         <button class="btn ghost" id="p-characters" type="button">Your Characters</button>
         <div id="character-list" class="character-list" hidden></div>
         <button class="btn ghost" id="p-new" type="button" data-i18n="newChar">New Character</button>
@@ -567,6 +569,16 @@
         <button class="btn primary" id="keys-back" type="button">Back to settings</button>
       </section>
     </div>
+    <div id="fishing-panel" class="pause" hidden>
+      <section class="panel rpg-window fishing-window" role="dialog" aria-modal="true" aria-labelledby="fishing-title" tabindex="-1">
+        <header><h2 id="fishing-title">Fishing log</h2><button id="fishing-close" type="button" aria-label="Close fishing log">×</button></header>
+        <p id="fishing-hint">Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.</p>
+        <p id="fishing-records"></p>
+        <label>Habitat <select id="fishing-filter"><option value="">All habitats</option><option value="Shore">Shore</option><option value="Cold">Cold</option><option value="Swamp">Swamp</option><option value="Forest">Forest</option><option value="Jungle">Jungle</option><option value="Oasis">Oasis</option><option value="Spring">Spring</option><option value="Lava">Lava</option></select></label>
+        <ul id="fishing-species"></ul>
+      </section>
+    </div>
+    <div id="fishing-catch" role="status" aria-live="polite" hidden></div>
     <div id="achievement-toast" role="status" aria-live="polite" aria-atomic="true" hidden>
       <div class="achievement-burst" aria-hidden="true"><i>◆</i><i>✦</i><i>◆</i><i>✦</i><i>◆</i><i>✦</i></div>
       <div class="achievement-emblem" aria-hidden="true">
@@ -812,6 +824,7 @@
 <script src="inventory.js"></script>
 <script src="gearservices.js"></script>
 <script src="fisher-workshop.js"></script>
+<script src="fishing.js"></script>
 <script src="attributes.js"></script>
 <script src="mounts.js"></script>
 <script src="rebirth.js"></script>

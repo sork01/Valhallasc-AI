@@ -170,5 +170,6 @@
   " : q.repeatable ? ",
   "hero sprite",
   "sprite job",
-  "Fisher recipes"
+  "Fisher recipes",
+  "KeyR"
 ]

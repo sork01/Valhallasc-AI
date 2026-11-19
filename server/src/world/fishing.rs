@@ -530,6 +530,11 @@ impl World {
         record.count += 1;
         record.best_kg = record.best_kg.max(kg);
         let _=p.peer.try_send(json!({"type":"event","kind":"fish_catch","actor":c.id,"item":s.item,"quantity":quantity,"kg":kg,"rarity":item(&s.item).unwrap().rarity}));
+        if band == 3 {
+            let actor = c.id.clone();
+            let text = format!("{0} caught {1} (ca {2} kg)!", c.look.name, item(&s.item).unwrap().name, kg);
+            self.emit_zone(line.zone, json!({"type":"announce","kind":"treasure","actor":actor,"text":text}));
+        }
         if let Some(point) = rich {
             self.fishing_spot_caught(line.zone, point);
         }

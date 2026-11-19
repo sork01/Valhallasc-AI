@@ -29,6 +29,7 @@
     ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
     ['worldmap', '.wm-panel', 'World map', '50% 50%', true], ['social-panel', '.social-panel', 'Social', '50% 50%', true],
     ['activity-panel', '.activity-window', 'Activity log', '50% 50%', true],
+    ['fishing-panel', '.fishing-window', 'Fishing log', '50% 50%', true],
     ['trade-panel', '.trade-panel', 'Trade', '50% 50%', true], ['inspect-panel', '.inspect-window', 'Inspect', '50% 50%', true], ['rebirth-dialog', '.rebirth-dialog', 'Rebirth', '50% 50%', true], ['recommended-dialog', '.recommended-dialog', 'Recommended stats', '50% 50%', true],
     ['mail-panel', '.mail-window', 'Mailbox', '50% 50%', true],
     ['bank-panel', '.bank-panel', 'Bank', '50% 50%', true], ['skills-panel', '.skills-panel', 'Skills', '50% 50%', true],
