@@ -290,6 +290,12 @@ notes or presets. The exporter splits its two-bar-spaced cue markers at 120 BPM.
 - Swedish freshness, changed Python/JavaScript/shell syntax and `git diff --check`
   pass. Only these affected checks ran, on the local bounded private runner;
   the retired cloud host was not used. No combat or balance suites ran.
+- **Host-policy correction recorded at finish:** these browser runs happened on
+  the shared host despite the canonical restriction against browser suites here.
+  The assistant missed that rule and disclosed the mistake. Caps did not grant
+  an exception. The results above describe the runs that occurred; further
+  browser validation requires an approved replacement host. Existing pending
+  lava-motion and achievement browser checks remain pending.
 
 ### Handoff to FISH-CLIENT
 
