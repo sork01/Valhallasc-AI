@@ -1,0 +1,673 @@
+{
+  "version": "valhallasc_fishing_items_v2",
+  "sourceHistory": [
+    [
+      {
+        "sprite": "a3484cea3a9e2ec1",
+        "order": [
+          "fish_pier_sprat",
+          "fish_saltby_herring",
+          "fish_sand_dab",
+          "fish_copper_mackerel",
+          "fish_tide_flounder",
+          "fish_glass_eel",
+          "fish_moonscale_carp",
+          "fish_snow_minnow",
+          "fish_frost_char",
+          "fish_ice_perch",
+          "fish_silver_smelt",
+          "fish_blue_grayling",
+          "fish_aurora_trout",
+          "fish_frostwake_pike",
+          "fish_mud_loach",
+          "fish_reed_bream",
+          "fish_bog_dace",
+          "fish_moss_catfish",
+          "fish_peat_eel",
+          "fish_lantern_gar",
+          "fish_fen_crownfin",
+          "fish_alder_trout",
+          "fish_brook_dace",
+          "fish_willow_chub",
+          "fish_fern_perch",
+          "fish_root_barb",
+          "fish_amber_salmon",
+          "fish_antler_sturgeon",
+          "fish_jade_barb",
+          "fish_vine_tetra",
+          "fish_rain_guppy",
+          "fish_orchid_gourami",
+          "fish_parrot_perch",
+          "fish_canopy_arowana",
+          "fish_jade_dragonfish",
+          "fish_sand_tilapia",
+          "fish_palm_minnow",
+          "fish_dune_carp",
+          "fish_lapis_bream",
+          "fish_dusk_catfish",
+          "fish_mirage_eel",
+          "fish_sapphire_lungfish",
+          "fish_blossom_dace",
+          "fish_thaw_minnow",
+          "fish_petal_chub",
+          "fish_vernal_trout",
+          "fish_equinox_perch",
+          "fish_wheel_koi",
+          "fish_yearling_crownray",
+          "fish_cinder_fry",
+          "fish_slag_sucker",
+          "fish_ash_barb",
+          "fish_basalt_eel",
+          "fish_furnace_bass",
+          "fish_obsidian_gar",
+          "fish_phoenix_koi",
+          "fish_sunfire_ray"
+        ]
+      },
+      {
+        "sprite": "4db4156992936e0b",
+        "order": [
+          "rod_twig_rod",
+          "rod_willow_rod",
+          "rod_reedglass_rod",
+          "rod_silverline_rod",
+          "rod_starcatch_rod",
+          "rod_worldwire_rod",
+          "rod_emberline_rod",
+          "rod_magma_reel",
+          "fishing_driftwood",
+          "fishing_old_boot",
+          "fishing_tangled_line",
+          "fishing_cracked_shell",
+          "fishing_cooled_slag",
+          "fishing_charred_branch",
+          "fishing_sunken_coffer",
+          "fishing_message_bottle",
+          "fishing_lost_purse",
+          "fishing_rod_charm",
+          "dish_shore_grill",
+          "dish_shore_feast",
+          "dish_cold_grill",
+          "dish_cold_feast",
+          "dish_swamp_grill",
+          "dish_swamp_feast",
+          "dish_forest_grill",
+          "dish_forest_feast",
+          "dish_jungle_grill",
+          "dish_jungle_feast",
+          "dish_oasis_grill",
+          "dish_oasis_feast",
+          "dish_spring_grill",
+          "dish_spring_feast",
+          "dish_lava_grill",
+          "dish_lava_feast"
+        ]
+      }
+    ]
+  ],
+  "size": 48,
+  "cols": 13,
+  "rows": 7,
+  "sources": [
+    {
+      "sprite": "65ccf93e7d5b859c",
+      "order": [
+        "fish_pier_sprat",
+        "fish_saltby_herring",
+        "fish_sand_dab",
+        "fish_copper_mackerel",
+        "fish_tide_flounder",
+        "fish_glass_eel",
+        "fish_moonscale_carp",
+        "fish_snow_minnow",
+        "fish_frost_char",
+        "fish_ice_perch",
+        "fish_silver_smelt",
+        "fish_blue_grayling",
+        "fish_aurora_trout",
+        "fish_frostwake_pike",
+        "fish_mud_loach",
+        "fish_reed_bream",
+        "fish_bog_dace",
+        "fish_moss_catfish",
+        "fish_peat_eel",
+        "fish_lantern_gar",
+        "fish_fen_crownfin",
+        "fish_alder_trout",
+        "fish_brook_dace",
+        "fish_willow_chub",
+        "fish_fern_perch",
+        "fish_root_barb",
+        "fish_amber_salmon",
+        "fish_antler_sturgeon",
+        "fish_jade_barb",
+        "fish_vine_tetra",
+        "fish_rain_guppy",
+        "fish_orchid_gourami",
+        "fish_parrot_perch",
+        "fish_canopy_arowana",
+        "fish_jade_dragonfish",
+        "fish_sand_tilapia",
+        "fish_palm_minnow",
+        "fish_dune_carp",
+        "fish_lapis_bream",
+        "fish_dusk_catfish",
+        "fish_mirage_eel",
+        "fish_sapphire_lungfish",
+        "fish_blossom_dace",
+        "fish_thaw_minnow",
+        "fish_petal_chub",
+        "fish_vernal_trout",
+        "fish_equinox_perch",
+        "fish_wheel_koi",
+        "fish_yearling_crownray",
+        "fish_cinder_fry",
+        "fish_slag_sucker",
+        "fish_ash_barb",
+        "fish_basalt_eel",
+        "fish_furnace_bass",
+        "fish_obsidian_gar",
+        "fish_phoenix_koi",
+        "fish_sunfire_ray"
+      ]
+    },
+    {
+      "sprite": "79022f15d7d351fb",
+      "order": [
+        "rod_twig_rod",
+        "rod_willow_rod",
+        "rod_reedglass_rod",
+        "rod_silverline_rod",
+        "rod_starcatch_rod",
+        "rod_worldwire_rod",
+        "rod_emberline_rod",
+        "rod_magma_reel",
+        "fishing_driftwood",
+        "fishing_old_boot",
+        "fishing_tangled_line",
+        "fishing_cracked_shell",
+        "fishing_cooled_slag",
+        "fishing_charred_branch",
+        "fishing_sunken_coffer",
+        "fishing_message_bottle",
+        "fishing_lost_purse",
+        "fishing_rod_charm",
+        "dish_shore_grill",
+        "dish_shore_feast",
+        "dish_cold_grill",
+        "dish_cold_feast",
+        "dish_swamp_grill",
+        "dish_swamp_feast",
+        "dish_forest_grill",
+        "dish_forest_feast",
+        "dish_jungle_grill",
+        "dish_jungle_feast",
+        "dish_oasis_grill",
+        "dish_oasis_feast",
+        "dish_spring_grill",
+        "dish_spring_feast",
+        "dish_lava_grill",
+        "dish_lava_feast"
+      ]
+    }
+  ],
+  "order": [
+    "fish_pier_sprat",
+    "fish_saltby_herring",
+    "fish_sand_dab",
+    "fish_copper_mackerel",
+    "fish_tide_flounder",
+    "fish_glass_eel",
+    "fish_moonscale_carp",
+    "fish_snow_minnow",
+    "fish_frost_char",
+    "fish_ice_perch",
+    "fish_silver_smelt",
+    "fish_blue_grayling",
+    "fish_aurora_trout",
+    "fish_frostwake_pike",
+    "fish_mud_loach",
+    "fish_reed_bream",
+    "fish_bog_dace",
+    "fish_moss_catfish",
+    "fish_peat_eel",
+    "fish_lantern_gar",
+    "fish_fen_crownfin",
+    "fish_alder_trout",
+    "fish_brook_dace",
+    "fish_willow_chub",
+    "fish_fern_perch",
+    "fish_root_barb",
+    "fish_amber_salmon",
+    "fish_antler_sturgeon",
+    "fish_jade_barb",
+    "fish_vine_tetra",
+    "fish_rain_guppy",
+    "fish_orchid_gourami",
+    "fish_parrot_perch",
+    "fish_canopy_arowana",
+    "fish_jade_dragonfish",
+    "fish_sand_tilapia",
+    "fish_palm_minnow",
+    "fish_dune_carp",
+    "fish_lapis_bream",
+    "fish_dusk_catfish",
+    "fish_mirage_eel",
+    "fish_sapphire_lungfish",
+    "fish_blossom_dace",
+    "fish_thaw_minnow",
+    "fish_petal_chub",
+    "fish_vernal_trout",
+    "fish_equinox_perch",
+    "fish_wheel_koi",
+    "fish_yearling_crownray",
+    "fish_cinder_fry",
+    "fish_slag_sucker",
+    "fish_ash_barb",
+    "fish_basalt_eel",
+    "fish_furnace_bass",
+    "fish_obsidian_gar",
+    "fish_phoenix_koi",
+    "fish_sunfire_ray",
+    "rod_twig_rod",
+    "rod_willow_rod",
+    "rod_reedglass_rod",
+    "rod_silverline_rod",
+    "rod_starcatch_rod",
+    "rod_worldwire_rod",
+    "rod_emberline_rod",
+    "rod_magma_reel",
+    "fishing_driftwood",
+    "fishing_old_boot",
+    "fishing_tangled_line",
+    "fishing_cracked_shell",
+    "fishing_cooled_slag",
+    "fishing_charred_branch",
+    "fishing_sunken_coffer",
+    "fishing_message_bottle",
+    "fishing_lost_purse",
+    "fishing_rod_charm",
+    "dish_shore_grill",
+    "dish_shore_feast",
+    "dish_cold_grill",
+    "dish_cold_feast",
+    "dish_swamp_grill",
+    "dish_swamp_feast",
+    "dish_forest_grill",
+    "dish_forest_feast",
+    "dish_jungle_grill",
+    "dish_jungle_feast",
+    "dish_oasis_grill",
+    "dish_oasis_feast",
+    "dish_spring_grill",
+    "dish_spring_feast",
+    "dish_lava_grill",
+    "dish_lava_feast"
+  ],
+  "at": {
+    "fish_pier_sprat": [
+      0,
+      0
+    ],
+    "fish_saltby_herring": [
+      1,
+      0
+    ],
+    "fish_sand_dab": [
+      2,
+      0
+    ],
+    "fish_copper_mackerel": [
+      3,
+      0
+    ],
+    "fish_tide_flounder": [
+      4,
+      0
+    ],
+    "fish_glass_eel": [
+      5,
+      0
+    ],
+    "fish_moonscale_carp": [
+      6,
+      0
+    ],
+    "fish_snow_minnow": [
+      7,
+      0
+    ],
+    "fish_frost_char": [
+      8,
+      0
+    ],
+    "fish_ice_perch": [
+      9,
+      0
+    ],
+    "fish_silver_smelt": [
+      10,
+      0
+    ],
+    "fish_blue_grayling": [
+      11,
+      0
+    ],
+    "fish_aurora_trout": [
+      12,
+      0
+    ],
+    "fish_frostwake_pike": [
+      0,
+      1
+    ],
+    "fish_mud_loach": [
+      1,
+      1
+    ],
+    "fish_reed_bream": [
+      2,
+      1
+    ],
+    "fish_bog_dace": [
+      3,
+      1
+    ],
+    "fish_moss_catfish": [
+      4,
+      1
+    ],
+    "fish_peat_eel": [
+      5,
+      1
+    ],
+    "fish_lantern_gar": [
+      6,
+      1
+    ],
+    "fish_fen_crownfin": [
+      7,
+      1
+    ],
+    "fish_alder_trout": [
+      8,
+      1
+    ],
+    "fish_brook_dace": [
+      9,
+      1
+    ],
+    "fish_willow_chub": [
+      10,
+      1
+    ],
+    "fish_fern_perch": [
+      11,
+      1
+    ],
+    "fish_root_barb": [
+      12,
+      1
+    ],
+    "fish_amber_salmon": [
+      0,
+      2
+    ],
+    "fish_antler_sturgeon": [
+      1,
+      2
+    ],
+    "fish_jade_barb": [
+      2,
+      2
+    ],
+    "fish_vine_tetra": [
+      3,
+      2
+    ],
+    "fish_rain_guppy": [
+      4,
+      2
+    ],
+    "fish_orchid_gourami": [
+      5,
+      2
+    ],
+    "fish_parrot_perch": [
+      6,
+      2
+    ],
+    "fish_canopy_arowana": [
+      7,
+      2
+    ],
+    "fish_jade_dragonfish": [
+      8,
+      2
+    ],
+    "fish_sand_tilapia": [
+      9,
+      2
+    ],
+    "fish_palm_minnow": [
+      10,
+      2
+    ],
+    "fish_dune_carp": [
+      11,
+      2
+    ],
+    "fish_lapis_bream": [
+      12,
+      2
+    ],
+    "fish_dusk_catfish": [
+      0,
+      3
+    ],
+    "fish_mirage_eel": [
+      1,
+      3
+    ],
+    "fish_sapphire_lungfish": [
+      2,
+      3
+    ],
+    "fish_blossom_dace": [
+      3,
+      3
+    ],
+    "fish_thaw_minnow": [
+      4,
+      3
+    ],
+    "fish_petal_chub": [
+      5,
+      3
+    ],
+    "fish_vernal_trout": [
+      6,
+      3
+    ],
+    "fish_equinox_perch": [
+      7,
+      3
+    ],
+    "fish_wheel_koi": [
+      8,
+      3
+    ],
+    "fish_yearling_crownray": [
+      9,
+      3
+    ],
+    "fish_cinder_fry": [
+      10,
+      3
+    ],
+    "fish_slag_sucker": [
+      11,
+      3
+    ],
+    "fish_ash_barb": [
+      12,
+      3
+    ],
+    "fish_basalt_eel": [
+      0,
+      4
+    ],
+    "fish_furnace_bass": [
+      1,
+      4
+    ],
+    "fish_obsidian_gar": [
+      2,
+      4
+    ],
+    "fish_phoenix_koi": [
+      3,
+      4
+    ],
+    "fish_sunfire_ray": [
+      4,
+      4
+    ],
+    "rod_twig_rod": [
+      5,
+      4
+    ],
+    "rod_willow_rod": [
+      6,
+      4
+    ],
+    "rod_reedglass_rod": [
+      7,
+      4
+    ],
+    "rod_silverline_rod": [
+      8,
+      4
+    ],
+    "rod_starcatch_rod": [
+      9,
+      4
+    ],
+    "rod_worldwire_rod": [
+      10,
+      4
+    ],
+    "rod_emberline_rod": [
+      11,
+      4
+    ],
+    "rod_magma_reel": [
+      12,
+      4
+    ],
+    "fishing_driftwood": [
+      0,
+      5
+    ],
+    "fishing_old_boot": [
+      1,
+      5
+    ],
+    "fishing_tangled_line": [
+      2,
+      5
+    ],
+    "fishing_cracked_shell": [
+      3,
+      5
+    ],
+    "fishing_cooled_slag": [
+      4,
+      5
+    ],
+    "fishing_charred_branch": [
+      5,
+      5
+    ],
+    "fishing_sunken_coffer": [
+      6,
+      5
+    ],
+    "fishing_message_bottle": [
+      7,
+      5
+    ],
+    "fishing_lost_purse": [
+      8,
+      5
+    ],
+    "fishing_rod_charm": [
+      9,
+      5
+    ],
+    "dish_shore_grill": [
+      10,
+      5
+    ],
+    "dish_shore_feast": [
+      11,
+      5
+    ],
+    "dish_cold_grill": [
+      12,
+      5
+    ],
+    "dish_cold_feast": [
+      0,
+      6
+    ],
+    "dish_swamp_grill": [
+      1,
+      6
+    ],
+    "dish_swamp_feast": [
+      2,
+      6
+    ],
+    "dish_forest_grill": [
+      3,
+      6
+    ],
+    "dish_forest_feast": [
+      4,
+      6
+    ],
+    "dish_jungle_grill": [
+      5,
+      6
+    ],
+    "dish_jungle_feast": [
+      6,
+      6
+    ],
+    "dish_oasis_grill": [
+      7,
+      6
+    ],
+    "dish_oasis_feast": [
+      8,
+      6
+    ],
+    "dish_spring_grill": [
+      9,
+      6
+    ],
+    "dish_spring_feast": [
+      10,
+      6
+    ],
+    "dish_lava_grill": [
+      11,
+      6
+    ],
+    "dish_lava_feast": [
+      12,
+      6
+    ]
+  }
+}

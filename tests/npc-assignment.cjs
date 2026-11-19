@@ -11,11 +11,11 @@ const people = [world, ...world.zones].flatMap(z => z.npcs || []).filter(n => ![
 const fishers=people.filter(n=>n.id.startsWith('fisher_'));
 assert.equal(people.length-fishers.length, 588);
 assert.equal(fishers.length,13);
-for(const n of fishers)assert.equal(old.npcs[n.id].art,'fisher');
+for(const n of fishers)assert.equal(old.npcs[n.id].art,'fisher_rod');
 assert.deepEqual(Object.keys(old.npcs).sort(), people.map(n => n.id).sort(), 'Every actual person, and no scenery, is assigned');
 for (const [key, value] of Object.entries(baseline)) if (key !== 'npcs') assert.deepEqual(old[key], value, key);
 for (const [id, who] of Object.entries(baseline.npcs)) assert.deepEqual(old.npcs[id], who, `Original identity ${id}`);
-assert.equal(Object.keys(fresh.sprites).length, 318);
+assert.equal(Object.keys(fresh.sprites).length, 319);
 for (const n of people) {
   const who = old.npcs[n.id];
   assert(who && fresh.sprites[who.art] && fresh.designs[who.art], `${n.id}: player-style source`);

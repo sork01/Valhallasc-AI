@@ -212,3 +212,95 @@ and hosted-count helpers, quest-drop doc indentation and the quest-journal
 single-element loop. No new lint diagnostics. Browser suites are not run on this
 production host; updated catalog/category/title browser assertions await an approved
 replacement host under FISH-CHECK. No world sync, version bump, release or restart.
+
+## FISH-ART implementation (2026-11-19)
+
+The feature branch now has **91 distinct 48×48 icons**: all 57 species, eight rods,
+ten junk/treasure items (including the charm, coffer and bottle), and 16 cooked
+dishes. Counts follow the real catalogue rather than the earlier approximate
+95-icon brief. Existing species and rod IDs are preserved.
+
+`client/assets/fishing-icons.png` is a separate 13×7 atlas. Its native PixelFlow
+sources, frame order, cell lookup and retained first-candidate source IDs live in
+`client/assets/fishing-icons.txt`; `client/fishingicons.js` exposes the same lookup.
+`Inventory.icon` selects this atlas for fishing items, retaining the existing bag
+rarity borders. Equipment's original atlas and other icons are unchanged. Fish
+have cel shading, dark outlines, habitat colours and authored body/fin/pattern
+choices; eels, rays, catfish, gar, crownfin, dragonfish and sturgeon have distinct
+features. Rods include line, float and reel; dishes have habitat garnish.
+
+The new `fisher_rod` player-style design has a straw hat, leather vest, pockets,
+rod, reel and hanging float. It is additive: the older fish-carrying `fisher`
+source and all 318 earlier looks remain unchanged. `fisher_npcs.assign_art`, also
+called by `assign_all_npc_art.py`, assigns the new look to all 13 fishing NPCs,
+keeping their individual colours, identities and gameplay. The library now has
+319 looks. Its PixelFlow source is `031e3fed395b7b5b`, with six idle, eight walk
+and six talk frames; the export is `client/assets/npcp_fisher_rod.png`.
+
+The seven effects are `assets/sfx_fish_{cast,plop,bite,reel,catch,legendary,lava}.mp3`.
+They use the established boss-cue dybase2/export recipe: mono 44.1 kHz MP3 at
+96 kbps, 25 Hz high-pass, independent peak normalization and short edge fades.
+All cues were authored in the new editable dybase2 project
+[`2e46dfdfb98c6923`](https://gunning.se/dybase2/?project=2e46dfdfb98c6923).
+Sork-60 supplies noise/water, resonant bubbles and the two short catch stingers;
+Dexed MARIMBA supplies the reel clicks. No existing score/project was edited.
+`fishing-sounds.txt` records each cue's source bar, duration and final checksum.
+Decoded duration, levels and clipping were checked; direct listening was not
+available, so these checks do not claim an auditory sign-off.
+
+### Reproduce or preserve editor changes
+
+```sh
+python3 scripts/make_fishing_art.py preview
+python3 scripts/make_fishing_art.py build
+python3 scripts/make_fishing_art.py export
+python3 scripts/make_fishing_art.py verify
+python3 scripts/make_npcp_sprites.py verify fisher_rod
+sh scripts/create_fishing_sounds.sh --render
+python3 scripts/export_fishing_sounds.py
+```
+
+`build` preserves registered PixelFlow work. `export` reads the actual saved
+frames, including later editor changes; no local-render bypass is provided.
+PixelFlow permits at most 64 frames per source, so fish and tackle use separate
+saves. The first candidate is retained in `sourceHistory`; the final source IDs
+are `65ccf93e7d5b859c` (fish) and `79022f15d7d351fb` (tackle).
+The sound script reopens its saved project and renders it without rewriting its
+notes or presets. The exporter splits its two-bar-spaced cue markers at 120 BPM.
+
+### Focused verification
+
+- `python3 tests/fishing-art.py`: all 91 unique cells and transparent margins,
+  unchanged earlier NPC metadata, stable assignments, all 20 new poses,
+  grounded feet, and seven finite, audible, unclipped mono MP3 decodes pass.
+- `make_fishing_art.py verify` and `make_npcp_sprites.py verify fisher_rod`:
+  all 91 icon frames and all 20 NPC frames match their saved editor pixels.
+- `tests/npc-assignment.cjs`: 601/601 actual people are assigned; original
+  identities are preserved. Its look count rises from 318 to 319 because the
+  rod-carrying Fisher is an additional saved design.
+- Bounded `tests/fishing-art-ui.cjs`: 91 icons use the production inventory
+  renderer, 13 Fishers × 20 poses use the new player-style bank with head sockets,
+  all seven MP3s decode in Chromium, and the actual bags/workshop/scene pass.
+  Screenshots in `test-results/driver-lQND3l/` were visually inspected.
+- `MUTATE=icons|npc|sound` fails separately in both the asset and browser tests.
+  Browser mutations serve the pre-art inventory from `a1764688`, remove the new
+  Fisher from the served manifest, or serve a corrupt plop file. None edits the
+  worktree or the production game. The missing-style assertion runs before image
+  readiness so a missing new source fails directly rather than timing out.
+- Swedish freshness, changed Python/JavaScript/shell syntax and `git diff --check`
+  pass. Only these affected checks ran, on the local bounded private runner;
+  the retired cloud host was not used. No combat or balance suites ran.
+
+### Handoff to FISH-CLIENT
+
+The bag/workshop item-icon helper and Fisher assignments are already connected.
+The seven sound assets are ready; their playback and event timing belong to
+FISH-CLIENT. Route sources through `sfxOut(c)`, honour Sound/SFX preferences,
+play plop when the cast lands, bite on `fish_bite`, reel during the hook, and the
+catch/legendary cue when the catch card appears (avoid double celebration cues).
+The client catch card and collection log can use `Inventory.icon(item)` to share
+the same art. The bobber, line, cast arc and splash remain procedural overlays.
+
+This work is private and has no version bump or release note; those belong to
+FISH-RELEASE. No world data, saved characters, production DB, running binary or
+live release link changed. Nothing was uploaded to FileDrop.

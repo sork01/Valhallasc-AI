@@ -9259,7 +9259,7 @@
       "color": "#74d7d0"
     },
     "fisher_meadow_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9269,7 +9269,7 @@
       "color": "#527e89"
     },
     "fisher_meadow_1": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9279,7 +9279,7 @@
       "color": "#527e89"
     },
     "fisher_crags_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9289,7 +9289,7 @@
       "color": "#527e89"
     },
     "fisher_rime_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9299,7 +9299,7 @@
       "color": "#527e89"
     },
     "fisher_fen_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9309,7 +9309,7 @@
       "color": "#527e89"
     },
     "fisher_wyrd_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9319,7 +9319,7 @@
       "color": "#527e89"
     },
     "fisher_storm_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9329,7 +9329,7 @@
       "color": "#527e89"
     },
     "fisher_sun_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9339,7 +9339,7 @@
       "color": "#527e89"
     },
     "fisher_tangle_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9349,7 +9349,7 @@
       "color": "#527e89"
     },
     "fisher_lapis_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9359,7 +9359,7 @@
       "color": "#527e89"
     },
     "fisher_fws_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9369,7 +9369,7 @@
       "color": "#527e89"
     },
     "fisher_yr_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",
@@ -9379,7 +9379,7 @@
       "color": "#527e89"
     },
     "fisher_ew_0": {
-      "art": "fisher",
+      "art": "fisher_rod",
       "identity": {
         "skin": "#dca480",
         "hair": "#694737",

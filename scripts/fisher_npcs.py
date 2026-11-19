@@ -91,7 +91,7 @@ def assign_art(manifest, world):
     for area in [world, *world['zones']]:
         for n in area['npcs']:
             if n['id'].startswith('fisher_'):
-                manifest['npcs'][n['id']] = dict(art='fisher',identity=dict(n['look']),color=n['color'])
+                manifest['npcs'][n['id']] = dict(art='fisher_rod',identity=dict(n['look']),color=n['color'])
 
 
 def main():

@@ -349,6 +349,21 @@ def prop_flowers(ink, xf, joints, R, p, c):
         ink.plate([b + V(x + dx, .5, z + dz) for dx, dz in circle(0, 0, 3.4, 3.4, 8)], ('accent', 'trim', 'cloth')[i % 3], 3)
 
 
+def prop_fishing_rod(ink, xf, joints, R, p, c):
+    """A wrist-gripped travel rod, reel and hanging float stay inside every pose."""
+    h = joints['L']['hand']
+    points = [h + R @ V(x, 0, z) for x, z in ((0,-12),(0,0),(-5,18),(-10,33),(-14,43))]
+    ink.ribbon(points, 1.1, .6, 'wood', 2, -.7)
+    tip = points[-1]
+    line = [tip, tip + R @ V(-6,0,-8), tip + R @ V(-7,0,-27)]
+    ink.ribbon(line, .22, .22, 'cream', 3, -.8, False)
+    float_at = line[-1]
+    line3(ink, float_at + V(0,0,2), float_at + V(0,0,-2), 1.5, 'accent', -.9)
+    reel = h + R @ V(3,1,-3)
+    ink.plate([reel + R @ V(x,0,z) for x,z in circle(0,0,3,3,10)], 'metal', 2)
+    hand_cover(ink, joints, R)
+
+
 def prop_fish(ink, xf, joints, R, p, c):
     h = joints['L']['hand']
     line3(ink, h + V(0, 0, 4), h + V(-1, 0, -3), .5, 'cream', -.5)
@@ -594,6 +609,10 @@ def extras(name, ink, xf, joints, R, p, c, head):
     if name == 'bard':
         ink.plate([xf(q) for q in [(-6.6, 4.8, 68), (-1.4, 4.8, 68), (-1, 4.9, 46), (-7, 4.9, 46)]], 'trim', 2, True)
         ink.plate([xf(q) for q in [(6.6, 4.8, 68), (1.4, 4.8, 68), (1, 4.9, 46), (7, 4.9, 46)]], 'trim', 2, True)
+    if name == 'fisher_rod':
+        for sx in (-1, 1):
+            ink.plate([xf(q) for q in [(sx*8,4.9,68),(sx*2,5.0,64),(sx*2,5.0,43),(sx*8,4.9,43)]], 'leather', 2)
+            ink.plate([xf(q) for q in [(sx*7,5.2,52),(sx*3,5.2,52),(sx*3,5.2,46),(sx*7,5.2,46)]], 'cream', 2)
     if name == 'banker':
         for z in (62, 56, 50):
             ink.plate([xf(q) for q in [(-.8, 4.9, z + 1), (.8, 4.9, z + 1), (.8, 4.9, z - 1), (-.8, 4.9, z - 1)]], 'gold', 3, True)
@@ -1114,6 +1133,7 @@ def _build_registry():
             d.update(hover=True, orn=_blend(d['coat'], '#ffffff', .62))
     import npcp_named
     npcp_named.install(out, sys.modules[__name__])
+    out['fisher_rod'] = dict(out['fisher'], arch='fisher_rod', name='Fisher', prop='fishing_rod', hat='straw')
     return out
 
 
@@ -1121,6 +1141,11 @@ def _blend(a, b, t):
     ra, rb = [int(a[i:i + 2], 16) for i in (1, 3, 5)], [int(b[i:i + 2], 16) for i in (1, 3, 5)]
     return '#' + ''.join(f'{round(x + (y - x) * t):02x}' for x, y in zip(ra, rb))
 
+
+OUTFITS['fisher_rod'] = dict(sleeve=.6, belt='leather', boots='leather')
+PROPS['fishing_rod'] = prop_fishing_rod
+HOLD['fishing_rod'] = dict(HOLD['staff'])
+WALK_HOLD += ('fishing_rod',)
 
 DESIGNS = _build_registry()
 GENERAL = list(SPECS)

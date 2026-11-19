@@ -1,0 +1,50 @@
+{
+  "project": "2e46dfdfb98c6923",
+  "bpm": 120,
+  "meter": "4/4",
+  "source": "dybase2 MCP; scripts/create_fishing_sounds.sh",
+  "clips": {
+    "cast": {
+      "file": "sfx_fish_cast.mp3",
+      "bar": 1,
+      "duration": 0.65,
+      "sha256": "f1733dc4a63fec08c5b8c12e3b6a3598cfd2f7bafe6833e82b1c4e8768dd8302"
+    },
+    "plop": {
+      "file": "sfx_fish_plop.mp3",
+      "bar": 3,
+      "duration": 0.5,
+      "sha256": "5ae1d0f2cde0462ef702d2375bb3eaeccab62c69be5e022da07ca0e9c17cdf2c"
+    },
+    "bite": {
+      "file": "sfx_fish_bite.mp3",
+      "bar": 5,
+      "duration": 0.7,
+      "sha256": "d41da9dbacfd7efc0e52e1b0cec472924ac4257296e30c1d0748f3ec78cf163d"
+    },
+    "reel": {
+      "file": "sfx_fish_reel.mp3",
+      "bar": 7,
+      "duration": 0.7,
+      "sha256": "a731a99cd70720e4789e7aee8e18fde1b667f35309943ce503c1960bcc918469"
+    },
+    "catch": {
+      "file": "sfx_fish_catch.mp3",
+      "bar": 9,
+      "duration": 1.0,
+      "sha256": "44c9d1a27dfd3f8b7dc219cbba6ee3b6ca874e423551ca26ba1212154dae95b8"
+    },
+    "legendary": {
+      "file": "sfx_fish_legendary.mp3",
+      "bar": 11,
+      "duration": 2.0,
+      "sha256": "6ea17ccf515c32799e2ba231d99725cf931ea5dc0677cef8c7ad2aa2f9c4712d"
+    },
+    "lava": {
+      "file": "sfx_fish_lava.mp3",
+      "bar": 13,
+      "duration": 1.0,
+      "sha256": "94ae50898ea327839f9d250d8b10735447df6bf9568c188bc5b536579ab561e9"
+    }
+  }
+}

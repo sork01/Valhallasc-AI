@@ -137,6 +137,11 @@
   function itemIcon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
     if (i && /^orange_(0[1-9]|[1-4][0-9]|50)$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
+    const fishingCell = i && window.FISHING_ICONS?.at[i.id];
+    if (fishingCell) {
+      const { cols, rows } = FISHING_ICONS;
+      return `<span class="item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/fishing-icons.png);background-size:${cols * 100}% ${rows * 100}%;background-position:${fishingCell[0] / (cols - 1) * 100}% ${fishingCell[1] / (rows - 1) * 100}%"></span>`;
+    }
     // A recoloured piece (art + tint in the catalog) shows its base piece's icon through the same colour filter the worn art gets.
     const base = i?.art ? WORLD_ITEMS.find(o => o.kind === i.kind && o.class === i.class && o.variant === i.art) : null;
     const cell = i?.rarity === 'hierloom' ? null : i && window.ITEM_ICONS?.at[i.id] || (base && window.ITEM_ICONS?.at[base.id]);   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph

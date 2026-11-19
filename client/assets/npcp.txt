@@ -346,7 +346,8 @@
     "reuse_treefolk_merchant": "b73ee884c882f075",
     "reuse_treefolk_courier": "348c7264ad7144b5",
     "reuse_treefolk_sentinel": "057a320c02cd5664",
-    "reuse_treefolk_steward": "ec6cc3095ce8a21c"
+    "reuse_treefolk_steward": "ec6cc3095ce8a21c",
+    "fisher_rod": "031e3fed395b7b5b"
   },
   "designs": {
     "sentinel": {
@@ -6751,6 +6752,44 @@
         ]
       },
       "species": "treefolk"
+    },
+    "fisher_rod": {
+      "general": true,
+      "name": "Fisher",
+      "materials": {
+        "skin0": "#907564",
+        "skin1": "#bf9b84",
+        "skin2": "#e9bda1",
+        "skin3": "#edcab4",
+        "hair0": "#242e28",
+        "hair1": "#35443d",
+        "hair2": "#475b51",
+        "hair3": "#7e8c85",
+        "cloth0": "#2c474a",
+        "cloth1": "#456e73",
+        "cloth2": "#629da4",
+        "cloth3": "#a9c9cd"
+      },
+      "amounts": {
+        "skin": [
+          0.62,
+          0.82,
+          1.0,
+          1.2
+        ],
+        "hair": [
+          0.5,
+          0.75,
+          1.0,
+          1.3
+        ],
+        "cloth": [
+          0.45,
+          0.7,
+          1.0,
+          1.45
+        ]
+      }
     }
   },
   "tops": {
@@ -7071,7 +7110,8 @@
     "reuse_treefolk_merchant": 86,
     "reuse_treefolk_courier": 87,
     "reuse_treefolk_sentinel": 86,
-    "reuse_treefolk_steward": 86
+    "reuse_treefolk_steward": 86,
+    "fisher_rod": 86
   },
   "bounds": {
     "sentinel": [
@@ -8980,6 +9020,12 @@
       28,
       4,
       75,
+      95
+    ],
+    "fisher_rod": [
+      28,
+      4,
+      76,
       95
     ]
   },
