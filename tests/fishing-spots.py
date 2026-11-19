@@ -50,7 +50,7 @@ class FishingData(unittest.TestCase):
         self.assertEqual({r['tier'] for r in rods if not r['lava']}, set(range(1, 7)))
         self.assertEqual({r['tier'] for r in rods if r['lava']}, {1, 2})
         self.assertEqual({r['category'] for r in loot}, {'junk', 'treasure'})
-        self.assertTrue(all(i['kind'] in ('fish', 'rod', 'material') and 'source' not in i for i in generated))
+        self.assertTrue(all(i['kind'] in ('fish', 'rod', 'material', 'food') and 'source' not in i for i in generated))
 
     def test_reachable_shore_and_liquid(self):
         world = json.loads((ROOT / 'world/map.txt').read_text())

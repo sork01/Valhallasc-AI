@@ -1,0 +1,994 @@
+[
+  {
+    "id": "rod:2",
+    "item": "rod_willow_rod",
+    "cost": 250,
+    "ingredients": [
+      [
+        "rod_twig_rod",
+        1
+      ],
+      [
+        "fish_pier_sprat",
+        5
+      ],
+      [
+        "slime_gel",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "rod:3",
+    "item": "rod_reedglass_rod",
+    "cost": 1500,
+    "ingredients": [
+      [
+        "rod_willow_rod",
+        1
+      ],
+      [
+        "fish_snow_minnow",
+        5
+      ],
+      [
+        "rime_shell",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      3,
+      6
+    ]
+  },
+  {
+    "id": "rod:4",
+    "item": "rod_silverline_rod",
+    "cost": 5000,
+    "ingredients": [
+      [
+        "rod_reedglass_rod",
+        1
+      ],
+      [
+        "fish_alder_trout",
+        5
+      ],
+      [
+        "mosshide_scrap",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20,
+      22
+    ]
+  },
+  {
+    "id": "rod:5",
+    "item": "rod_starcatch_rod",
+    "cost": 12000,
+    "ingredients": [
+      [
+        "rod_silverline_rod",
+        1
+      ],
+      [
+        "fish_copper_mackerel",
+        5
+      ],
+      [
+        "glassfin",
+        1
+      ]
+    ],
+    "zones": [
+      19,
+      22,
+      25,
+      26
+    ]
+  },
+  {
+    "id": "rod:6",
+    "item": "rod_worldwire_rod",
+    "cost": 30000,
+    "ingredients": [
+      [
+        "rod_starcatch_rod",
+        1
+      ],
+      [
+        "fish_sand_tilapia",
+        5
+      ],
+      [
+        "scorpion_glass",
+        1
+      ]
+    ],
+    "zones": [
+      25,
+      26,
+      28
+    ]
+  },
+  {
+    "id": "rod:emberline",
+    "item": "rod_emberline_rod",
+    "cost": 500,
+    "ingredients": [
+      [
+        "rod_twig_rod",
+        1
+      ],
+      [
+        "fish_pier_sprat",
+        5
+      ],
+      [
+        "ember_core",
+        1
+      ]
+    ],
+    "zones": [
+      1
+    ]
+  },
+  {
+    "id": "rod:magma",
+    "item": "rod_magma_reel",
+    "cost": 7500,
+    "ingredients": [
+      [
+        "rod_emberline_rod",
+        1
+      ],
+      [
+        "fish_cinder_fry",
+        5
+      ],
+      [
+        "ew_slagjaw_relic",
+        1
+      ]
+    ],
+    "zones": [
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_pier_sprat",
+    "item": "dish_shore_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_pier_sprat",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      19
+    ]
+  },
+  {
+    "id": "cook:fish_saltby_herring",
+    "item": "dish_shore_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_saltby_herring",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      19
+    ]
+  },
+  {
+    "id": "cook:fish_sand_dab",
+    "item": "dish_shore_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_sand_dab",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      19
+    ]
+  },
+  {
+    "id": "cook:fish_copper_mackerel",
+    "item": "dish_shore_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_copper_mackerel",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      19
+    ]
+  },
+  {
+    "id": "cook:fish_tide_flounder",
+    "item": "dish_shore_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_tide_flounder",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      19
+    ]
+  },
+  {
+    "id": "cook:fish_glass_eel",
+    "item": "dish_shore_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_glass_eel",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      19
+    ]
+  },
+  {
+    "id": "cook:fish_moonscale_carp",
+    "item": "dish_shore_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_moonscale_carp",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      19
+    ]
+  },
+  {
+    "id": "cook:fish_snow_minnow",
+    "item": "dish_cold_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_snow_minnow",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      26
+    ]
+  },
+  {
+    "id": "cook:fish_frost_char",
+    "item": "dish_cold_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_frost_char",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      26
+    ]
+  },
+  {
+    "id": "cook:fish_ice_perch",
+    "item": "dish_cold_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_ice_perch",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      26
+    ]
+  },
+  {
+    "id": "cook:fish_silver_smelt",
+    "item": "dish_cold_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_silver_smelt",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      26
+    ]
+  },
+  {
+    "id": "cook:fish_blue_grayling",
+    "item": "dish_cold_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_blue_grayling",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      26
+    ]
+  },
+  {
+    "id": "cook:fish_aurora_trout",
+    "item": "dish_cold_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_aurora_trout",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      26
+    ]
+  },
+  {
+    "id": "cook:fish_frostwake_pike",
+    "item": "dish_cold_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_frostwake_pike",
+        1
+      ]
+    ],
+    "zones": [
+      2,
+      26
+    ]
+  },
+  {
+    "id": "cook:fish_mud_loach",
+    "item": "dish_swamp_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_mud_loach",
+        1
+      ]
+    ],
+    "zones": [
+      3
+    ]
+  },
+  {
+    "id": "cook:fish_reed_bream",
+    "item": "dish_swamp_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_reed_bream",
+        1
+      ]
+    ],
+    "zones": [
+      3
+    ]
+  },
+  {
+    "id": "cook:fish_bog_dace",
+    "item": "dish_swamp_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_bog_dace",
+        1
+      ]
+    ],
+    "zones": [
+      3
+    ]
+  },
+  {
+    "id": "cook:fish_moss_catfish",
+    "item": "dish_swamp_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_moss_catfish",
+        1
+      ]
+    ],
+    "zones": [
+      3
+    ]
+  },
+  {
+    "id": "cook:fish_peat_eel",
+    "item": "dish_swamp_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_peat_eel",
+        1
+      ]
+    ],
+    "zones": [
+      3
+    ]
+  },
+  {
+    "id": "cook:fish_lantern_gar",
+    "item": "dish_swamp_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_lantern_gar",
+        1
+      ]
+    ],
+    "zones": [
+      3
+    ]
+  },
+  {
+    "id": "cook:fish_fen_crownfin",
+    "item": "dish_swamp_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_fen_crownfin",
+        1
+      ]
+    ],
+    "zones": [
+      3
+    ]
+  },
+  {
+    "id": "cook:fish_alder_trout",
+    "item": "dish_forest_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_alder_trout",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20
+    ]
+  },
+  {
+    "id": "cook:fish_brook_dace",
+    "item": "dish_forest_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_brook_dace",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20
+    ]
+  },
+  {
+    "id": "cook:fish_willow_chub",
+    "item": "dish_forest_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_willow_chub",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20
+    ]
+  },
+  {
+    "id": "cook:fish_fern_perch",
+    "item": "dish_forest_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_fern_perch",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20
+    ]
+  },
+  {
+    "id": "cook:fish_root_barb",
+    "item": "dish_forest_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_root_barb",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20
+    ]
+  },
+  {
+    "id": "cook:fish_amber_salmon",
+    "item": "dish_forest_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_amber_salmon",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20
+    ]
+  },
+  {
+    "id": "cook:fish_antler_sturgeon",
+    "item": "dish_forest_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_antler_sturgeon",
+        1
+      ]
+    ],
+    "zones": [
+      6,
+      20
+    ]
+  },
+  {
+    "id": "cook:fish_jade_barb",
+    "item": "dish_jungle_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_jade_barb",
+        1
+      ]
+    ],
+    "zones": [
+      22
+    ]
+  },
+  {
+    "id": "cook:fish_vine_tetra",
+    "item": "dish_jungle_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_vine_tetra",
+        1
+      ]
+    ],
+    "zones": [
+      22
+    ]
+  },
+  {
+    "id": "cook:fish_rain_guppy",
+    "item": "dish_jungle_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_rain_guppy",
+        1
+      ]
+    ],
+    "zones": [
+      22
+    ]
+  },
+  {
+    "id": "cook:fish_orchid_gourami",
+    "item": "dish_jungle_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_orchid_gourami",
+        1
+      ]
+    ],
+    "zones": [
+      22
+    ]
+  },
+  {
+    "id": "cook:fish_parrot_perch",
+    "item": "dish_jungle_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_parrot_perch",
+        1
+      ]
+    ],
+    "zones": [
+      22
+    ]
+  },
+  {
+    "id": "cook:fish_canopy_arowana",
+    "item": "dish_jungle_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_canopy_arowana",
+        1
+      ]
+    ],
+    "zones": [
+      22
+    ]
+  },
+  {
+    "id": "cook:fish_jade_dragonfish",
+    "item": "dish_jungle_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_jade_dragonfish",
+        1
+      ]
+    ],
+    "zones": [
+      22
+    ]
+  },
+  {
+    "id": "cook:fish_sand_tilapia",
+    "item": "dish_oasis_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_sand_tilapia",
+        1
+      ]
+    ],
+    "zones": [
+      25
+    ]
+  },
+  {
+    "id": "cook:fish_palm_minnow",
+    "item": "dish_oasis_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_palm_minnow",
+        1
+      ]
+    ],
+    "zones": [
+      25
+    ]
+  },
+  {
+    "id": "cook:fish_dune_carp",
+    "item": "dish_oasis_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_dune_carp",
+        1
+      ]
+    ],
+    "zones": [
+      25
+    ]
+  },
+  {
+    "id": "cook:fish_lapis_bream",
+    "item": "dish_oasis_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_lapis_bream",
+        1
+      ]
+    ],
+    "zones": [
+      25
+    ]
+  },
+  {
+    "id": "cook:fish_dusk_catfish",
+    "item": "dish_oasis_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_dusk_catfish",
+        1
+      ]
+    ],
+    "zones": [
+      25
+    ]
+  },
+  {
+    "id": "cook:fish_mirage_eel",
+    "item": "dish_oasis_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_mirage_eel",
+        1
+      ]
+    ],
+    "zones": [
+      25
+    ]
+  },
+  {
+    "id": "cook:fish_sapphire_lungfish",
+    "item": "dish_oasis_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_sapphire_lungfish",
+        1
+      ]
+    ],
+    "zones": [
+      25
+    ]
+  },
+  {
+    "id": "cook:fish_blossom_dace",
+    "item": "dish_spring_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_blossom_dace",
+        1
+      ]
+    ],
+    "zones": [
+      28
+    ]
+  },
+  {
+    "id": "cook:fish_thaw_minnow",
+    "item": "dish_spring_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_thaw_minnow",
+        1
+      ]
+    ],
+    "zones": [
+      28
+    ]
+  },
+  {
+    "id": "cook:fish_petal_chub",
+    "item": "dish_spring_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_petal_chub",
+        1
+      ]
+    ],
+    "zones": [
+      28
+    ]
+  },
+  {
+    "id": "cook:fish_vernal_trout",
+    "item": "dish_spring_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_vernal_trout",
+        1
+      ]
+    ],
+    "zones": [
+      28
+    ]
+  },
+  {
+    "id": "cook:fish_equinox_perch",
+    "item": "dish_spring_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_equinox_perch",
+        1
+      ]
+    ],
+    "zones": [
+      28
+    ]
+  },
+  {
+    "id": "cook:fish_wheel_koi",
+    "item": "dish_spring_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_wheel_koi",
+        1
+      ]
+    ],
+    "zones": [
+      28
+    ]
+  },
+  {
+    "id": "cook:fish_yearling_crownray",
+    "item": "dish_spring_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_yearling_crownray",
+        1
+      ]
+    ],
+    "zones": [
+      28
+    ]
+  },
+  {
+    "id": "cook:fish_cinder_fry",
+    "item": "dish_lava_grill",
+    "cost": 1,
+    "ingredients": [
+      [
+        "fish_cinder_fry",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_slag_sucker",
+    "item": "dish_lava_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_slag_sucker",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_ash_barb",
+    "item": "dish_lava_grill",
+    "cost": 2,
+    "ingredients": [
+      [
+        "fish_ash_barb",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_basalt_eel",
+    "item": "dish_lava_grill",
+    "cost": 4,
+    "ingredients": [
+      [
+        "fish_basalt_eel",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_furnace_bass",
+    "item": "dish_lava_grill",
+    "cost": 6,
+    "ingredients": [
+      [
+        "fish_furnace_bass",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_obsidian_gar",
+    "item": "dish_lava_feast",
+    "cost": 15,
+    "ingredients": [
+      [
+        "fish_obsidian_gar",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_phoenix_koi",
+    "item": "dish_lava_feast",
+    "cost": 50,
+    "ingredients": [
+      [
+        "fish_phoenix_koi",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  },
+  {
+    "id": "cook:fish_sunfire_ray",
+    "item": "dish_lava_feast",
+    "cost": 55,
+    "ingredients": [
+      [
+        "fish_sunfire_ray",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      45
+    ]
+  }
+]

@@ -769,3 +769,6 @@ client catalogues. Rebuild the private executable after generation. Focused chec
 `bash scripts/cargo.sh test fishing_`. Existing item IDs and zone IDs stay valid;
 no saved-character relocation or database migration is needed for this data layer.
 See [docs/fishing.md](docs/fishing.md) for rules, rollout and validation details.
+
+
+Fisher workshops (`FISH-RODS`, feature branch): `world/fishing-workshop.txt` owns rod/cooking recipes; `python3 scripts/fisher_npcs.py` overlays 13 reachable Fishers, their existing art assignments and 52 ordinary fish bring quests after shaped geography. It runs in `scripts/sync-world.cjs` after fishing candidate waters. `fish_catalog.py` adds the 16 cooked dishes from `consumable_tiers.fishing_dishes`. Use the normal full world sync and rebuild before testing the embedded data. No database or zone-ID migration is required. Focused checks: `cargo test fishing_`, `python3 tests/fishing-workshop.py`, `node tests/fishing-workshop-client.cjs`, and the bounded `tests/fishing-workshop-ui.cjs` against a private `--profile test` binary. Currency in recipes is copper.

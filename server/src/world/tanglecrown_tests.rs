@@ -527,7 +527,7 @@ fn the_tanglecrown_quests_are_connected_and_every_objective_names_something_that
     ] {
         assert!(map.quests.iter().any(|q| q.id == id), "{id}");
     }
-    assert_eq!(map.quests.len(), 32, "18 old quests and 14 new ones");
+    assert_eq!(map.quests.iter().filter(|q| !q.id.starts_with("fisher_")).count(), 32, "18 old quests and 14 new ones");
 }
 
 #[test]

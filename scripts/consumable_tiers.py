@@ -35,6 +35,22 @@ def tier_id(family, t):
     return family if t == 0 else f'{family}_l{LEVELS[t]}'
 
 
+def fishing_dishes(fish):
+    """Sixteen stable dish IDs, using the vendor meal scale and shared meal timer."""
+    result = []
+    for dish in dict.fromkeys(f['dish'] for f in fish):
+        source = next(f for f in fish if f['dish'] == dish)
+        level = source['level']
+        tier = max(t for t, low in enumerate(LEVELS) if low <= level)
+        feast = dish.endswith('_feast')
+        factor = 1.25 if feast else 1.0
+        name = source['habitat'] + (' Fish Feast' if feast else ' Fish Grill')
+        result.append(dict(id=dish, name=name, kind='food', rarity='uncommon' if feast else 'common',
+                           family=dish, requiredLevel=level, sell=max(1, FOOD_PRICE[tier]//4),
+                           heal=max(round(HEAL[tier]*factor),max(f['raw_heal'] for f in fish if f['dish']==dish)+1), mana=round(MANA[tier]*factor), duration=8, cooldown=30))
+    return result
+
+
 def main():
     raw = ITEMS.read_text()
     items = json.loads(raw)

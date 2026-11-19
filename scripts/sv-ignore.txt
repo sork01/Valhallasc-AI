@@ -169,5 +169,6 @@
   " : history ? ",
   " : q.repeatable ? ",
   "hero sprite",
-  "sprite job"
+  "sprite job",
+  "Fisher recipes"
 ]

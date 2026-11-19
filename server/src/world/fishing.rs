@@ -767,4 +767,27 @@ mod data_tests {
         w.use_item(1, &i.id);
         assert_eq!(w.players[&1].character.quantity(&i.id), 1);
     }
+    #[test]
+    fn fishing_workshop_best_rod_matches_water_or_lava_and_level() {
+        let (mut w, _) = super::super::fishing_tests::angler();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.level = 99;
+        for rod in RODS.iter() {
+            c.add_item(&rod.item, 1);
+        }
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 6);
+        w.players.get_mut(&1).unwrap().character.level = 10;
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
+        w.maps[1].objects =
+            vec![serde_json::from_value(json!({"kind":"lava","x":53.,"y":50.,"r":2.})).unwrap()];
+        w.maps[1].grid = Default::default();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.zone = 1;
+        p.character.x = 50.;
+        p.character.y = 50.;
+        p.character.level = 99;
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
+        w.players.get_mut(&1).unwrap().character.level = 5;
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 1);
+    }
 }

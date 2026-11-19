@@ -127,7 +127,7 @@ fn the_wheel_is_a_big_shaped_zone_with_four_towns_three_outposts_thirteen_elites
     assert_eq!(future.len(), 4);
     assert!(future.iter().all(|door| door["status"] == "open"));
     // 40 old quests keep their ids, 15 are new
-    assert_eq!(m.quests.len(), 55);
+    assert_eq!(m.quests.iter().filter(|q| !q.id.starts_with("fisher_")).count(), 55);
     for old in [
         "yr_sp_intro",
         "yr_su_solar_final",

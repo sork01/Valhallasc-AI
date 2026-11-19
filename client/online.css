@@ -1313,3 +1313,10 @@
 .tutorial-focus-inline { outline: 2px solid #ffd56b; outline-offset: 2px; border-radius: 4px; box-shadow: 0 0 10px #ffb838aa; }
 @media (pointer: coarse) { .tutorial-btn { min-height: var(--touch-target, 44px); padding: 8px 12px; } }
 @media (prefers-reduced-motion: reduce) { .tutorial-glow { animation: none; } }
+
+/* Fisher recipes share the ordinary conversation parchment and its scroll container. */
+.fisher-recipe { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #8d744d66; }
+.fisher-recipe > div { min-width:0; }
+.fisher-recipe small { display:block; margin-top:3px; }
+.fisher-recipe .btn { flex-shrink:0; min-height:44px; }
+@media (max-width:600px) { .fisher-recipe { align-items:stretch; flex-direction:column; gap:4px; } }

@@ -628,7 +628,7 @@ fn the_lapis_quests_are_connected_and_every_objective_names_something_that_exist
     ] {
         assert!(map.quests.iter().any(|q| q.id == id), "{id}");
     }
-    assert_eq!(map.quests.len(), 29, "15 old quests and 14 new ones");
+    assert_eq!(map.quests.iter().filter(|q| !q.id.starts_with("fisher_")).count(), 29, "15 old quests and 14 new ones");
 }
 
 #[test]

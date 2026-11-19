@@ -8,7 +8,10 @@ const world = read('world/map.txt'), old = read('client/assets/npc.txt'), fresh 
 const plan = read('docs/npc-named-plan.txt');
 const baseline = JSON.parse(execFileSync('git', ['show', 'c0b93e8e:client/assets/npc.txt'], { cwd: root }));
 const people = [world, ...world.zones].flatMap(z => z.npcs || []).filter(n => !['stone','scenery','mailbox','spirit_guide'].includes(n.art) && !/meeting stone/i.test(n.name));
-assert.equal(people.length, 588);
+const fishers=people.filter(n=>n.id.startsWith('fisher_'));
+assert.equal(people.length-fishers.length, 588);
+assert.equal(fishers.length,13);
+for(const n of fishers)assert.equal(old.npcs[n.id].art,'fisher');
 assert.deepEqual(Object.keys(old.npcs).sort(), people.map(n => n.id).sort(), 'Every actual person, and no scenery, is assigned');
 for (const [key, value] of Object.entries(baseline)) if (key !== 'npcs') assert.deepEqual(old[key], value, key);
 for (const [id, who] of Object.entries(baseline.npcs)) assert.deepEqual(old.npcs[id], who, `Original identity ${id}`);
@@ -29,4 +32,4 @@ for (const [alias, source] of Object.entries({ reuse_treefolk_merchant:'named_hw
   assert.equal(fresh.sprites[alias], fresh.sprites[source]);
   assert.deepEqual(fs.readFileSync(path.join(root,`client/assets/npcp_${alias}.png`)), fs.readFileSync(path.join(root,`client/assets/npcp_${source}.png`)));
 }
-console.log('NPC assignments: 588/588 people covered; all 319 original identities preserved; 148 bespoke and 121 role reuses, correct species/native sources');
+console.log(`NPC assignments: ${people.length}/${people.length} people covered, including ${fishers.length} Fishers; original identities preserved`);

@@ -12,6 +12,9 @@ use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
 mod fishing;
+mod fishing_workshop;
+#[cfg(test)]
+mod fishing_workshop_tests;
 #[cfg(test)]
 mod fishing_tests;
 mod achievements;
@@ -30,7 +33,8 @@ fn walk_out(p: &mut Player, gate: &Portal) {
 /// The Empty Seat quests and the yearly festival quests: the overlays that reach many zones.
 #[cfg(test)]
 fn narrow_overlay_quest(id: &str) -> bool {
-    id.starts_with("es_")
+    id.starts_with("fisher_")
+        || id.starts_with("es_")
         || [
             "halloween_",
             "christmas_",
@@ -54,7 +58,10 @@ fn narrow_overlay_npc(id: &str) -> bool {
         "newyear_launchpad",
         "halloween_lantern",
     ];
-    id.starts_with("mailbox_") || id.starts_with("festival_dance_") || SEASONAL.contains(&id)
+    id.starts_with("fisher_")
+        || id.starts_with("mailbox_")
+        || id.starts_with("festival_dance_")
+        || SEASONAL.contains(&id)
 }
 
 /// People that overlays add to zones: mailboxes, festival dancers and the one-per-season shrine.
@@ -69,7 +76,8 @@ pub(crate) fn overlay_npc(id: &str) -> bool {
         "halloween_lantern",
     ];
     // Later dungeons hang an entrance guide on their host zone (barrow_, keel_, span_, null_, raid_key_keeper).
-    id.starts_with("mailbox_")
+    id.starts_with("fisher_")
+        || id.starts_with("mailbox_")
         || id.starts_with("spirit_guide_")
         || id.starts_with("festival_dance_")
         || SEASONAL.contains(&id)
@@ -147,7 +155,8 @@ pub(crate) fn overlay_enemy(kind: &str) -> bool {
 /// The Empty Seat chapters and handoffs and the yearly festival quests are added to zones by overlays.
 #[cfg(test)]
 pub(crate) fn overlay_quest(id: &str) -> bool {
-    id.starts_with("es_")
+    id.starts_with("fisher_")
+        || id.starts_with("es_")
         || [
             "halloween_",
             "christmas_",
@@ -3372,6 +3381,9 @@ impl World {
         } else {
             1
         };
+        let trading = self.trade_index(&self.players[&session].character.id).is_some()
+            || self.pvp_busy(&self.players[&session].character.id)
+            || self.time < self.players[&session].cutscene_until;
         let seasons = self.seasonal.active();
         let p = self.players.get_mut(&session).unwrap();
         let map = &self.maps[p.character.zone];
@@ -3409,7 +3421,15 @@ impl World {
                 notice = "Please wait a moment before trying again.".into();
             } else {
                 p.service_at = self.time;
-                if let Some(action) = id.strip_prefix("prefer_copy:") {
+                if id.starts_with("rod:") || id.starts_with("cook:") {
+                    match fishing_workshop::purchase(p, npc, id, trading) {
+                        Ok(()) => {
+                            quest_changed = true;
+                            notice = "Your Fisher recipe is ready.".into();
+                        }
+                        Err(text) => notice = text.into(),
+                    }
+                } else if let Some(action) = id.strip_prefix("prefer_copy:") {
                     if !npc.offers.iter().any(|o| o.id == "refine") {
                         notice = "This townsperson cannot select gear copies.".into();
                     } else if let Ok(id) = action.parse::<u64>() {
@@ -3749,9 +3769,9 @@ impl World {
         if quest_changed {
             sync_progression(&mut p.character, &self.maps);
         }
-        let _ = p
-            .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"abandonedQuests":p.character.abandoned_quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+        let mut dialogue = json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"abandonedQuests":p.character.abandoned_quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look});
+        dialogue["fisherQuote"] = fishing_workshop::quotes(npc, &p.character);
+        let _ = p.peer.try_send(dialogue);
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {

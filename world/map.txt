@@ -63946,6 +63946,144 @@
           "cost": 0
         }
       ]
+    },
+    {
+      "id": "fisher_meadow_0",
+      "name": "Fisher",
+      "role": "Fishing and cooking",
+      "x": 248.25,
+      "y": 189.25,
+      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+      "offers": [
+        {
+          "id": "fishing_workshop",
+          "label": "Fisher workshop",
+          "cost": 0
+        },
+        {
+          "id": "buy_twig_rod",
+          "label": "Buy a Twig Rod",
+          "cost": 50,
+          "item": "rod_twig_rod"
+        },
+        {
+          "id": "rod:2",
+          "label": "Craft rod",
+          "cost": 250
+        },
+        {
+          "id": "cook:fish_pier_sprat",
+          "label": "Cook fish",
+          "cost": 1
+        },
+        {
+          "id": "cook:fish_saltby_herring",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_sand_dab",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_copper_mackerel",
+          "label": "Cook fish",
+          "cost": 4
+        },
+        {
+          "id": "cook:fish_tide_flounder",
+          "label": "Cook fish",
+          "cost": 6
+        },
+        {
+          "id": "cook:fish_glass_eel",
+          "label": "Cook fish",
+          "cost": 15
+        },
+        {
+          "id": "cook:fish_moonscale_carp",
+          "label": "Cook fish",
+          "cost": 50
+        }
+      ],
+      "buys": true,
+      "color": "#527e89",
+      "look": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "short",
+        "hat": "straw"
+      }
+    },
+    {
+      "id": "fisher_meadow_1",
+      "name": "Fisher",
+      "role": "Fishing and cooking",
+      "x": 200.5,
+      "y": 284,
+      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+      "offers": [
+        {
+          "id": "fishing_workshop",
+          "label": "Fisher workshop",
+          "cost": 0
+        },
+        {
+          "id": "buy_twig_rod",
+          "label": "Buy a Twig Rod",
+          "cost": 50,
+          "item": "rod_twig_rod"
+        },
+        {
+          "id": "rod:2",
+          "label": "Craft rod",
+          "cost": 250
+        },
+        {
+          "id": "cook:fish_pier_sprat",
+          "label": "Cook fish",
+          "cost": 1
+        },
+        {
+          "id": "cook:fish_saltby_herring",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_sand_dab",
+          "label": "Cook fish",
+          "cost": 2
+        },
+        {
+          "id": "cook:fish_copper_mackerel",
+          "label": "Cook fish",
+          "cost": 4
+        },
+        {
+          "id": "cook:fish_tide_flounder",
+          "label": "Cook fish",
+          "cost": 6
+        },
+        {
+          "id": "cook:fish_glass_eel",
+          "label": "Cook fish",
+          "cost": 15
+        },
+        {
+          "id": "cook:fish_moonscale_carp",
+          "label": "Cook fish",
+          "cost": 50
+        }
+      ],
+      "buys": true,
+      "color": "#527e89",
+      "look": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "short",
+        "hat": "straw"
+      }
     }
   ],
   "quests": [
@@ -65313,6 +65451,158 @@
       "autoLevel": 1,
       "landing": true,
       "repeatable": false
+    },
+    {
+      "id": "fisher_meadow_0_1",
+      "title": "Fresh Fish for Alderhaven",
+      "npc": "fisher_meadow_0",
+      "requires": null,
+      "repeatable": false,
+      "level": 1,
+      "rewardXp": 10,
+      "rewardGold": 5,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_pier_sprat",
+          "count": 5,
+          "what": "Pier Sprat"
+        }
+      ]
+    },
+    {
+      "id": "fisher_meadow_0_2",
+      "title": "A Finer Catch for Alderhaven",
+      "npc": "fisher_meadow_0",
+      "requires": "fisher_meadow_0_1",
+      "repeatable": false,
+      "level": 1,
+      "rewardXp": 10,
+      "rewardGold": 5,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_copper_mackerel",
+          "count": 3,
+          "what": "Copper Mackerel"
+        }
+      ]
+    },
+    {
+      "id": "fisher_meadow_0_3",
+      "title": "A Trophy for Alderhaven",
+      "npc": "fisher_meadow_0",
+      "requires": "fisher_meadow_0_2",
+      "repeatable": false,
+      "level": 25,
+      "rewardXp": 960,
+      "rewardGold": 75,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_glass_eel",
+          "count": 1,
+          "what": "Glass Eel"
+        }
+      ]
+    },
+    {
+      "id": "fisher_meadow_0_4",
+      "title": "The Daily Creel at Alderhaven",
+      "npc": "fisher_meadow_0",
+      "requires": "fisher_meadow_0_1",
+      "repeatable": true,
+      "level": 1,
+      "rewardXp": 10,
+      "rewardGold": 5,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_pier_sprat",
+          "count": 5,
+          "what": "Pier Sprat"
+        }
+      ]
+    },
+    {
+      "id": "fisher_meadow_1_1",
+      "title": "Fresh Fish for Saltby",
+      "npc": "fisher_meadow_1",
+      "requires": null,
+      "repeatable": false,
+      "level": 1,
+      "rewardXp": 10,
+      "rewardGold": 5,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_pier_sprat",
+          "count": 5,
+          "what": "Pier Sprat"
+        }
+      ]
+    },
+    {
+      "id": "fisher_meadow_1_2",
+      "title": "A Finer Catch for Saltby",
+      "npc": "fisher_meadow_1",
+      "requires": "fisher_meadow_1_1",
+      "repeatable": false,
+      "level": 1,
+      "rewardXp": 10,
+      "rewardGold": 5,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_copper_mackerel",
+          "count": 3,
+          "what": "Copper Mackerel"
+        }
+      ]
+    },
+    {
+      "id": "fisher_meadow_1_3",
+      "title": "A Trophy for Saltby",
+      "npc": "fisher_meadow_1",
+      "requires": "fisher_meadow_1_2",
+      "repeatable": false,
+      "level": 25,
+      "rewardXp": 960,
+      "rewardGold": 75,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_glass_eel",
+          "count": 1,
+          "what": "Glass Eel"
+        }
+      ]
+    },
+    {
+      "id": "fisher_meadow_1_4",
+      "title": "The Daily Creel at Saltby",
+      "npc": "fisher_meadow_1",
+      "requires": "fisher_meadow_1_1",
+      "repeatable": true,
+      "level": 1,
+      "rewardXp": 10,
+      "rewardGold": 5,
+      "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+      "objectives": [
+        {
+          "kind": "bring",
+          "target": "fish_pier_sprat",
+          "count": 5,
+          "what": "Pier Sprat"
+        }
+      ]
     }
   ],
   "name": "Greenmeadow",
@@ -131582,6 +131872,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_crags_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 169.77750183780864,
+          "y": 235.1139791549545,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:emberline",
+              "label": "Craft rod",
+              "cost": 500
+            },
+            {
+              "id": "cook:fish_cinder_fry",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_slag_sucker",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_ash_barb",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_basalt_eel",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_furnace_bass",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_obsidian_gar",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_phoenix_koi",
+              "label": "Cook fish",
+              "cost": 50
+            },
+            {
+              "id": "cook:fish_sunfire_ray",
+              "label": "Cook fish",
+              "cost": 55
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -132328,6 +132686,82 @@
           "rewardGold": 130,
           "requires": "crags_golems",
           "repeatable": false
+        },
+        {
+          "id": "fisher_crags_0_1",
+          "title": "Fresh Fish for Cinderwatch Camp",
+          "npc": "fisher_crags_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 5,
+          "rewardXp": 80,
+          "rewardGold": 15,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cinder_fry",
+              "count": 5,
+              "what": "Cinder Fry"
+            }
+          ]
+        },
+        {
+          "id": "fisher_crags_0_2",
+          "title": "A Finer Catch for Cinderwatch Camp",
+          "npc": "fisher_crags_0",
+          "requires": "fisher_crags_0_1",
+          "repeatable": false,
+          "level": 5,
+          "rewardXp": 80,
+          "rewardGold": 15,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_basalt_eel",
+              "count": 3,
+              "what": "Basalt Eel"
+            }
+          ]
+        },
+        {
+          "id": "fisher_crags_0_3",
+          "title": "A Trophy for Cinderwatch Camp",
+          "npc": "fisher_crags_0",
+          "requires": "fisher_crags_0_2",
+          "repeatable": false,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_obsidian_gar",
+              "count": 1,
+              "what": "Obsidian Gar"
+            }
+          ]
+        },
+        {
+          "id": "fisher_crags_0_4",
+          "title": "The Daily Creel at Cinderwatch Camp",
+          "npc": "fisher_crags_0",
+          "requires": "fisher_crags_0_1",
+          "repeatable": true,
+          "level": 5,
+          "rewardXp": 80,
+          "rewardGold": 15,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cinder_fry",
+              "count": 5,
+              "what": "Cinder Fry"
+            }
+          ]
         }
       ],
       "city": {
@@ -208031,6 +208465,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_rime_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 264.6704791128445,
+          "y": 152.25449317362506,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:2",
+              "label": "Craft rod",
+              "cost": 250
+            },
+            {
+              "id": "rod:3",
+              "label": "Craft rod",
+              "cost": 1500
+            },
+            {
+              "id": "cook:fish_snow_minnow",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_frost_char",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_ice_perch",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_silver_smelt",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_blue_grayling",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_aurora_trout",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_frostwake_pike",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -208812,6 +209314,82 @@
           "requires": "rime_wyrm",
           "repeatable": false,
           "rewardItem": "necklace_moonstone_l15_green"
+        },
+        {
+          "id": "fisher_rime_0_1",
+          "title": "Fresh Fish for Rimeward Camp",
+          "npc": "fisher_rime_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 10,
+          "rewardXp": 210,
+          "rewardGold": 30,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_snow_minnow",
+              "count": 5,
+              "what": "Snow Minnow"
+            }
+          ]
+        },
+        {
+          "id": "fisher_rime_0_2",
+          "title": "A Finer Catch for Rimeward Camp",
+          "npc": "fisher_rime_0",
+          "requires": "fisher_rime_0_1",
+          "repeatable": false,
+          "level": 10,
+          "rewardXp": 210,
+          "rewardGold": 30,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_silver_smelt",
+              "count": 3,
+              "what": "Silver Smelt"
+            }
+          ]
+        },
+        {
+          "id": "fisher_rime_0_3",
+          "title": "A Trophy for Rimeward Camp",
+          "npc": "fisher_rime_0",
+          "requires": "fisher_rime_0_2",
+          "repeatable": false,
+          "level": 25,
+          "rewardXp": 960,
+          "rewardGold": 75,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_aurora_trout",
+              "count": 1,
+              "what": "Aurora Trout"
+            }
+          ]
+        },
+        {
+          "id": "fisher_rime_0_4",
+          "title": "The Daily Creel at Rimeward Camp",
+          "npc": "fisher_rime_0",
+          "requires": "fisher_rime_0_1",
+          "repeatable": true,
+          "level": 10,
+          "rewardXp": 210,
+          "rewardGold": 30,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_snow_minnow",
+              "count": 5,
+              "what": "Snow Minnow"
+            }
+          ]
         }
       ],
       "city": {
@@ -292483,6 +293061,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_fen_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 181.57121597344437,
+          "y": 93.962843272421,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:2",
+              "label": "Craft rod",
+              "cost": 250
+            },
+            {
+              "id": "rod:3",
+              "label": "Craft rod",
+              "cost": 1500
+            },
+            {
+              "id": "cook:fish_mud_loach",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_reed_bream",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_bog_dace",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_moss_catfish",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_peat_eel",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_lantern_gar",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_fen_crownfin",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -293344,6 +293990,82 @@
           "requires": "fen_toads",
           "repeatable": false,
           "rewardItem": "necklace_moonstone_l15_green"
+        },
+        {
+          "id": "fisher_fen_0_1",
+          "title": "Fresh Fish for Lanternmere",
+          "npc": "fisher_fen_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 15,
+          "rewardXp": 410,
+          "rewardGold": 45,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_mud_loach",
+              "count": 5,
+              "what": "Mud Loach"
+            }
+          ]
+        },
+        {
+          "id": "fisher_fen_0_2",
+          "title": "A Finer Catch for Lanternmere",
+          "npc": "fisher_fen_0",
+          "requires": "fisher_fen_0_1",
+          "repeatable": false,
+          "level": 15,
+          "rewardXp": 410,
+          "rewardGold": 45,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_moss_catfish",
+              "count": 3,
+              "what": "Moss Catfish"
+            }
+          ]
+        },
+        {
+          "id": "fisher_fen_0_3",
+          "title": "A Trophy for Lanternmere",
+          "npc": "fisher_fen_0",
+          "requires": "fisher_fen_0_2",
+          "repeatable": false,
+          "level": 25,
+          "rewardXp": 960,
+          "rewardGold": 75,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_lantern_gar",
+              "count": 1,
+              "what": "Lantern Gar"
+            }
+          ]
+        },
+        {
+          "id": "fisher_fen_0_4",
+          "title": "The Daily Creel at Lanternmere",
+          "npc": "fisher_fen_0",
+          "requires": "fisher_fen_0_1",
+          "repeatable": true,
+          "level": 15,
+          "rewardXp": 410,
+          "rewardGold": 45,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_mud_loach",
+              "count": 5,
+              "what": "Mud Loach"
+            }
+          ]
         }
       ],
       "city": {
@@ -438811,6 +439533,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_wyrd_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 72.6,
+          "y": 218.7,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:3",
+              "label": "Craft rod",
+              "cost": 1500
+            },
+            {
+              "id": "rod:4",
+              "label": "Craft rod",
+              "cost": 5000
+            },
+            {
+              "id": "cook:fish_alder_trout",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_brook_dace",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_willow_chub",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_fern_perch",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_root_barb",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_amber_salmon",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_antler_sturgeon",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -439911,6 +440701,82 @@
           "requires": "wyrd_hm_ring",
           "repeatable": false,
           "rewardItem": "necklace_moonstone_l30_blue"
+        },
+        {
+          "id": "fisher_wyrd_0_1",
+          "title": "Fresh Fish for Hollowmoot",
+          "npc": "fisher_wyrd_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 25,
+          "rewardXp": 960,
+          "rewardGold": 75,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_alder_trout",
+              "count": 5,
+              "what": "Alder Trout"
+            }
+          ]
+        },
+        {
+          "id": "fisher_wyrd_0_2",
+          "title": "A Finer Catch for Hollowmoot",
+          "npc": "fisher_wyrd_0",
+          "requires": "fisher_wyrd_0_1",
+          "repeatable": false,
+          "level": 25,
+          "rewardXp": 960,
+          "rewardGold": 75,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_fern_perch",
+              "count": 3,
+              "what": "Fern Perch"
+            }
+          ]
+        },
+        {
+          "id": "fisher_wyrd_0_3",
+          "title": "A Trophy for Hollowmoot",
+          "npc": "fisher_wyrd_0",
+          "requires": "fisher_wyrd_0_2",
+          "repeatable": false,
+          "level": 25,
+          "rewardXp": 960,
+          "rewardGold": 75,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_amber_salmon",
+              "count": 1,
+              "what": "Amber Salmon"
+            }
+          ]
+        },
+        {
+          "id": "fisher_wyrd_0_4",
+          "title": "The Daily Creel at Hollowmoot",
+          "npc": "fisher_wyrd_0",
+          "requires": "fisher_wyrd_0_1",
+          "repeatable": true,
+          "level": 25,
+          "rewardXp": 960,
+          "rewardGold": 75,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_alder_trout",
+              "count": 5,
+              "what": "Alder Trout"
+            }
+          ]
         }
       ],
       "city": {
@@ -887314,6 +888180,69 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_storm_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 70.08327719506772,
+          "y": 254.43610059419052,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:5",
+              "label": "Craft rod",
+              "cost": 12000
+            },
+            {
+              "id": "cook:fish_pier_sprat",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_saltby_herring",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_sand_dab",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_copper_mackerel",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_tide_flounder",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_glass_eel",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_moonscale_carp",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -888524,6 +889453,82 @@
           "requires": "storm_bh_hold",
           "repeatable": false,
           "rewardItem": "necklace_moonstone_l65_green"
+        },
+        {
+          "id": "fisher_storm_0_1",
+          "title": "Fresh Fish for Breakwater Camp",
+          "npc": "fisher_storm_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_pier_sprat",
+              "count": 5,
+              "what": "Pier Sprat"
+            }
+          ]
+        },
+        {
+          "id": "fisher_storm_0_2",
+          "title": "A Finer Catch for Breakwater Camp",
+          "npc": "fisher_storm_0",
+          "requires": "fisher_storm_0_1",
+          "repeatable": false,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_copper_mackerel",
+              "count": 3,
+              "what": "Copper Mackerel"
+            }
+          ]
+        },
+        {
+          "id": "fisher_storm_0_3",
+          "title": "A Trophy for Breakwater Camp",
+          "npc": "fisher_storm_0",
+          "requires": "fisher_storm_0_2",
+          "repeatable": false,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_glass_eel",
+              "count": 1,
+              "what": "Glass Eel"
+            }
+          ]
+        },
+        {
+          "id": "fisher_storm_0_4",
+          "title": "The Daily Creel at Breakwater Camp",
+          "npc": "fisher_storm_0",
+          "requires": "fisher_storm_0_1",
+          "repeatable": true,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_pier_sprat",
+              "count": 5,
+              "what": "Pier Sprat"
+            }
+          ]
         }
       ],
       "city": {
@@ -936404,6 +937409,69 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_sun_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 127.14,
+          "y": 183.46,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:4",
+              "label": "Craft rod",
+              "cost": 5000
+            },
+            {
+              "id": "cook:fish_alder_trout",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_brook_dace",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_willow_chub",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_fern_perch",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_root_barb",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_amber_salmon",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_antler_sturgeon",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -937658,6 +938726,82 @@
           "requires": "svs_er_hold",
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l70_green"
+        },
+        {
+          "id": "fisher_sun_0_1",
+          "title": "Fresh Fish for Millbridge",
+          "npc": "fisher_sun_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_alder_trout",
+              "count": 5,
+              "what": "Alder Trout"
+            }
+          ]
+        },
+        {
+          "id": "fisher_sun_0_2",
+          "title": "A Finer Catch for Millbridge",
+          "npc": "fisher_sun_0",
+          "requires": "fisher_sun_0_1",
+          "repeatable": false,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_fern_perch",
+              "count": 3,
+              "what": "Fern Perch"
+            }
+          ]
+        },
+        {
+          "id": "fisher_sun_0_3",
+          "title": "A Trophy for Millbridge",
+          "npc": "fisher_sun_0",
+          "requires": "fisher_sun_0_2",
+          "repeatable": false,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_amber_salmon",
+              "count": 1,
+              "what": "Amber Salmon"
+            }
+          ]
+        },
+        {
+          "id": "fisher_sun_0_4",
+          "title": "The Daily Creel at Millbridge",
+          "npc": "fisher_sun_0",
+          "requires": "fisher_sun_0_1",
+          "repeatable": true,
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 120,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_alder_trout",
+              "count": 5,
+              "what": "Alder Trout"
+            }
+          ]
         }
       ],
       "city": {
@@ -1055610,6 +1056754,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_tangle_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 166.87271465194004,
+          "y": 228.57271465194003,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:4",
+              "label": "Craft rod",
+              "cost": 5000
+            },
+            {
+              "id": "rod:5",
+              "label": "Craft rod",
+              "cost": 12000
+            },
+            {
+              "id": "cook:fish_jade_barb",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_vine_tetra",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_rain_guppy",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_orchid_gourami",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_parrot_perch",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_canopy_arowana",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_jade_dragonfish",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -1056980,6 +1058192,82 @@
           "requires": "tangle_dr_hold",
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l80_green"
+        },
+        {
+          "id": "fisher_tangle_0_1",
+          "title": "Fresh Fish for Banyan Landing",
+          "npc": "fisher_tangle_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_jade_barb",
+              "count": 5,
+              "what": "Jade Barb"
+            }
+          ]
+        },
+        {
+          "id": "fisher_tangle_0_2",
+          "title": "A Finer Catch for Banyan Landing",
+          "npc": "fisher_tangle_0",
+          "requires": "fisher_tangle_0_1",
+          "repeatable": false,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_orchid_gourami",
+              "count": 3,
+              "what": "Orchid Gourami"
+            }
+          ]
+        },
+        {
+          "id": "fisher_tangle_0_3",
+          "title": "A Trophy for Banyan Landing",
+          "npc": "fisher_tangle_0",
+          "requires": "fisher_tangle_0_2",
+          "repeatable": false,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_canopy_arowana",
+              "count": 1,
+              "what": "Canopy Arowana"
+            }
+          ]
+        },
+        {
+          "id": "fisher_tangle_0_4",
+          "title": "The Daily Creel at Banyan Landing",
+          "npc": "fisher_tangle_0",
+          "requires": "fisher_tangle_0_1",
+          "repeatable": true,
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 210,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_jade_barb",
+              "count": 5,
+              "what": "Jade Barb"
+            }
+          ]
         }
       ],
       "city": {
@@ -1208943,6 +1210231,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_lapis_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 60.41,
+          "y": 191.10999999999999,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:5",
+              "label": "Craft rod",
+              "cost": 12000
+            },
+            {
+              "id": "rod:6",
+              "label": "Craft rod",
+              "cost": 30000
+            },
+            {
+              "id": "cook:fish_sand_tilapia",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_palm_minnow",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_dune_carp",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_lapis_bream",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_dusk_catfish",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_mirage_eel",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_sapphire_lungfish",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -1210232,6 +1211588,82 @@
           "requires": "lapis_ew_hold",
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l85_green"
+        },
+        {
+          "id": "fisher_lapis_0_1",
+          "title": "Fresh Fish for Azure Wells",
+          "npc": "fisher_lapis_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_sand_tilapia",
+              "count": 5,
+              "what": "Sand Tilapia"
+            }
+          ]
+        },
+        {
+          "id": "fisher_lapis_0_2",
+          "title": "A Finer Catch for Azure Wells",
+          "npc": "fisher_lapis_0",
+          "requires": "fisher_lapis_0_1",
+          "repeatable": false,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_lapis_bream",
+              "count": 3,
+              "what": "Lapis Bream"
+            }
+          ]
+        },
+        {
+          "id": "fisher_lapis_0_3",
+          "title": "A Trophy for Azure Wells",
+          "npc": "fisher_lapis_0",
+          "requires": "fisher_lapis_0_2",
+          "repeatable": false,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_mirage_eel",
+              "count": 1,
+              "what": "Mirage Eel"
+            }
+          ]
+        },
+        {
+          "id": "fisher_lapis_0_4",
+          "title": "The Daily Creel at Azure Wells",
+          "npc": "fisher_lapis_0",
+          "requires": "fisher_lapis_0_1",
+          "repeatable": true,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_sand_tilapia",
+              "count": 5,
+              "what": "Sand Tilapia"
+            }
+          ]
         }
       ],
       "city": {
@@ -1250756,6 +1252188,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_fws_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 46.95945806790323,
+          "y": 290.8252883175806,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:5",
+              "label": "Craft rod",
+              "cost": 12000
+            },
+            {
+              "id": "rod:6",
+              "label": "Craft rod",
+              "cost": 30000
+            },
+            {
+              "id": "cook:fish_snow_minnow",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_frost_char",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_ice_perch",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_silver_smelt",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_blue_grayling",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_aurora_trout",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_frostwake_pike",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -1251907,6 +1253407,82 @@
           "requires": "fws_rw_hold",
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l85_green"
+        },
+        {
+          "id": "fisher_fws_0_1",
+          "title": "Fresh Fish for Frostwake Station",
+          "npc": "fisher_fws_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_snow_minnow",
+              "count": 5,
+              "what": "Snow Minnow"
+            }
+          ]
+        },
+        {
+          "id": "fisher_fws_0_2",
+          "title": "A Finer Catch for Frostwake Station",
+          "npc": "fisher_fws_0",
+          "requires": "fisher_fws_0_1",
+          "repeatable": false,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_silver_smelt",
+              "count": 3,
+              "what": "Silver Smelt"
+            }
+          ]
+        },
+        {
+          "id": "fisher_fws_0_3",
+          "title": "A Trophy for Frostwake Station",
+          "npc": "fisher_fws_0",
+          "requires": "fisher_fws_0_2",
+          "repeatable": false,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_aurora_trout",
+              "count": 1,
+              "what": "Aurora Trout"
+            }
+          ]
+        },
+        {
+          "id": "fisher_fws_0_4",
+          "title": "The Daily Creel at Frostwake Station",
+          "npc": "fisher_fws_0",
+          "requires": "fisher_fws_0_1",
+          "repeatable": true,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_snow_minnow",
+              "count": 5,
+              "what": "Snow Minnow"
+            }
+          ]
         }
       ],
       "city": {
@@ -1450215,6 +1451791,69 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_yr_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 318.91735931288076,
+          "y": 751.1526406871193,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:6",
+              "label": "Craft rod",
+              "cost": 30000
+            },
+            {
+              "id": "cook:fish_blossom_dace",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_thaw_minnow",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_petal_chub",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_vernal_trout",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_equinox_perch",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_wheel_koi",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_yearling_crownray",
+              "label": "Cook fish",
+              "cost": 50
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -1451891,6 +1453530,82 @@
           "rewardGold": 13000,
           "requires": "yr_sp_intro",
           "repeatable": false
+        },
+        {
+          "id": "fisher_yr_0_1",
+          "title": "Fresh Fish for Springmere",
+          "npc": "fisher_yr_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_blossom_dace",
+              "count": 5,
+              "what": "Blossom Dace"
+            }
+          ]
+        },
+        {
+          "id": "fisher_yr_0_2",
+          "title": "A Finer Catch for Springmere",
+          "npc": "fisher_yr_0",
+          "requires": "fisher_yr_0_1",
+          "repeatable": false,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_vernal_trout",
+              "count": 3,
+              "what": "Vernal Trout"
+            }
+          ]
+        },
+        {
+          "id": "fisher_yr_0_3",
+          "title": "A Trophy for Springmere",
+          "npc": "fisher_yr_0",
+          "requires": "fisher_yr_0_2",
+          "repeatable": false,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_wheel_koi",
+              "count": 1,
+              "what": "Wheel Koi"
+            }
+          ]
+        },
+        {
+          "id": "fisher_yr_0_4",
+          "title": "The Daily Creel at Springmere",
+          "npc": "fisher_yr_0",
+          "requires": "fisher_yr_0_1",
+          "repeatable": true,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_blossom_dace",
+              "count": 5,
+              "what": "Blossom Dace"
+            }
+          ]
         }
       ],
       "city": {
@@ -1604702,6 +1606417,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_ew_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 180.10375426283784,
+          "y": 100.57175478571796,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
+            },
+            {
+              "id": "cook:fish_cinder_fry",
+              "label": "Cook fish",
+              "cost": 1
+            },
+            {
+              "id": "cook:fish_slag_sucker",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_ash_barb",
+              "label": "Cook fish",
+              "cost": 2
+            },
+            {
+              "id": "cook:fish_basalt_eel",
+              "label": "Cook fish",
+              "cost": 4
+            },
+            {
+              "id": "cook:fish_furnace_bass",
+              "label": "Cook fish",
+              "cost": 6
+            },
+            {
+              "id": "cook:fish_obsidian_gar",
+              "label": "Cook fish",
+              "cost": 15
+            },
+            {
+              "id": "cook:fish_phoenix_koi",
+              "label": "Cook fish",
+              "cost": 50
+            },
+            {
+              "id": "cook:fish_sunfire_ray",
+              "label": "Cook fish",
+              "cost": 55
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -1605421,6 +1607204,82 @@
           "requires": "ew_gh_hold",
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l95_green"
+        },
+        {
+          "id": "fisher_ew_0_1",
+          "title": "Fresh Fish for Chainrest",
+          "npc": "fisher_ew_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cinder_fry",
+              "count": 5,
+              "what": "Cinder Fry"
+            }
+          ]
+        },
+        {
+          "id": "fisher_ew_0_2",
+          "title": "A Finer Catch for Chainrest",
+          "npc": "fisher_ew_0",
+          "requires": "fisher_ew_0_1",
+          "repeatable": false,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_basalt_eel",
+              "count": 3,
+              "what": "Basalt Eel"
+            }
+          ]
+        },
+        {
+          "id": "fisher_ew_0_3",
+          "title": "A Trophy for Chainrest",
+          "npc": "fisher_ew_0",
+          "requires": "fisher_ew_0_2",
+          "repeatable": false,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_obsidian_gar",
+              "count": 1,
+              "what": "Obsidian Gar"
+            }
+          ]
+        },
+        {
+          "id": "fisher_ew_0_4",
+          "title": "The Daily Creel at Chainrest",
+          "npc": "fisher_ew_0",
+          "requires": "fisher_ew_0_1",
+          "repeatable": true,
+          "level": 95,
+          "rewardXp": 11140,
+          "rewardGold": 285,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cinder_fry",
+              "count": 5,
+              "what": "Cinder Fry"
+            }
+          ]
         }
       ],
       "city": {

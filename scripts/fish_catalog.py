@@ -28,10 +28,12 @@ def pieces(root=ROOT):
         out.append(dict(id=row['item'], name=row['name'], kind='material',
                         rarity=row['rarity'], sell=row['sell'],
                         fishing=dict(loot=row['category'])))
+    from consumable_tiers import fishing_dishes
+    out.extend(fishing_dishes(fish))
     ids = [i['id'] for i in out]
     if len(ids) != len(set(ids)):
         raise ValueError('Duplicate fishing item ID')
-    if any(i.get('source') == 'orange_pool' or i['kind'] not in ('fish', 'rod', 'material') for i in out):
+    if any(i.get('source') == 'orange_pool' or i['kind'] not in ('fish', 'rod', 'material', 'food') for i in out):
         raise ValueError('Fishing cannot generate equipment')
     return out
 

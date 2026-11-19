@@ -547,7 +547,7 @@
     if(!['merchant','sell'].includes(view.kind))$('npc-notice').textContent=packet.notice;
     $('npc-gold').innerHTML=`${Locale.translate('Your purse:')} ${Money.html(packet.gold)}`;
     $('npc-gold').hidden=!!quest;
-    $('npc-back').hidden=!['merchant','sell','merge','refine','repair','stat_reset'].includes(view.kind);
+    $('npc-back').hidden=!['merchant','sell','merge','refine','repair','stat_reset','fisher'].includes(view.kind);
     $('npc-back').textContent=view.kind==='merchant'?'Quests / services':'Back';
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
@@ -556,7 +556,7 @@
     if(view.kind==='gossip'){
       $('npc-quests').replaceChildren();
     }
-    else if(['merchant','sell','merge','refine','repair','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
+    else if(['merchant','sell','merge','refine','repair','stat_reset','fisher'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
       if(packet.travel?.length){
@@ -573,6 +573,11 @@
         const meta=(area().npcs||[]).find(n=>n.id===npc.id)?.offers?.find(o=>o.id===offer.id)||offer;
         if(meta.season&&!window.Seasonal?.isActive(meta.season)||meta.quest&&!window.Quests?.active(meta.quest))continue;
         if(window.Shop?.isStockOffer(offer))continue;
+        if(offer.id.startsWith('rod:')||offer.id.startsWith('cook:'))continue;
+        if(offer.id==='fishing_workshop'){
+          const b=row('vendor','Fisher workshop','Craft rods and cook fish');b.dataset.view='fisher';
+          b.addEventListener('click',()=>show({kind:'fisher'},'#npc-back'));offers.push(b);continue;
+        }
         if(offer.id==='mail') {
           const b=row('coin',offer.label||'Open mailbox','');b.dataset.offer='mail';b.addEventListener('click',()=>window.Mail?.open(npc));offers.push(b);continue;
         }
@@ -617,9 +622,11 @@
       confirm.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:'stat_reset'}))confirm.disabled=true;});offers.push(confirm);
     }
     $('npc-offers').replaceChildren(...offers);
+    if(view.kind!=='fisher')window.FisherWorkshop?.close();
     $('npc-inventory').replaceChildren();
     if(view.kind==='merchant'||view.kind==='sell')window.Shop?.render(npc,$('npc-inventory'),packet);
     else { window.Shop?.close(); $('npc-inventory').className=''; }
+    if(view.kind==='fisher')window.FisherWorkshop?.render(npc,packet,$('npc-inventory'));
     if(view.kind==='merge'||view.kind==='refine'||view.kind==='repair')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
     if(nav)nav.scrollTop=paneScroll.list;if(paper)paper.scrollTop=paneScroll.detail;
     const target=focus&&$('npc-dialogue').querySelector(focus);
@@ -660,13 +667,13 @@
     if(accepting)view={kind:'quest',id:accepting};
     else if(!same){view={kind:'gossip'};paneScroll.list=0;paneScroll.detail=0;questPane('list');}
     else if(view.kind==='quest'&&window.Quests?.offered(current.id).some(q=>q.id===view.id)){}
-    else if(!['merchant','sell','merge','refine','repair','stat_reset'].includes(view.kind))view={kind:'gossip'};
+    else if(!['merchant','sell','merge','refine','repair','stat_reset','fisher'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
     window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
     if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }
-  function close(resume=true) {clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
+  function close(resume=true) {window.FisherWorkshop?.close();clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
   for(const b of $('npc-dialogue').querySelectorAll('.quest-mobile-tabs button'))b.addEventListener('click',()=>questPane(b.dataset.questPane));
   $('npc-x').addEventListener('click',()=>close());
   $('npc-quest-close')?.addEventListener('click',()=>close());
