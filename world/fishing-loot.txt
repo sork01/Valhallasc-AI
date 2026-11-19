@@ -1,0 +1,92 @@
+[
+  {
+    "item": "fishing_driftwood",
+    "name": "Driftwood",
+    "category": "junk",
+    "rarity": "common",
+    "sell": 2,
+    "habitat": "water",
+    "weight": 1
+  },
+  {
+    "item": "fishing_old_boot",
+    "name": "Old Boot",
+    "category": "junk",
+    "rarity": "common",
+    "sell": 1,
+    "habitat": "water",
+    "weight": 1
+  },
+  {
+    "item": "fishing_tangled_line",
+    "name": "Tangled Line",
+    "category": "junk",
+    "rarity": "common",
+    "sell": 1,
+    "habitat": "water",
+    "weight": 1
+  },
+  {
+    "item": "fishing_cracked_shell",
+    "name": "Cracked Shell",
+    "category": "junk",
+    "rarity": "common",
+    "sell": 3,
+    "habitat": "water",
+    "weight": 1
+  },
+  {
+    "item": "fishing_cooled_slag",
+    "name": "Cooled Slag",
+    "category": "junk",
+    "rarity": "common",
+    "sell": 3,
+    "habitat": "lava",
+    "weight": 1
+  },
+  {
+    "item": "fishing_charred_branch",
+    "name": "Charred Branch",
+    "category": "junk",
+    "rarity": "common",
+    "sell": 2,
+    "habitat": "lava",
+    "weight": 1
+  },
+  {
+    "item": "fishing_sunken_coffer",
+    "name": "Sunken Coffer",
+    "category": "treasure",
+    "rarity": "rare",
+    "sell": 40,
+    "habitat": "any",
+    "weight": 1
+  },
+  {
+    "item": "fishing_message_bottle",
+    "name": "Message in a Bottle",
+    "category": "treasure",
+    "rarity": "uncommon",
+    "sell": 15,
+    "habitat": "any",
+    "weight": 2
+  },
+  {
+    "item": "fishing_lost_purse",
+    "name": "Lost Purse",
+    "category": "treasure",
+    "rarity": "uncommon",
+    "sell": 20,
+    "habitat": "any",
+    "weight": 3
+  },
+  {
+    "item": "fishing_rod_charm",
+    "name": "Rod Charm",
+    "category": "treasure",
+    "rarity": "rare",
+    "sell": 30,
+    "habitat": "any",
+    "weight": 1
+  }
+]

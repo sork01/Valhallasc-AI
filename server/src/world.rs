@@ -2006,6 +2006,7 @@ impl Drop {
 pub struct World {
     // Zone 0 is Greenmeadow with Alderhaven; later zones come from the map's `zones`.
     maps: Vec<Map>,
+    rich_fishing: BTreeMap<usize, Vec<fishing::RichSpot>>,
     // Every zone's enemy spawns in one list, so enemy ids stay stable and global.
     spawns: Vec<SlimeSpawn>,
     store: Store,
@@ -2152,6 +2153,7 @@ impl World {
             .collect();
         let mut world = Self {
             maps,
+            rich_fishing: BTreeMap::new(),
             spawns,
             store,
             mail_unread: BTreeMap::new(),
@@ -2606,6 +2608,7 @@ impl World {
         if !across.is_empty() {
             view["across"] = json!(across);
         }
+        view["fishingSpots"] = json!(self.rich_fishing.get(&zone).map(|spots| spots.iter().map(|s| s.point).collect::<Vec<_>>()).unwrap_or_default());
         view["damageMeter"] = self.damage_meter_view(zone);
         let boss_mech = self.boss_mech_view(zone);
         if !boss_mech.is_empty() {
@@ -3836,6 +3839,9 @@ impl World {
         self.update_signatures();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
+            if let Some(p) = self.players.get(&session).filter(|p| p.is_human()) {
+                self.ensure_fishing_spots(p.character.zone);
+            }
             self.update_food(session);
             self.update_player(session);
             if self.players.get(&session).is_some_and(|p| p.fishing.line.is_some()) {

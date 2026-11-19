@@ -139982,399 +139982,1140 @@
     "name": "Pier Sprat",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 1,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Shore",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_shore_grill"
+    }
   },
   {
     "id": "fish_saltby_herring",
     "name": "Saltby Herring",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 1,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Shore",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_shore_grill"
+    }
   },
   {
     "id": "fish_sand_dab",
     "name": "Sand Dab",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 1,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Shore",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_shore_grill"
+    }
   },
   {
     "id": "fish_copper_mackerel",
     "name": "Copper Mackerel",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 1,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Shore",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_shore_grill"
+    }
   },
   {
     "id": "fish_tide_flounder",
     "name": "Tide Flounder",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 1,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Shore",
+      "minTier": 2,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_shore_grill"
+    }
   },
   {
     "id": "fish_glass_eel",
     "name": "Glass Eel",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 1,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Shore",
+      "minTier": 3,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_shore_feast"
+    }
   },
   {
     "id": "fish_moonscale_carp",
     "name": "Moonscale Carp",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 1,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Shore",
+      "minTier": 6,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_shore_feast"
+    }
   },
   {
     "id": "fish_snow_minnow",
     "name": "Snow Minnow",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 10,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cold",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_cold_grill"
+    }
   },
   {
     "id": "fish_frost_char",
     "name": "Frost Char",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 10,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cold",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_cold_grill"
+    }
   },
   {
     "id": "fish_ice_perch",
     "name": "Ice Perch",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 10,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cold",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_cold_grill"
+    }
   },
   {
     "id": "fish_silver_smelt",
     "name": "Silver Smelt",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 10,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cold",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_cold_grill"
+    }
   },
   {
     "id": "fish_blue_grayling",
     "name": "Blue Grayling",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 10,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cold",
+      "minTier": 2,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_cold_grill"
+    }
   },
   {
     "id": "fish_aurora_trout",
     "name": "Aurora Trout",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 10,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cold",
+      "minTier": 3,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_cold_feast"
+    }
   },
   {
     "id": "fish_frostwake_pike",
     "name": "Frostwake Pike",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 10,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cold",
+      "minTier": 6,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_cold_feast"
+    }
   },
   {
     "id": "fish_mud_loach",
     "name": "Mud Loach",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 15,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Swamp",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_swamp_grill"
+    }
   },
   {
     "id": "fish_reed_bream",
     "name": "Reed Bream",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 15,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Swamp",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_swamp_grill"
+    }
   },
   {
     "id": "fish_bog_dace",
     "name": "Bog Dace",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 15,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Swamp",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_swamp_grill"
+    }
   },
   {
     "id": "fish_moss_catfish",
     "name": "Moss Catfish",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 15,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Swamp",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_swamp_grill"
+    }
   },
   {
     "id": "fish_peat_eel",
     "name": "Peat Eel",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 15,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Swamp",
+      "minTier": 2,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_swamp_grill"
+    }
   },
   {
     "id": "fish_lantern_gar",
     "name": "Lantern Gar",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 15,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Swamp",
+      "minTier": 3,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_swamp_feast"
+    }
   },
   {
     "id": "fish_fen_crownfin",
     "name": "Fen Crownfin",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 15,
+    "heal": 70,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Swamp",
+      "minTier": 6,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_swamp_feast"
+    }
   },
   {
     "id": "fish_alder_trout",
     "name": "Alder Trout",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 25,
+    "heal": 115,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Forest",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_forest_grill"
+    }
   },
   {
     "id": "fish_brook_dace",
     "name": "Brook Dace",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 25,
+    "heal": 115,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Forest",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_forest_grill"
+    }
   },
   {
     "id": "fish_willow_chub",
     "name": "Willow Chub",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 25,
+    "heal": 115,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Forest",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_forest_grill"
+    }
   },
   {
     "id": "fish_fern_perch",
     "name": "Fern Perch",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 25,
+    "heal": 115,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Forest",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_forest_grill"
+    }
   },
   {
     "id": "fish_root_barb",
     "name": "Root Barb",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 25,
+    "heal": 115,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Forest",
+      "minTier": 2,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_forest_grill"
+    }
   },
   {
     "id": "fish_amber_salmon",
     "name": "Amber Salmon",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 25,
+    "heal": 115,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Forest",
+      "minTier": 3,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_forest_feast"
+    }
   },
   {
     "id": "fish_antler_sturgeon",
     "name": "Antler Sturgeon",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 25,
+    "heal": 115,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Forest",
+      "minTier": 6,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_forest_feast"
+    }
   },
   {
     "id": "fish_jade_barb",
     "name": "Jade Barb",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 70,
+    "heal": 345,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Jungle",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_jungle_grill"
+    }
   },
   {
     "id": "fish_vine_tetra",
     "name": "Vine Tetra",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 70,
+    "heal": 345,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Jungle",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_jungle_grill"
+    }
   },
   {
     "id": "fish_rain_guppy",
     "name": "Rain Guppy",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 70,
+    "heal": 345,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Jungle",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_jungle_grill"
+    }
   },
   {
     "id": "fish_orchid_gourami",
     "name": "Orchid Gourami",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 70,
+    "heal": 345,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Jungle",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_jungle_grill"
+    }
   },
   {
     "id": "fish_parrot_perch",
     "name": "Parrot Perch",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 70,
+    "heal": 345,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Jungle",
+      "minTier": 2,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_jungle_grill"
+    }
   },
   {
     "id": "fish_canopy_arowana",
     "name": "Canopy Arowana",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 70,
+    "heal": 345,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Jungle",
+      "minTier": 3,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_jungle_feast"
+    }
   },
   {
     "id": "fish_jade_dragonfish",
     "name": "Jade Dragonfish",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 70,
+    "heal": 345,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Jungle",
+      "minTier": 6,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_jungle_feast"
+    }
   },
   {
     "id": "fish_sand_tilapia",
     "name": "Sand Tilapia",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 80,
+    "heal": 390,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Oasis",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_oasis_grill"
+    }
   },
   {
     "id": "fish_palm_minnow",
     "name": "Palm Minnow",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 80,
+    "heal": 390,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Oasis",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_oasis_grill"
+    }
   },
   {
     "id": "fish_dune_carp",
     "name": "Dune Carp",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 80,
+    "heal": 390,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Oasis",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_oasis_grill"
+    }
   },
   {
     "id": "fish_lapis_bream",
     "name": "Lapis Bream",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 80,
+    "heal": 390,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Oasis",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_oasis_grill"
+    }
   },
   {
     "id": "fish_dusk_catfish",
     "name": "Dusk Catfish",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 80,
+    "heal": 390,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Oasis",
+      "minTier": 2,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_oasis_grill"
+    }
   },
   {
     "id": "fish_mirage_eel",
     "name": "Mirage Eel",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 80,
+    "heal": 390,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Oasis",
+      "minTier": 3,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_oasis_feast"
+    }
   },
   {
     "id": "fish_sapphire_lungfish",
     "name": "Sapphire Lungfish",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 80,
+    "heal": 390,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Oasis",
+      "minTier": 6,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_oasis_feast"
+    }
   },
   {
     "id": "fish_blossom_dace",
     "name": "Blossom Dace",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 95,
+    "heal": 460,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Spring",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_spring_grill"
+    }
   },
   {
     "id": "fish_thaw_minnow",
     "name": "Thaw Minnow",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 95,
+    "heal": 460,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Spring",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_spring_grill"
+    }
   },
   {
     "id": "fish_petal_chub",
     "name": "Petal Chub",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 95,
+    "heal": 460,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Spring",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_spring_grill"
+    }
   },
   {
     "id": "fish_vernal_trout",
     "name": "Vernal Trout",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 95,
+    "heal": 460,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Spring",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_spring_grill"
+    }
   },
   {
     "id": "fish_equinox_perch",
     "name": "Equinox Perch",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 95,
+    "heal": 460,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Spring",
+      "minTier": 2,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_spring_grill"
+    }
   },
   {
     "id": "fish_wheel_koi",
     "name": "Wheel Koi",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 95,
+    "heal": 460,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Spring",
+      "minTier": 3,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_spring_feast"
+    }
   },
   {
     "id": "fish_yearling_crownray",
     "name": "Yearling Crownray",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 95,
+    "heal": 460,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Spring",
+      "minTier": 6,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_spring_feast"
+    }
   },
   {
     "id": "fish_cinder_fry",
     "name": "Cinder Fry",
     "kind": "fish",
     "rarity": "common",
-    "sell": 3
+    "sell": 3,
+    "requiredLevel": 5,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 1,
+      "kg": [
+        1,
+        2
+      ],
+      "dish": "dish_lava_grill"
+    }
   },
   {
     "id": "fish_slag_sucker",
     "name": "Slag Sucker",
     "kind": "fish",
     "rarity": "common",
-    "sell": 4
+    "sell": 4,
+    "requiredLevel": 5,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 1,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_lava_grill"
+    }
   },
   {
     "id": "fish_ash_barb",
     "name": "Ash Barb",
     "kind": "fish",
     "rarity": "common",
-    "sell": 5
+    "sell": 5,
+    "requiredLevel": 5,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 1,
+      "kg": [
+        3,
+        8
+      ],
+      "dish": "dish_lava_grill"
+    }
   },
   {
     "id": "fish_basalt_eel",
     "name": "Basalt Eel",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 9
+    "sell": 9,
+    "requiredLevel": 5,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 1,
+      "kg": [
+        4,
+        11
+      ],
+      "dish": "dish_lava_grill"
+    }
   },
   {
     "id": "fish_furnace_bass",
     "name": "Furnace Bass",
     "kind": "fish",
     "rarity": "uncommon",
-    "sell": 12
+    "sell": 12,
+    "requiredLevel": 5,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 1,
+      "kg": [
+        5,
+        14
+      ],
+      "dish": "dish_lava_grill"
+    }
   },
   {
     "id": "fish_obsidian_gar",
     "name": "Obsidian Gar",
     "kind": "fish",
     "rarity": "rare",
-    "sell": 30
+    "sell": 30,
+    "requiredLevel": 5,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 2,
+      "kg": [
+        6,
+        17
+      ],
+      "dish": "dish_lava_feast"
+    }
   },
   {
     "id": "fish_phoenix_koi",
     "name": "Phoenix Koi",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 100
+    "sell": 100,
+    "requiredLevel": 5,
+    "heal": 20,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 1,
+      "kg": [
+        7,
+        20
+      ],
+      "dish": "dish_lava_feast"
+    }
   },
   {
     "id": "fish_sunfire_ray",
     "name": "Sunfire Ray",
     "kind": "fish",
     "rarity": "legendary",
-    "sell": 110
+    "sell": 110,
+    "requiredLevel": 45,
+    "heal": 205,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Lava",
+      "minTier": 2,
+      "kg": [
+        8,
+        23
+      ],
+      "dish": "dish_lava_feast"
+    }
   },
   {
     "id": "rod_twig_rod",
@@ -140382,7 +141123,11 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 1
+    "requiredLevel": 1,
+    "fishing": {
+      "tier": 1,
+      "lava": false
+    }
   },
   {
     "id": "rod_willow_rod",
@@ -140390,7 +141135,11 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 10
+    "requiredLevel": 10,
+    "fishing": {
+      "tier": 2,
+      "lava": false
+    }
   },
   {
     "id": "rod_reedglass_rod",
@@ -140398,7 +141147,11 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 25
+    "requiredLevel": 25,
+    "fishing": {
+      "tier": 3,
+      "lava": false
+    }
   },
   {
     "id": "rod_silverline_rod",
@@ -140406,7 +141159,11 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 40
+    "requiredLevel": 40,
+    "fishing": {
+      "tier": 4,
+      "lava": false
+    }
   },
   {
     "id": "rod_starcatch_rod",
@@ -140414,7 +141171,11 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 60
+    "requiredLevel": 60,
+    "fishing": {
+      "tier": 5,
+      "lava": false
+    }
   },
   {
     "id": "rod_worldwire_rod",
@@ -140422,7 +141183,11 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 80
+    "requiredLevel": 80,
+    "fishing": {
+      "tier": 6,
+      "lava": false
+    }
   },
   {
     "id": "rod_emberline_rod",
@@ -140430,7 +141195,11 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 5
+    "requiredLevel": 5,
+    "fishing": {
+      "tier": 1,
+      "lava": true
+    }
   },
   {
     "id": "rod_magma_reel",
@@ -140438,6 +141207,110 @@
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
-    "requiredLevel": 45
+    "requiredLevel": 45,
+    "fishing": {
+      "tier": 2,
+      "lava": true
+    }
+  },
+  {
+    "id": "fishing_driftwood",
+    "name": "Driftwood",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2,
+    "fishing": {
+      "loot": "junk"
+    }
+  },
+  {
+    "id": "fishing_old_boot",
+    "name": "Old Boot",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1,
+    "fishing": {
+      "loot": "junk"
+    }
+  },
+  {
+    "id": "fishing_tangled_line",
+    "name": "Tangled Line",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1,
+    "fishing": {
+      "loot": "junk"
+    }
+  },
+  {
+    "id": "fishing_cracked_shell",
+    "name": "Cracked Shell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3,
+    "fishing": {
+      "loot": "junk"
+    }
+  },
+  {
+    "id": "fishing_cooled_slag",
+    "name": "Cooled Slag",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3,
+    "fishing": {
+      "loot": "junk"
+    }
+  },
+  {
+    "id": "fishing_charred_branch",
+    "name": "Charred Branch",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2,
+    "fishing": {
+      "loot": "junk"
+    }
+  },
+  {
+    "id": "fishing_sunken_coffer",
+    "name": "Sunken Coffer",
+    "kind": "material",
+    "rarity": "rare",
+    "sell": 40,
+    "fishing": {
+      "loot": "treasure"
+    }
+  },
+  {
+    "id": "fishing_message_bottle",
+    "name": "Message in a Bottle",
+    "kind": "material",
+    "rarity": "uncommon",
+    "sell": 15,
+    "fishing": {
+      "loot": "treasure"
+    }
+  },
+  {
+    "id": "fishing_lost_purse",
+    "name": "Lost Purse",
+    "kind": "material",
+    "rarity": "uncommon",
+    "sell": 20,
+    "fishing": {
+      "loot": "treasure"
+    }
+  },
+  {
+    "id": "fishing_rod_charm",
+    "name": "Rod Charm",
+    "kind": "material",
+    "rarity": "rare",
+    "sell": 30,
+    "fishing": {
+      "loot": "treasure"
+    }
   }
 ]

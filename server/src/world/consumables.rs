@@ -13,10 +13,13 @@ pub(super) fn resource_amount(it: &Item, c: &Character) -> f64 {
 }
 
 /// Food and health potions keep their catalog floor, but heal at least 40% of
-/// the drinker's maximum health. This also applies to old stacks after a level-up.
+/// the drinker's maximum health. Raw fish keep their smaller catalogue heal.
+/// This also applies to old stacks after a level-up.
 pub(super) fn health_amount(it: &Item, c: &Character) -> f64 {
     if it.heal <= 0. {
         0.
+    } else if it.kind == "fish" {
+        it.heal
     } else {
         it.heal.max((c.max_hp() * 0.4).round())
     }
@@ -34,7 +37,7 @@ impl World {
             return self.use_mount_licence(session, licence);
         }
         let Some(it) = item(id).filter(|i| {
-            matches!(i.kind.as_str(), "food" | "potion") && (i.heal > 0. || i.mana > 0.)
+            matches!(i.kind.as_str(), "food" | "potion" | "fish") && (i.heal > 0. || i.mana > 0.)
         }) else {
             return refuse(p, "That item cannot be used.");
         };
@@ -65,7 +68,7 @@ impl World {
         }
         let mut healed = 0.;
         let mut restored_resource = 0.;
-        if it.kind == "food" {
+        if it.kind != "potion" {
             if it.duration <= 0. {
                 return refuse(p, "That item cannot be used.");
             }

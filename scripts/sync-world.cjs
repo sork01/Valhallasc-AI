@@ -31,6 +31,9 @@ execFileSync('python3', [path.join(__dirname, 'quest_items.py')], { cwd: root, s
 execFileSync('python3', [path.join(__dirname, 'cloak_catalog.py')], { cwd: root, stdio: 'pipe' });
 // The vendor-weapon stock goes to every merchant and armorer: shaped zones add traders after the early pass, so run it again.
 execFileSync('python3', [path.join(__dirname, 'vendor_weapons.py')], { cwd: root, stdio: 'pipe' });
+// Fishing items follow equipment overlays; candidate waters follow the finished shapes.
+execFileSync('python3', [path.join(__dirname, 'fish_catalog.py')], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'fishing_spots.py'), '--write'], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));

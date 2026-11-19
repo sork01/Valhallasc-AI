@@ -15,19 +15,19 @@
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
   const licence = i => i?.kind === 'mount_licence';
   const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
-  const consumable = i => i && ['food', 'potion'].includes(i.kind);
-  const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind);
-  const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind) && (!i.class || i.class === look?.class);
+  const consumable = i => i && ['food', 'potion', 'fish'].includes(i.kind);
+  const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod'].includes(i.kind);
+  const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod'].includes(i.kind) && (!i.class || i.class === look?.class);
   const effect = i => {
     const hero = window.Field?.hero || {}, type = hero.resourceType || 'mana';
     const amount = type === 'mana' ? i.mana : Math.round(Math.min(1, i.mana / (100 + 15 * ((i.requiredLevel || 1) - 1))) * (hero.maxResource || 100));
-    const heal = i.heal ? Math.max(i.heal, Math.round((hero.maxHp || 0) * .4)) : 0;
+    const heal = i.heal ? (i.kind === 'fish' ? i.heal : Math.max(i.heal, Math.round((hero.maxHp || 0) * .4))) : 0;
     const restores = [heal ? `up to ${heal.toLocaleString()} HP (${Math.round(heal / (hero.maxHp || heal) * 100)}% max)` : '', i.mana ? `${amount} ${type}` : ''].filter(Boolean).join(' and ');
     const need = (i.requiredLevel || 1) > 1 ? ` · needs level ${i.requiredLevel}` : '';
-    return (i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time, ${i.cooldown || 30} s cooldown shared by all meals` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need;
+    return (i.kind !== 'potion' ? `Restores ${restores} over ${i.duration} s · one meal at a time, ${i.cooldown || 30} s cooldown shared by all meals` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need;
   };
   // Seconds before a meal or potion can be used again; the server owns both timers and sends them with the snapshot.
-  const cooldownLeft = i => !consumable(i) ? 0 : (i.kind === 'food' ? window.Field?.hero?.mealCd : window.Field?.hero?.potionCd) || 0;
+  const cooldownLeft = i => !consumable(i) ? 0 : (i.kind !== 'potion' ? window.Field?.hero?.mealCd : window.Field?.hero?.potionCd) || 0;
   function tickCooldowns() {
     for (const cell of document.querySelectorAll('#inventory-list .inventory-item')) {
       const left = cooldownLeft(definition(cell.dataset.item)), badge = cell.querySelector('.item-cooldown');
@@ -158,7 +158,7 @@
   }
   function summary(i, count = quantity(i.id), cellCopy) {
     const copy = cellCopy || displayCopy(i), rarity = cellCopy?.rarity || displayRarity(i);
-    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`} · ${questItem(i) ? 'Quest item · cannot be sold' : `sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
+    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind !== 'potion' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`} · ${questItem(i) ? 'Quest item · cannot be sold' : `sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
   }
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
@@ -168,13 +168,14 @@
   function showTooltip(anchor, i, slot, where, cellCopy) {
     if (!i) return;
     const copy = where ? where.copies[0] : cellCopy || displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : cellCopy?.rarity || displayRarity(i, slot);
-    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
-    if (consumable(i)) t.append(node('p', effect(i)));
+    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
+    if (i.kind === 'rod') t.append(node('p', i.fishing?.lava ? 'For lava fishing' : 'For water fishing'), node('p', `Tier ${i.fishing?.tier || 1} · Requires level ${levelOf(i)}`), node('p', 'Keep in your bags to fish'));
+    else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
     else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
-    if (compatible(i) && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
+    if ((compatible(i) || i.kind === 'rod') && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (i.rarity === 'hierloom') t.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
     if (setEntry(i)) t.append(...setLines(i.source));
     const weaponFeature = window.RaidRewards?.tooltip(i);
@@ -309,6 +310,8 @@
         const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot, selected), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip() || tooLow(i) || !bagQuantity(i.id); container.append(b);
       }
       if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
+    } else if (i.kind === 'rod') {
+      container.append(node('p', i.fishing?.lava ? 'For lava fishing' : 'For water fishing'), node('p', `Tier ${i.fishing?.tier || 1} · Requires level ${levelOf(i)}`), node('p', 'Keep in your bags to fish'));
     } else if (licence(i)) {
       const b = button('Use', () => useItem(i), 'item-action'); b.dataset.action = 'use'; b.disabled = !canEquip(); container.append(b);
       container.append(node('p', `Grants the ${i.mount} mount. Bound: it cannot be traded or sold.`, 'bag-empty-note'));

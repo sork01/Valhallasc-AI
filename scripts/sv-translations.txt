@@ -14086,5 +14086,21 @@
   "This stack is full.": "Den här stapeln är full.",
   "Too early.": "För tidigt.",
   "You cannot fish right now.": "Du kan inte fiska just nu.",
-  "You doze off. Cast again to keep fishing.": "Du slumrar till. Kasta ut igen för att fortsätta fiska."
+  "You doze off. Cast again to keep fishing.": "Du slumrar till. Kasta ut igen för att fortsätta fiska.",
+  "Charred Branch": "Förkolnad gren",
+  "Cooled Slag": "Svalnad slagg",
+  "Cracked Shell": "Sprucket skal",
+  "Driftwood": "Drivved",
+  "Fish": "Fisk",
+  "Fishing rod": "Fiskespö",
+  "For lava fishing": "För fiske i lava",
+  "For water fishing": "För fiske i vatten",
+  "Keep in your bags to fish": "Ha spöet i väskan för att fiska",
+  "Lost Purse": "Borttappad börs",
+  "Message in a Bottle": "Flaskpost",
+  "Old Boot": "Gammal stövel",
+  "Really sell these valuable items?": "Vill du verkligen sälja de här värdefulla föremålen?",
+  "Rod Charm": "Fiskeamulett",
+  "Sunken Coffer": "Sjunket skrin",
+  "Tangled Line": "Trasslig lina"
 }

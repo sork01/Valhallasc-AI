@@ -1,59 +1,914 @@
 [
-{"item": "fish_pier_sprat", "habitat": "Shore", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_saltby_herring", "habitat": "Shore", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_sand_dab", "habitat": "Shore", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_copper_mackerel", "habitat": "Shore", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_tide_flounder", "habitat": "Shore", "min_tier": 2, "kg": [5, 14], "zone": null},
-{"item": "fish_glass_eel", "habitat": "Shore", "min_tier": 3, "kg": [6, 17], "zone": null},
-{"item": "fish_moonscale_carp", "habitat": "Shore", "min_tier": 6, "kg": [7, 20], "zone": null},
-{"item": "fish_snow_minnow", "habitat": "Cold", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_frost_char", "habitat": "Cold", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_ice_perch", "habitat": "Cold", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_silver_smelt", "habitat": "Cold", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_blue_grayling", "habitat": "Cold", "min_tier": 2, "kg": [5, 14], "zone": null},
-{"item": "fish_aurora_trout", "habitat": "Cold", "min_tier": 3, "kg": [6, 17], "zone": null},
-{"item": "fish_frostwake_pike", "habitat": "Cold", "min_tier": 6, "kg": [7, 20], "zone": null},
-{"item": "fish_mud_loach", "habitat": "Swamp", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_reed_bream", "habitat": "Swamp", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_bog_dace", "habitat": "Swamp", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_moss_catfish", "habitat": "Swamp", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_peat_eel", "habitat": "Swamp", "min_tier": 2, "kg": [5, 14], "zone": null},
-{"item": "fish_lantern_gar", "habitat": "Swamp", "min_tier": 3, "kg": [6, 17], "zone": null},
-{"item": "fish_fen_crownfin", "habitat": "Swamp", "min_tier": 6, "kg": [7, 20], "zone": null},
-{"item": "fish_alder_trout", "habitat": "Forest", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_brook_dace", "habitat": "Forest", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_willow_chub", "habitat": "Forest", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_fern_perch", "habitat": "Forest", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_root_barb", "habitat": "Forest", "min_tier": 2, "kg": [5, 14], "zone": null},
-{"item": "fish_amber_salmon", "habitat": "Forest", "min_tier": 3, "kg": [6, 17], "zone": null},
-{"item": "fish_antler_sturgeon", "habitat": "Forest", "min_tier": 6, "kg": [7, 20], "zone": null},
-{"item": "fish_jade_barb", "habitat": "Jungle", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_vine_tetra", "habitat": "Jungle", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_rain_guppy", "habitat": "Jungle", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_orchid_gourami", "habitat": "Jungle", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_parrot_perch", "habitat": "Jungle", "min_tier": 2, "kg": [5, 14], "zone": null},
-{"item": "fish_canopy_arowana", "habitat": "Jungle", "min_tier": 3, "kg": [6, 17], "zone": null},
-{"item": "fish_jade_dragonfish", "habitat": "Jungle", "min_tier": 6, "kg": [7, 20], "zone": null},
-{"item": "fish_sand_tilapia", "habitat": "Oasis", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_palm_minnow", "habitat": "Oasis", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_dune_carp", "habitat": "Oasis", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_lapis_bream", "habitat": "Oasis", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_dusk_catfish", "habitat": "Oasis", "min_tier": 2, "kg": [5, 14], "zone": null},
-{"item": "fish_mirage_eel", "habitat": "Oasis", "min_tier": 3, "kg": [6, 17], "zone": null},
-{"item": "fish_sapphire_lungfish", "habitat": "Oasis", "min_tier": 6, "kg": [7, 20], "zone": null},
-{"item": "fish_blossom_dace", "habitat": "Spring", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_thaw_minnow", "habitat": "Spring", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_petal_chub", "habitat": "Spring", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_vernal_trout", "habitat": "Spring", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_equinox_perch", "habitat": "Spring", "min_tier": 2, "kg": [5, 14], "zone": null},
-{"item": "fish_wheel_koi", "habitat": "Spring", "min_tier": 3, "kg": [6, 17], "zone": null},
-{"item": "fish_yearling_crownray", "habitat": "Spring", "min_tier": 6, "kg": [7, 20], "zone": null},
-{"item": "fish_cinder_fry", "habitat": "Lava", "min_tier": 1, "kg": [1, 2], "zone": null},
-{"item": "fish_slag_sucker", "habitat": "Lava", "min_tier": 1, "kg": [2, 5], "zone": null},
-{"item": "fish_ash_barb", "habitat": "Lava", "min_tier": 1, "kg": [3, 8], "zone": null},
-{"item": "fish_basalt_eel", "habitat": "Lava", "min_tier": 1, "kg": [4, 11], "zone": null},
-{"item": "fish_furnace_bass", "habitat": "Lava", "min_tier": 1, "kg": [5, 14], "zone": null},
-{"item": "fish_obsidian_gar", "habitat": "Lava", "min_tier": 2, "kg": [6, 17], "zone": null},
-{"item": "fish_phoenix_koi", "habitat": "Lava", "min_tier": 1, "kg": [7, 20], "zone": 1},
-{"item": "fish_sunfire_ray", "habitat": "Lava", "min_tier": 2, "kg": [8, 23], "zone": 45}
+  {
+    "item": "fish_pier_sprat",
+    "habitat": "Shore",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Pier Sprat",
+    "rarity": "common",
+    "sell": 3,
+    "level": 1,
+    "raw_heal": 20,
+    "dish": "dish_shore_grill"
+  },
+  {
+    "item": "fish_saltby_herring",
+    "habitat": "Shore",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Saltby Herring",
+    "rarity": "common",
+    "sell": 4,
+    "level": 1,
+    "raw_heal": 20,
+    "dish": "dish_shore_grill"
+  },
+  {
+    "item": "fish_sand_dab",
+    "habitat": "Shore",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Sand Dab",
+    "rarity": "common",
+    "sell": 5,
+    "level": 1,
+    "raw_heal": 20,
+    "dish": "dish_shore_grill"
+  },
+  {
+    "item": "fish_copper_mackerel",
+    "habitat": "Shore",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Copper Mackerel",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 1,
+    "raw_heal": 20,
+    "dish": "dish_shore_grill"
+  },
+  {
+    "item": "fish_tide_flounder",
+    "habitat": "Shore",
+    "min_tier": 2,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Tide Flounder",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 1,
+    "raw_heal": 20,
+    "dish": "dish_shore_grill"
+  },
+  {
+    "item": "fish_glass_eel",
+    "habitat": "Shore",
+    "min_tier": 3,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Glass Eel",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 1,
+    "raw_heal": 20,
+    "dish": "dish_shore_feast"
+  },
+  {
+    "item": "fish_moonscale_carp",
+    "habitat": "Shore",
+    "min_tier": 6,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": null,
+    "name": "Moonscale Carp",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 1,
+    "raw_heal": 20,
+    "dish": "dish_shore_feast"
+  },
+  {
+    "item": "fish_snow_minnow",
+    "habitat": "Cold",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Snow Minnow",
+    "rarity": "common",
+    "sell": 3,
+    "level": 10,
+    "raw_heal": 70,
+    "dish": "dish_cold_grill"
+  },
+  {
+    "item": "fish_frost_char",
+    "habitat": "Cold",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Frost Char",
+    "rarity": "common",
+    "sell": 4,
+    "level": 10,
+    "raw_heal": 70,
+    "dish": "dish_cold_grill"
+  },
+  {
+    "item": "fish_ice_perch",
+    "habitat": "Cold",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Ice Perch",
+    "rarity": "common",
+    "sell": 5,
+    "level": 10,
+    "raw_heal": 70,
+    "dish": "dish_cold_grill"
+  },
+  {
+    "item": "fish_silver_smelt",
+    "habitat": "Cold",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Silver Smelt",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 10,
+    "raw_heal": 70,
+    "dish": "dish_cold_grill"
+  },
+  {
+    "item": "fish_blue_grayling",
+    "habitat": "Cold",
+    "min_tier": 2,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Blue Grayling",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 10,
+    "raw_heal": 70,
+    "dish": "dish_cold_grill"
+  },
+  {
+    "item": "fish_aurora_trout",
+    "habitat": "Cold",
+    "min_tier": 3,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Aurora Trout",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 10,
+    "raw_heal": 70,
+    "dish": "dish_cold_feast"
+  },
+  {
+    "item": "fish_frostwake_pike",
+    "habitat": "Cold",
+    "min_tier": 6,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": null,
+    "name": "Frostwake Pike",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 10,
+    "raw_heal": 70,
+    "dish": "dish_cold_feast"
+  },
+  {
+    "item": "fish_mud_loach",
+    "habitat": "Swamp",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Mud Loach",
+    "rarity": "common",
+    "sell": 3,
+    "level": 15,
+    "raw_heal": 70,
+    "dish": "dish_swamp_grill"
+  },
+  {
+    "item": "fish_reed_bream",
+    "habitat": "Swamp",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Reed Bream",
+    "rarity": "common",
+    "sell": 4,
+    "level": 15,
+    "raw_heal": 70,
+    "dish": "dish_swamp_grill"
+  },
+  {
+    "item": "fish_bog_dace",
+    "habitat": "Swamp",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Bog Dace",
+    "rarity": "common",
+    "sell": 5,
+    "level": 15,
+    "raw_heal": 70,
+    "dish": "dish_swamp_grill"
+  },
+  {
+    "item": "fish_moss_catfish",
+    "habitat": "Swamp",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Moss Catfish",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 15,
+    "raw_heal": 70,
+    "dish": "dish_swamp_grill"
+  },
+  {
+    "item": "fish_peat_eel",
+    "habitat": "Swamp",
+    "min_tier": 2,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Peat Eel",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 15,
+    "raw_heal": 70,
+    "dish": "dish_swamp_grill"
+  },
+  {
+    "item": "fish_lantern_gar",
+    "habitat": "Swamp",
+    "min_tier": 3,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Lantern Gar",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 15,
+    "raw_heal": 70,
+    "dish": "dish_swamp_feast"
+  },
+  {
+    "item": "fish_fen_crownfin",
+    "habitat": "Swamp",
+    "min_tier": 6,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": null,
+    "name": "Fen Crownfin",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 15,
+    "raw_heal": 70,
+    "dish": "dish_swamp_feast"
+  },
+  {
+    "item": "fish_alder_trout",
+    "habitat": "Forest",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Alder Trout",
+    "rarity": "common",
+    "sell": 3,
+    "level": 25,
+    "raw_heal": 115,
+    "dish": "dish_forest_grill"
+  },
+  {
+    "item": "fish_brook_dace",
+    "habitat": "Forest",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Brook Dace",
+    "rarity": "common",
+    "sell": 4,
+    "level": 25,
+    "raw_heal": 115,
+    "dish": "dish_forest_grill"
+  },
+  {
+    "item": "fish_willow_chub",
+    "habitat": "Forest",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Willow Chub",
+    "rarity": "common",
+    "sell": 5,
+    "level": 25,
+    "raw_heal": 115,
+    "dish": "dish_forest_grill"
+  },
+  {
+    "item": "fish_fern_perch",
+    "habitat": "Forest",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Fern Perch",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 25,
+    "raw_heal": 115,
+    "dish": "dish_forest_grill"
+  },
+  {
+    "item": "fish_root_barb",
+    "habitat": "Forest",
+    "min_tier": 2,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Root Barb",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 25,
+    "raw_heal": 115,
+    "dish": "dish_forest_grill"
+  },
+  {
+    "item": "fish_amber_salmon",
+    "habitat": "Forest",
+    "min_tier": 3,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Amber Salmon",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 25,
+    "raw_heal": 115,
+    "dish": "dish_forest_feast"
+  },
+  {
+    "item": "fish_antler_sturgeon",
+    "habitat": "Forest",
+    "min_tier": 6,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": null,
+    "name": "Antler Sturgeon",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 25,
+    "raw_heal": 115,
+    "dish": "dish_forest_feast"
+  },
+  {
+    "item": "fish_jade_barb",
+    "habitat": "Jungle",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Jade Barb",
+    "rarity": "common",
+    "sell": 3,
+    "level": 70,
+    "raw_heal": 345,
+    "dish": "dish_jungle_grill"
+  },
+  {
+    "item": "fish_vine_tetra",
+    "habitat": "Jungle",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Vine Tetra",
+    "rarity": "common",
+    "sell": 4,
+    "level": 70,
+    "raw_heal": 345,
+    "dish": "dish_jungle_grill"
+  },
+  {
+    "item": "fish_rain_guppy",
+    "habitat": "Jungle",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Rain Guppy",
+    "rarity": "common",
+    "sell": 5,
+    "level": 70,
+    "raw_heal": 345,
+    "dish": "dish_jungle_grill"
+  },
+  {
+    "item": "fish_orchid_gourami",
+    "habitat": "Jungle",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Orchid Gourami",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 70,
+    "raw_heal": 345,
+    "dish": "dish_jungle_grill"
+  },
+  {
+    "item": "fish_parrot_perch",
+    "habitat": "Jungle",
+    "min_tier": 2,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Parrot Perch",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 70,
+    "raw_heal": 345,
+    "dish": "dish_jungle_grill"
+  },
+  {
+    "item": "fish_canopy_arowana",
+    "habitat": "Jungle",
+    "min_tier": 3,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Canopy Arowana",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 70,
+    "raw_heal": 345,
+    "dish": "dish_jungle_feast"
+  },
+  {
+    "item": "fish_jade_dragonfish",
+    "habitat": "Jungle",
+    "min_tier": 6,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": null,
+    "name": "Jade Dragonfish",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 70,
+    "raw_heal": 345,
+    "dish": "dish_jungle_feast"
+  },
+  {
+    "item": "fish_sand_tilapia",
+    "habitat": "Oasis",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Sand Tilapia",
+    "rarity": "common",
+    "sell": 3,
+    "level": 80,
+    "raw_heal": 390,
+    "dish": "dish_oasis_grill"
+  },
+  {
+    "item": "fish_palm_minnow",
+    "habitat": "Oasis",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Palm Minnow",
+    "rarity": "common",
+    "sell": 4,
+    "level": 80,
+    "raw_heal": 390,
+    "dish": "dish_oasis_grill"
+  },
+  {
+    "item": "fish_dune_carp",
+    "habitat": "Oasis",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Dune Carp",
+    "rarity": "common",
+    "sell": 5,
+    "level": 80,
+    "raw_heal": 390,
+    "dish": "dish_oasis_grill"
+  },
+  {
+    "item": "fish_lapis_bream",
+    "habitat": "Oasis",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Lapis Bream",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 80,
+    "raw_heal": 390,
+    "dish": "dish_oasis_grill"
+  },
+  {
+    "item": "fish_dusk_catfish",
+    "habitat": "Oasis",
+    "min_tier": 2,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Dusk Catfish",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 80,
+    "raw_heal": 390,
+    "dish": "dish_oasis_grill"
+  },
+  {
+    "item": "fish_mirage_eel",
+    "habitat": "Oasis",
+    "min_tier": 3,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Mirage Eel",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 80,
+    "raw_heal": 390,
+    "dish": "dish_oasis_feast"
+  },
+  {
+    "item": "fish_sapphire_lungfish",
+    "habitat": "Oasis",
+    "min_tier": 6,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": null,
+    "name": "Sapphire Lungfish",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 80,
+    "raw_heal": 390,
+    "dish": "dish_oasis_feast"
+  },
+  {
+    "item": "fish_blossom_dace",
+    "habitat": "Spring",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Blossom Dace",
+    "rarity": "common",
+    "sell": 3,
+    "level": 95,
+    "raw_heal": 460,
+    "dish": "dish_spring_grill"
+  },
+  {
+    "item": "fish_thaw_minnow",
+    "habitat": "Spring",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Thaw Minnow",
+    "rarity": "common",
+    "sell": 4,
+    "level": 95,
+    "raw_heal": 460,
+    "dish": "dish_spring_grill"
+  },
+  {
+    "item": "fish_petal_chub",
+    "habitat": "Spring",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Petal Chub",
+    "rarity": "common",
+    "sell": 5,
+    "level": 95,
+    "raw_heal": 460,
+    "dish": "dish_spring_grill"
+  },
+  {
+    "item": "fish_vernal_trout",
+    "habitat": "Spring",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Vernal Trout",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 95,
+    "raw_heal": 460,
+    "dish": "dish_spring_grill"
+  },
+  {
+    "item": "fish_equinox_perch",
+    "habitat": "Spring",
+    "min_tier": 2,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Equinox Perch",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 95,
+    "raw_heal": 460,
+    "dish": "dish_spring_grill"
+  },
+  {
+    "item": "fish_wheel_koi",
+    "habitat": "Spring",
+    "min_tier": 3,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Wheel Koi",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 95,
+    "raw_heal": 460,
+    "dish": "dish_spring_feast"
+  },
+  {
+    "item": "fish_yearling_crownray",
+    "habitat": "Spring",
+    "min_tier": 6,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": null,
+    "name": "Yearling Crownray",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 95,
+    "raw_heal": 460,
+    "dish": "dish_spring_feast"
+  },
+  {
+    "item": "fish_cinder_fry",
+    "habitat": "Lava",
+    "min_tier": 1,
+    "kg": [
+      1,
+      2
+    ],
+    "zone": null,
+    "name": "Cinder Fry",
+    "rarity": "common",
+    "sell": 3,
+    "level": 5,
+    "raw_heal": 20,
+    "dish": "dish_lava_grill"
+  },
+  {
+    "item": "fish_slag_sucker",
+    "habitat": "Lava",
+    "min_tier": 1,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": null,
+    "name": "Slag Sucker",
+    "rarity": "common",
+    "sell": 4,
+    "level": 5,
+    "raw_heal": 20,
+    "dish": "dish_lava_grill"
+  },
+  {
+    "item": "fish_ash_barb",
+    "habitat": "Lava",
+    "min_tier": 1,
+    "kg": [
+      3,
+      8
+    ],
+    "zone": null,
+    "name": "Ash Barb",
+    "rarity": "common",
+    "sell": 5,
+    "level": 5,
+    "raw_heal": 20,
+    "dish": "dish_lava_grill"
+  },
+  {
+    "item": "fish_basalt_eel",
+    "habitat": "Lava",
+    "min_tier": 1,
+    "kg": [
+      4,
+      11
+    ],
+    "zone": null,
+    "name": "Basalt Eel",
+    "rarity": "uncommon",
+    "sell": 9,
+    "level": 5,
+    "raw_heal": 20,
+    "dish": "dish_lava_grill"
+  },
+  {
+    "item": "fish_furnace_bass",
+    "habitat": "Lava",
+    "min_tier": 1,
+    "kg": [
+      5,
+      14
+    ],
+    "zone": null,
+    "name": "Furnace Bass",
+    "rarity": "uncommon",
+    "sell": 12,
+    "level": 5,
+    "raw_heal": 20,
+    "dish": "dish_lava_grill"
+  },
+  {
+    "item": "fish_obsidian_gar",
+    "habitat": "Lava",
+    "min_tier": 2,
+    "kg": [
+      6,
+      17
+    ],
+    "zone": null,
+    "name": "Obsidian Gar",
+    "rarity": "rare",
+    "sell": 30,
+    "level": 5,
+    "raw_heal": 20,
+    "dish": "dish_lava_feast"
+  },
+  {
+    "item": "fish_phoenix_koi",
+    "habitat": "Lava",
+    "min_tier": 1,
+    "kg": [
+      7,
+      20
+    ],
+    "zone": 1,
+    "name": "Phoenix Koi",
+    "rarity": "legendary",
+    "sell": 100,
+    "level": 5,
+    "raw_heal": 20,
+    "dish": "dish_lava_feast"
+  },
+  {
+    "item": "fish_sunfire_ray",
+    "habitat": "Lava",
+    "min_tier": 2,
+    "kg": [
+      8,
+      23
+    ],
+    "zone": 45,
+    "name": "Sunfire Ray",
+    "rarity": "legendary",
+    "sell": 110,
+    "level": 45,
+    "raw_heal": 205,
+    "dish": "dish_lava_feast"
+  }
 ]

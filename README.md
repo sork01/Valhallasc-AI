@@ -750,3 +750,22 @@ with healthy endpoints and no server restart or database migration.
 ## Prismwaste enemy artwork (Beta 1.39.21)
 
 The six Prismwaste enemies have a slime-style remake with per-kind frames, eight readable attack poses and fitting material-specific deaths. `python3 scripts/make_prism_sprites.py preview | build | export | verify` uses saved native PixelFlow sources and refuses destructive `--replace`. Grounding, rollback, focused checks and FileDrop review: [Prismwaste enemy artwork](docs/prism-slime-art.md). Released as Beta 1.39.21 after owner approval of the pictures and corrected rigid Mirage Jackal tail. All nine public client hashes and health checks pass.
+
+
+## Fishing development (`feat/fishing-core`)
+
+Fishing is branch work and has not been released publicly. The data layer preserves
+57 species and eight rod IDs, adds junk/treasure and raw fish meals, and validates
+candidate waters in twelve outdoor zones. The game randomly activates rich spots;
+each yields 5–10 fish shared by all anglers, then disappears and relocates. Render
+only the active points in zone snapshots, rather than the entire candidate pool.
+Player controls, Fisher services, cooking and art have their own remaining tasks.
+
+`python3 scripts/fish_catalog.py` refreshes the item overlay;
+`python3 scripts/fishing_spots.py --write` regenerates candidate waters **after**
+zone shaping. Both run from `node scripts/sync-world.cjs`, which also writes the
+client catalogues. Rebuild the private executable after generation. Focused checks:
+`python3 tests/fishing-spots.py`, `node tests/fishing-data-client.cjs`, and
+`bash scripts/cargo.sh test fishing_`. Existing item IDs and zone IDs stay valid;
+no saved-character relocation or database migration is needed for this data layer.
+See [docs/fishing.md](docs/fishing.md) for rules, rollout and validation details.

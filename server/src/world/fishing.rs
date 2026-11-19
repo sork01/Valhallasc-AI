@@ -35,6 +35,23 @@ static RODS: LazyLock<Vec<Rod>> = LazyLock::new(|| {
     serde_json::from_str(include_str!("../../../world/rods.txt")).expect("rod catalogue")
 });
 
+pub(super) struct RichSpot {
+    pub(super) point: Point,
+    pub(super) remaining: u32,
+    pub(super) reserve: Option<Point>,
+}
+
+#[derive(Deserialize)]
+struct ExtraLoot {
+    item: String,
+    category: String,
+    habitat: String,
+    weight: f64,
+}
+static EXTRA_LOOT: LazyLock<Vec<ExtraLoot>> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("../../../world/fishing-loot.txt")).expect("fishing loot")
+});
+
 #[derive(Clone, Default)]
 pub(super) struct Session {
     pub(super) line: Option<Line>,
@@ -51,6 +68,7 @@ pub(super) struct Line {
     tier: u32,
     habitat: &'static str,
     bonus: f64,
+    rich: Option<Point>,
     hurt_at: f64,
     cast_end: f64,
     bite_at: f64,
@@ -153,6 +171,84 @@ fn landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> {
 }
 
 impl World {
+    pub(super) fn ensure_fishing_spots(&mut self, zone: usize) {
+        if self.rich_fishing.contains_key(&zone) || self.maps[zone].fishing_spots.is_empty() {
+            return;
+        }
+        let count = (4 + (self.random() * 5.) as usize)
+            .min(self.maps[zone].fishing_spots.len().saturating_sub(1));
+        self.rich_fishing.insert(zone, vec![]);
+        for _ in 0..count {
+            self.spawn_fishing_spot(zone, None);
+        }
+    }
+    fn spawn_fishing_spot(&mut self, zone: usize, old: Option<Point>) {
+        // Keep one alternate water location per spot clear of every other spot.
+        // This guarantees relocation even in a zone with only a few tiny pools.
+        let free: Vec<_> = self.maps[zone]
+            .fishing_spots
+            .iter()
+            .copied()
+            .filter(|point| {
+                self.rich_fishing.get(&zone).is_none_or(|spots| {
+                    spots.iter().all(|s| {
+                        s.point.distance(*point) > 6.
+                            && s.reserve.is_none_or(|p| p.distance(*point) > 6.)
+                    })
+                })
+            })
+            .collect();
+        if free.len() < 2 {
+            return;
+        }
+        let mut candidates: Vec<_> = free
+            .iter()
+            .copied()
+            .filter(|point| old.is_none_or(|old| old.distance(*point) > 0.1))
+            .collect();
+        if let Some(old) = old {
+            let distant: Vec<_> = candidates
+                .iter()
+                .copied()
+                .filter(|p| p.distance(old) > 6.)
+                .collect();
+            if !distant.is_empty() {
+                candidates = distant;
+            }
+        }
+        if candidates.is_empty() {
+            return;
+        }
+        let point = candidates[(self.random() * candidates.len() as f64) as usize];
+        let reserve = free
+            .iter()
+            .copied()
+            .filter(|p| p.distance(point) > 0.1)
+            .min_by(|a, b| a.distance(point).total_cmp(&b.distance(point)));
+        let remaining = 5 + (self.random() * 6.) as u32;
+        self.rich_fishing.entry(zone).or_default().push(RichSpot {
+            point,
+            remaining,
+            reserve,
+        });
+    }
+    fn fishing_spot_caught(&mut self, zone: usize, point: Point) {
+        let Some(spots) = self.rich_fishing.get_mut(&zone) else {
+            return;
+        };
+        let Some(index) = spots.iter().position(|s| s.point.distance(point) < 0.001) else {
+            return;
+        };
+        #[cfg(test)]
+        if std::env::var("MUTATE_FISH_DATA").as_deref() == Ok("depletion") {
+            return;
+        }
+        spots[index].remaining -= 1;
+        if spots[index].remaining == 0 {
+            spots.remove(index);
+            self.spawn_fishing_spot(zone, Some(point));
+        }
+    }
     fn can_fish(&self, session: u64) -> bool {
         let p = &self.players[&session];
         let c = &p.character;
@@ -190,7 +286,12 @@ impl World {
         let map = &self.maps[c.zone];
         let bobber = landing(map, c.point(), p.face, lava)
             .ok_or("Stand near the shore and face the water or lava.")?;
-        let rich = map.fishing_spots.iter().any(|s| s.distance(bobber) <= 3.);
+        let rich_point = self
+            .rich_fishing
+            .get(&c.zone)
+            .and_then(|spots| spots.iter().find(|s| s.point.distance(bobber) <= 3.))
+            .map(|s| s.point);
+        let rich = rich_point.is_some();
         let min_tier = match c.zone {
             2 | 3 if rich => 2,
             6 | 45 => 2,
@@ -222,6 +323,7 @@ impl World {
             bobber,
             tier: rod.tier,
             bonus,
+            rich: rich_point,
             waiting: false,
             biting: false,
             cast_end: time + CAST,
@@ -284,6 +386,7 @@ impl World {
         if time < self.players[&session].fishing.next {
             return;
         }
+        self.ensure_fishing_spots(self.players[&session].character.zone);
         let line = match self.fishing_line(session, time) {
             Ok(l) => l,
             Err(text) => {
@@ -307,6 +410,59 @@ impl World {
             return;
         }
         let multiplier = c.drop_multiplier();
+        let rich = line.rich.filter(|point| {
+            self.rich_fishing
+                .get(&line.zone)
+                .is_some_and(|spots| spots.iter().any(|s| s.point.distance(*point) < 0.001))
+        });
+        let bonus = if line.rich.is_some() && rich.is_none() {
+            line.bonus / 3.
+        } else {
+            line.bonus
+        };
+        // Junk and treasure have their own bands; every award uses the rebirth copies helper.
+        let extras: Vec<_> = EXTRA_LOOT
+            .iter()
+            .filter(|s| {
+                s.habitat == "any"
+                    || s.habitat
+                        == if line.habitat == "Lava" {
+                            "lava"
+                        } else {
+                            "water"
+                        }
+            })
+            .collect();
+        let extra_roll = self.random() * (98.5 + 8. + 1.5);
+        if extra_roll < 9.5 {
+            let category = if extra_roll < 8. { "junk" } else { "treasure" };
+            let pool: Vec<_> = extras.iter().filter(|s| s.category == category).collect();
+            let total: f64 = pool.iter().map(|s| s.weight).sum();
+            let mut roll = self.random() * total;
+            let s = pool
+                .iter()
+                .find(|s| {
+                    roll -= s.weight;
+                    roll <= 0.
+                })
+                .unwrap();
+            let quantity = copies(1., multiplier, || self.random());
+            let p = self.players.get_mut(&session).unwrap();
+            if p.character
+                .quantity(&s.item)
+                .checked_add(quantity)
+                .is_none()
+            {
+                self.fish_end(session, "This stack is full.", false, time);
+                return;
+            }
+            p.character.add_item(&s.item, quantity);
+            p.fishing.line = None;
+            p.fishing.next = time + 1.;
+            p.fishing.misses = 0;
+            let _=p.peer.try_send(json!({"type":"event","kind":"fish_catch","actor":p.character.id,"item":s.item,"quantity":quantity,"rarity":item(&s.item).unwrap().rarity}));
+            return;
+        }
         // Weights apply to the whole rarity band, independent of the number of eligible species.
         let mut bands: [Vec<&Species>; 4] = Default::default();
         for species in FISH.iter().filter(|s| {
@@ -326,7 +482,7 @@ impl World {
             };
             bands[band].push(species);
         }
-        let weights = [70., 22., 6. * line.bonus, 0.5 * line.bonus];
+        let weights = [70., 22., 6. * bonus, 0.5 * bonus];
         let total: f64 = (0..4)
             .filter(|&i| !bands[i].is_empty())
             .map(|i| weights[i])
@@ -367,5 +523,248 @@ impl World {
         record.count += 1;
         record.best_kg = record.best_kg.max(kg);
         let _=p.peer.try_send(json!({"type":"event","kind":"fish_catch","actor":c.id,"item":s.item,"quantity":quantity,"kg":kg,"rarity":item(&s.item).unwrap().rarity}));
+        if let Some(point) = rich {
+            self.fishing_spot_caught(line.zone, point);
+        }
+    }
+}
+
+#[cfg(test)]
+mod data_tests {
+    use super::*;
+
+    #[test]
+    fn fishing_data_all_candidates_pass_real_collision_and_cast() {
+        let (w, _) = super::super::fishing_tests::angler();
+        let points: Value =
+            serde_json::from_str(include_str!("../../../world/fishing-spots.txt")).unwrap();
+        for p in points.as_array().unwrap() {
+            let zone = p["zone"].as_u64().unwrap() as usize;
+            let shore: Point = serde_json::from_value(p["shore"].clone()).unwrap();
+            let face: Point = serde_json::from_value(p["facing"].clone()).unwrap();
+            let mut collided = shore;
+            w.maps[zone].collide(&mut collided, PLAYER_RADIUS);
+            assert!(
+                collided.distance(shore) < 1e-8,
+                "{}: blocked shore",
+                p["id"]
+            );
+            let bobber = landing(&w.maps[zone], shore, face, habitat(zone) == Some("Lava"))
+                .unwrap_or_else(|| panic!("{}: invalid cast", p["id"]));
+            let expected: Point = serde_json::from_value(p.clone()).unwrap();
+            assert!(
+                bobber.distance(expected) < 1e-8,
+                "{}: wrong bobber",
+                p["id"]
+            );
+        }
+    }
+
+    #[test]
+    fn fishing_data_random_spots_deplete_after_five_to_ten_fish_and_relocate() {
+        let (mut w, _) = super::super::fishing_tests::angler();
+        // A row of separated candidate waters gives every random draw room.
+        w.maps[0].fishing_spots = (0..24)
+            .map(|i| Point {
+                x: f64::from(i) * 10.,
+                y: 30.,
+            })
+            .collect();
+        w.rng = 10;
+        w.ensure_fishing_spots(0);
+        let first: Vec<_> = w.rich_fishing[&0].iter().map(|s| s.point).collect();
+        assert!((4..=8).contains(&first.len()));
+        assert!(
+            w.rich_fishing[&0]
+                .iter()
+                .all(|s| (5..=10).contains(&s.remaining))
+        );
+        let old = first[0];
+        let limit = w.rich_fishing[&0][0].remaining;
+        for _ in 1..limit {
+            w.fishing_spot_caught(0, old);
+            assert!(
+                w.rich_fishing[&0]
+                    .iter()
+                    .any(|s| s.point.distance(old) < 0.001)
+            );
+        }
+        w.fishing_spot_caught(0, old);
+        assert_eq!(w.rich_fishing[&0].len(), first.len());
+        assert!(
+            w.rich_fishing[&0]
+                .iter()
+                .all(|s| s.point.distance(old) > 0.1)
+        );
+        let before: Vec<_> = w.rich_fishing[&0]
+            .iter()
+            .map(|s| (s.point.x, s.remaining))
+            .collect();
+        w.ensure_fishing_spots(0);
+        assert_eq!(
+            before,
+            w.rich_fishing[&0]
+                .iter()
+                .map(|s| (s.point.x, s.remaining))
+                .collect::<Vec<_>>()
+        );
+        let snapshot = w.snapshot_for(0);
+        assert_eq!(
+            snapshot["fishingSpots"].as_array().unwrap().len(),
+            first.len()
+        );
+        assert!(snapshot["fishingSpots"][0].get("remaining").is_none());
+        w.rich_fishing.remove(&0);
+        w.rng = 20;
+        w.ensure_fishing_spots(0);
+        assert!(
+            first.iter().any(|p| w.rich_fishing[&0]
+                .iter()
+                .all(|s| s.point.distance(*p) > 0.1)),
+            "new random seed must change the active waters"
+        );
+    }
+
+    #[test]
+    fn fishing_data_every_zone_can_replace_depleted_spots() {
+        let (mut w, _) = super::super::fishing_tests::angler();
+        let original: Map = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
+        w.maps[0].fishing_spots = original.fishing_spots;
+        w.rng = 123;
+        for zone in [0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45] {
+            w.ensure_fishing_spots(zone);
+            let count = w.rich_fishing[&zone].len();
+            assert!((1..=8).contains(&count), "zone {zone}");
+            for _ in 0..count * 2 {
+                let point = w.rich_fishing[&zone][0].point;
+                let remaining = w.rich_fishing[&zone][0].remaining;
+                for _ in 0..remaining {
+                    w.fishing_spot_caught(zone, point);
+                }
+                assert_eq!(
+                    w.rich_fishing[&zone].len(),
+                    count,
+                    "zone {zone}: replacement must preserve spot count"
+                );
+                assert!(
+                    w.rich_fishing[&zone]
+                        .iter()
+                        .all(|s| s.point.distance(point) > 0.1),
+                    "zone {zone}: must relocate"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn fishing_data_real_catches_spend_one_fish_per_hook_and_junk_spends_none() {
+        let (mut w, mut rx) = super::super::fishing_tests::angler();
+        w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, 2];
+        w.fish_press(1, 20.);
+        let mut line = w.players[&1].fishing.line.unwrap();
+        line.rich = Some(line.bobber);
+        line.bonus *= 3.;
+        w.rich_fishing.insert(
+            0,
+            vec![RichSpot {
+                point: line.bobber,
+                remaining: 5,
+                reserve: None,
+            }],
+        );
+        w.players.get_mut(&1).unwrap().fishing.line = Some(line);
+        w.rng = 1;
+        w.fish_press(1, line.deadline());
+        assert_eq!(w.rich_fishing[&0][0].remaining, 4);
+        assert_eq!(w.players[&1].character.fishing.total, 1);
+        let caught = std::iter::from_fn(|| rx.try_recv().ok())
+            .find(|v| v["kind"] == "fish_catch")
+            .unwrap();
+        assert!(
+            caught["quantity"].as_u64().unwrap() > 1,
+            "rebirth multiplies copies, not spot use"
+        );
+        // Force the junk band on a lava cast without a timing sleep or random grind.
+        line.habitat = "Lava";
+        w.rng = 0;
+        w.land_fish(1, line, 50.);
+        assert_eq!(w.rich_fishing[&0][0].remaining, 4);
+        assert_eq!(w.players[&1].character.fishing.total, 1);
+        let junk = std::iter::from_fn(|| rx.try_recv().ok())
+            .find(|v| v["kind"] == "fish_catch")
+            .unwrap();
+        assert!(
+            EXTRA_LOOT
+                .iter()
+                .any(|s| s.item == junk["item"] && s.category == "junk" && s.habitat == "lava")
+        );
+        assert!(junk.get("kg").is_none());
+        w.rng = 35; // first draw is in the treasure band.
+        w.land_fish(1, line, 70.);
+        let treasure = std::iter::from_fn(|| rx.try_recv().ok())
+            .find(|v| v["kind"] == "fish_catch")
+            .unwrap();
+        assert!(
+            EXTRA_LOOT
+                .iter()
+                .any(|s| s.item == treasure["item"] && s.category == "treasure")
+        );
+        assert_eq!(w.rich_fishing[&0][0].remaining, 4);
+        assert_eq!(
+            w.players[&1]
+                .character
+                .quantity(junk["item"].as_str().unwrap()),
+            junk["quantity"].as_u64().unwrap() as u32
+        );
+    }
+
+    #[test]
+    fn fishing_data_stacks_sell_bank_mail_and_bring() {
+        let (mut w, _) = super::super::fishing_tests::angler();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.inventory.clear();
+        for species in FISH.iter() {
+            let i = item(&species.item).unwrap();
+            assert_eq!(i.kind, "fish");
+            assert!(!crate::items::is_gear(i));
+            assert!(crate::mail::ineligible(&i.id).is_none());
+        }
+        let id = FISH[0].item.as_str();
+        c.add_item(id, 7);
+        assert_eq!(c.bag_used(), 1);
+        c.bank_deposit(id, 3, None).unwrap();
+        assert_eq!((c.quantity(id), c.bank.quantity(id)), (4, 3));
+        c.bank_withdraw(id, 2, None).unwrap();
+        assert_eq!((c.quantity(id), c.bank.quantity(id)), (6, 1));
+        let q: Quest = serde_json::from_value(json!({"id":"fishing_test_bring","title":"Fish","npc":"test","requires":null,"repeatable":false,"level":1,"rewardXp":0,"rewardGold":0,"objectives":[{"kind":"bring","target":id,"count":5}]})).unwrap();
+        c.quests.push(QuestProgress {
+            id: q.id.clone(),
+            ..Default::default()
+        });
+        q.sync_bring(c);
+        assert!(q.ready(c.quests.last().unwrap()));
+        q.take_bring(c);
+        assert_eq!(c.quantity(id), 1);
+        let gold = c.gold;
+        let paid = c.sell_item(id, 1).unwrap();
+        assert_eq!((c.quantity(id), c.gold), (0, gold + paid));
+    }
+
+    #[test]
+    fn fishing_data_raw_fish_uses_meal_cooldown_and_small_heal() {
+        let (mut w, _) = super::super::fishing_tests::angler();
+        let i = item(&FISH[0].item).unwrap();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.hp = 1.;
+        p.character.add_item(&i.id, 2);
+        assert_eq!(
+            super::super::consumables::health_amount(i, &p.character),
+            i.heal
+        );
+        w.use_item(1, &i.id);
+        assert_eq!(w.players[&1].character.quantity(&i.id), 1);
+        assert_eq!(w.players[&1].meal_cd, 30.);
+        w.use_item(1, &i.id);
+        assert_eq!(w.players[&1].character.quantity(&i.id), 1);
     }
 }

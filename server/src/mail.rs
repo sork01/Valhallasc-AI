@@ -412,3 +412,26 @@ impl Store {
 #[cfg(test)]
 #[path = "mail_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+mod fishing_tests {
+    use super::*;
+    #[test]
+    fn fishing_data_mail_preserves_fish_and_rods_as_stacks() {
+        let mut sender = Character::mercenary(crate::model::Class::Warrior, 99, "FishSender");
+        let mut receiver = Character::mercenary(crate::model::Class::Mage, 99, "FishRecipient");
+        sender.inventory.clear();
+        receiver.inventory.clear();
+        let ids = ["fish_pier_sprat", "rod_twig_rod", "fishing_cooled_slag", "fishing_rod_charm"];
+        let attachments: Vec<_> = ids.iter().map(|id| {
+            sender.add_item(id, 5);
+            Attachment { item: (*id).into(), quantity: 3, copy: None }
+        }).collect();
+        let contents = take(&mut sender, 0, &attachments).unwrap();
+        assert!(contents.gear.is_empty());
+        let saved: Contents = serde_json::from_str(&serde_json::to_string(&contents).unwrap()).unwrap();
+        receive(&mut receiver, &saved).unwrap();
+        for id in ids { assert_eq!((sender.quantity(id), receiver.quantity(id)), (2, 3)); }
+        assert_eq!(receiver.bag_used(), ids.len());
+    }
+}

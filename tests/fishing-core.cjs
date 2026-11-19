@@ -34,14 +34,18 @@ async function run() {
     console.log(`30 snapshots in ${elapsed} ms, tick gaps of 2`);
     await w.waitFor(() => w.player(bot).fishing?.state === 'bite', 15000, 'bite');
     await w.action(bot, { type: 'fish' });
-    await w.waitFor(() => w.player(bot).fishingLog?.total === 1);
-    const [id] = Object.keys(w.player(bot).fishingLog.species);
-    assert(w.player(bot).inventory.some(s => s.item === id && s.quantity === 1));
+    await w.waitFor(() => w.events.some(e => e.kind === 'fish_catch'));
+    const caught = w.events.find(e => e.kind === 'fish_catch');
+    const id = caught.item;
+    await w.waitFor(() => w.player(bot).inventory.some(s => s.item === id && s.quantity === caught.quantity));
+    if (caught.kg != null) assert.equal(w.player(bot).fishingLog.species[id].count, 1);
+    else assert.equal(w.player(bot).fishingLog?.total || 0, 0, 'junk and treasure do not enter the species log');
     await w.disconnect(bot);
     await w.connect({ bot, class: 'warrior', gender: 'male' });
-    assert.equal(w.player(bot).fishingLog.species[id].count, 1);
+    assert(w.player(bot).inventory.some(s => s.item === id && s.quantity === caught.quantity));
+    if (caught.kg != null) assert.equal(w.player(bot).fishingLog.species[id].count, 1);
     assert(!w.player(bot).fishing);
-    console.log('Pier catch recorded and placed in bags:', id);
+    console.log('Pier catch placed in bags and persisted:', id);
   } finally { await w.stop(); }
 }
 run().catch(error => {console.error(error); process.exitCode = 1;});

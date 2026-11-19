@@ -595,6 +595,19 @@ mod tests {
         }
     }
     #[test]
+    fn fishing_data_fish_rods_and_treasure_trade_as_stacks() {
+        let mut alice = Character::mercenary(Class::Warrior, 99, "FishAlice");
+        let bob = Character::mercenary(Class::Mage, 99, "FishBob");
+        let ids = ["fish_pier_sprat", "rod_twig_rod", "fishing_rod_charm"];
+        let mut offered = Offer::default();
+        for id in ids {
+            alice.add_item(id, 7);
+            offered.items.push(ItemStack { item: id.into(), quantity: 5 });
+        }
+        let (a, b) = settle_trade(&alice, &bob, &offered, &Offer::default(), NOW).unwrap();
+        for id in ids { assert_eq!((a.quantity(id), b.quantity(id)), (2, 5)); }
+    }
+    #[test]
     fn neutral_gear_materials_and_potions_still_trade() {
         let neutral = ITEMS
             .iter()

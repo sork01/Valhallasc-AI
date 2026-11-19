@@ -1,6 +1,6 @@
 use super::*;
 
-fn angler() -> (World, mpsc::Receiver<Value>) {
+pub(super) fn angler() -> (World, mpsc::Receiver<Value>) {
     let mut world =
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
     let (tx, rx) = mpsc::channel(128);
@@ -15,6 +15,8 @@ fn angler() -> (World, mpsc::Receiver<Value>) {
             tx,
         )
         .unwrap();
+    world.maps[0].fishing_spots.clear();
+    world.rng = 1;
     let start = world.maps[0].dock.as_ref().unwrap().start;
     let p = world.players.get_mut(&1).unwrap();
     p.character.x = start.x;
@@ -44,6 +46,7 @@ fn fishing_deadline_bags_save_and_privacy() {
     assert!(view["players"][0]["fishDeadline"].is_null());
     assert_eq!(view["players"][0]["fishing"]["state"], "bite");
     let deadline = w.players[&1].fishing.line.unwrap().deadline();
+    w.rng = 1; // deterministic species catch; junk/treasure are tested separately.
     w.fish_press(1, deadline + 0.25);
     w.fish_press(1, deadline + 0.25);
     let catch = std::iter::from_fn(|| rx.try_recv().ok())
@@ -169,6 +172,7 @@ fn fishing_lava_shore_requires_matching_rod_and_direction() {
     let view = w.players[&1].snapshot();
     assert_eq!(view["fishing"]["lava"], true);
     assert!((51. ..55.).contains(&view["fishing"]["x"].as_f64().unwrap()));
+    w.rng = 1;
     w.fish_press(1, bite + 0.01);
     let c = &w.players[&1].character;
     let id = c.fishing.species.keys().next().unwrap();
@@ -193,7 +197,14 @@ fn fishing_rich_spot_rain_and_twilight_scale_wait() {
     let wait = cast(&mut w, start) - start - 0.5;
     w.players.get_mut(&1).unwrap().fishing = Default::default();
     w.rng = seed;
-    w.maps[0].fishing_spots.push(Point { x: 205., y: 293.5 });
+    w.rich_fishing.insert(
+        0,
+        vec![fishing::RichSpot {
+            point: Point { x: 205., y: 293.5 },
+            remaining: 7,
+            reserve: None,
+        }],
+    );
     w.world_clock.set(Some(18.), true).unwrap();
     w.weather
         .set(0, "rain", Some("light"), daynight::unix_ms())

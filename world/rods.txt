@@ -1,10 +1,66 @@
 [
-{"item": "rod_twig_rod", "tier": 1, "lava": false},
-{"item": "rod_willow_rod", "tier": 2, "lava": false},
-{"item": "rod_reedglass_rod", "tier": 3, "lava": false},
-{"item": "rod_silverline_rod", "tier": 4, "lava": false},
-{"item": "rod_starcatch_rod", "tier": 5, "lava": false},
-{"item": "rod_worldwire_rod", "tier": 6, "lava": false},
-{"item": "rod_emberline_rod", "tier": 1, "lava": true},
-{"item": "rod_magma_reel", "tier": 2, "lava": true}
+  {
+    "item": "rod_twig_rod",
+    "tier": 1,
+    "lava": false,
+    "name": "Twig Rod",
+    "level": 1,
+    "sell": 10
+  },
+  {
+    "item": "rod_willow_rod",
+    "tier": 2,
+    "lava": false,
+    "name": "Willow Rod",
+    "level": 10,
+    "sell": 10
+  },
+  {
+    "item": "rod_reedglass_rod",
+    "tier": 3,
+    "lava": false,
+    "name": "Reedglass Rod",
+    "level": 25,
+    "sell": 10
+  },
+  {
+    "item": "rod_silverline_rod",
+    "tier": 4,
+    "lava": false,
+    "name": "Silverline Rod",
+    "level": 40,
+    "sell": 10
+  },
+  {
+    "item": "rod_starcatch_rod",
+    "tier": 5,
+    "lava": false,
+    "name": "Starcatch Rod",
+    "level": 60,
+    "sell": 10
+  },
+  {
+    "item": "rod_worldwire_rod",
+    "tier": 6,
+    "lava": false,
+    "name": "Worldwire Rod",
+    "level": 80,
+    "sell": 10
+  },
+  {
+    "item": "rod_emberline_rod",
+    "tier": 1,
+    "lava": true,
+    "name": "Emberline Rod",
+    "level": 5,
+    "sell": 10
+  },
+  {
+    "item": "rod_magma_reel",
+    "tier": 2,
+    "lava": true,
+    "name": "Magma Reel",
+    "level": 45,
+    "sell": 10
+  }
 ]
