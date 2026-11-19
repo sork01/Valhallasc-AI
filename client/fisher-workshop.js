@@ -8,7 +8,7 @@
     if(!open){Online.send({type:'shop_presence',open:true});open=true;}
     const owned=id=>(packet.inventory||[]).find(s=>s.item===id)?.quantity||0;
     const recipes=packet.fisherQuote||[];
-    const nodes=[make('h4','Fisher workshop'),make('p','Craft rods and cook fish')];
+    const nodes=[make('h4','Fisher workshop'),make('p','Craft rods and cook fish'),make('p','One rod grows with you. Each upgrade replaces the previous rod and keeps its fishing waters.')];
     if(owned('fishing_rod_charm'))nodes.push(make('p','Rod Charm replaces one fish and is used up.'));
     for(const group of ['rod:','cook:']){
       nodes.push(make('h4',group==='rod:'?'Craft rods':'Cook fish'));
@@ -17,6 +17,8 @@
         const row=make('div','','fisher-recipe');row.dataset.recipe=r.id;
         const text=make('div');
         text.append(make('strong',Locale.translate(item.name)),make('small',`Requires level ${item.requiredLevel||1}.`));
+        if(item.kind==='rod')for(const detail of Inventory.rodDetails(item))text.append(make('small',detail));
+        if(item.foodBonus)text.append(make('small',Inventory.foodBonus(item)));
         for(const [id,count] of r.ingredients){
           const name=Inventory.definition(id)?.name||id;
           const line=make('small',`${Locale.translate(name)}: ${owned(id)} / ${count}`);line.dataset.ingredient=id;text.append(line);

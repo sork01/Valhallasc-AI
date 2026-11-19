@@ -66,7 +66,7 @@
   {
     "item": "fish_tide_flounder",
     "habitat": "Shore",
-    "min_tier": 2,
+    "min_tier": 3,
     "kg": [
       5,
       14
@@ -82,7 +82,7 @@
   {
     "item": "fish_glass_eel",
     "habitat": "Shore",
-    "min_tier": 3,
+    "min_tier": 4,
     "kg": [
       6,
       17
@@ -98,7 +98,7 @@
   {
     "item": "fish_moonscale_carp",
     "habitat": "Shore",
-    "min_tier": 6,
+    "min_tier": 8,
     "kg": [
       7,
       20
@@ -178,7 +178,7 @@
   {
     "item": "fish_blue_grayling",
     "habitat": "Cold",
-    "min_tier": 2,
+    "min_tier": 3,
     "kg": [
       5,
       14
@@ -194,7 +194,7 @@
   {
     "item": "fish_aurora_trout",
     "habitat": "Cold",
-    "min_tier": 3,
+    "min_tier": 4,
     "kg": [
       6,
       17
@@ -210,7 +210,7 @@
   {
     "item": "fish_frostwake_pike",
     "habitat": "Cold",
-    "min_tier": 6,
+    "min_tier": 8,
     "kg": [
       7,
       20
@@ -290,7 +290,7 @@
   {
     "item": "fish_peat_eel",
     "habitat": "Swamp",
-    "min_tier": 2,
+    "min_tier": 3,
     "kg": [
       5,
       14
@@ -306,7 +306,7 @@
   {
     "item": "fish_lantern_gar",
     "habitat": "Swamp",
-    "min_tier": 3,
+    "min_tier": 4,
     "kg": [
       6,
       17
@@ -322,7 +322,7 @@
   {
     "item": "fish_fen_crownfin",
     "habitat": "Swamp",
-    "min_tier": 6,
+    "min_tier": 8,
     "kg": [
       7,
       20
@@ -402,7 +402,7 @@
   {
     "item": "fish_root_barb",
     "habitat": "Forest",
-    "min_tier": 2,
+    "min_tier": 3,
     "kg": [
       5,
       14
@@ -418,7 +418,7 @@
   {
     "item": "fish_amber_salmon",
     "habitat": "Forest",
-    "min_tier": 3,
+    "min_tier": 4,
     "kg": [
       6,
       17
@@ -434,7 +434,7 @@
   {
     "item": "fish_antler_sturgeon",
     "habitat": "Forest",
-    "min_tier": 6,
+    "min_tier": 8,
     "kg": [
       7,
       20
@@ -514,7 +514,7 @@
   {
     "item": "fish_parrot_perch",
     "habitat": "Jungle",
-    "min_tier": 2,
+    "min_tier": 3,
     "kg": [
       5,
       14
@@ -530,7 +530,7 @@
   {
     "item": "fish_canopy_arowana",
     "habitat": "Jungle",
-    "min_tier": 3,
+    "min_tier": 4,
     "kg": [
       6,
       17
@@ -546,7 +546,7 @@
   {
     "item": "fish_jade_dragonfish",
     "habitat": "Jungle",
-    "min_tier": 6,
+    "min_tier": 8,
     "kg": [
       7,
       20
@@ -626,7 +626,7 @@
   {
     "item": "fish_dusk_catfish",
     "habitat": "Oasis",
-    "min_tier": 2,
+    "min_tier": 3,
     "kg": [
       5,
       14
@@ -642,7 +642,7 @@
   {
     "item": "fish_mirage_eel",
     "habitat": "Oasis",
-    "min_tier": 3,
+    "min_tier": 4,
     "kg": [
       6,
       17
@@ -658,7 +658,7 @@
   {
     "item": "fish_sapphire_lungfish",
     "habitat": "Oasis",
-    "min_tier": 6,
+    "min_tier": 8,
     "kg": [
       7,
       20
@@ -738,7 +738,7 @@
   {
     "item": "fish_equinox_perch",
     "habitat": "Spring",
-    "min_tier": 2,
+    "min_tier": 3,
     "kg": [
       5,
       14
@@ -754,7 +754,7 @@
   {
     "item": "fish_wheel_koi",
     "habitat": "Spring",
-    "min_tier": 3,
+    "min_tier": 4,
     "kg": [
       6,
       17
@@ -770,7 +770,7 @@
   {
     "item": "fish_yearling_crownray",
     "habitat": "Spring",
-    "min_tier": 6,
+    "min_tier": 8,
     "kg": [
       7,
       20
@@ -786,7 +786,7 @@
   {
     "item": "fish_cinder_fry",
     "habitat": "Lava",
-    "min_tier": 1,
+    "min_tier": 2,
     "kg": [
       1,
       2
@@ -802,7 +802,7 @@
   {
     "item": "fish_slag_sucker",
     "habitat": "Lava",
-    "min_tier": 1,
+    "min_tier": 2,
     "kg": [
       2,
       5
@@ -818,7 +818,7 @@
   {
     "item": "fish_ash_barb",
     "habitat": "Lava",
-    "min_tier": 1,
+    "min_tier": 2,
     "kg": [
       3,
       8
@@ -834,7 +834,7 @@
   {
     "item": "fish_basalt_eel",
     "habitat": "Lava",
-    "min_tier": 1,
+    "min_tier": 2,
     "kg": [
       4,
       11
@@ -850,7 +850,7 @@
   {
     "item": "fish_furnace_bass",
     "habitat": "Lava",
-    "min_tier": 1,
+    "min_tier": 2,
     "kg": [
       5,
       14
@@ -866,7 +866,7 @@
   {
     "item": "fish_obsidian_gar",
     "habitat": "Lava",
-    "min_tier": 2,
+    "min_tier": 6,
     "kg": [
       6,
       17
@@ -882,7 +882,7 @@
   {
     "item": "fish_phoenix_koi",
     "habitat": "Lava",
-    "min_tier": 1,
+    "min_tier": 2,
     "kg": [
       7,
       20
@@ -898,7 +898,7 @@
   {
     "item": "fish_sunfire_ray",
     "habitat": "Lava",
-    "min_tier": 2,
+    "min_tier": 6,
     "kg": [
       8,
       23

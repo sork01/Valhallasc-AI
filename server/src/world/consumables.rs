@@ -54,7 +54,8 @@ impl World {
         let max = p.character.max_hp();
         let needs_health = it.heal > 0. && p.character.hp < max;
         let needs_resource = it.mana > 0. && p.character.resource() < p.character.max_resource();
-        if !needs_health && !needs_resource {
+        // Dishes can be eaten at full health to choose or refresh a food bonus.
+        if !needs_health && !needs_resource && it.food_bonus.is_none() {
             return refuse(
                 p,
                 if it.heal > 0. && it.mana == 0. {
@@ -92,6 +93,17 @@ impl World {
                 time: it.duration,
             });
             p.food_shown = 0.;
+            if let Some(bonus) = &it.food_bonus {
+                // One food bonus, separate from skills and the meal's healing.
+                p.buffs.retain(|b| !b.id.starts_with("meal:"));
+                p.buffs.push(Buff {
+                    id: format!("meal:{}", it.id),
+                    kind: bonus.kind,
+                    amount: bonus.amount,
+                    left: bonus.duration,
+                    time: bonus.duration,
+                });
+            }
         } else {
             if p.potion_cd > 0. {
                 let text = format!(

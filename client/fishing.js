@@ -16,11 +16,11 @@
   const calm = () => !!window.Prefs?.lowGraphics || motion.matches;
 
   // A visibility hint, never a claim that the world will accept a cast. Match the facing ray and liquid shapes.
-  function shore(hero, map) {
+  function shore(hero, map, checkRod = true) {
     if (!hero || !map || ![0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45].includes(hero.zone || 0)) return false;
     const lava = [1, 45].includes(hero.zone), level = hero.level || 1;
-    if (!(hero.inventory || []).some(s => {
-      const i = definition(s.item); return s.quantity > 0 && i?.kind === 'rod' && i.requiredLevel <= level && !!i.fishing?.lava === lava;
+    if (checkRod && !(hero.inventory || []).some(s => {
+      const i = definition(s.item); return s.quantity > 0 && i?.kind === 'rod' && i.requiredLevel <= level && (!lava || !!i.fishing?.lava);
     })) return false;
     const length = Math.hypot(hero.fx, hero.fy); if (!length) return false;
     const fx = hero.fx / length, fy = hero.fy / length, dock = map.dock;
@@ -62,6 +62,13 @@
     }
     return false;
   }
+  function requiredRod(zone, rich = false) {
+    return (window.WORLD_ITEMS || []).filter(i => i.kind === 'rod' && (i.fishing?.zones?.includes(zone) || rich && i.fishing?.richZones?.includes(zone))).sort((a,b) => b.fishing.tier - a.fishing.tier)[0];
+  }
+  function requirement(zone, rich = false) {
+    const rod = requiredRod(zone, rich);
+    return rod ? tr('Requires {0} · level {1}').replace('{0}',tr(rod.name)).replace('{1}',rod.requiredLevel) : '';
+  }
   function available() {
     return !!own && !own.dead && !own.ghost && !own.sparkTravel && !own.inCombat && !(own.stun > 0) && !window.Cutscene?.active && !!(own.fishing || shoreHint);
   }
@@ -80,7 +87,7 @@
   function sync(packet, hero, map, emit) {
     if (emit) sound = emit;
     if (own && (own.id !== hero.id || own.zone !== hero.zone)) { lines.clear(); cast = null; result = null; miss = null; }
-    own = hero; zone = map; log = hero.fishingLog || {}; shoreHint = shore(hero, map);
+    own = hero; zone = map; log = hero.fishingLog || {}; shoreHint = shore(hero, map, false);
     // Server's Unix clock, when supplied, avoids relying on the device wall clock for the draining ring.
     if (Number.isFinite(packet.fishingTime)) clockOffset = packet.fishingTime * 1000 - Date.now();
     spots = (packet.fishingSpots || []).filter(p => Number.isFinite(p.x) && Number.isFinite(p.y));
@@ -129,7 +136,7 @@
     el.innerHTML = window.Inventory?.icon(item) || ''; return el;
   }
   function renderLog() {
-    const species = catalogue(), key = JSON.stringify([log, $('fishing-filter').value, window.Locale?.language]);
+    const species = catalogue(), key = JSON.stringify([log, own?.inventory, own?.level, $('fishing-filter').value, window.Locale?.language]);
     if (key === signature) return; signature = key;
     const caught = species.filter(i => (log.species?.[i.id]?.count || 0) > 0).length;
     $('fishing-records').textContent = tr('Caught: {0} · Species: {1}/{2} · Legendary: {3} · Best streak: {4}')
@@ -142,7 +149,19 @@
       details.append(name, node('small', tr(i.fishing.habitat)), node('span', known ? tr('{0} caught · Best: ca {1} kg').replace('{0}', record.count).replace('{1}', record.bestKg) : tr('Catch this species to reveal its record.')));
       row.append(art, details); return row;
     });
-    $('fishing-species').replaceChildren(...rows);
+    const progression = node('li', null, 'fishing-progression');
+    progression.append(node('strong', tr('Rod progression')));
+    const rods = (window.WORLD_ITEMS || []).filter(i => i.kind === 'rod').sort((a,b)=>a.fishing.tier-b.fishing.tier);
+    const current = rods.filter(i => i.requiredLevel <= (own?.level || 1) && own?.inventory?.some(s => s.item === i.id && s.quantity > 0)).at(-1);
+    const next = rods.find(i => i.fishing.tier > (current?.fishing.tier || 0));
+    progression.append(node('p', tr('Current rod: {0}').replace('{0}', tr(current?.name || 'No rod yet'))), node('p', tr('Next upgrade: {0}').replace('{0}', tr(next?.name || 'Fully upgraded'))));
+    const ladder = node('details'); ladder.append(node('summary', tr('All rod upgrades')));
+    for (const rod of rods) {
+      const row = node('div'); row.append(node('b', tr(rod.name)));
+      for (const text of window.Inventory?.rodDetails?.(rod) || []) row.append(node('small', text)); ladder.append(row);
+    }
+    progression.append(ladder);
+    $('fishing-species').replaceChildren(progression, ...rows);
   }
   function close(resume = true) { $('fishing-panel').hidden = true; if (resume) window.Field?.setPaused(false); }
   function open() {
@@ -178,17 +197,37 @@
     const point = (lines.get(own?.id) || cast)?.richSpot;
     return !!point && spots.some(spot => Math.hypot(spot.x - point.x, spot.y - point.y) < .001);
   }
-  let richPointer = null, richTooltip = null;
+  let richPointer = null, richTooltip = null, tooltipKey = null;
   function hideRichTooltip() { if (richTooltip) richTooltip.hidden = true; }
+  function waterAt(mx, my, project) {
+    if (!zone || !own || !requiredRod(own.zone || 0)) return false;
+    const a = project(0,0), b = project(1,0), c = project(0,1);
+    const ux = b[0]-a[0], uy = b[1]-a[1], vx = c[0]-a[0], vy = c[1]-a[1], det = ux*vy-uy*vx;
+    if (!det) return false;
+    const dx = mx-a[0], dy = my-a[1], x = (dx*vy-dy*vx)/det, y = (ux*dy-uy*dx)/det, lava = [1,45].includes(own.zone);
+    const pool = (zone.objects || []).some(o => {
+      const r = lava ? (['lava','ew_lava'].includes(o.kind) ? o.r : 0) : ['water','jungle_water','jade_pool'].includes(o.kind) ? o.r : ['seafoam','year_spring_pool','frostwake_frozen_pool','lapis_oasis'].includes(o.kind) ? Math.max(1,o.r||0) : 0;
+      return r > 0 && Math.hypot(x-o.x,y-o.y) < r;
+    });
+    const ship = zone.dock?.ship;
+    if (ship && Math.abs(x-ship.x) < ship.beam/2 && y >= ship.y0 && y <= ship.y1) return false;
+    return pool || !lava && x >= 0 && y >= 0 && zone.shapeFloor?.[Math.floor(y)]?.[Math.floor(x)] === ' ' && zone.shapeEdge?.[Math.floor(y)]?.[Math.floor(x)] === 'c';
+  }
   function drawRichTooltip(project, width, height) {
     if (!richPointer || !window.Field?.canAct || own?.dead || window.Cutscene?.active) { hideRichTooltip(); return; }
     const rect = $('fieldcv').getBoundingClientRect();
     const spot = rect.width && rect.height && richSpotAt((richPointer.x - rect.left) / rect.width * width, (richPointer.y - rect.top) / rect.height * height, project);
-    if (!spot) { hideRichTooltip(); return; }
+    if (!spot && !(rect.width && rect.height && waterAt((richPointer.x-rect.left)/rect.width*width, (richPointer.y-rect.top)/rect.height*height, project))) { hideRichTooltip(); return; }
     if (!richTooltip) {
       richTooltip = node('div', null, 'fishing-spot-tooltip'); richTooltip.id = 'rich-fishing-tooltip'; richTooltip.setAttribute('role', 'tooltip');
       richTooltip.append(node('strong', tr('Rich fishing spot')), node('p', tr('Better chances for rare fish. Moves after 5–10 fish are caught here.')));
       document.body.append(richTooltip);
+    }
+    const key = `${own?.zone || 0}:${!!spot}:${window.Locale?.language}`;
+    if (key !== tooltipKey) {
+      richTooltip.replaceChildren(node('strong', tr(spot ? 'Rich fishing spot' : 'Ordinary fishing water')), node('p', requirement(own?.zone || 0, !!spot)));
+      if (spot) richTooltip.append(node('p', tr('Better chances for rare fish. Moves after 5–10 fish are caught here.')));
+      tooltipKey = key;
     }
     richTooltip.hidden = false;
     const box = richTooltip.getBoundingClientRect();
@@ -197,7 +236,7 @@
   }
   function spotLabel(g, x, y) {
     g.save(); g.globalAlpha = 1; g.font = 'bold 14px sans-serif'; g.textAlign = 'center'; g.strokeStyle = '#10212b'; g.lineWidth = 4;
-    g.strokeText(tr('Rich fishing spot'), x, y - 45); g.fillStyle = '#fff1a5'; g.fillText(tr('Rich fishing spot'), x, y - 45); g.restore();
+    g.strokeText(tr('Rich fishing spot'), x, y - 45); g.fillStyle = '#fff1a5'; g.fillText(tr('Rich fishing spot'), x, y - 45); g.font = '12px sans-serif'; g.strokeText(requirement(own?.zone || 0, true), x, y - 28); g.fillText(requirement(own?.zone || 0, true), x, y - 28); g.restore();
   }
 
   function ring(g, x, y, r, colour, alpha = 1) {
@@ -214,6 +253,11 @@
         if (!reduced) ring(g, x, y, 24 + ((phase + .5) % 1) * 50, '#e1f7ff', .45);
       }
       return;
+    }
+    if (shoreHint && !own?.fishing) {
+      const h = window.Field?.hero || own, [x,y] = project(h.x,h.y);
+      g.save(); g.font = 'bold 13px sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#10212b'; g.fillStyle = '#fff1a5';
+      g.strokeText(requirement(own.zone || 0), x, y + 49); g.fillText(requirement(own.zone || 0), x, y + 49); g.restore();
     }
     if (cast && !cast.landed && time - cast.at >= 500) { cast.landed = true; sound('plop'); if (cast.lava) sound('lava'); }
     for (const [id, line] of lines) {
@@ -266,5 +310,5 @@
   const updateHint = () => { $('fishing-hint').textContent = tr('Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.').replace(/‹fish›/g, tr(Keys.label('fish', false))); };
   addEventListener('keymap-change', updateHint);
   updateHint();
-  window.Fishing = { sync, event, reset, press, available, shore, open, close, drawFishing, richSpotAt, get richActive() { return usingRichSpot(); }, get phase() { return lines.get(own?.id)?.state || 'idle'; } };
+  window.Fishing = { waterAt, requiredRod, requirement, sync, event, reset, press, available, shore, open, close, drawFishing, richSpotAt, get richActive() { return usingRichSpot(); }, get phase() { return lines.get(own?.id)?.state || 'idle'; } };
 })();

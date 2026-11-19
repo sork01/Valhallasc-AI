@@ -12,6 +12,9 @@ pub enum BuffKind {
     Crit,
     /// Food: `amount` hit points per second while it lasts.
     Regen,
+    /// Cooked fish meals improve fishing wait or rarity.
+    FishingSpeed,
+    FishingLuck,
 }
 
 #[derive(Clone, Debug, Deserialize)]

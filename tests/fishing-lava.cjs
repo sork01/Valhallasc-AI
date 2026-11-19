@@ -54,14 +54,14 @@ async function cadence() {
 (async () => {
   await w.start();
   await w.connect({bot, class:'warrior', gender:'male'});
-  await w.debug(bot, {op:'give_item', item:'rod_worldwire_rod', quantity:1});
+  await w.debug(bot, {op:'give_item', item:'rod_twig_rod', quantity:1});
   await shore(1);
-  await rejected('Carry a suitable fishing rod.');
+  await rejected('This water requires Platinum Rod (level 5).');
   await w.debug(bot, {op:'give_item', item:'rod_emberline_rod', quantity:1});
   for (const [zone, rod] of [[1, 'rod_emberline_rod'], [45, 'rod_magma_reel']]) {
     if (zone === 45) {
       await shore(zone);
-      await rejected('This fishing spot needs a stronger rod.');
+      await rejected('This water requires Tempered Platinum Rod (level 45).');
       await w.debug(bot, {op:'give_item', item:rod, quantity:1});
     }
     const before = {...w.player(bot)}, start = w.events.length;
@@ -78,7 +78,7 @@ async function cadence() {
       if (fish) {
         assert.equal(fish.habitat, 'Lava');
         assert(fish.zone == null || fish.zone === zone);
-        assert(fish.min_tier <= (zone === 1 ? 1 : 2));
+        assert(fish.min_tier <= (zone === 1 ? 2 : 6));
         assert(caught.kg >= fish.kg[0] && caught.kg <= fish.kg[1]);
       } else {
         assert(loot.some(s => s.item === caught.item && ['any', 'lava'].includes(s.habitat)));
@@ -92,9 +92,12 @@ async function cadence() {
     await Promise.all([probe, catchFish()]);
     await w.advance(1100);
   }
-  await w.debug(bot, {op:'take_item', item:'rod_worldwire_rod', quantity:1});
+  await w.debug(bot, {op:'take_item', item:'rod_twig_rod', quantity:1});
   await shore(0);
-  await rejected('Carry a suitable fishing rod.');
+  await w.action(bot, {type:'fish'});
+  await w.waitFor(() => w.player(bot).fishing);
+  assert.equal(w.player(bot).fishing.lava, false, 'one upgraded rod also fishes water');
+  await w.action(bot, {type:'fish'});
   const inventory = JSON.stringify(w.player(bot).inventory);
   const log = JSON.stringify(w.player(bot).fishingLog);
   await w.disconnect(bot);

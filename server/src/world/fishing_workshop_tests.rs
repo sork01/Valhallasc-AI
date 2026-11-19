@@ -36,6 +36,8 @@ fn fishing_workshop_buys_twig_and_consumes_complete_rod_recipe_once() {
     assert_eq!(w.players[&1].character.gold, 450);
     assert_eq!(w.players[&1].character.quantity("rod_twig_rod"), 1);
     let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.consume_item("rod_twig_rod", 1);
+    c.add_item("rod_emberline_rod", 1);
     c.level = 10;
     c.add_item("fish_pier_sprat", 5);
     c.add_item("slime_gel", 1);
@@ -43,7 +45,7 @@ fn fishing_workshop_buys_twig_and_consumes_complete_rod_recipe_once() {
     let c = &w.players[&1].character;
     assert_eq!(c.quantity("rod_willow_rod"), 1);
     assert_eq!(c.gold, 200);
-    for id in ["rod_twig_rod", "fish_pier_sprat", "slime_gel"] {
+    for id in ["rod_emberline_rod", "fish_pier_sprat", "slime_gel"] {
         assert_eq!(c.quantity(id), 0);
     }
     let after = inventory(&w);
@@ -68,7 +70,7 @@ fn fishing_workshop_failures_preserve_every_item_and_gold() {
         "zone", "distance", "full",
     ] {
         let (mut w, _rx) = fishing_tests::angler();
-        funded(&mut w, "rod_twig_rod", "fish_pier_sprat", "slime_gel");
+        funded(&mut w, "rod_emberline_rod", "fish_pier_sprat", "slime_gel");
         let n = w.maps[0]
             .npcs
             .iter()
@@ -87,7 +89,7 @@ fn fishing_workshop_failures_preserve_every_item_and_gold() {
                 p.character.consume_item("slime_gel", 1);
             }
             "rod" => {
-                p.character.consume_item("rod_twig_rod", 1);
+                p.character.consume_item("rod_emberline_rod", 1);
             }
             "level" => p.character.level = 1,
             "combat" => p.combat_left = 5.,
@@ -96,7 +98,7 @@ fn fishing_workshop_failures_preserve_every_item_and_gold() {
             "distance" => p.character.x += 10.,
             "full" => {
                 // Each consumed stack remains, so the output would require an additional cell.
-                p.character.add_item("rod_twig_rod", 1);
+                p.character.add_item("rod_emberline_rod", 1);
                 p.character.add_item("fish_pier_sprat", 1);
                 p.character.add_item("slime_gel", 1);
                 for i in ITEMS.iter().filter(|i| i.kind == "material") {
@@ -143,7 +145,7 @@ fn fishing_workshop_failures_preserve_every_item_and_gold() {
 #[test]
 fn fishing_workshop_charm_is_consumed_only_with_a_successful_craft() {
     let (mut w, _) = fishing_tests::angler();
-    funded(&mut w, "rod_twig_rod", "fish_pier_sprat", "slime_gel");
+    funded(&mut w, "rod_emberline_rod", "fish_pier_sprat", "slime_gel");
     let c = &mut w.players.get_mut(&1).unwrap().character;
     c.consume_item("fish_pier_sprat", 1);
     c.add_item("fishing_rod_charm", 1);
@@ -272,7 +274,7 @@ fn fishing_workshop_every_fisher_is_reachable_and_quests_consume_real_fish() {
 #[test]
 fn fishing_workshop_full_bags_can_use_the_cells_freed_by_ingredients() {
     let (mut w, _) = fishing_tests::angler();
-    funded(&mut w, "rod_twig_rod", "fish_pier_sprat", "slime_gel");
+    funded(&mut w, "rod_emberline_rod", "fish_pier_sprat", "slime_gel");
     let c = &mut w.players.get_mut(&1).unwrap().character;
     for i in ITEMS
         .iter()

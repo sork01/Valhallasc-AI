@@ -1,11 +1,34 @@
 [
   {
+    "id": "rod:emberline",
+    "item": "rod_emberline_rod",
+    "cost": 100,
+    "ingredients": [
+      [
+        "rod_twig_rod",
+        1
+      ],
+      [
+        "fish_pier_sprat",
+        5
+      ],
+      [
+        "ember_core",
+        1
+      ]
+    ],
+    "zones": [
+      0,
+      1
+    ]
+  },
+  {
     "id": "rod:2",
     "item": "rod_willow_rod",
     "cost": 250,
     "ingredients": [
       [
-        "rod_twig_rod",
+        "rod_emberline_rod",
         1
       ],
       [
@@ -72,12 +95,39 @@
     ]
   },
   {
+    "id": "rod:magma",
+    "item": "rod_magma_reel",
+    "cost": 7500,
+    "ingredients": [
+      [
+        "rod_silverline_rod",
+        1
+      ],
+      [
+        "fish_cinder_fry",
+        5
+      ],
+      [
+        "ember_core",
+        1
+      ]
+    ],
+    "zones": [
+      1,
+      19,
+      22,
+      25,
+      26,
+      45
+    ]
+  },
+  {
     "id": "rod:5",
     "item": "rod_starcatch_rod",
     "cost": 12000,
     "ingredients": [
       [
-        "rod_silverline_rod",
+        "rod_magma_reel",
         1
       ],
       [
@@ -118,50 +168,6 @@
       25,
       26,
       28
-    ]
-  },
-  {
-    "id": "rod:emberline",
-    "item": "rod_emberline_rod",
-    "cost": 500,
-    "ingredients": [
-      [
-        "rod_twig_rod",
-        1
-      ],
-      [
-        "fish_pier_sprat",
-        5
-      ],
-      [
-        "ember_core",
-        1
-      ]
-    ],
-    "zones": [
-      1
-    ]
-  },
-  {
-    "id": "rod:magma",
-    "item": "rod_magma_reel",
-    "cost": 7500,
-    "ingredients": [
-      [
-        "rod_emberline_rod",
-        1
-      ],
-      [
-        "fish_cinder_fry",
-        5
-      ],
-      [
-        "ew_slagjaw_relic",
-        1
-      ]
-    ],
-    "zones": [
-      45
     ]
   },
   {

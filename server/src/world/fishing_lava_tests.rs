@@ -48,8 +48,11 @@ fn fishing_lava_cast_requires_the_whole_hero_on_clear_shore() {
 fn fishing_lava_rods_surfaces_zone_and_level_are_enforced() {
     let (mut w, _) = super::super::fishing_tests::angler();
     for (zone, surface) in [(1, "lava"), (45, "ew_lava")] {
-        pool(&mut w, zone, surface, "rod_worldwire_rod");
-        assert!(w.fishing_line(1, 20.).is_err(), "water rod in lava {zone}");
+        pool(&mut w, zone, surface, "rod_twig_rod");
+        assert!(
+            w.fishing_line(1, 20.).is_err(),
+            "starter rod in lava {zone}"
+        );
         let p = w.players.get_mut(&1).unwrap();
         p.character.add_item("rod_emberline_rod", 1);
         p.character.level = 4;
@@ -61,7 +64,7 @@ fn fishing_lava_rods_surfaces_zone_and_level_are_enforced() {
         p.character.level = 44;
         assert_eq!(w.fishing_line(1, 20.).is_ok(), zone == 1);
         w.players.get_mut(&1).unwrap().character.level = 45;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 6);
         w.players.get_mut(&1).unwrap().face.x = -1.;
         assert!(w.fishing_line(1, 20.).is_err(), "facing away");
         w.players.get_mut(&1).unwrap().face.x = 1.;
@@ -74,13 +77,19 @@ fn fishing_lava_rods_surfaces_zone_and_level_are_enforced() {
     }
     for rod in ["rod_emberline_rod", "rod_magma_reel"] {
         pool(&mut w, 0, "water", rod);
-        assert!(w.fishing_line(1, 20.).is_err(), "lava rod in water: {rod}");
+        assert!(
+            w.fishing_line(1, 20.).is_ok(),
+            "heat-resistant rod keeps water fishing: {rod}"
+        );
         w.players
             .get_mut(&1)
             .unwrap()
             .character
             .add_item("rod_twig_rod", 1);
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 1);
+        assert_eq!(
+            w.fishing_line(1, 20.).unwrap().tier,
+            if rod == "rod_emberline_rod" { 2 } else { 6 }
+        );
         w.maps[0].objects[0].surface = FishingSurface::Lava;
         w.maps[0].grid = Default::default();
         assert!(
@@ -178,7 +187,8 @@ fn fishing_lava_catches_use_local_species_junk_tiers_and_legendaries() {
             w.fish_press(1, line.deadline());
             let packets: Vec<_> = std::iter::from_fn(|| rx.try_recv().ok()).collect();
             let catch = packets.iter().find(|v| v["kind"] == "fish_catch").unwrap();
-            let announcements: Vec<_> = packets.iter().filter(|v| v["type"] == "announce").collect();
+            let announcements: Vec<_> =
+                packets.iter().filter(|v| v["type"] == "announce").collect();
             assert_eq!(announcements.len(), usize::from(expected == legendary));
             if expected == legendary {
                 assert_eq!(announcements[0]["kind"], "treasure");

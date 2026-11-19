@@ -472,5 +472,14 @@
   "Quantity: {0}": "Antal: {0}",
   "You reel in {0} ×{1}.": "Du vevar in {0:t} ×{1}.",
   "You catch {0} (ca {1} kg) ×{2}.": "Du fångar {0:t} (ca {1} kg) ×{2}.",
-  "{0} caught {1} (ca {2} kg)!": "{0} fångade {1:t} (ca {2} kg)!"
+  "{0} caught {1} (ca {2} kg)!": "{0} fångade {1:t} (ca {2} kg)!",
+  "Food bonus: {0}% {1} for {2} min. One food bonus at a time.": "Matbonus: {0}% {1} i {2} min. En matbonus åt gången.",
+  "Fishing tier {0} · Requires level {1}": "Fiskenivå {0} · Kräver karaktärsnivå {1}",
+  "{0}% shorter waits · +{1}% rare fish weight": "{0}% kortare väntetid · +{1}% sannolikhetsvikt för sällsynt fisk",
+  "Unlocks: {0}": "Låser upp: {0}",
+  "Requires {0} · level {1}": "Kräver {0} · nivå {1}",
+  "This water requires {0} (level {1}).": "Detta vatten kräver {0} (nivå {1}).",
+  "Current rod: {0}": "Nuvarande spö: {0}",
+  "Next upgrade: {0}": "Nästa uppgradering: {0}",
+  "{0}% shorter waits · +{1}% rare catch bonus": "{0}% kortare väntetid · +{1}% bonus för sällsynta fångster"
 }

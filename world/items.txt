@@ -140069,7 +140069,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Shore",
-      "minTier": 2,
+      "minTier": 3,
       "kg": [
         5,
         14
@@ -140089,7 +140089,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Shore",
-      "minTier": 3,
+      "minTier": 4,
       "kg": [
         6,
         17
@@ -140109,7 +140109,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Shore",
-      "minTier": 6,
+      "minTier": 8,
       "kg": [
         7,
         20
@@ -140209,7 +140209,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Cold",
-      "minTier": 2,
+      "minTier": 3,
       "kg": [
         5,
         14
@@ -140229,7 +140229,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Cold",
-      "minTier": 3,
+      "minTier": 4,
       "kg": [
         6,
         17
@@ -140249,7 +140249,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Cold",
-      "minTier": 6,
+      "minTier": 8,
       "kg": [
         7,
         20
@@ -140349,7 +140349,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Swamp",
-      "minTier": 2,
+      "minTier": 3,
       "kg": [
         5,
         14
@@ -140369,7 +140369,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Swamp",
-      "minTier": 3,
+      "minTier": 4,
       "kg": [
         6,
         17
@@ -140389,7 +140389,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Swamp",
-      "minTier": 6,
+      "minTier": 8,
       "kg": [
         7,
         20
@@ -140489,7 +140489,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Forest",
-      "minTier": 2,
+      "minTier": 3,
       "kg": [
         5,
         14
@@ -140509,7 +140509,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Forest",
-      "minTier": 3,
+      "minTier": 4,
       "kg": [
         6,
         17
@@ -140529,7 +140529,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Forest",
-      "minTier": 6,
+      "minTier": 8,
       "kg": [
         7,
         20
@@ -140629,7 +140629,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Jungle",
-      "minTier": 2,
+      "minTier": 3,
       "kg": [
         5,
         14
@@ -140649,7 +140649,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Jungle",
-      "minTier": 3,
+      "minTier": 4,
       "kg": [
         6,
         17
@@ -140669,7 +140669,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Jungle",
-      "minTier": 6,
+      "minTier": 8,
       "kg": [
         7,
         20
@@ -140769,7 +140769,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Oasis",
-      "minTier": 2,
+      "minTier": 3,
       "kg": [
         5,
         14
@@ -140789,7 +140789,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Oasis",
-      "minTier": 3,
+      "minTier": 4,
       "kg": [
         6,
         17
@@ -140809,7 +140809,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Oasis",
-      "minTier": 6,
+      "minTier": 8,
       "kg": [
         7,
         20
@@ -140909,7 +140909,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Spring",
-      "minTier": 2,
+      "minTier": 3,
       "kg": [
         5,
         14
@@ -140929,7 +140929,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Spring",
-      "minTier": 3,
+      "minTier": 4,
       "kg": [
         6,
         17
@@ -140949,7 +140949,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Spring",
-      "minTier": 6,
+      "minTier": 8,
       "kg": [
         7,
         20
@@ -140969,7 +140969,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 1,
+      "minTier": 2,
       "kg": [
         1,
         2
@@ -140989,7 +140989,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 1,
+      "minTier": 2,
       "kg": [
         2,
         5
@@ -141009,7 +141009,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 1,
+      "minTier": 2,
       "kg": [
         3,
         8
@@ -141029,7 +141029,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 1,
+      "minTier": 2,
       "kg": [
         4,
         11
@@ -141049,7 +141049,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 1,
+      "minTier": 2,
       "kg": [
         5,
         14
@@ -141069,7 +141069,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 2,
+      "minTier": 6,
       "kg": [
         6,
         17
@@ -141089,7 +141089,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 1,
+      "minTier": 2,
       "kg": [
         7,
         20
@@ -141109,7 +141109,7 @@
     "cooldown": 30,
     "fishing": {
       "habitat": "Lava",
-      "minTier": 2,
+      "minTier": 6,
       "kg": [
         8,
         23
@@ -141126,7 +141126,13 @@
     "requiredLevel": 1,
     "fishing": {
       "tier": 1,
-      "lava": false
+      "lava": false,
+      "zones": [
+        0,
+        2,
+        3
+      ],
+      "richZones": []
     }
   },
   {
@@ -141137,8 +141143,15 @@
     "sell": 10,
     "requiredLevel": 10,
     "fishing": {
-      "tier": 2,
-      "lava": false
+      "tier": 3,
+      "lava": true,
+      "zones": [
+        6
+      ],
+      "richZones": [
+        2,
+        3
+      ]
     }
   },
   {
@@ -141149,8 +141162,13 @@
     "sell": 10,
     "requiredLevel": 25,
     "fishing": {
-      "tier": 3,
-      "lava": false
+      "tier": 4,
+      "lava": true,
+      "zones": [
+        20,
+        22
+      ],
+      "richZones": []
     }
   },
   {
@@ -141161,8 +141179,13 @@
     "sell": 10,
     "requiredLevel": 40,
     "fishing": {
-      "tier": 4,
-      "lava": false
+      "tier": 5,
+      "lava": true,
+      "zones": [
+        19,
+        25
+      ],
+      "richZones": []
     }
   },
   {
@@ -141173,8 +141196,12 @@
     "sell": 10,
     "requiredLevel": 60,
     "fishing": {
-      "tier": 5,
-      "lava": false
+      "tier": 7,
+      "lava": true,
+      "zones": [
+        26
+      ],
+      "richZones": []
     }
   },
   {
@@ -141185,32 +141212,44 @@
     "sell": 10,
     "requiredLevel": 80,
     "fishing": {
-      "tier": 6,
-      "lava": false
+      "tier": 8,
+      "lava": true,
+      "zones": [
+        28
+      ],
+      "richZones": []
     }
   },
   {
     "id": "rod_emberline_rod",
-    "name": "Emberline Rod",
+    "name": "Platinum Rod",
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
     "requiredLevel": 5,
     "fishing": {
-      "tier": 1,
-      "lava": true
+      "tier": 2,
+      "lava": true,
+      "zones": [
+        1
+      ],
+      "richZones": []
     }
   },
   {
     "id": "rod_magma_reel",
-    "name": "Magma Reel",
+    "name": "Tempered Platinum Rod",
     "kind": "rod",
     "rarity": "common",
     "sell": 10,
     "requiredLevel": 45,
     "fishing": {
-      "tier": 2,
-      "lava": true
+      "tier": 6,
+      "lava": true,
+      "zones": [
+        45
+      ],
+      "richZones": []
     }
   },
   {
@@ -141324,7 +141363,12 @@
     "heal": 60,
     "mana": 100,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "haste",
+      "amount": 0.02,
+      "duration": 600
+    }
   },
   {
     "id": "dish_shore_feast",
@@ -141337,7 +141381,12 @@
     "heal": 75,
     "mana": 125,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "haste",
+      "amount": 0.04,
+      "duration": 600
+    }
   },
   {
     "id": "dish_cold_grill",
@@ -141350,7 +141399,12 @@
     "heal": 210,
     "mana": 170,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "shield",
+      "amount": 0.02,
+      "duration": 600
+    }
   },
   {
     "id": "dish_cold_feast",
@@ -141363,7 +141417,12 @@
     "heal": 262,
     "mana": 212,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "shield",
+      "amount": 0.04,
+      "duration": 600
+    }
   },
   {
     "id": "dish_swamp_grill",
@@ -141376,7 +141435,12 @@
     "heal": 210,
     "mana": 170,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "dodge",
+      "amount": 0.02,
+      "duration": 600
+    }
   },
   {
     "id": "dish_swamp_feast",
@@ -141389,7 +141453,12 @@
     "heal": 262,
     "mana": 212,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "dodge",
+      "amount": 0.04,
+      "duration": 600
+    }
   },
   {
     "id": "dish_forest_grill",
@@ -141402,7 +141471,12 @@
     "heal": 350,
     "mana": 300,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "crit",
+      "amount": 0.02,
+      "duration": 600
+    }
   },
   {
     "id": "dish_forest_feast",
@@ -141415,7 +141489,12 @@
     "heal": 438,
     "mana": 375,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "crit",
+      "amount": 0.04,
+      "duration": 600
+    }
   },
   {
     "id": "dish_jungle_grill",
@@ -141428,7 +141507,12 @@
     "heal": 1050,
     "mana": 930,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "damage",
+      "amount": 0.02,
+      "duration": 600
+    }
   },
   {
     "id": "dish_jungle_feast",
@@ -141441,7 +141525,12 @@
     "heal": 1312,
     "mana": 1162,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "damage",
+      "amount": 0.04,
+      "duration": 600
+    }
   },
   {
     "id": "dish_oasis_grill",
@@ -141454,7 +141543,12 @@
     "heal": 1190,
     "mana": 1060,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "fishing_speed",
+      "amount": 0.1,
+      "duration": 600
+    }
   },
   {
     "id": "dish_oasis_feast",
@@ -141467,7 +141561,12 @@
     "heal": 1488,
     "mana": 1325,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "fishing_speed",
+      "amount": 0.2,
+      "duration": 600
+    }
   },
   {
     "id": "dish_spring_grill",
@@ -141480,7 +141579,12 @@
     "heal": 1400,
     "mana": 1260,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "fishing_luck",
+      "amount": 0.1,
+      "duration": 600
+    }
   },
   {
     "id": "dish_spring_feast",
@@ -141493,7 +141597,12 @@
     "heal": 1750,
     "mana": 1575,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "fishing_luck",
+      "amount": 0.2,
+      "duration": 600
+    }
   },
   {
     "id": "dish_lava_grill",
@@ -141506,7 +141615,12 @@
     "heal": 60,
     "mana": 100,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "damage",
+      "amount": 0.03,
+      "duration": 600
+    }
   },
   {
     "id": "dish_lava_feast",
@@ -141519,6 +141633,11 @@
     "heal": 206,
     "mana": 125,
     "duration": 8,
-    "cooldown": 30
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "damage",
+      "amount": 0.06,
+      "duration": 600
+    }
   }
 ]

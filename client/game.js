@@ -803,7 +803,7 @@
       const openId = buffTipState?.id, wasPinned = !!buffTipState?.pinned;
       buffBar.dataset.key = key;
       buffBar.replaceChildren(...list.map(b => {
-        const food = WORLD_ITEMS.find(k => k.id === b.id), def = b.kind === 'status' ? b : WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: Inventory.effect(food) });
+        const food = WORLD_ITEMS.find(k => k.id === b.id.replace(/^meal:/, '')), def = b.kind === 'status' ? b : WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: b.id.startsWith('meal:') ? Inventory.foodBonus(food) : Inventory.effect(food) });
         const translate = window.Locale?.translate || (text => text);
         const name = translate(def?.name || b.id);
         const description = translate(def?.description || '');
@@ -843,7 +843,7 @@
     for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) {
       if (chip._buffMeta) chip._buffMeta.current = b;
       const seconds = Math.ceil(b.left), label = b.kind === 'status' ? `${b.name} · ${seconds}s` : '';
-      chip.querySelector('i').textContent = (b.id === 'festivalspirit' || b.id === 'resurrection_sickness') ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : b.kind === 'status' ? `${seconds}s` : seconds;
+      chip.querySelector('i').textContent = (b.id === 'festivalspirit' || b.id === 'resurrection_sickness' || b.id.startsWith('meal:')) ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : b.kind === 'status' ? `${seconds}s` : seconds;
       if (label) chip.setAttribute('aria-label', label);
       chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time)));
     } }

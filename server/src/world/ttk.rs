@@ -450,7 +450,7 @@ fn cast_skills(w: &mut World, session: u64, id: usize, still: bool, outcome: &mu
             Effect::Buff { kind, .. } => match kind {
                 Buff_::Damage | Buff_::Haste | Buff_::Crit => distance <= 12.,
                 Buff_::Shield | Buff_::Dodge => hp < max_hp * 0.6 && distance <= 12.,
-                Buff_::Regen => false,
+                Buff_::Regen | Buff_::FishingSpeed | Buff_::FishingLuck => false,
             },
             Effect::Heal { .. } | Effect::Mend { .. } => hp < max_hp * 0.5,
         };

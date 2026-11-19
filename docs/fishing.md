@@ -1,17 +1,17 @@
 # Fishing rules and implementation plan
 
-Owner request (2026-11-18): fishing with craftable rods, a bobber in the water you press for when a fish bites, animations, fish icons, rare drops, places to fish, and a special rod for lava. Backlog chain: `FISH-*` in `TODO.md`.
+Owner request (2026-11-18): fishing with craftable rods, a bobber in the water you press for when a fish bites, animations, fish icons, rare drops, places to fish, and heat-resistant line upgrades for lava. Backlog chain: `FISH-*` in `TODO.md`.
 
 ## Grill answers (2026-11-18)
 - **Bite:** pure timing, one press. Every fish has the same window. Rarity comes from the tables, rod and spot, never from a harder press.
-- **Where:** any shore next to water (or lava with the lava rod), plus marked rich ripple spots.
+- **Where:** any shore next to water (or lava once platinum line is unlocked), plus marked rich ripple spots.
 - **Rods:** tiers, crafted at a Fisher NPC from the previous rod plus fish, a zone material and gold (a one-screen workshop, not a general crafting system).
 - **Fish are for:** selling, food (eat raw, cook at the Fisher), Fisher quests, and a collection log with achievements.
 - Fishing is a separate side activity. The 28 `es_` chapters stay untouched; Fisher quests are ordinary zone side quests. Ask again before touching `es_`.
 
 ## Server core decisions
 
-The action is `fish`. A rod occupies a bag cell and the highest usable tier for the habitat wins. Fish use the stackable item kind `fish`. Fisher bring quests will consume the ordinary bag stack. The species roster and weight ranges are in `world/fish.txt`, with 57 species across eight habitats. Rods and fish have ordinary inventory definitions so private characters can exercise the complete loop before the Fisher vendors arrive.
+The action is `fish`. A rod occupies one bag cell and the highest usable cumulative tier wins. Fish use the stackable item kind `fish`. Fisher bring quests will consume the ordinary bag stack. The species roster and weight ranges are in `world/fish.txt`, with 57 species across eight habitats. Rods and fish have ordinary inventory definitions so private characters can exercise the complete loop before the Fisher vendors arrive.
 
 Each cast needs a fresh press. Missing or interrupting a cast clears the current catch streak. Five timing misses display the doze-off message and reset the miss counter. A successful fish catch counts once for the collection and awards the rebirth-adjusted stack. Only the owner receives the Unix-seconds bite deadline. The public player snapshot supplies bobber position and phase. Rich spots have a three-tile radius. `fishingSpots` in map data is a validated candidate pool; only the randomly active points from the zone snapshot are rich. The data overlay, junk/treasure catalogue and raw fish meals are implemented by FISH-DATA. Fisher workshops, cooking and quests are implemented by FISH-RODS below; player controls belong to a later task.
 
@@ -36,7 +36,7 @@ Map objects kinds that are fishable water: `water` (1,733 circles: zones 2, 3, 6
 | Jungle | 22 Tanglecrown | jade pool, bright fish |
 | Oasis | 25 Lapis Erg | desert fish |
 | Spring | 28 Yearwheel | seasonal-flavoured, high level |
-| Lava | 1 Emberfall Crags, 45 Emberwake | needs a lava rod |
+| Lava | 1 Emberfall Crags, 45 Emberwake | platinum / tempered platinum line |
 
 - **Any shore** works, with the zone's ordinary table.
 - **Rich spots** ("ripples"): 4 to 8 active per fishing zone when separate waters fit, drawn as a ring of ripples, found by `scripts/fishing_spots.py --write` as an overlay (`world/fishing-spots.txt`, shipped by sync-world, run **after** `zone_shapes.py apply`, flood-checked to be reachable on foot, 18+ tiles off seams, 10+ tiles from hubs). A rich spot has `x3` rare weight, `x0.75` wait and its own spot fish.
@@ -45,18 +45,22 @@ Map objects kinds that are fishable water: `water` (1,733 circles: zones 2, 3, 6
 ## Rods
 Item kind `rod` (not a worn slot: the best rod in the bags is used; a tenth-slot-style change like cloaks is not worth it). Data `world/rods.txt`, items by `scripts/fish_catalog.py` (idempotent overlay run by sync-world after `gear_levels.py`, like `cloak_catalog.py`).
 
-| Tier | Rod | Level | Source | Reaches |
-| --- | --- | --- | --- | --- |
-| 1 | Twig Rod | 1 | vendor in Alderhaven, 50 copper | sea shore, Gloamfen, Rimeveil commons |
-| 2 | Willow Rod | 10 | Fisher craft | zones 2-3 rich, 6 |
-| 3 | Reedglass Rod | 25 | Fisher craft | zones 6, 20, 22 |
-| 4 | Silverline Rod | 40 | Fisher craft | zones 19, 22, 25 |
-| 5 | Starcatch Rod | 60 | Fisher craft | 26, 25 rares |
-| 6 | Worldwire Rod | 80 | Fisher craft | 28 and every legendary |
-| L1 | Emberline Rod | 5 | Fisher craft in Crags | lava, zone 1 |
-| L2 | Magma Reel | 45 | Fisher craft in Emberwake | lava, zone 45, all lava legendaries |
+| Tier | Rod | Level | Newly unlocked fishing |
+| --- | --- | --- | --- |
+| 1 | Twig Rod | 1 | Greenmeadow and ordinary Rimeveil/Gloamfen waters; buy for 50 copper |
+| 2 | Platinum Rod | 5 | Emberfall Crags lava; retains ordinary water |
+| 3 | Willow Rod | 10 | Wyrdwood; rich Rimeveil/Gloamfen spots |
+| 4 | Reedglass Rod | 25 | Sunward, Tanglecrown and rare water species |
+| 5 | Silverline Rod | 40 | Stormglass and Lapis Erg |
+| 6 | Tempered Platinum Rod | 45 | Emberwake lava |
+| 7 | Starcatch Rod | 60 | Frostwake |
+| 8 | Worldwire Rod | 80 | Yearwheel and every water legendary species |
 
-Tier sets bite speed (-6% per tier on the wait) and the **rare weight** (+10% per tier), and gates which fish of a zone you can land (a fish has a `min_tier`). The craft is the previous rod + gold + 5 common fish of the band + one zone material (an elite or ordinary drop, `items::is_elite`), taken by the Fisher in one window (`rod:<tier>` offers like `repair:<copy>`; validate before taking, one transaction). A rod does not wear. A lava rod does not work on water and the reverse, so a hero carries both.
+**One cumulative progression:** every upgrade consumes the immediately previous rod, five accessible fish, one existing material and copper. No separate line item, worn slot or second rod is needed. Every rod from Platinum onward fishes ordinary water and Crags lava; Tempered Platinum and later rods also fish Emberwake. The highest usable carried rod is selected automatically. Stable item IDs remain unchanged: former Emberline is now Platinum, former Magma Reel is Tempered Platinum.
+
+Each step above Twig reduces the base bite wait by 6% and adds 10% to rare/legendary selection weights. Worldwire has a 42% shorter base wait and +70% rarity weighting relative to Twig. Rarity weights are relative roll weights, not percentage-point catch probabilities or kilogram size bonuses. Species retain their original unlocks relative to the named rods; their numeric tiers move onto the eight-step ladder. The hook timing window remains identical for all fish and rods.
+
+`world/rods.txt` owns ordinary/rich water unlocks; the generated item metadata drives client requirements and the same embedded catalogue drives cast validation. Ordinary pools, coastline hover, rich rings/hover and the touch shoreline hint name the minimum rod and level. A rejected cast names them as well. The log shows current/next rod and an expandable complete ladder; bag and workshop descriptions show speed, rarity and new waters. A Rod Charm still replaces one recipe fish atomically.
 
 ## Fish, junk and rare drops
 About 60 species, ~7 per habitat: 3 common, 2 uncommon, 1 rare, 1 legendary ("trophy") per habitat, plus 4 shared. Each has: id, name, rarity, sell price, `min_tier`, weight range (kg, whole numbers for UI), `food` (raw heal) and a `dish` (cooked). Weights are rolled by the server and shown as `ca` rounded values (metric only). Draw weights: common 70%, uncommon 22%, rare 6%, legendary 0.5% (x3 on a rich spot, x rod tier bonus, a rain/dusk bonus), junk 8% on top.
@@ -70,10 +74,27 @@ About 60 species, ~7 per habitat: 3 common, 2 uncommon, 1 rare, 1 legendary ("tr
 ## Using fish
 - **Sell:** every fish and junk has `sell`. "Sell all junk" handles junk; fish are not junk (a confirm for rare and legendary).
 - **Eat raw:** small heal, uses the 30 s meal timer (`consumables.rs`).
-- **Cook:** the Fisher cooks fish into a dish (food kind, `family` ids, tiers like `traveler_stew`, `consumable_tiers.py`): better heal/mana, same 30 s timer, cost in gold. Raw never beats the vendor meal of its tier.
+- **Cook:** the Fisher cooks fish into a dish: better health/resource recovery, the shared 30-second meal timer, and a ten-minute food bonus (table below). Raw never beats the vendor meal of its tier.
 - **Collection log:** `Character.fishing` (`#[serde(default)]`): totals, per species count and best weight, longest streak, legendary count. A window lists every species with a silhouette until caught, plus records.
 - **Achievements (FISH-META):** 13 achievements / 230 points: 1, 100 and 1000 successful catches; all eight habitat collections; first legendary; a 20 kg catch. Titles: "the Angler" at 1000 catches and "Lavacaster" for all eight lava species, including both zone-exclusive legendaries. Current feature catalog: 120 achievements / 2555 points / 12 titles / 11 mounts. See `docs/achievements.md`.
 - **Quests:** a Fisher in each hub near water gives 3 bring quests (common, uncommon, rare fish of the band) and one daily-style repeatable. Ordinary side quests, with `level` and `rewardXp` = levels.txt[level-1]/10.
+
+### Cooked-fish bonuses (owner progression follow-up, 2026-11-19)
+
+All 16 existing dishes grant a bonus immediately when eaten, including at full health/resource. No additional consumable or recipe item is introduced. The eight-second recovery and shared 30-second meal cooldown remain. Exactly one food bonus can be active; a new cooked-fish meal replaces it, and ordinary vendor food/raw fish do not erase it. Food bonuses coexist with skill buffs without changing the rule that only the strongest skill buff of a kind applies. They expire through normal buff ticks and clear on death/logout, like other runtime buffs; the saved meal cooldown still survives relog.
+
+| Habitat | Grill | Feast | Duration |
+| --- | --- | --- | --- |
+| Shore | +2% attack speed | +4% attack speed | 10 minutes |
+| Cold | 2% damage reduction | 4% damage reduction | 10 minutes |
+| Swamp | +2 percentage points dodge | +4 percentage points dodge | 10 minutes |
+| Forest | +2 percentage points critical chance | +4 percentage points critical chance | 10 minutes |
+| Jungle | +2% damage | +4% damage | 10 minutes |
+| Oasis | 10% shorter fishing waits | 20% shorter fishing waits | 10 minutes |
+| Spring | +10% rare/legendary selection weight | +20% rare/legendary selection weight | 10 minutes |
+| Lava | +3% damage | +6% damage | 10 minutes |
+
+Oasis wait reduction multiplies the rod/weather/spot wait. Spring rarity multiplies rod/weather/spot weights. Food and workshop tooltips describe the actual bonus; the buff bar shows the dish and remaining bonus time separately from its healing. Data comes from `consumable_tiers.fishing_dishes` via `fish_catalog.py`; no new save field or equipment slot.
 
 ## Client: what it shows
 No new class art. Like the lead shoes, fishing is a **derived overlay** (`drawFishing` in `field.js`), so no per-class sprites change:
@@ -470,7 +491,7 @@ order fails the centre-marker pixel assertion; disabling hover fails its tooltip
 assertion. Before/after screenshots were inspected. No catches were ground for
 this regression; existing focused Rust depletion checks cover the shared budget.
 
-### Manual fishing server
+### Initial manual fishing server (before the progression follow-up)
 
 **https://gunning.se/ValhallaFishing/** is left running as the separate transient
 user service `valhalla-fishing-test.service` on `172.18.0.1:8082`. It serves this
@@ -538,3 +559,18 @@ The separate manual fishing service was rebuilt/reloaded with its existing
 database preserved. Public game service/database/release were untouched. The
 merfolk one-frame swim-facing flip was separately added to TODO as
 `MERFOLK-SWIM-FACING-FLICKER`; its implementation remains pending.
+
+
+### Progression verification and manual refresh (2026-11-19)
+
+The owner asked for clearer progression, visible water requirements, useful cooked-fish bonuses and a single carried rod whose platinum line also works in water. The eight stable rod IDs now form the cumulative ladder documented above; no new fish, rod, line or food item IDs were added. Existing Fisher locations/quests, all other map content and unrelated catalogue entries remain identical. The targeted catalogue/Fisher metadata generation is reproduced by the existing overlays; the 644 candidate waters were not changed or regenerated into different placements.
+
+Verification for this follow-up:
+
+- A clean optimized private build passes all **40 focused Rust fishing tests**. Four new gameplay tests cover every ordinary/rich rod gate, named errors, all seven upgrades without spare rods, retained water/lava access, actual wait/rarity bonuses, all 16 dishes at full health, feast strengths, shared cooldown, one food bonus, independent skill buffs and actual tick expiry. The expiry fixture keeps its receiver alive and preserves campaign monster indexes.
+- **Nine gameplay mutations** are caught (water access, gates, consumption, wait, rarity, missing food, stacked food, skill interference, full-health use). The temporary instrumentation is restored in `finally`; clean executables are rebuilt afterwards.
+- **90 new client behaviour checks** and **six client mutations** pass, including inverse isometric water hit-testing, ordinary/rich requirement text, no-rod touch/shore feedback, the current/next/expandable ladder, recipe explanations, real food tooltip data and the actual buff renderer's dish name/bonus/minutes display. Existing 719 controller/shore checks, 17 rich-water checks/seven mutations, ten coast checks, inventory/data and workshop checks pass.
+- Both workshop data/overlay checks and all three catalogue/shore/idempotence checks pass. Hand-written Swedish, its catalogue/freshness and 23 locale checks pass; changed JS/Python syntax and diff checks pass. All-target Clippy passes with only the three previously documented baseline categories excluded.
+- `tests/fishing-progression.cjs` exercises real private packets: all seven crafts consume their predecessors, one Worldwire casts in ordinary water/both lava zones/Yearwheel, a Twig is rejected with Yearwheel's named requirement, food produces the actual bonus and shared timer, and inventory/cooldown survive reconnect. No fishing grind, balance sweep or browser run is used.
+
+The separate **https://gunning.se/ValhallaFishing/** manual service is refreshed with the clean binary and current client, preserving its independent database/progress. Old multi-rod test grants are consolidated to one best usable rod; its starter now grants one usable rod on a fresh copy as well. The test directory retains running/stopped SQLite backups and the previous binary in `progression-backup-*`; executable hashes, HTTPS client bytes, health and SQLite integrity are verified. The public service PID/client link remain unchanged. No public release/restart, version bump or release-note entry: the fishing feature is still waiting for FISH-RELEASE. Browser/visual checks for these new screens remain pending under the existing host restriction; earlier FISH-CHECK permission does not carry over.

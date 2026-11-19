@@ -55,7 +55,7 @@ class Workshop(unittest.TestCase):
         original_items=json.loads(subprocess.check_output(['git','show','97f75da7:world/items.txt'],cwd=ROOT))
         previous_ids={i['id'] for i in original_items}
         self.assertEqual([i['id'] for i in actual if i['id'] in previous_ids],[i['id'] for i in original_items],'unrelated catalogue order is preserved')
-        self.assertTrue(all(items.get(i['id'])==i for i in original_items),'unrelated catalogue values are preserved')
+        self.assertTrue(all(items.get(i['id'])==i for i in original_items if i['id'] not in {g['id'] for g in fish_catalog.pieces()}),'unrelated catalogue values are preserved')
         recipes=json.loads((ROOT/'world/fishing-workshop.txt').read_text())
         fish=json.loads((ROOT/'world/fish.txt').read_text());rods=json.loads((ROOT/'world/rods.txt').read_text())
         by_rod={r['item']:r for r in rods};by_fish={f['item']:f for f in fish}
@@ -66,7 +66,8 @@ class Workshop(unittest.TestCase):
             if r['id'].startswith('rod:'):
                 prior=by_rod[r['ingredients'][0][0]];f=by_fish[r['ingredients'][1][0]]
                 self.assertLessEqual(f['min_tier'],prior['tier'])
-                self.assertEqual(prior['lava'],f['habitat']=='Lava')
+                self.assertTrue(f['habitat']!='Lava' or prior['lava'])
+                self.assertEqual(by_rod[r['item']]['tier'],prior['tier']+1)
                 self.assertEqual(r['ingredients'][1][1],5)
             else:
                 f=by_fish[r['ingredients'][0][0]];dish=items[r['item']]

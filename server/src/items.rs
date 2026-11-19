@@ -93,6 +93,8 @@ pub(crate) fn player_attack_scale(class: Class, level: u32) -> f64 {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Item {
+    #[serde(default, rename = "foodBonus", skip_serializing_if = "Option::is_none")]
+    pub food_bonus: Option<FoodBonus>,
     pub id: String,
     pub name: String,
     pub kind: String,
@@ -146,6 +148,13 @@ pub struct Item {
     #[serde(default)]
     pub mount: Option<String>,
 }
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct FoodBonus {
+    pub kind: crate::skills::BuffKind,
+    pub amount: f64,
+    pub duration: f64,
+}
+
 fn first_level() -> u32 {
     1
 }

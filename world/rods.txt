@@ -5,62 +5,101 @@
     "lava": false,
     "name": "Twig Rod",
     "level": 1,
-    "sell": 10
-  },
-  {
-    "item": "rod_willow_rod",
-    "tier": 2,
-    "lava": false,
-    "name": "Willow Rod",
-    "level": 10,
-    "sell": 10
-  },
-  {
-    "item": "rod_reedglass_rod",
-    "tier": 3,
-    "lava": false,
-    "name": "Reedglass Rod",
-    "level": 25,
-    "sell": 10
-  },
-  {
-    "item": "rod_silverline_rod",
-    "tier": 4,
-    "lava": false,
-    "name": "Silverline Rod",
-    "level": 40,
-    "sell": 10
-  },
-  {
-    "item": "rod_starcatch_rod",
-    "tier": 5,
-    "lava": false,
-    "name": "Starcatch Rod",
-    "level": 60,
-    "sell": 10
-  },
-  {
-    "item": "rod_worldwire_rod",
-    "tier": 6,
-    "lava": false,
-    "name": "Worldwire Rod",
-    "level": 80,
-    "sell": 10
+    "sell": 10,
+    "zones": [
+      0,
+      2,
+      3
+    ],
+    "richZones": []
   },
   {
     "item": "rod_emberline_rod",
-    "tier": 1,
+    "tier": 2,
     "lava": true,
-    "name": "Emberline Rod",
+    "name": "Platinum Rod",
     "level": 5,
-    "sell": 10
+    "sell": 10,
+    "zones": [
+      1
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_willow_rod",
+    "tier": 3,
+    "lava": true,
+    "name": "Willow Rod",
+    "level": 10,
+    "sell": 10,
+    "zones": [
+      6
+    ],
+    "richZones": [
+      2,
+      3
+    ]
+  },
+  {
+    "item": "rod_reedglass_rod",
+    "tier": 4,
+    "lava": true,
+    "name": "Reedglass Rod",
+    "level": 25,
+    "sell": 10,
+    "zones": [
+      20,
+      22
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_silverline_rod",
+    "tier": 5,
+    "lava": true,
+    "name": "Silverline Rod",
+    "level": 40,
+    "sell": 10,
+    "zones": [
+      19,
+      25
+    ],
+    "richZones": []
   },
   {
     "item": "rod_magma_reel",
-    "tier": 2,
+    "tier": 6,
     "lava": true,
-    "name": "Magma Reel",
+    "name": "Tempered Platinum Rod",
     "level": 45,
-    "sell": 10
+    "sell": 10,
+    "zones": [
+      45
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_starcatch_rod",
+    "tier": 7,
+    "lava": true,
+    "name": "Starcatch Rod",
+    "level": 60,
+    "sell": 10,
+    "zones": [
+      26
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_worldwire_rod",
+    "tier": 8,
+    "lava": true,
+    "name": "Worldwire Rod",
+    "level": 80,
+    "sell": 10,
+    "zones": [
+      28
+    ],
+    "richZones": []
   }
 ]

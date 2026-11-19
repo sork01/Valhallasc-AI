@@ -87,7 +87,7 @@ vm.runInContext('function fishTouchUpdate() {'+touch.split('  function update() 
 ctx.fishTouchUpdate();check(!ctx.fish.hidden&&ctx.fish.textContent==='Cast','contextual touch Cast button uses real update path');
 check(fishing.shore(hero,map),'Saltby sea mask is fishable');
 check(!fishing.shore({...hero,inventory:[]},map),'no rod hides shore control');
-check(!fishing.shore({...hero,inventory:[{item:lava.id,quantity:1}]},map),'lava-only bags cannot fish water');
+check(fishing.shore({...hero,inventory:[{item:lava.id,quantity:1}]},map),'Platinum line also fishes ordinary water');
 check(!fishing.shore({...hero,x:10000},map),'far from shores');
 for(const p of candidates) {
  const z=p.zone===0?map:map.zones[p.zone-1], h={...hero,zone:p.zone,x:p.shore.x,y:p.shore.y,fx:p.facing.x,fy:p.facing.y};
@@ -140,12 +140,12 @@ f.reduce(false);f.draw();check(el('stage').classList.contains('fishing-legendary
 f.setTime(6200);f.draw();check(el('fishing-catch').hidden&&!el('stage').classList.contains('fishing-legendary'),'card and glow expire');
 
 check(fishing.open()&&ctx.Field.paused,'collection window pauses inputs');
-check(el('fishing-species').children.length===items.filter(i=>i.kind==='fish').length,'log includes complete species catalogue');
+check(el('fishing-species').children.filter(r=>r.dataset.item).length===items.filter(i=>i.kind==='fish').length,'log includes complete species catalogue');
 check(el('fishing-records').textContent.includes('Caught: 1')&&el('fishing-records').textContent.includes('Legendary: 1'),'log uses saved counters');
-const caughtRow=el('fishing-species').children.find(r=>r.dataset.item===fish.id), unknown=el('fishing-species').children.find(r=>r.dataset.item!==fish.id);
+const caughtRow=el('fishing-species').children.find(r=>r.dataset.item===fish.id), unknown=el('fishing-species').children.find(r=>r.dataset.item&&r.dataset.item!==fish.id);
 check(caughtRow.textContent.includes('22')&&caughtRow.textContent.includes('1 caught'),'per-species saved weight and count');
 check(unknown.textContent.includes('Undiscovered fish')&&unknown.children[0].classList.contains('silhouette'),'unseen species have silhouette and hidden name');
-el('fishing-filter').value='Lava';el('fishing-filter').events.change();check(el('fishing-species').children.length===items.filter(i=>i.kind==='fish'&&i.fishing.habitat==='Lava').length,'habitat filter follows catalogue');
+el('fishing-filter').value='Lava';el('fishing-filter').events.change();check(el('fishing-species').children.filter(r=>r.dataset.item).length===items.filter(i=>i.kind==='fish'&&i.fishing.habitat==='Lava').length,'habitat filter follows catalogue');
 let stopped=false;f.events.keydown({code:'Escape',key:'Escape',preventDefault(){},stopPropagation(){stopped=true;}});check(stopped&&el('fishing-panel').hidden&&!ctx.Field.paused,'Escape closes log and resumes inputs without menu');
 
 f.setTime(7000);f.sync({...hero,fishing:{...line,lava:true,state:'cast'}});fishing.event({actor:'self',kind:'fish_cast',x:21,y:29},'self');

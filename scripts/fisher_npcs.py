@@ -10,7 +10,7 @@ from spirit_guides import clear
 ROOT = Path(__file__).resolve().parents[1]
 PREFIXES = {0:'meadow',1:'crags',2:'rime',3:'fen',6:'wyrd',19:'storm',20:'sun',22:'tangle',25:'lapis',26:'fws',28:'yr',45:'ew'}
 ELITES = set(json.loads((ROOT/'world/enrage.txt').read_text()))
-DIALOGUE = 'Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.'
+DIALOGUE = 'Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.'
 
 
 def safe(area, reach, x, y):

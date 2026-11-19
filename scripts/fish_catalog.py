@@ -23,7 +23,7 @@ def pieces(root=ROOT):
     for r in rods:
         out.append(dict(id=r['item'], name=r['name'], kind='rod', rarity='common',
                         sell=r['sell'], requiredLevel=r['level'],
-                        fishing=dict(tier=r['tier'], lava=r['lava'])))
+                        fishing=dict(tier=r['tier'], lava=r['lava'], zones=r['zones'], richZones=r['richZones'])))
     for row in loot:
         out.append(dict(id=row['item'], name=row['name'], kind='material',
                         rarity=row['rarity'], sell=row['sell'],

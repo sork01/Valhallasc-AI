@@ -24,7 +24,7 @@ check(!f.ctx.Fishing.shore({...hero,fx:-1},map),'facing land cannot cast into th
 check(!f.ctx.Fishing.shore({...hero,x:5},map),'distant sea is out of reach');
 check(!f.ctx.Fishing.shore({...hero,x:12},map),'cannot stand in the sea to fish');
 check(!f.ctx.Fishing.shore({...hero,inventory:[]},map),'coast still needs a rod');
-check(!f.ctx.Fishing.shore({...hero,inventory:[{item:'rod_emberline_rod',quantity:1}]},map),'lava rods do not fish sea');
+check(f.ctx.Fishing.shore({...hero,inventory:[{item:'rod_emberline_rod',quantity:1}]},map),'Platinum line keeps sea fishing');
 check(!f.ctx.Fishing.shore(hero,{...map,shapeEdge:Array(20).fill('          AAAAAAAAAA')}),'seams are not ocean water');
 check(!f.ctx.Fishing.shore(hero,{...map,shapeEdge:Array(20).fill('          llllllllll')}),'cliffs are not ocean water');
 check(!f.ctx.Fishing.shore(hero,{...map,shapeFloor:Array(20).fill('####################')}),'painted land is not sea');

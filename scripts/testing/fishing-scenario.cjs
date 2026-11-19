@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 module.exports = (_kit, map) => ({
-  description: 'Fishing through real packets: pier cast, early miss, private deadline, public bobber, catch, lava rod isolation and SQLite restart.',
+  description: 'Fishing through real packets: pier cast, early miss, private deadline, public bobber, catch, cumulative platinum line and SQLite restart.',
   startLevel: 99, levelSpread: 0, godMode: true,
   async run(w, check) {
     const bot = 'FishCheck', witness = 'FishWitness';
@@ -61,7 +61,7 @@ module.exports = (_kit, map) => ({
     from = w.events.length;
     await w.action(bot, { type: 'fish' });
     await w.waitFor(() => w.events.slice(from).some(e => e.bot === bot && e.type === 'error'));
-    check(w.events.slice(from).some(e => e.bot === bot && e.text === 'Carry a suitable fishing rod.') && !own().fishing, 'Water rod is rejected at a lava shore');
+    check(w.events.slice(from).some(e => e.bot === bot && e.text === 'This water requires Platinum Rod (level 5).') && !own().fishing, 'Water rod is rejected at a lava shore');
     await w.debug(bot, { op: 'give_item', item: 'rod_emberline_rod', quantity: 1 });
     await w.action(bot, { type: 'fish' });
     await w.waitFor(() => own().fishing);

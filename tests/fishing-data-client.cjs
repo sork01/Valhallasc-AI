@@ -54,7 +54,7 @@ assert.equal(ctx.Inventory.looseCopies(fish.id).length,0);
 assert.equal(ctx.Inventory.cooldownLeft(fish),17);
 assert(ctx.Inventory.effect(fish).includes(`up to ${fish.heal.toLocaleString()} HP`));
 const anchor=new Element();
-for(const [item,text] of [[fish,'Fish'],[rod,'For water fishing'],[lava,'For lava fishing']]){
+for(const [item,text] of [[fish,'Fish'],[rod,'For water fishing'],[lava,'For water and lava fishing']]){
  ctx.Inventory.showTooltip(anchor,item);
  const tooltip=all.find(n=>n.id==='item-tooltip');
  assert(tooltip.textContent.includes(text),tooltip.textContent);

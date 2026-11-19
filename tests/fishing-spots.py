@@ -46,9 +46,9 @@ class FishingData(unittest.TestCase):
             self.assertGreater(row['raw_heal'], 0)
             self.assertLessEqual(row['kg'][0], row['kg'][1])
             self.assertTrue(row['dish'].startswith('dish_'))
-            self.assertTrue(any(r['tier'] >= row['min_tier'] and r['lava'] == (row['habitat'] == 'Lava') for r in rods))
-        self.assertEqual({r['tier'] for r in rods if not r['lava']}, set(range(1, 7)))
-        self.assertEqual({r['tier'] for r in rods if r['lava']}, {1, 2})
+            self.assertTrue(any(r['tier'] >= row['min_tier'] and (row['habitat'] != 'Lava' or r['lava']) for r in rods))
+        self.assertEqual({r['tier'] for r in rods}, set(range(1, 9)))
+        self.assertEqual({r['tier'] for r in rods if r['lava']}, set(range(2, 9)))
         self.assertEqual({r['category'] for r in loot}, {'junk', 'treasure'})
         self.assertTrue(all(i['kind'] in ('fish', 'rod', 'material', 'food') and 'source' not in i for i in generated))
 

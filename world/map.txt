@@ -63953,7 +63953,7 @@
       "role": "Fishing and cooking",
       "x": 248.25,
       "y": 189.25,
-      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
       "offers": [
         {
           "id": "fishing_workshop",
@@ -63965,6 +63965,11 @@
           "label": "Buy a Twig Rod",
           "cost": 50,
           "item": "rod_twig_rod"
+        },
+        {
+          "id": "rod:emberline",
+          "label": "Craft rod",
+          "cost": 100
         },
         {
           "id": "rod:2",
@@ -64022,7 +64027,7 @@
       "role": "Fishing and cooking",
       "x": 200.5,
       "y": 284,
-      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+      "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
       "offers": [
         {
           "id": "fishing_workshop",
@@ -64034,6 +64039,11 @@
           "label": "Buy a Twig Rod",
           "cost": 50,
           "item": "rod_twig_rod"
+        },
+        {
+          "id": "rod:emberline",
+          "label": "Craft rod",
+          "cost": 100
         },
         {
           "id": "rod:2",
@@ -131879,7 +131889,7 @@
           "role": "Fishing and cooking",
           "x": 169.77750183780864,
           "y": 235.1139791549545,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
@@ -131889,7 +131899,12 @@
             {
               "id": "rod:emberline",
               "label": "Craft rod",
-              "cost": 500
+              "cost": 100
+            },
+            {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
             },
             {
               "id": "cook:fish_cinder_fry",
@@ -208472,7 +208487,7 @@
           "role": "Fishing and cooking",
           "x": 264.6704791128445,
           "y": 152.25449317362506,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
@@ -293068,7 +293083,7 @@
           "role": "Fishing and cooking",
           "x": 181.57121597344437,
           "y": 93.962843272421,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
@@ -439540,7 +439555,7 @@
           "role": "Fishing and cooking",
           "x": 72.6,
           "y": 218.7,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
@@ -888187,12 +888202,17 @@
           "role": "Fishing and cooking",
           "x": 70.08327719506772,
           "y": 254.43610059419052,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
               "label": "Fisher workshop",
               "cost": 0
+            },
+            {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
             },
             {
               "id": "rod:5",
@@ -937416,7 +937436,7 @@
           "role": "Fishing and cooking",
           "x": 127.14,
           "y": 183.46,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
@@ -1056761,7 +1056781,7 @@
           "role": "Fishing and cooking",
           "x": 166.87271465194004,
           "y": 228.57271465194003,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
@@ -1056772,6 +1056792,11 @@
               "id": "rod:4",
               "label": "Craft rod",
               "cost": 5000
+            },
+            {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
             },
             {
               "id": "rod:5",
@@ -1210238,12 +1210263,17 @@
           "role": "Fishing and cooking",
           "x": 60.41,
           "y": 191.10999999999999,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
               "label": "Fisher workshop",
               "cost": 0
+            },
+            {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
             },
             {
               "id": "rod:5",
@@ -1252195,12 +1252225,17 @@
           "role": "Fishing and cooking",
           "x": 46.95945806790323,
           "y": 290.8252883175806,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
               "label": "Fisher workshop",
               "cost": 0
+            },
+            {
+              "id": "rod:magma",
+              "label": "Craft rod",
+              "cost": 7500
             },
             {
               "id": "rod:5",
@@ -1451798,7 +1451833,7 @@
           "role": "Fishing and cooking",
           "x": 318.91735931288076,
           "y": 751.1526406871193,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",
@@ -1606424,7 +1606459,7 @@
           "role": "Fishing and cooking",
           "x": 180.10375426283784,
           "y": 100.57175478571796,
-          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Water rods and lava rods work in different waters.",
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
           "offers": [
             {
               "id": "fishing_workshop",

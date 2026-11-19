@@ -18,13 +18,24 @@
   const consumable = i => i && ['food', 'potion', 'fish'].includes(i.kind);
   const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod'].includes(i.kind);
   const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod'].includes(i.kind) && (!i.class || i.class === look?.class);
+  const tr = text => window.Locale?.translate(text) || text;
+  const foodBonus = i => {
+    const b = i?.foodBonus; if (!b) return '';
+    const labels = {damage:'damage', shield:'damage reduction', haste:'attack speed', dodge:'dodge chance', crit:'critical chance', fishing_speed:'shorter fishing waits', fishing_luck:'rare catch bonus'};
+    return tr('Food bonus: {0}% {1} for {2} min. One food bonus at a time.').replace('{0}', Math.round(b.amount * 100)).replace('{1}', tr(labels[b.kind])).replace('{2}', b.duration / 60);
+  };
+  const rodDetails = i => {
+    const tier = i.fishing?.tier || 1;
+    const unlock = ({1:'Ordinary Greenmeadow, Rimeveil and Gloamfen waters',2:'Crags lava',3:'Wyrdwood and rich Rimeveil/Gloamfen spots',4:'Sunward, Tanglecrown and rare water fish',5:'Stormglass and Lapis Erg',6:'Emberwake lava',7:'Frostwake',8:'Yearwheel and all water legendary fish'})[tier];
+    return [tr(i.fishing?.lava ? 'For water and lava fishing' : 'For water fishing'), tr('Fishing tier {0} · Requires level {1}').replace('{0}',tier).replace('{1}',levelOf(i)), tr('{0}% shorter waits · +{1}% rare catch bonus').replace('{0}',(tier-1)*6).replace('{1}',(tier-1)*10), tr('Unlocks: {0}').replace('{0}',tr(unlock)), tr('Keeps every earlier fishing unlock. Upgrading consumes the previous rod.')];
+  };
   const effect = i => {
     const hero = window.Field?.hero || {}, type = hero.resourceType || 'mana';
     const amount = type === 'mana' ? i.mana : Math.round(Math.min(1, i.mana / (100 + 15 * ((i.requiredLevel || 1) - 1))) * (hero.maxResource || 100));
     const heal = i.heal ? (i.kind === 'fish' ? i.heal : Math.max(i.heal, Math.round((hero.maxHp || 0) * .4))) : 0;
     const restores = [heal ? `up to ${heal.toLocaleString()} HP (${Math.round(heal / (hero.maxHp || heal) * 100)}% max)` : '', i.mana ? `${amount} ${type}` : ''].filter(Boolean).join(' and ');
     const need = (i.requiredLevel || 1) > 1 ? ` · needs level ${i.requiredLevel}` : '';
-    return (i.kind !== 'potion' ? `Restores ${restores} over ${i.duration} s · one meal at a time, ${i.cooldown || 30} s cooldown shared by all meals` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need;
+    return (i.kind !== 'potion' ? `Restores ${restores} over ${i.duration} s · one meal at a time, ${i.cooldown || 30} s cooldown shared by all meals` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need + (i.foodBonus ? ` · ${foodBonus(i)}` : '');
   };
   // Seconds before a meal or potion can be used again; the server owns both timers and sends them with the snapshot.
   const cooldownLeft = i => !consumable(i) ? 0 : (i.kind !== 'potion' ? window.Field?.hero?.mealCd : window.Field?.hero?.potionCd) || 0;
@@ -174,7 +185,7 @@
     if (!i) return;
     const copy = where ? where.copies[0] : cellCopy || displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : cellCopy?.rarity || displayRarity(i, slot);
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
-    if (i.kind === 'rod') t.append(node('p', i.fishing?.lava ? 'For lava fishing' : 'For water fishing'), node('p', `Tier ${i.fishing?.tier || 1} · Requires level ${levelOf(i)}`), node('p', 'Keep in your bags to fish'));
+    if (i.kind === 'rod') t.append(...rodDetails(i).map(text => node('p', text)));
     else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
@@ -316,7 +327,7 @@
       }
       if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
     } else if (i.kind === 'rod') {
-      container.append(node('p', i.fishing?.lava ? 'For lava fishing' : 'For water fishing'), node('p', `Tier ${i.fishing?.tier || 1} · Requires level ${levelOf(i)}`), node('p', 'Keep in your bags to fish'));
+      container.append(...rodDetails(i).map(text => node('p', text)));
     } else if (licence(i)) {
       const b = button('Use', () => useItem(i), 'item-action'); b.dataset.action = 'use'; b.disabled = !canEquip(); container.append(b);
       container.append(node('p', `Grants the ${i.mount} mount. Bound: it cannot be traded or sold.`, 'bag-empty-note'));
@@ -437,7 +448,7 @@
   }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(cellId(a)).kind.localeCompare(definition(cellId(b)).kind) || definition(cellId(a)).name.localeCompare(definition(cellId(b)).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
+  window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
     icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {

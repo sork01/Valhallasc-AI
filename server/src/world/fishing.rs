@@ -27,6 +27,9 @@ struct Rod {
     item: String,
     tier: u32,
     lava: bool,
+    zones: Vec<usize>,
+    #[serde(rename = "richZones")]
+    rich_zones: Vec<usize>,
 }
 static FISH: LazyLock<Vec<Species>> = LazyLock::new(|| {
     serde_json::from_str(include_str!("../../../world/fish.txt")).expect("fish catalogue")
@@ -360,26 +363,17 @@ impl World {
             && !self.pvp_busy(&c.id)
             && self.trade_index(&c.id).is_none()
     }
-    fn fishing_line(&mut self, session: u64, time: f64) -> Result<Line, &'static str> {
+    fn fishing_line(&mut self, session: u64, time: f64) -> Result<Line, String> {
         if !self.can_fish(session) {
-            return Err("You cannot fish right now.");
+            return Err("You cannot fish right now.".into());
         }
         let p = &self.players[&session];
         let c = &p.character;
         if c.bag_used() >= c.bag_capacity() {
-            return Err("Fishing needs a free bag cell.");
+            return Err("Fishing needs a free bag cell.".into());
         }
         let habitat = habitat(c.zone).ok_or("There are no fish here.")?;
         let lava = habitat == "Lava";
-        let rod = RODS
-            .iter()
-            .filter(|r| {
-                r.lava == lava
-                    && c.quantity(&r.item) > 0
-                    && item(&r.item).is_some_and(|i| c.level >= i.required_level)
-            })
-            .max_by_key(|r| r.tier)
-            .ok_or("Carry a suitable fishing rod.")?;
         let map = &self.maps[c.zone];
         let bobber = landing(map, c.point(), p.face, lava)
             .ok_or("Stand near the shore and face the water or lava.")?;
@@ -389,27 +383,38 @@ impl World {
             .and_then(|spots| spots.iter().find(|s| s.point.distance(bobber) <= 3.))
             .map(|s| s.point);
         let rich = rich_point.is_some();
-        let min_tier = match c.zone {
-            2 | 3 if rich => 2,
-            6 | 45 => 2,
-            20 | 22 => 3,
-            19 | 25 => 4,
-            26 => 5,
-            28 => 6,
-            _ => 1,
-        };
-        if rod.tier < min_tier {
-            return Err("This fishing spot needs a stronger rod.");
+        let required = RODS
+            .iter()
+            .filter(|r| r.zones.contains(&c.zone) || (rich && r.rich_zones.contains(&c.zone)))
+            .max_by_key(|r| r.tier)
+            .ok_or("There are no fish here.")?;
+        let rod = RODS
+            .iter()
+            .filter(|r| {
+                c.quantity(&r.item) > 0
+                    && (!lava || r.lava)
+                    && item(&r.item).is_some_and(|i| c.level >= i.required_level)
+            })
+            .max_by_key(|r| r.tier);
+        if rod.is_none_or(|r| r.tier < required.tier) {
+            let i = item(&required.item).unwrap();
+            return Err(format!(
+                "This water requires {} (level {}).",
+                i.name, i.required_level
+            ));
         }
+        let rod = rod.unwrap();
         let stamp = daynight::unix_ms();
         let rain = self.weather.view(c.zone, map.template, stamp)["type"] == "rain";
         let hour = self.world_clock.hour_at(stamp);
         let twilight = (5. ..7.).contains(&hour) || (17. ..19.).contains(&hour);
-        let scale = (1. - 0.06 * f64::from(rod.tier - 1))
+        let scale = (1. - p.buff(BuffKind::FishingSpeed).min(0.5))
+            * (1. - 0.06 * f64::from(rod.tier - 1))
             * if rich { 0.75 } else { 1. }
             * if rain { 0.85 } else { 1. }
             * if twilight { 0.9 } else { 1. };
-        let bonus = (1. + 0.1 * f64::from(rod.tier - 1))
+        let bonus = (1. + p.buff(BuffKind::FishingLuck))
+            * (1. + 0.1 * f64::from(rod.tier - 1))
             * if rich { 3. } else { 1. }
             * if rain || twilight { 1.1 } else { 1. };
         Ok(Line {
@@ -877,9 +882,9 @@ mod data_tests {
         for rod in RODS.iter() {
             c.add_item(&rod.item, 1);
         }
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 6);
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 8);
         w.players.get_mut(&1).unwrap().character.level = 10;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 3);
         w.maps[1].objects =
             vec![serde_json::from_value(json!({"kind":"lava","x":53.,"y":50.,"r":2.})).unwrap()];
         w.maps[1].grid = Default::default();
@@ -888,9 +893,9 @@ mod data_tests {
         p.character.x = 50.;
         p.character.y = 50.;
         p.character.level = 99;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 8);
         w.players.get_mut(&1).unwrap().character.level = 5;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 1);
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
     }
 }
 
@@ -901,3 +906,7 @@ mod lava_tests;
 #[cfg(test)]
 #[path = "fishing_coast_tests.rs"]
 mod coast_tests;
+
+#[cfg(test)]
+#[path = "fishing_progression_tests.rs"]
+mod progression_tests;

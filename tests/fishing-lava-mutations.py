@@ -29,7 +29,7 @@ def main():
     changed = original
     edits = [
         ('if shore.distance(p) > 1e-8 {', 'if shore.distance(p) > 1e-8 && !lava_mutant("shore") {'),
-        ('r.lava == lava', '(r.lava == lava || lava_mutant("rods"))'),
+        ('(!lava || r.lava)', '((!lava || r.lava) && (!lava_mutant("rods") || r.lava == lava))'),
         ('    use FishingSurface::*;\n', '    use FishingSurface::*;\n'
          '    if lava_mutant("surfaces") && matches!(o.surface, Water | Lava | EwLava) { return Some(o.r); }\n'),
         ('&& s.min_tier <= line.tier', '&& (s.min_tier <= line.tier || lava_mutant("species"))'),

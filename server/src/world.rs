@@ -793,12 +793,12 @@ impl Player {
         if self
             .buffs
             .iter()
-            .any(|b| b.kind == kind && b.amount > amount)
+            .any(|b| !b.id.starts_with("meal:") && b.kind == kind && b.amount > amount)
         {
             return;
         }
         self.buffs
-            .retain(|b| b.id != id && !(b.kind == kind && b.amount > 0.));
+            .retain(|b| b.id.starts_with("meal:") || (b.id != id && !(b.kind == kind && b.amount > 0.)));
         self.buffs.push(Buff {
             id: id.to_string(),
             kind,

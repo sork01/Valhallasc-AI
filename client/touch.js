@@ -169,6 +169,7 @@
   function update() {
     if (!coarse.matches || !Field.hero) return;
     fish.hidden = !window.Fishing?.available(); fish.disabled = !Field.canAct || !!Field.hero.sparkTravel;
+    fish.title = window.Fishing?.requirement(Field.hero?.zone || 0) || '';
     const bite = window.Fishing?.phase === 'bite'; fish.dataset.bite = String(bite); fish.textContent = tr(bite ? 'Hook!' : 'Cast');
     const ids = assignments(), states = ids.map(id => Skillbar.state(id));
     attack.disabled = !Field.canAct || !!Field.hero.sparkTravel;

@@ -44,10 +44,14 @@ def fishing_dishes(fish):
         tier = max(t for t, low in enumerate(LEVELS) if low <= level)
         feast = dish.endswith('_feast')
         factor = 1.25 if feast else 1.0
+        kind = {'Shore':'haste', 'Cold':'shield', 'Swamp':'dodge', 'Forest':'crit',
+                'Jungle':'damage', 'Oasis':'fishing_speed', 'Spring':'fishing_luck', 'Lava':'damage'}[source['habitat']]
+        amount = (0.1 if kind.startswith('fishing_') else 0.03 if source['habitat']=='Lava' else 0.02) * (2 if feast else 1)
         name = source['habitat'] + (' Fish Feast' if feast else ' Fish Grill')
         result.append(dict(id=dish, name=name, kind='food', rarity='uncommon' if feast else 'common',
                            family=dish, requiredLevel=level, sell=max(1, FOOD_PRICE[tier]//4),
-                           heal=max(round(HEAL[tier]*factor),max(f['raw_heal'] for f in fish if f['dish']==dish)+1), mana=round(MANA[tier]*factor), duration=8, cooldown=30))
+                           heal=max(round(HEAL[tier]*factor),max(f['raw_heal'] for f in fish if f['dish']==dish)+1), mana=round(MANA[tier]*factor), duration=8, cooldown=30,
+                           foodBonus=dict(kind=kind, amount=amount, duration=600)))
     return result
 
 
