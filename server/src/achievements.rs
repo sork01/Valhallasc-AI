@@ -68,6 +68,10 @@ pub fn catalog() -> &'static [Achievement] {
                     | "mounts"
                     | "boss_set"
                     | "quest_set"
+                    | "fish_catches"
+                    | "fish_legendary"
+                    | "fish_set"
+                    | "fish_weight"
             ));
             if matches!(a.metric.as_str(), "boss_set" | "quest_set") {
                 assert_eq!(a.target as usize, a.members.len());
@@ -77,6 +81,21 @@ pub fn catalog() -> &'static [Achievement] {
                 );
                 if a.metric == "boss_set" {
                     assert!(a.members.iter().all(|kind| crate::items::is_boss(kind)));
+                }
+            }
+            if matches!(a.metric.as_str(), "fish_set" | "fish_weight") {
+                assert!(!a.members.is_empty());
+                assert_eq!(
+                    a.members.iter().collect::<BTreeSet<_>>().len(),
+                    a.members.len()
+                );
+                assert!(
+                    a.members.iter().all(|id| {
+                        crate::items::item(id).is_some_and(|item| item.kind == "fish")
+                    })
+                );
+                if a.metric == "fish_set" {
+                    assert_eq!(a.target as usize, a.members.len());
                 }
             }
             assert!(a.mount.is_empty() || crate::model::mount_speed(&a.mount).is_some());
@@ -106,6 +125,28 @@ impl Character {
         match a.metric.as_str() {
             "level" => p.highest_level,
             "kills" => self.kills,
+            // Count successful hooks, not rebirth copies or fish acquired elsewhere.
+            // Clamp u64 counters before conversion so long-lived logs cannot wrap.
+            "fish_catches" => self.fishing.total.min(u64::from(a.target)) as u32,
+            "fish_legendary" => self.fishing.legendary.min(u64::from(a.target)) as u32,
+            "fish_set" => a
+                .members
+                .iter()
+                .filter(|id| {
+                    self.fishing
+                        .species
+                        .get(*id)
+                        .is_some_and(|record| record.count > 0)
+                })
+                .count() as u32,
+            "fish_weight" => a
+                .members
+                .iter()
+                .filter_map(|id| self.fishing.species.get(id))
+                .filter(|record| record.count > 0)
+                .map(|record| record.best_kg)
+                .max()
+                .unwrap_or(0),
             "mounts" => self.mounts.iter().collect::<BTreeSet<_>>().len() as u32,
             "quests" => p.quests.len() as u32,
             "regions" => regions().iter().filter(|&&z| cells(z) > 0).count() as u32,
@@ -263,12 +304,12 @@ mod tests {
     }
     #[test]
     fn achievements_catalog_has_positive_points_and_correct_atlas_and_rewards() {
-        assert_eq!(catalog().len(), 107);
+        assert_eq!(catalog().len(), 120);
         assert_eq!(regions().len(), 23);
         assert_eq!(regions().iter().collect::<BTreeSet<_>>().len(), 23);
         let c = hero();
         let view = c.achievement_view();
-        assert_eq!(view["maximum"], 2325);
+        assert_eq!(view["maximum"], 2555);
         for a in catalog() {
             if a.metric == "fog" {
                 assert!(regions().contains(&a.zone.unwrap()));
@@ -277,7 +318,7 @@ mod tests {
                 assert_eq!(a.target, (regions().len() * FOG_GRID * FOG_GRID) as u32);
             }
         }
-        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 10);
+        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 12);
         assert_eq!(catalog().iter().filter(|a| !a.mount.is_empty()).count(), 1);
     }
     #[test]
@@ -446,7 +487,7 @@ mod tests {
         assert_eq!(c.achievement_points(), 685);
         assert!(c.sync_achievements().is_empty());
         assert_eq!(c.achievement_points(), 685);
-        assert_eq!(c.achievement_view()["maximum"], 2325);
+        assert_eq!(c.achievement_view()["maximum"], 2555);
         assert_eq!(c.achievement_title(), "The Explorer");
         assert_eq!(c.mounts, ["gryphon"]);
     }
@@ -501,3 +542,7 @@ mod tests {
         assert_eq!(c.mount, "horse");
     }
 }
+
+#[cfg(test)]
+#[path = "fishing_achievement_tests.rs"]
+mod fishing_tests;

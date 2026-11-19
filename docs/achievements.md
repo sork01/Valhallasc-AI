@@ -97,7 +97,9 @@ change. When expanding the atlas, add the new region achievement and update the
 Explorer threshold, translations, documented maximum and focused catalog checks
 together. See the table below for the current catalog.
 
-105 achievements; maximum **2,275 points** (Valentine candidate Beta 1.36.0).
+Fishing feature branch: **120 achievements / 2,555 points / 12 titles / 11 mounts**.
+The fishing additions are not live; the preceding catalog has 107 achievements, 2,325 points and 10 titles.
+The older seasonal candidate totals below describe their historical releases.
 
 | Achievement | Requirement | Points | Extra reward |
 | --- | --- | ---: | --- |
@@ -305,3 +307,60 @@ and no title. It uses permanent quest/seasonal claim reconciliation across
 years, independently of the rare mount roll. Accepted/ready quests do not
 count; repeats never add points. Catalog: 105 achievements / 2,275 points,
 with the existing eight titles and mount rewards preserved.
+
+## Fishing achievements (FISH-META, 2026-11-19)
+
+Thirteen achievements add 230 points and two suffix titles in the Fishing category.
+They read the saved `Character.fishing` log, so existing fishing history reconciles
+on the next achievement update without inventing catches from inventory. Buying,
+trading, receiving or cooking fish never grants catch credit. One successful hook
+counts once even with rebirth copies; junk, treasure and misses do not count.
+
+| Achievement | Requirement | Points | Extra reward |
+| --- | --- | ---: | --- |
+| First Catch | Catch 1 fish. | 5 |  |
+| A Hundred Hooks | Catch 100 fish. | 10 |  |
+| A Thousand Catches | Catch 1000 fish. | 20 | the Angler |
+| Shore Collection | Catch every species in the Shore habitat. | 20 |  |
+| Coldwater Collection | Catch every species in the Cold habitat. | 20 |  |
+| Swamp Collection | Catch every species in the Swamp habitat. | 20 |  |
+| Forest Collection | Catch every species in the Forest habitat. | 20 |  |
+| Jungle Collection | Catch every species in the Jungle habitat. | 20 |  |
+| Oasis Collection | Catch every species in the Oasis habitat. | 20 |  |
+| Spring Collection | Catch every species in the Spring habitat. | 20 |  |
+| Lava Collection | Catch every lava species, including Phoenix Koi and Sunfire Ray. | 20 | Lavacaster |
+| A Legendary Catch | Catch 1 legendary fish. | 25 |  |
+| Heavy Haul | Catch a fish weighing at least 20 kg. | 10 |  |
+
+Habitat collections require each distinct species with a positive catch count.
+The eight member lists match `world/fish.txt` (57 species total); Lava includes both
+zone-exclusive legendaries. A weight record requires a positive catch count for a
+catalog species; unknown and zero-count records cannot qualify. Progress is capped
+at its target. The legendary and total counters are clamped before u64-to-u32
+conversion. No new persisted fields or migrations are needed. Logs, awards, points
+and title selections survive save/reconnect and rebirth, using the existing ledger.
+Existing suffix rendering, celebration and category navigation handle the additions.
+All new names, descriptions, the category and both titles have hand-written Swedish.
+
+No new mount or cosmetic rewards, version bump or release are part of this slice.
+Focused Rust coverage is in `server/src/fishing_achievement_tests.rs` and the real
+catch test in `server/src/world/fishing_tests.rs`. Catalog-dependent browser fixtures
+are updated; browser execution awaits an approved replacement host under FISH-CHECK.
+
+
+Validation for this slice: **44 distinct focused Rust tests pass** (32 `fishing_`
+checks and 12 existing achievement checks, with no duplicate test runs in the clean
+build). These include real hooks, both title snapshots, SQLite reconnect, duplicate
+award prevention, saved prior history and rebirth. **Eight independent mutations**
+are caught by `python3 tests/fishing-meta-mutations.py`: disabled progress, counter
+wrap, duplicate species, zero-count species, foreign species, legendary credit,
+weight evidence and rebirth-copy inflation. The runner restores the real source;
+all final checks used the clean build. Hand-written Swedish freshness/catalog and
+23 locale checks, changed JavaScript/Python syntax, scoped rustfmt and diff whitespace
+pass. All 107 earlier achievement catalog entries are byte-equivalent as JSON values.
+
+Strict all-target Clippy reports only the documented baseline: unused `mail_unread`
+and hosted-count helpers, quest-drop doc indentation and the quest-journal
+single-element loop. No new lint diagnostics. Browser suites are not run on this
+production host; updated catalog/category/title browser assertions await an approved
+replacement host under FISH-CHECK. No world sync, version bump, release or restart.

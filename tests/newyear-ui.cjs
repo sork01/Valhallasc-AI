@@ -60,7 +60,7 @@ const check=(v,s)=>{if(replaying)return;assert.ok(v,s);console.log(++checks+': '
  check(await p.evaluate(()=>!__ach.entries.find(a=>a.id==='newyear').complete),'A ready, unclaimed hunt does not award the achievement');
  await npc('nacre_gardener');const gold=await p.evaluate(()=>__self().gold);await interact('nacre_gardener','quest:claim:newyear_hunt');await wait(()=>__self().seasonalClaims.newyear_hunt===20261229);
  await p.evaluate(()=>Achievements.open());await wait(()=>__ach?.entries.find(a=>a.id==='newyear').complete);
- check(await p.evaluate(g=>__self().gold===g+300&&__ach.maximum===2325&&__ach.entries.find(a=>a.id==='newyear').points===25,gold),'A different city host pays the shared quest and awards the 25-point achievement');
+ check(await p.evaluate(g=>__self().gold===g+300&&__ach.maximum===2555&&__ach.entries.find(a=>a.id==='newyear').points===25,gold),'A different city host pays the shared quest and awards the 25-point achievement');
  await p.screenshot({path:path.join(w.runDir,'valhallasc-newyear-achievement.png')});
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(n=>!Quests.offered(n).some(q=>q.id==='newyear_hunt'))),'Changing hosts cannot repeat today’s quest');
  await debug({op:'give_mount',mount:'rocket'});await wait(()=>__self().mounts.includes('rocket'));

@@ -212,3 +212,171 @@ fn fishing_rich_spot_rain_and_twilight_scale_wait() {
     let shorter = cast(&mut w, start) - start - 0.5;
     assert!((shorter - wait * 0.75 * 0.85 * 0.9).abs() < 1e-8);
 }
+
+#[test]
+fn fishing_achievements_real_hook_ignores_copies_junk_and_misses() {
+    let (mut w, mut rx) = angler();
+    w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, 2];
+    let bite = cast(&mut w, 20.);
+    w.fish_press(1, bite - 0.01);
+    w.update_achievements();
+    assert!(
+        !w.players[&1]
+            .character
+            .achievements
+            .completed
+            .contains("fish_1")
+    );
+    let bite = cast(&mut w, 50.);
+    w.rng = 0;
+    w.fish_press(1, bite + 0.1);
+    w.update_achievements();
+    assert_eq!(w.players[&1].character.fishing.total, 0);
+    assert!(
+        !w.players[&1]
+            .character
+            .achievements
+            .completed
+            .contains("fish_1")
+    );
+    let bite = cast(&mut w, 80.);
+    w.rng = 35;
+    w.fish_press(1, bite + 0.1);
+    w.update_achievements();
+    assert_eq!(w.players[&1].character.fishing.total, 0);
+    assert!(
+        !w.players[&1]
+            .character
+            .achievements
+            .completed
+            .contains("fish_1")
+    );
+    std::iter::from_fn(|| rx.try_recv().ok()).for_each(drop);
+    // One deterministic hook lands multiple bag copies but earns just one catch.
+    w.players.get_mut(&1).unwrap().character.fishing.total = 98;
+    let bite = cast(&mut w, 110.);
+    w.rng = 1;
+    w.fish_press(1, bite + 0.1);
+    w.update_achievements();
+    let packets: Vec<_> = std::iter::from_fn(|| rx.try_recv().ok()).collect();
+    let catch = packets.iter().find(|v| v["kind"] == "fish_catch").unwrap();
+    assert!(catch["quantity"].as_u64().unwrap() > 1);
+    assert_eq!(w.players[&1].character.fishing.total, 99);
+    assert!(
+        !w.players[&1]
+            .character
+            .achievements
+            .completed
+            .contains("fish_100")
+    );
+    let bite = cast(&mut w, 140.);
+    w.rng = 1;
+    w.fish_press(1, bite + 0.1);
+    w.update_achievements();
+    assert_eq!(w.players[&1].character.fishing.total, 100);
+    assert!(
+        w.players[&1]
+            .character
+            .achievements
+            .completed
+            .contains("fish_100")
+    );
+    let packets: Vec<_> = std::iter::from_fn(|| rx.try_recv().ok()).collect();
+    assert_eq!(
+        packets
+            .iter()
+            .filter(|v| v["type"] == "notice"
+                && v["text"] == "Achievement earned: A Hundred Hooks (+10 points).")
+            .count(),
+        1
+    );
+    w.update_achievements();
+    assert!(!std::iter::from_fn(|| rx.try_recv().ok()).any(|v| {
+        v["text"]
+            .as_str()
+            .is_some_and(|s| s.starts_with("Achievement earned:"))
+    }));
+    let view = w.players[&1].character.achievement_view();
+    assert!(
+        view["entries"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|a| a["id"] == "fish_100" && a["progress"] == 100 && a["complete"] == true)
+    );
+}
+
+#[test]
+fn fishing_achievements_titles_survive_sqlite_reconnect_and_snapshot() {
+    let (mut w, mut first_rx) = angler();
+    std::iter::from_fn(|| first_rx.try_recv().ok()).for_each(drop);
+    let (tx, mut rx) = mpsc::channel(256);
+    let welcome = w
+        .join(
+            2,
+            None,
+            Some(Look {
+                name: "Title Fisher".into(),
+                ..Default::default()
+            }),
+            tx,
+        )
+        .unwrap();
+    let token = welcome["token"].as_str().unwrap().to_owned();
+    let c = &mut w.players.get_mut(&2).unwrap().character;
+    c.fishing.total = 1000;
+    c.fishing.legendary = 2;
+    let lava = crate::achievements::catalog()
+        .iter()
+        .find(|a| a.id == "fish_log_lava")
+        .unwrap();
+    for id in &lava.members {
+        c.fishing.species.insert(
+            id.clone(),
+            crate::model::FishRecord {
+                count: 1,
+                best_kg: 20,
+            },
+        );
+    }
+    w.update_achievements();
+    let points = w.players[&2].character.achievement_points();
+    for (id, title) in [("fish_1000", "the Angler"), ("fish_log_lava", "Lavacaster")] {
+        w.message(
+            2,
+            ClientMessage::SelectTitle {
+                achievement: id.into(),
+            },
+        );
+        let snapshot = w.players[&2].snapshot();
+        assert_eq!(snapshot["achievementTitle"], title);
+        assert_eq!(snapshot["achievementTitlePosition"], "suffix");
+        assert!(
+            std::iter::from_fn(|| rx.try_recv().ok()).any(|m| m["type"] == "achievements"
+                && m["selected"] == id
+                && m["maximum"] == 2555)
+        );
+    }
+    w.leave(2);
+    let saved = w.store.load(&token).unwrap().unwrap();
+    assert_eq!(saved.achievement_title(), "Lavacaster");
+    assert_eq!(saved.achievement_points(), points);
+    assert_eq!(saved.fishing.total, 1000);
+    assert_eq!(saved.fishing.species.len(), lava.members.len());
+    let (tx, mut rx) = mpsc::channel(256);
+    let welcome = w.join(2, Some(token), None, tx).unwrap();
+    assert!(
+        welcome["snapshot"]["players"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|p| p["id"] == saved.id && p["achievementTitle"] == "Lavacaster")
+    );
+    w.update_achievements();
+    assert_eq!(w.players[&2].character.achievement_points(), points);
+    assert!(!std::iter::from_fn(|| rx.try_recv().ok()).any(|m| {
+        m["text"]
+            .as_str()
+            .is_some_and(|text| text.starts_with("Achievement earned:"))
+    }));
+}

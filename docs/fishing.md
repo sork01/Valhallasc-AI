@@ -72,7 +72,7 @@ About 60 species, ~7 per habitat: 3 common, 2 uncommon, 1 rare, 1 legendary ("tr
 - **Eat raw:** small heal, uses the 30 s meal timer (`consumables.rs`).
 - **Cook:** the Fisher cooks fish into a dish (food kind, `family` ids, tiers like `traveler_stew`, `consumable_tiers.py`): better heal/mana, same 30 s timer, cost in gold. Raw never beats the vendor meal of its tier.
 - **Collection log:** `Character.fishing` (`#[serde(default)]`): totals, per species count and best weight, longest streak, legendary count. A window lists every species with a silhouette until caught, plus records.
-- **Achievements:** about 12 new (first catch, 100/1000 fish, each habitat log complete, first legendary, lava angler, record weights) and 2-3 titles ("the Angler", "Lavacaster"). `achievements.rs` is pinned at 107 / 2325 points / 10 titles / 11 mounts: update those expectations in the same commit.
+- **Achievements (FISH-META):** 13 achievements / 230 points: 1, 100 and 1000 successful catches; all eight habitat collections; first legendary; a 20 kg catch. Titles: "the Angler" at 1000 catches and "Lavacaster" for all eight lava species, including both zone-exclusive legendaries. Current feature catalog: 120 achievements / 2555 points / 12 titles / 11 mounts. See `docs/achievements.md`.
 - **Quests:** a Fisher in each hub near water gives 3 bring quests (common, uncommon, rare fish of the band) and one daily-style repeatable. Ordinary side quests, with `level` and `rewardXp` = levels.txt[level-1]/10.
 
 ## Client: what it shows
@@ -182,3 +182,33 @@ Lava fishing is complete on `feat/fishing-core`, without a public release. The p
 - Swedish freshness, changed-file syntax and scoped formatting checks pass. Strict Clippy retains the documented baseline dead-code, quest-drop documentation and single-element-loop diagnostics. All-target Clippy passes with only `dead_code`, `clippy::doc_lazy_continuation` and `clippy::single_element_loop` excluded; no lint suppressions were added to source.
 
 `tests/lava-motion-ui.cjs` was not run: the designated browser host was retired and the owner bars browser suites on the production host. The lava renderer and that suite are unchanged. Browser regression validation remains pending for an approved test host under FISH-CHECK. No version bump, release notes, service restart or production database change. Finish record: wiki `10_projects:valhallasc_fishing_lava_20261119`. Next task: **FISH-CLIENT**.
+
+## FISH-META implementation (2026-11-19, feature branch only)
+
+Fishing achievements reconcile from the existing saved fishing log. Per-hook totals
+exclude rebirth copies, junk and treasure; collections require distinct caught
+species, and the weight goal uses the best recorded weight of a real caught species.
+Inventory ownership alone awards nothing. Old saves default to an empty log; prior
+fishing catches reconcile once. Existing achievement events, title selection,
+snapshots and persistence carry the new rewards without new protocol or save fields.
+Hand-written Swedish covers every catalog string and the new Fishing category.
+No version bump or deployment: FISH-CLIENT, FISH-ART, FISH-CHECK and FISH-RELEASE
+remain separate tasks.
+
+
+Validation for this slice: **44 distinct focused Rust tests pass** (32 `fishing_`
+checks and 12 existing achievement checks, with no duplicate test runs in the clean
+build). These include real hooks, both title snapshots, SQLite reconnect, duplicate
+award prevention, saved prior history and rebirth. **Eight independent mutations**
+are caught by `python3 tests/fishing-meta-mutations.py`: disabled progress, counter
+wrap, duplicate species, zero-count species, foreign species, legendary credit,
+weight evidence and rebirth-copy inflation. The runner restores the real source;
+all final checks used the clean build. Hand-written Swedish freshness/catalog and
+23 locale checks, changed JavaScript/Python syntax, scoped rustfmt and diff whitespace
+pass. All 107 earlier achievement catalog entries are byte-equivalent as JSON values.
+
+Strict all-target Clippy reports only the documented baseline: unused `mail_unread`
+and hosted-count helpers, quest-drop doc indentation and the quest-journal
+single-element loop. No new lint diagnostics. Browser suites are not run on this
+production host; updated catalog/category/title browser assertions await an approved
+replacement host under FISH-CHECK. No world sync, version bump, release or restart.
