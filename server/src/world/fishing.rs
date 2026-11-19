@@ -112,6 +112,13 @@ fn landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> {
         x: p.x + face.x * d,
         y: p.y + face.y * d,
     };
+    // A shore cast needs room for the hero's whole collision footprint.
+    // Validate on a copy: fishing must never move a hero out of lava or scenery.
+    let mut shore = p;
+    map.collide(&mut shore, PLAYER_RADIUS);
+    if shore.distance(p) > 1e-8 {
+        return None;
+    }
     let mut nearest: Option<(f64, Point)> = None;
     let mut ids = vec![];
     if let Some(grid) = map.grid.get(&map.objects, map.size) {
@@ -791,3 +798,7 @@ mod data_tests {
         assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 1);
     }
 }
+
+#[cfg(test)]
+#[path = "fishing_lava_tests.rs"]
+mod lava_tests;
