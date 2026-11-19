@@ -9,7 +9,7 @@ let browser,started=false,checks=0;
 const check=(value,label)=>{assert.ok(value,label);checks++;};
 async function call(name,args={}){const reply=await client.callTool({name,arguments:args});assert.ok(!reply.isError,`${name}: ${JSON.stringify(reply.content)}`);return reply.structuredContent;}
 (async()=>{
-  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe',env:{...getDefaultEnvironment()}}));
+  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe',env:{...getDefaultEnvironment(),...process.env}}));
   const world=await call('start_world');started=true;
   browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1280,height:800},reducedMotion:'reduce'});

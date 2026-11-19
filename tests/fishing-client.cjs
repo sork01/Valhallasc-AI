@@ -38,6 +38,7 @@ function fixture() {
   vm.runInContext(read('client/keymap.js'),ctx);
   check(ctx.Keys.holders('KeyR','fish').length===0, 'default fishing key is free');
   let src=read('client/fishing.js');
+  if(process.env.MUTATE==='hint')src=src.replace(".replace(/‹fish›/g, tr(Keys.label('fish', false)))",'');
   // Deliberately break behaviour in memory; these remain effective after the implementation is committed.
   if(process.env.MUTATE==='input')src=src.replace("Online.send({ type: 'fish' })", "Online.send({ type: 'attack' })");
   if(process.env.MUTATE==='spots')src=src.replace('(packet.fishingSpots || [])','(map.fishingSpots || [])');
@@ -57,9 +58,10 @@ function fixture() {
 const f=fixture(), {ctx,el,cues,sent,errors}=f, fishing=ctx.Fishing;
 const twig=items.find(i=>i.kind==='rod'&&!i.fishing.lava), lava=items.find(i=>i.kind==='rod'&&i.fishing.lava), allRods=items.filter(i=>i.kind==='rod').map(i=>({item:i.id,quantity:1}));
 const hero={id:'self',x:map.dock.start.x,y:map.dock.start.y,zone:0,level:99,fx:1,fy:0,inventory:allRods};
+check(el('fishing-hint').textContent.includes('press R to cast')&&!el('fishing-hint').textContent.includes('‹fish›'),'log hint resolves the initial fishing key');
 check(ctx.Keys.is({code:'KeyR',key:'r'},'fish'),'default physical fishing key works');
 ctx.Prefs.keys.fish=['KeyV'];check(!ctx.Keys.is({code:'KeyR',key:'r'},'fish')&&ctx.Keys.is({code:'KeyV',key:'v'},'fish'),'rebound key replaces the shipped binding');
-check(ctx.Keys.label('fish')==='V','bite hint follows rebind');delete ctx.Prefs.keys.fish;
+check(ctx.Keys.label('fish')==='V','bite hint follows rebind');f.events['keymap-change']();check(el('fishing-hint').textContent.includes('press V to cast'),'log hint follows rebound fishing key');delete ctx.Prefs.keys.fish;
 
 // Exercise Field's real key routing and action dispatcher, including typing/repeat guards.
 const field=read('client/field.js');

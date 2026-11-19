@@ -22,3 +22,8 @@
   .fishing-window { max-height: 88%; padding: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { #stage.fishing-legendary::after { display: none; } }
+
+.fishing-spot-tooltip { position: fixed; z-index: 1000; pointer-events: none; max-width: min(300px, calc(100vw - 16px)); box-sizing: border-box; padding: 10px 14px; border: 2px solid #c9af68; border-radius: 8px; background: #10212bf5; color: #f1e9d2; box-shadow: 0 4px 20px #0009; }
+.fishing-spot-tooltip strong { color: #fff1a5; }
+.fishing-spot-tooltip p { margin: 6px 0 0; line-height: 1.4; }
+.fishing-spot-tooltip[hidden] { display: none; }

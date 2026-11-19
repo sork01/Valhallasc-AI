@@ -1,19 +1,21 @@
 // Run only on an approved browser host, through scripts/test-touch-bounded.sh.
 require('./lib/touch.cjs').requireMemoryLimit();
 const assert=require('node:assert/strict');
+const {frameJson}=require('./lib/frames.cjs');
 const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('./lib/playwright.cjs');
 const {TestWorld}=require('../scripts/testing/driver.cjs');
-const root=path.resolve(__dirname,'..'),w=new TestWorld();let browser;
+const root=path.resolve(__dirname,'..'),w=new TestWorld();let browser, page;
 (async()=>{
  await w.start();browser=await chromium.launch({headless:true,args:['--disable-gpu']});
- const page=await browser.newPage({viewport:{width:1280,height:800},reducedMotion:'reduce',hasTouch:true,isMobile:true});
+ page=await browser.newPage({viewport:{width:1280,height:800},reducedMotion:'reduce',hasTouch:true,isMobile:true});
+ const packets=[];page.on('websocket',ws=>ws.on('framereceived',frame=>{const p=frameJson(frame.payload);if(p.type==='error'||p.kind?.startsWith('fish_')){packets.push(p);console.log('Fishing packet:',JSON.stringify(p));}}));
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  // A real pre-feature mutation: disable the newly added presentation/controls, never serve post-feature HEAD.
  if(process.env.MUTATE==='1')await page.route('**/fishing.js',r=>r.fulfill({contentType:'application/javascript',body:'/* FISH-CLIENT disabled */'}));
  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
- await page.goto(w.url);await page.locator('#start').click();await page.locator('#login-guest').click();
+ await page.goto(w.url);assert(await page.evaluate(()=>!!window.Fishing),'Fishing presentation module is loaded');await page.locator('#start').click();await page.locator('#login-guest').click();
  await page.locator('#cls-warrior').click();await page.locator('#name').fill('FishingClientUI');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&!!Field.warriorSprites,null,{timeout:60000});
  await page.locator('#connection-overlay').waitFor({state:'hidden',timeout:60000});
@@ -25,11 +27,15 @@ const root=path.resolve(__dirname,'..'),w=new TestWorld();let browser;
  await page.keyboard.down('ArrowRight'); // Face toward an exposed plank edge, then stop locally.
  await page.waitForFunction(()=>Field.hero.fx>0&&Field.hero.fy<0);
  await page.keyboard.up('ArrowRight');
+ // Reset after facing: real-art frame stalls must not turn fixture setup into a long shore walk.
+ await page.evaluate(()=>{Field.clearInput();Online.send({type:'input',dx:0,dy:0});window.Tutorial?.disable?.();});
+ await debug({op:'teleport',zone:0,x:map.dock.start.x,y:map.dock.start.y});
+ await page.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.05&&!Field.hero.moving,map.dock.start);
  await page.waitForFunction(()=>!!window.Fishing?.available(),null,{timeout:5000});
  assert(await page.evaluate(()=>Keys.holders('KeyR','fish').length===0));
  await page.evaluate(()=>{window.__fishingInputs=[];const send=Online.send;Online.send=p=>{if(p.type==='fish')__fishingInputs.push(p);return send(p);};});
  await page.keyboard.press('r');
- await page.waitForFunction(()=>Fishing.phase==='cast'||Fishing.phase==='waiting');
+ await page.waitForFunction(()=>Fishing.phase==='cast'||Fishing.phase==='waiting',null,{timeout:5000});
  assert.equal(await page.evaluate(()=>__fishingInputs.length),1);
  await page.screenshot({path:path.join(w.runDir,'fishing-line.png')});
  await page.waitForFunction(()=>Fishing.phase==='bite',null,{timeout:15000});
@@ -40,12 +46,16 @@ const root=path.resolve(__dirname,'..'),w=new TestWorld();let browser;
  assert.equal(await page.evaluate(()=>document.getElementById('stage').classList.contains('fishing-legendary')),false,'reduced motion has no edge flash');
  await page.screenshot({path:path.join(w.runDir,'fishing-catch.png')});
  await page.waitForTimeout(1100);await hook.click();
- await page.waitForFunction(()=>Fishing.phase==='cast'||Fishing.phase==='waiting');
+ await page.waitForFunction(()=>Fishing.phase==='cast'||Fishing.phase==='waiting',null,{timeout:5000});
  await page.waitForTimeout(200);await hook.click();
  await page.waitForFunction(()=>Fishing.phase==='idle');
  await page.locator('#error-messages').getByText('Too early.',{exact:true}).waitFor();
  await page.keyboard.press('Escape');await page.locator('#fishing-open').click();
  assert(await page.locator('#fishing-panel').isVisible());
+ assert((await page.locator('#fishing-hint').textContent()).includes('press R to cast'),'log hint displays the actual key');
+ await page.evaluate(()=>Keys.bind('fish',0,'KeyV'));
+ await page.waitForFunction(()=>document.getElementById('fishing-hint').textContent.includes('press V to cast'));
+ assert(!(await page.locator('#fishing-hint').textContent()).includes('‹fish›'));
  const species=JSON.parse(fs.readFileSync(path.join(root,'world/items.txt'))).filter(i=>i.kind==='fish');
  assert.equal(await page.locator('#fishing-species li').count(),species.length);
  assert(await page.locator('#fishing-species [data-caught="false"] .silhouette').count()>0);
@@ -59,4 +69,4 @@ const root=path.resolve(__dirname,'..'),w=new TestWorld();let browser;
  assert.deepEqual(errors,[]);
  console.log('Fishing UI: real keyboard/touch cast, bite, catch, early miss, log/filter, reduced-motion and phone checks pass');
  console.log('Screenshots:',w.runDir);
-})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();await w.stop();});
+})().catch(async e=>{console.error(e);if(page)console.error('Fishing state:',await page.evaluate(()=>({phase:window.Fishing?.phase,canAct:window.Field?.canAct,active:document.activeElement?.id,inputs:window.__fishingInputs,position:window.Field?.hero&&{x:Field.hero.x,y:Field.hero.y,fx:Field.hero.fx,fy:Field.hero.fy},errors:document.getElementById('error-messages')?.textContent})).catch(()=>null));process.exitCode=1;}).finally(async()=>{await browser?.close();await w.stop();});

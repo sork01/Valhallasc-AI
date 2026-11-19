@@ -4945,7 +4945,6 @@
     if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge' || zdef.theme === 'ember') {
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
     }
-    drawFishing(g, true);
     City.drawPlaza(g, w2s);
     window.ExitPaths?.floor(g,zdef,w2s,hero);      // (a vault has no road marking: it is a doorway, not a signposted exit)
     window.Halloween?.drawFloor(g,zone,w2s);
@@ -4964,6 +4963,7 @@
     if (zdef.dock) window.MeadowDock?.draw(g, zdef, w2s, t);      // Greenmeadow's landing pier and its ship (meadowdock.js)
     if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost') drawWater(g, t);
     if (map.ghostWater?.length) drawWater(g, t, true);
+    drawFishing(g, true);      // rich markers must be above the painted water, below people
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);
     if (zdef.theme === 'deep') drawChimeRings(g, t);

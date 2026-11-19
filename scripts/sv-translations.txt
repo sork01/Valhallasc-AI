@@ -14234,5 +14234,8 @@
   "Forest": "Skog",
   "Jungle": "Djungel",
   "Oasis": "Oas",
-  "Spring": "Källvatten"
+  "Spring": "Källvatten",
+  "Rich fishing spot": "Rik fiskeplats",
+  "Ordinary fishing water": "Vanligt fiskevatten",
+  "Better chances for rare fish. Moves after 5–10 fish are caught here.": "Större chans på sällsynta fiskar. Platsen flyttar när 5–10 fiskar har fångats här."
 }

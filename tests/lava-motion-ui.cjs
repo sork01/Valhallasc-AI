@@ -34,6 +34,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
       await page.emulateMedia({reducedMotion:reduced?'reduce':'no-preference'});
       const paired=await page.evaluate(()=>{
         const cv=document.getElementById('fieldcv'),g=cv.getContext('2d'),original=EmberwakeArt.moltenMotion;
+        // Freeze presentation time: active fishing ripples must match in each on/off pair.
+        const clock=performance.now,frozen=clock.call(performance);performance.now=()=>frozen;
         const render=(t,on)=>{EmberwakeArt.moltenMotion=on?original:()=>{};Field._debug.drawFrame(t);return g.getImageData(0,0,cv.width,cv.height).data;};
         try{
           const deltas=[];
@@ -44,13 +46,13 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
           }
           let temporal=0;for(let i=0;i<deltas[0].delta.length;i++)if(deltas[0].delta[i]!==deltas[1].delta[i])temporal++;
           return {pixels:deltas.map(d=>d.pixels),max:Math.max(...deltas.map(d=>d.max)),temporal};
-        }finally{EmberwakeArt.moltenMotion=original;}
+        }finally{EmberwakeArt.moltenMotion=original;performance.now=clock;}
       });
       if(reduced)check(paired.pixels.every(n=>n===0),'Reduced motion disables the actual field overlay in '+name+': '+JSON.stringify(paired));
       else{
         check(paired.pixels.every(n=>n>50),'Motion reaches the actual rendered lava in '+name+': '+JSON.stringify(paired));
         check(paired.temporal>100,'Lava changes with the shared frame clock in '+name);
-        check(paired.max<100,'Motion remains a subtle overlay in '+name);
+        check(paired.max<100,'Motion remains a subtle overlay in '+name+': '+JSON.stringify(paired));
         await page.locator('#fieldcv').screenshot({path:path.join(world.artifacts,name+'-lava-motion.png')});
       }
       results.push({name,reduced,paired});

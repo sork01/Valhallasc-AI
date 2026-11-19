@@ -58,6 +58,7 @@
     return Online.send({ type: 'fish' });
   }
   function reset() {
+    richPointer = null; hideRichTooltip();
     own = null; zone = null; spots = []; log = {}; cast = null; result = null; miss = null; signature = ''; shoreHint = false; lastPress = -Infinity; clockOffset = 0;
     lines.clear(); $('fishing-panel').hidden = true; $('fishing-catch').hidden = true; $('stage').classList.remove('fishing-legendary');
   }
@@ -74,7 +75,8 @@
       seen.add(p.id);
       const old = lines.get(p.id), f = p.fishing;
       const same = old && old.x === f.x && old.y === f.y;
-      const line = { ...f, actor: p, at: same ? old.at : now(), biteAt: f.state === 'bite' ? (same && old.biteAt || now()) : null };
+      const richSpot = same ? old.richSpot : p.id === hero.id && cast ? cast.richSpot : spots.find(spot => Math.hypot(spot.x - f.x, spot.y - f.y) <= 3.) || null;
+      const line = { ...f, richSpot, actor: p, at: same ? old.at : now(), biteAt: f.state === 'bite' ? (same && old.biteAt || now()) : null };
       lines.set(p.id, line);
       if (p.id === hero.id) {
         if (!same && !cast) { cast = { ...line, at: now(), landed: f.state !== 'cast' }; }
@@ -91,7 +93,7 @@
     if (emit) sound = emit;
     if (e.actor !== self || !e.kind?.startsWith('fish_')) return;
     if (e.kind === 'fish_cast') {
-      result = null; miss = null; cast = { x: e.x, y: e.y, lava: [1, 45].includes(own?.zone), at: now(), landed: false };
+      result = null; miss = null; cast = { x: e.x, y: e.y, richSpot: spots.find(spot => Math.hypot(spot.x - e.x, spot.y - e.y) <= 3.) || null, lava: [1, 45].includes(own?.zone), at: now(), landed: false };
       sound('cast');
     } else if (e.kind === 'fish_bite') {
       const line = lines.get(self); if (line) { line.state = 'bite'; line.deadline = e.deadline; line.biteAt = now(); }
@@ -153,6 +155,41 @@
     el.style.left = `${Math.max(half, Math.min(width - half, x)) / width * 100}%`;
     el.style.top = `${Math.max(top, Math.min(height - 8, y - 145)) / height * 100}%`;
   }
+  // Active points only: ordinary scenery ripples never become fishing hotspots.
+  function richSpotAt(mx, my, project) {
+    return spots.find(spot => { const [x, y] = project(spot.x, spot.y); return ((mx - x) / 48) ** 2 + ((my - y) / 28) ** 2 <= 1; }) || null;
+  }
+  function usingRichSpot() {
+    const point = (lines.get(own?.id) || cast)?.richSpot;
+    return !!point && spots.some(spot => Math.hypot(spot.x - point.x, spot.y - point.y) < .001);
+  }
+  let richPointer = null, richTooltip = null;
+  function hideRichTooltip() { if (richTooltip) richTooltip.hidden = true; }
+  function drawRichTooltip(project, width, height) {
+    if (!richPointer || !window.Field?.canAct || own?.dead || window.Cutscene?.active) { hideRichTooltip(); return; }
+    const rect = $('fieldcv').getBoundingClientRect();
+    const spot = rect.width && rect.height && richSpotAt((richPointer.x - rect.left) / rect.width * width, (richPointer.y - rect.top) / rect.height * height, project);
+    if (!spot) { hideRichTooltip(); return; }
+    if (!richTooltip) {
+      richTooltip = node('div', null, 'fishing-spot-tooltip'); richTooltip.id = 'rich-fishing-tooltip'; richTooltip.setAttribute('role', 'tooltip');
+      richTooltip.append(node('strong', tr('Rich fishing spot')), node('p', tr('Better chances for rare fish. Moves after 5–10 fish are caught here.')));
+      document.body.append(richTooltip);
+    }
+    richTooltip.hidden = false;
+    const box = richTooltip.getBoundingClientRect();
+    richTooltip.style.left = Math.max(8, Math.min(innerWidth - box.width - 8, richPointer.x + 14)) + 'px';
+    richTooltip.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, richPointer.y + 12)) + 'px';
+  }
+  function spotMarker(g, x, y) {
+    g.save(); g.globalAlpha = 1; g.fillStyle = '#fff1a5'; g.strokeStyle = '#122b38'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(x - 10, y); g.quadraticCurveTo(x, y - 11, x + 9, y);
+    g.lineTo(x + 17, y - 7); g.lineTo(x + 17, y + 7); g.lineTo(x + 9, y);
+    g.quadraticCurveTo(x, y + 11, x - 10, y); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#122b38'; g.fillRect(x - 5, y - 2, 2, 2);
+    g.font = 'bold 14px sans-serif'; g.textAlign = 'center'; g.strokeStyle = '#10212b'; g.lineWidth = 4;
+    g.strokeText(tr('Rich fishing spot'), x, y - 23); g.fillStyle = '#fff1a5'; g.fillText(tr('Rich fishing spot'), x, y - 23); g.restore();
+  }
+
   function ring(g, x, y, r, colour, alpha = 1) {
     g.save(); g.globalAlpha *= alpha; g.strokeStyle = colour; g.lineWidth = 1.6; g.beginPath(); g.ellipse(x, y, r, r * .42, 0, 0, Math.PI * 2); g.stroke(); g.restore();
   }
@@ -162,6 +199,7 @@
     if (ground) {
       for (const spot of spots) {
         const [x, y] = project(spot.x, spot.y), phase = reduced ? .5 : (time / 1400 + spot.x) % 1;
+        spotMarker(g, x, y);
         ring(g, x, y, 16 + phase * 25, [1, 45].includes(own?.zone) ? '#ffa652' : '#b9efff', .85 - phase * .5);
         if (!reduced) ring(g, x, y, 12 + ((phase + .5) % 1) * 25, '#e1f7ff', .45);
       }
@@ -191,6 +229,7 @@
         if (!reduced) for (let i = 0; i < 5; i++) { const a = i * 1.256 + time / 300; g.fillStyle = line.lava ? '#ffae61' : '#c0eeff'; g.fillRect(bx + Math.cos(a) * 15, by - 10 + Math.sin(a) * 7, 2, 4); }
         if (id === own?.id) { g.font = 'bold 14px sans-serif'; g.globalAlpha *= reduced ? 1 : .8 + .2 * Math.sin(time / 90); g.fillText(tr('Hook!') + '  ' + Keys.label('fish'), hx, hy + 27); }
       }
+      if (id === own?.id) { const label = tr(usingRichSpot() ? 'Rich fishing spot' : 'Ordinary fishing water'); g.globalAlpha = 1; g.font = 'bold 14px sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#10212b'; g.strokeText(label, hx, hy + 49); g.fillStyle = usingRichSpot() ? '#fff1a5' : '#d2e6ec'; g.fillText(label, hx, hy + 49); }
       g.restore();
     }
     if (result?.from && time - result.at < 600 && own) {
@@ -204,13 +243,18 @@
     }
     if (miss) { const age = (time - miss.at) / 600; if (age >= 1) miss = null; else { const [x, y] = project(miss.x, miss.y); ring(g, x, y, 8 + age * 24, '#b9dce7', 1 - age); } }
     card(project, width, height);
+    drawRichTooltip(project, width, height);
   }
+  $('fieldcv').addEventListener('pointermove', e => { richPointer = e.pointerType === 'touch' ? null : { x: e.clientX, y: e.clientY }; });
+  $('fieldcv').addEventListener('pointerleave', () => { richPointer = null; hideRichTooltip(); });
   $('fishing-open').addEventListener('click', open); $('fishing-close').addEventListener('click', () => close());
   $('fishing-filter').addEventListener('change', renderLog);
   $('fishing-panel').addEventListener('click', e => { if (e.target === $('fishing-panel')) close(); });
   document.addEventListener('keydown', e => {
     if (!$('fishing-panel').hidden && Keys.is(e, 'menu')) { e.preventDefault(); e.stopPropagation(); close(); }
   }, true);
-  addEventListener('keymap-change', () => { $('fishing-hint').textContent = tr('Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.'); });
-  window.Fishing = { sync, event, reset, press, available, shore, open, close, drawFishing, get phase() { return lines.get(own?.id)?.state || 'idle'; } };
+  const updateHint = () => { $('fishing-hint').textContent = tr('Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.').replace(/‹fish›/g, tr(Keys.label('fish', false))); };
+  addEventListener('keymap-change', updateHint);
+  updateHint();
+  window.Fishing = { sync, event, reset, press, available, shore, open, close, drawFishing, richSpotAt, get richActive() { return usingRichSpot(); }, get phase() { return lines.get(own?.id)?.state || 'idle'; } };
 })();

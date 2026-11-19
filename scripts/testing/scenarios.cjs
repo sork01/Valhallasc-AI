@@ -4976,3 +4976,5 @@ scenarios.seam_walks = {
     }
   },
 };
+
+scenarios.fishing = require('./fishing-scenario.cjs')(kit, map);

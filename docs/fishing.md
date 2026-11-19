@@ -388,3 +388,111 @@ This slice does not change the 57 species, eight rods, art assets, world data or
 achievement catalogue. It has no version bump, release note, public deployment,
 service restart or production database change. **FISH-CHECK and FISH-RELEASE remain
 open.** Release/version work belongs to FISH-RELEASE.
+
+
+## FISH-CHECK verification (2026-11-19)
+
+The owner explicitly approved bounded browser checks on this host for FISH-CHECK.
+Every browser suite ran sequentially with the existing 1.5 GiB memory limit,
+no swap, one CPU and ten-minute timeout. This is a task-specific exception to
+the default host policy, not permission for later browser work.
+
+- All **34** `cargo test fishing_ -- --test-threads=1` checks pass. No world
+  generators or combat/balance suites ran; the 57 species and eight rods remain.
+- All three `tests/fishing-spots.py` checks pass, including 644 reachable shore
+  witnesses and byte-identical candidate generation. `tests/fishing-client.cjs`
+  passes **719** checks; its new `MUTATE=hint` fails the intended key-hint assertion.
+- New MCP scenario **fishing** is last in the scenario catalogue. The actual
+  MCP SDK handshake runs **17 assertions** covering early miss, pier hook,
+  Unix clock, active rich points, public bobber/private deadline and result,
+  bag award, record evidence, dry-shore health/position, water/lava rod isolation,
+  and inventory/log persistence across a SQLite-backed executable restart.
+  `tests/fishing-check-mutations.cjs` catches missing fishing inputs, a zero
+  clock, serving the candidate pool, a leaked private deadline and lost inventory
+  after restart. Mutations alter test-process transport data in memory only.
+  The affected MCP lifecycle/catalogue test passes with its ordered list updated.
+- Bounded `tests/fishing-ui.cjs` passes real keyboard cast/hook, touch cast/early
+  miss, catch card, records/filter, initial and rebound key hints, reduced-motion
+  glow suppression and 844x390 layout. Screenshots were inspected.
+  `MUTATE=1` disables the actual fishing module and fails its direct assertion.
+- Bounded `tests/lava-motion-ui.cjs` passes **18** assertions, including visible
+  and changing lava, zero reduced-motion deltas, footprint containment, camera
+  anchoring and sparse bubbles in Emberwake and the Chained Forge. The disabled
+  motion mutation fails the actual-field pixel assertion. The presentation clock
+  is frozen within each pair: new rich-spot ripples otherwise move between the
+  off/on frames and contaminate the comparison. Thresholds are unchanged; clean
+  full-frame maximum deltas are 25 (Emberwake) and 21 (Forge), below the same 100.
+- All **136** achievement/category/title browser checks and their category mutation pass.
+  These UI checks use the existing placeholder-sprite mode; a full-art run hit
+  the 1536 MiB cap while opening its second character page. No cap was raised.
+  The fishing UI and lava scene checks above use real sprites.
+- The complete **`npm run test:swedish`** passed before the rich-spot follow-up inside the same bounded scope,
+  including freshness, catalogue, locale, language switching and window layout.
+- Strict all-target Clippy reports only the documented existing `dead_code`
+  helpers/`mail_unread`, `doc_lazy_continuation` and `single_element_loop` issues.
+  All-target Clippy passes with only those three categories excluded. No source
+  lint suppressions or unrelated Rust fixes were added. Changed JavaScript syntax
+  and `git diff --check` pass.
+
+The real UI exposed an unresolved initial `‹fish›` token in the collection log.
+`fishing.js` now resolves the bound key when the module loads and after rebinding;
+unit/browser checks verify R initially and V after a real keymap rebind. Facing
+setup in the browser fixture resets to the pier after its directional input:
+real-art frame stalls under the cap must not extend that setup into a long walk.
+Affected MCP/Swedish launchers preserve the shared worktree's environment.
+The token replacement uses a regular expression: a standalone quoted key token
+is otherwise harvested as untranslated player text by the Swedish build.
+
+### Rich-spot feedback found during manual testing
+
+The owner could see ordinary pond ripples, but could not identify rich points or
+observe depletion. A short observation of the separate manual server found their
+bobber **12.54 tiles** from the nearest active point, outside the authoritative
+three-tile bonus radius. Those were ordinary-water catches. There was also a real
+rendering defect: the rich ground pass ran before `drawWater`, so Greenmeadow's
+ponds painted over its markers. The ground pass now follows painted water and
+flat liquid objects, while staying below people.
+
+Active snapshot points now have a gold fish silhouette and **Rich fishing spot**
+label, plus a viewport-clamped hover tooltip explaining rarity chances and
+5–10-fish depletion. The angler's line says **Rich fishing spot** or **Ordinary
+fishing water**. Rich status remembers the point at cast time and loses its bonus
+indicator when that point disappears; a later spawn cannot upgrade an ordinary
+line. These are presentation changes using existing authoritative snapshots;
+the fishing rules, depletion count and rarity tables are unchanged. Swedish is
+hand-written. No test-server restart was needed; reload the test page.
+
+`tests/fishing-rich-client.cjs` passes 15 behaviour assertions and five mutations
+(hit area, marker, current-line status, stale/depleted status, tooltip). The new
+bounded real-art `tests/fishing-rich-ui.cjs` verifies actual marker pixels above
+painted pond water, mouse hover and an actual rich cast. Restoring the old layer
+order fails the centre-marker pixel assertion; disabling hover fails its tooltip
+assertion. Before/after screenshots were inspected. No catches were ground for
+this regression; existing focused Rust depletion checks cover the shared budget.
+
+### Manual fishing server
+
+**https://gunning.se/ValhallaFishing/** is left running as the separate transient
+user service `valhalla-fishing-test.service` on `172.18.0.1:8082`. It serves this
+feature branch's client and a separate copy of its clean optimized test binary.
+Its private database is
+`/home/serveperry/webserver/www/Valhalla/fishing-test/valhalla.sqlite`: a consistent
+read-only backup of the public database. The two copied characters retain their
+levels/progression, start at the Saltby pier, and have all eight rods, four large
+bags and at least 1,000,000 copper. God mode/test commands are enabled; new
+characters start at 99. Log in with the usual account. Rods stay in bags; face
+water, press R, wait for Hook!, press R again. Touch uses Cast/Hook!
+
+The test server passes HTTPS health, exact client-byte comparison, WebSocket
+upgrade, executable comparison and SQLite `quick_check`. The public service's
+PID remains 1849; its database/client release/binary were not changed or
+restarted. Apache was validated and gracefully reloaded for the separate route.
+The local `fishing-test/README.md`, `start.py` and `receipt.json` retain the paths,
+recreation and stop commands. The transient service lasts until stopped/rebooted;
+the starter preserves its existing database. A normal later client release
+replaces the Apache include, so retain/remove the test route deliberately then.
+
+FISH-RELEASE remains pending. Final post-rich-fix lava/language browser reruns remain pending. The latest lava browser closed during startup before its assertions; prior clean 18-check run and mutation passed. Extra runs stopped when the owner reported only 2% usage remaining.
+
+No version bump, release notes, live release link
+swap, production game restart, world sync or FileDrop upload belongs to this check.
