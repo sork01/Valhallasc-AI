@@ -496,3 +496,12 @@ FISH-CHECK is complete. After the owner resumed work, the final post-rich-fix la
 
 No version bump, release notes, live release link
 swap, production game restart, world sync or FileDrop upload belongs to this check.
+
+
+### Rich-spot visual adjustment (owner, 2026-11-19)
+
+Removed the fish silhouette from rich spots and doubled both ripple radii. The
+name and hover explanation remain; their hit area grows with the rings. Focused
+checks cover larger rings, no fish geometry, hover, line status and depletion;
+the real-water regression samples the ring toward the pond centre instead of
+the removed centre icon. This updates only the private fishing client.

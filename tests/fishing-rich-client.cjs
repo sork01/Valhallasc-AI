@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'), fs=require('node:fs'), path=require(
 const root=path.resolve(__dirname,'..'), mode=process.env.FISH_RICH_MUTATION;
 if(process.argv.includes('--mutations')) {
  const {spawnSync}=require('node:child_process');
- for(const [name,message] of Object.entries({hit:'active spot is hoverable',marker:'active spot has a fish marker',status:'a cast into the active spot is identified',stale:'depletion clears the rich-line indicator',tooltip:'hover opens a named rich-spot tooltip'})) {
+ for(const [name,message] of Object.entries({hit:'active spot is hoverable',rings:'rich rings are visibly larger',fish:'rich spot has no fish silhouette',hoverSize:'larger rings remain hoverable near their outer edge',status:'a cast into the active spot is identified',stale:'depletion clears the rich-line indicator',tooltip:'hover opens a named rich-spot tooltip'})) {
   const r=spawnSync(process.execPath,[__filename],{cwd:root,encoding:'utf8',env:{...process.env,FISH_RICH_MUTATION:name}});
   assert(r.status!==0&&(r.stdout+r.stderr).includes(message),name+': '+r.stdout+r.stderr);
   console.log('Caught rich-spot mutation:',name);
@@ -13,7 +13,9 @@ if(process.argv.includes('--mutations')) {
 const read=fs.readFileSync.bind(fs);
 const controlled={...fs,readFileSync(file,...args){let s=read(file,...args);if(String(file).endsWith('/client/fishing.js')&&typeof s==='string'){
  if(mode==='hit')s=s.replace('function richSpotAt(mx, my, project) {','function richSpotAt(mx, my, project) { return null;');
- if(mode==='marker')s=s.replace('spotMarker(g, x, y);','');
+ if(mode==='hoverSize')s=s.replace('((mx - x) / 96) ** 2 + ((my - y) / 56) ** 2','((mx - x) / 48) ** 2 + ((my - y) / 28) ** 2');
+ if(mode==='rings')s=s.replace('32 + phase * 50','16 + phase * 25');
+ if(mode==='fish')s=s.replace('function spotLabel(g, x, y) {', 'function spotLabel(g, x, y) { g.beginPath();g.moveTo(x-10,y);g.quadraticCurveTo(x,y-11,x+9,y);g.lineTo(x+17,y-7);g.lineTo(x+17,y+7);g.quadraticCurveTo(x,y+11,x-10,y);g.closePath();g.fill();');
  if(mode==='status')s=s.replace('get richActive() { return usingRichSpot(); }','get richActive() { return false; }');
  if(mode==='stale')s=s.replace('return !!point && spots.some(spot => Math.hypot(spot.x - point.x, spot.y - point.y) < .001);','return !!point;');
  if(mode==='tooltip')s=s.replace('function drawRichTooltip(project, width, height) {','function drawRichTooltip(project, width, height) { return;');
@@ -32,7 +34,9 @@ f.sync(hero,[spot]);
 check(fish.richSpotAt(40,80,project)?.x===4,'active spot is hoverable');
 check(!fish.richSpotAt(400,800,project),'ordinary scenery is not a rich hotspot');
 f.reduce(true);f.ops.length=0;f.draw(true);
-check(f.ops.some(o=>o[0]==='quadraticCurveTo'),'active spot has a fish marker');
+check(!f.ops.some(o=>o[0]==='quadraticCurveTo'||o[0]==='fillRect'),'rich spot has no fish silhouette');
+check(f.ops.some(o=>o[0]==='ellipse'&&o[3]>=50),'rich rings are visibly larger');
+check(fish.richSpotAt(115,80,project)?.x===4,'larger rings remain hoverable near their outer edge');
 check(f.ops.some(o=>o[0]==='fillText'&&o[1]==='Rich fishing spot'),'active spot is named on the water');
 el('fieldcv').events.pointermove({pointerType:'mouse',clientX:40,clientY:80});f.draw();
 check(!tooltip().hidden&&tooltip().textContent.includes('Rich fishing spot'),'hover opens a named rich-spot tooltip');

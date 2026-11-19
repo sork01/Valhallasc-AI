@@ -36,13 +36,16 @@ let browser,page,latest;const errors=[];
   Fishing.drawFishing=function(ctx,project,width,height,ground,...args){if(ground)at={p:project(point.x,point.y),width,height};if(ground&&hide)return;return fishing.call(this,ctx,project,width,height,ground,...args);};
   try {
    Field._debug.drawFrame(1);
-   const sample=off=>{hide=off;Field._debug.drawFrame(1);const x=Math.round(at.p[0]/at.width*cv.width),y=Math.round(at.p[1]/at.height*cv.height);return g.getImageData(x-12,y-12,24,24).data;};
+   // Sample the enlarged ring toward the pond centre, where painted water would cover it in the old layer order.
+   const pool=WORLD_MAP.objects.filter(o=>o.kind==='water').sort((a,b)=>(b.r-Math.hypot(b.x-point.x,b.y-point.y))-(a.r-Math.hypot(a.x-point.x,a.y-point.y)))[0];
+   const centre=Field._debug.w2s(pool.x,pool.y),angle=Math.atan2((centre[1]-at.p[1])/.42,centre[0]-at.p[0]);
+   const sample=off=>{hide=off;Field._debug.drawFrame(1);const x=Math.round((at.p[0]+56*Math.cos(angle))/at.width*cv.width),y=Math.round((at.p[1]+56*.42*Math.sin(angle))/at.height*cv.height);return g.getImageData(x-12,y-12,24,24).data;};
    const a=sample(true),b=sample(false);let changed=0;for(let i=0;i<a.length;i+=4)if(a[i]!==b[i]||a[i+1]!==b[i+1]||a[i+2]!==b[i+2])changed++;
    return {changed,at};
   }finally{Fishing.drawFishing=fishing;performance.now=clock;}
  },active);
  await page.screenshot({path:path.join(w.runDir,'rich-spot-water.png')});
- assert(pixels.changed>20,`Rich fish marker must remain visible above Greenmeadow water (${pixels.changed} changed pixels)`);
+ assert(pixels.changed>20,`Rich rings must remain visible above Greenmeadow water (${pixels.changed} changed pixels)`);
  const box=await page.locator('#fieldcv').boundingBox();
  await page.mouse.move(box.x+pixels.at.p[0]/pixels.at.width*box.width,box.y+pixels.at.p[1]/pixels.at.height*box.height);
  await page.locator('#rich-fishing-tooltip').waitFor({state:'visible',timeout:5000});

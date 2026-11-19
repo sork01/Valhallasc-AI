@@ -157,7 +157,7 @@
   }
   // Active points only: ordinary scenery ripples never become fishing hotspots.
   function richSpotAt(mx, my, project) {
-    return spots.find(spot => { const [x, y] = project(spot.x, spot.y); return ((mx - x) / 48) ** 2 + ((my - y) / 28) ** 2 <= 1; }) || null;
+    return spots.find(spot => { const [x, y] = project(spot.x, spot.y); return ((mx - x) / 96) ** 2 + ((my - y) / 56) ** 2 <= 1; }) || null;
   }
   function usingRichSpot() {
     const point = (lines.get(own?.id) || cast)?.richSpot;
@@ -180,14 +180,9 @@
     richTooltip.style.left = Math.max(8, Math.min(innerWidth - box.width - 8, richPointer.x + 14)) + 'px';
     richTooltip.style.top = Math.max(8, Math.min(innerHeight - box.height - 8, richPointer.y + 12)) + 'px';
   }
-  function spotMarker(g, x, y) {
-    g.save(); g.globalAlpha = 1; g.fillStyle = '#fff1a5'; g.strokeStyle = '#122b38'; g.lineWidth = 3;
-    g.beginPath(); g.moveTo(x - 10, y); g.quadraticCurveTo(x, y - 11, x + 9, y);
-    g.lineTo(x + 17, y - 7); g.lineTo(x + 17, y + 7); g.lineTo(x + 9, y);
-    g.quadraticCurveTo(x, y + 11, x - 10, y); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle = '#122b38'; g.fillRect(x - 5, y - 2, 2, 2);
-    g.font = 'bold 14px sans-serif'; g.textAlign = 'center'; g.strokeStyle = '#10212b'; g.lineWidth = 4;
-    g.strokeText(tr('Rich fishing spot'), x, y - 23); g.fillStyle = '#fff1a5'; g.fillText(tr('Rich fishing spot'), x, y - 23); g.restore();
+  function spotLabel(g, x, y) {
+    g.save(); g.globalAlpha = 1; g.font = 'bold 14px sans-serif'; g.textAlign = 'center'; g.strokeStyle = '#10212b'; g.lineWidth = 4;
+    g.strokeText(tr('Rich fishing spot'), x, y - 45); g.fillStyle = '#fff1a5'; g.fillText(tr('Rich fishing spot'), x, y - 45); g.restore();
   }
 
   function ring(g, x, y, r, colour, alpha = 1) {
@@ -199,9 +194,9 @@
     if (ground) {
       for (const spot of spots) {
         const [x, y] = project(spot.x, spot.y), phase = reduced ? .5 : (time / 1400 + spot.x) % 1;
-        spotMarker(g, x, y);
-        ring(g, x, y, 16 + phase * 25, [1, 45].includes(own?.zone) ? '#ffa652' : '#b9efff', .85 - phase * .5);
-        if (!reduced) ring(g, x, y, 12 + ((phase + .5) % 1) * 25, '#e1f7ff', .45);
+        spotLabel(g, x, y);
+        ring(g, x, y, 32 + phase * 50, [1, 45].includes(own?.zone) ? '#ffa652' : '#b9efff', .85 - phase * .5);
+        if (!reduced) ring(g, x, y, 24 + ((phase + .5) % 1) * 50, '#e1f7ff', .45);
       }
       return;
     }
