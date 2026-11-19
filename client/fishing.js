@@ -45,6 +45,21 @@
       if (ship && Math.abs(x - ship.x) < ship.beam / 2 && y >= ship.y0 && y <= ship.y1) continue;
       return true;
     }
+    if (!lava && !onDock && map.shapeFloor && map.shapeEdge) {
+      const at = d => ({ x: hero.x + fx * d, y: hero.y + fy * d });
+      const sea = p => p.x >= 0 && p.y >= 0 && map.shapeFloor[Math.floor(p.y)]?.[Math.floor(p.x)] === ' ' && map.shapeEdge[Math.floor(p.y)]?.[Math.floor(p.x)] === 'c';
+      let start = null, end = 6;
+      if (sea(hero)) return false;
+      for (let step = 1; step <= 48; step++) {
+        const distance = step / 8;
+        if (sea(at(distance))) { if (start === null) { if (distance > 4) return false; start = distance; } }
+        else if (start !== null) { end = distance - .125; break; }
+      }
+      if (start !== null && Math.max(3, start) < Math.min(6, end)) {
+        const point = at((Math.max(3, start) + Math.min(6, end)) / 2), ship = dock?.ship;
+        return !(ship && Math.abs(point.x - ship.x) < ship.beam / 2 && point.y >= ship.y0 && point.y <= ship.y1);
+      }
+    }
     return false;
   }
   function available() {

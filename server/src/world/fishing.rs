@@ -106,6 +106,90 @@ fn area_radius(o: &Obstacle, lava: bool) -> Option<f64> {
         _ => None,
     }
 }
+// Match the renderer's open-sea cells, rather than treating every void or border as water.
+fn coast_landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> {
+    #[cfg(test)]
+    let mutation = std::env::var("MUTATE_FISH_COAST").unwrap_or_default();
+    #[cfg(test)]
+    if mutation == "disabled" {
+        return None;
+    }
+    if lava {
+        #[cfg(test)]
+        if mutation != "lava" {
+            return None;
+        }
+        #[cfg(not(test))]
+        return None;
+    }
+    let at = |distance: f64| Point {
+        x: p.x + face.x * distance,
+        y: p.y + face.y * distance,
+    };
+    let sea = |point: Point| {
+        if point.x < 0. || point.y < 0. {
+            return false;
+        }
+        let (x, y) = (point.x.floor() as usize, point.y.floor() as usize);
+        if map.shape_floor.get(y).and_then(|row| row.as_bytes().get(x)) != Some(&b' ') {
+            return false;
+        }
+        let edge = map
+            .shape_edge
+            .get(y)
+            .and_then(|row| row.as_bytes().get(x))
+            .copied()
+            .unwrap_or(b' ');
+        #[cfg(test)]
+        if mutation == "border" {
+            return edge != b' ';
+        }
+        edge == b'c'
+    };
+    if sea(p) {
+        return None;
+    }
+    let mut start: Option<f64> = None;
+    let mut end = 6.;
+    for step in 1..=48 {
+        let distance = f64::from(step) / 8.;
+        if sea(at(distance)) {
+            if start.is_none() {
+                if distance > 4. {
+                    return None;
+                }
+                start = Some(distance);
+            }
+        } else if start.is_some() {
+            end = distance - 0.125;
+            break;
+        }
+    }
+    let start = start?;
+    let (lo, hi) = (start.max(3.), end.min(6.));
+    if lo >= hi {
+        return None;
+    }
+    let blocked = !map.line_clear(p, at((start - 0.125).max(0.)), 0.);
+    #[cfg(test)]
+    let blocked = blocked && mutation != "blocked";
+    if blocked {
+        return None;
+    }
+    let bobber = at((lo + hi) / 2.);
+    if map
+        .dock
+        .as_ref()
+        .and_then(|dock| dock.ship.as_ref())
+        .is_some_and(|ship| {
+            (bobber.x - ship.x).abs() < ship.beam / 2. && (ship.y0..=ship.y1).contains(&bobber.y)
+        })
+    {
+        return None;
+    }
+    Some(bobber)
+}
+
 // Intersect the facing ray with each nearby pool, then clamp the throw to the part over liquid.
 fn landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> {
     let at = |d: f64| Point {
@@ -174,7 +258,13 @@ fn landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> {
             nearest = Some((start, bobber));
         }
     }
-    nearest.map(|(_, p)| p)
+    nearest.map(|(_, point)| point).or_else(|| {
+        if dock.is_none() {
+            coast_landing(map, p, face, lava)
+        } else {
+            None
+        }
+    })
 }
 
 impl World {
@@ -807,3 +897,7 @@ mod data_tests {
 #[cfg(test)]
 #[path = "fishing_lava_tests.rs"]
 mod lava_tests;
+
+#[cfg(test)]
+#[path = "fishing_coast_tests.rs"]
+mod coast_tests;

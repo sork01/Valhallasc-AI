@@ -25,7 +25,7 @@ Each cast needs a fresh press. Missing or interrupting a cast clears the current
 Anti-exploit: one line at a time per hero, 1 s between casts, mercenaries and ambient adventurers never fish, no fishing during a duel or arena match, the key is ignored while a cutscene plays.
 
 ## Habitats and where to fish
-Map objects kinds that are fishable water: `water` (1,733 circles: zones 2, 3, 6, 20, 25), `seafoam` (19), `jungle_water` (22), `year_spring_pool` (28), `frostwake_frozen_pool` (26), `jade_pool` (22), `lapis_oasis` (25), and **lava**: `lava` (zone 1, 543) and `ew_lava` (zone 45, 247). Greenmeadow (0) has inland water objects. At Saltby, the sea beside the pier is represented by void rectangles. A hero on the dock can cast across an exposed plank edge into that sea. The ship footprint is excluded. Ran's Deep and the Cathedral are underwater and excluded; `cf_lavafall` and the Foundry are instances and excluded.
+Map objects kinds that are fishable water: `water` (1,733 circles: zones 2, 3, 6, 20, 25), `seafoam` (19), `jungle_water` (22), `year_spring_pool` (28), `frostwake_frozen_pool` (26), `jade_pool` (22), `lapis_oasis` (25), and **lava**: `lava` (zone 1, 543) and `ew_lava` (zone 45, 247). Greenmeadow (0) has inland water objects. Ordinary open-sea shore casts now use the existing painted coast mask: `shapeEdge` code `c` outside `shapeFloor`. Other border codes are not ocean. At Saltby the original exposed-pier/void-rectangle cast remains unchanged, and the ship footprint is excluded. Ran's Deep and the Cathedral are underwater and excluded; `cf_lavafall` and the Foundry are instances and excluded.
 
 | Habitat | Zones | Notes |
 | --- | --- | --- |
@@ -505,3 +505,36 @@ name and hover explanation remain; their hit area grows with the rings. Focused
 checks cover larger rings, no fish geometry, hover, line status and depletion;
 the real-water regression samples the ring toward the pond centre instead of
 the removed centre icon. This updates only the private fishing client.
+
+
+### Ordinary sea coastline (owner report, 2026-11-19)
+
+The open coastline looked fishable but only inland water objects and Saltby
+pier casts had been implemented. The authoritative map now reads the existing
+`shapeFloor`/`shapeEdge` masks. A dry angler can cast toward coast-code `c` cells,
+with the same four-tile shore reach and three-to-six-tile bobber distance. The
+landward segment must be clear. Land, cliffs, seams, ships and lava rods cannot
+be treated as sea. Existing pool/pier landings are preferred and preserved.
+The client uses the same coast mask/range for its Cast hint. No world generator,
+species/rod IDs, rarity weights, movement/collision rules or save schema changed.
+
+All 36 focused fishing Rust tests pass, including six actual Greenmeadow coastal
+placements and synthetic sea/land/seam/cliff/lava/wall cases. Runtime test-only
+mutations for disabled coastal casts, accepting other borders, allowing lava
+and ignoring a blocking wall fail the intended coast tests. All 719 existing
+client checks and ten coast checks pass; four in-memory client mutations fail.
+Swedish text freshness and changed JS syntax pass. All-target Clippy has no new
+issues with only its three documented baseline categories excluded.
+
+The private optimized executable passes `tests/fishing-coast.cjs`: the actual
+client enables its coastal hint at a real Greenmeadow shore; the authoritative
+cast lands in a painted sea cell without moving the angler; one sea catch goes
+into bags and survives reconnect. No catch grind or browser suite was needed.
+The regression targets the reported Greenmeadow coast; Stormglass has no `c`
+border cells, and the Wyrdwood coast does not provide six clear, spaced shore
+placements, so neither is used as an arbitrary shoreline-count fixture.
+
+The separate manual fishing service was rebuilt/reloaded with its existing
+database preserved. Public game service/database/release were untouched. The
+merfolk one-frame swim-facing flip was separately added to TODO as
+`MERFOLK-SWIM-FACING-FLICKER`; its implementation remains pending.

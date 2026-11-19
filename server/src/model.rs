@@ -2246,6 +2246,11 @@ pub struct Map {
     pub objects: Vec<Obstacle>,
     #[serde(default, rename = "fishingSpots")]
     pub fishing_spots: Vec<Point>,
+    /// Existing painted outline: only empty floor cells with coast code c are sea.
+    #[serde(default, rename = "shapeFloor")]
+    pub shape_floor: Vec<String>,
+    #[serde(default, rename = "shapeEdge")]
+    pub shape_edge: Vec<String>,
     /// Built on first use; see `object_grid.rs`.
     #[serde(skip)]
     pub grid: crate::object_grid::GridSlot,
@@ -2744,6 +2749,8 @@ mod tests {
         let map = Map {
             grid: Default::default(),
             fishing_spots: vec![],
+            shape_floor: vec![],
+            shape_edge: vec![],
             crosses: vec![],
             name: String::new(),
             theme: String::new(),

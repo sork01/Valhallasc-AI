@@ -11636,6 +11636,8 @@ mod tests {
         let map = Map {
             grid: Default::default(),
             fishing_spots: vec![],
+            shape_floor: vec![],
+            shape_edge: vec![],
             crosses: vec![],
             name: String::new(),
             theme: String::new(),
