@@ -1,5 +1,30 @@
 # NPC artwork
 
+## Merfolk facing correction — 1.0.1 (2026-11-19)
+
+`Field.serverNow()` is re-anchored by every snapshot. A small backward clock
+correction reverses the difference between two sampled NPC positions for one
+frame. `City.update` previously treated that difference as the swimming heading,
+so `NpcArt.frame` mirrored the player-style sprite and reversed its lean until
+the next frame. This reproduces on `nacre_resident_0` at times 50, 50 + 1/60,
+50.005, 50.005 + 1/60, without changing the atlas frame.
+
+`City.routePoint` now returns the active route leg's `fx`/`fy` alongside the
+unchanged interpolated coordinates (both zero during a pause). `City.update`
+uses that heading for facing and moving. Clock corrections, repeated timestamps
+and initial placement no longer choose a reverse heading or a false idle frame.
+Authored routes, speed, phase, pauses, sprite frames and swim effects are preserved.
+
+Run `node tests/merfolk-facing.cjs`: 4,285 non-browser checks cover all 18 current
+player-style swimmers and 72 legs, including forward frames, a 12 ms clock rewind,
+repeated timestamps, animation boundaries, arrival/pause transitions and actual
+`NpcArt.draw` mirror/lean/frame arguments. The test loads the production modules
+and manifests in a VM; drawing calls are recorded, not rasterized.
+`MUTATE=displacement` restores the old update and fails on the clock rewind;
+`MUTATE=stopped` restores displacement-based moving and fails on repeated time.
+The unmodified pre-fix module also fails the regression. Browser suites were not
+run: the retired test host and production-host restriction still apply.
+
 ## Complete NPC release — Beta 1.45.0
 
 **Live 2026-11-12**, merge `3b732272`, source `9181d586`. All 588 people are

@@ -282,17 +282,17 @@
   function animateObject(g,o,sx,sy,t) {const def=art[o.kind];if(def?.animate)def.animate(g,o,sx,sy,t,kit);}
   // ---- walking townspeople: the same arithmetic as model.rs Npc::position_at, driven by the server's clock ----
   function routePoint(n,time) {
-    const r=n.route;if(!r||r.length<2||!(n.speed>0))return {x:n.x0??n.x,y:n.y0??n.y};
+    const r=n.route;if(!r||r.length<2||!(n.speed>0))return {x:n.x0??n.x,y:n.y0??n.y,fx:0,fy:0};
     const m=r.length,leg=i=>{const a=r[i],b=r[(i+1)%m];return Math.hypot(a[0]-b[0],a[1]-b[1]);};
     let cycle=0;for(let i=0;i<m;i++)cycle+=n.pause+leg(i)/n.speed;
     let t=(((time+n.phase)%cycle)+cycle)%cycle;
     for(let i=0;i<m;i++){
-      if(t<n.pause)return {x:r[i][0],y:r[i][1]};
+      if(t<n.pause)return {x:r[i][0],y:r[i][1],fx:0,fy:0};
       t-=n.pause;const walk=leg(i)/n.speed;
-      if(t<walk){const a=r[i],b=r[(i+1)%m],f=t/walk;return {x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f};}
+      if(t<walk){const a=r[i],b=r[(i+1)%m],f=t/walk;return {x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f,fx:b[0]-a[0],fy:b[1]-a[1]};}
       t-=walk;
     }
-    return {x:r[0][0],y:r[0][1]};
+    return {x:r[0][0],y:r[0][1],fx:0,fy:0};
   }
   // One mutable copy of each zone's people (the walkers move), made on first use.
   const folk=new Map();
@@ -310,8 +310,10 @@
     clockAt=time;
     for(const n of [...folkOf(Field.zone||0),...(Field.vaultZones||[]).flatMap(folkOf)]){      // the other side of a vault walks too
       if(!n.route)continue;
-      const p=routePoint(n,time),dx=p.x-n.x,dy=p.y-n.y;
-      n.moving=Math.hypot(dx,dy)>1e-4;if(n.moving){n.fx=dx;n.fy=dy;}
+      // Snapshot clock corrections can briefly move the sampled position backwards.
+      // Face the active route leg, so that correction never reverses a swimmer.
+      const p=routePoint(n,time);
+      n.moving=!!(p.fx||p.fy);if(n.moving){n.fx=p.fx;n.fy=p.fy;}
       n.x=p.x;n.y=p.y;
     }
   }
