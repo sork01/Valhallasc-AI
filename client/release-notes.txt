@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.2.0",
+    "date": "2026-11-19",
+    "new": [
+      "Earn a seahorse from Brynja the Tidehealer in Rán's Deep by bringing her fish caught at Saltby or another sea coast.",
+      "Ride your seahorse underwater at 160% of normal movement speed."
+    ],
+    "changed": [
+      "Ordinary mounts can no longer be ridden underwater. Seahorses can be ridden only underwater; crossing to the wrong environment dismounts you."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.1.0",
     "date": "2026-11-19",
     "new": [

@@ -1532,6 +1532,138 @@
         "mount_rocket_run_e": "c9bb9c4fbe245ea5",
         "mount_rocket_run_se": "f601ea412993f71b"
       }
+    },
+    "seahorse": {
+      "png": "mount_seahorse.png",
+      "depth": "mount_seahorse_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.495,
+          0.0,
+          -0.495
+        ],
+        "run": [
+          0.0,
+          0.933,
+          1.32,
+          0.933,
+          0.0,
+          -0.933,
+          -1.32,
+          -0.933
+        ]
+      },
+      "raise": 27,
+      "cut": 39,
+      "shadow": [
+        24,
+        8
+      ],
+      "coat": [
+        "#124b58",
+        "#187a86",
+        "#26a8ae",
+        "#69d5c9"
+      ],
+      "ramps": {
+        "coat": [
+          "#124b58",
+          "#187a86",
+          "#26a8ae",
+          "#69d5c9"
+        ],
+        "belly": [
+          "#866034",
+          "#b68b4e",
+          "#e3bb72",
+          "#ffe3a1"
+        ],
+        "fin": [
+          "#783d64",
+          "#ad5f86",
+          "#df91ad",
+          "#ffc5cc"
+        ],
+        "ridge": [
+          "#635a27",
+          "#a19140",
+          "#d9c36a",
+          "#fff0ac"
+        ],
+        "nose": [
+          "#123844",
+          "#22515a",
+          "#357481",
+          "#5b9caa"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#4a0f1d",
+          "#82182b",
+          "#b92a3c",
+          "#e8586a"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#3a2208",
+          "#6b3d10",
+          "#b9741f",
+          "#f0b14a"
+        ]
+      },
+      "sprites": {
+        "mount_seahorse_idle_s": "5d29ea0e9f2142f7",
+        "mount_seahorse_idle_sw": "0e7885cd8616f6c2",
+        "mount_seahorse_idle_w": "2bb63cee93c642f4",
+        "mount_seahorse_idle_nw": "f527fb33cc5ce4f2",
+        "mount_seahorse_idle_n": "2b808f6175339a2e",
+        "mount_seahorse_idle_ne": "282f3e4048843be8",
+        "mount_seahorse_idle_e": "b9135ffb1c24b99c",
+        "mount_seahorse_idle_se": "9a264202bb3556a2",
+        "mount_seahorse_run_s": "ef71e3d508aa4a0c",
+        "mount_seahorse_run_sw": "dfd7f6b577a1f2a8",
+        "mount_seahorse_run_w": "e5c61fdcc7699bcf",
+        "mount_seahorse_run_nw": "39b18215dd0f3264",
+        "mount_seahorse_run_n": "675ffb1494425f7b",
+        "mount_seahorse_run_ne": "a26964707cef68ec",
+        "mount_seahorse_run_e": "29639df52f84f33e",
+        "mount_seahorse_run_se": "a79379b3a6fa72a0"
+      }
     }
   }
 }

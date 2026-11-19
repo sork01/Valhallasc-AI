@@ -14262,5 +14262,17 @@
   "No rod yet": "Inget spö ännu",
   "Fully upgraded": "Fullt uppgraderat",
   "All rod upgrades": "Alla spöuppgraderingar",
-  "rare catch bonus": "bonus för sällsynta fångster"
+  "rare catch bonus": "bonus för sällsynta fångster",
+  "Seahorse": "Sjöhäst",
+  "seahorse": "sjöhäst",
+  "Only a seahorse can be ridden underwater.": "Du kan bara rida på en sjöhäst under vattnet.",
+  "A seahorse can be ridden only underwater.": "Du kan bara rida på en sjöhäst under vattnet.",
+  "A Friend Beneath the Tide": "En vän under ytan",
+  "A young seahorse has followed me to Keelhaven, but it will not trust an empty hand. Bring me 10 Pier Sprat and 5 Saltby Herring, caught with a fishing rod at Saltby or another sea coast. Buy a Twig Rod from the Fisher at Saltby if you need one; you cannot fish down here. Feed our new friend and it will carry you underwater at 160% of normal movement speed. It is the only mount that can be ridden underwater, and it cannot be ridden on land.": "En ung sjöhäst har följt efter mig till Keelhaven, men den litar inte på någon som kommer tomhänt. Ge mig 10 bryggskarpsillar och 5 Saltbysillar som du har fångat med metspö i Saltby eller vid en annan havskust. Köp ett kvistspö av fiskaren i Saltby om du behöver ett; här nere går det inte att fiska. Mata vår nya vän så bär den dig under vattnet i 160% av din vanliga rörelsehastighet. Det är det enda riddjuret som kan användas under vattnet, och du kan inte rida på det på land.",
+  "Bring 10 Pier Sprat": "Lämna 10 bryggskarpsillar",
+  "Bring 5 Saltby Herring": "Lämna 5 Saltbysillar",
+  "Quest: A Friend Beneath the Tide, from Brynja the Tidehealer in Rán's Deep": "Uppdrag: En vän under ytan, från Brynja tidvattenläkaren i Rán's Deep",
+  "Bring 10 Pier Sprat and 5 Saltby Herring caught at Saltby or another sea coast. Underwater only.": "Lämna 10 bryggskarpsillar och 5 Saltbysillar, fångade i Saltby eller vid en annan havskust. Endast under vattnet.",
+  "Select the seahorse": "Välj sjöhästen",
+  "Underwater only · 160% movement speed": "Endast under vattnet · 160% rörelsehastighet"
 }

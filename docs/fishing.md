@@ -141,7 +141,7 @@ About 60 species, ~7 per habitat: 3 common, 2 uncommon, 1 rare, 1 legendary ("tr
 - **Eat raw:** small heal, uses the 30 s meal timer (`consumables.rs`).
 - **Cook:** the Fisher cooks fish into a dish: better health/resource recovery, the shared 30-second meal timer, and a ten-minute food bonus (table below). Raw never beats the vendor meal of its tier.
 - **Collection log:** `Character.fishing` (`#[serde(default)]`): totals, per species count and best weight, longest streak, legendary count. A window lists every species with a silhouette until caught, plus records.
-- **Achievements (FISH-META):** 13 achievements / 230 points: 1, 100 and 1000 successful catches; all eight habitat collections; first legendary; a 20 kg catch. Titles: "the Angler" at 1000 catches and "Lavacaster" for all eight lava species, including both zone-exclusive legendaries. Current feature catalog: 120 achievements / 2555 points / 12 titles / 11 mounts. See `docs/achievements.md`.
+- **Achievements (FISH-META):** 13 achievements / 230 points: 1, 100 and 1000 successful catches; all eight habitat collections; first legendary; a 20 kg catch. Titles: "the Angler" at 1000 catches and "Lavacaster" for all eight lava species, including both zone-exclusive legendaries. Current feature catalog: 120 achievements / 2555 points / 12 titles / 12 mounts. See `docs/achievements.md`.
 - **Quests:** a Fisher in each hub near water gives 3 bring quests (common, uncommon, rare fish of the band) and one daily-style repeatable. Ordinary side quests, with `level` and `rewardXp` = levels.txt[level-1]/10.
 
 ### Cooked-fish bonuses (owner progression follow-up, 2026-11-19)
@@ -639,3 +639,14 @@ Verification for this follow-up:
 - `tests/fishing-progression.cjs` exercises real private packets: all seven crafts consume their predecessors, one Worldwire casts in ordinary water/both lava zones/Yearwheel, a Twig is rejected with Yearwheel's named requirement, food produces the actual bonus and shared timer, and inventory/cooldown survive reconnect. No fishing grind, balance sweep or browser run is used.
 
 The separate **https://gunning.se/ValhallaFishing/** manual service is refreshed with the clean binary and current client, preserving its independent database/progress. Old multi-rod test grants are consolidated to one best usable rod; its starter now grants one usable rod on a fresh copy as well. The test directory retains running/stopped SQLite backups and the previous binary in `progression-backup-*`; executable hashes, HTTPS client bytes, health and SQLite integrity are verified. The public service PID/client link remain unchanged. No public release/restart, version bump or release-note entry: the fishing feature is still waiting for FISH-RELEASE. Browser/visual checks for these new screens remain pending under the existing host restriction; earlier FISH-CHECK permission does not carry over.
+
+## Fishing seahorse quest (1.2.0)
+
+After the level-35 Keelhaven introduction, Brynja the Tidehealer offers
+**A Friend Beneath the Tide** in Rán’s Deep. Bring 10 Pier Sprat and 5 Saltby
+Herring from surface shore fishing to earn the permanent seahorse mount. Both
+fish are common and catchable with a Twig Rod. No underwater fishing or rare
+mount roll is added. The seahorse is the sole underwater mount and travels at
+160% of normal movement speed, with normal collision and combat dismount rules.
+There are now 12 mounts; achievement totals and all 57 fish species are unchanged.
+See [mounts.md](mounts.md) for environment, quest and validation details.

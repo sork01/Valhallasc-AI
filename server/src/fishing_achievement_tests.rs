@@ -60,7 +60,7 @@ fn fishing_achievements_catalog_covers_every_habitat_and_preserves_rewards() {
     );
     assert_eq!(achievement("fish_1000").title, "the Angler");
     assert_eq!(achievement("fish_log_lava").title, "Lavacaster");
-    assert_eq!(crate::model::MOUNTS.len(), 11);
+    assert_eq!(crate::model::MOUNTS.len(), 12); // Fishing quest adds the underwater seahorse.
 }
 
 #[test]

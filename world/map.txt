@@ -524266,6 +524266,32 @@
           "rewardGold": 1500,
           "requires": "deep_dw_stones",
           "repeatable": true
+        },
+        {
+          "id": "deep_seahorse",
+          "title": "A Friend Beneath the Tide",
+          "npc": "deep_healer",
+          "description": "A young seahorse has followed me to Keelhaven, but it will not trust an empty hand. Bring me 10 Pier Sprat and 5 Saltby Herring, caught with a fishing rod at Saltby or another sea coast. Buy a Twig Rod from the Fisher at Saltby if you need one; you cannot fish down here. Feed our new friend and it will carry you underwater at 160% of normal movement speed. It is the only mount that can be ridden underwater, and it cannot be ridden on land.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_pier_sprat",
+              "count": 10,
+              "label": "Bring 10 Pier Sprat"
+            },
+            {
+              "kind": "bring",
+              "target": "fish_saltby_herring",
+              "count": 5,
+              "label": "Bring 5 Saltby Herring"
+            }
+          ],
+          "level": 35,
+          "rewardXp": 1740,
+          "rewardGold": 1250,
+          "requires": "deep_welcome",
+          "repeatable": false,
+          "rewardMount": "seahorse"
         }
       ],
       "city": {

@@ -4,6 +4,7 @@
 // (docs/mounts.md); this only shows them and sends `select_mount`.
 (() => {
   const MOUNTS = [
+    {id:'seahorse',name:'Seahorse',level:35,route:'Quest: A Friend Beneath the Tide, from Brynja the Tidehealer in Rán\'s Deep',cost:'Bring 10 Pier Sprat and 5 Saltby Herring caught at Saltby or another sea coast. Underwater only.'},
     {id:'roseheart',name:'Roseheart Unicorn',level:1,route:'Valentine: defeat the Briarheart with five fighters in Rimeveil Glacier',cost:'Guaranteed when you claim the daily quest'},
     {id:'rocket',name:'Starflight Rocket',level:1,route:'New Year: summon the Starfire Rocketeer with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'sunwoven',name:'Sunwoven Stag',level:1,route:'Summer Solstice: defeat the Birchcrown Guardian with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
@@ -32,6 +33,7 @@
       card.dataset.mount = m.id; card.dataset.owned = has; card.dataset.selected = has && m.id === selected;
       const text = node('div', '', 'mount-text');
       text.append(node('b', m.name), node('small', has ? (m.id === selected ? 'Owned · selected' : 'Owned') : `Level ${m.level} · ${m.route} · ${m.cost}`));
+      if (m.id === 'seahorse') text.append(node('small', 'Underwater only · 160% movement speed'));
       card.append(text);
       if (has) {
         const pick = node('button', m.id === selected ? 'Selected' : 'Select', 'window-tool mount-select'); pick.type = 'button';

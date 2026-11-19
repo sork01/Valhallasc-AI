@@ -563,7 +563,7 @@ impl Character {
 }
 pub const RESURRECTION_SICKNESS_DURATION: f64 = 600.;
 pub const RESURRECTION_SICKNESS_SCALE: f64 = 0.25;
-/// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every mount uses the same 1.6× walking-speed multiplier.
+/// Every mount uses the same 1.6× movement multiplier; its acquisition and permitted environment differ (docs/mounts.md).
 pub struct MountDef {
     pub id: &'static str,
     pub name: &'static str,
@@ -572,7 +572,13 @@ pub struct MountDef {
     pub speed: f64,
 }
 pub const MOUNT_SPEED: f64 = 1.6;
-pub const MOUNTS: [MountDef; 11] = [
+pub const MOUNTS: [MountDef; 12] = [
+    MountDef {
+        id: "seahorse",
+        name: "seahorse",
+        level: 35,
+        speed: MOUNT_SPEED,
+    },
     MountDef {
         id: "rocket",
         name: "Starflight Rocket",
@@ -2327,6 +2333,11 @@ pub const UNDERWATER_THEMES: [&str; 7] = [
 impl Map {
     pub fn underwater(&self) -> bool {
         UNDERWATER_THEMES.contains(&self.theme.as_str())
+    }
+    /// Seahorses swim only underwater; ordinary mounts ride only on land.
+    /// Private dungeons retain their existing no-mount rule.
+    pub fn allows_mount(&self, id: &str) -> bool {
+        self.players == 0 && mount_def(id).is_some() && self.underwater() == (id == "seahorse")
     }
     /// True when a straight shot stays clear of the same solid objects that block movement.
     pub fn line_clear(&self, start: Point, end: Point, radius: f64) -> bool {

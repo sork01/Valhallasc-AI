@@ -6,7 +6,7 @@ These settle `MOUNT-RULES` in [TODO.md](../TODO.md). `MOUNT-SERVER` stores the o
 
 ## One cosmetic choice at one speed
 
-All eight mounts are the **same ability with a different look**: 1.6× the class's walking speed in the open world, as today (`speed() * 1.6` in `world.rs`). No mount crosses water, void, cliffs or any collision, and none flies, jumps or changes combat. The gryphon is a ground-runner that spreads its wings in the animation; this avoids new collision, zone-edge and exploit rules (Bifrost Reach's void rings, sealed gates, instance walls) and keeps travel balance identical to the horse. A mount's rank is its price of effort, not its power.
+All mounts share the same travel speed: 1.6× the class's walking speed in the open world, as today (`speed() * 1.6` in `world.rs`). No mount bypasses void, cliffs or any collision, and none flies, jumps or changes combat. Ordinary mounts work only on land; the seahorse works only in underwater zones. The gryphon is a ground-runner that spreads its wings in the animation; this avoids new collision, zone-edge and exploit rules (Bifrost Reach's void rings, sealed gates, instance walls) and keeps travel balance identical to the horse. A mount's rank is its price of effort, not its power.
 
 ## How each mount is obtained
 
@@ -39,7 +39,7 @@ Rules for the items:
 
 ## Dismount rules
 
-All mounts follow the existing rules exactly: mounting needs a living character, out of combat, not escorting, in the open world; attacking, casting, Shadowstep, dashing, taking aggro, Spark Travel, dying, entering a private dungeon, or an arena or duel dismount. A stat reset is refused while mounted ("Dismount before resetting stats."). Outdoor gates and cities keep the rider mounted. The selection survives all of them. There is no mount-specific exception.
+All mounts follow the existing rules exactly: mounting needs a living character, out of combat, not escorting, in the open world; attacking, casting, Shadowstep, dashing, taking aggro, Spark Travel, dying, entering a private dungeon, or an arena or duel dismount. A stat reset is refused while mounted ("Dismount before resetting stats."). Outdoor gates and cities keep the rider mounted when the destination allows that mount. The selection survives all of them. The seahorse is the sole underwater mount; crossing between land and underwater dismounts incompatible mounts while preserving selection and ownership. Private dungeons still disallow every mount.
 
 ## Tradability
 
@@ -126,3 +126,49 @@ ownership are safe. It follows ordinary collision/movement at the same
 160% walking speed as every mount; hovering is cosmetic. Original PixelFlow
 idle/run sources cover eight directions and the shared ten-rig depth
 compositor. Rules: [new-year-event.md](new-year-event.md).
+
+## Fishing seahorse (1.2.0)
+
+Brynja the Tidehealer in Keelhaven, Rán’s Deep, offers **A Friend Beneath the Tide**
+after **Beneath the Maelstrom** at level 35. Bring 10 Pier Sprat and 5 Saltby
+Herring from Saltby or any eligible sea coast. Both are common tier-one fish,
+so a Twig Rod suffices. This is a one-time ordinary hand-in quest: fish are
+consumed only on a valid claim, permanent `seahorse` ownership is granted
+directly, and an existing mount selection stays selected. Fishing itself remains
+unavailable underwater.
+
+The seahorse travels at 160% of the class’s normal movement speed. It can be
+ridden in Rán’s Deep and Nacrehold; underwater private dungeons retain the
+no-riding rule. Every ordinary mount is refused underwater; a seahorse is
+refused on land. The rules apply on mount input, selection, login, each movement
+update and portal/seam arrival. The Deep–Nacrehold seam keeps a seahorse mounted.
+Combat, death, Spark Travel, collision and all existing dismount rules remain.
+
+`scripts/seahorse_quest.py` runs after the Fisher overlay in full world sync.
+It appends only `deep_seahorse`, using the existing healer without changing
+terrain, people or other quests. Original eight-facing idle/swim art is authored
+in `mount_models.py`, saved as 16 PixelFlow sprites and exported through
+`make_mount_sprites.py`; all ten class/body rigs use the shared depth compositor.
+
+Focused checks: `cargo test underwater_mount`, `cargo test mounts_use_160`,
+`python3 tests/seahorse-data.py`, `python3 tests/seahorse-art.py`,
+`node tests/seahorse-client.cjs`, and `node tests/seahorse-probe.cjs`.
+`tests/seahorse-ui.cjs` is the focused browser check; it needs an approved host
+or explicit owner approval for the bounded local runner.
+
+Validation: 13 focused Rust cases pass, including every real map/mount pairing,
+real Maelstrom/Tideway crossings, the fish hand-in, duplicate claims and old
+mounted saves. The private protocol probe completes the actual quest, verifies
+a second player’s rider view, and retains the reward through reconnect and a
+private process restart. The quest overlay is byte-stable and changes only that
+quest; the existing Fisher preservation check passes. Art checks cover 96 frames,
+16 saved PixelFlow sources and 960 real JavaScript depth composites across all
+ten class/body rigs. Seven deliberate code/data/art/client faults are caught;
+all seven restored underwater Rust cases pass again. Release notes, Swedish
+freshness and the client release dry run pass. The browser suite remains pending
+explicit permission under the production-host restriction.
+
+Strict Clippy retains the existing unused-helper, `doc_lazy_continuation` and
+`single_element_loop` baseline findings. All targets pass with only those three
+known categories excluded on the command line; no source suppressions were added.
+The Swedish catalogue and 23 locale checks also pass.

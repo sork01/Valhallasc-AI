@@ -1,4 +1,4 @@
-"""The eight mounts as primitive lists (make_mount_sprites.py renders them).
+"""Mount models as primitive lists (make_mount_sprites.py renders them).
 
 Every builder takes (clip, k, n) and returns (prims, bob): the body parts for frame k of n and how far the saddle
 rises (world units) in that frame, which the client adds to the rider. Model space is documented in mount_toon.py:
@@ -627,7 +627,60 @@ def rocket(clip,k,n):
 
 # name -> (builder, materials, flat materials, seat). seat: `raise` lifts the rider so the pelvis sits on the saddle,
 # `cut` hides the rider below that world height (the legs vanish into the barrel), `shadow` is the ground shadow (rx, ry).
+# ----------------------------------------------------------------------------- underwater seahorse
+SEAHORSE = {
+    'coat': ['#124b58', '#187a86', '#26a8ae', '#69d5c9'],
+    'belly': ['#866034', '#b68b4e', '#e3bb72', '#ffe3a1'],
+    'fin': ['#783d64', '#ad5f86', '#df91ad', '#ffc5cc'],
+    'ridge': ['#635a27', '#a19140', '#d9c36a', '#fff0ac'],
+    'nose': ['#123844', '#22515a', '#357481', '#5b9caa'],
+    'leather': LEATHER, 'gold': GOLD, 'blanket': BLANKET,
+    'eye': EYE, 'white': WHITE, 'iris': IRIS,
+}
+
+
+def seahorse(clip, k, n):
+    """An upright reef swimmer: tube muzzle, crown, fluttering fins and a curled tail."""
+    ph = CYCLE(k, n)
+    moving = clip == 'run'
+    bob = S_(ph) * (1.2 if moving else .45)
+    sway = S_(ph) * (.9 if moving else .35)
+    prims = [Ell((sway, -1, 39 + bob), (12.4, 13, 19), 'coat'),
+             Ell((sway, 8.2, 39 + bob), (9.3, 6.3, 16), 'belly', bias=.03),
+             limb((sway, 5, 48 + bob), (sway, 17, 63 + bob), 7.2, 'coat', ext=3),
+             Ell((sway, 22, 66 + bob), (8.4, 10.5, 9.4), 'coat'),
+             limb((sway, 28, 63 + bob), (sway, 44, 58 + bob), 3.4, 'coat', ext=1),
+             Ell((sway, 45, 57.8 + bob), (3.8, 1.5, 3.7), 'ridge'),
+             Ell((sway, 46.4, 57.8 + bob), (2.1, .45, 2.0), 'nose')]
+    prims += eyes((sway, 22, 68 + bob), 7.2, 2.2, 2.3)
+    # Ribbed belly and a spiny crown are visible above the sea-green coat.
+    for z in (29, 35, 41, 47):
+        prims.append(Ell((sway, 13.3, z + bob), (7.7, .9, 1), 'ridge'))
+    for y, z, height in [(13, 73, 7), (19, 75, 8), (25, 75, 6)]:
+        prims.append(cone((sway, y, z + bob), (sway, y - 2, z + height + bob), 2.3, 'ridge'))
+    tail = [(sway, -3, 25 + bob), (sway, -8, 15 + bob),
+            (sway, -17, 7 + bob), (sway, -29, 9 + bob),
+            (sway, -34, 19 + bob), (sway, -28, 27 + bob),
+            (sway, -19, 26 + bob), (sway, -16, 20 + bob)]
+    for i, (a, b) in enumerate(zip(tail, tail[1:])):
+        prims.append(limb(a, b, 4.8 - i * .5, 'coat', ext=1.2))
+    # Swimming uses a fin beat rather than a ground gait.
+    flutter = S_(ph) * (6 if moving else 2)
+    for side in (-1, 1):
+        base = V(sway + side * 10, -4, 43 + bob)
+        tip = base + V(side * (8 + flutter * .3), -3, flutter)
+        prims.append(limb(base, tip, 2.1, 'ridge'))
+        for j in range(4):
+            prims.append(limb(base + V(0, -j * 1.3, -j), tip + V(side * 3, -j * 1.8, -j * 2), 1.3, 'fin'))
+    for j in range(5):
+        prims.append(limb((sway, -12, 48 - j * 4 + bob),
+                          (sway + flutter * .3, -21, 48 - j * 4 + bob), 1.5, 'fin'))
+    prims += saddle(-2, 54 + bob, width=9.5, length=7)
+    return prims, bob
+
+
 REGISTRY = {
+    'seahorse': (seahorse, SEAHORSE, FLAT, {'scale':1.1,'raise':27,'cut':39,'shadow':(24,8),'coat':'coat'}),
     'rocket': (rocket, ROCKET, {'flame':3}, {'scale':1.3,'raise':25,'cut':31,'shadow':(35,10),'coat':'hull'}),
     'roseheart': (roseheart, ROSEHEART, FLAT, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),
     'sunwoven': (sunwoven, SUNWOVEN, FLAT, {'scale':1.3,'raise':25,'cut':34,'shadow':(34,9),'coat':'coat'}),

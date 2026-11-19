@@ -97,7 +97,7 @@ change. When expanding the atlas, add the new region achievement and update the
 Explorer threshold, translations, documented maximum and focused catalog checks
 together. See the table below for the current catalog.
 
-Fishing feature branch: **120 achievements / 2,555 points / 12 titles / 11 mounts**.
+Fishing feature branch: **120 achievements / 2,555 points / 12 titles / 12 mounts**.
 The fishing additions are not live; the preceding catalog has 107 achievements, 2,325 points and 10 titles.
 The older seasonal candidate totals below describe their historical releases.
 

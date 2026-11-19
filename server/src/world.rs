@@ -292,6 +292,8 @@ mod mount_sources_tests;
 #[cfg(test)]
 mod mount_speed_tests;
 #[cfg(test)]
+mod underwater_mount_tests;
+#[cfg(test)]
 mod nacre_tests;
 #[cfg(test)]
 mod newyear_tests;
@@ -2815,7 +2817,8 @@ impl World {
                 fy: 0.,
             });
         }
-        if self.maps[c.zone].players > 0 {
+        c.normalize_mounts();
+        if !self.maps[c.zone].allows_mount(&c.mount) {
             c.mounted = false;
         }
         let mut point = c.point();
@@ -3138,13 +3141,25 @@ impl World {
                     || self.maps[p.character.zone].players > 0
                 {
                     let _ = p.peer.try_send(json!({"type":"error","text":"You can mount only while alive and out of combat in the open world."}));
+                } else if !self.maps[p.character.zone].allows_mount(&p.character.mount) {
+                    let text = if self.maps[p.character.zone].underwater() {
+                        "Only a seahorse can be ridden underwater."
+                    } else {
+                        "A seahorse can be ridden only underwater."
+                    };
+                    let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 } else {
                     p.character.mounted = true;
                     self.save();
                 }
             }
             ClientMessage::SelectMount { mount } => match p.character.select_mount(&mount) {
-                Ok(()) => self.save(),
+                Ok(()) => {
+                    if !self.maps[p.character.zone].allows_mount(&p.character.mount) {
+                        p.character.mounted = false;
+                    }
+                    self.save();
+                }
                 Err(text) => {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 }
@@ -4103,6 +4118,10 @@ impl World {
         self.update_resource(session);
         let carry_speed = self.forge_carry_speed(session);
         let p = self.players.get_mut(&session).unwrap();
+        // Also covers old mounted saves and administrative zone changes, before movement.
+        if p.character.mounted && !self.maps[p.character.zone].allows_mount(&p.character.mount) {
+            p.character.mounted = false;
+        }
         if p.merc.is_none() && p.ambient.is_none() && p.guard.is_none() {
             p.character.played_secs += TICK;
         }
@@ -4757,7 +4776,7 @@ impl World {
         let time = self.time;
         let p = self.players.get_mut(&session).unwrap();
         p.character.zone = portal.to;
-        if self.maps[portal.to].players > 0 {
+        if !self.maps[portal.to].allows_mount(&p.character.mount) {
             p.character.mounted = false;
         }
         p.character.x = arrival.x;

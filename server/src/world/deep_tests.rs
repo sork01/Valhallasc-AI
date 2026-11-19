@@ -706,18 +706,18 @@ fn both_three_player_elites_credit_nearby_heroes_and_pay_gear() {
 
 // ---- the questline -----------------------------------------------------------------------------------------------------------------
 #[test]
-fn the_questline_has_thirty_eight_deep_quests_with_three_chime_chains_and_the_old_objective_kinds()
+fn the_questline_has_thirty_nine_deep_quests_with_three_chime_chains_and_the_old_objective_kinds()
 {
     let w = world();
     let map = &w.maps[DEEP];
-    // 38 of the zone's own, the Longship's three (`keel_*`, their people stand in the dungeon) and the Empty Seat's two
-    assert_eq!(map.quests.len(), 43);
+    // 38 original zone quests plus the seahorse hand-in, the Longship's three and the Empty Seat's two
+    assert_eq!(map.quests.len(), 44); // The fishing seahorse hand-in adds one quest.
     assert_eq!(
         map.quests
             .iter()
             .filter(|q| q.id.starts_with("deep_"))
             .count(),
-        38
+        39
     );
     let mut kinds = std::collections::BTreeSet::new();
     let mut chimes = vec![];
@@ -742,7 +742,13 @@ fn the_questline_has_thirty_eight_deep_quests_with_three_chime_chains_and_the_ol
                     "{}",
                     q.id
                 ),
-                "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
+                "bring" => assert!(item(&o.target).is_some_and(|i| {
+                    if q.id == "deep_seahorse" {
+                        i.kind == "fish"
+                    } else {
+                        i.kind == "material"
+                    }
+                })),
                 "talk" => assert!(npc_exists(map, &o.target), "{}", q.id),
                 "visit" => assert!(map.places.iter().any(|p| p.id == o.target)),
                 "reach" => assert_eq!(o.target, "R\u{e1}n's Deep"),

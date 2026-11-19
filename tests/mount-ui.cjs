@@ -36,7 +36,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await page.keyboard.press('e');
     await page.locator('#character-tab-mounts').click();
     await page.waitForSelector('#character-mounts .mount-card');
-    assert.equal(await page.locator('#character-mounts .mount-card').count(), 11, 'every mount is listed (the catalogue has 11: server MOUNTS and client/mounts.js)');
+    assert.equal(await page.locator('#character-mounts .mount-card').count(), 12, 'every mount is listed (the catalogue has 12: server MOUNTS and client/mounts.js)');
     assert.equal(await page.locator('.mount-card[data-mount="horse"]').getAttribute('data-selected'), 'true', 'the horse owner has it selected');
     const raptorCard = page.locator('.mount-card[data-mount="raptor"]');
     assert.equal(await raptorCard.getAttribute('data-owned'), 'false');

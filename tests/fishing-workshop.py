@@ -13,6 +13,7 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import fisher_npcs as fishers
 import fish_catalog
 import fishing_spots
+import seahorse_quest
 if os.environ.get('MUTATE')=='overlay':
     fishers.install=lambda *args: None
 if os.environ.get('MUTATE')=='dishes':
@@ -26,13 +27,14 @@ class Workshop(unittest.TestCase):
         stripped=copy.deepcopy(world)
         for area in [stripped,*stripped['zones']]:
             area['npcs']=[n for n in area['npcs'] if not n['id'].startswith('fisher_')]
-            area['quests']=[q for q in area['quests'] if not q['id'].startswith('fisher_')]
-        self.assertTrue(stripped==original,'only new Fisher NPCs/quests may change the map')
+            area['quests']=[q for q in area['quests'] if not q['id'].startswith('fisher_') and q['id']!=seahorse_quest.QUEST]
+        self.assertTrue(stripped==original,'only new Fisher NPCs/quests and the explicit seahorse quest may change the map')
         levels=json.loads((ROOT/'world/levels.txt').read_text());levels.append(levels[-1]+2300)
         recipes=json.loads((ROOT/'world/fishing-workshop.txt').read_text());fish=json.loads((ROOT/'world/fish.txt').read_text())
         world=copy.deepcopy(original)
         fishers.install(world,recipes,fish,levels)
-        self.assertTrue(world==json.loads((ROOT/'world/map.txt').read_text()),'overlay reproduces the new content from the previous map')
+        seahorse_quest.install(world)
+        self.assertTrue(world==json.loads((ROOT/'world/map.txt').read_text()),'Fisher and seahorse overlays reproduce the new content from the previous map')
         once=copy.deepcopy(world);fishers.install(world,recipes,fish,levels);self.assertTrue(world==once,'second overlay is stable')
         self.assertTrue(json.dumps(world,ensure_ascii=False,indent=2)+'\n'==(ROOT/'world/map.txt').read_text(),'overlay bytes are canonical and stable')
         seen=set()
