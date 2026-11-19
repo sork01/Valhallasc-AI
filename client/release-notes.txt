@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.0.1",
+    "date": "2026-11-19",
+    "new": [],
+    "changed": [
+      "Swimming merfolk no longer briefly turn the wrong way between strokes."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.0.0",
     "date": "2026-11-16",
     "new": [
