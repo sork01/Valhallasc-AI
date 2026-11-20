@@ -172,3 +172,16 @@ Strict Clippy retains the existing unused-helper, `doc_lazy_continuation` and
 `single_element_loop` baseline findings. All targets pass with only those three
 known categories excluded on the command line; no source suppressions were added.
 The Swedish catalogue and 23 locale checks also pass.
+
+## Public release (2026-11-20)
+
+Owner requested deployment of 1.2.0. Client `1.2.0-9ca2ef55` and the prepared
+production executable from `9ca2ef55` are live. The approved stop/start took
+1.125 seconds. All nine changed public files match the clean release checkout;
+the running executable matches the pinned candidate. Public, legacy and bridge
+health, production flags, SQLite `quick_check` and the service journal pass.
+Fresh previous-executable, running-DB and stopped-DB backups plus the deployment
+receipt are under `deploy/backups/seahorse-deploy-20261120T060608Z/`. The prior
+client release is retained. The separate fishing test service remains stopped.
+Browser suites were not run under the existing host restriction; the non-browser
+and real private protocol/persistence checks remain the validation evidence.
