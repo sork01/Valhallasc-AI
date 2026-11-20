@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Focused private checks: unique-name UI, four-city dressing and the daily summoned Halloween encounter.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
 require('./lib/touch.cjs').requireMemoryLimit();
@@ -17,7 +18,7 @@ async function create(name,duplicate=false){
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}if(e.data instanceof ArrayBuffer){try{take(JSON.parse(window.pako.inflateRaw(new Uint8Array(e.data),{to:'string'})));}catch{}return;}e.data.arrayBuffer().then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await p.goto(world.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill(name);await p.locator('#go').click({timeout:60000});
+ await p.goto(world.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill(name);await p.locator('#go').click({timeout:60000});
  if(duplicate)await p.locator('#name-change-form').waitFor({state:'visible'});else await wait(p,()=>Online.connected&&Field.hero.hp>0);
  return p;
 }
@@ -81,7 +82,7 @@ async function npc(p,id){const n=await p.evaluate(id=>[WORLD_MAP,...WORLD_MAP.zo
  // Authenticated rename of an existing flagged character; all progress survives.
  const id=await p.evaluate(()=>Online.id);await debug(p,{op:'set_gold',gold:123456});await wait(p,()=>__self().gold===123456);
  cp.execFileSync('python3',['-c',"import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.execute('UPDATE characters SET name_key=NULL,rename_required=1 WHERE id=?',(sys.argv[2],)); c.commit()",world.db,id]);
- await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#name-change-form').waitFor({state:'visible'});
+ await p.reload();await p.locator('#start').click();await playGuest(p);await p.locator('#name-change-form').waitFor({state:'visible'});
  check((await p.locator('#connection-text').textContent()).includes('needs a new name'),'A flagged existing guest gets the required rename flow before entering');
  await p.locator('#new-character-name').fill('HuntTaken');await p.locator('#name-change-form button').click();await wait(p,()=>document.querySelector('#connection-text').textContent.includes('already taken'));
  await p.locator('#new-character-name').fill('HuntRenewed');await p.locator('#name-change-form button').click();await wait(p,()=>Online.connected&&__self().look.name==='HuntRenewed');

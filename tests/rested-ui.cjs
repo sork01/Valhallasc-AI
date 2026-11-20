@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 const { execFileSync } = require('node:child_process');
 const { run, replace, debug, safeSpot } = require('./lib/touch.cjs');
 
@@ -44,7 +45,7 @@ run([{
     await page.evaluate(() => Online.stop());
     await page.waitForFunction(async () => (await (await fetch('health')).json()).online === 0);
     offline(world.db, id, 144000);
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero?.rested?.percent === 200);
     await page.waitForFunction(() => /200% \/ 200%/.test(document.querySelector('#rested-status')?.textContent || ''));
     check(await page.locator('#rested').evaluate(el => el.classList.contains('rested-active')), 'offline reserve is full and purple');
@@ -57,7 +58,7 @@ run([{
     check(after.percent > 0 && after.percent < 200, 'quest bonus spends some reserve');
     await label.tap();
     await page.screenshot({ path: `${out}/rested-${width}x${height}.png` });
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero?.rested?.percent > 0 && Field.hero.rested.percent < 200);
     const resumed = await page.evaluate(() => Field.hero.rested.percent);
     check(Math.abs(resumed - after.percent) < .1, 'spent reserve persists across reconnect without refill');

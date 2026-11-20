@@ -6,14 +6,23 @@ const STUB = process.env.REAL_SPRITES !== '1';
 // Most tests exercise a different window. Acknowledge the release before loading it so the new-player dialog does not
 // cover their controls. The dedicated release-notes test opts in to the real first-visit behavior.
 const newsVersion = process.env.TEST_WHATS_NEW === '1' ? null : require('node:fs').readFileSync(require('node:path').join(__dirname, '../../client/index.html'), 'utf8').match(/class="version">([^<]+)</)[1];
-const init = ({ stub, version }) => {
+// Other suites explicitly continue past the guest warning. The dedicated guest
+// flow checks keep native dialogs with TEST_GUEST_WARNING=1.
+const guestWarning = "Guest progress is tied to this browser. Clearing browser data or losing this browser can make your character and progress inaccessible. Use an account to keep access across devices. Continue as guest?";
+const guestWarnings = process.env.TEST_GUEST_WARNING === '1' ? [] : [guestWarning,
+  JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname, '../../scripts/sv-translations.txt'), 'utf8'))[guestWarning]];
+const init = ({ stub, version, guestWarnings }) => {
+  if (guestWarnings.length) {
+    const confirm = window.confirm.bind(window);
+    window.confirm = message => guestWarnings.includes(message) ? true : confirm(message);
+  }
   if (stub) window.__valhallaTestSprites = true;
   if (version) { try { localStorage.setItem('valhallasc.whats-new.v1', version); } catch (_) {} }
 };
 function wrap(browser) {
-  if (!STUB && !newsVersion) return browser;
+  if (!STUB && !newsVersion && !guestWarnings.length) return browser;
   const newContext = browser.newContext.bind(browser);
-  browser.newContext = async (...args) => { const context = await newContext(...args); await context.addInitScript(init, { stub: STUB, version: newsVersion }); return context; };
+  browser.newContext = async (...args) => { const context = await newContext(...args); await context.addInitScript(init, { stub: STUB, version: newsVersion, guestWarnings }); return context; };
   browser.newPage = async (...args) => {
     const context = await browser.newContext(...args), page = await context.newPage(), close = page.close.bind(page);
     page.close = async options => { await close(options); await context.close(); };

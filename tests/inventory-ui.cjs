@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Real browser actions cover starter ownership, combat pickup, inventory controls,
 // vendor sales and reload. Separate display fixtures cover rare gear and markers.
 const assert = require('node:assert/strict');
@@ -22,7 +23,7 @@ async function reloadGuest(world) {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   assert.equal(online, 0, 'Previous guest socket disconnected before reload');
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
 }
 (async () => {
   // This suite checks the bag UI around one real kill, not combat difficulty: pin every enemy to its default level.
@@ -32,7 +33,7 @@ async function reloadGuest(world) {
   page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => { if(!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('InventoryUI');
   // Empty hands plus the starter Ash staff; the crystal staff is not a starter piece.
   check(await page.locator('#create-mageWeapon option').evaluateAll(os => os.map(o => o.value).join(',')) === 'none,ash', 'Character creation offers starter gear');

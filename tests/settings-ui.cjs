@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Settings (music/effects volume) and the Edit UI mode in a real browser. Nothing here touches gameplay state:
 // the checks drive the real menu, real sliders and real pointer drags, and read back stage geometry and storage.
 const assert = require('node:assert/strict');
@@ -31,7 +32,7 @@ const stageRect = page => rect(page, '#stage');
     AudioNode.prototype.connect = function (to, ...rest) { if (to instanceof AudioDestinationNode) window.__dest.add(this); return connect.call(this, to, ...rest); };
     if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null })); }
   });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Tuner'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && !!valhalla.fmusic?.running, null, { timeout: 60000 });
   await page.evaluate(() => {
@@ -143,7 +144,7 @@ const stageRect = page => rect(page, '#stage');
   await page.screenshot({ path: path.join(world.artifacts, 'ui-moved.png') });
 
   // --- it survives a reload, per device ---
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && Field.hero.level > 0, null, { timeout: 60000 }).catch(() => {});
   if (await page.locator('#scene-create').isVisible()) await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });

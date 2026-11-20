@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // The new mount only: real PixelFlow exports, all ten class/body rigs, eight directions and both gaits.
 process.env.REAL_SPRITES='1';
 require('./lib/touch.cjs').requireMemoryLimit();
@@ -10,7 +11,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  for(const cls of ['warrior','mage','assassin','priest','hunter'])for(const gender of ['male','female']){
   const p=await browser.newPage({viewport:{width:1280,height:800},reducedMotion:'reduce'});p.on('pageerror',e=>errors.push(e.message));
   await p.addInitScript(()=>{window.AudioContext=window.webkitAudioContext=undefined;localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,dpsMeter:false,lowGraphics:true,lowGraphicsSet:true}));});
-  await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-'+cls).click();await p.locator('#gender-'+gender).click();await p.locator('#name').fill('Rose'+cls.slice(0,3)+gender[0]);await p.locator('#go').click({timeout:60000});
+  await p.goto(w.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-'+cls).click();await p.locator('#gender-'+gender).click();await p.locator('#name').fill('Rose'+cls.slice(0,3)+gender[0]);await p.locator('#go').click({timeout:60000});
   await p.waitForFunction(()=>Online.connected&&Field.hero.hp>0,null,{timeout:60000});
   await p.evaluate(()=>Online.send({type:'debug',command:{op:'give_mount',mount:'roseheart'}}));await p.waitForFunction(()=>Field.hero.mounts.includes('roseheart'));
   await p.evaluate(()=>{Online.send({type:'select_mount',mount:'roseheart'});MountArt.preload('roseheart');});await p.waitForFunction(()=>MountArt.ready('roseheart'),null,{timeout:20000});

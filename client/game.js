@@ -1351,7 +1351,7 @@
   }
   Account.init({
     show,
-    guest() { setMode('guest'); show(save.char ? 'game' : 'create'); },
+    guest() { setMode('guest'); show(Online.characters.length ? 'chars' : 'create'); },
     account() { setMode('account'); },
     play(look) { save.char = { ...look }; save.draft = null; persist(); show('game'); },
     create() { load(save.char || cfg); save.draft = { ...cfg }; persist(); Online.newCharacter(); show('create'); },

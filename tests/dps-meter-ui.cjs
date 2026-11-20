@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Real authoritative damage from two humans and eight hires, without grinding a fight.
 const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
@@ -22,7 +23,7 @@ const results = [];
       await route.fulfill({ response, body: body.replace(from, to) });
     });
     await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })); });
-    await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
     // Each viewport logs in again in the same world, and a guest name is unique (characters.name_key), so the name carries the viewport.
     await page.locator('#name').fill('DpsOwner' + viewport.width); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero, null, { timeout: 60000 }).catch(async error => {
@@ -100,7 +101,7 @@ const results = [];
     for (let i = 0; i < 8; i++) { await page.waitForTimeout(100); samples.push(await page.evaluate(() => JSON.parse(JSON.stringify(window.__meter)))); }
     check(frozen.active === false && samples.every(sample => totals(sample) === totals(frozen)), 'completed totals and DPS freeze');
     await page.locator('#dps-close').click(); check(await page.locator('#dps-meter').isHidden(), 'hide button works');
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero);
     check(await page.evaluate(() => Prefs.dpsMeter === false), 'hidden preference survives a reload');
     check(await page.locator('#dps-meter').isHidden(), 'meter stays hidden on reconnect');

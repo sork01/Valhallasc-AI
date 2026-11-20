@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Private browser flow: buy a horse from the real vendor, ride, fight, and resume ownership.
 const assert = require('node:assert/strict');
 const { chromium } = require('./lib/playwright.cjs');
@@ -12,7 +13,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-    await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
     await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Rider'); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero.id);
     assert.equal(await page.locator('#mount-toggle').isDisabled(), true, 'a new character cannot mount');
@@ -86,7 +87,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     const watcher = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     watcher.on('pageerror', e => errors.push(e.message));
     await watcher.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-    await watcher.goto(world.url); await watcher.locator('#start').click(); await watcher.locator('#login-guest').click();
+    await watcher.goto(world.url); await watcher.locator('#start').click(); await playGuest(watcher);
     await watcher.locator('#cls-warrior').click(); await watcher.locator('#name').fill('Watcher'); await watcher.locator('#go').click({ timeout: 60000 });
     await watcher.waitForFunction(() => Online.connected && Field.hero.id);
     const spot = await watcher.evaluate(() => ({ zone: Field.zone, x: Field.hero.x, y: Field.hero.y }));
@@ -99,7 +100,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await watcher.close();
     await page.evaluate(() => Online.stop());
     await world.waitFor(async () => (await (await fetch(world.url + 'health')).json()).online === 0, 10000, 'guest disconnect');
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero.mountOwned, null, { timeout: 60000 }).catch(async error => {
       console.error('Resume state', await page.evaluate(() => ({ scene: [...document.querySelectorAll('.scene')].filter(n => !n.hidden).map(n => n.id), connected: Online.connected, hasCharacter: !!valhalla.save?.char, level: Field.hero.level, mountOwned: Field.hero.mountOwned, status: document.getElementById('connection-text')?.textContent })));
       throw error;

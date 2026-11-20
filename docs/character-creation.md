@@ -33,3 +33,35 @@ Real artwork was also reviewed at both sizes, including the female Priest's
 front-left view without gear. Syntax, Swedish coverage, release notes and diff
 checks pass. Public hashes match all six changed client files. The existing
 server handles the equip action, so no rebuild or restart was needed.
+
+## Guest choice and progression warning (silent update, 2026-11-20)
+
+Selecting **Play as guest** first warns that access to guest progression depends
+on this browser. Clearing its data or losing access to it can make the character
+and progress inaccessible. The player can cancel or continue; an account is
+recommended for access across devices. Guest characters really are saved on the
+server, so the warning does not incorrectly describe their saves as local-only.
+English and hand-written Swedish text are supported.
+
+A fresh guest opens the job/body/appearance creator, even when an obsolete cached
+look exists without any saved guest key. Returning guests see all characters
+saved for this browser plus **New character**. Selecting a saved character uses
+its existing key; creating another job preserves every previous guest and its
+layouts. The picker does not refresh, change or delete a remembered account
+session. Account limits, levels, deletion and GM controls retain their own rules.
+
+`node tests/guest-character-choice.cjs` passes 44 non-browser checks of the real
+Account/Online scripts, game sign-in and creation handlers, saved storage, chosen
+join packets, warning text/cancel/Swedish, account isolation and reconnect helpers.
+`MUTATE=auto|warning|picker|refresh` each fails its intended assertion. Unrelated
+browser fixtures acknowledge only this exact warning; native dialogs remain
+available with `TEST_GUEST_WARNING=1`, and unrelated confirmations are untouched.
+41 reconnect fixtures (plus two direct-Playwright guest entry fixtures) now explicitly choose their saved current guest through
+`tests/lib/guest.cjs`; the account integration test asserts the returning picker.
+The new native-dialog/creation/reconnect suite is
+`tests/guest-character-choice-ui.cjs`. Browser suites await an approved test host
+under the existing production-host restriction. No browser run is claimed.
+
+This is client-only and needs no server build or restart. Version 1.2.0 and its
+release notes stay unchanged. The achievement server update remains staged at
+the owner's explicit request; releasing this client does not activate it.

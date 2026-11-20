@@ -92,15 +92,17 @@
   }
 
   function renderChars() {
-    const account = Online.account, list = $('chars-list');
-    if (!account) { handlers.show('login'); return; }
+    const guest = Online.mode === 'guest', account = guest ? null : Online.account, list = $('chars-list');
+    if (!guest && !account) { handlers.show('login'); return; }
     const entries = Online.characters, ordinary = entries.filter(c => !c.gm).length, hasGm = entries.some(c => c.gm);
-    $('chars-who').textContent = `${account.name}${account.kind === 'sso' ? ' (gunning.se)' : ''} · ${ordinary} of ${account.max} characters${hasGm ? ' + [GM]' : ''}`;
+    $('chars-who').textContent = guest ? 'Guest characters saved in this browser' : `${account.name}${account.kind === 'sso' ? ' (gunning.se)' : ''} · ${ordinary} of ${account.max} characters${hasGm ? ' + [GM]' : ''}`;
     list.replaceChildren(...entries.map(c => {
       const row = document.createElement('div'); row.className = c.gm ? 'char-row gm' : 'char-row';
       const play = document.createElement('button'); play.type = 'button'; play.className = 'btn ghost char-play';
-      play.textContent = `${c.look.name} · Lv ${c.level} ${c.look.class}`;
+      play.textContent = guest ? `${c.look.name} · ${c.look.class}` : `${c.look.name} · Lv ${c.level} ${c.look.class}`;
       play.addEventListener('click', () => { const look = Online.select(c.key); if (look) handlers.play(look); });
+      row.append(play);
+      if (guest) return row;
       const del = document.createElement('button'); del.type = 'button'; del.className = 'btn ghost char-del';
       del.textContent = 'Delete'; del.setAttribute('aria-label', 'Delete ' + c.look.name);
       let armed = 0;
@@ -118,17 +120,17 @@
         else say('chars-msg', `${c.look.name} was deleted.`, true);
         renderChars();
       });
-      row.append(play, del); return row;
+      row.append(del); return row;
     }));
     if (!entries.length) list.textContent = 'No characters yet. Create your first one.';
-    $('chars-new').disabled = ordinary >= account.max;
+    $('chars-new').disabled = !guest && ordinary >= account.max;
     // The administrator character is a sixth, separate slot that only the game master's login is offered.
-    $('chars-gm').hidden = !(account.gm && !hasGm);
+    $('chars-gm').hidden = guest || !(account.gm && !hasGm);
   }
   function enterChars() {
     say('chars-msg', ''); renderChars();
     // Fresh from the server: another window may have added or deleted characters.
-    Online.resume().then(data => { if (data?.ok) renderChars(); else if (!Online.account) { handlers.show('login'); } });
+    if (Online.mode === 'account') Online.resume().then(data => { if (data?.ok) renderChars(); else if (!Online.account) { handlers.show('login'); } });
     ($('chars-list').querySelector('.char-play') || $('chars-new')).focus({ preventScroll: true });
   }
 
@@ -138,7 +140,9 @@
       $('login-form').addEventListener('submit', event => { event.preventDefault(); credentials('login'); });
       $('login-register').addEventListener('click', () => credentials('register'));
       $('login-sso').addEventListener('click', sso);
-      $('login-guest').addEventListener('click', () => { if (!busy) handlers.guest(); });
+      $('login-guest').addEventListener('click', () => {
+        if (!busy && window.confirm((window.Locale?.translate || (s => s))("Guest progress is tied to this browser. Clearing browser data or losing this browser can make your character and progress inaccessible. Use an account to keep access across devices. Continue as guest?"))) handlers.guest();
+      });
       $('login-continue').addEventListener('click', () => { if (!busy) { handlers.account(); handlers.show('chars'); } });
       $('login-logout').addEventListener('click', async () => { if (busy) return; setBusy(true); await Online.logout(); setBusy(false); renderLogin(); say('login-msg', 'Logged out.', true); });
       $('login-back').addEventListener('click', () => handlers.show('splash'));

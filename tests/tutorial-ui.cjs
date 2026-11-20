@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Browser check for EARLY-LEVEL-TUTORIAL (desktop + touch + persistence + MUTATE=1 control).
 // Run via: bash scripts/test-touch-bounded.sh tests/tutorial-ui.cjs
 // MUTATE=1 serves a stub tutorial.js and must fail.
@@ -27,7 +28,7 @@ function requireMemoryLimit() {
 async function resumeAfterReload(page) {
   await page.reload();
   await page.locator('#start').click();
-  await page.locator('#login-guest').click();
+  await playGuest(page);
   if (await page.locator('#go').isVisible()) await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
   if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
@@ -53,7 +54,7 @@ async function setupPage(context, world, { lang = 'en', touch = false } = {}) {
   }
   await page.goto(world.url);
   await page.locator('#start').click();
-  await page.locator('#login-guest').click();
+  await playGuest(page);
   await page.locator('#cls-warrior').click();
   await page.locator('#name').fill(touch ? 'TutTouch' : 'TutDesk');
   await page.locator('#go').click({ timeout: 60000 });

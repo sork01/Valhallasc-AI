@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Private browser flow: talk to the real Alderhaven banker, deposit and withdraw by click, shift-click, the quantity box
 // and drag, move gold, buy an expansion, pick one gear copy, see a refusal, walk away, reload and find the same bank.
 const assert = require('node:assert/strict');
@@ -16,7 +17,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.addInitScript(seed('en'));
-    await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
     await page.locator('#cls-warrior').click(); await page.locator('#name').fill('Hoarder'); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero.id);
     // The weapon the hero starts with is worn, so two more copies of it are two loose copies beside one worn one.
@@ -158,7 +159,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     // Reload: the same bank, gold and expansion come back from the server's save.
     await page.evaluate(() => Online.stop());
     await world.waitFor(async () => (await (await fetch(world.url + 'health')).json()).online === 0, 10000, 'guest disconnect');
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero.id, null, { timeout: 60000 });
     await gotoBanker();
     await openBank();
@@ -203,7 +204,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     const sv = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     sv.on('pageerror', e => errors.push(e.message));
     await sv.addInitScript(seed('sv'));
-    await sv.goto(world.url); await sv.locator('#start').click(); await sv.locator('#login-guest').click();
+    await sv.goto(world.url); await sv.locator('#start').click(); await playGuest(sv);
     await sv.locator('#cls-warrior').click(); await sv.locator('#name').fill('Svensson'); await sv.locator('#go').click({ timeout: 60000 });
     await sv.waitForFunction(() => Online.connected && Field.hero.id);
     const svDebug = (ref, command) => sv.evaluate(([ref, command]) => Online.send({ type: 'debug', ref, command }), [ref, command]);
@@ -232,7 +233,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     const phone = await phoneContext.newPage();
     phone.on('pageerror', e => errors.push(e.message));
     await phone.addInitScript(seed('en'));
-    await phone.goto(world.url); await phone.locator('#start').click(); await phone.locator('#login-guest').click();
+    await phone.goto(world.url); await phone.locator('#start').click(); await playGuest(phone);
     await phone.locator('#cls-warrior').click(); await phone.locator('#name').fill('Phoney'); await phone.locator('#go').click({ timeout: 60000 });
     await phone.waitForFunction(() => Online.connected && Field.hero.id);
     const phoneDebug = (ref, command) => phone.evaluate(([ref, command]) => Online.send({ type: 'debug', ref, command }), [ref, command]);

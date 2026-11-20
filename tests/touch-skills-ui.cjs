@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 const { run, replace, safeSpot, record, touch } = require('./lib/touch.cjs');
 const suite = {
   name: 'touch-skills',
@@ -11,7 +12,7 @@ const suite = {
     await page.locator('#touch-skill-editor select[data-arc="0"]').selectOption('arcaneward');
     check(await page.evaluate(() => Prefs.touchSkills.mage[0] === 'arcaneward'), 'assignment is stored');
     await page.locator('#layout-done').click(); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click(); await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
+    await page.reload(); await page.locator('#start').click(); await playGuest(page); await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
     await page.waitForFunction(() => document.querySelector('#touch-skills [data-arc="0"]').dataset.skill === 'arcaneward');
     check(await page.evaluate(() => TouchControls.assignments()[0] === 'arcaneward'), 'assignment survives reload');
     check(await page.evaluate(() => !TouchControls.assign(0, 'cleave') && !TouchControls.assign(6, 'arcaneward')), 'invalid class and slot assignments are refused');

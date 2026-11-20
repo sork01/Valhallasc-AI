@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 if (process.env.CHECK_ONLY === 'atlas') {
   require('./organic-atlas-ui.cjs');
 } else {
@@ -37,7 +38,7 @@ const root = path.resolve(__dirname, '..');
       await page.route(`**/${file}*`, r => r.fulfill({ contentType: 'text/javascript', body: source }));
     }
     await page.goto(world.url);
-    await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.locator('#start').click(); await playGuest(page);
     await page.locator('#cls-warrior').click(); await page.locator('#name').fill('TravelCheck');
     await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
@@ -138,7 +139,7 @@ const root = path.resolve(__dirname, '..');
           window.__valhallaTestSprites=true; window.AudioContext=undefined; window.webkitAudioContext=undefined;
           localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null}));
         });
-        await touchPage.goto(world.url); await touchPage.locator('#start').click(); await touchPage.locator('#login-guest').click();
+        await touchPage.goto(world.url); await touchPage.locator('#start').click(); await playGuest(touchPage);
         await touchPage.locator('#cls-warrior').click(); await touchPage.locator('#name').fill('AtlasT' + width); await touchPage.locator('#go').click({timeout:60000});
         await touchPage.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000}).catch(async error => {
           const state = await touchPage.evaluate(() => ({ connected: Online.connected, hero: !!Field.hero, hp: Field.hero?.hp, cutscene: window.Cutscene?.active, intro: window.IntroScene?.active, game: !document.getElementById('scene-game')?.hidden, start: !document.getElementById('start')?.hidden, login: !document.getElementById('login-guest')?.hidden, name: document.getElementById('name')?.value, err: document.getElementById('login-error')?.textContent || '' }));

@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Focused private-world checks: tracker controls and optional directional guidance.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -29,7 +30,7 @@ const check = (ok, label) => { assert.ok(ok, label); console.log(`${++checks}: $
     window.AudioContext = undefined; window.webkitAudioContext = undefined;
     if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: touch ? 'sv' : 'en', sound: false, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} }));
   }, touch);
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('QuestArrow'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 15000 }).catch(async e => {
     console.error(await page.evaluate(() => ({ connected: Online.connected, hp: Field.hero?.hp, gameHidden: document.getElementById('scene-game').hidden, connection: document.getElementById('connection-text').textContent })));

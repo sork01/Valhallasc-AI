@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // UI-WHATS-NEW: real browser, private Rust world, no grinding or public guests.
 // MUTATE=1 removes the saved acknowledgement: the repeat-visit assertion must fail.
 process.env.TEST_WHATS_NEW = '1';
@@ -69,7 +70,7 @@ async function newPage() {
   check(await page.evaluate(storage => localStorage.getItem(storage), storage) === current, 'Seen version uses its own Valhallasc storage key');
 
   // Join a real private world, then use the actual Settings row.
-  await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Newsreader'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();

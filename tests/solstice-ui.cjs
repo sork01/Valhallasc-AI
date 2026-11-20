@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Focused Summer Solstice browser checks, private storage and actual rendered artwork.
 process.env.REAL_SPRITES='1';
 require('./lib/touch.cjs').requireMemoryLimit();
@@ -16,7 +17,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('SunGuest');await p.locator('#go').click({timeout:60000});
+ await p.goto(w.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill('SunGuest');await p.locator('#go').click({timeout:60000});
  const wait=(fn,arg)=>p.waitForFunction(fn,arg,{timeout:25000}),send=m=>p.evaluate(m=>Online.send(m),m),debug=command=>send({type:'debug',command});
  await wait(()=>Online.connected&&Field.hero.hp>0);
  const stand=async(z,x,y)=>{await p.evaluate(()=>{City.close();Quests.close();WorldMap.close();Field.clearInput();Online.send({type:'stop'});});await debug({op:'teleport',zone:z,x,y});await wait(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<1.3,[z,x,y]);await p.waitForTimeout(250);await p.evaluate(()=>ZoneJourney.clear());};
@@ -70,11 +71,11 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  check(await p.evaluate(()=>Seasonal.isActive('solstice')),'The whole fourth day after solstice remains active');
  await debug({op:'season_time',unix:1813960800});await wait(()=>!Seasonal.active&&__snap.solstice===null&&!__self().quests.some(q=>q.id==='solstice_hunt'&&!q.claimed));await stand(2,291,225);
  check(await p.evaluate(()=>Solstice.objects(2).length===0&&!City.npcs.some(n=>n.id==='solstice_pole')&&[0,4,9,17].every(z=>Seasonal.decor(z).length===0)),'Expiry removes the pole, encounter, unfinished quest and all city dressing');
- const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
+ const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await playGuest(p);if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
  check(await p.evaluate(id=>Online.id===id&&__self().mounts.includes('sunwoven')&&__self().seasonalRolls.solstice_hunt===20270617,id),'Reconnect preserves the same character, mount and consumed attempt');
  }
  // A Swedish landscape phone, with the normal quest window and translated summon button.
- await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem('valhallasc.save.v1'));s.lang='sv';localStorage.setItem('valhallasc.save.v1',JSON.stringify(s));});await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();await wait(()=>Online.connected);await p.setViewportSize({width:844,height:390});
+ await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem('valhallasc.save.v1'));s.lang='sv';localStorage.setItem('valhallasc.save.v1',JSON.stringify(s));});await p.reload();await p.locator('#start').click();await playGuest(p);await wait(()=>Online.connected);await p.setViewportSize({width:844,height:390});
  await debug({op:'season_time',unix:1813183200});await wait(()=>Seasonal.isActive('solstice'));await stand(2,291,225);await p.evaluate(()=>Field.visitNpc('solstice_pole'));
  check(await p.locator('[data-offer="solstice:summon"] .gossip-label').textContent()==='Framkalla den Björkkrönte väktaren','Swedish phone presents the translated summon action');
  check(await p.evaluate(()=>Locale.translate('Sunwoven Stag')==='Solvävd hjort'&&Locale.translate('Summer Solstice')==='Sommarsolståndet'),'Swedish presents the mount and season names');

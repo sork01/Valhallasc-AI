@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // The real artwork, loaded for real. Every other browser suite runs on the client's stub sprites (tests/lib/playwright.cjs)
 // to keep page loads fast, so this one checks what they skip: each class's layered atlases composite into real figures
 // that change with equipment, the enemy atlases load at their documented sizes, and the stub itself behaves.
@@ -31,7 +32,7 @@ async function enter(stub, cls, name) {
     localStorage.setItem('valhallasc.whats-new.v1', newsVersion);
   }, { stub, newsVersion });
   const page = await context.newPage(); page.errors = []; page.on('pageerror', e => page.errors.push(e.message));
-  await page.goto(url, { waitUntil: 'domcontentloaded' }); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(url, { waitUntil: 'domcontentloaded' }); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-' + cls).click(); await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 90000 });
   await page.waitForFunction(cls => Online.connected && !!valhalla[cls] && !!Field.cragSprites, cls, { timeout: 90000 });
   return page;

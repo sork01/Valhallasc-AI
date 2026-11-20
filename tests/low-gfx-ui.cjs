@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
 const { run, replace, safeSpot } = require('./lib/touch.cjs');
@@ -34,7 +35,7 @@ const suite = {
     // Needs a host that can paint above 30 fps at 2x: under the 1-CPU production cap headless paints only ~8 frames/s and MUTATE=1 cannot fail. On the cloud box (8 vCPU) normal mode paints 17-35 fps and MUTATE=1 reaches 53.
     check(low.fps <= 31.5 && normal.fps > 10, `paint rate is capped while input updates continue (${normal.fps.toFixed(1)} -> ${low.fps.toFixed(1)})`);
     check(await page.evaluate(() => document.documentElement.classList.contains('low-graphics')), 'Low graphics applies cosmetic rules');
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click(); await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
+    await page.reload(); await page.locator('#start').click(); await playGuest(page); await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
     check(await page.evaluate(() => Prefs.lowGraphics), 'setting survives reload');
     check(await page.locator('#low-gfx-suggestion').isHidden(), 'suggestion stays dismissed');
     await page.locator('#touch-actions [data-action="menu"]').click(); await page.locator('#p-settings').click();

@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Learned skills and the level-up spectacle in a real browser. A level-40 mage (VALHALLA_START_LEVEL is a test-server
 // switch) casts through the real bar; the level-up fixture is display-only: it feeds the client the event the server sends.
 const assert = require('node:assert/strict');
@@ -21,7 +22,7 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainl
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Archmage'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && Field.hero.level === 40 && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
   // A new hero stands on the Saltby pier, where a wall stops aimed casts ("A wall blocks your skill."): move to open ground.
@@ -150,7 +151,7 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainl
   await page.evaluate(() => Online.saveSkillSlots(['attack', 'starfall', 'twinbolt', null, null, null, null, null, null, null, null, null], 99));
   await page.evaluate(() => Online.stop());
   for (let n = 0; n < 100; n++) { if ((await (await fetch(world.url + 'health')).json()).online === 0) break; await new Promise(resolve => setTimeout(resolve, 100)); }
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && Field.hero.level === 99 && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
   check(await page.locator('#skillbar-slots button').evaluateAll(b => b.slice(0, 3).map(x => x.dataset.skill).join(',') === 'attack,starfall,twinbolt'), 'An existing high-level character keeps its saved skillbar order');
   check(await page.evaluate(() => Field.hero.passiveAttributes.intellect > 0), 'Earned passives are derived from the resumed level');
@@ -161,7 +162,7 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'chainl
   await page.waitForFunction(() => Field.hero.level === 20 && document.querySelector('#skillbar-slots [data-slot="2"]')?.dataset.skill === '');
   await page.evaluate(() => Online.stop());
   for (let n = 0; n < 100; n++) { if ((await (await fetch(world.url + 'health')).json()).online === 0) break; await new Promise(resolve => setTimeout(resolve, 100)); }
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && Field.hero.level === 20 && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
   check(await page.evaluate(() => Online.skillSlots?.[1] === 'starfall' && document.querySelector('#skillbar-slots [data-slot="2"]').dataset.skill === ''), 'A saved Starfall assignment survives a lower-level login while the skill is locked');
   await page.evaluate(() => Online.send({ type: 'debug', ref: 914, command: { op: 'set_level', level: 40 } }));

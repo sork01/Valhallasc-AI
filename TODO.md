@@ -8,6 +8,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `GUEST-CHARACTER-CHOICE` — **Implemented 2026-11-20, silent client update.** Play as guest warns that clearing browser data or losing browser access can lose access to progress; Cancel preserves sign-in state. Fresh guests choose job/appearance; returning guests choose a saved character or New character. Existing guest keys/layouts and account sessions are preserved. 44 focused non-browser checks and four caught mutations; native-dialog browser coverage added but not run under the host restriction. See `docs/character-creation.md`.
+
 - [x] `ACHIEVEMENTS-POST-LAUNCH` — **Implemented 2026-11-20 (`cc1c12fa`); owner chose Keep staged.** 34 achievements, +1,535 points and eight titles extend combat, quests, rebirths, mounts and fishing. Existing history counts; all 120 old entries preserved. Catalog 154 / 4,090 points / 20 titles. Client translations are released; the live server has not been restarted. Focused validation and restart handoff in `docs/achievements.md`. No version or release-note changes.
 
 - [x] `UNDERWATER-NO-MOUNT` — **Released 2026-11-20 as 1.2.0 (`1.2.0-9ca2ef55`).** Environment checks cover mounting, selection, movement, login and real crossings; ordinary mounts are land-only, the seahorse is underwater-only, and private dungeons retain their no-mount rule. Owner (2026-11-19): block ordinary mounts underwater in Rán’s Deep and Nacrehold. Follow-up: the seahorse from `FISH-SEAHORSE-MOUNT` is the only mount allowed underwater.

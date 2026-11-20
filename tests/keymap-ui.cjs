@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Key map (UI-KEYMAP) in a real browser. Rebind keys on the Keyboard screen (Settings), then play with them: the old key does nothing, the
 // new key works, hints and tooltips read the new key, a taken key is swapped, typing in chat triggers nothing, and everything is still
 // there after a reload. Client-only. MUTATE=1 serves a keymap.js whose labels ignore the player's choices, MUTATE=2 one whose handlers
@@ -38,7 +39,7 @@ async function hold(page, key, ms) {
     await route.fulfill({ body, contentType: 'text/javascript' });
   });
   await page.addInitScript(() => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); } });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Keyer'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
 

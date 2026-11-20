@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 const { run, replace, debug, safeSpot } = require('./lib/touch.cjs');
 const defaults = {
   warrior: ['cleave', 'battlecry', 'shieldwall', 'whirlwind'],
@@ -35,7 +36,7 @@ const suite = {
         });
         await debug(page, { op: 'set_level', level: 4 });
         await page.waitForFunction(() => Field.hero.level === 4);
-        await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+        await page.reload(); await page.locator('#start').click(); await playGuest(page);
         await page.waitForFunction(() => Online.connected && Field.hero?.level === 4);
         await page.evaluate(() => TouchControls.update());
         check(await page.locator('#touch-skills .touch-skill:visible').count() === 0, 'reloaded locked custom choices stay hidden');

@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -23,7 +24,7 @@ const check = (value, message) => { assert.ok(value, message); checks++; };
           window.AudioContext = undefined; window.webkitAudioContext = undefined;
           if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang, sound: false, char: null, draft: null }));
         }, lang);
-        await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+        await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
         await page.evaluate(() => {
           const draw = MageSprite.prototype.draw;
           MageSprite.prototype.draw = function(g, hero, ...args) {
@@ -72,7 +73,7 @@ const check = (value, message) => { assert.ok(value, message); checks++; };
         if (cls === 'priest') {
           await page.evaluate(item => Online.send({ type: 'equip', slots: { hands: item } }), starter.weapon);
           await page.waitForFunction(() => Field.hero.look.priestWeapon === 'mace');
-          await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+          await page.reload(); await page.locator('#start').click(); await playGuest(page);
           await page.waitForFunction(() => Online.connected && Field.hero?.look?.priestWeapon === 'mace');
           check(await page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('valhallasc.characters.v1:')).every(key => JSON.parse(localStorage.getItem(key)).characters.every(slot => !slot.initialEmptySlots))), 'confirmed creation choice is cleared and never reapplied on reconnect');
         }

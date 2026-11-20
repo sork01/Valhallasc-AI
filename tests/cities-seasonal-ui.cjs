@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Four owner-reported city/travel tasks. Private server; bounded through test-touch-bounded.sh.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 require('./lib/touch.cjs').requireMemoryLimit();
@@ -19,7 +20,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-warrior').click();await page.locator('#name').fill('Festival Check');await page.locator('#go').click({timeout:60000});
+ await page.goto(world.url);await page.locator('#start').click();await playGuest(page);await page.locator('#cls-warrior').click();await page.locator('#name').fill('Festival Check');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
  const send=m=>page.evaluate(m=>Online.send(m),m),debug=command=>send({type:'debug',command});
  const wait=(fn,arg)=>page.waitForFunction(fn,arg,{timeout:15000});
@@ -66,7 +67,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  await season(1825801200,false);
  check(await page.evaluate(()=>!__self().quests.some(q=>q.id==='halloween_alder'&&!q.claimed)&&Seasonal.decor(4).length===0), 'November 10: unfinished run retires and decorations disappear while playing');
  const resumedId=await page.evaluate(()=>Online.id);
- await page.reload();await page.locator('#start').click();await page.locator('#login-guest').click();if(await page.locator('#scene-create').isVisible())await page.locator('#go').click({timeout:60000});await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
+ await page.reload();await page.locator('#start').click();await playGuest(page);if(await page.locator('#scene-create').isVisible())await page.locator('#go').click({timeout:60000});await page.waitForFunction(()=>Online.connected&&Field.hero?.hp>0,null,{timeout:60000});
  check(await page.evaluate(id=>Online.id===id&&!Seasonal.active&&!Quests.offered('baker').some(q=>q.season)&&__self().seasonalClaims.halloween_skald===2026,resumedId), 'Reload/reconnect retains the same character, annual reward history and off-season state');
  }
  await season(1792969200,true);

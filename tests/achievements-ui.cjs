@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 const { run, replace, debug, safeSpot } = require('./lib/touch.cjs');
 const suite = {
   name: 'achievements',
@@ -84,7 +85,7 @@ const suite = {
     await other.waitForFunction(() => window.__nameplates.some(n => /^Pathfinder\d* The Explorer$/.test(n)), null, { timeout: 10000 });
     check(true,'a second browser sees the selected title on the world nameplate');
     await other.context().close();
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero.achievementTitle === 'The Explorer');
     await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
     await page.waitForFunction(() => document.querySelector('#achievement-total').textContent.includes('/ 4090'));
@@ -94,7 +95,7 @@ const suite = {
     check(/^Pathfinder\d*$/.test(await page.locator('#hud-name').textContent()), 'No title restores the plain name');
     await page.locator('#equipment-close').click();
     await page.evaluate(() => { const key='valhallasc.save.v1'; const s=JSON.parse(localStorage.getItem(key)); s.lang='sv'; localStorage.setItem(key,JSON.stringify(s)); });
-    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.reload(); await page.locator('#start').click(); await playGuest(page);
     await page.waitForFunction(() => Online.connected && Field.hero.id); await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
     await page.locator('#achievements-filter').selectOption('');
     await page.waitForSelector('[data-achievement="explorer"]');

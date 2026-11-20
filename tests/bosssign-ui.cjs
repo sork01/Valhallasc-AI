@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // The boss sign on the screen (BOSSMECH-SIGN-ENGINE), in a real browser against a real private server. The world loads a
 // one-boss table of its own (VALHALLA_BOSSMECH_FILE, honoured only with test commands) that gives the Undervault's king a
 // harmless break bar, so the test does not depend on the shipped numbers; a dungeon whose boss has no mechanic shows no sign.
@@ -46,7 +47,7 @@ async function call(name, args = {}) {
   await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false })); });
   const enter = async () => {
     await page.goto(world.url);
-    await page.locator('#start').click(); await page.locator('#login-guest').click();
+    await page.locator('#start').click(); await playGuest(page);
     await page.locator('#name').fill('Reader'); await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && !!Field.hero.x, null, { timeout: 60000 });
   };
@@ -145,7 +146,7 @@ async function call(name, args = {}) {
   // ---- 5. a reload reads it again; the text is the server's every time ---------------------------------------------------------
   await page.evaluate(() => Online.stop());
   for (let i = 0; i < 50 && (await (await fetch(world.url + 'health')).json()).online !== 0; i++) await new Promise(r => setTimeout(r, 200));   // the old connection is gone
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();   // the saved guest key signs the same hero in
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);   // the saved guest key signs the same hero in
   await page.waitForFunction(() => Online.connected && Field.hero.id, null, { timeout: 60000 });
   await goNear([0, 1.2], [1.2, 0], [-1.2, 0]);
   await page.keyboard.press('f');

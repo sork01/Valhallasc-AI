@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Private-world equip, vendor, movement and mobile equipment checks; no grinding.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('playwright');
@@ -11,7 +12,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results/cloaks'
   const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   const newsVersion=fs.readFileSync(path.join(root,'client/index.html'),'utf8').match(/class="version">([^<]+)</)[1];
   await page.addInitScript(version=>{localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null}));localStorage.setItem('valhallasc.whats-new.v1',version);},newsVersion);
-  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();await page.locator('#cls-mage').click();await page.locator('#gender-female').click();await page.locator('#name').fill('CloakCheck');await page.locator('#go').click({timeout:90000});
+  await page.goto(world.url);await page.locator('#start').click();await playGuest(page);await page.locator('#cls-mage').click();await page.locator('#gender-female').click();await page.locator('#name').fill('CloakCheck');await page.locator('#go').click({timeout:90000});
   // Inspect the portrait panel under the game's existing rotate-device curtain, only in this private test.
   await page.addStyleTag({content:'.rotate {display:none!important}'});
   await page.waitForFunction(()=>Online.connected&&Field.mageSprites&&Field.hero?.look.gender==='female',null,{timeout:90000});

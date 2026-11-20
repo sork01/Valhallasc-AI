@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // New TODOs only: real-protocol elite selection, HUD geometry, recorded/synth sound routing and saved settings.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -12,13 +13,13 @@ let browser, checks = 0;
 const check = (value, label) => { assert.ok(value, label); checks++; };
 const debug = (page, command) => page.evaluate(command => Online.send({ type: 'debug', command }), command);
 async function join(page, name) {
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
   if (await page.locator('#low-gfx-dismiss').isVisible()) await page.locator('#low-gfx-dismiss').click();
 }
 async function resume(page) {
-  await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0);
 }
 async function select(page, kind) {

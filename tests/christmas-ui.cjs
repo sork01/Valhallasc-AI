@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Christmas, permanent seasonal titles and the actual seasonal city render. Private world only.
 process.env.REAL_SPRITES='1';
 require('./lib/touch.cjs').requireMemoryLimit();
@@ -16,7 +17,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('Christmas Check');await p.locator('#go').click({timeout:60000});
+ await p.goto(w.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill('Christmas Check');await p.locator('#go').click({timeout:60000});
  const wait=(fn,arg)=>p.waitForFunction(fn,arg,{timeout:20000}),send=m=>p.evaluate(m=>Online.send(m),m),debug=command=>send({type:'debug',command});
  await wait(()=>Online.connected&&Field.hero.hp>0);
  const stand=async(z,x,y)=>{await p.evaluate(()=>{City.close();Quests.close();WorldMap.close();Achievements.close();Field.clearInput();Online.send({type:'stop'});});await debug({op:'teleport',zone:z,x,y});await wait(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<1.3,[z,x,y]);await p.waitForTimeout(250);await p.evaluate(()=>ZoneJourney.clear());};
@@ -79,7 +80,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  await stand(2,290.5,225);
  check(await p.evaluate(()=>Christmas.objects(2).length===0&&!City.npcs.some(n=>n.id==='christmas_tree')&&[0,4,9,17].every(z=>Seasonal.decor(z).length===0)),'December 29 removes the tree, encounter, unfinished quest and all Christmas dressing');
  check(await p.evaluate(()=>__self().mounts.includes('reindeer')&&document.querySelector('#hud-name').textContent==='Christmas Check the Merry'),'Owned mount and earned suffix survive the event’s end');
- const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
+ const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await playGuest(p);if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
  check(await p.evaluate(id=>Online.id===id&&__self().mounts.includes('reindeer')&&document.querySelector('#hud-name').textContent==='Christmas Check the Merry',id),'Reconnect preserves the same character, permanent mount and selected seasonal title');
  await debug({op:'season_time',unix:1792969200});await wait(()=>Seasonal.isActive('halloween'));
  for(const [qid,host]of[['halloween_alder','baker'],['halloween_skald','city_bard'],['halloween_nacre','nacre_gardener'],['halloween_aster','asterion_singer'],['halloween_hunt','baker']]){

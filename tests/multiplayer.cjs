@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 const { frameJson } = require('./lib/frames.cjs');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -53,7 +54,7 @@ async function makePlayer(type, name) {
       }
     }
   }));
-  await page.goto(url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-' + type).click(); await page.locator('#name').fill(name);
   await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(() => Online.connected && !!(Field.warriorSprites || Field.mageSprites || Field.assassinSprites), null, { timeout: 60000 });
@@ -277,7 +278,7 @@ async function stageAt(page, point) {
   check(mage.pickups.slice(pickupStart).some(event=>event.actor===mageId && event.value===beetleGold), 'Server awards the level-scaled beetle gold pickup to its killer; wanted '+beetleGold+' for '+mageId+', saw '+JSON.stringify(mage.pickups.slice(pickupStart)));
   const progress=await mage.evaluate(()=>({id:Online.id,gold:Field.hero.gold,kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level}));
   check(progress.kills>0&&progress.gold>0&&(progress.xp>0||progress.level>1),'Server rewards kills, XP, and pickups');
-  await mage.reload();await mage.locator('#start').click(); await mage.locator('#login-guest').click();
+  await mage.reload();await mage.locator('#start').click(); await playGuest(mage);
   await mage.waitForFunction(()=>Online.connected&&!!Field.mageSprites,null,{timeout:60000});
   check(await mage.evaluate(p=>Online.id===p.id&&Field.hero.gold===p.gold&&Field.hero.kills===p.kills,progress),'Character resumes after page reload');
   await city;

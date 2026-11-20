@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Rewards only, in a private world: actual equipment, tooltip, bar and persistence.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('./lib/playwright.cjs');
@@ -14,7 +15,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{if(!sessionStorage.getItem('raid-seeded')){sessionStorage.setItem('raid-seeded','1');localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false}));}});
- await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
+ await page.goto(world.url);await page.locator('#start').click();await playGuest(page);
  await page.locator('#name').fill('Forge Rewards');await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero,null,{timeout:60000});
  const debug=command=>page.evaluate(command=>Online.send({type:'debug',command}),command);
@@ -55,7 +56,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  check(await page.evaluate(old=>JSON.stringify(Online.skillSlots)===JSON.stringify(old),originalSlots),'Equip and unequip preserve all saved bar assignments');
  await page.keyboard.press('Escape');await page.evaluate(()=>Online.send({type:'equip',slots:{hands:'chainforged_warrior_weapon'}}));
  await page.waitForFunction(()=>Field.hero.signatureWeapon==='chainforged_warrior_weapon');
- await page.reload();await page.locator('#start').click();await page.locator('#login-guest').click();
+ await page.reload();await page.locator('#start').click();await playGuest(page);
  await page.waitForFunction(()=>Online.connected||!document.getElementById('scene-create').hidden,null,{timeout:60000});
  if(await page.locator('#scene-create').isVisible())await page.locator('#go').click({timeout:60000});
  await page.waitForFunction(()=>Online.connected&&Field.hero.signatureWeapon==='chainforged_warrior_weapon',null,{timeout:60000});

@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Male and female bodies for every class, through the real creation screen and a real server. Runs on the stub
 // sprites (tests/lib/playwright.cjs): this checks the choice, the saved look, which sprite class is loaded and what
 // other players see. What the female art looks like is checked on the real atlases by tests/sprites-real.cjs.
@@ -20,7 +21,7 @@ const open = async (url, errors) => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
   page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  await page.goto(url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(url); await page.locator('#start').click(); await playGuest(page);
   return page;
 };
 const pressed = (page, id) => page.locator(id).getAttribute('aria-pressed');
@@ -72,7 +73,7 @@ const pressed = (page, id) => page.locator(id).getAttribute('aria-pressed');
   check(await a.evaluate(() => { const p = Field.remotePlayers.find(p => p.look.name === 'Ulfar'); return p.look.gender === 'male' && p.sprite.constructor === MageSprite; }), 'Freya sees Ulfar as a male Mage');
   await b.close();
 
-  await a.reload(); await a.locator('#start').click(); await a.locator('#login-guest').click();
+  await a.reload(); await a.locator('#start').click(); await playGuest(a);
   await a.waitForFunction(() => Online.connected && !!Field.hunterSprites, null, { timeout: 60000 });
   check(await a.evaluate(() => Field.hero.look.gender === 'female' && Field.hunterSprites.constructor === HunterSprite.Female), 'After a reload she is still a female Hunter');
 

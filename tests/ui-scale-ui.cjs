@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // UI size and window resizing in a real browser: the Settings slider scales every HUD piece about the corner it is anchored to,
 // and each window has a corner grip that resizes just that window. Client-only; nothing here touches gameplay state.
 const assert = require('node:assert/strict');
@@ -26,7 +27,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   await page.addInitScript(() => {
     if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null, panelSizeSet: true, panelSize: {} })); }
   });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Sizer'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
 
@@ -142,7 +143,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   const trackerSized = await tracker();
   await page.evaluate(() => Settings.stopEdit(false));
   check(await page.locator('.panel-grip:visible').count() === 0, 'The panel grips go when Edit UI ends');
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && Field.hero.level > 0, null, { timeout: 60000 }).catch(() => {});
   if (await page.locator('#scene-create').isVisible()) await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });

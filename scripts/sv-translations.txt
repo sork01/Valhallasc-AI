@@ -14349,5 +14349,7 @@
   "The Daily Round": "Dagens runda",
   "Claim the Daily Creel quest at each of the 13 Fishers at least once.": "Hämta belöningen för Dagens fiskkorg hos var och en av de 13 fiskarna minst en gång.",
   "A Bond Beneath the Waves": "Ett band under vågorna",
-  "Complete A Friend Beneath the Tide in Rán's Deep.": "Slutför En vän under ytan i Rán's Deep."
+  "Complete A Friend Beneath the Tide in Rán's Deep.": "Slutför En vän under ytan i Rán's Deep.",
+  "Guest characters saved in this browser": "Gästkaraktärer sparade i den här webbläsaren",
+  "Guest progress is tied to this browser. Clearing browser data or losing this browser can make your character and progress inaccessible. Use an account to keep access across devices. Continue as guest?": "Gästframsteg är knutna till den här webbläsaren. Om du rensar webbläsarens data eller förlorar tillgången till den kan din karaktär och dina framsteg bli oåtkomliga. Använd ett konto för åtkomst från flera enheter. Fortsätta som gäst?"
 }

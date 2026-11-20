@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // Real controls and authoritative cooldowns; extra-item fixtures are display-only.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -19,7 +20,7 @@ async function call(name, args = {}) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('SkillMage'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
   await page.keyboard.press('e');
@@ -59,7 +60,7 @@ async function call(name, args = {}) {
   await page.locator('#bag-search').fill('robe');
   check(await page.locator('#inventory-list .inventory-item').count() === 1 && await page.locator('#equipment').isVisible(), 'Search filters bag contents without triggering letter hotkeys');
   await page.locator('#bag-search').fill('');
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
   await page.keyboard.press('e');
   check(await page.locator('#inventory-list [data-position="11"]').getAttribute('data-item') === 'mage_weapon_ash', 'Bag positions and unequipped gear survive reload');
@@ -122,7 +123,7 @@ async function call(name, args = {}) {
   check(await page.locator('#chat-input').inputValue() === '9ek', 'Skill and panel keys remain text while chatting');
   check(await page.locator('#equipment').isHidden() && await page.locator('#skills-panel').isHidden(), 'Chat typing opens no menus');
   await page.locator('#chat-input').press('Escape');
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && document.querySelector('#skillbar-slots [data-slot="9"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
   check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('data-skill') === '' && await page.locator('#skillbar-slots [data-slot="3"]').getAttribute('data-skill') === 'attack', 'Custom skill layout survives reload');
   await page.screenshot({ path: path.join(world.artifacts, 'skillbar-mage.png') });

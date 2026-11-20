@@ -1,3 +1,4 @@
+const { playGuest } = require('./lib/guest.cjs');
 // RAID-MUSIC only. Real private travel/audio; future Eldmarr snapshots are replayed
 // at the WebSocket boundary because RAID-BOSS-FINAL has not built the boss yet.
 const assert = require('node:assert/strict');
@@ -66,7 +67,7 @@ const call = async (name, args = {}) => {
   await page.addInitScript(() => {
     if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, musicVol: .45, sfxVol: 0 }));
   });
-  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(world.url); await page.locator('#start').click(); await playGuest(page);
   await page.locator('#name').fill('Forge Listener'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero && valhalla.fmusic?.running, null, { timeout: 60000 });
   const debug = command => page.evaluate(command => Online.send({ type: 'debug', command }), command);
@@ -132,7 +133,7 @@ const call = async (name, args = {}) => {
   await page.waitForFunction(() => valhalla.emberwakeNightMusic.running && !valhalla.raidMusic.running && !valhalla.eldmarrMusic.running);
   check(true, 'Leaving the raid restores the outdoor night music and stops both raid players');
   await page.evaluate(() => Prefs.set({ sound: true }));
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.reload(); await page.locator('#start').click(); await playGuest(page);
   await page.waitForFunction(() => Online.connected && Field.hero, null, { timeout: 60000 });
   await page.keyboard.press('Shift'); await travel(46, 35, 303); await selected(false);
   await page.waitForFunction(() => Math.abs(valhalla.raidMusic.output.gain.value - .09) < .002);

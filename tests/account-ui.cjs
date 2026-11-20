@@ -75,7 +75,10 @@ const stored = (page, prefix) => page.evaluate(p => Object.entries(localStorage)
       check(guestChars?.characters?.length === 1 && /^[0-9a-f]{64}$/.test(guestChars.characters[0].token), 'the guest key is in this browser');
       check(!(await stored(guest, 'valhallasc.account.v1:'))[0]?.session, 'no account session for a guest');
       const guestId = await guest.evaluate(() => Online.id);
-      await guest.reload(); await toLogin(guest); await guest.locator('#login-guest').click(); await connected(guest);
+      await guest.reload(); await toLogin(guest); await guest.locator('#login-guest').click();
+      check(await guest.locator('#scene-chars').isVisible(), 'returning guests choose a character before entering');
+      check(await guest.locator('.char-play').count() === 1 && await guest.locator('#chars-new').isEnabled(), 'guest picker offers the saved character and new character creation');
+      await guest.locator('.char-play').click(); await connected(guest);
       check(await guest.evaluate(() => Online.id) === guestId, 'a guest resumes the same server character after a reload');
 
       },
