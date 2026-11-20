@@ -47,7 +47,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   await npc(host);await interact(host,'quest:accept:'+qid);await wait(id=>__self().quests.some(q=>q.id===id&&!q.claimed),qid);await debug({op:'quest',id:qid,action:'complete'});await interact(host,'quest:claim:'+qid);await wait(id=>__self().seasonalClaims[id]===2027,qid);
  }
  await p.evaluate(()=>Achievements.open());await wait(()=>window.__ach?.entries);
- check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='lovefool').complete===false&&__ach.maximum===2555),'Four city errands alone do not grant Lovefool');
+ check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='lovefool').complete===false&&__ach.maximum===4090),'Four city errands alone do not grant Lovefool');
  if(process.env.CHECK_ONLY==='titles'){
   await npc('baker');await interact('baker','quest:accept:valentine_hunt');await wait(()=>__self().quests.some(q=>q.id==='valentine_hunt'&&!q.claimed));await debug({op:'quest',id:'valentine_hunt',action:'complete'});await interact('baker','quest:claim:valentine_hunt');await wait(()=>__self().seasonalClaims.valentine_hunt===20270210);
   await wait(()=>document.querySelector('#achievement-toast-name').textContent.includes('Lovefool'));check(true,'The normal achievement celebration receives the Lovefool award');

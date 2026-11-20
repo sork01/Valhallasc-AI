@@ -97,8 +97,8 @@ change. When expanding the atlas, add the new region achievement and update the
 Explorer threshold, translations, documented maximum and focused catalog checks
 together. See the table below for the current catalog.
 
-Fishing feature branch: **120 achievements / 2,555 points / 12 titles / 12 mounts**.
-The fishing additions are not live; the preceding catalog has 107 achievements, 2,325 points and 10 titles.
+Current catalog: **154 achievements / 4,090 points / 20 titles / 12 available mounts**.
+Fishing and the seahorse quest are live; the November 20 expansion is prepared as a silent update.
 The older seasonal candidate totals below describe their historical releases.
 
 | Achievement | Requirement | Points | Extra reward |
@@ -364,3 +364,75 @@ and hosted-count helpers, quest-drop doc indentation and the quest-journal
 single-element loop. No new lint diagnostics. Browser suites are not run on this
 production host; updated catalog/category/title browser assertions await an approved
 replacement host under FISH-CHECK. No world sync, version bump, release or restart.
+
+## Silent expansion (2026-11-20)
+
+34 new achievements add 1,535 points and eight suffix titles. All 120 existing
+entries and their rewards remain unchanged. No new save fields, gameplay stats,
+world generation, version label or release-note changes. Existing saved evidence
+reconciles at login and the ordinary achievement update; unverifiable history
+is never invented. Fisher circuits require a claimed quest at every distinct
+Fisher, across any days or lifetimes; repeats at one Fisher cannot replace another.
+The seahorse achievement requires the claimed quest, not mount inventory.
+The complete fish collection needs a positive catch record for all 57 species.
+
+| Achievement | Requirement | Points | Extra reward |
+| --- | --- | ---: | --- |
+| An Unbroken Watch | Defeat 2500 monsters. | 25 |  |
+| A Thousand Roads Made Safe | Defeat 5000 monsters. | 30 |  |
+| The Relentless Hunt | Defeat 10000 monsters. | 40 | The Relentless |
+| A Legend in Every Camp | Defeat 25000 monsters. | 50 |  |
+| Defender of the Realm | Defeat 50000 monsters. | 75 |  |
+| A Taste for Danger | Defeat 5 different dungeon or raid bosses. | 20 |  |
+| Ten Different Terrors | Defeat 10 different dungeon or raid bosses. | 25 |  |
+| No Stranger to the Depths | Defeat 25 different dungeon or raid bosses. | 35 |  |
+| Vanquisher of Legends | Defeat 50 different dungeon or raid bosses. | 50 | The Vanquisher |
+| Every Terror Remembered | Defeat 75 different dungeon or raid bosses. | 75 |  |
+| The Work Goes On | Complete 200 different quests. | 45 |  |
+| Tales from Every Road | Complete 300 different quests. | 50 |  |
+| Keeper of Five Hundred Stories | Complete 500 different quests. | 75 | The Storykeeper |
+| A World of Deeds | Complete 750 different quests. | 100 |  |
+| Ten Dawns Later | Be reborn 10 times. | 50 | The Everlasting |
+| Life Finds a Way | Be reborn 20 times. | 75 |  |
+| A Soul Without End | Be reborn 30 times. | 100 |  |
+| Room for One More | Own 8 different mounts. | 30 |  |
+| A Remarkable Menagerie | Own 10 different mounts. | 50 | The Collector |
+| A Dozen Companions | Own 12 different mounts. | 75 |  |
+| Learning the Waters | Catch 10 fish. | 5 |  |
+| A Well-Worn Hook | Catch 25 fish. | 5 |  |
+| Patience Pays | Catch 250 fish. | 15 |  |
+| A Full Season of Fishing | Catch 500 fish. | 20 |  |
+| The Long Cast | Catch 2500 fish. | 30 |  |
+| Master of the Tides | Catch 5000 fish. | 50 | The Tidemaster |
+| Legends on the Line | Catch 10 legendary fish. | 30 |  |
+| More Than a Fish Tale | Catch 50 legendary fish. | 50 |  |
+| Every Fish Has a Story | Catch all 57 different fish species. | 100 | The Complete Angler |
+| Fresh Fish Everywhere | Claim the Fresh Fish quest at each of the 13 Fishers. | 25 |  |
+| Finer Fish Everywhere | Claim the Finer Catch quest at each of the 13 Fishers. | 30 |  |
+| Friend of the Fishers | Claim the Trophy quest at each of the 13 Fishers. | 50 | Friend of the Fishers |
+| The Daily Round | Claim the Daily Creel quest at each of the 13 Fishers at least once. | 30 |  |
+| A Bond Beneath the Waves | Complete A Friend Beneath the Tide in Rán's Deep. | 20 |  |
+
+Validation: all 25 focused `achievements` Rust checks pass, including the six new
+post-launch tests. Six independent catalog faults are caught by
+`python3 tests/achievement-refresh-mutations.py`; its temporary instrumentation is
+removed before the clean release build. The original catalog fingerprint, exact
+threshold boundaries, all 57 possible missing species, every missing Fisher,
+claimed-versus-pending quests, new title validation and save/rebirth persistence
+are covered without grinding. The existing fishing fixtures now exclude species
+shared with the new complete collection, and their overflow scenario explicitly
+expects the new 10/50-legendary rewards; their former expectations were obsolete.
+All catalog maxima and category counts in affected Rust/seasonal/browser fixtures
+are updated together. Swedish coverage/freshness, 23 locale checks, scoped Rust
+formatting, JavaScript/Python syntax and the unchanged-version release gate pass.
+Browser suites are not run under the production-host restriction.
+Strict Clippy remains blocked only by documented baseline diagnostics: unused
+`mail_unread` and hosted-count helpers, quest-drop doc indentation and the
+quest-journal single-element loop. No diagnostic points to the new tests or data.
+The clean production release binary also passes 121 private WebSocket/catalog/
+Swedish checks in `tests/achievement-refresh-probe.cjs`: authoritative totals and
+categories, initially locked goals, a real new award notice, unearned-title
+refusal, the new title in a second player's snapshot, the claimed seahorse quest,
+and points/title persistence through reconnect and a full SQLite process restart.
+Every new name, description and title is checked through production `Locale.translate`.
+The release executable is 56,242,576 bytes and contains no mutation instrumentation.

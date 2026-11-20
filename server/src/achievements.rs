@@ -304,12 +304,12 @@ mod tests {
     }
     #[test]
     fn achievements_catalog_has_positive_points_and_correct_atlas_and_rewards() {
-        assert_eq!(catalog().len(), 120);
+        assert_eq!(catalog().len(), 154);
         assert_eq!(regions().len(), 23);
         assert_eq!(regions().iter().collect::<BTreeSet<_>>().len(), 23);
         let c = hero();
         let view = c.achievement_view();
-        assert_eq!(view["maximum"], 2555);
+        assert_eq!(view["maximum"], 4090);
         for a in catalog() {
             if a.metric == "fog" {
                 assert!(regions().contains(&a.zone.unwrap()));
@@ -318,7 +318,7 @@ mod tests {
                 assert_eq!(a.target, (regions().len() * FOG_GRID * FOG_GRID) as u32);
             }
         }
-        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 12);
+        assert_eq!(catalog().iter().filter(|a| !a.title.is_empty()).count(), 20);
         assert_eq!(catalog().iter().filter(|a| !a.mount.is_empty()).count(), 1);
     }
     #[test]
@@ -487,7 +487,7 @@ mod tests {
         assert_eq!(c.achievement_points(), 685);
         assert!(c.sync_achievements().is_empty());
         assert_eq!(c.achievement_points(), 685);
-        assert_eq!(c.achievement_view()["maximum"], 2555);
+        assert_eq!(c.achievement_view()["maximum"], 4090);
         assert_eq!(c.achievement_title(), "The Explorer");
         assert_eq!(c.mounts, ["gryphon"]);
     }
@@ -546,3 +546,7 @@ mod tests {
 #[cfg(test)]
 #[path = "fishing_achievement_tests.rs"]
 mod fishing_tests;
+
+#[cfg(test)]
+#[path = "achievement_refresh_tests.rs"]
+mod refresh_tests;
