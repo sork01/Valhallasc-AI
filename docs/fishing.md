@@ -2,6 +2,28 @@
 
 Owner request (2026-11-18): fishing with craftable rods, a bobber in the water you press for when a fish bites, animations, fish icons, rare drops, places to fish, and heat-resistant line upgrades for lava. Backlog chain: `FISH-*` in `TODO.md`.
 
+## Rod warning follow-up: 1.2.1 (2026-11-20)
+
+Released as `1.2.1-79d960ad`, source `79d960ad` pushed to main. The owner
+requested rod requirements only as red cast-refusal text, rather than a passive
+label whenever the hero faces nearby water. The existing authoritative refusal
+already names the rod/level; only the passive shoreline drawing was removed.
+Cast access, intentional water hover and rich-spot labels remain.
+
+The 99 progression client checks include quiet shorelines with no/Twig/Worldwire
+rod, cast submission and the actual nonfatal error handler/shared presenter.
+Eight in-memory mutations fail at the intended assertions, including restoring
+the passive hint and removing error forwarding. Existing controller (719),
+rich-spot (17), coast (10) and standard release gates pass. Browser suites were
+not run under the host restriction.
+
+All three changed public files match their released bytes; public health is ok.
+Game PID `1250668` and executable stayed unchanged. Receipt:
+`www/Valhalla/fishing-rod-error-release-receipt.json`; previous client
+`1.2.0-f8031984` retained for rollback. The separate fishing test service remains
+inactive; the achievement expansion remains staged. Shared main's unrelated
+female hat/hair changes were excluded and preserved.
+
 ## Release 1.1.0 (2026-11-19)
 
 The full feature is **live as 1.1.0**, released after the owner explicitly
