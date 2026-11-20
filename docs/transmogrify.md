@@ -35,7 +35,7 @@ Swedish is handwritten in `sv-translations.txt` and `sv-template-translations.tx
 - `node tests/transmog-protocol.cjs`: real two-player private controller, appearance/stat separation, Inspect/privacy, atomic rejection, upgrading and unequipping, reconnect and process restart, and free reverting with an empty purse.
 - `tests/transmog-ui.cjs`: private real-client desktop/phone flow, an unlocked level-95 appearance on a level-1 character after the original item is gone, combined fees, hidden headgear, stat preservation, real-item markers/tooltips and free reverts. `MUTATE=1` removes the fee calculation and must fail. Browser execution requires the owner's explicit exception to the production-host restriction and the unchanged bounded runner.
 
-This feature branch is staged work. Publishing requires coordinated client and executable deployment; the public game must only be restarted after fresh owner approval.
+Released as 1.3.0 on 2026-11-20 after the owner tested the separate manual server and explicitly requested closure, deployment and merge to main. Implementation `190fe88a` is merged and pushed to main. The exact deployed source is `be5596a4` on `release/transmogrify-1.3.0`; this release branch retains the existing 120-achievement catalog because the owner’s earlier decision to keep the 34-achievement expansion staged remains in force. Main retains that staged implementation.
 
 ### Verification record, 2026-11-20
 
@@ -48,3 +48,13 @@ Strict all-target Clippy still fails on pre-existing `mail_unread`/`hosted_npc_c
 The real private two-player probe passed 16 checks across 57 snapshots, including reconnect and a complete private process restart (`test-results/driver-66bQlr/transmog-protocol.json`). The owner explicitly approved this feature's bounded browser suite and its mutation on this host. All 23 real-art UI checks pass in desktop English and phone English/Swedish (`test-results/driver-2wczzS`): window bounds, all seven desktop selectors plus fee/Apply without scrolling, persistent phone preview, readable Swedish labels, actual item tooltips, fees and free revert. Browsers close between viewport/language runs. The complete Node/executable/Chromium tree retains the existing 1.5 GiB, no-swap, one-CPU and ten-minute limits; there is no permission implied for future suites.
 
 The browser fee mutation is injected into the current production module and fails at the combined-fee assertion. Final screenshots were visually reviewed. No public release, production database mutation or public restart was performed. The independent fishing test service was not started.
+
+## Live release and manual-test closure, 2026-11-20
+
+Client `1.3.0-be5596a4` and the matching production executable are live at https://gunning.se/Valhalla/. Executable SHA-256: `99a0f8c34090618f1536650591b5a1e8cd55b92aa6489dd0c632f1c63139b789`; verified PID `1963690`. The stop-to-ready interval was 8.878 seconds with nobody online. All 13 changed public files, bridge/public/legacy health, executable hashes, production flags, five saved characters, SQLite `quick_check` and journal pass. No zone or schema migration was needed. Prior client `1.2.1-79d960ad` is retained.
+
+The isolated release passed all 13 transmogrify Rust tests, the retained achievement catalog test, seven affected fishing-achievement tests, 105 production client checks, world preservation and normal Swedish/notes/syntax release gates. The actual release executable passed 17 private two-player checks across 63 snapshots, including apply/stat preservation, privacy, reconnect/process restart, free revert and the retained 120 / 2,555-point achievement catalog. No additional browser suite was run for deployment.
+
+Receipt: `/home/serveperry/webserver/www/Valhalla/transmog-release-receipt.json`. Executable and consistent running/stopped database backups, validation scripts and journal: `/media/raid/valhallasc-data/backups/transmog-release-20261120T203841Z/`. Main’s unrelated hat/hair work was preserved byte-for-byte and excluded.
+
+The manual `valhalla-transmog-test.service` is stopped and its separate Apache Include was removed. Its frozen client/executable, independent DB, five class characters with 21 dungeon sets each and private credentials remain under `/media/raid/valhallasc-data/transmogrify-test/`; preserve tester progress and restart only when requested. The independent fishing test service remains inactive. Public service restarts and future browser runs require their own authorization.
