@@ -436,3 +436,26 @@ refusal, the new title in a second player's snapshot, the claimed seahorse quest
 and points/title persistence through reconnect and a full SQLite process restart.
 Every new name, description and title is checked through production `Locale.translate`.
 The release executable is 56,242,576 bytes and contains no mutation instrumentation.
+
+
+### Staged deployment handoff (owner decision, 2026-11-20)
+
+Owner explicitly chose **Keep staged** after validation; do not infer permission
+for a later public restart. Implementation `cc1c12fa` is pushed to main. The client
+translation release `1.2.0-cc1c12fa` is public and its hash verified; the running
+public executable is still the previous release (PID 1250668 at verification).
+The new achievements become available only after an explicitly approved restart.
+Version remains 1.2.0 and release notes are unchanged.
+
+Clean implementation checkout: `/media/raid/valhallasc-data/achievement-refresh`.
+Executable and running-DB backup, candidate, verification logs and deployment state:
+`deploy/backups/achievement-refresh-20261120T063606Z/`. Its
+`valhalla-server.candidate` is 56,242,576 bytes, SHA-256
+`5f93ba8337d98c920334aadb6e0e3497f57a0c0e786a18e077c8a23f3e27f66b`.
+`candidate.json` records the source commit, public client hash and staging decision;
+`valhalla-server.prev` and `running.sqlite` preserve the previous executable and
+consistent live database. On a future approved install, take a fresh backup,
+stop, preserve the stopped database, install the exact verified candidate, start,
+and verify the running hash, public/bridge health, SQLite quick_check and journal.
+No migration is required. Keep the independent fishing test service inactive.
+The shared main checkout's pending female character art was excluded and preserved.
