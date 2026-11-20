@@ -8,9 +8,27 @@
   let stacks = [], look = null, gearSlots = {}, bags = [], gearInstances = [], setCounts = {}, signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
   const bagPages = () => { let start = 0; return [{ name: 'Backpack', size: 16 }, ...bags.map(id => ({ name: definition(id)?.name || 'Bag', size: definition(id)?.bagSlots || 0 }))].map(bag => { const page = { ...bag, start }; start += bag.size; return page; }); };
   const capacity = () => bagPages().reduce((sum, b) => sum + b.size, 0);
-  const definition = id => WORLD_ITEMS.find(i => i.id === id);
+  let defSource = null, defLength = -1, defIndex = new Map(), defOrder = new Map();
+  let quantities = new Map();
+  function indexDefinitions() {
+    const source = window.WORLD_ITEMS || [];
+    if (source === defSource && source.length === defLength) return;
+    defSource = source; defLength = source.length;
+    defIndex = new Map(); defOrder = new Map();
+    for (const item of source) {
+      // Match the old find() lookup if a fixture contains duplicate IDs.
+      if (!defIndex.has(item.id)) { defOrder.set(item.id, defIndex.size); defIndex.set(item.id, item); }
+    }
+  }
+  const definition = id => { indexDefinitions(); return defIndex.get(id); };
+  // Tutorial priority used catalog order; keep that order without scanning unowned items.
+  const ownedItemIds = () => {
+    indexDefinitions();
+    return [...quantities].filter(([, count]) => count > 0).map(([id]) => id)
+      .sort((a, b) => (defOrder.get(a) ?? Infinity) - (defOrder.get(b) ?? Infinity));
+  };
   const slotKind = slot => ({ chest: 'armor', hands: 'weapon', accessory1: 'accessory', accessory2: 'accessory' })[slot] || slot;
-  const quantity = id => stacks.find(s => s.item === id)?.quantity || 0;
+  const quantity = id => quantities.get(id) || 0;
   const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number((!i.class || i.class === look?.class) && ['armor', 'weapon'].includes(i.kind) && look?.[look.class + (i.kind === 'armor' ? 'Armor' : 'Weapon')] === i.variant);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
   const licence = i => i?.kind === 'mount_licence';
@@ -448,7 +466,7 @@
   }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(cellId(a)).kind.localeCompare(definition(cellId(b)).kind) || definition(cellId(a)).name.localeCompare(definition(cellId(b)).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
+  window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
     icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
@@ -457,6 +475,8 @@
     },
     update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}) {
       const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets, heroLevel()]); if (key === signature) return;
+      quantities = new Map();
+      for (const stack of next) if (!quantities.has(stack.item)) quantities.set(stack.item, stack.quantity);
       stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;
       renderSets(); renderGearWarning();
       reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change'));

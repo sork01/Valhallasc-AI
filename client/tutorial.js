@@ -191,14 +191,14 @@ window.Tutorial = (() => {
   }
 
   function compatibleWearableItems() {
-    const list = window.WORLD_ITEMS || [];
     const inv = window.Inventory;
     const h = hero;
     if (!inv || !h) return [];
     const cls = h.look?.class;
     const lvl = h.level || 1;
     const out = [];
-    for (const item of list) {
+    for (const id of inv.ownedItemIds()) {
+      const item = inv.definition(id);
       if (!item || item.starter) continue;
       const isGear = item.kind === 'armor' || item.kind === 'weapon' || item.kind === 'accessory' || !!item.slot;
       if (!isGear) continue;
@@ -211,11 +211,11 @@ window.Tutorial = (() => {
   }
 
   function bagConsumables() {
-    const list = window.WORLD_ITEMS || [];
     const inv = window.Inventory;
     if (!inv) return [];
     const out = [];
-    for (const item of list) {
+    for (const id of inv.ownedItemIds()) {
+      const item = inv.definition(id);
       if (!item || (item.kind !== 'food' && item.kind !== 'potion')) continue;
       const qty = inv.bagQuantity?.(item.id) || 0;
       if (qty > 0) out.push({ item, qty });
