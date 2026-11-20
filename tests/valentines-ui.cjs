@@ -1,4 +1,3 @@
-const { playGuest } = require('./lib/guest.cjs');
 // Valentines, permanent seasonal titles and the actual seasonal city render. Private world only.
 process.env.REAL_SPRITES='1';
 require('./lib/touch.cjs').requireMemoryLimit();
@@ -16,7 +15,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await p.goto(w.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill('Sork');await p.locator('#go').click({timeout:60000});
+ await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('Sork');await p.locator('#go').click({timeout:60000});
  const wait=(fn,arg)=>p.waitForFunction(fn,arg,{timeout:20000}),send=m=>p.evaluate(m=>Online.send(m),m),debug=command=>send({type:'debug',command});
  await wait(()=>Online.connected&&Field.hero.hp>0);
  const stand=async(z,x,y)=>{await p.evaluate(()=>{City.close();Quests.close();WorldMap.close();Achievements.close();Field.clearInput();Online.send({type:'stop'});});await debug({op:'teleport',zone:z,x,y});await wait(([z,x,y])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<1.3,[z,x,y]);await p.waitForTimeout(250);await p.evaluate(()=>ZoneJourney.clear());};
@@ -48,7 +47,7 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   await npc(host);await interact(host,'quest:accept:'+qid);await wait(id=>__self().quests.some(q=>q.id===id&&!q.claimed),qid);await debug({op:'quest',id:qid,action:'complete'});await interact(host,'quest:claim:'+qid);await wait(id=>__self().seasonalClaims[id]===2027,qid);
  }
  await p.evaluate(()=>Achievements.open());await wait(()=>window.__ach?.entries);
- check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='lovefool').complete===false&&__ach.maximum===4090),'Four city errands alone do not grant Lovefool');
+ check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='lovefool').complete===false&&__ach.maximum===2555),'Four city errands alone do not grant Lovefool');
  if(process.env.CHECK_ONLY==='titles'){
   await npc('baker');await interact('baker','quest:accept:valentine_hunt');await wait(()=>__self().quests.some(q=>q.id==='valentine_hunt'&&!q.claimed));await debug({op:'quest',id:'valentine_hunt',action:'complete'});await interact('baker','quest:claim:valentine_hunt');await wait(()=>__self().seasonalClaims.valentine_hunt===20270210);
   await wait(()=>document.querySelector('#achievement-toast-name').textContent.includes('Lovefool'));check(true,'The normal achievement celebration receives the Lovefool award');
@@ -84,12 +83,12 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
  await p.evaluate(()=>Achievements.open());await send({type:'achievements'});await wait(()=>__ach?.entries.find(a=>a.id==='lovefool')?.complete);
  check(await p.evaluate(()=>__ach.entries.find(a=>a.id==='lovefool').points===25&&__ach.entries.find(a=>a.id==='lovefool').titlePosition==='prefix'),'Lovefool has 25 points and authoritative prefix metadata');
  await p.setViewportSize({width:844,height:390});check(await p.locator('#achievement-title-select option[value="lovefool"]').textContent()==='Lovefool','Phone title selector offers the earned prefix');await p.setViewportSize({width:1440,height:960});
- const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await playGuest(p);if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
+ const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
  check(await p.evaluate(id=>Online.id===id&&__self().mounts.includes('roseheart')&&document.querySelector('#hud-name').textContent==='Lovefool Sork',id),'Reconnect preserves the same character, permanent mount and selected seasonal title');
  check(await p.evaluate(()=>Achievements.displayName({look:{name:'Sork'},achievementTitle:'the Merry'})==='Sork the Merry'&&Achievements.displayName({look:{name:'Sork'},achievementTitle:'Lovefool',achievementTitlePosition:'prefix'})==='Lovefool Sork'),'Existing suffix placement and exact single-space prefix rendering coexist');
  const other=await browser.newPage({viewport:{width:844,height:390},hasTouch:true});
  await other.addInitScript(()=>{window.AudioContext=undefined;window.__names=[];const fill=CanvasRenderingContext2D.prototype.fillText;CanvasRenderingContext2D.prototype.fillText=function(s,...a){if(String(s).includes('Sork'))window.__names.push(String(s));return fill.call(this,s,...a);};localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false}));});
- await other.goto(w.url);await other.locator('#start').click();await playGuest(other);await other.locator('#cls-warrior').click();await other.locator('#name').fill('RoseWitness');await other.locator('#go').click({timeout:60000});await other.waitForFunction(()=>Online.connected&&Field.hero.hp>0);
+ await other.goto(w.url);await other.locator('#start').click();await other.locator('#login-guest').click();await other.locator('#cls-warrior').click();await other.locator('#name').fill('RoseWitness');await other.locator('#go').click({timeout:60000});await other.waitForFunction(()=>Online.connected&&Field.hero.hp>0);
  await other.evaluate(()=>Online.send({type:'debug',command:{op:'teleport',zone:2,x:291,y:225}}));
  await other.waitForFunction(()=>window.__names.includes('Lovefool Sork'),null,{timeout:20000});check(true,'A second real browser paints Lovefool Sork on the remote world nameplate');await other.close();
  const sv=await browser.newPage();await sv.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sv.goto(w.url);

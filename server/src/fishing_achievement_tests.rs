@@ -22,9 +22,9 @@ fn fishing_achievements_catalog_covers_every_habitat_and_preserves_rewards() {
         .iter()
         .filter(|a| a.category == "Fishing")
         .collect();
-    assert_eq!(fishing.len(), 26);
-    assert_eq!(fishing.iter().map(|a| a.points).sum::<u32>(), 670);
-    assert_eq!(fishing.iter().filter(|a| !a.title.is_empty()).count(), 5);
+    assert_eq!(fishing.len(), 13);
+    assert_eq!(fishing.iter().map(|a| a.points).sum::<u32>(), 230);
+    assert_eq!(fishing.iter().filter(|a| !a.title.is_empty()).count(), 2);
     assert!(
         fishing
             .iter()
@@ -104,9 +104,7 @@ fn fishing_achievements_collections_require_each_positive_species_record() {
             .iter()
             .filter(|other| other.metric == "fish_set" && other.id != a.id)
         {
-            // Collections now overlap: the all-species goal includes every habitat.
-            // Seed only foreign species so this fixture keeps its required species missing.
-            for id in other.members.iter().filter(|id| !a.members.contains(id)) {
+            for id in &other.members {
                 caught(&mut c, id, 1, 1);
             }
         }
@@ -153,11 +151,6 @@ fn fishing_achievements_legendary_and_weight_require_catch_evidence() {
     assert_eq!(c.achievement_progress(weight), 20);
     c.fishing.legendary = 1u64 << 32;
     assert_eq!(c.achievement_progress(legendary), 1);
-    // A huge old log now legitimately earns the new 10/50-legendary milestones.
-    assert_eq!(
-        c.sync_achievements(),
-        ["fish_legendary_10", "fish_legendary_50"]
-    );
     assert!(c.sync_achievements().is_empty());
 }
 

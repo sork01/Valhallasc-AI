@@ -1,4 +1,3 @@
-const { playGuest } = require('./lib/guest.cjs');
 const { run, replace, debug, safeSpot } = require('./lib/touch.cjs');
 const suite = {
   name: 'achievements',
@@ -11,10 +10,10 @@ const suite = {
     await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
     await page.waitForSelector('.achievement-card');
     check(await page.locator('#character-tab-achievements').getAttribute('aria-selected') === 'true', 'the Character pane Achievements tab is selected');
-    check(await page.locator('.achievement-card').count() === 154, 'all 154 achievements shown');
+    check(await page.locator('.achievement-card').count() === 120, 'all 120 achievements shown');
     check(await page.locator('.achievement-group-heading').allTextContents().then(a => a.join(',') === 'Adventure,Combat,Quests,Exploration,Fishing'), 'all achievements are grouped under their catalog categories');
     check(await page.locator('#achievement-categories').evaluate(n => n.scrollWidth <= n.clientWidth + 1), 'category buttons fit cleanly without horizontal overflow');
-    for (const [category, count] of [['Adventure',23],['Combat',50],['Quests',23],['Exploration',32],['Fishing',26]]) {
+    for (const [category, count] of [['Adventure',17],['Combat',40],['Quests',18],['Exploration',32],['Fishing',13]]) {
       const button = page.locator(`#achievement-categories button[data-category="${category}"]`);
       await button.click();
       check(await button.getAttribute('aria-pressed') === 'true', `${category} selection is exposed to assistive technology`);
@@ -39,10 +38,10 @@ const suite = {
     }), 'gold corner artwork loads');
     await page.locator('#achievement-categories button[data-category=""]').click();
     check(await page.locator('[data-achievement^="dungeon_"]').count() === 21, 'all 20 dungeon goals and their overall achievement are shown');
-    for (const [id,title] of [['dungeon_master','The Delver'],['mounts_5','The Stablemaster'],['story_20','The Witness'],['fish_1000','the Angler'],['fish_log_lava','Lavacaster'],['kills_10000','The Relentless'],['bosses_50','The Vanquisher'],['quests_500','The Storykeeper'],['rebirth_10','The Everlasting'],['mounts_10','The Collector'],['fish_5000','The Tidemaster'],['fish_log_all','The Complete Angler'],['fisher_circuit_3','Friend of the Fishers']]) {
+    for (const [id,title] of [['dungeon_master','The Delver'],['mounts_5','The Stablemaster'],['story_20','The Witness'],['fish_1000','the Angler'],['fish_log_lava','Lavacaster']]) {
       check((await page.locator(`[data-achievement="${id}"]`).textContent()).includes(title), `${title} reward is visible before it is earned`);
     }
-    check(/\d+ \/ 4090/.test(await page.locator('#achievement-total').textContent()), 'earned / maximum uses the full 4090-point catalog');
+    check(/\d+ \/ 2555/.test(await page.locator('#achievement-total').textContent()), 'earned / maximum uses the full 2555-point catalog');
     check(await page.locator('#achievement-title-select option').count() === 1, 'no unearned titles selectable');
     await page.keyboard.press('k'); check(await page.locator('#skills-panel').isHidden(), 'game shortcuts do not open another window behind achievements');
     await page.locator('#equipment-close').focus(); await page.keyboard.press('Shift+Tab');
@@ -85,17 +84,17 @@ const suite = {
     await other.waitForFunction(() => window.__nameplates.some(n => /^Pathfinder\d* The Explorer$/.test(n)), null, { timeout: 10000 });
     check(true,'a second browser sees the selected title on the world nameplate');
     await other.context().close();
-    await page.reload(); await page.locator('#start').click(); await playGuest(page);
+    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.waitForFunction(() => Online.connected && Field.hero.achievementTitle === 'The Explorer');
     await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
-    await page.waitForFunction(() => document.querySelector('#achievement-total').textContent.includes('/ 4090'));
+    await page.waitForFunction(() => document.querySelector('#achievement-total').textContent.includes('/ 2555'));
     check(await page.locator('#achievement-total').textContent() === total, 'points and title survive reconnect with no duplicate awards');
     check(await page.locator('#achievement-title-select').inputValue() === 'explorer', 'title selection persists');
     await page.locator('#achievement-title-select').selectOption(''); await page.waitForFunction(() => !Field.hero.achievementTitle);
     check(/^Pathfinder\d*$/.test(await page.locator('#hud-name').textContent()), 'No title restores the plain name');
     await page.locator('#equipment-close').click();
     await page.evaluate(() => { const key='valhallasc.save.v1'; const s=JSON.parse(localStorage.getItem(key)); s.lang='sv'; localStorage.setItem(key,JSON.stringify(s)); });
-    await page.reload(); await page.locator('#start').click(); await playGuest(page);
+    await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.waitForFunction(() => Online.connected && Field.hero.id); await page.keyboard.press('e'); await page.locator('#character-tab-achievements').click();
     await page.locator('#achievements-filter').selectOption('');
     await page.waitForSelector('[data-achievement="explorer"]');
@@ -104,9 +103,6 @@ const suite = {
     check(await page.locator('[data-achievement="explorer"] h4').textContent() === 'Utforskaren', 'Swedish catalog achievement');
     check((await page.locator('[data-achievement="story_20"]').textContent()).includes('Vittnet') && (await page.locator('[data-achievement="mounts_5"]').textContent()).includes('Stallmästaren') && (await page.locator('[data-achievement="dungeon_master"]').textContent()).includes('Djupvandraren'), 'all three added title rewards have Swedish text');
     check((await page.locator('[data-achievement="fish_1000"]').textContent()).includes('Metaren') && (await page.locator('[data-achievement="fish_log_lava"]').textContent()).includes('Lavametaren'), 'both fishing title rewards have Swedish text');
-    for (const [id,title] of [['kills_10000','Den obeveklige'],['bosses_50','Besegraren'],['quests_500','Berättelseväktaren'],['rebirth_10','Den evige'],['mounts_10','Samlaren'],['fish_5000','Tidvattenmästaren'],['fish_log_all','Den fullärde metaren'],['fisher_circuit_3','Fiskarnas vän']]) {
-      check((await page.locator(`[data-achievement="${id}"]`).textContent()).includes(title), `${title} new title has Swedish text`);
-    }
     check(await page.locator('#achievement-title-select option[value="explorer"]').textContent() === 'Utforskaren', 'Swedish title selector');
     await page.locator('#achievement-title-select').selectOption('explorer');
     await page.waitForFunction(() => /^Pathfinder\d* Utforskaren$/.test(document.getElementById('hud-name').textContent));

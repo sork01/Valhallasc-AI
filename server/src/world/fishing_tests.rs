@@ -354,7 +354,7 @@ fn fishing_achievements_titles_survive_sqlite_reconnect_and_snapshot() {
         assert!(
             std::iter::from_fn(|| rx.try_recv().ok()).any(|m| m["type"] == "achievements"
                 && m["selected"] == id
-                && m["maximum"] == 4090)
+                && m["maximum"] == 2555)
         );
     }
     w.leave(2);
