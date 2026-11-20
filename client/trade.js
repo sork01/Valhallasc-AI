@@ -11,9 +11,10 @@
     const stack = character?.inventory?.find(s => s.item === id), i = catalog.get(id);
     if (!stack || !i || i.starter || i.rarity === 'gm') return 0;
     let worn = Object.values(character.equipment || {}).filter(x => x === id).length;
-    if (i.class === character.look.class && (i.kind === 'armor' || i.kind === 'weapon')) {
-      const slot = `${i.class}_${i.kind}`;
-      if (character.look[slot] === i.variant) worn++;
+    const look = character.equippedLook || character.look;
+    if ((!i.class || i.class === look.class) && (i.kind === 'armor' || i.kind === 'weapon')) {
+      const slot = look.class + (i.kind === 'armor' ? 'Armor' : 'Weapon');
+      if (look[slot] === i.variant) worn++;
     }
     return Math.max(0, stack.quantity - worn);
   };
@@ -146,7 +147,7 @@
   });
   window.Trade = { request, onPacket, onSnapshot(c) {
     character = c;
-    const key = JSON.stringify([c?.inventory, c?.equipment, c?.gold, c?.look, c?.gearInstances]);
+    const key = JSON.stringify([c?.inventory, c?.equipment, c?.gold, c?.equippedLook || c?.look, c?.gearInstances]);
     if (key !== characterKey) { characterKey = key; if (state?.state === 'open') render(); }
   }, reset() { close(); character = null; characterKey = ''; }, get state() { return state; } };
 })();

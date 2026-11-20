@@ -1,0 +1,23 @@
+.transmog-layout { display:grid; grid-template-columns:minmax(120px, 180px) minmax(0, 1fr); gap:12px; }
+.transmog-figure { position:sticky; top:0; align-self:start; }
+.transmog-figure canvas { width:100%; max-width:240px; height:auto; }
+.transmog-controls { min-width:0; }
+.transmog-controls h4 { margin-top:0; }
+.transmog-controls input { box-sizing:border-box; width:100%; margin:4px 0 8px; }
+#npc-inventory .transmog-slot { display:grid; grid-template-columns:max(110px, calc(96px / var(--window-k, 1))) minmax(0, 1fr); align-items:center; gap:5px; margin:6px 0; }
+.transmog-slot span { min-width:0; overflow-wrap:anywhere; }
+.transmog-slot select { width:100%; min-width:0; padding:5px; }
+.transmog-total { font-weight:bold; }
+[data-transmog] { position:relative; }
+[data-transmog]::after { content:'◆'; position:absolute; right:2px; bottom:1px; color:#f0adff; font-size:12px; line-height:1; text-shadow:0 1px 2px #130b22; pointer-events:none; }
+.transmog-note { color:#e4b7f2; }
+@media (pointer:coarse) {
+  .transmog-slot select, .transmog-controls button, .transmog-controls input { min-height:44px; }
+}
+@media (max-width:480px) {
+  .transmog-layout { grid-template-columns:minmax(0, 1fr); }
+  .transmog-figure { position:static; text-align:center; }
+  .transmog-figure canvas { width:135px; }
+}
+#stage #npc-dialogue.transmog-mode:not(.merchant-mode) { grid-template-rows:minmax(0, 1fr); grid-template-columns:minmax(0, 1fr); }
+#stage #npc-dialogue.transmog-mode:not(.merchant-mode) > .gossip-window { width:calc(min(680px, 96cqw) / var(--window-k, .8)); height:calc(var(--touch-stage-h, 90cqh) / var(--window-k, .8)); }

@@ -68,9 +68,9 @@ impl World {
         let attack = self.raid_attack_power(target_session);
         let hired = b.merc.is_some();
         let real = !hired && b.ambient.is_none();
-        json!({"type":"inspect","id":target,"ok":true,"name":c.look.name,"look":c.look,"level":c.level,
+        json!({"type":"inspect","id":target,"ok":true,"name":c.look.name,"look":c.appearance_look(),"level":c.level,
             "reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},
-            "hired":hired,"adventurer":b.ambient.is_some(),"slots":slots,
+            "hired":hired,"adventurer":b.ambient.is_some(),"slots":slots,"transmogs":c.active_transmogs(),
             "stats":{"hp":c.max_hp(),"resource":c.max_resource(),"resourceType":c.look.class.resource_type(),
                 "attack":attack,"defense":defense,"attributes":c.attributes,"gearAttributes":c.gear_attributes(),
                 "passiveAttributes":skills::passive_bonus(c.look.class, c.level),

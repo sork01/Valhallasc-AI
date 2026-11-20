@@ -1167,6 +1167,7 @@ impl Character {
         if item(id).is_none() || quantity == 0 {
             return;
         }
+        self.unlock_appearance(id);
         if let Some(stack) = self.inventory.iter_mut().find(|s| s.item == id) {
             stack.quantity = stack.quantity.saturating_add(quantity);
         } else {
@@ -1549,6 +1550,7 @@ impl Character {
     /// piece of the character's own class shows its class art; a class-independent piece (class null in items.txt) shows
     /// the shared art named by its variant. Anything else worn there only adds stats.
     pub fn sync_look(&mut self) {
+        self.collect_owned_appearances();
         let worn = |slot: &str| {
             self.equipment
                 .get(slot)
@@ -1591,6 +1593,7 @@ impl Character {
         if self.overfills(&next) {
             return Err("Your bags are full. Make room before unequipping gear.");
         }
+        next.collect_owned_appearances();
         next.preserve_vitals_after_equipping(self);
         *self = next;
         Ok(())
@@ -1652,6 +1655,7 @@ impl Character {
         if self.overfills(&next) {
             return Err("Your bags are full. Make room before unequipping gear.");
         }
+        next.collect_owned_appearances();
         next.preserve_vitals_after_equipping(self);
         *self = next;
         Ok(())

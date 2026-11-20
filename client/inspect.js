@@ -31,6 +31,8 @@
     const t = tip(), rarity = piece.rarity || 'common';
     t.replaceChildren(node('b', piece.name, 'item-name'), node('small', `${tr(RARITY[rarity] || 'Common')} · ${piece.class ? piece.class : tr('All classes')}`));
     t.dataset.rarity = rarity;
+    const appearance = window.Transmog?.description(answer?.transmogs?.[piece.slot]);
+    if (appearance) t.append(node('p', appearance, 'transmog-note'));
     t.append(node('p', stats(piece) || tr('No bonuses')));
     if (piece.xpPercent) t.append(node('p', tr('+100% XP while equipped')), node('p', tr('Stats grow with your level')), node('p', tr('Never loses durability')));
     t.append(node('small', `${tr('Requires level')} ${piece.level}${piece.rank ? ` · ${tr('Rank')} ${piece.rank}` : ''}${piece.usable ? '' : ` · ${tr('Cannot be used yet')}`}`));
@@ -74,6 +76,7 @@
       card.dataset.slot = slot; card.dataset.rarity = piece?.rarity || 'common'; card.dataset.empty = String(!piece);
       const glyph = node('button', null, 'gear-icon'); glyph.type = 'button';
       glyph.innerHTML = window.Inventory ? Inventory.icon(piece ? catalog(piece.item) : null, KIND[slot] || slot) : '';
+      window.Transmog?.mark(glyph, piece && answer?.transmogs?.[slot]);
       glyph.setAttribute('aria-label', `${tr(label)}: ${piece ? `${piece.name}, ${tr(RARITY[piece.rarity] || 'Common')}, ${stats(piece)}` : tr('Empty')}`);
       if (piece) {
         glyph.addEventListener('pointerenter', () => showTip(glyph, piece)); glyph.addEventListener('focus', () => showTip(glyph, piece));

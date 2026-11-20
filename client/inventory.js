@@ -5,6 +5,7 @@
   const $ = id => document.getElementById(id);
   const dragType = 'application/x-valhallasc-item';
   const slots = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['cloak', 'Cloak'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
+  let transmogs = {};
   let stacks = [], look = null, gearSlots = {}, bags = [], gearInstances = [], setCounts = {}, signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
   const bagPages = () => { let start = 0; return [{ name: 'Backpack', size: 16 }, ...bags.map(id => ({ name: definition(id)?.name || 'Bag', size: definition(id)?.bagSlots || 0 }))].map(bag => { const page = { ...bag, start }; start += bag.size; return page; }); };
   const capacity = () => bagPages().reduce((sum, b) => sum + b.size, 0);
@@ -78,6 +79,7 @@
   const tooLow = i => !!i && levelOf(i) > heroLevel();   // gear above the hero's level cannot be put on (the server refuses it too)
   const levelNote = i => tooLow(i) ? `Requires level ${levelOf(i)} (you are level ${heroLevel()})` : `Requires level ${levelOf(i)}`;
   const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? WORLD_ITEMS.find(i => i.kind === slotKind(slot) && (i.class === look?.class || i.source === 'orange_pool') && look?.[look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === i.variant) : definition(gearSlots[slot]);
+  const appearanceForItem = i => Object.entries(transmogs).find(([slot]) => itemAtSlot(slot)?.id === i?.id)?.[1];
   const copiesOf = i => gearInstances.filter(g => g.item === i?.id);
   // A material no merchant pays for is a quest item: it can be neither sold nor traded.
   const questItem = i => i.kind === 'material' && i.sell === 0;
@@ -203,6 +205,8 @@
     if (!i) return;
     const copy = where ? where.copies[0] : cellCopy || displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : cellCopy?.rarity || displayRarity(i, slot);
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
+    const appearance = window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
+    if (appearance) t.append(node('p', appearance, 'transmog-note'));
     if (i.kind === 'rod') t.append(...rodDetails(i).map(text => node('p', text)));
     else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
@@ -373,7 +377,7 @@
         cell.dataset.condition = broken ? 'broken' : 'new';
         const b = button('', () => { selected = key; renderDetails(); for (const n of container.querySelectorAll('.item-tile')) n.setAttribute('aria-pressed', String(n.closest('.bag-cell').dataset.key === selected)); }, 'item-tile');
         b.setAttribute('aria-label', summary(i, count, cellCopy)); b.setAttribute('aria-pressed', String(selected === key));
-        b.innerHTML = icon(i, undefined, gear ? cellCopy : looseCopies(i.id).find(g => conditionState(g) === 'broken')); if (!gear) b.append(node('span', String(count), 'item-stack'));
+        b.innerHTML = icon(i, undefined, gear ? cellCopy : looseCopies(i.id).find(g => conditionState(g) === 'broken')); window.Transmog?.mark(b, gear && appearanceForItem(i)); if (!gear) b.append(node('span', String(count), 'item-stack'));
         if (consumable(i)) b.append(node('span', '', 'item-cooldown'));
         b.append(node('b', i.name, 'sr-only'), node('small', summary(i, count, cellCopy), 'sr-only'));
         b.addEventListener('contextmenu', event => { event.preventDefault(); selected = key; activate(i, key); renderDetails(); });
@@ -440,7 +444,7 @@
       const worn = i && wornCopy(slot, i);
       card.dataset.condition = conditionState(worn); card.style.setProperty('--dur', String(durabilityOf(worn)));
       card.querySelector('b').textContent = i?.name || 'Empty slot';
-      const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind, worn); glyph.draggable = !!i;
+      const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind, worn); window.Transmog?.mark(glyph, i && transmogs[slot]); glyph.draggable = !!i;
       const equippedCopy = i && wornCopy(slot, i);
       glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}${equippedCopy ? `, ${rarityName(equippedCopy)} copy #${equippedCopy.id}, ${stats(copyStats(equippedCopy))}${conditionState(equippedCopy) !== 'new' ? `, ${conditionText(equippedCopy)}` : ''}` : ''}. Right-click to unequip.`);
       const select = card.querySelector('select'), owned = WORLD_ITEMS.filter(item => item.kind === kind && compatible(item) && quantity(item.id) > 0);
@@ -471,12 +475,13 @@
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
       if (!look) return;
-      this.update(next, look, nextSlots, nextBags, nextInstances, setCounts);
+      this.update(next, look, nextSlots, nextBags, nextInstances, setCounts, transmogs);
     },
-    update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}) {
-      const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets, heroLevel()]); if (key === signature) return;
+    update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}, nextTransmogs = {}) {
+      const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets, nextTransmogs, heroLevel()]); if (key === signature) return;
       quantities = new Map();
       for (const stack of next) if (!quantities.has(stack.item)) quantities.set(stack.item, stack.quantity);
+      transmogs = nextTransmogs;
       stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;
       renderSets(); renderGearWarning();
       reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change'));

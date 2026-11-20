@@ -1733,7 +1733,7 @@
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
     window.Achievements?.update(own);
-    window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
+    window.Inventory?.update(own.inventory || [], own.equippedLook || own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {}, own.transmogs || {});
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || [], own.abandonedQuests || []);
     if(seasonChanged)window.City?.refresh();

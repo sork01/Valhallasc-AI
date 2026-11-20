@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.3.0",
+    "date": "2026-11-20",
+    "new": [
+      "Transmog Masters in Skaldholm, Nacrehold, Asterion and Veyrroot Heartwood let you change your equipment appearances for a small fee.",
+      "Equipment you acquire joins your permanent wardrobe. Your current equipment and bank are included when you first log in.",
+      "Preview multiple changes together, hide headgear, shoulders or cloaks, and return to your real appearance for free. Chosen looks stay with their equipment slots through upgrades."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.2.1",
     "date": "2026-11-20",
     "new": [],

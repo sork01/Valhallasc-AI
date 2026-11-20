@@ -525,6 +525,7 @@
     // One parchment column (owner references questgiver.webp / npc_dialogue1.png, 2026-11-13): the greeting with quests and services as rows, or one
     // quest's page with Accept and Decline under it. The two-pane journal frame is the journal's alone again.
     const gossip=view.kind==='gossip',classic=false;
+    $('npc-dialogue').classList.toggle('transmog-mode',view.kind==='transmog');
     const shell=$('npc-dialogue').querySelector('.gossip-window');
     if(shell){
       shell.classList.toggle('quest-panel',classic);$('npc-dialogue').classList.toggle('quest-conversation',classic);shell.classList.toggle('quest-view',!!quest);delete shell.dataset.questPane;
@@ -549,7 +550,7 @@
     if(!['merchant','sell'].includes(view.kind))$('npc-notice').textContent=packet.notice;
     $('npc-gold').innerHTML=`${Locale.translate('Your purse:')} ${Money.html(packet.gold)}`;
     $('npc-gold').hidden=!!quest;
-    $('npc-back').hidden=!['merchant','sell','merge','refine','repair','stat_reset','fisher'].includes(view.kind);
+    $('npc-back').hidden=!['merchant','sell','merge','refine','repair','stat_reset','fisher','transmog'].includes(view.kind);
     $('npc-back').textContent=view.kind==='merchant'?'Quests / services':'Back';
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
@@ -558,7 +559,7 @@
     if(view.kind==='gossip'){
       $('npc-quests').replaceChildren();
     }
-    else if(['merchant','sell','merge','refine','repair','stat_reset','fisher'].includes(view.kind))$('npc-quests').replaceChildren();
+    else if(['merchant','sell','merge','refine','repair','stat_reset','fisher','transmog'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
       if(packet.travel?.length){
@@ -600,6 +601,10 @@
           b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:'spirit_resurrect'}))b.disabled=true;});
           offers.push(b);continue;
         }
+        if(offer.id==='transmogrify') {
+          const b=row('coin','Transmogrify');b.dataset.view='transmog';
+          b.addEventListener('click',()=>show({kind:'transmog'},'#npc-back'));offers.push(b);continue;
+        }
         if(offer.id==='stat_reset') {
           const b=row('coin','Reset trained attributes',{money:packet.statResetPrice||0});
           b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;
@@ -624,10 +629,12 @@
       confirm.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:'stat_reset'}))confirm.disabled=true;});offers.push(confirm);
     }
     $('npc-offers').replaceChildren(...offers);
+    if(view.kind!=='transmog')window.Transmog?.close();
     if(view.kind!=='fisher')window.FisherWorkshop?.close();
     $('npc-inventory').replaceChildren();
     if(view.kind==='merchant'||view.kind==='sell')window.Shop?.render(npc,$('npc-inventory'),packet);
     else { window.Shop?.close(); $('npc-inventory').className=''; }
+    if(view.kind==='transmog')window.Transmog?.render(npc,packet,$('npc-inventory'));
     if(view.kind==='fisher')window.FisherWorkshop?.render(npc,packet,$('npc-inventory'));
     if(view.kind==='merge'||view.kind==='refine'||view.kind==='repair')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
     if(nav)nav.scrollTop=paneScroll.list;if(paper)paper.scrollTop=paneScroll.detail;
@@ -669,13 +676,13 @@
     if(accepting)view={kind:'quest',id:accepting};
     else if(!same){view={kind:'gossip'};paneScroll.list=0;paneScroll.detail=0;questPane('list');}
     else if(view.kind==='quest'&&window.Quests?.offered(current.id).some(q=>q.id===view.id)){}
-    else if(!['merchant','sell','merge','refine','repair','stat_reset','fisher'].includes(view.kind))view={kind:'gossip'};
+    else if(!['merchant','sell','merge','refine','repair','stat_reset','fisher','transmog'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
-    window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
+    window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || [], {}, packet.transmogs || {});
     if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }
-  function close(resume=true) {window.FisherWorkshop?.close();clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
+  function close(resume=true) {window.Transmog?.close();window.FisherWorkshop?.close();clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
   for(const b of $('npc-dialogue').querySelectorAll('.quest-mobile-tabs button'))b.addEventListener('click',()=>questPane(b.dataset.questPane));
   $('npc-x').addEventListener('click',()=>close());
   $('npc-quest-close')?.addEventListener('click',()=>close());

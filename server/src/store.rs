@@ -245,6 +245,7 @@ impl Store {
             seasonal_rolls: Default::default(),
             inventory: vec![],
             equipment: Default::default(),
+            wardrobe: Default::default(),
             gear_instances: vec![],
             next_gear_id: 1,
             bags: vec![],
@@ -595,6 +596,7 @@ fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
     character.grant_missing_starters();
     character.grant_missing_gm_gear();
     character.sync_look();
+    character.migrate_wardrobe();
     character.normalize_mounts();
     character.migrate_tutorial();
     character.clamp_level();
@@ -1078,4 +1080,22 @@ mod unique_name_tests {
         assert!(players[1].get("tutorialDisabled").is_none());
         assert!(players[1].get("landing").is_none());
     }
+    #[test]
+    fn transmog_store_load_migrates_legacy_equipment_and_bank_and_persists_collection() {
+        let mut store = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (mut c, token) = store.create_character(None, Look::default(), Point { x: 0., y: 0. }, false).unwrap();
+        let piece = crate::items::ITEMS.iter().find(|i| i.kind == "headgear" && i.required_level == 50 && i.class == Some(Class::Warrior)).unwrap();
+        c.bank.items.push(crate::items::ItemStack { item: piece.id.clone(), quantity: 1 });
+        let mut value = serde_json::to_value(&c).unwrap();
+        value.as_object_mut().unwrap().remove("wardrobe");
+        store.conn().execute("UPDATE characters SET state=?1 WHERE id=?2", params![value.to_string(), c.id]).unwrap();
+        let mut loaded = store.load(&token).unwrap().unwrap();
+        assert!(loaded.wardrobe.migrated);
+        assert!(loaded.wardrobe.unlocked.contains(&piece.id));
+        assert!(loaded.worn_slots().iter().all(|(_, i)| loaded.wardrobe.unlocked.contains(&i.id)));
+        loaded.bank.items.clear();
+        store.save_many([&loaded].into_iter()).unwrap();
+        assert!(store.load(&token).unwrap().unwrap().wardrobe.unlocked.contains(&piece.id));
+    }
+
 }

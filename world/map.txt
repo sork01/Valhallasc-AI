@@ -321065,6 +321065,29 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "city_transmog",
+          "name": "Transmog Master",
+          "role": "Equipment appearances",
+          "x": 30.5,
+          "y": 170.3,
+          "color": "#8a6a52",
+          "look": {
+            "skin": "#d9a47e",
+            "hair": "#3a2a22",
+            "style": "bun",
+            "apron": "#6a5040"
+          },
+          "dialogue": "Every piece you have owned leaves a memory. Choose a new appearance for your equipment slots. Changing or hiding a look costs a little money; returning to your real gear is free.",
+          "offers": [
+            {
+              "id": "transmogrify",
+              "label": "Transmogrify",
+              "cost": 0
+            }
+          ],
+          "buys": false
         }
       ],
       "quests": [
@@ -545457,6 +545480,31 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "nacre_transmog",
+          "name": "Transmog Master",
+          "role": "Equipment appearances",
+          "x": 118.0,
+          "y": 142.0,
+          "color": "#eccb89",
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#eccb89",
+            "skin": "#a4dbc9",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "Every piece you have owned leaves a memory. Choose a new appearance for your equipment slots. Changing or hiding a look costs a little money; returning to your real gear is free.",
+          "offers": [
+            {
+              "id": "transmogrify",
+              "label": "Transmogrify",
+              "cost": 0
+            }
+          ],
+          "buys": false
         }
       ],
       "places": [
@@ -818580,6 +818628,32 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "asterion_transmog",
+          "name": "Transmog Master",
+          "role": "Equipment appearances",
+          "x": 112.0,
+          "y": 78.0,
+          "color": "#bd93a7",
+          "look": {
+            "skin": "#745c4e",
+            "hair": "#c79055",
+            "style": "bald",
+            "apron": "#533f56",
+            "beard": "#c79055",
+            "scale": 1,
+            "prop": "hammer"
+          },
+          "dialogue": "Every piece you have owned leaves a memory. Choose a new appearance for your equipment slots. Changing or hiding a look costs a little money; returning to your real gear is free.",
+          "offers": [
+            {
+              "id": "transmogrify",
+              "label": "Transmogrify",
+              "cost": 0
+            }
+          ],
+          "buys": false
         }
       ],
       "quests": [
@@ -1141790,6 +1141864,30 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "hw_transmog",
+          "name": "Transmog Master",
+          "role": "Equipment appearances",
+          "x": 132.0,
+          "y": 176.5,
+          "color": "#e4f7ae",
+          "look": {
+            "skin": "#8a6248",
+            "hair": "#2a2a32",
+            "style": "short",
+            "hat": "hood",
+            "hatColor": "#a8864a"
+          },
+          "dialogue": "Every piece you have owned leaves a memory. Choose a new appearance for your equipment slots. Changing or hiding a look costs a little money; returning to your real gear is free.",
+          "offers": [
+            {
+              "id": "transmogrify",
+              "label": "Transmogrify",
+              "cost": 0
+            }
+          ],
+          "buys": false
         }
       ],
       "places": [

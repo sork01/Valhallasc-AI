@@ -400,6 +400,7 @@ fn move_items(
             .quantity(&s.item)
             .checked_add(s.quantity)
             .ok_or("Item stack is too large.")?;
+        receiver.unlock_appearance(&s.item);
         if let Some(stack) = receiver.inventory.iter_mut().find(|x| x.item == s.item) {
             stack.quantity = received;
         } else {
@@ -437,6 +438,24 @@ mod tests {
             item: id.into(),
             quantity,
         }]
+    }
+    #[test]
+    fn transmog_trade_unlocks_appearance_for_recipient_and_keeps_givers_memory() {
+        let mut giver = Character::mercenary(Class::Warrior, 20, "Giver");
+        let mut receiver = Character::mercenary(Class::Warrior, 20, "Receiver");
+        let id = "warrior_weapon_sword_l5_gray";
+        giver.add_item(id, 1);
+        giver.materialize_gear_instances();
+        giver.gear_instances.iter_mut().find(|g| g.item == id).unwrap()
+            .open_trade_window(vec!["receiver".into()], NOW);
+        assert!(!receiver.wardrobe.unlocked.contains(id));
+        move_items(&mut giver, &mut receiver, &Offer { items: items(id, 1), gold: 0, ready: false }, "receiver", NOW).unwrap();
+        assert!(giver.wardrobe.unlocked.contains(id));
+        assert!(receiver.wardrobe.unlocked.contains(id));
+        assert_eq!(giver.quantity(id), 0);
+        assert_eq!(receiver.quantity(id), 1);
+        receiver.consume_item(id, 1);
+        assert!(receiver.wardrobe.unlocked.contains(id));
     }
     #[test]
     fn no_golden_piece_can_be_offered_in_a_trade() {

@@ -9258,6 +9258,53 @@
       },
       "color": "#74d7d0"
     },
+    "city_transmog": {
+      "art": "smith",
+      "identity": {
+        "skin": "#d9a47e",
+        "hair": "#3a2a22",
+        "style": "bun",
+        "apron": "#6a5040"
+      },
+      "color": "#8a6a52"
+    },
+    "nacre_transmog": {
+      "art": "special_nacre_smith",
+      "identity": {
+        "species": "merfolk",
+        "female": false,
+        "tail": "#eccb89",
+        "skin": "#a4dbc9",
+        "hair": "#ebdbbd",
+        "style": "short"
+      },
+      "color": "#eccb89"
+    },
+    "asterion_transmog": {
+      "art": "special_asterion_smith",
+      "identity": {
+        "skin": "#745c4e",
+        "hair": "#c79055",
+        "style": "bald",
+        "apron": "#533f56",
+        "beard": "#c79055",
+        "scale": 1,
+        "prop": "hammer"
+      },
+      "color": "#bd93a7"
+    },
+    "hw_transmog": {
+      "art": "named_hw_smith",
+      "identity": {
+        "skin": "#8a6248",
+        "hair": "#2a2a32",
+        "style": "short",
+        "hat": "hood",
+        "hatColor": "#a8864a",
+        "species": "treefolk"
+      },
+      "color": "#e4f7ae"
+    },
     "fisher_meadow_0": {
       "art": "fisher_rod",
       "identity": {

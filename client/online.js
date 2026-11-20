@@ -217,7 +217,7 @@
             if (Date.now() - busySince < 90000) { waitingForRelease = true; ws.close(); break; }
           }
           if(packet.code==='name'){$('name-change-form').hidden=false;$('connection-overlay').classList?.add('show-panel');$('new-character-name').focus();}
-          log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text); window.Rebirth?.onError(packet.text);
+          log(packet.text); window.Transmog?.error(); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text); window.Rebirth?.onError(packet.text);
           if (packet.code === 'auth') { acct.session = null; accountList = []; persistAccount(); }
           if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, packet.text !== 'This character is already online in another window.'); status('Unable to enter world', false); ws.close(); }
           break;

@@ -9,7 +9,9 @@ const plan = read('docs/npc-named-plan.txt');
 const baseline = JSON.parse(execFileSync('git', ['show', 'c0b93e8e:client/assets/npc.txt'], { cwd: root }));
 const people = [world, ...world.zones].flatMap(z => z.npcs || []).filter(n => !['stone','scenery','mailbox','spirit_guide'].includes(n.art) && !/meeting stone/i.test(n.name));
 const fishers=people.filter(n=>n.id.startsWith('fisher_'));
-assert.equal(people.length-fishers.length, 588);
+// Four new Transmog Masters reuse the local smiths' existing player-style sprites.
+assert.equal(people.length-fishers.length, 592);
+assert.equal(people.filter(n=>n.id.endsWith('_transmog')).length,4);
 assert.equal(fishers.length,13);
 for(const n of fishers)assert.equal(old.npcs[n.id].art,'fisher_rod');
 assert.deepEqual(Object.keys(old.npcs).sort(), people.map(n => n.id).sort(), 'Every actual person, and no scenery, is assigned');

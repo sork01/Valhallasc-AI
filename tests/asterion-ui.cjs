@@ -31,7 +31,7 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.waitForFunction(()=>valhalla.hmusic?.loaded&&valhalla.hmusic.running,null,{timeout:15000,polling:100});
   check(await page.evaluate(()=>valhalla.hmusic.duration>68&&valhalla.hmusic.duration<69),'The dybase2 Asterion score decodes and plays in the city');
   await page.screenshot({path:path.join(world.artifacts,'asterion-arrival.png')});
-  check(await page.evaluate(()=>Field.zoneTheme==='asterion'&&City.npcs.length===24),'Asterion is rendered with its town population (31 entries less six seasonal dances not active and the spirit guide, alive)');
+  check(await page.evaluate(()=>Field.zoneTheme==='asterion'&&City.npcs.length===25&&City.npcs.some(n=>n.id==='asterion_transmog')),'Asterion includes its Transmog Master (32 entries less six inactive seasonal dances and the spirit guide, alive)');
   await stage(17,90,99);
   await page.screenshot({path:path.join(world.artifacts,'asterion-astrolabe.png')});
   const moving=await page.evaluate(()=>City.npcs.filter(n=>n.route).map(n=>[n.id,n.x,n.y]));

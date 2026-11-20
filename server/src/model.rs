@@ -375,6 +375,9 @@ pub struct Character {
     pub inventory: Vec<crate::items::ItemStack>,
     #[serde(default)]
     pub equipment: std::collections::BTreeMap<String, String>,
+    /// Permanent wardrobe and slot overrides; defaults preserve old saves.
+    #[serde(default)]
+    pub wardrobe: crate::transmog::Wardrobe,
     /// Per-copy gear data is materialized when an item service is used. Legacy stacks remain valid.
     #[serde(default)]
     pub gear_instances: Vec<crate::items::GearInstance>,
@@ -699,6 +702,7 @@ impl Character {
             seasonal_rolls: Default::default(),
             inventory: vec![],
             equipment: Default::default(),
+            wardrobe: Default::default(),
             gear_instances: vec![],
             next_gear_id: 1,
             bags: vec![],
@@ -1447,6 +1451,10 @@ pub fn quest_progress(character: &mut Character, quests: &[Quest], kind: &str, t
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ClientMessage {
+    Transmogrify {
+        npc: String,
+        changes: std::collections::BTreeMap<String, String>,
+    },
     Fish {},
     ShopPresence { open: bool },
     Join {

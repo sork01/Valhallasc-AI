@@ -481,5 +481,6 @@
   "This water requires {0} (level {1}).": "Detta vatten kräver {0} (nivå {1}).",
   "Current rod: {0}": "Nuvarande spö: {0}",
   "Next upgrade: {0}": "Nästa uppgradering: {0}",
-  "{0}% shorter waits · +{1}% rare catch bonus": "{0}% kortare väntetid · +{1}% bonus för sällsynta fångster"
+  "{0}% shorter waits · +{1}% rare catch bonus": "{0}% kortare väntetid · +{1}% bonus för sällsynta fångster",
+  "Transmogrified to: {0}": "Transmogrifierad till: {0:t}"
 }
