@@ -65,3 +65,12 @@ under the existing production-host restriction. No browser run is claimed.
 This is client-only and needs no server build or restart. Version 1.2.0 and its
 release notes stay unchanged. The achievement server update remains staged at
 the owner's explicit request; releasing this client does not activate it.
+
+
+Deployment: source `437d61b5` is pushed to main and silently released as
+`1.2.0-437d61b5`, then retained in latest client `1.2.0-f8031984`. All three
+changed public files (account, game, Swedish) matched the clean release checkout;
+public health passed and server PID/executable `1250668` stayed unchanged.
+Receipt: `www/Valhalla/guest-choice-release-receipt.json`. Previous client
+`1.2.0-cc1c12fa` remains available for rollback. No public guest was created.
+Wiki: `10_projects:valhallasc_guest_character_choice_20261120`.

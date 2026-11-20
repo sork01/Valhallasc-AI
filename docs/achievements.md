@@ -97,8 +97,10 @@ change. When expanding the atlas, add the new region achievement and update the
 Explorer threshold, translations, documented maximum and focused catalog checks
 together. See the table below for the current catalog.
 
-Current catalog: **154 achievements / 4,090 points / 20 titles / 12 available mounts**.
-Fishing and the seahorse quest are live; the November 20 expansion is prepared as a silent update.
+Prepared catalog: **154 achievements / 4,090 points / 20 titles / 12 available mounts**.
+The live catalog remains **120 achievements / 2,555 points / 12 titles**. Fishing
+and the seahorse quest are live; the November 20 expansion remains staged at the
+owner's explicit request.
 The older seasonal candidate totals below describe their historical releases.
 
 | Achievement | Requirement | Points | Extra reward |
@@ -441,8 +443,10 @@ The release executable is 56,242,576 bytes and contains no mutation instrumentat
 ### Staged deployment handoff (owner decision, 2026-11-20)
 
 Owner explicitly chose **Keep staged** after validation; do not infer permission
-for a later public restart. Implementation `cc1c12fa` is pushed to main. The client
-translation release `1.2.0-cc1c12fa` is public and its hash verified; the running
+for a later public restart. Implementation `cc1c12fa` is pushed to main. The initial client
+translation release `1.2.0-cc1c12fa` was verified; the later guest/performance
+client `1.2.0-f8031984` includes those translations without activating the
+achievements. The running
 public executable is still the previous release (PID 1250668 at verification).
 The new achievements become available only after an explicitly approved restart.
 Version remains 1.2.0 and release notes are unchanged.

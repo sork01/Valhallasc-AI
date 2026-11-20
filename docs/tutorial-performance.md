@@ -56,3 +56,17 @@ verification must be done on the actual device. No browser run is claimed.
 
 No world data, server binary, save schema, label or release-note change. Release
 the client only; the achievement binary remains staged at the owner's request.
+
+
+## Verified silent deployment
+
+Source `f8031984` is pushed to main; current public client is
+`1.2.0-f8031984` (previous `1.2.0-437d61b5` retained for rollback). Both changed
+public scripts match the clean checkout, health passes, and the original server
+PID `1250668` / executable SHA-256
+`30434f870d44a5b4ca4eaef669533a9b61b58e4cedaeeee4449479a2da72f7a5`
+remain unchanged. No public guest was created. Receipt:
+`www/Valhalla/tutorial-performance-release-receipt.json`.
+The original report and verification artifacts are preserved in
+`deploy/backups/tutorial-inventory-perf-20261120T072740Z/`.
+Wiki: `10_projects:valhallasc_tutorial_performance_20261120`.
