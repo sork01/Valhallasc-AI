@@ -254,11 +254,6 @@
       }
       return;
     }
-    if (shoreHint && !own?.fishing) {
-      const h = window.Field?.hero || own, [x,y] = project(h.x,h.y);
-      g.save(); g.font = 'bold 13px sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#10212b'; g.fillStyle = '#fff1a5';
-      g.strokeText(requirement(own.zone || 0), x, y + 49); g.fillText(requirement(own.zone || 0), x, y + 49); g.restore();
-    }
     if (cast && !cast.landed && time - cast.at >= 500) { cast.landed = true; sound('plop'); if (cast.lava) sound('lava'); }
     for (const [id, line] of lines) {
       const actor = id === own?.id ? window.Field?.hero || line.actor : line.actor;

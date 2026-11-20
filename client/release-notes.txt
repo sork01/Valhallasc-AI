@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.2.1",
+    "date": "2026-11-20",
+    "new": [],
+    "changed": [
+      "Fishing rod requirements appear as red error text after an unsuccessful cast instead of appearing whenever you face nearby water."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.2.0",
     "date": "2026-11-19",
     "new": [

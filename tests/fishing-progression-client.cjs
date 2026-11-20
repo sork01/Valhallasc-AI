@@ -2,18 +2,20 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),{spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..'),mode=process.env.FISH_PROGRESSION_MUTATION;
 if(process.argv.includes('--mutations')){
- for(const [name,message] of Object.entries({requirements:'Yearwheel names Worldwire',hover:'ordinary water hover names the required rod',food:'food description shows bonus strength',upgrade:'workshop explains replacement',ladder:'collection contains the complete upgrade ladder',buff:'food bonus chip shows the dish name'})){
+ for(const [name,message] of Object.entries({shore:'facing water does not draw a passive rod requirement',castError:'cast refusal appears in the red error stack',requirements:'Yearwheel names Worldwire',hover:'ordinary water hover names the required rod',food:'food description shows bonus strength',upgrade:'workshop explains replacement',ladder:'collection contains the complete upgrade ladder',buff:'food bonus chip shows the dish name'})){
   const p=spawnSync(process.execPath,[__filename],{env:{...process.env,FISH_PROGRESSION_MUTATION:name},encoding:'utf8'});
   assert(p.status!==0&&(p.stderr+p.stdout).includes(message),`${name}: ${p.stdout}${p.stderr}`);console.log('Caught fishing progression UI mutation:',name);
  }process.exit(0);
 }
 const read=fs.readFileSync.bind(fs),controlled={...fs,readFileSync(file,...args){let s=read(file,...args);if(typeof s==='string'){
  if(String(file).endsWith('/client/fishing.js')){
+  if(mode==='shore')s=s.replace('if (cast && !cast.landed', "if (shoreHint && !own?.fishing) g.fillText(requirement(own.zone || 0), 0, 0);\n    if (cast && !cast.landed");
   if(mode==='requirements')s=s.replace("i.fishing?.zones?.includes(zone)",'false');
   if(mode==='hover')s=s.replace('function waterAt(mx, my, project) {','function waterAt(mx, my, project) { return false;');
   if(mode==='ladder')s=s.replace('ladder.append(row);','');
  }
  if(String(file).endsWith('/client/game.js')&&mode==='buff')s=s.replace("b.id.replace(/^meal:/, '')",'b.id');
+ if(String(file).endsWith('/client/online.js')&&mode==='castError')s=s.replace('if (!packet.fatal) window.Field?.error(packet.text);','');
  if(String(file).endsWith('/client/inventory.js')&&mode==='food')s=s.replace("const b = i?.foodBonus; if (!b) return '';","return ''; const b = i?.foodBonus; if (!b) return '';");
  if(String(file).endsWith('/client/fisher-workshop.js')&&mode==='upgrade')s=s.replace("if(item.kind==='rod')for",'if(false)for');
 }return s;}};
@@ -28,7 +30,29 @@ check(fish.requirement(28).includes('Worldwire Rod'),'Yearwheel names Worldwire'
 for(const [zone,name] of [[0,'Twig Rod'],[1,'Platinum Rod'],[6,'Willow Rod'],[19,'Silverline Rod'],[20,'Reedglass Rod'],[22,'Reedglass Rod'],[25,'Silverline Rod'],[26,'Starcatch Rod'],[45,'Tempered Platinum Rod']])check(fish.requirement(zone).includes(name),`required rod in zone ${zone}`);
 check(fish.requirement(2,true).includes('Willow Rod')&&fish.requirement(2).includes('Twig Rod'),'rich cold water names its higher requirement');
 const small={objects:[{kind:'water',x:5,y:5,r:2}]};f.sync({...hero,x:2,y:5},[],small);f.ops.length=0;f.draw();
-check(f.ops.some(o=>o[0]==='fillText'&&o[1].includes('Requires Twig Rod')),'no-rod touch player sees a requirement beside the shore');
+// The former passive shoreline requirement was deliberately removed: cast errors own this feedback.
+for(const inventory of [[],[{item:'rod_twig_rod',quantity:1}],[{item:'rod_worldwire_rod',quantity:1}]]){
+ f.sync({...hero,x:2,y:5,inventory},[],small);f.ops.length=0;f.draw();
+ check(!f.ops.some(o=>['fillText','strokeText'].includes(o[0])&&o[1].startsWith('Requires ')),'facing water does not draw a passive rod requirement');
+ check(fish.available(),'shore Cast control remains available regardless of carried rod');
+}
+check(f.errors.length===0,'standing near water does not announce a rod error');
+f.sync({...hero,x:2,y:5},[],small);
+check(fish.press()&&f.sent.at(-1).type==='fish','shore cast reaches authoritative rod validation');
+// Exercise the actual nonfatal error handler and shared error presenter without a browser/socket.
+{
+ const feedback=getFixture('fishing-client.cjs','const f=fixture(),','\nreturn fixture();'),c=feedback.ctx;
+ c.Field.hero=hero;c.setTimeout=()=>0;
+ for(const name of ['announce.js','worldfeedback.js'])vm.runInContext(read(path.join(root,'client',name),'utf8'),c);
+ c.Field.error=text=>c.WorldFeedback.error(text);c.log=()=>{};
+ const online=controlled.readFileSync(path.join(root,'client/online.js'),'utf8');
+ const handler=online.slice(online.indexOf("        case 'error':"),online.indexOf('\n      }',online.indexOf("        case 'error':")));
+ c.packet={type:'error',text:'This water requires Worldwire Rod (level 80).'};
+ vm.runInContext('switch(packet.type){'+handler+'}',c);
+ const lines=feedback.el('error-messages').children;
+ check(lines.length===1&&lines[0].dataset.kind==='error'&&lines[0].textContent===c.packet.text,'cast refusal appears in the red error stack');
+ check(feedback.el('announce').children.length===0,'cast refusal stays out of ordinary announcements');
+}
 el('fieldcv').events.pointermove({pointerType:'mouse',clientX:50,clientY:50});f.draw();
 let tooltip=ctx.document.body.children.find(n=>n.id==='rich-fishing-tooltip');
 check(tooltip&&!tooltip.hidden&&tooltip.textContent.includes('Ordinary fishing water')&&tooltip.textContent.includes('Twig Rod'),'ordinary water hover names the required rod');
