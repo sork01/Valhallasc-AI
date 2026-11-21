@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="money.css">
 <link rel="stylesheet" href="transmog.css">
 <link rel="stylesheet" href="enchanting.css">
+<link rel="stylesheet" href="blacksmithing.css">
 <link rel="stylesheet" href="activity.css">
 <link rel="stylesheet" href="achievements.css">
 <link rel="stylesheet" href="rested.css">
@@ -45,7 +46,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">1.4.0</p>
+    <p class="version">1.5.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -581,6 +582,7 @@
         <ul id="fishing-species"></ul>
       </section>
     </div>
+    <div id="mining-status" role="status" aria-live="polite" hidden></div>
     <div id="fishing-catch" role="status" aria-live="polite" hidden></div>
     <div id="achievement-toast" role="status" aria-live="polite" aria-atomic="true" hidden>
       <div class="achievement-burst" aria-hidden="true"><i>◆</i><i>✦</i><i>◆</i><i>✦</i><i>◆</i><i>✦</i></div>
@@ -834,6 +836,9 @@
 <script src="fisher-workshop.js"></script>
 <script src="fishing-skill-data.js"></script>
 <script src="fishing.js"></script>
+<script src="blacksmithing-data.js"></script>
+<script src="blacksmithing-art.js"></script>
+<script src="blacksmithing.js"></script>
 <script src="attributes.js"></script>
 <script src="mounts.js"></script>
 <script src="rebirth.js"></script>

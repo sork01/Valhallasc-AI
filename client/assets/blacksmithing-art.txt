@@ -1,0 +1,68 @@
+{
+  "sources": [
+    {
+      "sprite": "7c1723852f331712",
+      "order": [
+        "smith_ore_tin",
+        "smith_ore_copper",
+        "smith_ore_iron",
+        "smith_ore_silver",
+        "smith_ore_gold",
+        "smith_ore_cobalt",
+        "smith_ore_mithril",
+        "smith_ore_stormsilver",
+        "smith_ore_sunsteel",
+        "smith_ore_stariron",
+        "smith_bar_tin",
+        "smith_bar_copper",
+        "smith_bar_steel",
+        "smith_bar_silver",
+        "smith_bar_gold",
+        "smith_bar_cobalt",
+        "smith_bar_mithril",
+        "smith_bar_stormsilver",
+        "smith_bar_sunsteel",
+        "smith_bar_stariron",
+        "smith_pick_1",
+        "smith_pick_2",
+        "smith_pick_3",
+        "smith_pick_4",
+        "smith_pick_5",
+        "smith_charcoal",
+        "smith_hardwood",
+        "smith_leather_strips",
+        "smith_linen_wraps"
+      ]
+    },
+    {
+      "sprite": "f0140151f6126e8f",
+      "order": [
+        "smith_plan_meadowguard_gloves",
+        "smith_plan_cragforged_broadsword",
+        "smith_plan_rimeveil_aegis_gloves",
+        "smith_plan_fenlight_staff",
+        "smith_plan_wyrdwatch_signet",
+        "smith_plan_galewarden_longbow",
+        "smith_plan_prismguard_vest",
+        "smith_plan_thunderwake_daggers",
+        "smith_plan_dunewarden_greaves",
+        "smith_plan_stariron_signet",
+        "smith_plan_chronoguard_breastplate",
+        "smith_plan_yearwheel_longbow",
+        "smith_plan_split_second_daggers",
+        "smith_plan_epoch_staff",
+        "smith_plan_last_hour_mace",
+        "vein_0",
+        "vein_1",
+        "vein_2",
+        "vein_3",
+        "vein_4",
+        "vein_5",
+        "vein_6",
+        "vein_7",
+        "vein_8",
+        "vein_9"
+      ]
+    }
+  ]
+}

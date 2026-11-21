@@ -1,0 +1,70 @@
+#mining-status {
+  position: fixed;
+  z-index: 8;
+  bottom: max(92px, 18vh);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 85vw;
+  padding: .45rem .75rem;
+  border: 1px solid #886a3d;
+  border-radius: .35rem;
+  background: #201813ee;
+  color: #f3d99a;
+  text-align: center;
+  pointer-events: none;
+}
+#npc-dialogue.smith-mode:not(.merchant-mode) > .gossip-window {
+  width: min(610px, 88cqw);
+  height: min(585px, 88cqh);
+}
+#npc-inventory.smith-workshop { display: block; }
+.smith-workshop h3 { margin: .2rem 0 .4rem; color: #392106; }
+.smith-notice:empty { display: none; }
+#npc-inventory .smith-notice { color: #315126; font-weight: bold; }
+#npc-inventory .smith-skill { font-weight: bold; }
+.smith-tabs { display: flex; flex-wrap: wrap; gap: .35rem; margin: .5rem 0; }
+.smith-tabs [aria-pressed="true"] { border-color: #dfb76e; color: #ffe0a0; }
+.smith-recipes { display: grid; gap: .35rem;  }
+.smith-recipe {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  gap: .5rem;
+  align-items: start;
+  padding: .45rem;
+  border: 1px solid #a7844e;
+  border-radius: .35rem;
+  background: #faebc9a8;
+  color: #35220c;
+}
+.smith-detail { display: grid; gap: .18rem; min-width: 0; overflow-wrap: anywhere; }
+.smith-recipe[data-rarity="uncommon"] b { color: #17642b; }
+.smith-recipe[data-rarity="rare"] b { color: #1b4e86; }
+.smith-recipe[data-rarity="epic"] b { color: #61278d; }
+.smith-icon { position: relative; width: 2.5rem; height: 2.5rem; }
+.smith-icon > .item-art { position: absolute; inset: 0; }
+.smith-crafted .smith-icon::after {
+  content: '';
+  position: absolute;
+  inset: -.35rem;
+  background: radial-gradient(circle at 21% 37%, #ffe9a2 0 2px, transparent 3px),
+              radial-gradient(circle at 68% 22%, #ffc371 0 2px, transparent 3px),
+              radial-gradient(circle at 85% 60%, #ff9b5b 0 2px, transparent 3px);
+  pointer-events: none;
+  animation: smith-sparks .48s ease-out both;
+}
+@keyframes smith-sparks {
+  from { opacity: 1; transform: scale(.4); }
+  to { opacity: 0; transform: scale(1.5) translateY(-.55rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .smith-crafted .smith-icon::after { display: none; }
+}
+.smith-ingredients { list-style: none; display: flex; flex-wrap: wrap; gap: .2rem .55rem; margin: 0; padding: 0; font-size: .8rem; }
+.smith-ingredients [data-short="true"] { color: #883b27; }
+.smith-recipe button { min-height: 2.25rem; align-self: center; }
+@media (max-width: 680px) {
+  .smith-recipe { grid-template-columns: 2rem minmax(0, 1fr); }
+  .smith-icon { width: 2rem; height: 2rem; }
+  .smith-recipe > :last-child { grid-column: 2; justify-self: start; }
+}

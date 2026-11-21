@@ -496,5 +496,12 @@
   "Fishing skill increased to {0}.": "Din fiskenivå har höjts till {0}.",
   "Can raise Enchanting through skill {0}.": "Kan höja förtrollning till nivå {0}.",
   "Use level {0} or higher gear for your next skill point.": "Använd utrustning på nivå {0} eller högre för nästa poäng.",
-  "Fish in {0} to reach skill {1}.": "Fiska i {0} för att nå färdighetsnivå {1}."
+  "Fish in {0} to reach skill {1}.": "Fiska i {0} för att nå färdighetsnivå {1}.",
+  "Blacksmithing skill {0} / {1}": "Smidesfärdighet {0} / {1}",
+  "Mined {0} × {1}": "Bröt {0} × {1}",
+  "Mines through {0}.": "Bryter malm upp till {0}.",
+  "Requires Blacksmithing {0}": "Kräver smide {0}",
+  "Train to {0} with {1} in {2}.": "Träna upp till {0} med {1} i {2}.",
+  "{0} · Blacksmithing {1}": "{0} · Smide {1}",
+  "Other mining areas · {0}": "Andra gruvområden · {0}"
 }

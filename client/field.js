@@ -1456,6 +1456,18 @@
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
     if (!ghostWalking) {
       if (window.RaidKey?.click(mx,my,w2s)) return;
+      const vein = window.Blacksmithing?.pick(mx,my,w2s);
+      if (vein) {
+        hero.target = null;
+        hero.goal = null;
+        Field.stopMoving();
+        pointer.down = false;
+        hero.pvpTargetId = null;
+        npcTarget = null;
+        window.Blacksmithing.start(vein);
+        emitHud();
+        return;
+      }
     }
     const npc = City.npcs.find(n => {
       if (ghostWalking && n.art !== 'spirit_guide') return false;
@@ -1567,7 +1579,7 @@
     }
     return out;
   }
-  function onPointerMove(e) { window.WorldFeedback?.pointer(e); if (pointer.down) rememberPointer(e); else if (cv && running && !paused) { const r=cv.getBoundingClientRect(); cv.style.cursor = pickPortal((e.clientX-r.left)/r.width*VW,(e.clientY-r.top)/r.height*VH) ? 'pointer' : ''; } }
+  function onPointerMove(e) { window.WorldFeedback?.pointer(e); if (pointer.down) rememberPointer(e); else if (cv && running && !paused) { const r=cv.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width*VW, y=(e.clientY-r.top)/r.height*VH; cv.style.cursor = pickPortal(x,y) || (!hero.dead && window.Blacksmithing?.pick(x,y,w2s)) ? 'pointer' : ''; } }
   function onPointerUp() { pointer.down = false; }
 
   // ---------- combat ----------
@@ -1730,6 +1742,7 @@
     window.RaidKey?.sync(packet, own, zone);
     window.EmptySeat?.sync(own, zone);
     window.Fishing?.sync(packet, own, zdef, cue => say('fishingSound', cue));
+    window.Blacksmithing?.sync(packet, own, cue => say('smithSound', cue));
     window.Attributes?.update(own);
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
@@ -5293,6 +5306,7 @@
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.NewYear?.drawFireworks(g,zone,hero,t,VW,VH,reducedMotion());
     drawFishing(g);
+    window.Blacksmithing?.draw(g, w2s, VW, VH, reducedMotion() || !!window.Prefs?.lowGraphics);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     window.Halloween?.drawLabel(g,zone,w2s);

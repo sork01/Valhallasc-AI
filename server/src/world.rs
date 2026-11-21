@@ -11,6 +11,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod blacksmithing;
 mod enchanting;
 mod fishing;
 mod fishing_workshop;
@@ -466,6 +467,7 @@ pub enum Command {
 
 struct Player {
     fishing: fishing::Session,
+    mining: Option<blacksmithing::Mining>,
     enchanting: enchanting::Session,
     character: Character,
     peer: Peer,
@@ -654,6 +656,7 @@ impl Player {
             peer,
             input: Point::default(),
             fishing: Default::default(),
+            mining: None,
             enchanting: Default::default(),
             input_at: -99.,
             goal: None,
@@ -2029,6 +2032,8 @@ pub struct World {
     // Zone 0 is Greenmeadow with Alderhaven; later zones come from the map's `zones`.
     maps: Vec<Map>,
     rich_fishing: BTreeMap<usize, Vec<fishing::RichSpot>>,
+    mining_veins: BTreeMap<usize, Vec<blacksmithing::Vein>>,
+    smith_rng: u64,
     // Every zone's enemy spawns in one list, so enemy ids stay stable and global.
     spawns: Vec<SlimeSpawn>,
     store: Store,
@@ -2180,6 +2185,8 @@ impl World {
         let mut world = Self {
             maps,
             rich_fishing: BTreeMap::new(),
+            mining_veins: BTreeMap::new(),
+            smith_rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             spawns,
             store,
             mail_unread: BTreeMap::new(),
@@ -2322,6 +2329,10 @@ impl World {
     fn random(&mut self) -> f64 {
         self.rng = self.rng.wrapping_mul(6364136223846793005).wrapping_add(1);
         (self.rng >> 32) as f64 / 4294967296.
+    }
+    fn smith_roll(&mut self) -> f64 {
+        self.smith_rng = self.smith_rng.wrapping_mul(6364136223846793005).wrapping_add(1);
+        (self.smith_rng >> 32) as f64 / 4294967296.
     }
     fn profession_roll(&mut self) -> f64 {
         self.profession_rng = self.profession_rng.wrapping_mul(6364136223846793005).wrapping_add(1);
@@ -2516,6 +2527,9 @@ impl World {
         view["mailUnread"] = json!(mail_unread);
         view["mailTotal"] = json!(mail_total);
         view["maxLevel"] = json!(p.character.at_max_level());
+        if let Some(channel) = p.mining {
+            view["mining"] = json!(channel.vein);
+        }
         view["hired"] = json!(p.merc.is_some());
         view["leadShoes"] = json!(p.shoed);
         view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
@@ -2643,6 +2657,9 @@ impl World {
         let across = self.across_view(zone);
         if !across.is_empty() {
             view["across"] = json!(across);
+        }
+        if let Some(veins) = self.mining_veins.get(&zone) {
+            view["miningVeins"] = json!(veins);
         }
         view["fishingTime"] = json!(fishing::now());
         view["fishingSpots"] = json!(self.rich_fishing.get(&zone).map(|spots| spots.iter().map(|s| s.point).collect::<Vec<_>>()).unwrap_or_default());
@@ -3045,7 +3062,19 @@ impl World {
         ) {
             p.dance = None;
         }
+        if p.mining.is_some() && match &message {
+            ClientMessage::Input { dx, dy } => dx.is_finite() && dy.is_finite() && (*dx != 0. || *dy != 0.),
+            ClientMessage::Move { x, y } => x.is_finite() && y.is_finite(),
+            ClientMessage::Attack { .. } | ClientMessage::Skill { .. } | ClientMessage::Dash { .. }
+            | ClientMessage::Target { .. } | ClientMessage::Mount { .. } | ClientMessage::Fish {}
+            | ClientMessage::Interact { .. } | ClientMessage::RaidCross { .. } => true,
+            _ => false,
+        } {
+            Self::interrupt_mining(p);
+        }
         match message {
+            ClientMessage::Mine { id } => self.start_mining(session, id),
+            ClientMessage::Blacksmithing { request } => self.blacksmithing_command(session, request),
             ClientMessage::Input { dx, dy }
                 if dx.is_finite() && dy.is_finite() && dx.abs() <= 1. && dy.abs() <= 1. =>
             {
@@ -3844,6 +3873,9 @@ impl World {
         if npc.offers.iter().any(|offer| offer.id == "learn_enchanting") {
             dialogue["enchantingSkill"] = json!(p.character.enchanting.proficiency.skill);
         }
+        if let Some(workshop) = blacksmithing::workshop_view(npc, &p.character) {
+            dialogue["blacksmithing"] = workshop;
+        }
         dialogue["fisherQuote"] = fishing_workshop::quotes(npc, &p.character);
         let _ = p.peer.try_send(dialogue);
         let actor = p.character.id.clone();
@@ -3939,7 +3971,9 @@ impl World {
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             if let Some(p) = self.players.get(&session).filter(|p| p.is_human()) {
-                self.ensure_fishing_spots(p.character.zone);
+                let zone = p.character.zone;
+                self.ensure_fishing_spots(zone);
+                self.ensure_veins(zone);
             }
             self.update_food(session);
             self.update_player(session);
@@ -3969,6 +4003,10 @@ impl World {
         self.update_boss_mechanics();
         self.update_bolts();
         self.update_enemy_bolts();
+        let miners: Vec<_> = self.players.iter().filter(|(_, p)| p.mining.is_some()).map(|(session, _)| *session).collect();
+        for session in miners {
+            self.update_mining(session);
+        }
         self.update_raid_key();
         self.update_empty_seat();
         self.update_festival_dances();
@@ -5875,6 +5913,7 @@ impl World {
                 self.enchant_xp_kill(session);
             }
             self.enchant_recipe_drop(&credit_id, zone, point, &kind, level);
+            self.smith_blueprint_drop(&credit_id, zone, point, &kind, level);
             // The credited hero's rebirth drop multiplier reaches every roll below (docs/rebirth.md).
             let boost = self.drop_multiplier_of(&credit_id);
             let value = if gold > 0 {
@@ -6625,6 +6664,9 @@ impl World {
         }
         let before = p.character.hp;
         let taken = value.min(before);
+        if taken > 0. {
+            Self::interrupt_mining(p);
+        }
         if taken > 0. && dazed {
             p.daze = 4.;
         }

@@ -62521,6 +62521,41 @@
           "id": "repair",
           "label": "Repair worn gear",
           "cost": 0
+        },
+        {
+          "id": "blacksmithing_workshop",
+          "label": "Blacksmithing workshop",
+          "cost": 0
+        },
+        {
+          "id": "buy_smith_charcoal",
+          "label": "Buy Charcoal",
+          "item": "smith_charcoal",
+          "cost": 8
+        },
+        {
+          "id": "buy_smith_hardwood",
+          "label": "Buy Hardwood",
+          "item": "smith_hardwood",
+          "cost": 16
+        },
+        {
+          "id": "buy_smith_leather_strips",
+          "label": "Buy Leather Strips",
+          "item": "smith_leather_strips",
+          "cost": 12
+        },
+        {
+          "id": "buy_smith_linen_wraps",
+          "label": "Buy Linen Wraps",
+          "item": "smith_linen_wraps",
+          "cost": 10
+        },
+        {
+          "id": "buy_smith_pick_1",
+          "label": "Buy Starter Mining Pick",
+          "item": "smith_pick_1",
+          "cost": 25
         }
       ],
       "buys": true
@@ -131319,7 +131354,43 @@
           "y": 293,
           "color": "#7a7a8a",
           "dialogue": "The hammer is cold because I am patient. The furnace is cold because the wisps ate my coal.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#d9b08c",
@@ -320963,6 +321034,41 @@
               "id": "repair",
               "label": "Repair worn gear",
               "cost": 0
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "buys": false,
@@ -438838,6 +438944,41 @@
               "label": "Replace and fit starter gear",
               "cost": 0,
               "gear": true
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "buys": false,
@@ -491878,6 +492019,41 @@
               "label": "Replace and fit starter gear",
               "cost": 0,
               "gear": true
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "buys": false,
@@ -522667,6 +522843,41 @@
               "label": "Replace and fit starter gear",
               "cost": 0,
               "gear": true
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "buys": false,
@@ -523041,7 +523252,43 @@
           "y": 128.5,
           "color": "#6aa8b8",
           "dialogue": "The reef grows where the vents breathe, and I cut it into plate. The vents west of the camp are the best, and the sirens like them too. Every hero who has cleared the Vent Garden has bought me a week of quiet.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#c99b7a",
@@ -544283,6 +544530,41 @@
               "id": "repair",
               "label": "Repair worn gear",
               "cost": 0
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "buys": false,
@@ -650392,7 +650674,43 @@
           "y": 179,
           "color": "#9a7a6a",
           "dialogue": "A beetle shell takes a hammer better than anything I have ever beaten flat. Bring me a few and I will make something that turns a claw.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#c99b7a",
@@ -816035,6 +816353,41 @@
               "id": "repair",
               "label": "Repair worn gear",
               "cost": 0
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "buys": false
@@ -818818,7 +819171,43 @@
           "y": 27,
           "color": "#697184",
           "dialogue": "The flagstones are warm and the well has cracked. The old forge is only sleeping. Nine chains hold Eldmarr beneath this mountain.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
+            }
+          ],
           "look": {
             "skin": "#c69a7b",
             "hair": "#533c39",
@@ -1056966,7 +1057355,43 @@
           "y": 221,
           "color": "#d6f1a2",
           "dialogue": "A caiman's scale turns a spear and a rainstorm alike. Bring me five and the Post will have a shield for every watchman.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#edc5a1",
@@ -1141321,6 +1141746,41 @@
               "id": "repair",
               "label": "Repair worn gear",
               "cost": 0
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "buys": false,
@@ -1606330,6 +1606790,41 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
+            },
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
             }
           ],
           "look": {
@@ -1606475,7 +1606970,43 @@
           "y": 131,
           "color": "#a8744f",
           "dialogue": "An ashback's relic holds heat longer than any coal. Bring me five and the rim-watch will keep its hands warm through the long dark.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "blacksmithing_workshop",
+              "label": "Blacksmithing workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_smith_charcoal",
+              "label": "Buy Charcoal",
+              "item": "smith_charcoal",
+              "cost": 8
+            },
+            {
+              "id": "buy_smith_hardwood",
+              "label": "Buy Hardwood",
+              "item": "smith_hardwood",
+              "cost": 16
+            },
+            {
+              "id": "buy_smith_leather_strips",
+              "label": "Buy Leather Strips",
+              "item": "smith_leather_strips",
+              "cost": 12
+            },
+            {
+              "id": "buy_smith_linen_wraps",
+              "label": "Buy Linen Wraps",
+              "item": "smith_linen_wraps",
+              "cost": 10
+            },
+            {
+              "id": "buy_smith_pick_1",
+              "label": "Buy Starter Mining Pick",
+              "item": "smith_pick_1",
+              "cost": 25
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#bd8c6f",

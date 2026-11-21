@@ -171,5 +171,9 @@
   "hero sprite",
   "sprite job",
   "Fisher recipes",
-  "KeyR"
+  "KeyR",
+  "Blacksmithing catalog",
+  "Mining vein positions",
+  "[data-recipe]",
+  "[data-smith-action]"
 ]

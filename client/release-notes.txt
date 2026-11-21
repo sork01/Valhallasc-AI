@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.5.0",
+    "date": "2026-11-21",
+    "new": [
+      "Learn Blacksmithing from Bram Emberforge in Alderhaven. Use your starter pick to mine Tin and Copper and forge stronger picks as your skill grows.",
+      "Mine shared ore veins across the adventure zones and visit town smiths to smelt bars, learn blueprints and forge equipment. Find rare blueprints on monsters and epic blueprints on selected level-99 final bosses.",
+      "Train Blacksmithing from skill 1 to 300. The workshop shows where to mine next, which blueprints you know and what each recipe requires."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.4.0",
     "date": "2026-11-21",
     "new": [

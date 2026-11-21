@@ -962,8 +962,24 @@
     });
   }
   // FISHING-SOUND-END
+  const smithCueBuffers = {};
+  function smithSound(cue) {
+    if (!['strike', 'smelt', 'forge'].includes(cue) || !save.sound) return;
+    const c = audio(); if (!c) return;
+    const requested = performance.now();
+    const buffer = smithCueBuffers[cue] ||= fetch(`assets/sfx_smith_${cue}.mp3`).then(r => {
+      if (!r.ok) throw Error('smith_audio');
+      return r.arrayBuffer();
+    }).then(b => c.decodeAudioData(b)).catch(() => { delete smithCueBuffers[cue]; return null; });
+    buffer.then(b => {
+      if (!b || !save.sound || scene !== 'game' || performance.now() - requested > 1200) return;
+      const source = c.createBufferSource();
+      source.buffer = b; source.connect(sfxOut(c)); source.start();
+    });
+  }
   const SFX = {
     fishingSound,
+    smithSound,
 
     bossMech: bossMechSound,
     forgeProc: ev => {

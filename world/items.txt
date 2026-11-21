@@ -141927,5 +141927,851 @@
     "rarity": "legendary",
     "sell": 75,
     "source": "enchanting"
+  },
+  {
+    "id": "smith_charcoal",
+    "name": "Charcoal",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "material"
+  },
+  {
+    "id": "smith_hardwood",
+    "name": "Hardwood",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "material"
+  },
+  {
+    "id": "smith_leather_strips",
+    "name": "Leather Strips",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "material"
+  },
+  {
+    "id": "smith_linen_wraps",
+    "name": "Linen Wraps",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_tin",
+    "name": "Tin Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 1,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_tin",
+    "name": "Tin Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 2,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_copper",
+    "name": "Copper Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 2,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_copper",
+    "name": "Copper Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 4,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_iron",
+    "name": "Iron Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 3,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_steel",
+    "name": "Steel Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 6,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_silver",
+    "name": "Silver Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 4,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_silver",
+    "name": "Silver Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 8,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_gold",
+    "name": "Gold Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 5,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_gold",
+    "name": "Gold Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 10,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_cobalt",
+    "name": "Cobalt Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 6,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_cobalt",
+    "name": "Cobalt Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 12,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_mithril",
+    "name": "Mithril Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 7,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_mithril",
+    "name": "Mithril Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 14,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_stormsilver",
+    "name": "Stormsilver Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 8,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_stormsilver",
+    "name": "Stormsilver Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 16,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_sunsteel",
+    "name": "Sunsteel Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 9,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_sunsteel",
+    "name": "Sunsteel Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 18,
+    "kind": "material"
+  },
+  {
+    "id": "smith_ore_stariron",
+    "name": "Stariron Ore",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 10,
+    "kind": "material"
+  },
+  {
+    "id": "smith_bar_stariron",
+    "name": "Stariron Bar",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 20,
+    "kind": "material"
+  },
+  {
+    "id": "smith_pick_1",
+    "name": "Starter Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_2",
+    "name": "Copper Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_3",
+    "name": "Silver Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_4",
+    "name": "Cobalt Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_5",
+    "name": "Stormsilver Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "class": "warrior",
+    "attack": 0.4,
+    "defense": 1.6,
+    "tint": {
+      "hue": 70,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_tin_banded_gloves",
+    "name": "Tin-Banded Gloves",
+    "source": "blacksmithing",
+    "sell": 40,
+    "requiredLevel": 4,
+    "variant": "smith_gear_tin_banded_gloves",
+    "art": "azure"
+  },
+  {
+    "kind": "gloves",
+    "rarity": "rare",
+    "class": "warrior",
+    "attack": 0.5,
+    "defense": 1.9,
+    "bonusStats": {
+      "accuracy": 1
+    },
+    "tint": {
+      "hue": 100,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_meadowguard_gloves",
+    "name": "Meadowguard Gloves",
+    "source": "blacksmithing",
+    "sell": 96,
+    "requiredLevel": 4,
+    "variant": "smith_gear_meadowguard_gloves",
+    "art": "crimson"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "class": "warrior",
+    "attack": 6.4,
+    "defense": 1.6,
+    "tint": {
+      "hue": 70,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_copperhead_sword",
+    "name": "Copperhead Sword",
+    "source": "blacksmithing",
+    "sell": 40,
+    "requiredLevel": 8,
+    "variant": "smith_gear_copperhead_sword",
+    "art": "royal"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "rare",
+    "class": "warrior",
+    "attack": 7.5,
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    },
+    "tint": {
+      "hue": 100,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_cragforged_broadsword",
+    "name": "Cragforged Broadsword",
+    "source": "blacksmithing",
+    "sell": 96,
+    "requiredLevel": 8,
+    "variant": "smith_gear_cragforged_broadsword",
+    "art": "sword"
+  },
+  {
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "class": "warrior",
+    "attack": 0.6,
+    "defense": 2.4,
+    "tint": {
+      "hue": 140,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_riveted_steel_gloves",
+    "name": "Riveted Steel Gloves",
+    "source": "blacksmithing",
+    "sell": 60,
+    "requiredLevel": 13,
+    "variant": "smith_gear_riveted_steel_gloves",
+    "art": "azure"
+  },
+  {
+    "kind": "gloves",
+    "rarity": "rare",
+    "class": "warrior",
+    "attack": 0.7,
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 3
+    },
+    "tint": {
+      "hue": 170,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_rimeveil_aegis_gloves",
+    "name": "Rimeveil Aegis Gloves",
+    "source": "blacksmithing",
+    "sell": 144,
+    "requiredLevel": 13,
+    "variant": "smith_gear_rimeveil_aegis_gloves",
+    "art": "crimson"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "class": "mage",
+    "attack": 12.8,
+    "defense": 3.2,
+    "tint": {
+      "hue": 210,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_silverleaf_staff",
+    "name": "Silverleaf Staff",
+    "source": "blacksmithing",
+    "sell": 80,
+    "requiredLevel": 18,
+    "variant": "smith_gear_silverleaf_staff",
+    "art": "crystal"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "rare",
+    "class": "mage",
+    "attack": 15.0,
+    "defense": 3.8,
+    "bonusStats": {
+      "dexterity": 5
+    },
+    "tint": {
+      "hue": 240,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_fenlight_staff",
+    "name": "Fenlight Staff",
+    "source": "blacksmithing",
+    "sell": 192,
+    "requiredLevel": 18,
+    "variant": "smith_gear_fenlight_staff",
+    "art": "ash"
+  },
+  {
+    "kind": "accessory",
+    "rarity": "uncommon",
+    "attack": 7.2,
+    "defense": 1.8,
+    "tint": {
+      "hue": 10,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_gilded_ward_ring",
+    "name": "Gilded Ward Ring",
+    "source": "blacksmithing",
+    "sell": 120,
+    "requiredLevel": 26,
+    "variant": "smith_gear_gilded_ward_ring",
+    "art": "regearl25"
+  },
+  {
+    "kind": "accessory",
+    "rarity": "rare",
+    "attack": 8.5,
+    "defense": 2.1,
+    "bonusStats": {
+      "dexterity": 10
+    },
+    "tint": {
+      "hue": 40,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_wyrdwatch_signet",
+    "name": "Wyrdwatch Signet",
+    "source": "blacksmithing",
+    "sell": 288,
+    "requiredLevel": 26,
+    "variant": "smith_gear_wyrdwatch_signet",
+    "art": "regearl25"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "class": "hunter",
+    "attack": 22.4,
+    "defense": 5.6,
+    "tint": {
+      "hue": 60,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_cobalt_longbow",
+    "name": "Cobalt Longbow",
+    "source": "blacksmithing",
+    "sell": 140,
+    "requiredLevel": 33,
+    "variant": "smith_gear_cobalt_longbow",
+    "art": "regearl30"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "rare",
+    "class": "hunter",
+    "attack": 26.3,
+    "defense": 6.6,
+    "bonusStats": {
+      "strength": 15
+    },
+    "tint": {
+      "hue": 90,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_galewarden_longbow",
+    "name": "Galewarden Longbow",
+    "source": "blacksmithing",
+    "sell": 336,
+    "requiredLevel": 33,
+    "variant": "smith_gear_galewarden_longbow",
+    "art": "regearl30"
+  },
+  {
+    "kind": "armor",
+    "rarity": "uncommon",
+    "class": "warrior",
+    "attack": 6.0,
+    "defense": 24.0,
+    "tint": {
+      "hue": 270,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_mithril_scale_vest",
+    "name": "Mithril Scale Vest",
+    "source": "blacksmithing",
+    "sell": 200,
+    "requiredLevel": 48,
+    "variant": "smith_gear_mithril_scale_vest",
+    "art": "regearl45"
+  },
+  {
+    "kind": "armor",
+    "rarity": "rare",
+    "class": "warrior",
+    "attack": 7.1,
+    "defense": 28.2,
+    "bonusStats": {
+      "dexterity": 35
+    },
+    "tint": {
+      "hue": 300,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_prismguard_vest",
+    "name": "Prismguard Vest",
+    "source": "blacksmithing",
+    "sell": 480,
+    "requiredLevel": 48,
+    "variant": "smith_gear_prismguard_vest",
+    "art": "regearl45"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "class": "assassin",
+    "attack": 41.6,
+    "defense": 10.4,
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_stormsilver_twin_daggers",
+    "name": "Stormsilver Twin Daggers",
+    "source": "blacksmithing",
+    "sell": 260,
+    "requiredLevel": 63,
+    "variant": "smith_gear_stormsilver_twin_daggers",
+    "art": "regearl60"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "rare",
+    "class": "assassin",
+    "attack": 48.9,
+    "defense": 12.2,
+    "bonusStats": {
+      "agility": 55
+    },
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_thunderwake_daggers",
+    "name": "Thunderwake Daggers",
+    "source": "blacksmithing",
+    "sell": 624,
+    "requiredLevel": 63,
+    "variant": "smith_gear_thunderwake_daggers",
+    "art": "regearl60"
+  },
+  {
+    "kind": "pants",
+    "rarity": "uncommon",
+    "attack": 3.4,
+    "defense": 13.6,
+    "tint": {
+      "hue": 60,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_sunsteel_greaves",
+    "name": "Sunsteel Greaves",
+    "source": "blacksmithing",
+    "sell": 340,
+    "requiredLevel": 83,
+    "variant": "smith_gear_sunsteel_greaves",
+    "art": "regearl80"
+  },
+  {
+    "kind": "pants",
+    "rarity": "rare",
+    "attack": 4.0,
+    "defense": 16.0,
+    "bonusStats": {
+      "agility": 85
+    },
+    "tint": {
+      "hue": 90,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_dunewarden_greaves",
+    "name": "Dunewarden Greaves",
+    "source": "blacksmithing",
+    "sell": 816,
+    "requiredLevel": 83,
+    "variant": "smith_gear_dunewarden_greaves",
+    "art": "regearl80"
+  },
+  {
+    "kind": "necklace",
+    "rarity": "uncommon",
+    "attack": 32.0,
+    "defense": 8.0,
+    "tint": {
+      "hue": 270,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_stariron_talisman",
+    "name": "Stariron Talisman",
+    "source": "blacksmithing",
+    "sell": 400,
+    "requiredLevel": 96,
+    "variant": "smith_gear_stariron_talisman",
+    "art": "regearl95"
+  },
+  {
+    "kind": "accessory",
+    "rarity": "rare",
+    "attack": 28.2,
+    "defense": 7.1,
+    "bonusStats": {
+      "strength": 108
+    },
+    "tint": {
+      "hue": 300,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_stariron_signet",
+    "name": "Stariron Signet",
+    "source": "blacksmithing",
+    "sell": 960,
+    "requiredLevel": 96,
+    "variant": "smith_gear_stariron_signet",
+    "art": "regearl95"
+  },
+  {
+    "kind": "armor",
+    "rarity": "epic",
+    "class": "warrior",
+    "attack": 17.8,
+    "defense": 71.4,
+    "bonusStats": {
+      "stamina": 97,
+      "agility": 97
+    },
+    "id": "smith_gear_chronoguard_breastplate",
+    "name": "Chronoguard Breastplate",
+    "source": "blacksmithing",
+    "sell": 2208,
+    "requiredLevel": 99,
+    "variant": "smith_gear_chronoguard_breastplate",
+    "art": "regearnull"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "epic",
+    "class": "hunter",
+    "attack": 95.1,
+    "defense": 23.8,
+    "bonusStats": {
+      "stamina": 97,
+      "agility": 97
+    },
+    "id": "smith_gear_yearwheel_longbow",
+    "name": "Yearwheel Longbow",
+    "source": "blacksmithing",
+    "sell": 2208,
+    "requiredLevel": 99,
+    "variant": "smith_gear_yearwheel_longbow",
+    "art": "regearnull"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "epic",
+    "class": "assassin",
+    "attack": 95.1,
+    "defense": 23.8,
+    "bonusStats": {
+      "stamina": 97,
+      "strength": 97
+    },
+    "id": "smith_gear_split_second_daggers",
+    "name": "Split-Second Daggers",
+    "source": "blacksmithing",
+    "sell": 2208,
+    "requiredLevel": 99,
+    "variant": "smith_gear_split_second_daggers",
+    "art": "regearnull"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "epic",
+    "class": "mage",
+    "attack": 95.1,
+    "defense": 23.8,
+    "bonusStats": {
+      "agility": 97,
+      "stamina": 97
+    },
+    "id": "smith_gear_epoch_staff",
+    "name": "Epoch Staff",
+    "source": "blacksmithing",
+    "sell": 2208,
+    "requiredLevel": 99,
+    "variant": "smith_gear_epoch_staff",
+    "art": "regearnull"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "epic",
+    "class": "priest",
+    "attack": 95.1,
+    "defense": 23.8,
+    "bonusStats": {
+      "stamina": 97,
+      "agility": 97
+    },
+    "id": "smith_gear_last_hour_mace",
+    "name": "Last Hour Mace",
+    "source": "blacksmithing",
+    "sell": 2208,
+    "requiredLevel": 99,
+    "variant": "smith_gear_last_hour_mace",
+    "art": "regearnull"
+  },
+  {
+    "id": "smith_plan_meadowguard_gloves",
+    "name": "Blueprint: Meadowguard Gloves",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 48,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_cragforged_broadsword",
+    "name": "Blueprint: Cragforged Broadsword",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 48,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_rimeveil_aegis_gloves",
+    "name": "Blueprint: Rimeveil Aegis Gloves",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 72,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_fenlight_staff",
+    "name": "Blueprint: Fenlight Staff",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 96,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_wyrdwatch_signet",
+    "name": "Blueprint: Wyrdwatch Signet",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 144,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_galewarden_longbow",
+    "name": "Blueprint: Galewarden Longbow",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 168,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_prismguard_vest",
+    "name": "Blueprint: Prismguard Vest",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 240,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_thunderwake_daggers",
+    "name": "Blueprint: Thunderwake Daggers",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 312,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_dunewarden_greaves",
+    "name": "Blueprint: Dunewarden Greaves",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 408,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_stariron_signet",
+    "name": "Blueprint: Stariron Signet",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 480,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_chronoguard_breastplate",
+    "name": "Blueprint: Chronoguard Breastplate",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 1104,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_yearwheel_longbow",
+    "name": "Blueprint: Yearwheel Longbow",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 1104,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_split_second_daggers",
+    "name": "Blueprint: Split-Second Daggers",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 1104,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_epoch_staff",
+    "name": "Blueprint: Epoch Staff",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 1104,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_last_hour_mace",
+    "name": "Blueprint: Last Hour Mace",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 1104,
+    "source": "blacksmithing"
   }
 ]

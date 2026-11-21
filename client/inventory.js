@@ -43,11 +43,12 @@
   }
   const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number(legacyPiece(i.kind, look)?.id === i.id);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
+  const smithKind = i => ({mining_pick:'Mining pick', smith_blueprint:'Blacksmithing blueprint'})[i.kind];
   const licence = i => i?.kind === 'mount_licence';
   const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion', 'fish'].includes(i.kind);
-  const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod'].includes(i.kind);
-  const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod'].includes(i.kind) && (!i.class || i.class === look?.class);
+  const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod', 'mining_pick', 'smith_blueprint'].includes(i.kind);
+  const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod', 'mining_pick', 'smith_blueprint'].includes(i.kind) && (!i.class || i.class === look?.class);
   const tr = text => window.Locale?.translate(text) || text;
   const foodBonus = i => {
     const b = i?.foodBonus; if (!b) return '';
@@ -182,6 +183,11 @@
   function itemIcon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
     if (i && /^orange_(0[1-9]|[1-4][0-9]|50)$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
+    const smithCell = i && window.BLACKSMITHING_ART?.at[i.id];
+    if (smithCell) {
+      const {cols, rows} = window.BLACKSMITHING_ART;
+      return `<span class="item-art" aria-hidden="true" style="background-image:url(assets/blacksmithing.png);background-size:${cols*100}% ${rows*100}%;background-position:${smithCell[0]*100/(cols-1)}% ${smithCell[1]*100/(rows-1)}%"></span>`;
+    }
     const fishingCell = i && window.FISHING_ICONS?.at[i.id];
     if (fishingCell) {
       const { cols, rows } = FISHING_ICONS;
@@ -211,7 +217,7 @@
   }
   function summary(i, count = quantity(i.id), cellCopy) {
     const copy = cellCopy || displayCopy(i), rarity = cellCopy?.rarity || displayRarity(i);
-    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind !== 'potion' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`} · ${questItem(i) ? 'Quest item · cannot be sold' : `sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
+    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${smithKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind !== 'potion' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`)} · ${questItem(i) ? 'Quest item · cannot be sold' : `sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
   }
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
@@ -221,7 +227,7 @@
   function showTooltip(anchor, i, slot, where, cellCopy) {
     if (!i) return;
     const copy = where ? where.copies[0] : cellCopy || displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : cellCopy?.rarity || displayRarity(i, slot);
-    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
+    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || smithKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
     const appearance = window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
     const scroll = window.Enchanting?.isScroll(i);
@@ -230,7 +236,8 @@
     else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
-    else if (i.kind !== 'material' && !scroll) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
+    else if (i.kind === 'mining_pick') t.append(node('p', window.Blacksmithing?.pickDetails(i) || ''));
+    else if (i.kind !== 'material' && !scroll && !smithKind(i)) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if ((compatible(i) || i.kind === 'rod') && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (i.rarity === 'hierloom') t.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
@@ -371,6 +378,12 @@
       if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
     } else if (i.kind === 'rod') {
       container.append(...rodDetails(i).map(text => node('p', text)));
+    } else if (i.kind === 'mining_pick') {
+      container.append(node('p', window.Blacksmithing?.pickDetails(i) || ''));
+    } else if (i.kind === 'smith_blueprint') {
+      const study = button('Study blueprint', () => window.Blacksmithing?.study(i.id), 'item-action');
+      study.dataset.action = 'study';
+      container.append(study);
     } else if (licence(i)) {
       const b = button('Use', () => useItem(i), 'item-action'); b.dataset.action = 'use'; b.disabled = !canEquip(); container.append(b);
       container.append(node('p', `Grants the ${i.mount} mount. Bound: it cannot be traded or sold.`, 'bag-empty-note'));
@@ -492,6 +505,7 @@
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(cellId(a)).kind.localeCompare(definition(cellId(b)).kind) || definition(cellId(a)).name.localeCompare(definition(cellId(b)).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
   window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
+    gearPreview: i => tr(`Level ${levelOf(i)}`) + (i.class ? ` · ${tr(i.class)}` : '') + (stats(i) ? ` · ${tr(stats(i))}` : ''),
     icon, definition, legacyPiece, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {

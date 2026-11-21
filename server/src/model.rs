@@ -365,6 +365,8 @@ pub struct Character {
     pub fishing: FishingLog,
     #[serde(default)]
     pub enchanting: crate::enchanting::Progress,
+    #[serde(default, skip_serializing_if = "crate::blacksmithing::Progress::is_untrained")]
+    pub blacksmithing: crate::blacksmithing::Progress,
     pub gold: u32,
     pub kills: u32,
     #[serde(default)]
@@ -715,6 +717,7 @@ impl Character {
             wardrobe: Default::default(),
             gear_instances: vec![],
             enchanting: Default::default(),
+            blacksmithing: Default::default(),
             next_gear_id: 1,
             bags: vec![],
             attributes: Attributes::default(),
@@ -1462,6 +1465,8 @@ pub fn quest_progress(character: &mut Character, quests: &[Quest], kind: &str, t
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ClientMessage {
+    Mine { id: u64 },
+    Blacksmithing { request: crate::blacksmithing::Command },
     Enchanting {
         request: crate::enchanting::Command,
     },

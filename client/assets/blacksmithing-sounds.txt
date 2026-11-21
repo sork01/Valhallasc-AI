@@ -1,0 +1,24 @@
+{
+  "project": "0a8d9c7879f1a8aa",
+  "bpm": 120,
+  "clips": {
+    "strike": {
+      "file": "sfx_smith_strike.mp3",
+      "bar": 1,
+      "duration": 0.65,
+      "sha256": "dac0b640f771a897461c143ff0cbe13641d56a3e8a717c343b7c05cdf2460d73"
+    },
+    "smelt": {
+      "file": "sfx_smith_smelt.mp3",
+      "bar": 3,
+      "duration": 0.85,
+      "sha256": "e768f5abc389281d8fd47c1c7b6358cdee8a6b3eb462478b92c25eaefac6f695"
+    },
+    "forge": {
+      "file": "sfx_smith_forge.mp3",
+      "bar": 5,
+      "duration": 1.1,
+      "sha256": "5a0c67a11c34dd2ad948b60573b84c241406e0d9d5b3cde0426fe5ee0f3dc817"
+    }
+  }
+}
