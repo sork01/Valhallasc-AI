@@ -39,4 +39,10 @@ The editable PixelFlow sources are listed in `client/assets/blacksmithing-art.tx
 - `node tests/blacksmithing-protocol.cjs` uses two guests and a disposable private world to drive real mining, smith purchases, crafting, equipping and restart persistence.
 - `bash scripts/test-touch-bounded.sh tests/blacksmithing-ui.cjs` checks desktop controls. `TOUCH=1` exercises touch in landscape and Swedish.
 
-Release 1.5.0 is prepared on the Blacksmithing branch. A public release requires the matching client and executable, the public achievement catalog specified in the project instructions, and explicit approval for the production restart.
+## Public release
+
+Blacksmithing went live on 2026-11-21 as `1.5.0-a72767c5`. Implementation `3c435067` and catalog ordering fix `a3cff571` are on main. The exact public source is `a72767c5` on `release/blacksmithing-1.5.0`. It uses the public achievement catalog of 120 achievements and 2,555 points.
+
+The release executable passed the private two-player protocol and restart test. Production returned to bridge health in 1.406 seconds. Verification matched the running executable and checksums of all 20 changed public files, checked both public routes and the service journal, and confirmed that SQLite preserved all five characters.
+
+See `www/Valhalla/blacksmithing-release-receipt.json` and `deploy/backups/blacksmithing-release-20261121-j2iHMR/` for the release record and rollback backups. The previous client release is `1.4.0-f1f0fc25`.
