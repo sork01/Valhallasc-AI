@@ -43,12 +43,12 @@
   }
   const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number(legacyPiece(i.kind, look)?.id === i.id);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
-  const smithKind = i => ({mining_pick:'Mining pick', smith_blueprint:'Blacksmithing blueprint'})[i.kind];
+  const professionKind = i => ({mining_pick:'Mining pick', smith_blueprint:'Blacksmithing blueprint', alchemy_formula:'Alchemy formula'})[i.kind];
   const licence = i => i?.kind === 'mount_licence';
   const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
-  const consumable = i => i && ['food', 'potion', 'fish'].includes(i.kind);
-  const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod', 'mining_pick', 'smith_blueprint'].includes(i.kind);
-  const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod', 'mining_pick', 'smith_blueprint'].includes(i.kind) && (!i.class || i.class === look?.class);
+  const consumable = i => i && ['food', 'potion', 'fish', 'alchemy_flask'].includes(i.kind);
+  const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod', 'mining_pick', 'smith_blueprint', 'alchemy_flask', 'alchemy_formula'].includes(i.kind);
+  const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence', 'fish', 'rod', 'mining_pick', 'smith_blueprint', 'alchemy_flask', 'alchemy_formula'].includes(i.kind) && (!i.class || i.class === look?.class);
   const tr = text => window.Locale?.translate(text) || text;
   const foodBonus = i => {
     const b = i?.foodBonus; if (!b) return '';
@@ -61,6 +61,7 @@
     return [tr(i.fishing?.lava ? 'For water and lava fishing' : 'For water fishing'), tr('Fishing tier {0} · Requires level {1}').replace('{0}',tier).replace('{1}',levelOf(i)), tr('{0}% shorter waits · +{1}% rare catch bonus').replace('{0}',(tier-1)*6).replace('{1}',(tier-1)*10), tr('Unlocks: {0}').replace('{0}',tr(unlock)), tr('Keeps every earlier fishing unlock. Upgrading consumes the previous rod.')];
   };
   const effect = i => {
+    if (window.Alchemy?.isBrew(i)) return window.Alchemy.effect(i);
     const hero = window.Field?.hero || {}, type = hero.resourceType || 'mana';
     const amount = type === 'mana' ? i.mana : Math.round(Math.min(1, i.mana / (100 + 15 * ((i.requiredLevel || 1) - 1))) * (hero.maxResource || 100));
     const heal = i.heal ? (i.kind === 'fish' ? i.heal : Math.max(i.heal, Math.round((hero.maxHp || 0) * .4))) : 0;
@@ -69,7 +70,7 @@
     return (i.kind !== 'potion' ? `Restores ${restores} over ${i.duration} s · one meal at a time, ${i.cooldown || 30} s cooldown shared by all meals` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need + (i.foodBonus ? ` · ${foodBonus(i)}` : '');
   };
   // Seconds before a meal or potion can be used again; the server owns both timers and sends them with the snapshot.
-  const cooldownLeft = i => !consumable(i) ? 0 : (i.kind !== 'potion' ? window.Field?.hero?.mealCd : window.Field?.hero?.potionCd) || 0;
+  const cooldownLeft = i => !consumable(i) || i.kind === 'alchemy_flask' ? 0 : (i.kind !== 'potion' ? window.Field?.hero?.mealCd : window.Field?.hero?.potionCd) || 0;
   function tickCooldowns() {
     for (const cell of document.querySelectorAll('#inventory-list .inventory-item')) {
       const left = cooldownLeft(definition(cell.dataset.item)), badge = cell.querySelector('.item-cooldown');
@@ -183,6 +184,11 @@
   function itemIcon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
     if (i && /^orange_(0[1-9]|[1-4][0-9]|50)$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
+    const alchemyCell = i && window.ALCHEMY_ART?.at[i.id];
+    if (alchemyCell) {
+      const {cols, rows} = window.ALCHEMY_ART;
+      return `<span class="item-art" aria-hidden="true" style="background-image:url(assets/alchemy.png);background-size:${cols*100}% ${rows*100}%;background-position:${alchemyCell[0]*100/(cols-1)}% ${alchemyCell[1]*100/(rows-1)}%"></span>`;
+    }
     const smithCell = i && window.BLACKSMITHING_ART?.at[i.id];
     if (smithCell) {
       const {cols, rows} = window.BLACKSMITHING_ART;
@@ -217,7 +223,7 @@
   }
   function summary(i, count = quantity(i.id), cellCopy) {
     const copy = cellCopy || displayCopy(i), rarity = cellCopy?.rarity || displayRarity(i);
-    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${smithKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind !== 'potion' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`)} · ${questItem(i) ? 'Quest item · cannot be sold' : `sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
+    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${professionKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind !== 'potion' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`)} · ${questItem(i) ? 'Quest item · cannot be sold' : `sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
   }
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
@@ -227,7 +233,7 @@
   function showTooltip(anchor, i, slot, where, cellCopy) {
     if (!i) return;
     const copy = where ? where.copies[0] : cellCopy || displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : cellCopy?.rarity || displayRarity(i, slot);
-    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || smithKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
+    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || professionKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
     const appearance = window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
     const scroll = window.Enchanting?.isScroll(i);
@@ -237,7 +243,7 @@
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
     else if (i.kind === 'mining_pick') t.append(node('p', window.Blacksmithing?.pickDetails(i) || ''));
-    else if (i.kind !== 'material' && !scroll && !smithKind(i)) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
+    else if (i.kind !== 'material' && !scroll && !professionKind(i)) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if ((compatible(i) || i.kind === 'rod') && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (i.rarity === 'hierloom') t.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
@@ -380,6 +386,10 @@
       container.append(...rodDetails(i).map(text => node('p', text)));
     } else if (i.kind === 'mining_pick') {
       container.append(node('p', window.Blacksmithing?.pickDetails(i) || ''));
+    } else if (i.kind === 'alchemy_formula') {
+      const study = button('Study formula', () => window.Alchemy?.study(i.id), 'item-action');
+      study.dataset.action = 'study';
+      container.append(study);
     } else if (i.kind === 'smith_blueprint') {
       const study = button('Study blueprint', () => window.Blacksmithing?.study(i.id), 'item-action');
       study.dataset.action = 'study';

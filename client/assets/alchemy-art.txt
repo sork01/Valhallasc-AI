@@ -1,0 +1,96 @@
+[
+  {
+    "sprite": "33ea21c5baa95f11",
+    "order": [
+      "alchemy_meadowgold",
+      "alchemy_cinder_poppy",
+      "alchemy_frostbell",
+      "alchemy_lantern_lily",
+      "alchemy_wyrd_clover",
+      "alchemy_moonveil_orchid",
+      "alchemy_rainbow_aster",
+      "alchemy_tideglass_anemone",
+      "alchemy_starwhisper",
+      "alchemy_prism_saffron",
+      "alchemy_brass_petal",
+      "alchemy_sporebell",
+      "alchemy_storm_iris",
+      "alchemy_suncrest_marigold",
+      "alchemy_ribbon_orchid",
+      "alchemy_thornsilk_blossom",
+      "alchemy_heartvine_bloom",
+      "alchemy_dune_lotus",
+      "alchemy_snowfire_edelweiss",
+      "alchemy_cairn_heather",
+      "alchemy_hourglass_blossom",
+      "alchemy_ashen_dahlia",
+      "patch_alchemy_meadowgold",
+      "patch_alchemy_cinder_poppy"
+    ]
+  },
+  {
+    "sprite": "a803a0c67ead4857",
+    "order": [
+      "patch_alchemy_frostbell",
+      "patch_alchemy_lantern_lily",
+      "patch_alchemy_wyrd_clover",
+      "patch_alchemy_moonveil_orchid",
+      "patch_alchemy_rainbow_aster",
+      "patch_alchemy_tideglass_anemone",
+      "patch_alchemy_starwhisper",
+      "patch_alchemy_prism_saffron",
+      "patch_alchemy_brass_petal",
+      "patch_alchemy_sporebell",
+      "patch_alchemy_storm_iris",
+      "patch_alchemy_suncrest_marigold",
+      "patch_alchemy_ribbon_orchid",
+      "patch_alchemy_thornsilk_blossom",
+      "patch_alchemy_heartvine_bloom",
+      "patch_alchemy_dune_lotus",
+      "patch_alchemy_snowfire_edelweiss",
+      "patch_alchemy_cairn_heather",
+      "patch_alchemy_hourglass_blossom",
+      "patch_alchemy_ashen_dahlia",
+      "alchemy_meadowgold_potion",
+      "alchemy_cinderheart_flask",
+      "alchemy_frostguard_potion",
+      "alchemy_fenlight_flask"
+    ]
+  },
+  {
+    "sprite": "ebb394f234afba14",
+    "order": [
+      "alchemy_wyrdstride_potion",
+      "alchemy_moonveil_flask",
+      "alchemy_bifrost_potion",
+      "alchemy_tideglass_flask",
+      "alchemy_starwhisper_potion",
+      "alchemy_flask_of_clear_light",
+      "alchemy_clockguard_potion",
+      "alchemy_moonspore_flask",
+      "alchemy_stormflash_potion",
+      "alchemy_suncrest_flask",
+      "alchemy_ribbonstep_potion",
+      "alchemy_thornsilk_flask",
+      "alchemy_deepbloom_flask",
+      "alchemy_snowfire_potion",
+      "alchemy_cairnkeeper_flask",
+      "alchemy_last_hour_potion",
+      "alchemy_trailwind_potion",
+      "alchemy_flask_of_the_turning_year",
+      "alchemy_flask_of_the_ashen_ward",
+      "alchemy_flask_of_the_quiet_grove",
+      "alchemy_trailwind_potion_formula",
+      "alchemy_flask_of_the_turning_year_formula",
+      "alchemy_flask_of_the_ashen_ward_formula",
+      "alchemy_flask_of_the_quiet_grove_formula"
+    ]
+  },
+  {
+    "sprite": "cd5a2d553a8bdfa4",
+    "order": [
+      "alchemy_empty_vial",
+      "alchemy_empty_flask"
+    ]
+  }
+]

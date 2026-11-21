@@ -1457,14 +1457,16 @@
     if (!ghostWalking) {
       if (window.RaidKey?.click(mx,my,w2s)) return;
       const vein = window.Blacksmithing?.pick(mx,my,w2s);
-      if (vein) {
+      const flower = window.Alchemy?.hit(mx,my,w2s);
+      if (vein || flower) {
         hero.target = null;
         hero.goal = null;
         Field.stopMoving();
         pointer.down = false;
         hero.pvpTargetId = null;
         npcTarget = null;
-        window.Blacksmithing.start(vein);
+        if (flower) window.Alchemy.start(flower);
+        else window.Blacksmithing.start(vein);
         emitHud();
         return;
       }
@@ -1579,7 +1581,7 @@
     }
     return out;
   }
-  function onPointerMove(e) { window.WorldFeedback?.pointer(e); if (pointer.down) rememberPointer(e); else if (cv && running && !paused) { const r=cv.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width*VW, y=(e.clientY-r.top)/r.height*VH; cv.style.cursor = pickPortal(x,y) || (!hero.dead && window.Blacksmithing?.pick(x,y,w2s)) ? 'pointer' : ''; } }
+  function onPointerMove(e) { window.WorldFeedback?.pointer(e); if (pointer.down) rememberPointer(e); else if (cv && running && !paused) { const r=cv.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width*VW, y=(e.clientY-r.top)/r.height*VH; cv.style.cursor = pickPortal(x,y) || (!hero.dead && (window.Blacksmithing?.pick(x,y,w2s) || window.Alchemy?.hit(x,y,w2s))) ? 'pointer' : ''; } }
   function onPointerUp() { pointer.down = false; }
 
   // ---------- combat ----------
@@ -1743,6 +1745,7 @@
     window.EmptySeat?.sync(own, zone);
     window.Fishing?.sync(packet, own, zdef, cue => say('fishingSound', cue));
     window.Blacksmithing?.sync(packet, own, cue => say('smithSound', cue));
+    window.Alchemy?.sync(packet, cue => say('alchemySound', cue));
     window.Attributes?.update(own);
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
@@ -1916,6 +1919,7 @@
     if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {
+      if (event.alchemy && event.actor === Online.id) say('alchemySound', 'drink');
       spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
       if (event.mana > 0) floater(event.x, event.y, '+' + event.mana + ' ' + (event.resourceType || 'mana'), '#85baff', false, 'heal');
       if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', true, 'heal'); }
@@ -5307,6 +5311,7 @@
     window.NewYear?.drawFireworks(g,zone,hero,t,VW,VH,reducedMotion());
     drawFishing(g);
     window.Blacksmithing?.draw(g, w2s, VW, VH, reducedMotion() || !!window.Prefs?.lowGraphics);
+    window.Alchemy?.draw(g, w2s, VW, VH);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     window.Halloween?.drawLabel(g,zone,w2s);

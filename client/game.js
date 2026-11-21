@@ -811,7 +811,7 @@
         const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, 'data-polarity': polarity, title: `${name}: ${description}` }), glyph = el('span', { class: 'skill-icon' });
         chip.tabIndex = 0;
         chip._buffMeta = { name, description, polarity, current: b };
-        glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph);
+        glyph.innerHTML = b.kind === 'alchemy' && food ? Inventory.icon(food) : Skillbar.icon(def?.icon || 'attack'); chip.append(glyph);
         if (b.kind === 'status') chip.append(el('b', { text: translate(b.short || b.name) }));
         chip.append(el('i'));
         chip.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch') showBuffTooltip(chip, chip._buffMeta.current, false); });
@@ -843,7 +843,7 @@
     for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) {
       if (chip._buffMeta) chip._buffMeta.current = b;
       const seconds = Math.ceil(b.left), label = b.kind === 'status' ? `${b.name} · ${seconds}s` : '';
-      chip.querySelector('i').textContent = (b.id === 'festivalspirit' || b.id === 'resurrection_sickness' || b.id.startsWith('meal:')) ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : b.kind === 'status' ? `${seconds}s` : seconds;
+      chip.querySelector('i').textContent = (b.id === 'festivalspirit' || b.id === 'resurrection_sickness' || b.id.startsWith('meal:') || (b.kind === 'alchemy' && b.time >= 60)) ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : b.kind === 'status' ? `${seconds}s` : seconds;
       if (label) chip.setAttribute('aria-label', label);
       chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time)));
     } }
@@ -962,15 +962,16 @@
     });
   }
   // FISHING-SOUND-END
-  const smithCueBuffers = {};
-  function smithSound(cue) {
-    if (!['strike', 'smelt', 'forge'].includes(cue) || !save.sound) return;
+  const professionCueBuffers = {};
+  function professionSound(profession, cue) {
+    if (!save.sound) return;
     const c = audio(); if (!c) return;
     const requested = performance.now();
-    const buffer = smithCueBuffers[cue] ||= fetch(`assets/sfx_smith_${cue}.mp3`).then(r => {
-      if (!r.ok) throw Error('smith_audio');
+    const key = profession + '_' + cue;
+    const buffer = professionCueBuffers[key] ||= fetch(`assets/sfx_${key}.mp3`).then(r => {
+      if (!r.ok) throw Error('profession_audio');
       return r.arrayBuffer();
-    }).then(b => c.decodeAudioData(b)).catch(() => { delete smithCueBuffers[cue]; return null; });
+    }).then(b => c.decodeAudioData(b)).catch(() => { delete professionCueBuffers[key]; return null; });
     buffer.then(b => {
       if (!b || !save.sound || scene !== 'game' || performance.now() - requested > 1200) return;
       const source = c.createBufferSource();
@@ -979,7 +980,8 @@
   }
   const SFX = {
     fishingSound,
-    smithSound,
+    smithSound(cue) { if (['strike', 'smelt', 'forge'].includes(cue)) professionSound('smith', cue); },
+    alchemySound(cue) { if (['pick', 'brew', 'drink'].includes(cue)) professionSound('alchemy', cue); },
 
     bossMech: bossMechSound,
     forgeProc: ev => {

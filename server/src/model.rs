@@ -367,6 +367,10 @@ pub struct Character {
     pub enchanting: crate::enchanting::Progress,
     #[serde(default, skip_serializing_if = "crate::blacksmithing::Progress::is_untrained")]
     pub blacksmithing: crate::blacksmithing::Progress,
+    #[serde(default, skip_serializing_if = "crate::alchemy::Progress::is_untrained")]
+    pub alchemy: crate::alchemy::Progress,
+    #[serde(skip)]
+    pub alchemy_health: f64,
     pub gold: u32,
     pub kills: u32,
     #[serde(default)]
@@ -718,6 +722,8 @@ impl Character {
             gear_instances: vec![],
             enchanting: Default::default(),
             blacksmithing: Default::default(),
+            alchemy: Default::default(),
+            alchemy_health: 0.,
             next_gear_id: 1,
             bags: vec![],
             attributes: Attributes::default(),
@@ -943,6 +949,7 @@ impl Character {
         self.legacy_max_hp()
             * player_health_scale(self.level)
             * (1. + self.set_stat_bonus("health"))
+            * (1. + self.alchemy_health)
             * self.stat_scale()
     }
     pub fn legacy_max_hp(&self) -> f64 {
@@ -1467,6 +1474,8 @@ pub fn quest_progress(character: &mut Character, quests: &[Quest], kind: &str, t
 pub enum ClientMessage {
     Mine { id: u64 },
     Blacksmithing { request: crate::blacksmithing::Command },
+    Alchemy { request: crate::alchemy::Command },
+    PickFlower { id: u64 },
     Enchanting {
         request: crate::enchanting::Command,
     },

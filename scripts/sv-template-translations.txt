@@ -503,5 +503,18 @@
   "Requires Blacksmithing {0}": "Kräver smide {0}",
   "Train to {0} with {1} in {2}.": "Träna upp till {0} med {1} i {2}.",
   "{0} · Blacksmithing {1}": "{0} · Smide {1}",
-  "Other mining areas · {0}": "Andra gruvområden · {0}"
+  "Other mining areas · {0}": "Andra gruvområden · {0}",
+  "Alchemy skill {0} / {1}": "Alkemifärdighet {0} / {1}",
+  "{0} · Requires Alchemy {1}": "{0} · Kräver alkemi {1}",
+  "Requires Alchemy {0}": "Kräver alkemi {0}",
+  "Formula drops in {0}.": "Receptet kan tappas i {0}.",
+  "Train to {0} by picking or brewing with these flowers.": "Nå {0} genom att plocka eller brygga med de här blommorna.",
+  "{0} · Alchemy {1}": "{0} · Alkemi {1}",
+  "+{0}% damage": "+{0} % skada",
+  "{0}% less damage taken": "{0} % mindre skada tagen",
+  "+{0}% outgoing healing": "+{0} % utgående läkning",
+  "+{0}% movement speed": "+{0} % rörelsehastighet",
+  "+{0}% maximum health": "+{0} % maximal hälsa",
+  "{0} for 45 min. PvE only. Drink out of combat. Requires level {1}.": "{0} i 45 min. Bara i PvE. Drick utanför strid. Kräver nivå {1}.",
+  "{0} for 15 s. PvE only. Shares the 60 s potion cooldown. Requires level {1}.": "{0} i 15 s. Bara i PvE. Delar dryckers återhämtning på 60 s. Kräver nivå {1}."
 }

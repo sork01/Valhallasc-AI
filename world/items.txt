@@ -142773,5 +142773,493 @@
     "rarity": "epic",
     "sell": 1104,
     "source": "blacksmithing"
+  },
+  {
+    "id": "alchemy_empty_vial",
+    "name": "Empty Vial",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_empty_flask",
+    "name": "Empty Flask",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 20,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_meadowgold",
+    "name": "Meadowgold",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_cinder_poppy",
+    "name": "Cinder Poppy",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_frostbell",
+    "name": "Frostbell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_lantern_lily",
+    "name": "Lantern Lily",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_wyrd_clover",
+    "name": "Wyrd Clover",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 6,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_moonveil_orchid",
+    "name": "Moonveil Orchid",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 7,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_rainbow_aster",
+    "name": "Rainbow Aster",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_tideglass_anemone",
+    "name": "Tideglass Anemone",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 9,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_starwhisper",
+    "name": "Starwhisper",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_prism_saffron",
+    "name": "Prism Saffron",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_brass_petal",
+    "name": "Brass Petal",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 12,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_sporebell",
+    "name": "Sporebell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 13,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_storm_iris",
+    "name": "Storm Iris",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 14,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_suncrest_marigold",
+    "name": "Suncrest Marigold",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 15,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_ribbon_orchid",
+    "name": "Ribbon Orchid",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 16,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_thornsilk_blossom",
+    "name": "Thornsilk Blossom",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 17,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_heartvine_bloom",
+    "name": "Heartvine Bloom",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 18,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_dune_lotus",
+    "name": "Dune Lotus",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 18,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_snowfire_edelweiss",
+    "name": "Snowfire Edelweiss",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 19,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_cairn_heather",
+    "name": "Cairn Heather",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 20,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_hourglass_blossom",
+    "name": "Hourglass Blossom",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 21,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_ashen_dahlia",
+    "name": "Ashen Dahlia",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 21,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_meadowgold_potion",
+    "name": "Meadowgold Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 1,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 5,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_cinderheart_flask",
+    "name": "Cinderheart Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 5,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 9,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_frostguard_potion",
+    "name": "Frostguard Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 10,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 14,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_fenlight_flask",
+    "name": "Fenlight Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 15,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 19,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_wyrdstride_potion",
+    "name": "Wyrdstride Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 20,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 24,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_moonveil_flask",
+    "name": "Moonveil Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 25,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 29,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_bifrost_potion",
+    "name": "Bifrost Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 30,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 34,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_tideglass_flask",
+    "name": "Tideglass Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 35,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 39,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_starwhisper_potion",
+    "name": "Starwhisper Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 40,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 44,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_flask_of_clear_light",
+    "name": "Flask of Clear Light",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 45,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 49,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_clockguard_potion",
+    "name": "Clockguard Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 50,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 54,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_moonspore_flask",
+    "name": "Moonspore Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 59,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_stormflash_potion",
+    "name": "Stormflash Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 64,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_suncrest_flask",
+    "name": "Suncrest Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 69,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_ribbonstep_potion",
+    "name": "Ribbonstep Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 70,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 74,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_thornsilk_flask",
+    "name": "Thornsilk Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 75,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 79,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_deepbloom_flask",
+    "name": "Deepbloom Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 80,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 84,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_snowfire_potion",
+    "name": "Snowfire Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 85,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 89,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_cairnkeeper_flask",
+    "name": "Cairnkeeper Flask",
+    "kind": "alchemy_flask",
+    "rarity": "uncommon",
+    "requiredLevel": 90,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 94,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_last_hour_potion",
+    "name": "Last Hour Potion",
+    "kind": "potion",
+    "rarity": "uncommon",
+    "requiredLevel": 95,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 99,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_trailwind_potion",
+    "name": "Trailwind Potion",
+    "kind": "potion",
+    "rarity": "rare",
+    "requiredLevel": 90,
+    "duration": 15,
+    "cooldown": 60,
+    "sell": 94,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_trailwind_potion_formula",
+    "name": "Formula: Trailwind Potion",
+    "kind": "alchemy_formula",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_flask_of_the_turning_year",
+    "name": "Flask of the Turning Year",
+    "kind": "alchemy_flask",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 103,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_flask_of_the_turning_year_formula",
+    "name": "Formula: Flask of the Turning Year",
+    "kind": "alchemy_formula",
+    "rarity": "epic",
+    "sell": 25,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_flask_of_the_ashen_ward",
+    "name": "Flask of the Ashen Ward",
+    "kind": "alchemy_flask",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 103,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_flask_of_the_ashen_ward_formula",
+    "name": "Formula: Flask of the Ashen Ward",
+    "kind": "alchemy_formula",
+    "rarity": "epic",
+    "sell": 25,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_flask_of_the_quiet_grove",
+    "name": "Flask of the Quiet Grove",
+    "kind": "alchemy_flask",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "duration": 2700,
+    "cooldown": 0,
+    "sell": 103,
+    "source": "alchemy"
+  },
+  {
+    "id": "alchemy_flask_of_the_quiet_grove_formula",
+    "name": "Formula: Flask of the Quiet Grove",
+    "kind": "alchemy_formula",
+    "rarity": "epic",
+    "sell": 25,
+    "source": "alchemy"
   }
 ]

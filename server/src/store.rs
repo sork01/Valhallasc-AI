@@ -249,6 +249,8 @@ impl Store {
             gear_instances: vec![],
             enchanting: Default::default(),
             blacksmithing: Default::default(),
+            alchemy: Default::default(),
+            alchemy_health: 0.,
             next_gear_id: 1,
             bags: vec![],
             attributes: Default::default(),

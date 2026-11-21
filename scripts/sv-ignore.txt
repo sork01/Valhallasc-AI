@@ -175,5 +175,7 @@
   "Blacksmithing catalog",
   "Mining vein positions",
   "[data-recipe]",
-  "[data-smith-action]"
+  "[data-smith-action]",
+  "Alchemy catalog",
+  "Alchemy patches"
 ]

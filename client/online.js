@@ -164,7 +164,7 @@
           }
           if (initialSlot?.initialEmptySlots?.length) send({ type: 'equip', slots: Object.fromEntries(initialSlot.initialEmptySlots.map(slot => [slot, 'none'])) });
           characterGm = character?.gm === true; window.GM?.onSelf?.(character);
-          window.Fishing?.reset(); window.Blacksmithing?.reset(); callbacks.onWelcome?.(packet);
+          window.Fishing?.reset(); window.Blacksmithing?.reset(); window.Alchemy?.reset(); callbacks.onWelcome?.(packet);
           window.DpsMeter?.update(packet.snapshot.damageMeter);
           window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
           window.Mail?.onUnread(character?.mailUnread || 0, character?.mailTotal);
@@ -197,6 +197,8 @@
         case 'social': window.Social?.onState(packet); break;
         case 'enchanting': window.Enchanting?.onPacket(packet); break;
         case 'blacksmithing': window.Blacksmithing?.onPacket(packet); break;
+        case 'alchemy': window.Alchemy?.onPacket(packet); break;
+        case 'picking': window.Alchemy?.picking(packet); break;
         case 'mining': window.Blacksmithing?.mining(packet); break;
         case 'trade': serviceError(packet); window.Trade?.onPacket(packet); break;
         case 'inspect': window.Inspect?.onPacket(packet); break;
@@ -231,7 +233,7 @@
       clearTimeout(joinTimeout);
       if (!current()) return;
       clearSnapshot(); clearInterval(heartbeat);
-      connected = false; characterGm = false; window.GM?.onSelf?.(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Fishing?.reset(); window.Blacksmithing?.reset(); window.Inventory?.hideTooltip(); window.Tutorial?.onSnapshot(null); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf?.(null); window.Attributes?.error?.(); window.Achievements?.reset(); window.Fishing?.reset(); window.Blacksmithing?.reset(); window.Alchemy?.reset(); window.Inventory?.hideTooltip(); window.Tutorial?.onSnapshot(null); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay(waitingForRelease ? 'Waiting for your previous connection to close…' : 'Connection lost. Reconnecting to your character…');
@@ -244,7 +246,7 @@
       $('chat').hidden = false; connect();
     },
     stop() {
-      window.DpsMeter?.reset(); window.Achievements?.reset(); window.Fishing?.reset(); window.Blacksmithing?.reset();
+      window.DpsMeter?.reset(); window.Achievements?.reset(); window.Fishing?.reset(); window.Blacksmithing?.reset(); window.Alchemy?.reset();
       active = false; generation++; clearSnapshot(); connected = false; id = null; busySince = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;

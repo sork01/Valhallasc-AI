@@ -27,6 +27,9 @@ pub(super) fn health_amount(it: &Item, c: &Character) -> f64 {
 
 impl World {
     pub(super) fn use_item(&mut self, session: u64, id: &str) {
+        if let Some(recipe) = crate::alchemy::CATALOG.recipe(id) {
+            return self.use_brew(session, recipe);
+        }
         let Some(p) = self.players.get_mut(&session) else {
             return;
         };

@@ -45,10 +45,14 @@ impl Skill {
     /// Only eligible actions affect the streak. Two eligible attempts without a point
     /// guarantee one on the next attempt, and better materials or fish improve the odds.
     pub fn try_gain(&mut self, quality: u8, cap: u16, roll: f64) -> bool {
-        if !(1..cap.min(MAX_SKILL)).contains(&self.skill) {
+        self.try_gain_to(quality, cap, MAX_SKILL, roll)
+    }
+
+    pub fn try_gain_to(&mut self, quality: u8, cap: u16, max_skill: u16, roll: f64) -> bool {
+        if !(1..cap.min(max_skill)).contains(&self.skill) {
             return false;
         }
-        let chance = 0.9 - 0.3 * f64::from(self.skill - 1) / f64::from(MAX_SKILL - 1)
+        let chance = 0.9 - 0.3 * f64::from(self.skill - 1) / f64::from(max_skill - 1)
             + 0.05 * f64::from(quality.min(3));
         if self.misses >= 2 || roll < chance.min(1.) {
             self.skill += 1;

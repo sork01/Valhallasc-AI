@@ -11,6 +11,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod alchemy;
 mod blacksmithing;
 mod enchanting;
 mod fishing;
@@ -468,6 +469,9 @@ pub enum Command {
 struct Player {
     fishing: fishing::Session,
     mining: Option<blacksmithing::Mining>,
+    picking: Option<alchemy::Picking>,
+    alchemy_potion: Option<crate::alchemy::ActiveBrew>,
+    alchemy_suppressed: bool,
     enchanting: enchanting::Session,
     character: Character,
     peer: Peer,
@@ -657,6 +661,9 @@ impl Player {
             input: Point::default(),
             fishing: Default::default(),
             mining: None,
+            picking: None,
+            alchemy_potion: None,
+            alchemy_suppressed: false,
             enchanting: Default::default(),
             input_at: -99.,
             goal: None,
@@ -2034,6 +2041,8 @@ pub struct World {
     rich_fishing: BTreeMap<usize, Vec<fishing::RichSpot>>,
     mining_veins: BTreeMap<usize, Vec<blacksmithing::Vein>>,
     smith_rng: u64,
+    flower_patches: BTreeMap<usize, Vec<alchemy::FlowerPatch>>,
+    alchemy_rng: u64,
     // Every zone's enemy spawns in one list, so enemy ids stay stable and global.
     spawns: Vec<SlimeSpawn>,
     store: Store,
@@ -2186,6 +2195,8 @@ impl World {
             maps,
             rich_fishing: BTreeMap::new(),
             mining_veins: BTreeMap::new(),
+            flower_patches: BTreeMap::new(),
+            alchemy_rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             smith_rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             spawns,
             store,
@@ -2329,6 +2340,10 @@ impl World {
     fn random(&mut self) -> f64 {
         self.rng = self.rng.wrapping_mul(6364136223846793005).wrapping_add(1);
         (self.rng >> 32) as f64 / 4294967296.
+    }
+    fn alchemy_roll(&mut self) -> f64 {
+        self.alchemy_rng = self.alchemy_rng.wrapping_mul(6364136223846793005).wrapping_add(1);
+        (self.alchemy_rng >> 32) as f64 / 4294967296.
     }
     fn smith_roll(&mut self) -> f64 {
         self.smith_rng = self.smith_rng.wrapping_mul(6364136223846793005).wrapping_add(1);
@@ -2530,6 +2545,9 @@ impl World {
         if let Some(channel) = p.mining {
             view["mining"] = json!(channel.vein);
         }
+        if let Some(buffs) = view["buffs"].as_array_mut() {
+            buffs.extend(p.alchemy_buffs());
+        }
         view["hired"] = json!(p.merc.is_some());
         view["leadShoes"] = json!(p.shoed);
         view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
@@ -2657,6 +2675,9 @@ impl World {
         let across = self.across_view(zone);
         if !across.is_empty() {
             view["across"] = json!(across);
+        }
+        if let Some(patches) = self.flower_patches.get(&zone) {
+            view["flowerPatches"] = json!(patches);
         }
         if let Some(veins) = self.mining_veins.get(&zone) {
             view["miningVeins"] = json!(veins);
@@ -2898,6 +2919,7 @@ impl World {
         );
         quest_drops::migrate_quest_items(&mut c, &self.maps);
         self.players.insert(session, Player::new(c, peer));
+        self.refresh_alchemy(session);
         self.audit_player(
             session,
             "login",
@@ -3062,17 +3084,23 @@ impl World {
         ) {
             p.dance = None;
         }
-        if p.mining.is_some() && match &message {
+        let interrupts_gathering = match &message {
             ClientMessage::Input { dx, dy } => dx.is_finite() && dy.is_finite() && (*dx != 0. || *dy != 0.),
             ClientMessage::Move { x, y } => x.is_finite() && y.is_finite(),
             ClientMessage::Attack { .. } | ClientMessage::Skill { .. } | ClientMessage::Dash { .. }
             | ClientMessage::Target { .. } | ClientMessage::Mount { .. } | ClientMessage::Fish {}
             | ClientMessage::Interact { .. } | ClientMessage::RaidCross { .. } => true,
             _ => false,
-        } {
+        };
+        if interrupts_gathering {
             Self::interrupt_mining(p);
         }
+        if interrupts_gathering || matches!(message, ClientMessage::Mine { .. } | ClientMessage::Pvp { .. }) {
+            Self::interrupt_picking(p);
+        }
         match message {
+            ClientMessage::Alchemy { request } => self.alchemy_command(session, request),
+            ClientMessage::PickFlower { id } => self.start_picking(session, id),
             ClientMessage::Mine { id } => self.start_mining(session, id),
             ClientMessage::Blacksmithing { request } => self.blacksmithing_command(session, request),
             ClientMessage::Input { dx, dy }
@@ -3873,6 +3901,9 @@ impl World {
         if npc.offers.iter().any(|offer| offer.id == "learn_enchanting") {
             dialogue["enchantingSkill"] = json!(p.character.enchanting.proficiency.skill);
         }
+        if let Some(workshop) = alchemy::workshop_view(npc, &p.character) {
+            dialogue["alchemy"] = workshop;
+        }
         if let Some(workshop) = blacksmithing::workshop_view(npc, &p.character) {
             dialogue["blacksmithing"] = workshop;
         }
@@ -3974,7 +4005,9 @@ impl World {
                 let zone = p.character.zone;
                 self.ensure_fishing_spots(zone);
                 self.ensure_veins(zone);
+                self.ensure_flowers(zone);
             }
+            self.refresh_alchemy(session);
             self.update_food(session);
             self.update_player(session);
             if self.players.get(&session).is_some_and(|p| p.fishing.line.is_some()) {
@@ -4006,6 +4039,11 @@ impl World {
         let miners: Vec<_> = self.players.iter().filter(|(_, p)| p.mining.is_some()).map(|(session, _)| *session).collect();
         for session in miners {
             self.update_mining(session);
+        }
+        let pickers: Vec<_> = self.players.iter()
+            .filter_map(|(session, p)| p.picking.map(|_| *session)).collect();
+        for session in pickers {
+            self.update_picking(session);
         }
         self.update_raid_key();
         self.update_empty_seat();
@@ -4594,6 +4632,7 @@ impl World {
                     1.
                 },
         ) * (1. + p.buff(BuffKind::Haste) + p.enchant_move_speed(self.time))
+            * (1. + p.alchemy_modifier(crate::alchemy::Stat::Speed))
             * if p.daze > 0. { 0.5 } else { 1. }
             * TICK
             * if p.attack > 0. { 0.25 } else { 1. })
@@ -5528,7 +5567,8 @@ impl World {
                 let p = self.players.get_mut(&session).unwrap();
                 let before = p.character.hp;
                 p.character.hp = (before
-                    + p.character.max_hp() * fraction * p.heal_factor_by(class))
+                    + p.character.max_hp() * fraction * p.heal_factor_by(class)
+                        * (1. + p.alchemy_modifier(crate::alchemy::Stat::Healing)))
                 .min(p.character.max_hp());
                 healed = (p.character.hp - before).round();
             }
@@ -5542,7 +5582,8 @@ impl World {
         if skill.lifesteal > 0. && dealt > 0. && self.players[&session].pvp_fight <= 0. {
             let p = self.players.get_mut(&session).unwrap();
             let before = p.character.hp;
-            p.character.hp = (before + dealt * skill.lifesteal * p.heal_factor_by(class))
+            p.character.hp = (before + dealt * skill.lifesteal * p.heal_factor_by(class)
+                * (1. + p.alchemy_modifier(crate::alchemy::Stat::Healing)))
                 .min(p.character.max_hp());
             healed = (p.character.hp - before).round();
         }
@@ -5594,12 +5635,19 @@ impl World {
     /// Returns the healed players' positions for the skill's visual effect.
     fn heal_players(&mut self, caster: u64, sessions: &[u64], mult: f64) -> Vec<[f64; 2]> {
         let warmth = self.signature_heal_multiplier(caster, sessions);
-        let amount = (self.raid_attack_power(caster) * mult * warmth).round();
+        let healing = self.players[&caster].alchemy_modifier(crate::alchemy::Stat::Healing);
+        let base = self.raid_attack_power(caster) * mult * warmth;
         let caster_class = self.players[&caster].character.look.class;
         let from = self.players[&caster].character.id.clone();
         let mut points = vec![];
         self.assist_combat(caster, sessions);
         for s in sessions {
+            let bonus = if healing > 0. && self.players.get(s).is_some_and(|p| !self.alchemy_pvp(p)) {
+                healing
+            } else {
+                0.
+            };
+            let amount = (base * (1. + bonus)).round();
             let Some(p) = self.players.get_mut(s) else {
                 continue;
             };
@@ -5694,7 +5742,7 @@ impl World {
         let damage = if gm_strike {
             self.slimes[id].hp.max(damage)
         } else {
-            damage
+            damage * (1. + p.alchemy_modifier(crate::alchemy::Stat::Damage))
         };
         // A final boss's mechanics may shield it, stun it, or hold a divided body down (world/boss_mechanics.rs).
         let damage = match self.boss_incoming(id, damage) {
@@ -5914,6 +5962,7 @@ impl World {
             }
             self.enchant_recipe_drop(&credit_id, zone, point, &kind, level);
             self.smith_blueprint_drop(&credit_id, zone, point, &kind, level);
+            self.alchemy_formula_drop(&credit_id, zone, point, &kind, level);
             // The credited hero's rebirth drop multiplier reaches every roll below (docs/rebirth.md).
             let boost = self.drop_multiplier_of(&credit_id);
             let value = if gold > 0 {
@@ -6640,7 +6689,8 @@ impl World {
         let p = self.players.get_mut(&session).unwrap();
         let shield = p.buff(BuffKind::Shield).min(0.8);
         let mut value =
-            ((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE * raid_taken)
+            ((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE * raid_taken
+                * (1. - p.alchemy_modifier(crate::alchemy::Stat::Ward)))
                 .round()
                 .max(1.);
         if shield > 0. {
@@ -6666,6 +6716,7 @@ impl World {
         let taken = value.min(before);
         if taken > 0. {
             Self::interrupt_mining(p);
+            Self::interrupt_picking(p);
         }
         if taken > 0. && dazed {
             p.daze = 4.;
@@ -6686,6 +6737,8 @@ impl World {
         if dead {
             p.dead_time = 0.;
             p.fallen = self.boss.fight_in(p.character.zone);
+            p.alchemy_potion = None;
+            p.suppress_alchemy(p.alchemy_suppressed);
             p.attack = 0.;
             p.buffs.clear();
             p.stop();

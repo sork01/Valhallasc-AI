@@ -64243,6 +64243,41 @@
         }
       ],
       "buys": false
+    },
+    {
+      "id": "alchemy_alderhaven",
+      "name": "Maera Petalbrook",
+      "role": "Alchemist",
+      "x": 257.25,
+      "y": 197.25,
+      "color": "#4e7469",
+      "dialogue": "Bring flowers and empty bottles to my counter. I can teach you recipes and help you brew them.",
+      "look": {
+        "skin": "#e3ae83",
+        "hair": "#704b51",
+        "style": "bun",
+        "apron": "#4e7469",
+        "prop": "alembic"
+      },
+      "offers": [
+        {
+          "id": "alchemy_workshop",
+          "label": "Alchemy workshop",
+          "cost": 0
+        },
+        {
+          "id": "buy_alchemy_empty_vial",
+          "label": "Buy Empty Vial",
+          "item": "alchemy_empty_vial",
+          "cost": 25
+        },
+        {
+          "id": "buy_alchemy_empty_flask",
+          "label": "Buy Empty Flask",
+          "item": "alchemy_empty_flask",
+          "cost": 100
+        }
+      ]
     }
   ],
   "quests": [
@@ -319199,7 +319234,25 @@
           "y": 66.3,
           "color": "#4f8a7a",
           "dialogue": "Gel for the base, glands for the body, hides for the stubborn stains. Every cure in this city starts with something a monster was not using any more. Bring me the ingredients and I will brew the rest.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "alchemy_workshop",
+              "label": "Alchemy workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_alchemy_empty_vial",
+              "label": "Buy Empty Vial",
+              "item": "alchemy_empty_vial",
+              "cost": 25
+            },
+            {
+              "id": "buy_alchemy_empty_flask",
+              "label": "Buy Empty Flask",
+              "item": "alchemy_empty_flask",
+              "cost": 100
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#f0c8a6",
@@ -546141,6 +546194,42 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "alchemy_nacrehold",
+          "name": "Neris Shellcup",
+          "role": "Alchemist",
+          "x": 146.25,
+          "y": 107.25,
+          "color": "#4e7469",
+          "dialogue": "Bring flowers and empty bottles to my counter. I can teach you recipes and help you brew them.",
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#63c6ab",
+            "skin": "#92c9bc",
+            "hair": "#46314b",
+            "style": "long"
+          },
+          "offers": [
+            {
+              "id": "alchemy_workshop",
+              "label": "Alchemy workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_alchemy_empty_vial",
+              "label": "Buy Empty Vial",
+              "item": "alchemy_empty_vial",
+              "cost": 25
+            },
+            {
+              "id": "buy_alchemy_empty_flask",
+              "label": "Buy Empty Flask",
+              "item": "alchemy_empty_flask",
+              "cost": 100
+            }
+          ]
         }
       ],
       "places": [
@@ -819519,6 +819608,41 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "alchemy_asterion",
+          "name": "Lio Sporeglass",
+          "role": "Alchemist",
+          "x": 61.25,
+          "y": 109.25,
+          "color": "#4e7469",
+          "dialogue": "Bring flowers and empty bottles to my counter. I can teach you recipes and help you brew them.",
+          "look": {
+            "skin": "#bd8064",
+            "hair": "#704b51",
+            "style": "bun",
+            "apron": "#4e7469",
+            "prop": "alembic"
+          },
+          "offers": [
+            {
+              "id": "alchemy_workshop",
+              "label": "Alchemy workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_alchemy_empty_vial",
+              "label": "Buy Empty Vial",
+              "item": "alchemy_empty_vial",
+              "cost": 25
+            },
+            {
+              "id": "buy_alchemy_empty_flask",
+              "label": "Buy Empty Flask",
+              "item": "alchemy_empty_flask",
+              "cost": 100
+            }
+          ]
         }
       ],
       "quests": [
@@ -1142944,6 +1143068,41 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "alchemy_heartwood",
+          "name": "Yrsa Mosskettle",
+          "role": "Alchemist",
+          "x": 145.25,
+          "y": 158.25,
+          "color": "#4e7469",
+          "dialogue": "Bring flowers and empty bottles to my counter. I can teach you recipes and help you brew them.",
+          "look": {
+            "skin": "#e3ae83",
+            "hair": "#704b51",
+            "style": "bun",
+            "apron": "#4e7469",
+            "prop": "alembic"
+          },
+          "offers": [
+            {
+              "id": "alchemy_workshop",
+              "label": "Alchemy workshop",
+              "cost": 0
+            },
+            {
+              "id": "buy_alchemy_empty_vial",
+              "label": "Buy Empty Vial",
+              "item": "alchemy_empty_vial",
+              "cost": 25
+            },
+            {
+              "id": "buy_alchemy_empty_flask",
+              "label": "Buy Empty Flask",
+              "item": "alchemy_empty_flask",
+              "cost": 100
+            }
+          ]
         }
       ],
       "places": [

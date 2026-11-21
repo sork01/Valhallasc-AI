@@ -1,0 +1,24 @@
+{
+  "project": "9d5ca3bbb967159e",
+  "bpm": 120,
+  "clips": {
+    "pick": {
+      "file": "sfx_alchemy_pick.mp3",
+      "bar": 1,
+      "duration": 0.5,
+      "sha256": "decce09b77b76417eae4d6ae13f250ed84d4ff76200ab219813c8c75b9f72496"
+    },
+    "brew": {
+      "file": "sfx_alchemy_brew.mp3",
+      "bar": 3,
+      "duration": 0.8,
+      "sha256": "b128a40b0e6a6be8d6911f4a5ca605b14a73e41727dd3f5b19b5c26073ac184f"
+    },
+    "drink": {
+      "file": "sfx_alchemy_drink.mp3",
+      "bar": 5,
+      "duration": 0.75,
+      "sha256": "53c0fe728ab8e8033f4980ae6541ea9f7e4a124dcb0c0f53984629f9fc0fdb96"
+    }
+  }
+}

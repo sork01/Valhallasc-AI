@@ -52,8 +52,11 @@ impl World {
     pub(super) fn is_arena_zone(&self, zone: usize) -> bool {
         self.maps.get(zone).is_some_and(|m| m.name == "The Arena")
     }
-    pub(super) fn pvp_busy(&self, id: &str) -> bool {
+    pub(super) fn in_duel(&self, id: &str) -> bool {
         self.pvp.duels.iter().any(|d| d.from == id || d.to == id)
+    }
+    pub(super) fn pvp_busy(&self, id: &str) -> bool {
+        self.in_duel(id)
             || self
                 .pvp
                 .queue
@@ -163,6 +166,7 @@ impl World {
             .unwrap()
             .0;
         self.players.get_mut(&session).unwrap().pvp_flag = enabled;
+        self.refresh_alchemy(session);
         self.tell(
             me,
             if enabled {
@@ -262,6 +266,13 @@ impl World {
         duel.center = center;
         duel.outside = [None, None];
         self.pvp.duels.push(duel);
+        for p in self
+            .players
+            .values_mut()
+            .filter(|p| p.character.id == me || p.character.id == from)
+        {
+            p.suppress_alchemy(true);
+        }
         self.tell(
             me,
             "Duel started. First to one health loses; no XP is lost.",
@@ -375,6 +386,7 @@ impl World {
                 p.character.zone = zone;
                 p.character.x = if side == 0 { 9. } else { 23. };
                 p.character.y = 13. + lane as f64 * 3.;
+                p.suppress_alchemy(true);
                 p.character.hp = p.character.max_hp();
                 p.character.reset_resource();
                 p.character.mounted = false;
@@ -620,6 +632,9 @@ impl World {
         if !self.pvp_legal(attacker, defender) {
             return 0.;
         }
+        for session in [attacker, defender] {
+            self.players.get_mut(&session).unwrap().suppress_alchemy(true);
+        }
         let session = attacker;
         let defender_session = defender;
         let damage = if self.players[&attacker].character.look.class == Class::Hunter {
@@ -702,6 +717,12 @@ impl World {
                 (p.character.hp - value).max(0.)
             };
             let taken = p.character.hp - hp;
+            if taken > 0. {
+                Self::interrupt_picking(p);
+            }
+            if hp <= 0. {
+                p.alchemy_potion = None;
+            }
             taken_total = taken;
             p.character.hp = hp;
             p.hurt = 0.25;
@@ -866,6 +887,7 @@ impl World {
                 p.root = 0.;
                 p.wound_left = 0.;
                 p.pvp_fight = 0.;
+                p.suppress_alchemy(p.pvp_flag);
                 p.absorb_left = 0.;
             }
             self.tell(id, text.clone(), true);
@@ -883,6 +905,7 @@ impl World {
                 p.character.zone = zone;
                 p.character.x = x;
                 p.character.y = y;
+                p.suppress_alchemy(p.pvp_flag);
                 p.character.hp = p.character.max_hp();
                 p.character.reset_resource();
                 p.cooldown = 0.;

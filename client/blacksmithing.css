@@ -1,4 +1,4 @@
-#mining-status {
+#mining-status, #picking-status {
   position: fixed;
   z-index: 8;
   bottom: max(92px, 18vh);
@@ -67,4 +67,20 @@
   .smith-recipe { grid-template-columns: 2rem minmax(0, 1fr); }
   .smith-icon { width: 2rem; height: 2rem; }
   .smith-recipe > :last-child { grid-column: 2; justify-self: start; }
+}
+
+.buff-chip[data-kind="alchemy"] .skill-icon { position: relative; }
+.buff-chip[data-kind="alchemy"] .item-art { position: absolute; inset: 0; }
+#picking-status { color: #dbefb2; border-color: #708b55; }
+.alchemy-workshop label { display: grid; gap: .45rem; }
+.alchemy-workshop select { max-width: 100%; min-height: 2.35rem; }
+.alchemy-flowers { padding-left: 1.2rem; }
+.alchemy-flowers li { margin-bottom: .35rem; }
+.alchemy-brewed { animation: alchemy-brewed .6s ease-out; }
+@keyframes alchemy-brewed {
+  from { box-shadow: inset 0 0 1rem #92b754; }
+  to { box-shadow: inset 0 0 0 transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .alchemy-brewed { animation: none; }
 }

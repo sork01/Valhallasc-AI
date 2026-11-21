@@ -526,7 +526,7 @@
     // quest's page with Accept and Decline under it. The two-pane journal frame is the journal's alone again.
     const gossip=view.kind==='gossip',classic=false;
     $('npc-dialogue').classList.toggle('transmog-mode',view.kind==='transmog');
-    $('npc-dialogue').classList.toggle('smith-mode',view.kind==='smith');
+    $('npc-dialogue').classList.toggle('smith-mode',view.kind==='smith'||view.kind==='alchemy');
     const shell=$('npc-dialogue').querySelector('.gossip-window');
     if(shell){
       shell.classList.toggle('quest-panel',classic);$('npc-dialogue').classList.toggle('quest-conversation',classic);shell.classList.toggle('quest-view',!!quest);delete shell.dataset.questPane;
@@ -579,6 +579,11 @@
         if(window.Shop?.isStockOffer(offer))continue;
         if(offer.id==='learn_enchanting' && packet.enchantingSkill>0)continue;
         if(offer.id.startsWith('rod:')||offer.id.startsWith('cook:'))continue;
+        if(offer.id==='alchemy_workshop'){
+          if(!packet.alchemy)continue;
+          const b=row('vendor','Alchemy workshop');b.dataset.view='alchemy';
+          b.addEventListener('click',()=>show({kind:'alchemy'},'#npc-back'));offers.push(b);continue;
+        }
         if(offer.id==='blacksmithing_workshop'){
           if(!packet.blacksmithing)continue;
           const b=row('vendor','Blacksmithing workshop');b.dataset.view='smith';
@@ -639,12 +644,14 @@
     if(view.kind!=='transmog')window.Transmog?.close();
     if(view.kind!=='fisher')window.FisherWorkshop?.close();
     if(view.kind!=='smith')window.Blacksmithing?.close();
+    if(view.kind!=='alchemy')window.Alchemy?.close();
     $('npc-inventory').replaceChildren();
     if(view.kind==='merchant'||view.kind==='sell')window.Shop?.render(npc,$('npc-inventory'),packet);
     else { window.Shop?.close(); $('npc-inventory').className=''; }
     if(view.kind==='transmog')window.Transmog?.render(npc,packet,$('npc-inventory'));
     if(view.kind==='fisher')window.FisherWorkshop?.render(npc,packet,$('npc-inventory'));
     if(view.kind==='smith')window.Blacksmithing?.render(npc,packet,$('npc-inventory'));
+    if(view.kind==='alchemy')window.Alchemy?.render(npc,packet,$('npc-inventory'));
     if(view.kind==='merge'||view.kind==='refine'||view.kind==='repair')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
     if(nav)nav.scrollTop=paneScroll.list;if(paper)paper.scrollTop=paneScroll.detail;
     const target=focus&&$('npc-dialogue').querySelector(focus);
@@ -691,13 +698,18 @@
     if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }
+  function alchemyUpdate(packet) {
+    if (!current || !lastPacket?.alchemy || (packet.npc && current.id !== packet.npc)) return;
+    Object.assign(lastPacket.alchemy, {skill:packet.skill, recipes:packet.recipes});
+    lastPacket.inventory = packet.inventory;
+  }
   function blacksmithingUpdate(packet) {
     if (!current || !lastPacket?.blacksmithing || (packet.npc && current.id !== packet.npc)) return;
     Object.assign(lastPacket.blacksmithing, {skill:packet.skill, recipes:packet.recipes});
     lastPacket.inventory = packet.inventory;
     City.shopGold(packet.gold);
   }
-  function close(resume=true) {window.Transmog?.close();window.FisherWorkshop?.close();window.Blacksmithing?.close();clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
+  function close(resume=true) {window.Transmog?.close();window.FisherWorkshop?.close();window.Blacksmithing?.close();window.Alchemy?.close();clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
   for(const b of $('npc-dialogue').querySelectorAll('.quest-mobile-tabs button'))b.addEventListener('click',()=>questPane(b.dataset.questPane));
   $('npc-x').addEventListener('click',()=>close());
   $('npc-quest-close')?.addEventListener('click',()=>close());
@@ -705,5 +717,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={portraitTo:portrait,signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,sweepSprites,get spriteInfo(){return spriteInfo();},animateObject,drawNpc,drawNpcPlate,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,blacksmithingUpdate,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').innerHTML=`${Locale.translate('Your purse:')} ${Money.html(gold)}`; },get open(){return !!current;}};
+  window.City={portraitTo:portrait,signHeight,nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,sweepSprites,get spriteInfo(){return spriteInfo();},animateObject,drawNpc,drawNpcPlate,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},npcsOf:folkOf,refresh(){if(current&&lastPacket)render();},dialogue,close,acceptQuest,blacksmithingUpdate,alchemyUpdate,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').innerHTML=`${Locale.translate('Your purse:')} ${Money.html(gold)}`; },get open(){return !!current;}};
 })();

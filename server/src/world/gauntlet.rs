@@ -305,6 +305,7 @@ impl World {
         p.character.zone = arena;
         p.character.x = HERO_SPOT.x;
         p.character.y = HERO_SPOT.y;
+        p.suppress_alchemy(true);
         p.character.hp = p.character.max_hp();
         p.character.reset_resource();
         p.character.mounted = false;
@@ -482,6 +483,7 @@ impl World {
             p.character.zone = zone;
             p.character.x = x;
             p.character.y = y;
+            p.suppress_alchemy(p.pvp_flag);
         }
         let id = p.character.id.clone();
         if !text.is_empty() {

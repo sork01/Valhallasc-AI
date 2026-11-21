@@ -1,0 +1,794 @@
+{
+  "flowers": [
+    {
+      "item": "alchemy_meadowgold",
+      "name": "Meadowgold",
+      "band": 0,
+      "zone": 0
+    },
+    {
+      "item": "alchemy_cinder_poppy",
+      "name": "Cinder Poppy",
+      "band": 1,
+      "zone": 1
+    },
+    {
+      "item": "alchemy_frostbell",
+      "name": "Frostbell",
+      "band": 2,
+      "zone": 2
+    },
+    {
+      "item": "alchemy_lantern_lily",
+      "name": "Lantern Lily",
+      "band": 3,
+      "zone": 3
+    },
+    {
+      "item": "alchemy_wyrd_clover",
+      "name": "Wyrd Clover",
+      "band": 4,
+      "zone": 6,
+      "region": "Outer Wyrdwood"
+    },
+    {
+      "item": "alchemy_moonveil_orchid",
+      "name": "Moonveil Orchid",
+      "band": 5,
+      "zone": 6,
+      "region": "Inner Wyrdwood"
+    },
+    {
+      "item": "alchemy_rainbow_aster",
+      "name": "Rainbow Aster",
+      "band": 6,
+      "zone": 7
+    },
+    {
+      "item": "alchemy_tideglass_anemone",
+      "name": "Tideglass Anemone",
+      "band": 7,
+      "zone": 8
+    },
+    {
+      "item": "alchemy_starwhisper",
+      "name": "Starwhisper",
+      "band": 8,
+      "zone": 13
+    },
+    {
+      "item": "alchemy_prism_saffron",
+      "name": "Prism Saffron",
+      "band": 9,
+      "zone": 14
+    },
+    {
+      "item": "alchemy_brass_petal",
+      "name": "Brass Petal",
+      "band": 10,
+      "zone": 15
+    },
+    {
+      "item": "alchemy_sporebell",
+      "name": "Sporebell",
+      "band": 11,
+      "zone": 16
+    },
+    {
+      "item": "alchemy_storm_iris",
+      "name": "Storm Iris",
+      "band": 12,
+      "zone": 19
+    },
+    {
+      "item": "alchemy_suncrest_marigold",
+      "name": "Suncrest Marigold",
+      "band": 13,
+      "zone": 20
+    },
+    {
+      "item": "alchemy_ribbon_orchid",
+      "name": "Ribbon Orchid",
+      "band": 14,
+      "zone": 21
+    },
+    {
+      "item": "alchemy_thornsilk_blossom",
+      "name": "Thornsilk Blossom",
+      "band": 15,
+      "zone": 22
+    },
+    {
+      "item": "alchemy_heartvine_bloom",
+      "name": "Heartvine Bloom",
+      "band": 16,
+      "zone": 23
+    },
+    {
+      "item": "alchemy_dune_lotus",
+      "name": "Dune Lotus",
+      "band": 16,
+      "zone": 25
+    },
+    {
+      "item": "alchemy_snowfire_edelweiss",
+      "name": "Snowfire Edelweiss",
+      "band": 17,
+      "zone": 26
+    },
+    {
+      "item": "alchemy_cairn_heather",
+      "name": "Cairn Heather",
+      "band": 18,
+      "zone": 27
+    },
+    {
+      "item": "alchemy_hourglass_blossom",
+      "name": "Hourglass Blossom",
+      "band": 19,
+      "zone": 28
+    },
+    {
+      "item": "alchemy_ashen_dahlia",
+      "name": "Ashen Dahlia",
+      "band": 19,
+      "zone": 45
+    }
+  ],
+  "recipes": [
+    {
+      "item": "alchemy_meadowgold_potion",
+      "name": "Meadowgold Potion",
+      "skill": 1,
+      "level": 1,
+      "flask": false,
+      "stat": "damage",
+      "amount": 4,
+      "ingredients": [
+        [
+          [
+            "alchemy_meadowgold"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_cinderheart_flask",
+      "name": "Cinderheart Flask",
+      "skill": 30,
+      "level": 5,
+      "flask": true,
+      "stat": "damage",
+      "amount": 2,
+      "ingredients": [
+        [
+          [
+            "alchemy_cinder_poppy"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_meadowgold"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_frostguard_potion",
+      "name": "Frostguard Potion",
+      "skill": 60,
+      "level": 10,
+      "flask": false,
+      "stat": "ward",
+      "amount": 5,
+      "ingredients": [
+        [
+          [
+            "alchemy_frostbell"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_fenlight_flask",
+      "name": "Fenlight Flask",
+      "skill": 90,
+      "level": 15,
+      "flask": true,
+      "stat": "healing",
+      "amount": 2,
+      "ingredients": [
+        [
+          [
+            "alchemy_lantern_lily"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_frostbell"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_wyrdstride_potion",
+      "name": "Wyrdstride Potion",
+      "skill": 120,
+      "level": 20,
+      "flask": false,
+      "stat": "speed",
+      "amount": 8,
+      "ingredients": [
+        [
+          [
+            "alchemy_wyrd_clover"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_moonveil_flask",
+      "name": "Moonveil Flask",
+      "skill": 150,
+      "level": 25,
+      "flask": true,
+      "stat": "ward",
+      "amount": 2,
+      "ingredients": [
+        [
+          [
+            "alchemy_moonveil_orchid"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_wyrd_clover"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_bifrost_potion",
+      "name": "Bifrost Potion",
+      "skill": 180,
+      "level": 30,
+      "flask": false,
+      "stat": "damage",
+      "amount": 6,
+      "ingredients": [
+        [
+          [
+            "alchemy_rainbow_aster"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_tideglass_flask",
+      "name": "Tideglass Flask",
+      "skill": 210,
+      "level": 35,
+      "flask": true,
+      "stat": "health",
+      "amount": 2,
+      "ingredients": [
+        [
+          [
+            "alchemy_tideglass_anemone"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_rainbow_aster"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_starwhisper_potion",
+      "name": "Starwhisper Potion",
+      "skill": 240,
+      "level": 40,
+      "flask": false,
+      "stat": "healing",
+      "amount": 7,
+      "ingredients": [
+        [
+          [
+            "alchemy_starwhisper"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_flask_of_clear_light",
+      "name": "Flask of Clear Light",
+      "skill": 270,
+      "level": 45,
+      "flask": true,
+      "stat": "damage",
+      "amount": 2,
+      "ingredients": [
+        [
+          [
+            "alchemy_prism_saffron"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_starwhisper"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_clockguard_potion",
+      "name": "Clockguard Potion",
+      "skill": 300,
+      "level": 50,
+      "flask": false,
+      "stat": "ward",
+      "amount": 7,
+      "ingredients": [
+        [
+          [
+            "alchemy_brass_petal"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_moonspore_flask",
+      "name": "Moonspore Flask",
+      "skill": 330,
+      "level": 55,
+      "flask": true,
+      "stat": "healing",
+      "amount": 3,
+      "ingredients": [
+        [
+          [
+            "alchemy_sporebell"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_brass_petal"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_stormflash_potion",
+      "name": "Stormflash Potion",
+      "skill": 360,
+      "level": 60,
+      "flask": false,
+      "stat": "damage",
+      "amount": 8,
+      "ingredients": [
+        [
+          [
+            "alchemy_storm_iris"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_suncrest_flask",
+      "name": "Suncrest Flask",
+      "skill": 390,
+      "level": 65,
+      "flask": true,
+      "stat": "health",
+      "amount": 3,
+      "ingredients": [
+        [
+          [
+            "alchemy_suncrest_marigold"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_storm_iris"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_ribbonstep_potion",
+      "name": "Ribbonstep Potion",
+      "skill": 420,
+      "level": 70,
+      "flask": false,
+      "stat": "speed",
+      "amount": 12,
+      "ingredients": [
+        [
+          [
+            "alchemy_ribbon_orchid"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_thornsilk_flask",
+      "name": "Thornsilk Flask",
+      "skill": 450,
+      "level": 75,
+      "flask": true,
+      "stat": "ward",
+      "amount": 3,
+      "ingredients": [
+        [
+          [
+            "alchemy_thornsilk_blossom"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_ribbon_orchid"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_deepbloom_flask",
+      "name": "Deepbloom Flask",
+      "skill": 480,
+      "level": 80,
+      "flask": true,
+      "stat": "damage",
+      "amount": 3,
+      "ingredients": [
+        [
+          [
+            "alchemy_heartvine_bloom",
+            "alchemy_dune_lotus"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_thornsilk_blossom"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_snowfire_potion",
+      "name": "Snowfire Potion",
+      "skill": 510,
+      "level": 85,
+      "flask": false,
+      "stat": "ward",
+      "amount": 10,
+      "ingredients": [
+        [
+          [
+            "alchemy_snowfire_edelweiss"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_cairnkeeper_flask",
+      "name": "Cairnkeeper Flask",
+      "skill": 540,
+      "level": 90,
+      "flask": true,
+      "stat": "healing",
+      "amount": 4,
+      "ingredients": [
+        [
+          [
+            "alchemy_cairn_heather"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_snowfire_edelweiss"
+          ],
+          1
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_last_hour_potion",
+      "name": "Last Hour Potion",
+      "skill": 570,
+      "level": 95,
+      "flask": false,
+      "stat": "damage",
+      "amount": 10,
+      "ingredients": [
+        [
+          [
+            "alchemy_hourglass_blossom",
+            "alchemy_ashen_dahlia"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "item": "alchemy_trailwind_potion",
+      "name": "Trailwind Potion",
+      "skill": 540,
+      "level": 90,
+      "flask": false,
+      "stat": "speed",
+      "amount": 15,
+      "ingredients": [
+        [
+          [
+            "alchemy_cairn_heather"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_vial"
+          ],
+          1
+        ]
+      ],
+      "formula": "alchemy_trailwind_potion_formula"
+    },
+    {
+      "item": "alchemy_flask_of_the_turning_year",
+      "name": "Flask of the Turning Year",
+      "skill": 600,
+      "level": 99,
+      "flask": true,
+      "stat": "damage",
+      "amount": 4,
+      "ingredients": [
+        [
+          [
+            "alchemy_hourglass_blossom",
+            "alchemy_ashen_dahlia"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_cairn_heather"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ],
+      "formula": "alchemy_flask_of_the_turning_year_formula",
+      "boss": "null_hour"
+    },
+    {
+      "item": "alchemy_flask_of_the_ashen_ward",
+      "name": "Flask of the Ashen Ward",
+      "skill": 600,
+      "level": 99,
+      "flask": true,
+      "stat": "ward",
+      "amount": 4,
+      "ingredients": [
+        [
+          [
+            "alchemy_hourglass_blossom",
+            "alchemy_ashen_dahlia"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_cairn_heather"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ],
+      "formula": "alchemy_flask_of_the_ashen_ward_formula",
+      "boss": "cf_eldmarr"
+    },
+    {
+      "item": "alchemy_flask_of_the_quiet_grove",
+      "name": "Flask of the Quiet Grove",
+      "skill": 600,
+      "level": 99,
+      "flask": true,
+      "stat": "healing",
+      "amount": 5,
+      "ingredients": [
+        [
+          [
+            "alchemy_hourglass_blossom",
+            "alchemy_ashen_dahlia"
+          ],
+          4
+        ],
+        [
+          [
+            "alchemy_cairn_heather"
+          ],
+          2
+        ],
+        [
+          [
+            "alchemy_empty_flask"
+          ],
+          1
+        ]
+      ],
+      "formula": "alchemy_flask_of_the_quiet_grove_formula",
+      "boss": "solstice_heart"
+    }
+  ],
+  "supplies": [
+    {
+      "item": "alchemy_empty_vial",
+      "name": "Empty Vial",
+      "price": 25
+    },
+    {
+      "item": "alchemy_empty_flask",
+      "name": "Empty Flask",
+      "price": 100
+    }
+  ]
+}
