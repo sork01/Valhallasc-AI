@@ -10,6 +10,7 @@ const mutations = {
   replacing: ['expected:target.gear.enchant ?? null', 'expected:null', 'apply names the old enchant'],
   salvage: ['copies().filter(row => !row.worn)', 'copies()', 'worn pieces cannot be salvaged'],
   cost: ['canCraft &&= have >= amount', 'canCraft = true', 'missing materials disable crafting'],
+  training: ["skill < cap ? tr('Can raise Enchanting", "skill <= cap ? tr('Can raise Enchanting", 'gear at its training cap explains why skill cannot rise'],
   trainer: ['An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.', 'Learn in your bags.', 'untrained characters are sent to a trainer'],
   skill: ['skill, maxSkill) : tr(', 'skill, 100) : tr(', 'the pane shows the authoritative skill cap'],
   tooltip: ['rarity(tier.rarity), recipe.cooldown', 'rarity(tier.rarity), 0', 'copy tooltip shows the effect and cooldown'],
@@ -73,9 +74,9 @@ const epic = gear('weapon','epic',101,'double_tap');
 const rare = gear('weapon','rare',102);
 const worn = gear('weapon','epic',103);
 const invalid = gear('necklace','epic',104);
-const copies = [{gear:epic,worn:false},{gear:rare,worn:false},{gear:worn,worn:true},{gear:invalid,worn:false}];
+const copies = [{gear:epic,worn:false,skillCap:30},{gear:rare,worn:false,skillCap:30},{gear:worn,worn:true},{gear:invalid,worn:false}];
 const inventory = [{item:'enchant_scroll_shieldbreaker',quantity:1},{item:'enchant_recipe_double_tap',quantity:1}];
-const answer = (patch = {}) => EN.onPacket({ok:true, text:'', skill:0, maxSkill:300, recipes:[], inventory, copies, ...patch});
+const answer = (patch = {}) => EN.onPacket({ok:true, text:'', skill:0, maxSkill:300, craftSkillCaps:[30,90,210], recipes:[], inventory, copies, ...patch});
 const button = label => panel.querySelectorAll('button').find(node => node.textContent === label);
 const select = label => panel.querySelectorAll('select').find(node => node.dataset.enchantingField === label);
 const emit = request => assert.deepEqual(calls.at(-1), {type:'enchanting',request});
@@ -96,7 +97,7 @@ button('Apply enchantment').click();
 assert.deepEqual(calls.at(-1).request, {op:'apply', enchant:'shieldbreaker', copy:101, expected:'double_tap'}, 'apply names the old enchant and the exact copy');
 answer({text:'Enchantment applied.'});
 assert.match(panel.textContent, /Enchantment applied\./);
-answer({skill:1});
+answer({skill:1,trainingGearLevel:1});
 assert.match(panel.textContent, /Enchanting skill 1 \/ 300/, 'the pane shows the authoritative skill cap');
 button('Study').click();
 select('Enchantment').choose('double_tap');
@@ -118,6 +119,9 @@ button('Disenchant').click();
 assert(!select('Equipment copy').options.some(o => o.value === '103'),'worn pieces cannot be salvaged');
 select('Equipment copy').choose('101');
 assert.match(panel.textContent,/Destroys this copy. You receive 2 × Enchanting Shard\./);
+answer({skill:30,trainingGearLevel:6,recipes:['double_tap']});
+assert.match(panel.textContent,/Use level 6 or higher gear for your next skill point/);
+assert.match(panel.textContent,/This action is below your current Enchanting training band/, 'gear at its training cap explains why skill cannot rise');
 const requests = calls.length;
 button('Disenchant this copy').click();
 assert.equal(calls.length, requests,'a destructive action requires explicit confirmation');

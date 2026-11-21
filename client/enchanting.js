@@ -103,6 +103,11 @@
     }, rows.length ? 'Choose equipment' : 'No eligible equipment'));
     return rows.find(row => String(row.gear.id) === copyId);
   }
+  function trainingNote(panel, skill, cap) {
+    if (!skill || !cap || skill >= packet.maxSkill) return;
+    panel.append(el('small', skill < cap ? tr('Can raise Enchanting through skill {0}.', cap)
+      : tr('This action is below your current Enchanting training band.')));
+  }
   function confirmAction(label, request, disabled = pending) {
     return action(label, () => { notice = ''; if (send(request)) render(); }, disabled);
   }
@@ -116,8 +121,9 @@
       if (!pending) root.append(confirmAction('Refresh', {op:'open'}));
       return;
     }
-    const { skill, maxSkill, recipes } = packet;
+    const { skill, maxSkill, recipes, trainingGearLevel, craftSkillCaps } = packet;
     root.append(el('p', skill ? tr('Enchanting skill {0} / {1}', skill, maxSkill) : tr('An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.')));
+    if (trainingGearLevel) root.append(el('small', tr('Use level {0} or higher gear for your next skill point.', trainingGearLevel)));
     const nav = el('div', '', 'enchanting-modes');
     for (const [key, label] of modes) {
       const tab = action(label, () => { mode = key; copyId = ''; confirmation = null; notice = ''; render(); }, pending || (!skill && key !== 'apply'));
@@ -136,6 +142,7 @@
       const material = materials.find(row => row.rarity === gear.rarity);
       enchantInfo(panel, gear.enchant);
       panel.append(el('p', tr('Destroys this copy. You receive {0} × {1}.', material.yield, tr(material.name))));
+      trainingNote(panel, skill, target.skillCap);
       panel.append(confirmation === gear.id
         ? confirmAction('Confirm disenchant', {op:'disenchant', copy:gear.id, expected:gear.enchant ?? null})
         : action('Disenchant this copy', () => { confirmation = gear.id; render(); root.querySelector('.enchanting-form button')?.focus(); }));
@@ -171,11 +178,14 @@
         line.dataset.short = String(have < amount); costs.append(line);
         canCraft &&= have >= amount;
       });
-      panel.append(costs, confirmAction('Craft one scroll', {op:'craft', enchant:recipe.id}, pending || !canCraft));
+      panel.append(costs);
+      trainingNote(panel, skill, craftSkillCaps?.[recipe.tier]);
+      panel.append(confirmAction('Craft one scroll', {op:'craft', enchant:recipe.id}, pending || !canCraft));
     } else {
       const target = selectedCopy(panel, copies().filter(row => fits(row, recipe) && row.gear.enchant !== recipe.id));
       panel.append(el('p', tr('Cost · One crafted scroll')));
       if (target?.gear.enchant) panel.append(el('p', tr('Replaces {0} on this copy.', tr(byId.get(target.gear.enchant).name))));
+      if (target) trainingNote(panel, skill, target.skillCap);
       if (target) panel.append(confirmAction('Apply enchantment', {op:'apply', enchant:recipe.id, copy:target.gear.id, expected:target.gear.enchant ?? null}));
     }
   }

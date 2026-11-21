@@ -14489,5 +14489,6 @@
   "Enchanting Master": "Förtrollningsmästare",
   "Enchanting trainer and recipe vendor": "Förtrollningslärare och receptförsäljare",
   "I can teach you Enchanting. Once trained, open your bags to disenchant gear, study recipes, and craft or apply scrolls.": "Jag kan lära dig förtrollning. Öppna sedan väskorna för att bryta ned utrustning, studera recept och tillverka eller använda rullar.",
-  "An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.": "En förtrollningsmästare kan lära dig. I Alderhaven finns en nära apotekaren."
+  "An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.": "En förtrollningsmästare kan lära dig. I Alderhaven finns en nära apotekaren.",
+  "This action is below your current Enchanting training band.": "Den här åtgärden ligger under din nuvarande förtrollningsnivå."
 }

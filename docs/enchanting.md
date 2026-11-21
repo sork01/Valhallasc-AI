@@ -24,7 +24,10 @@ One recipe can drop per eligible kill. The roll reserves the legendary band firs
 
 Green yields two dust, blue yields two essence, purple yields two shards, and orange yields one core. Orange gear is the sole source of cores. Gray, starter, Hierloom and GM gear are excluded from disenchanting. An enchanter can study recipes before reaching their crafting tier.
 
-Enchanting starts at skill 1 and caps at 300. Each successful disenchant, scroll craft, or application by a trained character can award one point. The chance on a basic green disenchant starts at 90% and approaches 60% near the cap. Higher rarities improve the odds. Two eligible attempts without a point guarantee the next one, so green disenchanting or rare scrolls can get a character all the way to 300. Untrained characters can still apply crafted scrolls.
+Enchanting starts at skill 1 and caps at 300. Applying or disenchanting level 1–5 gear can raise skill through 30. Every five item levels add another 30 points to the cap. That puts level 6–10 gear at 60, level 11–15 at 90, and level 46–50 or higher at 300. Gear above the current minimum can still grant a point. Lower-level gear still yields its materials or takes its enchant.
+
+Crafting can train through the first band in which each tier unlocks. The crafting caps are 30 for rare, 90 for epic and 210 for legendary. Applying and disenchanting higher-level gear cover the remaining bands. Each eligible action can award one point. Higher rarities improve the odds, and two eligible attempts without a point guarantee the next eligible one. Untrained characters can still apply crafted scrolls.
+
 
 ## Equipment and combat
 

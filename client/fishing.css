@@ -32,4 +32,4 @@
 .fishing-progression details > div { margin-top: 10px; }
 .fishing-progression small { display: block; color: #cbbda7; line-height: 1.5; }
 
-#fishing-catch .fishing-skill-up { color: #b9e7ac; }
+#fishing-catch .fishing-skill-up { grid-column: 2; color: #b9e7ac; }

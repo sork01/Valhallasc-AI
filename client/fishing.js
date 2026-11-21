@@ -135,6 +135,13 @@
     // Inventory.icon is trusted renderer output; item names and all packet text use textContent.
     el.innerHTML = window.Inventory?.icon(item) || ''; return el;
   }
+  const trainingWaters = skill => window.FISHING_SKILL_WATERS?.[Math.floor(skill / 30)] || [];
+  function trainingHint(skill) {
+    const world = window.WORLD_MAP;
+    const names = trainingWaters(skill).map(id => id === 0 ? world?.name : world?.zones?.[id - 1]?.name).filter(Boolean);
+    return names.length ? tr('Fish in {0} to reach skill {1}.').replace('{0}', names.map(tr).join(' / '))
+      .replace('{1}', (Math.floor(skill / 30) + 1) * 30) : '';
+  }
   function renderLog() {
     const species = catalogue(), key = JSON.stringify([log, own?.inventory, own?.level, $('fishing-filter').value, window.Locale?.language]);
     if (key === signature) return; signature = key;
@@ -142,6 +149,9 @@
     const skill = tr('Fishing skill {0} / {1}').replace('{0}', log.skill || 1).replace('{1}', 300);
     $('fishing-records').textContent = skill + ' · ' + tr('Caught: {0} · Species: {1}/{2} · Legendary: {3} · Best streak: {4}')
       .replace('{0}', log.total || 0).replace('{1}', caught).replace('{2}', species.length).replace('{3}', log.legendary || 0).replace('{4}', log.longestStreak || 0);
+    const training = $('fishing-training');
+    training.textContent = trainingHint(log.skill || 1);
+    training.hidden = !training.textContent;
     const rows = species.filter(i => !$('fishing-filter').value || i.fishing?.habitat === $('fishing-filter').value).map(i => {
       const record = log.species?.[i.id], known = (record?.count || 0) > 0, row = node('li', null, 'fishing-species'); row.dataset.item = i.id; row.dataset.caught = String(known);
       const art = icon(i); art.classList.toggle('silhouette', !known);
@@ -181,6 +191,10 @@
       const item = definition(result.item), name = tr(item?.name || result.item);
       el.replaceChildren(icon(item), node('strong', name), node('span', result.kg == null ? tr('Quantity: {0}').replace('{0}', result.quantity || 1) : tr('ca {0} kg · ×{1}').replace('{0}', result.kg).replace('{1}', result.quantity || 1)));
       if (result.skillUp) el.append(node('span', tr('Fishing skill increased to {0}.').replace('{0}', result.skillUp), 'fishing-skill-up'));
+      else if (result.kg != null && !trainingWaters(log.skill || 1).includes(own.zone || 0)) {
+        const hint = trainingHint(log.skill || 1);
+        if (hint) el.append(node('span', hint, 'fishing-skill-up'));
+      }
       el.style.setProperty('--fish-rarity', colours[result.rarity] || colours.common);
       sound(result.rarity === 'legendary' ? 'legendary' : 'catch');
     }

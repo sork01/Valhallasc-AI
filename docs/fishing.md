@@ -2,12 +2,27 @@
 
 ## Fishing skill (1.4.0)
 
-The fishing log shows skill 1–300 and the catch card announces skill gains. Landing a real fish gives one chance to gain a point, including common fish caught with the starting rod. The chance on a common fish starts at 90% and approaches 60% near the cap. Rarer fish improve the odds. After two eligible catches without a point, the next one gives a point. Junk, treasure, misses, and extra copies from the same hook give no skill roll. Rod and habitat requirements follow the existing progression.
+Fish in the current training waters to raise skill. Move to the next band at every 30 points. The fishing log and catch card point to the current waters. All legal catches still award fish and collection progress wherever you fish.
 
-Existing characters receive one point per two recorded fish above the starting skill of 1, capped at 300. This happens once, on their first login with the new skill. The new level and the number of unsuccessful eligible rolls are saved with the fishing log.
+| Skill points earned | Training waters | Minimum rod level along the main route |
+| --- | --- | ---: |
+| 2–30 | Greenmeadow | 1 |
+| 31–60 | Emberfall Crags | 5 |
+| 61–90 | Rimeveil Glacier | 1 |
+| 91–120 | Gloamfen | 1 |
+| 121–150 | Wyrdwood | 10 |
+| 151–180 | Sunward Vale | 25 |
+| 181–210 | The Tanglecrown | 25 |
+| 211–240 | The Stormglass Flats | 40 |
+| 241–270 | The Lapis Erg | 40 |
+| 271–300 | Emberwake Caldera, Frostwake Shelf or The Yearwheel | 45 in Emberwake |
 
+The main route uses rods available by character level 45. Later waters can be in zones with higher recommended combat levels. Existing rods and habitat requirements apply. Ordinary water is sufficient when a band also has richer spots.
 
-Owner request (2026-11-18): fishing with craftable rods, a bobber in the water you press for when a fish bites, animations, fish icons, rare drops, places to fish, and heat-resistant line upgrades for lava. Backlog chain: `FISH-*` in `TODO.md`.
+A real fish gives one skill roll in the current band. The chance on a common fish starts at 90% and approaches 60% near 300. Rarer fish improve the odds. After two eligible catches without a point, the next eligible catch gives a point. Junk, treasure, extra copies from the same hook, misses and catches outside the band give no roll.
+
+Existing anglers whose logs predate Fishing skill receive one point per two recorded fish, up to the first cap of 30. A saved skill is preserved. The new level and the number of unsuccessful eligible rolls are saved with the fishing log. `world/fishing-skill.txt` defines the same training waters on the authority and in the generated client data.
+
 
 ## Rod warning follow-up: 1.2.1 (2026-11-20)
 

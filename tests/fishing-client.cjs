@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, '..');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const items = JSON.parse(read('world/items.txt')), map = JSON.parse(read('world/map.txt'));
 const candidates = JSON.parse(read('world/fishing-spots.txt'));
+const skillWaters = JSON.parse(read('world/fishing-skill.txt'));
 let checks = 0;
 function check(value, message) { checks++; assert(value, message); }
 class Element {
@@ -26,7 +27,7 @@ function fixture() {
   const el = id => { if (!els.has(id)) els.set(id, new Element()); return els.get(id); };
   const ctx = {performance:{now:() => time},Date:class extends Date {static now(){return 100000 + time;}},
     document:{getElementById:el,createElement:tag => new Element(tag),addEventListener(name,fn){events[name]=fn;}},
-    WORLD_ITEMS:items, Prefs:{keys:{}}, navigator:{},
+    WORLD_ITEMS:items, WORLD_MAP:map, Prefs:{keys:{}}, navigator:{},
     Locale:{language:'en',translate:t=>t},matchMedia:()=>({get matches(){return reduced;}}),
     addEventListener(name,fn){events[name]=fn;},MutationObserver:class{observe(){}},
     Inventory:{definition:id=>items.find(i=>i.id===id),icon:i=>i ? `<i data-icon="${i.id}"></i>` : ''},
@@ -36,6 +37,8 @@ function fixture() {
   };
   ctx.window=ctx;vm.createContext(ctx);
   vm.runInContext(read('client/keymap.js'),ctx);
+  vm.runInContext(read('client/fishing-skill-data.js'),ctx);
+  assert.equal(JSON.stringify(ctx.FISHING_SKILL_WATERS), JSON.stringify(skillWaters), 'browser and world use the same training waters');
   check(ctx.Keys.holders('KeyR','fish').length===0, 'default fishing key is free');
   let src=read('client/fishing.js');
   if(process.env.MUTATE==='hint')src=src.replace(".replace(/‹fish›/g, tr(Keys.label('fish', false)))",'');
@@ -45,6 +48,7 @@ function fixture() {
   if(process.env.MUTATE==='records')src=src.replace('log = hero.fishingLog || {}','log = {}');
   if(process.env.MUTATE==='skill-card')src=src.replace('if (result.skillUp) el.append', 'if (false) el.append');
   if(process.env.MUTATE==='skill-log')src=src.replace("log.skill || 1", "1");
+  if(process.env.MUTATE==='skill-bands')src=src.replace('Math.floor(skill / 30)]', 'Math.floor((skill - 1) / 30)]');
   if(process.env.MUTATE==='deadline')src=src.replace(' / 1200)', ' / 120000)');
   if(process.env.MUTATE==='privacy')src=src.replace("if (e.actor !== self || !e.kind?.startsWith('fish_'))", "if (!e.kind?.startsWith('fish_'))");
   if(process.env.MUTATE==='cleanup')src=src.replace('lines.clear(); $(\'fishing-panel\')', '$(\'fishing-panel\')');
@@ -58,6 +62,19 @@ function fixture() {
   return {ctx,el,events,cues,sent,errors,ops,g,draw,sync,setTime:t=>{time=t;},reduce:on=>{reduced=on;}};
 }
 const f=fixture(), {ctx,el,cues,sent,errors}=f, fishing=ctx.Fishing;
+const areas = [map, ...map.zones];
+const routes = [0], reachable = new Set(routes);
+for (const zone of routes) {
+  for (const gate of areas[zone].portals) {
+    const next = areas[gate.to];
+    if (!next || reachable.has(gate.to) || next.copies || next.sealedTemplate ||
+        (next.min_level || 0) > 50 || gate.needs_quest || gate.needs_boss || gate.after_clear) continue;
+    reachable.add(gate.to); routes.push(gate.to);
+  }
+}
+check(skillWaters.length === 10 && skillWaters.every(band => band.some(zone => reachable.has(zone)
+  && items.some(rod => rod.kind === 'rod' && rod.requiredLevel <= 50 && rod.fishing.zones.includes(zone)))),
+'Every fishing band has an accessible zone with a rod usable at level 50');
 const twig=items.find(i=>i.kind==='rod'&&!i.fishing.lava), lava=items.find(i=>i.kind==='rod'&&i.fishing.lava), allRods=items.filter(i=>i.kind==='rod').map(i=>({item:i.id,quantity:1}));
 const hero={id:'self',x:map.dock.start.x,y:map.dock.start.y,zone:0,level:99,fx:1,fy:0,inventory:allRods};
 check(el('fishing-hint').textContent.includes('press R to cast')&&!el('fishing-hint').textContent.includes('‹fish›'),'log hint resolves the initial fishing key');
@@ -146,6 +163,13 @@ check(fishing.open()&&ctx.Field.paused,'collection window pauses inputs');
 check(el('fishing-species').children.filter(r=>r.dataset.item).length===items.filter(i=>i.kind==='fish').length,'log includes complete species catalogue');
 check(el('fishing-records').textContent.includes('Caught: 1')&&el('fishing-records').textContent.includes('Legendary: 1'),'log uses saved counters');
 check(el('fishing-records').textContent.includes('Fishing skill 78 / 300'),'fishing log shows the skill and cap');
+f.sync({...hero,fishingLog:{skill:29}});
+check(el('fishing-training').textContent === 'Fish in Greenmeadow to reach skill 30.', 'first band starts in Greenmeadow');
+f.sync({...hero,fishingLog:{skill:30}});
+check(el('fishing-training').textContent === 'Fish in Emberfall Crags to reach skill 60.', 'skill 30 sends the angler to the Crags');
+f.sync({...hero,fishingLog:{skill:300}});
+check(el('fishing-training').hidden, 'training hint hides at maximum skill');
+f.sync({...hero,fishingLog:{skill:78,total:1,legendary:1,longestStreak:1,species:{[fish.id]:{count:1,bestKg:22}}}});
 const caughtRow=el('fishing-species').children.find(r=>r.dataset.item===fish.id), unknown=el('fishing-species').children.find(r=>r.dataset.item&&r.dataset.item!==fish.id);
 check(caughtRow.textContent.includes('22')&&caughtRow.textContent.includes('1 caught'),'per-species saved weight and count');
 check(unknown.textContent.includes('Undiscovered fish')&&unknown.children[0].classList.contains('silhouette'),'unseen species have silhouette and hidden name');

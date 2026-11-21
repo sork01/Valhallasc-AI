@@ -1,5 +1,6 @@
 use crate::items::{GearInstance, is_gear, is_quest_item, item};
 use crate::model::Character;
+use crate::profession::{band_cap, gear_skill_cap};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::LazyLock;
@@ -32,6 +33,12 @@ pub struct Tier {
     skill: u16,
     pub min_enemy_level: u32,
     pub drop_chance: f64,
+}
+
+impl Tier {
+    pub fn skill_cap(&self) -> u16 {
+        band_cap(self.skill)
+    }
 }
 
 #[derive(Deserialize)]
@@ -122,6 +129,15 @@ pub enum Command {
     },
 }
 
+pub struct Training {
+    pub quality: u8,
+    pub cap: u16,
+}
+
+pub fn equipment_skill_cap(gear: &GearInstance) -> u16 {
+    item(&gear.item).map_or(0, |piece| gear_skill_cap(piece.required_level))
+}
+
 impl Character {
     pub fn wears_enchant(&self, enchant: Enchant) -> bool {
         let recipe = enchant.recipe();
@@ -149,7 +165,7 @@ impl Character {
     pub fn enchant_action(
         &mut self,
         command: Command,
-    ) -> Result<(&'static str, Option<u8>), &'static str> {
+    ) -> Result<(&'static str, Option<Training>), &'static str> {
         use Command::*;
         match command {
             Open => {
@@ -180,12 +196,16 @@ impl Character {
                     return Err("Unequip that copy before disenchanting it.");
                 }
                 let id = gear.item.clone();
+                let training = Training {
+                    quality: quality as u8,
+                    cap: equipment_skill_cap(gear),
+                };
                 if !self.consume_item(&id, 1) {
                     return Err("That gear copy is unavailable.");
                 }
                 self.gear_instances.remove(at);
                 self.enchant_output(&material.id, material.quantity)?;
-                Ok(("Equipment disenchanted.", Some(quality as u8)))
+                Ok(("Equipment disenchanted.", Some(training)))
             }
             Craft { enchant } => {
                 self.require_enchanting()?;
@@ -202,7 +222,13 @@ impl Character {
                     }
                 }
                 self.enchant_output(&enchant.item("scroll"), 1)?;
-                Ok(("Enchant scroll crafted.", Some(recipe.tier as u8 + 1)))
+                Ok((
+                    "Enchant scroll crafted.",
+                    Some(Training {
+                        quality: recipe.tier as u8 + 1,
+                        cap: tier.skill_cap(),
+                    }),
+                ))
             }
             Apply {
                 enchant,
@@ -218,14 +244,15 @@ impl Character {
                 if expected == Some(enchant) {
                     return Err("That copy already has this enchantment.");
                 }
+                let training = Training {
+                    quality: enchant.recipe().tier as u8 + 1,
+                    cap: equipment_skill_cap(gear),
+                };
                 if !self.consume_item(&enchant.item("scroll"), 1) {
                     return Err("You need the crafted scroll in your bags.");
                 }
                 self.gear_instances[at].enchant = Some(enchant);
-                Ok((
-                    "Enchantment applied.",
-                    Some(enchant.recipe().tier as u8 + 1),
-                ))
+                Ok(("Enchantment applied.", Some(training)))
             }
         }
     }

@@ -326,7 +326,7 @@ pub struct FishingLog {
 }
 impl FishingLog {
     pub fn initialize_skill(&mut self) {
-        let prior_catches = (self.total / 2).min(u64::from(crate::profession::MAX_SKILL - 1));
+        let prior_catches = (self.total / 2).min(u64::from(crate::profession::SKILL_BAND - 1));
         self.proficiency.initialize(1 + prior_catches as u16);
     }
 }

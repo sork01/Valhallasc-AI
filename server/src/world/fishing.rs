@@ -38,6 +38,23 @@ static RODS: LazyLock<Vec<Rod>> = LazyLock::new(|| {
     serde_json::from_str(include_str!("../../../world/rods.txt")).expect("rod catalogue")
 });
 
+static SKILL_WATERS: LazyLock<
+    [Vec<usize>; (crate::profession::MAX_SKILL / crate::profession::SKILL_BAND) as usize],
+> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("../../../world/fishing-skill.txt"))
+        .expect("fishing skill waters")
+});
+
+fn water_skill_cap(zone: usize, skill: u16) -> u16 {
+    use crate::profession::{MAX_SKILL, SKILL_BAND, band_cap};
+    let band = usize::from(skill / SKILL_BAND);
+    if skill < MAX_SKILL && SKILL_WATERS[band].contains(&zone) {
+        band_cap(skill)
+    } else {
+        0
+    }
+}
+
 pub(super) struct RichSpot {
     pub(super) point: Point,
     pub(super) remaining: u32,
@@ -621,8 +638,9 @@ impl World {
         p.fishing.streak += 1;
         c.fishing.initialize_skill();
         let proficiency = &mut c.fishing.proficiency;
+        let skill_cap = water_skill_cap(line.zone, proficiency.skill);
         let skill_up = proficiency
-            .try_gain(band as u8, skill_roll)
+            .try_gain(band as u8, skill_cap, skill_roll)
             .then_some(proficiency.skill);
         c.fishing.total += 1;
         c.fishing.legendary += u64::from(band == 3);
@@ -780,23 +798,85 @@ mod data_tests {
     #[test]
     fn fishing_skill_gives_existing_catches_one_time_credit() {
         let mut log: FishingLog = serde_json::from_value(json!({
-            "total":100,"legendary":1,"longestStreak":5,"species":{}
+            "total":40,"legendary":1,"longestStreak":5,"species":{}
         }))
         .unwrap();
         log.initialize_skill();
-        assert_eq!(log.proficiency.skill, 51);
-        assert!(log.proficiency.try_gain(0, 0.));
+        assert_eq!(log.proficiency.skill, 21);
+        assert!(log.proficiency.try_gain(0, 30, 0.));
         let mut reloaded: FishingLog =
             serde_json::from_value(serde_json::to_value(log).unwrap()).unwrap();
         reloaded.total = 1000;
         reloaded.initialize_skill();
-        assert_eq!(reloaded.proficiency.skill, 52);
+        assert_eq!(reloaded.proficiency.skill, 22);
         let mut veteran = FishingLog {
             total: 1000,
             ..FishingLog::default()
         };
         veteran.initialize_skill();
-        assert_eq!(veteran.proficiency.skill, 300);
+        assert_eq!(veteran.proficiency.skill, 30);
+    }
+
+    #[test]
+    fn fishing_skill_route_requires_each_band_and_can_be_finished_with_level_fifty_rods() {
+        use crate::profession::{MAX_SKILL, SKILL_BAND};
+        let (mut w, mut rx) = super::super::fishing_tests::angler();
+        let points: Value =
+            serde_json::from_str(include_str!("../../../world/fishing-spots.txt")).unwrap();
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .add_item("rod_magma_reel", 1);
+        let route = [0, 1, 2, 3, 6, 20, 22, 19, 25, 45];
+        for (index, zone) in route.into_iter().enumerate() {
+            let cap = (index as u16 + 1) * SKILL_BAND;
+            assert_eq!(SKILL_WATERS[index][0], zone);
+            assert_eq!(water_skill_cap(zone, cap - 1), cap);
+            assert_eq!(water_skill_cap(zone, cap), 0);
+            if index != 0 {
+                assert_eq!(water_skill_cap(zone, cap - SKILL_BAND - 1), 0);
+            }
+            assert!(w.maps[zone].min_level <= 50);
+            let shore = points
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|p| p["zone"] == zone)
+                .unwrap();
+            let at: Point = serde_json::from_value(shore["shore"].clone()).unwrap();
+            let face: Point = serde_json::from_value(shore["facing"].clone()).unwrap();
+            let p = w.players.get_mut(&1).unwrap();
+            p.face = face;
+            p.character.zone = zone;
+            p.character.level = 50;
+            p.character.x = at.x;
+            p.character.y = at.y;
+            p.character.fishing.proficiency.skill = cap - 1;
+            let line = w.fishing_line(1, 20.).unwrap();
+            w.rng = 1;
+            w.profession_rng = 0;
+            w.land_fish(1, line, 21.);
+            let reply = std::iter::from_fn(|| rx.try_recv().ok())
+                .find(|p| p["kind"] == "fish_catch")
+                .unwrap();
+            assert_eq!(reply["skillUp"], cap, "catch in zone {zone}");
+            if index == 0 {
+                // At 30, a real Greenmeadow catch still awards fish, but the skill is capped there.
+                w.rng = 1;
+                w.profession_rng = 0;
+                w.land_fish(1, line, 22.);
+                let reply = std::iter::from_fn(|| rx.try_recv().ok())
+                    .find(|p| p["kind"] == "fish_catch")
+                    .unwrap();
+                assert!(reply["kg"].is_number());
+                assert!(reply["skillUp"].is_null());
+                assert_eq!(w.players[&1].character.fishing.proficiency.skill, 30);
+            }
+        }
+        assert_eq!(w.players[&1].character.fishing.proficiency.skill, MAX_SKILL);
+        assert_eq!(water_skill_cap(26, 270), 300);
+        assert_eq!(water_skill_cap(28, 269), 0);
     }
 
     #[test]

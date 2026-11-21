@@ -2,6 +2,24 @@
 use serde::{Deserialize, Serialize};
 
 pub const MAX_SKILL: u16 = 300;
+pub const SKILL_BAND: u16 = 30;
+const GEAR_LEVELS_PER_BAND: u16 = 5;
+
+pub fn gear_skill_cap(level: u32) -> u16 {
+    let band = level.max(1).div_ceil(u32::from(GEAR_LEVELS_PER_BAND));
+    (band.min(u32::from(MAX_SKILL / SKILL_BAND)) as u16) * SKILL_BAND
+}
+
+pub fn training_gear_level(skill: u16) -> Option<u16> {
+    (1..MAX_SKILL)
+        .contains(&skill)
+        .then(|| skill / SKILL_BAND * GEAR_LEVELS_PER_BAND + 1)
+}
+
+pub const fn band_cap(skill: u16) -> u16 {
+    let cap = (skill / SKILL_BAND + 1) * SKILL_BAND;
+    if cap > MAX_SKILL { MAX_SKILL } else { cap }
+}
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
@@ -24,10 +42,10 @@ impl Skill {
         }
     }
 
-    /// Basic actions stay useful through 300. Better materials or fish improve the odds,
-    /// and two eligible attempts without a point guarantee one on the next attempt.
-    pub fn try_gain(&mut self, quality: u8, roll: f64) -> bool {
-        if !(1..MAX_SKILL).contains(&self.skill) {
+    /// Only eligible actions affect the streak. Two eligible attempts without a point
+    /// guarantee one on the next attempt, and better materials or fish improve the odds.
+    pub fn try_gain(&mut self, quality: u8, cap: u16, roll: f64) -> bool {
+        if !(1..cap.min(MAX_SKILL)).contains(&self.skill) {
             return false;
         }
         let chance = 0.9 - 0.3 * f64::from(self.skill - 1) / f64::from(MAX_SKILL - 1)
@@ -48,18 +66,46 @@ mod tests {
     use super::*;
 
     #[test]
-    fn profession_skill_basic_actions_reach_300_even_with_the_worst_rolls() {
+    fn profession_skill_eligible_actions_reach_300_even_with_the_worst_rolls() {
         let mut skill = Skill::default();
-        assert!(!skill.try_gain(3, 0.));
+        assert!(!skill.try_gain(3, MAX_SKILL, 0.));
         skill.initialize(1);
         for level in 1..MAX_SKILL {
             assert_eq!(skill.skill, level);
-            assert!(!skill.try_gain(0, 0.999));
-            assert!(!skill.try_gain(0, 0.999));
-            assert!(skill.try_gain(0, 0.999));
+            assert!(!skill.try_gain(0, band_cap(level), 0.999));
+            assert!(!skill.try_gain(0, band_cap(level), 0.999));
+            assert!(skill.try_gain(0, band_cap(level), 0.999));
         }
         assert_eq!(skill.skill, MAX_SKILL);
-        assert!(!skill.try_gain(3, 0.));
+        assert!(!skill.try_gain(3, MAX_SKILL, 0.));
+    }
+
+    #[test]
+    fn profession_skill_gear_caps_and_ineligible_actions_do_not_build_pity() {
+        for (level, cap) in [
+            (1, 30),
+            (5, 30),
+            (6, 60),
+            (10, 60),
+            (11, 90),
+            (45, 270),
+            (46, 300),
+            (50, 300),
+            (99, 300),
+        ] {
+            assert_eq!(gear_skill_cap(level), cap, "item level {level}");
+        }
+        assert_eq!(training_gear_level(30), Some(6));
+        assert_eq!(training_gear_level(270), Some(46));
+        assert_eq!(training_gear_level(300), None);
+        let mut skill = Skill::default();
+        skill.initialize(30);
+        for _ in 0..3 {
+            assert!(!skill.try_gain(0, 30, 0.999));
+        }
+        assert!(!skill.try_gain(0, 60, 0.999));
+        assert!(!skill.try_gain(0, 60, 0.999));
+        assert!(skill.try_gain(0, 60, 0.999));
     }
 
     #[test]
@@ -67,12 +113,12 @@ mod tests {
         let mut basic = Skill::default();
         basic.initialize(299);
         let mut better = basic.clone();
-        assert!(!basic.try_gain(0, 0.7));
-        assert!(better.try_gain(3, 0.7));
-        assert!(!basic.try_gain(0, 0.999));
+        assert!(!basic.try_gain(0, MAX_SKILL, 0.7));
+        assert!(better.try_gain(3, MAX_SKILL, 0.7));
+        assert!(!basic.try_gain(0, MAX_SKILL, 0.999));
         let mut restored: Skill =
             serde_json::from_value(serde_json::to_value(basic).unwrap()).unwrap();
-        assert!(restored.try_gain(0, 0.999));
+        assert!(restored.try_gain(0, MAX_SKILL, 0.999));
         assert_eq!(restored.skill, 300);
     }
 }

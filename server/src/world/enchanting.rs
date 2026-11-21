@@ -180,12 +180,13 @@ impl World {
         } else {
             staged
                 .enchant_action(request)
-                .and_then(|(notice, quality)| {
-                    if let Some(quality) = quality {
-                        staged
-                            .enchanting
-                            .proficiency
-                            .try_gain(quality, self.profession_roll());
+                .and_then(|(notice, training)| {
+                    if let Some(training) = training {
+                        staged.enchanting.proficiency.try_gain(
+                            training.quality,
+                            training.cap,
+                            self.profession_roll(),
+                        );
                     }
                     if !open || staged.gear_instances.len() != gear_count {
                         self.store
@@ -213,7 +214,7 @@ impl World {
                 {
                     return None;
                 }
-                Some(json!({"gear":gear,"worn":c.gear_instance_equipped(gear.id)}))
+                Some(json!({"gear":gear,"worn":c.gear_instance_equipped(gear.id),"skillCap":catalog::equipment_skill_cap(gear)}))
             })
             .collect();
         let _ = p
@@ -221,6 +222,8 @@ impl World {
             .try_send(json!({"type":"enchanting","ok":result.is_ok(),
             "text":result.unwrap_or_else(|text| text),"skill":c.enchanting.proficiency.skill,
             "maxSkill":crate::profession::MAX_SKILL,
+            "trainingGearLevel":crate::profession::training_gear_level(c.enchanting.proficiency.skill),
+            "craftSkillCaps":catalog::CATALOG.tiers.each_ref().map(|tier| tier.skill_cap()),
             "skillUp":c.enchanting.proficiency.skill > previous_skill,
             "recipes":c.enchanting.recipes,"inventory":c.inventory,"copies":copies}));
     }
@@ -1091,11 +1094,56 @@ mod tests {
     }
 
     #[test]
+    fn enchanting_bands_gate_disenchanting_and_cheap_scrolls() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let c = character(&mut w, 1);
+        c.enchanting.proficiency.initialize(29);
+        let low = "necklace_moonstone_l5_green";
+        let next = "necklace_moonstone_l10_green";
+        c.add_item(low, 2);
+        c.add_item(next, 1);
+        c.materialize_gear_instances();
+        let low_copies: Vec<_> = c
+            .gear_instances
+            .iter()
+            .filter(|g| g.item == low)
+            .map(|g| g.id)
+            .collect();
+        let next_copy = c.gear_instances.iter().find(|g| g.item == next).unwrap().id;
+        let command = |copy| json!({"op":"disenchant","copy":copy});
+        let first = request(&mut w, &mut rx, command(low_copies[0]));
+        assert_eq!(first["skill"], 30);
+        assert_eq!(first["trainingGearLevel"], 6);
+        assert_eq!(first["craftSkillCaps"], json!([30, 90, 210]));
+        let second = request(&mut w, &mut rx, command(low_copies[1]));
+        assert_eq!(second["skill"], 30);
+        assert_eq!(second["ok"], true);
+        assert_eq!(character(&mut w, 1).quantity("enchant_dust"), 4);
+        let c = character(&mut w, 1);
+        c.enchanting.recipes.insert(DoubleTap);
+        c.add_item("enchant_essence", 2);
+        let crafted = request(&mut w, &mut rx, json!({"op":"craft","enchant":DoubleTap}));
+        assert_eq!(crafted["ok"], true);
+        assert_eq!(crafted["skill"], 30);
+        assert_eq!(request(&mut w, &mut rx, command(next_copy))["skill"], 31);
+    }
+
+    #[test]
     fn enchanting_application_can_grant_the_last_skill_point_and_cannot_exceed_it() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Warrior);
-        let copy = worn(&mut w, 1, "weapon", "epic", DoubleTap);
         let c = character(&mut w, 1);
+        let gear = "warrior_weapon_royal_l50_purple";
+        c.add_item(gear, 1);
+        c.materialize_gear_instances();
+        let item = c
+            .gear_instances
+            .iter_mut()
+            .find(|g| g.item == gear)
+            .unwrap();
+        item.enchant = Some(DoubleTap);
+        let copy = item.id;
         c.enchanting.proficiency.initialize(299);
         for enchant in [Shieldbreaker, DoubleTap] {
             c.add_item(&enchant.item("scroll"), 1);
