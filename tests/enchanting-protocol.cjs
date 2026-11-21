@@ -7,7 +7,7 @@ const root = path.resolve(__dirname, '..');
 const read = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
 const map = read('world/map.txt');
 const items = read('world/items.txt');
-const npc = map.zones[3].npcs.find(n => n.id === 'city_transmog');
+const npc = map.zones[3].npcs.find(n => n.id === 'city_enchanting');
 const rare = items.find(i => i.id === 'necklace_moonstone_l1_blue');
 const epic = items.find(i => i.id === 'necklace_moonstone_l10_purple');
 const green = items.find(i => i.id === 'necklace_moonstone_l1_green');
@@ -38,7 +38,14 @@ async function ench(bot, request) {
   await world.debug('Crafter', {op:'set_gold',gold:cost});
   send('Crafter', {type:'interact',npc:npc.id,offer:'buy_' + recipe});
   await wait(() => have('Crafter',recipe) === 1 && world.player('Crafter').gold === 0, 'vendor charges full recipe price');
-  assert.equal((await ench('Crafter',{op:'learn'})).skill,1);
+  const untrained = await ench('Crafter',{op:'open'});
+  assert.equal(untrained.skill,0);
+  assert.equal(untrained.maxSkill,300);
+  const trained = packet('Crafter','dialogue',e => e.enchantingSkill === 1);
+  await new Promise(resolve => setTimeout(resolve, 600));
+  send('Crafter', {type:'interact',npc:npc.id,offer:'learn_enchanting'});
+  await trained;
+  assert.equal((await ench('Crafter',{op:'open'})).skill,1);
   assert((await ench('Crafter',{op:'study',enchant:'second_wind'})).recipes.includes('second_wind'));
 
   for (const [item, quantity] of [[green,2],[rare,3],[epic,1]]) {
@@ -48,7 +55,8 @@ async function ench(bot, request) {
   for (const {gear} of opened.copies.filter(({gear}) => gear.item === green.id).concat(opened.copies.filter(({gear}) => gear.item === rare.id).slice(0,1))) {
     assert((await ench('Crafter',{op:'disenchant',copy:gear.id})).ok);
   }
-  assert.equal((await ench('Crafter',{op:'craft',enchant:'second_wind'})).skill,6);
+  const crafted = await ench('Crafter',{op:'craft',enchant:'second_wind'});
+  assert(crafted.ok && crafted.skill >= 2 && crafted.skill <= 5);
   assert((await ench('Crafter',{op:'apply',enchant:'second_wind',copy:opened.copies.filter(({gear}) => gear.item === rare.id).at(-1).gear.id})).ok);
   await wait(() => findCopies('Crafter',rare.id).some(copy => copy.enchant), 'authoritative enchanted copy');
   const copy = findCopies('Crafter',rare.id).find(g => g.enchant);
@@ -93,6 +101,29 @@ async function ench(bot, request) {
   assert.equal(findCopies('Buyer',epic.id)[0].enchant,'second_wind');
   assert.equal(have('Buyer',scroll),0);
   assert.equal(have('Crafter',recipe),0);
-  assert((await ench('Crafter',{op:'open'})).recipes.includes('second_wind'));
-  console.log('Enchanting private protocol passed purchase, crafting, copy-specific trade, Inspect and restart (' + world.snapshotsChecked + ' snapshots)');
+  const saved = await ench('Crafter',{op:'open'});
+  assert(saved.recipes.includes('second_wind'));
+  assert(saved.skill >= crafted.skill && saved.skill <= 300);
+  await world.debug('Buyer', {op:'give_item',item:'rod_twig_rod',quantity:1});
+  await world.debug('Buyer', {op:'teleport',zone:0,x:200.5,y:293.5});
+  await world.action('Buyer', {type:'input',dx:1,dy:0});
+  await wait(() => world.player('Buyer').x > 200.55, 'face the water');
+  await world.action('Buyer', {type:'stop'});
+  await world.action('Buyer', {type:'fish'});
+  await wait(() => world.player('Buyer').fishing?.state === 'bite', 'bite');
+  const landed = packet('Buyer','event',e => e.kind === 'fish_catch');
+  await world.action('Buyer', {type:'fish'});
+  const catchEvent = await landed;
+  await wait(() => have('Buyer',catchEvent.item), 'catch arrives in bags');
+  const fishing = world.player('Buyer').fishingLog;
+  if (catchEvent.kg != null) {
+    assert.equal(fishing.total, 1);
+    assert.equal(fishing.skill, catchEvent.skillUp || 1);
+  } else {
+    assert(!fishing?.total && !catchEvent.skillUp, 'incidental catches give no skill');
+  }
+  await world.disconnect('Buyer');
+  await world.connect({bot:'Buyer'});
+  assert.equal(world.player('Buyer').fishingLog?.skill, fishing?.skill);
+  console.log('Private protocol passed training, copy-specific trade, Inspect, restart, and fishing catch (' + world.snapshotsChecked + ' snapshots)');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => { await world.stop(); });

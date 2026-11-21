@@ -18,28 +18,33 @@ MASTERS = {
 DIALOGUE = 'Every piece you have owned leaves a memory. Choose a new appearance for your equipment slots. Changing or hiding a look costs a little money; returning to your real gear is free.'
 
 
+def reachable_service_position(area, source):
+    reachable = connected(area)
+    candidates = [(source['x'] + r * math.cos(k * math.tau / 16),
+                   source['y'] + r * math.sin(k * math.tau / 16))
+                  for r in (4, 5, 6, 7, 8) for k in range(16)]
+    def safe(p):
+        x, y = p
+        return (int(y) * area['size'] + int(x) in reachable and clear(area, x, y, 1)
+                and all(math.hypot(x - n['x'], y - n['y']) >= 2.5 for n in area['npcs'])
+                and all(math.hypot(x - n['x'], y - n['y']) >= n.get('r', 1) + 3 for n in area['portals']))
+    return next((p for p in candidates if safe(p)), None)
+
+
 def install(world, art):
     areas = [world, *world['zones']]
     for zone, (key, template) in MASTERS.items():
         area = areas[zone]
+        old_index = next((index for index, npc in enumerate(area['npcs']) if npc['id'] == key), len(area['npcs']))
         area['npcs'] = [n for n in area['npcs'] if n['id'] != key]
         source = next(n for n in area['npcs'] if n['id'] == template)
-        reachable = connected(area)
-        candidates = [(source['x'] + r * math.cos(k * math.tau / 16),
-                       source['y'] + r * math.sin(k * math.tau / 16))
-                      for r in (4, 5, 6, 7, 8) for k in range(16)]
-        def safe(p):
-            x, y = p
-            return (int(y) * area['size'] + int(x) in reachable and clear(area, x, y, 1)
-                    and all(math.hypot(x - n['x'], y - n['y']) >= 2.5 for n in area['npcs'])
-                    and all(math.hypot(x - n['x'], y - n['y']) >= n.get('r', 1) + 3 for n in area['portals']))
-        pos = next((p for p in candidates if safe(p)), None)
+        pos = reachable_service_position(area, source)
         if pos is None:
             raise ValueError(f'No reachable Transmog Master position in {area["name"]}')
         npc = dict(id=key, name='Transmog Master', role='Equipment appearances', x=round(pos[0], 3), y=round(pos[1], 3),
                    color=source['color'], look=copy.deepcopy(source['look']), dialogue=DIALOGUE,
                    offers=[dict(id='transmogrify', label='Transmogrify', cost=0)], buys=False)
-        area['npcs'].append(npc)
+        area['npcs'].insert(old_index, npc)
         art['npcs'][key] = copy.deepcopy(art['npcs'][template])
 
 

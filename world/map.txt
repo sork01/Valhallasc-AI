@@ -64094,6 +64094,120 @@
         "style": "short",
         "hat": "straw"
       }
+    },
+    {
+      "id": "alder_enchanting",
+      "name": "Enchanting Master",
+      "role": "Enchanting trainer and recipe vendor",
+      "x": 259.696,
+      "y": 187.031,
+      "color": "#9a71aa",
+      "look": {},
+      "dialogue": "I can teach you Enchanting. Once trained, open your bags to disenchant gear, study recipes, and craft or apply scrolls.",
+      "offers": [
+        {
+          "id": "learn_enchanting",
+          "label": "Learn Enchanting",
+          "cost": 0
+        },
+        {
+          "id": "buy_enchant_recipe_double_tap",
+          "label": "Recipe: Double Tap",
+          "item": "enchant_recipe_double_tap",
+          "cost": 250000
+        },
+        {
+          "id": "buy_enchant_recipe_quickhands",
+          "label": "Recipe: Quickhands",
+          "item": "enchant_recipe_quickhands",
+          "cost": 250000
+        },
+        {
+          "id": "buy_enchant_recipe_brace",
+          "label": "Recipe: Brace",
+          "item": "enchant_recipe_brace",
+          "cost": 250000
+        },
+        {
+          "id": "buy_enchant_recipe_second_wind",
+          "label": "Recipe: Second Wind",
+          "item": "enchant_recipe_second_wind",
+          "cost": 250000
+        },
+        {
+          "id": "buy_enchant_recipe_slipstream",
+          "label": "Recipe: Slipstream",
+          "item": "enchant_recipe_slipstream",
+          "cost": 250000
+        },
+        {
+          "id": "buy_enchant_recipe_arcane_bulwark",
+          "label": "Recipe: Arcane Bulwark",
+          "item": "enchant_recipe_arcane_bulwark",
+          "cost": 1000000
+        },
+        {
+          "id": "buy_enchant_recipe_spellweaver",
+          "label": "Recipe: Spellweaver",
+          "item": "enchant_recipe_spellweaver",
+          "cost": 1000000
+        },
+        {
+          "id": "buy_enchant_recipe_shieldbreaker",
+          "label": "Recipe: Shieldbreaker",
+          "item": "enchant_recipe_shieldbreaker",
+          "cost": 1000000
+        },
+        {
+          "id": "buy_enchant_recipe_passing_spark",
+          "label": "Recipe: Passing Spark",
+          "item": "enchant_recipe_passing_spark",
+          "cost": 1000000
+        },
+        {
+          "id": "buy_enchant_recipe_guardian_thread",
+          "label": "Recipe: Guardian Thread",
+          "item": "enchant_recipe_guardian_thread",
+          "cost": 1000000
+        },
+        {
+          "id": "buy_enchant_recipe_shake_it_off",
+          "label": "Recipe: Shake It Off",
+          "item": "enchant_recipe_shake_it_off",
+          "cost": 1000000
+        },
+        {
+          "id": "buy_enchant_recipe_lightning_rod",
+          "label": "Recipe: Lightning Rod",
+          "item": "enchant_recipe_lightning_rod",
+          "cost": 4000000
+        },
+        {
+          "id": "buy_enchant_recipe_rise_from_ash",
+          "label": "Recipe: Rise from Ash",
+          "item": "enchant_recipe_rise_from_ash",
+          "cost": 4000000
+        },
+        {
+          "id": "buy_enchant_recipe_borrowed_time",
+          "label": "Recipe: Borrowed Time",
+          "item": "enchant_recipe_borrowed_time",
+          "cost": 4000000
+        },
+        {
+          "id": "buy_enchant_recipe_moonstep",
+          "label": "Recipe: Moonstep",
+          "item": "enchant_recipe_moonstep",
+          "cost": 4000000
+        },
+        {
+          "id": "buy_enchant_recipe_heartwood_grove",
+          "label": "Recipe: Heartwood Grove",
+          "item": "enchant_recipe_heartwood_grove",
+          "cost": 4000000
+        }
+      ],
+      "buys": false
     }
   ],
   "quests": [
@@ -321085,6 +321199,29 @@
               "id": "transmogrify",
               "label": "Transmogrify",
               "cost": 0
+            }
+          ],
+          "buys": false
+        },
+        {
+          "id": "city_enchanting",
+          "name": "Enchanting Master",
+          "role": "Enchanting trainer and recipe vendor",
+          "x": 31.964,
+          "y": 166.764,
+          "color": "#4f8a7a",
+          "look": {
+            "skin": "#f0c8a6",
+            "hair": "#d8d0c0",
+            "style": "bun",
+            "apron": "#d8e8e0"
+          },
+          "dialogue": "I can teach you Enchanting. Once trained, open your bags to disenchant gear, study recipes, and craft or apply scrolls.",
+          "offers": [
+            {
+              "id": "learn_enchanting",
+              "label": "Learn Enchanting",
+              "cost": 0
             },
             {
               "id": "buy_enchant_recipe_double_tap",
@@ -545597,6 +545734,31 @@
             {
               "id": "transmogrify",
               "label": "Transmogrify",
+              "cost": 0
+            }
+          ],
+          "buys": false
+        },
+        {
+          "id": "nacre_enchanting",
+          "name": "Enchanting Master",
+          "role": "Enchanting trainer and recipe vendor",
+          "x": 116.828,
+          "y": 144.828,
+          "color": "#81d6cc",
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "long"
+          },
+          "dialogue": "I can teach you Enchanting. Once trained, open your bags to disenchant gear, study recipes, and craft or apply scrolls.",
+          "offers": [
+            {
+              "id": "learn_enchanting",
+              "label": "Learn Enchanting",
               "cost": 0
             },
             {
@@ -818842,6 +819004,32 @@
             {
               "id": "transmogrify",
               "label": "Transmogrify",
+              "cost": 0
+            }
+          ],
+          "buys": false
+        },
+        {
+          "id": "asterion_enchanting",
+          "name": "Enchanting Master",
+          "role": "Enchanting trainer and recipe vendor",
+          "x": 110.828,
+          "y": 80.828,
+          "color": "#b7a5dd",
+          "look": {
+            "skin": "#c78e6e",
+            "hair": "#f2e7d5",
+            "style": "long",
+            "hat": "feather",
+            "hatColor": "#733a88",
+            "scale": 1,
+            "prop": "crown"
+          },
+          "dialogue": "I can teach you Enchanting. Once trained, open your bags to disenchant gear, study recipes, and craft or apply scrolls.",
+          "offers": [
+            {
+              "id": "learn_enchanting",
+              "label": "Learn Enchanting",
               "cost": 0
             },
             {
@@ -1142172,6 +1142360,30 @@
             {
               "id": "transmogrify",
               "label": "Transmogrify",
+              "cost": 0
+            }
+          ],
+          "buys": false
+        },
+        {
+          "id": "hw_enchanting",
+          "name": "Enchanting Master",
+          "role": "Enchanting trainer and recipe vendor",
+          "x": 130.828,
+          "y": 179.328,
+          "color": "#e4f7ae",
+          "look": {
+            "skin": "#ad7857",
+            "hair": "#28574b",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#569e66"
+          },
+          "dialogue": "I can teach you Enchanting. Once trained, open your bags to disenchant gear, study recipes, and craft or apply scrolls.",
+          "offers": [
+            {
+              "id": "learn_enchanting",
+              "label": "Learn Enchanting",
               "cost": 0
             },
             {

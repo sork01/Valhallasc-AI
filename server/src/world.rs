@@ -631,6 +631,7 @@ impl Player {
     }
     fn new(mut character: Character, peer: Peer) -> Self {
         character.normalize_mounts();
+        character.fishing.initialize_skill();
         if character.hp <= 0. || character.spark_travel.is_some() {
             character.mounted = false;
         }
@@ -2059,6 +2060,7 @@ pub struct World {
     tick: u64,
     rng: u64,
     enchant_rng: u64,
+    profession_rng: u64,
     enchant_epoch: f64,
     enchant_skill_hits: Option<Vec<enchanting::SkillHit>>,
     /// Damage each session has dealt to monsters (test builds: the harness reports damage per second per class).
@@ -2205,6 +2207,7 @@ impl World {
             enchant_rng: u64::from_le_bytes(
                 uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap(),
             ),
+            profession_rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             enchant_epoch: daynight::unix_ms() as f64 / 1000.,
             enchant_skill_hits: None,
             #[cfg(test)]
@@ -2319,6 +2322,10 @@ impl World {
     fn random(&mut self) -> f64 {
         self.rng = self.rng.wrapping_mul(6364136223846793005).wrapping_add(1);
         (self.rng >> 32) as f64 / 4294967296.
+    }
+    fn profession_roll(&mut self) -> f64 {
+        self.profession_rng = self.profession_rng.wrapping_mul(6364136223846793005).wrapping_add(1);
+        (self.profession_rng >> 32) as f64 / 4294967296.
     }
     fn entity(&mut self) -> u64 {
         let id = self.next_entity;
@@ -3666,7 +3673,23 @@ impl World {
                     let Some(offer) = npc.offers.iter().find(|offer| offer.id == id) else {
                         return;
                     };
-                    if offer.id == "bank" {
+                    if offer.id == "learn_enchanting" {
+                        if trading || p.combat_left > 0. {
+                            notice = "You can use Enchanting while alive and out of combat or travel.".into();
+                        } else {
+                            let mut trained = p.character.clone();
+                            notice = match trained.learn_enchanting() {
+                                Err(text) => text,
+                                Ok(()) if self.store.save_many([&trained].into_iter()).is_err() => {
+                                    "The enchanting change could not be saved."
+                                }
+                                Ok(()) => {
+                                    p.character = trained;
+                                    "You learned Enchanting."
+                                }
+                            }.into();
+                        }
+                    } else if offer.id == "bank" {
                         notice = "Open the bank window to use the strongroom.".into();
                     } else if offer.id == "stat_reset" {
                         if p.combat_left > 0. {
@@ -3817,6 +3840,9 @@ impl World {
             dialogue["wardrobe"] = json!(p.character.wardrobe.unlocked);
             dialogue["transmogPrice"] = json!(p.character.transmog_price());
             dialogue["gm"] = json!(p.character.gm);
+        }
+        if npc.offers.iter().any(|offer| offer.id == "learn_enchanting") {
+            dialogue["enchantingSkill"] = json!(p.character.enchanting.proficiency.skill);
         }
         dialogue["fisherQuote"] = fishing_workshop::quotes(npc, &p.character);
         let _ = p.peer.try_send(dialogue);

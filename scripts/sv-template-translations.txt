@@ -490,5 +490,8 @@
   "Requires Enchanting skill {0}.": "Kräver förtrollningsnivå {0}.",
   "{0} · {1} of {2} in bags": "{0} · {1} av {2} i väskorna",
   "Replaces {0} on this copy.": "Ersätter {0} på det här exemplaret.",
-  "Permanently teaches the recipe · Crafting requires Enchanting skill {0}.": "Lär dig receptet permanent · Tillverkning kräver förtrollningsnivå {0}."
+  "Permanently teaches the recipe · Crafting requires Enchanting skill {0}.": "Lär dig receptet permanent · Tillverkning kräver förtrollningsnivå {0}.",
+  "Enchanting skill increased to {0}.": "Din förtrollningsnivå har höjts till {0}.",
+  "Fishing skill {0} / {1}": "Fiskenivå {0} / {1}",
+  "Fishing skill increased to {0}.": "Din fiskenivå har höjts till {0}."
 }

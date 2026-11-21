@@ -9,6 +9,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
 import transmog_npcs as m
+from enchanting_catalog import MASTERS as ENCHANTING_MASTERS
 
 def main():
     world = json.loads((ROOT/'world/map.txt').read_text())
@@ -22,8 +23,17 @@ def main():
     for key in all_ids: base_art['npcs'].pop(key)
     # Reinstall from a world without our NPCs. Other zones may evolve without changing this test's baseline.
     world, art = copy.deepcopy(baseline), copy.deepcopy(base_art)
+    later_ids = {key for key, _, _ in ENCHANTING_MASTERS.values()}
+    areas = [world, *world['zones']]
+    later = [[npc for npc in area['npcs'] if npc['id'] in later_ids] for area in areas]
+    for area in areas:
+        area['npcs'] = [npc for npc in area['npcs'] if npc['id'] not in later_ids]
     m.install(world, art)
+    for area, additions in zip(areas, later):
+        area['npcs'].extend(additions)
     assert world == before, 'overlay already installed and idempotent'
+    m.install(world, art)
+    assert world == before, 'updating Transmog in place keeps later overlay ordering'
     assert art == art_before, 'art assignments already installed and idempotent'
     cleaned = copy.deepcopy(world)
     for area in [cleaned, *cleaned['zones']]:

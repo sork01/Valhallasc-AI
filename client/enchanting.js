@@ -116,9 +116,8 @@
       if (!pending) root.append(confirmAction('Refresh', {op:'open'}));
       return;
     }
-    const { skill, recipes } = packet;
-    root.append(el('p', skill ? tr('Enchanting skill {0} / {1}', skill, tiers.at(-1).craftCap) : tr('Learn Enchanting to study recipes, disenchant gear and craft scrolls.')));
-    if (!skill) root.append(confirmAction('Learn Enchanting', {op:'learn'}));
+    const { skill, maxSkill, recipes } = packet;
+    root.append(el('p', skill ? tr('Enchanting skill {0} / {1}', skill, maxSkill) : tr('An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.')));
     const nav = el('div', '', 'enchanting-modes');
     for (const [key, label] of modes) {
       const tab = action(label, () => { mode = key; copyId = ''; confirmation = null; notice = ''; render(); }, pending || (!skill && key !== 'apply'));
@@ -237,7 +236,8 @@
       clearTimeout(requestAt);
       if (!visible()) return;
       packet = answer;
-      if (answer.text) notice = answer.text;
+      if (answer.text) notice = tr(answer.text);
+      if (answer.skillUp) notice = [notice, tr('Enchanting skill increased to {0}.', answer.skill)].filter(Boolean).join(' ');
       confirmation = null;
       if (refresh) { refresh = false; send({op:'open'}); }
       render();

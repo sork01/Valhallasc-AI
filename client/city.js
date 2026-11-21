@@ -576,6 +576,7 @@
         const meta=(area().npcs||[]).find(n=>n.id===npc.id)?.offers?.find(o=>o.id===offer.id)||offer;
         if(meta.season&&!window.Seasonal?.isActive(meta.season)||meta.quest&&!window.Quests?.active(meta.quest))continue;
         if(window.Shop?.isStockOffer(offer))continue;
+        if(offer.id==='learn_enchanting' && packet.enchantingSkill>0)continue;
         if(offer.id.startsWith('rod:')||offer.id.startsWith('cook:'))continue;
         if(offer.id==='fishing_workshop'){
           const b=row('vendor','Fisher workshop','Craft rods and cook fish');b.dataset.view='fisher';

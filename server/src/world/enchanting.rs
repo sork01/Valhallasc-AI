@@ -164,6 +164,8 @@ impl World {
         };
         let open = matches!(request, Command::Open);
         let mut staged = p.character.clone();
+        let previous_skill = p.character.enchanting.proficiency.skill;
+        let gear_count = p.character.gear_instances.len();
         let result = if !open
             && (p.character.hp <= 0.
                 || p.combat_left > 0.
@@ -176,14 +178,22 @@ impl World {
         {
             Err("You can use Enchanting while alive and out of combat or travel.")
         } else {
-            staged.enchant_action(request).and_then(|notice| {
-                if !open || staged.gear_instances != p.character.gear_instances {
-                    self.store
-                        .save_many([&staged].into_iter())
-                        .map_err(|_| "The enchanting change could not be saved.")?;
-                }
-                Ok(notice)
-            })
+            staged
+                .enchant_action(request)
+                .and_then(|(notice, quality)| {
+                    if let Some(quality) = quality {
+                        staged
+                            .enchanting
+                            .proficiency
+                            .try_gain(quality, self.profession_roll());
+                    }
+                    if !open || staged.gear_instances.len() != gear_count {
+                        self.store
+                            .save_many([&staged].into_iter())
+                            .map_err(|_| "The enchanting change could not be saved.")?;
+                    }
+                    Ok(notice)
+                })
         };
         let p = self.players.get_mut(&session).unwrap();
         if result.is_ok() {
@@ -209,7 +219,9 @@ impl World {
         let _ = p
             .peer
             .try_send(json!({"type":"enchanting","ok":result.is_ok(),
-            "text":result.unwrap_or_else(|text| text),"skill":c.enchanting.skill,
+            "text":result.unwrap_or_else(|text| text),"skill":c.enchanting.proficiency.skill,
+            "maxSkill":crate::profession::MAX_SKILL,
+            "skillUp":c.enchanting.proficiency.skill > previous_skill,
             "recipes":c.enchanting.recipes,"inventory":c.inventory,"copies":copies}));
     }
 
@@ -870,6 +882,7 @@ mod tests {
     }
 
     fn request(w: &mut World, rx: &mut mpsc::Receiver<Value>, request: Value) -> Value {
+        w.profession_rng = 0;
         w.message(
             1,
             serde_json::from_value(json!({"type":"enchanting","request":request})).unwrap(),
@@ -888,7 +901,45 @@ mod tests {
         let token = welcome["token"].as_str().unwrap();
         let response = request(&mut w, &mut rx, json!({"op":"open"}));
         assert_eq!(response["skill"], 0);
-        assert_eq!(request(&mut w, &mut rx, json!({"op":"learn"}))["skill"], 1);
+        assert_eq!(response["maxSkill"], 300);
+        assert!(
+            serde_json::from_value::<ClientMessage>(
+                json!({"type":"enchanting","request":{"op":"learn"}})
+            )
+            .is_err()
+        );
+        let train = |npc: &str| ClientMessage::Interact {
+            npc: npc.into(),
+            offer: Some("learn_enchanting".into()),
+        };
+        let master = w.maps[0]
+            .npcs
+            .iter()
+            .find(|npc| npc.id == "alder_enchanting")
+            .unwrap()
+            .clone();
+        let nearby = at(master.x, master.y);
+        place(&mut w, 1, 0, at(master.x + 5., master.y));
+        w.message(1, train(&master.id));
+        assert_eq!(request(&mut w, &mut rx, json!({"op":"open"}))["skill"], 0);
+        let apothecary = w.maps[0]
+            .npcs
+            .iter()
+            .find(|npc| npc.id == "apothecary")
+            .unwrap();
+        let wrong = apothecary.position_at(w.time);
+        place(&mut w, 1, 0, wrong);
+        w.message(1, train("apothecary"));
+        assert_eq!(request(&mut w, &mut rx, json!({"op":"open"}))["skill"], 0);
+        w.time += 1.;
+        place(&mut w, 1, 0, nearby);
+        w.message(1, train(&master.id));
+        assert!(
+            drain(&mut rx)
+                .iter()
+                .any(|p| p["type"] == "dialogue" && p["enchantingSkill"] == 1)
+        );
+        assert_eq!(request(&mut w, &mut rx, json!({"op":"open"}))["skill"], 1);
         let epic = Shieldbreaker.item("recipe");
         let rare = DoubleTap.item("recipe");
         character(&mut w, 1).add_item(&epic, 1);
@@ -932,7 +983,7 @@ mod tests {
             assert!(!c.gear_instances.iter().any(|g| g.id == id));
             assert_eq!(c.quantity(resource), amount);
         }
-        assert_eq!(character(&mut w, 1).enchanting.skill, 5);
+        assert_eq!(character(&mut w, 1).enchanting.proficiency.skill, 5);
         assert_eq!(
             request(
                 &mut w,
@@ -944,7 +995,7 @@ mod tests {
         character(&mut w, 1).add_item("enchant_dust", 2);
         assert_eq!(
             request(&mut w, &mut rx, json!({"op":"craft","enchant":DoubleTap}))["skill"],
-            7
+            6
         );
         assert_eq!(character(&mut w, 1).quantity(&DoubleTap.item("scroll")), 1);
         character(&mut w, 1).add_item("enchant_dust", 4);
@@ -963,7 +1014,7 @@ mod tests {
             false
         );
         let saved = w.store.load(token).unwrap().unwrap();
-        assert_eq!(saved.enchanting.skill, 7);
+        assert_eq!(saved.enchanting.proficiency.skill, 6);
         assert_eq!(saved.enchanting.recipes, [DoubleTap, Shieldbreaker].into());
     }
 
@@ -1020,7 +1071,7 @@ mod tests {
             true
         );
         let c = character(&mut w, 1);
-        assert_eq!(c.enchanting.skill, 0);
+        assert_eq!(c.enchanting.proficiency.skill, 0);
         c.bank_deposit(&gear.id, 1, Some(target)).unwrap();
         let banked = c.bank.gear.first().unwrap();
         assert_eq!(banked.enchant, Some(Shieldbreaker));
@@ -1037,6 +1088,32 @@ mod tests {
                 .collect::<Vec<_>>(),
             [None, Some(Shieldbreaker)]
         );
+    }
+
+    #[test]
+    fn enchanting_application_can_grant_the_last_skill_point_and_cannot_exceed_it() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let copy = worn(&mut w, 1, "weapon", "epic", DoubleTap);
+        let c = character(&mut w, 1);
+        c.enchanting.proficiency.initialize(299);
+        for enchant in [Shieldbreaker, DoubleTap] {
+            c.add_item(&enchant.item("scroll"), 1);
+        }
+        let applied = request(
+            &mut w,
+            &mut rx,
+            json!({"op":"apply","enchant":Shieldbreaker,"copy":copy,"expected":DoubleTap}),
+        );
+        assert_eq!(applied["skill"], 300);
+        assert_eq!(applied["skillUp"], true);
+        let applied = request(
+            &mut w,
+            &mut rx,
+            json!({"op":"apply","enchant":DoubleTap,"copy":copy,"expected":Shieldbreaker}),
+        );
+        assert_eq!(applied["skill"], 300);
+        assert_eq!(applied["skillUp"], false);
     }
 
     #[test]
@@ -1360,7 +1437,7 @@ mod tests {
             .find_map(|(zone, map)| {
                 map.npcs
                     .iter()
-                    .find(|npc| npc.id == "city_transmog")
+                    .find(|npc| npc.id == "city_enchanting")
                     .map(|npc| (zone, npc.clone()))
             })
             .unwrap();

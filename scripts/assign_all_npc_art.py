@@ -46,8 +46,11 @@ def assign():
         if p['id'] in old['npcs']:
             assert old['npcs'][p['id']] == entry, ('Existing assignment differs', p['id'])
         old['npcs'][p['id']] = entry
-    from fisher_npcs import assign_art
-    assign_art(old, json.loads((ROOT/'world/map.txt').read_text()))
+    from enchanting_catalog import assign_art as assign_enchanting_art
+    from fisher_npcs import assign_art as assign_fisher_art
+    world = json.loads((ROOT/'world/map.txt').read_text())
+    assign_fisher_art(old, world)
+    assign_enchanting_art(old, world)
     assert set(old['npcs']) == {n['id'] for n in people()}
     for key, value in original.items():
         if key != 'npcs':

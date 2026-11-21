@@ -30,7 +30,6 @@ pub enum Enchant {
 pub struct Tier {
     rarity: String,
     skill: u16,
-    craft_cap: u16,
     pub min_enemy_level: u32,
     pub drop_chance: f64,
 }
@@ -42,7 +41,6 @@ struct Material {
     rarity: String,
     #[serde(rename = "yield")]
     quantity: u32,
-    skill_cap: u16,
 }
 
 #[derive(Deserialize)]
@@ -95,26 +93,18 @@ impl Recipe {
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Progress {
-    pub skill: u16,
+    #[serde(flatten)]
+    pub proficiency: crate::profession::Skill,
     pub recipes: BTreeSet<Enchant>,
     /// Absolute seconds. Re-equipping, relogging and restarting do not reset a proc's cooldown.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub ready: BTreeMap<Enchant, f64>,
 }
 
-impl Progress {
-    fn advance(&mut self, cap: u16, amount: u16) {
-        if self.skill < cap {
-            self.skill = (self.skill + amount).min(cap);
-        }
-    }
-}
-
 #[derive(Debug, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Command {
     Open,
-    Learn,
     Study {
         enchant: Enchant,
     },
@@ -147,20 +137,24 @@ impl Character {
         })
     }
 
+    pub fn learn_enchanting(&mut self) -> Result<(), &'static str> {
+        if self.enchanting.proficiency.skill > 0 {
+            return Err("You already know Enchanting.");
+        }
+        self.enchanting.proficiency.initialize(1);
+        Ok(())
+    }
+
     /// Operates on a staged character. The controller saves the completed change before publishing it.
-    pub fn enchant_action(&mut self, command: Command) -> Result<&'static str, &'static str> {
+    pub fn enchant_action(
+        &mut self,
+        command: Command,
+    ) -> Result<(&'static str, Option<u8>), &'static str> {
         use Command::*;
         match command {
             Open => {
                 self.materialize_gear_instances();
-                Ok("")
-            }
-            Learn => {
-                if self.enchanting.skill != 0 {
-                    return Err("You already know Enchanting.");
-                }
-                self.enchanting.skill = 1;
-                Ok("You learned Enchanting.")
+                Ok(("", None))
             }
             Study { enchant } => {
                 self.require_enchanting()?;
@@ -171,15 +165,16 @@ impl Character {
                     return Err("You need the recipe scroll in your bags.");
                 }
                 self.enchanting.recipes.insert(enchant);
-                Ok("You learned the recipe.")
+                Ok(("You learned the recipe.", None))
             }
             Disenchant { copy, expected } => {
                 self.require_enchanting()?;
                 let (at, gear) = self.enchant_target(copy, expected)?;
-                let material = CATALOG
+                let (quality, material) = CATALOG
                     .materials
                     .iter()
-                    .find(|m| m.rarity == gear.rarity)
+                    .enumerate()
+                    .find(|(_, m)| m.rarity == gear.rarity)
                     .ok_or("Disenchanting requires green, blue, purple or orange equipment.")?;
                 if self.gear_instance_equipped(copy) {
                     return Err("Unequip that copy before disenchanting it.");
@@ -190,14 +185,14 @@ impl Character {
                 }
                 self.gear_instances.remove(at);
                 self.enchant_output(&material.id, material.quantity)?;
-                self.enchanting.advance(material.skill_cap, 1);
-                Ok("Equipment disenchanted.")
+                Ok(("Equipment disenchanted.", Some(quality as u8)))
             }
             Craft { enchant } => {
                 self.require_enchanting()?;
                 let recipe = enchant.recipe();
                 let tier = &CATALOG.tiers[recipe.tier];
-                if !self.enchanting.recipes.contains(&enchant) || self.enchanting.skill < tier.skill
+                if !self.enchanting.recipes.contains(&enchant)
+                    || self.enchanting.proficiency.skill < tier.skill
                 {
                     return Err("This recipe requires training and more Enchanting skill.");
                 }
@@ -207,8 +202,7 @@ impl Character {
                     }
                 }
                 self.enchant_output(&enchant.item("scroll"), 1)?;
-                self.enchanting.advance(tier.craft_cap, 2);
-                Ok("Enchant scroll crafted.")
+                Ok(("Enchant scroll crafted.", Some(recipe.tier as u8 + 1)))
             }
             Apply {
                 enchant,
@@ -228,7 +222,10 @@ impl Character {
                     return Err("You need the crafted scroll in your bags.");
                 }
                 self.gear_instances[at].enchant = Some(enchant);
-                Ok("Enchantment applied.")
+                Ok((
+                    "Enchantment applied.",
+                    Some(enchant.recipe().tier as u8 + 1),
+                ))
             }
         }
     }
@@ -254,7 +251,7 @@ impl Character {
     }
 
     fn require_enchanting(&self) -> Result<(), &'static str> {
-        (self.enchanting.skill > 0)
+        (self.enchanting.proficiency.skill > 0)
             .then_some(())
             .ok_or("Learn Enchanting first.")
     }

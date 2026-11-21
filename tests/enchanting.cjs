@@ -10,6 +10,8 @@ const mutations = {
   replacing: ['expected:target.gear.enchant ?? null', 'expected:null', 'apply names the old enchant'],
   salvage: ['copies().filter(row => !row.worn)', 'copies()', 'worn pieces cannot be salvaged'],
   cost: ['canCraft &&= have >= amount', 'canCraft = true', 'missing materials disable crafting'],
+  trainer: ['An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.', 'Learn in your bags.', 'untrained characters are sent to a trainer'],
+  skill: ['skill, maxSkill) : tr(', 'skill, 100) : tr(', 'the pane shows the authoritative skill cap'],
   tooltip: ['rarity(tier.rarity), recipe.cooldown', 'rarity(tier.rarity), 0', 'copy tooltip shows the effect and cooldown'],
 };
 if (process.argv.includes('--mutations')) {
@@ -73,7 +75,7 @@ const worn = gear('weapon','epic',103);
 const invalid = gear('necklace','epic',104);
 const copies = [{gear:epic,worn:false},{gear:rare,worn:false},{gear:worn,worn:true},{gear:invalid,worn:false}];
 const inventory = [{item:'enchant_scroll_shieldbreaker',quantity:1},{item:'enchant_recipe_double_tap',quantity:1}];
-const answer = (patch = {}) => EN.onPacket({ok:true, text:'', skill:0, recipes:[], inventory, copies, ...patch});
+const answer = (patch = {}) => EN.onPacket({ok:true, text:'', skill:0, maxSkill:300, recipes:[], inventory, copies, ...patch});
 const button = label => panel.querySelectorAll('button').find(node => node.textContent === label);
 const select = label => panel.querySelectorAll('select').find(node => node.dataset.enchantingField === label);
 const emit = request => assert.deepEqual(calls.at(-1), {type:'enchanting',request});
@@ -82,7 +84,8 @@ EN.open(inventory[0].item);
 emit({op:'open'});
 answer();
 assert.equal(toggle.attributes['aria-expanded'],'true');
-assert.match(panel.textContent, /learn Enchanting/i);
+assert.match(panel.textContent, /Enchanting Master.*Alderhaven.*apothecary/, 'untrained characters are sent to a trainer');
+assert(!button('Learn Enchanting'), 'training has no bag button');
 assert.match(panel.textContent, /Weapon · Epic or higher · 10 s cooldown/, 'copy tooltip shows the effect and cooldown');
 assert.match(panel.textContent, /Cost · One crafted scroll/);
 assert(!select('Equipment copy').options.some(o => o.value === '102'), 'rare gear cannot receive an epic enchant');
@@ -93,9 +96,8 @@ button('Apply enchantment').click();
 assert.deepEqual(calls.at(-1).request, {op:'apply', enchant:'shieldbreaker', copy:101, expected:'double_tap'}, 'apply names the old enchant and the exact copy');
 answer({text:'Enchantment applied.'});
 assert.match(panel.textContent, /Enchantment applied\./);
-button('Learn Enchanting').click();
-emit({op:'learn'});
 answer({skill:1});
+assert.match(panel.textContent, /Enchanting skill 1 \/ 300/, 'the pane shows the authoritative skill cap');
 button('Study').click();
 select('Enchantment').choose('double_tap');
 button('Study recipe').click();
@@ -109,7 +111,8 @@ assert.equal(button('Craft one scroll').disabled,true,'missing materials disable
 answer({skill:1,recipes:['double_tap'],inventory:[{item:'enchant_dust',quantity:4},{item:'enchant_essence',quantity:2}]});
 button('Craft one scroll').click();
 emit({op:'craft',enchant:'double_tap'});
-answer({skill:3,recipes:['double_tap']});
+answer({skill:2,skillUp:true,text:'Enchant scroll crafted.',recipes:['double_tap']});
+assert.match(panel.textContent, /Enchanting skill increased to 2/);
 
 button('Disenchant').click();
 assert(!select('Equipment copy').options.some(o => o.value === '103'),'worn pieces cannot be salvaged');

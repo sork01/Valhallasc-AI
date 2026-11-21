@@ -14,6 +14,7 @@ mod transmog;
 mod notify;
 mod object_grid;
 mod perks;
+mod profession;
 mod rebirth;
 mod rested;
 mod seasonal;

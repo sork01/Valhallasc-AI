@@ -14485,5 +14485,9 @@
   "You need the crafted scroll in your bags.": "Du behöver den tillverkade rullen i väskorna.",
   "You need the recipe scroll in your bags.": "Du behöver receptrullen i väskorna.",
   "Your first eligible basic hit marks its target. Defeating it deals 40% basic-hit damage to the nearest other monster within 5 tiles and passes the mark. Both ring slots share 12 seconds between fresh marks.": "Den första grundattack som kan utlösa förtrollningen märker sitt mål. När du besegrar målet får det närmaste andra monstret inom 5 rutor 40 % av grundattackens skada och tar över märket. Båda ringplatserna delar väntetiden på 12 sekunder mellan nya märken.",
-  "Choose one copy for each offered piece of equipment.": "Välj ett exemplar för varje utrustningsdel i erbjudandet."
+  "Choose one copy for each offered piece of equipment.": "Välj ett exemplar för varje utrustningsdel i erbjudandet.",
+  "Enchanting Master": "Förtrollningsmästare",
+  "Enchanting trainer and recipe vendor": "Förtrollningslärare och receptförsäljare",
+  "I can teach you Enchanting. Once trained, open your bags to disenchant gear, study recipes, and craft or apply scrolls.": "Jag kan lära dig förtrollning. Öppna sedan väskorna för att bryta ned utrustning, studera recept och tillverka eller använda rullar.",
+  "An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.": "En förtrollningsmästare kan lära dig. I Alderhaven finns en nära apotekaren."
 }

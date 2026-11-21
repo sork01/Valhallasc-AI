@@ -607,6 +607,7 @@ impl World {
         let s = pool[(self.random() * pool.len() as f64) as usize];
         let kg = s.kg[0] + (self.random() * f64::from(1 + s.kg[1] - s.kg[0])) as u32;
         let quantity = copies(1., multiplier, || self.random());
+        let skill_roll = self.profession_roll();
         let p = self.players.get_mut(&session).unwrap();
         let c = &mut p.character;
         if c.quantity(&s.item).checked_add(quantity).is_none() {
@@ -618,17 +619,30 @@ impl World {
         p.fishing.next = time + 1.;
         p.fishing.misses = 0;
         p.fishing.streak += 1;
+        c.fishing.initialize_skill();
+        let proficiency = &mut c.fishing.proficiency;
+        let skill_up = proficiency
+            .try_gain(band as u8, skill_roll)
+            .then_some(proficiency.skill);
         c.fishing.total += 1;
         c.fishing.legendary += u64::from(band == 3);
         c.fishing.longest_streak = c.fishing.longest_streak.max(p.fishing.streak);
         let record = c.fishing.species.entry(s.item.clone()).or_default();
         record.count += 1;
         record.best_kg = record.best_kg.max(kg);
-        let _=p.peer.try_send(json!({"type":"event","kind":"fish_catch","actor":c.id,"item":s.item,"quantity":quantity,"kg":kg,"rarity":item(&s.item).unwrap().rarity}));
+        let _=p.peer.try_send(json!({"type":"event","kind":"fish_catch","actor":c.id,"item":s.item,"quantity":quantity,"kg":kg,"rarity":item(&s.item).unwrap().rarity,"skillUp":skill_up}));
         if band == 3 {
             let actor = c.id.clone();
-            let text = format!("{0} caught {1} (ca {2} kg)!", c.look.name, item(&s.item).unwrap().name, kg);
-            self.emit_zone(line.zone, json!({"type":"announce","kind":"treasure","actor":actor,"text":text}));
+            let text = format!(
+                "{0} caught {1} (ca {2} kg)!",
+                c.look.name,
+                item(&s.item).unwrap().name,
+                kg
+            );
+            self.emit_zone(
+                line.zone,
+                json!({"type":"announce","kind":"treasure","actor":actor,"text":text}),
+            );
         }
         if let Some(point) = rich {
             self.fishing_spot_caught(line.zone, point);
@@ -764,10 +778,33 @@ mod data_tests {
     }
 
     #[test]
+    fn fishing_skill_gives_existing_catches_one_time_credit() {
+        let mut log: FishingLog = serde_json::from_value(json!({
+            "total":100,"legendary":1,"longestStreak":5,"species":{}
+        }))
+        .unwrap();
+        log.initialize_skill();
+        assert_eq!(log.proficiency.skill, 51);
+        assert!(log.proficiency.try_gain(0, 0.));
+        let mut reloaded: FishingLog =
+            serde_json::from_value(serde_json::to_value(log).unwrap()).unwrap();
+        reloaded.total = 1000;
+        reloaded.initialize_skill();
+        assert_eq!(reloaded.proficiency.skill, 52);
+        let mut veteran = FishingLog {
+            total: 1000,
+            ..FishingLog::default()
+        };
+        veteran.initialize_skill();
+        assert_eq!(veteran.proficiency.skill, 300);
+    }
+
+    #[test]
     fn fishing_data_real_catches_spend_one_fish_per_hook_and_junk_spends_none() {
         let (mut w, mut rx) = super::super::fishing_tests::angler();
         w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, 2];
         w.fish_press(1, 20.);
+        w.profession_rng = 0;
         let mut line = w.players[&1].fishing.line.unwrap();
         line.rich = Some(line.bobber);
         line.bonus *= 3.;
@@ -784,9 +821,11 @@ mod data_tests {
         w.fish_press(1, line.deadline());
         assert_eq!(w.rich_fishing[&0][0].remaining, 4);
         assert_eq!(w.players[&1].character.fishing.total, 1);
+        assert_eq!(w.players[&1].character.fishing.proficiency.skill, 2);
         let caught = std::iter::from_fn(|| rx.try_recv().ok())
             .find(|v| v["kind"] == "fish_catch")
             .unwrap();
+        assert_eq!(caught["skillUp"], 2);
         assert!(
             caught["quantity"].as_u64().unwrap() > 1,
             "rebirth multiplies copies, not spot use"
@@ -797,6 +836,7 @@ mod data_tests {
         w.land_fish(1, line, 50.);
         assert_eq!(w.rich_fishing[&0][0].remaining, 4);
         assert_eq!(w.players[&1].character.fishing.total, 1);
+        assert_eq!(w.players[&1].character.fishing.proficiency.skill, 2);
         let junk = std::iter::from_fn(|| rx.try_recv().ok())
             .find(|v| v["kind"] == "fish_catch")
             .unwrap();

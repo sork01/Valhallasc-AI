@@ -43,6 +43,8 @@ function fixture() {
   if(process.env.MUTATE==='input')src=src.replace("Online.send({ type: 'fish' })", "Online.send({ type: 'attack' })");
   if(process.env.MUTATE==='spots')src=src.replace('(packet.fishingSpots || [])','(map.fishingSpots || [])');
   if(process.env.MUTATE==='records')src=src.replace('log = hero.fishingLog || {}','log = {}');
+  if(process.env.MUTATE==='skill-card')src=src.replace('if (result.skillUp) el.append', 'if (false) el.append');
+  if(process.env.MUTATE==='skill-log')src=src.replace("log.skill || 1", "1");
   if(process.env.MUTATE==='deadline')src=src.replace(' / 1200)', ' / 120000)');
   if(process.env.MUTATE==='privacy')src=src.replace("if (e.actor !== self || !e.kind?.startsWith('fish_'))", "if (!e.kind?.startsWith('fish_'))");
   if(process.env.MUTATE==='cleanup')src=src.replace('lines.clear(); $(\'fishing-panel\')', '$(\'fishing-panel\')');
@@ -125,10 +127,11 @@ ctx.fishTouchUpdate();check(ctx.fish.textContent==='Hook!'&&ctx.fish.dataset.bit
 f.draw();f.ops.length=0;f.setTime(2600);f.draw();
 const arc=f.ops.find(o=>o[0]==='arc');check(arc&&Math.abs(arc[5]-Math.PI/2)<.001,'deadline ring drains using server clock');
 const fish=items.find(i=>i.kind==='fish'&&i.rarity==='legendary');
-fishing.event({actor:'self',kind:'fish_catch',item:fish.id,rarity:fish.rarity,kg:22,quantity:3},'self');
-f.sync({...hero,fishingLog:{total:1,legendary:1,longestStreak:1,species:{[fish.id]:{count:1,bestKg:22}}}});
+fishing.event({actor:'self',kind:'fish_catch',item:fish.id,rarity:fish.rarity,kg:22,quantity:3,skillUp:78},'self');
+f.sync({...hero,fishingLog:{skill:78,total:1,legendary:1,longestStreak:1,species:{[fish.id]:{count:1,bestKg:22}}}});
 f.draw();check(el('fishing-catch').hidden&&cues.at(-1)==='reel','reel precedes catch card');
 f.setTime(3200);f.draw();check(!el('fishing-catch').hidden&&el('fishing-catch').textContent.includes(fish.name)&&el('fishing-catch').textContent.includes('22'),'card shows authoritative fish and weight');
+check(el('fishing-catch').textContent.includes('Fishing skill increased to 78.'),'catch shows a real skill gain');
 check(cues.at(-1)==='legendary'&&!cues.includes('catch'),'one legendary celebration replaces ordinary catch');
 el('stage').clientWidth=600;el('stage').clientHeight=390;ctx.Field.hero={x:1,y:1};f.draw();
 check(parseFloat(el('fishing-catch').style.left)*6>=138,'phone catch card stays inside the left edge');
@@ -142,6 +145,7 @@ f.setTime(6200);f.draw();check(el('fishing-catch').hidden&&!el('stage').classLis
 check(fishing.open()&&ctx.Field.paused,'collection window pauses inputs');
 check(el('fishing-species').children.filter(r=>r.dataset.item).length===items.filter(i=>i.kind==='fish').length,'log includes complete species catalogue');
 check(el('fishing-records').textContent.includes('Caught: 1')&&el('fishing-records').textContent.includes('Legendary: 1'),'log uses saved counters');
+check(el('fishing-records').textContent.includes('Fishing skill 78 / 300'),'fishing log shows the skill and cap');
 const caughtRow=el('fishing-species').children.find(r=>r.dataset.item===fish.id), unknown=el('fishing-species').children.find(r=>r.dataset.item&&r.dataset.item!==fish.id);
 check(caughtRow.textContent.includes('22')&&caughtRow.textContent.includes('1 caught'),'per-species saved weight and count');
 check(unknown.textContent.includes('Undiscovered fish')&&unknown.children[0].classList.contains('silhouette'),'unseen species have silhouette and hidden name');
@@ -165,8 +169,9 @@ rows=ctx.SystemLog.lines({actor:'self',kind:'fish_catch',item:'fishing_driftwood
 const body={nodeType:1,querySelectorAll:()=>[],hasAttribute:()=>false};
 const sv={window:null,localStorage:{getItem:()=>JSON.stringify({lang:'sv'})},navigator:{language:'sv'},document:{documentElement:{},body,createTreeWalker:()=>({nextNode:()=>null})},Node:{TEXT_NODE:3,ELEMENT_NODE:1},NodeFilter:{SHOW_TEXT:4},MutationObserver:class{observe(){}}};sv.window=sv;vm.createContext(sv);
 for(const name of ['sv-data.js','locale.js'])vm.runInContext(read('client/'+name),sv);
-ctx.Locale=sv.Locale;el('fishing-filter').value='';f.sync({...hero,fishingLog:{total:2,legendary:1,longestStreak:2,species:{[fish.id]:{count:2,bestKg:22}}}});fishing.open();
-check(el('fishing-records').textContent.startsWith('Fångster: 2'),'Swedish collection records');
+ctx.Locale=sv.Locale;el('fishing-filter').value='';f.sync({...hero,fishingLog:{skill:79,total:2,legendary:1,longestStreak:2,species:{[fish.id]:{count:2,bestKg:22}}}});fishing.open();
+check(el('fishing-records').textContent.includes('Fångster: 2'),'Swedish collection records');
+check(el('fishing-records').textContent.includes('Fiskenivå 79 / 300'),'Swedish fishing skill display');
 check(el('fishing-species').children.find(r=>r.dataset.item===fish.id).textContent.includes('Rekord: ca 22 kg'),'Swedish per-species record');
 check(sv.Locale.translate(`Forest caught ${fish.name} (ca 22 kg)!`).startsWith('Forest fångade '),'legendary announcement preserves player name');
 check(sv.Locale.translate(`You catch ${fish.name} (ca 22 kg) ×3.`).startsWith('Du fångar '),'Swedish catch line');

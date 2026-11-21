@@ -1,20 +1,30 @@
 # Enchanting
 
-Every character can learn Enchanting in the bag window. Study a recipe scroll once to learn its recipe permanently. Disenchant an unequipped copy to recover materials. Crafting produces a tradeable, single-use scroll. Any character can apply one to a compatible gear copy from their bags or equipped slots. The panel lists the eligible gear, effect, cooldown, cost and any enchantment it will replace. Disenchanting requires a separate confirmation.
+Every character can learn Enchanting for free by speaking with an Enchanting Master. After training, use the Enchanting panel in your bags. Study a recipe scroll once to learn its recipe permanently. Disenchant an unequipped copy to recover materials. Crafting produces a tradeable, single-use scroll. Any character can apply one to a compatible gear copy from their bags or equipped slots. The panel lists the eligible gear, effect, cooldown, cost and any enchantment it will replace. Disenchanting requires a separate confirmation.
 
-Recipes come from eligible monster loot and from the Transmog Masters in Skaldholm, Nacrehold, Asterion and Veyrroot Heartwood. A recipe scroll teaches the recipe and a crafted scroll applies the effect. Monsters below level 10 and repeated mechanic summons cannot supply recipes. Trades involving enchanted gear show which copy is offered and which enchantment it carries.
+Recipes come from eligible monster loot and from the Enchanting Masters listed below. A recipe scroll teaches the recipe and a crafted scroll applies the effect. Monsters below level 10 and repeated mechanic summons cannot supply recipes. Trades involving enchanted gear show which copy is offered and which enchantment it carries.
+
+| Town | Where to find the Enchanting Master |
+| --- | --- |
+| Alderhaven | Near Mira Moonleaf, the apothecary |
+| Skaldholm | Near Master Smith Brunhild |
+| Nacrehold | Near Thalos Reefhammer |
+| Asterion | Near Bramble Gilt |
+| Veyrroot Heartwood | Near Master Smith Torvald Pithfire |
 
 ## Initial progression
 
 | Tier | Required skill | Cost in dust, essence, shards, cores | Minimum enemy level | Monster drop chance | Vendor price |
 | --- | ---: | --- | ---: | ---: | ---: |
 | Rare (blue) | 1 | 4, 2, 0, 0 | 10 | 1.25% | 25 gold |
-| Epic (purple) | 25 | 6, 4, 2, 0 | 35 | 0.6% | 100 gold |
-| Legendary (orange) | 60 | 10, 8, 6, 1 | 65 | 0.25% | 400 gold |
+| Epic (purple) | 75 | 6, 4, 2, 0 | 35 | 0.6% | 100 gold |
+| Legendary (orange) | 180 | 10, 8, 6, 1 | 65 | 0.25% | 400 gold |
 
 One recipe can drop per eligible kill. The roll reserves the legendary band first, followed by epic and rare, with uniform selection among the recipes in the tier. Elites and bosses triple the chances. Normal kill credit assigns the drop.
 
-Green yields two dust, blue yields two essence, purple yields two shards, and orange yields one core. Orange gear is the sole source of cores. Each disenchant gives one skill point up to 25 for green, 60 for blue, and 100 for purple and orange. A craft gives two skill points up to 25 for rare, 60 for epic, and 100 for legendary. The skill cap is 100. An enchanter can study recipes before reaching their crafting tier. Gray, starter, Hierloom and GM gear are excluded from disenchanting.
+Green yields two dust, blue yields two essence, purple yields two shards, and orange yields one core. Orange gear is the sole source of cores. Gray, starter, Hierloom and GM gear are excluded from disenchanting. An enchanter can study recipes before reaching their crafting tier.
+
+Enchanting starts at skill 1 and caps at 300. Each successful disenchant, scroll craft, or application by a trained character can award one point. The chance on a basic green disenchant starts at 90% and approaches 60% near the cap. Higher rarities improve the odds. Two eligible attempts without a point guarantee the next one, so green disenchanting or rare scrolls can get a character all the way to 300. Untrained characters can still apply crafted scrolls.
 
 ## Equipment and combat
 
@@ -26,7 +36,7 @@ Shake It Off responds to the movement slow from enemy rear-hit daze. Moonstep dr
 
 ## Data and protocol
 
-The source for tiers, costs, drops, materials, display descriptions and cooldowns is `world/enchanting.txt`. `scripts/enchanting_catalog.py` generates the purchasable items, vendor stock and client display data as part of `scripts/sync-world.cjs`. The controller accepts the `enchanting` request with an `open`, `learn`, `study`, `disenchant`, `craft` or `apply` operation. Copy operations carry a copy ID and the expected current enchant. The controller validates and saves a staged character before publishing a change. Combat timers are saved with character progression and temporary combat state stays in the current session.
+The source for tiers, costs, drops, materials, display descriptions and cooldowns is `world/enchanting.txt`. `scripts/enchanting_catalog.py` generates the purchasable items, vendor stock and client display data as part of `scripts/sync-world.cjs`. The controller accepts the `enchanting` request with an `open`, `study`, `disenchant`, `craft` or `apply` operation. Training uses the Enchanting Master’s normal NPC interaction and checks the offer and distance. Copy operations carry a copy ID and the expected current enchant. The controller validates and saves a staged character before publishing a change. Combat timers are saved with character progression and temporary combat state stays in the current session.
 
 The trade controller accepts exact copy IDs, validates the selected copies again at confirmation and keeps the existing binding rules. The bank and mail controllers use the existing gear-copy serialization.
 

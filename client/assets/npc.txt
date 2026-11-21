@@ -9434,6 +9434,60 @@
         "hat": "straw"
       },
       "color": "#527e89"
+    },
+    "alder_enchanting": {
+      "art": "physician",
+      "identity": {
+        "skin": "#edc5a1",
+        "hair": "#755841"
+      },
+      "color": "#9a71aa"
+    },
+    "city_enchanting": {
+      "art": "alchemist",
+      "identity": {
+        "skin": "#f0c8a6",
+        "hair": "#d8d0c0",
+        "style": "bun",
+        "apron": "#d8e8e0"
+      },
+      "color": "#4f8a7a"
+    },
+    "nacre_enchanting": {
+      "art": "special_nacre_archivist",
+      "identity": {
+        "species": "merfolk",
+        "female": true,
+        "tail": "#81d6cc",
+        "skin": "#abd4e4",
+        "hair": "#ebdbbd",
+        "style": "long"
+      },
+      "color": "#81d6cc"
+    },
+    "asterion_enchanting": {
+      "art": "special_asterion_archon",
+      "identity": {
+        "skin": "#c78e6e",
+        "hair": "#f2e7d5",
+        "style": "long",
+        "hat": "feather",
+        "hatColor": "#733a88",
+        "scale": 1,
+        "prop": "crown"
+      },
+      "color": "#b7a5dd"
+    },
+    "hw_enchanting": {
+      "art": "special_heart_archivist",
+      "identity": {
+        "skin": "#ad7857",
+        "hair": "#28574b",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#569e66"
+      },
+      "color": "#e4f7ae"
     }
   },
   "tops": {

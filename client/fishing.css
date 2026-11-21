@@ -31,3 +31,5 @@
 .fishing-progression { grid-column: 1 / -1; padding: 10px; border: 1px solid #75644a; border-radius: 5px; }
 .fishing-progression details > div { margin-top: 10px; }
 .fishing-progression small { display: block; color: #cbbda7; line-height: 1.5; }
+
+#fishing-catch .fishing-skill-up { color: #b9e7ac; }

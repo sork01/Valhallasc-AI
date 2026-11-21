@@ -1,5 +1,12 @@
 # Fishing rules and implementation plan
 
+## Fishing skill (1.4.0)
+
+The fishing log shows skill 1–300 and the catch card announces skill gains. Landing a real fish gives one chance to gain a point, including common fish caught with the starting rod. The chance on a common fish starts at 90% and approaches 60% near the cap. Rarer fish improve the odds. After two eligible catches without a point, the next one gives a point. Junk, treasure, misses, and extra copies from the same hook give no skill roll. Rod and habitat requirements follow the existing progression.
+
+Existing characters receive one point per two recorded fish above the starting skill of 1, capped at 300. This happens once, on their first login with the new skill. The new level and the number of unsuccessful eligible rolls are saved with the fishing log.
+
+
 Owner request (2026-11-18): fishing with craftable rods, a bobber in the water you press for when a fish bites, animations, fish icons, rare drops, places to fish, and heat-resistant line upgrades for lava. Backlog chain: `FISH-*` in `TODO.md`.
 
 ## Rod warning follow-up: 1.2.1 (2026-11-20)

@@ -317,10 +317,18 @@ pub struct Corpse {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FishingLog {
+    #[serde(flatten)]
+    pub proficiency: crate::profession::Skill,
     pub total: u64,
     pub legendary: u64,
     pub longest_streak: u64,
     pub species: std::collections::BTreeMap<String, FishRecord>,
+}
+impl FishingLog {
+    pub fn initialize_skill(&mut self) {
+        let prior_catches = (self.total / 2).min(u64::from(crate::profession::MAX_SKILL - 1));
+        self.proficiency.initialize(1 + prior_catches as u16);
+    }
 }
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
