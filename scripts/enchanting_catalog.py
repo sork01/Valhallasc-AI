@@ -26,9 +26,12 @@ def assign_art(art, world):
 
 
 def apply(catalog, items, world, art):
+    # Replace the generated block in place so later overlays keep their order.
+    start = next((i for i, entry in enumerate(items) if entry.get('source') == 'enchanting'), len(items))
     items[:] = [item for item in items if item.get('source') != 'enchanting']
+    entries = []
     for number, material in enumerate(catalog['materials'], 1):
-        items.append({**{key: material[key] for key in ('id', 'name', 'rarity')},
+        entries.append({**{key: material[key] for key in ('id', 'name', 'rarity')},
                       'kind': 'material', 'sell': number * 10, 'source': 'enchanting'})
     stock = []
     for enchant in catalog['enchants']:
@@ -37,11 +40,13 @@ def apply(catalog, items, world, art):
                                     ('scroll', 'enchant_scroll', 'Scroll')]:
             item_id = f"enchant_{prefix}_{enchant['id']}"
             name = f"{title}: {enchant['name']}"
-            items.append({'id': item_id, 'name': name, 'kind': kind, 'rarity': tier['rarity'],
+            entries.append({'id': item_id, 'name': name, 'kind': kind, 'rarity': tier['rarity'],
                           'sell': 25 * (enchant['tier'] + 1), 'source': 'enchanting'})
             if prefix == 'recipe':
                 stock.append({'id': f'buy_{item_id}', 'label': name, 'item': item_id,
                               'cost': tier['vendorPrice']})
+    items[start:start] = entries
+
     areas = [world, *world['zones']]
     # Remove earlier generated offers from the draft and rebuild the dedicated trainers.
     for area in areas:

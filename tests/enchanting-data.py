@@ -31,6 +31,10 @@ assert len({e['id'] for e in enchants}) == len(enchants)
 assert [sum(e['tier'] == n for e in enchants) for n in range(3)] == [5, 6, 5]
 stock = {i['id']: i for i in items if i.get('source') == 'enchanting'}
 assert len(stock) == 36
+# Later item overlays keep their location even when Enchanting is rebuilt separately.
+positions = {source: [i for i, item in enumerate(items) if item.get('source') == source]
+             for source in ('enchanting', 'blacksmithing')}
+assert max(positions['enchanting']) < min(positions['blacksmithing'])
 assert [t['skill'] for t in catalog['tiers']] == [1, 75, 180]
 assert [t['vendorPrice'] for t in catalog['tiers']] == [250_000, 1_000_000, 4_000_000]
 assert [m['rarity'] for m in catalog['materials'] if m['id'] == 'enchant_core'] == ['legendary']
