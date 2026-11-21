@@ -84,7 +84,8 @@ async function ench(bot, request) {
   trade('Buyer',{op:'confirm'});
   await finished;
   await wait(() => have('Buyer',scroll) === 1 && findCopies('Buyer',rare.id).some(g => g.enchant), 'copy and crafted scroll arrive');
-  assert.equal(have('Crafter',rare.id),1);
+  // The two clients receive their inventory snapshots independently.
+  await wait(() => have('Crafter',rare.id) === 1, 'seller inventory after trade');
   assert(!findCopies('Crafter',rare.id).some(g => g.enchant));
   await world.debug('Buyer',{op:'give_item',item:epic.id,quantity:1});
   const buyer = await ench('Buyer',{op:'open'});
