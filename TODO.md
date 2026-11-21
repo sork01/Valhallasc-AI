@@ -8,6 +8,47 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [ ] `ALCHEMY-RULES` — Design drafted 2026-11-21. Confirm the proposed gameplay rules before implementation. Pick local flowers throughout Valhalla and brew potions and flasks that buff the character who drinks them. Alchemy is a secondary profession with a saved skill from 1 to 600.
+  - **Proposed training and brewing.** Any character can learn Alchemy alongside Fishing, Enchanting and Blacksmithing. A trainer in Alderhaven starts the profession. Alchemists in Alderhaven, Skaldholm, Nacrehold, Asterion and Veyrroot Heartwood teach and provide brewing stations and empty containers.
+  - **Proposed gathering.** Start with three active patches per shared adventure zone. Use one garden patch in each service city with its local flower. Skaldholm grows Lantern Lily, Nacrehold grows Tideglass Anemone, Asterion grows Sporebell and Veyrroot Heartwood grows Heartvine Bloom. Rán's Deep and Nacrehold use reachable seabed positions. Dungeons and the Arena are outside the proposed gathering scope. Click or tap within reach to pick by hand. Moving, taking damage or leaving reach interrupts the pick. Each patch gives 3–5 shared picks of 1–2 flowers, then relocates to a validated alternate position. A pick spends a charge after the flowers fit and are saved.
+  - **Training.** Start at skill 1. A successful harvest or learned brew in the current 30-point band rolls once for a point. Two eligible misses guarantee the next gain. Earlier flowers and recipes remain usable. Gathering alone or brewing each band's staple from traded flowers can reach 600. Each zone lists its flowers and required skill in the Alchemy panel.
+  - **Flower and staple recipe ladder.** Each short potion lasts 15 seconds and each flask lasts 45 minutes. The two Wyrdwood flowers grow in different parts of the zone. A slash between flower sources means either flower can fill that band's ingredient requirement. The level column is the minimum character level to drink the brew.
+
+    | Skill | Source | Flower | Level | Staple brew and effect |
+    | --- | --- | --- | ---: | --- |
+    | 1–29 | Greenmeadow | Meadowgold | 1 | Meadowgold Potion, +4% damage |
+    | 30–59 | Emberfall Crags | Cinder Poppy | 5 | Cinderheart Flask, +2% damage |
+    | 60–89 | Rimeveil Glacier | Frostbell | 10 | Frostguard Potion, 5% less damage taken |
+    | 90–119 | Gloamfen | Lantern Lily | 15 | Fenlight Flask, +2% outgoing healing |
+    | 120–149 | Outer Wyrdwood | Wyrd Clover | 20 | Wyrdstride Potion, +8% movement speed |
+    | 150–179 | Inner Wyrdwood | Moonveil Orchid | 25 | Moonveil Flask, 2% less damage taken |
+    | 180–209 | Bifrost Reach | Rainbow Aster | 30 | Bifrost Potion, +6% damage |
+    | 210–239 | Rán's Deep | Tideglass Anemone | 35 | Tideglass Flask, +2% maximum health |
+    | 240–269 | Astralhollow | Starwhisper | 40 | Starwhisper Potion, +7% outgoing healing |
+    | 270–299 | The Prismwaste | Prism Saffron | 45 | Flask of Clear Light, +2% damage |
+    | 300–329 | The Obsidian Orrery | Brass Petal | 50 | Clockguard Potion, 7% less damage taken |
+    | 330–359 | The Moonspore Canopy | Sporebell | 55 | Moonspore Flask, +3% outgoing healing |
+    | 360–389 | The Stormglass Flats | Storm Iris | 60 | Stormflash Potion, +8% damage |
+    | 390–419 | Sunward Vale | Suncrest Marigold | 65 | Suncrest Flask, +3% maximum health |
+    | 420–449 | The Ribbonwild | Ribbon Orchid | 70 | Ribbonstep Potion, +12% movement speed |
+    | 450–479 | The Tanglecrown | Thornsilk Blossom | 75 | Thornsilk Flask, 3% less damage taken |
+    | 480–509 | Veyrroot Canopy / The Lapis Erg | Heartvine Bloom / Dune Lotus | 80 | Deepbloom Flask, +3% damage |
+    | 510–539 | Frostwake Shelf | Snowfire Edelweiss | 85 | Snowfire Potion, 10% less damage taken |
+    | 540–569 | The Cairnspine | Cairn Heather | 90 | Cairnkeeper Flask, +4% outgoing healing |
+    | 570–599 | The Yearwheel / Emberwake Caldera | Hourglass Blossom / Ashen Dahlia | 95 | Last Hour Potion, +10% damage |
+
+  - **Proposed buff rules.** One flask and one short Alchemy potion can be active in PvE. A new brew refreshes or replaces the effect in its own slot. When both affect the same stat, use the stronger Alchemy modifier. Cooked-fish food keeps its own slot. Alchemy potions share the existing persistent 60-second timer with health and resource potions. Flasks can be used out of combat and do not spend that timer. Their expiry uses wall-clock time through death and reconnect. Short potions clear on death and logout. Suppress Alchemy in PvP, including duels and the Arena, and resume any unexpired flask on return to PvE.
+  - **Brewing costs.** A staple potion uses two flowers from its band and one shop vial. A staple flask uses four flowers from its band, one flower from the preceding band and one shop flask. Each brew makes one item. Any valid input combination grants the same recipe and skill credit.
+  - **Proposed recipes and trade.** Trainers teach the staple brew in every band. Cairnspine elites drop the Trailwind Potion formula. Selected level-99 final bosses drop the three capstone flask formulas. Unused formulas, flowers and finished brews are tradeable. Studying a formula teaches the recipe permanently. Anyone at the required character level can drink the finished brew.
+  - **Specialist recipes.** Add three level-99 flask choices at skill 600. Flask of the Turning Year gives +4% damage, Flask of the Ashen Ward gives 4% less damage taken, and Flask of the Quiet Grove gives +5% outgoing healing. Each takes four Hourglass Blossoms or Ashen Dahlias, two Cairn Heather and one shop flask. A level-90 Trailwind Potion formula at skill 540 uses two Cairn Heather and one vial for 15 seconds of +15% movement speed. All effects are first-pass tuning.
+
+- [ ] `ALCHEMY-SERVER` — After `ALCHEMY-RULES`, add saved profession skill and learned recipes, authoritative gathering, atomic brewing and consumable use, PvE buff timers and eligibility checks. Use the existing inventory and consumables paths.
+- [ ] `ALCHEMY-DATA` — After `ALCHEMY-SERVER`, author flowers, recipes, trainers, supplies and any recipe drops. Generate validated, reachable flower candidates after zone shaping. Verify full zone coverage, alternate positions, ingredient access and a complete 1–600 ladder.
+- [ ] `ALCHEMY-CLIENT` — After `ALCHEMY-DATA`, add desktop and touch gathering and brewing, tier and source guidance, ingredient costs, buff tooltips and remaining timers. Add Swedish translations.
+- [ ] `ALCHEMY-ART` — After `ALCHEMY-CLIENT`, create readable flower patches and flower, potion, flask and recipe icons in PixelFlow. Add picking, brewing and drinking cues.
+- [ ] `ALCHEMY-CHECK` — After `ALCHEMY-ART`, run focused data, Rust, private two-player and desktop/touch checks. Cover zone reachability, contention, interruptions, full bags, saved skill and recipes, cooldowns and buff expiry, PvP eligibility, and mutations of new assertions.
+- [ ] `ALCHEMY-RELEASE` — After `ALCHEMY-CHECK`, bump the middle version, add release notes and rebuild Swedish and coordinate the client and game release with owner approval for the restart.
+
 - [x] `BLACKSMITHING-RULES` — Design and owner decisions recorded 2026-11-21. Add Blacksmithing as a secondary profession that characters can learn alongside Fishing and Enchanting. Mine ore with a pick, smelt it into bars and use blueprints to forge equipment.
   - **Owner decisions.** Veins are shared and support several pulls before relocating, like rich Fishing spots. The profession makes useful leveling gear and endgame blue and purple equipment. The strongest gear remains combat-earned. Smiths teach staple recipes, monsters drop rare blueprints, and bosses drop the best blueprints. Both smelting and forging happen at existing town smiths and anvils.
   - **Skill and mining.** Alderhaven's smith teaches Blacksmithing and grants a starter pick. One saved skill starts at 1 and caps at 300 using the shared profession progression. A successful mining pull or equipment craft from the current 30-point band makes one skill roll. Two eligible attempts without a gain guarantee the next one. Earlier tiers still yield their materials or gear. Smelting and making components supply materials for those actions. A character can complete the skill ladder by mining. Start with three active veins per eligible shared adventure zone, with a smaller count where space is limited. A vein gives 3–5 shared pulls of 1–2 ore each before it relocates to another validated candidate position. Click or tap a nearby vein to start a short mining action. Moving, taking damage or leaving range interrupts it. A completed pull awards ore and consumes one charge only if the ore fits in the bag.
