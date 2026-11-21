@@ -64205,6 +64205,54 @@
           "label": "Recipe: Heartwood Grove",
           "item": "enchant_recipe_heartwood_grove",
           "cost": 4000000
+        },
+        {
+          "id": "buy_enchant_recipe_horizon_step",
+          "label": "Recipe: Horizon Step",
+          "item": "enchant_recipe_horizon_step",
+          "cost": 1500000
+        },
+        {
+          "id": "buy_enchant_recipe_prism_echo",
+          "label": "Recipe: Prism Echo",
+          "item": "enchant_recipe_prism_echo",
+          "cost": 1500000
+        },
+        {
+          "id": "buy_enchant_recipe_siltweave",
+          "label": "Recipe: Siltweave",
+          "item": "enchant_recipe_siltweave",
+          "cost": 1500000
+        },
+        {
+          "id": "buy_enchant_recipe_lantern_keeper",
+          "label": "Recipe: Lantern Keeper",
+          "item": "enchant_recipe_lantern_keeper",
+          "cost": 4500000
+        },
+        {
+          "id": "buy_enchant_recipe_ribbon_rush",
+          "label": "Recipe: Ribbon Rush",
+          "item": "enchant_recipe_ribbon_rush",
+          "cost": 4500000
+        },
+        {
+          "id": "buy_enchant_recipe_rootguard",
+          "label": "Recipe: Rootguard",
+          "item": "enchant_recipe_rootguard",
+          "cost": 4500000
+        },
+        {
+          "id": "buy_enchant_recipe_cairnstrike",
+          "label": "Recipe: Cairnstrike",
+          "item": "enchant_recipe_cairnstrike",
+          "cost": 10000000
+        },
+        {
+          "id": "buy_enchant_recipe_evergreen_sigil",
+          "label": "Recipe: Evergreen Sigil",
+          "item": "enchant_recipe_evergreen_sigil",
+          "cost": 2500000
         }
       ],
       "buys": false
@@ -321318,6 +321366,54 @@
               "label": "Recipe: Heartwood Grove",
               "item": "enchant_recipe_heartwood_grove",
               "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_horizon_step",
+              "label": "Recipe: Horizon Step",
+              "item": "enchant_recipe_horizon_step",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_prism_echo",
+              "label": "Recipe: Prism Echo",
+              "item": "enchant_recipe_prism_echo",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_siltweave",
+              "label": "Recipe: Siltweave",
+              "item": "enchant_recipe_siltweave",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_lantern_keeper",
+              "label": "Recipe: Lantern Keeper",
+              "item": "enchant_recipe_lantern_keeper",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_ribbon_rush",
+              "label": "Recipe: Ribbon Rush",
+              "item": "enchant_recipe_ribbon_rush",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_rootguard",
+              "label": "Recipe: Rootguard",
+              "item": "enchant_recipe_rootguard",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_cairnstrike",
+              "label": "Recipe: Cairnstrike",
+              "item": "enchant_recipe_cairnstrike",
+              "cost": 10000000
+            },
+            {
+              "id": "buy_enchant_recipe_evergreen_sigil",
+              "label": "Recipe: Evergreen Sigil",
+              "item": "enchant_recipe_evergreen_sigil",
+              "cost": 2500000
             }
           ],
           "buys": false
@@ -490827,6 +490923,20 @@
           "y": 288.98,
           "r": 0.3,
           "v": 0
+        },
+        {
+          "kind": "water",
+          "x": 211.25,
+          "y": 178.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_7_1"
+        },
+        {
+          "kind": "water",
+          "x": 166.25,
+          "y": 175.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_7_2"
         }
       ],
       "slimes": [
@@ -492680,6 +492790,64 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_sky_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 172.40182899632296,
+          "y": 181.40182899632296,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "cook:fish_cloud_minnow",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_storm_barb",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_gale_eel",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_thundercrest_ray",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_star_dace",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_comet_perch",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_nebula_gar",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "quests": [
@@ -493657,6 +493825,82 @@
           "requires": "sky_el_nests",
           "repeatable": false,
           "rewardItem": "accessory_amber_l35_blue"
+        },
+        {
+          "id": "fisher_sky_0_1",
+          "title": "Fresh Fish for Heimdall's Perch",
+          "npc": "fisher_sky_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cloud_minnow",
+              "count": 5,
+              "what": "Cloud Minnow"
+            }
+          ]
+        },
+        {
+          "id": "fisher_sky_0_2",
+          "title": "A Finer Catch for Heimdall's Perch",
+          "npc": "fisher_sky_0",
+          "requires": "fisher_sky_0_1",
+          "repeatable": false,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_storm_barb",
+              "count": 3,
+              "what": "Storm Barb"
+            }
+          ]
+        },
+        {
+          "id": "fisher_sky_0_3",
+          "title": "A Trophy for Heimdall's Perch",
+          "npc": "fisher_sky_0",
+          "requires": "fisher_sky_0_2",
+          "repeatable": false,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_gale_eel",
+              "count": 1,
+              "what": "Gale Eel"
+            }
+          ]
+        },
+        {
+          "id": "fisher_sky_0_4",
+          "title": "The Daily Creel at Heimdall's Perch",
+          "npc": "fisher_sky_0",
+          "requires": "fisher_sky_0_1",
+          "repeatable": true,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cloud_minnow",
+              "count": 5,
+              "what": "Cloud Minnow"
+            }
+          ]
         }
       ],
       "city": {
@@ -500001,6 +500245,38 @@
             "x": 256,
             "y": 103
           }
+        }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 7,
+          "habitat": "Cloudwater",
+          "x": 211.75,
+          "y": 178.75,
+          "shore": {
+            "x": 216.25,
+            "y": 178.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_7_01"
+        },
+        {
+          "zone": 7,
+          "habitat": "Cloudwater",
+          "x": 166.75,
+          "y": 175.25,
+          "shore": {
+            "x": 171.25,
+            "y": 175.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_7_02"
         }
       ]
     },
@@ -545856,6 +546132,54 @@
               "label": "Recipe: Heartwood Grove",
               "item": "enchant_recipe_heartwood_grove",
               "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_horizon_step",
+              "label": "Recipe: Horizon Step",
+              "item": "enchant_recipe_horizon_step",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_prism_echo",
+              "label": "Recipe: Prism Echo",
+              "item": "enchant_recipe_prism_echo",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_siltweave",
+              "label": "Recipe: Siltweave",
+              "item": "enchant_recipe_siltweave",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_lantern_keeper",
+              "label": "Recipe: Lantern Keeper",
+              "item": "enchant_recipe_lantern_keeper",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_ribbon_rush",
+              "label": "Recipe: Ribbon Rush",
+              "item": "enchant_recipe_ribbon_rush",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_rootguard",
+              "label": "Recipe: Rootguard",
+              "item": "enchant_recipe_rootguard",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_cairnstrike",
+              "label": "Recipe: Cairnstrike",
+              "item": "enchant_recipe_cairnstrike",
+              "cost": 10000000
+            },
+            {
+              "id": "buy_enchant_recipe_evergreen_sigil",
+              "label": "Recipe: Evergreen Sigil",
+              "item": "enchant_recipe_evergreen_sigil",
+              "cost": 2500000
             }
           ],
           "buys": false
@@ -647873,6 +648197,20 @@
           "r": 0.28,
           "v": 1,
           "layout": "astral_design_v1"
+        },
+        {
+          "kind": "water",
+          "x": 232.25,
+          "y": 187.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_13_1"
+        },
+        {
+          "kind": "water",
+          "x": 162.25,
+          "y": 59.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_13_2"
         }
       ],
       "slimes": [
@@ -650839,6 +651177,64 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_astral_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 223.7171680604919,
+          "y": 186.05271419845968,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "cook:fish_cloud_minnow",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_storm_barb",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_gale_eel",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_thundercrest_ray",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_star_dace",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_comet_perch",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_nebula_gar",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -652445,6 +652841,82 @@
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l45_blue",
           "recommendedPlayers": 3
+        },
+        {
+          "id": "fisher_astral_0_1",
+          "title": "Fresh Fish for Astralhollow",
+          "npc": "fisher_astral_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_star_dace",
+              "count": 5,
+              "what": "Star Dace"
+            }
+          ]
+        },
+        {
+          "id": "fisher_astral_0_2",
+          "title": "A Finer Catch for Astralhollow",
+          "npc": "fisher_astral_0",
+          "requires": "fisher_astral_0_1",
+          "repeatable": false,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_comet_perch",
+              "count": 3,
+              "what": "Comet Perch"
+            }
+          ]
+        },
+        {
+          "id": "fisher_astral_0_3",
+          "title": "A Trophy for Astralhollow",
+          "npc": "fisher_astral_0",
+          "requires": "fisher_astral_0_2",
+          "repeatable": false,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_nebula_gar",
+              "count": 1,
+              "what": "Nebula Gar"
+            }
+          ]
+        },
+        {
+          "id": "fisher_astral_0_4",
+          "title": "The Daily Creel at Astralhollow",
+          "npc": "fisher_astral_0",
+          "requires": "fisher_astral_0_1",
+          "repeatable": true,
+          "level": 45,
+          "rewardXp": 2740,
+          "rewardGold": 135,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_star_dace",
+              "count": 5,
+              "what": "Star Dace"
+            }
+          ]
         }
       ],
       "city": {
@@ -671841,6 +672313,38 @@
             "x": 172,
             "y": 51
           }
+        }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 13,
+          "habitat": "Cloudwater",
+          "x": 232.75,
+          "y": 187.75,
+          "shore": {
+            "x": 237.25,
+            "y": 187.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_13_01"
+        },
+        {
+          "zone": 13,
+          "habitat": "Cloudwater",
+          "x": 162.75,
+          "y": 59.25,
+          "shore": {
+            "x": 167.25,
+            "y": 59.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_13_02"
         }
       ]
     },
@@ -695517,6 +696021,20 @@
           "r": 0.8,
           "v": 1,
           "layout": "prism_design_v1"
+        },
+        {
+          "kind": "water",
+          "x": 77.25,
+          "y": 165.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_14_1"
+        },
+        {
+          "kind": "water",
+          "x": 97.25,
+          "y": 165.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_14_2"
         }
       ],
       "slimes": [
@@ -697740,6 +698258,64 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_prism_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 83.40182899632296,
+          "y": 171.90182899632296,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "cook:fish_prism_gudgeon",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_glass_spindlefish",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_suncut_carp",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_prismatic_mirrorfish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_clockwork_chub",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_obsidian_bream",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_orrery_sturgeon",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -698888,6 +699464,82 @@
           "requires": "prism_cf_hold",
           "repeatable": false,
           "rewardItem": "necklace_moonstone_l50_green"
+        },
+        {
+          "id": "fisher_prism_0_1",
+          "title": "Fresh Fish for The Last Shade",
+          "npc": "fisher_prism_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_prism_gudgeon",
+              "count": 5,
+              "what": "Prism Gudgeon"
+            }
+          ]
+        },
+        {
+          "id": "fisher_prism_0_2",
+          "title": "A Finer Catch for The Last Shade",
+          "npc": "fisher_prism_0",
+          "requires": "fisher_prism_0_1",
+          "repeatable": false,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_glass_spindlefish",
+              "count": 3,
+              "what": "Glass Spindlefish"
+            }
+          ]
+        },
+        {
+          "id": "fisher_prism_0_3",
+          "title": "A Trophy for The Last Shade",
+          "npc": "fisher_prism_0",
+          "requires": "fisher_prism_0_2",
+          "repeatable": false,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_suncut_carp",
+              "count": 1,
+              "what": "Suncut Carp"
+            }
+          ]
+        },
+        {
+          "id": "fisher_prism_0_4",
+          "title": "The Daily Creel at The Last Shade",
+          "npc": "fisher_prism_0",
+          "requires": "fisher_prism_0_1",
+          "repeatable": true,
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 150,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_prism_gudgeon",
+              "count": 5,
+              "what": "Prism Gudgeon"
+            }
+          ]
         }
       ],
       "city": {
@@ -715456,6 +716108,38 @@
             "x": 198,
             "y": 165
           }
+        }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 14,
+          "habitat": "Glasswater",
+          "x": 77.75,
+          "y": 165.75,
+          "shore": {
+            "x": 82.25,
+            "y": 165.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_14_01"
+        },
+        {
+          "zone": 14,
+          "habitat": "Glasswater",
+          "x": 97.75,
+          "y": 165.75,
+          "shore": {
+            "x": 102.25,
+            "y": 165.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_14_02"
         }
       ]
     },
@@ -748253,6 +748937,20 @@
           "r": 0.72,
           "v": 2,
           "layout": "orrery_design_v1"
+        },
+        {
+          "kind": "water",
+          "x": 66.25,
+          "y": 307.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_15_1"
+        },
+        {
+          "kind": "water",
+          "x": 78.25,
+          "y": 288.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_15_2"
         }
       ],
       "slimes": [
@@ -751278,6 +751976,64 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_orrery_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 74.2877519328482,
+          "y": 303.9206541384237,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "cook:fish_prism_gudgeon",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_glass_spindlefish",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_suncut_carp",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_prismatic_mirrorfish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_clockwork_chub",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_obsidian_bream",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_orrery_sturgeon",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -752422,6 +753178,82 @@
           "requires": "orrery_sw_hold",
           "repeatable": false,
           "rewardItem": "necklace_moonstone_l55_green"
+        },
+        {
+          "id": "fisher_orrery_0_1",
+          "title": "Fresh Fish for The Stillpoint",
+          "npc": "fisher_orrery_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_clockwork_chub",
+              "count": 5,
+              "what": "Clockwork Chub"
+            }
+          ]
+        },
+        {
+          "id": "fisher_orrery_0_2",
+          "title": "A Finer Catch for The Stillpoint",
+          "npc": "fisher_orrery_0",
+          "requires": "fisher_orrery_0_1",
+          "repeatable": false,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_obsidian_bream",
+              "count": 3,
+              "what": "Obsidian Bream"
+            }
+          ]
+        },
+        {
+          "id": "fisher_orrery_0_3",
+          "title": "A Trophy for The Stillpoint",
+          "npc": "fisher_orrery_0",
+          "requires": "fisher_orrery_0_2",
+          "repeatable": false,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_orrery_sturgeon",
+              "count": 1,
+              "what": "Orrery Sturgeon"
+            }
+          ]
+        },
+        {
+          "id": "fisher_orrery_0_4",
+          "title": "The Daily Creel at The Stillpoint",
+          "npc": "fisher_orrery_0",
+          "requires": "fisher_orrery_0_1",
+          "repeatable": true,
+          "level": 55,
+          "rewardXp": 3970,
+          "rewardGold": 165,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_clockwork_chub",
+              "count": 5,
+              "what": "Clockwork Chub"
+            }
+          ]
         }
       ],
       "city": {
@@ -771497,6 +772329,38 @@
             "x": 254,
             "y": 131
           }
+        }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 15,
+          "habitat": "Glasswater",
+          "x": 66.75,
+          "y": 307.25,
+          "shore": {
+            "x": 71.25,
+            "y": 307.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_15_01"
+        },
+        {
+          "zone": 15,
+          "habitat": "Glasswater",
+          "x": 78.75,
+          "y": 288.75,
+          "shore": {
+            "x": 83.25,
+            "y": 288.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_15_02"
         }
       ]
     },
@@ -808698,6 +809562,20 @@
           "width": 9,
           "depth": 3,
           "layout": "shape_v1"
+        },
+        {
+          "kind": "water",
+          "x": 124.75,
+          "y": 148.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_16_1"
+        },
+        {
+          "kind": "water",
+          "x": 117.75,
+          "y": 124.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_16_2"
         }
       ],
       "slimes": [
@@ -810564,6 +811442,64 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_moonspore_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 133.2828319395081,
+          "y": 147.05271419845968,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "cook:fish_spore_rasbora",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_veil_catfish",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_dreamfin_pike",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_moonwake_dragonfish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_crescent_bleak",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_silver_crescent_eel",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_ringwater_koi",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -811411,6 +812347,82 @@
           "autoLevel": 1,
           "repeatable": false,
           "handoffTo": "es_13"
+        },
+        {
+          "id": "fisher_moonspore_0_1",
+          "title": "Fresh Fish for Lamplight Refuge",
+          "npc": "fisher_moonspore_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_spore_rasbora",
+              "count": 5,
+              "what": "Spore Rasbora"
+            }
+          ]
+        },
+        {
+          "id": "fisher_moonspore_0_2",
+          "title": "A Finer Catch for Lamplight Refuge",
+          "npc": "fisher_moonspore_0",
+          "requires": "fisher_moonspore_0_1",
+          "repeatable": false,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_veil_catfish",
+              "count": 3,
+              "what": "Veil Catfish"
+            }
+          ]
+        },
+        {
+          "id": "fisher_moonspore_0_3",
+          "title": "A Trophy for Lamplight Refuge",
+          "npc": "fisher_moonspore_0",
+          "requires": "fisher_moonspore_0_2",
+          "repeatable": false,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_dreamfin_pike",
+              "count": 1,
+              "what": "Dreamfin Pike"
+            }
+          ]
+        },
+        {
+          "id": "fisher_moonspore_0_4",
+          "title": "The Daily Creel at Lamplight Refuge",
+          "npc": "fisher_moonspore_0",
+          "requires": "fisher_moonspore_0_1",
+          "repeatable": true,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_spore_rasbora",
+              "count": 5,
+              "what": "Spore Rasbora"
+            }
+          ]
         }
       ],
       "city": {
@@ -813277,6 +814289,38 @@
         "                                                                                                                                 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                         ",
         "                                                                                                                                     ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                            ",
         "                                                                                                                                         ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc                                                                                              "
+      ],
+      "fishingSpots": [
+        {
+          "zone": 16,
+          "habitat": "Moonwater",
+          "x": 125.25,
+          "y": 148.75,
+          "shore": {
+            "x": 129.75,
+            "y": 148.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_16_01"
+        },
+        {
+          "zone": 16,
+          "habitat": "Moonwater",
+          "x": 118.25,
+          "y": 124.75,
+          "shore": {
+            "x": 122.75,
+            "y": 124.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_16_02"
+        }
       ]
     },
     {
@@ -815362,6 +816406,20 @@
           "v": 0,
           "place": "admit_returning",
           "label": "The Returning Bell"
+        },
+        {
+          "kind": "water",
+          "x": 83.75,
+          "y": 158.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_17_1"
+        },
+        {
+          "kind": "water",
+          "x": 97.25,
+          "y": 157.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_17_2"
         }
       ],
       "slimes": [],
@@ -819010,6 +820068,64 @@
           "buys": false
         },
         {
+          "id": "fisher_asterion_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 95.55271419845968,
+          "y": 149.2171680604919,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "cook:fish_spore_rasbora",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_veil_catfish",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_dreamfin_pike",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_moonwake_dragonfish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_crescent_bleak",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_silver_crescent_eel",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_ringwater_koi",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
+        },
+        {
           "id": "asterion_enchanting",
           "name": "Enchanting Master",
           "role": "Enchanting trainer and recipe vendor",
@@ -819127,6 +820243,54 @@
               "label": "Recipe: Heartwood Grove",
               "item": "enchant_recipe_heartwood_grove",
               "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_horizon_step",
+              "label": "Recipe: Horizon Step",
+              "item": "enchant_recipe_horizon_step",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_prism_echo",
+              "label": "Recipe: Prism Echo",
+              "item": "enchant_recipe_prism_echo",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_siltweave",
+              "label": "Recipe: Siltweave",
+              "item": "enchant_recipe_siltweave",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_lantern_keeper",
+              "label": "Recipe: Lantern Keeper",
+              "item": "enchant_recipe_lantern_keeper",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_ribbon_rush",
+              "label": "Recipe: Ribbon Rush",
+              "item": "enchant_recipe_ribbon_rush",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_rootguard",
+              "label": "Recipe: Rootguard",
+              "item": "enchant_recipe_rootguard",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_cairnstrike",
+              "label": "Recipe: Cairnstrike",
+              "item": "enchant_recipe_cairnstrike",
+              "cost": 10000000
+            },
+            {
+              "id": "buy_enchant_recipe_evergreen_sigil",
+              "label": "Recipe: Evergreen Sigil",
+              "item": "enchant_recipe_evergreen_sigil",
+              "cost": 2500000
             }
           ],
           "buys": false
@@ -819962,6 +821126,82 @@
           "requires": null,
           "repeatable": true,
           "season": "valentine"
+        },
+        {
+          "id": "fisher_asterion_0_1",
+          "title": "Fresh Fish for Asterion",
+          "npc": "fisher_asterion_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_crescent_bleak",
+              "count": 5,
+              "what": "Crescent Bleak"
+            }
+          ]
+        },
+        {
+          "id": "fisher_asterion_0_2",
+          "title": "A Finer Catch for Asterion",
+          "npc": "fisher_asterion_0",
+          "requires": "fisher_asterion_0_1",
+          "repeatable": false,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_silver_crescent_eel",
+              "count": 3,
+              "what": "Silver Crescent Eel"
+            }
+          ]
+        },
+        {
+          "id": "fisher_asterion_0_3",
+          "title": "A Trophy for Asterion",
+          "npc": "fisher_asterion_0",
+          "requires": "fisher_asterion_0_2",
+          "repeatable": false,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_ringwater_koi",
+              "count": 1,
+              "what": "Ringwater Koi"
+            }
+          ]
+        },
+        {
+          "id": "fisher_asterion_0_4",
+          "title": "The Daily Creel at Asterion",
+          "npc": "fisher_asterion_0",
+          "requires": "fisher_asterion_0_1",
+          "repeatable": true,
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 180,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_crescent_bleak",
+              "count": 5,
+              "what": "Crescent Bleak"
+            }
+          ]
         }
       ],
       "city": {
@@ -857843,6 +859083,38 @@
           "v": 1,
           "hub": "Asterion",
           "color": "#c5a1df"
+        }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 17,
+          "habitat": "Moonwater",
+          "x": 84.25,
+          "y": 158.75,
+          "shore": {
+            "x": 88.75,
+            "y": 158.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_17_01"
+        },
+        {
+          "zone": 17,
+          "habitat": "Moonwater",
+          "x": 97.75,
+          "y": 157.75,
+          "shore": {
+            "x": 102.25,
+            "y": 157.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_17_02"
         }
       ]
     },
@@ -985889,6 +987161,20 @@
           "r": 0.22,
           "v": 3,
           "layout": "ribbon_design_v1"
+        },
+        {
+          "kind": "water",
+          "x": 179.75,
+          "y": 196.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_21_1"
+        },
+        {
+          "kind": "water",
+          "x": 215.25,
+          "y": 202.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_21_2"
         }
       ],
       "slimes": [
@@ -988041,6 +989327,69 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_ribbon_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 187.78775193284818,
+          "y": 192.9206541384237,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:rootbraid",
+              "label": "Craft rod",
+              "cost": 50000
+            },
+            {
+              "id": "cook:fish_ribbon_shiner",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_jubilee_guppy",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_parade_gourami",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_festival_crownfin",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_rootfoot_dace",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_nectar_perch",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_canopy_lungfish",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -989287,6 +990636,82 @@
           "requires": "ribbon_gr_hold",
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l75_green"
+        },
+        {
+          "id": "fisher_ribbon_0_1",
+          "title": "Fresh Fish for Jubilee Crossroads",
+          "npc": "fisher_ribbon_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_ribbon_shiner",
+              "count": 5,
+              "what": "Ribbon Shiner"
+            }
+          ]
+        },
+        {
+          "id": "fisher_ribbon_0_2",
+          "title": "A Finer Catch for Jubilee Crossroads",
+          "npc": "fisher_ribbon_0",
+          "requires": "fisher_ribbon_0_1",
+          "repeatable": false,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_jubilee_guppy",
+              "count": 3,
+              "what": "Jubilee Guppy"
+            }
+          ]
+        },
+        {
+          "id": "fisher_ribbon_0_3",
+          "title": "A Trophy for Jubilee Crossroads",
+          "npc": "fisher_ribbon_0",
+          "requires": "fisher_ribbon_0_2",
+          "repeatable": false,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_parade_gourami",
+              "count": 1,
+              "what": "Parade Gourami"
+            }
+          ]
+        },
+        {
+          "id": "fisher_ribbon_0_4",
+          "title": "The Daily Creel at Jubilee Crossroads",
+          "npc": "fisher_ribbon_0",
+          "requires": "fisher_ribbon_0_1",
+          "repeatable": true,
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 240,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_ribbon_shiner",
+              "count": 5,
+              "what": "Ribbon Shiner"
+            }
+          ]
         }
       ],
       "city": {
@@ -1009039,6 +1010464,38 @@
             "x": 305,
             "y": 298
           }
+        }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 21,
+          "habitat": "Greenwater",
+          "x": 180.25,
+          "y": 196.25,
+          "shore": {
+            "x": 184.75,
+            "y": 196.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_21_01"
+        },
+        {
+          "zone": 21,
+          "habitat": "Greenwater",
+          "x": 215.75,
+          "y": 202.25,
+          "shore": {
+            "x": 220.25,
+            "y": 202.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_21_02"
         }
       ]
     },
@@ -1104558,6 +1106015,20 @@
           "r": 0.1,
           "v": 2,
           "layout": "veyrroot_design_v1"
+        },
+        {
+          "kind": "water",
+          "x": 190.75,
+          "y": 229.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_23_1"
+        },
+        {
+          "kind": "water",
+          "x": 208.25,
+          "y": 259.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_23_2"
         }
       ],
       "slimes": [
@@ -1106769,6 +1108240,74 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_veyr_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 208.25,
+          "y": 250.55,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:rootbraid",
+              "label": "Craft rod",
+              "cost": 50000
+            },
+            {
+              "id": "rod:cairnsteel",
+              "label": "Craft rod",
+              "cost": 75000
+            },
+            {
+              "id": "cook:fish_ribbon_shiner",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_jubilee_guppy",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_parade_gourami",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_festival_crownfin",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_rootfoot_dace",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_nectar_perch",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_canopy_lungfish",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -1107624,6 +1109163,82 @@
               "cloak_l80_rare"
             ]
           }
+        },
+        {
+          "id": "fisher_veyr_0_1",
+          "title": "Fresh Fish for Rootfoot",
+          "npc": "fisher_veyr_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_rootfoot_dace",
+              "count": 5,
+              "what": "Rootfoot Dace"
+            }
+          ]
+        },
+        {
+          "id": "fisher_veyr_0_2",
+          "title": "A Finer Catch for Rootfoot",
+          "npc": "fisher_veyr_0",
+          "requires": "fisher_veyr_0_1",
+          "repeatable": false,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_nectar_perch",
+              "count": 3,
+              "what": "Nectar Perch"
+            }
+          ]
+        },
+        {
+          "id": "fisher_veyr_0_3",
+          "title": "A Trophy for Rootfoot",
+          "npc": "fisher_veyr_0",
+          "requires": "fisher_veyr_0_2",
+          "repeatable": false,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_canopy_lungfish",
+              "count": 1,
+              "what": "Canopy Lungfish"
+            }
+          ]
+        },
+        {
+          "id": "fisher_veyr_0_4",
+          "title": "The Daily Creel at Rootfoot",
+          "npc": "fisher_veyr_0",
+          "requires": "fisher_veyr_0_1",
+          "repeatable": true,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_rootfoot_dace",
+              "count": 5,
+              "what": "Rootfoot Dace"
+            }
+          ]
         }
       ],
       "city": {
@@ -1130216,6 +1131831,38 @@
             "y": 152
           }
         }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 23,
+          "habitat": "Greenwater",
+          "x": 191.25,
+          "y": 229.25,
+          "shore": {
+            "x": 195.75,
+            "y": 229.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_23_01"
+        },
+        {
+          "zone": 23,
+          "habitat": "Greenwater",
+          "x": 208.75,
+          "y": 259.25,
+          "shore": {
+            "x": 213.25,
+            "y": 259.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_23_02"
+        }
       ]
     },
     {
@@ -1141155,6 +1142802,20 @@
           "width": 8,
           "depth": 6,
           "layout": "shape_v1"
+        },
+        {
+          "kind": "water",
+          "x": 96.75,
+          "y": 172.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_24_1"
+        },
+        {
+          "kind": "water",
+          "x": 115.75,
+          "y": 188.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_24_2"
         }
       ],
       "slimes": [],
@@ -1142366,6 +1144027,74 @@
           "buys": false
         },
         {
+          "id": "fisher_heartwood_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 98.44728580154032,
+          "y": 163.7171680604919,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:rootbraid",
+              "label": "Craft rod",
+              "cost": 50000
+            },
+            {
+              "id": "rod:cairnsteel",
+              "label": "Craft rod",
+              "cost": 75000
+            },
+            {
+              "id": "cook:fish_heartwood_whitefish",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_pithscale_char",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_amberroot_gar",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_mountainheart_paddlefish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_cairn_minnow",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_tarn_grayling",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_graniteback_sturgeon",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
+        },
+        {
           "id": "hw_enchanting",
           "name": "Enchanting Master",
           "role": "Enchanting trainer and recipe vendor",
@@ -1142481,6 +1144210,54 @@
               "label": "Recipe: Heartwood Grove",
               "item": "enchant_recipe_heartwood_grove",
               "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_horizon_step",
+              "label": "Recipe: Horizon Step",
+              "item": "enchant_recipe_horizon_step",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_prism_echo",
+              "label": "Recipe: Prism Echo",
+              "item": "enchant_recipe_prism_echo",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_siltweave",
+              "label": "Recipe: Siltweave",
+              "item": "enchant_recipe_siltweave",
+              "cost": 1500000
+            },
+            {
+              "id": "buy_enchant_recipe_lantern_keeper",
+              "label": "Recipe: Lantern Keeper",
+              "item": "enchant_recipe_lantern_keeper",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_ribbon_rush",
+              "label": "Recipe: Ribbon Rush",
+              "item": "enchant_recipe_ribbon_rush",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_rootguard",
+              "label": "Recipe: Rootguard",
+              "item": "enchant_recipe_rootguard",
+              "cost": 4500000
+            },
+            {
+              "id": "buy_enchant_recipe_cairnstrike",
+              "label": "Recipe: Cairnstrike",
+              "item": "enchant_recipe_cairnstrike",
+              "cost": 10000000
+            },
+            {
+              "id": "buy_enchant_recipe_evergreen_sigil",
+              "label": "Recipe: Evergreen Sigil",
+              "item": "enchant_recipe_evergreen_sigil",
+              "cost": 2500000
             }
           ],
           "buys": false
@@ -1143701,6 +1145478,82 @@
             ]
           },
           "minLevel": 99
+        },
+        {
+          "id": "fisher_heartwood_0_1",
+          "title": "Fresh Fish for Veyrroot Heartwood",
+          "npc": "fisher_heartwood_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_heartwood_whitefish",
+              "count": 5,
+              "what": "Heartwood Whitefish"
+            }
+          ]
+        },
+        {
+          "id": "fisher_heartwood_0_2",
+          "title": "A Finer Catch for Veyrroot Heartwood",
+          "npc": "fisher_heartwood_0",
+          "requires": "fisher_heartwood_0_1",
+          "repeatable": false,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_pithscale_char",
+              "count": 3,
+              "what": "Pithscale Char"
+            }
+          ]
+        },
+        {
+          "id": "fisher_heartwood_0_3",
+          "title": "A Trophy for Veyrroot Heartwood",
+          "npc": "fisher_heartwood_0",
+          "requires": "fisher_heartwood_0_2",
+          "repeatable": false,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_amberroot_gar",
+              "count": 1,
+              "what": "Amberroot Gar"
+            }
+          ]
+        },
+        {
+          "id": "fisher_heartwood_0_4",
+          "title": "The Daily Creel at Veyrroot Heartwood",
+          "npc": "fisher_heartwood_0",
+          "requires": "fisher_heartwood_0_1",
+          "repeatable": true,
+          "level": 85,
+          "rewardXp": 9010,
+          "rewardGold": 255,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_heartwood_whitefish",
+              "count": 5,
+              "what": "Heartwood Whitefish"
+            }
+          ]
         }
       ],
       "city": {
@@ -1184130,7 +1185983,39 @@
         "edges": [],
         "neighbours": [],
         "placeAtSpawn": true
-      }
+      },
+      "fishingSpots": [
+        {
+          "zone": 24,
+          "habitat": "Deep Springs",
+          "x": 97.25,
+          "y": 172.25,
+          "shore": {
+            "x": 101.75,
+            "y": 172.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_24_01"
+        },
+        {
+          "zone": 24,
+          "habitat": "Deep Springs",
+          "x": 116.25,
+          "y": 188.25,
+          "shore": {
+            "x": 120.75,
+            "y": 188.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_24_02"
+        }
+      ]
     },
     {
       "name": "The Lapis Erg",
@@ -1299627,6 +1301512,20 @@
           "r": 0.9,
           "v": 0,
           "layout": "cairn_design_v1"
+        },
+        {
+          "kind": "water",
+          "x": 139.25,
+          "y": 159.75,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_27_1"
+        },
+        {
+          "kind": "water",
+          "x": 163.25,
+          "y": 185.25,
+          "r": 3.7,
+          "fishingWater": "fishing_pond_27_2"
         }
       ],
       "slimes": [
@@ -1301348,6 +1303247,69 @@
               "cost": 0
             }
           ]
+        },
+        {
+          "id": "fisher_cairn_0",
+          "name": "Fisher",
+          "role": "Fishing and cooking",
+          "x": 159.9206541384237,
+          "y": 177.21224806715182,
+          "dialogue": "Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.",
+          "offers": [
+            {
+              "id": "fishing_workshop",
+              "label": "Fisher workshop",
+              "cost": 0
+            },
+            {
+              "id": "rod:cairnsteel",
+              "label": "Craft rod",
+              "cost": 75000
+            },
+            {
+              "id": "cook:fish_heartwood_whitefish",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_pithscale_char",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_amberroot_gar",
+              "label": "Cook fish",
+              "cost": 65
+            },
+            {
+              "id": "cook:fish_mountainheart_paddlefish",
+              "label": "Cook fish",
+              "cost": 100
+            },
+            {
+              "id": "cook:fish_cairn_minnow",
+              "label": "Cook fish",
+              "cost": 30
+            },
+            {
+              "id": "cook:fish_tarn_grayling",
+              "label": "Cook fish",
+              "cost": 45
+            },
+            {
+              "id": "cook:fish_graniteback_sturgeon",
+              "label": "Cook fish",
+              "cost": 65
+            }
+          ],
+          "buys": true,
+          "color": "#527e89",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "short",
+            "hat": "straw"
+          }
         }
       ],
       "places": [
@@ -1302668,6 +1304630,82 @@
           "requires": "crn_sg_hold",
           "repeatable": false,
           "rewardItem": "pants_wayfarer_l90_green"
+        },
+        {
+          "id": "fisher_cairn_0_1",
+          "title": "Fresh Fish for Boulderwatch",
+          "npc": "fisher_cairn_0",
+          "requires": null,
+          "repeatable": false,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cairn_minnow",
+              "count": 5,
+              "what": "Cairn Minnow"
+            }
+          ]
+        },
+        {
+          "id": "fisher_cairn_0_2",
+          "title": "A Finer Catch for Boulderwatch",
+          "npc": "fisher_cairn_0",
+          "requires": "fisher_cairn_0_1",
+          "repeatable": false,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_tarn_grayling",
+              "count": 3,
+              "what": "Tarn Grayling"
+            }
+          ]
+        },
+        {
+          "id": "fisher_cairn_0_3",
+          "title": "A Trophy for Boulderwatch",
+          "npc": "fisher_cairn_0",
+          "requires": "fisher_cairn_0_2",
+          "repeatable": false,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_graniteback_sturgeon",
+              "count": 1,
+              "what": "Graniteback Sturgeon"
+            }
+          ]
+        },
+        {
+          "id": "fisher_cairn_0_4",
+          "title": "The Daily Creel at Boulderwatch",
+          "npc": "fisher_cairn_0",
+          "requires": "fisher_cairn_0_1",
+          "repeatable": true,
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 270,
+          "description": "Catch fish in the local waters and bring them to the Fisher. Ordinary fish from your bags count.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "fish_cairn_minnow",
+              "count": 5,
+              "what": "Cairn Minnow"
+            }
+          ]
         }
       ],
       "city": {
@@ -1319244,6 +1321282,38 @@
             "x": 176,
             "y": 66
           }
+        }
+      ],
+      "fishingSpots": [
+        {
+          "zone": 27,
+          "habitat": "Deep Springs",
+          "x": 139.75,
+          "y": 159.75,
+          "shore": {
+            "x": 144.25,
+            "y": 159.75
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_27_01"
+        },
+        {
+          "zone": 27,
+          "habitat": "Deep Springs",
+          "x": 163.75,
+          "y": 185.25,
+          "shore": {
+            "x": 168.25,
+            "y": 185.25
+          },
+          "facing": {
+            "x": -1.0,
+            "y": 0.0
+          },
+          "id": "fish_27_02"
         }
       ]
     },

@@ -8,8 +8,8 @@ const DECOY_RANGE: f64 = 5.;
 
 #[derive(Default)]
 pub(super) struct Session {
-    quickhands: f64,
-    speed: Option<(Enchant, f64, f64)>,
+    attack_speed: Option<(Enchant, f64, f64)>,
+    speed: BTreeMap<Enchant, (f64, f64)>,
     barriers: Vec<Barrier>,
     spell_hits: Vec<f64>,
     spell_ready: f64,
@@ -77,7 +77,13 @@ impl Player {
     }
 
     fn enchant_speed(&mut self, effect: Enchant, until: f64, bonus: f64) {
-        self.enchanting.speed = Some((effect, until, bonus));
+        if !matches!(effect, Siltweave | EvergreenSigil) {
+            // The original movement effects replace one another.
+            self.enchanting
+                .speed
+                .retain(|effect, _| matches!(effect, Siltweave | EvergreenSigil));
+        }
+        self.enchanting.speed.insert(effect, (until, bonus));
     }
 
     fn enchant_barrier(&mut self, source: Enchant, fraction: f64, until: f64) {
@@ -105,18 +111,19 @@ impl Player {
     }
 
     pub(super) fn enchant_attack_speed(&self, time: f64) -> f64 {
-        if self.enchanting.quickhands > time && self.character.wears_enchant(Quickhands) {
-            0.15
-        } else {
-            0.
-        }
+        self.enchanting
+            .attack_speed
+            .filter(|(effect, until, _)| *until > time && self.character.wears_enchant(*effect))
+            .map_or(0., |(_, _, bonus)| bonus)
     }
 
     pub(super) fn enchant_move_speed(&self, time: f64) -> f64 {
         self.enchanting
             .speed
-            .filter(|(effect, until, _)| *until > time && self.character.wears_enchant(*effect))
-            .map_or(0., |(_, _, bonus)| bonus)
+            .iter()
+            .filter(|(effect, (until, _))| *until > time && self.character.wears_enchant(**effect))
+            .map(|(_, (_, bonus))| *bonus)
+            .fold(0., f64::max)
     }
 
     pub(super) fn enchant_cast_modifiers(&self, time: f64) -> (bool, bool) {
@@ -223,7 +230,7 @@ impl World {
             "text":result.unwrap_or_else(|text| text),"skill":c.enchanting.proficiency.skill,
             "maxSkill":crate::profession::MAX_SKILL,
             "trainingGearLevel":crate::profession::training_gear_level(c.enchanting.proficiency.skill),
-            "craftSkillCaps":catalog::CATALOG.tiers.each_ref().map(|tier| tier.skill_cap()),
+            "craftSkillCaps":catalog::CATALOG.tiers.iter().map(|tier| tier.skill_cap()).collect::<Vec<_>>(),
             "skillUp":c.enchanting.proficiency.skill > previous_skill,
             "recipes":c.enchanting.recipes,"inventory":c.inventory,"copies":copies}));
     }
@@ -348,7 +355,7 @@ impl World {
         let p = self.players.get_mut(&session).unwrap();
         if quick {
             p.start_enchant_cooldown(Quickhands, now);
-            p.enchanting.quickhands = time + 8.;
+            p.enchanting.attack_speed = Some((Quickhands, time + 8., 0.15));
         }
         if p.enchanting.spell_ready <= time && p.available_enchant(Spellweaver, now) {
             p.enchanting.spell_hits.retain(|hit| *hit + 8. >= time);
@@ -395,6 +402,18 @@ impl World {
         if shieldbreak {
             self.enchant_damage(session, enemy, damage * 0.6, Shieldbreaker);
         }
+        if self.players[&session].available_enchant(PrismEcho, now)
+            && let Some(target) = self
+                .enchant_targets(session, point, zone, 4., &[enemy])
+                .into_iter()
+                .next()
+        {
+            self.players
+                .get_mut(&session)
+                .unwrap()
+                .start_enchant_cooldown(PrismEcho, now);
+            self.enchant_damage(session, target, reference * 0.35, PrismEcho);
+        }
     }
 
     fn enchant_skill_hit(&mut self, session: u64, enemy: usize, zone: usize, point: Point) {
@@ -416,6 +435,12 @@ impl World {
             }
             p.enchanting.zone = Some(zone);
         }
+        if !self.slimes[enemy].dead && p.available_enchant(Cairnstrike, now) {
+            p.start_enchant_cooldown(Cairnstrike, now);
+            let damage = self.set_basic_damage(session) * 0.55;
+            self.enchant_damage(session, enemy, damage, Cairnstrike);
+        }
+        let p = self.players.get_mut(&session).unwrap();
         let Some(rod) = p.enchanting.rod.filter(|r| {
             r.until > time
                 && r.zone == zone
@@ -525,21 +550,28 @@ impl World {
         let now = self.enchant_now();
         let giver = &self.players[&caster];
         let recipient = &self.players[&target];
-        if before < recipient.character.max_hp() * 0.4
-            && giver.available_enchant(GuardianThread, now)
-            && self
+        let max = recipient.character.max_hp();
+        let guardian = before < max * 0.4 && giver.available_enchant(GuardianThread, now);
+        let lantern = before < max * 0.5 && giver.available_enchant(LanternKeeper, now);
+        if !(guardian || lantern)
+            || !self
                 .party_mates(&giver.character.id)
                 .contains(&recipient.character.id)
         {
-            self.players
-                .get_mut(&caster)
-                .unwrap()
-                .start_enchant_cooldown(GuardianThread, now);
+            return;
+        }
+        let giver = self.players.get_mut(&caster).unwrap();
+        if guardian {
+            giver.start_enchant_cooldown(GuardianThread, now);
             self.players.get_mut(&target).unwrap().enchant_barrier(
                 GuardianThread,
                 0.10,
                 self.time + 5.,
             );
+        } else {
+            giver.start_enchant_cooldown(LanternKeeper, now);
+            let resource = giver.character.max_resource();
+            giver.character.change_resource(resource * 0.08);
         }
     }
 
@@ -547,6 +579,20 @@ impl World {
         let now = self.enchant_now();
         let time = self.time;
         let p = self.players.get_mut(&session).unwrap();
+        if p.available_enchant(HorizonStep, now) {
+            p.start_enchant_cooldown(HorizonStep, now);
+            p.enchant_barrier(HorizonStep, 0.08, time + 4.);
+        }
+        if p.available_enchant(RibbonRush, now) {
+            p.start_enchant_cooldown(RibbonRush, now);
+            p.enchanting.attack_speed = Some((RibbonRush, time + 5., 0.20));
+        }
+        if p.available_enchant(EvergreenSigil, now) {
+            p.start_enchant_cooldown(EvergreenSigil, now);
+            let max = p.character.max_hp();
+            p.character.hp = (p.character.hp + max * 0.04).min(max);
+            p.enchant_speed(EvergreenSigil, time + 4., 0.12);
+        }
         if p.available_enchant(Slipstream, now) {
             p.start_enchant_cooldown(Slipstream, now);
             p.enchant_speed(Slipstream, time + 3., 0.20);
@@ -603,9 +649,16 @@ impl World {
             return;
         }
         let max = p.character.max_hp();
-        for (effect, threshold, fraction, seconds) in
-            [(Brace, 0.5, 0.08, 5.), (ArcaneBulwark, 0.4, 0.20, 6.)]
+        if before >= max * 0.5 && p.character.hp < max * 0.5 && p.available_enchant(Siltweave, now)
         {
+            p.start_enchant_cooldown(Siltweave, now);
+            p.enchant_speed(Siltweave, time + 4., 0.18);
+        }
+        for (effect, threshold, fraction, seconds) in [
+            (Brace, 0.5, 0.08, 5.),
+            (ArcaneBulwark, 0.4, 0.20, 6.),
+            (Rootguard, 0.3, 0.13, 8.),
+        ] {
             if before >= max * threshold
                 && p.character.hp < max * threshold
                 && p.available_enchant(effect, now)
@@ -645,6 +698,7 @@ impl World {
         let p = self.players.get_mut(&session).unwrap();
         let s = &mut p.enchanting;
         s.barriers.retain(|b| b.remaining > 0. && b.until > time);
+        s.speed.retain(|_, (until, _)| *until > time);
         s.shield_skills.retain(|&id, (_, until, ready)| {
             (*ready || *until >= time)
                 && self
@@ -818,12 +872,17 @@ mod tests {
     }
 
     fn piece(kind: &str, rarity: &str, class: Class) -> &'static Item {
+        piece_at_level(kind, rarity, class, 1)
+    }
+
+    fn piece_at_level(kind: &str, rarity: &str, class: Class, level: u32) -> &'static Item {
         ITEMS
             .iter()
             .find(|item| {
                 item.kind == kind
                     && item.rarity == rarity
                     && !item.starter
+                    && item.required_level >= level
                     && item.class.is_none_or(|c| c == class)
                     && item.variant.as_deref().is_none_or(|variant| {
                         !matches!(kind, "armor" | "weapon")
@@ -836,8 +895,13 @@ mod tests {
 
     fn worn(w: &mut World, session: u64, kind: &str, rarity: &str, enchant: Enchant) -> u64 {
         let c = character(w, session);
-        let item = piece(kind, rarity, c.look.class);
-        c.level = 95;
+        let item = piece_at_level(
+            kind,
+            rarity,
+            c.look.class,
+            enchant.recipe().min_gear_level(),
+        );
+        c.level = 95.max(item.required_level);
         c.add_item(&item.id, 1);
         c.materialize_gear_instances();
         let copy = c
@@ -904,7 +968,7 @@ mod tests {
         let token = welcome["token"].as_str().unwrap();
         let response = request(&mut w, &mut rx, json!({"op":"open"}));
         assert_eq!(response["skill"], 0);
-        assert_eq!(response["maxSkill"], 300);
+        assert_eq!(response["maxSkill"], 600);
         assert!(
             serde_json::from_value::<ClientMessage>(
                 json!({"type":"enchanting","request":{"op":"learn"}})
@@ -1115,7 +1179,10 @@ mod tests {
         let first = request(&mut w, &mut rx, command(low_copies[0]));
         assert_eq!(first["skill"], 30);
         assert_eq!(first["trainingGearLevel"], 6);
-        assert_eq!(first["craftSkillCaps"], json!([30, 90, 210]));
+        assert_eq!(
+            first["craftSkillCaps"],
+            json!([30, 90, 210, 330, 450, 570, 600])
+        );
         let second = request(&mut w, &mut rx, command(low_copies[1]));
         assert_eq!(second["skill"], 30);
         assert_eq!(second["ok"], true);
@@ -1130,7 +1197,7 @@ mod tests {
     }
 
     #[test]
-    fn enchanting_application_can_grant_the_last_skill_point_and_cannot_exceed_it() {
+    fn enchanting_level_fifty_gear_caps_at_300() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Warrior);
         let c = character(&mut w, 1);
@@ -1162,6 +1229,133 @@ mod tests {
         );
         assert_eq!(applied["skill"], 300);
         assert_eq!(applied["skillUp"], false);
+    }
+
+    #[test]
+    fn enchanting_expert_recipe_requires_skill_and_item_level() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let c = character(&mut w, 1);
+        c.enchanting.proficiency.initialize(299);
+        c.enchanting.recipes.insert(PrismEcho);
+        c.add_item("enchant_dust", 8);
+        c.add_item("enchant_essence", 5);
+        let low = "warrior_weapon_royal_l50_purple";
+        let high = "warrior_weapon_sword_l55_blue";
+        c.add_item(low, 1);
+        c.add_item(high, 1);
+        c.materialize_gear_instances();
+        let copy = |id: &str| c.gear_instances.iter().find(|g| g.item == id).unwrap().id;
+        let (low, high) = (copy(low), copy(high));
+        let craft = json!({"op":"craft","enchant":PrismEcho});
+        assert_eq!(request(&mut w, &mut rx, craft.clone())["ok"], false);
+        character(&mut w, 1).enchanting.proficiency.skill = 300;
+        assert_eq!(request(&mut w, &mut rx, craft)["skill"], 301);
+        let apply = |copy| json!({"op":"apply","enchant":PrismEcho,"copy":copy});
+        assert_eq!(request(&mut w, &mut rx, apply(low))["ok"], false);
+        assert_eq!(request(&mut w, &mut rx, apply(high))["skill"], 302);
+    }
+
+    #[test]
+    fn enchanting_last_band_trains_with_farmable_materials_or_level_99_gear() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let c = character(&mut w, 1);
+        c.enchanting.proficiency.initialize(599);
+        c.enchanting.recipes.insert(EvergreenSigil);
+        let gear = "null_warrior_weapon";
+        c.add_item(gear, 1);
+        c.add_item("enchant_dust", 16);
+        c.add_item("enchant_essence", 12);
+        c.add_item(&DoubleTap.item("scroll"), 1);
+        c.materialize_gear_instances();
+        let copy = c.gear_instances.iter().find(|g| g.item == gear).unwrap().id;
+        let craft = json!({"op":"craft","enchant":EvergreenSigil});
+        let response = request(&mut w, &mut rx, craft.clone());
+        assert_eq!(response["skill"], 600);
+        assert_eq!(response["skillUp"], true);
+        assert!(response["trainingGearLevel"].is_null());
+        assert_eq!(request(&mut w, &mut rx, craft)["skillUp"], false);
+        character(&mut w, 1).enchanting.proficiency.skill = 599;
+        let response = request(
+            &mut w,
+            &mut rx,
+            json!({"op":"apply","enchant":DoubleTap,"copy":copy}),
+        );
+        assert_eq!(response["skill"], 600);
+        assert_eq!(response["skillUp"], true);
+        let persisted = &character(&mut w, 1).enchanting;
+        assert_eq!(serde_json::to_value(persisted).unwrap()["skill"], 600);
+    }
+
+    #[test]
+    fn enchanting_expert_combat_dodge_barrier_speeds_and_recovery() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        worn(&mut w, 1, "cloak", "rare", HorizonStep);
+        worn(&mut w, 1, "gloves", "epic", RibbonRush);
+        worn(&mut w, 1, "accessory", "rare", EvergreenSigil);
+        worn(&mut w, 1, "pants", "rare", Siltweave);
+        worn(&mut w, 1, "shoulders", "epic", Rootguard);
+        let point = at(270., 224.);
+        place(&mut w, 1, 0, point);
+        let max = character(&mut w, 1).max_hp();
+        character(&mut w, 1).hp = max * 0.55;
+        w.enchant_dodge(1, 0, point);
+        let p = &w.players[&1];
+        assert!((p.character.hp / max - 0.59).abs() < 1e-9);
+        assert_eq!(p.enchant_attack_speed(w.time), 0.20);
+        assert_eq!(p.enchant_attack_speed(w.time + 5.), 0.);
+        assert_eq!(p.enchant_move_speed(w.time), 0.12);
+        assert_eq!(p.enchanting.barriers[0].source, HorizonStep);
+        assert_eq!(p.enchanting.barriers[0].remaining, max * 0.08);
+        w.enchant_dodge(1, 0, point);
+        assert!((w.players[&1].character.hp / max - 0.59).abs() < 1e-9);
+        character(&mut w, 1).hp = max * 0.29;
+        w.enchant_incoming(1, Some(0), max * 0.59, false, max * 0.3);
+        let p = &w.players[&1];
+        assert_eq!(p.enchant_move_speed(w.time), 0.18);
+        assert_eq!(p.enchant_move_speed(w.time + 4.), 0.);
+        assert_eq!(p.enchanting.barriers[1].source, Rootguard);
+        assert_eq!(p.enchanting.barriers[1].remaining, max * 0.13);
+    }
+
+    #[test]
+    fn enchanting_expert_weapons_use_the_eligible_hit_and_nearest_target() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        worn(&mut w, 1, "weapon", "rare", PrismEcho);
+        place(&mut w, 1, 0, at(270., 224.));
+        enemies(
+            &mut w,
+            &[(270., 225.), (272., 225.), (273., 225.), (277., 225.)],
+        );
+        let reference = w.set_basic_damage(1);
+        hit(&mut w, 0, 5., Hit::Basic);
+        assert_eq!(w.slimes[0].hp, 195.);
+        assert!((w.slimes[1].hp - (200. - 0.35 * reference).max(0.)).abs() < 1e-8);
+        assert_eq!(w.slimes[2].hp, 200.);
+        assert!(
+            character(&mut w, 1)
+                .enchanting
+                .ready
+                .contains_key(&PrismEcho)
+        );
+        let before = w.slimes[1].hp;
+        hit(&mut w, 0, 5., Hit::Basic);
+        assert_eq!(w.slimes[1].hp, before);
+        worn(&mut w, 1, "weapon", "legendary", Cairnstrike);
+        let reference = w.set_basic_damage(1);
+        hit(&mut w, 2, 5., Hit::Basic);
+        assert_eq!(w.slimes[2].hp, 195.);
+        hit(&mut w, 2, 5., Hit::Skill);
+        assert!((w.slimes[2].hp - (190. - 0.55 * reference).max(0.)).abs() < 1e-8);
+        assert!(
+            character(&mut w, 1)
+                .enchanting
+                .ready
+                .contains_key(&Cairnstrike)
+        );
     }
 
     #[test]
@@ -1343,6 +1537,16 @@ mod tests {
             0.39
         );
         assert!(w.enchant_fields(0).is_empty());
+        worn(&mut w, 1, "necklace", "epic", LanternKeeper);
+        let max_resource = character(&mut w, 1).max_resource();
+        character(&mut w, 1).resource = Some(0.);
+        character(&mut w, 2).hp = max * 0.49;
+        let stranger = character(&mut w, 3);
+        stranger.hp = stranger.max_hp() * 0.2;
+        w.heal_players(1, &[3], 0.1);
+        assert_eq!(character(&mut w, 1).resource(), 0.);
+        w.heal_players(1, &[2], 0.1);
+        assert!((character(&mut w, 1).resource() - max_resource * 0.08).abs() < 1e-8);
     }
 
     #[test]
@@ -1472,7 +1676,16 @@ mod tests {
         assert_eq!(catalog::drop_recipe(10, false, 0., 0.), Some(DoubleTap));
         assert_eq!(catalog::drop_recipe(35, false, 0., 0.), Some(ArcaneBulwark));
         assert_eq!(catalog::drop_recipe(65, false, 0., 0.), Some(LightningRod));
-        assert_eq!(catalog::drop_recipe(65, false, 0.024, 0.), None);
+        assert_eq!(catalog::drop_recipe(91, false, 0., 0.), Some(Cairnstrike));
+        assert_eq!(
+            catalog::drop_recipe(95, false, 0.012, 0.),
+            Some(HorizonStep)
+        );
+        assert_eq!(
+            catalog::drop_recipe(96, false, 0.012, 0.),
+            Some(EvergreenSigil)
+        );
+        assert_eq!(catalog::drop_recipe(65, false, 0.03, 0.), None);
         assert!(catalog::drop_recipe(65, true, 0.024, 0.).is_some());
         for row in &CATALOG.enchants {
             assert!(item(&row.id.item("recipe")).is_some());

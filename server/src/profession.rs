@@ -1,7 +1,7 @@
-//! Shared 1–300 progression for secondary professions.
+//! Shared 1–600 progression for secondary professions.
 use serde::{Deserialize, Serialize};
 
-pub const MAX_SKILL: u16 = 300;
+pub const MAX_SKILL: u16 = 600;
 pub const SKILL_BAND: u16 = 30;
 const GEAR_LEVELS_PER_BAND: u16 = 5;
 
@@ -48,8 +48,9 @@ impl Skill {
         if !(1..cap.min(MAX_SKILL)).contains(&self.skill) {
             return false;
         }
-        let chance = 0.9 - 0.3 * f64::from(self.skill - 1) / f64::from(MAX_SKILL - 1)
-            + 0.05 * f64::from(quality.min(3));
+        // Keep the original 1–300 odds. Expert bands retain the 60% floor.
+        let progress = f64::from(self.skill.min(300) - 1) / 299.;
+        let chance = 0.9 - 0.3 * progress + 0.05 * f64::from(quality.min(3));
         if self.misses >= 2 || roll < chance.min(1.) {
             self.skill += 1;
             self.misses = 0;
@@ -66,7 +67,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn profession_skill_eligible_actions_reach_300_even_with_the_worst_rolls() {
+    fn profession_skill_eligible_actions_reach_600_even_with_the_worst_rolls() {
         let mut skill = Skill::default();
         assert!(!skill.try_gain(3, MAX_SKILL, 0.));
         skill.initialize(1);
@@ -91,13 +92,20 @@ mod tests {
             (45, 270),
             (46, 300),
             (50, 300),
-            (99, 300),
+            (51, 330),
+            (55, 330),
+            (56, 360),
+            (95, 570),
+            (96, 600),
+            (99, 600),
         ] {
             assert_eq!(gear_skill_cap(level), cap, "item level {level}");
         }
         assert_eq!(training_gear_level(30), Some(6));
         assert_eq!(training_gear_level(270), Some(46));
-        assert_eq!(training_gear_level(300), None);
+        assert_eq!(training_gear_level(300), Some(51));
+        assert_eq!(training_gear_level(570), Some(96));
+        assert_eq!(training_gear_level(600), None);
         let mut skill = Skill::default();
         skill.initialize(30);
         for _ in 0..3 {
@@ -111,7 +119,7 @@ mod tests {
     #[test]
     fn profession_skill_quality_improves_odds_and_misses_survive_reload() {
         let mut basic = Skill::default();
-        basic.initialize(299);
+        basic.initialize(599);
         let mut better = basic.clone();
         assert!(!basic.try_gain(0, MAX_SKILL, 0.7));
         assert!(better.try_gain(3, MAX_SKILL, 0.7));
@@ -119,6 +127,6 @@ mod tests {
         let mut restored: Skill =
             serde_json::from_value(serde_json::to_value(basic).unwrap()).unwrap();
         assert!(restored.try_gain(0, MAX_SKILL, 0.999));
-        assert_eq!(restored.skill, 300);
+        assert_eq!(restored.skill, 600);
     }
 }

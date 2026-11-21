@@ -5,6 +5,9 @@
   const tr = text => window.Locale?.translate(text) || text;
   const now = () => performance.now();
   const clamp = n => Math.max(0, Math.min(1, n));
+  const SKILL_BAND = 30;
+  const water = zone => window.FISHING_WATERS?.[zone || 0];
+  const lavaWater = zone => water(zone)?.habitat === 'Lava';
   const colours = { common: '#ddd6c7', uncommon: '#83df83', rare: '#80bdff', epic: '#cf9bff', legendary: '#ffbd59' };
   const catalogue = () => (window.WORLD_ITEMS || []).filter(i => i.kind === 'fish');
   const definition = id => window.Inventory?.definition(id);
@@ -17,8 +20,8 @@
 
   // A visibility hint, never a claim that the world will accept a cast. Match the facing ray and liquid shapes.
   function shore(hero, map, checkRod = true) {
-    if (!hero || !map || ![0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45].includes(hero.zone || 0)) return false;
-    const lava = [1, 45].includes(hero.zone), level = hero.level || 1;
+    if (!hero || !map || !water(hero.zone)) return false;
+    const lava = lavaWater(hero.zone), level = hero.level || 1;
     if (checkRod && !(hero.inventory || []).some(s => {
       const i = definition(s.item); return s.quantity > 0 && i?.kind === 'rod' && i.requiredLevel <= level && (!lava || !!i.fishing?.lava);
     })) return false;
@@ -115,7 +118,7 @@
     if (emit) sound = emit;
     if (e.actor !== self || !e.kind?.startsWith('fish_')) return;
     if (e.kind === 'fish_cast') {
-      result = null; miss = null; cast = { x: e.x, y: e.y, richSpot: spots.find(spot => Math.hypot(spot.x - e.x, spot.y - e.y) <= 3.) || null, lava: [1, 45].includes(own?.zone), at: now(), landed: false };
+      result = null; miss = null; cast = { x: e.x, y: e.y, richSpot: spots.find(spot => Math.hypot(spot.x - e.x, spot.y - e.y) <= 3.) || null, lava: lavaWater(own?.zone), at: now(), landed: false };
       sound('cast');
     } else if (e.kind === 'fish_bite') {
       const line = lines.get(self); if (line) { line.state = 'bite'; line.deadline = e.deadline; line.biteAt = now(); }
@@ -135,18 +138,22 @@
     // Inventory.icon is trusted renderer output; item names and all packet text use textContent.
     el.innerHTML = window.Inventory?.icon(item) || ''; return el;
   }
-  const trainingWaters = skill => window.FISHING_SKILL_WATERS?.[Math.floor(skill / 30)] || [];
+  const trainingWaters = skill => window.FISHING_SKILL_WATERS?.[Math.floor(skill / SKILL_BAND)] || [];
   function trainingHint(skill) {
     const world = window.WORLD_MAP;
-    const names = trainingWaters(skill).map(id => id === 0 ? world?.name : world?.zones?.[id - 1]?.name).filter(Boolean);
-    return names.length ? tr('Fish in {0} to reach skill {1}.').replace('{0}', names.map(tr).join(' / '))
-      .replace('{1}', (Math.floor(skill / 30) + 1) * 30) : '';
+    const names = trainingWaters(skill).map(id => {
+      const name = id === 0 ? world?.name : world?.zones?.[id - 1]?.name;
+      const site = water(id)?.name;
+      return name && (site ? tr(name) + ' · ' + tr(site) : tr(name));
+    }).filter(Boolean);
+    return names.length ? tr('Fish in {0} to reach skill {1}.').replace('{0}', names.join(' / '))
+      .replace('{1}', (Math.floor(skill / SKILL_BAND) + 1) * SKILL_BAND) : '';
   }
   function renderLog() {
     const species = catalogue(), key = JSON.stringify([log, own?.inventory, own?.level, $('fishing-filter').value, window.Locale?.language]);
     if (key === signature) return; signature = key;
     const caught = species.filter(i => (log.species?.[i.id]?.count || 0) > 0).length;
-    const skill = tr('Fishing skill {0} / {1}').replace('{0}', log.skill || 1).replace('{1}', 300);
+    const skill = tr('Fishing skill {0} / {1}').replace('{0}', log.skill || 1).replace('{1}', window.FISHING_SKILL_WATERS.length * SKILL_BAND);
     $('fishing-records').textContent = skill + ' · ' + tr('Caught: {0} · Species: {1}/{2} · Legendary: {3} · Best streak: {4}')
       .replace('{0}', log.total || 0).replace('{1}', caught).replace('{2}', species.length).replace('{3}', log.legendary || 0).replace('{4}', log.longestStreak || 0);
     const training = $('fishing-training');
@@ -220,7 +227,7 @@
     const a = project(0,0), b = project(1,0), c = project(0,1);
     const ux = b[0]-a[0], uy = b[1]-a[1], vx = c[0]-a[0], vy = c[1]-a[1], det = ux*vy-uy*vx;
     if (!det) return false;
-    const dx = mx-a[0], dy = my-a[1], x = (dx*vy-dy*vx)/det, y = (ux*dy-uy*dx)/det, lava = [1,45].includes(own.zone);
+    const dx = mx-a[0], dy = my-a[1], x = (dx*vy-dy*vx)/det, y = (ux*dy-uy*dx)/det, lava = lavaWater(own.zone);
     const pool = (zone.objects || []).some(o => {
       const r = lava ? (['lava','ew_lava'].includes(o.kind) ? o.r : 0) : ['water','jungle_water','jade_pool'].includes(o.kind) ? o.r : ['seafoam','year_spring_pool','frostwake_frozen_pool','lapis_oasis'].includes(o.kind) ? Math.max(1,o.r||0) : 0;
       return r > 0 && Math.hypot(x-o.x,y-o.y) < r;
@@ -241,7 +248,8 @@
     }
     const key = `${own?.zone || 0}:${!!spot}:${window.Locale?.language}`;
     if (key !== tooltipKey) {
-      richTooltip.replaceChildren(node('strong', tr(spot ? 'Rich fishing spot' : 'Ordinary fishing water')), node('p', requirement(own?.zone || 0, !!spot)));
+      const name = spot ? tr('Rich fishing spot') : tr(water(own?.zone)?.name || 'Ordinary fishing water');
+      richTooltip.replaceChildren(node('strong', name), node('p', requirement(own?.zone || 0, !!spot)));
       if (spot) richTooltip.append(node('p', tr('Better chances for rare fish. Moves after 5–10 fish are caught here.')));
       tooltipKey = key;
     }
@@ -265,7 +273,7 @@
       for (const spot of spots) {
         const [x, y] = project(spot.x, spot.y), phase = reduced ? .5 : (time / 1400 + spot.x) % 1;
         spotLabel(g, x, y);
-        ring(g, x, y, 32 + phase * 50, [1, 45].includes(own?.zone) ? '#ffa652' : '#b9efff', .85 - phase * .5);
+        ring(g, x, y, 32 + phase * 50, lavaWater(own?.zone) ? '#ffa652' : '#b9efff', .85 - phase * .5);
         if (!reduced) ring(g, x, y, 24 + ((phase + .5) % 1) * 50, '#e1f7ff', .45);
       }
       return;

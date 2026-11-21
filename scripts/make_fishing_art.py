@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Fishing icons: preview, build, export, verify. Build preserves saved editor work.
 
-Two native PixelFlow sources with one 48px frame per stable item ID. Export and
-verify always read the editor; preview never writes production assets.
+The original frames come from two native PixelFlow sources. Expert frames are
+authored below and appended locally without changing the original pixels.
+Preview never writes production assets.
 """
 import argparse
 import json
@@ -30,6 +31,9 @@ RAMPS = {
     'fire': ['#702e39', '#be4937', '#f28c45', '#ffdc79'],
     'coal': ['#29283a', '#45485c', '#76798b', '#b6b2ba'],
     'wood': ['#49302d', '#815139', '#b87e4b', '#e5bc7a'],
+    'storm': ['#2c3a67', '#416b91', '#7bd7de', '#c4ffe3'],
+    'opal': ['#385361', '#4fa996', '#9ee0bb', '#edffcb'],
+    'moon': ['#463d72', '#825cc0', '#c9b6ff', '#f9e7f2'],
 }
 # Authored body, fin and colour choices; roster order never controls a silhouette.
 # width/height refer to the body (tail and occupational details are separate).
@@ -63,6 +67,24 @@ SPECS = {
  'basalt_eel': ('eel','coal',32,9,3), 'furnace_bass': ('perch','fire',28,20,1),
  'obsidian_gar': ('gar','coal',33,12,3), 'phoenix_koi': ('dragon','fire',29,20,2),
  'sunfire_ray': ('ray','fire',34,25,2),
+ 'cloud_minnow': ('fish','silver',23,8,1), 'storm_barb': ('fish','blue',27,12,2),
+ 'gale_eel': ('eel','storm',32,9,1), 'thundercrest_ray': ('ray','blue',33,23,3),
+ 'star_dace': ('fish','purple',25,10,0), 'comet_perch': ('perch','gold',27,18,2),
+ 'nebula_gar': ('gar','purple',33,13,0), 'prism_gudgeon': ('fish','pink',23,10,1),
+ 'glass_spindlefish': ('gar','silver',30,8,2), 'suncut_carp': ('koi','gold',30,18,1),
+ 'prismatic_mirrorfish': ('crown','purple',26,20,2), 'clockwork_chub': ('fish','gold',24,13,3),
+ 'obsidian_bream': ('flat','coal',29,21,1), 'orrery_sturgeon': ('sturgeon','coal',33,16,2),
+ 'spore_rasbora': ('fish','pink',22,9,2), 'veil_catfish': ('cat','purple',25,20,1),
+ 'dreamfin_pike': ('gar','pink',34,10,0), 'moonwake_dragonfish': ('dragon','purple',32,20,0),
+ 'crescent_bleak': ('fish','silver',31,9,0), 'silver_crescent_eel': ('eel','purple',30,8,2),
+ 'ringwater_koi': ('koi','blue',28,23,3), 'ribbon_shiner': ('fish','pink',27,10,3),
+ 'jubilee_guppy': ('guppy','gold',22,13,0), 'parade_gourami': ('flat','pink',29,23,3),
+ 'festival_crownfin': ('crown','pink',29,21,1), 'rootfoot_dace': ('fish','green',25,10,3),
+ 'nectar_perch': ('perch','pink',26,19,0), 'canopy_lungfish': ('cat','green',31,21,2),
+ 'heartwood_whitefish': ('fish','silver',28,13,1), 'pithscale_char': ('fish','wood',31,13,2),
+ 'amberroot_gar': ('gar','gold',34,11,0), 'mountainheart_paddlefish': ('sturgeon','gold',34,14,1),
+ 'cairn_minnow': ('fish','coal',23,9,0), 'tarn_grayling': ('perch','silver',27,16,3),
+ 'graniteback_sturgeon': ('sturgeon','silver',33,17,0),
 }
 
 
@@ -152,7 +174,8 @@ def render(item):
     wood, gold, silver, blue = [RAMPS[k] for k in ('wood','gold','silver','blue')]
     if item['kind'] == 'rod':
         tier=item['fishing']['tier']; lava=item['fishing']['lava']
-        c=RAMPS['fire' if lava else ('wood','green','blue','silver','purple','gold')[tier-1]]
+        palette = {9: 'green', 10: 'coal'}.get(tier)
+        c = RAMPS[palette or ('fire' if lava else 'wood')]
         d.line([(9,40),(15,31),(24,19),(31,9),(36,6)],fill=INK,width=5)
         d.line([(9,40),(15,31),(24,19),(31,9),(36,6)],fill=c[2],width=3)
         d.line([(11,38),(16,31)],fill=wood[0],width=4)
@@ -165,7 +188,9 @@ def render(item):
         for k in range(tier):d.point((22+k*2,24-k*2),fill=gold[3])
     elif item['kind'] == 'food':
         habitat=key.split('_')[1]; feast=key.endswith('feast')
-        c=RAMPS[{'shore':'blue','cold':'silver','swamp':'green','forest':'wood','jungle':'green','oasis':'gold','spring':'pink','lava':'fire'}[habitat]]
+        c=RAMPS[{'shore':'blue','cold':'silver','swamp':'green','forest':'wood','jungle':'green','oasis':'gold',
+                 'spring':'pink','lava':'fire','cloudwater':'purple','glasswater':'opal','moonwater':'moon',
+                 'greenwater':'green','deep':'coal'}[habitat]]
         d.ellipse((4,19,44,41),fill=INK);d.ellipse((5,19,43,38),fill=silver[1],outline=silver[3]);d.ellipse((9,22,39,35),fill=wood[0])
         d.polygon([(12,25),(8,21),(8,30)],fill=gold[1],outline=INK)
         d.ellipse((12,21,36,32),fill=gold[1],outline=INK);d.ellipse((14,22,34,28),fill=gold[2])
@@ -249,13 +274,53 @@ def api():
     return pf_api()
 
 
+def save_atlas(atlas, meta):
+    atlas.save(ASSETS/'fishing-icons.png', optimize=True)
+    data = {key: meta[key] for key in ('size', 'cols', 'rows', 'at')}
+    (ROOT/'client/fishingicons.js').write_text(
+        "'use strict';\n// Generated from assets/fishing-icons.txt.\nwindow.FISHING_ICONS = "
+        + json.dumps(data, separators=(',', ':')) + ';\n')
+
+
+def extend(items, output):
+    """Rebuild the expert cells using the already exported original frames."""
+    meta = json.loads(META.read_text())
+    original = [key for source in meta['sources'] for key in source['order']]
+    by_id = {item['id']: item for item in items}
+    added = [key for key in by_id if key not in original]
+    previous = Image.open(ASSETS/'fishing-icons.png').convert('RGBA')
+    ids = original + added
+    meta.update(order=ids, rows=math.ceil(len(ids)/COLS), local=added)
+    atlas = Image.new('RGBA', (COLS*SIZE, meta['rows']*SIZE))
+    frames = []
+    for key in original:
+        x, y = meta['at'][key]
+        frames.append(previous.crop((x*SIZE, y*SIZE, (x+1)*SIZE, (y+1)*SIZE)))
+    frames.extend(render(by_id[key]) for key in added)
+    meta['at'] = {key: [n % COLS, n // COLS] for n, key in enumerate(ids)}
+    for n, frame in enumerate(frames):
+        atlas.alpha_composite(frame, (n % COLS*SIZE, n // COLS*SIZE))
+    META.write_text(json.dumps(meta, indent=2) + '\n')
+    save_atlas(atlas, meta)
+    contact(frames[len(original):], [by_id[key] for key in added], output)
+    print(f'Expert fishing art: {len(added)} new icons, {len(original)} original cells preserved')
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action',choices=['preview','build','export','verify'])
+    p.add_argument('action',choices=['preview','build','export','verify','extend'])
     p.add_argument('--output',default=str(ROOT/'test-results/fishing-art/contact.png'))
     args=p.parse_args(); items=roster();ids=[i['id'] for i in items]
     if args.action=='preview':
         contact([render(i) for i in items],items,args.output);print(args.output);return
+    if args.action == 'extend':
+        extend(items, args.output)
+        return
+    if META.exists():
+        meta = json.loads(META.read_text())
+        order = {key: i for i, key in enumerate(meta['order'])}
+        items.sort(key=lambda item: order.get(item['id'], len(order)))
+        ids = [i['id'] for i in items]
     pf=api()
     if args.action=='build':
         previous=json.loads(META.read_text()) if META.exists() else None
@@ -288,12 +353,17 @@ def main():
         for data in grids:
             n=len(frames);im=Image.fromarray(pf.to_rgba(data[0],sp['palette']));frames.append(im)
             atlas.alpha_composite(im,(n%COLS*SIZE,n//COLS*SIZE))
+    by_id = {i['id']: i for i in items}
+    for key in meta.get('local', []):
+        n = len(frames)
+        im = render(by_id[key])
+        frames.append(im)
+        atlas.alpha_composite(im, (n%COLS*SIZE, n//COLS*SIZE))
     target=ASSETS/'fishing-icons.png'
     if args.action=='verify':
         assert atlas.tobytes()==Image.open(target).convert('RGBA').tobytes(),'Editor export differs'
         print('Verified',len(ids),'editor frames against production atlas');return
-    atlas.save(target,optimize=True)
-    (ROOT/'client/fishingicons.js').write_text("'use strict';\n// Exported from the native PixelFlow source in assets/fishing-icons.txt.\nwindow.FISHING_ICONS = "+json.dumps({k:meta[k] for k in ('size','cols','rows','at')},separators=(',',':'))+';\n')
+    save_atlas(atlas, meta)
     contact(frames,items,args.output);print('Exported',len(ids),'icons;',args.output)
 
 

@@ -141199,7 +141199,9 @@
       "tier": 7,
       "lava": true,
       "zones": [
-        26
+        26,
+        16,
+        17
       ],
       "richZones": []
     }
@@ -141215,7 +141217,8 @@
       "tier": 8,
       "lava": true,
       "zones": [
-        28
+        28,
+        21
       ],
       "richZones": []
     }
@@ -141247,7 +141250,11 @@
       "tier": 6,
       "lava": true,
       "zones": [
-        45
+        45,
+        7,
+        13,
+        14,
+        15
       ],
       "richZones": []
     }
@@ -141641,6 +141648,829 @@
     }
   },
   {
+    "id": "fish_cloud_minnow",
+    "name": "Cloud Minnow",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 55,
+    "requiredLevel": 45,
+    "heal": 125,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cloudwater",
+      "minTier": 6,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_cloudwater_grill"
+    }
+  },
+  {
+    "id": "fish_storm_barb",
+    "name": "Storm Barb",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 110,
+    "requiredLevel": 45,
+    "heal": 150,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cloudwater",
+      "minTier": 6,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_cloudwater_grill"
+    }
+  },
+  {
+    "id": "fish_gale_eel",
+    "name": "Gale Eel",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 240,
+    "requiredLevel": 45,
+    "heal": 175,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cloudwater",
+      "minTier": 6,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_cloudwater_grill"
+    }
+  },
+  {
+    "id": "fish_thundercrest_ray",
+    "name": "Thundercrest Ray",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 900,
+    "requiredLevel": 45,
+    "heal": 200,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cloudwater",
+      "minTier": 6,
+      "kg": [
+        20,
+        30
+      ],
+      "dish": "dish_cloudwater_grill"
+    }
+  },
+  {
+    "id": "fish_star_dace",
+    "name": "Star Dace",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 60,
+    "requiredLevel": 45,
+    "heal": 125,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cloudwater",
+      "minTier": 6,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_cloudwater_grill"
+    }
+  },
+  {
+    "id": "fish_comet_perch",
+    "name": "Comet Perch",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 115,
+    "requiredLevel": 45,
+    "heal": 150,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cloudwater",
+      "minTier": 6,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_cloudwater_grill"
+    }
+  },
+  {
+    "id": "fish_nebula_gar",
+    "name": "Nebula Gar",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 245,
+    "requiredLevel": 45,
+    "heal": 175,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Cloudwater",
+      "minTier": 6,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_cloudwater_grill"
+    }
+  },
+  {
+    "id": "fish_prism_gudgeon",
+    "name": "Prism Gudgeon",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 65,
+    "requiredLevel": 50,
+    "heal": 130,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Glasswater",
+      "minTier": 6,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_glasswater_grill"
+    }
+  },
+  {
+    "id": "fish_glass_spindlefish",
+    "name": "Glass Spindlefish",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 120,
+    "requiredLevel": 50,
+    "heal": 155,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Glasswater",
+      "minTier": 6,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_glasswater_grill"
+    }
+  },
+  {
+    "id": "fish_suncut_carp",
+    "name": "Suncut Carp",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 250,
+    "requiredLevel": 50,
+    "heal": 180,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Glasswater",
+      "minTier": 6,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_glasswater_grill"
+    }
+  },
+  {
+    "id": "fish_prismatic_mirrorfish",
+    "name": "Prismatic Mirrorfish",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 910,
+    "requiredLevel": 50,
+    "heal": 205,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Glasswater",
+      "minTier": 6,
+      "kg": [
+        22,
+        32
+      ],
+      "dish": "dish_glasswater_grill"
+    }
+  },
+  {
+    "id": "fish_clockwork_chub",
+    "name": "Clockwork Chub",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 70,
+    "requiredLevel": 55,
+    "heal": 135,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Glasswater",
+      "minTier": 6,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_glasswater_grill"
+    }
+  },
+  {
+    "id": "fish_obsidian_bream",
+    "name": "Obsidian Bream",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 125,
+    "requiredLevel": 55,
+    "heal": 160,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Glasswater",
+      "minTier": 6,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_glasswater_grill"
+    }
+  },
+  {
+    "id": "fish_orrery_sturgeon",
+    "name": "Orrery Sturgeon",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 255,
+    "requiredLevel": 55,
+    "heal": 185,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Glasswater",
+      "minTier": 6,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_glasswater_grill"
+    }
+  },
+  {
+    "id": "fish_spore_rasbora",
+    "name": "Spore Rasbora",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 75,
+    "requiredLevel": 60,
+    "heal": 140,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Moonwater",
+      "minTier": 7,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_moonwater_grill"
+    }
+  },
+  {
+    "id": "fish_veil_catfish",
+    "name": "Veil Catfish",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 130,
+    "requiredLevel": 60,
+    "heal": 165,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Moonwater",
+      "minTier": 7,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_moonwater_grill"
+    }
+  },
+  {
+    "id": "fish_dreamfin_pike",
+    "name": "Dreamfin Pike",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 260,
+    "requiredLevel": 60,
+    "heal": 190,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Moonwater",
+      "minTier": 7,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_moonwater_grill"
+    }
+  },
+  {
+    "id": "fish_moonwake_dragonfish",
+    "name": "Moonwake Dragonfish",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 920,
+    "requiredLevel": 60,
+    "heal": 215,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Moonwater",
+      "minTier": 7,
+      "kg": [
+        24,
+        34
+      ],
+      "dish": "dish_moonwater_grill"
+    }
+  },
+  {
+    "id": "fish_crescent_bleak",
+    "name": "Crescent Bleak",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 80,
+    "requiredLevel": 60,
+    "heal": 140,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Moonwater",
+      "minTier": 7,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_moonwater_grill"
+    }
+  },
+  {
+    "id": "fish_silver_crescent_eel",
+    "name": "Silver Crescent Eel",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 135,
+    "requiredLevel": 60,
+    "heal": 165,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Moonwater",
+      "minTier": 7,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_moonwater_grill"
+    }
+  },
+  {
+    "id": "fish_ringwater_koi",
+    "name": "Ringwater Koi",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 265,
+    "requiredLevel": 60,
+    "heal": 190,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Moonwater",
+      "minTier": 7,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_moonwater_grill"
+    }
+  },
+  {
+    "id": "fish_ribbon_shiner",
+    "name": "Ribbon Shiner",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 85,
+    "requiredLevel": 80,
+    "heal": 160,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Greenwater",
+      "minTier": 8,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_greenwater_grill"
+    }
+  },
+  {
+    "id": "fish_jubilee_guppy",
+    "name": "Jubilee Guppy",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 140,
+    "requiredLevel": 80,
+    "heal": 185,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Greenwater",
+      "minTier": 8,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_greenwater_grill"
+    }
+  },
+  {
+    "id": "fish_parade_gourami",
+    "name": "Parade Gourami",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 270,
+    "requiredLevel": 80,
+    "heal": 210,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Greenwater",
+      "minTier": 8,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_greenwater_grill"
+    }
+  },
+  {
+    "id": "fish_festival_crownfin",
+    "name": "Festival Crownfin",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 930,
+    "requiredLevel": 80,
+    "heal": 235,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Greenwater",
+      "minTier": 8,
+      "kg": [
+        26,
+        36
+      ],
+      "dish": "dish_greenwater_grill"
+    }
+  },
+  {
+    "id": "fish_rootfoot_dace",
+    "name": "Rootfoot Dace",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 90,
+    "requiredLevel": 85,
+    "heal": 165,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Greenwater",
+      "minTier": 9,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_greenwater_grill"
+    }
+  },
+  {
+    "id": "fish_nectar_perch",
+    "name": "Nectar Perch",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 145,
+    "requiredLevel": 85,
+    "heal": 190,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Greenwater",
+      "minTier": 9,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_greenwater_grill"
+    }
+  },
+  {
+    "id": "fish_canopy_lungfish",
+    "name": "Canopy Lungfish",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 275,
+    "requiredLevel": 85,
+    "heal": 215,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Greenwater",
+      "minTier": 9,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_greenwater_grill"
+    }
+  },
+  {
+    "id": "fish_heartwood_whitefish",
+    "name": "Heartwood Whitefish",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 95,
+    "requiredLevel": 85,
+    "heal": 165,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Deep Springs",
+      "minTier": 9,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_deep_springs_grill"
+    }
+  },
+  {
+    "id": "fish_pithscale_char",
+    "name": "Pithscale Char",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 150,
+    "requiredLevel": 85,
+    "heal": 190,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Deep Springs",
+      "minTier": 9,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_deep_springs_grill"
+    }
+  },
+  {
+    "id": "fish_amberroot_gar",
+    "name": "Amberroot Gar",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 280,
+    "requiredLevel": 85,
+    "heal": 215,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Deep Springs",
+      "minTier": 9,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_deep_springs_grill"
+    }
+  },
+  {
+    "id": "fish_mountainheart_paddlefish",
+    "name": "Mountainheart Paddlefish",
+    "kind": "fish",
+    "rarity": "legendary",
+    "sell": 940,
+    "requiredLevel": 85,
+    "heal": 240,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Deep Springs",
+      "minTier": 9,
+      "kg": [
+        28,
+        38
+      ],
+      "dish": "dish_deep_springs_grill"
+    }
+  },
+  {
+    "id": "fish_cairn_minnow",
+    "name": "Cairn Minnow",
+    "kind": "fish",
+    "rarity": "common",
+    "sell": 100,
+    "requiredLevel": 90,
+    "heal": 170,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Deep Springs",
+      "minTier": 10,
+      "kg": [
+        2,
+        5
+      ],
+      "dish": "dish_deep_springs_grill"
+    }
+  },
+  {
+    "id": "fish_tarn_grayling",
+    "name": "Tarn Grayling",
+    "kind": "fish",
+    "rarity": "uncommon",
+    "sell": 155,
+    "requiredLevel": 90,
+    "heal": 195,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Deep Springs",
+      "minTier": 10,
+      "kg": [
+        5,
+        11
+      ],
+      "dish": "dish_deep_springs_grill"
+    }
+  },
+  {
+    "id": "fish_graniteback_sturgeon",
+    "name": "Graniteback Sturgeon",
+    "kind": "fish",
+    "rarity": "rare",
+    "sell": 285,
+    "requiredLevel": 90,
+    "heal": 220,
+    "duration": 8,
+    "cooldown": 30,
+    "fishing": {
+      "habitat": "Deep Springs",
+      "minTier": 10,
+      "kg": [
+        9,
+        19
+      ],
+      "dish": "dish_deep_springs_grill"
+    }
+  },
+  {
+    "id": "rod_rootbraid_rod",
+    "name": "Rootbraid Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 85,
+    "fishing": {
+      "tier": 9,
+      "lava": true,
+      "zones": [
+        23,
+        24
+      ],
+      "richZones": []
+    }
+  },
+  {
+    "id": "rod_cairnsteel_rod",
+    "name": "Cairnsteel Rod",
+    "kind": "rod",
+    "rarity": "common",
+    "sell": 10,
+    "requiredLevel": 90,
+    "fishing": {
+      "tier": 10,
+      "lava": true,
+      "zones": [
+        27
+      ],
+      "richZones": []
+    }
+  },
+  {
+    "id": "dish_cloudwater_grill",
+    "name": "Cloudwater Fish Grill",
+    "kind": "food",
+    "rarity": "common",
+    "family": "dish_cloudwater_grill",
+    "requiredLevel": 45,
+    "sell": 28,
+    "heal": 630,
+    "mana": 550,
+    "duration": 8,
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "fishing_speed",
+      "amount": 0.1,
+      "duration": 600
+    }
+  },
+  {
+    "id": "dish_glasswater_grill",
+    "name": "Glasswater Fish Grill",
+    "kind": "food",
+    "rarity": "common",
+    "family": "dish_glasswater_grill",
+    "requiredLevel": 50,
+    "sell": 41,
+    "heal": 770,
+    "mana": 680,
+    "duration": 8,
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "crit",
+      "amount": 0.02,
+      "duration": 600
+    }
+  },
+  {
+    "id": "dish_moonwater_grill",
+    "name": "Moonwater Fish Grill",
+    "kind": "food",
+    "rarity": "common",
+    "family": "dish_moonwater_grill",
+    "requiredLevel": 60,
+    "sell": 56,
+    "heal": 910,
+    "mana": 810,
+    "duration": 8,
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "fishing_luck",
+      "amount": 0.1,
+      "duration": 600
+    }
+  },
+  {
+    "id": "dish_greenwater_grill",
+    "name": "Greenwater Fish Grill",
+    "kind": "food",
+    "rarity": "common",
+    "family": "dish_greenwater_grill",
+    "requiredLevel": 80,
+    "sell": 97,
+    "heal": 1190,
+    "mana": 1060,
+    "duration": 8,
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "dodge",
+      "amount": 0.02,
+      "duration": 600
+    }
+  },
+  {
+    "id": "dish_deep_springs_grill",
+    "name": "Deep Springs Fish Grill",
+    "kind": "food",
+    "rarity": "common",
+    "family": "dish_deep_springs_grill",
+    "requiredLevel": 85,
+    "sell": 97,
+    "heal": 1190,
+    "mana": 1060,
+    "duration": 8,
+    "cooldown": 30,
+    "foodBonus": {
+      "kind": "shield",
+      "amount": 0.02,
+      "duration": 600
+    }
+  },
+  {
     "id": "enchant_dust",
     "name": "Enchanting Dust",
     "rarity": "uncommon",
@@ -141926,6 +142756,134 @@
     "kind": "enchant_scroll",
     "rarity": "legendary",
     "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_horizon_step",
+    "name": "Recipe: Horizon Step",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 100,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_horizon_step",
+    "name": "Scroll: Horizon Step",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 100,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_prism_echo",
+    "name": "Recipe: Prism Echo",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 100,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_prism_echo",
+    "name": "Scroll: Prism Echo",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 100,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_siltweave",
+    "name": "Recipe: Siltweave",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 100,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_siltweave",
+    "name": "Scroll: Siltweave",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 100,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_lantern_keeper",
+    "name": "Recipe: Lantern Keeper",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 125,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_lantern_keeper",
+    "name": "Scroll: Lantern Keeper",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 125,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_ribbon_rush",
+    "name": "Recipe: Ribbon Rush",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 125,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_ribbon_rush",
+    "name": "Scroll: Ribbon Rush",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 125,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_rootguard",
+    "name": "Recipe: Rootguard",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 125,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_rootguard",
+    "name": "Scroll: Rootguard",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 125,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_cairnstrike",
+    "name": "Recipe: Cairnstrike",
+    "kind": "enchant_recipe",
+    "rarity": "legendary",
+    "sell": 150,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_cairnstrike",
+    "name": "Scroll: Cairnstrike",
+    "kind": "enchant_scroll",
+    "rarity": "legendary",
+    "sell": 150,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_evergreen_sigil",
+    "name": "Recipe: Evergreen Sigil",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 175,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_evergreen_sigil",
+    "name": "Scroll: Evergreen Sigil",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 175,
     "source": "enchanting"
   }
 ]

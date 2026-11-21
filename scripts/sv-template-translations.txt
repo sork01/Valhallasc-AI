@@ -496,5 +496,7 @@
   "Fishing skill increased to {0}.": "Din fiskenivå har höjts till {0}.",
   "Can raise Enchanting through skill {0}.": "Kan höja förtrollning till nivå {0}.",
   "Use level {0} or higher gear for your next skill point.": "Använd utrustning på nivå {0} eller högre för nästa poäng.",
-  "Fish in {0} to reach skill {1}.": "Fiska i {0} för att nå färdighetsnivå {1}."
+  "Fish in {0} to reach skill {1}.": "Fiska i {0} för att nå färdighetsnivå {1}.",
+  "Requires equipment level {0} or higher.": "Kräver utrustning på minst nivå {0}.",
+  "Craft {0} to reach skill {1}.": "Tillverka {0} för att nå färdighetsnivå {1}."
 }

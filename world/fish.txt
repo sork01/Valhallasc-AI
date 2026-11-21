@@ -910,5 +910,565 @@
     "level": 45,
     "raw_heal": 205,
     "dish": "dish_lava_feast"
+  },
+  {
+    "item": "fish_cloud_minnow",
+    "habitat": "Cloudwater",
+    "min_tier": 6,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 7,
+    "name": "Cloud Minnow",
+    "rarity": "common",
+    "sell": 55,
+    "level": 45,
+    "raw_heal": 125,
+    "dish": "dish_cloudwater_grill"
+  },
+  {
+    "item": "fish_storm_barb",
+    "habitat": "Cloudwater",
+    "min_tier": 6,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 7,
+    "name": "Storm Barb",
+    "rarity": "uncommon",
+    "sell": 110,
+    "level": 45,
+    "raw_heal": 150,
+    "dish": "dish_cloudwater_grill"
+  },
+  {
+    "item": "fish_gale_eel",
+    "habitat": "Cloudwater",
+    "min_tier": 6,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 7,
+    "name": "Gale Eel",
+    "rarity": "rare",
+    "sell": 240,
+    "level": 45,
+    "raw_heal": 175,
+    "dish": "dish_cloudwater_grill"
+  },
+  {
+    "item": "fish_thundercrest_ray",
+    "habitat": "Cloudwater",
+    "min_tier": 6,
+    "kg": [
+      20,
+      30
+    ],
+    "zone": null,
+    "name": "Thundercrest Ray",
+    "rarity": "legendary",
+    "sell": 900,
+    "level": 45,
+    "raw_heal": 200,
+    "dish": "dish_cloudwater_grill"
+  },
+  {
+    "item": "fish_star_dace",
+    "habitat": "Cloudwater",
+    "min_tier": 6,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 13,
+    "name": "Star Dace",
+    "rarity": "common",
+    "sell": 60,
+    "level": 45,
+    "raw_heal": 125,
+    "dish": "dish_cloudwater_grill"
+  },
+  {
+    "item": "fish_comet_perch",
+    "habitat": "Cloudwater",
+    "min_tier": 6,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 13,
+    "name": "Comet Perch",
+    "rarity": "uncommon",
+    "sell": 115,
+    "level": 45,
+    "raw_heal": 150,
+    "dish": "dish_cloudwater_grill"
+  },
+  {
+    "item": "fish_nebula_gar",
+    "habitat": "Cloudwater",
+    "min_tier": 6,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 13,
+    "name": "Nebula Gar",
+    "rarity": "rare",
+    "sell": 245,
+    "level": 45,
+    "raw_heal": 175,
+    "dish": "dish_cloudwater_grill"
+  },
+  {
+    "item": "fish_prism_gudgeon",
+    "habitat": "Glasswater",
+    "min_tier": 6,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 14,
+    "name": "Prism Gudgeon",
+    "rarity": "common",
+    "sell": 65,
+    "level": 50,
+    "raw_heal": 130,
+    "dish": "dish_glasswater_grill"
+  },
+  {
+    "item": "fish_glass_spindlefish",
+    "habitat": "Glasswater",
+    "min_tier": 6,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 14,
+    "name": "Glass Spindlefish",
+    "rarity": "uncommon",
+    "sell": 120,
+    "level": 50,
+    "raw_heal": 155,
+    "dish": "dish_glasswater_grill"
+  },
+  {
+    "item": "fish_suncut_carp",
+    "habitat": "Glasswater",
+    "min_tier": 6,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 14,
+    "name": "Suncut Carp",
+    "rarity": "rare",
+    "sell": 250,
+    "level": 50,
+    "raw_heal": 180,
+    "dish": "dish_glasswater_grill"
+  },
+  {
+    "item": "fish_prismatic_mirrorfish",
+    "habitat": "Glasswater",
+    "min_tier": 6,
+    "kg": [
+      22,
+      32
+    ],
+    "zone": null,
+    "name": "Prismatic Mirrorfish",
+    "rarity": "legendary",
+    "sell": 910,
+    "level": 50,
+    "raw_heal": 205,
+    "dish": "dish_glasswater_grill"
+  },
+  {
+    "item": "fish_clockwork_chub",
+    "habitat": "Glasswater",
+    "min_tier": 6,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 15,
+    "name": "Clockwork Chub",
+    "rarity": "common",
+    "sell": 70,
+    "level": 55,
+    "raw_heal": 135,
+    "dish": "dish_glasswater_grill"
+  },
+  {
+    "item": "fish_obsidian_bream",
+    "habitat": "Glasswater",
+    "min_tier": 6,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 15,
+    "name": "Obsidian Bream",
+    "rarity": "uncommon",
+    "sell": 125,
+    "level": 55,
+    "raw_heal": 160,
+    "dish": "dish_glasswater_grill"
+  },
+  {
+    "item": "fish_orrery_sturgeon",
+    "habitat": "Glasswater",
+    "min_tier": 6,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 15,
+    "name": "Orrery Sturgeon",
+    "rarity": "rare",
+    "sell": 255,
+    "level": 55,
+    "raw_heal": 185,
+    "dish": "dish_glasswater_grill"
+  },
+  {
+    "item": "fish_spore_rasbora",
+    "habitat": "Moonwater",
+    "min_tier": 7,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 16,
+    "name": "Spore Rasbora",
+    "rarity": "common",
+    "sell": 75,
+    "level": 60,
+    "raw_heal": 140,
+    "dish": "dish_moonwater_grill"
+  },
+  {
+    "item": "fish_veil_catfish",
+    "habitat": "Moonwater",
+    "min_tier": 7,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 16,
+    "name": "Veil Catfish",
+    "rarity": "uncommon",
+    "sell": 130,
+    "level": 60,
+    "raw_heal": 165,
+    "dish": "dish_moonwater_grill"
+  },
+  {
+    "item": "fish_dreamfin_pike",
+    "habitat": "Moonwater",
+    "min_tier": 7,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 16,
+    "name": "Dreamfin Pike",
+    "rarity": "rare",
+    "sell": 260,
+    "level": 60,
+    "raw_heal": 190,
+    "dish": "dish_moonwater_grill"
+  },
+  {
+    "item": "fish_moonwake_dragonfish",
+    "habitat": "Moonwater",
+    "min_tier": 7,
+    "kg": [
+      24,
+      34
+    ],
+    "zone": null,
+    "name": "Moonwake Dragonfish",
+    "rarity": "legendary",
+    "sell": 920,
+    "level": 60,
+    "raw_heal": 215,
+    "dish": "dish_moonwater_grill"
+  },
+  {
+    "item": "fish_crescent_bleak",
+    "habitat": "Moonwater",
+    "min_tier": 7,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 17,
+    "name": "Crescent Bleak",
+    "rarity": "common",
+    "sell": 80,
+    "level": 60,
+    "raw_heal": 140,
+    "dish": "dish_moonwater_grill"
+  },
+  {
+    "item": "fish_silver_crescent_eel",
+    "habitat": "Moonwater",
+    "min_tier": 7,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 17,
+    "name": "Silver Crescent Eel",
+    "rarity": "uncommon",
+    "sell": 135,
+    "level": 60,
+    "raw_heal": 165,
+    "dish": "dish_moonwater_grill"
+  },
+  {
+    "item": "fish_ringwater_koi",
+    "habitat": "Moonwater",
+    "min_tier": 7,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 17,
+    "name": "Ringwater Koi",
+    "rarity": "rare",
+    "sell": 265,
+    "level": 60,
+    "raw_heal": 190,
+    "dish": "dish_moonwater_grill"
+  },
+  {
+    "item": "fish_ribbon_shiner",
+    "habitat": "Greenwater",
+    "min_tier": 8,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 21,
+    "name": "Ribbon Shiner",
+    "rarity": "common",
+    "sell": 85,
+    "level": 80,
+    "raw_heal": 160,
+    "dish": "dish_greenwater_grill"
+  },
+  {
+    "item": "fish_jubilee_guppy",
+    "habitat": "Greenwater",
+    "min_tier": 8,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 21,
+    "name": "Jubilee Guppy",
+    "rarity": "uncommon",
+    "sell": 140,
+    "level": 80,
+    "raw_heal": 185,
+    "dish": "dish_greenwater_grill"
+  },
+  {
+    "item": "fish_parade_gourami",
+    "habitat": "Greenwater",
+    "min_tier": 8,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 21,
+    "name": "Parade Gourami",
+    "rarity": "rare",
+    "sell": 270,
+    "level": 80,
+    "raw_heal": 210,
+    "dish": "dish_greenwater_grill"
+  },
+  {
+    "item": "fish_festival_crownfin",
+    "habitat": "Greenwater",
+    "min_tier": 8,
+    "kg": [
+      26,
+      36
+    ],
+    "zone": null,
+    "name": "Festival Crownfin",
+    "rarity": "legendary",
+    "sell": 930,
+    "level": 80,
+    "raw_heal": 235,
+    "dish": "dish_greenwater_grill"
+  },
+  {
+    "item": "fish_rootfoot_dace",
+    "habitat": "Greenwater",
+    "min_tier": 9,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 23,
+    "name": "Rootfoot Dace",
+    "rarity": "common",
+    "sell": 90,
+    "level": 85,
+    "raw_heal": 165,
+    "dish": "dish_greenwater_grill"
+  },
+  {
+    "item": "fish_nectar_perch",
+    "habitat": "Greenwater",
+    "min_tier": 9,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 23,
+    "name": "Nectar Perch",
+    "rarity": "uncommon",
+    "sell": 145,
+    "level": 85,
+    "raw_heal": 190,
+    "dish": "dish_greenwater_grill"
+  },
+  {
+    "item": "fish_canopy_lungfish",
+    "habitat": "Greenwater",
+    "min_tier": 9,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 23,
+    "name": "Canopy Lungfish",
+    "rarity": "rare",
+    "sell": 275,
+    "level": 85,
+    "raw_heal": 215,
+    "dish": "dish_greenwater_grill"
+  },
+  {
+    "item": "fish_heartwood_whitefish",
+    "habitat": "Deep Springs",
+    "min_tier": 9,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 24,
+    "name": "Heartwood Whitefish",
+    "rarity": "common",
+    "sell": 95,
+    "level": 85,
+    "raw_heal": 165,
+    "dish": "dish_deep_springs_grill"
+  },
+  {
+    "item": "fish_pithscale_char",
+    "habitat": "Deep Springs",
+    "min_tier": 9,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 24,
+    "name": "Pithscale Char",
+    "rarity": "uncommon",
+    "sell": 150,
+    "level": 85,
+    "raw_heal": 190,
+    "dish": "dish_deep_springs_grill"
+  },
+  {
+    "item": "fish_amberroot_gar",
+    "habitat": "Deep Springs",
+    "min_tier": 9,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 24,
+    "name": "Amberroot Gar",
+    "rarity": "rare",
+    "sell": 280,
+    "level": 85,
+    "raw_heal": 215,
+    "dish": "dish_deep_springs_grill"
+  },
+  {
+    "item": "fish_mountainheart_paddlefish",
+    "habitat": "Deep Springs",
+    "min_tier": 9,
+    "kg": [
+      28,
+      38
+    ],
+    "zone": null,
+    "name": "Mountainheart Paddlefish",
+    "rarity": "legendary",
+    "sell": 940,
+    "level": 85,
+    "raw_heal": 240,
+    "dish": "dish_deep_springs_grill"
+  },
+  {
+    "item": "fish_cairn_minnow",
+    "habitat": "Deep Springs",
+    "min_tier": 10,
+    "kg": [
+      2,
+      5
+    ],
+    "zone": 27,
+    "name": "Cairn Minnow",
+    "rarity": "common",
+    "sell": 100,
+    "level": 90,
+    "raw_heal": 170,
+    "dish": "dish_deep_springs_grill"
+  },
+  {
+    "item": "fish_tarn_grayling",
+    "habitat": "Deep Springs",
+    "min_tier": 10,
+    "kg": [
+      5,
+      11
+    ],
+    "zone": 27,
+    "name": "Tarn Grayling",
+    "rarity": "uncommon",
+    "sell": 155,
+    "level": 90,
+    "raw_heal": 195,
+    "dish": "dish_deep_springs_grill"
+  },
+  {
+    "item": "fish_graniteback_sturgeon",
+    "habitat": "Deep Springs",
+    "min_tier": 10,
+    "kg": [
+      9,
+      19
+    ],
+    "zone": 27,
+    "name": "Graniteback Sturgeon",
+    "rarity": "rare",
+    "sell": 285,
+    "level": 90,
+    "raw_heal": 220,
+    "dish": "dish_deep_springs_grill"
   }
 ]

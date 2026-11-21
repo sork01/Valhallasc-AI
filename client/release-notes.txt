@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.5.0",
+    "date": "2026-11-21",
+    "new": [
+      "Train Fishing and Enchanting to skill 600. After 300, keep moving to the next training band every 30 points.",
+      "Fish in ten new waters from Bifrost Reach to the Cairnspine. Discover 35 species, cook five fish dishes and upgrade your Worldwire Rod into a Rootbraid Rod and then a Cairnsteel Rod.",
+      "Learn eight new enchantments at skills 300, 420, 540 and 570. Prism Echo strikes a second monster, Horizon Step shields you after a dodge and Evergreen Sigil heals you and quickens your pace."
+    ],
+    "changed": [
+      "Apply enchantments to or disenchant level 51 to 99 equipment to train through the advanced bands."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.4.0",
     "date": "2026-11-21",
     "new": [

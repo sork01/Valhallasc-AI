@@ -8,6 +8,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `PROFESSIONS-600` — Extend Enchanting and Fishing through skill 600 on `feat/professions-600`. Twenty 30-point bands, eight expert enchants, ten new fishing regions, 35 species, five dishes and two rod upgrades. See `docs/enchanting.md` and `docs/fishing.md`.
+
 - [x] `ENCHANTING` — Implemented for 1.4.0 on `feat/enchanting`. See `docs/enchanting.md`. Add Enchanting as a secondary profession. Disenchant equipment to recover materials and use them to apply blue, purple and orange enchantments. Monsters drop enchanting scrolls. Vendors sell them at very high gold prices. Show the enchantment, eligible slots and cost before applying it, and show the effect and cooldown on the enchanted item's tooltip.
   - **Decided by the owner (grill, 2026-11-21).** Every character can learn Enchanting. Disenchanting and crafting raise profession skill and unlock Blue → Purple → Orange.
   - **Recipe scrolls and crafted scrolls.** Scrolls dropped by monsters or bought from expensive vendors permanently teach recipes. Enchanters use materials to craft single-use enchant scrolls. Anyone can buy, trade or apply the crafted scrolls.

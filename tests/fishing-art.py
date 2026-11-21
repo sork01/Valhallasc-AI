@@ -4,6 +4,7 @@
 MUTATE=icons|npc|sound changes in-memory candidates and must fail.
 """
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -18,13 +19,20 @@ sys.path.insert(0,str(ROOT/'scripts'))
 from fish_catalog import pieces
 from fisher_npcs import assign_art
 from export_fishing_sounds import CUES
+from make_fishing_art import render
 
 A=ROOT/'client/assets'
 read=lambda p:json.loads((ROOT/p).read_text())
 meta=read('client/assets/fishing-icons.txt')
-items=pieces(); ids=[i['id'] for i in items]
-assert set(meta['at'])==set(ids) and meta['order']==ids
-assert [k for source in meta['sources'] for k in source['order']]==ids
+items={i['id']: i for i in pieces()}
+ids=meta['order']
+assert set(meta['at']) == set(ids) == set(items)
+assert [k for source in meta['sources'] for k in source['order']] + meta['local'] == ids
+assert len(meta['local']) == 42
+baseline = lambda path: subprocess.check_output(['git', 'show', '143ae4d3:' + path], cwd=ROOT)
+previous = json.loads(baseline('client/assets/fishing-icons.txt'))
+before_atlas = np.array(Image.open(io.BytesIO(baseline('client/assets/fishing-icons.png'))).convert('RGBA'))
+assert meta['sources'] == previous['sources']
 assert all(0<len(source['order'])<=64 and source['sprite'] for source in meta['sources'])
 assert meta['size']==48
 atlas=np.array(Image.open(A/'fishing-icons.png').convert('RGBA'))
@@ -34,6 +42,11 @@ for key in ids:
     x,y=meta['at'][key];assert (x,y) not in coordinates;coordinates.add((x,y))
     cell=atlas[y*48:(y+1)*48,x*48:(x+1)*48].copy()
     if os.environ.get('MUTATE')=='icons':cell[:]=0
+    if key in previous['at']:
+        assert (x,y) == tuple(previous['at'][key])
+        assert np.array_equal(cell, before_atlas[y*48:(y+1)*48,x*48:(x+1)*48]), (key, 'original icon changed')
+    else:
+        assert np.array_equal(cell, np.array(render(items[key]))), (key, 'expert icon is stale')
     yy,xx=np.nonzero(cell[:,:,3]);assert len(xx)>40,(key,'blank')
     assert 0<xx.min()<=xx.max()<47 and 0<yy.min()<=yy.max()<47,(key,'clipped')
     signature=cell.tobytes();assert signature not in signatures,(key,'duplicate icon');signatures.add(signature)
@@ -49,7 +62,7 @@ for field,value in old_fresh.items():
 world=read('world/map.txt');people=[n for area in [world,*world['zones']] for n in area['npcs'] if n['id'].startswith('fisher_')]
 npcs=read('client/assets/npc.txt');old_npcs=before('client/assets/npc.txt')
 if os.environ.get('MUTATE')=='npc':npcs['npcs'][people[0]['id']]['art']='fisher'
-assert len(people)==13
+assert len(people)==23
 for n in people:assert npcs['npcs'][n['id']]['art']=='fisher_rod',n['id']
 for k,v in old_npcs['npcs'].items():
     if not k.startswith('fisher_'):assert npcs['npcs'][k]==v,k
@@ -82,4 +95,4 @@ for cue,duration in CUES.items():
     assert np.sqrt(np.mean(samples*samples))>.003,(cue,'silent')
     assert abs(len(samples)/44100-duration)<.08,(cue,'length')
     assert np.max(np.abs(samples[-220:]))<.05,(cue,'tail click')
-print(f'PASS: {len(ids)} distinct icons, 13 Fishers / 20 poses, seven decoded cues; previous NPC artwork preserved')
+print(f'PASS: {len(ids)} distinct icons, 23 Fishers / 20 poses, seven decoded cues; previous NPC artwork preserved')

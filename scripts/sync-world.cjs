@@ -44,7 +44,8 @@ const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'ut
 fs.writeFileSync(path.join(root, 'client/world.js'), "'use strict';\nwindow.WORLD_MAP = " + JSON.stringify(map) + ';\n');
 fs.writeFileSync(path.join(root, 'client/items.js'), "'use strict';\nwindow.WORLD_ITEMS = " + JSON.stringify(items) + ';\n');
 const fishingSkillWaters = JSON.parse(fs.readFileSync(path.join(root, 'world/fishing-skill.txt'), 'utf8'));
-fs.writeFileSync(path.join(root, 'client/fishing-skill-data.js'), "'use strict';\nwindow.FISHING_SKILL_WATERS = " + JSON.stringify(fishingSkillWaters) + ';\n');
+const fishingWaters = JSON.parse(fs.readFileSync(path.join(root, 'world/fishing-waters.txt'), 'utf8'));
+fs.writeFileSync(path.join(root, 'client/fishing-skill-data.js'), "'use strict';\nwindow.FISHING_SKILL_WATERS = " + JSON.stringify(fishingSkillWaters) + ';\nwindow.FISHING_WATERS = ' + JSON.stringify(fishingWaters) + ';\n');
 const skills = JSON.parse(fs.readFileSync(path.join(root, 'world/skills.txt'), 'utf8'));
 fs.writeFileSync(path.join(root, 'client/skills.js'), "'use strict';\nwindow.WORLD_SKILLS = " + JSON.stringify(skills) + ';\n');
 const passives = JSON.parse(fs.readFileSync(path.join(root, 'world/passives.txt'), 'utf8'));

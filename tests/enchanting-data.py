@@ -8,6 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 spec = importlib.util.spec_from_file_location('enchanting_catalog', ROOT / 'scripts/enchanting_catalog.py')
+import set_bonuses
 overlay = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(overlay)
 
@@ -26,15 +27,16 @@ assert catalog == generated('client/enchanting-data.js')
 assert items == generated('client/items.js')
 assert world == generated('client/world.js')
 enchants = catalog['enchants']
-assert len(enchants) == 16
+assert len(enchants) == 24
 assert len({e['id'] for e in enchants}) == len(enchants)
-assert [sum(e['tier'] == n for e in enchants) for n in range(3)] == [5, 6, 5]
+assert [sum(e['tier'] == n for e in enchants) for n in range(7)] == [5, 6, 5, 3, 3, 1, 1]
 stock = {i['id']: i for i in items if i.get('source') == 'enchanting'}
-assert len(stock) == 36
-assert [t['skill'] for t in catalog['tiers']] == [1, 75, 180]
-assert [t['vendorPrice'] for t in catalog['tiers']] == [250_000, 1_000_000, 4_000_000]
+assert len(stock) == 52
+assert [t['skill'] for t in catalog['tiers']] == [1, 75, 180, 300, 420, 540, 570]
+assert [t['vendorPrice'] for t in catalog['tiers']] == [250_000, 1_000_000, 4_000_000, 1_500_000, 4_500_000, 10_000_000, 2_500_000]
 assert [m['rarity'] for m in catalog['materials'] if m['id'] == 'enchant_core'] == ['legendary']
-assert all(e['cost'][-1] == (e['tier'] == 2) for e in enchants)
+assert all(bool(e['cost'][-1]) == (catalog['tiers'][e['tier']]['rarity'] == 'legendary') for e in enchants)
+assert set_bonuses.build() == read('world/set-bonuses.txt'), 'Enchanting items and dungeon set definitions coexist'
 masters = {entry[0]: zone for zone, entry in overlay.MASTERS.items()}
 seen = set()
 for index, zone in enumerate([world, *world['zones']]):
@@ -61,6 +63,10 @@ for index, zone in enumerate([world, *world['zones']]):
             assert stock[offer['item']]['rarity'] == tier['rarity']
 assert set(masters) == seen
 for enchant in enchants:
-    rarity = catalog['tiers'][enchant['tier']]['rarity']
-    assert any(row['rarity'] == rarity and row['kind'] == enchant['kind'] for row in items)
-print('Enchanting catalog, sixteen recipes, reachable stock owners and generated client data agree')
+    tier = catalog['tiers'][enchant['tier']]
+    rank = ['rare', 'epic', 'legendary']
+    assert any(row['rarity'] in rank[rank.index(tier['rarity']):]
+               and row['kind'] == enchant['kind']
+               and row.get('requiredLevel', 1) >= tier.get('minGearLevel', 1) for row in items)
+
+print('Enchanting catalog, 24 recipes, reachable stock owners and generated client data agree')

@@ -231,7 +231,7 @@ fn fishing_workshop_every_fisher_is_reachable_and_quests_consume_real_fish() {
                 .map(move |n| (zone, n.clone()))
         })
         .collect();
-    assert_eq!(jobs.len(), 13);
+    assert_eq!(jobs.len(), 23);
     for (zone, n) in jobs {
         let at = Point { x: n.x, y: n.y };
         let mut collision = at;

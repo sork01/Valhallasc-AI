@@ -105,18 +105,17 @@ impl Line {
     }
 }
 
+#[derive(Deserialize)]
+struct Water {
+    habitat: String,
+}
+
+static WATERS: LazyLock<BTreeMap<usize, Water>> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("../../../world/fishing-waters.txt")).expect("fishing waters")
+});
+
 fn habitat(zone: usize) -> Option<&'static str> {
-    Some(match zone {
-        0 | 19 => "Shore",
-        2 | 26 => "Cold",
-        3 => "Swamp",
-        6 | 20 => "Forest",
-        22 => "Jungle",
-        25 => "Oasis",
-        28 => "Spring",
-        1 | 45 => "Lava",
-        _ => return None,
-    })
+    WATERS.get(&zone).map(|water| water.habitat.as_str())
 }
 fn area_radius(o: &Obstacle, lava: bool) -> Option<f64> {
     use FishingSurface::*;
@@ -818,17 +817,26 @@ mod data_tests {
     }
 
     #[test]
-    fn fishing_skill_route_requires_each_band_and_can_be_finished_with_level_fifty_rods() {
+    fn fishing_skill_reaches_600_through_twenty_bands_at_real_shores() {
         use crate::profession::{MAX_SKILL, SKILL_BAND};
         let (mut w, mut rx) = super::super::fishing_tests::angler();
         let points: Value =
             serde_json::from_str(include_str!("../../../world/fishing-spots.txt")).unwrap();
-        w.players
-            .get_mut(&1)
-            .unwrap()
-            .character
-            .add_item("rod_magma_reel", 1);
-        let route = [0, 1, 2, 3, 6, 20, 22, 19, 25, 45];
+        for rod in [
+            "rod_magma_reel",
+            "rod_starcatch_rod",
+            "rod_worldwire_rod",
+            "rod_rootbraid_rod",
+            "rod_cairnsteel_rod",
+        ] {
+            w.players.get_mut(&1).unwrap().character.add_item(rod, 1);
+        }
+        let route = [
+            0, 1, 2, 3, 6, 20, 22, 19, 25, 45, 7, 13, 14, 15, 16, 17, 21, 23, 24, 27,
+        ];
+        let levels = [
+            50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 55, 60, 60, 80, 85, 85, 90,
+        ];
         for (index, zone) in route.into_iter().enumerate() {
             let cap = (index as u16 + 1) * SKILL_BAND;
             assert_eq!(SKILL_WATERS[index][0], zone);
@@ -837,7 +845,7 @@ mod data_tests {
             if index != 0 {
                 assert_eq!(water_skill_cap(zone, cap - SKILL_BAND - 1), 0);
             }
-            assert!(w.maps[zone].min_level <= 50);
+            assert!(w.maps[zone].min_level <= levels[index]);
             let shore = points
                 .as_array()
                 .unwrap()
@@ -849,7 +857,7 @@ mod data_tests {
             let p = w.players.get_mut(&1).unwrap();
             p.face = face;
             p.character.zone = zone;
-            p.character.level = 50;
+            p.character.level = levels[index];
             p.character.x = at.x;
             p.character.y = at.y;
             p.character.fishing.proficiency.skill = cap - 1;
@@ -861,8 +869,8 @@ mod data_tests {
                 .find(|p| p["kind"] == "fish_catch")
                 .unwrap();
             assert_eq!(reply["skillUp"], cap, "catch in zone {zone}");
-            if index == 0 {
-                // At 30, a real Greenmeadow catch still awards fish, but the skill is capped there.
+            if matches!(cap, 30 | 300 | MAX_SKILL) {
+                // A real catch still awards fish at the zone's skill cap.
                 w.rng = 1;
                 w.profession_rng = 0;
                 w.land_fish(1, line, 22.);
@@ -871,8 +879,17 @@ mod data_tests {
                     .unwrap();
                 assert!(reply["kg"].is_number());
                 assert!(reply["skillUp"].is_null());
-                assert_eq!(w.players[&1].character.fishing.proficiency.skill, 30);
+                assert_eq!(w.players[&1].character.fishing.proficiency.skill, cap);
             }
+            // Empty the catch bag before moving to the next training waters.
+            w.players
+                .get_mut(&1)
+                .unwrap()
+                .character
+                .inventory
+                .retain(|stack| {
+                    item(&stack.item).is_none_or(|definition| definition.kind != "fish")
+                });
         }
         assert_eq!(w.players[&1].character.fishing.proficiency.skill, MAX_SKILL);
         assert_eq!(water_skill_cap(26, 270), 300);
@@ -1002,7 +1019,9 @@ mod data_tests {
         for rod in RODS.iter() {
             c.add_item(&rod.item, 1);
         }
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 8);
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 10);
+        w.players.get_mut(&1).unwrap().character.level = 85;
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 9);
         w.players.get_mut(&1).unwrap().character.level = 10;
         assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 3);
         w.maps[1].objects =
@@ -1013,7 +1032,7 @@ mod data_tests {
         p.character.x = 50.;
         p.character.y = 50.;
         p.character.level = 99;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 8);
+        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 10);
         w.players.get_mut(&1).unwrap().character.level = 5;
         assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
     }

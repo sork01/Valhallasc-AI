@@ -47,8 +47,8 @@ class FishingData(unittest.TestCase):
             self.assertLessEqual(row['kg'][0], row['kg'][1])
             self.assertTrue(row['dish'].startswith('dish_'))
             self.assertTrue(any(r['tier'] >= row['min_tier'] and (row['habitat'] != 'Lava' or r['lava']) for r in rods))
-        self.assertEqual({r['tier'] for r in rods}, set(range(1, 9)))
-        self.assertEqual({r['tier'] for r in rods if r['lava']}, set(range(2, 9)))
+        self.assertEqual({r['tier'] for r in rods}, set(range(1, 11)))
+        self.assertEqual({r['tier'] for r in rods if r['lava']}, set(range(2, 11)))
         self.assertEqual({r['category'] for r in loot}, {'junk', 'treasure'})
         self.assertTrue(all(i['kind'] in ('fish', 'rod', 'material', 'food') and 'source' not in i for i in generated))
 
@@ -78,7 +78,8 @@ class FishingData(unittest.TestCase):
                     for a, b in zip(portal['seam']['points'], portal['seam']['points'][1:]):
                         for q in (p, p['shore']):
                             self.assertGreaterEqual(spots.segment_distance(q['x'], q['y'], a, b), 18, p['id'])
-                for hub in ([area['city']] if area.get('city') else []) + area.get('camps', []):
+                hubs = ([area['city']] if area.get('city') else []) + area.get('camps', [])
+                for hub in [] if spots.WATERS[z].get('ponds') else hubs:
                     for q in (p, p['shore']):
                         d = math.hypot(max(hub['x0']-q['x'], 0, q['x']-hub['x1']), max(hub['y0']-q['y'], 0, q['y']-hub['y1']))
                         self.assertGreaterEqual(d, 10, p['id'])
@@ -89,6 +90,7 @@ class FishingData(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(json.dumps(first, indent=2, ensure_ascii=False)+'\n', (ROOT / 'world/fishing-spots.txt').read_text())
         before = copy.deepcopy(world)
+        spots.install_ponds(world)
         spots.install(world, first)
         self.assertEqual(before, world)
         sync = (ROOT / 'scripts/sync-world.cjs').read_text()

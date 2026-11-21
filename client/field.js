@@ -4163,16 +4163,17 @@
     const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
     const shimmer = o => .5 + .5 * Math.sin(t * .8 + o.x * .45 + o.y * .33);
     const river = !ghost && zdef.theme === 'wyrd', frost = !ghost && zdef.theme === 'frost', meadow = ghost || zone === 0 || zdef.theme === 'sunward';
-    pass(1.36, meadow ? '#a1ad65' : frost ? '#e8f3fb' : river ? '#3c2c1c' : '#2c2a1c');
-    pass(1.2, meadow ? '#74a57b' : frost ? '#a9d2ec' : river ? '#6a7a3a' : '#3c5a30');
-    pass(1.04, o => meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : frost ? `hsl(${204 + shimmer(o) * 8}, 66%, ${48 + shimmer(o) * 6}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
-    pass(.8, o => meadow ? `hsl(${199 + shimmer(o) * 7}, 60%, ${36 + shimmer(o) * 5}%)` : frost ? `hsl(${213 + shimmer(o) * 8}, 74%, ${30 + shimmer(o) * 5}%)` : river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
+    const hue = !ghost ? window.FISHING_WATERS?.[zone]?.hue : undefined;
+    pass(1.36, hue != null ? `hsl(${hue}, 23%, 24%)` : meadow ? '#a1ad65' : frost ? '#e8f3fb' : river ? '#3c2c1c' : '#2c2a1c');
+    pass(1.2, hue != null ? `hsl(${hue}, 39%, 43%)` : meadow ? '#74a57b' : frost ? '#a9d2ec' : river ? '#6a7a3a' : '#3c5a30');
+    pass(1.04, o => hue != null ? `hsl(${hue + shimmer(o) * 6}, 58%, 48%)` : meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : frost ? `hsl(${204 + shimmer(o) * 8}, 66%, ${48 + shimmer(o) * 6}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
+    pass(.8, o => hue != null ? `hsl(${hue + shimmer(o) * 6}, 61%, 30%)` : meadow ? `hsl(${199 + shimmer(o) * 7}, 60%, ${36 + shimmer(o) * 5}%)` : frost ? `hsl(${213 + shimmer(o) * 8}, 74%, ${30 + shimmer(o) * 5}%)` : river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
     for (const [o, sx, sy] of rows) {
       const k = (o.x * 7 + o.y * 13) | 0;
       if (k % 3 === 0 && !frost) {                                                  // an expanding ripple ring
         const ph = (t * .35 + (k % 7) * .13) % 1; g.strokeStyle = `rgba(150,210,210,${.38 * (1 - ph)})`; g.lineWidth = 1.4; g.beginPath(); g.ellipse(sx + Math.sin(k) * 10, sy + Math.cos(k) * 4, 6 + ph * 26, 2.6 + ph * 11, 0, 0, 6.283); g.stroke();
       }
-      if (meadow) {
+      if (meadow || hue != null) {
         const gl = .35 + .22 * Math.sin(t * 1.3 + k);
         g.strokeStyle = `rgba(235,255,255,${gl})`; g.lineWidth = 1.5; g.beginPath();
         g.moveTo(sx - ex(o) * .4, sy - ey(o) * .1); g.lineTo(sx + ex(o) * .12, sy - ey(o) * .1); g.stroke();
@@ -4967,7 +4968,7 @@
       City.animateObject(g, o, sx, sy, t);
     }
     if (zdef.dock) window.MeadowDock?.draw(g, zdef, w2s, t);      // Greenmeadow's landing pier and its ship (meadowdock.js)
-    if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost') drawWater(g, t);
+    if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost' || window.FISHING_WATERS?.[zone]?.ponds) drawWater(g, t);
     if (map.ghostWater?.length) drawWater(g, t, true);
     window.Enchanting?.drawFields(g, enchantFields, w2s, TW, TH, VW, VH);
     drawFishing(g, true);      // rich markers must be above the painted water, below people
@@ -5429,6 +5430,7 @@
     }
     for (const o of objects) {
       if (o.kind === 'post' || o.kind === 'void') continue;
+      if (o.fishingWater) { g.fillStyle = '#65cce8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2.5, o.r * k), 0, Math.PI * 2); g.fill(); continue; }
       if (o.kind === 'ew_lava') {g.fillStyle='#ed864a';g.beginPath();g.arc(o.x*k,o.y*k,o.r*k,0,Math.PI*2);g.fill();continue;}
       if (moonwell) {g.fillStyle=o.kind==='moonmirror'?'#f8e8ad':o.kind==='moonlily'?'#c6e4d6':'#9af2d7';g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4);continue;}
       if (orrery) { g.fillStyle = o.kind === 'clockwall' ? '#c8aa80' : o.kind === 'blackspire' ? '#778399' : o.kind === 'stillpoint' ? '#d3b683' : '#9b8693'; g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4); continue; }

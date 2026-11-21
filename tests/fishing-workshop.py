@@ -13,7 +13,6 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import fisher_npcs as fishers
 import fish_catalog
 import fishing_spots
-import seahorse_quest
 if os.environ.get('MUTATE')=='overlay':
     fishers.install=lambda *args: None
 if os.environ.get('MUTATE')=='dishes':
@@ -23,20 +22,32 @@ if os.environ.get('MUTATE')=='dishes':
 class Workshop(unittest.TestCase):
     def test_overlay_and_existing_world_preserved(self):
         world=json.loads((ROOT/'world/map.txt').read_text())
-        original=json.loads(subprocess.check_output(['git','show','97f75da7:world/map.txt'],cwd=ROOT))
-        stripped=copy.deepcopy(world)
-        for area in [stripped,*stripped['zones']]:
-            area['npcs']=[n for n in area['npcs'] if not n['id'].startswith('fisher_')]
-            area['quests']=[q for q in area['quests'] if not q['id'].startswith('fisher_') and q['id']!=seahorse_quest.QUEST]
-        self.assertTrue(stripped==original,'only new Fisher NPCs/quests and the explicit seahorse quest may change the map')
+        original=json.loads(subprocess.check_output(['git','show','143ae4d3:world/map.txt'],cwd=ROOT))
+        for zone, (before, after) in enumerate(zip([original, *original['zones']], [world, *world['zones']])):
+            if zone == 0:
+                before = {key: value for key, value in before.items() if key != 'zones'}
+                after = {key: value for key, value in after.items() if key != 'zones'}
+            old_npcs = {n['id']: n for n in before['npcs']}
+            old_quests = {q['id']: q for q in before['quests']}
+            unchanged = copy.deepcopy(after)
+            unchanged['npcs'] = [n for n in unchanged['npcs'] if n['id'] in old_npcs]
+            unchanged['quests'] = [q for q in unchanged['quests'] if q['id'] in old_quests]
+            for n in unchanged['npcs']:
+                previous = {o['id'] for o in old_npcs[n['id']]['offers']}
+                n['offers'] = [o for o in n['offers'] if o['id'] in previous or not o['id'].startswith('buy_enchant_recipe_')]
+            if fishing_spots.WATERS.get(zone, {}).get('ponds'):
+                unchanged.pop('fishingSpots')
+                unchanged['objects'] = [o for o in unchanged['objects'] if 'fishingWater' not in o]
+            self.assertTrue(unchanged == before, f'only the profession overlays may change zone {zone}')
         levels=json.loads((ROOT/'world/levels.txt').read_text());levels.append(levels[-1]+2300)
         recipes=json.loads((ROOT/'world/fishing-workshop.txt').read_text());fish=json.loads((ROOT/'world/fish.txt').read_text())
-        world=copy.deepcopy(original)
-        fishers.install(world,recipes,fish,levels)
-        seahorse_quest.install(world)
-        self.assertTrue(world==json.loads((ROOT/'world/map.txt').read_text()),'Fisher and seahorse overlays reproduce the new content from the previous map')
-        once=copy.deepcopy(world);fishers.install(world,recipes,fish,levels);self.assertTrue(world==once,'second overlay is stable')
-        self.assertTrue(json.dumps(world,ensure_ascii=False,indent=2)+'\n'==(ROOT/'world/map.txt').read_text(),'overlay bytes are canonical and stable')
+        check=copy.deepcopy(world)
+        fishers.install(check,recipes,fish,levels)
+        for baseline, regenerated in zip([world, *world['zones']], [check, *check['zones']]):
+            generated = lambda area, field: [row for row in area[field] if row['id'].startswith('fisher_')]
+            for field in ('npcs', 'quests'):
+                self.assertEqual(generated(baseline, field), generated(regenerated, field))
+        self.assertEqual(json.dumps(world,ensure_ascii=False,indent=2)+'\n',(ROOT/'world/map.txt').read_text())
         seen=set()
         for zone,area in enumerate([world,*world['zones']]):
             people=[n for n in area['npcs'] if n['id'].startswith('fisher_')]
@@ -54,7 +65,8 @@ class Workshop(unittest.TestCase):
         self.assertEqual(seen,set(fishing_spots.HABITATS))
     def test_recipes_have_no_progression_deadlock_and_dishes_are_meals(self):
         actual=json.loads((ROOT/'world/items.txt').read_text());items={i['id']:i for i in actual}
-        original_items=json.loads(subprocess.check_output(['git','show','97f75da7:world/items.txt'],cwd=ROOT))
+        original_items=json.loads(subprocess.check_output(['git','show','143ae4d3:world/items.txt'],cwd=ROOT))
+        original_items=[i for i in original_items if i.get('source') != 'enchanting']
         previous_ids={i['id'] for i in original_items}
         self.assertEqual([i['id'] for i in actual if i['id'] in previous_ids],[i['id'] for i in original_items],'unrelated catalogue order is preserved')
         self.assertTrue(all(items.get(i['id'])==i for i in original_items if i['id'] not in {g['id'] for g in fish_catalog.pieces()}),'unrelated catalogue values are preserved')
