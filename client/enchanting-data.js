@@ -1,0 +1,32 @@
+'use strict';
+window.ENCHANTING = {
+  "tiers": [
+    {"rarity":"rare", "skill":1, "craftCap":25, "minEnemyLevel":10, "dropChance":0.0125, "vendorPrice":250000},
+    {"rarity":"epic", "skill":25, "craftCap":60, "minEnemyLevel":35, "dropChance":0.006, "vendorPrice":1000000},
+    {"rarity":"legendary", "skill":60, "craftCap":100, "minEnemyLevel":65, "dropChance":0.0025, "vendorPrice":4000000}
+  ],
+  "materials": [
+    {"id":"enchant_dust", "name":"Enchanting Dust", "rarity":"uncommon", "yield":2, "skillCap":25},
+    {"id":"enchant_essence", "name":"Enchanting Essence", "rarity":"rare", "yield":2, "skillCap":60},
+    {"id":"enchant_shard", "name":"Enchanting Shard", "rarity":"epic", "yield":2, "skillCap":100},
+    {"id":"enchant_core", "name":"Enchanting Core", "rarity":"legendary", "yield":1, "skillCap":100}
+  ],
+  "enchants": [
+    {"id":"double_tap", "name":"Double Tap", "kind":"weapon", "tier":0, "cooldown":3, "cost":[4,2,0,0], "effect":"Basic hits have a 20% chance to strike again for 50% basic-hit damage."},
+    {"id":"quickhands", "name":"Quickhands", "kind":"gloves", "tier":0, "cooldown":16, "cost":[4,2,0,0], "effect":"Basic hits have a 15% chance to grant 15% attack speed for 8 seconds."},
+    {"id":"brace", "name":"Brace", "kind":"armor", "tier":0, "cooldown":30, "cost":[4,2,0,0], "effect":"A hit that drops you below 50% health grants a barrier for 8% of maximum health for 5 seconds."},
+    {"id":"second_wind", "name":"Second Wind", "kind":"necklace", "tier":0, "cooldown":10, "cost":[4,2,0,0], "effect":"An experience-granting kill restores 4% of maximum health and 5% of your primary resource."},
+    {"id":"slipstream", "name":"Slipstream", "kind":"cloak", "tier":0, "cooldown":12, "cost":[4,2,0,0], "effect":"Dodging grants 20% movement speed for 3 seconds."},
+    {"id":"arcane_bulwark", "name":"Arcane Bulwark", "kind":"armor", "tier":1, "cooldown":60, "cost":[6,4,2,0], "effect":"A hit that drops you below 40% health grants a barrier for 20% of maximum health for 6 seconds."},
+    {"id":"spellweaver", "name":"Spellweaver", "kind":"gloves", "tier":1, "cooldown":12, "cost":[6,4,2,0], "effect":"Three basic hits in 8 seconds make your next skill within 5 seconds cost 30% less. Cooldown starts on use."},
+    {"id":"shieldbreaker", "name":"Shieldbreaker", "kind":"weapon", "tier":1, "cooldown":10, "cost":[6,4,2,0], "effect":"Hit the same enemy with two different skills in 5 seconds. Your next basic hit on it deals 60% bonus damage."},
+    {"id":"passing_spark", "name":"Passing Spark", "kind":"accessory", "tier":1, "cooldown":12, "cost":[6,4,2,0], "effect":"Your first eligible basic hit marks its target. Defeating it deals 40% basic-hit damage to the nearest other monster within 5 tiles and passes the mark. Both ring slots share 12 seconds between fresh marks."},
+    {"id":"guardian_thread", "name":"Guardian Thread", "kind":"necklace", "tier":1, "cooldown":25, "cost":[6,4,2,0], "effect":"Healing a party member below 40% health grants them a barrier for 10% of their maximum health for 5 seconds."},
+    {"id":"shake_it_off", "name":"Shake It Off", "kind":"pants", "tier":1, "cooldown":25, "cost":[6,4,2,0], "effect":"Halve an enemy slow's remaining duration. When it ends, gain 25% movement speed for 3 seconds."},
+    {"id":"lightning_rod", "name":"Lightning Rod", "kind":"weapon", "tier":2, "cooldown":12, "cost":[10,8,6,1], "effect":"Every fifth basic hit plants a rod for 5 seconds. Your next damaging skill on a monster within 4 tiles calls lightning on up to three nearby monsters for 45% basic-hit damage each."},
+    {"id":"rise_from_ash", "name":"Rise from Ash", "kind":"armor", "tier":2, "cooldown":300, "cost":[10,8,6,1], "effect":"Survive a lethal monster hit at 1 health and gain a barrier for 15% of maximum health for 4 seconds. Break line of sight with the attacker while the barrier holds to heal 20% of maximum health."},
+    {"id":"borrowed_time", "name":"Borrowed Time", "kind":"headgear", "tier":2, "cooldown":35, "cost":[10,8,6,1], "effect":"Cast three different skills within 8 seconds. Your next skill within 6 seconds starts with half its normal cooldown. Cooldown starts on use."},
+    {"id":"moonstep", "name":"Moonstep", "kind":"cloak", "tier":2, "cooldown":35, "cost":[10,8,6,1], "effect":"A dodge leaves a decoy that draws nearby ordinary monsters for 3 seconds, then grants 30% movement speed for 3 seconds."},
+    {"id":"heartwood_grove", "name":"Heartwood Grove", "kind":"shoulders", "tier":2, "cooldown":90, "cost":[10,8,6,1], "effect":"A hit that drops you below 40% health grows a visible grove for 6 seconds. You and allies inside heal 2% of your own maximum health each second."}
+  ]
+};

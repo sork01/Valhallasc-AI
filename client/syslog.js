@@ -39,7 +39,8 @@
     if (current !== 'system') $('tab-system').classList.add('unread');
   }
   const enemyName = kind => (window.Field?.enemyName?.(kind)) || kind || 'something';
-  const skillName = id => (window.WORLD_SKILLS || []).find(s => s.id === id)?.name || id;
+  const skillName = id => (id?.startsWith('enchant_proc_') && window.Enchanting?.name(id.slice('enchant_proc_'.length)))
+    || (window.WORLD_SKILLS || []).find(s => s.id === id)?.name || id;
   const itemName = id => (window.WORLD_ITEMS || []).find(i => i.id === id)?.name || id;
   const rarityOf = id => { const i = (window.WORLD_ITEMS || []).find(x => x.id === id); return i ? { name: i.name, rarity: i.rarity } : null; };
   const who = (kind, level) => `${enemyName(kind)}${level ? ` (Lv ${level})` : ''}`;

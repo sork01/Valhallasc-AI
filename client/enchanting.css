@@ -1,0 +1,31 @@
+#merchant-bags #enchanting-toggle { display: none; }
+
+#stage .bag-window.enchanting-open > :is(.bag-tabs, .bag-grid, .bag-details, .bag-footer, .bag-instructions),
+#stage .bag-window.enchanting-open .bag-toolbar > :not(#enchanting-toggle) { display: none; }
+
+.enchanting-panel {
+  overflow: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+  padding: .65rem .9rem 1rem;
+  color: #f3e4c9;
+}
+.enchanting-panel h4 { margin: 0 0 .35rem; font-size: 1.15rem; color: #e6bb81; }
+.enchanting-panel p { margin: .28rem 0; }
+.enchanting-panel small { color: #dad0c2; }
+.enchanting-modes { display: flex; gap: .3rem; flex-wrap: wrap; margin: .6rem 0; }
+.enchanting-modes [aria-pressed="true"], #enchanting-toggle[aria-expanded="true"] {
+  border-color: #c6a9ec;
+  background: #382c49;
+  color: #f3e7ff;
+}
+.enchanting-form { display: grid; gap: .42rem; min-width: 0; }
+.enchanting-field { display: grid; gap: .18rem; min-width: 0; }
+.enchanting-field select { width: 100%; min-width: 0; }
+.enchanting-form > button { justify-self: start; }
+.enchanting-status { color: #ead0a0; min-height: 1.15em; }
+.enchanting-status:empty { display: none; }
+.enchanting-cost { margin: .15rem 0; padding-left: 1.15rem; }
+.enchanting-cost [data-short="true"] { color: #ffa7a7; }
+.enchanting-note { border-top: 1px solid #9480af66; padding-top: .3rem; margin-top: .25rem; }
+.enchanting-note .enchanting-name { color: #d5bbf5; }

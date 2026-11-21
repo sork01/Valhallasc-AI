@@ -1672,6 +1672,7 @@
       Field.error('Out of line of sight.'); blockedAttack.warned = now;
     }
   }
+  let enchantFields = [];
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
     window.DayNight?.sync(packet.worldTime);
@@ -1819,6 +1820,7 @@
       return { ...c, dead: true, ghost: false, isCorpse: true, deadT: 99, moving: false, atkT: 0, hurtT: 0, sprite: c.id === Online.id ? mageSpr : entry.sprite };
     });
     for (const cid of corpseSprites.keys()) if (!seenCorpses.has(cid)) corpseSprites.delete(cid);
+    enchantFields = packet.enchantFields || [];
     chests = (packet.chests || []).filter(inZone).map(c => ({...c, expiresAt:tAll+c.left}));
     signs = (packet.signs || []).map(s => ({ ...s, sign: true }));   // the boss signs (BOSSMECH-SIGN-ENGINE): read like a townsperson
     if (pendingChest && !chests.some(c => c.id === pendingChest.id)) { pendingChest = null; cityRoute = []; }
@@ -1837,6 +1839,10 @@
     }
     if (event.kind === 'emberSummon') { effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:1,grow:1.5,col:'#ffad59'}); say('enemyAttack',{kind:'cf_eldmarr',boss:true,level:99,x:event.x,y:event.y}); }
     if (event.kind === 'skill') skillFx(event);
+    if (event.kind === 'enchantEffect') {
+      const color = event.enchant === 'lightning_rod' ? '#b6dcff' : event.enchant === 'passing_spark' ? '#d6a5ff' : '#f1dfb0';
+      effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:event.duration,grow:event.radius,col:color,still:reducedMotion()});
+    }
     if (event.kind === 'forgeProc') {
       effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: .55, grow: .65, col: '#ff963d', still: reducedMotion() });
       if (event.weapon === 'mage' && event.effect === 'proc') effects.push({ kind: 'forgeOrb', actor: event.actor, x: event.x, y: event.y, t: 0, life: 6 });
@@ -4963,6 +4969,7 @@
     if (zdef.dock) window.MeadowDock?.draw(g, zdef, w2s, t);      // Greenmeadow's landing pier and its ship (meadowdock.js)
     if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost') drawWater(g, t);
     if (map.ghostWater?.length) drawWater(g, t, true);
+    window.Enchanting?.drawFields(g, enchantFields, w2s, TW, TH, VW, VH);
     drawFishing(g, true);      // rich markers must be above the painted water, below people
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);

@@ -482,5 +482,13 @@
   "Current rod: {0}": "Nuvarande spö: {0}",
   "Next upgrade: {0}": "Nästa uppgradering: {0}",
   "{0}% shorter waits · +{1}% rare catch bonus": "{0}% kortare väntetid · +{1}% bonus för sällsynta fångster",
-  "Transmogrified to: {0}": "Transmogrifierad till: {0:t}"
+  "Transmogrified to: {0}": "Transmogrifierad till: {0:t}",
+  "{0} · {1} or higher · {2} s cooldown": "{0} · {1} eller högre · {2} s nedkylning",
+  "{0} · Copy #{1} · {2}": "{0} · Exemplar nr {1} · {2}",
+  "Enchanting skill {0} / {1}": "Förtrollningsnivå {0} / {1}",
+  "Destroys this copy. You receive {0} × {1}.": "Det här exemplaret förstörs. Du får {0} × {1}.",
+  "Requires Enchanting skill {0}.": "Kräver förtrollningsnivå {0}.",
+  "{0} · {1} of {2} in bags": "{0} · {1} av {2} i väskorna",
+  "Replaces {0} on this copy.": "Ersätter {0} på det här exemplaret.",
+  "Permanently teaches the recipe · Crafting requires Enchanting skill {0}.": "Lär dig receptet permanent · Tillverkning kräver förtrollningsnivå {0}."
 }

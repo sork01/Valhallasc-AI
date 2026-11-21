@@ -355,6 +355,8 @@ pub struct Character {
     pub played_secs: f64,
     #[serde(default)]
     pub fishing: FishingLog,
+    #[serde(default)]
+    pub enchanting: crate::enchanting::Progress,
     pub gold: u32,
     pub kills: u32,
     #[serde(default)]
@@ -704,6 +706,7 @@ impl Character {
             equipment: Default::default(),
             wardrobe: Default::default(),
             gear_instances: vec![],
+            enchanting: Default::default(),
             next_gear_id: 1,
             bags: vec![],
             attributes: Attributes::default(),
@@ -1451,6 +1454,9 @@ pub fn quest_progress(character: &mut Character, quests: &[Quest], kind: &str, t
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ClientMessage {
+    Enchanting {
+        request: crate::enchanting::Command,
+    },
     Transmogrify {
         npc: String,
         changes: std::collections::BTreeMap<String, String>,
@@ -1727,6 +1733,11 @@ pub enum TradeCommand {
     },
     Offer {
         items: Vec<crate::items::ItemStack>,
+        gold: u32,
+    },
+    OfferCopies {
+        items: Vec<crate::items::ItemStack>,
+        copies: Vec<u64>,
         gold: u32,
     },
     Confirm,

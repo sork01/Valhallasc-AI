@@ -60,7 +60,7 @@ impl World {
                 let bonus = hierlooms::attributes(i, c.level).unwrap_or(bonus);
                 json!({"slot":slot,"item":i.id,"name":i.name,"rarity":rarity,"level":i.required_level,
                     "xpPercent":if hierlooms::is_hierloom(i) {100} else {0},
-                    "class":i.class,"attack":attack,"defense":defense,"bonus":bonus,"rank":rank,
+                    "enchant":copy.and_then(|g| g.enchant),"class":i.class,"attack":attack,"defense":defense,"bonus":bonus,"rank":rank,
                     "usable":i.required_level <= c.level && i.class.is_none_or(|k| k == c.look.class)})
             })
             .collect();
@@ -219,6 +219,7 @@ mod tests {
                 trade_until: 0,
                 trade_with: vec![],
                 wear: 0,
+                enchant: None,
             });
         }
         let at = open_spot(&w);

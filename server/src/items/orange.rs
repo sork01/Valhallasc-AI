@@ -98,6 +98,7 @@ pub fn roll_orange_boosted(
         trade_until: 0,
         trade_with: vec![],
         wear: 0,
+        enchant: None,
     })
 }
 

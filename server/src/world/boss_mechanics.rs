@@ -1105,10 +1105,6 @@ impl World {
         let value = (p.character.max_hp() * share * self.raid_support(session).taken_multiplier())
             .round()
             .max(1.);
-        if value >= p.character.hp {
-            self.mech_kill(session, ability, boss);
-            return;
-        }
         if p.frozen
             || p.is_hidden()
             || p.character.hp <= 0.
@@ -1126,10 +1122,27 @@ impl World {
         let actor = p.character.id.clone();
         let kind = self.slimes[boss].kind.clone();
         let level = self.slimes[boss].level;
+        let enchanted = self.enchant_pve(session);
         let p = self.players.get_mut(&session).unwrap();
+        let before = p.character.hp;
+        let value = if enchanted {
+            p.enchant_absorb(value, self.time)
+        } else {
+            value
+        };
         p.combat_left = 5.;
         p.character.mounted = false;
-        p.character.hp -= value;
+        p.character.hp = (before - value).max(0.);
+        if enchanted {
+            self.enchant_incoming(session, Some(boss), before, false, value.min(before));
+        }
+        let p = self.players.get_mut(&session).unwrap();
+        if p.character.hp <= 0. {
+            // The normal mechanic death still performs its own guard and corpse checks.
+            p.character.hp = before;
+            self.mech_kill(session, ability, boss);
+            return;
+        }
         p.last_hurt = self.time;
         p.hurt = 0.25;
         self.event_with(

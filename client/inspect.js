@@ -32,6 +32,7 @@
     t.replaceChildren(node('b', piece.name, 'item-name'), node('small', `${tr(RARITY[rarity] || 'Common')} · ${piece.class ? piece.class : tr('All classes')}`));
     t.dataset.rarity = rarity;
     const appearance = window.Transmog?.description(answer?.transmogs?.[piece.slot]);
+    window.Enchanting?.tooltip(t, Inventory.definition(piece.item) || {}, piece);
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
     t.append(node('p', stats(piece) || tr('No bonuses')));
     if (piece.xpPercent) t.append(node('p', tr('+100% XP while equipped')), node('p', tr('Stats grow with your level')), node('p', tr('Never loses durability')));

@@ -141639,5 +141639,293 @@
       "amount": 0.06,
       "duration": 600
     }
+  },
+  {
+    "id": "enchant_dust",
+    "name": "Enchanting Dust",
+    "rarity": "uncommon",
+    "kind": "material",
+    "sell": 10,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_essence",
+    "name": "Enchanting Essence",
+    "rarity": "rare",
+    "kind": "material",
+    "sell": 20,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_shard",
+    "name": "Enchanting Shard",
+    "rarity": "epic",
+    "kind": "material",
+    "sell": 30,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_core",
+    "name": "Enchanting Core",
+    "rarity": "legendary",
+    "kind": "material",
+    "sell": 40,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_double_tap",
+    "name": "Recipe: Double Tap",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_double_tap",
+    "name": "Scroll: Double Tap",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_quickhands",
+    "name": "Recipe: Quickhands",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_quickhands",
+    "name": "Scroll: Quickhands",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_brace",
+    "name": "Recipe: Brace",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_brace",
+    "name": "Scroll: Brace",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_second_wind",
+    "name": "Recipe: Second Wind",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_second_wind",
+    "name": "Scroll: Second Wind",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_slipstream",
+    "name": "Recipe: Slipstream",
+    "kind": "enchant_recipe",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_slipstream",
+    "name": "Scroll: Slipstream",
+    "kind": "enchant_scroll",
+    "rarity": "rare",
+    "sell": 25,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_arcane_bulwark",
+    "name": "Recipe: Arcane Bulwark",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_arcane_bulwark",
+    "name": "Scroll: Arcane Bulwark",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_spellweaver",
+    "name": "Recipe: Spellweaver",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_spellweaver",
+    "name": "Scroll: Spellweaver",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_shieldbreaker",
+    "name": "Recipe: Shieldbreaker",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_shieldbreaker",
+    "name": "Scroll: Shieldbreaker",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_passing_spark",
+    "name": "Recipe: Passing Spark",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_passing_spark",
+    "name": "Scroll: Passing Spark",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_guardian_thread",
+    "name": "Recipe: Guardian Thread",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_guardian_thread",
+    "name": "Scroll: Guardian Thread",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_shake_it_off",
+    "name": "Recipe: Shake It Off",
+    "kind": "enchant_recipe",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_shake_it_off",
+    "name": "Scroll: Shake It Off",
+    "kind": "enchant_scroll",
+    "rarity": "epic",
+    "sell": 50,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_lightning_rod",
+    "name": "Recipe: Lightning Rod",
+    "kind": "enchant_recipe",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_lightning_rod",
+    "name": "Scroll: Lightning Rod",
+    "kind": "enchant_scroll",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_rise_from_ash",
+    "name": "Recipe: Rise from Ash",
+    "kind": "enchant_recipe",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_rise_from_ash",
+    "name": "Scroll: Rise from Ash",
+    "kind": "enchant_scroll",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_borrowed_time",
+    "name": "Recipe: Borrowed Time",
+    "kind": "enchant_recipe",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_borrowed_time",
+    "name": "Scroll: Borrowed Time",
+    "kind": "enchant_scroll",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_moonstep",
+    "name": "Recipe: Moonstep",
+    "kind": "enchant_recipe",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_moonstep",
+    "name": "Scroll: Moonstep",
+    "kind": "enchant_scroll",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_recipe_heartwood_grove",
+    "name": "Recipe: Heartwood Grove",
+    "kind": "enchant_recipe",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
+  },
+  {
+    "id": "enchant_scroll_heartwood_grove",
+    "name": "Scroll: Heartwood Grove",
+    "kind": "enchant_scroll",
+    "rarity": "legendary",
+    "sell": 75,
+    "source": "enchanting"
   }
 ]

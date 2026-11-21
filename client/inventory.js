@@ -9,16 +9,20 @@
   let stacks = [], look = null, gearSlots = {}, bags = [], gearInstances = [], setCounts = {}, signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
   const bagPages = () => { let start = 0; return [{ name: 'Backpack', size: 16 }, ...bags.map(id => ({ name: definition(id)?.name || 'Bag', size: definition(id)?.bagSlots || 0 }))].map(bag => { const page = { ...bag, start }; start += bag.size; return page; }); };
   const capacity = () => bagPages().reduce((sum, b) => sum + b.size, 0);
-  let defSource = null, defLength = -1, defIndex = new Map(), defOrder = new Map();
+  let defSource = null, defLength = -1, defIndex = new Map(), defOrder = new Map(), legacyGear = new Map();
   let quantities = new Map();
   function indexDefinitions() {
     const source = window.WORLD_ITEMS || [];
     if (source === defSource && source.length === defLength) return;
     defSource = source; defLength = source.length;
-    defIndex = new Map(); defOrder = new Map();
+    defIndex = new Map(); defOrder = new Map(); legacyGear = new Map();
     for (const item of source) {
       // Match the old find() lookup if a fixture contains duplicate IDs.
       if (!defIndex.has(item.id)) { defOrder.set(item.id, defIndex.size); defIndex.set(item.id, item); }
+      if (item.variant && (item.kind === 'armor' || item.kind === 'weapon') && (item.class || item.source === 'orange_pool')) {
+        const key = [item.class || '', item.kind, item.variant].join('|');
+        if (!legacyGear.has(key)) legacyGear.set(key, item);
+      }
     }
   }
   const definition = id => { indexDefinitions(); return defIndex.get(id); };
@@ -30,7 +34,14 @@
   };
   const slotKind = slot => ({ chest: 'armor', hands: 'weapon', accessory1: 'accessory', accessory2: 'accessory' })[slot] || slot;
   const quantity = id => quantities.get(id) || 0;
-  const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number((!i.class || i.class === look?.class) && ['armor', 'weapon'].includes(i.kind) && look?.[look.class + (i.kind === 'armor' ? 'Armor' : 'Weapon')] === i.variant);
+  function legacyPiece(kind, equipmentLook) {
+    if (!equipmentLook || (kind !== 'armor' && kind !== 'weapon')) return undefined;
+    indexDefinitions();
+    const klass = equipmentLook.class;
+    const variant = equipmentLook[klass + (kind === 'armor' ? 'Armor' : 'Weapon')];
+    return legacyGear.get([klass, kind, variant].join('|')) || legacyGear.get(['', kind, variant].join('|'));
+  }
+  const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number(legacyPiece(i.kind, look)?.id === i.id);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
   const licence = i => i?.kind === 'mount_licence';
   const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
@@ -68,7 +79,10 @@
   const useItem = i => (consumable(i) || licence(i)) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
   // The server wears the first loose copy of an item: name the one in the chosen cell first (ordered messages, so it lands before the equip).
   const preferCopy = key => { const id = key == null ? null : cellCopyId(key); if (id != null && canEquip()) Online.send({ type: 'prefer_copy', copy: id }); };
-  const activate = (i, key) => consumable(i) || licence(i) ? useItem(i) : equip(i, undefined, key);
+  const activate = (i, key) => {
+    if (window.Enchanting?.isScroll(i)) return window.Enchanting.open(i.id);
+    return consumable(i) || licence(i) ? useItem(i) : equip(i, undefined, key);
+  };
   const num = n => Number(n.toFixed(1));
   const statNames = ['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy'];
   const levelStats = i => i?.rarity === 'hierloom' ? { ...i, rarity: undefined, bonusStats: Object.fromEntries(statNames.map(k => [k, (i.bonusStats?.[k] || 0) * heroLevel()])) } : i;
@@ -78,7 +92,7 @@
   const levelOf = i => i?.requiredLevel || 1;
   const tooLow = i => !!i && levelOf(i) > heroLevel();   // gear above the hero's level cannot be put on (the server refuses it too)
   const levelNote = i => tooLow(i) ? `Requires level ${levelOf(i)} (you are level ${heroLevel()})` : `Requires level ${levelOf(i)}`;
-  const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? WORLD_ITEMS.find(i => i.kind === slotKind(slot) && (i.class === look?.class || i.source === 'orange_pool') && look?.[look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === i.variant) : definition(gearSlots[slot]);
+  const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? legacyPiece(slotKind(slot), look) : definition(gearSlots[slot]);
   const appearanceForItem = i => Object.entries(transmogs).find(([slot]) => itemAtSlot(slot)?.id === i?.id)?.[1];
   const copiesOf = i => gearInstances.filter(g => g.item === i?.id);
   // A material no merchant pays for is a quest item: it can be neither sold nor traded.
@@ -181,6 +195,9 @@
       const tint = t ? `hue-rotate(${t.hue}deg) saturate(${t.saturate}) brightness(${t.brightness}) ` : '';
       return `<span class="item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-size:${cols * 100}% ${rows * 100}%;background-position:${cell[0] / (cols - 1) * 100}% ${cell[1] / (rows - 1) * 100}%${t ? `;filter:${tint}drop-shadow(1px 2px 1px #000b)` : ''}"></span>`;
     }
+    if (kind === 'enchant_recipe' || kind === 'enchant_scroll') {
+      return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 12h29l-6 35H13z" fill="#e5ca9a" stroke="#482e1b" stroke-width="3"/><path d="M21 21h20M19 28h17M17 35h10" stroke="#97744e" stroke-width="2"/><path d="m43 31 10 8-6 12-9-6-8 6 1-12z" fill="${kind === 'enchant_recipe' ? '#b15148' : '#8160bf'}" stroke="#482e1b" stroke-width="2"/></svg>`;
+    }
     const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : kind === 'weapon' && i?.class === 'priest' ? 'mace' : kind === 'weapon' && i?.class === 'hunter' ? 'bow' : i?.id === 'ironhide_shell' ? 'shell' : kind;
     const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b', mana_potion: '#5488ef' };
     const bagColors = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
@@ -207,11 +224,13 @@
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
     const appearance = window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
+    const scroll = window.Enchanting?.isScroll(i);
+    window.Enchanting?.tooltip(t, i, (where || slot || cellCopy) ? copy : undefined);
     if (i.kind === 'rod') t.append(...rodDetails(i).map(text => node('p', text)));
     else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
-    else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
+    else if (i.kind !== 'material' && !scroll) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if ((compatible(i) || i.kind === 'rod') && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (i.rarity === 'hierloom') t.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
@@ -258,7 +277,7 @@
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
-    t.append(node('small', where ? where.hint : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
@@ -332,6 +351,8 @@
     if (!i || !quantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
     const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = cellCopy?.rarity || displayRarity(i);
     container.append(heading, node('small', summary(i, gearItem(i) ? 1 : quantity(i.id), cellCopy)));
+    window.Enchanting?.tooltip(container, i, cellCopy);
+    if (window.Enchanting?.isScroll(i)) container.append(button('Open Enchanting', () => window.Enchanting.open(i.id), 'item-action'));
     if (i.rarity === 'hierloom') container.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
     if (setEntry(i)) container.append(...setLines(i.source));
     if (i.source === 'orange_pool' || copiesOf(i).some(g => g.rarity !== i.rarity)) {
@@ -471,7 +492,7 @@
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(cellId(a)).kind.localeCompare(definition(cellId(b)).kind) || definition(cellId(a)).name.localeCompare(definition(cellId(b)).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
   window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
-    icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
+    icon, definition, legacyPiece, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
       if (!look) return;

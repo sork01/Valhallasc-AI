@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.4.0",
+    "date": "2026-11-21",
+    "new": [
+      "Learn Enchanting from your bags. Disenchant equipment for materials and use learned recipes to make rare, epic and legendary enchant scrolls.",
+      "Find recipe scrolls on monsters or buy them from Transmog Masters. Trade crafted scrolls with other players and apply them to eligible equipment without learning the profession.",
+      "Enchantments stay with the equipment copy. Preview the effect and cost before applying it, and see the effect and cooldown on the item tooltip."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.3.0",
     "date": "2026-11-20",
     "new": [

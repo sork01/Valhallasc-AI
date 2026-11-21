@@ -1,10 +1,11 @@
 'use strict';
-// The server owns trade invitations, offers and the final exchange. This panel sends only item ids and quantities.
+// The server owns trade invitations, offers and the final exchange.
 (() => {
   const $ = id => document.getElementById(id);
   const send = command => Online.send({ type: 'trade', command });
+  const offerDraft = () => send({ op: 'offer_copies', items: draft.items, copies: draft.copies.map(g => g.id), gold: draft.gold });
   const catalog = new Map((window.WORLD_ITEMS || []).map(i => [i.id, i]));
-  let state = null, character = null, characterKey = '', draft = { items: [], gold: 0 };
+  let state = null, character = null, characterKey = '', draft = { items: [], copies: [], gold: 0 };
   const make = (tag, text) => { const n = document.createElement(tag); n.textContent = text; return n; };
   const label = id => catalog.get(id)?.name || id;
   const available = id => {
@@ -12,10 +13,7 @@
     if (!stack || !i || i.starter || i.rarity === 'gm') return 0;
     let worn = Object.values(character.equipment || {}).filter(x => x === id).length;
     const look = character.equippedLook || character.look;
-    if ((!i.class || i.class === look.class) && (i.kind === 'armor' || i.kind === 'weapon')) {
-      const slot = look.class + (i.kind === 'armor' ? 'Armor' : 'Weapon');
-      if (look[slot] === i.variant) worn++;
-    }
+    if (window.Inventory?.legacyPiece(i.kind, look)?.id === id) worn++;
     return Math.max(0, stack.quantity - worn);
   };
   // Class gear is bound to its owner; a rolled copy can be handed to a voter of its roll for two hours (the server decides).
@@ -28,6 +26,12 @@
   };
   // How many of `id` the picker may offer right now.
   const tradeable = id => { const i = catalog.get(id); return i && bound(i) ? windowCopies(id).length : available(id); };
+  function exactCopies(id) {
+    const item = catalog.get(id);
+    if (bound(item)) return windowCopies(id);
+    const worn = (character?.inventory?.find(s => s.item === id)?.quantity || 0) - available(id);
+    return (character?.gearInstances || []).filter(g => g.item === id).slice(worn);
+  }
   const timeLeft = seconds => {
     const minutes = Math.max(1, Math.ceil(seconds / 60)), h = Math.floor(minutes / 60);
     return h ? `${h} h ${minutes % 60} min` : `${minutes} min`;
@@ -36,11 +40,18 @@
     const list = $(id); list.replaceChildren();
     for (const stack of offer?.items || []) {
       const row = make('li', `${label(stack.item)} ×${stack.quantity}`);
+      for (const gear of (offer.gear || []).filter(g => g.item === stack.item && g.enchant)) {
+        const detail = make('span', ' · ' + window.Enchanting?.name(gear.enchant));
+        detail.tabIndex = 0;
+        Inventory.attachTooltip(detail, () => catalog.get(gear.item), undefined, () => ({ copies: [gear], count: 1, in:'Trade', hint:'' }));
+        row.append(detail);
+      }
       if (own) {
         const remove = make('button', 'Remove'); remove.type = 'button'; remove.className = 'window-tool';
         remove.addEventListener('click', () => {
           draft.items = draft.items.filter(s => s.item !== stack.item);
-          send({ op: 'offer', items: draft.items, gold: draft.gold });
+          draft.copies = draft.copies.filter(g => g.item !== stack.item);
+          offerDraft();
         });
         row.append(remove);
       }
@@ -79,6 +90,15 @@
         option.title = 'Class gear is bound to its owner. It can only be sold.'; $('trade-item').append(option); continue;
       }
       const option = make('option', `${label(stack.item)} (${open})`); option.value = stack.item; $('trade-item').append(option);
+      for (const gear of exactCopies(stack.item)) {
+        const enchant = window.Enchanting?.name(gear.enchant);
+        if (!enchant) continue;
+        const copy = make('option', Locale.translate('{0} · Copy #{1} · {2}'.replace('{0}', label(gear.item)).replace('{1}', gear.id).replace('{2}', enchant)));
+        copy.dataset.item = gear.item;
+        copy.dataset.copy = String(gear.id);
+        copy.value = [gear.item, gear.id].join('@');
+        $('trade-item').append(copy);
+      }
       if (i && bound(i)) {
         const until = Math.min(...windowCopies(stack.item).map(g => g.tradeUntil));
         option.title = `Tradeable for ${timeLeft(until - Date.now() / 1000)} with the party of the roll`;
@@ -90,7 +110,7 @@
   }
   function close() {
     const wasOpen = !$('trade-panel').hidden;
-    state = null; draft = { items: [], gold: 0 }; render();
+    state = null; draft = { items: [], copies: [], gold: 0 }; render();
     if (wasOpen) Field.setPaused(false);
   }
   function request(id) {
@@ -111,7 +131,7 @@
   function onPacket(packet) {
     if (packet.state === 'closed' || packet.state === 'complete') { close(); return; }
     if (!state || state.partner?.id !== packet.partner?.id || state.state !== 'open' && packet.state === 'open')
-      draft = { items: [...(packet.mine?.items || [])], gold: packet.mine?.gold || 0 };
+      draft = { items: [...(packet.mine?.items || [])], copies: [], gold: packet.mine?.gold || 0 };
     state = packet;
     if (packet.state === 'pending' || packet.state === 'open') {
       closeOtherPanels(); Field.setPaused(true);
@@ -124,14 +144,23 @@
   $('trade-cancel').addEventListener('click', () => send({ op: 'cancel' }));
   $('trade-confirm').addEventListener('click', () => send({ op: 'confirm' }));
   $('trade-set-item').addEventListener('click', () => {
-    const id = $('trade-item').value, quantity = Number($('trade-quantity').value);
+    const option = $('trade-item').selectedOptions[0];
+    const id = option?.dataset.item || option?.value;
+    const copy = option?.dataset.copy && exactCopies(id).find(g => String(g.id) === option.dataset.copy);
+    const quantity = copy ? 1 : Number($('trade-quantity').value);
     if (!id || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > tradeable(id)) {
       $('trade-status').textContent = 'Choose an item quantity you can trade.'; return;
     }
     const items = draft.items.filter(s => s.item !== id);
-    items.push({ item: id, quantity });
+    if (copy) {
+      if (!draft.copies.some(g => g.id === copy.id)) draft.copies.push(copy);
+      items.push({ item: id, quantity: draft.copies.filter(g => g.item === id).length });
+    } else {
+      draft.copies = draft.copies.filter(g => g.item !== id);
+      items.push({ item: id, quantity });
+    }
     draft.items = items;
-    send({ op: 'offer', items, gold: draft.gold });
+    offerDraft();
   });
   Money.preview($('trade-gold'));
   $('trade-set-gold').addEventListener('click', () => {
@@ -140,7 +169,7 @@
       $('trade-status').textContent = 'Choose an amount of copper you have.'; return;
     }
     draft.gold = gold;
-    send({ op: 'offer', items: draft.items, gold });
+    offerDraft();
   });
   $('trade-panel').addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); send({ op: 'cancel' }); }

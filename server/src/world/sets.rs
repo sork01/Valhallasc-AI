@@ -60,7 +60,7 @@ impl Pending {
 
 impl World {
     /// A fixed, noncritical basic hit is the reference for small signature damage.
-    fn set_basic_damage(&self, session: u64) -> f64 {
+    pub(super) fn set_basic_damage(&self, session: u64) -> f64 {
         (self.raid_attack_power(session) * DAMAGE_DEALT_SCALE)
             .round()
             .max(1.)

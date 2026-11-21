@@ -28,6 +28,8 @@ pub(super) struct EnemyBolt {
     damage: f64,
     #[serde(skip)]
     level: u32,
+    #[serde(skip)]
+    attacker: usize,
 }
 
 impl World {
@@ -65,13 +67,14 @@ impl World {
                 life: (r.range + BOLT_OVERSHOOT) / r.speed,
                 damage,
                 level,
+                attacker: id,
             });
         }
     }
 
     pub(super) fn update_enemy_bolts(&mut self) {
         let mut bolts = std::mem::take(&mut self.enemy_bolts);
-        let mut hits: Vec<(u64, f64, Point, String, u32)> = vec![];
+        let mut hits = vec![];
         bolts.retain_mut(|b| {
             let start = Point { x: b.x, y: b.y };
             b.x += b.fx * b.speed * TICK;
@@ -103,14 +106,14 @@ impl World {
                     x: point.x - b.fx,
                     y: point.y - b.fy,
                 };
-                hits.push((session, b.damage, from, b.kind.clone(), b.level));
+                hits.push((session, b.damage, from, b.kind.clone(), b.level, b.attacker));
                 return false;
             }
             true
         });
         self.enemy_bolts = bolts;
-        for (session, damage, at, kind, level) in hits {
-            self.hurt_player_by(session, damage, at, &kind, level);
+        for (session, damage, at, kind, level, attacker) in hits {
+            self.hurt_monster_player(session, damage, at, &kind, level, Some(attacker));
         }
     }
 }
@@ -152,6 +155,7 @@ mod daze_tests {
                 speed: 24.,
                 life: 1.,
                 damage: 1.,
+                attacker: 0,
                 level: 1,
             });
             w.update_enemy_bolts();

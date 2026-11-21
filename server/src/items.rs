@@ -245,6 +245,7 @@ pub fn set_piece_copy(piece: &Item, roll: f64) -> Option<GearInstance> {
         trade_until: 0,
         trade_with: vec![],
         wear: 0,
+        enchant: None,
     })
 }
 /// One independent bag roll per enemy defeat, including elites and dungeon bosses.
@@ -1179,14 +1180,15 @@ impl Character {
     }
     pub fn equipped_count(&self, i: &Item) -> u32 {
         let extras = self.equipment.values().filter(|id| *id == &i.id).count() as u32;
-        if i.class != Some(self.look.class) && i.source.as_deref() != Some("orange_pool") {
-            return extras;
-        }
         let (armor, weapon) = self.gear();
+        let variant = match i.kind.as_str() {
+            "armor" => armor,
+            "weapon" => weapon,
+            _ => return extras,
+        };
         extras
             + u32::from(
-                matches!(i.kind.as_str(), "armor" | "weapon")
-                    && i.variant.as_deref() == Some(if i.kind == "armor" { armor } else { weapon }),
+                equipment(self.look.class, &i.kind, variant).is_some_and(|worn| worn.id == i.id),
             )
     }
     /// Whether `i` beats what this character wears in its slot (attack plus defense; an empty slot loses to any
@@ -1644,6 +1646,7 @@ impl Character {
         }
         next.sync_look();
         next.check_required_levels(self)?;
+        next.preserve_ring_copies(self);
         for i in ITEMS.iter() {
             if next.equipped_count(i) > next.quantity(&i.id) {
                 if i.kind == "armor" || i.kind == "weapon" {

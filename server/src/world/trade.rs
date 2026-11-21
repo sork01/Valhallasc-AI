@@ -10,6 +10,7 @@ const MAX_OFFER_STACKS: usize = 12;
 #[derive(Clone, Debug, Default)]
 struct Offer {
     items: Vec<ItemStack>,
+    gear: Vec<GearInstance>,
     gold: u32,
     ready: bool,
 }
@@ -73,8 +74,8 @@ impl World {
             if let Some(p) = self.online(id) {
                 let other = t.other(id);
                 let packet = json!({"type":"trade","state":if t.accepted { "open" } else if side == 0 { "pending" } else { "request" },
-                    "partner":{"id":other,"name":self.name_of(other)},"mine":{"items":t.offers[side].items,"gold":t.offers[side].gold,"ready":t.offers[side].ready},
-                    "theirs":{"items":t.offers[1-side].items,"gold":t.offers[1-side].gold,"ready":t.offers[1-side].ready},
+                    "partner":{"id":other,"name":self.name_of(other)},"mine":{"items":t.offers[side].items,"gear":t.offers[side].gear.iter().map(offer_copy_view).collect::<Vec<_>>(),"gold":t.offers[side].gold,"ready":t.offers[side].ready},
+                    "theirs":{"items":t.offers[1-side].items,"gear":t.offers[1-side].gear.iter().map(offer_copy_view).collect::<Vec<_>>(),"gold":t.offers[1-side].gold,"ready":t.offers[1-side].ready},
                     "left":(t.expires-self.time).max(0.)});
                 let _ = p.peer.try_send(packet);
             }
@@ -115,7 +116,12 @@ impl World {
             TradeCommand::Request { id } => self.trade_request(&me, &id),
             TradeCommand::Accept { id } => self.trade_accept(&me, &id),
             TradeCommand::Decline { id } => self.trade_decline(&me, &id),
-            TradeCommand::Offer { items, gold } => self.trade_offer(&me, items, gold),
+            TradeCommand::Offer { items, gold } => self.trade_offer(&me, items, gold, vec![]),
+            TradeCommand::OfferCopies {
+                items,
+                copies,
+                gold,
+            } => self.trade_offer(&me, items, gold, copies),
             TradeCommand::Confirm => self.trade_confirm(&me),
             TradeCommand::Cancel => self.trade_cancel(&me),
         };
@@ -171,30 +177,29 @@ impl World {
         self.close_trade(i, "Trade cancelled.", false);
         Ok(())
     }
-    fn trade_offer(&mut self, me: &str, items: Vec<ItemStack>, gold: u32) -> Result<(), String> {
+    fn trade_offer(
+        &mut self,
+        me: &str,
+        items: Vec<ItemStack>,
+        gold: u32,
+        copies: Vec<u64>,
+    ) -> Result<(), String> {
         let i = self.trade_index(me).ok_or("You are not trading.")?;
         if !self.trades[i].accepted {
             return Err("Wait for the other player to accept.".into());
         }
         let other = self.trades[i].other(me).to_owned();
         self.trade_pair_valid(me, &other)?;
-        let who = &self.online(me).unwrap().character;
-        validate_offer(
-            who,
-            &Offer {
-                items: items.clone(),
-                gold,
-                ready: false,
-            },
-            &other,
-            unix_now(),
-        )?;
+        let who = &mut self
+            .players
+            .values_mut()
+            .find(|p| p.character.id == me)
+            .unwrap()
+            .character;
+        who.materialize_gear_instances();
+        let offer = capture_offer(who, &other, items, gold, &copies, unix_now())?;
         let side = self.trades[i].side(me).unwrap();
-        self.trades[i].offers[side] = Offer {
-            items,
-            gold,
-            ready: false,
-        };
+        self.trades[i].offers[side] = offer;
         self.trades[i].offers[1 - side].ready = false;
         self.trades[i].expires = self.time + OPEN_LIFETIME;
         self.push_trade(i);
@@ -287,6 +292,62 @@ impl World {
     }
 }
 
+fn offer_copy_view(gear: &GearInstance) -> Value {
+    json!({"id":gear.id,"item":gear.item,"enchant":gear.enchant,"rarity":gear.rarity,
+        "rank":gear.rank,"wear":gear.wear,"attack":gear.attack,"defense":gear.defense,
+        "bonusStats":gear.bonus_stats,"rolledStats":gear.rolled_stats})
+}
+
+fn capture_offer(
+    who: &Character,
+    receiver: &str,
+    items: Vec<ItemStack>,
+    gold: u32,
+    copies: &[u64],
+    now: u64,
+) -> Result<Offer, String> {
+    if copies.len() > who.gear_instances.len() {
+        return Err("The offered gear copies are no longer available.".into());
+    }
+    let mut offer = Offer {
+        items,
+        gold,
+        ready: false,
+        gear: vec![],
+    };
+    let mut ids = std::collections::BTreeSet::new();
+    for id in copies {
+        let gear = who
+            .gear_instances
+            .iter()
+            .find(|g| g.id == *id && ids.insert(*id))
+            .ok_or("The offered gear copies are no longer available.")?;
+        offer.gear.push(gear.clone());
+    }
+    validate_offer(who, &offer, receiver, now)?;
+    // Freeze the gear behind legacy quantity offers, too, so a changed copy never slips into a confirmed trade.
+    for stack in &offer.items {
+        let Some(piece) = item(&stack.item).filter(|i| is_gear(i)) else {
+            continue;
+        };
+        if offer.gear.iter().any(|g| g.item == stack.item) {
+            continue;
+        }
+        let worn = who.equipped_count(piece) as usize;
+        offer.gear.extend(
+            who.gear_instances
+                .iter()
+                .filter(|g| g.item == stack.item)
+                .skip(worn)
+                .filter(|g| piece.class.is_none() || g.tradeable_to(receiver, now))
+                .take(stack.quantity as usize)
+                .cloned(),
+        );
+    }
+    validate_offer(who, &offer, receiver, now)?;
+    Ok(offer)
+}
+
 /// `receiver` is the other side's character id and `now` the wall clock in Unix seconds: a class piece is
 /// bound to its owner, except a rolled copy inside its hand-off window to a voter of that roll.
 fn validate_offer(who: &Character, offer: &Offer, receiver: &str, now: u64) -> Result<(), String> {
@@ -295,6 +356,16 @@ fn validate_offer(who: &Character, offer: &Offer, receiver: &str, now: u64) -> R
     }
     if offer.gold > who.gold {
         return Err("You do not have that much gold.".into());
+    }
+    for selected in &offer.gear {
+        if !offer.items.iter().any(|s| s.item == selected.item)
+            || !who.gear_instances.contains(selected)
+            || who.gear_instance_equipped(selected.id)
+            || item(&selected.item)
+                .is_some_and(|i| i.class.is_some() && !selected.tradeable_to(receiver, now))
+        {
+            return Err("The offered gear copies are no longer available.".into());
+        }
     }
     let mut seen = std::collections::BTreeSet::new();
     for stack in &offer.items {
@@ -314,6 +385,10 @@ fn validate_offer(who: &Character, offer: &Offer, receiver: &str, now: u64) -> R
                 .saturating_sub(who.equipped_count(i))
         {
             return Err("You cannot trade items you do not own or have equipped.".into());
+        }
+        let selected = offer.gear.iter().filter(|g| g.item == stack.item).count();
+        if selected != 0 && (!is_gear(i) || selected != stack.quantity as usize) {
+            return Err("Choose one copy for each offered piece of equipment.".into());
         }
         if is_gear(i)
             && i.class.is_some()
@@ -369,12 +444,19 @@ fn move_items(
             let worn = item(&s.item).map_or(0, |i| giver.equipped_count(i)) as usize;
             // A class piece moves only as a copy whose window is open for the receiver.
             let bound = item(&s.item).is_some_and(|i| i.class.is_some());
+            let selected: Vec<_> = offer
+                .gear
+                .iter()
+                .filter(|g| g.item == s.item)
+                .map(|g| g.id)
+                .collect();
             let moved: Vec<_> = giver
                 .gear_instances
                 .iter()
                 .filter(|g| g.item == s.item)
                 .skip(worn)
                 .filter(|g| !bound || g.tradeable_to(receiver_id, now))
+                .filter(|g| selected.is_empty() || selected.contains(&g.id))
                 .take(s.quantity as usize)
                 .cloned()
                 .collect();
@@ -449,7 +531,19 @@ mod tests {
         giver.gear_instances.iter_mut().find(|g| g.item == id).unwrap()
             .open_trade_window(vec!["receiver".into()], NOW);
         assert!(!receiver.wardrobe.unlocked.contains(id));
-        move_items(&mut giver, &mut receiver, &Offer { items: items(id, 1), gold: 0, ready: false }, "receiver", NOW).unwrap();
+        move_items(
+            &mut giver,
+            &mut receiver,
+            &Offer {
+                items: items(id, 1),
+                gold: 0,
+                ready: false,
+                gear: vec![],
+            },
+            "receiver",
+            NOW,
+        )
+        .unwrap();
         assert!(giver.wardrobe.unlocked.contains(id));
         assert!(receiver.wardrobe.unlocked.contains(id));
         assert_eq!(giver.quantity(id), 0);
@@ -466,6 +560,7 @@ mod tests {
                 items: items(id, 1),
                 gold: 0,
                 ready: false,
+                gear: vec![],
             };
             assert!(validate_offer(&gm, &offer, "bob", NOW).is_err(), "{id}");
         }
@@ -494,6 +589,7 @@ mod tests {
                 items: items(id, 1),
                 gold: 0,
                 ready: false,
+                gear: vec![],
             },
             "bob",
             NOW,
@@ -552,6 +648,7 @@ mod tests {
                 items: items(&piece.id, 1),
                 gold: 0,
                 ready: false,
+                gear: vec![],
             },
             "bob",
             NOW,
@@ -586,6 +683,7 @@ mod tests {
             items: items(id, quantity),
             gold: 0,
             ready: false,
+            gear: vec![],
         }
     }
     #[test]

@@ -247,6 +247,7 @@ impl Store {
             equipment: Default::default(),
             wardrobe: Default::default(),
             gear_instances: vec![],
+            enchanting: Default::default(),
             next_gear_id: 1,
             bags: vec![],
             attributes: Default::default(),

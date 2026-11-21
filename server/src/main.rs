@@ -5,6 +5,7 @@ mod bank;
 mod bossmech;
 mod bosssign;
 mod cathedral;
+mod enchanting;
 mod festival;
 mod items;
 mod mail;

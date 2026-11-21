@@ -28,6 +28,8 @@ pub struct GearInstance {
     /// loads at full condition. Only a death wears gear; a smith repairs it (docs/durability.md).
     #[serde(default)]
     pub wear: u8,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enchant: Option<crate::enchanting::Enchant>,
 }
 
 /// What a death did to the worn gear: pieces that lost durability, and pieces that are broken afterwards.
@@ -104,6 +106,7 @@ impl GearInstance {
             trade_until: 0,
             trade_with: vec![],
             wear: 0,
+            enchant: None,
         }
     }
     /// Durability left, 100 for a new piece and 0 for a broken one.
@@ -238,6 +241,51 @@ impl Character {
             .map_or(self.gear_instances.len(), |(at, _)| at);
         self.gear_instances.insert(front, copy);
     }
+    /// Preserve the copy in a ring slot that kept its catalog ID when the other slot changed.
+    /// When both slots use that ID the ledger is in slot order, followed by loose copies.
+    pub(super) fn preserve_ring_copies(&mut self, before: &Self) {
+        let slots = ["accessory1", "accessory2"];
+        let old = slots.map(|slot| before.equipment.get(slot));
+        let new = slots.map(|slot| self.equipment.get(slot).cloned());
+        if old[0] != old[1] && new[0] != new[1] || old == new.each_ref().map(Option::as_ref) {
+            return;
+        }
+        let kept = slots.map(|slot| {
+            let id = before.equipment.get(slot)?;
+            if self.equipment.get(slot) != Some(id) {
+                return None;
+            }
+            let occurrence = usize::from(slot == "accessory2" && old[0] == Some(id));
+            before.worn_gear_instance(id, occurrence).map(|g| g.id)
+        });
+        for (index, id) in new.iter().enumerate() {
+            let Some(id) = id else { continue };
+            let occurrence = usize::from(index == 1 && new[0].as_ref() == Some(id));
+            let choice = kept[index].or_else(|| {
+                self.gear_instances
+                    .iter()
+                    .find(|g| &g.item == id && !kept.contains(&Some(g.id)))
+                    .map(|g| g.id)
+            });
+            let Some(choice) = choice else { continue };
+            let Some(at) = self.gear_instances.iter().position(|g| g.id == choice) else {
+                continue;
+            };
+            let front = self
+                .gear_instances
+                .iter()
+                .enumerate()
+                .filter(|(_, g)| &g.item == id)
+                .nth(occurrence)
+                .map(|(index, _)| index)
+                .unwrap_or(at);
+            if at != front {
+                let copy = self.gear_instances.remove(at);
+                self.gear_instances.insert(front, copy);
+            }
+        }
+    }
+
     pub fn gear_instance_equipped(&self, id: u64) -> bool {
         let Some(g) = self.gear_instances.iter().find(|g| g.id == id) else {
             return false;
@@ -424,6 +472,7 @@ impl Character {
             trade_until: 0,
             trade_with: vec![],
             wear: 0,
+            enchant: None,
         })
     }
     pub fn preview_merge(&mut self, first: u64, second: u64) -> Result<GearInstance, &'static str> {

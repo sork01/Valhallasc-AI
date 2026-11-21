@@ -1215,7 +1215,7 @@
       window.Settings?.applyScale?.();
     }
   }
-  function setPause(on) { window.Fishing?.close(false); window.Attributes?.close?.(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); hideBuffTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
+  function setPause(on) { window.Enchanting?.close(); window.Fishing?.close(false); window.Attributes?.close?.(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); hideBuffTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
     mage.set(c);

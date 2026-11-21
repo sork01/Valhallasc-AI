@@ -195,6 +195,7 @@
         case 'notice': window.Achievements?.onNotice(packet); if (packet.ok === false) window.Field?.error(packet.text); log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;
+        case 'enchanting': window.Enchanting?.onPacket(packet); break;
         case 'trade': serviceError(packet); window.Trade?.onPacket(packet); break;
         case 'inspect': window.Inspect?.onPacket(packet); break;
         case 'shop': serviceError(packet); window.Shop?.onPacket(packet); break;

@@ -11,6 +11,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod enchanting;
 mod fishing;
 mod fishing_workshop;
 #[cfg(test)]
@@ -465,6 +466,7 @@ pub enum Command {
 
 struct Player {
     fishing: fishing::Session,
+    enchanting: enchanting::Session,
     character: Character,
     peer: Peer,
     input: Point,
@@ -604,6 +606,7 @@ impl Player {
     fn apply_death_penalty(&mut self) {
         self.dance = None;
         self.daze = 0.;
+        self.enchanting = Default::default();
         let wear = if self.merc.is_some() || self.ambient.is_some() || self.guard.is_some() {
             DeathWear::default()
         } else {
@@ -650,6 +653,7 @@ impl Player {
             peer,
             input: Point::default(),
             fishing: Default::default(),
+            enchanting: Default::default(),
             input_at: -99.,
             goal: None,
             target: None,
@@ -924,6 +928,8 @@ struct Slime {
     /// Cumulative damage dealt to this enemy by outpost guards since its last full reset.
     #[serde(skip)]
     guard_damage: f64,
+    #[serde(skip)]
+    enchant_decoy: Option<enchanting::Decoy>,
 }
 /// Two decimals, for what is only drawn.
 fn r2(v: f64) -> f64 {
@@ -1937,6 +1943,7 @@ impl Slime {
             hunt: false,
             contributors: Default::default(),
             guard_damage: 0.,
+            enchant_decoy: None,
         }
     }
     fn point(&self) -> Point {
@@ -2051,6 +2058,9 @@ pub struct World {
     time: f64,
     tick: u64,
     rng: u64,
+    enchant_rng: u64,
+    enchant_epoch: f64,
+    enchant_skill_hits: Option<Vec<enchanting::SkillHit>>,
     /// Damage each session has dealt to monsters (test builds: the harness reports damage per second per class).
     #[cfg(test)]
     damage_log: BTreeMap<u64, f64>,
@@ -2192,6 +2202,11 @@ impl World {
             time: 0.,
             tick: 0,
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
+            enchant_rng: u64::from_le_bytes(
+                uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap(),
+            ),
+            enchant_epoch: daynight::unix_ms() as f64 / 1000.,
+            enchant_skill_hits: None,
             #[cfg(test)]
             damage_log: BTreeMap::new(),
             #[cfg(test)]
@@ -2625,6 +2640,10 @@ impl World {
         view["fishingTime"] = json!(fishing::now());
         view["fishingSpots"] = json!(self.rich_fishing.get(&zone).map(|spots| spots.iter().map(|s| s.point).collect::<Vec<_>>()).unwrap_or_default());
         view["damageMeter"] = self.damage_meter_view(zone);
+        let enchant_fields = self.enchant_fields(zone);
+        if !enchant_fields.is_empty() {
+            view["enchantFields"] = json!(enchant_fields);
+        }
         let boss_mech = self.boss_mech_view(zone);
         if !boss_mech.is_empty() {
             view["bossMech"] = json!(boss_mech);
@@ -2996,6 +3015,7 @@ impl World {
                     | ClientMessage::Trade { .. }
                     | ClientMessage::Pvp { .. }
                     | ClientMessage::Inspect { .. }
+                    | ClientMessage::Enchanting { .. }
                     | ClientMessage::Achievements
                     | ClientMessage::SelectTitle { .. }
                     | ClientMessage::Roll { .. }
@@ -3220,6 +3240,7 @@ impl World {
             },
             ClientMessage::QuestAbandon { id } => self.abandon_quest(session, &id),
             ClientMessage::QuestRestore { id } => self.restore_quest(session, &id),
+            ClientMessage::Enchanting { request } => self.enchanting_command(session, request),
             ClientMessage::Transmogrify { npc, changes } => self.transmogrify(session, &npc, changes),
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
@@ -3833,12 +3854,17 @@ impl World {
                 .try_send(json!({"type":"error","text":"A wall blocks your shot."}));
             return;
         }
+        let bonus = if self.enchant_pve(session) {
+            p.enchant_attack_speed(self.time)
+        } else {
+            0.
+        };
         let p = self.players.get_mut(&session).unwrap();
         p.combat_left = 5.;
         p.character.mounted = false;
         p.attack = 0.0001;
         p.hit = false;
-        p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste));
+        p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste) + bonus);
         if p.merc_doom.is_some() {
             // A fighter whose hirer has fallen has lost its rhythm.
             p.cooldown *= 2.2;
@@ -4127,6 +4153,7 @@ impl World {
     }
     fn update_player(&mut self, session: u64) {
         self.update_resource(session);
+        self.update_enchanting(session);
         let carry_speed = self.forge_carry_speed(session);
         let p = self.players.get_mut(&session).unwrap();
         // Also covers old mounted saves and administrative zone changes, before movement.
@@ -4502,7 +4529,7 @@ impl World {
                 } else {
                     1.
                 },
-        ) * (1. + p.buff(BuffKind::Haste))
+        ) * (1. + p.buff(BuffKind::Haste) + p.enchant_move_speed(self.time))
             * if p.daze > 0. { 0.5 } else { 1. }
             * TICK
             * if p.attack > 0. { 0.25 } else { 1. })
@@ -4920,7 +4947,7 @@ impl World {
             .map(|s| s.id)
             .collect();
         for id in hit {
-            self.hit_slime(id, session, damage, crit);
+            self.enchant_hit(id, session, damage, crit, enchanting::Hit::Basic);
         }
     }
     /// Announces a level gain to the zone, with the new level and the skills it unlocks.
@@ -5109,19 +5136,30 @@ impl World {
         } else {
             vec![]
         };
+        let now = self.enchant_now();
+        let pve = self.enchant_pve(session);
         let p = self.players.get_mut(&session).unwrap();
-        if p.character.resource() < skill.cost {
+        let (discounted, borrowed) = if pve {
+            p.enchant_cast_modifiers(self.time)
+        } else {
+            (false, false)
+        };
+        let cost = skill.cost * if discounted { 0.7 } else { 1. };
+        if p.character.resource() < cost {
             let text = format!(
                 "Not enough {}: {} costs {}.",
                 class.resource_type(),
                 skill.name,
-                skill.cost
+                cost
             );
             let _ = p.peer.try_send(json!({"type":"error","text":text}));
             return;
         }
         p.character.mounted = false;
-        p.character.change_resource(-skill.cost);
+        p.character.change_resource(-cost);
+        if pve {
+            p.enchant_cast(id, discounted, borrowed, self.time, now);
+        }
         #[cfg(test)]
         {
             *self
@@ -5141,7 +5179,8 @@ impl World {
             skill.cooldown
                 * p.character.cooldown_multiplier()
                 * 0.85_f64.powi(cooldown_sets as i32)
-                * if amber { 0.9 } else { 1. },
+                * if amber { 0.9 } else { 1. }
+                * if borrowed { 0.5 } else { 1. },
         );
         if melee && !matches!(&skill.effect, Effect::Dash { mult, .. } if *mult == 0.) {
             p.combat_left = 5.;
@@ -5154,6 +5193,9 @@ impl World {
         let mut healed = 0.;
         let mut value = 0.;
         self.cur_skill = id.to_string();
+        if pve {
+            self.enchant_skill_hits = Some(vec![]);
+        }
         match &skill.effect {
             Effect::Cone { reach, dot, mult } => {
                 value = *reach;
@@ -5170,7 +5212,7 @@ impl World {
                     .collect();
                 for i in hit {
                     let (damage, crit) = self.roll_damage(session, *mult);
-                    dealt += self.hit_slime(i, session, damage, crit);
+                    dealt += self.enchant_hit(i, session, damage, crit, enchanting::Hit::Skill);
                 }
                 for f in self.foes_near(session, origin, *reach, &[]) {
                     let at = self.players[&f].character.point();
@@ -5193,7 +5235,7 @@ impl World {
                     .collect();
                 for i in visible {
                     let (damage, crit) = self.roll_damage(session, *mult);
-                    dealt += self.hit_slime(i, session, damage, crit);
+                    dealt += self.enchant_hit(i, session, damage, crit, enchanting::Hit::Skill);
                 }
                 for f in self.foes_near(session, origin, *radius, &[]) {
                     let at = self.players[&f].character.point();
@@ -5286,7 +5328,8 @@ impl World {
                         Some(Mark::Slime(i)) => {
                             points.push([self.slimes[i].x, self.slimes[i].y]);
                             let (damage, crit) = self.roll_damage(session, *mult);
-                            dealt += self.hit_slime(i, session, damage, crit);
+                            dealt +=
+                                self.enchant_hit(i, session, damage, crit, enchanting::Hit::Skill);
                         }
                         Some(Mark::Player(f)) => {
                             let at = self.players[&f].character.point();
@@ -5328,7 +5371,8 @@ impl World {
                             from = self.slimes[i].point();
                             points.push([from.x, from.y]);
                             let (damage, crit) = self.roll_damage(session, *mult);
-                            dealt += self.hit_slime(i, session, damage, crit);
+                            dealt +=
+                                self.enchant_hit(i, session, damage, crit, enchanting::Hit::Skill);
                         }
                         Some(Mark::Player(f)) => {
                             hit_foes.push(f);
@@ -5370,7 +5414,7 @@ impl World {
                     .collect();
                 for i in visible {
                     let (damage, crit) = self.roll_damage(session, *mult);
-                    dealt += self.hit_slime(i, session, damage, crit);
+                    dealt += self.enchant_hit(i, session, damage, crit, enchanting::Hit::Skill);
                 }
                 for f in self.foes_near(session, center, *radius, &[]) {
                     let at = self.players[&f].character.point();
@@ -5442,6 +5486,7 @@ impl World {
         let origin = self.players[&session].character.point();
         let set_signature =
             self.apply_set_signature(session, id, origin, face, target, &before_set_hits);
+        self.finish_enchant_skill(session, id);
         self.emit_zone(
             zone,
             json!({"type":"event","kind":"skill","skill":id,"actor":actor,"x":origin.x,"y":origin.y,
@@ -5504,6 +5549,7 @@ impl World {
                 p.character.zone,
             );
             points.push([at.x, at.y]);
+            self.enchant_heal(caster, *s, before, gained);
             self.signature_healed(caster, *s, gained);
             self.emit_zone(
                 zone,
@@ -5520,7 +5566,7 @@ impl World {
         self.cur_skill = p.dash_skill.clone();
         for i in self.enemies_near(zone, point, 0.9, &skip) {
             let (damage, crit) = self.roll_damage(session, mult);
-            self.hit_slime(i, session, damage, crit);
+            self.enchant_hit(i, session, damage, crit, enchanting::Hit::Skill);
             if let Some(p) = self.players.get_mut(&session) {
                 p.dash_hits.push(i);
             }
@@ -5537,6 +5583,16 @@ impl World {
     }
     /// Returns the health the enemy actually lost.
     fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) -> f64 {
+        self.hit_monster(id, session, damage, crit, false)
+    }
+    fn hit_monster(
+        &mut self,
+        id: usize,
+        session: u64,
+        damage: f64,
+        crit: bool,
+        enchant_damage: bool,
+    ) -> f64 {
         if seasonal_hunt::for_kind(&self.slimes[id].kind).is_some()
             && !self.festival_member(&self.slimes[id].kind, session)
         {
@@ -5606,7 +5662,7 @@ impl World {
             entry.0 += dealt;
             entry.1 += 1;
         }
-        if p.character.look.class == Class::Warrior {
+        if !enchant_damage && p.character.look.class == Class::Warrior {
             p.character.change_resource(dealt * 0.5);
         }
         if is_guard {
@@ -5771,6 +5827,7 @@ impl World {
             p.character.kills += 1;
             quest_progress(&mut p.character, &kill_quests, "kill", &kind);
             // A party shares the XP (see `partyxp.rs`); alone, the killer's hero gets all of it.
+            let awards_xp = xp > 0;
             let (xp, levels) = self.share_xp(&credit_id, zone, point, xp, level, &kind);
             self.event_with(
                 "slimeDie",
@@ -5788,6 +5845,10 @@ impl World {
             if crate::cathedral::enemy(&kind).is_some_and(|e| e.add) {
                 return dealt;
             }
+            if awards_xp && !enchant_damage && credit == session {
+                self.enchant_xp_kill(session);
+            }
+            self.enchant_recipe_drop(&credit_id, zone, point, &kind, level);
             // The credited hero's rebirth drop multiplier reaches every roll below (docs/rebirth.md).
             let boost = self.drop_multiplier_of(&credit_id);
             let value = if gold > 0 {
@@ -5888,7 +5949,9 @@ impl World {
                 }
             }
         }
-        self.signature_hit(session, signature::Target::Enemy(id), dealt);
+        if !enchant_damage {
+            self.signature_hit(session, signature::Target::Enemy(id), dealt);
+        }
         dealt
     }
     /// One random piece across all classes per boss slot pool. Party members roll just as for world gear;
@@ -5970,6 +6033,7 @@ impl World {
         } else {
             None
         };
+        let distracted = !self.slimes[id].dead && self.enchant_decoy_update(id, &bodies);
         let map = &self.maps[zone];
         let s = &mut self.slimes[id];
         let downed = self.pack_fights.get(&zone).map(|f| &f.downed);
@@ -6030,6 +6094,9 @@ impl World {
                 s.land_t = 0.15;
             }
             s.hop_v = 0.;
+        }
+        if distracted {
+            return;
         }
         let raid_grace = self
             .instances
@@ -6414,7 +6481,7 @@ impl World {
         let point = s.point();
         let (kind, level) = (s.kind.clone(), s.level);
         if let Some(session) = hit {
-            self.hurt_player_by(session, damage, point, &kind, level);
+            self.hurt_monster_player(session, damage, point, &kind, level, Some(id));
         }
         if slam_now {
             // The ring is announced to the zone once, on the tick the pound lands.
@@ -6424,12 +6491,13 @@ impl World {
             );
         }
         for session in slammed {
-            self.hurt_player_by(
+            self.hurt_monster_player(
                 session,
                 damage * Slime::slam_factor(&kind),
                 point,
                 &kind,
                 level,
+                Some(id),
             );
         }
         if let (Some(aim), Some(r)) = (fire, ranged) {
@@ -6441,7 +6509,19 @@ impl World {
         self.hurt_player_by(session, damage, from, "", 0);
     }
     /// `enemy` is the attacker's kind and `level` its level, shown in the system log.
+    #[cfg(test)]
     fn hurt_player_by(&mut self, session: u64, damage: f64, from: Point, enemy: &str, level: u32) {
+        self.hurt_monster_player(session, damage, from, enemy, level, None);
+    }
+    fn hurt_monster_player(
+        &mut self,
+        session: u64,
+        damage: f64,
+        from: Point,
+        enemy: &str,
+        level: u32,
+        attacker: Option<usize>,
+    ) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
@@ -6470,6 +6550,8 @@ impl World {
         let dodge_chance = (p.character.dodge_chance() + p.buff(BuffKind::Dodge)).min(0.95);
         let actor = p.character.id.clone();
         let point = p.character.point();
+        let zone = p.character.zone;
+        let enchant = !enemy.is_empty() && self.enchant_pve(session);
         if dodge_chance > 0. && self.random() < dodge_chance {
             self.players.get_mut(&session).unwrap().last_hurt = self.time;
             self.event_with(
@@ -6480,6 +6562,9 @@ impl World {
                 false,
                 json!({"enemy":enemy,"level":level}),
             );
+            if enchant {
+                self.enchant_dodge(session, zone, point);
+            }
             return;
         }
         // Rear half of the facing plane, tested only after a hit gets through the dodge check.
@@ -6509,7 +6594,11 @@ impl World {
         let absorbed = value.min(p.set_shield);
         p.set_shield -= absorbed;
         value -= absorbed;
-        let taken = value.min(p.character.hp);
+        if enchant {
+            value = p.enchant_absorb(value, self.time);
+        }
+        let before = p.character.hp;
+        let taken = value.min(before);
         if taken > 0. && dazed {
             p.daze = 4.;
         }
@@ -6519,6 +6608,10 @@ impl World {
         p.character.hp = (p.character.hp - value).max(0.);
         p.last_hurt = self.time;
         p.hurt = 0.25;
+        if enchant {
+            self.enchant_incoming(session, attacker, before, dazed, taken);
+        }
+        let p = self.players.get_mut(&session).unwrap();
         let point = p.character.point();
         let actor = p.character.id.clone();
         let dead = p.character.hp <= 0.;
@@ -6599,10 +6692,15 @@ impl World {
                         })
                         .collect();
                     for near in visible {
-                        self.hit_slime(near, b.owner, b.damage, b.crit);
+                        self.enchant_hit(near, b.owner, b.damage, b.crit, enchanting::Hit::Skill);
                     }
                 } else {
-                    self.hit_slime(id, b.owner, b.damage, b.crit);
+                    let source = if b.skill.is_empty() {
+                        enchanting::Hit::Basic
+                    } else {
+                        enchanting::Hit::Skill
+                    };
+                    self.enchant_hit(id, b.owner, b.damage, b.crit, source);
                 }
                 // The client paints an impact only where an authoritative bolt actually landed.
                 if !b.skill.is_empty() {
@@ -15348,6 +15446,7 @@ mod tests {
             trade_until: 0,
             trade_with: vec![],
             wear: 0,
+            enchant: None,
         };
         w.loot_drop_with_gear(&owner, zone, at, &base.id, Some(gear));
         w.drops.last_mut().unwrap().t = 1.;

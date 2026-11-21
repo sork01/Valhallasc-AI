@@ -321085,6 +321085,102 @@
               "id": "transmogrify",
               "label": "Transmogrify",
               "cost": 0
+            },
+            {
+              "id": "buy_enchant_recipe_double_tap",
+              "label": "Recipe: Double Tap",
+              "item": "enchant_recipe_double_tap",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_quickhands",
+              "label": "Recipe: Quickhands",
+              "item": "enchant_recipe_quickhands",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_brace",
+              "label": "Recipe: Brace",
+              "item": "enchant_recipe_brace",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_second_wind",
+              "label": "Recipe: Second Wind",
+              "item": "enchant_recipe_second_wind",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_slipstream",
+              "label": "Recipe: Slipstream",
+              "item": "enchant_recipe_slipstream",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_arcane_bulwark",
+              "label": "Recipe: Arcane Bulwark",
+              "item": "enchant_recipe_arcane_bulwark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_spellweaver",
+              "label": "Recipe: Spellweaver",
+              "item": "enchant_recipe_spellweaver",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shieldbreaker",
+              "label": "Recipe: Shieldbreaker",
+              "item": "enchant_recipe_shieldbreaker",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_passing_spark",
+              "label": "Recipe: Passing Spark",
+              "item": "enchant_recipe_passing_spark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_guardian_thread",
+              "label": "Recipe: Guardian Thread",
+              "item": "enchant_recipe_guardian_thread",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shake_it_off",
+              "label": "Recipe: Shake It Off",
+              "item": "enchant_recipe_shake_it_off",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_lightning_rod",
+              "label": "Recipe: Lightning Rod",
+              "item": "enchant_recipe_lightning_rod",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_rise_from_ash",
+              "label": "Recipe: Rise from Ash",
+              "item": "enchant_recipe_rise_from_ash",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_borrowed_time",
+              "label": "Recipe: Borrowed Time",
+              "item": "enchant_recipe_borrowed_time",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_moonstep",
+              "label": "Recipe: Moonstep",
+              "item": "enchant_recipe_moonstep",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_heartwood_grove",
+              "label": "Recipe: Heartwood Grove",
+              "item": "enchant_recipe_heartwood_grove",
+              "cost": 4000000
             }
           ],
           "buys": false
@@ -545502,6 +545598,102 @@
               "id": "transmogrify",
               "label": "Transmogrify",
               "cost": 0
+            },
+            {
+              "id": "buy_enchant_recipe_double_tap",
+              "label": "Recipe: Double Tap",
+              "item": "enchant_recipe_double_tap",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_quickhands",
+              "label": "Recipe: Quickhands",
+              "item": "enchant_recipe_quickhands",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_brace",
+              "label": "Recipe: Brace",
+              "item": "enchant_recipe_brace",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_second_wind",
+              "label": "Recipe: Second Wind",
+              "item": "enchant_recipe_second_wind",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_slipstream",
+              "label": "Recipe: Slipstream",
+              "item": "enchant_recipe_slipstream",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_arcane_bulwark",
+              "label": "Recipe: Arcane Bulwark",
+              "item": "enchant_recipe_arcane_bulwark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_spellweaver",
+              "label": "Recipe: Spellweaver",
+              "item": "enchant_recipe_spellweaver",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shieldbreaker",
+              "label": "Recipe: Shieldbreaker",
+              "item": "enchant_recipe_shieldbreaker",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_passing_spark",
+              "label": "Recipe: Passing Spark",
+              "item": "enchant_recipe_passing_spark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_guardian_thread",
+              "label": "Recipe: Guardian Thread",
+              "item": "enchant_recipe_guardian_thread",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shake_it_off",
+              "label": "Recipe: Shake It Off",
+              "item": "enchant_recipe_shake_it_off",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_lightning_rod",
+              "label": "Recipe: Lightning Rod",
+              "item": "enchant_recipe_lightning_rod",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_rise_from_ash",
+              "label": "Recipe: Rise from Ash",
+              "item": "enchant_recipe_rise_from_ash",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_borrowed_time",
+              "label": "Recipe: Borrowed Time",
+              "item": "enchant_recipe_borrowed_time",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_moonstep",
+              "label": "Recipe: Moonstep",
+              "item": "enchant_recipe_moonstep",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_heartwood_grove",
+              "label": "Recipe: Heartwood Grove",
+              "item": "enchant_recipe_heartwood_grove",
+              "cost": 4000000
             }
           ],
           "buys": false
@@ -818651,6 +818843,102 @@
               "id": "transmogrify",
               "label": "Transmogrify",
               "cost": 0
+            },
+            {
+              "id": "buy_enchant_recipe_double_tap",
+              "label": "Recipe: Double Tap",
+              "item": "enchant_recipe_double_tap",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_quickhands",
+              "label": "Recipe: Quickhands",
+              "item": "enchant_recipe_quickhands",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_brace",
+              "label": "Recipe: Brace",
+              "item": "enchant_recipe_brace",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_second_wind",
+              "label": "Recipe: Second Wind",
+              "item": "enchant_recipe_second_wind",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_slipstream",
+              "label": "Recipe: Slipstream",
+              "item": "enchant_recipe_slipstream",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_arcane_bulwark",
+              "label": "Recipe: Arcane Bulwark",
+              "item": "enchant_recipe_arcane_bulwark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_spellweaver",
+              "label": "Recipe: Spellweaver",
+              "item": "enchant_recipe_spellweaver",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shieldbreaker",
+              "label": "Recipe: Shieldbreaker",
+              "item": "enchant_recipe_shieldbreaker",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_passing_spark",
+              "label": "Recipe: Passing Spark",
+              "item": "enchant_recipe_passing_spark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_guardian_thread",
+              "label": "Recipe: Guardian Thread",
+              "item": "enchant_recipe_guardian_thread",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shake_it_off",
+              "label": "Recipe: Shake It Off",
+              "item": "enchant_recipe_shake_it_off",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_lightning_rod",
+              "label": "Recipe: Lightning Rod",
+              "item": "enchant_recipe_lightning_rod",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_rise_from_ash",
+              "label": "Recipe: Rise from Ash",
+              "item": "enchant_recipe_rise_from_ash",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_borrowed_time",
+              "label": "Recipe: Borrowed Time",
+              "item": "enchant_recipe_borrowed_time",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_moonstep",
+              "label": "Recipe: Moonstep",
+              "item": "enchant_recipe_moonstep",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_heartwood_grove",
+              "label": "Recipe: Heartwood Grove",
+              "item": "enchant_recipe_heartwood_grove",
+              "cost": 4000000
             }
           ],
           "buys": false
@@ -1141885,6 +1142173,102 @@
               "id": "transmogrify",
               "label": "Transmogrify",
               "cost": 0
+            },
+            {
+              "id": "buy_enchant_recipe_double_tap",
+              "label": "Recipe: Double Tap",
+              "item": "enchant_recipe_double_tap",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_quickhands",
+              "label": "Recipe: Quickhands",
+              "item": "enchant_recipe_quickhands",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_brace",
+              "label": "Recipe: Brace",
+              "item": "enchant_recipe_brace",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_second_wind",
+              "label": "Recipe: Second Wind",
+              "item": "enchant_recipe_second_wind",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_slipstream",
+              "label": "Recipe: Slipstream",
+              "item": "enchant_recipe_slipstream",
+              "cost": 250000
+            },
+            {
+              "id": "buy_enchant_recipe_arcane_bulwark",
+              "label": "Recipe: Arcane Bulwark",
+              "item": "enchant_recipe_arcane_bulwark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_spellweaver",
+              "label": "Recipe: Spellweaver",
+              "item": "enchant_recipe_spellweaver",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shieldbreaker",
+              "label": "Recipe: Shieldbreaker",
+              "item": "enchant_recipe_shieldbreaker",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_passing_spark",
+              "label": "Recipe: Passing Spark",
+              "item": "enchant_recipe_passing_spark",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_guardian_thread",
+              "label": "Recipe: Guardian Thread",
+              "item": "enchant_recipe_guardian_thread",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_shake_it_off",
+              "label": "Recipe: Shake It Off",
+              "item": "enchant_recipe_shake_it_off",
+              "cost": 1000000
+            },
+            {
+              "id": "buy_enchant_recipe_lightning_rod",
+              "label": "Recipe: Lightning Rod",
+              "item": "enchant_recipe_lightning_rod",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_rise_from_ash",
+              "label": "Recipe: Rise from Ash",
+              "item": "enchant_recipe_rise_from_ash",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_borrowed_time",
+              "label": "Recipe: Borrowed Time",
+              "item": "enchant_recipe_borrowed_time",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_moonstep",
+              "label": "Recipe: Moonstep",
+              "item": "enchant_recipe_moonstep",
+              "cost": 4000000
+            },
+            {
+              "id": "buy_enchant_recipe_heartwood_grove",
+              "label": "Recipe: Heartwood Grove",
+              "item": "enchant_recipe_heartwood_grove",
+              "cost": 4000000
             }
           ],
           "buys": false

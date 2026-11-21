@@ -37,6 +37,7 @@ execFileSync('python3', [path.join(__dirname, 'fishing_spots.py'), '--write'], {
 execFileSync('python3', [path.join(__dirname, 'fisher_npcs.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'seahorse_quest.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'transmog_npcs.py')], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'enchanting_catalog.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 execFileSync('python3', [path.join(__dirname, 'quest_sources.py')], { cwd: root, stdio: 'pipe' });
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
