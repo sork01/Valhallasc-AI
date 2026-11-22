@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.7.0",
+    "date": "2026-11-22",
+    "new": [
+      "Earn 34 new achievements for combat, quests, rebirths, mounts and fishing. Saved progress counts toward the new goals.",
+      "Earn skill milestones for Fishing, Blacksmithing, Enchanting and Alchemy under Professions in the Achievements tab.",
+      "Find the new Profession guide in Settings and see first-time tutorial tips near trainers and at workshops."
+    ],
+    "changed": [
+      "On touch, Go fishing turns you toward nearby water. Mine ore appears when a vein is within reach.",
+      "Use Track beside the minimap to find active ore veins or flower patches after training."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.6.2",
     "date": "2026-11-22",
     "new": [

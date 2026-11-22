@@ -525,6 +525,7 @@
     // One parchment column (owner references questgiver.webp / npc_dialogue1.png, 2026-11-13): the greeting with quests and services as rows, or one
     // quest's page with Accept and Decline under it. The two-pane journal frame is the journal's alone again.
     const gossip=view.kind==='gossip',classic=false;
+    if($('npc-dialogue').dataset.service!==view.kind)$('npc-dialogue').dataset.service=view.kind;
     $('npc-dialogue').classList.toggle('transmog-mode',view.kind==='transmog');
     $('npc-dialogue').classList.toggle('smith-mode',view.kind==='smith'||view.kind==='alchemy');
     const shell=$('npc-dialogue').querySelector('.gossip-window');

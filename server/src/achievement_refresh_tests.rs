@@ -60,10 +60,14 @@ fn achievements_refresh_preserves_the_entire_old_catalog() {
         digest,
         "1810c83c4ac9b02244e60fd41d3d3f680f4893a715508dd4bc4ace1504a10620"
     );
-    assert_eq!(raw.len(), 154);
-    assert_eq!(catalog().iter().map(|a| a.points).sum::<u32>(), 4090);
     assert_eq!(
-        catalog().iter().skip(120).map(|a| a.points).sum::<u32>(),
+        format!("{:x}", Sha256::digest(serde_json::to_vec(&raw[..154]).unwrap())),
+        "7c1f79c04629f3e74aea3fadeafa1f2a74a047ecdaa499abe4f6edcb09496c9b"
+    );
+    assert_eq!(raw.len(), 166);
+    assert_eq!(catalog().iter().map(|a| a.points).sum::<u32>(), 4370);
+    assert_eq!(
+        catalog().iter().skip(120).take(34).map(|a| a.points).sum::<u32>(),
         1535
     );
     assert_eq!(
@@ -80,6 +84,38 @@ fn achievements_refresh_preserves_the_entire_old_catalog() {
             .skip(120)
             .all(|a| !a.title_prefix && a.mount.is_empty())
     );
+}
+
+#[test]
+fn achievements_profession_milestones_use_each_saved_skill_at_the_exact_boundary() {
+    type SkillOf = fn(&mut Character) -> &mut crate::profession::Skill;
+    let paths: [(&str, [u16; 3], SkillOf); 4] = [
+        ("fishing_skill", [30, 150, crate::profession::MAX_SKILL], |c| &mut c.fishing.proficiency),
+        ("enchanting_skill", [30, 150, crate::profession::MAX_SKILL], |c| &mut c.enchanting.proficiency),
+        ("blacksmithing_skill", [30, 150, crate::profession::MAX_SKILL], |c| &mut c.blacksmithing.proficiency),
+        ("alchemy_skill", [30, 300, crate::alchemy::MAX_SKILL], |c| &mut c.alchemy.proficiency),
+    ];
+    for (metric, targets, skill_of) in paths {
+        let mut c = hero();
+        for (target, points) in targets.into_iter().zip([10, 20, 40]) {
+            let id = format!("{metric}_{target}");
+            let a = goal(&id);
+            assert_eq!((a.metric.as_str(), a.target, a.points), (metric, target.into(), points));
+            assert_eq!(a.category, "Professions");
+            skill_of(&mut c).skill = target - 1;
+            assert!(!c.sync_achievements().contains(&id), "early award {id}");
+            assert_eq!(c.achievement_progress(a), u32::from(target - 1));
+            skill_of(&mut c).skill = target;
+            assert_eq!(c.sync_achievements(), [id.clone()]);
+            assert!(c.sync_achievements().is_empty(), "duplicate {id}");
+        }
+        let mut legacy = serde_json::to_value(&c).unwrap();
+        legacy.as_object_mut().unwrap().remove("achievements");
+        let mut restored: Character = serde_json::from_value(legacy).unwrap();
+        assert_eq!(restored.sync_achievements().len(), 3, "{metric} saved evidence");
+        assert_eq!(restored.achievement_points(), 70);
+        assert!(restored.sync_achievements().is_empty());
+    }
 }
 
 #[test]

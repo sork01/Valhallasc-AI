@@ -988,10 +988,11 @@ mod unique_name_tests {
         veteran.tutorial_done.clear();
         let upgraded = decode(&serde_json::to_string(&veteran).unwrap()).unwrap();
         assert_eq!(upgraded.tutorial_version, 2);
-        assert_eq!(crate::model::TUTORIAL_MILESTONES.len(), 18);
-        for &id in crate::model::TUTORIAL_MILESTONES {
+        assert_eq!(crate::model::TUTORIAL_MILESTONES.len(), 22);
+        for &id in &crate::model::TUTORIAL_MILESTONES[..crate::model::TUTORIAL_V2_COUNT] {
             assert!(upgraded.tutorial_done.iter().any(|d| d == id), "missing {id}");
         }
+        assert_eq!(upgraded.tutorial_done.len(), crate::model::TUTORIAL_V2_COUNT);
         assert!(!upgraded.tutorial_disabled);
 
         let mut lowbie = Character::mercenary(crate::model::Class::Warrior, 5, "Lowbie");
@@ -1009,8 +1010,11 @@ mod unique_name_tests {
         assert_eq!(loaded_v1.tutorial_version, 2);
         let first_six = &crate::model::TUTORIAL_MILESTONES[..crate::model::TUTORIAL_V1_COUNT];
         assert!(loaded_v1.tutorial_done.iter().any(|d| d == "first_quest"));
-        for &id in &crate::model::TUTORIAL_MILESTONES[crate::model::TUTORIAL_V1_COUNT..] {
+        for &id in &crate::model::TUTORIAL_MILESTONES[crate::model::TUTORIAL_V1_COUNT..crate::model::TUTORIAL_V2_COUNT] {
             assert!(loaded_v1.tutorial_done.iter().any(|d| d == id), "new step {id} is skipped for a veteran");
+        }
+        for &id in &crate::model::TUTORIAL_MILESTONES[crate::model::TUTORIAL_V2_COUNT..] {
+            assert!(!loaded_v1.tutorial_done.iter().any(|d| d == id), "contextual profession tip {id} remains available");
         }
         assert!(
             first_six.iter().filter(|id| **id != "first_quest").all(|id| !loaded_v1.tutorial_done.iter().any(|d| d == id)),
@@ -1043,6 +1047,9 @@ mod unique_name_tests {
         assert!(!c.complete_tutorial("bogus_step"));
         assert!(c.complete_tutorial("first_death"), "the new ids are accepted");
         assert!(c.complete_tutorial("party_mercs"));
+        for &id in &crate::model::TUTORIAL_MILESTONES[crate::model::TUTORIAL_V2_COUNT..] {
+            assert!(c.complete_tutorial(id));
+        }
         c.reset_tutorial();
         assert!(c.complete_tutorial("first_quest"));
         assert!(c.complete_tutorial("first_quest"));

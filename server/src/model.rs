@@ -513,9 +513,14 @@ pub const TUTORIAL_MILESTONES: &[&str] = &[
     "bags_full",
     "mail_bank",
     "party_mercs",
+    "profession_fishing",
+    "profession_blacksmithing",
+    "profession_enchanting",
+    "profession_alchemy",
 ];
-/// How many of the milestones above existed in `tutorial_version` 1; the rest came with version 2.
+/// The first two onboarding migrations skip only the steps they originally introduced.
 pub const TUTORIAL_V1_COUNT: usize = 6;
+pub const TUTORIAL_V2_COUNT: usize = 18;
 pub const TUTORIAL_VETERAN_LEVEL: u32 = 5;
 /// An amount of money as the player reads it. Every stored amount is whole copper: 100 copper = 1 silver, 100 silver = 1 gold
 /// (`COIN-DENOMINATIONS`). Zero parts are left out, and nothing is "0 copper".
@@ -557,7 +562,7 @@ impl Character {
         }
         if self.tutorial_version == 1 {
             if self.level > TUTORIAL_VETERAN_LEVEL {
-                mark(self, &TUTORIAL_MILESTONES[TUTORIAL_V1_COUNT..]);
+                mark(self, &TUTORIAL_MILESTONES[TUTORIAL_V1_COUNT..TUTORIAL_V2_COUNT]);
             }
             self.tutorial_version = 2;
         }

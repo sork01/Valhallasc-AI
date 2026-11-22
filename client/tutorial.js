@@ -3,7 +3,8 @@ window.Tutorial = (() => {
   const $ = id => document.getElementById(id);
   const tr = s => window.Locale?.translate ? window.Locale.translate(s) : s;
   const MILESTONES = ['first_quest', 'levelup_stats', 'equip_gear', 'new_skill', 'consumables', 'merchant',
-    'target_attack', 'loot', 'quest_turnin', 'first_death', 'map', 'spark_travel', 'elite', 'rested', 'repair', 'bags_full', 'mail_bank', 'party_mercs'];
+    'target_attack', 'loot', 'quest_turnin', 'first_death', 'map', 'spark_travel', 'elite', 'rested', 'repair', 'bags_full', 'mail_bank', 'party_mercs',
+    'profession_fishing', 'profession_blacksmithing', 'profession_enchanting', 'profession_alchemy'];
   const COARSE = () => !!(window.matchMedia?.('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) <= 500);
 
   let hero = null;
@@ -31,13 +32,13 @@ window.Tutorial = (() => {
   function observeUi() {
     if (observed || typeof MutationObserver === 'undefined') return;
     observed = true;
-    const attrIds = ['stage', 'equipment', 'character-tab-stats', 'skills-panel', 'npc-dialogue',
+    const attrIds = ['stage', 'equipment', 'character-tab-stats', 'skills-panel', 'npc-dialogue', 'enchanting-panel',
       'pause', 'settings-panel', 'recommended-dialog', 'sell-warning', 'quest-journal', 'worldmap',
       'touch-actions', 'touch-quickuse'];
     const attrObs = new MutationObserver(scheduleRender);
     for (const id of attrIds) {
       const el = $(id);
-      if (el) attrObs.observe(el, { attributes: true, attributeFilter: ['hidden', 'class', 'aria-selected', 'aria-expanded'] });
+      if (el) attrObs.observe(el, { attributes: true, attributeFilter: ['hidden', 'class', 'aria-selected', 'aria-expanded', 'data-service'] });
     }
     const ws = document.querySelector('.equipment-workspace');
     if (ws) attrObs.observe(ws, { attributes: true, attributeFilter: ['data-view'] });
@@ -423,6 +424,64 @@ window.Tutorial = (() => {
   const npcNear = (test, r = 6) => (window.City?.npcs || []).find(n => n && test(n) && dist(n.x, n.y) <= r);
   const hasOffer = (n, ...ids) => (n.offers || []).some(o => ids.includes(o.id));
   const touchOr = (touchSelector, desktop) => COARSE() && isShown(document.querySelector(touchSelector)) ? document.querySelector(touchSelector) : desktop;
+  const PROFESSIONS = {
+    fishing: {
+      title: 'Fishing',
+      body: 'Buy a Twig Rod from the Fisher in Saltby for 50 copper and keep it in your bags. Face the water from the pier and press your fishing key (R by default). Press it again when a fish bites.',
+      touchBody: 'Buy a Twig Rod from the Fisher in Saltby for 50 copper and keep it in your bags. Walk to the pier and tap Go fishing or Cast. Tap Hook! when a fish bites.',
+    },
+    blacksmithing: {
+      title: 'Blacksmithing',
+      body: 'Learn from Bram Emberforge in Alderhaven. Keep his starter pick in your bags and select Ore with Track beside the minimap. Dismount, click a nearby tin vein and stay still.',
+      touchBody: 'Learn from Bram Emberforge in Alderhaven. Keep his starter pick in your bags and select Ore with Track beside the minimap. Dismount, get close to a tin vein and tap Mine ore. Stay still.',
+    },
+    enchanting: {
+      title: 'Enchanting',
+      body: 'Learn from the Enchanting Master near Mira Moonleaf in Alderhaven. Open Enchanting in Bags. Disenchant an unequipped green or better item for materials, study recipes and craft scrolls to apply to gear.',
+    },
+    alchemy: {
+      title: 'Alchemy',
+      body: 'Learn from Maera Petalbrook in Alderhaven. Select Flowers with Track beside the minimap and pick nearby flowers. Buy empty vials and return to the Alchemy workshop to brew potions.',
+    },
+  };
+  const professionBody = lesson => COARSE() && lesson.touchBody ? lesson.touchBody : lesson.body;
+  const localMentors = {fisher_meadow_0:'fishing', fisher_meadow_1:'fishing', smith:'blacksmithing',
+    alder_enchanting:'enchanting', alchemy_alderhaven:'alchemy'};
+  const workshopLessons = {fisher:'fishing', smith:'blacksmithing', alchemy:'alchemy'};
+  function professionStep(profession, allowedDialog = null, target = null) {
+    const id = 'profession_' + profession;
+    if (!profession || done.has(id)) return null;
+    const lesson = PROFESSIONS[profession];
+    return {id, sub:id, allowedDialog, target, title:lesson.title, body:professionBody(lesson)};
+  }
+  function openProfessionStep() {
+    const dialog = $('npc-dialogue');
+    if (isShown(dialog)) {
+      const profession = workshopLessons[dialog.dataset.service];
+      if (profession) return professionStep(profession, 'npc-dialogue', $('npc-inventory'));
+      const entry = $('npc-offers')?.querySelector('[data-view="fisher"], [data-view="smith"], [data-view="alchemy"], [data-offer="learn_enchanting"]');
+      if (isShown(entry)) return professionStep(workshopLessons[entry.dataset.view] || 'enchanting', 'npc-dialogue', entry);
+    }
+    const enchant = $('enchanting-panel');
+    if (isShown($('equipment')) && isShown(enchant)) return professionStep('enchanting', 'equipment', enchant);
+    return null;
+  }
+  function nearbyProfessionStep() {
+    if (hero.zone || hero.landing || hero.inCombat) return null;
+    const mentor = npcNear(n => localMentors[n.id] && !done.has('profession_' + localMentors[n.id]), 7);
+    return mentor ? professionStep(localMentors[mentor.id]) : null;
+  }
+  $('set-profession-guide')?.addEventListener('toggle', () => {
+    if (!$('set-profession-guide').open) return;
+    const host = $('profession-guide-list');
+    host.replaceChildren();
+    for (const lesson of Object.values(PROFESSIONS)) {
+      const title = document.createElement('dt'), text = document.createElement('dd');
+      title.textContent = tr(lesson.title);
+      text.textContent = tr(professionBody(lesson));
+      host.append(title, text);
+    }
+  });
   const FULL = () => { const h = hero; return !!h && h.bagCapacity > 0 && h.bagUsed >= h.bagCapacity; };
   const MORE = {
     first_death: {
@@ -517,6 +576,8 @@ window.Tutorial = (() => {
     if (!hero || disabled) return null;
     const ghostStep = moreStep('first_death');
     if (ghostStep) return ghostStep;
+    const profession = openProfessionStep();
+    if (profession) return profession;
     const dlg = currentDialogContext();
     const statPoints = hero.statPoints || 0;
     const gear = !done.has('equip_gear') ? compatibleWearableItems() : [];
@@ -537,7 +598,7 @@ window.Tutorial = (() => {
     if (!done.has('equip_gear') && gear.length) return stepEquipGear(gear);
     if (!done.has('new_skill') && skill) return stepNewSkill(skill);
     if (!done.has('consumables') && consumables.length) return stepConsumables(consumables);
-    return nextMoreStep();
+    return nearbyProfessionStep() || nextMoreStep();
   }
 
   function updateAutoCompletions() {
@@ -649,6 +710,8 @@ window.Tutorial = (() => {
     if (targetRect) avoid.push(targetRect);
     const stickRect = COARSE() ? stageRectFor($('touch-stick'), stage) : null;
     if (stickRect && step.target !== $('touch-stick')) avoid.push(stickRect);
+    const actionsRect = COARSE() ? stageRectFor($('touch-actions'), stage) : null;
+    if (actionsRect) avoid.push(actionsRect);
     const lowGfxRect = stageRectFor($('low-gfx-suggestion'), stage);
     if (lowGfxRect) avoid.push(lowGfxRect);
     const dlgEl = step.allowedDialog ? $(step.allowedDialog) : null;

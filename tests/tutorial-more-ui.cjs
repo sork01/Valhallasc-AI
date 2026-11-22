@@ -27,6 +27,7 @@ function requireMemoryLimit() {
 
 const FIRST_SIX = ['first_quest', 'levelup_stats', 'equip_gear', 'new_skill', 'consumables', 'merchant'];
 const LATER = ['target_attack', 'loot', 'quest_turnin', 'first_death', 'map', 'spark_travel', 'elite', 'rested', 'repair', 'bags_full', 'mail_bank', 'party_mercs'];
+const PROFESSIONS = ['profession_fishing', 'profession_blacksmithing', 'profession_enchanting', 'profession_alchemy'];
 
 (async () => {
   requireMemoryLimit();
@@ -68,7 +69,7 @@ const LATER = ['target_attack', 'loot', 'quest_turnin', 'first_death', 'map', 's
     }, { six: FIRST_SIX });
     const start = async (id, override) => {
       // Everything except the step under test counts as done, so only that step can show.
-      const others = [...FIRST_SIX, ...LATER.filter(x => x !== id)];
+      const others = [...FIRST_SIX, ...LATER.filter(x => x !== id), ...PROFESSIONS];
       await page.evaluate(([o, others]) => { window.__override = { tutorialDone: others, tutorialDisabled: false, ...o }; Tutorial.onSnapshot(window.__own); }, [override, others]);
     };
     const active = () => page.evaluate(() => Tutorial.state().active?.id || null);
