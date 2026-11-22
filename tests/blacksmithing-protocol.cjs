@@ -30,13 +30,18 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   await w.start();
   for (const bot of ['Minerone','Minertwo']) {
     await w.connect({bot,class:'warrior'});
+    assert.equal(w.player(bot).gathering,undefined,'an untrained character has no gathering flags');
     assert.equal((await smithing(bot,'train')).ok,false,'training requires the real nearby smith');
     await warp(bot,smith);
     assert.equal((await dialogue(bot)).blacksmithing.trainer,true);
     assert.equal((await smithing(bot,'train')).skill,1);
     assert.equal((await smithing(bot,'train')).ok,false,'starter pick cannot be granted twice');
     await wait(() => have(bot,'smith_pick_1') === 1,'starter pick in bags');
+    assert.deepEqual(w.player(bot).gathering,{ore:true,flowers:false},'training exposes ore tracking to the owner');
   }
+  const other = w.bots.get('Minertwo').id;
+  await wait(() => w.views.get('Minerone').players.some(p => p.id === other),'the second miner is visible');
+  assert.equal(w.views.get('Minerone').players.find(p => p.id === other).gathering,undefined,'gathering flags stay private');
 
   const view = w.views.get('Minerone');
   const safe = v => Math.min(...map.slimes.map(s => Math.hypot(s.x-v.x,s.y-v.y)));
@@ -85,6 +90,7 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   const copy = w.player('Minerone').gearInstances.find(g => g.item === staple);
   assert(copy && copy.rarity === 'uncommon');
   await w.restart();
+  assert.deepEqual(w.player('Minerone').gathering,{ore:true,flowers:false},'saved training enables tracking after reconnect');
   assert.equal(w.player('Minerone').gearInstances.find(g => g.item === staple).id,copy.id);
   assert.equal(w.player('Minerone').equipment.gloves,staple);
   assert.equal(have('Minerone','smith_pick_1'),1);

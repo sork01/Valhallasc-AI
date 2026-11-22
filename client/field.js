@@ -1364,7 +1364,7 @@
   let corpses = []; const corpseSprites = new Map();
   function reset() {
     pendingNpc = null; pendingChest = null; cityRoute = [];
-    window.Quests?.reset(); window.WorldMap?.reset(); explored = [];
+    window.Quests?.reset(); window.WorldMap?.reset(); window.GatheringMap?.reset(); explored = [];
     hero = newHero(); drops = []; chests = []; signs = []; corpses = []; corpseSprites.clear(); floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     touchDirection = [0, 0]; keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
@@ -1745,6 +1745,7 @@
     window.Fishing?.sync(packet, own, zdef, cue => say('fishingSound', cue));
     window.Blacksmithing?.sync(packet, own, cue => say('smithSound', cue));
     window.Alchemy?.sync(packet, cue => say('alchemySound', cue));
+    window.GatheringMap?.sync(packet, own);
     window.Attributes?.update(own);
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
@@ -5682,6 +5683,7 @@
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
     farLayer(farDots, zone, 0, 0, inA);
     if (miniFade) { const [fx, fy] = miniFade.shift; farLayer(miniFade.far, miniFade.zone, fx, fy, outA); if (!wmode) sparkLayer(miniFade.sparks, fx, fy, outA); }
+    window.GatheringMap?.draw(mctx, s, vx, vy, W);
     // Quest guidance stays above fog and actors, and changes independently of the cached ground.
     const questLayer = (list, dx, dy, a, pin = true) => {
       mctx.save(); mctx.globalAlpha = a; mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';

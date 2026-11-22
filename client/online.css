@@ -671,6 +671,14 @@
 .mini-zoom:disabled { opacity: .4; }
 .mini-zoom:focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
 @media (pointer: coarse) { .mini-zoom { display: grid; } }
+#mini-gather { position: absolute; top: .8cqw; right: calc(100% + 1cqw + 6px); min-width: 58px; min-height: 34px; padding: 0 7px; border: 1px solid #e5cd83; border-radius: 8px; color: #fff4ca; background: #17344d; font: bold 14px sans-serif; cursor: pointer; pointer-events: auto; touch-action: manipulation; }
+#mini-gather:focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
+#mini-gather[data-mode="ore"] { color: #ffd17a; border-color: currentColor; background: #442b1b; }
+#mini-gather[data-mode="flowers"] { color: #ffa6db; border-color: currentColor; background: #43273e; }
+@media (pointer: coarse) {
+  .hud-tr:has(#mini-gather:not([hidden])) { z-index: 23; }
+  #mini-gather { right: calc(100% + 1cqw + 12px + 46px / var(--ui, .8)); top: calc(.8cqw + 54px / var(--ui, .8)); min-width: calc(72px / var(--ui, .8)); min-height: calc(46px / var(--ui, .8)); font-size: calc(13px / var(--ui, .8)); }
+}
 .wm-open:hover, .wm-open:focus-visible { color: #fff; box-shadow: 0 0 1cqw #ffdc87, 0 .3cqw .8cqw #000a; }
 .wm-open:focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
 /* Mail: a round envelope under the world-map globe, on the same edge of the minimap; the dot shows unread letters. */

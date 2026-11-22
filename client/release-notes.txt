@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.6.2",
+    "date": "2026-11-22",
+    "new": [
+      "Use Track beside the minimap after learning Blacksmithing or Alchemy. Track active ore veins or flower patches, with an edge arrow pointing toward the nearest one when none are in view."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.6.1",
     "date": "2026-11-22",
     "new": [],

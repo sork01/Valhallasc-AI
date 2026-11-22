@@ -761,6 +761,11 @@ impl Player {
             if line.biting { view["fishDeadline"] = json!(line.deadline()); }
         }
         if c.fishing.total > 0 { view["fishingLog"] = json!(c.fishing); }
+        let ore = c.blacksmithing.proficiency.skill > 0;
+        let flowers = c.alchemy.proficiency.skill > 0;
+        if ore || flowers {
+            view["gathering"] = json!({ "ore": ore, "flowers": flowers });
+        }
         view["daze"] = json!(self.daze);
         view["danceT"] = json!(self.dance);
         view["festivalDance"] = self
