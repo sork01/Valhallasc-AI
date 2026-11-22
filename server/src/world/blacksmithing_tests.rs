@@ -169,6 +169,21 @@ fn blacksmithing_movement_damage_distance_and_full_bags_do_not_spend_pulls() {
 }
 
 #[test]
+fn blacksmithing_untrained_miner_gets_trainer_directions() {
+    let (mut w, _, mut replies) = smiths();
+    w.ensure_veins(0);
+    let vein = w.mining_veins[&0][0];
+    player_at(&mut w, 1, 0, vein.point);
+    w.message(1, ClientMessage::Mine { id: vein.id });
+    assert!(w.players[&1].mining.is_none());
+    assert!(std::iter::from_fn(|| replies[0].try_recv().ok()).any(|v| {
+        v["type"] == "mining"
+            && v["state"] == "error"
+            && v["text"] == "Learn Blacksmithing from Bram Emberforge in Alderhaven first."
+    }));
+}
+
+#[test]
 fn blacksmithing_simultaneous_last_pull_relocates_once_and_persists_once() {
     let (mut w, token, mut replies) = smiths();
     train(&mut w, 1);

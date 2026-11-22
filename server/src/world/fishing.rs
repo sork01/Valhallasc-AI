@@ -210,12 +210,7 @@ fn coast_landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> 
     Some(bobber)
 }
 
-// Intersect the facing ray with each nearby pool, then clamp the throw to the part over liquid.
-fn landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> {
-    let at = |d: f64| Point {
-        x: p.x + face.x * d,
-        y: p.y + face.y * d,
-    };
+fn landing(map: &Map, p: Point, face: Point, lava: bool, auto_aim: bool) -> Option<Point> {
     // A shore cast needs room for the hero's whole collision footprint.
     // Validate on a copy: fishing must never move a hero out of lava or scenery.
     let mut shore = p;
@@ -223,15 +218,36 @@ fn landing(map: &Map, p: Point, face: Point, lava: bool) -> Option<Point> {
     if shore.distance(p) > 1e-8 {
         return None;
     }
-    let mut nearest: Option<(f64, Point)> = None;
     let mut ids = vec![];
     if let Some(grid) = map.grid.get(&map.objects, map.size) {
         grid.in_box(p.x - 7., p.y - 7., p.x + 7., p.y + 7., 0, &mut ids);
     } else {
         ids.extend(0..map.objects.len() as u32);
     }
+    let cast = |direction| landing_along(map, p, direction, lava, &ids);
+    let aimed = cast(face);
+    if aimed.is_some() || !auto_aim {
+        return aimed;
+    }
+
+    // Try the smallest turn first. The same shore and surface rules apply to every ray.
+    let angle = face.y.atan2(face.x);
+    (1..24).find_map(|step| {
+        let turn = f64::from((step + 1) / 2) * std::f64::consts::TAU / 24.;
+        let (y, x) = (angle + if step % 2 == 1 { turn } else { -turn }).sin_cos();
+        cast(Point { x, y })
+    })
+}
+
+// Intersect the facing ray with each nearby pool, then clamp the throw to the part over liquid.
+fn landing_along(map: &Map, p: Point, face: Point, lava: bool, ids: &[u32]) -> Option<Point> {
+    let at = |d: f64| Point {
+        x: p.x + face.x * d,
+        y: p.y + face.y * d,
+    };
     let dock = map.dock.as_ref().filter(|d| d.contains(p));
-    for id in ids {
+    let mut nearest: Option<(f64, Point)> = None;
+    for &id in ids {
         let o = &map.objects[id as usize];
         let (start, end) = if let Some(r) = area_radius(o, lava) {
             let dx = o.x - p.x;
@@ -380,7 +396,7 @@ impl World {
             && !self.pvp_busy(&c.id)
             && self.trade_index(&c.id).is_none()
     }
-    fn fishing_line(&mut self, session: u64, time: f64) -> Result<Line, String> {
+    fn fishing_line(&mut self, session: u64, time: f64, auto_aim: bool) -> Result<Line, String> {
         if !self.can_fish(session) {
             return Err("You cannot fish right now.".into());
         }
@@ -392,8 +408,11 @@ impl World {
         let habitat = habitat(c.zone).ok_or("There are no fish here.")?;
         let lava = habitat == "Lava";
         let map = &self.maps[c.zone];
-        let bobber = landing(map, c.point(), p.face, lava)
-            .ok_or("Stand near the shore and face the water or lava.")?;
+        let bobber = landing(map, c.point(), p.face, lava, auto_aim).ok_or(if auto_aim {
+            "Move closer to the shore to fish."
+        } else {
+            "Stand near the shore and face the water or lava."
+        })?;
         let rich_point = self
             .rich_fishing
             .get(&c.zone)
@@ -489,8 +508,12 @@ impl World {
             let _=p.peer.try_send(json!({"type":"event","kind":"fish_bite","actor":p.character.id,"deadline":line.deadline()}));
         }
     }
-    pub(super) fn fish_press(&mut self, session: u64, time: f64) {
+    pub(super) fn fish_press(&mut self, session: u64, time: f64, auto_aim: bool) {
         if self.players[&session].fishing.line.is_some() {
+            // A second touch-cast request can arrive before the first cast is visible.
+            if auto_aim {
+                return;
+            }
             self.fish_update(session, time);
             let Some(line) = self.players[&session].fishing.line else {
                 return;
@@ -506,7 +529,7 @@ impl World {
             return;
         }
         self.ensure_fishing_spots(self.players[&session].character.zone);
-        let line = match self.fishing_line(session, time) {
+        let line = match self.fishing_line(session, time, auto_aim) {
             Ok(l) => l,
             Err(text) => {
                 let _ = self.players[&session]
@@ -519,6 +542,9 @@ impl World {
         p.stop();
         p.dance = None;
         p.character.mounted = false;
+        if auto_aim {
+            p.face = line.from.direction(line.bobber);
+        }
         p.fishing.line = Some(line);
         let _=p.peer.try_send(json!({"type":"event","kind":"fish_cast","actor":p.character.id,"x":line.bobber.x,"y":line.bobber.y}));
     }
@@ -673,6 +699,48 @@ mod data_tests {
     use super::*;
 
     #[test]
+    fn fishing_touch_cast_turns_toward_water_without_moving() {
+        let (mut w, mut rx) = super::super::fishing_tests::angler();
+        let p = &w.players[&1];
+        let start = p.character.point();
+        let away = [
+            Point { x: -1., y: 0. },
+            Point { x: 0., y: -1. },
+            Point { x: 0., y: 1. },
+        ]
+        .into_iter()
+        .find(|&face| landing(&w.maps[0], start, face, false, false).is_none())
+        .expect("the dock has a direction without a valid cast");
+        w.players.get_mut(&1).unwrap().face = away;
+
+        w.fish_press(1, 20., false);
+        assert!(w.players[&1].fishing.line.is_none());
+        assert!(matches!(
+            serde_json::from_value::<ClientMessage>(json!({"type":"fish","auto_aim":true})),
+            Ok(ClientMessage::Fish { auto_aim: true })
+        ));
+        w.fish_press(1, 20., true);
+        let player = &w.players[&1];
+        let line = player.fishing.line.expect("touch cast finds water");
+        assert_eq!(player.character.point().distance(start), 0.);
+        let bobber = landing(&w.maps[0], start, player.face, false, false).unwrap();
+        assert!(line.bobber.distance(bobber) < 1e-8);
+
+        w.fish_press(1, 20.3, true);
+        assert!(w.players[&1].fishing.line.is_some(), "repeated casts leave the line out");
+        let hook = line.deadline() - 0.5;
+        w.fish_press(1, hook, false);
+        assert!(std::iter::from_fn(|| rx.try_recv().ok()).any(|v| v["kind"] == "fish_catch"));
+
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.x = -10.;
+        assert_eq!(
+            w.fishing_line(1, hook + 2., true).err().as_deref(),
+            Some("Move closer to the shore to fish.")
+        );
+    }
+
+    #[test]
     fn fishing_data_all_candidates_pass_real_collision_and_cast() {
         let (w, _) = super::super::fishing_tests::angler();
         let points: Value =
@@ -688,7 +756,7 @@ mod data_tests {
                 "{}: blocked shore",
                 p["id"]
             );
-            let bobber = landing(&w.maps[zone], shore, face, habitat(zone) == Some("Lava"))
+            let bobber = landing(&w.maps[zone], shore, face, habitat(zone) == Some("Lava"), false)
                 .unwrap_or_else(|| panic!("{}: invalid cast", p["id"]));
             let expected: Point = serde_json::from_value(p.clone()).unwrap();
             assert!(
@@ -853,7 +921,7 @@ mod data_tests {
             p.character.x = at.x;
             p.character.y = at.y;
             p.character.fishing.proficiency.skill = cap - 1;
-            let line = w.fishing_line(1, 20.).unwrap();
+            let line = w.fishing_line(1, 20., false).unwrap();
             w.rng = 1;
             w.profession_rng = 0;
             w.land_fish(1, line, 21.);
@@ -883,7 +951,7 @@ mod data_tests {
     fn fishing_data_real_catches_spend_one_fish_per_hook_and_junk_spends_none() {
         let (mut w, mut rx) = super::super::fishing_tests::angler();
         w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, 2];
-        w.fish_press(1, 20.);
+        w.fish_press(1, 20., false);
         w.profession_rng = 0;
         let mut line = w.players[&1].fishing.line.unwrap();
         line.rich = Some(line.bobber);
@@ -898,7 +966,7 @@ mod data_tests {
         );
         w.players.get_mut(&1).unwrap().fishing.line = Some(line);
         w.rng = 1;
-        w.fish_press(1, line.deadline());
+        w.fish_press(1, line.deadline(), false);
         assert_eq!(w.rich_fishing[&0][0].remaining, 4);
         assert_eq!(w.players[&1].character.fishing.total, 1);
         assert_eq!(w.players[&1].character.fishing.proficiency.skill, 2);
@@ -1002,9 +1070,9 @@ mod data_tests {
         for rod in RODS.iter() {
             c.add_item(&rod.item, 1);
         }
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 8);
+        assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 8);
         w.players.get_mut(&1).unwrap().character.level = 10;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 3);
+        assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 3);
         w.maps[1].objects =
             vec![serde_json::from_value(json!({"kind":"lava","x":53.,"y":50.,"r":2.})).unwrap()];
         w.maps[1].grid = Default::default();
@@ -1013,9 +1081,9 @@ mod data_tests {
         p.character.x = 50.;
         p.character.y = 50.;
         p.character.level = 99;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 8);
+        assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 8);
         w.players.get_mut(&1).unwrap().character.level = 5;
-        assert_eq!(w.fishing_line(1, 20.).unwrap().tier, 2);
+        assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 2);
     }
 }
 

@@ -250,7 +250,11 @@ impl World {
         {
             return Err("Move closer to the ore vein.");
         }
-        if c.blacksmithing.proficiency.skill < skill_for(vein.tier) {
+        let skill = c.blacksmithing.proficiency.skill;
+        if skill == 0 {
+            return Err("Learn Blacksmithing from Bram Emberforge in Alderhaven first.");
+        }
+        if skill < skill_for(vein.tier) {
             return Err("Your Blacksmithing skill is too low.");
         }
         if !CATALOG

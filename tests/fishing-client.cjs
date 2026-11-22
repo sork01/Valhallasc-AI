@@ -23,12 +23,15 @@ class Element {
 }
 function fixture() {
   const els = new Map(), events = {}, cues = [], sent = [], errors = [], ops = [];
-  let time = 0, reduced = false;
+  let time = 0, reduced = false, touch = false;
   const el = id => { if (!els.has(id)) els.set(id, new Element()); return els.get(id); };
   const ctx = {performance:{now:() => time},Date:class extends Date {static now(){return 100000 + time;}},
     document:{getElementById:el,createElement:tag => new Element(tag),addEventListener(name,fn){events[name]=fn;}},
     WORLD_ITEMS:items, WORLD_MAP:map, Prefs:{keys:{}}, navigator:{},
-    Locale:{language:'en',translate:t=>t},matchMedia:()=>({get matches(){return reduced;}}),
+    Locale:{language:'en',translate:t=>t},matchMedia:query=>({
+      get matches(){return query === '(pointer: coarse)' ? touch : reduced;},
+      addEventListener(name,fn){events[query + name]=fn;},
+    }),
     addEventListener(name,fn){events[name]=fn;},MutationObserver:class{observe(){}},
     Inventory:{definition:id=>items.find(i=>i.id===id),icon:i=>i ? `<i data-icon="${i.id}"></i>` : ''},
     Field:{canAct:true,hero:null,clearInput(){this.clears=(this.clears||0)+1;},setPaused(on){this.paused=on; this.canAct=!on;}},
@@ -59,7 +62,8 @@ function fixture() {
   const project=(x,y)=>[x*10,y*10];
   const draw=(ground=false)=>ctx.Fishing.drawFishing(g,project,1600,900,ground,reduced);
   const sync=(hero,spots=[],z=map,others=[])=>{ctx.Field.hero={...hero};ctx.Fishing.sync({players:[hero,...others],fishingSpots:spots,fishingTime:(100000+time)/1000},hero,z,c=>cues.push(c));};
-  return {ctx,el,events,cues,sent,errors,ops,g,draw,sync,setTime:t=>{time=t;},reduce:on=>{reduced=on;}};
+  return {ctx,el,events,cues,sent,errors,ops,g,draw,sync,setTime:t=>{time=t;},reduce:on=>{reduced=on;},
+    touch:on=>{touch=on;events['(pointer: coarse)change']();}};
 }
 const f=fixture(), {ctx,el,cues,sent,errors}=f, fishing=ctx.Fishing;
 const areas = [map, ...map.zones];
@@ -85,7 +89,7 @@ check(ctx.Keys.label('fish')==='V','bite hint follows rebind');f.events['keymap-
 // Exercise Field's real key routing and action dispatcher, including typing/repeat guards.
 const field=read('client/field.js');
 ctx.running=true;ctx.paused=false;ctx.hero={...hero};ctx.heldDirection=()=>null;
-ctx.Field.action=vm.runInContext('(function(action) {'+field.split('    action(action) {')[1].split('\n    clearInput()')[0].replace(/},\s*$/, '}')+')',ctx);
+ctx.Field.action=vm.runInContext('(function('+field.split('    action(')[1].split('\n    clearInput()')[0].replace(/},\s*$/, '}')+')',ctx);
 vm.runInContext('function onKeyDown(e) {'+field.split('  function onKeyDown(e) {')[1].split('\n  function onKeyUp')[0],ctx);
 const key=(code,extra={})=>ctx.onKeyDown({code,key:code.slice(-1).toLowerCase(),preventDefault(){},...extra});
 f.sync(hero);f.setTime(50);key('KeyR',{target:{tagName:'INPUT'}});key('KeyR',{repeat:true});
@@ -96,14 +100,26 @@ delete ctx.Prefs.keys.fish;sent.length=0;f.setTime(500);
 
 // The real touch button uses pointerdown for a quick hook and suppresses its synthetic click.
 const touch=read('client/touch.js');ctx.arc=new Element();ctx.tr=text=>ctx.Locale.translate(text);
-ctx.Keys.register('fish',()=>ctx.Field.action('fish'));
-vm.runInContext('function button('+touch.split('  function button(')[1].split("\n  Keys.register('attack'")[0]+"\nthis.touchFish=button('Cast','fish',arc);",ctx);
+const fishRegistration = touch.split('\n').find(line => line.includes("Keys.register('fish'"));
+vm.runInContext('function button('+touch.split('  function button(')[1].split("\n  Keys.register('attack'")[0]+fishRegistration+"\nthis.touchFish=button('Cast','fish',arc);",ctx);
+const dry = {...hero,x:10000};
+f.sync(dry);
+ctx.coarse={matches:true};ctx.fish=ctx.touchFish;ctx.mine=new Element();
+let touchUpdate = touch.split('  function update() {')[1].split('    const ids = assignments()')[0];
+if (process.env.MUTATE === 'touch-hide') touchUpdate = touchUpdate.replace('!fishing?.touchAvailable()', '!fishing?.available()');
+if (process.env.MUTATE === 'touch-wait') touchUpdate = touchUpdate.replace(' || waiting;', ';');
+vm.runInContext('function fishTouchUpdate() {'+touchUpdate+'}',ctx);
+ctx.fishTouchUpdate();
+check(!ctx.fish.hidden && ctx.fish.textContent === 'Go fishing','touch fishing stays discoverable inland');
 ctx.touchFish.events.pointerdown({pointerType:'touch',preventDefault(){}});
 ctx.touchFish.events.click({detail:1});
-check(sent.length===1,'one touch produces one fishing input');sent.length=0;f.setTime(1000);
-ctx.coarse={matches:true};ctx.fish=ctx.touchFish;
-vm.runInContext('function fishTouchUpdate() {'+touch.split('  function update() {')[1].split('    const ids = assignments()')[0]+'}',ctx);
+check(JSON.stringify(sent)==='[{"type":"fish","auto_aim":true}]','one touch produces one assisted cast with no position');
+sent.length=0;f.setTime(1000);
+f.sync({...hero,zone:4},[],map.zones[3]);ctx.fishTouchUpdate();check(ctx.fish.hidden,'non-fishing zone hides fishing control');
+f.sync(hero);
 ctx.fishTouchUpdate();check(!ctx.fish.hidden&&ctx.fish.textContent==='Cast','contextual touch Cast button uses real update path');
+f.touch(true);check(el('fishing-hint').textContent.includes('tap Go fishing')&&!el('fishing-hint').textContent.includes('press R'),'touch log explains touch actions');
+f.touch(false);
 check(fishing.shore(hero,map),'Saltby sea mask is fishable');
 check(!fishing.shore({...hero,inventory:[]},map),'no rod hides shore control');
 check(fishing.shore({...hero,inventory:[{item:lava.id,quantity:1}]},map),'Platinum line also fishes ordinary water');
@@ -137,10 +153,15 @@ f.setTime(1500);f.draw();f.draw();check(cues.join(',')==='cast,plop','plop once 
 const remote={id:'other',x:24,y:30,zone:0,fishing:{...line,x:28,state:'waiting'}};
 f.sync({...hero,fishing:{...line,state:'waiting'}},[],map,[remote]);f.ops.length=0;f.draw();
 check(f.ops.filter(o=>o[0]==='quadraticCurveTo').length===4,'own and other player each draw rod and line');
+ctx.fishTouchUpdate();
+check(ctx.fish.disabled && ctx.fish.textContent === 'Fishing…','touch button prevents premature hooks and shows waiting state');
+check(!fishing.press(true),'touch dispatch also ignores an early hook');
 fishing.event({actor:'other',kind:'fish_catch',item:'fish_pier_sprat'},'self');check(cues.length===2,'remote events cannot show private catch UI or sound');
 f.setTime(2000);f.sync({...hero,fishing:{...line,state:'bite'},fishDeadline:103.2},[],map,[remote]);
 fishing.event({actor:'self',kind:'fish_bite',deadline:103.2},'self');check(fishing.phase==='bite'&&cues.at(-1)==='bite','bite phase and cue');
-ctx.fishTouchUpdate();check(ctx.fish.textContent==='Hook!'&&ctx.fish.dataset.bite==='true','touch button becomes Hook on bite');
+ctx.fishTouchUpdate();check(!ctx.fish.disabled&&ctx.fish.textContent==='Hook!'&&ctx.fish.dataset.bite==='true','touch button becomes Hook on bite');
+ctx.touchFish.events.pointerdown({pointerType:'touch',preventDefault(){}});
+check(JSON.stringify(sent.at(-1))==='{"type":"fish"}','touch hook uses the standard hook request');
 f.draw();f.ops.length=0;f.setTime(2600);f.draw();
 const arc=f.ops.find(o=>o[0]==='arc');check(arc&&Math.abs(arc[5]-Math.PI/2)<.001,'deadline ring drains using server clock');
 const fish=items.find(i=>i.kind==='fish'&&i.rarity==='legendary');

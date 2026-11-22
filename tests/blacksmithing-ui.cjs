@@ -26,10 +26,11 @@ let browser;
   });
   if (process.env.MUTATE === 'no-vein-click') {
     const text = fs.readFileSync(path.join(root,'client/field.js'),'utf8');
-    assert(text.includes('window.Blacksmithing.start(vein);'));
+    const call = touch ? 'startGathering(vein, smithing.start);' : 'startGathering(vein, window.Blacksmithing.start);';
+    assert(text.includes(call));
     await page.route('**/field.js', route => route.fulfill({
       contentType:'application/javascript',
-      body:text.replace('window.Blacksmithing.start(vein);','void vein;'),
+      body:text.replace(call,'void vein;'),
     }));
   }
   const errors = [];
@@ -100,12 +101,22 @@ let browser;
   });
   assert(await page.evaluate(({x,y}) => document.elementFromPoint(x,y)?.id === 'fieldcv', target),
     'the ore is visible on the interactive world canvas');
-  if (touch) await page.touchscreen.tap(target.x,target.y);
-  else await page.mouse.click(target.x,target.y);
+  if (touch) {
+    const mine = page.locator('#touch-skills .touch-mine');
+    assert.equal(await mine.textContent(),'Bryt malm');
+    const box = await mine.boundingBox();
+    assert(box.width >= 44 && box.height >= 44,'mining is a full-sized touch target');
+    assert(await mine.evaluate(button => {
+      const r=button.getBoundingClientRect();
+      return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2) === button;
+    }),'the Mine ore button receives touch events');
+    await mine.tap();
+  } else await page.mouse.click(target.x,target.y);
   try {
     await w.waitFor(() => miningPackets.at(-1)?.state === 'done' || miningPackets.at(-1)?.state === 'error', 9500, 'mining reply');
     assert.equal(miningPackets.at(-1).state,'done',miningPackets.at(-1).text || 'pull completed');
     assert(miningPackets.some(packet => packet.state === 'started'));
+    assert.deepEqual(miningRequests,[vein.id]);
     await page.waitForFunction(() => Inventory.bagQuantity('smith_ore_tin') > 0, null, {timeout:8000});
   } catch (error) {
     error.message += ` (sent ${JSON.stringify(miningRequests)}, received ${JSON.stringify(miningPackets)})`;

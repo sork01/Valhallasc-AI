@@ -1448,6 +1448,15 @@
     marker = {x:portal.x,y:portal.y,t:0}; emitHud();
   }
   const SIGN_W = 28, SIGN_TOP = 70;   // the clickable body of a boss sign, in screen pixels
+  function startGathering(target, start) {
+    hero.target = null;
+    hero.goal = null;
+    hero.pvpTargetId = null;
+    npcTarget = null;
+    Field.stopMoving();
+    start(target);
+    emitHud();
+  }
   function onPointerDown(e) {
     window.WorldFeedback?.leave();
     const ghostWalking = !!(hero.dead && hero.ghost);
@@ -1458,18 +1467,8 @@
       if (window.RaidKey?.click(mx,my,w2s)) return;
       const vein = window.Blacksmithing?.pick(mx,my,w2s);
       const flower = window.Alchemy?.hit(mx,my,w2s);
-      if (vein || flower) {
-        hero.target = null;
-        hero.goal = null;
-        Field.stopMoving();
-        pointer.down = false;
-        hero.pvpTargetId = null;
-        npcTarget = null;
-        if (flower) window.Alchemy.start(flower);
-        else window.Blacksmithing.start(vein);
-        emitHud();
-        return;
-      }
+      if (flower) { startGathering(flower, window.Alchemy.start); return; }
+      if (vein) { startGathering(vein, window.Blacksmithing.start); return; }
     }
     const npc = City.npcs.find(n => {
       if (ghostWalking && n.art !== 'spirit_guide') return false;
@@ -5810,14 +5809,20 @@
       if (z !== miniZoom) { miniZoom = z; window.Prefs?.set({ minimapZoom: z }); }
       miniZoomButtons(); return miniZoom;
     },
-    action(action) {
+    action(action, autoAim = false) {
       if (action === 'talk' && running && !paused && Online.connected && !hero.sparkTravel && (!hero.dead || hero.ghost)) {
         const list = hero.dead && hero.ghost ? City.npcs.filter(n => n.art === 'spirit_guide') : [...City.npcs.filter(n => n.art !== 'spirit_guide'), ...signs];
         const npc = list.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
         if (npc) talkTo(npc); return !!npc;
       }
       if (!Field.canAct || hero.sparkTravel) return false;
-      if (action === 'fish') return !!window.Fishing?.press();
+      if (action === 'fish') return !!window.Fishing?.press(autoAim);
+      if (action === 'mine') {
+        const smithing = window.Blacksmithing, vein = smithing?.nearbyVein;
+        if (!vein || smithing.isMining) return false;
+        startGathering(vein, smithing.start);
+        return true;
+      }
       if (action === 'attack') return Field.useSkill('attack');
       if (action === 'dash') return isAssassin() && Field.useSkill('shadowstep');
       if (action === 'mount') { Field.toggleMount(); return true; }

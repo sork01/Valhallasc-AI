@@ -13,11 +13,13 @@
   let lastPress = -Infinity, sound = () => {}, clockOffset = 0;
   const lines = new Map();
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const touch = matchMedia('(pointer: coarse)');
+  const habitats = new Set([0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45]);
   const calm = () => !!window.Prefs?.lowGraphics || motion.matches;
 
   // A visibility hint, never a claim that the world will accept a cast. Match the facing ray and liquid shapes.
   function shore(hero, map, checkRod = true) {
-    if (!hero || !map || ![0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45].includes(hero.zone || 0)) return false;
+    if (!hero || !map || !habitats.has(hero.zone || 0)) return false;
     const lava = [1, 45].includes(hero.zone), level = hero.level || 1;
     if (checkRod && !(hero.inventory || []).some(s => {
       const i = definition(s.item); return s.quantity > 0 && i?.kind === 'rod' && i.requiredLevel <= level && (!lava || !!i.fishing?.lava);
@@ -69,14 +71,18 @@
     const rod = requiredRod(zone, rich);
     return rod ? tr('Requires {0} · level {1}').replace('{0}',tr(rod.name)).replace('{1}',rod.requiredLevel) : '';
   }
-  function available() {
-    return !!own && !own.dead && !own.ghost && !own.sparkTravel && !own.inCombat && !(own.stun > 0) && !window.Cutscene?.active && !!(own.fishing || shoreHint);
-  }
-  function press() {
+  const touchAvailable = () => !!own && !own.dead && !own.ghost && habitats.has(own.zone || 0);
+  const ready = () => touchAvailable() && !own.sparkTravel && !own.inCombat && !(own.stun > 0) && !window.Cutscene?.active;
+  const available = () => ready() && !!(own.fishing || shoreHint);
+  const phase = () => lines.get(own?.id)?.state || (cast ? 'cast' : 'idle');
+  function press(autoAim = false) {
     if (!window.Field?.canAct || window.Cutscene?.active || Field.hero?.sparkTravel || now() - lastPress < 160) return false;
+    const state = phase();
+    if (autoAim && (!ready() || (state !== 'idle' && state !== 'bite'))) return false;
     lastPress = now();
     Field.clearInput();
     // Do not send a stop packet here: it can clear facing/targets before the authoritative cast check.
+    if (autoAim && state === 'idle') return Online.send({ type: 'fish', auto_aim: true });
     return Online.send({ type: 'fish' });
   }
   function reset() {
@@ -292,7 +298,7 @@
         const left = Number.isFinite(line.deadline) ? clamp((line.deadline * 1000 - Date.now() - clockOffset) / 1200) : clamp(1 - (time - line.biteAt) / 1200);
         g.strokeStyle = '#ffdf71'; g.lineWidth = 3; g.beginPath(); g.arc(bx, by - 35, 20, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left); g.stroke();
         if (!reduced) for (let i = 0; i < 5; i++) { const a = i * 1.256 + time / 300; g.fillStyle = line.lava ? '#ffae61' : '#c0eeff'; g.fillRect(bx + Math.cos(a) * 15, by - 10 + Math.sin(a) * 7, 2, 4); }
-        if (id === own?.id) { g.font = 'bold 14px sans-serif'; g.globalAlpha *= reduced ? 1 : .8 + .2 * Math.sin(time / 90); g.fillText(tr('Hook!') + '  ' + Keys.label('fish'), hx, hy + 27); }
+        if (id === own?.id) { g.font = 'bold 14px sans-serif'; g.globalAlpha *= reduced ? 1 : .8 + .2 * Math.sin(time / 90); g.fillText(tr('Hook!') + (touch.matches ? '' : '  ' + Keys.label('fish')), hx, hy + 27); }
       }
       if (id === own?.id) { const label = tr(usingRichSpot() ? 'Rich fishing spot' : 'Ordinary fishing water'); g.globalAlpha = 1; g.font = 'bold 14px sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#10212b'; g.strokeText(label, hx, hy + 49); g.fillStyle = usingRichSpot() ? '#fff1a5' : '#d2e6ec'; g.fillText(label, hx, hy + 49); }
       g.restore();
@@ -318,8 +324,13 @@
   document.addEventListener('keydown', e => {
     if (!$('fishing-panel').hidden && Keys.is(e, 'menu')) { e.preventDefault(); e.stopPropagation(); close(); }
   }, true);
-  const updateHint = () => { $('fishing-hint').textContent = tr('Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.').replace(/‹fish›/g, tr(Keys.label('fish', false))); };
+  const updateHint = () => {
+    $('fishing-hint').textContent = touch.matches
+      ? tr('Keep a rod in your bags, walk near the shore and tap Go fishing or Cast. Tap Hook! when a fish bites.')
+      : tr('Face the water with a rod, then press ‹fish› to cast. Press again when a fish bites.').replace(/‹fish›/g, tr(Keys.label('fish', false)));
+  };
   addEventListener('keymap-change', updateHint);
+  touch.addEventListener('change', updateHint);
   updateHint();
-  window.Fishing = { waterAt, requiredRod, requirement, sync, event, reset, press, available, shore, open, close, drawFishing, richSpotAt, get richActive() { return usingRichSpot(); }, get phase() { return lines.get(own?.id)?.state || 'idle'; } };
+  window.Fishing = { waterAt, requiredRod, requirement, sync, event, reset, press, available, touchAvailable, ready, shore, open, close, drawFishing, richSpotAt, get richActive() { return usingRichSpot(); }, get phase() { return phase(); } };
 })();

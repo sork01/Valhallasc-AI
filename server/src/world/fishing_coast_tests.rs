@@ -135,7 +135,7 @@ fn fishing_coast_real_greenmeadow_casts_do_not_move_the_angler() {
             p.face = face;
             p.fishing = Default::default();
             let before = p.character.point();
-            world.fish_press(1, 100.);
+            world.fish_press(1, 100., false);
             let line = world.players[&1].fishing.line.expect("ordinary coast cast");
             assert!(line.bobber.distance(before) >= 3. && line.bobber.distance(before) <= 6.);
             assert_eq!(line.habitat, habitat(zone).unwrap());

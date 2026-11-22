@@ -5,7 +5,7 @@
   const format = (text, ...values) => tr(text).replace(/\{(\d+)\}/g, (_, n) => values[Number(n)]);
   const itemName = id => tr(Inventory.definition(id)?.name || id);
   const status = document.getElementById('mining-status');
-  let veins = [], miners = [], active = null, sound = null, noticeTimer = 0;
+  let veins = [], miners = [], nearestVein = null, ownMining = false, active = null, sound = null, noticeTimer = 0;
   let workshop = null, pending = false, section = 'staple';
 
   function element(tag, text = '', className = '') {
@@ -154,7 +154,16 @@
     veins = packet.miningVeins || [];
     miners = packet.players.filter(player => player.mining);
     sound = cue;
-    if (active && !own.mining) active = null;
+    ownMining = !!own.mining;
+    if (active && !ownMining) active = null;
+    nearestVein = null;
+    let best = 2.6; // Keep in step with the server's mining reach.
+    for (const vein of veins) {
+      const distance = Math.hypot(vein.x - own.x, vein.y - own.y);
+      if (distance > best) continue;
+      nearestVein = vein;
+      best = distance;
+    }
   }
   function showStatus(text, timed = true) {
     if (!status) return;
@@ -225,12 +234,14 @@
   }
 
   function reset() {
-    veins = []; miners = []; active = null; sound = null;
+    veins = []; miners = []; nearestVein = null; ownMining = false; active = null; sound = null;
     clearTimeout(noticeTimer);
     if (status) status.hidden = true;
     close();
   }
   window.Blacksmithing = {render, close, onPacket, sync, mining, pick, start, draw, reset,
+    get nearbyVein() { return nearestVein; },
+    get isMining() { return !!active || ownMining; },
     study:plan => command('study', {plan}),
     pickDetails(item) {
       const pick = data?.picks.find(entry => entry.item === item.id);

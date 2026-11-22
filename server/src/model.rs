@@ -1483,7 +1483,10 @@ pub enum ClientMessage {
         npc: String,
         changes: std::collections::BTreeMap<String, String>,
     },
-    Fish {},
+    Fish {
+        #[serde(default)]
+        auto_aim: bool,
+    },
     ShopPresence { open: bool },
     Join {
         version: u32,

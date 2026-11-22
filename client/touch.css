@@ -384,7 +384,7 @@ html, body { overscroll-behavior: none; }
   .stick-disc { position: absolute; left: 50%; top: 50%; width: calc(112px / var(--ui, .8)); height: calc(112px / var(--ui, .8)); margin: calc(-56px / var(--ui, .8)); border-radius: 50%; border: 2px solid #f5c542; background: #101e4655; opacity: .45; pointer-events: none; }
   .stick-disc i { display: block; position: absolute; width: calc(44px / var(--ui, .8)); height: calc(44px / var(--ui, .8)); top: calc(34px / var(--ui, .8)); left: calc(34px / var(--ui, .8)); border-radius: 50%; background: #bfeeff99; border: 2px solid #f5c542; }
   #touch-stick.held .stick-disc { opacity: .8; }
-  #touch-skills { right: 8px; bottom: 8px; width: calc(270px / var(--ui, .8)); height: calc(176px / var(--ui, .8)); }
+  #touch-skills { right: 8px; bottom: 8px; width: calc(270px / var(--ui, .8)); height: calc(202px / var(--ui, .8)); }
   #touch-skills button, #touch-actions button, #touch-quickuse button, .touch-tray-open .skill-slot, .touch-tray-open .skills-open {
     min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); pointer-events: auto; touch-action: manipulation;
     font-size: calc(12px / var(--ui, .8)); color: #ffe6a8; background: #101e46ec; border: 1px solid #c9ad73; border-radius: 10px;
@@ -396,6 +396,10 @@ html, body { overscroll-behavior: none; }
   #touch-skills [data-arc="1"] { bottom: calc(48px / var(--ui, .8)); right: calc(134px / var(--ui, .8)); }
   #touch-skills [data-arc="2"] { bottom: calc(110px / var(--ui, .8)); right: calc(90px / var(--ui, .8)); }
   #touch-skills [data-arc="3"] { bottom: calc(80px / var(--ui, .8)); right: calc(18px / var(--ui, .8)); }
+  #touch-skills :is(.touch-fish, .touch-mine) { width: calc(74px / var(--ui, .8)); height: calc(52px / var(--ui, .8)); font-size: calc(14px / var(--ui, .8)); }
+  #touch-skills .touch-fish { right: 0; bottom: calc(150px / var(--ui, .8)); background: #173c4d; }
+  #touch-skills .touch-fish[data-bite="true"] { color: #241808; background: #ffe07d; border: 3px solid #fff4c0; }
+  #touch-skills .touch-mine { right: calc(164px / var(--ui, .8)); bottom: calc(118px / var(--ui, .8)); background: #442b1b; }
   #touch-skills button > span:first-child:not(:last-child) { display: block; height: 55%; }
   #touch-skills svg { height: 100%; width: 100%; }
   #touch-skills small { position: absolute; top: 0; right: 0; background: #101e46; }

@@ -49,6 +49,10 @@ if (process.env.MUTATE === 'no-click') {
   assert(moduleText.includes("return Online.send({type:'mine', id:vein.id});"));
   moduleText = moduleText.replace("return Online.send({type:'mine', id:vein.id});","return false;");
 }
+if (process.env.MUTATE === 'mine-range') {
+  assert(moduleText.includes('let best = 2.6;'));
+  moduleText = moduleText.replace('let best = 2.6;', 'let best = Infinity;');
+}
 vm.runInContext(moduleText,context,{filename:'blacksmithing.js'});
 
 const Blacksmithing = context.Blacksmithing;
@@ -101,4 +105,35 @@ assert.deepEqual(errors,['Mining interrupted.']);
 Blacksmithing.reset();
 assert.equal(Blacksmithing.pick(95,45,project),undefined);
 assert.equal(status.hidden,true);
+
+const fieldSource = read('field.js');
+const touchSource = read('touch.js');
+const hero = {x:100,y:60};
+const stop = () => sent.push({type:'stop'});
+Object.assign(context, { hero, npcTarget:null, Field:{canAct:true, hero, stopMoving:stop}, emitHud() {} });
+vm.runInContext('function startGathering'+fieldSource.split('  function startGathering')[1].split('  function onPointerDown')[0]
+  +'\nField.action = function('+fieldSource.split('    action(')[1].split('\n    clearInput()')[0].replace(/},\s*$/, '}'), context);
+const controls = { fish:new Node('button'), mine:new Node('button'), coarse:{matches:true}, tr:context.Locale.translate };
+Object.assign(context, controls);
+vm.runInContext('function updateProfessionButtons() {'+touchSource.split('  function update() {')[1].split('    const ids = assignments()')[0]+'}', context);
+const syncVeins = (x, mining) => Blacksmithing.sync({
+  miningVeins:[{id:12,x:102,y:60},vein,{id:13,x:110,y:60}],players:[],
+},{x,y:60,mining},() => {});
+syncVeins(113);
+context.updateProfessionButtons();
+assert.equal(controls.mine.hidden,true,'Mine ore is hidden outside mining reach');
+assert.equal(context.Field.action('mine'),false,'out-of-range mining sends nothing');
+syncVeins(100.5);
+context.updateProfessionButtons();
+assert.equal(controls.mine.hidden,false);
+assert.equal(controls.mine.textContent,'Bryt malm');
+assert.equal(context.Field.action('mine'),true);
+assert.deepEqual(sent.slice(-2),[{type:'stop'},{type:'mine',id:11}],'touch uses the nearest active vein and stops movement');
+syncVeins(100.5,11);
+context.updateProfessionButtons();
+assert.equal(controls.mine.disabled,true,'an active pull disables the button');
+assert.equal(controls.mine.textContent,'Bryter malm …');
+assert.equal(context.Field.action('mine'),false,'an active pull ignores repeated input');
+Blacksmithing.reset();
+assert.equal(Blacksmithing.nearbyVein,null);
 console.log('Blacksmithing client passed Swedish rendering, action gating, canvas hit detection, animated art and cues.');

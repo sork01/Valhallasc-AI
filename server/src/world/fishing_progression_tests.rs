@@ -42,7 +42,7 @@ fn fishing_progression_all_waters_name_the_required_rod_and_reject_its_predecess
     ] {
         let rod = RODS.iter().find(|r| r.tier == tier).unwrap();
         at_pool(&mut w, zone, &rod.item);
-        assert!(w.fishing_line(1, 20.).is_ok(), "tier {tier} in zone {zone}");
+        assert!(w.fishing_line(1, 20., false).is_ok(), "tier {tier} in zone {zone}");
         let p = w.players.get_mut(&1).unwrap();
         p.character.inventory.clear();
         if tier > 1 {
@@ -50,7 +50,7 @@ fn fishing_progression_all_waters_name_the_required_rod_and_reject_its_predecess
                 .add_item(&RODS.iter().find(|r| r.tier == tier - 1).unwrap().item, 1);
         }
         let message = w
-            .fishing_line(1, 20.)
+            .fishing_line(1, 20., false)
             .err()
             .expect("weaker rod must be rejected");
         assert!(
@@ -67,7 +67,7 @@ fn fishing_progression_all_waters_name_the_required_rod_and_reject_its_predecess
     }
     for zone in [2, 3] {
         at_pool(&mut w, zone, "rod_emberline_rod");
-        let point = w.fishing_line(1, 20.).unwrap().bobber;
+        let point = w.fishing_line(1, 20., false).unwrap().bobber;
         w.rich_fishing.insert(
             zone,
             vec![RichSpot {
@@ -76,13 +76,13 @@ fn fishing_progression_all_waters_name_the_required_rod_and_reject_its_predecess
                 reserve: None,
             }],
         );
-        assert!(w.fishing_line(1, 20.).err().unwrap().contains("Willow Rod"));
+        assert!(w.fishing_line(1, 20., false).err().unwrap().contains("Willow Rod"));
         w.players
             .get_mut(&1)
             .unwrap()
             .character
             .add_item("rod_willow_rod", 1);
-        assert!(w.fishing_line(1, 20.).is_ok());
+        assert!(w.fishing_line(1, 20., false).is_ok());
     }
 }
 
@@ -94,7 +94,7 @@ fn fishing_progression_every_upgrade_keeps_earlier_waters_and_replaces_one_rod()
         for zone in [0, 1, 45] {
             at_pool(&mut w, zone, &r.item);
             assert_eq!(
-                w.fishing_line(1, 20.).is_ok(),
+                w.fishing_line(1, 20., false).is_ok(),
                 r.tier
                     >= if zone == 45 {
                         6
@@ -154,10 +154,10 @@ fn fishing_progression_rods_and_food_change_wait_and_rare_weight() {
         .set(0, "clear", None, daynight::unix_ms())
         .unwrap();
     w.rng = 123;
-    let first = w.fishing_line(1, 20.).unwrap();
+    let first = w.fishing_line(1, 20., false).unwrap();
     at_pool(&mut w, 0, "rod_worldwire_rod");
     w.rng = 123;
-    let last = w.fishing_line(1, 20.).unwrap();
+    let last = w.fishing_line(1, 20., false).unwrap();
     assert!(
         ((last.bite_at - last.cast_end) / (first.bite_at - first.cast_end) - 0.58).abs() < 1e-8
     );
@@ -172,7 +172,7 @@ fn fishing_progression_rods_and_food_change_wait_and_rare_weight() {
         p.character.add_item(id, 1);
         w.use_item(1, id);
         w.rng = 123;
-        let food = w.fishing_line(1, 20.).unwrap();
+        let food = w.fishing_line(1, 20., false).unwrap();
         assert!(
             ((food.bite_at - food.cast_end) / (last.bite_at - last.cast_end) - speed).abs() < 1e-8,
             "{id}"

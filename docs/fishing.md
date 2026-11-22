@@ -1,5 +1,7 @@
 # Fishing rules and implementation plan
 
+On phones and tablets, **Go fishing** is available in fishing zones. Keep a rod in your bags, get close to the shore and tap the button. The cast uses your current direction if that reaches fishable water, or turns toward nearby water while you stay in place. Wait for **Hook!**, then tap it. On desktop, face the water and press **R** by default.
+
 ## Fishing skill (1.4.0)
 
 Fish in the current training waters to raise skill. Move to the next band at every 30 points. The fishing log and catch card point to the current waters. All legal catches still award fish and collection progress wherever you fish.

@@ -3088,7 +3088,8 @@ impl World {
             ClientMessage::Input { dx, dy } => dx.is_finite() && dy.is_finite() && (*dx != 0. || *dy != 0.),
             ClientMessage::Move { x, y } => x.is_finite() && y.is_finite(),
             ClientMessage::Attack { .. } | ClientMessage::Skill { .. } | ClientMessage::Dash { .. }
-            | ClientMessage::Target { .. } | ClientMessage::Mount { .. } | ClientMessage::Fish {}
+            | ClientMessage::Target { .. } | ClientMessage::Mount { .. }
+            | ClientMessage::Fish { .. }
             | ClientMessage::Interact { .. } | ClientMessage::RaidCross { .. } => true,
             _ => false,
         };
@@ -3121,7 +3122,7 @@ impl World {
                         .try_send(json!({"type":"error","text":text}));
                 }
             }
-            ClientMessage::Fish {} => self.fish_press(session, fishing::now()),
+            ClientMessage::Fish { auto_aim } => self.fish_press(session, fishing::now(), auto_aim),
             ClientMessage::ShopPresence { open } => {
                 p.fishing.shopping = open;
                 if open && p.fishing.line.is_some() { self.fish_end(session, "Line pulled in.", false, fishing::now()); }

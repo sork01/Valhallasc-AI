@@ -1,6 +1,6 @@
 # Blacksmithing
 
-Speak to Bram Emberforge in Alderhaven and choose the Blacksmithing workshop to learn the profession and receive a starter pick. Keep a pick in your bags. Click or tap an active vein within reach, then stay still for the pull. Moving, taking damage, or losing access to the vein ends the action. Town smiths sell components and replacement starter picks through their Buy menu.
+Speak to Bram Emberforge in Alderhaven and choose the Blacksmithing workshop to learn the profession and receive a starter pick. Keep a pick in your bags. Click or tap an active vein within reach, then stay still for the pull. On phones and tablets, **Mine ore** appears beside the skill buttons when a vein is within reach. Moving, taking damage, or losing access to the vein ends the action. Town smiths sell components and replacement starter picks through their Buy menu.
 
 Three veins are active in each of 21 shared adventure zones. Each supports three to five pulls shared by everyone nearby. A successful pull places one or two ore in the miner's bag. If a bag cannot hold the ore, the pull remains available. After the last pull the vein relocates to an unoccupied candidate and receives a fresh ID. Town service maps, private instances and the Arena have no veins.
 

@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.6.1",
+    "date": "2026-11-22",
+    "new": [],
+    "changed": [
+      "On phones and tablets, tap Go fishing near the shore to turn toward the water and cast. The button lights up when it is time to hook.",
+      "Use the Mine ore button when you are close to a vein, or tap the vein itself."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.6.0",
     "date": "2026-11-22",
     "new": [
