@@ -20,3 +20,11 @@ Alchemy effects are suppressed in duels, Arena matches, the Arena gauntlet and w
 - `cargo test alchemy_` checks authoritative approaches, shared depletion, interruption, atomic saves, training, formula drops and buff eligibility. `python3 tests/alchemy-data.py` checks coverage, alternate candidates, catalog parity, repeatable generation and asset integrity.
 - `node tests/alchemy-protocol.cjs` plays through the live protocol with two private guests and a disposable database. `node tests/alchemy-client.cjs` exercises the actual client module in Swedish. On an approved browser host, use the bounded runner with `tests/alchemy-ui.cjs` for desktop and set `TOUCH=1` for Swedish touch.
 - Editable PixelFlow projects are listed in `client/assets/alchemy-art.txt`. Run `python3 scripts/make_alchemy_art.py export` to rebuild the sprite atlas. The three dybase2 cues can be rendered again with `bash scripts/create_alchemy_sounds.sh`.
+
+## Public release
+
+Alchemy went live on 2026-11-22 as `1.6.0-8fe38684`. Implementation `8205d277` is on main. The public build came from `8fe38684` on `release/alchemy-1.6.0` and keeps the 120-achievement catalog at 2,555 points.
+
+The release executable passed the private two-player gathering, brewing and restart test. Production returned to bridge health in 2.97 seconds. Verification matched the running executable and all 20 changed client files, checked public and legacy health and the service journal, and confirmed that SQLite preserved all five characters. The desktop and touch browser suites still await host approval.
+
+The previous client release is `1.5.0-a72767c5`. See `www/Valhalla/alchemy-release-receipt.json` and `deploy/backups/alchemy-release-20261122-ArVtgm/` for the release record and rollback backups.

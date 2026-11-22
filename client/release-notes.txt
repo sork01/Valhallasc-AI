@@ -1,7 +1,7 @@
 [
   {
     "version": "1.6.0",
-    "date": "2026-11-21",
+    "date": "2026-11-22",
     "new": [
       "Learn Alchemy from Maera Petalbrook in Alderhaven. Pick flowers in the adventure zones and city gardens, or trade for ingredients and brew your way from skill 1 to 600.",
       "Alchemists teach potion and flask recipes and sell empty containers. Find Trailwind and three level-99 flask formulas on selected elites and final bosses.",
