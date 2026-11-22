@@ -84,20 +84,30 @@ let browser;
   const safe = v => Math.min(...map.slimes.map(s => Math.hypot(s.x-v.x,s.y-v.y)));
   const vein = [...view.miningVeins].sort((a,b) => safe(b)-safe(a))[0];
   await warp(vein);
-  await page.evaluate(vein => {
-    const draw = Blacksmithing.draw;
-    Blacksmithing.draw = (g,project,width,height,reduced) => {
-      const [x,y] = project(vein.x,vein.y);
-      if (x > 80 && x < width-80 && y > 90 && y < height-60) window.smithVeinTest = {x,y,width,height};
-      draw(g,project,width,height,reduced);
+  // Wandering enemies can put the character in combat even with test invulnerability.
+  const playerId = await page.evaluate(() => Online.id);
+  const nearbyEnemies = view.slimes.filter(s => !s.dead && Math.hypot(s.x-vein.x,s.y-vein.y) < 16);
+  const clearAt = view.tick;
+  for (const enemy of nearbyEnemies) await debug({op:'kill_enemy',id:enemy.id});
+  await w.waitFor(() => view.tick > clearAt && view.players.find(p => p.id === playerId)?.inCombat === false
+    && nearbyEnemies.every(enemy => !view.slimes.some(s => s.id === enemy.id && !s.dead)),
+    15000,'the test vein is clear of combat');
+  await page.evaluate(id => {
+    const draw = Blacksmithing.drawVein;
+    Blacksmithing.drawVein = (g,vein,x,y) => {
+      if (vein.id === id) {
+        const scale = g.getTransform().a;
+        window.smithVeinTest = {x,y,width:g.canvas.width/scale,height:g.canvas.height/scale};
+      }
+      draw(g,vein,x,y);
     };
-  },vein);
+  },vein.id);
   await page.waitForFunction(() => Boolean(window.smithVeinTest));
   await page.waitForTimeout(600); // let camera movement settle before taking the hitbox coordinates
   const target = await page.evaluate(() => {
     const {x,y,width,height} = window.smithVeinTest;
     const r = document.getElementById('fieldcv').getBoundingClientRect();
-    return {x:r.x+x*r.width/width,y:r.y+(y-22)*r.height/height};
+    return {x:r.x+x*r.width/width,y:r.y+(y-47)*r.height/height};
   });
   assert(await page.evaluate(({x,y}) => document.elementFromPoint(x,y)?.id === 'fieldcv', target),
     'the ore is visible on the interactive world canvas');

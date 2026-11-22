@@ -5031,6 +5031,14 @@
     for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, Math.round(70 * CHEST_SCALE))) { shadow(g,chest.x,chest.y,27 * CHEST_SCALE,9 * CHEST_SCALE,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
     for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
+    for (const vein of window.Blacksmithing?.veins || []) {
+      const [sx, sy] = w2s(vein.x, vein.y);
+      if (onScreen(sx, sy, 100)) list.push({ d: vein.x + vein.y, vein, sx, sy });
+    }
+    for (const patch of window.Alchemy?.patches || []) {
+      const [sx, sy] = w2s(patch.x, patch.y);
+      if (onScreen(sx, sy, 60)) list.push({ d: patch.x + patch.y, patch, sx, sy });
+    }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, hero.ghost ? .15 : .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
     for (const body of corpses) {
       const [sx, sy] = w2s(body.x, body.y);
@@ -5057,6 +5065,8 @@
       if (it.arch) { ExitPaths.arch(g,it.arch,w2s); continue; }
       if (it.stone) { EmptySeat.drawStone(g, it); continue; }
       if (it.fx) { drawMeleeFx(g, it.fx, it.back); continue; }
+      if (it.vein) { Blacksmithing.drawVein(g, it.vein, it.sx, it.sy); continue; }
+      if (it.patch) { Alchemy.drawPatch(g, it.patch, it.sx, it.sy); continue; }
       if (it.o) {
         const o = it.o;
         const oset = o.ghostSet || set;
@@ -5310,8 +5320,7 @@
     if (zdef.theme === 'moonwell') drawBossBar(g);
     window.NewYear?.drawFireworks(g,zone,hero,t,VW,VH,reducedMotion());
     drawFishing(g);
-    window.Blacksmithing?.draw(g, w2s, VW, VH, reducedMotion() || !!window.Prefs?.lowGraphics);
-    window.Alchemy?.draw(g, w2s, VW, VH);
+    window.Blacksmithing?.drawMiners(g, w2s, VW, VH, reducedMotion() || !!window.Prefs?.lowGraphics);
     window.BossMech?.drawForeground(g, t, bossMechView());
     window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     window.Halloween?.drawLabel(g,zone,w2s);

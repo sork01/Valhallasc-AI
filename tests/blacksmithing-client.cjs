@@ -53,6 +53,10 @@ if (process.env.MUTATE === 'mine-range') {
   assert(moduleText.includes('let best = 2.6;'));
   moduleText = moduleText.replace('let best = 2.6;', 'let best = Infinity;');
 }
+if (process.env.MUTATE === 'small-vein') {
+  assert(moduleText.includes('VEIN_SIZE = 92'));
+  moduleText = moduleText.replace('VEIN_SIZE = 92', 'VEIN_SIZE = 46');
+}
 vm.runInContext(moduleText,context,{filename:'blacksmithing.js'});
 
 const Blacksmithing = context.Blacksmithing;
@@ -90,13 +94,19 @@ Blacksmithing.sync({miningVeins:[vein],players:[actor]},actor,cue => cues.push(c
 Blacksmithing.onPacket({ok:true,npc:'smith',text:'You forged equipment.',skill:2,recipes:[recipe],inventory:[],gold:10,output:recipe});
 const project = (x,y) => [x,y];
 assert.equal(Blacksmithing.pick(95,45,project).id,vein.id);
+assert.equal(Blacksmithing.pick(145,0,project)?.id,vein.id,'the enlarged vein can be selected beyond its old bounds');
+assert.equal(Blacksmithing.pick(147,0,project),undefined,'a point outside the enlarged vein misses');
 assert.equal(Blacksmithing.pick(15,15,project),undefined);
 Blacksmithing.start(vein);
 assert.deepEqual(sent.at(-1),{type:'mine',id:11});
 Blacksmithing.mining({state:'started',vein:11,duration:1.8});
 assert.equal(status.hidden,false);
-Blacksmithing.draw({drawImage:(...args) => calls.push(args),fillRect(){},save(){},restore(){},translate(){},rotate(){}},project,250,100,false);
+const canvas = {drawImage:(...args) => calls.push(args),fillRect(){},save(){},restore(){},translate(){},rotate(){}};
+Blacksmithing.drawVein(canvas,vein,vein.x,vein.y);
+Blacksmithing.drawMiners(canvas,project,250,100,false);
 assert.equal(calls.length,2,'vein and pick draw using packed assets');
+assert.deepEqual(calls[0].slice(-4),[54,-29,92,92],'ore doubles in both dimensions around the same ground anchor');
+assert.deepEqual(calls[1].slice(-2),[31,31],'the mining pick retains its original size');
 Blacksmithing.mining({state:'done',vein:11,item:'smith_ore_tin',quantity:2,skill:2,skillUp:true});
 assert.equal(status.textContent,'Bröt 2 × Tennmalm · Smide 2');
 assert.deepEqual(cues,['forge','strike']);

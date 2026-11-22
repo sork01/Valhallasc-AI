@@ -227,27 +227,23 @@
     return hit;
   }
   function start(patch) { Online.send({type:'pick_flower', id:patch.id}); }
-  function draw(g, project, width, height) {
+  function drawPatch(g, patch, x, y) {
     const art = window.ALCHEMY_ART;
     if (!art || !image.complete || !image.naturalWidth) return;
-    for (const patch of patches) {
-      const [x, y] = project(patch.x, patch.y);
-      if (x < -50 || y < -20 || x > width + 50 || y > height + 55) continue;
-      const flower = data.flowers[patch.flower];
-      const [col, row] = art.at['patch_' + flower.item];
-      const {size} = art;
-      g.save();
-      g.imageSmoothingEnabled = false;
-      g.drawImage(image, col * size, row * size, size, size, x - 23, y - 43, 46, 46);
-      if (active?.id === patch.id) {
-        const fraction = Math.min(1, (performance.now() - active.start) / active.duration);
-        g.fillStyle = '#261d1e';
-        g.fillRect(x - 18, y - 45, 36, 5);
-        g.fillStyle = '#dcf29a';
-        g.fillRect(x - 17, y - 44, 34 * fraction, 3);
-      }
-      g.restore();
+    const flower = data.flowers[patch.flower];
+    const [col, row] = art.at['patch_' + flower.item];
+    const {size} = art;
+    g.save();
+    g.imageSmoothingEnabled = false;
+    g.drawImage(image, col * size, row * size, size, size, x - 23, y - 43, 46, 46);
+    if (active?.id === patch.id) {
+      const fraction = Math.min(1, (performance.now() - active.start) / active.duration);
+      g.fillStyle = '#261d1e';
+      g.fillRect(x - 18, y - 45, 36, 5);
+      g.fillStyle = '#dcf29a';
+      g.fillRect(x - 17, y - 44, 34 * fraction, 3);
     }
+    g.restore();
   }
   function reset() {
     close();
@@ -257,6 +253,7 @@
     clearTimeout(craftedTimer);
     status.hidden = true;
   }
-  window.Alchemy = {render, close, onPacket, sync, picking, hit, start, draw, reset, effect, study,
+  window.Alchemy = {render, close, onPacket, sync, picking, hit, start, drawPatch, reset, effect, study,
+    get patches() { return patches; },
     isBrew: item => recipesByItem.has(item?.id)};
 })();

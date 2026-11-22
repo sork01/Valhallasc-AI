@@ -187,11 +187,12 @@
       Field.error(packet.text);
     }
   }
+  const VEIN_SIZE = 92, VEIN_BASE = 3;
   function pick(mx, my, project) {
     return veins.map(vein => {
       const [x,y] = project(vein.x, vein.y);
       return {vein, x, y};
-    }).filter(({x,y}) => Math.abs(mx-x) <= 23 && my >= y - 40 && my <= y + 8)
+    }).filter(({x,y}) => Math.abs(mx-x) <= VEIN_SIZE / 2 && my >= y + VEIN_BASE - VEIN_SIZE && my <= y + 8)
       .sort((a,b) => b.y - a.y)[0]?.vein;
   }
   function start(vein) {
@@ -208,17 +209,15 @@
       -size/2 + x, y - size, size, size);
     return true;
   }
-  function draw(g, project, width, height, reduced) {
-    for (const {id,x,y,tier} of veins) {
-      const [sx,sy] = project(x,y);
-      if (sx < -30 || sx > width + 30 || sy < -10 || sy > height + 45) continue;
-      sprite(g, 'vein_' + tier, sx, sy+3, 46);
-      if (active?.vein === id) {
-        const fraction = Math.min(1, Math.max(0, (performance.now() - active.start) / (1000 * active.duration)));
-        g.fillStyle = '#221a16'; g.fillRect(sx-19,sy+6,38,5);
-        g.fillStyle = '#f3ce79'; g.fillRect(sx-18,sy+7,36*fraction,3);
-      }
+  function drawVein(g, vein, sx, sy) {
+    sprite(g, 'vein_' + vein.tier, sx, sy + VEIN_BASE, VEIN_SIZE);
+    if (active?.vein === vein.id) {
+      const fraction = Math.min(1, Math.max(0, (performance.now() - active.start) / (1000 * active.duration)));
+      g.fillStyle = '#221a16'; g.fillRect(sx-19,sy+6,38,5);
+      g.fillStyle = '#f3ce79'; g.fillRect(sx-18,sy+7,36*fraction,3);
     }
+  }
+  function drawMiners(g, project, width, height, reduced) {
     for (const actor of miners) {
       const vein = veins.find(v => v.id === actor.mining);
       if (!vein) continue;
@@ -239,7 +238,8 @@
     if (status) status.hidden = true;
     close();
   }
-  window.Blacksmithing = {render, close, onPacket, sync, mining, pick, start, draw, reset,
+  window.Blacksmithing = {render, close, onPacket, sync, mining, pick, start, drawVein, drawMiners, reset,
+    get veins() { return veins; },
     get nearbyVein() { return nearestVein; },
     get isMining() { return !!active || ownMining; },
     study:plan => command('study', {plan}),

@@ -73,14 +73,16 @@ let browser;
   const c = map.city;
   const patch = view.flowerPatches.find(p => p.x > c.x0 && p.x < c.x1 && p.y > c.y0 && p.y < c.y1);
   await warp(patch);
-  await page.evaluate(patch => {
-    const draw = Alchemy.draw;
-    Alchemy.draw = (g,project,width,height) => {
-      const [x,y] = project(patch.x,patch.y);
-      if (x > 80 && x < width-80 && y > 90 && y < height-60) window.testFlower = {x,y,width,height};
-      draw(g,project,width,height);
+  await page.evaluate(id => {
+    const draw = Alchemy.drawPatch;
+    Alchemy.drawPatch = (g,patch,x,y) => {
+      if (patch.id === id) {
+        const scale = g.getTransform().a;
+        window.testFlower = {x,y,width:g.canvas.width/scale,height:g.canvas.height/scale};
+      }
+      draw(g,patch,x,y);
     };
-  },patch);
+  },patch.id);
   await page.waitForFunction(() => window.testFlower);
   await page.waitForTimeout(600);
   const target = await page.evaluate(() => {
