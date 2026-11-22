@@ -26,11 +26,11 @@ for zone,a in enumerate(areas):
   assert a['city']['x0']<n['x']<a['city']['x1'] and a['city']['y0']<n['y']<a['city']['y1']
   centres.append(n['id'])
 assert len(centres)==24 and len(set(centres))==24
-catalog=json.loads((ROOT/'world/achievements.txt').read_text());assert len(catalog)==154 and sum(a['points'] for a in catalog)==4090
+catalog=json.loads((ROOT/'world/achievements.txt').read_text());assert len(catalog)==120 and sum(a['points'] for a in catalog)==2555
 mounts=json.loads((ROOT/'client/assets/mounts_sprites.txt').read_text())['mounts'];assert len(mounts)==12
 node='/home/serveperry/.nvm/versions/node/v20.20.2/bin/node'
 def hashes():return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for d in ['world','client'] for p in (ROOT/d).glob('*') if p.is_file()}
 subprocess.run([node,'scripts/sync-world.cjs'],cwd=ROOT,check=True,capture_output=True);one=hashes()
 subprocess.run([node,'scripts/sync-world.cjs'],cwd=ROOT,check=True,capture_output=True);two=hashes();assert one==two,[k for k in one if one[k]!=two[k]]
 (ROOT/'test-results/festival-data.json').write_text(json.dumps(dict(zones=47,geographyPreserved=True,centrepieces=centres,seasons=[s['id'] for s in seasons],mounts=len(mounts),byteStable=True,hashes=two),indent=2)+'\n')
-print('festival-data: 24 clear/reachable centrepieces, all six seasons/12 mounts/154 achievements; geography/services preserved; full sync twice byte-stable')
+print('festival-data: 24 clear/reachable centrepieces, all six seasons/12 mounts/120 achievements; geography/services preserved; full sync twice byte-stable')

@@ -1,4 +1,3 @@
-const { playGuest } = require('./lib/guest.cjs');
 // New Year only, private server: dates, actual UI hunt/claim, fireworks pixels and screenshots.
 process.env.REAL_SPRITES='1';
 require('./lib/touch.cjs').requireMemoryLimit();
@@ -17,7 +16,7 @@ const check=(v,s)=>{if(replaying)return;assert.ok(v,s);console.log(++checks+': '
   const WS=window.WebSocket;window.WebSocket=class extends WS{constructor(...a){super(...a);this.addEventListener('message',e=>{if(typeof e.data==='string'){try{take(JSON.parse(e.data));}catch{}return;}const buf=e.data instanceof ArrayBuffer?Promise.resolve(e.data):e.data.arrayBuffer();buf.then(b=>take(JSON.parse(window.pako.inflateRaw(new Uint8Array(b),{to:'string'})))).catch(()=>{});});}};
   window.__self=()=>window.__snap?.players.find(p=>p.id===window.Online?.id);
  });
- await p.goto(w.url);await p.locator('#start').click();await playGuest(p);await p.locator('#cls-warrior').click();await p.locator('#name').fill('Newyear Check');await p.locator('#go').click({timeout:60000});
+ await p.goto(w.url);await p.locator('#start').click();await p.locator('#login-guest').click();await p.locator('#cls-warrior').click();await p.locator('#name').fill('Newyear Check');await p.locator('#go').click({timeout:60000});
  const wait=(fn,arg)=>p.waitForFunction(fn,arg,{timeout:30000}),send=m=>p.evaluate(m=>Online.send(m),m),debug=command=>send({type:'debug',command});
  await wait(()=>Online.connected&&Field.hero.hp>0);
  const stand=async(z,x,y,tolerance=2.8)=>{await p.evaluate(()=>{City.close();Quests.close();WorldMap.close();Achievements.close();Field.clearInput();Online.send({type:'stop'});});await debug({op:'teleport',zone:z,x,y});await wait(([z,x,y,tolerance])=>Field.zone===z&&Math.hypot(Field.hero.nx-x,Field.hero.ny-y)<tolerance,[z,x,y,tolerance]);await p.waitForTimeout(300);await p.evaluate(()=>ZoneJourney.clear());};
@@ -61,7 +60,7 @@ const check=(v,s)=>{if(replaying)return;assert.ok(v,s);console.log(++checks+': '
  check(await p.evaluate(()=>!__ach.entries.find(a=>a.id==='newyear').complete),'A ready, unclaimed hunt does not award the achievement');
  await npc('nacre_gardener');const gold=await p.evaluate(()=>__self().gold);await interact('nacre_gardener','quest:claim:newyear_hunt');await wait(()=>__self().seasonalClaims.newyear_hunt===20261229);
  await p.evaluate(()=>Achievements.open());await wait(()=>__ach?.entries.find(a=>a.id==='newyear').complete);
- check(await p.evaluate(g=>__self().gold===g+300&&__ach.maximum===4090&&__ach.entries.find(a=>a.id==='newyear').points===25,gold),'A different city host pays the shared quest and awards the 25-point achievement');
+ check(await p.evaluate(g=>__self().gold===g+300&&__ach.maximum===2555&&__ach.entries.find(a=>a.id==='newyear').points===25,gold),'A different city host pays the shared quest and awards the 25-point achievement');
  await p.screenshot({path:path.join(w.runDir,'valhallasc-newyear-achievement.png')});
  check(await p.evaluate(()=>['baker','city_bard','nacre_gardener','asterion_singer'].every(n=>!Quests.offered(n).some(q=>q.id==='newyear_hunt'))),'Changing hosts cannot repeat today’s quest');
  await debug({op:'give_mount',mount:'rocket'});await wait(()=>__self().mounts.includes('rocket'));
@@ -74,7 +73,7 @@ const check=(v,s)=>{if(replaying)return;assert.ok(v,s);console.log(++checks+': '
  check(await p.evaluate(()=>Seasonal.isActive('newyear')),'January 2 remains active through its final second');
  await debug({op:'season_time',unix:1798930800});await wait(()=>!Seasonal.isActive('newyear')&&__snap.newyear===null);
  check(await p.evaluate(()=>NewYear.objects(2).length===0&&NewYear.fireworksPlan(2,{x:284,y:225},3,false,1440,960).length===0&&!__self().quests.some(q=>q.id==='newyear_hunt'&&!q.claimed)&&__self().mounts.includes('rocket')),'January 3 retires unfinished content and fireworks while keeping the rocket');
- const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await playGuest(p);if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
+ const id=await p.evaluate(()=>Online.id);await p.reload();await p.locator('#start').click();await p.locator('#login-guest').click();if(await p.locator('#scene-create').isVisible())await p.locator('#go').click({timeout:60000});await wait(()=>Online.connected&&Field.hero.hp>0);
  await p.evaluate(()=>Achievements.open());await wait(()=>__ach?.entries.find(a=>a.id==='newyear').complete);
  check(await p.evaluate(id=>Online.id===id&&__self().mounts.includes('rocket')&&__self().seasonalRolls.newyear_hunt===20261229,id),'Reconnect preserves permanent achievement, rocket and spent daily attempt');
  const sv=await browser.newPage();await sv.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sv.goto(w.url);
