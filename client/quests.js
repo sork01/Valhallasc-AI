@@ -2,7 +2,11 @@
 (() => {
   const $ = id => document.getElementById(id);
   const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
-  const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
+  const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({
+    ...q, zone,
+    // Fisher objectives store the fish name in "what".
+    objectives: q.objectives.map(o => o.label == null && o.what ? { ...o, label: Locale.translate(o.what) } : o),
+  })));
   let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
   let abandoned = [], initialized = false;
   const guidance = QuestGuidance.create(areas, window.QUEST_SOURCES || {});
