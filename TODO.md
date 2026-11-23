@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `TIDEKIN-RULES` — Owner decisions (2026-11-23): add Tidekin from Rán’s Deep, with sea-green skin, finned ears and pearlescent gill markings. Use the existing class skills and stats. Deliver one front-and-back in-game sprite render to FileDrop. Continue on `feat/playable-race`.
+- [ ] `TIDEKIN-PLAYABLE` — Add Tidekin to existing race creation and saved appearances. Verify both bodies and all five classes alongside Human and Mothkin.
+- [ ] `TIDEKIN-PREVIEW` — Upload a front-and-back Tidekin render from the game compositor.
+
 - [x] `MOTHKIN-RULES` — Owner decisions (2026-11-23): a new people native to Valhalla, the Mothkin of the Moonspore Canopy, with dusk skin, pale markings and feathered antennae. Make them playable in character creation with the existing class skills and stats. Deliver one front-and-back in-game sprite render to FileDrop. Work on `feat/playable-race`.
 - [x] `MOTHKIN-PLAYABLE` — Available in the 1.8.0 branch candidate for both bodies and all five classes. Verified guest and account persistence, desktop and touch creation, and 2,720 real sprite poses. See [character creation](docs/character-creation.md).
 - [x] `MOTHKIN-PREVIEW` — Rendered Neris, a silver-haired Hunter in starter gear, front and back using the game compositor. Verified the PNG and its metadata in [FileDrop](https://gunning.se/filedrop/api.php?action=download&file=valhalla-mothkin-front-and-back.png).
