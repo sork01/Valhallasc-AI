@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.9.0",
+    "date": "2026-11-23",
+    "new": [
+      "Play as Tidekin from Rán's Deep, with sea-green skin, finned ears and pearlescent gill markings. Choose Tidekin when creating a character of any class."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.8.0",
     "date": "2026-11-23",
     "new": [

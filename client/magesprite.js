@@ -95,33 +95,38 @@
   }
   const bytesOf = text => { const raw = atob(text), out = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; };
   const loadImages = files => Promise.all([bitmap('assets/' + files.png), bitmap('assets/' + files.depth)]);
-  const MOTHKIN_SKIN = ['#776183', '#676b92', '#906d93', '#54526e'];
-  const MOTHKIN_CELL = 48, MOTHKIN_X = 24, MOTHKIN_Y = 36;
-  const MOTHKIN_REACH = Math.ceil(Math.hypot(MOTHKIN_X, MOTHKIN_Y));
-  let mothkinArt;
-  function loadMothkin() {
-    return mothkinArt ||= bitmap('assets/mothkin.png').then(image => {
+  const RACE_APPEARANCE = {
+    mothkin: { skin: ['#776183', '#676b92', '#906d93', '#54526e'], portraitAbove: 39 },
+    tidekin: { skin: ['#559d86', '#448c91', '#82ad8d', '#426c70'], portraitAbove: 29 },
+  };
+  const RACIAL_ART = Object.keys(RACE_APPEARANCE);
+  const TRAIT_CELL = 48, TRAIT_X = 24, TRAIT_Y = 36;
+  const TRAIT_REACH = Math.ceil(Math.hypot(TRAIT_X, TRAIT_Y));
+  const traitAtlases = new Map();
+  function loadTraits(race) {
+    if (!traitAtlases.has(race)) traitAtlases.set(race, bitmap('assets/' + race + '.png').then(image => {
       try {
-        const read = reader('mothkin', MOTHKIN_CELL, MOTHKIN_CELL);
+        const read = reader('race', TRAIT_CELL, TRAIT_CELL);
         return Array.from({ length: 8 }, (_, dir) => [0, 1].map(layer =>
-          read(image, dir * MOTHKIN_CELL, layer * MOTHKIN_CELL, MOTHKIN_CELL, MOTHKIN_CELL)));
+          read(image, dir * TRAIT_CELL, layer * TRAIT_CELL, TRAIT_CELL, TRAIT_CELL)));
       } finally { image.close(); }
-    }).catch(error => { mothkinArt = null; console.warn(error.message); });
+    }).catch(error => { traitAtlases.delete(race); console.warn(error.message); }));
+    return traitAtlases.get(race);
   }
-  function paintMothkin(pixels, depth, fw, fh, pose, art, skin, showAntennae) {
-    const [cx, cy, rx, ry] = pose, [antennae, markings] = art;
+  function paintTraits(pixels, depth, fw, fh, pose, art, skin, showFeatures) {
+    const [cx, cy, rx, ry] = pose, [features, markings] = art;
     const headX = Math.floor(cx), headY = Math.floor(cy);
     const headDepth = Math.min(65534, depth[headY * fw + headX] ?? 65534);
-    for (let y = Math.max(0, headY - MOTHKIN_REACH); y < Math.min(fh, headY + MOTHKIN_REACH + 1); y++) {
-      for (let x = Math.max(0, headX - MOTHKIN_REACH); x < Math.min(fw, headX + MOTHKIN_REACH + 1); x++) {
+    for (let y = Math.max(0, headY - TRAIT_REACH); y < Math.min(fh, headY + TRAIT_REACH + 1); y++) {
+      for (let x = Math.max(0, headX - TRAIT_REACH); x < Math.min(fw, headX + TRAIT_REACH + 1); x++) {
         const dx = x + .5 - cx, dy = y + .5 - cy;
-        const u = Math.floor(MOTHKIN_X + dx * rx + dy * ry);
-        const v = Math.floor(MOTHKIN_Y - dx * ry + dy * rx);
-        if (u < 0 || v < 0 || u >= MOTHKIN_CELL || v >= MOTHKIN_CELL) continue;
-        const src = (v * MOTHKIN_CELL + u) * 4, dst = y * fw + x, k = dst * 4;
-        // Antenna roots disappear into the crown. Markings are pigment and only cover exposed skin.
-        if (showAntennae && antennae[src + 3] && !pixels[k + 3]) {
-          pixels.set(antennae.subarray(src, src + 4), k);
+        const u = Math.floor(TRAIT_X + dx * rx + dy * ry);
+        const v = Math.floor(TRAIT_Y - dx * ry + dy * rx);
+        if (u < 0 || v < 0 || u >= TRAIT_CELL || v >= TRAIT_CELL) continue;
+        const src = (v * TRAIT_CELL + u) * 4, dst = y * fw + x, k = dst * 4;
+        // Fins and antennae sit behind the body silhouette. Markings only cover exposed skin.
+        if (showFeatures && features[src + 3] && !pixels[k + 3]) {
+          pixels.set(features.subarray(src, src + 4), k);
           depth[dst] = headDepth;
         } else if (markings[src + 3] && pixels[k + 3] &&
           skin.has(pixels[k] * 65536 + pixels[k + 1] * 256 + pixels[k + 2])) {
@@ -347,7 +352,8 @@
       } else if (!background) promote(entry);
       return entry.promise;
     };
-    return { meta, parts, ensure, mothkin: await loadMothkin() };
+    const traits = new Map(await Promise.all(RACIAL_ART.map(async race => [race, await loadTraits(race)])));
+    return { meta, parts, ensure, traits };
   }
   // The catalog names every worn piece by a unique variant. An original piece is drawn as itself; a recolouring (items
   // with `art` and `tint`, built by scripts/gear_levels.py) is its base drawing painted with the tint, which uses the
@@ -717,7 +723,7 @@
       this.hairColours = new Set((this.meta.ramps.hair || []).map(c => { const v = hex(c); return v[0] * 65536 + v[1] * 256 + v[2]; }));
       const lum = c => c[0] * .299 + c[1] * .587 + c[2] * .114;
       const hair = this.constructor.HAIR, skin = this.constructor.skinPalette(look);
-      this.mothkin = look.race === 'mothkin';
+      this.traits = this.source.traits?.get(look.race);
       this.skinColours = new Set();
       for (const [role, target] of [['hair', hair[look.hairColor || 0]], ['brow', hair[look.hairColor || 0]], ['skin', skin[look.skin || 0]]]) {
         const ramp = this.meta.ramps[role], to = hex(target || (role === 'skin' ? skin[0] : hair[0]));
@@ -726,7 +732,7 @@
           const from = hex(color), k = lum(from) / base, ratio = k < 1 ? k : 1 + (k - 1) * .35;
           const painted = to.map(v => Math.min(255, Math.round(v * ratio)));
           this.tint.set(from[0] * 65536 + from[1] * 256 + from[2], painted);
-          if (this.mothkin && role === 'skin') this.skinColours.add(painted[0] * 65536 + painted[1] * 256 + painted[2]);
+          if (this.traits && role === 'skin') this.skinColours.add(painted[0] * 65536 + painted[1] * 256 + painted[2]);
         }
       }
     }
@@ -739,7 +745,7 @@
       const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
       const chosen = ['body'];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
-      const mothkinPose = this.mothkin && this.source.mothkin && this.meta.headFrames?.[key];
+      const traitPose = this.traits && this.meta.headFrames?.[key];
       // Hair that lies almost flush on a worn piece (a depth tie) flickered through the cloth. In the front views the worn piece
       // wins over hair that is only just nearer (`hairTie`): sleeves, chest and hands. From the back quarters the shoulder piece
       // includes a mantle across the upper back that the hair hangs over, and the walk cycle swung it in and out of the hair: there
@@ -767,8 +773,8 @@
             forge.set([255, 138, 46, 230], dst * 4);
           }
         }
-        if (part === 'body' && mothkinPose)
-          paintMothkin(out.data, nearest, fw, fh, mothkinPose, this.source.mothkin[dir], this.skinColours, this.equipment.head === 'none');
+        if (part === 'body' && traitPose)
+          paintTraits(out.data, nearest, fw, fh, traitPose, this.traits[dir], this.skinColours, this.equipment.head === 'none');
       }
       g.putImageData(out, 0, 0);
       if (this.equipment.weapon === 'regearchainforged') {
@@ -822,8 +828,9 @@
     portrait() {
       const c = document.createElement('canvas'); c.width = c.height = 128;
       const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
-      const head = this.mothkin && this.source.mothkin && this.equipment.head === 'none' && this.meta.headFrames?.['idle/0/0'];
-      const crop = head ? [Math.round(head[0]) - 31, Math.round(head[1]) - 39, 62, 62] : this.meta.portrait || [56, 18, 48, 48];
+      const head = this.traits && this.equipment.head === 'none' && this.meta.headFrames?.['idle/0/0'];
+      const crop = head ? [Math.round(head[0]) - 31, Math.round(head[1]) - RACE_APPEARANCE[this.look.race].portraitAbove, 62, 62]
+        : this.meta.portrait || [56, 18, 48, 48];
       g.drawImage(this.frame(), ...crop, 0, 0, 128, 128); return c.toDataURL();
     }
     static dancePose(h, gender = h.look?.gender) {
@@ -846,7 +853,7 @@
         stretch: 1 - Math.max(0, -pulse) * .055 };
     }
     static direction(fx, fy) { return ((Math.round(-Math.atan2(fx - fy, fx + fy) / (Math.PI / 4)) % 8) + 8) % 8; }
-    static skinPalette(look) { return look.race === 'mothkin' ? MOTHKIN_SKIN : this.SKIN; }
+    static skinPalette(look) { return RACE_APPEARANCE[look.race]?.skin || this.SKIN; }
     // `background` is for other players' sprites: they load one at a time, after your own, without blocking the page.
     static async load(look, { background = false } = {}) {
       const url = this.METADATA;
@@ -862,6 +869,7 @@
   MageSprite.GENERIC = GENERIC; MageSprite.hasGear = hasGear; MageSprite.resolveGear = resolve; MageSprite.tintMatrix = tintMatrix;
   MageSprite.DUNGEON_PALETTES = DUNGEON_PALETTES; MageSprite.dungeonMark = dungeonMark; MageSprite.dungeonAura = dungeonAura;
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
+  MageSprite.RACES = Object.freeze(['human', ...RACIAL_ART]);
   MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';
   // Every class has a second atlas set for a female character. `Base.Female` is the same class reading

@@ -46,6 +46,7 @@ pub enum Race {
     #[default]
     Human,
     Mothkin,
+    Tidekin,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Deserialize, Serialize)]

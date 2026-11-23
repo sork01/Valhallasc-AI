@@ -89,7 +89,18 @@ two-layer PixelFlow sprite `a3cadd60feee1497`. Run
 `python3 scripts/make_mothkin_art.py export` to export editor changes and use
 `verify` to compare the committed atlas with PixelFlow.
 
-`tests/mothkin-art.cjs` verifies the real sprite compositor and writes the
-front-and-back Hunter preview. `tests/mothkin-creation-ui.cjs` exercises the
-creator in English on desktop and Swedish on touch, including reconnect with
-a private game process. Run both through `scripts/test-touch-bounded.sh`.
+## Playable Tidekin (1.9.0)
+
+Tidekin come from Rán's Deep. They have four sea-green skin shades, finned
+ears and pearlescent gill markings. They can use either body and any class,
+with ordinary equipment, movement, skills and stats. The fin ears fit the
+existing head poses and disappear under headgear. The two-layer PixelFlow
+source is `80a958a4a7378e1d`. Run `python3 scripts/make_tidekin_art.py export`
+to export editor changes or use `verify` to compare the atlas with PixelFlow.
+
+`tests/playable-race-art.cjs` checks both races in the real compositor and
+writes their front-and-back renders. Its `--tidekin` and `--mothkin` options
+check one race, and `--preview-only` selects the body and class used in that
+race's preview. `tests/playable-race-creation-ui.cjs` checks selection, drafts
+and reconnect in desktop English and touch Swedish. Run both through
+`scripts/test-touch-bounded.sh`.

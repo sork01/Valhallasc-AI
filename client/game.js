@@ -43,7 +43,7 @@
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
       defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
-      race: 'Race', human: 'Human', mothkin: 'Mothkin',
+      race: 'Race', human: 'Human', mothkin: 'Mothkin', tidekin: 'Tidekin',
       noGear: 'No gear', facingNames: ['Front', 'Front left', 'Left side', 'Back left', 'Back view', 'Back right', 'Right side', 'Front right'],
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
       tip: 'Tip: click the Warrior’s axe, mug, head, beard or fish!',
@@ -76,7 +76,7 @@
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
       defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
-      race: '종족', human: '인간', mothkin: '나방족',
+      race: '종족', human: '인간', mothkin: '나방족', tidekin: '물결족',
       noGear: '장비 없음', facingNames: ['정면', '왼쪽 앞', '왼쪽', '왼쪽 뒤', '뒷면', '오른쪽 뒤', '오른쪽', '오른쪽 앞'],
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
       tip: '팁: 워리어의 도끼, 맥주잔, 머리, 수염, 물고기를 눌러 보세요!',
@@ -413,7 +413,7 @@
     cfg.armor = idx(cfg.armor, OPT.armors); cfg.rune = idx(cfg.rune, OPT.runeHues.length);
     cfg.class = ['mage', 'assassin', 'priest', 'hunter'].includes(cfg.class) ? cfg.class : 'warrior';
     cfg.gender = cfg.gender === 'female' ? 'female' : 'male';
-    cfg.race = cfg.race === 'mothkin' ? 'mothkin' : 'human';
+    cfg.race = MageSprite.RACES.includes(cfg.race) ? cfg.race : 'human';
     if (modular(cfg)) { cfg.hairColor = idx(cfg.hairColor, spriteClass(cfg).HAIR.length); cfg.skin = idx(cfg.skin, spriteClass(cfg).skinPalette(cfg).length); }
     const warriorGear = WarriorSprite.equipment(cfg); cfg.warriorArmor = warriorGear.armor; cfg.warriorWeapon = warriorGear.weapon;
     const gear = MageSprite.equipment(cfg); cfg.mageArmor = gear.armor; cfg.mageWeapon = gear.weapon;
@@ -569,7 +569,7 @@
     dice.addEventListener('click', () => { cfg.name = randName(); input.value = cfg.name; saveDraft(); blip(700); });
     custom.append(row(t('name'), input, dice));
     const race = el('select', { class: 'gear-pick', id: 'create-race', 'aria-label': t('race') });
-    for (const value of ['human', 'mothkin']) race.append(el('option', { value, text: t(value) }));
+    for (const value of MageSprite.RACES) race.append(el('option', { value, text: t(value) }));
     race.value = cfg.race;
     race.addEventListener('change', () => {
       cfg.race = race.value;

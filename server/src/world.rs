@@ -13439,34 +13439,39 @@ mod tests {
     }
 
     #[test]
-    fn mothkin_survive_guest_and_account_reconnects_with_ordinary_class_stats() {
-        let mut w = world();
-        let mothkin: Look = serde_json::from_str(
-            r#"{"name":"Neris","class":"hunter","gender":"female","race":"mothkin"}"#,
-        )
-        .unwrap();
+    fn playable_races_survive_guest_and_account_reconnects_with_ordinary_class_stats() {
         let legacy: Look =
             serde_json::from_str(r#"{"name":"Lina","class":"hunter","gender":"female"}"#).unwrap();
         assert_eq!(legacy.race, Race::Human);
         assert!(serde_json::from_str::<Look>(r#"{"race":"typo"}"#).is_err());
+        for (key, race) in [("mothkin", Race::Mothkin), ("tidekin", Race::Tidekin)] {
+            check_playable_race(&legacy, key, race);
+        }
+    }
+
+    fn check_playable_race(legacy: &Look, key: &str, race: Race) {
+        let mut w = world();
+        let look: Look =
+            serde_json::from_value(json!({"name":"Neris","class":"hunter","gender":"female","race":key}))
+                .unwrap();
 
         let (tx, _rx) = mpsc::channel(256);
-        let guest = w.join(1, None, Some(mothkin.clone()), tx).unwrap();
+        let guest = w.join(1, None, Some(look.clone()), tx).unwrap();
         let token = guest["token"].as_str().unwrap().to_owned();
-        assert_eq!(guest["snapshot"]["players"][0]["look"]["race"], "mothkin");
+        assert_eq!(guest["snapshot"]["players"][0]["look"]["race"], key);
         let (tx, _rx) = mpsc::channel(256);
-        w.join(2, None, Some(legacy), tx).unwrap();
-        let moth = &w.players[&1].character;
+        w.join(2, None, Some(legacy.clone()), tx).unwrap();
+        let guest = &w.players[&1].character;
         let human = &w.players[&2].character;
-        assert_eq!(moth.max_hp(), human.max_hp());
-        assert_eq!(moth.look.class, human.look.class);
-        assert_eq!(moth.level, human.level);
-        assert_eq!(moth.zone, human.zone);
-        assert_eq!(moth.landing, human.landing);
+        assert_eq!(guest.max_hp(), human.max_hp());
+        assert_eq!(guest.look.class, human.look.class);
+        assert_eq!(guest.level, human.level);
+        assert_eq!(guest.zone, human.zone);
+        assert_eq!(guest.landing, human.landing);
         w.leave(1);
         let (tx, _rx) = mpsc::channel(256);
         w.join(3, Some(token), None, tx).unwrap();
-        assert_eq!(w.players[&3].character.look.race, Race::Mothkin);
+        assert_eq!(w.players[&3].character.look.race, race);
 
         let owner = w
             .store
@@ -13493,13 +13498,13 @@ mod tests {
             None,
             Some(Look {
                 name: "Sivre".into(),
-                ..mothkin
+                ..look
             }),
         );
         let id = account["id"].as_str().unwrap().to_owned();
         w.leave(4);
         join_account(&mut w, 5, Some(id), None);
-        assert_eq!(w.players[&5].character.appearance_look().race, Race::Mothkin);
+        assert_eq!(w.players[&5].character.appearance_look().race, race);
     }
 
     #[test]
