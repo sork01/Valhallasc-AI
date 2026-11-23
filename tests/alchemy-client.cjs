@@ -47,6 +47,7 @@ let source = read('alchemy.js');
 const replacements = {
   'allow-missing': ['!enough || skill < recipe.skill','skill < recipe.skill'],
   'no-click': ["Online.send({type:'pick_flower', id:patch.id});", 'void patch;'],
+  'bulk': ['all:true','all:false'],
 };
 if (process.env.MUTATE) {
   const [before, after] = replacements[process.env.MUTATE];
@@ -61,7 +62,8 @@ const potion = 'alchemy_meadowgold_potion';
 const mixed = 'alchemy_deepbloom_flask';
 const skill = () => panel.children[1].textContent;
 const row = id => panel.querySelectorAll('[data-recipe]').find(n => n.dataset.recipe === id);
-const action = id => row(id).children.at(-1);
+const action = (id, bulk = false) => row(id).querySelectorAll('button')
+  .find(n => n.dataset.alchemyAction === (bulk ? 'all:' + id : id));
 const tab = id => panel.querySelectorAll('button').find(n => n.dataset.alchemyAction === id);
 const reply = (level, known, inventory = [], output) => Alchemy.onPacket({
   ok:true, skill:level, npc:npc.id, recipes:known, inventory, output, text:'You learned the recipe.',
@@ -78,17 +80,23 @@ action(potion).click();
 assert.deepEqual(packets.at(-1),{type:'alchemy',request:{op:'learn',npc:npc.id,recipe:potion}});
 reply(1,[potion]);
 assert.equal(action(potion).disabled,true,'missing containers and flowers prevent brewing');
+assert.equal(action(potion,true).disabled,true,'Brew All also needs ingredients');
 
 tab('flowers').click();
 assert.match(panel.children.at(-1).children.map(n => n.textContent).join('\n'),/Wyrdklöver.*120\n.*Månslöjeorkidé.*150/);
 tab('recipes').click();
-reply(480,[mixed],[
+const supplies = [
   {item:'alchemy_heartvine_bloom',quantity:2},{item:'alchemy_dune_lotus',quantity:2},
   {item:'alchemy_thornsilk_blossom',quantity:1},{item:'alchemy_empty_flask',quantity:1},
-]);
+];
+reply(480,[mixed],supplies);
 assert.equal(action(mixed).disabled,false,'alternates combine to fill one requirement');
 action(mixed).click();
-assert.equal(packets.at(-1).request.op,'brew');
+assert.deepEqual(packets.at(-1).request,{op:'brew',npc:npc.id,recipe:mixed});
+reply(480,[mixed],supplies);
+assert.equal(action(mixed,true).textContent,'Brygg alla');
+action(mixed,true).click();
+assert.deepEqual(packets.at(-1).request,{op:'brew',npc:npc.id,recipe:mixed,all:true},'Brew All sends a single batch request');
 
 const patch = {id:47,flower:0,x:100,y:60};
 const project = (x,y) => [x,y];

@@ -42,17 +42,19 @@ pub(super) fn quotes(npc: &Npc, c: &Character) -> Value {
 }
 
 pub(super) fn purchase(
-    p: &mut Player,
+    p: &Player,
     npc: &Npc,
     id: &str,
     trading: bool,
-) -> Result<(), &'static str> {
+) -> Result<(Character, u32), &'static str> {
+    let all = id.starts_with("cook_all:");
+    let recipe_id = id.replacen("cook_all:", "cook:", usize::from(all));
     let recipe = RECIPES
         .iter()
         .find(|r| {
-            r.id == id
+            r.id == recipe_id
                 && r.zones.contains(&p.character.zone)
-                && npc.offers.iter().any(|o| o.id == id)
+                && npc.offers.iter().any(|o| o.id == recipe_id)
         })
         .ok_or("This Fisher does not offer that recipe.")?;
     if !p.can_dance() || trading {
@@ -66,27 +68,13 @@ pub(super) fn purchase(
         return Err("You need a higher level for that recipe.");
     }
     let costs = ingredients(recipe, &p.character);
-    if p.character.gold < recipe.cost {
-        return Err("You cannot afford that recipe.");
-    }
-    if costs
-        .iter()
-        .any(|(id, count)| p.character.quantity(id) < *count)
-    {
-        return Err("You do not have the ingredients for that recipe.");
-    }
     let mut next = p.character.clone();
-    for (id, count) in costs {
-        if !next.consume_item(&id, count) {
-            return Err("You do not have the ingredients for that recipe.");
-        }
-    }
-    if !next.can_collect(&recipe.item) {
-        return Err("Your bags are full. Make room first.");
-    }
-    next.gold -= recipe.cost;
-    next.add_item(&recipe.item, 1);
-    p.character = next;
-    p.fishing.line = None;
-    Ok(())
+    let count = next.produce_recipe(
+        &recipe.item,
+        recipe.cost,
+        all,
+        costs.iter().map(|(id, count)| (std::iter::once(id.as_str()), *count)),
+        "You do not have the ingredients for that recipe.",
+    )?;
+    Ok((next, count))
 }

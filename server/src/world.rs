@@ -3533,11 +3533,28 @@ impl World {
                 notice = "Please wait a moment before trying again.".into();
             } else {
                 p.service_at = self.time;
-                if id.starts_with("rod:") || id.starts_with("cook:") {
-                    match fishing_workshop::purchase(p, npc, id, trading) {
-                        Ok(()) => {
-                            quest_changed = true;
-                            notice = "Your Fisher recipe is ready.".into();
+                if id.starts_with("rod:")
+                    || id.starts_with("cook:")
+                    || id.starts_with("cook_all:")
+                {
+                    let result = fishing_workshop::purchase(p, npc, id, trading).and_then(
+                        |(mut staged, count)| {
+                            sync_progression(&mut staged, &self.maps);
+                            self.store
+                                .save_many([&staged].into_iter())
+                                .map_err(|_| "The Fisher recipe could not be saved.")?;
+                            Ok((staged, count))
+                        },
+                    );
+                    match result {
+                        Ok((staged, count)) => {
+                            p.character = staged;
+                            p.fishing.line = None;
+                            notice = if id.starts_with("cook_all:") {
+                                format!("Cooked {} servings.", count)
+                            } else {
+                                "Your Fisher recipe is ready.".into()
+                            };
                         }
                         Err(text) => notice = text.into(),
                     }

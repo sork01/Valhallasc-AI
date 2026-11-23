@@ -103,9 +103,14 @@
       list.append(group);
     }
     detail.append(list);
+    const actions = node('div', '', 'recipe-actions');
     let action;
     if (learned) {
-      action = button('Brew', () => command('brew', {npc, recipe:recipe.item}), !enough || skill < recipe.skill);
+      const unavailable = !enough || skill < recipe.skill;
+      action = button('Brew', () => command('brew', {npc, recipe:recipe.item}), unavailable);
+      const bulk = button('Brew All', () => command('brew', {npc, recipe:recipe.item, all:true}), unavailable);
+      bulk.dataset.alchemyAction = 'all:' + recipe.item;
+      actions.append(action, bulk);
     } else if (!recipe.formula) {
       action = button('Learn recipe', () => command('learn', {npc, recipe:recipe.item}), skill < recipe.skill);
     } else if (amounts.get(recipe.formula)) {
@@ -116,7 +121,7 @@
       action = node('small', source);
     }
     action.dataset.alchemyAction = recipe.item;
-    card.append(icon, detail, action);
+    card.append(icon, detail, actions.children.length ? actions : action);
     return card;
   }
 

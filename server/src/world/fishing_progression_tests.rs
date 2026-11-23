@@ -134,8 +134,9 @@ fn fishing_progression_every_upgrade_keeps_earlier_waters_and_replaces_one_rod()
             p.character
                 .add_item(c[0].as_str().unwrap(), c[1].as_u64().unwrap() as u32);
         }
-        super::super::fishing_workshop::purchase(p, &npc, r["id"].as_str().unwrap(), false)
-            .unwrap();
+        (p.character, _) = super::super::fishing_workshop::purchase(
+            p, &npc, r["id"].as_str().unwrap(), false,
+        ).unwrap();
         assert_eq!(
             p.character.inventory.len(),
             1,

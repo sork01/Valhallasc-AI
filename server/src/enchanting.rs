@@ -121,6 +121,8 @@ pub enum Command {
     },
     Craft {
         enchant: Enchant,
+        #[serde(default)]
+        all: bool,
     },
     Apply {
         enchant: Enchant,
@@ -132,6 +134,7 @@ pub enum Command {
 pub struct Training {
     pub quality: u8,
     pub cap: u16,
+    pub attempts: u32,
 }
 
 pub fn equipment_skill_cap(gear: &GearInstance) -> u16 {
@@ -199,6 +202,7 @@ impl Character {
                 let training = Training {
                     quality: quality as u8,
                     cap: equipment_skill_cap(gear),
+                    attempts: 1,
                 };
                 if !self.consume_item(&id, 1) {
                     return Err("That gear copy is unavailable.");
@@ -207,7 +211,7 @@ impl Character {
                 self.enchant_output(&material.id, material.quantity)?;
                 Ok(("Equipment disenchanted.", Some(training)))
             }
-            Craft { enchant } => {
+            Craft { enchant, all } => {
                 self.require_enchanting()?;
                 let recipe = enchant.recipe();
                 let tier = &CATALOG.tiers[recipe.tier];
@@ -216,17 +220,25 @@ impl Character {
                 {
                     return Err("This recipe requires training and more Enchanting skill.");
                 }
-                for (material, amount) in CATALOG.materials.iter().zip(recipe.cost) {
-                    if amount > 0 && !self.consume_item(&material.id, amount) {
-                        return Err("You need more enchanting materials.");
-                    }
-                }
-                self.enchant_output(&enchant.item("scroll"), 1)?;
+                let costs = CATALOG
+                    .materials
+                    .iter()
+                    .zip(recipe.cost)
+                    .filter(|(_, amount)| *amount > 0)
+                    .map(|(material, amount)| (std::iter::once(material.id.as_str()), amount));
+                let attempts = self.produce_recipe(
+                    &enchant.item("scroll"),
+                    0,
+                    all,
+                    costs,
+                    "You need more enchanting materials.",
+                )?;
                 Ok((
                     "Enchant scroll crafted.",
                     Some(Training {
                         quality: recipe.tier as u8 + 1,
                         cap: tier.skill_cap(),
+                        attempts,
                     }),
                 ))
             }
@@ -247,6 +259,7 @@ impl Character {
                 let training = Training {
                     quality: enchant.recipe().tier as u8 + 1,
                     cap: equipment_skill_cap(gear),
+                    attempts: 1,
                 };
                 if !self.consume_item(&enchant.item("scroll"), 1) {
                     return Err("You need the crafted scroll in your bags.");

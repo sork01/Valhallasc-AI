@@ -43,8 +43,8 @@ pub(super) fn workshop_view(npc: &Npc, c: &Character) -> Option<Value> {
 fn workshop_action(
     c: &mut Character,
     request: &Command,
-    roll: f64,
-) -> Result<(&'static str, Option<String>), &'static str> {
+    roll: impl FnMut() -> f64,
+) -> Result<(String, Option<String>), &'static str> {
     let progress = &c.blacksmithing;
     let skill = progress.proficiency.skill;
     if let Command::Train { .. } = request {
@@ -57,7 +57,7 @@ fn workshop_action(
         c.blacksmithing.proficiency.initialize(1);
         c.add_item(STARTER_PICK, 1);
         return Ok((
-            "You learned Blacksmithing and received a starter pick.",
+            "You learned Blacksmithing and received a starter pick.".into(),
             None,
         ));
     }
@@ -82,7 +82,7 @@ fn workshop_action(
             if !c.blacksmithing.recipes.insert(recipe.item.clone()) {
                 return Err("You already know this blueprint.");
             }
-            Ok(("You learned the blueprint.", None))
+            Ok(("You learned the blueprint.".into(), None))
         }
         Command::Study { plan } => {
             if progress.recipes.contains(&recipe.item) {
@@ -92,9 +92,9 @@ fn workshop_action(
                 return Err("That blueprint is missing from your bags.");
             }
             c.blacksmithing.recipes.insert(recipe.item.clone());
-            Ok(("You learned the blueprint.", None))
+            Ok(("You learned the blueprint.".into(), None))
         }
-        Command::Craft { .. } => {
+        Command::Craft { all, .. } => {
             if skill < recipe.skill {
                 return Err("Your Blacksmithing skill is too low.");
             }
@@ -102,19 +102,18 @@ fn workshop_action(
             if gear && !progress.recipes.contains(&recipe.item) {
                 return Err("Learn this blueprint before forging it.");
             }
-            if c.gold < recipe.cost {
-                return Err("You cannot afford that recipe.");
-            }
-            for (item, count) in &recipe.ingredients {
-                if !c.consume_item(item, *count) {
-                    return Err("You do not have the ingredients for that recipe.");
-                }
-            }
-            if !c.can_collect(&recipe.item) || c.quantity(&recipe.item) == u32::MAX {
-                return Err("Your bags are full. Make room first.");
-            }
-            c.gold -= recipe.cost;
-            c.add_item(&recipe.item, 1);
+            let all = *all && recipe.method != Method::Upgrade;
+            let costs = recipe
+                .ingredients
+                .iter()
+                .map(|(id, count)| (std::iter::once(id.as_str()), *count));
+            let count = c.produce_recipe(
+                &recipe.item,
+                recipe.cost,
+                all,
+                costs,
+                "You do not have the ingredients for that recipe.",
+            )?;
             if gear {
                 c.materialize_gear_instances();
                 let quality = match recipe.method {
@@ -122,14 +121,20 @@ fn workshop_action(
                     Method::Rare => 1,
                     _ => 0,
                 };
-                c.blacksmithing
-                    .proficiency
-                    .try_gain(quality, training_cap(recipe.tier), roll);
+                c.blacksmithing.proficiency.train_batch(
+                    count,
+                    quality,
+                    training_cap(recipe.tier),
+                    crate::profession::MAX_SKILL,
+                    roll,
+                );
             }
-            let message = match recipe.method {
-                Method::Smelt => "You smelted a bar.",
-                Method::Upgrade => "You forged a new mining pick.",
-                _ => "You forged equipment.",
+            let message = match (recipe.method, all) {
+                (Method::Smelt, true) => format!("Smelted {} bars.", count),
+                (_, true) => format!("Forged {} pieces of equipment.", count),
+                (Method::Smelt, false) => "You smelted a bar.".into(),
+                (Method::Upgrade, false) => "You forged a new mining pick.".into(),
+                _ => "You forged equipment.".into(),
             };
             Ok((message, Some(recipe.item.clone())))
         }
@@ -172,7 +177,7 @@ impl World {
             Err("Walk closer to the smith to use this workshop.")
         } else {
             let mut staged = p.character.clone();
-            workshop_action(&mut staged, &request, self.smith_roll()).and_then(|action| {
+            workshop_action(&mut staged, &request, || self.smith_roll()).and_then(|action| {
                 self.store
                     .save_many([&staged].into_iter())
                     .map_err(|_| "The Blacksmithing change could not be saved.")?;
@@ -184,7 +189,7 @@ impl World {
         let c = &p.character;
         let (text, output) = result
             .as_ref()
-            .map(|(text, output)| (*text, output.as_deref()))
+            .map(|(text, output)| (text.as_str(), output.as_deref()))
             .unwrap_or_else(|text| (*text, None));
         let _ = p.peer.try_send(
             json!({"type":"blacksmithing","npc":npc,"ok":result.is_ok(),"text":text,

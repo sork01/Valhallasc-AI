@@ -9,6 +9,7 @@ const mutations = {
   rarity: ['&& tiers.findIndex(tier => tier.rarity === gear.rarity) >= recipe.tier', '&& true', 'rare gear cannot receive an epic enchant'],
   replacing: ['expected:target.gear.enchant ?? null', 'expected:null', 'apply names the old enchant'],
   salvage: ['copies().filter(row => !row.worn)', 'copies()', 'worn pieces cannot be salvaged'],
+  bulk: ['all:true','all:false','Craft All sends a single batch request'],
   cost: ['canCraft &&= have >= amount', 'canCraft = true', 'missing materials disable crafting'],
   training: ["skill < cap ? tr('Can raise Enchanting", "skill <= cap ? tr('Can raise Enchanting", 'gear at its training cap explains why skill cannot rise'],
   trainer: ['An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.', 'Learn in your bags.', 'untrained characters are sent to a trainer'],
@@ -109,11 +110,17 @@ button('Craft').click();
 select('Enchantment').choose('double_tap');
 assert.match(panel.textContent,/Enchanting Dust · 0 of 4 in bags/);
 assert.equal(button('Craft one scroll').disabled,true,'missing materials disable crafting');
+assert.equal(button('Craft All').disabled,true,'Craft All also needs materials');
 answer({skill:1,recipes:['double_tap'],inventory:[{item:'enchant_dust',quantity:4},{item:'enchant_essence',quantity:2}]});
 button('Craft one scroll').click();
 emit({op:'craft',enchant:'double_tap'});
 answer({skill:2,skillUp:true,text:'Enchant scroll crafted.',recipes:['double_tap']});
 assert.match(panel.textContent, /Enchanting skill increased to 2/);
+answer({skill:2,recipes:['double_tap'],inventory:[{item:'enchant_dust',quantity:9},{item:'enchant_essence',quantity:4}]});
+button('Craft All').click();
+assert.deepEqual(calls.at(-1).request,{op:'craft',enchant:'double_tap',all:true},'Craft All sends a single batch request');
+assert(button('Craft one scroll').disabled && button('Craft All').disabled);
+answer({skill:3,recipes:['double_tap']});
 
 button('Disenchant').click();
 assert(!select('Equipment copy').options.some(o => o.value === '103'),'worn pieces cannot be salvaged');

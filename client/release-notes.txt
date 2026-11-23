@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.7.1",
+    "date": "2026-11-23",
+    "new": [
+      "Cook, smelt, forge, brew or craft as many of a selected recipe as your materials, money and bag space allow."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.7.0",
     "date": "2026-11-22",
     "new": [

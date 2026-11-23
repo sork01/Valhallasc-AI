@@ -180,7 +180,12 @@
       });
       panel.append(costs);
       trainingNote(panel, skill, craftSkillCaps?.[recipe.tier]);
-      panel.append(confirmAction('Craft one scroll', {op:'craft', enchant:recipe.id}, pending || !canCraft));
+      const actions = el('div', '', 'recipe-actions');
+      actions.append(
+        confirmAction('Craft one scroll', {op:'craft', enchant:recipe.id}, pending || !canCraft),
+        confirmAction('Craft All', {op:'craft', enchant:recipe.id, all:true}, pending || !canCraft),
+      );
+      panel.append(actions);
     } else {
       const target = selectedCopy(panel, copies().filter(row => fits(row, recipe) && row.gear.enchant !== recipe.id));
       panel.append(el('p', tr('Cost · One crafted scroll')));

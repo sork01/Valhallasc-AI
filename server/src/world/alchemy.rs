@@ -42,15 +42,15 @@ pub(super) fn workshop_view(npc: &Npc, c: &Character) -> Option<Value> {
 fn workshop_action(
     c: &mut Character,
     request: &Command,
-    roll: f64,
-) -> Result<(&'static str, Option<String>), &'static str> {
+    roll: impl FnMut() -> f64,
+) -> Result<(String, Option<String>), &'static str> {
     let skill = c.alchemy.proficiency.skill;
     if let Command::Train { .. } = request {
         if skill > 0 {
             return Err("You already know Alchemy.");
         }
         c.alchemy.proficiency.initialize(1);
-        return Ok(("You learned Alchemy.", None));
+        return Ok(("You learned Alchemy.".into(), None));
     }
     if skill == 0 {
         return Err("Learn Alchemy from Maera in Alderhaven.");
@@ -81,39 +81,39 @@ fn workshop_action(
                 return Err("That formula is missing from your bags.");
             }
         }
-        Command::Brew { .. } => {
+        Command::Brew { all, .. } => {
             if skill < recipe.skill {
                 return Err("Your Alchemy skill is too low.");
             }
             if !known {
                 return Err("Learn this recipe before brewing it.");
             }
-            for (alternatives, count) in &recipe.ingredients {
-                let mut remaining = *count;
-                for id in alternatives {
-                    let used = remaining.min(c.quantity(id));
-                    if used > 0 {
-                        c.consume_item(id, used);
-                        remaining -= used;
-                    }
-                }
-                if remaining > 0 {
-                    return Err("You do not have the ingredients for that recipe.");
-                }
-            }
-            if !c.can_collect(&recipe.item) || c.quantity(&recipe.item) == u32::MAX {
-                return Err("Your bags are full. Make room first.");
-            }
-            c.add_item(&recipe.item, 1);
-            c.alchemy.train(recipe.skill / SKILL_BAND, roll);
-            return Ok(("You brewed an Alchemy item.", Some(recipe.item.clone())));
+            let costs = recipe
+                .ingredients
+                .iter()
+                .map(|(ids, count)| (ids.iter().map(String::as_str), *count));
+            let count = c.produce_recipe(
+                &recipe.item,
+                0,
+                *all,
+                costs,
+                "You do not have the ingredients for that recipe.",
+            )?;
+            let cap = (recipe.skill / SKILL_BAND + 1) * SKILL_BAND;
+            c.alchemy.proficiency.train_batch(count, 0, cap, crate::alchemy::MAX_SKILL, roll);
+            let message = if *all {
+                format!("Brewed {} Alchemy items.", count)
+            } else {
+                "You brewed an Alchemy item.".into()
+            };
+            return Ok((message, Some(recipe.item.clone())));
         }
         Command::Train { .. } => unreachable!(),
     }
     if !c.alchemy.recipes.insert(recipe.item.clone()) {
         return Err("You already know this recipe.");
     }
-    Ok(("You learned the recipe.", None))
+    Ok(("You learned the recipe.".into(), None))
 }
 
 impl Player {
@@ -221,7 +221,7 @@ impl World {
             Err("Walk closer to the alchemist to use this workshop.")
         } else {
             let mut staged = c.clone();
-            workshop_action(&mut staged, &request, self.alchemy_roll()).and_then(|action| {
+            workshop_action(&mut staged, &request, || self.alchemy_roll()).and_then(|action| {
                 self.store
                     .save_many([&staged].into_iter())
                     .map_err(|_| "The Alchemy change could not be saved.")?;
@@ -232,7 +232,7 @@ impl World {
         let p = &self.players[&session];
         let c = &p.character;
         let (text, output) = match &result {
-            Ok((text, output)) => (*text, output.as_deref()),
+            Ok((text, output)) => (text.as_str(), output.as_deref()),
             Err(text) => (*text, None),
         };
         let _ = p.peer.try_send(

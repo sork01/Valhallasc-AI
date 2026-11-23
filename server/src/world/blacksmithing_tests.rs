@@ -310,6 +310,7 @@ fn blacksmithing_workshop_validates_station_and_preserves_transactions_and_gear_
         recipe: item.clone(),
     };
     let craft = |recipe: &str| Command::Craft {
+        all: false,
         npc: TRAINER.into(),
         recipe: recipe.into(),
     };
@@ -380,6 +381,7 @@ fn blacksmithing_failed_save_preserves_ore_gold_ingredients_and_vein_charges() {
     command(
         &mut w,
         Command::Craft {
+            all: false,
             npc: TRAINER.into(),
             recipe: recipe.item.clone(),
         },
@@ -418,6 +420,7 @@ fn blacksmithing_pick_upgrades_require_the_previous_pick_fees_and_the_right_band
         c.blacksmithing.proficiency.skill = recipe.skill - 1;
         c.gold = recipe.cost;
         let craft = || Command::Craft {
+            all: false,
             npc: TRAINER.into(),
             recipe: recipe.item.clone(),
         };
@@ -513,6 +516,7 @@ fn blacksmithing_blueprints_follow_actual_loot_and_study_before_epic_unlock() {
     command(
         &mut w,
         Command::Craft {
+            all: false,
             npc: TRAINER.into(),
             recipe: epic.item.clone(),
         },
@@ -526,6 +530,7 @@ fn blacksmithing_blueprints_follow_actual_loot_and_study_before_epic_unlock() {
     command(
         &mut w,
         Command::Craft {
+            all: false,
             npc: TRAINER.into(),
             recipe: epic.item.clone(),
         },
@@ -538,4 +543,44 @@ fn blacksmithing_blueprints_follow_actual_loot_and_study_before_epic_unlock() {
             .iter()
             .any(|copy| copy.item == epic.item && copy.rarity == "epic")
     );
+}
+
+#[test]
+fn blacksmithing_bulk_smelting_and_forging_fit_bags_and_save_every_copy() {
+    let (mut w, token, _) = smiths();
+    train(&mut w, 1);
+    let bar = CATALOG.recipes.iter().find(|r| r.method == Method::Smelt).unwrap();
+    let gear = CATALOG.recipes.iter().find(|r| r.method == Method::Staple).unwrap();
+    let craft = |recipe: &str| serde_json::from_value(json!({
+        "op":"craft","npc":TRAINER,"recipe":recipe,"all":true,
+    })).unwrap();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    let (ore, amount) = &bar.ingredients[0];
+    c.add_item(ore, amount * 7 + 1);
+    command(&mut w, craft(&bar.item));
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    assert_eq!(c.quantity(&bar.item), 7);
+    assert_eq!(c.quantity(ore), 1);
+    assert_eq!(c.blacksmithing.proficiency.skill, 1, "smelting gives no skill");
+
+    c.blacksmithing.recipes.insert(gear.item.clone());
+    for (id, quantity) in &gear.ingredients {
+        c.add_item(id, quantity * 4);
+    }
+    for filler in ITEMS.iter().filter(|i| i.kind == "material") {
+        if c.bag_used() + 2 >= c.bag_capacity() {
+            break;
+        }
+        c.add_item(&filler.id, 1);
+    }
+    let before = c.clone();
+    assert_eq!(before.bag_used() + 2, before.bag_capacity());
+    command(&mut w, craft(&gear.item));
+    let saved = w.store.load(&token).unwrap().unwrap();
+    assert_eq!(saved.quantity(&gear.item), 2);
+    assert_eq!(saved.gear_instances.iter().filter(|g| g.item == gear.item).count(), 2);
+    assert_eq!(saved.bag_used(), saved.bag_capacity());
+    for (id, quantity) in &gear.ingredients {
+        assert_eq!(saved.quantity(id), before.quantity(id) - quantity * 2);
+    }
 }

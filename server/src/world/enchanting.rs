@@ -163,6 +163,7 @@ impl World {
             return;
         };
         let open = matches!(request, Command::Open);
+        let all = matches!(request, Command::Craft { all: true, .. });
         let mut staged = p.character.clone();
         let previous_skill = p.character.enchanting.proficiency.skill;
         let gear_count = p.character.gear_instances.len();
@@ -181,13 +182,22 @@ impl World {
             staged
                 .enchant_action(request)
                 .and_then(|(notice, training)| {
-                    if let Some(training) = training {
-                        staged.enchanting.proficiency.try_gain(
+                    let notice = if let Some(training) = training {
+                        staged.enchanting.proficiency.train_batch(
+                            training.attempts,
                             training.quality,
                             training.cap,
-                            self.profession_roll(),
+                            crate::profession::MAX_SKILL,
+                            || self.profession_roll(),
                         );
-                    }
+                        if all {
+                            format!("Crafted {} enchant scrolls.", training.attempts)
+                        } else {
+                            notice.into()
+                        }
+                    } else {
+                        notice.into()
+                    };
                     if !open || staged.gear_instances.len() != gear_count {
                         self.store
                             .save_many([&staged].into_iter())
@@ -220,7 +230,7 @@ impl World {
         let _ = p
             .peer
             .try_send(json!({"type":"enchanting","ok":result.is_ok(),
-            "text":result.unwrap_or_else(|text| text),"skill":c.enchanting.proficiency.skill,
+            "text":result.unwrap_or_else(|text| text.into()),"skill":c.enchanting.proficiency.skill,
             "maxSkill":crate::profession::MAX_SKILL,
             "trainingGearLevel":crate::profession::training_gear_level(c.enchanting.proficiency.skill),
             "craftSkillCaps":catalog::CATALOG.tiers.each_ref().map(|tier| tier.skill_cap()),
@@ -1019,6 +1029,30 @@ mod tests {
         let saved = w.store.load(token).unwrap().unwrap();
         assert_eq!(saved.enchanting.proficiency.skill, 6);
         assert_eq!(saved.enchanting.recipes, [DoubleTap, Shieldbreaker].into());
+    }
+
+
+    #[test]
+    fn enchanting_bulk_scrolls_use_limiting_material_and_save_the_batch() {
+        let mut w = world();
+        let (tx, mut rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let c = character(&mut w, 1);
+        c.enchanting.proficiency.skill = 28;
+        c.enchanting.recipes.insert(DoubleTap);
+        c.add_item("enchant_dust", 17);
+        c.add_item("enchant_essence", 6);
+        let craft = json!({"op":"craft","enchant":DoubleTap,"all":true});
+        let packet = request(&mut w, &mut rx, craft.clone());
+        assert_eq!(packet["ok"], true);
+        assert_eq!(packet["skill"], 30);
+        assert_eq!(packet["text"], "Crafted 3 enchant scrolls.");
+        assert_eq!(request(&mut w, &mut rx, craft)["ok"], false);
+        let saved = w.store.load(welcome["token"].as_str().unwrap()).unwrap().unwrap();
+        assert_eq!(saved.quantity(&DoubleTap.item("scroll")), 3);
+        assert_eq!(saved.quantity("enchant_dust"), 5);
+        assert_eq!(saved.quantity("enchant_essence"), 0);
+        assert_eq!(saved.enchanting.proficiency.skill, 30);
     }
 
     #[test]

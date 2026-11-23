@@ -5,6 +5,7 @@ use std::sync::LazyLock;
 #[cfg(test)]
 mod cloak_tests;
 mod gear_services;
+mod workshop;
 pub use gear_services::{DeathWear, GearInstance, SPIRIT_GUIDE_WEAR};
 pub mod hierlooms;
 mod orange;

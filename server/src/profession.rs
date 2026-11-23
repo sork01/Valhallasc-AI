@@ -48,6 +48,22 @@ impl Skill {
         self.try_gain_to(quality, cap, MAX_SKILL, roll)
     }
 
+    pub(crate) fn train_batch(
+        &mut self,
+        attempts: u32,
+        quality: u8,
+        cap: u16,
+        max_skill: u16,
+        mut roll: impl FnMut() -> f64,
+    ) {
+        for _ in 0..attempts {
+            if self.skill == 0 || self.skill >= cap.min(max_skill) {
+                break;
+            }
+            self.try_gain_to(quality, cap, max_skill, roll());
+        }
+    }
+
     pub fn try_gain_to(&mut self, quality: u8, cap: u16, max_skill: u16, roll: f64) -> bool {
         if !(1..cap.min(max_skill)).contains(&self.skill) {
             return false;

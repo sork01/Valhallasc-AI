@@ -111,18 +111,25 @@
         requires.append(fee);
       }
       details.append(requires);
+      const actions = element('div', '', 'recipe-actions');
       let action;
       if (gear && !learned) {
         if (!recipe.plan) action = button('Learn blueprint', () => command('learn', {npc, recipe:piece.id}), skill < recipe.skill);
         else if (amounts.get(recipe.plan)) action = button('Study blueprint', () => command('study', {plan:recipe.plan}));
         else action = element('small', tr(recipe.method === 'epic' ? 'Blueprint drops from final bosses.' : 'Blueprint drops from enemies.'));
       } else {
+        const unavailable = skill < recipe.skill || !supplies || gold < recipe.cost;
         action = button(recipe.method === 'smelt' ? 'Smelt' : 'Forge item',
-          () => command('craft', {npc, recipe:piece.id}),
-          skill < recipe.skill || !supplies || gold < recipe.cost);
+          () => command('craft', {npc, recipe:piece.id}), unavailable);
+        if (recipe.method !== 'upgrade') {
+          const bulk = button(recipe.method === 'smelt' ? 'Smelt All' : 'Forge All',
+            () => command('craft', {npc, recipe:piece.id, all:true}), unavailable);
+          bulk.dataset.smithAction = 'all:' + piece.id;
+          actions.append(action, bulk);
+        }
       }
       action.dataset.smithAction = recipe.item;
-      row.append(icon, details, action);
+      row.append(icon, details, actions.children.length ? actions : action);
       list.append(row);
     }
     target.append(list);

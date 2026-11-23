@@ -516,5 +516,10 @@
   "+{0}% movement speed": "+{0} % rörelsehastighet",
   "+{0}% maximum health": "+{0} % maximal hälsa",
   "{0} for 45 min. PvE only. Drink out of combat. Requires level {1}.": "{0} i 45 min. Bara i PvE. Drick utanför strid. Kräver nivå {1}.",
-  "{0} for 15 s. PvE only. Shares the 60 s potion cooldown. Requires level {1}.": "{0} i 15 s. Bara i PvE. Delar dryckers återhämtning på 60 s. Kräver nivå {1}."
+  "{0} for 15 s. PvE only. Shares the 60 s potion cooldown. Requires level {1}.": "{0} i 15 s. Bara i PvE. Delar dryckers återhämtning på 60 s. Kräver nivå {1}.",
+  "Cooked {0} servings.": "Tillagade {0} portioner.",
+  "Smelted {0} bars.": "Smälte {0} tackor.",
+  "Forged {0} pieces of equipment.": "Smidde {0} utrustningsdelar.",
+  "Brewed {0} Alchemy items.": "Bryggde {0} alkemiföremål.",
+  "Crafted {0} enchant scrolls.": "Tillverkade {0} förtrollningsrullar."
 }

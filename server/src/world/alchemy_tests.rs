@@ -213,6 +213,7 @@ fn alchemy_harvest_and_staple_brews_independently_can_award_the_last_point_of_ev
 
         c.alchemy.recipes.insert(recipe.item.clone());
         let brew = Command::Brew {
+            all: false,
             npc: TRAINER.into(),
             recipe: recipe.item.clone(),
         };
@@ -223,7 +224,7 @@ fn alchemy_harvest_and_staple_brews_independently_can_award_the_last_point_of_ev
                     c.add_item(&ids[n as usize % ids.len()], 1);
                 }
             }
-            assert!(workshop_action(&mut c, &brew, 0.999).is_ok());
+            assert!(workshop_action(&mut c, &brew, || 0.999).is_ok());
             assert_eq!(c.alchemy.proficiency.skill, expected);
         }
     }
@@ -238,6 +239,7 @@ fn alchemy_workshop_and_gathering_roll_back_on_failed_save_and_missing_ingredien
         recipe: POTION.into(),
     };
     let brew = Command::Brew {
+        all: false,
         npc: TRAINER.into(),
         recipe: POTION.into(),
     };
@@ -461,4 +463,34 @@ fn alchemy_healing_bonus_belongs_to_the_caster_and_only_benefits_pve_targets() {
     ally.pvp_flag = true;
     w.heal_players(1, &[2], mult);
     assert_eq!(w.players[&2].character.hp, 41.);
+}
+
+#[test]
+fn alchemy_bulk_brews_mixed_flowers_and_rolls_once_per_item_through_the_cap() {
+    let (mut w, token) = fixture();
+    train(&mut w, 1);
+    let recipe = CATALOG.recipe("alchemy_deepbloom_flask").unwrap();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.alchemy.proficiency.skill = 508;
+    c.alchemy.recipes.insert(recipe.item.clone());
+    let (flowers, count) = &recipe.ingredients[0];
+    assert!(flowers.len() > 1);
+    c.add_item(&flowers[0], count + 1);
+    c.add_item(&flowers[1], count * 2);
+    for (ids, quantity) in &recipe.ingredients[1..] {
+        c.add_item(&ids[0], quantity * 3);
+    }
+    let request: Command = serde_json::from_value(json!({
+        "op":"brew","npc":TRAINER,"recipe":recipe.item,"all":true,
+    })).unwrap();
+    let mut staged = c.clone();
+    let mut rolls = 0;
+    workshop_action(&mut staged, &request, || { rolls += 1; 0. }).unwrap();
+    assert_eq!(rolls, 2, "two brews reach the skill cap and the third gives no skill");
+    assert_eq!(staged.alchemy.proficiency.skill, 510);
+    w.alchemy_command(1, request);
+    let saved = w.store.load(&token).unwrap().unwrap();
+    assert_eq!(saved.quantity(&recipe.item), 3);
+    assert_eq!(saved.quantity(&flowers[0]), 0);
+    assert_eq!(saved.quantity(&flowers[1]), 1);
 }

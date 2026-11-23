@@ -14730,5 +14730,11 @@
   "You cannot use that brew right now.": "Du kan inte dricka den brygden just nu.",
   "You learned Alchemy.": "Du lärde dig alkemi.",
   "You need to be free to move before picking flowers.": "Du måste kunna röra dig fritt för att plocka blommor.",
-  "Your Alchemy skill is too low.": "Din färdighet i alkemi är för låg."
+  "Your Alchemy skill is too low.": "Din färdighet i alkemi är för låg.",
+  "Cook All": "Tillaga alla",
+  "Smelt All": "Smält alla",
+  "Forge All": "Smid alla",
+  "Brew All": "Brygg alla",
+  "Craft All": "Tillverka alla",
+  "The Fisher recipe could not be saved.": "Fiskarens recept kunde inte sparas."
 }

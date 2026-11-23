@@ -57,6 +57,7 @@ if (process.env.MUTATE === 'small-vein') {
   assert(moduleText.includes('VEIN_SIZE = 92'));
   moduleText = moduleText.replace('VEIN_SIZE = 92', 'VEIN_SIZE = 46');
 }
+if (process.env.MUTATE === 'bulk') moduleText = moduleText.replace('all:true', 'all:false');
 vm.runInContext(moduleText,context,{filename:'blacksmithing.js'});
 
 const Blacksmithing = context.Blacksmithing;
@@ -66,6 +67,8 @@ const inventory = [{item:'smith_bar_tin',quantity:3},{item:'smith_leather_strips
 const packet = {blacksmithing:state,inventory,gold:10};
 const render = () => Blacksmithing.render(npc,packet,panel);
 const row = id => panel.querySelectorAll('[data-recipe]').find(n => n.dataset.recipe === id);
+const action = (id, bulk = false) => row(id).querySelectorAll('[data-smith-action]')
+  .find(node => node.dataset.smithAction === (bulk ? 'all:' + id : id));
 render();
 assert.equal(panel.children[0].textContent,'Smide');
 panel.children.at(-1).click();
@@ -77,14 +80,25 @@ assert.equal(row(recipe).children[1].children[0].textContent,'Tennbeslagna hands
 assert.equal(row(recipe).children[1].children[1].textContent,'Preview');
 assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 1 / 300'));
 assert(panel.children.some(n => /^Träna upp till 30 med Tennmalm/.test(n.textContent)));
-row(recipe).children.at(-1).click();
+action(recipe).click();
 assert.deepEqual(sent.at(-1),{type:'blacksmithing',request:{op:'learn',npc:'smith',recipe}});
 Blacksmithing.onPacket({ok:true,npc:'smith',text:'You learned the blueprint.',skill:1,recipes:[recipe],inventory:[],gold:10});
-assert.equal(row(recipe).children.at(-1).disabled,true,'forge is disabled without inputs');
+assert.equal(action(recipe).disabled,true,'forge is disabled without inputs');
+assert.equal(action(recipe,true).disabled,true,'Forge All also needs ingredients');
 Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:1,recipes:[recipe],inventory,gold:10});
-assert.equal(row(recipe).children.at(-1).disabled,false);
-row(recipe).children.at(-1).click();
-assert.equal(sent.at(-1).request.op,'craft');
+assert.equal(action(recipe).disabled,false);
+action(recipe).click();
+assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe});
+Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:1,recipes:[recipe],inventory,gold:10});
+assert.equal(action(recipe,true).textContent,'Smid alla');
+action(recipe,true).click();
+assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe,all:true},'Forge All sends a single batch request');
+Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:1,recipes:[],inventory:[{item:'smith_ore_tin',quantity:6}],gold:10});
+panel.querySelectorAll('[data-smith-action]').find(n => n.dataset.smithAction === 'smelt').click();
+const smelt = action('smith_bar_tin',true);
+assert.equal(smelt.textContent,'Smält alla');
+smelt.click();
+assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe:'smith_bar_tin',all:true});
 Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:150,recipes:[],inventory:[],gold:10});
 assert(panel.children.some(n => /Andra gruvområden · .*Rán/.test(n.textContent)));
 

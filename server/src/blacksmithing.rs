@@ -27,7 +27,12 @@ impl Progress {
 pub enum Command {
     Train { npc: String },
     Learn { npc: String, recipe: String },
-    Craft { npc: String, recipe: String },
+    Craft {
+        npc: String,
+        recipe: String,
+        #[serde(default)]
+        all: bool,
+    },
     Study { plan: String },
 }
 
