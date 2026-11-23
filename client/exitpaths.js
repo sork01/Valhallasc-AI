@@ -1,16 +1,7 @@
 'use strict';
-// Clear, static road markings and readable destinations at every outdoor crossing.
+// Gate signs, crossing labels and vault arches.
 (() => {
   function stroke(g,pts,color,width){g.strokeStyle=color;g.lineWidth=width;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();}
-  function floor(g,z,w2s,hero){
-    g.save();g.lineCap='round';g.lineJoin='round';
-    for(const r of z.exitRoutes||[]){const p=z.portals.find(p=>p.id===r.portal);if(!p||p.vault||!p.walk||Math.hypot(p.x-hero.x,p.y-hero.y)>32)continue;      // a gate in the open (Asterion's, on the compass rose) has no side to mark
-      const points=r.points.map(([x,y])=>w2s(x,y));
-      stroke(g,points,'#302e35',42);stroke(g,points,z.sky?'#f1dfb9':'#d8c395',34);stroke(g,points,'#a28d69',2);
-      const [x,y]=w2s(p.x,p.y),[a,b]=w2s(p.x-p.walk[0],p.y-p.walk[1]),len=Math.hypot(x-a,y-b)||1,ux=(x-a)/len,uy=(y-b)/len;
-      for(let i=1;i<4;i++){const cx=x-ux*i*39,cy=y-uy*i*39;stroke(g,[[cx-ux*9-uy*9,cy-uy*9+ux*9],[cx,cy],[cx-ux*9+uy*9,cy-uy*9-ux*9]],'#fff0b7',3);}
-    }g.restore();
-  }
   function arch(g,a,w2s){
     const P=(u,v,h=0)=>w2s(a.x+(a.vertical?v:u),a.y+(a.vertical?u:v),h);
     const poly=(pts,color)=>{g.fillStyle=color;g.strokeStyle='#6e6756';g.lineWidth=1.5;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();g.stroke();};
@@ -57,5 +48,5 @@
       g.beginPath();g.roundRect(x-width/2,y-size,width,size*2,7);g.fill();g.stroke();g.fillStyle='#fff0c9';g.fillText(label,x,y);
     }g.restore();
   }
-  window.ExitPaths={floor,arch,gate,labels,hit};
+  window.ExitPaths={arch,gate,labels,hit};
 })();
