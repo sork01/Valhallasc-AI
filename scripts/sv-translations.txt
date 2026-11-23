@@ -14498,6 +14498,8 @@
   "Learn Enchanting to study recipes, disenchant gear and craft scrolls.": "Lär dig förtrollning för att studera recept, bryta ned utrustning och tillverka rullar.",
   "No crafted scrolls in your bags": "Inga tillverkade rullar i väskorna",
   "No eligible equipment": "Ingen utrustning som passar",
+  "This item cannot be disenchanted.": "Det här föremålet kan inte brytas ned.",
+  "Select gear in your bags to disenchant.": "Välj utrustning i väskorna att bryta ned.",
   "No known recipes": "Inga inlärda recept",
   "No reply. Try again.": "Inget svar. Försök igen.",
   "No unlearned recipe scrolls in your bags": "Inga rullar med nya recept i väskorna",

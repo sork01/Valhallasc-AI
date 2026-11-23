@@ -1,7 +1,23 @@
 #merchant-bags #enchanting-toggle { display: none; }
 
-#stage .bag-window.enchanting-open > :is(.bag-tabs, .bag-grid, .bag-details, .bag-footer, .bag-instructions),
-#stage .bag-window.enchanting-open .bag-toolbar > :not(#enchanting-toggle) { display: none; }
+#stage .bag-window.enchanting-open:not(.enchanting-disenchant) > :is(.bag-tabs, .bag-grid, .bag-details, .bag-footer),
+#stage .bag-window.enchanting-open > .bag-instructions,
+#stage .bag-window.enchanting-open:not(.enchanting-disenchant) .bag-toolbar > :not(#enchanting-toggle) { display: none; }
+
+.enchanting-disenchant .enchanting-panel { flex: 0 0 auto; padding: 0 .5rem; }
+.enchanting-disenchant .enchanting-panel h4 { display: none; }
+.enchanting-disenchant .bag-details .window-tool { margin-right: .5rem; }
+
+@media (pointer: coarse) {
+  #stage .equipment-workspace .enchanting-disenchant .bag-details {
+    max-height: calc(128px / var(--window-k, .8));
+  }
+  #stage .enchanting-disenchant :is(.enchanting-modes, .bag-details) .window-tool {
+    min-height: var(--touch-target);
+    font-size: calc(11px / var(--window-k, .8));
+  }
+}
+
 
 .enchanting-panel {
   overflow: auto;

@@ -82,6 +82,7 @@
   // The server wears the first loose copy of an item: name the one in the chosen cell first (ordered messages, so it lands before the equip).
   const preferCopy = key => { const id = key == null ? null : cellCopyId(key); if (id != null && canEquip()) Online.send({ type: 'prefer_copy', copy: id }); };
   const activate = (i, key) => {
+    if (window.Enchanting?.selectingDisenchant?.()) return;
     if (window.Enchanting?.isScroll(i)) return window.Enchanting.open(i.id);
     return consumable(i) || licence(i) ? useItem(i) : equip(i, undefined, key);
   };
@@ -290,7 +291,8 @@
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
-    t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    const choosingDisenchant = !slot && !where && window.Enchanting?.selectingDisenchant?.();
+    if (!choosingDisenchant) t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
@@ -361,6 +363,7 @@
     const container = $('bag-details'); if (!container) return;
     const i = selected && definition(cellId(selected)), cellCopy = selected && keyCopy(selected);
     container.replaceChildren();
+    if (window.Enchanting?.renderDisenchant?.(container, i, cellCopy)) return;
     if (!i || !quantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
     const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = cellCopy?.rarity || displayRarity(i);
     container.append(heading, node('small', summary(i, gearItem(i) ? 1 : quantity(i.id), cellCopy)));
@@ -514,7 +517,7 @@
   }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(cellId(a)).kind.localeCompare(definition(cellId(b)).kind) || definition(cellId(a)).name.localeCompare(definition(cellId(b)).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
+  window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderDetails, renderEquipped, renderSets, hideTooltip, showTooltip,
     gearPreview: i => tr(`Level ${levelOf(i)}`) + (i.class ? ` · ${tr(i.class)}` : '') + (stats(i) ? ` · ${tr(stats(i))}` : ''),
     icon, definition, legacyPiece, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.

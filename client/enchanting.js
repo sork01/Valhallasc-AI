@@ -38,12 +38,15 @@
     return true;
   }
   function visible() { return !$('enchanting-panel').hidden; }
+  function selectingDisenchant() { return visible() && mode === 'disenchant'; }
   function close() {
+    const restoreDetails = selectingDisenchant();
     $('enchanting-panel').hidden = true;
     $('enchanting-toggle').setAttribute('aria-expanded', 'false');
-    $('enchanting-panel').parentElement.classList.remove('enchanting-open');
+    $('enchanting-panel').parentElement.classList.remove('enchanting-open', 'enchanting-disenchant');
     confirmation = null;
     refresh = false;
+    if (restoreDetails) Inventory.renderDetails();
   }
   function open(item) {
     const row = rowForItem(Inventory.definition(item));
@@ -111,8 +114,42 @@
   function confirmAction(label, request, disabled = pending) {
     return action(label, () => { notice = ''; if (send(request)) render(); }, disabled);
   }
+  function renderDisenchant(container, item, copy) {
+    if (!selectingDisenchant()) return false;
+    const target = copy && packet?.skill
+      ? copies().find(({gear, worn}) => !worn && gear.id === copy.id && gear.rarity === copy.rarity
+        && (gear.enchant ?? null) === (copy.enchant ?? null))
+      : undefined;
+    if (confirmation !== target?.gear.id) confirmation = null;
+    if (!target) {
+      const message = item && packet && !pending
+        ? 'This item cannot be disenchanted.' : 'Select gear in your bags to disenchant.';
+      container.append(el('p', tr(message), 'bag-empty-note'));
+      return true;
+    }
+
+    const {gear} = target;
+    const material = materials.find(row => row.rarity === gear.rarity);
+    const title = el('b', copyLabel(target), 'item-name');
+    title.dataset.rarity = gear.rarity;
+    container.append(title, el('p', tr('Destroys this copy. You receive {0} × {1}.', material.yield, tr(material.name))));
+    const control = confirmation === gear.id
+      ? confirmAction('Confirm disenchant', {op:'disenchant', copy:gear.id, expected:gear.enchant ?? null})
+      : action('Disenchant this copy', () => {
+        confirmation = gear.id;
+        Inventory.renderDetails();
+        container.querySelector('button')?.focus({preventScroll:true});
+      });
+    container.append(control);
+    trainingNote(container, packet.skill, target.skillCap);
+    return true;
+  }
   function render() {
     const root = $('enchanting-panel');
+    const selecting = selectingDisenchant();
+    const updateBag = selecting || root.parentElement.classList.contains('enchanting-disenchant');
+    root.parentElement.classList.toggle('enchanting-disenchant', selecting);
+    if (updateBag) Inventory.renderDetails();
     const heading = el('h4', tr('Enchanting'));
     const status = el('p', notice ? tr(notice) : pending ? tr('Waiting for Enchanting…') : '', 'enchanting-status');
     status.setAttribute('role', 'status');
@@ -133,21 +170,9 @@
     root.append(nav);
     if (!skill && mode !== 'apply') return;
 
+    if (selecting) return;
     const panel = el('div', '', 'enchanting-form');
     root.append(panel);
-    if (mode === 'disenchant') {
-      const target = selectedCopy(panel, copies().filter(row => !row.worn));
-      if (!target) return;
-      const {gear} = target;
-      const material = materials.find(row => row.rarity === gear.rarity);
-      enchantInfo(panel, gear.enchant);
-      panel.append(el('p', tr('Destroys this copy. You receive {0} × {1}.', material.yield, tr(material.name))));
-      trainingNote(panel, skill, target.skillCap);
-      panel.append(confirmation === gear.id
-        ? confirmAction('Confirm disenchant', {op:'disenchant', copy:gear.id, expected:gear.enchant ?? null})
-        : action('Disenchant this copy', () => { confirmation = gear.id; render(); root.querySelector('.enchanting-form button')?.focus(); }));
-      return;
-    }
     const owned = new Map(packet.inventory.map(stack => [stack.item, stack.quantity]));
     const options = enchants.filter(row => {
       if (mode === 'craft') return recipes.includes(row.id);
@@ -245,7 +270,7 @@
     }
   }
   window.Enchanting = {
-    open, close, tooltip, drawFields, name: id => byId.has(id) ? tr(byId.get(id).name) : '', isScroll: item => !!rowForItem(item),
+    open, close, tooltip, drawFields, selectingDisenchant, renderDisenchant, name: id => byId.has(id) ? tr(byId.get(id).name) : '', isScroll: item => !!rowForItem(item),
     onPacket(answer) {
       pending = false;
       clearTimeout(requestAt);

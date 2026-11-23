@@ -1,6 +1,6 @@
 # Enchanting
 
-Every character can learn Enchanting for free by speaking with an Enchanting Master. After training, use the Enchanting panel in your bags. Study a recipe scroll once to learn its recipe permanently. Disenchant an unequipped copy to recover materials. Crafting produces a tradeable, single-use scroll. Any character can apply one to a compatible gear copy from their bags or equipped slots. The panel lists the eligible gear, effect, cooldown, cost and any enchantment it will replace. Disenchanting requires a separate confirmation.
+Every character can learn Enchanting for free by speaking with an Enchanting Master. After training, use the Enchanting panel in your bags. Study a recipe scroll once to learn its recipe permanently. To recover materials, choose Disenchant, select the exact unequipped copy in your bags, then review and confirm the yield. Crafting produces a tradeable, single-use scroll. Any character can apply one to a compatible gear copy from their bags or equipped slots. The Apply panel lists eligible gear, the effect, cooldown, cost and any enchantment it will replace.
 
 Recipes come from eligible monster loot and from the Enchanting Masters listed below. A recipe scroll teaches the recipe and a crafted scroll applies the effect. Monsters below level 10 and repeated mechanic summons cannot supply recipes. Trades involving enchanted gear show which copy is offered and which enchantment it carries.
 

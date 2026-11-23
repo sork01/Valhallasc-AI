@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.7.2",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "Select gear directly from your bags when disenchanting."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.7.1",
     "date": "2026-11-23",
     "new": [
