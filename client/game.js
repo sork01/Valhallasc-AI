@@ -1213,7 +1213,27 @@
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
   function leaveGame() { window.Settings?.close(false); if (window.Field) Field.stop(); }
-  const CHARACTER_TABS = ['stats', 'sets', 'achievements', 'mounts', 'rebirth'];
+  const CHARACTER_TABS = ['stats', 'sets', 'achievements', 'professions', 'mounts', 'rebirth'];
+  const professionPanel = $('character-professions'), professionList = $('profession-skills');
+  const professionRows = Array.from(professionList?.children || [], row => ({
+    id: row.dataset.profession, value: row.querySelector('b'), bar: row.querySelector('progress'),
+  }));
+  function renderProfessions(skills) {
+    if ($('equipment').hidden || !professionPanel || professionPanel.hidden) return;
+    const available = professionRows.every(({id}) => Number.isInteger(skills?.[id]?.skill) && skills[id].maxSkill > 0);
+    if (professionList.hidden === available) {
+      professionList.hidden = !available;
+      $('profession-skills-unavailable').hidden = available;
+    }
+    if (!available) return;
+    for (const {id, value, bar} of professionRows) {
+      const {skill, maxSkill} = skills[id];
+      if (bar.max !== maxSkill) bar.max = maxSkill;
+      if (bar.value !== skill) bar.value = skill;
+      const text = skill + ' / ' + maxSkill;
+      if (value.textContent !== text) value.textContent = text;
+    }
+  }
   let equipmentFocus = null, equipmentArtPending = null, characterTab = 'stats';
   function setCharacterTab(tab = 'stats') {
     characterTab = CHARACTER_TABS.includes(tab) ? tab : 'stats';
@@ -1230,6 +1250,7 @@
     if (!$('equipment').hidden) {
       if (characterTab === 'achievements') window.Achievements?.onShow?.();
       else renderEquipment();
+      if (characterTab === 'professions') renderProfessions(Field.hero?.professions);
       window.Settings?.applyScale?.();
     }
   }
@@ -1276,7 +1297,7 @@
     else if (characterTab === 'stats') $('field-' + save.char.class + 'Armor')?.focus({ preventScroll: true });
     else $('character-tab-' + characterTab)?.focus({ preventScroll: true });
   }
-  window.CharacterPane = { open: tab => openEquipment('both', tab), close: () => { if (!$('equipment').hidden) setPause(false); }, setTab: setCharacterTab, get tab() { return characterTab; } };
+  window.CharacterPane = { open: tab => openEquipment('both', tab), close: () => { if (!$('equipment').hidden) setPause(false); }, setTab: setCharacterTab, updateProfessions: renderProfessions, get tab() { return characterTab; } };
   addEventListener('keydown', e => {
     if (scene !== 'game' || e.defaultPrevented || e.repeat) return;
     const isEsc = e.key === 'Escape' || Keys.is(e, 'menu'), isChar = Keys.is(e, 'character'), isBags = Keys.is(e, 'bags'), gearKey = isChar || isBags;

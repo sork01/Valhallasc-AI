@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.7.4",
+    "date": "2026-11-23",
+    "new": [
+      "Open the Professions tab in the Character pane to see your Fishing, Blacksmithing and Mining, Enchanting, and Alchemy skills."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.7.3",
     "date": "2026-11-23",
     "new": [],

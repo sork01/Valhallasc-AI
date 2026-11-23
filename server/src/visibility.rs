@@ -10,6 +10,7 @@ const OWN_ONLY: &[&str] = &[
     "fishDeadline",
     "fishingLog",
     "gathering",
+    "professions",
     "quests",
     "inventory",
     "equipment",

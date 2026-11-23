@@ -6151,6 +6151,8 @@
   "Ore": "Malm",
   "Track gathering": "Spåra malm och blommor",
   "Professions": "Yrken",
+  "Blacksmithing and Mining": "Smide och gruvdrift",
+  "Profession skills are unavailable.": "Yrkesfärdigheterna är inte tillgängliga.",
   "Profession guide": "Yrkesguide",
   "Apprentice Angler": "Fiskelärling",
   "Journeyman Angler": "Fiskargesäll",

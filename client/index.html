@@ -46,7 +46,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">1.7.3</p>
+    <p class="version">1.7.4</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -639,6 +639,7 @@
             <button id="character-tab-stats" class="character-tab" type="button" role="tab" data-tab="stats" aria-selected="true" aria-controls="character-pane-stats">Character &amp; stats</button>
             <button id="character-tab-sets" class="character-tab" type="button" role="tab" data-tab="sets" aria-selected="false" aria-controls="character-sets" tabindex="-1">Dungeon sets</button>
             <button id="character-tab-achievements" class="character-tab" type="button" role="tab" data-tab="achievements" aria-selected="false" aria-controls="character-achievements" tabindex="-1">Achievements</button>
+            <button id="character-tab-professions" class="character-tab" type="button" role="tab" data-tab="professions" aria-selected="false" aria-controls="character-professions" tabindex="-1">Professions</button>
             <button id="character-tab-mounts" class="character-tab" type="button" role="tab" data-tab="mounts" aria-selected="false" aria-controls="character-mounts" tabindex="-1">Mounts</button>
             <button id="character-tab-rebirth" class="character-tab" type="button" role="tab" data-tab="rebirth" aria-selected="false" aria-controls="character-rebirth" tabindex="-1">Rebirth</button>
           </div>
@@ -662,6 +663,15 @@
             </div>
             <nav id="achievement-categories" aria-label="Achievement categories"></nav>
             <div id="achievement-list" tabindex="0"></div>
+          </section>
+          <section id="character-professions" class="character-professions character-tabpanel" role="tabpanel" aria-labelledby="character-tab-professions" tabindex="0" hidden>
+            <p id="profession-skills-unavailable">Profession skills are unavailable.</p>
+            <ul id="profession-skills" class="profession-skills" hidden>
+              <li data-profession="fishing"><span>Fishing</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+              <li data-profession="blacksmithing"><span>Blacksmithing and Mining</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+              <li data-profession="enchanting"><span>Enchanting</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+              <li data-profession="alchemy"><span>Alchemy</span><b></b><progress value="0" aria-hidden="true"></progress></li>
+            </ul>
           </section>
           <section id="character-mounts" class="character-mounts character-tabpanel" role="tabpanel" aria-labelledby="character-tab-mounts" aria-label="Mounts" hidden></section>
           <section id="character-rebirth" class="character-rebirth character-tabpanel" role="tabpanel" aria-labelledby="character-tab-rebirth" aria-label="Rebirth" hidden></section>

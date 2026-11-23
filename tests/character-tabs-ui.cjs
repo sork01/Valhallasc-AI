@@ -1,5 +1,7 @@
-// Focused private browser check for the five Character pane tabs (desktop + touch + keyboard + Swedish).
+// Focused private browser check for the Character pane tabs (desktop + touch + keyboard + Swedish).
 const assert = require('node:assert/strict');
+const { replace, debug, requireMemoryLimit } = require('./lib/touch.cjs');
+requireMemoryLimit();
 const { chromium } = require('./lib/playwright.cjs');
 const { TestWorld } = require('../scripts/testing/driver.cjs');
 
@@ -7,6 +9,7 @@ const TABS = [
   ['stats', 'Character & stats', '#character-pane-stats', 'Karaktär & attribut'],
   ['sets', 'Dungeon sets', '#character-sets', 'Dungeon-set'],
   ['achievements', 'Achievements', '#character-achievements', 'Prestationer'],
+  ['professions', 'Professions', '#character-professions', 'Yrken'],
   ['mounts', 'Mounts', '#character-mounts', 'Riddjur'],
   ['rebirth', 'Rebirth', '#character-rebirth', 'Pånyttfödelse'],
 ];
@@ -20,17 +23,19 @@ async function enter(browser, world, { lang = 'en', touch = false, name = 'TabTe
   await page.addInitScript(l => {
     window.AudioContext = undefined;
     window.webkitAudioContext = undefined;
-    localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: l, sound: false, char: null, draft: null }));
+    localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: l, sound: false, touchGraphicsSuggested: true, char: null, draft: null }));
   }, lang);
+  if (process.env.MUTATE === 'stale-skills') {
+    await replace(page, 'field.js', 'window.CharacterPane?.updateProfessions?.(own.professions);', '');
+  }
   await page.goto(world.url);
-  const dismiss = page.locator('#low-gfx-dismiss');
-  if (await dismiss.isVisible().catch(() => false)) await dismiss.click();
   await page.locator('#start').click();
   await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click();
   await page.locator('#name').fill(name);
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
+  await page.evaluate(() => window.Tutorial?.disable?.());
   return page;
 }
 
@@ -46,11 +51,14 @@ async function enter(browser, world, { lang = 'en', touch = false, name = 'TabTe
 
     // 1. Desktop English: tab order, exclusivity, keyboard navigation, World Menu Achievements, bag toggle.
     const page = await enter(browser, world, { lang: 'en', touch: false }, errors);
+    const smith = await page.evaluate(() => WORLD_MAP.npcs.find(npc => npc.id === 'smith'));
+    await debug(page, { op: 'teleport', zone: 0, x: smith.x, y: smith.y });
+    await page.waitForFunction(({x,y}) => Math.hypot(Field.hero.nx-x, Field.hero.ny-y) < 1, smith);
     await page.keyboard.press('e');
     await page.locator('#equipment').waitFor({ state: 'visible' });
 
     const tabLabels = await page.locator('#equipment .character-tab').allTextContents();
-    check(JSON.stringify(tabLabels) === JSON.stringify(TABS.map(t => t[1])), `five character tabs in order: ${tabLabels.join(', ')}`);
+    check(JSON.stringify(tabLabels) === JSON.stringify(TABS.map(t => t[1])), `six character tabs in order: ${tabLabels.join(', ')}`);
 
     for (const [id, , selector] of TABS) {
       await page.locator(`#character-tab-${id}`).click();
@@ -70,6 +78,20 @@ async function enter(browser, world, { lang = 'en', touch = false, name = 'TabTe
     check(await page.evaluate(() => document.activeElement.id === 'character-tab-sets' && !document.getElementById('character-sets').hidden), 'ArrowRight moves to Dungeon sets');
     await page.keyboard.press('ArrowRight');
     check(await page.evaluate(() => document.activeElement.id === 'character-tab-achievements' && !document.getElementById('character-achievements').hidden), 'ArrowRight moves to Achievements');
+    await page.keyboard.press('ArrowRight');
+    check(await page.evaluate(() => document.activeElement.id === 'character-tab-professions' && !document.getElementById('character-professions').hidden), 'ArrowRight moves to Professions');
+    const values = await page.locator('#profession-skills li').evaluateAll(rows => rows.map(row => [
+      row.querySelector('span').textContent, row.querySelector('b').textContent, row.querySelector('progress').max, row.querySelector('progress').position,
+    ]));
+    check(JSON.stringify(values) === JSON.stringify([
+      ['Fishing', '1 / 300', 300, 1/300], ['Blacksmithing and Mining', '0 / 300', 300, 0],
+      ['Enchanting', '0 / 300', 300, 0], ['Alchemy', '0 / 600', 600, 0],
+    ]), 'all four fresh skills show the correct caps');
+    await page.evaluate(() => Online.send({ type: 'blacksmithing', request: { op: 'train', npc: 'smith' } }));
+    await page.waitForFunction(() => Field.hero.professions?.blacksmithing?.skill === 1);
+    const mining = page.locator('#profession-skills [data-profession="blacksmithing"]');
+    check(await mining.locator('b').textContent() === '1 / 300' && await mining.locator('progress').evaluate(node => node.value === 1),
+      'learning Blacksmithing updates the open tab from the next snapshot');
     await page.keyboard.press('End');
     check(await page.evaluate(() => document.activeElement.id === 'character-tab-rebirth' && !document.getElementById('character-rebirth').hidden), 'End moves to Rebirth');
     await page.keyboard.press('ArrowLeft');
@@ -97,7 +119,7 @@ async function enter(browser, world, { lang = 'en', touch = false, name = 'TabTe
     await page.locator('#equipment-close').click();
     await page.context().close();
 
-    // 2. Touch Swedish (844x390): all five Swedish tab labels translate cleanly, hit >=44px touch targets, and never overflow.
+    // 2. Touch Swedish (844x390): all six Swedish tab labels translate cleanly, hit >=44px touch targets, and never overflow.
     const svTouch = await enter(browser, world, { lang: 'sv', touch: true, name: 'TabTesterSv' }, errors);
     await svTouch.keyboard.press('e');
     await svTouch.locator('#equipment').waitFor({ state: 'visible' });
@@ -121,6 +143,13 @@ async function enter(browser, world, { lang = 'en', touch = false, name = 'TabTe
       }, selector);
       check(winFit, `touch ${id}: character pane and panel fit horizontally without overflow`);
     }
+    await svTouch.setViewportSize({width:600, height:390});
+    await svTouch.locator('#character-tab-professions').tap();
+    check(await svTouch.locator('#profession-skills').isVisible(), 'Professions opens on a small landscape phone');
+    const names = await svTouch.locator('#profession-skills li span').allTextContents();
+    check(names.join(', ') === 'Fiske, Smide och gruvdrift, Förtrollning, Alkemi', 'all profession names translate into Swedish');
+    check(await svTouch.locator('.character-tabs').evaluate(el => el.scrollWidth <= el.clientWidth + 1),
+      'the sixth tab fits without clipping at 600 pixels');
     await svTouch.context().close();
 
     assert.deepEqual(errors, [], `page errors: ${errors.join('; ')}`);

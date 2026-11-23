@@ -766,6 +766,15 @@ impl Player {
         if ore || flowers {
             view["gathering"] = json!({ "ore": ore, "flowers": flowers });
         }
+        if self.is_human() {
+            let cap = crate::profession::MAX_SKILL;
+            view["professions"] = json!({
+                "fishing": {"skill": c.fishing.proficiency.skill, "maxSkill": cap},
+                "blacksmithing": {"skill": c.blacksmithing.proficiency.skill, "maxSkill": cap},
+                "enchanting": {"skill": c.enchanting.proficiency.skill, "maxSkill": cap},
+                "alchemy": {"skill": c.alchemy.proficiency.skill, "maxSkill": crate::alchemy::MAX_SKILL},
+            });
+        }
         view["daze"] = json!(self.daze);
         view["danceT"] = json!(self.dance);
         view["festivalDance"] = self
@@ -7302,6 +7311,38 @@ mod tests {
     fn world() -> World {
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
     }
+    #[test]
+    fn profession_snapshot_keeps_saved_skills_and_caps_private() {
+        let mut world = world();
+        let (tx, _rx) = mpsc::channel(256);
+        world.join(1, None, Some(Look::default()), tx).unwrap();
+        let player = world.players.get_mut(&1).unwrap();
+        let expected = json!({
+            "fishing": {"skill": 1, "maxSkill": 300},
+            "blacksmithing": {"skill": 0, "maxSkill": 300},
+            "enchanting": {"skill": 0, "maxSkill": 300},
+            "alchemy": {"skill": 0, "maxSkill": 600},
+        });
+        assert_eq!(player.snapshot()["professions"], expected);
+        player.character.fishing.proficiency.skill = 29;
+        player.character.blacksmithing.proficiency.skill = 87;
+        player.character.enchanting.proficiency.skill = 300;
+        player.character.alchemy.proficiency.skill = 527;
+
+        let mut other = json!({"players": [player.snapshot()]});
+        let mut owner = other.clone();
+        crate::visibility::filter_view(&mut owner, &player.character.id);
+        let saved = &owner["players"][0]["professions"];
+        assert_eq!(saved, &json!({
+            "fishing": {"skill": 29, "maxSkill": 300},
+            "blacksmithing": {"skill": 87, "maxSkill": 300},
+            "enchanting": {"skill": 300, "maxSkill": 300},
+            "alchemy": {"skill": 527, "maxSkill": 600},
+        }));
+        crate::visibility::filter_view(&mut other, "another player");
+        assert!(other["players"][0].get("professions").is_none());
+    }
+
     /// Open Greenmeadow ground: outside every camp and city, 8+ units from any scenery, 13+ from any enemy spawn.
     const OPEN_GROUND: Point = Point { x: 276., y: 226. };
     /// New heroes land on Greenmeadow's pier, which sits inside Saltby's sanctuary (nothing can hurt them there).

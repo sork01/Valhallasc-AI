@@ -92,7 +92,7 @@ html, body { overscroll-behavior: none; }
   #stage .equipment-workspace .character-tabs {
     flex: 0 0 auto;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: calc(3px / var(--window-k, .8));
     margin: calc(2px / var(--window-k, .8)) 0 calc(4px / var(--window-k, .8));
   }
@@ -193,7 +193,7 @@ html, body { overscroll-behavior: none; }
     font-size: calc(11px / var(--window-k, .8));
     line-height: 1.35;
   }
-  #stage .equipment-workspace :is(.character-sets, .character-mounts, .character-rebirth, .character-achievements) {
+  #stage .equipment-workspace :is(.character-sets, .character-mounts, .character-rebirth, .character-achievements, .character-professions) {
     font-size: calc(12px / var(--window-k, .8));
     line-height: 1.35;
     padding: calc(6px / var(--window-k, .8));
