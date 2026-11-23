@@ -14,6 +14,8 @@ const designs = [
     marking: [240, 223, 208], colors: ['#3b3455', '#111523', '#f1dfeb', '#c6b6d5', '#181827', '#746387', '#ded1e9'] },
   { race: 'tidekin', name: 'Eydan', label: 'Tidekin Mage · Rán’s Deep', job: 'Mage', body: 'male',
     marking: [241, 243, 223], colors: ['#244852', '#0d1c28', '#e4f6ec', '#a8cfc5', '#122730', '#5e8a85', '#d0e6e1'] },
+  { race: 'gnome', name: 'Tavi', label: 'Assassin · The Obsidian Orrery', job: 'Assassin', body: 'female',
+    marking: [234, 182, 102], size: [.76, .67] },
 ];
 const selected = designs.filter(design => process.argv.includes('--' + design.race));
 const races = selected.length ? selected : designs;
@@ -21,7 +23,7 @@ const previewOnly = process.argv.includes('--preview-only');
 const server = http.createServer((req, res) => {
   if (req.url === '/') {
     res.setHeader('Content-Type', 'text/html');
-    const scripts = ['items', 'magesprite', ...classes.filter(name => name !== 'Mage').map(name => name.toLowerCase() + 'sprite')];
+    const scripts = ['items', 'magesprite', 'mountart', ...classes.filter(name => name !== 'Mage').map(name => name.toLowerCase() + 'sprite')];
     return res.end('<!doctype html>' + scripts.map(name => '<script src="' + name + '.js"></script>').join(''));
   }
   const file = path.resolve(client, '.' + req.url);
@@ -45,11 +47,18 @@ const server = http.createServer((req, res) => {
         const page = await browser.newPage();
         const errors = [];
         page.on('pageerror', error => errors.push(error.message));
-        if (['features', 'antennae'].includes(process.env.MUTATE)) {
+        const faults = {
+          features: ['if (showFeatures && features', 'if (false && features'],
+          antennae: ['if (showFeatures && features', 'if (false && features'],
+          scale: ['g.scale(...this.bodyScale);', 'g.scale(1, 1);'],
+          mount: ['h.mountTint || 0, this.bodyScale);', 'h.mountTint || 0);'],
+        };
+        const fault = faults[process.env.MUTATE];
+        if (fault) {
           const source = fs.readFileSync(path.join(client, 'magesprite.js'), 'utf8');
-          assert.ok(source.includes('if (showFeatures && features'));
+          assert.ok(source.includes(fault[0]));
           await page.route('**/magesprite.js', route => route.fulfill({
-            contentType: 'text/javascript', body: source.replace('if (showFeatures && features', 'if (false && features'),
+            contentType: 'text/javascript', body: source.replace(...fault),
           }));
         }
         await page.goto('http://127.0.0.1:' + server.address().port);
@@ -86,6 +95,100 @@ const server = http.createServer((req, res) => {
           if (!sprite.source.parts[headPart]) fail('starter headgear did not load');
           const hattedHuman = sprite.frame()._px;
 
+          const hero = (dir, state = {}) => {
+            const angle = dir * Math.PI / 4;
+            return { fx: Math.cos(angle) - Math.sin(angle), fy: Math.cos(angle) + Math.sin(angle), ...state };
+          };
+
+          function verifySize(race, size) {
+            const canvas = document.createElement('canvas'), g = canvas.getContext('2d');
+            const [ax, ay] = sprite.meta.anchor, display = sprite.meta.displayScale || 1;
+            let draws = 0;
+            g.drawImage = (frame, x, y) => {
+              const { a, d, e, f } = g.getTransform();
+              if (Math.abs(a - display * size[0]) > 1e-6 || Math.abs(d - display * size[1]) > 1e-6)
+                fail(race + ' equipped sprite has the wrong scale');
+              if (x !== -ax || y !== -ay || e !== 0 || f !== 0) fail(race + ' sprite shifted from its feet');
+              if (g.imageSmoothingEnabled) fail(race + ' scaling blurred the sprite');
+              draws++;
+            };
+            sprite.set({ ...look, race });
+            const states = [{}, { moving: true, walk: 3 }, { atkT: .22 }, { hurtT: .12 }, { isCorpse: true }];
+            for (let dir = 0; dir < 8; dir++) for (const state of states) sprite.draw(g, hero(dir, state), 0, 1);
+            if (draws !== 40) fail(race + ' did not draw all five clips in all eight directions');
+          }
+
+          async function verifyMounts(design) {
+            const art = window.MountArt, [fw, fh] = sprite.meta.frame;
+            const blank = { _px: new Uint8ClampedArray(fw * fh * 4), _z: new Uint16Array(fw * fh) };
+            const pixels = canvas => new Uint32Array(canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.buffer);
+            const topOfRider = (bare, composite) => Math.floor(composite.findIndex((value, i) => value !== bare[i]) / fw);
+            let checked = 0;
+            sprite.set({ ...look, race: design.race });
+            for (const id of ['horse', 'seahorse']) {
+              const start = performance.now();
+              while (!art.ready(id)) {
+                if (performance.now() - start > 15000) fail(id + ' mount did not load');
+                await new Promise(resolve => setTimeout(resolve, 50));
+              }
+              for (const [clip, frame] of [['idle', 0], ['run', 3]]) for (let dir = 0; dir < 8; dir++) {
+                const rider = sprite.frame('idle', dir, 0);
+                const bare = pixels(art.compose(blank, id, clip, dir, frame, 0));
+                const adjusted = pixels(art.compose(blank, id, clip, dir, frame, 0, design.size));
+                if (!adjusted.every((value, i) => value === bare[i])) fail(id + ' mount changed size with no rider');
+                const normal = pixels(art.compose(rider, id, clip, dir, frame, 0));
+                const short = pixels(art.compose(rider, id, clip, dir, frame, 0, design.size));
+                const normalTop = topOfRider(bare, normal), shortTop = topOfRider(bare, short);
+                if (normalTop < 0 || shortTop < normalTop + 6)
+                  fail(id + '/' + clip + '/' + dir + ' rider was missing or the height did not shrink around the saddle');
+                checked++;
+              }
+            }
+            const compose = art.compose;
+            const g = document.createElement('canvas').getContext('2d');
+            let drawn = false;
+            g.drawImage = () => {
+              const { a, d } = g.getTransform(), display = sprite.meta.displayScale || 1;
+              if (a !== display || d !== display) fail('the mounted drawing scaled the mount along with its rider');
+              drawn = true;
+            };
+            art.compose = (...args) => {
+              if (!design.size.every((value, i) => args[6]?.[i] === value))
+                fail('mounted drawing did not pass the race scale to the rider compositor');
+              return compose(...args);
+            };
+            try { sprite.draw(g, hero(0, { mounted: true, mount: 'horse' }), 0, 1); }
+            finally { art.compose = compose; }
+            if (!drawn) fail('mounted sprite was not drawn');
+            return checked;
+          }
+
+          function renderComparison(design) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1216; canvas.height = 568;
+            const g = canvas.getContext('2d');
+            const background = g.createRadialGradient(608, 286, 50, 608, 286, 660);
+            background.addColorStop(0, '#352a44'); background.addColorStop(1, '#181524');
+            g.fillStyle = background; g.fillRect(0, 0, canvas.width, canvas.height);
+            g.textAlign = 'center'; g.fillStyle = '#f8e6d1'; g.font = 'bold 34px Georgia';
+            g.fillText(design.name + ', Gnome of the Obsidian Orrery', 608, 52);
+            g.fillStyle = '#ccb6ab'; g.font = '16px system-ui';
+            g.fillText('Assassin · matching equipment', 608, 82);
+            g.strokeStyle = '#66526f'; g.beginPath(); g.moveTo(608, 110); g.lineTo(608, 500); g.stroke();
+            for (const [dir, left, right, label] of [[0, 174, 430, 'Front'], [4, 786, 1042, 'Back']]) {
+              g.fillStyle = '#ead2b1'; g.font = 'bold 18px system-ui';
+              g.fillText(label, (left + right) / 2, 124);
+              for (const [race, x, caption] of [['human', left, 'Human'], ['gnome', right, 'Gnome']]) {
+                g.fillStyle = '#141321'; g.beginPath(); g.ellipse(x, 473, 99, 17, 0, 0, 2 * Math.PI); g.fill();
+                g.strokeStyle = '#594961'; g.stroke();
+                sprite.set({ ...look, race });
+                g.save(); g.translate(x, 471); sprite.draw(g, hero(dir), 0, 3.55); g.restore();
+                g.fillStyle = '#e7d5e1'; g.font = '16px system-ui'; g.fillText(caption, x, 526);
+              }
+            }
+            return canvas.toDataURL('image/png').split(',')[1];
+          }
+
           function render(design) {
             sprite.set({ ...look, race: design.race });
             const canvas = document.createElement('canvas');
@@ -114,7 +217,8 @@ const server = http.createServer((req, res) => {
             return canvas.toDataURL('image/png').split(',')[1];
           }
 
-          return chosen.map(design => {
+          const results = [];
+          for (const design of chosen) {
             const { race, marking } = design;
             if (!sprite.source.traits?.get(race)) fail(race + ' PixelFlow attachment atlas did not load');
             const custom = frames(race);
@@ -142,17 +246,27 @@ const server = http.createServer((req, res) => {
             for (let j = 3; j < hatted.length; j += 4) {
               if (hatted[j] !== hattedHuman[j]) fail(race + ' traits protrude through equipped headgear');
             }
-            return { race, poses: custom.length, png: design.job === name && design.body === gender ? render(design) : null };
-          });
+            const preview = design.job === name && design.body === gender;
+            if (design.size) {
+              verifySize('human', [1, 1]);
+              verifySize(race, design.size);
+            }
+            results.push({
+              race, poses: custom.length, mountPoses: design.size && preview ? await verifyMounts(design) : 0,
+              png: preview ? (design.size ? renderComparison(design) : render(design)) : null,
+            });
+          }
+          return results;
         }, { name, gender, chosen });
         assert.deepEqual(errors, []);
-        for (const { race, poses: count, png } of result) {
+        for (const { race, poses: count, mountPoses, png } of result) {
           poses += count;
           if (png) {
             fs.mkdirSync(output, { recursive: true });
             fs.writeFileSync(path.join(output, 'valhalla-' + race + '-front-and-back.png'), Buffer.from(png, 'base64'));
           }
           console.log(race + '/' + name + '/' + gender + ': ' + count + ' poses checked');
+          if (mountPoses) console.log(race + ': ' + mountPoses + ' real mounted poses checked');
         }
         await page.close();
       }

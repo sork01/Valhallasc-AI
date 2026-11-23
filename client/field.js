@@ -5209,7 +5209,8 @@
     for (const e of effects) if (e.kind === 'slash' || e.kind === 'dualSlash') continue; else if (e.kind === 'shadow' && mageSpr && isAssassin()) {
       const [sx, sy] = w2s(e.x, e.y), [ax, ay] = mageSpr.meta.anchor;
       g.save(); g.globalAlpha = Math.max(0, .35 * (1 - e.t / .32)); g.imageSmoothingEnabled = false;
-      g.drawImage(mageSpr.frame('walk', e.dir, e.frame), sx - ax * 1.3, sy - ay * 1.3, 160 * 1.3, 160 * 1.3); g.restore();
+      g.translate(sx, sy); g.scale(1.3, 1.3); g.scale(...mageSpr.bodyScale);
+      g.drawImage(mageSpr.frame('walk', e.dir, e.frame), -ax, -ay); g.restore();
     } else if (e.kind === 'chestOpen') {
       if (!chestSrc) continue;
       const [sx, sy] = w2s(e.x, e.y), fade = Math.min(1, (e.life - e.t) / .4);   // the lid swings back, the pile shimmers, then it is gone

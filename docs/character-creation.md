@@ -98,9 +98,25 @@ existing head poses and disappear under headgear. The two-layer PixelFlow
 source is `80a958a4a7378e1d`. Run `python3 scripts/make_tidekin_art.py export`
 to export editor changes or use `verify` to compare the atlas with PixelFlow.
 
-`tests/playable-race-art.cjs` checks both races in the real compositor and
-writes their front-and-back renders. Its `--tidekin` and `--mothkin` options
+## Playable Gnomes (1.10.0)
+
+Gnomes from the Obsidian Orrery have brass clockwork fittings and a compact
+frame. The game draws the dressed sprite at 76% width and 67% height around
+its foot anchor. Both bodies and all five classes use the usual class
+equipment, skills, stats and collision. On a mount, the compositor resamples
+the rider's color and depth around the saddle before layering the rider over
+the mount. The Assassin's Shadowstep afterimage uses the same foot-relative
+scale. Headgear covers the brasswork.
+
+The PixelFlow source for the brasswork is `47c3c9871c597c7a`. Use
+`python3 scripts/make_gnome_art.py export` or `verify`.
+
+## Race checks
+
+`tests/playable-race-art.cjs` checks the races in the real compositor and
+writes their front-and-back renders. Its `--gnome`, `--tidekin` and `--mothkin` options
 check one race, and `--preview-only` selects the body and class used in that
-race's preview. `tests/playable-race-creation-ui.cjs` checks selection, drafts
+race's preview. The Gnome check covers the dressed sprite on foot and on
+horse and seahorse. `tests/playable-race-creation-ui.cjs` checks selection, drafts
 and reconnect in desktop English and touch Swedish. Run both through
 `scripts/test-touch-bounded.sh`.

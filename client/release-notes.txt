@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.10.0",
+    "date": "2026-11-23",
+    "new": [
+      "Play as a Gnome from the Obsidian Orrery. Gnomes are 67% as tall and 76% as wide as Humans, and all their equipment fits their smaller frame."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.9.0",
     "date": "2026-11-23",
     "new": [

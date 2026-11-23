@@ -14760,5 +14760,7 @@
   "Mothkin": "Nattfjärilsfolk",
   "Play as a Mothkin from the Moonspore Canopy, with dusky skin, pale markings and feathered antennae. Choose Mothkin when creating a character of any class.": "Spela som nattfjärilsfolk från The Moonspore Canopy, med skymningsfärgad hud, ljusa tecken och fjäderlika antenner. Du kan välja nattfjärilsfolket när du skapar en karaktär av valfri klass.",
   "Tidekin": "Tidvattenfolk",
-  "Play as Tidekin from Rán's Deep, with sea-green skin, finned ears and pearlescent gill markings. Choose Tidekin when creating a character of any class.": "Spela som tidvattenfolk från Rán's Deep, med havsgrön hud, fenöron och pärlemorskimrande gältecken. Du kan välja tidvattenfolket när du skapar en karaktär av valfri klass."
+  "Play as Tidekin from Rán's Deep, with sea-green skin, finned ears and pearlescent gill markings. Choose Tidekin when creating a character of any class.": "Spela som tidvattenfolk från Rán's Deep, med havsgrön hud, fenöron och pärlemorskimrande gältecken. Du kan välja tidvattenfolket när du skapar en karaktär av valfri klass.",
+  "Gnome": "Gnom",
+  "Play as a Gnome from the Obsidian Orrery. Gnomes are 67% as tall and 76% as wide as Humans, and all their equipment fits their smaller frame.": "Spela som en gnom från The Obsidian Orrery. Gnomer är 67 procent så långa och 76 procent så breda som människor, och all deras utrustning passar den mindre kroppen."
 }

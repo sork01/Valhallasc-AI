@@ -98,7 +98,9 @@
   const RACE_APPEARANCE = {
     mothkin: { skin: ['#776183', '#676b92', '#906d93', '#54526e'], portraitAbove: 39 },
     tidekin: { skin: ['#559d86', '#448c91', '#82ad8d', '#426c70'], portraitAbove: 29 },
+    gnome: { scale: [.76, .67], portraitAbove: 29 },
   };
+  const NORMAL_BODY_SCALE = [1, 1];
   const RACIAL_ART = Object.keys(RACE_APPEARANCE);
   const TRAIT_CELL = 48, TRAIT_X = 24, TRAIT_Y = 36;
   const TRAIT_REACH = Math.ceil(Math.hypot(TRAIT_X, TRAIT_Y));
@@ -723,6 +725,7 @@
       this.hairColours = new Set((this.meta.ramps.hair || []).map(c => { const v = hex(c); return v[0] * 65536 + v[1] * 256 + v[2]; }));
       const lum = c => c[0] * .299 + c[1] * .587 + c[2] * .114;
       const hair = this.constructor.HAIR, skin = this.constructor.skinPalette(look);
+      this.bodyScale = RACE_APPEARANCE[look.race]?.scale || NORMAL_BODY_SCALE;
       this.traits = this.source.traits?.get(look.race);
       this.skinColours = new Set();
       for (const [role, target] of [['hair', hair[look.hairColor || 0]], ['brow', hair[look.hairColor || 0]], ['skin', skin[look.skin || 0]]]) {
@@ -810,11 +813,12 @@
         const mi = moving ? Math.floor(h.walk) % MC.n : Math.floor(t * MC.fps) % MC.n, ri = moving && this.equipment.cloak !== 'none' ? Math.floor(h.walk) % C.idle.n : moving ? 0 : Math.floor(t * C.idle.fps) % C.idle.n;
         const key = `mount/${h.mount}/${h.mountTint || 0}/${mclip}/${dir}/${mi}/${ri}`;
         let seat = this.cache.get(key);
-        if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }
+        if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0, this.bodyScale); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }
         g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, M.shadow[0], M.shadow[1], 0, 0, 6.283); g.fill();
         g.drawImage(seat, -ax, -ay - art.SHIFT);
       } else {
         const frame = this.frame(clip, dir, i);
+        g.scale(...this.bodyScale);
         g.drawImage(frame, -ax, -ay);
         if (frame._forge) {
           g.save(); g.globalCompositeOperation = 'screen';

@@ -4,7 +4,7 @@
 // into the mount's frame pixel by pixel on depth: one sheet serves every class and both bodies. The rider is raised onto
 // the saddle (raise + the frame's bob) and hidden below `cut` (world height), so the legs vanish into the barrel.
 (() => {
-  const FW = 160, FH = 160, AY = 119, SHIFT = 64, CH = FH + SHIFT, PX = 1.03, COSE = Math.sqrt(3) / 2;
+  const FW = 160, FH = 160, AX = 80, AY = 119, SHIFT = 64, CH = FH + SHIFT, PX = 1.03, COSE = Math.sqrt(3) / 2;
   const TONES = [.5, .78, 1, 1.18];
   let meta = null, metaJob = null;
   const atlases = new Map();         // id -> { color, depth, width, status }
@@ -54,7 +54,7 @@
     return a.status === 'ready';
   }
   // The rider's frame (a canvas from MageSprite.frame with _px colours and _z depths) sitting in the mount's frame.
-  function compose(rider, id, clip, dir, i, tint) {
+  function compose(rider, id, clip, dir, i, tint, [widthScale, heightScale] = [1, 1]) {
     const m = meta.mounts[id], a = atlases.get(id), C = m.clips[clip];
     i = ((i % C.n) + C.n) % C.n;
     // The saved horse run was authored with planted hooves travelling forwards. Play it backwards so they
@@ -73,13 +73,22 @@
     }
     const raise = m.raise + (m.bob[clip][i] || 0), shift = Math.round(raise * COSE * PX), lift = raise * 32;
     const px = rider._px, rz = rider._z;
+    // Resize just the rider about the saddle's cut plane. Keep color and depth on the same source pixel.
+    const seatZ = m.cut - m.raise, seatY = AY - seatZ * COSE * PX, seatDepth = (512 - seatZ * .5) * 64;
+    const columns = widthScale === 1 ? null :
+      Int16Array.from({ length: FW }, (_, x) => Math.floor(AX + (x + .5 - AX) / widthScale));
     for (let y = 0; y < FH; y++) {
       const ny = y + SHIFT - shift; if (ny < 0 || ny >= CH) continue;
+      const sourceY = heightScale === 1 ? y : Math.floor(seatY + (y + .5 - seatY) / heightScale);
+      if (sourceY < 0 || sourceY >= FH) continue;
       const up = (AY - y) / PX;
       for (let x = 0; x < FW; x++) {
-        const s = y * FW + x;
+        const sourceX = columns ? columns[x] : x;
+        if (sourceX < 0 || sourceX >= FW) continue;
+        const s = sourceY * FW + sourceX;
         if (!px[s * 4 + 3]) continue;
-        const enc = rz[s], world = COSE * up - .5 * (enc / 64 - 512) + raise;
+        const enc = seatDepth + (rz[s] - seatDepth) * heightScale;
+        const world = COSE * up - .5 * (enc / 64 - 512) + raise;
         if (world < m.cut) continue;
         const dst = ny * FW + x, depth = enc - lift;
         if (depth > z[dst]) continue;

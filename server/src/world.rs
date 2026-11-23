@@ -13444,7 +13444,11 @@ mod tests {
             serde_json::from_str(r#"{"name":"Lina","class":"hunter","gender":"female"}"#).unwrap();
         assert_eq!(legacy.race, Race::Human);
         assert!(serde_json::from_str::<Look>(r#"{"race":"typo"}"#).is_err());
-        for (key, race) in [("mothkin", Race::Mothkin), ("tidekin", Race::Tidekin)] {
+        for (key, race) in [
+            ("mothkin", Race::Mothkin),
+            ("tidekin", Race::Tidekin),
+            ("gnome", Race::Gnome),
+        ] {
             check_playable_race(&legacy, key, race);
         }
     }
@@ -13459,6 +13463,7 @@ mod tests {
         let guest = w.join(1, None, Some(look.clone()), tx).unwrap();
         let token = guest["token"].as_str().unwrap().to_owned();
         assert_eq!(guest["snapshot"]["players"][0]["look"]["race"], key);
+        assert_eq!(guest["snapshot"]["players"][0]["r"], PLAYER_RADIUS);
         let (tx, _rx) = mpsc::channel(256);
         w.join(2, None, Some(legacy.clone()), tx).unwrap();
         let guest = &w.players[&1].character;
