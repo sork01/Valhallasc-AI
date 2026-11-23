@@ -2,7 +2,7 @@
 
 On phones and tablets, **Go fishing** is available in fishing zones. Keep a rod in your bags, get close to the shore and tap the button. The cast uses your current direction if that reaches fishable water, or turns toward nearby water while you stay in place. Wait for **Hook!**, then tap it. On desktop, face the water and press **R** by default.
 
-## Fishing skill (1.4.0)
+## Fishing skill (1.12.0)
 
 Fish in the current training waters to raise skill. Move to the next band at every 30 points. The fishing log and catch card point to the current waters. All legal catches still award fish and collection progress wherever you fish.
 
@@ -19,12 +19,33 @@ Fish in the current training waters to raise skill. Move to the next band at eve
 | 241–270 | The Lapis Erg | 40 |
 | 271–300 | Emberwake Caldera, Frostwake Shelf or The Yearwheel | 45 in Emberwake |
 
-The main route uses rods available by character level 45. Later waters can be in zones with higher recommended combat levels. Existing rods and habitat requirements apply. Ordinary water is sufficient when a band also has richer spots.
+The route to 300 uses rods available by character level 45. Later waters can be in zones with higher recommended combat levels. Existing rods and habitat requirements apply. Ordinary water is sufficient when a band also has richer spots.
 
-A real fish gives one skill roll in the current band. The chance on a common fish starts at 90% and approaches 60% near 300. Rarer fish improve the odds. After two eligible catches without a point, the next eligible catch gives a point. Junk, treasure, extra copies from the same hook, misses and catches outside the band give no roll.
+A real fish gives one skill roll in the current band. The chance on a common fish starts at 90% and approaches 60% near 300 and stays there through 600. Rarer fish improve the odds. After two eligible catches without a point, the next eligible catch gives a point. Junk, treasure, extra copies from the same hook, misses and catches outside the band give no roll.
 
 Existing anglers whose logs predate Fishing skill receive one point per two recorded fish, up to the first cap of 30. A saved skill is preserved. The new level and the number of unsuccessful eligible rolls are saved with the fishing log. `world/fishing-skill.txt` defines the same training waters on the authority and in the generated client data.
 
+
+### Expert waters
+
+| Skill points earned | Region | Waters | Minimum rod |
+| --- | --- | --- | --- |
+| 301–330 | Bifrost Reach | Stormcatch Basins | Tempered Platinum |
+| 331–360 | Astralhollow | Constellation Springs | Tempered Platinum |
+| 361–390 | The Prismwaste | Mirrorglass Seeps | Tempered Platinum |
+| 391–420 | The Obsidian Orrery | Stillpoint Cisterns | Tempered Platinum |
+| 421–450 | The Moonspore Canopy | Sporelight Pools | Starcatch |
+| 451–480 | Asterion | Seven Rings Fountains | Starcatch |
+| 481–510 | The Ribbonwild | Jubilee Ponds | Worldwire |
+| 511–540 | Veyrroot Canopy | Rootfoot Catchments | Rootbraid |
+| 541–570 | Veyrroot Heartwood | Pithspring Pools | Rootbraid |
+| 571–600 | The Cairnspine | Boulderwatch Tarns | Cairnsteel |
+
+Each region has two ponds and a Fisher with four quests. The ten waters share five habitats and add 35 species, including five legendary fish. Each habitat has a cooked dish. The fishing log names the current region and waters. Small blue ponds on the local minimap show where to cast. The existing collections and achievement requirements use their original species lists.
+
+Craft the Rootbraid Rod at level 85 with Worldwire, five Ribbon Shiners, a Ribbon Gecko Tail, and five gold. Fish for Ribbon Shiners at the Jubilee Ponds with Worldwire. Craft the Cairnsteel Rod at level 90 with Rootbraid, five Heartwood Whitefish, a Lantern Hornet Amber, and seven gold and fifty silver. Rootbraid can catch Heartwood Whitefish in the Pithspring Pools. Both upgrades retain earlier water and lava access.
+
+The new ponds are placed by the normal post-shape fishing overlay using `world/fishing-waters.txt`. `world/fish.txt`, `world/rods.txt`, and `world/fishing-workshop.txt` hold the roster and recipes. Run `python3 scripts/make_fishing_art.py extend` to regenerate the expert icon cells. The original atlas cells remain intact.
 
 ## Rod warning follow-up: 1.2.1 (2026-11-20)
 

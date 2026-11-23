@@ -16,7 +16,7 @@ fn caught(c: &mut Character, id: &str, count: u64, kg: u32) {
 }
 
 #[test]
-fn fishing_achievements_catalog_covers_every_habitat_and_preserves_rewards() {
+fn fishing_achievements_catalog_preserves_original_waters_and_rewards() {
     let fish: Vec<Value> = serde_json::from_str(include_str!("../../world/fish.txt")).unwrap();
     let fishing: Vec<_> = catalog()
         .iter()
@@ -30,6 +30,13 @@ fn fishing_achievements_catalog_covers_every_habitat_and_preserves_rewards() {
             .iter()
             .all(|a| a.mount.is_empty() && !a.title_prefix)
     );
+    let original_habitats = [
+        "Shore", "Cold", "Swamp", "Forest", "Jungle", "Oasis", "Spring", "Lava",
+    ];
+    let fish: Vec<_> = fish
+        .into_iter()
+        .filter(|f| original_habitats.contains(&f["habitat"].as_str().unwrap()))
+        .collect();
     let habitats: BTreeSet<_> = fish
         .iter()
         .map(|f| f["habitat"].as_str().unwrap())

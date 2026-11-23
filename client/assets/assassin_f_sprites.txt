@@ -1264,6 +1264,10 @@
     "cloak_regearchainforged": {
       "png": "assassin_f_progression_cloak_regearchainforged.png",
       "depth": "assassin_f_progression_cloak_regearchainforged_depth.png"
+    },
+    "body_hat": {
+      "png": "assassin_f_body_hat.png",
+      "depth": "assassin_f_body_hat_depth.png"
     }
   },
   "gender": "female",
@@ -1836,7 +1840,8 @@
     "weapon_regearsolstice",
     "weapon_regearspan",
     "weapon_regearthunder",
-    "weapon_regearvault"
+    "weapon_regearvault",
+    "body_hat"
   ],
   "gearSprites": {
     "armor_regearl50": {

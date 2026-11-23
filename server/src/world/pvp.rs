@@ -847,12 +847,13 @@ impl World {
             } else if gauntlet {
                 self.gauntlet_fall(defender_session);
             } else {
+                let in_instance = self.is_instance(self.players[&defender_session].character.zone);
                 let p = self.players.get_mut(&defender_session).unwrap();
                 p.dead_time = 0.;
                 p.fallen = false;
                 p.buffs.clear();
                 p.stop();
-                p.mark_corpse(target_point);
+                p.mark_corpse(target_point, in_instance);
                 p.pvp_flag = false;
                 self.event_with(
                     "death",

@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::sync::LazyLock;
 
+pub const MAX_SKILL: u16 = 300;
 pub const WORKSHOP: &str = "blacksmithing_workshop";
 pub const TRAINER: &str = "smith";
 pub const STARTER_PICK: &str = "smith_pick_1";

@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.12.0",
+    "date": "2026-11-23",
+    "new": [
+      "Train Fishing and Enchanting to 600. Find new fishing waters in ten regions, 35 new fish, five dishes, two rod upgrades, and eight expert enchants."
+    ],
+    "changed": [
+      "Dying in a dungeon or raid now brings you back to life at the entrance or an unlocked checkpoint.",
+      "Long hair tucks under headgear on female characters.",
+      "Emberwake's basalt huts now have isometric artwork."
+    ],
+    "removed": [
+      "Removed Spirit Guides from dungeons and raids because heroes revive at the entrance or a checkpoint."
+    ]
+  },
+  {
     "version": "1.11.1",
     "date": "2026-11-23",
     "new": [],

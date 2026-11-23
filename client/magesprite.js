@@ -297,6 +297,7 @@
     const hair = rgb(meta.ramps.hair[2]), skin = rgb(meta.ramps.skin[2]);
     const parts = {};
     for (const part of Object.keys(meta.parts)) {
+      if (part === 'body_hat') continue;      // the stub figure has no hair to hide
       const frame = part === 'body' ? solid(ax - 3, ay - 14, 6, 14, row => row < 4 ? hair : skin, 1000)
         : part.startsWith('cloak_') ? solid(ax - 5, ay - 11, 10, 10, () => colour(part), 1500)
         : part.startsWith('armor_') ? solid(ax - 3, ay - 9, 6, 6, () => colour(part), 500)
@@ -402,6 +403,11 @@
   const HAIR_TIE = 400, BACK_HAIR_TIE = 150;
   const hairTie = (dir, part) => FRONT_DIRS.includes(dir) && CLOTHES_OVER_HAIR.some(slot => part.startsWith(slot + '_')) ? HAIR_TIE : 0;
   const hairKeeps = (dir, part) => BACK_DIRS.includes(dir) && part.startsWith('shoulders_');
+  // A woman's long hair is baked into her body layer and would hang out of any headgear, so under a worn head piece her body is drawn
+  // from `body_hat`: the same body without the long hair (scripts/export_character_body.py --hat-hair). Until the head piece and
+  // that atlas have loaded she keeps her ordinary body (no bald flash). Men, and sets without the extra part, always use `body`.
+  const bodyPart = (parts, equipment) => parts.body_hat && equipment.head && equipment.head !== 'none' && parts['head_' + equipment.head] ? 'body_hat' : 'body';
+  const isBody = part => part === 'body' || part === 'body_hat';
   const SLOT_ORDER = ['cloak', 'armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
   // A dungeon set needs a silhouette at field scale, not only a different tint on
   // the same 160px equipment rig. These marks sit behind the animated figure and
@@ -767,6 +773,7 @@
         const part = slot + '_' + this.equipment[slot];
         if (this.equipment[slot] !== 'none' && !this.source.parts[part]) this.source.ensure?.(part, this.background).then(() => { if (this.source.parts[part]) this.cache.clear(); });
       }
+      if (this.equipment.head !== 'none' && this.source.meta.parts.body_hat && !this.source.parts.body_hat) this.source.ensure?.('body_hat', this.background).then(() => { if (this.source.parts.body_hat) this.cache.clear(); });
       this.tint = new Map();
       const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
       this.hairColours = new Set((this.meta.ramps.hair || []).map(c => { const v = hex(c); return v[0] * 65536 + v[1] * 256 + v[2]; }));
@@ -793,7 +800,7 @@
       const [fw, fh] = this.meta.frame, canvas = document.createElement('canvas'); canvas.width = fw; canvas.height = fh;
       const g = canvas.getContext('2d'), out = g.createImageData(fw, fh), nearest = new Uint16Array(fw * fh); nearest.fill(65535);
       const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
-      const chosen = ['body'];
+      const chosen = [bodyPart(this.source.parts, this.equipment)];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
       const traitPose = this.traits && this.meta.headFrames?.[key];
       // Hair that lies almost flush on a worn piece (a depth tie) flickered through the cloth. In the front views the worn piece
@@ -802,17 +809,17 @@
       // the hair keeps its place over a shoulder piece that is only just nearer (`hairKeeps`). Hair clearly in front stays.
       const tracked = FRONT_DIRS.includes(dir) || BACK_DIRS.includes(dir), hairAt = tracked ? new Uint8Array(fw * fh) : null;
       for (const part of chosen) {
-        const f = this.source.parts[part][key], tie = part === 'body' || !tracked ? 0 : hairTie(dir, part), keeps = part !== 'body' && tracked && hairKeeps(dir, part);
+        const f = this.source.parts[part][key], tie = isBody(part) || !tracked ? 0 : hairTie(dir, part), keeps = !isBody(part) && tracked && hairKeeps(dir, part);
         for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
           const pixel = y * f.w + x, src = pixel * 4, dst = (f.y + y) * fw + f.x + x;
           if (!f.pixels[src + 3]) continue;
           if (f.z[pixel] > nearest[dst]) {
             if (!(tie && hairAt[dst] && f.z[pixel] - nearest[dst] < tie)) continue;
           } else if (keeps && hairAt[dst] && nearest[dst] - f.z[pixel] < BACK_HAIR_TIE) continue;
-          if (hairAt) hairAt[dst] = part === 'body' && this.hairColours.has(f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2]) ? 1 : 0;
+          if (hairAt) hairAt[dst] = isBody(part) && this.hairColours.has(f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2]) ? 1 : 0;
           nearest[dst] = f.z[pixel];
           const packed = f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2];
-          const tint = part === 'body' && this.tint.get(packed);
+          const tint = isBody(part) && this.tint.get(packed);
           const lut = this.tintLut.get(part);
           if (lut) {   // a recoloured piece: every colour is painted once and remembered
             let painted = lut.colours.get(packed);
@@ -941,5 +948,6 @@
   MageSprite.female = (Base, url) => { const Female = class extends Base {}; Female.METADATA = url; Base.Female = Female; return Female; };
   MageSprite.variant = function (look) { return look?.gender === 'female' && Object.hasOwn(this, 'Female') ? this.Female : this; };
   MageSprite.female(MageSprite, 'assets/mage_f_sprites.txt');
+  MageSprite.bodyPart = bodyPart;      // which body layer is drawn under the worn head piece (tests/hat-hair-unit.cjs)
   window.MageSprite = MageSprite;
 })();

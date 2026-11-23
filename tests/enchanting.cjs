@@ -6,7 +6,8 @@ const vm = require('node:vm');
 const { spawnSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const mutations = {
-  rarity: ['&& tiers.findIndex(tier => tier.rarity === gear.rarity) >= recipe.tier', '&& true', 'rare gear cannot receive an epic enchant'],
+  rarity: ['&& gearRarities.indexOf(gear.rarity) >= gearRarities.indexOf(tier.rarity)', '&& true', 'rare gear cannot receive an epic enchant'],
+  expertLevel: ['&& (item.requiredLevel || 1) >= (tier.minGearLevel || 1)', '&& true', 'expert recipes exclude gear below the required level'],
   replacing: ['expected:target.gear.enchant ?? null', 'expected:null', 'apply names the old enchant'],
   salvage: ['!worn && gear.id === copy.id', 'gear.id === copy.id', 'worn pieces cannot be salvaged'],
   bagCopy: ['gear.id === copy.id', 'gear.item === copy.item', 'disenchant targets the selected bag copy'],
@@ -96,7 +97,7 @@ const invalid = gear('necklace','epic',104);
 const copies = [{gear:epic,worn:false,skillCap:30},{gear:rare,worn:false,skillCap:30},{gear:worn,worn:true},{gear:invalid,worn:false}];
 copies.push({gear:duplicate,worn:false,skillCap:30});
 const inventory = [{item:'enchant_scroll_shieldbreaker',quantity:1},{item:'enchant_recipe_double_tap',quantity:1}];
-const answer = (patch = {}) => EN.onPacket({ok:true, text:'', skill:0, maxSkill:300, craftSkillCaps:[30,90,210], recipes:[], inventory, copies, ...patch});
+const answer = (patch = {}) => EN.onPacket({ok:true, text:'', skill:0, maxSkill:600, craftSkillCaps:[30,90,210,330,450,570,600], recipes:[], inventory, copies, ...patch});
 const button = label => panel.querySelectorAll('button').find(node => node.textContent === label);
 const select = label => panel.querySelectorAll('select').find(node => node.dataset.enchantingField === label);
 const emit = request => assert.deepEqual(calls.at(-1), {type:'enchanting',request});
@@ -124,7 +125,7 @@ assert.deepEqual(calls.at(-1).request, {op:'apply', enchant:'shieldbreaker', cop
 answer({text:'Enchantment applied.'});
 assert.match(panel.textContent, /Enchantment applied\./);
 answer({skill:1,trainingGearLevel:1});
-assert.match(panel.textContent, /Enchanting skill 1 \/ 300/, 'the pane shows the authoritative skill cap');
+assert.match(panel.textContent, /Enchanting skill 1 \/ 600/, 'the pane shows the authoritative skill cap');
 button('Study').click();
 select('Enchantment').choose('double_tap');
 button('Study recipe').click();
@@ -160,6 +161,8 @@ assert.match(details.textContent,/Destroys this copy. You receive 2 × Enchantin
 answer({skill:30,trainingGearLevel:6,recipes:['double_tap']});
 assert.match(panel.textContent,/Use level 6 or higher gear for your next skill point/);
 assert.match(details.textContent,/This action is below your current Enchanting training band/, 'gear at its training cap explains why skill cannot rise');
+answer({skill:300,trainingGearLevel:51,recipes:['double_tap']});
+assert.match(panel.textContent,/Use level 51 or higher gear for your next skill point/);
 const requests = calls.length;
 bagAction('Disenchant this copy').click();
 assert.equal(calls.length, requests,'a destructive action requires explicit confirmation');
@@ -180,6 +183,16 @@ const tooltip = new Element('div');
 assert(EN.tooltip(tooltip, items.get(epic.item), epic));
 assert(/strike again/.test(tooltip.textContent) && /3 s cooldown/.test(tooltip.textContent),'copy tooltip shows the effect and cooldown');
 assert(!EN.tooltip(new Element('div'), items.get(epic.item), { ...epic, enchant:null }));
+EN.close();
+const expert = {...rare, id:105, item:'warrior_weapon_sword_l55_blue'};
+EN.open('enchant_scroll_prism_echo');
+answer({skill:300, trainingGearLevel:51, inventory:[{item:'enchant_scroll_prism_echo',quantity:1}],
+  copies:[...copies, {gear:expert,worn:false,skillCap:330}]});
+assert.match(panel.textContent, /Requires equipment level 51 or higher/);
+assert(!select('Equipment copy').options.some(o => o.value === '101'), 'expert recipes exclude gear below the required level');
+assert(select('Equipment copy').options.some(o => o.value === '105'), 'expert recipe accepts level-55 rare gear');
+answer({skill:570, trainingGearLevel:96});
+assert.match(panel.textContent,/Craft Evergreen Sigil to reach skill 600/);
 EN.close();
 assert(panel.hidden);
 console.log('Enchanting controls, selection, costs, requests, and copy tooltips pass');

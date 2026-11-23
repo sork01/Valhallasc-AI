@@ -4,11 +4,15 @@
 Candidates and matching bounds go under test-results/turning-hair/assets.
 --editor updates only the existing editable body layer, archiving it first.
 --write installs the checked candidate PNGs and its body bounds entry.
+--hat-hair (with --female) draws the body without the long hair (HAT_HAIR=1 in cel_common) as the extra part
+`body_hat` (<stem>_body_hat.png + depth, own bounds entry, listed in the metadata's parts and lazyParts). The client
+draws it instead of `body` while a head piece is worn (MageSprite.bodyPart). `body` itself is never touched.
 """
 import argparse
 import base64
 import importlib
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -60,8 +64,12 @@ def main():
     ap.add_argument('--editor', action='store_true')
     ap.add_argument('--write', action='store_true')
     ap.add_argument('--measure-only', action='store_true')
+    ap.add_argument('--hat-hair', action='store_true')
     ap.add_argument('--out', type=Path, default=ROOT / 'test-results/turning-hair/assets')
     args = ap.parse_args()
+    if args.hat_hair:
+        assert args.female and not args.editor and not args.measure_only, 'the hat variant is a female, generated-only body'
+        os.environ['HAT_HAIR'] = '1'      # read by cel_common when the maker imports it
     maker = importlib.import_module(MODULES[args.character])
     import cel_common as cc
     import sprite_bounds
@@ -69,13 +77,14 @@ def main():
     assets = ROOT / 'client/assets'; args.out.mkdir(parents=True, exist_ok=True)
     meta_path = assets / f'{stem}_sprites.txt'; meta = json.loads(meta_path.read_text())
     names = [meta['parts']['body']['png'], meta['parts']['body']['depth'], f'{stem}_bounds.txt']
+    if args.hat_hair: names[:2] = [f'{stem}_body_hat.png', f'{stem}_body_hat_depth.png']
     before = args.out.parent / 'before'; before.mkdir(exist_ok=True)
     for name in names:
-        if not (before / name).exists(): shutil.copyfile(assets / name, before / name)
+        if not (before / name).exists() and (assets / name).exists(): shutil.copyfile(assets / name, before / name)
     if args.measure_only:
         measure(maker, meta, stem, args.out, before)
         return
-    previous = Image.open(before / names[0]).convert('RGBA')
+    previous = Image.open(assets / meta['parts']['body']['png'] if args.hat_hair else before / names[0]).convert('RGBA')
     colour = Image.new('RGBA', previous.size); depth = Image.new('RGB', previous.size)
     sheet = maker.SHEET
     group = next((g for g, layers in sheet.groups.items() if 'body' in layers), None)
@@ -111,11 +120,17 @@ def main():
         print(stem, clip, flush=True)
     colour.save(args.out / names[0], optimize=True); depth.save(args.out / names[1], optimize=True)
     bounds = json.loads((assets / names[2]).read_text())
-    bounds['parts']['body'] = base64.b64encode(sprite_bounds.part_bounds(args.out / names[0], meta)).decode()
+    part = 'body_hat' if args.hat_hair else 'body'
+    bounds['parts'][part] = base64.b64encode(sprite_bounds.part_bounds(args.out / names[0], meta)).decode()
     (args.out / names[2]).write_text(json.dumps(bounds, separators=(',', ':')) + '\n')
-    measure(maker, meta, stem, args.out, before)
+    if args.hat_hair:
+        meta['parts'][part] = {'png': names[0], 'depth': names[1]}
+        meta['lazyParts'] = [*meta.get('lazyParts', []), *([part] if part not in meta.get('lazyParts', []) else [])]
+        (args.out / f'{stem}_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
+    else: measure(maker, meta, stem, args.out, before)
     if args.write:
         for name in names: shutil.copyfile(args.out / name, assets / name)
+        if args.hat_hair: shutil.copyfile(args.out / f'{stem}_sprites.txt', meta_path)
 
 
 if __name__ == '__main__': main()

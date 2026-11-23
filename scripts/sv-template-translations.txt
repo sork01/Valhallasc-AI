@@ -524,5 +524,7 @@
   "Crafted {0} enchant scrolls.": "Tillverkade {0} förtrollningsrullar.",
   "Buy quantity: {0}": "Köp flera: {0:t}",
   "Bought {0} × {1}.": "Köpte {0} × {1:t}.",
-  "Fitted {0} × {1}. You now have {2} bag slots.": "Monterade {0} × {1:t}. Du har nu {2} väskplatser."
+  "Fitted {0} × {1}. You now have {2} bag slots.": "Monterade {0} × {1:t}. Du har nu {2} väskplatser.",
+  "Requires equipment level {0} or higher.": "Kräver utrustning på minst nivå {0}.",
+  "Craft {0} to reach skill {1}.": "Tillverka {0} för att nå färdighetsnivå {1}."
 }

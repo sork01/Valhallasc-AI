@@ -41,7 +41,7 @@
       hunterLoading: 'Calling the Hunter…', hunterError: 'Hunter sprites could not load. Select Hunter again to retry.',
       hunterArmorNames: ['Simple cloth', 'Scout\u2019s Jerkin', 'Wildwarden Coat'], hunterWeaponNames: ['Empty hands', 'Hunter\u2019s Shortbow', 'Wildwarden Longbow'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
-      defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
+      defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedStartSub: 'You wake up back at the start…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
       race: 'Race', human: 'Human', mothkin: 'Mothkin', tidekin: 'Tidekin', gnome: 'Gnome',
       humanPassive: ['Resourcefulness', 'Earn 5% more coin from quest turn-ins.'],
@@ -78,7 +78,7 @@
       hunterLoading: '사냥꾼 소환 중…', hunterError: '사냥꾼을 불러오지 못했습니다. 다시 선택해 주세요.',
       hunterArmorNames: ['기본 옷', '정찰병의 조끼', '와일드워든 코트'], hunterWeaponNames: ['맨손', '사냥꾼의 단궁', '와일드워든 장궁'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
-      defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
+      defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedStartSub: '시작 지점에서 깨어납니다…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
       race: '종족', human: '인간', mothkin: '나방족', tidekin: '물결족', gnome: '노움',
       humanPassive: ['수완', '퀘스트를 완료할 때 동전을 5% 더 받습니다.'],
@@ -1191,7 +1191,11 @@
     if (name === 'levelup') levelBanner(data);
     if (name === 'rebirth') window.Rebirth?.celebrate(data);
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
-    if (name === 'death') { $('dead-msg').hidden = !!Field.hero?.ghost; $('ghost-msg').hidden = !Field.hero?.ghost; }
+    if (name === 'death') {
+      $('dead-msg').hidden = !!Field.hero?.ghost;
+      $('ghost-msg').hidden = !Field.hero?.ghost;
+      $('dead-sub').textContent = t(Field.inInstance ? 'defeatedStartSub' : 'defeatedSub');
+    }
     if (name === 'ghost') { $('dead-msg').hidden = true; $('ghost-msg').hidden = false; }
     if (name === 'unghost' || name === 'respawn') { $('ghost-msg').hidden = true; window.City?.close?.(false); }
     if (name === 'respawn') $('dead-msg').hidden = true;

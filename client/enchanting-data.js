@@ -3,7 +3,11 @@ window.ENCHANTING = {
   "tiers": [
     {"rarity":"rare", "skill":1, "minEnemyLevel":10, "dropChance":0.0125, "vendorPrice":250000},
     {"rarity":"epic", "skill":75, "minEnemyLevel":35, "dropChance":0.006, "vendorPrice":1000000},
-    {"rarity":"legendary", "skill":180, "minEnemyLevel":65, "dropChance":0.0025, "vendorPrice":4000000}
+    {"rarity":"legendary", "skill":180, "minEnemyLevel":65, "dropChance":0.0025, "vendorPrice":4000000},
+    {"rarity":"rare", "skill":300, "minGearLevel":51, "minEnemyLevel":51, "dropChance":0.003, "vendorPrice":1500000},
+    {"rarity":"epic", "skill":420, "minGearLevel":71, "minEnemyLevel":71, "dropChance":0.00175, "vendorPrice":4500000},
+    {"rarity":"legendary", "skill":540, "minGearLevel":91, "minEnemyLevel":91, "dropChance":0.001, "vendorPrice":10000000},
+    {"rarity":"rare", "skill":570, "minGearLevel":91, "minEnemyLevel":96, "dropChance":0.0014, "vendorPrice":2500000}
   ],
   "materials": [
     {"id":"enchant_dust", "name":"Enchanting Dust", "rarity":"uncommon", "yield":2},
@@ -27,6 +31,14 @@ window.ENCHANTING = {
     {"id":"rise_from_ash", "name":"Rise from Ash", "kind":"armor", "tier":2, "cooldown":300, "cost":[10,8,6,1], "effect":"Survive a lethal monster hit at 1 health and gain a barrier for 15% of maximum health for 4 seconds. Break line of sight with the attacker while the barrier holds to heal 20% of maximum health."},
     {"id":"borrowed_time", "name":"Borrowed Time", "kind":"headgear", "tier":2, "cooldown":35, "cost":[10,8,6,1], "effect":"Cast three different skills within 8 seconds. Your next skill within 6 seconds starts with half its normal cooldown. Cooldown starts on use."},
     {"id":"moonstep", "name":"Moonstep", "kind":"cloak", "tier":2, "cooldown":35, "cost":[10,8,6,1], "effect":"A dodge leaves a decoy that draws nearby ordinary monsters for 3 seconds, then grants 30% movement speed for 3 seconds."},
-    {"id":"heartwood_grove", "name":"Heartwood Grove", "kind":"shoulders", "tier":2, "cooldown":90, "cost":[10,8,6,1], "effect":"A hit that drops you below 40% health grows a visible grove for 6 seconds. You and allies inside heal 2% of your own maximum health each second."}
+    {"id":"heartwood_grove", "name":"Heartwood Grove", "kind":"shoulders", "tier":2, "cooldown":90, "cost":[10,8,6,1], "effect":"A hit that drops you below 40% health grows a visible grove for 6 seconds. You and allies inside heal 2% of your own maximum health each second."},
+    {"id":"horizon_step", "name":"Horizon Step", "kind":"cloak", "tier":3, "cooldown":20, "cost":[8,5,0,0], "effect":"Dodging a monster grants a barrier for 8% of maximum health for 4 seconds."},
+    {"id":"prism_echo", "name":"Prism Echo", "kind":"weapon", "tier":3, "cooldown":8, "cost":[8,5,0,0], "effect":"A basic hit deals 35% basic-hit damage to the nearest other monster within 4 tiles."},
+    {"id":"siltweave", "name":"Siltweave", "kind":"pants", "tier":3, "cooldown":24, "cost":[8,5,0,0], "effect":"A hit that drops you below 50% health grants 18% movement speed for 4 seconds."},
+    {"id":"lantern_keeper", "name":"Lantern Keeper", "kind":"necklace", "tier":4, "cooldown":24, "cost":[10,7,4,0], "effect":"Healing a party member below 50% health restores 8% of your maximum primary resource."},
+    {"id":"ribbon_rush", "name":"Ribbon Rush", "kind":"gloves", "tier":4, "cooldown":24, "cost":[10,7,4,0], "effect":"Dodging a monster grants 20% attack speed for 5 seconds."},
+    {"id":"rootguard", "name":"Rootguard", "kind":"shoulders", "tier":4, "cooldown":45, "cost":[10,7,4,0], "effect":"A hit that drops you below 30% health grants a barrier for 13% of maximum health for 8 seconds."},
+    {"id":"cairnstrike", "name":"Cairnstrike", "kind":"weapon", "tier":5, "cooldown":14, "cost":[16,12,9,2], "effect":"A damaging skill that leaves a monster alive strikes it again for 55% basic-hit damage."},
+    {"id":"evergreen_sigil", "name":"Evergreen Sigil", "kind":"accessory", "tier":6, "cooldown":18, "cost":[8,6,0,0], "effect":"Dodging a monster restores 4% of maximum health and grants 12% movement speed for 4 seconds. Both rings share the cooldown."}
   ]
 };

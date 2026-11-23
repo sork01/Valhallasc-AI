@@ -57,7 +57,9 @@
   };
   const rodDetails = i => {
     const tier = i.fishing?.tier || 1;
-    const unlock = ({1:'Ordinary Greenmeadow, Rimeveil and Gloamfen waters',2:'Crags lava',3:'Wyrdwood and rich Rimeveil/Gloamfen spots',4:'Sunward, Tanglecrown and rare water fish',5:'Stormglass and Lapis Erg',6:'Emberwake lava',7:'Frostwake',8:'Yearwheel and all water legendary fish'})[tier];
+    const unlock = ({1:'Ordinary Greenmeadow, Rimeveil and Gloamfen waters',2:'Crags lava',3:'Wyrdwood and rich Rimeveil/Gloamfen spots',4:'Sunward, Tanglecrown and rare water fish',5:'Stormglass and Lapis Erg',6:'Emberwake lava, Bifrost Reach, Astralhollow, Prismwaste and the Orrery',
+      7:'Frostwake, Moonspore Canopy and Asterion',8:'Yearwheel and the Ribbonwild',
+      9:'Veyrroot Canopy and Heartwood',10:'The Cairnspine'})[tier];
     return [tr(i.fishing?.lava ? 'For water and lava fishing' : 'For water fishing'), tr('Fishing tier {0} · Requires level {1}').replace('{0}',tier).replace('{1}',levelOf(i)), tr('{0}% shorter waits · +{1}% rare catch bonus').replace('{0}',(tier-1)*6).replace('{1}',(tier-1)*10), tr('Unlocks: {0}').replace('{0}',tr(unlock)), tr('Keeps every earlier fishing unlock. Upgrading consumes the previous rod.')];
   };
   const effect = i => {

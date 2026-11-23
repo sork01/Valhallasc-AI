@@ -39,6 +39,16 @@ fn fishing_progression_all_waters_name_the_required_rod_and_reject_its_predecess
         (26, 7),
         (28, 8),
         (45, 6),
+        (7, 6),
+        (13, 6),
+        (14, 6),
+        (15, 6),
+        (16, 7),
+        (17, 7),
+        (21, 8),
+        (23, 9),
+        (24, 9),
+        (27, 10),
     ] {
         let rod = RODS.iter().find(|r| r.tier == tier).unwrap();
         at_pool(&mut w, zone, &rod.item);

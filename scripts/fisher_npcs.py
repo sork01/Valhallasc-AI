@@ -8,7 +8,9 @@ from fishing_spots import HABITATS, walkable, segment_distance, SURFACES, radius
 from spirit_guides import clear
 
 ROOT = Path(__file__).resolve().parents[1]
-PREFIXES = {0:'meadow',1:'crags',2:'rime',3:'fen',6:'wyrd',19:'storm',20:'sun',22:'tangle',25:'lapis',26:'fws',28:'yr',45:'ew'}
+PREFIXES = {0:'meadow',1:'crags',2:'rime',3:'fen',6:'wyrd',19:'storm',20:'sun',22:'tangle',25:'lapis',26:'fws',28:'yr',45:'ew',
+            7:'sky',13:'astral',14:'prism',15:'orrery',16:'moonspore',17:'asterion',21:'ribbon',
+            23:'veyr',24:'heartwood',27:'cairn'}
 ELITES = set(json.loads((ROOT/'world/enrage.txt').read_text()))
 DIALOGUE = 'Bring me fish and I can cook a meal or make a stronger rod. Each upgrade replaces your old rod. Platinum line fishes water and Crags lava; tempered platinum also reaches Emberwake. Cooked fish grant one food bonus for ten minutes.'
 
@@ -74,7 +76,7 @@ def install(world, recipes, fish, levels):
             for stage, rarity, count in [(1,'common',5),(2,'uncommon',3),(3,'rare',1),(4,'common',5)]:
                 f = next(f for f in pool if f['rarity']==rarity)
                 # Region entry tiers constrain where a species can actually be caught.
-                rod_level = {0:1,1:5,2:10,3:15,6:25,19:40,20:40,22:70,25:80,26:90,28:95,45:95}[zone]
+                rod_level = {0:1,1:5,2:10,3:15,6:25,19:40,20:40,22:70,25:80,26:90,28:95,45:95}.get(zone, f['level'])
                 level = max(f['level'],rod_level, 25 if rarity=='rare' and habitat!='Lava' else 1,
                             45 if rarity=='rare' and habitat=='Lava' else 1)
                 qid = f'{key}_{stage}'

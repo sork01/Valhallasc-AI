@@ -24,10 +24,22 @@ One recipe can drop per eligible kill. The roll reserves the legendary band firs
 
 Green yields two dust, blue yields two essence, purple yields two shards, and orange yields one core. Orange gear is the sole source of cores. Gray, starter, Hierloom and GM gear are excluded from disenchanting. An enchanter can study recipes before reaching their crafting tier.
 
-Enchanting starts at skill 1 and caps at 300. Applying or disenchanting level 1–5 gear can raise skill through 30. Every five item levels add another 30 points to the cap. That puts level 6–10 gear at 60, level 11–15 at 90, and level 46–50 or higher at 300. Gear above the current minimum can still grant a point. Lower-level gear still yields its materials or takes its enchant.
+Enchanting starts at skill 1 and caps at 600. Applying an enchant or disenchanting level 1–5 gear can raise skill through 30. Every five item levels add another 30 points to the cap. Level 46–50 gear can train through 300, level 51–55 through 330, level 91–95 through 570, and level 96–99 through 600. Gear above the current minimum can still grant a point. Lower-level gear still yields materials or takes eligible enchants.
 
-Crafting can train through the first band in which each tier unlocks. The crafting caps are 30 for rare, 90 for epic and 210 for legendary. Applying and disenchanting higher-level gear cover the remaining bands. Each eligible action can award one point. Higher rarities improve the odds, and two eligible attempts without a point guarantee the next eligible one. Untrained characters can still apply crafted scrolls.
+Crafting trains through the band in which a recipe tier unlocks. Each eligible action can award one point. Higher rarities improve the odds, and two eligible attempts without a point guarantee the next one. The base chance stays at 60% throughout the expert bands. Untrained characters can apply crafted scrolls.
 
+## Expert recipes (1.12.0)
+
+The same five Enchanting Masters sell these scrolls. Advanced scrolls require the listed item level and rarity or higher. Their monster drops follow the same rarity priority and elite bonus as earlier recipes.
+
+| Unlock | Crafting cap | Equipment | Minimum enemy level | Vendor cost | Effects |
+| ---: | ---: | --- | ---: | ---: | --- |
+| 300 | 330 | Rare level 51+ | 51 | 150 gold | Horizon Step (cloak), Prism Echo (weapon), Siltweave (pants) |
+| 420 | 450 | Epic level 71+ | 71 | 450 gold | Lantern Keeper (necklace), Ribbon Rush (gloves), Rootguard (shoulders) |
+| 540 | 570 | Legendary level 91+ | 91 | 1,000 gold | Cairnstrike (weapon) |
+| 570 | 600 | Rare level 91+ | 96 | 250 gold | Evergreen Sigil (ring) |
+
+Craft Evergreen Sigil with eight dust and six essence to train through 600 using ordinary disenchanting materials. The recipe gives an alternative to consuming level-99 equipment for the final band. Prism Echo and Cairnstrike use the same fixed basic-hit reference as Lightning Rod. Expert movement bonuses use the strongest active enchant bonus when effects overlap.
 
 ## Equipment and combat
 
@@ -45,6 +57,6 @@ The trade controller accepts exact copy IDs, validates the selected copies again
 
 ## Focused checks
 
-- `cargo test enchanting` covers profession progression, saved recipes, all 16 combat effects, ineligible input, replacement and storage.
+- `cargo test enchanting` covers profession progression, saved recipes, all 24 combat effects, ineligible input, replacement and storage.
 - `node tests/enchanting.cjs --mutations` runs production controls and tooltip fault checks. `python3 tests/enchanting-data.py` checks the generated data and vendor stock.
 - `node tests/enchanting-protocol.cjs` uses a disposable private game to exercise vendor purchase, crafting, exact-copy trade, inspection and restart persistence.

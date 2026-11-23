@@ -1264,6 +1264,10 @@
     "cloak_regearchainforged": {
       "png": "priest_f_progression_cloak_regearchainforged.png",
       "depth": "priest_f_progression_cloak_regearchainforged_depth.png"
+    },
+    "body_hat": {
+      "png": "priest_f_body_hat.png",
+      "depth": "priest_f_body_hat_depth.png"
     }
   },
   "gender": "female",
@@ -1842,7 +1846,8 @@
     "weapon_regearsolstice",
     "weapon_regearspan",
     "weapon_regearthunder",
-    "weapon_regearvault"
+    "weapon_regearvault",
+    "body_hat"
   ],
   "gearSprites": {
     "pants_regearl50": {

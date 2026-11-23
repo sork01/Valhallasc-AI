@@ -4183,16 +4183,17 @@
     const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
     const shimmer = o => .5 + .5 * Math.sin(t * .8 + o.x * .45 + o.y * .33);
     const river = !ghost && zdef.theme === 'wyrd', frost = !ghost && zdef.theme === 'frost', meadow = ghost || zone === 0 || zdef.theme === 'sunward';
-    pass(1.36, meadow ? '#a1ad65' : frost ? '#e8f3fb' : river ? '#3c2c1c' : '#2c2a1c');
-    pass(1.2, meadow ? '#74a57b' : frost ? '#a9d2ec' : river ? '#6a7a3a' : '#3c5a30');
-    pass(1.04, o => meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : frost ? `hsl(${204 + shimmer(o) * 8}, 66%, ${48 + shimmer(o) * 6}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
-    pass(.8, o => meadow ? `hsl(${199 + shimmer(o) * 7}, 60%, ${36 + shimmer(o) * 5}%)` : frost ? `hsl(${213 + shimmer(o) * 8}, 74%, ${30 + shimmer(o) * 5}%)` : river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
+    const hue = !ghost ? window.FISHING_WATERS?.[zone]?.hue : undefined;
+    pass(1.36, hue != null ? `hsl(${hue}, 23%, 24%)` : meadow ? '#a1ad65' : frost ? '#e8f3fb' : river ? '#3c2c1c' : '#2c2a1c');
+    pass(1.2, hue != null ? `hsl(${hue}, 39%, 43%)` : meadow ? '#74a57b' : frost ? '#a9d2ec' : river ? '#6a7a3a' : '#3c5a30');
+    pass(1.04, o => hue != null ? `hsl(${hue + shimmer(o) * 6}, 58%, 48%)` : meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : frost ? `hsl(${204 + shimmer(o) * 8}, 66%, ${48 + shimmer(o) * 6}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
+    pass(.8, o => hue != null ? `hsl(${hue + shimmer(o) * 6}, 61%, 30%)` : meadow ? `hsl(${199 + shimmer(o) * 7}, 60%, ${36 + shimmer(o) * 5}%)` : frost ? `hsl(${213 + shimmer(o) * 8}, 74%, ${30 + shimmer(o) * 5}%)` : river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
     for (const [o, sx, sy] of rows) {
       const k = (o.x * 7 + o.y * 13) | 0;
       if (k % 3 === 0 && !frost) {                                                  // an expanding ripple ring
         const ph = (t * .35 + (k % 7) * .13) % 1; g.strokeStyle = `rgba(150,210,210,${.38 * (1 - ph)})`; g.lineWidth = 1.4; g.beginPath(); g.ellipse(sx + Math.sin(k) * 10, sy + Math.cos(k) * 4, 6 + ph * 26, 2.6 + ph * 11, 0, 0, 6.283); g.stroke();
       }
-      if (meadow) {
+      if (meadow || hue != null) {
         const gl = .35 + .22 * Math.sin(t * 1.3 + k);
         g.strokeStyle = `rgba(235,255,255,${gl})`; g.lineWidth = 1.5; g.beginPath();
         g.moveTo(sx - ex(o) * .4, sy - ey(o) * .1); g.lineTo(sx + ex(o) * .12, sy - ey(o) * .1); g.stroke();
@@ -4988,7 +4989,7 @@
       City.animateObject(g, o, sx, sy, t);
     }
     if (zdef.dock) window.MeadowDock?.draw(g, zdef, w2s, t);      // Greenmeadow's landing pier and its ship (meadowdock.js)
-    if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost') drawWater(g, t);
+    if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward' || zdef.theme === 'frost' || window.FISHING_WATERS?.[zone]?.ponds) drawWater(g, t);
     if (map.ghostWater?.length) drawWater(g, t, true);
     window.Enchanting?.drawFields(g, enchantFields, w2s, TW, TH, VW, VH);
     drawFishing(g, true);      // rich markers must be above the painted water, below people
@@ -5462,6 +5463,7 @@
     }
     for (const o of objects) {
       if (o.kind === 'post' || o.kind === 'void') continue;
+      if (o.fishingWater) { g.fillStyle = '#65cce8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2.5, o.r * k), 0, Math.PI * 2); g.fill(); continue; }
       if (o.kind === 'ew_lava') {g.fillStyle='#ed864a';g.beginPath();g.arc(o.x*k,o.y*k,o.r*k,0,Math.PI*2);g.fill();continue;}
       if (moonwell) {g.fillStyle=o.kind==='moonmirror'?'#f8e8ad':o.kind==='moonlily'?'#c6e4d6':'#9af2d7';g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4);continue;}
       if (orrery) { g.fillStyle = o.kind === 'clockwall' ? '#c8aa80' : o.kind === 'blackspire' ? '#778399' : o.kind === 'stillpoint' ? '#d3b683' : '#9b8693'; g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4); continue; }
@@ -5929,6 +5931,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get instanceCleared() { return instanceCleared; },
+    get inInstance() { return !!(zdef.copies > 0 || zdef.raid); },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get areaName() { return areaName(); }, get seamless() { return performance.now() < seamlessUntil; }, get exitArches() { return zdef.exitArches || []; }, get vaultView() { return (map.vregs || []).length ? (map.ghosts || []).length : 0; }, get vaultRegions() { return map.vregs || []; }, get ghostNpcIds() { return (map.vregs || []).flatMap(R => City.npcsOf(R.to).filter(n => inRegion(R, n.x - R.shift[0], n.y - R.shift[1])).map(n => n.id)); }, get wallGhosts() { return (map.ghosts || []).filter(o => o.kind === 'rampart' || o.kind === 'tower').map(o => [o.kind, +o.x.toFixed(1), +o.y.toFixed(1)]); }, get cityIntrusion() { const c = zdef.city; if (!c || !(map.vregs || []).some(r => r.hide)) return null; const inside = zdef.shapeFloor ? o => inSquare(o.x, o.y) : o => o.x >= c.x0 - 1.5 && o.x <= c.x1 + 1.5 && o.y >= c.y0 - 1.5 && o.y <= c.y1 + 1.5; return { hidden: objects.filter(o => inside(o) && ownHidden(o)).length, ghosts: (map.ghosts || []).filter(inside).length, season: (map.vregs || []).reduce((n, R) => n + vaultSeason(R).filter(inside).length, 0) }; }, screenOf(x, y) { const [sx, sy] = w2s(x, y); return [sx / VW, sy / VH]; },
     sceneAround(x, y, r) {      // every scenery object this frame draws near a point, in this frame's coordinates (own, ghosts, seasonal): what must match across a vault
       const skip = o => o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void' || City.art[o.kind]?.ground, out = [];

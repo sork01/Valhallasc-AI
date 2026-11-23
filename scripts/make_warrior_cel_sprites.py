@@ -156,12 +156,13 @@ def render_frame(clip, facing, k):
     # Short spiky hair: a swept fringe of three sharp locks, bristling crown, a short tail at the nape.
     if cc.FEMALE:
         # A long braid down the back (a swaying plait with a ribbon at the end) and a short pair of face-framing locks.
-        body.plate([xf(q) for q in [(-3, -5.4, 86), (3, -5.4, 86), (5.2 + sw * 1.2, -9.4, 64), (4 + sw * 2.4, -10.8, 42), (0 + sw * 2.8, -10.8, 31), (-3.4 + sw * 2.2, -10.4, 42), (-4.6 + sw, -8.8, 66)]], 'hair', 1)
-        for z_ in (72, 60, 48):
-            body.plate([xf(q) for q in [(-3.4 + sw * (86 - z_) * .06, -9.6 - (86 - z_) * .02, z_ + 1.2), (3.4 + sw * (86 - z_) * .06, -9.6 - (86 - z_) * .02, z_ + 1.2), (2.4 + sw * (86 - z_) * .06, -10 - (86 - z_) * .02, z_ - 1.4), (-2.4 + sw * (86 - z_) * .06, -10 - (86 - z_) * .02, z_ - 1.4)]], 'hair', 2, True)
-        body.bone(xf((-1.4 + sw * 2.8, -10.8, 32)), xf((1.4 + sw * 2.8, -10.8, 32)), 1.1, 1.1, 'plume', -.4)
-        for sx_ in (-1, 1):
-            body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11, -1.2, 80), (sx_ * 10.6, .8, 69), (sx_ * 9, .6, 68), (sx_ * 8.6, -.4, 76)]], 'hair', 2 if sx_ > 0 else 1, True)
+        if not cc.HAT_HAIR:
+            body.plate([xf(q) for q in [(-3, -5.4, 86), (3, -5.4, 86), (5.2 + sw * 1.2, -9.4, 64), (4 + sw * 2.4, -10.8, 42), (0 + sw * 2.8, -10.8, 31), (-3.4 + sw * 2.2, -10.4, 42), (-4.6 + sw, -8.8, 66)]], 'hair', 1)
+            for z_ in (72, 60, 48):
+                body.plate([xf(q) for q in [(-3.4 + sw * (86 - z_) * .06, -9.6 - (86 - z_) * .02, z_ + 1.2), (3.4 + sw * (86 - z_) * .06, -9.6 - (86 - z_) * .02, z_ + 1.2), (2.4 + sw * (86 - z_) * .06, -10 - (86 - z_) * .02, z_ - 1.4), (-2.4 + sw * (86 - z_) * .06, -10 - (86 - z_) * .02, z_ - 1.4)]], 'hair', 2, True)
+            body.bone(xf((-1.4 + sw * 2.8, -10.8, 32)), xf((1.4 + sw * 2.8, -10.8, 32)), 1.1, 1.1, 'plume', -.4)
+            for sx_ in (-1, 1):
+                body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11, -1.2, 80), (sx_ * 10.6, .8, 69), (sx_ * 9, .6, 68), (sx_ * 8.6, -.4, 76)]], 'hair', 2 if sx_ > 0 else 1, True)
     else:
         body.plate([xf(q) for q in [(-4, -5, 80), (4, -5, 80), (5 + sw, -8, 70), (0 + sw * 1.3, -9, 66), (-5 + sw, -8, 70)]], 'hair', 1)
     if not cc.face(body, head, p, lashes=.8):

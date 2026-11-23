@@ -1,7 +1,7 @@
 //! Mining channels and workshop transactions resolve on the world thread.
 use super::*;
 use crate::blacksmithing::{
-    CANDIDATES, CATALOG, Command, Method, STARTER_PICK, TRAINER, WORKSHOP, training_cap,
+    CANDIDATES, CATALOG, Command, MAX_SKILL, Method, STARTER_PICK, TRAINER, WORKSHOP, training_cap,
 };
 
 const REACH: f64 = 2.6;
@@ -125,7 +125,8 @@ fn workshop_action(
                     count,
                     quality,
                     training_cap(recipe.tier),
-                    crate::profession::MAX_SKILL,
+                    MAX_SKILL,
+                    MAX_SKILL,
                     roll,
                 );
             }
@@ -354,7 +355,7 @@ impl World {
         staged
             .blacksmithing
             .proficiency
-            .try_gain(0, training_cap(vein.tier), self.smith_roll());
+            .try_gain_to(0, training_cap(vein.tier), MAX_SKILL, self.smith_roll());
         let p = self.players.get_mut(&session).unwrap();
         if self.store.save_many([&staged].into_iter()).is_err() {
             return Self::mining_notice(p, "error", "The Blacksmithing change could not be saved.");

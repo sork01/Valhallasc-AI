@@ -90,9 +90,9 @@ fn achievements_refresh_preserves_the_entire_old_catalog() {
 fn achievements_profession_milestones_use_each_saved_skill_at_the_exact_boundary() {
     type SkillOf = fn(&mut Character) -> &mut crate::profession::Skill;
     let paths: [(&str, [u16; 3], SkillOf); 4] = [
-        ("fishing_skill", [30, 150, crate::profession::MAX_SKILL], |c| &mut c.fishing.proficiency),
-        ("enchanting_skill", [30, 150, crate::profession::MAX_SKILL], |c| &mut c.enchanting.proficiency),
-        ("blacksmithing_skill", [30, 150, crate::profession::MAX_SKILL], |c| &mut c.blacksmithing.proficiency),
+        ("fishing_skill", [30, 150, 300], |c| &mut c.fishing.proficiency),
+        ("enchanting_skill", [30, 150, 300], |c| &mut c.enchanting.proficiency),
+        ("blacksmithing_skill", [30, 150, crate::blacksmithing::MAX_SKILL], |c| &mut c.blacksmithing.proficiency),
         ("alchemy_skill", [30, 300, crate::alchemy::MAX_SKILL], |c| &mut c.alchemy.proficiency),
     ];
     for (metric, targets, skill_of) in paths {
@@ -159,25 +159,31 @@ fn achievements_refresh_numeric_goals_award_at_the_exact_boundary_once() {
 }
 
 #[test]
-fn achievements_refresh_collections_match_real_fish_and_distinct_fisher_quests() {
+fn achievements_refresh_collections_keep_the_original_fish_and_fisher_circuits() {
     let fish: Vec<Value> = serde_json::from_str(include_str!("../../world/fish.txt")).unwrap();
     let a = goal("fish_log_all");
+    let original_habitats = [
+        "Shore", "Cold", "Swamp", "Forest", "Jungle", "Oasis", "Spring", "Lava",
+    ];
     let expected: BTreeSet<_> = fish
         .iter()
+        .filter(|f| original_habitats.contains(&f["habitat"].as_str().unwrap()))
         .map(|f| f["item"].as_str().unwrap().to_owned())
         .collect();
     assert_eq!(a.members.iter().cloned().collect::<BTreeSet<_>>(), expected);
     assert_eq!(a.target, 57);
     let map: Value = serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
-    let quests: Vec<_> = std::iter::once(&map)
+    let original_zones = [0, 1, 2, 3, 6, 19, 20, 22, 25, 26, 28, 45];
+    let quests = std::iter::once(&map)
         .chain(map["zones"].as_array().unwrap())
-        .flat_map(|z| z["quests"].as_array().unwrap())
-        .collect();
+        .enumerate();
     for tier in 1..=4 {
         let a = goal(&format!("fisher_circuit_{tier}"));
         let suffix = format!("_{tier}");
         let expected: BTreeSet<_> = quests
-            .iter()
+            .clone()
+            .filter(|(zone, _)| original_zones.contains(zone))
+            .flat_map(|(_, area)| area["quests"].as_array().unwrap())
             .filter_map(|q| q["id"].as_str())
             .filter(|id| id.starts_with("fisher_") && id.ends_with(&suffix))
             .map(str::to_owned)
@@ -186,7 +192,11 @@ fn achievements_refresh_collections_match_real_fish_and_distinct_fisher_quests()
         assert_eq!(a.target, 13);
         assert_eq!(a.members.len(), 13);
     }
-    assert!(quests.iter().any(|q| q["id"] == "deep_seahorse"));
+    assert!(
+        quests
+            .flat_map(|(_, area)| area["quests"].as_array().unwrap())
+            .any(|q| q["id"] == "deep_seahorse")
+    );
     assert_eq!(goal("seahorse_friend").members, ["deep_seahorse"]);
 }
 

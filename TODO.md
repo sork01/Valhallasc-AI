@@ -8,6 +8,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `PROFESSIONS-600` — Extend Enchanting and Fishing through skill 600 on `feat/professions-600`. Twenty 30-point bands, eight expert enchants, ten new fishing regions, 35 species, five dishes and two rod upgrades. See `docs/enchanting.md` and `docs/fishing.md`.
+
 - [x] `RACIAL-PASSIVES-RULES` — Owner choices (2026-11-23). Gnomes get 10% off NPC shop stock and bulk purchases, equipment repairs and Spark Travel fares. Player trade and vendor sell prices keep their usual rates. Humans get 5% more coin from quest turn-ins. Mothkin gather alchemy flowers 15% faster at night. Tidekin wait 10% less time for bites in water with the usual catch and loot rules.
 - [x] `RACIAL-PASSIVES` — Available in the 1.11.0 branch candidate. The creator and Character pane show each race's passive. Verified the pricing, quest claims and gathering timers with 15 focused Rust tests, plus bounded creator, shop and quest payout browser checks. All six new Rust tests and both browser price and reward checks caught disabled effects.
 

@@ -1070,6 +1070,7 @@ impl World {
         let level = self.slimes[boss].level;
         let point = p.character.point();
         let actor = p.character.id.clone();
+        let in_instance = self.is_instance(p.character.zone);
         let p = self.players.get_mut(&session).unwrap();
         p.combat_left = 5.;
         p.character.mounted = false;
@@ -1081,7 +1082,7 @@ impl World {
         p.attack = 0.;
         p.buffs.clear();
         p.stop();
-        p.mark_corpse(point);
+        p.mark_corpse(point, in_instance);
         p.apply_death_penalty();
         let text = bm::death_message(ability, false);
         let _ = p.peer.try_send(json!({"type":"system","text":text}));

@@ -100,7 +100,9 @@ fn workshop_action(
                 "You do not have the ingredients for that recipe.",
             )?;
             let cap = (recipe.skill / SKILL_BAND + 1) * SKILL_BAND;
-            c.alchemy.proficiency.train_batch(count, 0, cap, crate::alchemy::MAX_SKILL, roll);
+            c.alchemy.proficiency.train_batch(
+                count, 0, cap, crate::alchemy::MAX_SKILL, crate::alchemy::MAX_SKILL, roll,
+            );
             let message = if *all {
                 format!("Brewed {} Alchemy items.", count)
             } else {

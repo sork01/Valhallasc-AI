@@ -24,13 +24,42 @@ pub enum Enchant {
     BorrowedTime,
     Moonstep,
     HeartwoodGrove,
+    HorizonStep,
+    PrismEcho,
+    Siltweave,
+    LanternKeeper,
+    RibbonRush,
+    Rootguard,
+    Cairnstrike,
+    EvergreenSigil,
+}
+
+#[derive(Clone, Copy, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "lowercase")]
+enum Rarity {
+    Rare,
+    Epic,
+    Legendary,
+}
+
+impl Rarity {
+    fn gear(rarity: &str) -> Option<Self> {
+        match rarity {
+            "rare" => Some(Self::Rare),
+            "epic" => Some(Self::Epic),
+            "legendary" => Some(Self::Legendary),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Tier {
-    rarity: String,
+    rarity: Rarity,
     skill: u16,
+    #[serde(default)]
+    min_gear_level: u32,
     pub min_enemy_level: u32,
     pub drop_chance: f64,
 }
@@ -38,6 +67,10 @@ pub struct Tier {
 impl Tier {
     pub fn skill_cap(&self) -> u16 {
         band_cap(self.skill)
+    }
+
+    fn quality(&self) -> u8 {
+        self.rarity as u8 + 1
     }
 }
 
@@ -61,7 +94,7 @@ pub struct Recipe {
 
 #[derive(Deserialize)]
 pub struct Catalog {
-    pub tiers: [Tier; 3],
+    pub tiers: Vec<Tier>,
     materials: [Material; 4],
     pub enchants: Vec<Recipe>,
 }
@@ -86,15 +119,18 @@ impl Enchant {
 }
 
 impl Recipe {
+    pub fn min_gear_level(&self) -> u32 {
+        CATALOG.tiers[self.tier].min_gear_level
+    }
+
     pub fn fits(&self, gear: &GearInstance) -> bool {
         let Some(catalog) = item(&gear.item).filter(|i| !i.starter && is_gear(i)) else {
             return false;
         };
-        let rarity = CATALOG
-            .tiers
-            .iter()
-            .position(|tier| tier.rarity == gear.rarity);
-        catalog.kind == self.kind && rarity.is_some_and(|rank| rank >= self.tier)
+        let tier = &CATALOG.tiers[self.tier];
+        catalog.kind == self.kind
+            && catalog.required_level >= self.min_gear_level()
+            && Rarity::gear(&gear.rarity).is_some_and(|rarity| rarity >= tier.rarity)
     }
 }
 
@@ -236,7 +272,7 @@ impl Character {
                 Ok((
                     "Enchant scroll crafted.",
                     Some(Training {
-                        quality: recipe.tier as u8 + 1,
+                        quality: tier.quality(),
                         cap: tier.skill_cap(),
                         attempts,
                     }),
@@ -248,9 +284,10 @@ impl Character {
                 expected,
             } => {
                 let (at, gear) = self.enchant_target(copy, expected)?;
-                if !enchant.recipe().fits(gear) {
+                let recipe = enchant.recipe();
+                if !recipe.fits(gear) {
                     return Err(
-                        "This enchantment requires matching equipment of at least its rarity.",
+                        "This enchantment requires matching equipment of its level and rarity or higher.",
                     );
                 }
                 if expected == Some(enchant) {
@@ -305,10 +342,16 @@ impl Character {
     }
 }
 
+static DROP_TIERS: LazyLock<Vec<(usize, &'static Tier)>> = LazyLock::new(|| {
+    let mut tiers: Vec<_> = CATALOG.tiers.iter().enumerate().collect();
+    tiers.sort_by_key(|(index, tier)| std::cmp::Reverse((tier.rarity, *index)));
+    tiers
+});
+
 pub fn drop_recipe(level: u32, elite: bool, chance: f64, choice: f64) -> Option<Enchant> {
     let bonus = if elite { 3. } else { 1. };
     let mut roll = chance;
-    for (index, tier) in CATALOG.tiers.iter().enumerate().rev() {
+    for &(index, tier) in DROP_TIERS.iter() {
         if level < tier.min_enemy_level {
             continue;
         }

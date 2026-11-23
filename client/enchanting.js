@@ -83,6 +83,7 @@
     field.append(select);
     return field;
   }
+  const gearRarities = ['rare', 'epic', 'legendary'];
   function enchantInfo(container, enchant) {
     const recipe = byId.get(enchant);
     if (!recipe) return;
@@ -90,6 +91,7 @@
     container.append(el('strong', tr(recipe.name), 'enchanting-name'),
       el('p', tr(recipe.effect)),
       el('small', tr('{0} · {1} or higher · {2} s cooldown', tr(slots[recipe.kind]), rarity(tier.rarity), recipe.cooldown)));
+    if (tier.minGearLevel) container.append(el('small', tr('Requires equipment level {0} or higher.', tier.minGearLevel)));
   }
   const copies = () => (packet?.copies || []).filter(({gear}) => Inventory.definition(gear.item));
   function copyLabel({gear, worn}) {
@@ -97,8 +99,9 @@
       + (worn ? ' · ' + tr('Equipped') : '') + (gear.enchant ? ' · ' + tr(byId.get(gear.enchant)?.name || '') : '');
   }
   function fits({gear}, recipe) {
-    return Inventory.definition(gear.item).kind === recipe.kind
-      && tiers.findIndex(tier => tier.rarity === gear.rarity) >= recipe.tier;
+    const item = Inventory.definition(gear.item), tier = tiers[recipe.tier];
+    return item.kind === recipe.kind && (item.requiredLevel || 1) >= (tier.minGearLevel || 1)
+      && gearRarities.indexOf(gear.rarity) >= gearRarities.indexOf(tier.rarity);
   }
   function selectedCopy(panel, rows) {
     panel.append(picker('Equipment copy', rows.map(row => [String(row.gear.id), copyLabel(row)]), copyId, value => {
@@ -160,7 +163,12 @@
     }
     const { skill, maxSkill, recipes, trainingGearLevel, craftSkillCaps } = packet;
     root.append(el('p', skill ? tr('Enchanting skill {0} / {1}', skill, maxSkill) : tr('An Enchanting Master can teach you. In Alderhaven, find one near the apothecary.')));
-    if (trainingGearLevel) root.append(el('small', tr('Use level {0} or higher gear for your next skill point.', trainingGearLevel)));
+    if (trainingGearLevel) {
+      root.append(el('small', tr('Use level {0} or higher gear for your next skill point.', trainingGearLevel)));
+      const finalRecipe = enchants.find(recipe => craftSkillCaps?.[recipe.tier] === maxSkill &&
+        skill >= tiers[recipe.tier].skill);
+      if (finalRecipe) root.append(el('small', tr('Craft {0} to reach skill {1}.', tr(finalRecipe.name), maxSkill)));
+    }
     const nav = el('div', '', 'enchanting-modes');
     for (const [key, label] of modes) {
       const tab = action(label, () => { mode = key; copyId = ''; confirmation = null; notice = ''; render(); }, pending || (!skill && key !== 'apply'));

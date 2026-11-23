@@ -461,12 +461,14 @@ def render_frame(clip, facing, k):
         body.poly([H(gx, 9.8), H(gx + .8, 8.8), H(gx, 7.8), H(gx - .8, 8.8)], COLOR['glow'][3], hd - 6.55, False)
     # Long hair falls behind the shoulders (seen from the back and sides) tied with a crimson ribbon.
     sw = p['sway']
-    if cc.FEMALE:      # to the hips, with a wavy flared end
-        female_back_hair(body, xf, sw)
+    if cc.FEMALE:      # to the hips, with a wavy flared end (left out of the body drawn under headgear)
+        if not cc.HAT_HAIR:
+            female_back_hair(body, xf, sw)
     else:      # a man: hair to the nape, no fall of hair down the back
         body.plate([xf(q) for q in [(-6.4, -5.6, 83), (6.4, -5.6, 83), (7.6, -7, 76), (4 + sw * .5, -8, 72), (-4 + sw * .5, -8, 72), (-7.6, -7, 76)]], 'hair', 1)
     ribbon_y = -13.2 if cc.FEMALE else -6.6
-    body.plate([xf(q) for q in [(-8.4, ribbon_y, 62), (8.4, ribbon_y, 62), (8.4, ribbon_y - .1, 59.2), (-8.4, ribbon_y - .1, 59.2)]], 'stole', 2)
+    if not cc.HAT_HAIR:      # the ribbon ties the long hair
+        body.plate([xf(q) for q in [(-8.4, ribbon_y, 62), (8.4, ribbon_y, 62), (8.4, ribbon_y - .1, 59.2), (-8.4, ribbon_y - .1, 59.2)]], 'stole', 2)
 
     for key, mat in [('armor_pilgrim', 'robe'), ('armor_dawn', 'dawn')]:
         ink = inks[key]

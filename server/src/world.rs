@@ -595,8 +595,11 @@ impl Player {
             && !self.gauntlet
             && self.guard.is_none()
     }
-    pub(super) fn mark_corpse(&mut self, at: Point) {
-        if self.is_human() {
+    pub(super) fn mark_corpse(&mut self, at: Point, in_instance: bool) {
+        if in_instance {
+            self.character.corpse = None;
+            self.character.ghost = false;
+        } else if self.is_human() {
             self.character.corpse = Some(Corpse {
                 zone: self.character.zone,
                 x: at.x,
@@ -772,7 +775,7 @@ impl Player {
             let cap = crate::profession::MAX_SKILL;
             view["professions"] = json!({
                 "fishing": {"skill": c.fishing.proficiency.skill, "maxSkill": cap},
-                "blacksmithing": {"skill": c.blacksmithing.proficiency.skill, "maxSkill": cap},
+                "blacksmithing": {"skill": c.blacksmithing.proficiency.skill, "maxSkill": crate::blacksmithing::MAX_SKILL},
                 "enchanting": {"skill": c.enchanting.proficiency.skill, "maxSkill": cap},
                 "alchemy": {"skill": c.alchemy.proficiency.skill, "maxSkill": crate::alchemy::MAX_SKILL},
             });
@@ -2876,20 +2879,26 @@ impl World {
             c.y = self.maps[0].spawn.y;
         }
         // A dungeon copy is gone once nobody is in it: a hero who logged out inside wakes at its door.
-        if self.is_instance(c.zone)
-            && let Some(door) = self.maps[c.zone].portals.iter().find(|p| !p.after_clear)
+        let left_instance = self.is_instance(c.zone);
+        if left_instance && let Some(door) = self.maps[c.zone].portals.iter().find(|p| !p.after_clear)
         {
             (c.zone, c.x, c.y) = (door.to, door.tx, door.ty);
         }
-        // If a character reconnects dead from an old instance or vanished zone, wake them at half HP at the safe arrival point.
+        // Resolve deaths saved in instances and stranded older ghosts at the safe arrival point.
         if c.hp <= 0.
-            && (c.corpse.as_ref().is_some_and(|cor| {
-                cor.zone >= self.maps.len()
-                    || self.is_arena_zone(cor.zone)
-                    || (self.is_instance(cor.zone) && cor.zone != c.zone)
-            }) || (c.ghost && c.corpse.is_none()))
+            && (left_instance
+                || c.corpse.as_ref().is_some_and(|cor| {
+                    cor.zone >= self.maps.len()
+                        || self.is_arena_zone(cor.zone)
+                        || (self.is_instance(cor.zone) && cor.zone != c.zone)
+                })
+                || (c.ghost && c.corpse.is_none()))
         {
-            c.hp = (c.max_hp() * 0.5).round().max(1.);
+            c.hp = if left_instance && !c.ghost && c.corpse.is_none() {
+                c.max_hp()
+            } else {
+                (c.max_hp() * 0.5).round().max(1.)
+            };
             c.corpse = None;
             c.ghost = false;
         }
@@ -4398,7 +4407,9 @@ impl World {
                 3.2
             };
             if p.dead_time >= respawn_delay && !p.fallen {
-                if p.ambient.is_some() || p.merc.is_some() || p.guard.is_some() {
+                let zone = p.character.zone;
+                let is_human = p.is_human();
+                if !is_human || self.instances.iter().any(|instance| instance.zone == zone) {
                     let map = &self.maps[p.character.zone];
                     let rally = self
                         .instances
@@ -4430,8 +4441,10 @@ impl World {
                     }
                     let id = p.character.id.clone();
                     self.event("respawn", &id, point, 0., false);
+                    if is_human {
+                        self.save();
+                    }
                 } else {
-                    let zone = p.character.zone;
                     let death_point = p
                         .character
                         .corpse
@@ -6748,7 +6761,8 @@ impl World {
             p.attack = 0.;
             p.buffs.clear();
             p.stop();
-            p.mark_corpse(point);
+            let in_instance = self.instances.iter().any(|instance| instance.zone == p.character.zone);
+            p.mark_corpse(point, in_instance);
             p.apply_death_penalty();
         }
         self.event_with(
@@ -7292,13 +7306,13 @@ mod tests {
         world.join(1, None, Some(Look::default()), tx).unwrap();
         let player = world.players.get_mut(&1).unwrap();
         let expected = json!({
-            "fishing": {"skill": 1, "maxSkill": 300},
+            "fishing": {"skill": 1, "maxSkill": 600},
             "blacksmithing": {"skill": 0, "maxSkill": 300},
-            "enchanting": {"skill": 0, "maxSkill": 300},
+            "enchanting": {"skill": 0, "maxSkill": 600},
             "alchemy": {"skill": 0, "maxSkill": 600},
         });
         assert_eq!(player.snapshot()["professions"], expected);
-        player.character.fishing.proficiency.skill = 29;
+        player.character.fishing.proficiency.skill = 329;
         player.character.blacksmithing.proficiency.skill = 87;
         player.character.enchanting.proficiency.skill = 300;
         player.character.alchemy.proficiency.skill = 527;
@@ -7308,9 +7322,9 @@ mod tests {
         crate::visibility::filter_view(&mut owner, &player.character.id);
         let saved = &owner["players"][0]["professions"];
         assert_eq!(saved, &json!({
-            "fishing": {"skill": 29, "maxSkill": 300},
+            "fishing": {"skill": 329, "maxSkill": 600},
             "blacksmithing": {"skill": 87, "maxSkill": 300},
-            "enchanting": {"skill": 300, "maxSkill": 300},
+            "enchanting": {"skill": 300, "maxSkill": 600},
             "alchemy": {"skill": 527, "maxSkill": 600},
         }));
         crate::visibility::filter_view(&mut other, "another player");
@@ -16994,5 +17008,60 @@ mod tests {
         assert!(c.corpse.is_none());
         assert!(c.zone < w.maps.len());
         assert_eq!(c.hp, (c.max_hp() * 0.5).round().max(1.));
+    }
+    #[test]
+    fn corpse_run_dungeon_and_raid_deaths_restart_alive_at_entrance() {
+        for (idx, (zone, rally)) in [
+            (5usize, None),
+            (46usize, Some(Point { x: 151., y: 45. })),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let mut w = world();
+            assert!(w.is_instance(zone));
+            w.enter_instance(zone);
+            if let Some(inst) = w.instances.iter_mut().find(|i| i.zone == zone) {
+                inst.rally = rally;
+            }
+            let session = 10 + idx as u64;
+            let (tx, _rx) = mpsc::channel(256);
+            w.join(session, None, Some(Look::default()), tx).unwrap();
+            let death_pt = Point {
+                x: w.maps[zone].spawn.x + 15.,
+                y: w.maps[zone].spawn.y + 15.,
+            };
+            {
+                let p = w.players.get_mut(&session).unwrap();
+                p.character.zone = zone;
+                p.character.x = death_pt.x;
+                p.character.y = death_pt.y;
+                p.character.hp = 10.;
+                p.fallen = false;
+                p.pack_death = false;
+            }
+            w.hurt_player(session, 10_000., Point { x: 0., y: 0. });
+            {
+                let p = &w.players[&session];
+                assert_eq!(p.character.hp, 0.);
+                assert!(!p.character.ghost, "instance death must not set ghost");
+                assert!(
+                    p.character.corpse.is_none(),
+                    "instance death must not leave a corpse"
+                );
+            }
+            w.players.get_mut(&session).unwrap().dead_time = 3.2;
+            w.update_player(session);
+            let expected = rally.unwrap_or(w.maps[zone].spawn);
+            let p = &w.players[&session];
+            assert!(!p.character.ghost);
+            assert!(p.character.corpse.is_none());
+            assert_eq!(p.character.hp, p.character.max_hp());
+            assert!(
+                p.character.point().distance(expected) < 2.,
+                "zone {zone}: expected respawn near {expected:?}, got {:?}",
+                p.character.point()
+            );
+        }
     }
 }

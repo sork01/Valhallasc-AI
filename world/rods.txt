@@ -74,7 +74,11 @@
     "level": 45,
     "sell": 10,
     "zones": [
-      45
+      45,
+      7,
+      13,
+      14,
+      15
     ],
     "richZones": []
   },
@@ -86,7 +90,9 @@
     "level": 60,
     "sell": 10,
     "zones": [
-      26
+      26,
+      16,
+      17
     ],
     "richZones": []
   },
@@ -98,7 +104,33 @@
     "level": 80,
     "sell": 10,
     "zones": [
-      28
+      28,
+      21
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_rootbraid_rod",
+    "tier": 9,
+    "lava": true,
+    "name": "Rootbraid Rod",
+    "level": 85,
+    "sell": 10,
+    "zones": [
+      23,
+      24
+    ],
+    "richZones": []
+  },
+  {
+    "item": "rod_cairnsteel_rod",
+    "tier": 10,
+    "lava": true,
+    "name": "Cairnsteel Rod",
+    "level": 90,
+    "sell": 10,
+    "zones": [
+      27
     ],
     "richZones": []
   }
