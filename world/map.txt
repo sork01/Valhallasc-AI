@@ -133497,7 +133497,8 @@
               "at": 11,
               "tag": "anvil_props_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "anvil_rim",
@@ -133528,7 +133529,8 @@
               "at": 11,
               "tag": "ford_lit_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "ford_crown",
@@ -209947,7 +209949,8 @@
               "at": 11,
               "tag": "rime_sledge_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "rime_whalecairn",
@@ -209971,7 +209974,8 @@
               "at": 11,
               "tag": "rime_signal_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "rime_hornspire",
@@ -294556,7 +294560,8 @@
               "at": 11,
               "tag": "fen_wick_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "fen_breach_m",
@@ -294573,7 +294578,8 @@
               "at": 11,
               "tag": "fen_breach_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "fen_quarter",
@@ -352656,7 +352662,8 @@
               "at": 1,
               "tag": "empty-seat:es_06_m"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "wyrd_mill",
@@ -352701,7 +352708,8 @@
               "at": 11,
               "tag": "wyrd_vigil_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "wyrd_fire_m",
@@ -352718,7 +352726,8 @@
               "at": 11,
               "tag": "wyrd_fire_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "wyrd_gale_m",
@@ -352735,7 +352744,8 @@
               "at": 11,
               "tag": "wyrd_gale_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "wyrd_bridge_m",
@@ -352752,7 +352762,8 @@
               "at": 11,
               "tag": "wyrd_bridge_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "objects": [
@@ -459718,7 +459729,8 @@
               "at": 40,
               "tag": "sky_ward_wind#b"
             }
-          ]
+          ],
+          "holdRadius": 7.0
         },
         {
           "id": "sky_ward_vigil",
@@ -459739,7 +459751,8 @@
               "at": 65,
               "tag": "sky_ward_vigil#c"
             }
-          ]
+          ],
+          "holdRadius": 7.0
         },
         {
           "id": "sky_ward_last",
@@ -459760,7 +459773,8 @@
               "at": 90,
               "tag": "sky_ward_last#c"
             }
-          ]
+          ],
+          "holdRadius": 7.0
         },
         {
           "id": "sky_shardfield",
@@ -459798,7 +459812,8 @@
               "at": 11,
               "tag": "sky_beacon_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "sky_rod_m",
@@ -459815,7 +459830,8 @@
               "at": 11,
               "tag": "sky_rod_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "sky_nest_m",
@@ -459832,7 +459848,8 @@
               "at": 11,
               "tag": "sky_nest_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "sky_pad_stormrift",
@@ -651310,7 +651327,8 @@
               "at": 11,
               "tag": "astral_lamps_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "astral_chord_m",
@@ -651327,7 +651345,8 @@
               "at": 11,
               "tag": "astral_chord_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "astral_fire_m",
@@ -651344,7 +651363,8 @@
               "at": 11,
               "tag": "astral_fire_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "astral_line_m",
@@ -651361,7 +651381,8 @@
               "at": 11,
               "tag": "astral_line_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -698218,7 +698239,8 @@
               "at": 11,
               "tag": "prism_awning_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "prism_glass_m",
@@ -698235,7 +698257,8 @@
               "at": 11,
               "tag": "prism_glass_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "prism_beacon_m",
@@ -698252,7 +698275,8 @@
               "at": 11,
               "tag": "prism_beacon_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "prism_cairn_m",
@@ -698269,7 +698293,8 @@
               "at": 11,
               "tag": "prism_cairn_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -751749,7 +751774,8 @@
               "at": 11,
               "tag": "orrery_still_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "orrery_bell_m",
@@ -751766,7 +751792,8 @@
               "at": 11,
               "tag": "orrery_bell_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "orrery_gate_m",
@@ -751783,7 +751810,8 @@
               "at": 11,
               "tag": "orrery_gate_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "orrery_shard_m",
@@ -751800,7 +751828,8 @@
               "at": 11,
               "tag": "orrery_shard_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -889384,7 +889413,8 @@
               "at": 1,
               "tag": "empty-seat:es_15_m"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "storm_dunes",
@@ -889443,7 +889473,8 @@
               "at": 11,
               "tag": "storm_lamp_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "storm_rod_m",
@@ -889460,7 +889491,8 @@
               "at": 11,
               "tag": "storm_rod_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "storm_beacon_m",
@@ -889477,7 +889509,8 @@
               "at": 11,
               "tag": "storm_beacon_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "storm_wall_m",
@@ -889494,7 +889527,8 @@
               "at": 11,
               "tag": "storm_wall_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -938673,7 +938707,8 @@
               "at": 11,
               "tag": "svs_mb_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "svs_hw_m",
@@ -938690,7 +938725,8 @@
               "at": 11,
               "tag": "svs_hw_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "svs_wf_m",
@@ -938707,7 +938743,8 @@
               "at": 11,
               "tag": "svs_wf_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "svs_er_m",
@@ -938724,7 +938761,8 @@
               "at": 11,
               "tag": "svs_er_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -988639,7 +988677,8 @@
               "at": 11,
               "tag": "rw_jc_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "rw_bp_m",
@@ -988656,7 +988695,8 @@
               "at": 11,
               "tag": "rw_bp_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "rw_tp_m",
@@ -988673,7 +988713,8 @@
               "at": 11,
               "tag": "rw_tp_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "rw_gr_m",
@@ -988690,7 +988731,8 @@
               "at": 11,
               "tag": "rw_gr_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -1058011,7 +1058053,8 @@
               "at": 1,
               "tag": "empty-seat:es_18_m"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "tg_orchid_rise",
@@ -1058063,7 +1058106,8 @@
               "at": 11,
               "tag": "tg_lh_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "tg_rg_m",
@@ -1058080,7 +1058124,8 @@
               "at": 11,
               "tag": "tg_rg_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "tg_dr_m",
@@ -1058097,7 +1058142,8 @@
               "at": 11,
               "tag": "tg_dr_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "tg_sp_m",
@@ -1058114,7 +1058160,8 @@
               "at": 11,
               "tag": "tg_sp_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -1107410,7 +1107457,8 @@
               "at": 11,
               "tag": "ve_rf_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "ve_gw_m",
@@ -1107427,7 +1107475,8 @@
               "at": 11,
               "tag": "ve_gw_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "ve_rs_m",
@@ -1107444,7 +1107493,8 @@
               "at": 11,
               "tag": "ve_rs_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "ve_eb_m",
@@ -1107461,7 +1107511,8 @@
               "at": 11,
               "tag": "ve_eb_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -1211774,7 +1211825,8 @@
               "at": 11,
               "tag": "lp_wl_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "lp_ww_m",
@@ -1211791,7 +1211843,8 @@
               "at": 11,
               "tag": "lp_ww_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "lp_sp_m",
@@ -1211808,7 +1211861,8 @@
               "at": 11,
               "tag": "lp_sp_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "lp_ew_m",
@@ -1211825,7 +1211879,8 @@
               "at": 11,
               "tag": "lp_ew_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -1253708,7 +1253763,8 @@
               "at": 11,
               "tag": "fws_st_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "fws_bw_m",
@@ -1253725,7 +1253781,8 @@
               "at": 11,
               "tag": "fws_bw_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "fws_au_m",
@@ -1253742,7 +1253799,8 @@
               "at": 11,
               "tag": "fws_au_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "fws_rw_m",
@@ -1253759,7 +1253817,8 @@
               "at": 11,
               "tag": "fws_rw_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -1302073,7 +1302132,8 @@
               "at": 11,
               "tag": "crn_bw_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "crn_sc_m",
@@ -1302090,7 +1302150,8 @@
               "at": 11,
               "tag": "crn_sc_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "crn_wb_m",
@@ -1302107,7 +1302168,8 @@
               "at": 11,
               "tag": "crn_wb_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "crn_sg_m",
@@ -1302124,7 +1302186,8 @@
               "at": 11,
               "tag": "crn_sg_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "quests": [
@@ -1455130,7 +1455193,8 @@
           "name": "The Dawn Vigil",
           "x": 272,
           "y": 387,
-          "r": 1.8
+          "r": 1.8,
+          "holdRadius": 4.3
         },
         {
           "id": "es_24_0",
@@ -1455233,7 +1455297,8 @@
               "at": 11,
               "tag": "yrs_sp_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "yrs_wm_m",
@@ -1455250,7 +1455315,8 @@
               "at": 11,
               "tag": "yrs_wm_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "yrs_th_m",
@@ -1455267,7 +1455333,8 @@
               "at": 11,
               "tag": "yrs_th_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "yrs_lf_m",
@@ -1455284,7 +1455351,8 @@
               "at": 11,
               "tag": "yrs_lf_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "yw_crossing",
@@ -1609130,7 +1609198,8 @@
               "at": 11,
               "tag": "ew_warm_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "ew_rim_m",
@@ -1609147,7 +1609216,8 @@
               "at": 11,
               "tag": "ew_rim_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "ew_quay_m",
@@ -1609164,7 +1609234,8 @@
               "at": 11,
               "tag": "ew_quay_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         },
         {
           "id": "ew_glass_m",
@@ -1609181,7 +1609252,8 @@
               "at": 11,
               "tag": "ew_glass_m#b"
             }
-          ]
+          ],
+          "holdRadius": 4.6
         }
       ],
       "portals": [
@@ -1645259,7 +1645331,8 @@
           "at": 11,
           "tag": "fold_watch_m#b"
         }
-      ]
+      ],
+      "holdRadius": 4.6
     },
     {
       "id": "fold_hoar",

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.7.6",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "Hold quests give you two and a half extra tiles of room in every direction. The ground marker shows the wider boundary."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.7.5",
     "date": "2026-11-23",
     "new": [

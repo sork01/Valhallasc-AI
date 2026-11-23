@@ -2082,6 +2082,9 @@ pub struct Place {
     pub x: f64,
     pub y: f64,
     pub r: f64,
+    /// The larger channeling radius for a hold objective.
+    #[serde(default, rename = "holdRadius")]
+    hold_radius: Option<f64>,
     /// A ward a `hold` objective names: when the hero's own progress reaches `at` seconds, every sleeping enemy
     /// tagged `tag` attacks (world/hold.rs).
     #[serde(default)]
@@ -2092,6 +2095,11 @@ pub struct Place {
     pub chain: String,
     #[serde(default)]
     pub burn: f64,
+}
+impl Place {
+    pub fn hold_radius(&self) -> f64 {
+        self.hold_radius.unwrap_or(self.r)
+    }
 }
 #[derive(Clone, Deserialize)]
 pub struct Wave {

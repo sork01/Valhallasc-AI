@@ -104,7 +104,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   const ringAt = ward => page.evaluate(w => {
     const cv = document.getElementById('fieldcv'), k = cv.width / 1600, g = cv.getContext('2d'), out = [];
     for (let i = 0; i < 24; i++) {
-      const a = i / 24 * 6.283, [sx, sy] = Field._debug.w2s(w.x + Math.cos(a) * w.r, w.y + Math.sin(a) * w.r);
+      const a = i / 24 * 6.283, [sx, sy] = Field._debug.w2s(w.x + Math.cos(a) * w.holdRadius, w.y + Math.sin(a) * w.holdRadius);
       const d = g.getImageData(Math.max(0, Math.round((sx - 1.5) * k)), Math.max(0, Math.round((sy - 1.5) * k)), Math.max(1, Math.round(3 * k)), Math.max(1, Math.round(3 * k))).data;
       let r = 0, gr = 0, b = 0; const n = d.length / 4;
       for (let j = 0; j < d.length; j += 4) { r += d[j]; gr += d[j + 1]; b += d[j + 2]; }
@@ -160,8 +160,8 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
 
   // The wards: a stone with a floating crystal inside a rune circle. Dim blue until you take a ward quest.
   const ward = await page.evaluate(() => Field.place('sky_ward_wind'));
-  check(ward && ward.r === 4.5 && ward.waves.length === 2, 'The first ward is a 4.5-tile circle with two waves');
-  await stageAt(ward.x + 6.5, ward.y + 2);
+  check(ward && ward.holdRadius === 7 && ward.waves.length === 2, 'The first ward has a seven-tile hold radius and two waves');
+  await stageAt(ward.x, ward.y + 7.4);
   await shot('ward-idle');
   check(await page.evaluate(() => Quests.hold('sky_ward_wind').state === 'none'), 'With no ward quest the circle is idle');
   const ringIdle = (await ringAt(ward)).reduce((m, c) => Math.max(m, c.b - c.g), -999);
@@ -175,7 +175,7 @@ const look = (page, [x0, y0, x1, y1] = [.3, .35, .7, .65]) => page.evaluate(([x0
   check(true, 'Taking the ward quest makes the circle active');
   await page.locator('#quest-tracker').waitFor({ state: 'visible' });
   check(await page.locator('#quest-tracker').textContent().then(t => /Hold the Windward Ward: 0\/60 s/.test(t)), 'The tracker shows the objective in seconds (0/60 s)');
-  await stageAt(ward.x, ward.y + 2);
+  await stageAt(ward.x, ward.y + 6);
   await page.waitForFunction(() => Quests.hold('sky_ward_wind').have >= 17, null, { timeout: 50000 });
   await shot('ward-active');
   const have = await page.evaluate(() => Quests.hold('sky_ward_wind').have);

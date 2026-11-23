@@ -4292,15 +4292,17 @@
     for (let i = 0; i < 26; i++) { const a = Math.max(0, Math.sin(t * 1.7 + i * 2.3)); if (a < .2) continue; const x = (i * 211.7 + Math.sin(t * .3 + i) * 30) % VW, y = (i * 97.3 + t * 12) % VH; g.fillStyle = `hsla(${(i * 47 + t * 30) % 360}, 100%, 80%, ${a * .6})`; g.fillRect(x, y, 2, 2); }
     g.restore();
   }
-  // A ward's rune circle on the ground. Dim blue when you have no use for it, amber while you are holding it (with an arc for the
-  // progress), gold once it holds. The circle is as wide as the place the server checks.
+  // Active hold objectives show the same boundary the server checks. Bifrost's wardstones also show idle and completed circles.
   function drawWardRings(g, t) {
-    for (const o of objects) {
-      if (o.kind !== 'wardstone') continue;
-      const place = (zdef.places || []).find(p => p.id === o.place); if (!place) continue;
-      const [sx, sy] = w2s(place.x, place.y); if (sx < -300 || sx > VW + 300 || sy < -200 || sy > VH + 200) continue;
-      const h = window.Quests?.hold?.(o.place) || { state: 'none', have: 0, need: 1 }, inside = Math.hypot(hero.x - place.x, hero.y - place.y) <= place.r;
-      const rx = place.r * TW * .7071, ry = place.r * TH * .7071, col = h.state === 'done' ? '255,215,90' : h.state === 'active' ? (inside ? '255,170,60' : '255,200,120') : '110,200,255';
+    for (const place of zdef.places || []) {
+      if (!place.holdRadius || place.ring) continue;  // Empty Seat draws its own stone circles.
+      const radius = place.holdRadius, rx = radius * TW / Math.SQRT2, ry = radius * TH / Math.SQRT2;
+      const [sx, sy] = w2s(place.x, place.y);
+      if (sx + rx * 1.04 + 10 < 0 || sx - rx * 1.04 - 10 > VW || sy + ry * 1.04 + 50 < 0 || sy - ry * 1.04 - 10 > VH) continue;
+      const h = window.Quests?.hold?.(place.id) || { state: 'none', have: 0, need: 1 };
+      if (h.state !== 'active' && !(zdef.theme === 'sky' && objects.some(o => o.kind === 'wardstone' && o.place === place.id))) continue;
+      const inside = Math.hypot(hero.x - place.x, hero.y - place.y) <= radius;
+      const col = h.state === 'done' ? '255,215,90' : h.state === 'active' ? (inside ? '255,170,60' : '255,200,120') : '110,200,255';
       g.save(); g.translate(sx, sy);
       const fill = g.createRadialGradient(0, 0, 4, 0, 0, rx); fill.addColorStop(0, `rgba(${col},${h.state === 'active' && inside ? .26 : .1})`); fill.addColorStop(1, `rgba(${col},.02)`);
       g.fillStyle = fill; g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, 6.283); g.fill();
@@ -4990,7 +4992,7 @@
     window.Enchanting?.drawFields(g, enchantFields, w2s, TW, TH, VW, VH);
     drawFishing(g, true);      // rich markers must be above the painted water, below people
     if (zdef.theme === 'wyrd') drawBridges(g, t);
-    if (zdef.theme === 'sky') drawWardRings(g, t);
+    drawWardRings(g, t);
     if (zdef.theme === 'deep') drawChimeRings(g, t);
     window.EmptySeat?.drawFloor(g, w2s);
     window.BossMech?.drawFloor(g, t, bossMechView());
