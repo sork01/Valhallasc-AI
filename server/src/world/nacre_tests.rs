@@ -252,10 +252,11 @@ fn nacre_welcome_uses_real_talks_requires_acceptance_and_claims_once() {
     let before = w.players[&1].character.gold;
     stand(&mut w, "nacre_envoy");
     w.interact(1, "nacre_envoy", Some("quest:claim:nacre_welcome"));
-    assert_eq!(w.players[&1].character.gold, before + def.reward_gold);
+    let reward = w.players[&1].character.quest_gold(def.reward_gold);
+    assert_eq!(w.players[&1].character.gold, before + reward);
     stand(&mut w, "nacre_envoy");
     w.interact(1, "nacre_envoy", Some("quest:claim:nacre_welcome"));
-    assert_eq!(w.players[&1].character.gold, before + def.reward_gold);
+    assert_eq!(w.players[&1].character.gold, before + reward);
     assert!(drain(&mut rx).iter().any(|v| v["type"] == "dialogue"));
 }
 

@@ -7,6 +7,7 @@ requireMemoryLimit();
 const world = new TestWorld();
 world.startLevel = 20;
 const mobile = process.env.TOUCH === '1';
+const gnome = process.env.GNOME === '1';
 
 (async () => {
   await world.start();
@@ -18,6 +19,9 @@ const mobile = process.env.TOUCH === '1';
     page.on('pageerror', error => errors.push(error.message));
     if (process.env.MUTATE === 'buy') {
       await replace(page, 'shop.js', 'quantity: input.valueAsNumber', 'quantity: 1');
+    }
+    if (process.env.MUTATE === 'quote') {
+      await replace(page, 'shop.js', 'cost:quote ??', 'cost:null ??');
     }
     if (process.env.MUTATE === 'compare') {
       await replace(page, 'inventory.js', 'const candidate = value(candidateStats), equipped = value(wornStats);',
@@ -31,6 +35,7 @@ const mobile = process.env.TOUCH === '1';
     await page.locator('#start').click();
     await page.locator('#login-guest').click();
     await page.locator('#cls-warrior').click();
+    if (gnome) await page.locator('#create-race').selectOption('gnome');
     await page.locator('#name').fill('ShopQuantity');
     await page.locator('#go').click();
     await page.waitForFunction(() => Online.connected && Field.hero?.hp > 0, null, { timeout: 60000 });
@@ -53,6 +58,10 @@ const mobile = process.env.TOUCH === '1';
       const slot = page.locator(`#merchant-stock [data-offer="${offer}"]`);
       const id = await slot.getAttribute('data-item');
       const unitPrice = Number(await slot.locator('.money').getAttribute('data-copper'));
+      if (gnome) {
+        const catalogPrice = await page.evaluate(id => Inventory.definition(id).price, id);
+        assert.equal(unitPrice, Math.round(catalogPrice * 0.9), 'Gnome stock shows a discounted quote');
+      }
       const before = await page.evaluate(id => ({ count: Inventory.quantity(id), gold: Field.hero.gold }), id);
       const quantity = page.locator(`#merchant-stock [data-bulk-offer="${offer}"]`);
       if (mobile) assert.ok((await quantity.boundingBox()).width >= 43.5, 'Quantity has a touch-sized target');

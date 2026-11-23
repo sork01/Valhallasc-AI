@@ -1131,6 +1131,7 @@ impl Character {
             .ok_or("Unknown bag.")?
             .price;
         self.bag_slot(id)?;
+        let price = self.npc_price(price);
         if self.gold < price {
             return Err("You need more gold for this bag.");
         }

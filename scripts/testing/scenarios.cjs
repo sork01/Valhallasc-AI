@@ -7,6 +7,8 @@ const kit = require('./tools.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+// These quest scenarios join as unreborn Humans.
+const humanQuestCoin = quest => Math.floor((quest.rewardGold * 105 + 50) / 100);
 // Where a walker starts and steps toward to cross a gate: a walk gate fires only moving out through its side; a seam
 // fires only within its reach on its own side of the border line (Seam.crossing), so start 2 tiles on that side.
 // The claim offer for a quest with class reward choices: the rewardItem is automatic, the warrior's first choice is picked.
@@ -739,7 +741,7 @@ const scenarios = {
       await w.connect({ bot: 'Gm', class: 'warrior' });
       check(w.player('Gm').level === 1 && w.player('Gm').gold === 0, 'A new character starts at level 1 with no gold');
       const finished = ['slime_patrol', 'ironhide_hunt', 'king_challenge'];
-      const rewardGold = kit.quests.filter(q => finished.includes(q.id)).reduce((sum, q) => sum + q.rewardGold, 0);
+      const rewardGold = kit.quests.filter(q => finished.includes(q.id)).reduce((sum, q) => sum + humanQuestCoin(q), 0);
       const setup = await kit.setupCharacter(w, 'Gm', { level: 20, gold: 1000, items: [{ item: 'slime_gel', quantity: 12 }], finishQuests: ['king_challenge'], teleportTo: { spawn: 1 } });
       const me = () => w.player('Gm');
       check(me().level === 20 && me().hp === me().maxHp && setup.player.statPoints === 57, 'set_level reaches level 20 at full health with 57 stat points');
@@ -1048,9 +1050,9 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
       for (const q of pursued(crags.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
@@ -1213,9 +1215,9 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
       for (const q of pursued(rime.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
@@ -1470,10 +1472,10 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)), bag: Object.fromEntries(bring.map(o => [o.target, bag(o.target)])) };
         await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
         await w.waitFor(() => q(x.id).claimed);
-        check(w.player(bot).gold === before.gold + x.rewardGold && totalXp(w.player(bot)) === before.xp + x.rewardXp, `${x.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(x) && totalXp(w.player(bot)) === before.xp + x.rewardXp, `${x.title}: exact XP and gold reward`);
         check(bring.every(o => bag(o.target) === before.bag[o.target] - o.count), `${x.title}: exactly the handed-in items leave the bag`);
         await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
-        check(w.player(bot).gold === before.gold + x.rewardGold && q(x.id).completions === 1, `${x.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(x) && q(x.id).completions === 1, `${x.title}: duplicate turn-in pays nothing`);
       }
       // The repeatable standing order pays again after another hand-in.
       const standing = city.quests.find(x => x.repeatable && !x.season);
@@ -1486,7 +1488,7 @@ const scenarios = {
       const gold = w.player(bot).gold;
       await kit.talkTo(w, bot, standing.npc, `quest:claim:${standing.id}`);
       await w.waitFor(() => q(standing.id).completions === 2);
-      check(w.player(bot).gold === gold + standing.rewardGold, `${standing.title}: the second hand-in pays again`);
+      check(w.player(bot).gold === gold + humanQuestCoin(standing), `${standing.title}: the second hand-in pays again`);
       // Unclaimed hand-in materials are protected from merchant sales (they are quest items with sell 0), so selling the bag's
       // materials leaves the progress in place. The plain Magma Fang that the old check sold is not the standing order's item.
       await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
@@ -1552,9 +1554,9 @@ const scenarios = {
         const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
       }
       for (const q of pursued(fen.quests).filter(q => q.repeatable)) {
         await kit.teleport(w, bot, { npc: q.npc });
@@ -2414,7 +2416,7 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the group quests, the escort or the progression quest (it arrives by itself).
@@ -2444,7 +2446,7 @@ const scenarios = {
         await kit.teleport(w, bot, { npc: rep.npc });
         await kit.talkTo(w, bot, rep.npc, 'quest:claim:wyrd_patrol');
         await w.waitFor(() => state('wyrd_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
-        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(rep), `The repeatable patrol pays ${humanQuestCoin(rep)} gold again (round ${round + 1})`);
       }
       // The group quests: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
@@ -2512,7 +2514,7 @@ const scenarios = {
       const gold = w.player(bot).gold;
       await kit.talkTo(w, bot, 'wyrd_loremaster', 'quest:claim:wyrd_escort');
       await w.waitFor(() => state('wyrd_escort').claimed, 5000, 'Claim the escort quest');
-      check(w.player(bot).gold === gold + q.rewardGold, `Vigdis pays ${q.rewardGold} gold once`);
+      check(w.player(bot).gold === gold + humanQuestCoin(q), `Vigdis pays ${humanQuestCoin(q)} gold once`);
       // A second hero fails it: if the hero falls the quest fails, the escort is gone and the quest can be started again at the mill.
       const loser = 'Failer';
       await w.connect({ bot: loser, class: 'mage' });
@@ -2764,7 +2766,7 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the group quest or the progression quest (it arrives by itself).
@@ -2796,7 +2798,7 @@ const scenarios = {
         before.gold = w.player(bot).gold;
         await kit.talkTo(w, bot, rep.npc, 'quest:claim:sky_patrol');
         await w.waitFor(() => state('sky_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
-        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(rep), `The repeatable patrol pays ${humanQuestCoin(rep)} gold again (round ${round + 1})`);
       }
       // The group quest: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
@@ -3035,7 +3037,7 @@ const scenarios = {
         await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
         await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
         for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
-        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(q) && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${humanQuestCoin(q)} gold and a tenth of level ${q.level}'s XP`);
         return q;
       }
       // Dependency order: every ordinary quest, none of the elite quests, the capstone or the progression quest.
@@ -3066,7 +3068,7 @@ const scenarios = {
         before.gold = w.player(bot).gold;
         await kit.talkTo(w, bot, rep.npc, 'quest:claim:deep_patrol');
         await w.waitFor(() => state('deep_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
-        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+        check(w.player(bot).gold === before.gold + humanQuestCoin(rep), `The repeatable patrol pays ${humanQuestCoin(rep)} gold again (round ${round + 1})`);
       }
       // The three group quests: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
@@ -3203,10 +3205,10 @@ const scenarios = {
         const handed = q.objectives.filter(o => o.kind === 'bring').map(o => [o, bag(o.target)]);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
         await w.waitFor(() => quest(w, bot, q.id).claimed);
-        check(w.player(bot).gold === before + q.rewardGold && totalXp(w.player(bot)) === xp + q.rewardXp, `${q.title}: exact level-table XP and gold`);
+        check(w.player(bot).gold === before + humanQuestCoin(q) && totalXp(w.player(bot)) === xp + q.rewardXp, `${q.title}: exact level-table XP and gold`);
         check(handed.every(([o, n]) => bag(o.target) === n - o.count), `${q.title}: hand-in consumes exactly the requested items`);
         await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
-        check(w.player(bot).gold === before + q.rewardGold, `${q.title}: duplicate claim pays nothing`);
+        check(w.player(bot).gold === before + humanQuestCoin(q), `${q.title}: duplicate claim pays nothing`);
       }
       const repeat = ordinary.find(q => q.repeatable);
       await kit.talkTo(w, bot, repeat.npc, `quest:accept:${repeat.id}`);
@@ -3251,7 +3253,7 @@ const scenarios = {
       const before = w.player(bot).gold;
       await kit.talkTo(w, bot, 'astral_steward', `quest:claim:astral_welcome:${area.quests[0].rewardChoices.warrior[0]}`);
       await w.waitFor(() => quest(w, bot, 'astral_welcome').claimed);
-      check(w.player(bot).gold === before + area.quests[0].rewardGold, 'The steward pays the quest reward exactly once');
+      check(w.player(bot).gold === before + humanQuestCoin(area.quests[0]), 'The steward pays the quest reward exactly once');
       await kit.teleport(w, bot, { npc: 'travel_astralhollow' });
       await kit.talkTo(w, bot, 'travel_astralhollow');
       await w.waitFor(() => w.player(bot).travelStops.includes('travel_astralhollow'));

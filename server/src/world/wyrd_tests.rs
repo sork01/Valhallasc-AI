@@ -1440,7 +1440,7 @@ fn reaching_skuldwatch_completes_the_objective_wakes_the_ambushes_on_the_way_and
     let before = (c.gold, c.level, c.xp);
     let (text, _, changed) = quest_action(c, &q, "claim");
     assert!(changed, "{text}");
-    assert_eq!(c.gold, before.0 + q.reward_gold);
+    assert_eq!(c.gold, before.0 + c.quest_gold(q.reward_gold));
     assert!(!quest_action(c, &q, "claim").2);
     assert_eq!(q.npc, "wyrd_loremaster");
 }

@@ -380,12 +380,15 @@ impl Character {
             (value as f64 * REPAIR_PRICE_SHARE * f64::from(copy.wear) / f64::from(WEAR_MAX)).ceil();
         (price as u64).clamp(1, u64::from(u32::MAX)) as u32
     }
+    fn repair_cost(&self, copy: &GearInstance, multiplier: u32) -> u32 {
+        self.npc_price(self.repair_price(copy).saturating_mul(multiplier))
+    }
     /// Every damaged copy with its repair price, for the smith's window.
     pub fn repair_quote(&self, multiplier: u32) -> Vec<(u64, u32)> {
         self.gear_instances
             .iter()
             .filter(|g| g.wear > 0 && g.durability() < WEAR_MAX)
-            .map(|g| (g.id, self.repair_price(g).saturating_mul(multiplier)))
+            .map(|g| (g.id, self.repair_cost(g, multiplier)))
             .collect()
     }
     /// Repairs one copy (`only`) or every damaged copy, for gold. All or nothing, checked on a clone like the other
@@ -418,12 +421,7 @@ impl Character {
         }
         let total: u64 = due
             .iter()
-            .map(|at| {
-                u64::from(
-                    next.repair_price(&next.gear_instances[*at])
-                        .saturating_mul(multiplier),
-                )
-            })
+            .map(|at| u64::from(next.repair_cost(&next.gear_instances[*at], multiplier)))
             .sum();
         if u64::from(next.gold) < total {
             return Err("You cannot afford that repair.");

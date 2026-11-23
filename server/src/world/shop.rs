@@ -25,16 +25,8 @@ pub(super) enum Request {
     BuyBack(u64),
 }
 
-pub(super) fn purchase_items(
-    c: &mut Character,
-    offer: &Offer,
-    quantity: u32,
-) -> Result<&'static Item, String> {
-    let base = offer
-        .item
-        .as_deref()
-        .and_then(item)
-        .ok_or("That item is not for sale.")?;
+fn item_offer(c: &Character, offer: &Offer) -> Option<(&'static Item, u32)> {
+    let base = offer.item.as_deref().and_then(item)?;
     let stock = if offer.tiered {
         base.family
             .as_deref()
@@ -43,6 +35,29 @@ pub(super) fn purchase_items(
     } else {
         base
     };
+    let price = if offer.tiered { stock.price } else { offer.cost };
+    Some((stock, c.npc_price(price)))
+}
+
+pub(super) fn stock_prices<'a>(c: &Character, npc: &'a Npc) -> BTreeMap<&'a str, u32> {
+    npc.offers.iter().filter_map(|offer| {
+        let price = if let Some(id) = &offer.bag {
+            c.npc_price(item(id)?.price)
+        } else if offer.mount.is_some() {
+            c.npc_price(offer.cost)
+        } else {
+            item_offer(c, offer)?.1
+        };
+        Some((offer.id.as_str(), price))
+    }).collect()
+}
+
+pub(super) fn purchase_items(
+    c: &mut Character,
+    offer: &Offer,
+    quantity: u32,
+) -> Result<&'static Item, String> {
+    let (stock, price) = item_offer(c, offer).ok_or("That item is not for sale.")?;
     if stock.kind == "weapon" && stock.class.is_some_and(|class| class != c.look.class) {
         return Err("This weapon is for another class.".into());
     }
@@ -52,11 +67,6 @@ pub(super) fn purchase_items(
     if quantity == 0 {
         return Err("Enter a positive purchase quantity.".into());
     }
-    let price = if offer.tiered {
-        stock.price
-    } else {
-        offer.cost
-    };
     let cost = price
         .checked_mul(quantity)
         .ok_or("That purchase costs too much.")?;
@@ -449,14 +459,16 @@ impl World {
                 .map(|s| json!({"item":s.item,"quantity":s.quantity}))
                 .collect::<Vec<_>>()
         });
-        let _ = p
-            .peer
-            .try_send(json!({"type":"shop","npc":npc,"ok":ok,"notice":notice,
+        let mut reply = json!({"type":"shop","npc":npc,"ok":ok,"notice":notice,
             "paid":if ok {paid} else {0},"spent":if ok {spent} else {0},"changed":ok && changed,
             "available":available,"discardable":discardable,"buyBack":p.shop.merchants.get(npc).cloned().unwrap_or_default(),
             "goldPercent":c.rebirth_gold_percent(),"gold":c.gold,"inventory":c.inventory,
             "gearInstances":c.gear_instances,"equipment":c.equipment,"bags":c.bags,
-            "bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used()}));
+            "bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"level":c.level});
+        if c.look.race == Race::Gnome {
+            reply["stockPrices"] = json!(stock_prices(c, merchant));
+        }
+        let _ = p.peer.try_send(reply);
     }
 }
 
@@ -590,6 +602,54 @@ mod tests {
             .filter(|g| g.item == PIECE)
             .cloned()
             .collect()
+    }
+
+    #[test]
+    fn racial_gnome_shop_quotes_match_single_stock_bulk_bags_and_buyback() {
+        let (mut w, mut rx, token) = fixture();
+        let smith = w.maps[0].npcs.iter().find(|n| n.id == "smith").unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.race = Race::Gnome;
+        c.level = 20;
+        let sword = "buy_green_weapon_warrior";
+        let offer = smith.offers.iter().find(|offer| offer.id == sword).unwrap();
+        let (stock, quote) = item_offer(c, offer).unwrap();
+        let discounted = (f64::from(stock.price) * 0.9).round() as u32;
+        assert!(discounted < stock.price);
+        assert_eq!(quote, discounted);
+        let reply = message(&mut w, &mut rx, Request::Buy(sword.into(), 2));
+        assert_eq!(reply["ok"], true, "{reply}");
+        assert_eq!(reply["stockPrices"][sword], discounted);
+        assert_eq!(reply["spent"], 2 * discounted);
+
+        let sale = message(&mut w, &mut rx, Request::Sell(vec![line("slime_gel", 1, None)]));
+        let paid = item("slime_gel").unwrap().sell;
+        assert_eq!(sale["paid"], paid);
+        let id = sale["buyBack"][0]["id"].as_u64().unwrap();
+        let back = message(&mut w, &mut rx, Request::BuyBack(id));
+        assert_eq!(back["spent"], paid);
+
+        let merchant = w.maps[0].npcs.iter().find(|n| n.id == "merchant").unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        (c.x, c.y) = (merchant.x, merchant.y);
+        let bags = merchant_message(&mut w, &mut rx, "merchant", Request::Buy("satchel".into(), 2));
+        assert_eq!(bags["stockPrices"]["satchel"], 450);
+        assert_eq!(bags["spent"], 900);
+        let saved = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(saved.gold, 10000 - 2 * discounted - 900);
+        assert_eq!(saved.bags, ["linen_satchel", "linen_satchel"]);
+
+        let at = w.maps[0].npcs.iter().find(|n| n.id == "apothecary").unwrap().position_at(w.time);
+        let p = w.players.get_mut(&1).unwrap();
+        (p.character.x, p.character.y) = (at.x, at.y);
+        p.character.level = 1;
+        let gold = p.character.gold;
+        w.time += 1.;
+        w.interact(1, "apothecary", Some("buy_health_potion"));
+        let dialogue = std::iter::from_fn(|| rx.try_recv().ok()).find(|v| v["type"] == "dialogue").unwrap();
+        let unit = (f64::from(item("health_potion").unwrap().price) * 0.9).round() as u32;
+        assert_eq!(dialogue["stockPrices"]["buy_health_potion"], unit);
+        assert_eq!(dialogue["gold"], gold - unit);
     }
 
     #[test]

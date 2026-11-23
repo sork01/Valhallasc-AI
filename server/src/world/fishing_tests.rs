@@ -32,6 +32,34 @@ fn cast(w: &mut World, time: f64) -> f64 {
 }
 
 #[test]
+fn racial_tidekin_shortens_the_wait_for_water_bites_only() {
+    let (mut w, _rx) = angler();
+    w.world_clock.set(Some(12.), true).unwrap();
+    w.maps[1].fishing_spots.clear();
+    w.maps[1].objects =
+        vec![serde_json::from_value(json!({"kind":"lava","x":53.,"y":50.,"r":2.})).unwrap()];
+    for (zone, phase) in [(0, 0.9), (1, 1.0)] {
+        w.weather.set(zone, "clear", None, daynight::unix_ms()).unwrap();
+        if zone == 1 {
+            let p = w.players.get_mut(&1).unwrap();
+            (p.character.zone, p.character.x, p.character.y) = (1, 50., 50.);
+            p.character.level = 5;
+            p.character.add_item("rod_emberline_rod", 1);
+        }
+        let mut wait = Vec::new();
+        for race in [Race::Human, Race::Tidekin] {
+            let p = w.players.get_mut(&1).unwrap();
+            p.fishing = Default::default();
+            p.character.look.race = race;
+            w.rng = 123;
+            let bite = cast(&mut w, 20.);
+            wait.push(bite - 20.5);
+        }
+        assert!((wait[0] * phase - wait[1]).abs() < 1e-9, "{zone}: {wait:?}");
+    }
+}
+
+#[test]
 fn fishing_deadline_bags_save_and_privacy() {
     let (mut w, mut rx) = angler();
     w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, 2];

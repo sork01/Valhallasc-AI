@@ -401,7 +401,7 @@ fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
     assert!(c.quests[0].claimed);
     let want = (xp_to_level(5) / 10, 100);
     assert_eq!(c.xp - xp, c.boosted_xp(want.0));
-    assert_eq!(c.gold - gold, c.boosted_gold(want.1));
+    assert_eq!(c.gold - gold, c.quest_gold(want.1));
     assert!(c.gold - gold > 100);
     let said: Vec<String> = std::iter::from_fn(|| rx.try_recv().ok())
         .filter_map(|v| {
@@ -415,7 +415,7 @@ fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
         said.iter().any(|t| t.contains(&format!(
             "+{} XP and +{}",
             c.boosted_xp(want.0),
-            crate::model::money_text(c.boosted_gold(want.1))
+            crate::model::money_text(c.quest_gold(want.1))
         ))),
         "the message names what was paid: {said:?}"
     );
@@ -445,6 +445,24 @@ fn a_quest_pays_the_bonus_and_pays_again_after_a_rebirth() {
     let c = &w.players[&1].character;
     assert!(c.quests[0].claimed && c.quests[0].completions == 1);
     assert!(c.gold > gold && c.xp > xp, "paid a second time");
+}
+
+#[test]
+fn racial_human_coin_bonus_pays_on_quest_claims_only() {
+    for (race, expected) in [(Race::Human, 105), (Race::Mothkin, 100), (Race::Tidekin, 100), (Race::Gnome, 100)] {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.race = race;
+        c.level = 5;
+        c.gold = 0;
+        assert_eq!(c.boosted_gold(100), 100);
+        w.step();
+        claim_onward(&mut w);
+        let p = &w.players[&1];
+        assert_eq!(p.character.gold, expected, "{race:?}");
+        assert_eq!(p.snapshot()["questGoldPercent"], expected - 100);
+    }
 }
 
 #[test]

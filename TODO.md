@@ -9,7 +9,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 ## Open tasks
 
 - [x] `RACIAL-PASSIVES-RULES` — Owner choices (2026-11-23). Gnomes get 10% off NPC shop stock and bulk purchases, equipment repairs and Spark Travel fares. Player trade and vendor sell prices keep their usual rates. Humans get 5% more coin from quest turn-ins. Mothkin gather alchemy flowers 15% faster at night. Tidekin wait 10% less time for bites in water with the usual catch and loot rules.
-- [ ] `RACIAL-PASSIVES` — Implement the four passives on `feat/playable-race`. Show the passive in the creator and Character pane. Check the purchase quotes, rewards and timers against the actual transaction rules.
+- [x] `RACIAL-PASSIVES` — Available in the 1.11.0 branch candidate. The creator and Character pane show each race's passive. Verified the pricing, quest claims and gathering timers with 15 focused Rust tests, plus bounded creator, shop and quest payout browser checks. All six new Rust tests and both browser price and reward checks caught disabled effects.
 
 - [x] `GNOME-RULES` — Owner decisions (2026-11-23): add Gnomes from the Obsidian Orrery with clockwork motifs, a compact silhouette at 67% of Human height and 76% of Human width, and standard collision, class skills and stats. Upload a front-and-back comparison with a Human in matching gear. Continue on `feat/playable-race`.
 - [x] `GNOME-PLAYABLE` — Available in the 1.10.0 branch candidate for both bodies and all five classes. Verified desktop and touch creation, guest and account reconnects, standard collision, gear scaling across 2,720 poses, 32 horse and seahorse poses, and the Shadowstep afterimage.

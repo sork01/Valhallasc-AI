@@ -754,6 +754,8 @@ impl Player {
         view["equippedLook"] = json!(c.look);
         view["transmogs"] = json!(c.wardrobe.slots);
         view["abandonedQuests"] = json!(c.abandoned_quests);
+        view["questGoldPercent"] = json!(c.quest_gold_percent());
+        view["npcDiscountPercent"] = json!(c.npc_discount_percent());
         view["seasonalClaims"] = json!(c.seasonal_claims);
         view["seasonalRolls"] = json!(c.seasonal_rolls);
         if let Some(line) = self.fishing.line {
@@ -3805,6 +3807,7 @@ impl World {
                     "You are already at full health. Save it for after your next adventure!".into();
                     } else if let Some(def) = offer.mount.as_deref().and_then(mount_def) {
                         let c = &mut p.character;
+                        let price = c.npc_price(offer.cost);
                         let needed = offer
                             .needs
                             .as_deref()
@@ -3818,10 +3821,10 @@ impl World {
                             );
                         } else if needed.is_some_and(|(id, _)| c.quantity(id) == 0) {
                             notice = format!("You need a {} for this.", needed.unwrap().1);
-                        } else if c.gold < offer.cost {
-                            notice = format!("You need {} for the {}.", money_text(offer.cost), def.name);
+                        } else if c.gold < price {
+                            notice = format!("You need {} for the {}.", money_text(price), def.name);
                         } else {
-                            c.gold -= offer.cost;
+                            c.gold -= price;
                             if let Some((id, _)) = needed {
                                 c.consume_item(id, 1);
                             }
@@ -3893,6 +3896,9 @@ impl World {
         }
         let mut dialogue = json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"abandonedQuests":p.character.abandoned_quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look});
         dialogue["transmogs"] = json!(p.character.wardrobe.slots);
+        if p.character.look.race == Race::Gnome {
+            dialogue["stockPrices"] = json!(shop::stock_prices(&p.character, npc));
+        }
         if npc.offers.iter().any(|o| o.id == "transmogrify") {
             dialogue["wardrobe"] = json!(p.character.wardrobe.unlocked);
             dialogue["transmogPrice"] = json!(p.character.transmog_price());
@@ -7234,7 +7240,7 @@ fn quest_action_with_choice(
             *character = next;
             character.quests[i].claimed = true;
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
-            let gold = character.boosted_gold(quest.reward_gold);
+            let gold = character.quest_gold(quest.reward_gold);
             character.gold = character.gold.saturating_add(gold);
             let (xp, levels) = character.reward_xp(quest.reward_xp);
             (
@@ -7877,7 +7883,7 @@ mod tests {
         );
         let saved = w.store.load(&token).unwrap().unwrap();
         assert_eq!(saved.quantity(reward), 1);
-        assert_eq!(saved.gold, gold + q.reward_gold);
+        assert_eq!(saved.gold, gold + saved.quest_gold(q.reward_gold));
         assert!(
             saved
                 .quests
@@ -8937,13 +8943,13 @@ mod tests {
         quest_interact(&mut w, "crags_supplier", None);
         assert_eq!(w.players[&1].character.quests[0].counts, vec![1, 1, 1]);
         quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_welcome"));
-        assert_eq!(w.players[&1].character.gold, 40);
+        assert_eq!(w.players[&1].character.gold, 42);
         assert_eq!(
             w.store.load(token).unwrap().unwrap().quests[0].completions,
             1
         );
         quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_welcome"));
-        assert_eq!(w.players[&1].character.gold, 40, "no duplicate reward");
+        assert_eq!(w.players[&1].character.gold, 42, "no duplicate reward");
         quest_interact(&mut w, "crags_scout", Some("quest:accept:crags_wisps"));
         assert_eq!(w.players[&1].character.quests[1].counts, vec![0]);
     }
@@ -10849,7 +10855,7 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.zone = CITY;
         quest_interact(&mut w, "city_herald", Some("quest:claim:city_seals"));
         let c = &w.players[&1].character;
-        assert_eq!(c.gold, 520);
+        assert_eq!(c.gold, 546);
         assert!(c.quests[1].claimed && c.quests[1].completions == 1);
         // Kills are still credited only inside the killer's own zone: a kill in the glacier touches no city quest.
         let mut c2 = c.clone();
@@ -10944,7 +10950,7 @@ mod tests {
         give(&mut w, &gel, 4);
         quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
         let c = &w.players[&1].character;
-        assert_eq!(c.gold, 480, "reward paid");
+        assert_eq!(c.gold, 504, "reward paid");
         // Exactly 8 and 4 were taken, and the copies left over (1 gel, 4 blue) are discarded: no other quest needs them.
         assert_eq!((c.quantity(&gel), c.quantity(&blue)), (0, 0));
         assert!(
@@ -10999,7 +11005,7 @@ mod tests {
             // Accepting again starts from nothing: neither the handed-in copies nor the discarded spare are left.
             assert_eq!(counts(&w, "city_order"), vec![0, 0]);
         }
-        assert_eq!(w.players[&1].character.gold, 2 * 540);
+        assert_eq!(w.players[&1].character.gold, 2 * 567);
     }
 
     #[test]
@@ -11116,7 +11122,7 @@ mod tests {
             .quests
             .iter()
             .filter(|q| in_chain(q))
-            .map(|q| q.reward_gold)
+            .map(|q| c.quest_gold(q.reward_gold))
             .sum();
         assert_eq!(c.gold, gold, "every reward paid once");
         assert!(
@@ -11779,12 +11785,12 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.xp = 95;
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         let c = &w.players[&1].character;
-        assert_eq!((c.level, c.xp, c.gold), (2, 5, 12));
+        assert_eq!((c.level, c.xp, c.gold), (2, 5, 13));
         assert_eq!(c.hp, c.max_hp());
         assert!(c.quests[0].claimed);
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         quest_interact(&mut w, "guide", Some("quest:accept:welcome"));
-        assert_eq!(w.players[&1].character.gold, 12);
+        assert_eq!(w.players[&1].character.gold, 13);
         assert_eq!(w.players[&1].character.quests[0].completions, 1);
     }
 
@@ -11823,7 +11829,7 @@ mod tests {
         w.slimes[king] = Slime::new(king, &w.maps[0].slimes[king]);
         w.hit_slime(king, 1, 1000., false);
         quest_interact(&mut w, "gatekeeper", Some("quest:claim:king_challenge"));
-        assert_eq!(w.players[&1].character.gold, 24 + 35 + 60);
+        assert_eq!(w.players[&1].character.gold, 25 + 37 + 63);
     }
 
     #[test]
@@ -11855,18 +11861,18 @@ mod tests {
         }
         quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
         let saved = w.store.load(&token).unwrap().unwrap(); // Claim saves immediately.
-        assert_eq!(saved.gold, 49);
+        assert_eq!(saved.gold, 51);
         assert_eq!(saved.quests[1].completions, 1);
         w.players.get_mut(&1).unwrap().character = saved;
         quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
-        assert_eq!(w.players[&1].character.gold, 49);
+        assert_eq!(w.players[&1].character.gold, 51);
         quest_interact(&mut w, "merchant", Some("quest:accept:meadow_bounty"));
         let saved = w.store.load(&token).unwrap().unwrap();
         assert_eq!(saved.quests[1].counts, vec![0]);
         assert!(!saved.quests[1].claimed);
         assert_eq!(saved.quests[1].completions, 1);
         quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
-        assert_eq!(w.players[&1].character.gold, 49);
+        assert_eq!(w.players[&1].character.gold, 51);
     }
 
     #[test]
@@ -14861,7 +14867,7 @@ mod tests {
             .quests
             .iter()
             .filter(|q| claimed.contains(&q.id.as_str()))
-            .map(|q| q.reward_gold)
+            .map(|q| ch(&w).quest_gold(q.reward_gold))
             .sum();
         assert_eq!(ch(&w).gold, gold);
         assert!(
@@ -14905,7 +14911,7 @@ mod tests {
             .quests
             .iter()
             .filter(|q| claimed.contains(&q.id))
-            .map(|q| q.reward_gold)
+            .map(|q| ch(&w).quest_gold(q.reward_gold))
             .sum();
         assert_eq!(ch(&w).gold, reward_gold);
         for id in &claimed {
@@ -15892,6 +15898,26 @@ mod tests {
             .find(|g| g.item == "necklace_upgrade")
             .unwrap()
             .wear
+    }
+
+    #[test]
+    fn racial_gnome_repair_quote_matches_single_and_bulk_costs() {
+        let (mut w, mut rx) = debug_world();
+        wear_necklace(&mut w, 40);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.race = Race::Gnome;
+        c.gold = 50;
+        stand_at(&mut w, 1, "smith");
+        drain(&mut rx);
+        w.interact(1, "smith", None);
+        let quote = packets(&mut rx, "dialogue").pop().unwrap();
+        assert_eq!(quote["repairQuote"][0][1], 22);
+        let id = quote["repairQuote"][0][0].as_u64().unwrap();
+        w.interact(1, "smith", Some(&format!("repair:{id}")));
+        assert_eq!((necklace_wear(&w), ch(&w).gold), (0, 28));
+        wear_necklace(&mut w, 40);
+        w.interact(1, "smith", Some("repair_all"));
+        assert_eq!((necklace_wear(&w), ch(&w).gold), (0, 6));
     }
     fn notices(rx: &mut mpsc::Receiver<Value>) -> Vec<String> {
         packets(rx, "notice")

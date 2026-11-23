@@ -14762,5 +14762,15 @@
   "Tidekin": "Tidvattenfolk",
   "Play as Tidekin from Rán's Deep, with sea-green skin, finned ears and pearlescent gill markings. Choose Tidekin when creating a character of any class.": "Spela som tidvattenfolk från Rán's Deep, med havsgrön hud, fenöron och pärlemorskimrande gältecken. Du kan välja tidvattenfolket när du skapar en karaktär av valfri klass.",
   "Gnome": "Gnom",
-  "Play as a Gnome from the Obsidian Orrery. Gnomes are 67% as tall and 76% as wide as Humans, and all their equipment fits their smaller frame.": "Spela som en gnom från The Obsidian Orrery. Gnomer är 67 procent så långa och 76 procent så breda som människor, och all deras utrustning passar den mindre kroppen."
+  "Play as a Gnome from the Obsidian Orrery. Gnomes are 67% as tall and 76% as wide as Humans, and all their equipment fits their smaller frame.": "Spela som en gnom från The Obsidian Orrery. Gnomer är 67 procent så långa och 76 procent så breda som människor, och all deras utrustning passar den mindre kroppen.",
+  "Passive": "Passiv",
+  "Resourcefulness": "Rådighet",
+  "Earn 5% more coin from quest turn-ins.": "Få 5 procent fler mynt när du lämnar in uppdrag.",
+  "Moonlit Forager": "Månskensplockare",
+  "Gather alchemy flowers 15% faster during the world’s night.": "Plocka alkemiblommor 15 procent snabbare under spelets natt.",
+  "Water Sense": "Vattensinne",
+  "Wait 10% less time for a bite when fishing in water.": "Vänta 10 procent kortare tid på napp när du fiskar i vatten.",
+  "Haggler": "Prutare",
+  "Pay 10% less for shop stock, equipment repairs, and Spark Travel.": "Betala 10 procent mindre för butiksvaror, reparation av utrustning och gnistresor.",
+  "Every race has a passive ability. Humans earn 5% more quest coin, Mothkin gather flowers 15% faster at night, and Tidekin wait 10% less for bites in water. Gnomes pay 10% less for shop stock, repairs, and Spark Travel.": "Varje folkslag har en passiv förmåga. Människor får 5 procent fler mynt från uppdrag, nattfjärilsfolk plockar blommor 15 procent snabbare på natten och tidvattenfolk väntar 10 procent kortare tid på napp i vatten. Gnomer betalar 10 procent mindre för butiksvaror, reparationer och gnistresor."
 }

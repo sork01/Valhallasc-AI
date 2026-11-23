@@ -74,8 +74,10 @@
     return (npc?.offers || []).filter(isStockOffer).map(offer => {
       const mount = offer.mount && window.Mounts?.MOUNTS.find(m => m.id === offer.mount);
       let item = mount ? { id: `mount:${mount.id}`, name: mount.name, kind: 'mount_licence', mount: mount.id, requiredLevel: mount.level, rarity: 'common', sell: 0 } : Inventory.definition(offer.item || offer.bag);
-      if (offer.tiered && item?.family) item = WORLD_ITEMS.filter(i => i.family === item.family && (i.requiredLevel || 1) <= (packet?.level || 1)).sort((a,b) => b.requiredLevel-a.requiredLevel)[0] || item;
-      return {offer,item,cost:offer.tiered || offer.bag ? item?.price : offer.cost};
+      const level = data?.level ?? packet?.level ?? 1;
+      if (offer.tiered && item?.family) item = WORLD_ITEMS.filter(i => i.family === item.family && (i.requiredLevel || 1) <= level).sort((a,b) => b.requiredLevel-a.requiredLevel)[0] || item;
+      const quote = (data?.stockPrices ?? packet?.stockPrices)?.[offer.id];
+      return {offer,item,cost:quote ?? (offer.tiered || offer.bag ? item?.price : offer.cost)};
     }).filter(({item}) => item && (item.kind !== 'weapon' || !item.class || item.class === Field.hero.look.class));
   }
   function maximumPurchase({ offer, item, cost }) {
@@ -263,7 +265,7 @@
       if (!npc) return;
       const merchant = City.npcs.find(n => n.id === npc.id);
       if (!c || c.dead || c.sparkTravel || (c.zone || 0) !== zone || !merchant || Math.hypot(c.x - merchant.x, c.y - merchant.y) > 3.2) { close(); City.close(); return; }
-      const nextKey = JSON.stringify([c.inventory, c.gearInstances, c.equipment, c.gold, c.rebirthTiers, c.quests, c.abandonedQuests]);
+      const nextKey = JSON.stringify([c.inventory, c.gearInstances, c.equipment, c.gold, c.level, c.rebirthTiers, c.quests, c.abandonedQuests]);
       if (npc.buys && nextKey !== snapshotKey && !pending && !warning && !quantityDialog) { snapshotKey = nextKey; request(); }
     },
   };

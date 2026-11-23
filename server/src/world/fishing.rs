@@ -448,7 +448,8 @@ impl World {
             * (1. - 0.06 * f64::from(rod.tier - 1))
             * if rich { 0.75 } else { 1. }
             * if rain { 0.85 } else { 1. }
-            * if twilight { 0.9 } else { 1. };
+            * if twilight { 0.9 } else { 1. }
+            * if c.look.race == Race::Tidekin && !lava { 0.9 } else { 1. };
         let bonus = (1. + p.buff(BuffKind::FishingLuck))
             * (1. + 0.1 * f64::from(rod.tier - 1))
             * if rich { 3. } else { 1. }

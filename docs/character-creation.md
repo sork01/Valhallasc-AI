@@ -111,6 +111,24 @@ scale. Headgear covers the brasswork.
 The PixelFlow source for the brasswork is `47c3c9871c597c7a`. Use
 `python3 scripts/make_gnome_art.py export` or `verify`.
 
+## Racial passives (1.11.0)
+
+The creator shows the selected race's passive. The Character pane shows
+the saved character's passive. Races keep the normal class skills and combat stats.
+
+| Race | Passive | Effect |
+| --- | --- | --- |
+| Human | Resourcefulness | 5 percentage points more quest coin, added to the Rebirth coin bonus. The quest offer and journal show the calculated payout. |
+| Mothkin | Moonlit Forager | Flower gathering runs at 115% speed if started from 20:00 through 04:59 on the world clock. The speed is set when the pick starts and applies to the pick's duration. |
+| Tidekin | Water Sense | Waiting for a bite in water takes 90% of the usual time. It multiplies the existing bite-rate modifiers and leaves the casting and bite windows, loot, and lava timing at their normal values. |
+| Gnome | Haggler | 10% off NPC stock, equipment repairs, and Spark Travel. NPC stock includes bulk orders, fitted bags and mounts sold at shops. Spark fares apply Haggler after Rebirth. |
+
+Coin bonuses and discounts round to the nearest copper. A positive price
+costs at least one copper. Stock discounts are applied per unit and repairs
+per physical copy, so the bulk totals match the displayed prices. Vendor
+offers and shop replies quote the same discounted amount used by the
+purchase action. Buyback charges the exact original sale amount.
+
 ## Race checks
 
 `tests/playable-race-art.cjs` checks the races in the real compositor and

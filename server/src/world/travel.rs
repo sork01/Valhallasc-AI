@@ -719,6 +719,25 @@ mod spark_tests {
     }
 
     #[test]
+    fn racial_gnome_spark_route_quote_and_charge_take_ten_percent_off() {
+        let (mut w, _, _) = world(Class::Mage);
+        for id in [A, B, C] {
+            talk(&mut w, id);
+        }
+        stand(&mut w, A);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.race = Race::Gnome;
+        c.gold = 35;
+        let destination = w.spark_options(1, A).into_iter().find(|row| row["id"] == C).unwrap();
+        assert_eq!(destination["cost"], 36);
+        assert_eq!(destination["available"], false);
+        assert!(w.spark_start(1, A, C).is_err());
+        w.players.get_mut(&1).unwrap().character.gold = 36;
+        w.spark_start(1, A, C).unwrap();
+        assert_eq!(w.players[&1].character.gold, 0);
+    }
+
+    #[test]
     fn spark_follows_every_stop_at_three_times_each_class_speed_and_lands_on_clear_ground() {
         for class in [
             Class::Warrior,

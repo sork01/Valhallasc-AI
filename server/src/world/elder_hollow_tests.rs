@@ -297,7 +297,7 @@ fn elder_hollow_boss_kills_credit_living_party_in_copy_and_drop_exclusive_gear()
     let gold = character.gold;
     let (message, _, changed) = quest_action(character, &quest, "claim");
     assert!(changed, "{message}");
-    assert_eq!(character.gold, gold + quest.reward_gold);
+    assert_eq!(character.gold, gold + character.quest_gold(quest.reward_gold));
     assert!(
         character
             .inventory

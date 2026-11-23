@@ -68,6 +68,36 @@ fn pick(w: &mut World, session: u64, patch: FlowerPatch) {
 }
 
 #[test]
+fn racial_mothkin_pick_speed_uses_night_at_the_start_and_the_actual_channel() {
+    let (mut w, _) = fixture();
+    train(&mut w, 1);
+    w.ensure_flowers(0);
+    let patch = w.flower_patches[&0][0];
+    for (race, hour, time) in [
+        (Race::Human, 20., 1.5),
+        (Race::Mothkin, 19.99, 1.5),
+        (Race::Mothkin, 5., 1.5),
+        (Race::Mothkin, 20., 1.5 / 1.15),
+    ] {
+        w.world_clock.set(Some(hour), true).unwrap();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.look.race = race;
+        p.picking = None;
+        pick(&mut w, 1, patch);
+        let until = w.players[&1].picking.unwrap().until;
+        assert!((until - w.time - time).abs() < 1e-9, "{race:?} at {hour}");
+    }
+    w.world_clock.set(Some(5.), true).unwrap();
+    let until = w.players[&1].picking.unwrap().until;
+    w.time = until - 0.01;
+    w.update_picking(1);
+    assert_eq!(w.players[&1].character.quantity(MEADOW), 0);
+    w.time = until;
+    w.update_picking(1);
+    assert!(w.players[&1].character.quantity(MEADOW) > 0);
+}
+
+#[test]
 fn alchemy_environment_pools_have_walkable_replacements_and_workshops() {
     let (mut w, _) = fixture();
     assert_eq!(PATCHES.len(), 25);

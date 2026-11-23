@@ -48,11 +48,12 @@ fn seasonal_quests_pay_once_each_year_and_save_the_claim_year() {
         .unwrap()
         .counts = vec![1; q.objectives.len()];
     talk(&mut w, &q, "claim");
-    assert_eq!(w.players[&1].character.gold, before + q.reward_gold);
+    let reward = w.players[&1].character.quest_gold(q.reward_gold);
+    assert_eq!(w.players[&1].character.gold, before + reward);
     assert_eq!(w.players[&1].character.seasonal_claims[&q.id], 2026);
     talk(&mut w, &q, "accept");
     talk(&mut w, &q, "claim");
-    assert_eq!(w.players[&1].character.gold, before + q.reward_gold);
+    assert_eq!(w.players[&1].character.gold, before + reward);
     let roundtrip: Character =
         serde_json::from_value(serde_json::to_value(&w.players[&1].character).unwrap()).unwrap();
     assert_eq!(roundtrip.seasonal_claims[&q.id], 2026);
@@ -62,7 +63,7 @@ fn seasonal_quests_pay_once_each_year_and_save_the_claim_year() {
     assert!(!c.quests.iter().find(|g| g.id == q.id).unwrap().claimed);
     c.quests.iter_mut().find(|g| g.id == q.id).unwrap().counts = vec![1; q.objectives.len()];
     talk(&mut w, &q, "claim");
-    assert_eq!(w.players[&1].character.gold, before + 2 * q.reward_gold);
+    assert_eq!(w.players[&1].character.gold, before + 2 * reward);
     assert_eq!(w.players[&1].character.seasonal_claims[&q.id], 2027);
 }
 #[test]

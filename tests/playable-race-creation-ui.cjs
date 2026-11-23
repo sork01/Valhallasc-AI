@@ -40,7 +40,9 @@ world.startLevel = 1;
       await page.goto(world.url);
       await openGuest();
       const race = page.locator('#create-race');
+      const passive = page.locator('#create-racial-passive strong');
       assert.equal(await race.inputValue(), 'human');
+      assert.equal(await passive.textContent(), touch ? 'Rådighet' : 'Resourcefulness');
       assert.equal(await race.getAttribute('aria-label'), touch ? 'Folkslag' : 'Race');
       assert.deepEqual(await race.locator('option').allTextContents(),
         touch ? ['Människa', 'Nattfjärilsfolk', 'Tidvattenfolk', 'Gnom'] : ['Human', 'Mothkin', 'Tidekin', 'Gnome']);
@@ -48,15 +50,19 @@ world.startLevel = 1;
       const swatch = page.locator('button[data-k="skin"][data-v="0"]');
       const humanSwatch = await swatch.evaluate(button => button.style.getPropertyValue('--c'));
       await race.selectOption('mothkin');
+      assert.equal(await passive.textContent(), touch ? 'Månskensplockare' : 'Moonlit Forager');
       const mothkinSwatch = await swatch.evaluate(button => button.style.getPropertyValue('--c'));
       assert.notEqual(mothkinSwatch, humanSwatch, 'Mothkin have their own skin palette');
       await race.selectOption('human');
       assert.equal(await swatch.evaluate(button => button.style.getPropertyValue('--c')), humanSwatch);
       await race.selectOption('tidekin');
+      assert.equal(await passive.textContent(), touch ? 'Vattensinne' : 'Water Sense');
       const tidekinSwatch = await swatch.evaluate(button => button.style.getPropertyValue('--c'));
       assert.notEqual(tidekinSwatch, humanSwatch, 'Tidekin have their own skin palette');
       assert.notEqual(tidekinSwatch, mothkinSwatch, 'Tidekin and Mothkin use different skin palettes');
       await race.selectOption('gnome');
+      assert.equal(await passive.textContent(), touch ? 'Prutare' : 'Haggler');
+      assert.match(await page.locator('#create-racial-passive').textContent(), touch ? /gnistresor/ : /Spark Travel/);
       assert.equal(await swatch.evaluate(button => button.style.getPropertyValue('--c')), humanSwatch,
         'Gnomes can use the usual skin palette');
       await page.locator('#cls-assassin').click();
@@ -75,6 +81,11 @@ world.startLevel = 1;
       assert.equal(await page.evaluate(() => Field.hero.look.race), 'gnome');
       assert.equal(await page.evaluate(() => Field.hero.look.class), 'assassin');
       assert.equal(await page.evaluate(() => Field.hero.look.skin), 3);
+      await page.evaluate(() => CharacterPane.open('stats'));
+      const sheetPassive = page.locator('#character-racial-passive strong');
+      await sheetPassive.waitFor();
+      assert.equal(await sheetPassive.textContent(), touch ? 'Prutare' : 'Haggler');
+      await page.evaluate(() => CharacterPane.close());
       if (!touch) {
         await page.waitForFunction(() => !!Field.assassinSprites);
         const shadow = await page.evaluate(() => {

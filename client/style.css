@@ -151,6 +151,8 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 }
 .runeglow { animation: pulse 2.4s ease-in-out infinite; }
 .tip { margin: .9cqw 0 0; font-size: 1cqw; text-align: center; opacity: .8; color: #fff3c4; }
+#create-racial-passive { margin: .4cqw 0 .65cqw; font-size: max(11px, 1.05cqw); }
+.racial-passive strong { color: #ffda84; }
 
 .cc-desc { left: 50%; top: 40.6cqw; width: 42cqw; transform: translateX(-50%); display: flex; align-items: center; gap: 1.6cqw; padding: .8cqw 1.4cqw; }
 .cc-desc-text { flex: 1; }

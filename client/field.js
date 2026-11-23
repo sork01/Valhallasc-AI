@@ -1754,6 +1754,7 @@
     window.CharacterPane?.updateProfessions?.(own.professions);
     window.Inventory?.update(own.inventory || [], own.equippedLook || own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {}, own.transmogs || {});
     window.Quests?.setBells(own.bells || []);
+    hero.questGoldPercent = own.questGoldPercent ?? 0;
     window.Quests?.update(own.quests || [], own.abandonedQuests || []);
     if(seasonChanged)window.City?.refresh();
     const isGhost = !!(hero.dead && hero.ghost);

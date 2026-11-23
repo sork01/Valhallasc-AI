@@ -3,6 +3,7 @@
 // for the ones not owned, and a Select button on the owned ones. The server owns ownership and the selection
 // (docs/mounts.md); this only shows them and sends `select_mount`.
 (() => {
+  const vendorPrice = (hero, copper) => Money.text(Math.max(1, Math.round(copper * (100 - (hero.npcDiscountPercent || 0)) / 100)));
   const MOUNTS = [
     {id:'seahorse',name:'Seahorse',level:35,route:'Quest: A Friend Beneath the Tide, from Brynja the Tidehealer in Rán\'s Deep',cost:'Bring 10 Pier Sprat and 5 Saltby Herring caught at Saltby or another sea coast. Underwater only.'},
     {id:'roseheart',name:'Roseheart Unicorn',level:1,route:'Valentine: defeat the Briarheart with five fighters in Rimeveil Glacier',cost:'Guaranteed when you claim the daily quest'},
@@ -11,11 +12,11 @@
     {id:'springtide',name:'Springtide Bunny',level:1,route:'Easter: defeat the Bloomwarden with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'reindeer',name:'Red-nosed Reindeer',level:1,route:'Christmas: summon the Grinch with five fighters in Rimeveil Glacier',cost:'One independent 5% chance per eligible hero per day'},
     {id:'nightmare',name:'Nightmare Steed',level:1,route:'Halloween: summon the Hollow Rider with five fighters in Gloamfen',cost:'One independent 1% chance per eligible hero per day'},
-    { id: 'horse', name: 'Riding horse', level: 50, route: 'Buy from Stable-hand Greta in Skaldholm', cost: Money.text(500000) },
+    { id: 'horse', name: 'Riding horse', level: 50, route: 'Buy from Stable-hand Greta in Skaldholm', cost: hero => vendorPrice(hero, 500000) },
     { id: 'raptor', name: 'Raptor', level: 75, route: 'Quest chain The Banyan Run, from Mara Vines in the Tanglecrown', cost: 'no gold fee' },
-    { id: 'lizard', name: 'Lizard', level: 80, route: 'Buy from the Dune-wrangler in the Lapis Erg hub', cost: Money.text(160000) },
+    { id: 'lizard', name: 'Lizard', level: 80, route: 'Buy from the Dune-wrangler in the Lapis Erg hub', cost: hero => vendorPrice(hero, 160000) },
     { id: 'sabertooth', name: 'Sabertooth', level: 95, route: 'Rare drop: Sabertooth Whistle from the Rimesaber in the Yearwheel', cost: '4% per kill' },
-    { id: 'gryphon', name: 'Gryphon', level: 95, route: 'Dungeon reward: Gryphon Egg from the Thunderheart Gate\'s final boss, hatched by Oren Highwind in the Cairnspine', cost: `3% per kill and ${Money.text(250000)} to hatch; also earned by defeating all ten Chained Forge bosses` },
+    { id: 'gryphon', name: 'Gryphon', level: 95, route: 'Dungeon reward: Gryphon Egg from the Thunderheart Gate\'s final boss, hatched by Oren Highwind in the Cairnspine', cost: hero => `3% per kill and ${vendorPrice(hero, 250000)} to hatch; also earned by defeating all ten Chained Forge bosses` },
   ];
   const byId = Object.fromEntries(MOUNTS.map(m => [m.id, m]));
   let hero = null, signature = '';
@@ -23,7 +24,7 @@
   function render() {
     const host = document.getElementById('character-mounts'); if (!host || !hero) return;
     const owned = hero.mounts || [], selected = hero.mount || '';
-    const key = JSON.stringify([owned, selected, hero.level, !!hero.dead, !!hero.sparkTravel]);
+    const key = JSON.stringify([owned, selected, hero.level, !!hero.dead, !!hero.sparkTravel, hero.npcDiscountPercent]);
     if (key === signature && host.childElementCount) return;
     signature = key;
     host.replaceChildren(node('h4', 'Mounts'));
@@ -32,7 +33,8 @@
       const has = owned.includes(m.id), card = node('article', '', 'mount-card');
       card.dataset.mount = m.id; card.dataset.owned = has; card.dataset.selected = has && m.id === selected;
       const text = node('div', '', 'mount-text');
-      text.append(node('b', m.name), node('small', has ? (m.id === selected ? 'Owned · selected' : 'Owned') : `Level ${m.level} · ${m.route} · ${m.cost}`));
+      const cost = typeof m.cost === 'function' ? m.cost(hero) : m.cost;
+      text.append(node('b', m.name), node('small', has ? (m.id === selected ? 'Owned · selected' : 'Owned') : `Level ${m.level} · ${m.route} · ${cost}`));
       if (m.id === 'seahorse') text.append(node('small', 'Underwater only · 160% movement speed'));
       card.append(text);
       if (has) {

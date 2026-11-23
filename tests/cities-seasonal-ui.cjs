@@ -56,9 +56,9 @@ const check=(v,s)=>{assert.ok(v,s);console.log(++checks+': '+s);};
   }
   await wait(id=>{const q=__self().quests.find(q=>q.id===id);return q.counts.every(n=>n>=1);},q.id);
   await npc(zone,q.npc);await interact(q.npc,'quest:claim:'+q.id);await wait(id=>__self().seasonalClaims[id]===2026,q.id);
-  check(await page.evaluate(([id,gold,reward])=>__self().quests.some(q=>q.id===id&&q.claimed)&&__self().gold===gold+reward,[q.id,gold,q.rewardGold]),`${z.name}: real talk/visit objectives and one exact quest reward`);
+  check(await page.evaluate(([id,gold,reward])=>__self().quests.some(q=>q.id===id&&q.claimed)&&__self().gold===gold+reward,[q.id,gold,Math.floor((q.rewardGold * 105 + 50) / 100)]),`${z.name}: real talk/visit objectives and one exact quest reward`);
   await interact(q.npc,'quest:accept:'+q.id);await interact(q.npc,'quest:claim:'+q.id);
-  check(await page.evaluate(([id,gold,reward])=>!Quests.offered([WORLD_MAP,...WORLD_MAP.zones][Field.zone].quests.find(q=>q.id===id).npc).some(q=>q.id===id)&&__self().gold===gold+reward,[q.id,gold,q.rewardGold]),`${z.name}: repeat claim cannot pay again this year`);
+  check(await page.evaluate(([id,gold,reward])=>!Quests.offered([WORLD_MAP,...WORLD_MAP.zones][Field.zone].quests.find(q=>q.id===id).npc).some(q=>q.id===id)&&__self().gold===gold+reward,[q.id,gold,Math.floor((q.rewardGold * 105 + 50) / 100)]),`${z.name}: repeat claim cannot pay again this year`);
  }
  await season(1825023600,true); // next year
  await npc(0,'baker');await interact('baker','quest:accept:halloween_alder');await wait(()=>__self().quests.some(q=>q.id==='halloween_alder'&&!q.claimed));

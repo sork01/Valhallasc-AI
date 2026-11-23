@@ -285,6 +285,11 @@
   }
   // One selected quest is read on the parchment; the dark list keeps regions,
   // ready turn-ins, abandoned automatic quests and completed history separate.
+  function rewardCoins(quest) {
+    const bonus = window.Field?.hero?.questGoldPercent || 0;
+    return Math.min(4294967295, Math.floor((quest.rewardGold * (100 + bonus) + 50) / 100));
+  }
+
   function renderJournal(active) {
     const zone = window.Field?.zone || 0;
     const mine = [...active].sort((a, b) => Number(status(a) === 'ready') - Number(status(b) === 'ready') || Number(b.id === tracked) - Number(a.id === tracked) || Number(b.zone === zone) - Number(a.zone === zone));
@@ -374,7 +379,7 @@
     if (!quest.handoffTo) {
       node.append(element('h5', 'Rewards'), element('p', 'You will receive:', 'quest-reward-label'));
       rewards(quest, node, false);
-      { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(quest.rewardGold)}`; node.append(p); }
+      { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(rewardCoins(quest))}`; node.append(p); }
     }
     if (state(quest)?.completions) node.append(element('p', `Completed ${state(quest).completions} time${state(quest).completions === 1 ? '' : 's'}.`, 'quest-history'));
     const action = (label, name, handler, disabled = false) => {
@@ -535,7 +540,7 @@
       if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
       node.append(element('h5', actionContainer ? 'Quest Objectives' : 'Objectives'), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join('\n'), 'quest-objectives'));
       if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
-      if (!quest.handoffTo) { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(quest.rewardGold)}`; node.append(element('h5', 'Rewards'), p); }
+      if (!quest.handoffTo) { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(rewardCoins(quest))}`; node.append(element('h5', 'Rewards'), p); }
       const choices = rewards(quest, node, s === 'ready', npcId, !!actionContainer);
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {

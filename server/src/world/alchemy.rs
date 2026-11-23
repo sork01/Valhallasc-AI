@@ -415,6 +415,12 @@ impl World {
             Ok(patch) => patch,
             Err(text) => return Self::picking_notice(p, text),
         };
+        let hour = self.world_clock.hour_at(daynight::unix_ms());
+        let duration = if p.character.look.race == Race::Mothkin && !(5. ..20.).contains(&hour) {
+            PICK_TIME / 1.15
+        } else {
+            PICK_TIME
+        };
         let p = self.players.get_mut(&session).unwrap();
         p.stop();
         p.dance = None;
@@ -427,11 +433,11 @@ impl World {
             zone: p.character.zone,
             origin,
             hp: p.character.hp,
-            until: self.time + PICK_TIME,
+            until: self.time + duration,
         });
         let _ = p
             .peer
-            .try_send(json!({"type":"picking","state":"started","patch":id,"duration":PICK_TIME}));
+            .try_send(json!({"type":"picking","state":"started","patch":id,"duration":duration}));
     }
 
     pub(super) fn interrupt_picking(p: &mut Player) {

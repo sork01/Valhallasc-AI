@@ -44,6 +44,10 @@
       defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
       race: 'Race', human: 'Human', mothkin: 'Mothkin', tidekin: 'Tidekin', gnome: 'Gnome',
+      humanPassive: ['Resourcefulness', 'Earn 5% more coin from quest turn-ins.'],
+      mothkinPassive: ['Moonlit Forager', 'Gather alchemy flowers 15% faster during the world’s night.'],
+      tidekinPassive: ['Water Sense', 'Wait 10% less time for a bite when fishing in water.'],
+      gnomePassive: ['Haggler', 'Pay 10% less for shop stock, equipment repairs, and Spark Travel.'],
       noGear: 'No gear', facingNames: ['Front', 'Front left', 'Left side', 'Back left', 'Back view', 'Back right', 'Right side', 'Front right'],
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
       tip: 'Tip: click the Warrior’s axe, mug, head, beard or fish!',
@@ -77,6 +81,10 @@
       defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
       race: '종족', human: '인간', mothkin: '나방족', tidekin: '물결족', gnome: '노움',
+      humanPassive: ['수완', '퀘스트를 완료할 때 동전을 5% 더 받습니다.'],
+      mothkinPassive: ['달빛 채집가', '게임 내 밤에는 연금술 꽃을 15% 더 빠르게 채집합니다.'],
+      tidekinPassive: ['물의 감각', '물에서 낚시할 때 입질까지 기다리는 시간이 10% 줄어듭니다.'],
+      gnomePassive: ['흥정꾼', '상점 물품, 장비 수리, 스파크 여행에 10% 할인을 받습니다.'],
       noGear: '장비 없음', facingNames: ['정면', '왼쪽 앞', '왼쪽', '왼쪽 뒤', '뒷면', '오른쪽 뒤', '오른쪽', '오른쪽 앞'],
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
       tip: '팁: 워리어의 도끼, 맥주잔, 머리, 수염, 물고기를 눌러 보세요!',
@@ -542,6 +550,10 @@
   // controls
   const custom = $('custom');
   const row = (label, ...kids) => el('div', { class: 'row' }, el('span', { class: 'lab', text: label }), el('div', { class: 'ctl' }, ...kids));
+  function renderRacialPassive(container, race) {
+    const [name, description] = t((MageSprite.RACES.includes(race) ? race : 'human') + 'Passive');
+    container.replaceChildren(el('strong', { text: name }), document.createTextNode(' · ' + description));
+  }
   const opt = (k, v, cls, label, color) => {
     const b = el('button', { class: cls, type: 'button', 'data-k': k, 'data-v': String(v), 'aria-label': label, 'aria-pressed': 'false' });
     if (color) b.style.setProperty('--c', color);
@@ -569,7 +581,7 @@
     const dice = el('button', { class: 'arrow', type: 'button', 'aria-label': t('random'), text: '↻' });
     dice.addEventListener('click', () => { cfg.name = randName(); input.value = cfg.name; saveDraft(); blip(700); });
     custom.append(row(t('name'), input, dice));
-    const race = el('select', { class: 'gear-pick', id: 'create-race', 'aria-label': t('race') });
+    const race = el('select', { class: 'gear-pick', id: 'create-race', 'aria-label': t('race'), 'aria-describedby': 'create-racial-passive' });
     for (const value of MageSprite.RACES) race.append(el('option', { value, text: t(value) }));
     race.value = cfg.race;
     race.addEventListener('change', () => {
@@ -577,6 +589,9 @@
       buildControls(); refresh(); $('create-race').focus({ preventScroll: true }); blip(760);
     });
     custom.append(row(t('race'), race));
+    const passive = el('p', { class: 'tip racial-passive', id: 'create-racial-passive' });
+    renderRacialPassive(passive, cfg.race);
+    custom.append(passive);
     if (modular(cfg)) {      // every class comes in a male and a female body; the choice is part of the look, fixed once the character is made
       const seg = el('div', { class: 'seg', role: 'group', 'aria-label': t('gender') });
       for (const g of ['male', 'female']) {
@@ -1282,6 +1297,7 @@
     const g = canvas.getContext('2d'); g.translate(160, 365); mage.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8);
     const stats = Field.equipmentStats;
     $('character-subtitle').textContent = `${c.name} · Level ${Field.hero.level} ${c.class[0].toUpperCase() + c.class.slice(1)}`;
+    renderRacialPassive($('character-racial-passive'), c.race);
     $('equipment-stats').textContent = `${t('attack')}: ${Number(stats.attack.toFixed(1))} · ${t('defense')}: ${Number(stats.defense.toFixed(1))}`;
     window.Attributes?.render();
     window.Mounts?.render();

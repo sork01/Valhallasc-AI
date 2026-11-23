@@ -2,10 +2,13 @@ const { run, replace, debug, record } = require('./lib/touch.cjs');
 const suite = {
   name: 'quest-window',
   mutate(page) {
+    if (process.env.MUTATE === 'reward') return replace(page, 'quests.js',
+      'const bonus = window.Field?.hero?.questGoldPercent || 0;', 'const bonus = 0;');
     if (process.env.MUTATE === 'accept') return replace(page, 'city.js', "window.Quests?.update(packet.quests); close(); return;", "window.Quests?.update(packet.quests); return;");
     return replace(page, 'quests.js', 'b.innerHTML = Inventory.icon(item);', "b.textContent = item.name;");
   },
   async test({ player, check, sleep, width, height, out }) {
+    const racialOnly = process.argv.includes('--racial-only');
     const page = await player('QuestWindows',process.env.QUEST_DESKTOP?{isMobile:false,hasTouch:false}:{});
     const press = async target => {
       if (!process.env.QUEST_DESKTOP && !await target.isVisible()) {
@@ -22,17 +25,23 @@ const suite = {
       await page.evaluate(id=>Field.visitNpc(id),id); await page.locator('#npc-dialogue').waitFor({state:'visible'});
       await sleep(600);
     }
-    await press(page.locator('#inventory-open'));
-    const bagSize = (await page.locator('#inventory-list .item-tile').first().boundingBox()).width;
-    await page.keyboard.press('Escape');
+    let bagSize;
+    if (!racialOnly) {
+      await press(page.locator('#inventory-open'));
+      bagSize = (await page.locator('#inventory-list .item-tile').first().boundingBox()).width;
+      await page.keyboard.press('Escape');
+    }
     await visit(0,'gatekeeper');
     const gossip=await page.evaluate(()=>{
       const shown=q=>!!document.querySelector(q)?.getClientRects().length, paper=document.getElementById('npc-quest-page'), row=document.querySelector('#npc-quest-list [data-quest="slime_patrol"]'), bye=document.getElementById('npc-quest-close').getBoundingClientRect(), frame=document.querySelector('#npc-dialogue .gossip-window').getBoundingClientRect();
       return shown('#npc-text') && shown('#npc-portrait') && paper.contains(row) && row.querySelector('.gossip-icon').textContent==='!' && bye.width>0 && bye.right>frame.right-frame.width*.15 && document.getElementById('npc-quest-close').textContent.trim().length>0;
     });
     check(gossip,'the greeting shows the portrait, quest rows on the parchment and Goodbye at the bottom right');
-    await page.screenshot({path:`${out}/npc-gossip-${width}x${height}.png`});
+    if (!racialOnly) await page.screenshot({path:`${out}/npc-gossip-${width}x${height}.png`});
     await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));
+    const coinReward = await page.evaluate(() => Math.floor((WORLD_MAP.quests.find(q => q.id === 'slime_patrol').rewardGold * 105 + 50) / 100));
+    check(Number(await page.locator('#npc-quests .quest-reward .money').getAttribute('data-copper')) === coinReward,
+      'Human quest offer shows the boosted coin reward');
     const layout=await page.evaluate(()=>{
       const root=document.getElementById('npc-dialogue'), shell=root.querySelector('.gossip-window'), list=document.getElementById('npc-quest-list').getBoundingClientRect(), body=root.querySelector('.gossip-parchment').getBoundingClientRect(), actions=document.getElementById('npc-quest-actions').getBoundingClientRect(), frame=shell.getBoundingClientRect(), cv=document.getElementById('fieldcv').getBoundingClientRect();
       const phone=matchMedia('(pointer: coarse) and (max-width: 900px), (pointer: coarse) and (max-height: 500px)').matches;
@@ -41,17 +50,19 @@ const suite = {
     });
     check(layout,'the quest page is one parchment column with Accept at the bottom left and Decline at the bottom right, within the viewport');
     check(await page.evaluate(()=>[...document.querySelectorAll('#npc-quests .quest-detail h5')].map(h=>h.textContent).join('|')===[Locale.translate('Quest Objectives'),Locale.translate('Rewards')].join('|')),'the page reads title, story, Quest Objectives, Rewards');
-    await page.waitForFunction(()=>!document.getElementById('announce').children.length);
-    await page.screenshot({path:`${out}/quest-accept-classic-${width}x${height}.png`});
-    const reward = page.locator('#npc-quests .quest-reward-icon');
-    const r = await reward.boundingBox();
-    check(r && Math.abs(r.width-r.height)<1 && r.width>=(process.env.QUEST_DESKTOP?39.9:43.9) && bagSize>0,'reward icon is a square of touchable size');
-    check(await page.locator('#npc-quests .quest-reward-cell .quest-reward-name').textContent().then(t=>t.includes('Moonstone')),'the reward sits on a plate with its name beside the icon');
-    check(await reward.locator('[data-icon], svg').count()>0,'reward renders the bag artwork');
-    check(await reward.textContent()==='', 'item names are absent from the reward list');
-    await reward.hover(); await page.locator('#item-tooltip').waitFor({state:'visible'});
-    check(await page.locator('#item-tooltip').textContent().then(t=>t.includes('Moonstone')&&t.includes('Defense')||t.includes('defense')), 'hover shows normal reward stats');
-    await press(reward); check(await page.locator('#item-tooltip').isVisible(),'touch shows reward tooltip');
+    if (!racialOnly) {
+      await page.waitForFunction(()=>!document.getElementById('announce').children.length);
+      await page.screenshot({path:`${out}/quest-accept-classic-${width}x${height}.png`});
+      const reward = page.locator('#npc-quests .quest-reward-icon');
+      const r = await reward.boundingBox();
+      check(r && Math.abs(r.width-r.height)<1 && r.width>=(process.env.QUEST_DESKTOP?39.9:43.9) && bagSize>0,'reward icon is a square of touchable size');
+      check(await page.locator('#npc-quests .quest-reward-cell .quest-reward-name').textContent().then(t=>t.includes('Moonstone')),'the reward sits on a plate with its name beside the icon');
+      check(await reward.locator('[data-icon], svg').count()>0,'reward renders the bag artwork');
+      check(await reward.textContent()==='', 'item names are absent from the reward list');
+      await reward.hover(); await page.locator('#item-tooltip').waitFor({state:'visible'});
+      check(await page.locator('#item-tooltip').textContent().then(t=>t.includes('Moonstone')&&t.includes('Defense')||t.includes('defense')), 'hover shows normal reward stats');
+      await press(reward); check(await page.locator('#item-tooltip').isVisible(),'touch shows reward tooltip');
+    }
     await page.locator('#npc-dialogue [data-action="accept"]').focus(); await page.keyboard.press('Enter');
     await page.locator('#npc-dialogue').waitFor({state:'hidden'});
     await page.evaluate(()=>Quests.show());
@@ -59,14 +70,19 @@ const suite = {
     await press(page.locator('#quest-list [data-quest="slime_patrol"]'));
     await page.locator('#quest-page [data-quest="slime_patrol"] .quest-reward-icon').waitFor({state:'visible'});
     check(await page.locator('#quest-page [data-quest="slime_patrol"] .quest-reward-icon').count()===1,'journal uses the same reward icon');
+    check(Number(await page.locator('#quest-page .quest-reward .money').getAttribute('data-copper')) === coinReward,
+      'Human journal shows the same boosted coin reward');
     await page.keyboard.press('Escape');
     await debug(page,{op:'quest',id:'slime_patrol',action:'complete'});
     await visit(0,'gatekeeper'); await press(page.locator('#npc-quest-list [data-quest="slime_patrol"]'));
     check(await page.locator('#npc-quest-actions [data-action="claim"]').isVisible(),'ready quests use Complete Quest in the fixed red footer');
-    await page.screenshot({path:`${out}/quest-turnin-classic-${width}x${height}.png`});
+    const gold = await page.evaluate(() => Field.hero.gold);
+    if (!racialOnly) await page.screenshot({path:`${out}/quest-turnin-classic-${width}x${height}.png`});
     await press(page.locator('#npc-quest-actions [data-action="claim"]'));
     await page.waitForFunction(()=>Field.hero.quests.find(q=>q.id==='slime_patrol')?.claimed);
+    await page.waitForFunction(expected => Field.hero.gold === expected, gold + coinReward);
     check(await page.evaluate(()=>Inventory.quantity('necklace_moonstone_l1_green')>0),'styled turn-in grants its real item reward through the server');
+    if (racialOnly) return;
     await page.keyboard.press('Escape');
     await visit(0,'guide'); await press(page.locator('#npc-quest-list [data-quest="arena_alder_40"]'));
     await debug(page,{op:'set_level',level:1}); await page.waitForFunction(()=>Field.hero.level===1);

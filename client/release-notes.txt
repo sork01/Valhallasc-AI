@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.11.0",
+    "date": "2026-11-23",
+    "new": [
+      "Every race has a passive ability. Humans earn 5% more quest coin, Mothkin gather flowers 15% faster at night, and Tidekin wait 10% less for bites in water. Gnomes pay 10% less for shop stock, repairs, and Spark Travel."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.10.0",
     "date": "2026-11-23",
     "new": [
