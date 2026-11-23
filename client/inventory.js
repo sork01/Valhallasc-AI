@@ -230,54 +230,75 @@
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
   }
   function hideTooltip() { if ($('item-tooltip')) $('item-tooltip').hidden = true; }
+  function compareEquipment(i, copy) {
+    const slot = equipTarget(i), current = itemAtSlot(slot);
+    const worn = current && wornCopy(slot, current);
+    const table = node('table', '', 'item-comparison');
+    const head = table.createTHead().insertRow();
+    const labels = ['Stat', 'This item', 'Equipped'];
+    for (const label of labels) {
+      const heading = node('th', label); heading.scope = 'col'; head.append(heading);
+    }
+    const body = table.createTBody(), names = body.insertRow();
+    names.insertCell().append(node('small', slots.find(([key]) => key === slot)[1]));
+    const heldName = names.insertCell();
+    if (conditionState(copy) === 'broken') heldName.append(node('small', 'Broken'));
+    const wornName = names.insertCell(); wornName.append(node('strong', current?.name || 'Empty slot'));
+    if (conditionState(worn) === 'broken') wornName.append(node('small', 'Broken'));
+    const candidateStats = comparisonStats(i, copy), wornStats = comparisonStats(current, worn);
+    const entries = [['attack', 'Attack'], ['defense', 'Defense'], ['strength', 'Strength'], ['agility', 'Agility'],
+      ['intellect', 'Intellect'], ['stamina', 'Stamina'], ['dexterity', 'Dexterity'], ['accuracy', 'Accuracy']];
+    for (const [stat, label] of entries) {
+      const value = piece => num(piece[stat] ?? piece.bonusStats?.[stat] ?? 0);
+      const candidate = value(candidateStats), equipped = value(wornStats);
+      if (!candidate && !equipped) continue;
+      const delta = num(candidate - equipped), row = body.insertRow();
+      const name = node('th', label); name.scope = 'row'; row.append(name);
+      const change = node('span', `(${delta > 0 ? '+' : ''}${delta})`, delta > 0 ? 'stat-gain' : delta < 0 ? 'stat-loss' : 'stat-unchanged');
+      row.dataset.stat = stat;
+      row.insertCell().append(String(candidate), ' ', change);
+      row.insertCell().textContent = equipped;
+    }
+    if (copy?.enchant || worn?.enchant) {
+      const row = body.insertRow();
+      const heading = node('th', 'Enchantment'); heading.scope = 'row'; row.append(heading);
+      const left = row.insertCell(), right = row.insertCell();
+      if (!window.Enchanting?.tooltip(left, i, copy)) left.textContent = '—';
+      if (!current || !window.Enchanting?.tooltip(right, current, worn)) right.textContent = '—';
+    }
+    return table;
+  }
   // `where` is set for the bank window: the item's copies and count there replace the bag lookups and the sale line.
   function showTooltip(anchor, i, slot, where, cellCopy) {
     if (!i) return;
-    const copy = where ? where.copies[0] : cellCopy || displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : cellCopy?.rarity || displayRarity(i, slot);
+    const copy = cellCopy !== undefined ? cellCopy : where ? where.copies[0] : displayCopy(i, slot);
+    const rarity = cellCopy !== undefined ? copy?.rarity || i.rarity : where ? bestRarity(i, where.copies) : displayRarity(i, slot);
+    const compare = !slot && gearItem(i);
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || professionKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
+    t.classList.toggle('item-tooltip-comparing', compare);
     const appearance = window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
     const scroll = window.Enchanting?.isScroll(i);
-    window.Enchanting?.tooltip(t, i, (where || slot || cellCopy) ? copy : undefined);
+    if (!compare) window.Enchanting?.tooltip(t, i, (where || slot || cellCopy) ? copy : undefined);
     if (i.kind === 'rod') t.append(...rodDetails(i).map(text => node('p', text)));
     else if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
     else if (i.kind === 'mining_pick') t.append(node('p', window.Blacksmithing?.pickDetails(i) || ''));
-    else if (i.kind !== 'material' && !scroll && !professionKind(i)) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
+    else if (compare) t.append(compareEquipment(i, copy));
+    else if (i.kind !== 'material' && !scroll && !professionKind(i)) t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if ((compatible(i) || i.kind === 'rod') && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (i.rarity === 'hierloom') t.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
     if (setEntry(i)) t.append(...setLines(i.source));
     const weaponFeature = window.RaidRewards?.tooltip(i);
     if (weaponFeature) t.append(node('p', weaponFeature, 'weapon-feature'));
-    if (compatible(i) && !slot) {
-      const target = equipTarget(i), current = target && itemAtSlot(target);
-      if (target && current?.id !== i.id) {
-        const candidate = comparisonStats(i, copy), worn = comparisonStats(current, current && wornCopy(target, current));
-        const changes = ['attack', 'defense', ...statNames].map(stat => ({ stat, delta: num(
-          statNames.includes(stat) ? (candidate.bonusStats?.[stat] || 0) - (worn.bonusStats?.[stat] || 0) : (candidate[stat] || 0) - (worn[stat] || 0)
-        ) })).filter(({ stat, delta }) => delta || stat === 'attack' || stat === 'defense');
-        const line = node('p', '', 'item-comparison');
-        line.append(node('span', `Compared with ${current?.name || 'Empty slot'}:`), ' ');
-        changes.forEach(({ stat, delta }, index) => {
-          if (index) line.append(' · ');
-          const signed = `${delta >= 0 ? '+' : ''}${delta}`;
-          const text = { attack: `${signed} attack`, defense: `${signed} defense`, strength: `${signed} strength`, agility: `${signed} agility`,
-            intellect: `${signed} intellect`, stamina: `${signed} stamina`, dexterity: `${signed} dexterity`, accuracy: `${signed} accuracy` }[stat];
-          const change = node('span', text, delta > 0 ? 'stat-gain' : delta < 0 ? 'stat-loss' : 'stat-unchanged');
-          change.dataset.stat = stat;
-          line.append(change);
-        });
-        t.append(line);
-      }
-    }
     if (classGear(i)) {
       const left = Math.max(0, ...(where ? where.copies : copiesOf(i)).map(g => (g.tradeUntil || 0) - Date.now() / 1000)), minutes = Math.ceil(left / 60);
       const time = minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
       t.append(node('p', left > 0 ? `Bound on pickup · tradeable for ${time} with the party of the roll` : 'Bound on pickup · it can only be sold', 'item-bound'));
     }
-    const conditionCopy = where ? where.copies?.[0] : cellCopy || displayCopy(i, slot);
+    const conditionCopy = copy;
     if (conditionState(conditionCopy) !== 'new') {
       const line = node('p', conditionText(conditionCopy), 'item-durability'); line.dataset.state = conditionState(conditionCopy); t.append(line);
     }
@@ -428,7 +449,7 @@
         if (consumable(i)) b.append(node('span', '', 'item-cooldown'));
         b.append(node('b', i.name, 'sr-only'), node('small', summary(i, count, cellCopy), 'sr-only'));
         b.addEventListener('contextmenu', event => { event.preventDefault(); selected = key; activate(i, key); renderDetails(); });
-        b.addEventListener('dblclick', () => activate(i, key)); attachTooltip(b, () => definition(i.id), undefined, () => window.Shop?.bagTooltip(i.id), () => cellCopy);
+        b.addEventListener('dblclick', () => activate(i, key)); attachTooltip(b, () => definition(i.id), undefined, () => window.Shop?.bagTooltip(i.id), () => gear ? cellCopy ?? null : undefined);
         dragSource(b, () => ({ from: 'bag', item: i.id, key })); cell.append(b);
       } else {
         cell.classList.add('bag-cell-empty'); cell.setAttribute('aria-label', `Empty bag slot ${index - page.start + 1}`);
@@ -519,7 +540,9 @@
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(cellId(a)).kind.localeCompare(definition(cellId(b)).kind) || definition(cellId(a)).name.localeCompare(definition(cellId(b)).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
   window.Inventory = { foodBonus, rodDetails, icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, ownedItemIds, effect, render, renderDetails, renderEquipped, renderSets, hideTooltip, showTooltip,
     gearPreview: i => tr(`Level ${levelOf(i)}`) + (i.class ? ` · ${tr(i.class)}` : '') + (stats(i) ? ` · ${tr(stats(i))}` : ''),
-    icon, definition, legacyPiece, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
+    icon, definition, legacyPiece, attachTooltip, bestRarity, looseStacks, looseCopies, isGear: gearItem,
+    usedCells: () => looseStacks().reduce((used, stack) => used + (gearItem(definition(stack.item)) ? stack.quantity : 1), 0),
+    rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
       if (!look) return;

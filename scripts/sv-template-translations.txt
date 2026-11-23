@@ -521,5 +521,8 @@
   "Smelted {0} bars.": "Smälte {0} tackor.",
   "Forged {0} pieces of equipment.": "Smidde {0} utrustningsdelar.",
   "Brewed {0} Alchemy items.": "Bryggde {0} alkemiföremål.",
-  "Crafted {0} enchant scrolls.": "Tillverkade {0} förtrollningsrullar."
+  "Crafted {0} enchant scrolls.": "Tillverkade {0} förtrollningsrullar.",
+  "Buy quantity: {0}": "Köp flera: {0:t}",
+  "Bought {0} × {1}.": "Köpte {0} × {1:t}.",
+  "Fitted {0} × {1}. You now have {2} bag slots.": "Monterade {0} × {1:t}. Du har nu {2} väskplatser."
 }

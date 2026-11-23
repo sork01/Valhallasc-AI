@@ -65,7 +65,8 @@ async function call(name, args = {}) {
   await page.keyboard.press('e');
   check(await page.locator('#inventory-list [data-position="11"]').getAttribute('data-item') === 'mage_weapon_ash', 'Bag positions and unequipped gear survive reload');
   await page.locator('#inventory-list [data-item="mage_weapon_ash"] button').hover();
-  check(await page.locator('#item-tooltip').isVisible() && await page.locator('#item-tooltip').textContent().then(t => t.includes('+4 attack')), 'Hover shows an item stat tooltip');
+  const attack = page.locator('#item-tooltip .item-comparison [data-stat="attack"]');
+  check(await attack.isVisible() && (await attack.locator('td').allTextContents()).join('|') === '4 (+4)|0', 'Hover compares the weapon with an empty Hands slot');
   await page.locator('#inventory-list [data-item="mage_weapon_ash"] button').click({ button: 'right' });
   await page.waitForFunction(() => Field.hero.look.mageWeapon === 'ash');
   await page.locator('#inventory-list [data-item="mage_armor_apprentice"] button').dragTo(page.locator('[data-slot="chest"]'));

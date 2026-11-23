@@ -3326,6 +3326,9 @@ impl World {
             }
             ClientMessage::Resurrect => self.resurrect_command(session),
             ClientMessage::ShopOpen { npc } => self.shop(session, &npc, shop::Request::Open),
+            ClientMessage::BuyStock { npc, offer, quantity } => {
+                self.shop(session, &npc, shop::Request::Buy(offer, quantity))
+            }
             ClientMessage::SellBatch { npc, items } => {
                 self.shop(session, &npc, shop::Request::Sell(items))
             }
@@ -3838,49 +3841,13 @@ impl World {
                             }
                             Err(text) => notice = text.into(),
                         }
-                    } else if let Some(sold) = &offer.item {
-                        // A tiered offer sells the best tier of the line for the buyer's level, at that tier's price.
-                        let level = p.character.level;
-                        let stock = item(sold).map(|base| {
-                            if offer.tiered {
-                                base.family
-                                    .as_deref()
-                                    .and_then(|f| best_tier(f, level))
-                                    .unwrap_or(base)
-                            } else {
-                                base
-                            }
-                        });
-                        let cost = match stock {
-                            Some(i) if offer.tiered => i.price,
-                            _ => offer.cost,
-                        };
-                        match stock {
-                            None => notice = "That item is not for sale.".into(),
-                            Some(i)
-                                if i.kind == "weapon"
-                                    && i.class
-                                        .is_some_and(|class| class != p.character.look.class) =>
-                            {
-                                notice = "This weapon is for another class.".into();
-                            }
-                            Some(i)
-                                if i.kind == "weapon" && p.character.level < i.required_level =>
-                            {
-                                notice = format!("Requires level {}.", i.required_level);
-                            }
-                            Some(_) if p.character.gold < cost => {
-                                notice = format!("You need {} for this purchase.", money_text(cost));
-                            }
-                            Some(i) if !p.character.can_collect(&i.id) => {
-                                notice = "Your bags are full. Make room first.".into();
-                            }
-                            Some(i) => {
-                                p.character.gold -= cost;
-                                p.character.add_item(&i.id, 1);
+                    } else if offer.item.is_some() {
+                        match shop::purchase_items(&mut p.character, offer, 1) {
+                            Ok(i) => {
                                 notice = format!("Bought {}.", i.name);
                                 quest_changed = true;
                             }
+                            Err(text) => notice = text,
                         }
                     } else if p.character.gold < offer.cost {
                         notice = format!("You need {} for this service.", money_text(offer.cost));

@@ -1590,6 +1590,11 @@ pub enum ClientMessage {
     ShopOpen {
         npc: String,
     },
+    BuyStock {
+        npc: String,
+        offer: String,
+        quantity: u32,
+    },
     SellBatch {
         npc: String,
         items: Vec<SaleLine>,
@@ -1985,7 +1990,7 @@ pub struct Offer {
     pub gear: bool,
     #[serde(default)]
     pub bag: Option<String>,
-    /// An item the offer sells (one per purchase).
+    /// An item the offer sells.
     #[serde(default)]
     pub item: Option<String>,
     /// A mercenary the offer rents: a class name, or "dismiss" to send them all away (see world/mercs.rs).

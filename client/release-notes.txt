@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.7.5",
+    "date": "2026-11-23",
+    "new": [
+      "Use Qty beside a shop item to choose how many to buy and see the total before paying.",
+      "Hover over gear in your bags to compare it with the piece you are wearing. Each stat shows the gain or loss in parentheses."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.7.4",
     "date": "2026-11-23",
     "new": [

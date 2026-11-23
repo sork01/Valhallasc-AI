@@ -439,8 +439,8 @@ html, body { overscroll-behavior: none; }
   #touch-actions { width: calc(320px / .8); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(60px / .8), 1fr); grid-template-columns: none; overflow-x: auto; padding: 2px; }
   #touch-quickuse { max-width: calc(240px / .8); }
   #touch-actions button, #touch-quickuse button { min-width: calc(44px / .6); min-height: calc(44px / .6); font-size: calc(12px / .8); }
-  #connection-overlay > .connection-panel, #sell-warning { --touch-target: calc(44px / var(--window-k, .8)); max-width: calc(94cqw / var(--window-k, .8)); max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8)); overflow: auto; }
-  #sell-warning :is(button, input, select), #connection-overlay button { min-width: var(--touch-target); min-height: var(--touch-target); font-size: 16px; }
+  #connection-overlay > .connection-panel, :is(#sell-warning, #buy-quantity) { --touch-target: calc(44px / var(--window-k, .8)); max-width: calc(94cqw / var(--window-k, .8)); max-height: calc(var(--touch-stage-h, 94dvh) / var(--window-k, .8)); overflow: auto; }
+  :is(#sell-warning, #buy-quantity) :is(button, input, select), #connection-overlay button { min-width: var(--touch-target); min-height: var(--touch-target); font-size: 16px; }
   #touch-skills, #touch-stick { pointer-events: none; }
   #touch-stick { pointer-events: auto; }
   #touch-skills button { pointer-events: auto; }

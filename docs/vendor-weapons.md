@@ -8,8 +8,9 @@ stats, artwork, drop eligibility and resale values stay unchanged.
 Each vendor carries a tiered offer for every class. The client shows the buyer's
 own class and the highest decade their current level permits, including level,
 price, weapon icon and a normal equipment tooltip. Below level 10 it shows the
-first weapon disabled. Level 99 continues to use the level-90 tier. Purchase
-is one item, never automatic and never auto-equips it.
+first weapon disabled. Level 99 continues to use the level-90 tier. Clicking the
+weapon buys one. The Qty button opens a single order for several copies, with
+each copy taking a bag slot. Purchases leave the weapons in your bags.
 
 | Required level | Gold |
 | --- | ---: |
