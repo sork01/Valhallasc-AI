@@ -698,6 +698,53 @@
       return palette[index].map((channel, k) => Math.round(channel * (1 - mix) + palette[index + 1][k] * mix));
     };
   };
+  // Beats are held poses of the fitted walk cycle. Only the foot-relative
+  // canvas transform interpolates, so hair, race features and gear turn together.
+  // Each row is [walk frame, facing offset, x, y, lean in degrees, height scale].
+  const RACIAL_DANCES = new Map([
+    ['mothkin', {
+      female: { step: .16, poses: [
+        [0, 0, 0, 0, 0, 1], [1, -1, -3, -3, -8, 1.02], [3, -2, -6, -9, -13, 1.04],
+        [3, -2, -8, -12, -10, 1.04], [5, -1, -6, -13, -4, 1.03], [5, 0, -2, -11, 3, 1.02],
+        [2, 1, 3, -9, 9, 1.03], [4, 2, 7, -8, 12, 1.03], [4, 3, 8, -9, 7, 1.02],
+        [6, 4, 5, -10, 2, 1.04], [6, 6, 2, -6, -3, 1.02], [7, 7, 0, 0, 0, .95],
+      ] },
+      male: { step: .13, poses: [
+        [4, -2, 0, 0, -8, .94], [5, -2, -3, -5, -13, 1.03], [7, -1, -8, -9, -10, 1.05],
+        [7, 0, -10, -5, 3, 1.01], [0, 1, -8, 0, 10, .94], [1, 2, -4, -7, 15, 1.04],
+        [3, 2, 2, -13, 12, 1.05], [3, 1, 8, -8, -4, 1.02], [4, 0, 10, 0, -8, .94],
+        [6, -1, 8, -6, -14, 1.03], [2, -1, 4, -10, -9, 1.05], [6, 0, 1, -4, -2, 1.01],
+      ] },
+    }],
+    ['tidekin', {
+      female: { step: .22, poses: [
+        [7, -1, 0, -1, -7, 1], [0, -1, -5, -2, -10, 1.02], [1, -2, -10, -4, -8, 1.04],
+        [2, -3, -12, -5, -3, 1.05], [3, -4, -10, -3, 4, 1.02], [4, 3, -5, 0, 8, .98],
+        [5, 2, 0, 0, 11, .97], [6, 2, 6, -1, 10, .99], [7, 1, 11, -3, 6, 1.03],
+        [0, 1, 12, -5, 0, 1.06], [1, 0, 9, -4, -5, 1.04], [2, 0, 5, -2, -8, 1.02],
+      ] },
+      male: { step: .20, poses: [
+        [0, 0, 0, 0, 0, 1], [2, -1, -4, 0, -10, .96], [4, -2, -9, 0, -17, .88],
+        [4, -2, -11, 0, -14, .86], [3, -1, -8, 0, -7, .92], [1, 0, -4, -1, 4, .99],
+        [5, 0, 0, -2, 9, 1.06], [7, 1, 5, -1, 15, .99], [6, 2, 10, 0, 17, .88],
+        [6, 2, 12, 0, 12, .86], [5, 1, 9, 0, 4, .94], [3, 0, 4, -2, -3, 1.02],
+      ] },
+    }],
+    ['gnome', {
+      female: { step: .11, poses: [
+        [0, 0, 0, 0, 0, 1], [2, -1, -3, 0, -11, .95], [2, -1, -3, 0, -11, .95],
+        [4, 0, 0, -2, 3, 1.02], [6, 1, 3, 0, 11, .95], [6, 1, 3, 0, 11, .95],
+        [1, 2, 2, -3, 5, 1.05], [3, 4, 0, -4, 0, 1.05], [5, 6, -2, -3, -5, 1.05],
+        [7, 0, 0, 0, 0, .93], [1, 0, 1, -2, 4, 1.02], [7, 0, 0, 0, 0, .96],
+      ] },
+      male: { step: .12, poses: [
+        [2, -1, -2, 0, -7, .89], [6, -1, -4, -6, -9, 1.05], [0, -1, -5, 0, -10, .9],
+        [6, -1, -3, -6, -5, 1.05], [3, 0, 0, -8, 0, 1.07], [7, 0, 0, 0, 0, .87],
+        [4, 1, 2, 0, 7, .89], [0, 1, 4, -6, 9, 1.05], [6, 1, 5, 0, 10, .9],
+        [0, 1, 3, -6, 5, 1.05], [7, 0, 0, -8, 0, 1.07], [3, 0, 0, 0, 0, .87],
+      ] },
+    }],
+  ]);
   class MageSprite {
     constructor(source, look = {}, background = false) { this.source = source; this.background = background; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
@@ -798,7 +845,7 @@
       else if (h.atkT > 0) { clip = 'attack'; i = Math.floor(h.atkT / this.meta.attack.duration * C.attack.n); }
       else if (h.moving) { clip = 'walk'; i = Math.floor(h.walk) % C.walk.n; }
       let dir = MageSprite.direction(h.fx, h.fy);
-      const dance = MageSprite.dancePose(h, this.look.gender);
+      const dance = MageSprite.dancePose(h, this.look);
       if (dance) { clip = 'walk'; i = dance.frame % C.walk.n; dir = (dir + dance.turn + 8) % 8; }
       const [ax, ay] = this.meta.anchor;
       g.save(); g.imageSmoothingEnabled = false;
@@ -837,11 +884,23 @@
         : this.meta.portrait || [56, 18, 48, 48];
       g.drawImage(this.frame(), ...crop, 0, 0, 128, 128); return c.toDataURL();
     }
-    static dancePose(h, gender = h.look?.gender) {
-      if (!Number.isFinite(h.danceT) || h.dead || h.hurtT > 0 || h.atkT > 0 || h.moving || h.mounted) return null;
+    static dancePose(h, look = h.look) {
+      if (!Number.isFinite(h.danceT) || h.dead || h.isCorpse || h.hurtT > 0 || h.atkT > 0 || h.moving || h.mounted) return null;
+      const female = look?.gender === 'female';
+      const dances = RACIAL_DANCES.get(look?.race);
+      if (dances) {
+        const { step, poses } = female ? dances.female : dances.male;
+        const phase = h.danceT / step % poses.length;
+        const index = Math.floor(phase), fraction = phase - index;
+        const pose = poses[index], next = poses[(index + 1) % poses.length];
+        const ease = fraction * fraction * (3 - 2 * fraction);
+        const blend = i => pose[i] + (next[i] - pose[i]) * ease;
+        return { frame: pose[0], turn: pose[1], x: blend(2), y: blend(3),
+          lean: blend(4) * Math.PI / 180, stretch: blend(5) };
+      }
       // Four beats per phrase, at 120 BPM. Reversible footwork keeps the dancer in place.
       const beat = h.danceT * 2, phrase = beat % 4, pulse = Math.sin(beat * Math.PI * 2);
-      if (gender === 'female') {
+      if (female) {
         // Step-touch left/right, a hip sway, then an eight-way twirl on the last beat.
         const sway = Math.sin(beat * Math.PI);
         return { frame: [0, 1, 2, 1, 4, 5, 6, 5][Math.floor(beat * 4) % 8],

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.11.1",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "Type /dance to see your character's dance. Each race has a different dance for female and male characters."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.11.0",
     "date": "2026-11-23",
     "new": [
