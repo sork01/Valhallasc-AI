@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `MOTHKIN-RULES` — Owner decisions (2026-11-23): a new people native to Valhalla, the Mothkin of the Moonspore Canopy, with dusk skin, pale markings and feathered antennae. Make them playable in character creation with the existing class skills and stats. Deliver one front-and-back in-game sprite render to FileDrop. Work on `feat/playable-race`.
+- [ ] `MOTHKIN-PLAYABLE` — Save race for guest and account characters, offer it in character creation and render both bodies for all five classes. Verify legacy saves, new joins, reconnects and the race's sprite layers.
+- [ ] `MOTHKIN-PREVIEW` — Render one equipped Mothkin from the game compositor in front and back views and upload the image to FileDrop.
+
 - [x] `ALCHEMY-RULES` — Owner approved the gameplay rules on 2026-11-21. Pick local flowers throughout Valhalla and brew potions and flasks that buff the character who drinks them. Alchemy is a secondary profession with a saved skill from 1 to 600.
   - **Training and brewing.** Any character can learn Alchemy alongside Fishing, Enchanting and Blacksmithing. A trainer in Alderhaven starts the profession. Alchemists in Alderhaven, Skaldholm, Nacrehold, Asterion and Veyrroot Heartwood teach and provide brewing stations and empty containers.
   - **Gathering.** Start with three active patches per shared adventure zone. Use one garden patch in each service city with its local flower. Skaldholm grows Lantern Lily, Nacrehold grows Tideglass Anemone, Asterion grows Sporebell and Veyrroot Heartwood grows Heartvine Bloom. Rán's Deep and Nacrehold use reachable seabed positions. Keep dungeons and the Arena free of gathering patches. Click or tap within reach to pick by hand. Moving, taking damage or leaving reach interrupts the pick. Each patch gives 3–5 shared picks of 1–2 flowers, then relocates to a validated alternate position. A pick spends a charge after the flowers fit and are saved.
