@@ -8,6 +8,9 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `RACIAL-PASSIVES-RULES` — Owner choices (2026-11-23). Gnomes get 10% off NPC shop stock and bulk purchases, equipment repairs and Spark Travel fares. Player trade and vendor sell prices keep their usual rates. Humans get 5% more coin from quest turn-ins. Mothkin gather alchemy flowers 15% faster at night. Tidekin wait 10% less time for bites in water with the usual catch and loot rules.
+- [ ] `RACIAL-PASSIVES` — Implement the four passives on `feat/playable-race`. Show the passive in the creator and Character pane. Check the purchase quotes, rewards and timers against the actual transaction rules.
+
 - [x] `GNOME-RULES` — Owner decisions (2026-11-23): add Gnomes from the Obsidian Orrery with clockwork motifs, a compact silhouette at 67% of Human height and 76% of Human width, and standard collision, class skills and stats. Upload a front-and-back comparison with a Human in matching gear. Continue on `feat/playable-race`.
 - [x] `GNOME-PLAYABLE` — Available in the 1.10.0 branch candidate for both bodies and all five classes. Verified desktop and touch creation, guest and account reconnects, standard collision, gear scaling across 2,720 poses, 32 horse and seahorse poses, and the Shadowstep afterimage.
 - [x] `GNOME-PREVIEW` — Rendered Tavi in starter Assassin gear beside a Human in the same gear, front and back. Verified the compositor PNG and its metadata in [FileDrop](https://gunning.se/filedrop/api.php?action=download&file=valhalla-gnome-front-and-back.png).
