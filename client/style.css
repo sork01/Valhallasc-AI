@@ -146,8 +146,8 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 #create-facing { min-width: 6cqw; text-align: center; white-space: nowrap; }
 .cc-no-gear { width: 100%; margin-top: .5cqw; }
 @media (pointer: coarse) {
-  .cc-turn .arrow, .cc-no-gear { min-width: 44px; min-height: 44px; }
-  .cc-turn { font-size: max(12px, 1.1cqw); }
+  .cc-turn .arrow, .cc-no-gear, #create-race { min-width: 44px; min-height: 44px; }
+  .cc-turn, #create-race { font-size: max(12px, 1.1cqw); }
 }
 .runeglow { animation: pulse 2.4s ease-in-out infinite; }
 .tip { margin: .9cqw 0 0; font-size: 1cqw; text-align: center; opacity: .8; color: #fff3c4; }

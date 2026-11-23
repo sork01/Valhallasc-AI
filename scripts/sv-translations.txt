@@ -14754,5 +14754,9 @@
   "That purchase costs too much.": "Köpet kostar för mycket.",
   "Choose between one and four expansion bags.": "Välj mellan en och fyra extraväskor.",
   "Use Qty beside a shop item to choose how many to buy and see the total before paying.": "Använd Antal bredvid en vara för att välja hur många du vill köpa och se totalpriset innan du betalar.",
-  "Hover over gear in your bags to compare it with the piece you are wearing. Each stat shows the gain or loss in parentheses.": "Håll pekaren över utrustning i väskan för att jämföra med det du bär. Varje egenskap visar ökningen eller minskningen inom parentes."
+  "Hover over gear in your bags to compare it with the piece you are wearing. Each stat shows the gain or loss in parentheses.": "Håll pekaren över utrustning i väskan för att jämföra med det du bär. Varje egenskap visar ökningen eller minskningen inom parentes.",
+  "Race": "Folkslag",
+  "Human": "Människa",
+  "Mothkin": "Nattfjärilsfolk",
+  "Play as a Mothkin from the Moonspore Canopy, with dusky skin, pale markings and feathered antennae. Choose Mothkin when creating a character of any class.": "Spela som nattfjärilsfolk från The Moonspore Canopy, med skymningsfärgad hud, ljusa tecken och fjäderlika antenner. Du kan välja nattfjärilsfolket när du skapar en karaktär av valfri klass."
 }

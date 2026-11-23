@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.8.0",
+    "date": "2026-11-23",
+    "new": [
+      "Play as a Mothkin from the Moonspore Canopy, with dusky skin, pale markings and feathered antennae. Choose Mothkin when creating a character of any class."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "1.7.6",
     "date": "2026-11-23",
     "new": [],

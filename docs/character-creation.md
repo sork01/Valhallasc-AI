@@ -74,3 +74,22 @@ public health passed and server PID/executable `1250668` stayed unchanged.
 Receipt: `www/Valhalla/guest-choice-release-receipt.json`. Previous client
 `1.2.0-cc1c12fa` remains available for rollback. No public guest was created.
 Wiki: `10_projects:valhallasc_guest_character_choice_20261120`.
+
+## Playable Mothkin (1.8.0)
+
+Choose Human or Mothkin in the creator. Mothkin come from the Moonspore
+Canopy and have dusk skin, pale cheek markings and feathered antennae.
+Both bodies and all five classes are available. They start with the usual
+class equipment and Greenmeadow arrival. The server saves the race with
+the character's appearance. Earlier guest and account saves default to Human.
+
+The game uses the existing head pose for each frame to place the antennae
+and markings. Headgear covers the antennae. The artwork lives in the
+two-layer PixelFlow sprite `a3cadd60feee1497`. Run
+`python3 scripts/make_mothkin_art.py export` to export editor changes and use
+`verify` to compare the committed atlas with PixelFlow.
+
+`tests/mothkin-art.cjs` verifies the real sprite compositor and writes the
+front-and-back Hunter preview. `tests/mothkin-creation-ui.cjs` exercises the
+creator in English on desktop and Swedish on touch, including reconnect with
+a private game process. Run both through `scripts/test-touch-bounded.sh`.

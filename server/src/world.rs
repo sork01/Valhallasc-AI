@@ -2806,6 +2806,7 @@ impl World {
                     }
                     look.class = Class::Warrior;
                     look.gender = Gender::Male;
+                    look.race = Race::Human;
                 }
                 look.validate()?;
                 if !wants_gm
@@ -13435,6 +13436,70 @@ mod tests {
         let guest = w.join(40, None, Some(Look::default()), tx).unwrap();
         assert!(guest["token"].is_string());
         assert_eq!(w.store.account_characters(&bob.id).unwrap().len(), 0);
+    }
+
+    #[test]
+    fn mothkin_survive_guest_and_account_reconnects_with_ordinary_class_stats() {
+        let mut w = world();
+        let mothkin: Look = serde_json::from_str(
+            r#"{"name":"Neris","class":"hunter","gender":"female","race":"mothkin"}"#,
+        )
+        .unwrap();
+        let legacy: Look =
+            serde_json::from_str(r#"{"name":"Lina","class":"hunter","gender":"female"}"#).unwrap();
+        assert_eq!(legacy.race, Race::Human);
+        assert!(serde_json::from_str::<Look>(r#"{"race":"typo"}"#).is_err());
+
+        let (tx, _rx) = mpsc::channel(256);
+        let guest = w.join(1, None, Some(mothkin.clone()), tx).unwrap();
+        let token = guest["token"].as_str().unwrap().to_owned();
+        assert_eq!(guest["snapshot"]["players"][0]["look"]["race"], "mothkin");
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(2, None, Some(legacy), tx).unwrap();
+        let moth = &w.players[&1].character;
+        let human = &w.players[&2].character;
+        assert_eq!(moth.max_hp(), human.max_hp());
+        assert_eq!(moth.look.class, human.look.class);
+        assert_eq!(moth.level, human.level);
+        assert_eq!(moth.zone, human.zone);
+        assert_eq!(moth.landing, human.landing);
+        w.leave(1);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(3, Some(token), None, tx).unwrap();
+        assert_eq!(w.players[&3].character.look.race, Race::Mothkin);
+
+        let owner = w
+            .store
+            .create_account("moonhunter", "unused")
+            .unwrap()
+            .unwrap();
+        let join_account = |w: &mut World, session, character, look| {
+            let (tx, _rx) = mpsc::channel(256);
+            w.join_as(
+                session,
+                Identity::Account {
+                    id: owner.id.clone(),
+                    gm: false,
+                    character,
+                    look,
+                },
+                tx,
+            )
+            .unwrap()
+        };
+        let account = join_account(
+            &mut w,
+            4,
+            None,
+            Some(Look {
+                name: "Sivre".into(),
+                ..mothkin
+            }),
+        );
+        let id = account["id"].as_str().unwrap().to_owned();
+        w.leave(4);
+        join_account(&mut w, 5, Some(id), None);
+        assert_eq!(w.players[&5].character.appearance_look().race, Race::Mothkin);
     }
 
     #[test]

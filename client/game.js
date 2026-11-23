@@ -43,6 +43,7 @@
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
       defeated: 'Defeated!', defeatedSub: 'Releasing your spirit…', defeatedWait: 'You have fallen. Wait for the fight to end.', ghostForm: 'Spirit Form', ghostSub: 'Return to your body to resurrect', ghostResurrect: 'Resurrect', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
+      race: 'Race', human: 'Human', mothkin: 'Mothkin',
       noGear: 'No gear', facingNames: ['Front', 'Front left', 'Left side', 'Back left', 'Back view', 'Back right', 'Right side', 'Front right'],
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
       tip: 'Tip: click the Warrior’s axe, mug, head, beard or fish!',
@@ -75,6 +76,7 @@
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
       defeated: '쓰러졌다!', defeatedSub: '영혼을 해방하는 중…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', ghostForm: '영혼 상태', ghostSub: '시신으로 돌아가 부활하세요', ghostResurrect: '부활', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
+      race: '종족', human: '인간', mothkin: '나방족',
       noGear: '장비 없음', facingNames: ['정면', '왼쪽 앞', '왼쪽', '왼쪽 뒤', '뒷면', '오른쪽 뒤', '오른쪽', '오른쪽 앞'],
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
       tip: '팁: 워리어의 도끼, 맥주잔, 머리, 수염, 물고기를 눌러 보세요!',
@@ -401,7 +403,7 @@
   const equipmentKeys = c => [c.class + 'Armor', c.class + 'Weapon'];
   const NAMES = ['Bjorn', 'Ragna', 'Thora', 'Ulfar', 'Freya', 'Gunnar', 'Sunwoo', 'Haneul', 'Minjae', 'Dolgi', 'Eirik', 'Seoyun', 'Astrid', 'Jihoon'];
   const randName = () => NAMES[Math.floor(Math.random() * NAMES.length)];
-  const defaultCfg = () => ({ name: randName(), class: 'warrior', gender: 'male', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers', priestArmor: 'pilgrim', priestWeapon: 'mace', hunterArmor: 'scout', hunterWeapon: 'shortbow' });
+  const defaultCfg = () => ({ name: randName(), class: 'warrior', gender: 'male', race: 'human', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers', priestArmor: 'pilgrim', priestWeapon: 'mace', hunterArmor: 'scout', hunterWeapon: 'shortbow' });
   const idx = (v, n) => { v = Math.floor(+v); return v >= 0 && v < n ? v : 0; };
   let cfg = defaultCfg();
   const load = c => {
@@ -411,7 +413,8 @@
     cfg.armor = idx(cfg.armor, OPT.armors); cfg.rune = idx(cfg.rune, OPT.runeHues.length);
     cfg.class = ['mage', 'assassin', 'priest', 'hunter'].includes(cfg.class) ? cfg.class : 'warrior';
     cfg.gender = cfg.gender === 'female' ? 'female' : 'male';
-    if (modular(cfg)) { cfg.hairColor = idx(cfg.hairColor, spriteClass(cfg).HAIR.length); cfg.skin = idx(cfg.skin, spriteClass(cfg).SKIN.length); }
+    cfg.race = cfg.race === 'mothkin' ? 'mothkin' : 'human';
+    if (modular(cfg)) { cfg.hairColor = idx(cfg.hairColor, spriteClass(cfg).HAIR.length); cfg.skin = idx(cfg.skin, spriteClass(cfg).skinPalette(cfg).length); }
     const warriorGear = WarriorSprite.equipment(cfg); cfg.warriorArmor = warriorGear.armor; cfg.warriorWeapon = warriorGear.weapon;
     const gear = MageSprite.equipment(cfg); cfg.mageArmor = gear.armor; cfg.mageWeapon = gear.weapon;
     const assassinGear = AssassinSprite.equipment(cfg); cfg.assassinArmor = assassinGear.armor; cfg.assassinWeapon = assassinGear.weapon;
@@ -565,6 +568,14 @@
     const dice = el('button', { class: 'arrow', type: 'button', 'aria-label': t('random'), text: '↻' });
     dice.addEventListener('click', () => { cfg.name = randName(); input.value = cfg.name; saveDraft(); blip(700); });
     custom.append(row(t('name'), input, dice));
+    const race = el('select', { class: 'gear-pick', id: 'create-race', 'aria-label': t('race') });
+    for (const value of ['human', 'mothkin']) race.append(el('option', { value, text: t(value) }));
+    race.value = cfg.race;
+    race.addEventListener('change', () => {
+      cfg.race = race.value;
+      buildControls(); refresh(); $('create-race').focus({ preventScroll: true }); blip(760);
+    });
+    custom.append(row(t('race'), race));
     if (modular(cfg)) {      // every class comes in a male and a female body; the choice is part of the look, fixed once the character is made
       const seg = el('div', { class: 'seg', role: 'group', 'aria-label': t('gender') });
       for (const g of ['male', 'female']) {
@@ -577,7 +588,7 @@
     const sw = (k, list, labelKey) => { const d = el('div', { class: 'swatches' }); list.forEach((c, i) => d.append(opt(k, i, 'sw', `${t(labelKey)} ${i + 1}`, c))); return d; };
     const isModular = modular(cfg), C = spriteClass(cfg);
     custom.append(row(t(isModular ? 'hair' : 'hairBeard'), sw('hairColor', isModular ? C.HAIR : OPT.hairSwatch, isModular ? 'hair' : 'hairBeard')));
-    custom.append(row(t('skin'), sw('skin', isModular ? C.SKIN : OPT.skinSwatch, 'skin')));
+    custom.append(row(t('skin'), sw('skin', isModular ? C.skinPalette(cfg) : OPT.skinSwatch, 'skin')));
     if (isModular) {
       for (const key of equipmentKeys(cfg)) custom.append(gearSelect(key, cfg[key], value => { cfg[key] = value; refresh(); blip(760); }));
       const clear = el('button', { class: 'btn ghost cc-no-gear', id: 'create-no-gear', type: 'button', text: t('noGear'), title: 'Starter gear stays in your bag.' });
@@ -632,7 +643,7 @@
   }
   function leaveCreate() { clearTimeout(introTimer); cancelAnimationFrame(mageRaf); if (view.ok) view.setActive(false); }
   for (const name of ['warrior', 'mage', 'assassin', 'priest', 'hunter']) $('cls-' + name).addEventListener('click', () => {
-    if (cfg.class !== name) { cfg.class = name; if (modular(cfg)) cfg.skin = idx(cfg.skin, spriteClass(cfg).SKIN.length); buildControls(); refresh(); }
+    if (cfg.class !== name) { cfg.class = name; if (modular(cfg)) cfg.skin = idx(cfg.skin, spriteClass(cfg).skinPalette(cfg).length); buildControls(); refresh(); }
     updateClass(); if (modular(cfg)) castPreview(); else if (view.ok) view.play('attack');
   });
   $('back').addEventListener('click', () => { blip(520); show('splash'); });

@@ -95,6 +95,41 @@
   }
   const bytesOf = text => { const raw = atob(text), out = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; };
   const loadImages = files => Promise.all([bitmap('assets/' + files.png), bitmap('assets/' + files.depth)]);
+  const MOTHKIN_SKIN = ['#776183', '#676b92', '#906d93', '#54526e'];
+  const MOTHKIN_CELL = 48, MOTHKIN_X = 24, MOTHKIN_Y = 36;
+  const MOTHKIN_REACH = Math.ceil(Math.hypot(MOTHKIN_X, MOTHKIN_Y));
+  let mothkinArt;
+  function loadMothkin() {
+    return mothkinArt ||= bitmap('assets/mothkin.png').then(image => {
+      try {
+        const read = reader('mothkin', MOTHKIN_CELL, MOTHKIN_CELL);
+        return Array.from({ length: 8 }, (_, dir) => [0, 1].map(layer =>
+          read(image, dir * MOTHKIN_CELL, layer * MOTHKIN_CELL, MOTHKIN_CELL, MOTHKIN_CELL)));
+      } finally { image.close(); }
+    }).catch(error => { mothkinArt = null; console.warn(error.message); });
+  }
+  function paintMothkin(pixels, depth, fw, fh, pose, art, skin, showAntennae) {
+    const [cx, cy, rx, ry] = pose, [antennae, markings] = art;
+    const headX = Math.floor(cx), headY = Math.floor(cy);
+    const headDepth = Math.min(65534, depth[headY * fw + headX] ?? 65534);
+    for (let y = Math.max(0, headY - MOTHKIN_REACH); y < Math.min(fh, headY + MOTHKIN_REACH + 1); y++) {
+      for (let x = Math.max(0, headX - MOTHKIN_REACH); x < Math.min(fw, headX + MOTHKIN_REACH + 1); x++) {
+        const dx = x + .5 - cx, dy = y + .5 - cy;
+        const u = Math.floor(MOTHKIN_X + dx * rx + dy * ry);
+        const v = Math.floor(MOTHKIN_Y - dx * ry + dy * rx);
+        if (u < 0 || v < 0 || u >= MOTHKIN_CELL || v >= MOTHKIN_CELL) continue;
+        const src = (v * MOTHKIN_CELL + u) * 4, dst = y * fw + x, k = dst * 4;
+        // Antenna roots disappear into the crown. Markings are pigment and only cover exposed skin.
+        if (showAntennae && antennae[src + 3] && !pixels[k + 3]) {
+          pixels.set(antennae.subarray(src, src + 4), k);
+          depth[dst] = headDepth;
+        } else if (markings[src + 3] && pixels[k + 3] &&
+          skin.has(pixels[k] * 65536 + pixels[k + 1] * 256 + pixels[k + 2])) {
+          pixels.set(markings.subarray(src, src + 4), k);
+        }
+      }
+    }
+  }
   // Saved head layers have two drawings per pose: the front (stored for S) and the back (stored for N); the side rows only repeat one of them.
   // A turned head therefore gets a real turn here: the two drawings are wrapped round the head's own axis (HELM-DIRECTIONS-PROPER, 2026-11-13).
   //  - Each row of the hat has a radius about the head axis; inside it the drawing is a shell, and the screen shows the half-turn of it that
@@ -312,7 +347,7 @@
       } else if (!background) promote(entry);
       return entry.promise;
     };
-    return { meta, parts, ensure };
+    return { meta, parts, ensure, mothkin: await loadMothkin() };
   }
   // The catalog names every worn piece by a unique variant. An original piece is drawn as itself; a recolouring (items
   // with `art` and `tint`, built by scripts/gear_levels.py) is its base drawing painted with the tint, which uses the
@@ -681,13 +716,17 @@
       const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
       this.hairColours = new Set((this.meta.ramps.hair || []).map(c => { const v = hex(c); return v[0] * 65536 + v[1] * 256 + v[2]; }));
       const lum = c => c[0] * .299 + c[1] * .587 + c[2] * .114;
-      const hair = this.constructor.HAIR, skin = this.constructor.SKIN;
+      const hair = this.constructor.HAIR, skin = this.constructor.skinPalette(look);
+      this.mothkin = look.race === 'mothkin';
+      this.skinColours = new Set();
       for (const [role, target] of [['hair', hair[look.hairColor || 0]], ['brow', hair[look.hairColor || 0]], ['skin', skin[look.skin || 0]]]) {
         const ramp = this.meta.ramps[role], to = hex(target || (role === 'skin' ? skin[0] : hair[0]));
         const base = lum(hex(this.meta.ramps[role === 'brow' ? 'hair' : role][2]));
         for (const color of ramp) {
           const from = hex(color), k = lum(from) / base, ratio = k < 1 ? k : 1 + (k - 1) * .35;
-          this.tint.set(from[0] * 65536 + from[1] * 256 + from[2], to.map(v => Math.min(255, Math.round(v * ratio))));
+          const painted = to.map(v => Math.min(255, Math.round(v * ratio)));
+          this.tint.set(from[0] * 65536 + from[1] * 256 + from[2], painted);
+          if (this.mothkin && role === 'skin') this.skinColours.add(painted[0] * 65536 + painted[1] * 256 + painted[2]);
         }
       }
     }
@@ -700,6 +739,7 @@
       const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
       const chosen = ['body'];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
+      const mothkinPose = this.mothkin && this.source.mothkin && this.meta.headFrames?.[key];
       // Hair that lies almost flush on a worn piece (a depth tie) flickered through the cloth. In the front views the worn piece
       // wins over hair that is only just nearer (`hairTie`): sleeves, chest and hands. From the back quarters the shoulder piece
       // includes a mantle across the upper back that the hair hangs over, and the walk cycle swung it in and out of the hair: there
@@ -727,6 +767,8 @@
             forge.set([255, 138, 46, 230], dst * 4);
           }
         }
+        if (part === 'body' && mothkinPose)
+          paintMothkin(out.data, nearest, fw, fh, mothkinPose, this.source.mothkin[dir], this.skinColours, this.equipment.head === 'none');
       }
       g.putImageData(out, 0, 0);
       if (this.equipment.weapon === 'regearchainforged') {
@@ -780,7 +822,9 @@
     portrait() {
       const c = document.createElement('canvas'); c.width = c.height = 128;
       const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
-      g.drawImage(this.frame(), ...(this.meta.portrait || [56, 18, 48, 48]), 0, 0, 128, 128); return c.toDataURL();
+      const head = this.mothkin && this.source.mothkin && this.equipment.head === 'none' && this.meta.headFrames?.['idle/0/0'];
+      const crop = head ? [Math.round(head[0]) - 31, Math.round(head[1]) - 39, 62, 62] : this.meta.portrait || [56, 18, 48, 48];
+      g.drawImage(this.frame(), ...crop, 0, 0, 128, 128); return c.toDataURL();
     }
     static dancePose(h, gender = h.look?.gender) {
       if (!Number.isFinite(h.danceT) || h.dead || h.hurtT > 0 || h.atkT > 0 || h.moving || h.mounted) return null;
@@ -802,6 +846,7 @@
         stretch: 1 - Math.max(0, -pulse) * .055 };
     }
     static direction(fx, fy) { return ((Math.round(-Math.atan2(fx - fy, fx + fy) / (Math.PI / 4)) % 8) + 8) % 8; }
+    static skinPalette(look) { return look.race === 'mothkin' ? MOTHKIN_SKIN : this.SKIN; }
     // `background` is for other players' sprites: they load one at a time, after your own, without blocking the page.
     static async load(look, { background = false } = {}) {
       const url = this.METADATA;

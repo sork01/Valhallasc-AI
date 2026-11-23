@@ -39,6 +39,15 @@ pub enum Gender {
     Female,
 }
 
+/// Race affects appearance only. Characters saved before race selection are human.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Race {
+    #[default]
+    Human,
+    Mothkin,
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Class {
@@ -123,6 +132,7 @@ pub struct Look {
     pub name: String,
     pub class: Class,
     pub gender: Gender,
+    pub race: Race,
     pub hair_color: u8,
     pub skin: u8,
     pub warrior_armor: String,
@@ -156,6 +166,7 @@ impl Default for Look {
             name: "Adventurer".into(),
             class: Class::Warrior,
             gender: Gender::Male,
+            race: Race::Human,
             hair_color: 0,
             skin: 0,
             warrior_armor: "crimson".into(),
