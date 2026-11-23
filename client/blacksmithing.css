@@ -18,6 +18,45 @@
   width: min(610px, 88cqw);
   height: min(585px, 88cqh);
 }
+/* Center the scaled window even if its unscaled box is taller than the stage. */
+#stage #npc-dialogue[data-service="smith"] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+#stage #npc-dialogue[data-service="smith"] > .gossip-window {
+  /* The stage is an inline-size container. Its measured height can differ from the viewport. */
+  --smith-height-limit: var(--touch-stage-h, 94dvh);
+  width: calc(clamp(min(420px, 86cqw), var(--smith-width, min(820px, 90cqw)), 94cqw) / var(--window-k, .8));
+  height: calc(clamp(min(260px, var(--smith-height-limit) * .76),
+    var(--smith-height, min(640px, var(--smith-height-limit) * .95)), var(--smith-height-limit)) / var(--window-k, .8));
+}
+#npc-smith-resize { display: none; }
+#npc-dialogue[data-service="smith"] #npc-smith-resize {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4em;
+  flex: none;
+  min-height: calc(26px / var(--window-k, .8));
+  padding: .25em .55em;
+  cursor: nwse-resize;
+  touch-action: none;
+  user-select: none;
+}
+#npc-smith-resize::after {
+  content: '';
+  width: .8em;
+  height: .8em;
+  background: repeating-linear-gradient(135deg, transparent 0 3px, currentColor 3px 4px);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+@media (pointer: coarse) {
+  #stage #npc-dialogue[data-service="smith"] .gossip-footer { padding-right: calc(8px / var(--window-k, .8)); }
+  #npc-dialogue[data-service="smith"] #npc-smith-resize {
+    min-height: calc(44px / var(--window-k, .8));
+    font-size: calc(12px / var(--window-k, .8));
+  }
+}
 #npc-inventory.smith-workshop { display: block; }
 .smith-workshop h3 { margin: .2rem 0 .4rem; color: #392106; }
 .smith-notice:empty { display: none; }

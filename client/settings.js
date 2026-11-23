@@ -231,7 +231,9 @@
   }
   const currentPanel = p => ({ w: p.el.offsetWidth / cq(), h: (p.body(p.el)?.offsetHeight || 0) / cq() });
   function storePanels() {
-    const out = {}; for (const p of PANELS) if (p.size) out[p.id] = { ...p.size };
+    const out = {};
+    if (window.Prefs.panelSize.smith) out.smith = window.Prefs.panelSize.smith;
+    for (const p of PANELS) if (p.size) out[p.id] = { ...p.size };
     window.Prefs.set({ panelSize: out });
   }
   function clearPanel(p) { p.size = null; paintPanel(p); placePanelGrip(p); storePanels(); }
@@ -278,6 +280,66 @@
     for (const p of PANELS) new MutationObserver(placePanelGrips).observe(p.el, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
   }
   function resetPanels() { window.Prefs.set({ panelSize: null }); loadPanels(); placePanelGrips(); }
+
+  // The centered Blacksmithing window has its own dimensions in screen pixels.
+  // Its parchment reflows as the corner moves, using the normal conversation scale for text and controls.
+  const smithGrip = $('npc-smith-resize');
+  if (smithGrip) {
+    const workshop = smithGrip.closest('.gossip-window');
+    const paint = size => {
+      for (const [key, prop] of [['w', '--smith-width'], ['h', '--smith-height']]) {
+        const value = Number(size?.[key]);
+        if (Number.isFinite(value) && value > 0) workshop.style.setProperty(prop, value + 'px');
+        else workshop.style.removeProperty(prop);
+      }
+    };
+    const restore = () => paint(window.Prefs.panelSize.smith);
+    function save(size) {
+      const sizes = { ...window.Prefs.panelSize };
+      if (size) sizes.smith = size; else delete sizes.smith;
+      window.Prefs.set({ panelSize: sizes });
+    }
+    const dimensions = () => {
+      const { width, height } = workshop.getBoundingClientRect();
+      return { w: Math.round(width), h: Math.round(height) };
+    };
+    let resize = null;
+    smithGrip.addEventListener('pointerdown', event => {
+      if (resize || event.button !== 0) return;
+      event.preventDefault();
+      smithGrip.focus({ preventScroll: true });
+      resize = { pointer: event.pointerId, x: event.clientX, y: event.clientY, ...dimensions(), moved: false };
+      smithGrip.setPointerCapture(event.pointerId);
+    });
+    smithGrip.addEventListener('pointermove', event => {
+      if (resize?.pointer !== event.pointerId) return;
+      // A centered window grows on both sides, so the corner moves by half the change in size.
+      resize.moved = true;
+      paint({ w: Math.max(1, resize.w + 2 * (event.clientX - resize.x)),
+        h: Math.max(1, resize.h + 2 * (event.clientY - resize.y)) });
+    });
+    const end = event => {
+      if (resize?.pointer !== event.pointerId) return;
+      const moved = resize.moved;
+      resize = null;
+      const size = dimensions();
+      if (moved && size.w && size.h) save(size); else restore();
+    };
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) smithGrip.addEventListener(event, end);
+    smithGrip.addEventListener('dblclick', () => save(null));
+    smithGrip.addEventListener('keydown', event => {
+      const delta = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
+      if (!delta && event.key !== '0') return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (!delta) { save(null); return; }
+      const { w, h } = dimensions(), step = event.shiftKey ? 48 : 16;
+      paint({ w: Math.max(1, w + delta[0] * step), h: Math.max(1, h + delta[1] * step) });
+      save(dimensions());
+    });
+    addEventListener('prefs-change', () => { if (!resize) restore(); });
+    restore();
+  }
 
   // ---------- the volume panel ----------
   const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');

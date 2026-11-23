@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.7.3",
+    "date": "2026-11-23",
+    "new": [],
+    "changed": [
+      "The Blacksmithing workshop opens with more room. Drag the corner control to resize it and save that size for next time."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.7.2",
     "date": "2026-11-23",
     "new": [],
