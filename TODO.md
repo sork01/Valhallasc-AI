@@ -8,6 +8,15 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `XP-CURVE-RULES` — Owner decisions recorded 2026-11-24. Scale XP from all XP-paying monster kills and quest turn-ins by the level gap. Use the monster's actual level or the quest's recommended level. Story quests and bosses use the same curve.
+  - **Curve.** Same-level content pays 100%. Each level above the character adds 3 percentage points, capped at 115% at five levels above. Each level below the character subtracts 10 percentage points, with a 30% minimum. Content five levels below pays 50%. Content seven or more levels below pays 30%, including the owner's example of a character ten levels above the content.
+  - **Quests.** Use the character's level when they claim the reward. A level-20 quest turned in at level 21 pays 90% of its authored XP before bonuses.
+  - **Parties.** Use each eligible recipient's own level and apply the existing party XP share. On the same level-20 kill, level-18 and level-25 members earn 106% and 50% of their respective normal shares before character bonuses.
+  - **Existing rewards.** Apply the curve to XP before character bonuses. Keep existing Greenmeadow and boss base XP, party fellowship rules, and the level 99 XP cap.
+- [ ] `XP-CURVE-SERVER` — After `XP-CURVE-RULES`, apply the shared curve to authoritative solo and party kill payouts and quest claims.
+- [ ] `XP-CURVE-CLIENT` — After `XP-CURVE-SERVER`, show level-adjusted quest XP before character bonuses in the quest journal and NPC reward previews. Keep XP gained feedback tied to the actual payout.
+- [ ] `XP-CURVE-CHECK` — After `XP-CURVE-CLIENT`, verify the floor and cap, late quest turn-ins, mixed-level parties, existing XP bonuses, and matching reward previews with focused and mutation checks.
+
 - [x] `ALCHEMY-RULES` — Owner approved the gameplay rules on 2026-11-21. Pick local flowers throughout Valhalla and brew potions and flasks that buff the character who drinks them. Alchemy is a secondary profession with a saved skill from 1 to 600.
   - **Training and brewing.** Any character can learn Alchemy alongside Fishing, Enchanting and Blacksmithing. A trainer in Alderhaven starts the profession. Alchemists in Alderhaven, Skaldholm, Nacrehold, Asterion and Veyrroot Heartwood teach and provide brewing stations and empty containers.
   - **Gathering.** Start with three active patches per shared adventure zone. Use one garden patch in each service city with its local flower. Skaldholm grows Lantern Lily, Nacrehold grows Tideglass Anemone, Asterion grows Sporebell and Veyrroot Heartwood grows Heartvine Bloom. Rán's Deep and Nacrehold use reachable seabed positions. Keep dungeons and the Arena free of gathering patches. Click or tap within reach to pick by hand. Moving, taking damage or leaving reach interrupts the pick. Each patch gives 3–5 shared picks of 1–2 flowers, then relocates to a validated alternate position. A pick spends a charge after the flowers fit and are saved.
