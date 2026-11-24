@@ -7,7 +7,12 @@
   const key = row => `${row.item}:${row.copy || 0}`;
   const price = row => Math.min(4294967295, Math.floor((row.base * row.quantity * (100 + (data?.goldPercent || 0)) + 50) / 100));
   const rarity = row => row.rarity || row.gear?.[0]?.rarity || Inventory.definition(row.item)?.rarity;
-  const isJunk = row => !window.Quests?.needsMaterial(row.item) && row.rarity === 'common' && !Inventory.definition(row.item)?.starter && (!!row.gear || Inventory.definition(row.item)?.kind === 'material');   // starter gear sells, but is never swept up as junk
+  const minedOres = new Set((window.BLACKSMITHING_DATA?.tiers || []).map(tier => tier.ore));
+  function isJunk(row) {
+    const item = Inventory.definition(row.item);
+    return row.rarity === 'common' && !item?.starter && !minedOres.has(row.item)
+      && !window.Quests?.needsMaterial(row.item) && (!!row.gear || item?.kind === 'material');
+  }
   let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null, lastNotice = '';
   let quantityDialog = null;
   const bag = document.querySelector('.bag-window'), bagHome = bag.parentElement, bagNext = bag.nextSibling;

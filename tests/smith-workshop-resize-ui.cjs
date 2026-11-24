@@ -4,8 +4,10 @@ const { run, replace, debug, touch } = require('./lib/touch.cjs');
 const suite = {
   name: 'smith-workshop-resize',
   mutate(page) {
-    return replace(page, 'settings.js', 'if (resize?.pointer !== event.pointerId) return;\n      // A centered window',
-      'return;\n      // A centered window');
+    return process.env.MUTATE === 'alchemy'
+      ? replace(page, 'settings.js', 'paint(resize.id,', "paint('smith',")
+      : replace(page, 'settings.js', 'if (resize?.pointer !== event.pointerId) return;\n      // A centered window',
+        'return;\n      // A centered window');
   },
   async test({ player, check, width }) {
     const phone = width < 900;
@@ -47,19 +49,22 @@ const suite = {
     });
     check(corner.hit, 'the corner grip is inside the viewport and receives input ' + JSON.stringify({stage,handle,corner}));
 
-    const x = handle.x + handle.width / 2, y = handle.y + handle.height / 2;
-    if (phone) {
-      const dispatch = await touch(page);
-      await dispatch('touchStart', [[0,x,y]]);
-      await dispatch('touchMove', [[0,x-35,y-22]]);
-      await dispatch('touchMove', [[0,x-65,y-38]]);
-      await dispatch('touchEnd', []);
-    } else {
-      await page.mouse.move(x,y);
-      await page.mouse.down();
-      await page.mouse.move(x-65,y-38,{steps:5});
-      await page.mouse.up();
+    async function resize(handle, dx, dy) {
+      const x = handle.x + handle.width / 2, y = handle.y + handle.height / 2;
+      if (phone) {
+        const dispatch = await touch(page);
+        await dispatch('touchStart', [[0, x, y]]);
+        await dispatch('touchMove', [[0, x + dx / 2, y + dy / 2]]);
+        await dispatch('touchMove', [[0, x + dx, y + dy]]);
+        await dispatch('touchEnd', []);
+      } else {
+        await page.mouse.move(x, y);
+        await page.mouse.down();
+        await page.mouse.move(x + dx, y + dy, {steps:5});
+        await page.mouse.up();
+      }
     }
+    await resize(handle, -65, -38);
     const smaller = await frame.boundingBox();
     const close = (a,b) => Math.abs(a-b) <= 2;
     check(close(smaller.width, initial.width-130) && close(smaller.height, initial.height-76),
@@ -86,6 +91,33 @@ const suite = {
     else await grip.dblclick();
     const reset = await frame.boundingBox();
     check(close(reset.width,initial.width) && close(reset.height,initial.height), 'reset restores the larger default');
+
+    await press(page.locator('#npc-x'));
+    await page.evaluate(smith => Prefs.set({panelSize: {...Prefs.panelSize, smith}}), saved);
+    const trainer = await page.evaluate(() => WORLD_MAP.npcs.find(npc => npc.id === 'alchemy_alderhaven'));
+    await debug(page, {op:'teleport',zone:0,x:trainer.x,y:trainer.y});
+    await page.waitForFunction(({x,y}) => Math.hypot(Field.hero.x-x,Field.hero.y-y) < 1, trainer);
+    await page.evaluate(npc => Online.send({type:'interact',npc}), trainer.id);
+    const alchemy = page.locator('#npc-offers [data-view="alchemy"]');
+    await press(alchemy);
+    await press(page.getByRole('button', {name: 'Learn Alchemy', exact: true}));
+    await page.locator('.alchemy-workshop .smith-recipe').first().waitFor();
+    const alchemyDefault = await frame.boundingBox();
+    check(close(alchemyDefault.width,initial.width) && close(alchemyDefault.height,initial.height),
+      'Alchemy opens at the roomy default despite a saved Blacksmithing size');
+    await resize(await grip.boundingBox(), -50, -25);
+    const alchemySmaller = await frame.boundingBox();
+    check(close(alchemySmaller.width,alchemyDefault.width-100) && close(alchemySmaller.height,alchemyDefault.height-50),
+      'Alchemy grip changes both physical dimensions');
+    const sizes = await page.evaluate(() => Prefs.panelSize);
+    check(close(sizes.alchemy.w,alchemySmaller.width) && close(sizes.alchemy.h,alchemySmaller.height)
+      && close(sizes.smith.w,saved.w) && close(sizes.smith.h,saved.h), 'Alchemy saves its own size');
+    await press(page.locator('#npc-x'));
+    await page.evaluate(npc => Online.send({type:'interact',npc}), trainer.id);
+    await press(alchemy);
+    const alchemyReopened = await frame.boundingBox();
+    check(close(alchemyReopened.width,alchemySmaller.width) && close(alchemyReopened.height,alchemySmaller.height),
+      'Alchemy remembers its own size when reopened');
     await page.context().close();
   },
 };

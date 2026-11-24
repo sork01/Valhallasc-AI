@@ -366,7 +366,7 @@ html, body { overscroll-behavior: none; }
 
   /* HUD Quest Tracker (#quest-tracker): readable text and bounded height above #touch-stick */
   #stage #quest-tracker {
-    top: 96px;
+    top: max(96px, calc(10.8cqw + 3.6cqw * var(--ui, .8) + 4px));
     width: var(--pw, calc(205px / var(--ui, .8)));
     font-size: calc(11.5px / var(--ui, .8));
     line-height: 1.25;

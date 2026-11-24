@@ -591,6 +591,7 @@
 .roll-card[data-rarity="epic"] { border-color: #b45cffb0; }
 .roll-card[data-rarity="legendary"] { border-color: #ff9a2eb0; }
 .roll-head { display: flex; justify-content: space-between; gap: .6cqw; align-items: baseline; }
+.roll-name[tabindex] { cursor: help; }
 .roll-time { color: #cdbd93; font-size: .85cqw; }
 .roll-stats { display: block; margin: .15cqw 0 .4cqw; color: #b9c2cc; font-size: .8cqw; }
 .roll-buttons { display: flex; gap: .4cqw; }

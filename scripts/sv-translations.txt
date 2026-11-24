@@ -1711,7 +1711,7 @@
   "Drag to change the width and height · double-click for the normal size": "Dra för att ändra bredd och höjd · dubbelklicka för normal storlek",
   "Drag to resize · double-click for the normal size": "Dra för att ändra storlek · dubbelklicka för normal storlek",
   "Drag to resize": "Dra för att ändra storlek",
-  "Resize the Blacksmithing workshop. Use arrow keys to resize or 0 to reset.": "Ändra storlek på smidesverkstaden. Använd piltangenterna för att ändra storlek eller 0 för att återställa.",
+  "Resize the workshop. Use arrow keys to resize or 0 to reset.": "Ändra storlek på verkstaden. Använd piltangenterna för att ändra storlek eller 0 för att återställa.",
   "Drifter Filament": "Driftartråd",
   "Drink a tonic · restores 60 HP": "Drick ett styrkeelixir · återställer 60 HP",
   "Drink before you descend. Down there the water remembers every wound.": "Drick innan du går ner. Där nere minns vattnet varje sår.",

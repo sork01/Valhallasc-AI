@@ -5,6 +5,7 @@
   const $ = id => document.getElementById(id);
   const COLOURS = { uncommon: '#4ad66d', rare: '#4aa3ff', epic: '#b45cff', legendary: '#ff9a2e', hierloom: '#ffd24a' };
   const cards = new Map();
+  const itemContext = { roll: true, copies: [] };
   function el(tag, text, className) {
     const node = document.createElement(tag);
     if (text) node.textContent = text;
@@ -19,16 +20,22 @@
   }
   function remove(id) {
     const card = cards.get(id); if (!card) return;
+    if (card.name.hasAttribute('aria-describedby')) Inventory.hideTooltip();
     clearInterval(card.timer); card.node.remove(); cards.delete(id);
   }
   function start(packet) {
     if (cards.has(packet.id)) return;
     const holder = $('loot-rolls'); if (!holder) return;
-    const item = window.WORLD_ITEMS?.find(i => i.id === packet.item) || { name: packet.item, rarity: 'uncommon', kind: 'gear' };
+    const definition = Inventory.definition(packet.item);
+    const item = definition || { name: packet.item, rarity: 'uncommon', kind: 'gear' };
     const rarity = packet.gear?.rarity || item.rarity;
     const node = el('div', '', 'roll-card'); node.dataset.roll = packet.id; node.dataset.rarity = rarity;
     node.setAttribute('role', 'group'); node.setAttribute('aria-label', `Loot roll: ${item.name}`);
     const name = el('b', item.name, 'roll-name'); name.style.color = COLOURS[rarity] || '#fff';
+    if (definition) {
+      name.tabIndex = 0;
+      Inventory.attachTooltip(name, () => definition, null, () => itemContext, () => packet.gear ?? null);
+    }
     const time = el('span', '', 'roll-time');
     const head = el('div', '', 'roll-head'); head.append(name, time);
     const buttons = el('div', '', 'roll-buttons');
@@ -47,7 +54,7 @@
     const ends = Date.now() + packet.seconds * 1000;
     const tick = () => { time.textContent = `${Math.max(0, Math.ceil((ends - Date.now()) / 1000))}s`; };
     tick();
-    cards.set(packet.id, { node, timer: setInterval(tick, 500), need: !!packet.need, buttons });
+    cards.set(packet.id, { node, name, timer: setInterval(tick, 500), need: !!packet.need, buttons });
     holder.append(node);
   }
   window.Rolls = {

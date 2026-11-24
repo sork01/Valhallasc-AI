@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `SELL-JUNK-MINED-ORE` — Sell All Junk excludes the raw ore IDs from the mining catalog. Individual ore sales still work. The bounded merchant check verified starter and endgame ore, unchanged junk payouts, and individual sale.
+- [x] `ALCHEMY-WORKSHOP-RESIZE` — Alchemy uses the Blacksmithing workshop's resize grip and saves its own width and height. Checked both workshops and reopening on phone and larger viewports.
+- [x] `NEED-GREED-GEAR-COMPARE` — Hover or focus the loot card's item name to compare the exact rolled stats with the equipped copy. The comparison shows signed differences and supports empty slots. Checked both viewports.
+
 - [x] `XP-CURVE-RULES` — Owner decisions recorded 2026-11-24. Scale XP from all XP-paying monster kills and quest turn-ins by the level gap. Use the monster's actual level or the quest's recommended level. Story quests and bosses use the same curve.
   - **Curve.** Same-level content pays 100%. Each level above the character adds 3 percentage points, capped at 115% at five levels above. Each level below the character subtracts 10 percentage points, with a 30% minimum. Content five levels below pays 50%. Content seven or more levels below pays 30%, including the owner's example of a character ten levels above the content.
   - **Quests.** Use the character's level when they claim the reward. A level-20 quest turned in at level 21 pays 90% of its authored XP before bonuses.
@@ -73,7 +77,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 - [x] `ALCHEMY-DATA` — After `ALCHEMY-SERVER`, author flowers, recipes, trainers, supplies and any recipe drops. Generate validated, reachable flower candidates after zone shaping. Verify full zone coverage, alternate positions, ingredient access and a complete 1–600 ladder.
 - [x] `ALCHEMY-CLIENT` — After `ALCHEMY-DATA`, add desktop and touch gathering and brewing, tier and source guidance, ingredient costs, buff tooltips and remaining timers. Add Swedish translations.
 - [x] `ALCHEMY-ART` — After `ALCHEMY-CLIENT`, create readable flower patches and flower, potion, flask and recipe icons in PixelFlow. Add picking, brewing and drinking cues.
-- [ ] `ALCHEMY-CHECK` — After `ALCHEMY-ART`, run focused data, Rust, private two-player and desktop/touch checks. Cover zone reachability, contention, interruptions, full bags, saved skill and recipes, cooldowns and buff expiry, PvP eligibility, and mutations of new assertions. Ten Rust tests, the private two-player restart probe, data, client and three targeted mutations pass on `feat/alchemy`. Desktop and touch browser runs await an approved host.
+- [x] `ALCHEMY-CHECK` — Twelve focused Rust tests, the two-player protocol and restart, data and client checks, and bounded desktop and Swedish touch runs passed. Alchemy generation preserves the order of the existing item catalog and workshop entries.
 - [x] `ALCHEMY-RELEASE` — Live as `1.6.0-8fe38684` on 2026-11-22. Alchemy is merged and pushed to main. Verified the public client, executable, health and all five saved characters. See `docs/alchemy.md`.
 
 - [x] `BLACKSMITHING-RULES` — Design and owner decisions recorded 2026-11-21. Add Blacksmithing as a secondary profession that characters can learn alongside Fishing and Enchanting. Mine ore with a pick, smelt it into bars and use blueprints to forge equipment.

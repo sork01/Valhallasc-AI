@@ -55,7 +55,7 @@ let browser;
     await page.evaluate(id => Online.send({type:'interact',npc:id}),trainer.id);
     await use(page.locator('#npc-offers [data-view="alchemy"]'));
   }
-  const brew = page.locator(`[data-recipe="${potion}"] button`);
+  const brew = page.locator(`[data-alchemy-action="${potion}"]`);
   await warp(trainer);
   await interact();
   await use(page.getByRole('button',{name:touch ? 'Lär dig alkemi' : 'Learn Alchemy',exact:true}));
@@ -66,7 +66,7 @@ let browser;
   assert.match(plants,touch ? /Wyrdklöver.*120.*Månslöjeorkidé.*150/ : /Wyrd Clover.*120.*Moonveil Orchid.*150/);
   await use(page.locator('[data-alchemy-action="recipes"]'));
   await use(brew);
-  await brew.filter({hasText:touch ? 'Brygg' : 'Brew'}).waitFor();
+  await brew.waitFor();
   assert(await brew.isDisabled());
   await use(page.locator('#npc-x'));
 

@@ -88,7 +88,7 @@ def spread(points, origin, separation, limit):
     return [dict(x=x, y=y) for x, y in selected]
 
 
-def workshop(area, zone, reachable, stock):
+def workshop(area, zone, reachable, stock, npc_index):
     ident, name, anchor, flower = WORKSHOPS[zone]
     surfaces = point_objects(area, SURFACES)
     grounds = [pos for pos in open_ground(area, reachable, 2) if inside_city(area, *pos)
@@ -104,10 +104,16 @@ def workshop(area, zone, reachable, stock):
                           style='bun', apron='#4e7469', prop='alembic'))
         npc = dict(id=ident, name=name, role='Alchemist', x=x, y=y, color='#4e7469',
                    dialogue=DIALOGUE, look=look, offers=[])
-        area['npcs'].append(npc)
+        area['npcs'].insert(npc_index, npc)
     else:
         npc = next(n for n in area['npcs'] if n['id'] == ident)
-    npc['offers'].extend([dict(id=WORKSHOP, label='Alchemy workshop', cost=0), *stock])
+    def alchemy_offer(offer):
+        return offer['id'] == WORKSHOP or offer['id'].startswith('buy_alchemy_')
+
+    offers = npc['offers']
+    start = next((i for i, offer in enumerate(offers) if alchemy_offer(offer)), len(offers))
+    offers[:] = [offer for offer in offers if not alchemy_offer(offer)]
+    offers[start:start] = [dict(id=WORKSHOP, label='Alchemy workshop', cost=0), *stock]
     pos = npc['x'], npc['y']
     patches = [p for p in grounds if 3 <= math.dist(pos, p) <= 18
                and not any(nearby(p, n, 2.4) for n in area['npcs'])]
@@ -117,6 +123,7 @@ def workshop(area, zone, reachable, stock):
 
 
 def apply(catalog, world, items, veins):
+    start = next((i for i, item in enumerate(items) if item.get('source') == SOURCE), len(items))
     original = [i for i in items if i.get('source') != SOURCE]
     new = []
     stock = []
@@ -140,7 +147,7 @@ def apply(catalog, world, items, veins):
                             sell=25, source=SOURCE))
     if len({i['id'] for i in original + new}) != len(original) + len(new):
         raise ValueError('Alchemy item ID is already in the catalog')
-    items[:] = original + new
+    items[:] = original[:start] + new + original[start:]
 
     areas = [world, *world['zones']]
     by_id = {flower['item']: index for index, flower in enumerate(catalog['flowers'])}
@@ -161,14 +168,12 @@ def apply(catalog, world, items, veins):
                                                 points=spread(points, origin, 10, 10)))
     for zone, (ident, name, *_rest) in WORKSHOPS.items():
         area = areas[zone]
-        if name:
-            area['npcs'] = [n for n in area['npcs'] if n['id'] != ident]
-        else:
-            existing = next(n for n in area['npcs'] if n['id'] == ident)
-            existing['offers'] = [o for o in existing['offers']
-                                  if o['id'] != WORKSHOP and not o['id'].startswith('buy_alchemy_')]
+        npcs = area['npcs']
+        npc_index = next((i for i, npc in enumerate(npcs) if npc['id'] == ident), len(npcs))
+        if name and npc_index < len(npcs):
+            npcs.pop(npc_index)
         reachable = positions[zone][0] if zone in positions else walkable(area)
-        flower, points = workshop(area, zone, reachable, stock)
+        flower, points = workshop(area, zone, reachable, stock, npc_index)
         pools.setdefault(zone, []).append(dict(flower=by_id[flower], active=1, points=points))
     for zone, groups in pools.items():
         for group in groups:

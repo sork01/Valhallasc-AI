@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.12.5",
+    "date": "2026-11-24",
+    "new": [
+      "Hover over a Need or Greed drop to compare its stats with what you are wearing."
+    ],
+    "changed": [
+      "Sell All Junk keeps mined ore in your bags.",
+      "You can resize the Alchemy Workshop. It remembers its size separately from Blacksmithing.",
+      "On phones, the quest tracker leaves room for your active effects."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.4",
     "date": "2026-11-24",
     "new": [],

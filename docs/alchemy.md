@@ -1,6 +1,6 @@
 # Alchemy
 
-Learn Alchemy from Maera Petalbrook in Alderhaven. Alchemists in Alderhaven, Skaldholm, Nacrehold, Asterion and Veyrroot Heartwood have brewing counters, sell Empty Vials for 25 copper and Empty Flasks for 1 silver, and teach the staple recipes. The workshop lists flower locations, skill requirements, known recipes, available ingredients and buff effects.
+Learn Alchemy from Maera Petalbrook in Alderhaven. Alchemists in Alderhaven, Skaldholm, Nacrehold, Asterion and Veyrroot Heartwood have brewing counters, sell Empty Vials for 25 copper and Empty Flasks for 1 silver, and teach the staple recipes. The workshop lists flower locations, skill requirements, known recipes, available ingredients and buff effects. Drag its footer grip to resize it. Alchemy and Blacksmithing remember separate sizes.
 
 Click or tap a nearby flower patch and stay still for 1.5 seconds. Moving, taking damage or losing reach interrupts the pick. Each shared patch yields 1–2 flowers per pick and moves after 3–5 successful picks. Flowers and any skill gain must save before a charge is spent. Three patches are active per adventure zone. Wyrdwood has two outer patches and one inner patch. Alderhaven has its own garden in addition to Greenmeadow's outdoor patches. The four service cities each have one garden patch.
 

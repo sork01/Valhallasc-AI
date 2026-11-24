@@ -231,7 +231,12 @@
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
   }
-  function hideTooltip() { if ($('item-tooltip')) $('item-tooltip').hidden = true; }
+  let tooltipAnchor = null;
+  function hideTooltip() {
+    tooltipAnchor?.removeAttribute('aria-describedby');
+    tooltipAnchor = null;
+    if ($('item-tooltip')) $('item-tooltip').hidden = true;
+  }
   function compareEquipment(i, copy) {
     const slot = equipTarget(i), current = itemAtSlot(slot);
     const worn = current && wornCopy(slot, current);
@@ -270,15 +275,16 @@
     }
     return table;
   }
-  // `where` is set for the bank window: the item's copies and count there replace the bag lookups and the sale line.
+  // External items use the supplied copy and context for the tooltip footer.
   function showTooltip(anchor, i, slot, where, cellCopy) {
     if (!i) return;
     const copy = cellCopy !== undefined ? cellCopy : where ? where.copies[0] : displayCopy(i, slot);
     const rarity = cellCopy !== undefined ? copy?.rarity || i.rarity : where ? bestRarity(i, where.copies) : displayRarity(i, slot);
     const compare = !slot && gearItem(i);
+    const roll = where?.roll;
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || professionKind(i) || (i.kind === 'rod' ? 'Fishing rod' : i.kind === 'fish' ? 'Fish' : i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
     t.classList.toggle('item-tooltip-comparing', compare);
-    const appearance = window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
+    const appearance = !roll && window.Transmog?.description(slot ? transmogs[slot] : appearanceForItem(i));
     if (appearance) t.append(node('p', appearance, 'transmog-note'));
     const scroll = window.Enchanting?.isScroll(i);
     if (!compare) window.Enchanting?.tooltip(t, i, (where || slot || cellCopy) ? copy : undefined);
@@ -295,7 +301,7 @@
     if (setEntry(i)) t.append(...setLines(i.source));
     const weaponFeature = window.RaidRewards?.tooltip(i);
     if (weaponFeature) t.append(node('p', weaponFeature, 'weapon-feature'));
-    if (classGear(i)) {
+    if (classGear(i) && !roll) {
       const left = Math.max(0, ...(where ? where.copies : copiesOf(i)).map(g => (g.tradeUntil || 0) - Date.now() / 1000)), minutes = Math.ceil(left / 60);
       const time = minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
       t.append(node('p', left > 0 ? `Bound on pickup · tradeable for ${time} with the party of the roll` : 'Bound on pickup · it can only be sold', 'item-bound'));
@@ -304,8 +310,8 @@
     if (conditionState(conditionCopy) !== 'new') {
       const line = node('p', conditionText(conditionCopy), 'item-durability'); line.dataset.state = conditionState(conditionCopy); t.append(line);
     }
-    if (where) t.append(node('p', `${where.count} ${where.in}`));
-    else t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', questItem(i) ? 'Quest item · cannot be sold' : `Sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`));
+    if (where && !roll) t.append(node('p', `${where.count} ${where.in}`));
+    else if (!where) t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', questItem(i) ? 'Quest item · cannot be sold' : `Sells for ${Money.text(cellCopy ? copyValue(i, cellCopy) : saleValue(i))}${perCopy(cellCopy, copy)}`));
     if (compatible(i)) {
       const copies = where ? where.copies : gearInstances.filter(g=>g.item===i.id);
       for(const [index,g] of copies.entries()) {
@@ -315,11 +321,13 @@
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
     const choosingDisenchant = !slot && !where && window.Enchanting?.selectingDisenchant?.();
-    if (!choosingDisenchant) t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    if (!choosingDisenchant && !roll) t.append(node('small', where ? where.hint : scroll ? 'Open Enchanting from your bags' : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
     t.style.top = Math.max(8, Math.min(innerHeight - tr.height - 8, r.top)) + 'px';
+    if (tooltipAnchor !== anchor) tooltipAnchor?.removeAttribute('aria-describedby');
+    tooltipAnchor = anchor;
     anchor.setAttribute('aria-describedby', t.id);
   }
   function attachTooltip(anchor, getItem, slot, getWhere, getCopy) {

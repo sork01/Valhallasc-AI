@@ -201,6 +201,7 @@
   // These two are lists, so they get a real width and height (the list scrolls inside) instead of the window zoom. Sizes are
   // stored in cqw of the layout box (Prefs.panelSize {id: {w, h}}), applied as --pw / --ph, and h is the height of the list.
   // The grip lives in the grip layer, not inside the piece: quests.js rebuilds the tracker's children on every update.
+  const WORKSHOP_PANELS = ['smith', 'alchemy'];
   const PANELS = [
     { id: 'quests', name: 'Quest tracker', top: false, w: [12, 60], h: [4, 50], body: el => el.querySelector('.tracker-list') },
     { id: 'chat', name: 'Chat', top: true, w: [14, 60], h: [3.5, 45], body: el => [...el.querySelectorAll('.chat-log')].find(x => !x.hidden) },
@@ -232,7 +233,7 @@
   const currentPanel = p => ({ w: p.el.offsetWidth / cq(), h: (p.body(p.el)?.offsetHeight || 0) / cq() });
   function storePanels() {
     const out = {};
-    if (window.Prefs.panelSize.smith) out.smith = window.Prefs.panelSize.smith;
+    for (const id of WORKSHOP_PANELS) if (window.Prefs.panelSize[id]) out[id] = window.Prefs.panelSize[id];
     for (const p of PANELS) if (p.size) out[p.id] = { ...p.size };
     window.Prefs.set({ panelSize: out });
   }
@@ -281,22 +282,23 @@
   }
   function resetPanels() { window.Prefs.set({ panelSize: null }); loadPanels(); placePanelGrips(); }
 
-  // The centered Blacksmithing window has its own dimensions in screen pixels.
-  // Its parchment reflows as the corner moves, using the normal conversation scale for text and controls.
-  const smithGrip = $('npc-smith-resize');
-  if (smithGrip) {
-    const workshop = smithGrip.closest('.gossip-window');
-    const paint = size => {
-      for (const [key, prop] of [['w', '--smith-width'], ['h', '--smith-height']]) {
+  // The centered workshops each remember their own dimensions in screen pixels.
+  const workshopGrip = $('npc-smith-resize');
+  if (workshopGrip) {
+    const workshop = workshopGrip.closest('.gossip-window');
+    const mode = () => $('npc-dialogue').dataset.service;
+    const paint = (id, size) => {
+      for (const [key, dimension] of [['w', 'width'], ['h', 'height']]) {
+        const prop = `--${id}-${dimension}`;
         const value = Number(size?.[key]);
         if (Number.isFinite(value) && value > 0) workshop.style.setProperty(prop, value + 'px');
         else workshop.style.removeProperty(prop);
       }
     };
-    const restore = () => paint(window.Prefs.panelSize.smith);
-    function save(size) {
+    const restore = () => { for (const id of WORKSHOP_PANELS) paint(id, window.Prefs.panelSize[id]); };
+    function save(id, size) {
       const sizes = { ...window.Prefs.panelSize };
-      if (size) sizes.smith = size; else delete sizes.smith;
+      if (size) sizes[id] = size; else delete sizes[id];
       window.Prefs.set({ panelSize: sizes });
     }
     const dimensions = () => {
@@ -304,38 +306,40 @@
       return { w: Math.round(width), h: Math.round(height) };
     };
     let resize = null;
-    smithGrip.addEventListener('pointerdown', event => {
-      if (resize || event.button !== 0) return;
+    workshopGrip.addEventListener('pointerdown', event => {
+      const id = mode();
+      if (resize || event.button !== 0 || !WORKSHOP_PANELS.includes(id)) return;
       event.preventDefault();
-      smithGrip.focus({ preventScroll: true });
-      resize = { pointer: event.pointerId, x: event.clientX, y: event.clientY, ...dimensions(), moved: false };
-      smithGrip.setPointerCapture(event.pointerId);
+      workshopGrip.focus({ preventScroll: true });
+      resize = { id, pointer: event.pointerId, x: event.clientX, y: event.clientY, ...dimensions(), moved: false };
+      workshopGrip.setPointerCapture(event.pointerId);
     });
-    smithGrip.addEventListener('pointermove', event => {
+    workshopGrip.addEventListener('pointermove', event => {
       if (resize?.pointer !== event.pointerId) return;
       // A centered window grows on both sides, so the corner moves by half the change in size.
       resize.moved = true;
-      paint({ w: Math.max(1, resize.w + 2 * (event.clientX - resize.x)),
+      paint(resize.id, { w: Math.max(1, resize.w + 2 * (event.clientX - resize.x)),
         h: Math.max(1, resize.h + 2 * (event.clientY - resize.y)) });
     });
     const end = event => {
       if (resize?.pointer !== event.pointerId) return;
-      const moved = resize.moved;
+      const { id, moved } = resize;
       resize = null;
       const size = dimensions();
-      if (moved && size.w && size.h) save(size); else restore();
+      if (moved && mode() === id && size.w && size.h) save(id, size); else restore();
     };
-    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) smithGrip.addEventListener(event, end);
-    smithGrip.addEventListener('dblclick', () => save(null));
-    smithGrip.addEventListener('keydown', event => {
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) workshopGrip.addEventListener(event, end);
+    workshopGrip.addEventListener('dblclick', () => { if (WORKSHOP_PANELS.includes(mode())) save(mode(), null); });
+    workshopGrip.addEventListener('keydown', event => {
       const delta = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
-      if (!delta && event.key !== '0') return;
+      const id = mode();
+      if ((!delta && event.key !== '0') || !WORKSHOP_PANELS.includes(id)) return;
       event.preventDefault();
       event.stopPropagation();
-      if (!delta) { save(null); return; }
+      if (!delta) { save(id, null); return; }
       const { w, h } = dimensions(), step = event.shiftKey ? 48 : 16;
-      paint({ w: Math.max(1, w + delta[0] * step), h: Math.max(1, h + delta[1] * step) });
-      save(dimensions());
+      paint(id, { w: Math.max(1, w + delta[0] * step), h: Math.max(1, h + delta[1] * step) });
+      save(id, dimensions());
     });
     addEventListener('prefs-change', () => { if (!resize) restore(); });
     restore();
