@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.12.8",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Mercenaries hired for a dungeon stay with the party when a boss quest is completed and finish their contract when the dungeon is cleared."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.7",
     "date": "2026-11-24",
     "new": [],

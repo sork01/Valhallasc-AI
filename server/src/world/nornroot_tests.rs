@@ -216,6 +216,77 @@ fn nornroot_bosses_drop_exclusive_gear_and_only_clear_their_copy() {
 }
 
 #[test]
+fn nornroot_dungeon_hires_stay_after_arn_until_the_instance_clears() {
+    let mut w = world();
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    let guide = w.maps[WYRD]
+        .npcs
+        .iter()
+        .find(|npc| npc.id == "barrow_guide")
+        .unwrap()
+        .position_at(w.time);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.level = 25;
+    c.gold = 10_000;
+    place(&mut w, 1, WYRD, guide);
+    w.time += 1.;
+    w.interact(1, "barrow_guide", Some("quest:accept:barrow_amber"));
+    assert!(
+        w.players[&1]
+            .character
+            .quests
+            .iter()
+            .any(|q| q.id == "barrow_amber" && q.counts == vec![0])
+    );
+
+    w.time += 1.;
+    w.interact(1, "barrow_guide", Some("merc_priest"));
+    let (&hire, _) = w.players.iter().find(|(_, p)| p.merc.is_some()).unwrap();
+    enter(&mut w, 1);
+    let zone = w.players[&1].character.zone;
+    assert_eq!(w.public_zone(zone), BARROW);
+    w.update_mercenaries();
+    assert_eq!(w.players[&hire].character.zone, zone);
+
+    for kind in ["barrow_doorward", "barrow_threadkeeper", "barrow_fatebound"] {
+        let enemy = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == zone && s.kind == kind)
+            .unwrap();
+        let point = w.slimes[enemy].point();
+        place(&mut w, 1, zone, point);
+        w.hit_slime(enemy, 1, 1e9, false);
+        w.update_mercenaries();
+        let cleared = kind == "barrow_fatebound";
+        assert_eq!(w.instance_cleared(zone), cleared);
+        assert_eq!(
+            w.players.contains_key(&hire),
+            !cleared,
+            "a dungeon hire's contract ends on the full clear ({kind})"
+        );
+        if kind == "barrow_doorward" {
+            assert!(
+                w.players[&1]
+                    .character
+                    .quests
+                    .iter()
+                    .any(|q| q.id == "barrow_amber" && q.counts == vec![1] && !q.claimed)
+            );
+        }
+    }
+
+    place(&mut w, 1, WYRD, guide);
+    w.time += 1.;
+    w.interact(1, "barrow_guide", Some("merc_mage"));
+    let notices = super::wyrd_tests::lines(&mut rx);
+    assert!(
+        w.players.values().any(|p| p.merc.is_some()),
+        "a ready quest cannot block a new dungeon hire: {notices:?}"
+    );
+}
+
+#[test]
 fn nornroot_fatewoven_set_heals_only_its_wearer_and_has_a_timer() {
     let mut w = world();
     let _receivers: Vec<_> = (1..=2).map(|id| join(&mut w, id, Class::Warrior)).collect();

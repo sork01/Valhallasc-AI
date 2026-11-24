@@ -193,18 +193,18 @@ impl World {
             .collect()
     }
     /// The offer this NPC makes that rents or dismisses mercenaries, if `offer_id` is one.
-    pub(super) fn merc_offer(&self, session: u64, npc_id: &str, offer_id: &str) -> Option<String> {
+    pub(super) fn merc_offer(&self, session: u64, npc_id: &str, offer_id: &str) -> Option<Offer> {
         let zone = self.players.get(&session)?.character.zone;
         let npc = self.maps[zone].npcs.iter().find(|n| n.id == npc_id)?;
         npc.offers
             .iter()
-            .find(|o| o.id == offer_id)
-            .and_then(|o| o.merc.clone())
+            .find(|o| o.id == offer_id && o.merc.is_some())
+            .cloned()
     }
 
     /// Handles a mercenary offer from a quest giver: checks the player is at the NPC, runs the hire or dismissal and
     /// answers with the usual dialogue packet carrying the result as its notice.
-    pub(super) fn merc_interact(&mut self, session: u64, npc_id: &str, what: &str) {
+    pub(super) fn merc_interact(&mut self, session: u64, npc_id: &str, offer: &Offer) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
@@ -223,10 +223,10 @@ impl World {
             "Please wait a moment before trying again.".to_owned()
         } else {
             self.players.get_mut(&session).unwrap().service_at = self.time;
-            let result = if what == "dismiss" {
+            let result = if offer.merc.as_deref() == Some("dismiss") {
                 self.dismiss_mercenaries(session)
             } else {
-                self.hire_mercenary(session, what, npc_id)
+                self.hire_mercenary(session, offer, npc_id)
             };
             match result {
                 Ok(text) | Err(text) => text,
@@ -288,67 +288,56 @@ impl World {
     fn hire_mercenary(
         &mut self,
         session: u64,
-        class: &str,
+        offer: &Offer,
         npc_id: &str,
     ) -> Result<String, String> {
-        let class = class_named(class).ok_or("There is no such fighter for hire.")?;
+        let class = offer
+            .merc
+            .as_deref()
+            .and_then(class_named)
+            .ok_or("There is no such fighter for hire.")?;
         let p = self.players.get(&session).ok_or("Unknown session.")?;
         let c = &p.character;
-        // A group-quest giver rents fighters for that quest; the Meeting Stone rents them to anyone, for any party of up to five.
-        let seasons = self.seasonal.active();
-        let quest = self
-            .maps
-            .iter()
-            .flat_map(|m| &m.quests)
-            .find(|q| {
-                q.group
-                    && (q.npc == npc_id || crate::seasonal::giver(&q.id, npc_id))
-                    && c.quests.iter().any(|g| g.id == q.id && !g.claimed)
-                    && (crate::seasonal::quest_event(&q.id).is_none()
-                        || crate::seasonal::period(&q.id, &seasons)
-                            == c.seasonal_started.get(&q.id).copied())
-            })
-            .map(|q| {
-                (
-                    q.recommended_players as usize,
-                    q.title.clone(),
-                    q.id.clone(),
-                    q.ready(c.quests.iter().find(|g| g.id == q.id).unwrap()),
-                )
-            });
-        let open = self.maps[c.zone]
-            .npcs
-            .iter()
-            .find(|n| n.id == npc_id)
-            .is_some_and(|n| {
-                n.offers.iter().any(|o| {
-                    o.open && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
+        // The selected offer determines the contract, even when its NPC also gives a group quest.
+        let raid_contract = offer.raid;
+        let (wanted, title, contract) = if raid_contract {
+            (social::RAID_MAX, "The raid contract".to_owned(), None)
+        } else if offer.open {
+            (social::PARTY_MAX, "The Meeting Stone".to_owned(), None)
+        } else {
+            let seasons = self.seasonal.active();
+            let quest = self
+                .maps
+                .iter()
+                .flat_map(|m| &m.quests)
+                .filter(|q| {
+                    q.group
+                        && (q.npc == npc_id || crate::seasonal::giver(&q.id, npc_id))
+                        && (crate::seasonal::quest_event(&q.id).is_none()
+                            || crate::seasonal::period(&q.id, &seasons)
+                                == c.seasonal_started.get(&q.id).copied())
                 })
-            });
-        // The quartermaster at a raid door: hires every free seat of a raid group, no quest asked.
-        let raid_contract = self.maps[c.zone]
-            .npcs
-            .iter()
-            .find(|n| n.id == npc_id)
-            .is_some_and(|n| {
-                n.offers.iter().any(|o| {
-                    o.raid && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
-                })
-            });
-        let (wanted, title, contract) = match quest {
-            Some((_, _, _, true)) => {
+                .find_map(|q| {
+                    c.quests
+                        .iter()
+                        .find(|progress| progress.id == q.id && !progress.claimed)
+                        .map(|progress| (q, progress))
+                });
+            let Some((quest, progress)) = quest else {
+                return Err(
+                    "Take this elite quest first; I hire out fighters for the job itself.".into(),
+                );
+            };
+            if quest.ready(progress) {
                 return Err(
                     "This objective is already complete. Your mercenaries' work is done.".into(),
                 );
             }
-            Some((wanted, title, id, false)) => (wanted, title, Some(id)),
-            None if raid_contract => (social::RAID_MAX, "The raid contract".to_owned(), None),
-            None if open => (social::PARTY_MAX, "The Meeting Stone".to_owned(), None),
-            None => {
-                return Err(
-                    "Take this elite quest first; I hire out fighters for the job itself.".into(),
-                );
-            }
+            (
+                quest.recommended_players as usize,
+                quest.title.clone(),
+                Some(quest.id.clone()),
+            )
         };
         let owner = c.id.clone();
         // A raid contract turns the leader's (or a lone hirer's) group into a raid; a member signs only for a raid.

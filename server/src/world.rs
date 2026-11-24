@@ -3532,8 +3532,8 @@ impl World {
         if self.travel_master(npc_id).is_some() {
             return self.spark_interact(session, npc_id, offer_id);
         }
-        if let Some(what) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
-            return self.merc_interact(session, npc_id, &what);
+        if let Some(offer) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
+            return self.merc_interact(session, npc_id, &offer);
         }
         if offer_id == Some("gauntlet") {
             return self.gauntlet_interact(session, npc_id);
