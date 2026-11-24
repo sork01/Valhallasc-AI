@@ -2970,7 +2970,10 @@ impl World {
         let mut snapshot = self.snapshot_for(zone);
         crate::visibility::filter_view(&mut snapshot, &id);
         crate::visibility::cull_view(&mut snapshot, &id);
-        Ok(json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":snapshot}))
+        Ok(json!({
+            "type": "welcome", "version": 1, "id": id, "token": issued, "snapshot": snapshot,
+            "xpCurve": { "minGap": XP_LEVEL_MIN_GAP, "rates": XP_LEVEL_RATES },
+        }))
     }
     /// Test servers may start new characters above level 1 (VALHALLA_START_LEVEL).
     fn with_start_level(&self, mut c: Character) -> Character {
@@ -7256,7 +7259,8 @@ fn quest_action_with_choice(
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
             let gold = character.quest_gold(quest.reward_gold);
             character.gold = character.gold.saturating_add(gold);
-            let (xp, levels) = character.reward_xp(quest.reward_xp);
+            let base_xp = level_adjusted_xp(quest.reward_xp, character.level, quest.level);
+            let (xp, levels) = character.reward_xp(base_xp);
             (
                 format!(
                     "Quest complete: {}! +{} XP and +{}.{}",
@@ -8787,7 +8791,7 @@ mod tests {
         quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_onward"));
         let c = &w.players[&1].character;
         assert!(c.quests[0].claimed && c.quests[0].completions == 1);
-        assert_eq!(c.gold, gold + 100);
+        assert_eq!(c.gold, gold + c.quest_gold(100));
         assert_eq!(c.xp, xp + xp_to_level(5) / 10);
     }
 
@@ -12313,7 +12317,10 @@ mod tests {
         w.hit_slime(id, 1, 1000., false);
         assert_eq!(w.next_king_spawn, deadline);
         assert_eq!(w.players[&1].character.kills, 1);
-        assert_eq!(w.players[&1].character.xp, 38, "half XP in Greenmeadow");
+        assert_eq!(
+            w.players[&1].character.xp, 44,
+            "half XP in Greenmeadow plus the 15% level bonus"
+        );
         assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
         assert_eq!(
             w.drops
@@ -12325,8 +12332,9 @@ mod tests {
                 .count(),
             1
         );
-        // Authored 30 gold, halved by MOB_GOLD_SCALE.
-        assert_eq!(w.drops[0].value, 15);
+        // Recipe drops can precede the coin pile. The authored 30 gold is halved by MOB_GOLD_SCALE.
+        let coins = w.drops.iter().find(|drop| drop.item.is_none()).unwrap();
+        assert_eq!(coins.value, 15);
         for _ in 0..500 {
             w.time += TICK;
             w.update_king_spawn();
@@ -12726,13 +12734,13 @@ mod tests {
             (182., 17., 30, 8)
         );
         assert_eq!(high.r, base.r, "level never changes body size");
-        // A kill pays the rolled enemy's XP and gold, not the kind's default.
+        // The rolled enemy level sets the base XP, the level bonus and the gold.
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
         w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 7);
         w.hit_slime(id, 1, 5000., false);
-        assert_eq!(w.players[&1].character.xp, 40);
+        assert_eq!(w.players[&1].character.xp, 46);
         assert_eq!(
             w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
             6,
@@ -13033,7 +13041,7 @@ mod tests {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
         assert_eq!(w.players[&1].character.xp_need(), 100);
-        // Greenmeadow kills pay half XP: a level-2 green pays (45 + 5 x 2) / 2, rounded up.
+        // A level-2 green pays 28 in Greenmeadow and gets a 3% bonus for a level-1 hero.
         let kill = |w: &mut World| {
             w.hit_slime(0, 1, 1000., false);
             w.slimes[0].respawn = TICK;
@@ -13041,14 +13049,14 @@ mod tests {
         };
         kill(&mut w);
         assert_eq!(w.players[&1].character.level, 1);
-        assert_eq!(w.players[&1].character.xp, 28);
+        assert_eq!(w.players[&1].character.xp, 29);
         kill(&mut w);
         kill(&mut w);
         assert_eq!(w.players[&1].character.level, 1);
-        assert_eq!(w.players[&1].character.xp, 84);
+        assert_eq!(w.players[&1].character.xp, 87);
         w.hit_slime(0, 1, 1000., false);
         assert_eq!(w.players[&1].character.level, 2);
-        assert_eq!(w.players[&1].character.xp, 12);
+        assert_eq!(w.players[&1].character.xp, 16);
         assert_eq!(w.players[&1].character.xp_need(), 200);
         assert_eq!(w.players[&1].character.hp, 140.);
     }
@@ -13061,7 +13069,10 @@ mod tests {
         w.hit_slime(id, 1, 1000., false);
         w.hit_slime(id, 1, 1000., false);
         assert_eq!(w.players[&1].character.kills, 1);
-        assert_eq!(w.players[&1].character.xp, 35, "half XP in Greenmeadow");
+        assert_eq!(
+            w.players[&1].character.xp, 39,
+            "half XP in Greenmeadow plus the 12% level bonus"
+        );
         assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
         assert_eq!(
             w.drops
@@ -13199,7 +13210,7 @@ mod tests {
                 .count(),
             1
         );
-        assert_eq!(w.players[&1].character.xp, 28);
+        assert_eq!(w.players[&1].character.xp, 29);
         w.slimes[0].respawn = TICK;
         w.step();
         assert!(!w.slimes[0].dead);

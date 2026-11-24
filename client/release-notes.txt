@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.12.3",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Quests and monster kills above your level give up to 15% extra experience. Those below your level give less, down to 30% of the usual reward.",
+      "Quest rewards show the experience for your current level before personal bonuses."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.2",
     "date": "2026-11-24",
     "new": [],

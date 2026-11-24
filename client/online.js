@@ -164,6 +164,7 @@
           }
           if (initialSlot?.initialEmptySlots?.length) send({ type: 'equip', slots: Object.fromEntries(initialSlot.initialEmptySlots.map(slot => [slot, 'none'])) });
           characterGm = character?.gm === true; window.GM?.onSelf?.(character);
+          window.Quests?.setXpCurve?.(packet.xpCurve);
           window.Fishing?.reset(); window.Blacksmithing?.reset(); window.Alchemy?.reset(); callbacks.onWelcome?.(packet);
           window.DpsMeter?.update(packet.snapshot.damageMeter);
           window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.Mail?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });

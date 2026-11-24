@@ -67,7 +67,7 @@ fn hierloom_kill_and_quest_xp_are_actually_paid_at_five_times_base() {
     let point = at(w.slimes[id].x, w.slimes[id].y);
     place(&mut w, 1, 0, point);
     w.hit_slime(id, 1, 1e12, false);
-    assert_eq!(w.players[&1].character.xp, xp * 5);
+    assert_eq!(w.players[&1].character.xp, ((xp * 30 + 50) / 100) * 5);
     // Ready a single existing talk/visit quest using a fixture rather than playing its route.
     let npc = w.maps[1]
         .npcs
@@ -97,7 +97,7 @@ fn hierloom_kill_and_quest_xp_are_actually_paid_at_five_times_base() {
         .push(progress);
     let before = w.players[&1].character.xp;
     w.interact(1, "crags_captain", Some("quest:claim:crags_onward"));
-    assert_eq!(w.players[&1].character.xp - before, reward * 5);
+    assert_eq!(w.players[&1].character.xp - before, ((reward * 30 + 50) / 100) * 5);
 }
 
 #[test]

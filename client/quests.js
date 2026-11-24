@@ -8,7 +8,7 @@
     objectives: q.objectives.map(o => o.label == null && o.what ? { ...o, label: Locale.translate(o.what) } : o),
   })));
   let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
-  let abandoned = [], initialized = false;
+  let abandoned = [], initialized = false, xpCurve = null;
   const guidance = QuestGuidance.create(areas, window.QUEST_SOURCES || {});
   let groupKey = '', groupList = [];
   const closedGroups = new Set();
@@ -283,13 +283,27 @@
     tracker.append(list);
     if (open()) renderJournal(active);
   }
-  // One selected quest is read on the parchment; the dark list keeps regions,
-  // ready turn-ins, abandoned automatic quests and completed history separate.
+  function rewardExperience(quest) {
+    if (window.Field?.hero?.maxLevel) return 0;
+    if (!xpCurve || !quest.rewardXp) return quest.rewardXp;
+    const gap = quest.level - heroLevel;
+    const index = Math.max(0, Math.min(xpCurve.rates.length - 1, gap - xpCurve.minGap));
+    const xp = Math.round(quest.rewardXp * xpCurve.rates[index] / 100);
+    return Math.max(1, Math.min(4294967295, xp));
+  }
+
   function rewardCoins(quest) {
     const bonus = window.Field?.hero?.questGoldPercent || 0;
     return Math.min(4294967295, Math.floor((quest.rewardGold * (100 + bonus) + 50) / 100));
   }
 
+  function rewardLine(quest, xp = rewardExperience(quest)) {
+    const line = element('p', '', 'quest-reward');
+    line.innerHTML = `<span>${Locale.translate(`${xp} experience`)}</span> · ${Money.html(rewardCoins(quest))}`;
+    return line;
+  }
+
+  // The dark list keeps ready turn-ins, abandoned automatic quests and completed history separate.
   function renderJournal(active) {
     const zone = window.Field?.zone || 0;
     const mine = [...active].sort((a, b) => Number(status(a) === 'ready') - Number(status(b) === 'ready') || Number(b.id === tracked) - Number(a.id === tracked) || Number(b.zone === zone) - Number(a.zone === zone));
@@ -379,7 +393,7 @@
     if (!quest.handoffTo) {
       node.append(element('h5', 'Rewards'), element('p', 'You will receive:', 'quest-reward-label'));
       rewards(quest, node, false);
-      { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(rewardCoins(quest))}`; node.append(p); }
+      node.append(rewardLine(quest, history ? quest.rewardXp : rewardExperience(quest)));
     }
     if (state(quest)?.completions) node.append(element('p', `Completed ${state(quest).completions} time${state(quest).completions === 1 ? '' : 's'}.`, 'quest-history'));
     const action = (label, name, handler, disabled = false) => {
@@ -437,7 +451,14 @@
   });
   window.Quests = {
     show, close, get open() { return open(); },
-    setLevel(level) { if (heroLevel !== level) { heroLevel = level; clearGuidance(); render(); } },
+    setXpCurve(curve) { xpCurve = curve; },
+    setLevel(level) {
+      if (heroLevel === level) return;
+      heroLevel = level;
+      clearGuidance();
+      render();
+      if ($('npc-dialogue')?.dataset.service === 'quest') window.City?.refresh?.();
+    },
     mapMarkers, navigationTarget, track, get tracked() { return tracked; },
     // The highest quest level an NPC offers (null when they give none): the level their target frame shows in a city.
     npcLevel(id) { const l = (questsByNpc.get(id) || []).map(q => q.level).filter(Number.isFinite); return l.length ? Math.max(...l) : null; },
@@ -540,7 +561,7 @@
       if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
       node.append(element('h5', actionContainer ? 'Quest Objectives' : 'Objectives'), element('p', s === 'ready' ? 'Complete · Ready to turn in' : objectives(quest).join('\n'), 'quest-objectives'));
       if (arenaLevel(quest)) node.append(element('p', `Accepted from ${giver(quest).name}. Enter and hand in at any arena giver.`, 'quest-location'));
-      if (!quest.handoffTo) { const p = element('p', '', 'quest-reward'); p.innerHTML = `<span>${Locale.translate(`${quest.rewardXp} experience`)}</span> · ${Money.html(rewardCoins(quest))}`; node.append(element('h5', 'Rewards'), p); }
+      if (!quest.handoffTo) node.append(element('h5', 'Rewards'), rewardLine(quest));
       const choices = rewards(quest, node, s === 'ready', npcId, !!actionContainer);
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {

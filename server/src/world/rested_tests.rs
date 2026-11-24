@@ -122,7 +122,7 @@ fn rested_actual_kill_and_quest_rewards_spend_the_same_reserve() {
     c.level = 50;
     c.rested.reserve = 144_000_000;
     let id = w.slimes.iter().position(|s| s.zone == 0).unwrap();
-    let xp = w.slimes[id].xp;
+    let xp = (w.slimes[id].xp * 30 + 50) / 100;
     let point = at(w.slimes[id].x, w.slimes[id].y);
     place(&mut w, 1, 0, point);
     w.hit_slime(id, 1, 1e12, false);
@@ -154,7 +154,8 @@ fn rested_actual_kill_and_quest_rewards_spend_the_same_reserve() {
             completions: 0,
         });
     w.interact(1, "crags_captain", Some("quest:claim:crags_onward"));
-    assert_eq!(w.players[&1].character.xp, (xp + quest.reward_xp) * 3);
+    let quest_xp = (quest.reward_xp * 30 + 50) / 100;
+    assert_eq!(w.players[&1].character.xp, (xp + quest_xp) * 3);
     assert!(w.players[&1].character.rested.reserve < reserve);
     // A rejected second turn-in cannot consume more reserve.
     let after = w.players[&1].character.rested.reserve;

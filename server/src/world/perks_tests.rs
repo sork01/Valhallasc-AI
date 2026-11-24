@@ -306,11 +306,12 @@ fn xp_gold_bags_fares_and_the_reset_price_follow_the_table() {
         kill(&mut w, id, 0, level);
         (w.players[&1].character.clone(), paid)
     };
-    let (control, paid) = kill_xp([0; 5]);
-    assert_eq!(control.xp, paid);
+    let (control, base) = kill_xp([0; 5]);
+    let adjusted = (base * 30 + 50) / 100;
+    assert_eq!(control.xp, adjusted, "low-level kills pay the 30% floor");
     for tiers in [[1, 0, 0, 0, 0], [5, 0, 0, 0, 0], [0, 0, 0, 0, 3]] {
-        let (hero, paid) = kill_xp(tiers);
-        assert_eq!(hero.xp, hero.boosted_xp(paid), "{tiers:?}");
+        let (hero, _) = kill_xp(tiers);
+        assert_eq!(hero.xp, hero.boosted_xp(adjusted), "{tiers:?}");
     }
     // Bag cells and the stat-reset price.
     let before = c(&w);
@@ -379,6 +380,29 @@ fn claim_onward(w: &mut World) {
     c.x = here.x;
     c.y = here.y;
     w.interact(1, "crags_captain", Some("quest:claim:crags_onward"));
+}
+
+#[test]
+fn xp_level_curve_uses_level_when_a_completed_quest_is_claimed() {
+    let mut w = world();
+    let (tx, _rx) = mpsc::channel(512);
+    let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+    assert_eq!(
+        welcome["xpCurve"],
+        json!({ "minGap": -7, "rates": [30, 40, 50, 60, 70, 80, 90, 100, 103, 106, 109, 112, 115] }),
+    );
+    w.players.get_mut(&1).unwrap().character.level = 5;
+    w.step();
+    w.players.get_mut(&1).unwrap().character.zone = 1;
+    w.step();
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    assert_eq!(c.quests[0].counts, vec![1]);
+    c.level = 15;
+    let before = c.xp;
+    claim_onward(&mut w);
+    let c = &w.players[&1].character;
+    assert!(c.quests[0].claimed);
+    assert_eq!(c.xp - before, (xp_to_level(5) / 10) * 30 / 100);
 }
 
 #[test]
@@ -490,14 +514,12 @@ fn a_party_member_gets_their_own_bonus_on_the_shared_xp() {
     }
     w.players.get_mut(&2).unwrap().character.rebirth_tiers = [4, 0, 0, 0, 0];
     let id = w.slimes.iter().position(|s| s.zone == 0).unwrap();
-    let level = w.slimes[id].level;
-    let paid = w.slimes[id].xp;
+    let base = w.slimes[id].xp;
     w.slimes[id].x = 10.;
     w.slimes[id].y = 10.;
     w.hit_slime(id, 1, 1e12, false);
     let (first, second) = (w.players[&1].character.xp, w.players[&2].character.xp);
-    let share = super::partyxp::shared_xp(paid, 1);
-    let _ = level;
+    let share = super::partyxp::shared_xp((base * 30 + 50) / 100, 1);
     assert_eq!(first, share);
     assert_eq!(second, w.players[&2].character.boosted_xp(share));
     assert!(second > first);

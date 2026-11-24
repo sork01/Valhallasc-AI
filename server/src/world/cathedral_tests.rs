@@ -320,7 +320,11 @@ fn cathedral_final_boss_first_does_not_clear_but_all_four_bosses_open_only_their
         for (n, id) in ids.into_iter().enumerate() {
             let point = w.slimes[id].point();
             place(&mut w, 1, zone, point);
-            let xp = w.slimes[id].xp;
+            let xp = level_adjusted_xp(
+                w.slimes[id].xp,
+                w.players[&1].character.level,
+                w.slimes[id].level,
+            );
             let before = lifetime_xp(&w.players[&1].character);
             w.hit_slime(id, 1, 1e9, false);
             let encounter = crate::cathedral::enemy(&w.slimes[id].kind).unwrap();

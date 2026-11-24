@@ -251,6 +251,7 @@
   "{0} departs: {1}.": "{0} lämnar oss: {1}.",
   "{0} did not answer your {1}.": "{0} svarade inte på din {1}.",
   "{0} entered {1}.": "{0} gick in i {1}.",
+  "{0} experience": "{0} erfarenhet",
   "{0} experience · {1} gold": "{0} erfarenhet · {1} guld",
   "{0} extra slots · Requires level {1}": "{0} extra platser · Kräver nivå {1}",
   "{0} gained. Press ‹mount› to mount.": "{0} förvärvat. Tryck på ‹mount› för att sitta upp.",

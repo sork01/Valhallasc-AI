@@ -13,9 +13,9 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
   - **Quests.** Use the character's level when they claim the reward. A level-20 quest turned in at level 21 pays 90% of its authored XP before bonuses.
   - **Parties.** Use each eligible recipient's own level and apply the existing party XP share. On the same level-20 kill, level-18 and level-25 members earn 106% and 50% of their respective normal shares before character bonuses.
   - **Existing rewards.** Apply the curve to XP before character bonuses. Keep existing Greenmeadow and boss base XP, party fellowship rules, and the level 99 XP cap.
-- [ ] `XP-CURVE-SERVER` — After `XP-CURVE-RULES`, apply the shared curve to authoritative solo and party kill payouts and quest claims.
-- [ ] `XP-CURVE-CLIENT` — After `XP-CURVE-SERVER`, show level-adjusted quest XP before character bonuses in the quest journal and NPC reward previews. Keep XP gained feedback tied to the actual payout.
-- [ ] `XP-CURVE-CHECK` — After `XP-CURVE-CLIENT`, verify the floor and cap, late quest turn-ins, mixed-level parties, existing XP bonuses, and matching reward previews with focused and mutation checks.
+- [x] `XP-CURVE-SERVER` — Implemented on `feat/xp-level-curve`. Solo and party kills and quest claims use one level curve. Payouts apply the existing party share and personal bonuses after the level adjustment.
+- [x] `XP-CURVE-CLIENT` — The 1.12.3 candidate reads the rate table at login and updates both quest reward previews as the character levels. Previews show XP before personal bonuses and payout feedback shows actual XP earned.
+- [x] `XP-CURVE-CHECK` — Passed 26 focused Rust checks across the curve boundaries, late turn-ins, solo and mixed-level party kills, and existing XP bonuses. The non-browser journal and conversation checks passed, including preview refresh after level-up. Four curve mutations and three client mutations were caught. Swedish catalog and release notes passed.
 
 - [x] `PROFESSIONS-600` — Extend Enchanting and Fishing through skill 600 on `feat/professions-600`. Twenty 30-point bands, eight expert enchants, ten new fishing regions, 35 species, five dishes and two rod upgrades. See `docs/enchanting.md` and `docs/fishing.md`.
 

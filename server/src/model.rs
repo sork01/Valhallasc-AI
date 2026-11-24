@@ -880,6 +880,21 @@ pub fn xp_to_level(level: u32) -> u32 {
 pub fn enemy_xp(level: u32) -> u32 {
     45 + 5 * level.max(1)
 }
+pub const XP_LEVEL_MIN_GAP: i64 = -7;
+pub const XP_LEVEL_RATES: [u32; 13] = [30, 40, 50, 60, 70, 80, 90, 100, 103, 106, 109, 112, 115];
+
+/// Scale a quest or kill's base XP by its level relative to the recipient.
+/// Round to the nearest XP and keep at least one XP for a positive reward.
+pub fn level_adjusted_xp(base: u32, recipient_level: u32, reward_level: u32) -> u32 {
+    if base == 0 {
+        return 0;
+    }
+    let gap = i64::from(reward_level) - i64::from(recipient_level);
+    let index = (gap - XP_LEVEL_MIN_GAP).clamp(0, XP_LEVEL_RATES.len() as i64 - 1) as usize;
+    let scaled = (u64::from(base) * u64::from(XP_LEVEL_RATES[index]) + 50) / 100;
+    scaled.clamp(1, u64::from(u32::MAX)) as u32
+}
+
 impl Character {
     pub fn stat_scale(&self) -> f64 {
         if self.resurrection_sickness > 0. {
@@ -1221,9 +1236,7 @@ pub struct Quest {
     pub npc: String,
     pub requires: Option<String>,
     pub repeatable: bool,
-    /// Recommended character level; the XP reward is a tenth of what that level needs. Clients read it
-    /// from client/world.js and a world test checks the reward, so the server itself never uses it.
-    #[cfg_attr(not(test), allow(dead_code))]
+    /// Recommended character level, used to scale the authored XP at turn-in.
     pub level: u32,
     pub reward_xp: u32,
     pub reward_gold: u32,
@@ -2789,6 +2802,18 @@ mod tests {
         );
         assert_eq!(xp_to_level(0), 100);
         assert_eq!([1, 2, 5, 10, 98].map(enemy_xp), [50, 55, 70, 95, 535]);
+    }
+
+    #[test]
+    fn xp_level_curve_covers_each_step_and_both_bounds() {
+        let expected = [30, 30, 30, 30, 40, 50, 60, 70, 80, 90, 100, 103, 106, 109, 112, 115, 115];
+        for (level, xp) in (10..=26).zip(expected) {
+            assert_eq!(level_adjusted_xp(100, 20, level), xp, "reward level {level}");
+        }
+        assert_eq!(level_adjusted_xp(25, 20, 10), 8, "round half up");
+        assert_eq!(level_adjusted_xp(1, 20, 10), 1, "keep positive rewards");
+        assert_eq!(level_adjusted_xp(0, 20, 30), 0);
+        assert_eq!(level_adjusted_xp(u32::MAX, 1, u32::MAX), u32::MAX);
     }
 
     #[test]

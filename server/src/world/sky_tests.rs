@@ -1129,7 +1129,7 @@ fn a_held_ward_pays_its_reward_through_the_giver_and_a_hero_cannot_claim_it_earl
     assert!(c.quests[0].claimed && c.quests[0].completions == 1);
     assert_eq!(c.gold, gold + c.quest_gold(q.reward_gold));
     let paid: u32 = (level..c.level).map(xp_to_level).sum::<u32>() + c.xp - xp;
-    assert_eq!(paid, q.reward_xp);
+    assert_eq!(paid, level_adjusted_xp(q.reward_xp, level, q.level));
 }
 
 // ---- the gates and the flight ----------------------------------------------------------------------------------------------------------
