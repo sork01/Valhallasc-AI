@@ -17,7 +17,13 @@
     {"item": "smith_pick_2", "reaches": 3},
     {"item": "smith_pick_3", "reaches": 5},
     {"item": "smith_pick_4", "reaches": 7},
-    {"item": "smith_pick_5", "reaches": 9}
+    {"item": "smith_pick_5", "reaches": 9},
+    {"item": "smith_pick_6", "reaches": 9, "expertCap": 360},
+    {"item": "smith_pick_7", "reaches": 9, "expertCap": 420},
+    {"item": "smith_pick_8", "reaches": 9, "expertCap": 480},
+    {"item": "smith_pick_9", "reaches": 9, "expertCap": 540},
+    {"item": "smith_pick_10", "reaches": 9, "expertCap": 600},
+    {"item": "smith_pick_11", "reaches": 9, "expertCap": 600, "bonusOre": 1}
   ],
   "recipes": [
     {"item": "smith_bar_tin", "method": "smelt", "skill": 1, "tier": 0, "cost": 0, "ingredients": [["smith_ore_tin", 2]]},
@@ -34,6 +40,12 @@
     {"item": "smith_pick_3", "method": "upgrade", "skill": 90, "tier": 3, "cost": 350, "ingredients": [["smith_pick_2", 1], ["smith_bar_silver", 4], ["smith_hardwood", 2]]},
     {"item": "smith_pick_4", "method": "upgrade", "skill": 150, "tier": 5, "cost": 900, "ingredients": [["smith_pick_3", 1], ["smith_bar_cobalt", 4], ["smith_hardwood", 2]]},
     {"item": "smith_pick_5", "method": "upgrade", "skill": 210, "tier": 7, "cost": 1800, "ingredients": [["smith_pick_4", 1], ["smith_bar_stormsilver", 4], ["smith_hardwood", 2]]},
+    {"item": "smith_pick_6", "method": "upgrade", "skill": 300, "tier": 7, "cost": 3000, "ingredients": [["smith_pick_5", 1], ["smith_bar_stormsilver", 4], ["smith_hardwood", 2]]},
+    {"item": "smith_pick_7", "method": "upgrade", "skill": 360, "tier": 7, "cost": 4500, "ingredients": [["smith_pick_6", 1], ["smith_bar_stormsilver", 4], ["smith_hardwood", 2]]},
+    {"item": "smith_pick_8", "method": "upgrade", "skill": 420, "tier": 8, "cost": 6500, "ingredients": [["smith_pick_7", 1], ["smith_bar_sunsteel", 4], ["smith_hardwood", 2]]},
+    {"item": "smith_pick_9", "method": "upgrade", "skill": 480, "tier": 8, "cost": 9000, "ingredients": [["smith_pick_8", 1], ["smith_bar_sunsteel", 4], ["smith_hardwood", 2]]},
+    {"item": "smith_pick_10", "method": "upgrade", "skill": 540, "tier": 9, "cost": 12000, "ingredients": [["smith_pick_9", 1], ["smith_bar_stariron", 4], ["smith_hardwood", 2]]},
+    {"item": "smith_pick_11", "method": "upgrade", "skill": 600, "tier": 9, "cost": 20000, "ingredients": [["smith_pick_10", 1], ["smith_bar_stariron", 4], ["smith_hardwood", 2]]},
     {"item": "smith_gear_tin_banded_gloves", "method": "staple", "skill": 1, "tier": 0, "cost": 0, "ingredients": [["smith_bar_tin", 3], ["smith_leather_strips", 2]]},
     {"item": "smith_gear_meadowguard_gloves", "method": "rare", "skill": 1, "tier": 0, "cost": 0, "ingredients": [["smith_bar_tin", 5], ["smith_leather_strips", 2], ["slime_gel", 2]], "plan": "smith_plan_meadowguard_gloves"},
     {"item": "smith_gear_copperhead_sword", "method": "staple", "skill": 30, "tier": 1, "cost": 0, "ingredients": [["smith_bar_copper", 4], ["smith_hardwood", 2]]},
@@ -58,7 +70,20 @@
     {"item": "smith_gear_yearwheel_longbow", "method": "epic", "skill": 300, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 8], ["smith_hardwood", 4], ["smith_leather_strips", 2], ["chronoguard_plate", 4]], "plan": "smith_plan_yearwheel_longbow"},
     {"item": "smith_gear_split_second_daggers", "method": "epic", "skill": 300, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 8], ["smith_bar_stormsilver", 4], ["smith_leather_strips", 2], ["chronoguard_plate", 4]], "plan": "smith_plan_split_second_daggers"},
     {"item": "smith_gear_epoch_staff", "method": "epic", "skill": 300, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 8], ["smith_hardwood", 4], ["smith_linen_wraps", 2], ["epoch_core", 2]], "plan": "smith_plan_epoch_staff"},
-    {"item": "smith_gear_last_hour_mace", "method": "epic", "skill": 300, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 8], ["smith_bar_silver", 4], ["smith_linen_wraps", 2], ["epoch_core", 2]], "plan": "smith_plan_last_hour_mace"}
+    {"item": "smith_gear_last_hour_mace", "method": "epic", "skill": 300, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 8], ["smith_bar_silver", 4], ["smith_linen_wraps", 2], ["epoch_core", 2]], "plan": "smith_plan_last_hour_mace"},
+    {"item": "smith_gear_moonspore_pendant", "method": "staple", "skill": 300, "tier": 7, "cost": 0, "ingredients": [["smith_bar_stormsilver", 4], ["smith_bar_steel", 1]]},
+    {"item": "smith_gear_stormglass_mantle", "method": "rare", "skill": 330, "tier": 7, "cost": 0, "ingredients": [["smith_bar_stormsilver", 6], ["smith_linen_wraps", 3], ["saltclaw_shell", 2]], "plan": "smith_plan_stormglass_mantle", "dropZone": 19},
+    {"item": "smith_gear_sunward_trail_leggings", "method": "staple", "skill": 360, "tier": 7, "cost": 0, "ingredients": [["smith_bar_stormsilver", 4], ["smith_leather_strips", 2]]},
+    {"item": "smith_gear_jubilee_signet", "method": "rare", "skill": 390, "tier": 7, "cost": 0, "ingredients": [["smith_bar_stormsilver", 6], ["smith_bar_steel", 1], ["ribbon_tail", 2]], "plan": "smith_plan_jubilee_signet", "dropZone": 21},
+    {"item": "smith_gear_tanglecrown_mantle", "method": "staple", "skill": 420, "tier": 8, "cost": 0, "ingredients": [["smith_bar_sunsteel", 4], ["smith_linen_wraps", 2]]},
+    {"item": "smith_gear_duneglass_longbow", "method": "rare", "skill": 450, "tier": 8, "cost": 0, "ingredients": [["smith_bar_sunsteel", 6], ["smith_hardwood", 3], ["scorpion_glass", 2]], "plan": "smith_plan_duneglass_longbow", "dropZone": 25},
+    {"item": "smith_gear_frostwake_pauldrons", "method": "staple", "skill": 480, "tier": 8, "cost": 0, "ingredients": [["smith_bar_sunsteel", 4], ["smith_leather_strips", 2]]},
+    {"item": "smith_gear_slatewing_pendant", "method": "rare", "skill": 510, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 6], ["smith_bar_steel", 1], ["slate_raven_feather", 2]], "plan": "smith_plan_slatewing_pendant", "dropZone": 27},
+    {"item": "smith_gear_yearwheel_band", "method": "staple", "skill": 540, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 4], ["smith_bar_steel", 1]]},
+    {"item": "smith_gear_caldera_veil", "method": "rare", "skill": 570, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 6], ["smith_linen_wraps", 3], ["ew_slagjaw_relic", 2]], "plan": "smith_plan_caldera_veil", "dropZone": 45},
+    {"item": "smith_gear_equinox_crown_ring", "method": "epic", "skill": 600, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 10], ["smith_bar_stormsilver", 4], ["equinox_antler", 2]], "plan": "smith_plan_equinox_crown_ring"},
+    {"item": "smith_gear_unbroken_hour_pendant", "method": "epic", "skill": 600, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 10], ["smith_bar_sunsteel", 4], ["epoch_core", 2]], "plan": "smith_plan_unbroken_hour_pendant"},
+    {"item": "smith_gear_last_ember_mantle", "method": "epic", "skill": 600, "tier": 9, "cost": 0, "ingredients": [["smith_bar_stariron", 10], ["smith_linen_wraps", 4], ["longnight_scale", 2]], "plan": "smith_plan_last_ember_mantle"}
   ],
   "materials": [
     {"id": "smith_charcoal", "name": "Charcoal", "price": 8},
@@ -89,7 +114,13 @@
     {"id": "smith_pick_2", "name": "Copper Mining Pick", "sell": 0},
     {"id": "smith_pick_3", "name": "Silver Mining Pick", "sell": 0},
     {"id": "smith_pick_4", "name": "Cobalt Mining Pick", "sell": 0},
-    {"id": "smith_pick_5", "name": "Stormsilver Mining Pick", "sell": 0}
+    {"id": "smith_pick_5", "name": "Stormsilver Mining Pick", "sell": 0},
+    {"id": "smith_pick_6", "name": "Moonspore Mining Pick"},
+    {"id": "smith_pick_7", "name": "Sunward Mining Pick"},
+    {"id": "smith_pick_8", "name": "Tanglecrown Mining Pick"},
+    {"id": "smith_pick_9", "name": "Frostwake Mining Pick"},
+    {"id": "smith_pick_10", "name": "Yearwheel Mining Pick"},
+    {"id": "smith_pick_11", "name": "Masterwork Mining Pick"}
   ],
   "gear": [
     {"id": "smith_gear_tin_banded_gloves", "name": "Tin-Banded Gloves", "template": "warrior_gloves_azure_l5_green", "level": 4},
@@ -116,7 +147,20 @@
     {"id": "smith_gear_yearwheel_longbow", "name": "Yearwheel Longbow", "template": "null_hunter_weapon", "level": 99},
     {"id": "smith_gear_split_second_daggers", "name": "Split-Second Daggers", "template": "null_assassin_weapon", "level": 99},
     {"id": "smith_gear_epoch_staff", "name": "Epoch Staff", "template": "null_mage_weapon", "level": 99},
-    {"id": "smith_gear_last_hour_mace", "name": "Last Hour Mace", "template": "null_priest_weapon", "level": 99}
+    {"id": "smith_gear_last_hour_mace", "name": "Last Hour Mace", "template": "null_priest_weapon", "level": 99},
+    {"id": "smith_gear_moonspore_pendant", "name": "Moonspore Pendant", "template": "necklace_moonstone_l60_green", "level": 60},
+    {"id": "smith_gear_stormglass_mantle", "name": "Stormglass Mantle", "template": "cloak_l65_rare", "level": 65},
+    {"id": "smith_gear_sunward_trail_leggings", "name": "Sunward Trail Leggings", "template": "pants_wayfarer_l70_green", "level": 70},
+    {"id": "smith_gear_jubilee_signet", "name": "Jubilee Signet", "template": "accessory_amber_l75_blue", "level": 75},
+    {"id": "smith_gear_tanglecrown_mantle", "name": "Tanglecrown Mantle", "template": "cloak_l80_uncommon", "level": 80},
+    {"id": "smith_gear_duneglass_longbow", "name": "Duneglass Longbow", "template": "hunter_weapon_shortbow_l85_blue", "level": 85},
+    {"id": "smith_gear_frostwake_pauldrons", "name": "Frostwake Pauldrons", "template": "warrior_shoulders_azure_l90_green", "level": 90},
+    {"id": "smith_gear_slatewing_pendant", "name": "Slatewing Pendant", "template": "necklace_moonstone_l95_blue", "level": 95},
+    {"id": "smith_gear_yearwheel_band", "name": "Yearwheel Band", "template": "accessory_amber_l95_green", "level": 95},
+    {"id": "smith_gear_caldera_veil", "name": "Caldera Veil", "template": "cloak_l99_rare", "level": 99},
+    {"id": "smith_gear_equinox_crown_ring", "name": "Equinox Crown Ring", "template": "null_accessory", "level": 99},
+    {"id": "smith_gear_unbroken_hour_pendant", "name": "Unbroken Hour Pendant", "template": "null_necklace", "level": 99},
+    {"id": "smith_gear_last_ember_mantle", "name": "Last Ember Mantle", "template": "cloak_l99_epic", "level": 99}
   ],
   "epicBosses": [
     "null_hour",

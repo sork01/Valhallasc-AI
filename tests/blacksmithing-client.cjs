@@ -63,6 +63,12 @@ if (process.env.MUTATE === 'expert-cap') {
   moduleText = moduleText.replace(before, before.replace('maxSkill', '300'));
 }
 if (process.env.MUTATE === 'bulk') moduleText = moduleText.replace('all:true', 'all:false');
+if (process.env.MUTATE === 'expert-pick-hint') {
+  const line = "if (pick) target.append(element('small', pickHint(pick)));";
+  assert(moduleText.includes(line));
+  moduleText = moduleText.replace(line, '');
+}
+if (process.env.MUTATE === 'expert-plan-source') moduleText = moduleText.replace('recipe.dropZone != null', 'false');
 vm.runInContext(moduleText,context,{filename:'blacksmithing.js'});
 
 const Blacksmithing = context.Blacksmithing;
@@ -109,17 +115,35 @@ smelt.click();
 assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe:'smith_bar_tin',all:true});
 answer({ok:true,npc:'smith',text:'',skill:150,training:{cap:180,ore:'smith_ore_cobalt',zones:[7,8]},recipes:[],inventory:[],gold:10});
 assert(panel.children.some(n => /Andra gruvområden · .*Rán/.test(n.textContent)));
-const saved = {skill:300, maxSkill:600, training:{cap:330, ore:'smith_ore_stormsilver', zones:[16]}};
+const saved = {skill:300, maxSkill:600, training:{cap:330, ore:'smith_ore_stormsilver', zones:[16],pick:'smith_pick_6'}};
 Blacksmithing.render(npc, {...packet, blacksmithing:{...state, ...saved}}, panel);
 assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 300 / 600'));
 assert(panel.children.some(n => n.textContent.includes('330') && n.textContent.includes('Moonspore')));
-answer({ok:true,npc:'smith',text:'',skill:599,training:{cap:600,ore:'smith_ore_stariron',zones:[45]},recipes:[],inventory:[],gold:10});
+assert(panel.children.some(n => n.textContent.includes('Använd Moonsporehacka eller en bättre hacka')));
+const tab = value => panel.querySelectorAll('[data-smith-action]').find(n => n.dataset.smithAction === value);
+tab('staple').click();
+assert.equal(row('smith_gear_stormglass_mantle').children.at(-1).textContent,
+  'Fiender i The Stormglass Flats kan tappa ritningen.');
+tab('upgrade').click();
+assert.equal(panel.querySelectorAll('[data-recipe]').length,10);
+assert.match(row('smith_pick_6').children[1].children[1].textContent,/till 360/);
+assert.match(Blacksmithing.pickDetails(items.get('smith_pick_11')),/Ger 1 extra malm per brytning/);
+const lastPick = context.BLACKSMITHING_DATA.recipes.find(r => r.item === 'smith_pick_11');
+const pickInputs = lastPick.ingredients.map(([item,quantity]) => ({item,quantity}));
+answer({ok:true,npc:'smith',text:'',skill:599,training:{cap:600,ore:'smith_ore_stariron',zones:[45],pick:'smith_pick_10'},recipes:[],inventory:pickInputs,gold:lastPick.cost});
 assert(panel.children.some(n => /^Träna upp till 600/.test(n.textContent)));
-answer({ok:true,npc:'smith',text:'',skill:600,training:null,recipes:[],inventory:[],gold:10});
+assert.equal(action(lastPick.item).disabled,true);
+answer({ok:true,npc:'smith',text:'',skill:600,training:null,recipes:[],inventory:pickInputs,gold:lastPick.cost});
 assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 600 / 600'));
 assert(!panel.children.some(n => /^Träna upp till/.test(n.textContent)));
-
-
+assert.equal(action(lastPick.item).disabled,false);
+action(lastPick.item).click();
+assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe:lastPick.item});
+answer({ok:true,npc:'smith',text:'',skill:600,training:null,recipes:[],inventory:[],gold:0});
+tab('staple').click();
+const masterPlan = row('smith_gear_equinox_crown_ring');
+assert(masterPlan.children[1].children.some(n => n.textContent.includes('600')));
+assert.equal(masterPlan.children.at(-1).textContent,'Slutbossar kan tappa ritningen.');
 
 const vein = {id:11,tier:0,x:100,y:60}, actor = {mining:11,x:90,y:60};
 Blacksmithing.sync({miningVeins:[vein],players:[actor]},actor,cue => cues.push(cue));
@@ -142,6 +166,8 @@ assert.deepEqual(calls[1].slice(-2),[31,31],'the mining pick retains its origina
 Blacksmithing.mining({state:'done',vein:11,item:'smith_ore_tin',quantity:2,skill:2,skillUp:true});
 assert.equal(status.textContent,'Bröt 2 × Tennmalm · Smide 2');
 assert.deepEqual(cues,['forge','strike']);
+Blacksmithing.mining({state:'done',item:'smith_ore_stormsilver',quantity:2,skill:300,requiredPick:'smith_pick_6'});
+assert.match(status.textContent,/Bröt 2 × Stormsilvermalm · Använd Moonsporehacka/);
 Blacksmithing.mining({state:'error',text:'Mining interrupted.'});
 assert.deepEqual(errors,['Mining interrupted.']);
 Blacksmithing.reset();

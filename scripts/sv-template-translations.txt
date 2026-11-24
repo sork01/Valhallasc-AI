@@ -1,4 +1,8 @@
 {
+  "Use {0} or better to gain mining skill.": "Använd {0} eller en bättre hacka för att höja smidesfärdigheten när du bryter malm.",
+  "Trains expert mining through skill {0}.": "I expertområden kan du träna smide till {0} med den här hackan.",
+  "Yields {0} extra ore per pull.": "Ger {0} extra malm per brytning.",
+  "Blueprint drops from enemies in {0}.": "Fiender i {0} kan tappa ritningen.",
   " ({0} base · 25%)": " ({0} bas · 25 %)",
   "Return to your body ({0} tiles away)": "Återvänd till din kropp ({0} rutor bort)",
   "You resurrected at the Spirit Guide with Resurrection Sickness (stats at 25% for 10 minutes). {0} worn piece(s) broke.": "Du återuppstod hos andeguiden med återuppståndelsesjuka (alla värden på 25 % i 10 minuter). {0} buret föremål gick sönder.",

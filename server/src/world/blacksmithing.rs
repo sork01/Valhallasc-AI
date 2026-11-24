@@ -1,7 +1,8 @@
 //! Mining channels and workshop transactions resolve on the world thread.
 use super::*;
 use crate::blacksmithing::{
-    CANDIDATES, CATALOG, Command, MAX_SKILL, Method, STARTER_PICK, TRAINER, WORKSHOP, training_cap,
+    CANDIDATES, CATALOG, Command, MAX_SKILL, Method, Pick, STARTER_PICK, TRAINER, WORKSHOP,
+    training_cap,
 };
 
 const REACH: f64 = 2.6;
@@ -31,9 +32,14 @@ fn skill_for(tier: usize) -> u16 {
 }
 
 fn training_view(skill: u16) -> Option<Value> {
-    CATALOG
-        .training(skill)
-        .map(|band| json!({"cap":band.cap,"ore":CATALOG.tiers[band.tier].ore,"zones":band.zones}))
+    CATALOG.training(skill).map(|band| {
+        let pick = CATALOG.expert_pick(band.cap);
+        let mut view = json!({"cap":band.cap,"ore":CATALOG.tiers[band.tier].ore,"zones":band.zones});
+        if let Some(pick) = pick {
+            view["pick"] = json!(pick.item);
+        }
+        view
+    })
 }
 
 pub(super) fn workshop_view(npc: &Npc, c: &Character) -> Option<Value> {
@@ -248,7 +254,7 @@ impl World {
         });
     }
 
-    fn mine_target(&self, p: &Player, vein_id: u64) -> Result<Vein, &'static str> {
+    fn mine_target(&self, p: &Player, vein_id: u64) -> Result<(Vein, &'static Pick), &'static str> {
         if !self.smith_available(p) || p.fishing.line.is_some() {
             return Err("You need to be free to move before mining.");
         }
@@ -271,14 +277,18 @@ impl World {
         if skill < skill_for(vein.tier) {
             return Err("Your Blacksmithing skill is too low.");
         }
-        if !CATALOG
+        let pick = CATALOG
             .picks
             .iter()
-            .any(|pick| pick.reaches >= vein.tier && c.quantity(&pick.item) > 0)
-        {
-            return Err("You need a stronger mining pick in your bags.");
-        }
-        Ok(vein)
+            .rev()
+            .find(|pick| {
+                pick.reaches >= vein.tier
+                    && c.quantity(&pick.item) > 0
+                    && (pick.expert_cap == 0
+                        || CATALOG.recipe(&pick.item).is_some_and(|recipe| skill >= recipe.skill))
+            })
+            .ok_or("You need a stronger mining pick in your bags.")?;
+        Ok((vein, pick))
     }
 
     fn mining_notice(p: &Player, state: &str, text: &'static str) {
@@ -295,7 +305,7 @@ impl World {
             return;
         }
         let vein = match self.mine_target(p, id) {
-            Ok(vein) => vein,
+            Ok((vein, _)) => vein,
             Err(text) => return Self::mining_notice(p, "error", text),
         };
         let p = self.players.get_mut(&session).unwrap();
@@ -332,8 +342,8 @@ impl World {
         {
             return Self::interrupt_mining(self.players.get_mut(&session).unwrap());
         }
-        let vein = match self.mine_target(p, channel.vein) {
-            Ok(vein) => vein,
+        let (vein, pick) = match self.mine_target(p, channel.vein) {
+            Ok(target) => target,
             Err(text) => {
                 let p = self.players.get_mut(&session).unwrap();
                 p.mining = None;
@@ -351,7 +361,7 @@ impl World {
         if !staged.can_collect(ore) {
             return Self::mining_notice(p, "error", "Your bags are full. Make room first.");
         }
-        let quantity = 1 + (self.smith_roll() * 2.) as u32;
+        let quantity = 1 + (self.smith_roll() * 2.) as u32 + pick.bonus_ore;
         if staged.quantity(ore).checked_add(quantity).is_none() {
             return Self::mining_notice(
                 &self.players[&session],
@@ -360,10 +370,11 @@ impl World {
             );
         }
         staged.add_item(ore, quantity);
-        let cap = CATALOG
-            .training(previous)
-            .filter(|band| band.zones.contains(&channel.zone))
-            .map_or(previous, |band| band.cap);
+        let band = CATALOG.training(previous).filter(|band| band.zones.contains(&channel.zone));
+        let required_pick = band.as_ref().and_then(|band| {
+            CATALOG.expert_pick(band.cap).filter(|_| pick.expert_cap < band.cap)
+        });
+        let cap = band.filter(|_| required_pick.is_none()).map_or(previous, |band| band.cap);
         staged
             .blacksmithing
             .proficiency
@@ -374,7 +385,8 @@ impl World {
         }
         p.character = staged;
         let _ = p.peer.try_send(json!({"type":"mining","state":"done","vein":vein.id,"item":ore,"quantity":quantity,
-            "skill":p.character.blacksmithing.proficiency.skill,"skillUp":p.character.blacksmithing.proficiency.skill > previous}));
+            "skill":p.character.blacksmithing.proficiency.skill,"skillUp":p.character.blacksmithing.proficiency.skill > previous,
+            "requiredPick":required_pick.map(|pick| &pick.item)}));
         let veins = self.mining_veins.get_mut(&channel.zone).unwrap();
         let index = veins.iter().position(|v| v.id == vein.id).unwrap();
         veins[index].pulls -= 1;

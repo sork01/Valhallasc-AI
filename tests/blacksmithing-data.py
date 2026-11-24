@@ -61,16 +61,27 @@ for i, area in enumerate(regions):
 by_id = {i['id']:i for i in items}
 assert len(items) == len(by_id)
 picks = catalog['picks']
-assert [p['reaches'] for p in picks] == [1,3,5,7,9]
+assert [p['reaches'] for p in picks[:5]] == [1,3,5,7,9]
+assert [p['expertCap'] for p in picks[5:]] == [360,420,480,540,600,600]
+assert all(p['reaches'] == 9 for p in picks[5:])
+assert [p.get('bonusOre', 0) for p in picks] == [0] * 10 + [1]
 recipes = {r['item']:r for r in catalog['recipes']}
-assert len(recipes) == len(catalog['recipes']) == 39
+assert len(recipes) == len(catalog['recipes']) == 58
+for previous, pick, skill in zip(picks[4:], picks[5:], range(300, 601, 60)):
+    upgrade = recipes[pick['item']]
+    assert upgrade['method'] == 'upgrade' and upgrade['skill'] == skill
+    assert upgrade['ingredients'][0] == [previous['item'], 1]
+    for ingredient, quantity in upgrade['ingredients'][1:]:
+        assert quantity > 0
+        if ingredient in recipes:
+            assert recipes[ingredient]['method'] == 'smelt' and recipes[ingredient]['skill'] < skill
 for tier, row in enumerate(catalog['tiers']):
     smelt, = [r for r in recipes.values() if r['method'] == 'smelt' and r['tier'] == tier]
     assert smelt['skill'] == max(tier * 30, 1)
     assert smelt['ingredients'][0] == [row['ore'], 2]
     assert smelt['ingredients'][1:] == ([['smith_charcoal', 1]] if tier == 2 else [])
-    staple, = [r for r in recipes.values() if r['method'] == 'staple' and r['tier'] == tier]
-    rare, = [r for r in recipes.values() if r['method'] == 'rare' and r['tier'] == tier]
+    staple, = [r for r in recipes.values() if r['method'] == 'staple' and r['tier'] == tier and r['skill'] < 300]
+    rare, = [r for r in recipes.values() if r['method'] == 'rare' and r['tier'] == tier and not r.get('dropZone')]
     assert rare['ingredients'][0][1] == (staple['ingredients'][0][1] * 3 + 1) // 2
     assert rare['ingredients'][-1][1] == 2
     assert max(staple['skill'],rare['skill']) == max(1, tier * 30)
@@ -82,6 +93,14 @@ for tier, row in enumerate(catalog['tiers']):
         assert upgrade['ingredients'] == [[picks[index-1]['item'],1],[smelt['item'],4],['smith_hardwood',2]]
         assert upgrade['cost'] > 0
 
+expert_gear = [r for r in recipes.values() if r['method'] == 'staple' and r['skill'] >= 300
+               or 'dropZone' in r]
+assert [r['skill'] for r in expert_gear] == list(range(300, 600, 30))
+for r, zone in zip(expert_gear, expert):
+    assert r['tier'] == zone_tiers[zone]
+    if r['method'] == 'rare':
+        assert r['dropZone'] == zone and r['plan']
+assert [r['skill'] for r in recipes.values() if r['method'] == 'epic'] == [300] * 5 + [600] * 3
 modes = {'staple':'uncommon', 'rare':'rare', 'epic':'epic'}
 for r in recipes.values():
     assert all(i in by_id and n > 0 for i,n in r['ingredients'])
@@ -90,7 +109,7 @@ for r in recipes.values():
         assert output['rarity'] == modes[r['method']] and output['source'] == 'blacksmithing'
         if r['method'] == 'epic':
             ref = by_id[next(g['template'] for g in catalog['gear'] if g['id'] == output['id'])]
-            assert r['skill'] == 300 and ref['requiredLevel'] == output['requiredLevel'] == 99
+            assert ref['requiredLevel'] == output['requiredLevel'] == 99
             assert output['attack'] <= ref['attack'] and output['defense'] <= ref['defense']
             assert all(n <= ref['bonusStats'][stat] for stat,n in output['bonusStats'].items())
         if r.get('plan'):
@@ -108,7 +127,7 @@ for x,y in art['at'].values():
     bounds = pixels.getbbox()
     assert bounds and min(bounds[:2]) > 0 and max(bounds[2:]) < size
     cells.add(pixels.tobytes())
-assert len(cells) == len(art['at']) == 54
+assert len(cells) == len(art['at']) == 68
 for cue, spec in read('client/assets/blacksmithing-sounds.txt')['clips'].items():
     file = ROOT / 'client/assets' / spec['file']
     assert hashlib.sha256(file.read_bytes()).hexdigest() == spec['sha256']

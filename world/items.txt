@@ -142296,6 +142296,54 @@
     "kind": "mining_pick"
   },
   {
+    "id": "smith_pick_6",
+    "name": "Moonspore Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_7",
+    "name": "Sunward Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_8",
+    "name": "Tanglecrown Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_9",
+    "name": "Frostwake Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_10",
+    "name": "Yearwheel Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
+    "id": "smith_pick_11",
+    "name": "Masterwork Mining Pick",
+    "source": "blacksmithing",
+    "rarity": "common",
+    "sell": 0,
+    "kind": "mining_pick"
+  },
+  {
     "kind": "gloves",
     "rarity": "uncommon",
     "class": "warrior",
@@ -142790,6 +142838,266 @@
     "art": "regearnull"
   },
   {
+    "kind": "necklace",
+    "rarity": "uncommon",
+    "attack": 20.8,
+    "defense": 5.2,
+    "tint": {
+      "hue": 140,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_moonspore_pendant",
+    "name": "Moonspore Pendant",
+    "source": "blacksmithing",
+    "sell": 260,
+    "requiredLevel": 60,
+    "variant": "smith_gear_moonspore_pendant",
+    "art": "regearl60"
+  },
+  {
+    "kind": "cloak",
+    "rarity": "rare",
+    "class": null,
+    "attack": 0.0,
+    "defense": 0.0,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "tint": {
+      "hue": 263,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "id": "smith_gear_stormglass_mantle",
+    "name": "Stormglass Mantle",
+    "source": "blacksmithing",
+    "sell": 672,
+    "requiredLevel": 65,
+    "variant": "smith_gear_stormglass_mantle",
+    "art": "clasp"
+  },
+  {
+    "kind": "pants",
+    "rarity": "uncommon",
+    "attack": 3.0,
+    "defense": 12.0,
+    "tint": {
+      "hue": 280,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_sunward_trail_leggings",
+    "name": "Sunward Trail Leggings",
+    "source": "blacksmithing",
+    "sell": 300,
+    "requiredLevel": 70,
+    "variant": "smith_gear_sunward_trail_leggings",
+    "art": "regearl70"
+  },
+  {
+    "kind": "accessory",
+    "rarity": "rare",
+    "attack": 22.6,
+    "defense": 5.6,
+    "bonusStats": {
+      "agility": 78
+    },
+    "tint": {
+      "hue": 20,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_jubilee_signet",
+    "name": "Jubilee Signet",
+    "source": "blacksmithing",
+    "sell": 768,
+    "requiredLevel": 75,
+    "variant": "smith_gear_jubilee_signet",
+    "art": "regearl75"
+  },
+  {
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "class": null,
+    "attack": 0.0,
+    "defense": 0.0,
+    "bonusStats": {
+      "stamina": 72
+    },
+    "tint": {
+      "hue": 21,
+      "saturate": 0.9,
+      "brightness": 1
+    },
+    "id": "smith_gear_tanglecrown_mantle",
+    "name": "Tanglecrown Mantle",
+    "source": "blacksmithing",
+    "sell": 340,
+    "requiredLevel": 80,
+    "variant": "smith_gear_tanglecrown_mantle",
+    "art": "clasp"
+  },
+  {
+    "kind": "weapon",
+    "rarity": "rare",
+    "class": "hunter",
+    "attack": 67.7,
+    "defense": 16.9,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "tint": {
+      "hue": 140,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_duneglass_longbow",
+    "name": "Duneglass Longbow",
+    "source": "blacksmithing",
+    "sell": 864,
+    "requiredLevel": 85,
+    "variant": "smith_gear_duneglass_longbow",
+    "art": "regearl85"
+  },
+  {
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "class": "warrior",
+    "attack": 3.8,
+    "defense": 15.2,
+    "tint": {
+      "hue": 180,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_frostwake_pauldrons",
+    "name": "Frostwake Pauldrons",
+    "source": "blacksmithing",
+    "sell": 380,
+    "requiredLevel": 90,
+    "variant": "smith_gear_frostwake_pauldrons",
+    "art": "regearl90"
+  },
+  {
+    "kind": "necklace",
+    "rarity": "rare",
+    "attack": 37.6,
+    "defense": 9.4,
+    "bonusStats": {
+      "agility": 108
+    },
+    "tint": {
+      "hue": 300,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "id": "smith_gear_slatewing_pendant",
+    "name": "Slatewing Pendant",
+    "source": "blacksmithing",
+    "sell": 960,
+    "requiredLevel": 95,
+    "variant": "smith_gear_slatewing_pendant",
+    "art": "regearl95"
+  },
+  {
+    "kind": "accessory",
+    "rarity": "uncommon",
+    "attack": 24.0,
+    "defense": 6.0,
+    "tint": {
+      "hue": 270,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "id": "smith_gear_yearwheel_band",
+    "name": "Yearwheel Band",
+    "source": "blacksmithing",
+    "sell": 400,
+    "requiredLevel": 95,
+    "variant": "smith_gear_yearwheel_band",
+    "art": "regearl95"
+  },
+  {
+    "kind": "cloak",
+    "rarity": "rare",
+    "class": null,
+    "attack": 0.0,
+    "defense": 0.0,
+    "bonusStats": {
+      "agility": 114
+    },
+    "tint": {
+      "hue": 232,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "id": "smith_gear_caldera_veil",
+    "name": "Caldera Veil",
+    "source": "blacksmithing",
+    "sell": 998,
+    "requiredLevel": 99,
+    "variant": "smith_gear_caldera_veil",
+    "art": "ember"
+  },
+  {
+    "kind": "accessory",
+    "rarity": "epic",
+    "attack": 35.6,
+    "defense": 9.0,
+    "bonusStats": {
+      "stamina": 97,
+      "strength": 97
+    },
+    "id": "smith_gear_equinox_crown_ring",
+    "name": "Equinox Crown Ring",
+    "source": "blacksmithing",
+    "sell": 2208,
+    "requiredLevel": 99,
+    "variant": "smith_gear_equinox_crown_ring",
+    "art": "regearnull"
+  },
+  {
+    "kind": "necklace",
+    "rarity": "epic",
+    "attack": 47.5,
+    "defense": 11.9,
+    "bonusStats": {
+      "agility": 97,
+      "stamina": 97
+    },
+    "id": "smith_gear_unbroken_hour_pendant",
+    "name": "Unbroken Hour Pendant",
+    "source": "blacksmithing",
+    "sell": 2208,
+    "requiredLevel": 99,
+    "variant": "smith_gear_unbroken_hour_pendant",
+    "art": "regearnull"
+  },
+  {
+    "kind": "cloak",
+    "rarity": "epic",
+    "class": null,
+    "attack": 0.0,
+    "defense": 0.0,
+    "bonusStats": {
+      "stamina": 102,
+      "strength": 102
+    },
+    "tint": {
+      "hue": 255,
+      "saturate": 1.4,
+      "brightness": 1.24
+    },
+    "id": "smith_gear_last_ember_mantle",
+    "name": "Last Ember Mantle",
+    "source": "blacksmithing",
+    "sell": 1997,
+    "requiredLevel": 99,
+    "variant": "smith_gear_last_ember_mantle",
+    "art": "ember"
+  },
+  {
     "id": "smith_plan_meadowguard_gloves",
     "name": "Blueprint: Meadowguard Gloves",
     "kind": "smith_blueprint",
@@ -142907,6 +143215,70 @@
     "kind": "smith_blueprint",
     "rarity": "epic",
     "sell": 1104,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_stormglass_mantle",
+    "name": "Blueprint: Stormglass Mantle",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 336,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_jubilee_signet",
+    "name": "Blueprint: Jubilee Signet",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 384,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_duneglass_longbow",
+    "name": "Blueprint: Duneglass Longbow",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 432,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_slatewing_pendant",
+    "name": "Blueprint: Slatewing Pendant",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 480,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_caldera_veil",
+    "name": "Blueprint: Caldera Veil",
+    "kind": "smith_blueprint",
+    "rarity": "rare",
+    "sell": 499,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_equinox_crown_ring",
+    "name": "Blueprint: Equinox Crown Ring",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 1104,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_unbroken_hour_pendant",
+    "name": "Blueprint: Unbroken Hour Pendant",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 1104,
+    "source": "blacksmithing"
+  },
+  {
+    "id": "smith_plan_last_ember_mantle",
+    "name": "Blueprint: Last Ember Mantle",
+    "kind": "smith_blueprint",
+    "rarity": "epic",
+    "sell": 998,
     "source": "blacksmithing"
   },
   {

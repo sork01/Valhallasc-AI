@@ -8,6 +8,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `BLACKSMITHING-EXPERT-TOOLS-AND-PLANS` — The 1.13.0 candidate adds six mining picks at skills 300 through 600 and thirteen expert equipment recipes. Five trainer recipes and five regional drops cover the expert bands. Three master plans require skill 600. The workshop shows the pick needed to train and the regions that drop the new plans. See [Blacksmithing](docs/blacksmithing.md).
+
 - [x] `SELL-JUNK-MINED-ORE` — Sell All Junk excludes the raw ore IDs from the mining catalog. Individual ore sales still work. The bounded merchant check verified starter and endgame ore, unchanged junk payouts, and individual sale.
 - [x] `ALCHEMY-WORKSHOP-RESIZE` — Alchemy uses the Blacksmithing workshop's resize grip and saves its own width and height. Checked both workshops and reopening on phone and larger viewports.
 - [x] `NEED-GREED-GEAR-COMPARE` — Hover or focus the loot card's item name to compare the exact rolled stats with the equipped copy. The comparison shows signed differences and supports empty slots. Checked both viewports.

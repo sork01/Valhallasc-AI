@@ -57,6 +57,7 @@ pub struct Recipe {
     pub cost: u32,
     pub ingredients: Vec<(String, u32)>,
     pub plan: Option<String>,
+    pub drop_zone: Option<usize>,
 }
 
 pub fn training_cap(tier: usize) -> u16 {
@@ -70,9 +71,14 @@ pub struct Tier {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Pick {
     pub item: String,
     pub reaches: usize,
+    #[serde(default)]
+    pub expert_cap: u16,
+    #[serde(default)]
+    pub bonus_ore: u32,
 }
 
 #[derive(Deserialize)]
@@ -138,6 +144,12 @@ impl Catalog {
             .find(|recipe| recipe.plan.as_deref() == Some(id))
     }
 
+    pub(crate) fn expert_pick(&self, cap: u16) -> Option<&Pick> {
+        (cap > training_cap(self.tiers.len() - 1))
+            .then(|| self.picks.iter().find(|pick| pick.expert_cap >= cap))
+            .flatten()
+    }
+
     /// Rare plans use the outdoor region's ore tier and its normal level range.
     /// Epic plans share one pool on the selected level-99 final bosses.
     pub fn drop_plan(
@@ -149,39 +161,41 @@ impl Catalog {
         rolls: (f64, f64),
     ) -> Option<&str> {
         let (chance, choice) = rolls;
-        if map.final_boss == kind && level == 99 && self.epic_bosses.iter().any(|boss| boss == kind)
+        let eligible = if map.final_boss == kind
+            && level == 99
+            && self.epic_bosses.iter().any(|boss| boss == kind)
         {
             if chance >= 0.20 {
                 return None;
             }
-            let pool: Vec<_> = self
-                .recipes
-                .iter()
-                .filter(|r| r.method == Method::Epic)
-                .collect();
-            return pool
-                .get((choice * pool.len() as f64) as usize)?
-                .plan
-                .as_deref();
-        }
-        let tier = self.tier(zone)?;
-        let [min, max] = map.levels.unwrap_or([1, 5]);
-        if level < min.saturating_sub(2)
-            || level > max + 2
-            || chance
-                >= if is_elite(kind) || is_boss(kind) {
-                    0.045
-                } else {
-                    0.015
-                }
-        {
-            return None;
-        }
-        self.recipes
+            (Method::Epic, None)
+        } else {
+            let tier = self.tier(zone)?;
+            let [min, max] = map.levels.unwrap_or([1, 5]);
+            let rate = if is_elite(kind) || is_boss(kind) {
+                0.045
+            } else {
+                0.015
+            };
+            if level < min.saturating_sub(2) || level > max + 2 || chance >= rate {
+                return None;
+            }
+            (Method::Rare, Some(tier))
+        };
+        let (method, tier) = eligible;
+        let pool: Vec<_> = self
+            .recipes
             .iter()
-            .find(|r| r.method == Method::Rare && r.tier == tier)?
-            .plan
-            .as_deref()
+            .filter(|recipe| {
+                recipe.method == method
+                    && recipe.drop_zone.map_or_else(
+                        || tier.is_none_or(|tier| recipe.tier == tier),
+                        |source| source == zone,
+                    )
+            })
+            .filter_map(|recipe| recipe.plan.as_deref())
+            .collect();
+        pool.get((choice * pool.len() as f64) as usize).copied()
     }
 }
 

@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.13.0",
+    "date": "2026-11-24",
+    "new": [
+      "Blacksmiths can forge six expert mining picks, from the Moonspore Mining Pick at skill 300 to the Masterwork Mining Pick at skill 600.",
+      "Discover thirteen new equipment blueprints, including three level-99 epic plans that take Blacksmithing 600 to forge."
+    ],
+    "changed": [
+      "Expert mining skill gains require a pick suited to the current training region. Older picks can still gather the same ore.",
+      "The Blacksmithing Workshop shows the pick needed for the current training band and where to look for expert blueprints."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.5",
     "date": "2026-11-24",
     "new": [

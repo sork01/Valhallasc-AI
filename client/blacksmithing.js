@@ -4,6 +4,8 @@
   const tr = text => window.Locale?.translate(text) || text;
   const format = (text, ...values) => tr(text).replace(/\{(\d+)\}/g, (_, n) => values[Number(n)]);
   const itemName = id => tr(Inventory.definition(id)?.name || id);
+  const zoneName = id => tr(id === 0 ? WORLD_MAP.name : WORLD_MAP.zones[id - 1].name);
+  const pickHint = id => format('Use {0} or better to gain mining skill.', itemName(id));
   const status = document.getElementById('mining-status');
   let veins = [], miners = [], nearestVein = null, ownMining = false, active = null, sound = null, noticeTimer = 0;
   let workshop = null, pending = false, section = 'staple';
@@ -25,6 +27,17 @@
     if (pending || !Online.send({type:'blacksmithing', request:{op, ...fields}})) return;
     pending = true;
     if (workshop) renderWorkshop();
+  }
+
+  function pickDetails(item) {
+    const pick = data?.picks.find(entry => entry.item === item.id);
+    if (!pick) return '';
+    const details = [format('Mines through {0}.', itemName(data.tiers[pick.reaches].ore))];
+    if (pick.expertCap && !pick.bonusOre) {
+      details.push(format('Trains expert mining through skill {0}.', pick.expertCap));
+    }
+    if (pick.bonusOre) details.push(format('Yields {0} extra ore per pull.', pick.bonusOre));
+    return details.join(' ');
   }
 
   function render(npc, packet, target) {
@@ -56,14 +69,13 @@
     }
     target.append(element('p', format('Blacksmithing skill {0} / {1}', skill, maxSkill), 'smith-skill'));
     if (training) {
-      const {cap, ore, zones} = training;
-      const region = zones[0];
-      const zone = region === 0 ? WORLD_MAP : WORLD_MAP.zones[region - 1];
-      target.append(element('p', format('Train to {0} with {1} in {2}.', cap, itemName(ore), tr(zone.name))));
+      const {cap, ore, zones, pick} = training;
+      target.append(element('p', format('Train to {0} with {1} in {2}.', cap, itemName(ore), zoneName(zones[0]))));
       if (zones.length > 1) {
-        const otherZones = zones.slice(1).map(id => tr(WORLD_MAP.zones[id - 1].name)).join(', ');
+        const otherZones = zones.slice(1).map(zoneName).join(', ');
         target.append(element('small', format('Other mining areas · {0}', otherZones)));
       }
+      if (pick) target.append(element('small', pickHint(pick)));
       target.append(element('small', tr('Forging equipment from this ore also raises your skill.')));
     }
     const tabs = element('div', '', 'smith-tabs');
@@ -95,7 +107,7 @@
         const preview = Inventory.gearPreview(piece);
         if (preview) details.append(element('small', preview));
       } else if (recipe.method === 'upgrade') {
-        details.append(element('small', format('Mines through {0}.', itemName(data.tiers[data.picks.find(p => p.item === piece.id).reaches].ore))));
+        details.append(element('small', pickDetails(piece)));
       }
       details.append(element('small', format('Requires Blacksmithing {0}', recipe.skill)));
       const requires = element('ul', '', 'smith-ingredients');
@@ -117,6 +129,7 @@
       if (gear && !learned) {
         if (!recipe.plan) action = button('Learn blueprint', () => command('learn', {npc, recipe:piece.id}), skill < recipe.skill);
         else if (amounts.get(recipe.plan)) action = button('Study blueprint', () => command('study', {plan:recipe.plan}));
+        else if (recipe.dropZone != null) action = element('small', format('Blueprint drops from enemies in {0}.', zoneName(recipe.dropZone)));
         else action = element('small', tr(recipe.method === 'epic' ? 'Blueprint drops from final bosses.' : 'Blueprint drops from enemies.'));
       } else {
         const unavailable = skill < recipe.skill || !supplies || gold < recipe.cost;
@@ -189,7 +202,8 @@
       active = null;
       sound?.('strike');
       const ore = format('Mined {0} × {1}', packet.quantity, itemName(packet.item));
-      showStatus(packet.skillUp ? format('{0} · Blacksmithing {1}', ore, packet.skill) : ore);
+      const reward = packet.skillUp ? format('{0} · Blacksmithing {1}', ore, packet.skill) : ore;
+      showStatus(packet.requiredPick ? [reward, pickHint(packet.requiredPick)].join(' · ') : reward);
     } else {
       active = null;
       if (status) status.hidden = true;
@@ -252,9 +266,6 @@
     get nearbyVein() { return nearestVein; },
     get isMining() { return !!active || ownMining; },
     study:plan => command('study', {plan}),
-    pickDetails(item) {
-      const pick = data?.picks.find(entry => entry.item === item.id);
-      return pick ? format('Mines through {0}.', itemName(data.tiers[pick.reaches].ore)) : '';
-    },
+    pickDetails,
   };
 })();
