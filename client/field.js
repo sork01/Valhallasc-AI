@@ -1411,7 +1411,11 @@
     const code = Keys.codeOf(e);
     for (const [action, step] of [['minimapIn', 1], ['minimapOut', -1]]) if (Keys.is(e, action)) { e.preventDefault(); if (!e.repeat) Field.minimapZoom(step); return; }
     for (const action of ['interact', 'talk', 'mount', 'fish']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
-    if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; npcTarget = null; emitHud(); e.preventDefault(); }
+    if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) {
+      pendingNpc = null; cityRoute = []; keys.add(code);
+      if (autoAttackTarget === hero.pvpTargetId) autoAttackTarget = null;
+      hero.target = null; hero.goal = null; npcTarget = null; emitHud(); e.preventDefault();
+    }
     if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.action('attack'); }
     if (Keys.is(e, 'dash') && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.action('dash'); }
   }
@@ -1488,8 +1492,8 @@
     const s = ghostWalking ? null : pickSlime(mx, my, wx, wy);
     const rival = !ghostWalking && !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
     if (s) Field.targetEnemy(s.id);
-    else if (rival) { pointer.down = false; hero.pvpTargetId = rival.id; hero.target = null; hero.goal = null; }
-    else { hero.pvpTargetId = null; hero.target = null; npcTarget = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
+    else if (rival) { pointer.down = false; Field.targetPlayer(rival.id, true); }
+    else { autoAttackTarget = null; hero.pvpTargetId = null; hero.target = null; npcTarget = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
     emitHud();
   }
   // A boss sign is read with its own message; every townsperson is spoken to with `interact`.
@@ -5800,7 +5804,7 @@
       if (!running || paused || !Online.connected || (hero.dead && !hero.ghost) || hero.sparkTravel) { x = 0; y = 0; }
       if ((x || y) && !touchDirection.some(Boolean)) {
         pendingNpc = null; pendingChest = null; cityRoute = []; pointer.down = false;
-        hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud();
+        autoAttackTarget = null; hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud();
       }
       const wasMoving = touchDirection.some(Boolean);
       const n = Math.hypot(x, y) || 1; touchDirection = [x / n, y / n];
@@ -5848,10 +5852,9 @@
       return false;
     },
     clearInput() { autoAttackTarget = null; blockedAttack = null; touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
-    // Opening or closing a window (or focusing the chat) halts held movement, but a selected monster stays selected: the server keeps
-    // attacking it (an input of zero stops walking and clears nothing else; `stop` would also drop the target).
+    // Windows and chat halt held movement while keeping a selected autoattack target.
     stopMoving() {
-      const id = autoAttackTarget, keepAttack = id !== null && hero.target?.id === id && !hero.dead;
+      const id = autoAttackTarget, keepAttack = id !== null && (hero.target?.id === id || hero.pvpTargetId === id) && !hero.dead;
       Field.clearInput();
       if (keepAttack) { autoAttackTarget = id; Online.send({ type: 'input', dx: 0, dy: 0 }); } else Online.send({ type: 'stop' });
     },
@@ -5905,7 +5908,19 @@
       autoAttackTarget = id; hero.pvpTargetId = null; hero.target = target; hero.goal = null; npcTarget = null;
       Online.send({ type: 'target', id }); emitHud(); return true;
     },
-    targetPlayer(id) { if (!remotePlayers.has(id)) return false; npcTarget = null; hero.pvpTargetId = id; hero.target = null; hero.goal = null; emitHud(); return true; },
+    targetPlayer(id, attack = false) {
+      const target = remotePlayers.get(id);
+      if (!target) return false;
+      if (attack && Field.canAct && target.hp > 1 && window.Pvp?.canAutoattack(id)) {
+        Field.clearInput();
+        if (Online.send({ type: 'pvp', command: { op: 'arena_target', id } })) autoAttackTarget = id;
+      } else if (autoAttackTarget != null && autoAttackTarget === hero.pvpTargetId && id !== hero.pvpTargetId) {
+        autoAttackTarget = null;
+        Online.send({ type: 'stop' });
+      }
+      npcTarget = null; hero.pvpTargetId = id; hero.target = null; hero.goal = null;
+      emitHud(); return true;
+    },
     // Shows `text` in a speech bubble over the character `id` for a few seconds (longer for longer messages).
     bubble(id, text, party = false) {
       text = String(text || '').trim(); if (!id || !text) return;

@@ -157,14 +157,6 @@ pub(super) fn opponent_character(class: Class, level: u32, name: &str) -> Charac
 }
 
 /// The distance `pvp_attack` allows for a class.
-fn attack_range(class: Class) -> f64 {
-    if class.ranged() {
-        class.reach().max(8.)
-    } else {
-        1.8 // same as pvp_attack: melee PvP range is unchanged by MELEE-REACH
-    }
-}
-
 impl World {
     /// Whether `a` and `b` are a hero and that hero's own opponent in a live run (either way round).
     pub(super) fn gauntlet_pair(&self, a: u64, b: u64) -> bool {
@@ -559,7 +551,7 @@ impl World {
             p.cooldown <= 0. && p.dash <= 0. && p.stun <= 0.
         };
         if ready
-            && distance <= attack_range(class)
+            && distance <= pvp::attack_range(class)
             && (!class.ranged()
                 || self.maps[self.players[&me].character.zone].line_clear(here, there, 0.05))
         {

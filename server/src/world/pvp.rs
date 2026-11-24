@@ -48,6 +48,14 @@ struct Match {
     ends: f64,
 }
 
+pub(super) fn attack_range(class: Class) -> f64 {
+    if class.ranged() {
+        class.reach().max(8.)
+    } else {
+        1.8
+    }
+}
+
 impl World {
     pub(super) fn is_arena_zone(&self, zone: usize) -> bool {
         self.maps.get(zone).is_some_and(|m| m.name == "The Arena")
@@ -107,14 +115,14 @@ impl World {
                 .map(|q| q.size);
             let arena = self.pvp.matches.iter().find(|m| m.teams.iter().flatten().any(|a| a == id))
                 .map(|m| json!({"size":m.teams[0].len(),"teams":m.teams,"ends":(m.ends-self.time).max(0.).ceil()}));
-            let _ = p.peer.try_send(json!({"type":"pvp","flag":p.pvp_flag,"requests":requests,"duel":duel,"queue":queue,"arena":arena,"gauntlet":self.gauntlet_view(*session)}));
+            let _ = p.peer.try_send(json!({"type":"pvp","flag":p.pvp_flag,"requests":requests,"duel":duel,"queue":queue,"arena":arena,"gauntlet":self.gauntlet_view(*session),"arenaAutoattack":true}));
         }
     }
     pub(super) fn pvp_command(&mut self, session: u64, command: PvpCommand) {
         let Some(me) = self.players.get(&session).map(|p| p.character.id.clone()) else {
             return;
         };
-        let refresh = !matches!(command, PvpCommand::Attack { .. });
+        let refresh = !matches!(command, PvpCommand::Attack { .. } | PvpCommand::ArenaTarget { .. });
         let result = match command {
             PvpCommand::Refresh => Ok(()),
             PvpCommand::Flag { enabled } => self.pvp_flag(&me, enabled),
@@ -138,6 +146,7 @@ impl World {
             }
             PvpCommand::ArenaQueue { size } => self.pvp_queue(&me, size),
             PvpCommand::ArenaLeave => self.pvp_arena_leave(&me),
+            PvpCommand::ArenaTarget { id } => self.select_arena_target(session, &id),
             PvpCommand::Attack { id } => self.pvp_attack(session, &id),
         };
         if let Err(text) = result {
@@ -468,6 +477,47 @@ impl World {
         }
         Err("You are not in an arena queue or match.".into())
     }
+    fn select_arena_target(&mut self, session: u64, id: &str) -> Result<(), String> {
+        let target = self.players.iter()
+            .find_map(|(&target, p)| (p.character.id == id).then_some(target))
+            .filter(|&target| self.arena_opponent(session, target).is_some())
+            .ok_or("Target is unavailable.")?;
+        let player = self.players.get_mut(&session).unwrap();
+        player.stop();
+        player.arena_target = Some(target);
+        Ok(())
+    }
+
+    pub(super) fn arena_opponent(&self, session: u64, target: u64) -> Option<Point> {
+        let (player, opponent) = (self.players.get(&session)?, self.players.get(&target)?);
+        let zone = player.character.zone;
+        if !player.is_human()
+            || !self.is_arena_zone(zone)
+            || player.is_hidden()
+            || opponent.is_hidden()
+            || player.character.hp <= 1.
+            || opponent.character.hp <= 1.
+            || player.character.spark_travel.is_some()
+            || opponent.character.spark_travel.is_some()
+            || !self.pvp_legal(session, target)
+        {
+            return None;
+        }
+        let in_match = self.pvp.matches.iter().any(|m| {
+            m.zone == zone && m.teams.iter().enumerate().any(|(side, team)| {
+                team.contains(&player.character.id) && m.teams[1 - side].contains(&opponent.character.id)
+            })
+        });
+        (in_match || self.gauntlet_pair(session, target)).then(|| opponent.character.point())
+    }
+
+    pub(super) fn attack_arena_opponent(&mut self, session: u64, target: u64) {
+        if self.arena_opponent(session, target).is_some() {
+            let id = self.players[&target].character.id.clone();
+            let _ = self.pvp_attack(session, &id);
+        }
+    }
+
     fn pvp_attack(&mut self, session: u64, target: &str) -> Result<(), String> {
         let a = self.players.get(&session).ok_or("You are offline.")?;
         let me = a.character.id.clone();
@@ -516,14 +566,7 @@ impl World {
         if !legal {
             return Err("PvP requires a duel, opposing arena teams, or two flagged players outside a sanctuary.".into());
         }
-        if point.distance(target_point)
-            > if a.character.look.class.ranged() {
-                a.character.look.class.reach().max(8.)
-            } else {
-                // Duels keep the old melee range: PvP balancing is closed, so MELEE-REACH does not touch it.
-                1.8
-            }
-        {
+        if point.distance(target_point) > attack_range(a.character.look.class) {
             return Err("Target is out of range.".into());
         }
         if a.character.look.class.ranged() && !self.maps[zone].line_clear(point, target_point, 0.05)
@@ -763,8 +806,7 @@ impl World {
                     p.wound_left = p.wound_left.max(wound_time);
                 }
                 if stun > 0. {
-                    p.stop();
-                    p.attack = 0.;
+                    p.stop_for_stun();
                 }
                 if stunned {
                     self.tell(
@@ -1405,6 +1447,11 @@ mod tests {
         assert!(!w.pvp_legal(1, 2), "an ally");
         assert!(!w.pvp_legal(1, 1), "oneself");
         assert!(w.pvp_legal(1, 3) && w.pvp_legal(1, 4), "the other team");
+        assert!(w.select_arena_target(1, &ids[1]).is_err(), "allies cannot be autoattacked");
+        assert!(w.select_arena_target(1, &ids[2]).is_ok());
+        assert_eq!(w.players[&1].arena_target, Some(3));
+        w.message(1, ClientMessage::Stop);
+        assert_eq!(w.players[&1].arena_target, None, "explicit stop cancels");
         assert!(
             w.foes_near(1, w.players[&1].character.point(), 1000., &[])
                 .len()

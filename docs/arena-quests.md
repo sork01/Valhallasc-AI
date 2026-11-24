@@ -94,8 +94,9 @@ gear (PvP balancing stays closed).
 - Data: `scripts/arena_quests.py` (run by `sync-world.cjs`, idempotent and byte-stable) writes the quests and the offer into
   `world/map.txt`; never hand-edit them.
 - Client: `client/pvp.js` shows the `#gauntlet-banner` (fight n of 5, the next class or the opponent, the countdown or the time
-  left, "Leave the gauntlet"), targets the opponent when it appears and lets `canAttack` swing at it. The journal shows
-  "Win five Arena fights: n/5".
+  left, "Leave the gauntlet"), and selects the opponent when it appears for manual aiming. Click or tap the opponent to
+  approach and keep attacking at the normal PvP cooldown. Manual movement cancels the sustained attack. The journal
+  shows "Win five Arena fights: n/5".
 
 ## Checks
 

@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test": "npm run test:whats-new-notes && npm run test:quest-xp && npm run test:gear-generator && npm run test:driver && npm run test:scenarios && npm run test:skill-ranks && npm run test:ui",
+    "test": "npm run test:whats-new-notes && npm run test:quest-xp && npm run test:arena-autoattack-client && npm run test:gear-generator && npm run test:driver && npm run test:scenarios && npm run test:skill-ranks && npm run test:ui",
     "test:gear-generator": "python3 tests/gear-generator.py && python3 tests/quest-rewards.py && python3 tests/quest-backfill.py && python3 scripts/chest_zones.py --check && python3 scripts/weather_zones.py --check",
     "test:quest-xp": "node tests/quest-xp-curve.cjs",
+    "test:arena-autoattack-client": "node tests/arena-autoattack-client.cjs",
     "test:driver": "node --test tests/test-driver.cjs",
     "test:skill-ranks": "node tests/skill-ranks.cjs",
     "test:set-ui": "node tests/set-ui.cjs",

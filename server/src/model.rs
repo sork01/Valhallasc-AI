@@ -1815,6 +1815,7 @@ pub enum PvpCommand {
     DuelCancel,
     ArenaQueue { size: usize },
     ArenaLeave,
+    ArenaTarget { id: String },
     Attack { id: String },
     Refresh,
 }

@@ -479,6 +479,7 @@ struct Player {
     input_at: f64,
     goal: Option<Point>,
     target: Option<usize>,
+    arena_target: Option<u64>,
     face: Point,
     moving: bool,
     walk: f64,
@@ -671,6 +672,7 @@ impl Player {
             input_at: -99.,
             goal: None,
             target: None,
+            arena_target: None,
             face: normalize(1., 1.),
             moving: false,
             walk: 0.,
@@ -874,6 +876,14 @@ impl Player {
         self.input = Point::default();
         self.goal = None;
         self.target = None;
+        self.arena_target = None;
+    }
+
+    fn stop_for_stun(&mut self) {
+        let arena_target = self.arena_target;
+        self.stop();
+        self.arena_target = arena_target;
+        self.attack = 0.;
     }
 }
 
@@ -3142,6 +3152,7 @@ impl World {
                     p.dance = None;
                     p.goal = None;
                     p.target = None;
+                    p.arena_target = None;
                 }
             }
             ClientMessage::RaidCross { id } => {
@@ -3165,6 +3176,7 @@ impl World {
                     y: y.clamp(0.7, size - 0.7),
                 });
                 p.target = None;
+                p.arena_target = None;
                 p.input = Point::default();
             }
             ClientMessage::Target { id }
@@ -3176,6 +3188,7 @@ impl World {
             {
                 p.dance = None;
                 p.target = Some(id);
+                p.arena_target = None;
                 p.goal = None;
                 p.input = Point::default();
             }
@@ -4275,7 +4288,13 @@ impl World {
         self.update_resource(session);
         self.update_enchanting(session);
         let carry_speed = self.forge_carry_speed(session);
+        let arena_opponent = self.players[&session].arena_target.and_then(|target| {
+            self.arena_opponent(session, target).map(|point| (target, point))
+        });
         let p = self.players.get_mut(&session).unwrap();
+        if arena_opponent.is_none() {
+            p.arena_target = None;
+        }
         // Also covers old mounted saves and administrative zone changes, before movement.
         if p.character.mounted && !self.maps[p.character.zone].allows_mount(&p.character.mount) {
             p.character.mounted = false;
@@ -4550,9 +4569,7 @@ impl World {
             }
         }
         if p.stun > 0. {
-            // Stunned: stands where it is, like a player frozen in amber.
-            p.stop();
-            p.attack = 0.;
+            p.stop_for_stun();
             return;
         }
         let mut strike = false;
@@ -4569,6 +4586,7 @@ impl World {
         let mut dir = Point::default();
         let mut travel = 0.;
         let mut auto_attack = false;
+        let mut arena_attack = None;
         // A fighting escort finds its way round walls to its enemy like a hired fighter.
         let hired = (p.merc.is_some()
             && p.escort.as_ref().is_none_or(|e| e.fighting())
@@ -4615,6 +4633,19 @@ impl World {
                 }
             } else {
                 p.target = None;
+            }
+        } else if let Some((opponent, point)) = arena_opponent {
+            let here = p.character.point();
+            let class = p.character.look.class;
+            let reach = pvp::attack_range(class);
+            let distance = here.distance(point);
+            if distance > reach {
+                dir = here.direction(point);
+                travel = distance - reach + 0.05;
+            } else if p.cooldown <= 0. && p.dash <= 0.
+                && (!class.ranged() || self.maps[p.character.zone].line_clear(here, point, 0.05))
+            {
+                arena_attack = Some(opponent);
             }
         } else if let Some(goal) = p.goal {
             travel = p.character.point().distance(goal);
@@ -4697,6 +4728,9 @@ impl World {
         }
         if auto_attack {
             self.start_attack(session);
+        }
+        if let Some(opponent) = arena_attack {
+            self.attack_arena_opponent(session, opponent);
         }
         if self.players[&session].ambient.is_none() && self.players[&session].guard.is_none() {
             self.use_portal(session);

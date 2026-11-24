@@ -4650,6 +4650,7 @@
   "Select": "Välj",
   "Select a numbered slot, then choose a skill. You can also drag skills onto the bar or drag slots to swap them.": "Välj en numrerad plats och sedan en färdighet. Du kan också dra färdigheter till fältet eller dra platser för att byta plats på dem.",
   "Select an item to inspect it.": "Välj ett föremål för att granska det.",
+  "Select an Arena opponent to attack automatically.": "Välj en motståndare i arenan för att anfalla automatiskt.",
   "Select an opponent in the world or the Online list, then press Space or J to attack.": "Välj en motståndare i världen eller i onlinelistan och tryck sedan på mellanslag eller J för att attackera.",
   "Selected": "Vald",
   "Sell from your bags": "Sälj från dina väskor",

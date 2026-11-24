@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.12.4",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Clicking or tapping an Arena opponent now closes the distance and keeps attacking. Move manually to cancel."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.3",
     "date": "2026-11-24",
     "new": [],
