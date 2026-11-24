@@ -1,5 +1,6 @@
 // Two normal WebSocket guests on a private world and disposable SQLite database.
 const assert = require('node:assert/strict');
+const {execFileSync} = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const {TestWorld} = require('../scripts/testing/driver.cjs');
@@ -52,12 +53,15 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   const interrupted = next('Minerone','mining',e => e.state === 'error');
   send('Minerone',{type:'input',dx:1,dy:0});
   assert.equal((await interrupted).text,'Mining interrupted.');
+  await w.action('Minerone',{type:'stop'});
   await warp('Minerone',vein);
   await warp('Minertwo',vein);
   const pulls = await Promise.all(['Minerone','Minertwo'].map(async bot => {
-    const done = next(bot,'mining',p => p.state === 'done');
+    const done = next(bot,'mining',p => p.state !== 'started');
     await start(bot);
-    return done;
+    const result = await done;
+    assert.equal(result.state,'done',bot + ': ' + result.text);
+    return result;
   }));
   assert(pulls.every(p => p.item === 'smith_ore_tin' && p.quantity >= 1 && p.quantity <= 2));
   assert.equal(pulls[0].vein,pulls[1].vein);
@@ -99,7 +103,36 @@ const warp = (bot, point) => w.debug(bot,{op:'teleport',zone:0,x:point.x,y:point
   assert.equal(saved.blacksmithing.skill,made.skill);
   assert(saved.blacksmithing.recipes.includes(staple));
   assert.equal(saved.gold,76);
-  console.log('Blacksmithing protocol passed two miners, interruption, ordinary shop stock, smelting, forging, equipping and restart persistence.');
+
+  // Rejoin from a disposable save at the previous cap. The saved misses
+  // make one actual expert craft sufficient to test the next skill point.
+  const id = w.bots.get('Minerone').id;
+  await w.stop();
+  execFileSync('python3', ['-c', `
+import json, sqlite3, sys
+with sqlite3.connect(sys.argv[1]) as db:
+    raw, = db.execute("SELECT state FROM characters WHERE id=?", (sys.argv[2],)).fetchone()
+    state = json.loads(raw)
+    state["blacksmithing"]["proficiency"] = {"skill": 300, "misses": 2}
+    db.execute("UPDATE characters SET state=? WHERE id=?", (json.dumps(state), sys.argv[2]))
+  `, w.db, id]);
+  await w.launch();
+  await w.connect({bot:'Minerone'});
+  await wait(() => w.player('Minerone')?.professions?.blacksmithing?.skill === 300, 'old cap loads unchanged');
+  assert.deepEqual(w.player('Minerone').professions.blacksmithing, {skill:300, maxSkill:600});
+  await warp('Minerone',smith);
+  const expert = (await dialogue('Minerone')).blacksmithing;
+  assert.deepEqual(expert.training, {cap:330, ore:'smith_ore_stormsilver', zones:[16]});
+  const expertRecipe = 'smith_gear_stormsilver_twin_daggers';
+  assert.equal((await smithing('Minerone','learn',{recipe:expertRecipe})).ok,true);
+  await w.debug('Minerone',{op:'give_item',item:'smith_bar_stormsilver',quantity:5});
+  await w.debug('Minerone',{op:'give_item',item:'smith_leather_strips',quantity:2});
+  const expertCraft = await smithing('Minerone','craft',{recipe:expertRecipe});
+  assert.equal(expertCraft.skill,301);
+  assert.equal(expertCraft.maxSkill,600);
+  await w.restart();
+  await wait(() => w.player('Minerone')?.professions?.blacksmithing?.skill === 301, 'expert progress survives restart');
+  console.log('Blacksmithing protocol passed shared mining, crafting, equipment and upgrading a saved 300-skill character to 301.');
 })().catch(error => {
   console.error(error); process.exitCode = 1;
 }).finally(() => w.stop());

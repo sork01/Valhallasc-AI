@@ -30,12 +30,19 @@ fn skill_for(tier: usize) -> u16 {
     if tier == 0 { 1 } else { training_cap(tier - 1) }
 }
 
+fn training_view(skill: u16) -> Option<Value> {
+    CATALOG
+        .training(skill)
+        .map(|band| json!({"cap":band.cap,"ore":CATALOG.tiers[band.tier].ore,"zones":band.zones}))
+}
+
 pub(super) fn workshop_view(npc: &Npc, c: &Character) -> Option<Value> {
     npc.offers
         .iter()
         .any(|offer| offer.id == WORKSHOP)
         .then(|| {
-            json!({"skill":c.blacksmithing.proficiency.skill,"recipes":c.blacksmithing.recipes,
+            let skill = c.blacksmithing.proficiency.skill;
+            json!({"skill":skill,"maxSkill":MAX_SKILL,"training":training_view(skill),"recipes":c.blacksmithing.recipes,
             "trainer":c.zone == 0 && npc.id == TRAINER})
         })
 }
@@ -124,9 +131,9 @@ fn workshop_action(
                 c.blacksmithing.proficiency.train_batch(
                     count,
                     quality,
-                    training_cap(recipe.tier),
+                    CATALOG.forging_cap(skill, recipe.tier),
                     MAX_SKILL,
-                    MAX_SKILL,
+                    crate::profession::EXPERT_ODDS_FLOOR_AT,
                     roll,
                 );
             }
@@ -192,9 +199,10 @@ impl World {
             .as_ref()
             .map(|(text, output)| (text.as_str(), output.as_deref()))
             .unwrap_or_else(|text| (*text, None));
+        let skill = c.blacksmithing.proficiency.skill;
         let _ = p.peer.try_send(
             json!({"type":"blacksmithing","npc":npc,"ok":result.is_ok(),"text":text,
-            "skill":c.blacksmithing.proficiency.skill,"recipes":c.blacksmithing.recipes,
+            "skill":skill,"maxSkill":MAX_SKILL,"training":training_view(skill),"recipes":c.blacksmithing.recipes,
             "gold":c.gold,"inventory":c.inventory,"output":output}),
         );
     }
@@ -352,10 +360,14 @@ impl World {
             );
         }
         staged.add_item(ore, quantity);
+        let cap = CATALOG
+            .training(previous)
+            .filter(|band| band.zones.contains(&channel.zone))
+            .map_or(previous, |band| band.cap);
         staged
             .blacksmithing
             .proficiency
-            .try_gain_to(0, training_cap(vein.tier), MAX_SKILL, self.smith_roll());
+            .try_gain(0, cap, self.smith_roll());
         let p = self.players.get_mut(&session).unwrap();
         if self.store.save_many([&staged].into_iter()).is_err() {
             return Self::mining_notice(p, "error", "The Blacksmithing change could not be saved.");

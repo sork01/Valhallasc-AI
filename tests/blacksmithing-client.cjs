@@ -57,15 +57,23 @@ if (process.env.MUTATE === 'small-vein') {
   assert(moduleText.includes('VEIN_SIZE = 92'));
   moduleText = moduleText.replace('VEIN_SIZE = 92', 'VEIN_SIZE = 46');
 }
+if (process.env.MUTATE === 'expert-cap') {
+  const before = "format('Blacksmithing skill {0} / {1}', skill, maxSkill)";
+  assert.ok(moduleText.includes(before));
+  moduleText = moduleText.replace(before, before.replace('maxSkill', '300'));
+}
 if (process.env.MUTATE === 'bulk') moduleText = moduleText.replace('all:true', 'all:false');
 vm.runInContext(moduleText,context,{filename:'blacksmithing.js'});
 
 const Blacksmithing = context.Blacksmithing;
-const state = {trainer:true,skill:0,recipes:[]};
+const state = {trainer:true,skill:0,maxSkill:600,training:null,recipes:[]};
 const npc = {id:'smith'};
 const inventory = [{item:'smith_bar_tin',quantity:3},{item:'smith_leather_strips',quantity:2}];
 const packet = {blacksmithing:state,inventory,gold:10};
 const render = () => Blacksmithing.render(npc,packet,panel);
+const answer = fields => Blacksmithing.onPacket({
+  maxSkill:600, training:{cap:30,ore:'smith_ore_tin',zones:[0]}, ...fields,
+});
 const row = id => panel.querySelectorAll('[data-recipe]').find(n => n.dataset.recipe === id);
 const action = (id, bulk = false) => row(id).querySelectorAll('[data-smith-action]')
   .find(node => node.dataset.smithAction === (bulk ? 'all:' + id : id));
@@ -74,38 +82,48 @@ assert.equal(panel.children[0].textContent,'Smide');
 panel.children.at(-1).click();
 assert.equal(sent.at(-1).request.op,'train');
 
-Blacksmithing.onPacket({ok:true,npc:'smith',text:'You learned Blacksmithing and received a starter pick.',skill:1,recipes:[],inventory,gold:10});
+answer({ok:true,npc:'smith',text:'You learned Blacksmithing and received a starter pick.',skill:1,recipes:[],inventory,gold:10});
 const recipe = 'smith_gear_tin_banded_gloves';
 assert.equal(row(recipe).children[1].children[0].textContent,'Tennbeslagna handskar');
 assert.equal(row(recipe).children[1].children[1].textContent,'Preview');
-assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 1 / 300'));
+assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 1 / 600'));
 assert(panel.children.some(n => /^Träna upp till 30 med Tennmalm/.test(n.textContent)));
 action(recipe).click();
 assert.deepEqual(sent.at(-1),{type:'blacksmithing',request:{op:'learn',npc:'smith',recipe}});
-Blacksmithing.onPacket({ok:true,npc:'smith',text:'You learned the blueprint.',skill:1,recipes:[recipe],inventory:[],gold:10});
+answer({ok:true,npc:'smith',text:'You learned the blueprint.',skill:1,recipes:[recipe],inventory:[],gold:10});
 assert.equal(action(recipe).disabled,true,'forge is disabled without inputs');
 assert.equal(action(recipe,true).disabled,true,'Forge All also needs ingredients');
-Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:1,recipes:[recipe],inventory,gold:10});
+answer({ok:true,npc:'smith',text:'',skill:1,recipes:[recipe],inventory,gold:10});
 assert.equal(action(recipe).disabled,false);
 action(recipe).click();
 assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe});
-Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:1,recipes:[recipe],inventory,gold:10});
+answer({ok:true,npc:'smith',text:'',skill:1,recipes:[recipe],inventory,gold:10});
 assert.equal(action(recipe,true).textContent,'Smid alla');
 action(recipe,true).click();
 assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe,all:true},'Forge All sends a single batch request');
-Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:1,recipes:[],inventory:[{item:'smith_ore_tin',quantity:6}],gold:10});
+answer({ok:true,npc:'smith',text:'',skill:1,recipes:[],inventory:[{item:'smith_ore_tin',quantity:6}],gold:10});
 panel.querySelectorAll('[data-smith-action]').find(n => n.dataset.smithAction === 'smelt').click();
 const smelt = action('smith_bar_tin',true);
 assert.equal(smelt.textContent,'Smält alla');
 smelt.click();
 assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe:'smith_bar_tin',all:true});
-Blacksmithing.onPacket({ok:true,npc:'smith',text:'',skill:150,recipes:[],inventory:[],gold:10});
+answer({ok:true,npc:'smith',text:'',skill:150,training:{cap:180,ore:'smith_ore_cobalt',zones:[7,8]},recipes:[],inventory:[],gold:10});
 assert(panel.children.some(n => /Andra gruvområden · .*Rán/.test(n.textContent)));
+const saved = {skill:300, maxSkill:600, training:{cap:330, ore:'smith_ore_stormsilver', zones:[16]}};
+Blacksmithing.render(npc, {...packet, blacksmithing:{...state, ...saved}}, panel);
+assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 300 / 600'));
+assert(panel.children.some(n => n.textContent.includes('330') && n.textContent.includes('Moonspore')));
+answer({ok:true,npc:'smith',text:'',skill:599,training:{cap:600,ore:'smith_ore_stariron',zones:[45]},recipes:[],inventory:[],gold:10});
+assert(panel.children.some(n => /^Träna upp till 600/.test(n.textContent)));
+answer({ok:true,npc:'smith',text:'',skill:600,training:null,recipes:[],inventory:[],gold:10});
+assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 600 / 600'));
+assert(!panel.children.some(n => /^Träna upp till/.test(n.textContent)));
+
 
 
 const vein = {id:11,tier:0,x:100,y:60}, actor = {mining:11,x:90,y:60};
 Blacksmithing.sync({miningVeins:[vein],players:[actor]},actor,cue => cues.push(cue));
-Blacksmithing.onPacket({ok:true,npc:'smith',text:'You forged equipment.',skill:2,recipes:[recipe],inventory:[],gold:10,output:recipe});
+answer({ok:true,npc:'smith',text:'You forged equipment.',skill:2,recipes:[recipe],inventory:[],gold:10,output:recipe});
 const project = (x,y) => [x,y];
 assert.equal(Blacksmithing.pick(95,45,project).id,vein.id);
 assert.equal(Blacksmithing.pick(145,0,project)?.id,vein.id,'the enlarged vein can be selected beyond its old bounds');

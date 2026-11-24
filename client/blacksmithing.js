@@ -40,7 +40,7 @@
   }
   function renderWorkshop() {
     if (!workshop) return;
-    const {target, skill, trainer, recipes, inventory, gold, npc, notice} = workshop;
+    const {target, skill, maxSkill, training, trainer, recipes, inventory, gold, npc, notice} = workshop;
     const page = target.closest?.('.gossip-parchment');
     const scrollTop = page?.scrollTop || 0;
     const focusKey = document.activeElement?.dataset.smithAction;
@@ -54,16 +54,17 @@
       if (trainer) target.append(button('Learn Blacksmithing', () => command('train', {npc})));
       return;
     }
-    target.append(element('p', format('Blacksmithing skill {0} / {1}', skill, 300), 'smith-skill'));
-    if (skill < 300) {
-      const band = Math.floor(skill / 30), next = data.tiers[band];
-      const region = next.zones[0];
+    target.append(element('p', format('Blacksmithing skill {0} / {1}', skill, maxSkill), 'smith-skill'));
+    if (training) {
+      const {cap, ore, zones} = training;
+      const region = zones[0];
       const zone = region === 0 ? WORLD_MAP : WORLD_MAP.zones[region - 1];
-      target.append(element('p', format('Train to {0} with {1} in {2}.', (band + 1) * 30, itemName(next.ore), tr(zone.name))));
-      if (next.zones.length > 1) {
-        const otherZones = next.zones.slice(1).map(id => tr(WORLD_MAP.zones[id - 1].name)).join(', ');
+      target.append(element('p', format('Train to {0} with {1} in {2}.', cap, itemName(ore), tr(zone.name))));
+      if (zones.length > 1) {
+        const otherZones = zones.slice(1).map(id => tr(WORLD_MAP.zones[id - 1].name)).join(', ');
         target.append(element('small', format('Other mining areas · {0}', otherZones)));
       }
+      target.append(element('small', tr('Forging equipment from this ore also raises your skill.')));
     }
     const tabs = element('div', '', 'smith-tabs');
     for (const [value, label] of [['staple','Equipment'],['smelt','Smelting'],['upgrade','Mining picks']]) {
@@ -145,7 +146,8 @@
       sound?.(recipe?.method === 'smelt' ? 'smelt' : 'forge');
     }
     if (workshop && (!packet.npc || workshop.npc === packet.npc)) {
-      Object.assign(workshop, {skill:packet.skill, recipes:packet.recipes, inventory:packet.inventory, gold:packet.gold, notice:packet.text});
+      Object.assign(workshop, {skill:packet.skill, maxSkill:packet.maxSkill, training:packet.training,
+        recipes:packet.recipes, inventory:packet.inventory, gold:packet.gold, notice:packet.text});
       renderWorkshop();
       if (packet.ok && packet.output) {
         const row = [...workshop.target.querySelectorAll('[data-recipe]')].find(node => node.dataset.recipe === packet.output);

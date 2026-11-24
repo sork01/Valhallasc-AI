@@ -706,7 +706,7 @@
   }
   function blacksmithingUpdate(packet) {
     if (!current || !lastPacket?.blacksmithing || (packet.npc && current.id !== packet.npc)) return;
-    Object.assign(lastPacket.blacksmithing, {skill:packet.skill, recipes:packet.recipes});
+    Object.assign(lastPacket.blacksmithing, {skill:packet.skill, maxSkill:packet.maxSkill, training:packet.training, recipes:packet.recipes});
     lastPacket.inventory = packet.inventory;
     City.shopGold(packet.gold);
   }

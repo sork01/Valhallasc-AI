@@ -1,12 +1,12 @@
 //! Saved profession state and the shared client/server recipe catalog.
 use crate::items::{is_boss, is_elite};
 use crate::model::{Map, Point};
-use crate::profession::{SKILL_BAND, Skill};
+use crate::profession::{self, SKILL_BAND, Skill};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::sync::LazyLock;
 
-pub const MAX_SKILL: u16 = 300;
+pub const MAX_SKILL: u16 = profession::MAX_SKILL;
 pub const WORKSHOP: &str = "blacksmithing_workshop";
 pub const TRAINER: &str = "smith";
 pub const STARTER_PICK: &str = "smith_pick_1";
@@ -81,7 +81,14 @@ pub struct Catalog {
     pub tiers: Vec<Tier>,
     pub picks: Vec<Pick>,
     pub recipes: Vec<Recipe>,
+    pub expert_zones: Vec<usize>,
     epic_bosses: Vec<String>,
+}
+
+pub(crate) struct TrainingBand<'a> {
+    pub tier: usize,
+    pub zones: &'a [usize],
+    pub cap: u16,
 }
 
 impl Catalog {
@@ -93,6 +100,36 @@ impl Catalog {
 
     pub fn recipe(&self, id: &str) -> Option<&Recipe> {
         self.recipes.iter().find(|recipe| recipe.item == id)
+    }
+
+    pub(crate) fn training(&self, skill: u16) -> Option<TrainingBand<'_>> {
+        if !(1..MAX_SKILL).contains(&skill) {
+            return None;
+        }
+        let band = usize::from(skill / SKILL_BAND);
+        let (tier, zones) = if let Some(tier) = self.tiers.get(band) {
+            (band, tier.zones.as_slice())
+        } else {
+            let zone = self.expert_zones.get(band - self.tiers.len())?;
+            (self.tier(*zone)?, std::slice::from_ref(zone))
+        };
+        Some(TrainingBand {
+            tier,
+            zones,
+            cap: training_cap(band),
+        })
+    }
+
+    pub(crate) fn forging_cap(&self, skill: u16, tier: usize) -> u16 {
+        let mut cap = skill;
+        // Forge All can continue through consecutive bands using the same ore.
+        while let Some(band) = self.training(cap) {
+            if band.tier != tier {
+                break;
+            }
+            cap = band.cap;
+        }
+        cap
     }
 
     pub fn plan(&self, id: &str) -> Option<&Recipe> {

@@ -274,6 +274,127 @@ fn blacksmithing_mining_trains_every_band_with_its_pick_and_never_an_earlier_ban
 }
 
 #[test]
+fn blacksmithing_expert_mining_advances_a_saved_skill_through_all_ten_regions() {
+    let (mut w, token, _) = smiths();
+    train(&mut w, 1);
+    let pick = &CATALOG.picks.last().unwrap().item;
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.blacksmithing.proficiency.skill = 300;
+    c.add_item(pick, 1);
+    w.save();
+    assert_eq!(
+        w.store
+            .load(&token)
+            .unwrap()
+            .unwrap()
+            .blacksmithing
+            .proficiency
+            .skill,
+        300
+    );
+
+    let [first, wrong, ..] = CATALOG.expert_zones.as_slice() else {
+        panic!("missing expert route")
+    };
+    for (zone, skill) in [(*wrong, 300), (*first, 301)] {
+        w.ensure_veins(zone);
+        let vein = w.mining_veins[&zone][0];
+        w.smith_rng = 0;
+        start(&mut w, 1, vein, zone);
+        w.time += DURATION;
+        w.update_mining(1);
+        assert_eq!(
+            w.players[&1].character.blacksmithing.proficiency.skill, skill,
+            "zone {zone}"
+        );
+    }
+    for (index, &zone) in CATALOG.expert_zones.iter().enumerate() {
+        let cap = 330 + index as u16 * 30;
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .blacksmithing
+            .proficiency
+            .skill = cap - 1;
+        w.ensure_veins(zone);
+        let vein = w.mining_veins[&zone][0];
+        w.smith_rng = 0;
+        for _ in 0..2 {
+            start(&mut w, 1, vein, zone);
+            w.time += DURATION;
+            w.update_mining(1);
+            assert_eq!(
+                w.players[&1].character.blacksmithing.proficiency.skill, cap,
+                "zone {zone}"
+            );
+        }
+    }
+    assert_eq!(
+        w.store
+            .load(&token)
+            .unwrap()
+            .unwrap()
+            .blacksmithing
+            .proficiency
+            .skill,
+        600
+    );
+    assert!(
+        training_view(600).is_none(),
+        "a capped character has no next training band"
+    );
+}
+
+#[test]
+fn blacksmithing_expert_forge_all_advances_matching_bands_and_caps_at_600() {
+    let (mut w, token, mut replies) = smiths();
+    train(&mut w, 1);
+    for (tier, skill, count, expected) in [(7, 329, 2, 331), (9, 331, 1, 331), (9, 599, 2, 600)] {
+        let recipe = CATALOG
+            .recipes
+            .iter()
+            .find(|r| r.tier == tier && r.method == Method::Staple)
+            .unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.blacksmithing.proficiency.skill = skill;
+        c.blacksmithing.recipes.insert(recipe.item.clone());
+        for (item, quantity) in &recipe.ingredients {
+            c.add_item(item, quantity * count);
+        }
+        let prior = c.quantity(&recipe.item);
+        w.smith_rng = 0;
+        command(
+            &mut w,
+            Command::Craft {
+                npc: TRAINER.into(),
+                recipe: recipe.item.clone(),
+                all: true,
+            },
+        );
+        let c = &w.players[&1].character;
+        assert_eq!(c.quantity(&recipe.item), prior + count);
+        assert_eq!(c.blacksmithing.proficiency.skill, expected);
+    }
+    let reply = std::iter::from_fn(|| replies[0].try_recv().ok())
+        .filter(|packet| packet["type"] == "blacksmithing")
+        .last()
+        .unwrap();
+    assert_eq!(reply["maxSkill"], 600);
+    assert!(reply["training"].is_null());
+    assert_eq!(
+        w.store
+            .load(&token)
+            .unwrap()
+            .unwrap()
+            .blacksmithing
+            .proficiency
+            .skill,
+        600
+    );
+}
+
+#[test]
 fn blacksmithing_workshop_validates_station_and_preserves_transactions_and_gear_copies() {
     let (mut w, token, mut replies) = smiths();
     let smith = smith_at(&mut w);

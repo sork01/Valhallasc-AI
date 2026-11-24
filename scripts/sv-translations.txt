@@ -1,4 +1,5 @@
 {
+  "Forging equipment from this ore also raises your skill.": "Du kan också höja smidesfärdigheten genom att smida utrustning med den här malmen.",
   "You wake up back at the start…": "Du vaknar vid ingången…",
   "Reset / Replay tutorial": "Återställ / Spela om handledning",
   "Tutorial tip": "Handledningstips",

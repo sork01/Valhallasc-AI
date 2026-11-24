@@ -31,6 +31,12 @@ if os.getenv('MUTATE') == 'no-alternate':
     veins['0'] = veins['0'][:1]
 
 assert len(catalog['tiers']) == 10
+expert = catalog['expertZones']
+assert len(expert) == len(set(expert)) == 10
+zone_tiers = {zone: tier for tier, row in enumerate(catalog['tiers']) for zone in row['zones']}
+assert [zone_tiers[zone] for zone in expert] == [7] * 4 + [8] * 3 + [9] * 3
+assert all(len(veins[str(zone)]) >= 2 for zone in expert), 'Every expert band has reachable vein candidates'
+
 eligible = {str(i) for i,z in enumerate(regions) if z['slimes'] and not z.get('copies') and not z.get('interior')}
 assert set(veins) == eligible
 for key, points in veins.items():

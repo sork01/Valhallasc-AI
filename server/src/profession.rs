@@ -150,7 +150,7 @@ mod tests {
     }
 
     #[test]
-    fn profession_skill_expert_batches_keep_alchemy_and_smithing_odds() {
+    fn profession_skill_expert_batches_keep_alchemy_odds() {
         let mut enchant = Skill::default();
         enchant.initialize(330);
         let mut alchemy = enchant.clone();
@@ -158,10 +158,6 @@ mod tests {
         alchemy.train_batch(1, 0, 360, MAX_SKILL, MAX_SKILL, || 0.7);
         assert_eq!(enchant.skill, 330);
         assert_eq!(alchemy.skill, 331);
-
-        let mut smith = Skill::default();
-        smith.initialize(crate::blacksmithing::MAX_SKILL);
-        assert!(!smith.try_gain_to(0, 330, crate::blacksmithing::MAX_SKILL, 0.));
     }
 
     #[test]

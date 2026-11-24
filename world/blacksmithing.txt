@@ -11,6 +11,7 @@
     {"ore": "smith_ore_sunsteel", "zones": [25, 22, 23, 26]},
     {"ore": "smith_ore_stariron", "zones": [28, 27, 45]}
   ],
+  "expertZones": [16, 19, 20, 21, 22, 25, 26, 27, 28, 45],
   "picks": [
     {"item": "smith_pick_1", "reaches": 1},
     {"item": "smith_pick_2", "reaches": 3},

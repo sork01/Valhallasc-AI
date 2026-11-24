@@ -23,6 +23,25 @@ The workshop lists the current tier's primary and alternate mining areas. A comp
 
 Smiths teach ten green recipes when their bands open. Level-appropriate monsters in shared adventure zones drop their tier's blue blueprint at 1.5%, or 4.5% for elites and bosses. The final bosses of Black Hour Foundry, The Amber Archive, The Silent Solstice and The Chained Forge have a 20% chance to award a blueprint from the five level-99 epic plans. Unused plans can be traded. Study a plan from the bags or the workshop to learn it permanently. The five epic recipes require skill 300. Their stats use 90% of the equivalent level-99 Foundry epic budget.
 
+### Expert training
+
+From skill 300, mine in the region named in the workshop or forge equipment from its ore tier. The first expert band uses Stormsilver in the Moonspore Canopy. The existing Cobalt and Stormsilver picks cover the route, and ordinary green recipes can train every band.
+
+| Skill before gaining | Ore | Mining region |
+| --- | --- | --- |
+| 300–329 | Stormsilver | The Moonspore Canopy |
+| 330–359 | Stormsilver | The Stormglass Flats |
+| 360–389 | Stormsilver | Sunward Vale |
+| 390–419 | Stormsilver | The Ribbonwild |
+| 420–449 | Sunsteel | The Tanglecrown |
+| 450–479 | Sunsteel | The Lapis Erg |
+| 480–509 | Sunsteel | Frostwake Shelf |
+| 510–539 | Stariron | The Cairnspine |
+| 540–569 | Stariron | The Yearwheel |
+| 570–599 | Stariron | Emberwake Caldera |
+
+Mining trains through the current 30-point band. Forging can continue through consecutive bands using the same ore. Expert gains use the same 60% base chance as skill 300, with the existing recipe quality bonus and guaranteed gain after two eligible misses. Saved skill and existing achievement thresholds carry over.
+
 ## Data and persistence
 
 `world/blacksmithing.txt` defines the tier, pick, blueprint and ingredient lists. `scripts/blacksmithing_catalog.py` runs after shaping in `scripts/sync-world.cjs`. It adds smith offers and item definitions and generates `world/mining-veins.txt` from reachable finished terrain. It preserves other offers and world geometry. The client receives active vein IDs and coordinates in zone snapshots. Mining channels and active veins are session state, while the skill, miss streak, learned plans, materials and gear copies are saved with the character.

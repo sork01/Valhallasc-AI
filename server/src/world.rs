@@ -7307,13 +7307,13 @@ mod tests {
         let player = world.players.get_mut(&1).unwrap();
         let expected = json!({
             "fishing": {"skill": 1, "maxSkill": 600},
-            "blacksmithing": {"skill": 0, "maxSkill": 300},
+            "blacksmithing": {"skill": 0, "maxSkill": 600},
             "enchanting": {"skill": 0, "maxSkill": 600},
             "alchemy": {"skill": 0, "maxSkill": 600},
         });
         assert_eq!(player.snapshot()["professions"], expected);
         player.character.fishing.proficiency.skill = 329;
-        player.character.blacksmithing.proficiency.skill = 87;
+        player.character.blacksmithing.proficiency.skill = 387;
         player.character.enchanting.proficiency.skill = 300;
         player.character.alchemy.proficiency.skill = 527;
 
@@ -7323,7 +7323,7 @@ mod tests {
         let saved = &owner["players"][0]["professions"];
         assert_eq!(saved, &json!({
             "fishing": {"skill": 329, "maxSkill": 600},
-            "blacksmithing": {"skill": 87, "maxSkill": 300},
+            "blacksmithing": {"skill": 387, "maxSkill": 600},
             "enchanting": {"skill": 300, "maxSkill": 600},
             "alchemy": {"skill": 527, "maxSkill": 600},
         }));

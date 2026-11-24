@@ -92,7 +92,7 @@ fn achievements_profession_milestones_use_each_saved_skill_at_the_exact_boundary
     let paths: [(&str, [u16; 3], SkillOf); 4] = [
         ("fishing_skill", [30, 150, 300], |c| &mut c.fishing.proficiency),
         ("enchanting_skill", [30, 150, 300], |c| &mut c.enchanting.proficiency),
-        ("blacksmithing_skill", [30, 150, crate::blacksmithing::MAX_SKILL], |c| &mut c.blacksmithing.proficiency),
+        ("blacksmithing_skill", [30, 150, 300], |c| &mut c.blacksmithing.proficiency),
         ("alchemy_skill", [30, 300, crate::alchemy::MAX_SKILL], |c| &mut c.alchemy.proficiency),
     ];
     for (metric, targets, skill_of) in paths {
