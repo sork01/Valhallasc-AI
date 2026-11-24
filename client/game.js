@@ -653,6 +653,7 @@
   function enterCreate() {
     if (save.char && !save.draft) load(save.char);
     buildControls(); refresh(); updateClass();
+    scenes.create.scrollTop = 0;
     if (view.ok && !modular(cfg)) view.resize();
     clearTimeout(introTimer); introTimer = setTimeout(() => { if (modular(cfg)) castPreview(); else if (view.ok) view.play('attack'); }, 450);
     $('cls-' + cfg.class).focus({ preventScroll: true });

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.12.2",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "On touch screens, all five classes are visible when you open character creation. Scroll through customization to reach the create button."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.1",
     "date": "2026-11-24",
     "new": [],

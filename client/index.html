@@ -46,7 +46,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">1.12.1</p>
+    <p class="version">1.12.2</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -123,23 +123,25 @@
       </div>
     </aside>
 
-    <div class="cc-preview">
-      <canvas id="wcv" aria-label="Warrior preview. Click the axe, mug, head, beard or fish to interact."></canvas>
-      <canvas id="magecv" aria-label="Mage preview. Click to cast a spell." hidden></canvas>
-      <p id="mage-status" class="mage-status" role="status" hidden></p>
-      <div class="cc-turn" role="group" aria-label="Rotate character">
-        <button class="arrow" id="create-turn-left" type="button" aria-label="Turn left">↶</button>
-        <span id="create-facing" aria-live="polite">Front</span>
-        <button class="arrow" id="create-turn-right" type="button" aria-label="Turn right">↷</button>
+    <div class="cc-showcase">
+      <div class="cc-preview">
+        <canvas id="wcv" aria-label="Warrior preview. Click the axe, mug, head, beard or fish to interact."></canvas>
+        <canvas id="magecv" aria-label="Mage preview. Click to cast a spell." hidden></canvas>
+        <p id="mage-status" class="mage-status" role="status" hidden></p>
+        <div class="cc-turn" role="group" aria-label="Rotate character">
+          <button class="arrow" id="create-turn-left" type="button" aria-label="Turn left">↶</button>
+          <span id="create-facing" aria-live="polite">Front</span>
+          <button class="arrow" id="create-turn-right" type="button" aria-label="Turn right">↷</button>
+        </div>
       </div>
-    </div>
 
-    <div class="panel cc-desc">
-      <div class="cc-desc-text">
-        <h3 id="class-name">WARRIOR <span lang="ko">(워리어)</span></h3>
-        <p id="class-desc" data-i18n="warriorDesc">A furious vanguard who thrives on the front lines. High health and crushing melee power.</p>
+      <div class="panel cc-desc">
+        <div class="cc-desc-text">
+          <h3 id="class-name">WARRIOR <span lang="ko">(워리어)</span></h3>
+          <p id="class-desc" data-i18n="warriorDesc">A furious vanguard who thrives on the front lines. High health and crushing melee power.</p>
+        </div>
+        <dl class="stats" id="stats"></dl>
       </div>
-      <dl class="stats" id="stats"></dl>
     </div>
 
     <aside class="panel cc-custom" id="custom-panel" aria-label="Customize Warrior">
