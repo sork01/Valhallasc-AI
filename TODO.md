@@ -9,6 +9,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 ## Open tasks
 
 - [ ] `SELL-JUNK-MINED-ORE` — Owner reports that **Sell All Junk** may sell ore gathered through mining. Reproduce with a mined ore stack and ordinary junk. Keep mined ores out of the automatic sale while preserving individual sales. Verify the ore remains in the bag and only the junk earns coins.
+- [ ] `ALCHEMY-WORKSHOP-RESIZE` — Owner reports that the Alchemy Workshop opens too small and cannot be resized. Give it the same resizable panel behavior as Blacksmithing, with a separately remembered width and height. Verify that the resized window stays usable and keeps its size after closing and reopening.
 
 - [x] `XP-CURVE-RULES` — Owner decisions recorded 2026-11-24. Scale XP from all XP-paying monster kills and quest turn-ins by the level gap. Use the monster's actual level or the quest's recommended level. Story quests and bosses use the same curve.
   - **Curve.** Same-level content pays 100%. Each level above the character adds 3 percentage points, capped at 115% at five levels above. Each level below the character subtracts 10 percentage points, with a 30% minimum. Content five levels below pays 50%. Content seven or more levels below pays 30%, including the owner's example of a character ten levels above the content.
