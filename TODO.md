@@ -8,6 +8,9 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `GATHERING-OVERLAP-RULES` — Owner decisions (2026-11-24). Fishing, mining and flower picking unlock the next 30-point band 15 points early. Both bands can give points during the overlap, each up to its own cap. Emberfall Crags trains Fishing to 60, and Rimeveil Glacier opens at 45 and trains to 90. Gathering below the new minimum is blocked. Recipe and Enchanting requirements keep their existing thresholds.
+- [ ] `GATHERING-OVERLAP` — Apply the approved access thresholds and skill gains across Fishing, mining and flower picking. Show both eligible areas during the overlap and verify access, gains and caps.
+
 - [x] `PROFESSIONS-600` — Extend Enchanting and Fishing through skill 600 on `feat/professions-600`. Twenty 30-point bands, eight expert enchants, ten new fishing regions, 35 species, five dishes and two rod upgrades. See `docs/enchanting.md` and `docs/fishing.md`.
 
 - [x] `RACIAL-PASSIVES-RULES` — Owner choices (2026-11-23). Gnomes get 10% off NPC shop stock and bulk purchases, equipment repairs and Spark Travel fares. Player trade and vendor sell prices keep their usual rates. Humans get 5% more coin from quest turn-ins. Mothkin gather alchemy flowers 15% faster at night. Tidekin wait 10% less time for bites in water with the usual catch and loot rules.
