@@ -757,6 +757,7 @@ impl Player {
             "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet});
         view["equippedLook"] = json!(c.look);
+        view["weaponEnchant"] = json!(c.weapon_enchant());
         view["transmogs"] = json!(c.wardrobe.slots);
         view["abandonedQuests"] = json!(c.abandoned_quests);
         view["questGoldPercent"] = json!(c.quest_gold_percent());
@@ -812,7 +813,7 @@ impl Player {
     fn across_view(&self) -> Value {
         let c = &self.character;
         json!({"id":c.id,"look":c.appearance_look(),"zone":c.zone,"x":r2(c.x),"y":r2(c.y),"r":PLAYER_RADIUS,"hp":r2(c.hp),"maxHp":r2(c.max_hp()),
-            "level":c.level,"fx":r2(self.face.x),"fy":r2(self.face.y),"moving":self.moving,"walk":r2(self.walk),"atkT":r2(self.attack),
+            "level":c.level,"fx":r2(self.face.x),"fy":r2(self.face.y),"moving":self.moving,"walk":r2(self.walk),"atkT":r2(self.attack),"weaponEnchant":c.weapon_enchant(),
             "hurtT":r2(self.hurt),"dead":c.hp<=0.,"ghost":c.hp<=0. && c.ghost,"deadT":r2(self.dead_time),"fallen":c.hp<=0. && self.fallen,"dashT":r2(self.dash),
             "buffs":self.buffs,"sparkTravel":c.spark_travel,"mount":c.mount,"mounted":c.mounted,"mountTint":c.mount_tint,
             "reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"pvpFlag":self.pvp_flag,"stun":r2(self.stun),
@@ -2128,6 +2129,8 @@ pub struct World {
     empty_seat: empty_seat::State,
     /// Counter for mercenary sessions.
     merc_seq: u64,
+    /// Appearance rolls are independent of the combat and ambient behavior rolls.
+    adventurer_race_rng: u64,
     /// Live arena gauntlet runs (world/gauntlet.rs), in memory only.
     gauntlets: Vec<gauntlet::Run>,
     /// Desired autonomous adventurers in each currently occupied shared zone.
@@ -2272,6 +2275,9 @@ impl World {
             raid_key: raid_key::State::default(),
             empty_seat: empty_seat::State::default(),
             merc_seq: 0,
+            adventurer_race_rng: u64::from_le_bytes(
+                uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap(),
+            ),
             gauntlets: vec![],
             ambient_targets: BTreeMap::new(),
             ambient_chat_at: BTreeMap::new(),
@@ -2369,6 +2375,13 @@ impl World {
     fn random(&mut self) -> f64 {
         self.rng = self.rng.wrapping_mul(6364136223846793005).wrapping_add(1);
         (self.rng >> 32) as f64 / 4294967296.
+    }
+    fn roll_adventurer_race(&mut self) -> Race {
+        self.adventurer_race_rng = self.adventurer_race_rng
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1);
+        let races = [Race::Human, Race::Mothkin, Race::Tidekin, Race::Gnome];
+        races[(self.adventurer_race_rng >> 62) as usize]
     }
     fn alchemy_roll(&mut self) -> f64 {
         self.alchemy_rng = self.alchemy_rng.wrapping_mul(6364136223846793005).wrapping_add(1);

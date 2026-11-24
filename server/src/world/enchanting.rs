@@ -1193,6 +1193,81 @@ mod tests {
     }
 
     #[test]
+    fn enchanting_weapon_appearance_tracks_the_worn_copy_for_every_viewer() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let id = worn(&mut w, 1, "weapon", "epic", Shieldbreaker);
+        worn(&mut w, 1, "armor", "rare", Brace);
+        let state = |w: &World, expected| {
+            let p = &w.players[&1];
+            assert_eq!(p.snapshot().get("weaponEnchant"), Some(&expected));
+            assert_eq!(p.across_view().get("weaponEnchant"), Some(&expected));
+            let mut view = w.snapshot_for(p.character.zone);
+            crate::visibility::filter_view(&mut view, "observer");
+            let remote = view["players"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|row| row["id"] == p.character.id)
+                .unwrap();
+            assert_eq!(remote.get("weaponEnchant"), Some(&expected));
+            assert!(remote.get("gearInstances").is_none());
+        };
+        state(&w, json!("shieldbreaker"));
+
+        let c = character(&mut w, 1);
+        let piece = c
+            .gear_instances
+            .iter()
+            .find(|copy| copy.id == id)
+            .unwrap()
+            .item
+            .clone();
+        c.add_item(&piece, 1);
+        c.materialize_gear_instances();
+        let spare = c
+            .gear_instances
+            .iter()
+            .find(|copy| copy.item == piece && copy.id != id)
+            .unwrap()
+            .id;
+        c.prefer_gear_instance(spare).unwrap();
+        state(&w, Value::Null);
+
+        let c = character(&mut w, 1);
+        c.prefer_gear_instance(id).unwrap();
+        c.add_item(&DoubleTap.item("scroll"), 1);
+        assert_eq!(
+            request(
+                &mut w,
+                &mut rx,
+                json!({"op":"apply","enchant":DoubleTap,"copy":id,"expected":Shieldbreaker})
+            )["ok"],
+            true
+        );
+        state(&w, json!("double_tap"));
+
+        let set_wear = |w: &mut World, wear| {
+            character(w, 1)
+                .gear_instances
+                .iter_mut()
+                .find(|copy| copy.id == id)
+                .unwrap()
+                .wear = wear;
+        };
+        set_wear(&mut w, 100);
+        state(&w, Value::Null);
+        let c = character(&mut w, 1);
+        c.gold = 100_000;
+        c.repair_gear(Some(id), 1).unwrap();
+        state(&w, json!("double_tap"));
+        character(&mut w, 1)
+            .equip_slots(&[("hands".into(), "none".into())].into())
+            .unwrap();
+        state(&w, Value::Null);
+    }
+
+    #[test]
     fn enchanting_bands_gate_disenchanting_and_cheap_scrolls() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Warrior);

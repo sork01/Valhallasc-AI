@@ -1,4 +1,4 @@
-use crate::items::{GearInstance, is_gear, is_quest_item, item};
+use crate::items::{GearInstance, equipment, is_gear, is_quest_item, item};
 use crate::model::Character;
 use crate::profession::{band_cap, gear_skill_cap};
 use serde::{Deserialize, Serialize};
@@ -178,6 +178,14 @@ pub fn equipment_skill_cap(gear: &GearInstance) -> u16 {
 }
 
 impl Character {
+    pub(crate) fn weapon_enchant(&self) -> Option<Enchant> {
+        let weapon = equipment(self.look.class, "weapon", self.gear().1)?;
+        let copy = self.worn_gear_instance(&weapon.id, 0)?;
+        copy.enchant.filter(|enchant| {
+            weapon.required_level <= self.level && !copy.broken() && enchant.recipe().kind == "weapon"
+        })
+    }
+
     pub fn wears_enchant(&self, enchant: Enchant) -> bool {
         let recipe = enchant.recipe();
         self.worn_slots().into_iter().any(|(slot, piece)| {

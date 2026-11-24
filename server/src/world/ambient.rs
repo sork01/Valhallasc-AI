@@ -413,6 +413,7 @@ impl World {
         let level = low + (self.random() * (high - low + 1) as f64) as u32;
         let point = self.ambient_field_spot(zone, level);
         let mut character = Character::mercenary(class, level, &name);
+        character.look.race = self.roll_adventurer_race();
         character.look.gender = if self.random() < 0.5 {
             Gender::Female
         } else {
@@ -1044,6 +1045,41 @@ mod tests {
                 .iter()
                 .all(|name| (2..=16).contains(&name.chars().count()) && !name.contains("[GM]"))
         );
+    }
+
+    #[test]
+    fn adventurer_races_are_rolled_for_each_hire_and_ambient_spawn() {
+        let mut w = world();
+        let _rx = join(&mut w, 1);
+        let owner = w.players[&1].character.id.clone();
+        let point = w.players[&1].character.point();
+        for (seed, race) in [
+            (0, Race::Human),
+            (1, Race::Mothkin),
+            (2, Race::Tidekin),
+            (8, Race::Gnome),
+        ] {
+            w.adventurer_race_rng = seed;
+            w.place_mercenary(&owner, Class::Mage, 1, 0, point, false, None)
+                .unwrap();
+            let session = *w.players.keys().next_back().unwrap();
+            assert_eq!(w.players[&session].character.look.race, race, "mercenary race");
+            w.remove_mercenary(session);
+
+            w.adventurer_race_rng = seed;
+            w.spawn_ambient(0);
+            let session = *w.players.keys().next_back().unwrap();
+            assert_eq!(w.players[&session].character.look.race, race, "ambient race");
+        }
+        let before: Vec<_> = w.players.iter()
+            .filter(|(_, p)| p.ambient.is_some())
+            .map(|(&session, p)| (session, p.character.look.race))
+            .collect();
+        w.step();
+        for (session, race) in before {
+            assert_eq!(w.players[&session].character.look.race, race, "adventurer keeps its race");
+        }
+        assert_eq!(w.players[&1].character.look.race, Race::Human);
     }
 
     #[test]

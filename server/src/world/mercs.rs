@@ -262,6 +262,7 @@ impl World {
             name = format!("{name} {}", same + 1);
         }
         let mut character = Character::mercenary(class, level, &name);
+        character.look.race = self.roll_adventurer_race();
         if self.merc_mirror_gear
             && let Some(hirer) = self.players.values().find(|p| p.character.id == owner)
         {

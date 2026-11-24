@@ -61,6 +61,7 @@
     // push back against the ground; use the same source frame for colour, depth and the rider's saddle bob.
     if (id === 'horse' && clip === 'run') i = (C.n - i) % C.n;
     const out = new ImageData(FW, CH), z = new Uint16Array(FW * CH).fill(65535);
+    const enchant = rider._enchant, weaponMask = enchant && new Uint8Array(FW * CH);
     const bx = i * FW, by = (C.row0 + dir) * FH, table = tintTable(id, tint);
     for (let y = 0; y < FH; y++) for (let x = 0; x < FW; x++) {
       const p = ((by + y) * a.width + bx + x) * 4;
@@ -93,11 +94,13 @@
         const dst = ny * FW + x, depth = enc - lift;
         if (depth > z[dst]) continue;
         z[dst] = depth;
+        if (weaponMask) weaponMask[dst] = enchant.mask[s];
         out.data[dst * 4] = px[s * 4]; out.data[dst * 4 + 1] = px[s * 4 + 1]; out.data[dst * 4 + 2] = px[s * 4 + 2]; out.data[dst * 4 + 3] = 255;
       }
     }
     const canvas = document.createElement('canvas'); canvas.width = FW; canvas.height = CH;
     canvas.getContext('2d').putImageData(out, 0, 0);
+    if (weaponMask) canvas._enchant = window.WeaponEnchantArt.prepare(out, weaponMask, enchant.theme);
     return canvas;
   }
   const clipFor = (id, moving) => moving ? 'run' : 'idle';

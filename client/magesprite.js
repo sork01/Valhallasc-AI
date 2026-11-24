@@ -805,6 +805,8 @@
       const [fw, fh] = this.meta.frame, canvas = document.createElement('canvas'); canvas.width = fw; canvas.height = fh;
       const g = canvas.getContext('2d'), out = g.createImageData(fw, fh), nearest = new Uint16Array(fw * fh); nearest.fill(65535);
       const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
+      const weaponPart = 'weapon_' + this.equipment.weapon;
+      const weaponMask = this.weaponTheme && this.source.parts[weaponPart] ? new Uint8Array(fw * fh) : null;
       const chosen = [bodyPart(this.source.parts, this.equipment)];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
       const traitPose = this.traits && this.meta.headFrames?.[key];
@@ -815,6 +817,7 @@
       const tracked = FRONT_DIRS.includes(dir) || BACK_DIRS.includes(dir), hairAt = tracked ? new Uint8Array(fw * fh) : null;
       for (const part of chosen) {
         const f = this.source.parts[part][key], tie = isBody(part) || !tracked ? 0 : hairTie(dir, part), keeps = !isBody(part) && tracked && hairKeeps(dir, part);
+        const markWeapon = weaponMask && part === weaponPart; // The weapon is last in SLOT_ORDER.
         for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
           const pixel = y * f.w + x, src = pixel * 4, dst = (f.y + y) * fw + f.x + x;
           if (!f.pixels[src + 3]) continue;
@@ -831,6 +834,7 @@
             if (!painted) { painted = [...lut.paint(f.pixels[src], f.pixels[src + 1], f.pixels[src + 2]), 255]; lut.colours.set(packed, painted); }
             out.data.set(painted, dst * 4);
           } else out.data.set(tint ? [...tint, 255] : f.pixels.subarray(src, src + 4), dst * 4);
+          if (markWeapon) weaponMask[dst] = 1;
           if (part === 'weapon_regearchainforged' && f.pixels[src] > 150 && f.pixels[src] > f.pixels[src + 2] * 1.4) {
             forge.set([255, 138, 46, 230], dst * 4);
           }
@@ -839,6 +843,7 @@
           paintTraits(out.data, nearest, fw, fh, traitPose, this.traits[dir], this.skinColours, this.equipment.head === 'none');
       }
       g.putImageData(out, 0, 0);
+      if (weaponMask) canvas._enchant = window.WeaponEnchantArt.prepare(out, weaponMask, this.weaponTheme);
       if (this.equipment.weapon === 'regearchainforged') {
         const glow = document.createElement('canvas'); glow.width = fw; glow.height = fh;
         glow.getContext('2d').putImageData(new ImageData(forge, fw, fh), 0, 0); canvas._forge = glow;
@@ -848,6 +853,9 @@
       this.cache.set(key, canvas); return canvas;
     }
     draw(g, h, t, scale = 1.3) {
+      const enchantArt = window.WeaponEnchantArt;
+      const theme = enchantArt?.theme(h.weaponEnchant);
+      if (theme !== this.weaponTheme) { this.weaponTheme = theme; this.cache.clear(); }
       scale *= this.meta.displayScale || 1;
       const C = this.meta.clips;
       const dying = h.dead && !h.ghost;
@@ -875,6 +883,7 @@
         if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0, this.bodyScale); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }
         g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, M.shadow[0], M.shadow[1], 0, 0, 6.283); g.fill();
         g.drawImage(seat, -ax, -ay - art.SHIFT);
+        if (seat._enchant) enchantArt.draw(g, seat._enchant, -ax, -ay - art.SHIFT, t, false);
       } else {
         const frame = this.frame(clip, dir, i);
         g.scale(...this.bodyScale);
@@ -885,6 +894,7 @@
           g.globalAlpha *= still ? .22 : .22 + .14 * Math.sin(t * Math.PI * 5);
           g.drawImage(frame._forge, -ax, -ay); g.restore();
         }
+        if (frame._enchant && !h.dead && !h.isCorpse) enchantArt.draw(g, frame._enchant, -ax, -ay, t, clip === 'attack');
       }
       g.restore();
     }
