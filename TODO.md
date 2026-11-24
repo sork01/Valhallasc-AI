@@ -8,6 +8,15 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `XP-CURVE-RULES` — Owner decisions recorded 2026-11-24. Scale XP from all XP-paying monster kills and quest turn-ins by the level gap. Use the monster's actual level or the quest's recommended level. Story quests and bosses use the same curve.
+  - **Curve.** Same-level content pays 100%. Each level above the character adds 3 percentage points, capped at 115% at five levels above. Each level below the character subtracts 10 percentage points, with a 30% minimum. Content five levels below pays 50%. Content seven or more levels below pays 30%, including the owner's example of a character ten levels above the content.
+  - **Quests.** Use the character's level when they claim the reward. A level-20 quest turned in at level 21 pays 90% of its authored XP before bonuses.
+  - **Parties.** Use each eligible recipient's own level and apply the existing party XP share. On the same level-20 kill, level-18 and level-25 members earn 106% and 50% of their respective normal shares before character bonuses.
+  - **Existing rewards.** Apply the curve to XP before character bonuses. Keep existing Greenmeadow and boss base XP, party fellowship rules, and the level 99 XP cap.
+- [ ] `XP-CURVE-SERVER` — After `XP-CURVE-RULES`, apply the shared curve to authoritative solo and party kill payouts and quest claims.
+- [ ] `XP-CURVE-CLIENT` — After `XP-CURVE-SERVER`, show level-adjusted quest XP before character bonuses in the quest journal and NPC reward previews. Keep XP gained feedback tied to the actual payout.
+- [ ] `XP-CURVE-CHECK` — After `XP-CURVE-CLIENT`, verify the floor and cap, late quest turn-ins, mixed-level parties, existing XP bonuses, and matching reward previews with focused and mutation checks.
+
 - [x] `PROFESSIONS-600` — Extend Enchanting and Fishing through skill 600 on `feat/professions-600`. Twenty 30-point bands, eight expert enchants, ten new fishing regions, 35 species, five dishes and two rod upgrades. See `docs/enchanting.md` and `docs/fishing.md`.
 
 - [x] `RACIAL-PASSIVES-RULES` — Owner choices (2026-11-23). Gnomes get 10% off NPC shop stock and bulk purchases, equipment repairs and Spark Travel fares. Player trade and vendor sell prices keep their usual rates. Humans get 5% more coin from quest turn-ins. Mothkin gather alchemy flowers 15% faster at night. Tidekin wait 10% less time for bites in water with the usual catch and loot rules.
