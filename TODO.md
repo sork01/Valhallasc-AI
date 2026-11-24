@@ -16,6 +16,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 - [x] `XP-CURVE-SERVER` — Implemented on `feat/xp-level-curve`. Solo and party kills and quest claims use one level curve. Payouts apply the existing party share and personal bonuses after the level adjustment.
 - [x] `XP-CURVE-CLIENT` — The 1.12.3 candidate reads the rate table at login and updates both quest reward previews as the character levels. Previews show XP before personal bonuses and payout feedback shows actual XP earned.
 - [x] `XP-CURVE-CHECK` — Passed 26 focused Rust checks across the curve boundaries, late turn-ins, solo and mixed-level party kills, and existing XP bonuses. The non-browser journal and conversation checks passed, including preview refresh after level-up. Four curve mutations and three client mutations were caught. Swedish catalog and release notes passed.
+- [x] `XP-CURVE-RELEASE` — Live as `1.12.3-4e328694` on 2026-11-24. The optimized private probe verified late quest turn-in, solo XP and mixed-level party XP. The public client, executable, health and all eight saved characters were verified. See the Valhalla XP curve release receipt and local wiki.
 
 - [x] `PROFESSIONS-600` — Extend Enchanting and Fishing through skill 600 on `feat/professions-600`. Twenty 30-point bands, eight expert enchants, ten new fishing regions, 35 species, five dishes and two rod upgrades. See `docs/enchanting.md` and `docs/fishing.md`.
 
