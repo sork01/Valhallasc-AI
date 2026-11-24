@@ -1,6 +1,6 @@
 [
   {
-    "version": "1.13.0",
+    "version": "1.12.6",
     "date": "2026-11-24",
     "new": [
       "Blacksmiths can forge six expert mining picks, from the Moonspore Mining Pick at skill 300 to the Masterwork Mining Pick at skill 600.",
