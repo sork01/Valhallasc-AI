@@ -9,7 +9,7 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 ## Open tasks
 
 - [x] `GATHERING-OVERLAP-RULES` — Owner decisions (2026-11-24). Fishing, mining and flower picking unlock the next 30-point band 15 points early. Both bands can give points during the overlap, each up to its own cap. Emberfall Crags trains Fishing to 60, and Rimeveil Glacier opens at 45 and trains to 90. Gathering below the new minimum is blocked. Recipe and Enchanting requirements keep their existing thresholds.
-- [ ] `GATHERING-OVERLAP` — Apply the approved access thresholds and skill gains across Fishing, mining and flower picking. Show both eligible areas during the overlap and verify access, gains and caps.
+- [x] `GATHERING-OVERLAP` — Implemented for 1.12.3 on `fix/profession-band-overlap`. Fishing, mining and flower picking show eligible training bands and award points up to each band's cap. Forty focused Rust tests and the three client overlap checks pass. Owner chose to keep the candidate staged.
 
 - [x] `PROFESSIONS-600` — Extend Enchanting and Fishing through skill 600 on `feat/professions-600`. Twenty 30-point bands, eight expert enchants, ten new fishing regions, 35 species, five dishes and two rod upgrades. See `docs/enchanting.md` and `docs/fishing.md`.
 

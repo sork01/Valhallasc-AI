@@ -95,7 +95,7 @@
   function sync(packet, hero, map, emit) {
     if (emit) sound = emit;
     if (own && (own.id !== hero.id || own.zone !== hero.zone)) { lines.clear(); cast = null; result = null; miss = null; }
-    own = hero; zone = map; log = hero.fishingLog || {}; shoreHint = shore(hero, map, false);
+    own = hero; zone = map; log = hero.fishingLog || { skill: hero.professions?.fishing?.skill }; shoreHint = shore(hero, map, false);
     // Server's Unix clock, when supplied, avoids relying on the device wall clock for the draining ring.
     if (Number.isFinite(packet.fishingTime)) clockOffset = packet.fishingTime * 1000 - Date.now();
     spots = (packet.fishingSpots || []).filter(p => Number.isFinite(p.x) && Number.isFinite(p.y));
@@ -143,16 +143,23 @@
     // Inventory.icon is trusted renderer output; item names and all packet text use textContent.
     el.innerHTML = window.Inventory?.icon(item) || ''; return el;
   }
-  const trainingWaters = skill => window.FISHING_SKILL_WATERS?.[Math.floor(skill / SKILL_BAND)] || [];
+  function trainingWaters(skill) {
+    const first = Math.floor(skill / SKILL_BAND);
+    const last = Math.floor((skill + SKILL_BAND / 2) / SKILL_BAND);
+    return (window.FISHING_SKILL_WATERS || []).slice(first, last + 1)
+      .map((zones, index) => ({ zones, cap: (first + index + 1) * SKILL_BAND }));
+  }
   function trainingHint(skill) {
     const world = window.WORLD_MAP;
-    const names = trainingWaters(skill).map(id => {
-      const name = id === 0 ? world?.name : world?.zones?.[id - 1]?.name;
-      const site = water(id)?.name;
-      return name && (site ? tr(name) + ' · ' + tr(site) : tr(name));
-    }).filter(Boolean);
-    return names.length ? tr('Fish in {0} to reach skill {1}.').replace('{0}', names.join(' / '))
-      .replace('{1}', (Math.floor(skill / SKILL_BAND) + 1) * SKILL_BAND) : '';
+    return trainingWaters(skill).map(({zones, cap}) => {
+      const names = zones.map(id => {
+        const name = id === 0 ? world?.name : world?.zones?.[id - 1]?.name;
+        const site = water(id)?.name;
+        return name && (site ? tr(name) + ' · ' + tr(site) : tr(name));
+      }).filter(Boolean);
+      return names.length ? tr('Fish in {0} to reach skill {1}.').replace('{0}', names.join(' / '))
+        .replace('{1}', cap) : '';
+    }).filter(Boolean).join(' ');
   }
   function renderLog() {
     const species = catalogue(), key = JSON.stringify([log, own?.inventory, own?.level, $('fishing-filter').value, window.Locale?.language]);
@@ -203,7 +210,7 @@
       const item = definition(result.item), name = tr(item?.name || result.item);
       el.replaceChildren(icon(item), node('strong', name), node('span', result.kg == null ? tr('Quantity: {0}').replace('{0}', result.quantity || 1) : tr('ca {0} kg · ×{1}').replace('{0}', result.kg).replace('{1}', result.quantity || 1)));
       if (result.skillUp) el.append(node('span', tr('Fishing skill increased to {0}.').replace('{0}', result.skillUp), 'fishing-skill-up'));
-      else if (result.kg != null && !trainingWaters(log.skill || 1).includes(own.zone || 0)) {
+      else if (result.kg != null && !trainingWaters(log.skill || 1).some(band => band.zones.includes(own.zone || 0))) {
         const hint = trainingHint(log.skill || 1);
         if (hint) el.append(node('span', hint, 'fishing-skill-up'));
       }

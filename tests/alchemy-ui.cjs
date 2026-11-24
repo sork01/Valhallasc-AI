@@ -63,7 +63,7 @@ let browser;
   await use(page.locator('[data-alchemy-action="flowers"]'));
   await page.locator('.alchemy-workshop select').selectOption('6');
   const plants = await page.locator('.alchemy-flowers').textContent();
-  assert.match(plants,touch ? /Wyrdklöver.*120.*Månslöjeorkidé.*150/ : /Wyrd Clover.*120.*Moonveil Orchid.*150/);
+  assert.match(plants,touch ? /Wyrdklöver.*105.*Månslöjeorkidé.*135/ : /Wyrd Clover.*105.*Moonveil Orchid.*135/);
   await use(page.locator('[data-alchemy-action="recipes"]'));
   await use(brew);
   await brew.filter({hasText:touch ? 'Brygg' : 'Brew'}).waitFor();

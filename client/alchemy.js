@@ -5,6 +5,8 @@
   const format = (text, ...values) => tr(text).replace(/\{(\d+)\}/g, (_, n) => values[Number(n)]);
   const itemName = id => tr(Inventory.definition(id)?.name || id);
   const zoneName = id => tr((id === 0 ? WORLD_MAP : WORLD_MAP.zones[id - 1])?.name || '');
+  const SKILL_BAND = 30;
+  const GATHERING_OVERLAP = SKILL_BAND / 2;
   const recipesByItem = new Map(data.recipes.map(recipe => [recipe.item, recipe]));
   const status = document.getElementById('picking-status');
   const image = new Image();
@@ -73,7 +75,7 @@
       flowers.replaceChildren(...data.sources[workshop.zone].map(index => {
         const flower = data.flowers[index];
         const label = flower.region ? format('{0} · {1}', itemName(flower.item), tr(flower.region)) : itemName(flower.item);
-        return node('li', format('{0} · Requires Alchemy {1}', label, Math.max(1, flower.band * 30)));
+        return node('li', format('{0} · Requires Alchemy {1}', label, Math.max(1, flower.band * SKILL_BAND - GATHERING_OVERLAP)));
       }));
     };
     select.addEventListener('change', update);
@@ -151,11 +153,17 @@
       sourceGuide(target, workshop);
     } else if (skill) {
       if (skill < 600) {
-        const band = Math.floor(skill / 30);
-        const sources = data.flowers.filter(f => f.band === band)
-          .map(f => format('{0} · {1}', itemName(f.item), f.region ? tr(f.region) : zoneName(f.zone)));
-        target.append(node('p', format('Train to {0} by picking or brewing with these flowers.', (band + 1) * 30)));
-        target.append(node('p', sources.join(' / ')));
+        const band = Math.floor(skill / SKILL_BAND);
+        const earlyBand = Math.floor((skill + GATHERING_OVERLAP) / SKILL_BAND);
+        for (let index = band; index <= earlyBand; index++) {
+          const sources = data.flowers.filter(f => f.band === index)
+            .map(f => format('{0} · {1}', itemName(f.item), f.region ? tr(f.region) : zoneName(f.zone)));
+          if (!sources.length) continue;
+          const cap = (index + 1) * SKILL_BAND;
+          const hint = index === band ? format('Train to {0} by picking or brewing with these flowers.', cap)
+            : format('Pick these flowers to reach skill {0}.', cap);
+          target.append(node('p', hint), node('p', sources.join(' / ')));
+        }
       }
       const amounts = new Map(inventory.map(stack => [stack.item, stack.quantity]));
       const list = node('div', '', 'smith-recipes');

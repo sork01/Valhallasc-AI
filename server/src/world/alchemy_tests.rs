@@ -219,6 +219,35 @@ fn alchemy_movement_damage_reach_and_bags_preserve_pick_charges() {
 }
 
 #[test]
+fn alchemy_picking_opens_early_and_keeps_both_caps_and_brewing_requirements() {
+    let (mut w, token) = fixture();
+    train(&mut w, 1);
+    w.ensure_flowers(1);
+    w.ensure_flowers(2);
+    let cinder = w.flower_patches[&1][0];
+    let frost = w.flower_patches[&2][0];
+    let p = at(&mut w, 1, 2, frost.point);
+    p.character.alchemy.proficiency.skill = 44;
+    w.message(1, ClientMessage::PickFlower { id: frost.id });
+    assert!(w.players[&1].picking.is_none());
+    assert_eq!(w.flower_patches[&2][0].picks, frost.picks);
+    for (zone, patch, skill, expected) in [(2, frost, 45, 46), (1, cinder, 59, 60), (1, cinder, 60, 60)] {
+        at(&mut w, 1, zone, patch.point).character.alchemy.proficiency.skill = skill;
+        w.message(1, ClientMessage::PickFlower { id: patch.id });
+        w.time = w.players[&1].picking.unwrap().until;
+        w.alchemy_rng = 0;
+        w.update_picking(1);
+        assert_eq!(w.players[&1].character.alchemy.proficiency.skill, expected);
+        assert_eq!(w.store.load(&token).unwrap().unwrap().alchemy.proficiency.skill, expected);
+    }
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    c.alchemy.proficiency.skill = 45;
+    let recipe = CATALOG.recipes.iter().find(|r| r.skill == 60).unwrap().item.clone();
+    let learn = Command::Learn { npc: TRAINER.into(), recipe };
+    assert_eq!(workshop_action(c, &learn, || 0.).unwrap_err(), "Your Alchemy skill is too low.");
+}
+
+#[test]
 fn alchemy_harvest_and_staple_brews_independently_can_award_the_last_point_of_every_band() {
     for (band, recipe) in CATALOG
         .recipes
@@ -230,15 +259,15 @@ fn alchemy_harvest_and_staple_brews_independently_can_award_the_last_point_of_ev
         let end = (band as u16 + 1) * SKILL_BAND;
         c.alchemy.proficiency.skill = end - 1;
         if band > 0 {
-            c.alchemy.train(band as u16 - 1, 0.);
+            c.alchemy.train_gathering(band as u16 - 1, 0.);
             assert_eq!(c.alchemy.proficiency.skill, end - 1);
         }
         let mut harvest = c.alchemy.clone();
         for roll in [0.999, 0.999] {
-            harvest.train(band as u16, roll);
+            harvest.train_gathering(band as u16, roll);
             assert_eq!(harvest.proficiency.skill, end - 1);
         }
-        harvest.train(band as u16, 0.999);
+        harvest.train_gathering(band as u16, 0.999);
         assert_eq!(harvest.proficiency.skill, end);
 
         c.alchemy.recipes.insert(recipe.item.clone());

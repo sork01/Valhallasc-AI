@@ -65,6 +65,11 @@
         target.append(element('small', format('Other mining areas · {0}', otherZones)));
       }
       target.append(element('small', tr('Forging equipment from this ore also raises your skill.')));
+      if (training.next) {
+        const {cap, ore, zones} = training.next;
+        const names = zones.map(id => tr(WORLD_MAP.zones[id - 1].name));
+        target.append(element('p', format('Mine {0} in {1} to reach skill {2}.', itemName(ore), names.join(' / '), cap)));
+      }
     }
     const tabs = element('div', '', 'smith-tabs');
     for (const [value, label] of [['staple','Equipment'],['smelt','Smelting'],['upgrade','Mining picks']]) {

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 pub const MAX_SKILL: u16 = 600;
 pub const SKILL_BAND: u16 = 30;
+pub(crate) const GATHERING_OVERLAP: u16 = SKILL_BAND / 2;
 pub(crate) const EXPERT_ODDS_FLOOR_AT: u16 = 300;
 const GEAR_LEVELS_PER_BAND: u16 = 5;
 
@@ -20,6 +21,10 @@ pub fn training_gear_level(skill: u16) -> Option<u16> {
 pub const fn band_cap(skill: u16) -> u16 {
     let cap = (skill / SKILL_BAND + 1) * SKILL_BAND;
     if cap > MAX_SKILL { MAX_SKILL } else { cap }
+}
+
+pub(crate) fn gathering_requirement(band: u16) -> u16 {
+    (band * SKILL_BAND).saturating_sub(GATHERING_OVERLAP).max(1)
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]

@@ -19,28 +19,28 @@ Three veins are active in each of 21 shared adventure zones. Each supports three
 | 240–269 | Sunsteel | The Lapis Erg | Stormsilver |
 | 270–299 | Stariron | The Yearwheel | Stormsilver |
 
-The workshop lists the current tier's primary and alternate mining areas. A completed pull or equipment craft in the current band rolls once for one point. Two eligible misses guarantee the next gain. Earlier tiers still produce their ore and equipment. Smelting and pick upgrades use materials without increasing skill. Copper, Silver, Cobalt and Stormsilver pick upgrades unlock at skills 30, 90, 150 and 210. Each uses the previous pick, four current bars, two Hardwood and a fee of 1 silver, 3 silver 50 copper, 9 silver or 18 silver.
+The workshop lists eligible mining areas and their skill caps. Each new ore tier opens 15 points before the preceding band's cap and requires a suitable pick. Both bands can train during the overlap, each up to its own cap. Once an ore unlocks, it remains mineable. Eligible pulls and equipment crafts roll once for one point, and two eligible misses guarantee the next gain. Forging uses the recipe's printed skill requirement. Smelting and pick upgrades use materials without increasing skill. Copper, Silver, Cobalt and Stormsilver pick upgrades unlock at skills 30, 90, 150 and 210. Each uses the previous pick, four current bars, two Hardwood and a fee of 1 silver, 3 silver 50 copper, 9 silver or 18 silver.
 
 Smiths teach ten green recipes when their bands open. Level-appropriate monsters in shared adventure zones drop their tier's blue blueprint at 1.5%, or 4.5% for elites and bosses. The final bosses of Black Hour Foundry, The Amber Archive, The Silent Solstice and The Chained Forge have a 20% chance to award a blueprint from the five level-99 epic plans. Unused plans can be traded. Study a plan from the bags or the workshop to learn it permanently. The five epic recipes require skill 300. Their stats use 90% of the equivalent level-99 Foundry epic budget.
 
 ### Expert training
 
-From skill 300, mine in the region named in the workshop or forge equipment from its ore tier. The first expert band uses Stormsilver in the Moonspore Canopy. The existing Cobalt and Stormsilver picks cover the route, and ordinary green recipes can train every band.
+Expert mining starts at skill 285. At skill 300, forging can advance into the expert bands using the listed ore. The first expert band uses Stormsilver in the Moonspore Canopy. The existing Cobalt and Stormsilver picks cover the route, and ordinary green recipes can train every band.
 
-| Skill before gaining | Ore | Mining region |
-| --- | --- | --- |
-| 300–329 | Stormsilver | The Moonspore Canopy |
-| 330–359 | Stormsilver | The Stormglass Flats |
-| 360–389 | Stormsilver | Sunward Vale |
-| 390–419 | Stormsilver | The Ribbonwild |
-| 420–449 | Sunsteel | The Tanglecrown |
-| 450–479 | Sunsteel | The Lapis Erg |
-| 480–509 | Sunsteel | Frostwake Shelf |
-| 510–539 | Stariron | The Cairnspine |
-| 540–569 | Stariron | The Yearwheel |
-| 570–599 | Stariron | Emberwake Caldera |
+| Minimum skill for mining gains | Training cap | Ore | Mining region |
+| ---: | ---: | --- | --- |
+| 285 | 330 | Stormsilver | The Moonspore Canopy |
+| 315 | 360 | Stormsilver | The Stormglass Flats |
+| 345 | 390 | Stormsilver | Sunward Vale |
+| 375 | 420 | Stormsilver | The Ribbonwild |
+| 405 | 450 | Sunsteel | The Tanglecrown |
+| 435 | 480 | Sunsteel | The Lapis Erg |
+| 465 | 510 | Sunsteel | Frostwake Shelf |
+| 495 | 540 | Stariron | The Cairnspine |
+| 525 | 570 | Stariron | The Yearwheel |
+| 555 | 600 | Stariron | Emberwake Caldera |
 
-Mining trains through the current 30-point band. Forging can continue through consecutive bands using the same ore. Expert gains use the same 60% base chance as skill 300, with the existing recipe quality bonus and guaranteed gain after two eligible misses. Saved skill and existing achievement thresholds carry over.
+Expert mining regions begin to award skill 15 points before the preceding band's cap. Forging can continue through consecutive bands using the same ore. Expert gains use the same 60% base chance as skill 300, with the existing recipe quality bonus and guaranteed gain after two eligible misses. Saved skill and existing achievement thresholds carry over.
 
 ## Data and persistence
 

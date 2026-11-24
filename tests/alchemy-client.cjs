@@ -48,6 +48,7 @@ const replacements = {
   'allow-missing': ['!enough || skill < recipe.skill','skill < recipe.skill'],
   'no-click': ["Online.send({type:'pick_flower', id:patch.id});", 'void patch;'],
   'bulk': ['all:true','all:false'],
+  'no-overlap': ['Math.floor((skill + GATHERING_OVERLAP) / SKILL_BAND)', 'band'],
 };
 if (process.env.MUTATE) {
   const [before, after] = replacements[process.env.MUTATE];
@@ -83,8 +84,13 @@ assert.equal(action(potion).disabled,true,'missing containers and flowers preven
 assert.equal(action(potion,true).disabled,true,'Brew All also needs ingredients');
 
 tab('flowers').click();
-assert.match(panel.children.at(-1).children.map(n => n.textContent).join('\n'),/Wyrdklöver.*120\n.*Månslöjeorkidé.*150/);
+assert.match(panel.children.at(-1).children.map(n => n.textContent).join('\n'),/Wyrdklöver.*105\n.*Månslöjeorkidé.*135/);
 tab('recipes').click();
+reply(44,[]);
+assert(!panel.children.some(n => /Plocka de här blommorna.*90/.test(n.textContent)));
+reply(45,[]);
+assert(panel.children.some(n => /Nå 60 genom att plocka eller brygga/.test(n.textContent)));
+assert(panel.children.some(n => /Plocka de här blommorna.*90/.test(n.textContent)));
 const supplies = [
   {item:'alchemy_heartvine_bloom',quantity:2},{item:'alchemy_dune_lotus',quantity:2},
   {item:'alchemy_thornsilk_blossom',quantity:1},{item:'alchemy_empty_flask',quantity:1},

@@ -41,6 +41,7 @@ for (const file of ['sv-data.js','locale.js','world.js','items.js','blacksmithin
 const items = new Map(context.WORLD_ITEMS.map(item => [item.id,item]));
 context.Inventory = {definition:id => items.get(id), icon:item => item.id, attachTooltip() {}, gearPreview:() => 'Preview'};
 let moduleText = read('blacksmithing.js');
+if (process.env.MUTATE === 'no-overlap') moduleText = moduleText.replace('if (training.next)', 'if (false)');
 if (process.env.MUTATE === 'allow-missing') {
   assert(moduleText.includes('|| !supplies'));
   moduleText = moduleText.replace('|| !supplies','');
@@ -109,6 +110,10 @@ smelt.click();
 assert.deepEqual(sent.at(-1).request,{op:'craft',npc:'smith',recipe:'smith_bar_tin',all:true});
 answer({ok:true,npc:'smith',text:'',skill:150,training:{cap:180,ore:'smith_ore_cobalt',zones:[7,8]},recipes:[],inventory:[],gold:10});
 assert(panel.children.some(n => /Andra gruvområden · .*Rán/.test(n.textContent)));
+answer({ok:true,npc:'smith',text:'',skill:45,training:{cap:60,ore:'smith_ore_copper',zones:[1],
+  next:{cap:90,ore:'smith_ore_iron',zones:[2]}},recipes:[],inventory:[],gold:10});
+assert(panel.children.some(n => /Träna upp till 60.*Emberfall Crags/.test(n.textContent)));
+assert(panel.children.some(n => /Bryt .*Rimeveil Glacier.*nivå 90/.test(n.textContent)));
 const saved = {skill:300, maxSkill:600, training:{cap:330, ore:'smith_ore_stormsilver', zones:[16]}};
 Blacksmithing.render(npc, {...packet, blacksmithing:{...state, ...saved}}, panel);
 assert(panel.children.some(n => n.textContent === 'Smidesfärdighet 300 / 600'));

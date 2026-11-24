@@ -1,8 +1,9 @@
 //! Mining channels and workshop transactions resolve on the world thread.
 use super::*;
 use crate::blacksmithing::{
-    CANDIDATES, CATALOG, Command, MAX_SKILL, Method, STARTER_PICK, TRAINER, WORKSHOP, training_cap,
+    CANDIDATES, CATALOG, Command, MAX_SKILL, Method, STARTER_PICK, TRAINER, TrainingBand, WORKSHOP,
 };
+use crate::profession::gathering_requirement;
 
 const REACH: f64 = 2.6;
 const DURATION: f64 = 1.8;
@@ -26,14 +27,16 @@ pub(super) struct Mining {
     until: f64,
 }
 
-fn skill_for(tier: usize) -> u16 {
-    if tier == 0 { 1 } else { training_cap(tier - 1) }
+fn describe_band(band: TrainingBand<'_>) -> Value {
+    json!({"cap":band.cap,"ore":CATALOG.tiers[band.tier].ore,"zones":band.zones})
 }
 
 fn training_view(skill: u16) -> Option<Value> {
-    CATALOG
-        .training(skill)
-        .map(|band| json!({"cap":band.cap,"ore":CATALOG.tiers[band.tier].ore,"zones":band.zones}))
+    let mut training = describe_band(CATALOG.training(skill)?);
+    if let Some(next) = CATALOG.next_mining_band(skill) {
+        training["next"] = describe_band(next);
+    }
+    Some(training)
 }
 
 pub(super) fn workshop_view(npc: &Npc, c: &Character) -> Option<Value> {
@@ -268,7 +271,7 @@ impl World {
         if skill == 0 {
             return Err("Learn Blacksmithing from Bram Emberforge in Alderhaven first.");
         }
-        if skill < skill_for(vein.tier) {
+        if skill < gathering_requirement(vein.tier as u16) {
             return Err("Your Blacksmithing skill is too low.");
         }
         if !CATALOG
@@ -360,10 +363,7 @@ impl World {
             );
         }
         staged.add_item(ore, quantity);
-        let cap = CATALOG
-            .training(previous)
-            .filter(|band| band.zones.contains(&channel.zone))
-            .map_or(previous, |band| band.cap);
+        let cap = CATALOG.mining_cap(previous, channel.zone);
         staged
             .blacksmithing
             .proficiency

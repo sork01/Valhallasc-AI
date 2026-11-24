@@ -1,5 +1,6 @@
 //! Fishing inputs carry no position, catch or timestamp. The world owns each line.
 use super::*;
+use crate::profession::{SKILL_BAND, gathering_requirement};
 use serde::Deserialize;
 use std::{sync::LazyLock, time::Instant};
 
@@ -45,14 +46,22 @@ static SKILL_WATERS: LazyLock<
         .expect("fishing skill waters")
 });
 
+fn water_skill_band(zone: usize) -> Option<u16> {
+    SKILL_WATERS
+        .iter()
+        .position(|zones| zones.contains(&zone))
+        .map(|band| band as u16)
+}
+
 fn water_skill_cap(zone: usize, skill: u16) -> u16 {
-    use crate::profession::{MAX_SKILL, SKILL_BAND, band_cap};
-    let band = usize::from(skill / SKILL_BAND);
-    if skill < MAX_SKILL && SKILL_WATERS[band].contains(&zone) {
-        band_cap(skill)
-    } else {
-        0
-    }
+    water_skill_band(zone).map_or(0, |band| {
+        let cap = (band + 1) * SKILL_BAND;
+        if (gathering_requirement(band)..cap).contains(&skill) {
+            cap
+        } else {
+            0
+        }
+    })
 }
 
 pub(super) struct RichSpot {
@@ -437,6 +446,11 @@ impl World {
                 "This water requires {} (level {}).",
                 i.name, i.required_level
             ));
+        }
+        let band = water_skill_band(c.zone).ok_or("There are no fish here.")?;
+        let minimum = gathering_requirement(band);
+        if c.fishing.proficiency.skill < minimum {
+            return Err(format!("You need Fishing skill {minimum} to fish here."));
         }
         let rod = rod.unwrap();
         let stamp = daynight::unix_ms();
@@ -911,9 +925,9 @@ mod data_tests {
             assert_eq!(SKILL_WATERS[index][0], zone);
             assert_eq!(water_skill_cap(zone, cap - 1), cap);
             assert_eq!(water_skill_cap(zone, cap), 0);
-            if index != 0 {
-                assert_eq!(water_skill_cap(zone, cap - SKILL_BAND - 1), 0);
-            }
+            let minimum = if index == 0 { 1 } else { cap - 45 };
+            assert_eq!(water_skill_cap(zone, minimum - 1), 0);
+            assert_eq!(water_skill_cap(zone, minimum), cap);
             assert!(w.maps[zone].min_level <= levels[index]);
             let shore = points
                 .as_array()
@@ -929,6 +943,21 @@ mod data_tests {
             p.character.level = levels[index];
             p.character.x = at.x;
             p.character.y = at.y;
+            p.character.fishing.proficiency.skill = minimum - 1;
+            assert_eq!(
+                w.fishing_line(1, 20., false).err(),
+                Some(format!("You need Fishing skill {minimum} to fish here."))
+            );
+            w.players.get_mut(&1).unwrap().character.fishing.proficiency.skill = minimum;
+            let line = w.fishing_line(1, 20., false).unwrap();
+            w.rng = 1;
+            w.profession_rng = 0;
+            w.land_fish(1, line, 21.);
+            let reply = std::iter::from_fn(|| rx.try_recv().ok())
+                .find(|p| p["kind"] == "fish_catch")
+                .unwrap();
+            assert_eq!(reply["skillUp"], minimum + 1, "early catch in zone {zone}");
+            let p = w.players.get_mut(&1).unwrap();
             p.character.fishing.proficiency.skill = cap - 1;
             let line = w.fishing_line(1, 20., false).unwrap();
             w.rng = 1;
@@ -962,7 +991,8 @@ mod data_tests {
         }
         assert_eq!(w.players[&1].character.fishing.proficiency.skill, MAX_SKILL);
         assert_eq!(water_skill_cap(26, 270), 300);
-        assert_eq!(water_skill_cap(28, 269), 0);
+        assert_eq!(water_skill_cap(28, 254), 0);
+        assert_eq!(water_skill_cap(28, 255), 300);
     }
 
     #[test]
@@ -1101,6 +1131,7 @@ mod data_tests {
         p.character.x = 50.;
         p.character.y = 50.;
         p.character.level = 99;
+        p.character.fishing.proficiency.skill = 15;
         assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 10);
         w.players.get_mut(&1).unwrap().character.level = 5;
         assert_eq!(w.fishing_line(1, 20., false).unwrap().tier, 2);

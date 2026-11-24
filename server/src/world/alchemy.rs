@@ -1,9 +1,9 @@
 //! Authoritative flower gathering, workshop transactions and PvE brews.
 use super::*;
 use crate::alchemy::{
-    ActiveBrew, CATALOG, Command, PATCHES, POTION_COOLDOWN, Stat, TRAINER, WORKSHOP, band_skill,
+    ActiveBrew, CATALOG, Command, PATCHES, POTION_COOLDOWN, Stat, TRAINER, WORKSHOP,
 };
-use crate::profession::SKILL_BAND;
+use crate::profession::{SKILL_BAND, gathering_requirement};
 
 const REACH: f64 = 2.6;
 const PICK_TIME: f64 = 1.5;
@@ -394,7 +394,7 @@ impl World {
         {
             return Err("Move closer to the flower patch.");
         }
-        if c.alchemy.proficiency.skill < band_skill(CATALOG.flowers[patch.flower].band) {
+        if c.alchemy.proficiency.skill < gathering_requirement(CATALOG.flowers[patch.flower].band) {
             return Err("Your Alchemy skill is too low.");
         }
         Ok(patch)
@@ -481,7 +481,7 @@ impl World {
             return Self::picking_notice(p, "Your bags are full. Make room first.");
         }
         staged.add_item(&flower.item, count);
-        staged.alchemy.train(flower.band, roll);
+        staged.alchemy.train_gathering(flower.band, roll);
         if self.store.save_many([&staged].into_iter()).is_err() {
             return Self::picking_notice(p, "The Alchemy change could not be saved.");
         }

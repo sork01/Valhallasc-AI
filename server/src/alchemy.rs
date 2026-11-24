@@ -1,6 +1,6 @@
 //! Shared Alchemy catalog and saved character state.
 use crate::model::Point;
-use crate::profession::{SKILL_BAND, Skill};
+use crate::profession::{SKILL_BAND, Skill, gathering_requirement};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::LazyLock;
@@ -26,16 +26,12 @@ impl Progress {
         self.proficiency.skill == 0 && self.flask.is_none() && self.recipes.is_empty()
     }
 
-    pub fn train(&mut self, band: u16, roll: f64) {
-        if self.proficiency.skill >= band_skill(band) {
+    pub fn train_gathering(&mut self, band: u16, roll: f64) {
+        if self.proficiency.skill >= gathering_requirement(band) {
             self.proficiency
                 .try_gain_to(0, (band + 1) * SKILL_BAND, MAX_SKILL, roll);
         }
     }
-}
-
-pub fn band_skill(band: u16) -> u16 {
-    (band * SKILL_BAND).max(1)
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Deserialize)]

@@ -132,6 +132,19 @@ impl Catalog {
         cap
     }
 
+    pub(crate) fn next_mining_band(&self, skill: u16) -> Option<TrainingBand<'_>> {
+        self.training(skill.saturating_add(profession::GATHERING_OVERLAP))
+            .filter(|band| band.cap > profession::band_cap(skill))
+    }
+
+    pub(crate) fn mining_cap(&self, skill: u16, zone: usize) -> u16 {
+        self.next_mining_band(skill)
+            .into_iter()
+            .chain(self.training(skill))
+            .find(|band| band.zones.contains(&zone))
+            .map_or(skill, |band| band.cap)
+    }
+
     pub fn plan(&self, id: &str) -> Option<&Recipe> {
         self.recipes
             .iter()

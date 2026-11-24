@@ -1,4 +1,5 @@
 use super::*;
+use crate::blacksmithing::training_cap;
 use crate::profession::Skill;
 
 fn smiths() -> (World, String, Vec<mpsc::Receiver<Value>>) {
@@ -271,6 +272,37 @@ fn blacksmithing_mining_trains_every_band_with_its_pick_and_never_an_earlier_ban
         w.players[&1].character.blacksmithing.proficiency.skill,
         gear.skill
     );
+}
+
+#[test]
+fn blacksmithing_mining_opens_early_and_keeps_both_caps() {
+    let (mut w, token, _) = smiths();
+    train(&mut w, 1);
+    w.ensure_veins(1);
+    w.ensure_veins(2);
+    let copper = w.mining_veins[&1][0];
+    let iron = w.mining_veins[&2][0];
+    let p = player_at(&mut w, 1, 2, iron.point);
+    p.character.add_item(&CATALOG.picks[1].item, 1);
+    p.character.blacksmithing.proficiency.skill = 44;
+    w.message(1, ClientMessage::Mine { id: iron.id });
+    assert!(w.players[&1].mining.is_none());
+    assert_eq!(w.mining_veins[&2][0].pulls, iron.pulls);
+    assert!(training_view(44).unwrap().get("next").is_none());
+    assert_eq!(training_view(45).unwrap()["next"]["cap"], 90);
+    for (zone, vein, skill, expected) in [(2, iron, 45, 46), (1, copper, 59, 60), (1, copper, 60, 60)] {
+        w.players.get_mut(&1).unwrap().character.blacksmithing.proficiency.skill = skill;
+        w.smith_rng = 0;
+        start(&mut w, 1, vein, zone);
+        w.time += DURATION;
+        w.update_mining(1);
+        assert_eq!(w.players[&1].character.blacksmithing.proficiency.skill, expected);
+        assert_eq!(w.store.load(&token).unwrap().unwrap().blacksmithing.proficiency.skill, expected);
+    }
+    let next_expert = CATALOG.expert_zones[1];
+    assert_eq!(CATALOG.mining_cap(314, next_expert), 314);
+    assert_eq!(CATALOG.mining_cap(315, next_expert), 360);
+    assert_eq!(CATALOG.mining_cap(315, CATALOG.expert_zones[0]), 330);
 }
 
 #[test]

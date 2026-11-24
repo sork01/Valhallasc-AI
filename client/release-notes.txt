@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.12.3",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Fishing, mining, and flower picking unlock the next gathering tier 15 skill points early. Both tiers can give skill points during the overlap, up to each tier's cap."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.2",
     "date": "2026-11-24",
     "new": [],
