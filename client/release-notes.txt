@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.12.7",
+    "date": "2026-11-24",
+    "new": [],
+    "changed": [
+      "Dungeon gear auras, including the Gravewalker Claws effect, now turn with your character."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.12.6",
     "date": "2026-11-24",
     "new": [

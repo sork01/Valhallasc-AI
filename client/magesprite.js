@@ -411,7 +411,7 @@
   const SLOT_ORDER = ['cloak', 'armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
   // A dungeon set needs a silhouette at field scale, not only a different tint on
   // the same 160px equipment rig. These marks sit behind the animated figure and
-  // follow it in every pose/facing. One piece shows the origin; more pieces make
+  // turn with it in every pose. One piece shows the origin; more pieces make
   // the mark brighter. They are drawn from the equipped server-approved look.
   const DUNGEON_MARKS = {
     regearvault: { name: 'Undervault', dark: '#123840', bright: '#58f5d4' },
@@ -465,7 +465,7 @@
     const [theme, count] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || [];
     return theme ? { theme, count } : null;
   }
-  function dungeonAura(g, mark, t) {
+  function dungeonAura(g, mark, t, dir = 0) {
     const { theme, count } = mark, { dark, bright } = DUNGEON_MARKS[theme];
     const sway = Math.sin(t * 2.3) * 1.5;
     const diamond = (x, y, w, h, fill, stroke = bright) => {
@@ -476,7 +476,12 @@
       g.beginPath(); points.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y));
       g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = stroke; g.lineWidth = 1.7; g.stroke();
     };
+    const angle = dir * Math.PI / 4, facing = Math.cos(angle), side = Math.sin(angle);
+    // Foreshorten the mark and shift it behind the wearer as they turn.
+    // Keep some width edge-on so the dungeon's design remains visible.
+    const width = Math.abs(facing) < .32 ? .32 : facing;
     g.save();
+    g.transform(width, .4 * side, 0, 1, 14 * side, 7 * (1 - facing));
     g.globalAlpha *= Math.min(.92, .48 + count * .085);
     // The broken circle is a common field-scale cue; each dungeon then has its
     // own large profile so the sets cannot be mistaken for progression gear.
@@ -858,10 +863,10 @@
       g.save(); g.imageSmoothingEnabled = false;
       if (h.dead && h.ghost) g.globalAlpha *= .45;
       g.scale(scale, scale);
-      const mark = !h.dead && dungeonMark(this.equipment);
-      if (mark) dungeonAura(g, mark, t);
       // Move the dressed figure as one unit; equipment stays fitted at every step/turn.
       if (dance) { g.translate(dance.x, dance.y); g.rotate(dance.lean); g.scale(1, dance.stretch); }
+      const mark = !h.dead && dungeonMark(this.equipment);
+      if (mark) dungeonAura(g, mark, t, dir);
       if (h.mounted && !h.dead && window.MountArt?.ready(h.mount)) {   // seated on the saddle: the rider's idle frame laid into the mount's frame
         const art = window.MountArt, moving = !!h.moving, mclip = art.clipFor(h.mount, moving), M = art.meta(h.mount), MC = M.clips[mclip];
         const mi = moving ? Math.floor(h.walk) % MC.n : Math.floor(t * MC.fps) % MC.n, ri = moving && this.equipment.cloak !== 'none' ? Math.floor(h.walk) % C.idle.n : moving ? 0 : Math.floor(t * C.idle.fps) % C.idle.n;
