@@ -18,17 +18,24 @@ const sandbox = {
 vm.runInNewContext(source, sandbox);
 const weather = sandbox.window.Weather;
 const check = (ok, label) => { assert.ok(ok, label); checks++; };
+const width = 1280, height = 800;
 function frame(time, camera) {
-  const lines = [], splashes = []; let start = null, end = null;
+  const lines = [], splashes = [], fills = []; let start = null, end = null, flakes = 0;
   const g = {
-    save() {}, restore() {}, fillRect() {},
+    save() {}, restore() {},
+    fillRect(...bounds) { fills.push(bounds); },
     beginPath() { start = end = null; },
     moveTo(x, y) { start = [x, y]; }, lineTo(x, y) { end = [x, y]; },
     stroke() { if (start && end) lines.push({ start, end }); },
     ellipse(x, y) { splashes.push([x, y]); },
+    arc() { flakes++; }, fill() {},
   };
-  weather.draw(g, 1280, 800, time, camera);
-  return { lines, splashes };
+  weather.draw(g, width, height, time, camera);
+  return { lines, splashes, fills, flakes };
+}
+function checkTint(frame, label, layers = 1) {
+  check(frame.fills.length === layers && frame.fills.every(([x, y, w, h]) => x === 0 && y === 0 && w === width && h === height),
+    `${label}: atmosphere tints the whole view without a bottom band`);
 }
 weather.setZone({ theme: 'meadow' });
 for (const type of ['rain', 'thunderstorm']) for (const intensity of ['light', 'medium', 'heavy']) for (const low of [false, true]) {
@@ -36,6 +43,7 @@ for (const type of ['rain', 'thunderstorm']) for (const intensity of ['light', '
   weather.sync({ type, intensity, inside: false, ageSeconds: 50, endsInSeconds: 100 }, 0, 0);
   weather.tick(2);
   const before = frame(10), after = frame(10 + 1 / 120), label = `${type}/${intensity}/${low ? 'low' : 'normal'}`;
+  checkTint(before, label);
   check(before.lines.length > 0 && before.lines.length === after.lines.length, `${label}: stable rain population`);
   let matched = 0;
   for (let i = 0; i < before.lines.length; i++) {
@@ -73,8 +81,19 @@ for (const type of ['rain', 'thunderstorm']) {
   const jumped = frame(10.02, { x: 100000, y: -100000 });
   check(jumped.lines.every(l => Math.hypot(l.end[0] - l.start[0], l.end[1] - l.start[1]) < 50), `${type}: teleport does not make oversized streaks`);
 }
+checkTint(frame(0), 'thunderstorm with lightning', 2);
 reduced = true;
-check(JSON.stringify(frame(0, { x: 0, y: 0 })) === JSON.stringify(frame(10, { x: -100, y: 200 })), 'reduced motion keeps rain stationary');
+check(JSON.stringify(frame(1, { x: 0, y: 0 })) === JSON.stringify(frame(10, { x: -100, y: 200 })), 'reduced motion keeps rain stationary');
 sandbox.window.Prefs.weather = 0;
 check(frame(10).lines.length === 0, 'weather slider still disables rain');
+sandbox.window.Prefs.weather = 1;
+weather.setZone({ theme: 'city' });
+weather.sync({ type: 'snow', intensity: 'heavy', inside: false, ageSeconds: 50, endsInSeconds: 100 }, 0, 0);
+weather.tick(2);
+const snowy = frame(10);
+checkTint(snowy, 'Skaldholm snow');
+check(snowy.flakes > 0, 'Skaldholm snow still draws flakes');
+sandbox.window.Prefs.weather = 0;
+const disabled = frame(10);
+check(!disabled.flakes && !disabled.fills.length, 'weather slider still disables snow and its tint');
 console.log(`rain-direction: ${checks} checks passed`);

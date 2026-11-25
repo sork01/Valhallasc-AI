@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.13.7",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Rain, thunderstorms and snow tint the whole view evenly, removing the band of color at the bottom."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.6",
     "date": "2026-11-25",
     "new": [],
