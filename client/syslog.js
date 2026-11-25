@@ -228,25 +228,52 @@
   };
   let owner, inventory, skills, unreadMail;
   const reported = new Map();
+  const receipts = new Map();
+  let receiptTimer;
+  function flushReceipts() {
+    receiptTimer = undefined;
+    for (const [item, { quantity, mark }] of receipts) {
+      add(`You receive ${quantity} × ${itemName(item)}.`, 'sys-loot sys-item', mark, 'items');
+    }
+    receipts.clear();
+    reported.clear();
+  }
   const inventoryCounts = entries => new Map(entries.map(({item, quantity}) => [item, quantity]));
   function noteReceipt(item, quantity) {
-    reported.set(item, (reported.get(item) ?? 0) + quantity);
+    // A snapshot and its more specific receipt can reach the display in either order.
+    const pending = receipts.get(item);
+    if (pending) {
+      const shared = Math.min(pending.quantity, quantity);
+      pending.quantity -= shared;
+      quantity -= shared;
+      if (!pending.quantity) receipts.delete(item);
+    }
+    if (quantity > 0) {
+      reported.set(item, (reported.get(item) ?? 0) + quantity);
+      receiptTimer ??= setTimeout(flushReceipts, 300);
+    }
   }
   function trackInventory(packet) {
     if (!Array.isArray(packet.inventory)) return;
     const next = inventoryCounts(packet.inventory);
     if (inventory) {
       for (const [item, total] of next) {
-        const quantity = total - (inventory.get(item) ?? 0) - (reported.get(item) ?? 0);
+        const increase = total - (inventory.get(item) ?? 0);
+        if (increase <= 0) continue;
+        const alreadyReported = reported.get(item) ?? 0;
+        const covered = Math.min(increase, alreadyReported);
+        if (covered === alreadyReported) reported.delete(item);
+        else reported.set(item, alreadyReported - covered);
+        const quantity = increase - covered;
         if (quantity <= 0) continue;
         const name = itemName(item);
         const copy = packet.gearInstances?.filter(gear => gear.item === item).at(-1);
         const mark = copy ? { name, rarity: copy.rarity } : rarityOf(item);
-        add(`You receive ${quantity} × ${name}.`, 'sys-loot sys-item', mark, 'items');
+        receipts.set(item, { quantity: quantity + (receipts.get(item)?.quantity ?? 0), mark });
+        receiptTimer ??= setTimeout(flushReceipts, 300);
       }
     }
     inventory = next;
-    reported.clear();
   }
   function skillGain(key, skill) {
     if (!skills || !Number.isFinite(skill)) return;
@@ -268,6 +295,9 @@
   }
   function welcome(own) {
     if (owner && owner !== own.id) {
+      clearTimeout(receiptTimer);
+      receiptTimer = undefined;
+      receipts.clear();
       history.length = 0;
       for (const name of ['chat-log', 'system-log', 'custom-chat-log']) $(name).replaceChildren();
       tabs().forEach(tab => tab.classList.remove('unread'));

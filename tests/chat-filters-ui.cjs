@@ -33,6 +33,9 @@ const fixture = '<main style="width:100vw;height:100vh;position:relative;contain
       SystemLog.chat('Ready to travel?', 'Adventurer', 'party');
       SystemLog.event({ kind:'fish_catch', actor:id, item:'fish_pier_sprat', kg:3, quantity:1, skillUp:150 }, id);
       SystemLog.event({ kind:'fish_catch', actor:'other', item:'fish_pier_sprat', kg:99, quantity:1 }, id);
+      SystemLog.snapshot({ id, inventory:[], professions:{ fishing:{skill:150}, blacksmithing:{skill:1} } });
+      SystemLog.snapshot({ id, inventory:[take('fish_pier_sprat', 1), take('smith_ore_tin', 2)],
+        professions:{ fishing:{skill:150}, blacksmithing:{skill:1} } });
       SystemLog.packet({ type:'mining', state:'done', item:'smith_ore_tin', quantity:2, skill:2 });
       SystemLog.packet({ type:'dialogue', notice:'Quest complete: Bridge Watch!', inventory:[
         take('fish_pier_sprat', 1), take('smith_ore_tin', 2), take('test_gear', 1),
@@ -47,6 +50,7 @@ const fixture = '<main style="width:100vw;height:100vh;position:relative;contain
     await populate();
     assert(await page.locator('#tab-system').evaluate(tab => tab.classList.contains('unread')));
     await page.getByRole('tab', { name:'System', exact:true }).click();
+    await system.getByText('Trial Blade', { exact:true }).waitFor();
     const initial = await system.innerText();
     for (const line of ['You catch Pier Sprat (ca 3 kg) ×1.', 'Fishing skill increased to 150.',
       'You mine 2 × Tin Ore.', 'Blacksmithing skill increased to 2.', 'Quest complete: Bridge Watch!',

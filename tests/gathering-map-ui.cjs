@@ -21,13 +21,19 @@ let browser;
   });
   const errors = [];
   let view;
-  const gathered = [];
+  const gathered = [], requests = [];
   page.on('pageerror', error => errors.push(error.message));
-  page.on('websocket', socket => socket.on('framereceived', ({payload}) => {
-    const packet = frameJson(payload);
-    if (packet?.type === 'snapshot' || packet?.type === 'welcome') view = packet.snapshot || packet;
-    if (packet?.state === 'done' && ['mining', 'picking'].includes(packet.type)) gathered.push(packet);
-  }));
+  page.on('websocket', socket => {
+    socket.on('framesent', ({payload}) => {
+      const packet = frameJson(payload);
+      if (['move', 'mine', 'pick_flower'].includes(packet?.type)) requests.push(packet);
+    });
+    socket.on('framereceived', ({payload}) => {
+      const packet = frameJson(payload);
+      if (packet?.type === 'snapshot' || packet?.type === 'welcome') view = packet.snapshot || packet;
+      if (packet?.state === 'done' && ['mining', 'picking'].includes(packet.type)) gathered.push(packet);
+    });
+  });
   await page.addInitScript(() => {
     window.AudioContext = undefined;
     window.webkitAudioContext = undefined;
@@ -98,17 +104,34 @@ let browser;
     assert(approach, 'there is a walkable starting point beyond gathering reach');
     await warp(approach, 1);
     assert(await page.evaluate(spot => Math.hypot(Field.hero.x-spot.x,Field.hero.y-spot.y) > 2.6, spot));
-    await page.evaluate(({spot,type}) => {
+    requests.length = 0;
+    const hit = await page.evaluate(({spot,type}) => {
       const canvas = document.getElementById('fieldcv').getBoundingClientRect();
-      const [x,y] = Field.screenOf(spot.x,spot.y);
-      Field.tapAt(canvas.left+x*canvas.width,canvas.top+y*canvas.height-(type==='picking' ? 8 : 12));
+      const [x,y] = Field.screenOf(spot.x,spot.y), [sx,sy] = Field._debug.w2s(spot.x,spot.y);
+      const project = Field._debug.w2s;
+      const offset = [-9,-19,-3,0].find(dy => {
+        const flower = Alchemy.hit(sx,sy+dy,project);
+        if (type === 'picking') return flower?.id === spot.id;
+        return !flower && Blacksmithing.pick(sx,sy+dy,project)?.id === spot.id;
+      });
+      if (offset == null) return false;
+      Field.tapAt(canvas.left+x*canvas.width,canvas.top+(y+offset*y/sy)*canvas.height);
+      return true;
     }, {spot,type});
-    await world.waitFor(() => gathered.some(packet => packet.type === type), 12000,
-      'tapping a distant node walks into range and gathers').catch(async error => {
+    assert(hit, 'the gathering sprite can be hit at the chosen camera position');
+    const action = type === 'picking' ? 'pick_flower' : 'mine';
+    await world.waitFor(() => requests.some(packet => packet.type === action && packet.id === spot.id), 12000,
+      'the client starts gathering from the selected node after walking into range').catch(async error => {
       const state = await page.evaluate(() => ({ point: [Field.hero.x, Field.hero.y],
         route: Field._debug.cityRoute, system: document.getElementById('system-log').textContent.slice(-500) }));
-      throw new Error(type + ' did not finish. ' + JSON.stringify(state), { cause: error });
+      throw new Error(type + ' did not start. ' + JSON.stringify({ ...state, spot, requests }), { cause: error });
     });
+    assert.equal(requests[0].type, 'move', 'gathering first walks toward the distant target');
+    assert(await page.evaluate(spot => Math.hypot(Field.hero.nx-spot.x,Field.hero.ny-spot.y) <= 2.6, spot),
+      'the gathering request is sent from within reach');
+    if (type === 'picking') {
+      await world.waitFor(() => gathered.some(packet => packet.type === type), 8000, 'the flower is gathered');
+    }
   };
   await walkAndGather(garden, 'picking');
   await world.waitFor(() => !view.players.find(p => p.id === playerId).inCombat, 15000,
@@ -118,8 +141,8 @@ let browser;
   await walkAndGather(ore, 'mining');
   const system = page.locator('#system-log');
   assert.match(await system.locator('p[data-category="alchemy"]').last().textContent(), /Du plockar .*Ängsguld/);
-  assert.match(await system.locator('p[data-category="mining"]').last().textContent(), /Du bryter .*Tennmalm/);
-  assert.match((await system.locator('p[data-category="progress"]').allTextContents()).join('\n'), /färdighet i Smide har höjts/);
+  assert.match((await system.locator('p[data-category="progress"]').allTextContents()).join('\n'), /färdighet i Alkemi har höjts till 2/);
+  assert.doesNotMatch(await system.textContent(), /Du får .*Ängsguld/, 'the picked flower gets one receipt');
   await page.screenshot({path:world.runDir+'/gathering-flower-phone.png'});
   await page.evaluate(() => Settings.show());
   const oreSetting = page.locator('#set-track-ore'), flowerSetting = page.locator('#set-track-flowers');
