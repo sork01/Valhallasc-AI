@@ -55,6 +55,7 @@
     brazier: [0, -68],
     torch: [0, -88],
     campfire: [0, -24],
+    beacon: [0, -90],                         // between the great beacon's flame and the plaza it lights
     lamphouse: [0, -164],
     house: [0, -52],
     aetherhouse: [0, -34],
@@ -99,8 +100,11 @@
         const [ax, ay] = lightAnchor(light);
         const [bx, by] = project(light.x, light.y);
         const lx = bx + ax, ly = by + ay;
-        if (lx > -140 && lx < width + 140 && ly > -140 && ly < height + 140) {
-          visibleLights.push([lx, ly]);
+        const greatBeacon = light.kind === 'beacon' && light.great;
+        const cutRadius = greatBeacon ? 320 : 120;
+        const glowRadius = greatBeacon ? 240 : 64;
+        if (lx > -cutRadius - 20 && lx < width + cutRadius + 20 && ly > -cutRadius - 20 && ly < height + cutRadius + 20) {
+          visibleLights.push({ x: lx, y: ly, cutRadius, glowRadius });
           if (visibleLights.length >= 32) break;
         }
       }
@@ -143,7 +147,7 @@
           v.fillStyle = gr; v.beginPath(); v.arc(cx, cy, cr, 0, Math.PI * 2); v.fill();
         };
         const lightCut = .92 * Math.min(1, n * 1.15);
-        for (const [lx, ly] of visibleLights) cut(lx, ly, 120, lightCut);
+        for (const { x, y, cutRadius } of visibleLights) cut(x, y, cutRadius, lightCut);
         if (focus?.hero) cut(focus.hero[0], focus.hero[1] - 34, 195, .36);
         if (focus?.target) cut(focus.target[0], focus.target[1] - 24, 95, .36);
       }
@@ -180,7 +184,7 @@
       const sprite = glowSprite();
       g.globalCompositeOperation = 'lighter';
       g.globalAlpha = glowAlpha;
-      for (const [lx, ly] of visibleLights) g.drawImage(sprite, lx - 64, ly - 64);
+      for (const { x, y, glowRadius: r } of visibleLights) g.drawImage(sprite, x - r, y - r, 2 * r, 2 * r);
       g.globalCompositeOperation = 'source-over';
     }
     g.restore();

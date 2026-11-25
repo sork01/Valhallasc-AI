@@ -75,7 +75,7 @@
     if (zdef.shapeFloor) paintShape(zdef.shapeFloor, zdef.shapeEdge);
     paintVault();
     objects = zdef.objects.map(o => ({ ...o }));
-    nightLights = objects.filter(o => ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop', 'meadow_cottage', 'meadow_mill'].some(k => o.kind.includes(k)));
+    nightLights = objects.filter(o => (o.kind === 'beacon' && o.great) || ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop', 'meadow_cottage', 'meadow_mill'].some(k => o.kind.includes(k)));
   }
   // Skaldholm's ground: the zone lists its streets (type 1 cobbles), plazas and squares (2 marble, 3 brick) as rectangles, discs and rings.
   function paintRoads(roads) {

@@ -992,6 +992,11 @@ fn aggro_radius(awareness: f64, monster_level: u32, hero_level: u32) -> f64 {
 }
 
 impl Slime {
+    fn hit_radius(&self) -> f64 {
+        // Wyrdweavers have a wider attackable area than their movement footprint.
+        if self.kind == "weaver" { 0.8 } else { self.r }
+    }
+
     /// An enemy seen across a seam is drawn only while alive or dying.
     fn shows_across(&self) -> bool {
         !self.dead || self.die_t < 2.
@@ -4608,6 +4613,7 @@ impl World {
             && p.escort.as_ref().is_none_or(|e| e.fighting())
             && !p.gauntlet)
             || p.guard.is_some();
+        let mut navigate = hired;
         let mut navigation_goal = None;
         if self.time - p.input_at > 0.3 {
             p.input = Point::default();
@@ -4621,30 +4627,25 @@ impl World {
                 .get(id)
                 .filter(|s| !s.dead && s.zone == p.character.zone)
             {
-                let distance = p.character.point().distance(s.point());
-                let facing = p.character.point().direction(s.point());
-                if distance - s.r <= p.character.look.class.reach()
-                    && (!hired
-                        || self.maps[p.character.zone].line_clear(
-                            p.character.point(),
-                            s.point(),
-                            0.05,
-                        ))
-                {
+                let here = p.character.point();
+                let distance = here.distance(s.point()) - s.hit_radius();
+                let facing = here.direction(s.point());
+                let class = p.character.look.class;
+                let in_reach = distance <= class.reach();
+                // A Wyrdweaver can stand beside a tree or a ridge during a volley.
+                let find_clear_approach = hired || s.kind == "weaver";
+                let clear = in_reach
+                    && (!(find_clear_approach || class.ranged())
+                        || self.maps[p.character.zone].line_clear(here, s.point(), 0.05));
+                if in_reach && (!find_clear_approach || clear) {
                     p.face = facing;
-                    auto_attack = !p.character.look.class.ranged()
-                        || self.maps[p.character.zone].line_clear(
-                            p.character.point(),
-                            s.point(),
-                            0.05,
-                        );
+                    auto_attack = clear;
                 } else {
                     dir = facing;
                     // Stop just inside reach: at the exact floating-point boundary a fighter can keep
                     // requesting a sub-pixel step forever without ever starting its attack.
-                    travel = (distance - s.r - p.character.look.class.reach()
-                        + if hired { 0.05 } else { 0. })
-                    .max(0.);
+                    travel = (distance - class.reach() + 0.05).max(0.);
+                    navigate = find_clear_approach;
                     navigation_goal = Some(s.point());
                 }
             } else {
@@ -4673,7 +4674,7 @@ impl World {
                 navigation_goal = Some(goal);
             }
         }
-        if hired
+        if navigate
             && p.root <= 0.
             && p.dash <= 0.
             && let Some(goal) = navigation_goal.filter(|goal| {
@@ -5117,7 +5118,9 @@ impl World {
                 }
                 let d = point.distance(s.point());
                 let facing = point.direction(s.point());
-                d - s.r < reach && (d < 0.6 || facing.x * face.x + facing.y * face.y > 0.15)
+                d - s.hit_radius() <= reach
+                    && (d < 0.6 || facing.x * face.x + facing.y * face.y > 0.15)
+                    && (s.kind != "weaver" || self.maps[zone].line_clear(point, s.point(), 0.05))
             })
             .map(|s| s.id)
             .collect();
@@ -5164,7 +5167,7 @@ impl World {
                 !s.dead
                     && s.zone == zone
                     && !skip.contains(&s.id)
-                    && at.distance(s.point()) - s.r < radius
+                    && at.distance(s.point()) - s.hit_radius() < radius
             })
             .map(|s| (at.distance(s.point()), s.id))
             .collect();
@@ -6863,7 +6866,7 @@ impl World {
                     !s.dead
                         && s.zone == b.zone
                         && !b.hits.contains(&s.id)
-                        && segment_distance(s.point(), start, end) < s.r + 0.22
+                        && segment_distance(s.point(), start, end) < s.hit_radius() + 0.22
                         && self.maps[b.zone].line_clear(start, s.point(), 0.05)
                 })
                 .map(|s| (start.distance(s.point()), s.id))

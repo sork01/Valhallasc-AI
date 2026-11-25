@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.13.5",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Wyrdweavers are easier to hit, and autoattacks move into range before swinging. When scenery blocks a Wyrdweaver, autoattacks look for a clear approach.",
+      "Skuldwatch's central beacon lights more of the plaza at night."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.4",
     "date": "2026-11-25",
     "new": [],
