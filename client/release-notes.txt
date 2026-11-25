@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.13.6",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Spark Travel shows the \"You are here\" card when you hover over your current station.",
+      "Target portraits for players and adventurers always face forward."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.5",
     "date": "2026-11-25",
     "new": [],

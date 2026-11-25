@@ -971,8 +971,10 @@
       const on = () => sparkCard(entry, false), off = () => sparkCard(travel?.pinned || null, !!travel?.pinned);
       b.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') on(); });
       b.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') off(); });
-      b.addEventListener('focus', () => { if (!travel.pinned) on(); }); b.addEventListener('blur', () => { if (travel && !travel.pinned) off(); });
+      b.addEventListener('focus', () => { if (entry.state !== 'here' && !travel.pinned) on(); });
+      b.addEventListener('blur', () => { if (travel && !travel.pinned) off(); });
       b.addEventListener('click', event => {
+        if (entry.state === 'here') return;
         // A mouse or the keyboard flies at once; a finger first shows the name and fare, with a Fly button.
         const finger = event.pointerType === 'touch' || event.pointerType === 'pen';
         if (entry.state === 'open' && !finger) { sparkFly(entry); return; }

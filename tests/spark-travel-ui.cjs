@@ -1,5 +1,6 @@
 // Spark Travel in a real browser: the destination is chosen on the world map. Debug commands stage only gold and visits.
-// Run with the bounded runner. MUTATE=fare (the card loses its fare) and MUTATE=touch (a finger flies at once) must fail.
+// Run with the bounded runner. MUTATE=origin opens the current-station card on focus.
+// MUTATE=fare removes the fare and MUTATE=touch flies on the first tap.
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -26,6 +27,7 @@ async function call(name, args = {}) {
     const swap = (from, to) => { assert.ok(source.includes(from), `mutation target: ${from}`); source = source.replace(from, to); };
     if (process.env.MUTATE === 'fare') swap("el('span', Money.text(d.cost), 'wm-spark-cost')", "el('span', '', 'wm-spark-cost')");
     if (process.env.MUTATE === 'touch') swap("const finger = event.pointerType === 'touch' || event.pointerType === 'pen';", 'const finger = false;');
+    if (process.env.MUTATE === 'origin') swap("if (entry.state !== 'here' && !travel.pinned) on();", 'if (!travel.pinned) on();');
     route.fulfill({ contentType: 'text/javascript', body: source });
   });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
@@ -66,6 +68,20 @@ async function call(name, args = {}) {
   check(await page.locator('#npc-dialogue').isHidden() && await page.evaluate(() => WorldMap.open && WorldMap.travel && WorldMap.view === 'world'), 'Choosing Spark Travel opens the world map in place of the conversation');
   check((await page.locator('#wm-title').innerText()).includes('Spark Travel') && await page.locator('#wm-foot-travel').isVisible() && await page.locator('#wm-foot').isHidden(), 'The map says it is choosing a Spark Travel destination');
   check(await station(A).getAttribute('data-state') === 'here', 'The station the hero stands at is marked');
+  check(await card.isHidden(), 'Opening Spark Travel leaves the current-station card hidden');
+  await station(A).hover();
+  check(await card.isVisible() && (await card.innerText()).includes('You are here'), 'Hovering over the current station shows its card');
+  await page.locator('#wm-title').hover();
+  check(await card.isHidden(), 'Moving the pointer away hides the current-station card');
+  await page.keyboard.press('Enter');
+  check(await card.isHidden(), 'Activating the focused current station leaves its card hidden');
+  await station(A).evaluate(b => b.dispatchEvent(new PointerEvent('click', { pointerType: 'touch', bubbles: true })));
+  check(await card.isHidden(), 'Tapping the current station leaves its card hidden');
+  if (process.argv.includes('--current-station-only')) {
+    check(errors.length === 0, `No browser errors: ${errors.join('; ')}`);
+    console.log(JSON.stringify({ passed: true, checks }));
+    return;
+  }
   check(await page.evaluate(id => {
     const b = document.querySelector(`.wm-spark[data-station="${id}"]`).getBoundingClientRect(), t = document.querySelector('.wm-tile[data-zone="0"]').getBoundingClientRect();
     const x = b.left + b.width / 2, y = b.top + b.height / 2;

@@ -41,8 +41,9 @@ marker placed with `atlasPosition`.
 
 - Gold: the station the hero stands at. Bright: can be flown to now. Grey: discovered, but a stop on the way is not,
   or the purse is short. Small dark dot: not discovered; shown only where the hero has charted the ground.
-- Hovering or focusing a station shows a card with its name, the stops on the way, and the fare or the reason it
-  cannot be reached, and draws the route through its stations. All of that comes from the server's `travel` offers.
+- Hovering over the current station shows its “You are here” card. Hovering or focusing a destination shows its
+  name, the stops on the way, and the fare or the reason it cannot be reached. It also draws the route through its
+  stations. The route and fare come from the server's `travel` offers.
 - A mouse click or Enter on a bright station starts the flight. A finger first pins the card, which then has a Fly
   button.
 - A refused flight reopens the conversation with the server's reason.

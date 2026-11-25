@@ -3603,7 +3603,12 @@
     if (target.npc) { const n = City.npcs.find(n => n.id === target.id); return n ? City.portraitTo(n, canvas) : false; }
     if (target.player) {
       const g=canvas.getContext('2d'), remote=remotePlayers.get(target.id); g.clearRect(0,0,96,96);
-      if (remote?.sprite) { const sprite=remote.sprite, frame=sprite.frame('idle',MageSprite.direction(remote.fx,remote.fy),0); g.imageSmoothingEnabled=false; g.drawImage(frame,...(sprite.meta.portrait||[56,18,48,48]),0,0,96,96); return true; }
+      if (remote?.sprite) {
+        const sprite = remote.sprite, frame = sprite.frame('idle', 0, 0); // direction 0 faces the camera
+        g.imageSmoothingEnabled = false;
+        g.drawImage(frame, ...(sprite.meta.portrait || [56, 18, 48, 48]), 0, 0, 96, 96);
+        return true;
+      }
       g.fillStyle='#352c49'; g.fillRect(0,0,96,96); g.fillStyle='#f8e0a4'; g.font='bold 50px sans-serif'; g.textAlign='center'; g.fillText(target.name.slice(0,1).toUpperCase(),48,65); return false;
     }
     const g = canvas.getContext('2d'), s = { kind: target.kind, d: SLIME[target.kind] }, src = enemySource(s), img = src?.img[target.kind];
