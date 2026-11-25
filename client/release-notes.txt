@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.13.1",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "The Platinum Rod now works at Wyrdwood shores, including rich fishing spots.",
+      "Wyrdweavers hold their ground when you move in close."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.0",
     "date": "2026-11-25",
     "new": [

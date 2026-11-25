@@ -141145,9 +141145,7 @@
     "fishing": {
       "tier": 3,
       "lava": true,
-      "zones": [
-        6
-      ],
+      "zones": [],
       "richZones": [
         2,
         3
@@ -141234,7 +141232,8 @@
       "tier": 2,
       "lava": true,
       "zones": [
-        1
+        1,
+        6
       ],
       "richZones": []
     }

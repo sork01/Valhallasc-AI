@@ -31,7 +31,7 @@ fn fishing_progression_all_waters_name_the_required_rod_and_reject_its_predecess
         (1, 2),
         (2, 1),
         (3, 1),
-        (6, 3),
+        (6, 2),
         (19, 5),
         (20, 4),
         (22, 4),
@@ -101,14 +101,14 @@ fn fishing_progression_every_upgrade_keeps_earlier_waters_and_replaces_one_rod()
     let (mut w, _rx) = super::super::fishing_tests::angler();
     // All old save IDs still exist, and a single high rod handles water and both lava areas.
     for r in RODS.iter() {
-        for zone in [0, 1, 45] {
+        for zone in [0, 1, 6, 45] {
             at_pool(&mut w, zone, &r.item);
             assert_eq!(
                 w.fishing_line(1, 20., false).is_ok(),
                 r.tier
                     >= if zone == 45 {
                         6
-                    } else if zone == 1 {
+                    } else if [1, 6].contains(&zone) {
                         2
                     } else {
                         1

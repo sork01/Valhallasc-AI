@@ -6430,7 +6430,7 @@ impl World {
                         } else if d < r.range * 0.35
                             && matches!(
                                 s.kind.as_str(),
-                                "archer" | "acolyte" | "crow" | "weaver" | "skyray"
+                                "archer" | "acolyte" | "crow" | "skyray"
                             )
                         {
                             // Too close for comfort: back away from the hero while the shot recovers.

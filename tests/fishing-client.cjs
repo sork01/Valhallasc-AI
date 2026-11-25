@@ -69,6 +69,16 @@ function fixture() {
     touch:on=>{touch=on;events['(pointer: coarse)change']();}};
 }
 const f=fixture(), {ctx,el,cues,sent,errors}=f, fishing=ctx.Fishing;
+const shipped = { window: {} };
+vm.runInNewContext(read('client/items.js'), shipped);
+ctx.WORLD_ITEMS = shipped.window.WORLD_ITEMS;
+if (process.env.MUTATE === 'wyrdwood-rod') {
+  ctx.WORLD_ITEMS.find(item => item.id === 'rod_emberline_rod').fishing.zones = [1];
+  ctx.WORLD_ITEMS.find(item => item.id === 'rod_willow_rod').fishing.zones = [6];
+}
+check(fishing.requirement(6) === 'Requires Platinum Rod · level 5' &&
+  fishing.requirement(6, true) === 'Requires Platinum Rod · level 5', 'Wyrdwood shores and rich spots name the Platinum Rod');
+check(fishing.requirement(3, true) === 'Requires Willow Rod · level 10', 'Gloamfen rich spots still name the Willow Rod');
 const areas = [map, ...map.zones];
 function reachableZones(level) {
   const routes = [0], visited = new Set(routes);

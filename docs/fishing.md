@@ -180,8 +180,8 @@ Item kind `rod` (not a worn slot: the best rod in the bags is used; a tenth-slot
 | Tier | Rod | Level | Newly unlocked fishing |
 | --- | --- | --- | --- |
 | 1 | Twig Rod | 1 | Greenmeadow and ordinary Rimeveil/Gloamfen waters; buy for 50 copper |
-| 2 | Platinum Rod | 5 | Emberfall Crags lava; retains ordinary water |
-| 3 | Willow Rod | 10 | Wyrdwood; rich Rimeveil/Gloamfen spots |
+| 2 | Platinum Rod | 5 | Emberfall Crags lava and Wyrdwood shores |
+| 3 | Willow Rod | 10 | Rich Rimeveil and Gloamfen spots |
 | 4 | Reedglass Rod | 25 | Sunward, Tanglecrown and rare water species |
 | 5 | Silverline Rod | 40 | Stormglass and Lapis Erg |
 | 6 | Tempered Platinum Rod | 45 | Emberwake lava |
