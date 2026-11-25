@@ -128,7 +128,7 @@ let browser;
     }, {spot,type});
     assert(hit, 'the gathering sprite can be hit at the chosen camera position');
     const action = type === 'picking' ? 'pick_flower' : 'mine';
-    await world.waitFor(() => requests.some(packet => packet.type === action && packet.id === spot.id), 12000,
+    await world.waitFor(() => requests.some(packet => packet.type === action && packet.id === spot.id), 25000,
       'the client starts gathering from the selected node after walking into range').catch(async error => {
       const state = await page.evaluate(() => ({ point: [Field.hero.x, Field.hero.y],
         route: Field._debug.cityRoute, system: document.getElementById('system-log').textContent.slice(-500) }));

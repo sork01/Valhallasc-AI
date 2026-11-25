@@ -216,6 +216,18 @@ hero.x = 109;
 context.followGathering();
 assert.deepEqual(sent.slice(-2),[{type:'stop'},{type:'mine',id:13}],
   'arriving in range stops walking and begins the pull');
+const cornerStep = fieldSource.match(/^\s*while\(cityRoute\.length>1.*$/m)[0];
+function corner(clear, pendingGather) {
+  const cityRoute = [{x:1,y:0},{x:1,y:7}];
+  vm.runInNewContext(cornerStep, {
+    cityRoute, pendingGather, sx:0, sy:0, ahead:3, m:{v:10},
+    advanced:false, segmentFree:() => clear,
+  });
+  return cityRoute.length;
+}
+assert.equal(corner(false, {id:13}), 2, 'gathering does not turn too early past an obstacle');
+assert.equal(corner(true, {id:13}), 1, 'gathering advances as soon as the next leg is clear');
+assert.equal(corner(false, null), 1, 'existing travel keeps its early corner advance');
 Blacksmithing.reset();
 assert.equal(Blacksmithing.nearbyVein,null);
 console.log('Blacksmithing client passed Swedish rendering, action gating, canvas hit detection, animated art and cues.');

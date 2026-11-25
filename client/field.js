@@ -1582,7 +1582,7 @@
     // Connect the real position to a nearby clear cell before searching the grid.
     const sources=[];
     for(let x=Math.floor(origin.x)-3;x<=Math.ceil(origin.x)+3;x++) for(let y=Math.floor(origin.y)-3;y<=Math.ceil(origin.y)+3;y++) {
-      if(free(x,y) && segmentFree(origin,{x,y})) sources.push([x,y]);
+      if(free(x,y) && segmentFree(origin,{x,y},canReach ? .45 : .3)) sources.push([x,y]);
     }
     sources.sort((a,b)=>Math.hypot(a[0]-origin.x,a[1]-origin.y)-Math.hypot(b[0]-origin.x,b[1]-origin.y));
     if(!sources.length)return [];
@@ -3334,7 +3334,8 @@
           const sx=Number.isFinite(hero.nx)?hero.nx:hero.x, sy=Number.isFinite(hero.ny)?hero.ny:hero.y, m=routeMotion;
           if(tAll-m.t>=.25){const moved=Math.hypot(sx-m.x,sy-m.y);if(moved>0)m.v=clamp(moved/(tAll-m.t),3,30);m.x=sx;m.y=sy;m.t=tAll;}
           const ahead=clamp(m.v*.45,.9,6);let advanced=false;
-          while(cityRoute.length>1&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<ahead&&(segmentFree({x:sx,y:sy},cityRoute[1],.45)||Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<m.v*.15)){cityRoute.shift();advanced=true;}
+          // A gathering route must reach the safe side of a corner before aiming for the next leg.
+          while(cityRoute.length>1&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<ahead&&(segmentFree({x:sx,y:sy},cityRoute[1],.45)||(!pendingGather&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<m.v*.15))){cityRoute.shift();advanced=true;}
           if(cityRoute.length===1&&(Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<.32||Math.hypot(hero.x-cityRoute[0].x,hero.y-cityRoute[0].y)<.32)){cityRoute.shift();advanced=true;}
           if(cityRoute.length&&(advanced||tAll-routeTime>.35)){Online.send({type:'move',...cityRoute[0]});routeTime=tAll;}
         }
