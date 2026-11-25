@@ -1922,7 +1922,11 @@
     if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); effects.push({kind:'chestOpen',x:event.x,y:event.y,t:0,life:1.3}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
     if (event.kind === 'levelup') levelUpFx(event);
     if (event.kind === 'rebirth') rebirthFx(event);
-    if (event.kind === 'slam') { effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 }); burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10); kick(event.value > 4 ? 14 : 9, .45); }
+    if (event.kind === 'slam') {
+      effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 });
+      burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10);
+      if (Math.hypot(event.x - hero.x, event.y - hero.y) <= 50) kick(event.value > 4 ? 14 : 9, .45);
+    }
     if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {

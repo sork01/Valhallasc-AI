@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.13.4",
+    "date": "2026-11-25",
+    "new": [],
+    "changed": [
+      "Enemy ground slams shake your screen only within 50 tiles of the impact."
+    ],
+    "removed": []
+  },
+  {
     "version": "1.13.3",
     "date": "2026-11-25",
     "new": [],
