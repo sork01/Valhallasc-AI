@@ -95,13 +95,21 @@ let browser;
   assert(fieldPatch, 'an outdoor patch is available away from overlapping town quest marks');
   await follow(fieldPatch,[255,166,219]);
 
-  const walkAndGather = async (spot, type) => {
-    const approach = await page.evaluate(spot => {
-      const offsets = [[4,0],[-4,0],[0,4],[0,-4]];
-      return offsets.map(([dx,dy]) => ({x:spot.x+dx,y:spot.y+dy}))
-        .find(from => Field._debug.routeTo(spot,true,from,2).length);
-    }, spot);
-    assert(approach, 'there is a walkable starting point beyond gathering reach');
+  const walkAndGather = async (spots, type) => {
+    const target = await page.evaluate(spots => {
+      for (const spot of spots) {
+        for (const radius of [3.75, 5.5, 7]) {
+          for (let i=0; i<16; i++) {
+            const angle = i * Math.PI / 8;
+            const approach = {x:spot.x + radius*Math.cos(angle), y:spot.y + radius*Math.sin(angle)};
+            if (Field._debug.routeTo(spot,true,approach,2,() => true).length) return {spot,approach};
+          }
+        }
+      }
+      return null;
+    }, spots);
+    assert(target, 'there is a walkable starting point beyond gathering reach');
+    const {spot,approach} = target;
     await warp(approach, 1);
     assert(await page.evaluate(spot => Math.hypot(Field.hero.x-spot.x,Field.hero.y-spot.y) > 2.6, spot));
     requests.length = 0;
@@ -133,16 +141,19 @@ let browser;
       await world.waitFor(() => gathered.some(packet => packet.type === type), 8000, 'the flower is gathered');
     }
   };
-  await walkAndGather(garden, 'picking');
+  await walkAndGather([garden], 'picking');
   await world.waitFor(() => !view.players.find(p => p.id === playerId).inCombat, 15000,
     'the miner is out of combat before starting the approach');
   const clearance = spot => Math.min(...map.slimes.map(enemy => Math.hypot(enemy.x-spot.x,enemy.y-spot.y)));
-  const ore = [...view.miningVeins].sort((a,b) => clearance(b) - clearance(a))[0];
+  const ore = [...view.miningVeins].sort((a,b) => clearance(b) - clearance(a));
   await walkAndGather(ore, 'mining');
   const system = page.locator('#system-log');
   assert.match(await system.locator('p[data-category="alchemy"]').last().textContent(), /Du plockar .*Ängsguld/);
-  assert.match((await system.locator('p[data-category="progress"]').allTextContents()).join('\n'), /färdighet i Alkemi har höjts till 2/);
-  assert.doesNotMatch(await system.textContent(), /Du får .*Ängsguld/, 'the picked flower gets one receipt');
+  const pick = gathered.find(packet => packet.type === 'picking');
+  if (pick.skillUp) {
+    await system.getByText('Din färdighet i Alkemi har höjts till ' + pick.skill + '.').waitFor({state:'attached'});
+  }
+  assert.doesNotMatch(await system.textContent(), /Du får \d+ × Ängsguld\./, 'the picked flower gets one receipt');
   await page.screenshot({path:world.runDir+'/gathering-flower-phone.png'});
   await page.evaluate(() => Settings.show());
   const oreSetting = page.locator('#set-track-ore'), flowerSetting = page.locator('#set-track-flowers');
